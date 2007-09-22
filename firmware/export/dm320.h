@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: $
+ * $Id$
  *
  * Copyright (C) 2007 by Karl Kurbjun
  *
@@ -30,33 +30,33 @@
 #define DM320_REG(addr) (*(volatile unsigned short *)(PHY_IO_BASE + (addr)))
 
 /* Timer 0-3 */
-#define IO_TIMER0_TMMD            0x0000
-#define IO_TIMER0_TMRSV0          0x0002
-#define IO_TIMER0_TMPRSCL         0x0004
-#define IO_TIMER0_TMDIV           0x0006
-#define IO_TIMER0_TMTRG           0x0008
-#define IO_TIMER0_TMCNT           0x000A
+#define IO_TIMER0_TMMD            DM320_REG(0x0000)
+#define IO_TIMER0_TMRSV0          DM320_REG(0x0002)
+#define IO_TIMER0_TMPRSCL         DM320_REG(0x0004)
+#define IO_TIMER0_TMDIV           DM320_REG(0x0006)
+#define IO_TIMER0_TMTRG           DM320_REG(0x0008)
+#define IO_TIMER0_TMCNT           DM320_REG(0x000A)
 
-#define IO_TIMER1_TMMD            0x0080
-#define IO_TIMER1_TMRSV0          0x0082
-#define IO_TIMER1_TMPRSCL         0x0084
-#define IO_TIMER1_TMDIV           0x0086
-#define IO_TIMER1_TMTRG           0x0088
-#define IO_TIMER1_TMCNT           0x008A
+#define IO_TIMER1_TMMD            DM320_REG(0x0080)
+#define IO_TIMER1_TMRSV0          DM320_REG(0x0082)
+#define IO_TIMER1_TMPRSCL         DM320_REG(0x0084)
+#define IO_TIMER1_TMDIV           DM320_REG(0x0086)
+#define IO_TIMER1_TMTRG           DM320_REG(0x0088)
+#define IO_TIMER1_TMCNT           DM320_REG(0x008A)
 
-#define IO_TIMER2_TMMD            0x0100
-#define IO_TIMER2_TMVDCLR         0x0102
-#define IO_TIMER2_TMPRSCL         0x0104
-#define IO_TIMER2_TMDIV           0x0106
-#define IO_TIMER2_TMTRG           0x0108
-#define IO_TIMER2_TMCNT           0x010A
+#define IO_TIMER2_TMMD            DM320_REG(0x0100)
+#define IO_TIMER2_TMVDCLR         DM320_REG(0x0102)
+#define IO_TIMER2_TMPRSCL         DM320_REG(0x0104)
+#define IO_TIMER2_TMDIV           DM320_REG(0x0106)
+#define IO_TIMER2_TMTRG           DM320_REG(0x0108)
+#define IO_TIMER2_TMCNT           DM320_REG(0x010A)
 
-#define IO_TIMER3_TMMD            0x0180
-#define IO_TIMER3_TMVDCLR         0x0182
-#define IO_TIMER3_TMPRSCL         0x0184
-#define IO_TIMER3_TMDIV           0x0186
-#define IO_TIMER3_TMTRG           0x0188
-#define IO_TIMER3_TMCNT           0x018A
+#define IO_TIMER3_TMMD            DM320_REG(0x0180)
+#define IO_TIMER3_TMVDCLR         DM320_REG(0x0182)
+#define IO_TIMER3_TMPRSCL         DM320_REG(0x0184)
+#define IO_TIMER3_TMDIV           DM320_REG(0x0186)
+#define IO_TIMER3_TMTRG           DM320_REG(0x0188)
+#define IO_TIMER3_TMCNT           DM320_REG(0x018A)
 
 /* Serial 0/1 */
 #define IO_SERIAL0_TX_DATA        DM320_REG(0x0200)
@@ -144,30 +144,30 @@
 #define IO_SDIO_INT_STATUS        0x04D0
 
 /* Interrupt Controller */
-#define IO_INTC_FIQ0              0x0500
-#define IO_INTC_FIQ1              0x0502
-#define IO_INTC_FIQ2              0x0504
-#define IO_INTC_IRQ0              0x0508
-#define IO_INTC_IRQ1              0x050A
-#define IO_INTC_IRQ2              0x050C
-#define IO_INTC_FIQENTRY0         0x0510
-#define IO_INTC_FIQENTRY1         0x0512
-#define IO_INTC_FIQ_LOCK_ADDR0    0x0514
-#define IO_INTC_FIQ_LOCK_ADDR1    0x0516 
-#define IO_INTC_IRQENTRY0         0x0518
-#define IO_INTC_IRQENTRY1         0x051A
-#define IO_INTC_IRQ_LOCK_ADDR0    0x051C
-#define IO_INTC_IRQ_LOCK_ADDR1    0x051E
-#define IO_INTC_FISEL0            0x0520
-#define IO_INTC_FISEL1            0x0522
-#define IO_INTC_FISEL2            0x0524
-#define IO_INTC_EINT0             0x0528
-#define IO_INTC_EINT1             0x052A
-#define IO_INTC_EINT2             0x052C
-#define IO_INTC_RAW               0x0530
-#define IO_INTC_ENTRY_TBA0        0x0538
-#define IO_INTC_ENTRY_TBA1        0x053A
-#define IO_INTC_PRIORITY0         0x0540
+#define IO_INTC_FIQ0              DM320_REG(0x0500)
+#define IO_INTC_FIQ1              DM320_REG(0x0502)
+#define IO_INTC_FIQ2              DM320_REG(0x0504)
+#define IO_INTC_IRQ0              DM320_REG(0x0508)
+#define IO_INTC_IRQ1              DM320_REG(0x050A)
+#define IO_INTC_IRQ2              DM320_REG(0x050C)
+#define IO_INTC_FIQENTRY0         DM320_REG(0x0510)
+#define IO_INTC_FIQENTRY1         DM320_REG(0x0512)
+#define IO_INTC_FIQ_LOCK_ADDR0    DM320_REG(0x0514)
+#define IO_INTC_FIQ_LOCK_ADDR1    DM320_REG(0x0516)
+#define IO_INTC_IRQENTRY0         DM320_REG(0x0518)
+#define IO_INTC_IRQENTRY1         DM320_REG(0x051A)
+#define IO_INTC_IRQ_LOCK_ADDR0    DM320_REG(0x051C)
+#define IO_INTC_IRQ_LOCK_ADDR1    DM320_REG(0x051E)
+#define IO_INTC_FISEL0            DM320_REG(0x0520)
+#define IO_INTC_FISEL1            DM320_REG(0x0522)
+#define IO_INTC_FISEL2            DM320_REG(0x0524)
+#define IO_INTC_EINT0             DM320_REG(0x0528)
+#define IO_INTC_EINT1             DM320_REG(0x052A)
+#define IO_INTC_EINT2             DM320_REG(0x052C)
+#define IO_INTC_RAW               DM320_REG(0x0530)
+#define IO_INTC_ENTRY_TBA0        DM320_REG(0x0538)
+#define IO_INTC_ENTRY_TBA1        DM320_REG(0x053A)
+#define IO_INTC_PRIORITY0         DM320_REG(0x0540)
 #define IO_INTC_PRIORITY1         0x0542
 #define IO_INTC_PRIORITY2         0x0544
 #define IO_INTC_PRIORITY3         0x0546
@@ -701,5 +701,43 @@
 #define IRQ_RESERVED   45
 
 #define NR_IRQS        46
+
+/*  Taken from linux/include/asm-arm/arch-integrator/timex.h
+ *
+ *  Copyright (C) 1999 ARM Limited
+ */
+
+#define CONFIG_TIMER1_TMPRSCL          0x000A
+#define CLOCK_TICK_RATE                (CPUFREQ_MAX / CONFIG_TIMER1_TMPRSCL)
+#define CONFIG_TIMER1_TMDIV            (unsigned short)(CLOCK_TICK_RATE / HZ)
+
+#define CONFIG_TIMER0_TMMD_STOP        0x0000
+#define CONFIG_TIMER0_TMMD_ONE_SHOT    0x0001
+#define CONFIG_TIMER0_TMMD_FREE_RUN    0x0002
+
+#define CONFIG_TIMER1_TMMD_STOP        0x0000
+#define CONFIG_TIMER1_TMMD_ONE_SHOT    0x0001
+#define CONFIG_TIMER1_TMMD_FREE_RUN    0x0002
+
+#define CONFIG_TIMER2_TMMD_STOP        0x0000
+#define CONFIG_TIMER2_TMMD_ONE_SHOT    0x0001
+#define CONFIG_TIMER2_TMMD_FREE_RUN    0x0002
+#define CONFIG_TIMER2_TMMD_CCD_SHUTTER 0x0100
+#define CONFIG_TIMER2_TMMD_CCD_STROBE  0x0200
+#define CONFIG_TIMER2_TMMD_POLARITY    0x0400
+#define CONFIG_TIMER2_TMMD_TRG_SELECT  0x0800
+#define CONFIG_TIMER2_TMMD_TRG_READY   0x1000
+#define CONFIG_TIMER2_TMMD_SIGNAL      0x2000
+
+#define CONFIG_TIMER3_TMMD_STOP        0x0000
+#define CONFIG_TIMER3_TMMD_ONE_SHOT    0x0001
+#define CONFIG_TIMER3_TMMD_FREE_RUN    0x0002
+#define CONFIG_TIMER3_TMMD_CCD_SHUTTER 0x0100
+#define CONFIG_TIMER3_TMMD_CCD_STROBE  0x0200
+#define CONFIG_TIMER3_TMMD_POLARITY    0x0400
+#define CONFIG_TIMER3_TMMD_TRG_SELECT  0x0800
+#define CONFIG_TIMER3_TMMD_TRG_READY   0x1000
+#define CONFIG_TIMER3_TMMD_SIGNAL      0x2000
+
 
 #endif

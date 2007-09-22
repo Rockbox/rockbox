@@ -95,7 +95,7 @@ static const char * const irqname[] =
 
 static void UIRQ(void)
 {
-    unsigned int offset = inw(IO_INTC_IRQENTRY0);
+    unsigned int offset = IO_INTC_IRQENTRY0;
     panicf("Unhandled IRQ %02X: %s", offset, irqname[offset]);
 }
 
@@ -105,7 +105,7 @@ void irq_handler(void)
     /*
      * Based on: linux/arch/arm/kernel/entry-armv.S and system-meg-fx.c
      */
-
+    printf("INTERUPT!");
     asm volatile (
         "sub    lr, lr, #4            \r\n"
         "stmfd  sp!, {r0-r3, ip, lr}  \r\n"
@@ -149,23 +149,23 @@ void system_init(void)
     /* taken from linux/arch/arm/mach-itdm320-20/irq.c */
 
   	/* Clearing all FIQs and IRQs. */
-	outw(0xFFFF, IO_INTC_IRQ0);
-	outw(0xFFFF, IO_INTC_IRQ1);
-	outw(0xFFFF, IO_INTC_IRQ2);
+	IO_INTC_IRQ0 = 0xFFFF;
+	IO_INTC_IRQ1 = 0xFFFF;
+	IO_INTC_IRQ2 = 0xFFFF;
 
-	outw(0xFFFF, IO_INTC_FIQ0);
-	outw(0xFFFF, IO_INTC_FIQ1);
-	outw(0xFFFF, IO_INTC_FIQ2);
+	IO_INTC_FIQ0 = 0xFFFF;
+	IO_INTC_FIQ1 = 0xFFFF;
+	IO_INTC_FIQ2 = 0xFFFF;
 
 	/* Masking all Interrupts. */
-	outw(0, IO_INTC_EINT0);
-	outw(0, IO_INTC_EINT1);
-	outw(0, IO_INTC_EINT2);
+	IO_INTC_EINT0 = 0;
+	IO_INTC_EINT1 = 0;
+	IO_INTC_EINT2 = 0;
 
 	/* Setting INTC to all IRQs. */
-	outw(0, IO_INTC_FISEL0);
-	outw(0, IO_INTC_FISEL1);
-	outw(0, IO_INTC_FISEL2);
+	IO_INTC_FISEL0 = 0;
+	IO_INTC_FISEL1 = 0;
+	IO_INTC_FISEL2 = 0;
 }
 
 int system_memory_guard(int newmode)

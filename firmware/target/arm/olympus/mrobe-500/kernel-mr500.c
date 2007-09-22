@@ -27,7 +27,19 @@ extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 void tick_start(unsigned int interval_in_ms)
 {
-   (void)interval_in_ms;
+    IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_STOP;
+    
+    /* Setup the Prescalar */
+    IO_TIMER1_TMPRSCL = CONFIG_TIMER1_TMPRSCL;
+
+    /* Setup the Divisor */
+    IO_TIMER1_TMDIV = CONFIG_TIMER1_TMDIV;
+    
+    /* Turn Timer1 to Free Run mode */
+    IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_FREE_RUN;
+    
+    /* Enable the interrupt */
+    IO_INTC_EINT0 |= 1<<IRQ_TIMER1;
 }
 
 void TIMER4(void)
@@ -45,4 +57,5 @@ void TIMER4(void)
 
     current_tick++;
 
+    IO_INTC_IRQ0 |= 1<<IRQ_TIMER1;
 }

@@ -91,10 +91,7 @@ static inline void flush_icache(void)
 }
 
 #endif /* CONFIG_CPU */
-#else /* CPU_CONFIG == DM320 */
-
-#define inw(p)      (*((volatile unsigned short*)((p) + PHY_IO_BASE)))
-#define outw(v,p)   (*((volatile unsigned short*)((p) + PHY_IO_BASE)) = (v))
+#else
 
 #endif
 

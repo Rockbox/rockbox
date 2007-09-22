@@ -29,59 +29,55 @@ void TIMER0(void)
 {
     if (pfn_timer != NULL)
         pfn_timer();
+    IO_INTC_IRQ0 |= 1<<IRQ_TIMER0;
 }
 
 static void stop_timer(void)
 {
+    IO_INTC_EINT0 &= ~(1<<IRQ_TIMER0);
+
+    IO_INTC_IRQ0 |= 1<<IRQ_TIMER0;
+    
+    IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
 }
 
 bool __timer_set(long cycles, bool start)
 {
+    int oldlevel;
+    unsigned int divider;
     /* taken from linux/arch/arm/mach-itdm320-20/time.c and timer-meg-fx.c */
 
   	/* Turn off all timers */
-/*	outw(CONFIG_TIMER0_TMMD_STOP, IO_TIMER0_TMMD);
-	outw(CONFIG_TIMER1_TMMD_STOP, IO_TIMER1_TMMD);
-	outw(CONFIG_TIMER2_TMMD_STOP, IO_TIMER2_TMMD);
-	outw(CONFIG_TIMER3_TMMD_STOP, IO_TIMER3_TMMD);
- */
-	/* Turn Timer0 to Free Run mode */
-//	outw(CONFIG_TIMER0_TMMD_FREE_RUN, IO_TIMER0_TMMD);
-
-    bool retval = false;
+    IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
+	IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_STOP;
+	IO_TIMER2_TMMD = CONFIG_TIMER2_TMMD_STOP;
+	IO_TIMER3_TMMD = CONFIG_TIMER3_TMMD_STOP;
 
     /* Find the minimum factor that puts the counter in range 1-65535 */
     unsigned int prescaler = (cycles + 65534) / 65535;
 
     /* Test this by writing 1's to registers to see how many bits we have */
     /* Maximum divider setting is x / 1024 / 65536 = x / 67108864 */
+    if (start && pfn_unregister != NULL)
     {
-        int oldlevel;
-        unsigned int divider;
-
-        if (start && pfn_unregister != NULL)
-        {
-            pfn_unregister();
-            pfn_unregister = NULL;
-        }
-
-        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-
-        /* Max prescale is 1023+1 */
-        for (divider = 0; prescaler > 1024; prescaler >>= 1, divider++);
-
-        /* Setup the Prescalar */
-        outw(prescaler, IO_TIMER0_TMPRSCL);
-
-        /* Setup the Divisor */
-        outw(divider, IO_TIMER0_TMDIV);
-
-        set_irq_level(oldlevel);
-
-        retval = true;
+        pfn_unregister();
+        pfn_unregister = NULL;
     }
 
-    return retval;
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    /* Max prescale is 1023+1 */
+    for (divider = 0; prescaler > 1024; prescaler >>= 1, divider++);
+
+    /* Setup the Prescalar */
+    IO_TIMER0_TMPRSCL = prescaler;
+
+    /* Setup the Divisor */
+    IO_TIMER0_TMDIV = divider;
+
+    set_irq_level(oldlevel);
+
+    return true;
 }
 
 bool __timer_register(void)
@@ -93,7 +89,9 @@ bool __timer_register(void)
     stop_timer();
 
     /* Turn Timer0 to Free Run mode */
-	outw(0x0002, IO_TIMER0_TMMD);
+	IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_FREE_RUN;
+
+	IO_INTC_EINT0 |= 1<<IRQ_TIMER0;
 
     set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
 

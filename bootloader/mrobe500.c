@@ -117,8 +117,9 @@ void main(void)
             tsc2100_read_values(&x, &y, &z1, &z2);
             printf("x: %04x y: %04x z1: %04x z2: %04x", x, y, z1, z2);
             printf("tsadc: %4x", tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS)&0xffff);
+            printf("current tick: %04x", current_tick);
             tsc2100_keyclick(); /* doesnt work :( */
-            line -= 2;
+            line -= 3;
         }
 
     }
