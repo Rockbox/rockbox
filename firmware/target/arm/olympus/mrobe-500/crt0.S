@@ -9,6 +9,11 @@
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
  *
+ * Arm bootloader and startup code based on startup.s from the iPodLinux loader
+ *
+ * Copyright (c) 2003, Daniel Palffy (dpalffy (at) rainstorm.org)
+ * Copyright (c) 2005, Bernard Leach <leachbj@bouncycastle.org>
+ *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
  *
