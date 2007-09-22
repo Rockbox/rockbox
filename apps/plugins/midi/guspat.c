@@ -30,7 +30,7 @@ unsigned int readDWord(int file)
 }
 
 int curr_waveform;
-struct GWaveform waveforms[32] IBSS_ATTR;
+struct GWaveform waveforms[256] IBSS_ATTR;
 
 struct GWaveform * loadWaveform(int file)
 {
