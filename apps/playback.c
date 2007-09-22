@@ -391,7 +391,11 @@ void mp3_play_pause(bool play)
 
 bool mp3_is_playing(void)
 {
+#ifdef PLAYBACK_VOICE
     return voice_is_playing;
+#else
+    return false;
+#endif
 }
 
 /* If voice could be swapped out - wait for it to return
@@ -425,7 +429,9 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
     {
         audio_hard_stop();
         wait_for_voice_swap_in();
+#ifdef PLAYBACK_VOICE
         voice_stop();
+#endif
     }
     /* else buffer_state will be BUFFER_STATE_TRASHED at this point */
 
@@ -521,7 +527,9 @@ unsigned char *audio_get_recording_buffer(size_t *buffer_size)
        of pending events to ensure trouble-free operation of encoders */
     audio_hard_stop();
     wait_for_voice_swap_in();
+#ifdef PLAYBACK_VOICE
     voice_stop();
+#endif
     talk_buffer_steal();
 
 #ifdef PLAYBACK_VOICE
@@ -931,7 +939,6 @@ static void swap_codec(void)
    before it is called */
 static void voice_stop(void)
 {
-#ifdef PLAYBACK_VOICE
     /* Must have a voice codec loaded or we'll hang forever here */
     if (!voice_codec_loaded)
         return;
@@ -947,7 +954,6 @@ static void voice_stop(void)
 
     if (!playing)   
         pcmbuf_play_stop();
-#endif
 } /* voice_stop */
 
 /* Is voice still speaking */
@@ -959,15 +965,17 @@ static bool is_voice_speaking(void)
         || (!playing && pcm_is_playing());
 }
 
+#endif /* PLAYBACK_VOICE */
+
 /* Wait for voice to finish speaking. */
 /* Also only reliable when music is not also playing. */
 void voice_wait(void)
 {
+#ifdef PLAYBACK_VOICE
     while (is_voice_speaking())
         sleep(HZ/10);
+#endif
 }
-
-#endif /* PLAYBACK_VOICE */
 
 static void set_filebuf_watermark(int seconds)
 {
