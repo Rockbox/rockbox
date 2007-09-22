@@ -149,6 +149,7 @@ int flash_read_id(int no) {
 int flash_read_sector(int sector, unsigned char* buf,
                       unsigned char* oob)
 {
+    unsigned long *bufl = (unsigned long *)buf;
     int chip, chip_sector;
     int i;
     
@@ -167,8 +168,29 @@ int flash_read_sector(int sector, unsigned char* buf,
     
     flash_wait_ready();
     
-    for (i = 0; i < 512; i++)
-        buf[i] = flash_read_data();
+    if ((unsigned long)buf & 3)
+    {
+        for (i = 0; i < 512; i++)
+            buf[i] = flash_read_data();
+    }
+    else
+    {
+        for (i = 0; i < 512 / 4; i++) {
+            unsigned long v;
+#ifdef ROCKBOX_LITTLE_ENDIAN
+            v = flash_read_data();
+            v |= (unsigned long)flash_read_data() << 8;
+            v |= (unsigned long)flash_read_data() << 16;
+            v |= (unsigned long)flash_read_data() << 24;
+#else
+            v = (unsigned long)flash_read_data() << 24;
+            v |= (unsigned long)flash_read_data() << 16;
+            v |= (unsigned long)flash_read_data() << 8;
+            v |= flash_read_data();
+#endif
+            bufl[i] = v;
+        }
+    }
 
     flash_write_cmd(0x05);
     flash_write_addr((chip_sector & 3) * 0x10);
