@@ -1,0 +1,104 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id: $
+ *
+ * Copyright (C) 2007 by Jonathan Gordon
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+#ifndef __TSC2100_H_
+#define __TSC2100_H_
+
+/* Read X, Y, Z1, Z2 touchscreen coordinates. */
+void tsc2100_read_values(short *x, short* y, short *z1, short *z2);
+
+/* read a register */
+short tsc2100_readreg(int page, int address);
+/* write a value to the register */
+void tsc2100_writereg(int page, int address, short value);
+
+/* ts adc page defines (page 1, 00h ) (refer to page 40 of the datasheet) */
+#define TSADC_PAGE          1
+#define TSADC_ADDRESS       0x00
+#define TSADC_PSTCM         (1<<15)
+#define TSADC_ADST          (1<<14)
+#define TSADC_ADSCM_MASK    (0x3C00)
+#define TSADC_ADSCM_SHIFT   10
+#define TSADC_RESOL_MASK    (0x0300)
+#define TSADC_RESOL_SHIFT   8
+#define TSADC_ADAVG_MASK    (0x00C0)
+#define TSADC_ADAVG_SHIFT   6
+#define TSADC_ADCR_MASK     (0x0030)
+#define TSADC_ADCR_SHIFT    4
+#define TSADC_PVSTC_MASK    (0x000E)
+#define TSADC_PVSTC_SHIFT   1
+#define TSADC_AVGFS         (1<<0)
+
+/* ts status page defines (page 1, 01h ) (refer to page 41 of the datasheet) */
+#define TSSTAT_PAGE             1
+#define TSSTAT_ADDRESS          0x01
+#define TSSTAT_PINTDAV_MASK     0xC000 /* controls the !PINTDAV pin */
+#define TSSTAT_PINTDAV_SHIFT    14
+/* these are all read only */
+#define TSSTAT_PWRDN            (1<<13)
+#define TSSTAT_HCTLM            (1<<12)
+#define TSSTAT_DAVAIL           (1<<11)
+#define TSSTAT_XSTAT            (1<<10)
+#define TSSTAT_YSTAT            (1<<9)
+#define TSSTAT_Z1STAT           (1<<8)
+#define TSSTAT_Z2STAT           (1<<7)
+#define TSSTAT_B1STAT           (1<<6)
+#define TSSTAT_B2STAT           (1<<5)
+#define TSSTAT_AXSTAT           (1<<4)
+// Bit 3 is reserved            (1<<3)
+#define TSSTAT_T1STAT           (1<<2)
+#define TSSTAT_T2STAT           (1<<1)
+// Bit 0 is reserved            (1<<0)
+
+/* ts Reset Control */
+#define TSRESET_PAGE    1
+#define TSRESET_ADDRESS 0x04
+#define TSRESET_VALUE   0xBB00
+
+
+
+/* ts audio control 2 */
+#define TSAC2_PAGE          2
+#define TSAC2_ADDRESS       0x04
+#define TSAC2_KCLEN         (1<<15)
+#define TSAC2_KCLAC_MASK    0x7000
+#define TSAC2_KCLSC_SHIFT   12
+#define TSAC2_APGASS        (1<<11)
+#define TSAC2_KCLFRQ_MASK   0x0700
+#define TSAC2_KCLFRQ_SHIFT  8
+#define TSAC2_KCLLN_MASK    0x00F0
+#define TSAC2_KCLLN_SHIFT   4
+#define TSAC2_DLGAF         (1<<3) /* r only */
+#define TSAC2_DRGAF         (1<<2) /* r only */
+#define TSAC2_DASTC         (1<<1)
+#define TSAC2_ADGAF         (1<<0) /* r only */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif

@@ -38,8 +38,9 @@
 #include "common.h"
 #include "rbunicode.h"
 #include "usb.h"
-#include "spi-target.h"
+#include "spi.h"
 #include "uart-target.h"
+#include "tsc2100.h"
 
 extern int line;
 
@@ -59,7 +60,7 @@ void main(void)
     uartSetup();
     lcd_init();
     font_init();
-    dm320_spi_init();
+    spi_init();
 
     lcd_setfont(FONT_SYSFIXED);
 
@@ -102,7 +103,7 @@ void main(void)
 
     printf("ATA");
     
-    outw(inw(IO_GIO_DIR1)&~(1<<10), IO_GIO_DIR1); // set GIO26 to output
+    outw(inw(IO_GIO_DIR1)&~(1<<10), IO_GIO_DIR1); // set GIO26 (reset pin) to output
     while(true)
     {
         if (button_read_device() == BUTTON_POWER)
@@ -110,20 +111,15 @@ void main(void)
             printf("reset");
             outw(1<<10, IO_GIO_BITSET1);
         }
-        
-        // Read X, Y, Z1, Z2 touchscreen coordinates.
-        int page = 0, address = 0;
-        unsigned short command = 0x8000|(page << 11)|(address << 5);
-        unsigned char out[] = {command >> 8, command & 0xff};
-        unsigned char in[8];
-        dm320_spi_block_transfer(out, sizeof(out), in, sizeof(in));
-
-        printf("%02x%02x %02x%02x %02x%02x %02x%02x\n",
-            in[0], in[1],
-            in[2], in[3],
-            in[4], in[5],
-            in[6], in[7]);
-        line--;
+   //     if ((inw(IO_GIO_BITSET0)&(1<<14)) == 0)
+        {
+            short x,y,z1,z2, reg;
+            tsc2100_read_values(&x, &y, &z1, &z2);
+            printf("x: %04x y: %04x z1: %04x z2: %04x", x, y, z1, z2);
+            printf("tsadc: %4x", tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS)&0xffff);
+            tsc2100_keyclick(); /* doesnt work :( */
+            line -= 2;
+        }
 
     }
 #if 0

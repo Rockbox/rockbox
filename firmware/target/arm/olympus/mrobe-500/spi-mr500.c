@@ -31,8 +31,8 @@
 #define clr_gio_enable() outw(GIO_TS_ENABLE, IO_GIO_BITSET1)
 #define set_gio_enable() outw(GIO_TS_ENABLE, IO_GIO_BITCLR1)
 
-int dm320_spi_block_transfer(const uint8_t *tx_bytes, unsigned int tx_size,
-    uint8_t *rx_bytes, unsigned int rx_size)
+int spi_block_transfer(const uint8_t *tx_bytes, unsigned int tx_size,
+                             uint8_t *rx_bytes, unsigned int rx_size)
 {
     /* Activate the slave select pin */
     set_gio_enable();
@@ -63,7 +63,7 @@ int dm320_spi_block_transfer(const uint8_t *tx_bytes, unsigned int tx_size,
     return 0;
 }
 
-void dm320_spi_init(void)
+void spi_init(void)
 {
     /* Set SCLK idle level = 0 */
     IO_SERIAL0_MODE |= (1<<10);

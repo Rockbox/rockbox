@@ -253,6 +253,11 @@ drivers/usb/arcotg_udc.c
 #endif /* !defined(BOOTLOADER) */
 #endif /* !defined(SIMULATOR) */
 
+/* Other Random Hardware */
+#ifdef HAVE_TSC2100
+drivers/tsc2100.c
+#endif
+
 /* CPU Specific - By class then particular chip if applicable */
 #if defined(CPU_SH)
 

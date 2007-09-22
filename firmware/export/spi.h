@@ -16,14 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
-#ifndef SPI_TARGET_H
-#define SPI_TARGET_H
+#ifndef __SPI_H__
+#define __SPI_H__
 
-#include <inttypes.h>
-
-void spi_init(void);
 int spi_block_transfer(const uint8_t *tx_bytes, unsigned int tx_size,
                              uint8_t *rx_bytes, unsigned int rx_size);
+void spi_init(void);
 
 #endif
