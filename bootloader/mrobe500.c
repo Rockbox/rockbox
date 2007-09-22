@@ -41,13 +41,15 @@
 #include "spi-target.h"
 #include "uart-target.h"
 
+extern int line;
+
 void main(void)
 {
-    unsigned char* loadbuffer;
+/*    unsigned char* loadbuffer;
     int buffer_size;
     int rc;
     int(*kernel_entry)(void);
-
+*/
     power_init();
     system_init();
     kernel_init();
@@ -115,12 +117,14 @@ void main(void)
         unsigned char out[] = {command >> 8, command & 0xff};
         unsigned char in[8];
         dm320_spi_block_transfer(out, sizeof(out), in, sizeof(in));
-        
+
         printf("%02x%02x %02x%02x %02x%02x %02x%02x\n",
             in[0], in[1],
             in[2], in[3],
             in[4], in[5],
             in[6], in[7]);
+        line--;
+
     }
 #if 0
     rc = ata_init();

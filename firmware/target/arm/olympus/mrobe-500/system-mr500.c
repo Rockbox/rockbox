@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: $
+ * $Id$
  *
  * Copyright (C) 2007 by Karl Kurbjun
  *
@@ -101,6 +101,26 @@ static void UIRQ(void)
 
 void irq_handler(void) __attribute__((interrupt ("IRQ"), naked));
 void irq_handler(void)
+{
+    /*
+     * Based on: linux/arch/arm/kernel/entry-armv.S and system-meg-fx.c
+     */
+
+    asm volatile (
+        "sub    lr, lr, #4            \r\n"
+        "stmfd  sp!, {r0-r3, ip, lr}  \r\n"
+        "mov    r0, #0x00030000       \r\n"
+        "ldr    r0, [r0, #0x518]       \r\n"
+        "ldr    r1, =irqvector        \r\n"
+        "ldr    r1, [r1, r0, lsl #2]  \r\n"
+        "mov    lr, pc                \r\n"
+        "bx     r1                    \r\n"
+        "ldmfd  sp!, {r0-r3, ip, pc}^ \r\n"
+    );
+}
+
+void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked));
+void fiq_handler(void)
 {
     /*
      * Based on: linux/arch/arm/kernel/entry-armv.S and system-meg-fx.c

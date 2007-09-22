@@ -9,6 +9,8 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 #ifdef CPU_PP
 INPUT(target/arm/crt0-pp-bl.o)
+#elif defined(OLYMPUS_MROBE_500)
+INPUT(target/arm/olympus/mrobe-500/crt0.o)
 #else
 INPUT(target/arm/crt0.o)
 #endif
@@ -169,14 +171,6 @@ SECTIONS
 {
     . = DRAMORIG + 0x1000000;
 
-    .vectors 0x0 :
-    {
-        _vectorsstart = .;
-        *(.vectors);
-        _vectorsend = .;
-    } AT> DRAM
-    _vectorscopy = LOADADDR(.vectors);
-
     .text : {
         *(.init.text)
         *(.text*)
@@ -215,12 +209,26 @@ SECTIONS
          _stackend = .;
          stackend = .;
     } >DRAM
+
     .bss : {
          _edata = .;
          *(.bss*);
          *(.ibss);
          _end = .;
      }>DRAM
+     
+    .vectors 0x0 :
+    {
+        loadaddress = .;
+        _loadaddress = .;
+        _vectorsstart = .;
+        KEEP(*(.resetvectors));
+        *(.resetvectors);
+        KEEP(*(.vectors));
+        *(.vectors);
+        _vectorsend = .;
+    } AT> DRAM
+    _vectorscopy = LOADADDR(.vectors);
 }
 #elif (CONFIG_CPU==IMX31L)
 {
