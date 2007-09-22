@@ -70,7 +70,8 @@ void pcm_mute(bool mute)
 }
 #endif /* defined(CPU_COLDFIRE) || (CONFIG_CPU == S3C2440) */
 
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == S3C2440) || defined(CPU_PP)
+#if defined(CPU_COLDFIRE) || (CONFIG_CPU == S3C2440) || defined(CPU_PP) \
+    || (CONFIG_CPU == IMX31L)
 /* Implemented in target/... */
 #else
 static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */

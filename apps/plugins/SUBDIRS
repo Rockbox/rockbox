@@ -1,5 +1,4 @@
 #ifndef IRIVER_IFP7XX_SERIES
-#ifndef GIGABEAT_S
 
 /* For all targets */
 shortcuts
@@ -46,5 +45,4 @@ doom
 mpegplayer
 #endif
 
-#endif /* GIGABEAT_S */
 #endif /* IRIVER_IFP7XX_SERIES */

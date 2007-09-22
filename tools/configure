@@ -1270,8 +1270,8 @@ EOF
     appextra="recorder:gui"
     archosrom=""
     flash=""
-    plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libwma libTremor libwavpack libmusepack libalac libfaad libm4a libspeex libdemac"
+    plugins=""
+    swcodec="yes"
     toolset=$gigabeatbitmaptools
     boottool="$rootdir/tools/scramble -gigabeats"
     bootoutput="nk.bin"

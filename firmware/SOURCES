@@ -208,7 +208,7 @@ drivers/mas.c
 drivers/audio/uda1380.c
 #elif defined(HAVE_WM8751)
 drivers/audio/wm8751.c
-#elif defined(HAVE_WM8975)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8978)
 drivers/audio/wm8975.c
 #elif defined(HAVE_WM8758)
 drivers/audio/wm8758.c
@@ -608,7 +608,7 @@ target/arm/imx31/gigabeat-s/mmu-imx31.c
 target/arm/imx31/gigabeat-s/avic-imx31.c
 target/arm/imx31/gigabeat-s/spi-imx31.c
 #ifndef BOOTLOADER
-target/arm/imx31/gigabeat-fx/pcm-imx31.c
+target/arm/imx31/gigabeat-s/pcm-imx31.c
 #endif
 #endif /* SIMULATOR */
 #endif /* GIGABEAT_S */

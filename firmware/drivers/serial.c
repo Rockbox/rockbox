@@ -27,6 +27,9 @@
 #include "lcd.h"
 #include "serial.h"
 
+#if CONFIG_CPU == IMX31L
+#include "serial-imx31.h"
+#endif
 
 #if CONFIG_CPU == SH7034
 
@@ -164,6 +167,75 @@ void serial_setup (void)
     UMR0 = 0x07; /* 1 stop bit */
 
     UCR0 = 0x04; /* Tx enable */
+}
+
+#elif (CONFIG_CPU == IMX31L)
+
+void serial_setup(void)
+{
+#ifdef UART_INT /*enable UART Interrupts */
+    UCR1_1 |= (EUartUCR1_TRDYEN | EUartUCR1_RRDYEN | EUartUCR1_TXMPTYEN);
+    UCR4_1 |= (EUartUCR4_TCEN);
+#else /*disable UART Interrupts*/
+    UCR1_1 &= ~(EUartUCR1_TRDYEN | EUartUCR1_RRDYEN | EUartUCR1_TXMPTYEN);
+    UCR4_1 &= ~(EUartUCR4_TCEN);
+#endif
+    UCR1_1 |= EUartUCR1_UARTEN;
+    UCR2_1 |= (EUartUCR2_TXEN  | EUartUCR2_RXEN | EUartUCR2_IRTS);
+
+    /* Tx,Rx Interrupt Trigger levels, Disable for now*/
+    /*UFCR1 |= (UFCR1_TXTL_32 | UFCR1_RXTL_32);*/
+}
+
+int Tx_Rdy(void)
+{
+    if((UTS1 & EUartUTS_TXEMPTY))
+        return 1;
+    else return 0;
+}
+
+/*Not ready...After first Rx, UTS1 & UTS1_RXEMPTY 
+  keeps returning true*/
+int Rx_Rdy(void) 
+{
+    if(!(UTS1 & EUartUTS_RXEMPTY))
+        return 1;
+    else return 0;
+}
+
+void Tx_Writec(char c)
+{
+    UTXD1=(int) c;
+}
+
+void dprintf(const char * str, ... )
+{
+    char dprintfbuff[256];
+    unsigned char * ptr;
+	
+    va_list ap;
+    va_start(ap, str);
+
+    ptr = dprintfbuff;
+    vsnprintf(ptr,sizeof(dprintfbuff),str,ap);
+    va_end(ap);
+
+    serial_tx(ptr);
+}
+
+void serial_tx(const unsigned char * buf)
+{
+    /*Tx*/
+    for(;;) {
+        if(Tx_Rdy()) {
+            if(*buf == '\0')
+                return;
+            if(*buf == '\n')
+                Tx_Writec('\r');
+            Tx_Writec(*buf);
+            buf++;
+        }
+    }
 }
 
 #else /* Other targets */
