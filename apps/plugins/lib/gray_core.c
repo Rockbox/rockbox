@@ -40,8 +40,9 @@ struct _gray_info _gray_info;       /* global info structure */
 #ifndef SIMULATOR
 short _gray_random_buffer;          /* buffer for random number generator */
 
-#if CONFIG_LCD == LCD_SSD1815
+#if CONFIG_LCD == LCD_SSD1815 || CONFIG_LCD == LCD_IFP7XX
 /* measured and interpolated curve */
+/* TODO: check for iFP */
 static const unsigned char lcdlinear[256] = {
       0,   3,   5,   8,  11,  13,  16,  18,
      21,  23,  26,  28,  31,  33,  36,  38,
@@ -112,7 +113,7 @@ static const unsigned char lcdlinear[256] = {
     227, 228, 230, 232, 233, 235, 237, 239,
     241, 243, 245, 247, 249, 251, 253, 255
 };
-#elif (CONFIG_LCD == LCD_IPOD2BPP) || (CONFIG_LCD == LCD_IPODMINI)
+#elif (CONFIG_LCD == LCD_IPOD2BPP) || (CONFIG_LCD == LCD_IPODMINI) || (CONFIG_LCD == LCD_IFP7XX)
 /* measured and interpolated curve for mini LCD */
 /* TODO: verify this curve on the fullsize greyscale LCD */
 static const unsigned char lcdlinear[256] = {
@@ -556,7 +557,7 @@ void gray_show(bool enable)
 #elif CONFIG_LCD == LCD_IPODMINI
         _gray_rb->timer_register(1, NULL, TIMER_FREQ / 88, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_IFP7XX
-        (void)_timer_isr;   /* TODO: implement for iFP */
+        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 83, 1, _timer_isr);
 #endif /* CONFIG_LCD */
 #endif /* !SIMULATOR */
         _gray_rb->screen_dump_set_hook(gray_screendump_hook);
@@ -1840,6 +1841,293 @@ void gray_update_rect(int x, int y, int width, int height)
         "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a0"
                 );
             }
+#elif defined(CPU_ARM)
+            asm volatile
+            (
+                "ldr     r0, [%[cbuf]]           \n"
+                "ldr     r1, [%[bbuf]]           \n"
+                "eor     r1, r0, r1              \n"
+                "ldr     r0, [%[cbuf], #4]       \n"
+                "ldr     %[chg], [%[bbuf], #4]   \n"
+                "eor     %[chg], r0, %[chg]      \n"
+                "orr     %[chg], %[chg], r1      \n"
+                : /* outputs */
+                [chg] "=&r"(change)
+                : /* inputs */
+                [cbuf]"r"(cbuf),
+                [bbuf]"r"(bbuf)
+                : /* clobbers */
+                "r0", "r1"
+            );
+
+            if (change != 0)
+            {
+                unsigned char *addr;
+                unsigned mask, depth, trash;
+
+                pat_ptr = &pat_stack[0];
+
+                /* precalculate the bit patterns with random shifts
+                 * for all 8 pixels and put them on an extra "stack" */
+                asm volatile
+                (
+        "mov     r3, #8                      \n"  /* loop count */
+        "mov     %[mask], #0                 \n"
+
+    ".ur_pre_loop:                           \n"
+        "ldrb    r0, [%[cbuf]], #1           \n"  /* read current buffer */
+        "ldrb    r1, [%[bbuf]]               \n"  /* read back buffer */
+        "strb    r0, [%[bbuf]], #1           \n"  /* update back buffer */
+        "mov     r2, #0                      \n"  /* preset for skipped pixel */
+        "cmp     r0, r1                      \n"  /* no change? */
+        "beq     .ur_skip                    \n"  /* -> skip */
+
+        "ldr     r2, [%[bpat], r0, lsl #2]   \n"  /* r2 = bitpattern[byte]; */
+
+        "add     %[rnd], %[rnd], %[rnd], lsl #2  \n"  /* multiply by 75 */
+        "rsb     %[rnd], %[rnd], %[rnd], lsl #4  \n"
+        "add     %[rnd], %[rnd], #74         \n"  /* add another 74 */
+        /* Since the lower bits are not very random:   get bits 8..15 (need max. 5) */
+        "and     r1, %[rmsk], %[rnd], lsr #8 \n"  /* ..and mask out unneeded bits */
+
+        "cmp     r1, %[dpth]                 \n"  /* random >= depth ? */
+        "subhs   r1, r1, %[dpth]             \n"  /* yes: random -= depth */
+
+        "mov     r0, r2, lsl r1              \n"  /** rotate pattern **/
+        "sub     r1, %[dpth], r1             \n"
+        "orr     r2, r0, r2, lsr r1          \n"
+
+        "orr     %[mask], %[mask], #0x100    \n"  /* set mask bit */
+
+    ".ur_skip:                               \n"
+        "mov     %[mask], %[mask], lsr #1    \n"  /* shift mask */
+        "str     r2, [%[patp]], #4           \n"  /* push on pattern stack */
+
+        "subs    r3, r3, #1                  \n"  /* loop 8 times (pixel block) */
+        "bne     .ur_pre_loop                \n"
+        : /* outputs */
+        [cbuf]"+r"(cbuf),
+        [bbuf]"+r"(bbuf),
+        [patp]"+r"(pat_ptr),
+        [rnd] "+r"(_gray_random_buffer),
+        [mask]"=&r"(mask)
+        : /* inputs */
+        [bpat]"r"(_gray_info.bitpattern),
+        [dpth]"r"(_gray_info.depth),
+        [rmsk]"r"(_gray_info.randmask)
+        : /* clobbers */
+        "r0", "r1", "r2", "r3"
+                );
+
+                addr = dst_row;
+                depth = _gray_info.depth;
+
+                /* set the bits for all 8 pixels in all bytes according to the
+                 * precalculated patterns on the pattern stack */
+                asm volatile
+                (
+        "ldmdb   %[patp], {r1 - r8}          \n"  /* pop all 8 patterns */
+
+        /** Rotate the four 8x8 bit "blocks" within r1..r8 **/
+
+        "mov     %[rx], #0xF0                \n"  /** Stage 1: 4 bit "comb" **/
+        "orr     %[rx], %[rx], %[rx], lsl #8 \n"
+        "orr     %[rx], %[rx], %[rx], lsl #16\n"  /* bitmask = ...11110000 */
+        "eor     r0, r1, r5, lsl #4          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r1, r1, r0                  \n"  /* r1 = ...e3e2e1e0a3a2a1a0 */
+        "eor     r5, r5, r0, lsr #4          \n"  /* r5 = ...e7e6e5e4a7a6a5a4 */
+        "eor     r0, r2, r6, lsl #4          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r2, r2, r0                  \n"  /* r2 = ...f3f2f1f0b3b2b1b0 */
+        "eor     r6, r6, r0, lsr #4          \n"  /* r6 = ...f7f6f5f4f7f6f5f4 */
+        "eor     r0, r3, r7, lsl #4          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r3, r3, r0                  \n"  /* r3 = ...g3g2g1g0c3c2c1c0 */
+        "eor     r7, r7, r0, lsr #4          \n"  /* r7 = ...g7g6g5g4c7c6c5c4 */
+        "eor     r0, r4, r8, lsl #4          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r4, r4, r0                  \n"  /* r4 = ...h3h2h1h0d3d2d1d0 */
+        "eor     r8, r8, r0, lsr #4          \n"  /* r8 = ...h7h6h5h4d7d6d5d4 */
+
+        "mov     %[rx], #0xCC                \n"  /** Stage 2: 2 bit "comb" **/
+        "orr     %[rx], %[rx], %[rx], lsl #8 \n"
+        "orr     %[rx], %[rx], %[rx], lsl #16\n"  /* bitmask = ...11001100 */
+        "eor     r0, r1, r3, lsl #2          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r1, r1, r0                  \n"  /* r1 = ...g1g0e1e0c1c0a1a0 */
+        "eor     r3, r3, r0, lsr #2          \n"  /* r3 = ...g3g2e3e2c3c2a3a2 */
+        "eor     r0, r2, r4, lsl #2          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r2, r2, r0                  \n"  /* r2 = ...h1h0f1f0d1d0b1b0 */
+        "eor     r4, r4, r0, lsr #2          \n"  /* r4 = ...h3h2f3f2d3d2b3b2 */
+        "eor     r0, r5, r7, lsl #2          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r5, r5, r0                  \n"  /* r5 = ...g5g4e5e4c5c4a5a4 */
+        "eor     r7, r7, r0, lsr #2          \n"  /* r7 = ...g7g6e7e6c7c6a7a6 */
+        "eor     r0, r6, r8, lsl #2          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r6, r6, r0                  \n"  /* r6 = ...h5h4f5f4d5d4b5b4 */
+        "eor     r8, r8, r0, lsr #2          \n"  /* r8 = ...h7h6f7f6d7d6b7b6 */
+
+        "mov     %[rx], #0xAA                \n"  /** Stage 3: 1 bit "comb" **/
+        "orr     %[rx], %[rx], %[rx], lsl #8 \n"
+        "orr     %[rx], %[rx], %[rx], lsl #16\n"  /* bitmask = ...10101010 */
+        "eor     r0, r1, r2, lsl #1          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r1, r1, r0                  \n"  /* r1 = ...h0g0f0e0d0c0b0a0 */
+        "eor     r2, r2, r0, lsr #1          \n"  /* r2 = ...h1g1f1e1d1c1b1a1 */
+        "eor     r0, r3, r4, lsl #1          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r3, r3, r0                  \n"  /* r3 = ...h2g2f2e2d2c2b2a2 */
+        "eor     r4, r4, r0, lsr #1          \n"  /* r4 = ...h3g3f3e3d3c3b3a3 */
+        "eor     r0, r5, r6, lsl #1          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r5, r5, r0                  \n"  /* r5 = ...h4g4f4e4d4c4b4a4 */
+        "eor     r6, r6, r0, lsr #1          \n"  /* r6 = ...h5g5f5e5d5c5b5a5 */
+        "eor     r0, r7, r8, lsl #1          \n"
+        "and     r0, r0, %[rx]               \n"
+        "eor     r7, r7, r0                  \n"  /* r7 = ...h6g6f6e6d6c6b6a6 */
+        "eor     r8, r8, r0, lsr #1          \n"  /* r8 = ...h7g7f7e7d7c7b7a7 */
+
+        "sub     r0, %[dpth], #1             \n"  /** shift out unused low bytes **/
+        "and     r0, r0, #7                  \n"
+        "add     pc, pc, r0, lsl #2          \n"  /* jump into shift streak */
+        "mov     r8, r8, lsr #8              \n"  /* r8: never reached */
+        "mov     r7, r7, lsr #8              \n"
+        "mov     r6, r6, lsr #8              \n"
+        "mov     r5, r5, lsr #8              \n"
+        "mov     r4, r4, lsr #8              \n"
+        "mov     r3, r3, lsr #8              \n"
+        "mov     r2, r2, lsr #8              \n"
+        "mov     r1, r1, lsr #8              \n"
+
+        "mvn     %[mask], %[mask]            \n"  /* "set" mask -> "keep" mask */
+        "ands    %[mask], %[mask], #0xff     \n"
+        "beq     .ur_sstart                  \n"  /* short loop if no bits to keep */
+
+        "ldrb    r0, [pc, r0]                \n"  /* jump into full loop */
+        "add     pc, pc, r0                  \n"
+    ".ur_ftable:                             \n"
+        ".byte   .ur_f1 - .ur_ftable - 4     \n"  /* [jump tables are tricky] */
+        ".byte   .ur_f2 - .ur_ftable - 4     \n"
+        ".byte   .ur_f3 - .ur_ftable - 4     \n"
+        ".byte   .ur_f4 - .ur_ftable - 4     \n"
+        ".byte   .ur_f5 - .ur_ftable - 4     \n"
+        ".byte   .ur_f6 - .ur_ftable - 4     \n"
+        ".byte   .ur_f7 - .ur_ftable - 4     \n"
+        ".byte   .ur_f8 - .ur_ftable - 4     \n"
+
+    ".ur_floop:                              \n"  /** full loop (bits to keep)**/
+    ".ur_f8:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"  /* load old byte */
+        "and     r0, r0, %[mask]             \n"  /* mask out replaced bits */
+        "orr     r0, r0, r1                  \n"  /* set new bits */
+        "strb    r0, [%[addr]], %[psiz]      \n"  /* store byte */
+        "mov     r1, r1, lsr #8              \n"  /* shift out used-up byte */
+    ".ur_f7:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r2                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r2, r2, lsr #8              \n"
+    ".ur_f6:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r3                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r3, r3, lsr #8              \n"
+    ".ur_f5:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r4                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r4, r4, lsr #8              \n"
+    ".ur_f4:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r5                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r5, r5, lsr #8              \n"
+    ".ur_f3:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r6                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r6, r6, lsr #8              \n"
+    ".ur_f2:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r7                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r7, r7, lsr #8              \n"
+    ".ur_f1:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r8                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r8, r8, lsr #8              \n"
+
+        "subs    %[dpth], %[dpth], #8        \n"  /* next round if anything left */
+        "bhi     .ur_floop                   \n"
+
+        "b       .ur_end                     \n"
+
+    ".ur_sstart:                             \n"
+        "ldrb    r0, [pc, r0]                \n"  /* jump into short loop*/
+        "add     pc, pc, r0                  \n"
+    ".ur_stable:                             \n"
+        ".byte   .ur_s1 - .ur_stable - 4     \n"
+        ".byte   .ur_s2 - .ur_stable - 4     \n"
+        ".byte   .ur_s3 - .ur_stable - 4     \n"
+        ".byte   .ur_s4 - .ur_stable - 4     \n"
+        ".byte   .ur_s5 - .ur_stable - 4     \n"
+        ".byte   .ur_s6 - .ur_stable - 4     \n"
+        ".byte   .ur_s7 - .ur_stable - 4     \n"
+        ".byte   .ur_s8 - .ur_stable - 4     \n"
+
+    ".ur_sloop:                              \n"  /** short loop (nothing to keep) **/
+    ".ur_s8:                                 \n"
+        "strb    r1, [%[addr]], %[psiz]      \n"  /* store byte */
+        "mov     r1, r1, lsr #8              \n"  /* shift out used-up byte */
+    ".ur_s7:                                 \n"
+        "strb    r2, [%[addr]], %[psiz]      \n"
+        "mov     r2, r2, lsr #8              \n"
+    ".ur_s6:                                 \n"
+        "strb    r3, [%[addr]], %[psiz]      \n"
+        "mov     r3, r3, lsr #8              \n"
+    ".ur_s5:                                 \n"
+        "strb    r4, [%[addr]], %[psiz]      \n"
+        "mov     r4, r4, lsr #8              \n"
+    ".ur_s4:                                 \n"
+        "strb    r5, [%[addr]], %[psiz]      \n"
+        "mov     r5, r5, lsr #8              \n"
+    ".ur_s3:                                 \n"
+        "strb    r6, [%[addr]], %[psiz]      \n"
+        "mov     r6, r6, lsr #8              \n"
+    ".ur_s2:                                 \n"
+        "strb    r7, [%[addr]], %[psiz]      \n"
+        "mov     r7, r7, lsr #8              \n"
+    ".ur_s1:                                 \n"
+        "strb    r8, [%[addr]], %[psiz]      \n"
+        "mov     r8, r8, lsr #8              \n"
+
+        "subs    %[dpth], %[dpth], #8        \n"  /* next round if anything left */
+        "bhi     .ur_sloop                   \n"
+
+    ".ur_end:                                \n"
+        : /* outputs */
+        [addr]"+r"(addr),
+        [mask]"+r"(mask),
+        [dpth]"+r"(depth),
+        [rx]  "=&r"(trash)
+        : /* inputs */
+        [psiz]"r"(_gray_info.plane_size),
+        [patp]"[rx]"(pat_ptr)
+        : /* clobbers */
+        "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"
+                 );
+             }
 #else /* C version, for reference*/
 #warning C version of gray_update_rect() used
             (void)pat_ptr;

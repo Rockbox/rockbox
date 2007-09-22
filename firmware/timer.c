@@ -303,7 +303,7 @@ void timer_unregister(void)
     CPU_INT_CLR = TIMER2_MASK;
 #elif CONFIG_CPU == PNX0101
     TIMER1.ctrl &= ~0x80;  /* disable timer 1 */
-    irq_disable_int(5);
+    irq_disable_int(IRQ_TIMER1);
 #elif CONFIG_CPU == S3C2440
     __TIMER_UNREGISTER();
 #endif
