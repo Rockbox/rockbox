@@ -160,7 +160,7 @@ enum rec_status_flags
 
 static int rec_status = 0;
 
-bool in_recording_screen(void)   
+bool in_recording_screen(void)
 {   
     return (rec_status & RCSTAT_IN_RECSCREEN) != 0;
 } 
@@ -640,7 +640,7 @@ char *rec_create_filename(char *buffer)
 
 #if CONFIG_RTC == 0
 /* Hit disk to get a starting filename for the type */
-void rec_init_filename(void)
+static void rec_init_filename(void)
 {
     file_number = -1;
     rec_create_filename(path_buffer);
