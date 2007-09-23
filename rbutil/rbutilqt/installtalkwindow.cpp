@@ -69,24 +69,41 @@ void InstallTalkWindow::accept()
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
 
     QString folderToTalk = ui.lineTalkFolder->text();
-    QString pathEncoder = userSettings->value("encbin").toString();
-    QString pathTTS = userSettings->value("ttsbin").toString();
-
+    
+    // tts
+    QString preset = userSettings->value("ttspreset").toString();
+    userSettings->beginGroup(preset);
+    QString pathTTS = userSettings->value("binary").toString();
+    QString ttsOpts = userSettings->value("options").toString();
+    QString ttsLanguage = userSettings->value("language").toString();
+    QString ttsTemplate = userSettings->value("template").toString();
+    QString ttsType =userSettings->value("type").toString();
+    userSettings->endGroup();
+    
+    //encoder
+    QString encoderPreset = userSettings->value("encpreset").toString();
+    userSettings->beginGroup(encoderPreset);
+    QString pathEncoder = userSettings->value("binary").toString();
+    QString encOpts = userSettings->value("options").toString();
+    QString encTemplate = userSettings->value("template").toString();
+    QString encType =userSettings->value("type").toString();
+    userSettings->endGroup();
+  
     if(!QFileInfo(folderToTalk).isDir())
     {
-    	 logger->addItem(tr("The Folder to Talk is wrong!"),LOGERROR);
-    	 logger->abort();
-    	 return;
+        logger->addItem(tr("The Folder to Talk is wrong!"),LOGERROR);
+        logger->abort();
+        return;
     }
 
     if(!QFileInfo(pathEncoder).isExecutable())
     {
-      	 logger->addItem(tr("Path to Encoder is wrong!"),LOGERROR);
-       	 logger->abort();
-       	 return;
+        logger->addItem(tr("Path to Encoder is wrong!"),LOGERROR);
+        logger->abort();
+        return;
     }
 
-    if(!QFileInfo(pathTTS).isExecutable())
+    if(!QFileInfo(pathTTS).exists())
     {
          logger->addItem(tr("Path to TTS is wrong!"),LOGERROR);
          logger->abort();
@@ -99,21 +116,16 @@ void InstallTalkWindow::accept()
 
     talkcreator->setDir(folderToTalk);
     talkcreator->setTTSexe(pathTTS);
+    talkcreator->setTTsOpts(ttsOpts);
+    talkcreator->setTTsLanguage(ttsLanguage);
+    talkcreator->setTTsType(ttsType);
+    talkcreator->setTTsTemplate(ttsTemplate);
+   
     talkcreator->setEncexe(pathEncoder);
-    talkcreator->setEncOpts(userSettings->value("encopts").toString());
-    talkcreator->setTTsOpts(userSettings->value("ttsopts").toString());
-
-    devices->beginGroup(userSettings->value("ttspreset").toString());
-    talkcreator->setTTsType(devices->value("tts").toString());
-    talkcreator->setTTsOpts(devices->value("options").toString());
-    talkcreator->setTTsTemplate(devices->value("template").toString());
-    devices->endGroup();
-    devices->beginGroup(userSettings->value("encpreset").toString());
-    talkcreator->setEncType(devices->value("encoder").toString());
-    talkcreator->setEncOpts(devices->value("options").toString());
-    talkcreator->setEncTemplate(devices->value("template").toString());
-    devices->endGroup();
-
+    talkcreator->setEncOpts(encOpts);
+    talkcreator->setEncTemplate(encTemplate);
+    talkcreator->setEncType(encType);
+    
     talkcreator->setOverwriteTalk(ui.OverwriteTalk->isChecked());
     talkcreator->setOverwriteWav(ui.OverwriteWav->isChecked());
     talkcreator->setRemoveWav(ui.RemoveWav->isChecked());

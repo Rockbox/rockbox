@@ -128,18 +128,35 @@ void Config::accept()
     userSettings->setValue("offline", ui.cacheOfflineMode->isChecked());
 
     // tts settings
-    if(QFileInfo(ui.ttsExecutable->text()).isExecutable())
-        userSettings->setValue("ttsbin", ui.ttsExecutable->text());
-    userSettings->setValue("ttsopts", ui.ttsOptions->text());
-    if(QFileInfo(ui.encoderExecutable->text()).isExecutable())
-        userSettings->setValue("encbin", ui.encoderExecutable->text());
-    userSettings->setValue("ttsopts", ui.ttsOptions->text());
     QString preset;
-    preset = ui.comboEncoder->itemData(ui.comboEncoder->currentIndex(), Qt::UserRole).toString();
-    userSettings->setValue("encpreset", preset);
     preset = ui.comboTts->itemData(ui.comboTts->currentIndex(), Qt::UserRole).toString();
     userSettings->setValue("ttspreset", preset);
-
+    userSettings->beginGroup(preset);
+    
+    if(QFileInfo(ui.ttsExecutable->text()).exists())
+        userSettings->setValue("binary", ui.ttsExecutable->text());
+    userSettings->setValue("options", ui.ttsOptions->text());
+    userSettings->setValue("language", ui.ttsLanguage->text());
+    devices->beginGroup(preset);
+    userSettings->setValue("template", devices->value("template").toString());
+    userSettings->setValue("type", devices->value("tts").toString());
+    devices->endGroup();
+    userSettings->endGroup();
+    
+    //encoder settings
+    preset = ui.comboEncoder->itemData(ui.comboEncoder->currentIndex(), Qt::UserRole).toString();
+    userSettings->setValue("encpreset", preset);
+    userSettings->beginGroup(preset);
+    
+    if(QFileInfo(ui.encoderExecutable->text()).isExecutable())
+        userSettings->setValue("binary", ui.encoderExecutable->text());
+    userSettings->setValue("options", ui.encoderOptions->text());
+    devices->beginGroup(preset);
+    userSettings->setValue("template", devices->value("template").toString());
+    userSettings->setValue("type", devices->value("tts").toString());
+    devices->endGroup();
+    userSettings->endGroup();
+        
     // sync settings
     userSettings->sync();
     this->close();
@@ -302,7 +319,21 @@ void Config::setDevices(QSettings *dev)
     devices->beginGroup("tts");
     keys = devices->allKeys();
     for(int i=0; i < keys.size();i++)
-        ui.comboTts->addItem(devices->value(keys.at(i), "null").toString(), keys.at(i));
+    {
+        devices->endGroup();
+        devices->beginGroup(keys.at(i));
+        QString os = devices->value("os").toString();
+        devices->endGroup();
+        devices->beginGroup("tts");
+        
+        if(os == "all")
+            ui.comboTts->addItem(devices->value(keys.at(i), "null").toString(), keys.at(i));
+            
+#if defined(Q_OS_WIN32)
+        if(os == "win32")
+            ui.comboTts->addItem(devices->value(keys.at(i), "null").toString(), keys.at(i));
+#endif
+    }
     devices->endGroup();
 
     int index;
@@ -311,14 +342,12 @@ void Config::setDevices(QSettings *dev)
     if(index < 0) index = 0;
     ui.comboTts->setCurrentIndex(index);
     updateTtsOpts(index);
-    ui.ttsExecutable->setText(userSettings->value("ttsbin").toString());
-
+    
     index = ui.comboEncoder->findData(userSettings->value("encpreset").toString(),
                             Qt::UserRole, Qt::MatchExactly);
     if(index < 0) index = 0;
     ui.comboEncoder->setCurrentIndex(index);
     updateEncOpts(index);
-    ui.encoderExecutable->setText(userSettings->value("encbin").toString());
 
 }
 
@@ -347,9 +376,9 @@ void Config::updateEncOpts(int index)
     for(int i = 0; i < path.size(); i++) {
         QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + e;
 #if defined(Q_OS_WIN)
-	executable += ".exe";
-	QStringList ex = executable.split("\"", QString::SkipEmptyParts);
-	executable = ex.join("");
+    executable += ".exe";
+    QStringList ex = executable.split("\"", QString::SkipEmptyParts);
+    executable = ex.join("");
 #endif
         if(QFileInfo(executable).isExecutable()) {
             qDebug() << "found:" << executable;
@@ -360,6 +389,15 @@ void Config::updateEncOpts(int index)
             break;
         }
     }
+    
+    //user settings
+    userSettings->beginGroup(c);
+    QString temp = userSettings->value("binary","null").toString();
+    if(temp != "null")  ui.encoderExecutable->setText(temp);
+    temp = userSettings->value("options","null").toString();
+    if(temp != "null") ui.encoderOptions->setText(temp);
+    userSettings->endGroup();
+
 }
 
 
@@ -367,14 +405,18 @@ void Config::updateTtsOpts(int index)
 {
     bool edit;
     QString e;
+    bool needsLanguageCfg;
     QString c = ui.comboTts->itemData(index, Qt::UserRole).toString();
     devices->beginGroup(c);
     edit = devices->value("edit").toBool();
+    needsLanguageCfg = devices->value("needslanguagecfg").toBool();
+    ui.ttsLanguage->setVisible(needsLanguageCfg);
+    ui.ttsLanguageLabel->setVisible(needsLanguageCfg);
     ui.ttsOptions->setText(devices->value("options").toString());
     ui.ttsOptions->setEnabled(devices->value("edit").toBool());
     e = devices->value("tts").toString();
     devices->endGroup();
-
+       
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
 #elif defined(Q_OS_WIN)
@@ -385,11 +427,11 @@ void Config::updateTtsOpts(int index)
     for(int i = 0; i < path.size(); i++) {
         QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + e;
 #if defined(Q_OS_WIN)
-	executable += ".exe";
-	QStringList ex = executable.split("\"", QString::SkipEmptyParts);
-	executable = ex.join("");
+        executable += ".exe";
+        QStringList ex = executable.split("\"", QString::SkipEmptyParts);
+        executable = ex.join("");
 #endif
-	qDebug() << executable;
+        qDebug() << executable;
         if(QFileInfo(executable).isExecutable()) {
             ui.ttsExecutable->setText(QDir::toNativeSeparators(executable));
             // disallow changing the detected path if non-customizable profile
@@ -398,6 +440,16 @@ void Config::updateTtsOpts(int index)
             break;
         }
     }
+    
+    //user settings
+    userSettings->beginGroup(c);
+    QString temp = userSettings->value("binary","null").toString();
+    if(temp != "null")  ui.ttsExecutable->setText(temp);
+    temp = userSettings->value("options","null").toString();
+    if(temp != "null") ui.ttsOptions->setText(temp);
+    temp = userSettings->value("language","null").toString();
+    if(temp != "null") ui.ttsLanguage->setText(temp);
+    userSettings->endGroup();
 }
 
 
@@ -672,7 +724,7 @@ void Config::browseTts()
     {
         qDebug() << browser.getSelected();
         QString exe = browser.getSelected();
-        if(!QFileInfo(exe).isExecutable())
+        if(!QFileInfo(exe).exists())
             return;
         ui.ttsExecutable->setText(exe);
     }

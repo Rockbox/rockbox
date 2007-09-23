@@ -23,6 +23,29 @@
 
 #include "progressloggerinterface.h"
 
+class TTSBase : public QObject
+{
+    Q_OBJECT
+public:
+    TTSBase(){}
+    virtual ~TTSBase(){}
+    virtual bool voice(QString text,QString wavfile){return false;}    
+    virtual bool start(){return false;}
+    virtual bool stop(){return false;}
+    
+    void setTTSexe(QString exe){m_TTSexec=exe;}
+    void setTTsOpts(QString opts) {m_TTSOpts=opts;}
+    void setTTsLanguage(QString language) {m_TTSLanguage = language;}
+    void setTTsTemplate(QString t) { m_TTSTemplate = t; }
+    
+protected:
+    QString m_TTSexec;
+    QString m_TTSOpts;
+    QString m_TTSTemplate;
+    QString m_TTSLanguage;
+};
+
+
 class TalkFileCreator :public QObject
 {
     Q_OBJECT
@@ -37,6 +60,7 @@ public:
 
     void setTTsType(QString tts) { m_curTTS = tts; }
     void setTTsOpts(QString opts) {m_TTSOpts=opts;}
+    void setTTsLanguage(QString language) {m_TTSLanguage = language;}
     void setTTsTemplate(QString t) { m_curTTSTemplate = t; }
 
     void setEncType(QString enc) { m_curEnc = enc; }
@@ -56,19 +80,20 @@ private slots:
     void abort();
 
 private:
-
-    bool initTTS();
-    bool stopTTS();
+    TTSBase* m_tts;
+    //bool initTTS();
+    //bool stopTTS();
     bool initEncoder();
-
+    
     bool encode(QString input,QString output);
-    bool voice(QString text,QString wavfile);
+    //bool voice(QString text,QString wavfile);
 
     QString m_dir;
     QString m_mountpoint;
     QString m_curTTS;
     QString m_TTSexec;
     QString m_TTSOpts;
+    QString m_TTSLanguage;
     QString m_curTTSTemplate;
 
     QString m_curEnc;
@@ -87,4 +112,29 @@ private:
     bool m_abort;
 };
 
+class TTSSapi : public TTSBase
+{
+public:
+    TTSSapi() {};
+    virtual bool voice(QString text,QString wavfile);
+    virtual bool start();
+    virtual bool stop();
+    
+private:
+    QProcess* voicescript;
+};
+
+class TTSExes : public TTSBase
+{
+public:
+    TTSExes() {};
+    virtual bool voice(QString text,QString wavfile);
+    virtual bool start();
+    virtual bool stop() {return true;}
+    
+private:
+   
+};
+
 #endif
+
