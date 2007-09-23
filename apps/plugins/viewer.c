@@ -1375,6 +1375,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     viewer_reset_settings(); /* load defaults first */
     viewer_load_settings(); /* .. then try to load from disk */
     
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
+#endif
+    
     viewer_draw(col);
 
     while (!done) {

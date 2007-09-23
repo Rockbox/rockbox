@@ -322,6 +322,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     prev_show_statusbar = rb->global_settings->statusbar;
     rb->global_settings->statusbar = false;
 
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
+#endif
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(1);
 #endif
