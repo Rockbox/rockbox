@@ -25,6 +25,13 @@
 #include "browsedirtree.h"
 
 #include <stdio.h>
+#if defined(Q_OS_WIN32)
+#if defined(UNICODE)
+#define _UNICODE
+#endif
+#include <tchar.h>
+#include <windows.h>
+#endif
 
 #define DEFAULT_LANG "English (C)"
 
@@ -37,8 +44,8 @@ Config::Config(QWidget *parent) : QDialog(parent)
     QRegExp validate("[0-9]*");
     proxyValidator->setRegExp(validate);
     ui.proxyPort->setValidator(proxyValidator);
-#ifndef __linux
-    ui.radioSystemProxy->setEnabled(false); // only on linux for now
+#if !defined(Q_OS_LINUX) && !defined(Q_OS_WIN32)
+    ui.radioSystemProxy->setEnabled(false); // not on macox for now
 #endif
     // build language list and sort alphabetically
     QStringList langs = findLanguageFiles();
@@ -160,7 +167,7 @@ void Config::setUserSettings(QSettings *user)
     ui.proxyUser->setText(proxy.userName());
     ui.proxyPass->setText(proxy.password());
 
-    QString proxyType = userSettings->value("proxytype").toString();
+    QString proxyType = userSettings->value("proxytype", "system").toString();
     if(proxyType == "manual") ui.radioManualProxy->setChecked(true);
     else if(proxyType == "system") ui.radioSystemProxy->setChecked(true);
     else ui.radioNoProxy->setChecked(true);
@@ -419,13 +426,36 @@ void Config::setSystemProxy(bool checked)
         proxy.setHost(ui.proxyHost->text());
         proxy.setPort(ui.proxyPort->text().toInt());
         // show system values in input box
-#ifdef __linux
-        QUrl envproxy = QUrl(getenv("http_proxy"));
+        QUrl envproxy;
+#if defined(Q_OS_LINUX)
+        envproxy = QUrl(getenv("http_proxy"));
+#endif
+#if defined(Q_OS_WIN32)
+        HKEY hk;
+        wchar_t proxyval[80];
+        DWORD buflen = 80;
+        long ret;
+
+        ret = RegOpenKeyEx(HKEY_CURRENT_USER, _TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"),
+            0, KEY_QUERY_VALUE, &hk);
+        if(ret != ERROR_SUCCESS) return;
+
+        ret = RegQueryValueEx(hk, _TEXT("ProxyServer"), NULL, NULL, (LPBYTE)proxyval, &buflen);
+        if(ret != ERROR_SUCCESS) return;
+
+        RegCloseKey(hk);
+        envproxy = QUrl("http://" + QString::fromWCharArray(proxyval));
+        qDebug() << envproxy;
         ui.proxyHost->setText(envproxy.host());
         ui.proxyPort->setText(QString("%1").arg(envproxy.port()));
         ui.proxyUser->setText(envproxy.userName());
         ui.proxyPass->setText(envproxy.password());
 #endif
+        ui.proxyHost->setText(envproxy.host());
+        ui.proxyPort->setText(QString("%1").arg(envproxy.port()));
+        ui.proxyUser->setText(envproxy.userName());
+        ui.proxyPass->setText(envproxy.password());
+
     }
     else {
         ui.proxyHost->setText(proxy.host());

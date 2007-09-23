@@ -32,8 +32,16 @@
 #include "uninstallwindow.h"
 #include "browseof.h"
 
-#ifdef __linux
+#if defined(Q_OS_LINUX)
 #include <stdio.h>
+#endif
+#if defined(Q_OS_WIN32)
+#if defined(UNICODE)
+#define _UNICODE
+#endif
+#include <stdio.h>
+#include <tchar.h>
+#include <windows.h>
 #endif
 
 RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
@@ -935,11 +943,29 @@ void RbUtilQt::updateInfo()
 
 QUrl RbUtilQt::proxy()
 {
-    if(userSettings->value("proxytype") == "manual")
+    if(userSettings->value("proxytype", "system").toString() == "manual")
         return QUrl(userSettings->value("proxy").toString());
-#ifdef __linux
+#if defined(Q_OS_LINUX)
     else if(userSettings->value("proxytype") == "system")
         return QUrl(getenv("http_proxy"));
+#endif
+#if defined(Q_OS_WIN32)
+    HKEY hk;
+    wchar_t proxyval[80];
+    DWORD buflen = 80;
+    long ret;
+
+    ret = RegOpenKeyEx(HKEY_CURRENT_USER, _TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"),
+        0, KEY_QUERY_VALUE, &hk);
+    if(ret != ERROR_SUCCESS) return QUrl("");
+
+    ret = RegQueryValueEx(hk, _TEXT("ProxyServer"), NULL, NULL, (LPBYTE)proxyval, &buflen);
+    if(ret != ERROR_SUCCESS) return QUrl("");
+
+    RegCloseKey(hk);
+    qDebug() << QString::fromWCharArray(proxyval);
+    return QUrl("http://" + QString::fromWCharArray(proxyval));
+
 #endif
     return QUrl("");
 }
