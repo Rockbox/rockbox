@@ -28,28 +28,17 @@
 
 #define LCD_BUSY  0x8000
 
-/* check if number of useconds has past */
-static inline bool timer_check(int clock_start, int usecs)
-{
-    return ((int)(USEC_TIMER - clock_start)) >= usecs;
-}
-
-/* wait for LCD with timeout */
+/* wait for LCD */
 static inline void lcd_wait_write(void)
 {
-    int start = USEC_TIMER;
-
-    do {
-        if ((LCD_BASE & LCD_BUSY) == 0)
-            break;
-    } while (timer_check(start, 1000) == 0);
+    while (LCD_BASE & LCD_BUSY);
 }
 
 /* send LCD data */
 static void lcd_send_data(unsigned data)
 {
     lcd_wait_write();
-    LCD_DATA = (data >> 8) & 0xff;
+    LCD_DATA = data >> 8;
 
     lcd_wait_write();
     LCD_DATA = data & 0xff;
