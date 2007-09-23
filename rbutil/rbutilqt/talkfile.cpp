@@ -190,6 +190,7 @@ bool TTSSapi::start()
     QString execstring = m_TTSTemplate;
     execstring.replace("%exe",m_TTSexec);
     execstring.replace("%options",m_TTSOpts);
+    execstring.replace("%lang",m_TTSLanguage);
     qDebug() << "init" << execstring; 
     voicescript = new QProcess(NULL);
     voicescript->start(execstring);
