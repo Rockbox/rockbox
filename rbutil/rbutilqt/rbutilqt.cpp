@@ -946,7 +946,7 @@ QUrl RbUtilQt::proxy()
     if(userSettings->value("proxytype", "system").toString() == "manual")
         return QUrl(userSettings->value("proxy").toString());
 #if defined(Q_OS_LINUX)
-    else if(userSettings->value("proxytype") == "system")
+    else if(userSettings->value("proxytype", "system").toString() == "system")
         return QUrl(getenv("http_proxy"));
 #endif
 #if defined(Q_OS_WIN32)
