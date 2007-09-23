@@ -40,7 +40,7 @@ void tick_start(unsigned int interval_in_ms)
     INTMSK &= ~TIMER4_MASK;
 }
 
-void TIMER1(void)
+void TIMER4(void)
 {
     int i;
 
