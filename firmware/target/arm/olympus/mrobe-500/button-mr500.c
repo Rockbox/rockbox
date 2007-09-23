@@ -37,7 +37,7 @@
 void button_init_device(void)
 {
     /* GIO is the power button, set as input */
-    outw(inw(IO_GIO_DIR0)|0x01, IO_GIO_DIR0);
+    IO_GIO_DIR0|=0x01;
 }
 
 inline bool button_hold(void)
@@ -52,7 +52,7 @@ int button_read_device(void)
     int i = 0;
     int btn = BUTTON_NONE, timeout = BUTTON_TIMEOUT;
     
-    if ((inw(IO_GIO_BITSET0)&0x01) == 0)
+    if ((IO_GIO_BITSET0&0x01) == 0)
         btn |= BUTTON_POWER;
         
     uartHeartbeat();

@@ -46,19 +46,20 @@ extern int line;
 
 void main(void)
 {
-/*    unsigned char* loadbuffer;
+    unsigned char* loadbuffer;
     int buffer_size;
     int rc;
     int(*kernel_entry)(void);
-*/
+
     power_init();
+    lcd_init();
     system_init();
     kernel_init();
     adc_init();
     button_init();
     backlight_init();
     uartSetup();
-    lcd_init();
+
     font_init();
     spi_init();
 
@@ -73,7 +74,6 @@ void main(void)
 
     usb_init();
 
-    #if 0
     /* Enter USB mode without USB thread */
     if(usb_detect())
     {
@@ -99,18 +99,25 @@ void main(void)
         reset_screen();
         lcd_update();
     }
-    #endif
 
-    printf("ATA");
-    
-    outw(inw(IO_GIO_DIR1)&~(1<<10), IO_GIO_DIR1); // set GIO26 (reset pin) to output
+    int button=0, *address=0x0, count=0;
     while(true)
     {
-        if (button_read_device() == BUTTON_POWER)
+        button = button_read_device();
+        if (button == BUTTON_POWER)
         {
             printf("reset");
-            outw(1<<10, IO_GIO_BITSET1);
+            IO_GIO_BITSET1|=1<<10;
         }
+        if(button==BUTTON_RC_PLAY)
+            address+=0x02;
+        else if (button==BUTTON_RC_DOWN)
+            address-=0x02;
+        else if (button==BUTTON_RC_FF)
+            address+=0x1000;
+        else if (button==BUTTON_RC_REW)
+            address-=0x1000;
+
    //     if ((inw(IO_GIO_BITSET0)&(1<<14)) == 0)
         {
             short x,y,z1,z2, reg;
@@ -118,12 +125,15 @@ void main(void)
             printf("x: %04x y: %04x z1: %04x z2: %04x", x, y, z1, z2);
             printf("tsadc: %4x", tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS)&0xffff);
             printf("current tick: %04x", current_tick);
+            printf("Address: 0x%08x Data: 0x%08x", address, *address);
+            printf("Address: 0x%08x Data: 0x%08x", address+1, *(address+1));
+            printf("Address: 0x%08x Data: 0x%08x", address+2, *(address+2));
             tsc2100_keyclick(); /* doesnt work :( */
-            line -= 3;
+            line -= 6;
         }
-
     }
-#if 0
+
+    printf("ATA");
     rc = ata_init();
     if(rc)
     {
@@ -155,5 +165,4 @@ void main(void)
         kernel_entry = (void*) loadbuffer;
         rc = kernel_entry();
     }
-#endif
 }

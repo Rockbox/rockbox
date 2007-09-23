@@ -95,7 +95,7 @@ static const char * const irqname[] =
 
 static void UIRQ(void)
 {
-    unsigned int offset = IO_INTC_IRQENTRY0;
+    unsigned int offset = (IO_INTC_IRQENTRY0>>2)-1;
     panicf("Unhandled IRQ %02X: %s", offset, irqname[offset]);
 }
 
@@ -105,18 +105,13 @@ void irq_handler(void)
     /*
      * Based on: linux/arch/arm/kernel/entry-armv.S and system-meg-fx.c
      */
-    printf("INTERUPT!");
-    asm volatile (
-        "sub    lr, lr, #4            \r\n"
-        "stmfd  sp!, {r0-r3, ip, lr}  \r\n"
-        "mov    r0, #0x00030000       \r\n"
-        "ldr    r0, [r0, #0x518]       \r\n"
-        "ldr    r1, =irqvector        \r\n"
-        "ldr    r1, [r1, r0, lsl #2]  \r\n"
-        "mov    lr, pc                \r\n"
-        "bx     r1                    \r\n"
-        "ldmfd  sp!, {r0-r3, ip, pc}^ \r\n"
-    );
+
+    asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
+                    "sub   sp, sp, #8           \n"); /* Reserve stack */
+    irqvector[(IO_INTC_IRQENTRY0>>2)-1]();
+    asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
+                    "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
+                    "subs  pc, lr, #4           \n"); /* Return from FIQ */
 }
 
 void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked));
@@ -144,6 +139,11 @@ void system_reboot(void)
 
 }
 
+void enable_interrupts (void)
+{
+	asm volatile ("msr cpsr_c, #0x13" );
+}
+
 void system_init(void)
 {
     /* taken from linux/arch/arm/mach-itdm320-20/irq.c */
@@ -166,6 +166,12 @@ void system_init(void)
 	IO_INTC_FISEL0 = 0;
 	IO_INTC_FISEL1 = 0;
 	IO_INTC_FISEL2 = 0;
+
+    /* set GIO26 (reset pin) to output and low */
+	IO_GIO_BITSET1&=~(1<<10);
+	IO_GIO_DIR1&=~(1<<10);
+
+	enable_interrupts();
 }
 
 int system_memory_guard(int newmode)

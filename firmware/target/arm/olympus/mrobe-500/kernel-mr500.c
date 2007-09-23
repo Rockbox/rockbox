@@ -29,20 +29,22 @@ void tick_start(unsigned int interval_in_ms)
 {
     IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_STOP;
     
-    /* Setup the Prescalar */
-    IO_TIMER1_TMPRSCL = CONFIG_TIMER1_TMPRSCL;
+    /*  Setup the Prescalar (Divide by 10)
+     *  Based on linux/include/asm-arm/arch-integrator/timex.h 
+     */
+    IO_TIMER1_TMPRSCL = 0x000A;
 
     /* Setup the Divisor */
-    IO_TIMER1_TMDIV = CONFIG_TIMER1_TMDIV;
-    
+    IO_TIMER1_TMDIV = (TIMER_FREQ / (10*1000))*interval_in_ms;
+
     /* Turn Timer1 to Free Run mode */
     IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_FREE_RUN;
-    
+
     /* Enable the interrupt */
     IO_INTC_EINT0 |= 1<<IRQ_TIMER1;
 }
 
-void TIMER4(void)
+void TIMER1(void)
 {
     int i;
 

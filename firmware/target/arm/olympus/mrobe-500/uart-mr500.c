@@ -22,21 +22,7 @@
 #include "system.h"
 
 /* UART 0/1 */
-#define IO_UART0_DTRR             0x0300
-#define IO_UART0_BRSR             0x0302
-#define IO_UART0_MSR              0x0304
-#define IO_UART0_RFCR             0x0306
-#define IO_UART0_TFCR             0x0308
-#define IO_UART0_LCR              0x030A
-#define IO_UART0_SR               0x030C
 
-#define IO_UART1_DTRR             0x0380
-#define IO_UART1_BRSR             0x0382
-#define IO_UART1_MSR              0x0384
-#define IO_UART1_RFCR             0x0386
-#define IO_UART1_TFCR             0x0388
-#define IO_UART1_LCR              0x038A
-#define IO_UART1_SR               0x038C
 #define CONFIG_UART_BRSR            87
 
 void do_checksums(char *data, int len, char *xor, char *add)
@@ -53,16 +39,16 @@ void do_checksums(char *data, int len, char *xor, char *add)
 
 void uartSetup(void) {
     // 8-N-1
-    outw(0x8000, IO_UART1_MSR);
-    outw(CONFIG_UART_BRSR, IO_UART1_BRSR);
+    IO_UART1_MSR=0x8000;
+    IO_UART1_BRSR=CONFIG_UART_BRSR;
 }
 
 void uartPutc(char ch) {
     // Wait for room in FIFO
-    while ((inw(IO_UART1_TFCR) & 0x3f) >= 0x20);
+    while ((IO_UART1_TFCR & 0x3f) >= 0x20);
     
     // Write character
-    outw(ch, IO_UART1_DTRR);
+    IO_UART1_DTRR=ch;
 }
 
 // Unsigned integer to ASCII hexadecimal conversion
@@ -88,17 +74,17 @@ void uartGets(char *str, unsigned int size) {
         char ch;
         
         // Wait for FIFO to contain something
-        while ((inw(IO_UART1_RFCR) & 0x3f) == 0);
+        while ((IO_UART1_RFCR & 0x3f) == 0);
         
         // Read character
-        ch = (char)inw(IO_UART1_DTRR);
+        ch = (char)IO_UART1_DTRR;
         
         // Echo character back
-        outw(ch, IO_UART1_DTRR);
+        IO_UART1_DTRR=ch;
         
         // If CR, also echo LF, null-terminate, and return
         if (ch == '\r') {
-            outw('\n', IO_UART1_DTRR);
+            IO_UART1_DTRR='\n';
             if (size) {
                 *str++ = '\0';
             }
@@ -115,8 +101,8 @@ void uartGets(char *str, unsigned int size) {
 
 int uartPollch(unsigned int ticks) {
     while (ticks--) {
-        if (inw(IO_UART1_RFCR) & 0x3f) {
-            return inw(IO_UART1_DTRR) & 0xff;
+        if (IO_UART1_RFCR & 0x3f) {
+            return IO_UART1_DTRR & 0xff;
         }
     }
     
@@ -125,7 +111,7 @@ int uartPollch(unsigned int ticks) {
 
 bool uartAvailable(void)
 {
-    return (inw(IO_UART1_RFCR) & 0x3f)?true:false;
+    return (IO_UART1_RFCR & 0x3f)?true:false;
 }
 
 void uartHeartbeat(void)

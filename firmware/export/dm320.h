@@ -75,21 +75,21 @@
 #define IO_SERIAL1_MODE           DM320_REG(0x0286)
 
 /* UART 0/1 */
-#define IO_UART0_DTRR             0x0300
-#define IO_UART0_BRSR             0x0302
-#define IO_UART0_MSR              0x0304
-#define IO_UART0_RFCR             0x0306
-#define IO_UART0_TFCR             0x0308
-#define IO_UART0_LCR              0x030A
-#define IO_UART0_SR               0x030C
+#define IO_UART0_DTRR             DM320_REG(0x0300)
+#define IO_UART0_BRSR             DM320_REG(0x0302)
+#define IO_UART0_MSR              DM320_REG(0x0304)
+#define IO_UART0_RFCR             DM320_REG(0x0306)
+#define IO_UART0_TFCR             DM320_REG(0x0308)
+#define IO_UART0_LCR              DM320_REG(0x030A)
+#define IO_UART0_SR               DM320_REG(0x030C)
 
-#define IO_UART1_DTRR             0x0380
-#define IO_UART1_BRSR             0x0382
-#define IO_UART1_MSR              0x0384
-#define IO_UART1_RFCR             0x0386
-#define IO_UART1_TFCR             0x0388
-#define IO_UART1_LCR              0x038A
-#define IO_UART1_SR               0x038C
+#define IO_UART1_DTRR             DM320_REG(0x0380)
+#define IO_UART1_BRSR             DM320_REG(0x0382)
+#define IO_UART1_MSR              DM320_REG(0x0384)
+#define IO_UART1_RFCR             DM320_REG(0x0386)
+#define IO_UART1_TFCR             DM320_REG(0x0388)
+#define IO_UART1_LCR              DM320_REG(0x038A)
+#define IO_UART1_SR               DM320_REG(0x038C)
 
 /* Watchdog Timer */
 #define IO_WATCHDOG_MODE          0x0400
@@ -168,55 +168,55 @@
 #define IO_INTC_ENTRY_TBA0        DM320_REG(0x0538)
 #define IO_INTC_ENTRY_TBA1        DM320_REG(0x053A)
 #define IO_INTC_PRIORITY0         DM320_REG(0x0540)
-#define IO_INTC_PRIORITY1         0x0542
-#define IO_INTC_PRIORITY2         0x0544
-#define IO_INTC_PRIORITY3         0x0546
-#define IO_INTC_PRIORITY4         0x0548
-#define IO_INTC_PRIORITY5         0x054A
-#define IO_INTC_PRIORITY6         0x054C
-#define IO_INTC_PRIORITY7         0x054E
-#define IO_INTC_PRIORITY8         0x0550
-#define IO_INTC_PRIORITY9         0x0552
-#define IO_INTC_PRIORITY10        0x0554
-#define IO_INTC_PRIORITY11        0x0556
-#define IO_INTC_PRIORITY12        0x0558
-#define IO_INTC_PRIORITY13        0x055A
-#define IO_INTC_PRIORITY14        0x055C
-#define IO_INTC_PRIORITY15        0x055E
-#define IO_INTC_PRIORITY16        0x0560
-#define IO_INTC_PRIORITY17        0x0562
-#define IO_INTC_PRIORITY18        0x0564
-#define IO_INTC_PRIORITY19        0x0566
-#define IO_INTC_PRIORITY20        0x0568
-#define IO_INTC_PRIORITY21        0x056A
-#define IO_INTC_PRIORITY22        0x056C
+#define IO_INTC_PRIORITY1         DM320_REG(0x0542)
+#define IO_INTC_PRIORITY2         DM320_REG(0x0544)
+#define IO_INTC_PRIORITY3         DM320_REG(0x0546)
+#define IO_INTC_PRIORITY4         DM320_REG(0x0548)
+#define IO_INTC_PRIORITY5         DM320_REG(0x054A)
+#define IO_INTC_PRIORITY6         DM320_REG(0x054C)
+#define IO_INTC_PRIORITY7         DM320_REG(0x054E)
+#define IO_INTC_PRIORITY8         DM320_REG(0x0550)
+#define IO_INTC_PRIORITY9         DM320_REG(0x0552)
+#define IO_INTC_PRIORITY10        DM320_REG(0x0554)
+#define IO_INTC_PRIORITY11        DM320_REG(0x0556)
+#define IO_INTC_PRIORITY12        DM320_REG(0x0558)
+#define IO_INTC_PRIORITY13        DM320_REG(0x055A)
+#define IO_INTC_PRIORITY14        DM320_REG(0x055C)
+#define IO_INTC_PRIORITY15        DM320_REG(0x055E)
+#define IO_INTC_PRIORITY16        DM320_REG(0x0560)
+#define IO_INTC_PRIORITY17        DM320_REG(0x0562)
+#define IO_INTC_PRIORITY18        DM320_REG(0x0564)
+#define IO_INTC_PRIORITY19        DM320_REG(0x0566)
+#define IO_INTC_PRIORITY20        DM320_REG(0x0568)
+#define IO_INTC_PRIORITY21        DM320_REG(0x056A)
+#define IO_INTC_PRIORITY22        DM320_REG(0x056C)
 
 /* GIO Controller */
-#define IO_GIO_DIR0               0x0580
-#define IO_GIO_DIR1               0x0582
-#define IO_GIO_DIR2               0x0584
-#define IO_GIO_INV0               0x0586
-#define IO_GIO_INV1               0x0588
-#define IO_GIO_INV2               0x058A
-#define IO_GIO_BITSET0            0x058C
-#define IO_GIO_BITSET1            0x058E
-#define IO_GIO_BITSET2            0x0590
-#define IO_GIO_BITCLR0            0x0592
-#define IO_GIO_BITCLR1            0x0594
-#define IO_GIO_BITCLR2            0x0596
-#define IO_GIO_IRQPORT            0x0598
-#define IO_GIO_IRQEDGE            0x059A
-#define IO_GIO_CHAT0              0x059C
-#define IO_GIO_CHAT1              0x059E
-#define IO_GIO_CHAT2              0x05A0
-#define IO_GIO_NCHAT              0x05A2
-#define IO_GIO_FSEL0              0x05A4
-#define IO_GIO_FSEL1              0x05A6
-#define IO_GIO_FSEL2              0x05A8
-#define IO_GIO_FSEL3              0x05AA
-#define IO_GIO_FSEL4              0x05AC
-#define IO_GIO_CARD_SET           0x05AE
-#define IO_GIO_CARD_ST            0x05B0
+#define IO_GIO_DIR0               DM320_REG(0x0580)
+#define IO_GIO_DIR1               DM320_REG(0x0582)
+#define IO_GIO_DIR2               DM320_REG(0x0584)
+#define IO_GIO_INV0               DM320_REG(0x0586)
+#define IO_GIO_INV1               DM320_REG(0x0588)
+#define IO_GIO_INV2               DM320_REG(0x058A)
+#define IO_GIO_BITSET0            DM320_REG(0x058C)
+#define IO_GIO_BITSET1            DM320_REG(0x058E)
+#define IO_GIO_BITSET2            DM320_REG(0x0590)
+#define IO_GIO_BITCLR0            DM320_REG(0x0592)
+#define IO_GIO_BITCLR1            DM320_REG(0x0594)
+#define IO_GIO_BITCLR2            DM320_REG(0x0596)
+#define IO_GIO_IRQPORT            DM320_REG(0x0598)
+#define IO_GIO_IRQEDGE            DM320_REG(0x059A)
+#define IO_GIO_CHAT0              DM320_REG(0x059C)
+#define IO_GIO_CHAT1              DM320_REG(0x059E)
+#define IO_GIO_CHAT2              DM320_REG(0x05A0)
+#define IO_GIO_NCHAT              DM320_REG(0x05A2)
+#define IO_GIO_FSEL0              DM320_REG(0x05A4)
+#define IO_GIO_FSEL1              DM320_REG(0x05A6)
+#define IO_GIO_FSEL2              DM320_REG(0x05A8)
+#define IO_GIO_FSEL3              DM320_REG(0x05AA)
+#define IO_GIO_FSEL4              DM320_REG(0x05AC)
+#define IO_GIO_CARD_SET           DM320_REG(0x05AE)
+#define IO_GIO_CARD_ST            DM320_REG(0x05B0)
 
 /* DSP Controller */
 #define IO_DSPC_HPIB_CONTROL      0x0600
@@ -706,10 +706,6 @@
  *
  *  Copyright (C) 1999 ARM Limited
  */
-
-#define CONFIG_TIMER1_TMPRSCL          0x000A
-#define CLOCK_TICK_RATE                (CPUFREQ_MAX / CONFIG_TIMER1_TMPRSCL)
-#define CONFIG_TIMER1_TMDIV            (unsigned short)(CLOCK_TICK_RATE / HZ)
 
 #define CONFIG_TIMER0_TMMD_STOP        0x0000
 #define CONFIG_TIMER0_TMMD_ONE_SHOT    0x0001

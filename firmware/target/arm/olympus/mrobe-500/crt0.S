@@ -102,7 +102,7 @@ start:
     ldr    sp, =irq_stack
     msr    cpsr_c, #0xdb
     ldr    sp, =irq_stack
-    /* Switch to supervisor mode */
+    /* Switch to supervisor mode (no IRQ) */
     msr    cpsr_c, #0xd3
     ldr    sp, =stackend
 

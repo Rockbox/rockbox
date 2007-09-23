@@ -20,7 +20,7 @@
 #define TIMER_TARGET_H
 
 /* timer is based on PCLK and minimum division is 2 */
-#define TIMER_FREQ (49156800/2)
+#define TIMER_FREQ (27000000)
 
 bool __timer_set(long cycles, bool set);
 bool __timer_register(void);

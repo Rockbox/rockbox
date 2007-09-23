@@ -28,8 +28,8 @@
 #include "system.h"
 
 #define GIO_TS_ENABLE (1<<2)
-#define clr_gio_enable() outw(GIO_TS_ENABLE, IO_GIO_BITSET1)
-#define set_gio_enable() outw(GIO_TS_ENABLE, IO_GIO_BITCLR1)
+#define clr_gio_enable() IO_GIO_BITSET1=GIO_TS_ENABLE
+#define set_gio_enable() IO_GIO_BITCLR1=GIO_TS_ENABLE
 
 int spi_block_transfer(const uint8_t *tx_bytes, unsigned int tx_size,
                              uint8_t *rx_bytes, unsigned int rx_size)
@@ -72,6 +72,6 @@ void spi_init(void)
     IO_SERIAL0_TX_ENABLE = 0x0001;
 
     /* Set GIO 18 to output for touch screen slave enable */
-    outw(inw(IO_GIO_DIR1)&~GIO_TS_ENABLE, IO_GIO_DIR1);
+    IO_GIO_DIR1&=~GIO_TS_ENABLE;
     clr_gio_enable();
 }
