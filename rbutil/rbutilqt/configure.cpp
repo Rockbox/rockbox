@@ -39,6 +39,7 @@ Config::Config(QWidget *parent) : QDialog(parent)
 {
     programPath = qApp->applicationDirPath() + "/";
     ui.setupUi(this);
+    ui.tabConfiguration->setCurrentIndex(0);
     ui.radioManualProxy->setChecked(true);
     QRegExpValidator *proxyValidator = new QRegExpValidator(this);
     QRegExp validate("[0-9]*");
