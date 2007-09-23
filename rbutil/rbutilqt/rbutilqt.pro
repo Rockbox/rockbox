@@ -115,19 +115,18 @@ win32 {
     SOURCES +=  ../ipodpatcher/ipodio-win32.c
     SOURCES +=  ../sansapatcher/sansaio-win32.c
     RC_FILE = rbutilqt.rc
+    LIBS += -lsetupapi
 }
 
 unix {
     SOURCES +=  ../ipodpatcher/ipodio-posix.c
     SOURCES +=  ../sansapatcher/sansaio-posix.c
+    LIBS += -lusb
 }
 
 macx {
     QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
     CONFIG+=x86 ppc
-}
-unix {
-    LIBS += -lusb
 }
 
 static {

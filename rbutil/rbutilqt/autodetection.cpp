@@ -24,6 +24,15 @@
 #include <mntent.h>
 #include <usb.h>
 #endif
+#if defined(Q_OS_WIN32)
+#if defined(UNICODE)
+#define _UNICODE
+#endif
+#include <stdio.h>
+#include <tchar.h>
+#include <windows.h>
+#include <setupapi.h>
+#endif
 
 Autodetection::Autodetection(QObject* parent): QObject(parent)
 {
@@ -207,7 +216,7 @@ QString Autodetection::resolveMountPoint(QString device)
  */
 bool Autodetection::detectUsb()
 {
-        // autodetection only uses the buildin device settings only
+    // autodetection uses the buildin device settings only
     QSettings dev(":/ini/rbutil.ini", QSettings::IniFormat, this);
 
     // get a list of ID -> target name
@@ -268,6 +277,83 @@ bool Autodetection::detectUsb()
         }
         b = b->next;
     }
+#endif
+
+#if defined(Q_OS_WIN32)
+    HDEVINFO deviceInfo;
+    SP_DEVINFO_DATA infoData;
+    DWORD i;
+
+    // Iterate over all devices
+    // by doing it this way it's unneccessary to use GUIDs which might be not
+    // present in current MinGW. It also seemed to be more reliably than using
+    // a GUID.
+    // See KB259695 for an example.
+    deviceInfo = SetupDiGetClassDevs(NULL, NULL, NULL, DIGCF_ALLCLASSES | DIGCF_PRESENT);
+
+    infoData.cbSize = sizeof(SP_DEVINFO_DATA);
+
+    for(i = 0; SetupDiEnumDeviceInfo(deviceInfo, i, &infoData); i++) {
+        DWORD data;
+        LPTSTR buffer = NULL;
+        DWORD buffersize = 0;
+
+        // get device desriptor first
+        // for some reason not doing so results in bad things (tm)
+        while(!SetupDiGetDeviceRegistryProperty(deviceInfo, &infoData,
+            SPDRP_DEVICEDESC,&data, (PBYTE)buffer, buffersize, &buffersize)) {
+            if(GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+                if(buffer) free(buffer);
+                // double buffer size to avoid problems as per KB888609
+                buffer = (LPTSTR)malloc(buffersize * 2);
+            }
+            else {
+                break;
+            }
+        }
+
+        // now get the hardware id, which contains PID and VID.
+        while(!SetupDiGetDeviceRegistryProperty(deviceInfo, &infoData,
+            SPDRP_HARDWAREID,&data, (PBYTE)buffer, buffersize, &buffersize)) {
+            if(GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+                if(buffer) free(buffer);
+                // double buffer size to avoid problems as per KB888609
+                buffer = (LPTSTR)malloc(buffersize * 2);
+            }
+            else {
+                break;
+            }
+        }
+
+        unsigned int vid, pid, rev;
+        if(_stscanf(buffer, _TEXT("USB\\Vid_%x&Pid_%x&Rev_%x"), &vid, &pid, &rev) != 3) {
+            qDebug() << "Error getting USB ID -- possibly no USB device";
+        }
+        else {
+            uint32_t id;
+            id = vid << 16 | pid;
+            qDebug("VID: %04x PID: %04x", vid, pid);
+            if(usbids.contains(id)) {
+                    m_device = usbids.value(id);
+                    if(buffer) free(buffer);
+                    SetupDiDestroyDeviceInfoList(deviceInfo);
+                    qDebug() << "detectUsb: Got" << m_device;
+                    return true;
+                }
+                if(usberror.contains(id)) {
+                    m_errdev = usberror.value(id);
+                    // we detected something, so return true
+                    if(buffer) free(buffer);
+                    SetupDiDestroyDeviceInfoList(deviceInfo);
+                    qDebug() << "detectUsb: Got" << m_device;
+                    qDebug() << "detected device with problems via usb!";
+                    return true;
+                }
+        }
+        if(buffer) free(buffer);
+    }
+    SetupDiDestroyDeviceInfoList(deviceInfo);
+
 #endif
     return false;
 }
