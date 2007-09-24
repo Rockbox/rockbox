@@ -254,7 +254,11 @@
 % set link to the wiki.
 % Usage: \wikilink{WebHome}
 %        with "WebHome" being the wiki page name
-\newcommand{\wikilink}[1]{\url{http://www.rockbox.org/twiki/bin/view/Main/#1}}
+\newcommand{\wikibaseurl}{http://www.rockbox.org/wiki/}
+\ifpdfoutput{\newcommand{\wikiicon}{\Pointinghand}}
+    {\newcommand{\wikiicon}{}}
+\newcommand{\wikilink}[1]{\wikiicon{}\href{\wikibaseurl#1}{#1}}
+%\newcommand{\wikilink}[1]{\url{http://www.rockbox.org/wiki/#1}}
 
 % define environment "code" based on fancyvrb.
 % use it to set code the user should type / see on his screen.
