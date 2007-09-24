@@ -92,7 +92,7 @@ struct MIDIfile * mf IBSS_ATTR;
 int numberOfSamples IBSS_ATTR;
 long bpm IBSS_ATTR;
 
-long gmbuf[BUF_SIZE*NBUF];
+int32_t gmbuf[BUF_SIZE*NBUF];
 
 int quit=0;
 struct plugin_api * rb;
@@ -147,7 +147,7 @@ bool lastswap=1;
 
 inline void synthbuf(void)
 {
-   long *outptr;
+   int32_t *outptr;
    register int i;
    static int currentSample=0;
    int synthtemp[2];
