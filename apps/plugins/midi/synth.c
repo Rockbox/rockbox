@@ -5,6 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id$
  *
  * Copyright (C) 2005 Stepan Moskovchenko
  *
@@ -15,6 +16,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "plugin.h"
+#include "guspat.h"
+#include "midiutil.h"
+#include "synth.h"
 
 extern struct plugin_api * rb;
 
@@ -42,8 +47,6 @@ void readTextBlock(int file, char * buf)
     buf[cp-1]=0;
     rb->lseek(file, -1, SEEK_CUR);
 }
-
-
 
 /* Filename is the name of the config file              */
 /* The MIDI file should have been loaded at this point  */
@@ -400,34 +403,3 @@ signed short int synthVoice(struct SynthObject * so)
     return s*so->volscale>>14;
 }
 
-
-
-
-
-inline void synthSample(int * mixL, int * mixR)
-{
-   register int dL=0;
-   register int dR=0;
-   register short sample=0;
-   register struct SynthObject *voicept=voices;
-   struct SynthObject *lastvoice=&voices[MAX_VOICES];
-
-    while(voicept!=lastvoice)
-    {
-        if(voicept->isUsed==1)
-        {
-            sample = synthVoice(voicept);
-            dL += (sample*chPanLeft[voicept->ch])>>7;
-            dR += (sample*chPanRight[voicept->ch])>>7;
-        }
-        voicept++;
-    }
-
-   *mixL=dL;
-   *mixR=dR;
-
-    /* TODO: Automatic Gain Control, anyone? */
-    /* Or, should this be implemented on the DSP's output volume instead? */
-
-    return;  /* No more ghetto lowpass filter.. linear intrpolation works well. */
-}

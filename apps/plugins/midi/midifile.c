@@ -5,6 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id$
  *
  * Copyright (C) 2005 Stepan Moskovchenko
  *
@@ -15,8 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-
+#include "plugin.h"
+#include "midiutil.h"
 
 extern struct plugin_api * rb;
 
@@ -234,7 +235,6 @@ struct Track * readTrack(int file)
     return trk;
 }
 
-
 int readID(int file)
 {
     char id[5];
@@ -317,5 +317,4 @@ void unloadFile(struct MIDIfile * mf)
     free(mf);   //Unload the main struct
 }
 */
-
 

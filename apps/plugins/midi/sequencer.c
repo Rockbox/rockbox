@@ -5,6 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id$
  *
  * Copyright (C) 2005 Stepan Moskovchenko
  *
@@ -15,13 +16,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "plugin.h"
+#include "midiutil.h"
+#include "guspat.h"
 
 void setVolScale(int a);
 
 extern struct plugin_api * rb;
 
 long tempo=375000;
-
 
 inline void setVol(int ch, int vol)
 {
@@ -119,7 +122,6 @@ long pitchTbl[] ICONST_ATTR={
    73297,73330,73363,73396,73429,73462,73495,73528
 };
 
-
 void findDelta(struct SynthObject * so, int ch, int note)
 {
 
@@ -146,7 +148,6 @@ inline void setPW(int ch, int msb, int lsb)
         }
     }
 }
-
 
 /* Sets the volume scaling by channel volume and note volume */
 /* This way we can do the multiplication/indexing once per   */
@@ -375,3 +376,4 @@ int tick(void)
     else
         return 0;
 }
+

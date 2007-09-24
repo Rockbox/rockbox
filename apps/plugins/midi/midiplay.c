@@ -5,6 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id$
  *
  * Copyright (C) 2005 Karl Kurbjun based on midi2wav by Stepan Moskovchenko
  *
@@ -15,8 +16,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-#include "../../plugin.h"
+#include "plugin.h"
+#include "guspat.h"
+#include "midiutil.h"
+#include "synth.h"
+#include "sequencer.h"
+#include "midifile.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
@@ -62,7 +67,6 @@ PLUGIN_IRAM_DECLARE
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 
-
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define BTN_QUIT         BUTTON_POWER
 #define BTN_RIGHT        BUTTON_RIGHT
@@ -77,32 +81,6 @@ PLUGIN_IRAM_DECLARE
 
 #endif
 
-
-
-#define FRACTSIZE 10
-
-#ifndef SIMULATOR
-
-#if (HW_SAMPR_CAPS & SAMPR_CAP_22)
-#define SAMPLE_RATE SAMPR_22  // 44100 22050 11025
-#else
-#define SAMPLE_RATE SAMPR_44  // 44100 22050 11025
-#endif
-
-#define MAX_VOICES 20   // Note: 24 midi channels is the minimum general midi
-                        // spec implementation
-
-#else	// Simulator requires 44100, and we can afford to use more voices
-
-#define SAMPLE_RATE SAMPR_44
-#define MAX_VOICES 48
-
-#endif
-
-
-#define BUF_SIZE 256
-#define NBUF   2
-
 #undef SYNC
 
 #ifdef SIMULATOR
@@ -113,13 +91,6 @@ struct MIDIfile * mf IBSS_ATTR;
 
 int numberOfSamples IBSS_ATTR;
 long bpm IBSS_ATTR;
-
-#include "midi/midiutil.c"
-#include "midi/guspat.h"
-#include "midi/guspat.c"
-#include "midi/sequencer.c"
-#include "midi/midifile.c"
-#include "midi/synth.c"
 
 long gmbuf[BUF_SIZE*NBUF];
 
