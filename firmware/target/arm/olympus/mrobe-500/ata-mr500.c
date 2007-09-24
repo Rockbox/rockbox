@@ -64,7 +64,7 @@ void ata_device_init(void)
     ATA_RESET_DISABLE; /* Set the pin to disable an active low reset */
     
     /* set GIO17 (ATA power) on and output */
-    IO_GIO_BITSET1&=~(1<<1);
+    IO_GIO_BITCLR1=(1<<1);
 	IO_GIO_DIR1&=~(1<<1);
 }
 
