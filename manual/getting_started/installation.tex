@@ -9,6 +9,74 @@
   }
 }
 
+\section{Overview}
+There are two ways of installing Rockbox: automated and manual. While the
+manual way is older, more tested and proven to work correctly, the
+automated installation is based on a nice graphical application that does
+almost everything that's needed for you. It is still important that you have
+an overview of the installation process to be able to select the correct
+installation options.
+
+\opt{MASCODEC}{Rockbox itself comes as a single package. There is no need
+  to install additional software for running Rockbox.}
+\opt{SWCODEC} {
+  \opt{HAVE_RB_BL_ON_DISK}{There are three separate components,
+    two of which need to be installed in order to run Rockbox.}
+  \opt{HAVE_RB_BL_IN_FLASH}{There are two separate components of Rockbox
+    that need to be installed in order to run Rockbox.}
+
+\begin{description}
+\opt{HAVE_RB_BL_ON_DISK}{
+\item[The \playerman{} boot loader.]
+  The \playerman{} boot loader is the program that tells your \dap{} how to boot
+  and load the remaining firmware from disk. It is also responsible for the
+  disk mode on your \dap{}.
+
+  This boot loader is stored in special flash memory in your \playerman{}.
+  It is already installed on your \dap{}, so it is never necessary to modify
+  this in order to install Rockbox.}
+
+\item[The Rockbox boot loader.] \index{Boot loader}
+  \opt{HAVE_RB_BL_ON_DISK}{The Rockbox boot loader is loaded from disk by
+  the \playerman{} boot loader. It is responsible for loading the Rockbox
+  firmware and for providing the dual boot function. It directly replaces the
+  \playerman{} firmware on the \daps{} disk.
+  \opt{gigabeat}{\note{Dual boot does not currently work on the gigabeat.}}}
+
+  \opt{HAVE_RB_BL_IN_FLASH}{
+  The boot loader is the program that tells your
+  \dap{} how to boot and load other components of Rockbox. This is the
+  component of Rockbox that is installed to the flash memory of your
+  \playerman.}
+
+\item[The Rockbox firmware.]
+  \opt{HAVE_RB_BL_IN_FLASH}{Unlike the \playerman{} firmware, which runs
+  entirely from flash memory,}
+  \opt{HAVE_RB_BL_ON_DISK}{Similar to the \playerman{} firmware,}
+  most of the Rockbox code is contained in a
+  ``build'' that resides on your \daps{} drive. This makes it easy to
+  update Rockbox. The build consists of a directory called
+  \fname{.rockbox} containing all of Rockbox' files, which is located in the
+  root of your \daps{} drive.
+
+\end{description}
+}
+
+\nopt{player} {
+    Apart from the required parts there are some addons you might be interested
+    in installing too.
+    \begin{description}
+    \item[Fonts.] Rockbox can load custom fonts. The fonts itself are
+        distributed as separate package and thus needs to be installed
+        separately. The fonts are not required to run Rockbox itself but
+        a lot of themes require the fonts package to be installed.
+
+    \item[Themes.] The view of Rockbox can be customized by themes. Depending
+        on your taste you might want to install additional themes to change
+        the look of Rockbox.
+    \end{description}
+}
+
 \section{Prerequisites}\label{sec:prerequisites}
 \index{Installation!Prerequisites}
 Before installing Rockbox you should make sure you meet the prerequisites.
@@ -17,19 +85,6 @@ already available on your computer but if not you need to get some additional
 software.
 
 \begin{description}
-
-\item[ZIP utility.]\index{zip}
-  Rockbox is distributed as an archive using the
-  \fname{.zip} format. Thus you need a tool to handle that compressed
-  format. Usually your computer should have a tool installed that can
-  handle the \fname{.zip} file format. Windows XP has built-in support for
-  \fname{.zip} files and presents them to you as folders unless you have
-  installed a third party program that handles compressed files. For
-  other operating systems this may vary. If the \fname{.zip} file format
-  is not recognised on your computer you can find a program to handle them
-  at \url{http://www.info-zip.org/} or \url{http://sevenzip.sf.net/} which
-  can be downloaded and used free of charge.
-
 \item[USB connection.] To transfer Rockbox to your \dap{} you need to
   connect it to your computer. To proceed you need to know where to access the
   \dap{}. On Windows this means you need to figure out the drive letter
@@ -50,13 +105,25 @@ software.
     \note{\index{Firewire}Firewire detection is not supported in Rockbox at 
     the moment. Please use USB only.} 
   }
-
+\end{description}
+For manual installation and customization additional software is required.
+\begin{description}
+\item[ZIP utility.]\index{zip}
+  Rockbox is distributed as an archive using the
+  \fname{.zip} format. Thus you need a tool to handle that compressed
+  format. Usually your computer should have a tool installed that can
+  handle the \fname{.zip} file format. Windows XP has built-in support for
+  \fname{.zip} files and presents them to you as folders unless you have
+  installed a third party program that handles compressed files. For
+  other operating systems this may vary. If the \fname{.zip} file format
+  is not recognised on your computer you can find a program to handle them
+  at \url{http://www.info-zip.org/} or \url{http://sevenzip.sf.net/} which
+  can be downloaded and used free of charge.
 \item[Text editor.] As you will see in the following chapters, Rockbox is
   highly configurable. In addition to saving configurations within Rockbox,
   Rockbox also allows you to create customised configuration files. If you
   would like to edit custom configuration files on your computer, you will
   need a text editor like Windows' ``Wordpad''.
-
 \end{description}
 
 \opt{ipod}{
@@ -71,71 +138,45 @@ software.
   }
 }
 
-\section{Installing Rockbox}\label{sec:installing_rockbox}
-\index{Installation}
-\opt{MASCODEC}{
-  \subsection{Using the windows installer}
-  Using the Windows self installing executable to install Rockbox is the
-  easiest method of installing the software on your \dap{}. Simply follow the
-  on-screen instructions and select the appropriate drive letter and
-  \dap{}-model when prompted. You can use ``Add / Remove Programs'' to
-  uninstall the software at a later date.
+\section{Installing Rockbox}\label{sec:installing_rockbox}\index{Installation}
+\subsection{Automated Installation}
+To automatically install Rockbox download the official installer and
+housekeeping tool \textsc{Rockbox Utility}. It allows you to
+\begin{itemize}
+\item Automatically install all needed components for using Rockbox
+        (``Small Installation'')
+\item Automatically install all suggested components (``Full Installation'')
+\item Selectively install any of all available parts of Rockbox
+\item Install additional themes interactively
+\item Install voice files and generate talk clips
+\item Uninstall all components you installed using Rockbox Utility
+\end{itemize}
+Prebuild binaries for Windows, Linux and MacOS~X are
+available from \download{rbutil/}. As Rockbox Utility is still under
+development more information including up-to-date download links can be
+found at \wikilink{RockboxUtilityQt}.
 
-  \subsection{Manual installation}
-  For non{}-Windows users and those wishing to install manually from the
-  archive the procedure is still fairly simple.
-}
+\warn{Upon the first start of Rockbox Utility you \emph{need} to set at least
+the correct player and mountpoint in the configuration dialog. Autodetection
+can detect most player types. If autodetection failed or was unable to detect
+the mountpoint make sure to enter the correct values. The mountpoint indicates
+the location of the \dap{} in your filesystem. On Windows, this is the drive
+letter the \dap{} gets assigned, on other systems this is a path in the
+filesystem.}
+\opt{ipodvideo}{\warn{Autodetection is unable to distinguish between the
+        \playerman{} 30~GB and 60~GB / 80~GB models and defaults to the
+        30~GB model. This will usually work but you might want to check the
+        detected value, especially if you experience problems with Rockbox.}}
 
-\opt{SWCODEC}{
-  \subsection{Introduction}
+\note{Rockbox Utility currently lacks some guiding messages. Please have a
+        look at the manual installation instructions if you're stuck
+        during installation.}
 
-  \opt{HAVE_RB_BL_ON_DISK}{There are three separate components of Rockbox,
-  two of which need to be installed in order to run Rockbox.}
+\subsection{Manual Installation}
 
-  \opt{HAVE_RB_BL_IN_FLASH}{There are two separate components of Rockbox
-  that need to be installed in order to run Rockbox.}
+\subsubsection{Choosing a Rockbox version}\label{sec:choosing_version}
 
-  \begin{description}
-  \opt{HAVE_RB_BL_ON_DISK}{
-  \item[The \playerman{} boot loader.]
-    The \playerman{} boot loader is the program that tells your \dap{} how to boot
-    and load the remaining firmware from disk. It is also responsible for the
-    disk mode on your \dap{}.
-
-    This boot loader is stored in special flash memory in your \playerman{}.
-    It is already installed on your \dap{}, so it is never necessary to modify
-    this in order to install Rockbox.}
-
-  \item[The Rockbox boot loader.] \index{Boot loader}
-    \opt{HAVE_RB_BL_ON_DISK}{The Rockbox boot loader is loaded from disk by
-    the \playerman{} boot loader. It is responsible for loading the Rockbox
-    firmware and for providing the dual boot function. It directly replaces the
-    \playerman{} firmware on the \daps{} disk.
-    \opt{gigabeat}{\note{Dual boot does not currently work on the gigabeat.}}}
-
-    \opt{HAVE_RB_BL_IN_FLASH}{
-    The boot loader is the program that tells your
-    \dap{} how to boot and load other components of Rockbox. This is the
-    component of Rockbox that is installed to the flash memory of your
-    \playerman.}
-
-  \item[The Rockbox firmware.]
-    \opt{HAVE_RB_BL_IN_FLASH}{Unlike the \playerman{} firmware, which runs
-    entirely from flash memory, }
-    \opt{HAVE_RB_BL_ON_DISK}{Similar to the \playerman{} firmware, }
-    most of the Rockbox code is contained in a
-    ``build'' that resides on your \daps{} drive. This makes it easy to
-    update Rockbox. The build consists of a directory called
-    \fname{.rockbox} containing all of Rockbox' files, which is located in the
-    root of your \daps{} drive.
-
-  \end{description}
-
-}
-
-\subsection{Choosing a Rockbox version}\label{sec:choosing_version}
-
-There are three different types of firmware binaries from Rockbox website:
+There are three different types of firmware binaries from the Rockbox website:
 \label{Version}
 Release version, current build and daily build. You need to decide which one
 you want to install and get the version for your \dap{}.
@@ -187,7 +228,7 @@ project development, you can try development builds and help by reporting
 bugs. Just be aware that these are development builds that are highly
 functional, but not perfect!
 
-\subsection{Installing the firmware}\label{sec:installing_firmware}
+\subsubsection{Installing the firmware}\label{sec:installing_firmware}
 
 \opt{sansa}{\warn{The following steps require you to change the setting in
   \setting{Settings $\rightarrow$ USB Mode} to \setting{MSC} from within the
@@ -247,7 +288,7 @@ structure that Rockbox needs.
 }
 
 \opt{SWCODEC}{
-  \subsection{Installing the boot loader}
+  \subsubsection{Installing the boot loader}
   \opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
   \opt{ipod}{\input{getting_started/ipod_install.tex}}
   \opt{m5,x5}{\input{getting_started/iaudio_install.tex}}
@@ -256,7 +297,7 @@ structure that Rockbox needs.
   \opt{sansa}{\input{getting_started/sansa_install.tex}}
 }
 
-\section{Enabling Speech Support (optional)}\label{sec:enabling_speech_support}
+\subsection{Enabling Speech Support (optional)}\label{sec:enabling_speech_support}
 \index{Speech}\index{Installation!Optional Steps}
 If you wish to use speech support you will also need a voice file, english ones
 are available from \url{http://www.rockbox.org/daily.shtml}. Download the
@@ -266,15 +307,15 @@ your \dap{} and reboot. Voice menus are turned on by default. See
 \reference{ref:Voiceconfiguration} for details on voice settings.
 
 \section{Running Rockbox}
-Remove your \dap{} from the computer's USB port.%
+Remove your \dap{} from the computer's USB port. %
 \nopt{ipod,e200}{Unplug any connected power supply and turn the unit off. When
-you next turn the unit on, Rockbox should load.}%
+you next turn the unit on, Rockbox should load. }%
 \opt{ipod}{Rebooting the Ipod by holding
   \opt{IPOD_4G_PAD}{\ButtonMenu{}+\ButtonSelect{}}%
   \opt{IPOD_3G_PAD}{\ButtonMenu{}+\ButtonPlay{}}
   for a couple of seconds until the \dap{} reboots. Now Rockbox should load.
-}%
-\opt{e200}{Your e200 will automatically reboot and Rockbox should load}%
+} %
+\opt{e200}{Your e200 will automatically reboot and Rockbox should load. }%
 When you see the Rockbox splash screen, Rockbox is loaded and ready for
 use.
 
@@ -289,15 +330,29 @@ use.
   }
 }
 
-\section{Updating Rockbox} Updating Rockbox is easy. Download a Rockbox build.
+\section{Updating Rockbox}
+Even if you don't use Rockbox Utility for updating Rockbox it's easy.
+Download a Rockbox build.
 (The latest release of the Rockbox software will always be available from
 \url{http://www.rockbox.org/download/}). Unzip the build to the root directory
 of your \dap{} like you did in the installation step before. If your unzip
 program asks you whether to overwrite files, choose the ``Yes to all'' option.
 The new build will be installed over your current build.
 
-\section{Uninstalling Rockbox}\index{Installation!uninstall}
+\note{If you use Rockbox Utility be aware that it can not detect manually
+        installed components.}
 
+\section{Uninstalling Rockbox}\index{Installation!uninstall}
+\subsection{Automatic Uninstallation}
+You can uninstall Rockbox automatically by using Rockbox Utility. If you
+installed Rockbox manually you can still use Rockbox Utility for uninstallation
+but won't be able to do this selectively.
+
+\opt{h1xx,h300}{\note{Rockbox Utility can't uninstall the bootloader due to
+the fact that it requires a flashing procedure. To uninstall the bootloader
+completely follow the manual uninstallation instructions below.}}
+
+\subsection{Manual Uninstallation}
 \opt{archos}{
   If you would like to go back to using the original \playerman{} software,
   connect the \dap{} to your computer, and delete the
