@@ -28,6 +28,43 @@
 
 #define LCD_BUSY  0x8000
 
+/* LCD command set for Samsung S6B33B2 */
+
+#define R_OSCILLATION_MODE     0x02
+#define R_DRIVER_OUTPUT_MODE   0x10
+#define R_DCDC_SET             0x20
+#define R_BIAS_SET             0x22
+#define R_DCDC_CLOCK_DIV       0x24
+#define R_DCDC_AMP_ONOFF       0x26
+#define R_TEMP_COMPENSATION    0x28
+#define R_CONTRAST_CONTROL1    0x2a
+#define R_CONTRAST_CONTROL2    0x2b
+#define R_STANDBY_OFF          0x2c
+#define R_STANDBY_ON           0x2d
+#define R_DDRAM_BURST_OFF      0x2e
+#define R_DDRAM_BURST_ON       0x2f
+#define R_ADDRESSING_MODE      0x30
+#define R_ROW_VECTOR_MODE      0x32
+#define R_N_LINE_INVERSION     0x34
+#define R_FRAME_FREQ_CONTROL   0x36
+#define R_RED_PALETTE          0x38
+#define R_GREEN_PALETTE        0x3a
+#define R_BLUE_PALETTE         0x3c
+#define R_ENTRY_MODE           0x40
+#define R_X_ADDR_AREA          0x42
+#define R_Y_ADDR_AREA          0x43
+#define R_RAM_SKIP_AREA        0x45
+#define R_DISPLAY_OFF          0x50
+#define R_DISPLAY_ON           0x51
+#define R_SPEC_DISPLAY_PATTERN 0x53
+#define R_PARTIAL_DISPLAY_MODE 0x55
+#define R_PARTIAL_START_LINE   0x56
+#define R_PARTIAL_END_LINE     0x57
+#define R_AREA_SCROLL_MODE     0x59
+#define R_SCROLL_START_LINE    0x5a
+#define R_DATA_FORMAT_SELECT   0x60
+
+
 /* wait for LCD */
 static inline void lcd_wait_write(void)
 {
@@ -70,69 +107,69 @@ void lcd_init_device(void)
     LCD_BASE = 0x4687;
     udelay(10000);
 
-    lcd_send_command(0x2c);
+    lcd_send_command(R_STANDBY_OFF);
     udelay(20000);
 
-    lcd_send_command(0x02);
+    lcd_send_command(R_OSCILLATION_MODE);
     lcd_send_command(0x01);
     udelay(20000);
 
-    lcd_send_command(0x26);
+    lcd_send_command(R_DCDC_AMP_ONOFF);
     lcd_send_command(0x01);
     udelay(20000);
 
-    lcd_send_command(0x26);
+    lcd_send_command(R_DCDC_AMP_ONOFF);
     lcd_send_command(0x09);
     udelay(20000);
 
-    lcd_send_command(0x26);
+    lcd_send_command(R_DCDC_AMP_ONOFF);
     lcd_send_command(0x0b);
     udelay(20000);
 
-    lcd_send_command(0x26);
+    lcd_send_command(R_DCDC_AMP_ONOFF);
     lcd_send_command(0x0f);
     udelay(20000);
 
-    lcd_send_command(0x10);
+    lcd_send_command(R_DRIVER_OUTPUT_MODE);
     lcd_send_command(0x07);
 
-    lcd_send_command(0x20);
+    lcd_send_command(R_DCDC_SET);
     lcd_send_command(0x03);
 
-    lcd_send_command(0x24);
+    lcd_send_command(R_DCDC_CLOCK_DIV);
     lcd_send_command(0x03);
 
-    lcd_send_command(0x28);
+    lcd_send_command(R_TEMP_COMPENSATION);
     lcd_send_command(0x01);
 
-    lcd_send_command(0x2a);
+    lcd_send_command(R_CONTRAST_CONTROL1);
     lcd_send_command(0x55);
 
-    lcd_send_command(0x30);
+    lcd_send_command(R_ADDRESSING_MODE);
     lcd_send_command(0x10);
 
-    lcd_send_command(0x32);
+    lcd_send_command(R_ROW_VECTOR_MODE);
     lcd_send_command(0x0e);
 
-    lcd_send_command(0x34);
+    lcd_send_command(R_N_LINE_INVERSION);
     lcd_send_command(0x0d);
 
-    lcd_send_command(0x36);
+    lcd_send_command(R_FRAME_FREQ_CONTROL);
     lcd_send_command(0);
 
-    lcd_send_command(0x40);
+    lcd_send_command(R_ENTRY_MODE);
     lcd_send_command(0x82);
 
-    lcd_send_command(0x43);                  /* vertical dimensions */
+    lcd_send_command(R_Y_ADDR_AREA);         /* vertical dimensions */
     lcd_send_command(0x1a);                  /* y1 + 0x1a */
     lcd_send_command(LCD_HEIGHT - 1 + 0x1a); /* y2 + 0x1a */
 
-    lcd_send_command(0x42);                  /* horizontal dimensions */
+    lcd_send_command(R_X_ADDR_AREA);         /* horizontal dimensions */
     lcd_send_command(0);                     /* x1 */
     lcd_send_command(LCD_WIDTH - 1);         /* x2 */
     udelay(100000);
 
-    lcd_send_command(0x51);
+    lcd_send_command(R_DISPLAY_ON);
 }
 
 /*** hardware configuration ***/
@@ -156,8 +193,8 @@ void lcd_set_invert_display(bool yesno)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-  /* TODO: Implement lcd_set_flip() */
-  (void)yesno;
+  lcd_send_command(R_DRIVER_OUTPUT_MODE);
+  lcd_send_command(yesno ? 0x02 : 0x07);
 }
 
 /*** update functions ***/
@@ -212,14 +249,14 @@ void lcd_update_rect(int x0, int y0, int width, int height)
     if(y1 >= LCD_HEIGHT)
         y1 = LCD_HEIGHT - 1;
 
-    lcd_send_command(0x43);
+    lcd_send_command(R_Y_ADDR_AREA);
     lcd_send_command(y0 + 0x1a);
     lcd_send_command(y1 + 0x1a);
 
     if(x1 >= LCD_WIDTH)
         x1 = LCD_WIDTH - 1;
 
-    lcd_send_command(0x42);
+    lcd_send_command(R_X_ADDR_AREA);
     lcd_send_command(x0);
     lcd_send_command(x1);
 
