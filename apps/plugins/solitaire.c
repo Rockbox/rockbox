@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004-2006 Antoine Cellerier <dionoea @t videolan d.t org>
+ * Copyright (C) 2004-2007 Antoine Cellerier <dionoea @t videolan d.t org>
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,20 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-/*****************************************************************************
-Solitaire by dionoea
-Graphics & Fix Bugs by Ben Basha
-
-use arrows to move the cursor
-use ON to select cards, move cards, reveal hidden cards, ...
-use PLAY to move a card from the remains' stack to the top of the cursor
-use F1 to put card under cursor on one of the 4 final stacks
-use F2 to un-select card if a card was selected, else draw 3 new cards
-    out of the remains' stack
-use F3 to put card on top of the remains' stack on one of the 4 final stacks
-
-*****************************************************************************/
 
 #include "plugin.h"
 #include "playback_control.h"
@@ -1046,7 +1032,7 @@ enum move move_card( int dest_col, int src_card )
     return MOVE_OK;
 }
 
-enum { SOLITAIRE_WIN, SOLITAIRE_QUIT, SOLITAIRE_USB };
+enum { SOLITAIRE_WIN, SOLITAIRE_QUIT_NEW, SOLITAIRE_QUIT, SOLITAIRE_USB };
 
 /**
  * Bouncing cards at the end of the game
@@ -1115,10 +1101,125 @@ int bouncing_cards( void )
 }
 
 /**
+ * Game save/load routines
+ */
+void get_save_filename( char *buf )
+{
+    char *s;
+    rb->strcpy( buf, rb->plugin_get_current_filename() );
+    s = rb->strrchr( buf, '/' ) + 1;
+    *s = '\0';
+    rb->strcat( s, "sol.save" );
+}
+
+int open_save_file( int flags )
+{
+    char buf[MAX_PATH];
+    get_save_filename( buf );
+    return rb->open( buf, flags );
+}
+
+void delete_save_file( void )
+{
+    char buf[MAX_PATH];
+    rb->remove( buf );
+}
+
+#ifdef write
+#   undef write
+#endif
+int save_write( int fd, const void *buf, size_t count, int *checksum )
+{
+    size_t i;
+    if( rb->PREFIX(write)( fd, buf, count ) < (ssize_t)count )
+        return 1;
+    for( i = 0; i < count; i++ )
+        *checksum += (int)(((const char *)buf)[i]);
+    return 0;
+}
+
+#ifdef read
+#   undef read
+#endif
+int save_read( int fd, void *buf, size_t count, int *checksum )
+{
+    size_t i;
+    if( rb->PREFIX(read)( fd, buf, count ) < (ssize_t)count )
+        return 1;
+    for( i = 0; i < count; i++ )
+        *checksum -= (int)(((const char *)buf)[i]);
+    return 0;
+}
+
+int save_game( void )
+{
+    int fd = open_save_file( O_CREAT|O_WRONLY|O_TRUNC );
+    int checksum = 42;
+    if( fd < 0 )
+        return -1;
+    if(    save_write( fd, &cur_card, sizeof( int ), &checksum )
+        || save_write( fd, &cur_col, sizeof( int ), &checksum )
+        || save_write( fd, &sel_card, sizeof( int ), &checksum )
+        || save_write( fd, deck, NUM_CARDS * sizeof( card_t ), &checksum )
+        || save_write( fd, &rem, sizeof( int ), &checksum )
+        || save_write( fd, &cur_rem, sizeof( int ), &checksum )
+        || save_write( fd, &count_rem, sizeof( int ), &checksum )
+        || save_write( fd, &cards_per_draw, sizeof( int ), &checksum )
+        || save_write( fd, cols, COL_NUM * sizeof( int ), &checksum )
+        || save_write( fd, stacks, SUITS * sizeof( int ), &checksum )
+        || ( rb->PREFIX(write)( fd, &checksum, sizeof( int ) ) < (ssize_t)(sizeof( int ) ) ) )
+    {
+        rb->close( fd );
+        rb->splash( 2*HZ, "Error while saving game. Aborting." );
+        return -2;
+    }
+    rb->close( fd );
+    return 0;
+}
+
+int load_game( void )
+{
+    int fd = open_save_file( O_RDONLY );
+    int checksum;
+    if( fd < 0 )
+        return -1;
+    if(    ( rb->PREFIX(lseek)( fd, -sizeof( int ), SEEK_END ) == -((ssize_t)sizeof( int ))-1 )
+        || ( rb->PREFIX(read)( fd, &checksum, sizeof( int ) ) < ((ssize_t)sizeof( int )) )
+        || ( rb->PREFIX(lseek)( fd, 0, SEEK_SET ) == -1 )
+        || save_read( fd, &cur_card, sizeof( int ), &checksum )
+        || save_read( fd, &cur_col, sizeof( int ), &checksum )
+        || save_read( fd, &sel_card, sizeof( int ), &checksum )
+        || save_read( fd, deck, NUM_CARDS * sizeof( card_t ), &checksum )
+        || save_read( fd, &rem, sizeof( int ), &checksum )
+        || save_read( fd, &cur_rem, sizeof( int ), &checksum )
+        || save_read( fd, &count_rem, sizeof( int ), &checksum )
+        || save_read( fd, &cards_per_draw, sizeof( int ), &checksum )
+        || save_read( fd, cols, COL_NUM * sizeof( int ), &checksum )
+        || save_read( fd, stacks, SUITS * sizeof( int ), &checksum ) )
+    {
+        rb->close( fd );
+        rb->splash( 2*HZ, "Error while loading saved game. Aborting." );
+        delete_save_file();
+        return -2;
+    }
+    rb->close( fd );
+    if( checksum != 42 )
+    {
+        rb->splash( 2*HZ, "Save file was corrupted. Aborting." );
+        delete_save_file();
+        return -3;
+    }
+    return 0;
+}
+
+/**
  * The main game loop
+ *
+ * If skipmenu is defined to SOLITAIRE_QUIT, the menu will be skipped and
+ * game will resume.
  */
 
-int solitaire( void )
+int solitaire( int skipmenu )
 {
 
     int i,j;
@@ -1127,15 +1228,18 @@ int solitaire( void )
     int biggest_col_length;
 
     rb->srand( *rb->current_tick );
-    switch( solitaire_menu(false) )
+    if( skipmenu != SOLITAIRE_QUIT )
     {
-        case MENU_QUIT:
-            return SOLITAIRE_QUIT;
+        switch( solitaire_menu(false) )
+        {
+            case MENU_QUIT:
+                return SOLITAIRE_QUIT_NEW;
 
-        case MENU_USB:
-            return SOLITAIRE_USB;
+            case MENU_USB:
+                return SOLITAIRE_USB;
+        }
+        solitaire_init();
     }
-    solitaire_init();
 
     while( true )
     {
@@ -1600,7 +1704,7 @@ int solitaire( void )
 
             case SYS_POWEROFF:
                 return SOLITAIRE_QUIT;
-            
+
             default:
                 if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
                     return SOLITAIRE_USB;
@@ -1640,12 +1744,23 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
                     sizeof(config) / sizeof(config[0]), CFGFILE_VERSION);
     rb->memcpy(&sol, &sol_disk, sizeof(sol));   /* copy to running config */
 
+    if( load_game() == 0 )
+        result = SOLITAIRE_QUIT;
+    else
+        result = SOLITAIRE_WIN;
+
     init_help();
 
     /* play the game :)
      * Keep playing if a game was won (that means display the menu after
      * winning instead of quiting) */
-    while( ( result = solitaire() ) == SOLITAIRE_WIN );
+    while( ( result = solitaire( result ) ) == SOLITAIRE_WIN );
+
+    if( result != SOLITAIRE_QUIT_NEW )
+        save_game();
+    else
+        /* XXX: Not sure if this is the best spot to delete the save file */
+        delete_save_file();
 
     if (rb->memcmp(&sol, &sol_disk, sizeof(sol))) /* save settings if changed */
     {
