@@ -46,6 +46,7 @@
 #include "keyboard.h"
 #include "gui/scrollbar.h"
 #include "eq_menu.h"
+#include "pcmbuf.h"
 #ifdef HAVE_WM8758
 #include "wm8758.h"
 #endif
@@ -78,23 +79,25 @@ void eq_precut_format(char* buffer, size_t buffer_size, int value, const char* u
 /*
  * Settings functions
  */
-int enable_callback(int action, const struct menu_item_ex *this_item)
+void eq_apply(void)
 {
     int i;
+    dsp_set_eq(global_settings.eq_enabled); 
+    dsp_set_eq_precut(global_settings.eq_precut);    
+    /* Update all bands */
+    for(i = 0; i < 5; i++) {
+        dsp_set_eq_coefs(i);
+    }
+}
+int enable_callback(int action, const struct menu_item_ex *this_item)
+{
     (void)this_item;
     if (action == ACTION_EXIT_MENUITEM)
-    {
-        dsp_set_eq(global_settings.eq_enabled); 
-        dsp_set_eq_precut(global_settings.eq_precut);    
-        /* Update all bands */
-        for(i = 0; i < 5; i++) {
-            dsp_set_eq_coefs(i);
-        }
-    }
+        eq_apply();
     return action;
 }
 MENUITEM_SETTING(eq_enable, &global_settings.eq_enabled, enable_callback);
-MENUITEM_SETTING(eq_precut, &global_settings.eq_precut, NULL);
+MENUITEM_SETTING(eq_precut, &global_settings.eq_precut, enable_callback);
 
 int dsp_set_coefs_callback(int action, const struct menu_item_ex *this_item)
 {
@@ -121,6 +124,7 @@ int do_option(void* param)
 {
     const struct menu_item_ex *setting = (const struct menu_item_ex*)param;
     do_setting_from_menu(setting);
+    eq_apply();
     return 0;
 }
 
@@ -636,7 +640,7 @@ MENUITEM_FUNCTION(eq_browse, 0, ID2P(LANG_EQUALIZER_BROWSE),
                     (int(*)(void))eq_browse_presets, NULL, NULL, Icon_NOICON);
 
 int soundmenu_callback(int action,const struct menu_item_ex *this_item);
-MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), soundmenu_callback, Icon_EQ,
+MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), NULL, Icon_EQ,
         &eq_enable, &eq_graphical, &eq_precut, &gain_menu, 
         &advanced_eq_menu_, &eq_save, &eq_browse);
 
