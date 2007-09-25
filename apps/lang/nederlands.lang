@@ -1417,44 +1417,44 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "ID3 label prioriteit"
+    *: ""
   </dest>
   <voice>
-    *: "ID3 label prioriteit"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1 dan V2"
+    *: ""
   </dest>
   <voice>
-    *: "Versie 1 dan versie 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2 dan V1"
+    *: ""
   </dest>
   <voice>
-    *: "Versie 2 dan versie 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6760,13 +6760,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "Schudden..."
+    *: ""
   </dest>
   <voice>
     *: ""
