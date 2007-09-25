@@ -141,40 +141,40 @@ void system_reboot(void)
 
 void enable_interrupts (void)
 {
-	asm volatile ("msr cpsr_c, #0x13" );
+    asm volatile ("msr cpsr_c, #0x13" );
 }
 
 void system_init(void)
 {
     /* taken from linux/arch/arm/mach-itdm320-20/irq.c */
 
-  	/* Clearing all FIQs and IRQs. */
-	IO_INTC_IRQ0 = 0xFFFF;
-	IO_INTC_IRQ1 = 0xFFFF;
-	IO_INTC_IRQ2 = 0xFFFF;
+    /* Clearing all FIQs and IRQs. */
+    IO_INTC_IRQ0 = 0xFFFF;
+    IO_INTC_IRQ1 = 0xFFFF;
+    IO_INTC_IRQ2 = 0xFFFF;
 
-	IO_INTC_FIQ0 = 0xFFFF;
-	IO_INTC_FIQ1 = 0xFFFF;
-	IO_INTC_FIQ2 = 0xFFFF;
+    IO_INTC_FIQ0 = 0xFFFF;
+    IO_INTC_FIQ1 = 0xFFFF;
+    IO_INTC_FIQ2 = 0xFFFF;
 
-	/* Masking all Interrupts. */
-	IO_INTC_EINT0 = 0;
-	IO_INTC_EINT1 = 0;
-	IO_INTC_EINT2 = 0;
+    /* Masking all Interrupts. */
+    IO_INTC_EINT0 = 0;
+    IO_INTC_EINT1 = 0;
+    IO_INTC_EINT2 = 0;
 
-	/* Setting INTC to all IRQs. */
-	IO_INTC_FISEL0 = 0;
-	IO_INTC_FISEL1 = 0;
-	IO_INTC_FISEL2 = 0;
+    /* Setting INTC to all IRQs. */
+    IO_INTC_FISEL0 = 0;
+    IO_INTC_FISEL1 = 0;
+    IO_INTC_FISEL2 = 0;
 
-	IO_INTC_ENTRY_TBA0 =
-	IO_INTC_ENTRY_TBA1 = 0;
+    IO_INTC_ENTRY_TBA0 =
+    IO_INTC_ENTRY_TBA1 = 0;
 
     /* set GIO26 (reset pin) to output and low */
-	IO_GIO_BITCLR1=(1<<10);
-	IO_GIO_DIR1&=~(1<<10);
+    IO_GIO_BITCLR1=(1<<10);
+    IO_GIO_DIR1&=~(1<<10);
 
-	enable_interrupts();
+    enable_interrupts();
 }
 
 int system_memory_guard(int newmode)
