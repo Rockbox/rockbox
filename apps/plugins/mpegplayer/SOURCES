@@ -1,14 +1,15 @@
 alloc.c
 decode.c
 header.c
-idct.c
 
 motion_comp.c
 
 #ifdef CPU_ARM
+idct_arm_c.c
 motion_comp_arm_c.c
 motion_comp_arm_s.S
 #else  /* other CPU or SIM */
+idct.c
 motion_comp_c.c
 #endif /* CPU_* */
 

@@ -179,7 +179,7 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_bitmap,
 #endif
 
-#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
+#if defined(HAVE_LCD_COLOR)
     lcd_yuv_blit,
 #endif
     /* list */
@@ -505,6 +505,10 @@ static const struct plugin_api rockbox_api = {
     get_metadata,
 #endif
     led,
+
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+    lcd_yuv_set_options,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

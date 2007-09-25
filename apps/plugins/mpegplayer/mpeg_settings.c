@@ -9,20 +9,64 @@ extern struct plugin_api* rb;
 struct mpeg_settings settings;
 static struct mpeg_settings old_settings;
 
-#define SETTINGS_VERSION 1
+#define SETTINGS_VERSION 2
 #define SETTINGS_MIN_VERSION 1
 #define SETTINGS_FILENAME "mpegplayer.cfg"
 
-static char* showfps_options[] = {"No", "Yes"};
-static char* limitfps_options[] = {"No", "Yes"};
-static char* skipframes_options[] = {"No", "Yes"};
-
 static struct configdata config[] =
 {
-   {TYPE_ENUM, 0, 2, &settings.showfps, "Show FPS", showfps_options, NULL},
-   {TYPE_ENUM, 0, 2, &settings.limitfps, "Limit FPS", limitfps_options, NULL},
-   {TYPE_ENUM, 0, 2, &settings.skipframes, "Skip frames", skipframes_options, NULL},
+   {TYPE_ENUM, 0, 2, &settings.showfps, "Show FPS",
+        (char *[]){ "No", "Yes" }, NULL},
+   {TYPE_ENUM, 0, 2, &settings.limitfps, "Limit FPS",
+        (char *[]){ "No", "Yes" }, NULL},
+   {TYPE_ENUM, 0, 2, &settings.skipframes, "Skip frames",
+        (char *[]){ "No", "Yes" }, NULL},
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+   {TYPE_INT, 0, INT_MAX, &settings.displayoptions, "Display options",
+        NULL, NULL},
+#endif
 };
+
+enum mpeg_menu_ids
+{
+    __MPEG_OPTION_START = -1,
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+    MPEG_OPTION_DISPLAY_SETTINGS,
+#endif
+    MPEG_OPTION_DISPLAY_FPS,
+    MPEG_OPTION_LIMIT_FPS,
+    MPEG_OPTION_SKIP_FRAMES,
+    MPEG_OPTION_QUIT,
+};
+
+static const struct opt_items noyes[2] = {
+    { "No", -1 },
+    { "Yes", -1 },
+};
+
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+static bool set_option_dithering(void)
+{
+    int val = (settings.displayoptions & LCD_YUV_DITHER) ? 1 : 0;
+    rb->set_option("Dithering", &val, INT, noyes, 2, NULL);
+    settings.displayoptions = (settings.displayoptions & ~LCD_YUV_DITHER)
+        | ((val != 0) ? LCD_YUV_DITHER : 0);
+    rb->lcd_yuv_set_options(settings.displayoptions);
+    return false;
+}
+
+static void display_options(void)
+{
+    static const struct menu_item items[] = {
+        { "Dithering", set_option_dithering },
+    };
+
+    int m = menu_init(rb, items, ARRAYLEN(items),
+                          NULL, NULL, NULL, NULL);
+    menu_run(m);
+    menu_exit(m);
+}
+#endif /* #ifdef TOSHIBA_GIGABEAT_F */
 
 bool mpeg_menu(void)
 {
@@ -30,20 +74,22 @@ bool mpeg_menu(void)
     int result;
     int menu_quit=0;
 
-    static const struct opt_items noyes[2] = {
-        { "No", -1 },
-        { "Yes", -1 },
-    };
-
     static const struct menu_item items[] = {
-        { "Display FPS", NULL },
-        { "Limit FPS", NULL },
-        { "Skip frames", NULL },
-        { "Quit mpegplayer", NULL },
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+        [MPEG_OPTION_DISPLAY_SETTINGS] =
+            { "Display Options", NULL },
+#endif
+        [MPEG_OPTION_DISPLAY_FPS] =
+            { "Display FPS", NULL },
+        [MPEG_OPTION_LIMIT_FPS] =
+            { "Limit FPS", NULL },
+        [MPEG_OPTION_SKIP_FRAMES] =
+            { "Skip frames", NULL },
+        [MPEG_OPTION_QUIT] =
+            { "Quit mpegplayer", NULL },
     };
 
-    m = menu_init(rb, items, sizeof(items) / sizeof(*items),
-                      NULL, NULL, NULL, NULL);
+    m = menu_init(rb, items, ARRAYLEN(items), NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
@@ -52,22 +98,28 @@ bool mpeg_menu(void)
 
         switch(result)
         {
-            case 0: /* Show FPS */
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+            case MPEG_OPTION_DISPLAY_SETTINGS:
+                display_options();
+                break;
+#endif
+            case MPEG_OPTION_DISPLAY_FPS:
                 rb->set_option("Display FPS",&settings.showfps,INT,
                                noyes, 2, NULL);
                 break;
-            case 1: /* Limit FPS */
+            case MPEG_OPTION_LIMIT_FPS:
                 rb->set_option("Limit FPS",&settings.limitfps,INT,
                                noyes, 2, NULL);
                 break;
-            case 2: /* Skip frames */
+            case MPEG_OPTION_SKIP_FRAMES:
                 rb->set_option("Skip frames",&settings.skipframes,INT,
                                noyes, 2, NULL);
                 break;
+            case MPEG_OPTION_QUIT:
             default:
                 menu_quit=1;
                 if (result == MENU_ATTACHED_USB)
-                    result = 3;
+                    result = MPEG_OPTION_QUIT;
                 break;
         }
     }
@@ -77,7 +129,7 @@ bool mpeg_menu(void)
     rb->lcd_clear_display();
     rb->lcd_update();
 
-    return (result==3);
+    return (result==MPEG_OPTION_QUIT);
 }
 
 
@@ -87,6 +139,9 @@ void init_settings(void)
     settings.showfps = 0;     /* Do not show FPS */
     settings.limitfps = 1;    /* Limit FPS */
     settings.skipframes = 1;  /* Skip frames */
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+    settings.displayoptions = 0; /* No visual effects */
+#endif
 
     configfile_init(rb);
 
@@ -105,6 +160,9 @@ void init_settings(void)
     /* Keep a copy of the saved version of the settings - so we can check if
        the settings have changed when we quit */
     old_settings = settings;
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+    rb->lcd_yuv_set_options(settings.displayoptions);
+#endif
 }
 
 void save_settings(void)

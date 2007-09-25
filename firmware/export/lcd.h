@@ -84,7 +84,9 @@ extern void lcd_puts_scroll(int x, int y, const unsigned char* string);
 extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
                                   int style);
 
-#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
+#if defined(HAVE_LCD_COLOR)
+#define LCD_YUV_DITHER 0x1
+extern void lcd_yuv_set_options(unsigned options);
 extern void lcd_yuv_blit(unsigned char * const src[3],
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);

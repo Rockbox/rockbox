@@ -9,6 +9,7 @@
 
 static volatile bool lcd_on = true;
 volatile bool lcd_poweroff = false;
+static unsigned lcd_yuv_options = 0;
 /*
 ** These are imported from lcd-16bit.c
 */
@@ -248,11 +249,22 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
     );
 }
 
+void lcd_yuv_set_options(unsigned options)
+{
+    lcd_yuv_options = options;
+}
+
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
 extern void lcd_write_yuv420_lines(fb_data *dst,
                                    unsigned char const * const src[3],
                                    int width,
                                    int stride);
+extern void lcd_write_yuv420_lines_odither(fb_data *dst,
+                                           unsigned char const * const src[3],
+                                           int width,
+                                           int stride,
+                                           int x_screen, /* To align dither pattern */
+                                           int y_screen);
 /* Performance function to blit a YUV bitmap directly to the LCD */
 /* For the Gigabeat - show it rotated */
 /* So the LCD_WIDTH is now the height */
@@ -272,22 +284,39 @@ void lcd_yuv_blit(unsigned char * const src[3],
     width &= ~1;
     height >>= 1;
 
-    fb_data *dst = (fb_data*)FRAME + x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
+    y = LCD_WIDTH - 1 - y;
+    fb_data *dst = (fb_data*)FRAME + x * LCD_WIDTH + y;
 
     z = stride*src_y;
     yuv_src[0] = src[0] + z + src_x;
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
-    do
+    if (lcd_yuv_options & LCD_YUV_DITHER)
     {
-        lcd_write_yuv420_lines(dst, yuv_src, width, stride);
-        yuv_src[0] += stride << 1; /* Skip down two luma lines */
-        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-        yuv_src[2] += stride >> 1;
-        dst -= 2;
+        do
+        {
+            lcd_write_yuv420_lines_odither(dst, yuv_src, width, stride, y, x);
+            yuv_src[0] += stride << 1; /* Skip down two luma lines */
+            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+            yuv_src[2] += stride >> 1;
+            dst -= 2;
+            y -= 2;
+        }
+        while (--height > 0);
     }
-    while (--height > 0);
+    else
+    {
+        do
+        {
+            lcd_write_yuv420_lines(dst, yuv_src, width, stride);
+            yuv_src[0] += stride << 1; /* Skip down two luma lines */
+            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+            yuv_src[2] += stride >> 1;
+            dst -= 2;
+        }
+        while (--height > 0);
+    }
 }
 
 void lcd_set_contrast(int val) {

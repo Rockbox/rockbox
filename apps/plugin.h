@@ -112,7 +112,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 76
+#define PLUGIN_API_VERSION 77
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -259,7 +259,7 @@ struct plugin_api {
     void (*lcd_remote_bitmap)(const fb_remote_data *src, int x, int y, int width,
                               int height);
 #endif
-#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
+#if defined(HAVE_LCD_COLOR)
     void (*lcd_yuv_blit)(unsigned char * const src[3],
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);
@@ -623,6 +623,10 @@ struct plugin_api {
     bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
 #endif
     void (*led)(bool on);
+
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+    void (*lcd_yuv_set_options)(unsigned options);
+#endif
 };
 
 /* plugin header */

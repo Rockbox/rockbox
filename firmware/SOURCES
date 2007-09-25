@@ -407,9 +407,9 @@ target/sh/archos/ondio/usb-ondio.c
 
 #ifdef SANSA_E200
 #ifndef SIMULATOR
+target/arm/lcd-as-memframe.S
 target/arm/sandisk/ata-c200_e200.c
 target/arm/sandisk/sansa-e200/lcd-e200.c
-target/arm/sandisk/sansa-e200/lcd-as-e200.S
 target/arm/sandisk/adc-c200_e200.c
 target/arm/sandisk/backlight-c200_e200.c
 target/arm/usb-fw-pp502x.c
@@ -572,13 +572,13 @@ target/arm/usb-fw-pp502x.c
 
 #ifdef GIGABEAT_F
 #ifndef SIMULATOR
+target/arm/lcd-as-memframe.S
 target/arm/s3c2440/gigabeat-fx/adc-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/backlight-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/button-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/i2c-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/kernel-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/lcd-as-meg-fx.S
 target/arm/s3c2440/gigabeat-fx/lcd-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/power-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/powermgmt-meg-fx.c
