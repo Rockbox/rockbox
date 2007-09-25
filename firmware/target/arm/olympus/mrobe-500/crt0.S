@@ -48,6 +48,11 @@ start:
     str    r0, [r1, #28]
 #endif
 
+    /* Disable high vectors (at 0xffff0000 instead of 0x00000000) */
+    mrc    p15, 0, r0, c1, c0
+    and    r0, r0, #~(1<<13)
+    mcr    p15, 0, r0, c1, c0
+
 #if !defined(BOOTLOADER)
 
 #if !defined(STUB)

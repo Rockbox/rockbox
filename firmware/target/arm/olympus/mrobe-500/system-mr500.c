@@ -167,6 +167,9 @@ void system_init(void)
 	IO_INTC_FISEL1 = 0;
 	IO_INTC_FISEL2 = 0;
 
+	IO_INTC_ENTRY_TBA0 =
+	IO_INTC_ENTRY_TBA1 = 0;
+
     /* set GIO26 (reset pin) to output and low */
 	IO_GIO_BITCLR1=(1<<10);
 	IO_GIO_DIR1&=~(1<<10);
