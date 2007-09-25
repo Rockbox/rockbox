@@ -27,7 +27,7 @@
 #define HAVE_LCD_COLOR
 
 /* define this if you have a light associated with the buttons */
-/* TODO: #define HAVE_BUTTON_LIGHT */
+#define HAVE_BUTTON_LIGHT
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN

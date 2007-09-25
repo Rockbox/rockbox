@@ -3888,16 +3888,19 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
+    c200: "Button Light Timeout"
     gigabeatf: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Wheel Light Timeout"
+    c200: "Button Light Timeout"
     gigabeatf: "Button Light Timeout"
   </dest>
   <voice>
     *: none
     e200: "Wheel Light Timeout"
+    c200: "Button Light Timeout"
     gigabeatf: "Button Light Timeout"
   </voice>
 </phrase>

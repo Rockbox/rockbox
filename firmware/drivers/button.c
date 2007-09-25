@@ -256,7 +256,12 @@ static void button_tick(void)
                     remote_backlight_on();
                 else
 #endif
+                {
                     backlight_on();
+#ifdef HAVE_BUTTON_LIGHT
+                    button_backlight_on();
+#endif
+                }
 
                 reset_poweroff_timer();
             }
