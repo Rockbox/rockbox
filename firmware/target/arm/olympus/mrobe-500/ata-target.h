@@ -16,7 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
@@ -29,15 +29,18 @@
 #endif
 
 #define ATA_IOBASE      0x50000000
-#define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE+0xa0)))
-#define ATA_ERROR       (*((volatile unsigned char*)(ATA_IOBASE + 0xa2)))
-#define ATA_NSECTOR     (*((volatile unsigned char*)(ATA_IOBASE + 0x24)))
-#define ATA_SECTOR      (*((volatile unsigned char*)(ATA_IOBASE + 0x26)))
-#define ATA_LCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x28)))
-#define ATA_HCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x2A)))
-#define ATA_SELECT      (*((volatile unsigned char*)(ATA_IOBASE + 0x2C)))
-#define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0x2E)))
-#define ATA_CONTROL     (*((volatile unsigned char*)(ATA_IOBASE + 0x9C)))
+#define REGISTER_OFFSET 0x00400000 /* A21 = High */
+#define CONTROL_OFFSET  0x00800000 /* A22 = High */
+#define IDE_SHIFT 17
+#define ATA_DATA        (*((volatile unsigned short*)(REGISTER_OFFSET + (0x00 << IDE_SHIFT))))
+#define ATA_ERROR       (*((volatile unsigned char*)(REGISTER_OFFSET + (0x01 << IDE_SHIFT))))
+#define ATA_NSECTOR     (*((volatile unsigned char*)(REGISTER_OFFSET + (0x02 << IDE_SHIFT))))
+#define ATA_SECTOR      (*((volatile unsigned char*)(REGISTER_OFFSET + (0x03 << IDE_SHIFT))))
+#define ATA_LCYL        (*((volatile unsigned char*)(REGISTER_OFFSET + (0x04 << IDE_SHIFT))))
+#define ATA_HCYL        (*((volatile unsigned char*)(REGISTER_OFFSET + (0x05 << IDE_SHIFT))))
+#define ATA_SELECT      (*((volatile unsigned char*)(REGISTER_OFFSET + (0x06 << IDE_SHIFT))))
+#define ATA_COMMAND     (*((volatile unsigned char*)(REGISTER_OFFSET + (0x07 << IDE_SHIFT))))
+#define ATA_CONTROL     (*((volatile unsigned char*)(CONTROL_OFFSET  + (0x06 << IDE_SHIFT))))
 
 #define STATUS_BSY      0x80
 #define STATUS_RDY      0x40

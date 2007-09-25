@@ -29,12 +29,12 @@
 #include "backlight-target.h"
 
 /* ARESET on C7C68300 and RESET on ATA interface (Active Low) */
-#define ATA_RESET_ENABLE return
-#define ATA_RESET_DISABLE return
+#define ATA_RESET_ENABLE  (IO_GIO_BITCLR0 = 1 << 10)
+#define ATA_RESET_DISABLE (IO_GIO_BITSET0 = 1 << 10)
 
 /* ATA_EN on C7C68300 */
-#define USB_ATA_ENABLE return
-#define USB_ATA_DISABLE return
+#define USB_ATA_ENABLE    (IO_GIO_BITSET0 = 1 << 2)
+#define USB_ATA_DISABLE   (IO_GIO_BITCLR0 = 1 << 2)
 
 void ata_reset(void)
 {
@@ -55,20 +55,17 @@ void ata_enable(bool on)
 
 bool ata_is_coldstart(void)
 {
-    return false;
+    return true;
 }
 
 void ata_device_init(void)
 {
     /* ATA reset */
     ATA_RESET_DISABLE; /* Set the pin to disable an active low reset */
-    
-    /* set GIO17 (ATA power) on and output */
-    IO_GIO_BITCLR1=(1<<1);
-	IO_GIO_DIR1&=~(1<<1);
+    IO_GIO_DIR0&=~(1<<10);
 }
 
-#if !defined(BOOTLOADER)
+#if 0
 void copy_read_sectors(unsigned char* buf, int wordcount)
 {
     __buttonlight_trigger();

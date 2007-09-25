@@ -32,7 +32,9 @@
 void power_init(void)
 {
     /* Initialize IDE power pin */
+    /* set GIO17 (ATA power) on and output */
     ide_power_enable(true);
+    IO_GIO_DIR1&=~(1<<1);
     /* Charger detect */
 }
 
@@ -49,14 +51,14 @@ bool charging_state(void) {
 void ide_power_enable(bool on)
 {
     if (on)
-        return;
+        IO_GIO_BITCLR1=(1<<1);
     else
-        return;
+        IO_GIO_BITSET1=(1<<1);
 }
 
 bool ide_powered(void)
 {
-    return true;
+    return !(IO_GIO_BITSET1&(1<<1));
 }
 
 void power_off(void)
@@ -64,8 +66,8 @@ void power_off(void)
     /* turn off backlight and wait for 1 second */
     __backlight_off();
     sleep(HZ);
-    /* set SLEEP bit to on in CLKCON to turn off */
-//    CLKCON |=(1<<3);
+    /* Hard shutdown */
+    IO_GIO_BITSET1|=1<<10;
 }
 
 #else /* SIMULATOR */

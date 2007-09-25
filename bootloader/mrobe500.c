@@ -99,7 +99,7 @@ void main(void)
         reset_screen();
         lcd_update();
     }
-
+#if 0
     int button=0, *address=0x0, count=0;
     while(true)
     {
@@ -118,7 +118,7 @@ void main(void)
         else if (button==BUTTON_RC_REW)
             address-=0x1000;
 
-   //     if ((inw(IO_GIO_BITSET0)&(1<<14)) == 0)
+   //     if ((IO_GIO_BITSET0&(1<<14) == 0)
         {
             short x,y,z1,z2, reg;
             tsc2100_read_values(&x, &y, &z1, &z2);
@@ -132,7 +132,7 @@ void main(void)
             line -= 6;
         }
     }
-
+#endif
     printf("ATA");
     rc = ata_init();
     if(rc)
