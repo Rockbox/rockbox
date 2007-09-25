@@ -46,7 +46,6 @@
 #include "keyboard.h"
 #include "gui/scrollbar.h"
 #include "eq_menu.h"
-#include "pcmbuf.h"
 #ifdef HAVE_WM8758
 #include "wm8758.h"
 #endif
@@ -640,7 +639,7 @@ MENUITEM_FUNCTION(eq_browse, 0, ID2P(LANG_EQUALIZER_BROWSE),
                     (int(*)(void))eq_browse_presets, NULL, NULL, Icon_NOICON);
 
 int soundmenu_callback(int action,const struct menu_item_ex *this_item);
-MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), NULL, Icon_EQ,
+MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), soundmenu_callback, Icon_EQ,
         &eq_enable, &eq_graphical, &eq_precut, &gain_menu, 
         &advanced_eq_menu_, &eq_save, &eq_browse);
 
