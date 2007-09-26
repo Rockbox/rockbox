@@ -183,10 +183,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "Ääniasetukset"
+    *: "Ääni"
   </dest>
   <voice>
-    *: "Ääniasetukset"
+    *: "Ääni"
   </voice>
 </phrase>
 <phrase>
@@ -197,10 +197,10 @@
     *: "General Settings"
   </source>
   <dest>
-    *: "Yleiset asetukset"
+    *: "Yleiset"
   </dest>
   <voice>
-    *: "Yleiset asetukset"
+    *: "Yleiset"
   </voice>
 </phrase>
 <phrase>
@@ -774,7 +774,7 @@
     *: "Nollattu"
   </dest>
   <voice>
-    *: "Asetukset nollattu"
+    *: "Nollattu"
   </voice>
 </phrase>
 <phrase>
@@ -785,10 +785,10 @@
     *: "Write .cfg file"
   </source>
   <dest>
-    *: "Kirjoita .cfg-tiedosto"
+    *: "Tallenna asetustiedosto"
   </dest>
   <voice>
-    *: "Kirjoita asetustiedosto"
+    *: "Tallenna asetustiedosto"
   </voice>
 </phrase>
 <phrase>
@@ -801,11 +801,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nauhoitusasetukset"
+    recording: "Nauhoitus"
   </dest>
   <voice>
     *: none
-    recording: "Nauhoitusasetukset"
+    recording: "Nauhoitus"
   </voice>
 </phrase>
 <phrase>
@@ -1408,44 +1408,44 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "ID3-tunnisteprioriteetit"
+    *: ""
   </dest>
   <voice>
-    *: "ID3-tunnisteprioriteetit"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1, V2"
+    *: ""
   </dest>
   <voice>
-    *: "Versio 1, versio 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2, V1"
+    *: ""
   </dest>
   <voice>
-    *: "Versio 2, versio 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1773,10 +1773,10 @@
     *: "LCD Settings"
   </source>
   <dest>
-    *: "LCD-asetukset"
+    *: "LCD"
   </dest>
   <voice>
-    *: "LCD asetukset"
+    *: "LCD"
   </voice>
 </phrase>
 <phrase>
@@ -1789,11 +1789,11 @@
   </source>
   <dest>
     *: none
-    remote: "Kaukosäätimen asetukset"
+    remote: "Kaukosäädin"
   </dest>
   <voice>
     *: none
-    remote: "Kaukosäätimen asetukset"
+    remote: "Kaukosäädin"
   </voice>
 </phrase>
 <phrase>
@@ -2482,11 +2482,11 @@
   </source>
   <dest>
     *: none
-    recording: "Tiedostonkatkaisuasetukset"
+    recording: "Tiedostonkatkaisu"
   </dest>
   <voice>
     *: none
-    recording: "Tiedostonkatkaisuasetukset"
+    recording: "Tiedostonkatkaisu"
   </voice>
 </phrase>
 <phrase>
@@ -6757,13 +6757,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "Sekoitetaan..."
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -7310,10 +7310,10 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Asetukset ladattu"
+    *: "Ladattu"
   </dest>
   <voice>
-    *: "Asetukset ladattu"
+    *: "Ladattu"
   </voice>
 </phrase>
 <phrase>
@@ -7324,10 +7324,10 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Asetukset tallennettu"
+    *: "Tallennettu"
   </dest>
   <voice>
-    *: "Asetukset tallennettu"
+    *: "Tallennettu"
   </voice>
 </phrase>
 <phrase>
@@ -7720,11 +7720,11 @@
   </source>
   <dest>
     *: none
-    radio: "Asetuksia ei löytynyt. Etsitäänkö kanavia?"
+    radio: "Asetuksia ei löydy. Etsitäänkö kanavia?"
   </dest>
   <voice>
     *: none
-    radio: "Asetuksia ei löytynyt. Etsitäänkö kanavia?"
+    radio: "Asetuksia ei löydy. Etsitäänkö kanavia?"
   </voice>
 </phrase>
 <phrase>
@@ -7860,11 +7860,11 @@
   </source>
   <dest>
     *: none
-    remote: "Kaukosäätimen vieritysasetukset"
+    remote: "Kaukosäätimen vieritys"
   </dest>
   <voice>
     *: none
-    remote: "Kaukosäätimen vieritysasetukset"
+    remote: "Kaukosäätimen vieritys"
   </voice>
 </phrase>
 <phrase>
@@ -9343,11 +9343,11 @@
   </source>
   <dest>
     *: none
-    recording: "Enkooderiasetukset"
+    recording: "Enkooderi"
   </dest>
   <voice>
     *: none
-    recording: "Enkooderiasetukset"
+    recording: "Enkooderi"
   </voice>
 </phrase>
 <phrase>
@@ -9699,10 +9699,10 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "Tallenna teeman asetukset"
+    *: "Tallenna teema"
   </dest>
   <voice>
-    *: "Tallenna teeman asetukset"
+    *: "Tallenna teema"
   </voice>
 </phrase>
 <phrase>
@@ -9943,17 +9943,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Rullavalon aikakatkaisu"
-    gigabeatf: "Painikevalon aikakatkaisu"
+    c200,gigabeatf: "Painikevalon aikakatkaisu"
   </dest>
   <voice>
     *: none
     e200: "Rullavalon aikakatkaisu"
-    gigabeatf: "Painikevalon aikakatkaisu"
+    c200,gigabeatf: "Painikevalon aikakatkaisu"
   </voice>
 </phrase>
 <phrase>
@@ -9981,10 +9981,10 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Soittolistanäyttäjän asetukset"
+    *: "Soittolistanäyttäjä"
   </dest>
   <voice>
-    *: "Soittolistanäyttäjän asetukset"
+    *: "Soittolistanäyttäjä"
   </voice>
 </phrase>
 <phrase>
@@ -11056,6 +11056,125 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "nolla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Leikkautumislaskuri"
+  </dest>
+  <voice>
+    *: none
+    recording: "Leikkautumislaskuri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB-pino"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB pino"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Isäntä"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Isäntä"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Tila"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Tila"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Laite"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Laite"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Ajuri"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Ajuri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "LEIK:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
   </voice>
 </phrase>

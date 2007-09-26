@@ -1130,44 +1130,44 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "ID3 mærke prioritet"
+    *: ""
   </dest>
   <voice>
-    *: "ID3 mærke prioritet"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1 før V2"
+    *: ""
   </dest>
   <voice>
-    *: "Version 1 før version 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2 før V1"
+    *: ""
   </dest>
   <voice>
-    *: "Version 2 før version 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5992,13 +5992,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "Blander..."
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -9910,17 +9910,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Hjul-lys sluk"
-    gigabeatf: "Knap-lys sluk"
+    c200,gigabeatf: "Knap-lys sluk"
   </dest>
   <voice>
     *: none
     e200: "Hjul-lys sluk"
-    gigabeatf: "Knap-lys sluk"
+    c200,gigabeatf: "Knap-lys sluk"
   </voice>
 </phrase>
 <phrase>
