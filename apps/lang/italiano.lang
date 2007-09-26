@@ -9962,17 +9962,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Tempo di spegnimento illuminazione rotella"
-    gigabeatf: "Tempo di spegnimento illuminazione tasti"
+    c200,gigabeatf: "Tempo di spegnimento illuminazione tasti"
   </dest>
   <voice>
     *: none
     e200: "Tempo di spegnimento illuminazione rotella"
-    gigabeatf: "Tempo di spegnimento illuminazione tasti"
+    c200,gigabeatf: "Tempo di spegnimento illuminazione tasti"
   </voice>
 </phrase>
 <phrase>

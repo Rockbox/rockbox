@@ -10691,17 +10691,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "转盘灯自动关时间"
-    gigabeatf: "按钮灯自动关时间"
+    c200,gigabeatf: "按钮灯自动关时间"
   </dest>
   <voice>
     *: none
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
   </voice>
 </phrase>
 <phrase>

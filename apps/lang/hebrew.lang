@@ -10875,17 +10875,17 @@
   <source>
     *: ""
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
   </source>
   <dest>
     *: ""
     e200: "זמן תאורת הגלגל"
-    gigabeatf: "זמן תאורת כפתורים"
+    c200,gigabeatf: "זמן תאורת כפתורים"
   </dest>
   <voice>
     *: ""
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
   </voice>
 </phrase>
 <phrase>

@@ -10761,16 +10761,16 @@
   <source>
     *: ""
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
   </source>
   <dest>
     *: ""
     e200: "Tid før lys på hjul slukker"
-    gigabeatf: "Tid før lys på knapper slukker"
+    c200,gigabeatf: "Tid før lys på knapper slukker"
   </dest>
   <voice>
     *: ""
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
   </voice>
 </phrase>

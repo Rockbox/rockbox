@@ -10834,17 +10834,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    gigabeatf: "Button Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Opóźnienie wygaszania kółka"
-    gigabeatf: "Opóźnienie wygaszania klawiszy"
+    c200,gigabeatf: "Opóźnienie wygaszania klawiszy"
   </dest>
   <voice>
     *: none
     e200: "Opóźnienie wygaszania kółka"
-    gigabeatf: "Opóźnienie wygaszania klawiszy"
+    c200,gigabeatf: "Opóźnienie wygaszania klawiszy"
   </voice>
 </phrase>
 <phrase>
