@@ -48,3 +48,8 @@ static inline void synthSample(int * mixL, int * mixR)
     return;  /* No more ghetto lowpass filter.. linear intrpolation works well. */
 }
 
+static inline struct Event * getEvent(struct Track * tr, int evNum)
+{
+    return tr->dataBlock + (evNum*sizeof(struct Event));
+}
+

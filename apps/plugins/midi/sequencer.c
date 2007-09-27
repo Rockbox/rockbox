@@ -19,6 +19,7 @@
 #include "plugin.h"
 #include "midiutil.h"
 #include "guspat.h"
+#include "synth.h"
 
 void setVolScale(int a);
 
@@ -320,6 +321,7 @@ static void sendEvent(struct Event * ev)
     }
 }
 
+int tick(void) ICODE_ATTR;
 int tick(void)
 {
     if(mf==NULL)

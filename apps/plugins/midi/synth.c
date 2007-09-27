@@ -23,11 +23,6 @@
 
 extern struct plugin_api * rb;
 
-struct Event * getEvent(struct Track * tr, int evNum)
-{
-    return tr->dataBlock + (evNum*sizeof(struct Event));
-}
-
 void readTextBlock(int file, char * buf)
 {
     char c = 0;
