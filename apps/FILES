@@ -63,6 +63,7 @@ plugins/lib/*.[ch]
 plugins/lib/Makefile
 plugins/lib/SOURCES
 plugins/midi/*.[ch]
+plugins/midi/Makefile
 plugins/mpegplayer/*.[chS]
 plugins/mpegplayer/AUTHORS
 plugins/mpegplayer/Makefile

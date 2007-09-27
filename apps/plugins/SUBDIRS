@@ -43,7 +43,7 @@ doom
 /* For all the swcodec targets */
 #if CONFIG_CODEC == SWCODEC
 midi
-#beatbox
+/* beatbox */
 mpegplayer
 #endif
 
