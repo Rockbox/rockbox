@@ -171,6 +171,7 @@ static int _vds_init(vorbis_dsp_state *v,vorbis_info *vi){
 
   v->pcm_storage=ci->blocksizes[1];
   v->pcm=(ogg_int32_t **)_ogg_malloc(vi->channels*sizeof(*v->pcm));
+  v->pcmb=(ogg_int32_t **)_ogg_malloc(vi->channels*sizeof(*v->pcmb));
   v->pcmret=(ogg_int32_t **)_ogg_malloc(vi->channels*sizeof(*v->pcmret));
 
   for(i=0;i<vi->channels;i++)
@@ -308,25 +309,28 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
           /* large/large */
           ogg_int32_t *pcm=v->pcm[j]+prevCenter;
           ogg_int32_t *p=vb->pcm[j];
-          vect_add(pcm, p, n1);
+          vect_add(p, pcm, n1);
+          v->pcmb[j]=p;
         }else{
           /* large/small */
           ogg_int32_t *pcm=v->pcm[j]+prevCenter+n1/2-n0/2;
           ogg_int32_t *p=vb->pcm[j];
           vect_add(pcm, p, n0);
+          v->pcmb[j]=v->pcm[j]+prevCenter;
         }
       }else{
         if(v->W){
           /* small/large */
           ogg_int32_t *pcm=v->pcm[j]+prevCenter;
           ogg_int32_t *p=vb->pcm[j]+n1/2-n0/2;
-          vect_add(pcm, p, n0);
-          vect_copy(&pcm[n0], &p[n0], n1/2-n0/2);
+          vect_add(p, pcm, n0);
+          v->pcmb[j]=p;
         }else{
           /* small/small */
           ogg_int32_t *pcm=v->pcm[j]+prevCenter;
           ogg_int32_t *p=vb->pcm[j];
-          vect_add(pcm, p, n0);
+          vect_add(p, pcm, n0);
+          v->pcmb[j]=p;
         }
       }
       
@@ -351,10 +355,8 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
       v->pcm_returned=thisCenter;
       v->pcm_current=thisCenter;
     }else{
-      v->pcm_returned=prevCenter;
-      v->pcm_current=prevCenter+
-        ci->blocksizes[v->lW]/4+
-        ci->blocksizes[v->W]/4;
+      v->pcm_returned=0;
+      v->pcm_current=ci->blocksizes[v->lW]/4+ci->blocksizes[v->W]/4;
     }
 
   }
@@ -436,7 +438,7 @@ int vorbis_synthesis_pcmout(vorbis_dsp_state *v,ogg_int32_t ***pcm){
     if(pcm){
       int i;
       for(i=0;i<vi->channels;i++)
-        v->pcmret[i]=v->pcm[i]+v->pcm_returned;
+        v->pcmret[i]=v->pcmb[i]+v->pcm_returned;
       *pcm=v->pcmret;
     }
     return(v->pcm_current-v->pcm_returned);

@@ -59,6 +59,7 @@ typedef struct vorbis_dsp_state{
   vorbis_info *vi;
 
   ogg_int32_t **pcm;
+  ogg_int32_t **pcmb;
   ogg_int32_t **pcmret;
   int      pcm_storage;
   int      pcm_current;

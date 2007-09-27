@@ -199,7 +199,7 @@ STIN long decode_packed_entry_number(codebook *book,
   return(-1);
 }
 
-static inline long decode_packed_block(codebook *book, oggpack_buffer *b,
+static long decode_packed_block(codebook *book, oggpack_buffer *b,
                                 long *buf, int n){
   long *bufptr = buf;
   long *bufend = buf + n;
@@ -399,6 +399,55 @@ long vorbis_book_decodev_set(codebook *book,ogg_int32_t *a,
   return(0);
 }
 
+static long vorbis_book_decodevv_add_2ch_even(codebook *book,ogg_int32_t **a,
+                                              long offset,oggpack_buffer *b,
+                                              int n,int point){
+  long i,k,chunk,read;
+  int shift=point-book->binarypoint;
+  long entries[32];
+  ogg_int32_t *p0 = &(a[0][offset]);
+  ogg_int32_t *p1 = &(a[1][offset]);
+
+  if(shift>=0){
+    
+    for(i=0;i<n;){
+      chunk=32;
+      if (chunk*book->dim>(n-i)*2)
+        chunk=((n-i)*2+book->dim-1)/book->dim;
+      read = decode_packed_block(book,b,entries,chunk);
+      for(k=0;k<read;k++){
+        const ogg_int32_t *t = book->valuelist+entries[k]*book->dim;
+        const ogg_int32_t *u = t+book->dim;
+        do{
+          *p0++ += *t++>>shift;
+          *p1++ += *t++>>shift;
+        }while(t<u);
+      }
+      if (read<chunk)return-1;
+      i += read*book->dim/2;
+    }
+  }else{
+    shift = -shift;
+    for(i=0;i<n;){
+      chunk=32;
+      if (chunk*book->dim>(n-i)*2)
+        chunk=((n-i)*2+book->dim-1)/book->dim;
+      read = decode_packed_block(book,b,entries,chunk);
+      for(k=0;k<read;k++){
+        const ogg_int32_t *t = book->valuelist+entries[k]*book->dim;
+        const ogg_int32_t *u = t+book->dim;
+        do{
+          *p0++ += *t++<<shift;
+          *p1++ += *t++<<shift;
+        }while(t<u);
+      }
+      if (read<chunk)return-1;
+      i += read*book->dim/2;
+    }
+  }
+  return(0);
+}
+
 long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,
 			      long offset,int ch,
 			      oggpack_buffer *b,int n,int point){
@@ -407,6 +456,9 @@ long vorbis_book_decodevv_add(codebook *book,ogg_int32_t **a,
     int chptr=0;
     int shift=point-book->binarypoint;
     long entries[32];
+
+    if (!(book->dim&1) && ch==2)
+      return vorbis_book_decodevv_add_2ch_even(book,a,offset,b,n,point);
 
     if(shift>=0){
     

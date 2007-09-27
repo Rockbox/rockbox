@@ -38,6 +38,19 @@
 #include "mdct.h"
 #include "mdct_lookup.h"
 
+#ifdef CPU_ARM
+
+extern void mdct_butterfly_32(DATA_TYPE *x);
+extern void mdct_butterfly_generic_loop(DATA_TYPE *x1, DATA_TYPE *x2,
+                                        LOOKUP_T *T0, int step,
+                                        LOOKUP_T *Ttop);
+
+STIN void mdct_butterfly_generic(DATA_TYPE *x,int points, int step){
+    mdct_butterfly_generic_loop(x + points, x + (points>>1),
+                                sincos_lookup0, step, sincos_lookup0+1024);
+}
+
+#else
 
 /* 8 point butterfly (in place) */
 STIN void mdct_butterfly_8(DATA_TYPE *x){
@@ -224,6 +237,8 @@ void mdct_butterfly_generic(DATA_TYPE *x,int points, int step){
     x1-=8; x2-=8;
   }while(T>sincos_lookup0);
 }
+
+#endif /* CPU_ARM */
 
 STIN void mdct_butterflies(DATA_TYPE *x,int points,int shift) {
 
