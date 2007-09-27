@@ -29,7 +29,7 @@ class TTSBase : public QObject
 public:
     TTSBase(){}
     virtual ~TTSBase(){}
-    virtual bool voice(QString text,QString wavfile){return false;}    
+    virtual bool voice(QString text,QString wavfile){(void)text; (void)wavfile; return false;}
     virtual bool start(){return false;}
     virtual bool stop(){return false;}
     
