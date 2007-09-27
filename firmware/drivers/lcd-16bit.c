@@ -1033,11 +1033,11 @@ void lcd_scroll_fn(void)
             int h_b = RGB_UNPACK_BLUE(lss_pattern) << 16;
             int h_g = RGB_UNPACK_GREEN(lss_pattern) << 16;
             int rstep = (h_r - ((signed)RGB_UNPACK_RED(lse_pattern) << 16))
-                        / pf->height;
+                        / (signed)pf->height;
             int gstep = (h_g - ((signed)RGB_UNPACK_GREEN(lse_pattern) << 16))
-                        / pf->height;
+                        / (signed)pf->height;
             int bstep = (h_b - ((signed)RGB_UNPACK_BLUE(lse_pattern) << 16))
-                        / pf->height;
+                        / (signed)pf->height;
             unsigned int count;
 
             fg_pattern = lss_pattern;
