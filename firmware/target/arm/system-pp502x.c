@@ -255,7 +255,16 @@ void system_init(void)
 void system_reboot(void)
 {
     /* Reboot */
+#ifdef SANSA_C200
+    CACHE_CTL &= ~0x10;
+
+    /* Magic used by the c200 OF. The BL uses a magic value of 0x23066b7b.
+       In both cases, the OF executes these 2 commands from iram. */
+    outl(0x23066000, 0x70000008);
+    DEV_RS = DEV_SYSTEM;
+#else
     DEV_RS |= DEV_SYSTEM;
+#endif
 }
 
 int system_memory_guard(int newmode)
