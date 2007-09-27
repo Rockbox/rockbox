@@ -396,14 +396,9 @@ bool Autodetection::detectAjbrec(QString root)
             break;
             
         case 8:
-            // newer recorder firmwares also use the version id 8
-            // so check usb id too.
-            if(m_usbconid.contains(0x058f9330))
-                m_device = "ondiofm";
-            else
-                m_device = "recorderv2";
+            m_device = "ondiofm";
             break;
-            
+
         case 16:
             m_device = "ondiosp";
             break;
