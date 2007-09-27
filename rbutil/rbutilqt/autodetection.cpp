@@ -56,6 +56,7 @@ bool Autodetection::detect()
         QDir dir(mountpoints.at(i));
         if(dir.exists())
         {
+            qDebug() << "file checking:" << mountpoints.at(i);
             // check logfile first.
             if(QFile(mountpoints.at(i) + "/.rockbox/rbutil.log").exists()) {
                 QSettings log(mountpoints.at(i) + "/.rockbox/rbutil.log",
@@ -95,23 +96,28 @@ bool Autodetection::detect()
                 m_mountpoint = mountpoints.at(i);
                 return true;
             }
-            if(rootentries.contains("ONDIOST.BIN"), Qt::CaseInsensitive)
+            if(rootentries.contains("ONDIOST.BIN", Qt::CaseInsensitive))
             {
                 // ONDIOST.BIN in root -> Ondio FM
                 m_device = "ondiofm";
                 m_mountpoint = mountpoints.at(i);
                 return true;
             }
-            if(rootentries.contains("ONDIOSP.BIN"), Qt::CaseInsensitive)
+            if(rootentries.contains("ONDIOSP.BIN", Qt::CaseInsensitive))
             {
                 // ONDIOSP.BIN in root -> Ondio SP
                 m_device = "ondiosp";
                 m_mountpoint = mountpoints.at(i);
                 return true;
             }
-            if(rootentries.contains("ajbrec.ajz"), Qt::CaseInsensitive)
+            if(rootentries.contains("ajbrec.ajz", Qt::CaseInsensitive))
             {
-                qDebug() << "it's an archos. further detection needed";
+                qDebug() << "ajbrec.ajz found. Trying detectAjbrec()";
+                if(detectAjbrec(mountpoints.at(i))) {
+                    m_mountpoint = mountpoints.at(i);
+                    qDebug() << m_device;
+                    return true;
+                }
             }
             // detection based on player specific folders
             QStringList rootfolders = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -122,7 +128,6 @@ bool Autodetection::detect()
                 m_mountpoint = mountpoints.at(i);
                 return true;
             }
-            qDebug() << rootfolders;
         }
 
     }
@@ -260,6 +265,7 @@ bool Autodetection::detectUsb()
             while(u) {
                 uint32_t id;
                 id = u->descriptor.idVendor << 16 | u->descriptor.idProduct;
+                m_usbconid.append(id);
                 qDebug("%x", id);
 
                 if(usbids.contains(id)) {
@@ -332,6 +338,7 @@ bool Autodetection::detectUsb()
         else {
             uint32_t id;
             id = vid << 16 | pid;
+            m_usbconid.append(id);
             qDebug("VID: %04x PID: %04x", vid, pid);
             if(usbids.contains(id)) {
                     m_device = usbids.value(id);
@@ -356,4 +363,56 @@ bool Autodetection::detectUsb()
 
 #endif
     return false;
+}
+
+
+bool Autodetection::detectAjbrec(QString root)
+{
+    QFile f(root + "/ajbrec.ajz");
+    char header[24];
+    f.open(QIODevice::ReadOnly);
+    if(!f.read(header, 24)) return false;
+
+    // check the header of the file.
+    // recorder v1 had a 6 bytes sized header
+    // recorder v2, FM, Ondio SP and FM have a 24 bytes header.
+
+    // recorder v1 has the binary length in the first 4 bytes, so check
+    // for them first.
+    int len = (header[0]<<24) | (header[1]<<16) | (header[2]<<8) | header[3];
+    qDebug() << "possible bin length:" << len;
+    qDebug() << "file len:" << f.size();
+    if((f.size() - 6) == len)
+        m_device = "recorder";
+    
+    // size didn't match, now we need to assume we have a headerlength of 24.
+    switch(header[11]) {
+        case 2:
+            m_device = "recorderv2";
+            break;
+            
+        case 4:
+            m_device = "fmrecorder";
+            break;
+            
+        case 8:
+            // newer recorder firmwares also use the version id 8
+            // so check usb id too.
+            if(m_usbconid.contains(0x058f9330))
+                m_device = "ondiofm";
+            else
+                m_device = "recorderv2";
+            break;
+            
+        case 16:
+            m_device = "ondiosp";
+            break;
+
+        default:
+            break;
+    }
+    f.close();
+    
+    if(m_device.isEmpty()) return false;
+    return true;
 }

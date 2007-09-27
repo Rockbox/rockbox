@@ -46,10 +46,12 @@ private:
     QStringList getMountpoints(void);
     QString resolveMountPoint(QString);
     bool detectUsb(void);
+    bool detectAjbrec(QString);
 
     QString m_device;
     QString m_mountpoint;
     QString m_errdev;
+    QList<int> m_usbconid;
 };
 
 
