@@ -51,9 +51,15 @@ static long lcd_backdrop_offset IDATA_ATTR = 0;
 #if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
 static unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
 static unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
+static unsigned lss_pattern IDATA_ATTR = LCD_DEFAULT_LS;
+static unsigned lse_pattern IDATA_ATTR = LCD_DEFAULT_BG;
+static unsigned lst_pattern IDATA_ATTR = LCD_DEFAULT_FG;
 #else
 unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
 unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
+unsigned lss_pattern IDATA_ATTR = LCD_DEFAULT_LS;
+unsigned lse_pattern IDATA_ATTR = LCD_DEFAULT_BG;
+unsigned lst_pattern IDATA_ATTR = LCD_DEFAULT_FG;
 #endif
 
 static int drawmode = DRMODE_SOLID;
@@ -101,6 +107,21 @@ void lcd_set_background(unsigned color)
 unsigned lcd_get_background(void)
 {
     return bg_pattern;
+}
+
+void lcd_set_selector_start(unsigned color)
+{
+    lss_pattern = color;
+}
+
+void lcd_set_selector_end(unsigned color)
+{
+    lse_pattern = color;
+}
+
+void lcd_set_selector_text(unsigned color)
+{
+    lst_pattern = color;
 }
 
 void lcd_set_drawinfo(int mode, unsigned fg_color, unsigned bg_color)
@@ -808,16 +829,48 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
     ypos = ymargin + y*h;
     drawmode = (style & STYLE_INVERT) ?
                (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
-    if (style & STYLE_COLORED) {
+    if (style & STYLE_GRADIENT || style & STYLE_COLORBAR) {
+        fg_pattern = lss_pattern;
+    }
+    else if (style & STYLE_COLORED) {
         if (drawmode == DRMODE_SOLID)
             fg_pattern = style & STYLE_COLOR_MASK;
         else
             bg_pattern = style & STYLE_COLOR_MASK;
     }
-    lcd_putsxyofs(xpos, ypos, offset, str);
     drawmode ^= DRMODE_INVERSEVID;
     xrect = xpos + MAX(w - offset, 0);
-    lcd_fillrect(xrect, ypos, LCD_WIDTH - xrect, h);
+
+    if (style & STYLE_GRADIENT) {
+        int h_r = RGB_UNPACK_RED(lss_pattern) << 16;
+        int h_b = RGB_UNPACK_BLUE(lss_pattern) << 16;
+        int h_g = RGB_UNPACK_GREEN(lss_pattern) << 16;
+        int rstep = (h_r - ((signed)RGB_UNPACK_RED(lse_pattern) << 16)) / h;
+        int gstep = (h_g - ((signed)RGB_UNPACK_GREEN(lse_pattern) << 16)) / h;
+        int bstep = (h_b - ((signed)RGB_UNPACK_BLUE(lse_pattern) << 16)) / h;
+        int count;
+
+        drawmode = DRMODE_FG;
+        for(count = 0; count < h; count++) {
+            lcd_hline(xpos, LCD_WIDTH, ypos + count);
+            h_r -= rstep;
+            h_g -= gstep;
+            h_b -= bstep;
+            fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
+        }
+        fg_pattern = lst_pattern;
+    }
+    else if (style & STYLE_COLORBAR) {
+        drawmode = DRMODE_FG;
+        lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, h);
+        fg_pattern = lst_pattern;
+    }
+    else {
+        lcd_fillrect(xrect, ypos, LCD_WIDTH - xrect, h);
+        drawmode = (style & STYLE_INVERT) ?
+        (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
+    }
+    lcd_putsxyofs(xpos, ypos, offset, str);
     drawmode = lastmode;
     fg_pattern = oldfgcolor;
     bg_pattern = oldbgcolor;
@@ -852,7 +905,13 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
     s->start_tick = current_tick + lcd_scroll_info.delay;
     s->invert = false;
     if (style & STYLE_INVERT) {
-        s->invert = true;
+        s->invert = 1;
+    }
+    else if (style & STYLE_COLORBAR) {
+        s->invert = 2;
+    }
+    else if (style & STYLE_GRADIENT) {
+        s->invert = 3;
     }
     lcd_puts_style_offset(x,y,string,style,offset);
 
@@ -961,8 +1020,37 @@ void lcd_scroll_fn(void)
         }
 
         lastmode = drawmode;
-        drawmode = s->invert ?
+        drawmode = s->invert == 1 ?
             (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
+        if (s->invert == 2) {
+            fg_pattern = lss_pattern;
+            drawmode = DRMODE_FG;
+            lcd_fillrect(0, ypos, LCD_WIDTH, pf->height);
+            fg_pattern = lst_pattern;
+        }
+        else if (s->invert == 3) {
+            int h_r = RGB_UNPACK_RED(lss_pattern) << 16;
+            int h_b = RGB_UNPACK_BLUE(lss_pattern) << 16;
+            int h_g = RGB_UNPACK_GREEN(lss_pattern) << 16;
+            int rstep = (h_r - ((signed)RGB_UNPACK_RED(lse_pattern) << 16))
+                        / pf->height;
+            int gstep = (h_g - ((signed)RGB_UNPACK_GREEN(lse_pattern) << 16))
+                        / pf->height;
+            int bstep = (h_b - ((signed)RGB_UNPACK_BLUE(lse_pattern) << 16))
+                        / pf->height;
+            unsigned int count;
+
+            fg_pattern = lss_pattern;
+            drawmode = DRMODE_FG;
+            for(count = 0; count < pf->height; count++) {
+                lcd_hline(0, LCD_WIDTH , ypos + count);
+                h_r -= rstep;
+                h_g -= gstep;
+                h_b -= bstep;
+                fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
+            }
+            fg_pattern = lst_pattern;
+        }
         lcd_putsxyofs(xpos, ypos, s->offset, s->line);
         drawmode = lastmode;
         lcd_update_rect(xpos, ypos, LCD_WIDTH - xpos, pf->height);

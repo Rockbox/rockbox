@@ -857,6 +857,16 @@ bool recording_screen(bool no_source)
         ID2P(LANG_GIGABYTE)
     };
 
+    int style = STYLE_INVERT;
+#ifdef HAVE_LCD_COLOR
+    if (global_settings.cursor_style == 2) {
+        style |= STYLE_COLORBAR;
+    }
+    else if (global_settings.cursor_style == 3) {
+        style |= STYLE_GRADIENT;
+    }
+#endif
+
     struct audio_recording_options rec_options;
     if (check_dir(global_settings.rec_directory) == false)
     {
@@ -930,7 +940,7 @@ bool recording_screen(bool no_source)
     {
         screens[i].setfont(FONT_SYSFIXED);
         screens[i].getstringsize("M", &w, &h);
-        screens[i].setmargins(global_settings.invert_cursor ? 0 : w, 8);
+        screens[i].setmargins(global_settings.cursor_style ? 0 : w, 8);
         filename_offset[i] = ((screens[i].height >= 80) ? 1 : 0);
         pm_y[i] = 8 + h * (2 + filename_offset[i]);
     }
@@ -1331,7 +1341,7 @@ bool recording_screen(bool no_source)
                         {
                             screens[i].setfont(FONT_SYSFIXED);
                             screens[i].setmargins(
-                                global_settings.invert_cursor ? 0 : w, 8);
+                                global_settings.cursor_style ? 0 : w, 8);
                         }
                     }
                 }
@@ -1555,11 +1565,11 @@ bool recording_screen(bool no_source)
                               global_settings.volume,
                               buf2, sizeof(buf2)));
             
-            if (global_settings.invert_cursor && (pos++ == cursor))
+            if (global_settings.cursor_style && (pos++ == cursor))
             {
                 for(i = 0; i < screen_update; i++)
                     screens[i].puts_style_offset(0, filename_offset[i] +
-                                           PM_HEIGHT + 2, buf, STYLE_INVERT,0);
+                                           PM_HEIGHT + 2, buf, style,0);
             }
             else
             {
@@ -1574,11 +1584,11 @@ bool recording_screen(bool no_source)
                          fmt_gain(SOUND_MIC_GAIN,
                                   global_settings.rec_mic_gain,
                                   buf2, sizeof(buf2)));
-                if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
+                if(global_settings.cursor_style && ((1==cursor)||(2==cursor)))
                 {
                     for(i = 0; i < screen_update; i++)
                         screens[i].puts_style_offset(0, filename_offset[i] +
-                                            PM_HEIGHT + 3, buf, STYLE_INVERT,0);
+                                            PM_HEIGHT + 3, buf, style,0);
                 }
                 else
                 {
@@ -1598,11 +1608,11 @@ bool recording_screen(bool no_source)
                          fmt_gain(SOUND_LEFT_GAIN,
                                   global_settings.rec_left_gain,
                                   buf2, sizeof(buf2)));
-                if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
+                if(global_settings.cursor_style && ((1==cursor)||(2==cursor)))
                 {
                     for(i = 0; i < screen_update; i++)
                         screens[i].puts_style_offset(0, filename_offset[i] + 
-                                           PM_HEIGHT + 3, buf, STYLE_INVERT,0);
+                                           PM_HEIGHT + 3, buf, style,0);
                 }
                 else
                 {
@@ -1616,11 +1626,11 @@ bool recording_screen(bool no_source)
                          fmt_gain(SOUND_RIGHT_GAIN,
                                   global_settings.rec_right_gain,
                                   buf2, sizeof(buf2)));
-                if(global_settings.invert_cursor && ((1==cursor)||(3==cursor)))
+                if(global_settings.cursor_style && ((1==cursor)||(3==cursor)))
                 {
                     for(i = 0; i < screen_update; i++)
                         screens[i].puts_style_offset(0, filename_offset[i] + 
-                                            PM_HEIGHT + 4, buf, STYLE_INVERT,0);
+                                            PM_HEIGHT + 4, buf, style,0);
                 }
                 else
                 {
@@ -1701,11 +1711,11 @@ bool recording_screen(bool no_source)
                              global_settings.rec_right_gain)/2,
                              buf2, sizeof(buf2)));                         
 
-            if(global_settings.invert_cursor && ((cursor==4) || (cursor==5)))
+            if(global_settings.cursor_style && ((cursor==4) || (cursor==5)))
             {
                 for(i = 0; i < screen_update; i++)
                     screens[i].puts_style_offset(0, filename_offset[i] + 
-                                        PM_HEIGHT + line[i], buf, STYLE_INVERT,0);
+                                        PM_HEIGHT + line[i], buf, style,0);
             }
             else if (
                 global_settings.rec_source == AUDIO_SRC_MIC
@@ -1737,7 +1747,7 @@ bool recording_screen(bool no_source)
             }
 #endif /* HAVE_AGC */
 
-            if(!global_settings.invert_cursor) {
+            if(!global_settings.cursor_style) {
                 switch(cursor)
                 {
                     case 1:

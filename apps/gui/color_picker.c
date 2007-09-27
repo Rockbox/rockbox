@@ -200,7 +200,7 @@ static void draw_screen(struct screen *display, char *title,
             set_drawinfo(display, DRMODE_SOLID, text_color,
                          background_color);
 
-            if (global_settings.invert_cursor)
+            if (global_settings.cursor_style != 0)
             {
                 /* Draw solid bar selection bar */
                 display->fillrect(0,

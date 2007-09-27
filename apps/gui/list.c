@@ -141,7 +141,7 @@ static void gui_list_flash(struct gui_list * gui_list)
     int selected_line=gui_list->selected_item-gui_list->start_item+SHOW_LIST_TITLE;
 #ifdef HAVE_LCD_BITMAP
     int line_ypos=display->getymargin()+display->char_height*selected_line;
-    if (global_settings.invert_cursor)
+    if (global_settings.cursor_style)
     {
         int line_xpos=display->getxmargin();
         display->set_drawmode(DRMODE_COMPLEMENT);
@@ -313,7 +313,7 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
     draw_scrollbar = (global_settings.scrollbar &&
                 lines < gui_list->nb_items);
 
-    draw_cursor = !global_settings.invert_cursor && 
+    draw_cursor = !global_settings.cursor_style &&
                     gui_list->show_selection_marker;
     text_pos = 0; /* here it's in pixels */
     if(draw_scrollbar || SHOW_LIST_TITLE) /* indent if there's
@@ -390,11 +390,28 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
            current_item <  gui_list->selected_item + gui_list->selected_size)
         {/* The selected item must be displayed scrolling */
 #ifdef HAVE_LCD_BITMAP
-            if (global_settings.invert_cursor)/* Display inverted-line-style*/
+            if (global_settings.cursor_style == 1
+#ifdef HAVE_REMOTE_LCD
+                || display->screen_type == SCREEN_REMOTE
+#endif
+               )
             {
+                /* Display inverted-line-style */
                 style |= STYLE_INVERT;
             }
-            else  /*  if (!global_settings.invert_cursor) */
+#ifdef HAVE_LCD_COLOR
+            else if (global_settings.cursor_style == 2)
+            {
+                /* Display colour line selector */
+                style |= STYLE_COLORBAR;
+            }
+            else if (global_settings.cursor_style == 3)
+            {
+                /* Display gradient line selector */
+                style |= STYLE_GRADIENT;
+            }
+#endif
+            else  /*  if (!global_settings.cursor_style) */
             {
                 if (current_item % gui_list->selected_size != 0)
                     draw_cursor = false;

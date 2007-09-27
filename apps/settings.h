@@ -412,8 +412,7 @@ struct user_settings
     int contrast;   /* lcd contrast */
 #endif
     bool invert;    /* invert display */
-    bool invert_cursor; /* invert the current file in dir browser and menu
-                           instead of using the default cursor */
+    int cursor_style; /* style of the selection cursor */
     bool flip_display; /* turn display (and button layout) by 180 degrees */
     int poweroff;   /* power off timer */
     int backlight_timeout;  /* backlight off timeout:  0-18 0=never,
@@ -641,6 +640,9 @@ struct user_settings
 #ifdef HAVE_LCD_COLOR
     int bg_color; /* background color native format */
     int fg_color; /* foreground color native format */
+    int lss_color; /* background color for the selector or start color for the gradient */
+    int lse_color; /* end color for the selector gradient */
+    int lst_color; /* color of the text for the selector */
 #endif
     bool party_mode;    /* party mode - unstoppable music */
     

@@ -778,6 +778,9 @@ void settings_apply(void)
 #ifdef HAVE_LCD_COLOR
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
+    screens[SCREEN_MAIN].set_selector_start(global_settings.lss_color);
+    screens[SCREEN_MAIN].set_selector_end(global_settings.lse_color);
+    screens[SCREEN_MAIN].set_selector_text(global_settings.lst_color);
 #endif
 
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)

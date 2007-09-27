@@ -115,7 +115,7 @@ MENUITEM_SETTING(invert, &global_settings.invert, NULL);
 #ifdef HAVE_LCD_FLIP
 MENUITEM_SETTING(flip_display, &global_settings.flip_display, flipdisplay_callback);
 #endif
-MENUITEM_SETTING(invert_cursor, &global_settings.invert_cursor, NULL);
+MENUITEM_SETTING(cursor_style, &global_settings.cursor_style, NULL);
 #endif /* HAVE_LCD_BITMAP */
 #if LCD_DEPTH > 1
 /**
@@ -157,13 +157,55 @@ static int set_bg_color(void)
     settings_save();
     return res;
 }
+
+/* Line selector colour */
+static int set_lss_color(void)
+{
+    int res;
+    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_SELECTOR_START_COLOR),
+                         &global_settings.lss_color,-1);
+
+    screens[SCREEN_MAIN].set_selector_start(global_settings.lss_color);
+    settings_save();
+    return res;
+}
+
+static int set_lse_color(void)
+{
+    int res;
+    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_SELECTOR_END_COLOR),
+                         &global_settings.lse_color,-1);
+
+    screens[SCREEN_MAIN].set_selector_end(global_settings.lse_color);
+    settings_save();
+    return res;
+}
+
+/* Line selector text colour */
+static int set_lst_color(void)
+{
+    int res;
+    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_SELECTOR_TEXT_COLOR),
+                         &global_settings.lst_color,global_settings.lss_color);
+
+    screens[SCREEN_MAIN].set_selector_text(global_settings.lst_color);
+    settings_save();
+    return res;
+}
+
 static int reset_color(void)
 {
     global_settings.fg_color = LCD_DEFAULT_FG;
     global_settings.bg_color = LCD_DEFAULT_BG;
+    global_settings.lss_color = LCD_DEFAULT_LS;
+    global_settings.lse_color = LCD_DEFAULT_BG;
+    global_settings.lst_color = LCD_DEFAULT_FG;
 
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
+    screens[SCREEN_MAIN].set_selector_start(global_settings.lss_color);
+    screens[SCREEN_MAIN].set_selector_end(global_settings.lse_color);
+    screens[SCREEN_MAIN].set_selector_text(global_settings.lst_color);
     settings_save();
     return 0;
 }
@@ -171,6 +213,12 @@ MENUITEM_FUNCTION(set_bg_col, 0, ID2P(LANG_BACKGROUND_COLOR),
                     set_bg_color, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(set_fg_col, 0, ID2P(LANG_FOREGROUND_COLOR),
                     set_fg_color, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(set_lss_col, 0, ID2P(LANG_SELECTOR_START_COLOR),
+                    set_lss_color, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(set_lse_col, 0, ID2P(LANG_SELECTOR_END_COLOR),
+                    set_lse_color, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(set_lst_col, 0, ID2P(LANG_SELECTOR_TEXT_COLOR),
+                    set_lst_color, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(reset_colors, 0, ID2P(LANG_RESET_COLORS),
                     reset_color, NULL, NULL, Icon_NOICON);
 #endif
@@ -208,8 +256,11 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
 # ifdef HAVE_LCD_FLIP
             ,&flip_display
 # endif
-            ,&invert_cursor
+            ,&cursor_style
 #endif /* HAVE_LCD_BITMAP */
+#ifdef HAVE_LCD_COLOR
+            ,&set_lss_col, &set_lse_col, &set_lst_col
+#endif
 #if LCD_DEPTH > 1
             ,&clear_main_bd,
 #endif

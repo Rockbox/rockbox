@@ -27,6 +27,8 @@
 #define STYLE_DEFAULT    0x00000000
 #define STYLE_INVERT     0x20000000
 #define STYLE_COLORED    0x10000000
+#define STYLE_COLORBAR   0x40000000
+#define STYLE_GRADIENT   0x80000000
 #define STYLE_COLOR_MASK 0x0000FFFF
 
 #ifdef SIMULATOR
@@ -233,6 +235,7 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define LCD_WHITE      LCD_RGBPACK(255, 255, 255)
 #define LCD_DEFAULT_FG LCD_BLACK
 #define LCD_DEFAULT_BG LCD_RGBPACK(182, 198, 229) /* rockbox blue */
+#define LCD_DEFAULT_LS LCD_WHITE
 
 #elif LCD_DEPTH > 1 /* greyscale */
 
@@ -355,6 +358,11 @@ extern void     lcd_set_foreground(unsigned foreground);
 extern unsigned lcd_get_foreground(void);
 extern void     lcd_set_background(unsigned background);
 extern unsigned lcd_get_background(void);
+#ifdef HAVE_LCD_COLOR
+extern void     lcd_set_selector_start(unsigned selector);
+extern void     lcd_set_selector_end(unsigned selector);
+extern void     lcd_set_selector_text(unsigned selector_text);
+#endif
 extern void     lcd_set_drawinfo(int mode, unsigned foreground,
                                  unsigned background);
 void lcd_set_backdrop(fb_data* backdrop);

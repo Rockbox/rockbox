@@ -77,6 +77,11 @@ struct screen screens[NB_SCREENS] =
         .get_foreground=&lcd_get_foreground,
         .set_background=&lcd_set_background,
         .set_foreground=&lcd_set_foreground,
+#ifdef HAVE_LCD_COLOR
+        .set_selector_start=&lcd_set_selector_start,
+        .set_selector_end=&lcd_set_selector_end,
+        .set_selector_text=&lcd_set_selector_text,
+#endif
 #endif /* LCD_DEPTH > 1 */
         .update_rect=&lcd_update_rect,
         .fillrect=&lcd_fillrect,

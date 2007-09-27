@@ -457,8 +457,16 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,flip_display, LANG_FLIP_DISPLAY, false,"flip display", NULL),
 #endif
     /* display */
-    BOOL_SETTING(F_TEMPVAR, invert_cursor, LANG_INVERT_CURSOR, true ,"invert cursor", off_on,
-        LANG_INVERT_CURSOR_BAR, LANG_INVERT_CURSOR_POINTER, NULL),
+     CHOICE_SETTING(F_TEMPVAR|F_THEMESETTING, cursor_style, LANG_INVERT_CURSOR, 1,
+ #ifdef HAVE_LCD_COLOR
+         "selector type", "pointer,bar (inverse),bar (color),bar (gradient)",
+         NULL, 4,
+         ID2P(LANG_INVERT_CURSOR_POINTER), ID2P(LANG_INVERT_CURSOR_BAR),
+         ID2P(LANG_INVERT_CURSOR_COLOR), ID2P(LANG_INVERT_CURSOR_GRADIENT)),
+ #else
+         "selector type", "pointer,bar (inverse)", NULL, 2,
+         ID2P(LANG_INVERT_CURSOR_POINTER), ID2P(LANG_INVERT_CURSOR_BAR)),
+ #endif
     OFFON_SETTING(F_THEMESETTING|F_TEMPVAR, statusbar,
                   LANG_STATUS_BAR, true,"statusbar", NULL),
     OFFON_SETTING(0,scrollbar, LANG_SCROLL_BAR, true,"scrollbar", NULL),
@@ -625,6 +633,12 @@ const struct settings_list settings[] = {
         "foreground color",NULL,UNUSED},
     {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.bg_color,-1,INT(LCD_DEFAULT_BG),
         "background color",NULL,UNUSED},
+    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.lss_color,-1,INT(LCD_DEFAULT_LS),
+        "line selector start color",NULL,UNUSED},
+    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.lse_color,-1,INT(LCD_DEFAULT_BG),
+        "line selector end color",NULL,UNUSED},
+    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.lst_color,-1,INT(LCD_DEFAULT_FG),
+        "line selector text color",NULL,UNUSED},
 #endif
     /* more playback */
     OFFON_SETTING(0,play_selected,LANG_PLAY_SELECTED,true,"play selected",NULL),

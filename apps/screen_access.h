@@ -107,6 +107,11 @@ struct screen
     void (*set_background)(unsigned background);
     void (*set_foreground)(unsigned foreground);
 #endif /* (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1) */
+#if defined(HAVE_LCD_COLOR)
+    void (*set_selector_start)(unsigned selector);
+    void (*set_selector_end)(unsigned selector);
+    void (*set_selector_text)(unsigned selector_text);
+#endif
     void (*update_rect)(int x, int y, int width, int height);
     void (*fillrect)(int x, int y, int width, int height);
     void (*drawrect)(int x, int y, int width, int height);
