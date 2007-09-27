@@ -271,49 +271,52 @@ void releaseNote(int ch, int note)
     }
 }
 
-void sendEvent(struct Event * ev)
+static void sendEvent(struct Event * ev)
 {
-    if( ((ev->status & 0xF0) == MIDI_CONTROL) && (ev->d1 == CTRL_VOLUME) )
+    const unsigned char status_low = ev->status & 0x0F;
+    const unsigned char d1 = ev->d1;
+    const unsigned char d2 = ev->d2;
+    switch(ev->status & 0xF0)
     {
-        setVol((ev->status & 0xF), ev->d2);
-        return;
-    }
+        case MIDI_CONTROL:
+            switch(d1)
+            {
+                case CTRL_VOLUME:
+                {
+                    setVol((status_low), d2);
+                    return;
+                }
+                case CTRL_PANNING:
+                {
+                    setPan((status_low), d2);
+                    return;
+                }
+            }
+            break;
 
-    if( ((ev->status & 0xF0) == MIDI_CONTROL) && (ev->d1 == CTRL_PANNING))
-    {
-        setPan((ev->status & 0xF), ev->d2);
-        return;
-    }
+        case MIDI_PITCHW:
+            setPW((status_low), d2, d1);
+            return;
 
-    if(((ev->status & 0xF0) == MIDI_PITCHW))
-    {
-        setPW((ev->status & 0xF), ev->d2, ev->d1);
-        return;
-    }
+        case MIDI_NOTE_ON:
+            switch(d2)
+            {
+                case 0: /* Release by vol=0 */
+                    releaseNote(status_low, d1);
+                    return;
+                    
+                default:
+                    pressNote(status_low, d1, d2);
+                    return;
+            }
 
-    if(((ev->status & 0xF0) == MIDI_NOTE_ON) && (ev->d2 != 0))
-    {
-        pressNote(ev->status & 0x0F, ev->d1, ev->d2);
-        return;
-    }
+        case MIDI_NOTE_OFF:
+            releaseNote(status_low, d1);
+            return;
 
-    if(((ev->status & 0xF0) == MIDI_NOTE_ON) && (ev->d2 == 0)) /* Release by vol=0 */
-    {
-        releaseNote(ev->status & 0x0F, ev->d1);
-        return;
-    }
-
-
-    if((ev->status & 0xF0) == MIDI_NOTE_OFF)
-    {
-        releaseNote(ev->status & 0x0F, ev->d1);
-        return;
-    }
-
-    if((ev->status & 0xF0) == MIDI_PRGM)
-    {
-        if((ev->status & 0x0F) != 9)
-            setPatch(ev->status & 0x0F, ev->d1);
+        case MIDI_PRGM:
+            if((status_low) != 9)
+                setPatch(status_low, d1);
     }
 }
 

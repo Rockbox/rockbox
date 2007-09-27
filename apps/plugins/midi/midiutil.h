@@ -140,7 +140,6 @@ struct Track
 int printf(const char *fmt, ...);
 int midimain(void * filename);
 unsigned char readChar(int file);
-void sendEvent(struct Event * ev);
 inline void setPoint(struct SynthObject * so, int pt);
 struct Event * getEvent(struct Track * tr, int evNum);
 int readTwoBytes(int file);
