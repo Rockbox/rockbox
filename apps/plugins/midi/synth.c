@@ -88,26 +88,35 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     patchUsed[0]=1;
 
     /* Scan the file to see what needs to be loaded */
-    for(a=0; a<mf->numTracks; a++)
+    if(mf != NULL)
     {
-        unsigned int ts=0;
-
-        if(mf->tracks[a] == NULL)
+        for(a=0; a<mf->numTracks; a++)
         {
-            printf("NULL TRACK !!!");
-            rb->splash(HZ*2, "Null Track in loader.");
-            return -1;
+            unsigned int ts=0;
+
+            if(mf->tracks[a] == NULL)
+            {
+                printf("NULL TRACK !!!");
+                rb->splash(HZ*2, "Null Track in loader.");
+                return -1;
+            }
+
+            for(ts=0; ts<mf->tracks[a]->numEvents; ts++)
+            {
+
+                if((getEvent(mf->tracks[a], ts)->status) == (MIDI_NOTE_ON+9))
+                    drumUsed[getEvent(mf->tracks[a], ts)->d1]=1;
+
+                if( (getEvent(mf->tracks[a], ts)->status & 0xF0) == MIDI_PRGM)
+                    patchUsed[getEvent(mf->tracks[a], ts)->d1]=1;
+            }
         }
+    } else
+    {
+        /* Initialize the whole drum set */
+        for(a=0; a<128; a++)
+            drumUsed[a]=1;
 
-        for(ts=0; ts<mf->tracks[a]->numEvents; ts++)
-        {
-
-            if((getEvent(mf->tracks[a], ts)->status) == (MIDI_NOTE_ON+9))
-                drumUsed[getEvent(mf->tracks[a], ts)->d1]=1;
-
-            if( (getEvent(mf->tracks[a], ts)->status & 0xF0) == MIDI_PRGM)
-                patchUsed[getEvent(mf->tracks[a], ts)->d1]=1;
-        }
     }
 
     int file = rb->open(filename, O_RDONLY);
@@ -289,7 +298,7 @@ signed short int synthVoice(struct SynthObject * so)
     s2 = getSample((cpShifted)+1, wf);
 
         /* LOOP_REVERSE|LOOP_PINGPONG  = 24  */
-    if((wf->mode & (24)) && so->loopState == STATE_LOOPING && (cpShifted <= (wf->startLoop)))
+    if((wf->mode & (24)) && so->loopState == STATE_LOOPING && (cpShifted < (wf->startLoop)))
     {
         if(wf->mode & LOOP_REVERSE)
         {
@@ -304,7 +313,7 @@ signed short int synthVoice(struct SynthObject * so)
         }
     }
 
-    if((wf->mode & 28) && (cpShifted >= wf->endLoop))
+    if((wf->mode & 28) && (cpShifted > wf->endLoop))
     {
         so->loopState = STATE_LOOPING;
         if((wf->mode & (24)) == 0)
