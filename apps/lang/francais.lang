@@ -187,13 +187,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "Mélange en cours..."
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -839,6 +839,7 @@
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "Cross Gain"
@@ -855,6 +856,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_ATTENUATION
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Attenuation"
@@ -871,6 +873,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_CUTOFF
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Cutoff"
@@ -1982,44 +1985,44 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "Priorité de tag ID3"
+    *: ""
   </dest>
   <voice>
-    *: "Priorité de tag ID3"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1 puis V2"
+    *: ""
   </dest>
   <voice>
-    *: "Version 1 puis version 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2 puis V1"
+    *: ""
   </dest>
   <voice>
-    *: "Version 2 puis version 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2039,6 +2042,7 @@
 <phrase>
   id: LANG_RANDOM
   desc: random folder
+  user:
   <source>
     *: "Random"
   </source>
@@ -2509,6 +2513,7 @@
 <phrase>
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
+  user:
   <source>
     *: "Database is not ready"
   </source>
@@ -2841,15 +2846,15 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Sélecteur de ligne"
+    lcd_bitmap: "Type d'indicateur de sélection"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Sélecteur de ligne"
+    lcd_bitmap: "Type d'indicateur de sélection"
   </voice>
 </phrase>
 <phrase>
@@ -3170,7 +3175,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu altarnative for jump scroll
+  desc: (player) menu alternative for jump scroll
   user:
   <source>
     *: "Jump Scroll"
@@ -4866,7 +4871,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR
-  desc: item of voice menu, set the "talkbox" mode for directories
+  desc: item of voice menu, set the voice mode for directories
   user:
   <source>
     *: "Voice Directories"
@@ -4894,7 +4899,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_FILE
-  desc: item of voice menu, set the voive mode for files
+  desc: item of voice menu, set the voice mode for files
   user:
   <source>
     *: "Voice Filenames"
@@ -5567,6 +5572,7 @@
 <phrase>
   id: LANG_FM_REGION
   desc: fm tuner region setting
+  user:
   <source>
     *: none
     radio: "Region"
@@ -5583,6 +5589,7 @@
 <phrase>
   id: LANG_FM_EUROPE
   desc: fm tuner region europe
+  user:
   <source>
     *: none
     radio: "Europe"
@@ -5599,6 +5606,7 @@
 <phrase>
   id: LANG_FM_US
   desc: fm region us / canada
+  user:
   <source>
     *: none
     radio: "US / Canada"
@@ -5615,6 +5623,7 @@
 <phrase>
   id: LANG_FM_JAPAN
   desc: fm region japan
+  user:
   <source>
     *: none
     radio: "Japan"
@@ -5631,6 +5640,7 @@
 <phrase>
   id: LANG_FM_KOREA
   desc: fm region korea
+  user:
   <source>
     *: none
     radio: "Korea"
@@ -5939,6 +5949,7 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Measure"
@@ -5955,6 +5966,7 @@
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "What to do when Splitting"
@@ -6005,6 +6017,7 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Time"
@@ -6021,6 +6034,7 @@
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -6094,12 +6108,10 @@
     recording: ""
   </source>
   <dest>
-    *: none
-    recording: deprecated
+    *: ""
   </dest>
   <voice>
-    *: none
-    recording: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6258,6 +6270,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_TYPE
   desc: in recording trigger menu
+  user:
   <source>
     *: none
     recording: "Trigtype"
@@ -6274,6 +6287,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "New file"
@@ -6290,6 +6304,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "Stop"
@@ -6425,6 +6440,7 @@
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: automatic gain control in record settings
+  user:
   <source>
     *: none
     agc: "Automatic Gain Control"
@@ -6441,6 +6457,7 @@
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -6457,6 +6474,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -6473,6 +6491,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -6489,6 +6508,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -6505,6 +6525,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -6521,6 +6542,7 @@
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
@@ -6800,10 +6822,10 @@
   desc: displayed topmost on the info screen and in the info menu
   user:
   <source>
-    *: "Rockbox Info:"
+    *: "Rockbox Info"
   </source>
   <dest>
-    *: "Infos Rockbox:"
+    *: "Infos Rockbox"
   </dest>
   <voice>
     *: "Infos Rockbox"
@@ -9887,7 +9909,7 @@
     *: ""
   </source>
   <dest>
-    *: deprecated
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -10729,6 +10751,7 @@
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -10762,6 +10785,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
+  user:
   <source>
     *: none
     agc: "AGC"
@@ -10778,6 +10802,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -10794,6 +10819,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -10810,6 +10836,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -10826,6 +10853,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -10842,6 +10870,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -10858,6 +10887,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
@@ -11182,5 +11212,90 @@
   <voice>
     *: none
     usbstack: "Pilote du matériel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Couleur principale de l'indicateur de sélection"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Couleur principale de l'indicateur de sélection"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Couleur du texte sélectionné"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Couleur du texte sélectionné"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Ligne avec dégradé"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Ligne avec dégradé"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Ligne de couleur"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Ligne de couleur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Couleur secondaire de l'indicateur de sélection"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Couleur secondaire de l'indicateur de sélection"
   </voice>
 </phrase>
