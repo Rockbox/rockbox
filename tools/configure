@@ -133,7 +133,7 @@ simcc () {
    ;;
  esac
 
- if [ "`uname -m`" = "x86_64" ]; then
+ if [ "`uname -m`" = "x86_64" ] || [ "`uname -m`" = "amd64" ]; then
    GCCOPTS="$GCCOPTS -fPIC"  # needed to make shared objects link
  fi
 
