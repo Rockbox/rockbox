@@ -50,32 +50,32 @@
 #ifndef SIMULATOR
 /* Need to keep structures inside the header file because debug_menu
  * needs them. */
-# ifdef CPU_COLDFIRE
+#ifdef CPU_COLDFIRE
 struct regs
 {
-    unsigned int macsr;  /* EMAC status register */
-    unsigned int d[6];   /* d2-d7 */
-    unsigned int a[5];   /* a2-a6 */
-    void         *sp;    /* Stack pointer (a7) */
-    void         *start; /* Thread start address, or NULL when started */
-};
-# elif CONFIG_CPU == SH7034
+    unsigned int macsr;  /*     0 - EMAC status register */
+    unsigned int d[6];   /*  4-24 - d2-d7 */
+    unsigned int a[5];   /* 28-44 - a2-a6 */
+    void         *sp;    /*    48 - Stack pointer (a7) */
+    void         *start; /*    52 - Thread start address, or NULL when started */
+} __attribute__((packed));
+#elif CONFIG_CPU == SH7034
 struct regs
 {
-    unsigned int r[7];   /* Registers r8 thru r14 */
-    void         *sp;    /* Stack pointer (r15) */
-    void         *pr;    /* Procedure register */
-    void         *start; /* Thread start address, or NULL when started */
-};
-# elif defined(CPU_ARM)
+    unsigned int r[7];   /*  0-24 - Registers r8 thru r14 */
+    void         *sp;    /*    28 - Stack pointer (r15) */
+    void         *pr;    /*    32 - Procedure register */
+    void         *start; /*    36 - Thread start address, or NULL when started */
+} __attribute__((packed));
+#elif defined(CPU_ARM)
 struct regs
 {
-    unsigned int r[8];   /* Registers r4-r11 */
-    void         *sp;    /* Stack pointer (r13) */
-    unsigned int lr;     /* r14 (lr) */
-    void         *start; /* Thread start address, or NULL when started */
-};
-# endif
+    unsigned int r[8];   /*  0-28 - Registers r4-r11 */
+    void         *sp;    /*    32 - Stack pointer (r13) */
+    unsigned int lr;     /*    36 - r14 (lr) */
+    void         *start; /*    40 - Thread start address, or NULL when started */
+} __attribute__((packed));
+#endif /* CONFIG_CPU */
 #else
 struct regs
 {
@@ -140,9 +140,9 @@ struct core_entry {
 };
 
 #ifdef HAVE_PRIORITY_SCHEDULING
-#define IF_PRIO(empty, type)  , type
+#define IF_PRIO(...)    __VA_ARGS__
 #else
-#define IF_PRIO(empty, type)
+#define IF_PRIO(...)
 #endif
 
 /* PortalPlayer chips have 2 cores, therefore need atomic mutexes 
@@ -197,14 +197,6 @@ struct core_entry {
     })
 #endif
 
-#if NUM_CORES > 1
-inline void lock_cores(void);
-inline void unlock_cores(void);
-#else
-#define lock_cores(...)
-#define unlock_cores(...)
-#endif
-
 struct thread_entry*
     create_thread(void (*function)(void), void* stack, int stack_size,
                   const char *name IF_PRIO(, int priority)
@@ -239,7 +231,12 @@ void priority_yield(void);
 struct thread_entry * thread_get_current(void);
 void init_threads(void);
 int thread_stack_usage(const struct thread_entry *thread);
+#if NUM_CORES > 1
+int idle_stack_usage(unsigned int core);
+#endif
 int thread_get_status(const struct thread_entry *thread);
+void thread_get_name(char *buffer, int size,
+                     struct thread_entry *thread);
 #ifdef RB_PROFILE
 void profile_thread(void);
 #endif

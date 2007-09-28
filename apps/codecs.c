@@ -157,6 +157,10 @@ struct codec_api ci = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
+#ifdef CACHE_FUNCTIONS_AS_CALL
+    flush_icache,
+    invalidate_icache,
+#endif
 };
 
 void codec_get_full_path(char *path, const char *codec_root_fn)

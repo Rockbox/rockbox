@@ -20,6 +20,7 @@
 #include "config.h"
 #include "lcd.h"
 #include "lcd-remote.h"
+#include "thread.h"
 #include "kernel.h"
 #include "sprintf.h"
 #include "button.h"
@@ -52,10 +53,24 @@
 
 volatile unsigned char IDATA_ATTR cpu_message = 0;
 volatile unsigned char IDATA_ATTR cpu_reply = 0;
+#if NUM_CORES > 1
+extern int cop_idlestackbegin[];
+#endif
 
 void rolo_restart_cop(void) ICODE_ATTR;
 void rolo_restart_cop(void)
 {
+    if (CURRENT_CORE == CPU)
+    {
+        /* There should be free thread slots aplenty */
+        create_thread(rolo_restart_cop, cop_idlestackbegin, IDLE_STACK_SIZE,
+                      "rolo COP" IF_PRIO(, PRIORITY_REALTIME)
+                      IF_COP(, COP, false));
+        return;
+    }
+
+    COP_INT_CLR = -1;
+
     /* Invalidate cache */
     invalidate_icache();
     
@@ -63,14 +78,14 @@ void rolo_restart_cop(void)
     CACHE_CTL = CACHE_DISABLE;
 
     /* Tell the main core that we're ready to reload */
-    cpu_reply = 2;
+    cpu_reply = 1;
 
     /* Wait while RoLo loads the image into SDRAM */
     /* TODO: Accept checksum failure gracefully */
-    while(cpu_message == 1) {}
+    while(cpu_message != 1);
 
     /* Acknowledge the CPU and then reload */
-    cpu_reply = 1;
+    cpu_reply = 2;
 
     asm volatile(
         "mov   r0, #0x10000000   \n"
@@ -127,9 +142,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         : : "a"(dest)
     );
 #elif defined(CPU_PP502x)
-
-    /* Tell the COP that we've finished loading and started rebooting */
-    cpu_message = 0;
+    CPU_INT_CLR = -1;
 
     /* Flush cache */
     flush_icache();
@@ -141,8 +154,11 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     for (i=0;i<8;i++)
         memmapregs[i]=0;
 
+    /* Tell the COP it's safe to continue rebooting */
+    cpu_message = 1;
+
     /* Wait for the COP to tell us it is rebooting */
-    while(cpu_reply != 1) {}
+    while(cpu_reply != 2);
 
     asm volatile(
         "mov   r0, #0x10000000   \n"
@@ -211,11 +227,11 @@ int rolo_load(const char* filename)
 #endif
 
 #ifdef CPU_PP
-    cpu_message = COP_REBOOT;
-    COP_CTL = PROC_WAKE;
     lcd_puts(0, 2, "Waiting for coprocessor...");
     lcd_update();
-    while(cpu_reply != 2) {}
+    rolo_restart_cop();
+    /* Wait for COP to be in safe code */
+    while(cpu_reply != 1);
     lcd_puts(0, 2, "                          ");
     lcd_update();
 #endif

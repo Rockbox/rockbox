@@ -70,9 +70,7 @@ void irq(void)
         }
 #endif
     } else {
-        if (COP_INT_STAT & TIMER1_MASK)
-            TIMER1();
-        else if (COP_INT_STAT & TIMER2_MASK)
+        if (COP_INT_STAT & TIMER2_MASK)
             TIMER2();
     }
 }
@@ -85,25 +83,49 @@ void irq(void)
    to extend the funtions to do alternate cache configurations. */
 
 #ifndef BOOTLOADER
-static void ipod_init_cache(void)
+void flush_icache(void) ICODE_ATTR;
+void flush_icache(void)
+{
+    if (CACHE_CTL & CACHE_ENABLE)
+    {
+        outl(inl(0xf000f044) | 0x2, 0xf000f044);
+        while ((CACHE_CTL & 0x8000) != 0);
+    }
+}
+
+void invalidate_icache(void) ICODE_ATTR;
+void invalidate_icache(void)
+{
+    if (CACHE_CTL & CACHE_ENABLE)
+    {
+        unsigned i;
+        outl(inl(0xf000f044) | 0x6, 0xf000f044);
+        while ((CACHE_CTL & 0x8000) != 0);
+        for (i = 0x10000000; i < 0x10002000; i += 16)
+            inb(i);
+    }
+}
+
+static void init_cache(void)
 {
 /* Initialising the cache in the iPod bootloader prevents Rockbox from starting */
     unsigned i;
 
     /* cache init mode? */
-    CACHE_CTL = CACHE_INIT;
+    CACHE_CTL |= CACHE_INIT;
 
-    /* PP5002 has 8KB cache */
-    for (i = 0xf0004000; i < 0xf0006000; i += 16) {
-        outl(0x0, i);
-    }
+    /* what's this do? */
+    outl(inl(0x60006044) | (CURRENT_CORE == CPU ? 0x10 : 0x20),
+         0x60006044); 
 
-    outl(0x0, 0xf000f040);
-    outl(0x3fc0, 0xf000f044);
+    outl(0xc00, 0xf000f040);
+    outl(0xfc0, 0xf000f044);
 
     /* enable cache */
-    CACHE_CTL = CACHE_ENABLE;
+    CACHE_CTL |= CACHE_INIT | CACHE_ENABLE | CACHE_RUN;
 
+    /* fill cache from physical address - do we have a better candidate for
+       an 8KB unchanging memory range? */
     for (i = 0x10000000; i < 0x10002000; i += 16)
         inb(i);
 }
@@ -206,6 +228,12 @@ void system_init(void)
         outl(0xffffffff, 0x60006008);
         DEV_RS = 0;
         outl(0x00000000, 0x60006008);
+#elif defined (IRIVER_H10)
+        DEV_RS = 0x3ffffef8;
+        outl(0xffffffff, 0x60006008);
+        outl(inl(0x70000024) | 0xc0, 0x70000024);
+        DEV_RS = 0;
+        outl(0x00000000, 0x60006008);
 #endif
         /* Remap the flash ROM from 0x00000000 to 0x20000000. */
         MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
@@ -248,8 +276,8 @@ void system_init(void)
         pp_set_cpu_frequency(CPUFREQ_MAX);
 #endif
     }
-    ipod_init_cache();
 
+    init_cache();
 #endif /* BOOTLOADER */
 }
 

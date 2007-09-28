@@ -334,9 +334,7 @@ static void init(void)
     /* if nobody initialized ATA before, I consider this a cold start */
     bool coldstart = (PACR2 & 0x4000) != 0; /* starting from Flash */
 #endif
-#ifdef CPU_PP
-    COP_CTL = PROC_WAKE;
-#endif
+
     system_init();
     kernel_init();
 
@@ -591,25 +589,19 @@ void cop_main(void)
    so it should not be assumed that the coprocessor be usable even on
    platforms which support it.
 
-   A kernel thread runs on the coprocessor which waits for other threads to be
-   added, and gracefully handles RoLo */
+   A kernel thread is initially setup on the coprocessor and immediately
+   destroyed for purposes of continuity. The cop sits idle until at least
+   one thread exists on it. */
 
-#if CONFIG_CPU == PP5002
 /* 3G doesn't have Rolo or dual core support yet */
+#if NUM_CORES > 1
+    system_init();
+    kernel_init();
+    /* This should never be reached */
+#endif
     while(1) {
         COP_CTL = PROC_SLEEP;
     }
-#else
-    extern volatile unsigned char cpu_message;
-
-    system_init();
-    kernel_init();
-
-    while(cpu_message != COP_REBOOT) {
-        sleep(HZ);
-    }
-    rolo_restart_cop();
-#endif /* PP5002 */
 }
 #endif /* CPU_PP */
 

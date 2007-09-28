@@ -197,6 +197,18 @@ SECTIONS
     } > IRAM
 
 #ifdef CPU_PP
+#if NUM_CORES > 1
+    .idle_stacks :
+    {
+       *(.idle_stacks)
+       cpu_idlestackbegin = .;
+       . += 0x0080;
+       cpu_idlestackend = .;
+       cop_idlestackbegin = .;
+       . += 0x0080;
+       cop_idlestackend = .;
+    } > IRAM
+#else
     .cop_stack :
     {
        *(.cop_stack)
@@ -204,6 +216,7 @@ SECTIONS
        . += 0x0500;
        cop_stackend = .;
     } > IRAM
+#endif
 #endif
 
 #else

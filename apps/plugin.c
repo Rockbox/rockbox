@@ -509,6 +509,11 @@ static const struct plugin_api rockbox_api = {
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
     lcd_yuv_set_options,
 #endif
+
+#ifdef CACHE_FUNCTIONS_AS_CALL
+    flush_icache,
+    invalidate_icache,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

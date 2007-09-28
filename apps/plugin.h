@@ -112,7 +112,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 77
+#define PLUGIN_API_VERSION 78
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -627,6 +627,11 @@ struct plugin_api {
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
     void (*lcd_yuv_set_options)(unsigned options);
 #endif
+
+#ifdef CACHE_FUNCTIONS_AS_CALL
+    void (*flush_icache)(void);
+    void (*invalidate_icache)(void);
+#endif
 };
 
 /* plugin header */
@@ -709,5 +714,23 @@ enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)
         { \
             return (api)->memcmp(s1, s2, n); \
         }
+
+#ifndef CACHE_FUNCTION_WRAPPERS
+
+#ifdef CACHE_FUNCTIONS_AS_CALL
+#define CACHE_FUNCTION_WRAPPERS(api) \
+        void flush_icache(void) \
+        { \
+            (api)->flush_icache(); \
+        } \
+        void invalidate_icache(void) \
+        { \
+            (api)->invalidate_icache(); \
+        }
+#else
+#define CACHE_FUNCTION_WRAPPERS(api)
+#endif /* CACHE_FUNCTIONS_AS_CALL */
+
+#endif /* CACHE_FUNCTION_WRAPPERS */
 
 #endif

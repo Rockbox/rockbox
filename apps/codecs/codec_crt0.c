@@ -32,6 +32,8 @@ extern unsigned char plugin_end_addr[];
 
 extern enum codec_status codec_main(void);
 
+CACHE_FUNCTION_WRAPPERS(ci);
+
 enum codec_status codec_start(struct codec_api *api)
 {
 #ifndef SIMULATOR

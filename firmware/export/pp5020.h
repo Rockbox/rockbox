@@ -118,18 +118,18 @@
 #define DEV_RS (*(volatile unsigned long *)(0x60006004))
 #define DEV_EN (*(volatile unsigned long *)(0x6000600c))
 
-#define DEV_SYSTEM      0x4
-#define DEV_SER0        0x40
-#define DEV_SER1        0x80
-#define DEV_I2S         0x800
-#define DEV_I2C         0x1000
-#define DEV_ATA         0x4000
-#define DEV_OPTO        0x10000
-#define DEV_PIEZO       0x10000
-#define DEV_USB         0x400000
-#define DEV_FIREWIRE    0x800000
-#define DEV_IDE0        0x2000000
-#define DEV_LCD         0x4000000
+#define DEV_SYSTEM      0x00000004
+#define DEV_SER0        0x00000040
+#define DEV_SER1        0x00000080
+#define DEV_I2S         0x00000800
+#define DEV_I2C         0x00001000
+#define DEV_ATA         0x00004000
+#define DEV_OPTO        0x00010000
+#define DEV_PIEZO       0x00010000
+#define DEV_USB         0x00400000
+#define DEV_FIREWIRE    0x00800000
+#define DEV_IDE0        0x02000000
+#define DEV_LCD         0x04000000
 
 /* clock control */
 #define CLOCK_SOURCE    (*(volatile unsigned long *)(0x60006020))
@@ -174,6 +174,7 @@
 
 #define CACHE_DISABLE    0
 #define CACHE_ENABLE     1
+#define CACHE_RUN        2
 #define CACHE_INIT       4
 
 /* GPIO Ports */

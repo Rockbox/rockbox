@@ -179,6 +179,7 @@ static const char* const uiename[] = {
 /* Unexpected Interrupt or Exception handler. Currently only deals with
    exceptions, but will deal with interrupts later.
  */
+void UIE(unsigned int pc, unsigned int num) __attribute__((noreturn));
 void UIE(unsigned int pc, unsigned int num)
 {
     char str[32];
@@ -188,7 +189,8 @@ void UIE(unsigned int pc, unsigned int num)
     lcd_setfont(FONT_SYSFIXED);
 #endif
     lcd_puts(0, 0, uiename[num]);
-    snprintf(str, sizeof(str), "at %08x", pc);
+    snprintf(str, sizeof(str), "at %08x" IF_COP(" (%d)"), pc
+             IF_COP(, CURRENT_CORE));
     lcd_puts(0, 1, str);
     lcd_update();
 

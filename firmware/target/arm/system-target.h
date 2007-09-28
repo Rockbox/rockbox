@@ -70,29 +70,20 @@ static inline unsigned int current_core(void)
     );
     return core;
 }
-#else
-unsigned int current_core(void);
-#endif
 
-#if CONFIG_CPU != PP5002
+#define CACHE_FUNCTIONS_AS_CALL
 
 #define HAVE_INVALIDATE_ICACHE
-static inline void invalidate_icache(void)
-{
-    outl(inl(0xf000f044) | 0x6, 0xf000f044);
-    while ((CACHE_CTL & 0x8000) != 0);
-}
+void invalidate_icache(void);
 
 #define HAVE_FLUSH_ICACHE
-static inline void flush_icache(void)
-{
-    outl(inl(0xf000f044) | 0x2, 0xf000f044);
-    while ((CACHE_CTL & 0x8000) != 0);
-}
+void flush_icache(void);
 
-#endif /* CONFIG_CPU */
 #else
+unsigned int current_core(void);
+#endif /* CPU_PP502x */
 
-#endif
+
+#endif /* CPU_PP */
 
 #endif /* SYSTEM_TARGET_H */

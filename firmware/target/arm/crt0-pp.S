@@ -34,6 +34,7 @@ start:
 #if CONFIG_CPU == PP5002
     .equ    PROC_ID,    0xc4000000
     .equ    CPU_ICLR,   0xcf001028
+    .equ    CPU_CTRL,   0xcf004054
     .equ    COP_ICLR,   0xcf001038
     .equ    COP_CTRL,   0xcf004058
     .equ    COP_STATUS, 0xcf004050
@@ -44,6 +45,8 @@ start:
 #else
     .equ    PROC_ID,    0x60000000
     .equ    CPU_ICLR,   0x60004028
+    .equ    CPU_CTRL,   0x60007000
+    .equ    CPU_STATUS, 0x60007000
     .equ    COP_ICLR,   0x60004038
     .equ    COP_CTRL,   0x60007004
     .equ    COP_STATUS, 0x60007004
@@ -57,15 +60,16 @@ start:
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
     b      pad_skip
 
-.space 60*4 /* (more than enough) space for exception vectors and mi4 magic */
+.space 64*4 /* (more than enough) space for exception vectors and mi4 magic */
 
 pad_skip:
-#if defined(SANSA_E200) || defined(SANSA_C200)
-    /* On the Sansa, copying the vectors fails if the cache is initialised */
-    ldr    r1, =CACHE_CTRL
-    mov    r2, #0x0
-    str    r2, [r1]
-#endif
+    /* Find out which processor we are - r0 should be preserved for the
+     * duration of the init to avoid constant reloading of the processor ID.
+     * For each stage, CPU proceeds first, then COP. 
+     */
+    ldr    r0, =PROC_ID
+    ldrb   r0, [r0]
+
     /* We need to remap memory from wherever SDRAM is mapped natively, to
        base address 0, so we can put our exception vectors there. We don't
        want to do this remapping while executing from SDRAM, so we copy the
@@ -73,70 +77,95 @@ pad_skip:
        code is compiled for address 0, but is currently executing at either
        0x28000000 or 0x10000000, depending on chipset version. Do not use any
        absolute addresses until remapping has been done. */
-    ldr    r1, =0x40000000
-    ldr    r2, =remap_start
-    ldr    r3, =remap_end
 
-    and    r5, pc, #0xff000000 /* adjust for execute address */
-    orr    r2, r2, r5
-    orr    r3, r3, r5
+    /* Cores are stepped though the init in turn: CPU then COP. The the remap
+       stage is completed by each core in turn and then the COP waits for the
+       CPU to finish initializing its kernel where the CPU will wake the COP
+       and wait for the COP to finish. This ensures no threading activity
+       starts until it is safe. */
+    cmp    r0, #0x55
+    
+    /* mask all interrupt sources before setting anything up */
+    ldreq  r2, =CPU_ICLR
+    ldrne  r2, =COP_ICLR    
+    mvn    r1, #0
+    str    r1, [r2]
+
+    /* put us (co-processor) to sleep and wait for CPU to remap */
+    ldrne  r2, =COP_CTRL
+    movne  r1, #SLEEP
+    strne  r1, [r2]
+
+    /* wait for co-processor to sleep then CPU can begin its remapping */
+    ldreq  r2, =COP_STATUS
+1:
+    ldreq  r1, [r2]
+    tsteq  r1, #SLEEPING
+    beq    1b
+
+#ifdef CPU_PP502x
+    /* disable cache and local interrupt vectors - it is really not desireable
+       to have them enabled here */
+    ldr    r2, =CACHE_CTRL
+    mov    r1, #0
+    str    r1, [r2]
+#endif
+
+    mov    r2, #0x40000000
+    ldr    r3, =remap_start
+    ldr    r4, =remap_end
+
+    and    r6, pc, #0xff000000 /* adjust for execute address */
+    orr    r3, r3, r6
+    orr    r4, r4, r6
 
     /* copy the code to 0x40000000 */
 1:
-    ldr    r4, [r2], #4
-    str    r4, [r1], #4
-    cmp    r2, r3
-    ble    1b
+    ldr    r5, [r3], #4
+    str    r5, [r2], #4
+    cmp    r3, r4
+    blo    1b
 
-    ldr    r3, =0x3f84     /* r3 and r1 values here are magic, don't touch */
-    orr    r3, r3, r5      /* adjust for execute address */
-    ldr    r2, =0xf000f014
+    ldr    r4, =0x3f84     /* r3 and r1 values here are magic, don't touch */
+    orr    r4, r4, r6      /* adjust for execute address */
+    ldr    r3, =0xf000f014
 #if MEM > 32
-    mov    r1, #0x7400     /* r1 appears to indicate how much memory (not in
+    mov    r2, #0x7400     /* r1 appears to indicate how much memory (not in
                               bytes) is remapped */
 #else
-    mov    r1, #0x3a00
+    mov    r2, #0x3a00
 #endif
-    ldr    r0, =0xf000f010
+    ldr    r1, =0xf000f010
     mov    pc, #0x40000000 
 
 remap_start:
-    str    r1, [r0]
-    str    r3, [r2]
-    ldr    r0, L_post_remap
-    mov    pc, r0
-L_post_remap: .word remap_end
+    str    r2, [r1]
+    str    r4, [r3]
+    ldr    r1, L_post_remap
+    mov    pc, r1
+L_post_remap:
+    .word remap_end
 remap_end:
 
-    /* After doing the remapping, send the COP to sleep.
-       On wakeup it will go to cop_init */
-
-    /* Find out which processor we are */
-    ldr    r0, =PROC_ID
-    ldrb   r0, [r0]
     cmp    r0, #0x55
-
-    /* Mask all interrupt sources before setting up modes */
-    ldreq  r0, =CPU_ICLR
-    ldrne  r0, =COP_ICLR    
-    mvn    r1, #1
-    str    r1, [r0]    
-    
-    /* put us (co-processor) to sleep */
-    ldrne  r4, =COP_CTRL
+    ldr    r4, =COP_CTRL
+    /* Wakeup co-processor to let it do remappings */
+    moveq  r3, #WAKE
+    /* Sleep us (co-processor) and wait for CPU to do kernel initialization */
     movne  r3, #SLEEP
-    strne  r3, [r4]
+    str    r3, [r4]
 
+    /* Jump to co-processor init */
     ldrne  pc, =cop_init
 
 cpu_init:
-    /* Wait for COP to be sleeping */
+    /* Wait for COP to go to sleep before proceeding */
     ldr    r4, =COP_STATUS
 1:
     ldr    r3, [r4]
     tst    r3, #SLEEPING
     beq    1b
-    
+
     /* Copy exception handler code to address 0 */
     ldr    r2, =_vectorsstart
     ldr    r3, =_vectorsend
@@ -174,17 +203,28 @@ cpu_init:
     cmp    r3, r2
     strhi  r4, [r2], #4
     bhi    1b
-    
-    /* Set up some stack and munge it with 0xdeadbeef */
-    ldr    sp, =stackend
-    mov    r3, sp
-    ldr    r2, =stackbegin
+
+    /* Load stack munge value */    
     ldr    r4, =0xdeadbeef
+
+    /* Set up some stack and munge it with 0xdeadbeef */
+    ldr    r2, =stackbegin
+    ldr    sp, =stackend
+1:
+    cmp    sp, r2
+    strhi  r4, [r2], #4
+    bhi    1b
+
+#if NUM_CORES > 1
+    /* Set up idle stack and munge it with 0xdeadbeef */
+    ldr    r2, =cpu_idlestackbegin
+    ldr    r3, =cpu_idlestackend
 1:
     cmp    r3, r2
     strhi  r4, [r2], #4
     bhi    1b
-    
+#endif
+
     /* Set up stack for IRQ mode */ 
     msr    cpsr_c, #0x92 /* IRQ disabled, FIQ enabled */
     ldr    sp, =irq_stack
@@ -203,34 +243,41 @@ cpu_init:
     msr    cpsr_c, #0xdb /* IRQ/FIQ disabled */
     ldr    sp, =irq_stack
 
-    /* Switch to supervisor mode */
+    /* Switch back to supervisor mode */
     msr    cpsr_c, #0xd3
-    ldr    sp, =stackend
+
+    /* Delay waking the COP until thread initialization is complete unless dual-core
+       support is not enabled in which case the cop_main function does not perform
+       any kernel or thread initialization. It's just a trivial sleep loop. */
+#if NUM_CORES == 1
+    ldr    r4, =COP_CTRL
+    mov    r3, #WAKE
+    str    r3, [r4]
+#endif
+
     bl     main
     /* main() should never return */
 
 cop_init:
-#if CONFIG_CPU != PP5002
-    /* COP: Invalidate cache */
-    ldr    r0, =0xf000f044
-    ldr    r1, [r0]
-    orr    r1, r1, #0x6
-    str    r1, [r0]
-
-    ldr    r0, =CACHE_CTRL
+#if NUM_CORES > 1
+    /* Wait for CPU to go to sleep at the end of its kernel init */
+    ldr    r4, =CPU_STATUS
 1:
-    ldr    r1, [r0]
-    tst    r1, #0x8000
-    bne    1b
-#endif
+    ldr    r3, [r4]
+    tst    r3, #SLEEPING
+    beq    1b
 
-    /* Setup stack for COP */
-    ldr    sp, =cop_stackend
-    mov    r3, sp
+    /* Set up idle stack for COP and munge it with 0xdeadbeef */
+    ldr    r2, =cop_idlestackbegin
+    ldr    sp, =cop_idlestackend
+#else
+    /* Setup stack for COP and munge it with 0xdeadbeef */
     ldr    r2, =cop_stackbegin
+    ldr    sp, =cop_stackend
+#endif
     ldr    r4, =0xdeadbeef
 2:
-    cmp    r3, r2
+    cmp    sp, r2
     strhi  r4, [r2], #4
     bhi    2b
 
@@ -247,13 +294,12 @@ cop_init:
     msr    cpsr_c, #0xdb /* IRQ/FIQ disabled */
     ldr    sp, =cop_irq_stack
 
-    /* Switch to supervisor mode */
+    /* Switch back to supervisor mode */
     msr    cpsr_c, #0xd3
-    ldr    sp, =cop_stackend
     
     /* Run cop_main() in apps/main.c */
     bl     cop_main
-    
+
 /* Exception handlers. Will be copied to address 0 after memory remapping */
     .section .vectors,"aw"
     ldr    pc, [pc, #24]
@@ -300,7 +346,6 @@ undef_instr_handler:
 software_int_handler:
 reserved_handler:
     movs   pc, lr
-
 prefetch_abort_handler:
     sub    r0, lr, #4
     mov    r1, #1
@@ -324,6 +369,9 @@ UIE:
     b UIE
 #endif
 
+/* Align stacks to cache line boundary */
+    .balign 16
+    
 /* 256 words of IRQ stack */
     .space 256*4
 irq_stack:

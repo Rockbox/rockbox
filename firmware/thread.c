@@ -45,58 +45,12 @@ static int boosted_threads IBSS_ATTR;
 #endif
 
 /* Define to enable additional checks for blocking violations etc. */
-#define THREAD_EXTRA_CHECKS
+#define THREAD_EXTRA_CHECKS 0
 
 static const char main_thread_name[] = "main";
 
 extern int stackbegin[];
 extern int stackend[];
-
-#ifdef CPU_PP
-#ifndef BOOTLOADER
-extern int cop_stackbegin[];
-extern int cop_stackend[];
-#else
-/* The coprocessor stack is not set up in the bootloader code, but the threading
- * is.  No threads are run on the coprocessor, so set up some dummy stack */
-int *cop_stackbegin = stackbegin;
-int *cop_stackend = stackend;
-#endif
-#endif
-
-#if NUM_CORES > 1
-#if 0
-static long cores_locked IBSS_ATTR;
-
-#define LOCK(...) do { } while (test_and_set(&cores_locked, 1))
-#define UNLOCK(...) cores_locked = 0
-#endif
-
-/* #warning "Core locking mechanism should be fixed on H10/4G!" */
-
-inline void lock_cores(void)
-{
-#if 0
-    if (!cores[CURRENT_CORE].lock_issued)
-    {
-        LOCK();
-        cores[CURRENT_CORE].lock_issued = true;
-    }
-#endif
-}
-
-inline void unlock_cores(void)
-{
-#if 0
-    if (cores[CURRENT_CORE].lock_issued)
-    {
-        cores[CURRENT_CORE].lock_issued = false;
-        UNLOCK();
-    }
-#endif
-}
-
-#endif
 
 /* Conserve IRAM
 static void add_to_list(struct thread_entry **list,
@@ -115,79 +69,115 @@ static inline void core_sleep(void) __attribute__((always_inline));
 
 #if defined(CPU_ARM)
 /*---------------------------------------------------------------------------
+ * Start the thread running and terminate it if it returns
+ *---------------------------------------------------------------------------
+ */
+static void start_thread(void) __attribute__((naked,used));
+static void start_thread(void)
+{
+    /* r0 = context */
+    asm volatile (
+        "ldr    sp, [r0, #32]          \n" /* Load initial sp */
+        "ldr    r4, [r0, #40]          \n" /* start in r4 since it's non-volatile */
+        "mov    r1, #0                 \n" /* Mark thread as running */
+        "str    r1, [r0, #40]          \n"
+#if NUM_CORES > 1
+        "ldr    r0, =invalidate_icache \n" /* Invalidate this core's cache. */
+        "mov    lr, pc                 \n" /* This could be the first entry into */
+        "bx     r0                     \n" /* plugin or codec code for this core. */
+#endif
+        "mov    lr, pc                 \n" /* Call thread function */
+        "bx     r4                     \n"
+        "mov    r0, #0                 \n" /* remove_thread(NULL) */
+        "ldr    pc, =remove_thread     \n"
+        ".ltorg                        \n" /* Dump constant pool */
+    ); /* No clobber list - new thread doesn't care */
+}
+
+/*---------------------------------------------------------------------------
  * Store non-volatile context.
  *---------------------------------------------------------------------------
  */
 static inline void store_context(void* addr)
 {
     asm volatile(
-        "stmia  %0, { r4-r11, sp, lr }\n"
+        "stmia  %0, { r4-r11, sp, lr } \n"
         : : "r" (addr)
     );
 }
 
-/*---------------------------------------------------------------------------
- * Load non-volatile context.
- *---------------------------------------------------------------------------
- */
-static void start_thread(void (*thread_func)(void), const void* addr) __attribute__((naked,used));
-static void start_thread(void (*thread_func)(void), const void* addr)
-{
-    /* r0 = thread_func, r1 = addr */
-#if NUM_CORES > 1 && CONFIG_CPU != PP5002
-    asm volatile (
-        "mov    r2, #0           \n"
-        "str    r2, [r1, #40]    \n"
-        "ldr    r1, =0xf000f044  \n" /* invalidate this core's cache */
-        "ldr    r2, [r1]         \n"
-        "orr    r2, r2, #6       \n"
-        "str    r2, [r1]         \n"
-        "ldr    r1, =0x6000c000  \n"
-    "1:                          \n"
-        "ldr    r2, [r1]         \n"
-        "tst    r2, #0x8000      \n"
-        "bne    1b               \n"
-        "mov    pc, r0           \n"
-        : : : "r1", "r2"
-    );
-#else
-    asm volatile (
-        "mov    r2, #0           \n"
-        "str    r2, [r1, #40]    \n"
-        "mov    pc, r0           \n"
-        : : : "r1", "r2"
-    );
-#endif
-    (void)thread_func;
-    (void)addr;
-}
+/* For startup, place context pointer in r4 slot, start_thread pointer in r5
+ * slot, and thread function pointer in context.start. See load_context for
+ * what happens when thread is initially going to run. */
+#define THREAD_STARTUP_INIT(core, thread, function) \
+    ({ (thread)->context.r[0] = (unsigned int)&(thread)->context,  \
+       (thread)->context.r[1] = (unsigned int)start_thread, \
+       (thread)->context.start = (void *)function; })
 
 static inline void load_context(const void* addr)
 {
     asm volatile(
-        "ldmia  %0, { r4-r11, sp, lr } \n" /* load regs r4 to r14 from context */
-        "ldr    r0, [%0, #40]          \n" /* load start pointer */
-        "cmp    r0, #0                 \n" /* check for NULL */
-        "movne  r1, %0                 \n" /* if not already running, jump to start */
-        "ldrne  pc, =start_thread      \n" 
-        : : "r" (addr) : "r0", "r1"
+        "ldr     r0, [%0, #40]          \n" /* Load start pointer */
+        "cmp     r0, #0                 \n" /* Check for NULL */
+        "ldmneia %0, { r0, pc }         \n" /* If not already running, jump to start */ 
+        "ldmia   %0, { r4-r11, sp, lr } \n" /* Load regs r4 to r14 from context */
+        : : "r" (addr) : "r0" /* only! */
     );
 }
 
 #if defined (CPU_PP)
+
+#if NUM_CORES > 1
+extern int cpu_idlestackbegin[];
+extern int cpu_idlestackend[];
+extern int cop_idlestackbegin[];
+extern int cop_idlestackend[];
+static int * const idle_stacks[NUM_CORES] NOCACHEDATA_ATTR =
+{
+    [CPU] = cpu_idlestackbegin,
+    [COP] = cop_idlestackbegin
+};
+#else /* NUM_CORES == 1 */
+#ifndef BOOTLOADER
+extern int cop_stackbegin[];
+extern int cop_stackend[];
+#else
+/* The coprocessor stack is not set up in the bootloader code, but the threading
+ * is.  No threads are run on the coprocessor, so set up some dummy stack */
+int *cop_stackbegin = stackbegin;
+int *cop_stackend = stackend;
+#endif /* BOOTLOADER */
+#endif /* NUM_CORES */
+
 static inline void core_sleep(void)
 {
-    unlock_cores();
-
     /* This should sleep the CPU. It appears to wake by itself on
        interrupts */
     if (CURRENT_CORE == CPU)
         CPU_CTL = PROC_SLEEP;
     else
         COP_CTL = PROC_SLEEP;
-
-    lock_cores();
 }
+
+#if NUM_CORES > 1
+/*---------------------------------------------------------------------------
+ * Switches to a stack that always resides in the Rockbox core.
+ *
+ * Needed when a thread suicides on a core other than the main CPU since the
+ * stack used when idling is the stack of the last thread to run. This stack
+ * may not reside in the core in which case the core will continue to use a
+ * stack from an unloaded module until another thread runs on it.
+ *---------------------------------------------------------------------------
+ */
+static inline void switch_to_idle_stack(const unsigned int core)
+{
+    asm volatile (
+        "str  sp, [%0] \n" /* save original stack pointer on idle stack */
+        "mov  sp, %0   \n" /* switch stacks */
+        : : "r"(&idle_stacks[core][IDLE_STACK_WORDS-1]));
+}
+#endif /* NUM_CORES */
+
 #elif CONFIG_CPU == S3C2440
 static inline void core_sleep(void)
 {
@@ -205,14 +195,50 @@ static inline void core_sleep(void)
 
 #elif defined(CPU_COLDFIRE)
 /*---------------------------------------------------------------------------
+ * Start the thread running and terminate it if it returns
+ *---------------------------------------------------------------------------
+ */
+void start_thread(void); /* Provide C access to ASM label */
+static void __start_thread(void) __attribute__((used));
+static void __start_thread(void)
+{
+    /* a0=macsr, a1=context */
+    asm volatile (
+    "start_thread:             \n" /* Start here - no naked attribute */
+        "move.l  %a0, %macsr   \n" /* Set initial mac status reg */
+        "lea.l   48(%a1), %a1  \n"
+        "move.l  (%a1)+, %sp   \n" /* Set initial stack */
+        "move.l  (%a1), %a2    \n" /* Fetch thread function pointer */
+        "clr.l   (%a1)         \n" /* Mark thread running */
+        "jsr     (%a2)         \n" /* Call thread function */
+        "clr.l   -(%sp)        \n" /* remove_thread(NULL) */
+        "jsr     remove_thread \n"
+    );
+}
+
+/* Set EMAC unit to fractional mode with saturation for each new thread,
+ * since that's what'll be the most useful for most things which the dsp
+ * will do. Codecs should still initialize their preferred modes
+ * explicitly. Context pointer is placed in d2 slot and start_thread
+ * pointer in d3 slot. thread function pointer is placed in context.start.
+ * See load_context for what happens when thread is initially going to
+ * run.
+ */
+#define THREAD_STARTUP_INIT(core, thread, function) \
+    ({ (thread)->context.macsr = EMAC_FRACTIONAL | EMAC_SATURATE, \
+       (thread)->context.d[0] = (unsigned int)&(thread)->context, \
+       (thread)->context.d[1] = (unsigned int)start_thread,       \
+       (thread)->context.start = (void *)(function); })
+
+/*---------------------------------------------------------------------------
  * Store non-volatile context.
  *---------------------------------------------------------------------------
  */
 static inline void store_context(void* addr)
 {
     asm volatile (
-        "move.l  %%macsr,%%d0    \n"
-        "movem.l %%d0/%%d2-%%d7/%%a2-%%a7,(%0)   \n"
+        "move.l  %%macsr,%%d0                  \n"
+        "movem.l %%d0/%%d2-%%d7/%%a2-%%a7,(%0) \n"
         : : "a" (addr) : "d0" /* only! */
     );
 }
@@ -224,14 +250,13 @@ static inline void store_context(void* addr)
 static inline void load_context(const void* addr)
 {
     asm volatile (
-        "movem.l (%0),%%d0/%%d2-%%d7/%%a2-%%a7   \n"  /* Load context */
-        "move.l  %%d0,%%macsr    \n"
-        "move.l  (52,%0),%%d0    \n"  /* Get start address */
-        "beq.b   1f              \n"  /* NULL -> already running */
-        "clr.l   (52,%0)         \n"  /* Clear start address.. */
-        "move.l  %%d0,%0         \n"
-        "jmp     (%0)            \n"  /* ..and start the thread */
-    "1:                          \n"
+        "move.l  52(%0), %%d0                   \n"  /* Get start address */
+        "beq.b   1f                             \n"  /* NULL -> already running */
+        "movem.l (%0), %%a0-%%a2                \n"  /* a0=macsr, a1=context, a2=start_thread */
+        "jmp     (%%a2)                         \n"  /* Start the thread */
+    "1:                                         \n"
+        "movem.l (%0), %%d0/%%d2-%%d7/%%a2-%%a7 \n"  /* Load context */
+        "move.l  %%d0, %%macsr                  \n"
         : : "a" (addr) : "d0" /* only! */
     );
 }
@@ -250,14 +275,45 @@ static inline void core_sleep(void)
 
 #elif CONFIG_CPU == SH7034
 /*---------------------------------------------------------------------------
+ * Start the thread running and terminate it if it returns
+ *---------------------------------------------------------------------------
+ */
+void start_thread(void); /* Provide C access to ASM label */
+static void __start_thread(void) __attribute__((used));
+static void __start_thread(void)
+{
+    /* r8 = context */
+    asm volatile (
+    "_start_thread:            \n" /* Start here - no naked attribute */
+        "mov.l  @(4, r8), r0   \n" /* Fetch thread function pointer */
+        "mov.l  @(28, r8), r15 \n" /* Set initial sp */
+        "mov    #0, r1         \n" /* Start the thread */
+        "jsr    @r0            \n"
+        "mov.l  r1, @(36, r8)  \n" /* Clear start address */
+        "mov.l  1f, r0         \n" /* remove_thread(NULL) */
+        "jmp    @r0            \n"
+        "mov    #0, r4         \n"
+    "1:                        \n"
+        ".long  _remove_thread \n"
+    );
+}
+
+/* Place context pointer in r8 slot, function pointer in r9 slot, and
+ * start_thread pointer in context_start */
+#define THREAD_STARTUP_INIT(core, thread, function) \
+    ({ (thread)->context.r[0] = (unsigned int)&(thread)->context, \
+       (thread)->context.r[1] = (unsigned int)(function),         \
+       (thread)->context.start = (void*)start_thread; })
+
+/*---------------------------------------------------------------------------
  * Store non-volatile context.
  *---------------------------------------------------------------------------
  */
 static inline void store_context(void* addr)
 {
     asm volatile (
-        "add     #36,%0    \n"
-        "sts.l   pr, @-%0  \n"
+        "add     #36, %0   \n" /* Start at last reg. By the time routine */
+        "sts.l   pr, @-%0  \n" /* is done, %0 will have the original value */
         "mov.l   r15,@-%0  \n"
         "mov.l   r14,@-%0  \n"
         "mov.l   r13,@-%0  \n"
@@ -277,23 +333,20 @@ static inline void store_context(void* addr)
 static inline void load_context(const void* addr)
 {
     asm volatile (
-        "mov.l   @%0+,r8   \n"
-        "mov.l   @%0+,r9   \n"
-        "mov.l   @%0+,r10  \n"
-        "mov.l   @%0+,r11  \n"
-        "mov.l   @%0+,r12  \n"
-        "mov.l   @%0+,r13  \n"
-        "mov.l   @%0+,r14  \n"
-        "mov.l   @%0+,r15  \n"
-        "lds.l   @%0+,pr   \n"
-        "mov.l   @%0,r0    \n"  /* Get start address */
-        "tst     r0,r0     \n"
-        "bt      .running  \n"  /* NULL -> already running */
-        "lds     r0,pr     \n"
-        "mov     #0,r0     \n"
-        "rts               \n"  /* Start the thread */
-        "mov.l   r0,@%0    \n"  /* Clear start address */
-    ".running:             \n"
+        "mov.l  @(36, %0), r0 \n" /* Get start address */
+        "tst    r0, r0        \n"
+        "bt     .running      \n" /* NULL -> already running */
+        "jmp    @r0           \n" /* r8 = context */
+    ".running:                \n"
+        "mov.l  @%0+, r8      \n" /* Executes in delay slot and outside it */
+        "mov.l  @%0+, r9      \n"
+        "mov.l  @%0+, r10     \n"
+        "mov.l  @%0+, r11     \n"
+        "mov.l  @%0+, r12     \n"
+        "mov.l  @%0+, r13     \n"
+        "mov.l  @%0+, r14     \n"
+        "mov.l  @%0+, r15     \n"
+        "lds.l  @%0+, pr      \n"
         : : "r" (addr) : "r0" /* only! */
     );
 }
@@ -311,38 +364,36 @@ static inline void core_sleep(void)
 #define THREAD_CPU_INIT(core, thread)
 #endif
 
-#ifdef THREAD_EXTRA_CHECKS
-static void thread_panicf_format_name(char *buffer, struct thread_entry *thread)
+#if THREAD_EXTRA_CHECKS
+static void thread_panicf(const char *msg, struct thread_entry *thread)
 {
-    *buffer = '\0';
-    if (thread)
-    {
-        /* Display thread name if one or ID if none */
-        const char *fmt = thread->name ? " %s" : " %08lX";
-        intptr_t name = thread->name ?
-            (intptr_t)thread->name : (intptr_t)thread;
-        snprintf(buffer, 16, fmt, name);
-    }
+#if NUM_CORES > 1
+    const unsigned int core = thread->core;
+#endif
+    static char name[32];
+    thread_get_name(name, 32, thread);
+    panicf ("%s %s" IF_COP(" (%d)"), msg, name IF_COP(, core));
 }
-
-static void thread_panicf(const char *msg,
-    struct thread_entry *thread1, struct thread_entry *thread2)
+static void thread_stkov(struct thread_entry *thread)
 {
-    static char thread1_name[16], thread2_name[16];
-    thread_panicf_format_name(thread1_name, thread1);
-    thread_panicf_format_name(thread2_name, thread2);
-    panicf ("%s%s%s", msg, thread1_name, thread2_name);
+    thread_panicf("Stkov", thread);
 }
+#define THREAD_PANICF(msg, thread) \
+    thread_panicf(msg, thread)
+#define THREAD_ASSERT(exp, msg, thread) \
+    ({ if (!({ exp; })) thread_panicf((msg), (thread)); })
 #else
-static void thread_stkov(void)
+static void thread_stkov(struct thread_entry *thread)
 {
-    /* Display thread name if one or ID if none */
-    struct thread_entry *current = cores[CURRENT_CORE].running;
-    const char *fmt = current->name ? "%s %s" : "%s %08lX";
-    intptr_t name = current->name ?
-            (intptr_t)current->name : (intptr_t)current;
-    panicf(fmt, "Stkov", name);
+#if NUM_CORES > 1
+    const unsigned int core = thread->core;
+#endif
+    static char name[32];
+    thread_get_name(name, 32, thread);
+    panicf("Stkov %s" IF_COP(" (%d)"), name IF_COP(, core));
 }
+#define THREAD_PANICF(msg, thread)
+#define THREAD_ASSERT(exp, msg, thread)
 #endif /* THREAD_EXTRA_CHECKS */
 
 static void add_to_list(struct thread_entry **list, struct thread_entry *thread)
@@ -564,8 +615,6 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
     /* Do nothing */
 #else
 
-    lock_cores();
-    
     /* Begin task switching by saving our current context so that we can
      * restore the state of the current thread later to the point prior
      * to this call. */
@@ -576,11 +625,7 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
         /* Check if the current thread stack is overflown */
         stackptr = cores[core].running->stack;
         if(stackptr[0] != DEADBEEF)
-#ifdef THREAD_EXTRA_CHECKS
-            thread_panicf("Stkov", cores[core].running, NULL);
-#else
-            thread_stkov();
-#endif
+            thread_stkov(cores[core].running);
     
         /* Rearrange thread lists as needed */
         change_thread_state(blocked_list);
@@ -627,7 +672,6 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
 #endif
     
 #endif
-    unlock_cores();
     
     /* And finally give control to the next thread. */
     load_context(&cores[core].running->context);
@@ -641,8 +685,6 @@ void sleep_thread(int ticks)
 {
     struct thread_entry *current;
 
-    lock_cores();
-    
     current = cores[CURRENT_CORE].running;
 
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
@@ -668,8 +710,6 @@ void block_thread(struct thread_entry **list)
 {
     struct thread_entry *current;
     
-    lock_cores();
-    
     /* Get the entry for the current running thread. */
     current = cores[CURRENT_CORE].running;
 
@@ -680,11 +720,9 @@ void block_thread(struct thread_entry **list)
     unsigned long boost_flag = STATE_IS_BOOSTED(current->statearg);
 #endif
 
-#ifdef THREAD_EXTRA_CHECKS
     /* We are not allowed to mix blocking types in one queue. */
-    if (*list && GET_STATE((*list)->statearg) == STATE_BLOCKED_W_TMO)
-        thread_panicf("Blocking violation B->*T", current, *list);
-#endif
+    THREAD_ASSERT(*list != NULL && GET_STATE((*list)->statearg) == STATE_BLOCKED_W_TMO,
+                  "Blocking violation B->*T", current);
     
     /* Set the state to blocked and ask the scheduler to switch tasks,
      * this takes us off of the run queue until we are explicitly woken */
@@ -707,7 +745,6 @@ void block_thread_w_tmo(struct thread_entry **list, int timeout)
     /* Get the entry for the current running thread. */
     current = cores[CURRENT_CORE].running;
     
-    lock_cores();
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     /* A block with a timeout is a sleep situation, whatever we are waiting
      * for _may or may not_ happen, regardless of boost state, (user input
@@ -722,12 +759,9 @@ void block_thread_w_tmo(struct thread_entry **list, int timeout)
     }
 #endif
 
-#ifdef THREAD_EXTRA_CHECKS
     /* We can store only one thread to the "list" if thread is used
      * in other list (such as core's list for sleeping tasks). */
-    if (*list)
-        thread_panicf("Blocking violation T->*B", current, NULL);
-#endif
+    THREAD_ASSERT(*list == NULL, "Blocking violation T->*B", current);
     
     /* Set the state to blocked with the specified timeout */
     SET_STATE(current->statearg, STATE_BLOCKED_W_TMO, current_tick + timeout);
@@ -836,7 +870,6 @@ struct thread_entry*
     unsigned int stacklen;
     unsigned int *stackptr;
     int slot;
-    struct regs *regs;
     struct thread_entry *thread;
 
 /*****
@@ -862,12 +895,9 @@ struct thread_entry*
     }
 #endif
 
-    lock_cores();
-    
     slot = find_empty_thread_slot();
     if (slot < 0)
     {
-        unlock_cores();
         return NULL;
     }
     
@@ -899,17 +929,13 @@ struct thread_entry*
         flush_icache();
 #endif
     
-    regs = &thread->context;
     /* Align stack to an even 32 bit boundary */
-    regs->sp = (void*)(((unsigned int)stack + stack_size) & ~3);
-    regs->start = (void*)function;
+    thread->context.sp = (void*)(((unsigned int)stack + stack_size) & ~3);
 
-    /* Do any CPU specific inits after initializing common items
-       to have access to valid data */
-    THREAD_CPU_INIT(core, thread);
-    
+    /* Load the thread's context structure with needed startup information */
+    THREAD_STARTUP_INIT(core, thread, function);
+
     add_to_list(&cores[core].running, thread);
-    unlock_cores();
 
     return thread;
 #if NUM_CORES == 1
@@ -920,8 +946,6 @@ struct thread_entry*
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
 void trigger_cpu_boost(void)
 {
-    lock_cores();
-    
     if (!STATE_IS_BOOSTED(cores[CURRENT_CORE].running->statearg))
     {
         SET_BOOST_STATE(cores[CURRENT_CORE].running->statearg);
@@ -931,8 +955,6 @@ void trigger_cpu_boost(void)
         }
         boosted_threads++;
     }
-    
-    unlock_cores();
 }
 #endif
 
@@ -943,10 +965,10 @@ void trigger_cpu_boost(void)
  */
 void remove_thread(struct thread_entry *thread)
 {
-    lock_cores();
+    const unsigned int core = CURRENT_CORE;
 
     if (thread == NULL)
-        thread = cores[CURRENT_CORE].running;
+        thread = cores[core].running;
     
     /* Free the entry by removing thread name. */
     thread->name = NULL;
@@ -957,16 +979,26 @@ void remove_thread(struct thread_entry *thread)
     if (thread == cores[IF_COP2(thread->core)].running)
     {
         remove_from_list(&cores[IF_COP2(thread->core)].running, thread);
+#if NUM_CORES > 1
+        /* Switch to the idle stack if not on the main core (where "main"
+         * runs) */
+        if (core != CPU)
+        {
+            switch_to_idle_stack(core);
+        }
+
+        flush_icache();
+#endif
         switch_thread(false, NULL);
-        return ;
+        /* This should never and must never be reached - if it is, the
+         * state is corrupted */
+        THREAD_PANICF("remove_thread->K:*R", thread);
     }
     
     if (thread == cores[IF_COP2(thread->core)].sleeping)
         remove_from_list(&cores[IF_COP2(thread->core)].sleeping, thread);
     else
         remove_from_list(NULL, thread);
-    
-    unlock_cores();
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -974,14 +1006,12 @@ int thread_set_priority(struct thread_entry *thread, int priority)
 {
     int old_priority;
     
-    lock_cores();
     if (thread == NULL)
         thread = cores[CURRENT_CORE].running;
 
     old_priority = thread->priority;
     thread->priority = priority;
     cores[IF_COP2(thread->core)].highest_priority = 100;
-    unlock_cores();
     
     return old_priority;
 }
@@ -1013,15 +1043,7 @@ void init_threads(void)
     const unsigned int core = CURRENT_CORE;
     int slot;
 
-    /* Let main CPU initialize first. */
-#if NUM_CORES > 1
-    if (core != CPU)
-    {
-        while (!cores[CPU].kernel_running) ;
-    }
-#endif
-    
-    lock_cores();
+    /* CPU will initialize first and then sleep */
     slot = find_empty_thread_slot();
     
     cores[core].sleeping = NULL;
@@ -1042,30 +1064,40 @@ void init_threads(void)
     threads[slot].priority_x = 0;
     cores[core].highest_priority = 100;
 #endif
-#ifdef HAVE_SCHEDULER_BOOSTCTRL
-    boosted_threads = 0;
-#endif
     add_to_list(&cores[core].running, &threads[slot]);
     
     /* In multiple core setups, each core has a different stack.  There is
      * probably a much better way to do this. */
     if (core == CPU)
     {
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+        boosted_threads = 0;
+#endif
         threads[slot].stack = stackbegin;
         threads[slot].stack_size = (int)stackend - (int)stackbegin;
-    } 
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
+        /* Mark CPU initialized */
+        cores[CPU].kernel_running = true;
+        /* TODO: HAL interface for this */
+        /* Wake up coprocessor and let it initialize kernel and threads */
+        COP_CTL = PROC_WAKE;
+        /* Sleep until finished */
+        CPU_CTL = PROC_SLEEP;
+    } 
     else 
     {
-        threads[slot].stack = cop_stackbegin;
-        threads[slot].stack_size =
-            (int)cop_stackend - (int)cop_stackbegin;
-    }
-
-    cores[core].kernel_running = true;
+        /* Initial stack is the COP idle stack */
+        threads[slot].stack = cop_idlestackbegin;
+        threads[slot].stack_size = IDLE_STACK_SIZE;
+        /* Mark COP initialized */
+        cores[COP].kernel_running = true;
+        /* Get COP safely primed inside switch_thread where it will remain
+         * until a thread actually exists on it */
+        CPU_CTL = PROC_WAKE;
+        set_irq_level(0);
+        remove_thread(NULL);
 #endif
-    
-    unlock_cores();
+    }
 }
 
 int thread_stack_usage(const struct thread_entry *thread)
@@ -1083,7 +1115,59 @@ int thread_stack_usage(const struct thread_entry *thread)
         thread->stack_size;
 }
 
+#if NUM_CORES > 1
+/*---------------------------------------------------------------------------
+ * Returns the maximum percentage of the core's idle stack ever used during
+ * runtime.
+ *---------------------------------------------------------------------------
+ */
+int idle_stack_usage(unsigned int core)
+{
+    unsigned int *stackptr = idle_stacks[core];
+    int i, usage = 0;
+
+    for (i = 0; i < IDLE_STACK_WORDS; i++)
+    {
+        if (stackptr[i] != DEADBEEF)
+        {
+            usage = ((IDLE_STACK_WORDS - i) * 100) / IDLE_STACK_WORDS;
+            break;
+        }
+    }
+
+    return usage;
+}
+#endif
+
 int thread_get_status(const struct thread_entry *thread)
 {
     return GET_STATE(thread->statearg);
+}
+
+/*---------------------------------------------------------------------------
+ * Fills in the buffer with the specified thread's name. If the name is NULL,
+ * empty, or the thread is in destruct state a formatted ID is written
+ * instead.
+ *---------------------------------------------------------------------------
+ */
+void thread_get_name(char *buffer, int size,
+                     struct thread_entry *thread)
+{
+    if (size <= 0)
+        return;
+
+    *buffer = '\0';
+
+    if (thread)
+    {
+        /* Display thread name if one or ID if none */
+        const char *name = thread->name;
+        const char *fmt = "%s";
+        if (name == NULL || *name == '\0')
+        {
+            name = (const char *)thread;
+            fmt = "%08lX";
+        }
+        snprintf(buffer, size, fmt, name);
+    }
 }

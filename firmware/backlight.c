@@ -611,7 +611,6 @@ static void backlight_tick(void)
 void backlight_init(void)
 {
     queue_init(&backlight_queue, true);
-    queue_set_irq_safe(&backlight_queue, true);
 
 #ifndef SIMULATOR
     if (__backlight_init())

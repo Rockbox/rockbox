@@ -372,10 +372,10 @@
 #define NOCACHEBSS_ATTR IBSS_ATTR
 #define NOCACHEDATA_ATTR IDATA_ATTR
 
-#define IF_COP(empty, x, y) , x, y
+#define IF_COP(...) __VA_ARGS__
 
-/* Defines for inter-core messaging */
-#define COP_REBOOT 1
+#define IDLE_STACK_SIZE  0x80
+#define IDLE_STACK_WORDS 0x20
 
 #else
 #define NUM_CORES 1
@@ -383,7 +383,7 @@
 #define NOCACHEBSS_ATTR
 #define NOCACHEDATA_ATTR
 
-#define IF_COP(empty, x, y)
+#define IF_COP(...)
 
 #endif /* Processor specific */
 

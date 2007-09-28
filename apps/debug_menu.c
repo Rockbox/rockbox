@@ -180,7 +180,6 @@ static bool dbg_list(struct action_callback_info *info)
 /*---------------------------------------------------*/
 extern struct thread_entry threads[MAXTHREADS];
 
-
 static char thread_status_char(int status)
 {
     switch (status)
@@ -193,42 +192,48 @@ static char thread_status_char(int status)
 
     return '?';
 }
-#if NUM_CORES > 1
-#define IF_COP2(...) __VA_ARGS__
-#else
-#define IF_COP2(...)
-#endif
+
 static char* threads_getname(int selected_item, void * data, char *buffer)
 {
     (void)data;
+    char name[32];
     struct thread_entry *thread = NULL;
-    int status, usage;
+    unsigned status;
+    int usage;
+
+#if NUM_CORES > 1
+    if (selected_item < (int)NUM_CORES)
+    {
+        usage = idle_stack_usage(selected_item);
+        snprintf(buffer, MAX_PATH, "Idle (%d): %2d%%", selected_item, usage);
+        return buffer;
+    }
+
+    selected_item -= NUM_CORES;
+#endif
+
     thread = &threads[selected_item];
+    status = thread_get_status(thread);
     
     if (thread->name == NULL)
     {
         snprintf(buffer, MAX_PATH, "%2d: ---", selected_item);
         return buffer;
     }
-    
+
+    thread_get_name(name, 32, thread);
     usage = thread_stack_usage(thread);
     status = thread_get_status(thread);
-#ifdef HAVE_PRIORITY_SCHEDULING
-    snprintf(buffer, MAX_PATH, "%2d: " IF_COP2("(%d) ") "%c%c %d %2d%% %s", 
+
+    snprintf(buffer, MAX_PATH,
+             "%2d: " IF_COP("(%d) ") "%c%c " IF_PRIO("%d ") "%2d%% %s", 
              selected_item,
-             IF_COP2(thread->core,)
+             IF_COP(thread->core,)
              (status == STATE_RUNNING) ? '*' : ' ',
              thread_status_char(status),
-             thread->priority,
-             usage, thread->name);
-#else
-    snprintf(buffer, MAX_PATH, "%2d: " IF_COP2("(%d) ") "%c%c %2d%% %s", 
-             selected_item,
-             IF_COP2(thread->core,)
-             (status == STATE_RUNNING) ? '*' : ' ',
-             thread_status_char(status),
-             usage, thread->name);
-#endif
+             IF_PRIO(thread->priority,)
+             usage, name);
+
     return buffer;
 }
 static int dbg_threads_action_callback(int action, struct action_callback_info *info)
@@ -236,11 +241,16 @@ static int dbg_threads_action_callback(int action, struct action_callback_info *
 #ifdef ROCKBOX_HAS_LOGF
     if (action == ACTION_STD_OK)
     {
-        struct thread_entry *thread = &threads[gui_synclist_get_sel_pos(info->lists)];
-        if (thread->name != NULL)
-            remove_thread(thread);
-    }
+        int selpos = gui_synclist_get_sel_pos(info->lists);
+#if NUM_CORES > 1
+        if (selpos >= NUM_CORES)
+            remove_thread(&threads[selpos - NUM_CORES]);
+#else
+        remove_thread(&threads[selpos]);
 #endif
+    }
+    gui_synclist_hide_selection_marker(info->lists, false);
+#endif /* ROCKBOX_HAS_LOGF */
     gui_synclist_draw(info->lists);
     return action;
 }
@@ -248,8 +258,12 @@ static int dbg_threads_action_callback(int action, struct action_callback_info *
 static bool dbg_os(void)
 {
     struct action_callback_info info;
-    info.title = IF_COP2("Core and ") "Stack usage:";
+    info.title = IF_COP("Core and ") "Stack usage:";
+#if NUM_CORES == 1
     info.count = MAXTHREADS;
+#else
+    info.count = MAXTHREADS+NUM_CORES;
+#endif
     info.selection_size = 1;
     info.action_callback = dbg_threads_action_callback;
     info.dbg_getname = threads_getname;

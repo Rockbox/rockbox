@@ -80,7 +80,7 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 18
+#define CODEC_API_VERSION 19
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -230,6 +230,10 @@ struct codec_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
 
+#ifdef CACHE_FUNCTIONS_AS_CALL
+    void (*flush_icache)(void);
+    void (*invalidate_icache)(void);
+#endif
 };
 
 /* codec header */
@@ -285,5 +289,23 @@ int codec_load_file(const char* codec, struct codec_api *api);
 
 /* defined by the codec */
 enum codec_status codec_start(struct codec_api* rockbox);
+
+#ifndef CACHE_FUNCTION_WRAPPERS
+
+#ifdef CACHE_FUNCTIONS_AS_CALL
+#define CACHE_FUNCTION_WRAPPERS(api) \
+        void flush_icache(void) \
+        { \
+            (api)->flush_icache(); \
+        } \
+        void invalidate_icache(void) \
+        { \
+            (api)->invalidate_icache(); \
+        }
+#else
+#define CACHE_FUNCTION_WRAPPERS(api)
+#endif /* CACHE_FUNCTIONS_AS_CALL */
+
+#endif /* CACHE_FUNCTION_WRAPPERS */
 
 #endif

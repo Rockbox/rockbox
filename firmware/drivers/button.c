@@ -356,10 +356,6 @@ void button_init(void)
 
     queue_init(&button_queue, true);
     
-    /* Enable less protection which would kill IRQ handler. Writing queue is
-     * no longer core-wise thread safe. */
-    queue_set_irq_safe(&button_queue, true);
-    
     button_read();
     lastbtn = button_read();
     tick_add_task(button_tick);
