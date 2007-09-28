@@ -52,9 +52,7 @@ plasma.c
 
 blackjack.c
 bounce.c
-#ifndef SANSA_C200
 bubbles.c
-#endif
 
 #if (LCD_WIDTH >= 160)
 invadrox.c

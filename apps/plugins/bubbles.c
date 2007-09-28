@@ -174,6 +174,17 @@ PLUGIN_HEADER
 #define ROW_INDENT     5
 #define MAX_FPS       30
 
+/* 8x8 bubbles (Sansa C200) */
+#elif (LCD_HEIGHT == 80) && (LCD_WIDTH == 132)
+#define BUBBLE_WIDTH  8
+#define BUBBLE_HEIGHT 8
+#define EMBLEM_WIDTH   6
+#define EMBLEM_HEIGHT  6
+#define XOFS          45
+#define ROW_HEIGHT     6
+#define ROW_INDENT     4
+#define MAX_FPS       30
+
 /* 8x7 bubbles (Archos recorder, Ondio) */
 #elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 112)
 #define BUBBLE_WIDTH   8
@@ -2456,6 +2467,12 @@ static int bubbles(struct game_context* bb) {
             rb->lcd_puts(0, 6, " and show high scores");
             rb->lcd_puts(0, 7, "SCROLL to aim");
             rb->lcd_puts(0, 8, " and change level");
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
+            rb->lcd_puts(0, 2, "PLAY to start/pause");
+            rb->lcd_puts(0, 3, "SUBMENU to save/resume");
+            rb->lcd_puts(0, 4, "POWER to exit");
+            rb->lcd_puts_scroll(0, 5, "SELECT to fire and show high scores, "
+                                "LEFT/RIGHT to aim and change level");
 #endif
 #if LCD_WIDTH >= 138
             rb->snprintf(str, 28, "Start on level %d of %d", startlevel+1,
