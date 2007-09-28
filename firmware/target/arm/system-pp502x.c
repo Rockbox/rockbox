@@ -19,6 +19,7 @@
 #include "system.h"
 #include "thread.h"
 #include "i2s.h"
+#include "i2c-pp.h"
 
 #if NUM_CORES > 1
 struct mutex boostctrl_mtx NOCACHEBSS_ATTR;
