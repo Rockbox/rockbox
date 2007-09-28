@@ -258,9 +258,12 @@ void system_reboot(void)
 #ifdef SANSA_C200
     CACHE_CTL &= ~0x10;
 
-    /* Magic used by the c200 OF. The BL uses a magic value of 0x23066b7b.
+    pp_i2c_send( 0x46, 0x23, 0x0); /* backlight off */
+
+    /* Magic used by the c200 OF: 0x23066000
+       Magic used by the c200 BL: 0x23066b7b
        In both cases, the OF executes these 2 commands from iram. */
-    outl(0x23066000, 0x70000008);
+    outl(0x23066b7b, 0x70000008);
     DEV_RS = DEV_SYSTEM;
 #else
     DEV_RS |= DEV_SYSTEM;
