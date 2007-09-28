@@ -109,8 +109,10 @@ void usb_enable(bool on)
         if(button_status()==BUTTON_RIGHT)
 #endif /* defined(IRIVER_H10) || defined (IRIVER_H10_5GB) */
         {
+#ifndef HAVE_FLASH_STORAGE
             ata_sleepnow(); /* Immediately spindown the disk. */
             sleep(HZ*2);
+#endif
 
 #ifdef IPOD_ARCH  /* The following code is based on ipodlinux */
 #if CONFIG_CPU == PP5020

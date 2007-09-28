@@ -1087,10 +1087,6 @@ void ata_sleep(void)
 {
 }
 
-void ata_sleepnow(void)
-{
-}
-
 void ata_spin(void)
 {
 }
