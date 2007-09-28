@@ -409,6 +409,11 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
             {
                 /* Display gradient line selector */
                 style |= STYLE_GRADIENT;
+
+                /* Make the lcd driver know how many lines the gradient should
+                   cover and only draw it for the first selected item. */
+                if (current_item == gui_list->selected_item)
+                    style |= gui_list->selected_size & STYLE_COLOR_MASK;
             }
 #endif
             else  /*  if (!global_settings.cursor_style) */

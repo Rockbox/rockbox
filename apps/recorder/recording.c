@@ -863,7 +863,7 @@ bool recording_screen(bool no_source)
         style |= STYLE_COLORBAR;
     }
     else if (global_settings.cursor_style == 3) {
-        style |= STYLE_GRADIENT;
+        style |= STYLE_GRADIENT | 1;
     }
 #endif
 

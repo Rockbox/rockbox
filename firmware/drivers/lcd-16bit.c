@@ -529,6 +529,8 @@ void lcd_fillrect(int x, int y, int width, int height)
 /* Fill a rectangle with a gradient */
 void lcd_gradient_rect(int x1, int x2, int y, int h)
 {
+    if (h == 0) return;
+
     int h_r = RGB_UNPACK_RED(lss_pattern) << 16;
     int h_b = RGB_UNPACK_BLUE(lss_pattern) << 16;
     int h_g = RGB_UNPACK_GREEN(lss_pattern) << 16;
@@ -861,7 +863,7 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
 
     if (style & STYLE_GRADIENT) {
         drawmode = DRMODE_FG;
-        lcd_gradient_rect(xpos, LCD_WIDTH, ypos, h);
+        lcd_gradient_rect(xpos, LCD_WIDTH, ypos, h*(style & STYLE_COLOR_MASK));
         fg_pattern = lst_pattern;
     }
     else if (style & STYLE_COLORBAR) {
