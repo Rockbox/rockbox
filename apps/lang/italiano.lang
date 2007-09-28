@@ -2854,15 +2854,15 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Selettore Di Linea"
+    lcd_bitmap: "Tipo Selettore linea"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Selettore Di Linea"
+    lcd_bitmap: "Tipo Selettore Linea"
   </voice>
 </phrase>
 <phrase>
@@ -11195,5 +11195,90 @@
   <voice>
     *: none
     usbstack: "Driver Dispositivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Colore Primario Selettore Linea"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colore Primario Selettore Linea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Colore Secondario Selettore Linea"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colore Secondario Selettore Linea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Colore Testo Selettore Linea"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colore Testo Selettore Linea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Barra (Colore Marcato)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Barra (Colore Marcato)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Barra (Colore Sfumato)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Barra (Colore Sfumato)"
   </voice>
 </phrase>
