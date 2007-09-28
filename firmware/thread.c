@@ -1085,11 +1085,14 @@ void init_threads(void)
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
         /* Mark CPU initialized */
         cores[CPU].kernel_running = true;
+        /* Do _not_ wait for the COP to init in the bootloader because it doesn't */
+#ifndef BOOTLOADER
         /* TODO: HAL interface for this */
         /* Wake up coprocessor and let it initialize kernel and threads */
         COP_CTL = PROC_WAKE;
         /* Sleep until finished */
         CPU_CTL = PROC_SLEEP;
+#endif
     } 
     else 
     {
