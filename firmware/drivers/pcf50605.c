@@ -69,6 +69,7 @@
 #define D2REGC1 0x25
 #define D3REGC1 0x26
 
+unsigned char pcf50605_wakeup_flags = 0;
 
 int pcf50605_read(int address)
 {
@@ -101,8 +102,7 @@ int pcf50605_write_multiple(int address, const unsigned char* buf, int count)
    power on your iPod again. */
 void pcf50605_standby_mode(void)
 {
-    const char mask = pcf50605_read(OOCC1) | GOSTDBY | CHGWAK | EXTONWAK;
-    pcf50605_write(OOCC1, mask);
+    pcf50605_write(OOCC1, GOSTDBY | CHGWAK | EXTONWAK | pcf50605_wakeup_flags);
 }
 
 void pcf50605_init(void)

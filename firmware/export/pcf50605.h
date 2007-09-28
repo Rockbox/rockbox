@@ -20,6 +20,8 @@
 #ifndef PCF50605_H
 #define PCF50605_H
 
+extern unsigned char pcf50605_wakeup_flags;
+
 int pcf50605_read(int address);
 int pcf50605_read_multiple(int address, unsigned char* buf, int count);
 int pcf50605_write(int address, unsigned char val);

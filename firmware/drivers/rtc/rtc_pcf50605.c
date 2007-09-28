@@ -25,7 +25,9 @@
 #include <stdbool.h>
 
 /* Values which each disable one alarm time register */
-static char alarm_disable[] = { 0x7f, 0x7f, 0x3f, 0x07, 0x3f, 0x1f, 0xff };
+static const char alarm_disable[] = {
+    0x7f, 0x7f, 0x3f, 0x07, 0x3f, 0x1f, 0xff
+};
 
 void rtc_init(void)
 {
@@ -68,14 +70,16 @@ bool rtc_enable_alarm(bool enable)
         pcf50605_write_multiple(0x14, alarm_disable + 3, 4);
         /* Unmask the alarm interrupt (might be unneeded) */
         pcf50605_write(0x5, pcf50605_read(0x5) & ~0x80);
-        /* Make sure wake on RTC is set */
-        pcf50605_write(0x8, pcf50605_read(0x8) | 0x10);
+        /* Make sure wake on RTC is set when shutting down */
+        pcf50605_wakeup_flags |= 0x10;
     } else {
         /* We use this year to indicate a disabled alarm. If you happen to live
          * around this time and are annoyed by this, feel free to seek out my
          * grave and do something nasty to it.
          */
         pcf50605_write(0x17, 0x99);
+        /* Make sure we don't wake on RTC after shutting down */
+        pcf50605_wakeup_flags &= ~0x10;
     }
     return false;
 }
