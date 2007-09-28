@@ -71,6 +71,7 @@ static inline unsigned int current_core(void)
     return core;
 }
 
+#ifndef BOOTLOADER
 #define CACHE_FUNCTIONS_AS_CALL
 
 #define HAVE_INVALIDATE_ICACHE
@@ -78,6 +79,7 @@ void invalidate_icache(void);
 
 #define HAVE_FLUSH_ICACHE
 void flush_icache(void);
+#endif
 
 #else
 unsigned int current_core(void);
