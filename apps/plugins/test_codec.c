@@ -493,9 +493,6 @@ static void codec_thread(void)
 
     /* Signal to the main thread that we are done */
     codec_playing = false;
-
-    /* Commit suicide */
-    rb->remove_thread(NULL);
 }
 
 static unsigned char* codec_stack;

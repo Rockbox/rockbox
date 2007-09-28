@@ -1114,7 +1114,6 @@ void thread(void)
     } while (!gTread.exiting);
 
     gTread.ended = true; /* acknowledge the exit */
-    rb->remove_thread(NULL); /* commit suicide */
 }
 
 /* callback to end the TSR plugin, called before a new one gets loaded */

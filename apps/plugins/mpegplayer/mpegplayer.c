@@ -173,10 +173,16 @@ PLUGIN_IRAM_DECLARE
 
 struct plugin_api* rb;
 
-static mpeg2dec_t * mpeg2dec;
-static int total_offset = 0;
-static int num_drawn = 0;
-static int count_start = 0;
+CACHE_FUNCTION_WRAPPERS(rb);
+
+extern void *mpeg_malloc(size_t size, mpeg2_alloc_t reason);
+extern size_t mpeg_alloc_init(unsigned char *buf, size_t mallocsize,
+                              size_t libmpeg2size);
+
+static mpeg2dec_t * mpeg2dec NOCACHEBSS_ATTR;
+static int total_offset NOCACHEBSS_ATTR = 0;
+static int num_drawn  NOCACHEBSS_ATTR = 0;
+static int count_start  NOCACHEBSS_ATTR = 0;
 
 /* Streams */
 typedef struct
@@ -348,9 +354,6 @@ static inline void unlock_stream(void)
     { }
 #endif
 
-/* Events */
-static struct event_queue msg_queue IBSS_ATTR;
-
 #define MSG_BUFFER_NEARLY_EMPTY 1
 #define MSG_EXIT_REQUESTED      2
 
@@ -383,7 +386,7 @@ unsigned char mad_main_data[MAD_BUFFER_MDLEN];  /* 2567 bytes */
 #ifdef CPU_COLDFIRE
 static mad_fixed_t mad_frame_overlap[2][32][18] IBSS_ATTR;  /* 4608 bytes */
 #else
-static mad_fixed_t mad_frame_overlap[2][32][18];  /* 4608 bytes */
+static mad_fixed_t mad_frame_overlap[2][32][18] __attribute__((aligned(16)));  /* 4608 bytes */
 #endif
 
 static void init_mad(void* mad_frame_overlap)
@@ -717,11 +720,11 @@ static void get_next_data( Stream* str )
 #define TIME_TO_TICKS(stamp) ((uint64_t)CLOCK_RATE*(stamp) / 27000000)
 
 /** MPEG audio stream buffer */
-uint8_t* mpa_buffer;
+uint8_t* mpa_buffer NOCACHEBSS_ATTR;
 
 static bool init_mpabuf(void)
 {
-    mpa_buffer = mpeg2_malloc(MPABUF_SIZE,-2);
+    mpa_buffer = mpeg_malloc(MPABUF_SIZE,-2);
     return mpa_buffer != NULL;
 }
 
@@ -732,13 +735,13 @@ struct pts_queue_slot
 {
     uint32_t pts;   /* Time stamp for packet          */
     ssize_t  size;  /* Number of bytes left in packet */
-} pts_queue[PTS_QUEUE_LEN];
+} pts_queue[PTS_QUEUE_LEN] __attribute__((aligned(16)));
 
  /* This starts out wr == rd but will never be emptied to zero during
     streaming again in order to support initializing the first packet's
     pts value without a special case */
-static unsigned pts_queue_rd;
-static unsigned pts_queue_wr;
+static unsigned pts_queue_rd NOCACHEBSS_ATTR;
+static unsigned pts_queue_wr NOCACHEBSS_ATTR;
 
 /* Increments the queue head postion - should be used to preincrement */
 static bool pts_queue_add_head(void)
@@ -811,7 +814,7 @@ static ssize_t pcmbuf_used(void)
 
 static bool init_pcmbuf(void)
 {
-    pcm_buffer = mpeg2_malloc(PCMBUFFER_SIZE + PCMBUFFER_GUARD_SIZE, -2);
+    pcm_buffer = mpeg_malloc(PCMBUFFER_SIZE + PCMBUFFER_GUARD_SIZE, -2);
 
     if (pcm_buffer == NULL)
         return false;
@@ -1365,7 +1368,6 @@ audio_thread_quit:
     pcm_playback_stop();
 
     audio_str.status = STREAM_TERMINATED;
-    rb->remove_thread(NULL);
 }
 
 /* End of libmad stuff */
@@ -1405,7 +1407,7 @@ static void video_thread(void)
         rb->splash(0, "mpeg2_init failed");
         /* Commit suicide */
         video_str.status = STREAM_TERMINATED;
-        rb->remove_thread(NULL);
+        return;
     }
 
     /* Clear the display - this is mainly just to indicate that the
@@ -1444,7 +1446,9 @@ static void video_thread(void)
                     video_str.status = STREAM_STOPPED;
                     goto video_thread_quit;
                 case STREAM_PAUSE:
+            #if NUM_CORES > 1
                     flush_icache();
+            #endif
                     video_str.status = STREAM_PAUSED;
                     str_reply_msg(&video_str, 1);
                     continue;
@@ -1742,7 +1746,9 @@ static void video_thread(void)
     }
 
 done:
+#if NUM_CORES > 1
     flush_icache();
+#endif
 
     video_str.status = STREAM_DONE;
 
@@ -1757,11 +1763,8 @@ done:
     }
 
 video_thread_quit:
-    flush_icache();
-
     /* Commit suicide */
     video_str.status = STREAM_TERMINATED;
-    rb->remove_thread(NULL);
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -1811,15 +1814,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     audio_str.id = 0xc0;
 
     /* Initialise our malloc buffer */
-    mpeg2_alloc_init(audiobuf,audiosize);
+    audiosize = mpeg_alloc_init(audiobuf, audiosize, LIBMPEG2BUFFER_SIZE);
+    if (audiosize == 0)
+        return PLUGIN_ERROR;
 
     /* Grab most of the buffer for the compressed video - leave some for
        PCM audio data and some for libmpeg2 malloc use. */
     buffer_size = audiosize - (PCMBUFFER_SIZE+PCMBUFFER_GUARD_SIZE+
-                               MPABUF_SIZE+LIBMPEG2BUFFER_SIZE);
+                               MPABUF_SIZE);
 
     DEBUGF("audiosize=%ld, buffer_size=%ld\n",audiosize,buffer_size);
-    buffer = mpeg2_malloc(buffer_size,-1);
+    buffer = mpeg_malloc(buffer_size,-1);
 
     if (buffer == NULL)
         return PLUGIN_ERROR;
@@ -1877,10 +1882,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     init_settings();
 
-    /* Msg queue init - no need for queue_remove since it's not a registered
-       queue */
-    rb->queue_init( &msg_queue, false );
-
     /* Initialise libmad */
     rb->memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
     init_mad(mad_frame_overlap);
@@ -1913,7 +1914,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     init_stream_lock();
 
+#if NUM_CORES > 1
     flush_icache();
+#endif
 
     /* We put the video thread on the second processor for multi-core targets. */
     if ((video_str.thread = rb->create_thread(video_thread,
@@ -1982,6 +1985,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         str_send_msg(&audio_str, STREAM_QUIT, 0);
 
     rb->sleep(HZ/10);
+
+#if NUM_CORES > 1
+    invalidate_icache();
+#endif
 
 #ifndef HAVE_LCD_COLOR
     gray_release();

@@ -332,7 +332,7 @@ void thread(void)
                         "bench exit");
 #endif                        
             thread_stopped = true;
-            rb->remove_thread(NULL); /* Suicide. Never returns. */
+            return;
         }
         
         rb->queue_wait_w_tmo(&thread_q, &ev, sleep_time);
