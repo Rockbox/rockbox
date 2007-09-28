@@ -187,6 +187,7 @@ Name: Rockboxed.wps
 Author: Roan Horning
 Font.112x64x1: rockbox_default.fnt
 Font.128x128x16: nimbus-12.fnt
+Font.132x80x16: nimbus-10.fnt
 Font.138x110x2: nimbus-12.fnt
 Font.160x128x16: nimbus-12.fnt
 Font.160x128x2: nimbus-12.fnt
