@@ -202,11 +202,7 @@ PLUGIN_HEADER
 extern const fb_data bubbles_bubble[];
 extern const fb_data bubbles_emblem[];
 #ifdef HAVE_LCD_COLOR 
-extern const fb_data bubbles_left[];
-/* skip right border for square screens */
-#if (LCD_WIDTH > LCD_HEIGHT)
-extern const fb_data bubbles_right[];
-#endif
+extern const fb_data bubbles_background[];
 #endif
 
 /* global rockbox api */
@@ -1418,14 +1414,9 @@ static void bubbles_drawboard(struct game_context* bb) {
     /* clear screen */
     rb->lcd_clear_display();
 
-    /* draw sidebars */
+    /* draw background */
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_bitmap(bubbles_left, 0, 0, XOFS, LCD_HEIGHT);
-    /* skip right border for square screens */
-#if (LCD_WIDTH > LCD_HEIGHT)
-    rb->lcd_bitmap(bubbles_right, XOFS-1+BB_WIDTH*BUBBLE_WIDTH, 0,
-                   LCD_WIDTH-(XOFS-1+BB_WIDTH*BUBBLE_WIDTH), LCD_HEIGHT);
-#endif
+    rb->lcd_bitmap(bubbles_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 
     /* display play board */
