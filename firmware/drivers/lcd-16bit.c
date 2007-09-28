@@ -526,6 +526,27 @@ void lcd_fillrect(int x, int y, int width, int height)
     while (dst < dst_end);
 }
 
+/* Fill a rectangle with a gradient */
+void lcd_gradient_rect(int x1, int x2, int y, int h)
+{
+    int h_r = RGB_UNPACK_RED(lss_pattern) << 16;
+    int h_b = RGB_UNPACK_BLUE(lss_pattern) << 16;
+    int h_g = RGB_UNPACK_GREEN(lss_pattern) << 16;
+    int rstep = (h_r - ((signed)RGB_UNPACK_RED(lse_pattern) << 16)) / h;
+    int gstep = (h_g - ((signed)RGB_UNPACK_GREEN(lse_pattern) << 16)) / h;
+    int bstep = (h_b - ((signed)RGB_UNPACK_BLUE(lse_pattern) << 16)) / h;
+    int count;
+
+    fg_pattern = lss_pattern;
+    for(count = 0; count < h; count++) {
+        lcd_hline(x1, x2, y + count);
+        h_r -= rstep;
+        h_g -= gstep;
+        h_b -= bstep;
+        fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
+    }
+}
+
 /* About Rockbox' internal monochrome bitmap format:
  *
  * A bitmap contains one bit for every pixel that defines if that pixel is
@@ -829,10 +850,7 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
     ypos = ymargin + y*h;
     drawmode = (style & STYLE_INVERT) ?
                (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
-    if (style & STYLE_GRADIENT || style & STYLE_COLORBAR) {
-        fg_pattern = lss_pattern;
-    }
-    else if (style & STYLE_COLORED) {
+    if (style & STYLE_COLORED) {
         if (drawmode == DRMODE_SOLID)
             fg_pattern = style & STYLE_COLOR_MASK;
         else
@@ -842,26 +860,13 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
     xrect = xpos + MAX(w - offset, 0);
 
     if (style & STYLE_GRADIENT) {
-        int h_r = RGB_UNPACK_RED(lss_pattern) << 16;
-        int h_b = RGB_UNPACK_BLUE(lss_pattern) << 16;
-        int h_g = RGB_UNPACK_GREEN(lss_pattern) << 16;
-        int rstep = (h_r - ((signed)RGB_UNPACK_RED(lse_pattern) << 16)) / h;
-        int gstep = (h_g - ((signed)RGB_UNPACK_GREEN(lse_pattern) << 16)) / h;
-        int bstep = (h_b - ((signed)RGB_UNPACK_BLUE(lse_pattern) << 16)) / h;
-        int count;
-
         drawmode = DRMODE_FG;
-        for(count = 0; count < h; count++) {
-            lcd_hline(xpos, LCD_WIDTH, ypos + count);
-            h_r -= rstep;
-            h_g -= gstep;
-            h_b -= bstep;
-            fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
-        }
+        lcd_gradient_rect(xpos, LCD_WIDTH, ypos, h);
         fg_pattern = lst_pattern;
     }
     else if (style & STYLE_COLORBAR) {
         drawmode = DRMODE_FG;
+        fg_pattern = lss_pattern;
         lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, h);
         fg_pattern = lst_pattern;
     }
@@ -1023,32 +1028,16 @@ void lcd_scroll_fn(void)
         drawmode = s->invert == 1 ?
             (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
         if (s->invert == 2) {
-            fg_pattern = lss_pattern;
+            /* Solid colour line selector */
             drawmode = DRMODE_FG;
+            fg_pattern = lss_pattern;
             lcd_fillrect(0, ypos, LCD_WIDTH, pf->height);
             fg_pattern = lst_pattern;
         }
         else if (s->invert == 3) {
-            int h_r = RGB_UNPACK_RED(lss_pattern) << 16;
-            int h_b = RGB_UNPACK_BLUE(lss_pattern) << 16;
-            int h_g = RGB_UNPACK_GREEN(lss_pattern) << 16;
-            int rstep = (h_r - ((signed)RGB_UNPACK_RED(lse_pattern) << 16))
-                        / (signed)pf->height;
-            int gstep = (h_g - ((signed)RGB_UNPACK_GREEN(lse_pattern) << 16))
-                        / (signed)pf->height;
-            int bstep = (h_b - ((signed)RGB_UNPACK_BLUE(lse_pattern) << 16))
-                        / (signed)pf->height;
-            unsigned int count;
-
-            fg_pattern = lss_pattern;
+            /* Gradient line selector */
             drawmode = DRMODE_FG;
-            for(count = 0; count < pf->height; count++) {
-                lcd_hline(0, LCD_WIDTH , ypos + count);
-                h_r -= rstep;
-                h_g -= gstep;
-                h_b -= bstep;
-                fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
-            }
+            lcd_gradient_rect(0, LCD_WIDTH, ypos, (signed)pf->height);
             fg_pattern = lst_pattern;
         }
         lcd_putsxyofs(xpos, ypos, s->offset, s->line);
