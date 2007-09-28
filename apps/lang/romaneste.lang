@@ -1459,7 +1459,7 @@
   desc: Menu option to start id3 viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
     *: "Info ID3"

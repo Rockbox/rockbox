@@ -3889,13 +3889,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
     *: "顯示標籤資訊"
   </dest>
   <voice>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </voice>
 </phrase>
 <phrase>

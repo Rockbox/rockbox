@@ -3798,13 +3798,13 @@
   desc: Menu option to start id3 viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
     *: "Показывать инф. ID3"
   </dest>
   <voice>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </voice>
 </phrase>
 <phrase>

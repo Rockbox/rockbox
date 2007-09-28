@@ -4016,7 +4016,7 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
     *: "ID3 정보 보기"

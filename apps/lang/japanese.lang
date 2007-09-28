@@ -7371,13 +7371,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
     *: "ID3情報の表示"
   </dest>
   <voice>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </voice>
 </phrase>
 <phrase>
