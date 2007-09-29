@@ -23,14 +23,10 @@
 /* Plain C read & write loops */
 #define PREFER_C_READING
 #define PREFER_C_WRITING
-#if !defined(BOOTLOADER)
-//#define ATA_OPTIMIZED_READING
-//void copy_read_sectors(unsigned char* buf, int wordcount);
-#endif
 
 #define ATA_IOBASE      0x50000000
-#define REGISTER_OFFSET 0x00400000 /* A21 = High */
-#define CONTROL_OFFSET  0x00800000 /* A22 = High */
+#define REGISTER_OFFSET (ATA_IOBASE+0x00400000) /* A21 = High */
+#define CONTROL_OFFSET  (ATA_IOBASE+0x00800000) /* A22 = High */
 #define IDE_SHIFT 17
 #define ATA_DATA        (*((volatile unsigned short*)(REGISTER_OFFSET + (0x00 << IDE_SHIFT))))
 #define ATA_ERROR       (*((volatile unsigned char*)(REGISTER_OFFSET + (0x01 << IDE_SHIFT))))
