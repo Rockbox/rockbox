@@ -145,7 +145,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 bool swap=0;
 bool lastswap=1;
 
-inline void synthbuf(void)
+static inline void synthbuf(void)
 {
    int32_t *outptr;
    register int i;
@@ -161,7 +161,7 @@ inline void synthbuf(void)
    outptr=gmbuf;
 #endif
 
-   for(i=0; i<BUF_SIZE/2; i++)
+   for(i=0; i<BUF_SIZE; i++)
    {
       synthSample(&synthtemp[0], &synthtemp[1]);
       currentSample++;
@@ -187,7 +187,7 @@ void get_more(unsigned char** start, size_t* size)
     synthbuf();  // For some reason midiplayer crashes when an update is forced
 #endif
 
-    *size = BUF_SIZE*sizeof(short);
+    *size = sizeof(gmbuf)/NBUF;
 #ifndef SYNC
     *start = (unsigned char*)((swap ? gmbuf : gmbuf + BUF_SIZE));
     swap=!swap;
@@ -213,7 +213,6 @@ int midimain(void * filename)
         ROCKBOX_DIR "/patchset/drums.cfg") == -1)
         return -1;
 
-//#ifndef SIMULATOR
     rb->pcm_play_stop();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
@@ -221,7 +220,6 @@ int midimain(void * filename)
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
     rb->pcm_set_frequency(SAMPLE_RATE); // 44100 22050 11025
-//#endif
 
     /*
         * tick() will do one MIDI clock tick. Then, there's a loop here that
@@ -252,9 +250,7 @@ int midimain(void * filename)
     } while(notesUsed == 0);
 
     synthbuf();
-//#ifndef SIMULATOR
     rb->pcm_play_data(&get_more, NULL, 0);
-//#endif
 
     int vol=0;
 
