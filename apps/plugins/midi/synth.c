@@ -297,13 +297,13 @@ signed short int synthVoice(struct SynthObject * so)
     {
         if(wf->mode & LOOP_REVERSE)
         {
-            so->cp = (wf->endLoop)<<FRACTSIZE;
-            cpShifted = wf->endLoop;
+            cpShifted = wf->endLoop-(wf->startLoop-cpShifted);
+            so->cp = (cpShifted)<<FRACTSIZE;
             s2=getSample((cpShifted), wf);
         }
         else
         {
-            so->delta = -so->delta;
+            so->delta = -so->delta; /* At this point cpShifted is wrong. We need to take a step */
             so->loopDir = LOOPDIR_FORWARD;
         }
     }
@@ -313,8 +313,8 @@ signed short int synthVoice(struct SynthObject * so)
         so->loopState = STATE_LOOPING;
         if((wf->mode & (24)) == 0)
         {
-            so->cp = (wf->startLoop)<<FRACTSIZE;
-            cpShifted = wf->startLoop;
+            cpShifted = wf->startLoop + (cpShifted-wf->endLoop);
+            so->cp = (cpShifted)<<FRACTSIZE;
             s2=getSample((cpShifted), wf);
         }
         else
