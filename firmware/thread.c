@@ -81,7 +81,7 @@ static void start_thread(void)
         "ldr    r4, [r0, #40]          \n" /* start in r4 since it's non-volatile */
         "mov    r1, #0                 \n" /* Mark thread as running */
         "str    r1, [r0, #40]          \n"
-#if NUM_CORES > 1 && !defined (BOOTLOADER)
+#if NUM_CORES > 1
         "ldr    r0, =invalidate_icache \n" /* Invalidate this core's cache. */
         "mov    lr, pc                 \n" /* This could be the first entry into */
         "bx     r0                     \n" /* plugin or codec code for this core. */
@@ -132,23 +132,11 @@ extern int cpu_idlestackbegin[];
 extern int cpu_idlestackend[];
 extern int cop_idlestackbegin[];
 extern int cop_idlestackend[];
-#ifndef BOOTLOADER
 static int * const idle_stacks[NUM_CORES] NOCACHEDATA_ATTR =
 {
     [CPU] = cpu_idlestackbegin,
     [COP] = cop_idlestackbegin
 };
-#endif /* BOOTLOADER */
-#else /* NUM_CORES == 1 */
-#ifndef BOOTLOADER
-extern int cop_stackbegin[];
-extern int cop_stackend[];
-#else
-/* The coprocessor stack is not set up in the bootloader code, but the threading
- * is.  No threads are run on the coprocessor, so set up some dummy stack */
-int *cop_stackbegin = stackbegin;
-int *cop_stackend = stackend;
-#endif /* BOOTLOADER */
 #endif /* NUM_CORES */
 
 static inline void core_sleep(void)
@@ -173,12 +161,10 @@ static inline void core_sleep(void)
  */
 static inline void switch_to_idle_stack(const unsigned int core)
 {
-#ifndef BOOTLOADER
     asm volatile (
         "str  sp, [%0] \n" /* save original stack pointer on idle stack */
         "mov  sp, %0   \n" /* switch stacks */
         : : "r"(&idle_stacks[core][IDLE_STACK_WORDS-1]));
-#endif
     (void)core;
 }
 #endif /* NUM_CORES */
@@ -1086,17 +1072,14 @@ void init_threads(void)
         /* Mark CPU initialized */
         cores[CPU].kernel_running = true;
         /* Do _not_ wait for the COP to init in the bootloader because it doesn't */
-#ifndef BOOTLOADER
         /* TODO: HAL interface for this */
         /* Wake up coprocessor and let it initialize kernel and threads */
         COP_CTL = PROC_WAKE;
         /* Sleep until finished */
         CPU_CTL = PROC_SLEEP;
-#endif
     } 
     else 
     {
-#ifndef BOOTLOADER
         /* Initial stack is the COP idle stack */
         threads[slot].stack = cop_idlestackbegin;
         threads[slot].stack_size = IDLE_STACK_SIZE;
@@ -1107,7 +1090,6 @@ void init_threads(void)
         CPU_CTL = PROC_WAKE;
         set_irq_level(0);
         remove_thread(NULL);
-#endif /* BOOTLOADER */
 #endif /* NUM_CORES */
     }
 }
@@ -1127,7 +1109,7 @@ int thread_stack_usage(const struct thread_entry *thread)
         thread->stack_size;
 }
 
-#if NUM_CORES > 1 && !defined (BOOTLOADER)
+#if NUM_CORES > 1
 /*---------------------------------------------------------------------------
  * Returns the maximum percentage of the core's idle stack ever used during
  * runtime.

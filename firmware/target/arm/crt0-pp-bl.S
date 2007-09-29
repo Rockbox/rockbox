@@ -48,33 +48,34 @@ start:
     .equ    WAKE,       0x0
     .equ    SLEEPING,   0x80000000
     .equ    CACHE_CTRL, 0x6000c000
+    .equ    CACHE_ENAB, 0x1
 #endif
 
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
 #ifndef E200R_INSTALLER
 /* 1 - Copy the bootloader to IRAM */
     /* get the high part of our execute address */
-    ldr    r7, =0xffffff00
-    and    r4, pc, r7
+    bic    r0, pc, #0xff /* r4 = pc & 0xffffff00 */
 
     /* Copy bootloader to safe area - 0x40000000 (IRAM) */
-    mov    r5, #0x40000000
-    ldr    r6, = _dataend
+    mov    r1, #0x40000000
+    ldr    r2, =_dataend
 1:
-    cmp    r5, r6
-    ldrcc  r2, [r4], #4
-    strcc  r2, [r5], #4
-    bcc    1b
+    cmp    r2, r1
+    ldrhi  r3, [r0], #4
+    strhi  r3, [r1], #4
+    bhi    1b
 
 #ifndef IPOD_ARCH
     /* For builds on targets with mi4 firmware, scramble writes data to 
-       0xe0-0xeb, so jump past that.*/
+       0xe0-0xeb, so jump past that. pad_skip must then exist at an
+       address >= 0xec */
     b      pad_skip
 
 .space 60*4 
 
 pad_skip:
-#endif
+#endif /* IPOD_ARCH */
 
 
 /* 2 - Jump both CPU and COP there */
@@ -82,89 +83,92 @@ pad_skip:
 #endif /* E200R_INSTALLER */
 
 start_loc:
-
     /* Find out which processor we are */
     ldr    r0, =PROC_ID
-    ldr    r0, [r0]
-    and    r0, r0, #0xff
+    ldrb   r0, [r0]
     cmp    r0, #0x55
     beq    cpu
-    
-    /* put us (co-processor) to sleep */
-    ldr    r4, =COP_CTRL
-    mov    r3, #SLEEP
-    str    r3, [r4]
-    ldr    pc, =cop_wake_start
 
-cop_wake_start:
-#if CONFIG_CPU != PP5002
-     /* COP: Invalidate cache */
+cop:
+    /* put us (co-processor) to sleep */
+    ldr    r0, =COP_CTRL
+    mov    r1, #SLEEP
+    str    r1, [r0]
+
+#ifdef CPU_PP502x
+     /* COP: Invalidate cache if enabled */
+    ldr    r2, =CACHE_CTRL
+    ldr    r1, [r2]
+    tst    r1, #CACHE_ENAB
+    beq    2f
     ldr    r0, =0xf000f044
     ldr    r1, [r0]
     orr    r1, r1, #0x6
     str    r1, [r0]
-
-    ldr    r0, =CACHE_CTRL
 1:
-    ldr    r1, [r0]
+    ldr    r1, [r2]
     tst    r1, #0x8000
     bne    1b
-#endif
+2:
+#endif /* CPU_PP502x */
 
     ldr    r0, =startup_loc
     ldr    pc, [r0]
 
 cpu:
     /* Wait for COP to be sleeping */
-    ldr    r4, =COP_STATUS
+    ldr    r0, =COP_STATUS
 1:
-    ldr    r3, [r4]
-    ands   r3, r3, #SLEEPING
+    ldr    r1, [r0]
+    tst    r1, #SLEEPING
     beq    1b
     
     /* Initialise bss section to zero */
-    ldr    r2, =_edata
-    ldr    r3, =_end
-    mov    r4, #0
+    ldr    r0, =_edata
+    ldr    r1, =_end
+    mov    r2, #0
 1:
-    cmp    r3, r2
-    strhi  r4, [r2], #4
+    cmp    r1, r0
+    strhi  r2, [r0], #4
     bhi    1b
        
     /* Set up some stack and munge it with 0xdeadbeef */
     ldr    sp, =stackend
-    mov    r3, sp
-    ldr    r2, =stackbegin
-    ldr    r4, =0xdeadbeef
+    ldr    r0, =stackbegin
+    ldr    r1, =0xdeadbeef
 1:
-    cmp    r3, r2
-    strhi  r4, [r2], #4
+    cmp    sp, r0
+    strhi  r1, [r0], #4
     bhi    1b
 
     /* execute the loader - this will load an image to 0x10000000 */
     bl     main
 
+    /* store actual startup location returned by main() */
     ldr    r1, =startup_loc
     str    r0, [r1]
 
-#if CONFIG_CPU != PP5002
-    /* Flush cache */
-    ldr    r3, =0xf000f044
-    ldr    r4, [r3]
-    orr    r4, r4, #0x2
-    str    r4, [r3]
-
-    ldr    r3, =CACHE_CTRL
+#ifdef CPU_PP502x
+    /* Flush cache if enabled */
+    ldr    r2, =CACHE_CTRL
+    ldr    r1, [r2]
+    tst    r1, #CACHE_ENAB
+    beq    2f
+    ldr    r0, =0xf000f044
+    ldr    r1, [r0]
+    orr    r1, r1, #0x2
+    str    r1, [r0]
 1:
-    ldr    r4, [r3]
-    tst    r4, #0x8000
+    ldr    r1, [r2]
+    tst    r1, #0x8000
     bne    1b
-#endif
+2:
+#endif /* CPU_PP502x */
 
     /* Wake up the coprocessor before executing the firmware */
-    ldr    r4, =COP_CTRL
-    mov    r3, #WAKE
-    str    r3, [r4]
+    ldr    r0, =COP_CTRL
+    mov    r1, #WAKE
+    str    r1, [r0]
 
 #ifdef SANSA_C200
     /* Magic for loading the c200 OF */
@@ -184,6 +188,7 @@ startup_loc:
 .align 8    /* starts at 0x100 */
 .global boot_table
 boot_table:
-    /* here comes the boot table, don't move its offset */
+    /* here comes the boot table, don't move its offset - preceding
+       code+data must stay <= 256 bytes */
     .space 400
 #endif

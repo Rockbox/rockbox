@@ -364,7 +364,7 @@
 #endif
 
 /* Dual core support - not yet working on the 1G/2G and 3G iPod */
-#if defined(CPU_PP) && CONFIG_CPU != PP5002
+#if defined(CPU_PP) && CONFIG_CPU != PP5002 && !defined(BOOTLOADER)
 #define NUM_CORES 2
 #define CURRENT_CORE current_core()
 /* Hopefully at some point we will learn how to mark areas of main memory as

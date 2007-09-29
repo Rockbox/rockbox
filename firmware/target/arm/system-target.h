@@ -52,7 +52,6 @@ static inline void udelay(unsigned usecs)
     while (TIME_BEFORE(USEC_TIMER, stop));
 }
 
-#ifdef CPU_PP502x
 static inline unsigned int current_core(void)
 {
     /*
@@ -63,13 +62,15 @@ static inline unsigned int current_core(void)
      */
     unsigned int core;
     asm volatile (
-        "mov    %0, #0x60000000 \r\n" /* PROCESSOR_ID      */
-        "ldrb   %0, [%0]        \r\n" /* Just load the LSB */
-        "mov    %0, %0, lsr #7  \r\n" /* Bit 7 => index    */
-        : "=&r"(core)                 /* CPU=0, COP=1      */
+        "ldrb   %0, [%1]       \n" /* Just load the LSB */
+        "mov    %0, %0, lsr #7 \n" /* Bit 7 => index    */
+        : "=r"(core)              /* CPU=0, COP=1      */
+        : "r"(&PROCESSOR_ID)
     );
     return core;
 }
+
+#ifdef CPU_PP502x
 
 #ifndef BOOTLOADER
 #define CACHE_FUNCTIONS_AS_CALL
@@ -81,8 +82,6 @@ void invalidate_icache(void);
 void flush_icache(void);
 #endif
 
-#else
-unsigned int current_core(void);
 #endif /* CPU_PP502x */
 
 

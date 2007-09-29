@@ -266,15 +266,11 @@ cop_init:
     ldr    r3, [r4]
     tst    r3, #SLEEPING
     beq    1b
+#endif
 
     /* Set up idle stack for COP and munge it with 0xdeadbeef */
-    ldr    r2, =cop_idlestackbegin
     ldr    sp, =cop_idlestackend
-#else
-    /* Setup stack for COP and munge it with 0xdeadbeef */
-    ldr    r2, =cop_stackbegin
-    ldr    sp, =cop_stackend
-#endif
+    ldr    r2, =cop_idlestackbegin
     ldr    r4, =0xdeadbeef
 2:
     cmp    sp, r2

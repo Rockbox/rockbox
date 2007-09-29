@@ -197,26 +197,18 @@ SECTIONS
     } > IRAM
 
 #ifdef CPU_PP
-#if NUM_CORES > 1
     .idle_stacks :
     {
+#if NUM_CORES > 1
        *(.idle_stacks)
        cpu_idlestackbegin = .;
-       . += 0x0080;
+       . += IDLE_STACK_SIZE;
        cpu_idlestackend = .;
+#endif
        cop_idlestackbegin = .;
-       . += 0x0080;
+       . += IDLE_STACK_SIZE;
        cop_idlestackend = .;
     } > IRAM
-#else
-    .cop_stack :
-    {
-       *(.cop_stack)
-       cop_stackbegin = .;
-       . += 0x0500;
-       cop_stackend = .;
-    } > IRAM
-#endif
 #endif
 
 #else

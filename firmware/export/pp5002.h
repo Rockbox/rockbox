@@ -22,6 +22,8 @@
 /* Much info gleaned and/or copied from the iPodLinux project. */
 #define DRAM_START       0x28000000
 
+#define PROCESSOR_ID     (*(volatile unsigned long *)(0xc4000000))
+
 #define IPOD_LCD_BASE    0xc0001000
 
 #define IISCONFIG        (*(volatile unsigned long *)(0xc0002500))

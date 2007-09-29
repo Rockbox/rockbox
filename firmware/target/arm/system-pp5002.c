@@ -53,16 +53,6 @@ void irq(void)
 
 #endif
 
-unsigned int current_core(void)
-{
-    if(((*(volatile unsigned long *)(0xc4000000)) & 0xff) == 0x55)
-    {
-        return CPU;
-    }
-    return COP;
-}
-
-
 /* TODO: The following two function have been lifted straight from IPL, and
    hence have a lot of numeric addresses used straight. I'd like to use
    #defines for these, but don't know what most of them are for or even what

@@ -13,7 +13,9 @@ logf.c
 profile.c
 #endif /* RB_PROFILE */
 kernel.c
+#ifndef BOOTLOADER
 rolo.c
+#endif /* BOOTLOADER */
 thread.c
 timer.c
 #endif /* SIMULATOR */
