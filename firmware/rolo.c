@@ -51,11 +51,10 @@
  * TODO: Use the mailboxes built into the PP processor for this
  */
 
+#if NUM_CORES > 1
 volatile unsigned char IDATA_ATTR cpu_message = 0;
 volatile unsigned char IDATA_ATTR cpu_reply = 0;
-#if NUM_CORES > 1
 extern int cop_idlestackbegin[];
-#endif
 
 void rolo_restart_cop(void) ICODE_ATTR;
 void rolo_restart_cop(void)
@@ -92,7 +91,8 @@ void rolo_restart_cop(void)
         "mov   pc, r0            \n"
     );
 }
-#endif
+#endif /* NUM_CORES > 1 */
+#endif /* CPU_PP */
 
 static void rolo_error(const char *text)
 {
@@ -154,11 +154,13 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     for (i=0;i<8;i++)
         memmapregs[i]=0;
 
+#if NUM_CORES > 1
     /* Tell the COP it's safe to continue rebooting */
     cpu_message = 1;
 
     /* Wait for the COP to tell us it is rebooting */
     while(cpu_reply != 2);
+#endif
 
     asm volatile(
         "mov   r0, #0x10000000   \n"
@@ -226,7 +228,7 @@ int rolo_load(const char* filename)
     file_checksum = betoh32(file_checksum);
 #endif
 
-#ifdef CPU_PP
+#if defined(CPU_PP) && NUM_CORES > 1
     lcd_puts(0, 2, "Waiting for coprocessor...");
     lcd_update();
     rolo_restart_cop();

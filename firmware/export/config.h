@@ -364,7 +364,11 @@
 #endif
 
 /* Dual core support - not yet working on the 1G/2G and 3G iPod */
-#if defined(CPU_PP) && CONFIG_CPU != PP5002 && !defined(BOOTLOADER)
+#if defined(CPU_PP)
+#define IDLE_STACK_SIZE  0x80
+#define IDLE_STACK_WORDS 0x20
+
+#if !defined(BOOTLOADER) && CONFIG_CPU != PP5002
 #define NUM_CORES 2
 #define CURRENT_CORE current_core()
 /* Hopefully at some point we will learn how to mark areas of main memory as
@@ -373,18 +377,17 @@
 #define NOCACHEDATA_ATTR IDATA_ATTR
 
 #define IF_COP(...) __VA_ARGS__
+#endif /* !defined(BOOTLOADER) && CONFIG_CPU != PP5002 */
+#endif /* CPU_PP */
 
-#define IDLE_STACK_SIZE  0x80
-#define IDLE_STACK_WORDS 0x20
-
-#else
+#ifndef NUM_CORES
+/* Default to single core */
 #define NUM_CORES 1
 #define CURRENT_CORE CPU
 #define NOCACHEBSS_ATTR
 #define NOCACHEDATA_ATTR
 
 #define IF_COP(...)
+#endif /* NUM_CORES */
 
-#endif /* Processor specific */
-
-#endif
+#endif /* __CONFIG_H__ */
