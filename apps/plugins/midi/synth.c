@@ -308,7 +308,7 @@ signed short int synthVoice(struct SynthObject * so)
         }
     }
 
-    if((wf->mode & 28) && (cpShifted > wf->endLoop))
+    if((wf->mode & 28) && (cpShifted >= wf->endLoop))
     {
         so->loopState = STATE_LOOPING;
         if((wf->mode & (24)) == 0)
@@ -324,12 +324,10 @@ signed short int synthVoice(struct SynthObject * so)
         }
     }
 
-
     /* Have we overrun? */
     if( (cpShifted >= (wf->numSamples-1)))
     {
         so->cp -= so->delta;
-
         cpShifted = so->cp >> FRACTSIZE;
         s2 = getSample((cpShifted)+1, wf);
         stopVoice(so);
