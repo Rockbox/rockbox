@@ -7378,13 +7378,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show Track Info"
+    *: "Show ID3 Info"
   </source>
   <dest>
     *: "แสดงข้อมูล ID3"
   </dest>
   <voice>
-    *: "Show Track Info"
+    *: "Show ID3 Info"
   </voice>
 </phrase>
 <phrase>

@@ -1768,7 +1768,7 @@
   desc: Menu option to start id3 viewer
   user:
   <source>
-    *: "Show Track Info"
+    *: "Show ID3 Info"
   </source>
   <dest>
     *: "Pokazi ID3 Info"

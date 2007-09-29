@@ -3028,13 +3028,13 @@
   desc: Menu option to start id3 viewer
   user:
   <source>
-    *: "Show Track Info"
+    *: "Show ID3 Info"
   </source>
   <dest>
     *: "Sýna ID3 Uppl."
   </dest>
   <voice>
-    *: "Show Track Info"
+    *: "Show ID3 Info"
   </voice>
 </phrase>
 <phrase>
