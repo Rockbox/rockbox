@@ -199,8 +199,8 @@ SECTIONS
 #ifdef CPU_PP
     .idle_stacks :
     {
-#if NUM_CORES > 1
        *(.idle_stacks)
+#if NUM_CORES > 1
        cpu_idlestackbegin = .;
        . += IDLE_STACK_SIZE;
        cpu_idlestackend = .;
