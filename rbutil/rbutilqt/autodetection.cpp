@@ -21,8 +21,10 @@
 
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
 #include <stdio.h>
-#include <mntent.h>
 #include <usb.h>
+#endif
+#if defined(Q_OS_LINUX)
+#include <mntent.h>
 #endif
 #if defined(Q_OS_WIN32)
 #if defined(UNICODE)
