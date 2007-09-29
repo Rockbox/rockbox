@@ -1181,6 +1181,10 @@ void shutdown_hw(void)
     lcd_remote_set_contrast(0);
 #endif
 
+#ifdef HAVE_LCD_SHUTDOWN
+    lcd_shutdown();
+#endif
+
     /* Small delay to make sure all HW gets time to flush. Especially
        eeprom chips are quite slow and might be still writing the last
        byte. */

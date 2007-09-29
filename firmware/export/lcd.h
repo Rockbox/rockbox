@@ -288,6 +288,10 @@ extern bool lcd_enabled(void);
 extern void lcd_sleep(void);
 #endif /* HAVE_LCD_SLEEP */
 
+#ifdef HAVE_LCD_SHUTDOWN
+void lcd_shutdown(void);
+#endif
+
 /* Bitmap formats */
 enum
 {

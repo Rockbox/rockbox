@@ -368,3 +368,12 @@ void lcd_update(void)
 {
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
+
+#ifdef HAVE_LCD_SHUTDOWN
+/* LCD powerdown */
+void lcd_shutdown(void)
+{
+    lcd_cmd_and_data(R_POWER_CONTROL, 0x1500); /* Turn off op amp power */
+    lcd_cmd_and_data(R_POWER_CONTROL, 0x1502); /* Put LCD driver in standby */
+}
+#endif
