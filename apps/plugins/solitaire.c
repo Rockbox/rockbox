@@ -592,7 +592,7 @@ static void create_unhide_option_string(void)
 void solitaire_init(void);
 
 /* menu return codes */
-enum { MENU_RESUME, MENU_QUIT, MENU_USB };
+enum { MENU_RESUME, MENU_SAVE_AND_QUIT, MENU_QUIT, MENU_USB };
 
 int solitaire_menu(bool in_game)
 {
@@ -600,9 +600,9 @@ int solitaire_menu(bool in_game)
     int result = -1;
     int i = 0;
 
-    struct menu_item items[6];
+    struct menu_item items[7];
 
-    if (in_game)
+    if( in_game )
     {
         items[i++].desc = "Resume Game";
         items[i++].desc = "Restart Game";
@@ -615,6 +615,10 @@ int solitaire_menu(bool in_game)
     items[i++].desc = unhide_option_string;
     items[i++].desc = "Help";
     items[i++].desc = "Audio Playback";
+    if( in_game )
+    {
+        items[i++].desc = "Save and Quit";
+    }
     items[i++].desc = "Quit";
 
     create_draw_option_string();
@@ -665,6 +669,13 @@ int solitaire_menu(bool in_game)
                  break;
 
             case 5:
+                if( in_game )
+                    result = MENU_SAVE_AND_QUIT;
+                else
+                    result = MENU_QUIT;
+                break;
+
+            case 6:
                 result = MENU_QUIT;
                 break;
         }
@@ -1032,7 +1043,7 @@ enum move move_card( int dest_col, int src_card )
     return MOVE_OK;
 }
 
-enum { SOLITAIRE_WIN, SOLITAIRE_QUIT_NEW, SOLITAIRE_QUIT, SOLITAIRE_USB };
+enum { SOLITAIRE_WIN, SOLITAIRE_SAVE_AND_QUIT, SOLITAIRE_QUIT, SOLITAIRE_USB };
 
 /**
  * Bouncing cards at the end of the game
@@ -1122,6 +1133,7 @@ int open_save_file( int flags )
 void delete_save_file( void )
 {
     char buf[MAX_PATH];
+    get_save_filename( buf );
     rb->remove( buf );
 }
 
@@ -1233,7 +1245,7 @@ int solitaire( int skipmenu )
         switch( solitaire_menu(false) )
         {
             case MENU_QUIT:
-                return SOLITAIRE_QUIT_NEW;
+                return SOLITAIRE_QUIT;
 
             case MENU_USB:
                 return SOLITAIRE_USB;
@@ -1694,6 +1706,9 @@ int solitaire( int skipmenu )
             case SOL_QUIT:
                 switch( solitaire_menu(true) )
                 {
+                    case MENU_SAVE_AND_QUIT:
+                        return SOLITAIRE_SAVE_AND_QUIT;
+
                     case MENU_QUIT:
                         return SOLITAIRE_QUIT;
 
@@ -1703,7 +1718,7 @@ int solitaire( int skipmenu )
                 break;
 
             case SYS_POWEROFF:
-                return SOLITAIRE_QUIT;
+                return SOLITAIRE_SAVE_AND_QUIT;
 
             default:
                 if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
@@ -1745,7 +1760,10 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
     rb->memcpy(&sol, &sol_disk, sizeof(sol));   /* copy to running config */
 
     if( load_game() == 0 )
+    {
+        rb->splash( HZ, "Resuming saved game." );
         result = SOLITAIRE_QUIT;
+    }
     else
         result = SOLITAIRE_WIN;
 
@@ -1756,11 +1774,10 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
      * winning instead of quiting) */
     while( ( result = solitaire( result ) ) == SOLITAIRE_WIN );
 
-    if( result != SOLITAIRE_QUIT_NEW )
-        save_game();
-    else
-        /* XXX: Not sure if this is the best spot to delete the save file */
+    if( result == SOLITAIRE_QUIT )
         delete_save_file();
+    else /* result == SOLITAIRE_USB || result == SOLITAIRE_SAVE_AND_QUIT */
+        save_game();
 
     if (rb->memcmp(&sol, &sol_disk, sizeof(sol))) /* save settings if changed */
     {
