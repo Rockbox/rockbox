@@ -30,14 +30,6 @@
 #define PCMREC_W_PCM_BUFFER_OVF         0x00000001
 /* encoder output buffer has overflowed */
 #define PCMREC_W_ENC_BUFFER_OVF         0x00000002
-#ifdef PCMREC_PARANOID
-/* dma write position alignment incorrect */
-#define PCMREC_W_DMA_WR_POS_ALIGN       0x00000004
-/* pcm read position changed at some point not under control of recording */
-#define PCMREC_W_PCM_RD_POS_TRASHED     0x00000008
-/* dma write position changed at some point not under control of recording */
-#define PCMREC_W_DMA_WR_POS_TRASHED     0x00000010
-#endif /* PCMREC_PARANOID */
 /** Errors **/
 /* failed to load encoder */
 #define PCMREC_E_LOAD_ENCODER           0x80001000
@@ -47,16 +39,10 @@
 #define PCMREC_E_FNQ_DESYNC             0x80004000
 /* I/O error has occurred */
 #define PCMREC_E_IO                     0x80008000
-#ifdef PCMREC_PARANOID
+#ifdef DEBUG
 /* encoder has written past end of allotted space */
 #define PCMREC_E_CHUNK_OVF              0x80010000
-/* chunk header incorrect */
-#define PCMREC_E_BAD_CHUNK              0x80020000
-/* encoder read position changed outside of recording control */
-#define PCMREC_E_ENC_RD_INDEX_TRASHED   0x80040000
-/* encoder write position changed outside of recording control */
-#define PCMREC_E_ENC_WR_INDEX_TRASHED   0x80080000
-#endif /* PCMREC_PARANOID */
+#endif /* DEBUG */
 
 /**
  * RAW pcm data recording

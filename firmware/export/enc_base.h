@@ -157,12 +157,12 @@ struct encoder_config
 #define CHUNKF_ALLFLAGS (0x0033ul | CHUNKF_ERROR)
 
 /* Header at the beginning of every encoder chunk */
-#ifdef PCMREC_PARANOID
+#ifdef DEBUG
 #define ENC_CHUNK_MAGIC H_TO_BE32(('P' << 24) | ('T' << 16) | ('Y' << 8) | 'R')
 #endif
 struct enc_chunk_hdr
 {
-#ifdef PCMREC_PARANOID
+#ifdef DEBUG
     unsigned long id;         /* overflow detection - 'PTYR' - acronym for
                                  "PTYR Tells You Right" ;)                 */
 #endif

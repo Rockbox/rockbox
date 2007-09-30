@@ -147,58 +147,19 @@ static unsigned long  pre_record_ticks;  /* pre-record time in ticks       */
 
 #define GET_PCM_CHUNK(offset)   ((long *)(pcm_buffer + (offset)))
 #define GET_ENC_CHUNK(index)    ENC_CHUNK_HDR(enc_buffer + enc_chunk_size*(index))
-
-#ifdef PCMREC_PARANOID
-static void paranoid_set_code(unsigned long code, int line)
-{
-    logf("%08X at %d", code, line);
-    if ((long)code < 0)
-        errors |= code;
-    else
-        warnings |= code;
-}
-
-#define PARANOID_ENC_INDEX_CHECK(index) \
-            { if (index != index##_last) \
-                paranoid_set_code((&index == &enc_rd_index) ? \
-                    PCMREC_E_ENC_RD_INDEX_TRASHED : PCMREC_E_ENC_WR_INDEX_TRASHED, \
-                    __LINE__); }
-#define PARANOID_PCM_POS_CHECK(pos) \
-            { if (pos != pos##_last) \
-                paranoid_set_code((&pos == &pcm_rd_pos) ? \
-                    PCMREC_W_PCM_RD_POS_TRASHED : PCMREC_W_DMA_WR_POS_TRASHED, \
-                    __LINE__); }
-#define PARANOID_SET_LAST(var) \
-            ; var##_last = var
-#define PARANOID_CHUNK_CHECK(chunk) \
-            paranoid_chunk_check(chunk)
-#else
-#define PARANOID_ENC_INDEX_CHECK(index)
-#define PARANOID_PCM_POS_CHECK(pos)
-#define PARANOID_SET_LAST(var)
-#define PARANOID_CHUNK_CHECK(chunk)
-#endif
-
 #define INC_ENC_INDEX(index) \
-            PARANOID_ENC_INDEX_CHECK(index) \
-            { if (++index >= enc_num_chunks) index = 0; } \
-            PARANOID_SET_LAST(index)
+    { if (++index >= enc_num_chunks) index = 0; }
 #define DEC_ENC_INDEX(index) \
-            PARANOID_ENC_INDEX_CHECK(index) \
-            { if (--index < 0) index = enc_num_chunks - 1; } \
-            PARANOID_SET_LAST(index)
-#define SET_ENC_INDEX(index, value) \
-            PARANOID_ENC_INDEX_CHECK(index) \
-            index = value \
-            PARANOID_SET_LAST(index)
-#define SET_PCM_POS(pos, value) \
-            PARANOID_PCM_POS_CHECK(pos) \
-            pos = value \
-            PARANOID_SET_LAST(pos)
+    { if (--index < 0) index = enc_num_chunks - 1; }
 
 static size_t         rec_buffer_size; /* size of available buffer         */
 static unsigned char *pcm_buffer;      /* circular recording buffer        */
 static unsigned char *enc_buffer;      /* circular encoding buffer         */
+#ifdef DEBUG
+static unsigned long *wrap_id_p;       /* magic at wrap position - a debugging
+                                          aid to check if the encoder data
+                                          spilled out of its chunk         */
+#endif /* DEBUG */
 static volatile int   dma_wr_pos;      /* current DMA write pos            */
 static int            pcm_rd_pos;      /* current PCM read pos             */
 static int            pcm_enc_pos;     /* position encoder is processing   */
@@ -244,6 +205,16 @@ static unsigned char *fn_queue;        /* pointer to first filename        */
 static ssize_t        fnq_size;        /* capacity of queue in bytes       */
 static int            fnq_rd_pos;      /* current read position            */
 static int            fnq_wr_pos;      /* current write position           */
+#define FNQ_NEXT(pos) \
+    ({ int p = (pos) + MAX_PATH; \
+       if (p >= fnq_size)        \
+            p = 0;               \
+       p; })
+#define FNQ_PREV(pos) \
+    ({ int p = (pos) - MAX_PATH;     \
+       if (p < 0)                    \
+            p = fnq_size - MAX_PATH; \
+       p; })
 
 enum
 {
@@ -256,16 +227,6 @@ enum
     PCMREC_FLUSH_IF_HIGH        = 0x0000000, /* Flush if high watermark
                                                 reached                    */
 };
-
-/** extra debugging info positioned away from other vars **/
-#ifdef PCMREC_PARANOID
-static unsigned long *wrap_id_p;       /* magic at end of encoding buffer  */
-static volatile int   dma_wr_pos_last; /* previous dma write position      */ 
-static int            pcm_rd_pos_last; /* previous pcm read position       */
-static int            enc_rd_index_last; /* previsou encoder read position */
-static int            enc_wr_index_last; /* previsou encoder read position */
-#endif
-
 
 /***************************************************************************/
 
@@ -320,17 +281,7 @@ static int pcm_rec_have_more(int status)
         if ((unsigned)(pcm_enc_pos - next_pos) < PCM_CHUNK_SIZE)
             warnings |= PCMREC_W_PCM_BUFFER_OVF;
 
-#ifdef PCMREC_PARANOID
-        /* write position must always be on PCM_CHUNK_SIZE boundary -
-           anything else is corruption */
-        if (next_pos & (PCM_CHUNK_SIZE-1))
-        {
-            logf("dma_wr_pos unalgn: %d", next_pos);
-            warnings |= PCMREC_W_DMA_WR_POS_ALIGN;
-            next_pos &= ~PCM_CHUNK_SIZE; /* re-align */
-        }
-#endif
-        SET_PCM_POS(dma_wr_pos, next_pos);
+        dma_wr_pos = next_pos;
     }
 
     pcm_record_more(GET_PCM_CHUNK(dma_wr_pos), PCM_CHUNK_SIZE);
@@ -494,7 +445,7 @@ void audio_stop_recording(void)
 {
     logf("audio_stop_recording");
     flush_interrupt();
-    queue_send(&pcmrec_queue, PCMREC_STOP, 0);
+    queue_post(&pcmrec_queue, PCMREC_STOP, 0);
     logf("audio_stop_recording done");
 } /* audio_stop_recording */
 
@@ -505,7 +456,7 @@ void audio_pause_recording(void)
 {
     logf("audio_pause_recording");
     flush_interrupt();
-    queue_send(&pcmrec_queue, PCMREC_PAUSE, 0);
+    queue_post(&pcmrec_queue, PCMREC_PAUSE, 0);
     logf("audio_pause_recording done");
 } /* audio_pause_recording */
 
@@ -515,7 +466,7 @@ void audio_pause_recording(void)
 void audio_resume_recording(void)
 {
     logf("audio_resume_recording");
-    queue_send(&pcmrec_queue, PCMREC_RESUME, 0);
+    queue_post(&pcmrec_queue, PCMREC_RESUME, 0);
     logf("audio_resume_recording done");
 } /* audio_resume_recording */
 
@@ -587,22 +538,18 @@ static bool pcmrec_fnq_is_full(void)
     
     return size >= fnq_size - MAX_PATH;
 } /* pcmrec_fnq_is_full */
-    
+
 /* queue another filename - will overwrite oldest one if full */
 static bool pcmrec_fnq_add_filename(const char *filename)
 {
     strncpy(fn_queue + fnq_wr_pos, filename, MAX_PATH);
-    
-    if ((fnq_wr_pos += MAX_PATH) >= fnq_size)
-        fnq_wr_pos = 0;
+    fnq_wr_pos = FNQ_NEXT(fnq_wr_pos);
     
     if (fnq_rd_pos != fnq_wr_pos)
         return true;
 
     /* queue full */
-    if ((fnq_rd_pos += MAX_PATH) >= fnq_size)
-        fnq_rd_pos = 0;
-
+    fnq_rd_pos = FNQ_NEXT(fnq_rd_pos);
     return true;
 } /* pcmrec_fnq_add_filename */
 
@@ -614,9 +561,7 @@ static bool pcmrec_fnq_replace_tail(const char *filename)
     if (pcmrec_fnq_is_empty())
         return false;
 
-    pos = fnq_wr_pos - MAX_PATH;
-    if (pos < 0)
-        pos = fnq_size - MAX_PATH;
+    pos = FNQ_PREV(fnq_wr_pos);
 
     strncpy(fn_queue + pos, filename, MAX_PATH);
 
@@ -632,9 +577,7 @@ static bool pcmrec_fnq_get_filename(char *filename)
     if (filename)
         strncpy(filename, fn_queue + fnq_rd_pos, MAX_PATH);
     
-    if ((fnq_rd_pos += MAX_PATH) >= fnq_size)
-        fnq_rd_pos = 0;
-
+    fnq_rd_pos = FNQ_NEXT(fnq_rd_pos);
     return true;
 } /* pcmrec_fnq_get_filename */
 
@@ -649,51 +592,6 @@ static void pcmrec_close_file(int *fd_p)
 
     *fd_p = -1;
 } /* pcmrec_close_file */
-
-#ifdef PCMREC_PARANOID
-static void paranoid_chunk_check(const struct enc_chunk_hdr *chunk)
-{
-    /* check integrity of things that must be ok - data or not */
-
-    /* check magic in header */
-    if (chunk->id != ENC_CHUNK_MAGIC)
-    {
-        errors |= PCMREC_E_BAD_CHUNK | PCMREC_E_CHUNK_OVF;
-        logf("bad chunk: %d", chunk - (struct enc_chunk_hdr *)enc_buffer);
-    }
-
-    /* check magic wrap id */
-    if (*wrap_id_p != ENC_CHUNK_MAGIC)
-    {
-        errors |= PCMREC_E_BAD_CHUNK | PCMREC_E_CHUNK_OVF;
-        logf("bad magic at wrap pos");
-    }
-
-    if (chunk->enc_data == NULL) /* has data? */
-        return;
-
-    /* check that data points to something after header */
-    if (chunk->enc_data < ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk))
-    {
-        errors |= PCMREC_E_BAD_CHUNK;
-        logf("chk ptr < hdr end");
-    }
-
-        /* check if data end is within chunk */
-    if (chunk->enc_data + chunk->enc_size >
-            (unsigned char *)chunk + enc_chunk_size)
-    {
-        errors |= PCMREC_E_BAD_CHUNK;
-        logf("chk data > chk end");
-    }
-
-    if ((chunk->flags & ~CHUNKF_ALLFLAGS) != 0)
-    {
-        errors |= PCMREC_E_BAD_CHUNK;
-        logf("chk bad flags %08X", chunk->flags);
-    }
-} /* paranoid_chunk_check */
-#endif /* PCMREC_PARANOID */
 
 /** Data Flushing **/
 
@@ -1004,8 +902,6 @@ static void pcmrec_flush(unsigned flush_num)
         rec_fdata.new_enc_size = rec_fdata.chunk->enc_size;
         rec_fdata.new_num_pcm  = rec_fdata.chunk->num_pcm;
 
-        PARANOID_CHUNK_CHECK(rec_fdata.chunk);
-
         if (rec_fdata.chunk->flags & CHUNKF_START_FILE)
         {
             pcmrec_start_file();
@@ -1071,9 +967,6 @@ static int pcmrec_get_chunk_index(struct enc_chunk_hdr *chunk)
 
 static struct enc_chunk_hdr * pcmrec_get_prev_chunk(int index)
 {
-#ifdef PCMREC_PARANOID
-    int index_last = index;
-#endif
     DEC_ENC_INDEX(index);
     return GET_ENC_CHUNK(index);
 } /* pcmrec_get_prev_chunk */
@@ -1185,9 +1078,6 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
             /* get stats on data added to start - sort of a prerecord
                operation */
             int i = pcmrec_get_chunk_index(data.chunk);
-#ifdef PCMREC_PARANOID
-            int i_last = i;
-#endif
             struct enc_chunk_hdr *chunk = data.chunk;
 
             logf("start data: %d %d", i, enc_wr_index);
@@ -1241,13 +1131,13 @@ static void pcmrec_init(void)
 
     /* pcm FIFO */
     dma_lock          = true;
-    SET_PCM_POS(pcm_rd_pos, 0);
-    SET_PCM_POS(dma_wr_pos, 0);
+    pcm_rd_pos        = 0;
+    dma_wr_pos        = 0;
     pcm_enc_pos       = 0;
 
     /* encoder FIFO */
-    SET_ENC_INDEX(enc_wr_index, 0);
-    SET_ENC_INDEX(enc_rd_index, 0);
+    enc_wr_index      = 0;
+    enc_rd_index      = 0;
 
     /* filename queue */
     fnq_rd_pos        = 0;
@@ -1380,9 +1270,6 @@ static void pcmrec_record(const char *filename)
         if (pre_record_ticks)
         {
             int i = rd_start;
-#ifdef PCMREC_PARANOID
-            int i_last = i;
-#endif
             /* calculate number of available chunks */
             unsigned long avail_pre_chunks = (enc_wr_index - enc_rd_index +
                             enc_num_chunks) % enc_num_chunks;
@@ -1432,7 +1319,7 @@ static void pcmrec_record(const char *filename)
 #endif
         }
 
-        SET_ENC_INDEX(enc_rd_index, rd_start);
+        enc_rd_index = rd_start;
 
         /* filename queue should be empty */
         if (!pcmrec_fnq_is_empty())
@@ -1632,7 +1519,6 @@ static void pcmrec_thread(void)
                 if (is_recording)
                     break;
                 pcmrec_close();
-                reset_hardware();
                 /* Be sure other threads are released if waiting */
                 queue_clear(&pcmrec_queue);
                 flush_interrupts = 0;
@@ -1680,7 +1566,7 @@ void enc_set_parameters(struct enc_parameters *params)
     enc_sample_rate = params->enc_sample_rate;
     logf("enc sampr:%lu", enc_sample_rate);
 
-    SET_PCM_POS(pcm_rd_pos, dma_wr_pos);
+    pcm_rd_pos = dma_wr_pos;
     pcm_enc_pos = pcm_rd_pos;
 
     enc_config.afmt     = params->afmt;
@@ -1704,7 +1590,7 @@ void enc_set_parameters(struct enc_parameters *params)
 
     bufsize   = rec_buffer_size - (enc_buffer - pcm_buffer) -
                 resbytes - FNQ_MIN_NUM_PATHS*MAX_PATH
-#ifdef PCMREC_PARANOID
+#ifdef DEBUG
                 - sizeof (*wrap_id_p)
 #endif
                 ;
@@ -1716,12 +1602,12 @@ void enc_set_parameters(struct enc_parameters *params)
     bufsize = enc_num_chunks*enc_chunk_size;
     logf("enc size:%lu", bufsize);
 
-#ifdef PCMREC_PARANOID
-    /* add magic at wraparound */
+#ifdef DEBUG
+    /* add magic at wraparound for spillover checks */
     wrap_id_p  = SKIPBYTES((unsigned long *)enc_buffer, bufsize);
     bufsize   += sizeof (*wrap_id_p);
     *wrap_id_p = ENC_CHUNK_MAGIC;
-#endif /* PCMREC_PARANOID */
+#endif
 
     /** set OUT parameters **/
     params->enc_buffer     = enc_buffer;
@@ -1747,26 +1633,24 @@ void enc_set_parameters(struct enc_parameters *params)
     fnq_size  *= MAX_PATH;
     logf("fnq files:%ld", fnq_size / MAX_PATH);
 
-#if 0
+#if defined(DEBUG)
     logf("ab :%08lX", (uintptr_t)audiobuf);
     logf("pcm:%08lX", (uintptr_t)pcm_buffer);
     logf("enc:%08lX", (uintptr_t)enc_buffer);
     logf("res:%08lX", (uintptr_t)params->reserve_buffer);
-#ifdef PCMREC_PARANOID
     logf("wip:%08lX", (uintptr_t)wrap_id_p);
-#endif
     logf("fnq:%08lX", (uintptr_t)fn_queue);
     logf("end:%08lX", (uintptr_t)fn_queue + fnq_size);
     logf("abe:%08lX", (uintptr_t)audiobufend);
 #endif
 
     /* init all chunk headers and reset indexes */
-    SET_ENC_INDEX(enc_rd_index, 0);
+    enc_rd_index = 0;
     for (enc_wr_index = enc_num_chunks; enc_wr_index > 0; )
     {
         struct enc_chunk_hdr *chunk = GET_ENC_CHUNK(--enc_wr_index);
-#ifdef PCMREC_PARANOID
-        chunk->id    = ENC_CHUNK_MAGIC;
+#ifdef DEBUG
+        chunk->id = ENC_CHUNK_MAGIC;
 #endif
         chunk->flags = 0;
     }
@@ -1780,7 +1664,7 @@ struct enc_chunk_hdr * enc_get_chunk(void)
 {
     struct enc_chunk_hdr *chunk = GET_ENC_CHUNK(enc_wr_index);
 
-#ifdef PCMREC_PARANOID
+#ifdef DEBUG
     if (chunk->id != ENC_CHUNK_MAGIC || *wrap_id_p != ENC_CHUNK_MAGIC)
     {
         errors |= PCMREC_E_CHUNK_OVF;
@@ -1808,8 +1692,6 @@ void enc_finish_chunk(void)
         errors |= PCMREC_E_ENCODER;
         logf("finish chk enc error");
     }
-
-    PARANOID_CHUNK_CHECK(chunk);
 
     /* advance enc_wr_index to the next encoder chunk */
     INC_ENC_INDEX(enc_wr_index);
@@ -1872,13 +1754,14 @@ unsigned char * enc_get_pcm_data(size_t size)
         int next_pos = (pcm_rd_pos + size) & PCM_CHUNK_MASK;
 
         pcm_enc_pos = pcm_rd_pos;
-
-        SET_PCM_POS(pcm_rd_pos, next_pos);
+        pcm_rd_pos = next_pos;
 
         /* ptr must point to continous data at wraparound position */
         if ((size_t)pcm_rd_pos < size)
+        {
             memcpy(pcm_buffer + PCM_NUM_CHUNKS*PCM_CHUNK_SIZE,
                    pcm_buffer, pcm_rd_pos);
+        }
 
         pcm_buffer_empty = false;
         return ptr;
@@ -1905,7 +1788,7 @@ size_t enc_unget_pcm_data(size_t size)
             size = old_avail;
 
         pcm_enc_pos = (pcm_rd_pos - size) & PCM_CHUNK_MASK;
-        SET_PCM_POS(pcm_rd_pos, pcm_enc_pos);
+        pcm_rd_pos = pcm_enc_pos;
 
         return size;
     }
