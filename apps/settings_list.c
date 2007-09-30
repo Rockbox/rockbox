@@ -828,8 +828,6 @@ const struct settings_list settings[] = {
         2, ID2P(LANG_OFF), ID2P(LANG_ON)
 #endif
         ),
-    {F_T_INT|F_RECSETTING,&global_settings.cliplight,LANG_CLIP_LIGHT,INT(0),
-        "cliplight","off,main,both,remote",UNUSED},
 #endif
 #ifdef DEFAULT_REC_MIC_GAIN
     {F_T_INT|F_RECSETTING,&global_settings.rec_mic_gain,
