@@ -291,7 +291,7 @@ void system_reboot(void)
     /* Magic used by the c200 OF: 0x23066000
        Magic used by the c200 BL: 0x23066b7b
        In both cases, the OF executes these 2 commands from iram. */
-    outl(0x23066b7b, STRAP_OPT_A);
+    STRAP_OPT_A = 0x23066b7b;
     DEV_RS = DEV_SYSTEM;
 #else
     DEV_RS |= DEV_SYSTEM;
