@@ -74,7 +74,7 @@ void rolo_restart_cop(void)
     invalidate_icache();
     
     /* Disable cache */
-    CACHE_CTL = CACHE_DISABLE;
+    CACHE_CTL = CACHE_CTL_DISABLE;
 
     /* Tell the main core that we're ready to reload */
     cpu_reply = 1;
@@ -123,9 +123,6 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
 {
     long i;
     unsigned char* localdest = dest;
-#ifdef CPU_PP502x
-    unsigned long* memmapregs = (unsigned long*)0xf000f000;
-#endif
 
     /* This is the equivalent of a call to memcpy() but this must be done from
        iram to avoid overwriting itself and we don't want to depend on memcpy()
@@ -148,11 +145,14 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     flush_icache();
 
     /* Disable cache */
-    CACHE_CTL = CACHE_DISABLE;
+    CACHE_CTL = CACHE_CTL_DISABLE;
 
     /* Reset the memory mapping registers to zero */
-    for (i=0;i<8;i++)
-        memmapregs[i]=0;
+    {
+        volatile unsigned long *mmap_reg;
+        for (mmap_reg = &MMAP_FIRST; mmap_reg <= &MMAP_LAST; mmap_reg++)
+            *mmap_reg = 0;
+    }
 
 #if NUM_CORES > 1
     /* Tell the COP it's safe to continue rebooting */

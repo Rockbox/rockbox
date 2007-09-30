@@ -38,6 +38,7 @@
 #define COP_MESSAGE      (*(volatile unsigned long *)(0x60001004))
 #define CPU_REPLY        (*(volatile unsigned long *)(0x60001008))
 #define COP_REPLY        (*(volatile unsigned long *)(0x6000100c))
+#define MBOX_CONTROL     (*(volatile unsigned long *)(0x60001010))
 
 /* Interrupts */
 #define CPU_INT_STAT        (*(volatile unsigned long*)(0x60004000))
@@ -170,12 +171,24 @@
  */
 
 /* Cache Control */
+#define CACHE_PRIORITY   (*(volatile unsigned long *)(0x60006044))
 #define CACHE_CTL        (*(volatile unsigned long *)(0x6000c000))
+#define CACHE_MASK       (*(volatile unsigned long *)(0xf000f040))
+#define CACHE_OPERATION  (*(volatile unsigned long *)(0xf000f044))
+#define CACHE_FLUSH_MASK (*(volatile unsigned long *)(0xf000f048))
 
-#define CACHE_DISABLE    0
-#define CACHE_ENABLE     1
-#define CACHE_RUN        2
-#define CACHE_INIT       4
+/* CACHE_CTL bits */
+#define CACHE_CTL_DISABLE    0x0000
+#define CACHE_CTL_ENABLE     0x0001
+#define CACHE_CTL_RUN        0x0002
+#define CACHE_CTL_INIT       0x0004
+#define CACHE_CTL_VECT_REMAP 0x0010
+#define CACHE_CTL_READY      0x4000
+#define CACHE_CTL_BUSY       0x8000
+/* CACHE_OPERATION bits */
+#define CACHE_OP_FLUSH       0x0002
+#define CACHE_OP_INVALIDATE  0x0004
+
 
 /* GPIO Ports */
 #define GPIOA_ENABLE     (*(volatile unsigned long *)(0x6000d000))
@@ -280,9 +293,17 @@
 /* Device initialization */
 #define PP_VER1          (*(volatile unsigned long *)(0x70000000))
 #define PP_VER2          (*(volatile unsigned long *)(0x70000004))
+#define STRAP_OPT_A      (*(volatile unsigned long *)(0x70000008))
+#define STRAP_OPT_B      (*(volatile unsigned long *)(0x7000000c))
+#define BUS_WIDTH_MASK   0x00000010
+#define RAM_TYPE_MASK    0x000000c0
+#define ROM_TYPE_MASK    0x00000008
+
 #define DEV_INIT         (*(volatile unsigned long *)(0x70000020))
 /* some timing that needs to be handled during clock setup */
 #define DEV_TIMING1      (*(volatile unsigned long *)(0x70000034))
+#define XMB_NOR_CFG      (*(volatile unsigned long *)(0x70000038))
+#define XMB_RAM_CFG      (*(volatile unsigned long *)(0x7000003c))
 
 #define INIT_USB         0x80000000
 
@@ -324,19 +345,32 @@
 #define FIREWIRE_BASE       0xc6000000
 
 /* Memory controller */
-#define CACHE_BASE          (*(volatile unsigned long*)(0xf0000000))
-#define CACHE_INIT_BASE     (*(volatile unsigned long*)(0xf0004000))
-#define CACHE_FLUSH_BASE    (*(volatile unsigned long*)(0xf0008000))
-#define CACHE_INVALID_BASE  (*(volatile unsigned long*)(0xf000c000))
-#define MMAP0_LOGICAL       (*(volatile unsigned long*)(0xf000f000))
-#define MMAP0_PHYSICAL      (*(volatile unsigned long*)(0xf000f004))
-#define MMAP1_LOGICAL       (*(volatile unsigned long*)(0xf000f008))
-#define MMAP1_PHYSICAL      (*(volatile unsigned long*)(0xf000f00c))
-#define MMAP2_LOGICAL       (*(volatile unsigned long*)(0xf000f010))
-#define MMAP2_PHYSICAL      (*(volatile unsigned long*)(0xf000f014))
-#define MMAP3_LOGICAL       (*(volatile unsigned long*)(0xf000f018))
-#define MMAP3_PHYSICAL      (*(volatile unsigned long*)(0xf000f01c))
-#define CACHE_CTRL1         (*(volatile unsigned long*)(0xf000f020))
-#define CACHE_CTRL2         (*(volatile unsigned long*)(0xf000f024))
+#define CACHE_BASE              (*(volatile unsigned long*)(0xf0000000))
+/* 0xf0000000-0xf0001fff */
+#define CACHE_DATA_BASE         (*(volatile unsigned long*)(0xf0000000))
+/* 0xf0002000-0xf0003fff */
+#define CACHE_DATA_MIRROR_BASE  (*(volatile unsigned long*)(0xf0002000))
+/* 0xf0004000-0xf0007fff */
+#define CACHE_STATUS_BASE       (*(volatile unsigned long*)(0xf0004000))
+#define CACHE_FLUSH_BASE        (*(volatile unsigned long*)(0xf0008000))
+#define CACHE_INVALID_BASE      (*(volatile unsigned long*)(0xf000c000))
+#define MMAP_FIRST              (*(volatile unsigned long*)(0xf000f000))
+#define MMAP_LAST               (*(volatile unsigned long*)(0xf000f03c))
+#define MMAP0_LOGICAL           (*(volatile unsigned long*)(0xf000f000))
+#define MMAP0_PHYSICAL          (*(volatile unsigned long*)(0xf000f004))
+#define MMAP1_LOGICAL           (*(volatile unsigned long*)(0xf000f008))
+#define MMAP1_PHYSICAL          (*(volatile unsigned long*)(0xf000f00c))
+#define MMAP2_LOGICAL           (*(volatile unsigned long*)(0xf000f010))
+#define MMAP2_PHYSICAL          (*(volatile unsigned long*)(0xf000f014))
+#define MMAP3_LOGICAL           (*(volatile unsigned long*)(0xf000f018))
+#define MMAP3_PHYSICAL          (*(volatile unsigned long*)(0xf000f01c))
+#define MMAP4_LOGICAL           (*(volatile unsigned long*)(0xf000f020))
+#define MMAP4_PHYSICAL          (*(volatile unsigned long*)(0xf000f024))
+#define MMAP5_LOGICAL           (*(volatile unsigned long*)(0xf000f028))
+#define MMAP5_PHYSICAL          (*(volatile unsigned long*)(0xf000f02c))
+#define MMAP6_LOGICAL           (*(volatile unsigned long*)(0xf000f030))
+#define MMAP6_PHYSICAL          (*(volatile unsigned long*)(0xf000f034))
+#define MMAP7_LOGICAL           (*(volatile unsigned long*)(0xf000f038))
+#define MMAP7_PHYSICAL          (*(volatile unsigned long*)(0xf000f03c))
 
-#endif
+#endif /* __PP5020_H__ */

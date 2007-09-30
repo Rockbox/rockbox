@@ -86,21 +86,21 @@ void irq(void)
 void flush_icache(void) ICODE_ATTR;
 void flush_icache(void)
 {
-    if (CACHE_CTL & CACHE_ENABLE)
+    if (CACHE_CTL & CACHE_CTL_ENABLE)
     {
-        outl(inl(0xf000f044) | 0x2, 0xf000f044);
-        while ((CACHE_CTL & 0x8000) != 0);
+        CACHE_OPERATION |= CACHE_OP_FLUSH;
+        while ((CACHE_CTL & CACHE_CTL_BUSY) != 0);
     }
 }
 
 void invalidate_icache(void) ICODE_ATTR;
 void invalidate_icache(void)
 {
-    if (CACHE_CTL & CACHE_ENABLE)
+    if (CACHE_CTL & CACHE_CTL_ENABLE)
     {
         unsigned i;
-        outl(inl(0xf000f044) | 0x6, 0xf000f044);
-        while ((CACHE_CTL & 0x8000) != 0);
+        CACHE_OPERATION |= CACHE_OP_FLUSH | CACHE_OP_INVALIDATE;
+        while ((CACHE_CTL & CACHE_CTL_BUSY) != 0);
         for (i = 0x10000000; i < 0x10002000; i += 16)
             inb(i);
     }
@@ -112,17 +112,16 @@ static void init_cache(void)
     unsigned i;
 
     /* cache init mode? */
-    CACHE_CTL |= CACHE_INIT;
+    CACHE_CTL |= CACHE_CTL_INIT;
 
     /* what's this do? */
-    outl(inl(0x60006044) | (CURRENT_CORE == CPU ? 0x10 : 0x20),
-         0x60006044); 
+    CACHE_PRIORITY |= CURRENT_CORE == CPU ? 0x10 : 0x20;
 
-    outl(0xc00, 0xf000f040);
-    outl(0xfc0, 0xf000f044);
+    CACHE_MASK = 0xc00;
+    CACHE_OPERATION = 0xfc0;
 
     /* enable cache */
-    CACHE_CTL |= CACHE_INIT | CACHE_ENABLE | CACHE_RUN;
+    CACHE_CTL |= CACHE_CTL_INIT | CACHE_CTL_ENABLE | CACHE_CTL_RUN;
 
     /* fill cache from physical address - do we have a better candidate for
        an 8KB unchanging memory range? */
@@ -285,14 +284,14 @@ void system_reboot(void)
 {
     /* Reboot */
 #ifdef SANSA_C200
-    CACHE_CTL &= ~0x10;
+    CACHE_CTL &= ~CACHE_CTL_VECT_REMAP;
 
     pp_i2c_send( 0x46, 0x23, 0x0); /* backlight off */
 
     /* Magic used by the c200 OF: 0x23066000
        Magic used by the c200 BL: 0x23066b7b
        In both cases, the OF executes these 2 commands from iram. */
-    outl(0x23066b7b, 0x70000008);
+    outl(0x23066b7b, STRAP_OPT_A);
     DEV_RS = DEV_SYSTEM;
 #else
     DEV_RS |= DEV_SYSTEM;
