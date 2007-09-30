@@ -910,16 +910,7 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
     s = &lcd_scroll_info.scroll[y];
 
     s->start_tick = current_tick + lcd_scroll_info.delay;
-    s->invert = false;
-    if (style & STYLE_INVERT) {
-        s->invert = 1;
-    }
-    else if (style & STYLE_COLORBAR) {
-        s->invert = 2;
-    }
-    else if (style & STYLE_GRADIENT) {
-        s->invert = 3;
-    }
+    s->style = style;
     lcd_puts_style_offset(x,y,string,style,offset);
 
     lcd_getstringsize(string, &w, &h);
@@ -956,8 +947,6 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         s->offset = offset;
         s->startx = xmargin + x * s->width / s->len;
         s->backward = false;
-        s->line_color = (style&STYLE_COLORED)?
-                            (style&STYLE_COLOR_MASK): -1;
         lcd_scroll_info.lines |= (1<<y);
     }
     else
@@ -986,13 +975,13 @@ void lcd_scroll_fn(void)
         if (TIME_BEFORE(current_tick, s->start_tick))
             continue;
 
-        if (s->line_color >= 0) {
-            if (s->invert) {
+        if (s->style&STYLE_COLORED) {
+            if (s->style&STYLE_MODE_MASK) {
                 fg_pattern = old_fgcolor;
-                bg_pattern = s->line_color;
+                bg_pattern = s->style&STYLE_COLOR_MASK;
             }
             else {
-                fg_pattern = s->line_color;
+                fg_pattern = s->style&STYLE_COLOR_MASK;
                 bg_pattern = old_bgcolor;
             }
         }
@@ -1027,20 +1016,26 @@ void lcd_scroll_fn(void)
         }
 
         lastmode = drawmode;
-        drawmode = s->invert == 1 ?
-            (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
-        if (s->invert == 2) {
-            /* Solid colour line selector */
-            drawmode = DRMODE_FG;
-            fg_pattern = lss_pattern;
-            lcd_fillrect(0, ypos, LCD_WIDTH, pf->height);
-            fg_pattern = lst_pattern;
-        }
-        else if (s->invert == 3) {
-            /* Gradient line selector */
-            drawmode = DRMODE_FG;
-            lcd_gradient_rect(0, LCD_WIDTH, ypos, (signed)pf->height);
-            fg_pattern = lst_pattern;
+        switch (s->style&STYLE_MODE_MASK) {
+            case STYLE_INVERT:
+                drawmode = DRMODE_SOLID|DRMODE_INVERSEVID;
+                break;
+            case STYLE_COLORBAR:
+                /* Solid colour line selector */
+                drawmode = DRMODE_FG;
+                fg_pattern = lss_pattern;
+                lcd_fillrect(0, ypos, LCD_WIDTH, pf->height);
+                fg_pattern = lst_pattern;
+                break;
+            case STYLE_GRADIENT:
+                /* Gradient line selector */
+                drawmode = DRMODE_FG;
+                lcd_gradient_rect(0, LCD_WIDTH, ypos, (signed)pf->height);
+                fg_pattern = lst_pattern;
+                break;
+            default:
+                drawmode = DRMODE_SOLID;
+                break;
         }
         lcd_putsxyofs(xpos, ypos, s->offset, s->line);
         drawmode = lastmode;
