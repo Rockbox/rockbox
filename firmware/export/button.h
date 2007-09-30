@@ -57,7 +57,8 @@ int button_apply_acceleration(unsigned int data, unsigned int factor);
 #define BUTTON_NONE    0x00000000
 
 /* Button modifiers */
-#define BUTTON_REL     0x02000000
-#define BUTTON_REPEAT  0x04000000
+#define BUTTON_REL      0x02000000
+#define BUTTON_REPEAT   0x04000000
+#define BUTTON_TOUCHPAD 0x08000000
 
 #endif /* _BUTTON_H_ */
