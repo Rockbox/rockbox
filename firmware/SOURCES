@@ -333,7 +333,7 @@ target/arm/crt0-pp.S
 #elif CONFIG_CPU == PNX0101
 target/arm/pnx0101/crt0-pnx0101.S
 #elif defined(OLYMPUS_MROBE_500)
-target/arm/olympus/mrobe-500/crt0.S
+target/arm/tms320dm320/mrobe-500/crt0.S
 #elif defined(CPU_ARM)
 target/arm/crt0.S
 #endif /* defined(CPU_*) */
@@ -622,18 +622,18 @@ target/arm/imx31/gigabeat-s/pcm-imx31.c
 
 #ifdef MROBE_500
 #ifndef SIMULATOR
-target/arm/olympus/mrobe-500/adc-mr500.c
-target/arm/olympus/mrobe-500/ata-mr500.c
-target/arm/olympus/mrobe-500/backlight-mr500.c
-target/arm/olympus/mrobe-500/button-mr500.c
-target/arm/olympus/mrobe-500/kernel-mr500.c
-target/arm/olympus/mrobe-500/lcd-mr500.c
-target/arm/olympus/mrobe-500/power-mr500.c
-target/arm/olympus/mrobe-500/system-mr500.c
-target/arm/olympus/mrobe-500/timer-mr500.c
-target/arm/olympus/mrobe-500/usb-mr500.c
-target/arm/olympus/mrobe-500/uart-mr500.c
-target/arm/olympus/mrobe-500/spi-mr500.c
+target/arm/tms320dm320/mrobe-500/adc-mr500.c
+target/arm/tms320dm320/mrobe-500/ata-mr500.c
+target/arm/tms320dm320/mrobe-500/backlight-mr500.c
+target/arm/tms320dm320/mrobe-500/button-mr500.c
+target/arm/tms320dm320/mrobe-500/kernel-mr500.c
+target/arm/tms320dm320/mrobe-500/lcd-mr500.c
+target/arm/tms320dm320/mrobe-500/power-mr500.c
+target/arm/tms320dm320/mrobe-500/system-mr500.c
+target/arm/tms320dm320/mrobe-500/timer-mr500.c
+target/arm/tms320dm320/mrobe-500/usb-mr500.c
+target/arm/tms320dm320/mrobe-500/uart-mr500.c
+target/arm/tms320dm320/mrobe-500/spi-mr500.c
 #ifndef BOOTLOADER
 
 #endif

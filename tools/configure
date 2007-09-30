@@ -1301,7 +1301,7 @@ EOF
     bootoutput="rockbox.mrboot"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
-    t_manufacturer="olympus"
+    t_manufacturer="tms320dm320"
     t_model="mrobe-500"
     ;;
 
