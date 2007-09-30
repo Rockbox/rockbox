@@ -27,7 +27,7 @@
 #define OLYMPUS_MROBE_500 1
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 19
+#define MODEL_NUMBER 22
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP

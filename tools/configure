@@ -1287,7 +1287,7 @@ EOF
     target="-DMROBE_500"
     memory=64 # always
     arm9tdmicc
-    tool="$rootdir/tools/scramble -add=giga"
+    tool="$rootdir/tools/scramble -add=m500"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mrobe500"

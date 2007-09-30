@@ -10,7 +10,7 @@ OUTPUT_ARCH(arm)
 #ifdef CPU_PP
 INPUT(target/arm/crt0-pp-bl.o)
 #elif defined(OLYMPUS_MROBE_500)
-INPUT(target/arm/tms320dm320/mrobe-500/crt0.o)
+INPUT(target/arm/tms320dm320/crt0.o)
 #else
 INPUT(target/arm/crt0.o)
 #endif
