@@ -63,8 +63,8 @@ INPUT(target/sh/crt0.o)
 #define IRAM DRAM
 #elif CONFIG_CPU==DM320
 #define DRAMORIG 0x00900000 + STUBOFFSET
-#define IRAMORIG 0x00000100
-#define IRAMSIZE 0x4000-0x100
+#define IRAMORIG 0x00000000
+#define IRAMSIZE 0x4000
 #elif CONFIG_CPU==IMX31L
 #define DRAMORIG (0x80000000 + STUBOFFSET)
 #define IRAMORIG 0x1FFFC000
@@ -152,7 +152,11 @@ SECTIONS
     }
 
 #if defined(CPU_ARM)
+#if CONFIG_CPU==DM320
+    .vectors IRAMORIG :
+#else
     .vectors 0x0 :
+#endif
     {
         _vectorsstart = .;
         *(.vectors);
@@ -160,6 +164,8 @@ SECTIONS
 #if CONFIG_CPU==PNX0101
         *(.dmabuf)
     } >IRAM0 AT> DRAM
+#elif CONFIG_CPU==DM320
+    } AT> IRAM
 #else
     } AT> DRAM
 #endif
@@ -169,7 +175,7 @@ SECTIONS
 
 #if CONFIG_CPU==PNX0101
     .iram IRAMORIG + SIZEOF(.vectors) :
-#elif CONFIG_CPU==S3C2440
+#elif CONFIG_CPU==S3C2440 || CONFIG_CPU==DM320
     .iram :
 #else
     .iram IRAMORIG :
