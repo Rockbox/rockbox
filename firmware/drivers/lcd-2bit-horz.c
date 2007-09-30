@@ -886,9 +886,8 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
     s = &lcd_scroll_info.scroll[y];
 
     s->start_tick = current_tick + lcd_scroll_info.delay;
-    s->invert = false;
+    s->style = style;
     if (style & STYLE_INVERT) {
-        s->invert = true;
         lcd_puts_style_offset(x,y,string,STYLE_INVERT,offset);
     }
     else
@@ -984,7 +983,7 @@ void lcd_scroll_fn(void)
         }
 
         lastmode = drawmode;
-        drawmode = s->invert ?
+        drawmode = (s->style&STYLE_INVERT) ?
             (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
         lcd_putsxyofs(xpos, ypos, s->offset, s->line);
         drawmode = lastmode;

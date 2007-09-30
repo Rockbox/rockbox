@@ -685,9 +685,8 @@ void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *stri
     s = &lcd_remote_scroll_info.scroll[y];
 
     s->start_tick = current_tick + lcd_remote_scroll_info.delay;
-    s->invert = false;
+    s->style = style;
     if (style & STYLE_INVERT) {
-        s->invert = true;
         lcd_remote_puts_style_offset(x,y,string,STYLE_INVERT,offset);
     }
     else
@@ -783,7 +782,7 @@ void lcd_remote_scroll_fn(void)
         }
 
         lastmode = drawmode;
-        drawmode = s->invert ?
+        drawmode = (s->style&STYLE_INVERT) ?
             (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
         lcd_remote_putsxyofs(xpos, ypos, s->offset, s->line);
         drawmode = lastmode;

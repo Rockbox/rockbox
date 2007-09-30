@@ -43,11 +43,7 @@ struct scrollinfo
     int startx;
 #ifdef HAVE_LCD_BITMAP
     int width;  /* length of line in pixels */
-#ifdef HAVE_LCD_COLOR
     int style; /* line style */
-#else
-    bool invert; /* invert the scrolled text */
-#endif
 #endif/* HAVE_LCD_BITMAP */
     bool backward; /* scroll presently forward or backward? */
     bool bidir;
