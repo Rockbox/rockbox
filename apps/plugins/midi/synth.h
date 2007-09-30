@@ -16,20 +16,37 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig);
 signed short int synthVoice(struct SynthObject * so);
 void setPoint(struct SynthObject * so, int pt);
 
 static inline void synthSample(int * mixL, int * mixR)
 {
-   register int dL=0;
-   register int dR=0;
-   register short sample=0;
-   register struct SynthObject *voicept=voices;
-   struct SynthObject *lastvoice=&voices[MAX_VOICES];
+    int i;
+    register int dL=0;
+    register int dR=0;
+    register short sample = 0;
+    register struct SynthObject *voicept=voices;
 
-    while(voicept!=lastvoice)
+    for(i=MAX_VOICES/2; i > 0; i--)
+    {
+        if(voicept->isUsed==1)
+        {
+            sample = synthVoice(voicept);
+            dL += (sample*chPanLeft[voicept->ch])>>7;
+            dR += (sample*chPanRight[voicept->ch])>>7;
+        }
+        voicept++;
+        if(voicept->isUsed==1)
+        {
+            sample = synthVoice(voicept);
+            dL += (sample*chPanLeft[voicept->ch])>>7;
+            dR += (sample*chPanRight[voicept->ch])>>7;
+        }
+        voicept++;
+    }
+
+    for(i=MAX_VOICES%2; i > 0; i--)
     {
         if(voicept->isUsed==1)
         {
