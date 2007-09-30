@@ -24,7 +24,8 @@
 #ifndef __DM320_H__
 #define __DM320_H__
 
-#define FRAME ((short *) (0x4470000))
+#define LCD_BUFFER_SIZE (640*480*4)
+#define FRAME ((short *) (0x4900000-LCD_BUFFER_SIZE)) /* Put the buffer at the end of mem */
 
 #define PHY_IO_BASE 0x00030000
 #define DM320_REG(addr) (*(volatile unsigned short *)(PHY_IO_BASE + (addr)))
@@ -314,7 +315,6 @@
 #define IO_CCD_BLKCMP0            0x0728
 #define IO_CCD_BLKCMP1            0x072A
 #define IO_CCD_MEDFILT            0x072C
-#define IO_CCD_RYEGAN             0x072E /* this is kept on the odd chance that some code is using the misspelled reg */
 #define IO_CCD_RYEGAIN            0x072E
 #define IO_CCD_GRCYGAIN           0x0730
 #define IO_CCD_GBGGAIN            0x0732

@@ -162,7 +162,7 @@ void main(void)
     printf("Loading firmware");
 
     loadbuffer = (unsigned char*) 0x00900000;
-    buffer_size = (unsigned char*)0x00100000 - loadbuffer;
+    buffer_size = (unsigned char*)0x04900000 - loadbuffer;
 
     rc = load_firmware(loadbuffer, BOOTFILE, buffer_size);
     if(rc < 0)

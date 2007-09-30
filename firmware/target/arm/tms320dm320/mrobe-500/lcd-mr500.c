@@ -167,8 +167,9 @@ void lcd_yuv_blit(unsigned char * const src[3],
 
     do
     {
-        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
+/*        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
                                stride);
+                               */
         yuv_src[0] += stride << 1; /* Skip down two luma lines */
         yuv_src[1] += stride >> 1; /* Skip down one chroma line */
         yuv_src[2] += stride >> 1;

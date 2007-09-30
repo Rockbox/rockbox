@@ -194,8 +194,10 @@ data_abort_handler:
     mov    r1, #2
     b      UIE
 
+#if defined(STUB) || defined(BOOTLOADER)
 UIE:
     b UIE
+#endif
 
 /* 256 words of IRQ stack */
     .space 256*4

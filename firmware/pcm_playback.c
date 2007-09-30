@@ -50,7 +50,8 @@ void pcm_play_pause_unpause(void);
 
 /** Functions that require targeted implementation **/
 
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == S3C2440) || (CONFIG_CPU == IMX31L)
+#if defined(CPU_COLDFIRE) || (CONFIG_CPU == S3C2440) || (CONFIG_CPU == IMX31L) \
+    || (CONFIG_CPU == DM320)
 /* Implemented in target/... */
 #else
 /* dummy functions for those not actually supporting all this yet */
@@ -71,7 +72,7 @@ void pcm_mute(bool mute)
 #endif /* defined(CPU_COLDFIRE) || (CONFIG_CPU == S3C2440) */
 
 #if defined(CPU_COLDFIRE) || (CONFIG_CPU == S3C2440) || defined(CPU_PP) \
-    || (CONFIG_CPU == IMX31L)
+    || (CONFIG_CPU == IMX31L) || (CONFIG_CPU == DM320)
 /* Implemented in target/... */
 #else
 static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
