@@ -159,6 +159,14 @@ void queue_wait(struct event_queue *q, struct event *ev)
 {
     unsigned int rd;
 
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    if (q->send && q->send->curr_sender)
+    {
+        /* auto-reply */
+        queue_release_sender(&q->send->curr_sender, 0);
+    }
+#endif
+
     if (q->read == q->write)
     {
         block_thread(&q->thread);
@@ -178,6 +186,14 @@ void queue_wait(struct event_queue *q, struct event *ev)
 
 void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 {
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    if (q->send && q->send->curr_sender)
+    {
+        /* auto-reply */
+        queue_release_sender(&q->send->curr_sender, 0);
+    }
+#endif
+
     if (q->read == q->write && ticks > 0)
     {
         block_thread_w_tmo(&q->thread, ticks);

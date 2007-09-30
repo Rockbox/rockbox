@@ -3598,8 +3598,6 @@ static void audio_thread(void)
     
     while (1) 
     {
-        intptr_t result = 0;
-
         if (filling)
         {
             queue_wait_w_tmo(&audio_queue, &ev, 0);
@@ -3685,12 +3683,12 @@ static void audio_thread(void)
 
             case Q_AUDIO_REBUFFER_SEEK:
                 LOGFQUEUE("audio < Q_AUDIO_REBUFFER_SEEK");
-                result = audio_rebuffer_and_seek(ev.data);
+                queue_reply(&audio_queue, audio_rebuffer_and_seek(ev.data));
                 break;
 
             case Q_AUDIO_CHECK_NEW_TRACK:
                 LOGFQUEUE("audio < Q_AUDIO_CHECK_NEW_TRACK");
-                result = audio_check_new_track();
+                queue_reply(&audio_queue, audio_check_new_track());
                 break;
 
             case Q_AUDIO_DIR_SKIP:
@@ -3729,8 +3727,6 @@ static void audio_thread(void)
             default:
                 LOGFQUEUE("audio < default");
         } /* end switch */
-
-        queue_reply(&audio_queue, result);
     } /* end while */
 }
 

@@ -1358,7 +1358,6 @@ static void pcmrec_stop(void)
     if (is_recording)
     {
         dma_lock = true;    /* lock dma write position */
-        queue_reply(&pcmrec_queue, 0);
 
         /* flush all available data first to avoid overflow while waiting
            for encoding to finish */
@@ -1519,15 +1518,11 @@ static void pcmrec_thread(void)
                 if (is_recording)
                     break;
                 pcmrec_close();
-                /* Be sure other threads are released if waiting */
-                queue_clear(&pcmrec_queue);
-                flush_interrupts = 0;
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&pcmrec_queue);
+                flush_interrupts = 0;
                 break;
         } /* end switch */
-
-        queue_reply(&pcmrec_queue, 0);
     } /* end while */
 } /* pcmrec_thread */
 

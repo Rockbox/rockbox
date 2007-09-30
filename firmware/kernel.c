@@ -38,8 +38,6 @@ void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 static struct event_queue *all_queues[32] NOCACHEBSS_ATTR;
 static int num_queues NOCACHEBSS_ATTR;
 
-void queue_wait(struct event_queue *q, struct event *ev) ICODE_ATTR;
-
 /****************************************************************************
  * Standard kernel stuff
  ****************************************************************************/
@@ -234,7 +232,15 @@ void queue_wait(struct event_queue *q, struct event *ev)
     int oldlevel;
     unsigned int rd;
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);    
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    if(q->send && q->send->curr_sender)
+    {
+        /* auto-reply */
+        queue_release_sender(&q->send->curr_sender, 0);
+    }
+#endif
     
     if (q->read == q->write)
     {
@@ -259,6 +265,14 @@ void queue_wait(struct event_queue *q, struct event *ev)
 void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    if (q->send && q->send->curr_sender)
+    {
+        /* auto-reply */
+        queue_release_sender(&q->send->curr_sender, 0);
+    }
+#endif
     
     if (q->read == q->write && ticks > 0)
     {
