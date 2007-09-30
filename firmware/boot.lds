@@ -164,6 +164,7 @@ SECTIONS
          _edata = .;
          *(.bss*);
          *(.ibss);
+         *(COMMON)
          _end = .;
      }
 }
@@ -214,9 +215,10 @@ SECTIONS
          _edata = .;
          *(.bss*);
          *(.ibss);
+         *(COMMON)
          _end = .;
      }>DRAM
-     
+
     .vectors 0x0 :
     {
         loadaddress = .;
