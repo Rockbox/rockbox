@@ -31,7 +31,7 @@
 #define SAMPLE_RATE SAMPR_44  // 44100 22050 11025
 #endif
 
-#define MAX_VOICES 25 // Note: 24 midi channels is the minimum general midi
+#define MAX_VOICES 23 // Note: 24 midi channels is the minimum general midi
                         // spec implementation
 
 #else	// Simulator requires 44100, and we can afford to use more voices
