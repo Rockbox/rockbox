@@ -229,7 +229,7 @@ void setPoint(struct SynthObject * so, int pt)
      * default this to 10, and maybe later have an option to set it to 9
      * for longer decays.
      */
-    so->curRate = r<<11;
+    so->curRate = r<<10;
 
     /*
      * Do this here because the patches assume a 44100 sampling rate
