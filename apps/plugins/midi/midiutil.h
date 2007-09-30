@@ -138,9 +138,7 @@ struct Track
 };
 
 int printf(const char *fmt, ...);
-int midimain(void * filename);
 unsigned char readChar(int file);
-inline void setPoint(struct SynthObject * so, int pt);
 int readTwoBytes(int file);
 int readFourBytes(int file);
 int readVarData(int file);

@@ -21,13 +21,20 @@
 #include "guspat.h"
 #include "synth.h"
 
-void setVolScale(int a);
-
 extern struct plugin_api * rb;
 
 long tempo=375000;
 
-inline void setVol(int ch, int vol)
+/* Sets the volume scaling by channel volume and note volume */
+/* This way we can do the multiplication/indexing once per   */
+/* MIDI event at the most, instead of once per sample.       */
+static inline void setVolScale(int a)
+{
+    struct SynthObject * so = &voices[a];
+    so->volscale = ((signed short int)so->vol*(signed short int)chVol[so->ch]);
+}
+
+static inline void setVol(int ch, int vol)
 {
     int a=0;
     chVol[ch]=vol;
@@ -39,7 +46,7 @@ inline void setVol(int ch, int vol)
             setVolScale(a);
 }
 
-inline void setPan(int ch, int pan)
+static inline void setPan(int ch, int pan)
 {
 //    printf("\npanning[%d]  %d ==> %d", ch, chPanRight[ch], pan);
 
@@ -48,7 +55,7 @@ inline void setPan(int ch, int pan)
 }
 
 
-inline void setPatch(int ch, int pat)
+static inline void setPatch(int ch, int pat)
 {
     chPat[ch]=pat;
 }
@@ -123,7 +130,7 @@ const uint32_t pitchTbl[] ICONST_ATTR={
    73297,73330,73363,73396,73429,73462,73495,73528
 };
 
-void findDelta(struct SynthObject * so, int ch, int note)
+static void findDelta(struct SynthObject * so, int ch, int note)
 {
 
     struct GWaveform * wf = patchSet[chPat[ch]]->waveforms[patchSet[chPat[ch]]->noteTable[note]];
@@ -136,7 +143,7 @@ void findDelta(struct SynthObject * so, int ch, int note)
     so->delta = delta;
 }
 
-inline void setPW(int ch, int msb, int lsb)
+static inline void setPW(int ch, int msb, int lsb)
 {
     chPW[ch] = msb<<2|lsb>>5;
 
@@ -150,16 +157,7 @@ inline void setPW(int ch, int msb, int lsb)
     }
 }
 
-/* Sets the volume scaling by channel volume and note volume */
-/* This way we can do the multiplication/indexing once per   */
-/* MIDI event at the most, instead of once per sample.       */
-void setVolScale(int a)
-{
-    struct SynthObject * so = &voices[a];
-    so->volscale = ((signed short int)so->vol*(signed short int)chVol[so->ch]);
-}
-
-void pressNote(int ch, int note, int vol)
+static void pressNote(int ch, int note, int vol)
 {
     static int lastKill = 0;
 /* Silences all channels but one, for easy debugging, for me. */
@@ -251,9 +249,8 @@ void pressNote(int ch, int note, int vol)
         }
     }
 }
-inline void stopVoice(struct SynthObject * so);
 
-void releaseNote(int ch, int note)
+static void releaseNote(int ch, int note)
 {
 
     if(ch==9)

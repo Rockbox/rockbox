@@ -191,6 +191,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 
 #define getSample(s,wf) ((short *)(wf)->data)[s]
 
+void setPoint(struct SynthObject * so, int pt) ICODE_ATTR;
 void setPoint(struct SynthObject * so, int pt)
 {
     if(so->ch==9) /* Drums, no ADSR */
@@ -246,7 +247,6 @@ void setPoint(struct SynthObject * so, int pt)
     if(pt==0)
         so->curOffset = 0;
 }
-
 
 inline void stopVoice(struct SynthObject * so)
 {

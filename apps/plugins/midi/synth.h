@@ -19,6 +19,7 @@
 
 int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig);
 signed short int synthVoice(struct SynthObject * so);
+void setPoint(struct SynthObject * so, int pt);
 
 static inline void synthSample(int * mixL, int * mixR)
 {

@@ -97,6 +97,8 @@ int32_t gmbuf[BUF_SIZE*NBUF];
 int quit=0;
 struct plugin_api * rb;
 
+static int midimain(void * filename);
+
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int retval = 0;
@@ -134,7 +136,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
 #endif
-
     rb->splash(HZ, "FINISHED PLAYING");
 
     if(retval == -1)
@@ -196,7 +197,7 @@ void get_more(unsigned char** start, size_t* size)
 #endif
 }
 
-int midimain(void * filename)
+static int midimain(void * filename)
 {
     int notesUsed = 0;
     int a=0;
