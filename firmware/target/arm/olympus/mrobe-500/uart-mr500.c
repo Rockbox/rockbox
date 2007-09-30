@@ -23,7 +23,10 @@
 
 /* UART 0/1 */
 
-#define CONFIG_UART_BRSR            87
+#define CONFIG_UART_BRSR    87
+#define MAX_UART_BUFFER     32
+static unsigned char uart1buffer[MAX_UART_BUFFER];
+int uart1read = 0, uart1write = 0, uart1count = 0;
 
 void do_checksums(char *data, int len, char *xor, char *add)
 {
@@ -37,10 +40,24 @@ void do_checksums(char *data, int len, char *xor, char *add)
     }
 }
 
-void uartSetup(void) {
+void uart_init(void) 
+{
     // 8-N-1
     IO_UART1_MSR=0x8000;
     IO_UART1_BRSR=CONFIG_UART_BRSR;
+    IO_UART1_RFCR = 0x8000;
+    /* gio 27 is input, uart1 rx
+       gio 28 is output, uart1 tx */
+    IO_GIO_DIR1 |=  (1<<11); /* gio 27 */
+    IO_GIO_DIR1 &= ~(1<<12); /* gio 28 */
+    
+    /* init the recieve buffer */
+    uart1read = 0;
+    uart1write = 0;
+    uart1count = 0;
+    
+    /* Enable the interrupt */
+    IO_INTC_EINT0 |= (1<<IRQ_UART1);
 }
 
 void uartPutc(char ch) {
@@ -111,10 +128,10 @@ int uartPollch(unsigned int ticks) {
 
 bool uartAvailable(void)
 {
-    return (IO_UART1_RFCR & 0x3f)?true:false;
+    return uart1count > 0;
 }
 
-void uartHeartbeat(void)
+void uart1_heartbeat(void)
 {
     char data[5] = {0x11, 0x30, 0x11^0x30, 0x11+0x30, '\0'};
     uartPuts(data);
@@ -125,4 +142,31 @@ void uartSendData(char* data, int len)
     int i;
     for(i=0;i<len;i++)
         uartPutc(data[i]);
+}
+
+bool uart1_getch(char *c)
+{
+    if (uart1count > 0)
+    {
+        *c = uart1buffer[uart1read];
+        uart1read = (uart1read+1) % MAX_UART_BUFFER;
+        uart1count--;
+        return true;
+    }
+    return false;
+}
+
+/* UART1 receive intterupt handler */
+void UART1(void)
+{
+    if (IO_UART1_RFCR & 0x3f)
+    {
+        if (uart1count >= MAX_UART_BUFFER)
+            panicf("UART1 buffer overflow");
+        uart1buffer[uart1write] = IO_UART1_DTRR & 0xff;
+        uart1write = (uart1write+1) % MAX_UART_BUFFER;
+        uart1count++;
+    }
+    
+    IO_INTC_IRQ0 = (1<<IRQ_UART1);
 }

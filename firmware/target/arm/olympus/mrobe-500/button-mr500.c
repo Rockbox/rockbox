@@ -37,7 +37,7 @@
 void button_init_device(void)
 {
     /* GIO is the power button, set as input */
-    IO_GIO_DIR0|=0x01;
+    IO_GIO_DIR0 |= 0x01;
 }
 
 inline bool button_hold(void)
@@ -48,20 +48,17 @@ inline bool button_hold(void)
 int button_read_device(void)
 {
     char data[5], c;
-    int val;
     int i = 0;
-    int btn = BUTTON_NONE, timeout = BUTTON_TIMEOUT;
+    int btn = BUTTON_NONE;
     
     if ((IO_GIO_BITSET0&0x01) == 0)
         btn |= BUTTON_POWER;
         
-    uartHeartbeat();
-    while (timeout > 0)
+    uart1_heartbeat();
+    while (uartAvailable())
     {
-        val = uartPollch(BUTTON_TIMEOUT*100);
-        if (val > -1)
+        if (uart1_getch(&c))
         {
-            c = val&0xff;
             if (i && (data[0] == BUTTON_START_BYTE || data[0] == BUTTON_START_BYTE2))
             {
                 data[i++] = c;
@@ -94,7 +91,6 @@ int button_read_device(void)
                 break;
             }
         }
-        timeout--;
     }
     return btn;
 }

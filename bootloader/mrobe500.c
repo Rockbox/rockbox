@@ -58,7 +58,7 @@ void main(void)
     adc_init();
     button_init();
     backlight_init();
-    uartSetup();
+    uart_init();
 
     font_init();
     spi_init();
@@ -104,6 +104,8 @@ void main(void)
     while(true)
     {
         button = button_read_device();
+        if (button)
+            printf("btn: %x", button);
         if (button == BUTTON_POWER)
         {
             printf("reset");
@@ -121,6 +123,7 @@ void main(void)
    //     if ((IO_GIO_BITSET0&(1<<14) == 0)
         {
             short x,y,z1,z2, reg;
+            extern int uart1count;
             tsc2100_read_values(&x, &y, &z1, &z2);
             printf("x: %04x y: %04x z1: %04x z2: %04x", x, y, z1, z2);
             printf("tsadc: %4x", tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS)&0xffff);
@@ -128,8 +131,10 @@ void main(void)
             printf("Address: 0x%08x Data: 0x%08x", address, *address);
             printf("Address: 0x%08x Data: 0x%08x", address+1, *(address+1));
             printf("Address: 0x%08x Data: 0x%08x", address+2, *(address+2));
+            printf("uart1count: %d", uart1count);
+            printf("%x %x", IO_UART1_RFCR & 0x3f, IO_UART1_DTRR & 0xff);
             tsc2100_keyclick(); /* doesnt work :( */
-            line -= 6;
+            line -= 8;
         }
     }
 #endif

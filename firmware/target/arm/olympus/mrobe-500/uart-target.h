@@ -20,12 +20,14 @@
 #ifndef UART_H
 #define UART_H
 
-void uartPutc(char ch);
-void uartPutHex(unsigned int n);
-void uartSetup(void);
+void uart_init(void);
+bool uart1_getch(char *c);
+void uart1_heartbeat(void);
+
 void uartPuts(const char *str);
 void uartGets(char *str, unsigned int size);
 int  uartPollch(unsigned int ticks);
-void uartHeartbeat(void);
+void uartPutc(char ch);
+void uartPutHex(unsigned int n);
 
 #endif
