@@ -99,12 +99,8 @@ void lcd_invertscroll(int x, int y)
     if((unsigned)y>=LCD_SCROLLABLE_LINES) return;
 
     s = &lcd_scroll_info.scroll[y];
-#ifdef HAVE_LCD_COLOR
     s->style = !s->style; /* FIXME: now that the setting isn't bool this seems
                                     flawed. */
-#else
-    s->invert = !s->invert;
-#endif
 }
 
 void lcd_scroll_step(int step)
@@ -147,12 +143,8 @@ void lcd_remote_invertscroll(int x, int y)
     if((unsigned)y>=LCD_REMOTE_SCROLLABLE_LINES) return;
 
     s = &lcd_remote_scroll_info.scroll[y];
-#ifdef HAVE_LCD_COLOR
     s->style = !s->style; /* FIXME: now that the setting isn't bool this seems
                                     flawed. */
-#else
-    s->invert = !s->invert;
-#endif
 }
 
 void lcd_remote_stop_scroll(void)
