@@ -16,15 +16,16 @@ CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
 all:
 	@echo "Run make in your build directory!"
 
-scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o
+scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o
 descramble: descramble.o iriver.o gigabeat.o
 
-scramble.o: scramble.c iriver.h mi4.h gigabeat.h
+scramble.o: scramble.c iriver.h mi4.h gigabeat.h telechips.h
 descramble.o: descramble.c iriver.h gigabeat.h
 iriver.o: iriver.c iriver.h
 gigabeat.o: gigabeat.c gigabeat.h
 gigabeats.o: gigabeats.c gigabeats.h
 mi4.o: mi4.c mi4.h
+telechips.o: telechips.c telechips.h
 
 sh2d: sh2d.c
 

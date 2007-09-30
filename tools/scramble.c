@@ -25,6 +25,7 @@
 #include "gigabeat.h"
 #include "gigabeats.h"
 #include "mi4.h"
+#include "telechips.h"
 
 int iaudio_encode(char *iname, char *oname, char *idstring);
 int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc);
@@ -102,6 +103,7 @@ void usage(void)
            "\t        -model=XXXX   where XXXX is the model id string\n"
            "\t        -type=XXXX    where XXXX is a string indicating the \n"
            "\t                      type of binary, eg. RBOS, RBBL\n"
+           "\t-tcc=X  Telechips generic firmware format (X values: sum, crc)\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
            "\t                   ip3g, ip4g, mini, iax5, h10, h10_5gb, tpj2,\n"
@@ -127,7 +129,7 @@ int main (int argc, char** argv)
     unsigned long modelnum;
     char modelname[5];
     int model_id;
-    enum { none, scramble, xor, add } method = scramble;
+    enum { none, scramble, xor, tcc_sum, tcc_crc, add } method = scramble;
 
     model_id = ARCHOS_PLAYER;
     
@@ -184,6 +186,20 @@ int main (int argc, char** argv)
         else {
             printf("Multimedia needs an xor string\n");
             return -1;
+        }
+    }
+    else if(!strncmp(argv[1], "-tcc=", 4)) {
+        headerlen = 0;
+        iname = argv[2];
+        oname = argv[3];
+
+        if(!strcmp(&argv[1][5], "sum"))
+            method = tcc_sum;
+        else if(!strcmp(&argv[1][5], "crc"))
+            method = tcc_crc;
+        else {
+            fprintf(stderr, "unsupported TCC method: %s\n", &argv[1][5]);
+            return 2;
         }
     }
     else if(!strncmp(argv[1], "-add=", 5)) {
@@ -409,7 +425,7 @@ int main (int argc, char** argv)
             break;
     }
 
-    if(method != add) {
+    if((method == none) || (method == scramble) || (method == xor)) {
         /* calculate checksum */
         for (i=0;i<length;i++)
             crc += inbuf[i];
@@ -426,6 +442,17 @@ int main (int argc, char** argv)
             headerlen = 8;
         }
         break;
+
+        case tcc_sum:
+            memcpy(outbuf, inbuf, length); /* the input buffer to output*/
+            telechips_encode_sum(outbuf, length);
+            break;
+
+        case tcc_crc:
+            memcpy(outbuf, inbuf, length); /* the input buffer to output*/
+            telechips_encode_crc(outbuf, length);
+            break;
+
         case scramble:
             if (headerlen == 6) {
                 int2be(length, header);
@@ -488,9 +515,11 @@ int main (int argc, char** argv)
        perror(oname);
        return -1;
     }
-    if ( !fwrite(header,headerlen,1,file) ) {
-       perror(oname);
-       return -1;
+    if (headerlen > 0) {
+       if ( !fwrite(header,headerlen,1,file) ) {
+          perror(oname);
+          return -1;
+       }
     }
     if ( !fwrite(outbuf,length,1,file) ) {
        perror(oname);
