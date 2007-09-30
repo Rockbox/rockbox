@@ -633,11 +633,11 @@ target/arm/tms320dm320/mrobe-500/powermgmt-mr500.c
 target/arm/tms320dm320/mrobe-500/power-mr500.c
 target/arm/tms320dm320/mrobe-500/usb-mr500.c
 target/arm/tms320dm320/i2c-dm320.c
-target/arm/tms320dm320/kernel-mr500.c
-target/arm/tms320dm320/spi-mr500.c
-target/arm/tms320dm320/system-mr500.c
-target/arm/tms320dm320/timer-mr500.c
-target/arm/tms320dm320/uart-mr500.c
+target/arm/tms320dm320/kernel-dm320.c
+target/arm/tms320dm320/spi-dm320.c
+target/arm/tms320dm320/system-dm320.c
+target/arm/tms320dm320/timer-dm320.c
+target/arm/tms320dm320/uart-dm320.c
 #ifndef BOOTLOADER
 
 #endif
