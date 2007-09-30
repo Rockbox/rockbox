@@ -557,20 +557,20 @@ void RbUtilQt::installBootloader()
     if(blinstaller->uptodate())
     {
         int ret = QMessageBox::question(this, tr("Bootloader Installation"),
-                           tr("It seem your Bootloader is already uptodate.\n"
+                           tr("It seem your Bootloader is already up to date.\n"
                               "Do really want to install it?"),
                            QMessageBox::Ok | QMessageBox::Ignore  |QMessageBox::Cancel,
                            QMessageBox::Cancel);
         if(ret == QMessageBox::Cancel)
         {
-            logger->addItem(tr("Bootloader installation Canceled!"),LOGERROR);
+            logger->addItem(tr("Bootloader installation canceled!"),LOGERROR);
             logger->abort();
             m_error = true;
             return;
         }
         else if(ret == QMessageBox::Ignore)
         {
-            logger->addItem(tr("Bootloader installation Skipped!"),LOGERROR);
+            logger->addItem(tr("Bootloader installation skipped!"),LOGERROR);
             logger->abort();
             m_installed = true;
             return;
