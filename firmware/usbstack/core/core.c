@@ -20,12 +20,10 @@
 #include <errno.h>
 #include <string.h>
 #include <ctype.h>
-#include "usbstack.h"
-
 #include "config.h"
 
+#include "usbstack.h"
 #include "usbstack/core.h"
-#include "usbstack/config.h"
 #include "usbstack/controller.h"
 #include "usbstack/drivers/device/usb_serial.h"
 #include "usbstack/drivers/device/usb_storage.h"

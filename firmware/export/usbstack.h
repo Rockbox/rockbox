@@ -22,7 +22,15 @@
 
 #include <errno.h>
 
-#define USB_STACK_MAX_SETTINGS_NAME	32*10		/* should be enough for > 10 driver names */
+#define USB_STACK_MAX_SETTINGS_NAME     32*10       /* should be enough for > 10 driver names */
+
+/* usb stack configuration */
+#ifndef USBSTACK_CAPS
+#define USBSTACK_CAPS 0     /* default: use no controller */
+#endif
+
+#define CONTROLLER_DEVICE    (1 << 0)
+#define CONTROLLER_HOST      (1 << 1)
 
 /*
  * error codes
@@ -30,7 +38,7 @@
 #define ENOFREESLOT             1
 #define EWRONGCONTROLLERTYPE    2
 #define ENODRIVERFOUND          3
-#define EHWCRITICAL				4
+#define EHWCRITICAL             4
 
 enum usb_controller_type {
     DEVICE = 0,

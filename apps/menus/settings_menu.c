@@ -516,12 +516,17 @@ int usbdriver_menuitem(void)
     return false;
 }
 
+#if USBSTACK_CAPS == (CONTROLLER_DEVICE|CONTROLLER_HOST)
 MENUITEM_SETTING(usbstack_mode, &global_settings.usb_stack_mode, NULL);
+#endif
 MENUITEM_FUNCTION(usbdriver, 0, ID2P(LANG_USBSTACK_DEVICE_DRIVER),
                   usbdriver_menuitem, 0,  NULL, Icon_NOICON);
 
 MAKE_MENU(usbstack_menu, ID2P(LANG_USBSTACK), 0, Icon_NOICON,
-                &usbstack_mode, &usbdriver);
+#if USBSTACK_CAPS == (CONTROLLER_DEVICE|CONTROLLER_HOST)
+                &usbstack_mode,
+#endif
+                &usbdriver);
 /*    USB STACK MENU               */
 /***********************************/
 #endif
