@@ -29,6 +29,14 @@ bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
 
+struct touch_calibration_point {
+    short px_x; /* known pixel value */
+    short px_y;
+    short val_x; /* touchpad value at the known pixel */
+    short val_y;
+};
+void use_calibration(bool enable);
+
 /* m:robe 500 specific button codes */
 
 #define BUTTON_POWER        0x00000001

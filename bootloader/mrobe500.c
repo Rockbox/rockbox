@@ -41,8 +41,58 @@
 #include "spi.h"
 #include "uart-target.h"
 #include "tsc2100.h"
+#include "time.h"
 
 extern int line;
+
+struct touch_calibration_point tl, br;
+
+void touchpad_get_one_point(struct touch_calibration_point *p)
+{
+    int data = 0;
+    int start = current_tick;
+    while (TIME_AFTER(start+(HZ/3), current_tick))
+    {
+        if (button_read_device()&BUTTON_TOUCHPAD)
+        {
+            data = button_get_last_touch();
+            p->val_x = data>>16;
+            p->val_y = data&0xffff;
+            start = current_tick;
+        }
+        else if (data == 0)
+            start = current_tick;
+    }
+}
+
+#define MARGIN 25
+#define LEN    7
+void touchpad_calibrate_screen(void)
+{
+    reset_screen();
+    printf("touch the center of the crosshairs to calibrate");
+    /* get the topleft value */
+    lcd_hline(MARGIN-LEN, MARGIN+LEN, MARGIN);
+    lcd_vline(MARGIN, MARGIN-LEN, MARGIN+LEN);
+    lcd_update();
+    tl.px_x = MARGIN; tl.px_y = MARGIN;
+    touchpad_get_one_point(&tl);
+    reset_screen();
+    printf("touch the center of the crosshairs to calibrate");
+    /* get the topright value */
+    lcd_hline(LCD_WIDTH-MARGIN-LEN, LCD_WIDTH-MARGIN+LEN, LCD_HEIGHT-MARGIN);
+    lcd_vline(LCD_WIDTH-MARGIN, LCD_HEIGHT-MARGIN-LEN, LCD_HEIGHT-MARGIN+LEN);
+    lcd_update();
+    br.px_x = LCD_WIDTH-MARGIN; br.px_y = LCD_HEIGHT-MARGIN;
+    touchpad_get_one_point(&br);
+    reset_screen();
+    line++;
+    printf("tl %d %d", tl.val_x, tl.val_y);
+    printf("br %d %d", br.val_x, br.val_y);
+    line++;
+    set_calibration_points(&tl, &br);
+}
+
 
 void main(void)
 {
@@ -101,8 +151,14 @@ void main(void)
     }
 #if 0
     int button=0, *address=0x0, count=0;
+    use_calibration(false);
+    touchpad_calibrate_screen();
+    use_calibration(true);
     while(true)
     {
+        struct tm *t = get_time();
+        printf("%d:%d:%d %d %d %d", t->tm_hour, t->tm_min, t->tm_sec, t->tm_mday, t->tm_mon, t->tm_year);
+        printf("time: %d", mktime(t));
         button = button_read_device();
         if (button == BUTTON_POWER)
         {
@@ -119,26 +175,11 @@ void main(void)
             address-=0x1000;
         if (button&BUTTON_TOUCHPAD)
         {
-            int touch = button_get_last_touch();
-            printf("x: %d, y: %d", (touch>>16), touch&0xffff);
-            line--;
+            unsigned int data = button_get_last_touch();
+            printf("x: %d, y: %d", data>>16, data&0xffff);
+            line-=3;
         }
-//         if ((IO_GIO_BITSET0&(1<<14) == 0)
-//         {
-//             short x,y,z1,z2, reg;
-//             extern int uart1count;
-//             tsc2100_read_values(&x, &y, &z1, &z2);
-//             printf("x: %04x y: %04x z1: %04x z2: %04x", x, y, z1, z2);
-//             printf("tsadc: %4x", tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS)&0xffff);
-//             printf("current tick: %04x", current_tick);
-//             printf("Address: 0x%08x Data: 0x%08x", address, *address);
-//             printf("Address: 0x%08x Data: 0x%08x", address+1, *(address+1));
-//             printf("Address: 0x%08x Data: 0x%08x", address+2, *(address+2));
-//             printf("uart1count: %d", uart1count);
-//             printf("%x %x", IO_UART1_RFCR & 0x3f, IO_UART1_DTRR & 0xff);
-//             tsc2100_keyclick(); /* doesnt work :( */
-//             line -= 8;
-//         }
+        else line -=2;
     }
 #endif
     printf("ATA");
