@@ -30,7 +30,8 @@ void tsc2100_read_values(short *x, short* y, short *z1, short *z2)
     unsigned short command = 0x8000|(page << 11)|(address << 5);
     unsigned char out[] = {command >> 8, command & 0xff};
     unsigned char in[8];
-    spi_block_transfer(out, sizeof(out), in, sizeof(in));
+    spi_block_transfer(SPI_target_TSC2100, 
+                       out, sizeof(out), in, sizeof(in));
 
     *x = (in[0]<<8)|in[1];
     *y = (in[2]<<8)|in[3];
@@ -43,7 +44,8 @@ short tsc2100_readreg(int page, int address)
     unsigned short command = 0x8000|(page << 11)|(address << 5);
     unsigned char out[] = {command >> 8, command & 0xff};
     unsigned char in[2];
-    spi_block_transfer(out, sizeof(out), in, sizeof(in));
+    spi_block_transfer(SPI_target_TSC2100, 
+                       out, sizeof(out), in, sizeof(in));
     return (in[0]<<8)|in[1];
 }
 
@@ -53,7 +55,8 @@ void tsc2100_writereg(int page, int address, short value)
     unsigned short command = 0x8000|(page << 11)|(address << 5);
     unsigned char out[4] = {command >> 8, command & 0xff,
                             value >> 8,   value & 0xff};
-    spi_block_transfer(out, sizeof(out), NULL, 0);
+    spi_block_transfer(SPI_target_TSC2100, 
+                       out, sizeof(out), NULL, 0);
 }
 
 void tsc2100_keyclick(void)

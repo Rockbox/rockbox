@@ -21,9 +21,17 @@
 #define SPI_TARGET_H
 
 #include <inttypes.h>
+#include <stdbool.h>
+
+enum SPI_target {
+    SPI_target_TSC2100 = 0,
+    SPI_target_RX5X348AB,
+    SPI_MAX_TARGETS,
+};
 
 void spi_init(void);
-int spi_block_transfer(const uint8_t *tx_bytes, unsigned int tx_size,
+int spi_block_transfer(enum SPI_target target,
+                       const uint8_t *tx_bytes, unsigned int tx_size,
                              uint8_t *rx_bytes, unsigned int rx_size);
 
 #endif

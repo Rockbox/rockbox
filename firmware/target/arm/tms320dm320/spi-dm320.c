@@ -24,18 +24,43 @@
  *  with this program; if not, write  to the Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
+#include "kernel.h"
 #include "system.h"
+#include "spi.h"
 
-#define GIO_TS_ENABLE (1<<2)
-#define clr_gio_enable() IO_GIO_BITSET1=GIO_TS_ENABLE
-#define set_gio_enable() IO_GIO_BITCLR1=GIO_TS_ENABLE
+#define GIO_TS_ENABLE  (1<<2)
+#define GIO_RTC_ENABLE (1<<12)
 
-int spi_block_transfer(const uint8_t *tx_bytes, unsigned int tx_size,
+struct mutex spi_lock;
+
+struct SPI_info {
+    volatile unsigned short *setreg;
+    volatile unsigned short *clrreg;
+    int bit;
+};
+#define reg(a) (PHY_IO_BASE+a)
+struct SPI_info spi_targets[] =
+{
+    [SPI_target_TSC2100]   = { reg(0x0594), reg(0x058E), GIO_TS_ENABLE },
+    [SPI_target_RX5X348AB] = { reg(0x058C), reg(0x0592), GIO_RTC_ENABLE },
+};
+
+static void spi_disable_all_targets(void)
+{
+    int i;
+    for(i=0;i<SPI_MAX_TARGETS;i++)
+    {
+        *spi_targets[i].clrreg = spi_targets[i].bit;
+    }
+}
+
+int spi_block_transfer(enum SPI_target target,
+                       const uint8_t *tx_bytes, unsigned int tx_size,
                              uint8_t *rx_bytes, unsigned int rx_size)
 {
+    spinlock_lock(&spi_lock);
     /* Activate the slave select pin */
-    set_gio_enable();
+    *spi_targets[target].setreg = spi_targets[target].bit;
 
     while (tx_size--)
     {
@@ -58,13 +83,15 @@ int spi_block_transfer(const uint8_t *tx_bytes, unsigned int tx_size,
         *rx_bytes++ = data & 0xff;
     }
 
-    clr_gio_enable();
-
+    *spi_targets[target].clrreg = spi_targets[target].bit;
+    
+    spinlock_unlock(&spi_lock);
     return 0;
 }
 
 void spi_init(void)
 {
+    spinlock_init(&spi_lock);
     /* Set SCLK idle level = 0 */
     IO_SERIAL0_MODE |= (1<<10);
     
@@ -72,6 +99,9 @@ void spi_init(void)
     IO_SERIAL0_TX_ENABLE = 0x0001;
 
     /* Set GIO 18 to output for touch screen slave enable */
-    IO_GIO_DIR1&=~GIO_TS_ENABLE;
-    clr_gio_enable();
+    IO_GIO_DIR1 &= ~GIO_TS_ENABLE;
+    /* Set GIO 12 to output for rtc slave enable */
+    IO_GIO_DIR0 &= ~GIO_RTC_ENABLE;
+    
+    spi_disable_all_targets(); /* make sure only one is ever enabled at a time */
 }

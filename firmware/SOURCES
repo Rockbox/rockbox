@@ -146,6 +146,8 @@ drivers/rtc/rtc_ds1339_ds3231.c
 drivers/rtc/rtc_s3c2440.c
 #elif (CONFIG_RTC == RTC_AS3514)
 drivers/rtc/rtc_as3514.c
+#elif (CONFIG_RTC == RTC_RX5X348AB)
+drivers/rtc/rtc_rx5x348ab.c
 #endif /* (CONFIG_RTC == RTC_) */
 #endif /* SIMULATOR */
 
