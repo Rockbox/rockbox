@@ -11327,4 +11327,17 @@
     lcd_color: "Bar (Gradient Colour)"
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Central European (CP1250)"
+  </dest>
+  <voice>
+    *: "Central Eurpean"
+  </voice>
+</phrase>

@@ -138,7 +138,17 @@ unsigned short iso_decode(unsigned char *latin1, int cp, int count)
                     ucs = iso8859_2_to_uni[*latin1++ - 0xA1];
             }
             break;
-
+        
+        case 0x08: /* Central European (CP1250) */
+            while (count--) {
+                /* first convert to unicode */
+                if (*latin1 < 0x80)
+                    ucs = *latin1++;
+                else
+                    ucs = cp1250_to_uni[*latin1++ - 0x80];
+            }
+            break;
+            
         default:
             break;
     }
@@ -211,7 +221,7 @@ int main(int argc, char **argv)
         of = fopen("iso.cp", "wb");
         if (!of) return 1;
 
-        for (i=1; i<8; i++) {
+        for (i=1; i<9; i++) {
 
             for (j=0; j<128; j++) {
                 k = (unsigned char)j + 128;

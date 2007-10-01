@@ -11038,3 +11038,17 @@
     radio: "Menu Radia FM"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Europa Środkowa (CP1250)"
+  </source>
+  <dest>
+    *: "Europa Środkowa (CP1250)"
+  </dest>
+  <voice>
+    *: "Europa Środkowa"
+  </voice>
+</phrase>

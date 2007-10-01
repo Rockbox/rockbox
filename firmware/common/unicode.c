@@ -29,7 +29,7 @@ static int loaded_cp_table = 0;
 
 enum {
     ISO_8859_1 = 0, ISO_8859_7, ISO_8859_8, WIN_1251,
-    ISO_8859_11, WIN_1256, ISO_8859_9, ISO_8859_2,
+    ISO_8859_11, WIN_1256, ISO_8859_9, ISO_8859_2, WIN_1250,
     SJIS, GB_2312, KSX_1001, BIG_5, UTF_8, NUM_CODEPAGES
 };
 static const char *filename[NUM_TABLES] =
@@ -42,7 +42,7 @@ static const char *filename[NUM_TABLES] =
 };
 static const char cp_2_table[NUM_CODEPAGES] =
 {
-    0, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 0
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 0
 };
 
 #else /* !HAVE_LCD_BITMAP, reduced support */
@@ -51,8 +51,8 @@ static const char cp_2_table[NUM_CODEPAGES] =
 #define NUM_TABLES           1
 
 enum {
-    ISO_8859_1 = 0, ISO_8859_7, WIN_1251,
-    ISO_8859_9, ISO_8859_2, UTF_8, NUM_CODEPAGES
+    ISO_8859_1 = 0, ISO_8859_7, WIN_1251, ISO_8859_9,
+    ISO_8859_2, WIN_1250, UTF_8, NUM_CODEPAGES
 };
 static const char *filename[NUM_TABLES] =
 {
@@ -60,7 +60,7 @@ static const char *filename[NUM_TABLES] =
 };
 static const char cp_2_table[NUM_CODEPAGES] =
 {
-    0, 1, 1, 1, 1, 0
+    0, 1, 1, 1, 1, 1, 0
 };
 
 #endif
@@ -152,6 +152,7 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
                 case WIN_1251:    /* Cyrillic */
                 case ISO_8859_9:  /* Turkish */
                 case ISO_8859_2:  /* Latin Extended */
+                case WIN_1250:    /* Central European */
 #ifdef HAVE_LCD_BITMAP
                 case ISO_8859_8:  /* Hebrew */
                 case ISO_8859_11: /* Thai */
