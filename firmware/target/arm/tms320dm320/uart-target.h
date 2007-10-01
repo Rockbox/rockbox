@@ -23,11 +23,12 @@
 void uart_init(void);
 bool uart1_getch(char *c);
 void uart1_heartbeat(void);
+bool uart1_available(void);
 
-void uartPuts(const char *str);
-void uartGets(char *str, unsigned int size);
-int  uartPollch(unsigned int ticks);
-void uartPutc(char ch);
-void uartPutHex(unsigned int n);
+void uart1_puts(const char *str);
+void uart1_gets(char *str, unsigned int size);
+int  uart1_pollch(unsigned int ticks);
+void uart1_putc(char ch);
+void uart1_putHex(unsigned int n);
 
 #endif

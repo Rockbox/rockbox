@@ -84,7 +84,7 @@ int button_read_device(void)
         btn |= BUTTON_POWER;
         
     uart1_heartbeat();
-    while (uartAvailable())
+    while (uart1_available())
     {
         if (uart1_getch(&c))
         {

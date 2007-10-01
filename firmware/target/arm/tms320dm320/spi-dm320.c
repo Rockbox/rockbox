@@ -38,7 +38,7 @@ struct SPI_info {
     volatile unsigned short *clrreg;
     int bit;
 };
-#define reg(a) (PHY_IO_BASE+a)
+#define reg(a) ((volatile unsigned short *)(PHY_IO_BASE+a))
 struct SPI_info spi_targets[] =
 {
     [SPI_target_TSC2100]   = { reg(0x0594), reg(0x058E), GIO_TS_ENABLE },

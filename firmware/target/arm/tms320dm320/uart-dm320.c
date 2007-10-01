@@ -28,7 +28,8 @@
 static unsigned char uart1buffer[MAX_UART_BUFFER];
 int uart1read = 0, uart1write = 0, uart1count = 0;
 
-void do_checksums(char *data, int len, char *xor, char *add)
+/*
+static void do_checksums(char *data, int len, char *xor, char *add)
 {
     int i;
     *xor = data[0];
@@ -39,6 +40,7 @@ void do_checksums(char *data, int len, char *xor, char *add)
         *add += data[i];
     }
 }
+*/
 
 void uart_init(void) 
 {
@@ -60,46 +62,50 @@ void uart_init(void)
     IO_INTC_EINT0 |= (1<<IRQ_UART1);
 }
 
-void uartPutc(char ch) {
-    // Wait for room in FIFO
+void uart1_putc(char ch)
+{
+    /* Wait for room in FIFO */
     while ((IO_UART1_TFCR & 0x3f) >= 0x20);
     
-    // Write character
+    /* Write character */
     IO_UART1_DTRR=ch;
 }
 
-// Unsigned integer to ASCII hexadecimal conversion
-void uartPutHex(unsigned int n) {
+/* Unsigned integer to ASCII hexadecimal conversion */
+void uart1_putHex(unsigned int n)
+{
     unsigned int i;
 
     for (i = 8; i != 0; i--) {
         unsigned int digit = n >> 28;
-        uartPutc(digit >= 10 ? digit - 10 + 'A' : digit + '0');
+        uart1_putc(digit >= 10 ? digit - 10 + 'A' : digit + '0');
         n <<= 4;
     }
 }
 
-void uartPuts(const char *str) {
+void uart1_puts(const char *str)
+{
     char ch;
     while ((ch = *str++) != '\0') {
-        uartPutc(ch);
+        uart1_putc(ch);
     }
 }
 
-void uartGets(char *str, unsigned int size) {
+void uart1_gets(char *str, unsigned int size)
+{
     for (;;) {
         char ch;
         
-        // Wait for FIFO to contain something
+        /* Wait for FIFO to contain something */
         while ((IO_UART1_RFCR & 0x3f) == 0);
         
-        // Read character
+        /* Read character */
         ch = (char)IO_UART1_DTRR;
         
-        // Echo character back
+        /* Echo character back */
         IO_UART1_DTRR=ch;
         
-        // If CR, also echo LF, null-terminate, and return
+        /* If CR, also echo LF, null-terminate, and return */
         if (ch == '\r') {
             IO_UART1_DTRR='\n';
             if (size) {
@@ -108,7 +114,7 @@ void uartGets(char *str, unsigned int size) {
             return;
         }
         
-        // Append to buffer
+        /* Append to buffer */
         if (size) {
             *str++ = ch;
             --size;
@@ -116,17 +122,17 @@ void uartGets(char *str, unsigned int size) {
     }
 }
 
-int uartPollch(unsigned int ticks) {
+int uart1_pollch(unsigned int ticks)
+{
     while (ticks--) {
         if (IO_UART1_RFCR & 0x3f) {
             return IO_UART1_DTRR & 0xff;
         }
     }
-    
     return -1;
 }
 
-bool uartAvailable(void)
+bool uart1_available(void)
 {
     return uart1count > 0;
 }
@@ -134,14 +140,7 @@ bool uartAvailable(void)
 void uart1_heartbeat(void)
 {
     char data[5] = {0x11, 0x30, 0x11^0x30, 0x11+0x30, '\0'};
-    uartPuts(data);
-}
-
-void uartSendData(char* data, int len)
-{
-    int i;
-    for(i=0;i<len;i++)
-        uartPutc(data[i]);
+    uart1_puts(data);
 }
 
 bool uart1_getch(char *c)
@@ -161,12 +160,14 @@ void UART1(void)
 {
     if (IO_UART1_RFCR & 0x3f)
     {
+/*
         if (uart1count >= MAX_UART_BUFFER)
             panicf("UART1 buffer overflow");
+*/
         uart1buffer[uart1write] = IO_UART1_DTRR & 0xff;
         uart1write = (uart1write+1) % MAX_UART_BUFFER;
         uart1count++;
     }
-    
+
     IO_INTC_IRQ0 = (1<<IRQ_UART1);
 }
