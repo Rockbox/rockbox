@@ -1608,7 +1608,7 @@ static void add_tagcache(char *path, const struct dirent *dc)
 static void add_tagcache(char *path)
 #endif
 {
-    struct track_info track;
+    struct mp3entry id3;
     struct temp_file_entry entry;
     bool ret;
     int fd;
@@ -1657,10 +1657,10 @@ static void add_tagcache(char *path)
         return ;
     }
 
-    memset(&track, 0, sizeof(struct track_info));
+    memset(&id3, 0, sizeof(struct mp3entry));
     memset(&entry, 0, sizeof(struct temp_file_entry));
     memset(&tracknumfix, 0, sizeof(tracknumfix));
-    ret = get_metadata(&(track.id3), fd, path);
+    ret = get_metadata(&id3, fd, path);
     close(fd);
 
     if (!ret)
@@ -1669,7 +1669,7 @@ static void add_tagcache(char *path)
     logf("-> %s", path);
     
     /* Generate track number if missing. */
-    if (track.id3.tracknum <= 0)
+    if (id3.tracknum <= 0)
     {
         const char *p = strrchr(path, '.');
         
@@ -1689,52 +1689,52 @@ static void add_tagcache(char *path)
         
         if (tracknumfix[0] != '\0')
         {
-            track.id3.tracknum = atoi(tracknumfix);
+            id3.tracknum = atoi(tracknumfix);
             /* Set a flag to indicate track number has been generated. */
             entry.flag |= FLAG_TRKNUMGEN;
         }
         else
         {
             /* Unable to generate track number. */
-            track.id3.tracknum = -1;
+            id3.tracknum = -1;
         }
     }
     
     /* Numeric tags */
-    entry.tag_offset[tag_year] = track.id3.year;
-    entry.tag_offset[tag_discnumber] = track.id3.discnum;
-    entry.tag_offset[tag_tracknumber] = track.id3.tracknum;
-    entry.tag_offset[tag_length] = track.id3.length;
-    entry.tag_offset[tag_bitrate] = track.id3.bitrate;
+    entry.tag_offset[tag_year] = id3.year;
+    entry.tag_offset[tag_discnumber] = id3.discnum;
+    entry.tag_offset[tag_tracknumber] = id3.tracknum;
+    entry.tag_offset[tag_length] = id3.length;
+    entry.tag_offset[tag_bitrate] = id3.bitrate;
     
     /* String tags. */
-    has_albumartist = track.id3.albumartist != NULL
-        && strlen(track.id3.albumartist) > 0;
-    has_grouping = track.id3.grouping != NULL
-        && strlen(track.id3.grouping) > 0;
+    has_albumartist = id3.albumartist != NULL
+        && strlen(id3.albumartist) > 0;
+    has_grouping = id3.grouping != NULL
+        && strlen(id3.grouping) > 0;
 
     ADD_TAG(entry, tag_filename, &path);
-    ADD_TAG(entry, tag_title, &track.id3.title);
-    ADD_TAG(entry, tag_artist, &track.id3.artist);
-    ADD_TAG(entry, tag_album, &track.id3.album);
-    ADD_TAG(entry, tag_genre, &track.id3.genre_string);
-    ADD_TAG(entry, tag_composer, &track.id3.composer);
-    ADD_TAG(entry, tag_comment, &track.id3.comment);
+    ADD_TAG(entry, tag_title, &id3.title);
+    ADD_TAG(entry, tag_artist, &id3.artist);
+    ADD_TAG(entry, tag_album, &id3.album);
+    ADD_TAG(entry, tag_genre, &id3.genre_string);
+    ADD_TAG(entry, tag_composer, &id3.composer);
+    ADD_TAG(entry, tag_comment, &id3.comment);
     if (has_albumartist)
     {
-        ADD_TAG(entry, tag_albumartist, &track.id3.albumartist);
+        ADD_TAG(entry, tag_albumartist, &id3.albumartist);
     }
     else
     {
-        ADD_TAG(entry, tag_albumartist, &track.id3.artist);
+        ADD_TAG(entry, tag_albumartist, &id3.artist);
     }
     if (has_grouping)
     {
-        ADD_TAG(entry, tag_grouping, &track.id3.grouping);
+        ADD_TAG(entry, tag_grouping, &id3.grouping);
     }
     else
     {
-        ADD_TAG(entry, tag_grouping, &track.id3.title);
+        ADD_TAG(entry, tag_grouping, &id3.title);
     }
     entry.data_length = offset;
     
@@ -1743,27 +1743,27 @@ static void add_tagcache(char *path)
     
     /* And tags also... Correct order is critical */
     write_item(path);
-    write_item(track.id3.title);
-    write_item(track.id3.artist);
-    write_item(track.id3.album);
-    write_item(track.id3.genre_string);
-    write_item(track.id3.composer);
-    write_item(track.id3.comment);
+    write_item(id3.title);
+    write_item(id3.artist);
+    write_item(id3.album);
+    write_item(id3.genre_string);
+    write_item(id3.composer);
+    write_item(id3.comment);
     if (has_albumartist)
     {
-        write_item(track.id3.albumartist);
+        write_item(id3.albumartist);
     }
     else
     {
-        write_item(track.id3.artist);
+        write_item(id3.artist);
     }
     if (has_grouping)
     {
-        write_item(track.id3.grouping);
+        write_item(id3.grouping);
     }
     else
     {
-        write_item(track.id3.title);
+        write_item(id3.title);
     }
     total_entry_count++;    
 }
