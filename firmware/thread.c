@@ -1038,6 +1038,13 @@ void init_threads(void)
 
     /* CPU will initialize first and then sleep */
     slot = find_empty_thread_slot();
+#if THREAD_EXTRA_CHECKS
+    /* This can fail if, for example, .bss isn't zero'ed out by the loader
+       or threads is in the wrong section. */
+    if (slot < 0) {
+        panicf("uninitialized threads[]");
+    }
+#endif
     
     cores[core].sleeping = NULL;
     cores[core].running = NULL;
