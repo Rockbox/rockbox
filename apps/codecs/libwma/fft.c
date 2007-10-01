@@ -17,7 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "wmadec.h"
+//#include "types.h"
+#include "fft.h"
 #include "wmafixed.h"
 
 FFTComplex  exptab0[512] IBSS_ATTR;

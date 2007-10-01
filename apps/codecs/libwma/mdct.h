@@ -17,6 +17,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+//#include "types.h"
+#include "fft.h"
+
+typedef struct MDCTContext
+{
+    int n;  /* size of MDCT (i.e. number of input data * 2) */
+    int nbits; /* n = 2^nbits */
+    /* pre/post rotation tables */
+    FFTContext fft;
+}
+MDCTContext;
+
 int ff_mdct_init(MDCTContext *s, int nbits, int inverse);
 void ff_imdct_calc(MDCTContext *s, fixed32 *output, fixed32 *input);
 int mdct_init_global(void);

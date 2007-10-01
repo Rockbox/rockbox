@@ -22,6 +22,8 @@
 
 #include "asf.h"
 #include "bitstream.h" /* For GetBitContext */
+#include "types.h"
+#include "mdct.h"
 //#include "dsputil.h"  /* For MDCTContext */
 
 
@@ -51,39 +53,6 @@
 #define NOISE_TAB_SIZE 8192
 
 #define LSP_POW_BITS 7
-
-#define fixed32         int32_t
-#define fixed64         int64_t
-
-typedef fixed32 FFTSample;
-
-typedef struct FFTComplex
-{
-    fixed32 re, im;
-}
-FFTComplex;
-
-typedef struct FFTContext
-{
-    int nbits;
-    int inverse;
-    uint16_t *revtab;
-    FFTComplex *exptab;
-    FFTComplex *exptab1; /* only used by SSE code */
-    int (*fft_calc)(struct FFTContext *s, FFTComplex *z);
-}
-FFTContext;
-
-typedef struct MDCTContext
-{
-    int n;  /* size of MDCT (i.e. number of input data * 2) */
-    int nbits; /* n = 2^nbits */
-    /* pre/post rotation tables */
-    fixed32 *tcos;
-    fixed32 *tsin;
-    FFTContext fft;
-}
-MDCTContext;
 
 typedef struct WMADecodeContext
 {

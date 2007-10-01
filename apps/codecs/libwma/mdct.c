@@ -17,10 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <codecs/lib/codeclib.h>
-#include "wmadec.h"
 #include "wmafixed.h"
-#include "fft.h"
+#include "mdct.h"
 
 fixed32 tcos0[1024], tsin0[1024]; //these are the sin and cos rotations used by the MDCT
 uint16_t revtab0[1024];

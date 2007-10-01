@@ -17,6 +17,27 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "types.h"
+
+typedef fixed32 FFTSample;
+
+typedef struct FFTComplex
+{
+    fixed32 re, im;
+}
+FFTComplex;
+
+typedef struct FFTContext
+{
+    int nbits;
+    int inverse;
+    uint16_t *revtab;
+    FFTComplex *exptab;
+    FFTComplex *exptab1; /* only used by SSE code */
+    int (*fft_calc)(struct FFTContext *s, FFTComplex *z);
+}
+FFTContext;
+
 int fft_calc_unscaled(FFTContext *s, FFTComplex *z);
 int fft_init_global(void);
 

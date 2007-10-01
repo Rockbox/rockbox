@@ -28,7 +28,6 @@
 #include "wmadec.h"
 #include "wmafixed.h"
 #include "bitstream.h"
-#include "mdct.h"
 
 
 #define VLCBITS 7       /*7 is the lowest without glitching*/

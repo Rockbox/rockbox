@@ -7,6 +7,7 @@
 
 */
 
+#include "types.h"
 
 #define PRECISION       16
 #define PRECISION64     16
