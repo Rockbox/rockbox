@@ -682,7 +682,7 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, playlist_viewer_track_display, LANG_TRACK_DISPLAY, 0,
                    "playlist viewer track display","track name,full path", NULL, 2,
                     ID2P(LANG_DISPLAY_TRACK_NAME_ONLY), ID2P(LANG_DISPLAY_FULL_PATH)),
-    CHOICE_SETTING(0, recursive_dir_insert, LANG_RECURSE_DIRECTORY , RECURSE_OFF,
+    CHOICE_SETTING(0, recursive_dir_insert, LANG_RECURSE_DIRECTORY , RECURSE_ON,
         "recursive directory insert", off_on_ask, NULL , 3 ,
         ID2P(LANG_OFF), ID2P(LANG_ON), ID2P(LANG_ASK)),
     /* bookmarks */
