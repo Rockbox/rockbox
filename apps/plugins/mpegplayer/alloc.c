@@ -45,7 +45,7 @@ static void * mpeg_malloc_internal (unsigned char *mallocbuf,
 {
     void *x;
 
-    if (*mem_ptr + size > bufsize)
+    if ((size_t) (*mem_ptr + size) > bufsize)
     {
         DEBUGF("OUT OF MEMORY\n");
         return NULL;
