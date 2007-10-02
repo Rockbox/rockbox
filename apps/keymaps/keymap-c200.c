@@ -87,12 +87,12 @@ static const struct button_mapping button_context_wps[]  = {
 static const struct button_mapping button_context_settings[] = {
     { ACTION_STD_CANCEL,        BUTTON_POWER,                   BUTTON_NONE },
     { ACTION_SETTINGS_RESET,    BUTTON_SELECT,                  BUTTON_NONE },
-    
-    { ACTION_SETTINGS_INC,      BUTTON_UP,                    BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,BUTTON_UP|BUTTON_REPEAT,      BUTTON_NONE },
 
-    { ACTION_SETTINGS_DEC,      BUTTON_DOWN,                      BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_SETTINGS_INC,      BUTTON_UP,                      BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
+
+    { ACTION_SETTINGS_DEC,      BUTTON_DOWN,                    BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
    
     { ACTION_STD_PREV,          BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
@@ -241,6 +241,11 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MODE,           BUTTON_REC,                     BUTTON_NONE },
     { ACTION_FM_EXIT,           BUTTON_POWER,                   BUTTON_NONE },
     { ACTION_FM_PLAY,           BUTTON_UP|BUTTON_REL,           BUTTON_UP   },
+    { ACTION_SETTINGS_INC,      BUTTON_VOL_UP,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,      BUTTON_VOL_DOWN,                BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */
 #endif

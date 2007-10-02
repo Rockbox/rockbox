@@ -82,7 +82,11 @@ bool tuner_power_nolock(bool status)
         if (status)
         {
             /* init mystery amplification device */
+#if defined(SANSA_E200)
             outl(inl(0x70000084) | 0x1, 0x70000084);
+#else /* SANSA_C200 */
+            DEV_INIT &= ~0x800;
+#endif
             udelay(5);
 
             /* When power up, host should initialize the 3-wire bus
@@ -113,7 +117,11 @@ bool tuner_power_nolock(bool status)
             GPIOH_ENABLE &= ~((1 << 5) | (1 << 3) | (1 << 4)); 
 
             /* turn off mystery amplification device */
+#if defined (SANSA_E200)
             outl(inl(0x70000084) & ~0x1, 0x70000084);
+#else
+            DEV_INIT |= 0x800;
+#endif
         }
 
         powered = status;

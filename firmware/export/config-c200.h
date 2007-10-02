@@ -100,8 +100,8 @@
 #define AB_REPEAT_ENABLE 1
 
 /* FM Tuner */
-/* TODO: #define CONFIG_TUNER LV24020LP */
-/* TODO: #define HAVE_TUNER_PWR_CTRL */
+#define CONFIG_TUNER LV24020LP
+#define HAVE_TUNER_PWR_CTRL
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT

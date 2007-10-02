@@ -45,7 +45,9 @@
 #include "lang.h"
 #include "font.h"
 #include "sound_menu.h"
+#ifdef HAVE_RECORDING
 #include "recording.h"
+#endif
 #include "talk.h"
 #include "tuner.h"
 #include "power.h"
@@ -90,7 +92,7 @@
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define FM_RECORD_DBLPRE
 #define FM_RECORD
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || (CONFIG_KEYPAD == SANSA_C200_PAD)
 #define FM_MENU     
 #define FM_PRESET    
 #define FM_STOP
