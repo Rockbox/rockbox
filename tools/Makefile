@@ -11,7 +11,7 @@ LDFLAGS := -g
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
  generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database \
- lngdump
+ lngdump telechips gigabeats
 
 all:
 	@echo "Run make in your build directory!"
