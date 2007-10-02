@@ -25,6 +25,7 @@
  ****************************************************************************/
 
 #include "system.h"
+#include "audiohw.h"
 #include "i2c-pp.h"
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
@@ -39,7 +40,7 @@
 /*
  * Initialise the PP I2C and I2S.
  */
-int audiohw_init(void) {
+void audiohw_init(void) {
     /* reset I2C */
     i2c_init();
 
@@ -95,12 +96,17 @@ int audiohw_init(void) {
 #endif /* IPOD_1G2G/3G */
 #endif
     
-    return 0;
+#ifdef HAVE_WM8731
+    audiohw_preinit();
+#endif
+   
 }
 
+#ifndef HAVE_WM8731
 void audiohw_postinit(void)
 {
 }
+#endif
 
 void wmcodec_write(int reg, int data)
 {

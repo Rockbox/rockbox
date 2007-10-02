@@ -168,7 +168,8 @@ void fiq(void)
 
     do {
         while (p_size) {
-            if (FIFO_FREE_COUNT < 2) {
+            //if (FIFO_FREE_COUNT < 2) {
+            if (((IISFIFO_CFG & (0x1f << 16)) >> 16) < 2) {
                 /* Enable interrupt */
 #ifdef CPU_PP502x
                 IISCONFIG |= (1 << 1);
@@ -219,8 +220,10 @@ void pcm_play_dma_start(const void *addr, size_t size)
     set_fiq_handler(fiq);
     enable_fiq();
 
+#if CONFIG_CPU == PP5020
+    /* Do nothing */
+#elif defined(CPU_PP502x)
     /* Enable playback FIFO */
-#ifdef CPU_PP502x
     IISCONFIG |= (1 << 29);
 #elif CONFIG_CPU == PP5002
     IISCONFIG |= 0x4;
@@ -257,11 +260,13 @@ void pcm_play_dma_stop(void)
     if (!audio_status())
         pcm_paused = false;
 
-#ifdef CPU_PP502x
+#if CONFIG_CPU == PP5020
+    /* Disable TX interrupt */
+    IISCONFIG &= ~(1 << 1);
+#elif defined(CPU_PP502x)
     /* Disable playback FIFO and interrupt */
     IISCONFIG &= ~((1 << 29) | (1 << 1));
 #elif CONFIG_CPU == PP5002
-
     /* Disable playback FIFO */
     IISCONFIG &= ~0x4;
 
@@ -274,7 +279,10 @@ void pcm_play_dma_stop(void)
 
 void pcm_play_pause_pause(void)
 {
-#ifdef CPU_PP502x
+#if CONFIG_CPU == PP5020
+    /* Disable TX interrupt */
+    IISCONFIG &= ~(1 << 1);
+#elif defined(CPU_PP502x)
     /* Disable playback FIFO and interrupt */
     IISCONFIG &= ~((1 << 29) | (1 << 1));
 #elif CONFIG_CPU == PP5002
@@ -293,8 +301,10 @@ void pcm_play_pause_unpause(void)
     set_fiq_handler(fiq);
     enable_fiq();
 
+#if CONFIG_CPU == PP5020
+    /* Do nothing */
+#elif defined(CPU_PP502x)
     /* Enable playback FIFO */
-#ifdef CPU_PP502x
     IISCONFIG |= (1 << 29);
 #elif CONFIG_CPU == PP5002
     IISCONFIG |= 0x4;
@@ -344,14 +354,20 @@ void pcm_init(void)
     /* Initialize default register values. */
     audiohw_init();
 
+#ifndef HAVE_WM8731
     /* Power on */
     audiohw_enable_output(true);
-
     /* Unmute the master channel (DAC should be at zero point now). */
     audiohw_mute(false);
+#endif
 
     /* Call pcm_play_dma_stop to initialize everything. */
     pcm_play_dma_stop();
+
+#if CONFIG_CPU == PP5020
+    /* This processor doesn't like this disabled */
+    IISCONFIG |= (1 << 29);
+#endif
 }
 
 void pcm_postinit(void)
@@ -438,12 +454,15 @@ fiq_record_exit:
 #else
 static short peak_l, peak_r IBSS_ATTR;
 
-void fiq_record(void) ICODE_ATTR __attribute__ ((interrupt ("FIQ")));
+/* Temporary to stop playback crashing after record */
+void fiq_record(void) ICODE_ATTR __attribute__((naked));
 void fiq_record(void)
 {
-    short value;
-    pcm_more_callback_type2 more_ready;
-    int status = 0;
+    asm volatile ("stmfd sp!, {r0-r7, r11, ip, lr} \n");   /* Store context */
+
+    register short value;
+    register pcm_more_callback_type2 more_ready;
+    register int status = 0;
 
     /* Clear interrupt */
 #ifdef CPU_PP502x
@@ -460,7 +479,7 @@ void fiq_record(void)
 #elif CONFIG_CPU == PP5002
             /* TODO */
 #endif
-            return;
+            goto fiq_record_exit;
         }
 
         value = (unsigned short)(IISFIFO_RD >> 16);
@@ -486,10 +505,14 @@ void fiq_record(void)
     more_ready = pcm_callback_more_ready;
 
     if (more_ready != NULL && more_ready(status) >= 0)
-        return;
+        goto fiq_record_exit;
 
     /* Finished recording */
     pcm_rec_dma_stop();
+
+fiq_record_exit:
+    asm volatile("ldmfd sp!, {r0-r7, r11, ip, lr} \n"   /* Restore context */
+                 "subs  pc, lr, #4                \n"); /* Return from FIQ */
 }
 
 #endif /* HAVE_AS3514 */

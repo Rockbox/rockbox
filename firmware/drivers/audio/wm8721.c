@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Driver for WM8731L audio codec
+ * Driver for WM8721 audio codec
  *
  * Based on code from the ipodlinux project - http://ipodlinux.org/
  * Adapted for Rockbox in January 2006
@@ -46,11 +46,6 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  1,   0, 255, 100},
-#ifdef HAVE_RECORDING
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
-#endif
 };
 
 /* convert tenth of dB volume (-730..60) to master volume register value */
@@ -118,13 +113,8 @@ void audiohw_enable_output(bool enable)
 
         codec_set_active(0x0);
 
-#ifdef HAVE_WM8721
         /* DACSEL=1 */
         wmcodec_write(0x4, 0x10);
-#elif defined HAVE_WM8731
-        /* DACSEL=1, BYPASS=1 */
-        wmcodec_write(0x4, 0x18);
-#endif
     
         /* set power register to POWEROFF=0 on OUTPD=0, DACPD=0 */
         wmcodec_write(PWRMGMT, 0x67);
@@ -133,7 +123,7 @@ void audiohw_enable_output(bool enable)
         /* IWL=00(16 bit) FORMAT=10(I2S format) */
         wmcodec_write(AINTFCE, 0x42);
 
-        audiohw_set_sample_rate(WM8731L_44100HZ);
+        audiohw_set_sample_rate(WM8721_USB24_44100HZ);
 
         /* set the volume to -6dB */
         wmcodec_write(LOUTVOL, IPOD_PCM_LEVEL);
@@ -145,16 +135,8 @@ void audiohw_enable_output(bool enable)
         /* 5. Set DACMU = 0 to soft-un-mute the audio DACs. */
         wmcodec_write(DACCTRL, 0x0);
         
-#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
-        /* We need to enable bit 4 of GPIOL for output for sound on H10 */
-        GPIOL_OUTPUT_VAL |= 0x10;
-#endif
         audiohw_mute(0);
     } else {
-#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
-        /* We need to disable bit 4 of GPIOL to disable sound on H10 */
-        GPIOL_OUTPUT_VAL &= ~0x10;
-#endif
         audiohw_mute(1);
     }
 }
@@ -166,32 +148,13 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
     /* 1111001 == 0dB */
     /* 0110000 == -73dB */
     /* 0101111 == mute (0x2f) */
-
     wmcodec_write(LOUTVOL, VOLUME_ZC_WAIT | vol_l);
     wmcodec_write(ROUTVOL, VOLUME_ZC_WAIT | vol_r);
  
     return 0;
 }
 
-int audiohw_set_mixer_vol(int channel1, int channel2)
-{
-    (void)channel1;
-    (void)channel2;
-
-    return 0;
-}
-
-void audiohw_set_bass(int value)
-{
-    (void)value;
-}
-
-void audiohw_set_treble(int value)
-{
-    (void)value;
-}
-
-/* Nice shutdown of WM8731 codec */
+/* Nice shutdown of WM8721 codec */
 void audiohw_close(void)
 {
    /* set DACMU=1 DEEMPH=0 */
@@ -224,87 +187,4 @@ void audiohw_set_sample_rate(int sampling_control)
     codec_set_active(0x0);
     wmcodec_write(SAMPCTRL, sampling_control);
     codec_set_active(0x1);
-}
-
-void audiohw_enable_recording(bool source_mic)
-{
-    static int line_level = 0x17;
-    static int mic_boost = true;
-    codec_set_active(0x0);
-    
-    /* set BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0
-     * LRP=0 IWL=00(16 bit) FORMAT=10(I2S format) */
-    wmcodec_write(AINTFCE, 0x42);
-    
-    wmcodec_write(LOUTVOL, 0x0);   /* headphone mute left */
-    wmcodec_write(ROUTVOL, 0x0);   /* headphone mute right */
-
-    
-    if(source_mic){
-        wmcodec_write(LINVOL, 0x80);  /* line in mute left */
-        wmcodec_write(RINVOL, 0x80);  /* line in mute right */
-
-
-        if (mic_boost) {
-            wmcodec_write(AAPCTRL, 0x5);   /* INSEL=mic, MIC_BOOST=enable */
-        } else {
-            wmcodec_write(AAPCTRL, 0x4);   /* INSEL=mic */
-        }
-    } else {
-        if (line_level == 0) {
-            wmcodec_write(LINVOL, 0x80);
-            wmcodec_write(RINVOL, 0x80);
-        } else {
-            wmcodec_write(LINVOL, line_level);
-            wmcodec_write(RINVOL, line_level);
-        }
-        wmcodec_write(AAPCTRL, 0xa);   /* BY PASS, mute mic, INSEL=line in */
-    }
-    
-    /* disable ADC high pass filter, mute dac */
-    wmcodec_write(DACCTRL, 0x9);
-    
-    /* power on (PWR_OFF=0) */
-    if(source_mic){
-        /* CLKOUTPD OSCPD OUTPD DACPD LINEINPD */
-        wmcodec_write(PWRMGMT, 0x79);
-    } else {
-    	wmcodec_write(PWRMGMT, 0x7a);  /* MICPD */
-    }
-    
-    codec_set_active(0x1);
-}
-
-void audiohw_disable_recording(void)
-{
-    /* set DACMU=1 DEEMPH=0 */
-    wmcodec_write(DACCTRL, 0x8);
-    
-    /* ACTIVE=0 */
-    codec_set_active(0x0);
-    
-    /* line in mute left & right*/
-    wmcodec_write(LINVOL, 0x80);
-    wmcodec_write(RINVOL, 0x80);
-    
-    /* set DACSEL=0, MUTEMIC=1 */
-    wmcodec_write(AAPCTRL, 0x2);
-    
-    /* set POWEROFF=0 OUTPD=0 DACPD=1 */
-    wmcodec_write(PWRMGMT, 0x6f);
-    
-    /* set POWEROFF=1 OUTPD=1 DACPD=1 */
-    wmcodec_write(PWRMGMT, 0xff);
-}
-
-void audiohw_set_recvol(int left, int right, int type)
-{
-    (void)left;
-    (void)right;
-    (void)type;
-}
-
-void audiohw_set_monitor(int enable)
-{
-    (void)enable;
 }

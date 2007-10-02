@@ -214,8 +214,10 @@ drivers/audio/wm8751.c
 drivers/audio/wm8975.c
 #elif defined(HAVE_WM8758)
 drivers/audio/wm8758.c
-#elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
-drivers/audio/wm8731l.c
+#elif defined(HAVE_WM8721)
+drivers/audio/wm8721.c
+#elif defined(HAVE_WM8731)
+drivers/audio/wm8731.c
 #elif defined(HAVE_AS3514)
 drivers/audio/as3514.c
 #elif defined(HAVE_TLV320)

@@ -744,7 +744,7 @@ void sound_set(int setting, int value)
         sound_set_val(value);
 }
 
-#if !defined(HAVE_AS3514) || defined(SIMULATOR)
+#if (!defined(HAVE_AS3514) && !defined (HAVE_WM8731)) || defined(SIMULATOR)
 int sound_val2phys(int setting, int value)
 {
 #if CONFIG_CODEC == MAS3587F
@@ -782,7 +782,7 @@ int sound_val2phys(int setting, int value)
             break;
     }
     return result;
-#elif defined(HAVE_TLV320)
+#elif defined(HAVE_TLV320) || defined(HAVE_WM8751)
     int result = 0;
     
     switch(setting)
