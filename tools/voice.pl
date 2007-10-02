@@ -130,7 +130,11 @@ sub correct_string {
         $string =~ s/ID3/I D 3/g;
 
         case "english" {
-            $string =~ s/plugin(s?)/plug-in$1/ig;
+            switch($$tts_object{"name"}) {
+                case "festival" {
+                    $string =~ s/plugin(s?)/plug-in$1/ig;
+                }
+            }
         }
         case "deutsch" {
             # for all german engines (e.g. for english words)
