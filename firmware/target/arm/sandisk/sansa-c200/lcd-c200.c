@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
+ * $Id$
  *
  * Copyright (C) 2007 by Mark Arigo
  *
@@ -180,21 +180,21 @@ int lcd_default_contrast(void)
 
 void lcd_set_contrast(int val)
 {
-  /* TODO: Implement lcd_set_contrast() */
-  (void)val;
+    lcd_send_command(R_CONTRAST_CONTROL1);
+    lcd_send_command(val);
 }
 
 void lcd_set_invert_display(bool yesno)
 {
-  /* TODO: Implement lcd_set_invert_display() */
-  (void)yesno;
+    /* TODO: Implement lcd_set_invert_display() */
+    (void)yesno;
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-  lcd_send_command(R_DRIVER_OUTPUT_MODE);
-  lcd_send_command(yesno ? 0x02 : 0x07);
+    lcd_send_command(R_DRIVER_OUTPUT_MODE);
+    lcd_send_command(yesno ? 0x02 : 0x07);
 }
 
 /*** update functions ***/

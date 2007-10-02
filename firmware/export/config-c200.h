@@ -58,11 +58,11 @@
 /* TODO: #define HAVE_LCD_INVERT */
 
 /* Define this if your LCD can set contrast */
-/* #define HAVE_LCD_CONTRAST */
+#define HAVE_LCD_CONTRAST
 
 #define MIN_CONTRAST_SETTING        0
-#define MAX_CONTRAST_SETTING        30
-#define DEFAULT_CONTRAST_SETTING    14 /* Match boot contrast */
+#define MAX_CONTRAST_SETTING        255
+#define DEFAULT_CONTRAST_SETTING    85
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
