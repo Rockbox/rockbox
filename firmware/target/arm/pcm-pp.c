@@ -220,9 +220,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     set_fiq_handler(fiq);
     enable_fiq();
 
-#if CONFIG_CPU == PP5020
-    /* Do nothing */
-#elif defined(CPU_PP502x)
+#if defined(CPU_PP502x)
     /* Enable playback FIFO */
     IISCONFIG |= (1 << 29);
 #elif CONFIG_CPU == PP5002
@@ -301,9 +299,7 @@ void pcm_play_pause_unpause(void)
     set_fiq_handler(fiq);
     enable_fiq();
 
-#if CONFIG_CPU == PP5020
-    /* Do nothing */
-#elif defined(CPU_PP502x)
+#if defined(CPU_PP502x)
     /* Enable playback FIFO */
     IISCONFIG |= (1 << 29);
 #elif CONFIG_CPU == PP5002
