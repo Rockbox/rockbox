@@ -267,7 +267,8 @@ extern unsigned char plugin_end_addr[];
 #else /* def SIMULATOR */
 /* decoders */
 #define CODEC_HEADER \
-        const struct codec_header __header = { \
+        const struct codec_header __header \
+        __attribute__((visibility("default"))) = { \
         CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
         NULL, NULL, codec_start };
 /* encoders */

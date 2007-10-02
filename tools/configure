@@ -134,7 +134,10 @@ simcc () {
  esac
 
  if [ "`uname -m`" = "x86_64" ] || [ "`uname -m`" = "amd64" ]; then
-   GCCOPTS="$GCCOPTS -fPIC"  # needed to make shared objects link
+   # fPIC is needed to make shared objects link
+   # setting visibility to hidden is necessary to avoid strange crashes
+   # due to symbol clashing
+   GCCOPTS="$GCCOPTS -fPIC -fvisibility=hidden"
  fi
 
  GCCOPTS="$GCCOPTS -I\$(SIMDIR)"

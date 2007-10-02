@@ -655,7 +655,8 @@ extern unsigned char plugin_end_addr[];
         plugin_start_addr, plugin_end_addr, plugin_start };
 #else /* SIMULATOR */
 #define PLUGIN_HEADER \
-        const struct plugin_header __header = { \
+        const struct plugin_header __header \
+        __attribute__((visibility("default"))) = { \
         PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
         NULL, NULL, plugin_start };
 #endif /* SIMULATOR */
