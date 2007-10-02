@@ -309,7 +309,7 @@ int Dbuild_base (struct opt_items *names)
         if ( !fileexists (wads_builtin[j]) )
         {
             names[i].string=versions_builtin[j];
-            names[i].voice_id=0;
+            names[i].voice_id=-1;
             namemap[i]=j;
             i++;
         }
@@ -333,7 +333,7 @@ int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory
 
    if(filedir==NULL)
    {
-      temp=malloc(sizeof(struct opt_items));
+      temp=malloc(sizeof(struct menu_item));
       temp[0].desc=firstentry;
       temp[0].function=0;
       *names=temp;
@@ -349,7 +349,7 @@ int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory
    filedir=rb->opendir(directory);
 
    i++;
-   temp=malloc(i*sizeof(struct opt_items));
+   temp=malloc(i*sizeof(struct menu_item));
    temp[0].desc=firstentry;
    temp[0].function=0;
    i=1;
@@ -447,23 +447,23 @@ int Oset_keys()
 
 
    static const struct opt_items doomkeys[] = {
-      { "Unmapped", NULL },
-      { "Key Right", NULL },
-      { "Key Left", NULL },
-      { "Key Up", NULL },
-      { "Key Down", NULL },
-      { "Key Select", NULL },
+      { "Unmapped", -1 },
+      { "Key Right", -1 },
+      { "Key Left", -1 },
+      { "Key Up", -1 },
+      { "Key Down", -1 },
+      { "Key Select", -1 },
 #if defined(TOSHIBA_GIGABEAT_F)
-      { "Key A", NULL },
-      { "Key Menu", NULL },
-      { "Key Power", NULL },
-      { "Key Volume Down", NULL },
-      { "Key Volume Up", NULL },
+      { "Key A", -1 },
+      { "Key Menu", -1 },
+      { "Key Power", -1 },
+      { "Key Volume Down", -1 },
+      { "Key Volume Up", -1 },
 #else
-      { "Key Record", NULL },
-      { "Key Mode", NULL },
-      { "Key Off", NULL },
-      { "Key On", NULL },
+      { "Key Record", -1 },
+      { "Key Mode", -1 },
+      { "Key Off", -1 },
+      { "Key On", -1 },
 #endif
    };
    
@@ -519,8 +519,8 @@ extern int fake_contrast;
 static bool Doptions()
 {
    static const struct opt_items onoff[2] = {
-      { "Off", NULL },
-      { "On", NULL },
+      { "Off", -1 },
+      { "On", -1 },
    };
 
    int m, result;
