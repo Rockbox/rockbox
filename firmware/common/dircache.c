@@ -867,7 +867,7 @@ static struct dircache_entry* dircache_new_entry(const char *path, int attribute
     if (entry == NULL)
     {
         logf("basedir not found!");
-        logf(basedir);
+        logf("%s", basedir);
         dircache_initialized = false;
         return NULL;
     }
