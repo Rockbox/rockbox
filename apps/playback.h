@@ -39,23 +39,6 @@
 
 #define MAX_TRACK_MASK  (MAX_TRACK-1)
 
-struct track_info {
-    struct mp3entry id3;       /* TAG metadata */
-    char *codecbuf;            /* Pointer to codec buffer */
-    size_t codecsize;          /* Codec length in bytes */
-    bool has_codec;            /* Does this track have a codec on the buffer */
-
-    size_t buf_idx;            /* Pointer to the track's buffer */
-    size_t filerem;            /* Remaining bytes of file NOT in buffer */
-    size_t filesize;           /* File total length */
-    size_t start_pos;          /* Position to first bytes of file in buffer */
-    volatile size_t available; /* Available bytes to read from buffer */
-
-    bool taginfo_ready;        /* Is metadata read */
-
-    bool event_sent;           /* Was this track's buffered event sent */
-};
-
 /* Functions */
 const char * get_codec_filename(int cod_spec);
 void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3));

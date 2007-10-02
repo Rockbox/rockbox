@@ -222,6 +222,23 @@ static int buffer_state = BUFFER_STATE_TRASHED; /* Buffer state */
 #define FILEBUFUSED RINGBUF_SUB(buf_widx, buf_ridx)
 
 /* Track info structure about songs in the file buffer (A/C-) */
+struct track_info {
+    struct mp3entry id3;       /* TAG metadata */
+    char *codecbuf;            /* Pointer to codec buffer */
+    size_t codecsize;          /* Codec length in bytes */
+    bool has_codec;            /* Does this track have a codec on the buffer */
+
+    size_t buf_idx;            /* Pointer to the track's buffer */
+    size_t filerem;            /* Remaining bytes of file NOT in buffer */
+    size_t filesize;           /* File total length */
+    size_t start_pos;          /* Position to first bytes of file in buffer */
+    volatile size_t available; /* Available bytes to read from buffer */
+
+    bool taginfo_ready;        /* Is metadata read */
+
+    bool event_sent;           /* Was this track's buffered event sent */
+};
+
 static struct track_info tracks[MAX_TRACK];
 static volatile int track_ridx = 0;  /* Track being decoded (A/C-) */
 static int track_widx = 0;           /* Track being buffered (A) */

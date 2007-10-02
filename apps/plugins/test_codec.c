@@ -94,7 +94,12 @@ static char str[MAX_PATH];
 /* Our local implementation of the codec API */
 static struct codec_api ci;
 
-static struct track_info track;
+struct test_track_info {
+    struct mp3entry id3;       /* TAG metadata */
+    size_t filesize;           /* File total length */
+};
+
+static struct test_track_info track;
 static bool taginfo_ready = true;
 
 static volatile unsigned int elapsed;
