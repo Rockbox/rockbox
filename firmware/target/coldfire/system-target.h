@@ -165,6 +165,10 @@ void coldfire_set_pllcr_audio_bits(long bits);
 /* Set DATAINCONTROL without disturbing FIFO reset state */
 void coldfire_set_dataincontrol(unsigned long value);
 
+#ifndef HAVE_ADJUSTABLE_CPU_FREQ
+extern void cf_set_cpu_frequency(long frequency);
+#endif
+
 /* 11.2896 MHz */
 #define CPUFREQ_DEFAULT_MULT 1
 #define CPUFREQ_DEFAULT      (CPUFREQ_DEFAULT_MULT * CPU_FREQ)

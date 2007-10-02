@@ -252,6 +252,10 @@ void system_init(void)
     SPURVEC = 24;
 
     MPARK     = 0x81;   /* PARK[1,0]=10 + BCR24BIT                   */
+    
+#ifndef HAVE_ADJUSTABLE_CPU_FREQ
+    cf_set_cpu_frequency(CPUFREQ_DEFAULT);
+#endif
 }
 
 void system_reboot (void)

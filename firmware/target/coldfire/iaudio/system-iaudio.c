@@ -24,8 +24,6 @@
 #include "timer.h"
 #include "pcf50606.h"
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-
 /* Settings for all possible clock frequencies (with properly working timers)
  *
  *                    xxx_REFRESH_TIMER below
@@ -55,8 +53,13 @@
 #define RECALC_DELAYS(f) \
         pcf50606_i2c_recalc_delay(f)
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency (long) __attribute__ ((section (".icode")));
 void set_cpu_frequency(long frequency)
+#else
+void cf_set_cpu_frequency (long) __attribute__ ((section (".icode")));
+void cf_set_cpu_frequency(long frequency)
+#endif    
 {
     switch(frequency)
     {
@@ -115,5 +118,3 @@ void set_cpu_frequency(long frequency)
         break;
     }
 }
-
-#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
