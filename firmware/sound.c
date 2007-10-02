@@ -782,7 +782,7 @@ int sound_val2phys(int setting, int value)
             break;
     }
     return result;
-#elif defined(HAVE_TLV320) || defined(HAVE_WM8751)
+#elif defined(HAVE_TLV320) || defined(HAVE_WM8731)
     int result = 0;
     
     switch(setting)
