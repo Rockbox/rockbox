@@ -82,10 +82,10 @@ void audiohw_mute(bool mute)
     if (mute)
     {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
-        wmcodec_write(DACCTRL, 0x8);
+        wmcodec_write(DAPCTRL, 0x8);
     } else {
         /* Set DACMU = 0 to soft-un-mute the audio DACs. */
-        wmcodec_write(DACCTRL, 0x0);
+        wmcodec_write(DAPCTRL, 0x0);
     }
 }
 
@@ -117,7 +117,7 @@ void audiohw_enable_output(bool enable)
         wmcodec_write(0x4, 0x10);
     
         /* set power register to POWEROFF=0 on OUTPD=0, DACPD=0 */
-        wmcodec_write(PWRMGMT, 0x67);
+        wmcodec_write(PDCTRL, 0x67);
 
         /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
         /* IWL=00(16 bit) FORMAT=10(I2S format) */
@@ -133,7 +133,7 @@ void audiohw_enable_output(bool enable)
         codec_set_active(1);
 
         /* 5. Set DACMU = 0 to soft-un-mute the audio DACs. */
-        wmcodec_write(DACCTRL, 0x0);
+        wmcodec_write(DAPCTRL, 0x0);
         
         audiohw_mute(0);
     } else {
@@ -158,22 +158,19 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
 void audiohw_close(void)
 {
    /* set DACMU=1 DEEMPH=0 */
-    wmcodec_write(DACCTRL, 0x8);
+    wmcodec_write(DAPCTRL, 0x8);
 
     /* ACTIVE=0 */
     codec_set_active(0x0);
-
-    /* line in mute left & right*/
-    wmcodec_write(LINVOL, 0x100 | 0x80);
 
     /* set DACSEL=0, MUTEMIC=1 */
     wmcodec_write(0x4, 0x2);
 
     /* set POWEROFF=0 OUTPD=0 DACPD=1 */
-    wmcodec_write(PWRMGMT, 0x6f);
+    wmcodec_write(PDCTRL, 0x6f);
 
     /* set POWEROFF=1 OUTPD=1 DACPD=1 */
-    wmcodec_write(PWRMGMT, 0xff);
+    wmcodec_write(PDCTRL, 0xff);
 }
 
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */

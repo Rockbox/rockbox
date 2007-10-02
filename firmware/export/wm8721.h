@@ -61,23 +61,23 @@ extern void audiohw_set_sample_rate(int sampling_control);
 #define PDCTRL_POWEROFF         (1 << 7)
 
 #define AINTFCE                 0x07
-#define AINTFCE_FORMAT_MSB_RJUST(0 << 0)
-#define AINTFCE_FORMAT_MSB_LJUST(1 << 0)
-#define AINTFCE_FORMAT_I2S      (2 << 0)
-#define AINTFCE_FORMAT_DSP      (3 << 0)
-#define AINTFCE_FORMAT_MASK     (3 << 0)
-#define AINTFCE_IWL_16BIT       (0 << 2)
-#define AINTFCE_IWL_20BIT       (1 << 2)
-#define AINTFCE_IWL_24BIT       (2 << 2)
-#define AINTFCE_IWL_32BIT       (3 << 2)
-#define AINTFCE_IWL_MASK        (3 << 2)
-#define AINTFCE_LRP_I2S_RLO     (0 << 4)
-#define AINTFCE_LRP_I2S_RHI     (1 << 4)
-#define AINTFCE_DSP_MODE_A      (0 << 4)
-#define AINTFCE_DSP_MODE_B      (1 << 4)
-#define AINTFCE_LRSWAP          (1 << 5)
-#define AINTFCE_MS              (1 << 6)
-#define AINTFCE_BCLKINV         (1 << 7)
+#define AINTFCE_FORMAT_MSB_RJUST (0 << 0)
+#define AINTFCE_FORMAT_MSB_LJUST (1 << 0)
+#define AINTFCE_FORMAT_I2S       (2 << 0)
+#define AINTFCE_FORMAT_DSP       (3 << 0)
+#define AINTFCE_FORMAT_MASK      (3 << 0)
+#define AINTFCE_IWL_16BIT        (0 << 2)
+#define AINTFCE_IWL_20BIT        (1 << 2)
+#define AINTFCE_IWL_24BIT        (2 << 2)
+#define AINTFCE_IWL_32BIT        (3 << 2)
+#define AINTFCE_IWL_MASK         (3 << 2)
+#define AINTFCE_LRP_I2S_RLO      (0 << 4)
+#define AINTFCE_LRP_I2S_RHI      (1 << 4)
+#define AINTFCE_DSP_MODE_A       (0 << 4)
+#define AINTFCE_DSP_MODE_B       (1 << 4)
+#define AINTFCE_LRSWAP           (1 << 5)
+#define AINTFCE_MS               (1 << 6)
+#define AINTFCE_BCLKINV          (1 << 7)
 
 #define SAMPCTRL                0x08
 #define SAMPCTRL_USB            (1 << 0)
@@ -86,7 +86,7 @@ extern void audiohw_set_sample_rate(int sampling_control);
 #define SAMPCTRL_BOSR_USB_250fs (0 << 1)
 #define SAMPCTRL_BOSR_USB_272fs (1 << 1)
 /* Bits 2-5:
- * Sample rate setting are device-specific. See WM8731(L) datasheet
+ * Sample rate setting are device-specific. See WM8721 datasheet
  * for proper settings for the device's clocking */
 #define SAMPCTRL_SR_MASK        (0xf << 2)
 #define SAMPCTRL_CLKIDIV2       (1 << 6)
