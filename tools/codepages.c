@@ -23,8 +23,8 @@
 
 #define MAX_TABLE_SIZE     32768
 
-static const int mini_index[5] = {
-    0, 1, 3, 6, 7
+static const int mini_index[6] = {
+    0, 1, 3, 6, 7, 8
 };
 
 static unsigned short iso_table[MAX_TABLE_SIZE];
@@ -207,7 +207,7 @@ int main(int argc, char **argv)
         of = fopen("isomini.cp", "wb");
         if (!of) return 1;
 
-        for (i=1; i<5; i++) {
+        for (i=1; i<6; i++) {
 
             for (j=0; j<128; j++) {
                 k = (unsigned char)j + 128;

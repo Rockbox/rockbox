@@ -47,7 +47,7 @@ static const char cp_2_table[NUM_CODEPAGES] =
 
 #else /* !HAVE_LCD_BITMAP, reduced support */
 
-#define MAX_CP_TABLE_SIZE  512
+#define MAX_CP_TABLE_SIZE  640
 #define NUM_TABLES           1
 
 enum {
