@@ -3598,13 +3598,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
-    *: "Mostra info ID3"
+    *: "Mostra info traccia"
   </dest>
   <voice>
-    *: "Mostra info ID3"
+    *: "Mostra info traccia"
   </voice>
 </phrase>
 <phrase>
@@ -11280,5 +11280,19 @@
   <voice>
     *: none
     lcd_color: "Barra (Colore Sfumato)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Europa Centrale (CP1250)"
+  </dest>
+  <voice>
+    *: "Europa Centrale"
   </voice>
 </phrase>
