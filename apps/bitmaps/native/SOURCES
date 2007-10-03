@@ -21,10 +21,8 @@ rockboxlogo.176x54x16.bmp
 rockboxlogo.220x68x16.bmp
 #elif (LCD_WIDTH == 240) && (LCD_DEPTH == 16)
 rockboxlogo.240x74x16.bmp
-#elif (LCD_WIDTH == 320) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH >= 320) && (LCD_DEPTH == 16)
 rockboxlogo.320x98x16.bmp
-#elif (LCD_WIDTH >= 640) && (LCD_DEPTH == 16)
-rockboxlogo.640x198x16.bmp
 #endif
 
 /* USB logo */
