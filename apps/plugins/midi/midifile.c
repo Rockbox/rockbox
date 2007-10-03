@@ -24,6 +24,8 @@ extern struct plugin_api * rb;
 struct Track * readTrack(int file);
 int readID(int file);
 
+struct MIDIfile midi_file IBSS_ATTR;
+
 struct MIDIfile * loadFile(char * filename)
 {
     struct MIDIfile * mfload;
@@ -35,14 +37,7 @@ struct MIDIfile * loadFile(char * filename)
         return NULL;
     }
 
-    mfload = (struct MIDIfile*)malloc(sizeof(struct MIDIfile));
-
-    if(mfload==NULL)
-    {
-        rb->close(file);
-        printf("Could not allocate memory for MIDIfile struct");
-        return NULL;
-    }
+    mfload = &midi_file;
 
     rb->memset(mfload, 0, sizeof(struct MIDIfile));
 
