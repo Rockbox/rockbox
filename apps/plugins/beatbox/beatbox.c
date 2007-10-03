@@ -123,6 +123,62 @@ long bpm IBSS_ATTR;
 #include "midi/midifile.h"
 
 
+const unsigned char * drumNames[]={
+    "Bass Drum 2    ",
+    "Bass Drum 1    ",
+    "Side Stick     ",
+    "Snare Drum 1   ",
+    "Hand Clap      ",
+    "Snare Drum 2   ",
+    "Low Tom 2      ",
+    "Closed Hi-hat  ",
+    "Low Tom 1      ",
+    "Pedal Hi-hat   ",
+    "Mid Tom 2      ",
+    "Open Hi-hat    ",
+    "Mid Tom 1      ",
+    "High Tom 2     ",
+    "Crash Cymbal 1 ",
+    "High Tom 1     ",
+    "Ride Cymbal 1  ",
+    "Chinese Cymbal ",
+    "Ride Bell      ",
+    "Tambourine     ",
+    "Splash Cymbal  ",
+    "Cowbell        ",
+    "Crash Cymbal 2 ",
+    "Vibra Slap     ",
+    "Ride Cymbal 2  ",
+    "High Bongo     ",
+    "Low Bongo      ",
+    "Mute High Conga",
+    "Open High Conga",
+    "Low Conga      ",
+    "High Timbale   ",
+    "Low Timbale    ",
+    "High Agogo     ",
+    "Low Agogo      ",
+    "Cabasa         ",
+    "Maracas        ",
+    "Short Whistle  ",
+    "Long Whistle   ",
+    "Short Guiro    ",
+    "Long Guiro     ",
+    "Claves         ",
+    "High Wood Block",
+    "Low Wood Block ",
+    "Mute Cuica     ",
+    "Open Cuica     ",
+    "Mute Triangle  ",
+    "Open Triangle  ",
+    "Shaker         ",
+    "Jingle Bell    ",
+    "Bell Tree      ",
+    "Castenets      ",
+    "Mute Surdo     ",
+    "Open Surdo     "
+};
+
 long gmbuf[BUF_SIZE*NBUF];
 
 int quit=0;
@@ -163,6 +219,7 @@ struct plugin_api * rb;
 #define GRID_YPOS 10
 
 
+#define COLOR_NAME_TEXT LCD_RGBPACK(0xFF,0xFF,0xFF)
 #define COLOR_NORMAL    LCD_RGBPACK(0xFF,0xFF,0xFF)
 #define COLOR_PLAY      LCD_RGBPACK(0xFF,0xFF,0x00)
 #define COLOR_DISABLED  LCD_RGBPACK(0xA0,0xA0,0xA0)
@@ -274,7 +331,7 @@ inline void synthbuf(void)
 
 unsigned char trackPos[V_NUMCELLS];
 unsigned char trackData[H_NUMCELLS][V_NUMCELLS];
-unsigned char trackMap[V_NUMCELLS] = {38, 39, 40, 41, 42, 43, 44, 45};
+unsigned char trackMap[V_NUMCELLS] = {38, 39, 40, 41, 42, 43, 44, 56};
 
 
 struct Cell
@@ -305,8 +362,16 @@ void sendEvents()
     for(i=0; i<V_NUMCELLS; i++)
     {
         if(trackData[trackPos[i]][i] == VAL_ENABLED)
-            pressNote(9, trackMap[i], 127);
+            pressNote_Nonstatic(9, trackMap[i], 127);
     }
+}
+
+#define NAME_POSX 10
+#define NAME_POSY 100
+void showDrumName(int trackNum)
+{
+    rb->lcd_set_foreground(COLOR_NAME_TEXT);
+    rb->lcd_putsxy(NAME_POSX, NAME_POSY, drumNames[trackMap[trackNum]-35]);
 }
 
 void updateDisplay()
@@ -460,6 +525,12 @@ int beatboxmain()
 
     int i, j;
 
+    /* Start at 16 cells/loop for now. User can un-loop if more are needed */
+    for(i=0; i<V_NUMCELLS; i++)
+        trackData[16][i] = VAL_LOOP;
+
+
+/*  Very very rough beat to 'Goodbye Horses'
     trackData[16][3] = VAL_LOOP;
     trackData[16][2] = VAL_LOOP;
 
@@ -474,9 +545,10 @@ int beatboxmain()
     trackData[6][2] = 1;
     trackData[10][2] = 1;
     trackData[14][2] = 1;
-
+*/
 
     drawGrid();
+    showDrumName(yCursor);
     updateDisplay();
     redrawScreen(1);
 
@@ -557,6 +629,7 @@ int beatboxmain()
                         if(yCursor > 0)
                         {
                             yCursor--;
+                            showDrumName(yCursor);
                             updateDisplay();
                             redrawScreen(0);
                         }
@@ -572,6 +645,7 @@ int beatboxmain()
                         if(yCursor < V_NUMCELLS-1)
                         {
                             yCursor++;
+                            showDrumName(yCursor);
                             updateDisplay();
                             redrawScreen(0);
                         }
@@ -662,3 +736,4 @@ int beatboxmain()
 
     return 0;
 }
+

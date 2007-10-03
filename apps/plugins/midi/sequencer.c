@@ -379,3 +379,12 @@ int tick(void)
         return 0;
 }
 
+
+/* Ugly hack so that beatbox can get at teh pressnote function */
+/* Is there a speed advantage to keeping pressNote itself static? */
+/* Note that midiplay needs the speed much more than beatbox does */
+void pressNote_Nonstatic(int ch, int note, int vol)
+{
+	pressNote(ch, note, vol);
+}
+
