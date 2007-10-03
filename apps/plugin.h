@@ -112,7 +112,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 78
+#define PLUGIN_API_VERSION 79
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -632,6 +632,9 @@ struct plugin_api {
     void (*flush_icache)(void);
     void (*invalidate_icache)(void);
 #endif
+
+    void (*talk_disable_menus)(void);
+    void (*talk_enable_menus)(void);
 };
 
 /* plugin header */

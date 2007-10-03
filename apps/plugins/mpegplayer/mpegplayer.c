@@ -1780,7 +1780,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     long graysize;
     int grayscales;
 #endif
-    bool talk_menu;
 
     if (parameter == NULL)
     {
@@ -1872,8 +1871,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Turn off backlight timeout */
     backlight_force_on(rb); /* backlight control in lib/helper.c */
-    talk_menu = rb->global_settings->talk_menu;
-    rb->global_settings->talk_menu = false;
+    rb->talk_disable_menus();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
@@ -2014,7 +2012,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(rb); /* backlight control in lib/helper.c */
-    rb->global_settings->talk_menu = talk_menu;
+    rb->talk_enable_menus();
 
     return status;
 }

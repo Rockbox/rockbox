@@ -34,6 +34,7 @@
 #include "splash.h"
 #include "logf.h"
 #include "option_select.h"
+#include "talk.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -514,6 +515,9 @@ static const struct plugin_api rockbox_api = {
     flush_icache,
     invalidate_icache,
 #endif
+    talk_disable_menus,
+    talk_enable_menus,
+
 };
 
 int plugin_load(const char* plugin, void* parameter)
