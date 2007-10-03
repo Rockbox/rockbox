@@ -67,9 +67,7 @@ chip8.c
 chopper.c
 demystify.c
 jewels.c
-#ifndef SANSA_C200
 minesweeper.c
-#endif
 oscilloscope.c
 pong.c
 sliding_puzzle.c

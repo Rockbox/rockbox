@@ -114,6 +114,17 @@ enum minesweeper_status {
 #   define MINESWP_DISCOVER BUTTON_SELECT
 #   define MINESWP_INFO     (BUTTON_REC|BUTTON_REPEAT)
 
+#elif (CONFIG_KEYPAD == SANSA_C200_PAD)
+#   define MINESWP_UP         BUTTON_UP
+#   define MINESWP_DOWN       BUTTON_DOWN
+#   define MINESWP_QUIT       BUTTON_POWER
+#   define MINESWP_TOGGLE_PRE BUTTON_SELECT
+#   define MINESWP_TOGGLE     (BUTTON_SELECT | BUTTON_REL)
+#   define MINESWP_TOGGLE2    BUTTON_VOL_DOWN
+#   define MINESWP_DISCOVER   (BUTTON_SELECT | BUTTON_REPEAT)
+#   define MINESWP_DISCOVER2  BUTTON_VOL_UP
+#   define MINESWP_INFO       BUTTON_REC
+
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #   define MINESWP_UP       BUTTON_SCROLL_UP
 #   define MINESWP_DOWN     BUTTON_SCROLL_DOWN
@@ -138,8 +149,10 @@ extern const fb_data minesweeper_tiles[];
 #   if ( LCD_HEIGHT * LCD_WIDTH ) / ( 16 * 16 ) >= 130
         /* We want to have at least 130 tiles on the screen */
 #       define TileSize 16
-#   else
+#   elif ( LCD_HEIGHT * LCD_WIDTH ) / ( 12 * 12 ) >= 130
 #       define TileSize 12
+#   else
+#       define TileSize 10
 #   endif
 #   define BackgroundColor LCD_RGBPACK( 128, 128, 128 )
 #elif LCD_DEPTH > 1
