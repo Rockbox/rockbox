@@ -174,8 +174,8 @@ Plugins
 :maze:
 :mazezam:
 :metronome:
-:midi2wav:
-:midiplay:
+:midi2wav: Stepan Moskovchenko (though it's deprecated in favor of midiplay)
+:midiplay: Stepan Moskovchenko
 :minesweeper: Antoine Cellerier
 :mosaique:
 :mp3_encoder:
