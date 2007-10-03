@@ -55,7 +55,7 @@ start:
 
 #if !defined(BOOTLOADER)
 
-#if !defined(STUB)
+#if 0//!defined(STUB)
     /* Zero out IBSS */
     ldr    r2, =_iedata
     ldr    r3, =_iend
@@ -64,6 +64,8 @@ start:
     cmp    r3, r2
     strhi  r4, [r2], #4
     bhi    1b
+#endif
+#if 1
 
     /* Copy the IRAM */
     ldr    r2, =_iramcopy
