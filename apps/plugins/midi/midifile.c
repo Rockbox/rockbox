@@ -191,9 +191,12 @@ int readEvent(int file, void * dest)
     return 1;
 }
 
+int curr_track = 0;
+struct Track tracks[48] IBSS_ATTR;
+
 struct Track * readTrack(int file)
 {
-    struct Track * trk = (struct Track *)malloc(sizeof(struct Track));
+    struct Track * trk = &tracks[curr_track++];
     rb->memset(trk, 0, sizeof(struct Track));
 
     trk->size = readFourBytes(file);

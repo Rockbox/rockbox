@@ -19,22 +19,26 @@
 
 #define FRACTSIZE 10
 
-#define BUF_SIZE 256
+#define BUF_SIZE 8192 /* 32 kB output buffers */
 #define NBUF   2
-
 
 #ifndef SIMULATOR
 
-#if (HW_SAMPR_CAPS & SAMPR_CAP_22)
-#define SAMPLE_RATE SAMPR_22  // 44100 22050 11025
+#if (HW_SAMPR_CAPS & SAMPR_CAP_22)  /* use 22050Hz if we can */
+#define SAMPLE_RATE SAMPR_22        /* 22050 */
 #else
-#define SAMPLE_RATE SAMPR_44  // 44100 22050 11025
+#define SAMPLE_RATE SAMPR_44        /* 44100 */
 #endif
 
-#define MAX_VOICES 23 // Note: 24 midi channels is the minimum general midi
-                        // spec implementation
+#ifdef CPU_PP /* the pp based targets can't handle too many voices
+                 mainly because they have to use 44100Hz sample rate */
+#define MAX_VOICES 16
+#else
+#define MAX_VOICES 24 /* Note: 24 midi channels is the minimum general midi
+                         spec implementation */
+#endif /* CPU_PP */
 
-#else	// Simulator requires 44100, and we can afford to use more voices
+#else	/* Simulator requires 44100Hz, and we can afford to use more voices */
 
 #define SAMPLE_RATE SAMPR_44
 #define MAX_VOICES 48
@@ -43,14 +47,14 @@
 
 #define BYTE unsigned char
 
-//Data chunk ID types, returned by readID()
+/* Data chunk ID types, returned by readID() */
 #define ID_UNKNOWN  -1
 #define ID_MTHD     1
 #define ID_MTRK     2
 #define ID_EOF      3
 #define ID_RIFF     4
 
-//MIDI Commands
+/* MIDI Commands */
 #define MIDI_NOTE_OFF   128
 #define MIDI_NOTE_ON    144
 #define MIDI_AFTERTOUCH 160
@@ -58,24 +62,24 @@
 #define MIDI_PRGM   192
 #define MIDI_PITCHW 224
 
-//MIDI Controllers
+/* MIDI Controllers */
 #define CTRL_VOLUME 7
 #define CTRL_BALANCE    8
 #define CTRL_PANNING    10
 #define CHANNEL     1
 
-//Most of these are deprecated.. rampdown is used, maybe one other one too
+/* Most of these are deprecated.. rampdown is used, maybe one other one too */
 #define STATE_ATTACK        1
 #define STATE_DECAY         2
 #define STATE_SUSTAIN       3
 #define STATE_RELEASE       4
 #define STATE_RAMPDOWN      5
 
-//Loop states
+/* Loop states */
 #define STATE_LOOPING           7
 #define STATE_NONLOOPING    8
 
-//Various bits in the GUS mode byte
+/* Various bits in the GUS mode byte */
 #define LOOP_ENABLED    4
 #define LOOP_PINGPONG   8
 #define LOOP_REVERSE    16
