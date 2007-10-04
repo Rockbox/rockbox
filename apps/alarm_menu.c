@@ -33,15 +33,26 @@
 #include "rtc.h"
 #include "misc.h"
 #include "screens.h"
-
+#include"talk.h"
 #include "lang.h"
 #include "power.h"
 #include "alarm_menu.h"
 #include "backlight.h"
-
 #include "splash.h"
 #include "statusbar.h"
 #include "textarea.h"
+
+static void speak_time(int hours, int minutes, bool speak_hours)
+{
+    if (talk_menus_enabled()){
+        if(speak_hours) {
+            talk_value(hours, UNIT_HOUR, false);
+            talk_value(minutes, UNIT_MIN, true);
+        } else {
+            talk_value(minutes, UNIT_MIN, false);
+        }
+    }
+}
 
 bool alarm_screen(void)
 {
@@ -53,7 +64,7 @@ bool alarm_screen(void)
     int button;
     int i;
     bool update = true;
-    
+    bool hour_wrapped = false;
 
     rtc_get_alarm(&h, &m);
 
@@ -74,6 +85,12 @@ bool alarm_screen(void)
                 gui_textarea_clear(&screens[i]);
                 screens[i].puts(0, 3, str(LANG_ALARM_MOD_KEYS));
             }
+            /* Talk when entering the wakeup screen */
+            if (talk_menus_enabled())
+            {
+                talk_value(h, UNIT_HOUR, true);
+                talk_value(m, UNIT_MIN, true);
+            }
             update = false;
         }
 
@@ -91,15 +108,23 @@ bool alarm_screen(void)
             /* accept alarms only if they are in 2 minutes or more */
             tm = get_time();
             togo = (m + h * 60 - tm->tm_min - tm->tm_hour * 60 + 1440) % 1440;
+
             if (togo > 1) {
                 rtc_init();
                 rtc_set_alarm(h,m);
                 rtc_enable_alarm(true);
+                if (talk_menus_enabled())
+                {
+                    talk_id(LANG_ALARM_MOD_TIME_TO_GO, true);
+                    talk_value(togo / 60, UNIT_HOUR, true);
+                    talk_value(togo % 60, UNIT_MIN, true);
+                    talk_force_enqueue_next();
+                }
                 gui_syncsplash(HZ*2, str(LANG_ALARM_MOD_TIME_TO_GO),
-                       togo / 60, togo % 60);
+                               togo / 60, togo % 60);
                 done = true;
             } else {
-                gui_syncsplash(HZ, str(LANG_ALARM_MOD_ERROR));
+                gui_syncsplash(HZ, ID2P(LANG_ALARM_MOD_ERROR));
                 update = true;
             }
             break;
@@ -111,9 +136,12 @@ bool alarm_screen(void)
             if (m == 60) {
                 h += 1;
                 m = 0;
+                hour_wrapped = true;
             }
             if (h == 24)
                 h = 0;
+
+            speak_time(h, m, hour_wrapped);
             break;
 
          /* dec(m) */
@@ -123,31 +151,41 @@ bool alarm_screen(void)
              if (m == -5) {
                  h -= 1;
                  m = 55;
+                 hour_wrapped = true;
              }
              if (h == -1)
                  h = 23;
+
+             speak_time(h, m, hour_wrapped);
              break;
 
          /* inc(h) */
          case ACTION_STD_NEXT:
          case ACTION_STD_NEXTREPEAT:
              h = (h+1) % 24;
+
+             if (talk_menus_enabled())
+                 talk_value(h, UNIT_HOUR, false);
              break;
 
          /* dec(h) */
         case ACTION_STD_PREV:
         case ACTION_STD_PREVREPEAT:
              h = (h+23) % 24;
+             
+             if (talk_menus_enabled())
+                 talk_value(h, UNIT_HOUR, false);
              break;
 
         case ACTION_STD_CANCEL:
             rtc_enable_alarm(false);
-            gui_syncsplash(HZ*2, str(LANG_ALARM_MOD_DISABLE));
+            gui_syncsplash(HZ*2, ID2P(LANG_ALARM_MOD_DISABLE));
             done = true;
             break;
 
         case ACTION_NONE:
             gui_syncstatusbar_draw(&statusbars, false);
+            hour_wrapped = false;
             break;
 
         default:

@@ -4695,7 +4695,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Waking up in"
   </voice>
 </phrase>
 <phrase>
@@ -4712,7 +4712,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm set"
   </voice>
 </phrase>
 <phrase>
@@ -4729,7 +4729,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm Time Is Too Soon!"
   </voice>
 </phrase>
 <phrase>
@@ -4765,7 +4765,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm Disabled"
   </voice>
 </phrase>
 <phrase>
