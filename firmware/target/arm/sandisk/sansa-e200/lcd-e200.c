@@ -304,7 +304,7 @@ static void lcd_display_on(void)
        REV=x, D1-0=01 */
     lcd_write_reg(R_DISP_CONTROL1, 0x0041 | r_disp_control_rev);
 
-    udelay(HZ/20);
+    sleep(HZ/20);
 
     /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, DTE=0, CL=0,
        REV=x, D1-0=01 */
@@ -313,7 +313,7 @@ static void lcd_display_on(void)
        REV=x, D1-0=11 */
     lcd_write_reg(R_DISP_CONTROL1, 0x0063 | r_disp_control_rev);
 
-    udelay(HZ/20);
+    sleep(HZ/20);
 
     /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, DTE=1, CL=0,
        REV=x, D1-0=11 */
