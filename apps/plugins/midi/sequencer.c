@@ -46,15 +46,6 @@ static inline void setVol(int ch, int vol)
             setVolScale(a);
 }
 
-static inline void setPan(int ch, int pan)
-{
-//    printf("\npanning[%d]  %d ==> %d", ch, chPanRight[ch], pan);
-
-    chPanLeft[ch]=128-pan;
-    chPanRight[ch]=pan;
-}
-
-
 static inline void setPatch(int ch, int pat)
 {
     chPat[ch]=pat;
@@ -286,7 +277,7 @@ static void sendEvent(struct Event * ev)
                 }
                 case CTRL_PANNING:
                 {
-                    setPan((status_low), d2);
+                    chPan[status_low]=d2;
                     return;
                 }
             }

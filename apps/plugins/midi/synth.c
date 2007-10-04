@@ -62,10 +62,9 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     for(a=0; a<16; a++)
     {
         chVol[a]=100;            /* Default, not quite full blast.. */
-            chPanLeft[a]=64;     /* Center                          */
-        chPanRight[a]=64;        /* Center                          */
+        chPan[a]=64;             /* Center                          */
         chPat[a]=0;              /* Ac Gr Piano                     */
-        chPW[a]=256;              /* .. not .. bent ?                */
+        chPW[a]=256;             /* .. not .. bent ?                */
     }
     for(a=0; a<128; a++)
     {

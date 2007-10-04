@@ -152,8 +152,7 @@ void * my_malloc(int size);
 extern struct SynthObject voices[MAX_VOICES];
 
 extern int chVol[16];       /* Channel volume                */
-extern int chPanLeft[16];   /* Channel panning               */
-extern int chPanRight[16];
+extern int chPan[16];       /* Channel panning               */
 extern int chPat[16];       /* Channel patch                 */
 extern int chPW[16];        /* Channel pitch wheel, MSB only */
 

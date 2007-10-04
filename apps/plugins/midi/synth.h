@@ -25,7 +25,7 @@ static inline void synthSample(int * mixL, int * mixR)
     int i;
     register int dL=0;
     register int dR=0;
-    register short sample = 0;
+    register int sample = 0;
     register struct SynthObject *voicept=voices;
 
     for(i=MAX_VOICES/2; i > 0; i--)
@@ -33,15 +33,17 @@ static inline void synthSample(int * mixL, int * mixR)
         if(voicept->isUsed==1)
         {
             sample = synthVoice(voicept);
-            dL += (sample*chPanLeft[voicept->ch])>>7;
-            dR += (sample*chPanRight[voicept->ch])>>7;
+            dL += sample;
+            sample *= chPan[voicept->ch];
+            dR += sample;
         }
         voicept++;
         if(voicept->isUsed==1)
         {
             sample = synthVoice(voicept);
-            dL += (sample*chPanLeft[voicept->ch])>>7;
-            dR += (sample*chPanRight[voicept->ch])>>7;
+            dL += sample;
+            sample *= chPan[voicept->ch];
+            dR += sample;
         }
         voicept++;
     }
@@ -51,19 +53,22 @@ static inline void synthSample(int * mixL, int * mixR)
         if(voicept->isUsed==1)
         {
             sample = synthVoice(voicept);
-            dL += (sample*chPanLeft[voicept->ch])>>7;
-            dR += (sample*chPanRight[voicept->ch])>>7;
+            dL += sample;
+            sample *= chPan[voicept->ch];
+            dR += sample;
         }
         voicept++;
     }
 
-   *mixL=dL;
-   *mixR=dR;
+    dL = (dL << 7) - dR;
+
+    *mixL=dL >> 7;
+    *mixR=dR >> 7;
 
     /* TODO: Automatic Gain Control, anyone? */
     /* Or, should this be implemented on the DSP's output volume instead? */
 
-    return;  /* No more ghetto lowpass filter.. linear intrpolation works well. */
+    return;  /* No more ghetto lowpass filter. Linear interpolation works well. */
 }
 
 static inline struct Event * getEvent(struct Track * tr, int evNum)

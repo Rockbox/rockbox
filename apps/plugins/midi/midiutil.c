@@ -22,8 +22,7 @@
 extern struct plugin_api * rb;
 
 int chVol[16] IBSS_ATTR;       /* Channel volume                */
-int chPanLeft[16] IBSS_ATTR;   /* Channel panning               */
-int chPanRight[16] IBSS_ATTR;
+int chPan[16] IBSS_ATTR;       /* Channel panning               */
 int chPat[16] IBSS_ATTR;                  /* Channel patch                 */
 int chPW[16] IBSS_ATTR;                   /* Channel pitch wheel, MSB only */
 
