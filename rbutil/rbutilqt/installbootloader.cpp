@@ -732,7 +732,12 @@ void BootloaderInstaller::ipodPrepare()
 
         if (ipod.macpod)
         {
-            m_dp->addItem(tr("Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod"),LOGWARNING);
+            m_dp->addItem(tr("Warning this is a MacPod, Rockbox doesnt work on "
+                    "this. Convert it to WinPod\n"
+                    "See http://www.rockbox.org/wiki/IpodConverstionToFAT32"),
+                    LOGWARNING);
+            emit done(true);
+            return;
         }
 
         if (ipod_reopen_rw(&ipod) < 0)
@@ -829,7 +834,12 @@ void BootloaderInstaller::ipodFinish()
 
     if (ipod.macpod)
     {
-        m_dp->addItem(tr("Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod"),LOGWARNING);
+        m_dp->addItem(tr("Warning this is a MacPod, Rockbox doesnt work on "
+                "this. Convert it to WinPod\n"
+                "See http://www.rockbox.org/wiki/IpodConverstionToFAT32"),
+                LOGWARNING);
+        emit done(true);
+        return;
     }
 
     if (ipod_reopen_rw(&ipod) < 0)
