@@ -70,8 +70,14 @@ static inline unsigned int current_core(void)
     return core;
 }
 
+#ifdef BOOTLOADER
+/* All addresses within rockbox are in IRAM in the bootloader so
+   are therefore uncached */
+#define UNCACHED_ADDR(a) (a)
+#else
 #define UNCACHED_ADDR(a) \
     ((typeof (a))((uintptr_t)(a) + 0x10000000))
+#endif
 
 #ifdef CPU_PP502x
 
