@@ -406,6 +406,11 @@ void fiq_record(void)
 
             /* TODO: Figure out how to do IIS loopback */
             if (audio_output_source != AUDIO_SRC_PLAYBACK) {
+                if ((IISFIFO_CFG & (0x3f << 16)) >= (16 << 16)) {
+                    /* Resync the output FIFO - it ran dry */
+                    IISFIFO_WR = 0;
+                    IISFIFO_WR = 0;
+                }
                 IISFIFO_WR = value1;
                 IISFIFO_WR = value1;
             }
@@ -428,6 +433,12 @@ void fiq_record(void)
             p_size -= 4;
 
             if (audio_output_source != AUDIO_SRC_PLAYBACK) {
+                if ((IISFIFO_CFG & (0x3f << 16)) >= (16 << 16)) {
+                    /* Resync the output FIFO - it ran dry */
+                    IISFIFO_WR = 0;
+                    IISFIFO_WR = 0;
+                }
+
                 value1 = *((int32_t *)p - 1);
                 IISFIFO_WR = value1;
                 IISFIFO_WR = value1;
