@@ -70,6 +70,9 @@ static inline unsigned int current_core(void)
     return core;
 }
 
+#define UNCACHED_ADDR(a) \
+    ((typeof (a))((uintptr_t)(a) + 0x10000000))
+
 #ifdef CPU_PP502x
 
 #ifndef BOOTLOADER

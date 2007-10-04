@@ -42,6 +42,14 @@ start:
     .equ    SLEEP,      0x000000ca
     .equ    WAKE,       0x000000ce
     .equ    SLEEPING,   0x00004000
+    .equ    MMAP_LOG,   0xf000f010 /* MMAP2 */
+    .equ    MMAP_PHYS,  0xf000f014
+#if MEM > 32
+    .equ    MMAP_MASK,  0x00007400
+#else
+    .equ    MMAP_MASK,  0x00003a00
+#endif
+    .equ    MMAP_FLAGS, 0x00003f84
 #else
     .equ    PROC_ID,    0x60000000
     .equ    CPU_ICLR,   0x60004028
@@ -55,6 +63,14 @@ start:
     .equ    WAKE,       0x00000000
     .equ    SLEEPING,   0x80000000
     .equ    CACHE_CTRL, 0x6000c000
+    .equ    MMAP_LOG,   0xf000f000 /* MMAP0 */
+    .equ    MMAP_PHYS,  0xf000f004
+#if MEM > 32
+    .equ    MMAP_MASK,  0x00003c00
+#else
+    .equ    MMAP_MASK,  0x00003e00
+#endif
+    .equ    MMAP_FLAGS, 0x00000f84
 #endif
 
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
@@ -126,16 +142,11 @@ pad_skip:
     cmp    r3, r4
     blo    1b
 
-    ldr    r4, =0x3f84     /* r3 and r1 values here are magic, don't touch */
+    ldr    r4, =MMAP_FLAGS
     orr    r4, r4, r6      /* adjust for execute address */
-    ldr    r3, =0xf000f014
-#if MEM > 32
-    mov    r2, #0x7400     /* r1 appears to indicate how much memory (not in
-                              bytes) is remapped */
-#else
-    mov    r2, #0x3a00
-#endif
-    ldr    r1, =0xf000f010
+    ldr    r3, =MMAP_PHYS
+    ldr    r2, =MMAP_MASK  /* ldr is more flexible */
+    ldr    r1, =MMAP_LOG
     mov    pc, #0x40000000 
 
 remap_start:

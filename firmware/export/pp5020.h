@@ -189,7 +189,6 @@
 #define CACHE_OP_FLUSH       0x0002
 #define CACHE_OP_INVALIDATE  0x0004
 
-
 /* GPIO Ports */
 #define GPIOA_ENABLE     (*(volatile unsigned long *)(0x6000d000))
 #define GPIOB_ENABLE     (*(volatile unsigned long *)(0x6000d004))
@@ -354,6 +353,10 @@
 #define CACHE_STATUS_BASE       (*(volatile unsigned long*)(0xf0004000))
 #define CACHE_FLUSH_BASE        (*(volatile unsigned long*)(0xf0008000))
 #define CACHE_INVALID_BASE      (*(volatile unsigned long*)(0xf000c000))
+#define MMAP_PHYS_READ_MASK     0x0100
+#define MMAP_PHYS_WRITE_MASK    0x0200
+#define MMAP_PHYS_DATA_MASK     0x0400
+#define MMAP_PHYS_CODE_MASK     0x0800
 #define MMAP_FIRST              (*(volatile unsigned long*)(0xf000f000))
 #define MMAP_LAST               (*(volatile unsigned long*)(0xf000f03c))
 #define MMAP0_LOGICAL           (*(volatile unsigned long*)(0xf000f000))

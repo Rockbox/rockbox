@@ -108,9 +108,10 @@ static unsigned short r_drv_output_control  = R_DRV_OUTPUT_CONTROL_NORMAL;
 
 /* We don't know how to receive a DMA finished signal from the LCD controller
  * To avoid problems with flickering, we double-buffer the framebuffer and turn
- * off DMA while updates are taking place */
+ * off DMA while updates are taking place
+ * Same alignment as in lcd-16bit.c and cache interference free */
 static fb_data lcd_driver_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
-    __attribute__((aligned(16))); /* Same alignment as in lcd-16bit.c */
+    __attribute__((aligned(16)));
 
 #ifdef BOOTLOADER
 static void lcd_init_gpio(void)
@@ -175,13 +176,15 @@ static void lcd_write_reg(unsigned int reg, unsigned int data)
 /* The LCD controller gets passed the address of the framebuffer, but can only
    use the physical, not the remapped, address.  This is a quick and dirty way
    of correcting it */
-static unsigned long phys_fb_address(unsigned long address)
+static inline unsigned long phys_fb_address(typeof (lcd_driver_framebuffer) fb)
 {
-    if(address < 0x10000000)
+    if ((unsigned long)fb < 0x10000000)
     {
-        return address + 0x10000000;
-    } else {
-        return address;
+        return (unsigned long)fb + 0x10000000;
+    }
+    else
+    {
+        return (unsigned long)fb;
     }
 }
 
@@ -410,7 +413,7 @@ void lcd_init_device(void)
     LCD_REG_6 |= (1 << 4);
 
     LCD_REG_5 &= ~(1 << 7);
-    LCD_FB_BASE_REG = phys_fb_address((unsigned long)lcd_driver_framebuffer);
+    LCD_FB_BASE_REG = phys_fb_address(lcd_driver_framebuffer);
 
     udelay(100000);
 
@@ -425,7 +428,7 @@ void lcd_init_device(void)
 #else
     /* Power and display already ON - switch framebuffer address and reset
        settings */
-    LCD_FB_BASE_REG = phys_fb_address((unsigned long)lcd_driver_framebuffer);
+    LCD_FB_BASE_REG = phys_fb_address(lcd_driver_framebuffer);
 
     power_on = true;
     display_on = true;
@@ -512,7 +515,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
      * and lcd_framebuffer */
-    dst = &lcd_driver_framebuffer[y][x];
+    dst = UNCACHED_ADDR(&lcd_driver_framebuffer[y][x]);
     src = &lcd_framebuffer[y][x];
 
     /* Copy part of the Rockbox framebuffer to the second framebuffer */
@@ -526,8 +529,6 @@ void lcd_update_rect(int x, int y, int width, int height)
         /* Full width - copy as one line */
         lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
     }
-
-    flush_icache();
 }
 
 void lcd_update(void)
@@ -538,10 +539,8 @@ void lcd_update(void)
     /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
      * and lcd_framebuffer */
     /* Copy the Rockbox framebuffer to the second framebuffer */
-    lcd_copy_buffer_rect(&lcd_driver_framebuffer[0][0],
+    lcd_copy_buffer_rect(UNCACHED_ADDR(&lcd_driver_framebuffer[0][0]),
                          &lcd_framebuffer[0][0], LCD_WIDTH*LCD_HEIGHT, 1);
-
-    flush_icache();
 }
 
 
@@ -660,8 +659,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
     height >>= 1;
 
     y = LCD_WIDTH - 1 - y;
-    fb_data *dst = (fb_data*)lcd_driver_framebuffer + 
-                   x * LCD_WIDTH + y;
+    fb_data *dst = UNCACHED_ADDR(&lcd_driver_framebuffer[x][y]);
 
     z = stride*src_y;
     yuv_src[0] = src[0] + z + src_x;
