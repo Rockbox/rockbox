@@ -16,7 +16,12 @@
  *
  ****************************************************************************/
 
-#include "../../plugin.h"
+#include "plugin.h"
+#include "midi/guspat.h"
+#include "midi/midiutil.h"
+#include "midi/synth.h"
+#include "midi/sequencer.h"
+#include "midi/midifile.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
@@ -113,15 +118,6 @@ struct MIDIfile * mf IBSS_ATTR;
 
 int numberOfSamples IBSS_ATTR;
 long bpm IBSS_ATTR;
-
-
-#include "plugin.h"
-#include "midi/guspat.h"
-#include "midi/midiutil.h"
-#include "midi/synth.h"
-#include "midi/sequencer.h"
-#include "midi/midifile.h"
-
 
 const unsigned char * drumNames[]={
     "Bass Drum 2    ",
@@ -362,7 +358,7 @@ void sendEvents()
     for(i=0; i<V_NUMCELLS; i++)
     {
         if(trackData[trackPos[i]][i] == VAL_ENABLED)
-            pressNote_Nonstatic(9, trackMap[i], 127);
+            pressNote(9, trackMap[i], 127);
     }
 }
 

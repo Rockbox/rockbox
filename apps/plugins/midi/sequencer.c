@@ -157,7 +157,7 @@ static inline void setPW(int ch, int msb, int lsb)
     }
 }
 
-static void pressNote(int ch, int note, int vol)
+inline void pressNote(int ch, int note, int vol)
 {
     static int lastKill = 0;
 /* Silences all channels but one, for easy debugging, for me. */
@@ -377,14 +377,5 @@ int tick(void)
         return 1;
     else
         return 0;
-}
-
-
-/* Ugly hack so that beatbox can get at teh pressnote function */
-/* Is there a speed advantage to keeping pressNote itself static? */
-/* Note that midiplay needs the speed much more than beatbox does */
-void pressNote_Nonstatic(int ch, int note, int vol)
-{
-	pressNote(ch, note, vol);
 }
 
