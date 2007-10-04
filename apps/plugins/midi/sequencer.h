@@ -19,5 +19,8 @@
 
 int tick(void);
 
+/* used by beatbox */
+void pressNote(int ch, int note, int vol);
+
 extern long tempo;
 
