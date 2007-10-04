@@ -734,7 +734,7 @@ void BootloaderInstaller::ipodPrepare()
         {
             m_dp->addItem(tr("Warning this is a MacPod, Rockbox doesnt work on "
                     "this. Convert it to WinPod\n"
-                    "See http://www.rockbox.org/wiki/IpodConverstionToFAT32"),
+                    "See http://www.rockbox.org/wiki/IpodConversionToFAT32"),
                     LOGWARNING);
             emit done(true);
             return;
@@ -836,7 +836,7 @@ void BootloaderInstaller::ipodFinish()
     {
         m_dp->addItem(tr("Warning this is a MacPod, Rockbox doesnt work on "
                 "this. Convert it to WinPod\n"
-                "See http://www.rockbox.org/wiki/IpodConverstionToFAT32"),
+                "See http://www.rockbox.org/wiki/IpodConversionToFAT32"),
                 LOGWARNING);
         emit done(true);
         return;
