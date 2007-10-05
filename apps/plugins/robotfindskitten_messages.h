@@ -417,8 +417,6 @@ static char* messages[] =
   "It's the triangle leg adjacent to an angle divided by the leg opposite it.",
   "It's a bottle of nail polish remover.",
   "You found netkit! Way to go, robot!",
-/* Exclude some messages on targets with less RAM */
-#if PLUGIN_BUFFER_SIZE > 0x8000
   "It's the ASCII Floating Head of Seth David Schoen!",
   "A frosted pink party-cake, half eaten.",
   "A bitchin' homemade tesla coil.",
@@ -449,5 +447,4 @@ static char* messages[] =
   "The intermission from a 1930s silent movie.",
   "It's an inverted billiard ball!",
   "The spectre of Sherlock Holmes wills you onwards.",
-#endif
 };

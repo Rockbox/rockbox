@@ -127,8 +127,8 @@ const unsigned colors[NUM_COLORS] = {
   on the screen*/
 typedef struct
 {
-  int x;
-  int y;
+  short x;
+  short y;
   int color;
   bool bold;
   char character;
@@ -139,22 +139,22 @@ typedef struct
  */
 
 /*Initialization and setup functions*/
-void initialize_arrays(void);
-void initialize_robot(void);
-void initialize_kitten(void);
-void initialize_bogus(void);
-void initialize_screen(void);
-void instructions(void);
-void finish(int sig);
+static void initialize_arrays(void);
+static void initialize_robot(void);
+static void initialize_kitten(void);
+static void initialize_bogus(void);
+static void initialize_screen(void);
+static void instructions(void);
+static void finish(int sig);
 
 /*Game functions*/
-void play_game(void);
-void process_input(int);
+static void play_game(void);
+static void process_input(int);
 
 /*Helper functions*/
-int validchar(char);
+static int validchar(char);
 
-void play_animation(int);
+static void play_animation(int);
 
 /*Global variables. Bite me, it's fun.*/
 screen_object robot;
@@ -186,14 +186,14 @@ static struct plugin_api* rb;
 
 MEM_FUNCTION_WRAPPERS(rb) 
 
-void drawchar(int x, int y, char c)
+static void drawchar(int x, int y, char c)
 {
   char str[2];
   rb->snprintf(str, sizeof(str), "%c", c);
   rb->lcd_putsxy(x*SYSFONT_WIDTH, y*SYSFONT_HEIGHT, str);
 }
 
-void draw(screen_object o)
+static void draw(screen_object o)
 {
 #if LCD_DEPTH > 1
   unsigned oldforeground;
@@ -206,12 +206,12 @@ void draw(screen_object o)
 #endif
 }
 
-void message(char * str)
+static void message(char * str)
 {
   rb->lcd_puts_scroll(0, ADV_ROW, str);
 }
 
-void refresh(void)
+static void refresh(void)
 {
   rb->lcd_update();
 }
@@ -219,7 +219,7 @@ void refresh(void)
 /*
  *play_game waits in a loop getting input and sending it to process_input
  */
-void play_game()
+static void play_game()
 {
   int old_x = robot.x;
   int old_y = robot.y;
@@ -261,7 +261,7 @@ void play_game()
  *Given the keyboard input, process_input interprets it in terms of moving,
  *touching objects, etc.
  */
-void process_input(int input)
+static void process_input(int input)
 {
 #ifdef __PLUGINLIB_ACTIONS_H__
   const struct button_mapping *plugin_contexts[] = {generic_directions, generic_actions};
@@ -334,7 +334,7 @@ void process_input(int input)
 }
 
 /*finish is called upon signal or progam exit*/
-void finish(int sig)
+static void finish(int sig)
 {
   (void)sig;
   exit_rfk = true;
@@ -346,7 +346,7 @@ void finish(int sig)
  *
  *****************************************************************************/
 
-int validchar(char a)
+static int validchar(char a)
 {
   switch(a)
     {
@@ -358,7 +358,7 @@ int validchar(char a)
   return 1;
 }
 
-void play_animation(int input)
+static void play_animation(int input)
 {
   int counter;
   screen_object left;
@@ -403,7 +403,7 @@ void play_animation(int input)
  *
  *****************************************************************************/
 
-void instructions()
+static void instructions()
 {
   char buf[X_MAX + 5];
   rb->snprintf(buf, sizeof(buf), "robotfindskitten %s", RFK_VERSION);
@@ -433,7 +433,7 @@ void instructions()
 #endif
 }
 
-void initialize_arrays()
+static void initialize_arrays()
 {
   unsigned int counter, counter2;
   screen_object empty;
@@ -467,7 +467,7 @@ void initialize_arrays()
 }
 
 /*initialize_robot initializes robot.*/
-void initialize_robot()
+static void initialize_robot()
 {
   /*Assign a position to the player.*/
   robot.x = randx();
@@ -480,7 +480,7 @@ void initialize_robot()
 }
 
 /*initialize kitten, well, initializes kitten.*/
-void initialize_kitten()
+static void initialize_kitten()
 {
   /*Assign the kitten a unique position.*/
   do
@@ -500,7 +500,7 @@ void initialize_kitten()
 }
 
 /*initialize_bogus initializes all non-kitten objects to be used in this run.*/
-void initialize_bogus()
+static void initialize_bogus()
 {
   int counter, index;
   for (counter = 0; counter < num_bogus; counter++)
@@ -534,7 +534,7 @@ void initialize_bogus()
 }
 
 /*initialize_screen paints the screen.*/
-void initialize_screen()
+static void initialize_screen()
 {
   int counter;
   char buf[40];
