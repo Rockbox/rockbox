@@ -35,23 +35,25 @@ PLUGIN_HEADER
 
 #define BATTERY_ON BUTTON_PLAY
 #define BATTERY_OFF BUTTON_OFF
+#define BATTERY_ON_TXT  "PLAY - start"
+#define BATTERY_OFF_TXT "OFF  - quit"
 
-#if BUTTON_REMOTE != 0
 #define BATTERY_RC_ON BUTTON_RC_PLAY
 #define BATTERY_RC_OFF BUTTON_RC_STOP
-#endif
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 
 #define BATTERY_ON BUTTON_RIGHT
 #define BATTERY_OFF BUTTON_OFF
+#define BATTERY_ON_TXT  "RIGHT - start"
+#define BATTERY_OFF_TXT "OFF   - quit"
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 
 #define BATTERY_ON BUTTON_PLAY
-#define BATTERY_RC_ON BUTTON_RC_PLAY
-
 #define BATTERY_OFF BUTTON_STOP
+
+#define BATTERY_RC_ON BUTTON_RC_PLAY
 #define BATTERY_RC_OFF BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
@@ -63,37 +65,52 @@ PLUGIN_HEADER
 #define BATTERY_OFF BUTTON_OFF
 #define BATTERY_RC_OFF BUTTON_RC_STOP
 
+#define BATTERY_ON_TXT  "PLAY - start"
+#define BATTERY_OFF_TXT "STOP - quit"
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #define BATTERY_ON  BUTTON_PLAY
 #define BATTERY_OFF BUTTON_MENU
+#define BATTERY_ON_TXT  "PLAY - start"
+#define BATTERY_OFF_TXT "MENU - quit"
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 
 #define BATTERY_ON  BUTTON_SELECT
-#define BATTERY_OFF BUTTON_PLAY
+#define BATTERY_OFF BUTTON_POWER
+#define BATTERY_ON_TXT  "SELECT - start"
+#define BATTERY_OFF_TXT "POWER  - quit"
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 
 #define BATTERY_ON  BUTTON_SELECT
 #define BATTERY_OFF BUTTON_PLAY
+#define BATTERY_ON_TXT  "SELECT - start"
+#define BATTERY_OFF_TXT "PLAY   - quit"
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
 (CONFIG_KEYPAD == SANSA_C200_PAD)
 #define BATTERY_ON BUTTON_SELECT
 #define BATTERY_OFF BUTTON_POWER
+#define BATTERY_ON_TXT  "SELECT - start"
+#define BATTERY_OFF_TXT "POWER  - quit"
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 
 #define BATTERY_ON  BUTTON_PLAY
 #define BATTERY_OFF BUTTON_POWER
+#define BATTERY_ON_TXT  "PLAY  - start"
+#define BATTERY_OFF_TXT "POWER - quit"
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 
 #define BATTERY_ON  BUTTON_SELECT
 #define BATTERY_OFF BUTTON_POWER
+#define BATTERY_ON_TXT  "SELECT - start"
+#define BATTERY_OFF_TXT "POWER  - quit"
 
 #endif
 
@@ -376,7 +393,7 @@ int main(void)
 #ifdef HAVE_LCD_BITMAP
     int i;
     const char *msgs[] = { "Battery Benchmark","Check file", BATTERY_LOG,
-            "for more info", "PLAY - start", "OFF  - quit" };
+                           "for more info", BATTERY_ON_TXT, BATTERY_OFF_TXT };
 #endif    
     rb->lcd_clear_display();
 
