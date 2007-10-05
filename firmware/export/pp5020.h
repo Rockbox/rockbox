@@ -116,8 +116,9 @@
 #define RTC          (*(volatile unsigned long *)(0x60005014))
 
 /* Device Controller */
-#define DEV_RS (*(volatile unsigned long *)(0x60006004))
-#define DEV_EN (*(volatile unsigned long *)(0x6000600c))
+#define DEV_RS       (*(volatile unsigned long *)(0x60006004))
+#define DEV_OFF_MASK (*(volatile unsigned long *)(0x60006008))
+#define DEV_EN       (*(volatile unsigned long *)(0x6000600c))
 
 #define DEV_SYSTEM      0x00000004
 #define DEV_SER0        0x00000040

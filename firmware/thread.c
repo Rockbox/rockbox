@@ -1095,7 +1095,6 @@ void init_threads(void)
         /* Get COP safely primed inside switch_thread where it will remain
          * until a thread actually exists on it */
         CPU_CTL = PROC_WAKE;
-        set_irq_level(0);
         remove_thread(NULL);
 #endif /* NUM_CORES */
     }

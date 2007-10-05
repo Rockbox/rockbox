@@ -134,15 +134,12 @@ void set_cpu_frequency(long frequency)
 static void pp_set_cpu_frequency(long frequency)
 #endif
 {
-    unsigned long clcd_clock_src;
-
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
     /* Using mutex or spinlock isn't safe here. */
     while (test_and_set(&boostctrl_mtx.locked, 1)) ;
 #endif
 
     cpu_frequency = frequency;
-    clcd_clock_src = CLCD_CLOCK_SRC; /* save selected color LCD clock source */
 
     switch (frequency)
     {
@@ -152,7 +149,6 @@ static void pp_set_cpu_frequency(long frequency)
        * have this limitation (and the post divider?) */
       case CPUFREQ_MAX:
         CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
-        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
         DEV_TIMING1  = 0x00000808;
 #if CONFIG_CPU == PP5020
         PLL_CONTROL  = 0x8a020a03;  /* 10/3 * 24MHz */
@@ -168,7 +164,6 @@ static void pp_set_cpu_frequency(long frequency)
 
       case CPUFREQ_NORMAL:
         CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
-        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
         DEV_TIMING1  = 0x00000303;
 #if CONFIG_CPU == PP5020
         PLL_CONTROL  = 0x8a020504;  /* 5/4 * 24MHz */
@@ -182,23 +177,18 @@ static void pp_set_cpu_frequency(long frequency)
 
       case CPUFREQ_SLEEP:
         CLOCK_SOURCE = 0x10002202;  /* source #2: 32kHz, #1, #3, #4: 24MHz */
-        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
         PLL_CONTROL &= ~0x80000000; /* disable PLL */
         udelay(10000);              /* let 32kHz source stabilize? */
         break;
 
       default:
         CLOCK_SOURCE = 0x10002222;  /* source #1, #2, #3, #4: 24MHz */
-        CLCD_CLOCK_SRC &= ~0xc0000000; /* select 24MHz as color LCD clock source */
         DEV_TIMING1  = 0x00000303;
         PLL_CONTROL &= ~0x80000000; /* disable PLL */
         cpu_frequency = CPUFREQ_DEFAULT;
         break;
     }
     CLOCK_SOURCE = (CLOCK_SOURCE & ~0xf0000000) | 0x20000000;  /* select source #2 */
-
-    CLCD_CLOCK_SRC;             /* dummy read (to sync the write pipeline??) */
-    CLCD_CLOCK_SRC = clcd_clock_src; /* restore saved value */
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
     boostctrl_mtx.locked = 0;
@@ -213,17 +203,17 @@ void system_init(void)
     {
 #if defined(SANSA_E200) || defined(SANSA_C200)
         /* Reset all devices */
-        outl(inl(0x60006008) | 0x20, 0x60006008);
+        DEV_OFF_MASK |= 0x20;
         DEV_RS = 0x3bfffef8;
-        outl(0xffffffff, 0x60006008);
+        DEV_OFF_MASK = -1;
         DEV_RS = 0;
-        outl(0x00000000, 0x60006008);
-#elif defined (IRIVER_H10)
+        DEV_OFF_MASK = 0;
+ #elif defined (IRIVER_H10)
         DEV_RS = 0x3ffffef8;
-        outl(0xffffffff, 0x60006008);
+        DEV_OFF_MASK = -1;
         outl(inl(0x70000024) | 0xc0, 0x70000024);
         DEV_RS = 0;
-        outl(0x00000000, 0x60006008);
+        DEV_OFF_MASK = 0;
 #endif
 
 #if !defined(SANSA_E200) && !defined(SANSA_C200)

@@ -44,22 +44,18 @@ static int num_queues NOCACHEBSS_ATTR;
 void kernel_init(void)
 {
     /* Init the threading API */
-#if NUM_CORES > 1
-    if (CURRENT_CORE == COP)
-    {
-        /* This enables the interrupt but it won't be active until
-           the timer is actually started and interrupts are unmasked */
-        tick_start(1000/HZ);
-    }
-#endif
-
     init_threads();
 
-    /* No processor other than the CPU will proceed here */
-    memset(tick_funcs, 0, sizeof(tick_funcs));
-    num_queues = 0;
-    memset(all_queues, 0, sizeof(all_queues));
-    tick_start(1000/HZ);
+    /* Other processors will not reach this point in a multicore build.
+     * In a single-core build with multiple cores they fall-through and
+     * sleep in cop_main without returning. */
+    if (CURRENT_CORE == CPU)
+    {
+        memset(tick_funcs, 0, sizeof(tick_funcs));
+        num_queues = 0;
+        memset(all_queues, 0, sizeof(all_queues));
+        tick_start(1000/HZ);
+    }
 }
 
 void sleep(int ticks)
@@ -573,8 +569,8 @@ void TIMER1(void)
 
     TIMER1_VAL; /* Read value to ack IRQ */
 
-    /* Run through the list of tick tasks (using main core - 
-       COP does not dispatch ticks to this subroutine) */
+    /* Run through the list of tick tasks using main CPU core - 
+       wake up the COP through its control interface to provide pulse */
     for (i = 0;i < MAX_NUM_TICK_TASKS;i++)
     {
         if (tick_funcs[i])
@@ -582,6 +578,27 @@ void TIMER1(void)
             tick_funcs[i]();
         }
     }
+
+#if NUM_CORES > 1
+#ifdef CPU_PP502x
+    {
+        /* If COP is sleeping - give it a kick */
+        /* TODO: Use a mailbox in addition to make sure it doesn't go to
+         * sleep if kicked just as it's headed to rest to make sure its
+         * tick checks won't be jittery. Don't bother at all if it owns no
+         * threads. */
+        unsigned int cop_ctl;
+
+        cop_ctl = COP_CTL;
+        if (cop_ctl & PROC_SLEEP)
+        {
+            COP_CTL = cop_ctl & ~PROC_SLEEP;
+        }
+    }
+#else
+    /* TODO: PP5002 */
+#endif
+#endif /* NUM_CORES */
 
     current_tick++;
 }
@@ -591,17 +608,12 @@ void TIMER1(void)
 void tick_start(unsigned int interval_in_ms)
 {
 #ifndef BOOTLOADER
-    if(CURRENT_CORE == CPU)
-    {
-        TIMER1_CFG = 0x0;
-        TIMER1_VAL;
-        /* enable timer */
-        TIMER1_CFG = 0xc0000000 | (interval_in_ms*1000 - 1);
-        /* unmask interrupt source */
-        CPU_INT_EN = TIMER1_MASK;
-    } else {
-        COP_INT_EN = TIMER1_MASK;
-    }
+    TIMER1_CFG = 0x0;
+    TIMER1_VAL;
+    /* enable timer */
+    TIMER1_CFG = 0xc0000000 | (interval_in_ms*1000 - 1);
+    /* unmask interrupt source */
+    CPU_INT_EN = TIMER1_MASK;
 #else
     /* We don't enable interrupts in the bootloader */
     (void)interval_in_ms;
