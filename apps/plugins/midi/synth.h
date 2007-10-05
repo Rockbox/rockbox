@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig);
-signed short int synthVoice(struct SynthObject * so);
+int synthVoice(struct SynthObject * so);
 void setPoint(struct SynthObject * so, int pt);
 
 static inline void synthSample(int * mixL, int * mixR)
@@ -48,6 +48,8 @@ static inline void synthSample(int * mixL, int * mixR)
         voicept++;
     }
 
+    /* if max voices is an even number gcc is smart enough to not
+       include this loop */
     for(i=MAX_VOICES%2; i > 0; i--)
     {
         if(voicept->isUsed==1)

@@ -255,8 +255,8 @@ inline void stopVoice(struct SynthObject * so)
     so->decay = 0;
 }
 
-signed short int synthVoice(struct SynthObject * so) ICODE_ATTR;
-signed short int synthVoice(struct SynthObject * so)
+int synthVoice(struct SynthObject * so) ICODE_ATTR;
+int synthVoice(struct SynthObject * so)
 {
     struct GWaveform * wf;
     register int s;
