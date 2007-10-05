@@ -150,7 +150,7 @@ static inline void synthbuf(void)
 {
    int32_t *outptr;
    register int i;
-   static int currentSample=0;
+   int currentSample=0;
    int synthtemp[2];
 
 #ifndef SYNC
