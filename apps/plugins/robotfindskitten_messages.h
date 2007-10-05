@@ -417,6 +417,8 @@ static char* messages[] =
   "It's the triangle leg adjacent to an angle divided by the leg opposite it.",
   "It's a bottle of nail polish remover.",
   "You found netkit! Way to go, robot!",
+/* Exclude some messages on targets with less RAM */
+#if PLUGIN_BUFFER_SIZE > 0x8000
   "It's the ASCII Floating Head of Seth David Schoen!",
   "A frosted pink party-cake, half eaten.",
   "A bitchin' homemade tesla coil.",
@@ -426,8 +428,6 @@ static char* messages[] =
   "Fonzie sits here, mumbling incoherently about a shark and a pair of waterskis.",
   "The ghost of your dance instructor, his face a paper-white mask of evil.",
   "A bag of groceries taken off the shelf before the expiration date.",
-/* Exclude some messages on targets with less RAM */
-#if PLUGIN_BUFFER_SIZE > 0x8000
   "A book: Feng Shui, Zen: the art of randomly arranging items that are not kitten.",
   "This might be the fountain of youth, but you'll never know.",
   "Tigerbot Hesh.",
