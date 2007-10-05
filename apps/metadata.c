@@ -101,6 +101,9 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     int i;
 #endif
 
+    /* Clear the mp3entry to avoid having bogus pointers appear */
+    memset(id3, 0, sizeof(struct mp3entry));
+
     /* Take our best guess at the codec type based on file extension */
     id3->codectype = probe_file_format(trackname);
 
