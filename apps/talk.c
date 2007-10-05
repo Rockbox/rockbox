@@ -77,7 +77,7 @@ const char* const file_thumbnail_ext = ".talk";
 #define LOADED_MASK 0x80000000 /* MSB */
 
 #if CONFIG_CODEC == SWCODEC    
-#define MAX_THUMBNAIL_BUFSIZE 32768
+#define MAX_THUMBNAIL_BUFSIZE 0x10000
 #endif
 
 #ifndef SIMULATOR
