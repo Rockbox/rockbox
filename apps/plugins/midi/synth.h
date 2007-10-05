@@ -48,9 +48,9 @@ static inline void synthSample(int * mixL, int * mixR)
         voicept++;
     }
 
-    /* if max voices is an even number gcc is smart enough to not
-       include this loop */
-    for(i=MAX_VOICES%2; i > 0; i--)
+/* if MAX_VOICES is not even we do this to get the last voice */
+#if MAX_VOICES%2
+    if (MAX_VOICES%2)
     {
         if(voicept->isUsed==1)
         {
@@ -59,8 +59,8 @@ static inline void synthSample(int * mixL, int * mixR)
             sample *= chPan[voicept->ch];
             dR += sample;
         }
-        voicept++;
     }
+#endif
 
     dL = (dL << 7) - dR;
 
