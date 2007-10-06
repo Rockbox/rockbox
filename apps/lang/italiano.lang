@@ -4407,7 +4407,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Sveglia tra"
   </voice>
 </phrase>
 <phrase>
@@ -4420,11 +4420,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Spegnimento..."
+    alarm: "Imposta Allarme"
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Imposta Allarme"
   </voice>
 </phrase>
 <phrase>
@@ -4441,7 +4441,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "L'orario impostato è troppo vicino!"
   </voice>
 </phrase>
 <phrase>
@@ -4477,7 +4477,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Sveglia disattivata"
   </voice>
 </phrase>
 <phrase>
@@ -11203,15 +11203,15 @@
   user:
   <source>
     *: none
-    lcd_color: "Line Selector Primary Colour"
+    lcd_color: "Primary Colour"
   </source>
   <dest>
     *: none
-    lcd_color: "Colore Primario Selettore Linea"
+    lcd_color: "Colore Primario"
   </dest>
   <voice>
     *: none
-    lcd_color: "Colore Primario Selettore Linea"
+    lcd_color: "Colore Primario"
   </voice>
 </phrase>
 <phrase>
@@ -11220,15 +11220,15 @@
   user:
   <source>
     *: none
-    lcd_color: "Line Selector Secondary Colour"
+    lcd_color: "Secondary Colour"
   </source>
   <dest>
     *: none
-    lcd_color: "Colore Secondario Selettore Linea"
+    lcd_color: "Colore Secondario"
   </dest>
   <voice>
     *: none
-    lcd_color: "Colore Secondario Selettore Linea"
+    lcd_color: "Colore Secondario"
   </voice>
 </phrase>
 <phrase>
@@ -11237,15 +11237,15 @@
   user:
   <source>
     *: none
-    lcd_color: "Line Selector Text Colour"
+    lcd_color: "Text Colour"
   </source>
   <dest>
     *: none
-    lcd_color: "Colore Testo Selettore Linea"
+    lcd_color: "Colore Testo"
   </dest>
   <voice>
     *: none
-    lcd_color: "Colore Testo Selettore Linea"
+    lcd_color: "Colore Testo"
   </voice>
 </phrase>
 <phrase>
@@ -11294,5 +11294,53 @@
   </dest>
   <voice>
     *: "Europa Centrale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user:
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Impostazioni Tema"
+  </dest>
+  <voice>
+    *: "Impostazioni Tema"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user:
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Colori"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colori"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Colori Selettore Linea"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colori Selettore Linea"
   </voice>
 </phrase>
