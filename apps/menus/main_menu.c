@@ -49,18 +49,7 @@
 
 
 
-struct browse_folder_info {
-    const char* dir;
-    int show_options;
-};
-static struct browse_folder_info theme = {THEME_DIR, SHOW_CFG};
 static struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
-int browse_folder(void *param)
-{
-    const struct browse_folder_info *info =
-            (const struct browse_folder_info*)param;
-    return rockbox_browse(info->dir, info->show_options);
-}
 
 /***********************************/
 /*    MANAGE SETTINGS MENU        */
@@ -454,8 +443,6 @@ MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_Questionmark,
 /***********************************/
 /*    MAIN MENU                    */
 
-MENUITEM_FUNCTION(browse_themes, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_THEME), 
-        browse_folder, (void*)&theme, NULL, Icon_Folder);
 
 #ifdef HAVE_LCD_CHARCELLS
 int mainmenu_callback(int action,const struct menu_item_ex *this_item)
@@ -478,10 +465,11 @@ int mainmenu_callback(int action,const struct menu_item_ex *this_item)
 MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), mainmenu_callback,
         Icon_Submenu_Entered,
         &sound_settings,
-        &settings_menu_item, &manage_settings, &browse_themes,
+        &settings_menu_item, &theme_menu,
 #ifdef HAVE_RECORDING
         &recording_settings,
 #endif
+        &manage_settings,
         );
 /*    MAIN MENU                    */
 /***********************************/

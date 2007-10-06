@@ -11248,15 +11248,15 @@
   user:
   <source>
     *: none
-    lcd_color: "Line Selector Primary Colour"
+    lcd_color: "Primary Colour"
   </source>
   <dest>
     *: none
-    lcd_color: "Line Selector Primary Colour"
+    lcd_color: "Primary Colour"
   </dest>
   <voice>
     *: none
-    lcd_color: "Line Selector Primary Colour"
+    lcd_color: "Primary Colour"
   </voice>
 </phrase>
 <phrase>
@@ -11265,15 +11265,15 @@
   user:
   <source>
     *: none
-    lcd_color: "Line Selector Secondary Colour"
+    lcd_color: "Secondary Colour"
   </source>
   <dest>
     *: none
-    lcd_color: "Line Selector Secondary Colour"
+    lcd_color: "Secondary Colour"
   </dest>
   <voice>
     *: none
-    lcd_color: "Line Selector Secondary Colour"
+    lcd_color: "Secondary Colour"
   </voice>
 </phrase>
 <phrase>
@@ -11282,15 +11282,15 @@
   user:
   <source>
     *: none
-    lcd_color: "Line Selector Text Colour"
+    lcd_color: "Text Colour"
   </source>
   <dest>
     *: none
-    lcd_color: "Line Selector Text Colour"
+    lcd_color: "Text Colour"
   </dest>
   <voice>
     *: none
-    lcd_color: "Line Selector Text Colour"
+    lcd_color: "Text Colour"
   </voice>
 </phrase>
 <phrase>
@@ -11339,5 +11339,54 @@
   </dest>
   <voice>
     *: "Central Eurpean"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user:
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Theme Settings"
+  </dest>
+  <voice>
+    *: "Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user:
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Colours"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colours"
+  </voice>
+</phrase>
+
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Line Selector Colours"
   </voice>
 </phrase>

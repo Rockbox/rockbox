@@ -11,6 +11,7 @@ language.c
 main.c
 menu.c
 menus/display_menu.c
+menus/theme_menu.c
 #if CONFIG_CODEC == SWCODEC
 menus/eq_menu.c
 #endif

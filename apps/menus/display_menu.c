@@ -115,113 +115,7 @@ MENUITEM_SETTING(invert, &global_settings.invert, NULL);
 #ifdef HAVE_LCD_FLIP
 MENUITEM_SETTING(flip_display, &global_settings.flip_display, flipdisplay_callback);
 #endif
-MENUITEM_SETTING(cursor_style, &global_settings.cursor_style, NULL);
 #endif /* HAVE_LCD_BITMAP */
-#if LCD_DEPTH > 1
-/**
-* Menu to clear the backdrop image
- */
-static int clear_main_backdrop(void)
-{
-    global_settings.backdrop_file[0]=0;
-    unload_main_backdrop();
-    show_main_backdrop();
-    settings_save();
-    return 0;
-}
-MENUITEM_FUNCTION(clear_main_bd, 0, ID2P(LANG_CLEAR_BACKDROP),
-                    clear_main_backdrop, NULL, NULL, Icon_NOICON);
-#endif /* LCD_DEPTH > 1 */
-#ifdef HAVE_LCD_COLOR
-/**
- * Menu for fore/back colors
- */
-static int set_fg_color(void)
-{
-    int res;
-    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_FOREGROUND_COLOR),
-                     &global_settings.fg_color,global_settings.bg_color);
-
-    screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
-    settings_save();
-    return res;
-}
-
-static int set_bg_color(void)
-{
-    int res;
-    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_BACKGROUND_COLOR),
-                     &global_settings.bg_color,global_settings.fg_color);
-
-    screens[SCREEN_MAIN].set_background(global_settings.bg_color);
-    settings_save();
-    return res;
-}
-
-/* Line selector colour */
-static int set_lss_color(void)
-{
-    int res;
-    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_SELECTOR_START_COLOR),
-                         &global_settings.lss_color,-1);
-
-    screens[SCREEN_MAIN].set_selector_start(global_settings.lss_color);
-    settings_save();
-    return res;
-}
-
-static int set_lse_color(void)
-{
-    int res;
-    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_SELECTOR_END_COLOR),
-                         &global_settings.lse_color,-1);
-
-    screens[SCREEN_MAIN].set_selector_end(global_settings.lse_color);
-    settings_save();
-    return res;
-}
-
-/* Line selector text colour */
-static int set_lst_color(void)
-{
-    int res;
-    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_SELECTOR_TEXT_COLOR),
-                         &global_settings.lst_color,global_settings.lss_color);
-
-    screens[SCREEN_MAIN].set_selector_text(global_settings.lst_color);
-    settings_save();
-    return res;
-}
-
-static int reset_color(void)
-{
-    global_settings.fg_color = LCD_DEFAULT_FG;
-    global_settings.bg_color = LCD_DEFAULT_BG;
-    global_settings.lss_color = LCD_DEFAULT_LS;
-    global_settings.lse_color = LCD_DEFAULT_BG;
-    global_settings.lst_color = LCD_DEFAULT_FG;
-
-    screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
-    screens[SCREEN_MAIN].set_background(global_settings.bg_color);
-    screens[SCREEN_MAIN].set_selector_start(global_settings.lss_color);
-    screens[SCREEN_MAIN].set_selector_end(global_settings.lse_color);
-    screens[SCREEN_MAIN].set_selector_text(global_settings.lst_color);
-    settings_save();
-    return 0;
-}
-MENUITEM_FUNCTION(set_bg_col, 0, ID2P(LANG_BACKGROUND_COLOR),
-                    set_bg_color, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_fg_col, 0, ID2P(LANG_FOREGROUND_COLOR),
-                    set_fg_color, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_lss_col, 0, ID2P(LANG_SELECTOR_START_COLOR),
-                    set_lss_color, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_lse_col, 0, ID2P(LANG_SELECTOR_END_COLOR),
-                    set_lse_color, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_lst_col, 0, ID2P(LANG_SELECTOR_TEXT_COLOR),
-                    set_lst_color, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(reset_colors, 0, ID2P(LANG_RESET_COLORS),
-                    reset_color, NULL, NULL, Icon_NOICON);
-#endif
 
 /* now the actual menu */
 MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
@@ -256,17 +150,7 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
 # ifdef HAVE_LCD_FLIP
             ,&flip_display
 # endif
-            ,&cursor_style
 #endif /* HAVE_LCD_BITMAP */
-#ifdef HAVE_LCD_COLOR
-            ,&set_lss_col, &set_lse_col, &set_lst_col
-#endif
-#if LCD_DEPTH > 1
-            ,&clear_main_bd,
-#endif
-#ifdef HAVE_LCD_COLOR
-            &set_bg_col, &set_fg_col, &reset_colors
-#endif
          );
 /*    LCD MENU                    */
 /***********************************/
@@ -594,57 +478,16 @@ MAKE_MENU(peak_meter_menu, ID2P(LANG_PM_MENU), NULL, Icon_NOICON,
 
 
 
-struct browse_folder_info {
-    const char* dir;
-    int show_options;
-};
-#ifdef HAVE_LCD_BITMAP
-static struct browse_folder_info fonts = {FONT_DIR, SHOW_FONT};
-#endif
-static struct browse_folder_info wps = {WPS_DIR, SHOW_WPS};
-#ifdef HAVE_REMOTE_LCD
-static struct browse_folder_info rwps = {WPS_DIR, SHOW_RWPS};
-#endif
-
-static int browse_folder(void *param)
-{
-    const struct browse_folder_info *info =
-        (const struct browse_folder_info*)param;
-    return rockbox_browse(info->dir, info->show_options);
-}
-
-#ifdef HAVE_LCD_BITMAP
-MENUITEM_FUNCTION(browse_fonts, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_CUSTOM_FONT), 
-        browse_folder, (void*)&fonts, NULL, Icon_NOICON);
-#endif
-MENUITEM_FUNCTION(browse_wps, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_WHILE_PLAYING), 
-        browse_folder, (void*)&wps, NULL, Icon_NOICON);
-#ifdef HAVE_REMOTE_LCD
-MENUITEM_FUNCTION(browse_rwps, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_REMOTE_WHILE_PLAYING), 
-        browse_folder, (void*)&rwps, NULL, Icon_NOICON);
-#endif
-
-MENUITEM_SETTING(show_icons, &global_settings.show_icons, NULL);
 MENUITEM_SETTING(codepage_setting, &global_settings.default_codepage, NULL);
 
 
 MAKE_MENU(display_menu, ID2P(LANG_DISPLAY),
             NULL, Icon_Display_menu,
-#ifdef HAVE_LCD_BITMAP
-            &browse_fonts,
-#endif
-            &browse_wps,
-#ifdef HAVE_REMOTE_LCD
-            &browse_rwps,
-#endif
             &lcd_settings,
 #ifdef HAVE_REMOTE_LCD
             &lcd_remote_settings,
 #endif
-            &show_icons, &scroll_settings_menu,
+            &scroll_settings_menu,
 #ifdef HAVE_LCD_BITMAP
             &bars_menu, &peak_meter_menu,
 #endif
