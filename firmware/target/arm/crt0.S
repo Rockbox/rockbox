@@ -23,7 +23,7 @@
 
     .global    start
 start:
-    b	   newstart	
+    b          newstart
     .space 4*16
 
 
@@ -324,8 +324,8 @@ L2_loop:
     cmp r2, #0
     bne L2_loop
     /*** End of L2 operations ***/
-		 /* Set up stack for IRQ mode */ 
-	mov    r0,#0xd2
+    /* Set up stack for IRQ mode */ 
+    mov    r0,#0xd2
     msr    cpsr, r0
     ldr    sp, =irq_stack
     /* Set up stack for FIQ mode */ 
@@ -350,19 +350,19 @@ L2_loop:
       if usb will be needed within the bootloader to load the 
       main firmware file. Interrupts will be needed for this
       (whether they be swi or irq)*/
-	bl memory_init
-	mov r0,#0
-	ldr r1,=_vectorstart
-	mov r2,#0
-	
+    bl memory_init
+    mov r0,#0
+    ldr r1,=_vectorstart
+    mov r2,#0
+
 lp: ldr r3,[r1]
-	add r1,r1,#4
-	str r3,[r0]
-	add r0,r0,#4
-	add r2,r2,#1
-	cmp r2,#16
-	bne lp
-	bl main
+    add r1,r1,#4
+    str r3,[r0]
+    add r0,r0,#4
+    add r2,r2,#1
+    cmp r2,#16
+    bne lp
+    bl main
 
 .section .vectors,"aw"
 _vectorstart:
@@ -399,7 +399,7 @@ undef_instr_handler:
 
 software_int_handler:
 reserved_handler:
-	bl     irq_handler
+    bl     irq_handler
     movs   pc, lr
 
 prefetch_abort_handler:
@@ -432,7 +432,7 @@ fiq_stack:
 
 #else /* BOOTLOADER */
 
-	 /* Set up stack for IRQ mode */
+     /* Set up stack for IRQ mode */
     msr    cpsr_c, #0xd2
     ldr    sp, =irq_stack
     /* Set up stack for FIQ mode */ 
