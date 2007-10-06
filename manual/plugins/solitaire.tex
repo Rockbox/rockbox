@@ -16,7 +16,7 @@ visit\\
 \begin{table}
   \begin{btnmap}{}{}
     \ButtonLeft/\ButtonRight/\\
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,SANSA_C200_PAD}
       {\ButtonUp/\ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
     \opt{IRIVER_H10_PAD,SANSA_E200_PAD}{\ButtonScrollUp/\ButtonScrollDown}
@@ -24,7 +24,7 @@ visit\\
     %
     \opt{RECORDER_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonSelect}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD}{\ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonPlay}
       & Select cards, move cards, reveal hidden cards...\\
     %
@@ -35,6 +35,7 @@ visit\\
     \opt{IAUDIO_X5_PAD}{\ButtonPlay}
     \opt{IRIVER_H10_PAD}{Hold \ButtonLeft}
     \opt{SANSA_E200_PAD}{\ButtonRec}
+    \opt{SANSA_C200_PAD}{\ButtonVolDown}
       & If a card was selected -- unselect it, else\\
       & Draw 3 new cards from the remains stack\\
     %
@@ -44,12 +45,13 @@ visit\\
     \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay}
     \opt{IRIVER_H10_PAD}{\ButtonFF}
     \opt{SANSA_E200_PAD}{\ButtonLeft}
+    \opt{SANSA_C200_PAD}{\ButtonRec}
     \opt{GIGABEAT_PAD}{\ButtonA + \ButtonLeft}
       & Put the card from the top of the remains stack on top of the cursor\\
     %
     \opt{RECORDER_PAD}{\ButtonFTwo}
     \opt{ONDIO_PAD}{Hold \ButtonUp}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD}{Hold \ButtonSelect}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,SANSA_C200_PAD}{Hold \ButtonSelect}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Hold \ButtonMenu}
     \opt{IAUDIO_X5_PAD}{Hold \ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
@@ -62,11 +64,12 @@ visit\\
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
     \opt{SANSA_E200_PAD}{\ButtonRight}
     \opt{GIGABEAT_PAD}{\ButtonA + \ButtonRight}
+    \opt{SANSA_C200_PAD}{\ButtonVolUp}
       & Put the card on top of the remains stack on one of the final colour stacks.\\
     %
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H300_PAD,IRIVER_H100_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu+\ButtonSelect}
-    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD}{\ButtonPower}
       & Show menu\\
    \end{btnmap}
   \end{table}
