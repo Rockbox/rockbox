@@ -353,6 +353,9 @@ static void init(void)
     power_init();
 
     set_irq_level(0);
+#ifdef CPU_ARM
+    set_fiq_status(FIQ_ENABLED);
+#endif
     lcd_init();
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();

@@ -31,7 +31,7 @@
 #include "dac.h"
 #include "system.h"
 #if CONFIG_CODEC == SWCODEC
-#include "pcm_playback.h"
+#include "pcm.h"
 #endif
 #endif
 

@@ -26,17 +26,6 @@
 #include "spdif.h"
 #endif
 
-/* peaks */
-static unsigned long *rec_peak_addr;
-enum
-{
-    PLAY_PEAK_LEFT = 0,
-    PLAY_PEAK_RIGHT,
-    REC_PEAK_LEFT,
-    REC_PEAK_RIGHT
-};
-static int peaks[4]; /* p-l, p-r, r-l, r-r */
-
 #define IIS_PLAY_DEFPARM    ( (freq_ent[FPARM_CLOCKSEL] << 12) | \
                               (IIS_PLAY & (7 << 8)) | \
                               (4 << 2) )  /* 64 bit clocks / word clock */
@@ -50,6 +39,12 @@ static int peaks[4]; /* p-l, p-r, r-l, r-r */
 #define SET_IIS_PLAY(x) IIS2CONFIG = (x)
 #define IIS_PLAY        IIS2CONFIG
 #endif
+
+struct dma_lock
+{
+    int locked;
+    unsigned long state;
+};
 
 static bool is_playback_monitoring(void)
 {
@@ -93,7 +88,7 @@ static const unsigned char pcm_freq_parms[HW_NUM_FREQ][3] =
 };
 #endif
 
-static int                  pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
+static unsigned long pcm_freq = 0; /* 44.1 is default */
 static const unsigned char *freq_ent = pcm_freq_parms[HW_FREQ_DEFAULT];
 
 /* set frequency used by the audio hardware */
@@ -126,13 +121,12 @@ void pcm_set_frequency(unsigned int frequency)
 /* apply audio settings */
 bool _pcm_apply_settings(bool clear_reset)
 {
-    static int last_pcm_freq = 0;
     bool did_reset = false;
     unsigned long iis_play_defparm = IIS_PLAY_DEFPARM;
  
-    if (pcm_freq != last_pcm_freq)
+    if (pcm_freq != pcm_curr_sampr)
     {
-        last_pcm_freq = pcm_freq;
+        pcm_curr_sampr = pcm_freq;
         /* Reprogramming bits 15-12 requires FIFO to be in a reset
            condition - Users Manual 17-8, Note 11 */
         or_l(IIS_FIFO_RESET, &IIS_PLAY);
@@ -159,6 +153,14 @@ bool _pcm_apply_settings(bool clear_reset)
     return did_reset;
 } /* _pcm_apply_settings */
 
+/* apply audio setting with all DMA interrupts disabled */
+void _pcm_apply_settings_irq_lock(bool clear_reset)
+{
+    int level = set_irq_level(DMA_IRQ_LEVEL);
+    _pcm_apply_settings(clear_reset);
+    set_irq_level(level);
+}
+
 /* This clears the reset bit to enable monitoring immediately if monitoring
    recording sources or always if playback is in progress - we might be 
    switching samplerates on the fly */
@@ -176,76 +178,8 @@ void pcm_apply_settings(void)
     set_irq_level(level);
 } /* pcm_apply_settings */
 
-/** DMA **/
-
-/****************************************************************************
- ** Playback DMA transfer
- **/
-
-/* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_init(void)
 {
-    int level;
-
-    logf("pcm_play_dma_start");
-
-    addr = (void *)((unsigned long)addr & ~3); /* Align data */
-    size &= ~3; /* Size must be multiple of 4 */
-
-    /* If a tranfer is going, prevent an interrupt while setting up
-       a new one */
-    level = set_irq_level(DMA_IRQ_LEVEL);
-
-    pcm_playing = true;
-
-    /* Set up DMA transfer  */
-    SAR0 = (unsigned long)addr;   /* Source address      */
-    DAR0 = (unsigned long)&PDOR3; /* Destination address */
-    BCR0 = (unsigned long)size;   /* Bytes to transfer   */
-
-    /* Enable the FIFO and force one write to it */
-    _pcm_apply_settings(is_playback_monitoring());
-
-    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA |
-           DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) | DMA_START;
-
-    set_irq_level(level);
-} /* pcm_play_dma_start */
-
-/* Stops the DMA transfer and interrupt */
-static void pcm_play_dma_stop_irq(void)
-{
-    pcm_playing = false;
-    if (!audio_status())
-        pcm_paused = false;
-
-    DSR0 = 1;
-    DCR0 = 0;
-
-    /* Place TX FIFO in reset condition if playback monitoring is on.
-       Recording monitoring something else should not be stopped. */
-    iis_play_reset_if_playback(true);
-} /* pcm_play_dma_stop_irq */
-
-void pcm_play_dma_stop(void)
-{
-    int level = set_irq_level(DMA_IRQ_LEVEL);
-
-    logf("pcm_play_dma_stop");
-
-    pcm_play_dma_stop_irq();
-
-    set_irq_level(level);
-} /* pcm_play_dma_stop */
-
-void pcm_init(void)
-{
-    logf("pcm_init");
-
-    pcm_playing           = false;
-    pcm_paused            = false;
-    pcm_callback_for_more = NULL;
-
     AUDIOGLOB =   (1 <<  8) /* IIS1 fifo auto sync  */
                 | (1 <<  7) /* PDIR2 fifo auto sync */
 #ifdef HAVE_SPDIF_OUT
@@ -259,8 +193,6 @@ void pcm_init(void)
 
     /* Call pcm_play_dma_stop to initialize everything. */
     pcm_play_dma_stop();
-    /* Call pcm_close_recording to put in closed state */
-    pcm_close_recording();
 
     /* Setup Coldfire I2S before initializing hardware or changing
        other settings. */
@@ -282,13 +214,94 @@ void pcm_init(void)
 #endif
     /* Enable interrupt at level 6, priority 0 */
     ICR6 = (6 << 2);
-    and_l(~(1 << 14), &IMR); /* bit 14 is DMA0 */
-} /* pcm_init */
+} /* pcm_play_dma_init */
 
 void pcm_postinit(void)
 {
     audiohw_postinit();
 }
+
+/** DMA **/
+
+/****************************************************************************
+ ** Playback DMA transfer
+ **/
+/* For the locks, DMA interrupt must be disabled when manipulating the lock
+   if the handler ever calls these - right now things are arranged so it
+   doesn't */
+static struct dma_lock dma_play_lock =
+{
+    .locked = 0,
+    .state = (0 << 14)  /* bit 14 is DMA0 */
+};
+
+void pcm_play_lock(void)
+{
+    if (++dma_play_lock.locked == 1)
+        or_l((1 << 14), &IMR);
+}
+
+void pcm_play_unlock(void)
+{
+    if (--dma_play_lock.locked == 0)
+        and_l(~dma_play_lock.state, &IMR);
+}
+
+/* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
+void pcm_play_dma_start(const void *addr, size_t size)
+{
+    logf("pcm_play_dma_start");
+
+    /* stop any DMA in progress */
+    DSR0 = 1;
+    DCR0 = 0;
+
+    /* Set up DMA transfer  */
+    SAR0 = (unsigned long)addr;   /* Source address      */
+    DAR0 = (unsigned long)&PDOR3; /* Destination address */
+    BCR0 = (unsigned long)size;   /* Bytes to transfer   */
+
+    /* Enable the FIFO and force one write to it */
+    _pcm_apply_settings_irq_lock(is_playback_monitoring());
+
+    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA |
+           DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) | DMA_START;
+
+    dma_play_lock.state = (1 << 14);
+} /* pcm_play_dma_start */
+
+/* Stops the DMA transfer and interrupt */
+void pcm_play_dma_stop(void)
+{
+    DSR0 = 1;
+    DCR0 = 0;
+    BCR0 = 0;
+
+    /* Place TX FIFO in reset condition if playback monitoring is on.
+       Recording monitoring something else should not be stopped. */
+    iis_play_reset_if_playback(true);
+
+    dma_play_lock.state = (0 << 14);
+} /* pcm_play_dma_stop */
+
+void pcm_play_dma_pause(bool pause)
+{
+    if (pause)
+    {
+        /* pause playback on current buffer */
+        and_l(~DMA_EEXT, &DCR0);
+        iis_play_reset_if_playback(true);
+        dma_play_lock.state = (0 << 14);
+    }
+    else
+    {
+        /* restart playback on current buffer */
+        /* Enable the FIFO and force one write to it */
+        _pcm_apply_settings_irq_lock(is_playback_monitoring());
+        or_l(DMA_EEXT | DMA_START, &DCR0);
+        dma_play_lock.state = (1 << 14);
+    }
+} /* pcm_play_dma_pause */
 
 size_t pcm_get_bytes_waiting(void)
 {
@@ -341,29 +354,54 @@ void DMA0(void)
 #endif
     }
 
-    pcm_play_dma_stop_irq();
+    /* Stop interrupt and futher transfers */
+    pcm_play_dma_stop();
+    /* Inform PCM that we're done */
+    pcm_play_dma_stopped_callback();
 } /* DMA0 */
+
+const void * pcm_play_dma_get_peak_buffer(int *count)
+{
+    unsigned long addr = SAR0;
+    int cnt = BCR0;
+    *count = (cnt & 0xffffff) >> 2;
+    return (void *)((addr + 2) & ~3);
+} /* pcm_play_dma_get_peak_buffer */
 
 /****************************************************************************
  ** Recording DMA transfer
  **/
+static struct dma_lock dma_rec_lock =
+{
+    .locked = 0,
+    .state = (0 << 15)  /* bit 15 is DMA1 */
+};
+
+/* For the locks, DMA interrupt must be disabled when manipulating the lock
+   if the handler ever calls these - right now things are arranged so it
+   doesn't */
+void pcm_rec_lock(void)
+{
+    if (++dma_rec_lock.locked == 1)
+        or_l((1 << 15), &IMR);
+}
+
+void pcm_rec_unlock(void)
+{
+    if (--dma_rec_lock.locked == 0)
+        and_l(~dma_rec_lock.state, &IMR);
+}
+
 void pcm_rec_dma_start(void *addr, size_t size)
 {
-    int level;
-    logf("pcm_rec_dma_start");
-
-    addr = (void *)((unsigned long)addr & ~3); /* Align data */
-    size &= ~3; /* Size must be multiple of 4 */
-
-    /* No DMA1 interrupts while setting up a new transfer */
-    level = set_irq_level(DMA_IRQ_LEVEL);
-
-    pcm_recording = true;
+    /* stop any DMA in progress */
+    and_l(~DMA_EEXT, &DCR1);
+    DSR1 = 1;
 
     and_l(~PDIR2_FIFO_RESET, &DATAINCONTROL);
     /* Clear TX FIFO reset bit if the source is not set to monitor playback
        otherwise maintain independence between playback and recording. */
-    _pcm_apply_settings(!is_playback_monitoring());
+    _pcm_apply_settings_irq_lock(!is_playback_monitoring());
 
     /* Start the DMA transfer.. */
 #ifdef HAVE_SPDIF_REC
@@ -371,74 +409,48 @@ void pcm_rec_dma_start(void *addr, size_t size)
     INTERRUPTCLEAR = (1 << 25) | (1 << 24) | (1 << 23) | (1 << 22);
 #endif
 
-    SAR1          = (unsigned long)&PDIR2; /* Source address        */
-    rec_peak_addr = (unsigned long *)addr; /* Start peaking at dest */
-    DAR1          = (unsigned long)addr;   /* Destination address   */
-    BCR1          = (unsigned long)size;   /* Bytes to transfer     */
+    SAR1              = (unsigned long)&PDIR2; /* Source address        */
+    pcm_rec_peak_addr = (unsigned long *)addr; /* Start peaking at dest */
+    DAR1              = (unsigned long)addr;   /* Destination address   */
+    BCR1              = (unsigned long)size;   /* Bytes to transfer     */
 
     DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_DINC |
-           DMA_DSIZE(DMA_SIZE_LINE) /* | DMA_START */;
+           DMA_DSIZE(DMA_SIZE_LINE) | DMA_START;
 
-    set_irq_level(level);
-} /* pcm_dma_start */
-
-static void pcm_rec_dma_stop_irq(void)
-{
-    DSR1 = 1;         /* Clear interrupt */
-    DCR1 = 0;
-    pcm_recording = false;
-    or_l(PDIR2_FIFO_RESET, &DATAINCONTROL);
-
-    iis_play_reset_if_playback(false);
-} /* pcm_rec_dma_stop_irq */
+    dma_rec_lock.state = (1 << 15);
+} /* pcm_rec_dma_start */
 
 void pcm_rec_dma_stop(void)
 {
-    int level = set_irq_level(DMA_IRQ_LEVEL);
+    DSR1 = 1;         /* Clear interrupt */
+    DCR1 = 0;
+    BCR1 = 0;
+    or_l(PDIR2_FIFO_RESET, &DATAINCONTROL);
 
-    logf("pcm_rec_dma_stop");
+    iis_play_reset_if_playback(false);
 
-    pcm_rec_dma_stop_irq();
-
-    set_irq_level(level);
+    dma_rec_lock.state = (0 << 15);
 } /* pcm_rec_dma_stop */
 
-void pcm_init_recording(void)
+void pcm_rec_dma_init(void)
 {
-    int level = set_irq_level(DMA_IRQ_LEVEL);
-
-    logf("pcm_init_recording");
-
-    pcm_recording           = false;
-    pcm_callback_more_ready = NULL;
-
-    DIVR1     = 55;       /* DMA1 is mapped into vector 55 in system.c     */
-    DMACONFIG = 1;        /* DMA0Req = PDOR3, DMA1Req = PDIR2              */
+    DIVR1     = 55; /* DMA1 is mapped into vector 55 in system.c */
+    DMACONFIG = 1;  /* DMA0Req = PDOR3, DMA1Req = PDIR2 */
     and_l(0xffff00ff, &DMAROUTE);
     or_l(DMA1_REQ_AUDIO_2, &DMAROUTE);
 
-    pcm_rec_dma_stop_irq();
+    pcm_rec_dma_stop();
 
-    ICR7 = (6 << 2) | (1 << 0); /* Enable interrupt at level 6, priority 1 */
-    and_l(~(1 << 15), &IMR); /* bit 15 is DMA1                             */
-
-    set_irq_level(level);
+    /* Enable interrupt at level 6, priority 1 */
+    ICR7 = (6 << 2) | (1 << 0);
 } /* pcm_init_recording */
 
-void pcm_close_recording(void)
+void pcm_rec_dma_close(void)
 {
-    int level = set_irq_level(DMA_IRQ_LEVEL);
-
-    logf("pcm_close_recording");
-
-    pcm_rec_dma_stop_irq();
-
     and_l(0xffff00ff, &DMAROUTE);
-    ICR7 = 0x00;            /* Disable interrupt */
-    or_l((1 << 15), &IMR);  /* bit 15 is DMA1    */
-
-    set_irq_level(level);
-} /* pcm_close_recording */
+    ICR7 = 0x00;     /* Disable interrupt */
+    dma_rec_lock.state = (0 << 15);
+} /* pcm_rec_dma_close */
 
 /* DMA1 Interrupt is called when the DMA has finished transfering a chunk
    into the caller's buffer */
@@ -485,175 +497,25 @@ void DMA1(void)
     logf("DMA1 done:%04x %d", res, status);
 #endif
     /* Finished recording */
-    pcm_rec_dma_stop_irq();
+    pcm_rec_dma_stop();
+    /* Inform PCM that we're done */
+    pcm_rec_dma_stopped_callback();
 } /* DMA1 */
 
 /* Continue transferring data in - call from interrupt callback */
 void pcm_record_more(void *start, size_t size)
 {
-    rec_peak_addr = (unsigned long *)start; /* Start peaking at dest */
-    DAR1          = (unsigned long)start;   /* Destination address */
-    BCR1          = (unsigned long)size;    /* Bytes to transfer   */
+    pcm_rec_peak_addr = (unsigned long *)start; /* Start peaking at dest */
+    DAR1              = (unsigned long)start;   /* Destination address */
+    BCR1              = (unsigned long)size;    /* Bytes to transfer   */
     or_l(DMA_EEXT, &DCR1);                  /* Enable peripheral request */
-}
+} /* pcm_record_more */
 
-void pcm_mute(bool mute)
+const void * pcm_rec_dma_get_peak_buffer(int *count)
 {
-    audiohw_mute(mute);
-    if (mute)
-        sleep(HZ/16);
-} /* pcm_mute */
-
-void pcm_play_pause_pause(void)
-{
-    /* Disable DMA peripheral request. */
-    int level = set_irq_level(DMA_IRQ_LEVEL);
-
-    and_l(~DMA_EEXT, &DCR0);
-    iis_play_reset_if_playback(true);
-
-    set_irq_level(level);
-} /* pcm_play_pause_pause */
-
-void pcm_play_pause_unpause(void)
-{
-    int level = set_irq_level(DMA_IRQ_LEVEL);
-
-    /* Enable the FIFO and force one write to it */
-    _pcm_apply_settings(is_playback_monitoring());
-    or_l(DMA_EEXT | DMA_START, &DCR0);
-
-    set_irq_level(level);
-} /* pcm_play_pause_unpause */
-
-/**
- * Do peak calculation using distance squared from axis and save a lot
- * of jumps and negation. Don't bother with the calculations of left or
- * right only as it's never really used and won't save much time.
- */
-static void pcm_peak_peeker(unsigned long *addr, unsigned long *end,
-                            int peaks[2])
-{
-    long peak_l   = 0, peak_r   = 0;
-    long peaksq_l = 0, peaksq_r = 0;
-
-    do
-    {
-        long value = *addr;
-        long ch, chsq;
-
-        ch   = value >> 16;
-        chsq = ch*ch;
-        if (chsq > peaksq_l)
-            peak_l = ch, peaksq_l = chsq;
-
-        ch   = (short)value;
-        chsq = ch*ch;
-        if (chsq > peaksq_r)
-            peak_r = ch, peaksq_r = chsq;
-
-        addr += 4;
-    }
-    while (addr < end);
-
-    peaks[0] = abs(peak_l);
-    peaks[1] = abs(peak_r);
-} /* pcm_peak_peeker */
-
-/**
- * Return playback peaks - Peaks ahead in the DMA buffer based upon the
- *                         calling period to attempt to compensate for
- *                         delay.
- */
-void pcm_calculate_peaks(int *left, int *right)
-{
-    static unsigned long last_peak_tick = 0;
-    static unsigned long frame_period   = 0;
-
-    long samples, samp_frames;
-    unsigned long *addr;
-
-    /* Throttled peak ahead based on calling period */
-    unsigned long period = current_tick - last_peak_tick;
-
-    /* Keep reasonable limits on period */
-    if (period < 1)
-        period = 1;
-    else if (period > HZ/5)
-        period = HZ/5;
-
-    frame_period = (3*frame_period + period) >> 2;
-
-    last_peak_tick = current_tick;
-
-    if (pcm_playing && !pcm_paused)
-    {
-        /* Snapshot as quickly as possible */
-        asm volatile (
-            "move.l %c[sar0], %[start] \n"
-            "move.l %c[bcr0], %[count] \n"
-            : [start]"=r"(addr), [count]"=r"(samples)
-            : [sar0]"p"(&SAR0), [bcr0]"p"(&BCR0)
-        );
-
-        samples    &= 0xfffffc;
-        samp_frames = frame_period*pcm_freq/(HZ/4);
-        samples     = MIN(samp_frames, samples) >> 2;
-
-        if (samples > 0)
-        {
-            addr = (long *)((long)addr & ~3);
-            pcm_peak_peeker(addr, addr + samples, &peaks[PLAY_PEAK_LEFT]);
-        }
-    }
-    else
-    {
-        peaks[PLAY_PEAK_LEFT] = peaks[PLAY_PEAK_RIGHT] = 0;
-    }
-
-    if (left)
-        *left = peaks[PLAY_PEAK_LEFT];
-
-    if (right)
-        *right = peaks[PLAY_PEAK_RIGHT];
-} /* pcm_calculate_peaks */
-
-/**
- * Return recording peaks - From the end of the last peak up to
- *                          current write position.
- */
-void pcm_calculate_rec_peaks(int *left, int *right)
-{
-    if (pcm_recording)
-    {
-        unsigned long *addr, *end;
-
-        /* Snapshot as quickly as possible */
-        asm volatile (
-            "move.l %c[start], %[addr] \n"
-            "move.l %c[dar1],  %[end]  \n"
-            "and.l  %[mask],   %[addr] \n"
-            "and.l  %[mask],   %[end]  \n"
-            : [addr]"=r"(addr), [end]"=r"(end)
-            : [start]"p"(&rec_peak_addr), [dar1]"p"(&DAR1), [mask]"r"(~3)
-        );
-
-        if (addr < end)
-        {
-            pcm_peak_peeker(addr, end, &peaks[REC_PEAK_LEFT]);
-
-            if (addr == rec_peak_addr)
-                rec_peak_addr = end;
-        }
-    }
-    else
-    {
-        peaks[REC_PEAK_LEFT] = peaks[REC_PEAK_RIGHT] = 0;
-    }
-
-    if (left)
-        *left = peaks[REC_PEAK_LEFT];
-
-    if (right)
-        *right = peaks[REC_PEAK_RIGHT];
-} /* pcm_calculate_rec_peaks */
+    unsigned long addr = (unsigned long)pcm_rec_peak_addr;
+    unsigned long end = DAR1;
+    addr >>= 2;
+    *count = (end >> 2) - addr;
+    return (void *)(addr << 2);
+} /* pcm_rec_dma_get_peak_buffer */

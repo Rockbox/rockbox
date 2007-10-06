@@ -70,6 +70,20 @@ static inline unsigned int current_core(void)
     return core;
 }
 
+/* Return the actual ID instead of core index */
+static inline unsigned int processor_id(void)
+{
+    unsigned char id;
+
+    asm volatile (
+        "ldrb   %0, [%1] \n"
+        : "=r"(id)
+        : "r"(&PROCESSOR_ID)
+    );
+
+    return id;
+}
+
 #ifdef BOOTLOADER
 /* All addresses within rockbox are in IRAM in the bootloader so
    are therefore uncached */

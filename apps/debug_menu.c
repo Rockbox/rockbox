@@ -75,7 +75,6 @@
 #include "logfdisp.h"
 #if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
-#include "pcm_playback.h"
 #if defined(HAVE_SPDIF_OUT) || defined(HAVE_SPDIF_IN)
 #include "spdif.h"
 #endif

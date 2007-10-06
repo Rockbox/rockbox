@@ -84,7 +84,7 @@
 #define TIMER1_IRQ   0
 #define TIMER2_IRQ   1
 #define MAILBOX_IRQ  4
-#define I2S_IRQ      10
+#define IIS_IRQ      10
 #define IDE_IRQ      23
 #define USB_IRQ      24
 #define FIREWIRE_IRQ 25
@@ -97,7 +97,7 @@
 #define TIMER1_MASK   (1 << TIMER1_IRQ)
 #define TIMER2_MASK   (1 << TIMER2_IRQ)
 #define MAILBOX_MASK  (1 << MAILBOX_IRQ)
-#define I2S_MASK      (1 << I2S_IRQ)
+#define IIS_MASK      (1 << IIS_IRQ)
 #define IDE_MASK      (1 << IDE_IRQ)
 #define USB_MASK      (1 << USB_IRQ)
 #define FIREWIRE_MASK (1 << FIREWIRE_IRQ)
@@ -307,11 +307,95 @@
 
 #define INIT_USB         0x80000000
 
-/* I2S */
+/* IIS */
 #define IISCONFIG           (*(volatile unsigned long*)(0x70002800))
 #define IISFIFO_CFG         (*(volatile unsigned long*)(0x7000280c))
 #define IISFIFO_WR          (*(volatile unsigned long*)(0x70002840))
 #define IISFIFO_RD          (*(volatile unsigned long*)(0x70002880))
+
+/**
+ * IISCONFIG bits:
+ * |   31   |   30   |   29   |   28   |   27   |   26   |   25   |   24   |
+ * | RESET  |        |TXFIFOEN|RXFIFOEN|        |  ????  |   MS   |  ????  |
+ * |   23   |   22   |   21   |   20   |   19   |   18   |   17   |   16   |
+ * |        |        |        |        |        |        |        |        |
+ * |   15   |   14   |   13   |   12   |   11   |   10   |    9   |    8   |
+ * |        |        |        |        | Bus Format[1:0] |     Size[1:0]   |
+ * |    7   |    6   |    5   |    4   |    3   |    2   |    1   |    0   |
+ * |        |     Size Format[2:0]     |  ????  |  ????  | IRQTX  | IRQRX  |
+ */
+
+/* All IIS formats send MSB first */
+#define IIS_RESET    (1 << 31)
+#define IIS_TXFIFOEN (1 << 29)
+#define IIS_RXFIFOEN (1 << 28)
+#define IIS_MASTER   (1 << 25)
+#define IIS_IRQTX    (1 << 1)
+#define IIS_IRQRX    (1 << 0)
+
+#define IIS_IRQTX_REG  IISCONFIG
+#define IIS_IRQRX_REG  IISCONFIG
+
+/* Data format on the IIS bus */
+#define IIS_FORMAT_MASK  (0x3 << 10)
+#define IIS_FORMAT_IIS   (0x0 << 10) /* Standard IIS - leading dummy bit */
+#define IIS_FORMAT_1     (0x1 << 10)
+#define IIS_FORMAT_LJUST (0x2 << 10) /* Left justified - no dummy bit */
+#define IIS_FORMAT_3     (0x3 << 10)
+/* Other formats not yet known  */
+
+/* Data size on IIS bus */
+#define IIS_SIZE_MASK   (0x3 << 8)
+#define IIS_SIZE_16BIT  (0x0 << 8)
+/* Other sizes not yet known */
+
+/* Data size/format on IIS FIFO */
+#define IIS_FIFO_FORMAT_MASK (0x7 << 4)
+#define IIS_FIFO_FORMAT_0    (0x0 << 4)
+/* Big-endian formats - data sent to the FIFO must be big endian.
+ * I forgot which is which size but did test them. */
+#define IIS_FIFO_FORMAT_1    (0x1 << 4)
+#define IIS_FIFO_FORMAT_2    (0x2 << 4)
+ /* 32bit-MSB-little endian */
+#define IIS_FIFO_FORMAT_LE32 (0x3 << 4)
+ /* 16bit-MSB-little endian */
+#define IIS_FIFO_FORMAT_LE16 (0x4 << 4)
+
+/* FIFO formats 0x5 and above seem equivalent to 0x4 ?? */
+
+/**
+ * IISFIFO_CFG bits:
+ * |   31   |   30   |   29   |   28   |   27   |   26   |   25   |   24   |
+ * |        |        |                      RXFull[5:0]                    |
+ * |   23   |   22   |   21   |   20   |   19   |   18   |   17   |   16   |
+ * |        |        |                      TXFree[5:0]                    |
+ * |   15   |   14   |   13   |   12   |   11   |   10   |    9   |    8   |
+ * |        |        |        | RXCLR  |        |        |        | TXCLR  |
+ * |    7   |    6   |    5   |    4   |    3   |    2   |    1   |    0   |
+ * |        |        |   RX_FULL_LVL   |        |        |  TX_EMPTY_LVL   |
+ */
+
+/* handy macros to extract the FIFO counts */
+#define IIS_RX_FULL_MASK (0x3f << 24)
+#define IIS_RX_FULL_COUNT \
+    ((IISFIFO_CFG & IIS_RX_FULL_MASK) >> 24)
+
+#define IIS_TX_FREE_MASK (0x3f << 16)
+#define IIS_TX_FREE_COUNT \
+    ((IISFIFO_CFG & IIS_TX_FREE_MASK) >> 16)
+
+#define IIS_RXCLR (1 << 12)
+#define IIS_TXCLR (1 << 8)
+/* Number of slots */
+#define IIS_RX_FULL_LVL_4  (0x1 << 4)
+#define IIS_RX_FULL_LVL_8  (0x2 << 4)
+#define IIS_RX_FULL_LVL_12 (0x3 << 4)
+
+#define IIS_TX_EMPTY_LVL_4  (0x1 << 0)
+#define IIS_TX_EMPTY_LVL_8  (0x2 << 0)
+#define IIS_TX_EMPTY_LVL_12 (0x3 << 0)
+
+/* Note: didn't bother to see of levels 0 and 16 actually work */
 
 /* Serial Controller */
 #define SERIAL0             (*(volatile unsigned long*)(0x70006000))

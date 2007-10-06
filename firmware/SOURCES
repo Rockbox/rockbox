@@ -182,9 +182,7 @@ sound.c
 general.c
 pcm_sampr.c
 replaygain.c
-#ifndef SIMULATOR
-pcm_playback.c
-#endif /* SIMULATOR */
+pcm.c
 #ifdef HAVE_RECORDING
 enc_base.c
 #ifndef SIMULATOR
@@ -808,7 +806,7 @@ target/arm/pnx0101/iriver-ifp7xx/powermgmt-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/usb-ifp7xx.c   
 #ifndef BOOTLOADER
 target/arm/pnx0101/pcm-pnx0101.c
-#endif
-#endif
-#endif
+#endif /* BOOTLOADER */
+#endif /* SIMULATOR */
+#endif /* IRIVER_IFP7XX */
 

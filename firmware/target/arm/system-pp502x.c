@@ -214,6 +214,7 @@ void system_init(void)
         outl(inl(0x70000024) | 0xc0, 0x70000024);
         DEV_RS = 0;
         DEV_OFF_MASK = 0;
+        STRAP_OPT_A = 0x80;
 #endif
 
 #if !defined(SANSA_E200) && !defined(SANSA_C200)

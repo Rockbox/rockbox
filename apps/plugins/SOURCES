@@ -20,6 +20,7 @@ stopwatch.c
 vbrfix.c
 viewer.c
 
+
 #if CONFIG_CODEC == SWCODEC
 metronome.c
 #endif

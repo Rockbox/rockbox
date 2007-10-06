@@ -25,31 +25,42 @@
 #include "file.h"
 #include "mmu-meg-fx.h"
 
+/* All exact rates for 16.9344MHz clock */
 #define GIGABEAT_11025HZ     (0x19 << 1)
 #define GIGABEAT_22050HZ     (0x1b << 1)
 #define GIGABEAT_44100HZ     (0x11 << 1)
 #define GIGABEAT_88200HZ     (0x1f << 1)
 
-static int pcm_freq = 0; /* 44.1 is default */
+/* PCM interrupt routine lockout */
+static struct
+{
+    int locked;
+    unsigned long state;
+} dma_play_lock =
+{
+    .locked = 0,
+    .state  = (0<<19)
+};
+
+/* Last samplerate set by pcm_set_frequency */
+static unsigned long pcm_freq = 0; /* 44.1 is default */
+/* Samplerate control for audio codec */
 static int sr_ctrl = 0;
-#define FIFO_COUNT ((IISFCON >> 6) & 0x01F)
+
+#define FIFO_COUNT ((IISFCON >> 6) & 0x3F)
 
 /* Setup for the DMA controller */
 #define DMA_CONTROL_SETUP  ((1<<31) | (1<<29) | (1<<23) | (1<<22) | (1<<20))
 
 /* DMA count has hit zero - no more data */
 /* Get more data from the callback and top off the FIFO */
-/* Uses explicitly coded prologue/epilogue code to get around complier bugs
-   in order to be able to use the stack */
-void fiq_handler(void) __attribute__((naked));
+void fiq_handler(void) __attribute__((interrupt ("FIQ")));
 
 static void _pcm_apply_settings(void)
 {
-    static int last_freqency = 0;
-
-    if (pcm_freq != last_freqency)
+    if (pcm_freq != pcm_curr_sampr)
     {
-        last_freqency = pcm_freq;
+        pcm_curr_sampr = pcm_freq;
         audiohw_set_frequency(sr_ctrl);
     }
 }
@@ -61,29 +72,50 @@ void pcm_apply_settings(void)
     set_fiq_status(oldstatus);
 }
 
-void pcm_init(void)
+/* For the locks, DMA interrupt must be disabled because the handler
+   manipulates INTMSK and the operation is not atomic */
+void pcm_play_lock(void)
 {
-    pcm_playing = false;
-    pcm_paused = false;
-    pcm_callback_for_more = NULL;
+    int status = set_fiq_status(FIQ_DISABLED);
+    if (++dma_play_lock.locked == 1)
+        INTMSK |= (1<<19); /* Mask the DMA interrupt */
+    set_fiq_status(status);
+}
 
+void pcm_play_unlock(void)
+{
+    int status = set_fiq_status(FIQ_DISABLED);
+    if (--dma_play_lock.locked == 0)
+        INTMSK &= ~dma_play_lock.state; /* Unmask the DMA interrupt if enabled */
+    set_fiq_status(status);
+}
+
+void pcm_play_dma_init(void)
+{
     pcm_set_frequency(SAMPR_44);
 
     /* slave */
     IISMOD |= (1<<8);
 
+    /* RX,TX off,idle */
+    IISCON |= (1<<3) | (1<<2);
+
     audiohw_init();
 
     /* init GPIO */
     GPCCON = (GPCCON & ~(3<<14)) | (1<<14);
-    GPCDAT |= 1<<7;
-    GPECON |= 0x2aa;
+    GPCDAT |= (1<<7);
+    /* GPE4=I2SDO, GPE3=I2SDI, GPE2=CDCLK, GPE1=I2SSCLK, GPE0=I2SLRCK */
+    GPECON = (GPECON & ~0x3ff) | 0x2aa;
 
     /* Do not service DMA requests, yet */
+
     /* clear any pending int and mask it */
-    INTMSK |= (1<<19);      /* mask the interrupt */
-    SRCPND = (1<<19);       /* clear any pending interrupts */
-    INTMOD |= (1<<19);      /* connect to FIQ */
+    INTMSK |= (1<<19);
+    SRCPND = (1<<19);
+
+    /* connect to FIQ */
+    INTMOD |= (1<<19);
 }
 
 void pcm_postinit(void)
@@ -92,56 +124,22 @@ void pcm_postinit(void)
     pcm_apply_settings();
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+/* Connect the DMA and start filling the FIFO */
+static void play_start_pcm(void)
 {
-    addr = (void *)((unsigned long)addr & ~3); /* Align data */
-    size &= ~3; /* Size must be multiple of 4 */
-
-    /* sanity check: bad pointer or too small file */
-    if (NULL == addr || size == 0) return;
-
-    disable_fiq();
-
-    /* Enable the IIS clock */
-    CLKCON |= (1<<17);
-
-    /* IIS interface setup and set to idle */
-    IISCON = (1<<5) | (1<<3);
-
-    /* slave, transmit mode, 16 bit samples - MCLK 384fs - use 16.9344Mhz -
-       BCLK 32fs */
-    IISMOD = (1<<9) | (1<<8) | (2<<6) | (1<<3) | (1<<2) | (1<<0);
-
-    /* connect DMA to the FIFO and enable the FIFO */
-    IISFCON = (1<<15) | (1<<13);
-
-    /* set DMA dest */
-    DIDST2 = (int)&IISFIFO;
-
-    /* IIS is on the APB bus, INT when TC reaches 0, fixed dest addr */
-    DIDSTC2 = 0x03;
-
-    /* How many transfers to make - we transfer half-word at a time = 2 bytes */
-    /* DMA control: CURR_TC int, single service mode, I2SSDO int, HW trig */
-    /*     no auto-reload, half-word (16bit) */
-    DCON2 = DMA_CONTROL_SETUP | (size / 2);
-
-    /* set DMA source and options */
-    DISRC2 = (unsigned long)addr + 0x30000000;
-    DISRCC2 = 0x00;  /* memory is on AHB bus, increment addresses */
-
     /* clear pending DMA interrupt */
-    SRCPND = 1<<19;
-
-    pcm_playing = true;
+    SRCPND = (1<<19);
 
     _pcm_apply_settings();
 
-    /* unmask the DMA interrupt */
-    INTMSK &= ~(1<<19);
-
     /* Flush any pending writes */
-    clean_dcache_range(addr, size);
+    clean_dcache_range((void*)DISRC2, (DCON2 & 0xFFFFF) * 2);
+
+    /* unmask DMA interrupt when unlocking */
+    dma_play_lock.state = (1<<19);
+
+    /* turn on the request */
+    IISCON |= (1<<5);
 
     /* Activate the channel */
     DMASKTRIG2 = 0x2;
@@ -151,120 +149,127 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     /* start the IIS */
     IISCON |= (1<<0);
-
-    enable_fiq();
 }
 
-static void pcm_play_dma_stop_fiq(void)
+/* Disconnect the DMA and wait for the FIFO to clear */
+static void play_stop_pcm(void)
 {
-    INTMSK |= (1<<19); /* mask the DMA interrupt */
-    IISCON &= ~(1<<5); /* disable fifo request */
-    DMASKTRIG2 = 0x4; /* De-Activate the DMA channel */
+    /* Mask DMA interrupt */
+    INTMSK |= (1<<19);
+
+    /* De-Activate the DMA channel */
+    DMASKTRIG2 = 0x4;
 
     /* are we playing? wait for the chunk to finish */
-    if (pcm_playing)
+    if (dma_play_lock.state != 0)
     {
-        /* wait for the FIFO to empty before turning things off */
-        while (IISCON & (1<<7))  ;
-
-        pcm_playing = false;
-        if (!audio_status())
-            pcm_paused = false;
+        /* wait for the FIFO to empty and DMA to stop */
+        while ((IISCON & (1<<7)) || (DMASKTRIG2 & 0x2));
     }
+
+    /* Keep interrupt masked when unlocking */
+    dma_play_lock.state = 0;
+
+    /* turn off the request */
+    IISCON &= ~(1<<5);
+
+    /* turn on the idle */
+    IISCON |= (1<<3);
+
+    /* stop the IIS */
+    IISCON &= ~(1<<0);
+}
+
+void pcm_play_dma_start(const void *addr, size_t size)
+{
+    /* Enable the IIS clock */
+    CLKCON |= (1<<17);
+
+    /* stop any DMA in progress - idle IIS */
+    play_stop_pcm();
+
+    /* slave, transmit mode, 16 bit samples - MCLK 384fs - use 16.9344Mhz -
+       BCLK 32fs */
+    IISMOD = (1<<9) | (1<<8) | (2<<6) | (1<<3) | (1<<2) | (1<<0);
+
+    /* connect DMA to the FIFO and enable the FIFO */
+    IISFCON = (1<<15) | (1<<13);
+
+    /* set DMA dest */
+    DIDST2 = (unsigned int)&IISFIFO;
+
+    /* IIS is on the APB bus, INT when TC reaches 0, fixed dest addr */
+    DIDSTC2 = 0x03;
+
+    /* set DMA source and options */
+    DISRC2 = (unsigned int)addr + 0x30000000;
+    /* How many transfers to make - we transfer half-word at a time = 2 bytes */
+    /* DMA control: CURR_TC int, single service mode, I2SSDO int, HW trig */
+    /*     no auto-reload, half-word (16bit) */
+    DCON2 = DMA_CONTROL_SETUP | (size / 2);
+    DISRCC2 = 0x00;  /* memory is on AHB bus, increment addresses */
+
+    play_start_pcm();
+}
+
+/* Promptly stop DMA transfers and stop IIS */
+void pcm_play_dma_stop(void)
+{
+    play_stop_pcm();
 
     /* Disconnect the IIS clock */
     CLKCON &= ~(1<<17);
 }
 
+void pcm_play_dma_pause(bool pause)
+{
+    if (pause)
+    {
+        /* pause playback on current buffer */
+        play_stop_pcm();
+    }
+    else
+    {
+        /* restart playback on current buffer */
+        /* make sure we're aligned on left channel - skip any right
+           channel sample left waiting */
+        DISRC2 = (DCSRC2 + 2) & ~0x3;
+        DCON2  = DMA_CONTROL_SETUP | (DSTAT2 & 0xFFFFE);
+        play_start_pcm();
+    }
+}
+
 void fiq_handler(void)
 {
-    /* r0-r7 are probably not all used by GCC but there's no way to know
-       otherwise this whole thing must be assembly */
-    asm volatile ("stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
-                  "sub   sp, sp, #8           \n"); /* Reserve stack */
+    static unsigned char *start;
+    static size_t         size;
     register pcm_more_callback_type get_more;   /* No stack for this */
-    unsigned char                  *next_start; /* sp + #0 */
-    size_t                          next_size;  /* sp + #4 */
 
     /* clear any pending interrupt */
     SRCPND = (1<<19);
 
     /* Buffer empty.  Try to get more. */
     get_more = pcm_callback_for_more;
-    if (get_more == NULL)
+    size = 0;
+
+    if (get_more == NULL || (get_more(&start, &size), size == 0))
     {
-        /* Callback missing */
-        pcm_play_dma_stop_fiq();
-        goto fiq_exit;
+        /* Callback missing or no more DMA to do */
+        pcm_play_dma_stop();
+        pcm_play_dma_stopped_callback();
     }
-
-    next_size = 0;
-    get_more(&next_start, &next_size);
-
-    if (next_size == 0)
+    else
     {
-        /* No more DMA to do */
-        pcm_play_dma_stop_fiq();
-        goto fiq_exit;
+        /* Flush any pending cache writes */
+        clean_dcache_range(start, size);
+
+        /* set the new DMA values */
+        DCON2 = DMA_CONTROL_SETUP | (size >> 1);
+        DISRC2 = (unsigned int)start + 0x30000000;
+
+        /* Re-Activate the channel */
+        DMASKTRIG2 = 0x2;
     }
-
-    /* Flush any pending cache writes */
-    clean_dcache_range(next_start, next_size);
-
-    /* set the new DMA values */
-    DCON2 = DMA_CONTROL_SETUP | (next_size >> 1);
-    DISRC2 = (unsigned long)next_start + 0x30000000;
-
-    /* Re-Activate the channel */
-    DMASKTRIG2 = 0x2;
-
-fiq_exit:
-    asm volatile("add   sp, sp, #8           \n"   /* Cleanup stack   */
-                 "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
-                 "subs  pc, lr, #4           \n"); /* Return from FIQ */
-}
-
-/* Disconnect the DMA and wait for the FIFO to clear */
-void pcm_play_dma_stop(void)
-{
-    disable_fiq();
-    pcm_play_dma_stop_fiq();
-}
-
-void pcm_play_pause_pause(void)
-{
-    /* stop servicing refills */
-    int oldstatus = set_fiq_status(FIQ_DISABLED);
-    INTMSK |= (1<<19);  /* mask interrupt request */
-    IISCON &= ~(1<<5);  /* turn off FIFO request */
-    DMASKTRIG2 = 0x4;  /* stop DMA at end of atomic transfer */
-
-    if (pcm_playing)
-    {
-        /* playing - wait for the FIFO to empty */
-        while (IISCON & (1<<7))  ;
-    }
-
-    set_fiq_status(oldstatus);
-}
-
-void pcm_play_pause_unpause(void)
-{
-    /* refill buffer and keep going */
-    int oldstatus = set_fiq_status(FIQ_DISABLED);
-    _pcm_apply_settings();
-    if (pcm_playing)
-    {
-        /* make sure we're aligned on left channel - skip any right channel
-           sample left waiting */
-        DISRC2 = (DCSRC2 + 2) & ~0x3;
-        DCON2  = (DSTAT2 & 0xFFFFE);
-
-        SRCPND = (1<<19);   /* clear pending DMA interrupt */
-        INTMSK &= ~(1<<19); /* unmask interrupt request */
-        IISCON |= (1<<5);   /* enable FIFO request */
-    }
-    set_fiq_status(oldstatus);
 }
 
 void pcm_set_frequency(unsigned int frequency)
@@ -296,89 +301,10 @@ size_t pcm_get_bytes_waiting(void)
     return (DSTAT2 & 0xFFFFE) * 2;
 }
 
-/** **/
-
-void pcm_mute(bool mute)
+const void * pcm_play_dma_get_peak_buffer(int *count)
 {
-    audiohw_mute(mute);
-    if (mute)
-        sleep(HZ/16);
+    unsigned long addr = DCSRC2;
+    int cnt = DSTAT2;
+    *count = (cnt & 0xFFFFF) >> 1;
+    return (void *)((addr + 2) & ~3);
 }
-
-/**
- * Return playback peaks - Peaks ahead in the DMA buffer based upon the
- *                         calling period to attempt to compensate for
- *                         delay.
- */
-void pcm_calculate_peaks(int *left, int *right)
-{
-    static unsigned long last_peak_tick = 0;
-    static unsigned long frame_period   = 0;
-    static int peaks_l = 0, peaks_r = 0;
-
-    /* Throttled peak ahead based on calling period */
-    unsigned long period = current_tick - last_peak_tick;
-
-    /* Keep reasonable limits on period */
-    if (period < 1)
-        period = 1;
-    else if (period > HZ/5)
-        period = HZ/5;
-
-    frame_period = (3*frame_period + period) >> 2;
-
-    last_peak_tick = current_tick;
-
-    if (pcm_playing && !pcm_paused)
-    {
-        unsigned long *addr = (unsigned long *)DCSRC2;
-        long samples = DSTAT2;
-        long samp_frames;
-
-        addr        = (unsigned long *)((unsigned long)addr & ~3);
-        samples    &= 0xFFFFE;
-        samp_frames = frame_period*pcm_freq/(HZ/2);
-        samples     = MIN(samp_frames, samples) >> 1;
-
-        if (samples > 0)
-        {
-            long peak_l   = 0, peak_r   = 0;
-            long peaksq_l = 0, peaksq_r = 0;
-
-            addr -= 0x30000000 >> 2;
-            addr = (long *)((long)addr & ~3);
-
-            do
-            {
-                long value = *addr;
-                long ch, chsq;
-
-                ch   = (int16_t)value;
-                chsq = ch*ch;
-                if (chsq > peaksq_l)
-                    peak_l = ch, peaksq_l = chsq;
-
-                ch   = value >> 16;
-                chsq = ch*ch;
-                if (chsq > peaksq_r)
-                    peak_r = ch, peaksq_r = chsq;
-
-                addr += 4;
-            }
-            while ((samples -= 4) > 0);
-
-            peaks_l = abs(peak_l);
-            peaks_r = abs(peak_r);
-        }
-    }
-    else
-    {
-        peaks_l = peaks_r = 0;
-    }
-
-    if (left)
-        *left = peaks_l;
-
-    if (right)
-        *right = peaks_r;
-} /* pcm_calculate_peaks */

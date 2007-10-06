@@ -243,10 +243,10 @@ cpu_init:
     msr    cpsr_c, #0xd1 /* IRQ/FIQ disabled */
     ldr    sp, =fiq_stack
     /* We'll load the banked FIQ mode registers with useful values here.
-       These values will be used in the FIQ handler in pcm_playback.c */
-    ldr    r12, =IIS_CONFIG
+       These values will be used in the FIQ handler in pcm-pp.c */
+    ldr    r10, =IIS_CONFIG
 
-    ldr    r11, =p
+    ldr    r11, =dma_play_data
 
     /* Let abort and undefined modes use IRQ stack */
     msr    cpsr_c, #0xd7 /* IRQ/FIQ disabled */
@@ -328,7 +328,7 @@ vectors:
     .word  data_abort_handler
     .word  reserved_handler
     .word  irq_handler
-    .word  0 /* fiq handler set in pcm driver */
+    .word  fiq_handler
 
     .text
 

@@ -34,24 +34,7 @@
 
 /***************************************************************************/
 
-/**
- * APIs implemented in the target tree portion:
- * Public -
- *      pcm_init_recording
- *      pcm_close_recording
- * Semi-private -
- *      pcm_rec_dma_start
- *      pcm_rec_dma_stop
- */
-
-/** These items may be implemented target specifically or need to
-    be shared semi-privately **/
 extern struct thread_entry *codec_thread_p;
-
-/* the registered callback function for when more data is available */
-volatile pcm_more_callback_type2 pcm_callback_more_ready = NULL;
-/* DMA transfer in is currently active */
-volatile bool                    pcm_recording           = false;
 
 /** General recording state **/
 static bool is_recording;              /* We are recording                 */
@@ -1790,25 +1773,3 @@ size_t enc_unget_pcm_data(size_t size)
 
     return 0;
 } /* enc_unget_pcm_data */
-
-/** Low level pcm recording apis **/
-
-/****************************************************************************
- * Functions that do not require targeted implementation but only a targeted
- * interface
- */
-void pcm_record_data(pcm_more_callback_type2 more_ready,
-                     void *start, size_t size)
-{
-    if (!(start && size))
-        return;
-
-    pcm_callback_more_ready = more_ready;
-    pcm_rec_dma_start(start, size);
-} /* pcm_record_data */
-
-void pcm_stop_recording(void)
-{
-    if (pcm_recording)
-        pcm_rec_dma_stop();
-} /* pcm_stop_recording */

@@ -26,11 +26,27 @@
 
 #define IPOD_LCD_BASE    0xc0001000
 
-#define IISCONFIG        (*(volatile unsigned long *)(0xc0002500))
+/* Processor ID */
+#define PROCESSOR_ID     (*(volatile unsigned long *)(0xc4000000))
 
+#define PROC_ID_CPU      0x55
+#define PROC_ID_COP      0xaa
+
+#define IISCONFIG        (*(volatile unsigned long *)(0xc0002500))
 #define IISFIFO_CFG      (*(volatile unsigned long *)(0xc000251c))
 #define IISFIFO_WR       (*(volatile unsigned long *)(0xc0002540))
 #define IISFIFO_RD       (*(volatile unsigned long *)(0xc0002580))
+
+/* IISCONFIG bits: */
+#define IIS_TXFIFOEN      (1 << 2)
+#define IIS_TX_FREE_MASK  (0xf << 23)
+#define IIS_TX_FREE_COUNT ((IISFIFO_CFG & IIS_TX_FREE_MASK) >> 23)
+
+/* IISFIFO_CFG bits: */
+#define IIS_IRQTX_REG    IISFIFO_CFG
+#define IIS_IRQTX        (1 << 9)
+
+#define I2C_BASE         0xc0008000
 
 #define IDE_BASE         0xc0003000
 
@@ -103,6 +119,8 @@
 #define DMA_OUT_MASK     (1 << DMA_OUT_IRQ)
 #define DMA_IN_MASK      (1 << DMA_IN_IRQ)
 
+/* Yes, there is I2S_MASK but this cleans up the pcm code */
+#define IIS_MASK         DMA_OUT_MASK
 
 #define TIMER1_CFG       (*(volatile unsigned long *)(0xcf001100))
 #define TIMER1_VAL       (*(volatile unsigned long *)(0xcf001104))

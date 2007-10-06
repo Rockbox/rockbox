@@ -25,9 +25,36 @@
 short __attribute__((section(".dmabuf"))) dma_buf_left[DMA_BUF_SAMPLES];
 short __attribute__((section(".dmabuf"))) dma_buf_right[DMA_BUF_SAMPLES];
 
-/* From pcm_playback.c */
-extern unsigned short* p;
-extern size_t p_size;
+static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
+
+unsigned short* p IBSS_ATTR;
+size_t p_size IBSS_ATTR;
+
+void pcm_play_lock(void)
+{
+}
+
+void pcm_play_unlock(void)
+{
+}
+
+void pcm_play_dma_start(const void *addr, size_t size)
+{
+    pcm_apply_settings();
+
+    p = (unsigned short*)addr;
+    p_size = size;
+}
+
+void pcm_play_dma_stop(void)
+{
+}
+
+void pcm_play_dma_pause(bool pause)
+{
+    if (!pause)
+        pcm_apply_settings();
+}
 
 static inline void fill_dma_buf(int offset)
 {
@@ -85,7 +112,8 @@ static inline void fill_dma_buf(int offset)
                                   &p_size);
         }
         while (p_size);
-        pcm_playing = false;
+
+        pcm_play_dma_stopped_callback();
     }
 
     if (l < lend)
@@ -117,9 +145,7 @@ void pcm_init(void)
 {
     int i;
 
-    pcm_playing = false;
-    pcm_paused = false;
-    pcm_callback_for_more = NULL;
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
 
     memset(dma_buf_left, 0, sizeof(dma_buf_left));
     memset(dma_buf_right, 0, sizeof(dma_buf_right));
@@ -159,3 +185,32 @@ void pcm_init(void)
     DMAR10(1) |= 1;
 }
 
+void pcm_postinit(void)
+{
+    audiohw_postinit();
+    pcm_apply_settings();
+}
+
+void pcm_set_frequency(unsigned int frequency)
+{
+    (void)frequency;
+    pcm_freq = HW_SAMPR_DEFAULT;
+}
+
+void pcm_apply_settings(void)
+{
+    pcm_curr_sampr = pcm_freq;
+}
+
+size_t pcm_get_bytes_waiting(void)
+{
+    return p_size & ~3;
+}
+
+const void * pcm_play_dma_get_peak_buffer(int *count)
+{
+    unsigned long addr = (unsigned long)p;
+    size_t cnt = p_size;
+    *count = cnt >> 2;
+    return (void *)((addr + 2) & ~3);
+}

@@ -24,7 +24,7 @@
 #include "panic.h"
 #include <kernel.h>
 #include "pcmbuf.h"
-#include "pcm_playback.h"
+#include "pcm.h"
 #include "logf.h"
 #ifndef SIMULATOR
 #include "cpu.h"
@@ -154,7 +154,6 @@ static void pcmbuf_callback(unsigned char** start, size_t* size)
             crossfade_chunk = pcmbuf_read;
     }
 
-process_new_buffer:
     {
         /* Send the new buffer to the pcm */
         struct pcmbufdesc *pcmbuf_new = pcmbuf_read;
@@ -171,10 +170,6 @@ process_new_buffer:
         }
         else
         {
-            /* There may be more data waiting to flush, try to use it */
-            if (pcmbuf_flush_fillpos())
-                goto process_new_buffer;
-                
             /* No more buffers */
             last_chunksize = 0;
             *realsize = 0;
@@ -487,7 +482,12 @@ void pcmbuf_pause(bool pause)
     if (pause)
        pcm_mute(true);
 #endif
-    pcm_play_pause(!pause);
+
+    if (pcm_is_playing())
+        pcm_play_pause(!pause);
+    else if (!pause)
+        pcmbuf_play_start();
+
 #ifdef PCMBUF_MUTING
     if (!pause)
         pcm_mute(false);
@@ -823,7 +823,8 @@ static bool prepare_insert(size_t length)
 #endif
         {
             logf("pcm starting");
-            pcmbuf_play_start();
+            if (!(audio_status() & AUDIO_STATUS_PAUSE))
+                pcmbuf_play_start();
         }
     } 
     else if (pcmbuf_unplayed_bytes <= pcmbuf_watermark)

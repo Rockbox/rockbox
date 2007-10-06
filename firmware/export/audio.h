@@ -26,7 +26,7 @@
    many files. */
 #if CONFIG_CODEC == SWCODEC
 #include "pcm_sampr.h"
-#include "pcm_playback.h"
+#include "pcm.h"
 #ifdef HAVE_RECORDING
 #include "pcm_record.h"
 #include "id3.h"

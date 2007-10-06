@@ -74,12 +74,6 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return value;
 }
 
-static inline void set_fiq_handler(void(*fiq_handler)(void))
-{
-    /* Install the FIQ handler */
-    *((unsigned int*)(15*4)) = (unsigned int)fiq_handler;
-}
-
 static inline void enable_fiq(void)
 {
     /* Clear FIQ disable bit */
