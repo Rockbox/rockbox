@@ -150,7 +150,7 @@ struct core_entry {
  */
 
 /* Macros generate better code than an inline function is this case */
-#if defined (CPU_PP) || defined (CPU_ARM)
+#if (defined (CPU_PP) || defined (CPU_ARM)) && CONFIG_CPU != PP5020
 #define test_and_set(x_, v_) \
 ({ \
     uint32_t old; \

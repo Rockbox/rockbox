@@ -201,7 +201,8 @@ typedef struct
     uint8_t* next_packet;        /* Next stream packet beginning */
 
     size_t guard_bytes;          /* Number of bytes in guardbuf used */
-    size_t buffer_remaining;     /* How much data is left in the buffer */
+    uint64_t buffer_tail;        /* Accumulation of bytes added */
+    uint64_t buffer_head;        /* Accumulation of bytes removed */
     uint32_t curr_pts;           /* Current presentation timestamp */
     uint32_t curr_time;          /* Current time in samples */
     uint32_t tagged;             /* curr_pts is valid */
@@ -300,7 +301,8 @@ static intptr_t str_send_msg(Stream *str, int id, intptr_t data)
         return str->dispatch_fn(str, msg);
 #endif
 
-    /* Only one thread at a time, please */
+    /* Only one thread at a time, please - only one core may safely send
+       right now */
     rb->spinlock_lock(&str->msg_lock);
 
     str->ev.id = id;
@@ -335,24 +337,6 @@ static uint8_t *disk_buf IBSS_ATTR;
 static uint8_t *disk_buf_end IBSS_ATTR;
 static uint8_t *disk_buf_tail IBSS_ATTR;
 static size_t   buffer_size IBSS_ATTR;
-#if NUM_CORES > 1
-/* Some stream variables are shared between cores */
-struct mutex stream_lock IBSS_ATTR;
-static inline void init_stream_lock(void)
-    { rb->spinlock_init(&stream_lock); }
-static inline void lock_stream(void)
-    { rb->spinlock_lock(&stream_lock); }
-static inline void unlock_stream(void)
-    { rb->spinlock_unlock(&stream_lock); }
-#else
-/* No RMW issue here */
-static inline void init_stream_lock(void)
-    { }
-static inline void lock_stream(void)
-    { }
-static inline void unlock_stream(void)
-    { }
-#endif
 
 #define MSG_BUFFER_NEARLY_EMPTY 1
 #define MSG_EXIT_REQUESTED      2
@@ -677,21 +661,16 @@ static void get_next_data( Stream* str )
 
             if (str->curr_packet != NULL)
             {
-                lock_stream();
-
                 if (str->curr_packet < str->prev_packet)
                 {
-                    str->buffer_remaining -= (disk_buf_end - str->prev_packet) +
-                                             (str->curr_packet - disk_buf);
-                    str->buffer_remaining -= str->guard_bytes;
+                    str->buffer_head += (disk_buf_end - str->prev_packet) +
+                                        (str->curr_packet - disk_buf);
                     str->guard_bytes = 0;
                 }
                 else
                 {
-                    str->buffer_remaining -= (str->curr_packet - str->prev_packet);
+                    str->buffer_head += (str->curr_packet - str->prev_packet);
                 }
-
-                unlock_stream();
 
                 str->prev_packet = str->curr_packet;
             }
@@ -1898,11 +1877,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     disk_buf_tail = buffer+disk_buf_len;
     file_remaining -= disk_buf_len;
 
-    video_str.guard_bytes = audio_str.guard_bytes = 0;
-    video_str.prev_packet = disk_buf;
+    audio_str.guard_bytes = 0;
     audio_str.prev_packet = disk_buf;
-    video_str.buffer_remaining = disk_buf_len;
-    audio_str.buffer_remaining = disk_buf_len;
+    audio_str.buffer_head = 0;
+    audio_str.buffer_tail = disk_buf_len;
+    video_str.guard_bytes = 0;
+    video_str.prev_packet = disk_buf;
+    video_str.buffer_head = 0;
+    video_str.buffer_tail = disk_buf_len;
 
     rb->spinlock_init(&audio_str.msg_lock);
     rb->spinlock_init(&video_str.msg_lock);
@@ -1912,8 +1894,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifndef HAVE_LCD_COLOR
     gray_show(true);
 #endif
-
-    init_stream_lock();
 
 #if NUM_CORES > 1
     flush_icache();
@@ -1940,8 +1920,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         /* Wait until both threads have finished their work */
         while ((audio_str.status >= 0) || (video_str.status >= 0))
         {
-            size_t audio_remaining = audio_str.buffer_remaining;
-            size_t video_remaining = video_str.buffer_remaining;
+            size_t audio_remaining = audio_str.buffer_tail - audio_str.buffer_head;
+            size_t video_remaining = video_str.buffer_tail - video_str.buffer_head;
 
             if (MIN(audio_remaining,video_remaining) < MPEG_LOW_WATERMARK) {
 
@@ -1957,11 +1937,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     bytes_to_read -= n;
                     file_remaining -= n;
 
-                    lock_stream();
-                    audio_str.buffer_remaining += n;
-                    video_str.buffer_remaining += n;
-                    unlock_stream();
-
+                    audio_str.buffer_tail += n;
+                    video_str.buffer_tail += n;
                     disk_buf_tail += n;
 
                     rb->yield();
