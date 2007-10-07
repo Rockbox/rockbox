@@ -61,7 +61,7 @@
  *      pcm_recording (R)
  *
  * States are set _after_ the target's pcm driver is called so that it may
- * know from whence the state is changed.
+ * know from whence the state is changed. One exception is init.
  *
  */
 
@@ -362,6 +362,9 @@ void pcm_init_recording(void)
 {
     logf("pcm_init_recording");
 
+    /* Recording init is locked unlike general pcm init since this is not
+     * just a one-time event at startup and it should and must be safe by
+     * now. */
     pcm_rec_lock();
 
     logf(" pcm_rec_dma_init");
@@ -380,8 +383,8 @@ void pcm_close_recording(void)
     if (pcm_recording)
     {
         logf(" pcm_rec_dma_stop");
-        pcm_rec_dma_stopped_callback();
         pcm_rec_dma_stop();
+        pcm_rec_dma_stopped_callback();
     }
 
     logf(" pcm_rec_dma_close");
