@@ -86,18 +86,18 @@ minutes in 1 minute steps. Then \setting{15,30,45} and \setting{60} minutes are
 available.
 
 \opt{HAVE_RTC_ALARM}{
-\subsection{Wake Up alarm}
-    This option turns the \dap{} off and then starts it up again at the 
-    specified time. This is most useful when combined with
-    \setting{Start Screen} set to \setting{Resume Playback}, so 
-    that the \dap{} wakes up and immediately starts playing music. Use 
-    \ActionSettingInc{} and \ActionSettingDec to adjust the minutes setting,
-    \ButtonLeft{} and \ButtonRight{} to adjust the HOURS.
-    \ButtonPlay{} confirms the alarm and shuts your \dap{} down, and
-    \opt{RECORDER_PAD}{\ButtonOff}\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
-    cancels setting an alarm. If the \dap{} is turned on again before the alarm
-    occurs, the alarm will be cancelled. Using this option disables the 
-    \setting{Sleep Timer}.
+\subsection{Wake-Up Alarm}
+    This option turns the \dap{} off and then starts it up again at the
+    specified time. Use \ActionSettingInc{} and \ActionSettingDec{} to adjust
+    the minutes setting, \ButtonLeft{} and \ButtonRight{} to adjust the hours.
+    \ActionAlarmSet{} confirms the alarm and shuts the \dap{} down, and
+    \ActionAlarmCancel{} cancels setting an alarm. If the \dap{} is turned on
+    again before the alarm occurs, the alarm will be cancelled. Using this
+    option disables the \setting{Sleep Timer}.
+
+    \subsection{Alarm Wake up Screen}
+    This option controls what the \dap{} does when it is woken up by the alarm.
+    
 }
 
 \subsection{Limits}
