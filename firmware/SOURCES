@@ -429,6 +429,7 @@ target/arm/sandisk/audio-c200_e200.c
 #ifndef SIMULATOR
 target/arm/sandisk/ata-c200_e200.c
 target/arm/sandisk/sansa-c200/lcd-c200.c
+target/arm/sandisk/sansa-c200/lcd-as-c200.S
 target/arm/sandisk/adc-c200_e200.c
 target/arm/sandisk/backlight-c200_e200.c
 target/arm/usb-fw-pp502x.c

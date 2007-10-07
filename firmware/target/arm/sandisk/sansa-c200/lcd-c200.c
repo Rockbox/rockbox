@@ -206,19 +206,49 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
     (void)stride;
 }
 
+/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
+extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
+                                   int width,
+                                   int stride);
 /* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
+    unsigned char const * yuv_src[3];
+    off_t z;
+
+    /* Sorry, but width and height must be >= 2 or else */
+    width &= ~1;
+    height >>= 1;
+    
+    y += 0x1a;
+
+    z = stride*src_y;
+    yuv_src[0] = src[0] + z + src_x;
+    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
+    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
+
+    lcd_send_command(R_ENTRY_MODE);
+    lcd_send_command(0x80);
+
+    lcd_send_command(R_X_ADDR_AREA);
+    lcd_send_command(x);
+    lcd_send_command(x + width - 1);
+
+    do
+    {
+        lcd_send_command(R_Y_ADDR_AREA);
+        lcd_send_command(y);
+        lcd_send_command(y + 1);
+
+        lcd_write_yuv420_lines(yuv_src, width, stride);
+        yuv_src[0] += stride << 1; /* Skip down two luma lines */
+        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+        yuv_src[2] += stride >> 1;
+        y += 2;
+    }
+    while (--height > 0);
 }
 
 /* Update the display.
@@ -238,6 +268,9 @@ void lcd_update_rect(int x0, int y0, int width, int height)
 
     if ((x1 <= 0) || (y1 <= 0))
         return;
+
+    lcd_send_command(R_ENTRY_MODE);
+    lcd_send_command(0x82);
 
     if(y1 >= LCD_HEIGHT)
         y1 = LCD_HEIGHT - 1;
