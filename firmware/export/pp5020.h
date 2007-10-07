@@ -307,8 +307,11 @@
 
 #define INIT_USB         0x80000000
 
+
 /* IIS */
+#define IISDIV              (*(volatile unsigned long*)(0x60006080))
 #define IISCONFIG           (*(volatile unsigned long*)(0x70002800))
+#define IISCLK              (*(volatile unsigned long*)(0x70002808))
 #define IISFIFO_CFG         (*(volatile unsigned long*)(0x7000280c))
 #define IISFIFO_WR          (*(volatile unsigned long*)(0x70002840))
 #define IISFIFO_WRH         (*(volatile unsigned short*)(0x70002840))
@@ -358,10 +361,14 @@
  * I forgot which is which size but did test them. */
 #define IIS_FIFO_FORMAT_1           (0x1 << 4)
 #define IIS_FIFO_FORMAT_2           (0x2 << 4)
- /* 32bit-MSB-little endian */
+/* 32bit-MSB-little endian */
 #define IIS_FIFO_FORMAT_LE32        (0x3 << 4)
- /* 16bit-MSB-little endian */
+/* 16bit-MSB-little endian */
 #define IIS_FIFO_FORMAT_LE16        (0x4 << 4)
+#define IIS_FIFO_FORMAT_5           (0x5 << 4)
+#define IIS_FIFO_FORMAT_6           (0x6 << 4)
+/* A second one like IIS_FIFO_FORMAT_LE16? PP5020 only? */
+#define IIS_FIFO_FORMAT_LE16_2      (0x7 << 4)
 
 /* FIFO formats 0x5 and above seem equivalent to 0x4 ?? */
 

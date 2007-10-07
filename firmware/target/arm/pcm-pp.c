@@ -29,11 +29,12 @@
    of working settings. DMA-compatible settings should be found for here, i2s,
    and codec setup using "arithmetic" the hardware supports like halfword
    swapping. Try to use 32-bit packed in IIS modes if possible. */
-#if defined(SANSA_C200) || defined(SANSA_E200)
+#if defined(SANSA_C200) || defined(SANSA_E200) \
+    || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
 /* 16-bit, L-R packed into 32 bits with left in the least significant halfword */
 #define SAMPLE_SIZE   16
 #define TRANSFER_SIZE 32
-#elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+#elif 0
 /* 16-bit, one left 16-bit sample followed by one right 16-bit sample */
 #define SAMPLE_SIZE   16
 #define TRANSFER_SIZE 16
@@ -204,10 +205,10 @@ void fiq_playback(void)
             }
 #if SAMPLE_SIZE == 16
 #if TRANSFER_SIZE == 16
-        IISFIFO_WRH = *dma_play_data.p++;
-        IISFIFO_WRH = *dma_play_data.p++;
+            IISFIFO_WRH = *dma_play_data.p++;
+            IISFIFO_WRH = *dma_play_data.p++;
 #elif TRANSFER_SIZE == 32
-        IISFIFO_WR = *dma_play_data.p++;
+            IISFIFO_WR = *dma_play_data.p++;
 #endif
 #elif SAMPLE_SIZE == 32
             IISFIFO_WR = *dma_play_data.p++ << 16;
@@ -294,8 +295,8 @@ static void play_stop_pcm(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    dma_play_data.p    = (void *)addr;
-    dma_play_data.size = size;
+    dma_play_data.p    = (void *)(((uintptr_t)addr + 2) & ~3);
+    dma_play_data.size = (size & ~3);
 
 #if NUM_CORES > 1
     /* This will become more important later - and different ! */

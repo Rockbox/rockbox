@@ -57,9 +57,9 @@ void i2s_reset(void)
     IISCONFIG &= ~IIS_RESET;
 
     /* BIT.FORMAT */
-    IISCONFIG = ((IISCONFIG & ~IIS_SIZE_MASK) | IIS_SIZE_16BIT);
-    /* BIT.SIZE */
     IISCONFIG = ((IISCONFIG & ~IIS_FORMAT_MASK) | IIS_FORMAT_IIS);
+    /* BIT.SIZE */
+    IISCONFIG = ((IISCONFIG & ~IIS_SIZE_MASK) | IIS_SIZE_16BIT);
 
     /* FIFO.FORMAT */
     /* If BIT.SIZE < FIFO.FORMAT low bits will be 0 */
@@ -67,11 +67,11 @@ void i2s_reset(void)
     /* AS3514 can only operate as I2S Slave */
     IISCONFIG |= IIS_MASTER;
     /* Set I2S to 44.1kHz */
-    outl((inl(0x70002808) & ~(0x1ff)) | 33, 0x70002808);
-    outl(7, 0x60006080);
+    IISCLK = (IISCLK & ~0x1ff) | 33;
+    IISDIV = 7;
     IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE16);
 #elif defined (IRIVER_H10) || defined (IRIVER_H10_5GB)
-    IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE_HALFWORD);
+    IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE16_2);
 #else
     IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE32);
 #endif
