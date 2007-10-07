@@ -411,32 +411,42 @@ static void play_animation(int input)
 
 static void instructions()
 {
-  char buf[X_MAX + 5];
-  rb->snprintf(buf, sizeof(buf), "robotfindskitten %s", RFK_VERSION);
-    /* 
-     * fixme: Find a nice way of portably putting a lot of
-     * text on the screen. Fixing it for all these sizes is just a horrible job
-     */
-#if X_MAX >= 52 /* 320 pixels wide */
-    rb->lcd_putsxy(0,0, buf);
-    rb->lcd_putsxy(0,SYSFONT_HEIGHT*1, "By the illustrious Leonard Richardson (C) 1997, 2000");
-    rb->lcd_putsxy(0,SYSFONT_HEIGHT*2, "Written originally for the Nerth Pork");
-    rb->lcd_putsxy(0,SYSFONT_HEIGHT*3, "robotfindskitten contest");
-    rb->lcd_putsxy(0,SYSFONT_HEIGHT*5, "In this game you are robot (#). Your job is to find");
-    rb->lcd_putsxy(0,SYSFONT_HEIGHT*6, "kitten. This task is complicated by the existence of");
-    rb->lcd_putsxy(0,SYSFONT_HEIGHT*7, "various things which are not kitten. Robot must");
-    rb->lcd_putsxy(0,SYSFONT_HEIGHT*8, "touch items to determine if they are kitten or not.");
-    rb->lcd_putsxy(0,SYSFONT_HEIGHT*9, "The game ends when robotfindskitten.");
-    rb->lcd_putsxy(0,SYSFONT_HEIGHT*11, "Press any key to start");
-    rb->lcd_update();
-    rb->button_get(true);
-#elif X_MAX >= 39 /* 240 pixels wide */
-#elif X_MAX >= 35 /* 220 pixels wide */
-#elif X_MAX >= 28 /* 176 pixels wide */
-#elif X_MAX >= 25 /* 160 pixels wide */
-#elif X_MAX >= 20 /* 128 pixels wide */
-#elif X_MAX >= 17 /* 112 pixels wide */
+  unsigned short row = 0, col = 0, len = 0, i = 0;
+#define WORDS (sizeof instructions / sizeof (char*))
+  static char* instructions[] = {
+#if 0
+    /* Not sure if we want to include this? */
+    "robotfindskitten", RFK_VERSION, "", "",
+    "By", "the", "illustrious", "Leonard", "Richardson", "(C)", "1997,", "2000", "",
+    "Written", "originally", "for", "the", "Nerth", "Pork", "robotfindskitten", "contest", "", "",
 #endif
+    "In", "this", "game", "you", "are", "robot", "(#).", "Your", "job", "is", "to", "find", "kitten.", "This", "task", "is", "complicated", "by", "the", "existence", "of", "various", "things", "which", "are", "not", "kitten.", "Robot", "must", "touch", "items", "to", "determine", "if", "they", "are", "kitten", "or", "not.", "",
+    "The", "game", "ends", "when", "robotfindskitten.", "", "",
+    "Press", "any", "key", "to", "start",
+  };
+  for (i = 0; i < WORDS; i++) {
+    len = rb->strlen(instructions[i]);
+    /* Skip to next line if the current one can't fit the word */
+    if (col+len > X_MAX) {
+      col = 0;
+      row++;
+    }
+    /* .. or if the word is the empty string */
+    if (rb->strcmp(instructions[i], "") == 0) {
+      col = 0;
+      row++;
+      continue;
+    }
+    /* We filled the screen */
+    if (row > Y_MAX) {
+      row = 0;
+      pause();
+      rb->lcd_clear_display();
+    }
+    rb->lcd_putsxy(SYSFONT_WIDTH*col, row*SYSFONT_HEIGHT, instructions[i]);
+    col += len + 1;
+  }
+  pause();
 }
 
 static void initialize_arrays()
