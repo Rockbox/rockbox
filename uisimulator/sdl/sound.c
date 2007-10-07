@@ -283,6 +283,8 @@ void pcm_rec_dma_close(void)
 
 void pcm_rec_dma_start(void *start, size_t size)
 {
+    (void)start;
+    (void)size;
 }
 
 void pcm_rec_dma_stop(void)
