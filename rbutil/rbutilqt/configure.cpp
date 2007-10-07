@@ -230,7 +230,7 @@ void Config::updateCacheInfo(QString path)
         sz += fs.at(i).size();
         qDebug() << fs.at(i).fileName() << fs.at(i).size();
     }
-    ui.cacheSize->setText(tr("Current cache size is %1 kiB.")
+    ui.cacheSize->setText(tr("Current cache size is %L1 kiB.")
             .arg(sz/1024));
 }
 

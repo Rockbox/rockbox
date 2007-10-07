@@ -168,7 +168,7 @@ void ThemesInstallWindow::updateDetails(int row)
     size += iniDetails.value("size").toInt();
     qDebug() << ui.listThemes->item(row)->data(Qt::UserRole).toString() << size;
     iniDetails.endGroup();
-    ui.labelSize->setText(tr("Download size %1 kiB").arg(size));
+    ui.labelSize->setText(tr("Download size %L1 kiB").arg(size));
 
     iniDetails.beginGroup(ui.listThemes->item(row)->data(Qt::UserRole).toString());
 

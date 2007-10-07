@@ -42,6 +42,7 @@ int main( int argc, char ** argv ) {
     if(!user->value("lang", "").toString().isEmpty()) {
         if(!translator.load("rbutil_" + user->value("lang").toString(), absolutePath))
             translator.load("rbutil_" + user->value("lang").toString(), ":/lang");
+        QLocale::setDefault(user->value("lang").toString());
     }
     delete user;
     app.installTranslator(&translator);
