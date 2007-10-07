@@ -411,7 +411,8 @@ static void play_animation(int input)
 
 static void instructions()
 {
-  unsigned short row = 0, col = 0, len = 0, i = 0;
+  int y, space_w, width, height;
+  unsigned short x = 0, i = 0;
 #define WORDS (sizeof instructions / sizeof (char*))
   static char* instructions[] = {
 #if 0
@@ -424,27 +425,30 @@ static void instructions()
     "The", "game", "ends", "when", "robotfindskitten.", "", "",
     "Press", "any", "key", "to", "start",
   };
+  rb->lcd_clear_display();
+  rb->lcd_getstringsize(" ", &space_w, &height);
+  y = 0;
   for (i = 0; i < WORDS; i++) {
-    len = rb->strlen(instructions[i]);
+    rb->lcd_getstringsize(instructions[i], &width, NULL);
     /* Skip to next line if the current one can't fit the word */
-    if (col+len > X_MAX) {
-      col = 0;
-      row++;
+    if (x + width > LCD_WIDTH) {
+      x = 0;
+      y += height;
     }
     /* .. or if the word is the empty string */
     if (rb->strcmp(instructions[i], "") == 0) {
-      col = 0;
-      row++;
+      x = 0;
+      y += height;
       continue;
     }
     /* We filled the screen */
-    if (row > Y_MAX) {
-      row = 0;
+    if (y + height > LCD_HEIGHT) {
+      y = 0;
       pause();
       rb->lcd_clear_display();
     }
-    rb->lcd_putsxy(SYSFONT_WIDTH*col, row*SYSFONT_HEIGHT, instructions[i]);
-    col += len + 1;
+    rb->lcd_putsxy(x, y, instructions[i]);
+    x += width + space_w;
   }
   pause();
 }
@@ -559,15 +563,6 @@ static void initialize_screen()
   char buf[40];
 
   /*
-   * Set up white-on-black screen on color targets
-   */
-#if LCD_DEPTH >= 16
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
-#endif
-
-  /*
    *Print the status portion of the screen.
    */
   rb->lcd_clear_display();
@@ -600,42 +595,40 @@ static void initialize_screen()
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    (void)parameter;
-    rb = api;
+  (void)parameter;
+  rb = api;
 
-    exit_rfk = false;
+  exit_rfk = false;
 
-    rb->srand(*rb->current_tick);
+  rb->srand(*rb->current_tick);
 
-    initialize_arrays();
+  initialize_arrays();
 
-    /*
-     * Now we initialize the various game objects.
-     */
-    initialize_robot();
-    initialize_kitten();
-    initialize_bogus();
+  /*
+   * Now we initialize the various game objects.
+   */
+  initialize_robot();
+  initialize_kitten();
+  initialize_bogus();
 
-    /*
-     * Set up white-on-black screen on color targets
-     */
+  /*
+   * Set up white-on-black screen on color targets
+   */
 #if LCD_DEPTH >= 16
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
+  rb->lcd_set_backdrop(NULL);
+  rb->lcd_set_foreground(LCD_WHITE);
+  rb->lcd_set_background(LCD_BLACK);
 #endif
-    rb->lcd_clear_display();
-    rb->lcd_setfont(FONT_SYSFIXED);
 
-    /*
-     * Run the game
-     */
-    instructions();  
+  /*
+   * Run the game
+   */
+  instructions();  
 
-    initialize_screen();
+  initialize_screen();
 
-    play_game();
+  play_game();
 
-    rb->lcd_setfont(FONT_UI);
-    return PLUGIN_OK;
+  rb->lcd_setfont(FONT_UI);
+  return PLUGIN_OK;
 }
