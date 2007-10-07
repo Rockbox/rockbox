@@ -1321,7 +1321,8 @@ void tree_flush(void)
         int old_val = global_status.dircache_size;
         if (global_settings.dircache)
         {
-            global_status.dircache_size = dircache_get_cache_size();
+            if (!dircache_is_initializing())
+                global_status.dircache_size = dircache_get_cache_size();
 # ifdef HAVE_EEPROM_SETTINGS
             if (firmware_settings.initialized)
                 dircache_save();
