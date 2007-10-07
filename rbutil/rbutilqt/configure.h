@@ -49,6 +49,7 @@ class Config : public QDialog
         QString language;
         QString programPath;
         QUrl proxy;
+        void updateCacheInfo(QString);
 
         BrowseDirtree *browser;
         BrowseDirtree *cbrowser;

@@ -217,7 +217,14 @@ void Config::setUserSettings(QSettings *user)
     ui.cachePath->setText(userSettings->value("cachepath").toString());
     ui.cacheDisable->setChecked(userSettings->value("cachedisable", true).toBool());
     ui.cacheOfflineMode->setChecked(userSettings->value("offline").toBool());
-    QList<QFileInfo> fs = QDir(userSettings->value("cachepath").toString() + "/rbutil-cache/").entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    updateCacheInfo(userSettings->value("cachepath").toString());
+}
+
+
+void Config::updateCacheInfo(QString path)
+{
+    QList<QFileInfo> fs;
+    fs = QDir(path + "/rbutil-cache/").entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
     qint64 sz = 0;
     for(int i = 0; i < fs.size(); i++) {
         sz += fs.at(i).size();
@@ -225,7 +232,6 @@ void Config::setUserSettings(QSettings *user)
     }
     ui.cacheSize->setText(tr("Current cache size is %1 kiB.")
             .arg(sz/1024));
-
 }
 
 
@@ -611,6 +617,7 @@ void Config::setMountpoint(QString m)
 void Config::setCache(QString c)
 {
     ui.cachePath->setText(c);
+    updateCacheInfo(c);
 }
 
 
@@ -709,6 +716,7 @@ void Config::cacheClear()
         QFile::remove(f);
         qDebug() << "removed:" << f;
     }
+    updateCacheInfo(userSettings->value("cachepath").toString());
 }
 
 
