@@ -739,7 +739,7 @@ struct user_settings
     unsigned char colors_file[MAX_FILENAME+1];
 #endif
 #ifdef HAVE_BUTTON_LIGHT
-    int button_light_timeout;
+    int buttonlight_timeout;
 #endif
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
     int buttonlight_brightness;

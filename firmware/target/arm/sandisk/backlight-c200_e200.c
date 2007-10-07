@@ -51,7 +51,7 @@ void __backlight_off(void)
 }
 
 #ifdef HAVE_BUTTON_LIGHT
-void __button_backlight_on(void)
+void __buttonlight_on(void)
 {
     GPIOG_OUTPUT_VAL |= 0x80;
 #ifdef SANSA_C200
@@ -59,7 +59,7 @@ void __button_backlight_on(void)
 #endif
 }
 
-void __button_backlight_off(void)
+void __buttonlight_off(void)
 {
     GPIOG_OUTPUT_VAL &=~ 0x80;
 #ifdef SANSA_C200

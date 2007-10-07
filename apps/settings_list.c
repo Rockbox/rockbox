@@ -711,7 +711,7 @@ const struct settings_list settings[] = {
         TALK_ID(7, UNIT_SEC), TALK_ID(8, UNIT_SEC), TALK_ID(9, UNIT_SEC), 
         TALK_ID(10, UNIT_SEC), TALK_ID(15, UNIT_SEC), TALK_ID(20, UNIT_SEC), 
         TALK_ID(25, UNIT_SEC), TALK_ID(30, UNIT_SEC), TALK_ID(45, UNIT_SEC), 
-        TALK_ID(60, UNIT_SEC), TALK_ID(90, UNIT_SEC), TALK_ID(2, UNIT_MIN), 
+        TALK_ID(60, UNIT_SEC), TALK_ID(90, UNIT_SEC), TALK_ID(2, UNIT_MIN),
         TALK_ID(3, UNIT_MIN), TALK_ID(5, UNIT_MIN), TALK_ID(10, UNIT_MIN), 
         TALK_ID(20, UNIT_MIN), TALK_ID(45, UNIT_MIN), TALK_ID(90, UNIT_MIN)),
     STRINGCHOICE_SETTING(0, peak_meter_hold, LANG_PM_PEAK_HOLD, 3,
@@ -1254,11 +1254,11 @@ const struct settings_list settings[] = {
                      THEME_DIR "/", ".colours", MAX_FILENAME+1),
 #endif
 #ifdef HAVE_BUTTON_LIGHT
-    INT_SETTING_W_CFGVALS(F_FLIPLIST, button_light_timeout,
+    INT_SETTING_W_CFGVALS(F_FLIPLIST, buttonlight_timeout,
                           LANG_BUTTONLIGHT_TIMEOUT, 6,
         "button light timeout", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
-        button_backlight_set_timeout),
+        buttonlight_set_timeout),
 #endif
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
     INT_SETTING(0, buttonlight_brightness, LANG_BUTTONLIGHT_BRIGHTNESS, DEFAULT_BRIGHTNESS_SETTING,

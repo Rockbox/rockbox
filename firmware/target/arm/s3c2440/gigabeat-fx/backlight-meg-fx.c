@@ -328,17 +328,17 @@ static void led_control_service(void)
 }
 #endif /* BOOTLOADER */
 
-void __button_backlight_on(void)
+void __buttonlight_on(void)
 {
     buttonlight_control = BUTTONLIGHT_CONTROL_ON;
 }
 
-void __button_backlight_off(void)
+void __buttonlight_off(void)
 {
     buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
 }
 
-void __button_backlight_dim(bool dim_now)
+void __buttonlight_dim(bool dim_now)
 {
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
     buttonlight_target = (dim_now == true) ? 0 : buttonlight_brightness;

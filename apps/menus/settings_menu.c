@@ -337,7 +337,7 @@ MENUITEM_SETTING(car_adapter_mode, &global_settings.car_adapter_mode, NULL);
 MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
 
 #ifdef HAVE_BUTTON_LIGHT
-MENUITEM_SETTING(button_light_timeout, &global_settings.button_light_timeout, NULL);
+MENUITEM_SETTING(buttonlight_timeout, &global_settings.buttonlight_timeout, NULL);
 #endif
 
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
@@ -371,7 +371,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &car_adapter_mode,
 #endif
 #ifdef HAVE_BUTTON_LIGHT
-            &button_light_timeout,
+            &buttonlight_timeout,
 #endif
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
             &buttonlight_brightness

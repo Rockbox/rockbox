@@ -82,7 +82,7 @@ int button_read_device(void)
         /* if the buttons dont agree twice in a row, then its none */
         lastbutton = btn;
         btn = BUTTON_NONE;
-        button_backlight_on();
+        buttonlight_on();
     }
 
     /* Check for hold first - exit if asserted with no button pressed */
@@ -107,7 +107,7 @@ int button_read_device(void)
 
         if (buttons & (1 << 4))
             btn |= BUTTON_A;
-        button_backlight_on();
+        buttonlight_on();
     }
     
     /* the touchpad */
@@ -128,7 +128,7 @@ int button_read_device(void)
 
         if (touchpad & (1 << 3))
             btn |= BUTTON_SELECT;
-        button_backlight_on();
+        buttonlight_on();
     }
     
     return btn;

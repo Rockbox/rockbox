@@ -80,9 +80,9 @@ void buttonlight_set_brightness(int val);
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_BUTTON_LIGHT
-void button_backlight_on(void);
-void button_backlight_off(void);
-void button_backlight_set_timeout(int index);
+void buttonlight_on(void);
+void buttonlight_off(void);
+void buttonlight_set_timeout(int index);
 #endif
 
 #endif /* BACKLIGHT_H */

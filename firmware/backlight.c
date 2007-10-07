@@ -108,66 +108,66 @@ static int backlight_on_button_hold = 0;
 #endif
 
 #ifdef HAVE_BUTTON_LIGHT
-static int button_backlight_timer;
-static int button_backlight_timeout = 5*HZ;
+static int buttonlight_timer;
+static int buttonlight_timeout = 5*HZ;
 
 /* internal interface */
-static void _button_backlight_on(void)
+static void _buttonlight_on(void)
 {
 #ifndef SIMULATOR
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-    __button_backlight_dim(false);
+    __buttonlight_dim(false);
 #else
-    __button_backlight_on();
+    __buttonlight_on();
 #endif
 #endif
 }
 
-void _button_backlight_off(void)
+void _buttonlight_off(void)
 {
 #ifndef SIMULATOR
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-    if(button_backlight_timeout>0)
-        __button_backlight_dim(true);
+    if(buttonlight_timeout>0)
+        __buttonlight_dim(true);
     else
 #endif
-        __button_backlight_off();
+        __buttonlight_off();
 #endif
 }
 
 /* Update state of buttonlight according to timeout setting */
 static void buttonlight_update_state(void)
 {
-    button_backlight_timer = button_backlight_timeout;
+    buttonlight_timer = buttonlight_timeout;
 
     /* Buttonlight == OFF in the setting? */
-    if (button_backlight_timer < 0)
+    if (buttonlight_timer < 0)
     {
-        button_backlight_timer = 0; /* Disable the timeout */
-        _button_backlight_off();
+        buttonlight_timer = 0; /* Disable the timeout */
+        _buttonlight_off();
     }
     else
-        _button_backlight_on();
+        _buttonlight_on();
 }
 
 /* external interface */
-void button_backlight_on(void)
+void buttonlight_on(void)
 {
     queue_remove_from_head(&backlight_queue, BUTTON_LIGHT_ON);
     queue_post(&backlight_queue, BUTTON_LIGHT_ON, 0);
 }
 
-void button_backlight_off(void)
+void buttonlight_off(void)
 {
     queue_post(&backlight_queue, BUTTON_LIGHT_OFF, 0);
 }
 
-void button_backlight_set_timeout(int index)
+void buttonlight_set_timeout(int index)
 {
     if((unsigned)index >= sizeof(backlight_timeout_value))
         /* if given a weird value, use default */
         index = 6;
-    button_backlight_timeout = HZ * backlight_timeout_value[index];
+    buttonlight_timeout = HZ * backlight_timeout_value[index];
     buttonlight_update_state();
 }
 
@@ -543,8 +543,8 @@ void backlight_thread(void)
                 break;
 
             case BUTTON_LIGHT_OFF:
-                button_backlight_timer = 0;
-                _button_backlight_off();
+                buttonlight_timer = 0;
+                _buttonlight_off();
                 break;
 #endif
 
@@ -597,12 +597,12 @@ static void backlight_tick(void)
     }
 #endif /* HAVE_REMOVE_LCD */
 #ifdef HAVE_BUTTON_LIGHT
-    if (button_backlight_timer)
+    if (buttonlight_timer)
     {
-        button_backlight_timer--;
-        if (button_backlight_timer == 0)
+        buttonlight_timer--;
+        if (buttonlight_timer == 0)
         {
-            button_backlight_off();
+            buttonlight_off();
         }
     }
 #endif /* HAVE_BUTTON_LIGHT */
@@ -825,7 +825,7 @@ void backlight_init(void)
 
 void backlight_on(void) {}
 void backlight_off(void) {}
-void button_backlight_on(void) {}
+void buttonlight_on(void) {}
 void backlight_set_timeout(int index) {(void)index;}
 bool is_backlight_on(void) {return true;}
 #ifdef HAVE_REMOTE_LCD

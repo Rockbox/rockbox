@@ -259,7 +259,7 @@ static void button_tick(void)
                 {
                     backlight_on();
 #ifdef HAVE_BUTTON_LIGHT
-                    button_backlight_on();
+                    buttonlight_on();
 #endif
                 }
 

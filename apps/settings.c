@@ -713,7 +713,7 @@ void settings_apply(void)
     buttonlight_set_brightness(global_settings.buttonlight_brightness);
 #endif
 #ifdef HAVE_BUTTON_LIGHT
-    button_backlight_set_timeout(global_settings.button_light_timeout);
+    buttonlight_set_timeout(global_settings.buttonlight_timeout);
 #endif
 #ifndef HAVE_FLASH_STORAGE
     ata_spindown(global_settings.disk_spindown);

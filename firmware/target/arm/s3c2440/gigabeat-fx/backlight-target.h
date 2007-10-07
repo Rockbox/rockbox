@@ -48,11 +48,11 @@ void __backlight_set_brightness(int brightness);
 
 void __buttonlight_set_brightness(int brightness);
 
-void __button_backlight_on(void);
-void __button_backlight_off(void);
+void __buttonlight_on(void);
+void __buttonlight_off(void);
 
 /* true: backlight fades off - false: backlight fades on */
 void __backlight_dim(bool dim);
-void __button_backlight_dim(bool dim_now);
+void __buttonlight_dim(bool dim_now);
 
 #endif
