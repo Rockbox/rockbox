@@ -44,36 +44,58 @@ void Uninstaller::uninstall(ProgressloggerInterface* dp)
     m_dp->setProgressMax(0);
     m_dp->addItem(tr("Starting Uninstallation"),LOGINFO);
 
-    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
+    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, this);
 
     for(int i=0; i< uninstallSections.size() ; i++)
     {
         m_dp->addItem(tr("Uninstalling ") + uninstallSections.at(i) + " ...",LOGINFO);
+        // create list of all other install sections
+        QStringList sections = installlog.childGroups();
+        sections.removeAt(sections.indexOf(uninstallSections.at(i)));
         installlog.beginGroup(uninstallSections.at(i));
         QStringList toDeleteList = installlog.allKeys();
         QStringList dirList;
+        installlog.endGroup();
 
-        // iterate over all entrys
+        // iterate over all entries
         for(int j =0; j < toDeleteList.size(); j++ )
         {
+            // check if current file is in use by another section
+            bool deleteFile = true;
+            for(int s = 0; s < sections.size(); s++)
+            {
+                installlog.beginGroup(sections.at(s));
+                if(installlog.contains(toDeleteList.at(j)))
+                {
+                    deleteFile = false;
+                    qDebug() << "file still in use:" << toDeleteList.at(j);
+                }
+                installlog.endGroup();
+            }
+
+            installlog.beginGroup(uninstallSections.at(i));
             QFileInfo toDelete(m_mountpoint + "/" + toDeleteList.at(j));
             if(toDelete.isFile())  // if it is a file remove it
             {
-                if(!QFile::remove(toDelete.filePath()))
+                if(deleteFile && !QFile::remove(toDelete.filePath()))
                     m_dp->addItem(tr("Could not delete: ")+ toDelete.filePath(),LOGWARNING);
                 installlog.remove(toDeleteList.at(j));
             }
             else  // if it is a dir, remember it for later deletion
             {
+                // no need to keep track on folders still in use -- only empty
+                // folders will be rm'ed.
                 dirList << toDeleteList.at(j);
             }
+            installlog.endGroup();
         }
         // delete the dirs
+        installlog.beginGroup(uninstallSections.at(i));
         for(int j=0; j < dirList.size(); j++ )
         {
             installlog.remove(dirList.at(j));
             QDir dir(m_mountpoint);
-            dir.rmdir(dirList.at(j));
+            dir.rmdir(dirList.at(j)); // rm works only on empty folders
         }
 
         installlog.endGroup();
