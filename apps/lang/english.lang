@@ -11338,7 +11338,7 @@
     *: "Central European (CP1250)"
   </dest>
   <voice>
-    *: "Central Eurpean"
+    *: "Central European"
   </voice>
 </phrase>
 <phrase>
@@ -11372,7 +11372,6 @@
     lcd_color: "Colours"
   </voice>
 </phrase>
-
 <phrase>
   id: LANG_SELECTOR_COLOR_MENU
   desc: line selector color menu title

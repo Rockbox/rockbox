@@ -15,8 +15,9 @@
 #    les entrées vocales par Simon Descarpentries (Siltaar) <siltaar chez fdn.fr> Mar 07)
 #    
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
-#    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007
-#    
+#    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007,
+#    Oct 2007
+#
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -4642,7 +4643,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Réveil dans %d:%02d"
   </voice>
 </phrase>
 <phrase>
@@ -4659,7 +4660,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Réveil activé"
   </voice>
 </phrase>
 <phrase>
@@ -4676,7 +4677,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Le réveil est trop tôt!"
   </voice>
 </phrase>
 <phrase>
@@ -4712,7 +4713,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Réveil désactivé"
   </voice>
 </phrase>
 <phrase>
@@ -7397,7 +7398,7 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
     *: "Montrer infos tags"
@@ -11220,15 +11221,32 @@
   user:
   <source>
     *: none
-    lcd_color: "Line Selector Primary Colour"
+    lcd_color: "Primary Colour"
   </source>
   <dest>
     *: none
-    lcd_color: "Couleur principale de l'indicateur de sélection"
+    lcd_color: "Couleur principale"
   </dest>
   <voice>
     *: none
-    lcd_color: "Couleur principale de l'indicateur de sélection"
+    lcd_color: "Couleur principale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Couleur secondaire"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Couleur secondaire"
   </voice>
 </phrase>
 <phrase>
@@ -11237,32 +11255,15 @@
   user:
   <source>
     *: none
-    lcd_color: "Line Selector Text Colour"
+    lcd_color: "Text Colour"
   </source>
   <dest>
     *: none
-    lcd_color: "Couleur du texte sélectionné"
+    lcd_color: "Couleur du texte"
   </dest>
   <voice>
     *: none
-    lcd_color: "Couleur du texte sélectionné"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INVERT_CURSOR_GRADIENT
-  desc: in settings_menu
-  user:
-  <source>
-    *: none
-    lcd_color: "Bar (Gradient Colour)"
-  </source>
-  <dest>
-    *: none
-    lcd_color: "Ligne avec dégradé"
-  </dest>
-  <voice>
-    *: none
-    lcd_color: "Ligne avec dégradé"
+    lcd_color: "Couleur du texte"
   </voice>
 </phrase>
 <phrase>
@@ -11283,19 +11284,81 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SELECTOR_END_COLOR
-  desc: line selector color option
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
   user:
   <source>
     *: none
-    lcd_color: "Line Selector Secondary Colour"
+    lcd_color: "Bar (Gradient Colour)"
   </source>
   <dest>
     *: none
-    lcd_color: "Couleur secondaire de l'indicateur de sélection"
+    lcd_color: "Ligne avec dégradé"
   </dest>
   <voice>
     *: none
-    lcd_color: "Couleur secondaire de l'indicateur de sélection"
+    lcd_color: "Ligne avec dégradé"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Europe centrale (CP1250)"
+  </dest>
+  <voice>
+    *: "Europe centrale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user:
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Réglages Thème"
+  </dest>
+  <voice>
+    *: "Réglages Thème"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user:
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Couleurs"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Couleurs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Couleurs de l'indicateur de sélection"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Couleurs de l'indicateur de sélection"
   </voice>
 </phrase>
