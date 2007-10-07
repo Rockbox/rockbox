@@ -311,7 +311,9 @@
 #define IISCONFIG           (*(volatile unsigned long*)(0x70002800))
 #define IISFIFO_CFG         (*(volatile unsigned long*)(0x7000280c))
 #define IISFIFO_WR          (*(volatile unsigned long*)(0x70002840))
+#define IISFIFO_WRH         (*(volatile unsigned short*)(0x70002840))
 #define IISFIFO_RD          (*(volatile unsigned long*)(0x70002880))
+#define IISFIFO_RDH         (*(volatile unsigned short*)(0x70002880))
 
 /**
  * IISCONFIG bits:
@@ -350,16 +352,16 @@
 /* Other sizes not yet known */
 
 /* Data size/format on IIS FIFO */
-#define IIS_FIFO_FORMAT_MASK (0x7 << 4)
-#define IIS_FIFO_FORMAT_0    (0x0 << 4)
+#define IIS_FIFO_FORMAT_MASK        (0x7 << 4)
+#define IIS_FIFO_FORMAT_LE_HALFWORD (0x0 << 4)
 /* Big-endian formats - data sent to the FIFO must be big endian.
  * I forgot which is which size but did test them. */
-#define IIS_FIFO_FORMAT_1    (0x1 << 4)
-#define IIS_FIFO_FORMAT_2    (0x2 << 4)
+#define IIS_FIFO_FORMAT_1           (0x1 << 4)
+#define IIS_FIFO_FORMAT_2           (0x2 << 4)
  /* 32bit-MSB-little endian */
-#define IIS_FIFO_FORMAT_LE32 (0x3 << 4)
+#define IIS_FIFO_FORMAT_LE32        (0x3 << 4)
  /* 16bit-MSB-little endian */
-#define IIS_FIFO_FORMAT_LE16 (0x4 << 4)
+#define IIS_FIFO_FORMAT_LE16        (0x4 << 4)
 
 /* FIFO formats 0x5 and above seem equivalent to 0x4 ?? */
 
