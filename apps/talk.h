@@ -25,6 +25,7 @@
 #define __TALK_H__
 
 #include <stdbool.h>
+#include "time.h"
 
 enum {
     /* See array "unit_voiced" in talk.c function "talk_value" */
@@ -77,6 +78,15 @@ bool talk_menus_enabled(void); /* returns true if menus should be voiced */
 void talk_disable_menus(void); /* disable voice menus (temporarily, not persisted) */
 void talk_enable_menus(void); /* re-enable voice menus */
 int do_shutup(void); /* kill voice unconditionally */
+
+#if CONFIG_RTC
+/* this is in talk.c which isnt compiled for hwcodec simulator */
+#if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
+void talk_date_time(struct tm *time, bool speak_current_time_string);
+#else
+#define talk_date_time(t, s)
+#endif
+#endif /* CONFIG_RTC */
 
 /* This (otherwise invalid) ID signals the end of the array. */
 #define TALK_FINAL_ID LANG_LAST_INDEX_IN_ARRAY

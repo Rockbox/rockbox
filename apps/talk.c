@@ -864,3 +864,68 @@ void talk_enable_menus(void)
 {    
     talk_menu_disable--;
 }
+
+#if CONFIG_RTC
+void talk_date_time(struct tm *tm, bool speak_current_time_string)
+{
+    if(talk_menus_enabled ())
+    {
+        if(speak_current_time_string)
+            talk_id(VOICE_CURRENT_TIME, true);
+        if (global_settings.timeformat == 1)
+        {
+            long am_pm_id = VOICE_AM;
+            int hour = tm->tm_hour;
+
+            if (hour >= 12)
+            {
+                am_pm_id = VOICE_PM;
+                hour -= 12;
+            }
+            if (hour == 0)
+                hour = 12;
+                
+            talk_number(hour, true);
+
+            /* Voice the minutes */
+            if (tm->tm_min == 0)
+            {
+                /* Say o'clock if the minute is 0. */
+                talk_id(VOICE_OCLOCK, true);
+            }
+            else
+            {
+                /* Pronounce the leading 0 */
+                if(tm->tm_min < 10)
+                {
+                    talk_id(VOICE_OH, true);
+                }
+                talk_number(tm->tm_min, true);
+            }
+            talk_id(am_pm_id, true);
+        }
+        else
+        {
+            /* Voice the time in 24 hour format */
+            talk_number(tm->tm_hour, true);
+            if (tm->tm_min == 0)
+            {
+                talk_id(VOICE_HUNDRED, true);
+                talk_id(VOICE_HOUR, true);
+            }
+            else
+            {
+                /* Pronounce the leading 0 */
+                if(tm->tm_min < 10)
+                {
+                    talk_id(VOICE_OH, true);
+                }
+                talk_number(tm->tm_min, true);
+            }
+        }
+        talk_id(LANG_MONTH_JANUARY + tm->tm_mon, true);
+        talk_number(tm->tm_mday, true);
+        talk_number(1900 + tm->tm_year, true);
+    }
+}
+#endif
