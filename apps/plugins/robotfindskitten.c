@@ -152,18 +152,22 @@ static void play_game(void);
 static void process_input(int);
 
 /*Helper functions*/
+static void pause(void);
 static int validchar(char);
-
 static void play_animation(int);
 
 /*Global variables. Bite me, it's fun.*/
 screen_object robot;
 screen_object kitten;
 
-int num_bogus;
-screen_object bogus[MESSAGES];
-int bogus_messages[MESSAGES];
-int used_messages[MESSAGES];
+#if X_MAX*Y_MAX < 200
+#define NUM_BOGUS 15
+#else
+#define NUM_BOGUS 20
+#endif
+screen_object bogus[NUM_BOGUS];
+unsigned short bogus_messages[NUM_BOGUS];
+bool used_messages[MESSAGES];
 
 bool exit_rfk;
 
@@ -263,9 +267,6 @@ static void play_game()
  */
 static void process_input(int input)
 {
-#ifdef __PLUGINLIB_ACTIONS_H__
-  const struct button_mapping *plugin_contexts[] = {generic_directions, generic_actions};
-#endif
   int check_x = robot.x;
   int check_y = robot.y;
 
@@ -313,12 +314,7 @@ static void process_input(int input)
         case KITTEN: /*Found it!*/
           play_animation(input);
           /* Wait for the user to click something */
-          rb->button_clear_queue();
-#ifdef __PLUGINLIB_ACTIONS_H__
-          input = pluginlib_getaction(rb, TIMEOUT_BLOCK, plugin_contexts, 2);
-#else
-          input = rb->button_get(true);
-#endif
+          pause();
           break;
         default: /*We hit a bogus object; print its message.*/
           message(messages[bogus_messages[screen[check_x][check_y]-2]]);
@@ -345,6 +341,16 @@ static void finish(int sig)
  * Begin helper routines
  *
  *****************************************************************************/
+
+static void pause()
+{
+  int button;
+  rb->lcd_update();
+  do
+    button = rb->button_get(true);
+  while( ( button == BUTTON_NONE )
+      || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+}
 
 static int validchar(char a)
 {
@@ -459,11 +465,14 @@ static void initialize_arrays()
   
   /*Initialize the other arrays.*/
   for (counter = 0; counter < MESSAGES; counter++)
-    {
-      used_messages[counter] = 0;
-      bogus_messages[counter] = 0;
-      bogus[counter] = empty;
-    }
+  {
+    used_messages[counter] = false;
+  }
+  for (counter = 0; counter < NUM_BOGUS; counter++)
+  {
+    bogus_messages[counter] = 0;
+    bogus[counter] = empty;
+  }
 }
 
 /*initialize_robot initializes robot.*/
@@ -503,7 +512,7 @@ static void initialize_kitten()
 static void initialize_bogus()
 {
   int counter, index;
-  for (counter = 0; counter < num_bogus; counter++)
+  for (counter = 0; counter < NUM_BOGUS; counter++)
     {
       /*Give it a color.*/
       bogus[counter].color = colors[randcolor()];
@@ -526,9 +535,9 @@ static void initialize_bogus()
       /*Find a message for this object.*/
       do {
         index = rb->rand() % MESSAGES;
-      } while (used_messages[index] != 0);
+      } while (used_messages[index] != false);
       bogus_messages[counter] = index;
-      used_messages[index] = 1;
+      used_messages[index] = true;
     }
 
 }
@@ -566,7 +575,7 @@ static void initialize_screen()
   /*
    *Draw all the objects on the playing field.
    */
-  for (counter = 0; counter < num_bogus; counter++)
+  for (counter = 0; counter < NUM_BOGUS; counter++)
     {
       draw(bogus[counter]);
     }
@@ -584,12 +593,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     (void)parameter;
     rb = api;
 
-    /* Get a number of non-kitten objects */
-#if X_MAX*Y_MAX < 200
-    num_bogus = 15;
-#else
-    num_bogus = 20;
-#endif
     exit_rfk = false;
 
     rb->srand(*rb->current_tick);
