@@ -30,19 +30,6 @@
 #include "system.h"
 #include "hwcompat.h"
 
-
-/*** hardware configuration ***/
-
-#if CONFIG_CPU == PP5002
-#define IPOD_LCD_BASE       0xc0001000
-#else /* PP502x */
-#define IPOD_LCD_BASE       0x70003000
-#endif
-
-#define LCD_BUSY_MASK       0x00008000
-#define LCD_CMD  0x08
-#define LCD_DATA 0x10
-
 /* LCD command codes for HD66753 */
 
 #define R_START_OSC             0x00
@@ -97,7 +84,7 @@ static const unsigned char dibits[16] ICONST_ATTR = {
 /* wait for LCD with timeout */
 static inline void lcd_wait_write(void)
 {
-    while (inl(IPOD_LCD_BASE) & LCD_BUSY_MASK);
+    while (LCD1_BASE & LCD1_BUSY_MASK);
 }
 
 /* send LCD data */
@@ -109,11 +96,11 @@ static void lcd_send_data(unsigned data)
 {
     lcd_wait_write();
 #ifdef IPOD_MINI2G
-    outl(data | 0x760000, IPOD_LCD_BASE+8);
+    LCD1_CMD = data | 0x760000;
 #else
-    outl(data >> 8, IPOD_LCD_BASE + LCD_DATA);
+    LCD1_DATA = data >> 8;
     lcd_wait_write();
-    outl(data & 0xff, IPOD_LCD_BASE + LCD_DATA);
+    LCD1_DATA = data & 0xff;
 #endif
 }
 
@@ -122,11 +109,11 @@ static void lcd_prepare_cmd(unsigned cmd)
 {
     lcd_wait_write();
 #ifdef IPOD_MINI2G
-    outl(cmd | 0x740000, IPOD_LCD_BASE+8);
+    LCD1_CMD = cmd | 0x740000;
 #else
-    outl(0x0, IPOD_LCD_BASE + LCD_CMD);
+    LCD1_CMD = 0;
     lcd_wait_write();
-    outl(cmd, IPOD_LCD_BASE + LCD_CMD);
+    LCD1_CMD = cmd;
 #endif
 }
 
@@ -168,7 +155,7 @@ void lcd_init_device(void)
         power_reg_h = 0x1100;
 #elif defined IPOD_MINI2G
     lcd_wait_write();
-    outl((inl(IPOD_LCD_BASE) & ~0x1f00000) | 0x1700000, IPOD_LCD_BASE);
+    LCD1_BASE = (LCD1_BASE & ~0x1f00000) | 0x1700000;
 #endif
 
     lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0xc);

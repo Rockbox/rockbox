@@ -22,12 +22,6 @@
 #include "kernel.h"
 #include "system.h"
 
-#define LCD_BASE  (*(volatile unsigned long *)(0x70003000))
-#define LCD_CMD   (*(volatile unsigned long *)(0x70003008))
-#define LCD_DATA  (*(volatile unsigned long *)(0x70003010))
-
-#define LCD_BUSY  0x8000
-
 /* LCD command set for Samsung S6B33B2 */
 
 #define R_OSCILLATION_MODE     0x02
@@ -68,24 +62,23 @@
 /* wait for LCD */
 static inline void lcd_wait_write(void)
 {
-    while (LCD_BASE & LCD_BUSY);
+    while (LCD1_BASE & LCD1_BUSY_MASK);
 }
 
 /* send LCD data */
 static void lcd_send_data(unsigned data)
 {
     lcd_wait_write();
-    LCD_DATA = data >> 8;
-
+    LCD1_DATA = data >> 8;
     lcd_wait_write();
-    LCD_DATA = data & 0xff;
+    LCD1_DATA = data & 0xff;
 }
 
 /* send LCD command */
 static void lcd_send_command(unsigned cmd)
 {
     lcd_wait_write();
-    LCD_CMD = cmd;
+    LCD1_CMD = cmd;
 }
 
 /* LCD init */
@@ -98,13 +91,13 @@ void lcd_init_device(void)
     DEV_INIT &= ~0x400;
     udelay(10000);
     
-    LCD_BASE &= ~0x4;
+    LCD1_BASE &= ~0x4;
     udelay(15);
 
-    LCD_BASE |= 0x4;
+    LCD1_BASE |= 0x4;
     udelay(10);
 
-    LCD_BASE = 0x4687;
+    LCD1_BASE = 0x4687;
     udelay(10000);
 
     lcd_send_command(R_STANDBY_OFF);

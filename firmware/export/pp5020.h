@@ -399,6 +399,13 @@
 
 /* Note: didn't bother to see of levels 0 and 16 actually work */
 
+/* First ("mono") LCD bridge */
+#define LCD1_BASE  (*(volatile unsigned long *)(0x70003000))
+#define LCD1_CMD   (*(volatile unsigned long *)(0x70003008))
+#define LCD1_DATA  (*(volatile unsigned long *)(0x70003010))
+
+#define LCD1_BUSY_MASK  0x8000
+
 /* Serial Controller */
 #define SERIAL0             (*(volatile unsigned long*)(0x70006000))
 #define SERIAL1             (*(volatile unsigned long*)(0x70006040))

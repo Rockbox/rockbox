@@ -22,16 +22,14 @@
 /* Much info gleaned and/or copied from the iPodLinux project. */
 #define DRAM_START       0x28000000
 
-#define PROCESSOR_ID     (*(volatile unsigned long *)(0xc4000000))
+/* LCD bridge */
+#define LCD1_BASE  (*(volatile unsigned long *)(0xc0001000))
+#define LCD1_CMD   (*(volatile unsigned long *)(0xc0001008))
+#define LCD1_DATA  (*(volatile unsigned long *)(0xc0001010))
 
-#define IPOD_LCD_BASE    0xc0001000
+#define LCD1_BUSY_MASK  0x8000
 
-/* Processor ID */
-#define PROCESSOR_ID     (*(volatile unsigned long *)(0xc4000000))
-
-#define PROC_ID_CPU      0x55
-#define PROC_ID_COP      0xaa
-
+/* I2S controller */
 #define IISCONFIG        (*(volatile unsigned long *)(0xc0002500))
 #define IISFIFO_CFG      (*(volatile unsigned long *)(0xc000251c))
 #define IISFIFO_WR       (*(volatile unsigned long *)(0xc0002540))
@@ -46,8 +44,6 @@
 #define IIS_IRQTX_REG    IISFIFO_CFG
 #define IIS_IRQTX        (1 << 9)
 
-#define I2C_BASE         0xc0008000
-
 #define IDE_BASE         0xc0003000
 
 #define IDE_CFG_STATUS   (*(volatile unsigned long *)(0xc0003024))
@@ -55,6 +51,12 @@
 #define USB_BASE         0xc0005000
 
 #define I2C_BASE         0xc0008000
+
+/* Processor ID */
+#define PROCESSOR_ID     (*(volatile unsigned long *)(0xc4000000))
+
+#define PROC_ID_CPU      0x55
+#define PROC_ID_COP      0xaa
 
 #define GPIOA_ENABLE     (*(volatile unsigned char *)(0xcf000000))
 #define GPIOB_ENABLE     (*(volatile unsigned char *)(0xcf000004))
