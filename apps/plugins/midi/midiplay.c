@@ -148,32 +148,31 @@ bool lastswap=1;
 
 static inline void synthbuf(void)
 {
-   int32_t *outptr;
-   register int i;
-   int currentSample=0;
-   int synthtemp[2];
+    int32_t *outptr;
+    int i;
 
 #ifndef SYNC
-   if(lastswap==swap) return;
-   lastswap=swap;
+    if(lastswap==swap) return;
+    lastswap=swap;
 
-   outptr=(swap ? gmbuf : gmbuf+BUF_SIZE);
+    outptr=(swap ? gmbuf : gmbuf+BUF_SIZE);
 #else
-   outptr=gmbuf;
+    outptr=gmbuf;
 #endif
 
-   for(i=0; i<BUF_SIZE; i++)
-   {
-      synthSample(&synthtemp[0], &synthtemp[1]);
-      currentSample++;
-      *outptr=((synthtemp[0]&0xFFFF) << 16) | (synthtemp[1]&0xFFFF);
-      outptr++;
-      if(currentSample==numberOfSamples)
-      {
-         if( tick() == 0 ) quit=1;
-         currentSample=0;
-      }
-   }
+    for(i=0; i<BUF_SIZE/numberOfSamples; i++)
+    {
+        synthSamples((int32_t*)outptr, numberOfSamples);
+        outptr += numberOfSamples;
+        if( tick() == 0 )
+            quit=1;
+    }
+
+    if(BUF_SIZE%numberOfSamples)
+    {
+        synthSamples((int32_t*)outptr, BUF_SIZE%numberOfSamples);
+        outptr += BUF_SIZE%numberOfSamples;
+    }
 }
 
 void get_more(unsigned char** start, size_t* size)

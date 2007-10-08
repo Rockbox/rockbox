@@ -255,8 +255,7 @@ inline void stopVoice(struct SynthObject * so)
     so->decay = 0;
 }
 
-int synthVoice(struct SynthObject * so) ICODE_ATTR;
-int synthVoice(struct SynthObject * so)
+static inline int synthVoice(struct SynthObject * so)
 {
     struct GWaveform * wf;
     register int s;
@@ -402,5 +401,48 @@ int synthVoice(struct SynthObject * so)
     /* Scaling by channel volume and note volume is done in sequencer.c */
     /* That saves us some multiplication and pointer operations         */
     return s*so->volscale>>14;
+}
+
+/* synth num_samples samples and write them to the */
+/* buffer pointed to by buf_ptr                    */
+void synthSamples(int32_t *buf_ptr, unsigned int num_samples) ICODE_ATTR;
+void synthSamples(int32_t *buf_ptr, unsigned int num_samples)
+{
+    int i;
+    register int dL;
+    register int dR;
+    register int sample;
+    register struct SynthObject *voicept;
+    while(num_samples>0)
+    {
+        dL=0;
+        dR=0;
+        voicept=&voices[0];
+
+        for(i=MAX_VOICES; i > 0; i--)
+        {
+            if(voicept->isUsed==1)
+            {
+                sample = synthVoice(voicept);
+                dL += sample;
+                sample *= chPan[voicept->ch];
+                dR += sample;
+            }
+            voicept++;
+        }
+
+        dL = (dL << 7) - dR;
+
+        /* combine the left and right 16 bit samples into 32 bits and write */
+        /* to the buffer, left sample in the high word and right in the low word */
+        *buf_ptr=(((dL&0x7FFF80) << 9) | ((dR&0x7FFF80) >> 7));
+
+        buf_ptr++;
+        num_samples--;
+    }
+    /* TODO: Automatic Gain Control, anyone? */
+    /* Or, should this be implemented on the DSP's output volume instead? */
+
+    return;  /* No more ghetto lowpass filter. Linear interpolation works well. */
 }
 

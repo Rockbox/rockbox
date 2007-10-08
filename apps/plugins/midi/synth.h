@@ -17,61 +17,8 @@
  *
  ****************************************************************************/
 int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig);
-int synthVoice(struct SynthObject * so);
 void setPoint(struct SynthObject * so, int pt);
-
-static inline void synthSample(int * mixL, int * mixR)
-{
-    int i;
-    register int dL=0;
-    register int dR=0;
-    register int sample = 0;
-    register struct SynthObject *voicept=voices;
-
-    for(i=MAX_VOICES/2; i > 0; i--)
-    {
-        if(voicept->isUsed==1)
-        {
-            sample = synthVoice(voicept);
-            dL += sample;
-            sample *= chPan[voicept->ch];
-            dR += sample;
-        }
-        voicept++;
-        if(voicept->isUsed==1)
-        {
-            sample = synthVoice(voicept);
-            dL += sample;
-            sample *= chPan[voicept->ch];
-            dR += sample;
-        }
-        voicept++;
-    }
-
-/* if MAX_VOICES is not even we do this to get the last voice */
-#if MAX_VOICES%2
-    if (MAX_VOICES%2)
-    {
-        if(voicept->isUsed==1)
-        {
-            sample = synthVoice(voicept);
-            dL += sample;
-            sample *= chPan[voicept->ch];
-            dR += sample;
-        }
-    }
-#endif
-
-    dL = (dL << 7) - dR;
-
-    *mixL=dL >> 7;
-    *mixR=dR >> 7;
-
-    /* TODO: Automatic Gain Control, anyone? */
-    /* Or, should this be implemented on the DSP's output volume instead? */
-
-    return;  /* No more ghetto lowpass filter. Linear interpolation works well. */
-}
+void synthSamples(int32_t *buf_ptr, unsigned int num_samples);
 
 static inline struct Event * getEvent(struct Track * tr, int evNum)
 {
