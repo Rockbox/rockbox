@@ -800,6 +800,7 @@ static void car_adapter_mode_processing(bool inserted)
                 else
                     audio_pause();
             }
+            waiting_to_resume_play = false;
         }
     }
 }
@@ -812,7 +813,7 @@ static void car_adapter_tick(void)
         {
             if (audio_status() & AUDIO_STATUS_PAUSE)
             {
-                audio_resume(); 
+                queue_broadcast(SYS_CAR_ADAPTER_RESUME, 0);
             }
             waiting_to_resume_play = false;
         }
@@ -892,6 +893,10 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
         case SYS_CHARGER_DISCONNECTED:
             car_adapter_mode_processing(false);
             return SYS_CHARGER_DISCONNECTED;
+
+        case SYS_CAR_ADAPTER_RESUME:
+            audio_resume();
+            return SYS_CAR_ADAPTER_RESUME;
 #endif
 #ifdef HAVE_HEADPHONE_DETECTION
         case SYS_PHONE_PLUGGED:
