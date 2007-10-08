@@ -143,7 +143,7 @@ p, li { white-space: pre-wrap; }
         <item row="0" column="0" >
          <widget class="QToolButton" name="buttonComplete" >
           <property name="text" >
-           <string>...</string>
+           <string>Complete Installation</string>
           </property>
           <property name="icon" >
            <iconset resource="rbutilqt.qrc" >:/icons/icons/bootloader_btn.png</iconset>
@@ -173,7 +173,7 @@ p, li { white-space: pre-wrap; }
         <item row="1" column="0" >
          <widget class="QToolButton" name="buttonSmall" >
           <property name="text" >
-           <string>...</string>
+           <string>Small Installation</string>
           </property>
           <property name="icon" >
            <iconset resource="rbutilqt.qrc" >:/icons/icons/rbinstall_btn.png</iconset>
