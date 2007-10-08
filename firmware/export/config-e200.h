@@ -104,7 +104,10 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
+#ifndef BOOTLOADER
 #define HAVE_MULTIVOLUME
+#define HAVE_HOTSWAP
+#endif
 
 #define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
@@ -139,8 +142,6 @@
 
 /* Type of LCD TODO: hopefully the same as the x5 but check this*/
 #define CONFIG_LCD LCD_X5
-
-#define HAVE_HOTSWAP
 
 /* Offset ( in the firmware file's header ) to the file CRC and data. These are
    only used when loading the old format rockbox.e200 file */

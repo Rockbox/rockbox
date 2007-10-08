@@ -125,6 +125,11 @@
 #define SD_APP_OP_COND  41
 
 /** global, exported variables **/
+#ifdef HAVE_HOTSWAP
+#define NUM_VOLUMES 2
+#else
+#define NUM_VOLUMES 1
+#endif
 
 /* for compatibility */
 int ata_spinup_time = 0;
@@ -146,10 +151,12 @@ struct sd_card_status
     int retry_max;
 };
 
-static struct sd_card_status sd_status[2] =
+static struct sd_card_status sd_status[NUM_VOLUMES] =
 {
     { 0, 1  },
+#ifdef HAVE_HOTSWAP
     { 0, 10 }
+#endif
 };
 
 /* Shoot for around 75% usage */
@@ -575,7 +582,9 @@ static void sd_card_mux(int card_no)
 static void sd_init_device(int card_no)
 {
 /* SD Protocol registers */
+#ifdef HAVE_HOTSWAP
     unsigned int response = 0;
+#endif
     unsigned int  i;
     unsigned int  c_size;
     unsigned long c_mult;
@@ -613,7 +622,8 @@ static void sd_init_device(int card_no)
         goto card_init_error;
 
     check_time[EC_POWER_UP] = USEC_TIMER;
-    
+
+#ifdef HAVE_HOTSWAP
     /* Check for SDHC:
        - non-SDHC cards simply ignore SEND_IF_COND (CMD8) and we get error -219,
          which we can just ignore and assume we're dealing with standard SD.
@@ -623,6 +633,7 @@ static void sd_init_device(int card_no)
     ret = sd_command(SEND_IF_COND,0x1aa, &response,7);
     if ( (ret < 0) && (ret!=-219) )
             goto card_init_error;
+#endif
 
     while ((currcard->ocr & (1 << 31)) == 0) /* until card is powered up */
     {
@@ -630,15 +641,20 @@ static void sd_init_device(int card_no)
         if (ret < 0)
             goto card_init_error;
 
+#ifdef HAVE_HOTSWAP
         if(response == 0x1aa)
         {
             /* SDHC */
             ret = sd_command(SD_APP_OP_COND, (1<<30)|0x100000,
                              &currcard->ocr, 3);
-        } else {
+        }
+        else
+#endif /* HAVE_HOTSWAP */
+        {
             /* SD Standard */
             ret = sd_command(SD_APP_OP_COND, 0x100000, &currcard->ocr, 3);
         }
+
         if (ret < 0)
             goto card_init_error;
 
@@ -672,6 +688,7 @@ static void sd_init_device(int card_no)
         currcard->numblocks = c_size * c_mult * (currcard->max_read_bl_len/512);
         currcard->capacity = currcard->numblocks * currcard->block_size;
     }
+#ifdef HAVE_HOTSWAP
     else if( (currcard->csd[3]>>30) == 1)
     {
         /* CSD version 2.0 */
@@ -681,6 +698,7 @@ static void sd_init_device(int card_no)
         currcard->numblocks = c_size;
         currcard->capacity = currcard->numblocks * currcard->block_size;
     }
+#endif /* HAVE_HOTSWAP */
     
     REG_1 = 0;
 
@@ -771,9 +789,12 @@ void ata_led(bool onoff)
     led(onoff);
 }
 
-int ata_read_sectors(int drive, unsigned long start, int incount,
+int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
+#ifndef HAVE_HOTSWAP
+    const int drive = 0;
+#endif
     int ret;
     unsigned char *buf, *buf_end;
     int bank;
@@ -823,12 +844,14 @@ ata_read_retry:
 
     BLOCK_COUNT_REG = incount;
 
+#ifdef HAVE_HOTSWAP
     if(currcard->ocr & (1<<30) )
     {
         /* SDHC */
         ret = sd_command(READ_MULTIPLE_BLOCK, start, NULL, 0x1c25);
     }
     else
+#endif
     {
         ret = sd_command(READ_MULTIPLE_BLOCK, start * BLOCK_SIZE, NULL, 0x1c25);
     }
@@ -880,12 +903,15 @@ ata_read_error:
     }
 }
 
-int ata_write_sectors(int drive, unsigned long start, int count,
+int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
 /* Write support is not finished yet */
 /* TODO: The standard suggests using ACMD23 prior to writing multiple blocks
    to improve performance */
+#ifndef HAVE_HOTSWAP
+    const int drive = 0;
+#endif
     int ret;
     const unsigned char *buf, *buf_end;
     int bank;
@@ -933,12 +959,14 @@ ata_write_retry:
 
     BLOCK_COUNT_REG = count;
 
+#ifdef HAVE_HOTSWAP
     if(currcard->ocr & (1<<30) )
     {
         /* SDHC */
         ret = sd_command(WRITE_MULTIPLE_BLOCK, start, NULL, 0x1c2d);
     }
     else
+#endif
     {
         ret = sd_command(WRITE_MULTIPLE_BLOCK, start*BLOCK_SIZE, NULL, 0x1c2d);
     }
@@ -1015,6 +1043,7 @@ static void sd_thread(void)
 
         switch ( ev.id ) 
         {
+#ifdef HAVE_HOTSWAP
         case SD_HOTSWAP:
         {
             int action = SDA_NONE;
@@ -1046,6 +1075,7 @@ static void sd_thread(void)
                 queue_broadcast(SYS_FS_CHANGED, 0);
             break;
             } /* SD_HOTSWAP */
+#endif /* HAVE_HOTSWAP */
         case SYS_TIMEOUT:
             if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
             {
@@ -1138,12 +1168,13 @@ int ata_init(void)
         GPIOG_OUTPUT_EN  |= (0x3 << 5);
         GPIOG_OUTPUT_VAL |= (0x3 << 5);
 
+#ifdef HAVE_HOTSWAP
         /* enable card detection port - mask interrupt first */
         GPIOA_INT_EN     &= ~0x80;
 
         GPIOA_OUTPUT_EN  &= ~0x80;
         GPIOA_ENABLE     |=  0x80;
-
+#endif
         sd_select_device(0);
 
         if (currcard->initialized < 0)
@@ -1155,7 +1186,7 @@ int ata_init(void)
 
         /* enable interupt for the mSD card */
         sleep(HZ/10);
-
+#ifdef HAVE_HOTSWAP
         CPU_INT_EN = HI_MASK;
         CPU_HI_INT_EN = GPIO0_MASK;
 
@@ -1163,7 +1194,7 @@ int ata_init(void)
 
         GPIOA_INT_CLR = 0x80;
         GPIOA_INT_EN |= 0x80;
-
+#endif
         spinlock_unlock(&sd_mtx);
     }
 
@@ -1204,6 +1235,7 @@ tCardInfo *card_get_info_target(int card_no)
     return &card;
 }
 
+#ifdef HAVE_HOTSWAP
 bool card_detect_target(void)
 {
     /* 0x00:inserted, 0x80:not inserted */
@@ -1231,3 +1263,4 @@ void microsd_int(void)
     timeout_register(&sd1_oneshot, sd1_oneshot_callback,
                      detect ? 1 : HZ/2, detect == 0);
 }
+#endif /* HAVE_HOTSWAP */
