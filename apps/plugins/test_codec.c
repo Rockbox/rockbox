@@ -30,6 +30,8 @@ PLUGIN_HEADER
 
 static struct plugin_api* rb;
 
+CACHE_FUNCTION_WRAPPERS(rb)
+
 /* Log functions copied from test_disk.c */
 static int line = 0;
 static int max_line = 0;
@@ -483,6 +485,11 @@ static void init_ci(void)
     ci.profstop = rb->profstop;
     ci.profile_func_enter = rb->profile_func_enter;
     ci.profile_func_exit = rb->profile_func_exit;
+#endif
+
+#ifdef CACHE_FUNCTIONS_AS_CALL
+    ci.invalidate_icache = invalidate_icache;
+    ci.flush_icache = flush_icache;
 #endif
 }
 
