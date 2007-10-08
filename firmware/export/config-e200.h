@@ -104,11 +104,6 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-#ifndef BOOTLOADER
-#define HAVE_MULTIVOLUME
-#define HAVE_HOTSWAP
-#endif
-
 #define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 750        /* max. capacity selectable */
@@ -148,6 +143,11 @@
 #define FIRMWARE_OFFSET_FILE_CRC    0x0
 #define FIRMWARE_OFFSET_FILE_DATA   0x8
 
+#ifndef BOOTLOADER
+#define HAVE_MULTIVOLUME
+#define HAVE_HOTSWAP
+#endif
+
 /* #define USB_IPODSTYLE */
 
 /* USB On-the-go */
@@ -157,6 +157,7 @@
 #define HAVE_USBSTACK
 #define USBSTACK_CAPS CONTROLLER_DEVICE
 */
+
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
