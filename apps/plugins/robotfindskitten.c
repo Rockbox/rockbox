@@ -411,8 +411,9 @@ static void play_animation(int input)
 
 static void instructions()
 {
-  int y, space_w, width, height;
-  unsigned short x = 0, i = 0;
+#define MARGIN 2
+  int y = MARGIN, space_w, width, height;
+  unsigned short x = MARGIN, i = 0;
 #define WORDS (sizeof instructions / sizeof (char*))
   static char* instructions[] = {
 #if 0
@@ -427,23 +428,22 @@ static void instructions()
   };
   rb->lcd_clear_display();
   rb->lcd_getstringsize(" ", &space_w, &height);
-  y = 0;
   for (i = 0; i < WORDS; i++) {
     rb->lcd_getstringsize(instructions[i], &width, NULL);
     /* Skip to next line if the current one can't fit the word */
-    if (x + width > LCD_WIDTH) {
-      x = 0;
+    if (x + width > LCD_WIDTH - MARGIN) {
+      x = MARGIN;
       y += height;
     }
     /* .. or if the word is the empty string */
     if (rb->strcmp(instructions[i], "") == 0) {
-      x = 0;
+      x = MARGIN;
       y += height;
       continue;
     }
     /* We filled the screen */
-    if (y + height > LCD_HEIGHT) {
-      y = 0;
+    if (y + height > LCD_HEIGHT - MARGIN) {
+      y = MARGIN;
       pause();
       rb->lcd_clear_display();
     }
