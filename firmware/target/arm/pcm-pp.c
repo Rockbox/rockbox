@@ -30,7 +30,7 @@
    and codec setup using "arithmetic" the hardware supports like halfword
    swapping. Try to use 32-bit packed in IIS modes if possible. */
 #if defined(SANSA_C200) || defined(SANSA_E200) \
-    || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+    || defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(IPOD_NANO)
 /* 16-bit, L-R packed into 32 bits with left in the least significant halfword */
 #define SAMPLE_SIZE   16
 #define TRANSFER_SIZE 32
