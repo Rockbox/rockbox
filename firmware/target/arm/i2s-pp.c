@@ -69,9 +69,11 @@ void i2s_reset(void)
     /* Set I2S to 44.1kHz */
     IISCLK = (IISCLK & ~0x1ff) | 33;
     IISDIV = 7;
-    IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE16);
-#elif defined (IRIVER_H10) || defined (IRIVER_H10_5GB) || defined(IPOD_NANO) \
-      || defined(IPOD_VIDEO) || defined(IPOD_MINI2G)
+#endif /* HAVE_AS3514 */
+
+#if defined (IRIVER_H10) || defined (IRIVER_H10_5GB) || defined(IPOD_NANO) \
+      || defined(IPOD_VIDEO) || defined(IPOD_MINI2G) \
+      || defined (SANSA_C200) || defined (SANSA_E200)
     /* Nano works fine with IIS_FIFO_FORMAT_LE16 as well */
     IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE16_2);
 #else
