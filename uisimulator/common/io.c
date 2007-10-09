@@ -45,6 +45,7 @@
 #endif
 
 #define MAX_PATH 260
+#define MAX_OPEN_FILES 11
 
 #include <fcntl.h>
 #include <SDL.h>
@@ -125,6 +126,7 @@ extern int _wrmdir(const wchar_t*);
 #define CLOSEDIR(a) (closedir)(a)
 #define STAT(a,b)   (stat)(a,b)
 #define OPEN(a,b,c) (open)(a,b,c)
+#define CLOSE(x)    (close)(x)
 #define REMOVE(a)   (remove)(a)
 #define RENAME(a,b) (rename)(a,b)
 
@@ -137,6 +139,8 @@ void dircache_rename(const char *oldpath, const char *newpath);
 #endif
 
 #define SIMULATOR_ARCHOS_ROOT "archos"
+
+static int num_openfiles = 0;
 
 struct sim_dirent {
     unsigned char d_name[MAX_PATH];
@@ -387,23 +391,44 @@ int sim_open(const char *name, int o)
 {
     char buffer[MAX_PATH]; /* sufficiently big */
     int opts = rockbox2sim(o);
+    int ret;
+
+    if (num_openfiles >= MAX_OPEN_FILES)
+        return -2;
 
 #ifndef __PCTOOL__
-    if(name[0] == '/') 
+    if(name[0] == '/')
     {
         snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
         debugf("We open the real file '%s'\n", buffer);
-        return OPEN(buffer, opts, 0666);
+        if (num_openfiles < MAX_OPEN_FILES)
+        {
+            ret = OPEN(buffer, opts, 0666);
+            if (ret >= 0) num_openfiles++;
+            return ret;
+        }
     }
-    
+
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
             name);
     return -1;
 #else
-    return OPEN(name, opts, 0666);
+    if (num_openfiles < MAX_OPEN_FILES)
+    {
+        ret = OPEN(buffer, opts, 0666);
+        if (ret >= 0) num_openfiles++;
+        return ret;
+    }
 #endif
-    
+}
+
+int sim_close(int fd)
+{
+    int ret;
+    ret = CLOSE(fd);
+    if (ret == 0) num_openfiles--;
+    return ret;
 }
 
 int sim_creat(const char *name)

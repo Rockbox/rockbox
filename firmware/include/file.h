@@ -57,6 +57,7 @@
 #define lseek(x,y,z) sim_lseek(x,y,z)
 #define read(x,y,z) sim_read(x,y,z)
 #define write(x,y,z) sim_write(x,y,z)
+#define close(x) sim_close(x)
 #endif
 
 typedef int (*open_func)(const char* pathname, int flags);
