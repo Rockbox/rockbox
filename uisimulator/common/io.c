@@ -109,6 +109,7 @@ extern int _wrmdir(const wchar_t*);
 #define CLOSEDIR(a) (_wclosedir)(a)
 #define STAT(a,b)   (_wstat)(UTF8_TO_OS(a),b)
 #define OPEN(a,b,c) (_wopen)(UTF8_TO_OS(a),b,c)
+#define CLOSE(a)    (close)(a)
 #define REMOVE(a)   (_wremove)(UTF8_TO_OS(a))
 #define RENAME(a,b) (_wrename)(UTF8_TO_OS(a),utf8_to_ucs2(b,convbuf2))
 
