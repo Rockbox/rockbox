@@ -38,9 +38,41 @@ struct configdata
 };
 
 void configfile_init(struct plugin_api* newrb);
+
+/* configfile_save - Given configdata entries this function will
+   create a config file with these entries, destroying any
+   previous config file of the same name */
 int configfile_save(const char *filename, struct configdata *cfg,
                     int num_items, int version);
+
 int configfile_load(const char *filename, struct configdata *cfg,
                     int num_items, int min_version);
+
+/* configfile_get_value - Given a key name, this function will
+   return the integer value for that key.
+
+   Input:
+     filename = config file filename
+     name = (name/value) pair name entry
+   Return:
+     value if (name/value) pair is found
+     -1    if entry is not found
+*/
+int configfile_get_value(const char* filename, const char* name);
+
+/* configure_update_entry - Given a key name and integer value
+   this function will update the entry if found, or add it if
+   not found.
+
+   Input:
+     filename = config file filename
+     name = (name/value) pair name entry
+     val = new value for (name/value) pair
+   Return:
+     1  if the (name/value) pair was found and updated with the new value
+     0  if the (name/value) pair was added as a new entry
+     -1 if error
+*/
+int configfile_update_entry(const char* filename, const char* name, int val);
 
 #endif

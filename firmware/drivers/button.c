@@ -293,6 +293,11 @@ static void button_boost(bool state)
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
+int button_available( void )
+{
+    return queue_count(&button_queue);
+}
+
 long button_get(bool block)
 {
     struct event ev;

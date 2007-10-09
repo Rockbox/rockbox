@@ -43,8 +43,7 @@ static int output_height;
 void vo_draw_frame (uint8_t * const * buf)
 {
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_yuv_blit(buf,
-                    0,0,image_width,
+    rb->lcd_yuv_blit(buf, 0,0,image_width,
                     output_x,output_y,output_width,output_height);
 #else
     gray_ub_gray_bitmap_part(buf[0],0,0,image_width,
@@ -60,10 +59,105 @@ void vo_draw_frame (uint8_t * const * buf)
 #define SCREEN_HEIGHT LCD_WIDTH
 #endif
 
+uint8_t* tmpbufa = 0;
+uint8_t* tmpbufb = 0;
+uint8_t* tmpbufc = 0;
+uint8_t* tmpbuf[3];
+
+void vo_draw_frame_thumb (uint8_t * const * buf)
+{
+  int r,c;
+
+#if LCD_WIDTH >= LCD_HEIGHT
+  for (r=0;r<image_width/2;r++)
+    for (c=0;c<image_height/2;c++)
+      *(tmpbuf[0]+c*image_width/2+r) = 
+        *(buf[0]+2*c*image_width+2*r);
+  
+  for (r=0;r<image_width/4;r++)
+    for (c=0;c<image_height/4;c++)
+    {
+      *(tmpbuf[1]+c*image_width/4+r) = 
+        *(buf[1]+2*c*image_width/2+2*r);
+      *(tmpbuf[2]+c*image_width/4+r) = 
+        *(buf[2]+2*c*image_width/2+2*r);
+    }
+#else
+  for (r=0;r<image_width/2;r++)
+    for (c=0;c<image_height/2;c++)
+      *(tmpbuf[0]+(image_width/2-1-r)*image_height/2+c) = 
+        *(buf[0]+2*c*image_width+2*r);
+  
+  for (r=0;r<image_width/4;r++)
+    for (c=0;c<image_height/4;c++)
+    {
+      *(tmpbuf[1]+(image_width/4-1-r)*image_height/4+c) = 
+        *(buf[1]+2*c*image_width/2+2*r);
+      *(tmpbuf[2]+(image_width/4-1-r)*image_height/4+c) = 
+        *(buf[2]+2*c*image_width/2+2*r);
+    }
+#endif
+
+rb->lcd_clear_display();
+rb->lcd_update();
+
+#ifdef HAVE_LCD_COLOR
+#ifdef SIMULATOR
+#if LCD_WIDTH >= LCD_HEIGHT
+  rb->lcd_yuv_blit(tmpbuf,0,0,image_width/2,
+                  (LCD_WIDTH-1-image_width/2)/2,
+                  LCD_HEIGHT-50-(image_height/2),
+                  output_width/2,output_height/2);
+
+#else
+  rb->lcd_yuv_blit(tmpbuf,0,0,image_height/2,
+                  LCD_HEIGHT-50-(image_height/2),
+                  (LCD_WIDTH-1-image_width/2)/2,
+                  output_height/2,output_width/2);
+#endif
+#else
+#if LCD_WIDTH >= LCD_HEIGHT
+  rb->lcd_yuv_blit(tmpbuf,0,0,image_width/2,
+                   (LCD_WIDTH-1-image_width/2)/2,
+                   LCD_HEIGHT-50-(image_height/2),
+                   output_width/2,output_height/2);
+#else
+  rb->lcd_yuv_blit(tmpbuf,0,0,image_height/2,
+                   LCD_HEIGHT-50-(image_height/2),
+                   (LCD_WIDTH-1-image_width/2)/2,
+                   output_height/2,output_width/2);
+#endif
+#endif
+#else
+#if LCD_WIDTH >= LCD_HEIGHT
+  gray_ub_gray_bitmap_part(tmpbuf[0],0,0,image_width/2,
+                           (LCD_WIDTH-1-image_width/2)/2,
+                           LCD_HEIGHT-50-(image_height/2),
+                           output_width/2,output_height/2);
+#else
+  gray_ub_gray_bitmap_part(tmpbuf[0],0,0,image_height/2,
+                           LCD_HEIGHT-50-(image_height/2),
+                           (LCD_WIDTH-1-image_width/2)/2,
+                           output_height/2,output_width/2);
+#endif
+#endif
+}
+
 void vo_setup(const mpeg2_sequence_t * sequence)
 {
     image_width=sequence->width;
     image_height=sequence->height;
+
+    tmpbufa = (uint8_t*)mpeg2_malloc(sizeof(uint8_t)*image_width/2*
+                                     image_height/2, -2);
+    tmpbufb = (uint8_t*)mpeg2_malloc(sizeof(uint8_t)*image_width/4*
+                                     image_height/4, -2);
+    tmpbufc = (uint8_t*)mpeg2_malloc(sizeof(uint8_t)*image_width/4*
+                                     image_height/4, -2);
+    tmpbuf[0] = tmpbufa;
+    tmpbuf[1] = tmpbufb;
+    tmpbuf[2] = tmpbufc;
+
     image_chroma_x=image_width/sequence->chroma_width;
     image_chroma_y=image_height/sequence->chroma_height;
 
@@ -82,4 +176,14 @@ void vo_setup(const mpeg2_sequence_t * sequence)
         output_height = sequence->display_height;
         output_y = (SCREEN_HEIGHT-sequence->display_height)/2;
     }
+}
+
+void vo_cleanup(void)
+{
+  if (tmpbufc)
+    mpeg2_free(tmpbufc);
+  if (tmpbufb)
+    mpeg2_free(tmpbufb);
+  if (tmpbufa)
+    mpeg2_free(tmpbufa);
 }

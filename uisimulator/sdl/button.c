@@ -736,6 +736,11 @@ void button_event(int key, bool pressed)
 
 /* Again copied from real button.c... */
 
+int button_available( void )
+{
+    return queue_count(&button_queue);
+}
+
 long button_get(bool block)
 {
     struct event ev;

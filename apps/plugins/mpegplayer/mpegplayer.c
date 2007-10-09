@@ -110,6 +110,7 @@ FPS     | 27Mhz   | 100Hz          | 44.1KHz   | 48KHz
 #include "mpeg_settings.h"
 #include "video_out.h"
 #include "../../codecs/libmad/mad.h"
+#include "splash.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
@@ -198,11 +199,8 @@ typedef struct
     uint8_t* curr_packet_end;    /* Current stream packet end */
 
     uint8_t* prev_packet;        /* Previous stream packet beginning */
-    uint8_t* next_packet;        /* Next stream packet beginning */
-
-    size_t guard_bytes;          /* Number of bytes in guardbuf used */
-    uint64_t buffer_tail;        /* Accumulation of bytes added */
-    uint64_t buffer_head;        /* Accumulation of bytes removed */
+    size_t prev_packet_length;   /* Lenth of previous packet */
+    size_t buffer_remaining;     /* How much data is left in the buffer */
     uint32_t curr_pts;           /* Current presentation timestamp */
     uint32_t curr_time;          /* Current time in samples */
     uint32_t tagged;             /* curr_pts is valid */
@@ -301,8 +299,7 @@ static intptr_t str_send_msg(Stream *str, int id, intptr_t data)
         return str->dispatch_fn(str, msg);
 #endif
 
-    /* Only one thread at a time, please - only one core may safely send
-       right now */
+    /* Only one thread at a time, please */
     rb->spinlock_lock(&str->msg_lock);
 
     str->ev.id = id;
@@ -333,13 +330,62 @@ static intptr_t str_send_msg(Stream *str, int id, intptr_t data)
 /* NOTE: Putting the following variables in IRAM cause audio corruption
    on the ipod (reason unknown)
 */
-static uint8_t *disk_buf IBSS_ATTR;
-static uint8_t *disk_buf_end IBSS_ATTR;
-static uint8_t *disk_buf_tail IBSS_ATTR;
-static size_t   buffer_size IBSS_ATTR;
+static uint8_t *disk_buf_start IBSS_ATTR;  /* Start pointer */
+static uint8_t *disk_buf_end IBSS_ATTR; /* End of buffer pointer less
+                                           MPEG_GUARDBUF_SIZE. The
+                                           guard space is used to wrap
+                                           data at the buffer start to
+                                           pass continuous data
+                                           packets */
+static uint8_t *disk_buf_tail IBSS_ATTR;  /* Location of last data + 1
+                                             filled into the buffer */
+static size_t   disk_buf_size IBSS_ATTR;  /* The total buffer length
+                                             including the guard
+                                             space */
+static size_t file_remaining IBSS_ATTR;
 
-#define MSG_BUFFER_NEARLY_EMPTY 1
-#define MSG_EXIT_REQUESTED      2
+#if NUM_CORES > 1
+/* Some stream variables are shared between cores */
+struct mutex stream_lock IBSS_ATTR;
+static inline void init_stream_lock(void)
+    { rb->spinlock_init(&stream_lock); }
+static inline void lock_stream(void)
+    { rb->spinlock_lock(&stream_lock); }
+static inline void unlock_stream(void)
+    { rb->spinlock_unlock(&stream_lock); }
+#else
+/* No RMW issue here */
+static inline void init_stream_lock(void)
+    { }
+static inline void lock_stream(void)
+    { }
+static inline void unlock_stream(void)
+    { }
+#endif
+
+static int audio_sync_start IBSS_ATTR; /* If 0, the audio thread
+                                          yields waiting on the video
+                                          thread to synchronize with
+                                          the stream */
+static uint32_t audio_sync_time IBSS_ATTR; /* The time that the video
+                                              thread has reached after
+                                              synchronizing.  The
+                                              audio thread now needs
+                                              to advance to this
+                                              time */
+static int video_sync_start IBSS_ATTR; /* While 0, the video thread
+                                          yields until the audio
+                                          thread has reached the
+                                          audio_sync_time */
+static int video_thumb_print IBSS_ATTR; /* If 1, the video thread is
+                                           only decoding one frame for
+                                           use in the menu.  If 0,
+                                           normal operation */
+static int play_time IBSS_ATTR; /* The movie time as represented by
+                                   the maximum audio PTS tag in the
+                                   stream converted to half minutes */
+char *filename;                 /* hack for resume time storage */
+
 
 /* Various buffers */
 /* TODO: Can we reduce the PCM buffer size? */
@@ -350,7 +396,7 @@ static size_t   buffer_size IBSS_ATTR;
 #define LIBMPEG2BUFFER_SIZE         (2*1024*1024)
 
 /* 65536+6 is required since each PES has a 6 byte header with a 16 bit packet length field  */
-#define MPEG_GUARDBUF_SIZE (64*1024+1024) /* Keep a bit extra - excessive for now */
+#define MPEG_GUARDBUF_SIZE (65*1024) /* Keep a bit extra - excessive for now */
 #define MPEG_LOW_WATERMARK (1024*1024)
 
 static void pcm_playback_play_pause(bool play);
@@ -471,8 +517,47 @@ static void init_mad(void* mad_frame_overlap)
                 ((p)[b3]      <<  6) | \
                 ((p)[b4] >> 2      )))
 
-/* This function demuxes the streams and gives the next stream data pointer */
-static void get_next_data( Stream* str )
+/* This function synchronizes the mpeg stream.  The function returns
+   true on error */
+bool sync_data_stream(uint8_t **p)
+{
+    for (;;) 
+    {
+        while ( !CMP_4_CONST(*p, PACK_START_CODE) && (*p) < disk_buf_tail ) 
+            (*p)++;
+        if ( (*p) >= disk_buf_tail )
+            break;
+        uint8_t *p_save = (*p); 
+        if ( ((*p)[4] & 0xc0) == 0x40 ) /* mpeg-2 */
+            (*p) += 14 + ((*p)[13] & 7);
+        else if ( ((*p)[4] & 0xf0) == 0x20 ) /* mpeg-1 */
+            (*p) += 12;
+        else
+            (*p) += 5;
+        if ( (*p) >= disk_buf_tail )
+            break;
+        if ( CMP_3_CONST(*p, PACKET_START_CODE_PREFIX) )
+        {
+            (*p) = p_save;
+            break;
+        }
+        else
+            (*p) = p_save+1;
+    }
+
+    if ( (*p) >= disk_buf_tail )
+        return true;
+    else
+        return false;
+}
+
+/* This function demuxes the streams and gives the next stream data
+   pointer.  Type 0 is normal operation.  Type 1 and 2 have been added
+   for rapid seeks into the data stream.  Type 1 and 2 ignore the
+   video_sync_start state (a signal to yield for refilling the
+   buffer).  Type 1 will append more data to the buffer tail (minumal
+   bufer size reads that are increased only as needed). */
+static int get_next_data( Stream* str, uint8_t type )
 {
     uint8_t *p;
     uint8_t *header;
@@ -481,29 +566,48 @@ static void get_next_data( Stream* str )
     static int mpeg1_skip_table[16] =
         { 0, 0, 4, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    if (str->curr_packet_end == NULL)
-    {
-        /* What does this do? */
-        while ((p = disk_buf) == NULL)
-        {
-            rb->lcd_putsxy(0,LCD_HEIGHT-10,"FREEZE!");
-            rb->lcd_update();
-            rb->sleep(HZ);
-        }
-    }
-    else
-    {
-        p = str->curr_packet_end;
-    }
+    if ( (p=str->curr_packet_end) == NULL)
+        p = disk_buf_start;
 
     while (1)
     {
         int length, bytes;
 
-        if (p >= disk_buf_end)
+        /* Yield for buffer filling */
+        if ( (type == 0) && (str->buffer_remaining < 120*1024) && (file_remaining > 0) )
+          while ( (str->buffer_remaining < 512*1024) && (file_remaining > 0) )
+            rb->yield();
+        
+        /* The packet start position (plus an arbitrary header length)
+           has exceeded the amount of data in the buffer */
+        if ( type == 1 && (p+50) >= disk_buf_tail ) 
         {
-            p = disk_buf + (p - disk_buf_end);
+            DEBUGF("disk buffer overflow\n");
+            return 1;
         }
+
+        /* are we at the end of file? */
+        {
+            size_t tmp_length;
+            if (p < str->prev_packet)
+                tmp_length = (disk_buf_end - str->prev_packet) +
+                  (p - disk_buf_start);
+            else
+                tmp_length = (p - str->prev_packet);
+            if (0 == str->buffer_remaining-tmp_length-str->prev_packet_length)
+            {
+                str->curr_packet_end = str->curr_packet = NULL;
+                break;      
+            }
+        }
+
+        /* wrap the disk buffer */
+        if (p >= disk_buf_end)
+            p = disk_buf_start + (p - disk_buf_end);
+
+        /* wrap packet header if needed */
+        if ( (p+50) >= disk_buf_end ) 
+            rb->memcpy(disk_buf_end, disk_buf_start, 50);
 
         /* Pack header, skip it */
         if (CMP_4_CONST(p, PACK_START_CODE))
@@ -521,7 +625,6 @@ static void get_next_data( Stream* str )
                 rb->splash( 30, "Weird Pack header!" );
                 p += 5;
             }
-            /*rb->splash( 30, "Pack header" );*/
         }
 
         /* System header, parse and skip it - four bytes */
@@ -535,29 +638,29 @@ static void get_next_data( Stream* str )
 
             p += header_length;
 
-            if (p >= disk_buf_end)
-            {
-                p = disk_buf + (p - disk_buf_end);
-            }
-            /*rb->splash( 30, "System header" );*/
+            if ( p >= disk_buf_end )
+                p = disk_buf_start + (p - disk_buf_end);
         }
-
+        
         /* Packet header, parse it */
         if (!CMP_3_CONST(p, PACKET_START_CODE_PREFIX))
         {
             /* Problem */
-            //rb->splash( HZ*3, "missing packet start code prefix : %X%X at %X", *p, *(p+2), p-disk_buf );
+            rb->splash( HZ*3, "missing packet start code prefix : %X%X at %lX",
+                        *p, *(p+2), (long unsigned int)(p-disk_buf_start) );
+
+            DEBUGF("end diff: %X,%X,%X,%X,%X,%X\n",(int)str->curr_packet_end,
+                   (int)audio_str.curr_packet_end,(int)video_str.curr_packet_end,
+                   (int)disk_buf_start,(int)disk_buf_end,(int)disk_buf_tail);
+
             str->curr_packet_end = str->curr_packet = NULL;
             break;
-            //++p;
-            //break;
         }
 
         /* We retrieve basic infos */
         stream = p[3];
         length = (p[4] << 8) | p[5];
 
-        /*rb->splash( 100, "Stream : %X", stream );*/
         if (stream != str->id)
         {
             /* End of stream ? */
@@ -618,11 +721,9 @@ static void get_next_data( Stream* str )
                     break;
                 }
             }
-
-            if ((header[length - 1] & 0xc0) == 0x40)
-            {
+            
+            if ( (header[length - 1] & 0xc0) == 0x40 )
                 length += 2;
-            }
 
             len_skip = length;
             length += mpeg1_skip_table[header[length - 1] >> 4];
@@ -657,20 +758,19 @@ static void get_next_data( Stream* str )
         if (bytes > 0)
         {
             str->curr_packet_end = p + bytes;
-            //DEBUGF("prev = %d, curr = %d\n",str->prev_packet,str->curr_packet);
 
             if (str->curr_packet != NULL)
             {
+                lock_stream();
+
+                str->buffer_remaining -= str->prev_packet_length;
                 if (str->curr_packet < str->prev_packet)
-                {
-                    str->buffer_head += (disk_buf_end - str->prev_packet) +
-                                        (str->curr_packet - disk_buf);
-                    str->guard_bytes = 0;
-                }
+                  str->prev_packet_length = (disk_buf_end - str->prev_packet) +
+                    (str->curr_packet - disk_buf_start);
                 else
-                {
-                    str->buffer_head += (str->curr_packet - str->prev_packet);
-                }
+                  str->prev_packet_length = (str->curr_packet - str->prev_packet);
+
+                unlock_stream();
 
                 str->prev_packet = str->curr_packet;
             }
@@ -678,14 +778,13 @@ static void get_next_data( Stream* str )
             str->curr_packet = p;
 
             if (str->curr_packet_end > disk_buf_end)
-            {
-                str->guard_bytes = str->curr_packet_end - disk_buf_end;
-                rb->memcpy(disk_buf_end, disk_buf, str->guard_bytes);
-            }
+              rb->memcpy(disk_buf_end, disk_buf_start, 
+                         str->curr_packet_end - disk_buf_end );
         }
 
         break;
     } /* end while */
+    return 0;
 }
 
 /* Our clock rate in ticks/second - this won't be a constant for long */
@@ -943,6 +1042,8 @@ static int button_loop(void)
     int vol, minvol, maxvol;
     int button;
 
+    if (video_sync_start==1) {
+
     if (str_have_msg(&audio_str))
     {
         struct event ev;
@@ -1014,6 +1115,7 @@ static int button_loop(void)
             rb->lcd_setfont(FONT_SYSFIXED);
 
             if (result) {
+                settings.resume_time = (int)(get_stream_time()/44100/30);
                 str_send_msg(&video_str, STREAM_QUIT, 0);
                 audio_str.status = STREAM_STOPPED;
             } else {
@@ -1024,6 +1126,7 @@ static int button_loop(void)
             break;
 
         case MPEG_STOP:
+            settings.resume_time = (int)(get_stream_time()/44100/30);
             str_send_msg(&video_str, STREAM_QUIT, 0);
             audio_str.status = STREAM_STOPPED;
             break;
@@ -1060,7 +1163,7 @@ static int button_loop(void)
                 audio_str.status = STREAM_STOPPED;
             }
     }
-
+    }
 quit:
     return audio_str.status;
 }
@@ -1086,7 +1189,23 @@ static void audio_thread(void)
     pcm_playback_play(0);
 
     /* Get first packet */
-    get_next_data(&audio_str);
+    get_next_data(&audio_str, 0 );
+
+    /* skip audio packets here */
+    while (audio_sync_start==0)
+    {
+      audio_str.status = STREAM_PLAYING;
+      rb->yield();
+    }
+
+    if (audio_sync_time>10000)
+    {
+      while (TS_TO_TICKS(audio_str.curr_pts) < audio_sync_time - 10000)
+      {
+        get_next_data(&audio_str, 0 );
+        rb->priority_yield();
+      }
+    }
 
     if (audio_str.curr_packet == NULL)
         goto done;
@@ -1165,7 +1284,7 @@ static void audio_thread(void)
                 mpabuf = mpa_buffer;
 
                 /* Get data from next audio packet */
-                get_next_data(&audio_str);
+                get_next_data(&audio_str, 0 );
             }
             while (audio_str.curr_packet != NULL &&
                    mpabuf_used < MPA_MAX_FRAME_SIZE + MAD_BUFFER_GUARD);
@@ -1198,8 +1317,6 @@ static void audio_thread(void)
 
         if (mad_stat != 0)
         {
-            DEBUGF("Audio stream error - %d\n", stream.error);
-
             if (stream.error == MAD_FLAG_INCOMPLETE
                 || stream.error == MAD_ERROR_BUFLEN)
             {
@@ -1259,6 +1376,13 @@ static void audio_thread(void)
                 rb->priority_yield();
             }
 
+            if (video_sync_start == 0 && 
+                pts->pts+(uint32_t)synth.pcm.length<audio_sync_time) {
+              synth.pcm.length = 0;
+              size = 0;
+              rb->yield();
+            }
+
             /* TODO: This part will be replaced with dsp calls soon */
             if (MAD_NCHANNELS(&frame.header) == 2)
             {
@@ -1305,6 +1429,7 @@ static void audio_thread(void)
                 audio_str.status = STREAM_PLAYING;
                 pcmbuf_threshold = PCMBUF_PLAY_ALL;
                 pcm_playback_seek_time(pcmbuf_tail->time);
+                video_sync_start = 1;
             }
 
             /* Make this data available to DMA */
@@ -1391,29 +1516,32 @@ static void video_thread(void)
 
     /* Clear the display - this is mainly just to indicate that the
        video thread has started successfully. */
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    if (!video_thumb_print)
+    {
+      rb->lcd_clear_display();
+      rb->lcd_update();
+    }
 
     /* Request the first packet data */
-    get_next_data( &video_str );
+    get_next_data( &video_str, 0 );
 
     if (video_str.curr_packet == NULL)
-        goto done;
+        goto video_thread_quit;
 
     mpeg2_buffer (mpeg2dec, video_str.curr_packet, video_str.curr_packet_end);
     total_offset += video_str.curr_packet_end - video_str.curr_packet;
 
     info = mpeg2_info (mpeg2dec);
 
-    /* Wait if the audio thread is buffering - i.e. before
-       the first frames are decoded */
-    while (audio_str.status == STREAM_BUFFERING)
-        rb->priority_yield();
-
     while (1)
     {
         /* quickly check mailbox first */
-        if (str_have_msg(&video_str))
+        if (video_thumb_print)
+        {
+            if (video_str.status == STREAM_STOPPED)
+                break;
+        }
+        else if (str_have_msg(&video_str))
         {
             while (1)
             {
@@ -1450,7 +1578,8 @@ static void video_thread(void)
         {
         case STATE_BUFFER:
             /* Request next packet data */
-            get_next_data( &video_str );
+            get_next_data( &video_str, 0 );
+
             mpeg2_buffer (mpeg2dec, video_str.curr_packet, video_str.curr_packet_end);
             total_offset += video_str.curr_packet_end - video_str.curr_packet;
             info = mpeg2_info (mpeg2dec);
@@ -1458,7 +1587,7 @@ static void video_thread(void)
             if (video_str.curr_packet == NULL)
             {
                 /* No more data. */
-                goto done;
+                goto video_thread_quit;
             }
             continue;
 
@@ -1528,8 +1657,12 @@ static void video_thread(void)
                 break;
 
             /* No limiting => no dropping - draw this frame */
-            if (!settings.limitfps)
+            if (!settings.limitfps && (video_thumb_print == 0))
+            {
+                audio_sync_start = 1;
+                video_sync_start = 1;
                 goto picture_draw;
+            }
 
             /* Get presentation times in audio samples - quite accurate
                enough - add previous frame duration if not stamped */
@@ -1538,7 +1671,19 @@ static void video_thread(void)
 
             period = TIME_TO_TICKS(info->sequence->frame_period);
 
+            if ( (video_thumb_print == 1 || video_sync_start == 0) && 
+                 ((int)(info->current_picture->flags & PIC_MASK_CODING_TYPE) 
+                 == PIC_FLAG_CODING_TYPE_B))
+              break;
+
             eta_video = curr_time;
+
+            audio_sync_time = eta_video;
+            audio_sync_start = 1;
+            
+            while (video_sync_start == 0)
+                rb->yield();
+
             eta_audio = get_stream_time();
 
             /* How early/late are we? > 0 = late, < 0  early */
@@ -1664,32 +1809,39 @@ static void video_thread(void)
 
         picture_wait:
             /* Wait until audio catches up */
-            while (eta_video > eta_audio)
-            {
-                rb->priority_yield();
-
-                /* Make sure not to get stuck waiting here forever */
-                if (str_have_msg(&video_str))
+            if (video_thumb_print)
+                video_str.status = STREAM_STOPPED;
+            else
+                while (eta_video > eta_audio)
                 {
-                    str_look_msg(&video_str, &ev);
+                    rb->priority_yield();
+                  
+                    /* Make sure not to get stuck waiting here forever */
+                    if (str_have_msg(&video_str))
+                    {
+                        str_look_msg(&video_str, &ev);
+                      
+                        /* If not to play, process up top */
+                        if (ev.id != STREAM_PLAY)
+                            goto rendering_finished;
+                      
+                        /* Told to play but already playing */
+                        str_get_msg(&video_str, &ev);
+                        str_reply_msg(&video_str, 1);
+                    }
 
-                    /* If not to play, process up top */
-                    if (ev.id != STREAM_PLAY)
-                        goto rendering_finished;
-
-                    /* Told to play but already playing */
-                    str_get_msg(&video_str, &ev);
-                    str_reply_msg(&video_str, 1);
+                    eta_audio = get_stream_time();
                 }
-
-                eta_audio = get_stream_time();
-            }
-
+       
         picture_draw:
             /* Record last frame time */
             last_render = *rb->current_tick;
 
-            vo_draw_frame(info->display_fbuf->buf);
+            if (video_thumb_print)
+                vo_draw_frame_thumb(info->display_fbuf->buf);
+            else
+                vo_draw_frame(info->display_fbuf->buf);
+
             num_drawn++;
 
         picture_skip:
@@ -1724,53 +1876,298 @@ static void video_thread(void)
         rb->yield();
     }
 
-done:
-#if NUM_CORES > 1
-    flush_icache();
-#endif
-
-    video_str.status = STREAM_DONE;
-
-    while (1)
+ video_thread_quit:
+    /* if video ends before time sync'd, 
+       besure the audio thread is closed */
+    if (video_sync_start == 0)
     {
-        str_get_msg(&video_str, &ev);
-
-        if (ev.id == STREAM_QUIT)
-            break;
-
-        str_reply_msg(&video_str, 0);
+        audio_str.status = STREAM_STOPPED;
+        audio_sync_start = 1;
     }
 
-video_thread_quit:
+  #if NUM_CORES > 1
+      flush_icache();
+  #endif
+  
+    mpeg2_close (mpeg2dec);
+  
     /* Commit suicide */
     video_str.status = STREAM_TERMINATED;
 }
 
+void initialize_stream( Stream *str, uint8_t *buffer_start, size_t disk_buf_len, int id )
+{
+    str->curr_packet_end = str->curr_packet = NULL;
+    str->prev_packet_length = 0;
+    str->prev_packet = str->curr_packet_end = buffer_start;
+    str->buffer_remaining = disk_buf_len;
+    str->id = id;
+}
+    
+void display_thumb(int in_file)
+{
+    size_t disk_buf_len;
+
+    video_thumb_print = 1;
+    audio_sync_start = 1;
+    video_sync_start = 1;
+  
+    disk_buf_len = rb->read (in_file, disk_buf_start, disk_buf_size - MPEG_GUARDBUF_SIZE);
+    disk_buf_tail = disk_buf_start + disk_buf_len;
+    file_remaining = 0;
+    initialize_stream(&video_str,disk_buf_start,disk_buf_len,0xe0);
+    
+    video_str.status = STREAM_PLAYING;
+
+    if ((video_str.thread = rb->create_thread(video_thread,
+       (uint8_t*)video_stack,VIDEO_STACKSIZE,"mpgvideo" 
+       IF_PRIO(,PRIORITY_PLAYBACK)
+       IF_COP(, COP, true))) == NULL)
+    {
+        rb->splash(HZ, "Cannot create video thread!");
+    }
+    else
+    {
+        while (video_str.status != STREAM_TERMINATED)
+            rb->yield();
+    }
+
+    if ( video_str.curr_packet_end == video_str.curr_packet)
+      rb->splash(0, "frame not available");
+}
+
+int find_length( int in_file )
+{
+    uint8_t *p;
+    size_t read_length = 60*1024;
+    size_t disk_buf_len;
+  
+    play_time = 0;
+
+    /* temporary read buffer size cannot exceed buffer size */
+    if ( read_length > disk_buf_size )
+        read_length = disk_buf_size;
+  
+    /* read tail of file */
+    rb->lseek( in_file, -1*read_length, SEEK_END );
+    disk_buf_len = rb->read( in_file, disk_buf_start, read_length );
+    disk_buf_tail = disk_buf_start + disk_buf_len;
+  
+    /* sync reader to this segment of the stream */
+    p=disk_buf_start;
+    if (sync_data_stream(&p))
+    {
+        DEBUGF("Could not sync stream\n");
+        return PLUGIN_ERROR;
+    }
+  
+    /* find last PTS in audio stream; will movie always have audio? if
+       the play time can not be determined, set play_time to 0 */
+    audio_sync_start = 0;
+    audio_sync_time = 0;
+    video_sync_start = 0;
+    {
+        Stream tmp;
+        initialize_stream(&tmp,p,disk_buf_len-(disk_buf_start-p),0xc0);
+        
+        do
+        {  
+            get_next_data(&tmp, 2);
+            if (tmp.tagged == 1)
+                /* 10 sec less to insure the video frame exist */
+                play_time = (int)((tmp.curr_pts/45000-10)/30);
+        }
+        while (tmp.curr_packet_end != NULL);
+    } 
+    return 0;
+}
+
+ssize_t seek_PTS( int in_file, int start_time, int accept_button )
+{
+    static ssize_t last_seek_pos = 0;
+    static int last_start_time = 0;
+    ssize_t seek_pos;
+    size_t disk_buf_len;
+    uint8_t *p;
+    size_t read_length = 60*1024;
+
+    /* temporary read buffer size cannot exceed buffer size */
+    if ( read_length > disk_buf_size )
+        read_length = disk_buf_size;
+
+    if ( start_time == last_start_time )
+    {
+        seek_pos = last_seek_pos;
+        rb->lseek(in_file,seek_pos,SEEK_SET);
+    }
+    else if ( start_time != 0 )
+    {
+        seek_pos = rb->filesize(in_file)*start_time/play_time;
+        int seek_pos_sec_inc = rb->filesize(in_file)/play_time/30;
+        
+        if (seek_pos<0)
+            seek_pos=0;
+        if ((size_t)seek_pos > rb->filesize(in_file) - read_length)
+            seek_pos = rb->filesize(in_file) - read_length;
+        rb->lseek( in_file, seek_pos, SEEK_SET );
+        disk_buf_len = rb->read( in_file, disk_buf_start, read_length );
+        disk_buf_tail = disk_buf_start + disk_buf_len;
+      
+        /* sync reader to this segment of the stream */
+        p=disk_buf_start;
+        if (sync_data_stream(&p))
+        {
+            DEBUGF("Could not sync stream\n");
+            return PLUGIN_ERROR;
+        }
+      
+        /* find PTS >= start_time */
+        audio_sync_start = 0;
+        audio_sync_time = 0;
+        video_sync_start = 0;
+        {
+            Stream tmp;
+            initialize_stream(&tmp,p,disk_buf_len-(disk_buf_start-p),0xc0);
+            int cont_seek_loop = 1;
+            int coarse_seek = 1;
+            do
+            {
+                if ( accept_button )
+                {
+                    rb->yield();
+                    if (rb->button_available())
+                      return -101;
+                }
+
+                while ( get_next_data(&tmp, 1) == 1 )
+                {
+                    if ( tmp.curr_packet_end == disk_buf_start )
+                        seek_pos += disk_buf_tail - disk_buf_start;
+                    else
+                        seek_pos += tmp.curr_packet_end - disk_buf_start;
+                    if ((size_t)seek_pos > rb->filesize(in_file) - read_length)
+                        seek_pos = rb->filesize(in_file) - read_length;
+                    rb->lseek( in_file, seek_pos, SEEK_SET );
+                    disk_buf_len = rb->read ( in_file, disk_buf_start, read_length );
+                    disk_buf_tail = disk_buf_start + disk_buf_len;
+                    
+                    /* sync reader to this segment of the stream */
+                    p=disk_buf_start;
+                    initialize_stream(&tmp,p,disk_buf_len,0xc0);
+                }
+                  
+                /* are we after start_time in the stream? */
+                if ( coarse_seek && (int)(tmp.curr_pts/45000) >= start_time*30 )
+                {
+                    int time_to_backup = (int)(tmp.curr_pts/45000) - start_time*30;
+                    if (time_to_backup == 0)
+                        time_to_backup++;
+                    seek_pos -= seek_pos_sec_inc * time_to_backup;
+                    seek_pos_sec_inc -= seek_pos_sec_inc/20; /* for stability */
+                    if (seek_pos<0)
+                        seek_pos=0;
+                    if ((size_t)seek_pos > rb->filesize(in_file) - read_length)
+                        seek_pos = rb->filesize(in_file) - read_length;
+                    rb->lseek( in_file, seek_pos, SEEK_SET );
+                    disk_buf_len = rb->read( in_file, disk_buf_start, read_length );
+                    disk_buf_tail = disk_buf_start + disk_buf_len;
+                    
+                    /* sync reader to this segment of the stream */
+                    p=disk_buf_start;
+                    if (sync_data_stream(&p))
+                    {
+                        DEBUGF("Could not sync stream\n");
+                        return PLUGIN_ERROR;
+                    }         
+                    initialize_stream(&tmp,p,disk_buf_len-(disk_buf_start-p),0xc0);
+                    continue;
+                }
+          
+                /* are we well before start_time in the stream? */
+                if ( coarse_seek && start_time*30 - (int)(tmp.curr_pts/45000) > 2 )
+                {
+                    int time_to_advance = start_time*30 - (int)(tmp.curr_pts/45000) - 2;
+                    if (time_to_advance <= 0)
+                        time_to_advance = 1;
+                    seek_pos += seek_pos_sec_inc * time_to_advance;
+                    if (seek_pos<0)
+                        seek_pos=0;
+                    if ((size_t)seek_pos > rb->filesize(in_file) - read_length)
+                        seek_pos = rb->filesize(in_file) - read_length;
+                    rb->lseek( in_file, seek_pos, SEEK_SET );
+                    disk_buf_len = rb->read ( in_file, disk_buf_start, read_length );
+                    disk_buf_tail = disk_buf_start + disk_buf_len;
+              
+                    /* sync reader to this segment of the stream */
+                    p=disk_buf_start;
+                    if (sync_data_stream(&p))
+                    {
+                        DEBUGF("Could not sync stream\n");
+                        return PLUGIN_ERROR;
+                    }         
+                    initialize_stream(&tmp,p,disk_buf_len-(disk_buf_start-p),0xc0);
+                    continue;
+                }
+          
+                coarse_seek = 0;
+          
+                /* are we at start_time in the stream? */
+                if ( (int)(tmp.curr_pts/45000) >= start_time*30 )
+                    cont_seek_loop = 0;
+                
+            } 
+            while ( cont_seek_loop );
+        
+        
+            DEBUGF("start diff: %u %u\n",(unsigned int)(tmp.curr_pts/45000),start_time*30);
+            seek_pos+=tmp.curr_packet_end-disk_buf_start;
+            
+            last_seek_pos = seek_pos;
+            last_start_time = start_time;
+            
+            rb->lseek(in_file,seek_pos,SEEK_SET);
+        }
+    }
+    else
+    {
+        seek_pos = 0;
+        rb->lseek(in_file,0,SEEK_SET);
+        last_seek_pos = seek_pos;
+        last_start_time = start_time;
+    }
+    return seek_pos;
+}
+  
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int status = PLUGIN_ERROR; /* assume failure */
+    int start_time=-1;
     void* audiobuf;
     ssize_t audiosize;
     int in_file;
-    uint8_t* buffer;
-    size_t file_remaining;
     size_t disk_buf_len;
+    ssize_t seek_pos;
 #ifndef HAVE_LCD_COLOR
     long graysize;
     int grayscales;
 #endif
 
+    audio_sync_start = 0;
+    audio_sync_time = 0;
+    video_sync_start = 0;
+
     if (parameter == NULL)
     {
         api->splash(HZ*2, "No File");
-        return PLUGIN_ERROR;
     }
 
     /* Initialize IRAM - stops audio and voice as well */
     PLUGIN_IRAM_INIT(api)
 
     rb = api;
+    rb->splash(0, "loading ...");
 
+    /* sets audiosize and returns buffer pointer */
     audiobuf = rb->plugin_get_audio_buffer(&audiosize);
 
 #if INPUT_SRC_CAPS != 0
@@ -1781,48 +2178,37 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->pcm_set_frequency(SAMPR_44);
 
-    /* Set disk pointers to NULL */
-    disk_buf_end = disk_buf = NULL;
-
-    /* Stream construction */
-    /* We take the first stream of each (audio and video) */
-    /* TODO : Search for these in the file first */
-    audio_str.curr_packet_end = audio_str.curr_packet = audio_str.next_packet = NULL;
-    video_str = audio_str;
-    video_str.id = 0xe0;
-    audio_str.id = 0xc0;
-
-    /* Initialise our malloc buffer */
-    audiosize = mpeg_alloc_init(audiobuf, audiosize, LIBMPEG2BUFFER_SIZE);
-    if (audiosize == 0)
-        return PLUGIN_ERROR;
-
-    /* Grab most of the buffer for the compressed video - leave some for
-       PCM audio data and some for libmpeg2 malloc use. */
-    buffer_size = audiosize - (PCMBUFFER_SIZE+PCMBUFFER_GUARD_SIZE+
-                               MPABUF_SIZE);
-
-    DEBUGF("audiosize=%ld, buffer_size=%ld\n",audiosize,buffer_size);
-    buffer = mpeg_malloc(buffer_size,-1);
-
-    if (buffer == NULL)
-        return PLUGIN_ERROR;
-
 #ifndef HAVE_LCD_COLOR
     /* initialize the grayscale buffer: 32 bitplanes for 33 shades of gray. */
-    grayscales = gray_init(rb, buffer, buffer_size, false, LCD_WIDTH, LCD_HEIGHT,
+    grayscales = gray_init(rb, audiobuf, audiosize, false, LCD_WIDTH, LCD_HEIGHT,
                            32, 2<<8, &graysize) + 1;
-    buffer += graysize;
-    buffer_size -= graysize;
-    if (grayscales < 33 || buffer_size <= 0)
+    audiobuf += graysize;
+    audiosize -= graysize;
+    if (grayscales < 33 || audiosize <= 0)
     {
         rb->splash(HZ, "gray buf error");
         return PLUGIN_ERROR;
     }
 #endif
 
-    buffer_size &= ~(0x7ff);  /* Round buffer down to nearest 2KB */
-    DEBUGF("audiosize=%ld, buffer_size=%ld\n",audiosize,buffer_size);
+    /* Initialise our malloc buffer */
+    audiosize = mpeg_alloc_init(audiobuf,audiosize, LIBMPEG2BUFFER_SIZE);
+    if (audiosize == 0)
+        return PLUGIN_ERROR;
+
+    /* Set disk pointers to NULL */
+    disk_buf_end = disk_buf_start = NULL;
+
+    /* Grab most of the buffer for the compressed video - leave some for
+       PCM audio data and some for libmpeg2 malloc use. */
+    disk_buf_size = audiosize - (PCMBUFFER_SIZE+PCMBUFFER_GUARD_SIZE+
+                               MPABUF_SIZE);
+
+    DEBUGF("audiosize=%ld, disk_buf_size=%ld\n",audiosize,disk_buf_size);
+    disk_buf_start = mpeg_malloc(disk_buf_size,-1);
+
+    if (disk_buf_start == NULL)
+        return PLUGIN_ERROR;
 
     if (!init_mpabuf())
         return PLUGIN_ERROR;
@@ -1836,9 +2222,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     in_file = rb->open((char*)parameter,O_RDONLY);
 
     if (in_file < 0){
-        //fprintf(stderr,"Could not open %s\n",argv[1]);
+        DEBUGF("Could not open %s\n",(char*)parameter);
         return PLUGIN_ERROR;
     }
+    filename = (char*)parameter;
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_backdrop(NULL);
@@ -1860,40 +2247,59 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
        cannot just return PLUGIN_ERROR - instead drop though to cleanup code
      */
 
-    init_settings();
+    init_settings((char*)parameter);
 
     /* Initialise libmad */
     rb->memset(mad_frame_overlap, 0, sizeof(mad_frame_overlap));
     init_mad(mad_frame_overlap);
 
-    file_remaining = rb->filesize(in_file);
-    disk_buf_end = buffer + buffer_size-MPEG_GUARDBUF_SIZE;
+    disk_buf_end = disk_buf_start + disk_buf_size-MPEG_GUARDBUF_SIZE;
+
+    /* initalize play_time with the length (in half minutes) of the movie
+         zero if the time could not be determined */
+    find_length( in_file );
+    
+    /* start menu */
+    start_time = mpeg_start_menu(play_time, in_file);
+    if ( start_time == -1 )
+        return 0;
+    else if ( start_time < 0 )
+        start_time = 0;
+    else if ( start_time > play_time )
+        start_time = play_time;
+    
+    rb->splash(0, "loading ...");
+    
+    /* seek start time */
+    seek_pos = seek_PTS( in_file, start_time, 0 );
+
+    rb->lseek(in_file,seek_pos,SEEK_SET);
+    video_thumb_print = 0;
+    audio_sync_start = 0;
+    audio_sync_time = 0;
+    video_sync_start = 0;
 
     /* Read some stream data */
-    disk_buf_len = rb->read (in_file, buffer, MPEG_LOW_WATERMARK);
+    disk_buf_len = rb->read (in_file, disk_buf_start, disk_buf_size - MPEG_GUARDBUF_SIZE);
 
-    DEBUGF("Initial Buffering - %d bytes\n",(int)disk_buf_len);
-    disk_buf = buffer;
-    disk_buf_tail = buffer+disk_buf_len;
-    file_remaining -= disk_buf_len;
+    disk_buf_tail = disk_buf_start + disk_buf_len;
+    file_remaining = rb->filesize(in_file);
+    file_remaining -= disk_buf_len + seek_pos;
 
-    audio_str.guard_bytes = 0;
-    audio_str.prev_packet = disk_buf;
-    audio_str.buffer_head = 0;
-    audio_str.buffer_tail = disk_buf_len;
-    video_str.guard_bytes = 0;
-    video_str.prev_packet = disk_buf;
-    video_str.buffer_head = 0;
-    video_str.buffer_tail = disk_buf_len;
+    initialize_stream( &video_str, disk_buf_start, disk_buf_len, 0xe0 );
+    initialize_stream( &audio_str, disk_buf_start, disk_buf_len, 0xc0 );
 
     rb->spinlock_init(&audio_str.msg_lock);
     rb->spinlock_init(&video_str.msg_lock);
+
     audio_str.status = STREAM_BUFFERING;
     video_str.status = STREAM_PLAYING;
 
 #ifndef HAVE_LCD_COLOR
     gray_show(true);
 #endif
+
+    init_stream_lock();
 
 #if NUM_CORES > 1
     flush_icache();
@@ -1914,38 +2320,52 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
     else
     {
-        //DEBUGF("START: video = %d, audio = %d\n",audio_str.buffer_remaining,video_str.buffer_remaining);
         rb->lcd_setfont(FONT_SYSFIXED);
 
         /* Wait until both threads have finished their work */
         while ((audio_str.status >= 0) || (video_str.status >= 0))
         {
-            size_t audio_remaining = audio_str.buffer_tail - audio_str.buffer_head;
-            size_t video_remaining = video_str.buffer_tail - video_str.buffer_head;
+            size_t audio_remaining = audio_str.buffer_remaining;
+            size_t video_remaining = video_str.buffer_remaining;
 
-            if (MIN(audio_remaining,video_remaining) < MPEG_LOW_WATERMARK) {
+            if (MIN(audio_remaining,video_remaining) < MPEG_LOW_WATERMARK) 
+            {
 
-                size_t bytes_to_read = buffer_size - MPEG_GUARDBUF_SIZE -
+                size_t bytes_to_read = disk_buf_size - MPEG_GUARDBUF_SIZE -
                                        MAX(audio_remaining,video_remaining);
 
                 bytes_to_read = MIN(bytes_to_read,(size_t)(disk_buf_end-disk_buf_tail));
 
                 while (( bytes_to_read > 0) && (file_remaining > 0) &&
-                       ((audio_str.status >= 0) || (video_str.status >= 0))) {
-                    size_t n = rb->read(in_file, disk_buf_tail, MIN(32*1024,bytes_to_read));
+                       ((audio_str.status != STREAM_DONE) || (video_str.status != STREAM_DONE)))
+                {
+
+                    size_t n;
+                    if ( video_sync_start != 0 )
+                        n = rb->read(in_file, disk_buf_tail, MIN(32*1024,bytes_to_read));
+                    else 
+                    {
+                        n = rb->read(in_file, disk_buf_tail,bytes_to_read);
+                        if (n==0)
+                            rb->splash(30,"buffer fill error");
+                    }
+                    
 
                     bytes_to_read -= n;
                     file_remaining -= n;
 
-                    audio_str.buffer_tail += n;
-                    video_str.buffer_tail += n;
+                    lock_stream();
+                    audio_str.buffer_remaining += n;
+                    video_str.buffer_remaining += n;
+                    unlock_stream();
+
                     disk_buf_tail += n;
 
                     rb->yield();
                 }
 
                 if (disk_buf_tail == disk_buf_end)
-                    disk_buf_tail = buffer;
+                    disk_buf_tail = disk_buf_start;
             }
 
             rb->sleep(HZ/10);
@@ -1967,6 +2387,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #if NUM_CORES > 1
     invalidate_icache();
 #endif
+
+    vo_cleanup();
 
 #ifndef HAVE_LCD_COLOR
     gray_release();

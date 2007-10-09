@@ -22,4 +22,6 @@
  */
 
 void vo_draw_frame (uint8_t * const * buf);
+void vo_draw_frame_thumb (uint8_t * const * buf);
 void vo_setup (const mpeg2_sequence_t * sequence);
+void vo_cleanup (void);

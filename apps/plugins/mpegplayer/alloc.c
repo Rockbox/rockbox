@@ -54,6 +54,8 @@ static void * mpeg_malloc_internal (unsigned char *mallocbuf,
     x = &mallocbuf[*mem_ptr];
     *mem_ptr += (size + 3) & ~3; /* Keep memory 32-bit aligned */
 
+    rb->memset(x,0,size);
+
     return x;
     (void)reason;
 }
@@ -116,7 +118,7 @@ void * mpeg2_malloc(unsigned size, mpeg2_alloc_t reason)
 
 void mpeg2_free(void *ptr)
 {
-    (void)ptr;
+    mpeg2_mem_ptr = (void *)ptr - (void *)mpeg2_mallocbuf;
 }
 
 /* The following are expected by libmad */
@@ -141,7 +143,7 @@ void * codec_calloc(size_t nmemb, size_t size)
 
 void codec_free(void* ptr)
 {
-    (void)ptr;
+    mem_ptr = (void *)ptr - (void *)mallocbuf;
 }
 
 void *memmove(void *dest, const void *src, size_t n)

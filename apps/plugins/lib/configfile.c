@@ -55,12 +55,14 @@ int configfile_save(const char *filename, struct configdata *cfg,
     if(fd < 0)
         return fd*10 - 1;
 
-    cfg_rb->fdprintf(fd, "file version: %d\n", version);
+    /* pre-allocate 10 bytes for INT */
+    cfg_rb->fdprintf(fd, "file version: %10d\n", version);
     
     for(i = 0;i < num_items;i++) {
         switch(cfg[i].type) {
             case TYPE_INT:
-                cfg_rb->fdprintf(fd, "%s: %d\n",
+                /* pre-allocate 10 bytes for INT */
+                cfg_rb->fdprintf(fd, "%s: %10d\n",
                                 cfg[i].name,
                                 *cfg[i].val);
                 break;
@@ -140,4 +142,73 @@ int configfile_load(const char *filename, struct configdata *cfg,
     
     cfg_rb->close(fd);
     return 0;
+}
+
+int configfile_get_value(const char* filename, const char* name)
+{
+    int fd;
+    char *pname;
+    char *pval;
+    char buf[MAX_PATH];
+
+    get_cfg_filename(buf, MAX_PATH, filename);
+    fd = cfg_rb->open(buf, O_RDONLY);
+    if(fd < 0)
+      return -1;
+
+    while(cfg_rb->read_line(fd, buf, MAX_PATH) > 0)
+    {
+        cfg_rb->settings_parseline(buf, &pname, &pval);
+        if(!cfg_rb->strcmp(name, pname))
+        {
+          cfg_rb->close(fd);
+          return cfg_rb->atoi(pval);
+        }
+    }
+
+    cfg_rb->close(fd);
+    return -1;
+}
+
+int configfile_update_entry(const char* filename, const char* name, int val)
+{
+  int fd;
+  char *pname;
+  char *pval;
+  char path[MAX_PATH];
+  char buf[256];
+  int found = 0;
+  int line_len = 0;
+  int pos = 0;
+
+  /* open the current config file */
+  get_cfg_filename(path, MAX_PATH, filename);
+  fd = cfg_rb->open(path, O_RDWR);
+  if(fd < 0)
+    return -1;
+
+  /* read in the current stored settings */
+  while((line_len = cfg_rb->read_line(fd, buf, 256)) > 0)
+  {
+    cfg_rb->settings_parseline(buf, &pname, &pval);
+
+    if(!cfg_rb->strcmp(name, pname))
+    {
+      found = 1;
+      cfg_rb->lseek(fd, pos, SEEK_SET);
+      /* pre-allocate 10 bytes for INT */
+      cfg_rb->fdprintf(fd, "%s: %10d\n", pname, val);
+      break;
+    }
+    pos += line_len;
+  }
+
+  /* if (name/val) is a new entry just append to file */
+  if (found == 0)
+    /* pre-allocate 10 bytes for INT */
+    cfg_rb->fdprintf(fd, "%s: %10d\n", name, val);
+
+  cfg_rb->close(fd);
+
+  return found;
 }

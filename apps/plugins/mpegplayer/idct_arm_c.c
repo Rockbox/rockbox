@@ -509,6 +509,8 @@ static void mpeg2_idct_add_c (int last, int16_t * block,
 
 void mpeg2_idct_init (void)
 {
+    extern uint8_t default_mpeg2_scan_norm[64];
+    extern uint8_t default_mpeg2_scan_alt[64];
     extern uint8_t mpeg2_scan_norm[64];
     extern uint8_t mpeg2_scan_alt[64];
     int i, j;
@@ -518,10 +520,10 @@ void mpeg2_idct_init (void)
 
     for (i = 0; i < 64; i++)
     {
-        j = mpeg2_scan_norm[i];
+        j = default_mpeg2_scan_norm[i];
         mpeg2_scan_norm[i] = ((j & 0x36) >> 1) | ((j & 0x09) << 2);
 
-        j = mpeg2_scan_alt[i];
+        j = default_mpeg2_scan_alt[i];
         mpeg2_scan_alt[i] = ((j & 0x36) >> 1) | ((j & 0x09) << 2);
     }
 }

@@ -518,6 +518,8 @@ static const struct plugin_api rockbox_api = {
     talk_disable_menus,
     talk_enable_menus,
 
+    button_available,
+
 };
 
 int plugin_load(const char* plugin, void* parameter)
