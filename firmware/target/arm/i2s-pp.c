@@ -71,7 +71,7 @@ void i2s_reset(void)
     IISDIV = 7;
     IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE16);
 #elif defined (IRIVER_H10) || defined (IRIVER_H10_5GB) || defined(IPOD_NANO) \
-      || defined(IPOD_VIDEO)
+      || defined(IPOD_VIDEO) || defined(IPOD_MINI2G)
     /* Nano works fine with IIS_FIFO_FORMAT_LE16 as well */
     IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE16_2);
 #else
