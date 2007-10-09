@@ -41,11 +41,13 @@ char *my_strtok( char * s, const char * delim );
 
 #ifdef SIMULATOR
 #undef open
+#undef close
 #undef lseek
 #undef filesize
 #undef read
 #undef write
 #define open(a,b)          rb->sim_open((a),(b))
+#define close(a)           rb->sim_close((a))
 #define lseek(a,b,c)       rb->sim_lseek((a),(b),(c))
 #define filesize(a)        rb->sim_filesize((a))
 #define read(a,b,c)        rb->sim_read((a),(b),(c))

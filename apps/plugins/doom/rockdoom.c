@@ -755,7 +755,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    printf("There were still: %d files open\n", fpoint);
    while(fpoint>0)
    {
+#ifdef SIMULATOR
+      close(filearray[fpoint]);
+#else
       rb->close(filearray[fpoint]);
+#endif
       fpoint--;
    }
 
