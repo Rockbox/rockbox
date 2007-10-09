@@ -1333,7 +1333,7 @@ static int toggle_radio_mode(void)
 }
 MENUITEM_FUNCTION_DYNTEXT(radio_mode_item, 0,
                                  toggle_radio_mode, NULL, 
-                                 get_mode_text, NULL, NULL, Icon_NOICON);
+                                 get_mode_text, NULL, NULL, NULL, Icon_NOICON);
 #endif
 
 static int scan_presets(void)

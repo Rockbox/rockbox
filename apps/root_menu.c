@@ -362,7 +362,7 @@ char *get_wps_item_name(int selected_item, void * data, char *buffer)
     return ID2P(LANG_RESUME_PLAYBACK);
 }
 MENUITEM_RETURNVALUE_DYNTEXT(wps_item, GO_TO_WPS, NULL, get_wps_item_name, 
-                                NULL, Icon_Playback_menu);
+                                NULL, NULL, Icon_Playback_menu);
 #ifdef HAVE_RECORDING
 MENUITEM_RETURNVALUE(rec, ID2P(LANG_RECORDING), GO_TO_RECSCREEN,  
                         NULL, Icon_Recording);

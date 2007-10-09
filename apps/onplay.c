@@ -1001,7 +1001,7 @@ static int ratingitem_callback(int action,const struct menu_item_ex *this_item)
     return action;
 }
 MENUITEM_FUNCTION_DYNTEXT(rating_item, 0, set_rating_inline,
-                          NULL, rating_name, NULL, 
+                          NULL, rating_name, NULL, NULL, 
                           ratingitem_callback, Icon_Questionmark);
 #endif
 

@@ -237,12 +237,22 @@ static void talk_menu_item(const struct menu_item_ex *menu,
             {
                 if (menu->submenus[sel]->flags&(MENU_DYNAMIC_DESC))
                 {
-                    char buffer[80];
-                    str = menu->submenus[sel]->menu_get_name_and_icon->
-                        list_get_name(sel, menu->submenus[sel]->
-                                      menu_get_name_and_icon->
-                                      list_get_name_data, buffer);
-                    id = P2ID(str);
+                    int (*list_speak_item)(int selected_item, void * data)
+                        = menu->submenus[sel]->menu_get_name_and_icon->
+                        list_speak_item;
+                    if(list_speak_item)
+                        list_speak_item(sel, menu->submenus[sel]->
+                                        menu_get_name_and_icon->
+                                        list_get_name_data);
+                    else
+                    {
+                        char buffer[80];
+                        str = menu->submenus[sel]->menu_get_name_and_icon->
+                            list_get_name(sel, menu->submenus[sel]->
+                                          menu_get_name_and_icon->
+                                          list_get_name_data, buffer);
+                        id = P2ID(str);
+                    }
                 }
                 else
                     id = P2ID(menu->submenus[sel]->callback_and_desc->desc);

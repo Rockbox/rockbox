@@ -90,6 +90,7 @@ struct menu_item_ex {
             int (*menu_callback)(int action, 
                                  const struct menu_item_ex *this_item);
             char *(*list_get_name)(int selected_item, void * data, char *buffer);
+            int (*list_speak_item)(int selected_item, void * data);
             void *list_get_name_data;
             int icon_id;
         } *menu_get_name_and_icon;
@@ -165,9 +166,9 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected);
          
 /* same as above, except the item name is dynamic */
 #define MENUITEM_RETURNVALUE_DYNTEXT(name, val, cb, text_callback,          \
-                                     text_cb_data, icon)                    \
+                                     voice_callback, text_cb_data, icon)    \
      static const struct menu_get_name_and_icon name##_                     \
-                                = {cb,text_callback,text_cb_data,icon};     \
+         = {cb,text_callback,voice_callback,text_cb_data,icon};             \
      static const struct menu_item_ex name   =                              \
         { MT_RETURN_VALUE|MENU_DYNAMIC_DESC, { .value = val},               \
         {.menu_get_name_and_icon = & name##_}};
@@ -187,10 +188,11 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected);
          { .function = & name##__}, {.callback_and_desc = & name##_}};
             
 /* As above, except the text is dynamic */
-#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, param,                    \
-                                  text_callback, text_cb_data, callback, icon) \
-    static const struct menu_get_name_and_icon name##_                         \
-                                = {callback,text_callback,text_cb_data,icon};  \
+#define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, param,                 \
+                                  text_callback, voice_callback,            \
+                                  text_cb_data, callback, icon)             \
+    static const struct menu_get_name_and_icon name##_                      \
+        = {callback,text_callback,voice_callback,text_cb_data,icon};        \
     static const struct menu_func name##__ = {{(void*)func}, param};           \
     static const struct menu_item_ex name   =                                  \
         { MT_FUNCTION_CALL|MENU_DYNAMIC_DESC|flags,                            \
