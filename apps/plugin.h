@@ -295,7 +295,7 @@ struct plugin_api {
 
     /* file */
     int (*PREFIX(open))(const char* pathname, int flags);
-    int (*close)(int fd);
+    int (*PREFIX(close))(int fd);
     ssize_t (*PREFIX(read))(int fd, void* buf, size_t count);
     off_t (*PREFIX(lseek))(int fd, off_t offset, int whence);
     int (*PREFIX(creat))(const char *pathname);

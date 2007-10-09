@@ -75,7 +75,7 @@ void dynamic_recompile (struct dynarec_block *newblock);
 #undef lseek
 #define lseek(a,b,c)    rb->sim_lseek((a),(b),(c))
 #undef close
-#define close(a)        rb->close((a))
+#define close(a)        rb->sim_close((a))
 #undef read
 #define read(a,b,c)     rb->sim_read((a),(b),(c))
 #undef write
