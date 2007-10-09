@@ -73,6 +73,7 @@ void i2s_reset(void)
 
 #if defined (IRIVER_H10) || defined (IRIVER_H10_5GB) || defined(IPOD_NANO) \
       || defined(IPOD_VIDEO) || defined(IPOD_MINI2G) \
+      || defined(IPOD_COLOR) || defined(IPOD_4G) \
       || defined (SANSA_C200) || defined (SANSA_E200)
     /* Nano works fine with IIS_FIFO_FORMAT_LE16 as well */
     IISCONFIG = ((IISCONFIG & ~IIS_FIFO_FORMAT_MASK) | IIS_FIFO_FORMAT_LE16_2);

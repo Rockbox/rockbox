@@ -31,7 +31,8 @@
    swapping. Try to use 32-bit packed in IIS modes if possible. */
 #if defined(SANSA_C200) || defined(SANSA_E200) \
     || defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(IPOD_NANO) \
-    || defined(IPOD_VIDEO) || defined(IPOD_MINI2G)
+    || defined(IPOD_VIDEO) || defined(IPOD_MINI2G) \
+    || defined(IPOD_COLOR) || defined(IPOD_4G)
 /* 16-bit, L-R packed into 32 bits with left in the least significant halfword */
 #define SAMPLE_SIZE   16
 #define TRANSFER_SIZE 32
