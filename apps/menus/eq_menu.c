@@ -118,6 +118,14 @@ char* gainitem_get_name(int selected_item, void * data, char *buffer)
     snprintf(buffer, MAX_PATH, str(LANG_EQUALIZER_GAIN_ITEM), *setting);
     return buffer;
 }
+int gainitem_speak_item(int selected_item, void * data)
+{
+    (void)selected_item;
+    int *setting = (int*)data;
+    talk_number(*setting, false);
+    talk_id(LANG_EQUALIZER_GAIN_ITEM, true);
+    return 0;
+}
 
 int do_option(void* param)
 {
@@ -145,21 +153,26 @@ MENUITEM_SETTING(gain_2, &global_settings.eq_band2_gain, dsp_set_coefs_callback)
 MENUITEM_SETTING(gain_3, &global_settings.eq_band3_gain, dsp_set_coefs_callback);
 MENUITEM_SETTING(gain_4, &global_settings.eq_band4_gain, dsp_set_coefs_callback);
 
-MENUITEM_FUNCTION_DYNTEXT(gain_item_0, MENU_FUNC_USEPARAM, do_option,
-    (void*)&gain_0, gainitem_get_name, NULL, &global_settings.eq_band0_cutoff,
-    NULL, Icon_NOICON);
-MENUITEM_FUNCTION_DYNTEXT(gain_item_1, MENU_FUNC_USEPARAM, do_option,
-    (void*)&gain_1, gainitem_get_name, NULL, &global_settings.eq_band1_cutoff,
-    NULL, Icon_NOICON);
-MENUITEM_FUNCTION_DYNTEXT(gain_item_2, MENU_FUNC_USEPARAM, do_option,
-    (void*)&gain_2, gainitem_get_name, NULL, &global_settings.eq_band2_cutoff,
-    NULL, Icon_NOICON);
-MENUITEM_FUNCTION_DYNTEXT(gain_item_3, MENU_FUNC_USEPARAM, do_option,
-    (void*)&gain_3, gainitem_get_name, NULL, &global_settings.eq_band3_cutoff,
-    NULL, Icon_NOICON);
-MENUITEM_FUNCTION_DYNTEXT(gain_item_4, MENU_FUNC_USEPARAM, do_option,
-    (void*)&gain_4, gainitem_get_name, NULL, &global_settings.eq_band4_cutoff,
-    NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(gain_item_0, MENU_FUNC_USEPARAM,
+                          do_option, (void*)&gain_0, 
+                          gainitem_get_name, gainitem_speak_item,
+                          &global_settings.eq_band0_cutoff, NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(gain_item_1, MENU_FUNC_USEPARAM,
+                          do_option, (void*)&gain_1,
+                          gainitem_get_name, gainitem_speak_item,
+                          &global_settings.eq_band1_cutoff, NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(gain_item_2, MENU_FUNC_USEPARAM,
+                          do_option, (void*)&gain_2,
+                          gainitem_get_name, gainitem_speak_item,
+                          &global_settings.eq_band2_cutoff, NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(gain_item_3, MENU_FUNC_USEPARAM,
+                          do_option, (void*)&gain_3,
+                          gainitem_get_name, gainitem_speak_item,
+                          &global_settings.eq_band3_cutoff, NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(gain_item_4, MENU_FUNC_USEPARAM,
+                          do_option, (void*)&gain_4,
+                          gainitem_get_name, gainitem_speak_item,
+                          &global_settings.eq_band4_cutoff, NULL, Icon_NOICON);
                                     
 MAKE_MENU(gain_menu, ID2P(LANG_EQUALIZER_GAIN), NULL, Icon_NOICON, &gain_item_0, 
             &gain_item_1, &gain_item_2, &gain_item_3, &gain_item_4);
@@ -175,6 +188,14 @@ char* centerband_get_name(int selected_item, void * data, char *buffer)
     int band = (intptr_t)data;
     snprintf(buffer, MAX_PATH, str(LANG_EQUALIZER_BAND_PEAK), band);
     return buffer;
+}
+int centerband_speak_item(int selected_item, void * data)
+{
+    (void)selected_item;
+    int band = (intptr_t)data;
+    talk_id(LANG_EQUALIZER_BAND_PEAK, false);
+    talk_number(band, true);
+    return 0;
 }
 int do_center_band_menu(void* param)
 {
@@ -196,14 +217,17 @@ int do_center_band_menu(void* param)
 MAKE_MENU(band_0_menu, ID2P(LANG_EQUALIZER_BAND_LOW_SHELF), NULL, 
             Icon_EQ, &cutoff_0, &q_0, &gain_0);
 MENUITEM_FUNCTION_DYNTEXT(band_1_menu, MENU_FUNC_USEPARAM,
-    do_center_band_menu, (void*)1,
-    centerband_get_name, NULL, (void*)1, NULL, Icon_EQ);
+                          do_center_band_menu, (void*)1,
+                          centerband_get_name, centerband_speak_item,
+                          (void*)1, NULL, Icon_EQ);
 MENUITEM_FUNCTION_DYNTEXT(band_2_menu, MENU_FUNC_USEPARAM, 
-    do_center_band_menu, (void*)2, 
-    centerband_get_name, NULL, (void*)2, NULL, Icon_EQ);
+                          do_center_band_menu, (void*)2, 
+                          centerband_get_name, centerband_speak_item,
+                          (void*)2, NULL, Icon_EQ);
 MENUITEM_FUNCTION_DYNTEXT(band_3_menu, MENU_FUNC_USEPARAM, 
-    do_center_band_menu, (void*)3, 
-    centerband_get_name, NULL, (void*)3, NULL, Icon_EQ);
+                          do_center_band_menu, (void*)3, 
+                          centerband_get_name, centerband_speak_item,
+                          (void*)3, NULL, Icon_EQ);
 MAKE_MENU(band_4_menu, ID2P(LANG_EQUALIZER_BAND_HIGH_SHELF), NULL, 
             Icon_EQ, &cutoff_4, &q_4, &gain_4);
 
@@ -594,12 +618,12 @@ static bool eq_save_preset(void)
         if (!kbd_input(filename, sizeof filename)) {
             fd = creat(filename);
             if (fd < 0)
-                gui_syncsplash(HZ, str(LANG_FAILED));
+                gui_syncsplash(HZ, ID2P(LANG_FAILED));
             else
                 break;
         }
         else {
-            gui_syncsplash(HZ, str(LANG_CANCEL));
+            gui_syncsplash(HZ, ID2P(LANG_CANCEL));
             return false;
         }
     }
@@ -618,7 +642,7 @@ static bool eq_save_preset(void)
 
     close(fd);
 
-    gui_syncsplash(HZ, str(LANG_SETTINGS_SAVED));
+    gui_syncsplash(HZ, ID2P(LANG_SETTINGS_SAVED));
 
     return true;
 }

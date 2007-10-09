@@ -1109,7 +1109,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "hertz band gain"
   </voice>
 </phrase>
 <phrase>
