@@ -63,7 +63,7 @@ struct dma_data
 #endif
     int locked;
     int state;
-} __attribute__((packed));
+};
 
 extern void *fiq_function;
 
