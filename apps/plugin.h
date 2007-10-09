@@ -636,7 +636,7 @@ struct plugin_api {
     void (*talk_disable_menus)(void);
     void (*talk_enable_menus)(void);
 
-    int (*button_available)(void);
+    int (*button_queue_count)(void);
 };
 
 /* plugin header */

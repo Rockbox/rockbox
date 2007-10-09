@@ -27,7 +27,7 @@
 extern struct event_queue button_queue;
 
 void button_init (void);
-int button_available(void);
+int button_queue_count(void);
 long button_get (bool block);
 long button_get_w_tmo(int ticks);
 intptr_t button_get_data(void);

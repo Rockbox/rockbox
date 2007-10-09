@@ -518,7 +518,7 @@ static const struct plugin_api rockbox_api = {
     talk_disable_menus,
     talk_enable_menus,
 
-    button_available,
+    button_queue_count,
 
 };
 

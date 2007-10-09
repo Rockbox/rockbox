@@ -110,7 +110,6 @@ FPS     | 27Mhz   | 100Hz          | 44.1KHz   | 48KHz
 #include "mpeg_settings.h"
 #include "video_out.h"
 #include "../../codecs/libmad/mad.h"
-#include "splash.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
@@ -649,10 +648,12 @@ static int get_next_data( Stream* str, uint8_t type )
             rb->splash( HZ*3, "missing packet start code prefix : %X%X at %lX",
                         *p, *(p+2), (long unsigned int)(p-disk_buf_start) );
 
+            /* not 64bit safe
             DEBUGF("end diff: %X,%X,%X,%X,%X,%X\n",(int)str->curr_packet_end,
                    (int)audio_str.curr_packet_end,(int)video_str.curr_packet_end,
                    (int)disk_buf_start,(int)disk_buf_end,(int)disk_buf_tail);
-
+            */
+            
             str->curr_packet_end = str->curr_packet = NULL;
             break;
         }
@@ -2035,7 +2036,7 @@ ssize_t seek_PTS( int in_file, int start_time, int accept_button )
                 if ( accept_button )
                 {
                     rb->yield();
-                    if (rb->button_available())
+                    if (rb->button_queue_count())
                       return -101;
                 }
 
@@ -2159,6 +2160,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (parameter == NULL)
     {
         api->splash(HZ*2, "No File");
+        return PLUGIN_ERROR;        
     }
 
     /* Initialize IRAM - stops audio and voice as well */

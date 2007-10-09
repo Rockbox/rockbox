@@ -293,7 +293,7 @@ static void button_boost(bool state)
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
-int button_available( void )
+int button_queue_count( void )
 {
     return queue_count(&button_queue);
 }

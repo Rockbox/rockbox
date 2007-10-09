@@ -736,7 +736,7 @@ void button_event(int key, bool pressed)
 
 /* Again copied from real button.c... */
 
-int button_available( void )
+int button_queue_count( void )
 {
     return queue_count(&button_queue);
 }

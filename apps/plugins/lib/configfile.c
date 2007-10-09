@@ -154,7 +154,7 @@ int configfile_get_value(const char* filename, const char* name)
     get_cfg_filename(buf, MAX_PATH, filename);
     fd = cfg_rb->open(buf, O_RDONLY);
     if(fd < 0)
-      return -1;
+        return -1;
 
     while(cfg_rb->read_line(fd, buf, MAX_PATH) > 0)
     {
@@ -172,43 +172,42 @@ int configfile_get_value(const char* filename, const char* name)
 
 int configfile_update_entry(const char* filename, const char* name, int val)
 {
-  int fd;
-  char *pname;
-  char *pval;
-  char path[MAX_PATH];
-  char buf[256];
-  int found = 0;
-  int line_len = 0;
-  int pos = 0;
-
-  /* open the current config file */
-  get_cfg_filename(path, MAX_PATH, filename);
-  fd = cfg_rb->open(path, O_RDWR);
-  if(fd < 0)
-    return -1;
-
-  /* read in the current stored settings */
-  while((line_len = cfg_rb->read_line(fd, buf, 256)) > 0)
-  {
-    cfg_rb->settings_parseline(buf, &pname, &pval);
-
-    if(!cfg_rb->strcmp(name, pname))
+    int fd;
+    char *pname;
+    char *pval;
+    char path[MAX_PATH];
+    char buf[256];
+    int found = 0;
+    int line_len = 0;
+    int pos = 0;
+    
+    /* open the current config file */
+    get_cfg_filename(path, MAX_PATH, filename);
+    fd = cfg_rb->open(path, O_RDWR);
+    if(fd < 0)
+        return -1;
+    
+    /* read in the current stored settings */
+    while((line_len = cfg_rb->read_line(fd, buf, 256)) > 0)
     {
-      found = 1;
-      cfg_rb->lseek(fd, pos, SEEK_SET);
-      /* pre-allocate 10 bytes for INT */
-      cfg_rb->fdprintf(fd, "%s: %10d\n", pname, val);
-      break;
+        cfg_rb->settings_parseline(buf, &pname, &pval);
+        if(!cfg_rb->strcmp(name, pname))
+        {
+            found = 1;
+            cfg_rb->lseek(fd, pos, SEEK_SET);
+            /* pre-allocate 10 bytes for INT */
+            cfg_rb->fdprintf(fd, "%s: %10d\n", pname, val);
+            break;
+        }
+        pos += line_len;
     }
-    pos += line_len;
-  }
-
-  /* if (name/val) is a new entry just append to file */
-  if (found == 0)
-    /* pre-allocate 10 bytes for INT */
-    cfg_rb->fdprintf(fd, "%s: %10d\n", name, val);
-
-  cfg_rb->close(fd);
-
-  return found;
+    
+    /* if (name/val) is a new entry just append to file */
+    if (found == 0)
+        /* pre-allocate 10 bytes for INT */
+        cfg_rb->fdprintf(fd, "%s: %10d\n", name, val);
+    
+    cfg_rb->close(fd);
+    
+    return found;
 }
