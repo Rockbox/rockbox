@@ -39,7 +39,7 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_TREBLE]        = {"dB", 1, 15, -60,  90,   0},
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  1,   0, 255, 100},
+    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
 };
 
 /* Flags used in combination with settings */

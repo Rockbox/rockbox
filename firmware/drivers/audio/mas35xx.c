@@ -35,7 +35,7 @@ const struct sound_settings_info audiohw_settings[] = {
 #endif
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  1,   0, 255, 100},
+    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     [SOUND_LOUDNESS]      = {"dB", 0,  1,   0,  17,   0},
     [SOUND_AVC]           = {"",   0,  1,  -1,   4,   0},

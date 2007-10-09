@@ -45,7 +45,7 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  1,   0, 255, 100},
+    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
 };
 
 /* convert tenth of dB volume (-730..60) to master volume register value */
