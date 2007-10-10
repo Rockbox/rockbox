@@ -2541,12 +2541,10 @@
     recording: ""
   </source>
   <dest>
-    *: none
-    recording: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    recording: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3080,15 +3078,15 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Regel aanwijzer"
+    lcd_bitmap: "Regelkiezer type"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Regel aanwijzer"
+    lcd_bitmap: "Regelkiezer type"
   </voice>
 </phrase>
 <phrase>
@@ -3889,13 +3887,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
-    *: "Toon ID3 info"
+    *: "Toon ID3 tags"
   </dest>
   <voice>
-    *: "Toon ID3 info"
+    *: "Toon ID3 tags"
   </voice>
 </phrase>
 <phrase>
@@ -4900,6 +4898,7 @@
     lcd_color: "RGB: %02X%02X%02X"
   </dest>
   <voice>
+    *: ""
     lcd_color: "RGB: %02X%02X%02X"
   </voice>
 </phrase>
@@ -7763,6 +7762,7 @@
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
+  user:
   <source>  
     *: none
     swcodec: "Cross Gain"
@@ -7779,6 +7779,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_ATTENUATION
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Attenuation"
@@ -7795,6 +7796,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_CUTOFF
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Cutoff"
@@ -7811,6 +7813,7 @@
 <phrase>
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
+  user:
   <source>
     *: "Database is not ready"
   </source>
@@ -8009,6 +8012,7 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Measure"
@@ -8025,6 +8029,7 @@
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "What to do when Splitting"
@@ -8041,6 +8046,7 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Time"
@@ -8057,6 +8063,7 @@
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -8824,6 +8831,7 @@
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -8967,6 +8975,7 @@
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: automatic gain control in record settings
+  user:
   <source>
     *: none
     agc: "Automatic Gain Control"
@@ -8983,6 +8992,7 @@
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -8999,6 +9009,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -9015,6 +9026,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -9031,6 +9043,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -9047,6 +9060,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -9063,6 +9077,7 @@
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
@@ -9079,6 +9094,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
+  user:
   <source>
     *: none
     agc: "AGC"
@@ -9126,6 +9142,7 @@
 <phrase>
   id: LANG_FM_REGION
   desc: fm tuner region setting
+  user:
   <source>
     *: none
     radio: "Region"
@@ -9142,6 +9159,7 @@
 <phrase>
   id: LANG_FM_EUROPE
   desc: fm tuner region europe
+  user:
   <source>
     *: none
     radio: "Europe"
@@ -9158,6 +9176,7 @@
 <phrase>
   id: LANG_FM_US
   desc: fm region us / canada
+  user:
   <source>
     *: none
     radio: "US / Canada"
@@ -9174,6 +9193,7 @@
 <phrase>
   id: LANG_FM_JAPAN
   desc: fm region japan
+  user:
   <source>
     *: none
     radio: "Japan"
@@ -9190,6 +9210,7 @@
 <phrase>
   id: LANG_FM_KOREA
   desc: fm region korea
+  user:
   <source>
     *: none
     radio: "Korea"
@@ -9206,6 +9227,7 @@
 <phrase>
   id: LANG_RANDOM
   desc: random folder
+  user:
   <source>
     *: "Random"
   </source>
@@ -9400,6 +9422,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_TYPE
   desc: in recording trigger menu
+  user:
   <source>
     *: none
     recording: "Trigtype"
@@ -9416,6 +9439,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "Stop"
@@ -9432,6 +9456,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "New file"
@@ -9493,6 +9518,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -9509,6 +9535,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -9525,6 +9552,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -9541,6 +9569,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -9557,6 +9586,7 @@
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -9573,6 +9603,7 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
@@ -11167,5 +11198,180 @@
   <voice>
     *: none
     usbstack: "Device Driver"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Eerste kleur"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Eerste kleur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user: 
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Regelkiezer kleuren"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Regelkiezer kleuren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Tekstkleur"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Tekstkleur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user: 
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Thema instellingen"
+  </dest>
+  <voice>
+    *: "Thema instellingen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Balk (gradient)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Balk (gradient)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Balk (vaste kleur)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Balk (vaste kleur)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user: 
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Kleuren"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Kleuren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Tweede kleur"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Tweede kleur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Centraal Europees (CP1250)"
+  </dest>
+  <voice>
+    *: "Centraal Europees"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Blanco"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Wijzig"
   </voice>
 </phrase>
