@@ -32,6 +32,8 @@
 #include "hangul.h"
 #include "action.h"
 #include "icon.h"
+#include "pcmbuf.h"
+#include "lang.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -188,14 +190,26 @@ int load_kbd(unsigned char* filename)
 /* helper function to spell a char if voice UI is enabled */
 static void kbd_spellchar(unsigned short c)
 {
-    static char spell_char[2] = "\0\0"; /* store char to pass to talk_spell */
-
-    if (talk_menus_enabled() && c < 128) /* voice UI? */
+    if (talk_menus_enabled()) /* voice UI? */
     {
-        spell_char[0] = (char)c;
-        talk_spell(spell_char, false);
+         unsigned char tmp[5];
+         /* store char to pass to talk_spell */
+         unsigned char* utf8 = utf8encode(c, tmp);
+         *utf8 = 0;
+
+         if(c == ' ')
+              talk_id(VOICE_BLANK, false);
+        else talk_spell(tmp, false);
     }
 }
+
+#ifdef KBD_MODES
+static void say_edit(void)
+{
+    if(talk_menus_enabled())
+        talk_id(VOICE_EDIT, false);
+}
+#endif
 
 static void kbd_inschar(unsigned char* text, int buflen,
                         int* editpos, unsigned short ch)
@@ -814,7 +828,8 @@ int kbd_input(char* text, int buflen)
                     {
                         int c = utf8seek(text, ++editpos);
                         kbd_spellchar(text[c]);
-                    }
+                    } else if(global_settings.beep)
+                        pcmbuf_beep(1000, 150, 1500*global_settings.beep);
                 }
                 else
 #endif /* KBD_MODES */
@@ -855,7 +870,8 @@ int kbd_input(char* text, int buflen)
                     {
                         int c = utf8seek(text, --editpos);
                         kbd_spellchar(text[c]);
-                    }
+                    } else if(global_settings.beep)
+                        pcmbuf_beep(1000, 150, 1500*global_settings.beep);
                 }
                 else
 #endif /* KBD_MODES */
@@ -884,7 +900,11 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MORSE_INPUT
 #ifdef KBD_MODES
                 if (morse_mode)
+                {
                     pm->line_edit = !pm->line_edit;
+                    if(pm->line_edit)
+                        say_edit();
+                }
                 else
 #else
                 if (morse_mode)
@@ -902,7 +922,10 @@ int kbd_input(char* text, int buflen)
 #endif
                     if (++pm->y >= pm->lines)
 #ifdef KBD_MODES
+                    {
                         pm->line_edit = true;   
+                        say_edit();
+                    }
 #else
                         pm->y = 0;
 #endif
@@ -920,7 +943,11 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MORSE_INPUT
 #ifdef KBD_MODES
                 if (morse_mode)
+                {
                     pm->line_edit = !pm->line_edit;
+                    if(pm->line_edit)
+                        say_edit();
+                }
                 else
 #else
                 if (morse_mode)
@@ -938,7 +965,10 @@ int kbd_input(char* text, int buflen)
 #endif
                     if (--pm->y < 0)
 #ifdef KBD_MODES
+                    {
                         pm->line_edit = true;
+                        say_edit();
+                    }
 #else
                         pm->y = pm->lines - 1;
 #endif
