@@ -941,7 +941,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "Hertz, Guadagno Banda"
   </voice>
 </phrase>
 <phrase>
@@ -2436,7 +2436,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Autoazionamento (non vocalizzato)"
+    recording: "Autoazionamento"
   </voice>
 </phrase>
 <phrase>
@@ -4305,7 +4305,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Una volta"
   </voice>
 </phrase>
 <phrase>
@@ -4322,7 +4322,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Livello Avvio"
   </voice>
 </phrase>
 <phrase>
@@ -4339,7 +4339,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Livello arresto"
   </voice>
 </phrase>
 <phrase>
@@ -4356,7 +4356,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Soglia di separazione"
   </voice>
 </phrase>
 <phrase>
@@ -4373,7 +4373,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "meno infinito"
   </voice>
 </phrase>
 <phrase>
@@ -9442,11 +9442,11 @@
   </source>
   <dest>
     *: none
-    recording: "Tipo azionamento"
+    recording: "Tipo Autoazionamento"
   </dest>
   <voice>
     *: none
-    recording: "Tipo azionamento"
+    recording: "Tipo autoazionamento"
   </voice>
 </phrase>
 <phrase>
@@ -10670,7 +10670,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "per almeno"
   </voice>
 </phrase>
 <phrase>
@@ -11342,5 +11342,33 @@
   <voice>
     *: none
     lcd_color: "Colori Selettore Linea"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Editazione"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Vuoto"
   </voice>
 </phrase>
