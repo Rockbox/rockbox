@@ -828,8 +828,8 @@ int kbd_input(char* text, int buflen)
                     {
                         int c = utf8seek(text, ++editpos);
                         kbd_spellchar(text[c]);
-                    } else if(global_settings.beep)
-                        pcmbuf_beep(1000, 150, 1500*global_settings.beep);
+                    } else if(talk_menus_enabled())
+                        pcmbuf_beep(1000, 150, 1500);
                 }
                 else
 #endif /* KBD_MODES */
@@ -870,8 +870,8 @@ int kbd_input(char* text, int buflen)
                     {
                         int c = utf8seek(text, --editpos);
                         kbd_spellchar(text[c]);
-                    } else if(global_settings.beep)
-                        pcmbuf_beep(1000, 150, 1500*global_settings.beep);
+                    } else if(talk_menus_enabled())
+                        pcmbuf_beep(1000, 150, 1500);
                 }
                 else
 #endif /* KBD_MODES */
