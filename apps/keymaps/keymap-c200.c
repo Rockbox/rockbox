@@ -211,22 +211,15 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 /** Recording Screen **/
 #ifdef HAVE_RECORDING
 static const struct button_mapping button_context_recscreen[]  = {
-    { ACTION_STD_MENU,          BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE  },
-    { ACTION_REC_PAUSE,         BUTTON_UP|BUTTON_REL,           BUTTON_UP    },
-    { ACTION_STD_CANCEL,        BUTTON_POWER|BUTTON_REL,        BUTTON_POWER },
-    { ACTION_REC_NEWFILE,       BUTTON_REC|BUTTON_REL,          BUTTON_REC   },
-    
-    { ACTION_SETTINGS_INC,      BUTTON_RIGHT,                   BUTTON_NONE  },
-    { ACTION_SETTINGS_INC,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE  },
-    
-    { ACTION_SETTINGS_DEC,      BUTTON_LEFT,                    BUTTON_NONE  },
-    { ACTION_SETTINGS_DEC,      BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE  },
-    
-    { ACTION_STD_PREV,          BUTTON_SCROLL_UP,               BUTTON_NONE  },
-    { ACTION_STD_PREV,          BUTTON_SCROLL_UP|BUTTON_REPEAT, BUTTON_NONE  },
-    
-    { ACTION_STD_NEXT,          BUTTON_SCROLL_DOWN,             BUTTON_NONE  },
-    { ACTION_STD_NEXT,          BUTTON_SCROLL_DOWN|BUTTON_REPEAT,BUTTON_NONE },
+    { ACTION_STD_MENU,          BUTTON_POWER|BUTTON_REL,        BUTTON_POWER  },
+    { ACTION_REC_PAUSE,         BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },
+    { ACTION_STD_CANCEL,        BUTTON_POWER|BUTTON_REPEAT,     BUTTON_NONE   },
+    { ACTION_REC_NEWFILE,       BUTTON_REC|BUTTON_REL,          BUTTON_REC    },
+
+    { ACTION_SETTINGS_INC,      BUTTON_RIGHT,                   BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,      BUTTON_LEFT,                    BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
@@ -239,7 +232,7 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_PRESET,         BUTTON_SELECT,                  BUTTON_NONE },
     { ACTION_FM_STOP,           BUTTON_UP|BUTTON_REPEAT,        BUTTON_UP   },
     { ACTION_FM_MODE,           BUTTON_REC,                     BUTTON_NONE },
-    { ACTION_FM_EXIT,           BUTTON_POWER,                   BUTTON_NONE },
+    { ACTION_FM_EXIT,           BUTTON_POWER|BUTTON_REL,        BUTTON_POWER },
     { ACTION_FM_PLAY,           BUTTON_UP|BUTTON_REL,           BUTTON_UP   },
     { ACTION_SETTINGS_INC,      BUTTON_VOL_UP,                  BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE },

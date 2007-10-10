@@ -10,7 +10,7 @@
 #define HW_SAMPR_CAPS       (SAMPR_CAP_44)
 
 /* define this if you have recording possibility */
-/* TODO: #define HAVE_RECORDING */
+#define HAVE_RECORDING
 
 #define REC_SAMPR_CAPS      (SAMPR_CAP_22)
 #define REC_FREQ_DEFAULT    REC_FREQ_22 /* Default is not 44.1kHz */
