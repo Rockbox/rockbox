@@ -6310,7 +6310,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Once"
   </voice>
 </phrase>
 <phrase>
@@ -6326,7 +6326,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Trigtype"
+    recording: "Trigger type"
   </voice>
 </phrase>
 <phrase>
@@ -6375,7 +6375,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Start Above"
   </voice>
 </phrase>
 <phrase>
@@ -6392,7 +6392,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "for at least"
   </voice>
 </phrase>
 <phrase>
@@ -6409,7 +6409,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Stop Below"
   </voice>
 </phrase>
 <phrase>
@@ -6426,7 +6426,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Presplit Gap"
   </voice>
 </phrase>
 <phrase>
@@ -8354,7 +8354,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "minus infinity"
   </voice>
 </phrase>
 <phrase>

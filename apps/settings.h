@@ -39,6 +39,11 @@
 #include "backlight.h" /* for [MIN|MAX]_BRIGHTNESS_SETTING */
 #endif
 
+struct opt_items {
+    unsigned const char* string;
+    long voice_id;
+};
+
 /** Setting values defines **/
 
 /* name of directory where configuration, fonts and other data
@@ -103,7 +108,7 @@
 #define TRIG_MODE_REARM 2
 
 #define TRIG_DURATION_COUNT 13
-extern const char * const trig_durations[TRIG_DURATION_COUNT];
+extern const struct opt_items trig_durations[TRIG_DURATION_COUNT];
 
 #define CROSSFADE_ENABLE_SHUFFLE                1
 #define CROSSFADE_ENABLE_TRACKSKIP              2
@@ -255,10 +260,6 @@ void settings_display(void);
 
 enum optiontype { INT, BOOL };
 
-struct opt_items {
-    unsigned const char* string;
-    long voice_id;
-};
 const struct settings_list* find_setting(void* variable, int *id);
 bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len);
 void talk_setting(void *global_settings_variable);

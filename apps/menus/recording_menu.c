@@ -381,17 +381,23 @@ enum trigger_menu_option
     TRIG_OPTION_COUNT,
 };
 
-static char* create_thres_str(int threshold)
+static char* create_thres_str(int threshold, long *voice_id)
 {
     static char retval[6];
     if (threshold < 0) {
         if (threshold < -88) {
             snprintf (retval, sizeof retval, "%s", str(LANG_DB_INF));
+            if(voice_id)
+                *voice_id = LANG_DB_INF;
         } else {
             snprintf (retval, sizeof retval, "%ddb", threshold + 1);
+            if(voice_id)
+                *voice_id = TALK_ID(threshold + 1, UNIT_DB);
         }
     } else {
         snprintf (retval, sizeof retval, "%d%%", threshold);
+        if(voice_id)
+            *voice_id = TALK_ID(threshold, UNIT_PERCENT);
     }
     return retval;
 }
@@ -442,11 +448,13 @@ bool rectrigger(void)
     };
 
 #define PRERECORD_TIMES_COUNT 31
-    static const unsigned char *prerecord_times[] = {
-        ID2P(LANG_OFF),"1s","2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
-        "10s", "11s", "12s", "13s", "14s", "15s", "16s", "17s", "18s", "19s",
-        "20s", "21s", "22s", "23s", "24s", "25s", "26s", "27s", "28s", "29s",
-        "30s"
+    static const struct opt_items prerecord_times[] = {
+        { STR(LANG_OFF) },
+#define T(x) { (unsigned char *)(#x "s"), TALK_ID(x, UNIT_SEC) }
+        T(1), T(2), T(3), T(4), T(5), T(6), T(7), T(8), T(9), T(10),
+        T(11), T(12), T(13), T(14), T(15), T(16), T(17), T(18), T(19), T(20),
+        T(21), T(22), T(23), T(24), T(25), T(26), T(27), T(28), T(29), T(30),
+#undef T
     };
 
 #define TRIGGER_TYPE_COUNT 3
@@ -485,6 +493,8 @@ bool rectrigger(void)
     int trig_xpos[NB_SCREENS];
     int trig_ypos[NB_SCREENS];
     int trig_width[NB_SCREENS];
+
+    bool say_field = true, say_value = true;
 
     FOR_NB_SCREENS(i)
     {
@@ -535,23 +545,17 @@ bool rectrigger(void)
             "%s",
             P2STR(trigger_types[global_settings.rec_trigger_type]));
 
-        snprintf(
-            option_value[TRIGGER_TYPE],
-            sizeof option_value[TRIGGER_TYPE],
-            "%s",
-            P2STR(trigger_types[global_settings.rec_trigger_type]));
-
         snprintf (
             option_value[PRERECORD_TIME],
             sizeof option_value[PRERECORD_TIME],
             "%s",
-            P2STR(prerecord_times[global_settings.rec_prerecord_time]));
+            prerecord_times[global_settings.rec_prerecord_time].string);
 
         /* due to value range shift (peak_meter_define_trigger) -1 is 0db */
         if (global_settings.rec_start_thres == -1) {
             str = str(LANG_OFF);
         } else {
-            str = create_thres_str(global_settings.rec_start_thres);
+            str = create_thres_str(global_settings.rec_start_thres, NULL);
         }
         snprintf(
             option_value[START_THRESHOLD],
@@ -563,13 +567,12 @@ bool rectrigger(void)
             option_value[START_DURATION],
             sizeof option_value[START_DURATION],
             "%s",
-            trig_durations[global_settings.rec_start_duration]);
-
+            trig_durations[global_settings.rec_start_duration].string);
 
         if (global_settings.rec_stop_thres <= INF_DB) {
             str = str(LANG_OFF);
         } else {
-            str = create_thres_str(global_settings.rec_stop_thres);
+            str = create_thres_str(global_settings.rec_stop_thres, NULL);
         }
         snprintf(
             option_value[STOP_THRESHOLD],
@@ -581,13 +584,13 @@ bool rectrigger(void)
             option_value[STOP_POSTREC],
             sizeof option_value[STOP_POSTREC],
             "%s",
-            trig_durations[global_settings.rec_stop_postrec]);
+            trig_durations[global_settings.rec_stop_postrec].string);
 
         snprintf(
             option_value[STOP_GAP],
             sizeof option_value[STOP_GAP],
             "%s",
-            trig_durations[global_settings.rec_stop_gap]);
+            trig_durations[global_settings.rec_stop_gap].string);
 
         FOR_NB_SCREENS(i)
         {
@@ -629,6 +632,52 @@ bool rectrigger(void)
                     VERTICAL);
         }
 
+        bool enqueue = false;
+        if(say_field) {
+            talk_id(P2ID(option_name[selected]), enqueue);
+            enqueue = true;
+        }
+        if(say_value) {
+            long id;
+            switch(selected) {
+            case TRIGGER_MODE:
+                id = P2ID(trigger_modes[global_settings.rec_trigger_mode]);
+                break;
+            case TRIGGER_TYPE:
+                id = P2ID(trigger_types[global_settings.rec_trigger_type]);
+                break;
+            case PRERECORD_TIME:
+                id = prerecord_times[global_settings.rec_prerecord_time]
+                    .voice_id;
+                break;
+            case START_THRESHOLD:
+                if (global_settings.rec_start_thres == -1)
+                    id = LANG_OFF;
+                else create_thres_str(global_settings.rec_start_thres, &id);
+                break;
+            case START_DURATION:
+                id = trig_durations[global_settings.rec_start_duration]
+                    .voice_id;
+                break;
+            case STOP_THRESHOLD:
+                if (global_settings.rec_stop_thres <= INF_DB)
+                    id = LANG_OFF;
+                else create_thres_str(global_settings.rec_stop_thres, &id);
+                break;
+            case STOP_POSTREC:
+                id = trig_durations[global_settings.rec_stop_postrec].voice_id;
+                break;
+            case STOP_GAP:
+                id = trig_durations[global_settings.rec_stop_gap].voice_id;
+                break;
+            case TRIG_OPTION_COUNT:
+                // avoid compiler warnings
+                break;
+            };
+            talk_id(id, enqueue);
+        }
+        say_field = say_value = false;
+
         peak_meter_draw_trig(trig_xpos, trig_ypos, trig_width, NB_SCREENS);
         button = peak_meter_draw_get_btn(0, pm_y, 8, NB_SCREENS);
 
@@ -661,6 +710,7 @@ bool rectrigger(void)
                     offset[i] = MIN(offset[i], (int)selected);
                     offset[i] = MAX(offset[i], (int)selected - option_lines[i] + 1);
                 }
+                say_field = say_value = true;
                 break;
 
             case ACTION_STD_NEXT:
@@ -671,6 +721,7 @@ bool rectrigger(void)
                     offset[i] = MIN(offset[i], (int)selected);
                     offset[i] = MAX(offset[i], (int)selected - option_lines[i] + 1);
                 }
+                say_field = say_value = true;
                 break;
 
             case ACTION_SETTINGS_INC:
@@ -719,6 +770,7 @@ bool rectrigger(void)
                 }
                 peak_meter_trigger(global_settings.rec_trigger_mode!=TRIG_OFF);
                 settings_apply_trigger();
+                say_value = true;
                 break;
 
             case ACTION_SETTINGS_DEC:
@@ -770,6 +822,7 @@ bool rectrigger(void)
                 }
                 peak_meter_trigger(global_settings.rec_trigger_mode!=TRIG_OFF);
                 settings_apply_trigger();
+                say_value = true;
                 break;
 
             case ACTION_REC_F2:

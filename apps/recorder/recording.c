@@ -123,11 +123,15 @@ static unsigned long rec_sizesplit_bytes(void)
  * Time strings used for the trigger durations.
  * Keep synchronous to trigger_times in settings_apply_trigger
  */
-const char * const trig_durations[TRIG_DURATION_COUNT] =
+const struct opt_items trig_durations[TRIG_DURATION_COUNT] =
 {
-    "0s", "1s", "2s", "5s",
-    "10s", "15s", "20s", "25s", "30s",
-    "1min", "2min", "5min", "10min"
+#define TS(x) { (unsigned char *)(#x "s"), TALK_ID(x, UNIT_SEC) }
+#define TM(x) { (unsigned char *)(#x "min"), TALK_ID(x, UNIT_MIN) }
+    TS(0), TS(1), TS(2), TS(5),
+    TS(10), TS(15), TS(20), TS(25), TS(30),
+    TM(1), TM(2), TM(5), TM(10)
+#undef TS
+#undef TM
 };
 
 void settings_apply_trigger(void)
