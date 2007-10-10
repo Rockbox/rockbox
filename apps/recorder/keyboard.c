@@ -58,7 +58,8 @@
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted Ondio keypad */
 #define KBD_MODES /* Ondio uses 2 modes, picker and line edit */
 
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+   || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define KBD_MODES /* iPod uses 2 modes, picker and line edit */
 #define KBD_MORSE_INPUT
 
@@ -199,7 +200,7 @@ static void kbd_spellchar(unsigned short c)
 
         if(c == ' ')
             talk_id(VOICE_BLANK, false);
-        else 
+        else
             talk_spell(tmp, false);
     }
 }
@@ -1164,6 +1165,10 @@ int kbd_input(char* text, int buflen)
                     int c = utf8seek(text, ++editpos);
                     kbd_spellchar(text[c]);
                 }
+#if CONFIG_CODEC == SWCODEC
+                else if (talk_menus_enabled())
+                    pcmbuf_beep(1000, 150, 1500);
+#endif
                 break;
 
             case ACTION_KBD_CURSOR_LEFT:
@@ -1174,6 +1179,10 @@ int kbd_input(char* text, int buflen)
                     int c = utf8seek(text, --editpos);
                     kbd_spellchar(text[c]);
                 }
+#if CONFIG_CODEC == SWCODEC
+                else if (talk_menus_enabled())
+                    pcmbuf_beep(1000, 150, 1500);
+#endif
                 break;
 #endif /* !defined (KBD_MODES) || defined (KBD_CURSOR_KEYS) */
 
