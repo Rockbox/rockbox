@@ -257,8 +257,7 @@ static bool on_end_file(struct enc_file_event_data *data)
 
     uint32_t data_size;
 
-    if (!is_file_data_ok(data))
-        return false;
+    /* always _try_ to write the file header, even on error */
 
     /* read template headers at start */
     if (ci->lseek(data->rec_file, 0, SEEK_SET) != 0 ||

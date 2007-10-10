@@ -2084,6 +2084,8 @@ long fat_readwrite( struct fat_file *file, long sectorcount,
         numsec++;
         if ( numsec > (long)fat_bpb->bpb_secperclus || !cluster ) {
             long oldcluster = cluster;
+            long oldsector = sector;
+            long oldnumsec = numsec;
             if (write)
                 cluster = next_write_cluster(file, cluster, &sector);
             else {
@@ -2099,7 +2101,9 @@ long fat_readwrite( struct fat_file *file, long sectorcount,
                 if ( write ) {
                     /* remember last cluster, in case 
                        we want to append to the file */
+                    sector = oldsector;
                     cluster = oldcluster;
+                    numsec = oldnumsec;
                     clusternum--;
                     i = -1; /* Error code */
                     break;

@@ -901,7 +901,10 @@ static void pcmrec_flush(unsigned flush_num)
         INC_ENC_INDEX(enc_rd_index);
 
         if (errors != 0)
+        {
+            pcmrec_end_file();
             break;
+        }
 
         if (flush_num == PCMREC_FLUSH_MINI &&
                 ++chunks_flushed >= MINI_CHUNKS)

@@ -278,14 +278,22 @@ int fsync(int fd)
         if ( file->dirty ) {
             rc = flush_cache(fd);
             if (rc < 0)
+            {
+                /* when failing, try to close the file anyway */
+                fat_closewrite(&(file->fatfile), file->size, file->attr);
                 return rc * 10 - 3;
+            }
         }
 
         /* truncate? */
         if (file->trunc) {
             rc = ftruncate(fd, file->size);
             if (rc < 0)
+            {
+                /* when failing, try to close the file anyway */
+                fat_closewrite(&(file->fatfile), file->size, file->attr);
                 return rc * 10 - 4;
+            }
         }
 
         /* tie up all loose ends */
@@ -475,6 +483,10 @@ static int readwrite(int fd, void* buf, long count, bool write)
     struct filedesc* file = &openfiles[fd];
     int rc;
 
+    if (fd < 0 || fd > MAX_OPEN_FILES-1) {
+        errno = EINVAL;
+        return -1;
+    }
     if ( !file->busy ) {
         errno = EBADF;
         return -1;
@@ -643,6 +655,10 @@ off_t lseek(int fd, off_t offset, int whence)
 
     LDEBUGF("lseek(%d,%ld,%d)\n",fd,offset,whence);
 
+    if (fd < 0 || fd > MAX_OPEN_FILES-1) {
+        errno = EINVAL;
+        return -1;
+    }
     if ( !file->busy ) {
         errno = EBADF;
         return -1;
@@ -716,6 +732,10 @@ off_t filesize(int fd)
 {
     struct filedesc* file = &openfiles[fd];
 
+    if (fd < 0 || fd > MAX_OPEN_FILES-1) {
+        errno = EINVAL;
+        return -1;
+    }
     if ( !file->busy ) {
         errno = EBADF;
         return -1;
@@ -743,3 +763,4 @@ int release_files(int volume)
     return closed; /* return how many we did */
 }
 #endif /* #ifdef HAVE_HOTSWAP */
+

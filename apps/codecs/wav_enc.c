@@ -144,8 +144,7 @@ static bool on_end_file(struct enc_file_event_data *data)
     struct riff_header hdr;
     uint32_t data_size;
 
-    if (!is_file_data_ok(data))
-        return false;
+    /* always _try_ to write the file header, even on error */
 
     if (ci->lseek(data->rec_file, 0, SEEK_SET) != 0 ||
         ci->read(data->rec_file, &hdr, sizeof (hdr)) != sizeof (hdr))
@@ -387,7 +386,7 @@ enum codec_status codec_main(void)
 
     /* reset parameters to initial state */
     ci->enc_set_parameters(NULL);
- 
+
     /* main application waits for this flag during encoder removing */
     ci->enc_codec_loaded = 0;
 
