@@ -154,6 +154,16 @@ void setoptions (void)
         options.START=BUTTON_SCROLL_UP;
         options.SELECT=BUTTON_SCROLL_DOWN;
         options.MENU=BUTTON_POWER;
+        
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_SELECT;
+        options.B=BUTTON_REC;
+        options.START=BUTTON_VOL_DOWN;
+        options.SELECT=BUTTON_VOL_UP;
+        options.MENU=BUTTON_POWER;
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
         options.UP=BUTTON_UP;
