@@ -76,14 +76,15 @@ static void kbd_spellchar(char c)
 {
     if (talk_menus_enabled()) /* voice UI? */
     {
-         unsigned char tmp[5];
-         /* store char to pass to talk_spell */
-         unsigned char* utf8 = utf8encode(c, tmp);
-         *utf8 = 0;
+        unsigned char tmp[5];
+        /* store char to pass to talk_spell */
+        unsigned char* utf8 = utf8encode(c, tmp);
+        *utf8 = 0;
 
-         if(c == ' ')
-              talk_id(VOICE_BLANK, false);
-        else talk_spell(tmp, false);
+        if(c == ' ')
+            talk_id(VOICE_BLANK, false);
+        else
+            talk_spell(tmp, false);
     }
 }
 
