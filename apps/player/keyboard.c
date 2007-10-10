@@ -28,6 +28,7 @@
 #include "talk.h"
 #include "misc.h"
 #include "rbunicode.h"
+#include "lang.h"
 
 #define KBD_BUF_SIZE  64
 #define KEYBOARD_PAGES 3
@@ -73,13 +74,23 @@ static unsigned short *kbd_setupkeys(int page, int* len)
 /* helper function to spell a char if voice UI is enabled */
 static void kbd_spellchar(char c)
 {
-    static char spell_char[2] = "\0\0"; /* store char to pass to talk_spell */
-
     if (talk_menus_enabled()) /* voice UI? */
     {
-        spell_char[0] = c; 
-        talk_spell(spell_char, false);
+         unsigned char tmp[5];
+         /* store char to pass to talk_spell */
+         unsigned char* utf8 = utf8encode(c, tmp);
+         *utf8 = 0;
+
+         if(c == ' ')
+              talk_id(VOICE_BLANK, false);
+        else talk_spell(tmp, false);
     }
+}
+
+static void say_edit(void)
+{
+    if (talk_menus_enabled())
+        talk_id(VOICE_EDIT, false);
 }
 
 int kbd_input(char* text, int buflen)
@@ -184,7 +195,9 @@ int kbd_input(char* text, int buflen)
 
             case BUTTON_ON:    /* toggle mode */
                 line_edit = !line_edit;
-                if (!line_edit)
+                if (line_edit)
+                    say_edit();
+                else
                     kbd_spellchar(line[x]);
                 break;
 
