@@ -78,6 +78,7 @@ bool talk_menus_enabled(void); /* returns true if menus should be voiced */
 void talk_disable_menus(void); /* disable voice menus (temporarily, not persisted) */
 void talk_enable_menus(void); /* re-enable voice menus */
 int do_shutup(void); /* kill voice unconditionally */
+int shutup(void); /* Interrupt voice, as when enqueue is false */
 
 #if CONFIG_RTC
 /* this is in talk.c which isnt compiled for hwcodec simulator */
@@ -98,6 +99,7 @@ void talk_date_time(struct tm *time, bool speak_current_time_string);
 #define talk_ids(...)
 #define cond_talk_ids(...)
 #define cond_talk_ids_fq(...)
+#define shutup(...)
 #else
 
 /* Enqueue next utterance even if enqueue parameter is false: don't
