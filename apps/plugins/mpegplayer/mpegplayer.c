@@ -2229,7 +2229,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     PLUGIN_IRAM_INIT(api)
 
     rb = api;
-    rb->splash(0, "loading ...");
+    rb->splash(0, "Loading...");
 
     /* sets audiosize and returns buffer pointer */
     audiobuf = rb->plugin_get_audio_buffer(&audiosize);
@@ -2333,7 +2333,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     else if ( start_time > (end_pts_time-start_pts_time) )
         start_time = (end_pts_time-start_pts_time);
     
-    rb->splash(0, "loading ...");
+    rb->splash(0, "Loading...");
     
     /* seek start time */
     seek_pos = seek_PTS( in_file, start_time, 0 );

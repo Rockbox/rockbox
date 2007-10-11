@@ -258,7 +258,7 @@ int get_start_time(int play_time, int in_file)
             rb->lcd_update();
 #ifdef HAVE_LCD_COLOR
             if (resume_time > 0)
-                rb->splash(0, "loading ...");
+                rb->splash(0, "Loading...");
 #endif
             slider_state = state1;
             break;
