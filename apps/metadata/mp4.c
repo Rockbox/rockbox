@@ -402,17 +402,21 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
 
         case MP4_cday:
             read_mp4_tag_string(fd, size, &buffer, &buffer_left,
-                &id3->year_string);
+                                &id3->year_string);
  
             /* Try to parse it as a year, for the benefit of the database.
              */
-            id3->year = atoi(id3->year_string);
-
-            if (id3->year < 1900)
+            if(id3->year_string)
             {
-                id3->year = 0;
+                id3->year = atoi(id3->year_string);
+                if (id3->year < 1900)
+                {
+                    id3->year = 0;
+                }
             }
-            
+            else
+                id3->year = 0;
+
             break;
 
         case MP4_gnre:
