@@ -139,12 +139,11 @@ LCD_RGBPACK(19,10,26) };
 
 #endif
 
-static const struct opt_items autofire_delay_settings[16] = {
+static const struct opt_items autofire_delay_settings[15] = {
     { "Off",   NULL },
     { "50ms",  NULL },
     { "100ms", NULL },
     { "200ms", NULL },
-    { "300ms", NULL },
     { "300ms", NULL },
     { "400ms", NULL },
     { "500ms", NULL },
@@ -158,7 +157,7 @@ static const struct opt_items autofire_delay_settings[16] = {
     { "4s",    NULL }
 };
 
-int autofire_delay_values[16] = {
+int autofire_delay_values[15] = {
     0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400 };
 
 static const struct opt_items particle_settings[8] = {
@@ -334,7 +333,7 @@ void fireworks_menu(void)
                 break;
 
             case 1:
-                rb->set_option("Auto-Fire", &autofire_delay, INT, autofire_delay_settings, 16, NULL);
+                rb->set_option("Auto-Fire", &autofire_delay, INT, autofire_delay_settings, 15, NULL);
                 break;
 
             case 2:
