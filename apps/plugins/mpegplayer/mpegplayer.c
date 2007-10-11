@@ -380,8 +380,11 @@ static int video_thumb_print IBSS_ATTR; /* If 1, the video thread is
                                            only decoding one frame for
                                            use in the menu.  If 0,
                                            normal operation */
-static int play_time IBSS_ATTR; /* The movie time as represented by
+static int end_pts_time IBSS_ATTR; /* The movie end time as represented by
                                    the maximum audio PTS tag in the
+                                   stream converted to half minutes */
+static int start_pts_time IBSS_ATTR; /* The movie start time as represented by
+                                   the first audio PTS tag in the
                                    stream converted to half minutes */
 char *filename;                 /* hack for resume time storage */
 
@@ -1116,7 +1119,8 @@ static int button_loop(void)
             rb->lcd_setfont(FONT_SYSFIXED);
 
             if (result) {
-                settings.resume_time = (int)(get_stream_time()/44100/30);
+                settings.resume_time = (int)(get_stream_time()/44100/
+                                             30-start_pts_time);
                 str_send_msg(&video_str, STREAM_QUIT, 0);
                 audio_str.status = STREAM_STOPPED;
             } else {
@@ -1127,12 +1131,16 @@ static int button_loop(void)
             break;
 
         case MPEG_STOP:
-            settings.resume_time = (int)(get_stream_time()/44100/30);
+            settings.resume_time = (int)(get_stream_time()/44100/
+                                         30-start_pts_time);
             str_send_msg(&video_str, STREAM_QUIT, 0);
             audio_str.status = STREAM_STOPPED;
             break;
 
         case MPEG_PAUSE:
+            settings.resume_time = (int)(get_stream_time()/44100/
+                                         30-start_pts_time);
+            save_settings();
             str_send_msg(&video_str, STREAM_PAUSE, 0);
             audio_str.status = STREAM_PAUSED;
             pcm_playback_play_pause(false);
@@ -1937,13 +1945,59 @@ void display_thumb(int in_file)
       rb->splash(0, "frame not available");
 }
 
-int find_length( int in_file )
+int find_start_pts( int in_file )
 {
     uint8_t *p;
     size_t read_length = 60*1024;
     size_t disk_buf_len;
   
-    play_time = 0;
+    start_pts_time = 0;
+
+    /* temporary read buffer size cannot exceed buffer size */
+    if ( read_length > disk_buf_size )
+        read_length = disk_buf_size;
+  
+    /* read tail of file */
+    rb->lseek( in_file, 0, SEEK_SET );
+    disk_buf_len = rb->read( in_file, disk_buf_start, read_length );
+    disk_buf_tail = disk_buf_start + disk_buf_len;
+  
+    /* sync reader to this segment of the stream */
+    p=disk_buf_start;
+    if (sync_data_stream(&p))
+    {
+        DEBUGF("Could not sync stream\n");
+        return PLUGIN_ERROR;
+    }
+  
+    /* find first PTS in audio stream. if the PTS can not be determined, 
+       set start_pts_time to 0 */
+    audio_sync_start = 0;
+    audio_sync_time = 0;
+    video_sync_start = 0;
+    {
+        Stream tmp;
+        initialize_stream(&tmp,p,disk_buf_len-(disk_buf_start-p),0xc0);
+        int count=0;
+        do
+        {
+            count++;
+            get_next_data(&tmp, 2);
+        }
+        while (tmp.tagged != 1 && count < 30);
+        if (tmp.tagged == 1)
+            start_pts_time = (int)((tmp.curr_pts/45000)/30);
+    } 
+    return 0;
+}
+
+int find_end_pts( int in_file )
+{
+    uint8_t *p;
+    size_t read_length = 60*1024;
+    size_t disk_buf_len;
+  
+    end_pts_time = 0;
 
     /* temporary read buffer size cannot exceed buffer size */
     if ( read_length > disk_buf_size )
@@ -1963,7 +2017,7 @@ int find_length( int in_file )
     }
   
     /* find last PTS in audio stream; will movie always have audio? if
-       the play time can not be determined, set play_time to 0 */
+       the play time can not be determined, set end_pts_time to 0 */
     audio_sync_start = 0;
     audio_sync_time = 0;
     video_sync_start = 0;
@@ -1976,7 +2030,7 @@ int find_length( int in_file )
             get_next_data(&tmp, 2);
             if (tmp.tagged == 1)
                 /* 10 sec less to insure the video frame exist */
-                play_time = (int)((tmp.curr_pts/45000-10)/30);
+                end_pts_time = (int)((tmp.curr_pts/45000-10)/30);
         }
         while (tmp.curr_packet_end != NULL);
     } 
@@ -2003,8 +2057,10 @@ ssize_t seek_PTS( int in_file, int start_time, int accept_button )
     }
     else if ( start_time != 0 )
     {
-        seek_pos = rb->filesize(in_file)*start_time/play_time;
-        int seek_pos_sec_inc = rb->filesize(in_file)/play_time/30;
+        seek_pos = rb->filesize(in_file)*start_time/
+          (end_pts_time-start_pts_time);
+        int seek_pos_sec_inc = rb->filesize(in_file)/
+          (end_pts_time-start_pts_time)/30;
         
         if (seek_pos<0)
             seek_pos=0;
@@ -2058,9 +2114,11 @@ ssize_t seek_PTS( int in_file, int start_time, int accept_button )
                 }
                   
                 /* are we after start_time in the stream? */
-                if ( coarse_seek && (int)(tmp.curr_pts/45000) >= start_time*30 )
+                if ( coarse_seek && (int)(tmp.curr_pts/45000) >= 
+                     (start_time+start_pts_time)*30 )
                 {
-                    int time_to_backup = (int)(tmp.curr_pts/45000) - start_time*30;
+                    int time_to_backup = (int)(tmp.curr_pts/45000) - 
+                      (start_time+start_pts_time)*30;
                     if (time_to_backup == 0)
                         time_to_backup++;
                     seek_pos -= seek_pos_sec_inc * time_to_backup;
@@ -2085,9 +2143,11 @@ ssize_t seek_PTS( int in_file, int start_time, int accept_button )
                 }
           
                 /* are we well before start_time in the stream? */
-                if ( coarse_seek && start_time*30 - (int)(tmp.curr_pts/45000) > 2 )
+                if ( coarse_seek && (start_time+start_pts_time)*30 - 
+                     (int)(tmp.curr_pts/45000) > 2 )
                 {
-                    int time_to_advance = start_time*30 - (int)(tmp.curr_pts/45000) - 2;
+                    int time_to_advance = (start_time+start_pts_time)*30 - 
+                      (int)(tmp.curr_pts/45000) - 2;
                     if (time_to_advance <= 0)
                         time_to_advance = 1;
                     seek_pos += seek_pos_sec_inc * time_to_advance;
@@ -2113,14 +2173,16 @@ ssize_t seek_PTS( int in_file, int start_time, int accept_button )
                 coarse_seek = 0;
           
                 /* are we at start_time in the stream? */
-                if ( (int)(tmp.curr_pts/45000) >= start_time*30 )
+                if ( (int)(tmp.curr_pts/45000) >= (start_time+start_pts_time)*
+                     30 )
                     cont_seek_loop = 0;
                 
             } 
             while ( cont_seek_loop );
         
         
-            DEBUGF("start diff: %u %u\n",(unsigned int)(tmp.curr_pts/45000),start_time*30);
+            DEBUGF("start diff: %u %u\n",(unsigned int)(tmp.curr_pts/45000),
+                   (start_time+start_pts_time)*30);
             seek_pos+=tmp.curr_packet_end-disk_buf_start;
             
             last_seek_pos = seek_pos;
@@ -2257,18 +2319,19 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     disk_buf_end = disk_buf_start + disk_buf_size-MPEG_GUARDBUF_SIZE;
 
-    /* initalize play_time with the length (in half minutes) of the movie
-         zero if the time could not be determined */
-    find_length( in_file );
+    /* initalize start_pts_time and end_pts_time with the length (in half 
+       minutes) of the movie. zero if the time could not be determined */
+    find_start_pts( in_file );
+    find_end_pts( in_file );
     
     /* start menu */
-    start_time = mpeg_start_menu(play_time, in_file);
+    start_time = mpeg_start_menu(end_pts_time-start_pts_time, in_file);
     if ( start_time == -1 )
         return 0;
     else if ( start_time < 0 )
         start_time = 0;
-    else if ( start_time > play_time )
-        start_time = play_time;
+    else if ( start_time > (end_pts_time-start_pts_time) )
+        start_time = (end_pts_time-start_pts_time);
     
     rb->splash(0, "loading ...");
     
