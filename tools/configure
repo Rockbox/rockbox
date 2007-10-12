@@ -941,7 +941,7 @@ EOF
     arm7tdmicc
     tool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBOS"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.mi4"
     appextra="recorder:gui"
     archosrom=""

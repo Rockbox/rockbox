@@ -39,7 +39,7 @@
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128
 #define LCD_DEPTH  16   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB565 /* rgb565 */
+#define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 byte-swapped */
 
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE

@@ -22,23 +22,6 @@
 #include "kernel.h"
 #include "system.h"
 
-/* check if number of useconds has past */
-static inline bool timer_check(int clock_start, int usecs)
-{
-    return ((int)(USEC_TIMER - clock_start)) >= usecs;
-}
-
-/* Hardware address of LCD. Bits are:
- * 31   - set to write, poll for completion.
- * 24   - 0 for command, 1 for data 
- * 7..0 - command/data to send
- * Commands/Data are always sent in 16-bits, msb first.
- */
-#define LCD_BASE        *(volatile unsigned int *)0x70008a0c 
-#define LCD_BUSY_MASK   0x80000000  
-#define LCD_CMD         0x80000000
-#define LCD_DATA        0x81000000
-
 /* register defines for TL1771 */
 #define R_START_OSC             0x00
 #define R_DEVICE_CODE_READ      0x00
@@ -72,38 +55,23 @@ static inline bool timer_check(int clock_start, int usecs)
 
 static inline void lcd_wait_write(void)
 {
-    if ((LCD_BASE & LCD_BUSY_MASK) != 0) {
-        int start = USEC_TIMER;
-
-        do {
-            if ((LCD_BASE & LCD_BUSY_MASK) == 0) break;
-        } while (timer_check(start, 1000) == 0);
-    }
+    while (LCD2_PORT & LCD2_BUSY_MASK);
 }
 
 /* Send command */
-static inline void lcd_send_cmd(int v)
+static inline void lcd_send_cmd(unsigned v)
 {
     lcd_wait_write();
-    LCD_BASE =   0x00000000 | LCD_CMD;
-    LCD_BASE =            v | LCD_CMD;
+    LCD2_PORT = LCD2_CMD_MASK;
+    LCD2_PORT = LCD2_CMD_MASK | v;
 }
 
 /* Send 16-bit data */
-static inline void lcd_send_data(int v)
+static inline void lcd_send_data(unsigned v)
 {
     lcd_wait_write();
-    LCD_BASE = (     v & 0xff) | LCD_DATA;  /* Send MSB first */
-    LCD_BASE = ((v>>8) & 0xff) | LCD_DATA;
-}
-
-/* Send two 16-bit data */
-static inline void lcd_send_data2(int v)
-{
-    unsigned int vsr = v;
-    lcd_send_data(vsr);
-    vsr = v >> 16;
-    lcd_send_data(vsr);
+    LCD2_PORT = LCD2_DATA_MASK | (v >> 8);    /* Send MSB first */
+    LCD2_PORT = LCD2_DATA_MASK | (v & 0xff);
 }
 
 
@@ -181,17 +149,17 @@ void lcd_yuv_blit(unsigned char * const src[3],
     y0 = y;
     y1 = y + height - 1;
 
-    /* start horiz << 8 | max horiz */
+    /* max horiz << 8 | start horiz */
     lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
-    lcd_send_data((x0 << 8) | x1);
+    lcd_send_data((x1 << 8) | x0);
     
-    /* start vert << 8 | max vert */
+    /* max vert << 8 | start vert */
     lcd_send_cmd(R_VERT_RAM_ADDR_POS);
-    lcd_send_data((y0 << 8) | y1);
+    lcd_send_data((y1 << 8) | y0);
 
-    /* start horiz << 8 | start vert */
+    /* start vert << 8 | start horiz */
     lcd_send_cmd(R_RAM_ADDR_SET);
-    lcd_send_data(((x0 << 8) | y0));
+    lcd_send_data((y0 << 8) | x0);
     
     /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);
@@ -302,12 +270,12 @@ void lcd_yuv_blit(unsigned char * const src[3],
             rbits = red1 >> 16 ;
             gbits = green1 >> 15 ;
             bbits = blue1 >> 16 ;
-            lcd_send_data(swap16((rbits << 11) | (gbits << 5) | bbits));
+            lcd_send_data((rbits << 11) | (gbits << 5) | bbits);
 
             rbits = red2 >> 16 ;
             gbits = green2 >> 15 ;
             bbits = blue2 >> 16 ;
-            lcd_send_data(swap16((rbits << 11) | (gbits << 5) | bbits));
+            lcd_send_data((rbits << 11) | (gbits << 5) | bbits);
         }
         while (ysrc < row_end);
 
@@ -321,8 +289,7 @@ void lcd_update_rect(int x0, int y0, int width, int height)
 {
     int x1, y1;
     int newx,newwidth;
-
-    unsigned long *addr = (unsigned long *)lcd_framebuffer;
+    unsigned long *addr;
 
     /* Ensure x and width are both even - so we can read 32-bit aligned 
        data from lcd_framebuffer */
@@ -352,34 +319,56 @@ void lcd_update_rect(int x0, int y0, int width, int height)
         x1 = t;
     }
 
-    /* start horiz << 8 | max horiz */
+    /* max horiz << 8 | start horiz */
     lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
-    lcd_send_data((x0 << 8) | x1);
-    
-    /* start vert << 8 | max vert */
-    lcd_send_cmd(R_VERT_RAM_ADDR_POS);
-    lcd_send_data((y0 << 8) | y1);
+    lcd_send_data((x1 << 8) | x0);
 
-    /* start horiz << 8 | start vert */
+    /* max vert << 8 | start vert */
+    lcd_send_cmd(R_VERT_RAM_ADDR_POS);
+    lcd_send_data((y1 << 8) | y0);
+
+    /* start vert << 8 | start horiz */
     lcd_send_cmd(R_RAM_ADDR_SET);
-    lcd_send_data(((x0 << 8) | y0));
+    lcd_send_data((y0 << 8) | x0);
 
     /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);
 
     addr = (unsigned long*)&lcd_framebuffer[y0][x0];
 
-    int c, r;
+    while (height > 0) {
+        int c, r;
+        int h, pixels_to_write;
 
-    /* for each row */
-    for (r = 0; r < height; r++) {
-        /* for each column */
-        for (c = 0; c < width; c += 2) {
-            /* output 2 pixels */
-            lcd_send_data2(*(addr++));
+        pixels_to_write = (width * height) * 2;
+        h = height;
+
+        /* calculate how much we can do in one go */
+        if (pixels_to_write > 0x10000) {
+            h = (0x10000/2) / width;
+            pixels_to_write = (width * h) * 2;
         }
 
-        addr += (LCD_WIDTH - width)/2;
+        LCD2_BLOCK_CTRL = 0x10000080;
+        LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
+        LCD2_BLOCK_CTRL = 0x34000000;
+
+        /* for each row */
+        for (r = 0; r < h; r++) {
+            /* for each column */
+            for (c = 0; c < width; c += 2) {
+                while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
+
+                /* output 2 pixels */
+                LCD2_BLOCK_DATA = *addr++;
+            }
+            addr += (LCD_WIDTH - width)/2;
+        }
+
+        while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
+        LCD2_BLOCK_CONFIG = 0;
+
+        height -= h;
     }
 }
 

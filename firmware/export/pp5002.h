@@ -23,11 +23,13 @@
 #define DRAM_START       0x28000000
 
 /* LCD bridge */
-#define LCD1_BASE  (*(volatile unsigned long *)(0xc0001000))
-#define LCD1_CMD   (*(volatile unsigned long *)(0xc0001008))
-#define LCD1_DATA  (*(volatile unsigned long *)(0xc0001010))
+#define LCD1_BASE        0xc0001000
 
-#define LCD1_BUSY_MASK  0x8000
+#define LCD1_CONTROL     (*(volatile unsigned long *)(0xc0001000))
+#define LCD1_CMD         (*(volatile unsigned long *)(0xc0001008))
+#define LCD1_DATA        (*(volatile unsigned long *)(0xc0001010))
+
+#define LCD1_BUSY_MASK   0x8000
 
 /* I2S controller */
 #define IISCONFIG        (*(volatile unsigned long *)(0xc0002500))

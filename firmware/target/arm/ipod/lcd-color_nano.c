@@ -30,15 +30,6 @@
 #include "system.h"
 #include "hwcompat.h"
 
-/* check if number of useconds has past */
-static inline bool timer_check(int clock_start, int usecs)
-{
-    return ((int)(USEC_TIMER - clock_start)) >= usecs;
-}
-
-#define IPOD_LCD_BASE           0x70008a0c
-#define IPOD_LCD_BUSY_MASK      0x80000000
-
 /* LCD command codes for HD66789R */
 #define LCD_CNTL_RAM_ADDR_SET           0x21
 #define LCD_CNTL_WRITE_TO_GRAM          0x22
@@ -48,39 +39,25 @@ static inline bool timer_check(int clock_start, int usecs)
 /*** globals ***/
 int lcd_type = 1; /* 0 = "old" Color/Photo, 1 = "new" Color & Nano */
 
-static void lcd_wait_write(void)
+static inline void lcd_wait_write(void)
 {
-    if ((inl(IPOD_LCD_BASE) & IPOD_LCD_BUSY_MASK) != 0) {
-        int start = USEC_TIMER;
-
-        do {
-            if ((inl(IPOD_LCD_BASE) & IPOD_LCD_BUSY_MASK) == 0) break;
-        } while (timer_check(start, 1000) == 0);
-    }
+    while (LCD2_PORT & LCD2_BUSY_MASK);
 }
 
-static void lcd_send_lo(int v)
+static void lcd_cmd_data(unsigned cmd, unsigned data)
 {
-    lcd_wait_write();
-    outl(v | 0x80000000, IPOD_LCD_BASE);
-}
-
-static void lcd_send_hi(int v)
-{
-    lcd_wait_write();
-    outl(v | 0x81000000, IPOD_LCD_BASE);
-}
-
-static void lcd_cmd_data(int cmd, int data)
-{
-    if (lcd_type == 0) {
-        lcd_send_lo(cmd);
-        lcd_send_lo(data);
+    if (lcd_type == 0) {  /* 16 bit transfers */
+        lcd_wait_write();
+        LCD2_PORT = LCD2_CMD_MASK | cmd;
+        lcd_wait_write();
+        LCD2_PORT = LCD2_CMD_MASK | data;
     } else {
-        lcd_send_lo(0x0);
-        lcd_send_lo(cmd);
-        lcd_send_hi((data >> 8) & 0xff);
-        lcd_send_hi(data & 0xff);
+        lcd_wait_write();
+        LCD2_PORT = LCD2_CMD_MASK;
+        LCD2_PORT = LCD2_CMD_MASK | cmd;
+        lcd_wait_write();
+        LCD2_PORT = LCD2_DATA_MASK | (data >> 8);
+        LCD2_PORT = LCD2_DATA_MASK | (data & 0xff);
     }
 }
 
@@ -229,8 +206,9 @@ void lcd_yuv_blit(unsigned char * const src[3],
         lcd_cmd_data(LCD_CNTL_RAM_ADDR_SET, ((x0 << 8) | y0));
 
         /* start drawing */
-        lcd_send_lo(0x0);
-        lcd_send_lo(LCD_CNTL_WRITE_TO_GRAM);
+        lcd_wait_write();
+        LCD2_PORT = LCD2_CMD_MASK;
+        LCD2_PORT = (LCD2_CMD_MASK|LCD_CNTL_WRITE_TO_GRAM);
     }
 
     const int stride_div_csub_x = stride/CSUB_X;
@@ -257,8 +235,8 @@ void lcd_yuv_blit(unsigned char * const src[3],
         fb_data pixel1,pixel2;
 
         if (h==0) {
-            while ((inl(0x70008a20) & 0x4000000) == 0);
-            outl(0x0, 0x70008a24);
+            while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
+            LCD2_BLOCK_CONFIG = 0;
 
             if (height == 0) break;
 
@@ -272,9 +250,9 @@ void lcd_yuv_blit(unsigned char * const src[3],
             }
 
             height -= h;
-            outl(0x10000080, 0x70008a20);
-            outl((pixels_to_write - 1) | 0xc0010000, 0x70008a24);
-            outl(0x34000000, 0x70008a20);
+            LCD2_BLOCK_CTRL = 0x10000080;
+            LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
+            LCD2_BLOCK_CTRL = 0x34000000;
         }
 
         do
@@ -368,10 +346,10 @@ void lcd_yuv_blit(unsigned char * const src[3],
             bbits = blue2 >> 16 ;
             pixel2 = swap16((rbits << 11) | (gbits << 5) | bbits);
 
-            while ((inl(0x70008a20) & 0x1000000) == 0);
+            while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
 
             /* output 2 pixels */
-            outl((pixel2<<16)|pixel1, 0x70008b00);
+            LCD2_BLOCK_DATA = (pixel2 << 16) | pixel1;
         }
         while (ysrc < row_end);
 
@@ -379,8 +357,8 @@ void lcd_yuv_blit(unsigned char * const src[3],
         h--;
     }
 
-    while ((inl(0x70008a20) & 0x4000000) == 0);
-    outl(0x0, 0x70008a24);
+    while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
+    LCD2_BLOCK_CONFIG = 0;
 }
 
 
@@ -389,8 +367,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     int y0, x0, y1, x1;
     int newx,newwidth;
-
-    unsigned long *addr = (unsigned long *)lcd_framebuffer;
+    unsigned long *addr;
 
     /* Ensure x and width are both even - so we can read 32-bit aligned 
        data from lcd_framebuffer */
@@ -449,8 +426,9 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_cmd_data(LCD_CNTL_RAM_ADDR_SET, ((x0 << 8) | y0));
 
         /* start drawing */
-        lcd_send_lo(0x0);
-        lcd_send_lo(LCD_CNTL_WRITE_TO_GRAM);
+        lcd_wait_write();
+        LCD2_PORT = LCD2_CMD_MASK;
+        LCD2_PORT = (LCD2_CMD_MASK|LCD_CNTL_WRITE_TO_GRAM);
     }
 
     addr = (unsigned long*)&lcd_framebuffer[y][x];
@@ -468,28 +446,26 @@ void lcd_update_rect(int x, int y, int width, int height)
             pixels_to_write = (width * h) * 2;
         }
 
-        outl(0x10000080, 0x70008a20);
-        outl((pixels_to_write - 1) | 0xc0010000, 0x70008a24);
-        outl(0x34000000, 0x70008a20);
+        LCD2_BLOCK_CTRL = 0x10000080;
+        LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
+        LCD2_BLOCK_CTRL = 0x34000000;
 
         /* for each row */
         for (r = 0; r < h; r++) {
             /* for each column */
             for (c = 0; c < width; c += 2) {
-                while ((inl(0x70008a20) & 0x1000000) == 0);
+                while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
 
                 /* output 2 pixels */
-                outl(*(addr++), 0x70008b00);
+                LCD2_BLOCK_DATA = *addr++;
             }
-
             addr += (LCD_WIDTH - width)/2;
         }
 
-        while ((inl(0x70008a20) & 0x4000000) == 0);
+        while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
+        LCD2_BLOCK_CONFIG = 0;
 
-        outl(0x0, 0x70008a24);
-
-        height = height - h;
+        height -= h;
     }
 }
 

@@ -22,12 +22,6 @@
 #include "kernel.h"
 #include "system.h"
 
-/* check if number of useconds has past */
-static inline bool timer_check(int clock_start, int usecs)
-{
-    return ((int)(USEC_TIMER - clock_start)) >= usecs;
-}
-
 /** Initialized in lcd_init_device() **/
 /* Is the power turned on? */
 static bool power_on;
@@ -42,17 +36,6 @@ static int lcd_contrast;
 
 /* Forward declarations */
 static void lcd_display_off(void);
-
-/* Hardware address of LCD. Bits are:
- * 31   - set to write, poll for completion.
- * 24   - 0 for command, 1 for data 
- * 7..0 - command/data to send
- * Commands/Data are always sent in 16-bits, msb first.
- */
-#define LCD_BASE        *(volatile unsigned int *)0x70008a0c 
-#define LCD_BUSY_MASK   0x80000000  
-#define LCD_CMD         0x80000000
-#define LCD_DATA        0x81000000
 
 /* register defines for the Renesas HD66773R */
 #define R_START_OSC             0x00
@@ -91,30 +74,33 @@ static void lcd_display_off(void);
 
 static inline void lcd_wait_write(void)
 {
-    if ((LCD_BASE & LCD_BUSY_MASK) != 0) {
-        int start = USEC_TIMER;
-
-        do {
-            if ((LCD_BASE & LCD_BUSY_MASK) == 0) break;
-        } while (timer_check(start, 1000) == 0);
-    }
+    while (LCD2_PORT & LCD2_BUSY_MASK);
 }
 
 /* Send command */
-static inline void lcd_send_cmd(int v)
+static inline void lcd_send_cmd(unsigned v)
 {
     lcd_wait_write();
-    LCD_BASE =   0x00000000 | LCD_CMD;
-    LCD_BASE =            v | LCD_CMD;
+    LCD2_PORT = LCD2_CMD_MASK;
+    LCD2_PORT = LCD2_CMD_MASK | v;
 }
 
 /* Send 16-bit data */
-static inline void lcd_send_data(int v)
+static inline void lcd_send_data(unsigned v)
 {
     lcd_wait_write();
-    LCD_BASE = ((v>>8) & 0xff) | LCD_DATA;  /* Send MSB first */
-    LCD_BASE = (     v & 0xff) | LCD_DATA;
+    LCD2_PORT = LCD2_DATA_MASK | (v >> 8);    /* Send MSB first */
+    LCD2_PORT = LCD2_DATA_MASK | (v & 0xff);
 }
+
+/* Send 16-bit data byte-swapped. Only needed until we can use block transfer. */
+static inline void lcd_send_data_swapped(unsigned v)
+{
+    lcd_wait_write();
+    LCD2_PORT = LCD2_DATA_MASK | (v & 0xff);  /* Send LSB first */
+    LCD2_PORT = LCD2_DATA_MASK | (v >> 8);    
+}
+
 
 /* Write value to register */
 static inline void lcd_write_reg(int reg, int val)
@@ -635,7 +621,7 @@ void lcd_update_rect(int x0, int y0, int width, int height)
         /* for each column */
         for (c = 0; c < width; c++) {
             /* output 1 pixel */
-            lcd_send_data(*(addr++));
+            lcd_send_data_swapped(*addr++);
         }
 
         addr += LCD_WIDTH - width;

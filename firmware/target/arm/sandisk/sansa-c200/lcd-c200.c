@@ -62,7 +62,7 @@
 /* wait for LCD */
 static inline void lcd_wait_write(void)
 {
-    while (LCD1_BASE & LCD1_BUSY_MASK);
+    while (LCD1_CONTROL & LCD1_BUSY_MASK);
 }
 
 /* send LCD data */
@@ -91,13 +91,13 @@ void lcd_init_device(void)
     DEV_INIT &= ~0x400;
     udelay(10000);
     
-    LCD1_BASE &= ~0x4;
+    LCD1_CONTROL &= ~0x4;
     udelay(15);
 
-    LCD1_BASE |= 0x4;
+    LCD1_CONTROL |= 0x4;
     udelay(10);
 
-    LCD1_BASE = 0x4687;
+    LCD1_CONTROL = 0x4687;
     udelay(10000);
 
     lcd_send_command(R_STANDBY_OFF);

@@ -84,7 +84,7 @@ static const unsigned char dibits[16] ICONST_ATTR = {
 /* wait for LCD with timeout */
 static inline void lcd_wait_write(void)
 {
-    while (LCD1_BASE & LCD1_BUSY_MASK);
+    while (LCD1_CONTROL & LCD1_BUSY_MASK);
 }
 
 /* send LCD data */
@@ -155,7 +155,7 @@ void lcd_init_device(void)
         power_reg_h = 0x1100;
 #elif defined IPOD_MINI2G
     lcd_wait_write();
-    LCD1_BASE = (LCD1_BASE & ~0x1f00000) | 0x1700000;
+    LCD1_CONTROL = (LCD1_CONTROL & ~0x1f00000) | 0x1700000;
 #endif
 
     lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0xc);
