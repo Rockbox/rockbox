@@ -238,6 +238,7 @@ static int wpsscrn(void* param)
     (void)param;
     if (audio_status())
     {
+        shutup();
         ret_val = gui_wps_show();
     }
     else if ( global_status.resume_index != -1 )
