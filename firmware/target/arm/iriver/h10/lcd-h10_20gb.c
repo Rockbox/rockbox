@@ -101,9 +101,8 @@ static inline void lcd_send_data_swapped(unsigned v)
     LCD2_PORT = LCD2_DATA_MASK | (v >> 8);    
 }
 
-
 /* Write value to register */
-static inline void lcd_write_reg(int reg, int val)
+static void lcd_write_reg(int reg, int val)
 {
     lcd_send_cmd(reg);
     lcd_send_data(val);

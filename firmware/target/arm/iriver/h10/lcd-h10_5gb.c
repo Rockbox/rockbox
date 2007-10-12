@@ -74,6 +74,13 @@ static inline void lcd_send_data(unsigned v)
     LCD2_PORT = LCD2_DATA_MASK | (v & 0xff);
 }
 
+/* Write value to register */
+static void lcd_write_reg(int reg, int val)
+{
+    lcd_send_cmd(reg);
+    lcd_send_data(val);
+}
+
 
 /*** hardware configuration ***/
 
@@ -150,17 +157,14 @@ void lcd_yuv_blit(unsigned char * const src[3],
     y1 = y + height - 1;
 
     /* max horiz << 8 | start horiz */
-    lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
-    lcd_send_data((x1 << 8) | x0);
-    
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (x1 << 8) | x0);
+
     /* max vert << 8 | start vert */
-    lcd_send_cmd(R_VERT_RAM_ADDR_POS);
-    lcd_send_data((y1 << 8) | y0);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, (y1 << 8) | y0);
 
     /* start vert << 8 | start horiz */
-    lcd_send_cmd(R_RAM_ADDR_SET);
-    lcd_send_data((y0 << 8) | x0);
-    
+    lcd_write_reg(R_RAM_ADDR_SET, (y0 << 8) | x0);
+
     /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);
 
@@ -320,16 +324,13 @@ void lcd_update_rect(int x0, int y0, int width, int height)
     }
 
     /* max horiz << 8 | start horiz */
-    lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
-    lcd_send_data((x1 << 8) | x0);
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (x1 << 8) | x0);
 
     /* max vert << 8 | start vert */
-    lcd_send_cmd(R_VERT_RAM_ADDR_POS);
-    lcd_send_data((y1 << 8) | y0);
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, (y1 << 8) | y0);
 
     /* start vert << 8 | start horiz */
-    lcd_send_cmd(R_RAM_ADDR_SET);
-    lcd_send_data((y0 << 8) | x0);
+    lcd_write_reg(R_RAM_ADDR_SET, (y0 << 8) | x0);
 
     /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);
