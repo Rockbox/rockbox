@@ -105,6 +105,19 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonSmall, SIGNAL(clicked()), this, SLOT(smallInstall()));
     connect(ui.buttonComplete, SIGNAL(clicked()), this, SLOT(completeInstall()));
 
+    // actions accessible from the menu
+    connect(ui.actionComplete_Installation, SIGNAL(triggered()), this, SLOT(completeInstall()));
+    connect(ui.actionSmall_Installation, SIGNAL(triggered()), this, SLOT(smallInstall()));
+    connect(ui.actionInstall_Bootloader, SIGNAL(triggered()), this, SLOT(installBootloaderBtn()));
+    connect(ui.actionInstall_Rockbox, SIGNAL(triggered()), this, SLOT(installBtn()));
+    connect(ui.actionFonts_Package, SIGNAL(triggered()), this, SLOT(installFontsBtn()));
+    connect(ui.actionInstall_Themes, SIGNAL(triggered()), this, SLOT(installThemes()));
+    connect(ui.actionInstall_Game_Files, SIGNAL(triggered()), this, SLOT(installDoomBtn()));
+    connect(ui.actionInstall_Voice_File, SIGNAL(triggered()), this, SLOT(installVoice()));
+    connect(ui.actionCreate_Talk_Files, SIGNAL(triggered()), this, SLOT(createTalkFiles()));
+    connect(ui.actionRemove_bootloader, SIGNAL(triggered()), this, SLOT(uninstallBootloader()));
+    connect(ui.actionUninstall_Rockbox, SIGNAL(triggered()), this, SLOT(uninstall()));
+
 #if !defined(STATIC)
     ui.actionInstall_Rockbox_Utility_on_player->setEnabled(false);
 #else

@@ -822,7 +822,54 @@ p, li { white-space: pre-wrap; }
     <addaction name="separator" />
     <addaction name="action_Help" />
    </widget>
+   <widget class="QMenu" name="menuA_ctions" >
+    <property name="title" >
+     <string>Action&amp;s</string>
+    </property>
+    <widget class="QMenu" name="menuInstallation" >
+     <property name="title" >
+      <string>Installation</string>
+     </property>
+     <addaction name="actionInstall_Bootloader" />
+     <addaction name="actionInstall_Rockbox" />
+    </widget>
+    <widget class="QMenu" name="menuQuick_Start" >
+     <property name="title" >
+      <string>Quick Start</string>
+     </property>
+     <addaction name="actionComplete_Installation" />
+     <addaction name="actionSmall_Installation" />
+    </widget>
+    <widget class="QMenu" name="menuExtras" >
+     <property name="title" >
+      <string>Extras</string>
+     </property>
+     <addaction name="actionFonts_Package" />
+     <addaction name="actionInstall_Themes" />
+     <addaction name="actionInstall_Game_Files" />
+    </widget>
+    <widget class="QMenu" name="menuAccessibility" >
+     <property name="title" >
+      <string>Accessibility</string>
+     </property>
+     <addaction name="actionInstall_Voice_File" />
+     <addaction name="actionCreate_Talk_Files" />
+    </widget>
+    <widget class="QMenu" name="menuUninstallation" >
+     <property name="title" >
+      <string>Uninstallation</string>
+     </property>
+     <addaction name="actionRemove_bootloader" />
+     <addaction name="actionUninstall_Rockbox" />
+    </widget>
+    <addaction name="menuQuick_Start" />
+    <addaction name="menuInstallation" />
+    <addaction name="menuExtras" />
+    <addaction name="menuAccessibility" />
+    <addaction name="menuUninstallation" />
+   </widget>
    <addaction name="menu_File" />
+   <addaction name="menuA_ctions" />
    <addaction name="menuAbout" />
   </widget>
   <widget class="QStatusBar" name="statusbar" />
@@ -862,6 +909,119 @@ p, li { white-space: pre-wrap; }
   <action name="action_Help" >
    <property name="text" >
     <string>&amp;Help</string>
+   </property>
+  </action>
+  <action name="actionInfo" >
+   <property name="text" >
+    <string>Info</string>
+   </property>
+  </action>
+  <action name="actionComplete_Installation" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/bootloader_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Complete Installation</string>
+   </property>
+  </action>
+  <action name="actionSmall_Installation" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/rbinstall_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Small Installation</string>
+   </property>
+  </action>
+  <action name="actionInstall_Bootloader" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/bootloader_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Install Bootloader</string>
+   </property>
+  </action>
+  <action name="actionInstall_Rockbox" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/rbinstall_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Install Rockbox</string>
+   </property>
+  </action>
+  <action name="actionFonts_Package" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/font_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Fonts Package</string>
+   </property>
+  </action>
+  <action name="actionInstall_Themes" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/themes_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Install Themes</string>
+   </property>
+  </action>
+  <action name="actionInstall_Game_Files" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/doom_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Install Game Files</string>
+   </property>
+  </action>
+  <action name="actionInstall_Voice_File" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/talkfile_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Install Voice File</string>
+   </property>
+  </action>
+  <action name="actionCreate_Talk_Files" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/talkfile_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Create Talk Files</string>
+   </property>
+  </action>
+  <action name="actionRemove_bootloader" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/rembootloader_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Remove bootloader</string>
+   </property>
+  </action>
+  <action name="actionUninstall_Rockbox" >
+   <property name="icon" >
+    <iconset resource="rbutilqt.qrc" >:/icons/icons/remrb_btn.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Uninstall Rockbox</string>
+   </property>
+  </action>
+  <action name="actionRead_PDF_manual" >
+   <property name="text" >
+    <string>Read PDF manual</string>
+   </property>
+  </action>
+  <action name="actionRead_HTML_manual" >
+   <property name="text" >
+    <string>Read HTML manual</string>
+   </property>
+  </action>
+  <action name="actionDownload_PDF_manual" >
+   <property name="text" >
+    <string>Download PDF manual</string>
+   </property>
+  </action>
+  <action name="actionDownload_HTML_manual_zip" >
+   <property name="text" >
+    <string>Download HTML manual (zip)</string>
    </property>
   </action>
  </widget>
