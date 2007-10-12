@@ -487,10 +487,17 @@ static int load_context_screen(int selection)
     else
         return GO_TO_PREVIOUS;
 }
+
+static int previous_music = GO_TO_WPS;
+
+void previous_music_is_wps(void)
+{
+    previous_music = GO_TO_WPS;
+}
+
 void root_menu(void)
 {
     int previous_browser = GO_TO_FILEBROWSER;
-    int previous_music = GO_TO_WPS;
     int next_screen = GO_TO_ROOT;
     int selected = 0;
 

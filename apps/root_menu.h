@@ -51,4 +51,6 @@ enum {
 
 extern const struct menu_item_ex root_menu_;
 
+extern void previous_music_is_wps(void);
+
 #endif /* __ROOT_MENU_H__ */

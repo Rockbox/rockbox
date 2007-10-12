@@ -99,6 +99,7 @@
 #include "talk.h"
 #include "splash.h"
 #include "rbunicode.h"
+#include "root_menu.h"
 
 #define PLAYLIST_CONTROL_FILE ROCKBOX_DIR "/.playlist_control"
 #define PLAYLIST_CONTROL_FILE_VERSION 2
@@ -2386,6 +2387,11 @@ int playlist_shuffle(int random_seed, int start_index)
 int playlist_start(int start_index, int offset)
 {
     struct playlist_info* playlist = &current_playlist;
+
+    /* Cancel FM radio selection as previous music. For cases where we start
+       playback without going to the WPS, such as playlist insert.. or
+       playlist catalog. */
+    previous_music_is_wps();
 
     playlist->index = start_index;
 
