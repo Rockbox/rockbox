@@ -831,6 +831,7 @@ void RbUtilQt::downloadManual(void)
         installer->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
     installer->setProxy(proxy());
     installer->setLogSection(section);
+    installer->setLogVersion(date);
     installer->setUrl(manualurl);
     installer->setUnzip(false);
     installer->setTarget(target);
