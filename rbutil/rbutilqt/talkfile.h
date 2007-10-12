@@ -75,6 +75,8 @@ public:
     void setRemoveWav(bool ov) {m_removeWav = ov;}
     void setRecursive(bool ov) {m_recursive = ov;}
     void setStripExtensions(bool ov) {m_stripExtensions = ov;}
+    void setTalkFolders(bool ov) {m_talkFolders = ov;} 
+    void setTalkFiles(bool ov) {m_talkFiles = ov;}
 
 private slots:
     void abort();
@@ -106,6 +108,8 @@ private:
     bool m_removeWav;
     bool m_recursive;
     bool m_stripExtensions;
+    bool m_talkFolders;
+    bool m_talkFiles;
 
     ProgressloggerInterface* m_logger;
 

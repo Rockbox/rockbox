@@ -78,38 +78,76 @@
       <string>Generation options</string>
      </property>
      <layout class="QGridLayout" >
-      <item row="0" column="0" >
+      <item row="2" column="0" >
        <widget class="QCheckBox" name="OverwriteWav" >
         <property name="text" >
          <string>Overwrite Wavefiles</string>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QCheckBox" name="RemoveWav" >
-        <property name="text" >
-         <string>Remove Wavefiles</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QCheckBox" name="recursive" >
-        <property name="text" >
-         <string>Run recursive</string>
+        <property name="checked" >
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="3" column="0" >
-       <widget class="QCheckBox" name="StripExtensions" >
+       <widget class="QCheckBox" name="RemoveWav" >
         <property name="text" >
-         <string>Strip Extensions</string>
+         <string>Remove Wavefiles</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="4" column="0" >
+       <widget class="QCheckBox" name="recursive" >
+        <property name="text" >
+         <string>Run recursive</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" >
+       <widget class="QCheckBox" name="StripExtensions" >
+        <property name="text" >
+         <string>Strip Extensions</string>
+        </property>
+        <property name="checked" >
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" >
        <widget class="QCheckBox" name="OverwriteTalk" >
         <property name="text" >
          <string>Overwrite Talkfiles</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QCheckBox" name="talkFolders" >
+        <property name="text" >
+         <string>Generate .talk files for Folders</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QCheckBox" name="talkFiles" >
+        <property name="text" >
+         <string>Generate .talk files for Files</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+        <property name="tristate" >
+         <bool>false</bool>
         </property>
        </widget>
       </item>

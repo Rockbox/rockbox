@@ -131,6 +131,8 @@ void InstallTalkWindow::accept()
     talkcreator->setRemoveWav(ui.RemoveWav->isChecked());
     talkcreator->setRecursive(ui.recursive->isChecked());
     talkcreator->setStripExtensions(ui.StripExtensions->isChecked());
+    talkcreator->setTalkFolders(ui.talkFolders->isChecked());
+    talkcreator->setTalkFiles(ui.talkFiles->isChecked());
 
     talkcreator->createTalkFiles(logger);
 }

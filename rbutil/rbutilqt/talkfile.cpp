@@ -96,11 +96,23 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         }
         if(fileInf.isDir())  // if it is a dir
         {
+            // skip entry if folder talking isnt enabled
+            if(m_talkFolders == false) 
+            {
+              it.next();
+              continue;
+            }            
             toSpeak = fileInf.fileName();
             filename = fileInf.absolutePath() + "/_dirname.talk";
         }
         else   // if it is a file
         {
+            // skip entry if file talking isnt enabled
+            if(m_talkFiles == false)
+            {
+               it.next();
+               continue;
+            }
             if(m_stripExtensions)
                 toSpeak = fileInf.baseName();
             else
@@ -181,7 +193,7 @@ bool TalkFileCreator::encode(QString input,QString output)
 }
 
 bool TTSSapi::start()
-{
+{    
     QFileInfo tts(m_TTSexec);
     if(!tts.exists())
         return false;
