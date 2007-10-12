@@ -277,7 +277,8 @@ static int radio(void* param)
 static int load_bmarks(void* param)
 {
     (void)param;
-    bookmark_mrb_load();
+    if(bookmark_mrb_load())
+        return GO_TO_WPS;
     return GO_TO_PREVIOUS;
 }
 static int plugins_menu(void* param)
