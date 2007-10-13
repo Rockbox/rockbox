@@ -183,7 +183,7 @@ int rolo_load(const char* filename)
 {
     int fd;
     long length;
-#if defined(CPU_COLDFIRE) || defined(CPU_PP)
+#if defined(CPU_COLDFIRE) || defined(CPU_ARM)
 #if !defined(MI4_FORMAT)
     int i;
 #endif
@@ -215,7 +215,7 @@ int rolo_load(const char* filename)
 
     length = filesize(fd) - FIRMWARE_OFFSET_FILE_DATA;
 
-#if defined(CPU_COLDFIRE) || defined(CPU_PP)
+#if defined(CPU_COLDFIRE) || defined(CPU_PP) || (CONFIG_CPU==DM320)
     /* Read and save checksum */
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
     if (read(fd, &file_checksum, 4) != 4) {
@@ -251,7 +251,7 @@ int rolo_load(const char* filename)
     checksum = chksum_crc32 (audiobuf, length);
 #else
     checksum = MODEL_NUMBER;
-    
+
     for(i = 0;i < length;i++) {
         checksum += audiobuf[i];
     }
@@ -282,7 +282,7 @@ int rolo_load(const char* filename)
         rolo_error("File length mismatch");
         return -1;
     }
-    
+
     /* Read and save checksum */
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
     if (read(fd, &file_checksum, 2) != 2) {
@@ -306,7 +306,7 @@ int rolo_load(const char* filename)
     lcd_update();
 
     checksum = descramble(audiobuf + length, audiobuf, length);
-    
+
     /* Verify checksum against file header */
     if (checksum != file_checksum) {
         rolo_error("Checksum Error");
@@ -317,7 +317,7 @@ int rolo_load(const char* filename)
     lcd_update();
 
     set_irq_level(HIGHEST_IRQ_LEVEL);
-    
+
     /* Calling these 2 initialization routines was necessary to get the
        the origional Archos version of the firmware to load and execute. */
     system_init();           /* Initialize system for restart */

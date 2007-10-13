@@ -66,7 +66,6 @@ start:
     bhi    1b
 #endif
 #if 1
-
     /* Copy the IRAM */
     ldr    r2, =_iramcopy
     ldr    r3, =_iramstart
@@ -112,15 +111,14 @@ start:
     /* Switch to supervisor mode (no IRQ) */
     msr    cpsr_c, #0xd3
     ldr    sp, =stackend
-
+    
 #ifdef BOOTLOADER
     /* get the high part of our execute address */
     ldr    r2, =0xffffff00
     and    r4, pc, r2
 
     /* Copy bootloader to safe area - 0x01900000 */
-    mov    r5, #0x00900000
-    add    r5, r5, #0x01000000
+    mov    r5, #0x01900000
     ldr    r6, = _dataend
     sub    r0, r6, r5       /* length of loader */
     add    r0, r4, r0     /* r0 points to start of loader */

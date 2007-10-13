@@ -37,3 +37,8 @@ void audiohw_init(void)
 void audiohw_close(void)
 {
 }
+
+void audiohw_mute(bool mute)
+{
+    (void) mute;
+}

@@ -147,7 +147,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
 {
     /* Caches for chroma data so it only need be recaculated every other
        line */
-    unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 480 bytes */
+/*    unsigned char chroma_buf[LCD_HEIGHT/2*3];*/ /* 480 bytes */
     unsigned char const * yuv_src[3];
     off_t z;
 

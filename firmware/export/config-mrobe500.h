@@ -22,6 +22,8 @@
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
+#define CPU_ARM
+
 #define CONFIG_SDRAM_START 0x00900000
 
 #define OLYMPUS_MROBE_500 1
@@ -132,7 +134,6 @@
 #define CONFIG_LCD LCD_MROBE500
 
 /* define this if the backlight can be set to a brightness */
-#define HAVE_BACKLIGHT_SET_FADING
 #define __BACKLIGHT_INIT
 
 /* Offset ( in the firmware file's header ) to the file CRC */

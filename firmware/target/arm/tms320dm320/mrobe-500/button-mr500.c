@@ -30,6 +30,7 @@
 #include "backlight-target.h"
 #include "uart-target.h"
 #include "tsc2100.h"
+#include "string.h"
 
 #define BUTTON_TIMEOUT 50
 

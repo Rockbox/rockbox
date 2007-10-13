@@ -16,7 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdlib.h>
 #include "system.h"
 #include "kernel.h"
 #include "logf.h"
@@ -24,30 +23,36 @@
 #include "sound.h"
 #include "file.h"
 
-static void _pcm_apply_settings(void)
+void pcm_postinit(void)
 {
+
+}
+
+const void * pcm_play_dma_get_peak_buffer(int *count)
+{
+    (void) count;
+    return 0;
+}
+
+void pcm_play_dma_init(void)
+{
+
 }
 
 void pcm_apply_settings(void)
 {
+
 }
 
-void pcm_init(void)
+void pcm_set_frequency(unsigned int frequency)
 {
-}
-
-void pcm_postinit(void)
-{
+    (void) frequency;
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-
-}
-
-static void pcm_play_dma_stop_fiq(void)
-{
-
+    (void) addr;
+    (void) size;
 }
 
 void pcm_play_dma_stop(void)
@@ -55,31 +60,22 @@ void pcm_play_dma_stop(void)
 
 }
 
-void pcm_play_pause_pause(void)
+void pcm_play_lock(void)
 {
+
 }
 
-void pcm_play_pause_unpause(void)
+void pcm_play_unlock(void)
 {
+
 }
 
-void pcm_set_frequency(unsigned int frequency)
+void pcm_play_dma_pause(bool pause)
 {
+    (void) pause;
 }
 
 size_t pcm_get_bytes_waiting(void)
 {
+    return 0;
 }
-
-void pcm_mute(bool mute)
-{
-}
-
-/**
- * Return playback peaks - Peaks ahead in the DMA buffer based upon the
- *                         calling period to attempt to compensate for
- *                         delay.
- */
-void pcm_calculate_peaks(int *left, int *right)
-{
-} /* pcm_calculate_peaks */

@@ -104,7 +104,7 @@ SECTIONS
     *(.text*)
   }
 
-  .data : { 
+  .data : {
     *(.icode)
     *(.irodata)
     *(.idata)
@@ -173,6 +173,8 @@ SECTIONS
     . = DRAMORIG + 0x1000000;
 
     .text : {
+        loadaddress = .;
+        _loadaddress = .;
         *(.init.text)
         *(.text*)
         *(.glue_7)
@@ -199,7 +201,7 @@ SECTIONS
         *(.data*)
         . = ALIGN(0x4);
         _dataend = . ;
-     } >DRAM
+    } > DRAM
 
     .stack :
     {
@@ -209,27 +211,26 @@ SECTIONS
          . += 0x2000;
          _stackend = .;
          stackend = .;
-    } >DRAM
+    } > DRAM
 
-    .bss : {
+    .bss :
+    {
          _edata = .;
          *(.bss*);
          *(.ibss);
          *(COMMON)
          _end = .;
-     }>DRAM
+    } > DRAM
 
-    .vectors 0x0 :
+    .vectors IRAMORIG :
     {
-        loadaddress = .;
-        _loadaddress = .;
         _vectorsstart = .;
         KEEP(*(.resetvectors));
         *(.resetvectors);
         KEEP(*(.vectors));
         *(.vectors);
         _vectorsend = .;
-    } AT> DRAM
+    } AT > DRAM
     _vectorscopy = LOADADDR(.vectors);
 }
 #elif (CONFIG_CPU==IMX31L)

@@ -19,14 +19,15 @@
 #include "system.h"
 #include "i2c-dm320.h"
 
+#if 0
 static int i2c_getack(void)
 {
-
+    return 0;
 }
 
 static int i2c_start(void)
 {
-
+    return 0;
 }
 
 static void i2c_stop(void)
@@ -36,12 +37,16 @@ static void i2c_stop(void)
 
 static int i2c_outb(unsigned char byte)
 {
-
+    (void) byte;
+    return 0;
 }
+#endif
 
 void i2c_write(int addr, const unsigned char *buf, int count)
 {
-
+    (void) addr;
+    (void) buf;
+    (void) count;
 }
 
 void i2c_init(void)

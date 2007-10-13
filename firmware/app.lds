@@ -165,7 +165,7 @@ SECTIONS
         *(.dmabuf)
     } >IRAM0 AT> DRAM
 #elif CONFIG_CPU==DM320
-    } AT> IRAM
+    } > IRAM AT> DRAM
 #else
     } AT> DRAM
 #endif
