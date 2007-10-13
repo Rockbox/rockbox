@@ -43,6 +43,10 @@
 #include "tsc2100.h"
 #include "time.h"
 
+//#define MRDEBUG
+
+#if defined(MRDEBUG)
+
 extern int line;
 
 struct touch_calibration_point tl, br;
@@ -93,6 +97,41 @@ void touchpad_calibrate_screen(void)
     set_calibration_points(&tl, &br);
 }
 
+void mrdebug()
+{
+    int button=0, *address=0x0;
+    use_calibration(false);
+    touchpad_calibrate_screen();
+    use_calibration(true);
+    while(true)
+    {
+        struct tm *t = get_time();
+        printf("%d:%d:%d %d %d %d", t->tm_hour, t->tm_min, t->tm_sec, t->tm_mday, t->tm_mon, t->tm_year);
+        printf("time: %d", mktime(t));
+        button = button_read_device();
+        if (button == BUTTON_POWER)
+        {
+            printf("reset");
+            IO_GIO_BITSET1|=1<<10;
+        }
+        if(button==BUTTON_RC_PLAY)
+            address+=0x02;
+        else if (button==BUTTON_RC_DOWN)
+            address-=0x02;
+        else if (button==BUTTON_RC_FF)
+            address+=0x1000;
+        else if (button==BUTTON_RC_REW)
+            address-=0x1000;
+        if (button&BUTTON_TOUCHPAD)
+        {
+            unsigned int data = button_get_last_touch();
+            printf("x: %d, y: %d", data>>16, data&0xffff);
+            line-=3;
+        }
+        else line -=2;
+    }
+}
+#endif
 
 void main(void)
 {
@@ -149,38 +188,8 @@ void main(void)
         reset_screen();
         lcd_update();
     }
-#if 0
-    int button=0, *address=0x0, count=0;
-    use_calibration(false);
-    touchpad_calibrate_screen();
-    use_calibration(true);
-    while(true)
-    {
-        struct tm *t = get_time();
-        printf("%d:%d:%d %d %d %d", t->tm_hour, t->tm_min, t->tm_sec, t->tm_mday, t->tm_mon, t->tm_year);
-        printf("time: %d", mktime(t));
-        button = button_read_device();
-        if (button == BUTTON_POWER)
-        {
-            printf("reset");
-            IO_GIO_BITSET1|=1<<10;
-        }
-        if(button==BUTTON_RC_PLAY)
-            address+=0x02;
-        else if (button==BUTTON_RC_DOWN)
-            address-=0x02;
-        else if (button==BUTTON_RC_FF)
-            address+=0x1000;
-        else if (button==BUTTON_RC_REW)
-            address-=0x1000;
-        if (button&BUTTON_TOUCHPAD)
-        {
-            unsigned int data = button_get_last_touch();
-            printf("x: %d, y: %d", data>>16, data&0xffff);
-            line-=3;
-        }
-        else line -=2;
-    }
+#if defined(MRDEBUG)
+    mrdebug();
 #endif
     printf("ATA");
     rc = ata_init();
