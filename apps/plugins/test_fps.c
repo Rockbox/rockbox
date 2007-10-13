@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "helper.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -29,135 +30,267 @@
 #define FPS_QUIT BUTTON_POWER
 #endif
 
+#define DURATION (2*HZ) /* longer duration gives more precise results */
+
 PLUGIN_HEADER
 
 static struct plugin_api* rb;
 
+/* Screen logging */
+static int line;
+static int max_line;
+#ifdef HAVE_REMOTE_LCD
+static int remote_line;
+static int remote_max_line;
+#endif
+
+static void log_init(void)
+{
+    int h;
+
+    rb->lcd_setmargins(0, 0);
+    rb->lcd_getstringsize("A", NULL, &h);
+    max_line = LCD_HEIGHT / h;
+    line = 0;
+    rb->lcd_clear_display();
+    rb->lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_setmargins(0, 0);
+    rb->lcd_remote_getstringsize("A", NULL, &h);
+    remote_max_line = LCD_REMOTE_HEIGHT / h;
+    remote_line = 0;
+    rb->lcd_remote_clear_display();
+    rb->lcd_remote_update();
+#endif
+}
+
+static void log_text(char *text)
+{
+    rb->lcd_puts(0, line, text);
+    if (++line >= max_line)
+        line = 0;
+    rb->lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_puts(0, remote_line, text);
+    if (++remote_line >= remote_max_line)
+        remote_line = 0;
+    rb->lcd_remote_update();
+#endif
+}
+
+static int calc_tenth_fps(int framecount, long ticks)
+{
+    return (10*HZ) * framecount / ticks;
+}
+
+static void time_main_update(void)
+{
+    char str[32];     /* text buffer */
+    long time_start;  /* start tickcount */
+    long time_end;    /* end tickcount */
+    int frame_count;
+    int fps;
+
+    const int part14_x = LCD_WIDTH/4;   /* x-offset for 1/4 update test */
+    const int part14_w = LCD_WIDTH/2;   /* x-size for 1/4 update test */
+    const int part14_y = LCD_HEIGHT/4;  /* y-offset for 1/4 update test */
+    const int part14_h = LCD_HEIGHT/2;  /* y-size for 1/4 update test */
+
+    /* Test 1: full LCD update */
+    frame_count = 0;
+    rb->sleep(0); /* sync to tick */
+    time_start = *rb->current_tick;
+    while((time_end = *rb->current_tick) - time_start < DURATION)
+    {
+        rb->lcd_update();
+        frame_count++;
+    }
+    fps = calc_tenth_fps(frame_count, time_end - time_start);
+    rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
+    log_text(str);
+
+    /* Test 2: quarter LCD update */
+    frame_count = 0;
+    rb->sleep(0); /* sync to tick */
+    time_start = *rb->current_tick;
+    while((time_end = *rb->current_tick) - time_start < DURATION)
+    {
+        rb->lcd_update_rect(part14_x, part14_y, part14_w, part14_h);
+        frame_count++;
+    }
+    fps = calc_tenth_fps(frame_count, time_end - time_start);
+    rb->snprintf(str, sizeof(str), "1/4: %d.%d fps", fps / 10, fps % 10);
+    log_text(str);
+}
+
+#ifdef HAVE_LCD_COLOR
+
+#if LCD_WIDTH >= LCD_HEIGHT
+#define YUV_WIDTH LCD_WIDTH
+#define YUV_HEIGHT LCD_HEIGHT
+#else /* Assume the screen is rotated on portrait LCDs */
+#define YUV_WIDTH LCD_HEIGHT
+#define YUV_HEIGHT LCD_WIDTH
+#endif
+
+static unsigned char ydata[YUV_HEIGHT][YUV_WIDTH];
+static unsigned char udata[YUV_HEIGHT/2][YUV_WIDTH/2];
+static unsigned char vdata[YUV_HEIGHT/2][YUV_WIDTH/2];
+
+static unsigned char * const yuvbuf[3] = {
+    (void*)ydata,
+    (void*)udata,
+    (void*)vdata
+};
+
+static void make_gradient_rect(width, height)
+{
+    unsigned char vline[YUV_WIDTH/2];
+    int x, y;
+
+    width /= 2;
+    height /= 2;
+
+    for (x = 0; x < width; x++)
+        vline[x] = (x << 8) / width;
+    for (y = 0; y < height; y++)
+    {
+        rb->memset(udata[y], (y << 8) / height, width);
+        rb->memcpy(vdata[y], vline, width);
+    }
+}
+
+static void time_main_yuv(void)
+{
+    char str[32];     /* text buffer */
+    long time_start;  /* start tickcount */
+    long time_end;    /* end tickcount */
+    int frame_count;
+    int fps;
+
+    const int part14_x = YUV_WIDTH/4;   /* x-offset for 1/4 update test */
+    const int part14_w = YUV_WIDTH/2;   /* x-size for 1/4 update test */
+    const int part14_y = YUV_HEIGHT/4;  /* y-offset for 1/4 update test */
+    const int part14_h = YUV_HEIGHT/2;  /* y-size for 1/4 update test */
+    
+    int x, y;
+
+    rb->memset(ydata, 128, sizeof(ydata)); /* medium grey */
+
+    /* Test 1: full LCD update */
+    make_gradient_rect(YUV_WIDTH, YUV_HEIGHT);
+
+    frame_count = 0;
+    rb->sleep(0); /* sync to tick */
+    time_start = *rb->current_tick;
+    while((time_end = *rb->current_tick) - time_start < DURATION)
+    {
+        rb->lcd_yuv_blit(yuvbuf, 0, 0, YUV_WIDTH,
+                         0, 0, YUV_WIDTH, YUV_HEIGHT);
+        frame_count++;
+    }
+    fps = calc_tenth_fps(frame_count, time_end - time_start);
+    rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
+    log_text(str);
+
+    /* Test 2: quarter LCD update */
+    make_gradient_rect(YUV_WIDTH/2, YUV_HEIGHT/2);
+
+    frame_count = 0;
+    rb->sleep(0); /* sync to tick */
+    time_start = *rb->current_tick;
+    while((time_end = *rb->current_tick) - time_start < DURATION)
+    {
+        rb->lcd_yuv_blit(yuvbuf, 0, 0, YUV_WIDTH,
+                         part14_x, part14_y, part14_w, part14_h);
+        frame_count++;
+    }
+    fps = calc_tenth_fps(frame_count, time_end - time_start);
+    rb->snprintf(str, sizeof(str), "1/4: %d.%d fps", fps / 10, fps % 10);
+    log_text(str);
+}
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+static void time_remote_update(void)
+{
+    char str[32];     /* text buffer */
+    long time_start;  /* start tickcount */
+    long time_end;    /* end tickcount */
+    int frame_count;
+    int fps;
+
+    const int part14_x = LCD_REMOTE_WIDTH/4;   /* x-offset for 1/4 update test */
+    const int part14_w = LCD_REMOTE_WIDTH/2;   /* x-size for 1/4 update test */
+    const int part14_y = LCD_REMOTE_HEIGHT/4;  /* y-offset for 1/4 update test */
+    const int part14_h = LCD_REMOTE_HEIGHT/2;  /* y-size for 1/4 update test */
+
+    /* Test 1: full LCD update */
+    frame_count = 0;
+    rb->sleep(0); /* sync to tick */
+    time_start = *rb->current_tick;
+    while((time_end = *rb->current_tick) - time_start < DURATION)
+    {
+        rb->lcd_remote_update();
+        frame_count++;
+    }
+    fps = calc_tenth_fps(frame_count, time_end - time_start);
+    rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
+    log_text(str);
+
+    /* Test 2: quarter LCD update */
+    frame_count = 0;
+    rb->sleep(0); /* sync to tick */
+    time_start = *rb->current_tick;
+    while((time_end = *rb->current_tick) - time_start < DURATION)
+    {
+        rb->lcd_remote_update_rect(part14_x, part14_y, part14_w, part14_h);
+        frame_count++;
+    }
+    fps = calc_tenth_fps(frame_count, time_end - time_start);
+    rb->snprintf(str, sizeof(str), "1/4: %d.%d fps", fps / 10, fps % 10);
+    log_text(str);
+}
+#endif
+
 /* plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    char str[64];                   /* text buffer */
-    int time_start;                 /* start tickcount */
-    int frame_count;                /* frame counter */
 #ifndef SIMULATOR
+    char str[32];
     int cpu_freq;
-#endif
-    int line = 0;
-    int part14_x = LCD_WIDTH/4;     /* x-offset for 1/4 update test */
-    int part14_w = LCD_WIDTH/2;     /* x-size for 1/4 update test */
-    int part14_y = LCD_HEIGHT/4;    /* y-offset for 1/4 update test */
-    int part14_h = LCD_HEIGHT/2;    /* y-size for 1/4 update test */
-#ifdef HAVE_REMOTE_LCD
-    int r_line = 0;
-    int r_part14_x = LCD_REMOTE_WIDTH/4;  /* x-offset for 1/4 update test */
-    int r_part14_w = LCD_REMOTE_WIDTH/2;  /* x-size for 1/4 update test */
-    int r_part14_y = LCD_REMOTE_HEIGHT/4; /* y-offset for 1/4 update test */
-    int r_part14_h = LCD_REMOTE_HEIGHT/2; /* y-size for 1/4 update test */
 #endif
 
     /* standard stuff */
     (void)parameter;
     rb = api;
-
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, line++, "FPS Measurement");
-#ifdef HAVE_REMOTE_LCD
-    rb->lcd_puts(0, line++, "Main LCD");
-    rb->lcd_remote_puts(0, r_line++, "FPS Measurement");
-    rb->lcd_remote_puts(0, r_line++, "Main LCD");
-    rb->lcd_remote_update();
-#endif
-    rb->lcd_update();
-
+    
+    log_init();
 #ifndef SIMULATOR
     cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
 #endif
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 
-    /* TEST 1: FULL LCD UPDATE */
-    frame_count = 0;
-    time_start = *rb->current_tick;
-    while(*rb->current_tick - time_start < 2*HZ)
-    {
-        rb->lcd_update();
-        frame_count++;
-    }
-
-    rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", frame_count / 2,
-                 (frame_count % 2) * 5);
-    rb->lcd_puts(0, line++, str);
-    rb->lcd_update();
-
-    /* TEST 2: QUARTER LCD UPDATE */
-    frame_count = 0;
-    time_start = *rb->current_tick;
-    while(*rb->current_tick - time_start < 2*HZ)
-    {
-        rb->lcd_update_rect(part14_x, part14_y, part14_w, part14_h);
-        frame_count++;
-    }
-
-    rb->snprintf(str, sizeof(str), "1/4: %d.%d fps", frame_count/2,
-                 (frame_count%2)*5);
-    rb->lcd_puts(0, line++, str);
-    
-#ifndef SIMULATOR
-    if (*rb->cpu_frequency != cpu_freq)
-        rb->snprintf(str, sizeof(str), "CPU: frequency changed!");
-    else
-        rb->snprintf(str, sizeof(str), "CPU: %d Hz", cpu_freq);
-
-    rb->lcd_puts(0, line++, str);
+    log_text("Main LCD Update");
+    time_main_update();
+#ifdef HAVE_LCD_COLOR
+    log_text("Main LCD YUV");
+    time_main_yuv();
 #endif
-    rb->lcd_update();
-
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_puts(0, line++, "Remote LCD");
-    rb->lcd_update();
-    rb->lcd_remote_puts(0, r_line++, "Remote LCD");
-    rb->lcd_remote_update();
-
-#ifndef SIMULATOR
-    cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
+    log_text("Remote LCD Update");
+    time_remote_update();
 #endif
 
-    /* TEST 1: FULL LCD UPDATE */
-    frame_count = 0;
-    time_start = *rb->current_tick;
-    while(*rb->current_tick - time_start < 2*HZ)
-    {
-        rb->lcd_remote_update();
-        frame_count++;
-    }
-
-    rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", frame_count / 2,
-                 (frame_count % 2) * 5);
-    rb->lcd_puts(0, line++, str);
-    rb->lcd_update();
-
-    /* TEST 2: QUARTER LCD UPDATE */
-    frame_count = 0;
-    time_start = *rb->current_tick;
-    while(*rb->current_tick - time_start < 2*HZ)
-    {
-        rb->lcd_remote_update_rect(r_part14_x, r_part14_y, r_part14_w, 
-                                   r_part14_h);
-        frame_count++;
-    }
-
-    rb->snprintf(str, sizeof(str), "1/4: %d.%d fps", frame_count/2,
-                 (frame_count%2)*5);
-    rb->lcd_puts(0, line++, str);
-    
 #ifndef SIMULATOR
     if (*rb->cpu_frequency != cpu_freq)
-        rb->snprintf(str, sizeof(str), "CPU: frequency changed!");
+        rb->snprintf(str, sizeof(str), "CPU clock changed!");
     else
-        rb->snprintf(str, sizeof(str), "CPU: %d Hz", cpu_freq);
-
-    rb->lcd_puts(0, line++, str);
+        rb->snprintf(str, sizeof(str), "CPU: %d MHz",
+                     (cpu_freq + 500000) / 1000000);
+    log_text(str);
 #endif
-    rb->lcd_update();
-#endif
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
     /* wait until user closes plugin */
     while (rb->button_get(true) != FPS_QUIT);

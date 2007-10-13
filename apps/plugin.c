@@ -519,7 +519,9 @@ static const struct plugin_api rockbox_api = {
     talk_enable_menus,
 
     button_queue_count,
-
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_setmargins,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
