@@ -47,7 +47,7 @@ extern unsigned shadow_codec_reg0;
 #ifdef SIMULATOR
 /* dummy for sim */
 const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -40,   6, -25},
+    [SOUND_VOLUME]        = {"dB", 0,  1, VOLUME_MIN / 10, VOLUME_MAX / 10, -25},
     [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
     [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
@@ -666,7 +666,8 @@ void sound_set_superbass(int value)
 int sim_volume;
 void sound_set_volume(int value)
 {
-    sim_volume =128*(value +40)/46; /* 128 is SDL_MIX_MAXVOLUME */
+    /* 128 is SDL_MIX_MAXVOLUME */
+    sim_volume = 128 * (value - VOLUME_MIN / 10) / ((VOLUME_MAX - VOLUME_MIN) / 10);
 }
 
 void sound_set_balance(int value)
