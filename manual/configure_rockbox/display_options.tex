@@ -2,31 +2,7 @@
 \section{\label{ref:Displayoptions}Display}
   
   \begin{description}
-  \nopt{player}{
-    \item[Browse fonts:]
-    Browse the fonts that reside in your \fname{/.rockbox/fonts} directory.
-    Selecting one will activate it. See \reference{ref:Loadingfonts}
-    for further details about fonts.
-  } % \nopt{player}
 
-  \item[Browse WPS files:]
-    Opens the \setting{File Browser} in the \fname{/.rockbox/wps} directory and
-    displays all \fname{.wps} files. Selecting one will activate it, stop will
-    exit back to the menu. For further information about the WPS see 
-    \reference{ref:WPS}. For information about editing a .wps file see
-    \reference{ref:ConfiguringtheWPS}.
-    
-  \opt{HAVE_REMOTE_LCD}{
-    \item[Browse RWPS files:]
-    Opens the \setting{File Browser} in the \fname{/.rockbox/wps} directory and
-    displays all \fname{.rwps} files. Selecting one will activate it, stop will
-    exit back to the menu.
-    \note{
-      A \fname{.rwps} file is a special \fname{.wps} file for the remote
-      display.
-    }
-  }
-  
   \item[LCD Settings:]
     This sub menu contains settings that relate to the display of the \dap.
     \begin{description}
@@ -88,26 +64,8 @@
         This is sometimes useful when carrying the \dap\ in a pocket for easy
         access to the headphone socket.
       } % \nopt{ipodcolor,ipodnano.ipodvideo}
-    
-      \item[Line Selector:]
-      This option allows you to select whether the line selector is a bar
-      of inverted text (\setting{Bar (inverse)} option) or a small arrow to the
-      left of the menu text (\setting{Pointer} option).
-    
-      \nopt{archos}{%
-        \item[Clear Backdrop:]
-          Rockbox allows you to select bitmap pictures to use as backdrops,
-          see \reference{ref:LoadingBackdrops} for further information.
-          This option allows you to clear the backdrops that you set.
-      }%
-      \opt{HAVE_LCD_COLOR}{
-        \item[Background Colour:]
-          Sets the background colour for the LCD display.
-        \item[Foreground Colour:]
-          Sets the colour used for text and icons.
-        \item[Reset Colours:]
-          Resets the LCD display to Rockbox's default colours.
-      }
+
+      
     } % \opt{HAVE_LCD_BITMAP}
     \end{description}
 %
