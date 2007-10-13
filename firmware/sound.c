@@ -35,6 +35,17 @@
 #endif
 #endif
 
+#if CONFIG_CODEC == MAS3507D /* volume/balance/treble/bass interdependency */
+#define VOLUME_MIN -780
+#define VOLUME_MAX  180
+#else
+#define VOLUME_MIN -400
+#define VOLUME_MAX  600
+#endif
+
+/* volume/balance/treble/bass interdependency main part */
+#define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
+
 #ifndef SIMULATOR
 extern bool audio_is_initialized;
 
@@ -179,8 +190,6 @@ void sound_set_dsp_callback(int (*func)(int, intptr_t))
 
 #ifndef SIMULATOR
 #if CONFIG_CODEC == MAS3507D /* volume/balance/treble/bass interdependency */
-#define VOLUME_MIN -780
-#define VOLUME_MAX  180
 
 static const unsigned int bass_table[] =
 {
@@ -286,8 +295,6 @@ static int tenthdb2reg(int db)
     || defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_WM8731) \
     || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
     || defined(HAVE_AS3514)
- /* volume/balance/treble/bass interdependency main part */
-#define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
 
 /* all values in tenth of dB    MAS3507D    UDA1380  */
 int current_volume = 0;    /* -780..+180  -840..   0 */
@@ -667,7 +674,7 @@ int sim_volume;
 void sound_set_volume(int value)
 {
     /* 128 is SDL_MIX_MAXVOLUME */
-    sim_volume = 128 * (value - VOLUME_MIN / 10) / ((VOLUME_MAX - VOLUME_MIN) / 10);
+    sim_volume = 128 * (value - VOLUME_MIN / 10) / (VOLUME_RANGE / 10);
 }
 
 void sound_set_balance(int value)
