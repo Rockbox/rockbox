@@ -38,6 +38,7 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
 
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;
+    bool last_metadata = false;
     bool rc = false;
 
     if (!skip_id3v2(fd, id3) || (read(fd, buf, 4) < 4))
@@ -50,24 +51,26 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
         return rc;
     }
 
-    while (true) 
+    while (!last_metadata) 
     {
-        long i;
+        unsigned long i;
+        int type;
         
         if (read(fd, buf, 4) < 0)
         {
             return rc;
         }
         
+        last_metadata = buf[0] & 0x80;
+        type = buf[0] & 0x7f;
         /* The length of the block */
         i = (buf[1] << 16) | (buf[2] << 8) | buf[3];
 
-        if ((buf[0] & 0x7f) == 0)       /* 0 is the STREAMINFO block */
+        if (type == 0)       /* 0 is the STREAMINFO block */
         {
             unsigned long totalsamples;
-
-            /* FIXME: Don't trust the value of i */
-            if (read(fd, buf, i) < 0)
+            
+            if (i >= sizeof(id3->path) || read(fd, buf, i) < 0)
             {
                 return rc;
             }
@@ -92,7 +95,7 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
 
             id3->bitrate = (id3->filesize * 8) / id3->length;
         } 
-        else if ((buf[0] & 0x7f) == 4)  /* 4 is the VORBIS_COMMENT block */
+        else if (type == 4)  /* 4 is the VORBIS_COMMENT block */
         {
             /* The next i bytes of the file contain the VORBIS COMMENTS. */
             if (!read_vorbis_tags(fd, id3, i))
@@ -100,20 +103,12 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
                 return rc;
             }
         } 
-        else 
+        else if (!last_metadata)
         {
-            if (buf[0] & 0x80) 
+            /* Skip to next metadata block */
+            if (lseek(fd, i, SEEK_CUR) < 0)
             {
-                /* If we have reached the last metadata block, abort. */
-                break;
-            }
-            else
-            {
-                /* Skip to next metadata block */
-                if (lseek(fd, i, SEEK_CUR) < 0)
-                {
-                    return rc;
-                }
+                return rc;
             }
         }
     }
