@@ -129,6 +129,8 @@ macx {
     CONFIG+=x86 ppc
     LIBS += -L/usr/local/lib -framework IOKit
     INCLUDEPATH += /usr/local/include
+    QMAKE_INFO_PLIST = Info.plist
+    RC_FILE = icons/rbutilqt.icns
 }
 
 static {
