@@ -26,6 +26,11 @@
 #if defined(Q_OS_LINUX)
 #include <mntent.h>
 #endif
+#if defined(Q_OS_MACX)
+#include <sys/param.h>
+#include <sys/ucred.h>
+#include <sys/mount.h>
+#endif
 #if defined(Q_OS_WIN32)
 #if defined(UNICODE)
 #define _UNICODE
@@ -163,20 +168,24 @@ bool Autodetection::detect()
 
 QStringList Autodetection::getMountpoints()
 {
-#if defined(Q_OS_WIN32)
     QStringList tempList;
+#if defined(Q_OS_WIN32)
     QFileInfoList list = QDir::drives();
     for(int i=0; i<list.size();i++)
     {
         tempList << list.at(i).absolutePath();
     }
-    return tempList;
 
 #elif defined(Q_OS_MACX)
-    QDir dir("/Volumes");
-    return dir.entryList();
+    int num;
+    struct statfs *mntinf;
+
+    num = getmntinfo(&mntinf, MNT_WAIT);
+    while(num--) {
+        tempList << QString(mntinf->f_mntonname);
+        mntinf++;
+    }
 #elif defined(Q_OS_LINUX)
-    QStringList tempList;
 
     FILE *mn = setmntent("/etc/mtab", "r");
     if(!mn)
@@ -187,10 +196,10 @@ QStringList Autodetection::getMountpoints()
         tempList << QString(ent->mnt_dir);
     endmntent(mn);
 
-    return tempList;
 #else
 #error Unknown Plattform
 #endif
+    return tempList;
 }
 
 QString Autodetection::resolveMountPoint(QString device)
@@ -212,6 +221,19 @@ QString Autodetection::resolveMountPoint(QString device)
     }
     endmntent(mn);
 
+#endif
+
+#if defined(Q_OS_MACX)
+    int num;
+    struct statfs *mntinf;
+
+    num = getmntinfo(&mntinf, MNT_WAIT);
+    while(num--) {
+        if(QString(mntinf->f_mntfromname).startsWith(device)
+           && QString(mntinf->f_fstypename).contains("vfat", Qt::CaseInsensitive))
+            return QString(mntinf->f_mntonname);
+        mntinf++;
+    }
 #endif
     return QString("");
 
