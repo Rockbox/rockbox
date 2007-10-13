@@ -1,0 +1,113 @@
+% $Id $ %
+The \setting{Theme Settings} menu offers options that you can change to
+customize the visual apperance of Rockbox.
+
+\begin{description}
+\item[Browse Themes.]
+  This option will display all the currently installed themes on the \dap{}, 
+  press \ActionTreeEnter{} to load the chosen theme and apply it.
+
+  A theme is a configuration file, stored in a specific directory, 
+  that typically changes the WPS 
+  \opt{HAVE_REMOTE_LCD}{and remote WPS}, font used and on some platforms
+  additional information such as background image and text colours.
+
+  There are a number of themes that ship with Rockbox. If none of
+  these suit your needs, many more can be downloaded from 
+  \opt{RECORDER_PAD}{\wikilink{WpsArchos}}%
+  \opt{h1xx}{\wikilink{WpsIriverH100}}%
+  \opt{h300,ipodcolor}{\wikilink{WpsIriverH300}}%
+  \opt{ipodvideo}{\wikilink{WpsIpod5g}}%
+  \opt{ipodnano}{\wikilink{WpsIpodNano}}%
+  \opt{ipodmini}{\wikilink{WpsIpodMini}}%
+  \opt{x5}{\wikilink{WpsIaudioX5}}%
+  .
+  Some of the downloads from this site will actually be standalone WPS files, 
+  others will be full-blown themes. 
+
+  \note{Themes do not have to be purely visual. It is quite possible to create
+    a theme that switches between audio configurations for use in the car, with
+    headphones and when connected to an external amplifier. See
+    \reference{ref:CreateYourOwnWPS} for more details.}
+
+\nopt{player}{
+  \item[Browse fonts.]
+    Browse the installed fonts on your \dap{}. Selecting one will activate it.
+    See \reference{ref:Loadingfonts} for further details about fonts.
+} % \nopt{player}
+
+\item[Browse WPS files.]
+  Opens the \setting{File Browser} in the \fname{/.rockbox/wps} directory and
+  displays all \fname{.wps} files. Selecting one will activate it, stop will
+  exit back to the menu. For further information about the WPS see 
+  \reference{ref:WPS}. For information about editing a .wps file see
+  \reference{ref:ConfiguringtheWPS}.
+
+\opt{HAVE_REMOTE_LCD}{
+  \item[Browse RWPS files.]
+    Opens the \setting{File Browser} in the \fname{/.rockbox/wps} directory and
+    displays all \fname{.rwps} files. Selecting one will activate it, stop will
+    exit back to the menu.
+    \note{
+      A \fname{.rwps} file is a special \fname{.wps} file for the remote
+      display.
+    }
+}
+
+\item[Show Icons.]
+  Rockbox has the ability to display an icon to the left of the file
+  in the \setting{File Browser}. For details of these icons, see
+  \reference{ref:Supportedfileformats}.
+
+\nopt{archos}{%
+  \item[Clear Backdrop:]
+    Rockbox allows you to select bitmap pictures to use as backdrops,
+    see \reference{ref:LoadingBackdrops} for further information.
+    This option allows you to clear the backdrops that you set.
+}%
+
+\opt{HAVE_LCD_BITMAP}{
+\item[Line Selector Type.]
+  This option allows you to select which type of line selector to use.
+  \begin{description}
+    \item[Pointer:]
+      A small arrow to the left of the menu text.
+    \item[Bar (inverse):]
+      A bar with inverted foreground and background colour.
+\opt{HAVE_LCD_COLOR}{
+    \item[Bar (Solid Colour):]
+      A bar with a solid colour, the colour is set in the \setting{Colours}
+      submenu.
+    \item[Bar (Gradient Colour):]
+      A bar with a colour gradient, the colours are set in the \setting{Colours}
+      submenu.
+}
+  \end{description}
+}
+
+\opt{HAVE_LCD_COLOR}{
+  \item[Colours.]
+    The options in this menu sets the colours for visual elements in Rockbox.
+    \begin{description}
+    \item[Line Selector Colours.]
+      These options sets the colours for the line selector bars.
+      \begin{description}
+        \item[Primary Colour:]
+          Set the primary colour used for the gradient line selector bar and the
+          colour used for the solid color line selector bar.
+        \item[Secondary Colour:]
+          Set the secondary colour used for the gradient line selector bar.
+        \item[Text Colour:]
+          Set the colour of the selected text when using the solid colour or the
+          gradient colour line selection bars.
+      \end{description}
+
+    \item[Background Colour:]
+      Sets the background colour for the display.
+    \item[Foreground Colour:]
+      Sets the colour used for text and icons.
+    \item[Reset Colours:]
+      Resets the LCD display to Rockbox's default colours.
+    \end{description}
+}% HAVE_LCD_COLOR
+\end{description}
