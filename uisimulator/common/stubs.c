@@ -169,9 +169,11 @@ bool rtc_enable_alarm(bool enable)
     return enable;
 }
 
+extern bool sim_alarm_wakeup;
 bool rtc_check_alarm_started(bool release_alarm)
 {
-    return release_alarm;
+    (void)release_alarm;
+    return sim_alarm_wakeup;
 }
 
 bool rtc_check_alarm_flag(void)

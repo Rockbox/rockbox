@@ -54,6 +54,7 @@ SDL_TimerID tick_timer_id;
 
 bool lcd_display_redraw = true;         /* Used for player simulator */
 char having_new_lcd = true;               /* Used for player simulator */
+bool sim_alarm_wakeup = false;
 
 bool debug_audio = false;
 
@@ -206,6 +207,9 @@ int main(int argc, char *argv[])
                 else
                     display_zoom = 2;
                 printf("Window zoom is %d\n", display_zoom);
+            } else if (!strcmp("--alarm", argv[x])) {
+                sim_alarm_wakeup = true;
+                printf("Simulating alarm wakeup.\n");
             } else {
                 printf("rockboxui\n");
                 printf("Arguments:\n");
@@ -214,6 +218,7 @@ int main(int argc, char *argv[])
                 printf("  --background \t Use background image of hardware\n");
                 printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
                 printf("  --zoom [VAL]\t window zoom (will disable backgrounds)\n");
+                printf("  --alarm \t Simulate a wakup-up on Alarm\n");
                 exit(0);
             }
         }
