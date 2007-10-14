@@ -109,7 +109,7 @@ static unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer,
                                         unsigned int* buffer_left, char** dest)
 {
     unsigned int bytes_read = read_mp4_tag(fd, size_left, *buffer,
-        *buffer_left - 1);
+        *buffer_left > 0 ? *buffer_left - 1 : 0);
     unsigned int length = 0;
 
     if (bytes_read)
