@@ -45,6 +45,23 @@
  *   |B|   |19611723 33976259         0| |Cr - 128| >> 26
  *
  * Needs EMAC set to saturated, signed integer mode.
+ *
+ * register usage:
+ *   %a0 - LCD data port
+ *   %a1 - Y pointer
+ *   %a2 - C pointer
+ *   %a3 - C width
+ *   %a4 - Y end address
+ *   %a5 - Y factor
+ *   %a6 - BU factor
+ *   %d0 - scratch
+ *   %d1 -     B, previous Y \ alternating
+ *   %d2 - U / B, previous Y /
+ *   %d3 - V / G
+ *   %d4 - R / output pixel
+ *   %d5 - GU factor
+ *   %d6 - GV factor
+ *   %d7 - RGB signed -> unsigned conversion mask
  */
     .align      2
     .global     lcd_write_yuv420_lines
@@ -55,8 +72,8 @@ lcd_write_yuv420_lines:
     movem.l %d2-%d7/%a2-%a6, (%sp)
 
     lea.l   0xf0008002, %a0         /* LCD data port */
-    movem.l (44+4, %sp), %a1-%a4    /* Y data, Cb data, Cr data, width */
-    lea.l   (%a1, %a4), %a4         /* end address */
+    movem.l (44+4, %sp), %a1-%a3    /* Y data, C data, C width */
+    lea.l   (%a1, %a3*2), %a4       /* Y end address */
 
     move.l  #19611723, %a5          /* y factor */
     move.l  #33976259, %a6          /* bu factor */
@@ -65,11 +82,11 @@ lcd_write_yuv420_lines:
     move.l  #0x01040820, %d7        /* bitmask for signed->unsigned conversion
                                      * of R, G and B within RGGB6666 at once */
 
-    /* chroma for (very) first & second pixel */
+    /* chroma for first 2x2 block */
+    clr.l   %d3                     /* load v component */
+    move.b  (%a2, %a3), %d3
     clr.l   %d2                     /* load u component */
     move.b  (%a2)+, %d2
-    clr.l   %d3                     /* load v component */
-    move.b  (%a3)+, %d3
     moveq.l #-128, %d0
     add.l   %d0, %d2
     add.l   %d0, %d3
@@ -80,9 +97,9 @@ lcd_write_yuv420_lines:
     move.l  #26881894, %d0          /* rv factor */
     mac.l   %d0, %d3, %acc2         /* rv */
 
-    /* luma for (very) first pixel */
+    /* luma for very first pixel (top left) */
     clr.l   %d1
-    move.b  (%a1)+, %d1
+    move.b  (%a1, %a3*2), %d1
     moveq.l #-126, %d0
     add.l   %d1, %d0                /* y' (-0.5 ... +0.5) */
     mac.l   %a5, %d0, %acc0
@@ -92,11 +109,11 @@ lcd_write_yuv420_lines:
     bra.b   .yuv_line_entry
 
 .yuv_line_loop:
-    /* chroma for first & second pixel */
+    /* chroma for 2x2 pixel block */
+    clr.l   %d3                     /* load v component */
+    move.b  (%a2, %a3), %d3
     clr.l   %d2                     /* load u component */
     move.b  (%a2)+, %d2
-    clr.l   %d3                     /* load v component */
-    move.b  (%a3)+, %d3
     moveq.l #-128, %d0
     add.l   %d0, %d2
     add.l   %d0, %d3
@@ -107,9 +124,9 @@ lcd_write_yuv420_lines:
     move.l  #26881894, %d0          /* rv factor */
     mac.l   %d0, %d3, %acc2         /* rv */
 
-    /* luma for first pixel */
+    /* luma for first pixel (top left) */
     clr.l   %d1
-    move.b  (%a1)+, %d1
+    move.b  (%a1, %a3*2), %d1
     moveq.l #-126, %d0
     add.l   %d1, %d0                /* y' (-0.5 ... +0.5) */
     mac.l   %a5, %d0, %acc0
@@ -140,9 +157,74 @@ lcd_write_yuv420_lines:
     move.w  %d4, (%a0)
     swap    %d4
 
-    /* luma for second pixel as delta from the first */
-    clr.l   %d0
-    move.b  (%a1)+, %d0
+    /* luma for second pixel (bottom left) as delta from the first */
+    clr.l   %d2
+    move.b  (%a1)+, %d2
+    move.l  %d2, %d0
+    sub.l   %d1, %d0
+    mac.l   %a5, %d0, %acc0
+    mac.l   %a5, %d0, %acc1
+    mac.l   %a5, %d0, %acc2
+
+    move.w  %d4, (%a0)
+    /* 2nd LCD write is delayed one pixel to use it for filling the EMAC latency */
+
+    /* convert to RGB666, pack and output */
+    moveq.l #26, %d0
+    move.l  %acc0, %d4
+    move.l  %acc1, %d3
+    move.l  %acc2, %d1
+    lsr.l   %d0, %d4
+    lsr.l   %d0, %d3
+    lsr.l   %d0, %d1
+
+    lsl.l   #6, %d1
+    or.l    %d3, %d1                /* |00000000|00000000|0000Rrrr|rrGggggg| */
+    lsl.l   #7, %d1
+    or.l    %d1, %d3                /* |00000000|00000Rrr|rrrGgggg|g0Gggggg| */
+    lsl.l   #6, %d3
+    or.l    %d3, %d4                /* |0000000R|rrrrrGgg|ggg0Gggg|ggBbbbbb| */
+    eor.l   %d7, %d4                /* |0000000r|rrrrrggg|ggg0gggg|ggbbbbbb| */
+    swap    %d4
+    move.w  %d4, (%a0)
+    swap    %d4
+    
+    /* luma for third pixel (top right) as delta from the second */
+    clr.l   %d1
+    move.b  (%a1, %a3*2), %d1
+    move.l  %d1, %d0
+    sub.l   %d2, %d0
+    mac.l   %a5, %d0, %acc0
+    mac.l   %a5, %d0, %acc1
+    mac.l   %a5, %d0, %acc2
+    
+    move.w  %d4, (%a0)
+    /* 2nd LCD write is delayed one pixel to use it for filling the EMAC latency */
+
+    /* convert to RGB666, pack and output */
+    moveq.l #26, %d0
+    move.l  %acc0, %d4
+    move.l  %acc1, %d3
+    move.l  %acc2, %d2
+    lsr.l   %d0, %d4
+    lsr.l   %d0, %d3
+    lsr.l   %d0, %d2
+    
+    lsl.l   #6, %d2
+    or.l    %d3, %d2                /* |00000000|00000000|0000Rrrr|rrGggggg| */
+    lsl.l   #7, %d2
+    or.l    %d2, %d3                /* |00000000|00000Rrr|rrrGgggg|g0Gggggg| */
+    lsl.l   #6, %d3
+    or.l    %d3, %d4                /* |0000000R|rrrrrGgg|ggg0Gggg|ggBbbbbb| */
+    eor.l   %d7, %d4                /* |0000000r|rrrrrggg|ggg0gggg|ggbbbbbb| */
+    swap    %d4
+    move.w  %d4, (%a0)
+    swap    %d4
+
+    /* luma for fourth pixel (bottom right) as delta from the thrid */
+    clr.l   %d2
+    move.b  (%a1)+, %d2
+    move.l  %d2, %d0
     sub.l   %d1, %d0
     mac.l   %a5, %d0, %acc0
     mac.l   %a5, %d0, %acc1
@@ -155,15 +237,15 @@ lcd_write_yuv420_lines:
     moveq.l #26, %d0
     movclr.l %acc0, %d4
     movclr.l %acc1, %d3
-    movclr.l %acc2, %d2
+    movclr.l %acc2, %d1
     lsr.l   %d0, %d4
     lsr.l   %d0, %d3
-    lsr.l   %d0, %d2
+    lsr.l   %d0, %d1
 
-    lsl.l   #6, %d2
-    or.l    %d3, %d2                /* |00000000|00000000|0000Rrrr|rrGggggg| */
-    lsl.l   #7, %d2
-    or.l    %d2, %d3                /* |00000000|00000Rrr|rrrGgggg|g0Gggggg| */
+    lsl.l   #6, %d1
+    or.l    %d3, %d1                /* |00000000|00000000|0000Rrrr|rrGggggg| */
+    lsl.l   #7, %d1
+    or.l    %d1, %d3                /* |00000000|00000Rrr|rrrGgggg|g0Gggggg| */
     lsl.l   #6, %d3
     or.l    %d3, %d4                /* |0000000R|rrrrrGgg|ggg0Gggg|ggBbbbbb| */
     eor.l   %d7, %d4                /* |0000000r|rrrrrggg|ggg0gggg|ggbbbbbb| */
@@ -174,21 +256,10 @@ lcd_write_yuv420_lines:
     cmp.l   %a1, %a4                /* run %a1 up to end of line */
     bhi.w   .yuv_line_loop
 
-    tst.l   (44+4, %sp)             /* use original Y pointer as a flag to */
-    beq.b   .yuv_exit               /* distinguish between first and second */
-    clr.l   (44+4, %sp)             /* pixel line */
-
-    /* Rewind chroma pointers */
-    movem.l (44+8, %sp), %a2-%a4    /* Cb data, Cr data, width */
-    lea.l   (%a1, %a4), %a4         /* end address */
-    bra.w   .yuv_line_loop
-    
-.yuv_exit:
     move.w  %d4, (%a0)              /* write (very) last 2nd word */
 
     movem.l (%sp), %d2-%d7/%a2-%a6
     lea.l   (44, %sp), %sp  /* restore registers */
-
     rts
 .yuv_end:
     .size   lcd_write_yuv420_lines, yuv_end - lcd_write_yuv420_lines

@@ -80,6 +80,9 @@ static int xoffset = 0; /* needed for flip */
 #define LCD_CMD  (*(volatile unsigned short *)0xf0000000)
 #define LCD_DATA (*(volatile unsigned short *)0xf0000002)
 
+#define R_ENTRY_MODE_HORZ 0x7030
+#define R_ENTRY_MODE_VERT 0x7038
+
 /* called very frequently - inline! */
 static inline void lcd_write_reg(int reg, int val)
 {
@@ -307,13 +310,12 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
 }
 
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420.
- * y should have two lines of Y back to back.
- * bu and rv should contain the Cb and Cr data for the two lines of Y.
+ * y should have two lines of Y back to back, 2nd line first.
+ * c should contain the Cb and Cr data for the two lines of Y back to back.
  * Needs EMAC set to saturated, signed integer mode.
  */
 extern void lcd_write_yuv420_lines(const unsigned char *y,
-                                   const unsigned char *bu,
-                                   const unsigned char *rv, int width);
+                                   const unsigned char *c, int cwidth);
 
 /* Performance function to blit a YUV bitmap directly to the LCD
  * src_x, src_y, width and height should be even
@@ -325,8 +327,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
 {
     /* IRAM Y, Cb and Cb buffers. */
     unsigned char y_ibuf[LCD_WIDTH*2];
-    unsigned char bu_ibuf[LCD_WIDTH/2];
-    unsigned char rv_ibuf[LCD_WIDTH/2];
+    unsigned char c_ibuf[LCD_WIDTH];
     const unsigned char *ysrc, *usrc, *vsrc;
     const unsigned char *ysrc_max;
 
@@ -336,11 +337,9 @@ void lcd_yuv_blit(unsigned char * const src[3],
     width &= ~1;  /* stay on the safe side */
     height &= ~1;
 
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
     /* Set start position and window */
-    lcd_write_reg(R_VERT_RAM_ADDR_POS,((x+xoffset+width-1) << 8) | (x+xoffset));
-    lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
-
-    lcd_begin_write_gram();
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((xoffset + 219) << 8) | xoffset);
 
     ysrc = src[0] + src_y * stride + src_x;
     usrc = src[1] + (src_y * stride >> 2) + (src_x >> 1);
@@ -350,11 +349,17 @@ void lcd_yuv_blit(unsigned char * const src[3],
     coldfire_set_macsr(EMAC_SATURATE);
     do
     {
-        memcpy(y_ibuf, ysrc, width);
-        memcpy(y_ibuf + width, ysrc + stride, width);
-        memcpy(bu_ibuf, usrc, width >> 1);
-        memcpy(rv_ibuf, vsrc, width >> 1);
-        lcd_write_yuv420_lines(y_ibuf, bu_ibuf, rv_ibuf, width);
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((y + 1) << 8) | y);
+        lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
+        lcd_begin_write_gram();
+
+        memcpy(y_ibuf + width, ysrc, width);
+        memcpy(y_ibuf, ysrc + stride, width);
+        memcpy(c_ibuf, usrc, width >> 1);
+        memcpy(c_ibuf + (width >> 1), vsrc, width >> 1);
+        lcd_write_yuv420_lines(y_ibuf, c_ibuf, width >> 1);
+
+        y += 2;
         ysrc += 2 * stride;
         usrc += stride >> 1;
         vsrc += stride >> 1;
@@ -368,11 +373,12 @@ void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
     if(display_on){
-        /* reset update window */
+        lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VERT);
+        /* set start position window */
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 175 << 8);
         lcd_write_reg(R_VERT_RAM_ADDR_POS,((xoffset+219)<<8) | xoffset);
-
-        /* Copy display bitmap to hardware */
         lcd_write_reg(R_RAM_ADDR_SET, xoffset << 8);
+
         lcd_begin_write_gram();
 
         DAR3 = 0xf0000002;
@@ -403,8 +409,9 @@ void lcd_update_rect(int x, int y, int width, int height)
         if(y + height > LCD_HEIGHT)
             height = LCD_HEIGHT - y;
 
+        lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VERT);
         /* set update window */
-
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 175 << 8);
         lcd_write_reg(R_VERT_RAM_ADDR_POS,((x+xoffset+width-1) << 8) | (x+xoffset));
         lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
         lcd_begin_write_gram();
