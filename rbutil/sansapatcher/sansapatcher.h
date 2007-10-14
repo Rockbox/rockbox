@@ -37,6 +37,7 @@ int sansa_read_firmware(struct sansa_t* sansa, char* filename);
 int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type);
 int sansa_delete_bootloader(struct sansa_t* sansa);
 int sansa_update_of(struct sansa_t* sansa,char* filename);
+int sansa_update_ppbl(struct sansa_t* sansa,char* filename);
 void sansa_list_images(struct sansa_t* sansa);
 
 #endif

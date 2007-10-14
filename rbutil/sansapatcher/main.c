@@ -48,7 +48,8 @@ enum {
    WRITE_FIRMWARE,
    READ_PARTITION,
    WRITE_PARTITION,
-   UPDATE_OF
+   UPDATE_OF,
+   UPDATE_PPBL
 };
 
 void print_usage(void)
@@ -67,6 +68,7 @@ void print_usage(void)
     fprintf(stderr,"  -a,   --add-bootloader            filename.mi4\n");
     fprintf(stderr,"  -d,   --delete-bootloader\n");
     fprintf(stderr,"  -of   --update-original-firmware  filename.mi4\n");
+    fprintf(stderr,"  -bl   --update-ppbl               filename.bin\n");
     fprintf(stderr,"\n");
 
 #ifdef __WIN32__
@@ -225,6 +227,13 @@ int main(int argc, char* argv[])
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
+        } else if ((strcmp(argv[i],"-bl")==0) || 
+                   (strcmp(argv[i],"--update-ppbl")==0)) {
+            action = UPDATE_PPBL;
+            i++;
+            if (i == argc) { print_usage(); return 1; }
+            filename=argv[i];
+            i++;
         } else if ((strcmp(argv[i],"-rf")==0) || 
                    (strcmp(argv[i],"--read-firmware")==0)) {
             action = READ_FIRMWARE;
@@ -344,6 +353,25 @@ int main(int argc, char* argv[])
                 fprintf(stderr,"[INFO] OF updated successfully.\n");
             } else {
                 fprintf(stderr,"[ERR]  --update-original-firmware failed.\n");
+            }
+        } else if (action==UPDATE_PPBL) {
+            printf("[WARN] PPBL installation will overwrite your bootloader. This will lead to a\n");
+            printf("       Sansa that won't boot if the bootloader file is invalid. Only continue if\n");
+            printf("       you're sure you know what you're doing.\n");
+            printf("       Continue (y/n)? ");
+
+            if (fgets(yesno,4,stdin)) {
+                if (yesno[0]=='y') {
+                    if (sansa_reopen_rw(&sansa) < 0) {
+                        return 5;
+                    }
+        
+                    if (sansa_update_ppbl(&sansa, filename)==0) {
+                        fprintf(stderr,"[INFO] PPBL updated successfully.\n");
+                    } else {
+                        fprintf(stderr,"[ERR]  --update-ppbl failed.\n");
+                    }
+                }
             }
         }
     }

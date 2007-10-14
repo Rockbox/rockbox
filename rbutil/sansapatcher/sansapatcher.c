@@ -886,3 +886,47 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
     return 0;
 }
 
+/* Update the PPBL (bootloader) image in the hidden firmware partition */
+int sansa_update_ppbl(struct sansa_t* sansa, char* filename)
+{
+    int n;
+    int infile = -1;   /* Prevent an erroneous "may be used uninitialised" gcc warning */
+    int ppbl_length = 0; /* Keep gcc happy when building for rbutil */
+
+    /* Step 1 - read bootloader into RAM. */
+    infile=open(filename,O_RDONLY|O_BINARY);
+    if (infile < 0) {
+        fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
+        return -1;
+    }
+
+    ppbl_length = filesize(infile);
+
+    n = read(infile,sectorbuf+0x200,ppbl_length);
+    close(infile);
+    if (n < ppbl_length) {
+           fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n", ppbl_length, n);
+           return -1;
+    }
+
+    /* Step 2 - Build the header */
+    memset(sectorbuf,0,0x200);
+    memcpy(sectorbuf,"PPBL",4);
+    int2le(ppbl_length, sectorbuf+4);
+    int2le(0x00010000,  sectorbuf+8);
+
+    /* Step 3 - write the bootloader to the Sansa */
+    if (sansa_seek(sansa, sansa->start) < 0) {
+        fprintf(stderr,"[ERR]  Seek to 0x%08llx in sansa_update_ppbl failed.\n", sansa->start);
+        return -1;
+    }
+
+    n=sansa_write(sansa, sectorbuf, ppbl_length + 0x200);
+    if (n < (ppbl_length+0x200)) {
+        fprintf(stderr,"[ERR]  Short write in sansa_update_ppbl\n");
+        return -1;
+    }
+
+    return 0;
+}
+
