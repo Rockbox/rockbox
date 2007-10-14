@@ -1119,7 +1119,7 @@ static int button_loop(void)
             rb->lcd_setfont(FONT_SYSFIXED);
 
             if (result) {
-                settings.resume_time = (int)(get_stream_time()/44100/
+                settings.resume_time = (int)(get_stream_time()/CLOCK_RATE/
                                              30-start_pts_time);
                 str_send_msg(&video_str, STREAM_QUIT, 0);
                 audio_str.status = STREAM_STOPPED;
@@ -1131,14 +1131,14 @@ static int button_loop(void)
             break;
 
         case MPEG_STOP:
-            settings.resume_time = (int)(get_stream_time()/44100/
+            settings.resume_time = (int)(get_stream_time()/CLOCK_RATE/
                                          30-start_pts_time);
             str_send_msg(&video_str, STREAM_QUIT, 0);
             audio_str.status = STREAM_STOPPED;
             break;
 
         case MPEG_PAUSE:
-            settings.resume_time = (int)(get_stream_time()/44100/
+            settings.resume_time = (int)(get_stream_time()/CLOCK_RATE/
                                          30-start_pts_time);
             save_settings();
             str_send_msg(&video_str, STREAM_PAUSE, 0);
