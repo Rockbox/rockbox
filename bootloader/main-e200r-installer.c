@@ -35,6 +35,7 @@
 #include <string.h>
 #include "i2c.h"
 #include "backlight-target.h"
+#include "power.h"
 
 /* Bootloader version */
 char version[] = APPSVERSION;
@@ -75,6 +76,7 @@ void* main(void)
     printf("Rockbox e200R installer");
     printf("Version: %s", version);
     printf(MODEL_NAME);
+    printf("");
 
     i=ata_init();
     disk_init(IF_MV(0));
@@ -84,18 +86,21 @@ void* main(void)
         error(EDISK,num_partitions);
     }
     pinfo = disk_partinfo(1);
+#if 0 /* not needed in release builds */
     printf("--- Partition info ---");
     printf("start: %x", pinfo->start);
     printf("size: %x", pinfo->size);
     printf("type: %x", pinfo->type);
     printf("reading: %x", (START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK)*512);
+#endif
     ata_read_sectors(IF_MV2(0,) 
                         pinfo->start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
                         1 , sector);
     crc32 = chksum_crc32 (sector, 512);
+#if 0 /* not needed in release builds */
     printf("--- Hack Status ---");
     printf("Sector checksum: %x", crc32);
-    
+#endif
     if ((crc32 == KNOWN_CRC32) && 
         !memcmp(&sector[HACK_OFFSET], knownBytes, 
                 sizeof(knownBytes)/sizeof(*knownBytes)))
@@ -106,14 +111,23 @@ void* main(void)
         ata_write_sectors(IF_MV2(0,) 
                         pinfo->start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
                         1 , sector);
-        printf("Firmware Hacked");
+        printf("Firmware Unlocked");
         printf("Proceed to Step 2");
     }
     else
-        printf("Unknown bootloader... aborted");
+    {
+        printf("Unknown bootloader");
+        printf("Rockbox installer cannot");
+        printf("continue");
+    }
     GPIOG_OUTPUT_VAL &=~0x80;
-   
-    while(1);
+    printf("");
+    if (button_hold())
+        printf("Release Hold and");
+    printf("Press any key to shutdown");
+    while(button_read_device() == BUTTON_NONE)
+        ;
+    power_off();
     return NULL;
 }
 
