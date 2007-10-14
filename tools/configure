@@ -1493,7 +1493,6 @@ fi
       apps="bootloader"
       extradefines="-DBOOTLOADER -DE200R_INSTALLER -ffunction-sections -fdata-sections"
       bootloader="1"
-      output="bootloader.bin"
       echo "e200R-installer build selected"
       ;;
     [Bb])
