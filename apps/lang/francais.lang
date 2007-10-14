@@ -1055,7 +1055,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "Gain bande en hertz"
   </voice>
 </phrase>
 <phrase>
@@ -6265,7 +6265,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Unique"
   </voice>
 </phrase>
 <phrase>
@@ -6333,7 +6333,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Démarrer à"
   </voice>
 </phrase>
 <phrase>
@@ -6350,7 +6350,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Pour au moins"
   </voice>
 </phrase>
 <phrase>
@@ -6367,7 +6367,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Arrêt en dessous de"
   </voice>
 </phrase>
 <phrase>
@@ -6384,7 +6384,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Intervalle de précoupe"
   </voice>
 </phrase>
 <phrase>
@@ -8319,7 +8319,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Infinité minimale"
   </voice>
 </phrase>
 <phrase>
@@ -10092,11 +10092,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Actif"
+    lcd_bitmap: "Activé"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Actif"
+    lcd_bitmap: "Activé"
   </voice>
 </phrase>
 <phrase>
@@ -10109,11 +10109,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Inactif"
+    lcd_bitmap: "Désactivé"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Inactif"
+    lcd_bitmap: "Désactivé"
   </voice>
 </phrase>
 <phrase>
@@ -11360,5 +11360,33 @@
   <voice>
     *: none
     lcd_color: "Couleurs de l'indicateur de sélection"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "éditer"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Vide"
   </voice>
 </phrase>
