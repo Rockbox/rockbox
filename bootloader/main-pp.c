@@ -33,6 +33,10 @@
 #include "disk.h"
 #include "crc32-mi4.h"
 #include <string.h>
+#if defined(SANSA_E200)
+#include "i2c.h"
+#include "backlight-target.h"
+#endif
 #if defined(SANSA_E200) || defined(SANSA_C200)
 #include "usb.h"
 #include "arcotg_udc.h"
@@ -468,6 +472,10 @@ void* main(void)
     lcd_init();
     font_init();
     button_init();
+#if defined(SANSA_E200)
+    i2c_init();
+    __backlight_on();
+#endif
 
     lcd_set_foreground(LCD_WHITE);
     lcd_set_background(LCD_BLACK);
