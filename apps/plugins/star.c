@@ -512,8 +512,6 @@ void star_display_text(char *str, bool waitkey)
 /**
  * Do a pretty transition from one level to another.
  */
-#if !defined(GIGABEAT_F) || defined(SIMULATOR)
-/* FIXME: this crashes on the Gigabeat but not in the sim */
 static void star_transition_update(void)
 {
     const int center_x = LCD_WIDTH / 2;
@@ -537,10 +535,16 @@ static void star_transition_update(void)
             var_y -= LCD_WIDTH;
             y+=step;
         }
-        rb->lcd_update_rect(center_x - x, center_y - y, x*2, step);
-        rb->lcd_update_rect(center_x - x, center_y - y, step, y*2);
-        rb->lcd_update_rect(center_x + x - step, center_y - y, step, y*2);
-        rb->lcd_update_rect(center_x - x, center_y + y - step, x*2, step);
+        if( x )
+        {
+            rb->lcd_update_rect(center_x - x, center_y - y, x*2, step);
+            rb->lcd_update_rect(center_x - x, center_y + y - step, x*2, step);
+        }
+        if( y )
+        {
+            rb->lcd_update_rect(center_x - x, center_y - y, step, y*2);
+            rb->lcd_update_rect(center_x + x - step, center_y - y, step, y*2);
+        }
         STAR_SLEEP
     }
 #else
@@ -555,16 +559,21 @@ static void star_transition_update(void)
             var_x -= LCD_HEIGHT;
             x++;
         }
-        rb->lcd_update_rect(center_x - x, center_y - y, x * 2, 1);
-        rb->lcd_update_rect(center_x - x, center_y - y, 1, y * 2);
-        rb->lcd_update_rect(center_x + x - 1, center_y - y, 1, y * 2);
-        rb->lcd_update_rect(center_x - x, center_y + y - 1, x * 2, 1);
+        if( x )
+        {
+            rb->lcd_update_rect(center_x - x, center_y - y, x * 2, 1);
+            rb->lcd_update_rect(center_x - x, center_y + y - 1, x * 2, 1);
+        }
+        if( y )
+        {
+            rb->lcd_update_rect(center_x - x, center_y - y, 1, y * 2);
+            rb->lcd_update_rect(center_x + x - 1, center_y - y, 1, y * 2);
+        }
         STAR_SLEEP
     }
 #endif
     rb->lcd_update();
 }
-#endif
 
 /**
  * Display information board of the current level.
@@ -666,11 +675,7 @@ static int star_load_level(int current_level)
         ptr_tab++;
     }
     star_display_board_info(current_level);
-#if !defined(GIGABEAT_F) || defined(SIMULATOR)
     star_transition_update();
-#else
-    rb->lcd_update();
-#endif
     return 1;
 }
 
