@@ -32,6 +32,16 @@
 #include "misc.h"
 #include "splash.h"
 
+#if defined (HAVE_SCROLLWHEEL)      || \
+    (CONFIG_KEYPAD == IPOD_3G_PAD)  || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD)  || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD) || \
+    (CONFIG_KEYPAD == PLAYER_PAD)
+/* Define this if your target makes sense to have 
+   smaller values at the top of the list increasing down the list */
+#define ASCENDING_INT_SETTINGS
+#endif
+
 static const char *unit_strings[] = 
 {   
     [UNIT_INT] = "",    [UNIT_MS]  = "ms",
@@ -249,14 +259,20 @@ static int selection_to_val(struct settings_list *setting, int selection)
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
         int setting_id = setting->sound_setting->setting;
+#ifndef ASCENDING_INT_SETTINGS
         step = sound_steps(setting_id);
         max = sound_max(setting_id);
         min = sound_min(setting_id);
+#else
+        step = -sound_steps(setting_id);
+        min = sound_max(setting_id);
+        max = sound_min(setting_id);
+#endif
     }
     else if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
     {
         struct int_setting *info = setting->int_setting;
-#if CONFIG_KEYPAD != PLAYER_PAD
+#ifndef ASCENDING_INT_SETTINGS
         min = info->min;
         max = info->max;
         step = info->step;
@@ -265,12 +281,6 @@ static int selection_to_val(struct settings_list *setting, int selection)
         min = info->max;
         step = -info->step;
 #endif
-    }
-    if (setting->flags & F_FLIPLIST)
-    {
-        int a;
-        a = min; min = max; max = a;
-        step = -step;
     }
     return max- (selection * step);
 }
@@ -342,32 +352,16 @@ bool option_screen(struct settings_list *setting,
             int min = sound_min(setting_id);
             int max = sound_max(setting_id);
             nb_items = (max-min)/steps + 1;
-            if (setting->flags&F_FLIPLIST)
-            {
-                selected = (oldvalue - min) / steps;
-            }
-            else
-            {
-                selected = (max - oldvalue) / steps;
-            }
+            selected = (max - oldvalue) / steps;
             function = sound_get_fn(setting_id);
         }
         else
         {
             struct int_setting *info = setting->int_setting;
             int min, max, step;
-            if (setting->flags&F_FLIPLIST)
-            {
-                min = info->max;
-                max = info->min;
-                step = -info->step;
-            }
-            else
-            {
-                max = info->max;
-                min = info->min;
-                step = info->step;
-            }
+            max = info->max;
+            min = info->min;
+            step = info->step;
             nb_items = (max-min)/step + 1;
             selected = (max - oldvalue)/step;
             function = info->option_callback;

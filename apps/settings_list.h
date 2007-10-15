@@ -103,11 +103,10 @@ struct choice_setting {
 - a NVRAM setting is removed
 */
 #define F_TEMPVAR    0x0400 /* used if the setting should be set using a temp var */
-#define F_FLIPLIST   0x0800 /* used if the order in the setting screen is backwards */
 #define F_NO_WRAP     0x1000 /* used if the list should not wrap */
 
 struct settings_list {
-    uint32_t             flags;   /* ____ ___R TFFF ____ NNN_ FTVC IFRB STTT */
+    uint32_t             flags;   /* ____ ___R TFFF ____ NNN_ _TVC IFRB STTT */
     void                *setting;
     int                  lang_id; /* -1 for none */
     union storage_type   default_val;

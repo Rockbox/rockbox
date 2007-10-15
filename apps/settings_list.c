@@ -371,23 +371,13 @@ static long jumpscroll_getlang(int value)
 }
 #endif /* HAVE_LCD_CHARCELLS */
 
-#if defined (HAVE_SCROLLWHEEL)      || \
-    (CONFIG_KEYPAD == IPOD_3G_PAD)  || \
-    (CONFIG_KEYPAD == IPOD_4G_PAD)  || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD) || \
-    (CONFIG_KEYPAD == PLAYER_PAD) /* player doesnt have a wheel, \
-                                     but acts the same way */
-#define FLIP_IF_WHEEL F_FLIPLIST
-#else
-#define FLIP_IF_WHEEL 0
-#endif
                     
 const struct settings_list settings[] = {
     /* sound settings */
-    SOUND_SETTING(FLIP_IF_WHEEL | F_NO_WRAP,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
-    SOUND_SETTING(FLIP_IF_WHEEL, balance, LANG_BALANCE, "balance", SOUND_BALANCE),
-    SOUND_SETTING(FLIP_IF_WHEEL | F_NO_WRAP,bass, LANG_BASS, "bass", SOUND_BASS),
-    SOUND_SETTING(FLIP_IF_WHEEL | F_NO_WRAP,treble, LANG_TREBLE, "treble", SOUND_TREBLE),
+    SOUND_SETTING(F_NO_WRAP,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
+    SOUND_SETTING(0, balance, LANG_BALANCE, "balance", SOUND_BALANCE),
+    SOUND_SETTING(F_NO_WRAP,bass, LANG_BASS, "bass", SOUND_BASS),
+    SOUND_SETTING(F_NO_WRAP,treble, LANG_TREBLE, "treble", SOUND_TREBLE),
     
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     SOUND_SETTING(0,loudness, LANG_LOUDNESS, "loudness", SOUND_LOUDNESS),
@@ -438,12 +428,12 @@ const struct settings_list settings[] = {
                 MAX_CONTRAST_SETTING, 1, NULL, NULL}}}},
 #endif
 #ifdef HAVE_BACKLIGHT
-    INT_SETTING_W_CFGVALS(F_FLIPLIST, backlight_timeout, LANG_BACKLIGHT, 6,
+    INT_SETTING_W_CFGVALS(0, backlight_timeout, LANG_BACKLIGHT, 6,
         "backlight timeout", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
         backlight_set_timeout),
 #if CONFIG_CHARGING
-    INT_SETTING_W_CFGVALS(F_FLIPLIST, backlight_timeout_plugged,
+    INT_SETTING_W_CFGVALS(0, backlight_timeout_plugged,
         LANG_BACKLIGHT_ON_WHEN_CHARGING, 11,
         "backlight timeout plugged", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
@@ -489,7 +479,7 @@ const struct settings_list settings[] = {
 #endif /* HAVE_LCD_BITMAP */
     OFFON_SETTING(0,show_icons, LANG_SHOW_ICONS ,true,"show icons", NULL),
     /* system */
-    INT_SETTING_W_CFGVALS(F_FLIPLIST, poweroff, LANG_POWEROFF_IDLE, 10, "idle poweroff",
+    INT_SETTING_W_CFGVALS(0, poweroff, LANG_POWEROFF_IDLE, 10, "idle poweroff",
                     "off,1,2,3,4,5,6,7,8,9,10,15,30,45,60", UNIT_MIN,
                     0, 14, 1, poweroff_idle_timer_formatter,
                     poweroff_idle_timer_getlang, set_poweroff_timeout),
@@ -541,12 +531,12 @@ const struct settings_list settings[] = {
         LANG_INVERT_LCD_INVERSE, LANG_NORMAL, lcd_remote_set_invert_display),
     OFFON_SETTING(0,remote_flip_display, LANG_FLIP_DISPLAY,
         false,"remote flip display", NULL),
-    INT_SETTING_W_CFGVALS(F_FLIPLIST, remote_backlight_timeout, LANG_BACKLIGHT, 6,
+    INT_SETTING_W_CFGVALS(0, remote_backlight_timeout, LANG_BACKLIGHT, 6,
         "remote backlight timeout", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
         remote_backlight_set_timeout),
 #if CONFIG_CHARGING
-    INT_SETTING_W_CFGVALS(F_FLIPLIST, remote_backlight_timeout_plugged,
+    INT_SETTING_W_CFGVALS(0, remote_backlight_timeout_plugged,
         LANG_BACKLIGHT_ON_WHEN_CHARGING, 11,
         "remote backlight timeout plugged", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
@@ -646,7 +636,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,play_selected,LANG_PLAY_SELECTED,true,"play selected",NULL),
     OFFON_SETTING(0,party_mode,LANG_PARTY_MODE,false,"party mode",NULL),
     OFFON_SETTING(0,fade_on_stop,LANG_FADE_ON_STOP,true,"volume fade",NULL),
-    INT_SETTING_W_CFGVALS(F_FLIPLIST, ff_rewind_min_step, LANG_FFRW_STEP, FF_REWIND_1000,
+    INT_SETTING_W_CFGVALS(0, ff_rewind_min_step, LANG_FFRW_STEP, FF_REWIND_1000,
         "scan min step", "1,2,3,4,5,6,8,10,15,20,25,30,45,60", UNIT_SEC,
         13, 0, -1, ff_rewind_min_step_formatter,
         ff_rewind_min_step_getlang, NULL),        
@@ -1256,7 +1246,7 @@ const struct settings_list settings[] = {
                      THEME_DIR "/", ".colours", MAX_FILENAME+1),
 #endif
 #ifdef HAVE_BUTTON_LIGHT
-    INT_SETTING_W_CFGVALS(F_FLIPLIST, buttonlight_timeout,
+    INT_SETTING_W_CFGVALS(0, buttonlight_timeout,
                           LANG_BUTTONLIGHT_TIMEOUT, 6,
         "button light timeout", backlight_times_conf, UNIT_SEC,
         0, 18, 1, backlight_formatter, backlight_getlang, 
