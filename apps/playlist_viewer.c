@@ -524,11 +524,33 @@ bool playlist_viewer(void)
     return playlist_viewer_ex(NULL);
 }
 
+static int get_track_num( struct playlist_viewer * local_viewer,
+                          int selected_item )
+{
+    if( local_viewer->move_track >= 0 )
+    {
+        if( local_viewer->selected_track == selected_item )
+        {
+            return local_viewer->move_track;
+        }
+        else if( local_viewer->selected_track > selected_item
+              && selected_item >= local_viewer->move_track )
+        {
+            return selected_item+1;
+        }
+        else if( local_viewer->selected_track < selected_item
+              && selected_item <= local_viewer->move_track )
+        {
+            return selected_item-1;
+        }
+    }
+    return selected_item;
+}
+
 static char *playlist_callback_name(int selected_item, void *data, char *buffer)
 {
     struct playlist_viewer * local_viewer = (struct playlist_viewer *)data;
-    struct playlist_entry *track=
-        playlist_buffer_get_track(&(local_viewer->buffer), selected_item);
+    struct playlist_entry *track = playlist_buffer_get_track(&(local_viewer->buffer), get_track_num(local_viewer,selected_item));
     format_line(track, buffer, MAX_PATH);
     return(buffer);
 }
@@ -538,7 +560,8 @@ static int playlist_callback_icons(int selected_item, void *data)
 {
     struct playlist_viewer * local_viewer=(struct playlist_viewer *)data;
     struct playlist_entry *track=
-        playlist_buffer_get_track(&(local_viewer->buffer), selected_item);
+        playlist_buffer_get_track(&(local_viewer->buffer),
+                                  get_track_num(local_viewer, selected_item));
     if (track->index == local_viewer->current_playing_track)
     {
         /* Current playing track */
@@ -580,8 +603,6 @@ bool playlist_viewer_ex(char* filename)
     while (!exit)
     {
         int track;
-        if (viewer.move_track != -1)
-            gui_synclist_flash(&playlist_lists);
 
         if (global_status.resume_index != -1 && !viewer.playlist)
             playlist_get_resume_info(&track);
@@ -616,6 +637,7 @@ bool playlist_viewer_ex(char* filename)
                         :
                         BACKWARD
                     );
+            gui_synclist_draw(&playlist_lists);
         }
         switch (button)
         {
