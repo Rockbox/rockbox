@@ -70,13 +70,13 @@ lcd_write_data:
 
     lea     0xf0008002, %a1
 .loop:
-    /* When running in IRAM, this loop takes 7 cycles plus the LCD write.
-       The 7 cycles are necessary to follow the LCD timing specs
+    /* When running in IRAM, this loop takes 10 cycles plus the LCD write.
+       The 10 cycles are necessary to follow the LCD timing specs
        at 140MHz */
+    nop                     /* 3(0/0) */
     move.b  (%a0)+, %d1     /* 3(1/0) */
     move.w  %d1, (%a1)      /* 1(0/1) */
     subq.l  #1, %d0         /* 1(0/0) */
-    nop                     /* 1(0/0) */
     bne     .loop           /* 2(0/0) */
     rts
 .wd_end:

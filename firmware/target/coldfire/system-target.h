@@ -155,7 +155,7 @@ static inline void invalidate_icache(void)
 {
    asm volatile ("move.l #0x01000000,%d0\n"
                  "movec.l %d0,%cacr\n"
-                 "move.l #0x80000000,%d0\n"
+                 "move.l #0x80000100,%d0\n"
                  "movec.l %d0,%cacr");
 }
 

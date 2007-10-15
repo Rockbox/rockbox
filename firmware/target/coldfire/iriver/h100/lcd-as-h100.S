@@ -29,8 +29,8 @@
 
 lcd_write_command:
     move.l  (4,%sp),%d0
-    lea MBAR2,%a1
-    move.l   #~8,%d1
+    lea     MBAR2,%a1
+    move.l  #~8,%d1
     and.l   %d1,(0xb4,%a1)
     move.w  %d0,0xf0000000
     rts
@@ -77,19 +77,19 @@ lcd_write_command_ex:
 lcd_write_data:
     move.l  (4,%sp),%a0     /* Data pointer */
     move.l  (8,%sp),%d0     /* Length */
-    lea MBAR2,%a1
+    lea     MBAR2,%a1
     moveq   #8,%d1
     or.l    %d1,(0xb4,%a1)
 
     lea     0xf0000000,%a1
 .loop:
-    /* When running in IRAM, this loop takes 7 cycles plus the LCD write.
-       The 7 cycles are necessary to follow the LCD timing specs
+    /* When running in IRAM, this loop takes 10 cycles plus the LCD write.
+       The 10 cycles are necessary to follow the LCD timing specs
        at 140MHz */
+    nop                     /* 3(0/0) */
     move.b  (%a0)+,%d1      /* 3(1/0) */
     move.w  %d1,(%a1)       /* 1(0/1) */
     subq.l  #1,%d0          /* 1(0/0) */
-    nop                     /* 1(0/0) */
     bne     .loop           /* 2(0/0) */
     rts
 .wd_end:

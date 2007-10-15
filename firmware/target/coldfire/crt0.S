@@ -218,8 +218,8 @@ start:
     move.l  #0x01000000,%d0
     movec.l %d0,%cacr
         
-    /* Enable cache, default=non-cacheable,no buffered writes */
-    move.l  #0x80000000,%d0
+    /* Enable cache, default=non-cacheable, buffered writes */
+    move.l  #0x80000100,%d0
     movec.l %d0,%cacr
 
     /* Cache enabled in SDRAM only, buffered writes enabled */

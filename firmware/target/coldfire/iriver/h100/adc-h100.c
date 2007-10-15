@@ -37,7 +37,7 @@
     ({                                \
         int _x_;                      \
         asm volatile (                \
-            "move.l #11, %[_x_] \r\n" \
+            "move.l #13, %[_x_] \r\n" \
         "1:                     \r\n" \
             "subq.l #1, %[_x_]  \r\n" \
             "bhi.b  1b          \r\n" \
@@ -94,7 +94,7 @@ unsigned short adc_scan(int channel)
         data <<= 1;
         data |= DO?1:0;
     }
-    
+
     CS_HI;
 
     set_irq_level(level);

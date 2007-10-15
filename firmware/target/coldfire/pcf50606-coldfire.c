@@ -81,7 +81,7 @@ static int i2c_delay IDATA_ATTR = 44;
 
 void pcf50606_i2c_recalc_delay(int cpu_clock)
 {
-    i2c_delay = MAX(cpu_clock / (400000*2*3) - 7, 1);
+    i2c_delay = MAX(cpu_clock / (400000*2*3) - 5, 1);
 }
 
 inline void pcf50606_i2c_start(void)

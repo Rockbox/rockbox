@@ -71,7 +71,7 @@ void cf_set_cpu_frequency(long frequency)
         RECALC_DELAYS(CPUFREQ_MAX);
         PLLCR = 0x0102c049 | (PLLCR & 0x70C00000);
         CSCR0 = 0x00001180; /* Flash: 4 wait states */
-        CSCR1 = 0x00000980; /* LCD: 2 wait states */
+        CSCR1 = 0x00001180; /* LCD: 4 wait states */
         while(!(PLLCR & 0x80000000)) {}; /* Wait until the PLL has locked.
                                             This may take up to 10ms! */
         timers_adjust_prescale(CPUFREQ_MAX_MULT, true);
