@@ -84,7 +84,6 @@ static void gui_list_init(struct gui_list * gui_list,
     gui_list->start_item = 0;
     gui_list->limit_scroll = false;
     gui_list->data=data;
-    gui_list->cursor_flash_state=false;
 #ifdef HAVE_LCD_BITMAP
     gui_list->offset_position = 0;
 #endif
@@ -128,44 +127,6 @@ static void gui_list_set_display(struct gui_list * gui_list, struct screen * dis
 #endif
     gui_list_select_at_offset(gui_list, 0);
 }
-
-/*
- * One call on 2, the selected lune will either blink the cursor or
- * invert/display normal the selected line
- * - gui_list : the list structure
- */
-static void gui_list_flash(struct gui_list * gui_list)
-{
-    struct screen * display=gui_list->display;
-    gui_list->cursor_flash_state=!gui_list->cursor_flash_state;
-    int selected_line=gui_list->selected_item-gui_list->start_item+SHOW_LIST_TITLE;
-#ifdef HAVE_LCD_BITMAP
-    int line_ypos=display->getymargin()+display->char_height*selected_line;
-    if (global_settings.cursor_style)
-    {
-        int line_xpos=display->getxmargin();
-        display->set_drawmode(DRMODE_COMPLEMENT);
-        display->fillrect(line_xpos, line_ypos, display->width,
-                          display->char_height);
-        display->set_drawmode(DRMODE_SOLID);
-        display->invertscroll(0, selected_line);
-    }
-    else
-    {
-        int cursor_xpos=(global_settings.scrollbar &&
-                         display->nb_lines < gui_list->nb_items)?1:0;
-        screen_put_cursorxy(display, cursor_xpos, selected_line,
-                            gui_list->cursor_flash_state);
-    }
-    display->update_rect(0, line_ypos,display->width,
-                         display->char_height);
-#else
-    screen_put_cursorxy(display, 0, selected_line,
-                        gui_list->cursor_flash_state);
-    gui_textarea_update(display);
-#endif
-}
-
 
 #ifdef HAVE_LCD_BITMAP
 static int gui_list_get_item_offset(struct gui_list * gui_list, int item_width,
@@ -884,13 +845,6 @@ void gui_synclist_set_title(struct gui_synclist * lists,
     int i;
     FOR_NB_SCREENS(i)
             gui_list_set_title(&(lists->gui_list[i]), title, icon);
-}
-
-void gui_synclist_flash(struct gui_synclist * lists)
-{
-    int i;
-    FOR_NB_SCREENS(i)
-        gui_list_flash(&(lists->gui_list[i]));
 }
 
 #ifdef HAVE_LCD_BITMAP

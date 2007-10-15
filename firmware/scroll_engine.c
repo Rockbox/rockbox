@@ -88,21 +88,6 @@ void lcd_scroll_speed(int speed)
 }
 
 #if defined(HAVE_LCD_BITMAP)
-/* Reverse the invert setting of the scrolling line (if any) at given char
-   position.  Setting will go into affect next time line scrolls. */
-void lcd_invertscroll(int x, int y)
-{
-    struct scrollinfo *s;
-
-    (void)x;
-
-    if((unsigned)y>=LCD_SCROLLABLE_LINES) return;
-
-    s = &lcd_scroll_info.scroll[y];
-    s->style = !s->style; /* FIXME: now that the setting isn't bool this seems
-                                    flawed. */
-}
-
 void lcd_scroll_step(int step)
 {
     lcd_scroll_info.step = step;
@@ -132,21 +117,6 @@ void lcd_jump_scroll_delay(int ms)
 #endif
 
 #ifdef HAVE_REMOTE_LCD
-/* Reverse the invert setting of the scrolling line (if any) at given char
-   position.  Setting will go into affect next time line scrolls. */
-void lcd_remote_invertscroll(int x, int y)
-{
-    struct scrollinfo *s;
-
-    (void)x;
-
-    if((unsigned)y>=LCD_REMOTE_SCROLLABLE_LINES) return;
-
-    s = &lcd_remote_scroll_info.scroll[y];
-    s->style = !s->style; /* FIXME: now that the setting isn't bool this seems
-                                    flawed. */
-}
-
 void lcd_remote_stop_scroll(void)
 {
     lcd_remote_scroll_info.lines = 0;

@@ -166,7 +166,6 @@ extern void lcd_remote_bitmap(const fb_remote_data *src, int x, int y,
                               int width, int height);
 extern void lcd_remote_putsxy(int x, int y, const unsigned char *str);
 
-extern void lcd_remote_invertscroll(int x, int y);
 extern void lcd_remote_bidir_scroll(int threshold);
 extern void lcd_remote_scroll_step(int pixels);
 

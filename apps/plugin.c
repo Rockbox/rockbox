@@ -194,7 +194,6 @@ static const struct plugin_api rockbox_api = {
     gui_synclist_add_item,
     gui_synclist_del_item,
     gui_synclist_limit_scroll,
-    gui_synclist_flash,
     gui_synclist_do_button,
     gui_synclist_set_title,
 

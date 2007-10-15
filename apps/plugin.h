@@ -117,7 +117,7 @@
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 76
+#define PLUGIN_MIN_API_VERSION 79
 
 /* plugin return codes */
 enum plugin_status {
@@ -279,7 +279,6 @@ struct plugin_api {
     void (*gui_synclist_add_item)(struct gui_synclist * lists);
     void (*gui_synclist_del_item)(struct gui_synclist * lists);
     void (*gui_synclist_limit_scroll)(struct gui_synclist * lists, bool scroll);
-    void (*gui_synclist_flash)(struct gui_synclist * lists);
     bool (*gui_synclist_do_button)(struct gui_synclist * lists,
                                          unsigned *action, enum list_wrap wrap);
     void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title, int icon);

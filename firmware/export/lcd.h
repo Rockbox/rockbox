@@ -355,7 +355,6 @@ extern void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 extern void lcd_bitmap(const fb_data *src, int x, int y, int width,
                        int height);
 
-extern void lcd_invertscroll(int x, int y);
 extern void lcd_scroll_step(int pixels);
 
 #if LCD_DEPTH > 1

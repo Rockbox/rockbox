@@ -82,7 +82,6 @@ struct gui_list
     /* wether the text of the whole items of the list have to be
      * scrolled or only for the selected item */
     bool scroll_all;
-    bool cursor_flash_state;
 
     int nb_items;
     int selected_item;
