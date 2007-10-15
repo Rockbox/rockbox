@@ -1024,13 +1024,13 @@ void lcd_scroll_fn(void)
                 /* Solid colour line selector */
                 drawmode = DRMODE_FG;
                 fg_pattern = lss_pattern;
-                lcd_fillrect(0, ypos, LCD_WIDTH, pf->height);
+                lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
                 fg_pattern = lst_pattern;
                 break;
             case STYLE_GRADIENT:
                 /* Gradient line selector */
                 drawmode = DRMODE_FG;
-                lcd_gradient_rect(0, LCD_WIDTH, ypos, (signed)pf->height);
+                lcd_gradient_rect(xpos, LCD_WIDTH, ypos, (signed)pf->height);
                 fg_pattern = lst_pattern;
                 break;
             default:
