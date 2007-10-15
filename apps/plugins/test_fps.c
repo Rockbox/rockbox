@@ -143,7 +143,7 @@ static unsigned char * const yuvbuf[3] = {
     (void*)vdata
 };
 
-static void make_gradient_rect(width, height)
+static void make_gradient_rect(int width, int height)
 {
     unsigned char vline[YUV_WIDTH/2];
     int x, y;
@@ -173,8 +173,6 @@ static void time_main_yuv(void)
     const int part14_y = YUV_HEIGHT/4;  /* y-offset for 1/4 update test */
     const int part14_h = YUV_HEIGHT/2;  /* y-size for 1/4 update test */
     
-    int x, y;
-
     rb->memset(ydata, 128, sizeof(ydata)); /* medium grey */
 
     /* Test 1: full LCD update */
