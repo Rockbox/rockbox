@@ -375,17 +375,17 @@ static long jumpscroll_getlang(int value)
     (CONFIG_KEYPAD == IPOD_3G_PAD)  || \
     (CONFIG_KEYPAD == IPOD_4G_PAD)  || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define BALANCE_FLIP F_FLIPLIST
+#define FLIP_IF_WHEEL F_FLIPLIST
 #else
-#define BALANCE_FLIP 0
+#define FLIP_IF_WHEEL 0
 #endif
                     
 const struct settings_list settings[] = {
     /* sound settings */
-    SOUND_SETTING(F_NO_WRAP,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
-    SOUND_SETTING(BALANCE_FLIP, balance, LANG_BALANCE, "balance", SOUND_BALANCE),
-    SOUND_SETTING(F_NO_WRAP,bass, LANG_BASS, "bass", SOUND_BASS),
-    SOUND_SETTING(F_NO_WRAP,treble, LANG_TREBLE, "treble", SOUND_TREBLE),
+    SOUND_SETTING(FLIP_IF_WHEEL | F_NO_WRAP,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
+    SOUND_SETTING(FLIP_IF_WHEEL, balance, LANG_BALANCE, "balance", SOUND_BALANCE),
+    SOUND_SETTING(FLIP_IF_WHEEL | F_NO_WRAP,bass, LANG_BASS, "bass", SOUND_BASS),
+    SOUND_SETTING(FLIP_IF_WHEEL | F_NO_WRAP,treble, LANG_TREBLE, "treble", SOUND_TREBLE),
     
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     SOUND_SETTING(0,loudness, LANG_LOUDNESS, "loudness", SOUND_LOUDNESS),

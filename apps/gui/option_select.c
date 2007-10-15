@@ -336,7 +336,14 @@ bool option_screen(struct settings_list *setting,
             int min = sound_min(setting_id);
             int max = sound_max(setting_id);
             nb_items = (max-min)/steps + 1;
-            selected = (max-oldvalue)/steps;
+            if (setting->flags&F_FLIPLIST)
+            {
+                selected = (oldvalue - min) / steps;
+            }
+            else
+            {
+                selected = (max - oldvalue) / steps;
+            }
             function = sound_get_fn(setting_id);
         }
         else
