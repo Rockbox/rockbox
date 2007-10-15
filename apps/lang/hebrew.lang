@@ -55,20 +55,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESUME_SETTING_ASK
-  desc: in settings_menu
-  user:
-  <source>
-    *: "Ask"
-  </source>
-  <dest>
-    *: "שאל"
-  </dest>
-  <voice>
-    *: "Ask"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALWAYS
   desc: used in various places
   user:
@@ -87,13 +73,16 @@
   desc: in shutdown screen
   user:
   <source>
-    *: "Press OFF to shut down"
+    *: none
+    soft_shutdown: "Press OFF to shut down"
   </source>
   <dest>
-    *: "לחץ על כבה כדי לכבות"
+    *: ""
+    soft_shutdown: "לחץ על OFF כדי לכבות"
   </dest>
   <voice>
-    *: ""
+    *: none
+    soft_shutdown: ""
   </voice>
 </phrase>
 <phrase>
@@ -115,13 +104,16 @@
   desc: splash screen displayed when pcm buffer size is changed
   user:
   <source>
-    *: "Restarting playback..."
+    *: none
+    swcodec: "Restarting playback..."
   </source>
   <dest>
-    *: "...מאתחל את ההשמעה"
+    *: ""
+    swcodec: "...מאתחל את ההשמעה"
   </dest>
   <voice>
     *: "Restarting playback..."
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -129,27 +121,16 @@
   desc: before acknowledging usb in case an MMC is inserted (Ondio)
   user:
   <source>
-    *: "Please remove inserted MMC"
+    *: none
+    ondio*: "Please remove inserted MMC"
   </source>
   <dest>
-    *: "אנא הסר כרטיס מולטימדיה"
+    *: ""
+    ondio*: "אנא הסר כרטיס מולטימדיה"
   </dest>
   <voice>
     *: "Please remove multimedia card"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MENU_SETTING_CANCEL
-  desc: Visual confirmation of canceling a changed setting
-  user:
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "מבוטל"
-  </dest>
-  <voice>
-    *: ""
+    ondio*: ""
   </voice>
 </phrase>
 <phrase>
@@ -227,13 +208,16 @@
   desc: in the main menu
   user:
   <source>
-    *: "FM Radio"
+    *: none
+    radio: "FM Radio"
   </source>
   <dest>
-    *: "FM רדיו"
+    *: ""
+    radio: "FM רדיו"
   </dest>
   <voice>
     *: "FM Radio"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -241,27 +225,16 @@
   desc: in the main menu
   user:
   <source>
-    *: "Recording"
+    *: none
+    recording: "Recording"
   </source>
   <dest>
-    *: "הקלטה"
+    *: ""
+    recording: "הקלטה"
   </dest>
   <voice>
     *: "Recording"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_MENU
-  desc: in the main menu
-  user:
-  <source>
-    *: "Playlist"
-  </source>
-  <dest>
-    *: "רשימת שירים"
-  </dest>
-  <voice>
-    *: "Playlist Options"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -279,31 +252,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INFO
-  desc: in the main menu
-  user:
-  <source>
-    *: "System"
-  </source>
-  <dest>
-    *: "מערכת"
-  </dest>
-  <voice>
-    *: "Info"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SHUTDOWN
   desc: in main menu
   user:
   <source>
-    *: "Shut down"
+    *: none
+    soft_shutdown: "Shut down"
   </source>
   <dest>
-    *: "כיבוי"
+    *: ""
+    soft_shutdown: "כיבוי"
   </dest>
   <voice>
     *: "Shut down"
+    soft_shutdown: ""
   </voice>
 </phrase>
 <phrase>
@@ -360,34 +322,6 @@
   </dest>
   <voice>
     *: "Balance"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL_MENU
-  desc: in sound_settings
-  user:
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "ערוצים"
-  </dest>
-  <voice>
-    *: "Channels"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL
-  desc: in sound_settings
-  user:
-  <source>
-    *: "Channel Configuration"
-  </source>
-  <dest>
-    *: "הגדרות ערוץ"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -493,13 +427,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Loudness"
+    *: none
+    masf: "Loudness"
   </source>
   <dest>
-    *: "צעקנות"
+    *: ""
+    masf: "עוצמה"
   </dest>
   <voice>
     *: "Loudness"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -507,13 +444,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Auto Volume"
+    *: none
+    masf: "Auto Volume"
   </source>
   <dest>
-    *: "עוצמת קול אוטומטית"
+    *: ""
+    masf: "עוצמת קול אוטומטית"
   </dest>
   <voice>
     *: "Auto Volume"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -521,13 +461,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "AV Decay Time"
+    *: none
+    masf: "AV Decay Time"
   </source>
   <dest>
-    *: "זמן דעיכת AV"
+    *: ""
+    masf: "זמן דעיכת עוצמת קול אוטומטית"
   </dest>
   <voice>
-    *: ""
+    *: none
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -535,13 +478,16 @@
   desc: in sound settings
   user:
   <source>
-    *: "Super Bass"
+    *: none
+    masf: "Super Bass"
   </source>
   <dest>
-    *: "סופר בס"
+    *: ""
+    masf: "סופר באס"
   </dest>
   <voice>
     *: "Super bass"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -549,13 +495,16 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Enable"
+    *: none
+    masf: "MDB Enable"
   </source>
   <dest>
-    *: "MDB פעיל"
+    *: ""
+    masf: "MDB פעיל"
   </dest>
   <voice>
     *: "MDB Enable"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -563,13 +512,16 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Strength"
+    *: none
+    masf: "MDB Strength"
   </source>
   <dest>
-    *: "חוזק MDB"
+    *: ""
+    masf: "חוזק MDB"
   </dest>
   <voice>
     *: "MDB Strength"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -577,13 +529,16 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Harmonics"
+    *: none
+    masf: "MDB Harmonics"
   </source>
   <dest>
-    *: "הרמוניית MDB"
+    *: ""
+    masf: "הרמוניות MDB"
   </dest>
   <voice>
     *: "MDB Harmonics"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -591,13 +546,16 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Center Frequency"
+    *: none
+    masf: "MDB Center Frequency"
   </source>
   <dest>
-    *: "תדירות מרכז MDB"
+    *: ""
+    masf: "תדירות מרכזית MDB"
   </dest>
   <voice>
     *: "MDB Center frequency"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -605,13 +563,16 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Shape"
+    *: none
+    masf: "MDB Shape"
   </source>
   <dest>
-    *: "MDB צורת"
+    *: ""
+    masf: "MDB צורת"
   </dest>
   <voice>
     *: "MDB Shape"
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -658,7 +619,7 @@
 </phrase>
 <phrase>
   id: LANG_SYSTEM
-  desc: in settings_menu()
+  desc: in the main menu and settings menu
   user:
   <source>
     *: "System"
@@ -727,20 +688,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FIRMWARE
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "הצג קושחות"
-  </dest>
-  <voice>
-    *: "Browse Firmwares"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET
   desc: in system_settings_menu()
   user:
@@ -755,74 +702,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESET_ASK_RECORDER
-  desc: confirm to reset settings
-  user:
-  <source>
-    *: "Are You Sure?"
-  </source>
-  <dest>
-    *: "?אתה בטוח"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_WITH_PLAY_RECORDER
-  desc: Generic recorder string to use to confirm
-  user:
-  <source>
-    *: "PLAY = Yes"
-    h100,h120,h300: "NAVI = Yes"
-    ipod*: "SELECT = Yes"
-    x5: "SELECT = Yes"
-    h10,h10_5gb: "SELECT = Yes"
-    gigabeatf: "SELECT = Yes"
-    e200,c200: "SELECT = Yes"
-  </source>
-  <dest>
-    *: "נגן = כן"
-    h100,h120,h300: "בחר = כן"
-    ipod*: "בחר = כן"
-    x5: "בחר = כן"
-    h10,h10_5gb: "בחר = כן"
-    gigabeatf: "בחר = כן"
-    e200,c200: "בחר = כן"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CANCEL_WITH_ANY_RECORDER
-  desc: Generic recorder string to use to cancel
-  user:
-  <source>
-    *: "Any Other = No"
-  </source>
-  <dest>
-    *: "כל לחצן אחר = לא"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_DONE_SETTING
-  desc: visual confirmation after settings reset
-  user:
-  <source>
-    *: "Settings"
-  </source>
-  <dest>
-    *: "הגדרות"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET_DONE_CLEAR
   desc: visual confirmation after settings reset
   user:
@@ -831,20 +710,6 @@
   </source>
   <dest>
     *: "מאופס"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_DONE_CANCEL
-  desc: Visual confirmation of cancelation
-  user:
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "מבוטל"
   </dest>
   <voice>
     *: ""
@@ -865,87 +730,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SETTINGS_SAVE_PLAYER
-  desc: displayed if save settings has failed
-  user:
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "השמירה נכשלה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_PLAYER
-  desc: if save settings has failed
-  user:
-  <source>
-    *: "Partition?"
-  </source>
-  <dest>
-    *: "?לחלק"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_RECORDER
-  desc: displayed if save settings has failed
-  user:
-  <source>
-    *: "Save Failed"
-  </source>
-  <dest>
-    *: "השמירה נכשלה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_RECORDER
-  desc: if save settings has failed
-  user:
-  <source>
-    *: "No partition?"
-  </source>
-  <dest>
-    *: "?לא לחלק"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_MENU
-  desc: in the recording sub menu
-  user:
-  <source>
-    *: "Recording"
-  </source>
-  <dest>
-    *: "הקלטה"
-  </dest>
-  <voice>
-    *: "Recording screen"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_SETTINGS
   desc: in the main menu
   user:
   <source>
-    *: "Recording Settings"
+    *: none
+    recording: "Recording Settings"
   </source>
   <dest>
-    *: "הגדרות הקלטה"
+    *: ""
+    recording: "הגדרות הקלטה"
   </dest>
   <voice>
     *: "Recording Settings"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -1005,20 +803,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INFO_MENU
-  desc: in the info menu
-  user:
-  <source>
-    *: "Rockbox Info"
-  </source>
-  <dest>
-    *: "מידע על רוקבוקס"
-  </dest>
-  <voice>
-    *: "Rockbox Info"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VERSION
   desc: in the info menu
   user:
@@ -1044,20 +828,6 @@
   </dest>
   <voice>
     *: "Debug, keep out!"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB
-  desc: in the info menu
-  user:
-  <source>
-    *: "USB (Sim)"
-  </source>
-  <dest>
-    *: "USB (הדמייה)"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1089,20 +859,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "הכל"
-  </dest>
-  <voice>
-    *: "All"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REPEAT_ONE
   desc: repeat one song
   user:
@@ -1118,7 +874,7 @@
 </phrase>
 <phrase>
   id: LANG_REPEAT_AB
-  desc: repeat one song
+  desc: repeat range from point A to B
   user:
   <source>
     *: "A-B"
@@ -1145,20 +901,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESUME
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "המשך מאותו מקום באתחול המערכת"
-  </dest>
-  <voice>
-    *: "Resume on startup"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_WIND_MENU
   desc: in the playback sub menu
   user:
@@ -1178,12 +920,15 @@
   user:
   <source>
     *: "Anti-Skip Buffer"
+    flash_storage: none
   </source>
   <dest>
     *: "זיכרון נגד קפיצות"
+    flash_storage: none
   </dest>
   <voice>
     *: "Anti-Skip Buffer"
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
@@ -1205,13 +950,16 @@
   desc: in playback settings
   user:
   <source>
-    *: "Crossfade"
+    *: none
+    swcodec: "Crossfade"
   </source>
   <dest>
-    *: "מעבר ביניים"
+    *: ""
+    swcodec: "מעבר ביניים"
   </dest>
   <voice>
     *: "Crossfade"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -1233,13 +981,16 @@
   desc: in playback settings
   user:
   <source>
-    *: "Beep Volume"
+    *: none
+    swcodec: "Beep Volume"
   </source>
   <dest>
-    *: "עוצמת הצפצוף"
+    *: ""
+    swcodec: "עוצמת הצפצוף"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -1247,13 +998,16 @@
   desc: in beep volume in playback settings
   user:
   <source>
-    *: "Weak"
+    *: none
+    swcodec: "Weak"
   </source>
   <dest>
-    *: "חלש"
+    *: ""
+    swcodec: "חלש"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -1261,13 +1015,16 @@
   desc: in beep volume in playback settings
   user:
   <source>
-    *: "Moderate"
+    *: none
+    swcodec: "Moderate"
   </source>
   <dest>
-    *: "בינוני"
+    *: ""
+    swcodec: "בינוני"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -1275,13 +1032,16 @@
   desc: in beep volume in playback settings
   user:
   <source>
-    *: "Strong"
+    *: none
+    swcodec: "Strong"
   </source>
   <dest>
-    *: "חזק"
+    *: ""
+    swcodec: "חזק"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -1289,55 +1049,58 @@
   desc: in playback settings menu. enable/disable the optical out
   user:
   <source>
-    *: "Optical Output"
+    *: none
+    spdif_power: "Optical Output"
   </source>
   <dest>
-    *: "יציאה אופטית"
+    *: ""
+    spdif_power: "יציאה אופטית"
   </dest>
   <voice>
     *: "Optical output"
+    spdif_power: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "ID3 עדיפות תווית"
+    *: ""
   </dest>
   <voice>
-    *: "ID3 tag priority"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "2 מאשר גרסה 1 גרסה"
+    *: ""
   </dest>
   <voice>
-    *: "Version 1 then version 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "1 מאשר גרסה 2 גרסה"
+    *: ""
   </dest>
   <voice>
-    *: "Version 2 then version 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1481,20 +1244,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILTER_ALL
-  desc: show all files
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "הכל"
-  </dest>
-  <voice>
-    *: "All"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILTER_SUPPORTED
   desc: show all file types supported by Rockbox
   user:
@@ -1520,34 +1269,6 @@
   </dest>
   <voice>
     *: "Music"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_PLAYLIST
-  desc: show only playlist
-  user:
-  <source>
-    *: "Playlists"
-  </source>
-  <dest>
-    *: "רשימות השמעה"
-  </dest>
-  <voice>
-    *: "Playlists"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_ID3DB
-  desc: show ID3 Database
-  user:
-  <source>
-    *: "Database"
-  </source>
-  <dest>
-    *: "מסד נתונים"
-  </dest>
-  <voice>
-    *: "ID3 database"
   </voice>
 </phrase>
 <phrase>
@@ -1583,13 +1304,16 @@
   desc: in setting_menu()
   user:
   <source>
-    *: "Browse Fonts"
+    *: none
+    lcd_bitmap: "Browse Fonts"
   </source>
   <dest>
-    *: "הצג גפנים"
+    *: ""
+    lcd_bitmap: "הצג גופנים"
   </dest>
   <voice>
     *: "Browse Fonts"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -1625,13 +1349,16 @@
   desc: in the display sub menu
   user:
   <source>
-    *: "Remote-LCD Settings"
+    *: none
+    remote: "Remote-LCD Settings"
   </source>
   <dest>
-    *: "הגדרות מסך השלט"
+    *: ""
+    remote: "הגדרות מסך השלט"
   </dest>
   <voice>
-    *: ""
+    *: none
+    remote: ""
   </voice>
 </phrase>
 <phrase>
@@ -1653,13 +1380,16 @@
   desc: in the display sub menu
   user:
   <source>
-    *: "Status-/Scrollbar"
+    *: none
+    lcd_bitmap: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "שורת מצב ושורת גלילה"
+    *: ""
+    lcd_bitmap: "שורת מצב ושורת גלילה"
   </dest>
   <voice>
     *: "Status- and Scrollbar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -1668,12 +1398,15 @@
   user:
   <source>
     *: "Peak Meter"
+    masd: none
   </source>
   <dest>
-    *: "מד עוצמה"
+    *: "מחוון עוצמה"
+    masd: none
   </dest>
   <voice>
     *: "Peak Meter"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -1709,13 +1442,16 @@
   desc: in the system sub menu
   user:
   <source>
-    *: "Time & Date"
+    *: none
+    rtc: "Time & Date"
   </source>
   <dest>
-    *: "תאריך וזמן"
+    *: ""
+    rtc: "תאריך וזמן"
   </dest>
   <voice>
     *: "Time and Date"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1751,13 +1487,16 @@
   desc: The name of the additional entry in the main menu for the RTC alarm mod.
   user:
   <source>
-    *: "Wake-Up Alarm"
+    *: none
+    alarm: "Wake-Up Alarm"
   </source>
   <dest>
-    *: "שעון מעורר"
+    *: ""
+    alarm: "שעון מעורר"
   </dest>
   <voice>
     *: "Wake-Up Alarm"
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -1776,16 +1515,19 @@
 </phrase>
 <phrase>
   id: LANG_LINE_IN
-  desc: in settings_menu
+  desc: in the recording settings
   user:
   <source>
-    *: "Line In"
+    *: none
+    recording,player: "Line In"
   </source>
   <dest>
-    *: "כניסת שמע"
+    *: ""
+    recording,player: "כניסת שמע"
   </dest>
   <voice>
     *: "Line In"
+    recording,player: ""
   </voice>
 </phrase>
 <phrase>
@@ -1793,13 +1535,16 @@
   desc: Displayed for setting car adapter mode to on/off
   user:
   <source>
-    *: "Car Adapter Mode"
+    *: none
+    charging: "Car Adapter Mode"
   </source>
   <dest>
-    *: "מצב מכונית"
+    *: ""
+    charging: "מצב מכונית"
   </dest>
   <voice>
     *: "Car Adapter Mode"
+    charging: ""
   </voice>
 </phrase>
 <phrase>
@@ -1902,7 +1647,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR
-  desc: item of voice menu, set the "talkbox" mode for directories
+  desc: item of voice menu, set the voice mode for directories
   user:
   <source>
     *: "Voice Directories"
@@ -1916,7 +1661,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_FILE
-  desc: item of voice menu, set the voive mode for files
+  desc: item of voice menu, set the voice mode for files
   user:
   <source>
     *: "Voice Filenames"
@@ -1975,13 +1720,16 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Quality"
+    *: none
+    recording_hwcodec: "Quality"
   </source>
   <dest>
-    *: "איכות"
+    *: ""
+    recording_hwcodec: "איכות"
   </dest>
   <voice>
     *: "Quality"
+    recording_hwcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -1989,13 +1737,16 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </source>
   <dest>
-    *: "תדירות"
+    *: ""
+    recording: "תדירות"
   </dest>
   <voice>
     *: "Frequency"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -2003,13 +1754,16 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Source"
+    *: none
+    recording: "Source"
   </source>
   <dest>
-    *: "מקור"
+    *: ""
+    recording: "מקור"
   </dest>
   <voice>
     *: "Source"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -2017,29 +1771,19 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
-    h100,h120,h300: "Internal Mic"
+    *: none
+    recording: "Microphone"
+    h100,h120,h300: "Internal Microphone"
   </source>
   <dest>
-    *: "מיקרופון"
+    *: ""
+    recording: "מיקרופון"
     h100,h120,h300: "מיקרופון פנימי"
   </dest>
   <voice>
     *: "Microphone"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "כניסת שמע"
-  </dest>
-  <voice>
-    *: "Line In"
+    recording: ""
+    h100,h120,h300: ""
   </voice>
 </phrase>
 <phrase>
@@ -2047,27 +1791,16 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </source>
   <dest>
-    *: "כניסת שמע דיגיטלית"
+    *: ""
+    recording: "כניסת שמע דיגיטלית"
   </dest>
   <voice>
     *: "Digital"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_CHANNELS
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "ערוצים"
-  </dest>
-  <voice>
-    *: "Channels"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -2075,13 +1808,16 @@
   desc: Editable recordings setting
   user:
   <source>
-    *: "Independent Frames"
+    *: none
+    recording_hwcodec: "Independent Frames"
   </source>
   <dest>
-    *: "מסגרות נפרדות"
+    *: ""
+    recording_hwcodec: "מסגרות נפרדות"
   </dest>
   <voice>
     *: "Independent frames"
+    recording_hwcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -2089,13 +1825,16 @@
   desc: Record split menu
   user:
   <source>
-    *: "File Split Options"
+    *: none
+    recording: "File Split Options"
   </source>
   <dest>
-    *: "אפשרויות פיצול לקבצים"
+    *: ""
+    recording: "אפשרויות פיצול לקבצים"
   </dest>
   <voice>
     *: "Time Split"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -2103,13 +1842,16 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Prerecord Time"
+    *: none
+    recording: "Prerecord Time"
   </source>
   <dest>
-    *: "זמן הקלטה מראש"
+    *: ""
+    recording: "זמן הקלטה מראש"
   </dest>
   <voice>
     *: "Pre-Record time"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -2117,41 +1859,31 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Directory"
+    *: none
+    recording: "Directory"
   </source>
   <dest>
-    *: "ספריה"
+    *: ""
+    recording: "ספריה"
   </dest>
   <voice>
     *: "Directory"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_CURRENT_DIR
-  desc: in recording directory options
-  user:
-  <source>
-    *: "Current Directory"
-  </source>
-  <dest>
-    *: "ספריה נוכחית"
-  </dest>
-  <voice>
-    *: "Current directory"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_STARTUP
   desc: DEPRECATED
   user:
   <source>
-    *: ""
+    *: none
+    recording: ""
   </source>
   <dest>
-    *: "הצג מסך הקלטה באתחול המערכת"
+    *: ""
   </dest>
   <voice>
-    *: "Show recording screen on startup"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2159,13 +1891,16 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Trigger"
+    *: none
+    recording: "Trigger"
   </source>
   <dest>
-    *: "גורם הפעלה"
+    *: ""
+    recording: "גורם הפעלה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -2201,13 +1936,16 @@
   desc: in playback settings, crossfade option
   user:
   <source>
-    *: "Mix"
+    *: none
+    swcodec: "Mix"
   </source>
   <dest>
-    *: "ערבוב"
+    *: ""
+    swcodec: "ערבוב"
   </dest>
   <voice>
     *: "Mix"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -2229,13 +1967,16 @@
   desc: in replaygain
   user:
   <source>
-    *: "Prevent Clipping"
+    *: none
+    swcodec: "Prevent Clipping"
   </source>
   <dest>
-    *: "מנע עיוותים"
+    *: ""
+    swcodec: "מנע עיוותים"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -2313,13 +2054,16 @@
   desc: in display_settings_menu, backlight timeout with charger connected
   user:
   <source>
-    *: "Backlight (While Plugged In)"
+    *: none
+    charging: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "תאורה דולקת כשמחובר למטען"
+    *: ""
+    charging: "תאורה דולקת (כשמחובר למטען)"
   </dest>
   <voice>
     *: "Backlight On When Plugged"
+    charging: ""
   </voice>
 </phrase>
 <phrase>
@@ -2341,13 +2085,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight Fade In"
+    *: none
+    backlight_fade: "Backlight Fade In"
   </source>
   <dest>
-    *: "הגברה הדרגתית של תאורת המסך"
+    *: ""
+    backlight_fade: "הגברה הדרגתית של תאורת המסך"
   </dest>
   <voice>
     *: "Backlight fade in"
+    backlight_fade: ""
   </voice>
 </phrase>
 <phrase>
@@ -2355,13 +2102,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight Fade Out"
+    *: none
+    backlight_fade: "Backlight Fade Out"
   </source>
   <dest>
-    *: "עמעום תאורת המסך"
+    *: ""
+    backlight_fade: "עמעום תאורת המסך"
   </dest>
   <voice>
     *: "Backlight fade out"
+    backlight_fade: ""
   </voice>
 </phrase>
 <phrase>
@@ -2383,27 +2133,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: "LCD Mode"
+    *: none
+    lcd_invert: "LCD Mode"
   </source>
   <dest>
-    *: "מצב המסך"
+    *: ""
+    lcd_invert: "מצב המסך"
   </dest>
   <voice>
     *: "LCD Mode"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INVERT_LCD_NORMAL
-  desc: in settings_menu
-  user:
-  <source>
-    *: "Normal"
-  </source>
-  <dest>
-    *: "רגיל"
-  </dest>
-  <voice>
-    *: "Normal"
+    lcd_invert: ""
   </voice>
 </phrase>
 <phrase>
@@ -2411,27 +2150,33 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Inverse"
+    *: none
+    lcd_invert: "Inverse"
   </source>
   <dest>
-    *: "הפוך"
+    *: ""
+    lcd_invert: "הפוך"
   </dest>
   <voice>
     *: "Inverse"
+    lcd_invert: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  desc: in settings_menu, option to turn display+buttos by 180 degrees
   user:
   <source>
-    *: "Upside Down"
+    *: none
+    lcd_bitmap: "Upside Down"
   </source>
   <dest>
-    *: "היפוך תצוגה"
+    *: ""
+    lcd_bitmap: "היפוך מעלה-מטה"
   </dest>
   <voice>
     *: "Upside Down"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -2439,13 +2184,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Line Selector"
+    *: none
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
-    *: "בורר השורה"
+    *: ""
+    lcd_bitmap: "בורר השורה"
   </dest>
   <voice>
     *: "Line Selector"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -2453,13 +2201,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Pointer"
+    *: none
+    lcd_bitmap: "Pointer"
   </source>
   <dest>
-    *: "מצביע"
+    *: ""
+    lcd_bitmap: "חץ"
   </dest>
   <voice>
     *: "Pointer"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -2467,13 +2218,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Bar (Inverse)"
+    *: none
+    lcd_bitmap: "Bar (Inverse)"
   </source>
   <dest>
-    *: "שורה הפוכה"
+    *: ""
+    lcd_bitmap: "שורה (בצבע נגדי)"
   </dest>
   <voice>
     *: "Inverse Bar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -2562,7 +2316,7 @@
 </phrase>
 <phrase>
   id: LANG_JUMP_SCROLL
-  desc: (player) menu altarnative for jump scroll
+  desc: (player) menu alternative for jump scroll
   user:
   <source>
     *: "Jump Scroll"
@@ -2607,13 +2361,16 @@
   desc: display menu, F3 substitute
   user:
   <source>
-    *: "Scroll Bar"
+    *: none
+    lcd_bitmap: "Scroll Bar"
   </source>
   <dest>
-    *: "שורת גלילה"
+    *: ""
+    lcd_bitmap: "שורת גלילה"
   </dest>
   <voice>
     *: "Scroll Bar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -2621,13 +2378,16 @@
   desc: display menu, F3 substitute
   user:
   <source>
-    *: "Status Bar"
+    *: none
+    lcd_bitmap: "Status Bar"
   </source>
   <dest>
-    *: "שורת מצב"
+    *: ""
+    lcd_bitmap: "שורת מצב"
   </dest>
   <voice>
     *: "Status Bar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -2635,13 +2395,16 @@
   desc: in settings menu
   user:
   <source>
-    *: "Button Bar"
+    *: none
+    recorder_pad: "Button Bar"
   </source>
   <dest>
-    *: "שורת כפתורים"
+    *: ""
+    recorder_pad: "שורת כפתורים"
   </dest>
   <voice>
     *: "Button bar"
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -2649,13 +2412,16 @@
   desc: Volume type title
   user:
   <source>
-    *: "Volume Display"
+    *: none
+    lcd_bitmap: "Volume Display"
   </source>
   <dest>
     *: "תצוגת עוצמת קול"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: "Volume Display"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -2663,13 +2429,16 @@
   desc: Battery type title
   user:
   <source>
-    *: "Battery Display"
+    *: none
+    lcd_bitmap: "Battery Display"
   </source>
   <dest>
-    *: "תצוגת סוללה"
+    *: ""
+    lcd_bitmap: "תצוגת סוללה"
   </dest>
   <voice>
     *: "Battery Display"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -2677,13 +2446,16 @@
   desc: Label for type of icon display
   user:
   <source>
-    *: "Graphic"
+    *: none
+    lcd_bitmap: "Graphic"
   </source>
   <dest>
-    *: "גרפית"
+    *: ""
+    lcd_bitmap: "גרפית"
   </dest>
   <voice>
     *: "Graphic"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -2691,13 +2463,16 @@
   desc: Label for type of icon display
   user:
   <source>
-    *: "Numeric"
+    *: none
+    lcd_bitmap: "Numeric"
   </source>
   <dest>
-    *: "מספרית"
+    *: ""
+    lcd_bitmap: "מספרית"
   </dest>
   <voice>
     *: "Numeric"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -2706,26 +2481,29 @@
   user:
   <source>
     *: "Peak Release"
+    masd: none
   </source>
   <dest>
     *: "שחרור משיא העוצמה"
+    masd: none
   </dest>
   <voice>
     *: "Peak Release"
+    masd: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Units Per Read"
+    *: ""
   </source>
   <dest>
-    *: "יחידות לקריאה"
+    *: ""
   </dest>
   <voice>
-    *: "Units Per Read"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2734,12 +2512,15 @@
   user:
   <source>
     *: "Peak Hold Time"
+    masd: none
   </source>
   <dest>
     *: "זמן החזקה על שיא העוצמה"
+    masd: none
   </dest>
   <voice>
     *: "Peak Hold Time"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2748,12 +2529,15 @@
   user:
   <source>
     *: "Clip Hold Time"
+    masd: none
   </source>
   <dest>
     *: "זמן החזקה לאחר עיוות"
+    masd: none
   </dest>
   <voice>
     *: "Clip Hold Time"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2762,12 +2546,15 @@
   user:
   <source>
     *: "Eternal"
+    masd: none
   </source>
   <dest>
-    *: "אין סופי"
+    *: "אין-סופי"
+    masd: none
   </dest>
   <voice>
     *: "Eternal"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2776,12 +2563,15 @@
   user:
   <source>
     *: "Scale"
+    masd: none
   </source>
   <dest>
     *: "קנה מידה"
+    masd: none
   </dest>
   <voice>
     *: "Scale"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2790,12 +2580,15 @@
   user:
   <source>
     *: "Logarithmic (dB)"
+    masd: none
   </source>
   <dest>
-    *: "(db) לוגריתמי"
+    *: "(dB) לוגריתמי"
+    masd: none
   </dest>
   <voice>
     *: "Logarithmic decibel"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2804,12 +2597,15 @@
   user:
   <source>
     *: "Linear (%)"
+    masd: none
   </source>
   <dest>
     *: "(%) ליניארי"
+    masd: none
   </dest>
   <voice>
     *: "Linear percent"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2818,12 +2614,15 @@
   user:
   <source>
     *: "Minimum Of Range"
+    masd: none
   </source>
   <dest>
-    *: "טווח מינימלי"
+    *: "מינימום בטווח"
+    masd: none
   </dest>
   <voice>
     *: "Minimum Of Range"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2832,12 +2631,15 @@
   user:
   <source>
     *: "Maximum Of Range"
+    masd: none
   </source>
   <dest>
-    *: "טווח מקסימלי"
+    *: "מקסימום בטווח"
+    masd: none
   </dest>
   <voice>
     *: "Maximum Of Range"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -2859,13 +2661,16 @@
   desc: in battery settings
   user:
   <source>
-    *: "Battery Type"
+    *: none
+    battery_types: "Battery Type"
   </source>
   <dest>
-    *: "סוג סוללה"
+    *: ""
+    battery_types: "סוג סוללה"
   </dest>
   <voice>
     *: "Battery type"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
@@ -2873,13 +2678,16 @@
   desc: in battery settings
   user:
   <source>
-    *: "Alkaline"
+    *: none
+    battery_types: "Alkaline"
   </source>
   <dest>
-    *: "אלקליין"
+    *: ""
+    battery_types: "אלקליין"
   </dest>
   <voice>
     *: "Alkaline"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
@@ -2887,13 +2695,16 @@
   desc: in battery settings
   user:
   <source>
-    *: "NiMH"
+    *: none
+    battery_types: "NiMH"
   </source>
   <dest>
-    *: "ניקל מטאל היידריד"
+    *: ""
+    battery_types: "ניקל מטאל היידריד"
   </dest>
   <voice>
     *: "Nickel metal hydride"
+    battery_types: ""
   </voice>
 </phrase>
 <phrase>
@@ -2902,34 +2713,23 @@
   user:
   <source>
     *: "Disk Spindown"
+    flash_storage: none
   </source>
   <dest>
     *: "הפסקת סיבוב הכונן"
+    flash_storage: none
   </dest>
   <voice>
     *: "Disk Spindown"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_POWEROFF
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "כיבוי הכונן"
-  </dest>
-  <voice>
-    *: "Disk Poweroff"
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_TIME
-  desc: in settings_menu
+  desc: Used on the bookmark select window to label elapsed time
   user:
   <source>
-    *: "Set Time/Date"
+    *: "Time"
   </source>
   <dest>
     *: "הגדר תאריך וזמן"
@@ -2943,13 +2743,16 @@
   desc: select the time format of time in status bar
   user:
   <source>
-    *: "Time Format"
+    *: none
+    rtc: "Time Format"
   </source>
   <dest>
-    *: "מבנה תצוגת זמן"
+    *: ""
+    rtc: "מבנה תצוגת זמן"
   </dest>
   <voice>
     *: "Time Format"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -2957,13 +2760,16 @@
   desc: option for 12 hour clock
   user:
   <source>
-    *: "12 Hour Clock"
+    *: none
+    rtc: "12 Hour Clock"
   </source>
   <dest>
-    *: "שעות 12 שעון של"
+    *: ""
+    rtc: "שעות 12 שעון של"
   </dest>
   <voice>
     *: "12 Hour Clock"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -2971,13 +2777,16 @@
   desc: option for 24 hour clock
   user:
   <source>
-    *: "24 Hour Clock"
+    *: none
+    rtc: "24 Hour Clock"
   </source>
   <dest>
-    *: "שעות 24 שעון של"
+    *: ""
+    rtc: "שעות 24 שעון של"
   </dest>
   <voice>
     *: "24 Hour Clock"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3041,7 +2850,7 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
     *: "ID3 הצג מידע"
@@ -3052,7 +2861,7 @@
 </phrase>
 <phrase>
   id: LANG_MENU_SET_RATING
-  desc: in wps context menu
+  desc: Set the rating of a file in the wps context menu
   user:
   <source>
     *: "Set Song Rating"
@@ -3062,20 +2871,6 @@
   </dest>
   <voice>
     *: "Set song rating"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RATING
-  desc: in set_rating
-  user:
-  <source>
-    *: "Rating:"
-  </source>
-  <dest>
-    *: "דירוג:"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3332,41 +3127,13 @@
 </phrase>
 <phrase>
   id: LANG_ROCKBOX_INFO
-  desc: displayed topmost on the info screen
+  desc: displayed topmost on the info screen and in the info menu
   user:
   <source>
-    *: "Rockbox Info:"
+    *: "Rockbox Info"
   </source>
   <dest>
     *: ":מידע על רוקבוקס"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size player-screen width, %d MB %d fraction of MB
-  user:
-  <source>
-    *: "Buf: %d.%03dMB"
-  </source>
-  <dest>
-    *: "זכר: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-  user:
-  <source>
-    *: "Buffer: %d.%03dMB"
-  </source>
-  <dest>
-    *: "זיכרון: %d.%03dMB"
   </dest>
   <voice>
     *: ""
@@ -3377,27 +3144,33 @@
   desc: tells that the battery is charging, instead of battery level
   user:
   <source>
-    *: "Battery: Charging"
+    *: none
+    charging: "Battery: Charging"
   </source>
   <dest>
-    *: "סוללה: בטעינה"
+    *: ""
+    charging: "סוללה: בטעינה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running
+  desc: in info display, shows that top off charge is running Only for V1 recorder
   user:
   <source>
-    *: "Battery: Top-Off Chg"
+    *: none
+    recorder: "Battery: Top-Off Chg"
   </source>
   <dest>
-    *: "טעינת: כיבוי במקסימום"
+    *: ""
+    recorder: "טעינת: כיבוי במקסימום"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder: ""
   </voice>
 </phrase>
 <phrase>
@@ -3405,13 +3178,16 @@
   desc: in info display, shows that trickle charge is running
   user:
   <source>
-    *: "Battery: Trickle Chg"
+    *: none
+    charging: "Battery: Trickle Chg"
   </source>
   <dest>
-    *: "טעינת: טפטוף טעינה"
+    *: ""
+    charging: "טעינת: טפטוף טעינה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: ""
   </voice>
 </phrase>
 <phrase>
@@ -3420,14 +3196,18 @@
   user:
   <source>
     *: "Battery: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondiosp,ondiofm,ifp7xx: "%d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
     h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "%d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: ""
+    h10,ipodmini,ipodmini2g: ""
   </dest>
   <voice>
     *: "Battery level"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: ""
+    h10,ipodmini,ipodmini2g: ""
   </voice>
 </phrase>
 <phrase>
@@ -3463,13 +3243,16 @@
   desc: in info menu; name for internal disk with multivolume (keep short!)
   user:
   <source>
-    *: "Int:"
+    *: none
+    multivolume: "Int:"
   </source>
   <dest>
-    *: "פנימי:"
+    *: ""
+    multivolume: "פנימי:"
   </dest>
   <voice>
     *: "Internal"
+    multivolume: ""
   </voice>
 </phrase>
 <phrase>
@@ -3477,13 +3260,19 @@
   desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
   user:
   <source>
-    *: "MMC:"
+    *: none
+    e200,c200: "mSD:"
+    ondio*: "MMC:"
   </source>
   <dest>
-    *: "MMC:"
+    *: ""
+    e200,c200: "mSD:"
+    ondio*: "MMC:"
   </dest>
   <voice>
     *: "Multimedia card"
+    e200,c200: ""
+    ondio*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3491,13 +3280,16 @@
   desc: spoken only, for wall clock announce
   user:
   <source>
-    *: ""
+    *: none
+    rtc: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    rtc: ""
   </dest>
   <voice>
     *: "Current time:"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -3505,13 +3297,16 @@
   desc: in wps
   user:
   <source>
-    *: "Pitch Up"
+    *: none
+    pitchscreen: "Pitch Up"
   </source>
   <dest>
-    *: "הגבה גובה צליל"
+    *: ""
+    pitchscreen: "הגבה גובה צליל"
   </dest>
   <voice>
-    *: ""
+    *: none
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -3519,204 +3314,27 @@
   desc: in wps
   user:
   <source>
-    *: "Pitch Down"
+    *: none
+    pitchscreen: "Pitch Down"
   </source>
   <dest>
-    *: "הנמך גובה צליל"
+    *: ""
+    pitchscreen: "הנמך גובה צליל"
   </dest>
   <voice>
-    *: ""
+    *: none
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PAUSE
-  desc: in wps
+  desc: in wps and recording trigger menu
   user:
   <source>
     *: "Pause"
   </source>
   <dest>
     *: "עצירה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F2_MODE
-  desc: in wps F2 pressed
-  user:
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "מצב:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_STATUS
-  desc: in wps F3 pressed
-  user:
-  <source>
-    *: "Status"
-  </source>
-  <dest>
-    *: "מצב"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_SCROLL
-  desc: in wps F3 pressed
-  user:
-  <source>
-    *: "Scroll"
-  </source>
-  <dest>
-    *: "גלילה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_BAR
-  desc: in wps F3 pressed
-  user:
-  <source>
-    *: "Bar"
-  </source>
-  <dest>
-    *: "קו"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "למטה = רשימה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_EXIT
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "כבה = יציאה"
-    h100,h120,h300: "עצור = יציאה"
-    ipod*: "נגן\עצור = יציאה"
-    x5: "הקלטה = יציאה"
-    h10: "אחורה = יציאה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "סימניה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "מפתח"
-  </dest>
-  <voice>
-    *: "Index"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_TIME_TEXT
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "זמן"
-  </dest>
-  <voice>
-    *: "Time"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_PLAY
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "נגן = בחירה"
-    h100,h120,h300: "בחר = בחירה"
-    ipod*: "בחר = בחירה"
-    x5: "בחר = בחירה"
-    h10: "הבא = בחירה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SELECT_DELETE
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "הפעל+נגן = מחיקה"
-    h100,h120,h300: "הקלטה = מחיקה"
-    ipod*: "החזק תפריט = מחיקה"
-    x5: "החזק הקלטה = מחיקה"
-    h10: "אחורה = מחיקה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_AUTOLOAD_QUERY
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "?לטעון סימניה אחרונה"
   </dest>
   <voice>
     *: ""
@@ -3779,111 +3397,35 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TIME_SET
-  desc: used in set_time()
-  user:
-  <source>
-    *: "ON = Set"
-    h100,h120,h300: "NAVI = Set"
-    ipod*: "SELECT = Set"
-    x5: "SELECT = Set"
-    h10,h10_5gb: "SELECT = Set"
-    gigabeatf: "SELECT = Set"
-    e200,c200: "SELECT = Set"
-  </source>
-  <dest>
-    *: "הפעל = אישור"
-    h100,h120,h300: "בחר = אישור"
-    ipod*: "בחר = אישור"
-    x5: "בחר = אישור"
-    h10,h10_5gb: "הבא = אישור"
-    gigabeatf: "בחר = אישור"
-    e200,c200: "בחר = אישור"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TIME_REVERT
   desc: used in set_time()
   user:
   <source>
-    *: "OFF = Revert"
+    *: none
+    rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*: "MENU = Revert"
-    x5: "RECORD = Revert"
+    ipod*,e200,c200: "MENU = Revert"
+    x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
-    gigabeatf: "POWER = Revert"
-    e200,c200: "PREV = Revert"
+    gigabeatf: "A = Revert"
   </source>
   <dest>
-    *: "כבה = ביטול"
-    h100,h120,h300: "עצור = ביטול"
-    ipod*: "תפריט = ביטול"
-    x5: "הקלטה = ביטול"
-    h10,h10_5gb: "אחורה = ביטול"
-    gigabeatf: "הפעל = ביטול"
-    e200,c200: "אחורה = ביטול"
+    *: ""
+    rtc: "OFF = ביטול"
+    h100,h120,h300: "STOP = ביטול"
+    ipod*,e200,c200: "MENU = ביטול"
+    x5,m5: "RECORD = ביטול"
+    h10,h10_5gb: "PREV = ביטול"
+    gigabeatf: "A = ביטול"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_PLAYER
-  desc: displayed when key lock is on
-  user:
-  <source>
-    *: "Key Lock ON"
-  </source>
-  <dest>
-    *: "נעילת מקשים פעילה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_PLAYER
-  desc: displayed when key lock is turned off
-  user:
-  <source>
-    *: "Key Lock OFF"
-  </source>
-  <dest>
-    *: "נעילת מקשים מבוטלת"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_RECORDER
-  desc: displayed when key lock is on
-  user:
-  <source>
-    *: "Keylock is ON"
-  </source>
-  <dest>
-    *: "נעילת מקשים פעילה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_RECORDER
-  desc: displayed when key lock is turned off
-  user:
-  <source>
-    *: "Keylock is OFF"
-  </source>
-  <dest>
-    *: "נעילת מקשים מבוטלת"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,e200,c200: ""
+    x5,m5: ""
+    h10,h10_5gb: ""
+    gigabeatf: ""
   </voice>
 </phrase>
 <phrase>
@@ -3891,41 +3433,16 @@
   desc: Display of recorded time
   user:
   <source>
-    *: "Time:"
+    *: none
+    recording: "Time:"
   </source>
   <dest>
-    *: "זמן:"
+    *: ""
+    recording: "זמן:"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
-  user:
-  <source>
-    *: "Split Time:"
-  </source>
-  <dest>
-    *: "זמן פיצול:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_SIZE
-  desc: Display of recorded file size
-  user:
-  <source>
-    *: "Size:"
-  </source>
-  <dest>
-    *: "גודל:"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3933,27 +3450,16 @@
   desc: in recording and radio screen
   user:
   <source>
-    *: "Pre-Recording"
+    *: none
+    recording: "Pre-Recording"
   </source>
   <dest>
-    *: "הקלטה מראש"
+    *: ""
+    recording: "הקלטה מראש"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN
-  desc: in the recording screen
-  user:
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "הגברה"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3961,13 +3467,16 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Gain Left"
+    *: none
+    recording: "Gain Left"
   </source>
   <dest>
-    *: "הגברה שמאלית"
+    *: ""
+    recording: "הגברה (ערוץ שמאל)"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3975,13 +3484,16 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Gain Right"
+    *: none
+    recording: "Gain Right"
   </source>
   <dest>
-    *: "הגברה ימנית"
+    *: ""
+    recording: "הגברה (ערוץ ימין)"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3989,29 +3501,25 @@
   desc: in recording screen
   user:
   <source>
-    *: "The disk is full. Press OFF to continue."
+    *: none
+    recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5: "The disk is full. Press POWER to continue."
+    e200,c200: "The disk is full. Press UP to continue."
   </source>
   <dest>
-    *: "הכונן מלא. לחץ על כבה כדי להמשיך"
-    h100,h120,h300: "הכונן מלא. לחץ על עצור כדי להמשיך"
+    *: ""
+    recording: "הכונן מלא. לחץ על OFF כדי להמשיך"
+    h100,h120,h300: "הכונן מלא. לחץ על STOP כדי להמשיך"
+    m5,x5: "הכונן מלא. לחץ על POWER כדי להמשיך"
+    e200,c200: "הכונן מלא. לחץ על למעלה כדי להמשיך"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIGGER_MODE
-  desc: in recording settings_menu
-  user:
-  <source>
-    *: "Trigger"
-  </source>
-  <dest>
-    *: "גורם הפעלה"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
+    h100,h120,h300: ""
+    m5,x5: ""
+    e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4019,27 +3527,16 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Once"
+    *: none
+    recording: "Once"
   </source>
   <dest>
-    *: "פעם אחת"
+    *: ""
+    recording: "פעם אחת"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIG_REARM
-  desc: in recording settings_menu
-  user:
-  <source>
-    *: "Repeat"
-  </source>
-  <dest>
-    *: "חזרה"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4047,27 +3544,16 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Start Above"
+    *: none
+    recording: "Start Above"
   </source>
   <dest>
-    *: "התחל לפני"
+    *: ""
+    recording: "התחל לפני"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_MIN_DURATION
-  desc: in recording settings_menu
-  user:
-  <source>
-    *: "for at least"
-  </source>
-  <dest>
-    *: "למשך לפחות"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4075,27 +3561,16 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Stop Below"
+    *: none
+    recording: "Stop Below"
   </source>
   <dest>
-    *: "עצור אחרי"
+    *: ""
+    recording: "עצור אחרי"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_STOP_POSTREC
-  desc: in recording settings_menu
-  user:
-  <source>
-    *: "for at least"
-  </source>
-  <dest>
-    *: "למשך לפחות"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4103,13 +3578,16 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Presplit Gap"
+    *: none
+    recording: "Presplit Gap"
   </source>
   <dest>
-    *: "חלק מראש את הרווח"
+    *: ""
+    recording: "חלק מראש את הרווח"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4117,41 +3595,16 @@
   desc: -inf db for values below measurement
   user:
   <source>
-    *: "-inf"
+    *: none
+    recording: "-inf"
   </source>
   <dest>
-    *: "-inf"
+    *: ""
+    recording: "מינוס אינסוף"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIG_IDLE
-  desc: waiting for threshold
-  user:
-  <source>
-    *: "Trigger Idle"
-  </source>
-  <dest>
-    *: "גורם ההפעלה ממתין"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
-  user:
-  <source>
-    *: "Trigger Active"
-  </source>
-  <dest>
-    *: "גורם ההפעלה מופעל"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4159,13 +3612,16 @@
   desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
   user:
   <source>
-    *: "Alarm Time: %02d:%02d"
+    *: none
+    alarm: "Alarm Time: %02d:%02d"
   </source>
   <dest>
-    *: "שעון מעורר: %02d:%02d"
+    *: ""
+    alarm: "שעון מעורר: %02d:%02d"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -4173,13 +3629,16 @@
   desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
   user:
   <source>
-    *: "Waking Up In %d:%02d"
+    *: none
+    alarm: "Waking Up In %d:%02d"
   </source>
   <dest>
-    *: "מתעורר ב: %d:%02d"
+    *: ""
+    alarm: "מתעורר ב: %d:%02d"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -4187,13 +3646,16 @@
   desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
   user:
   <source>
-    *: "Alarm Set"
+    *: none
+    alarm: "Alarm Set"
   </source>
   <dest>
-    *: "שעון מעורר מוגדר"
+    *: ""
+    alarm: "שעון מעורר מוגדר"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -4201,13 +3663,16 @@
   desc: The text that tells that the time is incorrect (for the RTC alarm mod).
   user:
   <source>
-    *: "Alarm Time Is Too Soon!"
+    *: none
+    alarm: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: "!השעה בשעון המעורר מוקדמת מדיי"
+    *: ""
+    alarm: "!השעה בשעון המעורר מוקדמת מדי"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -4215,15 +3680,19 @@
   desc: Shown key functions in alarm menu (for the RTC alarm mod).
   user:
   <source>
-    *: "PLAY=Set OFF=Cancel"
+    *: none
+    alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
   </source>
   <dest>
-    *: "נגן=אישור כבה=ביטול"
-    ipod*: "בחר=אישור תפריט=ביטול"
+    *: ""
+    alarm: "PLAY=אישור OFF=ביטול"
+    ipod*: "SELECT=אישור MENU=ביטול"
   </dest>
   <voice>
-    *: ""
+    *: none
+    alarm: ""
+    ipod*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4231,13 +3700,16 @@
   desc: Announce that the RTC alarm has been turned off
   user:
   <source>
-    *: "Alarm Disabled"
+    *: none
+    alarm: "Alarm Disabled"
   </source>
   <dest>
-    *: "שעון מעורר מבוטל"
+    *: ""
+    alarm: "שעון מעורר מבוטל"
   </dest>
   <voice>
     *: "Alarm Disabled"
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -4353,20 +3825,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_UNIT_DB
-  desc: in browse_id3
-  user:
-  <source>
-    *: "dB"
-  </source>
-  <dest>
-    *: "dB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3_VBR
   desc: in browse_id3
   user:
@@ -4455,13 +3913,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Sun"
+    *: none
+    rtc: "Sun"
   </source>
   <dest>
-    *: "ראש"
+    *: ""
+    rtc: "א' "
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4469,13 +3930,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Mon"
+    *: none
+    rtc: "Mon"
   </source>
   <dest>
-    *: "שני"
+    *: ""
+    rtc: "ב' "
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4483,13 +3947,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Tue"
+    *: none
+    rtc: "Tue"
   </source>
   <dest>
-    *: "שלי"
+    *: ""
+    rtc: "ג'"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4497,13 +3964,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Wed"
+    *: none
+    rtc: "Wed"
   </source>
   <dest>
-    *: "רבי"
+    *: ""
+    rtc: "ד' "
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4511,13 +3981,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Thu"
+    *: none
+    rtc: "Thu"
   </source>
   <dest>
-    *: "חמי"
+    *: ""
+    rtc: "ה' "
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4525,13 +3998,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Fri"
+    *: none
+    rtc: "Fri"
   </source>
   <dest>
-    *: "שיש"
+    *: ""
+    rtc: "ו' "
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4539,13 +4015,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Sat"
+    *: none
+    rtc: "Sat"
   </source>
   <dest>
-    *: "שבת"
+    *: ""
+    rtc: "שבת"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4553,13 +4032,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Jan"
+    *: none
+    rtc: "Jan"
   </source>
   <dest>
-    *: "ינו"
+    *: ""
+    rtc: "ינו"
   </dest>
   <voice>
     *: "January"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4567,13 +4049,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Feb"
+    *: none
+    rtc: "Feb"
   </source>
   <dest>
-    *: "פבר"
+    *: ""
+    rtc: "פבר"
   </dest>
   <voice>
     *: "February"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4581,13 +4066,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Mar"
+    *: none
+    rtc: "Mar"
   </source>
   <dest>
-    *: "מרץ"
+    *: ""
+    rtc: "מרץ"
   </dest>
   <voice>
     *: "March"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4595,13 +4083,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Apr"
+    *: none
+    rtc: "Apr"
   </source>
   <dest>
-    *: "אפר"
+    *: ""
+    rtc: "אפר"
   </dest>
   <voice>
     *: "April"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4609,13 +4100,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "May"
+    *: none
+    rtc: "May"
   </source>
   <dest>
-    *: "מאי"
+    *: ""
+    rtc: "מאי"
   </dest>
   <voice>
     *: "May"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4623,13 +4117,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Jun"
+    *: none
+    rtc: "Jun"
   </source>
   <dest>
-    *: "יונ"
+    *: ""
+    rtc: "יונ"
   </dest>
   <voice>
     *: "June"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4637,13 +4134,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Jul"
+    *: none
+    rtc: "Jul"
   </source>
   <dest>
-    *: "יול"
+    *: ""
+    rtc: "יול"
   </dest>
   <voice>
     *: "July"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4651,13 +4151,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Aug"
+    *: none
+    rtc: "Aug"
   </source>
   <dest>
-    *: "אוג"
+    *: ""
+    rtc: "אוג"
   </dest>
   <voice>
     *: "August"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4665,13 +4168,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Sep"
+    *: none
+    rtc: "Sep"
   </source>
   <dest>
-    *: "ספט"
+    *: ""
+    rtc: "ספט"
   </dest>
   <voice>
     *: "September"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4679,13 +4185,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Oct"
+    *: none
+    rtc: "Oct"
   </source>
   <dest>
-    *: "אוק"
+    *: ""
+    rtc: "אוק"
   </dest>
   <voice>
     *: "October"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4693,13 +4202,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Nov"
+    *: none
+    rtc: "Nov"
   </source>
   <dest>
-    *: "נוב"
+    *: ""
+    rtc: "נוב"
   </dest>
   <voice>
     *: "November"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -4707,13 +4219,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Dec"
+    *: none
+    rtc: "Dec"
   </source>
   <dest>
-    *: "דצמ"
+    *: ""
+    rtc: "דצמ"
   </dest>
   <voice>
     *: "December"
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -5922,7 +5437,7 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_TXT
-  desc: spoken only, for file extension
+  desc: DEPRECATED
   user:
   <source>
     *: ""
@@ -5931,7 +5446,7 @@
     *: ""
   </dest>
   <voice>
-    *: "text"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5977,20 +5492,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_EXT_UCL
-  desc: spoken only, for file extension
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "flash"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_EXT_AJZ
   desc: spoken only, for file extension
   user:
@@ -6005,28 +5506,14 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PLAYLIST_LOAD
-  desc: displayed on screen while loading a playlist
-  user:
-  <source>
-    *: "Loading..."
-  </source>
-  <dest>
-    *: "...טוען"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "...מערבב"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -6041,36 +5528,6 @@
   </source>
   <dest>
     *: "זיכרון רשימת השירים מלא"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_PLAYER
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "סוף הרשימה"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_RECORDER
-  desc: when playlist has finished
-  user:
-  <source>
-    *: "End of Song List"
-    player: "End of List"
-  </source>
-  <dest>
-    *: "סוף רשימת השירים"
-    player: "סוף הרשימה"
   </dest>
   <voice>
     *: ""
@@ -6235,13 +5692,16 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%02d MHz"
+    *: none
+    radio: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "תחנה: %d.%02d MHz"
+    *: ""
+    radio: "תחנה: %d.%02d MHz"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6249,13 +5709,16 @@
   desc: error when preset list is empty
   user:
   <source>
-    *: "No presets"
+    *: none
+    radio: "No presets"
   </source>
   <dest>
-    *: ""
+    *: none
+    radio: "אין תחנות קבועות"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6263,13 +5726,16 @@
   desc: in radio screen
   user:
   <source>
-    *: "Edit Preset"
+    *: none
+    radio: "Edit Preset"
   </source>
   <dest>
-    *: "ערוך תחנה קבועה"
+    *: ""
+    radio: "ערוך תחנה קבועה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6277,13 +5743,16 @@
   desc: in radio screen
   user:
   <source>
-    *: "Remove Preset"
+    *: none
+    radio: "Remove Preset"
   </source>
   <dest>
-    *: "הסר תחנה קבועה"
+    *: ""
+    radio: "הסר תחנה קבועה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6291,13 +5760,16 @@
   desc: in radio screen
   user:
   <source>
-    *: "Preset Save Failed"
+    *: none
+    radio: "Preset Save Failed"
   </source>
   <dest>
-    *: "שמירת התחנה הקבועה נכשלה"
+    *: ""
+    radio: "שמירת התחנה הקבועה נכשלה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6305,13 +5777,16 @@
   desc: in radio screen
   user:
   <source>
-    *: "The Preset List is Full"
+    *: none
+    radio: "The Preset List is Full"
   </source>
   <dest>
-    *: "רשימת התחנות הקבועות מראש מלאה"
+    *: ""
+    radio: "רשימת התחנות הקבועות מראש מלאה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6319,13 +5794,16 @@
   desc: in button bar
   user:
   <source>
-    *: "Menu"
+    *: none
+    radio_screen_button_bar: "Menu"
   </source>
   <dest>
-    *: "תפריט"
+    *: ""
+    radio_screen_button_bar: "תפריט"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6333,13 +5811,16 @@
   desc: in radio screen
   user:
   <source>
-    *: "Exit"
+    *: none
+    radio_screen_button_bar: "Exit"
   </source>
   <dest>
-    *: "יציאה"
+    *: ""
+    radio_screen_button_bar: "יציאה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6347,27 +5828,16 @@
   desc: in radio screen
   user:
   <source>
-    *: "Action"
+    *: none
+    radio_screen_button_bar: "Action"
   </source>
   <dest>
-    *: "פעולה"
+    *: ""
+    radio_screen_button_bar: "פעולה"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_PRESETS
-  desc: in button bar
-  user:
-  <source>
-    *: "Preset"
-  </source>
-  <dest>
-    *: "תחנה קבועה"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6375,13 +5845,16 @@
   desc: in radio screen
   user:
   <source>
-    *: "Add"
+    *: none
+    radio_screen_button_bar: "Add"
   </source>
   <dest>
-    *: "הוסף"
+    *: ""
+    radio_screen_button_bar: "הוסף"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6389,13 +5862,16 @@
   desc: in radio screen
   user:
   <source>
-    *: "Record"
+    *: none
+    radio_screen_button_bar: "Record"
   </source>
   <dest>
-    *: "הקלטה"
+    *: ""
+    radio_screen_button_bar: "הקלטה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6403,55 +5879,16 @@
   desc: in radio screen
   user:
   <source>
-    *: "Force mono"
+    *: none
+    radio: "Force mono"
   </source>
   <dest>
-    *: "מצב מונו"
+    *: ""
+    radio: "כפה מצב מונו"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user:
-  <source>
-    *: "Menu"
-  </source>
-  <dest>
-    *: "תפריט"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user:
-  <source>
-    *: "Option"
-  </source>
-  <dest>
-    *: "אפשרות"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user:
-  <source>
-    *: "LCD"
-  </source>
-  <dest>
-    *: "מסך"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6544,36 +5981,24 @@
   user:
   <source>
     *: "OFF to abort"
-    h100,h120,h300: "STOP to abort"
+    player,h100,h120,h300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
-    x5: "Long PLAY to abort"
-    h10,h10_5gb: "PREV to abort"
-    e200,c200: "PREV to abort"
+    x5,m5: "Long PLAY to abort"
+    h10,h10_5gb,e200,c200: "PREV to abort"
   </source>
   <dest>
-    *: "כבה כדי לבטל"
-    h100,h120,h300: "עצור כדי לבטל"
-    ipod*: "נגן\עצור כדי לבטל"
-    x5: "החזק נגן כדי לבטל"
-    h10,h10_5gb: "אחורה כדי לבטל"
-    e200,c200: "אחורה כדי לבטל"
+    *: "OFF כדי לבטל"
+    player,h100,h120,h300: "STOP כדי לבטל"
+    ipod*: "PLAY/PAUSE כדי לבטל"
+    x5,m5: "PLAY ארוך כדי לבטל"
+    h10,h10_5gb,e200,c200: "PREV כדי לבטל"
   </dest>
   <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STOP_ABORT
-  desc: Used on player models
-  user:
-  <source>
-    *: "STOP to abort"
-  </source>
-  <dest>
-    *: "עצור כדי לבטל"
-  </dest>
-  <voice>
-    *: ""
+    player,h100,h120,h300: ""
+    ipod*: ""
+    x5,m5: ""
+    h10,h10_5gb,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -6591,132 +6016,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ID3DB_ARTISTS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Artists"
-  </source>
-  <dest>
-    *: "אמנים"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ALBUMS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Albums"
-  </source>
-  <dest>
-    *: "אלבומים"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SONGS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Songs"
-  </source>
-  <dest>
-    *: "שירים"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Search"
-  </source>
-  <dest>
-    *: "חיפוש"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_ARTISTS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Search Artists"
-  </source>
-  <dest>
-    *: "חיפוש אמנים"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_ALBUMS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Search Albums"
-  </source>
-  <dest>
-    *: "חיפוש אלבומים"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_SEARCH_SONGS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Search Songs"
-  </source>
-  <dest>
-    *: "חיפוש שירים"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_MATCHES
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "Found %d matches"
-  </source>
-  <dest>
-    *: "נמצאו%d  התאמות"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_ALL_SONGS
-  desc: ID3 virtual folder name
-  user:
-  <source>
-    *: "<All songs>"
-  </source>
-  <dest>
-    *: "<כל השירים>"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_MOVE
   desc: The verb/action Move
   user:
@@ -6728,20 +6027,6 @@
   </dest>
   <voice>
     *: "Move"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MOVE_FAILED
-  desc: Error message displayed in playlist viewer
-  user:
-  <source>
-    *: "Move Failed"
-  </source>
-  <dest>
-    *: "העברה נכשלה"
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6812,20 +6097,6 @@
   </dest>
   <voice>
     *: "Remove"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILE_OPTIONS
-  desc: in playlist viewer on+play menu
-  user:
-  <source>
-    *: "File Options"
-  </source>
-  <dest>
-    *: "אפשרויות קובץ"
-  </dest>
-  <voice>
-    *: "File Options"
   </voice>
 </phrase>
 <phrase>
@@ -6941,45 +6212,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILETYPES_STRING_BUFFER_EMPTY
-  desc: Filetype string buffer empty
-  user:
-  <source>
-    *: "Filetype string buffer empty"
-  </source>
-  <dest>
-    *: "זיכרון סוגי הקבצים ריק"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME_CONFIRM_PLAYER
-  desc: possible answers to resume question
-  user:
-  <source>
-    *: "(PLAY/STOP)"
-  </source>
-  <dest>
-    *: "(נגן/הפסק)"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_SAVE_CHANGES
   desc: When you try to exit radio to confirm save
   user:
   <source>
-    *: "Save Changes?"
+    *: none
+    radio: "Save Changes?"
   </source>
   <dest>
-    *: "לשמור שינויים?"
+    *: ""
+    radio: "לשמור שינויים?"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -6987,13 +6233,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Advanced EQ Settings"
+    *: none
+    swcodec: "Advanced EQ Settings"
   </source>
   <dest>
-    *: "הגדרות מאפנן צליל מתקדמות"
+    *: ""
+    swcodec: "הגדרות אקולייזר מתקדמות"
   </dest>
   <voice>
     *: "Advanced equalizer settings"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7043,13 +6292,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Graphical EQ"
+    *: none
+    swcodec: "Graphical EQ"
   </source>
   <dest>
-    *: "מאפנן צליל גרפי"
+    *: ""
+    swcodec: "אקולייזר גרפי"
   </dest>
   <voice>
     *: "Graphical equalizer"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7057,13 +6309,16 @@
   desc: text for LCD settings menu
   user:
   <source>
-    *: "Clear Backdrop"
+    *: none
+    lcd_non-mono: "Clear Backdrop"
   </source>
   <dest>
-    *: "נקה תמונת רקע"
+    *: ""
+    lcd_non-mono: "נקה תמונת רקע"
   </dest>
   <voice>
     *: "Clear Backdrop"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7081,31 +6336,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FM_TUNE_MODE
-  desc: in radio screen / menu
-  user:
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "מצב:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REMOTE_WHILE_PLAYING
   desc: in settings_menu()
   user:
   <source>
-    *: "Browse .rwps files"
+    *: none
+    remote: "Browse .rwps files"
   </source>
   <dest>
-    *: ".rwps הצג קבצי"
+    *: ""
+    remote: ".rwps הצג קבצי"
   </dest>
   <voice>
     *: "Browse remote while-playing-screen files"
+    remote: ""
   </voice>
 </phrase>
 <phrase>
@@ -7113,13 +6357,16 @@
   desc: default preset name for auto scan mode
   user:
   <source>
-    *: "%d.%02d MHz"
+    *: none
+    radio: "%d.%02d MHz"
   </source>
   <dest>
-    *: "%d.%02d MHz"
+    *: ""
+    radio: "%d.%02d MHz"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7127,13 +6374,16 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Enable Crossfade"
+    *: none
+    swcodec: "Enable Crossfade"
   </source>
   <dest>
-    *: "הפעל מעבר ביניים"
+    *: ""
+    swcodec: "הפעל מעבר ביניים"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7141,13 +6391,16 @@
   desc: menu entry to set the background color
   user:
   <source>
-    *: "Background Colour"
+    *: none
+    lcd_non-mono: "Background Colour"
   </source>
   <dest>
-    *: "צבע אחורי"
+    *: ""
+    lcd_non-mono: "צבע רקע"
   </dest>
   <voice>
     *: "Background Colour"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7155,13 +6408,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Q"
+    *: none
+    swcodec: "Q"
   </source>
   <dest>
-    *: "Q"
+    *: ""
+    swcodec: "Q"
   </dest>
   <voice>
     *: "Q"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7183,13 +6439,16 @@
   desc: in remote lcd settings menu
   user:
   <source>
-    *: "Reduce Ticking"
+    *: none
+    remote_ticking: "Reduce Ticking"
   </source>
   <dest>
-    *: "הפחת צלילי תיקתוק"
+    *: ""
+    remote_ticking: "הפחת צלילי תיקתוק"
   </dest>
   <voice>
     *: "Reduce Ticking"
+    remote_ticking: ""
   </voice>
 </phrase>
 <phrase>
@@ -7197,13 +6456,16 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Thai (ISO-8859-11)"
+    *: none
+    lcd_bitmap: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: "תאילנדית (ISO-8859-11)"
+    *: ""
+    lcd_bitmap: "תאילנדית (ISO-8859-11)"
   </dest>
   <voice>
     *: "Thai"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7225,27 +6487,16 @@
   desc: in eq settings
   user:
   <source>
-    *: "Precut"
+    *: none
+    swcodec: "Precut"
   </source>
   <dest>
-    *: "חיתוך מראש"
+    *: ""
+    swcodec: "חיתוך מראש"
   </dest>
   <voice>
     *: "Pre-cut"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGCACHE_DISK
-  desc: 
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "שמור על הכונן"
-  </dest>
-  <voice>
-    *: "Keep on Disk"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7253,13 +6504,16 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Japanese (SJIS)"
+    *: none
+    lcd_bitmap: "Japanese (SJIS)"
   </source>
   <dest>
-    *: "יפנית (SJIS)"
+    *: ""
+    lcd_bitmap: "יפנית (SJIS)"
   </dest>
   <voice>
     *: "Japanese"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7267,13 +6521,16 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Hebrew (ISO-8859-8)"
+    *: none
+    lcd_bitmap: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: "עברית (ISO-8859-8)"
+    *: ""
+    lcd_bitmap: "עברית (ISO-8859-8)"
   </dest>
   <voice>
     *: "Hebrew"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7293,6 +6550,7 @@
 <phrase>
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
+  user:
   <source>
     *: "Database is not ready"
   </source>
@@ -7308,13 +6566,16 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Korean (KSX1001)"
+    *: none
+    lcd_bitmap: "Korean (KSX1001)"
   </source>
   <dest>
-    *: "קוריאנית (KSX1001)"
+    *: ""
+    lcd_bitmap: "קוריאנית (KSX1001)"
   </dest>
   <voice>
     *: "Korean"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7336,13 +6597,16 @@
   desc: menu entry to set the foreground color
   user:
   <source>
-    *: "Foreground Colour"
+    *: none
+    lcd_non-mono: "Foreground Colour"
   </source>
   <dest>
-    *: "צבע קדמי"
+    *: ""
+    lcd_non-mono: "צבע ראשי"
   </dest>
   <voice>
     *: "Foreground Colour"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7350,13 +6614,16 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Simp. Chinese (GB2312)"
+    *: none
+    lcd_bitmap: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: "סינית רגילה (GB2312)"
+    *: ""
+    lcd_bitmap: "סינית מפושטת (GB2312)"
   </dest>
   <voice>
     *: "Simplified Chinese"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7364,7 +6631,7 @@
   desc: Backlight behaviour setting
   user:
   <source>
-    *: "First Keypress Enables Backlight Only"
+    *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
     *: "לחיצה ראשונה מפעילה תאורה בלבד"
@@ -7378,27 +6645,16 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Main and Remote Unit"
+    *: none
+    remote: "Main and Remote Unit"
   </source>
   <dest>
-    *: "יחידה מרכזית והשלט"
+    *: ""
+    remote: "יחידה מרכזית והשלט"
   </dest>
   <voice>
     *: "Main and remote unit"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PIXELS
-  desc: In the settings menu
-  user:
-  <source>
-    *: "pixels"
-  </source>
-  <dest>
-    *: "פיקסלים"
-  </dest>
-  <voice>
-    *: "pixels"
+    remote: ""
   </voice>
 </phrase>
 <phrase>
@@ -7420,13 +6676,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Brightness"
+    *: none
+    backlight_brightness: "Brightness"
   </source>
   <dest>
-    *: "בהירות"
+    *: ""
+    backlight_brightness: "בהירות"
   </dest>
   <voice>
     *: "Brightness"
+    backlight_brightness: ""
   </voice>
 </phrase>
 <phrase>
@@ -7434,13 +6693,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Save EQ Preset"
+    *: none
+    swcodec: "Save EQ Preset"
   </source>
   <dest>
-    *: "שמור הגדרות מאפנן צליל"
+    *: ""
+    swcodec: "שמור הגדרות אקולייזר"
   </dest>
   <voice>
     *: "Save equalizer preset"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7448,13 +6710,16 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Main Unit Only"
+    *: none
+    remote: "Main Unit Only"
   </source>
   <dest>
-    *: "יחידה מרכזית בלבד"
+    *: ""
+    remote: "יחידה מרכזית בלבד"
   </dest>
   <voice>
     *: "Main unit only"
+    remote: ""
   </voice>
 </phrase>
 <phrase>
@@ -7462,13 +6727,16 @@
   desc: load preset list in fm radio
   user:
   <source>
-    *: "Load Preset List"
+    *: none
+    radio: "Load Preset List"
   </source>
   <dest>
-    *: "טען רשימת תחנות"
+    *: ""
+    radio: "טען רשימת תחנות קבועות"
   </dest>
   <voice>
     *: "Load Preset List"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7476,13 +6744,16 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Load to RAM"
+    *: none
+    tc_ramcache: "Load to RAM"
   </source>
   <dest>
-    *: "טען לזיכרון מהיר"
+    *: ""
+    tc_ramcache: "טען לזיכרון מהיר"
   </dest>
   <voice>
     *: "Load to RAM"
+    tc_ramcache: ""
   </voice>
 </phrase>
 <phrase>
@@ -7490,13 +6761,16 @@
   desc: in sound settings
   user:
   <source>
-    *: "Crossfeed"
+    *: none
+    swcodec: "Crossfeed"
   </source>
   <dest>
-    *: "הזנה הפוכה"
+    *: ""
+    swcodec: "הזנה הפוכה"
   </dest>
   <voice>
     *: "Crossfeed"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7518,13 +6792,16 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Trad. Chinese (BIG5)"
+    *: none
+    lcd_bitmap: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: "סינית מסורתית (BIG5)"
+    *: ""
+    lcd_bitmap: "סינית מסורתית (BIG5)"
   </dest>
   <voice>
     *: "Traditional Chinese"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -7546,13 +6823,16 @@
   desc: during auto scan
   user:
   <source>
-    *: "Scanning %d.%02d MHz"
+    *: none
+    radio: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: "סורק %d.%02d MHz"
+    *: ""
+    radio: "סורק %d.%02d MHz"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7560,13 +6840,16 @@
   desc: splash screen during freeze in radio mode
   user:
   <source>
-    *: "Screen frozen!"
+    *: none
+    radio: "Screen frozen!"
   </source>
   <dest>
-    *: "המסך קפוא!"
+    *: ""
+    radio: "המסך קפוא!"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7574,13 +6857,16 @@
   desc: "pitch" in the pitch screen
   user:
   <source>
-    *: "Pitch"
+    *: none
+    pitchscreen: "Pitch"
   </source>
   <dest>
-    *: "גובה צליל"
+    *: ""
+    pitchscreen: "גובה צליל"
   </dest>
   <voice>
     *: "Pitch"
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -7602,13 +6888,16 @@
   desc: in radio screen / menu
   user:
   <source>
-    *: "Scan"
+    *: none
+    radio: "Scan"
   </source>
   <dest>
-    *: "סריקה"
+    *: ""
+    radio: "סריקה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7642,14 +6931,18 @@
 <phrase>
   id: LANG_CROSSFEED_HF_CUTOFF
   desc: in crossfeed settings
+  user:
   <source>
-    *: "High-Frequency Cutoff"
+    *: none
+    swcodec: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: "חיתוך צלילים בתדירות גבוהה"
+    *: ""
+    swcodec: "חיתוך צלילים בתדירות גבוהה"
   </dest>
   <voice>
     *: "High-frequency cutoff"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7657,13 +6950,16 @@
   desc: Used when you need to say Preset List, also voiced
   user:
   <source>
-    *: "Preset List"
+    *: none
+    radio: "Preset List"
   </source>
   <dest>
-    *: "רשימת קבועים-מראש"
+    *: ""
+    radio: "רשימת תחנות קבועות"
   </dest>
   <voice>
     *: "Preset List"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7671,13 +6967,16 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade-Out Delay"
+    *: none
+    swcodec: "Fade-Out Delay"
   </source>
   <dest>
-    *: "השהיית דעיכת צליל"
+    *: ""
+    swcodec: "השהיית דעיכת צליל"
   </dest>
   <voice>
     *: "Fade-Out Delay"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7713,13 +7012,16 @@
   desc: splash when user selects an invalid colour
   user:
   <source>
-    *: "Invalid colour"
+    *: none
+    lcd_non-mono: "Invalid colour"
   </source>
   <dest>
-    *: "צבע לא תקף"
+    *: ""
+    lcd_non-mono: "צבע לא תקף"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7737,20 +7039,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_GAIN_DIGITAL
-  desc: in the recording screen
-  user:
-  <source>
-    *: "D"
-  </source>
-  <dest>
-    *: "D"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ID3_LENGTH
   desc: in tag viewer
   user:
@@ -7759,20 +7047,6 @@
   </source>
   <dest>
     *: "[אורך]"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3DB_GENRES
-  desc: in tag cache
-  user:
-  <source>
-    *: "Genres"
-  </source>
-  <dest>
-    *: "סגנונות"
   </dest>
   <voice>
     *: ""
@@ -7811,13 +7085,16 @@
   desc: text for splash to indicate a failure to load a bitmap as backdrop
   user:
   <source>
-    *: "Backdrop Failed"
+    *: none
+    lcd_non-mono: "Backdrop Failed"
   </source>
   <dest>
-    *: "תמונת רקע נכשלה"
+    *: ""
+    lcd_non-mono: "תמונת רקע נכשלה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7825,13 +7102,16 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Remote Unit Only"
+    *: none
+    remote: "Remote Unit Only"
   </source>
   <dest>
-    *: "שלט בלבד"
+    *: ""
+    remote: "שלט בלבד"
   </dest>
   <voice>
     *: "Remote unit only"
+    remote: ""
   </voice>
 </phrase>
 <phrase>
@@ -7853,13 +7133,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Cutoff Frequency"
+    *: none
+    swcodec: "Cutoff Frequency"
   </source>
   <dest>
-    *: "תדירות חיתוך צליל"
+    *: ""
+    swcodec: "תדירות חיתוך צליל"
   </dest>
   <voice>
     *: "Cutoff Frequency"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7877,31 +7160,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_DIRCACHE_BUILDING
-  desc: when booting up and rebuilding the cache
-  user:
-  <source>
-    *: "Scanning disk..."
-  </source>
-  <dest>
-    *: "...סורק כונן"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CLIP_LIGHT
   desc: in record settings menu.
   user:
   <source>
-    *: "Clipping Light"
+    *: none
+    recording: "Clipping Light"
   </source>
   <dest>
-    *: "עיוותי צליל מפעילים תאורה"
+    *: ""
+    recording: "עיוותי צליל מפעילים תאורה"
   </dest>
   <voice>
     *: "Clipping Light"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -7909,13 +7181,16 @@
   desc: menu
   user:
   <source>
-    *: "Reset Colours"
+    *: none
+    lcd_non-mono: "Reset Colours"
   </source>
   <dest>
-    *: "אפס צבעים"
+    *: ""
+    lcd_non-mono: "אפס צבעים"
   </dest>
   <voice>
     *: "Reset Colours"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -7923,13 +7198,16 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade-In Duration"
+    *: none
+    swcodec: "Fade-In Duration"
   </source>
   <dest>
-    *: "משך זמן הגברת צליל הדרגתית"
+    *: ""
+    swcodec: "משך זמן הגברת צליל הדרגתית"
   </dest>
   <voice>
     *: "Fade-In Duration"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7937,13 +7215,16 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade-Out Duration"
+    *: none
+    swcodec: "Fade-Out Duration"
   </source>
   <dest>
-    *: "משך זמן דעיכת צליל הדרגתית"
+    *: ""
+    swcodec: "משך זמן דעיכת צליל הדרגתית"
   </dest>
   <voice>
     *: "Fade-Out Duration"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -7951,13 +7232,16 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No settings found. Autoscan?"
+    *: none
+    radio: "No settings found. Autoscan?"
   </source>
   <dest>
-    *: "לא נמצאו תחנות מוגדרות. סרוק אוטומטית?"
+    *: ""
+    radio: "לא נמצאו תחנות מוגדרות. סרוק אוטומטית?"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7965,27 +7249,33 @@
   desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
   user:
   <source>
-    *: "RGB"
+    *: none
+    lcd_color: "RGB"
   </source>
   <dest>
-    *: "RGB"
+    *: ""
+    lcd_color: "RGB"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_DIRCACHE_ENABLE
   desc: in directory cache settings
-  user:
+  user: 
   <source>
-    *: "Directory Cache"
+    *: none
+    dircache: "Directory Cache"
   </source>
   <dest>
-    *: "זיכרון ספריות"
+    *: ""
+    dircache: "זיכרון ספריות"
   </dest>
   <voice>
     *: "Directory Cache"
+    dircache: ""
   </voice>
 </phrase>
 <phrase>
@@ -8007,13 +7297,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "%d Hz Band Gain"
+    *: none
+    swcodec: "%d Hz Band Gain"
   </source>
   <dest>
-    *: "%d Hz רצועה מוגברת"
+    *: ""
+    swcodec: "%d Hz רצועה מוגברת"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8021,13 +7314,16 @@
   desc: in crossfade settings
   user:
   <source>
-    *: "Track Skip Only"
+    *: none
+    swcodec: "Track Skip Only"
   </source>
   <dest>
-    *: "רק בדילוג על שיר"
+    *: ""
+    swcodec: "רק בדילוג על שיר"
   </dest>
   <voice>
     *: "Track Skip Only"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8035,13 +7331,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Center Frequency"
+    *: none
+    swcodec: "Center Frequency"
   </source>
   <dest>
-    *: "תדירות מרכזית"
+    *: ""
+    swcodec: "תדירות מרכזית"
   </dest>
   <voice>
     *: "Center frequency"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8049,19 +7348,22 @@
   desc: clear preset list in fm radio
   user:
   <source>
-    *: "Clear Preset List"
+    *: none
+    radio: "Clear Preset List"
   </source>
   <dest>
-    *: "מחק רשימת תחנות"
+    *: ""
+    radio: "מחק רשימת תחנות קבועות"
   </dest>
   <voice>
     *: "Clear Preset List"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_KEYBOARD_LOADED
   desc: shown when a keyboard has been loaded from the dir browser
-  user:
+  user: 
   <source>
     *: "New Keyboard"
   </source>
@@ -8088,7 +7390,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in settings menu
+  desc: in the main menu and the settings menu
   user:
   <source>
     *: "Database"
@@ -8115,19 +7417,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_UNIT_HERTZ
-  desc: in sound settings
-  <source>
-    *: "Hz"
-  </source>
-  <dest>
-    *: "Hz"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CODEPAGE_LATIN1
   desc: in codepage setting menu
   user:
@@ -8144,28 +7433,18 @@
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
-  <source>  
-    *: "Cross Gain"
-  </source>
-  <dest>  
-    *: "הגברה הפוכה"
-  </dest>
-  <voice>  
-    *: "Cross gain"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_EQUALIZER_BAND_GAIN
-  desc: in the equalizer settings menu
   user:
   <source>
-    *: "Gain"
+    *: none
+    swcodec: "Cross Gain"
   </source>
   <dest>
-    *: "הגברה"
+    *: ""
+    swcodec: "הגברה הפוכה"
   </dest>
   <voice>
-    *: "Gain"
+    *: "Cross gain"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8173,13 +7452,16 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Arabic (CP1256)"
+    *: none
+    lcd_bitmap: "Arabic (CP1256)"
   </source>
   <dest>
-    *: "ערבית (CP1256)"
+    *: ""
+    lcd_bitmap: "ערבית (CP1256)"
   </dest>
   <voice>
     *: "Arabic"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8187,13 +7469,16 @@
   desc: Save preset list in fm radio
   user:
   <source>
-    *: "Save Preset List"
+    *: none
+    radio: "Save Preset List"
   </source>
   <dest>
-    *: "שמור רשימת תחנות"
+    *: ""
+    radio: "שמור רשימת תחנות קבועות"
   </dest>
   <voice>
     *: "Save Preset List"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -8201,13 +7486,16 @@
   desc: in color screen
   user:
   <source>
-    *: "RGB: %02X%02X%02X"
+    *: none
+    lcd_color: "RGB: %02X%02X%02X"
   </source>
   <dest>
-    *: "RGB: %02X%02X%02X"
+    *: ""
+    lcd_color: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -8215,13 +7503,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Simple EQ Settings"
+    *: none
+    swcodec: "Simple EQ Settings"
   </source>
   <dest>
-    *: "הגדרות מאפנן צליל פשוטות"
+    *: ""
+    swcodec: "הגדרות אקולייזר פשוטות"
   </dest>
   <voice>
     *: "Simple equalizer settings"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8229,13 +7520,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Low Shelf Filter"
+    *: none
+    swcodec: "Low Shelf Filter"
   </source>
   <dest>
-    *: "מסנן רף תחתון"
+    *: ""
+    swcodec: "מסנן רף תחתון"
   </dest>
   <voice>
     *: "Low shelf filter"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8243,13 +7537,16 @@
   desc: in radio menu
   user:
   <source>
-    *: "Add Preset"
+    *: none
+    radio: "Add Preset"
   </source>
   <dest>
-    *: "הוסף תחנה קבועה"
+    *: ""
+    radio: "הוסף תחנה קבועה"
   </dest>
   <voice>
     *: "Add Preset"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -8257,26 +7554,33 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Edit mode: %s"
+    *: none
+    swcodec: "Edit mode: %s"
   </source>
   <dest>
-    *: "מצב עריכה: %s"
+    *: ""
+    swcodec: "מצב עריכה: %s"
   </dest>
   <voice>
-    *: ""
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFEED_HF_ATTENUATION
   desc: in crossfeed settings
+  user:
   <source>
-    *: "High-Frequency Attenuation"
+    *: none
+    swcodec: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: "הנמכת צלילים בתדירות גבוהה"
+    *: ""
+    swcodec: "הנמכת צלילים בתדירות גבוהה"
   </dest>
   <voice>
     *: "High-frequency attenuation"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8284,13 +7588,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Enable EQ"
+    *: none
+    swcodec: "Enable EQ"
   </source>
   <dest>
-    *: "הפעל מאפנן צליל"
+    *: ""
+    swcodec: "הפעל אקולייזר"
   </dest>
   <voice>
     *: "Enable equalizer"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8312,13 +7619,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "High Shelf Filter"
+    *: none
+    swcodec: "High Shelf Filter"
   </source>
   <dest>
-    *: "מסנן רף עליון"
+    *: ""
+    swcodec: "מסנן רף עליון"
   </dest>
   <voice>
     *: "High shelf filter"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8326,27 +7636,16 @@
   desc: spoken only, for file extension
   user:
   <source>
-    *: ""
+    *: none
+    remote: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    remote: ""
   </dest>
   <voice>
     *: "remote while-playing-screen"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RADIO_PRESET_MODE
-  desc: in radio screen / menu
-  user:
-  <source>
-    *: "Preset"
-  </source>
-  <dest>
-    *: "תחנות קבועות מראש"
-  </dest>
-  <voice>
-    *: ""
+    remote: ""
   </voice>
 </phrase>
 <phrase>
@@ -8354,13 +7653,16 @@
   desc: in radio menu
   user:
   <source>
-    *: "Auto-Scan Presets"
+    *: none
+    radio: "Auto-Scan Presets"
   </source>
   <dest>
-    *: "סרוק תחנות אוטומטית"
+    *: ""
+    radio: "סרוק תחנות אוטומטית"
   </dest>
   <voice>
     *: "Auto scan presets"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -8368,13 +7670,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Browse EQ Presets"
+    *: none
+    swcodec: "Browse EQ Presets"
   </source>
   <dest>
-    *: "הצג קבצי מאפנן צליל"
+    *: ""
+    swcodec: "הצג קבצי הגדרות אקולייזר"
   </dest>
   <voice>
     *: "Browse equalizer presets"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8396,13 +7701,16 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade-Out Mode"
+    *: none
+    swcodec: "Fade-Out Mode"
   </source>
   <dest>
-    *: "מצב דעיכת צליל"
+    *: ""
+    swcodec: "מצב דעיכת צליל"
   </dest>
   <voice>
     *: "Fade-Out Mode"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8410,27 +7718,16 @@
   desc: in the sound settings menu
   user:
   <source>
-    *: "Equalizer"
+    *: none
+    swcodec: "Equalizer"
   </source>
   <dest>
-    *: "מאפנן צליל"
-  </dest>
-  <voice>
-    *: "Equalizer"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN_ANALOG
-  desc: in the recording screen
-  user:
-  <source>
-    *: "A"
-  </source>
-  <dest>
-    *: "A"
-  </dest>
-  <voice>
     *: ""
+    swcodec: "אקולייזר"
+  </dest>
+  <voice>
+    *: "Equalizer"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8438,13 +7735,16 @@
   desc: text for splash to indicate a new backdrop has been loaded successfully
   user:
   <source>
-    *: "Backdrop Loaded"
+    *: none
+    lcd_non-mono: "Backdrop Loaded"
   </source>
   <dest>
-    *: "תמונת רקע נטענה"
+    *: ""
+    lcd_non-mono: "תמונת רקע נטענה"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
@@ -8452,41 +7752,33 @@
   desc: text for onplay menu entry
   user:
   <source>
-    *: "Set As Backdrop"
+    *: none
+    lcd_non-mono: "Set As Backdrop"
   </source>
   <dest>
-    *: "הגדר כתמונת רקע"
+    *: ""
+    lcd_non-mono: "הגדר כתמונת רקע"
   </dest>
   <voice>
     *: "Set As Backdrop"
+    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFEED_DIRECT_GAIN
   desc: in crossfeed settings
-  user:
+  user: 
   <source>
-    *: "Direct Gain"
+    *: none
+    swcodec: "Direct Gain"
   </source>
   <dest>
-    *: "הגברה ישירה"
+    *: ""
+    swcodec: "הגברה ישירה"
   </dest>
   <voice>
     *: "Direct gain"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DIRCACHE_REBOOT
-  desc: DEPRECATED
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: "אנא אתחל את הנגן כדי להפעיל את זיכרון הספריות"
-  </dest>
-  <voice>
-    *: ""
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8494,13 +7786,16 @@
   desc: confirmation if presets can be cleared
   user:
   <source>
-    *: "Clear Current Presets?"
+    *: none
+    radio: "Clear Current Presets?"
   </source>
   <dest>
-    *: "נקה רשימת התחנות הקבועות מראש?"
+    *: ""
+    radio: "נקה רשימת התחנות הקבועות מראש?"
   </dest>
   <voice>
-    *: ""
+    *: none
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -8508,13 +7803,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Peak Filter %d"
+    *: none
+    swcodec: "Peak Filter %d"
   </source>
   <dest>
-    *: "%d מסנן פסגה"
+    *: ""
+    swcodec: "%d מסנן פסגה"
   </dest>
   <voice>
     *: "Peak filter"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8522,13 +7820,16 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade-In Delay"
+    *: none
+    swcodec: "Fade-In Delay"
   </source>
   <dest>
-    *: "השהיית הגברת צליל"
+    *: ""
+    swcodec: "השהיית הגברת צליל"
   </dest>
   <voice>
     *: "Fade-In Delay"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8550,13 +7851,16 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Trigger"
+    *: none
+    recording: "Trigger"
   </source>
   <dest>
-    *: "Trigger"
+    *: ""
+    recording: "Trigger"
   </dest>
   <voice>
     *: "Trigger"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8564,13 +7868,16 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Gain Left"
+    *: none
+    recording: "Gain Left"
   </source>
   <dest>
-    *: "Gain Left"
+    *: ""
+    recording: "Gain Left"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8578,13 +7885,16 @@
   desc: in recording and radio screen
   user:
   <source>
-    *: "Pre-Recording"
+    *: none
+    recording: "Pre-Recording"
   </source>
   <dest>
-    *: "Pre-Recording"
+    *: ""
+    recording: "Pre-Recording"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8592,27 +7902,16 @@
   desc: Used in a lot of places
   user:
   <source>
-    *: "Off"
+    *: none
+    lcd_bitmap: "Off"
   </source>
   <dest>
-    *: "Off"
+    *: ""
+    lcd_bitmap: "Off"
   </dest>
   <voice>
     *: "Off"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ALL
-  desc: show all files
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "All"
-  </dest>
-  <voice>
-    *: "All"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8620,13 +7919,16 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Int. Mic"
+    *: none
+    recording: "Int. Mic"
   </source>
   <dest>
-    *: "Int. Mic"
+    *: ""
+    recording: "Int. Mic"
   </dest>
   <voice>
     *: "Microphone"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8634,13 +7936,16 @@
   desc: bool false representation
   user:
   <source>
-    *: "No"
+    *: none
+    lcd_bitmap: "No"
   </source>
   <dest>
-    *: "No"
+    *: ""
+    lcd_bitmap: "No"
   </dest>
   <voice>
     *: "No"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8648,15 +7953,22 @@
   desc: in recording screen
   user:
   <source>
-    *: "The disk is full. Press OFF to continue."
+    *: none
+    recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
   </source>
   <dest>
-    *: "The disk is full. Press OFF to continue."
+    *: ""
+    recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
+    h100,h120,h300: ""
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -8664,27 +7976,16 @@
   desc: in dir browser, F1 button bar text
   user:
   <source>
-    *: "Menu"
+    *: none
+    recorder_pad: "Menu"
   </source>
   <dest>
-    *: "Menu"
+    *: ""
+    recorder_pad: "Menu"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_F2_MODE
-  desc: in wps F2 pressed
-  user:
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Mode:"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -8692,13 +7993,16 @@
   desc: in dir browser, F2 button bar text
   user:
   <source>
-    *: "Option"
+    *: none
+    recorder_pad: "Option"
   </source>
   <dest>
-    *: "Option"
+    *: ""
+    recorder_pad: "Option"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -8706,13 +8010,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Volume"
+    *: none
+    recording: "Volume"
   </source>
   <dest>
-    *: "Volume"
+    *: ""
+    recording: "Volume"
   </dest>
   <voice>
     *: "Volume"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8720,27 +8027,16 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Source"
+    *: none
+    recording: "Source"
   </source>
   <dest>
-    *: "Source"
-  </dest>
-  <voice>
-    *: "Source"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_GAIN
-  desc: in the recording screen
-  user:
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Gain"
-  </dest>
-  <voice>
     *: ""
+    recording: "Source"
+  </dest>
+  <voice>
+    *: "Source"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8748,13 +8044,16 @@
   desc: Display of recorded file size
   user:
   <source>
-    *: "Size:"
+    *: none
+    recording: "Size:"
   </source>
   <dest>
-    *: "Size:"
+    *: ""
+    recording: "Size:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8762,27 +8061,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Stereo"
+    *: none
+    recording: "Stereo"
   </source>
   <dest>
-    *: "Stereo"
-  </dest>
-  <voice>
-    *: "Stereo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_UP
-  desc: in wps
-  user:
-  <source>
-    *: "Pitch Up"
-  </source>
-  <dest>
-    *: "Pitch Up"
-  </dest>
-  <voice>
     *: ""
+    recording: "Stereo"
+  </dest>
+  <voice>
+    *: "Stereo"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8790,27 +8078,16 @@
   desc: display menu, F3 substitute
   user:
   <source>
-    *: "Status Bar"
+    *: none
+    lcd_bitmap: "Status Bar"
   </source>
   <dest>
-    *: "Status Bar"
+    *: ""
+    lcd_bitmap: "Status Bar"
   </dest>
   <voice>
     *: "Status Bar"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_CHANNELS
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Channels"
-  </dest>
-  <voice>
-    *: "Channels"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8818,13 +8095,16 @@
   desc: Used in a lot of places
   user:
   <source>
-    *: "On"
+    *: none
+    lcd_bitmap: "On"
   </source>
   <dest>
-    *: "On"
+    *: ""
+    lcd_bitmap: "On"
   </dest>
   <voice>
     *: "On"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8832,27 +8112,16 @@
   desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
   user:
   <source>
-    *: "Remote Scrolling Options"
+    *: none
+    remote: "Remote Scrolling Options"
   </source>
   <dest>
-    *: "גלילת מילים"
+    *: ""
+    remote: "גלילת מילים בשלט"
   </dest>
   <voice>
     *: "Remote Scrolling Options"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "All"
-  </dest>
-  <voice>
-    *: "All"
+    remote: ""
   </voice>
 </phrase>
 <phrase>
@@ -8860,13 +8129,16 @@
   desc: show only playlist
   user:
   <source>
-    *: "Playlists"
+    *: none
+    lcd_bitmap: "Playlists"
   </source>
   <dest>
-    *: "Playlists"
+    *: ""
+    lcd_bitmap: "Playlists"
   </dest>
   <voice>
     *: "Playlists"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8874,13 +8146,16 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </source>
   <dest>
-    *: "Frequency"
+    *: ""
+    recording: "Frequency"
   </dest>
   <voice>
     *: "Frequency"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8888,41 +8163,16 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </source>
   <dest>
-    *: "Digital"
-  </dest>
-  <voice>
-    *: "Digital"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ID3DB
-  desc: show ID3 Database
-  user:
-  <source>
-    *: "Database"
-  </source>
-  <dest>
-    *: "Database"
-  </dest>
-  <voice>
-    *: "ID3 Database"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_DOWN
-  desc: in wps
-  user:
-  <source>
-    *: "Pitch Down"
-  </source>
-  <dest>
-    *: "Pitch Down"
-  </dest>
-  <voice>
     *: ""
+    recording: "Digital"
+  </dest>
+  <voice>
+    *: "Digital"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -8944,13 +8194,16 @@
   desc: repeat one song
   user:
   <source>
-    *: "One"
+    *: none
+    lcd_bitmap: "One"
   </source>
   <dest>
-    *: "One"
+    *: ""
+    lcd_bitmap: "One"
   </dest>
   <voice>
     *: "One"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8958,13 +8211,16 @@
   desc: bool true representation
   user:
   <source>
-    *: "Yes"
+    *: none
+    lcd_bitmap: "Yes"
   </source>
   <dest>
-    *: "Yes"
+    *: ""
+    lcd_bitmap: "Yes"
   </dest>
   <voice>
     *: "Yes"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8972,13 +8228,16 @@
   desc: show only music-related files
   user:
   <source>
-    *: "Music"
+    *: none
+    lcd_bitmap: "Music"
   </source>
   <dest>
-    *: "Music"
+    *: ""
+    lcd_bitmap: "Music"
   </dest>
   <voice>
     *: "Music"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8986,27 +8245,33 @@
   desc: display menu, F3 substitute
   user:
   <source>
-    *: "Scroll Bar"
+    *: none
+    lcd_bitmap: "Scroll Bar"
   </source>
   <dest>
-    *: "Scroll Bar"
+    *: ""
+    lcd_bitmap: "Scroll Bar"
   </dest>
   <voice>
     *: "Scroll Bar"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
-  desc: repeat one song
+  desc: repeat range from point A to B
   user:
   <source>
-    *: "A-B"
+    *: none
+    lcd_bitmap: "A-B"
   </source>
   <dest>
-    *: "A-B"
+    *: ""
+    lcd_bitmap: "A-B"
   </dest>
   <voice>
     *: "A-B"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9014,13 +8279,16 @@
   desc: Display of record timer interval setting, on the record screen
   user:
   <source>
-    *: "Split Time:"
+    *: none
+    recording: "Split Time:"
   </source>
   <dest>
-    *: "Split Time:"
+    *: ""
+    recording: "Split Time:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9028,13 +8296,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Repeat"
+    *: none
+    lcd_bitmap: "Repeat"
   </source>
   <dest>
-    *: "Repeat"
+    *: ""
+    lcd_bitmap: "Repeat"
   </dest>
   <voice>
     *: "Repeat"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9042,13 +8313,16 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Gain Right"
+    *: none
+    recording: "Gain Right"
   </source>
   <dest>
-    *: "Gain Right"
+    *: ""
+    recording: "Gain Right"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9056,55 +8330,33 @@
   desc: in settings_menu, option to turn display+buttos by 180 degreed
   user:
   <source>
-    *: "Upside Down"
+    *: none
+    lcd_bitmap: "Upside Down"
   </source>
   <dest>
-    *: "Upside Down"
+    *: ""
+    lcd_bitmap: "Upside Down"
   </dest>
   <voice>
     *: "Upside Down"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH
-  desc: "pitch" in the pitch screen
-  user:
-  <source>
-    *: "Pitch"
-  </source>
-  <dest>
-    *: "Pitch"
-  </dest>
-  <voice>
-    *: "Pitch"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Line In"
-  </dest>
-  <voice>
-    *: "Line In"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_DIRBROWSE_F3
   desc: in dir browser, F3 button bar text
-  user:
+  user: 
   <source>
-    *: "LCD"
+    *: none
+    recorder_pad: "LCD"
   </source>
   <dest>
-    *: "LCD"
+    *: ""
+    recorder_pad: "LCD"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -9112,27 +8364,33 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Quality"
+    *: none
+    recording_hwcodec: "Quality"
   </source>
   <dest>
-    *: "Quality"
+    *: ""
+    recording_hwcodec: "Quality"
   </dest>
   <voice>
     *: "Quality"
+    recording_hwcodec: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
   desc: show all file types supported by Rockbox
-  user:
-  <source>
-    *: "Supported"
+  user: 
+  <source>  
+    *: none
+    lcd_bitmap: "Supported"
   </source>
-  <dest>
-    *: "Supported"
+  <dest>  
+    *: ""
+    lcd_bitmap: "Supported"
   </dest>
-  <voice>
+  <voice>  
     *: "Supported"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9140,13 +8398,16 @@
   desc: setting name for dir filter
   user:
   <source>
-    *: "Show Files"
+    *: none
+    lcd_bitmap: "Show Files"
   </source>
   <dest>
-    *: "Show Files"
+    *: ""
+    lcd_bitmap: "Show Files"
   </dest>
   <voice>
     *: "Show Files"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9154,13 +8415,16 @@
   desc: Display of recorded time
   user:
   <source>
-    *: "Time:"
+    *: none
+    recording: "Time:"
   </source>
   <dest>
-    *: "Time:"
+    *: ""
+    recording: "Time:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9168,13 +8432,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Mono"
+    *: none
+    recording: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: ""
+    recording: "Mono"
   </dest>
   <voice>
     *: "Mono"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9182,13 +8449,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Shuffle"
+    *: none
+    lcd_bitmap: "Shuffle"
   </source>
   <dest>
-    *: "Shuffle"
+    *: ""
+    lcd_bitmap: "Shuffle"
   </dest>
   <voice>
     *: "Shuffle"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -9196,27 +8466,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Edit mode: %s"
+    *: none
+    swcodec: "Edit mode: %s"
   </source>
   <dest>
-    *: "Edit mode: %s"
-  </dest>
-  <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REC_TIME
-  desc: in record timesplit options
-  user:
-  <source>
-    *: "Time"
-  </source>
-  <dest>
-    *: "זמן"
+    swcodec: "Edit mode: %s"
   </dest>
   <voice>
-    *: "Time"
+    *: none
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -9224,13 +8483,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Cutoff Frequency"
+    *: none
+    swcodec: "Cutoff Frequency"
   </source>
   <dest>
-    *: "Cutoff Frequency"
+    *: ""
+    swcodec: "Cutoff Frequency"
   </dest>
   <voice>
     *: "Cutoff Frequency"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -9252,27 +8514,33 @@
   desc: in record timesplit options
   user:
   <source>
-    *: "Filesize"
+    *: none
+    recording: "Filesize"
   </source>
   <dest>
-    *: "גודל קובץ"
+    *: ""
+    recording: "גודל קובץ"
   </dest>
   <voice>
     *: "Filesize"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_REMOTE_LCD_OFF
-  desc: Remote lcd off splash
-  user:
+  desc: Remote lcd off splash in recording screen
+  user: 
   <source>
-    *: "Remote Display OFF"
+    *: none
+    remote: "Remote Display OFF"
   </source>
   <dest>
-    *: "תצוגת השלט כבויה"
+    *: ""
+    remote: "תצוגת השלט כבויה"
   </dest>
   <voice>
     *: "Remote Display OFF"
+    remote: ""
   </voice>
 </phrase>
 <phrase>
@@ -9294,13 +8562,16 @@
   desc: in record timesplit options
   user:
   <source>
-    *: "Stop recording"
+    *: none
+    recording: "Stop recording"
   </source>
   <dest>
-    *: "הפסק הקלטה"
+    *: ""
+    recording: "הפסק הקלטה"
   </dest>
   <voice>
     *: "Stop recording"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9332,44 +8603,37 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_GAIN
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Gain"
-  </dest>
-  <voice>
-    *: "Gain"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
-    *: "Split Filesize"
+    *: none
+    recording: "Split Filesize"
   </source>
   <dest>
-    *: "פיצול לפי גודל קובץ"
+    *: ""
+    recording: "פיצול לפי גודל קובץ"
   </dest>
   <voice>
     *: "Split Filesize"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_REMOTE_LCD_ON
-  desc: Remote lcd off splash
+  desc: Remote lcd off splash in recording screen
   user:
   <source>
-    *: "(Vol- : Re-enable)"
+    *: none
+    remote: "(Vol- : Re-enable)"
   </source>
   <dest>
-    *: "(Vol-: התחל מחדש)"
+    *: ""
+    remote: "(Vol-: התחל מחדש)"
   </dest>
   <voice>
     *: "(Vol- : Re-enable)"
+    remote: ""
   </voice>
 </phrase>
 <phrase>
@@ -9389,14 +8653,18 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
+  user:
   <source>
-    *: "Split Measure"
+    *: none
+    recording: "Split Measure"
   </source>
   <dest>
-    *: "מדידת הפיצול"
+    *: ""
+    recording: "מדידת הפיצול"
   </dest>
   <voice>
     *: "Split Measure"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9416,14 +8684,18 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
+  user:
   <source>
-    *: "Split Time"
+    *: none
+    recording: "Split Time"
   </source>
   <dest>
-    *: "זמן הפיצול"
+    *: ""
+    recording: "זמן הפיצול"
   </dest>
   <voice>
     *: "Split Time"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9445,26 +8717,33 @@
   desc: in record timesplit options
   user:
   <source>
-    *: "Start new file"
+    *: none
+    recording: "Start new file"
   </source>
   <dest>
-    *: "התחל קובץ חדש"
+    *: ""
+    recording: "התחל קובץ חדש"
   </dest>
   <voice>
     *: "Start new file"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
+  user:
   <source>
-    *: "What to do when Splitting"
+    *: none
+    recording: "What to do when Splitting"
   </source>
   <dest>
-    *: "מה לעשות בפיצול"
+    *: ""
+    recording: "מה לעשות בפיצול"
   </dest>
   <voice>
     *: "What to do when Splitting"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9514,13 +8793,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Narrow"
+    *: none
+    ipodvideo: "Narrow"
   </source>
   <dest>
-    *: "צר"
+    *: ""
+    ipodvideo: "צר"
   </dest>
   <voice>
     *: "Narrow"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -9528,26 +8810,33 @@
   desc: audio format description
   user:
   <source>
-    *: "PCM Wave"
+    *: none
+    recording: "PCM Wave"
   </source>
   <dest>
-    *: "PCM Wave"
+    *: ""
+    recording: "PCM Wave"
   </dest>
   <voice>
     *: "PCM Wave"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: automatic gain control in record settings
+  user:
   <source>
-    *: "Automatic Gain Control"
+    *: none
+    agc: "Automatic Gain Control"
   </source>
   <dest>
-    *: "שליטת הגברה אוטומטית"
+    *: ""
+    agc: "שליטת הגברה אוטומטית"
   </dest>
   <voice>
     *: "Automatic gain control"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9565,57 +8854,37 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_AGC_MAXGAIN
-  desc: AGC maximum gain in recording screen
-  <source>
-    *: "AGC max. gain"
-  </source>
-  <dest>
-    *: "הגברה אוטומטית מירבית"
-  </dest>
-  <voice>
-    *: "AGC maximum gain"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
-  desc: in wps
-  user:
-  <source>
-    *: "Semitone Down"
-  </source>
-  <dest>
-    *: "Semitone Down"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_NEVER
   desc: in lcd settings
   user:
   <source>
-    *: "Never"
+    *: none
+    lcd_sleep: "Never"
   </source>
   <dest>
-    *: "אף פעם"
+    *: ""
+    lcd_sleep: "אף פעם"
   </dest>
   <voice>
     *: "Never"
+    lcd_sleep: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
-    *: "DJ-Set (slow)"
+    *: none
+    agc: "DJ-Set (slow)"
   </source>
   <dest>
-    *: "(מערכת ד'י-ג'יי (איטי"	
- </dest>
+    *: ""
+    agc: "(מערכת ד'י-ג'יי (איטי"
+  </dest>
   <voice>
     *: "DJ set (slow)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9623,13 +8892,16 @@
   desc: audio format description
   user:
   <source>
-    *: "WavPack"
+    *: none
+    recording_swcodec: "WavPack"
   </source>
   <dest>
-    *: "WavPack"
+    *: ""
+    recording_swcodec: "WavPack"
   </dest>
   <voice>
     *: "WavPack"
+    recording_swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -9637,13 +8909,16 @@
   desc: In display settings, time to switch LCD chip into power saving state
   user:
   <source>
-    *: "Sleep (After Backlight Off)"
+    *: none
+    lcd_sleep: "Sleep (After Backlight Off)"
   </source>
   <dest>
-    *: "שינה (אחרי כיבוי תאורה)"
+    *: ""
+    lcd_sleep: "שינה (אחרי כיבוי תאורה)"
   </dest>
   <voice>
     *: "Sleep after backlight off"
+    lcd_sleep: ""
   </voice>
 </phrase>
 <phrase>
@@ -9651,40 +8926,33 @@
   desc: when recording source frequency setting must follow source
   user:
   <source>
-    *: "(Same As Source)"
+    *: none
+    recording: "(Same As Source)"
   </source>
   <dest>
-    *: "(כמו המקור)"
+    *: ""
+    recording: "(כמו המקור)"
   </dest>
   <voice>
     *: "Same As Source"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_UP_SEMITONE
-  desc: in wps
-  user:
-  <source>
-    *: "Semitone Up"
-  </source>
-  <dest>
-    *: "Semitone Up"
-  </dest>
-  <voice>
-    *: ""
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_EUROPE
   desc: fm tuner region europe
+  user:
   <source>
-    *: "Europe"
+    *: none
+    radio: "Europe"
   </source>
   <dest>
-    *: "אירופה"
+    *: ""
+    radio: "אירופה"
   </dest>
   <voice>
     *: "Europe"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -9692,13 +8960,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Enable Hardware EQ"
+    *: none
+    ipodvideo: "Enable Hardware EQ"
   </source>
   <dest>
-    *: "הפעל אקולייזר של החומרה"
+    *: ""
+    ipodvideo: "הפעל אקולייזר בחומרה"
   </dest>
   <voice>
     *: "Enable hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -9720,13 +8991,16 @@
   desc: encoder settings
   user:
   <source>
-    *: "Encoder Settings"
+    *: none
+    recording: "Encoder Settings"
   </source>
   <dest>
-    *: "הגדרות מקודד"
+    *: ""
+    recording: "הגדרות מקודד"
   </dest>
   <voice>
     *: "Encoder Settings"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9734,41 +9008,16 @@
   desc: audio format item in recording menu
   user:
   <source>
-    *: "Format"
+    *: none
+    recording: "Format"
   </source>
   <dest>
-    *: "תבנית"
+    *: ""
+    recording: "תבנית"
   </dest>
   <voice>
     *: "Format"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SHOW_PATH_FULL
-  desc: in show path menu
-  user:
-  <source>
-    *: "Full Path"
-  </source>
-  <dest>
-    *: "נתיב מלא"
-  </dest>
-  <voice>
-    *: "Full Path"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_UNPLUG_RW
-  desc: in pause_phones_menu.
-  user:
-  <source>
-    *: "Duration to Rewind"
-  </source>
-  <dest>
-    *: "משך זמן להעביר אחורה"
-  </dest>
-  <voice>
-    *: "Duration to rewind"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9776,18 +9025,22 @@
   desc: bits-kilobits per unit time
   user:
   <source>
-    *: "Bitrate"
+    *: none
+    recording_swcodec: "Bitrate"
   </source>
   <dest>
-    *: "איכות"
+    *: ""
+    recording_swcodec: "איכות"
   </dest>
   <voice>
     *: "Bitrate"
+    recording_swcodec: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RANDOM
   desc: random folder
+  user:
   <source>
     *: "Random"
   </source>
@@ -9801,41 +9054,35 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
-  <source>
-    *: "New file"
-  </source>
-  <dest>
-    *: "קובץ חדש"
-  </dest>
-  <voice>
-    *: "New file"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
-  desc: in lcd settings
   user:
   <source>
-    *: "Normal"
+    *: none
+    recording: "New file"
   </source>
   <dest>
-    *: "רגיל"
+    *: ""
+    recording: "קובץ חדש"
   </dest>
   <voice>
-    *: "Normal"
+    *: "New file"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
-    *: "Live (slow)"
+    *: none
+    agc: "Live (slow)"
   </source>
   <dest>
-    *: "(חי (איטי"
+    *: ""
+    agc: "(חי (איטי"
   </dest>
   <voice>
     *: "Live (slow)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9843,26 +9090,33 @@
   desc: audio format description
   user:
   <source>
-    *: "AIFF"
+    *: none
+    recording: "AIFF"
   </source>
   <dest>
-    *: "AIFF"
+    *: ""
+    recording: "AIFF"
   </dest>
   <voice>
     *: "AIFF"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
-    *: "Voice (fast)"
+    *: none
+    agc: "Voice (fast)"
   </source>
   <dest>
-    *: "(קול (מהיר"
+    *: ""
+    agc: "(קול (מהיר"
   </dest>
   <voice>
     *: "Voice (fast)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9870,40 +9124,33 @@
   desc: when something has settings in a certain context
   user:
   <source>
-    *: "(No Settings)"
+    *: none
+    recording: "(No Settings)"
   </source>
   <dest>
-    *: "(אין הגדרות)"
+    *: ""
+    recording: "(אין הגדרות)"
   </dest>
   <voice>
     *: "No settings available"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_UNPLUG
-  desc: in settings_menu.
-  user:
-  <source>
-    *: "Pause on Headphone Unplug"
-  </source>
-  <dest>
-    *: "עצור השמעה בניתוק אוזניות"
-  </dest>
-  <voice>
-    *: "Pause on headphone unplug"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
-    *: "Medium"
+    *: none
+    agc: "Medium"
   </source>
   <dest>
-    *: "בינוני"
+    *: ""
+    agc: "בינוני"
   </dest>
   <voice>
     *: "Medium"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9911,26 +9158,33 @@
   desc: Filename header in recording screen
   user:
   <source>
-    *: "Filename:"
+    *: none
+    recording: "Filename:"
   </source>
   <dest>
-    *: "Filename:"
+    *: ""
+    recording: "Filename:"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
-    *: "Safety (clip)"
+    *: none
+    agc: "Safety (clip)"
   </source>
   <dest>
-    *: "(ביטחון (עיוות"
+    *: ""
+    agc: "(ביטחון (עיוות"
   </dest>
   <voice>
     *: "Safety (clip)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -9950,53 +9204,69 @@
 <phrase>
   id: LANG_FM_KOREA
   desc: fm region korea
+  user:
   <source>
-    *: "Korea"
+    *: none
+    radio: "Korea"
   </source>
   <dest>
-    *: "קוריאה"
+    *: ""
+    radio: "קוריאה"
   </dest>
   <voice>
     *: "Korea"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_US
   desc: fm region us / canada
+  user:
   <source>
-    *: "US / Canada"
+    *: none
+    radio: "US / Canada"
   </source>
   <dest>
-    *: "ארהב \ קנדה"
+    *: ""
+    radio: "ארה''ב \ קנדה"
   </dest>
   <voice>
     *: "US / Canada"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_REGION
   desc: fm tuner region setting
+  user:
   <source>
-    *: "Region"
+    *: none
+    radio: "Region"
   </source>
   <dest>
-    *: "אזור"
+    *: ""
+    radio: "אזור"
   </dest>
   <voice>
     *: "Region"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user:
   <source>
-    *: "Stop"
+    *: none
+    recording: "Stop"
   </source>
   <dest>
-    *: "עצירה"
+    *: ""
+    recording: "עצירה"
   </dest>
   <voice>
     *: "Stop"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10030,14 +9300,18 @@
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
-    *: "Split Filesize"
+    *: none
+    recording: "Split Filesize"
   </source>
   <dest>
-    *: "Split Filesize"
+    *: ""
+    recording: "Split Filesize"
   </dest>
   <voice>
     *: "Split Filesize"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10045,53 +9319,33 @@
   desc: in the sound settings menu
   user:
   <source>
-    *: "Hardware Equalizer"
+    *: none
+    ipodvideo: "Hardware Equalizer"
   </source>
   <dest>
-    *: "אקולייזר חומרה"
+    *: ""
+    ipodvideo: "אקולייזר בחומרה"
   </dest>
   <voice>
     *: "Hardware equalizer"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_UNPLUG_DISABLE_AUTORESUME
-  desc: in pause_phones_menu.
-  user:
-  <source>
-    *: "Disable resume on startup if phones unplugged"
-  </source>
-  <dest>
-    *: "עצור השמעה בהפעלה מחדש אם האוזניות לא מחוברות"
-  </dest>
-  <voice>
-    *: "Disable auto-resume if phones not present"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORD_TRIGGER_PAUSE
-  desc: trigger types
-  <source>
-    *: "Pause"
-  </source>
-  <dest>
-    *: "השהיה"
-  </dest>
-  <voice>
-    *: "Pause"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_JAPAN
   desc: fm region japan
+  user:
   <source>
-    *: "Japan"
+    *: none
+    radio: "Japan"
   </source>
   <dest>
-    *: "יפן"
+    *: ""
+    radio: "יפן"
   </dest>
   <voice>
     *: "Japan"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -10113,13 +9367,16 @@
   desc: in the sound settings menu
   user:
   <source>
-    *: "Dithering"
+    *: none
+    swcodec: "Dithering"
   </source>
   <dest>
-    *: "ערבוב צלילים"
+    *: ""
+    swcodec: "מיזוג צלילים"
   </dest>
   <voice>
     *: "Dithering"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -10127,40 +9384,33 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Bandwidth"
+    *: none
+    ipodvideo: "Bandwidth"
   </source>
   <dest>
-    *: "טווח תדרים"
+    *: ""
+    ipodvideo: "טווח תדרים"
   </dest>
   <voice>
     *: "Bandwidth"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_UNPLUG_RESUME
-  desc: in pause_phones_menu.
-  user:
-  <source>
-    *: "Pause and Resume"
-  </source>
-  <dest>
-    *: "עצור וחזור"
-  </dest>
-  <voice>
-    *: "Pause and Resume"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
-    *: "AGC clip time"
+    *: none
+    agc: "AGC clip time"
   </source>
   <dest>
-    *: "זמן עיוות בהגברה אוטומטית"
+    *: ""
+    agc: "זמן עיוות בהגברה אוטומטית"
   </dest>
   <voice>
     *: "AGC clip time"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -10168,13 +9418,16 @@
   desc: audio format description
   user:
   <source>
-    *: "MPEG Layer 3"
+    *: none
+    recording: "MPEG Layer 3"
   </source>
   <dest>
-    *: "MPEG Layer 3"
+    *: ""
+    recording: "MPEG Layer 3"
   </dest>
   <voice>
     *: "MPEG Layer 3"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10194,14 +9447,18 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
+  user:
   <source>
-    *: "AGC"
+    *: none
+    agc: "AGC"
   </source>
   <dest>
-    *: "AGC"
+    *: ""
+    agc: "AGC"
   </dest>
   <voice>
     *: "AGC"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -10209,13 +9466,16 @@
   desc: in the equalizer settings menu
   user:
   <source>
-    *: "Wide"
+    *: none
+    ipodvideo: "Wide"
   </source>
   <dest>
-    *: "רחב"
+    *: ""
+    ipodvideo: "רחב"
   </dest>
   <voice>
     *: "Wide"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -10237,104 +9497,135 @@
   desc: in lcd settings
   user:
   <source>
-    *: "Backlight (On Hold Key)"
+    *: none
+    hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: "(תאורה (במצב נעול"
+    *: ""
+    hold_button: "(תאורה (במצב נעול"
   </dest>
   <voice>
     *: "Backlight on hold key"
+    hold_button: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_TRIGGER_TYPE
   desc: in recording trigger menu
+  user:
   <source>
-    *: "Trigtype"
+    *: none
+    recording: "Trigtype"
   </source>
   <dest>
-    *: "סוג ההפעלה"
+    *: ""
+    recording: "סוג ההפעלה"
   </dest>
   <voice>
     *: "Trigtype"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
-    *: "DJ-Set (slow)"
+    *: none
+    agc: "DJ-Set (slow)"
   </source>
   <dest>
-    *: "DJ-Set (slow)"
- </dest>
+    *: ""
+    agc: "DJ-Set (slow)"
+  </dest>
   <voice>
     *: "DJ set (slow)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
-    *: "Live (slow)"
+    *: none
+    agc: "Live (slow)"
   </source>
   <dest>
-    *: "Live (slow)"
+    *: ""
+    agc: "Live (slow)"
   </dest>
   <voice>
     *: "Live (slow)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
-    *: "Voice (fast)"
+    *: none
+    agc: "Voice (fast)"
   </source>
   <dest>
-    *: "Voice (fast)"
+    *: ""
+    agc: "Voice (fast)"
   </dest>
   <voice>
     *: "Voice (fast)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
-    *: "Medium"
+    *: none
+    agc: "Medium"
   </source>
   <dest>
-    *: "Medium"
+    *: ""
+    agc: "Medium"
   </dest>
   <voice>
     *: "Medium"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
-    *: "Safety (clip)"
+    *: none
+    agc: "Safety (clip)"
   </source>
   <dest>
-    *: "Safety (clip)"
+    *: ""
+    agc: "Safety (clip)"
   </dest>
   <voice>
     *: "Safety (clip)"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
-    *: "AGC max. gain"
+    *: none
+    agc: "AGC max. gain"
   </source>
   <dest>
-    *: "AGC max. gain"
+    *: ""
+    agc: "AGC max. gain"
   </dest>
   <voice>
     *: "AGC maximum gain"
+    agc: ""
   </voice>
 </phrase>
 <phrase>
@@ -10345,25 +9636,27 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PLAY/PAUSE to return)"
-    x5: "Building database... %d found (Long PLAY to return)"
-    h10,h10_5gb: "Building database... %d found (PREV to return)"
-    e200,c200: "Building database... %d found (PREV to return)"
+    x5,m5: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
-    *: " בונה מסד נתונים... %d (כבה כדי לחזור) נמצאו"
-    h100,h120,h300: "בונה מסד נתונים... %d (נגן\עצור כדי לחזור) נמצאו"
-    ipod*: "בונה מסד נתונים... %d (עצור כדי לחזור) נמצאו"
-    x5: "בונה מסד נתונים... %d (החזק נגן כדי לחזור) נמצאו"
-    h10,h10_5gb: " בונה מסד נתונים... %d (אחורה כדי לחזור) נמצאו"
-    e200,c200: " בונה מסד נתונים... %d (אחורה כדי לחזור) נמצאו"
+    *: " בונה מסד נתונים... %d (OFF כדי לחזור) נמצאו"
+    h100,h120,h300: "בונה מסד נתונים... %d (STOP כדי לחזור) נמצאו"
+    ipod*: "בונה מסד נתונים... %d (PLAY/PAUSEכדי לחזור) נמצאו"
+    x5,m5: " בונה מסד נתונים... %d (LEFT כדי לחזור) נמצאו"
+    h10,h10_5gb,e200,c200: " בונה מסד נתונים... %d (PREV כדי לחזור) נמצאו"
   </dest>
   <voice>
     *: ""
+    h100,h120,h300: ""
+    ipod*: ""
+    x5,m5: ""
+    h10,h10_5gb,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_DIR_BROWSER
-  desc: in root menu
+  desc: main menu title
   user:
   <source>
     *: "Files"
@@ -10391,7 +9684,7 @@
 </phrase>
 <phrase>
   id: LANG_DELETING
-  desc:
+  desc: 
   user:
   <source>
     *: "Deleting..."
@@ -10408,13 +9701,16 @@
   desc: in Battery menu
   user:
   <source>
-    *: "Charge During USB Connection"
+    *: none
+    usb_charging: "Charge During USB Connection"
   </source>
   <dest>
-    *: "USB הטען בזמן חיבור"
+    *: ""
+    usb_charging: "USB הטען בזמן חיבור"
   </dest>
   <voice>
     *: "Charge During U S B Connection"
+    usb_charging: ""
   </voice>
 </phrase>
 <phrase>
@@ -10434,7 +9730,7 @@
 <phrase>
   id: LANG_PLAYLISTVIEWER_SETTINGS
   desc: title for the playlist viewer settings menus
-  user:
+  user: 
   <source>
     *: "Playlist Viewer Settings"
   </source>
@@ -10447,7 +9743,7 @@
 </phrase>
 <phrase>
   id: LANG_NOW_PLAYING
-  desc: in root menu
+  desc: in the main menu
   user:
   <source>
     *: "Now Playing"
@@ -10465,12 +9761,15 @@
   user:
   <source>
     *: "List Acceleration Speed"
+    scrollwheel: none
   </source>
   <dest>
     *: "מהירות האצה בגלילת רשימות"
+    scrollwheel: none
   </dest>
   <voice>
     *: "List Acceleration Speed"
+    scrollwheel: none
   </voice>
 </phrase>
 <phrase>
@@ -10492,18 +9791,21 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Shuffle and Track Skip"
+    *: none
+    swcodec: "Shuffle and Track Skip"
   </source>
   <dest>
-    *: "בערבוב ובדילוג על שיר"
+    *: ""
+    swcodec: "בערבוב ובדילוג על שיר"
   </dest>
   <voice>
     *: "Shuffle and Track Skip"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_BROWSE_CUESHEET
-  desc:
+  desc: 
   user:
   <source>
     *: "Browse Cuesheet"
@@ -10518,7 +9820,7 @@
 <phrase>
   id: LANG_TOP_TIME
   desc: in run time screen
-  user:
+  user: 
   <source>
     *: "Top Time"
   </source>
@@ -10530,36 +9832,8 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_BOOKMARK_SELECT_TIME_TEXT
-  desc: voice only, used in the bookmark select list to label elapsed time
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Time"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_MENU
-  desc: in root menu
-  user:
-  <source>
-    *: "Settings"
-  </source>
-  <dest>
-    *: "הגדרות"
-  </dest>
-  <voice>
-    *: "Settings"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_MAIN_MENU
-  desc: in root menu setting
+  desc: in start screen setting
   user:
   <source>
     *: "Main Menu"
@@ -10574,15 +9848,18 @@
 <phrase>
   id: LANG_ALARM_WAKEUP_SCREEN
   desc: in alarm menu setting
-  user:
+  user: 
   <source>
-    *: "Alarm Wake up Screen"
+    *: none
+    alarm: "Alarm Wake up Screen"
   </source>
   <dest>
-    *: "שעון מעורר"
+    *: ""
+    alarm: "מסך שעון מעורר"
   </dest>
   <voice>
     *: "Alarm Wake up Screen"
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -10601,7 +9878,7 @@
 </phrase>
 <phrase>
   id: LANG_RESUME_PLAYBACK
-  desc: in root menu
+  desc: in the main menu
   user:
   <source>
     *: "Resume Playback"
@@ -10616,13 +9893,13 @@
 <phrase>
   id: LANG_REPLACE
   desc: in onplay menu.  Replace the current playlist with a new one.
-  user:
+  user: 
   <source>
     *: "Play Next"
   </source>
   <dest>
     *: "נגן הבא"
-  </dest>
+ </dest>
   <voice>
     *: "Play Next"
   </voice>
@@ -10643,7 +9920,7 @@
 </phrase>
 <phrase>
   id: LANG_ROCKBOX_TITLE
-  desc: in root menu
+  desc: main menu title
   user:
   <source>
     *: "Rockbox"
@@ -10685,8 +9962,8 @@
 </phrase>
 <phrase>
   id: LANG_PREVIOUS_SCREEN
-  desc: in root menu setting
-  user:
+  desc: in start screen setting
+  user: 
   <source>
     *: "Previous Screen"
   </source>
@@ -10702,15 +9979,15 @@
   desc: in settings_menu
   user:
   <source>
-    *: ""
+    *: none
     gigabeatf: "Button Light Brightness"
   </source>
   <dest>
-    *: ""
+    *: none
     gigabeatf: "בהירות אור הכפתורים"
   </dest>
   <voice>
-    *: ""
+    *: none
     gigabeatf: "Button Light Brightness"
   </voice>
 </phrase>
@@ -10730,7 +10007,7 @@
 </phrase>
 <phrase>
   id: LANG_START_SCREEN
-  desc: in root menu setting
+  desc: in the system sub menu
   user:
   <source>
     *: "Start Screen"
@@ -10771,20 +10048,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CUESHEET
-  desc:
-  user:
-  <source>
-    *: "Cuesheet"
-  </source>
-  <dest>
-    *: "גליון סימנים"
-  </dest>
-  <voice>
-    *: "Cuesheet"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BOOKMARK_SELECT_BOOKMARK
   desc: bookmark selection list title
   user:
@@ -10804,18 +10067,21 @@
   user:
   <source>
     *: "List Acceleration Start Delay"
+    scrollwheel: none
   </source>
   <dest>
     *: "השהיה לפי האצה בגלילת רשימות"
+    scrollwheel: none
   </dest>
   <voice>
     *: "List Acceleration Start Delay"
+    scrollwheel: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_MOVING
-  desc:
-  user:
+  desc: 
+  user: 
   <source>
     *: "Moving..."
   </source>
@@ -10829,7 +10095,7 @@
 <phrase>
   id: LANG_PROPERTIES
   desc: browser file/dir properties
-  user:
+  user: 
   <source>
     *: "Properties"
   </source>
@@ -10857,7 +10123,7 @@
 <phrase>
   id: LANG_BOOKMARK_INVALID
   desc: bookmark selection list, bookmark couldn't be parsed
-  user:
+  user: 
   <source>
     *: "<Invalid Bookmark>"
   </source>
@@ -10873,17 +10139,17 @@
   desc: in settings_menu
   user:
   <source>
-    *: ""
+    *: none
     e200: "Wheel Light Timeout"
     c200,gigabeatf: "Button Light Timeout"
   </source>
   <dest>
-    *: ""
+    *: none
     e200: "זמן תאורת הגלגל"
     c200,gigabeatf: "זמן תאורת כפתורים"
   </dest>
   <voice>
-    *: ""
+    *: none
     e200: "Wheel Light Timeout"
     c200,gigabeatf: "Button Light Timeout"
   </voice>
@@ -10891,7 +10157,7 @@
 <phrase>
   id: LANG_ID3_ALBUMARTIST
   desc: in tag viewer
-  user:
+  user: 
   <source>
     *: "[Album Artist]"
   </source>
@@ -10932,8 +10198,8 @@
 </phrase>
 <phrase>
   id: LANG_COPYING
-  desc:
-  user:
+  desc: 
+  user: 
   <source>
     *: "Copying..."
   </source>
@@ -10949,16 +10215,1186 @@
   desc: fm menu title
   user:
   <source>
-    *: "FM Radio Menu"
+    *: none
+    radio: "FM Radio Menu"
   </source>
   <dest>
-    *: "תפריט רדיו"
+    *: ""
+    radio: "תפריט רדיו"
   </dest>
   <voice>
     *: "FM Radio Menu"
+    radio: ""
   </voice>
 </phrase>
-
-
-
-
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "units per tick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "מחסנית USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB Stack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "צבע ראשי"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Primary Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_LINE_IN
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording: "Line In"
+  </source>
+  <dest>
+    *: none
+    recording: "כניסת שמע"
+  </dest>
+  <voice>
+    *: none
+    recording: "Line In"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCANNING_DISK
+  desc: when booting up and rebuilding the cache and calculating free space
+  user: 
+  <source>
+    *: "Scanning disk..."
+  </source>
+  <dest>
+    *: "סורק כונן..."
+  </dest>
+  <voice>
+    *: "Scanning disk"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Blank"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "סופר עיוותים"
+  </dest>
+  <voice>
+    *: none
+    recording: "Clip Counter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_ALL
+  desc: repeat playlist once all songs have completed
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "All"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "הכל"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "All"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN
+  desc: Generic string for gain used in EQ menu and recording screen
+  user: 
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "הגברה"
+  </dest>
+  <voice>
+    *: "Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: none
+    headphone_detection: "Disable resume on startup if phones unplugged"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "בטל המשך השמעה לאחר אתחול אם האוזניות מנותקות"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "Disable resume on startup if phones unplugged"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_PARTITION
+  desc: if save settings has failed
+  user:
+  <source>
+    *: "No partition?"
+    player: "Partition?"
+  </source>
+  <dest>
+    *: "אין חלוקה למחיצות?"
+    player: "חלוקה למחיצות?"
+  </dest>
+  <voice>
+    *: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user: 
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "צבעי שורת הסימון"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_TIME
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    rtc: "Set Time/Date"
+  </source>
+  <dest>
+    *: none
+    rtc: "כוון תאריך/זמן"
+  </dest>
+  <voice>
+    *: none
+    rtc: "Set Time and Date"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_FAILED
+  desc: displayed if save settings has failed
+  user:
+  <source>
+    *: "Save Failed"
+  </source>
+  <dest>
+    *: "שמירה נכשלה"
+  </dest>
+  <voice>
+    *: "Save Failed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NORMAL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "רגיל"
+  </dest>
+  <voice>
+    *: "Normal"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_AM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "A M"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT
+  desc: the buffer size, %d MB %d fraction of MB
+  user:
+  <source>
+    *: "Buffer: %d.%03dMB"
+    player: "Buf: %d.%03dMB"
+  </source>
+  <dest>
+    *: "חוצץ: %d.%03dMB"
+    player: "חצץ: %d.%03dMB"
+  </dest>
+  <voice>
+    *: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Host"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: none
+    headphone_detection: "Pause and Resume"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "הפסק והמשך"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "Pause and Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR_NOT_WRITABLE
+  desc: 
+  user:
+  <source>
+    *: none
+    recording: "Can't write to recording directory"
+  </source>
+  <dest>
+    *: none
+    recording: "לא ניתן לכתוב לספרית ההקלטה!"
+  </dest>
+  <voice>
+    *: none
+    recording: "Can't write to recording directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_CONFIGURATION
+  desc: in sound_settings
+  user: 
+  <source>
+    *: "Channel Configuration"
+  </source>
+  <dest>
+    *: "אפשרויות הערוצים"
+  </dest>
+  <voice>
+    *: "Channel Configuration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONFIRM_WITH_BUTTON
+  desc: Generic string to use to confirm
+  user:
+  <source>
+    *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    player: "(PLAY/STOP)"
+  </source>
+  <dest>
+    *: "PLAY = כן"
+    h100,h120,h300: "NAVI = כן"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = כן"
+    player: "(PLAY/STOP)"
+  </dest>
+  <voice>
+    *: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_SET_BUTTON
+  desc: used in set_time()
+  user:
+  <source>
+    *: none
+    rtc: "ON = Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+  </source>
+  <dest>
+    *: none
+    rtc: "ON = כוון"
+    h100,h120,h300: "NAVI = כוון"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = כוון"
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_WITH_ANY
+  desc: Generic string to use to cancel
+  user:
+  <source>
+    *: "Any Other = No"
+    player: none
+  </source>
+  <dest>
+    *: "אחר = לא"
+    player: none
+  </dest>
+  <voice>
+    *: ""
+    player: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_DEMOS
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Demos"
+  </source>
+  <dest>
+    *: "Demos"
+  </dest>
+  <voice>
+    *: "Demos"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE_TALK
+  desc: Item of voice menu, whether to use file .talk clips
+  user: 
+  <source>
+    *: "Use File .talk Clips"
+  </source>
+  <dest>
+    *: "השתמש בקטעי דיבור עבור קבצים"
+ </dest>
+  <voice>
+    *: "Use File .talk Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "צבע הטקסט"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Text Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user: 
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "אפשרויות ערכת-צבע"
+  </dest>
+  <voice>
+    *: "Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALL
+  desc: generic string used both in dir file filter and repeat mode selection
+  user: 
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "הכל"
+  </dest>
+  <voice>
+    *: "All"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "oh"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_FAVES
+  desc: 
+  user: 
+  <source>
+    *: "Add to shortcuts"
+  </source>
+  <dest>
+    *: "הוסף לקיצורים"
+  </dest>
+  <voice>
+    *: "Add to shortcuts"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESET
+  desc: in button bar and radio screen / menu
+  user:
+  <source>
+    *: none
+    radio: "Preset"
+  </source>
+  <dest>
+    *: none
+    radio: "תחנה קבועה"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "מצב מחסנית USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB Stack Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_GAMES
+  desc: in the main menu
+  user:
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "משחקים"
+  </dest>
+  <voice>
+    *: "Games"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST
+  desc: when playlist has finished
+  user:
+  <source>
+    *: "End of Song List"
+    player: "End of List"
+  </source>
+  <dest>
+    *: "סוף רשימת השירים"
+    player: "סוף הרשימה"
+  </dest>
+  <voice>
+    *: "End of Song List"
+    player: "End of List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Gain"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Gain"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Device"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Device"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_REC_DIR
+  desc: 
+  user:
+  <source>
+    *: none
+    recording: "Clear Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "נקה ספרית הקלטות"
+  </dest>
+  <voice>
+    *: none
+    recording: "Clear Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF
+  desc: displayed when key lock is turned off
+  user:
+  <source>
+    *: "Buttons Unlocked"
+  </source>
+  <dest>
+    *: "כפתורים לא נעולים"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "P M"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_MODE
+  desc: in wps F2 pressed
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Mode:"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mode:"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIN_DURATION
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "for at least"
+  </source>
+  <dest>
+    *: none
+    recording: "למשך לפחות"
+  </dest>
+  <voice>
+    *: none
+    recording: "for at least"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNELS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "ערוצים"
+  </dest>
+  <voice>
+    *: "Channels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASK
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Ask"
+  </source>
+  <dest>
+    *: "שאל"
+  </dest>
+  <voice>
+    *: "Ask"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MODE
+  desc: in wps F2 pressed and radio screen
+  user:
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "מצב:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: none
+    pitchscreen: "Semitone Down"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "חצי-טון למטה"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Edit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: none
+    headphone_detection: "Pause on Headphone Unplug"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "עצור בעת ניתוק אוזניות"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "Pause on Headphone Unplug"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Device Driver"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Device Driver"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_GROUPING
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Work]"
+  </source>
+  <dest>
+    *: "[עבודה]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: none
+    headphone_detection: "Duration to Rewind"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "משך זמן לחזור אחורה"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "Duration to Rewind"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: none
+    pitchscreen: "Semitone Up"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "חצי-טון למעלה"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "שורה (מעבר בין צבעים)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_DISCNUM
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[מס' דיסק]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FILENAME_EXT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Filename Extensions"
+  </source>
+  <dest>
+    *: "הראה סיומות קבצים"
+  </dest>
+  <voice>
+    *: "Show Filename Extensions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "שורה (צבע אחד)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "o'clock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_APPS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Applications"
+  </source>
+  <dest>
+    *: "יישומים"
+  </dest>
+  <voice>
+    *: "Applications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR_TALK
+  desc: Item of voice menu, whether to use directory .talk clips
+  user:
+  <source>
+    *: "Use Directory .talk Clips"
+  </source>
+  <dest>
+    *: "השתמש בקטעי דיבור עבור ספריות"
+  </dest>
+  <voice>
+    *: "Use Directory .talk Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_CUESHEET
+  desc: 
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user:
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "צבעים"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "צבע משני"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Secondary Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_CHANNELS
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Channels"
+  </source>
+  <dest>
+    *: none
+    recording: "Channels"
+  </dest>
+  <voice>
+    *: none
+    recording: "Channels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTS
+  desc: in the main menu and  file vew setting
+  user:
+  <source>
+    *: "Playlists"
+  </source>
+  <dest>
+    *: "רשימות השמעה"
+  </dest>
+  <voice>
+    *: "Playlists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXT_ONLY_VIEW_ALL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Only When Viewing All Types"
+  </source>
+  <dest>
+    *: "רק כשמציגים את כל הסוגים"
+  </dest>
+  <voice>
+    *: "Only When Viewing All Types"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN_TYPES
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Only Unknown Types"
+  </source>
+  <dest>
+    *: "רק סוגים לא מוכרים"
+  </dest>
+  <voice>
+    *: "Only Unknown Types"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "מרכז-אירופה (CP1250)"
+  </dest>
+  <voice>
+    *: "Central European"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON
+  desc: displayed when key lock is on
+  user:
+  <source>
+    *: "Buttons Locked"
+  </source>
+  <dest>
+    *: "כפתורים נעולים"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS
+  desc:  in main menu and visual confirmation after settings reset
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "אפשרויות"
+  </dest>
+  <voice>
+    *: "Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL
+  desc: Visual confirmation of canceling a changed setting
+  user:
+  <source>
+    *: "Cancelled"
+  </source>
+  <dest>
+    *: "מבוטל"
+  </dest>
+  <voice>
+    *: "Cancelled"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OF
+  desc: spoken only, as in 3/8 => 3 of 8
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "of"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_ASK
+  desc: confirm to reset settings
+  user:
+  <source>
+    *: "Are You Sure?"
+  </source>
+  <dest>
+    *: "האם את/ה בטוח/ה?"
+  </dest>
+  <voice>
+    *: "Are You Sure?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_REC_DIR
+  desc: used in the onplay menu to set a recording dir
+  user:
+  <source>
+    *: none
+    recording: "Set As Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "בחר כספרית הקלטות"
+  </dest>
+  <voice>
+    *: none
+    recording: "Set As Recording Directory"
+  </voice>
+</phrase>
