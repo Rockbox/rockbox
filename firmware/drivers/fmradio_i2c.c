@@ -49,11 +49,10 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 #ifdef IRIVER_H300_SERIES
 
 /* SDA is GPIO57 */
-#define SDA_LO     and_l(~0x02000000, &GPIO1_OUT)
-#define SDA_HI      or_l( 0x02000000, &GPIO1_OUT)
-#define SDA_INPUT  and_l(~0x02000000, &GPIO1_ENABLE)
-#define SDA_OUTPUT  or_l( 0x02000000, &GPIO1_ENABLE)
-#define SDA             ( 0x02000000 & GPIO1_READ)
+#define SDA_OUTINIT and_l(~0x02000000, &GPIO1_OUT)
+#define SDA_HI_IN   and_l(~0x02000000, &GPIO1_ENABLE)
+#define SDA_LO_OUT   or_l( 0x02000000, &GPIO1_ENABLE)
+#define SDA              ( 0x02000000 & GPIO1_READ)
 
 /* SCL is GPIO56 */
 #define SCL_INPUT  and_l(~0x01000000, &GPIO1_ENABLE)
@@ -65,11 +64,10 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 #else
 
 /* SDA is GPIO55 */
-#define SDA_LO     and_l(~0x00800000, &GPIO1_OUT)
-#define SDA_HI      or_l( 0x00800000, &GPIO1_OUT)
-#define SDA_INPUT  and_l(~0x00800000, &GPIO1_ENABLE)
-#define SDA_OUTPUT  or_l( 0x00800000, &GPIO1_ENABLE)
-#define SDA             ( 0x00800000 & GPIO1_READ)
+#define SDA_OUTINIT and_l(~0x00800000, &GPIO1_OUT)
+#define SDA_HI_IN   and_l(~0x00800000, &GPIO1_ENABLE)
+#define SDA_LO_OUT   or_l( 0x00800000, &GPIO1_ENABLE)
+#define SDA              ( 0x00800000 & GPIO1_READ)
 
 /* SCL is GPIO3 */
 #define SCL_INPUT  and_l(~0x00000008, &GPIO_ENABLE)
@@ -94,22 +92,23 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 
 static void fmradio_i2c_start(void)
 {
-    SDA_OUTPUT;
-    SCL_OUTPUT;
-    SDA_HI;
     SCL_HI;
+    SCL_OUTPUT;
+    SDA_HI_IN;
+    SDA_OUTINIT;
     DELAY;
-    SDA_LO;
+    SDA_LO_OUT;
     DELAY;
     SCL_LO;
 }
 
 static void fmradio_i2c_stop(void)
 {
-   SDA_LO;
+   SDA_LO_OUT;
+   DELAY;
    SCL_HI;
    DELAY;
-   SDA_HI;
+   SDA_HI_IN;
 }
 
 /* Generate ACK or NACK */
@@ -123,23 +122,21 @@ static void fmradio_i2c_ack(bool nack)
        In their infinite wisdom, iriver didn't pull up the SCL line, so
        we have to drive the SCL high repeatedly to simulate a pullup. */
     
-    SCL_LO;      /* Set the clock low */
-
     if (nack)
-        SDA_HI;
+        SDA_HI_IN;
     else
-        SDA_LO;
-    
-    SCL_INPUT;   /* Set the clock to input */
-    while(!SCL)  /* and wait for the slave to release it */
+        SDA_LO_OUT;
+    DELAY;
+
+    SCL_HI;
+    do
     {
-        SCL_HI;
         SCL_OUTPUT;  /* Set the clock to output */
         SCL_INPUT;   /* Set the clock to input */
         DELAY;
     }
+    while(!SCL);  /* and wait for the slave to release it */
 
-    DELAY;
     SCL_OUTPUT;
     SCL_LO;
 }
@@ -156,24 +153,23 @@ static int fmradio_i2c_getack(void)
        In their infinite wisdom, iriver didn't pull up the SCL line, so
        we have to drive the SCL high repeatedly to simulate a pullup. */
 
-    SDA_INPUT;   /* And set to input */
-    SCL_INPUT;   /* Set the clock to input */
-    while(!SCL)  /* and wait for the slave to release it */
+    SDA_HI_IN;
+    DELAY;
+
+    SCL_HI;          /* set clock to high */
+    do
     {
-        SCL_HI;
         SCL_OUTPUT;  /* Set the clock to output */
         SCL_INPUT;   /* Set the clock to input */
         DELAY;
     }
+    while(!SCL);     /* and wait for the slave to release it */
 
     if (SDA)
-        /* ack failed */
-        ret = 0;
+        ret = 0;    /* ack failed */
     
     SCL_OUTPUT;
     SCL_LO;
-    SDA_HI;
-    SDA_OUTPUT;
 
     return ret;
 }
@@ -185,20 +181,14 @@ static void fmradio_i2c_outb(unsigned char byte)
    /* clock out each bit, MSB first */
    for ( i=0x80; i; i>>=1 ) {
       if ( i & byte )
-      {
-         SDA_HI;
-      }
+         SDA_HI_IN;
       else
-      {
-         SDA_LO;
-      }
+         SDA_LO_OUT;
       DELAY;
       SCL_HI;
       DELAY;
       SCL_LO;
    }
-
-   SDA_HI;
 }
 
 static unsigned char fmradio_i2c_inb(void)
@@ -206,18 +196,15 @@ static unsigned char fmradio_i2c_inb(void)
    int i;
    unsigned char byte = 0;
 
+   SDA_HI_IN;
    /* clock in each bit, MSB first */
    for ( i=0x80; i; i>>=1 ) {
-       SDA_INPUT;   /* And set to input */
        DELAY;
+       SCL_HI;
        DELAY;
        if ( SDA )
            byte |= i;
-       SCL_HI;
-       DELAY;
        SCL_LO;
-       DELAY;
-       SDA_OUTPUT;
    }
 
    return byte;
@@ -278,14 +265,14 @@ int fmradio_i2c_read(int address, unsigned char* buf, int count)
 #define SDA_HI     or_b(0x10, &PBDRL)
 #define SDA_INPUT  and_b(~0x10, &PBIORL)
 #define SDA_OUTPUT or_b(0x10, &PBIORL)
-#define SDA     (PBDR & 0x0010)
+#define SDA        (PBDR & 0x0010)
 
 /* SCL is PB1 */
 #define SCL_INPUT  and_b(~0x02, &PBIORL)
 #define SCL_OUTPUT or_b(0x02, &PBIORL)
 #define SCL_LO     and_b(~0x02, &PBDRL)
 #define SCL_HI     or_b(0x02, &PBDRL)
-#define SCL     (PBDR & 0x0002)
+#define SCL        (PBDR & 0x0002)
 
 /* arbitrary delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<20;_x++);} while (0)

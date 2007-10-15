@@ -140,6 +140,11 @@ inline void pcf50606_i2c_stop(void)
     asm (
         "or.l    %[sdab],(8,%[sdard]) \n" /* SDA_LO_OUT */
 
+        "move.l  %[dly],%%d0          \n" /* DELAY */
+    "1:                               \n"
+        "subq.l  #1,%%d0              \n"
+        "bhi.s   1b                   \n"
+
         "not.l   %[sclb]              \n" /* SCL_HI_IN */
         "and.l   %[sclb],(8,%[sclrd]) \n"
         "not.l   %[sclb]              \n"
@@ -169,6 +174,7 @@ inline void pcf50606_i2c_stop(void)
     );
 #else
     SDA_LO_OUT;
+    DELAY;
     SCL_HI_IN;
     DELAY;
     SDA_HI_IN;
@@ -188,6 +194,11 @@ inline void pcf50606_i2c_ack(bool ack)
         ".word   0x51fb               \n" /* trapf.l : else */
     "1:                               \n"
         "or.l    %[sdab],(8,%[sdard]) \n" /*   SDA_LO_OUT */
+
+        "move.l  %[dly],%%d0          \n" /* DELAY */
+    "1:                               \n"
+        "subq.l  #1,%%d0              \n"
+        "bhi.s   1b                   \n"
 
         "not.l   %[sclb]              \n" /* SCL_HI_IN */
         "and.l   %[sclb],(8,%[sclrd]) \n"
@@ -220,9 +231,8 @@ inline void pcf50606_i2c_ack(bool ack)
         SDA_LO_OUT;
     else
         SDA_HI_IN;
-
+    DELAY;
     SCL_HI_IN;
-
     DELAY;
     SCL_LO_OUT;
 #endif
@@ -251,16 +261,16 @@ inline bool pcf50606_i2c_getack(void)
         "btst.l  %[sclbnum],%%d0      \n"
         "beq.s   1b                   \n"
 
+        "move.l  %[dly],%%d0          \n" /* DELAY */
+    "1:                               \n"
+        "subq.l  #1,%%d0              \n"
+        "bhi.s   1b                   \n"
+
         "move.l  (%[sdard]),%%d0      \n" /* ret = !SDA */
         "btst.l  %[sdabnum],%%d0      \n"
         "seq.b   %[ret]               \n"
 
         "or.l    %[sclb],(8,%[sclrd]) \n" /* SCL_LO_OUT */
-
-        "move.l  %[dly],%%d0          \n" /* DELAY */
-    "1:                               \n"
-        "subq.l  #1,%%d0              \n"
-        "bhi.s   1b                   \n"
         : /* outputs */
         [ret]   "=&d"(ret)
         : /* inputs */
@@ -278,11 +288,11 @@ inline bool pcf50606_i2c_getack(void)
     SDA_HI_IN;
     DELAY;
     SCL_HI_IN;
+    DELAY;
 
     ret = !SDA;
-
+               
     SCL_LO_OUT;
-    DELAY;
 #endif
     return ret;
 }
@@ -372,6 +382,11 @@ unsigned char pcf50606_i2c_inb(bool ack)
         "clr.l   %[byte]              \n" /* byte = 0 */
 
     "2:                               \n" /* do */
+        "move.l  %[dly],%%d0          \n" /* DELAY */
+    "1:                               \n"
+        "subq.l  #1,%%d0              \n"
+        "bhi.s   1b                   \n"
+
         "not.l   %[sclb]              \n" /* SCL_HI_IN */
         "and.l   %[sclb],(8,%[sclrd]) \n"
         "not.l   %[sclb]              \n"
@@ -393,11 +408,6 @@ unsigned char pcf50606_i2c_inb(bool ack)
     "1:                               \n"
 
         "or.l    %[sclb],(8,%[sclrd]) \n" /* SCL_LO_OUT */
-
-        "move.l  %[dly],%%d0          \n" /* DELAY */
-    "1:                               \n"
-        "subq.l  #1,%%d0              \n"
-        "bhi.s   1b                   \n"
 
         "subq.l  #1,%%d1              \n" /* i-- */
         "bne.s   2b                   \n" /* while (i != 0) */
@@ -421,12 +431,12 @@ unsigned char pcf50606_i2c_inb(bool ack)
     SDA_HI_IN;
     for ( i=0x80; i; i>>=1 )
     {
+        DELAY;
         SCL_HI_IN;
         DELAY;
         if ( SDA )
             byte |= i;
         SCL_LO_OUT;
-        DELAY;
     }
 #endif
 
