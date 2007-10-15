@@ -93,6 +93,7 @@ int numberOfSamples IBSS_ATTR;
 long bpm IBSS_ATTR;
 
 int32_t gmbuf[BUF_SIZE*NBUF];
+static unsigned int samples_in_buf;
 
 int quit=0;
 struct plugin_api * rb;
@@ -160,7 +161,8 @@ static inline void synthbuf(void)
     outptr=gmbuf;
 #endif
 
-    for(i=0; i<BUF_SIZE/numberOfSamples; i++)
+    /* synth samples for as many whole ticks as we can fit in the buffer */
+    for(i=0; i < BUF_SIZE/numberOfSamples; i++)
     {
         synthSamples((int32_t*)outptr, numberOfSamples);
         outptr += numberOfSamples;
@@ -168,11 +170,9 @@ static inline void synthbuf(void)
             quit=1;
     }
 
-    if(BUF_SIZE%numberOfSamples)
-    {
-        synthSamples((int32_t*)outptr, BUF_SIZE%numberOfSamples);
-        outptr += BUF_SIZE%numberOfSamples;
-    }
+    /* how many samples did we write to the buffer? */
+    samples_in_buf = BUF_SIZE-(BUF_SIZE%numberOfSamples);
+
 }
 
 void get_more(unsigned char** start, size_t* size)
@@ -187,7 +187,7 @@ void get_more(unsigned char** start, size_t* size)
     synthbuf();  // For some reason midiplayer crashes when an update is forced
 #endif
 
-    *size = sizeof(gmbuf)/NBUF;
+    *size = samples_in_buf*sizeof(int32_t);
 #ifndef SYNC
     *start = (unsigned char*)((swap ? gmbuf : gmbuf + BUF_SIZE));
     swap=!swap;

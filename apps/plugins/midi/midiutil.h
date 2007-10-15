@@ -63,7 +63,8 @@
 #define MIDI_PITCHW 224
 
 /* MIDI Controllers */
-#define CTRL_VOLUME 7
+#define CTRL_PWDEPTH    6
+#define CTRL_VOLUME     7
 #define CTRL_BALANCE    8
 #define CTRL_PANNING    10
 #define CHANNEL     1
@@ -159,6 +160,7 @@ extern int chVol[16];       /* Channel volume                */
 extern int chPan[16];       /* Channel panning               */
 extern int chPat[16];       /* Channel patch                 */
 extern int chPW[16];        /* Channel pitch wheel, MSB only */
+extern int chPBDepth[16];   /* Channel pitch bend depth (Controller 6 */
 
 extern struct GPatch * gusload(char *);
 extern struct GPatch * patchSet[128];

@@ -65,6 +65,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         chPan[a]=64;             /* Center                          */
         chPat[a]=0;              /* Ac Gr Piano                     */
         chPW[a]=256;             /* .. not .. bent ?                */
+        chPBDepth[a]=2;          /* Default bend value is 2 */
     }
     for(a=0; a<128; a++)
     {
@@ -255,153 +256,173 @@ inline void stopVoice(struct SynthObject * so)
     so->decay = 0;
 }
 
-static inline int synthVoice(struct SynthObject * so)
+static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned int samples)
 {
     struct GWaveform * wf;
     register int s;
-    register unsigned int cpShifted;
-    register short s1;
-    register short s2;
+    register int s1;
+    register int s2;
+
+    register unsigned int cp_temp = so->cp;
 
     wf = so->wf;
 
+    const int mode_mask24 = wf->mode&24;
+    const int mode_mask28 = wf->mode&28;
+    const int mode_mask_looprev = wf->mode&LOOP_REVERSE;
 
-    /* Is voice being ramped? */
-    if(so->state == STATE_RAMPDOWN)
+    const unsigned int num_samples = (wf->numSamples-1) << FRACTSIZE;
+
+    const unsigned int end_loop = wf->endLoop << FRACTSIZE;
+    const unsigned int start_loop = wf->startLoop << FRACTSIZE;
+    const int diff_loop = end_loop-start_loop;
+
+    while(samples > 0)
     {
-        if(so->decay != 0)  /* Ramp has been started */
+        samples--;
+        /* Is voice being ramped? */
+        if(so->state == STATE_RAMPDOWN)
         {
-            so->decay = so->decay / 2;
+            if(so->decay != 0)  /* Ramp has been started */
+            {
+                so->decay = so->decay / 2;
 
-            if(so->decay < 10 && so->decay > -10)
-                so->isUsed = 0;
+                if(so->decay < 10 && so->decay > -10)
+                    so->isUsed = 0;
 
-            return so->decay;
+                s1=so->decay;
+                s2 = s1*chPan[so->ch];
+                s1 = (s1<<7) -s2;
+                *(out++)+=(((s1&0x7FFF80) << 9) | ((s2&0x7FFF80) >> 7));
+                continue;
+            }
+        } else  /* OK to advance voice */
+        {
+            cp_temp += so->delta;
         }
-    } else  /* OK to advance voice */
-    {
-        so->cp += so->delta;
-    }
 
-
-    cpShifted = so->cp >> FRACTSIZE;
-
-
-
-    s2 = getSample((cpShifted)+1, wf);
+        s2 = getSample((cp_temp >> FRACTSIZE)+1, wf);
 
         /* LOOP_REVERSE|LOOP_PINGPONG  = 24  */
-    if((wf->mode & (24)) && so->loopState == STATE_LOOPING && (cpShifted < (wf->startLoop)))
-    {
-        if(wf->mode & LOOP_REVERSE)
+        if(mode_mask24 && so->loopState == STATE_LOOPING && (cp_temp < start_loop))
         {
-            cpShifted = wf->endLoop-(wf->startLoop-cpShifted);
-            so->cp = (cpShifted)<<FRACTSIZE;
-            s2=getSample((cpShifted), wf);
-        }
-        else
-        {
-            so->delta = -so->delta; /* At this point cpShifted is wrong. We need to take a step */
-            so->loopDir = LOOPDIR_FORWARD;
-        }
-    }
-
-    if((wf->mode & 28) && (cpShifted >= wf->endLoop))
-    {
-        so->loopState = STATE_LOOPING;
-        if((wf->mode & (24)) == 0)
-        {
-            cpShifted = wf->startLoop + (cpShifted-wf->endLoop);
-            so->cp = (cpShifted)<<FRACTSIZE;
-            s2=getSample((cpShifted), wf);
-        }
-        else
-        {
-            so->delta = -so->delta;
-            so->loopDir = LOOPDIR_REVERSE;
-        }
-    }
-
-    /* Have we overrun? */
-    if( (cpShifted >= (wf->numSamples-1)))
-    {
-        so->cp -= so->delta;
-        cpShifted = so->cp >> FRACTSIZE;
-        s2 = getSample((cpShifted)+1, wf);
-        stopVoice(so);
-    }
-
-
-    /* Better, working, linear interpolation    */
-    s1=getSample((cpShifted), wf);
-
-    s = s1 + ((signed)((s2 - s1) * (so->cp & ((1<<FRACTSIZE)-1)))>>FRACTSIZE);
-
-
-    if(so->curRate == 0)
-    {
-        stopVoice(so);
-//        so->isUsed = 0;
-
-    }
-
-    if(so->ch != 9 && so->state != STATE_RAMPDOWN) /* Stupid ADSR code... and don't do ADSR for drums */
-    {
-        if(so->curOffset < so->targetOffset)
-        {
-            so->curOffset += (so->curRate);
-            if(so -> curOffset > so->targetOffset && so->curPoint != 2)
+            if(mode_mask_looprev)
             {
-                if(so->curPoint != 5)
-                {
-                    setPoint(so, so->curPoint+1);
-                }
-                else
-                {
-                    stopVoice(so);
-                }
+                cp_temp += diff_loop;
+                s2=getSample((cp_temp >> FRACTSIZE), wf);
             }
-        } else
-        {
-            so->curOffset -= (so->curRate);
-            if(so -> curOffset < so->targetOffset && so->curPoint != 2)
+            else
             {
-
-                if(so->curPoint != 5)
-                {
-                    setPoint(so, so->curPoint+1);
-                }
-                else
-                {
-                    stopVoice(so);
-                }
-
+                so->delta = -so->delta; /* At this point cp_temp is wrong. We need to take a step */
+                so->loopDir = LOOPDIR_FORWARD;
             }
         }
+
+        if(mode_mask28 && (cp_temp >= end_loop))
+        {
+            so->loopState = STATE_LOOPING;
+            if(!mode_mask24)
+            {
+                cp_temp -= diff_loop;
+                s2=getSample((cp_temp >> FRACTSIZE), wf);
+            }
+            else
+            {
+                so->delta = -so->delta;
+                so->loopDir = LOOPDIR_REVERSE;
+            }
+        }
+
+        /* Have we overrun? */
+        if(cp_temp >= num_samples)
+        {
+            cp_temp -= so->delta;
+            s2 = getSample((cp_temp >> FRACTSIZE)+1, wf);
+            stopVoice(so);
+        }
+
+        /* Better, working, linear interpolation    */
+        s1=getSample((cp_temp >> FRACTSIZE), wf);
+
+        s = s1 + ((signed)((s2 - s1) * (cp_temp & ((1<<FRACTSIZE)-1)))>>FRACTSIZE);
+
+        if(so->curRate == 0)
+        {
+            stopVoice(so);
+//          so->isUsed = 0;
+
+        }
+
+        if(so->ch != 9 && so->state != STATE_RAMPDOWN) /* Stupid ADSR code... and don't do ADSR for drums */
+        {
+            if(so->curOffset < so->targetOffset)
+            {
+                so->curOffset += (so->curRate);
+                if(so -> curOffset > so->targetOffset && so->curPoint != 2)
+                {
+                    if(so->curPoint != 5)
+                    {
+                        setPoint(so, so->curPoint+1);
+                    }
+                    else
+                    {
+                        stopVoice(so);
+                    }
+                }
+            } else
+            {
+                so->curOffset -= (so->curRate);
+                if(so -> curOffset < so->targetOffset && so->curPoint != 2)
+                {
+
+                    if(so->curPoint != 5)
+                    {
+                        setPoint(so, so->curPoint+1);
+                    }
+                    else
+                    {
+                        stopVoice(so);
+                    }
+
+                }
+            }
+        }
+
+        if(so->curOffset < 0)
+        {
+            so->curOffset = so->targetOffset;
+            stopVoice(so);
+        }
+
+        s = (s * (so->curOffset >> 22) >> 8);
+
+        /* need to set ramp beginning */
+        if(so->state == STATE_RAMPDOWN && so->decay == 0)
+        {
+            so->decay = s*so->volscale>>14;
+            if(so->decay == 0)
+                so->decay = 1;  /* stupid junk.. */
+        }
+
+
+        /* Scaling by channel volume and note volume is done in sequencer.c */
+        /* That saves us some multiplication and pointer operations         */
+        s1=s*so->volscale>>14;
+
+        s2 = s1*chPan[so->ch];
+        s1 = (s1<<7) - s2;
+        *(out++)+=(((s1&0x7FFF80) << 9) | ((s2&0x7FFF80) >> 7));
+
     }
 
-    if(so->curOffset < 0)
-    {
-        so->curOffset = so->targetOffset;
-        stopVoice(so);
-    }
-
-    s = (s * (so->curOffset >> 22) >> 8);
-
-
-    /* need to set ramp beginning */
-    if(so->state == STATE_RAMPDOWN && so->decay == 0)
-    {
-        so->decay = s*so->volscale>>14;
-        if(so->decay == 0)
-            so->decay = 1;  /* stupid junk.. */
-    }
-
-
-    /* Scaling by channel volume and note volume is done in sequencer.c */
-    /* That saves us some multiplication and pointer operations         */
-    return s*so->volscale>>14;
+    so->cp=cp_temp; /* store this again */
+    return;
 }
+
+/* buffer to hold all the samples for the current tick, this is a hack
+   neccesary for coldfire targets as pcm_play_data uses the dma which cannot
+   access iram */
+int32_t samp_buf[256] IBSS_ATTR;
 
 /* synth num_samples samples and write them to the */
 /* buffer pointed to by buf_ptr                    */
@@ -409,37 +430,21 @@ void synthSamples(int32_t *buf_ptr, unsigned int num_samples) ICODE_ATTR;
 void synthSamples(int32_t *buf_ptr, unsigned int num_samples)
 {
     int i;
-    register int dL;
-    register int dR;
-    register int sample;
-    register struct SynthObject *voicept;
-    while(num_samples>0)
+    struct SynthObject *voicept;
+
+    rb->memset(samp_buf, 0, num_samples*4);
+
+    for(i=0; i < MAX_VOICES; i++)
     {
-        dL=0;
-        dR=0;
-        voicept=&voices[0];
-
-        for(i=MAX_VOICES; i > 0; i--)
+        voicept=&voices[i];
+        if(voicept->isUsed==1)
         {
-            if(voicept->isUsed==1)
-            {
-                sample = synthVoice(voicept);
-                dL += sample;
-                sample *= chPan[voicept->ch];
-                dR += sample;
-            }
-            voicept++;
+            synthVoice(voicept, samp_buf, num_samples);
         }
-
-        dL = (dL << 7) - dR;
-
-        /* combine the left and right 16 bit samples into 32 bits and write */
-        /* to the buffer, left sample in the high word and right in the low word */
-        *buf_ptr=(((dL&0x7FFF80) << 9) | ((dR&0x7FFF80) >> 7));
-
-        buf_ptr++;
-        num_samples--;
     }
+
+    rb->memcpy(buf_ptr, samp_buf, num_samples*4);
+
     /* TODO: Automatic Gain Control, anyone? */
     /* Or, should this be implemented on the DSP's output volume instead? */
 
