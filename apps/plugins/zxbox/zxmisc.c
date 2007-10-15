@@ -79,7 +79,7 @@ int file_exist(const char *filename)
   int fd;
 
   fd = rb->open(filename, O_RDONLY);
-  if(fd != NULL) {
+  if(fd >= 0) {
     rb->close(fd);
     return 1;
   }
