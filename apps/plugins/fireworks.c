@@ -140,60 +140,60 @@ LCD_RGBPACK(19,10,26) };
 #endif
 
 static const struct opt_items autofire_delay_settings[15] = {
-    { "Off",   NULL },
-    { "50ms",  NULL },
-    { "100ms", NULL },
-    { "200ms", NULL },
-    { "300ms", NULL },
-    { "400ms", NULL },
-    { "500ms", NULL },
-    { "600ms", NULL },
-    { "700ms", NULL },
-    { "800ms", NULL },
-    { "900ms", NULL },
-    { "1s",    NULL },
-    { "2s",    NULL },
-    { "3s",    NULL },
-    { "4s",    NULL }
+    { "Off",   -1 },
+    { "50ms",  -1 },
+    { "100ms", -1 },
+    { "200ms", -1 },
+    { "300ms", -1 },
+    { "400ms", -1 },
+    { "500ms", -1 },
+    { "600ms", -1 },
+    { "700ms", -1 },
+    { "800ms", -1 },
+    { "900ms", -1 },
+    { "1s",    -1 },
+    { "2s",    -1 },
+    { "3s",    -1 },
+    { "4s",    -1 }
 };
 
 int autofire_delay_values[15] = {
     0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400 };
 
 static const struct opt_items particle_settings[8] = {
-    { "5",  NULL },
-    { "10", NULL },
-    { "15", NULL },
-    { "20", NULL },
-    { "25", NULL },
-    { "30", NULL },
-    { "35", NULL },
-    { "40", NULL },
+    { "5",  -1 },
+    { "10", -1 },
+    { "15", -1 },
+    { "20", -1 },
+    { "25", -1 },
+    { "30", -1 },
+    { "35", -1 },
+    { "40", -1 },
 };
 
 int particle_values[8] = {
     5, 10, 15, 20, 25, 30, 35, 40 };
 
 static const struct opt_items particle_life_settings[9] = {
-    { "20 cycles",  NULL },
-    { "30 cycles",  NULL },
-    { "40 cycles",  NULL },
-    { "50 cycles",  NULL },
-    { "60 cycles",  NULL },
-    { "70 cycles",  NULL },
-    { "80 cycles",  NULL },
-    { "90 cycles",  NULL },
-    { "100 cycles", NULL }
+    { "20 cycles",  -1 },
+    { "30 cycles",  -1 },
+    { "40 cycles",  -1 },
+    { "50 cycles",  -1 },
+    { "60 cycles",  -1 },
+    { "70 cycles",  -1 },
+    { "80 cycles",  -1 },
+    { "90 cycles",  -1 },
+    { "100 cycles", -1 }
 };
 
 int particle_life_values[9] = {
     20, 30, 40, 50, 60, 70, 80, 90, 100 };
 
 static const struct opt_items gravity_settings[4] = {
-    { "Off",      NULL },
-    { "Weak",     NULL },
-    { "Moderate", NULL },
-    { "Strong",   NULL },
+    { "Off",      -1 },
+    { "Weak",     -1 },
+    { "Moderate", -1 },
+    { "Strong",   -1 },
 };
 
 int gravity_values[4] = {
@@ -202,9 +202,9 @@ int gravity_values[4] = {
 #ifdef HAVE_LCD_COLOR
 
 static const struct opt_items rocket_settings[3] = {
-    { "No",                NULL },
-    { "Yes (no trails)",   NULL },
-    { "Yes (with trails)", NULL },
+    { "No",                -1 },
+    { "Yes (no trails)",   -1 },
+    { "Yes (with trails)", -1 },
 };
 int rocket_values[4] = {
     2, 1, 0 };
@@ -212,8 +212,8 @@ int rocket_values[4] = {
 #else
 
 static const struct opt_items rocket_settings[2] = {
-    { "No", NULL },
-    { "Yes",  NULL },
+    { "No",  -1 },
+    { "Yes", -1 },
 };
 int rocket_values[4] = {
     1, 0 };
@@ -221,15 +221,15 @@ int rocket_values[4] = {
 #endif
 
 static const struct opt_items fps_settings[9] = {
-    { "20 FPS", NULL },
-    { "25 FPS", NULL },
-    { "30 FPS", NULL },
-    { "35 FPS", NULL },
-    { "40 FPS", NULL },
-    { "45 FPS", NULL },
-    { "50 FPS", NULL },
-    { "55 FPS", NULL },
-    { "60 FPS", NULL }
+    { "20 FPS", -1 },
+    { "25 FPS", -1 },
+    { "30 FPS", -1 },
+    { "35 FPS", -1 },
+    { "40 FPS", -1 },
+    { "45 FPS", -1 },
+    { "50 FPS", -1 },
+    { "55 FPS", -1 },
+    { "60 FPS", -1 }
 };
 
 int fps_values[9] = {

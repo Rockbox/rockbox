@@ -322,9 +322,9 @@ static void reversi_gui_display_board(void) {
 /* Menu entries and the corresponding values for cursor wrap mode */
 #define MENU_TEXT_WRAP_MODE "Cursor wrap mode"
 static const struct opt_items cursor_wrap_mode_settings[] = {
-    { "Flat board", NULL },
-    { "Sphere",     NULL },
-    { "Torus",      NULL },
+    { "Flat board", -1 },
+    { "Sphere",     -1 },
+    { "Torus",      -1 },
 };
 static const cursor_wrap_mode_t cursor_wrap_mode_values[3] = {
     WRAP_FLAT, WRAP_SPHERE, WRAP_TORUS };
@@ -335,10 +335,10 @@ static const cursor_wrap_mode_t cursor_wrap_mode_values[3] = {
 #define MENU_TEXT_STRAT_BLACK "Strategy for black"
 
 static struct opt_items strategy_settings[] = {
-    { "Human", NULL },
-    { "Naive robot", NULL },
-    { "Simple robot", NULL },
-    //{ "AB robot", NULL },
+    { "Human", -1 },
+    { "Naive robot", -1 },
+    { "Simple robot", -1 },
+    //{ "AB robot", -1 },
 };
 static const game_strategy_t * const strategy_values[] = {
     &strategy_human, &strategy_naive, &strategy_simple, /*&strategy_ab*/ };

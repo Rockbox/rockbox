@@ -138,18 +138,18 @@ void play_waveform(void)
 {
     static struct opt_items names[HW_NUM_FREQ] =
     {
-        HW_HAVE_96_([HW_FREQ_96] = { "96kHz",     NULL },)
-        HW_HAVE_88_([HW_FREQ_88] = { "88.2kHz",   NULL },)
-        HW_HAVE_64_([HW_FREQ_64] = { "64kHz",     NULL },)
-        HW_HAVE_48_([HW_FREQ_48] = { "48kHz",     NULL },)
-        HW_HAVE_44_([HW_FREQ_44] = { "44.1kHz",   NULL },)
-        HW_HAVE_32_([HW_FREQ_32] = { "32kHz",     NULL },)
-        HW_HAVE_24_([HW_FREQ_24] = { "24kHz",     NULL },)
-        HW_HAVE_22_([HW_FREQ_22] = { "22.05kHz",  NULL },)
-        HW_HAVE_16_([HW_FREQ_16] = { "16kHz",     NULL },)
-        HW_HAVE_12_([HW_FREQ_12] = { "12kHz",     NULL },)
-        HW_HAVE_11_([HW_FREQ_11] = { "11.025kHz", NULL },)
-        HW_HAVE_8_( [HW_FREQ_8 ] = { "8kHz",      NULL },)
+        HW_HAVE_96_([HW_FREQ_96] = { "96kHz",     -1 },)
+        HW_HAVE_88_([HW_FREQ_88] = { "88.2kHz",   -1 },)
+        HW_HAVE_64_([HW_FREQ_64] = { "64kHz",     -1 },)
+        HW_HAVE_48_([HW_FREQ_48] = { "48kHz",     -1 },)
+        HW_HAVE_44_([HW_FREQ_44] = { "44.1kHz",   -1 },)
+        HW_HAVE_32_([HW_FREQ_32] = { "32kHz",     -1 },)
+        HW_HAVE_24_([HW_FREQ_24] = { "24kHz",     -1 },)
+        HW_HAVE_22_([HW_FREQ_22] = { "22.05kHz",  -1 },)
+        HW_HAVE_16_([HW_FREQ_16] = { "16kHz",     -1 },)
+        HW_HAVE_12_([HW_FREQ_12] = { "12kHz",     -1 },)
+        HW_HAVE_11_([HW_FREQ_11] = { "11.025kHz", -1 },)
+        HW_HAVE_8_( [HW_FREQ_8 ] = { "8kHz",      -1 },)
     };
 
     /* 50 cycles of wavform */
@@ -241,10 +241,10 @@ void set_waveform(void)
 {
     static struct opt_items names[NUM_WAVEFORMS] =
     {
-        [TONE_SINE]     = { "Sine",     NULL },
-        [TONE_TRIANGLE] = { "Triangle", NULL },
-        [TONE_SAWTOOTH] = { "Sawtooth", NULL },
-        [TONE_SQUARE]   = { "Square",   NULL },
+        [TONE_SINE]     = { "Sine",     -1 },
+        [TONE_TRIANGLE] = { "Triangle", -1 },
+        [TONE_SAWTOOTH] = { "Sawtooth", -1 },
+        [TONE_SQUARE]   = { "Square",   -1 },
     };
 
     rb->set_option("Waveform", &waveform, INT, names,

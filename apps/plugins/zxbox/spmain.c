@@ -237,8 +237,8 @@ static void select_keymap(void){
 /* options menu */
 static void options_menu(void){
     static const struct opt_items no_yes[2] = {
-        { "No", NULL },
-        { "Yes", NULL },
+        { "No", -1 },
+        { "Yes", -1 },
     };
     int m;
     int result;
@@ -255,16 +255,16 @@ static void options_menu(void){
         { "Custom keymap", NULL },
        };
     static struct opt_items frameskip_items[] = {
-        { "0", NULL },
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL },
-        { "4", NULL },
-        { "5", NULL },
-        { "6", NULL },
-        { "7", NULL },
-        { "8", NULL },
-        { "9", NULL },
+        { "0", -1 },
+        { "1", -1 },
+        { "2", -1 },
+        { "3", -1 },
+        { "4", -1 },
+        { "5", -1 },
+        { "6", -1 },
+        { "7", -1 },
+        { "8", -1 },
+        { "9", -1 },
        };
         
 

@@ -17,7 +17,7 @@ extern "C" {
 #include <stddef.h>
 
 #ifndef NULL
-#define NULL 0
+#define NULL ((void*)0)
 #endif
 
 #define EXIT_FAILURE 1
