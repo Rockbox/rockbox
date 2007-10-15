@@ -2299,18 +2299,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_clear_display();
     rb->lcd_update();
 
-    /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
-    rb->talk_disable_menus();
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
-#endif
-
-    /* From this point on we've altered settings, colors, cpu_boost, etc. and
-       cannot just return PLUGIN_ERROR - instead drop though to cleanup code
-     */
-
     init_settings((char*)parameter);
 
     /* Initialise libmad */
@@ -2332,6 +2320,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         start_time = 0;
     else if ( start_time > (end_pts_time-start_pts_time) )
         start_time = (end_pts_time-start_pts_time);
+
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
+    rb->talk_disable_menus();
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true);
+#endif
+
+    /* From this point on we've altered settings, colors, cpu_boost, etc. and
+       cannot just return PLUGIN_ERROR - instead drop though to cleanup code
+     */
     
     rb->splash(0, "Loading...");
     
