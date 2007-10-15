@@ -352,7 +352,11 @@ bool option_screen(struct settings_list *setting,
             int min = sound_min(setting_id);
             int max = sound_max(setting_id);
             nb_items = (max-min)/steps + 1;
+#ifndef ASCENDING_INT_SETTINGS
             selected = (max - oldvalue) / steps;
+#else
+            selected = (oldvalue - min) / steps;
+#endif
             function = sound_get_fn(setting_id);
         }
         else
@@ -363,7 +367,11 @@ bool option_screen(struct settings_list *setting,
             min = info->min;
             step = info->step;
             nb_items = (max-min)/step + 1;
-            selected = (max - oldvalue)/step;
+#ifndef ASCENDING_INT_SETTINGS
+            selected = (max - oldvalue) / step;
+#else
+            selected = (oldvalue - min) / step;
+#endif
             function = info->option_callback;
         }
     }
