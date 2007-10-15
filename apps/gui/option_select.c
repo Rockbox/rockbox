@@ -256,9 +256,15 @@ static int selection_to_val(struct settings_list *setting, int selection)
     else if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
     {
         struct int_setting *info = setting->int_setting;
+#if CONFIG_KEYPAD != PLAYER_PAD
         min = info->min;
         max = info->max;
         step = info->step;
+#else
+        max = info->min;
+        min = info->max;
+        step = -info->step;
+#endif
     }
     if (setting->flags & F_FLIPLIST)
     {

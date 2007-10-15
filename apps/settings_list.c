@@ -374,7 +374,9 @@ static long jumpscroll_getlang(int value)
 #if defined (HAVE_SCROLLWHEEL)      || \
     (CONFIG_KEYPAD == IPOD_3G_PAD)  || \
     (CONFIG_KEYPAD == IPOD_4G_PAD)  || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD) || \
+    (CONFIG_KEYPAD == PLAYER_PAD) /* player doesnt have a wheel, \
+                                     but acts the same way */
 #define FLIP_IF_WHEEL F_FLIPLIST
 #else
 #define FLIP_IF_WHEEL 0
