@@ -27,10 +27,23 @@ const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
 };
 
-#define STOP_AUTOSCROLL(action) ((ACTION_KBD_ABORT == action) || \
-                                 (ACTION_KBD_UP == action) || \
-                                 (ACTION_KBD_DOWN == action))
-
+bool STOP_AUTOSCROLL(int action)
+{
+    switch (action)
+    {
+        case ACTION_STD_CANCEL:
+        case ACTION_STD_OK:
+        case ACTION_STD_NEXT:
+        case ACTION_STD_NEXTREPEAT:
+        case ACTION_STD_PREV:
+        case ACTION_STD_PREVREPEAT:
+            return true;
+        default:
+            return false;
+    }
+    return false;
+}
+    
 #ifdef HAVE_LCD_CHARCELLS
 
 void roll_credits(void)
@@ -77,7 +90,7 @@ void roll_credits(void)
         rb->lcd_update();
 
         /* abort on keypress */
-        if(ACTION_KBD_ABORT == rb->get_action(CONTEXT_KEYBOARD,HZ/8))
+        if(rb->action_userabort(HZ/8))
             return;
 
         if (++curr_index >= curr_len)
@@ -98,10 +111,12 @@ int update_rowpos(int action, int cur_pos, int rows_per_screen, int tot_rows)
 {
     switch(action)
     {
-        case ACTION_KBD_UP:
+        case ACTION_STD_PREV:
+        case ACTION_STD_PREVREPEAT:
             cur_pos--;
             break;
-        case ACTION_KBD_DOWN:
+        case ACTION_STD_NEXT:
+        case ACTION_STD_NEXTREPEAT:
             cur_pos++;
             break;
     }                
@@ -194,7 +209,7 @@ void roll_credits(void)
             rb->lcd_update_rect(0, font_h*(i+1), LCD_WIDTH, font_h);
 
             /* exit on abort, switch to manual on up/down */
-            action = rb->get_action(CONTEXT_KEYBOARD, HZ/ANIM_SPEED);
+            action = rb->get_action(CONTEXT_LIST, HZ/ANIM_SPEED);
             if(STOP_AUTOSCROLL(action))
                 break;
         }
@@ -203,7 +218,7 @@ void roll_credits(void)
     }
     
     /* process user actions (if any) */
-    if(ACTION_KBD_ABORT == action)
+    if(ACTION_STD_CANCEL == action)
         return;
     if(STOP_AUTOSCROLL(action))
         manual_scroll = true; /* up/down - abort was catched above */
@@ -213,8 +228,8 @@ void roll_credits(void)
         j+= i;
 
         /* pause for a bit if needed */
-        action = rb->get_action(CONTEXT_KEYBOARD, HZ*PAUSE_TIME);
-        if(ACTION_KBD_ABORT == action)
+        action = rb->get_action(CONTEXT_LIST, HZ*PAUSE_TIME);
+        if(ACTION_STD_CANCEL == action)
             return;
         if(STOP_AUTOSCROLL(action))
             manual_scroll = true;
@@ -246,7 +261,7 @@ void roll_credits(void)
                     rb->lcd_update_rect(0, font_h*(i+1), LCD_WIDTH, font_h);
     
                     /* exit on keypress, react to scrolling */
-                    action = rb->get_action(CONTEXT_KEYBOARD, HZ/ANIM_SPEED);
+                    action = rb->get_action(CONTEXT_LIST, HZ/ANIM_SPEED);
                     if(STOP_AUTOSCROLL(action))
                         break;
 
@@ -277,7 +292,7 @@ void roll_credits(void)
                     rb->lcd_update_rect(CREDITS_TARGETPOS, 0, credits_w,font_h);
     
                     /* stop on keypress */
-                    action = rb->get_action(CONTEXT_KEYBOARD, HZ/ANIM_SPEED);
+                    action = rb->get_action(CONTEXT_LIST, HZ/ANIM_SPEED);
                     if(STOP_AUTOSCROLL(action))
                         break;
                 }
@@ -288,7 +303,7 @@ void roll_credits(void)
             if(STOP_AUTOSCROLL(action))
                 break;
             
-            action = rb->get_action(CONTEXT_KEYBOARD, HZ*PAUSE_TIME);
+            action = rb->get_action(CONTEXT_LIST, HZ*PAUSE_TIME);
             if(STOP_AUTOSCROLL(action))
                 break;
 
@@ -296,7 +311,7 @@ void roll_credits(void)
         } /* while(j < numnames) */
         
         /* handle the keypress that we intercepted during autoscroll */
-        if(ACTION_KBD_ABORT == action)
+        if(ACTION_STD_CANCEL == action)
             return;
         if(STOP_AUTOSCROLL(action))
             manual_scroll = true;
@@ -306,7 +321,7 @@ void roll_credits(void)
     {
         /* user went into manual scrolling, handle it here */
         rb->lcd_set_drawmode(DRMODE_SOLID);
-        while(ACTION_KBD_ABORT != action)
+        while(ACTION_STD_CANCEL != action)
         {
             rb->lcd_clear_display();
             rb->snprintf(elapsednames, sizeof(elapsednames),
@@ -323,16 +338,16 @@ void roll_credits(void)
             rb->lcd_update();
             
             /* wait for user action */
-            action = rb->get_action(CONTEXT_KEYBOARD, TIMEOUT_BLOCK);
-            if(ACTION_KBD_ABORT == action)
+            action = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
+            if(ACTION_STD_CANCEL == action)
                 return;
             j = update_rowpos(action, j, NUM_VISIBLE_LINES, numnames);
         }
         return; /* exit without animation */
     }
     
-    action = rb->get_action(CONTEXT_KEYBOARD, HZ*3);
-    if(ACTION_KBD_ABORT == action)
+    action = rb->get_action(CONTEXT_LIST, HZ*3);
+    if(ACTION_STD_CANCEL == action)
         return;
 
     offset_dummy = 1;
@@ -366,7 +381,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     /* Show the logo for about 3 secs allowing the user to stop */
-    if(ACTION_KBD_ABORT != rb->get_action(CONTEXT_KEYBOARD,3*HZ))
+    if(!rb->action_userabort(3*HZ))
         roll_credits();
 
     /* Turn on backlight timeout (revert to settings) */
