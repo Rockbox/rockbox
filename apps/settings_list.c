@@ -492,7 +492,7 @@ const struct settings_list settings[] = {
 #else
         400,
 #endif
-            "max files in playlist", UNIT_INT,1000,20000,1000,NULL,NULL,NULL),
+            "max files in playlist", UNIT_INT,1000,32000,1000,NULL,NULL,NULL),
     INT_SETTING(0,max_files_in_dir,LANG_MAX_FILES_IN_DIR,
 #if MEM > 1
         1000,
