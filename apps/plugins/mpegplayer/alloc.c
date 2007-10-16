@@ -54,8 +54,6 @@ static void * mpeg_malloc_internal (unsigned char *mallocbuf,
     x = &mallocbuf[*mem_ptr];
     *mem_ptr += (size + 3) & ~3; /* Keep memory 32-bit aligned */
 
-    rb->memset(x,0,size);
-
     return x;
     (void)reason;
 }
@@ -75,7 +73,6 @@ size_t mpeg_alloc_init(unsigned char *buf, size_t mallocsize,
     mallocbuf = (char *)(((intptr_t)buf + 15) & ~15);
     /* Adjust for real size */
     bufsize -= mallocbuf - buf;
-    rb->memset(buf,0,bufsize);
 
     /* Separate allocator for video */
     libmpeg2size = (libmpeg2size + 15) & ~15;

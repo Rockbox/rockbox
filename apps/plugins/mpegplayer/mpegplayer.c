@@ -1042,7 +1042,7 @@ static inline int32_t clip_sample(int32_t sample)
 
 static int button_loop(void)
 {
-    bool result;
+    int result;
     int vol, minvol, maxvol;
     int button;
 
@@ -1118,15 +1118,19 @@ static int button_loop(void)
             /* The menu can change the font, so restore */
             rb->lcd_setfont(FONT_SYSFIXED);
 
-            if (result) {
-                settings.resume_time = (int)(get_stream_time()/CLOCK_RATE/
-                                             30-start_pts_time);
-                str_send_msg(&video_str, STREAM_QUIT, 0);
-                audio_str.status = STREAM_STOPPED;
-            } else {
-                audio_str.status = STREAM_PLAYING;
-                str_send_msg(&video_str, STREAM_PLAY, 0);
-                pcm_playback_play_pause(true);
+            switch (result)
+            {
+                case MPEG_MENU_QUIT:
+                    settings.resume_time = (int)(get_stream_time()/CLOCK_RATE/
+                                                 30-start_pts_time);
+                    str_send_msg(&video_str, STREAM_QUIT, 0);
+                    audio_str.status = STREAM_STOPPED;
+                    break;
+                default:
+                  audio_str.status = STREAM_PLAYING;
+                  str_send_msg(&video_str, STREAM_PLAY, 0);
+                  pcm_playback_play_pause(true);
+                  break;
             }
             break;
 
@@ -2203,7 +2207,8 @@ ssize_t seek_PTS( int in_file, int start_time, int accept_button )
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int status = PLUGIN_ERROR; /* assume failure */
-    int start_time=-1;
+    int result;
+    int start_time = -1;
     void* audiobuf;
     ssize_t audiosize;
     int in_file;
@@ -2295,8 +2300,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
 #endif
-    rb->lcd_clear_display();
-    rb->lcd_update();
 
     init_settings((char*)parameter);
 
@@ -2312,10 +2315,21 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     find_end_pts( in_file );
     
     /* start menu */
-    start_time = mpeg_start_menu(end_pts_time-start_pts_time, in_file);
-    if ( start_time == -1 )
-        return 0;
-    else if ( start_time < 0 )
+    rb->lcd_clear_display();
+    rb->lcd_update();
+    result = mpeg_start_menu(end_pts_time-start_pts_time, in_file);
+    
+    switch (result)
+    {
+        case MPEG_START_QUIT:
+            return 0;
+        default:
+            start_time = settings.resume_time;
+            break;
+    }
+
+    /* basic time checks */
+    if ( start_time < 0 )
         start_time = 0;
     else if ( start_time > (end_pts_time-start_pts_time) )
         start_time = (end_pts_time-start_pts_time);
