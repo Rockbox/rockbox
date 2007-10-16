@@ -52,12 +52,6 @@ void dynamic_recompile (struct dynarec_block *newblock);
 
 #define USER_MENU_QUIT -2
 
-/* Disable ICODE for the ARMs */
-#ifdef CPU_ARM
-#undef ICODE_ATTR
-#define ICODE_ATTR
-#endif
-
 /* Disable IBSS when using dynarec since it won't fit */
 #ifdef DYNAREC
 #undef IBSS_ATTR
