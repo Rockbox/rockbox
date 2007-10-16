@@ -510,7 +510,7 @@ bool get_asf_metadata(int fd, struct mp3entry* id3)
        header.
      */
     id3->first_frame_offset = lseek(fd, 0, SEEK_CUR) + 26;
-
+    id3->filesize = filesize(fd);
     /* We copy the wfx struct to the MP3 TOC field in the id3 struct so
        the codec doesn't need to parse the header object again */
     memcpy(id3->toc, &wfx, sizeof(wfx));
