@@ -1318,10 +1318,15 @@ int peak_meter_draw_get_btn(int x, int y[], int height, int nb_screens)
     long next_refresh = current_tick;
     long next_big_refresh = current_tick + HZ / 10;
     int i;
-#ifndef SIMULATOR
-    bool highperf = !ata_disk_is_active();
-#else
+#if (CONFIG_CODEC == SWCODEC) || defined(SIMULATOR)
     bool highperf = false;
+#else
+    /* On MAS targets, we need to poll as often as possible in order to not
+     * miss a peak, as the MAS does only provide a quasi-peak. When the disk
+     * is active, it must not draw too much CPU power or a buffer overrun can
+     * happen when saving a recording. As a compromise, poll only once per tick
+     * when the disk is active, otherwise spin around as fast as possible. */
+    bool highperf = !ata_disk_is_active();
 #endif
     bool dopeek = true;
 
