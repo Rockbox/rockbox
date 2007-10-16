@@ -52,7 +52,7 @@ bool button_hold(void)
 
 bool remote_button_hold(void)
 {
-    return adc_scan(ADC_REMOTE) < 0x17;
+    return adc_scan(ADC_REMOTE) < 0x2B;
 }
 
 /*
@@ -102,7 +102,7 @@ int button_read_device(void)
             data = adc_scan(ADC_SCROLLPAD);
             GPIOD_OUTPUT_VAL |= 0x40;
             
-            if(data < 0x210)
+            if(data < 0x224)
             {
                 btn |= BUTTON_SCROLL_DOWN;
             } else {
@@ -115,7 +115,7 @@ int button_read_device(void)
     remote_hold_button_old = remote_hold_button;
 
     data = adc_scan(ADC_REMOTE);
-    remote_hold_button = data < 0x17;
+    remote_hold_button = data < 0x2B;
 
 #ifndef BOOTLOADER
     if (remote_hold_button != remote_hold_button_old)
@@ -126,13 +126,13 @@ int button_read_device(void)
     {
         if (data < 0x3FF)
         {
-            if(data < 0x1F0)
-                if(data < 0x141)
+            if(data < 0x204)
+                if(data < 0x155)
                     btn |= BUTTON_RC_FF;
                 else
                     btn |= BUTTON_RC_REW;
             else
-                if(data < 0x2BC)
+                if(data < 0x2D0)
                    btn |= BUTTON_RC_VOL_DOWN;
                 else
                     btn |= BUTTON_RC_VOL_UP;

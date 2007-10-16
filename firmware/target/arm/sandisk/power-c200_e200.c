@@ -85,7 +85,7 @@ bool tuner_power_nolock(bool status)
 #if defined(SANSA_E200)
             outl(inl(0x70000084) | 0x1, 0x70000084);
 #else /* SANSA_C200 */
-            DEV_INIT &= ~0x800;
+            DEV_INIT2 &= ~0x800;
 #endif
             udelay(5);
 
@@ -120,7 +120,7 @@ bool tuner_power_nolock(bool status)
 #if defined (SANSA_E200)
             outl(inl(0x70000084) & ~0x1, 0x70000084);
 #else
-            DEV_INIT |= 0x800;
+            DEV_INIT2 |= 0x800;
 #endif
         }
 

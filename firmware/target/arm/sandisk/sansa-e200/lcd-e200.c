@@ -372,7 +372,7 @@ void lcd_init_device(void)
 /* Controller init */
     outl((inl(0x70000084) | (1 << 28)), 0x70000084);
     outl((inl(0x70000080) & ~(1 << 28)), 0x70000080);
-    outl(((inl(0x70000010) & (0x03ffffff)) | (0x15 << 26)), 0x70000010);
+    DEV_INIT1 = ( (DEV_INIT1 & 0x03ffffff) | (0x15 << 26) );
     outl(((inl(0x70000014) & (0x0fffffff)) | (0x5 << 28)), 0x70000014);
     outl((inl(0x70000020) & ~(0x3 << 10)), 0x70000020);
     DEV_EN |= DEV_LCD; /* Enable controller */

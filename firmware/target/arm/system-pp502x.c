@@ -240,17 +240,17 @@ void system_init(void)
     {
 #if defined(SANSA_E200) || defined(SANSA_C200)
         /* Reset all devices */
-        DEV_OFF_MASK |= 0x20;
+        DEV_RS2 |= 0x20;
         DEV_RS = 0x3bfffef8;
-        DEV_OFF_MASK = -1;
+        DEV_RS2 = -1;
         DEV_RS = 0;
-        DEV_OFF_MASK = 0;
+        DEV_RS2 = 0;
  #elif defined (IRIVER_H10)
         DEV_RS = 0x3ffffef8;
-        DEV_OFF_MASK = -1;
+        DEV_RS2 = -1;
         outl(inl(0x70000024) | 0xc0, 0x70000024);
         DEV_RS = 0;
-        DEV_OFF_MASK = 0;
+        DEV_RS2 = 0;
 #endif
 
 #if !defined(SANSA_E200) && !defined(SANSA_C200)
@@ -289,7 +289,7 @@ void system_init(void)
         outl(inl(0x6000a000) | 0x80000000, 0x6000a000); /* Init DMA controller? */
 #endif 
 
-        DEV_INIT |= 1 << 30; /* enable PLL power */
+        DEV_INIT2 |= 1 << 30; /* enable PLL power */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #if NUM_CORES > 1

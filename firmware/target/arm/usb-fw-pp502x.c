@@ -44,7 +44,7 @@ void usb_init_device(void)
     DEV_RS |= DEV_USB; /* reset usb start */  
     DEV_RS &=~DEV_USB;/* reset usb end */  
 
-    DEV_INIT |= INIT_USB;
+    DEV_INIT2 |= INIT_USB;
     while ((inl(0x70000028) & 0x80) == 0);
 
     UDC_PORTSC1 |= PORTSCX_PORT_RESET;  
@@ -70,7 +70,7 @@ void usb_init_device(void)
 
     /* Note from IPL source (referring to next 5 lines of code:  
        THIS NEEDS TO BE CHANGED ONCE THERE IS KERNEL USB */  
-    DEV_INIT |= INIT_USB;
+    DEV_INIT2 |= INIT_USB;
     DEV_EN |= DEV_USB;
     while ((inl(0x70000028) & 0x80) == 0);
     outl(inl(0x70000028) | 0x2, 0x70000028);

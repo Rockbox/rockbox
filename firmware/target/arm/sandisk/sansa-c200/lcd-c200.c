@@ -88,7 +88,7 @@ void lcd_init_device(void)
     outl(inl(0x70000010) & ~0xfc000000, 0x70000010);
     outl(inl(0x70000010), 0x70000010);
 
-    DEV_INIT &= ~0x400;
+    DEV_INIT2 &= ~0x400;
     udelay(10000);
     
     LCD1_CONTROL &= ~0x4;

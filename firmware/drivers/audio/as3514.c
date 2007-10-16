@@ -138,7 +138,7 @@ void audiohw_init(void)
     i2c_init();
 
     /* normal outputs for CDI and I2S pin groups */
-    DEV_INIT &= ~0x300;
+    DEV_INIT2 &= ~0x300;
 
     /*mini2?*/
     outl(inl(0x70000010) & ~0x3000000, 0x70000010);

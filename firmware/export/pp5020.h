@@ -121,8 +121,9 @@
 
 /* Device Controller */
 #define DEV_RS       (*(volatile unsigned long *)(0x60006004))
-#define DEV_OFF_MASK (*(volatile unsigned long *)(0x60006008))
+#define DEV_RS2      (*(volatile unsigned long *)(0x60006008))
 #define DEV_EN       (*(volatile unsigned long *)(0x6000600c))
+#define DEV_EN2      (*(volatile unsigned long *)(0x60006010))
 
 #define DEV_SYSTEM      0x00000004
 #define DEV_SER0        0x00000040
@@ -141,6 +142,7 @@
 #define CLOCK_SOURCE    (*(volatile unsigned long *)(0x60006020))
 #define PLL_CONTROL     (*(volatile unsigned long *)(0x60006034))
 #define PLL_STATUS      (*(volatile unsigned long *)(0x6000603c))
+#define ADC_CLOCK_SRC   (*(volatile unsigned long *)(0x60006094))
 #define CLCD_CLOCK_SRC  (*(volatile unsigned long *)(0x600060a0))
 
 /* Processors Control */
@@ -304,7 +306,8 @@
 #define RAM_TYPE_MASK    0x000000c0
 #define ROM_TYPE_MASK    0x00000008
 
-#define DEV_INIT         (*(volatile unsigned long *)(0x70000020))
+#define DEV_INIT1        (*(volatile unsigned long *)(0x70000010))
+#define DEV_INIT2        (*(volatile unsigned long *)(0x70000020))
 /* some timing that needs to be handled during clock setup */
 #define DEV_TIMING1      (*(volatile unsigned long *)(0x70000034))
 #define XMB_NOR_CFG      (*(volatile unsigned long *)(0x70000038))
