@@ -13,6 +13,10 @@ idct.c
 motion_comp_c.c
 #endif /* CPU_* */
 
+#ifdef CPU_COLDFIRE
+idct_coldfire.S
+#endif
+
 slice.c
 video_out_rockbox.c
 mpeg_settings.c

@@ -401,6 +401,12 @@ void mpeg2_reset (mpeg2dec_t * mpeg2dec, int full_reset)
 
 }
 
+#ifdef CPU_COLDFIRE
+/* twice as large as on other targets because coldfire uses
+ * a secondary, transposed buffer for optimisation */
+static int16_t static_dct_block[128] IBSS_ATTR ATTR_ALIGN(16);
+#endif
+
 mpeg2dec_t * mpeg2_init (void)
 {
     mpeg2dec_t * mpeg2dec;
@@ -410,7 +416,11 @@ mpeg2dec_t * mpeg2_init (void)
     mpeg2dec = (mpeg2dec_t *) mpeg2_malloc (sizeof (mpeg2dec_t),
 					    MPEG2_ALLOC_MPEG2DEC);
     if (mpeg2dec == NULL)
-	return NULL;
+	    return NULL;
+
+#ifdef CPU_COLDFIRE
+    mpeg2dec->decoder.DCTblock = static_dct_block;
+#endif
 
     rb->memset (mpeg2dec->decoder.DCTblock, 0, 64 * sizeof (int16_t));
     rb->memset (mpeg2dec->quantizer_matrix, 0, 4 * 64 * sizeof (uint8_t));

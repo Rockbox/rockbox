@@ -20,6 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+ 
+#include "config.h" /* for Rockbox CPU_ #defines */
 
 /* macroblock modes */
 #define MACROBLOCK_INTRA 1
@@ -92,7 +94,11 @@ struct mpeg2_decoder_s {
     int16_t dc_dct_pred[3];
 
     /* DCT coefficients */
+#ifdef CPU_COLDFIRE
+    int16_t *DCTblock;  /* put buffer separately to have it in IRAM */
+#else
     int16_t DCTblock[64] ATTR_ALIGN(64);
+#endif
 
     uint8_t * picture_dest[3];
     void (* convert) (void * convert_id, uint8_t * const * src,

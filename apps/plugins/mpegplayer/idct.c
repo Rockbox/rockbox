@@ -76,6 +76,14 @@ uint8_t mpeg2_clip[3840 * 2 + 256] IBSS_ATTR;
 #define CLIP(i) ((mpeg2_clip + 3840)[i])
 #endif
 
+#ifdef CPU_COLDFIRE
+/* assembler functions */
+extern void mpeg2_idct_copy_coldfire(int16_t * block, uint8_t * dest,
+                                     const int stride);
+extern void mpeg2_idct_add_coldfire(const int last, int16_t * block,
+                                    uint8_t * dest, const int stride);
+#else /* !CPU_COLDFIE */
+
 #if 0
 #define BUTTERFLY(t0,t1,W0,W1,d0,d1) \
     do {                             \
@@ -258,6 +266,8 @@ static void mpeg2_idct_add_c (const int last, int16_t * block,
     }
 }
 
+#endif /* !CPU_COLDFIRE */
+
 void mpeg2_idct_init (void)
 {
     extern uint8_t default_mpeg2_scan_norm[64];
@@ -266,8 +276,13 @@ void mpeg2_idct_init (void)
     extern uint8_t mpeg2_scan_alt[64];
     int i, j;
 
+#ifdef CPU_COLDFIRE
+    mpeg2_idct_copy = mpeg2_idct_copy_coldfire;
+    mpeg2_idct_add  = mpeg2_idct_add_coldfire;
+#else
     mpeg2_idct_copy = mpeg2_idct_copy_c;
-    mpeg2_idct_add = mpeg2_idct_add_c;
+    mpeg2_idct_add  = mpeg2_idct_add_c;
+#endif
 
 #if !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
     for (i = -3840; i < 3840 + 256; i++)
