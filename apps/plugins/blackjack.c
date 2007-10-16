@@ -176,13 +176,13 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
 #define BJACK_START      BUTTON_SELECT
 #define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        (BUTTON_REC|BUTTON_UP)
-#define BJACK_MIN        (BUTTON_REC|BUTTON_VOL_DOWN)
+#define BJACK_MAX        BUTTON_VOL_UP
+#define BJACK_MIN        BUTTON_VOL_DOWN
 #define BJACK_HIT        BUTTON_SELECT
 #define BJACK_STAY       BUTTON_RIGHT
 #define BJACK_DOUBLEDOWN BUTTON_LEFT
-#define BJACK_SCORES     BUTTON_VOL_UP
-#define BJACK_RESUME     BUTTON_REC
+#define BJACK_SCORES     BUTTON_REC
+#define BJACK_RESUME     BUTTON_DOWN
 #define BJACK_UP         BUTTON_UP
 #define BJACK_DOWN       BUTTON_DOWN
 #define BJACK_RIGHT      BUTTON_RIGHT
@@ -1113,7 +1113,15 @@ static unsigned int blackjack_menu(struct game_context* bj) {
             rb->lcd_puts(0, 7, "UP to view scores");
             rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
             rb->lcd_puts(0, 8, str);
-
+#elif (CONFIG_KEYPAD == SANSA_C200_PAD)
+            rb->lcd_puts(0, 2, "SELECT to start & to hit");
+            rb->lcd_puts(0, 3, "POWER to exit");
+            rb->lcd_puts(0, 4, "RIGHT to stay");
+            rb->lcd_puts(0, 5, "LEFT to double down");
+            rb->lcd_puts(0, 6, "DOWN to save/resume");
+            rb->lcd_puts(0, 7, "REC to view scores");
+            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
+            rb->lcd_puts(0, 9, str);
 #endif
         } else {
             rb->snprintf(str, 12, "%s", "High Scores");
