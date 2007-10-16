@@ -387,6 +387,13 @@ void corelock_unlock(struct corelock *cl)
 
 #endif /* CONFIG_CORELOCK == SW_CORELOCK */
 
+#ifdef CPU_PP502x
+/* Some code relies on timing */
+void switch_thread(struct thread_entry *old) ICODE_ATTR;
+void core_wake(IF_COP_VOID(unsigned int othercore)) ICODE_ATTR;
+void core_idle(void) ICODE_ATTR;
+#endif
+
 /*---------------------------------------------------------------------------
  * Put core in a power-saving state if waking list wasn't repopulated and if
  * no other core requested a wakeup for it to perform a task.
@@ -405,7 +412,7 @@ static inline void core_sleep(IF_COP(unsigned int core,) struct thread_entry **w
         "ldr    r0, [%[w]]                 \n" /* Check *waking */
         "cmp    r0, #0                     \n" /* != NULL -> exit */
         "bne    1f                         \n"
-        /* ------ fixed-time sequence ----- */
+        /* ------ fixed-time sequence ----- */ /* Can this be relied upon? */
         "ldr    r0, [%[ms], %[oc], lsl #2] \n" /* Stay-awake requested? */
         "mov    r1, #0x80000000            \n"
         "tst    r0, #1                     \n"
@@ -453,7 +460,7 @@ void core_wake(IF_COP_VOID(unsigned int othercore))
         "orr    r1, r2, #0xc0              \n"
         "msr    cpsr_c, r1                 \n"
         "mov    r1, #1                     \n"
-        /* ------ fixed-time sequence ----- */
+        /* ------ fixed-time sequence ----- */ /* Can this be relied upon? */
         "str    r1, [%[ms], %[oc], lsl #2] \n" /* Send stay-awake message */
         "nop                               \n"
         "nop                               \n"

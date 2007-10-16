@@ -46,7 +46,7 @@
 #define MAX_EVENT_AGE  HZ
 #endif
 
-struct event_queue button_queue NOCACHEBSS_ATTR;
+struct event_queue button_queue;
 
 static long lastbtn;   /* Last valid button status */
 static long last_read; /* Last button status, for debouncing/filtering */

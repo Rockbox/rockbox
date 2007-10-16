@@ -62,7 +62,7 @@ static unsigned long reserve_used = 0;
 static unsigned int  cache_build_ticks = 0;
 static char dircache_cur_path[MAX_PATH*2];
 
-static struct event_queue dircache_queue NOCACHEBSS_ATTR;
+static struct event_queue dircache_queue;
 static long dircache_stack[(DEFAULT_STACK_SIZE + 0x900)/sizeof(long)];
 static const char dircache_thread_name[] = "dircache";
 

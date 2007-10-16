@@ -66,7 +66,7 @@ static int usb_mmc_countdown = 0;
 static long usb_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
 #endif
-static struct event_queue usb_queue NOCACHEBSS_ATTR;
+static struct event_queue usb_queue;
 static int last_usb_status;
 static bool usb_monitor_enabled;
 

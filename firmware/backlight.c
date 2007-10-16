@@ -95,7 +95,7 @@ const signed char backlight_timeout_value[19] =
 static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
-static struct event_queue backlight_queue NOCACHEBSS_ATTR;
+static struct event_queue backlight_queue;
 
 static int backlight_timer;
 static int backlight_timeout;

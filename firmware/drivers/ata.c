@@ -83,7 +83,7 @@ static bool lba48 = false; /* set for 48 bit addressing */
 #endif
 static long ata_stack[(DEFAULT_STACK_SIZE*3)/sizeof(long)];
 static const char ata_thread_name[] = "ata";
-static struct event_queue ata_queue NOCACHEBSS_ATTR;
+static struct event_queue ata_queue;
 static bool initialized = false;
 
 static long last_user_activity = -1;

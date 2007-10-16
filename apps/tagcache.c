@@ -88,7 +88,7 @@
 
 #ifndef __PCTOOL__
 /* Tag Cache thread. */
-static struct event_queue tagcache_queue NOCACHEBSS_ATTR;
+static struct event_queue tagcache_queue;
 static long tagcache_stack[(DEFAULT_STACK_SIZE + 0x4000)/sizeof(long)];
 static const char tagcache_thread_name[] = "tagcache";
 #endif
@@ -152,7 +152,7 @@ struct tagcache_command_entry {
 static struct tagcache_command_entry command_queue[TAGCACHE_COMMAND_QUEUE_LENGTH];
 static volatile int command_queue_widx = 0;
 static volatile int command_queue_ridx = 0;
-static struct mutex command_queue_mutex NOCACHEBSS_ATTR;
+static struct mutex command_queue_mutex;
 /* Timestamp of the last added event, so we can wait a bit before committing the
  * whole queue at once. */
 static long command_queue_timestamp = 0;
