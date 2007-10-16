@@ -1,95 +1,41 @@
 \subsection{Jewels}
 \screenshot{plugins/images/ss-jewels}{Jewels}{img:jewels}
 
-Jewels is a simple yet addicting game which involves swapping 
-pairs of jewels in order to form connected segments of three 
+Jewels is a simple yet addicting game which involves swapping
+pairs of jewels in order to form connected segments of three
 or more of the same type.
 
-The goal of the game is to score as many points as possible 
-before running out of available moves. Higher points are 
-awarded to larger combos. The game advances to the next level 
+The goal of the game is to score as many points as possible
+before running out of available moves. Higher points are
+awarded to larger combos. The game advances to the next level
 after every one hundred points and randomly clears several jewels.
 
-\opt{RECORDER_PAD}{
-  \begin{table}
-    \begin{btnmap}{}{}
-      \ButtonLeft, \ButtonRight, \ButtonUp{} and \ButtonDown 
-      & Move the cursor around the jewels \\
-      \ButtonPlay 
-      & Select a jewel \\
-      Long \ButtonPlay 
-      & Show the in-game menu\\
-      \ButtonOff 
-      & Exit\\
-    \end{btnmap}
-  \end{table}
-}
-\opt{ONDIO_PAD}{
-  \begin{table}
-    \begin{btnmap}{}{}
-      \ButtonLeft, \ButtonRight, \ButtonUp{} and \ButtonDown 
-      & Move the cursor around the jewels \\
-      \ButtonMenu 
-      & Select a jewel \\
-      Long \ButtonMenu 
-      & Show the in-game menu\\
-      \ButtonOff 
-      & Exit\\
-    \end{btnmap}
-  \end{table}
-}
-\opt{h1xx,h300}{
-  \begin{table}
-    \begin{btnmap}{}{}
-      \ButtonLeft, \ButtonRight, \ButtonUp{} and \ButtonDown 
-      & Move the cursor around the jewels \\
-      \ButtonSelect 
-      & Select a jewel \\
-      Long \ButtonSelect 
-      & Show the in-game menu\\
-      \ButtonOff 
-      & Exit\\
-    \end{btnmap}
-  \end{table}
-}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{
-  \begin{table}
-    \begin{btnmap}{}{}
-      \ButtonLeft, \ButtonRight, \ButtonMenu{} and \ButtonPlay
-      & Move the cursor around the jewels \\
-      \ButtonSelect 
-      & Select a jewel \\
-      Long \ButtonSelect 
-      & Show the in-game menu\\
-    \end{btnmap}
-  \end{table}
-  To exit the game, bring up the in-game menu and select \setting{Quit}\\
-}
-\opt{SANSA_E200_PAD}{
-  \begin{table}
-    \begin{btnmap}{}{}
-      \ButtonLeft, \ButtonRight, \ButtonUp{} and \ButtonDown
-      & Move the cursor around the jewels \\
-      \ButtonSelect 
-      & Select a jewel \\
-      Long \ButtonSelect 
-      & Show the in-game menu\\
-      \ButtonPower 
-      & Exit\\
-    \end{btnmap}
-  \end{table}
-}
-\opt{GIGABEAT_PAD}{
-  \begin{table}
-    \begin{btnmap}{}{}
-      \ButtonLeft, \ButtonRight, \ButtonUp{} and \ButtonDown
-      & Move the cursor around the jewels \\
-      \ButtonSelect 
-      & Select a jewel \\
-      \ButtonPower 
-      & Show the in-game menu\\
-    \end{btnmap}
-  \end{table}
-  To exit the game, bring up the in-game menu and select \setting{Quit}\\
-}
+\begin{table}
+  \begin{btnmap}{}{}
+    \ButtonLeft/\ButtonRight/\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,IAUDIO_X5_PAD}
+        {\ButtonUp/\ButtonDown}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu/\ButtonPlay}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown}
+    & Move the cursor around the jewels \\
+    \opt{RECORDER_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,IAUDIO_X5_PAD}
+        {\ButtonSelect}
+    & Select a jewel \\
+    \opt{RECORDER_PAD,IRIVER_H10_PAD}{Long \ButtonPlay}%
+    \opt{ONDIO_PAD}{Long \ButtonMenu}%
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,IAUDIO_X5_PAD}%
+        {Long \ButtonSelect}%
+  \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{% start here because latex didn't like skipping the bottom row
+    & Show the in-game menu \\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
+    \opt{IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,IAUDIO_X5_PAD}{\ButtonPower}%
+    & Exit \\}%
+  \opt{IPOD_4G_PAD,IPOD_3G_PAD}{% only finish this row for Ipods here
+    & Show the in-game menu \\}%
+  \end{btnmap}
+\end{table}
 
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}
+  {To exit the game, bring up the in-game menu and select \setting{Exit Jewels}.}
