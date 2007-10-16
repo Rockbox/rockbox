@@ -134,16 +134,33 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
 #define CSUB_X 2
 #define CSUB_Y 2
 
-#define RYFAC (31*257)
-#define GYFAC (31*257)
-#define BYFAC (31*257)
-#define RVFAC 11170     /* 31 * 257 *  1.402    */
-#define GVFAC (-5690)  /* 31 * 257 * -0.714136 */
-#define GUFAC (-2742)   /* 31 * 257 * -0.344136 */
-#define BUFAC 14118     /* 31 * 257 *  1.772    */
+/*   YUV- > RGB565 conversion
+ *   |R|   |1.000000 -0.000001  1.402000| |Y'|
+ *   |G| = |1.000000 -0.334136 -0.714136| |Pb|
+ *   |B|   |1.000000  1.772000  0.000000| |Pr|
+ *   Scaled, normalized, rounded and tweaked to yield RGB 565:
+ *   |R|   |74   0 101| |Y' -  16| >> 9
+ *   |G| = |74 -24 -51| |Cb - 128| >> 8
+ *   |B|   |74 128   0| |Cr - 128| >> 9
+*/
 
-#define ROUNDOFFS (127*257)
-#define ROUNDOFFSG (63*257)
+#define RGBYFAC   74   /*  1.0      */
+#define RVFAC    101   /*  1.402    */
+#define GVFAC   (-51)  /* -0.714136 */
+#define GUFAC   (-24)  /* -0.334136 */
+#define BUFAC    128   /*  1.772    */
+
+/* ROUNDOFFS contain constant for correct round-offs as well as
+   constant parts of the conversion matrix (e.g. (Y'-16)*RGBYFAC
+   -> constant part = -16*RGBYFAC). Through extraction of these
+   constant parts we save at leat 4 substractions in the conversion
+   loop */
+#define ROUNDOFFSR (256 - 16*RGBYFAC - 128*RVFAC)
+#define ROUNDOFFSG (128 - 16*RGBYFAC - 128*GVFAC - 128*GUFAC)
+#define ROUNDOFFSB (256 - 16*RGBYFAC             - 128*BUFAC)
+
+#define MAX_5BIT 0x1f
+#define MAX_6BIT 0x3f
 
 /* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_yuv_blit(unsigned char * const src[3],
@@ -225,10 +242,9 @@ void lcd_yuv_blit(unsigned char * const src[3],
         const unsigned char *vsrc = src[2] + uvoffset;
         const unsigned char *row_end = ysrc + width;
 
-        int y, u, v;
+        int yp, up, vp;
         int red1, green1, blue1;
         int red2, green2, blue2;
-        unsigned rbits, gbits, bbits;
 
         int rc, gc, bc;
         int pixels_to_write;
@@ -257,94 +273,52 @@ void lcd_yuv_blit(unsigned char * const src[3],
 
         do
         {
-            u = *usrc++ - 128;
-            v = *vsrc++ - 128;
-            rc = RVFAC * v + ROUNDOFFS;
-            gc = GVFAC * v + GUFAC * u + ROUNDOFFSG;
-            bc = BUFAC * u + ROUNDOFFS;
+            up = *usrc++;
+            vp = *vsrc++;
+            rc = RVFAC * vp              + ROUNDOFFSR;
+            gc = GVFAC * vp + GUFAC * up + ROUNDOFFSG;
+            bc =              BUFAC * up + ROUNDOFFSB;
+            
+            /* Pixel 1 -> RGB565 */
+            yp = *ysrc++ * RGBYFAC;
+            red1   = (yp + rc) >> 9;
+            green1 = (yp + gc) >> 8;
+            blue1  = (yp + bc) >> 9;
 
-            /* Pixel 1 */
-            y = *ysrc++;
-
-            red1   = RYFAC * y + rc;
-            green1 = GYFAC * y + gc;
-            blue1  = BYFAC * y + bc;
-
-            /* Pixel 2 */
-            y = *ysrc++;
-            red2   = RYFAC * y + rc;
-            green2 = GYFAC * y + gc;
-            blue2  = BYFAC * y + bc;
+            /* Pixel 2 -> RGB565 */
+            yp = *ysrc++ * RGBYFAC;
+            red2   = (yp + rc) >> 9;
+            green2 = (yp + gc) >> 8;
+            blue2  = (yp + bc) >> 9;
 
             /* Since out of bounds errors are relatively rare, we check two
                pixels at once to see if any components are out of bounds, and
                then fix whichever is broken. This works due to high values and
-               negative values both becoming larger than the cutoff when
-               casted to unsigned.  And ORing them together checks all of them
-               simultaneously.  */
-            if (((unsigned)(red1 | green1 | blue1 |
-                     red2 | green2 | blue2)) > (RYFAC*255+ROUNDOFFS)) {
-                if (((unsigned)(red1 | green1 | blue1)) > 
-                    (RYFAC*255+ROUNDOFFS)) {
-                    if ((unsigned)red1 > (RYFAC*255+ROUNDOFFS))
-                    {
-                        if (red1 < 0)
-                            red1 = 0;
-                        else
-                            red1 = (RYFAC*255+ROUNDOFFS);
-                    }
-                    if ((unsigned)green1 > (GYFAC*255+ROUNDOFFSG))
-                    {
-                        if (green1 < 0)
-                            green1 = 0;
-                        else
-                            green1 = (GYFAC*255+ROUNDOFFSG);
-                    }
-                    if ((unsigned)blue1 > (BYFAC*255+ROUNDOFFS))
-                    {
-                        if (blue1 < 0)
-                            blue1 = 0;
-                        else
-                            blue1 = (BYFAC*255+ROUNDOFFS);
-                    }
-                }
-
-                if (((unsigned)(red2 | green2 | blue2)) > 
-                    (RYFAC*255+ROUNDOFFS)) {
-                    if ((unsigned)red2 > (RYFAC*255+ROUNDOFFS))
-                    {
-                        if (red2 < 0)
-                            red2 = 0;
-                        else
-                            red2 = (RYFAC*255+ROUNDOFFS);
-                    }
-                    if ((unsigned)green2 > (GYFAC*255+ROUNDOFFSG))
-                    {
-                        if (green2 < 0)
-                            green2 = 0;
-                        else
-                            green2 = (GYFAC*255+ROUNDOFFSG);
-                    }
-                    if ((unsigned)blue2 > (BYFAC*255+ROUNDOFFS))
-                    {
-                        if (blue2 < 0)
-                            blue2 = 0;
-                        else
-                            blue2 = (BYFAC*255+ROUNDOFFS);
-                    }
-                }
+               negative values both being !=0 when bitmasking them.
+               We first check for red and blue components (5bit range). */
+            if ((red1 | blue1 | red2 | blue2) & ~MAX_5BIT)
+            {
+                if (red1  & ~MAX_5BIT)
+                    red1  = (red1  >> 31) ? 0 : MAX_5BIT;
+                if (blue1 & ~MAX_5BIT)
+                    blue1 = (blue1 >> 31) ? 0 : MAX_5BIT;
+                if (red2  & ~MAX_5BIT)
+                    red2  = (red2  >> 31) ? 0 : MAX_5BIT;
+                if (blue2 & ~MAX_5BIT)
+                    blue2 = (blue2 >> 31) ? 0 : MAX_5BIT;
             }
-                
-            rbits = red1 >> 16 ;
-            gbits = green1 >> 15 ;
-            bbits = blue1 >> 16 ;
+            /* We second check for green component (6bit range) */
+            if ((green1 | green2) & ~MAX_6BIT)
+            {
+                if (green1 & ~MAX_6BIT)
+                    green1 = (green1 >> 31) ? 0 : MAX_6BIT;
+                if (green2 & ~MAX_6BIT)
+                    green2 = (green2 >> 31) ? 0 : MAX_6BIT;
+            }
 
-            pixel1 = swap16((rbits << 11) | (gbits << 5) | bbits);
+            pixel1 = swap16((red1 << 11) | (green1 << 5) | blue1);
 
-            rbits = red2 >> 16 ;
-            gbits = green2 >> 15 ;
-            bbits = blue2 >> 16 ;
-            pixel2 = swap16((rbits << 11) | (gbits << 5) | bbits);
+            pixel2 = swap16((red2 << 11) | (green2 << 5) | blue2);
 
             while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
 

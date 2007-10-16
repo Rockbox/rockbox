@@ -135,14 +135,16 @@ void lcd_update_rect(int x, int y, int width, int height)
         }
     }
 
-    if (finishup_needed) {
-        unsigned int data;
+    if (finishup_needed) 
+    {
         /* Bottom-half of original lcd_bcm_finishup() function */
-        do {
-            /* This function takes about 14ms to execute - so we yield() */
+        unsigned int data = lcd_bcm_read32(0x1F8);
+        while (data == 0xFFFA0005 || data == 0xFFFF) 
+        {
+            /* This loop can wait for up to 14ms - so we yield() */
             yield();
             data = lcd_bcm_read32(0x1F8);
-        } while (data == 0xFFFA0005 || data == 0xFFFF);
+        } 
     }
 
     lcd_bcm_read32(0x1FC);
@@ -236,15 +238,19 @@ void lcd_update(void)
 /* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
+                  int x, int y, int width, int height) ICODE_ATTR;
+void lcd_yuv_blit(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
     width = (width + 1) & ~1;
 
-    if (finishup_needed) {
-        unsigned int data;
+    if (finishup_needed) 
+    {
         /* Bottom-half of original lcd_bcm_finishup() function */
-        data = lcd_bcm_read32(0x1F8);
-        while (data == 0xFFFA0005 || data == 0xFFFF) {
+        unsigned int data = lcd_bcm_read32(0x1F8);
+        while (data == 0xFFFA0005 || data == 0xFFFF) 
+        {
             /* This loop can wait for up to 14ms - so we yield() */
             yield();
             data = lcd_bcm_read32(0x1F8);
@@ -321,28 +327,22 @@ void lcd_yuv_blit(unsigned char * const src[3],
                We first check for red and blue components (5bit range). */
             if ((red1 | blue1 | red2 | blue2) & ~MAX_5BIT)
             {
-                if ((red1 | blue1) & ~MAX_5BIT)
-                {
-                    if (red1 & ~MAX_5BIT)
-                        red1  = (red1  >> 31) ? 0 : MAX_5BIT;
-                    if (blue1 & ~MAX_5BIT)
-                        blue1 = (blue1 >> 31) ? 0 : MAX_5BIT;
-                }
-                if ((red2 | blue2) & ~MAX_5BIT)
-                {
-                    if (red2 & ~MAX_5BIT)
-                        red2  = (red2 >> 31) ? 0 : MAX_5BIT;
-                    if (blue2 & ~MAX_5BIT)
-                        blue2 = (blue2 >> 31) ? 0 : MAX_5BIT;
-                }
+                if (red1  & ~MAX_5BIT)
+                    red1  = (red1  >> 31) ? 0 : MAX_5BIT;
+                if (blue1 & ~MAX_5BIT)
+                    blue1 = (blue1 >> 31) ? 0 : MAX_5BIT;
+                if (red2  & ~MAX_5BIT)
+                    red2  = (red2  >> 31) ? 0 : MAX_5BIT;
+                if (blue2 & ~MAX_5BIT)
+                    blue2 = (blue2 >> 31) ? 0 : MAX_5BIT;
             }
             /* We second check for green component (6bit range) */
             if ((green1 | green2) & ~MAX_6BIT)
             {
-                    if (green1 & ~MAX_6BIT)
-                        green1 = (green1 >> 31) ? 0 : MAX_6BIT;
-                    if (green2 & ~MAX_6BIT)
-                        green2 = (green2 >> 31) ? 0 : MAX_6BIT;
+                if (green1 & ~MAX_6BIT)
+                    green1 = (green1 >> 31) ? 0 : MAX_6BIT;
+                if (green2 & ~MAX_6BIT)
+                    green2 = (green2 >> 31) ? 0 : MAX_6BIT;
             }
             
             /* pixel1 */
