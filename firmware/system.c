@@ -35,6 +35,13 @@ long cpu_frequency NOCACHEBSS_ATTR = CPU_FREQ;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static int boost_counter NOCACHEBSS_ATTR = 0;
 static bool cpu_idle NOCACHEBSS_ATTR = false;
+#if NUM_CORES > 1
+struct spinlock boostctrl_spin NOCACHEBSS_ATTR;
+void cpu_boost_init(void)
+{
+    spinlock_init(&boostctrl_spin, SPINLOCK_NO_TASK_SWITCH);
+}
+#endif
 
 int get_cpu_boost_counter(void)
 {
@@ -52,25 +59,51 @@ int cpu_boost_log_getcount(void)
 }
 char * cpu_boost_log_getlog_first(void)
 {
+    char *first;
+#if NUM_CORES > 1
+    spinlock_lock(&boostctrl_spin);
+#endif
+
+    first = NULL;
+
     if (cpu_boost_calls_count)
     {
         cpu_boost_track_message = 1;
-        return cpu_boost_calls[cpu_boost_first];
+        first = cpu_boost_calls[cpu_boost_first];
     }
-    else return NULL;
+
+#if NUM_CORES > 1
+    spinlock_unlock(&boostctrl_spin);
+#endif
 }
 char * cpu_boost_log_getlog_next(void)
 {
-    int message = (cpu_boost_track_message+cpu_boost_first)%MAX_BOOST_LOG;
+    int message;
+    char *next;
+
+#if NUM_CORES > 1
+    spinlock_lock(&boostctrl_spin);
+#endif
+
+    message = (cpu_boost_track_message+cpu_boost_first)%MAX_BOOST_LOG;
+    next = NULL;
+
     if (cpu_boost_track_message < cpu_boost_calls_count)
     {
         cpu_boost_track_message++;
-        return cpu_boost_calls[message];
+        next = cpu_boost_calls[message];
     }
-    else return NULL;
+
+#if NUM_CORES > 1
+    spinlock_unlock(&boostctrl_spin);
+#endif
 }
 void cpu_boost_(bool on_off, char* location, int line)
 {
+#if NUM_CORES > 1
+    spinlock_lock(&boostctrl_spin);
+#endif
+
     if (cpu_boost_calls_count == MAX_BOOST_LOG)
     {
         cpu_boost_first = (cpu_boost_first+1)%MAX_BOOST_LOG;
@@ -88,32 +121,46 @@ void cpu_boost_(bool on_off, char* location, int line)
 #else
 void cpu_boost(bool on_off)
 {
+#if NUM_CORES > 1
+    spinlock_lock(&boostctrl_spin);
 #endif
+
+#endif /* CPU_BOOST_LOGGING */
     if(on_off)
     {
         /* Boost the frequency if not already boosted */
-        if(boost_counter++ == 0)
+        if(++boost_counter == 1)
             set_cpu_frequency(CPUFREQ_MAX);
     }
     else
     {
         /* Lower the frequency if the counter reaches 0 */
-        if(--boost_counter == 0)
+        if(--boost_counter <= 0)
         {
             if(cpu_idle)
                 set_cpu_frequency(CPUFREQ_DEFAULT);
             else
                 set_cpu_frequency(CPUFREQ_NORMAL);
-        }
 
-        /* Safety measure */
-        if(boost_counter < 0)
-            boost_counter = 0;
+            /* Safety measure */
+            if (boost_counter < 0)
+            {
+                boost_counter = 0;
+            }
+        }
     }
+
+#if NUM_CORES > 1
+    spinlock_unlock(&boostctrl_spin);
+#endif
 }
 
 void cpu_idle_mode(bool on_off)
 {
+#if NUM_CORES > 1
+    spinlock_lock(&boostctrl_spin);
+#endif
+
     cpu_idle = on_off;
 
     /* We need to adjust the frequency immediately if the CPU
@@ -125,6 +172,10 @@ void cpu_idle_mode(bool on_off)
         else
             set_cpu_frequency(CPUFREQ_NORMAL);
     }
+
+#if NUM_CORES > 1
+    spinlock_unlock(&boostctrl_spin);
+#endif
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
@@ -199,6 +250,7 @@ void UIE(unsigned int pc, unsigned int num)
         /* TODO: perhaps add button handling in here when we get a polling
            driver some day.
          */
+        core_idle();
     }
 }
 

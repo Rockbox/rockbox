@@ -153,7 +153,7 @@ void usb_screen(void)
 #ifdef HAVE_MMC
 int mmc_remove_request(void)
 {
-    struct event ev;
+    struct queue_event ev;
     int i;
     FOR_NB_SCREENS(i)
         screens[i].clear_display();

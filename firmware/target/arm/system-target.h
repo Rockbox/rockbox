@@ -46,6 +46,10 @@
 #define inw(a) (*(volatile unsigned short *) (a))
 #define outw(a,b) (*(volatile unsigned short *) (b) = (a))
 
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && NUM_CORES > 1
+extern struct spinlock boostctrl_spin;
+#endif
+
 static inline void udelay(unsigned usecs)
 {
     unsigned stop = USEC_TIMER + usecs;
@@ -106,7 +110,6 @@ void flush_icache(void);
 #endif
 
 #endif /* CPU_PP502x */
-
 
 #endif /* CPU_PP */
 

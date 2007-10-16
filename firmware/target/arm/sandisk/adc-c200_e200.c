@@ -21,8 +21,6 @@
 #include "i2c-pp.h"
 #include "as3514.h"
 
-static struct mutex adc_mutex NOCACHEBSS_ATTR;
-
 /* Read 10-bit channel data */
 unsigned short adc_read(int channel)
 {
@@ -30,7 +28,7 @@ unsigned short adc_read(int channel)
 
     if ((unsigned)channel < NUM_ADC_CHANNELS)
     {
-        spinlock_lock(&adc_mutex);
+        spinlock_lock(&i2c_spin);
 
         /* Select channel */
         if (pp_i2c_send( AS3514_I2C_ADDR, ADC_0, (channel << 4)) >= 0)
@@ -44,7 +42,7 @@ unsigned short adc_read(int channel)
             }
         }
 
-        spinlock_unlock(&adc_mutex);
+        spinlock_unlock(&i2c_spin);
     }
     
     return data;
@@ -52,5 +50,4 @@ unsigned short adc_read(int channel)
 
 void adc_init(void)
 {
-    spinlock_init(&adc_mutex);
 }

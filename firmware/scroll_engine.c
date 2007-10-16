@@ -46,7 +46,7 @@ struct scrollinfo lcd_scroll[LCD_SCROLLABLE_LINES];
 
 #ifdef HAVE_REMOTE_LCD
 struct scrollinfo lcd_remote_scroll[LCD_REMOTE_SCROLLABLE_LINES];
-struct event_queue scroll_queue;
+struct event_queue scroll_queue NOCACHEBSS_ATTR;
 #endif
 
 struct scroll_screen_info lcd_scroll_info =
@@ -150,7 +150,7 @@ static void sync_display_ticks(void)
 
 static bool scroll_process_message(int delay)
 {
-    struct event ev;
+    struct queue_event ev;
 
     do
     {
@@ -268,7 +268,7 @@ void scroll_init(void)
     queue_init(&scroll_queue, true);
 #endif
     create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name
+                  sizeof(scroll_stack), 0, scroll_name
                   IF_PRIO(, PRIORITY_USER_INTERFACE)
-                  IF_COP(, CPU, false));
+                  IF_COP(, CPU));
 }

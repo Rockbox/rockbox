@@ -45,6 +45,10 @@
 
 /* TODO: Fully implement i2c driver */
 
+/* To be used by drivers that need to do multiple i2c operations
+   atomically */
+extern struct spinlock i2c_spin;
+
 void i2c_init(void);
 int i2c_readbyte(unsigned int dev_addr, int addr);
 int pp_i2c_send(unsigned int addr, int data0, int data1);

@@ -132,18 +132,18 @@ static int pp_i2c_send_byte(unsigned int addr, int data0)
 }
 
 /* Public functions */
-static struct mutex i2c_mutex;
+struct spinlock i2c_spin NOCACHEBSS_ATTR;
 
 int i2c_readbytes(unsigned int dev_addr, int addr, int len, unsigned char *data) {
     unsigned int temp;
     int i;
-    spinlock_lock(&i2c_mutex);
+    spinlock_lock(&i2c_spin);
     pp_i2c_send_byte(dev_addr, addr);
     for (i = 0; i < len; i++) {
         pp_i2c_read_byte(dev_addr, &temp);
         data[i] = temp;
     }
-    spinlock_unlock(&i2c_mutex);
+    spinlock_unlock(&i2c_spin);
     return i;
 }
 
@@ -151,10 +151,10 @@ int i2c_readbyte(unsigned int dev_addr, int addr)
 {
     int data;
 
-    spinlock_lock(&i2c_mutex);
+    spinlock_lock(&i2c_spin);
     pp_i2c_send_byte(dev_addr, addr);
     pp_i2c_read_byte(dev_addr, &data);
-    spinlock_unlock(&i2c_mutex);
+    spinlock_unlock(&i2c_spin);
 
     return data;
 }
@@ -167,9 +167,9 @@ int pp_i2c_send(unsigned int addr, int data0, int data1)
     data[0] = data0;
     data[1] = data1;
 
-    spinlock_lock(&i2c_mutex);
+    spinlock_lock(&i2c_spin);
     retval = pp_i2c_send_bytes(addr, 2, data);
-    spinlock_unlock(&i2c_mutex);
+    spinlock_unlock(&i2c_spin);
 
     return retval;
 }
@@ -221,7 +221,7 @@ void i2c_init(void)
 #endif
 #endif
 
-    spinlock_init(&i2c_mutex);
+    spinlock_init(&i2c_spin IF_COP(, SPINLOCK_TASK_SWITCH));
 
     i2c_readbyte(0x8, 0);
 }

@@ -197,7 +197,7 @@ struct fat_cache_entry
 
 static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE];
 static struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
-static struct mutex cache_mutex;
+static struct mutex cache_mutex NOCACHEBSS_ATTR;
 
 static long cluster2sec(IF_MV2(struct bpb* fat_bpb,) long cluster)
 {

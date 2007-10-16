@@ -215,7 +215,7 @@ void thread(void)
 #endif    
     long sleep_time = 5 * HZ;
     
-    struct event ev;
+    struct queue_event ev;
 
     buffelements = sizeof(bat)/sizeof(struct batt_info);
 
@@ -500,9 +500,9 @@ int main(void)
     
     rb->queue_init(&thread_q, true); /* put the thread's queue in the bcast list */
     if(rb->create_thread(thread, thread_stack,
-        sizeof(thread_stack), "Battery Benchmark" 
+        sizeof(thread_stack), 0, "Battery Benchmark" 
         IF_PRIO(, PRIORITY_BACKGROUND)
-	IF_COP(, CPU, false)) == NULL)
+	    IF_COP(, CPU)) == NULL)
     {
         rb->splash(HZ, "Cannot create thread!");
         return PLUGIN_ERROR;

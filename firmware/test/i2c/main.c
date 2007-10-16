@@ -708,7 +708,7 @@ int main(void)
 
 
 
-    create_thread(mpeg_thread, stack - 0x2000, 0x4000);
+    create_thread(mpeg_thread, stack - 0x2000, 0x4000, 0);
 
 
 
@@ -1004,7 +1004,7 @@ void mpeg_thread(void)
 
 {
 
-    struct event ev;
+    struct queue_event ev;
 
     int len;
 

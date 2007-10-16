@@ -282,9 +282,13 @@
 #define HAVE_EXTENDED_MESSAGING_AND_NAME
 #endif
 
-#if (CONFIG_CODEC == SWCODEC) && !defined(SIMULATOR) && !defined(BOOTLOADER)
+#if (CONFIG_CODEC == SWCODEC) && !defined(BOOTLOADER)
+#ifndef SIMULATOR
 #define HAVE_PRIORITY_SCHEDULING
 #define HAVE_SCHEDULER_BOOSTCTRL
+#endif /* SIMULATOR */
+#define HAVE_SEMAPHORE_OBJECTS
+#define HAVE_EVENT_OBJECTS
 #endif
 
 /* define for all cpus from SH family */
@@ -363,22 +367,57 @@
 #define IRAM_LCDFRAMEBUFFER
 #endif
 
+/* Change this if you want to build a single-core firmware for a multicore
+ * target for debugging */
+#if defined(BOOTLOADER)
+#define FORCE_SINGLE_CORE
+#endif
+
+/* Core locking types - specifies type of atomic operation */
+#define CORELOCK_NONE   0
+#define SW_CORELOCK     1 /* Mutual exclusion provided by a software algorithm
+                             and not a special semaphore instruction */
+#define CORELOCK_SWAP   2 /* A swap (exchange) instruction */
+
 /* Dual core support - not yet working on the 1G/2G and 3G iPod */
 #if defined(CPU_PP)
 #define IDLE_STACK_SIZE  0x80
 #define IDLE_STACK_WORDS 0x20
 
-#if !defined(BOOTLOADER) && CONFIG_CPU != PP5002
+#if !defined(FORCE_SINGLE_CORE) && CONFIG_CPU != PP5002
+
 #define NUM_CORES 2
 #define CURRENT_CORE current_core()
-/* Hopefully at some point we will learn how to mark areas of main memory as
- * not to be cached.  Until then, use IRAM for variables shared across cores */
+/* Use IRAM for variables shared across cores - large memory buffers should
+ * use UNCACHED_ADDR(a) and be appropriately aligned and padded */
 #define NOCACHEBSS_ATTR IBSS_ATTR
 #define NOCACHEDATA_ATTR IDATA_ATTR
 
-#define IF_COP(...) __VA_ARGS__
+#define IF_COP(...)         __VA_ARGS__
+#define IF_COP_VOID(...)    __VA_ARGS__
+#define IF_COP_CORE(core)   core
+
+#if CONFIG_CPU == PP5020
+#define CONFIG_CORELOCK SW_CORELOCK /* SWP(B) is broken */
+#else
+#define CONFIG_CORELOCK CORELOCK_SWAP
+#endif
+
 #endif /* !defined(BOOTLOADER) && CONFIG_CPU != PP5002 */
+
 #endif /* CPU_PP */
+
+#ifndef CONFIG_CORELOCK
+#define CONFIG_CORELOCK CORELOCK_NONE
+#endif
+
+#if CONFIG_CORELOCK == SW_CORELOCK
+#define IF_SWCL(...) __VA_ARGS__
+#define IFN_SWCL(...)
+#else
+#define IF_SWCL(...)
+#define IFN_SWCL(...) __VA_ARGS__
+#endif /* CONFIG_CORELOCK == */
 
 #ifndef NUM_CORES
 /* Default to single core */
@@ -386,8 +425,12 @@
 #define CURRENT_CORE CPU
 #define NOCACHEBSS_ATTR
 #define NOCACHEDATA_ATTR
+#define CONFIG_CORELOCK CORELOCK_NONE
 
 #define IF_COP(...)
+#define IF_COP_VOID(...)    void
+#define IF_COP_CORE(core)   CURRENT_CORE
+
 #endif /* NUM_CORES */
 
 #endif /* __CONFIG_H__ */

@@ -29,7 +29,7 @@ volatile long current_tick = 0;
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
 /* This array holds all queues that are initiated. It is used for broadcast. */
-static struct event_queue *all_queues[32];
+static struct event_queue *all_queues[MAX_NUM_QUEUES];
 static int num_queues = 0;
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
@@ -53,7 +53,7 @@ static void queue_release_sender(struct thread_entry **sender,
                                  intptr_t retval)
 {
     (*sender)->retval = retval;
-    wakeup_thread(sender);
+    wakeup_thread_no_listlock(sender);
     if(*sender != NULL)
     {
         fprintf(stderr, "queue->send slot ovf: %p\n", *sender);
@@ -98,14 +98,14 @@ void queue_init(struct event_queue *q, bool register_queue)
 {
     q->read   = 0;
     q->write  = 0;
-    q->thread = NULL;
+    thread_queue_init(&q->queue);
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     q->send   = NULL; /* No message sending by default */
 #endif
 
     if(register_queue)
     {
-        if(num_queues >= 32)
+        if(num_queues >= MAX_NUM_QUEUES)
         {
             fprintf(stderr, "queue_init->out of queues");
             exit(-1);
@@ -142,7 +142,7 @@ void queue_delete(struct event_queue *q)
     }
 
     /* Release threads waiting on queue head */
-    wakeup_thread(&q->thread);
+    thread_queue_wake(&q->queue);
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     /* Release waiting threads and reply to any dequeued message
@@ -155,7 +155,7 @@ void queue_delete(struct event_queue *q)
     q->write = 0;
 }
 
-void queue_wait(struct event_queue *q, struct event *ev)
+void queue_wait(struct event_queue *q, struct queue_event *ev)
 {
     unsigned int rd;
 
@@ -169,7 +169,11 @@ void queue_wait(struct event_queue *q, struct event *ev)
 
     if (q->read == q->write)
     {
-        block_thread(&q->thread);
+        do
+        {
+            block_thread(&q->queue);
+        }
+        while (q->read == q->write);
     }
 
     rd = q->read++ & QUEUE_LENGTH_MASK;
@@ -184,7 +188,7 @@ void queue_wait(struct event_queue *q, struct event *ev)
 #endif
 }
 
-void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
+void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 {
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     if (q->send && q->send->curr_sender)
@@ -196,7 +200,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 
     if (q->read == q->write && ticks > 0)
     {
-        block_thread_w_tmo(&q->thread, ticks);
+        block_thread_w_tmo(&q->queue, ticks);
     }
 
     if(q->read != q->write)
@@ -238,7 +242,7 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
     }
 #endif
 
-    wakeup_thread(&q->thread);
+    wakeup_thread(&q->queue);
 }
 
 /* Special thread-synced queue_post for button driver or any other preemptive sim thread */
@@ -268,9 +272,9 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
             queue_release_sender(spp, 0);
         }
 
-        wakeup_thread(&q->thread);
+        wakeup_thread(&q->queue);
 
-        block_thread(spp);
+        block_thread_no_listlock(spp);
         return thread_get_current()->retval;
     }
 
@@ -370,7 +374,7 @@ int queue_syncbroadcast(long id, intptr_t data)
 
 void yield(void)
 {
-    switch_thread(true, NULL);
+    switch_thread(NULL);
 }
 
 void sleep(int ticks)
@@ -431,39 +435,218 @@ int tick_remove_task(void (*f)(void))
    multitasking, but is better than nothing at all */
 void mutex_init(struct mutex *m)
 {
+    m->queue = NULL;
     m->thread = NULL;
+    m->count = 0;
     m->locked = 0;
 }
 
 void mutex_lock(struct mutex *m)
 {
-    if (test_and_set(&m->locked, 1))
+    struct thread_entry *const thread = thread_get_current();
+
+    if(thread == m->thread)
     {
-        block_thread(&m->thread);
+        m->count++;
+        return;
     }
+
+    if (!test_and_set(&m->locked, 1))
+    {
+        m->thread = thread;
+        return;
+    }
+
+    block_thread_no_listlock(&m->queue);
 }
 
 void mutex_unlock(struct mutex *m)
 {
-    if (m->thread != NULL)
+    /* unlocker not being the owner is an unlocking violation */
+    if(m->thread != thread_get_current())
     {
-        wakeup_thread(&m->thread);
+        fprintf(stderr, "spinlock_unlock->wrong thread");
+        exit(-1);
+    }    
+
+    if (m->count > 0)
+    {
+        /* this thread still owns lock */
+        m->count--;
+        return;
     }
-    else
+
+    m->thread = wakeup_thread_no_listlock(&m->queue);
+
+    if (m->thread == NULL)
     {
+        /* release lock */
         m->locked = 0;
     }
 }
 
-void spinlock_lock(struct mutex *l)
+void spinlock_init(struct spinlock *l)
 {
+    l->locked = 0;
+    l->thread = NULL;
+    l->count = 0;
+}
+
+void spinlock_lock(struct spinlock *l)
+{
+    struct thread_entry *const thread = thread_get_current();
+
+    if (l->thread == thread)
+    {
+        l->count++;
+        return;
+    }
+
     while(test_and_set(&l->locked, 1))
     {
-        switch_thread(true, NULL);
+        switch_thread(NULL);
+    }
+
+    l->thread = thread;
+}
+
+void spinlock_unlock(struct spinlock *l)
+{
+    /* unlocker not being the owner is an unlocking violation */
+    if(l->thread != thread_get_current())
+    {
+        fprintf(stderr, "spinlock_unlock->wrong thread");
+        exit(-1);
+    }    
+
+    if (l->count > 0)
+    {
+        /* this thread still owns lock */
+        l->count--;
+        return;
+    }
+
+    /* clear owner */
+    l->thread = NULL;
+    l->locked = 0;
+}
+
+void semaphore_init(struct semaphore *s, int max, int start)
+{
+    if(max <= 0 || start < 0 || start > max)
+    {
+        fprintf(stderr, "semaphore_init->inv arg");
+        exit(-1);
+    }
+    s->queue = NULL;
+    s->max = max;
+    s->count = start;
+}
+
+void semaphore_wait(struct semaphore *s)
+{
+    if(--s->count >= 0)
+        return;
+    block_thread_no_listlock(&s->queue);
+}
+
+void semaphore_release(struct semaphore *s)
+{
+    if(s->count < s->max)
+    {
+        if(++s->count <= 0)
+        {
+            if(s->queue == NULL)
+            {
+                /* there should be threads in this queue */
+                fprintf(stderr, "semaphore->wakeup");
+                exit(-1);
+            }
+            /* a thread was queued - wake it up */
+            wakeup_thread_no_listlock(&s->queue);
+        }
     }
 }
 
-void spinlock_unlock(struct mutex *l)
+void event_init(struct event *e, unsigned int flags)
 {
-    l->locked = 0;
+    e->queues[STATE_NONSIGNALED] = NULL;
+    e->queues[STATE_SIGNALED] = NULL;
+    e->state = flags & STATE_SIGNALED;
+    e->automatic = (flags & EVENT_AUTOMATIC) ? 1 : 0;
+}
+
+void event_wait(struct event *e, unsigned int for_state)
+{
+    unsigned int last_state = e->state;
+
+    if(e->automatic != 0)
+    {
+        /* wait for false always satisfied by definition
+           or if it just changed to false */
+        if(last_state == STATE_SIGNALED || for_state == STATE_NONSIGNALED)
+        {
+            /* automatic - unsignal */
+            e->state = STATE_NONSIGNALED;
+            return;
+        }
+        /* block until state matches */
+    }
+    else if(for_state == last_state)
+    {
+        /* the state being waited for is the current state */
+        return;
+    }
+
+    /* current state does not match wait-for state */
+    block_thread_no_listlock(&e->queues[for_state]);
+}
+
+void event_set_state(struct event *e, unsigned int state)
+{
+    unsigned int last_state = e->state;
+
+    if(last_state == state)
+    {
+        /* no change */
+        return;
+    }
+
+    if(state == STATE_SIGNALED)
+    {
+        if(e->automatic != 0)
+        {
+            struct thread_entry *thread;
+
+            if(e->queues[STATE_NONSIGNALED] != NULL)
+            {
+                /* no thread should have ever blocked for nonsignaled */
+                fprintf(stderr, "set_event_state->queue[NS]:S");
+                exit(-1);
+            }
+
+            /* pass to next thread and keep unsignaled - "pulse" */
+            thread = wakeup_thread_no_listlock(&e->queues[STATE_SIGNALED]);
+            e->state = thread != NULL ? STATE_NONSIGNALED : STATE_SIGNALED;
+        }
+        else
+        {
+            /* release all threads waiting for signaled */
+            thread_queue_wake_no_listlock(&e->queues[STATE_SIGNALED]);
+            e->state = STATE_SIGNALED;
+        }
+    }
+    else
+    {
+        /* release all threads waiting for unsignaled */
+        if(e->queues[STATE_NONSIGNALED] != NULL && e->automatic != 0)
+        {
+            /* no thread should have ever blocked */
+            fprintf(stderr, "set_event_state->queue[NS]:NS");
+            exit(-1);
+        }
+
+        thread_queue_wake_no_listlock(&e->queues[STATE_NONSIGNALED]);
+        e->state = STATE_NONSIGNALED;
+    }
 }

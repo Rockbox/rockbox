@@ -34,11 +34,15 @@
 /* Each processor has two mailboxes it can write to and two which
    it can read from.  We define the first to be for sending messages
    and the second for replying to messages */
-#define CPU_MESSAGE      (*(volatile unsigned long *)(0x60001000))
-#define COP_MESSAGE      (*(volatile unsigned long *)(0x60001004))
-#define CPU_REPLY        (*(volatile unsigned long *)(0x60001008))
-#define COP_REPLY        (*(volatile unsigned long *)(0x6000100c))
-#define MBOX_CONTROL     (*(volatile unsigned long *)(0x60001010))
+#define CPU_MESSAGE         (*(volatile unsigned long *)(0x60001000))
+#define COP_MESSAGE         (*(volatile unsigned long *)(0x60001004))
+#define CPU_REPLY           (*(volatile unsigned long *)(0x60001008))
+#define COP_REPLY           (*(volatile unsigned long *)(0x6000100c))
+#define MBOX_CONTROL        (*(volatile unsigned long *)(0x60001010))
+
+/* Simple convenient array-like access */
+#define PROC_MESSAGE(core)  ((&CPU_MESSAGE)[core])
+#define PROC_REPLY(core)    ((&CPU_REPLY)[core])
 
 /* Interrupts */
 #define CPU_INT_STAT        (*(volatile unsigned long*)(0x60004000))
@@ -142,6 +146,7 @@
 /* Processors Control */
 #define CPU_CTL          (*(volatile unsigned long *)(0x60007000))
 #define COP_CTL          (*(volatile unsigned long *)(0x60007004))
+#define PROC_CTL(core)   ((&CPU_CTL)[core])
 
 #define PROC_SLEEP     0x80000000
 #define PROC_WAIT      0x40000000

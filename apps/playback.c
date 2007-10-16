@@ -290,8 +290,8 @@ static void set_current_codec(int codec_idx);
 static void set_filebuf_watermark(int seconds);
 
 /* Audio thread */
-static struct event_queue       audio_queue;
-static struct queue_sender_list audio_queue_sender_list;
+static struct event_queue       audio_queue NOCACHEBSS_ATTR;
+static struct queue_sender_list audio_queue_sender_list NOCACHEBSS_ATTR;
 static long audio_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
 static const char audio_thread_name[] = "audio";
 
@@ -340,9 +340,10 @@ static unsigned char *dram_buf = NULL;
    automatically swaps in the other and the swap when unlocking should not
    happen if the parity is even.
  */
-static bool          swap_codec_parity = false; /* true=odd, false=even */
-/* Mutex to control which codec (normal/voice) is running */
-static struct mutex mutex_codecthread NOCACHEBSS_ATTR; 
+static bool   swap_codec_parity NOCACHEBSS_ATTR = false; /* true=odd, false=even */
+/* Locking to control which codec (normal/voice) is running */
+static struct semaphore sem_codecthread NOCACHEBSS_ATTR;
+static struct event event_codecthread NOCACHEBSS_ATTR;
 
 /* Voice state */
 static volatile bool voice_thread_start = false; /* Triggers voice playback (A/V) */
@@ -424,8 +425,7 @@ static void wait_for_voice_swap_in(void)
     if (NULL == iram_buf)
         return;
 
-    while (current_codec != CODEC_IDX_VOICE)
-        yield();
+    event_wait(&event_codecthread, STATE_NONSIGNALED);
 #endif /* PLAYBACK_VOICE */
 }
 
@@ -924,21 +924,21 @@ static void swap_codec(void)
     }
 
     /* Release my semaphore */
-    mutex_unlock(&mutex_codecthread);
+    semaphore_release(&sem_codecthread);
     logf("unlocked: %d", my_codec);
 
-    /* Loop until the other codec has locked and run */
-    do {
-        /* Release my semaphore and force a task switch. */
-        yield();
-    } while (my_codec == current_codec);
+    /* Wait for other codec */
+    event_wait(&event_codecthread,
+        (my_codec == CODEC_IDX_AUDIO) ? STATE_NONSIGNALED : STATE_SIGNALED);
 
     /* Wait for other codec to unlock */
-    mutex_lock(&mutex_codecthread);
+    logf("waiting for lock: %d", my_codec);
+    semaphore_wait(&sem_codecthread);
 
     /* Take control */
-    logf("waiting for lock: %d", my_codec);
     set_current_codec(my_codec);
+    event_set_state(&event_codecthread,
+        (my_codec == CODEC_IDX_AUDIO) ? STATE_SIGNALED : STATE_NONSIGNALED);
 
     /* Reload our IRAM and DRAM */
     memswap128(iram_buf, CODEC_IRAM_ORIGIN, CODEC_IRAM_SIZE);
@@ -1161,7 +1161,7 @@ static bool voice_on_voice_stop(bool aborting, size_t *realsize)
 
 static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
 {
-    struct event ev;
+    struct queue_event ev;
 
     if (ci_voice.new_track)
     {
@@ -1332,7 +1332,8 @@ static void voice_thread(void)
 {
     logf("Loading voice codec");
     voice_codec_loaded = true;
-    mutex_lock(&mutex_codecthread);
+    semaphore_wait(&sem_codecthread);
+    event_set_state(&event_codecthread, false);
     set_current_codec(CODEC_IDX_VOICE);
     dsp_configure(DSP_RESET, 0);
     voice_remaining = 0;
@@ -1344,9 +1345,8 @@ static void voice_thread(void)
 
     logf("Voice codec finished");
     voice_codec_loaded = false;
-    mutex_unlock(&mutex_codecthread);
     voice_thread_p = NULL;
-    remove_thread(NULL);
+    semaphore_release(&sem_codecthread);
 } /* voice_thread */
 
 #endif /* PLAYBACK_VOICE */
@@ -1968,7 +1968,7 @@ static bool codec_request_next_track_callback(void)
 
 static void codec_thread(void)
 {
-    struct event ev;
+    struct queue_event ev;
     int status;
     size_t wrap;
 
@@ -1988,13 +1988,14 @@ static void codec_thread(void)
                     LOGFQUEUE("codec > voice Q_AUDIO_PLAY");
                     queue_post(&voice_queue, Q_AUDIO_PLAY, 0);
                 }
-                mutex_lock(&mutex_codecthread);
+                semaphore_wait(&sem_codecthread);
+                event_set_state(&event_codecthread, true);
 #endif
                 set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
                 status = codec_load_file((const char *)ev.data, &ci);
 #ifdef PLAYBACK_VOICE
-                mutex_unlock(&mutex_codecthread);
+                semaphore_release(&sem_codecthread);
 #endif
                 break;
 
@@ -2019,7 +2020,8 @@ static void codec_thread(void)
                     LOGFQUEUE("codec > voice Q_AUDIO_PLAY");
                     queue_post(&voice_queue, Q_AUDIO_PLAY, 0);
                 }
-                mutex_lock(&mutex_codecthread);
+                semaphore_wait(&sem_codecthread);
+                event_set_state(&event_codecthread, true);
 #endif
                 set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
@@ -2027,7 +2029,7 @@ static void codec_thread(void)
                 status = codec_load_ram(CUR_TI->codecbuf, CUR_TI->codecsize,
                         &filebuf[0], wrap, &ci);
 #ifdef PLAYBACK_VOICE
-                mutex_unlock(&mutex_codecthread);
+                semaphore_release(&sem_codecthread);
 #endif
                 break;
 
@@ -2041,14 +2043,15 @@ static void codec_thread(void)
                     LOGFQUEUE("codec > voice Q_ENCODER_RECORD");
                     queue_post(&voice_queue, Q_ENCODER_RECORD, 0);
                 }
-                mutex_lock(&mutex_codecthread);
+                semaphore_wait(&sem_codecthread);
+                event_set_state(&event_codecthread, true);
 #endif
                 logf("loading encoder");
                 set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_encoder = false;
                 status = codec_load_file((const char *)ev.data, &ci);
 #ifdef PLAYBACK_VOICE
-                mutex_unlock(&mutex_codecthread);
+                semaphore_release(&sem_codecthread);
 #endif
                 logf("encoder stopped");
                 break;
@@ -3594,13 +3597,13 @@ static bool ata_fillbuffer_callback(void)
 
 static void audio_thread(void)
 {
-    struct event ev;
+    struct queue_event ev;
 
     pcm_postinit();
 
 #ifdef PLAYBACK_VOICE
-    /* Unlock mutex that init stage locks before creating this thread */
-    mutex_unlock(&mutex_codecthread);
+    /* Unlock semaphore that init stage locks before creating this thread */
+    semaphore_release(&sem_codecthread);
 
     /* Buffers must be set up by now - should panic - really */
     if (buffer_state != BUFFER_STATE_INITIALIZED)
@@ -3764,7 +3767,9 @@ void audio_init(void)
 #ifdef PLAYBACK_VOICE
     static bool voicetagtrue = true;
     static struct mp3entry id3_voice;
+    struct thread_entry *voice_thread_p = NULL;
 #endif
+    struct thread_entry *audio_thread_p;
 
     /* Can never do this twice */
     if (audio_is_initialized)
@@ -3779,11 +3784,11 @@ void audio_init(void)
        to send messages. Thread creation will be delayed however so nothing
        starts running until ready if something yields such as talk_init. */
 #ifdef PLAYBACK_VOICE
-    mutex_init(&mutex_codecthread);
     /* Take ownership of lock to prevent playback of anything before audio
        hardware is initialized - audio thread unlocks it after final init
        stage */
-    mutex_lock(&mutex_codecthread);
+    semaphore_init(&sem_codecthread, 1, 0);
+    event_init(&event_codecthread, EVENT_MANUAL | STATE_SIGNALED);
 #endif
     queue_init(&audio_queue, true);
     queue_enable_queue_send(&audio_queue, &audio_queue_sender_list);
@@ -3842,16 +3847,16 @@ void audio_init(void)
        talk first */
     talk_init();
 
-    /* Create the threads late now that we shouldn't be yielding again before
-       returning */
     codec_thread_p = create_thread(
             codec_thread, codec_stack, sizeof(codec_stack),
+            CREATE_THREAD_FROZEN,
             codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK)
-        IF_COP(, CPU, true));
+            IF_COP(, CPU));
 
-    create_thread(audio_thread, audio_stack, sizeof(audio_stack),
+    audio_thread_p = create_thread(audio_thread, audio_stack,
+                  sizeof(audio_stack), CREATE_THREAD_FROZEN,
                   audio_thread_name IF_PRIO(, PRIORITY_BUFFERING)
-          IF_COP(, CPU, false));
+                  IF_COP(, CPU));
 
 #ifdef PLAYBACK_VOICE
     /* TODO: Change this around when various speech codecs can be used */
@@ -3859,9 +3864,10 @@ void audio_init(void)
     {
         logf("Starting voice codec");
         queue_init(&voice_queue, true);
-        create_thread(voice_thread, voice_stack,
-                sizeof(voice_stack), voice_thread_name 
-                IF_PRIO(, PRIORITY_PLAYBACK) IF_COP(, CPU, false));
+        voice_thread_p = create_thread(voice_thread, voice_stack,
+                sizeof(voice_stack), CREATE_THREAD_FROZEN,
+                voice_thread_name
+                IF_PRIO(, PRIORITY_PLAYBACK) IF_COP(, CPU));
     }
 #endif
 
@@ -3881,5 +3887,13 @@ void audio_init(void)
 #ifndef HAVE_FLASH_STORAGE 
     audio_set_buffer_margin(global_settings.buffer_margin);
 #endif
+
+    /* it's safe to let the threads run now */
+    thread_thaw(codec_thread_p);
+#ifdef PLAYBACK_VOICE
+    if (voice_thread_p)
+        thread_thaw(voice_thread_p);
+#endif
+    thread_thaw(audio_thread_p);
 } /* audio_init */
 

@@ -959,7 +959,7 @@ void ata_spin(void)
 
 static void mmc_thread(void)
 {
-    struct event ev;
+    struct queue_event ev;
     bool idle_notified = false;
     
     while (1) {
@@ -1153,8 +1153,9 @@ int ata_init(void)
 
         queue_init(&mmc_queue, true);
         create_thread(mmc_thread, mmc_stack,
-                      sizeof(mmc_stack), mmc_thread_name IF_PRIO(, PRIORITY_SYSTEM)
-		      IF_COP(, CPU, false));
+                      sizeof(mmc_stack), 0, mmc_thread_name
+                      IF_PRIO(, PRIORITY_SYSTEM)
+  		              IF_COP(, CPU));
         tick_add_task(mmc_tick);
         initialized = true;
     }

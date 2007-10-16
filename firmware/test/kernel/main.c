@@ -44,7 +44,7 @@ int main(void)
     char buf[40];
     char str[32];
     int i=0;
-    struct event *ev;
+    struct queue_event *ev;
 
     /* Clear it all! */
     SSR1 &= ~(SCI_RDRF | SCI_ORER | SCI_PER | SCI_FER);
@@ -69,8 +69,8 @@ int main(void)
     
     queue_init(&main_q);
     
-    create_thread(t1, s1, 1024);
-    create_thread(t2, s2, 1024);
+    create_thread(t1, s1, 1024, 0);
+    create_thread(t2, s2, 1024, 0);
 
     while(1)
     {

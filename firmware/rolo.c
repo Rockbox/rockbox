@@ -63,8 +63,8 @@ void rolo_restart_cop(void)
     {
         /* There should be free thread slots aplenty */
         create_thread(rolo_restart_cop, cop_idlestackbegin, IDLE_STACK_SIZE,
-                      "rolo COP" IF_PRIO(, PRIORITY_REALTIME)
-                      IF_COP(, COP, false));
+                      0, "rolo COP" IF_PRIO(, PRIORITY_REALTIME)
+                      IF_COP(, COP));
         return;
     }
 

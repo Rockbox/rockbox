@@ -743,7 +743,7 @@ int button_queue_count( void )
 
 long button_get(bool block)
 {
-    struct event ev;
+    struct queue_event ev;
 
     if ( block || !queue_empty(&button_queue) ) {
         queue_wait(&button_queue, &ev);
@@ -755,7 +755,7 @@ long button_get(bool block)
 
 long button_get_w_tmo(int ticks)
 {
-    struct event ev;
+    struct queue_event ev;
     queue_wait_w_tmo(&button_queue, &ev, ticks);
     if (ev.id == SYS_TIMEOUT)
         ev.id = BUTTON_NONE;

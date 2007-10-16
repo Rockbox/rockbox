@@ -584,8 +584,8 @@ static enum plugin_status test_track(char* filename)
     codec_playing = true;
 
     if ((codecthread_id = rb->create_thread(codec_thread,
-        (uint8_t*)codec_stack, codec_stack_size, "testcodec" IF_PRIO(,PRIORITY_PLAYBACK)
-        IF_COP(, CPU, false))) == NULL)
+        (uint8_t*)codec_stack, codec_stack_size, 0, "testcodec"
+        IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, CPU))) == NULL)
     {
         log_text("Cannot create codec thread!",true);
         goto exit;

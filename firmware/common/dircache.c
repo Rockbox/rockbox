@@ -62,7 +62,7 @@ static unsigned long reserve_used = 0;
 static unsigned int  cache_build_ticks = 0;
 static char dircache_cur_path[MAX_PATH*2];
 
-static struct event_queue dircache_queue;
+static struct event_queue dircache_queue NOCACHEBSS_ATTR;
 static long dircache_stack[(DEFAULT_STACK_SIZE + 0x900)/sizeof(long)];
 static const char dircache_thread_name[] = "dircache";
 
@@ -147,7 +147,7 @@ static struct travel_data dir_recursion[MAX_SCAN_DEPTH];
  */
 static bool check_event_queue(void)
 {
-    struct event ev;
+    struct queue_event ev;
     
     queue_wait_w_tmo(&dircache_queue, &ev, 0);
     switch (ev.id)
@@ -598,7 +598,7 @@ static int dircache_do_rebuild(void)
  */
 static void dircache_thread(void)
 {
-    struct event ev;
+    struct queue_event ev;
 
     while (1)
     {
@@ -701,8 +701,9 @@ void dircache_init(void)
     
     queue_init(&dircache_queue, true);
     create_thread(dircache_thread, dircache_stack,
-                sizeof(dircache_stack), dircache_thread_name IF_PRIO(, PRIORITY_BACKGROUND)
-		IF_COP(, CPU, false));
+                sizeof(dircache_stack), 0, dircache_thread_name
+                IF_PRIO(, PRIORITY_BACKGROUND)
+                IF_COP(, CPU));
 }
 
 /**

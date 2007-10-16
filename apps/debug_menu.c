@@ -125,6 +125,8 @@ static char* dbg_listmessage_getname(int item, void * data, char *buffer)
 #endif
 
 struct action_callback_info;
+#define DBGLIST_SHOW_SELECTION 0x1
+
 struct action_callback_info
 {
     char *title;
@@ -137,6 +139,7 @@ struct action_callback_info
 };
 
 static char* dbg_menu_getname(int item, void * data, char *buffer);
+static char* threads_getname(int selected_item, void * data, char *buffer);
 static bool dbg_list(struct action_callback_info *info)
 {
     struct gui_synclist lists;
@@ -149,8 +152,7 @@ static bool dbg_list(struct action_callback_info *info)
     gui_synclist_set_title(&lists, info->title, NOICON);
     gui_synclist_set_icon_callback(&lists, NULL);
     gui_synclist_set_nb_items(&lists, info->count*info->selection_size);
-    if (info->dbg_getname != dbg_menu_getname)
-        gui_synclist_hide_selection_marker(&lists, true);
+    gui_synclist_hide_selection_marker(&lists, true);
     
     if (info->action_callback)
         info->action_callback(ACTION_REDRAW, info);
@@ -179,17 +181,28 @@ static bool dbg_list(struct action_callback_info *info)
 /*---------------------------------------------------*/
 extern struct thread_entry threads[MAXTHREADS];
 
-static char thread_status_char(int status)
+static char thread_status_char(unsigned status)
 {
-    switch (status)
+    static const char thread_status_chars[THREAD_NUM_STATES+1] =
     {
-        case STATE_RUNNING      : return 'R';
-        case STATE_BLOCKED      : return 'B';
-        case STATE_SLEEPING     : return 'S';
-        case STATE_BLOCKED_W_TMO: return 'T';
-    }
+        [0 ... THREAD_NUM_STATES] = '?',
+        [STATE_RUNNING]           = 'R',
+        [STATE_BLOCKED]           = 'B',
+        [STATE_SLEEPING]          = 'S',
+        [STATE_BLOCKED_W_TMO]     = 'T',
+        [STATE_FROZEN]            = 'F',
+        [STATE_KILLED]            = 'K',
+    };
 
-    return '?';
+#if NUM_CORES > 1
+    if (status == STATE_BUSY) /* Not a state index */
+        return '.';
+#endif
+
+    if (status > THREAD_NUM_STATES)
+        status = THREAD_NUM_STATES;
+
+    return thread_status_chars[status];
 }
 
 static char* threads_getname(int selected_item, void * data, char *buffer)
@@ -214,7 +227,7 @@ static char* threads_getname(int selected_item, void * data, char *buffer)
     thread = &threads[selected_item];
     status = thread_get_status(thread);
     
-    if (thread->name == NULL)
+    if (status == STATE_KILLED)
     {
         snprintf(buffer, MAX_PATH, "%2d: ---", selected_item);
         return buffer;
@@ -222,7 +235,6 @@ static char* threads_getname(int selected_item, void * data, char *buffer)
 
     thread_get_name(name, 32, thread);
     usage = thread_stack_usage(thread);
-    status = thread_get_status(thread);
 
     snprintf(buffer, MAX_PATH,
              "%2d: " IF_COP("(%d) ") "%c%c " IF_PRIO("%d ") "%2d%% %s", 
@@ -2329,6 +2341,7 @@ static const struct the_menu_item menuitems[] = {
     };
 static int menu_action_callback(int btn, struct action_callback_info *info)
 {
+    gui_synclist_hide_selection_marker(info->lists, false);
     if (btn == ACTION_STD_OK)
     {
         menuitems[gui_synclist_get_sel_pos(info->lists)].function();

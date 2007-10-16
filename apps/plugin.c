@@ -141,6 +141,7 @@ static const struct plugin_api rockbox_api = {
     /* remote lcd */
     lcd_remote_set_contrast,
     lcd_remote_clear_display,
+    lcd_remote_setmargins,
     lcd_remote_puts,
     lcd_remote_puts_scroll,
     lcd_remote_stop_scroll,
@@ -183,6 +184,9 @@ static const struct plugin_api rockbox_api = {
 #if defined(HAVE_LCD_COLOR)
     lcd_yuv_blit,
 #endif
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+    lcd_yuv_set_options,
+#endif
     /* list */
     gui_synclist_init,
     gui_synclist_set_nb_items,
@@ -202,6 +206,7 @@ static const struct plugin_api rockbox_api = {
     button_get_w_tmo,
     button_status,
     button_clear_queue,
+    button_queue_count,
 #ifdef HAS_BUTTON_HOLD
     button_hold,
 #endif
@@ -463,6 +468,13 @@ static const struct plugin_api rockbox_api = {
 #endif
     &global_settings,
     &global_status,
+    talk_disable_menus,
+    talk_enable_menus,
+#if CONFIG_CODEC == SWCODEC
+    codec_load_file,
+    get_codec_filename,
+    get_metadata,
+#endif
     mp3info,
     count_mp3_frames,
     create_xing_header,
@@ -492,6 +504,11 @@ static const struct plugin_api rockbox_api = {
     detect_flashed_ramimage,
     detect_flashed_romimage,
 #endif
+    led,
+#ifdef CACHE_FUNCTIONS_AS_CALL
+    flush_icache,
+    invalidate_icache,
+#endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
@@ -499,27 +516,6 @@ static const struct plugin_api rockbox_api = {
     spinlock_init,
     spinlock_lock,
     spinlock_unlock,
-
-    codec_load_file,
-    get_codec_filename,
-    get_metadata,
-#endif
-    led,
-
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
-    lcd_yuv_set_options,
-#endif
-
-#ifdef CACHE_FUNCTIONS_AS_CALL
-    flush_icache,
-    invalidate_icache,
-#endif
-    talk_disable_menus,
-    talk_enable_menus,
-
-    button_queue_count,
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_setmargins,
 #endif
 };
 
@@ -666,7 +662,11 @@ int plugin_load(const char* plugin, void* parameter)
 #endif
     lcd_remote_setmargins(rxm, rym);
     lcd_remote_clear_display();
+
+
     lcd_remote_update();
+
+
 #endif
 
     if (pfn_tsr_exit == NULL)

@@ -162,7 +162,7 @@ static struct sd_card_status sd_status[NUM_VOLUMES] =
 /* Shoot for around 75% usage */
 static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
 static const char         sd_thread_name[] = "ata/sd";
-static struct mutex       sd_mtx;
+static struct spinlock    sd_spin NOCACHEBSS_ATTR;
 static struct event_queue sd_queue;
 
 /* Posted when card plugged status has changed */
@@ -801,7 +801,7 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     
     /* TODO: Add DMA support. */
 
-    spinlock_lock(&sd_mtx);
+    spinlock_lock(&sd_spin);
 
     ata_led(true);
 
@@ -888,7 +888,7 @@ ata_read_retry:
     while (1)
     {
         ata_led(false);
-        spinlock_unlock(&sd_mtx);
+        spinlock_unlock(&sd_spin);
 
         return ret;
 
@@ -916,7 +916,7 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
     const unsigned char *buf, *buf_end;
     int bank;
 
-    spinlock_lock(&sd_mtx);
+    spinlock_lock(&sd_spin);
 
     ata_led(true);
 
@@ -1016,7 +1016,7 @@ ata_write_retry:
     while (1)
     {
         ata_led(false);
-        spinlock_unlock(&sd_mtx);
+        spinlock_unlock(&sd_spin);
 
         return ret;
 
@@ -1034,7 +1034,7 @@ ata_write_error:
 static void sd_thread(void) __attribute__((noreturn));
 static void sd_thread(void)
 {
-    struct event ev;
+    struct queue_event ev;
     bool idle_notified = false;
     
     while (1)
@@ -1050,10 +1050,9 @@ static void sd_thread(void)
 
             /* Lock to keep us from messing with this variable while an init
                may be in progress */
-            spinlock_lock(&sd_mtx);
+            spinlock_lock(&sd_spin);
             card_info[1].initialized = 0;
             sd_status[1].retry = 0;
-            spinlock_unlock(&sd_mtx);
 
             /* Either unmount because the card was pulled or unmount and
                remount if already mounted since multiple messages may be
@@ -1073,6 +1072,8 @@ static void sd_thread(void)
 
             if (action != SDA_NONE)
                 queue_broadcast(SYS_FS_CHANGED, 0);
+
+            spinlock_unlock(&sd_spin);
             break;
             } /* SD_HOTSWAP */
 #endif /* HAVE_HOTSWAP */
@@ -1155,9 +1156,9 @@ int ata_init(void)
     {
         initialized = true;
 
-        spinlock_init(&sd_mtx);
+        spinlock_init(&sd_spin IF_COP(, SPINLOCK_TASK_SWITCH));
 
-        spinlock_lock(&sd_mtx);
+        spinlock_lock(&sd_spin);
 
         /* init controller */
         outl(inl(0x70000088) & ~(0x4), 0x70000088);
@@ -1181,8 +1182,8 @@ int ata_init(void)
             ret = currcard->initialized;
 
         queue_init(&sd_queue, true);
-        create_thread(sd_thread, sd_stack, sizeof(sd_stack),
-            sd_thread_name IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU, false));
+        create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
+            sd_thread_name IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU));
 
         /* enable interupt for the mSD card */
         sleep(HZ/10);
@@ -1195,7 +1196,7 @@ int ata_init(void)
         GPIOA_INT_CLR = 0x80;
         GPIOA_INT_EN |= 0x80;
 #endif
-        spinlock_unlock(&sd_mtx);
+        spinlock_unlock(&sd_spin);
     }
 
     return ret;

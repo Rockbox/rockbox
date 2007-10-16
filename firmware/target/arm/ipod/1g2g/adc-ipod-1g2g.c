@@ -22,7 +22,7 @@
 #include "hwcompat.h"
 #include "kernel.h"
 
-static struct mutex adc_mutex NOCACHEBSS_ATTR;
+static struct spinlock adc_spin NOCACHEBSS_ATTR;
 
 /* used in the 2nd gen ADC interrupt */
 static unsigned int_data;
@@ -33,7 +33,7 @@ unsigned short adc_scan(int channel)
     unsigned short data = 0;
 
     (void)channel; /* there is only one */
-    spinlock_lock(&adc_mutex);
+    spinlock_lock(&adc_spin);
 
     if ((IPOD_HW_REVISION >> 16) == 1)
     {
@@ -69,7 +69,7 @@ unsigned short adc_scan(int channel)
 
         data = int_data & 0xff;
     }
-    spinlock_unlock(&adc_mutex);
+    spinlock_unlock(&adc_spin);
     return data;
 }
 
@@ -100,7 +100,7 @@ void ipod_2g_adc_int(void)
 
 void adc_init(void)
 {
-    spinlock_init(&adc_mutex);
+    spinlock_init(&adc_spin IF_COP(, SPINLOCK_TASK_SWITCH));
     
     GPIOB_ENABLE |= 0x1e;  /* enable B1..B4 */
 

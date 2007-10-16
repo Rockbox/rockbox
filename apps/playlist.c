@@ -1163,7 +1163,7 @@ static int compare(const void* p1, const void* p2)
  */
 static void playlist_thread(void)
 {
-    struct event ev;
+    struct queue_event ev;
     bool dirty_pointers = false;
     static char tmp[MAX_PATH+1];
 
@@ -1889,8 +1889,8 @@ void playlist_init(void)
     memset(playlist->filenames, 0,
            playlist->max_playlist_size * sizeof(int));
     create_thread(playlist_thread, playlist_stack, sizeof(playlist_stack),
-                  playlist_thread_name IF_PRIO(, PRIORITY_BACKGROUND)
-		  IF_COP(, CPU, false));
+                  0, playlist_thread_name IF_PRIO(, PRIORITY_BACKGROUND)
+		          IF_COP(, CPU));
     queue_init(&playlist_queue, true);
 #endif
 }

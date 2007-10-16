@@ -21,10 +21,6 @@
 #include "i2s.h"
 #include "i2c-pp.h"
 
-#if NUM_CORES > 1
-struct mutex boostctrl_mtx NOCACHEBSS_ATTR;
-#endif
-
 #ifndef BOOTLOADER
 extern void TIMER1(void);
 extern void TIMER2(void);
@@ -129,15 +125,41 @@ static void init_cache(void)
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+void scale_suspend_core(bool suspend) ICODE_ATTR;
+void scale_suspend_core(bool suspend)
+{
+    unsigned int core = CURRENT_CORE;
+    unsigned int othercore = 1 - core;
+    static unsigned long proc_bits IBSS_ATTR;
+    static int oldstatus IBSS_ATTR;
+
+    if (suspend)
+    {
+        oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+        proc_bits = PROC_CTL(othercore) & 0xc0000000;
+        PROC_CTL(othercore) = 0x40000000; nop;
+        PROC_CTL(core) = 0x48000003; nop;
+    }
+    else
+    {
+        PROC_CTL(core) = 0x4800001f; nop;
+        if (proc_bits == 0)
+            PROC_CTL(othercore) = 0;
+        set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
+    }
+}
+
+void set_cpu_frequency(long frequency) ICODE_ATTR;
 void set_cpu_frequency(long frequency)
 #else
 static void pp_set_cpu_frequency(long frequency)
 #endif
 {
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
-    /* Using mutex or spinlock isn't safe here. */
-    while (test_and_set(&boostctrl_mtx.locked, 1)) ;
+    spinlock_lock(&boostctrl_spin);
 #endif
+
+    scale_suspend_core(true);
 
     cpu_frequency = frequency;
 
@@ -149,17 +171,20 @@ static void pp_set_cpu_frequency(long frequency)
        * have this limitation (and the post divider?) */
       case CPUFREQ_MAX:
         CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
-        DEV_TIMING1  = 0x00000808;
+        DEV_TIMING1  = 0x00000303;
 #if CONFIG_CPU == PP5020
         PLL_CONTROL  = 0x8a020a03;  /* 10/3 * 24MHz */
         PLL_STATUS   = 0xd19b;      /* unlock frequencies > 66MHz */
         PLL_CONTROL  = 0x8a020a03;  /* repeat setup */
+        scale_suspend_core(false);
         udelay(500);                /* wait for relock */
 #elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
         PLL_CONTROL  = 0x8a121403;  /* (20/3 * 24MHz) / 2 */
+        scale_suspend_core(false);
         udelay(250);
         while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
 #endif
+        scale_suspend_core(true);
         break;
 
       case CPUFREQ_NORMAL:
@@ -167,18 +192,23 @@ static void pp_set_cpu_frequency(long frequency)
         DEV_TIMING1  = 0x00000303;
 #if CONFIG_CPU == PP5020
         PLL_CONTROL  = 0x8a020504;  /* 5/4 * 24MHz */
+        scale_suspend_core(false);
         udelay(500);                /* wait for relock */
 #elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
         PLL_CONTROL  = 0x8a220501;  /* (5/1 * 24MHz) / 4 */
+        scale_suspend_core(false);
         udelay(250);
         while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
 #endif
+        scale_suspend_core(true);
         break;
 
       case CPUFREQ_SLEEP:
         CLOCK_SOURCE = 0x10002202;  /* source #2: 32kHz, #1, #3, #4: 24MHz */
         PLL_CONTROL &= ~0x80000000; /* disable PLL */
+        scale_suspend_core(false);
         udelay(10000);              /* let 32kHz source stabilize? */
+        scale_suspend_core(true);
         break;
 
       default:
@@ -186,12 +216,19 @@ static void pp_set_cpu_frequency(long frequency)
         DEV_TIMING1  = 0x00000303;
         PLL_CONTROL &= ~0x80000000; /* disable PLL */
         cpu_frequency = CPUFREQ_DEFAULT;
+        PROC_CTL(CURRENT_CORE) = 0x4800001f; nop;
         break;
     }
+
+    if (frequency == CPUFREQ_MAX)
+        DEV_TIMING1 = 0x00000808;
+
     CLOCK_SOURCE = (CLOCK_SOURCE & ~0xf0000000) | 0x20000000;  /* select source #2 */
 
+    scale_suspend_core(false);
+
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
-    boostctrl_mtx.locked = 0;
+    spinlock_unlock(&boostctrl_spin);
 #endif
 }
 #endif /* !BOOTLOADER */
@@ -256,7 +293,7 @@ void system_init(void)
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #if NUM_CORES > 1
-        spinlock_init(&boostctrl_mtx);
+        cpu_boost_init();
 #endif
 #else
         pp_set_cpu_frequency(CPUFREQ_MAX);

@@ -66,7 +66,7 @@ static int usb_mmc_countdown = 0;
 static long usb_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
 #endif
-static struct event_queue usb_queue;
+static struct event_queue usb_queue NOCACHEBSS_ATTR;
 static int last_usb_status;
 static bool usb_monitor_enabled;
 
@@ -119,7 +119,7 @@ static void usb_thread(void)
 {
     int num_acks_to_expect = -1;
     bool waiting_for_ack;
-    struct event ev;
+    struct queue_event ev;
 
     waiting_for_ack = false;
 
@@ -307,9 +307,9 @@ void usb_init(void)
 #ifndef BOOTLOADER
     queue_init(&usb_queue, true);
     
-    create_thread(usb_thread, usb_stack, sizeof(usb_stack), 
+    create_thread(usb_thread, usb_stack, sizeof(usb_stack), 0, 
                   usb_thread_name IF_PRIO(, PRIORITY_SYSTEM)
-		  IF_COP(, CPU, false));
+		          IF_COP(, CPU));
 
     tick_add_task(usb_tick);
 #endif
@@ -318,7 +318,7 @@ void usb_init(void)
 
 void usb_wait_for_disconnect(struct event_queue *q)
 {
-    struct event ev;
+    struct queue_event ev;
 
     /* Don't return until we get SYS_USB_DISCONNECTED */
     while(1)
@@ -334,7 +334,7 @@ void usb_wait_for_disconnect(struct event_queue *q)
 
 int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks)
 {
-    struct event ev;
+    struct queue_event ev;
 
     /* Don't return until we get SYS_USB_DISCONNECTED or SYS_TIMEOUT */
     while(1)

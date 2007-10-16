@@ -1230,7 +1230,7 @@ static void mpeg_thread(void)
 {
     static int pause_tick = 0;
     static unsigned int pause_track = 0;
-    struct event ev;
+    struct queue_event ev;
     int len;
     int free_space_left;
     int unplayed_space_left;
@@ -2910,8 +2910,9 @@ void audio_init(void)
     queue_init(&mpeg_queue, true);
 #endif /* !SIMULATOR */
     create_thread(mpeg_thread, mpeg_stack,
-                  sizeof(mpeg_stack), mpeg_thread_name IF_PRIO(, PRIORITY_SYSTEM)
-		  IF_COP(, CPU, false));
+                  sizeof(mpeg_stack), 0, mpeg_thread_name
+                  IF_PRIO(, PRIORITY_SYSTEM)
+		          IF_COP(, CPU));
 
     memset(trackdata, sizeof(trackdata), 0);
 

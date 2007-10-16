@@ -112,12 +112,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 82
+#define PLUGIN_API_VERSION 83
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 82
+#define PLUGIN_MIN_API_VERSION 83
 
 /* plugin return codes */
 enum plugin_status {
@@ -219,6 +219,7 @@ struct plugin_api {
     /* remote lcd */
     void (*lcd_remote_set_contrast)(int x);
     void (*lcd_remote_clear_display)(void);
+    void (*lcd_remote_setmargins)(int x, int y);
     void (*lcd_remote_puts)(int x, int y, const unsigned char *string);
     void (*lcd_remote_lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_remote_lcd_stop_scroll)(void);
@@ -265,6 +266,10 @@ struct plugin_api {
                          int x, int y, int width, int height);
 #endif
 
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+    void (*lcd_yuv_set_options)(unsigned options);
+#endif
+
     /* list */
     void (*gui_synclist_init)(struct gui_synclist * lists,
             list_get_name callback_get_item_name,void * data,
@@ -288,6 +293,7 @@ struct plugin_api {
     long (*button_get_w_tmo)(int ticks);
     int (*button_status)(void);
     void (*button_clear_queue)(void);
+    int (*button_queue_count)(void);   
 #ifdef HAS_BUTTON_HOLD
     bool (*button_hold)(void);
 #endif
@@ -334,9 +340,10 @@ struct plugin_api {
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
     struct thread_entry* threads;
     struct thread_entry* (*create_thread)(void (*function)(void), void* stack,
-                                          int stack_size, const char *name
+                                          int stack_size, unsigned flags,
+                                          const char *name
                                           IF_PRIO(, int priority)
-					  IF_COP(, unsigned int core, bool fallback));
+					                      IF_COP(, unsigned int core));
     void (*remove_thread)(struct thread_entry *thread);
     void (*reset_poweroff_timer)(void);
 #ifndef SIMULATOR
@@ -359,7 +366,7 @@ struct plugin_api {
     void (*queue_init)(struct event_queue *q, bool register_queue);
     void (*queue_delete)(struct event_queue *q);
     void (*queue_post)(struct event_queue *q, long id, intptr_t data);
-    void (*queue_wait_w_tmo)(struct event_queue *q, struct event *ev,
+    void (*queue_wait_w_tmo)(struct event_queue *q, struct queue_event *ev,
             int ticks);
     void (*usb_acknowledge)(long id);
 #ifdef RB_PROFILE
@@ -572,6 +579,13 @@ struct plugin_api {
 #endif
     struct user_settings* global_settings;
     struct system_status *global_status;
+    void (*talk_disable_menus)(void);
+    void (*talk_enable_menus)(void);
+#if CONFIG_CODEC == SWCODEC
+    int (*codec_load_file)(const char* codec, struct codec_api *api);
+    const char *(*get_codec_filename)(int cod_spec);
+    bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
+#endif
     bool (*mp3info)(struct mp3entry *entry, const char *filename);
     int (*count_mp3_frames)(int fd, int startpos, int filesize,
                             void (*progressfunc)(int));
@@ -609,35 +623,21 @@ struct plugin_api {
     bool (*detect_flashed_ramimage)(void);
     bool (*detect_flashed_romimage)(void);
 #endif
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
 
-#if (CONFIG_CODEC == SWCODEC)
-    void (*spinlock_init)(struct mutex *m);
-    void (*spinlock_lock)(struct mutex *m);
-    void (*spinlock_unlock)(struct mutex *m);
-
-    int (*codec_load_file)(const char* codec, struct codec_api *api);
-    const char *(*get_codec_filename)(int cod_spec);
-    bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
-#endif
     void (*led)(bool on);
-
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
-    void (*lcd_yuv_set_options)(unsigned options);
-#endif
 
 #ifdef CACHE_FUNCTIONS_AS_CALL
     void (*flush_icache)(void);
     void (*invalidate_icache)(void);
 #endif
 
-    void (*talk_disable_menus)(void);
-    void (*talk_enable_menus)(void);
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
 
-    int (*button_queue_count)(void);   
-#ifdef HAVE_REMOTE_LCD
-    void (*lcd_remote_setmargins)(int x, int y);
+#if (CONFIG_CODEC == SWCODEC)
+    void (*spinlock_init)(struct spinlock *l IF_COP(, unsigned int flags));
+    void (*spinlock_lock)(struct spinlock *l);
+    void (*spinlock_unlock)(struct spinlock *l);
 #endif
 };
 

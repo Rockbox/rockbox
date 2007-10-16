@@ -189,11 +189,11 @@ typedef struct
 {
     struct thread_entry *thread; /* Stream's thread */
     int      status;             /* Current stream status */
-    struct   event ev;           /* Event sent to steam */
+    struct   queue_event ev;     /* Event sent to steam */
     int      have_msg;           /* 1=event pending */
     int      replied;            /* 1=replied to last event */
     int      reply;              /* reply value */
-    struct mutex msg_lock;       /* serialization for event senders */
+    struct spinlock msg_lock;    /* serialization for event senders */
     uint8_t* curr_packet;        /* Current stream packet beginning */
     uint8_t* curr_packet_end;    /* Current stream packet end */
 
@@ -256,7 +256,7 @@ static void str_wait_msg(Stream *str)
 
 /* Returns a message waiting or blocks until one is available - removes the
    event */
-static void str_get_msg(Stream *str, struct event *ev)
+static void str_get_msg(Stream *str, struct queue_event *ev)
 {
     str_wait_msg(str);
     ev->id   = str->ev.id;
@@ -266,7 +266,7 @@ static void str_get_msg(Stream *str, struct event *ev)
 
 /* Peeks at the current message without blocking, returns the data but
    does not remove the event */
-static bool str_look_msg(Stream *str, struct event *ev)
+static bool str_look_msg(Stream *str, struct queue_event *ev)
 {
     if (!str_have_msg(str))
         return false;
@@ -345,9 +345,9 @@ static size_t file_remaining IBSS_ATTR;
 
 #if NUM_CORES > 1
 /* Some stream variables are shared between cores */
-struct mutex stream_lock IBSS_ATTR;
+struct spinlock stream_lock IBSS_ATTR;
 static inline void init_stream_lock(void)
-    { rb->spinlock_init(&stream_lock); }
+    { rb->spinlock_init(&stream_lock, SPINLOCK_TASK_SWITCH); }
 static inline void lock_stream(void)
     { rb->spinlock_lock(&stream_lock); }
 static inline void unlock_stream(void)
@@ -1050,7 +1050,7 @@ static int button_loop(void)
 
     if (str_have_msg(&audio_str))
     {
-        struct event ev;
+        struct queue_event ev;
         str_get_msg(&audio_str, &ev);
 
         if (ev.id == STREAM_QUIT)
@@ -1375,7 +1375,7 @@ static void audio_thread(void)
             {
                 if (str_have_msg(&audio_str))
                 {
-                    struct event ev;
+                    struct queue_event ev;
                     str_look_msg(&audio_str, &ev);
 
                     if (ev.id == STREAM_QUIT)
@@ -1498,7 +1498,7 @@ static uint32_t video_stack[VIDEO_STACKSIZE / sizeof(uint32_t)] IBSS_ATTR;
 
 static void video_thread(void)
 {
-    struct event ev;
+    struct queue_event ev;
     const mpeg2_info_t * info;
     mpeg2_state_t state;
     char str[80];
@@ -1929,9 +1929,8 @@ void display_thumb(int in_file)
     video_str.status = STREAM_PLAYING;
 
     if ((video_str.thread = rb->create_thread(video_thread,
-       (uint8_t*)video_stack,VIDEO_STACKSIZE,"mpgvideo" 
-       IF_PRIO(,PRIORITY_PLAYBACK)
-       IF_COP(, COP, true))) == NULL)
+       (uint8_t*)video_stack,VIDEO_STACKSIZE, 0,"mpgvideo" 
+       IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, COP))) == NULL)
     {
         rb->splash(HZ, "Cannot create video thread!");
     }
@@ -2354,8 +2353,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     initialize_stream( &video_str, disk_buf_start, disk_buf_len, 0xe0 );
     initialize_stream( &audio_str, disk_buf_start, disk_buf_len, 0xc0 );
 
-    rb->spinlock_init(&audio_str.msg_lock);
-    rb->spinlock_init(&video_str.msg_lock);
+    rb->spinlock_init(&audio_str.msg_lock IF_COP(, SPINLOCK_TASK_SWITCH));
+    rb->spinlock_init(&video_str.msg_lock IF_COP(, SPINLOCK_TASK_SWITCH));
 
     audio_str.status = STREAM_BUFFERING;
     video_str.status = STREAM_PLAYING;
@@ -2372,14 +2371,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* We put the video thread on the second processor for multi-core targets. */
     if ((video_str.thread = rb->create_thread(video_thread,
-        (uint8_t*)video_stack,VIDEO_STACKSIZE,"mpgvideo" IF_PRIO(,PRIORITY_PLAYBACK)
-        IF_COP(, COP, true))) == NULL)
+        (uint8_t*)video_stack, VIDEO_STACKSIZE, 0,
+        "mpgvideo" IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, COP))) == NULL)
     {
         rb->splash(HZ, "Cannot create video thread!");
     }
     else if ((audio_str.thread = rb->create_thread(audio_thread,
-        (uint8_t*)audio_stack,AUDIO_STACKSIZE,"mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK)
-        IF_COP(, CPU, false))) == NULL)
+        (uint8_t*)audio_stack,AUDIO_STACKSIZE, 0,"mpgaudio"
+        IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, CPU))) == NULL)
     {
         rb->splash(HZ, "Cannot create audio thread!");
     }

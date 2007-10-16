@@ -139,6 +139,8 @@
 #define CPU_CTL          (*(volatile unsigned char *)(0xcf004054))
 #define COP_CTL          (*(volatile unsigned char *)(0xcf004058))
 
+#define PROC_CTL(core)   ((&CPU_CTL)[(core)*4])
+
 #define PROC_SLEEP       0xca
 #define PROC_WAKE        0xce
 

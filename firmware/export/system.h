@@ -45,6 +45,10 @@ bool detect_original_firmware(void);
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#if NUM_CORES > 1
+extern struct spinlock boostctrl_spin;
+#endif
+void cpu_boost_init(void);
 #define FREQ cpu_frequency
 void set_cpu_frequency(long frequency);
 #ifdef CPU_BOOST_LOGGING

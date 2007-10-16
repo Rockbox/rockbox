@@ -88,7 +88,7 @@
 
 #ifndef __PCTOOL__
 /* Tag Cache thread. */
-static struct event_queue tagcache_queue;
+static struct event_queue tagcache_queue NOCACHEBSS_ATTR;
 static long tagcache_stack[(DEFAULT_STACK_SIZE + 0x4000)/sizeof(long)];
 static const char tagcache_thread_name[] = "tagcache";
 #endif
@@ -152,7 +152,7 @@ struct tagcache_command_entry {
 static struct tagcache_command_entry command_queue[TAGCACHE_COMMAND_QUEUE_LENGTH];
 static volatile int command_queue_widx = 0;
 static volatile int command_queue_ridx = 0;
-static struct mutex command_queue_mutex;
+static struct mutex command_queue_mutex NOCACHEBSS_ATTR;
 /* Timestamp of the last added event, so we can wait a bit before committing the
  * whole queue at once. */
 static long command_queue_timestamp = 0;
@@ -3377,7 +3377,7 @@ static bool delete_entry(long idx_id)
  */
 static bool check_event_queue(void)
 {
-    struct event ev;
+    struct queue_event ev;
     
     queue_wait_w_tmo(&tagcache_queue, &ev, 0);
     switch (ev.id)
@@ -3972,7 +3972,7 @@ void tagcache_unload_ramcache(void)
 #ifndef __PCTOOL__
 static void tagcache_thread(void)
 {
-    struct event ev;
+    struct queue_event ev;
     bool check_done = false;
 
     /* If the previous cache build/update was interrupted, commit
@@ -4176,9 +4176,9 @@ void tagcache_init(void)
     mutex_init(&command_queue_mutex);
     queue_init(&tagcache_queue, true);
     create_thread(tagcache_thread, tagcache_stack,
-                  sizeof(tagcache_stack), tagcache_thread_name 
+                  sizeof(tagcache_stack), 0, tagcache_thread_name 
                   IF_PRIO(, PRIORITY_BACKGROUND)
-		  IF_COP(, CPU, false));
+		          IF_COP(, CPU));
 #else
     tc_stat.initialized = true;
     allocate_tempbuf();

@@ -46,7 +46,7 @@
 #define MAX_EVENT_AGE  HZ
 #endif
 
-struct event_queue button_queue;
+struct event_queue button_queue NOCACHEBSS_ATTR;
 
 static long lastbtn;   /* Last valid button status */
 static long last_read; /* Last button status, for debouncing/filtering */
@@ -300,7 +300,7 @@ int button_queue_count( void )
 
 long button_get(bool block)
 {
-    struct event ev;
+    struct queue_event ev;
     int pending_count = queue_count(&button_queue);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -330,7 +330,7 @@ long button_get(bool block)
 
 long button_get_w_tmo(int ticks)
 {
-    struct event ev;
+    struct queue_event ev;
     
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     /* Be sure to keep boosted state. */

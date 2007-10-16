@@ -95,7 +95,7 @@ const signed char backlight_timeout_value[19] =
 static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
-static struct event_queue backlight_queue;
+static struct event_queue backlight_queue NOCACHEBSS_ATTR;
 
 static int backlight_timer;
 static int backlight_timeout;
@@ -465,7 +465,7 @@ static void remote_backlight_update_state(void)
 
 void backlight_thread(void)
 {
-    struct event ev;
+    struct queue_event ev;
     bool locked = false;
 
     while(1)
@@ -627,9 +627,9 @@ void backlight_init(void)
      * status if necessary. */
 
     create_thread(backlight_thread, backlight_stack,
-                  sizeof(backlight_stack), backlight_thread_name
+                  sizeof(backlight_stack), 0, backlight_thread_name
                   IF_PRIO(, PRIORITY_SYSTEM)
-                  IF_COP(, CPU, false));
+                  IF_COP(, CPU));
     tick_add_task(backlight_tick);
 }
 
