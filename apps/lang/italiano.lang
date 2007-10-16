@@ -9926,14 +9926,14 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    ipod*: "Building database... %d found (PREV to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Costruzione database... %d trovato (OFF per uscire)"
     h100,h120,h300: "Costruzione database... %d trovato (STOP per uscire)"
-    ipod*: "Costruzione database... %d trovato (PLAY/PAUSE per uscire)"
+    ipod*: "Costruzione database... %d trovato (PREV per uscire)"
     x5,m5: "Costruzione database... %d trovato (Sinistra per uscire)"
     h10,h10_5gb,e200,c200: "Costruzione database... %d trovato (PREV per uscire)"
   </dest>
