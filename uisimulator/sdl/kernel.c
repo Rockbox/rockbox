@@ -531,6 +531,7 @@ void spinlock_unlock(struct spinlock *l)
     l->locked = 0;
 }
 
+#ifdef HAVE_SEMAPHORE_OBJECTS
 void semaphore_init(struct semaphore *s, int max, int start)
 {
     if(max <= 0 || start < 0 || start > max)
@@ -567,7 +568,9 @@ void semaphore_release(struct semaphore *s)
         }
     }
 }
+#endif /* HAVE_SEMAPHORE_OBJECTS */
 
+#ifdef HAVE_EVENT_OBJECTS
 void event_init(struct event *e, unsigned int flags)
 {
     e->queues[STATE_NONSIGNALED] = NULL;
@@ -650,3 +653,4 @@ void event_set_state(struct event *e, unsigned int state)
         e->state = STATE_NONSIGNALED;
     }
 }
+#endif /* HAVE_EVENT_OBJECTS */
