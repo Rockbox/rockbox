@@ -861,6 +861,8 @@ void RbUtilQt::installPortable(void)
         return;
 
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
+    logger->setProgressMax(0);
+    logger->setProgressValue(0);
     logger->show();
     logger->addItem(tr("Installing Rockbox Utility"), LOGINFO);
 
@@ -888,6 +890,8 @@ void RbUtilQt::installPortable(void)
     }
     logger->addItem(tr("Successfully installed Rockbox Utility."), LOGOK);
     logger->abort();
+    logger->setProgressMax(1);
+    logger->setProgressValue(1);
 
 }
 
