@@ -339,7 +339,7 @@ struct core_entry
 /* Macros generate better code than an inline function is this case */
 #if (defined (CPU_PP) || defined (CPU_ARM))
 /* atomic */
-#ifdef SOFTWARE_CORELOCK
+#if CONFIG_CORELOCK == SW_CORELOCK
 #define test_and_set(a, v, cl) \
     xchg8((a), (v), (cl))
 /* atomic */
@@ -364,7 +364,7 @@ struct core_entry
     *(a) = (v);          \
     corelock_unlock(cl); \
     o; })
-#else
+#elif CONFIG_CORELOCK == CORELOCK_SWAP
 /* atomic */
 #define test_and_set(a, v, ...) \
     xchg8((a), (v))
@@ -393,7 +393,7 @@ struct core_entry
         : "=r"(o)           \
         : "r"(v), "r"(a));  \
     o; })
-#endif /* SOFTWARE_CORELOCK */
+#endif /* locking selection */
 #elif defined (CPU_COLDFIRE)
 /* atomic */
 /* one branch will be optimized away if v is a constant expression */
