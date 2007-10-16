@@ -10,6 +10,7 @@
 #include "save.h"
 #include "lib/oldmenuapi.h"
 #include "rtc-gb.h"
+#include "pcm.h"
 
 #if CONFIG_KEYPAD == IPOD_4G_PAD
 #define MENU_BUTTON_UP BUTTON_SCROLL_BACK
