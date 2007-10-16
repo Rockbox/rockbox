@@ -7,16 +7,17 @@
 #include "button.h"
 #include "rockmacros.h"
 #include "mem.h"
+#include "save.h"
 #include "lib/oldmenuapi.h"
 #include "rtc-gb.h"
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD)
+#if CONFIG_KEYPAD == IPOD_4G_PAD
 #define MENU_BUTTON_UP BUTTON_SCROLL_BACK
 #define MENU_BUTTON_DOWN BUTTON_SCROLL_FWD
 #define MENU_BUTTON_LEFT BUTTON_LEFT
 #define MENU_BUTTON_RIGHT BUTTON_RIGHT
 
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define MENU_BUTTON_UP BUTTON_SCROLL_UP
 #define MENU_BUTTON_DOWN BUTTON_SCROLL_DOWN
 #define MENU_BUTTON_LEFT BUTTON_LEFT
@@ -37,7 +38,7 @@ static void munge_name(char *buf, size_t bufsiz);
 /* directory ROM save slots belong in */
 #define STATE_DIR ROCKBOX_DIR "/rockboy"
 
-int getbutton(char *text)
+static int getbutton(char *text)
 {
     int fw, fh;
     rb->lcd_clear_display();
@@ -59,7 +60,7 @@ int getbutton(char *text)
     }
 }
 
-void setupkeys(void)
+static void setupkeys(void)
 {
     options.UP=getbutton    ("Press Up");
     options.DOWN=getbutton  ("Press Down");
@@ -348,7 +349,7 @@ static void do_opt_menu(void)
     };
     
 #ifdef HAVE_LCD_COLOR
-    static const struct opt_items fullscreen[]= {
+    static const struct opt_items scaling[]= {
         { "Scaled", -1 },
         { "Scaled - Maintain Ratio", -1 },
 #if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144)
@@ -417,8 +418,8 @@ static void do_opt_menu(void)
                 break;
 #ifdef HAVE_LCD_COLOR
             case 4: /* Screen Size */
-                rb->set_option(items[4].desc, &options.fullscreen, INT, fullscreen,
-                    sizeof(fullscreen)/sizeof(*fullscreen), NULL );
+                rb->set_option(items[4].desc, &options.scaling, INT, scaling,
+                    sizeof(scaling)/sizeof(*scaling), NULL );
                 setvidmode();
                 break;
             case 5: /* Screen rotate */

@@ -274,22 +274,3 @@ void savestate(int fd)
     lseek(fd, base_offset + (sramblock << 12), SEEK_SET);
     write(fd,ram.sbank, 4096*srl);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

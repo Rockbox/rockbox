@@ -23,9 +23,10 @@ struct cpu
     union reg pc, sp, bc, de, hl, af;
 #endif
     int ime, ima;
-    int speed;
-    int halt;
-    int div, tim;
+    unsigned int speed;
+    unsigned int halt;
+    unsigned int div;
+    int tim;
     int lcdc;
     int snd;
 };
@@ -48,12 +49,7 @@ extern int blockclen;
 #endif
 
 void cpu_reset(void);
-void div_advance(int cnt) ICODE_ATTR;
-void timer_advance(int cnt) ICODE_ATTR;
-void lcdc_advance(int cnt) ICODE_ATTR;
-void sound_advance(int cnt) ICODE_ATTR;
 void cpu_timers(int cnt) ICODE_ATTR;
 int cpu_emulate(int cycles) ICODE_ATTR;
-inline int cpu_step(int max) ICODE_ATTR;
 
 #endif

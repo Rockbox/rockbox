@@ -47,9 +47,8 @@ void stat_trigger(void)
  * update the STAT interrupt line.
  */
 
-static void stat_change(int stat)
+static void stat_change(unsigned int stat)
 {
-    stat &= 3;
     R_STAT = (R_STAT & 0x7C) | stat;
 
     if (stat != 1) hw_interrupt(0, IF_VBLANK);

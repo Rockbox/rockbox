@@ -10,15 +10,15 @@
 
 struct fb
 {
-    fb_data *ptr;
+#ifdef HAVE_LCD_COLOR
     struct
     {
         int l, r;
     } cc[3];
-    int enabled;
-#if !defined(HAVE_LCD_COLOR)
+#else
     int mode;
 #endif
+    int enabled;
 };
 
 

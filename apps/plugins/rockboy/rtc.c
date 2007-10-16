@@ -58,7 +58,7 @@ void rtc_write(byte b)
     }
 }
 
-void rtc_tick()
+void rtc_tick(void)
 {
     if (rtc.stop) return;
     if (++rtc.t == 60)

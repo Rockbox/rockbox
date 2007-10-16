@@ -39,8 +39,6 @@ void hw_dma(byte b) ICODE_ATTR;
 void hw_hdma_cmd(byte c) ICODE_ATTR;
 void hw_hdma(void) ICODE_ATTR;
 void pad_refresh(void) ICODE_ATTR;
-void pad_press(byte k) ICODE_ATTR;
-void pad_release(byte k) ICODE_ATTR;
 void pad_set(byte k, int st) ICODE_ATTR;
 void hw_reset(void);
 

@@ -31,18 +31,13 @@ extern int shut,cleanshut;
 void vid_init(void);
 inline void vid_begin(void);
 void die(char *message, ...);
-void *sys_timer(void);
-int  sys_elapsed(long *oldtick);
-int  pcm_submit(void);
-void pcm_init(void);
 void doevents(void) ICODE_ATTR;
 void ev_poll(void);
 int do_user_menu(void);
-void loadstate(int fd);
-void savestate(int fd);
 void setvidmode(void);
+#if defined(HAVE_LCD_COLOR)
 void set_pal(void);
-#if !defined(HAVE_LCD_COLOR)
+#else
 void vid_update(int scanline);
 #endif
 #ifdef DYNAREC
@@ -106,7 +101,7 @@ struct options {
    int A, B, START, SELECT, MENU;
    int UP, DOWN, LEFT, RIGHT;
    int frameskip, fps, maxskip;
-   int sound, fullscreen, showstats;
+   int sound, scaling, showstats;
    int rotate;
    int pal;
    int dirty;

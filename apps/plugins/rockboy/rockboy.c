@@ -19,6 +19,10 @@
 #include "plugin.h"
 #include "loader.h"
 #include "rockmacros.h"
+#include "input.h"
+#include "emu.h"
+#include "hw.h"
+#include "pcm.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
@@ -29,8 +33,6 @@ PLUGIN_IRAM_DECLARE
 struct plugin_api* rb;
 int shut,cleanshut;
 char *errormsg;
-int gnuboy_main(char *rom);
-void pcm_close(void);
 
 #define optionname "options"
 
@@ -65,7 +67,7 @@ void* memcpy(void* dst, const void* src, size_t size)
     return rb->memcpy(dst, src, size);
 }
 
-void setoptions (void)
+static void setoptions (void)
 {
    int fd;
    DIR* dir;
@@ -85,7 +87,7 @@ void setoptions (void)
         options.LEFT=BUTTON_LEFT;
         options.RIGHT=BUTTON_RIGHT;
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD)
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
         options.UP=BUTTON_UP;
         options.DOWN=BUTTON_DOWN;
 
@@ -95,7 +97,7 @@ void setoptions (void)
         options.SELECT=BUTTON_SELECT;
         options.MENU=BUTTON_MODE;
 
-#elif (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#elif CONFIG_KEYPAD == IRIVER_H300_PAD
         options.UP=BUTTON_UP;
         options.DOWN=BUTTON_DOWN;
 
@@ -190,9 +192,9 @@ void setoptions (void)
       options.fps=0;
       options.showstats=0;
 #if (LCD_WIDTH>=160) && (LCD_HEIGHT>=144)
-      options.fullscreen=0;
+      options.scaling=0;
 #else
-      options.fullscreen=1;
+      options.scaling=1;
 #endif
       options.sound=1;
       options.pal=0;
@@ -203,7 +205,7 @@ void setoptions (void)
     close(fd);
 }
 
-void savesettings(void)
+static void savesettings(void)
 {
     int fd;
     char optionsave[sizeof(savedir)+sizeof(optionname)];
@@ -216,6 +218,42 @@ void savesettings(void)
         write(fd,&options, sizeof(options));
         close(fd);
     }
+}
+
+void doevents(void)
+{
+    event_t ev;
+    int st;
+
+    ev_poll();
+    while (ev_getevent(&ev))
+    {
+        if (ev.type != EV_PRESS && ev.type != EV_RELEASE)
+            continue;
+        st = (ev.type != EV_RELEASE);
+        pad_set(ev.code, st);
+    }
+}
+
+static int gnuboy_main(char *rom)
+{
+    rb->lcd_puts(0,0,"Init video");
+    vid_init();
+    rb->lcd_puts(0,1,"Init sound");
+    pcm_init();
+    rb->lcd_puts(0,2,"Loading rom");
+    loader_init(rom);
+    if(shut)
+        return PLUGIN_ERROR;
+    rb->lcd_puts(0,3,"Emu reset");
+    emu_reset();
+    rb->lcd_puts(0,4,"Emu run");
+    rb->lcd_clear_display();
+    rb->lcd_update();
+    emu_run();
+
+    /* never reached */
+    return PLUGIN_OK;
 }
 
 /* this is the plugin entry point */

@@ -37,14 +37,14 @@ F = (F & (FL|FC)) | decflag_table[(r)]; }
 #define DECW(r) ( (r)-- )
 
 #define ADD(n) { \
-W(acc) = (un16)A + (un16)(n); \
+W(acc) = (un32)A + (un32)(n); \
 F = (ZFLAG(LB(acc))) \
 | (FH & ((A ^ (n) ^ LB(acc)) << 1)) \
 | (HB(acc) << 4); \
 A = LB(acc); }
 
 #define ADC(n) { \
-W(acc) = (un16)A + (un16)(n) + (un16)((F&FC)>>4); \
+W(acc) = (un32)A + (un32)(n) + (un32)((F&FC)>>4); \
 F = (ZFLAG(LB(acc))) \
 | (FH & ((A ^ (n) ^ LB(acc)) << 1)) \
 | (HB(acc) << 4); \
@@ -70,7 +70,7 @@ F = (FH & (((SP>>8) ^ ((n)>>8) ^ HB(acc)) << 1)) \
 HL = W(acc); }
 
 #define CP(n) { \
-W(acc) = (un16)A - (un16)(n); \
+W(acc) = (un32)A - (un32)(n); \
 F = FN \
 | (ZFLAG(LB(acc))) \
 | (FH & ((A ^ (n) ^ LB(acc)) << 1)) \
@@ -79,7 +79,7 @@ F = FN \
 #define SUB(n) { CP((n)); A = LB(acc); }
 
 #define SBC(n) { \
-W(acc) = (un16)A - (un16)(n) - (un16)((F&FC)>>4); \
+W(acc) = (un32)A - (un32)(n) - (un32)((F&FC)>>4); \
 F = FN \
 | (ZFLAG((n8)LB(acc))) \
 | (FH & ((A ^ (n) ^ LB(acc)) << 1)) \
@@ -273,18 +273,19 @@ void cpu_reset(void)
 #endif
 }
 
-
-void div_advance(int cnt)
+static void div_advance(int cnt) ICODE_ATTR;
+static void div_advance(int cnt)
 {
     cpu.div += (cnt<<1);
-    if (cpu.div >= 256)
+    if (cpu.div >> 8)
     {
         R_DIV += (cpu.div >> 8);
         cpu.div &= 0xff;
     }
 }
 
-void timer_advance(int cnt)
+static void timer_advance(int cnt) ICODE_ATTR;
+static void timer_advance(int cnt)
 {
     int unit, tima;
     
@@ -293,28 +294,30 @@ void timer_advance(int cnt)
     unit = ((-R_TAC) & 3) << 1;
     cpu.tim += (cnt<<unit);
 
-    if (cpu.tim >= 512)
+    if (cpu.tim >> 9)
     {
         tima = R_TIMA + (cpu.tim >> 9);
         cpu.tim &= 0x1ff;
-        if (tima >= 256)
+        if (tima >> 8)
         {
             hw_interrupt(IF_TIMER, IF_TIMER);
             hw_interrupt(0, IF_TIMER);
         }
-        while (tima >= 256)
+        while (tima >> 8)
             tima = tima - 256 + R_TMA;
         R_TIMA = tima;
     }
 }
 
-void lcdc_advance(int cnt)
+static void lcdc_advance(int cnt) ICODE_ATTR;
+static void lcdc_advance(int cnt)
 {
     cpu.lcdc -= cnt;
     if (cpu.lcdc <= 0) lcdc_trans();
 }
 
-void sound_advance(int cnt)
+static void sound_advance(int cnt) ICODE_ATTR;
+static void sound_advance(int cnt)
 {
     cpu.snd += cnt;
 }
@@ -328,11 +331,16 @@ void cpu_timers(int cnt)
         sound_advance(cnt);
 }
 
-int cpu_idle(int max)
+static int cpu_idle(int max)
 {
     int cnt, unit;
 
     if (!(cpu.halt && IME)) return 0;
+	if (R_IF & R_IE)
+	{
+		cpu.halt = 0;
+		return 0;
+	}
 
     /* Make sure we don't miss lcdc status events! */
     if ((R_IE & (IF_VBLANK | IF_STAT)) && (max > cpu.lcdc))
@@ -878,7 +886,7 @@ next:
         PC++;
         if (R_KEY1 & 1)
         {
-            cpu.speed = cpu.speed ^ 1;
+            cpu.speed ^= 1;
             R_KEY1 = (R_KEY1 & 0x7E) | (cpu.speed << 7);
             break;
         }
@@ -996,27 +1004,3 @@ next:
 }
 
 #endif /* ASM_CPU_EMULATE */
-
-
-#ifndef ASM_CPU_STEP
-
-inline int cpu_step(int max)
-{
-    register int cnt;
-    if ((cnt = cpu_idle(max))) return cnt;
-    return cpu_emulate(1);
-}
-
-#endif /* ASM_CPU_STEP */
-
-
-
-
-
-
-
-
-
-
-
-

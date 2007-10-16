@@ -302,7 +302,7 @@ static void gbSoundChannel3(int *r, int *l)
     }
 }
 
-void gbSoundChannel4(int *r, int *l)
+static void gbSoundChannel4(int *r, int *l)
 {
     int vol = S4.envol;
   
@@ -669,7 +669,7 @@ void sound_write(byte r, byte b)
         snd.gbDigitalSound = false;
 }
 
-void sound_reset()
+void sound_reset(void)
 {
     snd.level1 = 7;
     snd.level2 = 7;
@@ -737,7 +737,7 @@ void sound_reset()
 	else snd.rate = 0;
 }
 
-void sound_dirty()
+void sound_dirty(void)
 {
     sound_write(RI_NR10, R_NR10);
     sound_write(RI_NR11, R_NR11);

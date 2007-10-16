@@ -26,7 +26,7 @@
  *         11 - ROM+MBC3
  */
 
-static int mbc_table[256] =
+static const int mbc_table[256] =
 {
     MBC_NONE,
     MBC_MBC1,
@@ -81,7 +81,7 @@ static int mbc_table[256] =
     MBC_HUC1
 };
 
-static unsigned short romsize_table[56] =
+static const unsigned short romsize_table[56] =
 {
     2,   4,   8,  16,  32,  64, 128, 256,
     512, 0,   0,   0,   0,   0,   0,   0,
@@ -94,7 +94,7 @@ static unsigned short romsize_table[56] =
 };
 
 /* Ram size should be no larger then 16 banks 1Mbit */
-static unsigned char ramsize_table[5] =
+static const unsigned char ramsize_table[5] =
 {
     0, 1, 1, 4, 16
 };
@@ -103,8 +103,6 @@ static char *romfile;
 static char sramfile[500];
 static char rtcfile[500];
 static char saveprefix[500];
-
-static int saveslot;
 
 static int forcebatt, nobatt;
 static int forcedmg;
@@ -142,7 +140,7 @@ static byte *loadfile(int fd, int *len)
     return d;
 }
 
-int rom_load(void)
+static int rom_load(void)
 {
     int fd;
     byte c, *data, *header;
@@ -220,7 +218,7 @@ int rom_load(void)
     return 0;
 }
 
-int sram_load(void)
+static int sram_load(void)
 {
     int fd;
     char meow[500];
@@ -243,7 +241,7 @@ int sram_load(void)
 }
 
 
-int sram_save(void)
+static int sram_save(void)
 {
     int fd;
     char meow[500];
@@ -261,45 +259,7 @@ int sram_save(void)
     return 0;
 }
 
-
-void state_save(int n)
-{
-    int fd;
-    char name[500];
-
-    if (n < 0) n = saveslot;
-    if (n < 0) n = 0;
-    snprintf(name, 499,"%s.%03d", saveprefix, n);
-
-    if ((fd = open(name, O_WRONLY|O_CREAT|O_TRUNC)>=0))
-    {
-        savestate(fd);
-        close(fd);
-    }
-}
-
-
-void state_load(int n)
-{
-    int fd;
-    char name[500];
-
-    if (n < 0) n = saveslot;
-    if (n < 0) n = 0;
-    snprintf(name, 499, "%s.%03d", saveprefix, n);
-
-    if ((fd = open(name, O_RDONLY)>=0))
-    {
-        loadstate(fd);
-        close(fd);
-        vram_dirty();
-        pal_dirty();
-        sound_dirty();
-        mem_updatemap();
-    }
-}
-
-void rtc_save(void)
+static void rtc_save(void)
 {
     int fd;
     if (!rtc.batt) return;
@@ -308,28 +268,13 @@ void rtc_save(void)
     close(fd);
 }
 
-void rtc_load(void)
+static void rtc_load(void)
 {
     int fd;
     if (!rtc.batt) return;
     if ((fd = open(rtcfile, O_RDONLY))<0) return;
     rtc_load_internal(fd);
     close(fd);
-}
-
-
-void loader_unload(void)
-{
-    sram_save();
-    /* if (romfile) free(romfile);
-    if (sramfile) free(sramfile);
-    if (saveprefix) free(saveprefix);
-    if (rom.bank) free(rom.bank);
-    if (ram.sbank) free(ram.sbank); */
-    romfile =   0;
-    rom.bank = 0;
-    ram.sbank = 0;
-    mbc.type = mbc.romsize = mbc.ramsize = mbc.batt = 0;
 }
 
 void cleanup(void)

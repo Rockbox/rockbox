@@ -5,7 +5,9 @@
 #include "mem.h"
 #include "lcd-gb.h"
 #include "fb.h"
+#ifdef HAVE_LCD_COLOR
 #include "palette-presets.h"
+#endif
 #ifdef USE_ASM
 #include "asm.h"
 #endif
@@ -59,7 +61,8 @@ static int dmg_pal[4][4];
 fb_data *vdest;
 
 #ifndef ASM_UPDATEPATPIX
-void updatepatpix(void)
+static void updatepatpix(void) ICODE_ATTR;
+static void updatepatpix(void)
 {
     int i, j;
 #if ((CONFIG_CPU != SH7034) && !defined(CPU_COLDFIRE))
@@ -366,7 +369,8 @@ void updatepatpix(void)
 
 
 
-void tilebuf(void)
+static void tilebuf(void) ICODE_ATTR;
+static void tilebuf(void)
 {
     int i, cnt;
     int base;
@@ -468,7 +472,8 @@ void tilebuf(void)
  * WX = WND start (if 0, no need to do anything) -> WY
  * U = start...something...thingy... 7 at most
  */
-void bg_scan(void)
+static void bg_scan(void) ICODE_ATTR;
+static void bg_scan(void)
 {
     int cnt;
     byte *src, *dest;
@@ -508,7 +513,8 @@ void bg_scan(void)
         *(dest++) = *(src++);
 }
 
-void wnd_scan(void)
+static void wnd_scan(void) ICODE_ATTR;
+static void wnd_scan(void)
 {
     int cnt;
     byte *src, *dest;
@@ -554,7 +560,8 @@ static int priused(void *attr)
     return (int)((a[0]|a[1]|a[2]|a[3]|a[4]|a[5]|a[6]|a[7])&0x80808080);
 }
 
-void bg_scan_pri(void)
+static void bg_scan_pri(void) ICODE_ATTR;
+static void bg_scan_pri(void)
 {
     int cnt, i;
     byte *src, *dest;
@@ -584,7 +591,8 @@ void bg_scan_pri(void)
     memset(dest, src[i&31]&128, cnt);
 }
 
-void wnd_scan_pri(void)
+static void wnd_scan_pri(void) ICODE_ATTR;
+static void wnd_scan_pri(void)
 {
     int cnt, i;
     byte *src, *dest;
@@ -610,7 +618,7 @@ void wnd_scan_pri(void)
     memset(dest, src[i]&128, cnt);
 }
 
-void bg_scan_color(void)
+static void bg_scan_color(void)
 {
     int cnt;
     byte *src, *dest;
@@ -684,7 +692,7 @@ void bg_scan_color(void)
     blendcpy(dest, src, *(tile++), cnt);
 }
 
-void wnd_scan_color(void)
+static void wnd_scan_color(void)
 {
     int cnt;
     byte *src, *dest;
@@ -706,12 +714,8 @@ void wnd_scan_color(void)
     blendcpy(dest, src, *(tile++), cnt);
 }
 
-static void recolor(byte *buf, byte fill, int cnt)
-{
-    while (cnt--) *(buf++) |= fill;
-}
-
-void spr_enum(void)
+static void spr_enum(void) ICODE_ATTR;
+static void spr_enum(void)
 {
     int i, j;
     struct obj *o;
@@ -764,14 +768,15 @@ void spr_enum(void)
             if (VS[i].x > VS[j].x)
             {
                 ts = VS[i];
-				VS[i] = VS[j];
-				VS[j] = ts;
+                VS[i] = VS[j];
+                VS[j] = ts;
             }
         }
     }
 }
 
-void spr_scan(void)
+static void spr_scan(void) ICODE_ATTR;
+static void spr_scan(void)
 {
     int i, x;
     byte pal, b, ns = NS;
@@ -874,26 +879,27 @@ void lcd_begin(void)
 #define S3R ((LCD_HEIGHT-((160*DXR)>>16))/2)*LCD_WIDTH+LCD_WIDTH-1
 #endif
 
-    set_pal();
-
+    vdest=rb->lcd_framebuffer;
 #ifdef HAVE_LCD_COLOR
+    set_pal();
+    
     if(options.rotate)
     {
-        if(options.fullscreen == 0)
-            vdest=fb.ptr+S2R;
-        else if (options.fullscreen == 1)
-            vdest=fb.ptr+S3R;
+        if(options.scaling == 0)
+            vdest+=+S2R;
+        else if (options.scaling == 1)
+            vdest+=S3R;
         else
-            vdest=fb.ptr+S1R;
+            vdest+=S1R;
     }
     else
     {
-        if(options.fullscreen == 0)
-            vdest=fb.ptr+S2;
-        else if (options.fullscreen == 1)
-            vdest=fb.ptr+S3;
+        if(options.scaling == 0)
+            vdest+=S2;
+        else if (options.scaling == 1)
+            vdest+=S3;
         else
-            vdest=fb.ptr+S1;
+            vdest+=S1;
     }
 #endif
     WY = R_WY;
@@ -911,7 +917,7 @@ int sremain IDATA_ATTR=LCD_WIDTH-160;
 void setvidmode(void)
 {
 #ifdef HAVE_LCD_COLOR
-    switch(options.fullscreen)
+    switch(options.scaling)
     {
         case 0:
             if(options.rotate)
@@ -1036,7 +1042,6 @@ void lcd_refreshline(void)
 
         bg_scan();
         wnd_scan();
-        recolor(BUF+WX, 0x04, 160-WX);
     }
     spr_scan();
 
@@ -1097,13 +1102,13 @@ void lcd_refreshline(void)
 #endif
 }
 
+#ifdef HAVE_LCD_COLOR
 void set_pal(void)
 {
-    memcpy(dmg_pal,palettes[options.pal], sizeof dmg_pal);
+    memcpy(dmg_pal,palettes[options.pal], sizeof(dmg_pal));
     pal_dirty();
 }
 
-#ifdef HAVE_LCD_COLOR
 static void updatepalette(int i)
 {
     int c, r, g, b;
@@ -1127,13 +1132,13 @@ static void updatepalette(int i)
 #endif
     PAL[i] = c;
 }
-#endif
+#endif /* HAVE_LCD_COLOR */
 
 void pal_write(int i, byte b)
 {
     if (lcd.pal[i] == b) return;
     lcd.pal[i] = b;
-#if LCD_DEPTH ==16
+#ifdef HAVE_LCD_COLOR
     updatepalette(i>>1);
 #endif
 }
@@ -1175,7 +1180,7 @@ void vram_dirty(void)
 
 void pal_dirty(void)
 {
-#if LCD_DEPTH ==16
+#ifdef HAVE_LCD_COLOR
     int i;
 #endif
     if (!hw.cgb)
@@ -1186,7 +1191,7 @@ void pal_dirty(void)
         pal_write_dmg(64, 2, R_OBP0);
         pal_write_dmg(72, 3, R_OBP1);
     }
-#if LCD_DEPTH ==16
+#ifdef HAVE_LCD_COLOR
     for (i = 0; i < 64; i++)
         updatepalette(i);
 #endif
@@ -1198,19 +1203,3 @@ void lcd_reset(void)
     lcd_begin();
     vram_dirty();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -16,7 +16,7 @@ static unsigned short *buf=0, *hwbuf=0;
 
 static bool newly_started;
 
-void get_more(unsigned char** start, size_t* size)
+static void get_more(unsigned char** start, size_t* size)
 {
     memcpy(hwbuf, &buf[pcm.len*doneplay], BUF_SIZE*sizeof(short));
     *start = (unsigned char*)(hwbuf);

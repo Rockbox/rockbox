@@ -7,6 +7,7 @@
 #include "lcd-gb.h"
 #include "sound.h"
 #include "rtc-gb.h"
+#include "pcm.h"
 
 /*
  * emu_reset is called to initialize the state of the emulated
@@ -23,7 +24,7 @@ void emu_reset(void)
     sound_reset();
 }
 
-void emu_step(void)
+static void emu_step(void)
 {
     cpu_emulate(cpu.lcdc);
 }

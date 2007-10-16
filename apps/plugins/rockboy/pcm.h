@@ -15,6 +15,9 @@ struct pcm
 
 extern struct pcm pcm;
 
+void pcm_init(void);
+int  pcm_submit(void);
+void pcm_close(void);
 
 #endif
 

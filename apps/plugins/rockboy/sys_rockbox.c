@@ -24,12 +24,10 @@
 #include "hw.h"
 #include "config.h"
 
-#if (CONFIG_KEYPAD == SANSA_E200_PAD)
-
+#if CONFIG_KEYPAD == SANSA_E200_PAD
 #define ROCKBOY_SCROLLWHEEL
 #define ROCKBOY_SCROLLWHEEL_CC  BUTTON_SCROLL_UP
 #define ROCKBOY_SCROLLWHEEL_CW  BUTTON_SCROLL_DOWN
-
 #endif
 
 struct fb fb IBSS_ATTR;
@@ -210,7 +208,6 @@ inline void vid_begin(void)
 void vid_init(void)
 {
     fb.enabled=1;
-    fb.ptr=rb->lcd_framebuffer;
 
 #if defined(HAVE_LCD_COLOR)
     fb.cc[0].r = 3;  /* 8-5 (wasted bits on red) */

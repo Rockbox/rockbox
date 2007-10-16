@@ -9,7 +9,7 @@ struct vissprite
 {
     byte *buf;
     int x;
-    byte pal, pri, pad[6];
+    byte pal, pri;
 };
 
 struct scan
@@ -51,15 +51,6 @@ struct lcd
 extern struct lcd lcd;
 extern struct scan scan;
 
-
-void updatepatpix(void) ICODE_ATTR;
-void tilebuf(void) ICODE_ATTR;
-void bg_scan(void) ICODE_ATTR;
-void wnd_scan(void) ICODE_ATTR;
-void bg_scan_pri(void) ICODE_ATTR;
-void wnd_scan_pri(void) ICODE_ATTR;
-void spr_enum(void) ICODE_ATTR;
-void spr_scan(void) ICODE_ATTR;
 void lcd_begin(void) ICODE_ATTR;
 void lcd_refreshline(void) ICODE_ATTR;
 void pal_write(int i, byte b) ICODE_ATTR;

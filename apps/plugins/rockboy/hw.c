@@ -63,8 +63,7 @@ void hw_hdma(void)
 
     sa = ((addr)R_HDMA1 << 8) | (R_HDMA2&0xf0);
     da = 0x8000 | ((int)(R_HDMA3&0x1f) << 8) | (R_HDMA4&0xf0);
-    cnt = 16;
-    while (cnt--)
+    for (cnt=16; cnt>0; cnt--)
         writeb(da++, readb(sa++));
     cpu_timers(16);
     R_HDMA1 = sa >> 8;
@@ -93,12 +92,11 @@ void hw_hdma_cmd(byte c)
     /* Perform GDMA */
     sa = ((addr)R_HDMA1 << 8) | (R_HDMA2&0xf0);
     da = 0x8000 | ((int)(R_HDMA3&0x1f) << 8) | (R_HDMA4&0xf0);
-    cnt = ((int)c)+1;
+    cnt = (((int)c)+1) << 4;
     /* FIXME - this should use cpu time! */
     /*cpu_timers(102 * cnt);*/
-    cpu_timers((460>>cpu.speed)+cnt*16); /*dalias*/
+    cpu_timers((460>>cpu.speed)+cnt); /*dalias*/
 	/*cpu_timers(228 + (16*cnt));*/ /* this should be right according to no$ */
-    cnt <<= 4;
     while (cnt--)
         writeb(da++, readb(sa++));
     R_HDMA1 = sa >> 8;
@@ -115,7 +113,7 @@ void hw_hdma_cmd(byte c)
  * interrupt line) if a transition has been made.
  */
 
-void pad_refresh()
+void pad_refresh(void)
 {
     byte oldp1;
     oldp1 = R_P1;
@@ -139,7 +137,8 @@ void pad_refresh()
  * pad.
  */
 
-void pad_press(byte k)
+static void pad_press(byte k) ICODE_ATTR;
+static void pad_press(byte k)
 {
     if (hw.pad & k)
         return;
@@ -147,7 +146,8 @@ void pad_press(byte k)
     pad_refresh();
 }
 
-void pad_release(byte k)
+static void pad_release(byte k) ICODE_ATTR;
+static void pad_release(byte k)
 {
     if (!(hw.pad & k))
         return;
@@ -160,7 +160,7 @@ void pad_set(byte k, int st)
     st ? pad_press(k) : pad_release(k);
 }
 
-void hw_reset()
+void hw_reset(void)
 {
     hw.ilines = hw.pad = 0;
 
