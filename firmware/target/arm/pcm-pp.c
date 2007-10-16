@@ -25,25 +25,12 @@
 
 /** DMA **/
 
-/* List of transfer settings. Defined by player in order to have an inventory
-   of working settings. DMA-compatible settings should be found for here, i2s,
-   and codec setup using "arithmetic" the hardware supports like halfword
-   swapping. Try to use 32-bit packed in IIS modes if possible. */
-#if defined(SANSA_C200) || defined(SANSA_E200) \
-    || defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(IPOD_NANO) \
-    || defined(IPOD_VIDEO) || defined(IPOD_MINI2G) \
-    || defined(IPOD_COLOR) || defined(IPOD_4G)
+#ifdef CPU_PP502x
 /* 16-bit, L-R packed into 32 bits with left in the least significant halfword */
 #define SAMPLE_SIZE   16
-#define TRANSFER_SIZE 32
-#elif 0
-/* 16-bit, one left 16-bit sample followed by one right 16-bit sample */
-#define SAMPLE_SIZE   16
-#define TRANSFER_SIZE 16
 #else
 /* 32-bit, one left 32-bit sample followed by one right 32-bit sample */
 #define SAMPLE_SIZE   32
-#define TRANSFER_SIZE 32
 #endif
 
 struct dma_data
@@ -51,11 +38,7 @@ struct dma_data
 /* NOTE: The order of size and p is important if you use assembler
    optimised fiq handler, so don't change it. */
 #if SAMPLE_SIZE == 16
-#if TRANSFER_SIZE == 16
-    uint16_t *p;
-#elif TRANSFER_SIZE == 32
     uint32_t *p;
-#endif
 #elif SAMPLE_SIZE == 32
     uint16_t *p;
 #endif
@@ -140,15 +123,8 @@ void fiq_playback(void)
         "ands    r12, r12, %[mask]   \n"
         "beq     .exit               \n" /* FIFO full, exit */
 #if SAMPLE_SIZE == 16
-#if TRANSFER_SIZE == 16
-        "ldrh    r12, [r8], #2       \n" /* Load left channel */
-        "strh    r12, [r10, %[wr]]   \n" /* Store it */
-        "ldrh    r12, [r8], #2       \n" /* Load right channel */
-        "strh    r12, [r10, %[wr]]   \n" /* Store it */
-#elif TRANSFER_SIZE == 32
         "ldr     r12, [r8], #4       \n" /* load two samples */
         "str     r12, [r10, %[wr]]   \n" /* write them */
-#endif
 #elif SAMPLE_SIZE == 32
         "ldr     r12, [r8], #4       \n" /* load two samples */
         "mov     r12, r12, ror #16   \n" /* put left sample at the top bits */
@@ -206,12 +182,7 @@ void fiq_playback(void)
                 return;
             }
 #if SAMPLE_SIZE == 16
-#if TRANSFER_SIZE == 16
-            IISFIFO_WRH = *dma_play_data.p++;
-            IISFIFO_WRH = *dma_play_data.p++;
-#elif TRANSFER_SIZE == 32
             IISFIFO_WR = *dma_play_data.p++;
-#endif
 #elif SAMPLE_SIZE == 32
             IISFIFO_WR = *dma_play_data.p++ << 16;
             IISFIFO_WR = *dma_play_data.p++ << 16;
@@ -274,12 +245,7 @@ static void play_start_pcm(void)
         }
 
 #if SAMPLE_SIZE == 16
-#if TRANSFER_SIZE == 16
-        IISFIFO_WRH = *dma_play_data.p++;
-        IISFIFO_WRH = *dma_play_data.p++;
-#elif TRANSFER_SIZE == 32
         IISFIFO_WR = *dma_play_data.p++;
-#endif
 #elif SAMPLE_SIZE == 32
         IISFIFO_WR = *dma_play_data.p++ << 16;
         IISFIFO_WR = *dma_play_data.p++ << 16;
@@ -496,12 +462,7 @@ void fiq_record(void)
         }
 
 #if SAMPLE_SIZE == 16
-#if TRANSFER_SIZE == 16
-        *dma_rec_data.p++ = IISFIFO_RDH;
-        *dma_rec_data.p++ = IISFIFO_RDH;
-#elif TRANSFER_SIZE == 32
         *dma_rec_data.p++ = IISFIFO_RD;
-#endif
 #elif SAMPLE_SIZE == 32
         *dma_rec_data.p++ = IISFIFO_RD >> 16;
         *dma_rec_data.p++ = IISFIFO_RD >> 16;
