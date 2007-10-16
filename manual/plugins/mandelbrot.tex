@@ -3,45 +3,57 @@
 This demonstration draws fractal images from the Mandelbrot set
 \opt{archos,h1xx}{using the greyscale engine}.
 \begin{table}
-\begin{btnmap}{}{}
-Direction keys & Move about the image\\
-\opt{RECORDER_PAD,IRIVER_H10_PAD}{\ButtonPlay}
-\opt{ONDIO_PAD}{\ButtonMenu\ / \ButtonMenu+\ButtonUp}
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
-\opt{SANSA_E200_PAD}{\ButtonScrollDown}
-& Zoom in\\
-\opt{RECORDER_PAD}{\ButtonOn}
-\opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
-\opt{IAUDIO_X5_PAD}{Long \ButtonSelect}
-\opt{IRIVER_H10_PAD}{Long \ButtonPlay}
-\opt{SANSA_E200_PAD}{\ButtonScrollUp}
-& Zoom out\\
-\opt{RECORDER_PAD}{\ButtonFOne}
-\opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonLeft}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\ButtonSelect+\ButtonLeft}
-\opt{IAUDIO_X5_PAD}{\ButtonPlay+\ButtonLeft}
-\opt{IRIVER_H10_PAD}{\ButtonRew}
-& Decrease iteration depth (less detail)\\
-\opt{RECORDER_PAD}{\ButtonFTwo}
-\opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonRight}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\ButtonSelect+\ButtonRight}
-\opt{IAUDIO_X5_PAD}{\ButtonPlay+\ButtonRight}
-\opt{IRIVER_H10_PAD}{\ButtonFF}
-& Increase iteration depth (more detail)\\
-\opt{RECORDER_PAD}{\ButtonFThree}
-\opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff}
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
-\opt{IRIVER_H10_PAD}{\ButtonPlay + \ButtonRew}
-& Reset and return to the default image\\
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
-\opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD}{\ButtonPower}
-& Quit\\
-\end{btnmap}
+  \begin{btnmap}{}{}
+    Direction keys
+    & Move about the image\\
+    %
+    \opt{RECORDER_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu\ / \ButtonMenu+\ButtonUp}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD}{\ButtonSelect}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
+    \opt{SANSA_E200_PAD}{\ButtonScrollDown}
+    \opt{SANSA_C200_PAD}{\ButtonVolUp}
+    & Zoom in\\
+    %
+    \opt{RECORDER_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
+    \opt{IAUDIO_X5_PAD,GIGABEAT_PAD}{Long \ButtonSelect}
+    \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
+    \opt{SANSA_E200_PAD}{\ButtonScrollUp}
+    \opt{SANSA_C200_PAD}{\ButtonVolDown}
+    & Zoom out\\
+    %
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonLeft}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonSelect+\ButtonLeft}
+    \opt{IAUDIO_X5_PAD}{Long \ButtonPlay}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{GIGABEAT_PAD}{\ButtonVolDown}
+    & Decrease iteration depth (less detail)\\
+    %
+    \opt{RECORDER_PAD}{\ButtonFTwo}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonRight}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonSelect+\ButtonRight}
+    \opt{IAUDIO_X5_PAD}{\ButtonPlay}
+    \opt{IRIVER_H10_PAD}{\ButtonFF}
+    \opt{GIGABEAT_PAD}{\ButtonVolUp}
+    & Increase iteration depth (more detail)\\
+    %
+    \opt{RECORDER_PAD}{\ButtonFThree}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
+    \opt{IRIVER_H10_PAD}{\ButtonPlay + \ButtonRew}
+    \opt{GIGABEAT_PAD}{\ButtonA}
+    & Reset and return to the default image\\
+    %
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD}{\ButtonPower}
+    & Quit\\
+  \end{btnmap}
 \end{table}
