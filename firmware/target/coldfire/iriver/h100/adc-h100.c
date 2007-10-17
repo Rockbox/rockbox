@@ -37,7 +37,7 @@
     ({                                \
         int _x_;                      \
         asm volatile (                \
-            "move.l #13, %[_x_] \r\n" \
+            "move.l #11, %[_x_] \r\n" \
         "1:                     \r\n" \
             "subq.l #1, %[_x_]  \r\n" \
             "bhi.b  1b          \r\n" \
