@@ -6,11 +6,10 @@ motion_comp.c
 
 #ifdef CPU_COLDFIRE
 idct_coldfire.S
+motion_comp_coldfire_c.c
+motion_comp_coldfire_s.S
 #elif defined CPU_ARM
 idct_arm.S
-#endif
-
-#ifdef CPU_ARM
 motion_comp_arm_c.c
 motion_comp_arm_s.S
 #else  /* other CPU or SIM */
