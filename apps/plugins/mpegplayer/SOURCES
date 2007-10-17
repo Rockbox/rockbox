@@ -1,21 +1,21 @@
 alloc.c
 decode.c
 header.c
-
-motion_comp.c
-
-#ifdef CPU_ARM
-idct_arm_c.c
-motion_comp_arm_c.c
-motion_comp_arm_s.S
-#else  /* other CPU or SIM */
 idct.c
-motion_comp_c.c
-#endif /* CPU_* */
+motion_comp.c
 
 #ifdef CPU_COLDFIRE
 idct_coldfire.S
+#elif defined CPU_ARM
+idct_arm.S
 #endif
+
+#ifdef CPU_ARM
+motion_comp_arm_c.c
+motion_comp_arm_s.S
+#else  /* other CPU or SIM */
+motion_comp_c.c
+#endif /* CPU_* */
 
 slice.c
 video_out_rockbox.c

@@ -29,52 +29,10 @@
 #include "attributes.h"
 #include "mpeg2_internal.h"
 
-#define W1 2841 /* 2048 * sqrt (2) * cos (1 * pi / 16) */
-#define W2 2676 /* 2048 * sqrt (2) * cos (2 * pi / 16) */
-#define W3 2408 /* 2048 * sqrt (2) * cos (3 * pi / 16) */
-#define W5 1609 /* 2048 * sqrt (2) * cos (5 * pi / 16) */
-#define W6 1108 /* 2048 * sqrt (2) * cos (6 * pi / 16) */
-#define W7 565  /* 2048 * sqrt (2) * cos (7 * pi / 16) */
-
 /* idct main entry point  */
 void (* mpeg2_idct_copy) (int16_t * block, uint8_t * dest, int stride);
 void (* mpeg2_idct_add) (int last, int16_t * block,
                          uint8_t * dest, int stride);
-
-/*
- * In legal streams, the IDCT output should be between -384 and +384.
- * In corrupted streams, it is possible to force the IDCT output to go
- * to +-3826 - this is the worst case for a column IDCT where the
- * column inputs are 16-bit values.
- */
-#ifdef CPU_COLDFIRE
-static inline unsigned CLIP(int value)
-{
-    asm (  /* Note: Uses knowledge that only the low byte of the result is used */
-        "cmp.l   #255,%[v]   \n"  /* overflow? */
-        "bls.b   1f          \n"  /* no: return value */
-        "spl.b   %[v]        \n"  /* yes: set low byte to appropriate boundary */
-    "1:                      \n"
-        : /* outputs */
-        [v]"+d"(value)
-    );
-    return value;
-}
-#elif defined CPU_ARM
-static inline unsigned CLIP(int value)
-{
-    asm volatile ( /* Note: Uses knowledge that only the low byte of the result is used */
-        "cmp     %[v], #255          \n"
-        "mvnhi   %[v], %[v], asr #31 \n"
-        : /* outputs */
-        [v]"+r"(value)
-    );
-    return value;
-}
-#else
-uint8_t mpeg2_clip[3840 * 2 + 256] IBSS_ATTR;
-#define CLIP(i) ((mpeg2_clip + 3840)[i])
-#endif
 
 #ifdef CPU_COLDFIRE
 /* assembler functions */
@@ -82,7 +40,31 @@ extern void mpeg2_idct_copy_coldfire(int16_t * block, uint8_t * dest,
                                      const int stride);
 extern void mpeg2_idct_add_coldfire(const int last, int16_t * block,
                                     uint8_t * dest, const int stride);
-#else /* !CPU_COLDFIE */
+
+#elif defined CPU_ARM
+/* assembler functions */
+extern void mpeg2_idct_copy_arm(int16_t * block, uint8_t * dest,
+                                const int stride);
+extern void mpeg2_idct_add_arm(const int last, int16_t * block,
+                               uint8_t * dest, const int stride);
+
+#else /* !CPU_COLDFIE, !CPU_ARM */
+
+#define W1 2841 /* 2048 * sqrt (2) * cos (1 * pi / 16) */
+#define W2 2676 /* 2048 * sqrt (2) * cos (2 * pi / 16) */
+#define W3 2408 /* 2048 * sqrt (2) * cos (3 * pi / 16) */
+#define W5 1609 /* 2048 * sqrt (2) * cos (5 * pi / 16) */
+#define W6 1108 /* 2048 * sqrt (2) * cos (6 * pi / 16) */
+#define W7 565  /* 2048 * sqrt (2) * cos (7 * pi / 16) */
+
+/*
+ * In legal streams, the IDCT output should be between -384 and +384.
+ * In corrupted streams, it is possible to force the IDCT output to go
+ * to +-3826 - this is the worst case for a column IDCT where the
+ * column inputs are 16-bit values.
+ */
+uint8_t mpeg2_clip[3840 * 2 + 256] IBSS_ATTR;
+#define CLIP(i) ((mpeg2_clip + 3840)[i])
 
 #if 0
 #define BUTTERFLY(t0,t1,W0,W1,d0,d1) \
@@ -266,7 +248,7 @@ static void mpeg2_idct_add_c (const int last, int16_t * block,
     }
 }
 
-#endif /* !CPU_COLDFIRE */
+#endif /* CPU selection */
 
 void mpeg2_idct_init (void)
 {
@@ -279,12 +261,13 @@ void mpeg2_idct_init (void)
 #ifdef CPU_COLDFIRE
     mpeg2_idct_copy = mpeg2_idct_copy_coldfire;
     mpeg2_idct_add  = mpeg2_idct_add_coldfire;
+#elif defined CPU_ARM
+    mpeg2_idct_copy = mpeg2_idct_copy_arm;
+    mpeg2_idct_add  = mpeg2_idct_add_arm;
 #else
     mpeg2_idct_copy = mpeg2_idct_copy_c;
     mpeg2_idct_add  = mpeg2_idct_add_c;
-#endif
 
-#if !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
     for (i = -3840; i < 3840 + 256; i++)
         CLIP(i) = (i < 0) ? 0 : ((i > 255) ? 255 : i);
 #endif
