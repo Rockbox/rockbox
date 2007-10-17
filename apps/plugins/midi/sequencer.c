@@ -25,13 +25,36 @@ extern struct plugin_api * rb;
 
 long tempo=375000;
 
+/* From the old patch config.... each patch is scaled.
+ * Should be moved into patchset.cfg
+ * But everyone would need a new config file.
+ *
+ * While this really does need to go into the patch config,
+ * I doubt anyone has made their own custom rockbox patchset
+ * (if you have, please send a copy my way :) )
+ */
+static const unsigned char patchScale[]=
+{
+    125,115,115,100,100,80,115,100,100,100,100,80,100,100,100,100,
+    100,100,100,100,60,100,100,100,150,155,145,100,125,86,125,85,
+    161,160,133,160,135,133,100,128,150,100,100,150,100,130,100,200,
+    100,100,125,125,100,100,100,100,124,110,111,100,139,113,115,115,
+    125,115,95,140,100,100,105,100,90,100,80,80,100,125,100,80,
+    100,100,100,250,130,100,100,100,115,100,100,120,200,100,100,80,
+    130,100,100,150,100,100,100,100,100,100,200,100,100,100,100,100,
+    100,100,113,100,200,100,100,100,30,100,100,100,100,100,100,100
+};
+
 /* Sets the volume scaling by channel volume and note volume */
 /* This way we can do the multiplication/indexing once per   */
 /* MIDI event at the most, instead of once per sample.       */
 static inline void setVolScale(int a)
 {
     struct SynthObject * so = &voices[a];
-    so->volscale = ((signed short int)so->vol*(signed short int)chVol[so->ch]);
+    int ch = so->ch;
+
+    so->volscale = so->vol * chVol[ch]*patchScale[chPat[ch]] / 100;
+    //((signed short int)so->vol*(signed short int)chVol[ch])*patchScale[chPat[ch]];
 }
 
 static inline void setVol(int ch, int vol)
