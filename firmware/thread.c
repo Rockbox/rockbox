@@ -608,7 +608,8 @@ static inline void core_sleep(struct thread_entry **waking)
 #else
 static inline void core_sleep(struct thread_entry **waking)
 {
-
+    (void) waking;
+#warning core_sleep not implemented, battery life will be decreased
 }
 #endif /* CONFIG_CPU == */
 

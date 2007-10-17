@@ -31,7 +31,7 @@
 #define GIO_TS_ENABLE  (1<<2)
 #define GIO_RTC_ENABLE (1<<12)
 
-struct mutex spi_lock;
+struct spinlock spi_lock;
 
 struct SPI_info {
     volatile unsigned short *setreg;
