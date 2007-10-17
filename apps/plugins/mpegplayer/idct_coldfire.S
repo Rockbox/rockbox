@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id $
+ * $Id$
  *
  * Copyright (C) 2007 Jens Arnold
  * Based on the work of Karim Boucher and Rani Hod

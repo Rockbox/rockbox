@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id $
+ * $Id$
  *
  * Copyright (C) 2007 by Michael Sevakis
  *
@@ -323,7 +323,7 @@ mpeg2_idct_add_arm:
     bne    3f                    
 1:
     stmfd  sp!, { r2-r12, lr }
-    bl     .idct                  
+    bl     .idct
     ldmfd  sp!, { r1-r2 }        
     mov    r11, #0               
     add    r12, r0, #128         
