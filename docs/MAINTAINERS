@@ -44,12 +44,12 @@ specific to that target.
 :Ipod Mini 1st Gen:
 :Ipod Mini 2nd Gen: Jens Arnold
 :Ipod Nano 1st Gen: Thom Johansen
-:Iriver H10 20GB:
+:Iriver H10 20GB: Barry Wardell
 :Iriver H10 5GB/6GB:
 :Iaudio X5: Linus Nielsen Feltzing
 :Iaudio X5V: Linus Nielsen Feltzing
 :Iaudio M5: Marianne Arnold
-:Sansa E200: Michael Sevakis
+:Sansa E200: Michael Sevakis, Barry Wardell
 :Sansa E200R:
 :Sansa C200:
 :Toshiba Gigabeat F: Michael Sevakis
@@ -65,6 +65,7 @@ Core code (low-level)
 :Rolo:
 :ATA driver: Michael Sevakis
 :MMC driver: Jens Arnold
+:SD driver: Barry Wardell
 :FAT driver: Linus Nielsen Feltzing
 :Battery/Power Management:
 :FM Tuner drivers: Michael Sevakis
@@ -270,9 +271,9 @@ Bootloaders
 
 :Iriver H1xx/H3xx: Miika Pekkarinen, Linus Nielsen Feltzing
 :Iaudio X5/M5: Linus Nielsen Feltzing
-:PortalPlayer (not ipod):
+:PortalPlayer (not ipod): Barry Wardell
 :Ipod: Dave Chapman
-:Gigabeat F/X
+:Gigabeat F/X: Barry Wardell
 
 
 Build Tools
@@ -302,7 +303,7 @@ Install Tools
 
 :Rockbox Utility:
 :ipodpatcher: Dave Chapman
-:sansapatcher: Dave Chapman
+:sansapatcher: Dave Chapman, Barry Wardell
 
 
 Manual
