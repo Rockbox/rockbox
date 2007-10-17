@@ -321,7 +321,7 @@ enum codec_status codec_main(void)
 
     ci->configure(DSP_SET_SAMPLE_DEPTH, 30);
 
-    next_track:
+next_track:
 
     /* Wait for the metadata to be read */
     while (!*ci->taginfo_ready && !ci->stop_codec)
@@ -373,10 +373,13 @@ enum codec_status codec_main(void)
             goto done;
         }
 
-        /* Deal with any pending seek requests - ignore them */
+        /* Deal with any pending seek requests */
         if (ci->seek_time)
         {
+            /* Ignore all seeks for now, unless for the start of the track */
             ci->seek_complete();
+            if (ci->seek_time == 1)
+                goto next_track; /* Pretend you never saw this... */
         }
 
         res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx);
