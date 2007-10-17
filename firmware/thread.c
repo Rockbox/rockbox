@@ -606,7 +606,7 @@ static inline void core_sleep(struct thread_entry **waking)
         :  : "r"(waking) : "r0", "r1", "r2", "r3");
 }
 #else
-static inline void core_sleep(void)
+static inline void core_sleep(struct thread_entry **waking)
 {
 
 }
