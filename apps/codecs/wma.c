@@ -377,9 +377,11 @@ next_track:
         if (ci->seek_time)
         {
             /* Ignore all seeks for now, unless for the start of the track */
-            ci->seek_complete();
-            if (ci->seek_time == 1)
+            if (ci->seek_time == 1) {
+                ci->seek_complete();
                 goto next_track; /* Pretend you never saw this... */
+            }
+            ci->seek_complete();
         }
 
         res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx);
