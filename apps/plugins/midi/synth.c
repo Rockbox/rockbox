@@ -66,6 +66,8 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         chPat[a]=0;              /* Ac Gr Piano                     */
         chPW[a]=256;             /* .. not .. bent ?                */
         chPBDepth[a]=2;          /* Default bend value is 2 */
+        chPBNoteOffset[a]=0;     /* No offset */
+        chPBFractBend[a]=65536; /* Center.. no bend */
     }
     for(a=0; a<128; a++)
     {

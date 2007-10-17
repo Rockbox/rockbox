@@ -25,7 +25,10 @@ int chVol[16] IBSS_ATTR;       /* Channel volume                */
 int chPan[16] IBSS_ATTR;       /* Channel panning               */
 int chPat[16] IBSS_ATTR;                  /* Channel patch                 */
 int chPW[16] IBSS_ATTR;                   /* Channel pitch wheel, MSB only */
-int chPBDepth[16] IBSS_ATTR;                   /* Channel pitch wheel, MSB only */
+int chPBDepth[16] IBSS_ATTR;              /* Channel pitch bend depth */
+int chPBNoteOffset[16] IBSS_ATTR;       /* Pre-computed whole semitone offset */
+int chPBFractBend[16] IBSS_ATTR;        /* Fractional bend applied to delta */
+
 
 struct GPatch * gusload(char *);
 struct GPatch * patchSet[128];

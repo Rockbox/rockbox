@@ -34,8 +34,7 @@
                  mainly because they have to use 44100Hz sample rate */
 #define MAX_VOICES 16
 #else
-#define MAX_VOICES 24 /* Note: 24 midi channels is the minimum general midi
-                         spec implementation */
+#define MAX_VOICES 24 /* Note: 24 midi channels is the minimum general midi spec implementation */
 #endif /* CPU_PP */
 
 #else	/* Simulator requires 44100Hz, and we can afford to use more voices */
@@ -98,19 +97,6 @@ struct MIDIfile
     int numPatches;
 };
 
-/*
-struct SynthObject
-{
-    struct GWaveform * wf;
-    unsigned int delta;
-    unsigned int decay;
-    unsigned int cp;
-    unsigned char state, loopState, loopDir;
-    unsigned char note, vol, ch, isUsed;
-    int curRate, curOffset, targetOffset;
-    unsigned int curPoint;
-};
-*/
 
 struct SynthObject
 {
@@ -161,6 +147,10 @@ extern int chPan[16];       /* Channel panning               */
 extern int chPat[16];       /* Channel patch                 */
 extern int chPW[16];        /* Channel pitch wheel, MSB only */
 extern int chPBDepth[16];   /* Channel pitch bend depth (Controller 6 */
+extern int chPBNoteOffset[16] IBSS_ATTR;       /* Pre-computed whole semitone offset */
+extern int chPBFractBend[16] IBSS_ATTR;        /* Fractional bend applied to delta */
+
+
 
 extern struct GPatch * gusload(char *);
 extern struct GPatch * patchSet[128];
