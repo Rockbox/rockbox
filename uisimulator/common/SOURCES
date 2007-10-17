@@ -5,6 +5,5 @@ lcd-common.c
 font-player.c
 lcd-playersim.c
 #endif
-mpegplay.c
 sim_icons.c
 stubs.c
