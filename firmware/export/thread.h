@@ -372,7 +372,7 @@ struct core_entry
 ({  uint32_t o;                \
     asm volatile(              \
         "swpb %0, %1, [%2]"    \
-        : "=r"(o)              \
+        : "=&r"(o)             \
         : "r"(v),              \
           "r"((uint8_t*)(a))); \
     o; })
@@ -381,7 +381,7 @@ struct core_entry
 ({  uint32_t o;                 \
     asm volatile(               \
         "swp %0, %1, [%2]"      \
-        : "=r"(o)               \
+        : "=&r"(o)              \
         : "r"((uint32_t)(v)),   \
           "r"((uint32_t*)(a))); \
     o; })
@@ -390,7 +390,7 @@ struct core_entry
 ({  typeof (*(a)) o;        \
     asm volatile(           \
         "swp %0, %1, [%2]"  \
-        : "=r"(o)           \
+        : "=&r"(o)          \
         : "r"(v), "r"(a));  \
     o; })
 #endif /* locking selection */
