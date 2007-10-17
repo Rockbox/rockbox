@@ -47,16 +47,8 @@
 RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 {
     absolutePath = qApp->applicationDirPath();
-    // use built-in rbutil.ini if no external file in binary folder
-    QString iniFile = absolutePath + "/rbutil.ini";
-    if(QFileInfo(iniFile).isFile()) {
-        qDebug() << "using external rbutil.ini";
-        devices = new QSettings(iniFile, QSettings::IniFormat, 0);
-    }
-    else {
-        qDebug() << "using built-in rbutil.ini";
-        devices = new QSettings(":/ini/rbutil.ini", QSettings::IniFormat, 0);
-    }
+    // only use built-in rbutil.ini
+    devices = new QSettings(":/ini/rbutil.ini", QSettings::IniFormat, 0);
 
     ui.setupUi(this);
 
@@ -817,7 +809,8 @@ void RbUtilQt::downloadManual(void)
 
     devices->beginGroup(userSettings->value("platform").toString());
     QString manual;
-    manual = devices->value("manualname", "rockbox-" + devices->value("platform").toString()).toString();
+    manual = devices->value("manualname", "rockbox-" +
+            devices->value("platform").toString()).toString();
     devices->endGroup();
 
     QString date = (info.value("dailies/date").toString());
@@ -973,7 +966,8 @@ QUrl RbUtilQt::proxy()
     DWORD buflen = 80;
     long ret;
 
-    ret = RegOpenKeyEx(HKEY_CURRENT_USER, _TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"),
+    ret = RegOpenKeyEx(HKEY_CURRENT_USER,
+        _TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"),
         0, KEY_QUERY_VALUE, &hk);
     if(ret != ERROR_SUCCESS) return QUrl("");
 
