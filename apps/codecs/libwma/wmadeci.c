@@ -80,32 +80,58 @@ VLC_TYPE vlcbuf4[540][2];
 
 #ifdef CPU_ARM
 static inline
-void vector_fmul_add_add(fixed32 *dst, const fixed32 *data, const fixed32 *window, int n)
+void vector_fmul_add_add(fixed32 *dst, const fixed32 *data,
+                         const fixed32 *window, int n)
 {
-  while (n>=2) {
-    asm volatile ("ldmia %[d]!, {r0, r1};"
-                  "ldmia %[w]!, {r4, r5};"
+    /* Block sizes are always power of two */
+    asm volatile (
+        "0:"
+        "ldmia %[d]!, {r0, r1};"
+        "ldmia %[w]!, {r4, r5};"
+        /* consume the first data and window value so we can use those
+         * registers again */
+        "smull r8, r9, r0, r4;"
+        "ldmia %[dst], {r0, r4};"
+        "add   r0, r0, r9, lsl #1;"  /* *dst=*dst+(r9<<1)*/
+        "smull r8, r9, r1, r5;"
+        "add   r1, r4, r9, lsl #1;"
+        "stmia %[dst]!, {r0, r1};"
+        "subs %[n], %[n], #2;"
+        "bne 0b;"
+        : [d] "+r" (data), [w] "+r" (window), [dst] "+r" (dst), [n] "+r" (n)
+        : : "r0", "r1", "r4", "r5", "r8", "r9", "memory", "cc");
+}
 
-         /*consume the first data and window value so we can use those registers again */
-                  "smull r8, r9, r0, r4;"
+#elif defined(CPU_COLDFIRE)
 
-                  "ldmia %[dst], {r0, r4};"
-                  "add   r0, r0, r9, lsl #1;"  /* *dst=*dst+(r9<<1)*/
-                  "smull r8, r9, r1, r5;"
-                  "add   r1, r4, r9, lsl #1;"
-                  "stmia %[dst]!, {r0, r1};"
-                  : [d] "+r" (data), [w] "+r" (window), [dst] "+r" (dst)
-                  : : "r0", "r1",
-                  "r4", "r5", "r8", "r9",
-                  "memory", "cc");
-    n -= 2;
-  }
-  while(n>0) {
-    *dst = fixmul32b(*data, *window);
-    data++;
-    window++;
-    n--;
-  }
+static inline
+void vector_fmul_add_add(fixed32 *dst, const fixed32 *data,
+                         const fixed32 *window, int n)
+{
+    /* Block sizes are always power of two. Smallest block is always way bigger
+     * than four too.*/ 
+    asm volatile (
+        "0:"
+        "movem.l (%[d]), %%d0-%%d3;"
+        "movem.l (%[w]), %%a0-%%a1/%%d4-%%d5;"
+        "mac.l %%d0, %%a0, %%acc0;"
+        "mac.l %%d1, %%a1, %%acc1;"
+        "mac.l %%d2, %%d4, %%acc2;"
+        "mac.l %%d3, %%d5, %%acc3;"
+        "lea.l (%[d], 16), %[d];"
+        "lea.l (%[w], 16), %[w];"
+        "movclr.l %%acc0, %%d0;"
+        "movclr.l %%acc1, %%d1;"
+        "movclr.l %%acc2, %%d2;"
+        "movclr.l %%acc3, %%d3;"
+        "add.l %%d0, (%[dst])+;"
+        "add.l %%d1, (%[dst])+;"
+        "add.l %%d2, (%[dst])+;"
+        "add.l %%d3, (%[dst])+;"
+        "subq.l #4, %[n];"
+        "jne 0b;"
+        : [d] "+a" (data), [w] "+a" (window), [dst] "+a" (dst), [n] "+d" (n)
+        : : "d0", "d1", "d2", "d3", "d4", "d5", "a0", "a1", "memory", "cc");
 }
 
 #else
@@ -1069,7 +1095,7 @@ static int wma_decode_block(WMADecodeContext *s)
                 ptr += run;
                 if (ptr >= eptr)
                 {
-                    return -9;
+                    break;
                 }
                 *ptr++ = level;
 
