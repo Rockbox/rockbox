@@ -25,10 +25,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include <string.h>
 #include <inttypes.h>
 
+#include "codecs.h" /* for Rockbox CPU definitions etc */
 #include "demac.h"
 #include "filter.h"
 
+#ifdef CPU_COLDFIRE
+#include "vector_math16_cf.h"
+#else
 #include "vector_math16.h"
+#endif
 
 struct filter_t {
     int16_t* coeffs; /* ORDER entries */
@@ -84,6 +89,10 @@ static inline void do_apply_filter_3980(struct filter_t* f, int32_t* data, int c
     int res;
     int absres;
 
+#ifdef PREPARE_SCALARPRODUCT
+    PREPARE_SCALARPRODUCT
+#endif
+
     while(count--)
     {
         res = FP_TO_INT(scalarproduct(f->delay - ORDER, f->coeffs));
@@ -135,6 +144,10 @@ static inline void do_apply_filter_3980(struct filter_t* f, int32_t* data, int c
 static inline void do_apply_filter_3970(struct filter_t* f, int32_t* data, int count)
 {
     int res;
+    
+#ifdef PREPARE_SCALARPRODUCT
+    PREPARE_SCALARPRODUCT
+#endif
 
     while(count--)
     {

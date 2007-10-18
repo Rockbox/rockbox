@@ -32,12 +32,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 /* Statically allocate the filter buffers */
 
-static int16_t filterbuf32[(32*3 + HISTORY_SIZE) * 2] IBSS_ATTR;   /* 4480 bytes */
-static int16_t filterbuf256[(256*3 + HISTORY_SIZE) * 2] IBSS_ATTR;  /* 5120 bytes */
+static int16_t filterbuf32[(32*3 + HISTORY_SIZE) * 2]     /* 4480 bytes */
+               IBSS_ATTR __attribute__((aligned(16)));
+static int16_t filterbuf256[(256*3 + HISTORY_SIZE) * 2]   /* 5120 bytes */
+               IBSS_ATTR __attribute__((aligned(16)));
 
 /* This is only needed for "insane" files, and no Rockbox targets can
    hope to decode them in realtime anyway. */
-static int16_t filterbuf1280[(1280*3 + HISTORY_SIZE) * 2]; /* 17408 bytes */
+static int16_t filterbuf1280[(1280*3 + HISTORY_SIZE) * 2] /* 17408 bytes */
+               __attribute__((aligned(16)));
 
 void init_frame_decoder(struct ape_ctx_t* ape_ctx,
                         unsigned char* inbuffer, int* firstbyte,
@@ -163,7 +166,7 @@ int decode_chunk(struct ape_ctx_t* ape_ctx,
         }
 
         /* Now apply the predictor decoding */
-	predictor_decode_stereo(&ape_ctx->predictor,decoded0,decoded1,count);
+        predictor_decode_stereo(&ape_ctx->predictor,decoded0,decoded1,count);
 
         if (ape_ctx->bps == 8) {
             /* TODO: Handle 8-bit streams */
