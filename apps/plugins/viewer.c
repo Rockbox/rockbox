@@ -1139,8 +1139,6 @@ static void viewer_save_settings(void)/* same name as global, but not the same f
 {
     int settings_fd;
 
-    rb->splash(1, "Saving Settings");
-
     settings_fd = rb->creat(SETTINGS_FILE); /* create the settings file */
     
     rb->write (settings_fd, &prefs, sizeof(struct preferences));
