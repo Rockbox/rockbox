@@ -5,7 +5,7 @@
 	<key>CFBundleExecutable</key>
 	<string>rbutilqt</string>
 	<key>CFBundleGetInfoString</key>
-	<string>SVN $Revision$ (m1.0.1)</string>
+	<string>SVN $Revision$ (m1.0.2)</string>
 	<key>CFBundleIconFile</key>
 	<string>rbutilqt.icns</string>
 	<key>CFBundleIdentifier</key>
