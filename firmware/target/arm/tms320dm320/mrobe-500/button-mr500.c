@@ -46,7 +46,11 @@ void use_calibration(bool enable)
 {
     using_calibration = enable;
 }
-
+/* Jd's tests.. These will hopefully work for everyone so we dont have to
+    create a calibration screen. and 
+(0,0) = 0x00c0, 0xf40
+(480,320) = 0x0f19, 0x00fc
+*/
 void set_calibration_points(struct touch_calibration_point *tl,
                             struct touch_calibration_point *br)
 {
@@ -75,7 +79,12 @@ void button_init_device(void)
     last_touch = 0;
     /* GIO is the power button, set as input */
     IO_GIO_DIR0 |= 0x01;
+    topleft.px_x = 0;       topleft.px_y = 0;
+    topleft.val_x = 0x00c0; topleft.val_y = 0xf40;
     
+    bottomright.px_x = LCD_WIDTH;   bottomright.px_y = LCD_HEIGHT;
+    bottomright.val_x = 0x0f19;     bottomright.val_y = 0x00fc;
+    using_calibration = true;
     
     /* Enable the touchscreen interrupt */
     IO_INTC_EINT2 |= (1<<3); /* IRQ_GIO14 */
@@ -94,14 +103,13 @@ inline bool button_hold(void)
 {
     return false;
 }
-#ifdef BOOTLOADER
+
 int button_get_last_touch(void)
 {
     int ret_val = last_touch;
     last_touch = 0;
     return ret_val;
 }
-#endif
 
 static void remote_heartbeat(void)
 {
@@ -114,10 +122,7 @@ int button_read_device(void)
     char c;
     int i = 0;
     int btn = BUTTON_NONE;
-    
-    if (last_touch)
-        btn |= BUTTON_TOUCHPAD;
-
+        
     if ((IO_GIO_BITSET0&0x01) == 0)
         btn |= BUTTON_POWER;
 
@@ -158,11 +163,27 @@ int button_read_device(void)
     }
     return btn;
 }
-
+#define TOUCH_MARGIN 8
 void GIO14(void)
 {
-    tsc2100_read_values(&last_x,  &last_y,
+    short x,y;
+    static int last_tick = 0;
+    tsc2100_read_values(&x,  &y,
                         &last_z1, &last_z2);
-    last_touch = touch_to_pixels(last_x, last_y);
+     if (TIME_BEFORE(last_tick+HZ/5, current_tick))
+    {
+        if ((x > last_x + TOUCH_MARGIN) ||
+            (x < last_x - TOUCH_MARGIN) ||
+            (y > last_y + TOUCH_MARGIN) ||
+            (y < last_y - TOUCH_MARGIN))
+        {
+            last_x = x;
+            last_y = y;
+            queue_clear(&button_queue);
+            queue_post(&button_queue, BUTTON_TOUCHPAD, 
+                touch_to_pixels(x, y));
+        }
+         last_tick = current_tick;
+    }
     IO_INTC_IRQ2 = (1<<3);
 }

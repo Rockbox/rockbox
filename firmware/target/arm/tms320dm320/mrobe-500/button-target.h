@@ -28,6 +28,7 @@
 bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
+int button_get_last_touch(void);
 
 struct touch_calibration_point {
     short px_x; /* known pixel value */
@@ -58,8 +59,9 @@ void use_calibration(bool enable);
 /* compatibility hacks */
 #define BUTTON_LEFT     BUTTON_RC_REW
 #define BUTTON_RIGHT    BUTTON_RC_FF
+
 #define POWEROFF_BUTTON BUTTON_POWER
-#define POWEROFF_COUNT  40
+#define POWEROFF_COUNT  10
 
 #define BUTTON_MAIN BUTTON_POWER
 

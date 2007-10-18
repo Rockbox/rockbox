@@ -112,7 +112,7 @@ void mrdebug(void)
         printf("%d:%d:%d %d %d %d", t->tm_hour, t->tm_min, t->tm_sec, t->tm_mday, t->tm_mon, t->tm_year);
         printf("time: %d", mktime(t));
 #endif
-        button = button_status();
+        button = button_get(false);
         if (button == BUTTON_POWER)
         {
             printf("reset");
@@ -138,14 +138,16 @@ void mrdebug(void)
 //            tsc2100_keyclick(); /* doesnt work :( */
             line -= 6;
         }
-#if 0
+#if 1
         if (button&BUTTON_TOUCHPAD)
         {
-            unsigned int data = button_get_last_touch();
-            printf("x: %d, y: %d", data>>16, data&0xffff);
-            line-=3;
+            unsigned int data = button_get_data();
+            int x = (data&0xffff0000)>>16, y = data&0x0000ffff;
+            reset_screen();
+            lcd_hline(x-5, x+5, y);
+            lcd_vline(x, y-5, y+5);
+            lcd_update();
         }
-        else line -=2;
 #endif
     }
 }
