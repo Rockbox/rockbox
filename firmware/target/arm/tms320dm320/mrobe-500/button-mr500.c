@@ -69,6 +69,7 @@ static int touch_to_pixels(short val_x, short val_y)
         y = 0;
     return (x<<16)|y;
 }
+
 void button_init_device(void)
 {
     last_touch = 0;
@@ -102,53 +103,56 @@ int button_get_last_touch(void)
 }
 #endif
 
+static void remote_heartbeat(void)
+{
+    char data[5] = {0x11, 0x30, 0x11^0x30, 0x11+0x30, '\0'};
+    uart1_puts(data);
+}
+
 int button_read_device(void)
 {
-    char data[5], c;
+    char c;
     int i = 0;
     int btn = BUTTON_NONE;
     
     if (last_touch)
         btn |= BUTTON_TOUCHPAD;
-    
+
     if ((IO_GIO_BITSET0&0x01) == 0)
         btn |= BUTTON_POWER;
-        
-    uart1_heartbeat();
-    while (uart1_available())
+
+    remote_heartbeat();
+    while (uart1_getch(&c))
     {
-        if (uart1_getch(&c))
+        if (i==0 && (c == BUTTON_START_BYTE || c == BUTTON_START_BYTE2) )
         {
-            if (i && (data[0] == BUTTON_START_BYTE || data[0] == BUTTON_START_BYTE2))
+            i++;
+        }
+        else if (i)
+        {
+            i++;
+            if(i==2)
             {
-                data[i++] = c;
-            }
-            else if (c == BUTTON_START_BYTE ||
-                     c == BUTTON_START_BYTE2)
-            {
-                data[0] = c;
-                i = 1;
-            }
-            
-            if (i == 5)
-            {
-                if (data[1]& (1<<7))
+                if (c& (1<<7))
                     btn |= BUTTON_RC_HEART;
-                if (data[1]& (1<<6))
+                if (c& (1<<6))
                     btn |= BUTTON_RC_MODE;
-                if (data[1]& (1<<5))
+                if (c& (1<<5))
                     btn |= BUTTON_RC_VOL_DOWN;
-                if (data[1]& (1<<4))
+                if (c& (1<<4))
                     btn |= BUTTON_RC_VOL_UP;
-                if (data[1]& (1<<3))
+                if (c& (1<<3))
                     btn |= BUTTON_RC_REW;
-                if (data[1]& (1<<2))
+                if (c& (1<<2))
                     btn |= BUTTON_RC_FF;
-                if (data[1]& (1<<1))
+                if (c& (1<<1))
                     btn |= BUTTON_RC_DOWN;
-                if (data[1]& (1<<0))
+                if (c& (1<<0))
                     btn |= BUTTON_RC_PLAY;
-                break;
+            }
+            else if(i==5)
+            {
+                i=0;
             }
         }
     }

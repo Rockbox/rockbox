@@ -43,7 +43,7 @@
 #include "tsc2100.h"
 #include "time.h"
 
-//#define MRDEBUG
+#define MRDEBUG
 
 #if defined(MRDEBUG)
 
@@ -97,18 +97,22 @@ void touchpad_calibrate_screen(void)
     set_calibration_points(&tl, &br);
 }
 
-void mrdebug()
+void mrdebug(void)
 {
     int button=0, *address=0x0;
+#if 0
     use_calibration(false);
     touchpad_calibrate_screen();
     use_calibration(true);
+#endif
     while(true)
     {
+#if 0
         struct tm *t = get_time();
         printf("%d:%d:%d %d %d %d", t->tm_hour, t->tm_min, t->tm_sec, t->tm_mday, t->tm_mon, t->tm_year);
         printf("time: %d", mktime(t));
-        button = button_read_device();
+#endif
+        button = button_status();
         if (button == BUTTON_POWER)
         {
             printf("reset");
@@ -122,6 +126,19 @@ void mrdebug()
             address+=0x1000;
         else if (button==BUTTON_RC_REW)
             address-=0x1000;
+        {
+            short x,y,z1,z2;
+            tsc2100_read_values(&x, &y, &z1, &z2);
+            printf("x: %04x y: %04x z1: %04x z2: %04x", x, y, z1, z2);
+            printf("tsadc: %4x", tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS)&0xffff);
+            printf("current tick: %04x", current_tick);
+            printf("Address: 0x%08x Data: 0x%08x", address, *address);
+            printf("Address: 0x%08x Data: 0x%08x", address+1, *(address+1));
+            printf("Address: 0x%08x Data: 0x%08x", address+2, *(address+2));
+//            tsc2100_keyclick(); /* doesnt work :( */
+            line -= 6;
+        }
+#if 0
         if (button&BUTTON_TOUCHPAD)
         {
             unsigned int data = button_get_last_touch();
@@ -129,6 +146,7 @@ void mrdebug()
             line-=3;
         }
         else line -=2;
+#endif
     }
 }
 #endif

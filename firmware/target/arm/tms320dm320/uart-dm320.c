@@ -1,22 +1,21 @@
-/*
- * (C) Copyright 2007 Catalin Patulea <cat@vv.carleton.ca>
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
+ * Copyright (C) 2007 Catalin Patulea <cat@vv.carleton.ca>
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
  *
- */
+ ****************************************************************************/
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
@@ -24,8 +23,8 @@
 /* UART 0/1 */
 
 #define CONFIG_UART_BRSR    87
-#define MAX_UART_BUFFER     32
-static unsigned char uart1buffer[MAX_UART_BUFFER];
+#define MAX_UART_BUFFER     31
+unsigned char uart1buffer[MAX_UART_BUFFER];
 int uart1read = 0, uart1write = 0, uart1count = 0;
 
 /*
@@ -42,17 +41,17 @@ static void do_checksums(char *data, int len, char *xor, char *add)
 }
 */
 
-void uart_init(void) 
+void uart_init(void)
 {
     // 8-N-1
     IO_UART1_MSR=0x8000;
     IO_UART1_BRSR=CONFIG_UART_BRSR;
-    IO_UART1_RFCR = 0x8000;
+    IO_UART1_RFCR = 0x8010; /* Trigger later */
     /* gio 27 is input, uart1 rx
        gio 28 is output, uart1 tx */
     IO_GIO_DIR1 |=  (1<<11); /* gio 27 */
     IO_GIO_DIR1 &= ~(1<<12); /* gio 28 */
-    
+
     /* init the recieve buffer */
     uart1read = 0;
     uart1write = 0;
@@ -101,10 +100,7 @@ void uart1_gets(char *str, unsigned int size)
         
         /* Read character */
         ch = (char)IO_UART1_DTRR;
-        
-        /* Echo character back */
-        IO_UART1_DTRR=ch;
-        
+
         /* If CR, also echo LF, null-terminate, and return */
         if (ch == '\r') {
             IO_UART1_DTRR='\n';
@@ -122,33 +118,14 @@ void uart1_gets(char *str, unsigned int size)
     }
 }
 
-int uart1_pollch(unsigned int ticks)
-{
-    while (ticks--) {
-        if (IO_UART1_RFCR & 0x3f) {
-            return IO_UART1_DTRR & 0xff;
-        }
-    }
-    return -1;
-}
-
-bool uart1_available(void)
-{
-    return uart1count > 0;
-}
-
-void uart1_heartbeat(void)
-{
-    char data[5] = {0x11, 0x30, 0x11^0x30, 0x11+0x30, '\0'};
-    uart1_puts(data);
-}
-
 bool uart1_getch(char *c)
 {
     if (uart1count > 0)
     {
-        *c = uart1buffer[uart1read];
-        uart1read = (uart1read+1) % MAX_UART_BUFFER;
+        if(uart1read>MAX_UART_BUFFER)
+            uart1read=0;
+
+        *c = uart1buffer[uart1read++];
         uart1count--;
         return true;
     }
@@ -158,15 +135,18 @@ bool uart1_getch(char *c)
 /* UART1 receive intterupt handler */
 void UART1(void)
 {
-    if (IO_UART1_RFCR & 0x3f)
+    while (IO_UART1_RFCR & 0x3f)
     {
-/*
-        if (uart1count >= MAX_UART_BUFFER)
+        if (uart1count > MAX_UART_BUFFER)
             panicf("UART1 buffer overflow");
-*/
-        uart1buffer[uart1write] = IO_UART1_DTRR & 0xff;
-        uart1write = (uart1write+1) % MAX_UART_BUFFER;
-        uart1count++;
+        else
+        {
+            if(uart1write>MAX_UART_BUFFER)
+                uart1write=0;
+
+            uart1buffer[uart1write++] = IO_UART1_DTRR & 0xff;
+            uart1count++;
+        }
     }
 
     IO_INTC_IRQ0 = (1<<IRQ_UART1);
