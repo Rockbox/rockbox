@@ -1130,7 +1130,7 @@ static size_t voice_filebuf_callback(void *ptr, size_t size)
 /* Handle Q_VOICE_STOP and part of SYS_USB_CONNECTED */
 static bool voice_on_voice_stop(bool aborting, size_t *realsize)
 {
-    if (aborting && !playing && pcm_is_playing())
+    if (aborting && !playing)
     {
         /* Aborting: Slight hack - flush PCM buffer if
            only being used for voice */
