@@ -41,13 +41,8 @@ mpegplayer is structured as follows:
 Using the main thread for buffering wastes the 8KB main stack which is
 in IRAM.  However, 8KB is not enough for the audio thread to run (it
 needs somewhere between 8KB and 9KB), so we create a new thread in
-order to`give it a larger stack.
-
-We use 4.5KB of the main stack for a libmad buffer (making use of
-otherwise unused IRAM).  There is also the possiblity of stealing the
-main Rockbox codec thread's 9KB of IRAM stack and using that for
-mpegplayer's audio thread - but we should only implement that if we
-can put the IRAM to good use.
+order to`give it a larger stack and steal the core codec thread's
+stack (9KB of precious IRAM).
 
 The button loop (and hence pause/resume, main menu and, in the future,
 seeking) is placed in the audio thread.  This keeps it on the main CPU
@@ -1489,11 +1484,10 @@ audio_thread_quit:
 
 /* End of libmad stuff */
 
-/* TODO: Running in the main thread, libmad needs 8.25KB of stack.
-   The codec thread uses a 9KB stack.  So we can probable reduce this a
-   little, but leave at 9KB for now to be safe. */
+/* The audio stack is stolen from the core codec thread */
 #define AUDIO_STACKSIZE (9*1024)
-uint32_t audio_stack[AUDIO_STACKSIZE / sizeof(uint32_t)] IBSS_ATTR;
+static uint32_t codec_stack_copy[AUDIO_STACKSIZE / sizeof(uint32_t)];
+uint32_t* audio_stack;
 
 /* TODO: Check if 4KB is appropriate - it works for my test streams,
    so maybe we can reduce it. */
@@ -2214,6 +2208,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int in_file;
     size_t disk_buf_len;
     ssize_t seek_pos;
+    size_t audio_stack_size = 0; /* Keep gcc happy and init */
+    int i;
 #ifndef HAVE_LCD_COLOR
     long graysize;
     int grayscales;
@@ -2313,7 +2309,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
        minutes) of the movie. zero if the time could not be determined */
     find_start_pts( in_file );
     find_end_pts( in_file );
-    
+
+ 
     /* start menu */
     rb->lcd_clear_display();
     rb->lcd_update();
@@ -2345,6 +2342,43 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* From this point on we've altered settings, colors, cpu_boost, etc. and
        cannot just return PLUGIN_ERROR - instead drop though to cleanup code
      */
+
+#ifdef SIMULATOR
+    /* The simulator thread implementation doesn't have stack buffers, and
+       these parameters are ignored. */
+    (void)i;  /* Keep gcc happy */
+    audio_stack = NULL;
+    audio_stack_size = 0;
+#else
+    /* Borrow the codec thread's stack (in IRAM on most targets) */
+    audio_stack = NULL;
+    for (i = 0; i < MAXTHREADS; i++)
+    {
+        if (rb->strcmp(rb->threads[i].name,"codec")==0)
+        {
+            /* Wait to ensure the codec thread has blocked */
+            while (rb->threads[i].state!=STATE_BLOCKED)
+                rb->yield();
+
+            /* Now we can steal the stack */
+            audio_stack = rb->threads[i].stack;
+            audio_stack_size = rb->threads[i].stack_size;
+
+            /* Backup the codec thread's stack */
+            rb->memcpy(codec_stack_copy,audio_stack,audio_stack_size);    
+
+            break;
+        }
+    }
+
+    if (audio_stack == NULL)
+    {
+        /* This shouldn't happen, but deal with it anyway by using
+           the copy instead */
+        audio_stack = codec_stack_copy;
+        audio_stack_size = AUDIO_STACKSIZE;
+    }
+#endif
     
     rb->splash(0, "Loading...");
     
@@ -2391,7 +2425,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->splash(HZ, "Cannot create video thread!");
     }
     else if ((audio_str.thread = rb->create_thread(audio_thread,
-        (uint8_t*)audio_stack,AUDIO_STACKSIZE, 0,"mpgaudio"
+        (uint8_t*)audio_stack,audio_stack_size, 0,"mpgaudio"
         IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, CPU))) == NULL)
     {
         rb->splash(HZ, "Cannot create audio thread!");
@@ -2478,6 +2512,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     mpeg2_close (mpeg2dec);
 
     rb->close (in_file);
+
+#ifndef SIMULATOR
+    /* Restore the codec thread's stack */
+    rb->memcpy(audio_stack, codec_stack_copy, audio_stack_size);    
+#endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
