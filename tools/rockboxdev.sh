@@ -167,7 +167,7 @@ case $1 in
   [Aa])
     target="arm-elf"
     gccurl="http://www.rockbox.org/twiki/pub/Main/CrossCompiler"
-    gccpatch="thumb-interwork-4.0.3.diff"
+    gccpatch="rockbox-multilibs-arm-elf-gcc-4.0.3.diff"
     ;;
   *)
     echo "unsupported"
