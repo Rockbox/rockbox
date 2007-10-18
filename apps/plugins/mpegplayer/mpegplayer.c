@@ -1484,10 +1484,13 @@ audio_thread_quit:
 
 /* End of libmad stuff */
 
-/* The audio stack is stolen from the core codec thread */
+/* The audio stack is stolen from the core codec thread (but not in uisim) */
 #define AUDIO_STACKSIZE (9*1024)
-static uint32_t codec_stack_copy[AUDIO_STACKSIZE / sizeof(uint32_t)];
 uint32_t* audio_stack;
+
+#ifndef SIMULATOR
+static uint32_t codec_stack_copy[AUDIO_STACKSIZE / sizeof(uint32_t)];
+#endif
 
 /* TODO: Check if 4KB is appropriate - it works for my test streams,
    so maybe we can reduce it. */
