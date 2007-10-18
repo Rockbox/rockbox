@@ -316,7 +316,6 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
             else
             {
                 so->delta = -so->delta; /* At this point cp_temp is wrong. We need to take a step */
-                so->loopDir = LOOPDIR_FORWARD;
             }
         }
 
@@ -331,7 +330,6 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
             else
             {
                 so->delta = -so->delta;
-                so->loopDir = LOOPDIR_REVERSE;
             }
         }
 

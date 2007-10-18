@@ -84,9 +84,6 @@
 #define LOOP_PINGPONG   8
 #define LOOP_REVERSE    16
 
-#define LOOPDIR_FORWARD 0
-#define LOOPDIR_REVERSE 1
-
 struct MIDIfile
 {
     int  Length;
@@ -97,14 +94,13 @@ struct MIDIfile
     int numPatches;
 };
 
-
 struct SynthObject
 {
     struct GWaveform * wf;
     int delta;
     int decay;
     unsigned int cp; /* unsigned int */
-    int state, loopState, loopDir;
+    int state, loopState;
     int note, vol, ch, isUsed;
     int curRate, curOffset, targetOffset;
     int curPoint;
