@@ -387,13 +387,6 @@ void corelock_unlock(struct corelock *cl)
 
 #endif /* CONFIG_CORELOCK == SW_CORELOCK */
 
-#ifdef CPU_PP502x
-/* Some code relies on timing */
-void switch_thread(struct thread_entry *old) ICODE_ATTR;
-void core_wake(IF_COP_VOID(unsigned int othercore)) ICODE_ATTR;
-void core_idle(void) ICODE_ATTR;
-#endif
-
 /*---------------------------------------------------------------------------
  * Put core in a power-saving state if waking list wasn't repopulated and if
  * no other core requested a wakeup for it to perform a task.
@@ -403,34 +396,59 @@ static inline void core_sleep(IF_COP(unsigned int core,) struct thread_entry **w
 {
 #if NUM_CORES > 1
 #ifdef CPU_PP502x
+#if 1
     /* Disabling IRQ and FIQ is important to making the fixed-time sequence
      * non-interruptable */
     asm volatile (
         "mrs    r2, cpsr                   \n" /* Disable IRQ, FIQ */
         "orr    r2, r2, #0xc0              \n"
         "msr    cpsr_c, r2                 \n"
-        "ldr    r0, [%[w]]                 \n" /* Check *waking */
-        "cmp    r0, #0                     \n" /* != NULL -> exit */
-        "bne    1f                         \n"
-        /* ------ fixed-time sequence ----- */ /* Can this be relied upon? */
-        "ldr    r0, [%[ms], %[oc], lsl #2] \n" /* Stay-awake requested? */
-        "mov    r1, #0x80000000            \n"
-        "tst    r0, #1                     \n"
-        "streq  r1, [%[ct], %[c], lsl #2]  \n" /* Sleep if not */
-        "nop                               \n"
-        "mov    r0, #0                     \n"
-        "str    r0, [%[ct], %[c], lsl #2]  \n" /* Clear control reg */
-        /* -------------------------------- */
-    "1:                                    \n"
-        "mov    r0, #1                     \n"
-        "add    r1, %[ms], #8              \n"
-        "str    r0, [r1, %[oc], lsl #2]    \n" /* Clear mailbox */
+        "mov    r0, #4                     \n" /* r0 = 0x4 << core */
+        "mov    r0, r0, lsl %[c]           \n"
+        "str    r0, [%[mbx], #4]           \n" /* signal intent to sleep */
+        "ldr    r1, [%[waking]]            \n" /* *waking == NULL ? */
+        "cmp    r1, #0                     \n"
+        "ldreq  r1, [%[mbx], #0]           \n" /* && !(MBX_MSG_STAT & (0x10<<core)) ? */
+        "tsteq  r1, r0, lsl #2             \n"  
+        "moveq  r1, #0x80000000            \n" /* Then sleep */
+        "streq  r1, [%[ctl], %[c], lsl #2] \n"
+        "moveq  r1, #0                     \n" /* Clear control reg */
+        "streq  r1, [%[ctl], %[c], lsl #2] \n"
+        "orr    r1, r0, r0, lsl #2         \n" /* Signal intent to wake - clear wake flag */
+        "str    r1, [%[mbx], #8]           \n"
+    "1:                                    \n" /* Wait for wake procedure to finish */
+        "ldr    r1, [%[mbx], #0]           \n"
+        "tst    r1, r0, lsr #2             \n"
+        "bne    1b                         \n"
         "bic    r2, r2, #0xc0              \n" /* Enable interrupts */
         "msr    cpsr_c, r2                 \n"
-        : 
-        : [ct]"r"(&PROC_CTL(CPU)), [ms]"r"(&PROC_MESSAGE(CPU)),
-          [c]"r" (core), [oc]"r"(1-core), [w]"r"(waking)
+        :
+        :  [ctl]"r"(&PROC_CTL(CPU)), [mbx]"r"(MBX_BASE),
+           [waking]"r"(waking), [c]"r"(core)
         : "r0", "r1", "r2");
+#else /* C version for reference */
+    /* Disable IRQ, FIQ */
+    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+
+    /* Signal intent to sleep */
+    MBX_MSG_SET = 0x4 << core;
+
+    /* Something waking or other processor intends to wake us? */
+    if (*waking == NULL && (MBX_MSG_STAT & (0x10 << core)) == 0)
+    {
+        PROC_CTL(core) = PROC_SLEEP; nop; /* Snooze */
+        PROC_CTL(core) = 0;               /* Clear control reg */
+    }
+
+    /* Signal wake - clear wake flag */
+    MBX_MSG_CLR = 0x14 << core;
+
+    /* Wait for other processor to finish wake procedure */
+    while (MBX_MSG_STAT & (0x1 << core));
+
+    /* Enable IRQ, FIQ */
+    set_interrupt_status(IRQ_FIQ_ENABLED, IRQ_FIQ_STATUS);
+#endif /* ASM/C selection */
 #else
     /* TODO: PP5002 */
 #endif /* CONFIG_CPU == */
@@ -454,26 +472,52 @@ void core_wake(IF_COP_VOID(unsigned int othercore))
 #if NUM_CORES == 1
     /* No wakey - core already wakey */
 #elif defined (CPU_PP502x)
+#if 1
     /* avoid r0 since that contains othercore */
     asm volatile (
-        "mrs    r2, cpsr                   \n"
-        "orr    r1, r2, #0xc0              \n"
-        "msr    cpsr_c, r1                 \n"
-        "mov    r1, #1                     \n"
-        /* ------ fixed-time sequence ----- */ /* Can this be relied upon? */
-        "str    r1, [%[ms], %[oc], lsl #2] \n" /* Send stay-awake message */
-        "nop                               \n"
-        "nop                               \n"
-        "ldr    r1, [%[ct], %[oc], lsl #2] \n" /* Wake other core if asleep */
-        "tst    r1, #0x80000000            \n"
-        "bic    r1, r1, #0x80000000        \n"
-        "strne  r1, [%[ct], %[oc], lsl #2] \n"
-        /* -------------------------------- */
-        "msr    cpsr_c, r2                 \n"
+        "mrs    r3, cpsr                    \n" /* Disable IRQ */
+        "orr    r1, r3, #0x80               \n"
+        "msr    cpsr_c, r1                  \n"
+        "mov    r2, #0x11                   \n" /* r2 = (0x11 << othercore) */
+        "mov    r2, r2, lsl %[oc]           \n" /* Signal intent to wake othercore */
+        "str    r2, [%[mbx], #4]            \n"
+    "1:                                     \n" /* If it intends to sleep, let it first */
+        "ldr    r1, [%[mbx], #0]            \n" /* (MSG_MSG_STAT & (0x4 << othercore)) != 0 ? */
+        "eor    r1, r1, #0xc                \n"
+        "tst    r1, r2, lsr #2              \n"
+        "ldr    r1, [%[ctl], %[oc], lsl #2] \n" /* && (PROC_CTL(othercore) & PROC_SLEEP) == 0 ? */
+        "tsteq  r1, #0x80000000             \n"
+        "beq    1b                          \n" /* Wait for sleep or wake */
+        "tst    r1, #0x80000000             \n" /* If sleeping, wake it */
+        "movne  r1, #0x0                    \n"
+        "strne  r1, [%[ctl], %[oc], lsl #2] \n"
+        "mov    r1, r2, lsr #4              \n"
+        "str    r1, [%[mbx], #8]            \n" /* Done with wake procedure */
+        "msr    cpsr_c, r3                  \n" /* Restore int status */
         :
-        : [ct]"r"(&PROC_CTL(CPU)), [ms]"r"(&PROC_MESSAGE(CPU)),
-          [oc]"r" (othercore)
-        : "r1", "r2");
+        : [ctl]"r"(&PROC_CTL(CPU)), [mbx]"r"(MBX_BASE), [oc]"r" (othercore)
+        : "r1", "r2", "r3");
+#else /* C version for reference */
+    /* Disable interrupts - avoid reentrancy from the tick */
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    /* Signal intent to wake other processor - set stay awake */
+    MBX_MSG_SET = 0x11 << othercore;
+
+    /* If it intends to sleep, wait until it does or aborts */
+    while ((MBX_MSG_STAT & (0x4 << othercore)) != 0 &&
+           (PROC_CTL(othercore) & PROC_SLEEP) == 0);
+
+    /* If sleeping, wake it up */
+    if (PROC_CTL(othercore) & PROC_SLEEP)
+    {
+        PROC_CTL(othercore) = 0;
+    }
+
+    /* Done with wake procedure */
+    MBX_MSG_CLR = 0x1 << othercore;
+    set_irq_level(oldlevel);
+#endif /* ASM/C selection */
 #else
     PROC_CTL(othercore) = PROC_WAKE;
 #endif
@@ -2496,6 +2540,7 @@ void init_threads(void)
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
         /* TODO: HAL interface for this */
         /* Wake up coprocessor and let it initialize kernel and threads */
+        MBX_MSG_CLR = 0x3f;
         COP_CTL = PROC_WAKE;
         /* Sleep until finished */
         CPU_CTL = PROC_SLEEP;

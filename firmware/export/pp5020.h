@@ -31,18 +31,21 @@
 #define PROC_ID_COP      0xaa
 
 /* Mailboxes */
-/* Each processor has two mailboxes it can write to and two which
-   it can read from.  We define the first to be for sending messages
-   and the second for replying to messages */
-#define CPU_MESSAGE         (*(volatile unsigned long *)(0x60001000))
-#define COP_MESSAGE         (*(volatile unsigned long *)(0x60001004))
-#define CPU_REPLY           (*(volatile unsigned long *)(0x60001008))
-#define COP_REPLY           (*(volatile unsigned long *)(0x6000100c))
-#define MBOX_CONTROL        (*(volatile unsigned long *)(0x60001010))
+#define MBX_BASE            (0x60001000)
+/* Read bits in the mailbox */
+#define MBX_MSG_STAT        (*(volatile unsigned long *)(0x60001000))
+/* Set bits in the mailbox */
+#define MBX_MSG_SET         (*(volatile unsigned long *)(0x60001004))
+/* Clear bits in the mailbox */
+#define MBX_MSG_CLR         (*(volatile unsigned long *)(0x60001008))
+/* Doesn't seem to be COP_REPLY at all :) */
+#define MBX_UNKNOWN1        (*(volatile unsigned long *)(0x6000100c))
+/* COP can set bit 29 - only CPU read clears it */
+#define CPU_QUEUE           (*(volatile unsigned long *)(0x60001010))
+/* CPU can set bit 29 - only COP read clears it */
+#define COP_QUEUE           (*(volatile unsigned long *)(0x60001020))
 
-/* Simple convenient array-like access */
-#define PROC_MESSAGE(core)  ((&CPU_MESSAGE)[core])
-#define PROC_REPLY(core)    ((&CPU_REPLY)[core])
+#define PROC_QUEUE(core)    ((&CPU_QUEUE)[(core)*4])
 
 /* Interrupts */
 #define CPU_INT_STAT        (*(volatile unsigned long*)(0x60004000))
