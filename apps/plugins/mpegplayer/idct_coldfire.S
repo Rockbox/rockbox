@@ -25,11 +25,9 @@
 
     /* The IDCT itself.
      * Input: %a0: block pointer
-     * All registers are preserved. */
+     * Caller must save all registers. */
     .align  2
 .idct:
-    lea.l   (-15*4,%sp), %sp
-    movem.l %d0-%d7/%a0-%a6, (%sp)  | save all registers
     move.l  %a0, %a6
 
     move.l  #0, %macsr              | signed integer mode
@@ -238,20 +236,19 @@
     subq.l  #1, %d3             | loop 8 times
     bne.w   .col_loop
     
-    movem.l (%sp), %d0-%d7/%a0-%a6  | restore all registers
-    lea.l   (15*4,%sp), %sp
     rts
     
     .align  2
 
 mpeg2_idct_copy_coldfire:
-    lea.l   (-4*4,%sp), %sp
-    movem.l %d2-%d4/%a2, (%sp)  | save some registers
-    movem.l (4*4+4,%sp), %a0-%a2| %a0 - block pointer
-                                | %a1 - destination pointer
-                                | %a2 - stride
+    lea.l   (-11*4,%sp), %sp
+    movem.l %d2-%d7/%a2-%a6, (%sp)  | save some registers
+    move.l  (11*4+4,%sp), %a0       | %a0 - block pointer for idct
 
-    bsr.w   .idct               | apply idct to block
+    bsr.w   .idct                   | apply idct to block
+    movem.l (11*4+4,%sp), %a0-%a2   | %a0 - block pointer
+                                    | %a1 - destination pointer
+                                    | %a2 - stride
 
     move.l  #255, %d1           | preload constant for clipping
     moveq.l #8, %d4             | loop counter
@@ -336,22 +333,23 @@ mpeg2_idct_copy_coldfire:
     subq.l  #1, %d4             | loop 8 times
     bne.w   .copy_clip_loop
 
-    movem.l (%sp), %d2-%d4/%a2  | restore registers
-    lea.l   (4*4,%sp), %sp
+    movem.l (%sp), %d2-%d7/%a2-%a6
+    lea.l   (11*4,%sp), %sp
     rts
 
     .align  2
 
 mpeg2_idct_add_coldfire:
-    lea.l   (-7*4,%sp), %sp
-    movem.l %d2-%d7/%a2, (%sp)      | save some registers
-    movem.l (7*4+4,%sp), %d0/%a0-%a2| %d0 - last value
-                                    | %a0 - block pointer
-                                    | %a1 - destination pointer
-                                    | %a2 - stride
+    lea.l   (-11*4,%sp), %sp
+    movem.l %d2-%d7/%a2-%a6, (%sp)
+    movem.l (11*4+4,%sp), %d0/%a0-%a2   | %d0 - last value
+                                        | %a0 - block pointer
+                                        | %a1 - destination pointer
+                                        | %a2 - stride
+
     cmp.l   #129, %d0           | last == 129 ?
     bne.b   .idct_add           |   no: perform idct + addition
-    move.w  (%a0), %d0          
+    move.w  (%a0), %d0
     ext.l   %d0                 | ((block[0]
     asr.l   #4, %d0             |      >> 4)
     and.l   #7, %d0             |      & 7)
@@ -359,8 +357,9 @@ mpeg2_idct_add_coldfire:
     bne.w   .dc_add             |   no: just perform addition
 
 .idct_add:
-    bsr.w   .idct               | apply idct
-    
+    bsr.w   .idct                   | apply idct
+    movem.l (11*4+8,%sp), %a0-%a2   | reload arguments %a0..%a2
+
     move.l  #255, %d2           | preload constant for clipping
     clr.l   %d3                 | used for splitting input words into bytes
     moveq.l #8, %d4             | loop counter
@@ -569,6 +568,6 @@ mpeg2_idct_add_coldfire:
     bne.w   .dc_clip_loop
 
 .idct_add_end:
-    movem.l (%sp), %d2-%d7/%a2  | restore registers
-    lea.l   (7*4,%sp), %sp
+    movem.l (%sp), %d2-%d7/%a2-%a6
+    lea.l   (11*4,%sp), %sp
     rts
