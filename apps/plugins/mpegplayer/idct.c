@@ -48,7 +48,7 @@ extern void mpeg2_idct_copy_arm(int16_t * block, uint8_t * dest,
 extern void mpeg2_idct_add_arm(const int last, int16_t * block,
                                uint8_t * dest, const int stride);
 
-#else /* !CPU_COLDFIE, !CPU_ARM */
+#else /* !CPU_COLDFIRE, !CPU_ARM */
 
 #define W1 2841 /* 2048 * sqrt (2) * cos (1 * pi / 16) */
 #define W2 2676 /* 2048 * sqrt (2) * cos (2 * pi / 16) */
