@@ -273,16 +273,15 @@ void corelock_lock(struct corelock *cl)
     asm volatile (
         "mov    r1, %0               \n" /* r1 = PROCESSOR_ID */
         "ldrb   r1, [r1]             \n"
-        "mov    r3, #1               \n" /* cl->myl[core] = 1 */
-        "strb   r3, [r0, r1, lsr #7] \n"
+        "strb   r1, [r0, r1, lsr #7] \n" /* cl->myl[core] = core */
         "and    r2, r1, #1           \n" /* r2 = othercore */
         "strb   r2, [r0, #2]         \n" /* cl->turn = othercore */
     "1:                              \n"
-        "ldrb   r3, [r0, r2]         \n" /* cl->myl[othercore] == 1 ? */
-        "cmp    r3, #1               \n"
-        "ldreqb r3, [r0, #2]         \n" /* && cl->turn == othercore ? */
-        "cmpeq  r3, r2               \n"
-        "bxne   lr                   \n" /* no? lock acquired */
+        "ldrb   r3, [r0, r2]         \n" /* cl->myl[othercore] == 0 ? */
+        "cmp    r3, #0               \n"
+        "ldrneb r3, [r0, #2]         \n" /* || cl->turn == core ? */
+        "cmpne  r3, r1, lsr #7       \n"
+        "bxeq   lr                   \n" /* yes? lock acquired */
         "b      1b                   \n" /* keep trying */
         : : "i"(&PROCESSOR_ID)
     );
@@ -299,17 +298,16 @@ int corelock_try_lock(struct corelock *cl)
     asm volatile (
         "mov    r1, %0               \n" /* r1 = PROCESSOR_ID */
         "ldrb   r1, [r1]             \n"
-        "mov    r3, #1               \n" /* cl->myl[core] = 1 */
-        "strb   r3, [r0, r1, lsr #7] \n"
+        "strb   r1, [r0, r1, lsr #7] \n" /* cl->myl[core] = core */
         "and    r2, r1, #1           \n" /* r2 = othercore */
         "strb   r2, [r0, #2]         \n" /* cl->turn = othercore */
     "1:                              \n"
-        "ldrb   r3, [r0, r2]         \n" /* cl->myl[othercore] == 1 ? */
-        "cmp    r3, #1               \n"
-        "ldreqb r3, [r0, #2]         \n" /* && cl->turn == othercore? */
-        "cmpeq  r3, r2               \n"
-        "movne  r0, #1               \n" /* no? lock acquired */
-        "bxne   lr                   \n"
+        "ldrb   r3, [r0, r2]         \n" /* cl->myl[othercore] == 0 ? */
+        "cmp    r3, #0               \n"
+        "ldrneb r3, [r0, #2]         \n" /* || cl->turn == core? */
+        "cmpne  r3, r1, lsr #7       \n"
+        "moveq  r0, #1               \n" /* yes? lock acquired */
+        "bxeq   lr                   \n"
         "mov    r2, #0               \n" /* cl->myl[core] = 0 */
         "strb   r2, [r0, r1, lsr #7] \n"
         "mov    r0, r2               \n"
@@ -348,10 +346,14 @@ void corelock_lock(struct corelock *cl)
     const unsigned int core = CURRENT_CORE;
     const unsigned int othercore = 1 - core;
 
-    cl->myl[core] = 1;
+    cl->myl[core] = core;
     cl->turn = othercore;
 
-    while (cl->myl[othercore] == 1 && cl->turn == othercore);
+    for (;;)
+    {
+        if (cl->myl[othercore] == 0 || cl->turn == core)
+            break;
+    }
 }
 
 /*---------------------------------------------------------------------------
@@ -363,16 +365,16 @@ int corelock_try_lock(struct corelock *cl)
     const unsigned int core = CURRENT_CORE;
     const unsigned int othercore = 1 - core;
 
-    cl->myl[core] = 1;
+    cl->myl[core] = core;
     cl->turn = othercore;
 
-    if (cl->myl[othercore] == 1 && cl->turn == othercore)
+    if (cl->myl[othercore] == 0 || cl->turn == core)
     {
-        cl->myl[core] = 0;
-        return 0;
+        return 1;
     }
 
-    return 1;
+    cl->myl[core] = 0;
+    return 0;
 }
 
 /*---------------------------------------------------------------------------
