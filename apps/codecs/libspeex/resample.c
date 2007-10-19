@@ -37,17 +37,23 @@
       - Low memory requirement
       - Good *perceptual* quality (and not best SNR)
 
-   The code is working, but it's in a very early stage, so it may have
-   artifacts, noise or subliminal messages from satan. Also, the API 
-   isn't stable and I can actually promise that I *will* change the API
-   some time in the future.
+   Warning: This resampler is relatively new. Although I think I got rid of 
+   all the major bugs and I don't expect the API to change anymore, there
+   may be something I've missed. So use with caution.
 
-TODO list:
-      - Variable calculation resolution depending on quality setting
-         - Single vs double in float mode
-         - 16-bit vs 32-bit (sinc only) in fixed-point mode
-      - Make sure the filter update works even when changing params 
-             after only a few samples procesed
+   This algorithm is based on this original resampling algorithm:
+   Smith, Julius O. Digital Audio Resampling Home Page
+   Center for Computer Research in Music and Acoustics (CCRMA), 
+   Stanford University, 2007.
+   Web published at http://www-ccrma.stanford.edu/~jos/resample/.
+
+   There is one main difference, though. This resampler uses cubic 
+   interpolation instead of linear interpolation in the above paper. This
+   makes the table much smaller and makes it possible to compute that table
+   on a per-stream basis. In turn, being able to tweak the table for each 
+   stream makes it possible to both reduce complexity on simple ratios 
+   (e.g. 2/3), and get rid of the rounding operations in the inner loop. 
+   The latter both reduces CPU time and makes the algorithm more SIMD-friendly.
 */
 
 #ifdef HAVE_CONFIG_H
@@ -84,6 +90,7 @@ static void speex_free (void *ptr) {free(ptr);}
 #define OVERSAMPLE 8
 
 #define IMAX(a,b) ((a) > (b) ? (a) : (b))
+#define IMIN(a,b) ((a) < (b) ? (a) : (b))
 
 #ifndef NULL
 #define NULL 0
@@ -576,10 +583,10 @@ static void update_filter(SpeexResamplerState *st)
       }
       for (i=0;i<st->den_rate;i++)
       {
-         spx_uint32_t j;
+         spx_int32_t j;
          for (j=0;j<st->filt_len;j++)
          {
-            st->sinc_table[i*st->filt_len+j] = sinc(st->cutoff,((j-st->filt_len/2+1)-((float)i)/st->den_rate), st->filt_len, quality_map[st->quality].window_func);
+            st->sinc_table[i*st->filt_len+j] = sinc(st->cutoff,((j-(spx_int32_t)st->filt_len/2+1)-((float)i)/st->den_rate), st->filt_len, quality_map[st->quality].window_func);
          }
       }
 #ifdef FIXED_POINT
@@ -997,16 +1004,19 @@ void speex_resampler_get_rate(SpeexResamplerState *st, spx_uint32_t *in_rate, sp
 
 int speex_resampler_set_rate_frac(SpeexResamplerState *st, spx_uint32_t ratio_num, spx_uint32_t ratio_den, spx_uint32_t in_rate, spx_uint32_t out_rate)
 {
-   int fact;
+   spx_uint32_t fact;
+   spx_uint32_t old_den;
+   spx_uint32_t i;
    if (st->in_rate == in_rate && st->out_rate == out_rate && st->num_rate == ratio_num && st->den_rate == ratio_den)
       return RESAMPLER_ERR_SUCCESS;
    
+   old_den = st->den_rate;
    st->in_rate = in_rate;
    st->out_rate = out_rate;
    st->num_rate = ratio_num;
    st->den_rate = ratio_den;
    /* FIXME: This is terribly inefficient, but who cares (at least for now)? */
-   for (fact=2;fact<=sqrt(IMAX(in_rate, out_rate));fact++)
+   for (fact=2;fact<=IMIN(st->num_rate, st->den_rate);fact++)
    {
       while ((st->num_rate % fact == 0) && (st->den_rate % fact == 0))
       {
@@ -1015,6 +1025,17 @@ int speex_resampler_set_rate_frac(SpeexResamplerState *st, spx_uint32_t ratio_nu
       }
    }
       
+   if (old_den > 0)
+   {
+      for (i=0;i<st->nb_channels;i++)
+      {
+         st->samp_frac_num[i]=st->samp_frac_num[i]*st->den_rate/old_den;
+         /* Safety net */
+         if (st->samp_frac_num[i] >= st->den_rate)
+            st->samp_frac_num[i] = st->den_rate-1;
+      }
+   }
+   
    if (st->initialised)
       update_filter(st);
    return RESAMPLER_ERR_SUCCESS;

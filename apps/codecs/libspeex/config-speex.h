@@ -102,19 +102,19 @@
 #define SIZEOF_SHORT 2
 
 /* Version extra */
-#define SPEEX_EXTRA_VERSION "-svn"
+#define SPEEX_EXTRA_VERSION "-git"
 
 /* Version major */
 #define SPEEX_MAJOR_VERSION 1
 
 /* Version micro */
-#define SPEEX_MICRO_VERSION 14
+#define SPEEX_MICRO_VERSION 15
 
 /* Version minor */
 #define SPEEX_MINOR_VERSION 1
 
 /* Complete version string */
-#define SPEEX_VERSION "1.1.14-svn"
+#define SPEEX_VERSION "1.2beta3"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -160,7 +160,7 @@
 #define OVERRIDE_SPEEX_FREE 1
 #define OVERRIDE_SPEEX_FREE_SCRATCH 1
 #define OVERRIDE_SPEEX_MOVE 1
-#define OVERRIDE_SPEEX_ERROR 1
+#define OVERRIDE_SPEEX_FATAL 1
 #define OVERRIDE_SPEEX_WARNING 1
 #define OVERRIDE_SPEEX_WARNING_INT 1
 #define OVERRIDE_SPEEX_NOTIFY 1

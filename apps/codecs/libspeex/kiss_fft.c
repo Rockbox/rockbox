@@ -86,7 +86,7 @@ static void kf_bfly4(
         kiss_fft_cpx * Fout,
         const size_t fstride,
         const kiss_fft_cfg st,
-        const size_t m,
+        int m,
         int N,
         int mm
         )
@@ -95,8 +95,7 @@ static void kf_bfly4(
     kiss_fft_cpx scratch[6];
     const size_t m2=2*m;
     const size_t m3=3*m;
-    int i;
-    unsigned int j;
+    int i, j;
 
     if (st->inverse)
     {
@@ -291,7 +290,7 @@ static void kf_bfly_generic(
 
     /*CHECKBUF(scratchbuf,nscratchbuf,p);*/
     if (p>17)
-       speex_error("KissFFT: max radix supported is 17");
+       speex_fatal("KissFFT: max radix supported is 17");
     
     for ( u=0; u<m; ++u ) {
         k=u;
@@ -506,7 +505,7 @@ void kiss_fft_stride(kiss_fft_cfg st,const kiss_fft_cpx *fin,kiss_fft_cpx *fout,
 {
     if (fin == fout) 
     {
-       speex_error("In-place FFT not supported");
+       speex_fatal("In-place FFT not supported");
        /*CHECKBUF(tmpbuf,ntmpbuf,st->nfft);
        kf_work(tmpbuf,fin,1,in_stride, st->factors,st);
        speex_move(fout,tmpbuf,sizeof(kiss_fft_cpx)*st->nfft);*/

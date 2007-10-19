@@ -209,7 +209,7 @@ void *nb_encoder_init(const SpeexMode *m)
    st->highpass_enabled = 1;
    
 #ifdef ENABLE_VALGRIND
-   VALGRIND_MAKE_READABLE(st, (st->stack-(char*)st));
+   VALGRIND_MAKE_READABLE(st, NB_ENC_STACK);
 #endif
    return st;
 }
@@ -355,7 +355,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 
 
       /*Open-loop pitch*/
-      if (st->complexity>2 || !st->submodes[st->submodeID] || st->vbr_enabled || st->vad_enabled || SUBMODE(forced_pitch_gain) ||
+      if (!st->submodes[st->submodeID] || (st->complexity>2 && SUBMODE(have_subframe_gain)<3) || st->vbr_enabled || st->vad_enabled || SUBMODE(forced_pitch_gain) ||
           SUBMODE(lbr_pitch) != -1)
       {
          int nol_pitch[6];
@@ -440,7 +440,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 #endif
       {
          spx_word16_t g = compute_rms16(st->exc, st->frameSize);
-         if (ol_pitch>0)
+         if (st->submodeID!=1 && ol_pitch>0)
             ol_gain = MULT16_16(g, MULT16_16_Q14(QCONST16(1.1,14),
                                 spx_sqrt(QCONST32(1.,28)-MULT16_32_Q15(QCONST16(.8,15),SHL32(MULT16_16(ol_pitch_coef,ol_pitch_coef),16)))));
          else
@@ -787,18 +787,15 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
       /*print_vec(st->bw_lpc1, 10, "bw_lpc");*/
 #endif
 
+      /*FIXME: This will break if we change the window size */
+      speex_assert(st->windowSize-st->frameSize == st->subframeSize);
+      if (sub==0)
       {
-         /*FIXME: This will break if we change the window size */
-         if (st->windowSize-st->frameSize != st->subframeSize)
-            speex_error("windowSize-frameSize != subframeSize");
-         if (sub==0)
-         {
-            for (i=0;i<st->subframeSize;i++)
-               real_exc[i] = sw[i] = st->winBuf[i];
-         } else {
-            for (i=0;i<st->subframeSize;i++)
-               real_exc[i] = sw[i] = in[i+((sub-1)*st->subframeSize)];
-         }
+         for (i=0;i<st->subframeSize;i++)
+            real_exc[i] = sw[i] = st->winBuf[i];
+      } else {
+         for (i=0;i<st->subframeSize;i++)
+            real_exc[i] = sw[i] = in[i+((sub-1)*st->subframeSize)];
       }
       fir_mem16(real_exc, interp_qlpc, real_exc, st->subframeSize, st->lpcSize, st->mem_exc2, stack);
       
@@ -845,7 +842,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          exc[i]=0;
 
       /* If we have a long-term predictor (otherwise, something's wrong) */
-      if (SUBMODE(ltp_quant))
+      speex_assert (SUBMODE(ltp_quant));
       {
          int pit_min, pit_max;
          /* Long-term prediction */
@@ -894,10 +891,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 #endif
 
          st->pitch[sub]=pitch;
-      } else {
-         speex_error ("No pitch prediction, what's wrong");
       }
-
       /* Quantization of innovation */
       for (i=0;i<st->subframeSize;i++)
          innov[i]=0;
@@ -944,7 +938,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
       signal_div(target, target, ener, st->subframeSize);
       
       /* Quantize innovation */
-      if (SUBMODE(innovation_quant))
+      speex_assert (SUBMODE(innovation_quant));
       {
          /* Codebook search */
          SUBMODE(innovation_quant)(target, interp_qlpc, bw_lpc1, bw_lpc2, 
@@ -980,10 +974,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          {
             st->innov_rms_save[sub] = compute_rms(innov, st->subframeSize);
          }
-      } else {
-         speex_error("No fixed codebook");
       }
-
 
       for (i=0;i<st->subframeSize;i++)
          sw[i] = exc[i];
@@ -1101,7 +1092,7 @@ void *nb_decoder_init(const SpeexMode *m)
    st->highpass_enabled = 1;
 
 #ifdef ENABLE_VALGRIND
-   VALGRIND_MAKE_READABLE(st, (st->stack-(char*)st));
+   VALGRIND_MAKE_READABLE(st, NB_DEC_STACK);
 #endif
    return st;
 }
@@ -1330,10 +1321,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
       ALLOC(lpc, st->lpcSize, spx_coef_t);
       bw_lpc(QCONST16(0.93f,15), st->interp_qlpc, lpc, st->lpcSize);
       {
-         float innov_gain=0;
-         float pgain=GAIN_SCALING_1*st->last_pitch_gain;
-         if (pgain>.6)
-            pgain=.6;
+         spx_word16_t innov_gain=0;
          /* FIXME: This was innov, not exc */
          innov_gain = compute_rms16(st->exc, st->frameSize);
          for (i=0;i<st->frameSize;i++)
@@ -1477,7 +1465,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
          exc[i]=0;
 
       /*Adaptive codebook contribution*/
-      if (SUBMODE(ltp_unquant))
+      speex_assert (SUBMODE(ltp_unquant));
       {
          int pit_min, pit_max;
          /* Handle pitch constraints if any */
@@ -1542,8 +1530,6 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
             if (tmp > best_pitch_gain)
                best_pitch_gain = tmp;
          }
-      } else {
-         speex_error("No pitch prediction, what's wrong");
       }
       
       /* Unquantize the innovation */
@@ -1567,7 +1553,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
             ener = ol_gain;
          }
                   
-         if (SUBMODE(innovation_unquant))
+         speex_assert (SUBMODE(innovation_unquant));
          {
             /*Fixed codebook contribution*/
             SUBMODE(innovation_unquant)(innov, SUBMODE(innovation_params), st->subframeSize, bits, stack, &st->seed);
@@ -1599,39 +1585,40 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
                for (i=0;i<st->subframeSize;i++)
                   innov_save[i] = EXTRACT16(PSHR32(innov[i], SIG_SHIFT));
             }
-         } else {
-            speex_error("No fixed codebook");
          }
 
          /*Vocoder mode*/
          if (st->submodeID==1) 
          {
-            float g=ol_pitch_coef*GAIN_SCALING_1;
-
+            spx_word16_t g=ol_pitch_coef;
+            g=MULT16_16_P14(QCONST16(1.5f,14),(g-QCONST16(.2f,6)));
+            if (g<0)
+               g=0;
+            if (g>GAIN_SCALING)
+               g=GAIN_SCALING;
             
             for (i=0;i<st->subframeSize;i++)
                exc[i]=0;
             while (st->voc_offset<st->subframeSize)
             {
+               /* exc[st->voc_offset]= g*sqrt(2*ol_pitch)*ol_gain;
+                  Not quite sure why we need the factor of two in the sqrt */
                if (st->voc_offset>=0)
-                  exc[st->voc_offset]=sqrt(1.0*ol_pitch);
+                  exc[st->voc_offset]=MULT16_16(spx_sqrt(MULT16_16_16(2,ol_pitch)),EXTRACT16(PSHR32(MULT16_16(g,PSHR32(ol_gain,SIG_SHIFT)),6)));
                st->voc_offset+=ol_pitch;
             }
             st->voc_offset -= st->subframeSize;
-
-            g=.5+2*(g-.6);
-            if (g<0)
-               g=0;
-            if (g>1)
-               g=1;
+            
             for (i=0;i<st->subframeSize;i++)
             {
                spx_word16_t exci=exc[i];
-               /* FIXME: cleanup the innov[i]/SIG_SCALING */
-               exc[i]=.8*g*exc[i]*PSHR32(ol_gain,SIG_SHIFT) + .6*g*st->voc_m1*PSHR32(ol_gain,SIG_SHIFT) + (1-.5*g)*PSHR32(innov[i],SIG_SHIFT) - .5*g*PSHR32(st->voc_m2,SIG_SHIFT);
+               exc[i]= ADD16(ADD16(MULT16_16_Q15(QCONST16(.7f,15),exc[i]) , MULT16_16_Q15(QCONST16(.3f,15),st->voc_m1)),
+                             SUB16(MULT16_16_Q15(Q15_ONE-MULT16_16_16(QCONST16(.85f,9),g),EXTRACT16(PSHR32(innov[i],SIG_SHIFT))),
+                                   MULT16_16_Q15(MULT16_16_16(QCONST16(.15f,9),g),EXTRACT16(PSHR32(st->voc_m2,SIG_SHIFT)))
+                                  ));
                st->voc_m1 = exci;
                st->voc_m2=innov[i];
-               st->voc_mean = .95*st->voc_mean + .05*exc[i];
+               st->voc_mean = EXTRACT16(PSHR32(ADD32(MULT16_16(QCONST16(.8f,15),st->voc_mean), MULT16_16(QCONST16(.2f,15),exc[i])), 15));
                exc[i]-=st->voc_mean;
             }
          }

@@ -215,7 +215,7 @@ struct SpeexPreprocessState_ {
    spx_word32_t *S;          /**< Smoothed power spectrum */
    spx_word32_t *Smin;       /**< See Cohen paper */
    spx_word32_t *Stmp;       /**< See Cohen paper */
-   int *update_prob;       /**< Propability of speech presence for noise update */
+   int *update_prob;         /**< Probability of speech presence for noise update */
 
    spx_word16_t *zeta;       /**< Smoothed a priori SNR */
    spx_word32_t *echo_noise;
@@ -737,6 +737,8 @@ int speex_preprocess_run(SpeexPreprocessState *st, spx_int16_t *x)
    spx_word16_t effective_echo_suppress;
    
    st->nb_adapt++;
+   if (st->nb_adapt>20000)
+      st->nb_adapt = 20000;
    st->min_count++;
    
    beta = MAX16(QCONST16(.03,15),DIV32_16(Q15_ONE,st->nb_adapt));

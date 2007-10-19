@@ -35,7 +35,6 @@
 
 #include <math.h>
 #include "sb_celp.h"
-#include "stdlib.h"
 #include "filters.h"
 #include "lpc.h"
 #include "lsp.h"
@@ -46,6 +45,10 @@
 #include "ltp.h"
 #include "misc.h"
 #include "math_approx.h"
+
+#ifndef NULL
+#define NULL 0
+#endif
 
 /* Default size for the encoder and decoder stack (can be changed at compile time).
    This does not apply when using variable-size arrays or alloca. */
@@ -61,40 +64,40 @@
 #ifdef DISABLE_WIDEBAND
 void *sb_encoder_init(const SpeexMode *m)
 {
-   speex_error("Wideband and Ultra-wideband are disabled");
+   speex_fatal("Wideband and Ultra-wideband are disabled");
    return NULL;
 }
 void sb_encoder_destroy(void *state)
 {
-   speex_error("Wideband and Ultra-wideband are disabled");
+   speex_fatal("Wideband and Ultra-wideband are disabled");
 }
 int sb_encode(void *state, void *vin, SpeexBits *bits)
 {
-   speex_error("Wideband and Ultra-wideband are disabled");
+   speex_fatal("Wideband and Ultra-wideband are disabled");
    return -2;
 }
 void *sb_decoder_init(const SpeexMode *m)
 {
-   speex_error("Wideband and Ultra-wideband are disabled");
+   speex_fatal("Wideband and Ultra-wideband are disabled");
    return NULL;
 }
 void sb_decoder_destroy(void *state)
 {
-   speex_error("Wideband and Ultra-wideband are disabled");
+   speex_fatal("Wideband and Ultra-wideband are disabled");
 }
 int sb_decode(void *state, SpeexBits *bits, void *vout)
 {
-   speex_error("Wideband and Ultra-wideband are disabled");
+   speex_fatal("Wideband and Ultra-wideband are disabled");
    return -2;
 }
 int sb_encoder_ctl(void *state, int request, void *ptr)
 {
-   speex_error("Wideband and Ultra-wideband are disabled");
+   speex_fatal("Wideband and Ultra-wideband are disabled");
    return -2;
 }
 int sb_decoder_ctl(void *state, int request, void *ptr)
 {
-   speex_error("Wideband and Ultra-wideband are disabled");
+   speex_fatal("Wideband and Ultra-wideband are disabled");
    return -2;
 }
 #else

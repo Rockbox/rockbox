@@ -368,7 +368,7 @@ static void dump_audio(const spx_int16_t *rec, const spx_int16_t *play, const sp
 {
    if (!(rFile && pFile && oFile))
    {
-      speex_error("Dump files not open");
+      speex_fatal("Dump files not open");
    }
    fwrite(rec, sizeof(spx_int16_t), len, rFile);
    fwrite(play, sizeof(spx_int16_t), len, pFile);
@@ -384,10 +384,10 @@ SpeexEchoState *speex_echo_state_init(int frame_size, int filter_length)
 
 #ifdef DUMP_ECHO_CANCEL_DATA
    if (rFile || pFile || oFile)
-      speex_error("Opening dump files twice");
-   rFile = fopen("aec_rec.sw", "w");
-   pFile = fopen("aec_play.sw", "w");
-   oFile = fopen("aec_out.sw", "w");
+      speex_fatal("Opening dump files twice");
+   rFile = fopen("aec_rec.sw", "wb");
+   pFile = fopen("aec_play.sw", "wb");
+   oFile = fopen("aec_out.sw", "wb");
 #endif
    
    st->frame_size = frame_size;
@@ -635,13 +635,13 @@ void speex_echo_playback(SpeexEchoState *st, const spx_int16_t *play)
    }
 }
 
-/** Performs echo cancellation on a frame */
+/** Performs echo cancellation on a frame (deprecated, last arg now ignored) */
 void speex_echo_cancel(SpeexEchoState *st, const spx_int16_t *in, const spx_int16_t *far_end, spx_int16_t *out, spx_int32_t *Yout)
 {
    speex_echo_cancellation(st, in, far_end, out);
 }
 
-/** Performs echo cancellation on a frame (deprecated, last arg now ignored) */
+/** Performs echo cancellation on a frame */
 void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, const spx_int16_t *far_end, spx_int16_t *out)
 {
    int i,j;

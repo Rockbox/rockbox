@@ -80,17 +80,16 @@ void sanitize_values32(spx_word32_t *vec, spx_word32_t min_val, spx_word32_t max
    }
 }
 
+void highpass(const spx_word16_t *x, spx_word16_t *y, int len, int filtID, spx_mem_t *mem)
+{
+   int i;
 #ifdef FIXED_POINT
-   const spx_word16_t Pcoef[5][3] ICONST_ATTR = {{16384, -31313, 14991}, {16384, -31569, 15249}, {16384, -31677, 15328}, {16384, -32313, 15947}, {16384, -22446, 6537}};
-   const spx_word16_t Zcoef[5][3] ICONST_ATTR = {{15672, -31344, 15672}, {15802, -31601, 15802}, {15847, -31694, 15847}, {16162, -32322, 16162}, {14418, -28836, 14418}};
+   static const spx_word16_t Pcoef[5][3] ICONST_ATTR = {{16384, -31313, 14991}, {16384, -31569, 15249}, {16384, -31677, 15328}, {16384, -32313, 15947}, {16384, -22446, 6537}};
+   static const spx_word16_t Zcoef[5][3] ICONST_ATTR = {{15672, -31344, 15672}, {15802, -31601, 15802}, {15847, -31694, 15847}, {16162, -32322, 16162}, {14418, -28836, 14418}};
 #else
    const spx_word16_t Pcoef[5][3] = {{1.00000f, -1.91120f, 0.91498f}, {1.00000f, -1.92683f, 0.93071f}, {1.00000f, -1.93338f, 0.93553f}, {1.00000f, -1.97226f, 0.97332f}, {1.00000f, -1.37000f, 0.39900f}};
    const spx_word16_t Zcoef[5][3] = {{0.95654f, -1.91309f, 0.95654f}, {0.96446f, -1.92879f, 0.96446f}, {0.96723f, -1.93445f, 0.96723f}, {0.98645f, -1.97277f, 0.98645f}, {0.88000f, -1.76000f, 0.88000f}};
 #endif
- 
-void highpass(const spx_word16_t *x, spx_word16_t *y, int len, int filtID, spx_mem_t *mem)
-{
-   int i;
    const spx_word16_t *den, *num;
    if (filtID>4)
       filtID=4;
