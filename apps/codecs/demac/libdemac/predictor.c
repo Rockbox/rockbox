@@ -66,16 +66,10 @@ void init_predictor_decoder(struct predictor_t* p)
     p->XlastA = 0;
 }
 
-#ifdef CPU_COLDFIRE
-/* Putting this in IRAM makes a small speedup (e.g. 186% -> 187%
-   realtime for a -c1000 file on Coldfire, but is slower on PP. */
-int predictor_decode_stereo(struct predictor_t* p, int32_t* decoded0, int32_t* decoded1, int count) ICODE_ATTR;
-#endif
-
-#ifndef CPU_ARM
+#if !defined(CPU_ARM) && !defined(CPU_COLDFIRE)
 int predictor_decode_stereo(struct predictor_t* p, int32_t* decoded0, int32_t* decoded1, int count)
 {
-    int32_t predictionA, predictionB;
+    int32_t predictionA, predictionB; 
 
     while (count--)
     {
