@@ -655,6 +655,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_ERROR;
     }
 
+    codec_mallocbuf = rb->plugin_get_audio_buffer(&audiosize);
+
 #ifdef SIMULATOR
     /* The simulator thread implementation doesn't have stack buffers */
     (void)i;
@@ -666,6 +668,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     {
         if (rb->strcmp(rb->threads[i].name,"codec")==0)
         {
+            /* Wait to ensure the codec thread has blocked */
+            while (rb->threads[i].state!=STATE_BLOCKED)
+                rb->yield();
+
             codec_stack = rb->threads[i].stack;
             codec_stack_size = rb->threads[i].stack_size;
             break;
@@ -679,7 +685,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 #endif
 
-    codec_mallocbuf = rb->plugin_get_audio_buffer(&audiosize);
     codec_stack_copy = codec_mallocbuf + 512*1024;
     audiobuf = codec_stack_copy + codec_stack_size;
     audiosize -= 512*1024 + codec_stack_size;
