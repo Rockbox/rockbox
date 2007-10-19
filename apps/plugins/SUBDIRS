@@ -16,9 +16,7 @@ rockboy
 
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
-#ifndef SANSA_C200
 chessbox
-#endif
 sudoku
 reversi
 #endif

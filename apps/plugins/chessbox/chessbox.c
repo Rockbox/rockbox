@@ -196,37 +196,29 @@ PLUGIN_HEADER
 #define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
 #define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
 
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
+#define CB_SELECT  BUTTON_SELECT
+#define CB_UP      BUTTON_UP
+#define CB_DOWN    BUTTON_DOWN
+#define CB_LEFT    BUTTON_LEFT
+#define CB_RIGHT   BUTTON_RIGHT
+#define CB_PLAY    BUTTON_VOL_UP
+#define CB_LEVEL   BUTTON_REC
+#define CB_MENU    BUTTON_POWER
+
+#define CB_SCROLL_UP     (BUTTON_UP|BUTTON_REPEAT)
+#define CB_SCROLL_DOWN   (BUTTON_DOWN|BUTTON_REPEAT)
+#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
+#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
+
 #else
     #error CHESSBOX: Unsupported keypad
 #endif
 
-/* use 30x30 tiles */
-#if (LCD_HEIGHT >= 240) && (LCD_WIDTH >= 240)
-#define TILE_WIDTH  30
-#define TILE_HEIGHT 30
-/* use 22x22 tiles */
-#elif (LCD_HEIGHT >= 176) && (LCD_WIDTH >= 176)
-#define TILE_WIDTH  22
-#define TILE_HEIGHT 22
-/* use 16x16 tiles */
-#elif (LCD_HEIGHT >= 128) && (LCD_WIDTH >= 128)
-#define TILE_WIDTH  16
-#define TILE_HEIGHT 16
-/* use 13x13 tiles */
-#elif (LCD_HEIGHT >= 104) && (LCD_WIDTH >= 104)
-#define TILE_WIDTH  13
-#define TILE_HEIGHT 13
-/* use 10x8 tiles , only for the archoses */
-#elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 112)
-#define TILE_WIDTH  10
-#define TILE_HEIGHT 8
-/* use 8x8 tiles */
-#elif (LCD_HEIGHT >= 64) && (LCD_WIDTH >= 64)
-#define TILE_WIDTH  8
-#define TILE_HEIGHT 8
-#else
-    #error CHESSBOX: Unsupported LCD
-#endif
+/* Tile size defined by the assigned bitmap */
+#include "chessbox_pieces.h"
+#define TILE_WIDTH BMPWIDTH_chessbox_pieces
+#define TILE_HEIGHT (BMPHEIGHT_chessbox_pieces/26)
 
 /* Calculate Offsets */
 #define XOFS ((LCD_WIDTH-8*TILE_WIDTH)/2)
