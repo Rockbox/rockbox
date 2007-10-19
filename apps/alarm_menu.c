@@ -44,7 +44,7 @@
 
 static void speak_time(int hours, int minutes, bool speak_hours)
 {
-    if (talk_menus_enabled()){
+    if (global_settings.talk_menu){
         if(speak_hours) {
             talk_value(hours, UNIT_HOUR, false);
             talk_value(minutes, UNIT_MIN, true);
@@ -86,7 +86,7 @@ bool alarm_screen(void)
                 screens[i].puts(0, 3, str(LANG_ALARM_MOD_KEYS));
             }
             /* Talk when entering the wakeup screen */
-            if (talk_menus_enabled())
+            if (global_settings.talk_menu)
             {
                 talk_value(h, UNIT_HOUR, true);
                 talk_value(m, UNIT_MIN, true);
@@ -113,7 +113,7 @@ bool alarm_screen(void)
                 rtc_init();
                 rtc_set_alarm(h,m);
                 rtc_enable_alarm(true);
-                if (talk_menus_enabled())
+                if (global_settings.talk_menu)
                 {
                     talk_id(LANG_ALARM_MOD_TIME_TO_GO, true);
                     talk_value(togo / 60, UNIT_HOUR, true);
@@ -164,7 +164,7 @@ bool alarm_screen(void)
          case ACTION_STD_NEXTREPEAT:
              h = (h+1) % 24;
 
-             if (talk_menus_enabled())
+             if (global_settings.talk_menu)
                  talk_value(h, UNIT_HOUR, false);
              break;
 
@@ -173,7 +173,7 @@ bool alarm_screen(void)
         case ACTION_STD_PREVREPEAT:
              h = (h+23) % 24;
              
-             if (talk_menus_enabled())
+             if (global_settings.talk_menu)
                  talk_value(h, UNIT_HOUR, false);
              break;
 

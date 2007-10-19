@@ -225,7 +225,7 @@ static void init_tagcache(void)
             /* hwcodec can't use voice here, as the database commit
              * uses the audio buffer. */
             static long talked_tick = 0;
-            if(talk_menus_enabled()
+            if(global_settings.talk_menu
                && (talked_tick == 0
                    || TIME_AFTER(current_tick, talked_tick+7*HZ)))
             {

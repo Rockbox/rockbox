@@ -1664,7 +1664,7 @@ static void display_playlist_count(int count, const unsigned char *fmt,
 {
     static long talked_tick = 0;
     long id = P2ID(fmt);
-    if(talk_menus_enabled() && id>=0)
+    if(global_settings.talk_menu && id>=0)
     {
         if(final || (count && (talked_tick == 0
                                || TIME_AFTER(current_tick, talked_tick+5*HZ))))

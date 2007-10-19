@@ -145,7 +145,7 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
     while (result==-1)
     {
         /* Repeat the question every 5secs (more or less) */
-        if (talk_menus_enabled()
+        if (global_settings.talk_menu
             && (talked_tick==0 || TIME_AFTER(current_tick, talked_tick+HZ*5)))
         {
             talked_tick = current_tick;
@@ -175,7 +175,7 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
     FOR_NB_SCREENS(i)
         result_displayed=gui_yesno_draw_result(&(yn[i]), result);
 
-    if (talk_menus_enabled())
+    if (global_settings.talk_menu)
     {
         talk_idarray(voice_ids, false);
         talk_force_enqueue_next();

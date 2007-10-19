@@ -66,19 +66,16 @@ void talk_init(void);
 bool talk_voice_required(void); /* returns true if voice codec required */
 #endif
 int talk_get_bufsize(void); /* get the loaded voice file size */
-/* talk_buffer_steal - on SWCODEC, for use by buffer functions only */
-int talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */
+void talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */
 bool is_voice_queued(void); /* Are there more voice clips to be spoken? */
 int talk_id(long id, bool enqueue); /* play a voice ID from voicefont */
 int talk_file(const char* filename, bool enqueue); /* play a thumbnail from file */
 int talk_number(long n, bool enqueue); /* say a number */
 int talk_value(long n, int unit, bool enqueue); /* say a numeric value */
 int talk_spell(const char* spell, bool enqueue); /* spell a string */
-bool talk_menus_enabled(void); /* returns true if menus should be voiced */
-void talk_disable_menus(void); /* disable voice menus (temporarily, not persisted) */
-void talk_enable_menus(void); /* re-enable voice menus */
-int do_shutup(void); /* kill voice unconditionally */
-int shutup(void); /* Interrupt voice, as when enqueue is false */
+void talk_disable(bool disable); /* temporarily disable (or re-enable) talking (temporarily, not persisted) */
+void talk_force_shutup(void); /* kill voice unconditionally */
+void talk_shutup(void); /* Interrupt voice, as when enqueue is false */
 
 #if CONFIG_RTC
 /* this is in talk.c which isnt compiled for hwcodec simulator */
@@ -94,12 +91,14 @@ void talk_date_time(struct tm *time, bool speak_current_time_string);
 
 /* We don't build talk.c for hwcodec sims so we need to define these as empty */
 #if defined(SIMULATOR) && !(CONFIG_CODEC == SWCODEC)
+#define talk_init(...)
+#define talk_buffer_steal(...)
+#define talk_shutup(...)
 #define talk_force_enqueue_next(...)
 #define talk_idarray(...)
 #define talk_ids(...)
 #define cond_talk_ids(...)
 #define cond_talk_ids_fq(...)
-#define shutup(...)
 #else
 
 /* Enqueue next utterance even if enqueue parameter is false: don't
@@ -116,18 +115,18 @@ int talk_idarray(long *idarray, bool enqueue);
 /* This version talks only if talking menus are enabled, and does not
    enqueue the initial id. */
 #define cond_talk_ids(ids...) do { \
-        if (talk_menus_enabled()) \
+        if (global_settings.talk_menu) \
             talk_ids(false, ids); \
     } while(0)
 /* And a version that takes the array parameter... */
 #define cond_talk_idarray(idarray) do { \
-        if (talk_menus_enabled() \
+        if (global_settings.talk_menu \
             talk_idarray(idarray, false); \
     } while(0)
 /* Convenience macro to conditionally speak something and not have
    it interrupted. */
 #define cond_talk_ids_fq(ids...) do { \
-        if (talk_menus_enabled()) { \
+        if (global_settings.talk_menu) { \
             talk_ids(false, ids);                 \
             talk_force_enqueue_next(); \
         } \

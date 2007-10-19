@@ -889,7 +889,7 @@ bool recording_screen(bool no_source)
 
 #if CONFIG_CODEC == SWCODEC
     /* recording_menu gets messed up: so prevent manus talking */
-    talk_disable_menus();
+    talk_disable(true);
     /* audio_init_recording stops anything playing when it takes the audio
        buffer */
 #else
@@ -1873,8 +1873,8 @@ bool recording_screen(bool no_source)
         /* Go back to playback mode */
         rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 
-    /* restore talk_menu setting */
-    talk_enable_menus();
+    /* restore talking */
+    talk_disable(false);
 #else /* !SWCODEC */
     audio_init_playback();
 #endif /* CONFIG_CODEC == SWCODEC */

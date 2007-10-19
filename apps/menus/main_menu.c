@@ -161,7 +161,7 @@ static bool show_info(void)
                 size2 = 0;
 #endif
 
-            if (talk_menus_enabled())
+            if (global_settings.talk_menu)
             {   
                 /* say whatever is reasonable, no real connection to the screen */
                 bool enqueue = false; /* enqueue all but the first */

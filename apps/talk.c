@@ -80,10 +80,6 @@ const char* const file_thumbnail_ext = ".talk";
 #define MAX_THUMBNAIL_BUFSIZE 0x10000
 #endif
 
-#ifndef SIMULATOR
-extern bool audio_is_initialized;
-#endif
-
 /***************** Data types *****************/
 
 struct clip_entry /* one entry of the index table */
@@ -118,8 +114,7 @@ static long size_for_thumbnail; /* leftover buffer size for it */
 static struct voicefile* p_voicefile; /* loaded voicefile */
 static bool has_voicefile; /* a voicefile file is present */
 static struct queue_entry queue[QUEUE_SIZE]; /* queue of scheduled clips */
-/* enqueue next utterance even if enqueue is false. */
-static bool force_enqueue_next;
+static bool force_enqueue_next; /* enqueue next utterance even if enqueue is false */
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
 static int sent; /* how many bytes handed over to playback, owned by ISR */
@@ -131,16 +126,8 @@ static unsigned char* p_lastclip; /* address of latest clip, for silence add */
 static unsigned long voicefile_size = 0; /* size of the loaded voice file */
 static unsigned char last_lang[MAX_FILENAME+1]; /* name of last used lang file (in talk_init) */
 static bool talk_initialized; /* true if talk_init has been called */
-static int talk_menu_disable; /* if non-zero, temporarily disable voice UI (not saved) */
+static int talk_temp_disable_count; /* if positive, temporarily disable voice UI (not saved) */
 
-/***************** Private prototypes *****************/
-
-static void load_voicefile(void);
-static void mp3_callback(unsigned char** start, size_t* size);
-static int queue_clip(unsigned char* buf, long size, bool enqueue);
-static int open_voicefile(void);
-static unsigned char* get_clip(long id, long* p_size);
-int shutup(void); /* Interrupt voice, as when enqueue is false */
 
 /***************** Private implementation *****************/
 
@@ -158,6 +145,50 @@ static int open_voicefile(void)
     snprintf(buf, sizeof(buf), LANG_DIR "/%s.voice", p_lang);
     
     return open(buf, O_RDONLY);
+}
+
+
+/* fetch a clip from the voice file */
+static unsigned char* get_clip(long id, long* p_size)
+{
+    long clipsize;
+    unsigned char* clipbuf;
+    
+    if (id > VOICEONLY_DELIMITER)
+    {   /* voice-only entries use the second part of the table */
+        id -= VOICEONLY_DELIMITER + 1;
+        if (id >= p_voicefile->id2_max)
+            return NULL; /* must be newer than we have */
+        id += p_voicefile->id1_max; /* table 2 is behind table 1 */
+    }
+    else
+    {   /* normal use of the first table */
+        if (id >= p_voicefile->id1_max)
+            return NULL; /* must be newer than we have */
+    }
+    
+    clipsize = p_voicefile->index[id].size;
+    if (clipsize == 0) /* clip not included in voicefile */
+        return NULL;
+    clipbuf = (unsigned char *) p_voicefile + p_voicefile->index[id].offset;
+
+#ifdef HAVE_MMC /* dynamic loading, on demand */
+    if (!(clipsize & LOADED_MASK))
+    {   /* clip used for the first time, needs loading */
+        lseek(filehandle, p_voicefile->index[id].offset, SEEK_SET);
+        if (read(filehandle, clipbuf, clipsize) != clipsize)
+            return NULL; /* read error */
+
+        p_voicefile->index[id].size |= LOADED_MASK; /* mark as loaded */
+    }
+    else
+    {   /* clip is in memory already */
+        clipsize &= ~LOADED_MASK; /* without the extra bit gives true size */
+    }
+#endif
+
+    *p_size = clipsize;
+    return clipbuf;
 }
 
 
@@ -252,7 +283,7 @@ load_err:
 /* Are more voice clips queued and waiting? */
 bool is_voice_queued()
 {
-    return !!QUEUE_LEVEL;
+    return (QUEUE_LEVEL != 0);
 }
 
 
@@ -280,7 +311,7 @@ static void mp3_callback(unsigned char** start, size_t* size)
 
 re_check:
 
-    if (QUEUE_LEVEL) /* queue is not empty? */
+    if (QUEUE_LEVEL != 0) /* queue is not empty? */
     {   /* start next clip */
 #if CONFIG_CODEC != SWCODEC
         sent = MIN(queue[queue_read].len, 0xFFFF);
@@ -309,26 +340,22 @@ re_check:
     }
 }
 
+/***************** Public routines *****************/
+
 /* stop the playback and the pending clips */
-int do_shutup(void)
+void talk_force_shutup(void)
 {
+    /* Most of this is MAS only */
 #if CONFIG_CODEC != SWCODEC
     unsigned char* pos;
     unsigned char* search;
     unsigned char* end;
-#endif
-
     if (QUEUE_LEVEL == 0) /* has ended anyway */
-    {
-#if CONFIG_CODEC == SWCODEC
-        mp3_play_stop();
-#endif
-        return 0;
-    }
-#if CONFIG_CODEC != SWCODEC
+        return;
+
 #if CONFIG_CPU == SH7034
     CHCR3 &= ~0x0001; /* disable the DMA (and therefore the interrupt also) */
-#endif
+#endif /* CONFIG_CPU == SH7034 */
     /* search next frame boundary and continue up to there */
     pos = search = mp3_get_pos();
     end = queue[queue_read].buf + queue[queue_read].len;
@@ -362,41 +389,38 @@ int do_shutup(void)
 #if CONFIG_CPU == SH7034
             DTCR3 = sent; /* let the DMA finish this frame */
             CHCR3 |= 0x0001; /* re-enable DMA */
-#endif
-            return 0;
+#endif /* CONFIG_CPU == SH7034 */
+            return;
         }
     }
-#endif
+#endif /* CONFIG_CODEC != SWCODEC */
 
-    /* nothing to do, was frame boundary or not our clip */
+    /* Either SWCODEC, or MAS had nothing to do (was frame boundary or not our clip) */
     mp3_play_stop();
-
     queue_write = queue_read = 0; /* reset the queue */
-    
-    return 0;
+    return;
 }
 
 /* Shutup the voice, except if force_enqueue_next is set. */
-int shutup(void)
+void talk_shutup(void)
 {
     if (!force_enqueue_next)
-        return do_shutup();
-    return 0;
+        talk_force_shutup();
 }
 
 /* schedule a clip, at the end or discard the existing queue */
-static int queue_clip(unsigned char* buf, long size, bool enqueue)
+static void queue_clip(unsigned char* buf, long size, bool enqueue)
 {
     int queue_level;
 
     if (!enqueue)
-        shutup(); /* cut off all the pending stuff */
+        talk_shutup(); /* cut off all the pending stuff */
     /* Something is being enqueued, force_enqueue_next override is no
        longer in effect. */
     force_enqueue_next = false;
     
     if (!size)
-        return 0; /* safety check */
+        return; /* safety check */
 #if CONFIG_CPU == SH7034
     /* disable the DMA temporarily, to be safe of race condition */
     CHCR3 &= ~0x0001;
@@ -431,50 +455,7 @@ static int queue_clip(unsigned char* buf, long size, bool enqueue)
 #endif
     }
 
-    return 0;
-}
-
-/* fetch a clip from the voice file */
-static unsigned char* get_clip(long id, long* p_size)
-{
-    long clipsize;
-    unsigned char* clipbuf;
-    
-    if (id > VOICEONLY_DELIMITER)
-    {   /* voice-only entries use the second part of the table */
-        id -= VOICEONLY_DELIMITER + 1;
-        if (id >= p_voicefile->id2_max)
-            return NULL; /* must be newer than we have */
-        id += p_voicefile->id1_max; /* table 2 is behind table 1 */
-    }
-    else
-    {   /* normal use of the first table */
-        if (id >= p_voicefile->id1_max)
-            return NULL; /* must be newer than we have */
-    }
-    
-    clipsize = p_voicefile->index[id].size;
-    if (clipsize == 0) /* clip not included in voicefile */
-        return NULL;
-    clipbuf = (unsigned char *) p_voicefile + p_voicefile->index[id].offset;
-
-#ifdef HAVE_MMC /* dynamic loading, on demand */
-    if (!(clipsize & LOADED_MASK))
-    {   /* clip used for the first time, needs loading */
-        lseek(filehandle, p_voicefile->index[id].offset, SEEK_SET);
-        if (read(filehandle, clipbuf, clipsize) != clipsize)
-            return NULL; /* read error */
-
-        p_voicefile->index[id].size |= LOADED_MASK; /* mark as loaded */
-    }
-    else
-    {   /* clip is in memory already */
-        clipsize &= ~LOADED_MASK; /* without the extra bit gives true size */
-    }
-#endif
-
-    *p_size = clipsize;
-    return clipbuf;
+    return;
 }
 
 
@@ -500,11 +481,12 @@ static void reset_state(void)
     p_silence = NULL; /* pause clip not accessible */
 }
 
+
 /***************** Public implementation *****************/
 
 void talk_init(void)
 {
-    talk_menu_disable = 0;
+    talk_temp_disable_count = 0;
     if (talk_initialized && !strcasecmp(last_lang, global_settings.lang_file))
     {
         /* not a new file, nothing to do */
@@ -558,7 +540,7 @@ int talk_get_bufsize(void)
 }
 
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
-int talk_buffer_steal(void)
+void talk_buffer_steal(void)
 {
 #if CONFIG_CODEC != SWCODEC
     mp3_play_stop();
@@ -570,9 +552,7 @@ int talk_buffer_steal(void)
         filehandle = -1;
     }
 #endif
-    reset_state();
-
-    return 0;
+    reset_state();;
 }
 
 
@@ -583,6 +563,8 @@ int talk_id(long id, bool enqueue)
     unsigned char* clipbuf;
     int unit;
 
+    if (talk_temp_disable_count > 0)
+        return -1;  /* talking has been disabled */
 #if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
         return -1; 
@@ -644,6 +626,8 @@ int talk_file(const char* filename, bool enqueue)
     int size;
     struct mp3entry info;
 
+    if (talk_temp_disable_count > 0)
+        return -1;  /* talking has been disabled */
 #if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
         return -1; 
@@ -689,13 +673,15 @@ int talk_number(long n, bool enqueue)
     int level = 2; /* mille count */
     long mil = 1000000000; /* highest possible "-illion" */
 
+    if (talk_temp_disable_count > 0)
+        return -1;  /* talking has been disabled */
 #if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
         return -1; 
 #endif
 
     if (!enqueue)
-        shutup(); /* cut off all the pending stuff */
+        talk_shutup(); /* cut off all the pending stuff */
     
     if (n==0)
     {   /* special case */
@@ -785,6 +771,8 @@ int talk_value(long n, int unit, bool enqueue)
             = VOICE_PM_UNITS_PER_TICK,
     };
 
+    if (talk_temp_disable_count > 0)
+        return -1;  /* talking has been disabled */
 #if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
         return -1; 
@@ -819,13 +807,15 @@ int talk_spell(const char* spell, bool enqueue)
 {
     char c; /* currently processed char */
     
+    if (talk_temp_disable_count > 0)
+        return -1;  /* talking has been disabled */
 #if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
         return -1; 
 #endif
 
     if (!enqueue)
-        shutup(); /* cut off all the pending stuff */
+        talk_shutup(); /* cut off all the pending stuff */
     
     while ((c = *spell++) != '\0')
     {
@@ -849,26 +839,18 @@ int talk_spell(const char* spell, bool enqueue)
     return 0;
 }
 
-bool talk_menus_enabled(void)
+void talk_disable(bool disable)
 {
-    return (global_settings.talk_menu && talk_menu_disable == 0);
-}
-
-
-void talk_disable_menus(void)
-{
-    talk_menu_disable++;
-}
-
-void talk_enable_menus(void)
-{    
-    talk_menu_disable--;
+    if (disable)
+        talk_temp_disable_count++;
+    else 
+        talk_temp_disable_count--;
 }
 
 #if CONFIG_RTC
 void talk_date_time(struct tm *tm, bool speak_current_time_string)
 {
-    if(talk_menus_enabled ())
+    if(global_settings.talk_menu)
     {
         if(speak_current_time_string)
             talk_id(VOICE_CURRENT_TIME, true);

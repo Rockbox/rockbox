@@ -133,7 +133,7 @@ static char *option_get_valuestring(struct settings_list *setting,
 
 static void option_talk(struct settings_list *setting, int temp_var)
 {
-    if (!talk_menus_enabled())
+    if (!global_settings.talk_menu)
         return;
     if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
     {

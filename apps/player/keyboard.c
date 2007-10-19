@@ -74,7 +74,7 @@ static unsigned short *kbd_setupkeys(int page, int* len)
 /* helper function to spell a char if voice UI is enabled */
 static void kbd_spellchar(char c)
 {
-    if (talk_menus_enabled()) /* voice UI? */
+    if (global_settings.talk_menu) /* voice UI? */
     {
         unsigned char tmp[5];
         /* store char to pass to talk_spell */
@@ -90,7 +90,7 @@ static void kbd_spellchar(char c)
 
 static void say_edit(void)
 {
-    if (talk_menus_enabled())
+    if (global_settings.talk_menu)
         talk_id(VOICE_EDIT, false);
 }
 
@@ -112,7 +112,7 @@ int kbd_input(char* text, int buflen)
 
     editpos = utf8length(text);
 
-    if (talk_menus_enabled()) /* voice UI? */
+    if (global_settings.talk_menu) /* voice UI? */
         talk_spell(text, true); /* spell initial text */ 
 
     while (!done)
@@ -284,7 +284,7 @@ int kbd_input(char* text, int buflen)
                         editpos++;
                     }
                 }
-                if (talk_menus_enabled()) /* voice UI? */
+                if (global_settings.talk_menu) /* voice UI? */
                     talk_spell(text, false); /* speak revised text */
                 break;
 

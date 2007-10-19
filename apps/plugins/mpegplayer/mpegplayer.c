@@ -1170,7 +1170,7 @@ static int button_loop(void)
                 str_send_msg(&video_str, STREAM_QUIT, 0);
                 audio_str.status = STREAM_STOPPED;
             }
-    }
+        }
     }
 quit:
     return audio_str.status;
@@ -2227,6 +2227,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         api->splash(HZ*2, "No File");
         return PLUGIN_ERROR;        
     }
+    api->talk_disable(true);
 
     /* Initialize IRAM - stops audio and voice as well */
     PLUGIN_IRAM_INIT(api)
@@ -2253,6 +2254,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     audiosize -= graysize;
     if (grayscales < 33 || audiosize <= 0)
     {
+        rb->talk_disable(false);
         rb->splash(HZ, "gray buf error");
         return PLUGIN_ERROR;
     }
@@ -2261,7 +2263,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* Initialise our malloc buffer */
     audiosize = mpeg_alloc_init(audiobuf,audiosize, LIBMPEG2BUFFER_SIZE);
     if (audiosize == 0)
+    {
+        rb->talk_disable(false);
         return PLUGIN_ERROR;
+    }
 
     /* Set disk pointers to NULL */
     disk_buf_end = disk_buf_start = NULL;
@@ -2275,13 +2280,21 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     disk_buf_start = mpeg_malloc(disk_buf_size,-1);
 
     if (disk_buf_start == NULL)
+    {
+        rb->talk_disable(false);
         return PLUGIN_ERROR;
+    }
 
     if (!init_mpabuf())
+    {
+        rb->talk_disable(false);
         return PLUGIN_ERROR;
-
+    }
     if (!init_pcmbuf())
+    {
+        rb->talk_disable(false);
         return PLUGIN_ERROR;
+    }
 
     /* The remaining buffer is for use by libmpeg2 */
 
@@ -2290,6 +2303,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     if (in_file < 0){
         DEBUGF("Could not open %s\n",(char*)parameter);
+        rb->talk_disable(false);
         return PLUGIN_ERROR;
     }
     filename = (char*)parameter;
@@ -2322,6 +2336,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     switch (result)
     {
         case MPEG_START_QUIT:
+            rb->talk_disable(false);
             return 0;
         default:
             start_time = settings.resume_time;
@@ -2336,7 +2351,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Turn off backlight timeout */
     backlight_force_on(rb); /* backlight control in lib/helper.c */
-    rb->talk_disable_menus();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
@@ -2463,8 +2477,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                         n = rb->read(in_file, disk_buf_tail,bytes_to_read);
                         if (n==0)
                             rb->splash(30,"buffer fill error");
-                    }
-                    
+                    }                   
 
                     bytes_to_read -= n;
                     file_remaining -= n;
@@ -2531,7 +2544,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(rb); /* backlight control in lib/helper.c */
-    rb->talk_enable_menus();
-
+    rb->talk_disable(false);
     return status;
 }

@@ -302,14 +302,6 @@ void button_set_flip(bool yesno)
 }
 
 #if CONFIG_CODEC != SWCODEC
-void talk_init(void)
-{
-}
-
-int talk_buffer_steal(void)
-{
-    return 0;
-}
 
 int talk_id(int id, bool enqueue)
 {
@@ -347,17 +339,9 @@ int talk_spell(char* spell, bool enqueue)
     return 0;
 }
 
-bool talk_menus_enabled(void)
+void talk_disable(bool disable)
 {
-    return false;
-}
-
-void talk_enable_menus(void)
-{
-}
-
-void talk_disable_menus(void)
-{
+    (void) disable;
 }
 
 const char* const dir_thumbnail_name = "_dirname.talk";

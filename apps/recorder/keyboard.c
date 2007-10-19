@@ -191,7 +191,7 @@ int load_kbd(unsigned char* filename)
 /* helper function to spell a char if voice UI is enabled */
 static void kbd_spellchar(unsigned short c)
 {
-    if (talk_menus_enabled()) /* voice UI? */
+    if (global_settings.talk_menu) /* voice UI? */
     {
         unsigned char tmp[5];
         /* store char to pass to talk_spell */
@@ -208,7 +208,7 @@ static void kbd_spellchar(unsigned short c)
 #ifdef KBD_MODES
 static void say_edit(void)
 {
-    if(talk_menus_enabled())
+    if(global_settings.talk_menu)
         talk_id(VOICE_EDIT, false);
 }
 #endif
@@ -527,7 +527,7 @@ int kbd_input(char* text, int buflen)
     /* Initial edit position is after last character */
     editpos = utf8length(text);
 
-    if (talk_menus_enabled()) /* voice UI? */
+    if (global_settings.talk_menu) /* voice UI? */
         talk_spell(text, true); /* spell initial text */
 
 
@@ -832,7 +832,7 @@ int kbd_input(char* text, int buflen)
                         kbd_spellchar(text[c]);
                     } 
 #if CONFIG_CODEC == SWCODEC
-                    else if (talk_menus_enabled())
+                    else if (global_settings.talk_menu)
                         pcmbuf_beep(1000, 150, 1500);
 #endif
                 }
@@ -877,7 +877,7 @@ int kbd_input(char* text, int buflen)
                         kbd_spellchar(text[c]);
                     } 
 #if CONFIG_CODEC == SWCODEC
-                    else if (talk_menus_enabled())
+                    else if (global_settings.talk_menu)
                         pcmbuf_beep(1000, 150, 1500);
 #endif
                 }
@@ -1124,7 +1124,7 @@ int kbd_input(char* text, int buflen)
                     kbd_inschar(text, buflen, &editpos, ch);
                 }
 
-                if (talk_menus_enabled()) /* voice UI? */
+                if (global_settings.talk_menu) /* voice UI? */
                     talk_spell(text, false);
 
                 /* speak revised text */
@@ -1153,7 +1153,7 @@ int kbd_input(char* text, int buflen)
                     kbd_inschar(text, buflen, &editpos, ch);
                 }
 
-                if (talk_menus_enabled()) /* voice UI? */
+                if (global_settings.talk_menu) /* voice UI? */
                     talk_spell(text, false);   /* speak revised text */
                 break;
 
@@ -1166,7 +1166,7 @@ int kbd_input(char* text, int buflen)
                     kbd_spellchar(text[c]);
                 }
 #if CONFIG_CODEC == SWCODEC
-                else if (talk_menus_enabled())
+                else if (global_settings.talk_menu)
                     pcmbuf_beep(1000, 150, 1500);
 #endif
                 break;
@@ -1180,7 +1180,7 @@ int kbd_input(char* text, int buflen)
                     kbd_spellchar(text[c]);
                 }
 #if CONFIG_CODEC == SWCODEC
-                else if (talk_menus_enabled())
+                else if (global_settings.talk_menu)
                     pcmbuf_beep(1000, 150, 1500);
 #endif
                 break;
@@ -1212,7 +1212,7 @@ int kbd_input(char* text, int buflen)
                         param[l].hangul = false;
                     kbd_inschar(text, buflen, &editpos, morse_alphabets[j]);
 
-                    if (talk_menus_enabled()) /* voice UI? */
+                    if (global_settings.talk_menu) /* voice UI? */
                         talk_spell(text, false);   /* speak revised text */
                 }
 #endif /* KBD_MORSE_INPUT */

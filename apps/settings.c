@@ -949,7 +949,7 @@ const struct settings_list* find_setting(void* variable, int *id)
 void talk_setting(void *global_settings_variable)
 {
     const struct settings_list *setting;
-    if (!talk_menus_enabled())
+    if (!global_settings.talk_menu)
         return;
     setting = find_setting(global_settings_variable, NULL);
     if (setting == NULL)

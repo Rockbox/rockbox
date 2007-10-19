@@ -225,7 +225,7 @@ static void talk_menu_item(const struct menu_item_ex *menu,
     unsigned char *str;
     int sel;
     
-    if (talk_menus_enabled())
+    if (global_settings.talk_menu)
     {
         sel = get_menu_selection(gui_synclist_get_sel_pos(lists),menu);
         if ((menu->flags&MENU_TYPE_MASK) == MT_MENU)

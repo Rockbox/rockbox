@@ -468,8 +468,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     &global_settings,
     &global_status,
-    talk_disable_menus,
-    talk_enable_menus,
+    talk_disable,
 #if CONFIG_CODEC == SWCODEC
     codec_load_file,
     get_codec_filename,

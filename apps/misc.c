@@ -685,7 +685,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             audio_close_recording();       
 #endif
 
-            if(talk_menus_enabled())
+            if(global_settings.talk_menu)
             {
                 bool enqueue = false;
                 if(msg_id != -1)

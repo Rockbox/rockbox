@@ -112,12 +112,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 83
+#define PLUGIN_API_VERSION 84
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 83
+#define PLUGIN_MIN_API_VERSION 84
 
 /* plugin return codes */
 enum plugin_status {
@@ -579,8 +579,7 @@ struct plugin_api {
 #endif
     struct user_settings* global_settings;
     struct system_status *global_status;
-    void (*talk_disable_menus)(void);
-    void (*talk_enable_menus)(void);
+    void (*talk_disable)(bool disable);
 #if CONFIG_CODEC == SWCODEC
     int (*codec_load_file)(const char* codec, struct codec_api *api);
     const char *(*get_codec_filename)(int cod_spec);
