@@ -581,12 +581,12 @@ static int dirbrowse()
     start_wps = false;
     numentries = update_dir();
     if (numentries == -1)
-        return false;  /* currdir is not a directory */
+        return GO_TO_PREVIOUS;  /* currdir is not a directory */
 
     if (*tc.dirfilter > NUM_FILTER_MODES && numentries==0)
     {
         gui_syncsplash(HZ*2, ID2P(LANG_NO_FILES));
-        return false;  /* No files found for rockbox_browser() */
+        return GO_TO_PREVIOUS;  /* No files found for rockbox_browser() */
     }
     
     while(1) {
