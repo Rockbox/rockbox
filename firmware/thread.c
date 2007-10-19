@@ -2491,6 +2491,7 @@ unsigned int switch_core(unsigned int new_core)
 void init_threads(void)
 {
     const unsigned int core = CURRENT_CORE;
+    struct thread_entry *thread;
     int slot;
 
     /* CPU will initialize first and then sleep */
@@ -2503,42 +2504,38 @@ void init_threads(void)
          * or threads is in the wrong section. */
         THREAD_PANICF("init_threads->no slot", NULL);
     }
-    
-    cores[core].running = NULL;
-    cores[core].timeout = NULL;
+
+    /* Initialize initially non-zero members of core */
     thread_queue_init(&cores[core].waking);
     cores[core].next_tmo_check = current_tick; /* Something not in the past */
-#if NUM_CORES > 1
-    cores[core].blk_ops.flags = 0;
-#else
+#if NUM_CORES == 1
     cores[core].irq_level = STAY_IRQ_LEVEL;
 #endif
-    threads[slot].name = main_thread_name;
-    UNLOCK_THREAD_SET_STATE(&threads[slot], STATE_RUNNING); /* No sync worries yet */
-    threads[slot].context.start = NULL; /* core's main thread already running */
-    threads[slot].tmo.prev = NULL;
-    threads[slot].queue = NULL;
-#ifdef HAVE_SCHEDULER_BOOSTCTRL
-    threads[slot].boosted = 0;
-#endif
-#if NUM_CORES > 1
-    threads[slot].core = core;
-#endif
 #ifdef HAVE_PRIORITY_SCHEDULING
-    threads[slot].priority = PRIORITY_USER_INTERFACE;
-    threads[slot].priority_x = LOWEST_PRIORITY;
     cores[core].highest_priority = LOWEST_PRIORITY;
 #endif
 
-    add_to_list_l(&cores[core].running, &threads[slot]);
+    /* Initialize initially non-zero members of slot */
+    thread = &threads[slot];
+    thread->name = main_thread_name;
+    UNLOCK_THREAD_SET_STATE(thread, STATE_RUNNING); /* No sync worries yet */
+#if NUM_CORES > 1
+    thread->core = core;
+#endif
+#ifdef HAVE_PRIORITY_SCHEDULING
+    thread->priority = PRIORITY_USER_INTERFACE;
+    thread->priority_x = LOWEST_PRIORITY;
+#endif
+#if CONFIG_CORELOCK == SW_CORELOCK
+    corelock_init(&thread->cl);
+#endif
+
+    add_to_list_l(&cores[core].running, thread);
 
     if (core == CPU)
     {
-#ifdef HAVE_SCHEDULER_BOOSTCTRL
-        boosted_threads = 0;
-#endif
-        threads[slot].stack = stackbegin;
-        threads[slot].stack_size = (int)stackend - (int)stackbegin;
+        thread->stack = stackbegin;
+        thread->stack_size = (int)stackend - (int)stackbegin;
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
         /* TODO: HAL interface for this */
         /* Wake up coprocessor and let it initialize kernel and threads */
@@ -2550,10 +2547,8 @@ void init_threads(void)
     else
     {
         /* Initial stack is the COP idle stack */
-        threads[slot].stack = cop_idlestackbegin;
-        threads[slot].stack_size = IDLE_STACK_SIZE;
-        /* Mark COP initialized */
-        cores[COP].blk_ops.flags = 0;
+        thread->stack = cop_idlestackbegin;
+        thread->stack_size = IDLE_STACK_SIZE;
         /* Get COP safely primed inside switch_thread where it will remain
          * until a thread actually exists on it */
         CPU_CTL = PROC_WAKE;
