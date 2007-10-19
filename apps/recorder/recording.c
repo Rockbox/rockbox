@@ -688,8 +688,10 @@ void rec_set_recording_options(struct audio_recording_options *options)
 {
 #if CONFIG_CODEC != SWCODEC
     if (global_settings.rec_prerecord_time)
+    {
         talk_buffer_steal(); /* will use the mp3 buffer */
-#else /* == SWOCODEC */
+    }
+#else /* == SWCODEC */
     rec_set_source(options->rec_source,
                    options->rec_source_flags | SRCF_RECORDING);
 #endif /* CONFIG_CODEC != SWCODEC */
