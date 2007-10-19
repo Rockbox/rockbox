@@ -67,7 +67,7 @@ public:
     void setEncOpts(QString opts) {m_EncOpts=opts;}
     void setEncTemplate(QString t) { m_curEncTemplate = t; }
 
-    void setDir(QString dir){m_dir = dir; }
+    void setDir(QDir dir){m_dir = dir; }
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
 
     void setOverwriteTalk(bool ov) {m_overwriteTalk = ov;}
@@ -83,14 +83,11 @@ private slots:
 
 private:
     TTSBase* m_tts;
-    //bool initTTS();
-    //bool stopTTS();
     bool initEncoder();
     
     bool encode(QString input,QString output);
-    //bool voice(QString text,QString wavfile);
 
-    QString m_dir;
+    QDir   m_dir;
     QString m_mountpoint;
     QString m_curTTS;
     QString m_TTSexec;

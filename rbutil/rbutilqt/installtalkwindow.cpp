@@ -114,7 +114,8 @@ void InstallTalkWindow::accept()
 
     userSettings->sync();
 
-    talkcreator->setDir(folderToTalk);
+    talkcreator->setDir(QDir(folderToTalk));
+    talkcreator->setMountPoint(userSettings->value("mountpoint").toString());
     talkcreator->setTTSexe(pathTTS);
     talkcreator->setTTsOpts(ttsOpts);
     talkcreator->setTTsLanguage(ttsLanguage);
@@ -165,8 +166,6 @@ void InstallTalkWindow::setDeviceSettings(QSettings *dev)
 void InstallTalkWindow::setUserSettings(QSettings *user)
 {
     userSettings = user;
-
-    talkcreator->setMountPoint(userSettings->value("mountpoint").toString());
 
     setTalkFolder(userSettings->value("last_talked_folder").toString());
 

@@ -43,7 +43,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 {
     m_abort = false;
     m_logger = logger;
-    m_logger->addItem("Starting Talkfile generation",LOGINFO);
+    m_logger->addItem("Starting Talk file generation",LOGINFO);
     
     if(m_curTTS == "sapi")
         m_tts = new TTSSapi();
@@ -78,7 +78,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     {
         if(m_abort)
         {
-            m_logger->addItem("Talkfile creation aborted",LOGERROR);
+            m_logger->addItem("Talk file creation aborted",LOGERROR);
             m_tts->stop();
             return false;
         }
@@ -88,13 +88,15 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         QString toSpeak;
         QString filename;
         QString wavfilename;
-
-        if(fileInf.fileName() == "." || fileInf.fileName() == ".." || fileInf.suffix() == "talk")
+        
+        //! skip dotdot and .talk files
+        if(fileInf.fileName() == ".." || fileInf.suffix() == "talk")
         {
             it.next();
             continue;
         }
-        if(fileInf.isDir())  // if it is a dir
+        //! if it is a dir
+        if(fileInf.isDir())  
         {
             // skip entry if folder talking isnt enabled
             if(m_talkFolders == false) 
@@ -102,7 +104,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
               it.next();
               continue;
             }            
-            toSpeak = fileInf.fileName();
+            toSpeak = fileInf.absoluteDir().dirName();
             filename = fileInf.absolutePath() + "/_dirname.talk";
         }
         else   // if it is a file
@@ -124,6 +126,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         QFileInfo filenameInf(filename);
         QFileInfo wavfilenameInf(wavfilename);
 
+        //! the actual generation of the .talk files
         if(!filenameInf.exists() || m_overwriteTalk)
         {
             if(!wavfilenameInf.exists() || m_overwriteWav)
@@ -146,7 +149,8 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
                 return false;
             }
         }
-
+        
+        //! remove the intermedia wav file, if requested
         QString now = QDate::currentDate().toString("yyyyMMdd");
         if(m_removeWav)
         {
@@ -155,15 +159,16 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             installlog.remove(wavfilename);
         }
         else
-            installlog.setValue(wavfilename.remove(m_mountpoint),now);
-
-        installlog.setValue(filename.remove(m_mountpoint),now);
+            installlog.setValue(wavfilename.remove(0,m_mountpoint.length()),now);
+        
+        //! add the .talk file to the install log
+        installlog.setValue(filename.remove(0,m_mountpoint.length()),now);
         it.next();
     }
 
     installlog.endGroup();
     m_tts->stop();
-    m_logger->addItem("Finished creating Talkfiles",LOGOK);
+    m_logger->addItem("Finished creating Talk files",LOGOK);
     m_logger->setProgressMax(1);
     m_logger->setProgressValue(1);
     m_logger->abort();
