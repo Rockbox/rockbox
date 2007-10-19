@@ -409,7 +409,10 @@ bool RbUtilQt::smallInstallInner()
     }
     // Bootloader
     devices->beginGroup(userSettings->value("platform").toString());
-    if(devices->value("needsbootloader", "") == "yes") {
+    QString needBootloader = devices->value("needsbootloader", "").toString();
+    devices->endGroup();
+    if(needBootloader == "yes") 
+    {
         m_error = false;
         m_installed = false;
         if(!installBootloaderAuto())
@@ -422,8 +425,7 @@ bool RbUtilQt::smallInstallInner()
         }
         if(m_error) return true;
         logger->undoAbort();
-    }
-    devices->endGroup();
+    }    
 
     // Rockbox
     m_error = false;
