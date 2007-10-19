@@ -171,7 +171,7 @@ void Install::setDetailsArchived(bool show)
     if(show) {
         ui.labelDetails->setText(tr("These are automatically built each day "
         "from the current development source code. This generally has more "
-        "features than the last release but may be much less stable. "
+        "features than the last stable release but may be much less stable. "
         "Features may change regularly."));
         ui.labelNote->setText(tr("<b>Note:</b> archived version is r%1 (%2).")
             .arg(version.value("arch_rev"), version.value("arch_date")));
