@@ -38,31 +38,34 @@ static inline void vector_add(int16_t* v1, int16_t* v2)
         "moveq.l %[cnt], %%d5        \n"
     "1:                              \n"
 #endif
-        "movem.l (%[v1]), %%d0-%%d3  \n"
         "movem.l (%[v2]), %%a0-%%a3  \n"
-        
-        ADDHALFREGS(%%a0, %%d0)
-        ADDHALFREGS(%%a1, %%d1)
-        ADDHALFREGS(%%a2, %%d2)
-        ADDHALFREGS(%%a3, %%d3)
-
-        "movem.l %%d0-%%d3, (%[v1])  \n"
-        "lea.l   (16, %[v1]), %[v1]  \n"
         "movem.l (%[v1]), %%d0-%%d3  \n"
+        ADDHALFREGS(%%a0, %%d0)
+        "move.l  %%d0, (%[v1])+      \n"
+        ADDHALFREGS(%%a1, %%d1)
+        "move.l  %%d1, (%[v1])+      \n"
+        ADDHALFREGS(%%a2, %%d2)
+        "move.l  %%d2, (%[v1])+      \n"
+        ADDHALFREGS(%%a3, %%d3)
+        "move.l  %%d3, (%[v1])+      \n"
+
         "lea.l   (16, %[v2]), %[v2]  \n"
+
         "movem.l (%[v2]), %%a0-%%a3  \n"
-
+        "movem.l (%[v1]), %%d0-%%d3  \n"
         ADDHALFREGS(%%a0, %%d0)
+        "move.l  %%d0, (%[v1])+      \n"
         ADDHALFREGS(%%a1, %%d1)
+        "move.l  %%d1, (%[v1])+      \n"
         ADDHALFREGS(%%a2, %%d2)
+        "move.l  %%d2, (%[v1])+      \n"
         ADDHALFREGS(%%a3, %%d3)
-
-        "movem.l %%d0-%%d3, (%[v1])  \n"
+        "move.l  %%d3, (%[v1])+      \n"
 #if ORDER > 16
-        "lea.l   (16, %[v1]), %[v1]  \n"
         "lea.l   (16, %[v2]), %[v2]  \n"
+
         "subq.l  #1, %%d5            \n"
-        "bne.s   1b                  \n"
+        "bne.w   1b                  \n"
 #endif
         : /* outputs */
         [v1]"+a"(v1),
@@ -89,31 +92,34 @@ static inline void vector_sub(int16_t* v1, int16_t* v2)
         "moveq.l %[cnt], %%d5        \n"
     "1:                              \n"
 #endif
-        "movem.l (%[v1]), %%a0-%%a3  \n"
         "movem.l (%[v2]), %%d1-%%d4  \n"
-        
-        SUBHALFREGS(%%a0, %%d1, %%d0)
-        SUBHALFREGS(%%a1, %%d2, %%d1)
-        SUBHALFREGS(%%a2, %%d3, %%d2)
-        SUBHALFREGS(%%a3, %%d4, %%d3)
-
-        "movem.l %%d0-%%d3, (%[v1])  \n"
-        "lea.l   (16, %[v1]), %[v1]  \n"
         "movem.l (%[v1]), %%a0-%%a3  \n"
+        SUBHALFREGS(%%a0, %%d1, %%d0)
+        "move.l  %%d0, (%[v1])+      \n"
+        SUBHALFREGS(%%a1, %%d2, %%d1)
+        "move.l  %%d1, (%[v1])+      \n"
+        SUBHALFREGS(%%a2, %%d3, %%d2)
+        "move.l  %%d2, (%[v1])+      \n"
+        SUBHALFREGS(%%a3, %%d4, %%d3)
+        "move.l  %%d3, (%[v1])+      \n"
+
         "lea.l   (16, %[v2]), %[v2]  \n"
-        "movem.l (%[v2]), %%d1-%%d4  \n"
-            
-        SUBHALFREGS(%%a0, %%d1, %%d0)
-        SUBHALFREGS(%%a1, %%d2, %%d1)
-        SUBHALFREGS(%%a2, %%d3, %%d2)
-        SUBHALFREGS(%%a3, %%d4, %%d3)
 
-        "movem.l %%d0-%%d3, (%[v1])  \n"
+        "movem.l (%[v2]), %%d1-%%d4  \n"
+        "movem.l (%[v1]), %%a0-%%a3  \n"
+        SUBHALFREGS(%%a0, %%d1, %%d0)
+        "move.l  %%d0, (%[v1])+      \n"
+        SUBHALFREGS(%%a1, %%d2, %%d1)
+        "move.l  %%d1, (%[v1])+      \n"
+        SUBHALFREGS(%%a2, %%d3, %%d2)
+        "move.l  %%d2, (%[v1])+      \n"
+        SUBHALFREGS(%%a3, %%d4, %%d3)
+        "move.l  %%d3, (%[v1])+      \n"
 #if ORDER > 16
-        "lea.l   (16, %[v1]), %[v1]  \n"
         "lea.l   (16, %[v2]), %[v2]  \n"
+
         "subq.l  #1, %%d5            \n"
-        "bne.s   1b                  \n"
+        "bne.w   1b                  \n"
 #endif
         : /* outputs */
         [v1]"+a"(v1),
@@ -160,6 +166,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 #if ORDER > 32
         "mac.w   %%d2u, %%d3u, (%[v1])+, %%d0, %%acc0\n"
         "mac.w   %%d2l, %%d3l, (%[v2])+, %%d1, %%acc0\n"
+
         "subq.l  #1, %[res]                          \n"
         "bne.w   1b                                  \n"
 #else
