@@ -20,6 +20,8 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
+#include "uart-target.h"
+#include "spi.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -175,6 +177,8 @@ void system_init(void)
     IO_GIO_DIR1&=~(1<<10);
 
     enable_interrupts();
+    uart_init();
+    spi_init();
 }
 
 int system_memory_guard(int newmode)
