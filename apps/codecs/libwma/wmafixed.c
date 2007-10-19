@@ -43,56 +43,8 @@ fixed64 Fixed32To64(fixed32 x)
   return (fixed64)x;
 }
 
-
 /*
-	Fixed precision multiply code.
-
-*/
-
-/*Sign-15.16 format */
-#ifdef CPU_ARM
-/* these are defines in wmafixed.h*/
-#elif defined(CPU_COLDFIRE)
-
-#else
-
-fixed32 fixmul32(fixed32 x, fixed32 y)
-{
-    fixed64 temp;
-    temp = x;
-    temp *= y;
-
-    temp >>= PRECISION;
-
-    return (fixed32)temp;
-}
-
-#endif
-/*
-	Special fixmul32 that does a 16.16 x 1.31 multiply that returns a 16.16 value.
-	this is needed because the fft constants are all normalized to be less then 1
-	and can't fit into a 16 bit number without excessive rounding
-
-
-*/
-#ifndef CPU_ARM
-fixed32 fixmul32b(fixed32 x, fixed32 y)
-{
-    fixed64 temp;
-
-    temp = x;
-    temp *= y;
-
-    temp >>= 31;        //16+31-16 = 31 bits
-
-    return (fixed32)temp;
-}
-#endif
-
-
-
-/*
-	Not performance senstitive code here
+    Not performance senstitive code here
 
 */
 
@@ -204,7 +156,7 @@ static const unsigned long atan_table[] = {
 
 /*
 
-	Below here functions do not use standard fixed precision!
+    Below here functions do not use standard fixed precision!
 */
 
 
@@ -270,7 +222,7 @@ long fsincos(unsigned long phase, fixed32 *cos)
 
 
 /*
-	Old trig functions.  Still used in 1 place each.
+    Old trig functions.  Still used in 1 place each.
 
 */
 

@@ -1,9 +1,9 @@
-/* 	fixed precision code.  We use a combination of Sign 15.16 and Sign.31
-	precision here.
+/*  fixed precision code.  We use a combination of Sign 15.16 and Sign.31
+     precision here.
 
-	The WMA decoder does not always follow this convention, and occasionally
-	renormalizes values to other formats in order to maximize precision.
-	However, only the two precisions above are provided in this file.
+    The WMA decoder does not always follow this convention, and occasionally
+    renormalizes values to other formats in order to maximize precision.
+    However, only the two precisions above are provided in this file.
 
 */
 
@@ -35,16 +35,7 @@ fixed32 fixsin32(fixed32 x);
 fixed32 fixcos32(fixed32 x);
 long fsincos(unsigned long phase, fixed32 *cos);
 
-
-
-
-
 #ifdef CPU_ARM
-
-/*
-	Fixed precision multiply code ASM.
-
-*/
 
 /*Sign-15.16 format */
 
@@ -62,8 +53,7 @@ long fsincos(unsigned long phase, fixed32 *cos);
        __result;  \
     })
 
-
- #define fixmul32b(x, y)  \
+#define fixmul32b(x, y)  \
     ({ int32_t __hi;  \
        uint32_t __lo;  \
        int32_t __result;  \
@@ -76,6 +66,7 @@ long fsincos(unsigned long phase, fixed32 *cos);
     })
 
 #elif defined(CPU_COLDFIRE)
+
 static inline int32_t fixmul32(int32_t x, int32_t y)
 {
 #if PRECISION != 16
@@ -89,22 +80,49 @@ static inline int32_t fixmul32(int32_t x, int32_t y)
         "lsr.l   #1, %[t1]       \n"
         "move.w  %[t1], %[x]     \n"
         "swap    %[x]            \n"
-        : /* outputs */
-        [t1]"=&d"(t1),
-        [x] "+d" (x)
-        : /* inputs */
-        [y] "d"  (y)
+        : [t1] "=&d" (t1), [x] "+d" (x)
+        : [y] "d"  (y)
     );
     return x;
 }
 
-fixed32 fixmul32b(fixed32 x, fixed32 y);
+static inline int32_t fixmul32b(int32_t x, int32_t y)
+{
+    asm (
+        "mac.l   %[x], %[y], %%acc0  \n" /* multiply */
+        "movclr.l %%acc0, %[x]  \n"     /* get higher half */
+        : [x] "+d" (x)
+        : [y] "d"  (y)
+    );
+    return x;
+}
+
 #else
 
-fixed32 fixmul32(fixed32 x, fixed32 y);
-fixed32 fixmul32b(fixed32 x, fixed32 y);
-#endif
+static inline fixed32 fixmul32(fixed32 x, fixed32 y)
+{
+    fixed64 temp;
+    temp = x;
+    temp *= y;
 
+    temp >>= PRECISION;
+
+    return (fixed32)temp;
+}
+
+static inline fixed32 fixmul32b(fixed32 x, fixed32 y)
+{
+    fixed64 temp;
+
+    temp = x;
+    temp *= y;
+
+    temp >>= 31;        //16+31-16 = 31 bits
+
+    return (fixed32)temp;
+}
+
+#endif
 
 #ifdef CPU_ARM
 static inline
@@ -148,7 +166,6 @@ void CMUL(fixed32 *x, fixed32 *y,
                 : "cc", "memory");
 }
 #else
-// PJJ : reinstate macro
 static inline
 void CMUL(fixed32 *pre,
           fixed32 *pim,
