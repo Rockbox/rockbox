@@ -136,11 +136,11 @@ gccver="4.0.3" # default gcc version
 binutils="2.16.1" # The binutils version to use
 
 system=`uname -s`
+gccurl="http://www.rockbox.org/gcc"
 
 case $1 in
   [Ss])
     target="sh-elf"
-    gccurl="http://www.rockbox.org/twiki/pub/Main/CrossCompiler"
     gccpatch="gcc-4.0.3-rockbox-1.diff"
     ;;
   [Mm])
@@ -148,14 +148,12 @@ case $1 in
     gccver="3.4.6"
     case $system in
       CYGWIN* | Darwin)
-        gccurl="http://www.rockbox.org/twiki/pub/Main/CrossCompiler"
         gccpatch="gcc-3.4.6.patch"
         ;;
       Linux)
         machine=`uname -m`
         case $machine in
           x86_64)
-            gccurl="http://www.rockbox.org/twiki/pub/Main/CrossCompiler"
             gccpatch="gcc-3.4.6-amd64.patch"
             ;;
         esac
@@ -166,7 +164,6 @@ case $1 in
     ;;
   [Aa])
     target="arm-elf"
-    gccurl="http://www.rockbox.org/twiki/pub/Main/CrossCompiler"
     gccpatch="rockbox-multilibs-arm-elf-gcc-4.0.3.diff"
     ;;
   *)
