@@ -223,5 +223,47 @@ extern void gui_synclist_hide_selection_marker(struct gui_synclist *lists,
 extern bool gui_synclist_do_button(struct gui_synclist * lists,
                                        unsigned *action,
                                        enum list_wrap);
+                                       
+/** Simplelist implementation.
+    USe this if you dont need to reimplement the list code, 
+    and just need to show a list 
+ **/
+
+struct simplelist_info {
+    char *title; /* title to show on the list */
+    int  count; /* number of items in the list, each item is selection_size high */
+    char selection_size; /* list selection size, usually 1 */
+    bool hide_selection;
+    bool scroll_all;
+    int (*action_callback)(int action, struct gui_synclist *lists); /* can be NULL */
+        /* action_callback notes:
+            action == the action pressed by the user 
+                _after_ gui_synclist_do_button returns.
+            lists == the lists sturct so the callack can get selection and count etc. */
+    list_get_icon *get_icon; /* can be NULL */
+    list_get_name *get_name; /* NULL if you're using simplelist_addline() */
+    void *callback_data; /* data for callbacks */
+};
+
+#define SIMPLELIST_MAX_LINES 32
+#define SIMPLELIST_MAX_LINELENGTH 32
+
+/** The next three functions are used if the text is mostly static.
+    These should be called in the action callback for the list.
+ **/
+/* set the amount of lines shown in the list
+   Only needed if simplelist_info.get_name == NULL */
+void simplelist_set_line_count(int lines);
+/* get the current amount of lines shown */
+int simplelist_get_line_count(void);
+/* add/edit a line in the list.
+   if line_number > number of lines shown it adds the line, else it edits the line */
+#define SIMPLELIST_ADD_LINE (SIMPLELIST_MAX_LINES+1)
+void simplelist_addline(int line_number, const char *fmt, ...);
+
+/* show a list.
+   if list->action_callback != NULL it is called with the action ACTION_REDRAW
+    before the list is dislplayed for the first time */
+bool simplelist_show_list(struct simplelist_info *info);
 
 #endif /* _GUI_LIST_H_ */

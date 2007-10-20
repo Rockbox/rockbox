@@ -87,95 +87,6 @@
 #endif
 #include "hwcompat.h"
 
-#if defined(HAVE_DIRCACHE) || defined(HAVE_TAGCACHE) || CONFIG_TUNER
-#define MAX_DEBUG_MESSAGES 16
-#define DEBUG_MSG_LEN 32
-int debug_listmessage_lines;
-char debug_list_messages[MAX_DEBUG_MESSAGES][DEBUG_MSG_LEN];
-static void dbg_listmessage_setlines(int lines)
-{
-    if (lines < 0)
-        lines = 0;
-    else if (lines > MAX_DEBUG_MESSAGES)
-        lines = MAX_DEBUG_MESSAGES;
-    debug_listmessage_lines = lines;
-}
-#ifndef SIMULATOR
-static int dbg_listmessage_getlines(void)
-{
-    return debug_listmessage_lines;
-}
-#endif
-static void dbg_listmessage_addline(const char *fmt, ...)
-{
-    va_list ap;
-
-    if (debug_listmessage_lines >= MAX_DEBUG_MESSAGES)
-        return;
-
-    va_start(ap, fmt);
-    vsnprintf(debug_list_messages[debug_listmessage_lines++], DEBUG_MSG_LEN, fmt, ap);
-    va_end(ap);
-}
-static char* dbg_listmessage_getname(int item, void * data, char *buffer)
-{
-    (void)buffer; (void)data;
-    return debug_list_messages[item];
-}
-#endif
-
-struct action_callback_info;
-#define DBGLIST_SHOW_SELECTION 0x1
-
-struct action_callback_info
-{
-    char *title;
-    int count;
-    int selection_size;
-    int (*action_callback)(int btn, struct action_callback_info *info);
-    char* (*dbg_getname)(int item, void * data, char *buffer);
-    intptr_t cbdata; /* extra callback data (pointer, int, whatever) */
-    struct gui_synclist *lists; /* passed back to the callback */
-};
-
-static char* dbg_menu_getname(int item, void * data, char *buffer);
-static char* threads_getname(int selected_item, void * data, char *buffer);
-static bool dbg_list(struct action_callback_info *info)
-{
-    struct gui_synclist lists;
-    int action;
-
-    info->lists = &lists;
-    
-    gui_synclist_init(&lists, info->dbg_getname, NULL, false,
-                      info->selection_size);
-    gui_synclist_set_title(&lists, info->title, NOICON);
-    gui_synclist_set_icon_callback(&lists, NULL);
-    gui_synclist_set_nb_items(&lists, info->count*info->selection_size);
-    gui_synclist_hide_selection_marker(&lists, true);
-    
-    if (info->action_callback)
-        info->action_callback(ACTION_REDRAW, info);
-
-    gui_synclist_draw(&lists);
-
-    while(1)
-    {
-        gui_syncstatusbar_draw(&statusbars, true);
-        action = get_action(CONTEXT_STD, HZ/5); 
-        if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
-            continue;
-        if (info->action_callback)
-            action = info->action_callback(action, info);
-        if (action == ACTION_STD_CANCEL)
-            break;
-        else if (action == ACTION_REDRAW)
-            gui_synclist_draw(&lists);
-        else if(default_event_handler(action) == SYS_USB_CONNECTED)
-            return true;
-    }
-    return false;
-}
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -247,28 +158,28 @@ static char* threads_getname(int selected_item, void * data, char *buffer)
 
     return buffer;
 }
-static int dbg_threads_action_callback(int action, struct action_callback_info *info)
+static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
 {
+    (void)lists;
 #ifdef ROCKBOX_HAS_LOGF
     if (action == ACTION_STD_OK)
     {
-        int selpos = gui_synclist_get_sel_pos(info->lists);
+        int selpos = gui_synclist_get_sel_pos(lists);
 #if NUM_CORES > 1
         if (selpos >= NUM_CORES)
             remove_thread(&threads[selpos - NUM_CORES]);
 #else
         remove_thread(&threads[selpos]);
 #endif
+        return ACTION_REDRAW;
     }
-    gui_synclist_hide_selection_marker(info->lists, false);
 #endif /* ROCKBOX_HAS_LOGF */
-    gui_synclist_draw(info->lists);
     return action;
 }
 /* Test code!!! */
 static bool dbg_os(void)
 {
-    struct action_callback_info info;
+    struct simplelist_info info;
     info.title = IF_COP("Core and ") "Stack usage:";
 #if NUM_CORES == 1
     info.count = MAXTHREADS;
@@ -276,9 +187,17 @@ static bool dbg_os(void)
     info.count = MAXTHREADS+NUM_CORES;
 #endif
     info.selection_size = 1;
+#ifdef ROCKBOX_HAS_LOGF
+    info.hide_selection = false;
+#else
+    info.hide_selection = true;
+#endif
+    info.scroll_all = false;
     info.action_callback = dbg_threads_action_callback;
-    info.dbg_getname = threads_getname;
-    return dbg_list(&info);
+    info.get_icon = NULL;
+    info.get_name = threads_getname;
+    info.callback_data = NULL;
+    return simplelist_show_list(&info);
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -816,14 +735,17 @@ static char* dbg_partitions_getname(int selected_item, void * data, char *buffer
 
 bool dbg_partitions(void)
 {
-    struct action_callback_info info;
+    struct simplelist_info info;
     info.title = "Partition Info";
     info.count = 4;
     info.selection_size = 2;
+    info.hide_selection = true;
+    info.scroll_all = false;
     info.action_callback = NULL;
-    info.dbg_getname = dbg_partitions_getname;
-    dbg_list(&info);
-    return false;
+    info.get_icon = NULL;
+    info.get_name = dbg_partitions_getname;
+    info.callback_data = NULL;
+    return simplelist_show_list(&info);
 }
 #endif
 
@@ -1693,116 +1615,109 @@ static bool view_battery(void)
 #else
 #define CARDTYPE "microSD"
 #endif
-static int cardinfo_callback(int btn, struct action_callback_info *info)
+static int disk_callback(int btn, struct gui_synclist *lists)
 {
     tCardInfo *card;
+    int *cardnum = (int*)lists->gui_list[SCREEN_MAIN].data;
     unsigned char card_name[7];
     unsigned char pbuf[32];
+    char *title = lists->gui_list[SCREEN_MAIN].title;
     static const unsigned char i_vmin[] = { 0, 1, 5, 10, 25, 35, 60, 100 };
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
     static const unsigned char *kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };
-    static const unsigned char *nsec_units[] = { "ns", "µs", "ms" };
+    static const unsigned char *nsec_units[] = { "ns", "ï¿½s", "ms" };
     static const char *spec_vers[] = { "1.0-1.2", "1.4", "2.0-2.2",
         "3.1-3.31", "4.0" };
     if ((btn == ACTION_STD_OK) || (btn == SYS_FS_CHANGED) || (btn == ACTION_REDRAW))
     {
         if (btn == ACTION_STD_OK)
-            info->cbdata ^= 0x1; /* change cards */
+        {
+            *cardnum ^= 0x1; /* change cards */
+        }
 
-        dbg_listmessage_setlines(0);
+        simplelist_set_line_count(0);
 
-        card = card_get_info(info->cbdata);
+        card = card_get_info(*cardnum);
 
         if (card->initialized > 0)
         {
             card_name[6] = '\0';
             strncpy(card_name, ((unsigned char*)card->cid) + 3, 6);
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "%s Rev %d.%d", card_name,
                     (int) card_extract_bits(card->cid, 72, 4),
                     (int) card_extract_bits(card->cid, 76, 4));
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "Prod: %d/%d",
                     (int) card_extract_bits(card->cid, 112, 4),
                     (int) card_extract_bits(card->cid, 116, 4) + 1997);
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "Ser#: 0x%08lx",
                     card_extract_bits(card->cid, 80, 32));
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "M=%02x, O=%04x",
                     (int) card_extract_bits(card->cid, 0, 8),
                     (int) card_extract_bits(card->cid, 8, 16));
             int temp = card_extract_bits(card->csd, 2, 4);
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                      CARDTYPE " v%s", temp < 5 ?
                             spec_vers[temp] : "?.?");
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "Blocks: 0x%06lx", card->numblocks);
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "Blksz.: %d P:%c%c", card->blocksize,
                     card_extract_bits(card->csd, 48, 1) ? 'R' : '-',
                     card_extract_bits(card->csd, 106, 1) ? 'W' : '-');
             output_dyn_value(pbuf, sizeof pbuf, card->speed / 1000,
                                             kbit_units, false);
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "Speed: %s", pbuf);
             output_dyn_value(pbuf, sizeof pbuf, card->tsac,
                             nsec_units, false);
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "Tsac: %s", pbuf);
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "Nsac: %d clk", card->nsac);
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "R2W: *%d", card->r2w_factor);
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "IRmax: %d..%d mA",
                     i_vmin[card_extract_bits(card->csd, 66, 3)],
                     i_vmax[card_extract_bits(card->csd, 69, 3)]);
-            dbg_listmessage_addline(
+            simplelist_addline(SIMPLELIST_ADD_LINE, 
                     "IWmax: %d..%d mA",
                     i_vmin[card_extract_bits(card->csd, 72, 3)],
                     i_vmax[card_extract_bits(card->csd, 75, 3)]);
         }
         else if (card->initialized == 0)
         {
-            dbg_listmessage_addline("Not Found!");
+            simplelist_addline(SIMPLELIST_ADD_LINE, "Not Found!");
         }
 #ifndef HAVE_MMC
         else /* card->initialized < 0 */
         {
-            dbg_listmessage_addline("Init Error! (%d)", card->initialized);
+            simplelist_addline(SIMPLELIST_ADD_LINE, "Init Error! (%d)", card->initialized);
         }
 #endif
-        snprintf(info->title, 16, "[" CARDTYPE " %d]", (int)info->cbdata);
-        gui_synclist_set_nb_items(info->lists, dbg_listmessage_getlines());
-        gui_synclist_select_item(info->lists, 0);
+        snprintf(title, 16, "[" CARDTYPE " %d]", *cardnum);
+        gui_synclist_set_title(lists, title, Icon_NOICON);
+        gui_synclist_set_nb_items(lists, simplelist_get_line_count());
+        gui_synclist_select_item(lists, 0);
         btn = ACTION_REDRAW;
     }
     return btn;
 }
-static bool dbg_disk_info(void)
-{
-    char listtitle[16];
-    struct action_callback_info info;
-    info.title = listtitle;
-    info.count = 1;
-    info.selection_size = 1;
-    info.action_callback = cardinfo_callback;
-    info.dbg_getname = dbg_listmessage_getname;
-    info.cbdata = 0;
-    dbg_list(&info);
-    return false;
-}
 #else /* !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP) */
-static int disk_callback(int btn, struct action_callback_info *info)
+static int disk_callback(int btn, struct gui_synclist *lists)
 {
+    (void)lists;
     int i;
     char buf[128];
     unsigned short* identify_info = ata_get_identify();
     bool timing_info_present = false;
     (void)btn;
 
-    dbg_listmessage_setlines(0);
+    simplelist_set_line_count(0);
 
     for (i=0; i < 20; i++)
         ((unsigned short*)buf)[i]=htobe16(identify_info[i+27]);
@@ -1810,32 +1725,31 @@ static int disk_callback(int btn, struct action_callback_info *info)
     /* kill trailing space */
     for (i=39; i && buf[i]==' '; i--)
         buf[i] = 0;
-    dbg_listmessage_addline( 
-            "Model: %s", buf);
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Model: %s", buf);
     for (i=0; i < 4; i++)
         ((unsigned short*)buf)[i]=htobe16(identify_info[i+23]);
     buf[8]=0;
-    dbg_listmessage_addline(
+    simplelist_addline(SIMPLELIST_ADD_LINE,
              "Firmware: %s", buf);
     snprintf(buf, sizeof buf, "%ld MB",
              ((unsigned long)identify_info[61] << 16 |
               (unsigned long)identify_info[60]) / 2048 );
-    dbg_listmessage_addline(
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
              "Size: %s", buf);
     unsigned long free;
     fat_size( IF_MV2(0,) NULL, &free );
-    dbg_listmessage_addline(
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
              "Free: %ld MB", free / 1024);
-    dbg_listmessage_addline(
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
              "Spinup time: %d ms", ata_spinup_time * (1000/HZ));
     i = identify_info[83] & (1<<3);
-    dbg_listmessage_addline(
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
              "Power mgmt: %s", i ? "enabled" : "unsupported");
     i = identify_info[83] & (1<<9);
-    dbg_listmessage_addline(
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
              "Noise mgmt: %s", i ? "enabled" : "unsupported");
     i = identify_info[82] & (1<<6);
-    dbg_listmessage_addline(
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
              "Read-ahead: %s", i ? "enabled" : "unsupported");
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
@@ -1843,122 +1757,137 @@ static int disk_callback(int btn, struct action_callback_info *info)
         pio4[1] = 0;
         pio3[0] = (identify_info[64] & (1<<0)) ? '3' : 0;
         pio4[0] = (identify_info[64] & (1<<1)) ? '4' : 0;
-        dbg_listmessage_addline(
+        simplelist_addline(SIMPLELIST_ADD_LINE, 
                  "PIO modes: 0 1 2 %s %s", pio3, pio4);
     }
     else {
-        dbg_listmessage_addline(
+        simplelist_addline(SIMPLELIST_ADD_LINE, 
                  "No PIO mode info");
     }
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
-        dbg_listmessage_addline(
+        simplelist_addline(SIMPLELIST_ADD_LINE, 
                  "Cycle times %dns/%dns",
                  identify_info[67],
                  identify_info[68] );
     } else {
-        dbg_listmessage_addline(
+        simplelist_addline(SIMPLELIST_ADD_LINE, 
                  "No timing info");
     }
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
         i = identify_info[49] & (1<<11);
-        dbg_listmessage_addline(
+        simplelist_addline(SIMPLELIST_ADD_LINE, 
             "IORDY support: %s", i ? "yes" : "no");
         i = identify_info[49] & (1<<10);
-        dbg_listmessage_addline(
+        simplelist_addline(SIMPLELIST_ADD_LINE, 
                 "IORDY disable: %s", i ? "yes" : "no");
     } else {
-        dbg_listmessage_addline(
+        simplelist_addline(SIMPLELIST_ADD_LINE, 
                 "No timing info");
     }
-    dbg_listmessage_addline(
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
              "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
-    gui_synclist_set_nb_items(info->lists, dbg_listmessage_getlines());
     return btn;
 }
+#endif /* !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP) */
 static bool dbg_disk_info(void)
 {
-    struct action_callback_info info;
+    struct simplelist_info info;
+#if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
+    char title[16];
+    int card = 0;
+    info.callback_data = (void*)&card;
+    info.title = title;
+#else
+    info.callback_data = NULL;
     info.title = "Disk Info";
+#endif
     info.count = 1;
     info.selection_size = 1;
     info.action_callback = disk_callback;
-    info.dbg_getname = dbg_listmessage_getname;
-    dbg_list(&info);
-    return false;
+    info.hide_selection = true;
+    info.scroll_all = false;
+    info.get_icon = NULL;
+    info.get_name = NULL;
+    return simplelist_show_list(&info);
 }
-#endif /* !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP) */
 #endif /* !SIMULATOR */
 
 #ifdef HAVE_DIRCACHE
-static int dircache_callback(int btn, struct action_callback_info *info)
+static int dircache_callback(int btn, struct gui_synclist *lists)
 {
-    (void)btn; (void)info;
-    dbg_listmessage_setlines(0);
-    dbg_listmessage_addline("Cache initialized: %s",
+    (void)btn; (void)lists;
+    simplelist_set_line_count(0);
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Cache initialized: %s",
              dircache_is_enabled() ? "Yes" : "No");
-    dbg_listmessage_addline("Cache size: %d B", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Cache size: %d B", 
              dircache_get_cache_size());
-    dbg_listmessage_addline("Last size: %d B", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Last size: %d B", 
              global_status.dircache_size);
-    dbg_listmessage_addline("Limit: %d B", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Limit: %d B", 
              DIRCACHE_LIMIT);
-    dbg_listmessage_addline("Reserve: %d/%d B", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Reserve: %d/%d B", 
              dircache_get_reserve_used(), DIRCACHE_RESERVE);
-    dbg_listmessage_addline("Scanning took: %d s", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Scanning took: %d s", 
              dircache_get_build_ticks() / HZ);
-    dbg_listmessage_addline("Entry count: %d", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Entry count: %d", 
              dircache_get_entry_count());
     return btn;
 }
     
 static bool dbg_dircache_info(void)
 {
-    struct action_callback_info info;
+    struct simplelist_info info;
     info.title = "Dircache Info";
     info.count = 7;
     info.selection_size = 1;
     info.action_callback = dircache_callback;
-    info.dbg_getname = dbg_listmessage_getname;
-    dbg_list(&info);
-    return false;
+    info.hide_selection = true;
+    info.scroll_all = false;
+    info.get_icon = NULL;
+    info.get_name = NULL;
+    info.callback_data = NULL;
+    return simplelist_show_list(&info);
 }
 
 #endif /* HAVE_DIRCACHE */
 
 #ifdef HAVE_TAGCACHE
-static int database_callback(int btn, struct action_callback_info *info)
+static int database_callback(int btn, struct gui_synclist *lists)
 {
-    (void)btn; (void)info;
+    (void)btn; (void)lists;
     struct tagcache_stat *stat = tagcache_get_stat();
-    dbg_listmessage_setlines(0);
-    dbg_listmessage_addline("Initialized: %s",
+    simplelist_set_line_count(0);
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Initialized: %s",
              stat->initialized ? "Yes" : "No");
-    dbg_listmessage_addline("DB Ready: %s", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "DB Ready: %s", 
              stat->ready ? "Yes" : "No");
-    dbg_listmessage_addline("RAM Cache: %s", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "RAM Cache: %s", 
              stat->ramcache ? "Yes" : "No");
-    dbg_listmessage_addline("RAM: %d/%d B", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "RAM: %d/%d B", 
              stat->ramcache_used, stat->ramcache_allocated);
-    dbg_listmessage_addline("Progress: %d%% (%d entries)", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Progress: %d%% (%d entries)", 
              stat->progress, stat->processed_entries);
-    dbg_listmessage_addline("Commit step: %d", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Commit step: %d", 
              stat->commit_step);
-    dbg_listmessage_addline("Commit delayed: %s", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Commit delayed: %s", 
              stat->commit_delayed ? "Yes" : "No");
     return btn;
 }
 static bool dbg_tagcache_info(void)
 {
-    struct action_callback_info info;
+    struct simplelist_info info;
     info.title = "Database Info";
     info.count = 7;
     info.selection_size = 1;
     info.action_callback = database_callback;
-    info.dbg_getname = dbg_listmessage_getname;
-    dbg_list(&info);
-    return false;
+    info.hide_selection = true;
+    info.scroll_all = false;
+    info.get_icon = NULL;
+    info.get_name = NULL;
+    info.callback_data = NULL;
+    return simplelist_show_list(&info);
 }
 #endif
 
@@ -2049,61 +1978,67 @@ static bool dbg_save_roms(void)
 
 #ifndef SIMULATOR
 #if CONFIG_TUNER
-static int radio_callback(int btn, struct action_callback_info *info)
+static int radio_callback(int btn, struct gui_synclist *lists)
 {
-    dbg_listmessage_setlines(1);
+    (void)lists;
+    if (btn == ACTION_STD_CANCEL)
+        return btn;
+    simplelist_set_line_count(1);
 
 #if (CONFIG_TUNER & LV24020LP)
-    dbg_listmessage_addline("CTRL_STAT: %02X", lv24020lp_get(LV24020LP_CTRL_STAT) );
-    dbg_listmessage_addline("RADIO_STAT: %02X", lv24020lp_get(LV24020LP_REG_STAT) );
-    dbg_listmessage_addline("MSS_FM: %d kHz", lv24020lp_get(LV24020LP_MSS_FM) );
-    dbg_listmessage_addline("MSS_IF: %d Hz", lv24020lp_get(LV24020LP_MSS_IF) );
-    dbg_listmessage_addline("MSS_SD: %d Hz", lv24020lp_get(LV24020LP_MSS_SD) );
-    dbg_listmessage_addline("if_set: %d Hz", lv24020lp_get(LV24020LP_IF_SET) );
-    dbg_listmessage_addline("sd_set: %d Hz", lv24020lp_get(LV24020LP_SD_SET) );
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
+                        "CTRL_STAT: %02X", lv24020lp_get(LV24020LP_CTRL_STAT) );
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
+                        "RADIO_STAT: %02X", lv24020lp_get(LV24020LP_REG_STAT) );
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
+                        "MSS_FM: %d kHz", lv24020lp_get(LV24020LP_MSS_FM) );
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
+                        "MSS_IF: %d Hz", lv24020lp_get(LV24020LP_MSS_IF) );
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
+                        "MSS_SD: %d Hz", lv24020lp_get(LV24020LP_MSS_SD) );
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
+                        "if_set: %d Hz", lv24020lp_get(LV24020LP_IF_SET) );
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
+                        "sd_set: %d Hz", lv24020lp_get(LV24020LP_SD_SET) );
 #endif
 #if (CONFIG_TUNER & S1A0903X01)
-    dbg_listmessage_addline("Samsung regs: %08X", s1a0903x01_get(RADIO_ALL));
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
+                        "Samsung regs: %08X", s1a0903x01_get(RADIO_ALL));
     /* This one doesn't return dynamic data atm */
 #endif
 #if (CONFIG_TUNER & TEA5767)
     struct tea5767_dbg_info nfo;
     tea5767_dbg_info(&nfo);
-    dbg_listmessage_addline("Philips regs:");
-    dbg_listmessage_addline(
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Philips regs:");
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
              "   Read: %02X %02X %02X %02X %02X",
              (unsigned)nfo.read_regs[0], (unsigned)nfo.read_regs[1],
              (unsigned)nfo.read_regs[2], (unsigned)nfo.read_regs[3],
              (unsigned)nfo.read_regs[4]);
-    dbg_listmessage_addline(
+    simplelist_addline(SIMPLELIST_ADD_LINE, 
              "   Write: %02X %02X %02X %02X %02X",
              (unsigned)nfo.write_regs[0], (unsigned)nfo.write_regs[1],
              (unsigned)nfo.write_regs[2], (unsigned)nfo.write_regs[3],
              (unsigned)nfo.write_regs[4]);
 #endif
-
-    if (btn != ACTION_STD_CANCEL)
-        btn = ACTION_REDRAW;
-
-    gui_synclist_set_nb_items(info->lists, dbg_listmessage_getlines());
-    return btn;
+    return ACTION_REDRAW;
 }
 static bool dbg_fm_radio(void)
 {
-    struct action_callback_info info;
+    struct simplelist_info info;
+    simplelist_set_line_count(0);
+    simplelist_addline(SIMPLELIST_ADD_LINE, "HW detected: %s", radio_hardware_present() ? "yes" : "no");
 
     info.title = "FM Radio";
     info.count = 1;
     info.selection_size = 1;
-    info.cbdata = radio_hardware_present();
-    info.action_callback = info.cbdata ? radio_callback : NULL;
-    info.dbg_getname = dbg_listmessage_getname;
-
-    dbg_listmessage_setlines(0);
-    dbg_listmessage_addline("HW detected: %s", info.cbdata ? "yes" : "no");
-
-    dbg_list(&info);
-    return false;
+    info.action_callback = radio_hardware_present()?radio_callback : NULL;
+    info.hide_selection = true;
+    info.scroll_all = false;
+    info.get_icon = NULL;
+    info.get_name = NULL;
+    info.callback_data = NULL;
+    return simplelist_show_list(&info);
 }
 #endif /* CONFIG_TUNER */
 #endif /* !SIMULATOR */
@@ -2339,13 +2274,12 @@ static const struct the_menu_item menuitems[] = {
         {"cpu_boost log",cpu_boost_log},
 #endif
     };
-static int menu_action_callback(int btn, struct action_callback_info *info)
+static int menu_action_callback(int btn, struct gui_synclist *lists)
 {
-    gui_synclist_hide_selection_marker(info->lists, false);
     if (btn == ACTION_STD_OK)
     {
-        menuitems[gui_synclist_get_sel_pos(info->lists)].function();
-        gui_synclist_draw(info->lists);
+        menuitems[gui_synclist_get_sel_pos(lists)].function();
+        btn = ACTION_REDRAW;
     }
     return btn;
 }
@@ -2356,12 +2290,16 @@ static char* dbg_menu_getname(int item, void * data, char *buffer)
 }
 bool debug_menu(void)
 {
-    struct action_callback_info info;
+    struct simplelist_info info;
     info.title = "Debug Menu";
+    info.selection_size = 1;
     info.count = ARRAYLEN(menuitems);
     info.selection_size = 1;
     info.action_callback = menu_action_callback;
-    info.dbg_getname = dbg_menu_getname;
-    dbg_list(&info);
-    return false;
+    info.hide_selection = false;
+    info.scroll_all = false;
+    info.get_icon = NULL;
+    info.get_name = dbg_menu_getname;
+    info.callback_data = NULL;
+    return simplelist_show_list(&info);
 }

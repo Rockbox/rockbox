@@ -1028,3 +1028,106 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
     }
     return false;
 }
+
+/* Simple use list implementation */
+static int simplelist_line_count = 0;
+static char simplelist_text[SIMPLELIST_MAX_LINES][SIMPLELIST_MAX_LINELENGTH];
+/* set the amount of lines shown in the list */
+void simplelist_set_line_count(int lines)
+{
+    if (lines < 0)
+        lines = 0;
+    else if (lines > SIMPLELIST_MAX_LINES)
+        lines = SIMPLELIST_MAX_LINES;
+    simplelist_line_count = 0;
+}
+/* get the current amount of lines shown */
+int simplelist_get_line_count(void)
+{
+    return simplelist_line_count;
+}
+/* add/edit a line in the list.
+   if line_number > number of lines shown it adds the line, else it edits the line */
+void simplelist_addline(int line_number, const char *fmt, ...)
+{
+    va_list ap;
+
+    if (line_number > simplelist_line_count)
+    {
+        if (simplelist_line_count < SIMPLELIST_MAX_LINES)
+            line_number = simplelist_line_count++;
+        else 
+             return;
+    }
+    va_start(ap, fmt);
+    vsnprintf(simplelist_text[line_number], SIMPLELIST_MAX_LINELENGTH, fmt, ap);
+    va_end(ap);
+}
+
+static char* simplelist_static_getname(int item, void * data, char *buffer)
+{
+    (void)data; (void)buffer;
+    return simplelist_text[item];
+}
+bool simplelist_show_list(struct simplelist_info *info)
+{
+    struct gui_synclist lists;
+    int action, old_line_count = simplelist_line_count;
+    char* (*getname)(int item, void * data, char *buffer);
+    if (info->get_name)
+        getname = info->get_name;
+    else
+        getname = simplelist_static_getname;
+    gui_synclist_init(&lists, getname,  info->callback_data, 
+                      info->scroll_all, info->selection_size);
+    if (info->title)
+        gui_synclist_set_title(&lists, info->title, NOICON);
+    if (info->get_icon)
+        gui_synclist_set_icon_callback(&lists, info->get_icon);
+    
+    gui_synclist_hide_selection_marker(&lists, info->hide_selection);
+    
+    if (info->action_callback)
+        info->action_callback(ACTION_REDRAW, &lists);
+
+    if (info->get_name == NULL)
+        gui_synclist_set_nb_items(&lists, simplelist_line_count*info->selection_size);
+    else
+        gui_synclist_set_nb_items(&lists, info->count*info->selection_size);
+
+    gui_synclist_draw(&lists);
+
+    while(1)
+    {
+        gui_syncstatusbar_draw(&statusbars, true);
+        action = get_action(CONTEXT_STD, HZ/5); 
+        if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
+            continue;
+        if (info->action_callback)
+        {
+            action = info->action_callback(action, &lists);
+            if (info->get_name == NULL)
+                gui_synclist_set_nb_items(&lists, simplelist_line_count*info->selection_size);
+        }
+        if (action == ACTION_STD_CANCEL)
+            break;
+        else if ((action == ACTION_REDRAW) || (old_line_count == simplelist_line_count))
+        {
+            if (info->get_name == NULL)
+                gui_synclist_set_nb_items(&lists, simplelist_line_count*info->selection_size);
+            gui_synclist_draw(&lists);
+        }
+        else if(default_event_handler(action) == SYS_USB_CONNECTED)
+            return true;
+    }
+    return false;
+}
+
+
+
+
+
+
+
+
+
