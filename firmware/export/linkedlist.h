@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: adc.h 13174 2007-04-15 23:35:56Z amiconn $
+ * $Id$
  *
  * Copyright (C) by Linux Kernel Developers
  *
