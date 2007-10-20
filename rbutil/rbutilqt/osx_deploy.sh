@@ -5,7 +5,7 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id: gentalkclips.sh 11426 2006-11-03 21:47:52Z rasher $
+# $Id$
 #
 # Copyright (c) 2007 Barry Wardell
 #
