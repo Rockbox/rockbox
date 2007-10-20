@@ -344,32 +344,6 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
 }
 
 #if defined(SANSA_E200) || defined(SANSA_C200)
-#ifdef SANSA_E200
-struct OFDB_info {
-    char *version;
-    int version_length;
-    int sector;
-    int offset;
-} OFDatabaseOffsets[] = {
-    { "PP5022AF-05.51-S301-01.11-S301.01.11A-D", 39, 0x3c08, 0xe1 },
-    { "PP5022AF-05.51-S301-00.12-S301.00.12E-D", 39, 0x3c5c, 0x2  },
-    { "PP5022AF-05.51-S301-00.12-S301.00.12A-D", 39, 0x3c08, 0xe1 },
-    { "PP5022AF-05.51-S301-02.15-S301.02.15E-D", 39, 0x3c08, 0xe1 },
-    { "PP5022AF-05.51-S301-02.18-S301.02.18A-D", 39, 0x3c08, 0xe1 },
-    { "PP5022AF-05.51-S301-02.18-S301.02.18E-D", 39, 0x3c08, 0xe1 }
-};
-#else /* SANSA_C200 */
-/* TODO: need to determine these for the c200 */
-struct OFDB_info {
-    char *version;
-    int version_length;
-    int sector;
-    int offset;
-} OFDatabaseOffsets[] = {
-    { "PP5022AF-05.51-S301-01.11-S301.01.11A-D", 39, 0x3c08, 0xe1 },
-};
-#endif
-
 /* Load mi4 firmware from a hidden disk partition */
 int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
                   unsigned int buffer_size, bool disable_rebuild)
@@ -424,31 +398,19 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
     if(sum != mi4header.crc32)
         return EBAD_CHKSUM;
     
+#ifdef SANSA_E200    
     if (disable_rebuild)
     {
         char block[512];
-        int  sector = 0, offset = 0;
-        unsigned int i;
-        /* check which known version we have */
-        /* These are taken from the PPPS section, 0x00780240 */
-        ata_read_sectors(IF_MV2(0,) pinfo->start + 0x3C01, 1, block);
-        for (i=0; i<sizeof(OFDatabaseOffsets)/sizeof(*OFDatabaseOffsets); i++)
-        {
-            if (!memcmp(&block[0x40], OFDatabaseOffsets[i].version,
-                                      OFDatabaseOffsets[i].version_length))
-            {
-                sector = pinfo->start + OFDatabaseOffsets[i].sector;
-                offset  = OFDatabaseOffsets[i].offset;
-                break;
-            }
-        }
-        if (sector && offset)
-        {
-            ata_read_sectors(IF_MV2(0,) sector, 1, block);
-            block[offset] = 0;
-            ata_write_sectors(IF_MV2(0,) sector, 1, block);
-        }
+        
+        printf("Disabling database rebuild");
+        
+        ata_read_sectors(IF_MV2(0,) pinfo->start + 0x3c08, 1, block);
+        block[0xe1] = 0;
+        ata_write_sectors(IF_MV2(0,) pinfo->start + 0x3c08, 1, block);
     }
+#endif
+
     return EOK;
 }
 #endif

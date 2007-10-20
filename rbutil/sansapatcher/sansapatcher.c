@@ -34,7 +34,9 @@
     #include "bootimg_e200.h"
 #endif
 /* The offset of the MI4 image header in the firmware partition */
-#define PPMI_OFFSET 0x80000
+#define PPMI_OFFSET     0x80000
+#define NVPARAMS_OFFSET 0x780000
+#define NVPARAMS_SIZE   (0x80000-0x200)
 
 extern int verbose;
 
@@ -882,7 +884,26 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
         fprintf(stderr,"[ERR]  Short write in sansa_update_of\n");
         return -1;
     }
-
+    
+    /* Step 4 - zero out the nvparams section - we have to do this or we end up
+       with multiple copies of the nvparams data and don't know which one to
+       work with for the database rebuild disabling trick in our bootloader */
+    if (strcmp(sansa->targetname,"e200") == 0) {
+        printf("[INFO] Resetting Original Firmware settings\n");
+        if (sansa_seek(sansa, sansa->start+NVPARAMS_OFFSET+0x200) < 0) {
+            fprintf(stderr,"[ERR]  Seek to 0x%08llx in sansa_update_of failed.\n",
+                       sansa->start+NVPARAMS_OFFSET+0x200);
+            return -1;
+        }
+        
+        memset(sectorbuf,0,NVPARAMS_SIZE);
+        n=sansa_write(sansa, sectorbuf, NVPARAMS_SIZE);
+        if (n < NVPARAMS_SIZE) {
+            fprintf(stderr,"[ERR]  Short write in sansa_update_of\n");
+            return -1;
+        }
+    }
+    
     return 0;
 }
 
