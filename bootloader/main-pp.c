@@ -409,6 +409,8 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
         block[0xe1] = 0;
         ata_write_sectors(IF_MV2(0,) pinfo->start + 0x3c08, 1, block);
     }
+#else
+    (void) disable_rebuild;
 #endif
 
     return EOK;
