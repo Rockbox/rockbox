@@ -602,7 +602,7 @@ void* main(void)
                 {
                     printf("dumping sector %d", i);
                 }
-                ata_read_sectors(0, pinfo->start + i, 1, sector);
+                ata_read_sectors(IF_MV2(0,) pinfo->start + i, 1, sector);
                 write(fd,sector,512);
             }
             close(fd);
