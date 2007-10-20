@@ -352,8 +352,11 @@ struct OFDB_info {
     int offset;
 } OFDatabaseOffsets[] = {
     { "PP5022AF-05.51-S301-01.11-S301.01.11A-D", 39, 0x3c08, 0xe1 },
-    { "PP5022AF-05.51-S301-00.12-S301.00.12E-D", 39, 0x3c5c, 0x2 },
+    { "PP5022AF-05.51-S301-00.12-S301.00.12E-D", 39, 0x3c5c, 0x2  },
     { "PP5022AF-05.51-S301-00.12-S301.00.12A-D", 39, 0x3c08, 0xe1 },
+    { "PP5022AF-05.51-S301-02.15-S301.02.15E-D", 39, 0x3c08, 0xe1 },
+    { "PP5022AF-05.51-S301-02.18-S301.02.18A-D", 39, 0x3c08, 0xe1 },
+    { "PP5022AF-05.51-S301-02.18-S301.02.18E-D", 39, 0x3c08, 0xe1 }
 };
 #else /* SANSA_C200 */
 /* TODO: need to determine these for the c200 */
