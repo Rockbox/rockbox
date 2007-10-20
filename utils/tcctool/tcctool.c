@@ -42,14 +42,15 @@ struct device_t
     char* name;
     char* label;
     uint32_t loadaddr;
-    uint32_t magic;
+    uint32_t sdcfg;
 };
 
 static struct device_t devices[] = 
 { 
     {"logikdax", "Logik DAX 1GB DAB/MP3 player", 0x20000000, 0x52e97410 },
     {"iaudio6", "iAudio 6", 0x20000000, 0x62e97010 },
-    {"iaudio7", "iAudio 7", 0x20000000, 0x62e97010 }
+    {"iaudio7", "iAudio 7", 0x20000000, 0x62e97010 },
+    {"cowond2", "Cowon D2", 0x20000000, 0xa2e92010 }
 };
 
 #define NUM_DEVICES ((sizeof(devices) / sizeof(struct device_t)))
@@ -104,13 +105,13 @@ int upload_app(usb_dev_handle* dh, int device, char* p, int len)
     int err;
     int i;
 
-    /* Send the header - Destination address, length and magic value */
+    /* Send the header - Destination address, length and SDCFG value */
     memset(buf, 0, PACKET_SIZE);
 
     put_int32le(0xf0000000, buf);   /* Unknown - always the same */
     put_int32le(len / PACKET_SIZE, buf + 4);
     put_int32le(devices[device].loadaddr, buf + 8);
-    put_int32le(devices[device].magic, buf + 12);
+    put_int32le(devices[device].sdcfg, buf + 12);
 
     err = usb_bulk_write(dh, TCC_BULK_TO, buf, PACKET_SIZE, TOUT);
 
