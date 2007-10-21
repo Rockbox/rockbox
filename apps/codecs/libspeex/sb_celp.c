@@ -754,13 +754,14 @@ int sb_encode(void *state, void *vin, SpeexBits *bits)
 
 
 
+static SBDecState global_decstate IBSS_ATTR;
 
 void *sb_decoder_init(const SpeexMode *m)
 {
    spx_int32_t tmp;
-   SBDecState *st;
+   SBDecState *st = &global_decstate;
    const SpeexSBMode *mode;
-   st = (SBDecState*)speex_alloc(sizeof(SBDecState));
+   /* st = (SBDecState*)speex_alloc(sizeof(SBDecState)); */
    if (!st)
       return NULL;
    st->mode = m;
@@ -790,17 +791,17 @@ void *sb_decoder_init(const SpeexMode *m)
 
    st->first=1;
 
-   st->g0_mem = (spx_word32_t*)speex_alloc((QMF_ORDER)*sizeof(spx_word32_t));
-   st->g1_mem = (spx_word32_t*)speex_alloc((QMF_ORDER)*sizeof(spx_word32_t));
+   /* st->g0_mem = (spx_word32_t*)speex_alloc((QMF_ORDER)*sizeof(spx_word32_t)); */
+   /* st->g1_mem = (spx_word32_t*)speex_alloc((QMF_ORDER)*sizeof(spx_word32_t)); */
 
-   st->excBuf = (spx_word16_t*)speex_alloc((st->subframeSize)*sizeof(spx_word16_t));
+   /* st->excBuf = (spx_word16_t*)speex_alloc((st->subframeSize)*sizeof(spx_word16_t)); */
 
-   st->old_qlsp = (spx_lsp_t*)speex_alloc((st->lpcSize)*sizeof(spx_lsp_t));
-   st->interp_qlpc = (spx_coef_t*)speex_alloc(st->lpcSize*sizeof(spx_coef_t));
+   /* st->old_qlsp = (spx_lsp_t*)speex_alloc((st->lpcSize)*sizeof(spx_lsp_t)); */
+   /* st->interp_qlpc = (spx_coef_t*)speex_alloc(st->lpcSize*sizeof(spx_coef_t)); */
 
-   st->pi_gain = (spx_word32_t*)speex_alloc((st->nbSubframes)*sizeof(spx_word32_t));
-   st->exc_rms = (spx_word16_t*)speex_alloc((st->nbSubframes)*sizeof(spx_word16_t));
-   st->mem_sp = (spx_mem_t*)speex_alloc((2*st->lpcSize)*sizeof(spx_mem_t));
+   /* st->pi_gain = (spx_word32_t*)speex_alloc((st->nbSubframes)*sizeof(spx_word32_t)); */
+   /*st->exc_rms = (spx_word16_t*)speex_alloc((st->nbSubframes)*sizeof(spx_word16_t)); */
+   /* st->mem_sp = (spx_mem_t*)speex_alloc((2*st->lpcSize)*sizeof(spx_mem_t)); */
    
    st->innov_save = NULL;
 
@@ -822,7 +823,7 @@ void sb_decoder_destroy(void *state)
 #if !(defined(VAR_ARRAYS) || defined (USE_ALLOCA))
    /*speex_free_scratch(st->stack);*/
 #endif
-
+/*
    speex_free(st->g0_mem);
    speex_free(st->g1_mem);
    speex_free(st->excBuf);
@@ -833,6 +834,7 @@ void sb_decoder_destroy(void *state)
    speex_free(st->mem_sp);
 
    speex_free(state);
+*/
 }
 
 static void sb_decode_lost(SBDecState *st, spx_word16_t *out, int dtx, char *stack)

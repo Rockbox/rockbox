@@ -14,7 +14,15 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
-SPEEXOPTS = -O -DHAVE_CONFIG_H
+SPEEXOPTS = -DHAVE_CONFIG_H
+
+# We're faster on ARM-targets with -O1 instead of -O2
+ifeq ($(CPU),arm)
+   SPEEXOPTS += -O
+else
+   SPEEXOPTS += -O2
+endif
+
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(SPEEXOPTS) $(TARGET)	\
 $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} ${PROFILE_OPTS} -Wno-unused-parameter
 

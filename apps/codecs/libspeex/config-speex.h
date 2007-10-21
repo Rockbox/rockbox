@@ -6,7 +6,7 @@
 /* Make use of ARM4 assembly optimizations */
 /* #undef ARM4_ASM */
 
-/* Make use of ARM5E assembly optimizations */
+/* Make use of ARM4E assembly optimizations */
 #if defined(CPU_ARM)
 #define ARM4_ASM
 #endif

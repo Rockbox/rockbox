@@ -35,6 +35,8 @@
 #ifndef STACK_ALLOC_H
 #define STACK_ALLOC_H
 
+#include "config-speex.h"
+
 #ifdef USE_ALLOCA
 # ifdef WIN32
 #  include <malloc.h>

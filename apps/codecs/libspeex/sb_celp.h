@@ -109,15 +109,15 @@ typedef struct SBDecState {
    int    lpc_enh_enabled;
 
    char  *stack;
-   spx_word32_t *g0_mem, *g1_mem;
+   spx_word32_t g0_mem[64], g1_mem[64];
 
-   spx_word16_t *excBuf;
-   spx_lsp_t *old_qlsp;
-   spx_coef_t *interp_qlpc;
+   spx_word16_t excBuf[80];
+   spx_lsp_t old_qlsp[10];
+   spx_coef_t interp_qlpc[10];
 
-   spx_mem_t *mem_sp;
-   spx_word32_t *pi_gain;
-   spx_word16_t *exc_rms;
+   spx_mem_t mem_sp[20];
+   spx_word32_t pi_gain[5];
+   spx_word16_t exc_rms[5];
    spx_word16_t *innov_save;      /** If non-NULL, innovation is copied here */
    
    spx_word16_t last_ener;

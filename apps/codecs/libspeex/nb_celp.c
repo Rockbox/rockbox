@@ -1024,14 +1024,16 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
    return 1;
 }
 
+static DecState global_decstate IBSS_ATTR;
+
 void *nb_decoder_init(const SpeexMode *m)
 {
-   DecState *st;
+   DecState *st = &global_decstate;
    const SpeexNBMode *mode;
    int i;
 
    mode=(const SpeexNBMode*)m->mode;
-   st = (DecState *)speex_alloc(sizeof(DecState));
+   /* st = (DecState *)speex_alloc(sizeof(DecState)); */
    if (!st)
       return NULL;
 #if defined(VAR_ARRAYS) || defined (USE_ALLOCA)
@@ -1062,15 +1064,15 @@ void *nb_decoder_init(const SpeexMode *m)
 
    st->lpc_enh_enabled=1;
 
-   st->excBuf = (spx_word16_t*)speex_alloc((st->frameSize + 2*st->max_pitch + st->subframeSize + 12)*sizeof(spx_word16_t));
+   /* st->excBuf = (spx_word16_t*)speex_alloc((st->frameSize + 2*st->max_pitch + st->subframeSize + 12)*sizeof(spx_word16_t)); */
    st->exc = st->excBuf + 2*st->max_pitch + st->subframeSize + 6;
    for (i=0;i<st->frameSize + st->max_pitch + 1;i++)
       st->excBuf[i]=0;
 
-   st->interp_qlpc = (spx_coef_t*)speex_alloc(st->lpcSize*sizeof(spx_coef_t));
-   st->old_qlsp = (spx_lsp_t*)speex_alloc(st->lpcSize*sizeof(spx_lsp_t));
-   st->mem_sp = (spx_mem_t*)speex_alloc(st->lpcSize*sizeof(spx_mem_t));
-   st->pi_gain = (spx_word32_t*)speex_alloc((st->nbSubframes)*sizeof(spx_word32_t));
+   /* st->interp_qlpc = (spx_coef_t*)speex_alloc(st->lpcSize*sizeof(spx_coef_t)); */
+   /* st->old_qlsp = (spx_lsp_t*)speex_alloc(st->lpcSize*sizeof(spx_lsp_t)); */
+   /* st->mem_sp = (spx_mem_t*)speex_alloc(st->lpcSize*sizeof(spx_mem_t)); */
+   /* st->pi_gain = (spx_word32_t*)speex_alloc((st->nbSubframes)*sizeof(spx_word32_t)); */
    st->last_pitch = 40;
    st->count_lost=0;
    st->pitch_gain_buf[0] = st->pitch_gain_buf[1] = st->pitch_gain_buf[2] = 0;
@@ -1105,7 +1107,7 @@ void nb_decoder_destroy(void *state)
 #if !(defined(VAR_ARRAYS) || defined (USE_ALLOCA))
    speex_free_scratch(st->stack);
 #endif
-
+/*
    speex_free (st->excBuf);
    speex_free (st->interp_qlpc);
    speex_free (st->old_qlsp);
@@ -1113,6 +1115,7 @@ void nb_decoder_destroy(void *state)
    speex_free (st->pi_gain);
 
    speex_free(state);
+*/
 }
 
 #define median3(a, b, c)	((a) < (b) ? ((b) < (c) ? (b) : ((a) < (c) ? (c) : (a))) : ((c) < (b) ? (b) : ((c) < (a) ? (c) : (a))))
