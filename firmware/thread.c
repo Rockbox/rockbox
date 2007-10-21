@@ -2387,7 +2387,9 @@ void thread_thaw(struct thread_entry *thread)
         }
 
         UNLOCK_THREAD_SET_STATE(thread, STATE_RUNNING);
+#if NUM_CORES > 1
         set_irq_level(oldlevel);
+#endif
         return;
     }
 
