@@ -424,29 +424,33 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
 /* buffer to hold all the samples for the current tick, this is a hack
    neccesary for coldfire targets as pcm_play_data uses the dma which cannot
    access iram */
-int32_t samp_buf[256] IBSS_ATTR;
+int32_t samp_buf[512] IBSS_ATTR;
 
 /* synth num_samples samples and write them to the */
 /* buffer pointed to by buf_ptr                    */
 void synthSamples(int32_t *buf_ptr, unsigned int num_samples) ICODE_ATTR;
 void synthSamples(int32_t *buf_ptr, unsigned int num_samples)
 {
-    int i;
-    struct SynthObject *voicept;
-
-    rb->memset(samp_buf, 0, num_samples*4);
-
-    for(i=0; i < MAX_VOICES; i++)
+    if (num_samples > 512)
+        DEBUGF("num_samples is too big!\n");
+    else
     {
-        voicept=&voices[i];
-        if(voicept->isUsed==1)
+        int i;
+        struct SynthObject *voicept;
+
+        rb->memset(samp_buf, 0, num_samples*4);
+
+        for(i=0; i < MAX_VOICES; i++)
         {
-            synthVoice(voicept, samp_buf, num_samples);
+            voicept=&voices[i];
+            if(voicept->isUsed==1)
+            {
+                synthVoice(voicept, samp_buf, num_samples);
+            }
         }
+
+        rb->memcpy(buf_ptr, samp_buf, num_samples*4);
     }
-
-    rb->memcpy(buf_ptr, samp_buf, num_samples*4);
-
     /* TODO: Automatic Gain Control, anyone? */
     /* Or, should this be implemented on the DSP's output volume instead? */
 
