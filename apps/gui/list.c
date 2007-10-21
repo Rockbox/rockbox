@@ -1179,13 +1179,17 @@ bool simplelist_show_list(struct simplelist_info *info)
         gui_synclist_set_nb_items(&lists, simplelist_line_count*info->selection_size);
     else
         gui_synclist_set_nb_items(&lists, info->count*info->selection_size);
-
+    
+    gui_synclist_select_item(&lists, info->start_selection);
+    
+    if (info->get_talk)
+        info->get_talk(gui_synclist_get_sel_pos(&lists), info->callback_data);
     gui_synclist_draw(&lists);
 
     while(1)
     {
         gui_syncstatusbar_draw(&statusbars, true);
-        action = get_action(CONTEXT_STD, HZ/100); 
+        action = get_action(CONTEXT_STD, info->timeout); 
         if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
             continue;
         if (info->action_callback)
@@ -1218,6 +1222,8 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->selection_size = 1;
     info->hide_selection = false;
     info->scroll_all = false;
+    info->timeout = HZ/10;
+    info->start_selection = 0;
     info->action_callback = NULL;
     info->get_icon = NULL;
     info->get_name = NULL;

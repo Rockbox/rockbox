@@ -1880,6 +1880,7 @@ static bool dbg_tagcache_info(void)
     simplelist_info_init(&info, "Database Info", 8, NULL);
     info.action_callback = database_callback;
     info.hide_selection = true;
+    info.timeout = TIMEOUT_NOBLOCK;
     tagcache_screensync_enable(true);
     return simplelist_show_list(&info);
 }

@@ -267,6 +267,8 @@ struct simplelist_info {
     char selection_size; /* list selection size, usually 1 */
     bool hide_selection;
     bool scroll_all;
+    int  timeout;
+    int  start_selection; /* the item to select when the list is first displayed */
     int (*action_callback)(int action, struct gui_synclist *lists); /* can be NULL */
         /* action_callback notes:
             action == the action pressed by the user 
@@ -303,6 +305,8 @@ void simplelist_addline(int line_number, const char *fmt, ...);
     info.get_icon = NULL;
     info.get_name = NULL;
     info.get_voice = NULL;
+    info.timeout = HZ/10;
+    info.start_selection = 0;
 */
 void simplelist_info_init(struct simplelist_info *info, char* title,
                           int count, void* data);
