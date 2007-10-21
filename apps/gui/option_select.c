@@ -42,6 +42,8 @@
 #define ASCENDING_INT_SETTINGS
 #endif
 
+static int selection_to_val(struct settings_list *setting, int selection);
+
 static const char *unit_strings[] = 
 {   
     [UNIT_INT] = "",    [UNIT_MS]  = "ms",
@@ -131,10 +133,10 @@ static char *option_get_valuestring(struct settings_list *setting,
     return buffer;
 }
 
-static void option_talk(struct settings_list *setting, int temp_var)
+static int option_talk(int selected_item, void * data)
 {
-    if (!global_settings.talk_menu)
-        return;
+    struct settings_list *setting = (struct settings_list *)data;
+    int temp_var = selection_to_val(setting, selected_item);
     if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
     {
         bool val = temp_var==1?true:false;
@@ -177,6 +179,7 @@ static void option_talk(struct settings_list *setting, int temp_var)
             talk_id(P2ID(setting->choice_setting->desc[value]), false);
         }
     }
+    return 0;
 }
 #if 0
 int option_select_next_val(struct settings_list *setting,
@@ -335,6 +338,8 @@ bool option_screen(struct settings_list *setting,
     
     gui_synclist_set_title(&lists, title, Icon_Questionmark);
     gui_synclist_set_icon_callback(&lists, NULL);
+    if(global_settings.talk_menu)
+        gui_synclist_set_voice_callback(&lists, option_talk);
     
     /* set the number of items and current selection */
     if (var_type == F_T_INT || var_type == F_T_UINT)
@@ -390,13 +395,11 @@ bool option_screen(struct settings_list *setting,
     gui_synclist_limit_scroll(&lists, true);
     gui_synclist_draw(&lists);
     /* talk the item */
-    option_talk(setting, *variable);
+    gui_synclist_speak_item(&lists);
     while (!done)
     {
-        action = get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
-        if (action == ACTION_NONE)
-            continue;
-        if (gui_synclist_do_button(&lists, &action,
+        if (list_do_action(CONTEXT_LIST, TIMEOUT_BLOCK,
+                           &lists, &action,
             allow_wrap? LIST_WRAP_UNLESS_HELD: LIST_WRAP_OFF))
         {
             selected = gui_synclist_get_sel_pos(&lists);
@@ -406,9 +409,9 @@ bool option_screen(struct settings_list *setting,
                 if (!use_temp_var)
                     *(bool*)setting->setting = selected==1?true:false;
             }
-            /* talk */
-            option_talk(setting, *variable);
         }
+        else if (action == ACTION_NONE)
+            continue;
         else if (action == ACTION_STD_CANCEL)
         {
             bool show_cancel = false;
