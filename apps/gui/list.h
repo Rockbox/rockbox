@@ -243,7 +243,19 @@ extern void gui_synclist_hide_selection_marker(struct gui_synclist *lists,
 extern bool gui_synclist_do_button(struct gui_synclist * lists,
                                        unsigned *action,
                                        enum list_wrap);
-                                       
+
+/* If the list has a pending postponed scheduled announcement, that
+   may become due before the next get_action tmieout. This function
+   adjusts the get_action timeout appropriately. */
+extern int list_do_action_timeout(struct gui_synclist *lists, int timeout);
+/* This one combines a get_action call (with timeout overridden by
+   list_do_action_timeout) with the gui_synclist_do_button call, for
+   convenience. */
+extern bool list_do_action(int context, int timeout,
+                           struct gui_synclist *lists, int *action,
+                           enum list_wrap wrap);
+
+
 /** Simplelist implementation.
     USe this if you dont need to reimplement the list code, 
     and just need to show a list 
@@ -262,6 +274,7 @@ struct simplelist_info {
             lists == the lists sturct so the callack can get selection and count etc. */
     list_get_icon *get_icon; /* can be NULL */
     list_get_name *get_name; /* NULL if you're using simplelist_addline() */
+    list_speak_item *get_talk; /* can be NULL to not speak */
     void *callback_data; /* data for callbacks */
 };
 
@@ -281,20 +294,21 @@ int simplelist_get_line_count(void);
 #define SIMPLELIST_ADD_LINE (SIMPLELIST_MAX_LINES+1)
 void simplelist_addline(int line_number, const char *fmt, ...);
 
+/* setup the info struct. members not setup in this function need to be assigned manually
+   members set in this function:
+    info.hide_selection = false;
+    info.scroll_all = false;
+    info.action_callback = NULL;
+    info.get_icon = NULL;
+    info.get_name = NULL;
+    info.get_voice = NULL;
+*/
+void simplelist_info_init(struct simplelist_info *info, char* title,
+                          int selection_size, int count, void* data);
+                          
 /* show a list.
    if list->action_callback != NULL it is called with the action ACTION_REDRAW
     before the list is dislplayed for the first time */
 bool simplelist_show_list(struct simplelist_info *info);
-
-/* If the list has a pending postponed scheduled announcement, that
-   may become due before the next get_action tmieout. This function
-   adjusts the get_action timeout appropriately. */
-extern int list_do_action_timeout(struct gui_synclist *lists, int timeout);
-/* This one combines a get_action call (with timeout overridden by
-   list_do_action_timeout) with the gui_synclist_do_button call, for
-   convenience. */
-extern bool list_do_action(int context, int timeout,
-                           struct gui_synclist *lists, int *action,
-                           enum list_wrap wrap);
 
 #endif /* _GUI_LIST_H_ */

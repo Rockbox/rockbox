@@ -1167,6 +1167,8 @@ bool simplelist_show_list(struct simplelist_info *info)
         gui_synclist_set_title(&lists, info->title, NOICON);
     if (info->get_icon)
         gui_synclist_set_icon_callback(&lists, info->get_icon);
+    if (info->get_talk)
+        gui_synclist_set_voice_callback(&lists, info->get_talk);
     
     gui_synclist_hide_selection_marker(&lists, info->hide_selection);
     
@@ -1206,7 +1208,20 @@ bool simplelist_show_list(struct simplelist_info *info)
     return false;
 }
 
-
+void simplelist_info_init(struct simplelist_info *info, char* title,
+                          int selection_size, int count, void* data)
+{
+    info->title = title;
+    info->count = count;
+    info->selection_size = selection_size;
+    info->hide_selection = false;
+    info->scroll_all = false;
+    info->action_callback = NULL;
+    info->get_icon = NULL;
+    info->get_name = NULL;
+    info->get_talk = NULL;
+    info->callback_data = data;
+}
 
 
 

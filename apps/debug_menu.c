@@ -180,23 +180,18 @@ static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
 static bool dbg_os(void)
 {
     struct simplelist_info info;
-    info.title = IF_COP("Core and ") "Stack usage:";
+    simplelist_info_init(&info, IF_COP("Core and ") "Stack usage:", 1,
 #if NUM_CORES == 1
-    info.count = MAXTHREADS;
+                            MAXTHREADS,
 #else
-    info.count = MAXTHREADS+NUM_CORES;
+                            MAXTHREADS+NUM_CORES,
 #endif
-    info.selection_size = 1;
-#ifdef ROCKBOX_HAS_LOGF
-    info.hide_selection = false;
-#else
+                            NULL);
+#ifndef ROCKBOX_HAS_LOGF
     info.hide_selection = true;
 #endif
-    info.scroll_all = false;
     info.action_callback = dbg_threads_action_callback;
-    info.get_icon = NULL;
     info.get_name = threads_getname;
-    info.callback_data = NULL;
     return simplelist_show_list(&info);
 }
 
@@ -736,15 +731,9 @@ static char* dbg_partitions_getname(int selected_item, void * data, char *buffer
 bool dbg_partitions(void)
 {
     struct simplelist_info info;
-    info.title = "Partition Info";
-    info.count = 4;
-    info.selection_size = 2;
+    simplelist_info_init(&info, "Partition Info", 2, 4, NULL);
     info.hide_selection = true;
-    info.scroll_all = false;
-    info.action_callback = NULL;
-    info.get_icon = NULL;
     info.get_name = dbg_partitions_getname;
-    info.callback_data = NULL;
     return simplelist_show_list(&info);
 }
 #endif
@@ -1794,22 +1783,15 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 static bool dbg_disk_info(void)
 {
     struct simplelist_info info;
+    simplelist_info_init(&info, "Disk Info", 1,1, NULL);
 #if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
     char title[16];
     int card = 0;
     info.callback_data = (void*)&card;
     info.title = title;
-#else
-    info.callback_data = NULL;
-    info.title = "Disk Info";
 #endif
-    info.count = 1;
-    info.selection_size = 1;
     info.action_callback = disk_callback;
     info.hide_selection = true;
-    info.scroll_all = false;
-    info.get_icon = NULL;
-    info.get_name = NULL;
     return simplelist_show_list(&info);
 }
 #endif /* !SIMULATOR */
@@ -1839,15 +1821,9 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
 static bool dbg_dircache_info(void)
 {
     struct simplelist_info info;
-    info.title = "Dircache Info";
-    info.count = 7;
-    info.selection_size = 1;
+    simplelist_info_init(&info, "Dircache Info", 1, 7, NULL);
     info.action_callback = dircache_callback;
     info.hide_selection = true;
-    info.scroll_all = false;
-    info.get_icon = NULL;
-    info.get_name = NULL;
-    info.callback_data = NULL;
     return simplelist_show_list(&info);
 }
 
@@ -1878,15 +1854,9 @@ static int database_callback(int btn, struct gui_synclist *lists)
 static bool dbg_tagcache_info(void)
 {
     struct simplelist_info info;
-    info.title = "Database Info";
-    info.count = 7;
-    info.selection_size = 1;
+    simplelist_info_init(&info, "Database Info", 1, 7, NULL);
     info.action_callback = database_callback;
     info.hide_selection = true;
-    info.scroll_all = false;
-    info.get_icon = NULL;
-    info.get_name = NULL;
-    info.callback_data = NULL;
     return simplelist_show_list(&info);
 }
 #endif
@@ -2026,18 +1996,13 @@ static int radio_callback(int btn, struct gui_synclist *lists)
 static bool dbg_fm_radio(void)
 {
     struct simplelist_info info;
+    simplelist_info_init(&info, "FM Radio", 1, 1, NULL);
     simplelist_set_line_count(0);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "HW detected: %s", radio_hardware_present() ? "yes" : "no");
+    simplelist_addline(SIMPLELIST_ADD_LINE, "HW detected: %s", 
+                       radio_hardware_present() ? "yes" : "no");
 
-    info.title = "FM Radio";
-    info.count = 1;
-    info.selection_size = 1;
     info.action_callback = radio_hardware_present()?radio_callback : NULL;
     info.hide_selection = true;
-    info.scroll_all = false;
-    info.get_icon = NULL;
-    info.get_name = NULL;
-    info.callback_data = NULL;
     return simplelist_show_list(&info);
 }
 #endif /* CONFIG_TUNER */

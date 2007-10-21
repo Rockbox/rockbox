@@ -487,14 +487,10 @@ int filetype_list_viewers(const char* current_file)
         return PLUGIN_OK;
     }
 #endif
-    info.title = str(LANG_ONPLAY_OPEN_WITH);
-    info.count = count;
-    info.selection_size = 1; info.hide_selection = false;
-    info.scroll_all = false;
+    simplelist_info_init(&info, str(LANG_ONPLAY_OPEN_WITH), 1, count, &data);
     info.action_callback = openwith_action_callback;
     info.get_name = openwith_get_name;
     info.get_icon = openwith_get_icon;
-    info.callback_data = &data;
     return simplelist_show_list(&info);
 }
 
