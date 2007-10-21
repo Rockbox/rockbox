@@ -78,9 +78,9 @@ void vo_draw_frame_thumb (uint8_t * const * buf)
     for (c=0;c<image_height/4;c++)
     {
       *(tmpbuf[1]+c*image_width/4+r) = 
-        *(buf[1]+2*c*image_width/2+2*r);
+        *(buf[1]+c*image_width+2*r);
       *(tmpbuf[2]+c*image_width/4+r) = 
-        *(buf[2]+2*c*image_width/2+2*r);
+        *(buf[2]+c*image_width+2*r);
     }
 #else
   for (r=0;r<image_width/2;r++)
@@ -92,9 +92,9 @@ void vo_draw_frame_thumb (uint8_t * const * buf)
     for (c=0;c<image_height/4;c++)
     {
       *(tmpbuf[1]+(image_width/4-1-r)*image_height/4+c) = 
-        *(buf[1]+2*c*image_width/2+2*r);
+        *(buf[1]+c*image_width+2*r);
       *(tmpbuf[2]+(image_width/4-1-r)*image_height/4+c) = 
-        *(buf[2]+2*c*image_width/2+2*r);
+        *(buf[2]+c*image_width+2*r);
     }
 #endif
 
@@ -148,12 +148,12 @@ void vo_setup(const mpeg2_sequence_t * sequence)
     image_width=sequence->width;
     image_height=sequence->height;
 
-    tmpbufa = (uint8_t*)mpeg2_malloc(sizeof(uint8_t)*image_width/2*
-                                     image_height/2, -2);
-    tmpbufb = (uint8_t*)mpeg2_malloc(sizeof(uint8_t)*image_width/4*
+    tmpbufa = (uint8_t*)mpeg2_malloc(sizeof(uint8_t)*image_width*
                                      image_height/4, -2);
-    tmpbufc = (uint8_t*)mpeg2_malloc(sizeof(uint8_t)*image_width/4*
-                                     image_height/4, -2);
+    tmpbufb = (uint8_t*)mpeg2_malloc(sizeof(uint8_t)*image_width*
+                                     image_height/16, -2);
+    tmpbufc = (uint8_t*)mpeg2_malloc(sizeof(uint8_t)*image_width*
+                                     image_height/16, -2);
     tmpbuf[0] = tmpbufa;
     tmpbuf[1] = tmpbufb;
     tmpbuf[2] = tmpbufc;

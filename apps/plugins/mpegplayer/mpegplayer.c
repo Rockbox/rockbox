@@ -2402,7 +2402,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* seek start time */
     seek_pos = seek_PTS( in_file, start_time, 0 );
 
-    rb->lseek(in_file,seek_pos,SEEK_SET);
     video_thumb_print = 0;
     audio_sync_start = 0;
     audio_sync_time = 0;

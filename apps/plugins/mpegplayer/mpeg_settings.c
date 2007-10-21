@@ -101,6 +101,8 @@ static struct configdata config[] =
     {TYPE_INT, 0, 2, &settings.skipframes, "Skip frames", NULL, NULL},
     {TYPE_INT, 0, INT_MAX, &settings.resume_count, "Resume count",
      NULL, NULL},
+    {TYPE_INT, 0, 2, &settings.enable_start_menu, "Enable start menu",
+     NULL, NULL},
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
     {TYPE_INT, 0, INT_MAX, &settings.displayoptions, "Display options",
      NULL, NULL},
@@ -110,6 +112,11 @@ static struct configdata config[] =
 static const struct opt_items noyes[2] = {
     { "No", -1 },
     { "Yes", -1 },
+};
+
+static const struct opt_items enabledisable[2] = {
+    { "Disable", -1 },
+    { "Enable", -1 },
 };
 
 static void display_options(void)
@@ -329,6 +336,32 @@ enum mpeg_start_id  mpeg_start_menu(int play_time, int in_file)
     char resume_str[32];
     int time_hol  = (int)(settings.resume_time/2);
     int time_rem = ((settings.resume_time%2)==0) ? 0 : 5;
+
+    if (settings.enable_start_menu == 0)
+    {
+        rb->snprintf(resume_str, sizeof(resume_str),
+                     "Yes (min): %d.%d", time_hol, time_rem);
+
+        struct opt_items resume_no_yes[2] =
+        {
+            { "No", -1 },
+            { resume_str, -1 },
+        };
+        if (settings.resume_time == 0)
+            return MPEG_START_RESTART;
+
+        rb->set_option("Resume", &result, INT,
+                       resume_no_yes, 2, NULL);
+
+        if (result == 0)
+        {
+            settings.resume_time = 0;
+            return MPEG_START_RESTART;
+        }
+        else
+           return MPEG_START_RESUME;
+    }
+
     rb->snprintf(resume_str, sizeof(resume_str),
                  "Resume time (min): %d.%d", time_hol, time_rem);
 
@@ -414,6 +447,8 @@ enum mpeg_menu_id mpeg_menu(void)
     struct menu_item items[] = {
         [MPEG_MENU_DISPLAY_SETTINGS] =
             { "Display Options", NULL },
+        [MPEG_MENU_ENABLE_START_MENU] =
+            { "Start menu", NULL },
         [MPEG_MENU_CLEAR_RESUMES] =
             { clear_str, NULL },
         [MPEG_MENU_QUIT] =
@@ -433,6 +468,11 @@ enum mpeg_menu_id mpeg_menu(void)
         {
             case MPEG_MENU_DISPLAY_SETTINGS:
                 display_options();
+                break;
+            case MPEG_MENU_ENABLE_START_MENU:
+                rb->set_option("Start menu",
+                               &settings.enable_start_menu,
+                               INT, enabledisable, 2, NULL);
                 break;
             case MPEG_MENU_CLEAR_RESUMES:
                 clear_resume_count();
@@ -462,6 +502,7 @@ void init_settings(const char* filename)
     settings.showfps = 0;     /* Do not show FPS */
     settings.limitfps = 1;    /* Limit FPS */
     settings.skipframes = 1;  /* Skip frames */
+    settings.enable_start_menu = 1; /* Enable start menu */
     settings.resume_count = -1;
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
     settings.displayoptions = 0; /* No visual effects */
@@ -513,6 +554,8 @@ void save_settings(void)
                             settings.limitfps);
     configfile_update_entry(SETTINGS_FILENAME, "Skip frames", 
                             settings.skipframes);
+    configfile_update_entry(SETTINGS_FILENAME, "Enable start menu",
+                            settings.enable_start_menu);
 
     /* If this was a new resume entry then update the total resume count */
     if (configfile_update_entry(SETTINGS_FILENAME, settings.resume_filename,

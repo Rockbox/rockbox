@@ -22,6 +22,7 @@ enum mpeg_start_id
 enum mpeg_menu_id
 {
     MPEG_MENU_DISPLAY_SETTINGS,
+    MPEG_MENU_ENABLE_START_MENU,
     MPEG_MENU_CLEAR_RESUMES,
     MPEG_MENU_QUIT,
 };
@@ -30,6 +31,7 @@ struct mpeg_settings {
     int showfps;               /* flag to display fps */
     int limitfps;              /* flag to limit fps */
     int skipframes;            /* flag to skip frames */
+    int enable_start_menu;     /* flag to enable/disable start menu */
     int resume_count;          /* total # of resumes in config file */
     int resume_time;           /* resume time for current mpeg (in half minutes) */
     char resume_filename[128]; /* filename of current mpeg */
