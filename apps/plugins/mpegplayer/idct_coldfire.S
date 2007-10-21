@@ -83,11 +83,11 @@
     mac.w   %a3u, %d0l, %acc1   |       + W6 * f2
     msac.w  %a1u, %d1l, %acc1   |       - W2 * f6
 
-    | ^ move.l  %acc0, %acc3      %acc2 = W0 * f0 - W4 * f4
+    | ^ move.l  %acc1, %acc2      %acc2 = W0 * f0 - W4 * f4
     msac.w  %a3u, %d0l, %acc2   |       - W6 * f2
     mac.w   %a1u, %d1l, %acc2   |       + W2 * f6
 
-    | ^ move.l  %acc1, %acc2      %acc3 = W0 * f0 + W4 * f4
+    | ^ move.l  %acc0, %acc3      %acc3 = W0 * f0 + W4 * f4
     msac.w  %a1u, %d0l, %acc3   |       - W2 * f2
     msac.w  %a3u, %d1l, %acc3   |       - W6 * f6
 
@@ -329,7 +329,7 @@ mpeg2_idct_copy_coldfire:
     clr.l   (%a0)+
     
     movem.l %d2-%d3, (%a1)      | write all 8 output bytes at once
-    lea.l   (%a2,%a1), %a1      | advance output pointer
+    add.l   %a2, %a1            | advance output pointer
     subq.l  #1, %d4             | loop 8 times
     bne.w   .copy_clip_loop
 
@@ -460,7 +460,7 @@ mpeg2_idct_add_coldfire:
     clr.l   (%a0)+
 
     movem.l %d5-%d6, (%a1)      | write all 8 output bytes at once
-    lea.l   (%a2,%a1), %a1      | advance output pointer
+    add.l   %a2, %a1            | advance output pointer
     subq.l  #1, %d4             | loop 8 times
     bne.w   .add_clip_loop
 
@@ -563,7 +563,7 @@ mpeg2_idct_add_coldfire:
     move.b  %d0, %d6
 
     movem.l %d5-%d6, (%a1)      | write all 8 output bytes at once
-    lea.l   (%a2,%a1), %a1      | advance output pointer
+    add.l   %a2, %a1            | advance output pointer
     subq.l  #1, %d4             | loop 8 times
     bne.w   .dc_clip_loop
 
