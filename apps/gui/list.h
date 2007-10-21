@@ -296,6 +296,7 @@ void simplelist_addline(int line_number, const char *fmt, ...);
 
 /* setup the info struct. members not setup in this function need to be assigned manually
    members set in this function:
+    info.selection_size = 1;
     info.hide_selection = false;
     info.scroll_all = false;
     info.action_callback = NULL;
@@ -304,7 +305,7 @@ void simplelist_addline(int line_number, const char *fmt, ...);
     info.get_voice = NULL;
 */
 void simplelist_info_init(struct simplelist_info *info, char* title,
-                          int selection_size, int count, void* data);
+                          int count, void* data);
                           
 /* show a list.
    if list->action_callback != NULL it is called with the action ACTION_REDRAW

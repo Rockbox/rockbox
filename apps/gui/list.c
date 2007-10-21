@@ -1209,11 +1209,11 @@ bool simplelist_show_list(struct simplelist_info *info)
 }
 
 void simplelist_info_init(struct simplelist_info *info, char* title,
-                          int selection_size, int count, void* data)
+                          int count, void* data)
 {
     info->title = title;
     info->count = count;
-    info->selection_size = selection_size;
+    info->selection_size = 1;
     info->hide_selection = false;
     info->scroll_all = false;
     info->action_callback = NULL;

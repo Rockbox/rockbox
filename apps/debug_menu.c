@@ -180,7 +180,7 @@ static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
 static bool dbg_os(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, IF_COP("Core and ") "Stack usage:", 1,
+    simplelist_info_init(&info, IF_COP("Core and ") "Stack usage:",
 #if NUM_CORES == 1
                             MAXTHREADS,
 #else
@@ -731,7 +731,8 @@ static char* dbg_partitions_getname(int selected_item, void * data, char *buffer
 bool dbg_partitions(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "Partition Info", 2, 4, NULL);
+    simplelist_info_init(&info, "Partition Info", 4, NULL);
+    info.selection_size = 2;
     info.hide_selection = true;
     info.get_name = dbg_partitions_getname;
     return simplelist_show_list(&info);
@@ -1783,7 +1784,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 static bool dbg_disk_info(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "Disk Info", 1,1, NULL);
+    simplelist_info_init(&info, "Disk Info", 1, NULL);
 #if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
     char title[16];
     int card = 0;
@@ -1821,7 +1822,7 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
 static bool dbg_dircache_info(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "Dircache Info", 1, 7, NULL);
+    simplelist_info_init(&info, "Dircache Info", 7, NULL);
     info.action_callback = dircache_callback;
     info.hide_selection = true;
     return simplelist_show_list(&info);
@@ -1854,7 +1855,7 @@ static int database_callback(int btn, struct gui_synclist *lists)
 static bool dbg_tagcache_info(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "Database Info", 1, 7, NULL);
+    simplelist_info_init(&info, "Database Info", 7, NULL);
     info.action_callback = database_callback;
     info.hide_selection = true;
     return simplelist_show_list(&info);
@@ -1996,7 +1997,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
 static bool dbg_fm_radio(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "FM Radio", 1, 1, NULL);
+    simplelist_info_init(&info, "FM Radio", 1, NULL);
     simplelist_set_line_count(0);
     simplelist_addline(SIMPLELIST_ADD_LINE, "HW detected: %s", 
                        radio_hardware_present() ? "yes" : "no");
