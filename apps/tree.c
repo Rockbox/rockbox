@@ -111,9 +111,9 @@ static bool start_wps = false;
 static int curr_context = false;/* id3db or tree*/
 
 static int dirbrowse(void);
-static int ft_play_filenumber(int pos, int attr);
 static int ft_play_dirname(char* name);
 static void ft_play_filename(char *dir, char *file);
+static void say_filetype(int attr);
 
 /*
  * removes the extension of filename (if it doesn't start with a .)
@@ -216,6 +216,69 @@ static int tree_get_fileicon(int selected_item, void * data)
     }
 }
 
+static int tree_voice_cb(int selected_item, void * data)
+{
+    struct tree_context * local_tc=(struct tree_context *)data;
+    char *name;
+    int attr=0;
+#ifdef HAVE_TAGCACHE
+    bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
+
+    if (id3db)
+    {
+        attr = tagtree_get_attr(local_tc);
+        name = tagtree_get_entry(local_tc, selected_item)->name;
+    }
+    else
+#endif
+    {
+        struct entry* dc = local_tc->dircache;
+        struct entry* e = &dc[selected_item];
+        name = e->name;
+        attr = e->attr;
+    }
+    bool is_dir = (attr & ATTR_DIRECTORY);
+    bool did_clip = false;
+    /* First the .talk clip case */
+    if(is_dir)
+    {
+        if(global_settings.talk_dir_clip)
+        {
+            DEBUGF("Playing directory thumbnail: %s", local_tc->currdir);
+            did_clip = true;
+            if(ft_play_dirname(name) <0)
+                /* failed, not existing */
+                did_clip = false;
+        }
+    } else { /* it's a file */
+        if (global_settings.talk_file_clip && (attr & FILE_ATTR_THUMBNAIL))
+        {
+            did_clip = true;
+            DEBUGF("Playing file thumbnail: %s/%s%s\n",
+                   local_tc->currdir, name, file_thumbnail_ext);
+            ft_play_filename(local_tc->currdir, name);
+        }
+    }
+    if(!did_clip)
+    {
+        /* say the number or spell if required or as a fallback */
+        switch (is_dir ? global_settings.talk_dir : global_settings.talk_file)
+        {
+        case 1: /* as numbers */
+            talk_id(is_dir ? VOICE_DIR : VOICE_FILE, false);
+            talk_number(selected_item+1        - (is_dir ? 0 : local_tc->dirsindir),
+                        true);
+            if(!is_dir)
+                say_filetype(attr);
+            break;
+        case 2: /* spelled */
+            talk_spell(name, false);
+            break;
+        }
+    }
+    return 0;
+}
+
 bool check_rockboxdir(void)
 {
     DIR *dir = opendir(ROCKBOX_DIR);
@@ -255,6 +318,7 @@ void tree_gui_init(void)
     gui_buttonbar_set_display(&tree_buttonbar, &(screens[SCREEN_MAIN]) );
 #endif
     gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1);
+    gui_synclist_set_voice_callback(&tree_lists, tree_voice_cb);
     gui_synclist_set_icon_callback(&tree_lists, &tree_get_fileicon);
 #ifdef HAVE_LCD_COLOR
     gui_list_set_color_callback(&tree_lists.gui_list[SCREEN_MAIN],
@@ -269,8 +333,6 @@ struct tree_context* tree_get_context(void)
     return &tc;
 }
 
-/* talkbox hovering delay, to avoid immediate disk activity */
-#define HOVER_DELAY (HZ/2)
 /*
  * Returns the position of a given file in the current directory
  * returns -1 if not found
@@ -424,6 +486,7 @@ static int update_dir(void)
     }
 #endif
     gui_synclist_draw(&tree_lists);
+    gui_synclist_speak_item(&tree_lists);
     gui_syncstatusbar_draw(&statusbars, true);
     return tc.filesindir;
 }
@@ -551,14 +614,11 @@ static int dirbrowse()
 {
     int numentries=0;
     char buf[MAX_PATH];
-    int lasti = -1;
     unsigned button, oldbutton;
     bool reload_root = false;
     int lastfilter = *tc.dirfilter;
     bool lastsortcase = global_settings.sort_case;
-    bool need_update = true;
     bool exit_func = false;
-    long thumbnail_time = -1; /* for delaying a thumbnail */
 
     char* currdir = tc.currdir; /* just a shortcut */
 #ifdef HAVE_TAGCACHE
@@ -580,6 +640,7 @@ static int dirbrowse()
 
     start_wps = false;
     numentries = update_dir();
+    reload_dir = false;
     if (numentries == -1)
         return GO_TO_PREVIOUS;  /* currdir is not a directory */
 
@@ -604,9 +665,10 @@ static int dirbrowse()
             boot_changed = false;
         }
 #endif
-        button = get_action(CONTEXT_TREE,HZ/5);
+        button = get_action(CONTEXT_TREE,
+                            list_do_action_timeout(&tree_lists, HZ/2));
         oldbutton = button;
-        need_update = gui_synclist_do_button(&tree_lists, &button,LIST_WRAP_UNLESS_HELD);
+        gui_synclist_do_button(&tree_lists, &button,LIST_WRAP_UNLESS_HELD);
         tc.selected_item = gui_synclist_get_sel_pos(&tree_lists);
         switch ( button ) {
             case ACTION_STD_OK:
@@ -750,57 +812,6 @@ static int dirbrowse()
             }
 
             case ACTION_NONE:
-                if (thumbnail_time != -1 &&
-                    TIME_AFTER(current_tick, thumbnail_time))
-                {   /* a delayed hovering thumbnail is due now */
-                    int res;
-                    int attr;
-                    char* name;
-
-#ifdef HAVE_TAGCACHE
-                    if (id3db)
-                    {
-                        attr = tagtree_get_attr(&tc);
-                        name = tagtree_get_entry(&tc, lasti)->name;
-                    }
-                    else
-#endif
-                    {
-                        attr = dircache[lasti].attr;
-                        name = dircache[lasti].name;
-                    }
-
-                    if (attr & ATTR_DIRECTORY)
-                    {
-                        DEBUGF("Playing directory thumbnail: %s", currdir);
-                        res = ft_play_dirname(name);
-                        if (res < 0) /* failed, not existing */
-                        {   
-                            /* say the number or spell if required as a fallback */
-                            switch (global_settings.talk_dir) 
-                            {
-                            case 1: /* dirs as numbers */
-                                talk_id(VOICE_DIR, false);
-                                talk_number(lasti+1, true);
-                                break;
-
-                            case 2: /* dirs spelled */
-                                talk_spell(name, false);
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        DEBUGF("Playing file thumbnail: %s/%s%s\n",
-                               currdir, name,
-                               file_thumbnail_ext);
-                        /* no fallback necessary, we knew in advance
-                           that the file exists */
-                        ft_play_filename(currdir, name);
-                    }
-                    thumbnail_time = -1; /* job done */
-                }
                 gui_syncstatusbar_draw(&statusbars, false);
                 break;
 
@@ -872,86 +883,11 @@ static int dirbrowse()
         if (restore || reload_dir) {
             /* restore display */
             numentries = update_dir();
+            reload_dir = false;
             if (currdir[1] && (numentries < 0))
             {   /* not in root and reload failed */
                 reload_root = true; /* try root */
-                reload_dir = false;
                 goto check_rescan;
-            }
-            need_update = true;
-            reload_dir = false;
-        }
-
-        if(need_update) {
-            need_update=false;
-            if ( numentries > 0 ) {
-                /* Voice the file if changed */
-                if(lasti != tc.selected_item || restore) {
-                    int attr;
-                    char* name;
-
-                    lasti = tc.selected_item;
-                    thumbnail_time = -1; /* Cancel whatever we were
-                                            about to say */
-
-#ifdef HAVE_TAGCACHE
-                    if (id3db)
-                    {
-                        attr = tagtree_get_attr(&tc);
-                        name = tagtree_get_entry(&tc, tc.selected_item)->name;
-                    }
-                    else
-#endif
-                    {
-                        attr = dircache[tc.selected_item].attr;
-                        name = dircache[tc.selected_item].name;
-                    }
-
-                    /* Directory? */
-                    if (attr & ATTR_DIRECTORY)
-                    {
-                        /* schedule thumbnail playback if required */
-                        if (global_settings.talk_dir_clip)
-                            thumbnail_time = current_tick + HOVER_DELAY;
-                        else
-                        {
-                            /* talk directly */
-                            switch (global_settings.talk_dir) 
-                            {
-                            case 1: /* dirs as numbers */
-                                talk_id(VOICE_DIR, false);
-                                talk_number(tc.selected_item+1, true);
-                                break;
-
-                            case 2: /* dirs spelled */
-                                talk_spell(name, false);
-                                break;
-                            }
-                        }
-                    }
-                    else /* file */
-                    {
-                        /* schedule thumbnail playback if required */
-                        if (global_settings.talk_file_clip && (attr & FILE_ATTR_THUMBNAIL))
-                            thumbnail_time = current_tick + HOVER_DELAY;
-                        else
-                        {
-                            /* talk directly */
-                            switch (global_settings.talk_file) 
-                            {
-                            case 1: /* files as numbers */
-                                ft_play_filenumber(
-                                    tc.selected_item-tc.dirsindir+1,
-                                    attr & FILE_ATTR_MASK);
-                                break;
-
-                            case 2: /* files spelled */
-                                talk_spell(name, false);
-                                break;
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -1226,24 +1162,17 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
     start_wps=true;
 }
 
-static int ft_play_filenumber(int pos, int attr)
+static void say_filetype(int attr)
 {
     /* try to find a voice ID for the extension, if known */
     int j;
-    int ext_id = -1; /* default to none */
+    attr &= FILE_ATTR_MASK; /* file type */
     for (j=0; j<filetypes_count; j++)
-    {
         if (attr == filetypes[j].tree_attr)
         {
-            ext_id = filetypes[j].voiceclip;
-            break;
+            talk_id(filetypes[j].voiceclip, true);
+            return;
         }
-    }
-
-    talk_id(VOICE_FILE, false);
-    talk_number(pos, true);
-    talk_id(ext_id, true);
-    return 1;
 }
 
 static int ft_play_dirname(char* name)
