@@ -184,7 +184,7 @@ static const struct plugin_api rockbox_api = {
 #if defined(HAVE_LCD_COLOR)
     lcd_yuv_blit,
 #endif
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
     lcd_yuv_set_options,
 #endif
     /* list */

@@ -3,7 +3,7 @@
 
 enum mpeg_option_id
 {
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
     MPEG_OPTION_DITHERING,
 #endif
     MPEG_OPTION_DISPLAY_FPS,
@@ -33,7 +33,7 @@ struct mpeg_settings {
     int resume_count;          /* total # of resumes in config file */
     int resume_time;           /* resume time for current mpeg (in half minutes) */
     char resume_filename[128]; /* filename of current mpeg */
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
     int displayoptions;
 #endif
 };

@@ -101,7 +101,7 @@ static struct configdata config[] =
     {TYPE_INT, 0, 2, &settings.skipframes, "Skip frames", NULL, NULL},
     {TYPE_INT, 0, INT_MAX, &settings.resume_count, "Resume count",
      NULL, NULL},
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
     {TYPE_INT, 0, INT_MAX, &settings.displayoptions, "Display options",
      NULL, NULL},
 #endif
@@ -119,7 +119,7 @@ static void display_options(void)
     int options_quit = 0;
 
     static const struct menu_item items[] = {
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
         [MPEG_OPTION_DITHERING] =
             { "Dithering", NULL },
 #endif /* #ifdef TOSHIBA_GIGABEAT_F */
@@ -142,7 +142,7 @@ static void display_options(void)
 
         switch (result)
         {
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
             case MPEG_OPTION_DITHERING:
                 result = (settings.displayoptions & LCD_YUV_DITHER) ? 1 : 0;
                 rb->set_option("Dithering", &result, INT, noyes, 2, NULL);
@@ -463,7 +463,7 @@ void init_settings(const char* filename)
     settings.limitfps = 1;    /* Limit FPS */
     settings.skipframes = 1;  /* Skip frames */
     settings.resume_count = -1;
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
     settings.displayoptions = 0; /* No visual effects */
 #endif
 
@@ -479,7 +479,7 @@ void init_settings(const char* filename)
                         SETTINGS_VERSION);
     }
 
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
     if ((settings.displayoptions =
          configfile_get_value(SETTINGS_FILENAME, "Display options")) < 0)
     {
@@ -522,7 +522,7 @@ void save_settings(void)
                                 ++settings.resume_count);
     }
 
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
     configfile_update_entry(SETTINGS_FILENAME, "Display options", 
                             settings.displayoptions);
 #endif
