@@ -436,7 +436,7 @@ bool option_screen(struct settings_list *setting,
                 }
             }
             if (show_cancel)
-                gui_syncsplash(HZ/2, str(LANG_CANCEL));
+                gui_syncsplash(HZ/2, ID2P(LANG_CANCEL));
             done = true;
         }
         else if (action == ACTION_STD_OK)
