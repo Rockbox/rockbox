@@ -311,7 +311,7 @@
 
 /* define for all cpus from ARM family */
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-    || (CONFIG_CPU == TMS320DSC25) || (CONFIG_CPU == IMX31L)
+    || (CONFIG_CPU == TMS320DSC25) || (CONFIG_CPU == IMX31L) || (CONFIG_CPU == DM320)
 #define CPU_ARM
 #endif
 
