@@ -65,6 +65,7 @@
 static struct menu_item_ex *current_submenus_menu;
 static int current_subitems[MAX_MENU_SUBITEMS];
 static int current_subitems_count = 0;
+static int talk_menu_item(int selected_item, void *data);
 
 static void get_menu_callback(const struct menu_item_ex *m,
                         menu_callback_type *menu_callback) 
@@ -207,6 +208,8 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     (void)icon;
     gui_synclist_set_icon_callback(lists, NULL);
 #endif
+    if(global_settings.talk_menu)
+        gui_synclist_set_voice_callback(lists, talk_menu_item);
     gui_synclist_set_nb_items(lists,current_subitems_count);
     gui_synclist_limit_scroll(lists,true);
     gui_synclist_select_item(lists, find_menu_selection(selected));
@@ -215,19 +218,17 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     if (callback && menu_callback)
         menu_callback(ACTION_ENTER_MENUITEM,menu);
     gui_synclist_draw(lists);
+    gui_synclist_speak_item(lists);
 }
 
-static void talk_menu_item(const struct menu_item_ex *menu,
-                    struct gui_synclist *lists)
+static int talk_menu_item(int selected_item, void *data)
 {
+    const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
     int id = -1;
     int type;
     unsigned char *str;
-    int sel;
+    int sel = get_menu_selection(selected_item, menu);
     
-    if (global_settings.talk_menu)
-    {
-        sel = get_menu_selection(gui_synclist_get_sel_pos(lists),menu);
         if ((menu->flags&MENU_TYPE_MASK) == MT_MENU)
         {
             type = menu->submenus[sel]->flags&MENU_TYPE_MASK;
@@ -271,7 +272,7 @@ static void talk_menu_item(const struct menu_item_ex *menu,
                     talk_id(id,false);
             }
         }
-    }
+        return 0;
 }
 #define MAX_OPTIONS 32
 bool do_setting_from_menu(const struct menu_item_ex *temp)
@@ -307,7 +308,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     int stack_top = 0;
     bool in_stringlist, done = false;
     menu_callback_type menu_callback = NULL;
-    bool talk_item = false;
     if (start_menu == NULL)
         menu = &main_menu_;
     else menu = start_menu;
@@ -320,25 +320,18 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
     init_menu_lists(menu,&lists,selected,true);
     in_stringlist = ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID);
     
-    talk_menu_item(menu, &lists);
-    
     /* load the callback, and only reload it if menu changes */
     get_menu_callback(menu, &menu_callback);
-    gui_synclist_draw(&lists);
     
     while (!done)
     {
-        talk_item = false;
         redraw_lists = false;
         gui_syncstatusbar_draw(&statusbars, true);
-        action = get_action(CONTEXT_MAINMENU,HZ); 
+        action = get_action(CONTEXT_MAINMENU,
+                            list_do_action_timeout(&lists, HZ));
         /* HZ so the status bar redraws corectly */
-        if (action == ACTION_NONE)
-        {
-            continue;
-        }
         
-        if (menu_callback)
+        if (action != ACTION_NONE && menu_callback)
         {
             int old_action = action;
             action = menu_callback(action, menu);
@@ -356,10 +349,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         }
 
         if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
-        {
-            talk_menu_item(menu, &lists);
             continue;
-        }
+        if (action == ACTION_NONE)
+            continue;
         
 #ifdef HAVE_RECORDING
         if (action == ACTION_STD_REC)
@@ -411,7 +403,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                                  menu_stack_selected_item[stack_top], false);
                 /* new menu, so reload the callback */
                 get_menu_callback(menu, &menu_callback);
-                talk_item = true;
             }
             else if (menu != &root_menu_)
             {
@@ -453,13 +444,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                         init_menu_lists(temp, &lists, 0, true);
                         redraw_lists = false; /* above does the redraw */
                         menu = temp;
-                        talk_item = true;
                     }
                     break;
                 case MT_FUNCTION_CALL:
                 {
                     int return_value;
-                    talk_item = true;
                     if (temp->flags&MENU_FUNC_USEPARAM)
                         return_value = temp->function->function_w_param(
                                     temp->function->param);
@@ -483,7 +472,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                         init_menu_lists(menu, &lists, selected, true);
                         redraw_lists = false; /* above does the redraw */
                     }
-                    talk_item = true;
                     break;
                 }
                 case MT_RETURN_ID:
@@ -500,7 +488,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                         menu = temp;
                         init_menu_lists(menu,&lists,0,false);
                         redraw_lists = false; /* above does the redraw */
-                        talk_item = true;
                         in_stringlist = true;
                     }
                     break;
@@ -534,11 +521,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
             ret = MENU_ATTACHED_USB;
             done = true;
         }
-        if (talk_item && !done)
-            talk_menu_item(menu, &lists);
         
-        if (redraw_lists)
+        if (redraw_lists && !done)
+        {
             gui_synclist_draw(&lists);
+            gui_synclist_speak_item(&lists);
+        }
     }
     if (start_selected)
     {
