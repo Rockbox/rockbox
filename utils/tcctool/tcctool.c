@@ -41,16 +41,17 @@ struct device_t
 {
     char* name;
     char* label;
+    uint16_t productid;
     uint32_t loadaddr;
     uint32_t sdcfg;
 };
 
 static struct device_t devices[] = 
 { 
-    {"logikdax", "Logik DAX 1GB DAB/MP3 player", 0x20000000, 0x52e97410 },
-    {"iaudio6", "iAudio 6", 0x20000000, 0x62e97010 },
-    {"iaudio7", "iAudio 7", 0x20000000, 0x62e97010 },
-    {"cowond2", "Cowon D2", 0x20000000, 0xa2e92010 }
+    {"logikdax", "Logik DAX 1GB DAB/MP3 player", 0xb021, 0x20000000, 0x52e97410 },
+    {"iaudio6",  "iAudio 6",                     0xb021, 0x20000000, 0x62e97010 },
+    {"iaudio7",  "iAudio 7",                     0xb021, 0x20000000, 0x62e97010 },
+    {"cowond2",  "Cowon D2",                     0xb011, 0x20000000, 0xa2e92010 }
 };
 
 #define NUM_DEVICES ((sizeof(devices) / sizeof(struct device_t)))
@@ -81,7 +82,6 @@ void print_devices(void)
 
 /* USB IDs for USB Boot Mode */
 #define TCC_VENDORID    0x140e
-#define TCC_PRODUCTID   0xb021
 
 #define TCC_BULK_TO       1
 #define TOUT              5000
@@ -173,7 +173,7 @@ void do_patching(int device, char* buf, int len)
         for (tmp_dev = bus->devices; tmp_dev; tmp_dev = tmp_dev->next) {
             //printf("Found Vendor %04x Product %04x\n",tmp_dev->descriptor.idVendor, tmp_dev->descriptor.idProduct);
             if (tmp_dev->descriptor.idVendor == TCC_VENDORID &&
-                tmp_dev->descriptor.idProduct == TCC_PRODUCTID ) {
+                tmp_dev->descriptor.idProduct == devices[device].productid) {
 
                 dev = tmp_dev;
                 goto found;
