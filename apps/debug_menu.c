@@ -1833,9 +1833,12 @@ static bool dbg_dircache_info(void)
 #ifdef HAVE_TAGCACHE
 static int database_callback(int btn, struct gui_synclist *lists)
 {
-    (void)btn; (void)lists;
+    (void)lists;
     struct tagcache_stat *stat = tagcache_get_stat();
+    static bool synced = false;
+    
     simplelist_set_line_count(0);
+    
     simplelist_addline(SIMPLELIST_ADD_LINE, "Initialized: %s",
              stat->initialized ? "Yes" : "No");
     simplelist_addline(SIMPLELIST_ADD_LINE, "DB Ready: %s", 
@@ -1846,18 +1849,38 @@ static int database_callback(int btn, struct gui_synclist *lists)
              stat->ramcache_used, stat->ramcache_allocated);
     simplelist_addline(SIMPLELIST_ADD_LINE, "Progress: %d%% (%d entries)", 
              stat->progress, stat->processed_entries);
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Curfile: %s", 
+                       stat->curentry ? stat->curentry : "---");
     simplelist_addline(SIMPLELIST_ADD_LINE, "Commit step: %d", 
              stat->commit_step);
     simplelist_addline(SIMPLELIST_ADD_LINE, "Commit delayed: %s", 
              stat->commit_delayed ? "Yes" : "No");
+    
+    
+    if (synced)
+    {
+        synced = false;
+        tagcache_screensync_event();
+    }
+    
+    if (!btn && stat->curentry)
+    {
+        synced = true;
+        return ACTION_REDRAW;
+    }
+    
+    if (btn == ACTION_STD_CANCEL)
+        tagcache_screensync_enable(false);
+    
     return btn;
 }
 static bool dbg_tagcache_info(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "Database Info", 7, NULL);
+    simplelist_info_init(&info, "Database Info", 8, NULL);
     info.action_callback = database_callback;
     info.hide_selection = true;
+    tagcache_screensync_enable(true);
     return simplelist_show_list(&info);
 }
 #endif
@@ -2257,15 +2280,10 @@ static char* dbg_menu_getname(int item, void * data, char *buffer)
 bool debug_menu(void)
 {
     struct simplelist_info info;
-    info.title = "Debug Menu";
-    info.selection_size = 1;
-    info.count = ARRAYLEN(menuitems);
-    info.selection_size = 1;
+    
+    simplelist_info_init(&info, "Debug Menu", ARRAYLEN(menuitems), NULL);
     info.action_callback = menu_action_callback;
-    info.hide_selection = false;
-    info.scroll_all = false;
-    info.get_icon = NULL;
     info.get_name = dbg_menu_getname;
-    info.callback_data = NULL;
+
     return simplelist_show_list(&info);
 }

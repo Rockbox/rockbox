@@ -3673,7 +3673,8 @@ static bool load_tagcache(void)
 # endif
                 {
                     
-# if 0 /* Maybe we could enable this for flash players. Too slow otherwise. */
+                    /* Enabled for flash based targets. Too slow otherwise. */
+# ifdef HAVE_FLASH_STORAGE
                     /* Check if entry has been removed. */
                     if (global_settings.tagcache_autoupdate)
                     {
@@ -3834,11 +3835,20 @@ static bool check_dir(const char *dirname)
         if (entry->attribute & ATTR_DIRECTORY)
             check_dir(curpath);
         else
+        {
+            tc_stat.curentry = curpath;
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
             add_tagcache(curpath, dir->internal_entry);
 #else
             add_tagcache(curpath);
 #endif
+            
+            /* Wait until current path for debug screen is read and unset. */
+            while (tc_stat.syncscreen && tc_stat.curentry != NULL)
+                yield();
+            
+            tc_stat.curentry = NULL;
+        }
 
         curpath[len] = '\0';
     }
@@ -3846,6 +3856,16 @@ static bool check_dir(const char *dirname)
     closedir(dir);
 
     return success;
+}
+
+void tagcache_screensync_event(void)
+{
+    tc_stat.curentry = NULL;
+}
+
+void tagcache_screensync_enable(bool state)
+{
+    tc_stat.syncscreen = state;
 }
 
 void build_tagcache(const char *path)
@@ -4046,10 +4066,15 @@ static void tagcache_thread(void)
                 if (global_settings.tagcache_autoupdate)
                 {
                     build_tagcache("/");
-                    /* Don't do auto removal without dircache (very slow). */
-#ifdef HAVE_DIRCACHE
+                    /* Don't do auto removal without dircache or flash
+                     * storage (very slow). */
+#ifdef HAVE_FLASH_STORAGE
+                    check_deleted_files();
+#else
+# ifdef HAVE_DIRCACHE
                     if (dircache_is_enabled())
                         check_deleted_files();
+# endif
 #endif
                 }
             

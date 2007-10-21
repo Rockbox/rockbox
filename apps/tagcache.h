@@ -103,6 +103,10 @@ struct tagcache_stat {
     int  ramcache_used;      /* How much ram has been really used */
     int  progress;           /* Current progress of disk scan */
     int  processed_entries;  /* Scanned disk entries so far */
+    volatile const char 
+        *curentry;           /* Path of the current entry being scanned. */
+    volatile bool syncscreen;/* Synchronous operation with debug screen? */
+    // const char *uimessage;   /* Pending error message. Implement soon. */
 };
 
 struct tagcache_search_clause
@@ -183,6 +187,9 @@ struct tagcache_stat* tagcache_get_stat(void);
 int tagcache_get_commit_step(void);
 bool tagcache_prepare_shutdown(void);
 void tagcache_shutdown(void);
+
+void tagcache_screensync_event(void);
+void tagcache_screensync_enable(bool state);
 
 #ifdef HAVE_TC_RAMCACHE
 bool tagcache_is_ramcache(void);

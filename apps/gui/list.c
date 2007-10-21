@@ -1185,7 +1185,7 @@ bool simplelist_show_list(struct simplelist_info *info)
     while(1)
     {
         gui_syncstatusbar_draw(&statusbars, true);
-        action = get_action(CONTEXT_STD, HZ/5); 
+        action = get_action(CONTEXT_STD, HZ/100); 
         if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
             continue;
         if (info->action_callback)
@@ -1196,14 +1196,16 @@ bool simplelist_show_list(struct simplelist_info *info)
         }
         if (action == ACTION_STD_CANCEL)
             break;
-        else if ((action == ACTION_REDRAW) || (old_line_count == simplelist_line_count))
+        else if ((action == ACTION_REDRAW) || (old_line_count != simplelist_line_count))
         {
             if (info->get_name == NULL)
                 gui_synclist_set_nb_items(&lists, simplelist_line_count*info->selection_size);
             gui_synclist_draw(&lists);
+            old_line_count = simplelist_line_count;
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
+        
     }
     return false;
 }
