@@ -421,26 +421,48 @@ bool  filetype_supported(int attr)
 }
 
 /**** Open With Screen ****/
+struct cb_data {
+    int *items;
+    char *current_file;
+};
 enum themable_icons openwith_get_icon(int selected_item, void * data)
 {
-    int *items = (int*)data;
+    struct cb_data *info = (struct cb_data *)data;
+    int *items = info->items;
     return filetypes[items[selected_item]].icon;
 }
 char * openwith_get_name(int selected_item, void * data, char * buffer)
 {
     (void)buffer;
-    int *items = (int*)data;
+    struct cb_data *info = (struct cb_data *)data;
+    int *items = info->items;
     char *s = strrchr(filetypes[items[selected_item]].plugin, '/');
     if (s)
         return s+1;
     else return filetypes[items[selected_item]].plugin;
 }
-
+int openwith_action_callback(int action, struct gui_synclist *lists)
+{
+    struct cb_data *info = (struct cb_data *)lists->gui_list[SCREEN_MAIN].data;
+    int *items = info->items;
+    int i;
+    if (action == ACTION_STD_OK)
+    {
+        char plugin[MAX_PATH];
+        i = items[gui_synclist_get_sel_pos(lists)];
+        snprintf(plugin, MAX_PATH, "%s/%s.%s",
+                    PLUGIN_DIR, filetypes[i].plugin, ROCK_EXTENSION);
+        plugin_load(plugin, info->current_file);
+        return ACTION_STD_CANCEL;
+    }
+    return action;
+}
 int filetype_list_viewers(const char* current_file)
 {
-    int i, count = 0, action;
+    int i, count = 0;
     int items[MAX_FILETYPES];
-    struct gui_synclist lists;
+    struct simplelist_info info;
+    struct cb_data data = { items, (char*)current_file };
     for (i=0; i<filetype_count && count < MAX_FILETYPES; i++)
     {
         if (filetypes[i].plugin)
@@ -465,30 +487,15 @@ int filetype_list_viewers(const char* current_file)
         return PLUGIN_OK;
     }
 #endif
-    gui_synclist_init(&lists,openwith_get_name,(void*)items, false, 1);
-    gui_synclist_set_nb_items(&lists, count);
-    gui_synclist_set_icon_callback(&lists, openwith_get_icon);
-    gui_synclist_set_title(&lists, str(LANG_ONPLAY_OPEN_WITH), Icon_Plugin);
-    gui_synclist_select_item(&lists, 0);
-    gui_synclist_draw(&lists);
-    while (1)
-    {
-        gui_syncstatusbar_draw(&statusbars, true);
-        action = get_action(CONTEXT_MAINMENU,HZ);
-        if ((action == ACTION_NONE) ||
-            gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
-            continue;
-        else if (action == ACTION_STD_OK)
-        {
-            char plugin[MAX_PATH];
-            i = items[gui_synclist_get_sel_pos(&lists)];
-            snprintf(plugin, MAX_PATH, "%s/%s.%s",
-                     PLUGIN_DIR, filetypes[i].plugin, ROCK_EXTENSION);
-            return plugin_load(plugin, (char*)current_file);
-        }
-        else if (action == ACTION_STD_CANCEL)
-            return action;
-    }
+    info.title = str(LANG_ONPLAY_OPEN_WITH);
+    info.count = count;
+    info.selection_size = 1; info.hide_selection = false;
+    info.scroll_all = false;
+    info.action_callback = openwith_action_callback;
+    info.get_name = openwith_get_name;
+    info.get_icon = openwith_get_icon;
+    info.callback_data = &data;
+    return simplelist_show_list(&info);
 }
 
 int filetype_load_plugin(const char* plugin, char* file)
