@@ -170,13 +170,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "Mische..."
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -1965,44 +1965,44 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "Bevorzugtes ID3 Tag"
+    *: ""
   </dest>
   <voice>
-    *: "Bevorzugtes ID3 Tag"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1 vor V2"
+    *: ""
   </dest>
   <voice>
-    *: "Version 1 vor Version 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2 vor V1"
+    *: ""
   </dest>
   <voice>
-    *: "Version 2 vor Version 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2345,7 +2345,7 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    ipod*: "Building database... %d found (PREV to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
@@ -2824,15 +2824,15 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Zeilenauswahl"
+    lcd_bitmap: "Zeilenauswahltyp"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Zeilenauswahl"
+    lcd_bitmap: "Zeilenauswahltyp"
   </voice>
 </phrase>
 <phrase>
@@ -7362,13 +7362,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
-    *: "Zeige ID3-Info"
+    *: "Zeige Titel-Info"
   </dest>
   <voice>
-    *: "Zeige ID3 Info"
+    *: "Zeige Titel-Info"
   </voice>
 </phrase>
 <phrase>
@@ -11168,5 +11168,194 @@
   <voice>
     *: none
     rtc: "Uhr"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Erste Farbe"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Erste Farbe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Textfarbe"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Textfarbe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Balken (Farbverlauf)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Balken Farbverlauf"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Balken (einfarbig)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Balken einfarbig"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Zweite Farbe"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Zweite Farbe"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Leerzeichen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Zeilenauswahlfarben"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Zeilenauswahlfarben"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Leere Liste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user:
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Themeneinstellungen"
+  </dest>
+  <voice>
+    *: "Themeneinstellungen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Editieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user:
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Farben"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Farben"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Mitteleuropäisch (CP1250)"
+  </dest>
+  <voice>
+    *: "Mitteleuropäisch"
   </voice>
 </phrase>
