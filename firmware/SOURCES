@@ -625,12 +625,16 @@ target/arm/imx31/gigabeat-s/pcm-imx31.c
 
 #ifdef MROBE_500
 #ifndef SIMULATOR
+target/arm/lcd-as-memframe.S
 target/arm/tms320dm320/mrobe-500/adc-mr500.c
 target/arm/tms320dm320/mrobe-500/ata-mr500.c
 target/arm/tms320dm320/mrobe-500/backlight-mr500.c
 target/arm/tms320dm320/mrobe-500/button-mr500.c
 target/arm/tms320dm320/mrobe-500/dm320codec-mr500.c
 target/arm/tms320dm320/mrobe-500/lcd-mr500.c
+#if defined(HAVE_REMOTE_LCD)
+target/arm/tms320dm320/mrobe-500/lcd-remote-mr500.c
+#endif
 target/arm/tms320dm320/mrobe-500/pcm-mr500.c
 target/arm/tms320dm320/mrobe-500/powermgmt-mr500.c
 target/arm/tms320dm320/mrobe-500/power-mr500.c

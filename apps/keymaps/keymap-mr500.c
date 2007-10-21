@@ -35,7 +35,7 @@
  */
 
 
-#define BUTTON_UP       BUTTON_RC_PLAY 
+#define BUTTON_UP       BUTTON_RC_PLAY
 #define BUTTON_DOWN     BUTTON_RC_DOWN
 //#define BUTTON_LEFT     BUTTON_RC_REW
 //#define BUTTON_RIGHT    BUTTON_RC_FF

@@ -28,6 +28,12 @@
 #include "memory.h"
 #include "system-target.h"
 
+/* Copies a rectangle from one framebuffer to another. Can be used in
+   single transfer mode with width = num pixels, and height = 1 which
+   allows a full-width rectangle to be copied more efficiently. */
+extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
+                                 int width, int height);
+
 static volatile bool lcd_on = true;
 volatile bool lcd_poweroff = false;
 /*
@@ -76,6 +82,7 @@ void lcd_init_device(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     fb_data *dst, *src;
+    int yc;
 
     if (!lcd_on)
         return;
@@ -100,19 +107,13 @@ void lcd_update_rect(int x, int y, int width, int height)
     /* Copy part of the Rockbox framebuffer to the second framebuffer */
     if (width < LCD_WIDTH)
     {
-        int y;
         /* Not full width - do line-by-line */
-        for(y=0;y<height;y++)
-        {
-            memcpy(dst, src, width*sizeof(fb_data));
-            dst+=LCD_WIDTH;
-            src+=LCD_WIDTH;
-        }
+        lcd_copy_buffer_rect(dst, src, width, height);
     }
     else
     {
         /* Full width - copy as one line */
-        memcpy(dst, src, LCD_WIDTH*height*sizeof(fb_data));
+        lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
     }
 }
 
@@ -127,9 +128,25 @@ void lcd_update(void)
 {
     if (!lcd_on)
         return;
+#if defined(SCREEN_ROTATE)
+    lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
+                         LCD_WIDTH*LCD_HEIGHT, 1);
+#else
+    register fb_data *dst, *src=&lcd_framebuffer[0][0];
+    register unsigned int x, y;
+    
+    register short *start=FRAME + LCD_HEIGHT*(LCD_WIDTH-1)+1;
 
-    memcpy((fb_data *)FRAME, &lcd_framebuffer[0][0],
-                LCD_WIDTH*LCD_HEIGHT*sizeof(fb_data));
+    for(y=0; y<LCD_HEIGHT;y++)
+    {
+        dst=start+y;
+        for(x=0; x<LCD_WIDTH; x++)
+        {
+            *dst=*src++;
+            dst-=LCD_HEIGHT;
+        }
+    }
+#endif
 }
 
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */

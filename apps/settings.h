@@ -134,16 +134,6 @@ extern const struct opt_items trig_durations[TRIG_DURATION_COUNT];
 #define MAX_CONTRAST_SETTING        63
 #endif
 
-/* As it was */
-#ifdef HAVE_REMOTE_LCD
-#ifndef DEFAULT_REMOTE_CONTRAST_SETTING
-/* May be defined in config file if driver code needs the value */
-#define DEFAULT_REMOTE_CONTRAST_SETTING 42
-#endif
-#define MIN_REMOTE_CONTRAST_SETTING MIN_CONTRAST_SETTING
-#define MAX_REMOTE_CONTRAST_SETTING MAX_CONTRAST_SETTING
-#endif
-
 #endif /* !TARGET_TREE */
 
 #if !defined(HAVE_LCD_COLOR)

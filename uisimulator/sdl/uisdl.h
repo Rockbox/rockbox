@@ -229,6 +229,22 @@
 #define UI_LCD_WIDTH                240
 #define UI_LCD_HEIGHT               320
 
+#elif defined(MROBE_500)
+#define UI_TITLE                    "Olympus M:Robe 500"
+#define UI_WIDTH                    401 /* width of GUI window */
+#define UI_HEIGHT                   655 /* height of GUI window */
+/* high-colour */
+#define UI_LCD_POSX                 48 /* x position of lcd */
+#define UI_LCD_POSY                 60 /* y position of lcd */
+#define UI_LCD_WIDTH                LCD_WIDTH
+#define UI_LCD_HEIGHT               LCD_HEIGHT
+#define UI_REMOTE_BGCOLOR           90, 145, 90 /* bkgnd of remote lcd (no bklight) */
+#define UI_REMOTE_BGCOLORLIGHT      130, 180, 250 /* bkgnd of remote lcd (bklight) */
+#define UI_REMOTE_POSX              50  /* x position of remote lcd */
+#define UI_REMOTE_POSY              403 /* y position of remote lcd */
+#define UI_REMOTE_WIDTH             79
+#define UI_REMOTE_HEIGHT            16
+
 #elif defined(IRIVER_H10)
 #define UI_TITLE                    "iriver H10 20Gb"
 #define UI_WIDTH                    392 /* width of GUI window */

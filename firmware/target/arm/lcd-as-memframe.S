@@ -103,7 +103,6 @@ lcd_copy_buffer_rect:                   @
     .ltorg                              @ dump constant pool
     .size   lcd_copy_buffer_rect, .-lcd_copy_buffer_rect
 
-
 /****************************************************************************
  * void lcd_write_yuv_420_lines(fb_data *dst,
  *                              unsigned char const * const src[3],
@@ -188,7 +187,11 @@ lcd_write_yuv420_lines:
                                         @
     orr         r1, r1, r7, lsl #5      @ r4 |= (g << 5)
     orr         r1, r1, r11, lsl #11    @ r4 = b | (r << 11)
+#if LCD_WIDTH < 256
     strh        r1, [r0], #LCD_WIDTH    @ store pixel
+#else
+    strh        r1, [r0]                @
+#endif
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*74
     add         r12, r7, r7, asl #2     @
@@ -217,7 +220,12 @@ lcd_write_yuv420_lines:
                                         @
     orr         r1, r1, r11, lsl #11    @ r1 = b | (r << 11)
     orr         r1, r1, r7, lsl #5      @ r1 |= (g << 5)
+#if LCD_WIDTH < 256
     strh        r1, [r0, #-LCD_WIDTH-2] @ store pixel
+#else
+    strh        r1, [r0, #-2]           @
+    add         r0, r0, #LCD_WIDTH      @
+#endif
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*74
     add         r12, r7, r7, asl #2     @
@@ -246,7 +254,11 @@ lcd_write_yuv420_lines:
                                         @
     orr         r1, r1, r7, lsl #5      @ r1 = b | (g << 5)
     orr         r1, r1, r11, lsl #11    @ r1 |= (r << 11)
+#if LCD_WIDTH <  256
     strh        r1, [r0, #LCD_WIDTH]!   @ store pixel
+#else
+    strh        r1, [r0]                @
+#endif
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*74
     add         r12, r7, r7, asl #2     @
@@ -274,7 +286,11 @@ lcd_write_yuv420_lines:
     orr         r12, r1, r11, lsl #11   @ r12 = b | (r << 11)
     orr         r12, r12, r7, lsl #5    @ r12 |= (g << 5)
     strh        r12, [r0, #-2]          @ store pixel
+#if LCD_WIDTH < 256
     add         r0, r0, #2*LCD_WIDTH    @
+#else
+    add         r0, r0, #LCD_WIDTH      @
+#endif
                                         @
     subs        r2, r2, #2              @ subtract block from width
     bgt         10b @ loop line         @
@@ -405,7 +421,11 @@ lcd_write_yuv420_lines_odither:
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
     orr         r1, r11, r1, lsr #10    @              (b >> 10)
                                         @
+#if LCD_WIDTH < 256
     strh        r1, [r0], #LCD_WIDTH    @ store pixel
+#else
+    strh        r1, [r0]                @
+#endif
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*149
     add         r12, r7, r7, asl #2     @
@@ -451,7 +471,12 @@ lcd_write_yuv420_lines_odither:
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
     orr         r1, r11, r1, lsr #10    @              (b >> 10)
                                         @
+#if LCD_WIDTH < 256
     strh        r1, [r0, #-LCD_WIDTH-2] @ store pixel
+#else
+    strh        r1, [r0, #-2]           @ store pixel
+    add         r0, r0, #LCD_WIDTH      @
+#endif
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*149
     add         r12, r7, r7, asl #2     @
@@ -499,7 +524,11 @@ lcd_write_yuv420_lines_odither:
     orr         r11, r11, r7, lsr #4    @              ((g & 0x7e00) >> 4) |
     orr         r1, r11, r1, lsr #10    @              (b >> 10)
                                         @
+#if LCD_WIDTH < 256
     strh        r1, [r0, #LCD_WIDTH]!   @ store pixel
+#else
+    strh        r1, [r0]                @
+#endif
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*149
     add         r12, r7, r7, asl #2     @
@@ -544,7 +573,11 @@ lcd_write_yuv420_lines_odither:
     orr         r1, r11, r1, lsr #10    @              (b >> 10)
                                         @
     strh        r1, [r0, #-2]           @ store pixel
+#if LCD_WIDTH < 256
     add         r0, r0, #2*LCD_WIDTH    @
+#else
+    add         r0, r0, #LCD_WIDTH      @
+#endif
                                         @
     subs        r2, r2, #2              @ subtract block from width
     bgt         10b @ loop line         @

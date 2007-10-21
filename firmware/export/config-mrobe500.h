@@ -22,7 +22,9 @@
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
+#if CONFIG_CPU == DM320
 #define CPU_ARM
+#endif
 
 #define CONFIG_SDRAM_START 0x00900000
 
@@ -50,13 +52,33 @@
 #define HAVE_VOLUME_IN_LIST
 
 /* LCD dimensions */
+#define CONFIG_LCD LCD_MROBE500
+#define SCREEN_ROTATE
+#if defined(SCREEN_ROTATE)
 #define LCD_WIDTH  480
 #define LCD_HEIGHT 640
+#else
+#define LCD_WIDTH  640
+#define LCD_HEIGHT 480
+#endif
+
 #define LCD_DEPTH  16   /* 65k colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
 /* Define this if your LCD can be enabled/disabled */
 //#define HAVE_LCD_ENABLE
+
+/* remote LCD */
+//#define HAVE_REMOTE_LCD
+#define LCD_REMOTE_WIDTH  79
+#define LCD_REMOTE_HEIGHT 16
+#define LCD_REMOTE_DEPTH  1
+
+#define LCD_REMOTE_PIXELFORMAT VERTICAL_PACKING
+
+#define MIN_REMOTE_CONTRAST_SETTING     0
+#define MAX_REMOTE_CONTRAST_SETTING     15
+#define DEFAULT_REMOTE_CONTRAST_SETTING 7
 
 #define CONFIG_KEYPAD MROBE500_PAD
 
@@ -130,8 +152,6 @@
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
-
-#define CONFIG_LCD LCD_MROBE500
 
 /* define this if the backlight can be set to a brightness */
 #define __BACKLIGHT_INIT
