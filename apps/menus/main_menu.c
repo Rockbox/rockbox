@@ -120,217 +120,192 @@ static bool show_credits(void)
 #else
 #define SIZE_FMT "%s %s"
 #endif
-
-static bool show_info(void)
-{
-    char s[64], s1[32];
-    unsigned long size, free;
-    long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
-    int key;
-    int i;
-    bool done = false;
-    bool new_info = true;
+struct info_data {
+    bool new_data;
+    unsigned long size;
+    unsigned long free;
 #ifdef HAVE_MULTIVOLUME
-    char s2[32];
-    unsigned long size2, free2;
+    unsigned long size2;
+    unsigned long free2;
 #endif
-#ifdef HAVE_LCD_CHARCELLS
-    int page = 0;
-#endif
-
+};
+static char* info_getname(int selected_item, void * data, char *buffer)
+{
+    struct info_data *info = (struct info_data*)data;
     const unsigned char *kbyte_units[] = {
         ID2P(LANG_KILOBYTE),
         ID2P(LANG_MEGABYTE),
         ID2P(LANG_GIGABYTE)
     };
-#if defined(HAVE_LCD_BITMAP)
-    FOR_NB_SCREENS(i)
-        screens[i].setmargins(0, 0);
+    char s1[32];
+#ifdef HAVE_MULTIVOLUME
+    char s2[32];
 #endif
-    while (!done)
+    if (info->new_data)
     {
-        int y=0;
-
-        if (new_info)
-        {
-            fat_size( IF_MV2(0,) &size, &free );
+        fat_size( IF_MV2(0,) &info->size, &info->free );
 #ifdef HAVE_MULTIVOLUME
-            if (fat_ismounted(1))
-                fat_size( 1, &size2, &free2 );
-            else
-                size2 = 0;
+        if (fat_ismounted(1))
+            fat_size( 1, &info->size2, &info->free2 );
+        else
+            info->size2 = 0;
 #endif
-
-            if (global_settings.talk_menu)
-            {   
-                /* say whatever is reasonable, no real connection to the screen */
-                bool enqueue = false; /* enqueue all but the first */
-                if (battery_level() >= 0)
-                {
-                    talk_id(LANG_BATTERY_TIME, enqueue);
-                    enqueue = true;
-                    talk_value(battery_level(), UNIT_PERCENT, true);
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-                    if (charge_state == CHARGING)
-                        talk_id(LANG_BATTERY_CHARGE, true);
-#if CONFIG_CHARGING == CHARGING_CONTROL
-                    else if (charge_state == TOPOFF)
-                        talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
-#endif
-                    else if (charge_state == TRICKLE)
-                        talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
-#endif
-                }
-
-                talk_id(LANG_DISK_FREE_INFO, enqueue);
-#ifdef HAVE_MULTIVOLUME
-                talk_id(LANG_DISK_NAME_INTERNAL, true);
-                output_dyn_value(NULL, 0, free, kbyte_units, true);
-                if (size2)
-                {
-                    talk_id(LANG_DISK_NAME_MMC, true);
-                    output_dyn_value(NULL, 0, free2, kbyte_units, true);
-                }
-#else
-                output_dyn_value(NULL, 0, free, kbyte_units, true);
-#endif
-#if CONFIG_RTC
-                talk_date_time(get_time(), true);
-#endif
-            new_info = false;
-        }
-}
-        FOR_NB_SCREENS(i)
+        info->new_data = false;
+    }
+    switch (selected_item)
+    {
+        case 0:
+            snprintf(buffer, MAX_PATH, "%s: %s", 
+                     str(LANG_VERSION), appsversion);
+            break;
+        case 1:
+            return "";
+        case 2: /* buffer */
         {
-            screens[i].clear_display();
-#ifdef HAVE_LCD_BITMAP
-            screens[i].puts(0, y, str(LANG_ROCKBOX_INFO));
-#endif
-        }
-#ifdef HAVE_LCD_BITMAP
-        y++;
-#endif
-#ifdef HAVE_LCD_CHARCELLS
-        if (page == 0)
-#endif
-        {
-            snprintf(s, sizeof(s), "%s: %s", str(LANG_VERSION), appsversion);
-            FOR_NB_SCREENS(i)
-                screens[i].puts_scroll(0, y, (unsigned char *)s);
-#ifdef HAVE_LCD_BITMAP
-            y += 2;
-#endif
-        }
-
-#ifdef HAVE_LCD_CHARCELLS
-        if (page == 1)
-#endif
-        {
+            long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
             int integer = buflen / 1000;
             int decimal = buflen % 1000;
 
-            snprintf(s, sizeof(s), (char *)str(LANG_BUFFER_STAT),
+            snprintf(buffer, MAX_PATH, (char *)str(LANG_BUFFER_STAT),
                      integer, decimal);
-
-            FOR_NB_SCREENS(i)
-                screens[i].puts_scroll(0, y, (unsigned char *)s);
-            y++;
+        }
+        break;
+        case 3: /* battery */
 #if CONFIG_CHARGING == CHARGING_CONTROL
             if (charge_state == CHARGING)
-                snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_CHARGE));
+                snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_CHARGE));
             else if (charge_state == TOPOFF)
-                snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_TOPOFF_CHARGE));
+                snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_TOPOFF_CHARGE));
             else if (charge_state == TRICKLE)
-                snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_TRICKLE_CHARGE));
+                snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_TRICKLE_CHARGE));
             else
 #endif
             if (battery_level() >= 0)
-                snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_TIME), battery_level(),
+                snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_TIME), battery_level(),
                          battery_time() / 60, battery_time() % 60);
             else
-                strncpy(s, "(n/a)", sizeof(s));
-            FOR_NB_SCREENS(i)
-                screens[i].puts_scroll(0, y, (unsigned char *)s); 
-            y++;
-        }
-
-#ifdef HAVE_LCD_CHARCELLS
-        if (page == 2)
-#endif
-        {
+                strcpy(buffer, "(n/a)");
+            break;
+        case 4: /* disc usage 1 */
 #ifdef HAVE_MULTIVOLUME
-            output_dyn_value(s1, sizeof s1, free, kbyte_units, true);
-            output_dyn_value(s2, sizeof s2, size, kbyte_units, true);
-            snprintf(s, sizeof s, "%s %s/%s", str(LANG_DISK_NAME_INTERNAL),
+            output_dyn_value(s1, sizeof s1, info->free, kbyte_units, true);
+            output_dyn_value(s2, sizeof s2, info->size, kbyte_units, true);
+            snprintf(buffer, MAX_PATH, "%s %s/%s", str(LANG_DISK_NAME_INTERNAL),
                      s1, s2);
-            FOR_NB_SCREENS(i)
-                screens[i].puts_scroll(0, y, (unsigned char *)s);
-            y++;
-
-            if (size2) {
-                output_dyn_value(s1, sizeof s1, free2, kbyte_units, true);
-                output_dyn_value(s2, sizeof s2, size2, kbyte_units, true);
-                snprintf(s, sizeof s, "%s %s/%s", str(LANG_DISK_NAME_MMC),
-                         s1, s2);
-                FOR_NB_SCREENS(i)
-                    screens[i].puts_scroll(0, y, (unsigned char *)s);
-                y++;
-            }
 #else
-            output_dyn_value(s1, sizeof s1, size, kbyte_units, true);
-            snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
-            FOR_NB_SCREENS(i)
-                screens[i].puts_scroll(0, y, (unsigned char *)s);
-            y++;
-            output_dyn_value(s1, sizeof s1, free, kbyte_units, true);
-            snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
-            FOR_NB_SCREENS(i)
-                screens[i].puts_scroll(0, y, (unsigned char *)s);
-            y++;
+            output_dyn_value(s1, sizeof s1, info->size, kbyte_units, true);
+            snprintf(buffer, MAX_PATH, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
-        }
-
-        FOR_NB_SCREENS(i)
-                screens[i].update();
-
-        /* Wait for a key to be pushed */
-        key = get_action(CONTEXT_MAINMENU,HZ*5);
-        switch(key) {
-
-            case ACTION_STD_CANCEL:
-                done = true;
-                break;
-
-#ifdef HAVE_LCD_CHARCELLS
-            case ACTION_STD_NEXT:
-                page = (page+1)%3;
-                break;
-            case ACTION_STD_PREV:
-                page--;
-                if (page < 0)
-                    page = 2;
-                break;
-#endif
-
-#ifndef SIMULATOR
-            case ACTION_STD_OK:
-                gui_syncsplash(0, str(LANG_SCANNING_DISK));
-                fat_recalc_free(IF_MV(0));
+            break;
+        case 5: /* disc usage 2 */
 #ifdef HAVE_MULTIVOLUME
-                if (fat_ismounted(1))
-                    fat_recalc_free(1);
+            if (info->size2)
+            {
+                output_dyn_value(s1, sizeof s1, info->free2, kbyte_units, true);
+                output_dyn_value(s2, sizeof s2, info->size2, kbyte_units, true);
+                snprintf(buffer, MAX_PATH, "%s %s/%s", str(LANG_DISK_NAME_MMC),
+                         s1, s2);
+            }
+            else 
+                return "";
+#else
+            output_dyn_value(s1, sizeof s1, info->free, kbyte_units, true);
+            snprintf(buffer, MAX_PATH, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
 #endif
-                new_info = true;
-                break;
-#endif
-
-            default:
-                if (default_event_handler(key) == SYS_USB_CONNECTED)
-                    return true;
-                break;
-        }
+            break;
     }
-    return false;
+    return buffer;
+}
+static int info_speak_item(int selected_item, void * data)
+{
+    struct info_data *info = (struct info_data*)data;
+    const unsigned char *kbyte_units[] = {
+        ID2P(LANG_KILOBYTE),
+        ID2P(LANG_MEGABYTE),
+        ID2P(LANG_GIGABYTE)
+    };
+    switch (selected_item)
+    {
+        case 0:/* version, not voiced, so say the time instead */
+#if CONFIG_RTC
+            talk_date_time(get_time(), false);
+#endif
+            break;
+        case 1: /* nothing */
+            break;
+        case 2: /* buffer, not spoken */
+            break;
+        case 3: /* battery */
+            if (battery_level() >= 0)
+            {
+                talk_id(LANG_BATTERY_TIME, false);
+                talk_value(battery_level(), UNIT_PERCENT, true);
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+                if (charge_state == CHARGING)
+                    talk_id(LANG_BATTERY_CHARGE, true);
+#if CONFIG_CHARGING == CHARGING_CONTROL
+                else if (charge_state == TOPOFF)
+                    talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
+#endif
+                else if (charge_state == TRICKLE)
+                    talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
+#endif
+            }
+            break;
+        case 4: /* disk 1 */
+            talk_id(LANG_DISK_FREE_INFO, false);
+#ifdef HAVE_MULTIVOLUME
+            talk_id(LANG_DISK_NAME_INTERNAL, true);
+#endif
+            output_dyn_value(NULL, 0, info->free, kbyte_units, true);
+            break;
+        case 5: /* disk 2 */
+#ifdef HAVE_MULTIVOLUME
+            if (info->size2)
+            {
+                talk_id(LANG_DISK_NAME_MMC, false);
+                output_dyn_value(NULL, 0, info->free2, kbyte_units, true);
+            }
+#endif
+            break;
+    }
+    return 0;
+}
+
+static int info_action_callback(int action, struct gui_synclist *lists)
+{
+    (void)lists;
+    if ((action == ACTION_STD_OK)
+#ifdef HAVE_MULTIVOLUME
+        || action == SYS_HOTSWAP_INSERTED
+        || action == SYS_HOTSWAP_EXTRACTED
+#endif
+        )
+    {
+#ifndef SIMULATOR
+        struct info_data *info = (struct info_data *)lists->gui_list[SCREEN_MAIN].data;
+        info->new_data = true;
+        gui_syncsplash(0, ID2P(LANG_SCANNING_DISK));
+        fat_recalc_free(IF_MV(0));
+#ifdef HAVE_MULTIVOLUME
+        if (fat_ismounted(1))
+            fat_recalc_free(1);
+#endif
+#endif
+        return ACTION_REDRAW;
+    }
+    return action;
+}
+static bool show_info(void)
+{
+    struct info_data data = {.new_data = true};
+    struct simplelist_info info;
+    simplelist_info_init(&info, str(LANG_ROCKBOX_INFO), 6, (void*)&data);
+    info.hide_selection = !global_settings.talk_menu;
+    info.get_name = info_getname;
+    info.get_talk = info_speak_item;
+    info.action_callback = info_action_callback;
+    return simplelist_show_list(&info);
 }
 MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
                    (menu_function)show_info, NULL, NULL, Icon_NOICON);
