@@ -1076,7 +1076,13 @@ void mutex_unlock(struct mutex *m)
 #endif
 
     /* transfer to next queued thread if any */
-    m->thread = wakeup_thread_no_listlock(&m->queue);
+
+    /* This can become busy using SWP but is safe since only one thread
+       will be changing things at a time. Allowing timeout waits will
+       change that however but not now. There is also a hazard the thread
+       could be killed before performing the wakeup but that's just
+       irresponsible. :-) */
+    m->thread = m->queue;
 
     if(m->thread == NULL)
     {
@@ -1087,6 +1093,7 @@ void mutex_unlock(struct mutex *m)
     }
     else /* another thread is waiting - remain locked */
     {
+        wakeup_thread_no_listlock(&m->queue);
 #if CONFIG_CORELOCK == SW_CORELOCK
         corelock_unlock(&m->cl);
 #elif CONFIG_CORELOCK == CORELOCK_SWAP
