@@ -818,11 +818,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Käytä taajuuskorjainta"
+    swcodec: "Ota käyttöön"
   </dest>
   <voice>
     *: none
-    swcodec: "Käytä taajuuskorjainta"
+    swcodec: "Ota käyttöön"
   </voice>
 </phrase>
 <phrase>
@@ -835,11 +835,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Graafinen taajuuskorjain"
+    swcodec: "Graafinen"
   </dest>
   <voice>
     *: none
-    swcodec: "Graafinen taajuuskorjain"
+    swcodec: "Graafinen"
   </voice>
 </phrase>
 <phrase>
@@ -869,11 +869,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Taajuuskorjaimen perusasetukset"
+    swcodec: "Perusasetukset"
   </dest>
   <voice>
     *: none
-    swcodec: "Taajuuskorjaimen perusasetukset"
+    swcodec: "Perusasetukset"
   </voice>
 </phrase>
 <phrase>
@@ -886,11 +886,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Taajuuskorjaimen lisäasetukset"
+    swcodec: "Lisäasetukset"
   </dest>
   <voice>
     *: none
-    swcodec: "Taajuuskorjaimen lisäasetukset"
+    swcodec: "Lisäasetukset"
   </voice>
 </phrase>
 <phrase>
@@ -903,11 +903,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Tallenna taajuuskorjaimen esivalinta"
+    swcodec: "Tallenna asetukset"
   </dest>
   <voice>
     *: none
-    swcodec: "Tallenna taajuuskorjaimen esivalinta"
+    swcodec: "Tallenna asetukset"
   </voice>
 </phrase>
 <phrase>
@@ -920,11 +920,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Selaa taajuuskorjaimen esivalintoja"
+    swcodec: "Selaa asetuksia"
   </dest>
   <voice>
     *: none
-    swcodec: "Selaa taajuuskorjaimen esivalintoja"
+    swcodec: "Selaa asetuksia"
   </voice>
 </phrase>
 <phrase>
@@ -958,7 +958,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "hertsin taajuusvahvistus"
   </voice>
 </phrase>
 <phrase>
@@ -992,7 +992,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "Huippusuodatin"
   </voice>
 </phrase>
 <phrase>
@@ -3071,15 +3071,15 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Rivinvalitsija"
+    lcd_bitmap: "Rivinvalitsijan tyyppi"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Rivinvalitsija"
+    lcd_bitmap: "Rivinvalitsijan tyyppi"
   </voice>
 </phrase>
 <phrase>
@@ -3194,11 +3194,11 @@
   </source>
   <dest>
     *: none
-    remote_ticking: "Vähennä kaukosäätimen audiosignaalin häiriöitä"
+    remote_ticking: "Vähennä audiosignaalin häiriöitä"
   </dest>
   <voice>
     *: none
-    remote_ticking: "Vähennä kaukosäätimen audiosignaalin häiriöitä"
+    remote_ticking: "Vähennä audiosignaalin häiriöitä"
   </voice>
 </phrase>
 <phrase>
@@ -3209,10 +3209,10 @@
     *: "Scroll Speed"
   </source>
   <dest>
-    *: "Vieritysnopeus"
+    *: "Nopeus"
   </dest>
   <voice>
-    *: "Vieritysnopeus"
+    *: "Nopeus"
   </voice>
 </phrase>
 <phrase>
@@ -3237,10 +3237,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Vierityksen aloitusviive"
+    *: "Aloitusviive"
   </dest>
   <voice>
-    *: "Vierityksen aloitusviive"
+    *: "Aloitusviive"
   </voice>
 </phrase>
 <phrase>
@@ -3251,10 +3251,10 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Vierityksen askelkoko"
+    *: "Askelkoko"
   </dest>
   <voice>
-    *: "Vierityksen askelkoko"
+    *: "Askelkoko"
   </voice>
 </phrase>
 <phrase>
@@ -3880,13 +3880,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
-    *: "Näytä ID3-tiedot"
+    *: "Näytä kappaletiedot"
   </dest>
   <voice>
-    *: "Näytä ID3 tiedot"
+    *: "Näytä kappaletiedot"
   </voice>
 </phrase>
 <phrase>
@@ -4497,7 +4497,7 @@
     *: "Tauko"
   </dest>
   <voice>
-    *: ""
+    *: "Tauko"
   </voice>
 </phrase>
 <phrase>
@@ -4690,7 +4690,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Kerran"
   </voice>
 </phrase>
 <phrase>
@@ -4724,7 +4724,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Lopeta jälkeen"
   </voice>
 </phrase>
 <phrase>
@@ -4741,7 +4741,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Katkaisua edeltävä väli"
   </voice>
 </phrase>
 <phrase>
@@ -4758,7 +4758,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "miinus ääretön"
   </voice>
 </phrase>
 <phrase>
@@ -4792,7 +4792,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Herätys"
   </voice>
 </phrase>
 <phrase>
@@ -4809,7 +4809,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Herätys asetettu"
   </voice>
 </phrase>
 <phrase>
@@ -4826,7 +4826,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Herätysaika liian pian"
   </voice>
 </phrase>
 <phrase>
@@ -4845,8 +4845,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
-    ipod*: ""
+    alarm,ipod*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4863,7 +4862,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Herätys poistettu käytöstä"
   </voice>
 </phrase>
 <phrase>
@@ -7860,11 +7859,11 @@
   </source>
   <dest>
     *: none
-    remote: "Kaukosäätimen vieritys"
+    remote: "Kaukosäädin"
   </dest>
   <voice>
     *: none
-    remote: "Kaukosäätimen vieritys"
+    remote: "Kaukosäädin"
   </voice>
 </phrase>
 <phrase>
@@ -9410,11 +9409,11 @@
   </source>
   <dest>
     *: none
-    recording: "Käynnistintyyppi"
+    recording: "Tyyppi"
   </dest>
   <voice>
     *: none
-    recording: "Käynnistintyyppi"
+    recording: "Tyyppi"
   </voice>
 </phrase>
 <phrase>
@@ -9903,14 +9902,14 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    ipod*: "Building database... %d found (PREV to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Luodaan tietokantaa... %d löytyi (OFF = palaa)"
     h100,h120,h300: "Luodaan tietokantaa... %d löytyi (STOP = palaa)"
-    ipod*: "Luodaan tietokantaa... %d löytyi (PLAY/PAUSE = palaa)"
+    ipod*: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
     x5,m5: "Luodaan tietokantaa... %d löytyi (LEFT = palaa)"
     h10,h10_5gb,e200,c200: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
   </dest>
@@ -10637,7 +10636,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "vähintään"
   </voice>
 </phrase>
 <phrase>
@@ -11176,5 +11175,194 @@
   <voice>
     *: none
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Ensisijainen väri"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Ensisijainen väri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Tekstin väri"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Tekstin väri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Palkki (liukuväri)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Palkki, liukuväri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Palkki (yksivärinen)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Palkki, yksivärinen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Toissijainen väri"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Toissijainen väri"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Keski-Eurooppa (CP1250)"
+  </dest>
+  <voice>
+    *: "Keski Eurooppa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Rivinvalitsijan värit"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Rivinvalitsijan värit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user:
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Teema"
+  </dest>
+  <voice>
+    *: "Teema"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user:
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Värit"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Värit"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Tyhjä"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Muokkaa"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Tyhjä lista"
   </voice>
 </phrase>
