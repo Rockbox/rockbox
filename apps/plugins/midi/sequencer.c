@@ -299,10 +299,39 @@ static void sendEvent(struct Event * ev)
                     chPan[status_low]=d2;
                     return;
                 }
-                case CTRL_PWDEPTH:
+                case CTRL_DATAENT_MSB:
                 {
                     /* TODO: Update all deltas. Is this really needed? */
-                    chPBDepth[status_low] = d2;
+                    if(chLastCtrlMSB[status_low] == REG_PITCHBEND_MSB &&
+                       chLastCtrlLSB[status_low] == REG_PITCHBEND_LSB)
+                    {
+//                         printf("Pitch bend depth set to %d\n", d2);
+                        chPBDepth[status_low] = d2;
+                    }
+                    return;
+                }
+
+                case CTRL_NONREG_LSB:
+                {
+                    chLastCtrlLSB[status_low] = 0xFF;   /* Ignore nonregistered writes */
+                    return;
+                }
+
+                case CTRL_NONREG_MSB:
+                {
+                    chLastCtrlMSB[status_low] = 0xFF;   /* Ignore nonregistered writes */
+                    return;
+                }
+
+                case CTRL_REG_LSB:
+                {
+                    chLastCtrlLSB[status_low] = d2;
+                    return;
+                }
+
+                case CTRL_REG_MSB:
+                {
+                    chLastCtrlMSB[status_low] = d2;
                     return;
                 }
 

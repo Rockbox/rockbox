@@ -68,6 +68,8 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         chPBDepth[a]=2;          /* Default bend value is 2 */
         chPBNoteOffset[a]=0;     /* No offset */
         chPBFractBend[a]=65536; /* Center.. no bend */
+        chLastCtrlMSB[a]=0;     /* Set to pitch bend depth */
+        chLastCtrlLSB[a]=0;     /* Set to pitch bend depth */
     }
     for(a=0; a<128; a++)
     {

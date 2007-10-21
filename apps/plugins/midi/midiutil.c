@@ -28,7 +28,8 @@ int chPW[16] IBSS_ATTR;                   /* Channel pitch wheel, MSB only */
 int chPBDepth[16] IBSS_ATTR;              /* Channel pitch bend depth */
 int chPBNoteOffset[16] IBSS_ATTR;       /* Pre-computed whole semitone offset */
 int chPBFractBend[16] IBSS_ATTR;        /* Fractional bend applied to delta */
-
+unsigned char chLastCtrlMSB[16]; /* MIDI regs, used for Controller 6. */
+unsigned char chLastCtrlLSB[16]; /* The non-registered ones are ignored */
 
 struct GPatch * gusload(char *);
 struct GPatch * patchSet[128];

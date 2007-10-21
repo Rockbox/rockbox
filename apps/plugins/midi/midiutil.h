@@ -62,10 +62,19 @@
 #define MIDI_PITCHW 224
 
 /* MIDI Controllers */
-#define CTRL_PWDEPTH    6
+#define CTRL_DATAENT_MSB    6
 #define CTRL_VOLUME     7
 #define CTRL_BALANCE    8
 #define CTRL_PANNING    10
+#define CTRL_NONREG_LSB 98
+#define CTRL_NONREG_MSB 99
+#define CTRL_REG_LSB    100
+#define CTRL_REG_MSB    101
+
+#define REG_PITCHBEND_MSB 0
+#define REG_PITCHBEND_LSB 0
+
+
 #define CHANNEL     1
 
 /* Most of these are deprecated.. rampdown is used, maybe one other one too */
@@ -145,8 +154,8 @@ extern int chPW[16];        /* Channel pitch wheel, MSB only */
 extern int chPBDepth[16];   /* Channel pitch bend depth (Controller 6 */
 extern int chPBNoteOffset[16] IBSS_ATTR;       /* Pre-computed whole semitone offset */
 extern int chPBFractBend[16] IBSS_ATTR;        /* Fractional bend applied to delta */
-
-
+extern unsigned char chLastCtrlMSB[16]; /* MIDI regs, used for Controller 6. */
+extern unsigned char chLastCtrlLSB[16]; /* The non-registered ones are ignored */
 
 extern struct GPatch * gusload(char *);
 extern struct GPatch * patchSet[128];
