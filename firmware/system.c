@@ -75,7 +75,10 @@ char * cpu_boost_log_getlog_first(void)
 #if NUM_CORES > 1
     spinlock_unlock(&boostctrl_spin);
 #endif
+    
+    return first;
 }
+
 char * cpu_boost_log_getlog_next(void)
 {
     int message;
@@ -97,7 +100,10 @@ char * cpu_boost_log_getlog_next(void)
 #if NUM_CORES > 1
     spinlock_unlock(&boostctrl_spin);
 #endif
+    
+    return next;
 }
+
 void cpu_boost_(bool on_off, char* location, int line)
 {
 #if NUM_CORES > 1

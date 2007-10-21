@@ -118,13 +118,13 @@ struct screen screens[NB_SCREENS] =
         .backlight_on=&backlight_on,
         .backlight_off=&backlight_off,
         .is_backlight_on=&is_backlight_on,
-        .backlight_set_timeout=&backlight_set_timeout
+        .backlight_set_timeout=&backlight_set_timeout,
 #ifdef HAS_BUTTONBAR
-       ,.has_buttonbar=false
+        .has_buttonbar=false
 #endif
-    }
-#ifdef HAVE_REMOTE_LCD
-   ,{
+    },
+#if NB_SCREENS == 2
+    {
         .screen_type=SCREEN_REMOTE,
         .width=LCD_REMOTE_WIDTH,
         .height=LCD_REMOTE_HEIGHT,
