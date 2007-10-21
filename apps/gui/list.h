@@ -62,6 +62,14 @@ typedef enum themable_icons list_get_icon(int selected_item, void * data);
  * Returns a pointer to a string that contains the text to display
  */
 typedef char * list_get_name(int selected_item, void * data, char * buffer);
+/*
+ * Voice callback
+ *  - selected_item : an integer that tells the number of the item to speak
+ *  - data : a void pointer to the data you gave to the list when you
+ *           initialized it
+ * Returns an integer, 0 means success, ignored really...
+ */
+typedef int list_speak_item(int selected_item, void * data);
 #ifdef HAVE_LCD_COLOR
 /*
  * Color callback
@@ -97,9 +105,11 @@ struct gui_list
 #endif
     /* Cache the width of the title string in pixels/characters */
     int title_width;
+    long scheduled_talk_tick, last_talked_tick;
 
     list_get_icon *callback_get_item_icon;
     list_get_name *callback_get_item_name;
+    list_speak_item *callback_speak_item;
 
     struct screen * display;
     /* The data that will be passed to the callback function YOU implement */
@@ -139,6 +149,14 @@ struct gui_list
  */
 #define gui_list_set_icon_callback(gui_list, _callback) \
     (gui_list)->callback_get_item_icon=_callback
+
+/*
+ * Sets the voice callback function
+ *  - gui_list : the list structure
+ *  - _callback : the callback function
+ */
+#define gui_list_set_voice_callback(gui_list, _callback) \
+    (gui_list)->callback_speak_item=_callback
 
 #ifdef HAVE_LCD_COLOR
 /*
@@ -200,6 +218,8 @@ extern void gui_synclist_init(
     );
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
 extern void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback);
+extern void gui_synclist_set_voice_callback(struct gui_synclist * lists, list_speak_item voice_callback);
+extern void gui_synclist_speak_item(struct gui_synclist * lists);
 extern int gui_synclist_get_nb_items(struct gui_synclist * lists);
 
 extern int  gui_synclist_get_sel_pos(struct gui_synclist * lists);
@@ -265,5 +285,16 @@ void simplelist_addline(int line_number, const char *fmt, ...);
    if list->action_callback != NULL it is called with the action ACTION_REDRAW
     before the list is dislplayed for the first time */
 bool simplelist_show_list(struct simplelist_info *info);
+
+/* If the list has a pending postponed scheduled announcement, that
+   may become due before the next get_action tmieout. This function
+   adjusts the get_action timeout appropriately. */
+extern int list_do_action_timeout(struct gui_synclist *lists, int timeout);
+/* This one combines a get_action call (with timeout overridden by
+   list_do_action_timeout) with the gui_synclist_do_button call, for
+   convenience. */
+extern bool list_do_action(int context, int timeout,
+                           struct gui_synclist *lists, int *action,
+                           enum list_wrap wrap);
 
 #endif /* _GUI_LIST_H_ */

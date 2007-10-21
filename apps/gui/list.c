@@ -36,6 +36,7 @@
 #include "lang.h"
 #include "sound.h"
 #include "misc.h"
+#include "talk.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 #define SCROLL_LIMIT 1
@@ -78,6 +79,7 @@ static void gui_list_init(struct gui_list * gui_list,
 {
     gui_list->callback_get_item_icon = NULL;
     gui_list->callback_get_item_name = callback_get_item_name;
+    gui_list->callback_speak_item = NULL;
     gui_list->display = NULL;
     gui_list_set_nb_items(gui_list, 0);
     gui_list->selected_item = 0;
@@ -95,6 +97,7 @@ static void gui_list_init(struct gui_list * gui_list,
 
     gui_list->last_displayed_selected_item = -1 ;
     gui_list->last_displayed_start_item = -1 ;
+    gui_list->scheduled_talk_tick = gui_list->last_talked_tick = 0;
     gui_list->show_selection_marker = true;
 
 #ifdef HAVE_LCD_COLOR
@@ -786,6 +789,12 @@ void gui_synclist_set_icon_callback(struct gui_synclist * lists,
     }
 }
 
+void gui_synclist_set_voice_callback(struct gui_synclist * lists,
+                                    list_speak_item voice_callback)
+{
+    gui_list_set_voice_callback(&(lists->gui_list[0]), voice_callback);
+}
+
 void gui_synclist_draw(struct gui_synclist * lists)
 {
     int i;
@@ -862,6 +871,43 @@ static void gui_synclist_scroll_left(struct gui_synclist * lists)
         gui_list_scroll_left(&(lists->gui_list[i]));
 }
 #endif /* HAVE_LCD_BITMAP */
+
+static void _gui_synclist_speak_item(struct gui_synclist *lists, bool repeating)
+{
+    struct gui_list *l = &lists->gui_list[0];
+    list_speak_item *cb = l->callback_speak_item;
+    if(cb && gui_synclist_get_nb_items(lists) != 0)
+    {
+        int sel = gui_synclist_get_sel_pos(lists);
+        talk_shutup();
+        /* If we got a repeating key action, or we have just very
+           recently started talking, then we want to stay silent for a
+           while until things settle. Likewise if we already had a
+           pending scheduled announcement not yet due: we need to
+           reschedule it. */
+        if(repeating
+           || (l->scheduled_talk_tick
+               && TIME_BEFORE(current_tick, l->scheduled_talk_tick))
+           || (l->last_talked_tick
+               && TIME_BEFORE(current_tick, l->last_talked_tick +HZ/4)))
+        {
+            l->scheduled_talk_tick = current_tick +HZ/4;
+            return;
+        } else {
+            l->scheduled_talk_tick = 0; /* work done */
+            cb(sel, l->data);
+            l->last_talked_tick = current_tick;
+        }
+    }
+}
+void gui_synclist_speak_item(struct gui_synclist * lists)
+/* The list user should call this to speak the first item on entering
+   the list, and whenever the list is updated. */
+{
+    if(gui_synclist_get_nb_items(lists) == 0 && global_settings.talk_menu)
+        talk_id(VOICE_EMPTY_LIST, true);
+    else _gui_synclist_speak_item(lists, false);
+}
 
 extern intptr_t get_action_data(void);
 
@@ -941,9 +987,10 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 #ifndef HAVE_SCROLLWHEEL
             if (queue_count(&button_queue) < FRAMEDROP_TRIGGER)
 #endif
-            {
                 gui_synclist_draw(lists);
-            }
+            _gui_synclist_speak_item(lists,
+                                     action == ACTION_STD_PREVREPEAT
+                                     || next_item_modifier >1);
             yield();
             *actionptr = ACTION_STD_PREV;
             return true;
@@ -955,9 +1002,10 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 #ifndef HAVE_SCROLLWHEEL
             if (queue_count(&button_queue) < FRAMEDROP_TRIGGER)
 #endif
-            {
                 gui_synclist_draw(lists);
-            }
+            _gui_synclist_speak_item(lists,
+                                     action == ACTION_STD_NEXTREPEAT
+                                     || next_item_modifier >1);
             yield();
             *actionptr = ACTION_STD_NEXT;
             return true;
@@ -1006,6 +1054,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
                                           SCREEN_MAIN;
             gui_synclist_select_previous_page(lists, screen);
             gui_synclist_draw(lists);
+            _gui_synclist_speak_item(lists, false);
             yield();
             *actionptr = ACTION_STD_NEXT;
         }
@@ -1021,12 +1070,46 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
                                           SCREEN_MAIN;
             gui_synclist_select_next_page(lists, screen);
             gui_synclist_draw(lists);
+            _gui_synclist_speak_item(lists, false);
             yield();
             *actionptr = ACTION_STD_PREV;
         }
         return true;
     }
+    if(lists->gui_list[0].scheduled_talk_tick
+       && TIME_AFTER(current_tick, lists->gui_list[0].scheduled_talk_tick))
+        /* scheduled postponed item announcement is due */
+        _gui_synclist_speak_item(lists, false);
     return false;
+}
+
+int list_do_action_timeout(struct gui_synclist *lists, int timeout)
+/* Returns the lowest of timeout or the delay until a postponed
+   scheduled announcement is due (if any). */
+{
+    if(lists->gui_list[0].scheduled_talk_tick)
+    {
+        long delay = lists->gui_list[0].scheduled_talk_tick -current_tick +1;
+        /* +1 because the trigger condition uses TIME_AFTER(), which
+           is implemented as strictly greater than. */
+        if(delay < 0)
+            delay = 0;
+        if(timeout > delay || timeout == TIMEOUT_BLOCK)
+            timeout = delay;
+    }
+    return timeout;
+}
+
+bool list_do_action(int context, int timeout,
+                    struct gui_synclist *lists, int *action,
+                    enum list_wrap wrap)
+/* Combines the get_action() (with possibly overridden timeout) and
+   gui_synclist_do_button() calls. Returns the list action from
+   do_button, and places the action from get_action in *action. */
+{
+    timeout = list_do_action_timeout(lists, timeout);
+    *action = get_action(context, timeout);
+    return gui_synclist_do_button(lists, action, wrap);
 }
 
 /* Simple use list implementation */
