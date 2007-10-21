@@ -2367,14 +2367,14 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    ipod*: "Building database... %d found (LEFT to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Création base de données... %d trouvés (OFF = retour)"
     h100,h120,h300: "Création base de données... %d trouvés (STOP = retour)"
-    ipod*: "Création base de données... %d trouvés (PLAY/PAUSE = retour)"
+    ipod*: "Création base de données... %d trouvés (LEFT = retour)"
     x5,m5: "Création base de données... %d trouvés (LEFT = retour)"
     h10,h10_5gb,e200,c200: "Création base de données... %d trouvés (PREC = retour)"
   </dest>
@@ -11388,5 +11388,19 @@
   </dest>
   <voice>
     *: "Vide"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Liste vide"
   </voice>
 </phrase>
