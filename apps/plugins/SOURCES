@@ -1,3 +1,4 @@
+#ifndef OLYMPUS_MROBE_500
 /* plugins common to all models */
 battery_bench.c
 chessclock.c
@@ -141,3 +142,4 @@ iriver_flash.c
 /* Built for bitmap targets except H10 5/6gb, Archoses, iPod mini and ifp */
 superdom.c
 #endif
+#endif /* m:robe 500 */

@@ -1,4 +1,4 @@
-#ifndef IRIVER_IFP7XX_SERIES
+#if !defined(IRIVER_IFP7XX_SERIES) && !defined(OLYMPUS_MROBE_500)
 
 /* For all targets */
 shortcuts
