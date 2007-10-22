@@ -45,6 +45,8 @@
 #include "filters_sse.h"
 #elif defined (ARM4_ASM) || defined(ARM5E_ASM)
 #include "filters_arm4.h"
+#elif defined (COLDFIRE_ASM)
+#define OVERRIDE_IIR_MEM16
 #elif defined (BFIN_ASM)
 #include "filters_bfin.h"
 #endif

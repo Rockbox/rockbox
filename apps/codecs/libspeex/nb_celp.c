@@ -1108,6 +1108,9 @@ void *nb_decoder_init(const SpeexMode *m)
    st->isWideband = 0;
    st->highpass_enabled = 1;
 
+#ifdef CPU_COLDFIRE
+   coldfire_set_macsr(0); // Integer mode
+#endif
 #ifdef ENABLE_VALGRIND
    VALGRIND_MAKE_READABLE(st, NB_DEC_STACK);
 #endif

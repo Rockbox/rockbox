@@ -42,3 +42,6 @@ vbr.c
 vorbis_psy.c
 vq.c
 window.c
+#ifdef CPU_COLDFIRE
+filters_cf.S
+#endif

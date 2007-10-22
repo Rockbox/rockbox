@@ -11,6 +11,11 @@
 #define ARM4_ASM
 #endif
 
+/* Make use of Coldfire assembly optimizations */
+#if defined(CPU_COLDFIRE)
+#define COLDFIRE_ASM
+#endif
+
 /* Make use of Blackfin assembly optimizations */
 /* #undef BFIN_ASM */
 
