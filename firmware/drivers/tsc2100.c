@@ -52,7 +52,7 @@ short tsc2100_readreg(int page, int address)
 
 void tsc2100_writereg(int page, int address, short value)
 {
-    unsigned short command = 0x0800|(page << 11)|(address << 5);
+    unsigned short command = (page << 11)|(address << 5);
     unsigned char out[4] = {command >> 8, command & 0xff,
                             value >> 8,   value & 0xff};
     spi_block_transfer(SPI_target_TSC2100, 
@@ -63,5 +63,5 @@ void tsc2100_keyclick(void)
 {
     // 1100 0100 0001 0000
     short val = 0xC410;
-    tsc2100_writereg(TSAC2_PAGE, TSAC2_ADDRESS, val);
+    tsc2100_writereg(TSAC2_PAGE, TSAC2_ADDRESS, tsc2100_readreg(TSAC2_PAGE, TSAC2_ADDRESS)&0x8000);
 }
