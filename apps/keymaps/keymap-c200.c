@@ -228,6 +228,7 @@ static const struct button_mapping button_context_recscreen[]  = {
 /** FM Radio Screen **/
 #if CONFIG_TUNER
 static const struct button_mapping button_context_radio[]  = {
+    { ACTION_NONE,              BUTTON_UP,                      BUTTON_NONE },
     { ACTION_FM_MENU,           BUTTON_DOWN,                    BUTTON_NONE },
     { ACTION_FM_PRESET,         BUTTON_SELECT,                  BUTTON_NONE },
     { ACTION_FM_STOP,           BUTTON_UP|BUTTON_REPEAT,        BUTTON_UP   },
