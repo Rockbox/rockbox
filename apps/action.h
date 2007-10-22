@@ -78,6 +78,7 @@ enum {
     ACTION_NONE = BUTTON_NONE,
     ACTION_UNKNOWN,
     ACTION_REDRAW, /* returned if keys are locked and we splash()'ed */
+    ACTION_TOUCHPAD,
     
     /* standard actions, use these first */
     ACTION_STD_PREV, 
@@ -258,5 +259,14 @@ int get_action_statuscode(int *button);
 /* returns the data value associated with the last action that is not
    BUTTON_NONE or flagged with SYS_EVENT */
 intptr_t get_action_data(void);
+
+#ifdef HAVE_TOUCHPAD
+/* return BUTTON_NONE on error
+          BUTTON_REPEAT if repeated press
+          BUTTON_REL    if its a short press
+          BUTTON_TOUCHPAD   otherwise
+*/
+int action_get_touchpad_press(short *x, short *y);
+#endif
 
 #endif /* __ACTION_H__ */

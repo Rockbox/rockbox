@@ -35,6 +35,10 @@ static intptr_t last_data = 0;
 static int last_action = ACTION_NONE;
 static bool repeated = false;
 
+#ifdef HAVE_TOUCHPAD
+static bool short_press = false;
+#endif
+
 #define REPEAT_WINDOW_TICKS HZ/10
 static int last_action_tick = 0;
 
@@ -132,7 +136,25 @@ static int get_action_worker(int context, int timeout,
         return ACTION_NONE; /* "safest" return value */
     }
     last_context = context;
-    
+#ifdef HAVE_TOUCHPAD
+    if (button&BUTTON_TOUCHPAD)
+    {
+        repeated = false;
+        short_press = false;
+        if (last_button&BUTTON_TOUCHPAD)
+        {
+            if ((button&BUTTON_REL) &&
+                ((last_button&BUTTON_REPEAT)==0))
+            {
+                short_press = true;
+            }
+            else if (button&BUTTON_REPEAT)
+                repeated = true;
+        }
+        last_button = button;
+        return ACTION_TOUCHPAD;
+    }
+#endif
 #ifndef HAS_BUTTON_HOLD
     screen_has_lock = ((context&ALLOW_SOFTLOCK)==ALLOW_SOFTLOCK);
     if (screen_has_lock && (keys_locked == true))
@@ -250,3 +272,35 @@ int get_action_statuscode(int *button)
         ret |= ACTION_REPEAT;
     return ret;
 }
+
+#ifdef HAVE_TOUCHPAD
+/* return BUTTON_NONE on error
+          BUTTON_REPEAT if repeated press
+          BUTTON_REL    if its a short press
+          BUTTON_TOUCHPAD   otherwise
+*/
+int action_get_touchpad_press(short *x, short *y)
+{
+    static int last_data = 0;
+    int data;
+    if ((last_button&BUTTON_TOUCHPAD) == 0)
+        return BUTTON_NONE;
+    data = button_get_data();
+    if (last_button&BUTTON_REL)
+    {
+        *x = (last_data&0xffff0000)>>16;
+        *y = (last_data&0xffff);
+    }
+    else
+    {
+        *x = (data&0xffff0000)>>16;
+        *y = (data&0xffff);
+    }
+    last_data = data;
+    if (repeated)
+        return BUTTON_REPEAT;
+    if (short_press)
+        return BUTTON_REL;
+    return BUTTON_NONE;
+}
+#endif

@@ -911,6 +911,81 @@ void gui_synclist_speak_item(struct gui_synclist * lists)
 
 extern intptr_t get_action_data(void);
 
+#if  defined(HAVE_TOUCHPAD)
+unsigned gui_synclist_do_touchpad(struct gui_synclist * lists)
+{
+    struct gui_list *gui_list = &(lists->gui_list[SCREEN_MAIN]);
+    short x,y;
+    unsigned button = action_get_touchpad_press(&x, &y);
+    int line;
+    if (x<SCROLLBAR_WIDTH)
+    {
+        /* top left corner is hopefully GO_TO_ROOT */
+        if (y<STATUSBAR_HEIGHT)
+        {
+            if (button == BUTTON_REL)
+                return ACTION_STD_MENU;
+            else if (button == BUTTON_REPEAT)
+                return ACTION_STD_CONTEXT;
+            else
+                return ACTION_NONE;
+        }
+        /* scroll bar */
+        else
+        {
+            int new_selection, nb_lines;
+            int height, size;
+            nb_lines = gui_list->display->nb_lines - SHOW_LIST_TITLE;
+            if (nb_lines <  gui_list->nb_items)
+            {
+                height = nb_lines * gui_list->display->char_height;
+                size = height*nb_lines / gui_list->nb_items;
+                new_selection = (y*(gui_list->nb_items-nb_lines))/(height-size);
+                gui_synclist_select_item(lists, new_selection);
+                nb_lines /= 2;
+                if (new_selection - gui_list->start_item > nb_lines)
+                {
+                    new_selection = gui_list->start_item+nb_lines;
+                }
+                FOR_NB_SCREENS(line)
+                    lists->gui_list[line].selected_item = new_selection;
+                return ACTION_REDRAW;
+            }
+        }
+    }
+    else
+    {
+        if (button != BUTTON_REL && button != BUTTON_REPEAT)
+            return ACTION_NONE;
+        /* title or statusbar is cancel */
+        if (global_settings.statusbar)
+        {
+            if (y < STATUSBAR_HEIGHT && !SHOW_LIST_TITLE )
+                return ACTION_STD_CANCEL;
+            y -= STATUSBAR_HEIGHT;
+        }
+        /* title goes up one level */
+        if (SHOW_LIST_TITLE)
+        {
+            if (y < gui_list->display->char_height)
+                return ACTION_STD_CANCEL;
+            y -= gui_list->display->char_height;
+        }
+        /*  pressing an item will select it.
+            pressing the selected item will "enter" it */
+        line = y / gui_list->display->char_height;
+        if (line != gui_list->selected_item - gui_list->start_item)
+            gui_synclist_select_item(lists, gui_list->start_item+line);
+        
+        if (button == BUTTON_REPEAT)
+            return ACTION_STD_CONTEXT;
+        else
+            return ACTION_STD_OK;
+    }
+    return ACTION_NONE;
+}
+#endif
+
 bool gui_synclist_do_button(struct gui_synclist * lists,
                             unsigned *actionptr, enum list_wrap wrap)
 {
@@ -950,6 +1025,11 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
         }
     }
 #endif
+    
+#if defined(HAVE_TOUCHPAD)
+    if (action == ACTION_TOUCHPAD)
+        action = *actionptr = gui_synclist_do_touchpad(lists);
+#endif
 
     switch (wrap)
     {
@@ -971,6 +1051,10 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 
     switch (action)
     {
+        case ACTION_REDRAW:
+            gui_synclist_draw(lists);
+            return true;
+            
 #ifdef HAVE_VOLUME_IN_LIST
         case ACTION_LIST_VOLUP:
             global_settings.volume += 2; 
