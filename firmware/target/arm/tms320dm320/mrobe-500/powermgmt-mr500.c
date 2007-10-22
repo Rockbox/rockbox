@@ -20,7 +20,10 @@
 #include "config.h"
 #include "adc.h"
 #include "powermgmt.h"
+#include "tsc2100.h"
+#include "kernel.h"
 
+unsigned short current_voltage = 3910;
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     3450
@@ -42,10 +45,38 @@ const unsigned short percent_to_volt_charge[11] =
 {
     3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990
 };
-
+void read_battery_inputs(void)
+{
+    short tsadc = tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS);
+    short adscm = (tsadc&TSADC_ADSCM_MASK)>>TSADC_ADSCM_SHIFT;
+    if (adscm == 0xb) /* battery is available */
+    {
+        current_voltage = tsc2100_readreg(0, 5); /* BAT1 */
+        tsc2100_readreg(0, 6); /* BAT2 */
+        tsc2100_readreg(0, 7); /* AUX */
+        /* reset the TSC2100 to read touches */
+        tsadc &= ~(TSADC_PSTCM|TSADC_ADST|TSADC_ADSCM_MASK);
+        tsadc |= TSADC_PSTCM|(0x2<<TSADC_ADSCM_SHIFT);
+        tsc2100_writereg(TSADC_PAGE, TSADC_ADDRESS, tsadc);
+        tsc2100_writereg(TSSTAT_PAGE, TSSTAT_ADDRESS, 2<<TSSTAT_PINTDAV_SHIFT);
+    }
+}
+    
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    return 3910;
+    static unsigned last_tick = 0;
+    short tsadc = tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS);
+    if (TIME_BEFORE(last_tick+2*HZ, current_tick))
+    {
+        tsadc &= ~(TSADC_PSTCM|TSADC_ADST|TSADC_ADSCM_MASK);
+        tsadc |= 0xb<<TSADC_ADSCM_SHIFT;
+        tsc2100_writereg(TSADC_PAGE, TSADC_ADDRESS, tsadc&(~(1<<15)));
+        tsc2100_writereg(TSSTAT_PAGE, TSSTAT_ADDRESS, 2<<TSSTAT_PINTDAV_SHIFT);
+        last_tick = current_tick;
+    }
+    else
+        read_battery_inputs();
+    return current_voltage;
 }
 

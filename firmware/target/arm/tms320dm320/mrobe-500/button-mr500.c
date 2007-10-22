@@ -187,8 +187,21 @@ int button_read_device(int *data)
 }
 
 /* Touchpad data available interupt */
+void read_battery_inputs(void);
 void GIO14(void)
 {
+    short tsadc = tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS);
+    short adscm = (tsadc&TSADC_ADSCM_MASK)>>TSADC_ADSCM_SHIFT;
+    switch (adscm)
+    {
+        case 1:
+        case 2:
+            touch_available = true;
+            break;
+        case 0xb:
+            read_battery_inputs();
+            break;
+    }
     touch_available = true;
     IO_INTC_IRQ2 = (1<<3); /* IRQ_GIO14 == 35 */
 }
