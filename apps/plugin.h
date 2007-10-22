@@ -112,12 +112,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 85
+#define PLUGIN_API_VERSION 86
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 85
+#define PLUGIN_MIN_API_VERSION 86
 
 /* plugin return codes */
 enum plugin_status {
@@ -634,10 +634,12 @@ struct plugin_api {
        the API gets incompatible */
 
 #if (CONFIG_CODEC == SWCODEC)
-    void (*spinlock_init)(struct spinlock *l IF_COP(, unsigned int flags));
-    void (*spinlock_lock)(struct spinlock *l);
-    void (*spinlock_unlock)(struct spinlock *l);
+    void (*mutex_init)(struct mutex *m);
+    void (*mutex_lock)(struct mutex *m);
+    void (*mutex_unlock)(struct mutex *m);
 #endif
+
+    void (*thread_wait)(struct thread_entry *thread);
 };
 
 /* plugin header */

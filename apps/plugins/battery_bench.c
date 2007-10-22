@@ -133,8 +133,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     return main();
 }
 
-bool thread_stopped = false;
-
 /* Struct for battery information */
 struct batt_info
 {
@@ -147,6 +145,7 @@ struct batt_info
     unsigned short flags;
 } bat[BUF_SIZE/sizeof(struct batt_info)];
 
+struct thread_entry *thread_id;
 struct event_queue thread_q;
 
 bool exit_tsr(bool reenter)
@@ -166,8 +165,7 @@ bool exit_tsr(bool reenter)
     if (exit)
     {
         rb->queue_post(&thread_q, EV_EXIT, 0);
-        while (!thread_stopped)
-            rb->yield();
+        rb->thread_wait(thread_id);
         /* remove the thread's queue from the broadcast list */
         rb->queue_delete(&thread_q);
         return true;
@@ -350,7 +348,6 @@ void thread(void)
 #else
                         "bench exit");
 #endif                        
-            thread_stopped = true;
             return;
         }
         
@@ -373,7 +370,6 @@ void thread(void)
                 break;
         }
     } while (1);
-    
 }
 
 
@@ -499,10 +495,10 @@ int main(void)
     }
     
     rb->queue_init(&thread_q, true); /* put the thread's queue in the bcast list */
-    if(rb->create_thread(thread, thread_stack,
+    if((thread_id = rb->create_thread(thread, thread_stack,
         sizeof(thread_stack), 0, "Battery Benchmark" 
         IF_PRIO(, PRIORITY_BACKGROUND)
-	    IF_COP(, CPU)) == NULL)
+	    IF_COP(, CPU))) == NULL)
     {
         rb->splash(HZ, "Cannot create thread!");
         return PLUGIN_ERROR;

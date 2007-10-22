@@ -601,6 +601,9 @@ static enum plugin_status test_track(char* filename)
     /* Save the current time before we spin up the disk to access the log */
     ticks = *rb->current_tick - starttick;
 
+    /* Be sure it is done */
+    rb->thread_wait(codecthread_id);
+
     log_text(str,true);
     
     /* Close WAV file (if there was one) */

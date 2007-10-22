@@ -512,10 +512,12 @@ static const struct plugin_api rockbox_api = {
        the API gets incompatible */
 
 #if (CONFIG_CODEC == SWCODEC)
-    spinlock_init,
-    spinlock_lock,
-    spinlock_unlock,
+    mutex_init,
+    mutex_lock,
+    mutex_unlock,
 #endif
+
+    thread_wait,
 };
 
 int plugin_load(const char* plugin, void* parameter)

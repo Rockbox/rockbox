@@ -188,7 +188,7 @@ typedef struct
     int      have_msg;           /* 1=event pending */
     int      replied;            /* 1=replied to last event */
     int      reply;              /* reply value */
-    struct spinlock msg_lock;    /* serialization for event senders */
+    struct mutex msg_lock;    /* serialization for event senders */
     uint8_t* curr_packet;        /* Current stream packet beginning */
     uint8_t* curr_packet_end;    /* Current stream packet end */
 
@@ -294,7 +294,7 @@ static intptr_t str_send_msg(Stream *str, int id, intptr_t data)
 #endif
 
     /* Only one thread at a time, please */
-    rb->spinlock_lock(&str->msg_lock);
+    rb->mutex_lock(&str->msg_lock);
 
     str->ev.id = id;
     str->ev.data = data;
@@ -316,7 +316,7 @@ static intptr_t str_send_msg(Stream *str, int id, intptr_t data)
 
     reply = str->reply;
 
-    rb->spinlock_unlock(&str->msg_lock);
+    rb->mutex_unlock(&str->msg_lock);
 
     return reply;
 }
@@ -340,13 +340,13 @@ static size_t file_remaining IBSS_ATTR;
 
 #if NUM_CORES > 1
 /* Some stream variables are shared between cores */
-struct spinlock stream_lock IBSS_ATTR;
+struct mutex stream_lock IBSS_ATTR;
 static inline void init_stream_lock(void)
-    { rb->spinlock_init(&stream_lock, SPINLOCK_TASK_SWITCH); }
+    { rb->mutex_init(&stream_lock); }
 static inline void lock_stream(void)
-    { rb->spinlock_lock(&stream_lock); }
+    { rb->mutex_lock(&stream_lock); }
 static inline void unlock_stream(void)
-    { rb->spinlock_unlock(&stream_lock); }
+    { rb->mutex_unlock(&stream_lock); }
 #else
 /* No RMW issue here */
 static inline void init_stream_lock(void)
@@ -1937,8 +1937,7 @@ void display_thumb(int in_file)
     }
     else
     {
-        while (video_str.status != STREAM_TERMINATED)
-            rb->yield();
+        rb->thread_wait(video_str.thread);
     }
 
     if ( video_str.curr_packet_end == video_str.curr_packet)
@@ -2417,8 +2416,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     initialize_stream( &video_str, disk_buf_start, disk_buf_len, 0xe0 );
     initialize_stream( &audio_str, disk_buf_start, disk_buf_len, 0xc0 );
 
-    rb->spinlock_init(&audio_str.msg_lock IF_COP(, SPINLOCK_TASK_SWITCH));
-    rb->spinlock_init(&video_str.msg_lock IF_COP(, SPINLOCK_TASK_SWITCH));
+    rb->mutex_init(&audio_str.msg_lock);
+    rb->mutex_init(&video_str.msg_lock);
 
     audio_str.status = STREAM_BUFFERING;
     video_str.status = STREAM_PLAYING;
@@ -2504,12 +2503,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Stop the threads and wait for them to terminate */
     if (video_str.thread != NULL)
+    {
         str_send_msg(&video_str, STREAM_QUIT, 0);
+        rb->thread_wait(video_str.thread);
+    }
 
     if (audio_str.thread != NULL)
+    {
         str_send_msg(&audio_str, STREAM_QUIT, 0);
-
-    rb->sleep(HZ/10);
+        rb->thread_wait(audio_str.thread);
+    }
 
 #if NUM_CORES > 1
     invalidate_icache();

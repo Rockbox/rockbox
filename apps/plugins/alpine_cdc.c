@@ -204,7 +204,7 @@ struct
 {
     bool foreground; /* set as long as we're owning the UI */
     bool exiting; /* signal to the thread that we want to exit */
-    bool ended; /* response from the thread, that is has exited */
+    struct thread_entry *thread; /* worker thread id */
 } gTread;
 
 static struct plugin_api* rb; /* here is the global API struct pointer */
@@ -1112,8 +1112,6 @@ void thread(void)
         }
 
     } while (!gTread.exiting);
-
-    gTread.ended = true; /* acknowledge the exit */
 }
 
 /* callback to end the TSR plugin, called before a new one gets loaded */
@@ -1122,8 +1120,7 @@ bool exit_tsr(bool reenter)
     if (reenter)
         return false; /* dont let it start again */
     gTread.exiting = true; /* tell the thread to end */
-    while (!gTread.ended) /* wait until it did */
-        rb->yield();
+    rb->thread_wait(gTread.thread);  /* wait until it did */
 
     uart_init(BAUDRATE); /* return to standard baudrate */
     IPRE = (IPRE & ~0xF000); /* UART interrupt off */
@@ -1167,9 +1164,9 @@ int main(void* parameter)
 
     rb->memset(&gTread, 0, sizeof(gTread));
     gTread.foreground = true;
-    rb->create_thread(thread, stack, stacksize, 0, "CDC"
-                      IF_PRIO(, PRIORITY_BACKGROUND)
-		              IF_COP(, CPU));
+    gTread.thread = rb->create_thread(thread, stack, stacksize, 0, "CDC"
+                                      IF_PRIO(, PRIORITY_BACKGROUND)
+                                      IF_COP(, CPU));
 
 #ifdef DEBUG
     do
