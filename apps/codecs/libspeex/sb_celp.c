@@ -184,7 +184,7 @@ static const float h0[64] = {
 
 extern const spx_word16_t lpc_window[];
 
-
+#if 0 
 void *sb_encoder_init(const SpeexMode *m)
 {
    int i;
@@ -750,20 +750,39 @@ int sb_encode(void *state, void *vin, SpeexBits *bits)
 
    return 1;
 }
+#else
+void *sb_encoder_init(const SpeexMode *m)
+{
+    return NULL;
+}
+void sb_encoder_destroy(void *state)
+{
+}
+int sb_encode(void *state, void *vin, SpeexBits *bits)
+{
+    return 1;
+}
+#endif
 
 
 
-
-static SBDecState global_decstate IBSS_ATTR;
+static SBDecState global_decstate_wb IBSS_ATTR;
+static SBDecState global_decstate_uwb IBSS_ATTR;
 
 void *sb_decoder_init(const SpeexMode *m)
 {
    spx_int32_t tmp;
-   SBDecState *st = &global_decstate;
+   SBDecState *st;
    const SpeexSBMode *mode;
-   /* st = (SBDecState*)speex_alloc(sizeof(SBDecState)); */
+/* 
+   st = (SBDecState*)speex_alloc(sizeof(SBDecState));
    if (!st)
       return NULL;
+*/
+   if (m->modeID == SPEEX_MODEID_UWB)
+      st = &global_decstate_uwb; 
+   else
+      st = &global_decstate_wb;
    st->mode = m;
    mode=(const SpeexSBMode*)m->mode;
    st->encode_submode = 1;
@@ -1107,7 +1126,7 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
    return 0;
 }
 
-
+#if 0
 int sb_encoder_ctl(void *state, int request, void *ptr)
 {
    SBEncState *st;
@@ -1355,6 +1374,12 @@ int sb_encoder_ctl(void *state, int request, void *ptr)
    }
    return 0;
 }
+#else
+int sb_encoder_ctl(void *state, int request, void *ptr)
+{
+    return 0;
+}
+#endif
 
 int sb_decoder_ctl(void *state, int request, void *ptr)
 {

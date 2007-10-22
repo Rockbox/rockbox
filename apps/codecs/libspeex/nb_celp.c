@@ -108,8 +108,8 @@ const float exc_gain_quant_scal1[2]={0.70469f, 1.05127f};
 #define sqr(x) ((x)*(x))
 
 extern const spx_word16_t lpc_window[];
-
-void *nb_encoder_init(const SpeexMode *m)
+#if 0
+void *nb_encoder_init(const speexmode *m)
 {
    EncState *st;
    const SpeexNBMode *mode;
@@ -1023,6 +1023,19 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 
    return 1;
 }
+#else
+void *nb_encoder_init(const SpeexMode *m)
+{
+    return NULL;
+}
+void nb_encoder_destroy(void *state)
+{
+}
+int nb_encode(void *state, void *vin, SpeexBits *bits)
+{
+    return 1;
+}
+#endif
 
 static DecState global_decstate IBSS_ATTR;
 
@@ -1033,9 +1046,11 @@ void *nb_decoder_init(const SpeexMode *m)
    int i;
 
    mode=(const SpeexNBMode*)m->mode;
-   /* st = (DecState *)speex_alloc(sizeof(DecState)); */
+/*
+   st = (DecState *)speex_alloc(sizeof(DecState));
    if (!st)
       return NULL;
+*/
 #if defined(VAR_ARRAYS) || defined (USE_ALLOCA)
    st->stack = NULL;
 #else
@@ -1740,6 +1755,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    return 0;
 }
 
+#if 0
 int nb_encoder_ctl(void *state, int request, void *ptr)
 {
    EncState *st;
@@ -1935,6 +1951,12 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
    }
    return 0;
 }
+#else
+int nb_encoder_ctl(void *state, int request, void *ptr)
+{
+    return 0;
+}
+#endif
 
 int nb_decoder_ctl(void *state, int request, void *ptr)
 {
