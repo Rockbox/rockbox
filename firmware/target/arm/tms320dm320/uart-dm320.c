@@ -149,5 +149,5 @@ void UART1(void)
         }
     }
 
-    IO_INTC_IRQ0 |= (1<<IRQ_UART1);
+    IO_INTC_IRQ0 = (1<<IRQ_UART1);
 }
