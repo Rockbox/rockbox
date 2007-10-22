@@ -59,5 +59,5 @@ void TIMER1(void)
 
     current_tick++;
 
-    IO_INTC_IRQ0 = 1<<IRQ_TIMER1;
+    IO_INTC_IRQ0 |= 1<<IRQ_TIMER1;
 }
