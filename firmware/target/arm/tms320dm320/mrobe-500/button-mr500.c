@@ -38,7 +38,7 @@
 #define BUTTON_START_BYTE2 0xF4 /* not sure why, but sometimes you get F0 or F4, */
                                 /* but always the same one for the session? */
 static short last_x, last_y, last_z1, last_z2; /* for the touch screen */
-static int last_touch;
+static bool touch_available = false;
 
 static struct touch_calibration_point topleft, bottomright;
 static bool using_calibration = false;
@@ -76,7 +76,7 @@ static int touch_to_pixels(short val_x, short val_y)
 
 void button_init_device(void)
 {
-    last_touch = 0;
+    touch_available = false;
     /* GIO is the power button, set as input */
     IO_GIO_DIR0 |= 0x01;
     topleft.px_x = 0;       topleft.px_y = 0;
@@ -104,28 +104,50 @@ inline bool button_hold(void)
     return false;
 }
 
-int button_get_last_touch(void)
-{
-    int ret_val = last_touch;
-    last_touch = 0;
-    return ret_val;
-}
-
 static void remote_heartbeat(void)
 {
     char data[5] = {0x11, 0x30, 0x11^0x30, 0x11+0x30, '\0'};
     uart1_puts(data);
 }
 
-int button_read_device(void)
+#define TOUCH_MARGIN 8
+int button_read_device(int *data)
 {
     char c;
     int i = 0;
     int btn = BUTTON_NONE;
-        
+    *data = 0;
+    
     if ((IO_GIO_BITSET0&0x01) == 0)
         btn |= BUTTON_POWER;
-
+    if (touch_available)
+    {
+        short x,y;
+        static long last_touch = 0;
+        bool send_touch = false;
+        tsc2100_read_values(&x,  &y, &last_z1, &last_z2);
+        if (TIME_BEFORE(last_touch + HZ/5, current_tick))
+        {
+            if ((x > last_x + TOUCH_MARGIN) ||
+                (x < last_x - TOUCH_MARGIN) ||
+                (y > last_y + TOUCH_MARGIN) ||
+                (y < last_y - TOUCH_MARGIN))
+            {
+                send_touch = true;
+            }
+        }
+        else
+            send_touch = true;
+        if (send_touch)
+        {
+            last_x = x;
+            last_y = y;
+            *data = touch_to_pixels(x, y);
+            btn |= BUTTON_TOUCHPAD;
+        }
+        last_touch = current_tick;
+        touch_available = false;
+    }
     remote_heartbeat();
     while (uart1_getch(&c))
     {
@@ -163,27 +185,10 @@ int button_read_device(void)
     }
     return btn;
 }
-#define TOUCH_MARGIN 8
+
+/* Touchpad data available interupt */
 void GIO14(void)
 {
-    short x,y;
-    static int last_tick = 0;
-    tsc2100_read_values(&x,  &y,
-                        &last_z1, &last_z2);
-     if (TIME_BEFORE(last_tick+HZ/5, current_tick))
-    {
-        if ((x > last_x + TOUCH_MARGIN) ||
-            (x < last_x - TOUCH_MARGIN) ||
-            (y > last_y + TOUCH_MARGIN) ||
-            (y < last_y - TOUCH_MARGIN))
-        {
-            last_x = x;
-            last_y = y;
-            queue_clear(&button_queue);
-            queue_post(&button_queue, BUTTON_TOUCHPAD, 
-                touch_to_pixels(x, y));
-        }
-         last_tick = current_tick;
-    }
-    IO_INTC_IRQ2 = (1<<3);
+    touch_available = true;
+    IO_INTC_IRQ2 = (1<<3); /* IRQ_GIO14 == 35 */
 }

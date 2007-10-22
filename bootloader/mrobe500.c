@@ -48,7 +48,7 @@
 #if defined(MRDEBUG)
 
 extern int line;
-
+#if 0
 struct touch_calibration_point tl, br;
 
 void touchpad_get_one_point(struct touch_calibration_point *p)
@@ -96,7 +96,7 @@ void touchpad_calibrate_screen(void)
     line++;
     set_calibration_points(&tl, &br);
 }
-
+#endif
 void mrdebug(void)
 {
     int button=0, *address=0x0;
@@ -126,24 +126,28 @@ void mrdebug(void)
             address+=0x1000;
         else if (button==BUTTON_RC_REW)
             address-=0x1000;
-        {
-            short x,y,z1,z2;
-            tsc2100_read_values(&x, &y, &z1, &z2);
-            printf("x: %04x y: %04x z1: %04x z2: %04x", x, y, z1, z2);
-            printf("tsadc: %4x", tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS)&0xffff);
-            printf("current tick: %04x", current_tick);
-            printf("Address: 0x%08x Data: 0x%08x", address, *address);
-            printf("Address: 0x%08x Data: 0x%08x", address+1, *(address+1));
-            printf("Address: 0x%08x Data: 0x%08x", address+2, *(address+2));
-//            tsc2100_keyclick(); /* doesnt work :( */
-            line -= 6;
-        }
+//         {
+//             short x,y,z1,z2;
+//             tsc2100_read_values(&x, &y, &z1, &z2);
+//             printf("x: %04x y: %04x z1: %04x z2: %04x", x, y, z1, z2);
+//             printf("tsadc: %4x", tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS)&0xffff);
+//             printf("current tick: %04x", current_tick);
+//             printf("Address: 0x%08x Data: 0x%08x", address, *address);
+//             printf("Address: 0x%08x Data: 0x%08x", address+1, *(address+1));
+//             printf("Address: 0x%08x Data: 0x%08x", address+2, *(address+2));
+// //            tsc2100_keyclick(); /* doesnt work :( */
+//             line -= 6;
+//         }
 #if 1
         if (button&BUTTON_TOUCHPAD)
         {
+            if (button&BUTTON_REL)
+                continue;
             unsigned int data = button_get_data();
             int x = (data&0xffff0000)>>16, y = data&0x0000ffff;
             reset_screen();
+            line = 9;
+            printf("%x %d %d\n", button, x,y);
             lcd_hline(x-5, x+5, y);
             lcd_vline(x, y-5, y+5);
             lcd_update();

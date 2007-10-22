@@ -73,7 +73,11 @@ bool phones_present = false;
 /* speed repeat finishes at, in ticks */
 #define REPEAT_INTERVAL_FINISH  5
 
+#ifdef HAVE_BUTTON_DATA
+static int button_read(int *data);
+#else
 static int button_read(void);
+#endif
 
 static void button_tick(void)
 {
@@ -90,6 +94,11 @@ static void button_tick(void)
 #endif
     int diff;
     int btn;
+#ifdef HAVE_BUTTON_DATA
+    int data = 0;
+#else
+    const int data = 0;
+#endif
 
 #ifdef HAS_SERIAL_REMOTE
     /* Post events for the remote control */
@@ -117,7 +126,11 @@ static void button_tick(void)
     }
 #endif
 
+#ifdef HAVE_BUTTON_DATA
+    btn = button_read(&data);
+#else
     btn = button_read();
+#endif
 
     /* Find out if a key has been released */
     diff = btn ^ lastbtn;
@@ -127,17 +140,17 @@ static void button_tick(void)
 #ifdef HAVE_REMOTE_LCD
         if(diff & BUTTON_REMOTE)
             if(!skip_remote_release)
-                queue_post(&button_queue, BUTTON_REL | diff, 0);
+                queue_post(&button_queue, BUTTON_REL | diff, data);
             else
                 skip_remote_release = false;
         else
 #endif
             if(!skip_release)
-                queue_post(&button_queue, BUTTON_REL | diff, 0);
+                queue_post(&button_queue, BUTTON_REL | diff, data);
             else
                 skip_release = false;
 #else
-        queue_post(&button_queue, BUTTON_REL | diff, 0);
+        queue_post(&button_queue, BUTTON_REL | diff, data);
 #endif
     }
     else
@@ -212,7 +225,7 @@ static void button_tick(void)
                      * to avoid afterscroll effects. */
                     if (queue_empty(&button_queue))
                     {
-                        queue_post(&button_queue, BUTTON_REPEAT | btn, 0);
+                        queue_post(&button_queue, BUTTON_REPEAT | btn, data);
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                         skip_remote_release = false;
@@ -232,7 +245,7 @@ static void button_tick(void)
                            || (remote_type()==REMOTETYPE_H300_NONLCD)
 #endif
                             )
-                            queue_post(&button_queue, btn, 0);
+                            queue_post(&button_queue, btn, data);
                         else
                             skip_remote_release = true;
                     }
@@ -243,11 +256,11 @@ static void button_tick(void)
                                 || (btn&BUTTON_REMOTE)
 #endif
                            )
-                            queue_post(&button_queue, btn, 0);
+                            queue_post(&button_queue, btn, data);
                         else
                             skip_release = true;
 #else /* no backlight, nothing to skip */
-                    queue_post(&button_queue, btn, 0);
+                    queue_post(&button_queue, btn, data);
 #endif
                     post = false;
                 }
@@ -356,13 +369,22 @@ intptr_t button_get_data(void)
 
 void button_init(void)
 {
+#ifdef HAVE_BUTTON_DATA
+    int temp;
+#endif
     /* hardware inits */
     button_init_device();
 
     queue_init(&button_queue, true);
-    
+
+#ifdef HAVE_BUTTON_DATA
+    button_read(&temp);
+    lastbtn = button_read(&temp);
+#else
     button_read();
     lastbtn = button_read();
+#endif
+    
     tick_add_task(button_tick);
     reset_poweroff_timer();
 
@@ -457,9 +479,15 @@ void set_remote_backlight_filter_keypress(bool value)
 /*
  * Get button pressed from hardware
  */
+#ifdef HAVE_BUTTON_DATA
+static int button_read(int *data)
+{
+    int btn = button_read_device(data);
+#else
 static int button_read(void)
 {
     int btn = button_read_device();
+#endif
     int retval;
 
 #ifdef HAVE_LCD_BITMAP
@@ -469,9 +497,11 @@ static int button_read(void)
 
     /* Filter the button status. It is only accepted if we get the same
        status twice in a row. */
+#ifndef HAVE_TOUCHPAD
     if (btn != last_read)
-        retval = lastbtn;
+            retval = lastbtn;
     else
+#endif
         retval = btn;
     last_read = btn;
 

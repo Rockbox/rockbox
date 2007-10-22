@@ -77,6 +77,8 @@
 #define DEFAULT_REMOTE_CONTRAST_SETTING 7
 
 #define CONFIG_KEYPAD MROBE500_PAD
+#define HAVE_TOUCHPAD
+#define HAVE_BUTTON_DATA
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC

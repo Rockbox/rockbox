@@ -27,8 +27,7 @@
 
 bool button_hold(void);
 void button_init_device(void);
-int button_read_device(void);
-int button_get_last_touch(void);
+int button_read_device(int *data);
 
 struct touch_calibration_point {
     short px_x; /* known pixel value */
