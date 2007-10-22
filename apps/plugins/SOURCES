@@ -42,6 +42,7 @@ maze.c
 mazezam.c
 text_editor.c
 wavview.c
+robotfindskitten.c
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
 fire.c
