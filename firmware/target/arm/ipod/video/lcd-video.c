@@ -207,43 +207,26 @@ void lcd_update(void)
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
-/*   YUV- > RGB565 conversion
- *   |R|   |1.000000 -0.000001  1.402000| |Y'|
- *   |G| = |1.000000 -0.334136 -0.714136| |Pb|
- *   |B|   |1.000000  1.772000  0.000000| |Pr|
- *   Scaled, normalized, rounded and tweaked to yield RGB 565:
- *   |R|   |74   0 101| |Y' -  16| >> 9
- *   |G| = |74 -24 -51| |Cb - 128| >> 8
- *   |B|   |74 128   0| |Cr - 128| >> 9
-*/
-
-#define RGBYFAC   74   /*  1.0      */
-#define RVFAC    101   /*  1.402    */
-#define GVFAC   (-51)  /* -0.714136 */
-#define GUFAC   (-24)  /* -0.334136 */
-#define BUFAC    128   /*  1.772    */
-
-/* ROUNDOFFS contain constant for correct round-offs as well as
-   constant parts of the conversion matrix (e.g. (Y'-16)*RGBYFAC
-   -> constant part = -16*RGBYFAC). Through extraction of these
-   constant parts we save at leat 4 substractions in the conversion
-   loop */
-#define ROUNDOFFSR (256 - 16*RGBYFAC - 128*RVFAC)
-#define ROUNDOFFSG (128 - 16*RGBYFAC - 128*GVFAC - 128*GUFAC)
-#define ROUNDOFFSB (256 - 16*RGBYFAC             - 128*BUFAC)
-
-#define MAX_5BIT 0x1f
-#define MAX_6BIT 0x3f
+/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
+extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
+                                   int width,
+                                   int stride);
 
 /* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
-                  int x, int y, int width, int height) ICODE_ATTR;
-void lcd_yuv_blit(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    width = (width + 1) & ~1;
+    unsigned char const * yuv_src[3];
+    off_t z;
+
+    /* Sorry, but width and height must be >= 2 or else */
+    width &= ~1;
+
+    z = stride * src_y;
+    yuv_src[0] = src[0] + z + src_x;
+    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
+    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
     if (finishup_needed) 
     {
@@ -279,85 +262,19 @@ void lcd_yuv_blit(unsigned char * const src[3],
     /* wait for it to be write ready */
     while ((inw(0x30030000) & 0x2) == 0);
 
-    const int ymax = y + height - 1;
-    const int stride_div_sub_x = stride >> 1;
-    unsigned char *ysrc = 0;
-    unsigned char *usrc = 0;
-    unsigned char *vsrc = 0;
-    unsigned char *row_end = 0;
-    int uvoffset;
-    int yp, up, vp, rc, gc, bc; /* temporary variables */
-    int red1, green1, blue1;    /* contain RGB of 1st pixel */
-    int red2, green2, blue2;    /* contain RGB of 2nd pixel */
-
-    for (; y <= ymax ; y++)
+    height >>= 1;
+    do
     {
-        /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
-        uvoffset = stride_div_sub_x*(src_y >> 1) + (src_x >> 1);
-        ysrc = src[0] + stride * src_y + src_x;
-        usrc = src[1] + uvoffset;
-        vsrc = src[2] + uvoffset;
-        
-        row_end = ysrc + width;
+        lcd_write_yuv420_lines(yuv_src, width, stride);
 
-        do
-        {
-            up = *usrc++;
-            vp = *vsrc++;
-            rc = RVFAC * vp              + ROUNDOFFSR;
-            gc = GVFAC * vp + GUFAC * up + ROUNDOFFSG;
-            bc =              BUFAC * up + ROUNDOFFSB;
-            
-            /* Pixel 1 -> RGB565 */
-            yp = *ysrc++ * RGBYFAC;
-            red1   = (yp + rc) >> 9;
-            green1 = (yp + gc) >> 8;
-            blue1  = (yp + bc) >> 9;
-
-            /* Pixel 2 -> RGB565 */
-            yp = *ysrc++ * RGBYFAC;
-            red2   = (yp + rc) >> 9;
-            green2 = (yp + gc) >> 8;
-            blue2  = (yp + bc) >> 9;
-            
-            /* Since out of bounds errors are relatively rare, we check two
-               pixels at once to see if any components are out of bounds, and
-               then fix whichever is broken. This works due to high values and
-               negative values both being !=0 when bitmasking them.
-               We first check for red and blue components (5bit range). */
-            if ((red1 | blue1 | red2 | blue2) & ~MAX_5BIT)
-            {
-                if (red1  & ~MAX_5BIT)
-                    red1  = (red1  >> 31) ? 0 : MAX_5BIT;
-                if (blue1 & ~MAX_5BIT)
-                    blue1 = (blue1 >> 31) ? 0 : MAX_5BIT;
-                if (red2  & ~MAX_5BIT)
-                    red2  = (red2  >> 31) ? 0 : MAX_5BIT;
-                if (blue2 & ~MAX_5BIT)
-                    blue2 = (blue2 >> 31) ? 0 : MAX_5BIT;
-            }
-            /* We second check for green component (6bit range) */
-            if ((green1 | green2) & ~MAX_6BIT)
-            {
-                if (green1 & ~MAX_6BIT)
-                    green1 = (green1 >> 31) ? 0 : MAX_6BIT;
-                if (green2 & ~MAX_6BIT)
-                    green2 = (green2 >> 31) ? 0 : MAX_6BIT;
-            }
-            
-            /* pixel1 */
-            outw((red1 << 11) | (green1 << 5) | blue1, 0x30000000);
-
-            /* pixel2 */
-            outw((red2 << 11) | (green2 << 5) | blue2, 0x30000000);
-        }
-        while (ysrc < row_end);
-
-        src_y++;
+        yuv_src[0] += stride << 1; /* Skip down two luma lines */
+        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+        yuv_src[2] += stride >> 1;
     }
+    while (--height > 0);
 
     /* Top-half of original lcd_bcm_finishup() function */
-    outw(0x31, 0x30030000); 
+    outw(0x31, 0x30030000);
 
     lcd_bcm_read32(0x1FC);
 

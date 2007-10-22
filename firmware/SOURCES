@@ -730,6 +730,7 @@ target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/powermgmt-ipod-pcf.c
+target/arm/ipod/video/lcd-as-video.S
 target/arm/ipod/video/lcd-video.c
 target/arm/usb-fw-pp502x.c
 #endif /* SIMULATOR */
