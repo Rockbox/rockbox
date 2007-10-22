@@ -107,7 +107,8 @@ PLUGIN_HEADER
 #define FLIPIT_STEP_BY_STEP BUTTON_VOL_DOWN
 #define FLIPIT_TOGGLE       BUTTON_SELECT
 
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_C200_PAD)
 
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
@@ -523,6 +524,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 28, "[PL-LEFT] shuffle");
     rb->lcd_putsxy(2, 38, "[PL-RIGHT] solution");
     rb->lcd_putsxy(2, 48, "[PL-UP] step by step");
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_C200_PAD)
+    rb->lcd_putsxy(2, 8, "[POWER] to stop");
+    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
+    rb->lcd_putsxy(2, 28, "[REC-LEFT] shuffle");
+    rb->lcd_putsxy(2, 38, "[REC-RIGHT] solution");
+    rb->lcd_putsxy(2, 48, "[REC-SEL] step by step");
 #endif
     rb->lcd_update();
 #else /* HAVE_LCD_CHARCELLS */

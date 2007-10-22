@@ -21,7 +21,6 @@ stopwatch.c
 vbrfix.c
 viewer.c
 
-
 #if CONFIG_CODEC == SWCODEC
 metronome.c
 #endif
@@ -36,16 +35,13 @@ wavrecord.c
 #ifndef IRIVER_IFP7XX_SERIES       /* Temporarily disable plugins for iFP7xx */
 dice.c
 disktidy.c
-#ifndef SANSA_C200
 flipit.c
-#endif
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
 maze.c
 mazezam.c
 text_editor.c
 wavview.c
-robotfindskitten.c
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
 fire.c

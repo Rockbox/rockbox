@@ -202,6 +202,9 @@ flipit_tokens.28x56x16.bmp
 #elif LCD_WIDTH >= 125 && LCD_HEIGHT >= 110
 flipit_cursor.25x25x16.bmp
 flipit_tokens.25x50x16.bmp
+#elif LCD_WIDTH >= 85 && LCD_HEIGHT >= 78
+flipit_cursor.17x17x16.bmp
+flipit_tokens.17x34x16.bmp
 #endif
 #elif LCD_DEPTH > 1 /* greyscale */
 #if LCD_WIDTH >= 140 && LCD_HEIGHT >= 122
