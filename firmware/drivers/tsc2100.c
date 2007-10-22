@@ -52,7 +52,7 @@ short tsc2100_readreg(int page, int address)
 
 void tsc2100_writereg(int page, int address, short value)
 {
-    unsigned short command = 0x8000|(page << 11)|(address << 5);
+    unsigned short command = 0x0800|(page << 11)|(address << 5);
     unsigned char out[4] = {command >> 8, command & 0xff,
                             value >> 8,   value & 0xff};
     spi_block_transfer(SPI_target_TSC2100, 
