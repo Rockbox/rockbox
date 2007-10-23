@@ -22,22 +22,58 @@ option and choose \setting{mpegplayer}.
 \end{btnmap}
 \end{table}
 
-The menu has the following entries.
+When a video file is selected, the start Menu will be displayed, unless it is 
+disabled via the option "start menu" (see below). In the latter case the video 
+will start playing immediately - unless a resume point is found, in which case 
+the resume menu is presented.
+
+Start Menu
 
 \begin{description}
-\item[Show FPS] This option displays (once a second - if your video is
-    full-screen this means it will get overwritten by the video and appear to
-    flash once per second) the average number of frames decoded per second,
-    the total number of frames skipped (see the Skip Frames option), the
-    current time (in 100Hz ticks) and the time the current frame is due to be
-    displayed.
-\item[Limit FPS] With this option disabled, mpegplayer will display the video
-    as fast as it can. Useful for benchmarking.
-\item[Skip frames] This option causes mpegplayer to attempt to maintain
-    realtime playback by skipping the display of frames - but these frames are
-    still decoded. Disabling this option can cause loss of A/V sync.
+\item[Play from beginning] Resume information is discarded and the video plays
+    from the start.
+\item[Resume time (min): x.x] Resume video playback at stored resume time x.x
+    (start of the video if no resume time is found).
+\item[Set start time (min)] A preview screen is presented consisting of a
+    thumbnail preview and a progress bar where the user can select a start time
+    by 'seeking' through the video. The video playback is started by pressing
+    the select button.
+\item[Quit mpegplayer] Exit the plugin.
+\end{description}
+
+Resume Menu
+
+\begin{description}
+\item[Yes (min): x.x] Resume video playback at stored resume time x.x.
+\item[No] Play video from the beginning.
+\end{description}
+
+Main Menu
+
+\begin{description}
+\item[Display Options] Opens "Display Options" submenu - see below.
+\item[Start Menu] (default: on) Enable/disable the start menu.
+\item[Clear all resumes: x] Discard all x resume points.
+\item[Quit mpegplayer] Exit the plugin.
+\end{description}
+
+Display Options Menu
+
+\begin{description}
+\item[Dithering] (default: off) Prevent banding effects in gradients by blending
+    of colours. (only available on Sansa e200, Sansa c200 and Gigabeat F/X)
+\item[Show FPS] (default: off) This option displays (once a second - if your
+    video is full-screen this means it will get overwritten by the video and
+    appear to flash once per second) the average number of frames decoded per
+    second, the total number of frames skipped (see the Skip Frames option),
+    the current time (in 100Hz ticks) and the time the current frame is due to
+    be displayed.
+\item[Limit FPS] (default: on) With this option disabled, mpegplayer will
+    display the video as fast as it can. Useful for benchmarking.
+\item[Skip frames] (default: on) This option causes mpegplayer to attempt to
+    maintain realtime playback by skipping the display of frames - but these
+    frames are still decoded. Disabling this option can cause loss of A/V sync. 
 \end{description}
 
 See this page in the Rockbox wiki for information on how to encode your videos
 to the supported format. \wikilink{PluginMpegplayer}
-
