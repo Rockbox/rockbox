@@ -102,6 +102,11 @@ PLUGIN_HEADER
 #define MOSAIQUE_SPEED BUTTON_FF
 #define MOSAIQUE_RESTART BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define MOSAIQUE_QUIT BUTTON_POWER
+#define MOSAIQUE_SPEED BUTTON_RC_FF
+#define MOSAIQUE_RESTART BUTTON_RC_PLAY
+
 #endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)

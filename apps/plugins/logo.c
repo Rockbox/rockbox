@@ -224,6 +224,14 @@ const unsigned char rockbox16x7[] = {
 #define LP_INC_X BUTTON_RIGHT
 #define LP_DEC_Y BUTTON_SCROLL_DOWN
 #define LP_INC_Y BUTTON_SCROLL_UP
+
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define LP_QUIT BUTTON_POWER
+#define LP_DEC_X BUTTON_LEFT
+#define LP_INC_X BUTTON_RIGHT
+#define LP_DEC_Y BUTTON_RC_DOWN
+#define LP_INC_Y BUTTON_RC_PLAY
+
 #else
 #define LP_QUIT BUTTON_OFF
 #define LP_DEC_X BUTTON_LEFT

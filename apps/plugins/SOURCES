@@ -1,4 +1,3 @@
-#ifndef OLYMPUS_MROBE_500
 /* plugins common to all models */
 battery_bench.c
 chessclock.c
@@ -20,6 +19,8 @@ stats.c
 stopwatch.c
 vbrfix.c
 viewer.c
+
+#ifndef OLYMPUS_MROBE_500
 
 #if CONFIG_CODEC == SWCODEC
 metronome.c

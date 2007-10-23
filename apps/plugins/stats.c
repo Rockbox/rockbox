@@ -60,6 +60,8 @@ static bool abort;
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define STATS_STOP BUTTON_POWER
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define STATS_STOP BUTTON_POWER
 #endif
 
 /* TODO: Better get the exts from the filetypes var in tree.c */

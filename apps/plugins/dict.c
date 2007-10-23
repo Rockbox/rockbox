@@ -119,6 +119,8 @@ long reverse (long N) {
 #define LP_QUIT BUTTON_POWER
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define LP_QUIT BUTTON_POWER
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define LP_QUIT BUTTON_POWER
 #else
 #define LP_QUIT BUTTON_OFF
 #endif
