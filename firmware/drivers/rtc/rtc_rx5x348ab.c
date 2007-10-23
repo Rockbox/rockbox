@@ -21,15 +21,32 @@
 #include "spi.h"
 #include "rtc.h"
 #include <stdbool.h>
-
+/* Choose one of: */
+#define ADDR_READ       0x04
+#define ADDR_WRITE      0x00
+/* and one of: */
+#define ADDR_ONE        0x08
+#define ADDR_BURST      0x00
 void rtc_init(void)
 {
 }
-
+    
 int rtc_read_datetime(unsigned char* buf)
 {
-    char command = 0x04; /* burst read from the start of the time/date reg */
+    char command = ADDR_READ|ADDR_BURST; /* burst read from the start of the time/date reg */
     spi_block_transfer(SPI_target_RX5X348AB,
                        &command, 1, buf, 7);
+    return 1;
+}
+int rtc_write_datetime(unsigned char* buf)
+{
+    char command = ADDR_WRITE|ADDR_BURST; /* burst read from the start of the time/date reg */
+    char data[8];
+    int i;
+    data[0] = command;
+    for (i=1;i<8;i++)
+        data[i] = buf[i-1];
+    spi_block_transfer(SPI_target_RX5X348AB,
+                       data, 8, NULL, 0);
     return 1;
 }

@@ -84,7 +84,7 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-//#define CONFIG_RTC RTC_RX5X348AB
+#define CONFIG_RTC RTC_RX5X348AB
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT

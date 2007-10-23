@@ -92,9 +92,8 @@ int spi_block_transfer(enum SPI_target target,
 void spi_init(void)
 {
     spinlock_init(&spi_lock);
-    /* Set SCLK idle level = 0 */
-    IO_SERIAL0_MODE |= (1<<10);
-    
+    /* Set SCLK idle level = 1 */
+    IO_SERIAL0_MODE &= ~(1<<10);
     /* Enable TX */
     IO_SERIAL0_TX_ENABLE = 0x0001;
 
