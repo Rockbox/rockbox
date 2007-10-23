@@ -918,6 +918,8 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * lists)
     short x,y;
     unsigned button = action_get_touchpad_press(&x, &y);
     int line;
+    if (button == BUTTON_NONE)
+        return ACTION_NONE;
     if (x<SCROLLBAR_WIDTH)
     {
         /* top left corner is hopefully GO_TO_ROOT */
@@ -956,7 +958,16 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * lists)
     else
     {
         if (button != BUTTON_REL && button != BUTTON_REPEAT)
-            return ACTION_NONE;
+        {
+            if (global_settings.statusbar)
+                y -= STATUSBAR_HEIGHT;
+            if (SHOW_LIST_TITLE)
+                y -= gui_list->display->char_height;
+            line = y / gui_list->display->char_height;
+            if (line != gui_list->selected_item - gui_list->start_item)
+                gui_synclist_select_item(lists, gui_list->start_item+line);
+            return ACTION_REDRAW;
+        }
         /* title or statusbar is cancel */
         if (global_settings.statusbar)
         {

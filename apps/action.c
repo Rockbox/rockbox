@@ -301,6 +301,6 @@ int action_get_touchpad_press(short *x, short *y)
         return BUTTON_REPEAT;
     if (short_press)
         return BUTTON_REL;
-    return BUTTON_NONE;
+    return BUTTON_TOUCHPAD;
 }
 #endif

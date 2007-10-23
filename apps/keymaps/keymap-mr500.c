@@ -86,6 +86,12 @@ static const struct button_mapping button_context_listtree_scroll_without_combo[
 };
 
 static const struct button_mapping button_context_settings[]  = {
+    { ACTION_SETTINGS_INC,          BUTTON_RC_VOL_UP,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,    BUTTON_RC_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_RC_VOL_DOWN,                BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,    BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_OK,                BUTTON_RC_HEART,               BUTTON_NONE },
+    { ACTION_STD_CANCEL,            BUTTON_RC_MODE,                BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
