@@ -89,7 +89,7 @@ PLUGIN_IRAM_DECLARE
 
 struct MIDIfile * mf IBSS_ATTR;
 
-int numberOfSamples IBSS_ATTR;
+int numberOfSamples IBSS_ATTR; /* the number of samples in the current tick */
 long bpm IBSS_ATTR;
 
 int32_t gmbuf[BUF_SIZE*NBUF];
@@ -150,7 +150,7 @@ bool lastswap=1;
 static inline void synthbuf(void)
 {
     int32_t *outptr;
-    int i;
+    int i=BUF_SIZE;
 
 #ifndef SYNC
     if(lastswap==swap) return;
@@ -162,7 +162,7 @@ static inline void synthbuf(void)
 #endif
 
     /* synth samples for as many whole ticks as we can fit in the buffer */
-    for(i=0; i < BUF_SIZE/numberOfSamples; i++)
+    for(; i >= numberOfSamples; i -= numberOfSamples)
     {
         synthSamples((int32_t*)outptr, numberOfSamples);
         outptr += numberOfSamples;
@@ -171,7 +171,7 @@ static inline void synthbuf(void)
     }
 
     /* how many samples did we write to the buffer? */
-    samples_in_buf = BUF_SIZE-(BUF_SIZE%numberOfSamples);
+    samples_in_buf = BUF_SIZE-i;
 
 }
 
