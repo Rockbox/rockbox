@@ -303,7 +303,8 @@ static bool show_info(void)
     simplelist_info_init(&info, str(LANG_ROCKBOX_INFO), 6, (void*)&data);
     info.hide_selection = !global_settings.talk_menu;
     info.get_name = info_getname;
-    info.get_talk = info_speak_item;
+    if(global_settings.talk_menu)
+         info.get_talk = info_speak_item;
     info.action_callback = info_action_callback;
     return simplelist_show_list(&info);
 }

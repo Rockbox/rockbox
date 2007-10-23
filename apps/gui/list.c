@@ -1266,15 +1266,14 @@ bool simplelist_show_list(struct simplelist_info *info)
     
     gui_synclist_select_item(&lists, info->start_selection);
     
-    if (info->get_talk)
-        info->get_talk(gui_synclist_get_sel_pos(&lists), info->callback_data);
     gui_synclist_draw(&lists);
+    gui_synclist_speak_item(&lists);
 
     while(1)
     {
         gui_syncstatusbar_draw(&statusbars, true);
-        action = get_action(CONTEXT_STD, info->timeout); 
-        if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
+        if (list_do_action(CONTEXT_STD, info->timeout,
+                           &lists, &action, LIST_WRAP_UNLESS_HELD))
             continue;
         if (info->action_callback)
         {
@@ -1289,12 +1288,14 @@ bool simplelist_show_list(struct simplelist_info *info)
             if (info->get_name == NULL)
                 gui_synclist_set_nb_items(&lists, simplelist_line_count*info->selection_size);
             gui_synclist_draw(&lists);
+            gui_synclist_speak_item(&lists);
             old_line_count = simplelist_line_count;
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
         
     }
+    talk_shutup();
     return false;
 }
 
