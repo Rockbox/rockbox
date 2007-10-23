@@ -17,6 +17,14 @@
  *
  ****************************************************************************/
 
+#define CACHE_ALL (1 << 3 | 1 << 2 )
+#define CACHE_NONE 0
+#define BUFFERED (1 << 2)
+
+void ttb_init(void);
+void enable_mmu(void);
+void map_section(unsigned int pa, unsigned int va, int mb, int cache_flags);
+
 /* Invalidate DCache for this range  */
 /* Will do write back */
 void invalidate_dcache_range(const void *base, unsigned int size);

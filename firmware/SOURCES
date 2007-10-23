@@ -576,6 +576,7 @@ target/arm/usb-fw-pp502x.c
 #ifdef GIGABEAT_F
 #ifndef SIMULATOR
 target/arm/lcd-as-memframe.S
+target/arm/mmu-arm.c
 target/arm/s3c2440/gigabeat-fx/adc-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/backlight-meg-fx.c
@@ -591,7 +592,6 @@ target/arm/s3c2440/gigabeat-fx/usb-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/dma_start.c
 target/arm/s3c2440/gigabeat-fx/system-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/mmu-meg-fx.c
 #ifndef BOOTLOADER
 target/arm/s3c2440/gigabeat-fx/pcm-meg-fx.c
 #endif
@@ -626,6 +626,7 @@ target/arm/imx31/gigabeat-s/pcm-imx31.c
 #ifdef MROBE_500
 #ifndef SIMULATOR
 target/arm/lcd-as-memframe.S
+target/arm/mmu-arm.c
 target/arm/tms320dm320/mrobe-500/adc-mr500.c
 target/arm/tms320dm320/mrobe-500/ata-mr500.c
 target/arm/tms320dm320/mrobe-500/backlight-mr500.c
@@ -645,9 +646,6 @@ target/arm/tms320dm320/spi-dm320.c
 target/arm/tms320dm320/system-dm320.c
 target/arm/tms320dm320/timer-dm320.c
 target/arm/tms320dm320/uart-dm320.c
-#ifndef BOOTLOADER
-
-#endif
 #endif /* SIMULATOR */
 #endif /* MROBE_500 */
 

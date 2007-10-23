@@ -82,7 +82,6 @@ void lcd_init_device(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     fb_data *dst, *src;
-    int yc;
 
     if (!lcd_on)
         return;

@@ -19,8 +19,8 @@
 #ifndef SYSTEM_TARGET_H
 #define SYSTEM_TARGET_H
 
-#include "mmu-meg-fx.h"
 #include "system-arm.h"
+#include "mmu-arm.h"
 
 #define CPUFREQ_DEFAULT 98784000
 #define CPUFREQ_NORMAL  98784000

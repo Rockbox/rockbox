@@ -229,7 +229,7 @@
 #define TTB_SIZE (0x4000)
 /*#define FRAME   ( (short *) 0x31E00000  ) */ /* LCD Frame buffer - Firmware Address */
 /* must be 16Kb (0x4000) aligned */
-#define TTB_BASE   (0x30000000 + (32*1024*1024) - TTB_SIZE) /* End of memory */
+#define TTB_BASE   ((unsigned int *)(0x30000000 + (32*1024*1024) - TTB_SIZE)) /* End of memory */
 #define FRAME   ((short *) (TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
 /* NAND Flash */
 

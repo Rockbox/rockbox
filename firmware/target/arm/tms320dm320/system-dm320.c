@@ -16,7 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+#include "cpu.h"
+#include "mmu-arm.h"
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
@@ -25,6 +26,9 @@
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
+
+void irq_handler(void) __attribute__((interrupt ("IRQ"), naked));
+void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked));
 
 default_interrupt(TIMER0);
 default_interrupt(TIMER1);
@@ -101,7 +105,6 @@ static void UIRQ(void)
     panicf("Unhandled IRQ %02X: %s", offset, irqname[offset]);
 }
 
-void irq_handler(void) __attribute__((interrupt ("IRQ"), naked));
 void irq_handler(void)
 {
     /*
@@ -116,7 +119,6 @@ void irq_handler(void)
                     "subs  pc, lr, #4           \n"); /* Return from FIQ */
 }
 
-void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked));
 void fiq_handler(void)
 {
     /*
@@ -179,6 +181,13 @@ void system_init(void)
     enable_interrupts();
     uart_init();
     spi_init();
+ 
+    /* MMU initialization (Starts data and instruction cache) */   
+    ttb_init();
+    map_section(0, 0, 0x1000, CACHE_NONE); /* Make sure everything is mapped on itself */
+    map_section(0x00900000, 0x00900000, 64, CACHE_ALL); /* Enable caching for RAM */
+    map_section((int)FRAME, (int)FRAME, 2, BUFFERED); /* enable buffered writing for the framebuffer */
+    enable_mmu();
 }
 
 int system_memory_guard(int newmode)

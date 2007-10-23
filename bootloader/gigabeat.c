@@ -41,7 +41,7 @@
 #include "common.h"
 #include "rbunicode.h"
 #include "usb.h"
-#include "mmu-meg-fx.h"
+#include "mmu-arm.h"
 
 #include <stdarg.h>
 

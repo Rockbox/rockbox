@@ -1,7 +1,8 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
-#include "mmu-meg-fx.h"
+#include "mmu-arm.h"
+#include "cpu.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -88,6 +89,19 @@ void system_reboot(void)
     WTCON = 0x21;
     for(;;)
         ;
+}
+
+static void set_page_tables(void)
+{
+    map_section(0, 0, 0x1000, CACHE_NONE); /* map every memory region to itself */
+    map_section(0x30000000, 0, 32, CACHE_ALL); /* map RAM to 0 and enable caching for it */
+    map_section((int)FRAME, (int)FRAME, 1, BUFFERED); /* enable buffered writing for the framebuffer */
+}
+
+void memory_init(void) {
+    ttb_init();
+    set_page_tables();
+    enable_mmu();
 }
 
 void system_init(void)

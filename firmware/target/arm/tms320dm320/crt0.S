@@ -48,14 +48,19 @@ start:
     str    r0, [r1, #28]
 #endif
 
-    /* Disable high vectors (at 0xffff0000 instead of 0x00000000) */
-    mrc    p15, 0, r0, c1, c0
-    and    r0, r0, #~(1<<13)
-    mcr    p15, 0, r0, c1, c0
+    /* Disable data and instruction cache, high vectors (at 0xffff0000 instead of 0x00000000) */
+	mrc	p15, 0, r0, c1, c0, 0
+	/* clear bits 13, 9:8 (--VI --RS) */
+	bic	r0, r0, #0x00003300
+	/* clear bits 7, 2:0 (B--- -C-M) */
+	bic	r0, r0, #0x00000085
+	/* make sure bit 2 (A) Align is set */
+	orr	r0, r0, #0x00000002
+	mcr	p15, 0, r0, c1, c0, 0
 
 #if !defined(BOOTLOADER)
 
-#if 0//!defined(STUB)
+#if !defined(STUB)
     /* Zero out IBSS */
     ldr    r2, =_iedata
     ldr    r3, =_iend
@@ -64,8 +69,7 @@ start:
     cmp    r3, r2
     strhi  r4, [r2], #4
     bhi    1b
-#endif
-#if 1
+
     /* Copy the IRAM */
     ldr    r2, =_iramcopy
     ldr    r3, =_iramstart

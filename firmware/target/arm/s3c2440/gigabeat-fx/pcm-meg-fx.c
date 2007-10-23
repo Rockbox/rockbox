@@ -23,7 +23,6 @@
 #include "audio.h"
 #include "sound.h"
 #include "file.h"
-#include "mmu-meg-fx.h"
 
 /* All exact rates for 16.9344MHz clock */
 #define GIGABEAT_11025HZ     (0x19 << 1)
