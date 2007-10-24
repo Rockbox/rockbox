@@ -31,6 +31,7 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
     .text
 /* void iir_mem16(const spx_word16_t *x, const spx_coef_t *den, spx_word16_t *y, int N, int ord, spx_mem_t *mem, char *stack) */
     .global iir_mem16
@@ -70,8 +71,8 @@ iir_mem16:
     move.l   %a6, %d0           | Clip high
 2:
     sub.l    %d1, %d0           | Bias clipped result back to [-32767..32767]
-    neg.l    %d0                | msac.w is bugged in gas, do this for now
     move.w   %d0, (%a5)+        | Write result to y[i]
+    neg.l    %d0                | msac.w is bugged in gas, do this for now
     move.l   (%a4)+, %a6        | Fetch den[0] and den[1]
     mac.w    %a6u, %d0l, %acc0
     mac.w    %a6l, %d0l, (%a4)+, %a6, %acc1
@@ -126,8 +127,8 @@ iir_mem16:
     move.l   %a6, %d0           | Clip high
 2:
     sub.l    %d1, %d0           | Bias clipped result back to [-32767..32767]
-    neg.l    %d0                | msac.w is bugged in gas, do this for now
     move.w   %d0, (%a5)+        | Write result to y[i]
+    neg.l    %d0                | msac.w is bugged in gas, do this for now
     move.l   (%a4)+, %a6        | Fetch den[0] and den[1]
     mac.w    %a6u, %d0l, %acc0
     mac.w    %a6l, %d0l, (%a4)+, %a6, %acc1
