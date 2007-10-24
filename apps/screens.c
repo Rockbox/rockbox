@@ -819,8 +819,8 @@ const int monthname[] = {
 /* little helper function for voice output */
 static void say_time(int cursorpos, const struct tm *tm)
 {
-    static const int unit[] = { UNIT_HOUR, UNIT_MIN, UNIT_SEC, 0, 0, 0 };
     int value = 0;
+    int unit = 0;
 
     if (!global_settings.talk_menu)
         return;
@@ -829,12 +829,15 @@ static void say_time(int cursorpos, const struct tm *tm)
     {
     case 0:
         value = tm->tm_hour;
+        unit = UNIT_HOUR;
         break;
     case 1:
         value = tm->tm_min;
+        unit = UNIT_MIN;
         break;
     case 2:
         value = tm->tm_sec;
+        unit = UNIT_SEC;
         break;
     case 3:
         value = tm->tm_year + 1900;
@@ -847,7 +850,7 @@ static void say_time(int cursorpos, const struct tm *tm)
     if (cursorpos == 4) /* month */
         talk_id(LANG_MONTH_JANUARY + tm->tm_mon, false);
     else
-        talk_value(value, unit[cursorpos], false);
+        talk_value(value, unit, false);
 }
 
 
