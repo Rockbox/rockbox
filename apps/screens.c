@@ -791,9 +791,6 @@ void charging_splash(void)
 
 #if defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0)
 
-extern const int dayname[];
-extern const int monthname[];
-
 /* little helper function for voice output */
 static void say_time(int cursorpos, const struct tm *tm)
 {
@@ -870,7 +867,7 @@ bool set_time_screen(const char* title, struct tm *tm)
         ptr[1] = buffer + 3;                 /* minutes */
         ptr[2] = buffer + 6;                 /* seconds */
         ptr[3] = buffer + 9;                 /* year */
-        ptr[4] = str(monthname[tm->tm_mon]); /* monthname */
+        ptr[4] = str(LANG_MONTH_JANUARY + tm->tm_mon); /* monthname */
         ptr[5] = buffer + 14;                /* day of month */
 
         /* calculate the number of days in febuary */
@@ -949,7 +946,7 @@ bool set_time_screen(const char* title, struct tm *tm)
             cursor[2][INDEX_Y] = prev_line_height + statusbar_height;
 
             /* weekday */
-            screens[s].getstringsize(str(dayname[tm->tm_wday]), &weekday_width, NULL);
+            screens[s].getstringsize(str(LANG_WEEKDAY_SUNDAY + tm->tm_wday), &weekday_width, NULL);
             screens[s].getstringsize(" ", &separator_width, NULL);
 
             /* year */
@@ -974,7 +971,7 @@ bool set_time_screen(const char* title, struct tm *tm)
             screens[s].puts_scroll(0, 0, title);
 
             /* these are not selectable, so we draw them outside the loop */
-            screens[s].putsxy(0, cursor[3][INDEX_Y], str(dayname[tm->tm_wday])); /* name of the week day */
+            screens[s].putsxy(0, cursor[3][INDEX_Y], str(LANG_WEEKDAY_SUNDAY + tm->tm_wday)); /* name of the week day */
             screens[s].putsxy(cursor[1][INDEX_X] - separator_width, 
                               cursor[0][INDEX_Y], SEPARATOR);
             screens[s].putsxy(cursor[2][INDEX_X] - separator_width,

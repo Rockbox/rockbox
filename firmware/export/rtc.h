@@ -25,10 +25,6 @@
 
 #if CONFIG_RTC
 
-extern const int dayname[];
-
-extern const int monthname[];
-
 /* Common functions for all targets */
 void rtc_init(void);
 int rtc_read_datetime(unsigned char* buf);

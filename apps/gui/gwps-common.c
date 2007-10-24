@@ -1160,12 +1160,12 @@ static char *get_token_value(struct gui_wps *gwps,
 
         case WPS_TOKEN_RTC_WEEKDAY_NAME:
             /* a: abbreviated weekday name (Sun..Sat) */
-            snprintf(buf, buf_size, "%s",str(dayname[tm->tm_wday]));
+            snprintf(buf, buf_size, "%s",str(LANG_WEEKDAY_SUNDAY + tm->tm_wday));
             return buf;
 
         case WPS_TOKEN_RTC_MONTH_NAME:
             /* b: abbreviated month name (Jan..Dec) */
-            snprintf(buf, buf_size, "%s",str(monthname[tm->tm_mon]));
+            snprintf(buf, buf_size, "%s",str(LANG_MONTH_JANUARY + tm->tm_mon));
             return buf;
 
         case WPS_TOKEN_RTC_DAY_OF_WEEK_START_MON:

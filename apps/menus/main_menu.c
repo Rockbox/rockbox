@@ -131,11 +131,9 @@ struct info_data
 enum infoscreenorder 
 {
     INFO_VERSION = 0,
-    INFO_GAP1,
 #if CONFIG_RTC
     INFO_TIME,
     INFO_DATE,
-    INFO_GAP2,
 #endif
     INFO_BUFFER,
     INFO_BATTERY,
@@ -143,34 +141,7 @@ enum infoscreenorder
     INFO_DISK2, /* free space or external capacity/free on hotswap */
     INFO_COUNT
 };
-#if CONFIG_RTC
-const int dayname[] =
-{
-    LANG_WEEKDAY_SUNDAY,
-    LANG_WEEKDAY_MONDAY,
-    LANG_WEEKDAY_TUESDAY,
-    LANG_WEEKDAY_WEDNESDAY,
-    LANG_WEEKDAY_THURSDAY,
-    LANG_WEEKDAY_FRIDAY,
-    LANG_WEEKDAY_SATURDAY
-};
 
-const int monthname[] =
-{
-    LANG_MONTH_JANUARY,
-    LANG_MONTH_FEBRUARY,
-    LANG_MONTH_MARCH,
-    LANG_MONTH_APRIL,
-    LANG_MONTH_MAY,
-    LANG_MONTH_JUNE,
-    LANG_MONTH_JULY,
-    LANG_MONTH_AUGUST,
-    LANG_MONTH_SEPTEMBER,
-    LANG_MONTH_OCTOBER,
-    LANG_MONTH_NOVEMBER,
-    LANG_MONTH_DECEMBER
-};
-#endif
 static char* info_getname(int selected_item, void *data, char *buffer)
 {
     struct info_data *info = (struct info_data*)data;
@@ -204,11 +175,6 @@ static char* info_getname(int selected_item, void *data, char *buffer)
             snprintf(buffer, MAX_PATH, "%s: %s", 
                      str(LANG_VERSION), appsversion);
             break;
-        case INFO_GAP1:
-#if CONFIG_RTC
-        case INFO_GAP2:
-#endif
-            return "";
 #if CONFIG_RTC
         case INFO_TIME:
             tm = get_time();
@@ -220,11 +186,10 @@ static char* info_getname(int selected_item, void *data, char *buffer)
             break;
         case INFO_DATE:
             tm = get_time();
-            snprintf(buffer, MAX_PATH, "%s %d %s %d", 
-                str(dayname[tm->tm_wday]),
-                tm->tm_year+1900, 
-                str(monthname[tm->tm_mon]),
-                tm->tm_mday);
+            snprintf(buffer, MAX_PATH, "%s %d %d", 
+                str(LANG_MONTH_JANUARY + tm->tm_mon),
+                tm->tm_mday,
+                tm->tm_year+1900);
             break;
 #endif
         case INFO_BUFFER: /* buffer */
@@ -380,28 +345,10 @@ static int info_action_callback(int action, struct gui_synclist *lists)
         if (fat_ismounted(1))
             fat_recalc_free(1);
 #endif
+#else
+        (void) lists;
 #endif
         return ACTION_REDRAW;
-    }
-    else if (lists->gui_list[SCREEN_MAIN].show_selection_marker == true)
-    {
-        if (lists->gui_list[SCREEN_MAIN].selected_item == INFO_GAP1
-#if CONFIG_RTC
-            || lists->gui_list[SCREEN_MAIN].selected_item == INFO_GAP2
-#endif
-            )
-        {
-            if (action == ACTION_STD_PREV)
-            {
-                gui_synclist_select_item(lists, lists->gui_list[SCREEN_MAIN].selected_item-1);
-                return ACTION_REDRAW;
-            }
-            else if (action == ACTION_STD_NEXT)
-            {
-                gui_synclist_select_item(lists, lists->gui_list[SCREEN_MAIN].selected_item+1);
-                return ACTION_REDRAW;
-            }
-        }
     }
     return action;
 }
