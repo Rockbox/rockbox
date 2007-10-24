@@ -6880,7 +6880,7 @@
     player: "Buf: %d.%03dMB"
   </dest>
   <voice>
-    *: ""
+    *: "Buffer size"
   </voice>
 </phrase>
 <phrase>
@@ -6912,7 +6912,7 @@
     *: "Disk:"
   </dest>
   <voice>
-    *: ""
+    *: "Disk size"
   </voice>
 </phrase>
 <phrase>

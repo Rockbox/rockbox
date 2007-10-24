@@ -1283,9 +1283,8 @@ bool simplelist_show_list(struct simplelist_info *info)
     while(1)
     {
         gui_syncstatusbar_draw(&statusbars, true);
-        if (list_do_action(CONTEXT_STD, info->timeout,
-                           &lists, &action, LIST_WRAP_UNLESS_HELD))
-            continue;
+        list_do_action(CONTEXT_STD, info->timeout,
+                       &lists, &action, LIST_WRAP_UNLESS_HELD);
         if (info->action_callback)
         {
             action = info->action_callback(action, &lists);

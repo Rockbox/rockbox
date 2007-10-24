@@ -80,9 +80,11 @@ void talk_shutup(void); /* Interrupt voice, as when enqueue is false */
 #if CONFIG_RTC
 /* this is in talk.c which isnt compiled for hwcodec simulator */
 #if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
-void talk_date_time(struct tm *time, bool speak_current_time_string);
+void talk_time(struct tm *tm, bool enqueue);
+void talk_date(struct tm *tm, bool enqueue);
 #else
-#define talk_date_time(t, s)
+#define talk_date(t, e)
+#define talk_time(t, e)
 #endif
 #endif /* CONFIG_RTC */
 

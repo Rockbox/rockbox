@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½rn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -791,30 +791,8 @@ void charging_splash(void)
 
 #if defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0)
 
-const int dayname[] = {
-    LANG_WEEKDAY_SUNDAY,
-    LANG_WEEKDAY_MONDAY,
-    LANG_WEEKDAY_TUESDAY,
-    LANG_WEEKDAY_WEDNESDAY,
-    LANG_WEEKDAY_THURSDAY,
-    LANG_WEEKDAY_FRIDAY,
-    LANG_WEEKDAY_SATURDAY
-};
-
-const int monthname[] = {
-    LANG_MONTH_JANUARY,
-    LANG_MONTH_FEBRUARY,
-    LANG_MONTH_MARCH,
-    LANG_MONTH_APRIL,
-    LANG_MONTH_MAY,
-    LANG_MONTH_JUNE,
-    LANG_MONTH_JULY,
-    LANG_MONTH_AUGUST,
-    LANG_MONTH_SEPTEMBER,
-    LANG_MONTH_OCTOBER,
-    LANG_MONTH_NOVEMBER,
-    LANG_MONTH_DECEMBER
-};
+extern const int dayname[];
+extern const int monthname[];
 
 /* little helper function for voice output */
 static void say_time(int cursorpos, const struct tm *tm)
