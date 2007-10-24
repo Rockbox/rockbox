@@ -50,6 +50,8 @@
 #include "ltp_sse.h"
 #elif defined (ARM4_ASM) || defined(ARM5E_ASM)
 #include "ltp_arm4.h"
+#elif defined (COLDFIRE_ASM)
+#define OVERRIDE_INNER_PROD
 #elif defined (BFIN_ASM)
 #include "ltp_bfin.h"
 #endif

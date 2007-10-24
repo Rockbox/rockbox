@@ -44,4 +44,5 @@ vq.c
 window.c
 #ifdef CPU_COLDFIRE
 filters_cf.S
+ltp_cf.S
 #endif
