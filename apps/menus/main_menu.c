@@ -119,7 +119,8 @@ static bool show_credits(void)
 #else
 #define SIZE_FMT "%s %s"
 #endif
-struct info_data {
+struct info_data 
+{
     bool new_data;
     unsigned long size;
     unsigned long free;
@@ -128,19 +129,20 @@ struct info_data {
     unsigned long free2;
 #endif
 };
-enum InfoScreenOrder {
-    Order_SVN_revision = 0,
-    Order_GAP1,
+enum infoscreenorder 
+{
+    INFO_VERSION = 0,
+    INFO_GAP1,
 #if CONFIG_RTC
-    Order_Time,
-    Order_Date,
-    Order_GAP2,
+    INFO_TIME,
+    INFO_DATE,
+    INFO_GAP2,
 #endif
-    Order_Buffer,
-    Order_Batt,
-    Order_Disk1, /* capacity or internal capacity/free on hotswap */
-    Order_Disk2,/* free space or external capacity/free on hotswap */
-    Order_Count
+    INFO_BUFFER,
+    INFO_BATTERY,
+    INFO_DISK1, /* capacity or internal capacity/free on hotswap */
+    INFO_DISK2, /* free space or external capacity/free on hotswap */
+    INFO_COUNT
 };
 #if CONFIG_RTC
 const int dayname[] = {
@@ -196,17 +198,17 @@ static char* info_getname(int selected_item, void * data, char *buffer)
     }
     switch (selected_item)
     {
-        case Order_SVN_revision:
+        case INFO_VERSION:
             snprintf(buffer, MAX_PATH, "%s: %s", 
                      str(LANG_VERSION), appsversion);
             break;
-        case Order_GAP1:
+        case INFO_GAP1:
 #if CONFIG_RTC
-        case Order_GAP2:
+        case INFO_GAP2:
 #endif
             return "";
 #if CONFIG_RTC
-        case Order_Time:
+        case INFO_TIME:
             tm = get_time();
             snprintf(buffer, MAX_PATH, "%02d:%02d:%02d %s", 
                                         global_settings.timeformat == 0
@@ -215,7 +217,7 @@ static char* info_getname(int selected_item, void * data, char *buffer)
                                         global_settings.timeformat == 0
                                             ?"":tm->tm_hour>11?"P":"A");
             break;
-        case Order_Date:
+        case INFO_DATE:
             tm = get_time();
             snprintf(buffer, MAX_PATH, "%s %d %s %d", str(dayname[tm->tm_wday]),
                                                       tm->tm_year+1900, 
@@ -223,7 +225,7 @@ static char* info_getname(int selected_item, void * data, char *buffer)
                                                       tm->tm_mday);
             break;
 #endif
-        case Order_Buffer: /* buffer */
+        case INFO_BUFFER: /* buffer */
         {
             long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
             int integer = buflen / 1000;
@@ -233,7 +235,7 @@ static char* info_getname(int selected_item, void * data, char *buffer)
                      integer, decimal);
         }
         break;
-        case Order_Batt: /* battery */
+        case INFO_BATTERY: /* battery */
 #if CONFIG_CHARGING == CHARGING_CONTROL
             if (charge_state == CHARGING)
                 snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_CHARGE));
@@ -249,7 +251,7 @@ static char* info_getname(int selected_item, void * data, char *buffer)
             else
                 strcpy(buffer, "(n/a)");
             break;
-        case Order_Disk1: /* disc usage 1 */
+        case INFO_DISK1: /* disc usage 1 */
 #ifdef HAVE_MULTIVOLUME
             output_dyn_value(s1, sizeof s1, info->free, kbyte_units, true);
             output_dyn_value(s2, sizeof s2, info->size, kbyte_units, true);
@@ -260,7 +262,7 @@ static char* info_getname(int selected_item, void * data, char *buffer)
             snprintf(buffer, MAX_PATH, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
             break;
-        case Order_Disk2: /* disc usage 2 */
+        case INFO_DISK2: /* disc usage 2 */
 #ifdef HAVE_MULTIVOLUME
             if (info->size2)
             {
@@ -289,27 +291,27 @@ static int info_speak_item(int selected_item, void * data)
     };
     switch (selected_item)
     {
-        case Order_SVN_revision: /* version */
+        case INFO_VERSION: /* version */
             talk_id(LANG_VERSION, false);
             talk_spell(appsversion, true);
             break;
 #if CONFIG_RTC
-        case Order_Time: 
+        case INFO_TIME: 
             talk_id(LANG_CURRENT_TIME, false);
             talk_time(get_time(), true);
             break;
-        case Order_Date:
+        case INFO_DATE:
             talk_date(get_time(), true);
             break;
 #endif
-        case Order_Buffer: /* buffer, not spoken */
+        case INFO_BUFFER: /* buffer */
         {
             talk_id(LANG_BUFFER_STAT, false);
             long buflen = (audiobufend - audiobuf) / 1024L;
             output_dyn_value(NULL, 0, buflen, kbyte_units, true);
             break;
         }
-        case Order_Batt: /* battery */
+        case INFO_BATTERY: /* battery */
             if (battery_level() >= 0)
             {
                 talk_id(LANG_BATTERY_TIME, false);
@@ -330,7 +332,7 @@ static int info_speak_item(int selected_item, void * data)
 #endif
             }
             break;
-        case Order_Disk1: /* disk 1 */
+        case INFO_DISK1: /* disk 1 */
 #ifdef HAVE_MULTIVOLUME
             talk_id(LANG_DISK_FREE_INFO, false);
             talk_id(LANG_DISK_NAME_INTERNAL, true);
@@ -340,7 +342,7 @@ static int info_speak_item(int selected_item, void * data)
             output_dyn_value(NULL, 0, info->size, kbyte_units, true);
 #endif
             break;
-        case Order_Disk2: /* disk 2 */
+        case INFO_DISK2: /* disk 2 */
 #ifdef HAVE_MULTIVOLUME
             if (info->size2)
             {
@@ -382,9 +384,9 @@ static int info_action_callback(int action, struct gui_synclist *lists)
     }
     else if (lists->gui_list[SCREEN_MAIN].show_selection_marker == true)
     {
-        if (lists->gui_list[SCREEN_MAIN].selected_item == Order_GAP1
+        if (lists->gui_list[SCREEN_MAIN].selected_item == INFO_GAP1
 #if CONFIG_RTC
-            || lists->gui_list[SCREEN_MAIN].selected_item == Order_GAP2
+            || lists->gui_list[SCREEN_MAIN].selected_item == INFO_GAP2
 #endif
             )
         {
@@ -406,7 +408,7 @@ static bool show_info(void)
 {
     struct info_data data = {.new_data = true };
     struct simplelist_info info;
-    simplelist_info_init(&info, str(LANG_ROCKBOX_INFO), Order_Count, (void*)&data);
+    simplelist_info_init(&info, str(LANG_ROCKBOX_INFO), INFO_COUNT, (void*)&data);
     info.hide_selection = !global_settings.talk_menu;
     info.get_name = info_getname;
     if(global_settings.talk_menu)
