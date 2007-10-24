@@ -47,6 +47,7 @@
 #include "filters_arm4.h"
 #elif defined (COLDFIRE_ASM)
 #define OVERRIDE_IIR_MEM16
+#define OVERRIDE_QMF_SYNTH
 #elif defined (BFIN_ASM)
 #include "filters_bfin.h"
 #endif
@@ -475,6 +476,7 @@ void qmf_decomp(const spx_word16_t *xx, const spx_word16_t *aa, spx_word16_t *y1
    }
 }
 
+#ifndef OVERRIDE_QMF_SYNTH
 /* Re-synthesised a signal from the QMF low-band and high-band signals */
 void qmf_synth(const spx_word16_t *x1, const spx_word16_t *x2, const spx_word16_t *a, spx_word16_t *y, int N, int M, spx_word32_t *mem1, spx_word32_t *mem2, char *stack)
    /* assumptions:
@@ -566,6 +568,7 @@ void qmf_synth(const spx_word16_t *x1, const spx_word16_t *x2, const spx_word16_
    for (i = 0; i < M2; i++)
       mem2[2*i+1] = xx2[i];
 }
+#endif
 
 #ifdef FIXED_POINT
 #if 0
