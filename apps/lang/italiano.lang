@@ -3998,7 +3998,7 @@
     *: "Disco:"
   </dest>
   <voice>
-    *: ""
+    *: "Dimensione disco"
   </voice>
 </phrase>
 <phrase>
@@ -10468,7 +10468,7 @@
     player: "Buf: %d.%03dMB"
   </dest>
   <voice>
-    *: ""
+    *: "Dimensione buffer"
   </voice>
 </phrase>
 <phrase>
