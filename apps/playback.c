@@ -46,7 +46,6 @@
 #include "settings.h"
 #include "codecs.h"
 #include "audio.h"
-#include "logf.h"
 #include "mp3_playback.h"
 #include "usb.h"
 #include "status.h"
@@ -98,13 +97,17 @@
  * for their correct seeek target, 32k seems a good size */
 #define AUDIO_REBUFFER_GUESS_SIZE    (1024*32)
 
+/* Define LOGF_ENABLE to enable logf output in this file */
+/*#define LOGF_ENABLE*/
+#include "logf.h"
+
 /* macros to enable logf for queues
    logging on SYS_TIMEOUT can be disabled */
 #ifdef SIMULATOR
 /* Define this for logf output of all queuing except SYS_TIMEOUT */
 #define PLAYBACK_LOGQUEUES
 /* Define this to logf SYS_TIMEOUT messages */
-#define PLAYBACK_LOGQUEUES_SYS_TIMEOUT
+/*#define PLAYBACK_LOGQUEUES_SYS_TIMEOUT*/
 #endif
 
 #ifdef PLAYBACK_LOGQUEUES
@@ -3556,7 +3559,7 @@ static void audio_reset_buffer(void)
     /* Clear any references to the file buffer */
     buffer_state = BUFFER_STATE_INITIALIZED;
 
-#ifdef ROCKBOX_HAS_LOGF
+#if defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
     /* Make sure everything adds up - yes, some info is a bit redundant but
        aids viewing and the sumation of certain variables should add up to
        the location of others. */

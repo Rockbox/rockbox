@@ -21,6 +21,7 @@
 #include <config.h>
 #include <stdbool.h>
 #include "../include/_ansi.h"
+#include "debug.h"
 
 #ifdef ROCKBOX_HAS_LOGF
 
@@ -38,8 +39,16 @@ extern bool logfwrap;
 void _logf(const char *format, ...) ATTRIBUTE_PRINTF(1, 2);
 
 #else /* !ROCKBOX_HAS_LOGF */
-/* built without logf() support enabled */
-#define logf(...)
+
+/* built without logf() support enabled, replace logf() by DEBUGF() */
+#define logf(f,args...) DEBUGF(f"\n",##args)
+
 #endif /* !ROCKBOX_HAS_LOGF */
 
 #endif /* LOGF_H */
+
+/* Allow fine tuning (per file) of the logf output */
+#ifndef LOGF_ENABLE
+#undef logf
+#define logf(...)
+#endif

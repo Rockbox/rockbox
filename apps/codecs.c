@@ -30,7 +30,6 @@
 #include "file.h"
 #include "kernel.h"
 #include "sprintf.h"
-#include "logf.h"
 #include "screens.h"
 #include "misc.h"
 #include "mas.h"
@@ -50,6 +49,9 @@
 #include "sound.h"
 #include "splash.h"
 #include "general.h"
+
+#define LOGF_ENABLE
+#include "logf.h"
 
 #ifdef SIMULATOR
 #if CONFIG_CODEC == SWCODEC
