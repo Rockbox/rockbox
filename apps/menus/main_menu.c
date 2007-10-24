@@ -48,20 +48,19 @@
 #include "version.h"
 #include "time.h"
 
-
-static struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
+static const struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
 
 /***********************************/
 /*    MANAGE SETTINGS MENU        */
 
 static int reset_settings(void)
 {
-    unsigned char *lines[]={ID2P(LANG_RESET_ASK)};
-    unsigned char *yes_lines[]={
+    const unsigned char *lines[]={ID2P(LANG_RESET_ASK)};
+    const unsigned char *yes_lines[]={
         str(LANG_SETTINGS),
         ID2P(LANG_RESET_DONE_CLEAR)
     };
-    unsigned char *no_lines[]={yes_lines[0], ID2P(LANG_CANCEL)};
+    const unsigned char *no_lines[]={yes_lines[0], ID2P(LANG_CANCEL)};
     struct text_message message={(char **)lines, 1};
     struct text_message yes_message={(char **)yes_lines, 2};
     struct text_message no_message={(char **)no_lines, 2};
@@ -145,7 +144,8 @@ enum infoscreenorder
     INFO_COUNT
 };
 #if CONFIG_RTC
-const int dayname[] = {
+const int dayname[] =
+{
     LANG_WEEKDAY_SUNDAY,
     LANG_WEEKDAY_MONDAY,
     LANG_WEEKDAY_TUESDAY,
@@ -155,7 +155,8 @@ const int dayname[] = {
     LANG_WEEKDAY_SATURDAY
 };
 
-const int monthname[] = {
+const int monthname[] =
+{
     LANG_MONTH_JANUARY,
     LANG_MONTH_FEBRUARY,
     LANG_MONTH_MARCH,
@@ -170,13 +171,14 @@ const int monthname[] = {
     LANG_MONTH_DECEMBER
 };
 #endif
-static char* info_getname(int selected_item, void * data, char *buffer)
+static char* info_getname(int selected_item, void *data, char *buffer)
 {
     struct info_data *info = (struct info_data*)data;
 #if CONFIG_RTC
     struct tm *tm;
 #endif
-    const unsigned char *kbyte_units[] = {
+    const unsigned char *kbyte_units[] =
+    {
         ID2P(LANG_KILOBYTE),
         ID2P(LANG_MEGABYTE),
         ID2P(LANG_GIGABYTE)
@@ -187,10 +189,10 @@ static char* info_getname(int selected_item, void * data, char *buffer)
 #endif
     if (info->new_data)
     {
-        fat_size( IF_MV2(0,) &info->size, &info->free );
+        fat_size(IF_MV2(0,) &info->size, &info->free);
 #ifdef HAVE_MULTIVOLUME
         if (fat_ismounted(1))
-            fat_size( 1, &info->size2, &info->free2 );
+            fat_size(1, &info->size2, &info->free2);
         else
             info->size2 = 0;
 #endif
@@ -211,18 +213,18 @@ static char* info_getname(int selected_item, void * data, char *buffer)
         case INFO_TIME:
             tm = get_time();
             snprintf(buffer, MAX_PATH, "%02d:%02d:%02d %s", 
-                                        global_settings.timeformat == 0
-                                            ?tm->tm_hour:tm->tm_hour-12,
-                                        tm->tm_min, tm->tm_sec, 
-                                        global_settings.timeformat == 0
-                                            ?"":tm->tm_hour>11?"P":"A");
+                global_settings.timeformat == 0 ? tm->tm_hour : tm->tm_hour-12,
+                tm->tm_min, 
+                tm->tm_sec, 
+                global_settings.timeformat == 0 ? "" : tm->tm_hour>11 ? "P" : "A");
             break;
         case INFO_DATE:
             tm = get_time();
-            snprintf(buffer, MAX_PATH, "%s %d %s %d", str(dayname[tm->tm_wday]),
-                                                      tm->tm_year+1900, 
-                                                      str(monthname[tm->tm_mon]),
-                                                      tm->tm_mday);
+            snprintf(buffer, MAX_PATH, "%s %d %s %d", 
+                str(dayname[tm->tm_wday]),
+                tm->tm_year+1900, 
+                str(monthname[tm->tm_mon]),
+                tm->tm_mday);
             break;
 #endif
         case INFO_BUFFER: /* buffer */
@@ -230,7 +232,6 @@ static char* info_getname(int selected_item, void * data, char *buffer)
             long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
             int integer = buflen / 1000;
             int decimal = buflen % 1000;
-
             snprintf(buffer, MAX_PATH, (char *)str(LANG_BUFFER_STAT),
                      integer, decimal);
         }
@@ -251,7 +252,7 @@ static char* info_getname(int selected_item, void * data, char *buffer)
             else
                 strcpy(buffer, "(n/a)");
             break;
-        case INFO_DISK1: /* disc usage 1 */
+        case INFO_DISK1: /* disk usage 1 */
 #ifdef HAVE_MULTIVOLUME
             output_dyn_value(s1, sizeof s1, info->free, kbyte_units, true);
             output_dyn_value(s2, sizeof s2, info->size, kbyte_units, true);
@@ -262,7 +263,7 @@ static char* info_getname(int selected_item, void * data, char *buffer)
             snprintf(buffer, MAX_PATH, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
             break;
-        case INFO_DISK2: /* disc usage 2 */
+        case INFO_DISK2: /* disk usage 2 */
 #ifdef HAVE_MULTIVOLUME
             if (info->size2)
             {
@@ -307,7 +308,7 @@ static int info_speak_item(int selected_item, void * data)
         case INFO_BUFFER: /* buffer */
         {
             talk_id(LANG_BUFFER_STAT, false);
-            long buflen = (audiobufend - audiobuf) / 1024L;
+            long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
             output_dyn_value(NULL, 0, buflen, kbyte_units, true);
             break;
         }
