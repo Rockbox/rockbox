@@ -143,8 +143,6 @@ struct directory_search_context {
     int count;
 };
 
-static bool changing_dir = false;
-
 static struct playlist_info current_playlist;
 static char now_playing[MAX_PATH+1];
 
@@ -560,6 +558,46 @@ exit:
 #endif
 
     return result;
+}
+
+/*
+ * Utility function to create a new playlist, fill it with the next or
+ * previous directory, shuffle it if needed, and start playback.
+ * If play_last is true and direction zero or negative, start playing
+ * the last file in the directory, otherwise start playing the first.
+ */
+static int create_and_play_dir(int direction, bool play_last)
+{
+    char dir[MAX_PATH + 1];
+    int res;
+    int index = -1;
+
+    if(direction > 0)
+      res = get_next_directory(dir);
+    else
+      res = get_previous_directory(dir);
+
+    if (!res)
+    {
+        if (playlist_create(dir, NULL) != -1)
+        {
+            ft_build_playlist(tree_get_context(), 0);
+
+            if (global_settings.playlist_shuffle)
+                 playlist_shuffle(current_tick, -1);
+
+            if (play_last && direction <= 0)
+                index = current_playlist.amount - 1;
+            else
+                index = 0;
+
+#if (CONFIG_CODEC != SWCODEC)
+            playlist_start(index, 0);
+#endif
+        }
+    }
+    
+    return index;
 }
 
 /*
@@ -2534,44 +2572,12 @@ int playlist_next(int steps)
         }
         else if (playlist->in_ram && global_settings.next_folder)
         {
-            char dir[MAX_PATH+1];
+            index = create_and_play_dir(steps, true);
 
-            changing_dir = true;
-            if (steps > 0)
+            if (index >= 0)
             {
-                if (!get_next_directory(dir))
-                {
-                    /* start playing next directory */
-                    if (playlist_create(dir, NULL) != -1)
-                    {
-                        ft_build_playlist(tree_get_context(), 0);
-                        if (global_settings.playlist_shuffle)
-                            playlist_shuffle(current_tick, -1);                    
-#if CONFIG_CODEC != SWCODEC
-                        playlist_start(0, 0);
-#endif
-                        playlist->index = index = 0;
-                    }
-                }
+                playlist->index = index;
             }
-            else
-            {
-                if (!get_previous_directory(dir))
-                {
-                    /* start playing previous directory */
-                    if (playlist_create(dir, NULL) != -1)
-                    {
-                        ft_build_playlist(tree_get_context(), 0);
-                        if (global_settings.playlist_shuffle)
-                            playlist_shuffle(current_tick, -1);
-#if CONFIG_CODEC != SWCODEC
-                        playlist_start(current_playlist.amount-1, 0);
-#endif
-                        playlist->index = index = current_playlist.amount - 1;
-                    }
-                }
-            }
-            changing_dir = false;
         }
 
         return index;
@@ -2609,43 +2615,11 @@ int playlist_next(int steps)
 /* try playing next or previous folder */
 bool playlist_next_dir(int direction)
 {
-    char dir[MAX_PATH+1];
-    bool result;
-    int res;
-
     /* not to mess up real playlists */
     if(!current_playlist.in_ram)
        return false;
 
-    if(changing_dir)
-       return false;
-
-    changing_dir = true;
-    if(direction > 0)
-      res = get_next_directory(dir);
-    else
-      res = get_previous_directory(dir);
-    if (!res)
-    {
-        if (playlist_create(dir, NULL) != -1)
-        {
-            ft_build_playlist(tree_get_context(), 0);
-            if (global_settings.playlist_shuffle)
-                 playlist_shuffle(current_tick, -1);
-#if (CONFIG_CODEC != SWCODEC)
-            playlist_start(0,0);
-#endif
-            result = true;
-        }
-        else
-            result = false;
-    }
-    else
-        result = false;
-
-    changing_dir = false;
-
-    return result;    
+    return create_and_play_dir(direction, false) >= 0;
 }
 
 /* Get resume info for current playing song.  If return value is -1 then
