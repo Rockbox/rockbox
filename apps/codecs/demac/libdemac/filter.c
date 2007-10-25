@@ -31,6 +31,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 #ifdef CPU_COLDFIRE
 #include "vector_math16_cf.h"
+#elif defined CPU_ARM7TDMI
+#include "vector_math16_arm7.h"
 #else
 #include "vector_math16.h"
 #endif
