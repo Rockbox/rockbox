@@ -20,6 +20,7 @@
 #include "thread.h"
 #include "i2s.h"
 #include "i2c-pp.h"
+#include "as3514.h"
 
 #ifndef BOOTLOADER
 extern void TIMER1(void);
@@ -310,7 +311,7 @@ void system_reboot(void)
 #ifdef SANSA_C200
     CACHE_CTL &= ~CACHE_CTL_VECT_REMAP;
 
-    pp_i2c_send( 0x46, 0x23, 0x0); /* backlight off */
+    pp_i2c_send(AS3514_I2C_ADDR, DCDC15, 0x0); /* backlight off */
 
     /* Magic used by the c200 OF: 0x23066000
        Magic used by the c200 BL: 0x23066b7b

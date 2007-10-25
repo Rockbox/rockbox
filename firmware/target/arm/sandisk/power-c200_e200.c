@@ -22,6 +22,7 @@
 #include "cpu.h"
 #include "i2c-pp.h"
 #include "tuner.h"
+#include "as3514.h"
 
 void power_init(void)
 {
@@ -39,9 +40,9 @@ void power_off(void)
     COP_INT_CLR = -1;
 
     /* Send shutdown command to PMU */
-    byte = i2c_readbyte(0x46, 0x20);
+    byte = i2c_readbyte(AS3514_I2C_ADDR, SYSTEM);
     byte &= ~0x1;   
-    pp_i2c_send(0x46, 0x20, byte);
+    pp_i2c_send(AS3514_I2C_ADDR, SYSTEM, byte);
 
     /* Halt everything and wait for device to power off */
     while (1)

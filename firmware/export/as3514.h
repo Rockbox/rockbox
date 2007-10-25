@@ -59,10 +59,18 @@ extern void audiohw_set_monitor(int enable);
 #define AUDIOSET3  0x16
 #define PLLMODE    0x1d
 
+#define SYSTEM     0x20
+#define DCDC15     0x23
+#define SUPERVISOR 0x24
+
 #define IRQ_ENRD0  0x25
 #define IRQ_ENRD1  0x26
 #define IRQ_ENRD2  0x27
 
+#define RTC_0      0x2a
+#define RTC_1      0x2b
+#define RTC_2      0x2c
+#define RTC_3      0x2d
 #define ADC_0      0x2e
 #define ADC_1      0x2f
 
