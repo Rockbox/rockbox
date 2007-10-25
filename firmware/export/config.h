@@ -309,6 +309,11 @@
 #define CPU_PP502x
 #endif
 
+/* define for all cpus from ARM7TDMI family (for specific optimisations) */
+#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == DSC25)
+#define CPU_ARM7TDMI
+#endif
+
 /* define for all cpus from ARM family */
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
     || (CONFIG_CPU == DSC25) || (CONFIG_CPU == IMX31L) || (CONFIG_CPU == DM320)
