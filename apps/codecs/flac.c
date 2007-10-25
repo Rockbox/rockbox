@@ -77,8 +77,7 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
     uint32_t offset_hi,offset_lo;
     uint16_t blocksize;
     int endofmetadata=0;
-    int blocklength;
-    int n;
+    uint32_t blocklength;
 
     ci->memset(fc,0,sizeof(FLACContext));
     nseekpoints=0;
@@ -113,9 +112,7 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
 
         if ((buf[0] & 0x7f) == 0)       /* 0 is the STREAMINFO block */
         {
-            /* FIXME: Don't trust the value of blocklength, use actual return
-             * value in bytes instead */
-            ci->read_filebuf(buf, blocklength);
+            if (ci->read_filebuf(buf, blocklength) < blocklength) return false;
           
             fc->filesize = ci->filesize;
             fc->min_blocksize = (buf[0] << 8) | buf[1];
@@ -140,9 +137,8 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
         } else if ((buf[0] & 0x7f) == 3) { /* 3 is the SEEKTABLE block */
             while ((nseekpoints < MAX_SUPPORTED_SEEKTABLE_SIZE) && 
                    (blocklength >= 18)) {
-                n=ci->read_filebuf(buf,18);
-                if (n < 18) return false;
-                blocklength-=n;
+                if (ci->read_filebuf(buf,18) < 18) return false;
+                blocklength-=18;
 
                 seekpoint_hi=(buf[0] << 24) | (buf[1] << 16) | 
                              (buf[2] << 8) | buf[3];

@@ -1204,8 +1204,6 @@ unsigned short LoadSIDFromMemory(void *pSidData, unsigned short *load_addr,
 
 enum codec_status codec_main(void)
 {
-    size_t n, bytesfree;
-    unsigned char *p;
     unsigned int filesize;
 
     unsigned short load_addr, init_addr, play_addr;
@@ -1229,20 +1227,16 @@ next_track:
 
     codec_set_replaygain(ci->id3);
     
-    /* Load SID file */    
-    p = sidfile;
-    bytesfree=sizeof(sidfile);
-    while ((n = ci->read_filebuf(p, bytesfree)) > 0) {
-        p += n;
-        bytesfree -= n;
-    }
-    filesize = p-sidfile;
+    /* Load SID file the read_filebuf callback will return the full requested
+     * size if at all possible, so there is no need to loop */    
+    filesize = ci->read_filebuf(sidfile, sizeof(sidfile));
 
     if (filesize == 0)
         return CODEC_ERROR;
     
     c64Init(44100);
-    LoadSIDFromMemory(sidfile, &load_addr, &init_addr, &play_addr, &subSongsMax, &subSong, &song_speed, filesize);
+    LoadSIDFromMemory(sidfile, &load_addr, &init_addr, &play_addr,
+            &subSongsMax, &subSong, &song_speed, filesize);
     sidPoke(24, 15);                /* Turn on full volume */
     cpuJSR(init_addr, subSong);     /* Start the song initialize */
     
