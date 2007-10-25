@@ -169,6 +169,17 @@ PLUGIN_HEADER
 #define JPEG_NEXT BUTTON_FF
 #define JPEG_PREVIOUS BUTTON_REW
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define JPEG_ZOOM_IN    BUTTON_RC_VOL_UP
+#define JPEG_ZOOM_OUT   BUTTON_RC_VOL_DOWN
+#define JPEG_UP         BUTTON_RC_PLAY
+#define JPEG_DOWN       BUTTON_RC_DOWN
+#define JPEG_LEFT       BUTTON_LEFT
+#define JPEG_RIGHT      BUTTON_RIGHT
+#define JPEG_MENU       BUTTON_POWER
+#define JPEG_NEXT       BUTTON_RC_HEART
+#define JPEG_PREVIOUS   BUTTON_RC_MODE
+
 #endif
 
 /* different graphics libraries */

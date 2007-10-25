@@ -90,6 +90,16 @@ volatile long thumbDelayTimer;
 #define MPEG_DOWN        BUTTON_DOWN
 #define MPEG_EXIT        BUTTON_POWER
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define MPEG_SELECT      BUTTON_RC_HEART
+#define MPEG_SCROLL_UP   BUTTON_RC_VOL_UP
+#define MPEG_SCROLL_DOWN BUTTON_RC_VOL_DOWN
+#define MPEG_LEFT        BUTTON_LEFT
+#define MPEG_RIGHT       BUTTON_RIGHT
+#define MPEG_UP          BUTTON_RC_PLAY
+#define MPEG_DOWN        BUTTON_RC_DOWN
+#define MPEG_EXIT        BUTTON_POWER
+
 #else
 #error MPEGPLAYER: Unsupported keypad
 #endif

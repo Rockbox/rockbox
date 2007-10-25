@@ -79,6 +79,12 @@ PLUGIN_IRAM_DECLARE
 #define BTN_UP           BUTTON_SCROLL_UP
 #define BTN_DOWN         BUTTON_SCROLL_DOWN
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_UP           BUTTON_RC_PLAY
+#define BTN_DOWN         BUTTON_RC_DOWN
+
 #endif
 
 #undef SYNC

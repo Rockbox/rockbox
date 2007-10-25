@@ -37,7 +37,8 @@ pacbox
     (LCD_DEPTH == 2) && !defined(ARCHOS_AV300)
 doom
 #endif
-
+#endif /* mrobe 500 */
+#if !defined(IRIVER_IFP7XX_SERIES)
 /* For all the swcodec targets */
 #if CONFIG_CODEC == SWCODEC
 midi

@@ -28,7 +28,7 @@
 #define TTB_SIZE (0x4000)
 /* must be 16Kb (0x4000) aligned */
 #define TTB_BASE   ((unsigned int *)(0x04900000 - TTB_SIZE)) /* End of memory */
-#define FRAME   ((short *) (TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
+#define FRAME   ((short *) ((char*)TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
 
 #define PHY_IO_BASE 0x00030000
 #define DM320_REG(addr) (*(volatile unsigned short *)(PHY_IO_BASE + (addr)))
