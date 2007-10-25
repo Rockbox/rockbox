@@ -48,7 +48,7 @@
 #define PP5024       5024
 #define PNX0101       101
 #define S3C2440      2440
-#define TMS320DSC25    25
+#define DSC25          25
 #define DM320         320
 #define IMX31L         31
 
@@ -311,7 +311,7 @@
 
 /* define for all cpus from ARM family */
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-    || (CONFIG_CPU == TMS320DSC25) || (CONFIG_CPU == IMX31L) || (CONFIG_CPU == DM320)
+    || (CONFIG_CPU == DSC25) || (CONFIG_CPU == IMX31L) || (CONFIG_CPU == DM320)
 #define CPU_ARM
 #endif
 
