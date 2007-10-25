@@ -32,9 +32,9 @@
 #define CODEC_SET_AUDIOBUF_WATERMARK    4
 
 #if MEM > 1
-#define MAX_TRACK       32
+#define MAX_TRACK       128
 #else
-#define MAX_TRACK       8
+#define MAX_TRACK       32
 #endif
 
 #define MAX_TRACK_MASK  (MAX_TRACK-1)

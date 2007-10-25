@@ -75,6 +75,7 @@
 #include "logfdisp.h"
 #if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
+#include "buffering.h"
 #if defined(HAVE_SPDIF_OUT) || defined(HAVE_SPDIF_IN)
 #include "spdif.h"
 #endif
@@ -261,7 +262,7 @@ static void dbg_audio_task(void)
     ticks++;
 }
 
-static bool dbg_audio_thread(void)
+static bool dbg_buffering_thread(void)
 {
     char buf[32];
     int button;
@@ -270,6 +271,7 @@ static bool dbg_audio_thread(void)
     size_t bufused;
     size_t bufsize = pcmbuf_get_bufsize();
     int pcmbufdescs = pcmbuf_descs();
+    struct buffering_debug d;
 
     ticks = boost_ticks = 0;
 
@@ -292,6 +294,9 @@ static bool dbg_audio_thread(void)
                 done = true;
                 break;
         }
+
+        buffering_get_debugdata(&d);
+
         line = 0;
         lcd_clear_display();
 
@@ -300,19 +305,45 @@ static bool dbg_audio_thread(void)
         snprintf(buf, sizeof(buf), "pcm: %7ld/%7ld", (long) bufused, (long) bufsize);
         lcd_puts(0, line++, buf);
 
-        /* Playable space left */
-        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6, bufsize, 0, bufused, HORIZONTAL);
+        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
+                           bufsize, 0, bufused, HORIZONTAL);
         line++;
 
-        snprintf(buf, sizeof(buf), "codec: %8ld/%8ld", audio_filebufused(), (long) filebuflen);
+        snprintf(buf, sizeof(buf), "alloc: %8ld/%8ld", audio_filebufused(),
+                 (long) filebuflen);
         lcd_puts(0, line++, buf);
 
-        /* Playable space left */
-        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6, filebuflen, 0,
-                  audio_filebufused(), HORIZONTAL);
+#if LCD_HEIGHT > 80
+        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
+                           filebuflen, 0, audio_filebufused(), HORIZONTAL);
         line++;
 
-        snprintf(buf, sizeof(buf), "track count: %2d", audio_track_count());
+        snprintf(buf, sizeof(buf), "real:  %8ld/%8ld", (long)d.buffered_data,
+                 (long)filebuflen);
+        lcd_puts(0, line++, buf);
+
+        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
+                           filebuflen, 0, (long)d.buffered_data, HORIZONTAL);
+        line++;
+#endif
+
+        snprintf(buf, sizeof(buf), "usefl: %8ld/%8ld", (long)(d.useful_data),
+                                                       (long)filebuflen);
+        lcd_puts(0, line++, buf);
+
+#if LCD_HEIGHT > 80
+        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6,
+                           filebuflen, 0, d.useful_data, HORIZONTAL);
+        line++;
+#endif
+
+        snprintf(buf, sizeof(buf), "data_rem: %ld", (long)d.data_rem);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "track count: %2d", audio_track_count()-1);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof(buf), "handle count: %d", (int)d.num_handles);
         lcd_puts(0, line++, buf);
 
 #ifndef SIMULATOR
@@ -2241,7 +2272,9 @@ static const struct the_menu_item menuitems[] = {
         { "View database info", dbg_tagcache_info },
 #endif
 #ifdef HAVE_LCD_BITMAP
-#if CONFIG_CODEC == SWCODEC || !defined(SIMULATOR)
+#if CONFIG_CODEC == SWCODEC
+        { "View buffering thread", dbg_buffering_thread },
+#elif !defined(SIMULATOR)
         { "View audio thread", dbg_audio_thread },
 #endif
 #ifdef PM_DEBUG

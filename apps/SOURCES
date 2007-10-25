@@ -14,6 +14,7 @@ menus/display_menu.c
 menus/theme_menu.c
 #if CONFIG_CODEC == SWCODEC
 menus/eq_menu.c
+buffering.c
 #endif
 menus/main_menu.c
 menus/playback_menu.c

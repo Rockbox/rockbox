@@ -43,7 +43,7 @@
 #define PRIORITY_BACKGROUND      8   /* Normal application threads */
 
 #if CONFIG_CODEC == SWCODEC
-#define MAXTHREADS	16
+#define MAXTHREADS  17
 #else
 #define MAXTHREADS  11
 #endif
