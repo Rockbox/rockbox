@@ -84,7 +84,7 @@ struct filter_t {
 
 /* Apply the filter with state f to count entries in data[] */
 
-static inline void do_apply_filter_3980(struct filter_t* f, int32_t* data, int count)
+static void do_apply_filter_3980(struct filter_t* f, int32_t* data, int count)
 {
     int res;
     int absres;
@@ -95,7 +95,7 @@ static inline void do_apply_filter_3980(struct filter_t* f, int32_t* data, int c
 
     while(count--)
     {
-        res = FP_TO_INT(scalarproduct(f->delay - ORDER, f->coeffs));
+        res = FP_TO_INT(scalarproduct(f->coeffs, f->delay - ORDER));
 
         if (*data < 0)
             vector_add(f->coeffs, f->adaptcoeffs - ORDER);
@@ -141,7 +141,7 @@ static inline void do_apply_filter_3980(struct filter_t* f, int32_t* data, int c
     }
 }
 
-static inline void do_apply_filter_3970(struct filter_t* f, int32_t* data, int count)
+static void do_apply_filter_3970(struct filter_t* f, int32_t* data, int count)
 {
     int res;
     
@@ -151,7 +151,7 @@ static inline void do_apply_filter_3970(struct filter_t* f, int32_t* data, int c
 
     while(count--)
     {
-        res = FP_TO_INT(scalarproduct(f->delay - ORDER, f->coeffs));
+        res = FP_TO_INT(scalarproduct(f->coeffs, f->delay - ORDER));
 
         if (*data < 0)
             vector_add(f->coeffs, f->adaptcoeffs - ORDER);
