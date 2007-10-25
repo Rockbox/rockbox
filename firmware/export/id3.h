@@ -198,12 +198,6 @@ struct mp3entry {
     unsigned long offset;  /* bytes played */
     int index;             /* playlist index */
 
-    /* FileEntry fields */
-    long fileentryoffset;
-    long filehash;
-    long songentryoffset;
-    long rundbentryoffset;
-
     /* runtime database fields */
     long tagcache_idx;
     short rating;
