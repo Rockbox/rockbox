@@ -164,10 +164,17 @@ void audiohw_init(void)
     /* Turn on SUM, DAC */
     as3514_write(AUDIOSET1, (1 << 6) | (1 << 5));
 
+    /* Set BIAS on, DITH on, AGC on, IBR_DAC max, LSP_LP on, IBR_LSP min */
+    as3514_write(AUDIOSET2, (1 << 2) | (3 << 0));
+
     /* Set HPCM off, ZCU off*/
     as3514_write(AUDIOSET3, (1 << 2) | (1 << 0));
 
-    /* set vol and set speaker over-current to 0 */
+    /* Mute and disable speaker */
+    as3514_write(LSP_OUT_R, 0);
+    as3514_write(LSP_OUT_L, (1 << 7));
+
+    /* set vol and set headphone over-current to 0 */
     as3514_write(HPH_OUT_R, (0x3 << 6) | 0x16);
     /* set default vol for headphone */
     as3514_write(HPH_OUT_L, 0x16);
