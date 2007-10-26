@@ -22,6 +22,7 @@
 #include <setjmp.h>
 #include "autoconf.h"
 #include "button.h"
+#include "system-sdl.h"
 #include "thread.h"
 #include "kernel.h"
 #include "uisdl.h"
@@ -75,7 +76,11 @@ Uint32 tick_timer(Uint32 interval, void *param)
     if (new_tick != current_tick) {
         long i;
         for (i = new_tick - current_tick; i > 0; i--)
+        {
+            sim_enter_irq_handler();
             sim_tick_tasks();
+            sim_exit_irq_handler();
+        }
         current_tick = new_tick;
     }
     
@@ -92,10 +97,14 @@ void gui_message_loop(void)
         switch(event.type)
         {
             case SDL_KEYDOWN:
+                sim_enter_irq_handler();
                 button_event(event.key.keysym.sym, true);
+                sim_exit_irq_handler();
                 break;
             case SDL_KEYUP:
+                sim_enter_irq_handler();
                 button_event(event.key.keysym.sym, false);
+                sim_exit_irq_handler();
                 break;
             case SDL_QUIT:
                 done = true;
@@ -170,11 +179,12 @@ bool gui_startup(void)
 
 bool gui_shutdown(void)
 {
-    SDL_RemoveTimer(tick_timer_id);
     /* Order here is relevent to prevent deadlocks and use of destroyed
        sync primitives by kernel threads */
     thread_sdl_shutdown();
+    SDL_RemoveTimer(tick_timer_id);
     sim_io_shutdown();
+    sim_kernel_shutdown();
     return true;
 }
 
@@ -226,6 +236,11 @@ int main(int argc, char *argv[])
 
     if (display_zoom > 1) {
         background = false;
+    }
+
+    if (!sim_kernel_init()) {
+        fprintf(stderr, "sim_kernel_init failed\n");
+        return -1;
     }
 
     if (!sim_io_init()) {

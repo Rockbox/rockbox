@@ -18,12 +18,92 @@
  ****************************************************************************/
 
 #include <stdlib.h>
+#include <SDL.h>
+#include <SDL_thread.h>
 #include "memory.h"
+#include "system-sdl.h"
 #include "uisdl.h"
 #include "kernel.h"
 #include "thread-sdl.h"
 #include "thread.h"
 #include "debug.h"
+
+/* Prevent "irq handler" from thread concurrent access as well as current
+ * access on multiple handlers */ 
+static SDL_cond *sim_thread_cond;
+/* Protect sim irq object when it is being changed */
+static SDL_mutex *sim_irq_mtx;
+static int interrupt_level = HIGHEST_IRQ_LEVEL;
+static int status_reg = 0;
+
+extern struct core_entry cores[NUM_CORES];
+
+/* Nescessary logic:
+ * 1) All threads must pass unblocked
+ * 2) Current handler must always pass unblocked
+ * 3) Threads must be excluded when irq routine is running
+ * 4) No more than one handler routine should execute at a time
+ */
+int set_irq_level(int level)
+{
+    SDL_LockMutex(sim_irq_mtx);
+
+    int oldlevel = interrupt_level;
+
+    if (status_reg == 0 && level == 0 && oldlevel != 0)
+    {
+        /* Not in a handler and "interrupts" are being reenabled */
+        SDL_CondSignal(sim_thread_cond);
+    }
+
+    interrupt_level = level; /* save new level */
+
+    SDL_UnlockMutex(sim_irq_mtx);
+    return oldlevel;
+}
+
+void sim_enter_irq_handler(void)
+{
+    SDL_LockMutex(sim_irq_mtx);
+    if(interrupt_level != 0)
+    {
+        /* "Interrupts" are disabled. Wait for reenable */
+        SDL_CondWait(sim_thread_cond, sim_irq_mtx);
+    }
+    status_reg = 1;
+}
+
+void sim_exit_irq_handler(void)
+{
+    status_reg = 0;
+    SDL_UnlockMutex(sim_irq_mtx);
+}
+
+bool sim_kernel_init(void)
+{
+    sim_irq_mtx = SDL_CreateMutex();
+    if (sim_irq_mtx == NULL)
+    {
+        fprintf(stderr, "Cannot create sim_handler_mtx\n");
+        return false;
+    }
+
+    /* Create with a count of 0 to have interrupts disabled by default */
+    sim_thread_cond = SDL_CreateCond();
+    if (sim_thread_cond == NULL)
+    {
+        fprintf(stderr, "Cannot create sim_thread_cond\n");
+        return false;
+    }
+
+    return true;
+}
+
+void sim_kernel_shutdown(void)
+{
+    SDL_DestroyMutex(sim_irq_mtx);
+    SDL_DestroyCond(sim_thread_cond);
+}
 
 volatile long current_tick = 0;
 static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
@@ -85,17 +165,21 @@ static void queue_release_all_senders(struct event_queue *q)
 void queue_enable_queue_send(struct event_queue *q,
                              struct queue_sender_list *send)
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     q->send = NULL;
     if(send)
     {
         q->send = send;
         memset(send, 0, sizeof(*send));
     }
+    set_irq_level(oldlevel);
 }
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
 void queue_init(struct event_queue *q, bool register_queue)
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
     q->read   = 0;
     q->write  = 0;
     thread_queue_init(&q->queue);
@@ -113,12 +197,16 @@ void queue_init(struct event_queue *q, bool register_queue)
         /* Add it to the all_queues array */
         all_queues[num_queues++] = q;
     }
+
+    set_irq_level(oldlevel);
 }
 
 void queue_delete(struct event_queue *q)
 {
     int i;
     bool found = false;
+
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
 
     /* Find the queue to be deleted */
     for(i = 0;i < num_queues;i++)
@@ -153,11 +241,14 @@ void queue_delete(struct event_queue *q)
 
     q->read = 0;
     q->write = 0;
+
+    set_irq_level(oldlevel);
 }
 
 void queue_wait(struct event_queue *q, struct queue_event *ev)
 {
     unsigned int rd;
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     if (q->send && q->send->curr_sender)
@@ -171,7 +262,9 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
     {
         do
         {
+            cores[CURRENT_CORE].irq_level = oldlevel;
             block_thread(&q->queue);
+            oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
         }
         while (q->read == q->write);
     }
@@ -186,10 +279,14 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
         queue_fetch_sender(q->send, rd);
     }
 #endif
+
+    set_irq_level(oldlevel);
 }
 
 void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     if (q->send && q->send->curr_sender)
     {
@@ -200,7 +297,9 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
     if (q->read == q->write && ticks > 0)
     {
+        cores[CURRENT_CORE].irq_level = oldlevel;
         block_thread_w_tmo(&q->queue, ticks);
+        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     }
 
     if(q->read != q->write)
@@ -220,10 +319,14 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
     {
         ev->id = SYS_TIMEOUT;
     }
+
+    set_irq_level(oldlevel);
 }
 
 void queue_post(struct event_queue *q, long id, intptr_t data)
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
     unsigned int wr = q->write++ & QUEUE_LENGTH_MASK;
 
     q->events[wr].id   = id;
@@ -243,20 +346,15 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
 #endif
 
     wakeup_thread(&q->queue);
-}
 
-/* Special thread-synced queue_post for button driver or any other preemptive sim thread */
-void queue_syncpost(struct event_queue *q, long id, intptr_t data)
-{
-    thread_sdl_lock();
-    /* No rockbox threads can be running here */
-    queue_post(q, id, data);
-    thread_sdl_unlock();
+    set_irq_level(oldlevel);
 }
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
 intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 {
+    int oldlevel = set_irq_level(oldlevel);
+
     unsigned int wr = q->write++ & QUEUE_LENGTH_MASK;
 
     q->events[wr].id   = id;
@@ -274,11 +372,14 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 
         wakeup_thread(&q->queue);
 
+        cores[CURRENT_CORE].irq_level = oldlevel;
         block_thread_no_listlock(spp);
         return thread_get_current()->retval;
     }
 
     /* Function as queue_post if sending is not enabled */
+    wakeup_thread(&q->queue);
+    set_irq_level(oldlevel);
     return 0;
 }
 
@@ -307,6 +408,8 @@ bool queue_empty(const struct event_queue* q)
 
 void queue_clear(struct event_queue* q)
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
     /* fixme: This is potentially unsafe in case we do interrupt-like processing */
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     /* Release all thread waiting in the queue for a reply -
@@ -315,10 +418,14 @@ void queue_clear(struct event_queue* q)
 #endif
     q->read = 0;
     q->write = 0;
+
+    set_irq_level(oldlevel);
 }
 
 void queue_remove_from_head(struct event_queue *q, long id)
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
     while(q->read != q->write)
     {
         unsigned int rd = q->read & QUEUE_LENGTH_MASK;
@@ -342,6 +449,8 @@ void queue_remove_from_head(struct event_queue *q, long id)
 #endif
         q->read++;
     }
+
+    set_irq_level(oldlevel);
 }
 
 int queue_count(const struct event_queue *q)
@@ -351,25 +460,16 @@ int queue_count(const struct event_queue *q)
 
 int queue_broadcast(long id, intptr_t data)
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     int i;
     
     for(i = 0;i < num_queues;i++)
     {
         queue_post(all_queues[i], id, data);
     }
-   
-    return num_queues;
-}
 
-/* Special thread-synced queue_broadcast for button driver or any other preemptive sim thread */
-int queue_syncbroadcast(long id, intptr_t data)
-{
-    int i;
-    thread_sdl_lock();
-    /* No rockbox threads can be running here */
-    i = queue_broadcast(id, data);
-    thread_sdl_unlock();
-    return i;
+    set_irq_level(oldlevel);   
+    return num_queues;
 }
 
 void yield(void)
@@ -398,6 +498,7 @@ void sim_tick_tasks(void)
 
 int tick_add_task(void (*f)(void))
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     int i;
 
     /* Add a task if there is room */
@@ -406,6 +507,7 @@ int tick_add_task(void (*f)(void))
         if(tick_funcs[i] == NULL)
         {
             tick_funcs[i] = f;
+            set_irq_level(oldlevel);
             return 0;
         }
     }
@@ -416,6 +518,7 @@ int tick_add_task(void (*f)(void))
 
 int tick_remove_task(void (*f)(void))
 {
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     int i;
 
     /* Remove a task if it is there */
@@ -424,10 +527,12 @@ int tick_remove_task(void (*f)(void))
         if(tick_funcs[i] == f)
         {
             tick_funcs[i] = NULL;
+            set_irq_level(oldlevel);
             return 0;
         }
     }
-    
+
+    set_irq_level(oldlevel);
     return -1;
 }
 

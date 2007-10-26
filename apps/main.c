@@ -113,6 +113,10 @@
 
 #include "cuesheet.h"
 
+#ifdef SIMULATOR
+#include "system-sdl.h"
+#endif
+
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
 const char appsversion[]=APPSVERSION;
@@ -267,6 +271,7 @@ static void init(void)
 {
     init_threads();
     buffer_init();
+    set_irq_level(0);
     lcd_init();
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();

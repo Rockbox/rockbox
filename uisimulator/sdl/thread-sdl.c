@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <setjmp.h>
+#include "system-sdl.h"
 #include "thread-sdl.h"
 #include "kernel.h"
 #include "thread.h"
@@ -45,7 +46,8 @@ static char __name[32];
 #define THREAD_PANICF(str...) \
     ({ fprintf(stderr, str); exit(-1); })
 
-/* Thread entries as in core */
+/* Thread/core entries as in rockbox core */
+struct core_entry cores[NUM_CORES];
 struct thread_entry threads[MAXTHREADS];
 /* Jump buffers for graceful exit - kernel threads don't stay neatly
  * in their start routines responding to messages so this is the only
@@ -133,6 +135,7 @@ bool thread_sdl_init(void *param)
     running->name = "main";
     running->state = STATE_RUNNING;
     running->context.c = SDL_CreateCond();
+    cores[CURRENT_CORE].irq_level = STAY_IRQ_LEVEL;
 
     if (running->context.c == NULL)
     {
@@ -152,16 +155,6 @@ bool thread_sdl_init(void *param)
 
     SDL_UnlockMutex(m);
     return true;
-}
-
-void thread_sdl_lock(void)
-{
-    SDL_LockMutex(m);
-}
-
-void thread_sdl_unlock(void)
-{
-    SDL_UnlockMutex(m);
 }
 
 static int find_empty_thread_slot(void)
@@ -218,6 +211,17 @@ static void remove_from_list_l(struct thread_entry **list,
     /* Fix links to jump over the removed entry. */
     thread->l.prev->l.next = thread->l.next;
     thread->l.next->l.prev = thread->l.prev;
+}
+
+static void run_blocking_ops(void)
+{
+    int level = cores[CURRENT_CORE].irq_level;
+
+    if (level != STAY_IRQ_LEVEL)
+    {
+        cores[CURRENT_CORE].irq_level = STAY_IRQ_LEVEL;
+        set_irq_level(level);
+    }
 }
 
 struct thread_entry *thread_get_current(void)
@@ -373,6 +377,8 @@ void _block_thread(struct thread_queue *tq)
     thread->bqp = tq;
     add_to_list_l(&tq->queue, thread);
 
+    run_blocking_ops();
+
     SDL_CondWait(thread->context.c, m);
     running = thread;
 
@@ -387,6 +393,8 @@ void block_thread_w_tmo(struct thread_queue *tq, int ticks)
     thread->state = STATE_BLOCKED_W_TMO;
     thread->bqp = tq;
     add_to_list_l(&tq->queue, thread);
+
+    run_blocking_ops();
 
     SDL_CondWaitTimeout(thread->context.c, m, (1000/HZ) * ticks);
     running = thread;
@@ -451,6 +459,8 @@ void remove_thread(struct thread_entry *thread)
     SDL_Thread *t;
     SDL_cond *c;
 
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
     if (thread == NULL)
     {
         thread = current;
@@ -486,10 +496,12 @@ void remove_thread(struct thread_entry *thread)
     {
         /* Do a graceful exit - perform the longjmp back into the thread
            function to return */
+        set_irq_level(oldlevel);
         longjmp(thread_jmpbufs[current - threads], 1);
     }
 
     SDL_KillThread(t);
+    set_irq_level(oldlevel);
 }
 
 void thread_wait(struct thread_entry *thread)

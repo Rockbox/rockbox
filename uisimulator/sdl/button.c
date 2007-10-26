@@ -30,11 +30,6 @@
 
 static intptr_t button_data; /* data value from last message dequeued */
 
-/* Special thread-synced queue_post for button driver or any other preemptive sim thread */
-extern void queue_syncpost(struct event_queue *q, long id, intptr_t data);
-/* Special thread-synced queue_broadcast for button driver or any other preemptive sim thread */
-extern int queue_syncbroadcast(long id, intptr_t data);
-
 /* how long until repeat kicks in */
 #define REPEAT_START      6
 
@@ -115,9 +110,9 @@ void button_event(int key, bool pressed)
         {
             usb_connected = !usb_connected;
             if (usb_connected)
-                queue_syncpost(&button_queue, SYS_USB_CONNECTED, 0);
+                queue_post(&button_queue, SYS_USB_CONNECTED, 0);
             else
-                queue_syncpost(&button_queue, SYS_USB_DISCONNECTED, 0);
+                queue_post(&button_queue, SYS_USB_DISCONNECTED, 0);
         }
         return;
 
@@ -634,7 +629,7 @@ void button_event(int key, bool pressed)
     case SDLK_F5:
         if(pressed)
         {
-            queue_syncbroadcast(SYS_SCREENDUMP, 0);
+            queue_broadcast(SYS_SCREENDUMP, 0);
             return;
         }
         break;
@@ -655,17 +650,17 @@ void button_event(int key, bool pressed)
 #ifdef HAVE_REMOTE_LCD
         if(diff & BUTTON_REMOTE)
             if(!skip_remote_release)
-                queue_syncpost(&button_queue, BUTTON_REL | diff, 0);
+                queue_post(&button_queue, BUTTON_REL | diff, 0);
             else
                 skip_remote_release = false;
         else
 #endif
             if(!skip_release)
-                queue_syncpost(&button_queue, BUTTON_REL | diff, 0);
+                queue_post(&button_queue, BUTTON_REL | diff, 0);
             else
                 skip_release = false;
 #else
-        queue_syncpost(&button_queue, BUTTON_REL | diff, 0);
+        queue_post(&button_queue, BUTTON_REL | diff, 0);
 #endif
     }
 
@@ -717,7 +712,7 @@ void button_event(int key, bool pressed)
                 {
                     if (queue_empty(&button_queue))
                     {
-                        queue_syncpost(&button_queue, BUTTON_REPEAT | btn, 0);
+                        queue_post(&button_queue, BUTTON_REPEAT | btn, 0);
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                             if(btn & BUTTON_REMOTE)
@@ -739,18 +734,18 @@ void button_event(int key, bool pressed)
 #ifdef HAVE_REMOTE_LCD
                         if (btn & BUTTON_REMOTE) {
                             if (!remote_filter_first_keypress || is_remote_backlight_on())
-                                queue_syncpost(&button_queue, btn, 0);
+                                queue_post(&button_queue, btn, 0);
                             else
                                 skip_remote_release = true;
                         }
                         else
 #endif                                    
                             if (!filter_first_keypress || is_backlight_on())
-                                queue_syncpost(&button_queue, btn, 0);
+                                queue_post(&button_queue, btn, 0);
                             else
                                 skip_release = true;
 #else /* no backlight, nothing to skip */
-                        queue_syncpost(&button_queue, btn, 0);
+                        queue_post(&button_queue, btn, 0);
 #endif
                     post = false;
                 }    
