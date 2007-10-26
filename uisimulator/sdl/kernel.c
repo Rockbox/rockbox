@@ -28,10 +28,10 @@
 #include "thread.h"
 #include "debug.h"
 
-/* Prevent "irq handler" from thread concurrent access as well as current
- * access on multiple handlers */ 
+/* Condition to signal that "interrupts" may proceed */
 static SDL_cond *sim_thread_cond;
-/* Protect sim irq object when it is being changed */
+/* Mutex to serialize changing levels and exclude other threads while
+ * inside a handler */
 static SDL_mutex *sim_irq_mtx;
 static int interrupt_level = HIGHEST_IRQ_LEVEL;
 static int status_reg = 0;
@@ -88,7 +88,6 @@ bool sim_kernel_init(void)
         return false;
     }
 
-    /* Create with a count of 0 to have interrupts disabled by default */
     sim_thread_cond = SDL_CreateCond();
     if (sim_thread_cond == NULL)
     {
