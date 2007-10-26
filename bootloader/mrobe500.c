@@ -42,6 +42,7 @@
 #include "uart-target.h"
 #include "tsc2100.h"
 #include "time.h"
+#include "system-arm.h"
 
 #define MRDEBUG
 
@@ -168,6 +169,10 @@ void main(void)
     lcd_init();
     system_init();
     kernel_init();
+    
+    set_irq_level(0);
+    set_fiq_status(FIQ_ENABLED);
+
     adc_init();
     button_init();
     backlight_init();

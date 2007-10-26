@@ -22,6 +22,7 @@
 #include "system.h"
 #include "panic.h"
 #include "uart-target.h"
+#include "system-arm.h"
 #include "spi.h"
 
 #define default_interrupt(name) \
@@ -143,11 +144,6 @@ void system_reboot(void)
 
 }
 
-void enable_interrupts (void)
-{
-    asm volatile ("msr cpsr_c, #0x13" );
-}
-
 void system_init(void)
 {
     /* taken from linux/arch/arm/mach-itdm320-20/irq.c */
@@ -171,22 +167,24 @@ void system_init(void)
     IO_INTC_FISEL1 = 0;
     IO_INTC_FISEL2 = 0;
 
-    IO_INTC_ENTRY_TBA0 =
+    IO_INTC_ENTRY_TBA0 = 0;
     IO_INTC_ENTRY_TBA1 = 0;
 
     /* set GIO26 (reset pin) to output and low */
     IO_GIO_BITCLR1=(1<<10);
     IO_GIO_DIR1&=~(1<<10);
 
-    enable_interrupts();
     uart_init();
     spi_init();
  
-    /* MMU initialization (Starts data and instruction cache) */   
+    /* MMU initialization (Starts data and instruction cache) */
     ttb_init();
-    map_section(0, 0, 0x1000, CACHE_NONE); /* Make sure everything is mapped on itself */
-    map_section(0x00900000, 0x00900000, 64, CACHE_ALL); /* Enable caching for RAM */
-    map_section((int)FRAME, (int)FRAME, 2, BUFFERED); /* enable buffered writing for the framebuffer */
+    /* Make sure everything is mapped on itself */
+    map_section(0, 0, 0x1000, CACHE_NONE);
+    /* Enable caching for RAM */
+    map_section(0x00900000, 0x00900000, 64, CACHE_ALL);
+    /* enable buffered writing for the framebuffer */
+    map_section((int)FRAME, (int)FRAME, 1, BUFFERED);
     enable_mmu();
 }
 

@@ -28,9 +28,22 @@
 
     .global    start
 start:
-    msr    cpsr, #0xd3 /* enter supervisor mode, disable IRQ */
+    .equ    INTC_IRQ0,    0x00030508
+    .equ    INTC_IRQ1,    0x0003050A
+    .equ    INTC_IRQ2,    0x0003050C
+    .equ    INTC_FIQ0,    0x00030500
+    .equ    INTC_FIQ1,    0x00030502
+    .equ    INTC_FIQ2,    0x00030504
+    .equ    INTC_EINT0,   0x00030528
+    .equ    INTC_EINT1,   0x0003052A
+    .equ    INTC_EINT2,   0x0003052C
+    .equ    INTC_FISEL0,  0x00030520
+    .equ    INTC_FISEL1,  0x00030522
+    .equ    INTC_FISEL2,  0x00030524
+    .equ    INTC_MASK,    0xFFFFFFFF
 
-#if !defined(DEBUG)
+    msr    cpsr, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
+
     /* Copy exception handler code to address 0 */
     ldr    r2, =_vectorsstart
     ldr    r3, =_vectorsend
@@ -40,13 +53,6 @@ start:
     ldrhi  r5, [r4], #4
     strhi  r5, [r2], #4
     bhi    1b
-#else
-    ldr    r1, =vectors
-    ldr    r0, =irq_handler
-    str    r0, [r1, #24]
-    ldr    r0, =fiq_handler
-    str    r0, [r1, #28]
-#endif
 
     /* Disable data and instruction cache, high vectors (at 0xffff0000 instead of 0x00000000) */
 	mrc	p15, 0, r0, c1, c0, 0
@@ -58,9 +64,38 @@ start:
 	orr	r0, r0, #0x00000002
 	mcr	p15, 0, r0, c1, c0, 0
 
-#if !defined(BOOTLOADER)
+#if 0
+	/* mask interrupts */
+	ldr    r1, =INTC_MASK
+    ldr    r2, =INTC_IRQ0
+    strh   r1, [r2]
+    ldr    r2, =INTC_IRQ1
+    strh   r1, [r2]
+    ldr    r2, =INTC_IRQ2
+    strh   r1, [r2]
+    ldr    r2, =INTC_FIQ0
+    strh   r1, [r2]
+    ldr    r2, =INTC_FIQ1
+    strh   r1, [r2]
+    ldr    r2, =INTC_FIQ2
+    strh   r1, [r2]
 
-#if !defined(STUB)
+    mov    r1, #0
+    ldr    r2, =INTC_EINT0
+    strh   r1, [r2]
+    ldr    r2, =INTC_EINT1
+    strh   r1, [r2]
+    ldr    r2, =INTC_EINT2
+    strh   r1, [r2]
+    ldr    r2, =INTC_FISEL0
+    strh   r1, [r2]
+    ldr    r2, =INTC_FISEL1
+    strh   r1, [r2]
+    ldr    r2, =INTC_FISEL2
+    strh   r1, [r2]
+#endif
+
+#if !defined(BOOTLOADER) && !defined(STUB)
     /* Zero out IBSS */
     ldr    r2, =_iedata
     ldr    r3, =_iend
@@ -79,8 +114,7 @@ start:
     ldrhi  r5, [r2], #4
     strhi  r5, [r3], #4
     bhi    1b
-#endif /* !STUB */
-#endif /* !BOOTLOADER */
+#endif /* !BOOTLOADER,!STUB */
 
     /* Initialise bss section to zero */
     ldr    r2, =_edata
@@ -90,28 +124,31 @@ start:
     cmp    r3, r2
     strhi  r4, [r2], #4
     bhi    1b
-    
-    /* Set up some stack and munge it with 0xdeadbeef */
-    ldr    r3, =stackend
-    ldr    r2, =stackbegin
+
+    /* Load stack munge value */
     ldr    r4, =0xdeadbeef
+
+    /* Set up some stack and munge it with 0xdeadbeef */
+    ldr    r2, =stackbegin
+    ldr    r3, =stackend
 1:
     cmp    r3, r2
     strhi  r4, [r2], #4
     bhi    1b
 
 	 /* Set up stack for IRQ mode */
-    msr    cpsr_c, #0xd2
+    msr    cpsr_c, #0x92 /* IRQ disabled, FIQ enabled */
     ldr    sp, =irq_stack
     /* Set up stack for FIQ mode */
-    msr    cpsr_c, #0xd1
+    msr    cpsr_c, #0xd1 /* IRQ/FIQ disabled */
     ldr    sp, =fiq_stack
 
     /* Let abort and undefined modes use IRQ stack */
-    msr    cpsr_c, #0xd7
+    msr    cpsr_c, #0xd7 /* IRQ/FIQ disabled */
     ldr    sp, =irq_stack
-    msr    cpsr_c, #0xdb
+    msr    cpsr_c, #0xdb /* IRQ/FIQ disabled */
     ldr    sp, =irq_stack
+
     /* Switch to supervisor mode (no IRQ) */
     msr    cpsr_c, #0xd3
     ldr    sp, =stackend
@@ -202,6 +239,9 @@ data_abort_handler:
 UIE:
     b UIE
 #endif
+
+/* Align stacks to cache line boundary */
+    .balign 16
 
 /* 256 words of IRQ stack */
     .space 256*4

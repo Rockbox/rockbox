@@ -24,7 +24,7 @@
 #ifndef __DM320_H__
 #define __DM320_H__
 
-#define LCD_BUFFER_SIZE (640*480*4)
+#define LCD_BUFFER_SIZE (640*480*2)
 #define TTB_SIZE (0x4000)
 /* must be 16Kb (0x4000) aligned */
 #define TTB_BASE   ((unsigned int *)(0x04900000 - TTB_SIZE)) /* End of memory */

@@ -42,7 +42,7 @@ newstart:
     msr    cpsr, #0xd3 /* enter supervisor mode, disable IRQ */
 #endif  
 
-#if !defined(BOOTLOADER) || (CONFIG_CPU == DM320)
+#if !defined(BOOTLOADER)
 #if !defined(DEBUG)
     /* Copy exception handler code to address 0 */
     ldr    r2, =_vectorsstart
