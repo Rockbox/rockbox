@@ -1285,6 +1285,11 @@ bool simplelist_show_list(struct simplelist_info *info)
         gui_syncstatusbar_draw(&statusbars, true);
         list_do_action(CONTEXT_STD, info->timeout,
                        &lists, &action, LIST_WRAP_UNLESS_HELD);
+#ifdef SIMULATOR
+        /* Sim has no interrupts, so this is needed for buttons to be recognised */
+        if (info->timeout == TIMEOUT_NOBLOCK)
+            yield(); 
+#endif
         if (info->action_callback)
         {
             action = info->action_callback(action, &lists);
@@ -1303,7 +1308,6 @@ bool simplelist_show_list(struct simplelist_info *info)
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
-        
     }
     talk_shutup();
     return false;
