@@ -194,30 +194,32 @@ qmf_synth:
     move.l   %a6, %sp                   | Update sp
     move.l   %d3, -(%sp)                | Stack old %sp
 
-    | Backwards copy x1 and x2 arrays to xx1 and xx2
+    | Backwards copy x1 and x2 arrays to xx1 and xx2, assume N2 is power of two
     | TODO: these copying loops probably have more potential for optimization
     lea.l    (%a0, %d0.l*2), %a0        | x1 += N2
     lea.l    (%a1, %d0.l*2), %a1        | x2 += N2
     move.l   %d0, %d2                   | Loop counter is N2
 0:
-    move.w   -(%a0), (%a2)+
-    move.w   -(%a1), (%a6)+
-    subq.l   #1, %d2
+    move.l   -(%a0), %d3
+    swap.w   %d3
+    move.l   %d3, (%a2)+
+    move.l   -(%a1), %d3
+    swap.w   %d3
+    move.l   %d3, (%a6)+
+    subq.l   #2, %d2
     jne      0b
 
     | Copy alternate members of mem1 and mem2 to last part of xx1 and xx2
     move.l   %d1, %d2                   | Loop counter is M2
-    addq.l   #4, %a4                    | a4 = &mem1[1]
-    addq.l   #4, %a5                    | a5 = &mem2[1]
+    addq.l   #2, %a4                    | a4 = &mem1[1]
+    addq.l   #2, %a5                    | a5 = &mem2[1]
     move.l   %a4, %d3                   | Backup mem1 and mem2
     move.l   %a5, %d4
 0:
-    move.l   (%a4), %d5
-    move.w   %d5, (%a2)+
-    move.l   (%a5), %d5
-    move.w   %d5, (%a6)+
-    addq.l   #8, %a4
-    addq.l   #8, %a5
+    move.w   (%a4), (%a2)+
+    move.w   (%a5), (%a6)+ 
+    addq.l   #4, %a4
+    addq.l   #4, %a5
     subq.l   #1, %d2
     jne      0b
     move.l   %d3, %a4                   | a4 = &mem1[1]
@@ -295,14 +297,10 @@ qmf_synth:
     addq.l   #4, %a0            | a0 = &xx1[0]
     addq.l   #4, %a1            | a1 = &xx2[0]
 0:
-    move.w   (%a0)+, %d2
-    move.w   (%a1)+, %d3
-    ext.l    %d2
-    ext.l    %d3
-    move.l   %d2, (%a4)
-    move.l   %d3, (%a5)
-    addq.l   #8, %a4
-    addq.l   #8, %a5
+    move.w   (%a0)+, (%a4)
+    move.w   (%a1)+, (%a5)
+    addq.l   #4, %a4
+    addq.l   #4, %a5
     subq.l   #1, %d1
     jne      0b
 

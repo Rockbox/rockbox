@@ -109,7 +109,7 @@ typedef struct SBDecState {
    int    lpc_enh_enabled;
 
    char  *stack;
-   spx_word32_t g0_mem[64], g1_mem[64];
+   spx_word16_t g0_mem[64], g1_mem[64];
 
    spx_word16_t excBuf[80];
    spx_lsp_t old_qlsp[10];
