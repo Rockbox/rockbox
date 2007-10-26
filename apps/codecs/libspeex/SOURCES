@@ -22,11 +22,9 @@ lpc.c
 lsp.c
 lsp_tables_nb.c
 ltp.c
-math_approx.c
 mdf.c
-medfilter.c
-misc.c
 modes.c
+modes_wb.c
 nb_celp.c
 oggframing.c
 preprocess.c

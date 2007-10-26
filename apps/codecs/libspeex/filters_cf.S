@@ -245,25 +245,25 @@ qmf_synth:
 1:  | Innerloop
     move.w   (%a0)+, %d3                        | d3 = x11
     move.w   (%a1)+, %d5                        | d5 = x21
-    mac.w    %d6u, %d3l, #1, %acc0              | acc0 += a0*x11
-    msac.w   %d6u, %d5l, #1, %acc0              | acc0 -= a0*x21
-    mac.w    %d6l, %d3l, #1, %acc1              | acc1 += a1*x11
-    mac.w    %d6l, %d5l, #1, %acc1              | acc1 += a1*x21
-    mac.w    %d6u, %d2l, #1, %acc2              | acc2 += a0*x10
-    msac.w   %d6u, %d4l, #1, %acc2              | acc2 -= a0*x20
-    mac.w    %d6l, %d2l, #1, %acc3              | acc3 += a1*x10
-    mac.w    %d6l, %d4l, #1, (%a2)+, %d6, %acc3 | acc3 += a1*x20
+    mac.w    %d6u, %d3l, <<, %acc0              | acc0 += a0*x11
+    msac.w   %d6u, %d5l, <<, %acc0              | acc0 -= a0*x21
+    mac.w    %d6l, %d3l, <<, %acc1              | acc1 += a1*x11
+    mac.w    %d6l, %d5l, <<, %acc1              | acc1 += a1*x21
+    mac.w    %d6u, %d2l, <<, %acc2              | acc2 += a0*x10
+    msac.w   %d6u, %d4l, <<, %acc2              | acc2 -= a0*x20
+    mac.w    %d6l, %d2l, <<, %acc3              | acc3 += a1*x10
+    mac.w    %d6l, %d4l, <<, (%a2)+, %d6, %acc3 | acc3 += a1*x20
 
     move.w   (%a0)+, %d2                        | d2 = x10
     move.w   (%a1)+, %d4                        | d4 = x20
-    mac.w    %d6u, %d2l, #1, %acc0              | acc0 += a0*x10
-    msac.w   %d6u, %d4l, #1, %acc0              | acc0 -= a0*x20
-    mac.w    %d6l, %d2l, #1, %acc1              | acc1 += a1*x10
-    mac.w    %d6l, %d4l, #1, %acc1              | acc1 += a1*x20
-    mac.w    %d6u, %d3l, #1, %acc2              | acc2 += a0*x11
-    msac.w   %d6u, %d5l, #1, %acc2              | acc2 -= a0*x21
-    mac.w    %d6l, %d3l, #1, %acc3              | acc3 += a1*x11
-    mac.w    %d6l, %d5l, #1, (%a2)+, %d6, %acc3 | acc3 += a1*x21
+    mac.w    %d6u, %d2l, <<, %acc0              | acc0 += a0*x10
+    msac.w   %d6u, %d4l, <<, %acc0              | acc0 -= a0*x20
+    mac.w    %d6l, %d2l, <<, %acc1              | acc1 += a1*x10
+    mac.w    %d6l, %d4l, <<, %acc1              | acc1 += a1*x20
+    mac.w    %d6u, %d3l, <<, %acc2              | acc2 += a0*x11
+    msac.w   %d6u, %d5l, <<, %acc2              | acc2 -= a0*x21
+    mac.w    %d6l, %d3l, <<, %acc3              | acc3 += a1*x11
+    mac.w    %d6l, %d5l, <<, (%a2)+, %d6, %acc3 | acc3 += a1*x21
     subq.l   #2, %d1
     jne      1b
  
