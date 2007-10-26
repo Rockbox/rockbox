@@ -347,7 +347,7 @@ static void voice_stop(void);
 
 /* --- Helper functions --- */
 
-struct mp3entry *bufgetid3(int handle_id)
+static struct mp3entry *bufgetid3(int handle_id)
 {
     if (handle_id < 0)
         return NULL;
@@ -361,7 +361,7 @@ struct mp3entry *bufgetid3(int handle_id)
     return id3;
 }
 
-void *bufgetcodec(struct track_info *track)
+static void *bufgetcodec(struct track_info *track)
 {
     void *ptr;
     ssize_t ret = bufgetdata(track->codec_hid, track->codecsize, &ptr);
@@ -381,7 +381,7 @@ void *bufgetcodec(struct track_info *track)
         return ptr;
 }
 
-bool clear_track_info(struct track_info *track)
+static bool clear_track_info(struct track_info *track)
 {
     if (!track)
         return false;
