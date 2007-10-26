@@ -163,8 +163,8 @@ void dice_print(struct dices* dice, struct screen* display){
             start=end;
         }
     }
-    rb->snprintf(buffer, PRINT_BUFFER_LENGTH, "Total: %4d", dice->total);
-    display->puts(0, current_row, buffer);
+    rb->snprintf(buffer, PRINT_BUFFER_LENGTH, "Total: %d", dice->total);
+    display->puts_scroll(0, current_row, buffer);
     display->update();
 }
 
