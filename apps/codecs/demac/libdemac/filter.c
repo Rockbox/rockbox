@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include <string.h>
 #include <inttypes.h>
 
-#include "codecs.h" /* for Rockbox CPU definitions etc */
 #include "demac.h"
 #include "filter.h"
 
