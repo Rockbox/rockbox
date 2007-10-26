@@ -313,7 +313,7 @@ int plugin_main(void)
         starfield_move_and_draw(&starfield);
 
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(LCD_WHITE);
+        rb->lcd_set_foreground(LCD_WHITE);
 #endif
 
         /* if a parameter is updated (by the user), we must print it */
@@ -324,7 +324,7 @@ int plugin_main(void)
                          "star:%d speed:%d",
                          starfield.nb_stars,
                          starfield.z_move);
-#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
             rb->lcd_set_foreground(LCD_WHITE);
 #endif
             rb->lcd_putsxy(0, LCD_HEIGHT-font_h, str_buffer);
