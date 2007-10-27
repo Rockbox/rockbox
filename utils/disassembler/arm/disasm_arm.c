@@ -238,6 +238,49 @@ void opcode_stg(char *stg, ULONG val, ULONG off)
   }
 }
 
+void opcode_cop(char *stg, ULONG val, ULONG off)
+{
+  char* op;
+  int   opcode1 = (val >> 21) & 0x7;
+  int   CRn = (val >> 16) & 0xf;
+  int   Rd = (val >> 12) & 0xf;
+  int   cp_num = (val >> 8) & 0xf;
+  int   opcode2 = (val >> 5) & 0x7;
+  int   CRm = val & 0xf;
+
+
+// ee073f5e        mcr     15, 0, r3, cr7, cr14, {2}
+
+  if (val & (1<<4)) {
+    if (val & (1<<20)) {
+      op = "mrc";
+    } else {
+      op = "mcr";
+    }
+    opcode1 = (val >> 21) & 0x7;
+    CRn = (val >> 16) & 0xf;
+    Rd = (val >> 12) & 0xf;
+    cp_num = (val >> 8) & 0xf;
+    opcode2 = (val >> 5) & 0x7;
+    CRm = val & 0xf;
+
+    sprintf(stg+strlen(stg), "%s%s	%d, %d, r%d, cr%d, cr%d, {%d}", op, cnd1[val>>28], cp_num, opcode1, Rd, CRn, CRm, opcode2);
+  } else {
+    op = "cdp";
+
+    opcode1 = (val >> 20) & 0xf;
+    CRn = (val >> 16) & 0xf;
+    Rd = (val >> 12) & 0xf;
+    cp_num = (val >> 8) & 0xf;
+    opcode2 = (val >> 5) & 0x7;
+    CRm = val & 0xf;
+
+    sprintf(stg+strlen(stg), "%s%s	%d, %d, cr%d, cr%d, cr%d, {%d}", op, cnd1[val>>28], cp_num, opcode1, Rd, CRn, CRm, opcode2);
+  }
+
+}
+
+
 void single_data(char *stg, ULONG val)
 {
   char  op2[80];
@@ -370,8 +413,8 @@ void dis_asm(ULONG off, ULONG val, char *stg)
     case 10:
     case 11: branch_stg(stg, val, off); break;
     case 12:
-    case 13:
-    case 14: sprintf(stg+strlen(stg), "cop%s", cnd1[val>>28]); break;
+    case 13: sprintf(stg+strlen(stg), "cop%s", cnd1[val>>28]); break;
+    case 14: opcode_cop(stg, val, off); break;
     case 15: sprintf(stg+strlen(stg), "swi%s", cnd1[val>>28]); break;
   }
 }
