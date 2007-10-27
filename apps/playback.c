@@ -367,7 +367,7 @@ static void *bufgetcodec(struct track_info *track)
     ssize_t ret = bufgetdata(track->codec_hid, track->codecsize, &ptr);
 
     if (ret == -2) {
-        buf_request_buffer_handle(CUR_TI->audio_hid);
+        buf_request_buffer_handle(track->codec_hid);
     }
 
     while (ret == -2) {
