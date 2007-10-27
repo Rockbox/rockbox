@@ -35,7 +35,7 @@
 
 #define VERSION "0.1"
 
-#define MAX_FIRMWARESIZE   (2*1024*1024)   /* Arbitrary limit (for safety) */
+#define MAX_FIRMWARESIZE   (10*1024*1024)   /* Arbitrary limit (for safety) */
 
 struct device_t
 {
@@ -48,10 +48,11 @@ struct device_t
 
 static struct device_t devices[] = 
 { 
-    {"logikdax", "Logik DAX 1GB DAB/MP3 player", 0xb021, 0x20000000, 0x52e97410 },
+    {"c100",     "Sansa C100 series",            0xb021, 0x20000000, 0x62e97010 },
+    {"cowond2",  "Cowon D2",                     0xb011, 0x20000000, 0xa2e92010 },
     {"iaudio6",  "iAudio 6",                     0xb021, 0x20000000, 0x62e97010 },
     {"iaudio7",  "iAudio 7",                     0xb021, 0x20000000, 0x62e97010 },
-    {"cowond2",  "Cowon D2",                     0xb011, 0x20000000, 0xa2e92010 }
+    {"logikdax", "Logik DAX 1GB DAB/MP3 player", 0xb021, 0x20000000, 0x52e97410 }
 };
 
 #define NUM_DEVICES ((sizeof(devices) / sizeof(struct device_t)))
@@ -259,12 +260,14 @@ int main(int argc, char* argv[])
     if (argc != 4)
     {
         print_usage();
+        print_devices();
         return 1;
     }
 
     if (strcmp(argv[1],"-d"))
     {
         print_usage();
+        print_devices();
         return 2;
     }
 
