@@ -2594,8 +2594,6 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
         if (!queue_empty(&audio_queue)) {
             /* There's a message in the queue. break the loop to treat it,
                and go back to filling after that. */
-            LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
-            queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
             break;
         }
     } while (continue_buffering);
@@ -2604,7 +2602,6 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
         track_changed = true;
 
     audio_generate_postbuffer_events();
-    register_buffer_low_callback(low_buffer_callback);
 }
 
 static void audio_rebuffer(void)
@@ -2702,6 +2699,7 @@ static int audio_check_new_track(void)
     track_ridx &= MAX_TRACK_MASK;
 
     buf_set_base_handle(CUR_TI->audio_hid);
+    register_buffer_low_callback(low_buffer_callback);
 
     if (automatic_skip)
     {
