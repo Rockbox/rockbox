@@ -105,7 +105,7 @@
 
 /* assert(sizeof(struct memory_handle)%4==0) */
 struct memory_handle {
-    int id;                     /* A unique ID for the handle */
+    unsigned int id;           /* A unique ID for the handle */
     enum data_type type;       /* Type of data buffered with this handle */
     char path[MAX_PATH];       /* Path if data originated in a file */
     int fd;                    /* File descriptor to path (-1 if closed) */
@@ -146,7 +146,7 @@ static struct memory_handle *first_handle;
 
 static int num_handles;  /* number of handles in the list */
 
-static int base_handle_id;
+static unsigned int base_handle_id;
 
 static struct mutex llist_mutex;
 
@@ -210,37 +210,61 @@ buf_ridx == buf_widx means the buffer is empty.
 
 
 /* Add a new handle to the linked list and return it. It will have become the
-   new current handle. "data_size" must contain the size of what will be in the
-   handle. On return, it's the size available for the handle. */
-static struct memory_handle *add_handle(size_t *data_size)
+   new current handle.
+   data_size must contain the size of what will be in the handle.
+             On return, it's the size available for the handle.
+   can_wrap tells us whether this type of data may wrap on buffer
+   alloc_all tells us if we must immediately be able to allocate data_size
+   */
+static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
+                                        const bool alloc_all)
 {
+    /* gives each handle a unique id, unsigned to handle wraps gracefully */
+    static unsigned int cur_handle_id = 1;
+    size_t shift;
+    size_t new_widx = buf_widx;
+    size_t len;
+    int overlap;
+
     mutex_lock(&llist_mutex);
 
-    /* this will give each handle a unique id */
-    static int cur_handle_id = 1;
+    /* Allocate the remainder of the space for the current handle */
+    if (cur_handle)
+        new_widx = RINGBUF_ADD(cur_handle->widx, cur_handle->filerem);
 
-    /* make sure buf_widx is 32-bit aligned so that the handle struct is,
-       but before that we check we can actually align. */
-    if (RINGBUF_ADD_CROSS(buf_widx, 3, buf_ridx) >= 0) {
+    /* align buf_widx to 4 bytes up */
+    new_widx = (RINGBUF_ADD(new_widx, 3)) & ~3;
+
+    len = data_size + sizeof(struct memory_handle);
+
+    /* First, will the handle wrap? */
+    overlap = RINGBUF_ADD_CROSS(new_widx, sizeof(struct memory_handle),
+                                buffer_len - 1);
+    /* If the handle would wrap, move to the beginning of the buffer,
+     * otherwise check if the data can/would wrap and move it to the
+     * beginning if needed */
+    if (overlap > 0) {
+        new_widx = 0;
+    } else if (!can_wrap) {
+        overlap = RINGBUF_ADD_CROSS(new_widx, len, buffer_len - 1);
+        if (overlap > 0)
+            new_widx += data_size - overlap;
+    }
+
+    /* This is how far we shifted buf_widx to align things */
+    shift = RINGBUF_SUB(new_widx, buf_widx);
+    
+    /* How much space are we short in the actual ring buffer? */
+    overlap = RINGBUF_ADD_CROSS(buf_widx, shift + len, buf_ridx);
+    if (overlap >= 0 && (alloc_all || (unsigned)overlap > data_size)) {
+        /* Not enough space for required allocations */
         mutex_unlock(&llist_mutex);
         return NULL;
     }
-    buf_widx = (RINGBUF_ADD(buf_widx, 3)) & ~3;
 
-    size_t len = (data_size ? *data_size : 0)
-                 + sizeof(struct memory_handle);
-
-    /* check that we actually can add the handle and its data */
-    int overlap = RINGBUF_ADD_CROSS(buf_widx, len, buf_ridx);
-    if (overlap >= 0) {
-        *data_size -= overlap;
-        len -= overlap;
-    }
-    if (len < sizeof(struct memory_handle)) {
-        /* There isn't even enough space to write the struct */
-        mutex_unlock(&llist_mutex);
-        return NULL;
-    }
+    /* There is enough space for the required data, advance the buf_widx and
+     * initialize the struct */
+    buf_widx = new_widx;
 
     struct memory_handle *new_handle =
         (struct memory_handle *)(&buffer[buf_widx]);
@@ -248,22 +272,24 @@ static struct memory_handle *add_handle(size_t *data_size)
     /* only advance the buffer write index of the size of the struct */
     buf_widx = RINGBUF_ADD(buf_widx, sizeof(struct memory_handle));
 
-    if (!first_handle) {
-        /* the new handle is the first one */
-        first_handle = new_handle;
-    }
-
-    if (cur_handle) {
-        cur_handle->next = new_handle;
-    }
-
-    cur_handle = new_handle;
-    cur_handle->id = cur_handle_id++;
-    cur_handle->next = NULL;
+    new_handle->id = cur_handle_id;
+    /* Use += 2 instead of ++ to guarantee that the low bit is always high and
+     * prevent the assignment of a zero id when wrapping. */
+    cur_handle_id += 2;
+    new_handle->next = NULL;
     num_handles++;
 
+    if (!first_handle)
+        /* the new handle is the first one */
+        first_handle = new_handle;
+
+    if (cur_handle)
+        cur_handle->next = new_handle;
+
+    cur_handle = new_handle;
+
     mutex_unlock(&llist_mutex);
-    return cur_handle;
+    return new_handle;
 }
 
 /* Delete a given memory handle from the linked list
@@ -314,7 +340,7 @@ static bool rm_handle(const struct memory_handle *h)
 
 /* Return a pointer to the memory handle of given ID.
    NULL if the handle wasn't found */
-static struct memory_handle *find_handle(const int handle_id)
+static struct memory_handle *find_handle(const unsigned int handle_id)
 {
     if (handle_id <= 0)
         return NULL;
@@ -349,36 +375,59 @@ static struct memory_handle *find_handle(const int handle_id)
 }
 
 /* Move a memory handle and data_size of its data of delta.
-   Return a pointer to the new location of the handle.
-   delta is the value of which to move the struct data.
+   Return a pointer to the new location of the handle (null if it hasn't moved).
+   delta is the value of which to move the struct data, modified to the actual
+         distance moved.
    data_size is the amount of data to move along with the struct. */
-static struct memory_handle *move_handle(struct memory_handle *h,
-                                         size_t *delta, size_t data_size)
+static struct memory_handle *move_handle(const struct memory_handle *h,
+                                         size_t *delta, const size_t data_size)
 {
-    mutex_lock(&llist_mutex);
+    struct memory_handle *dest;
+    size_t newpos;
+    size_t size_to_move;
+    int overlap;
 
-    if (*delta < 4) {
-        /* aligning backwards would yield a negative result,
-           and moving the handle of such a small amount is a waste
-           of time anyway. */
-        mutex_unlock(&llist_mutex);
+    if (*delta < sizeof(struct memory_handle)) {
+        /* It's not worth trying to move such a short distance, and it would
+         * complicate the overlap calculations below */
         return NULL;
     }
-    /* make sure delta is 32-bit aligned so that the handle struct is. */
-    *delta = (*delta - 3) & ~3;
 
-    size_t newpos = RINGBUF_ADD((void *)h - (void *)buffer, *delta);
+    mutex_lock(&llist_mutex);
 
-    struct memory_handle *dest = (struct memory_handle *)(&buffer[newpos]);
+    size_to_move = sizeof(struct memory_handle) + data_size;
 
-    /* Invalidate the cache to prevent it from keeping the old location of h */
-    if (h == cached_handle)
-        cached_handle = NULL;
+    /* Align to four bytes, down */
+    *delta &= ~3;
+    newpos = RINGBUF_ADD((void *)h - (void *)buffer, *delta);
+    overlap = RINGBUF_ADD_CROSS(newpos, size_to_move, buffer_len - 1);
 
-    /* the cur_handle pointer might need updating */
-    if (h == cur_handle) {
-        cur_handle = dest;
+    /* This means that moving the data will put it on the wrap */
+    if (overlap > 0) {
+        /* This means that the memory_handle struct would wrap */
+        size_t correction;
+        /* If the overlap lands inside the memory_handle */
+        if ((unsigned)overlap > data_size) {
+            /* Correct the position and real delta to prevent the struct from
+             * wrapping, this guarantees an aligned delta, I think */
+            correction = overlap - data_size;
+        } else {
+            /* Otherwise it falls in the data area and must all be backed out */
+            correction = overlap;
+            /* Align to four bytes, up */
+            correction = (correction+3) & ~3;
+            if (*delta <= correction) {
+                /* After correcting, no movement (or, impossibly, backwards) */
+                mutex_unlock(&llist_mutex);
+                return NULL;
+            }
+        }
+        newpos -= correction;
+        overlap -= correction;
+        *delta -= correction;
     }
+    
+    dest = (struct memory_handle *)(&buffer[newpos]);
 
     if (h == first_handle) {
         first_handle = dest;
@@ -396,7 +445,21 @@ static struct memory_handle *move_handle(struct memory_handle *h,
         }
     }
 
-    memmove(dest, h, sizeof(struct memory_handle) + data_size);
+    /* Update the cache to prevent it from keeping the old location of h */
+    if (h == cached_handle)
+        cached_handle = dest;
+
+    /* the cur_handle pointer might need updating */
+    if (h == cur_handle)
+        cur_handle = dest;
+
+    if (overlap > 0) {
+        size_t first_part = size_to_move - overlap;
+        memmove(dest, h, first_part);
+        memmove(buffer, (char *)h + first_part, overlap);
+    } else {
+        memmove(dest, h, size_to_move);
+    }
 
     mutex_unlock(&llist_mutex);
     return dest;
@@ -586,19 +649,21 @@ static bool close_handle(int handle_id)
    part of its data buffer or by moving all the data. */
 static void shrink_handle(int handle_id)
 {
+    size_t delta;
     struct memory_handle *h = find_handle(handle_id);
+
     if (!h)
         return;
-
-    size_t delta;
-    /* The value of delta might change for alignment reasons */
 
     if (h->next && (h->type == TYPE_ID3 || h->type == TYPE_CUESHEET ||
                     h->type == TYPE_IMAGE) && h->filerem == 0 )
     {
         /* metadata handle: we can move all of it */
-        delta = RINGBUF_SUB( (unsigned)((void *)h->next - (void *)buffer),
-                             h->data) - h->available;
+        size_t handle_distance = 
+            RINGBUF_SUB((unsigned)((void *)h->next - (void*)buffer), h->data);
+        delta = handle_distance - h->available;
+
+        /* The value of delta might change for alignment reasons */
         h = move_handle(h, &delta, h->available);
         if (!h) return;
 
@@ -620,6 +685,7 @@ static void shrink_handle(int handle_id)
         delta = RINGBUF_SUB(h->ridx, h->data);
         h = move_handle(h, &delta, 0);
         if (!h) return;
+
         h->data = RINGBUF_ADD(h->data, delta);
         h->available -= delta;
         h->offset += delta;
@@ -655,17 +721,14 @@ static void fill_buffer(void)
 */
 static bool can_add_handle(void)
 {
+    /* the current handle hasn't finished buffering. We can only add
+       a new one if there is already enough free space to finish
+       the buffering. */
     if (cur_handle && cur_handle->filerem > 0) {
-        /* the current handle hasn't finished buffering. We can only add
-           a new one if there is already enough free space to finish
-           the buffering. */
-        if (cur_handle->filerem < (buffer_len - BUF_USED)) {
-            /* Before adding the new handle we reserve some space for the
-               current one to finish buffering its data. */
-            buf_widx = RINGBUF_ADD(buf_widx, cur_handle->filerem);
-        } else {
+        size_t minimum_space =
+            cur_handle->filerem + sizeof(struct memory_handle );
+        if (RINGBUF_ADD_CROSS(cur_handle->widx, minimum_space, buf_ridx) >= 0)
             return false;
-        }
     }
 
     return true;
@@ -727,16 +790,9 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     if (fd < 0)
         return -1;
 
-    size_t size = filesize(fd) - offset;
+    size_t size = filesize(fd);
 
-    if (type != TYPE_AUDIO &&
-        size + sizeof(struct memory_handle) > buffer_len - buf_widx)
-    {
-        /* for types other than audio, the data can't wrap, so we force it */
-        buf_widx = 0;
-    }
-
-    struct memory_handle *h = add_handle(&size);
+    struct memory_handle *h = add_handle(size-offset, type==TYPE_AUDIO, false);
     if (!h)
     {
         DEBUGF("bufopen: failed to add handle\n");
@@ -745,9 +801,8 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     }
 
     strncpy(h->path, file, MAX_PATH);
-    h->fd = -1;
-    h->filesize = filesize(fd);
-    h->filerem = h->filesize - offset;
+    h->filesize = size;
+    h->filerem = size - offset;
     h->offset = offset;
     h->ridx = buf_widx;
     h->widx = buf_widx;
@@ -755,12 +810,15 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     h->available = 0;
     h->type = type;
 
-    close(fd);
-
     if (type == TYPE_CODEC || type == TYPE_CUESHEET || type == TYPE_IMAGE) {
-        /* Immediately buffer those */
+        h->fd = fd;
+        /* Immediately start buffering those */
         LOGFQUEUE("? >| buffering Q_BUFFER_HANDLE");
         queue_send(&buffering_queue, Q_BUFFER_HANDLE, h->id);
+    } else {
+        /* Other types will get buffered in the course of normal operations */
+        h->fd = -1;
+        close(fd);
     }
 
     logf("bufopen: new hdl %d", h->id);
@@ -779,16 +837,9 @@ int bufalloc(const void *src, size_t size, enum data_type type)
     if (!can_add_handle())
         return -2;
 
-    if (buf_widx + size + sizeof(struct memory_handle) > buffer_len) {
-        /* The data would need to wrap. */
-        DEBUGF("bufalloc: data wrap\n");
-        return -2;
-    }
+    struct memory_handle *h = add_handle(size, false, true);
 
-    size_t allocsize = size;
-    struct memory_handle *h = add_handle(&allocsize);
-
-    if (!h || allocsize != size)
+    if (!h)
         return -2;
 
     if (src) {
