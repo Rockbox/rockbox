@@ -537,6 +537,28 @@ bool queue_empty(const struct event_queue* q)
     return ( q->read == q->write );
 }
 
+bool queue_peek(struct event_queue *q, struct queue_event *ev)
+{
+    if (q->read == q->write)
+         return false;
+
+    bool have_msg = false;
+
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&q->cl);
+
+    if (q->read != q->write)
+    {
+        *ev = q->events[q->read & QUEUE_LENGTH_MASK];
+        have_msg = true;
+    }
+
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+
+    return have_msg;
+}
+
 void queue_clear(struct event_queue* q)
 {
     int oldlevel;

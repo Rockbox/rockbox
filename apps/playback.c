@@ -2569,6 +2569,7 @@ static void low_buffer_callback(void)
 
 static void audio_fill_file_buffer(bool start_play, size_t offset)
 {
+    struct queue_event ev;
     bool had_next_track = audio_next_track() != NULL;
     bool continue_buffering;
 
@@ -2591,9 +2592,14 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
         start_play = false;
         offset = 0;
         sleep(1);
-        if (!queue_empty(&audio_queue)) {
-            /* There's a message in the queue. break the loop to treat it,
-               and go back to filling after that. */
+        if (queue_peek(&audio_queue, &ev)) {
+            if (ev.id != Q_AUDIO_FILL_BUFFER)
+            {
+                /* There's a message in the queue. break the loop to treat it,
+                and go back to filling after that. */
+                LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
+                queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+            }
             break;
         }
     } while (continue_buffering);
