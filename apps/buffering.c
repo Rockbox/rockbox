@@ -819,7 +819,7 @@ bool bufclose(int handle_id)
 {
     logf("bufclose(%d)", handle_id);
 
-    LOGFQUEUE("buffering >| Q_CLOSE_HANDLE");
+    LOGFQUEUE("buffering >| Q_CLOSE_HANDLE %d", handle_id);
     return queue_send(&buffering_queue, Q_CLOSE_HANDLE, handle_id);
 }
 
@@ -981,13 +981,13 @@ ssize_t buf_handle_offset(int handle_id)
 
 void buf_request_buffer_handle(int handle_id)
 {
-    LOGFQUEUE("buffering >| buffering Q_BUFFER_HANDLE");
+    LOGFQUEUE("buffering >| buffering Q_BUFFER_HANDLE %d", handle_id);
     queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
 }
 
 void buf_set_base_handle(int handle_id)
 {
-    LOGFQUEUE("buffering >| buffering Q_BUFFER_HANDLE");
+    LOGFQUEUE("buffering > buffering Q_BASE_HANDLE %d", handle_id);
     queue_post(&buffering_queue, Q_BASE_HANDLE, handle_id);
 }
 
@@ -1198,7 +1198,10 @@ bool buffering_init(char *buf, size_t buflen)
     buf_ridx = 0;
 
     first_handle = NULL;
+    cur_handle = NULL;
+    cached_handle = NULL;
     num_handles = 0;
+    base_handle_id = 0;
 
     buffer_callback_count = 0;
     memset(buffer_low_callback_funcs, 0, sizeof(buffer_low_callback_funcs));

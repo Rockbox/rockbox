@@ -1895,6 +1895,7 @@ static void codec_thread(void)
     struct queue_event ev;
     int status;
     size_t wrap;
+    void *codecptr;
 
     while (1) {
         status = 0;
@@ -1950,9 +1951,10 @@ static void codec_thread(void)
 #endif
                 set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
-                wrap = (size_t)&filebuf[filebuflen] - (size_t)bufgetcodec(CUR_TI);
-                status = codec_load_ram(bufgetcodec(CUR_TI), CUR_TI->codecsize,
-                        &filebuf[0], wrap, &ci);
+                codecptr = bufgetcodec(CUR_TI);
+                wrap = (size_t)&filebuf[filebuflen] - (size_t)codecptr;
+                status = codec_load_ram(codecptr, CUR_TI->codecsize,
+                                        &filebuf[0], wrap, &ci);
 #ifdef PLAYBACK_VOICE
                 semaphore_release(&sem_codecthread);
 #endif
