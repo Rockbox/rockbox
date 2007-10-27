@@ -1195,13 +1195,13 @@ void buffering_init(void) {
     conf_filechunk = BUFFERING_DEFAULT_FILECHUNK;
     conf_watermark = BUFFERING_DEFAULT_WATERMARK;
 
+    queue_init(&buffering_queue, true);
+    queue_enable_queue_send(&buffering_queue, &buffering_queue_sender_list);
+
     buffering_thread_p = create_thread( buffering_thread, buffering_stack,
             sizeof(buffering_stack), 0,
             buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING)
             IF_COP(, CPU));
-
-    queue_init(&buffering_queue, true);
-    queue_enable_queue_send(&buffering_queue, &buffering_queue_sender_list);
 }
 
 /* Initialise the buffering subsystem */
