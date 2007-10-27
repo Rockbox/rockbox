@@ -1255,24 +1255,6 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                     return NULL;
                 break;
 
-            case SYS_USB_CONNECTED:
-            {
-                LOGFQUEUE("voice < SYS_USB_CONNECTED");
-                bool change_tracks = voice_on_voice_stop(ev.data, realsize);
-                /* Voice is obviously current so let us swap ourselves away if
-                   playing so audio may stop itself - audio_codec_loaded can
-                   only be true in this case if we're here even if the codec
-                   is only about to load */
-                if (audio_codec_loaded)
-                    swap_codec();
-                /* Playback should be finished by now - ack and wait */
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                usb_wait_for_disconnect(&voice_queue);
-                if (change_tracks)
-                    return NULL;
-                break;
-                }
-
             case Q_VOICE_PLAY:
                 LOGFQUEUE("voice < Q_VOICE_PLAY");
                 if (!voice_is_playing)
@@ -1984,15 +1966,6 @@ static void codec_thread(void)
                 break;
 #endif /* AUDIO_HAVE_RECORDING */
 
-#ifndef SIMULATOR
-            case SYS_USB_CONNECTED:  
-                LOGFQUEUE("codec < SYS_USB_CONNECTED");
-                queue_clear(&codec_queue);
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                usb_wait_for_disconnect(&codec_queue);
-                break;
-#endif
-                
             default:
                 LOGFQUEUE("codec < default");
         }
@@ -3218,6 +3191,10 @@ static void audio_thread(void)
                 LOGFQUEUE("audio < SYS_USB_CONNECTED");
                 if (playing)
                     audio_stop_playback();
+#ifdef PLAYBACK_VOICE
+                wait_for_voice_swap_in();
+                voice_stop();
+#endif
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&audio_queue);
                 /* release tracks to make sure all handles are closed */
@@ -3278,7 +3255,7 @@ void audio_init(void)
 #endif
     queue_init(&audio_queue, true);
     queue_enable_queue_send(&audio_queue, &audio_queue_sender_list);
-    queue_init(&codec_queue, true);
+    queue_init(&codec_queue, false);
     queue_enable_queue_send(&codec_queue, &codec_queue_sender_list);
 
     pcm_init();
@@ -3350,7 +3327,7 @@ void audio_init(void)
     if (talk_voice_required())
     {
         logf("Starting voice codec");
-        queue_init(&voice_queue, true);
+        queue_init(&voice_queue, false);
         voice_thread_p = create_thread(voice_thread, voice_stack,
                 sizeof(voice_stack), CREATE_THREAD_FROZEN,
                 voice_thread_name
