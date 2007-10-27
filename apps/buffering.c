@@ -1189,8 +1189,23 @@ void buffering_thread(void)
     }
 }
 
+void buffering_init(void) {
+    mutex_init(&llist_mutex);
+
+    conf_filechunk = BUFFERING_DEFAULT_FILECHUNK;
+    conf_watermark = BUFFERING_DEFAULT_WATERMARK;
+
+    buffering_thread_p = create_thread( buffering_thread, buffering_stack,
+            sizeof(buffering_stack), 0,
+            buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING)
+            IF_COP(, CPU));
+
+    queue_init(&buffering_queue, true);
+    queue_enable_queue_send(&buffering_queue, &buffering_queue_sender_list);
+}
+
 /* Initialise the buffering subsystem */
-bool buffering_init(char *buf, size_t buflen)
+bool buffering_reset(char *buf, size_t buflen)
 {
     if (!buf || !buflen)
         return false;
@@ -1211,26 +1226,10 @@ bool buffering_init(char *buf, size_t buflen)
     buffer_callback_count = 0;
     memset(buffer_low_callback_funcs, 0, sizeof(buffer_low_callback_funcs));
 
-    mutex_init(&llist_mutex);
-
-    conf_filechunk = BUFFERING_DEFAULT_FILECHUNK;
-    conf_watermark = BUFFERING_DEFAULT_WATERMARK;
-
     /* Set the high watermark as 75% full...or 25% empty :) */
 #if MEM > 8
     high_watermark = 3*buflen / 4;
 #endif
-
-    if (buffering_thread_p == NULL)
-    {
-        buffering_thread_p = create_thread( buffering_thread, buffering_stack,
-                sizeof(buffering_stack), 0,
-                buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING)
-                IF_COP(, CPU));
-
-        queue_init(&buffering_queue, true);
-        queue_enable_queue_send(&buffering_queue, &buffering_queue_sender_list);
-    }
 
     return true;
 }

@@ -37,7 +37,10 @@ enum data_type {
 
 
 /* Initialise the buffering subsystem */
-bool buffering_init(char *buf, size_t buflen);
+void buffering_init(void);
+
+/* Reset the buffering system */
+bool buffering_reset(char *buf, size_t buflen);
 
 
 /***************************************************************************

@@ -3067,7 +3067,7 @@ static void audio_reset_buffer(void)
        will already be line aligned */
     filebuflen &= ~3;
 
-    buffering_init(filebuf, filebuflen);
+    buffering_reset(filebuf, filebuflen);
 
     /* Clear any references to the file buffer */
     buffer_state = BUFFER_STATE_INITIALIZED;
@@ -3361,6 +3361,9 @@ void audio_init(void)
     /* Set crossfade setting for next buffer init which should be about... */
     pcmbuf_crossfade_enable(global_settings.crossfade);
 
+    /* initialize the buffering system */
+
+    buffering_init();
     /* ...now! Set up the buffers */
     audio_reset_buffer();
 
