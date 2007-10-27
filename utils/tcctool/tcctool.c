@@ -48,7 +48,7 @@ struct device_t
 
 static struct device_t devices[] = 
 { 
-    {"c100",     "Sansa C100 series",            0xb021, 0x20000000, 0x62e97010 },
+    {"c100",     "Sansa C100 series",            0xb021, 0x20000000, 0x42e97010 },
     {"cowond2",  "Cowon D2",                     0xb011, 0x20000000, 0xa2e92010 },
     {"iaudio6",  "iAudio 6",                     0xb021, 0x20000000, 0x62e97010 },
     {"iaudio7",  "iAudio 7",                     0xb021, 0x20000000, 0x62e97010 },
