@@ -94,31 +94,31 @@
 
 /* Ring buffer helper macros */
 /* Buffer pointer (p) plus value (v), wrapped if necessary */
-#define RINGBUF_ADD(p,v) ((p+v)<buffer_len ? p+v : p+v-buffer_len)
+#define RINGBUF_ADD(p,v) (((p)+(v))<buffer_len ? (p)+(v) : (p)+(v)-buffer_len)
 /* Buffer pointer (p) minus value (v), wrapped if necessary */
-#define RINGBUF_SUB(p,v) ((p>=v) ? p-v : p+buffer_len-v)
+#define RINGBUF_SUB(p,v) ((p>=v) ? (p)-(v) : (p)+buffer_len-(v))
 /* How far value (v) plus buffer pointer (p1) will cross buffer pointer (p2) */
 #define RINGBUF_ADD_CROSS(p1,v,p2) \
-((p1<p2) ? (int)(p1+v)-(int)p2 : (int)(p1+v-p2)-(int)buffer_len)
+((p1<p2) ? (int)((p1)+(v))-(int)(p2) : (int)((p1)+(v)-(p2))-(int)buffer_len)
 /* Bytes available in the buffer */
 #define BUF_USED RINGBUF_SUB(buf_widx, buf_ridx)
 
+/* assert(sizeof(struct memory_handle)%4==0) */
 struct memory_handle {
     int id;                     /* A unique ID for the handle */
-    enum data_type type;
-    char path[MAX_PATH];
-    int fd;
-    size_t data;                /* Start index of the handle's data buffer */
-    volatile size_t ridx;       /* Current read pointer, relative to the main buffer */
-    size_t widx;                /* Current write pointer */
-    size_t filesize;            /* File total length */
-    size_t filerem;             /* Remaining bytes of file NOT in buffer */
-    volatile size_t available;  /* Available bytes to read from buffer */
-    size_t offset;              /* Offset at which we started reading the file */
+    enum data_type type;       /* Type of data buffered with this handle */
+    char path[MAX_PATH];       /* Path if data originated in a file */
+    int fd;                    /* File descriptor to path (-1 if closed) */
+    size_t data;               /* Start index of the handle's data buffer */
+    volatile size_t ridx;      /* Read pointer, relative to the main buffer */
+    size_t widx;               /* Write pointer */
+    size_t filesize;           /* File total length */
+    size_t filerem;            /* Remaining bytes of file NOT in buffer */
+    volatile size_t available; /* Available bytes to read from buffer */
+    size_t offset;             /* Offset at which we started reading the file */
     struct memory_handle *next;
 };
-/* at all times, we have: filesize == offset + available + filerem */
-
+/* invariant: filesize == offset + available + filerem */
 
 static char *buffer;
 static char *guard_buffer;
@@ -131,8 +131,10 @@ static volatile size_t buf_ridx;  /* current reading position */
 
 /* Configuration */
 static size_t conf_watermark = 0; /* Level to trigger filebuf fill */
-static size_t conf_filechunk = 0; /* Largest chunk the codec accepts */
-static size_t conf_preseek   = 0; /* Codec pre-seek margin */
+static size_t conf_filechunk = 0; /* Bytes-per-read for buffering (impacts
+                                     responsiveness of buffering thread) */
+static size_t conf_preseek   = 0; /* Distance a codec may look backwards after
+                                     seeking, to prevent double rebuffers */
 #if MEM > 8
 static size_t high_watermark = 0; /* High watermark for rebuffer */
 #endif
@@ -149,7 +151,7 @@ static int base_handle_id;
 static struct mutex llist_mutex;
 
 /* Handle cache (makes find_handle faster).
-   This needs be to be global so that move_handle can invalidate it. */
+   This is global so that move_handle and rm_handle can invalidate it. */
 static struct memory_handle *cached_handle = NULL;
 
 static buffer_low_callback buffer_low_callback_funcs[MAX_BUF_CALLBACKS];
@@ -266,8 +268,11 @@ static struct memory_handle *add_handle(size_t *data_size)
 
 /* Delete a given memory handle from the linked list
    and return true for success. Nothing is actually erased from memory. */
-static bool rm_handle(struct memory_handle *h)
+static bool rm_handle(const struct memory_handle *h)
 {
+    if (h == NULL)
+        return false;
+
     mutex_lock(&llist_mutex);
 
     if (h == first_handle) {
@@ -275,7 +280,7 @@ static bool rm_handle(struct memory_handle *h)
         if (h == cur_handle) {
             /* h was the first and last handle: the buffer is now empty */
             cur_handle = NULL;
-            buf_ridx = buf_widx;
+            buf_ridx = buf_widx = 0;
         } else {
             /* update buf_ridx to point to the new first handle */
             buf_ridx = (void *)first_handle - (void *)buffer;
@@ -285,7 +290,7 @@ static bool rm_handle(struct memory_handle *h)
         while (m && m->next != h) {
             m = m->next;
         }
-        if (h && m && m->next == h) {
+        if (m && m->next == h) {
             m->next = h->next;
             if (h == cur_handle) {
                 cur_handle = m;
@@ -309,7 +314,7 @@ static bool rm_handle(struct memory_handle *h)
 
 /* Return a pointer to the memory handle of given ID.
    NULL if the handle wasn't found */
-static struct memory_handle *find_handle(int handle_id)
+static struct memory_handle *find_handle(const int handle_id)
 {
     if (handle_id <= 0)
         return NULL;
@@ -336,9 +341,8 @@ static struct memory_handle *find_handle(int handle_id)
         m = m->next;
     }
     /* This condition can only be reached with !m or m->id == handle_id */
-    if (m) {
+    if (m)
         cached_handle = m;
-    }
 
     mutex_unlock(&llist_mutex);
     return m;
@@ -853,7 +857,7 @@ int bufseek(int handle_id, size_t newpos)
    Return 0 for success and < 0 for failure */
 int bufadvance(int handle_id, off_t offset)
 {
-    struct memory_handle *h = find_handle(handle_id);
+    const struct memory_handle *h = find_handle(handle_id);
     if (!h)
         return -1;
 
@@ -865,7 +869,7 @@ int bufadvance(int handle_id, off_t offset)
    Return the number of bytes copied or < 0 for failure. */
 ssize_t bufread(int handle_id, size_t size, void *dest)
 {
-    struct memory_handle *h = find_handle(handle_id);
+    const struct memory_handle *h = find_handle(handle_id);
     if (!h)
         return -1;
 
@@ -908,7 +912,7 @@ ssize_t bufread(int handle_id, size_t size, void *dest)
    The guard buffer may be used to provide the requested size */
 ssize_t bufgetdata(int handle_id, size_t size, void **data)
 {
-    struct memory_handle *h = find_handle(handle_id);
+    const struct memory_handle *h = find_handle(handle_id);
     if (!h)
         return -1;
 
@@ -964,7 +968,7 @@ management functions for all the actual handle management work.
 /* Get a handle offset from a pointer */
 ssize_t buf_get_offset(int handle_id, void *ptr)
 {
-    struct memory_handle *h = find_handle(handle_id);
+    const struct memory_handle *h = find_handle(handle_id);
     if (!h)
         return -1;
 
@@ -973,7 +977,7 @@ ssize_t buf_get_offset(int handle_id, void *ptr)
 
 ssize_t buf_handle_offset(int handle_id)
 {
-    struct memory_handle *h = find_handle(handle_id);
+    const struct memory_handle *h = find_handle(handle_id);
     if (!h)
         return -1;
     return h->offset;
@@ -1142,6 +1146,7 @@ void buffering_thread(void)
             data_counters.buffered < high_watermark)
         {
             fill_buffer();
+            update_data_counters();
         }
 
         if (ata_disk_is_active() && queue_empty(&buffering_queue) &&
