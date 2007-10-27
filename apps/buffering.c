@@ -1199,7 +1199,7 @@ void buffering_init(void) {
     queue_enable_queue_send(&buffering_queue, &buffering_queue_sender_list);
 
     buffering_thread_p = create_thread( buffering_thread, buffering_stack,
-            sizeof(buffering_stack), 0,
+            sizeof(buffering_stack), CREATE_THREAD_FROZEN,
             buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING)
             IF_COP(, CPU));
 }
@@ -1230,6 +1230,8 @@ bool buffering_reset(char *buf, size_t buflen)
 #if MEM > 8
     high_watermark = 3*buflen / 4;
 #endif
+
+    thread_thaw(buffering_thread_p);
 
     return true;
 }
