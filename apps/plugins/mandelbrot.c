@@ -184,6 +184,7 @@ PLUGIN_HEADER
 #define MYLCD_UPDATE()
 #define MYXLCD(fn) gray_ub_ ## fn
 #else
+#define UPDATE_FREQ (HZ/50)
 #define MYLCD(fn) rb->lcd_ ## fn
 #define MYLCD_UPDATE() rb->lcd_update();
 #define MYXLCD(fn) xlcd_ ## fn
@@ -439,6 +440,10 @@ void init_mandelbrot_set(void)
 void calc_mandelbrot_low_prec(void)
 {
     long start_tick, last_yield;
+#ifndef USEGSLIB
+    long next_update = *rb->current_tick;
+    int last_px = px_min;
+#endif
     unsigned n_iter;
     long a32, b32;
     short x, x2, y, y2, a, b;
@@ -482,11 +487,17 @@ void calc_mandelbrot_low_prec(void)
         }
 #ifdef USEGSLIB
         gray_ub_gray_bitmap_part(imgbuffer, 0, py_min, 1,
-                                 p_x, py_min, 1, py_max-py_min);
+                                 p_x, py_min, 1, py_max - py_min);
 #else
         rb->lcd_bitmap_part(imgbuffer, 0, py_min, 1,
-                            p_x, py_min, 1, py_max-py_min);
-        rb->lcd_update_rect(p_x, py_min, 1, py_max-py_min);
+                            p_x, py_min, 1, py_max - py_min);
+        if ((p_x == px_max - 1) || TIME_AFTER(*rb->current_tick, next_update))
+        {
+            next_update = *rb->current_tick + UPDATE_FREQ;
+            rb->lcd_update_rect(last_px, py_min, p_x - last_px + 1,
+                                py_max - py_min);
+            last_px = p_x;
+        }
 #endif
     }
 }
@@ -494,6 +505,10 @@ void calc_mandelbrot_low_prec(void)
 void calc_mandelbrot_high_prec(void)
 {
     long start_tick, last_yield;
+#ifndef USEGSLIB
+    long next_update = *rb->current_tick;
+    int last_px = px_min;
+#endif
     unsigned n_iter;
     long x, x2, y, y2, a, b;
     int p_x, p_y;
@@ -535,11 +550,17 @@ void calc_mandelbrot_high_prec(void)
         }
 #ifdef USEGSLIB
         gray_ub_gray_bitmap_part(imgbuffer, 0, py_min, 1,
-                                 p_x, py_min, 1, py_max-py_min);
+                                 p_x, py_min, 1, py_max - py_min);
 #else
         rb->lcd_bitmap_part(imgbuffer, 0, py_min, 1,
                             p_x, py_min, 1, py_max-py_min);
-        rb->lcd_update_rect(p_x, py_min, 1, py_max-py_min);
+        if ((p_x == px_max - 1) || TIME_AFTER(*rb->current_tick, next_update))
+        {
+            next_update = *rb->current_tick + UPDATE_FREQ;
+            rb->lcd_update_rect(last_px, py_min, p_x - last_px + 1,
+                                py_max - py_min);
+            last_px = p_x;
+        }
 #endif
     }
 }
