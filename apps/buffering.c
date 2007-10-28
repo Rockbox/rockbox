@@ -212,9 +212,12 @@ buf_ridx == buf_widx means the buffer is empty.
 /* Add a new handle to the linked list and return it. It will have become the
    new current handle.
    data_size must contain the size of what will be in the handle.
-             On return, it's the size available for the handle.
    can_wrap tells us whether this type of data may wrap on buffer
    alloc_all tells us if we must immediately be able to allocate data_size
+   returns a valid memory handle if all conditions for allocation are met.
+           NULL if there memory_handle itself cannot be allocated or if the
+           data_size cannot be allocated and alloc_all is set.  This function
+           has no side effects if NULL is returned.
    */
 static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
                                         const bool alloc_all)
@@ -578,6 +581,10 @@ static ssize_t buffer_handle(int handle_id)
         h->filerem -= rc;
 
         /* Stop buffering if new queue events have arrived */
+        /* FIXME: This may sleep, if it does it will untrigger the
+         * cpu boost for this thread.  If the codec's low data
+         * situation was very short lived that could leave us filling
+         * w/o boost */
         if (yield_codec())
             break;
     }
