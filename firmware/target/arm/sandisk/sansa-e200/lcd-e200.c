@@ -304,7 +304,7 @@ static void lcd_display_on(void)
        REV=x, D1-0=01 */
     lcd_write_reg(R_DISP_CONTROL1, 0x0041 | r_disp_control_rev);
 
-    sleep(HZ/20);
+    sleep(HZ/30);
 
     /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, DTE=0, CL=0,
        REV=x, D1-0=01 */
@@ -313,7 +313,7 @@ static void lcd_display_on(void)
        REV=x, D1-0=11 */
     lcd_write_reg(R_DISP_CONTROL1, 0x0063 | r_disp_control_rev);
 
-    sleep(HZ/20);
+    sleep(HZ/30);
 
     /* PT1-0=00, VLE2-1=00, SPT=0, IB6(??)=1, GON=1, DTE=1, CL=0,
        REV=x, D1-0=11 */
@@ -451,8 +451,7 @@ void lcd_enable(bool on)
         lcd_display_on();  /* Turn on display */
         lcd_update();      /* Resync display */
         LCD_REG_6 |= 1;    /* Restart DMA */
-        sleep(HZ/25);      /* Wait for a frame to be written by
-                              DMA or a white flash will happen */
+        sleep(HZ/50);      /* Wait for a frame to be written */
     }
     else
     {
