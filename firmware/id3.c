@@ -192,6 +192,13 @@ char* id3_get_num_genre(const unsigned int genre_num)
     return NULL;
 }
 
+/* True if the string is from the "genres" array */
+bool id3_is_genre_string(const char *string)
+{
+    return ( string >= genres[0] &&
+             string <= genres[sizeof(genres)/sizeof(char*) - 1] );
+}
+
 char* id3_get_codec(const struct mp3entry* id3)
 {
     if (id3->codectype < AFMT_NUM_CODECS) {
@@ -1233,7 +1240,8 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
         entry->artist += offset;
     if (entry->album)
         entry->album += offset;
-    if (entry->genre_string)
+    if (entry->genre_string && !id3_is_genre_string(entry->genre_string))
+        /* Don't adjust that if it points to an entry of the "genres" array */
         entry->genre_string += offset;
     if (entry->track_string)
         entry->track_string += offset;
