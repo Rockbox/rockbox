@@ -212,6 +212,13 @@ arm9tdmicc () {
  endian="little"
 }
 
+arm946cc () {
+ prefixtools arm-elf-
+ GCCOPTS="$CCOPTS -mcpu=arm9e -mlong-calls"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="little"
+}
+
 whichadvanced () {
   ##################################################################
   # Prompt for specific developer options
@@ -619,10 +626,10 @@ cat <<EOF
  ==iAudio==            ==Toshiba==            ==SanDisk==
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
  31) M5/M5L            41) Gigabeat S         51) Sansa e200R
-                                              52) Sansa c200
+ 32) 7                                        52) Sansa c200
 
- ==Tatung==            ==Olympus==
- 60) Elio TPJ-1022     70) M:Robe 500
+ ==Tatung==            ==Olympus==            ==Logik==
+ 60) Elio TPJ-1022     70) M:Robe 500         80) DAX 1GB MP3/DAB
 EOF
 
   buildfor=`input`;
@@ -636,6 +643,7 @@ EOF
   iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb"
   ipodbitmaptools="$toolset scramble ipod_fw bmp2rb"
   gigabeatbitmaptools="$toolset scramble descramble bmp2rb"
+  tccbitmaptools="$toolset scramble mktccboot bmp2rb"
   # generic is used by IFP, H10, Sansa-e200
   genericbitmaptools="$toolset bmp2rb"
 
@@ -1310,6 +1318,32 @@ EOF
     t_model="mrobe-500"
     ;;
 
+   80|logikdax)
+    target_id=31
+    archos="logikdax"
+    target="-DLOGIK_DAX"
+    memory=2 # always
+    arm946cc
+    tool="$rootdir/tools/scramble -add=ldax"
+    boottool="$rootdir/tools/scramble -tcc=crc"
+    bootoutput="player.rom"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
+    output="rockbox.logik"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="no"
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$tccbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tcc77x"
+    t_model="logikdax"
+    ;;
+
    50|e200)
     target_id=23
     archos="e200"
@@ -1415,6 +1449,32 @@ EOF
     t_cpu="arm"
     t_manufacturer="tatung"
     t_model="tpj1022"
+    ;;
+
+   32|iaudio7)
+    target_id=32
+    archos="iaudio7"
+    target="-DIAUDIO_7"
+    memory=16 # always
+    arm946cc
+    tool="$rootdir/tools/scramble -add i7"
+    boottool="$rootdir/tools/scramble -tcc=crc"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    output="rockbox.iaudio"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    swcodec="yes"
+    bootoutput="I7_FW.BIN"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$tccbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tcc77x"
+    t_model="iaudio7"
     ;;
     
    *)

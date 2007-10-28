@@ -651,6 +651,11 @@ static inline void core_sleep(struct thread_entry **waking)
         "msr    cpsr_c, r0      \n"
         :  : "r"(waking) : "r0", "r1", "r2", "r3");
 }
+#elif defined(CPU_TCC77X)
+static inline void core_sleep(struct thread_entry **waking)
+{
+    #warning TODO: Implement core_sleep
+}
 #else
 static inline void core_sleep(struct thread_entry **waking)
 {

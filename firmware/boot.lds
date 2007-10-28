@@ -11,6 +11,8 @@ OUTPUT_ARCH(arm)
 INPUT(target/arm/crt0-pp-bl.o)
 #elif defined(OLYMPUS_MROBE_500)
 INPUT(target/arm/tms320dm320/crt0.o)
+#elif defined(CPU_TCC77X)
+INPUT(target/arm/tcc77x/crt0.o)
 #else
 INPUT(target/arm/crt0.o)
 #endif
@@ -77,6 +79,12 @@ INPUT(target/sh/crt0.o)
 #define IRAMSIZE 16K
 #define FLASHORIG 0x0000000
 #define FLASHSIZE 1M
+#elif defined(CPU_TCC77X)
+#define DRAMORIG 0x20000000
+#define IRAMORIG 0x00000000
+#define IRAMSIZE 64K
+#define FLASHORIG 0x0000000
+#define FLASHSIZE 1M
 #else
 #define DRAMORIG 0x09000000
 #define IRAMORIG 0x0f000000
@@ -85,7 +93,17 @@ INPUT(target/sh/crt0.o)
 #define FLASHSIZE 256K - ROM_START
 #endif
 
-#if !defined(CPU_PP) && (CONFIG_CPU!=S3C2440) && (CONFIG_CPU!=IMX31L)
+#if defined(CPU_TCC77X)
+MEMORY
+{
+#ifdef TCCBOOT
+   DRAM : ORIGIN = DRAMORIG + DRAMSIZE - 0x100000, LENGTH = 0x100000
+#else
+   DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+#endif
+   IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+}
+#elif !defined(CPU_PP) && (CONFIG_CPU!=S3C2440) && (CONFIG_CPU!=IMX31L)
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
@@ -167,6 +185,43 @@ SECTIONS
          *(COMMON)
          _end = .;
      }
+}
+#elif defined(CPU_TCC77X)
+{
+    .text : {
+        *(.init.text)
+        *(.text)
+        *(.text*)
+        *(.glue_7)
+        *(.glue_7t)
+   } > DRAM
+
+    .data : {
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        *(.data*)
+        *(.rodata.*)
+        . = ALIGN(0x4);
+        _dataend = . ;
+    } > DRAM
+
+    .stack :
+    {
+         *(.stack)
+         _stackbegin = .;
+         stackbegin = .;
+         . += 0x2000;
+         _stackend = .;
+         stackend = .;
+    } > DRAM
+    .bss : {
+         _edata = .;
+         *(.bss*);
+         *(.ibss);
+         *(COMMON)
+         _end = .;
+     } > DRAM
 }
 #elif (CONFIG_CPU==DM320)
 {

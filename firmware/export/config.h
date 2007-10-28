@@ -51,6 +51,8 @@
 #define DSC25          25
 #define DM320         320
 #define IMX31L         31
+#define TCC771L       771
+#define TCC773L       773
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -71,6 +73,8 @@
 #define ARCHOS_AV300_PAD   16
 #define MROBE500_PAD       17
 #define GIGABEAT_S_PAD     18
+#define LOGIK_DAX_PAD      19
+#define IAUDIO67_PAD       20 
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -103,6 +107,8 @@
 #define LCD_DSC25    16 /* as used by Archos AV300 */
 #define LCD_C200     17 /* as used by Sandisk Sansa c200 */
 #define LCD_MROBE500 18 /* as used by Olympus M:Robe 500i */
+#define LCD_LOGIKDAX 19 /* as used by Logik DAX - SSD1815 */
+#define LCD_IAUDIO67 20 /* as used by iAudio 6/7 - unknown */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -122,6 +128,7 @@
 #define I2C_S3C2440  7
 #define I2C_PP5024   8 /* PP5024 style */
 #define I2C_IMX31L   9
+#define I2C_TCC77X  10
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -141,6 +148,7 @@
 #define RTC_DS1339_DS3231   7 /* h1x0 RTC mod */
 #define RTC_IMX31L   8
 #define RTC_RX5X348AB 9
+#define RTC_TCC77X   10
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */
@@ -210,6 +218,10 @@
 #include "config-tpj1022.h"
 #elif defined(MROBE_500)
 #include "config-mrobe500.h"
+#elif defined(LOGIK_DAX)
+#include "config-logikdax.h"
+#elif defined(IAUDIO_7)
+#include "config-iaudio7.h"
 #else
 /* no known platform */
 #endif
@@ -309,6 +321,11 @@
 #define CPU_PP502x
 #endif
 
+/* define for all cpus from TCC77X family */
+#if (CONFIG_CPU == TCC771L) || (CONFIG_CPU == TCC773L)
+#define CPU_TCC77X
+#endif
+
 /* define for all cpus from ARM7TDMI family (for specific optimisations) */
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == DSC25)
 #define CPU_ARM7TDMI
@@ -316,7 +333,8 @@
 
 /* define for all cpus from ARM family */
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-    || (CONFIG_CPU == DSC25) || (CONFIG_CPU == IMX31L) || (CONFIG_CPU == DM320)
+  || (CONFIG_CPU == DSC25) || (CONFIG_CPU == IMX31L) || (CONFIG_CPU == DM320) \
+  || defined(CPU_TCC77X)
 #define CPU_ARM
 #endif
 
@@ -342,6 +360,7 @@
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
+    defined(CPU_TCC77X) ||  /* Telechips: core, plugins, codecs */ \
     (CONFIG_CPU == PNX0101))
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))

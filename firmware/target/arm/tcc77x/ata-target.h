@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * Copyright (C) 2007 Dave Chapman
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,38 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
+#ifndef ATA_TARGET_H
+#define ATA_TARGET_H
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
-#endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
-#include "pp5024.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-#if CONFIG_CPU == DM320
-#include "dm320.h"
-#endif
-#if CONFIG_CPU == IMX31L
-#include "imx31l.h"
-#endif
-#ifdef CPU_TCC77X
-#include "tcc77x.h"
 #endif
