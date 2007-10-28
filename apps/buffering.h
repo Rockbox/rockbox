@@ -35,6 +35,13 @@ enum data_type {
     TYPE_UNKNOWN,
 };
 
+/* Error return values */
+#define HANDLE_NOT_FOUND    -1
+#define BUFFER_FULL         -2
+#define INVALID_VALUE       -3
+#define FILE_ERROR          -4
+#define DATA_NOT_READY      -5
+
 
 /* Initialise the buffering subsystem */
 void buffering_init(void);
