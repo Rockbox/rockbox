@@ -88,7 +88,7 @@
 #define FAT_ATTR_LONG_NAME_MASK (FAT_ATTR_READ_ONLY | FAT_ATTR_HIDDEN | \
                                  FAT_ATTR_SYSTEM | FAT_ATTR_VOLUME_ID | \
                                  FAT_ATTR_DIRECTORY | FAT_ATTR_ARCHIVE )
-                                 
+
 /* NTRES flags */
 #define FAT_NTRES_LC_NAME    0x08
 #define FAT_NTRES_LC_EXT     0x10
@@ -176,11 +176,14 @@ static struct bpb fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int flush_fat(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb));
-static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,) long secnum, bool dirty);
+static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,)
+                              long secnum, bool dirty);
 static void create_dos_name(const unsigned char *name, unsigned char *newname);
 static void randomize_dos_name(unsigned char *name);
-static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned long start);
-static int transfer(IF_MV2(struct bpb* fat_bpb,) unsigned long start, long count, char* buf, bool write );
+static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,)
+                                       unsigned long start);
+static int transfer(IF_MV2(struct bpb* fat_bpb,) unsigned long start,
+                    long count, char* buf, bool write );
 
 #define FAT_CACHE_SIZE 0x20
 #define FAT_CACHE_MASK (FAT_CACHE_SIZE-1)
@@ -285,7 +288,7 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
 #ifdef HAVE_MULTIVOLUME
     fat_bpb->drive          = drive;
 #endif
-  
+
     fat_bpb->bpb_bytspersec = BYTES2INT16(buf,BPB_BYTSPERSEC);
     secmult = fat_bpb->bpb_bytspersec / SECTOR_SIZE; 
     /* Sanity check is performed later */
@@ -318,7 +321,7 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
     rootdirsectors = secmult * ((fat_bpb->bpb_rootentcnt * DIR_ENTRY_SIZE
                      + fat_bpb->bpb_bytspersec - 1) / fat_bpb->bpb_bytspersec);
 #endif /* #ifdef HAVE_FAT16SUPPORT */
-    
+
     fat_bpb->firstdatasector = fat_bpb->bpb_rsvdseccnt
 #ifdef HAVE_FAT16SUPPORT
         + rootdirsectors
@@ -365,7 +368,7 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
             / fat_bpb->bpb_secperclus); /* rounded up, to full clusters */
         /* I assign negative pseudo cluster numbers for the root directory,
            their range is counted upward until -1. */
-        fat_bpb->bpb_rootclus = 0 - dirclusters; /* backwards, before the data */
+        fat_bpb->bpb_rootclus = 0 - dirclusters; /* backwards, before the data*/
         fat_bpb->rootdiroffset = dirclusters * fat_bpb->bpb_secperclus
             - rootdirsectors;
     }
@@ -374,7 +377,8 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
     { /* FAT32 specific part of BPB */
         fat_bpb->bpb_rootclus  = BYTES2INT32(buf,BPB_ROOTCLUS);
         fat_bpb->bpb_fsinfo    = secmult * BYTES2INT16(buf,BPB_FSINFO);
-        fat_bpb->rootdirsector = cluster2sec(IF_MV2(fat_bpb,) fat_bpb->bpb_rootclus);
+        fat_bpb->rootdirsector = cluster2sec(IF_MV2(fat_bpb,)
+                                             fat_bpb->bpb_rootclus);
     }
 
     rc = bpb_is_sane(IF_MV(fat_bpb));
@@ -473,7 +477,7 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
                 unsigned int c = i * CLUSTERS_PER_FAT16_SECTOR + j;
                 if ( c > fat_bpb->dataclusters+1 ) /* nr 0 is unused */
                     break;
-      
+
                 if (letoh16(fat[j]) == 0x0000) {
                     free++;
                     if ( fat_bpb->fsinfo.nextfree == 0xffffffff )
@@ -492,7 +496,7 @@ void fat_recalc_free(IF_MV_NONVOID(int volume))
                 unsigned long c = i * CLUSTERS_PER_FAT_SECTOR + j;
                 if ( c > fat_bpb->dataclusters+1 ) /* nr 0 is unused */
                     break;
-      
+
                 if (!(letoh32(fat[j]) & 0x0fffffff)) {
                     free++;
                     if ( fat_bpb->fsinfo.nextfree == 0xffffffff )
@@ -516,7 +520,8 @@ static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb))
                 fat_bpb->bpb_bytspersec);
         return -1;
     }
-    if((long)fat_bpb->bpb_secperclus * (long)fat_bpb->bpb_bytspersec > 128L*1024L)
+    if((long)fat_bpb->bpb_secperclus * (long)fat_bpb->bpb_bytspersec
+                                                                   > 128L*1024L)
     {
         DEBUGF( "bpb_is_sane() - Error: cluster size is larger than 128K "
                 "(%d * %d = %d)\n",
@@ -601,7 +606,7 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
     fce->dirty = false;
 }
 
-/* Note: The returned pointer is only safely valid until the next 
+/* Note: The returned pointer is only safely valid until the next
          task switch! (Any subsequent ata read/write may yield.) */
 static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,)
                               long fatsector, bool dirty)
@@ -657,7 +662,8 @@ static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,)
     return sectorbuf;
 }
 
-static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned long startcluster)
+static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,)
+                                       unsigned long startcluster)
 {
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
@@ -671,7 +677,7 @@ static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned lon
     {
         sector = startcluster / CLUSTERS_PER_FAT16_SECTOR;
         offset = startcluster % CLUSTERS_PER_FAT16_SECTOR;
-    
+
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
             unsigned int nr = (i + sector) % fat_bpb->fatsize;
@@ -699,7 +705,7 @@ static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned lon
     {
         sector = startcluster / CLUSTERS_PER_FAT_SECTOR;
         offset = startcluster % CLUSTERS_PER_FAT_SECTOR;
-    
+
         for (i = 0; i<fat_bpb->fatsize; i++) {
             unsigned int j;
             unsigned long nr = (i + sector) % fat_bpb->fatsize;
@@ -727,7 +733,8 @@ static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned lon
     return 0; /* 0 is an illegal cluster number */
 }
 
-static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry, unsigned long val)
+static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry,
+                            unsigned long val)
 {
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
@@ -765,7 +772,8 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry, un
                 fat_bpb->fsinfo.freecount++;
         }
 
-        LDEBUGF("update_fat_entry: %d free clusters\n", fat_bpb->fsinfo.freecount);
+        LDEBUGF("update_fat_entry: %d free clusters\n",
+                fat_bpb->fsinfo.freecount);
 
         sec[offset] = htole16(val);
     }
@@ -787,7 +795,7 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry, un
         sec = cache_fat_sector(IF_MV2(fat_bpb,) sector, true);
         if (!sec)
         {
-            DEBUGF( "update_fat_entry() - Could not cache sector %ld\n", sector);
+            DEBUGF("update_fat_entry() - Could not cache sector %ld\n", sector);
             return -1;
         }
 
@@ -801,7 +809,8 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry, un
                 fat_bpb->fsinfo.freecount++;
         }
 
-        LDEBUGF("update_fat_entry: %ld free clusters\n", fat_bpb->fsinfo.freecount);
+        LDEBUGF("update_fat_entry: %ld free clusters\n",
+                fat_bpb->fsinfo.freecount);
 
         /* don't change top 4 bits */
         sec[offset] &= htole32(0xf0000000);
@@ -854,7 +863,7 @@ static long get_next_cluster(IF_MV2(struct bpb* fat_bpb,) long cluster)
 {
     long next_cluster;
     long eof_mark = FAT_EOF_MARK;
-    
+
 #ifdef HAVE_FAT16SUPPORT
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
@@ -883,12 +892,12 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
     unsigned char fsinfo[SECTOR_SIZE];
     unsigned long* intptr;
     int rc;
-    
+
 #ifdef HAVE_FAT16SUPPORT
     if (fat_bpb->is_fat16)
         return 0; /* FAT16 has no FsInfo */
 #endif /* #ifdef HAVE_FAT16SUPPORT */
-    
+
     /* update fsinfo */
     rc = ata_read_sectors(IF_MV2(fat_bpb->drive,) 
                           fat_bpb->startsector + fat_bpb->bpb_fsinfo, 1,fsinfo);
@@ -967,7 +976,7 @@ static void fat_time(unsigned short* date,
     /* non-RTC version returns an increment from the supplied time, or a
      * fixed standard time/date if no time given as input */
     bool next_day = false;
-    
+
     if (time)
     {
         if (0 == *time)
@@ -992,7 +1001,7 @@ static void fat_time(unsigned short* date,
             *time = (hours << 11) | (mins << 5);
         }
     }
-    
+
     if (date)
     {
         if (0 == *date)
@@ -1004,8 +1013,8 @@ static void fat_time(unsigned short* date,
 #define S100(x) 1 ## x
 #define C2DIG2DEC(x) (S100(x)-100)
             /* set to build date */
-            *date = ((YEAR - 1980) << 9) | (C2DIG2DEC(MONTH) << 5) 
-                  | C2DIG2DEC(DAY);
+            *date = ((YEAR - 1980) << 9) | (C2DIG2DEC(MONTH) << 5)
+                    | C2DIG2DEC(DAY);
         }
         else
         {
@@ -1174,7 +1183,7 @@ static int write_long_name(struct fat_file* file,
     rc = fat_readwrite(file, 1, buf, true);
     if (rc<1)
         return rc * 10 - 7;
-    
+
     return 0;
 }
 
@@ -1237,7 +1246,7 @@ static int add_dir_entry(struct fat_dir* dir,
         strncpy(shortname, name, 12);
         for(i = strlen(shortname); i < 12; i++)
             shortname[i] = ' ';
-        
+
         entries_needed = 1;
     } else {
         create_dos_name(name, shortname);
@@ -1250,7 +1259,7 @@ static int add_dir_entry(struct fat_dir* dir,
 
   restart:
     firstentry = -1;
-    
+
     rc = fat_seek(&dir->file, 0);
     if (rc < 0)
         return rc * 10 - 2;
@@ -1342,7 +1351,7 @@ static int add_dir_entry(struct fat_dir* dir,
     sector = firstentry / DIR_ENTRIES_PER_SECTOR;
     LDEBUGF("Adding longname to entry %d in sector %d\n",
             firstentry, sector);
-            
+
     rc = write_long_name(&dir->file, firstentry,
                          entries_needed, name, shortname, is_directory);
     if (rc < 0)
@@ -1361,7 +1370,7 @@ static int add_dir_entry(struct fat_dir* dir,
 static unsigned char char2dos(unsigned char c, int* randomize)
 {
     static const char invalid_chars[] = "\"*+,./:;<=>?[\\]|";
-    
+
     if (c <= 0x20)
         c = 0;   /* Illegal char, remove */
     else if (strchr(invalid_chars, c) != NULL)
@@ -1379,7 +1388,7 @@ static unsigned char char2dos(unsigned char c, int* randomize)
 static void create_dos_name(const unsigned char *name, unsigned char *newname)
 {
     int i;
-    unsigned char *ext;      
+    unsigned char *ext;
     int randomize = 0;
 
     /* Find extension part */
@@ -1491,12 +1500,12 @@ static int update_short_entry( struct fat_file* file, long size, int attr )
 
     if (!entry[0] || entry[0] == 0xe5)
         panicf("Updating size on empty dir entry %d\n", file->direntry);
-        
+
     entry[FATDIR_ATTR] = attr & 0xFF;
 
     clusptr = (short*)(entry + FATDIR_FSTCLUSHI);
     *clusptr = htole16(file->firstcluster >> 16);
-    
+
     clusptr = (short*)(entry + FATDIR_FSTCLUSLO);
     *clusptr = htole16(file->firstcluster & 0xffff);
 
@@ -1509,8 +1518,8 @@ static int update_short_entry( struct fat_file* file, long size, int attr )
         unsigned short date = 0;
 #else
         /* get old time to increment from */
-        unsigned short time = htole16(*(unsigned short*)(entry + FATDIR_WRTTIME));
-        unsigned short date = htole16(*(unsigned short*)(entry + FATDIR_WRTDATE));
+        unsigned short time = htole16(*(unsigned short*)(entry+FATDIR_WRTTIME));
+        unsigned short date = htole16(*(unsigned short*)(entry+FATDIR_WRTDATE));
 #endif
         fat_time(&date, &time, NULL);
         *(unsigned short*)(entry + FATDIR_WRTTIME) = htole16(time);
@@ -1547,7 +1556,7 @@ static int parse_direntry(struct fat_direntry *de, const unsigned char *buf)
         ((long)(unsigned)BYTES2INT16(buf,FATDIR_FSTCLUSHI) << 16);
     /* The double cast is to prevent a sign-extension to be done on CalmRISC16.
        (the result of the shift is always considered signed) */
-       
+
     /* fix the name */
     lowercase = (buf[FATDIR_NTRES] & FAT_NTRES_LC_NAME);
     c = buf[FATDIR_NAME];
@@ -1646,7 +1655,8 @@ int fat_create_dir(const char* name,
         return rc * 10 - 1;
 
     /* Allocate a new cluster for the directory */
-    newdir->file.firstcluster = find_free_cluster(IF_MV2(fat_bpb,) fat_bpb->fsinfo.nextfree);
+    newdir->file.firstcluster = find_free_cluster(IF_MV2(fat_bpb,)
+                                                  fat_bpb->fsinfo.nextfree);
     if(newdir->file.firstcluster == 0)
         return -1;
 
@@ -1660,7 +1670,7 @@ int fat_create_dir(const char* name,
         if (rc < 0)
             return rc * 10 - 2;
     }
-    
+
     /* Then add the "." entry */
     rc = add_dir_entry(newdir, &dummyfile, ".", true, true);
     if (rc < 0)
@@ -1679,10 +1689,10 @@ int fat_create_dir(const char* name,
     else
         dummyfile.firstcluster = dir->file.firstcluster;
     update_short_entry(&dummyfile, 0, FAT_ATTR_DIRECTORY);
-    
+
     /* Set the firstcluster field in the direntry */
     update_short_entry(&newdir->file, 0, FAT_ATTR_DIRECTORY);
-    
+
     rc = flush_fat(IF_MV(fat_bpb));
     if (rc < 0)
         return rc * 10 - 5;
@@ -1874,7 +1884,7 @@ int fat_rename(struct fat_file* file,
     unsigned int parentcluster;
 #ifdef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[file->volume];
-    
+
     if (file->volume != dir->file.volume) {
         DEBUGF("No rename across volumes!\n");
         return -1;
@@ -1983,7 +1993,8 @@ static long next_write_cluster(struct fat_file* file,
         if (oldcluster > 0)
             cluster = find_free_cluster(IF_MV2(fat_bpb,) oldcluster+1);
         else if (oldcluster == 0)
-            cluster = find_free_cluster(IF_MV2(fat_bpb,) fat_bpb->fsinfo.nextfree);
+            cluster = find_free_cluster(IF_MV2(fat_bpb,)
+                                        fat_bpb->fsinfo.nextfree);
 #ifdef HAVE_FAT16SUPPORT
         else /* negative, pseudo-cluster of the root dir */
             return 0; /* impossible to append something to the root */
@@ -1991,7 +2002,7 @@ static long next_write_cluster(struct fat_file* file,
 
         if (cluster) {
             if (oldcluster)
-                update_fat_entry(IF_MV2(fat_bpb,) oldcluster, cluster); 
+                update_fat_entry(IF_MV2(fat_bpb,) oldcluster, cluster);
             else
                 file->firstcluster = cluster;
             update_fat_entry(IF_MV2(fat_bpb,) cluster, FAT_EOF_MARK);
@@ -2032,7 +2043,7 @@ static int transfer(IF_MV2(struct bpb* fat_bpb,)
         else
 #endif
             firstallowed = fat_bpb->firstdatasector;
-            
+
         if (start < firstallowed)
             panicf("Write %ld before data\n", firstallowed - start);
         if (start + count > fat_bpb->totalsectors)
@@ -2099,7 +2110,7 @@ long fat_readwrite( struct fat_file *file, long sectorcount,
             if (!cluster) {
                 eof = true;
                 if ( write ) {
-                    /* remember last cluster, in case 
+                    /* remember last cluster, in case
                        we want to append to the file */
                     sector = oldsector;
                     cluster = oldcluster;
@@ -2207,7 +2218,7 @@ int fat_seek(struct fat_file *file, unsigned long seeksector )
                 return -1;
             }
         }
-        
+
         sector = cluster2sec(IF_MV2(fat_bpb,) cluster) + sectornum;
     }
     else {
@@ -2362,14 +2373,16 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                     /* replace shortname with longname? */
                     if ( longs ) {
                         int j;
-                        /* This should be enough to hold any name segment utf8-encoded */
+                        /* This should be enough to hold any name segment
+                           utf8-encoded */
                         unsigned char shortname[13]; /* 8+3+dot+\0 */
-                        unsigned char longname_utf8segm[6*4 + 1]; /* Add 1 for trailing \0 */
+                        /* Add 1 for trailing \0 */
+                        unsigned char longname_utf8segm[6*4 + 1];
                         int longname_utf8len = 0;
-                        
-                        strcpy(shortname, entry->name); /* Temporarily store it */
+                        /* Temporarily store it */
+                        strcpy(shortname, entry->name);
                         entry->name[0] = 0;
-                        
+
                         /* iterate backwards through the dir entries */
                         for (j=longs-1; j>=0; j--) {
                             unsigned char* ptr = cached_buf;
@@ -2391,11 +2404,13 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                                 index &= SECTOR_SIZE-1;
                             }
 
-                            /* Try to append each segment of the long name. Check if we'd
-                               exceed the buffer. Also check for FAT padding characters 0xFFFF. */
+                            /* Try to append each segment of the long name.
+                               Check if we'd exceed the buffer.
+                               Also check for FAT padding characters 0xFFFF. */
                             if (fat_copy_long_name_segment(ptr + index + 1, 5,
                                     longname_utf8segm) == 0) break;
-                            // logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                            /* logf("SG: %s, EN: %s", longname_utf8segm,
+                                    entry->name); */
                             longname_utf8len += strlen(longname_utf8segm);
                             if (longname_utf8len < FAT_FILENAME_BYTES)
                                 strcat(entry->name, longname_utf8segm);
@@ -2404,7 +2419,8 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
                             if (fat_copy_long_name_segment(ptr + index + 14, 6,
                                     longname_utf8segm) == 0) break;
-                            // logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                            /* logf("SG: %s, EN: %s", longname_utf8segm,
+                                    entry->name); */
                             longname_utf8len += strlen(longname_utf8segm);
                             if (longname_utf8len < FAT_FILENAME_BYTES)
                                 strcat(entry->name, longname_utf8segm);
@@ -2413,7 +2429,8 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
                             if (fat_copy_long_name_segment(ptr + index + 28, 2,
                                     longname_utf8segm) == 0) break;
-                            // logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                            /* logf("SG: %s, EN: %s", longname_utf8segm,
+                                    entry->name); */
                             longname_utf8len += strlen(longname_utf8segm);
                             if (longname_utf8len < FAT_FILENAME_BYTES)
                                 strcat(entry->name, longname_utf8segm);
@@ -2423,19 +2440,22 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
                         /* Does the utf8-encoded name fit into the entry? */
                         if (longname_utf8len >= FAT_FILENAME_BYTES) {
-                            /* Take the short DOS name. Need to utf8-encode it since
-                               it may contain chars from the upper half of the OEM
-                               code page which wouldn't be a valid utf8. Beware: this
-                               file will be shown with strange glyphs in file browser
-                               since unicode 0x80 to 0x9F are control characters. */
+                            /* Take the short DOS name. Need to utf8-encode it
+                               since it may contain chars from the upper half of
+                               the OEM code page which wouldn't be a valid utf8.
+                               Beware: this file will be shown with strange
+                               glyphs in file browser since unicode 0x80 to 0x9F
+                               are control characters. */
                             logf("SN-DOS: %s", shortname);
                             unsigned char *utf8;
-                            utf8 = iso_decode(shortname, entry->name, -1, strlen(shortname));
+                            utf8 = iso_decode(shortname, entry->name, -1,
+                                              strlen(shortname));
                         *utf8 = 0;
                             logf("SN: %s", entry->name);
                         } else {
-                            // logf("LN: %s", entry->name);
-                            // logf("LNLen: %d (%c)", longname_utf8len, entry->name[0]);
+                            /* logf("LN: %s", entry->name);
+                               logf("LNLen: %d (%c)", longname_utf8len,
+                                    entry->name[0]); */
                         }
                     }
                     done = true;
