@@ -25,6 +25,7 @@
 #include <inttypes.h>
 
 #include "id3.h"
+#include "replaygain.h"
 #include "debug.h"
 #include "rbunicode.h"
 #include "metadata_common.h"
@@ -440,6 +441,19 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                                 id3->year = asf_intdecode(fd, type, length);
                             } else {
                                 lseek(fd, length, SEEK_CUR);
+                            }
+                        } else if (!strncmp("replaygain_", utf8buf, 11)) {
+                            char* value = id3buf;
+                            int buf_len = id3buf_remaining;
+                            int len;
+                            asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
+                            len = parse_replaygain(utf8buf, value, id3, 
+                                value, buf_len);
+                            
+                            if (len == 0) {
+                                /* Don't need to keep the value */
+                                id3buf = value;
+                                id3buf_remaining = buf_len;
                             }
                         } else {
                             lseek(fd, length, SEEK_CUR);
