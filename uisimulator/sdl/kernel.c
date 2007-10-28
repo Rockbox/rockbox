@@ -34,6 +34,7 @@ static SDL_cond *sim_thread_cond;
  * inside a handler */
 static SDL_mutex *sim_irq_mtx;
 static int interrupt_level = HIGHEST_IRQ_LEVEL;
+static int handlers_pending = 0;
 static int status_reg = 0;
 
 extern struct core_entry cores[NUM_CORES];
@@ -53,7 +54,8 @@ int set_irq_level(int level)
     if (status_reg == 0 && level == 0 && oldlevel != 0)
     {
         /* Not in a handler and "interrupts" are being reenabled */
-        SDL_CondSignal(sim_thread_cond);
+        if (handlers_pending > 0)
+            SDL_CondSignal(sim_thread_cond);
     }
 
     interrupt_level = level; /* save new level */
@@ -65,16 +67,22 @@ int set_irq_level(int level)
 void sim_enter_irq_handler(void)
 {
     SDL_LockMutex(sim_irq_mtx);
+    handlers_pending++;
+
     if(interrupt_level != 0)
     {
         /* "Interrupts" are disabled. Wait for reenable */
         SDL_CondWait(sim_thread_cond, sim_irq_mtx);
     }
+
     status_reg = 1;
 }
 
 void sim_exit_irq_handler(void)
 {
+    if (--handlers_pending > 0)
+        SDL_CondSignal(sim_thread_cond);
+
     status_reg = 0;
     SDL_UnlockMutex(sim_irq_mtx);
 }
