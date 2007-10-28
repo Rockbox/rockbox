@@ -193,7 +193,7 @@ char* id3_get_num_genre(const unsigned int genre_num)
 }
 
 /* True if the string is from the "genres" array */
-bool id3_is_genre_string(const char *string)
+static bool id3_is_genre_string(const char *string)
 {
     return ( string >= genres[0] &&
              string <= genres[sizeof(genres)/sizeof(char*) - 1] );
