@@ -291,43 +291,42 @@ void lcd_update(void)
 }
 
 /* Update a fraction of the display. */
-void lcd_update_rect(int x0, int y0, int width, int height)
+void lcd_update_rect(int x, int y, int width, int height)
 {
-    unsigned short *addr;
-    int c, r;
-    int x1 = (x0 + width) - 1;
-    int y1 = (y0 + height) - 1;
+    const fb_data *addr;
+    
+    if (x + width >= LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height >= LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+        
+    if ((width <= 0) || (height <= 0))
+        return; /* Nothing left to do. */
 
-    if ((x1 <= 0) || (y1 <= 0))
-        return;
+    addr = &lcd_framebuffer[y][x];
 
-    lcd_send_command(R_ENTRY_MODE);
-    lcd_send_command(0x82);
-
-    if(y1 >= LCD_HEIGHT)
-        y1 = LCD_HEIGHT - 1;
-
-    lcd_send_command(R_Y_ADDR_AREA);
-    lcd_send_command(y0 + 0x1a);
-    lcd_send_command(y1 + 0x1a);
-
-    if(x1 >= LCD_WIDTH)
-        x1 = LCD_WIDTH - 1;
-
-    lcd_send_command(R_X_ADDR_AREA);
-    lcd_send_command(x0);
-    lcd_send_command(x1);
-
-    addr = (unsigned short*)&lcd_framebuffer[y0][x0];
-
-    /* for each row */
-    for (r = 0; r < height; r++) {
-        /* for each column */
-        for (c = 0; c < width; c++) {
-            /* output 1 pixel */
-            lcd_send_data(*(addr++));
-        }
-
-        addr += LCD_WIDTH - width;
+    if (width <= 1) {                    
+        lcd_send_command(R_ENTRY_MODE);  /* The X end address must be larger */
+        lcd_send_command(0x80);          /* that the X start address, so we */
+        lcd_send_command(R_X_ADDR_AREA); /* switch to vertical mode for */
+        lcd_send_command(x);             /* single column updates and set */
+        lcd_send_command(x + 1);         /* the window width to 2 */
+    } else {
+        lcd_send_command(R_ENTRY_MODE);
+        lcd_send_command(0x82);
+        lcd_send_command(R_X_ADDR_AREA);
+        lcd_send_command(x);
+        lcd_send_command(x + width - 1);
     }
+    lcd_send_command(R_Y_ADDR_AREA);
+    lcd_send_command(y + 0x1a);
+    lcd_send_command(y + height - 1 + 0x1a);
+
+    do {
+        int w = width;
+        do {
+            lcd_send_data(*addr++);
+        } while (--w > 0);
+        addr += LCD_WIDTH - width;
+    } while (--height > 0);
 }
