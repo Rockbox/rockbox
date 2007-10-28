@@ -467,25 +467,17 @@ static void resume_int(void)
 
 static void reset_int(void)
 {
-    struct timer t;
-
     /* clear device address */
     UDC_DEVICEADDR = 0 << 25;
 
     /* update usb state */
     dcd_controller.usb_state = USB_STATE_DEFAULT;
 
-    timer_set(&t, RESET_TIMER);
-
     UDC_ENDPTSETUPSTAT = UDC_ENDPTSETUPSTAT;
     UDC_ENDPTCOMPLETE  = UDC_ENDPTCOMPLETE;
 
-    while (UDC_ENDPTPRIME) { /* prime and flush pending transfers */
-        if (timer_expired(&t)) {
-            logf("TIMEOUT->p&f");
-        }
-    }
-
+    /* prime and flush pending transfers */
+    while (UDC_ENDPTPRIME);
     UDC_ENDPTFLUSH = ~0;
 
     if ((UDC_PORTSC1 & PORTSCX_PORT_RESET) == 0) {
@@ -493,18 +485,8 @@ static void reset_int(void)
     }
 
     /* clear USB Reset status bit */
-    UDC_USBSTS = USB_STS_RESET;
-
-    /* wait for port change */
-    while ((UDC_USBSTS & USB_STS_PORT_CHANGE) == 0) {
-        if (timer_expired(&t)) {
-        logf("TIMEOUT->portchange");
-        }
-    }
-
-    UDC_USBSTS = (1 << 2);
+    UDC_USBSTS |= USB_STS_RESET;
 }
-
 
 /*-------------------------------------------------------------------------*/
 /* usb controller ops */

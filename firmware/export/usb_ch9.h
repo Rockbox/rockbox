@@ -21,6 +21,33 @@
  *
  ****************************************************************************/
 
+/*
+ * This file holds USB constants and structures that are needed for
+ * USB device APIs.  These are used by the USB device model, which is
+ * defined in chapter 9 of the USB 2.0 specification and in the
+ * Wireless USB 1.0 (spread around).
+ *
+ * USB 2.0 adds an additional "On The Go" (OTG) mode, which lets systems
+ * act either as a USB master/host or as a USB slave/device.  That means
+ * the master and slave side APIs benefit from working well together.
+ *
+ * There's also "Wireless USB", using low power short range radios for
+ * peripheral interconnection but otherwise building on the USB framework.
+ *
+ * Note all descriptors are declared '__attribute__((packed))' so that:
+ *
+ * [a] they never get padded, either internally (USB spec writers
+ *     probably handled that) or externally;
+ *
+ * [b] so that accessing bigger-than-a-bytes fields will never
+ *     generate bus errors on any platform, even when the location of
+ *     its descriptor inside a bundle isn't "naturally aligned", and
+ *
+ * [c] for consistency, removing all doubt even when it appears to
+ *     someone that the two other points are non-issues for that
+ *     particular descriptor type.
+ */
+
 #ifndef _CH9_H_
 #define _CH9_H_
 
