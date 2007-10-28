@@ -17,6 +17,47 @@
  *
  ****************************************************************************/
 
+    .section .icode, "ax", %progbits
+
+    .align  2
+    .global lcd_write_data
+    .type   lcd_write_data, %function
+                                      /* r0 = addr */
+lcd_write_data:                       /* r1 = pixel count */
+    stmfd   sp!, {r4-r6}
+    mov     r2, #0x30000000           /* LCD data port */
+
+    tst     r0, #2                    /* first pixel unaligned? */
+    ldrneh  r3, [r0], #2
+    strneh  r3, [r2]
+    subne   r1, r1, #1
+    
+    subs    r1, r1, #16
+.loop16:
+    ldmgeia r0!, {r3-r6}
+    stmgeia r2, {r3-r6}
+    ldmgeia r0!, {r3-r6}
+    stmgeia r2, {r3-r6}
+    subges  r1, r1, #16
+    bge     .loop16
+
+    /* no need to correct the count, we're just checking bits from now */
+    tst     r1, #8
+    ldmneia r0!, {r3-r6}
+    stmneia r2, {r3-r6}
+    tst     r1, #4
+    ldmneia r0!, {r3-r4}
+    stmneia r2, {r3-r4}
+    tst     r1, #2
+    ldrne   r3, [r0], #4
+    strne   r3, [r2]
+    tst     r1, #1
+    ldrneh  r3, [r0]
+    strneh  r3, [r2]
+
+    ldmfd   sp!, {r4-r6}
+    bx      lr
+
 /****************************************************************************
  * void lcd_write_yuv_420_lines(unsigned char const * const src[3],
  *                              int width,
@@ -30,7 +71,6 @@
  *   |G| = |74 -24 -51| |Cb - 128| >> 8
  *   |B|   |74 128   0| |Cr - 128| >> 9
  */
-    .section    .icode, "ax", %progbits
     .align      2
     .global     lcd_write_yuv420_lines
     .type       lcd_write_yuv420_lines, %function

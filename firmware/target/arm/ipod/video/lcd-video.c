@@ -29,6 +29,25 @@
 #include "kernel.h"
 #include "system.h"
 
+/* The BCM bus width is 16 bits. But since the low address bits aren't decoded
+ * by the chip (the 3 BCM address bits are mapped to address bits 16..18 of the
+ * PP5022), writing 32 bits (and even more, using 'stmia') at once works. */
+#define BCM_DATA      (*(volatile unsigned short*)(0x30000000))
+#define BCM_DATA32    (*(volatile unsigned long *)(0x30000000))
+#define BCM_WR_ADDR   (*(volatile unsigned short*)(0x30010000))
+#define BCM_WR_ADDR32 (*(volatile unsigned long *)(0x30010000))
+#define BCM_RD_ADDR   (*(volatile unsigned short*)(0x30020000))
+#define BCM_RD_ADDR32 (*(volatile unsigned long *)(0x30020000))
+#define BCM_CONTROL   (*(volatile unsigned short*)(0x30030000))
+
+#define BCM_ALT_DATA      (*(volatile unsigned short*)(0x30040000))
+#define BCM_ALT_DATA32    (*(volatile unsigned long *)(0x30040000))
+#define BCM_ALT_WR_ADDR   (*(volatile unsigned short*)(0x30050000))
+#define BCM_ALT_WR_ADDR32 (*(volatile unsigned long *)(0x30050000))
+#define BCM_ALT_RD_ADDR   (*(volatile unsigned short*)(0x30060000))
+#define BCM_ALT_RD_ADDR32 (*(volatile unsigned long *)(0x30060000))
+#define BCM_ALT_CONTROL   (*(volatile unsigned short*)(0x30070000))
+
 /*** hardware configuration ***/
 
 void lcd_set_contrast(int val)
@@ -74,130 +93,97 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
 
 static inline void lcd_bcm_write32(unsigned address, unsigned value)
 {
-    /* write out destination address as two 16bit values */
-    outw(address, 0x30010000);
-    outw((address >> 16), 0x30010000);
+    /* write out destination address */
+    BCM_WR_ADDR32 = address;
 
     /* wait for it to be write ready */
-    while ((inw(0x30030000) & 0x2) == 0);
+    while (!(BCM_CONTROL & 0x2));
 
-    /* write out the value low 16, high 16 */
-    outw(value, 0x30000000);
-    outw((value >> 16), 0x30000000);
+    /* write out the value */
+    BCM_DATA32 = value;
 }
 
 static void lcd_bcm_setup_rect(unsigned cmd,
-                               unsigned start_horiz, 
-                               unsigned start_vert, 
-                               unsigned max_horiz,
-                               unsigned max_vert, 
-                               unsigned count)
+                               unsigned x,
+                               unsigned y,
+                               unsigned width,
+                               unsigned height)
 {
     lcd_bcm_write32(0x1F8, 0xFFFA0005);
     lcd_bcm_write32(0xE0000, cmd);
-    lcd_bcm_write32(0xE0004, start_horiz);
-    lcd_bcm_write32(0xE0008, start_vert);
-    lcd_bcm_write32(0xE000C, max_horiz);
-    lcd_bcm_write32(0xE0010, max_vert);
-    lcd_bcm_write32(0xE0014, count);
-    lcd_bcm_write32(0xE0018, count);
+    lcd_bcm_write32(0xE0004, x);
+    lcd_bcm_write32(0xE0008, y);
+    lcd_bcm_write32(0xE000C, x + width - 1);
+    lcd_bcm_write32(0xE0010, y + height - 1);
+    lcd_bcm_write32(0xE0014, (width * height) << 1);
+    lcd_bcm_write32(0xE0018, (width * height) << 1);
     lcd_bcm_write32(0xE001C, 0);
 }
 
-static inline unsigned lcd_bcm_read32(unsigned address) {
-    while ((inw(0x30020000) & 1) == 0);
+static inline unsigned lcd_bcm_read32(unsigned address) 
+{
+    while (!(BCM_RD_ADDR & 1));
 
-    /* write out destination address as two 16bit values */
-    outw(address, 0x30020000);
-    outw((address >> 16), 0x30020000);
+    /* write out destination address */
+    BCM_RD_ADDR32 = address;
 
     /* wait for it to be read ready */
-    while ((inw(0x30030000) & 0x10) == 0);
+    while (!(BCM_CONTROL & 0x10));
 
     /* read the value */
-    return inw(0x30000000) | inw(0x30000000) << 16;
+    return BCM_DATA32;
 }
 
-static int finishup_needed = 0;
+static bool finishup_needed = false;
 
 /* Update a fraction of the display. */
-void lcd_update_rect(int x, int y, int width, int height) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    {
-        int endy = x + width;
-        /* Ensure x and width are both even - so we can read 32-bit aligned 
-           data from lcd_framebuffer */
-        x &= ~1;
-        width &= ~1;
-        if (x + width < endy) {
-            width += 2;
-        }
-    }
+    const fb_data *addr;
 
-    if (finishup_needed) 
+    if (x + width >= LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height >= LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+        
+    if ((width <= 0) || (height <= 0))
+        return; /* Nothing left to do - 0 is harmful to lcd_write_data(). */
+        
+    addr = &lcd_framebuffer[y][x];
+
+    if (finishup_needed)
     {
         /* Bottom-half of original lcd_bcm_finishup() function */
         unsigned int data = lcd_bcm_read32(0x1F8);
-        while (data == 0xFFFA0005 || data == 0xFFFF) 
+        while (data == 0xFFFA0005 || data == 0xFFFF)
         {
             /* This loop can wait for up to 14ms - so we yield() */
             yield();
             data = lcd_bcm_read32(0x1F8);
         } 
     }
-
     lcd_bcm_read32(0x1FC);
 
+    lcd_bcm_setup_rect(0x34, x, y, width, height);
+
+    /* write out destination address  */
+    BCM_WR_ADDR32 = 0xE0020;
+
+    while (!(BCM_CONTROL & 0x2));  /* wait for it to be write ready */
+
+    do 
     {
-        int rect1, rect2, rect3, rect4;
-        int count = (width * height) << 1;
-        /* calculate the drawing region */
-        rect1 = x;                         /* start horiz */
-        rect2 = y;                         /* start vert */
-        rect3 = (x + width) - 1;           /* max horiz */
-        rect4 = (y + height) - 1;          /* max vert */
-
-        /* setup the drawing region */
-        lcd_bcm_setup_rect(0x34, rect1, rect2, rect3, rect4, count);
+        lcd_write_data(addr, width);
+        addr += LCD_WIDTH;
     }
-
-    /* write out destination address as two 16bit values */
-    outw((0xE0020 & 0xffff), 0x30010000);
-    outw((0xE0020 >> 16), 0x30010000);
-
-    /* wait for it to be write ready */
-    while ((inw(0x30030000) & 0x2) == 0);
-
-    {
-        unsigned short *src = (unsigned short*)&lcd_framebuffer[y][x];
-        unsigned short *end = &src[LCD_WIDTH * height];
-        int line_rem = (LCD_WIDTH - width);
-        while (src < end) {
-            /* Duff's Device to unroll loop */
-            register int count = width ;
-            register int n=( count + 7 ) / 8;
-            switch( count % 8 ) {
-                case 0: do{ outw(*(src++), 0x30000000);
-                case 7:     outw(*(src++), 0x30000000);
-                case 6:     outw(*(src++), 0x30000000);
-                case 5:     outw(*(src++), 0x30000000);
-                case 4:     outw(*(src++), 0x30000000);
-                case 3:     outw(*(src++), 0x30000000);
-                case 2:     outw(*(src++), 0x30000000);
-                case 1:     outw(*(src++), 0x30000000);
-              } while(--n>0);
-            }
-            src += line_rem;
-        }
-    }
+    while (--height > 0);
 
     /* Top-half of original lcd_bcm_finishup() function */
-    outw(0x31, 0x30030000); 
+    BCM_CONTROL = 0x31;
 
     lcd_bcm_read32(0x1FC);
 
-    finishup_needed = 1;
+    finishup_needed = true;
 }
 
 /* Update the display.
@@ -228,11 +214,11 @@ void lcd_yuv_blit(unsigned char * const src[3],
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
-    if (finishup_needed) 
+    if (finishup_needed)
     {
         /* Bottom-half of original lcd_bcm_finishup() function */
         unsigned int data = lcd_bcm_read32(0x1F8);
-        while (data == 0xFFFA0005 || data == 0xFFFF) 
+        while (data == 0xFFFA0005 || data == 0xFFFF)
         {
             /* This loop can wait for up to 14ms - so we yield() */
             yield();
@@ -241,26 +227,13 @@ void lcd_yuv_blit(unsigned char * const src[3],
     }
 
     lcd_bcm_read32(0x1FC);
+    
+    lcd_bcm_setup_rect(0x34, x, y, width, height);
 
-    {
-        int rect1, rect2, rect3, rect4;
-        int count = (width * height) << 1;
-        /* calculate the drawing region */
-        rect1 = x;                         /* start horiz */
-        rect2 = y;                         /* start vert */
-        rect3 = (x + width) - 1;           /* max horiz */
-        rect4 = (y + height) - 1;          /* max vert */
+    /* write out destination address */
+    BCM_WR_ADDR32 = 0xE0020;
 
-        /* setup the drawing region */
-        lcd_bcm_setup_rect(0x34, rect1, rect2, rect3, rect4, count);
-    }
-
-    /* write out destination address as two 16bit values */
-    outw((0xE0020 & 0xffff), 0x30010000);
-    outw((0xE0020 >> 16), 0x30010000);
-
-    /* wait for it to be write ready */
-    while ((inw(0x30030000) & 0x2) == 0);
+    while (!(BCM_CONTROL & 0x2));  /* wait for it to be write ready */
 
     height >>= 1;
     do
@@ -274,9 +247,9 @@ void lcd_yuv_blit(unsigned char * const src[3],
     while (--height > 0);
 
     /* Top-half of original lcd_bcm_finishup() function */
-    outw(0x31, 0x30030000);
+    BCM_CONTROL = 0x31;
 
     lcd_bcm_read32(0x1FC);
 
-    finishup_needed = 1;
+    finishup_needed = true;
 }
