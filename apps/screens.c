@@ -1180,7 +1180,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                 if (id3->disc_string)
                     info = id3->disc_string;
                 else if (id3->discnum)
-				{
+                {
                     snprintf(buffer, MAX_PATH, "%d", id3->discnum);
                     info = buffer;
                 }
