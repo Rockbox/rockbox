@@ -377,37 +377,43 @@ static struct memory_handle *find_handle(const unsigned int handle_id)
     return m;
 }
 
-/* Move a memory handle and data_size of its data of delta.
-   Return a pointer to the new location of the handle (null if it hasn't moved).
-   delta is the value of which to move the struct data, modified to the actual
-         distance moved.
-   data_size is the amount of data to move along with the struct. */
+/* Move a memory handle and data_size of its data delta bytes along the buffer.
+   delta maximum bytes available to move the handle.  If the move is performed
+         it is set to the actual distance moved.
+   data_size is the amount of data to move along with the struct.
+   returns a valid memory_handle if the move is successful
+           NULL if the handle is NULL, the  move would be less than the size of
+           a memory_handle after correcting for wraps or if the handle is not
+           found in the linked list for adjustment.  This function has no side
+           effects if NULL is returned. */
 static struct memory_handle *move_handle(const struct memory_handle *h,
                                          size_t *delta, const size_t data_size)
 {
     struct memory_handle *dest;
     size_t newpos;
     size_t size_to_move;
+    size_t new_delta = *delta;
     int overlap;
 
-    if (*delta < sizeof(struct memory_handle)) {
-        /* It's not worth trying to move such a short distance, and it would
-         * complicate the overlap calculations below */
+    if (h == NULL)
+        return NULL;
+
+    size_to_move = sizeof(struct memory_handle) + data_size;
+
+    /* Align to four bytes, down */
+    new_delta &= ~3;
+    if (new_delta < sizeof(struct memory_handle)) {
+        /* It's not legal to move less than the size of the struct */
         return NULL;
     }
 
     mutex_lock(&llist_mutex);
 
-    size_to_move = sizeof(struct memory_handle) + data_size;
-
-    /* Align to four bytes, down */
-    *delta &= ~3;
-    newpos = RINGBUF_ADD((void *)h - (void *)buffer, *delta);
+    newpos = RINGBUF_ADD((void *)h - (void *)buffer, new_delta);
     overlap = RINGBUF_ADD_CROSS(newpos, size_to_move, buffer_len - 1);
 
-    /* This means that moving the data will put it on the wrap */
     if (overlap > 0) {
-        /* This means that the memory_handle struct would wrap */
+        /* Some part of the struct + data would wrap, maybe ok */
         size_t correction;
         /* If the overlap lands inside the memory_handle */
         if ((unsigned)overlap > data_size) {
@@ -415,19 +421,22 @@ static struct memory_handle *move_handle(const struct memory_handle *h,
              * wrapping, this guarantees an aligned delta, I think */
             correction = overlap - data_size;
         } else {
-            /* Otherwise it falls in the data area and must all be backed out */
+            /* Otherwise the overlap falls in the data area and must all be
+             * backed out.  This may become conditional if ever we move
+             * data that is allowed to wrap (ie audio) */
             correction = overlap;
-            /* Align to four bytes, up */
+            /* Align correction to four bytes, up */
             correction = (correction+3) & ~3;
-            if (*delta <= correction) {
-                /* After correcting, no movement (or, impossibly, backwards) */
-                mutex_unlock(&llist_mutex);
-                return NULL;
-            }
         }
+        if (new_delta < correction + sizeof(struct memory_handle)) {
+            /* Delta cannot end up less than the size of the struct */
+            mutex_unlock(&llist_mutex);
+            return NULL;
+        }
+
         newpos -= correction;
-        overlap -= correction;
-        *delta -= correction;
+        overlap -= correction;   /* Used below to know how to split the data */
+        new_delta -= correction;
     }
 
     dest = (struct memory_handle *)(&buffer[newpos]);
@@ -440,13 +449,16 @@ static struct memory_handle *move_handle(const struct memory_handle *h,
         while (m && m->next != h) {
             m = m->next;
         }
-        if (h && m && m->next == h) {
+        if (m && m->next == h) {
             m->next = dest;
         } else {
             mutex_unlock(&llist_mutex);
             return NULL;
         }
     }
+
+    /* All checks pass, update the caller with how far we're moving */
+    *delta = new_delta;
 
     /* Update the cache to prevent it from keeping the old location of h */
     if (h == cached_handle)
