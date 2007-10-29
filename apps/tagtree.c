@@ -50,7 +50,8 @@
 
 static int tagtree_play_folder(struct tree_context* c);
 
-static char searchstring[128];
+#define SEARCHSTR_SIZE 128
+static char searchstring[SEARCHSTR_SIZE];
 
 enum variables {
     var_sorttype = 100,
@@ -293,9 +294,13 @@ static bool read_clause(struct tagcache_search_clause *clause)
     logf("got clause: %d/%d [%s]", clause->tag, clause->type, clause->str);
     
     if (*(clause->str) == '\0')
-        clause->input = true;
+        clause->source = source_input;
+    else if (!strcasecmp(clause->str, SOURCE_CURRENT_ALBUM))
+        clause->source = source_current_album;
+    else if (!strcasecmp(clause->str, SOURCE_CURRENT_ARTIST))
+        clause->source = source_current_artist;
     else
-        clause->input = false;
+        clause->source = source_constant;
     
     if (tagcache_is_numeric_tag(clause->tag))
     {
@@ -1345,8 +1350,10 @@ int tagtree_enter(struct tree_context* c)
 {
     int rc = 0;
     struct tagentry *dptr;
+    struct mp3entry *id3;
     int newextra;
     int seek;
+    int source;
 
     dptr = tagtree_get_entry(c, c->selected_item);
     
@@ -1388,20 +1395,43 @@ int tagtree_enter(struct tree_context* c)
                 {
                     for (j = 0; j < csi->clause_count[i]; j++)
                     {
-                        if (!csi->clause[i][j]->input)
+                        *searchstring='\0';
+                        source = csi->clause[i][j]->source;
+                        
+                        if (source == source_constant)
                             continue;
                         
-                        rc = kbd_input(searchstring, sizeof(searchstring));
-                        if (rc == -1 || !searchstring[0])
+                        id3 = audio_current_track();
+
+                        if ((source == source_current_artist) && 
+                            (id3) && (id3->artist)) 
                         {
-                            tagtree_exit(c);
-                            return 0;
-                        }
-                        
+                            strncpy(searchstring, id3->artist, SEARCHSTR_SIZE);
+                            searchstring[SEARCHSTR_SIZE-1] = '\0';
+                        }           
+
+                        if ((source == source_current_album) && 
+                            (id3) && (id3->album)) 
+                        {
+                            strncpy(searchstring, id3->album, SEARCHSTR_SIZE);
+                            searchstring[SEARCHSTR_SIZE-1] = '\0';
+                        }           
+
+                        if((source == source_input) || (*searchstring=='\0'))
+                        {
+                            rc = kbd_input(searchstring, SEARCHSTR_SIZE);
+                            if (rc == -1 || !searchstring[0])
+                            {
+                                tagtree_exit(c);
+                                return 0;
+                            }
+                        }   
+                                             
                         if (csi->clause[i][j]->numeric)
                             csi->clause[i][j]->numeric_data = atoi(searchstring);
-                        else
-                            csi->clause[i][j]->str = searchstring;
+                            
+                        /* existing bug: only one dynamic string per clause! */    
+                        csi->clause[i][j]->str = searchstring;
                     }
                 }
             }

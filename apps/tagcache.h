@@ -109,12 +109,18 @@ struct tagcache_stat {
     // const char *uimessage;   /* Pending error message. Implement soon. */
 };
 
+enum source_type {source_constant, source_input, 
+                 source_current_artist, source_current_album};
+
+#define SOURCE_CURRENT_ARTIST "#artist#"
+#define SOURCE_CURRENT_ALBUM "#album#"
+
 struct tagcache_search_clause
 {
     int tag;
     int type;
     bool numeric;
-    bool input;
+    int source;
     long numeric_data;
     char *str;
 };
