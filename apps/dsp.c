@@ -236,14 +236,13 @@ static inline struct dsp_config * switch_dsp(struct dsp_config *_dsp)
 /* Clip sample to arbitrary limits where range > 0 and min + range = max */
 static inline long clip_sample(int32_t sample, int32_t min, int32_t range)
 {
-    int32_t c = sample - min;
-    if ((uint32_t)c > (uint32_t)range)
+    if ((uint32_t)(sample - min) > (uint32_t)range)
     {
-        sample -= c;
-        if (c > 0)
-            sample += range;
+        int32_t c = min;
+        if (sample > min)
+            c += range;
+        sample = c
     }
-
     return sample;
 }
 #endif
@@ -488,20 +487,12 @@ static void sample_output_dithered(int count, struct dsp_data *data,
             dither->random = random;
 
             /* Clip */
-            int32_t c = output - min;
-            if ((uint32_t)c > (uint32_t)range)
+            if ((uint32_t)(output - min) > (uint32_t)range)
             {
-                output -= c;
-                if (c > 0)
-                {
-                    output += range;
-                    if (sample > max)
-                        sample = max;
-                }
-                else if (sample < min)
-                {
-                    sample = min;
-                }
+                int32_t c = min;
+                if (output > min)
+                    c += range;
+                output = c;
             }
 
             output &= ~mask;
@@ -986,6 +977,9 @@ static void set_tone_controls(void)
 }
 #endif
 
+/* Hook back from firmware/ part of audio, which can't/shouldn't call apps/
+ * code directly.
+ */
 int dsp_callback(int msg, intptr_t param)
 {
     switch (msg) {
