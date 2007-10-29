@@ -35,7 +35,7 @@
 #include <ctype.h>
 #include "config.h"
 #include "file.h"
-#include "debug.h"
+#include "logf.h"
 #include "atoi.h"
 
 #include "id3.h"
@@ -841,7 +841,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         /* Keep track of the total size */
         totframelen = framelen;
 
-        DEBUGF("framelen = %ld\n", framelen);
+        logf("framelen = %ld", framelen);
         if(framelen == 0){
             if (header[0] == 0 && header[1] == 0 && header[2] == 0)
                 return;
@@ -896,7 +896,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         if(framelen >= buffersize - bufferpos)
             framelen = buffersize - bufferpos - 1;
 
-        DEBUGF("id3v2 frame: %.4s\n", header);
+        logf("id3v2 frame: %.4s", header);
 
         /* Check for certain frame headers
 
@@ -1049,7 +1049,7 @@ int getid3v2len(int fd)
         else
             offset = unsync(buf[0], buf[1], buf[2], buf[3]) + 10;
 
-    DEBUGF("ID3V2 Length: 0x%x\n", offset);
+    logf("ID3V2 Length: 0x%x", offset);
     return offset;
 }
 
@@ -1076,7 +1076,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
     bytecount = get_mp3file_info(fd, &info);
 
-    DEBUGF("Space between ID3V2 tag and first audio frame: 0x%lx bytes\n",
+    logf("Space between ID3V2 tag and first audio frame: 0x%lx bytes",
            bytecount);
 
     if(bytecount < 0)
@@ -1096,8 +1096,8 @@ static int getsonglength(int fd, struct mp3entry *entry)
         if ((info.byte_count > expected + diff)
             || (info.byte_count < expected - diff))
         {
-            DEBUGF("Note: info.byte_count differs from expected value by "
-                "%ld bytes\n", labs((long) (expected - info.byte_count)));
+            logf("Note: info.byte_count differs from expected value by "
+                 "%ld bytes", labs((long) (expected - info.byte_count)));
             info.byte_count = 0;
             info.frame_count = 0;
             info.file_time = 0;
@@ -1161,7 +1161,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
     /* Update the seek point for the first playable frame */
     entry->first_frame_offset = bytecount;
-    DEBUGF("First frame is at %lx\n", entry->first_frame_offset);
+    logf("First frame is at %lx", entry->first_frame_offset);
 
     return filetime;
 }
