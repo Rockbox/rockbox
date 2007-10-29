@@ -3192,8 +3192,8 @@ static void audio_thread(void)
                 {
                     wps_offset = 0;
                     automatic_skip = false;
-                    prevtrack_id3.path[0] = 0;
                 }
+                prevtrack_id3.path[0] = 0;
                 if (track_changed_callback)
                     track_changed_callback(&curtrack_id3);
                 track_changed = true;
