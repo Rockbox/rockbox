@@ -53,7 +53,17 @@ static int tagtree_play_folder(struct tree_context* c);
 
 #define SEARCHSTR_SIZE 128
 static char searchstring[SEARCHSTR_SIZE];
-
+static const struct id3_to_search_mapping {
+    char   *string;
+    size_t id3_offset;
+} id3_to_search_mapping[] = {
+    { "#title#",  offsetof(struct mp3entry, title) },
+    { "#artist#", offsetof(struct mp3entry, artist) },
+    { "#album#",  offsetof(struct mp3entry, album) },
+    { "#genre#",  offsetof(struct mp3entry, genre_string) },
+    { "#composer#",  offsetof(struct mp3entry, composer) },
+    { "#albumartist#",   offsetof(struct mp3entry, albumartist) },
+};
 enum variables {
     var_sorttype = 100,
     var_limit,
@@ -296,12 +306,25 @@ static bool read_clause(struct tagcache_search_clause *clause)
     
     if (*(clause->str) == '\0')
         clause->source = source_input;
-    else if (!strcasecmp(clause->str, SOURCE_CURRENT_ALBUM))
-        clause->source = source_current_album;
-    else if (!strcasecmp(clause->str, SOURCE_CURRENT_ARTIST))
-        clause->source = source_current_artist;
-    else
-        clause->source = source_constant;
+    else if (!strcasecmp(clause->str, "#directory#"))
+        clause->source = source_current_path;
+    else 
+    {
+        unsigned int i;
+        bool found = false;
+        for (i=0; !found && i<ARRAYLEN(id3_to_search_mapping); i++)
+        {
+            if (!strcasecmp(clause->str, id3_to_search_mapping[i].string))
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+            clause->source = source_current_id3+i;
+        else
+            clause->source = source_constant;
+    }
     
     if (tagcache_is_numeric_tag(clause->tag))
     {
@@ -1403,21 +1426,28 @@ int tagtree_enter(struct tree_context* c)
                             continue;
                         
                         id3 = audio_current_track();
-
-                        if ((source == source_current_artist) && 
-                            (id3) && (id3->artist)) 
+                        
+                        if (source == source_current_path && id3)
                         {
-                            strncpy(searchstring, id3->artist, SEARCHSTR_SIZE);
-                            searchstring[SEARCHSTR_SIZE-1] = '\0';
-                        }           
-
-                        if ((source == source_current_album) && 
-                            (id3) && (id3->album)) 
+                            char *e;
+                            strncpy(searchstring, id3->path, SEARCHSTR_SIZE);
+                            e = strrchr(searchstring, '/');
+                            if (e)
+                                *e = '\0';
+                        }
+                        
+                        if (source >= source_current_id3 && id3)
                         {
-                            strncpy(searchstring, id3->album, SEARCHSTR_SIZE);
-                            searchstring[SEARCHSTR_SIZE-1] = '\0';
-                        }           
-
+                            int i = source-source_current_id3;
+                            int offset = id3_to_search_mapping[i].id3_offset;
+                            char **src = (char**)((char*)id3 + offset);
+                            if (*src)
+                            {
+                                strncpy(searchstring, *src, SEARCHSTR_SIZE);
+                                searchstring[SEARCHSTR_SIZE-1] = '\0';
+                            }
+                        }
+                        
                         if((source == source_input) || (*searchstring=='\0'))
                         {
                             rc = kbd_input(searchstring, SEARCHSTR_SIZE);

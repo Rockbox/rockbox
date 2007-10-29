@@ -110,10 +110,12 @@ struct tagcache_stat {
 };
 
 enum source_type {source_constant, source_input, 
-                 source_current_artist, source_current_album};
-
-#define SOURCE_CURRENT_ARTIST "#artist#"
-#define SOURCE_CURRENT_ALBUM "#album#"
+                  source_current_path, /* has different handling to _id3
+                                          so it has to be seperate */
+                 source_current_id3 /* dont add items after this.
+                                       it is used as an index 
+                                       into id3_to_search_mapping */
+                 };
 
 struct tagcache_search_clause
 {
