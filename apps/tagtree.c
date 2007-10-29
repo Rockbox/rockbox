@@ -45,6 +45,7 @@
 #include "yesno.h"
 #include "misc.h"
 #include "filetypes.h"
+#include "audio.h"
 
 #define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
 
