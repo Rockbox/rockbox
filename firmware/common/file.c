@@ -69,7 +69,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
 #ifndef HAVE_DIRCACHE
     (void)use_cache;
 #endif
-    
+
     LDEBUGF("open(\"%s\",%d)\n",pathname,flags);
 
     if ( pathname[0] != '/' ) {
@@ -105,7 +105,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
     if (dircache_is_enabled() && !file->write && use_cache)
     {
         const struct dircache_entry *ce;
-        
+
         ce = dircache_get_entry_ptr(pathname);
         if (!ce)
         {
@@ -113,7 +113,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
             file->busy = false;
             return -7;
         }
-        
+
         fat_open(IF_MV2(unsupported at the moment,)
                  ce->startcluster,
                  &(file->fatfile),
@@ -122,14 +122,14 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
         file->attr = ce->attribute;
         file->cacheoffset = -1;
         file->fileoffset = 0;
-        
+
         return fd;
     }
 #endif
-    
+
     strncpy(pathnamecopy,pathname,sizeof(pathnamecopy));
     pathnamecopy[sizeof(pathnamecopy)-1] = 0;
-    
+
     /* locate filename */
     name=strrchr(pathnamecopy+1,'/');
     if ( name ) {
@@ -148,7 +148,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
         file->busy = false;
         return -4;
     }
-    
+
     if(name[0] == 0) {
         DEBUGF("Empty file name\n");
         errno = EINVAL;
@@ -156,7 +156,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
         closedir_uncached(dir);
         return -5;
     }
-    
+
     /* scan dir for name */
     while ((entry = readdir_uncached(dir))) {
         if ( !strcasecmp(name, entry->d_name) ) {
@@ -367,7 +367,7 @@ int rename(const char* path, const char* newpath)
 
     /* Extract new path */
     strcpy(newpath2, newpath);
-    
+
     dirptr = strrchr(newpath2,'/');
     if(dirptr)
         *dirptr = 0;
@@ -375,20 +375,20 @@ int rename(const char* path, const char* newpath)
         return - 4;
 
     dirptr = newpath2;
-    
+
     if(strlen(dirptr) == 0) {
         dirptr = "/";
     }
-    
+
     dir = opendir_uncached(dirptr);
     if(!dir)
         return - 5;
-    
+
     file = &openfiles[fd];
 #ifdef HAVE_DIRCACHE
     dircache_rename(path, newpath);
 #endif
-    
+
     rc = fat_rename(&file->fatfile, &dir->fatdir, nameptr,
                     file->size, file->attr);
 #ifdef HAVE_MULTIVOLUME
@@ -453,16 +453,15 @@ static int flush_cache(int fd)
     int rc;
     struct filedesc* file = &openfiles[fd];
     long sector = file->fileoffset / SECTOR_SIZE;
-      
+
     DEBUGF("Flushing dirty sector cache\n");
-        
+
     /* make sure we are on correct sector */
     rc = fat_seek(&(file->fatfile), sector);
     if ( rc < 0 )
         return rc * 10 - 3;
 
-    rc = fat_readwrite(&(file->fatfile), 1,
-                       file->cache, true );
+    rc = fat_readwrite(&(file->fatfile), 1, file->cache, true );
 
     if ( rc < 0 ) {
         if(file->fatfile.eof)
@@ -529,7 +528,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
         nread = headbytes;
         count -= headbytes;
     }
-    
+
     /* If the buffer has been modified, either it has been flushed already
      * (if (offs+headbytes == SECTOR_SIZE)...) or does not need to be (no
      * more data to follow in this call). Do NOT flush here. */
@@ -585,7 +584,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
                 }
                 /* seek back one sector to put file position right */
                 rc = fat_seek(&(file->fatfile), 
-                              (file->fileoffset + nread) / 
+                              (file->fileoffset + nread) /
                               SECTOR_SIZE);
                 if ( rc < 0 ) {
                     DEBUGF("fat_seek() failed\n");
@@ -609,7 +608,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
             }
             memcpy( (unsigned char*)buf + nread, file->cache, count );
         }
-            
+
         nread += count;
         file->cacheoffset = count;
     }
@@ -700,7 +699,7 @@ off_t lseek(int fd, off_t offset, int whence)
                 if (rc < 0)
                     return rc * 10 - 5;
             }
-            
+
             rc = fat_seek(&(file->fatfile), newsector);
             if ( rc < 0 ) {
                 errno = EIO;
@@ -740,13 +739,13 @@ off_t filesize(int fd)
         errno = EBADF;
         return -1;
     }
-    
+
     return file->size;
 }
 
 
 #ifdef HAVE_HOTSWAP
-// release all file handles on a given volume "by force", to avoid leaks
+/* release all file handles on a given volume "by force", to avoid leaks */
 int release_files(int volume)
 {
     struct filedesc* pfile = openfiles;
