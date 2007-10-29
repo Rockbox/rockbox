@@ -1,15 +1,13 @@
-#
 #             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
-#   Jukebox    |    |   (  <_> )  \___|    +| \_\ (  <_> > + <
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
-#                     \/            \/     \/    \/            \/
-# $Original: $Id: english.lang 14418 2007-08-21 22:54:57Z rasher $
+#                  \/            \/     \/    \/            \/
+# $Original: $Id: english.lang 15284 2007-10-24 12:32:12Z pondlife $
 #
 # Translate from "the master of the language files".
-# $Id: portugues-br.lang 00001 2007-09-01 20:11:14GMT-3 $
-# Review: 906,1007,1313,1682,2133,10629,10847,10863,10879
+# $Id: portugues-br.lang 00002 2007-10-27 10:11:14GMT-3 $
 
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -181,13 +179,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "Embaralhando..."
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -260,10 +258,10 @@
     player: "(PLAY/STOP)"
   </source>
   <dest>
-    *: "REPRODUZIR = Sim"
-    h100,h120,h300: "NAVI = Sim"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECIONAR = Sim"
-    player: "(REPRODUZIR/PARAR)"
+    *: "PLAY = SIM"
+    h100,h120,h300: "NAVI = SIM"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Sim"
+    player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
@@ -1045,7 +1043,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "hertz band gain"
   </voice>
 </phrase>
 <phrase>
@@ -1869,7 +1867,7 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Ganho de Faixa se em Modo Aleatório"
+    *: "Ganho de Faixa no Modo Aleatório"
   </dest>
   <voice>
     *: "Track Gain if Shuffling"
@@ -1976,44 +1974,44 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "Prioridade de Tag ID3"
+    *: ""
   </dest>
   <voice>
-    *: "ID3 Tag Priority"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1 e Depois V2"
+    *: ""
   </dest>
   <voice>
-    *: "Version 1 then version 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED 
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2 e Depois V1"
+    *: ""
   </dest>
   <voice>
-    *: "Version 2 then version 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2098,7 +2096,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pausar and Retomar"
+    headphone_detection: "Pausar e Retomar"
   </dest>
   <voice>
     *: none
@@ -2356,14 +2354,14 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    ipod*: "Building database... %d found (PREV to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Construindo Base de Dados... %d encontrados (OFF para retornar)"
     h100,h120,h300: "Construindo Base de Dados... %d encontrados (STOP para retornar)"
-    ipod*: "Construindo Base de Dados... %d encontrados (PLAY/PAUSE para retornar)"
+    ipod*: "Construindo Base de Dados... %d encontrados (PREV para retornar)"
     x5,m5: "Construindo Base de Dados... %d encontrados (LEFT para retornar)"
     h10,h10_5gb,e200,c200: "Construindo Base de Dados... %d encontrados (PREV para retornar)"
   </dest>
@@ -2835,15 +2833,15 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Seletor De Linha"
+    lcd_bitmap: "Tipo De Seletor De Linha"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </voice>
 </phrase>
 <phrase>
@@ -3575,7 +3573,7 @@
     masd: none
   </source>
   <dest>
-    *: "Mínimo do Alcance"
+    *: "Mínimo de Alcance"
     masd: none
   </dest>
   <voice>
@@ -3592,7 +3590,7 @@
     masd: none
   </source>
   <dest>
-    *: "Máximo do Alcance"
+    *: "Máximo de Alcance"
     masd: none
   </dest>
   <voice>
@@ -4120,8 +4118,8 @@
   </source>
   <dest>
     *: none
-    rtc: "ON = Ajustar"
-    h100,h120,h300: "NAVI = Ajustar"
+    rtc: "ON = Set"
+    h100,h120,h300: "NAVI = Set"
     ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Ajustar"
   </dest>
   <voice>
@@ -4631,7 +4629,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Waking up in"
   </voice>
 </phrase>
 <phrase>
@@ -4648,7 +4646,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm set"
   </voice>
 </phrase>
 <phrase>
@@ -4665,7 +4663,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm Time Is Too Soon!"
   </voice>
 </phrase>
 <phrase>
@@ -4701,7 +4699,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm Disabled"
   </voice>
 </phrase>
 <phrase>
@@ -6246,7 +6244,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Once"
   </voice>
 </phrase>
 <phrase>
@@ -6262,7 +6260,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Trigtype"
+    recording: "Trigger type"
   </voice>
 </phrase>
 <phrase>
@@ -6311,7 +6309,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Start Above"
   </voice>
 </phrase>
 <phrase>
@@ -6328,7 +6326,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "for at least"
   </voice>
 </phrase>
 <phrase>
@@ -6345,7 +6343,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Stop Below"
   </voice>
 </phrase>
 <phrase>
@@ -6362,7 +6360,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Presplit Gap"
   </voice>
 </phrase>
 <phrase>
@@ -6816,7 +6814,7 @@
     player: "Buf: %d.%03dMB"
   </dest>
   <voice>
-    *: ""
+    *: "Buffer size"
   </voice>
 </phrase>
 <phrase>
@@ -6848,7 +6846,7 @@
     *: "Disco:"
   </dest>
   <voice>
-    *: ""
+    *: "Disk size"
   </voice>
 </phrase>
 <phrase>
@@ -7369,13 +7367,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
-    *: "Ver Informação ID3"
+    *: "Ver Informação Da Faixa"
   </dest>
   <voice>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </voice>
 </phrase>
 <phrase>
@@ -7470,7 +7468,7 @@
     *: "[Length]"
   </source>
   <dest>
-    *: "[Tamanho]"
+    *: "[Duração]"
   </dest>
   <voice>
     *: ""
@@ -7842,7 +7840,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Carregamento do Fundo Falhou"
+    lcd_non-mono: "Falha ao Carregar Fundo"
   </dest>
   <voice>
     *: none
@@ -8258,7 +8256,7 @@
   desc: in recording screen
   user:
   <source>
-    *: none
+     *: none
     recording: "The disk is full. Press OFF to continue."
     h100,h120,h300: "The disk is full. Press STOP to continue."
     m5,x5: "The disk is full. Press POWER to continue."
@@ -8266,10 +8264,10 @@
   </source>
   <dest>
     *: none
-    recording: "O disco está cheio. Aperte OFF para continuar."
-    h100,h120,h300: "O disco está cheio. Aperte STOP para continuar."
-    m5,x5: "O disco está cheio. Aperte POWER para continuar."
-    e200,c200: "O disco está cheio. Aperte UP para continuar."
+    recording: "O disco está cheio. Pressione OFF para continuar."
+    h100,h120,h300: "O disco está cheio. Pressione STOP para continuar."
+    m5,x5: "O disco está cheio. Pressione POWER para continuar."
+    e200,c200: "O disco está cheio. Pressione UP para continuar."
   </dest>
   <voice>
     *: none
@@ -8290,7 +8288,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "minus infinity"
   </voice>
 </phrase>
 <phrase>
@@ -8303,7 +8301,7 @@
   </source>
   <dest>
     *: none
-    soft_shutdown: "Aperte OFF para desligar"
+    soft_shutdown: "Pressione OFF para desligar"
   </dest>
   <voice>
     *: none
@@ -8370,7 +8368,7 @@
     *: "OFF para abortar"
     player,h100,h120,h300: "STOP para abortar"
     ipod*: "PLAY/PAUSE para abortar"
-    x5,m5: "Long PLAY para abortar"
+    x5,m5: "PLAY Longo para abortar"
     h10,h10_5gb,e200,c200: "PREV para abortar"
   </dest>
   <voice>
@@ -8539,7 +8537,7 @@
     *: "Plugin name too long"
   </source>
   <dest>
-    *: "Nome do Plugin Demasiado Longo"
+    *: "Nome de Plugin Muito Longo"
   </dest>
   <voice>
     *: "Plugin name too long"
@@ -10778,7 +10776,7 @@
   </source>
   <dest>
     *: none
-    agc: "Safety (clip)"
+    agc: "Segurança (clip)"
   </dest>
   <voice>
     *: none
@@ -10794,7 +10792,7 @@
   </source>
   <dest>
     *: none
-    agc: "Live (slow)"
+    agc: "Ao Vivoe (devagar)"
   </dest>
   <voice>
     *: none
@@ -10810,7 +10808,7 @@
   </source>
   <dest>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: "DJ-Set (devagar)"
   </dest>
   <voice>
     *: none
@@ -11042,4 +11040,328 @@
     rtc: "A M"
   </voice>
 </phrase>
-
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "oh"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Contador de Clip"
+  </dest>
+  <voice>
+    *: none
+    recording: "Clip Counter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Pilha USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB Stack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Modo de Pilha USB"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB Stack Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Dispositivo"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Device"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Hospedeiro"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Driver de Dispositivo"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Device Driver"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Cor Primária"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Primary Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Cor Secundária"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Secondary Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Cor do Texto"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Text Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Barra (Cor Sólida)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Barra (Cor em Gradiente)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Europeu Central (CP1250)"
+  </dest>
+  <voice>
+    *: "Central European"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user:
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Opções de Tema"
+  </dest>
+  <voice>
+    *: "Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user:
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Cores"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Cores do Seletor de Linha"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Edit"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Blank"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Empty list"
+  </voice>
+</phrase>
