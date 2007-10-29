@@ -1473,11 +1473,15 @@ static void codec_set_elapsed_callback(unsigned int value)
 
     latency = pcmbuf_get_latency();
     if (value < latency)
+    {
         curtrack_id3.elapsed = 0;
+        bufgetid3(CUR_TI->id3_hid)->elapsed = 0;
+    }
     else if (value - latency > curtrack_id3.elapsed ||
             value - latency < curtrack_id3.elapsed - 2)
     {
         curtrack_id3.elapsed = value - latency;
+        bufgetid3(CUR_TI->id3_hid)->elapsed = value - latency;
     }
 }
 
@@ -1490,9 +1494,15 @@ static void codec_set_offset_callback(size_t value)
 
     latency = pcmbuf_get_latency() * curtrack_id3.bitrate / 8;
     if (value < latency)
+    {
         curtrack_id3.offset = 0;
+        bufgetid3(CUR_TI->id3_hid)->offset = 0;
+    }
     else
+    {
         curtrack_id3.offset = value - latency;
+        bufgetid3(CUR_TI->id3_hid)->offset = value - latency;
+    }
 }
 
 static void codec_advance_buffer_counters(size_t amount)
