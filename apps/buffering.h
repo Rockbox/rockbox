@@ -36,11 +36,11 @@ enum data_type {
 };
 
 /* Error return values */
-#define HANDLE_NOT_FOUND    -1
-#define BUFFER_FULL         -2
-#define INVALID_VALUE       -3
-#define FILE_ERROR          -4
-#define DATA_NOT_READY      -5
+#define ERR_HANDLE_NOT_FOUND    -1
+#define ERR_BUFFER_FULL         -2
+#define ERR_INVALID_VALUE       -3
+#define ERR_FILE_ERROR          -4
+#define ERR_DATA_NOT_READY      -5
 
 
 /* Initialise the buffering subsystem */

@@ -803,11 +803,11 @@ management functions for all the actual handle management work.
 int bufopen(const char *file, size_t offset, enum data_type type)
 {
     if (!can_add_handle())
-        return BUFFER_FULL;
+        return ERR_BUFFER_FULL;
 
     int fd = open(file, O_RDONLY);
     if (fd < 0)
-        return FILE_ERROR;
+        return ERR_FILE_ERROR;
 
     size_t size = filesize(fd);
 
@@ -816,7 +816,7 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     {
         DEBUGF("bufopen: failed to add handle\n");
         close(fd);
-        return BUFFER_FULL;
+        return ERR_BUFFER_FULL;
     }
 
     strncpy(h->path, file, MAX_PATH);
@@ -854,12 +854,12 @@ int bufopen(const char *file, size_t offset, enum data_type type)
 int bufalloc(const void *src, size_t size, enum data_type type)
 {
     if (!can_add_handle())
-        return BUFFER_FULL;
+        return ERR_BUFFER_FULL;
 
     struct memory_handle *h = add_handle(size, false, true);
 
     if (!h)
-        return BUFFER_FULL;
+        return ERR_BUFFER_FULL;
 
     if (src) {
         if (type == TYPE_ID3 && size == sizeof(struct mp3entry)) {
@@ -907,11 +907,11 @@ int bufseek(int handle_id, size_t newpos)
 {
     struct memory_handle *h = find_handle(handle_id);
     if (!h)
-        return HANDLE_NOT_FOUND;
+        return ERR_HANDLE_NOT_FOUND;
 
     if (newpos > h->filesize) {
         /* access beyond the end of the file */
-        return INVALID_VALUE;
+        return ERR_INVALID_VALUE;
     }
     else if (newpos < h->offset || h->offset + h->available < newpos) {
         /* access before or after buffered data. A rebuffer is needed. */
@@ -929,7 +929,7 @@ int bufadvance(int handle_id, off_t offset)
 {
     const struct memory_handle *h = find_handle(handle_id);
     if (!h)
-        return HANDLE_NOT_FOUND;
+        return ERR_HANDLE_NOT_FOUND;
 
     size_t newpos = h->offset + RINGBUF_SUB(h->ridx, h->data) + offset;
     return bufseek(handle_id, newpos);
@@ -941,18 +941,18 @@ ssize_t bufread(int handle_id, size_t size, void *dest)
 {
     const struct memory_handle *h = find_handle(handle_id);
     if (!h)
-        return HANDLE_NOT_FOUND;
+        return ERR_HANDLE_NOT_FOUND;
 
     size_t ret;
     size_t copy_n = RINGBUF_SUB(h->widx, h->ridx);
 
     if (size == 0 && h->filerem > 0 && copy_n == 0)
         /* Data isn't ready */
-        return DATA_NOT_READY;
+        return ERR_DATA_NOT_READY;
 
     if (copy_n < size && h->filerem > 0)
         /* Data isn't ready */
-        return DATA_NOT_READY;
+        return ERR_DATA_NOT_READY;
 
     if (copy_n == 0 && h->filerem == 0)
         /* File is finished reading */
@@ -984,18 +984,18 @@ ssize_t bufgetdata(int handle_id, size_t size, void **data)
 {
     const struct memory_handle *h = find_handle(handle_id);
     if (!h)
-        return HANDLE_NOT_FOUND;
+        return ERR_HANDLE_NOT_FOUND;
 
     ssize_t ret;
     size_t copy_n = RINGBUF_SUB(h->widx, h->ridx);
 
     if (size == 0 && h->filerem > 0 && copy_n == 0)
         /* Data isn't ready */
-        return DATA_NOT_READY;
+        return ERR_DATA_NOT_READY;
 
     if (copy_n < size && h->filerem > 0)
         /* Data isn't ready */
-        return DATA_NOT_READY;
+        return ERR_DATA_NOT_READY;
 
     if (copy_n == 0 && h->filerem == 0)
         /* File is finished reading */
@@ -1040,7 +1040,7 @@ ssize_t buf_get_offset(int handle_id, void *ptr)
 {
     const struct memory_handle *h = find_handle(handle_id);
     if (!h)
-        return HANDLE_NOT_FOUND;
+        return ERR_HANDLE_NOT_FOUND;
 
     return (size_t)ptr - (size_t)&buffer[h->ridx];
 }
@@ -1049,7 +1049,7 @@ ssize_t buf_handle_offset(int handle_id)
 {
     const struct memory_handle *h = find_handle(handle_id);
     if (!h)
-        return HANDLE_NOT_FOUND;
+        return ERR_HANDLE_NOT_FOUND;
     return h->offset;
 }
 

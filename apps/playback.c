@@ -366,11 +366,11 @@ static void *bufgetcodec(struct track_info *track)
     void *ptr;
     ssize_t ret = bufgetdata(track->codec_hid, track->codecsize, &ptr);
 
-    if (ret == DATA_NOT_READY) {
+    if (ret == ERR_DATA_NOT_READY) {
         buf_request_buffer_handle(track->codec_hid);
     }
 
-    while (ret == DATA_NOT_READY) {
+    while (ret == ERR_DATA_NOT_READY) {
         sleep(1);
         ret = bufgetdata(track->codec_hid, track->codecsize, &ptr);
     }
@@ -1516,13 +1516,13 @@ static size_t codec_filebuf_callback(void *ptr, size_t size)
         return 0;
 
 
-    if (copy_n == DATA_NOT_READY)
+    if (copy_n == ERR_DATA_NOT_READY)
     {
         buf_request_buffer_handle(CUR_TI->audio_hid);
     }
 
     /* Let the disk buffer catch fill until enough data is available */
-    while (copy_n == DATA_NOT_READY)
+    while (copy_n == ERR_DATA_NOT_READY)
     {
         sleep(1);
 
@@ -1561,13 +1561,13 @@ static void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
         return NULL;
     }
 
-    if (ret == DATA_NOT_READY)
+    if (ret == ERR_DATA_NOT_READY)
     {
         buf_request_buffer_handle(CUR_TI->audio_hid);
     }
 
     /* Let the disk buffer catch fill until enough data is available */
-    while (ret == DATA_NOT_READY)
+    while (ret == ERR_DATA_NOT_READY)
     {
         sleep(1);
 
