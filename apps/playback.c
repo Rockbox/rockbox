@@ -655,7 +655,7 @@ struct mp3entry* audio_current_track(void)
     static struct mp3entry temp_id3;
     int cur_idx;
     int offset = ci.new_track + wps_offset;
-    
+
     cur_idx = track_ridx + offset;
     cur_idx &= MAX_TRACK_MASK;
 
@@ -667,7 +667,7 @@ struct mp3entry* audio_current_track(void)
         return bufgetid3(tracks[cur_idx].id3_hid);
 
     memset(&temp_id3, 0, sizeof(struct mp3entry));
-    
+
     filename = playlist_peek(0);
     if (!filename)
         filename = "No file!";
@@ -710,7 +710,7 @@ struct mp3entry* audio_next_track(void)
 
 bool audio_has_changed_track(void)
 {
-    if (track_changed) 
+    if (track_changed)
     {
         track_changed = false;
         return true;
@@ -1018,7 +1018,7 @@ static void voice_stop(void)
            ci_voice.new_track)
         yield();
 
-    if (!playing)   
+    if (!playing)
         pcmbuf_play_stop();
 } /* voice_stop */
 
@@ -1199,7 +1199,7 @@ static bool voice_on_voice_stop(bool aborting, size_t *realsize)
             sleep(0);
 
         /* Force the codec to think it's changing tracks */
-        ci_voice.new_track = 1; 
+        ci_voice.new_track = 1;
 
         *realsize = 0;
         return true; /* Yes, change tracks */
@@ -1311,7 +1311,7 @@ voice_play_clip:
                 pcmbuf_play_start();
         }
     }
-    
+
     *realsize = MIN(voice_remaining, reqsize);
 
     if (*realsize == 0)
@@ -1330,14 +1330,14 @@ static void voice_advance_buffer_callback(size_t amount)
 static void voice_advance_buffer_loc_callback(void *ptr)
 {
     size_t amount = (size_t)ptr - (size_t)voicebuf;
-    
+
     voice_advance_buffer_callback(amount);
 }
 
 static off_t voice_mp3_get_filepos_callback(int newtime)
 {
     (void)newtime;
-    
+
     return 0;
 }
 
@@ -1349,7 +1349,7 @@ static void voice_do_nothing(void)
 static bool voice_seek_buffer_callback(size_t newpos)
 {
     (void)newpos;
-    
+
     return false;
 }
 
@@ -1398,7 +1398,7 @@ static bool codec_pcmbuf_insert_callback(
         if (ci.new_track || ci.stop_codec)
             return true;
 
-        while ((dest = pcmbuf_request_buffer(&out_count)) == NULL) 
+        while ((dest = pcmbuf_request_buffer(&out_count)) == NULL)
         {
             sleep(1);
             if (ci.seek_time || ci.new_track || ci.stop_codec)
@@ -1424,7 +1424,7 @@ static bool codec_pcmbuf_insert_callback(
         pcmbuf_write_complete(out_count);
 
 #ifdef PLAYBACK_VOICE
-        if ((voice_is_playing || voice_thread_start) 
+        if ((voice_is_playing || voice_thread_start)
             && pcm_is_playing() && voice_codec_loaded &&
             pcmbuf_usage() > 30 && pcmbuf_mix_free() > 80)
         {
@@ -1446,13 +1446,13 @@ static void* codec_get_memory_callback(size_t *size)
 }
 
 static void codec_pcmbuf_position_callback(size_t size) ICODE_ATTR;
-static void codec_pcmbuf_position_callback(size_t size) 
+static void codec_pcmbuf_position_callback(size_t size)
 {
     /* This is called from an ISR, so be quick */
     unsigned int time = size * 1000 / 4 / NATIVE_FREQUENCY +
         prevtrack_id3.elapsed;
 
-    if (time >= prevtrack_id3.length) 
+    if (time >= prevtrack_id3.length)
     {
         pcmbuf_set_position_callback(NULL);
         prevtrack_id3.elapsed = prevtrack_id3.length;
@@ -1484,7 +1484,7 @@ static void codec_set_elapsed_callback(unsigned int value)
 static void codec_set_offset_callback(size_t value)
 {
     unsigned int latency;
-    
+
     if (ci.seek_time)
         return;
 
@@ -1495,7 +1495,7 @@ static void codec_set_offset_callback(size_t value)
         curtrack_id3.offset = value - latency;
 }
 
-static void codec_advance_buffer_counters(size_t amount) 
+static void codec_advance_buffer_counters(size_t amount)
 {
     bufadvance(CUR_TI->audio_hid, amount);
     ci.curpos += amount;
@@ -1545,7 +1545,7 @@ static void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     ssize_t ret;
     void *ptr;
 
-    if (!playing) 
+    if (!playing)
     {
         *realsize = 0;
         return NULL;
@@ -1571,7 +1571,7 @@ static void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     {
         sleep(1);
 
-        if (ci.stop_codec || ci.new_track) 
+        if (ci.stop_codec || ci.new_track)
         {
             *realsize = 0;
             return NULL;
@@ -1677,7 +1677,7 @@ static off_t codec_mp3_get_filepos_callback(int newtime)
 static void codec_seek_complete_callback(void)
 {
     logf("seek_complete");
-    if (pcm_is_paused()) 
+    if (pcm_is_paused())
     {
         /* If this is not a seamless seek, clear the buffer */
         pcmbuf_play_stop();
@@ -1746,14 +1746,16 @@ static void codec_discard_codec_callback(void)
     }
 }
 
-static inline void codec_gapless_track_change(void) {
+static inline void codec_gapless_track_change(void)
+{
     /* callback keeps the progress bar moving while the pcmbuf empties */
     pcmbuf_set_position_callback(codec_pcmbuf_position_callback);
     /* set the pcmbuf callback for when the track really changes */
     pcmbuf_set_event_handler(codec_pcmbuf_track_changed_callback);
 }
 
-static inline void codec_crossfade_track_change(void) {
+static inline void codec_crossfade_track_change(void)
+{
     /* Initiate automatic crossfade mode */
     pcmbuf_crossfade_init(false);
     /* Notify the wps that the track change starts now */
@@ -1762,8 +1764,6 @@ static inline void codec_crossfade_track_change(void) {
 
 static void codec_track_skip_done(bool was_manual)
 {
-    int crossfade_mode = global_settings.crossfade;
-
     /* Manual track change (always crossfade or flush audio). */
     if (was_manual)
     {
@@ -1773,9 +1773,9 @@ static void codec_track_skip_done(bool was_manual)
     }
     /* Automatic track change w/crossfade, if not in "Track Skip Only" mode. */
     else if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()
-             && crossfade_mode != CROSSFADE_ENABLE_TRACKSKIP)
+             && global_settings.crossfade != CROSSFADE_ENABLE_TRACKSKIP)
     {
-        if (crossfade_mode == CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP)
+        if (global_settings.crossfade == CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP)
         {
             if (global_settings.playlist_shuffle)
                 /* shuffle mode is on, so crossfade: */
@@ -1793,7 +1793,7 @@ static void codec_track_skip_done(bool was_manual)
         codec_gapless_track_change();
 }
 
-static bool codec_load_next_track(void) 
+static bool codec_load_next_track(void)
 {
     intptr_t result = Q_CODEC_REQUEST_FAILED;
 
@@ -1986,11 +1986,11 @@ static void codec_thread(void)
             case Q_CODEC_LOAD_DISK:
             case Q_CODEC_LOAD:
                 LOGFQUEUE("codec < Q_CODEC_LOAD");
-                if (playing) 
+                if (playing)
                 {
-                    if (ci.new_track || status != CODEC_OK) 
+                    if (ci.new_track || status != CODEC_OK)
                     {
-                        if (!ci.new_track) 
+                        if (!ci.new_track)
                         {
                             logf("Codec failure");
                             gui_syncsplash(HZ*2, "Codec failure");
@@ -2003,8 +2003,8 @@ static void codec_thread(void)
                             queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                             break;
                         }
-                    } 
-                    else 
+                    }
+                    else
                     {
                         logf("Codec finished");
                         if (ci.stop_codec)
@@ -2029,7 +2029,7 @@ static void codec_thread(void)
                         LOGFQUEUE("codec > codec Q_CODEC_LOAD");
                         queue_post(&codec_queue, Q_CODEC_LOAD, 0);
                     }
-                    else
+                    else if (curtrack_id3.codectype != 0) /* Sucky workaround */
                     {
                         const char *codec_fn =
                             get_codec_filename(curtrack_id3.codectype);
@@ -2079,22 +2079,22 @@ static bool audio_have_free_tracks(void)
         return track_widx + 1 < track_ridx;
     else if (track_ridx == 0)
         return track_widx < MAX_TRACK - 1;
-    
+
     return true;
 }
-        
+
 int audio_track_count(void)
 {
     if (audio_have_tracks())
     {
         int relative_track_widx = track_widx;
-        
+
         if (track_ridx > track_widx)
             relative_track_widx += MAX_TRACK;
-        
+
         return relative_track_widx - track_ridx + 1;
     }
-    
+
     return 0;
 }
 
@@ -2220,7 +2220,7 @@ static bool audio_loadcodec(bool start_play)
     else
     {
         /* If we already have another track than this one buffered */
-        if (track_widx != track_ridx) 
+        if (track_widx != track_ridx)
         {
             prev_track = (track_widx - 1) & MAX_TRACK_MASK;
 
@@ -2266,7 +2266,7 @@ static bool audio_loadcodec(bool start_play)
 /* TODO: Copied from mpeg.c. Should be moved somewhere else. */
 static void audio_set_elapsed(struct mp3entry* id3)
 {
-    unsigned long offset = id3->offset > id3->first_frame_offset ? 
+    unsigned long offset = id3->offset > id3->first_frame_offset ?
         id3->offset - id3->first_frame_offset : 0;
 
     if ( id3->vbr ) {
@@ -2305,7 +2305,7 @@ static void audio_set_elapsed(struct mp3entry* id3)
         }
         else {
             /* no TOC exists. set a rough estimate using average bitrate */
-            int tpk = id3->length / 
+            int tpk = id3->length /
                 ((id3->filesize - id3->first_frame_offset - id3->id3v1len) /
                 1024);
             id3->elapsed = offset / 1024 * tpk;
@@ -2530,12 +2530,12 @@ static void audio_generate_postbuffer_events(void)
 
     logf("Postbuffer:%d/%d",track_ridx,track_widx);
 
-    if (audio_have_tracks()) 
+    if (audio_have_tracks())
     {
         cur_idx = track_ridx;
 
         while (1) {
-            if (!tracks[cur_idx].event_sent) 
+            if (!tracks[cur_idx].event_sent)
             {
                 if (last_idx >= 0 && !tracks[last_idx].event_sent)
                 {
@@ -2828,7 +2828,7 @@ static void audio_stop_playback(void)
          * Done here, as audio_stop_playback() may be called more than once.
          * Don't update runtime unless playback is stopped because of end of playlist.
          * Updating runtime when manually stopping a tracks, can destroy autoscores
-         * and playcounts. 
+         * and playcounts.
          */
         if (playlist_end)
         {
@@ -2911,7 +2911,7 @@ static void audio_new_playlist(void)
 {
     /* Prepare to start a new fill from the beginning of the playlist */
     last_peek_offset = -1;
-    if (audio_have_tracks()) 
+    if (audio_have_tracks())
     {
         if (paused)
             skipped_during_pause = true;
@@ -3267,7 +3267,7 @@ void audio_init(void)
 #ifdef ROCKBOX_HAS_LOGF
     audio_set_track_changed_event(audio_test_track_changed_event);
 #endif
- 
+
      /* Initialize codec api. */
     ci.read_filebuf        = codec_filebuf_callback;
     ci.pcmbuf_insert       = codec_pcmbuf_insert_callback;
@@ -3283,7 +3283,7 @@ void audio_init(void)
     ci.set_offset          = codec_set_offset_callback;
     ci.configure           = codec_configure_callback;
     ci.discard_codec       = codec_discard_codec_callback;
- 
+
      /* Initialize voice codec api. */
 #ifdef PLAYBACK_VOICE
     memcpy(&ci_voice, &ci, sizeof(ci_voice));
@@ -3307,7 +3307,7 @@ void audio_init(void)
     id3_voice.frequency          = 11200;
     id3_voice.length             = 1000000L;
 #endif
- 
+
     /* initialize the buffer */
     filebuf = audiobuf;
 
@@ -3355,7 +3355,7 @@ void audio_init(void)
 #ifdef HAVE_WM8758
     eq_hw_enable(global_settings.eq_hw_enabled);
 #endif
-#ifndef HAVE_FLASH_STORAGE 
+#ifndef HAVE_FLASH_STORAGE
     audio_set_buffer_margin(global_settings.buffer_margin);
 #endif
 
