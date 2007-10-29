@@ -386,7 +386,7 @@ static struct memory_handle *find_handle(const unsigned int handle_id)
            a memory_handle after correcting for wraps or if the handle is not
            found in the linked list for adjustment.  This function has no side
            effects if NULL is returned. */
-static bool move_handle(struct memory_handle const **h,
+static bool move_handle(struct memory_handle **h,
                         size_t *delta, const size_t data_size)
 {
     struct memory_handle *dest;
