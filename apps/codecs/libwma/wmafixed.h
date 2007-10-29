@@ -1,3 +1,21 @@
+/****************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ *
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
 /*  fixed precision code.  We use a combination of Sign 15.16 and Sign.31
      precision here.
 
@@ -31,8 +49,6 @@ fixed64 fixmul64byfixed(fixed64 x, fixed32 y);
 fixed32 fixdiv32(fixed32 x, fixed32 y);
 fixed64 fixdiv64(fixed64 x, fixed64 y);
 fixed32 fixsqrt32(fixed32 x);
-fixed32 fixsin32(fixed32 x);
-fixed32 fixcos32(fixed32 x);
 long fsincos(unsigned long phase, fixed32 *cos);
 
 #ifdef CPU_ARM

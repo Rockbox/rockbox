@@ -1,3 +1,21 @@
+/****************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ *
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
 #include "wmadec.h"
 #include "wmafixed.h"
 #include <codecs.h>
@@ -220,61 +238,4 @@ long fsincos(unsigned long phase, fixed32 *cos)
     return y;
 }
 
-
-/*
-    Old trig functions.  Still used in 1 place each.
-
-*/
-
-
-fixed32 fixsin32(fixed32 x)
-{
-
-    fixed64 x2, temp;
-    int     sign = 1;
-
-    if(x < 0)
-    {
-        sign = -1;
-        x = -x;
-    }
-    while (x > 0x19220)
-    {
-        x -= M_PI_F;
-        sign = -sign;
-    }
-    if (x > 0x19220)
-    {
-        x = M_PI_F - x;
-    }
-    x2 = (fixed64)x * x;
-    x2 >>= PRECISION;
-    if(sign != 1)
-    {
-        x = -x;
-    }
-    /**
-    temp = ftofix32(-.0000000239f) * x2;
-    temp >>= PRECISION;
-    **/
-    temp = 0; // PJJ
-    //temp = (temp + 0x0) * x2;    //MGG:  this can't possibly do anything?
-    //temp >>= PRECISION;
-    temp = (temp - 0xd) * x2;
-    temp >>= PRECISION;
-    temp = (temp + 0x222) * x2;
-    temp >>= PRECISION;
-    temp = (temp - 0x2aab) * x2;
-    temp >>= PRECISION;
-    temp += 0x10000;
-    temp = temp * x;
-    temp >>= PRECISION;
-
-    return  (fixed32)(temp);
-}
-
-fixed32 fixcos32(fixed32 x)
-{
-    return fixsin32(x - (M_PI_F>>1))*-1;
-}
 
