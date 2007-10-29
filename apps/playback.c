@@ -2029,7 +2029,7 @@ static void codec_thread(void)
                         LOGFQUEUE("codec > codec Q_CODEC_LOAD");
                         queue_post(&codec_queue, Q_CODEC_LOAD, 0);
                     }
-                    else if (curtrack_id3.codectype != 0) /* Sucky workaround */
+                    else
                     {
                         const char *codec_fn =
                             get_codec_filename(curtrack_id3.codectype);
