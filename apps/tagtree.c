@@ -51,12 +51,14 @@
 
 static int tagtree_play_folder(struct tree_context* c);
 
-#define SEARCHSTR_SIZE 128
-static char searchstring[SEARCHSTR_SIZE];
+#define SEARCHSTR_SIZE 256
+
 static const struct id3_to_search_mapping {
     char   *string;
     size_t id3_offset;
 } id3_to_search_mapping[] = {
+    { "",  0 },              /* offset n/a */
+    { "#directory#",  0 },   /* offset n/a */
     { "#title#",  offsetof(struct mp3entry, title) },
     { "#artist#", offsetof(struct mp3entry, artist) },
     { "#album#",  offsetof(struct mp3entry, album) },
@@ -288,7 +290,8 @@ static int get_clause(int *condition)
 
 static bool read_clause(struct tagcache_search_clause *clause)
 {
-    char buf[256];
+    char buf[SEARCHSTR_SIZE];
+    unsigned int i;
     
     if (get_tag(&clause->tag) <= 0)
         return false;
@@ -298,33 +301,24 @@ static bool read_clause(struct tagcache_search_clause *clause)
     
     if (get_token_str(buf, sizeof buf) < 0)
         return false;
-    
-    clause->str = buffer_alloc(strlen(buf)+1);
-    strcpy(clause->str, buf);
-    
-    logf("got clause: %d/%d [%s]", clause->tag, clause->type, clause->str);
-    
-    if (*(clause->str) == '\0')
-        clause->source = source_input;
-    else if (!strcasecmp(clause->str, "#directory#"))
-        clause->source = source_current_path;
+       
+    for (i=0; i<ARRAYLEN(id3_to_search_mapping); i++)
+    {
+        if (!strcasecmp(buf, id3_to_search_mapping[i].string))
+            break;
+    }
+
+    if (i<ARRAYLEN(id3_to_search_mapping)) /* runtime search operand found */
+    {
+        clause->source = source_runtime+i;
+        clause->str = buffer_alloc(SEARCHSTR_SIZE);
+    }    
     else 
     {
-        unsigned int i;
-        bool found = false;
-        for (i=0; !found && i<ARRAYLEN(id3_to_search_mapping); i++)
-        {
-            if (!strcasecmp(clause->str, id3_to_search_mapping[i].string))
-            {
-                found = true;
-                break;
-            }
-        }
-        if (found)
-            clause->source = source_current_id3+i;
-        else
-            clause->source = source_constant;
-    }
+        clause->source = source_constant;
+        clause->str = buffer_alloc(strlen(buf)+1);
+        strcpy(clause->str, buf);
+    }    
     
     if (tagcache_is_numeric_tag(clause->tag))
     {
@@ -333,6 +327,8 @@ static bool read_clause(struct tagcache_search_clause *clause)
     }
     else
         clause->numeric = false;
+
+    logf("got clause: %d/%d [%s]", clause->tag, clause->type, clause->str);   
     
     return true;
 }
@@ -1419,14 +1415,17 @@ int tagtree_enter(struct tree_context* c)
                 {
                     for (j = 0; j < csi->clause_count[i]; j++)
                     {
-                        *searchstring='\0';
+                        char* searchstring;
                         source = csi->clause[i][j]->source;
                         
                         if (source == source_constant)
                             continue;
-                        
+
+                        searchstring=csi->clause[i][j]->str;
+                        *searchstring = '\0';               
+                                
                         id3 = audio_current_track();
-                        
+
                         if (source == source_current_path && id3)
                         {
                             char *e;
@@ -1435,11 +1434,11 @@ int tagtree_enter(struct tree_context* c)
                             if (e)
                                 *e = '\0';
                         }
-                        
-                        if (source >= source_current_id3 && id3)
+                        else if (source > source_runtime && id3)
                         {
-                            int i = source-source_current_id3;
-                            int offset = id3_to_search_mapping[i].id3_offset;
+                            
+                            int k = source-source_runtime;
+                            int offset = id3_to_search_mapping[k].id3_offset;
                             char **src = (char**)((char*)id3 + offset);
                             if (*src)
                             {
@@ -1447,8 +1446,7 @@ int tagtree_enter(struct tree_context* c)
                                 searchstring[SEARCHSTR_SIZE-1] = '\0';
                             }
                         }
-                        
-                        if((source == source_input) || (*searchstring=='\0'))
+                        else
                         {
                             rc = kbd_input(searchstring, SEARCHSTR_SIZE);
                             if (rc == -1 || !searchstring[0])
@@ -1456,18 +1454,16 @@ int tagtree_enter(struct tree_context* c)
                                 tagtree_exit(c);
                                 return 0;
                             }
+                            if (csi->clause[i][j]->numeric)
+                                csi->clause[i][j]->numeric_data = atoi(searchstring);
                         }   
                                              
-                        if (csi->clause[i][j]->numeric)
-                            csi->clause[i][j]->numeric_data = atoi(searchstring);
                             
-                        /* existing bug: only one dynamic string per clause! */    
-                        csi->clause[i][j]->str = searchstring;
                     }
                 }
             }
             c->currtable = newextra;
-        
+
             break;
 
         case navibrowse:
