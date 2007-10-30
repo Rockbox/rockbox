@@ -2415,6 +2415,7 @@ static bool audio_load_track(int offset, bool start_play)
             /* Skip invalid entry from playlist. */
             playlist_skip_entry(NULL, last_peek_offset);
             tracks[track_widx].taginfo_ready = false;
+            close(fd);
             goto peek_again;
         }
 
