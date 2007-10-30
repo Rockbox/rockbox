@@ -79,6 +79,55 @@ int ft_build_playlist(struct tree_context* c, int start_index)
     return start_index;
 }
 
+/* Start playback of a playlist, checking for bookmark autoload, modified
+ * playlists, etc., as required. Returns false if playback wasn't started,
+ * or started via bookmark autoload, true otherwise.
+ *
+ * Pointers to both the full pathname and the separated parts needed to
+ * avoid allocating yet another path buffer on the stack (and save some 
+ * code; the caller typically needs to create the full pathname anyway)...
+ */
+bool ft_play_playlist(char* pathname, char* dirname, char* filename)
+{
+    if (global_settings.party_mode) 
+    {
+        gui_syncsplash(HZ, ID2P(LANG_PARTY_MODE));
+        return false;
+    }
+
+    if (bookmark_autoload(pathname))
+    {
+        return false;
+    }
+
+    gui_syncsplash(0, ID2P(LANG_WAIT));
+
+    /* about to create a new current playlist...
+       allow user to cancel the operation */
+    if (global_settings.warnon_erase_dynplaylist &&
+        playlist_modified(NULL))
+    {
+        char *lines[] = {ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
+        struct text_message message = {lines, 1};
+
+        if (gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
+            return false;
+    }
+
+    if (playlist_create(dirname, filename) != -1)
+    {
+        if (global_settings.playlist_shuffle)
+        {
+            playlist_shuffle(current_tick, -1);
+        }
+        
+        playlist_start(0, 0);
+        return true;
+    }
+    
+    return false;
+}
+
 /* walk a directory and check all dircache entries if a .talk file exists */
 static void check_file_thumbnails(struct tree_context* c)
 {
@@ -341,36 +390,13 @@ int ft_enter(struct tree_context* c)
 
         switch ( file->attr & FILE_ATTR_MASK ) {
             case FILE_ATTR_M3U:
-                if (global_settings.party_mode) {
-                    gui_syncsplash(HZ, ID2P(LANG_PARTY_MODE));
-                    break;
-                }
-
-                if (bookmark_autoload(buf))
-                    break;
-
-                gui_syncsplash(0, ID2P(LANG_WAIT));
-
-                /* about to create a new current playlist...
-                   allow user to cancel the operation */
-                if (global_settings.warnon_erase_dynplaylist &&
-                    playlist_modified(NULL))
+                play = ft_play_playlist(buf, c->currdir, file->name);
+                
+                if (play)
                 {
-                    char *lines[]={ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
-                    struct text_message message={lines, 1};
-
-                    if(gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
-                        break;
-                }
-
-                if (playlist_create(c->currdir, file->name) != -1)
-                {
-                    if (global_settings.playlist_shuffle)
-                        playlist_shuffle(seed, -1);
                     start_index = 0;
-                    playlist_start(start_index,0);
-                    play = true;
                 }
+
                 break;
 
             case FILE_ATTR_AUDIO:

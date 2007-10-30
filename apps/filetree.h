@@ -24,5 +24,6 @@ int ft_load(struct tree_context* c, const char* tempdir);
 int ft_enter(struct tree_context* c);
 int ft_exit(struct tree_context* c);
 int ft_build_playlist(struct tree_context* c, int start_index);
+bool ft_play_playlist(char* pathname, char* dirname, char* filename);
 
 #endif

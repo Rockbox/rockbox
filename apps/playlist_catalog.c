@@ -38,6 +38,7 @@
 #include "tree.h"
 #include "yesno.h"
 #include "filetypes.h"
+#include "debug.h"
 
 #define PLAYLIST_CATALOG_CFG ROCKBOX_DIR "/playlist_catalog.config"
 #define PLAYLIST_CATALOG_DEFAULT_DIR "/Playlists"
@@ -212,6 +213,18 @@ static char* playlist_callback_name(int selected_item, void* data,
 
     strncpy(buffer, playlists[selected_item], MAX_PATH);
 
+    if (buffer[0] != '.' && !(global_settings.show_filename_ext == 1
+        || (global_settings.show_filename_ext == 3
+            && global_settings.dirfilter == 0)))
+    {
+        char* dot = strrchr(buffer, '.');
+
+        if (dot != NULL)
+        {
+            *dot = '\0';
+        }
+    }
+
     return buffer;
 }
 
@@ -260,21 +273,12 @@ static int display_playlists(char* playlist, bool view)
                 break;
 
             case ACTION_STD_OK:
+                snprintf(playlist, MAX_PATH, "%s/%s", playlist_dir, sel_file);
+
                 if (view)
                 {
                     /* In view mode, selecting a playlist starts playback */
-                    if (playlist_create(playlist_dir, sel_file) != -1)
-                    {
-                        if (global_settings.playlist_shuffle)
-                            playlist_shuffle(current_tick, -1);
-                        playlist_start(0, 0);
-                    }
-                }
-                else
-                {
-                    /* we found the playlist we want to add to */
-                    snprintf(playlist, MAX_PATH, "%s/%s", playlist_dir,
-                        sel_file);
+                    ft_play_playlist(playlist, playlist_dir, sel_file);
                 }
 
                 result = 0;
