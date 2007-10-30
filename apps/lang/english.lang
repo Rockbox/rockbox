@@ -6957,7 +6957,7 @@
   </source>
   <dest>
     *: none
-    e200,c200: "mSD:"
+    e200,c200: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
@@ -11429,5 +11429,22 @@
   </dest>
   <voice>
     *: "Empty list"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user:
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Not present"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "Not present"
   </voice>
 </phrase>

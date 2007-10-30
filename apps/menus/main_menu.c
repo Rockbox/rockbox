@@ -119,6 +119,7 @@ static bool show_credits(void)
 #define SIZE_FMT "%s %s"
 #endif
 struct info_data 
+
 {
     bool new_data;
     unsigned long size;
@@ -129,26 +130,31 @@ struct info_data
 #endif
 };
 enum infoscreenorder 
+
 {
-    INFO_VERSION = 0,
-#if CONFIG_RTC
-    INFO_TIME,
-    INFO_DATE,
-#endif
-    INFO_BUFFER,
-    INFO_BATTERY,
+    INFO_BATTERY = 0,
     INFO_DISK1, /* capacity or internal capacity/free on hotswap */
     INFO_DISK2, /* free space or external capacity/free on hotswap */
+    INFO_BUFFER,
+    INFO_VERSION,
+#if CONFIG_RTC
+    INFO_DATE,
+    INFO_TIME,
+#endif
     INFO_COUNT
 };
+
 
 static char* info_getname(int selected_item, void *data, char *buffer)
 {
     struct info_data *info = (struct info_data*)data;
+
 #if CONFIG_RTC
     struct tm *tm;
+
 #endif
     const unsigned char *kbyte_units[] =
+
     {
         ID2P(LANG_KILOBYTE),
         ID2P(LANG_MEGABYTE),
@@ -181,13 +187,16 @@ static char* info_getname(int selected_item, void *data, char *buffer)
             snprintf(buffer, MAX_PATH, "%02d:%02d:%02d %s", 
                 global_settings.timeformat == 0 ? tm->tm_hour : tm->tm_hour-12,
                 tm->tm_min, 
+
                 tm->tm_sec, 
                 global_settings.timeformat == 0 ? "" : tm->tm_hour>11 ? "P" : "A");
             break;
         case INFO_DATE:
             tm = get_time();
             snprintf(buffer, MAX_PATH, "%s %d %d", 
+
                 str(LANG_MONTH_JANUARY + tm->tm_mon),
+
                 tm->tm_mday,
                 tm->tm_year+1900);
             break;
@@ -224,8 +233,8 @@ static char* info_getname(int selected_item, void *data, char *buffer)
             snprintf(buffer, MAX_PATH, "%s %s/%s", str(LANG_DISK_NAME_INTERNAL),
                      s1, s2);
 #else
-            output_dyn_value(s1, sizeof s1, info->size, kbyte_units, true);
-            snprintf(buffer, MAX_PATH, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
+            output_dyn_value(s1, sizeof s1, info->free, kbyte_units, true);
+            snprintf(buffer, MAX_PATH, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
 #endif
             break;
         case INFO_DISK2: /* disk usage 2 */
@@ -238,10 +247,13 @@ static char* info_getname(int selected_item, void *data, char *buffer)
                          s1, s2);
             }
             else 
-                return "";
+            {
+                snprintf(buffer, MAX_PATH, "%s %s %s", str(LANG_DISK_NAME_MMC),
+                         s1, str(LANG_NOT_PRESENT), s2);
+            }
 #else
-            output_dyn_value(s1, sizeof s1, info->free, kbyte_units, true);
-            snprintf(buffer, MAX_PATH, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
+            output_dyn_value(s1, sizeof s1, info->size, kbyte_units, true);
+            snprintf(buffer, MAX_PATH, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
             break;
     }
@@ -255,6 +267,7 @@ static int info_speak_item(int selected_item, void * data)
         ID2P(LANG_MEGABYTE),
         ID2P(LANG_GIGABYTE)
     };
+
     switch (selected_item)
     {
         case INFO_VERSION: /* version */
@@ -263,19 +276,26 @@ static int info_speak_item(int selected_item, void * data)
             break;
 #if CONFIG_RTC
         case INFO_TIME: 
-            talk_id(LANG_CURRENT_TIME, false);
+
+            talk_id(VOICE_CURRENT_TIME, false);
             talk_time(get_time(), true);
             break;
         case INFO_DATE:
             talk_date(get_time(), true);
+
             break;
 #endif
         case INFO_BUFFER: /* buffer */
+
         {
             talk_id(LANG_BUFFER_STAT, false);
+
             long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
+
             output_dyn_value(NULL, 0, buflen, kbyte_units, true);
+
             break;
+
         }
         case INFO_BATTERY: /* battery */
             if (battery_level() >= 0)
@@ -299,26 +319,28 @@ static int info_speak_item(int selected_item, void * data)
             }
             break;
         case INFO_DISK1: /* disk 1 */
-#ifdef HAVE_MULTIVOLUME
             talk_id(LANG_DISK_FREE_INFO, false);
+#ifdef HAVE_MULTIVOLUME
             talk_id(LANG_DISK_NAME_INTERNAL, true);
-            output_dyn_value(NULL, 0, info->free, kbyte_units, true);
-#else
-            talk_id(LANG_DISK_SIZE_INFO, false);
-            output_dyn_value(NULL, 0, info->size, kbyte_units, true);
 #endif
+            output_dyn_value(NULL, 0, info->free, kbyte_units, true);
             break;
         case INFO_DISK2: /* disk 2 */
 #ifdef HAVE_MULTIVOLUME
             if (info->size2)
             {
                 talk_id(LANG_DISK_FREE_INFO, false);
-                talk_id(LANG_DISK_NAME_MMC, false);
+                talk_id(LANG_DISK_NAME_MMC, true);
                 output_dyn_value(NULL, 0, info->free2, kbyte_units, true);
             }
+            else
+            {
+                talk_id(LANG_DISK_NAME_MMC, false);
+                talk_id(LANG_NOT_PRESENT, true);
+            }
 #else
-            talk_id(LANG_DISK_FREE_INFO, false);
-            output_dyn_value(NULL, 0, info->free, kbyte_units, true);
+            talk_id(LANG_DISK_SIZE_INFO, false);
+            output_dyn_value(NULL, 0, info->size, kbyte_units, true);
 #endif
             break;
     }
@@ -345,7 +367,9 @@ static int info_action_callback(int action, struct gui_synclist *lists)
         if (fat_ismounted(1))
             fat_recalc_free(1);
 #endif
+
 #else
+
         (void) lists;
 #endif
         return ACTION_REDRAW;
