@@ -241,7 +241,7 @@ static inline long clip_sample(int32_t sample, int32_t min, int32_t range)
         int32_t c = min;
         if (sample > min)
             c += range;
-        sample = c
+        sample = c;
     }
     return sample;
 }
