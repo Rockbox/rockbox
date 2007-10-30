@@ -1271,7 +1271,7 @@ void semaphore_release(struct semaphore *s)
 #endif /* CONFIG_CORELOCK */
 
             /* there should be threads in this queue */
-            KERNEL_ASSERT(s->queue.queue != NULL, "semaphore->wakeup");
+            KERNEL_ASSERT(s->queue != NULL, "semaphore->wakeup");
             /* a thread was queued - wake it up */
             wakeup_thread_no_listlock(&s->queue);
         }
@@ -1379,7 +1379,7 @@ void event_set_state(struct event *e, unsigned int state)
         {
             struct thread_entry *thread;
             /* no thread should have ever blocked for unsignaled */
-            KERNEL_ASSERT(e->queues[STATE_NONSIGNALED].queue == NULL,
+            KERNEL_ASSERT(e->queues[STATE_NONSIGNALED] == NULL,
                           "set_event_state->queue[NS]:S");
             /* pass to next thread and keep unsignaled - "pulse" */
             thread = wakeup_thread_no_listlock(&e->queues[STATE_SIGNALED]);
@@ -1397,7 +1397,7 @@ void event_set_state(struct event *e, unsigned int state)
         /* release all threads waiting for unsignaled */
 
         /* no thread should have ever blocked if automatic */
-        KERNEL_ASSERT(e->queues[STATE_NONSIGNALED].queue == NULL ||
+        KERNEL_ASSERT(e->queues[STATE_NONSIGNALED] == NULL ||
                       e->automatic == 0, "set_event_state->queue[NS]:NS");
 
         thread_queue_wake_no_listlock(&e->queues[STATE_NONSIGNALED]);
