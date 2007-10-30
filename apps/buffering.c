@@ -216,8 +216,9 @@ buf_ridx == buf_widx means the buffer is empty.
    alloc_all tells us if we must immediately be able to allocate data_size
    returns a valid memory handle if all conditions for allocation are met.
            NULL if there memory_handle itself cannot be allocated or if the
-           data_size cannot be allocated and alloc_all is set.  This function
-           has no side effects if NULL is returned.
+           data_size cannot be allocated and alloc_all is set.  This function's
+           only potential side effect is to allocate space for the cur_handle
+           if it returns NULL.
    */
 static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
                                         const bool alloc_all)
@@ -225,7 +226,7 @@ static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
     /* gives each handle a unique id, unsigned to handle wraps gracefully */
     static unsigned int cur_handle_id = 1;
     size_t shift;
-    size_t new_widx = buf_widx;
+    size_t new_widx;
     size_t len;
     int overlap;
 
@@ -242,12 +243,12 @@ static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
             return NULL;
         } else {
             /* Allocate the remainder of the space for the current handle */
-            new_widx = RINGBUF_ADD(cur_handle->widx, cur_handle->filerem);
+            buf_widx = RINGBUF_ADD(cur_handle->widx, cur_handle->filerem);
         }
     }
 
-    /* align buf_widx to 4 bytes up */
-    new_widx = (RINGBUF_ADD(new_widx, 3)) & ~3;
+    /* align to 4 bytes up */
+    new_widx = RINGBUF_ADD(buf_widx, 3) & ~3;
 
     len = data_size + sizeof(struct memory_handle);
 
@@ -265,7 +266,7 @@ static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
             new_widx += data_size - overlap;
     }
 
-    /* This is how far we shifted buf_widx to align things */
+    /* How far we shifted buf_widx to align things, must be < buffer_len */
     shift = RINGBUF_SUB(new_widx, buf_widx);
 
     /* How much space are we short in the actual ring buffer? */
