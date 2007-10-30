@@ -1209,37 +1209,34 @@ void buffering_thread(void)
 
 #if MEM > 8
         /* If the disk is spinning, take advantage by filling the buffer */
-        if (ata_disk_is_active() && queue_empty(&buffering_queue) &&
-            data_counters.remaining > 0 &&
-            data_counters.buffered < high_watermark)
+        if ((ata_disk_is_active() ||  ev.id == Q_BUFFER_HANDLE) &&
+            queue_empty(&buffering_queue))
         {
-            fill_buffer();
-            update_data_counters();
-        }
+            if (data_counters.remaining > 0 &&
+                data_counters.buffered < high_watermark)
+            {
+                fill_buffer();
+                update_data_counters();
+            }
 
-        if (ata_disk_is_active() && queue_empty(&buffering_queue) &&
-            num_handles > 0 && data_counters.useful < high_watermark)
-        {
-            call_buffer_low_callbacks();
+            if (num_handles > 0 && data_counters.useful < high_watermark)
+            {
+                call_buffer_low_callbacks();
+            }
         }
 #endif
 
         if (ev.id == SYS_TIMEOUT && queue_empty(&buffering_queue))
         {
             if (data_counters.remaining > 0 &&
-                data_counters.wasted > data_counters.buffered/2)
+                data_counters.useful < conf_watermark)
             {
                 /* First work forward, shrinking any unmoveable handles */
                 shrink_buffer(true,false);
                 /* Then work forward following those up with moveable handles */
                 shrink_buffer(false,true);
-                update_data_counters();
-            }
-
-            if (data_counters.remaining > 0 &&
-                data_counters.buffered < conf_watermark)
-            {
                 fill_buffer();
+                update_data_counters();
             }
         }
     }
