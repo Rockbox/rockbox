@@ -231,9 +231,20 @@ static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
 
     mutex_lock(&llist_mutex);
 
-    /* Allocate the remainder of the space for the current handle */
-    if (cur_handle)
-        new_widx = RINGBUF_ADD(cur_handle->widx, cur_handle->filerem);
+    if (cur_handle && cur_handle->filerem > 0) {
+        /* the current handle hasn't finished buffering. We can only add
+           a new one if there is already enough free space to finish
+           the buffering. */
+        size_t req = cur_handle->filerem + sizeof(struct memory_handle);
+        if (RINGBUF_ADD_CROSS(cur_handle->widx, req, buf_ridx) >= 0) {
+            /* Not enough space */
+            mutex_unlock(&llist_mutex);
+            return NULL;
+        } else {
+            /* Allocate the remainder of the space for the current handle */
+            new_widx = RINGBUF_ADD(cur_handle->widx, cur_handle->filerem);
+        }
+    }
 
     /* align buf_widx to 4 bytes up */
     new_widx = (RINGBUF_ADD(new_widx, 3)) & ~3;
