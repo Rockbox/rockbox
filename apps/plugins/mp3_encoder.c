@@ -24,8 +24,6 @@ MEM_FUNCTION_WRAPPERS(rb);
 #define SAMPL2                576
 #define SBLIMIT                32
 #define HTN                    16
-#define memcpy         rb->memcpy
-#define memset         rb->memset
 #define putlong(c, s)  if(s+sz <= 32) { cc = (cc << s) | c;      sz+= s; } \
                        else           { putbits(cc, sz); cc = c; sz = s; }
 
@@ -2278,42 +2276,7 @@ void compress(void)
 
 
 int  num_file;
-char filename[12][80];
 char mp3_name[80];
-
-void read_wav_files(char *dirname)
-{
-  DIR *dir = rb->opendir(dirname);
-
-  if(!dir)
-    return;
-
-  while(true)
-  {
-    struct dirent *entry;
-
-    entry = rb->readdir(dir);
-    if(!entry)
-      break;
-
-    if( !(entry->attribute & ATTR_DIRECTORY) )
-    {
-      int slen = rb->strlen(entry->d_name);
-            
-      /* add all wav audio files */
-      if(!rb->strcasecmp(entry->d_name + slen - 4, ".wav"))
-      {
-        if(num_file >= 12)
-          break;
-
-        rb->strncpy(filename[num_file], dirname, 79);
-        slen = rb->strlen(filename[num_file]);
-        rb->strncpy(filename[num_file++] + slen, entry->d_name, 79);
-      }
-    }
-  }
-  rb->closedir(dir);
-}
 
 void get_mp3_filename(char *wav_name)
 {
@@ -2358,20 +2321,24 @@ void get_mp3_filename(char *wav_name)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int   fil, sfil, nfil; /* for file selection */
     int   rat, srat, nrat; /* for rate selection */
     int   cont = 1, butt;
     long  tim  = 0;
     char  stg[40];
-    char* bstrg[] = {"64","80","96","112","128","160","192","224","256","320"};
-    int   brate[] = { 64,  80,  96,  112,  128,  160,  192,  224,  256,  320 };
+    static const char* bstrg[] = {
+        "64", "80", "96", "112", "128", "160", "192", "224", "256", "320"
+    };
+    static const int brate[] = {
+        64, 80, 96, 112, 128, 160, 192, 224, 256, 320
+    };
 
-    (void)parameter;
+    if (parameter == NULL)
+        return PLUGIN_ERROR;
 
     PLUGIN_IRAM_INIT(api)
 
 #ifdef CPU_COLDFIRE
-    asm volatile ("move.l #0, %macsr"); /* integer mode */
+    coldfire_set_macsr(0); /* integer mode */
 #endif
 
     rb = api;
@@ -2381,42 +2348,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->cpu_boost(true);
 #endif
     rb->button_clear_queue();
-
-    /* check 'viewer' or 'plugin' call */
-    if(parameter == NULL || *(char*)parameter == 0)
-    {
-        read_wav_files("/");
-        read_wav_files(REC_BASE_DIR"/");
-
-        nfil = num_file - 1;
-        sfil = 0; /* set first file as default */
-
-        while(cont && (butt = rb->button_get_w_tmo(HZ/10)) != MP3ENC_SELECT)
-        {
-            switch(butt)
-            {
-                case MP3ENC_DONE:   cont = 0;               break;
-                case MP3ENC_PREV:   if(sfil >  0  ) sfil--; break;
-                case MP3ENC_NEXT:   if(sfil < nfil) sfil++; break;
-            }
-
-            rb->lcd_clear_display();
-            rb->lcd_putsxy(2, 2, "-- Select WAV-File --");
-
-            for(fil=0; fil<=nfil; fil++)
-                rb->lcd_putsxy(2, 12 + fil*8, filename[fil]);
-
-            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-            rb->lcd_fillrect(0, 12 + sfil*8, 127, 8);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
-            rb->lcd_update();
-        }
-    }
-    else
-    {
-        sfil = 0;
-        rb->strncpy(filename[0], (char*)parameter, 79);
-    }
 
     nrat = 9;
     srat = 4; /* set 128kBit as default */
@@ -2441,7 +2372,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->lcd_update();
     }
 
-    wav_filename = filename[sfil];
+    wav_filename = parameter;
 
     if(cont)
     {
