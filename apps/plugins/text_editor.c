@@ -17,7 +17,6 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "action.h"
 #include "playback_control.h"
 
 #if PLUGIN_BUFFER_SIZE > 0x45000
