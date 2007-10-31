@@ -835,11 +835,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Graafinen"
+    swcodec: "Graafinen taajuuskorjain"
   </dest>
   <voice>
     *: none
-    swcodec: "Graafinen"
+    swcodec: "Graafinen taajuuskorjain"
   </voice>
 </phrase>
 <phrase>
@@ -4088,7 +4088,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Äänenkorkeus"
   </voice>
 </phrase>
 <phrase>
@@ -4381,7 +4381,7 @@
     *: "Levy:"
   </dest>
   <voice>
-    *: ""
+    *: "Levyn koko"
   </voice>
 </phrase>
 <phrase>
@@ -4431,7 +4431,7 @@
   </dest>
   <voice>
     *: none
-    e200,c200: "SD muistikortti"
+    e200,c200: "Muistikortti"
     ondio*: "Muistikortti"
   </voice>
 </phrase>
@@ -10420,7 +10420,7 @@
     player: "Puskuri: %d.%03dMt"
   </dest>
   <voice>
-    *: ""
+    *: "Puskurin koko"
   </voice>
 </phrase>
 <phrase>
@@ -11364,5 +11364,22 @@
   </dest>
   <voice>
     *: "Tyhjä lista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user:
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Ei käytettävissä"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "Ei käytettävissä"
   </voice>
 </phrase>
