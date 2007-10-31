@@ -23,7 +23,6 @@
  *
  ****************************************************************************/
 
-
 #include <stdio.h>
 #include <inttypes.h>
 #include <usb.h>
@@ -36,6 +35,11 @@
 #define VERSION "0.1"
 
 #define MAX_FIRMWARESIZE   (10*1024*1024)   /* Arbitrary limit (for safety) */
+
+/* For win32 compatibility: */
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 
 struct device_t
 {
@@ -281,7 +285,7 @@ int main(int argc, char* argv[])
     }
 
     printf("[INFO] Using device \"%s\"\n",devices[device].label);
-    fd = open(argv[3], O_RDONLY);
+    fd = open(argv[3], O_RDONLY|O_BINARY);
     if (fd < 0)
     {
         printf("[ERR]  Could not open %s\n", argv[3]);
