@@ -118,8 +118,8 @@ static int track_write_idx = 0;
 
 /* Callback function to call when current track has really changed. */
 void (*track_changed_callback)(struct mp3entry *id3) = NULL;
-void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
-void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
+void (*track_buffer_callback)(struct mp3entry *id3);
+void (*track_unbuffer_callback)(struct mp3entry *id3);
 
 /* Cuesheet callback */
 static bool (*cuesheet_callback)(const char *filename) = NULL;
@@ -475,14 +475,12 @@ unsigned long mpeg_get_last_header(void)
 #endif /* !SIMULATOR */
 }
 
-void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,
-                                                  bool last_track))
+void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3))
 {
     track_buffer_callback = handler;
 }
 
-void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
-                                                    bool last_track))
+void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3))
 {
     track_unbuffer_callback = handler;
 }
@@ -502,29 +500,16 @@ void audio_set_cuesheet_callback(bool (*handler)(const char *filename))
 static void generate_unbuffer_events(void)
 {
     int i;
-    int event_count = 0;
     int numentries = MAX_TRACK_ENTRIES - num_tracks_in_memory();
     int cur_idx = track_write_idx;
-    
-    for (i = 0; i < numentries; i++)
-    {
-        if (trackdata[cur_idx].event_sent)
-            event_count++;
-
-        cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
-    }
-
-    cur_idx = track_write_idx;
 
     for (i = 0; i < numentries; i++)
     {
         /* Send an event to notify that track has finished. */
         if (trackdata[cur_idx].event_sent)
         {
-            event_count--;
             if (track_unbuffer_callback)
-                track_unbuffer_callback(&trackdata[cur_idx].id3,
-                                        event_count == 0);
+                track_unbuffer_callback(&trackdata[cur_idx].id3);
             trackdata[cur_idx].event_sent = false;
         }
         cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
@@ -535,28 +520,15 @@ static void generate_unbuffer_events(void)
 static void generate_postbuffer_events(void)
 {
     int i;
-    int event_count = 0;
     int numentries = num_tracks_in_memory();
     int cur_idx = track_read_idx;
 
     for (i = 0; i < numentries; i++)
     {
         if (!trackdata[cur_idx].event_sent)
-            event_count++;
-
-        cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
-    }
-
-    cur_idx = track_read_idx;
-
-    for (i = 0; i < numentries; i++)
-    {
-        if (!trackdata[cur_idx].event_sent)
         {
-            event_count--;
             if (track_buffer_callback)
-                track_buffer_callback(&trackdata[cur_idx].id3,
-                                      event_count == 0);
+                track_buffer_callback(&trackdata[cur_idx].id3);
             trackdata[cur_idx].event_sent = true;
         }
         cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;

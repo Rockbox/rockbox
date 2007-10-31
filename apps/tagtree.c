@@ -633,10 +633,9 @@ static int compare(const void *p1, const void *p2)
     return strncasecmp(e1->name, e2->name, MAX_PATH);
 }
 
-static void tagtree_buffer_event(struct mp3entry *id3, bool last_track)
+static void tagtree_buffer_event(struct mp3entry *id3)
 {
     (void)id3;
-    (void)last_track;
     
     /* Do not gather data unless proper setting has been enabled. */
     if (!global_settings.runtimedb)
@@ -663,9 +662,8 @@ static void tagtree_buffer_event(struct mp3entry *id3, bool last_track)
     tagcache_search_finish(&tcs);
 }
 
-static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
+static void tagtree_unbuffer_event(struct mp3entry *id3)
 {
-    (void)last_track;
     long playcount;
     long playtime;
     long lastplayed;

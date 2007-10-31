@@ -252,9 +252,9 @@ static bool skipped_during_pause = false; /* Do we need to clear the PCM buffer 
 /* When the playing track has changed from the user's perspective */
 void (*track_changed_callback)(struct mp3entry *id3) = NULL;
 /* When a track has been buffered */
-void (*track_buffer_callback)(struct mp3entry *id3, bool last_track) = NULL;
+void (*track_buffer_callback)(struct mp3entry *id3) = NULL;
 /* When a track's buffer has been overwritten or cleared */
-void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track) = NULL;
+void (*track_unbuffer_callback)(struct mp3entry *id3) = NULL;
 
 static size_t buffer_margin  = 0; /* Buffer margin aka anti-skip buffer (A/C-) */
 
@@ -2129,7 +2129,6 @@ static void audio_update_trackinfo(void)
 static void audio_clear_track_entries(bool clear_unbuffered)
 {
     int cur_idx = track_widx;
-    int last_idx = -1;
 
     logf("Clearing tracks:%d/%d, %d", track_ridx, track_widx, clear_unbuffered);
 
@@ -2146,29 +2145,15 @@ static void audio_clear_track_entries(bool clear_unbuffered)
          * otherwise clear the track if that option is selected */
         if (tracks[cur_idx].event_sent)
         {
-            if (last_idx >= 0)
-            {
-                /* If there is an unbuffer callback, call it, otherwise,
-                 * just clear the track */
-                if (track_unbuffer_callback && tracks[last_idx].id3_hid > 0)
-                    track_unbuffer_callback(bufgetid3(tracks[last_idx].id3_hid), false);
+            /* If there is an unbuffer callback, call it, otherwise,
+             * just clear the track */
+            if (track_unbuffer_callback && tracks[cur_idx].id3_hid > 0)
+                track_unbuffer_callback(bufgetid3(tracks[cur_idx].id3_hid));
 
-                clear_track_info(&tracks[last_idx]);
-            }
-            last_idx = cur_idx;
+            clear_track_info(&tracks[cur_idx]);
         }
         else if (clear_unbuffered)
             clear_track_info(&tracks[cur_idx]);
-    }
-
-    /* We clear the previous instance of a buffered track throughout
-     * the above loop to facilitate 'last' detection.  Clear/notify
-     * the last track here */
-    if (last_idx >= 0)
-    {
-        if (track_unbuffer_callback && tracks[last_idx].id3_hid > 0)
-            track_unbuffer_callback(bufgetid3(tracks[last_idx].id3_hid), true);
-        clear_track_info(&tracks[last_idx]);
     }
 }
 
@@ -2527,7 +2512,6 @@ static bool audio_load_track(int offset, bool start_play)
 static void audio_generate_postbuffer_events(void)
 {
     int cur_idx;
-    int last_idx = -1;
 
     logf("Postbuffer:%d/%d",track_ridx,track_widx);
 
@@ -2538,26 +2522,15 @@ static void audio_generate_postbuffer_events(void)
         while (1) {
             if (!tracks[cur_idx].event_sent)
             {
-                if (last_idx >= 0 && !tracks[last_idx].event_sent)
-                {
-                    /* Mark the event 'sent' even if we don't really send one */
-                    tracks[last_idx].event_sent = true;
-                    if (track_buffer_callback && tracks[last_idx].id3_hid > 0)
-                        track_buffer_callback(bufgetid3(tracks[last_idx].id3_hid), false);
-                }
-                last_idx = cur_idx;
+                /* Mark the event 'sent' even if we don't really send one */
+                tracks[cur_idx].event_sent = true;
+                if (track_buffer_callback && tracks[cur_idx].id3_hid > 0)
+                    track_buffer_callback(bufgetid3(tracks[cur_idx].id3_hid));
             }
             if (cur_idx == track_widx)
                 break;
             cur_idx++;
             cur_idx &= MAX_TRACK_MASK;
-        }
-
-        if (last_idx >= 0 && !tracks[last_idx].event_sent)
-        {
-            tracks[last_idx].event_sent = true;
-            if (track_buffer_callback && tracks[last_idx].id3_hid > 0)
-                track_buffer_callback(bufgetid3(tracks[last_idx].id3_hid), true);
         }
     }
 }
@@ -2767,14 +2740,12 @@ skip_done:
     return Q_CODEC_REQUEST_COMPLETE;
 }
 
-void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,
-                                                  bool last_track))
+void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3))
 {
     track_buffer_callback = handler;
 }
 
-void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
-                                                    bool last_track))
+void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3))
 {
     track_unbuffer_callback = handler;
 }

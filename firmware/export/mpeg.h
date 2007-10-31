@@ -57,10 +57,8 @@ void rec_tick(void);
 void playback_tick(void); /* FixMe: get rid of this, use mp3_get_playtime() */
 
 void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3));
-void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3,
-                                                  bool last_track));
-void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
-                                                   bool last_track));
+void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3));
+void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3));
 void audio_set_cuesheet_callback(bool (*handler)(const char *filename));
 
 #endif
