@@ -73,7 +73,7 @@ int sansa_open(struct sansa_t* sansa, int silent)
     DISK_GEOMETRY diskgeometry;
     unsigned long n;
 
-    sansa->dh = CreateFile(sansa->diskname, GENERIC_READ,
+    sansa->dh = CreateFileA(sansa->diskname, GENERIC_READ,
                     FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
                     FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
@@ -121,7 +121,7 @@ int sansa_reopen_rw(struct sansa_t* sansa)
     unlock_volume(sansa->dh);
     CloseHandle(sansa->dh);
 
-    sansa->dh = CreateFile(sansa->diskname, GENERIC_READ | GENERIC_WRITE,
+    sansa->dh = CreateFileA(sansa->diskname, GENERIC_READ | GENERIC_WRITE,
                      FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
                      FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
