@@ -11389,3 +11389,20 @@
     *: "Lege lijst"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user:
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Niet aanwezig"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "Niet aanwezig"
+  </voice>
+</phrase>
