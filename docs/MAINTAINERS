@@ -77,8 +77,9 @@ Core code (Mid-level)
 
 :DSP: Michael Sevakis,Thom Johansen
 :LCD/Graphics API: Jens Arnold
+:Buffering engine: Nicolas Pennequin
 :Playback engine (HWCODEC):
-:Playback engine (SWCODEC): Michael Sevakis
+:Playback engine (SWCODEC): Michael Sevakis, Nicolas Pennequin
 :PCM playback API (SWCODEC): Michael Sevakis
 :PCM recording API (SWCODEC): Michael Sevakis
 :Recording API (HWCODEC):
