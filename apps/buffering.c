@@ -540,7 +540,7 @@ static bool yield_codec(void)
 
 /* Buffer data for the given handle. Return the amount of data buffered
    or -1 if the handle wasn't found */
-static ssize_t buffer_handle(int handle_id)
+static ssize_t buffer_handle(int handle_id, bool force)
 {
     logf("buffer_handle(%d)", handle_id);
     struct memory_handle *h = find_handle(handle_id);
@@ -575,12 +575,16 @@ static ssize_t buffer_handle(int handle_id)
         size_t copy_n = MIN( MIN(h->filerem, conf_filechunk),
                              buffer_len - h->widx);
 
-        /* stop copying if it would overwrite the reading position
-           or the next handle */
-        if (RINGBUF_ADD_CROSS(h->widx, copy_n, buf_ridx) >= 0 || (h->next &&
-            RINGBUF_ADD_CROSS(h->widx, copy_n, (unsigned)
-                              ((void *)h->next - (void *)buffer)) > 0))
+        /* stop copying if it would overwrite the reading position */
+        if (RINGBUF_ADD_CROSS(h->widx, copy_n, buf_ridx) >= 0)
             break;
+
+        /* This would read into the next handle, this is broken */
+        if (h->next && RINGBUF_ADD_CROSS(h->widx, copy_n,
+                    (unsigned)((void *)h->next - (void *)buffer)) > 0) {
+            logf("Handle allocation short");
+            break;
+        }
 
         /* rc is the actual amount read */
         int rc = read(h->fd, &buffer[h->widx], copy_n);
@@ -611,7 +615,7 @@ static ssize_t buffer_handle(int handle_id)
          * cpu boost for this thread.  If the codec's low data
          * situation was very short lived that could leave us filling
          * w/o boost */
-        if (yield_codec())
+        if (!force && yield_codec())
             break;
     }
 
@@ -733,7 +737,7 @@ static void fill_buffer(void)
     struct memory_handle *m = first_handle;
     while (queue_empty(&buffering_queue) && m) {
         if (m->filerem > 0) {
-            buffer_handle(m->id);
+            buffer_handle(m->id, false);
         }
         m = m->next;
     }
@@ -1152,7 +1156,7 @@ void buffering_thread(void)
             case Q_BUFFER_HANDLE:
                 LOGFQUEUE("buffering < Q_BUFFER_HANDLE");
                 queue_reply(&buffering_queue, 1);
-                buffer_handle((int)ev.data);
+                buffer_handle((int)ev.data, true);
                 break;
 
             case Q_RESET_HANDLE:
