@@ -128,10 +128,11 @@ char *speex_header_to_packet(SpeexHeader *header, int *size)
 }
 #endif
 
+static SpeexHeader global_le_header; /* Avoid malloc */
 SpeexHeader *speex_packet_to_header(char *packet, int size)
 {
    int i;
-   SpeexHeader *le_header;
+   SpeexHeader *le_header = &global_le_header;
    const char *h = "Speex   ";
    for (i=0;i<8;i++)
       if (packet[i]!=h[i])
@@ -147,7 +148,7 @@ SpeexHeader *speex_packet_to_header(char *packet, int size)
       return NULL;
    }
    
-   le_header = (SpeexHeader*)speex_alloc(sizeof(SpeexHeader));
+   /* le_header = (SpeexHeader*)speex_alloc(sizeof(SpeexHeader)); */
    
    speex_move(le_header, packet, sizeof(SpeexHeader));
    

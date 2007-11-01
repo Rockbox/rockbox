@@ -364,7 +364,6 @@ static void *process_header(spx_ogg_packet *op,
 
     *extra_headers = header->extra_headers;
 
-    codec_free(header);
     return st;
 }
 
@@ -412,8 +411,6 @@ next_track:
 
     samplerate = ci->id3->frequency; 
     codec_set_replaygain(ci->id3);
-
-    speex_bits_init(&bits);
 
     eof = 0;
     while (!eof) {
@@ -513,10 +510,9 @@ next_page:
                     if (op.e_o_s) /* End of stream condition */
                         eos=1;
 
-                    /* Copy Ogg packet to Speex bitstream */
-
-                    speex_bits_read_from(&bits, (char*)op.packet, op.bytes);
-
+                    /* Set Speex bitstream to point to Ogg packet */
+                    speex_bits_set_bit_buffer(&bits, (char *)op.packet,
+                                                     op.bytes);
                     for (j = 0; j != nframes; j++){
                         int ret;
 
@@ -561,7 +557,6 @@ done:
         /* Clean things up for the next track */
 
         speex_decoder_destroy(st);
-        speex_bits_reset(&bits);
 
         if (stream_init == 1)
             spx_ogg_stream_reset(&os);
