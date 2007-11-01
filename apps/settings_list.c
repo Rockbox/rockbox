@@ -605,12 +605,12 @@ const struct settings_list settings[] = {
 #endif
 #ifdef HAVE_LCD_BITMAP
     OFFON_SETTING(0, offset_out_of_view, LANG_SCREEN_SCROLL_VIEW,
-                    false, "Screen Scrolls Out Of View", NULL),
+                    false, "Screen Scrolls Out Of View", gui_list_screen_scroll_out_of_view),
     INT_SETTING(0, scroll_step, LANG_SCROLL_STEP, 6, "scroll step",                      
                     UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL, lcd_scroll_step),
     INT_SETTING(0, screen_scroll_step, LANG_SCREEN_SCROLL_STEP,
                     16, "screen scroll step",                      
-                    UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL, NULL),
+                    UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL, gui_list_screen_scroll_step),
 #endif /* HAVE_LCD_BITMAP */
 #ifdef HAVE_LCD_CHARCELLS
     INT_SETTING(0, jump_scroll, LANG_JUMP_SCROLL, 0, "jump scroll",                      
