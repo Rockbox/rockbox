@@ -69,7 +69,7 @@ MENUITEM_FUNCTION(view_playlist, 0, ID2P(LANG_VIEW_DYNAMIC_PLAYLIST),
 MENUITEM_FUNCTION(save_playlist, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST), 
                          (int(*)(void*))save_playlist_screen, 
                         NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(catalog, 0, ID2P(LANG_CATALOG), 
+MENUITEM_FUNCTION(catalog, 0, ID2P(LANG_CATALOG_VIEW), 
                   (int(*)(void))catalog_view_playlists,
                    NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(recursive_dir_insert, &global_settings.recursive_dir_insert, NULL);
