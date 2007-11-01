@@ -116,7 +116,11 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 #if defined(HAVE_RECORDING)
 # define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
 #endif
-#else /* Not iriver H1x0, H3x0, nor Archos Ondio, nor iPODVideo */
+#elif defined(SANSA_E200)    /* Sandisk players */
+# define CURRENT_NORMAL     50  /* Toni's measurements in spring 2007 suggests 50 ma during normal operation */
+# define CURRENT_BACKLIGHT  20  /* seems like a reasonible value for now */
+# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+#else /* Not iriver H1x0, H3x0, nor Archos Ondio, nor iPODVideo, nor Sansas */
 # define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
 # define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
 #if defined(HAVE_RECORDING)
