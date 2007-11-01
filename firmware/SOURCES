@@ -821,6 +821,7 @@ target/arm/pnx0101/pcm-pnx0101.c
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/ata-nand-tcc77x.c
 target/arm/tcc77x/system-tcc77x.c
+target/arm/tcc77x/logikdax/button-logikdax.c
 target/arm/tcc77x/logikdax/lcd-logikdax.c
 target/arm/tcc77x/logikdax/power-logikdax.c
 #endif /* SIMULATOR */

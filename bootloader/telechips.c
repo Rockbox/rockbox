@@ -32,6 +32,7 @@
 #include "fat.h"
 #include "disk.h"
 #include "font.h"
+#include "button.h"
 #include "adc.h"
 #include "adc-target.h"
 #include "backlight-target.h"
@@ -46,8 +47,10 @@ extern int line;
 
 void* main(void)
 {
-    unsigned short button;
-    int gpioa;
+    int button;
+    int power_count = 0;
+    int count = 0;
+    bool do_power_off = false;
 
     system_init();
     adc_init();
@@ -56,16 +59,35 @@ void* main(void)
 
     __backlight_on();
 
-    while(1) {
+    while(!do_power_off) {
         line = 0;
         printf("Hello World!");
 
-        gpioa = GPIOA;
-        printf("GPIOA: 0x%08x",gpioa);
+        button = button_read_device();
 
-        button = adc_read(ADC_BUTTONS);
-        printf("ADC[0]: 0x%04x",button);
+        /* Power-off if POWER button has been held for a long time
+           This loop is currently running at about 100 iterations/second
+         */
+        if (button & BUTTON_POWERPLAY) {
+            power_count++;
+            if (power_count > 200)
+               do_power_off = true;
+        } else {
+            power_count = 0;
+        }
+
+        printf("Btn: 0x%08x",button);
+
+        count++;
+        printf("Count: %d",count);
     }
+
+    lcd_clear_display();
+    line = 0;
+    printf("POWER-OFF");
+
+    /* TODO: Power-off */
+    while(1);
 
     return 0;
 }
