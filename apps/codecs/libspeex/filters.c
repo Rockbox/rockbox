@@ -45,6 +45,8 @@
 #include "filters_sse.h"
 #elif defined (ARM4_ASM) || defined(ARM5E_ASM)
 #include "filters_arm4.h"
+#define OVERRIDE_IIR_MEM16
+#define OVERRIDE_QMF_SYNTH
 #elif defined (COLDFIRE_ASM)
 #define OVERRIDE_IIR_MEM16
 #define OVERRIDE_QMF_SYNTH

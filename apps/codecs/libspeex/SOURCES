@@ -34,4 +34,6 @@ window.c
 #ifdef CPU_COLDFIRE
 filters_cf.S
 ltp_cf.S
+#elif defined(CPU_ARM)
+filters_arm4.S
 #endif

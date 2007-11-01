@@ -48,6 +48,7 @@ iir_mem16:
     jeq      .order_10
     jra      .exit
 
+    | TODO: try using direct form 1 filtering
     | d0 = y[i], d1-d7, a0 = mem[0] .. mem[7]
     | a3 = x, a4 = den, a5 = y, a6 = temp 
 .order_8:
@@ -171,6 +172,7 @@ iir_mem16:
     lea.l    (44, %sp), %sp
     rts
 
+
 /* void qmf_synth(const spx_word16_t *x1, const spx_word16_t *x2, const spx_word16_t *a, spx_word16_t *y, int N, int M, spx_word32_t *mem1, spx_word32_t *mem2, char *stack) */
     .global qmf_synth
 qmf_synth:
@@ -210,10 +212,10 @@ qmf_synth:
     jne      0b
 
     | Copy alternate members of mem1 and mem2 to last part of xx1 and xx2
-    move.l   %d1, %d2                   | Loop counter is M2
-    addq.l   #2, %a4                    | a4 = &mem1[1]
-    addq.l   #2, %a5                    | a5 = &mem2[1]
-    move.l   %a4, %d3                   | Backup mem1 and mem2
+    move.l   %d1, %d2                           | Loop counter is M2
+    addq.l   #2, %a4                            | a4 = &mem1[1]
+    addq.l   #2, %a5                            | a5 = &mem2[1]
+    move.l   %a4, %d3                           | Backup mem1 and mem2
     move.l   %a5, %d4
 0:
     move.w   (%a4), (%a2)+
@@ -222,14 +224,14 @@ qmf_synth:
     addq.l   #4, %a5
     subq.l   #1, %d2
     jne      0b
-    move.l   %d3, %a4                   | a4 = &mem1[1]
-    move.l   %d4, %a5                   | a5 = &mem2[1]
+    move.l   %d3, %a4                           | a4 = &mem1[1]
+    move.l   %d4, %a5                           | a5 = &mem2[1]
 
     clr.l    %d2
-    sub.l    %d1, %d2                   | d2 = -M2
-    lea.l    (-4, %a2, %d2.l*2), %a0    | a0 = &xx1[N2 - 2]
-    lea.l    (-4, %a6, %d2.l*2), %a1    | a1 = &xx2[N2 - 2]
-    move.l   %d6, %a2                   | a2 = a
+    sub.l    %d1, %d2                           | d2 = -M2
+    lea.l    (-4, %a2, %d2.l*2), %a0            | a0 = &xx1[N2 - 2]
+    lea.l    (-4, %a6, %d2.l*2), %a1            | a1 = &xx2[N2 - 2]
+    move.l   %d6, %a2                           | a2 = a
 
     | Main loop, register usage:
     | d0 = N2 counter, d1 = M2 counter, d7 = M2 backup
@@ -286,7 +288,7 @@ qmf_synth:
     | The clipping will be [-32768..32767], not Speex standard [-32767..32767],
     | but since qmf_synth() is called so late in the signal chain, it should
     | work fine.
-    move.w   %d2, (%a3)+        | Write results to y[]
+    move.w   %d2, (%a3)+                        | Write results to y[]
     move.w   %d3, (%a3)+
     move.w   %d4, (%a3)+
     move.w   %d5, (%a3)+
@@ -294,8 +296,8 @@ qmf_synth:
     jne      0b
 
     | Copy start of xx1 and xx2 back to alternate mem1 and mem2 entries
-    addq.l   #4, %a0            | a0 = &xx1[0]
-    addq.l   #4, %a1            | a1 = &xx2[0]
+    addq.l   #4, %a0                            | a0 = &xx1[0]
+    addq.l   #4, %a1                            | a1 = &xx2[0]
 0:
     move.w   (%a0)+, (%a4)
     move.w   (%a1)+, (%a5)
