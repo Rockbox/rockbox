@@ -41,6 +41,7 @@
 /*float e_ratio_quant[4] = {1, 1.26, 1.587, 2};*/
 static const float e_ratio_quant[4] = {.25f, .315f, .397f, .5f};
 
+#ifndef SPEEX_DISABLE_ENCODER
 void speex_encode_stereo(float *data, int frame_size, SpeexBits *bits)
 {
    int i, tmp;
@@ -114,6 +115,7 @@ void speex_encode_stereo_int(spx_int16_t *data, int frame_size, SpeexBits *bits)
    tmp=vq_index(&e_ratio, e_ratio_quant, 1, 4);
    speex_bits_pack(bits, tmp, 2);
 }
+#endif
 
 void speex_decode_stereo(float *data, int frame_size, SpeexStereoState *stereo)
 {

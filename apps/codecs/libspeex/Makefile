@@ -14,7 +14,7 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
-SPEEXOPTS = -DHAVE_CONFIG_H
+SPEEXOPTS = -DHAVE_CONFIG_H -DSPEEX_DISABLE_ENCODER
 
 # We're faster on ARM-targets with -O1 instead of -O2
 ifeq ($(CPU),arm)

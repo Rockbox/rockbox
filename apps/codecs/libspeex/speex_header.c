@@ -67,6 +67,7 @@ typedef struct SpeexHeader {
 } SpeexHeader;
 */
 
+#ifndef SPEEX_DISABLE_ENCODER
 void speex_init_header(SpeexHeader *header, int rate, int nb_channels, const SpeexMode *m)
 {
    int i;
@@ -125,6 +126,7 @@ char *speex_header_to_packet(SpeexHeader *header, int *size)
    *size = sizeof(SpeexHeader);
    return (char *)le_header;
 }
+#endif
 
 SpeexHeader *speex_packet_to_header(char *packet, int size)
 {

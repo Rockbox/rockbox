@@ -124,6 +124,7 @@ void signal_mul(const spx_sig_t *x, spx_sig_t *y, spx_word32_t scale, int len)
    }
 }
 
+#ifndef SPEEX_DISABLE_ENCODER
 void signal_div(const spx_word16_t *x, spx_word16_t *y, spx_word32_t scale, int len)
 {
    int i;
@@ -156,6 +157,7 @@ void signal_div(const spx_word16_t *x, spx_word16_t *y, spx_word32_t scale, int 
       }
    }
 }
+#endif
 
 #else
 
@@ -320,6 +322,7 @@ spx_word16_t compute_rms16(const spx_word16_t *x, int len)
 
 
 
+#ifndef SPEEX_DISABLE_ENCODER
 #ifndef OVERRIDE_FILTER_MEM16
 void filter_mem16(const spx_word16_t *x, const spx_coef_t *num, const spx_coef_t *den, spx_word16_t *y, int N, int ord, spx_mem_t *mem, char *stack)
 {
@@ -338,6 +341,7 @@ void filter_mem16(const spx_word16_t *x, const spx_coef_t *num, const spx_coef_t
       y[i] = yi;
    }
 }
+#endif
 #endif
 
 #ifndef OVERRIDE_IIR_MEM16
@@ -360,6 +364,7 @@ void iir_mem16(const spx_word16_t *x, const spx_coef_t *den, spx_word16_t *y, in
 }
 #endif
 
+#ifndef SPEEX_DISABLE_ENCODER
 #ifndef OVERRIDE_FIR_MEM16
 void fir_mem16(const spx_word16_t *x, const spx_coef_t *num, spx_word16_t *y, int N, int ord, spx_mem_t *mem, char *stack)
 {
@@ -477,6 +482,7 @@ void qmf_decomp(const spx_word16_t *xx, const spx_word16_t *aa, spx_word16_t *y1
       y2[k] = EXTRACT16(SATURATE(PSHR32(y2k,15),32767));
    }
 }
+#endif
 
 #ifndef OVERRIDE_QMF_SYNTH
 /* Re-synthesised a signal from the QMF low-band and high-band signals */

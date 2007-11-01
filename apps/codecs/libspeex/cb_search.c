@@ -49,6 +49,7 @@
 #include "cb_search_bfin.h"
 #endif
 
+#ifndef SPEEX_DISABLE_ENCODER
 #ifndef OVERRIDE_COMPUTE_WEIGHTED_CODEBOOK
 static void compute_weighted_codebook(const signed char *shape_cb, const spx_word16_t *r, spx_word16_t *resp, spx_word16_t *resp2, spx_word32_t *E, int shape_cb_size, int subvect_size, char *stack)
 {
@@ -511,6 +512,7 @@ int   update_target
          target[j]=SUB16(target[j],PSHR16(r2[j],2));
    }
 }
+#endif
 
 
 void split_cb_shape_sign_unquant(
@@ -571,6 +573,7 @@ spx_int32_t *seed
    }
 }
 
+#ifndef SPEEX_DISABLE_ENCODER
 void noise_codebook_quant(
 spx_word16_t target[],			/* target vector */
 spx_coef_t ak[],			/* LPCs for this subframe */
@@ -597,6 +600,7 @@ int   update_target
    for (i=0;i<nsf;i++)
       target[i]=0;
 }
+#endif
 
 
 void noise_codebook_unquant(

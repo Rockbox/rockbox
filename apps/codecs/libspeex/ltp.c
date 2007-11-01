@@ -75,6 +75,7 @@ spx_word32_t inner_prod(const spx_word16_t *x, const spx_word16_t *y, int len)
 }
 #endif
 
+#ifndef SPEEX_DISABLE_ENCODER
 #ifndef OVERRIDE_PITCH_XCORR
 #if 0 /* HINT: Enable this for machines with enough registers (i.e. not x86) */
 void pitch_xcorr(const spx_word16_t *_x, const spx_word16_t *_y, spx_word32_t *corr, int len, int nb_pitch, char *stack)
@@ -659,6 +660,7 @@ spx_word32_t *cumul_gain
 #endif
    return pitch;
 }
+#endif
 
 void pitch_unquant_3tap(
 spx_word16_t exc[],             /* Input excitation */
@@ -760,6 +762,7 @@ int cdbk_offset
 }
 
 
+#ifndef SPEEX_DISABLE_ENCODER
 /** Forced pitch delay and gain */
 int forced_pitch_quant(
 spx_word16_t target[],                 /* Target vector */
@@ -809,6 +812,7 @@ spx_word32_t *cumul_gain
       target[i]=EXTRACT16(SATURATE(SUB32(EXTEND32(target[i]),EXTEND32(res[i])),32700));
    return start;
 }
+#endif
 
 /** Unquantize forced pitch delay and gain */
 void forced_pitch_unquant(

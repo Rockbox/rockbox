@@ -28,9 +28,6 @@ speex.c
 speex_callbacks.c
 speex_header.c
 stereo.c
-vbr.c
-vq.c
-window.c
 #ifdef CPU_COLDFIRE
 filters_cf.S
 ltp_cf.S

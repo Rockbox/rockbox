@@ -68,6 +68,7 @@
 
 #endif
 
+#ifndef SPEEX_DISABLE_ENCODER
 static void compute_quant_weights(spx_lsp_t *qlsp, spx_word16_t *quant_weight, int order)
 {
    int i;
@@ -209,6 +210,7 @@ void lsp_quant_nb(spx_lsp_t *lsp, spx_lsp_t *qlsp, int order, SpeexBits *bits)
    for (i=0;i<order;i++)
       qlsp[i]=lsp[i]-qlsp[i];
 }
+#endif
 
 void lsp_unquant_nb(spx_lsp_t *lsp, int order, SpeexBits *bits)
 {
@@ -239,6 +241,7 @@ void lsp_unquant_nb(spx_lsp_t *lsp, int order, SpeexBits *bits)
 }
 
 
+#ifndef SPEEX_DISABLE_ENCODER
 void lsp_quant_lbr(spx_lsp_t *lsp, spx_lsp_t *qlsp, int order, SpeexBits *bits)
 {
    int i;
@@ -279,6 +282,7 @@ void lsp_quant_lbr(spx_lsp_t *lsp, spx_lsp_t *qlsp, int order, SpeexBits *bits)
    for (i=0;i<order;i++)
       qlsp[i]=lsp[i]-qlsp[i];
 }
+#endif
 
 void lsp_unquant_lbr(spx_lsp_t *lsp, int order, SpeexBits *bits)
 {
@@ -316,6 +320,7 @@ extern const signed char high_lsp_cdbk[];
 extern const signed char high_lsp_cdbk2[];
 
 
+#ifndef SPEEX_DISABLE_ENCODER
 void lsp_quant_high(spx_lsp_t *lsp, spx_lsp_t *qlsp, int order, SpeexBits *bits)
 {
    int i;
@@ -362,6 +367,7 @@ void lsp_quant_high(spx_lsp_t *lsp, spx_lsp_t *qlsp, int order, SpeexBits *bits)
    for (i=0;i<order;i++)
       qlsp[i]=lsp[i]-qlsp[i];
 }
+#endif
 
 void lsp_unquant_high(spx_lsp_t *lsp, int order, SpeexBits *bits)
 {
@@ -389,6 +395,7 @@ void lsp_unquant_high(spx_lsp_t *lsp, int order, SpeexBits *bits)
 extern const signed char cdbk_lsp_vlbr[5120];
 extern const signed char cdbk_lsp2_vlbr[160];
 
+#ifndef SPEEX_DISABLE_ENCODER
 void lsp_quant_48k(spx_lsp_t *lsp, spx_lsp_t *qlsp, int order, SpeexBits *bits)
 {
    int i;
@@ -427,6 +434,7 @@ void lsp_quant_48k(spx_lsp_t *lsp, spx_lsp_t *qlsp, int order, SpeexBits *bits)
    for (i=0;i<order;i++)
       qlsp[i]=lsp[i]-qlsp[i];
 }
+#endif
 
 void lsp_unquant_48k(spx_lsp_t *lsp, int order, SpeexBits *bits)
 {

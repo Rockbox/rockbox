@@ -109,8 +109,8 @@ const float exc_gain_quant_scal1[2]={0.70469f, 1.05127f};
 #define sqr(x) ((x)*(x))
 
 extern const spx_word16_t lpc_window[];
-#if 0
-void *nb_encoder_init(const speexmode *m)
+#ifndef SPEEX_DISABLE_ENCODER
+void *nb_encoder_init(const SpeexMode *m)
 {
    EncState *st;
    const SpeexNBMode *mode;
@@ -1024,18 +1024,6 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 
    return 1;
 }
-#else
-void *nb_encoder_init(const SpeexMode *m)
-{
-    return NULL;
-}
-void nb_encoder_destroy(void *state)
-{
-}
-int nb_encode(void *state, void *vin, SpeexBits *bits)
-{
-    return 1;
-}
 #endif
 
 static DecState global_decstate IBSS_ATTR;
@@ -1763,7 +1751,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    return 0;
 }
 
-#if 0
+#ifndef SPEEX_DISABLE_ENCODER 
 int nb_encoder_ctl(void *state, int request, void *ptr)
 {
    EncState *st;
@@ -1958,11 +1946,6 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
       return -1;
    }
    return 0;
-}
-#else
-int nb_encoder_ctl(void *state, int request, void *ptr)
-{
-    return 0;
 }
 #endif
 

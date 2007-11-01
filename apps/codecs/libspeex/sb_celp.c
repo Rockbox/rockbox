@@ -185,7 +185,7 @@ static const float h0[64] = {
 
 extern const spx_word16_t lpc_window[];
 
-#if 0 
+#ifndef SPEEX_DISABLE_ENCODER 
 void *sb_encoder_init(const SpeexMode *m)
 {
    int i;
@@ -751,18 +751,6 @@ int sb_encode(void *state, void *vin, SpeexBits *bits)
 
    return 1;
 }
-#else
-void *sb_encoder_init(const SpeexMode *m)
-{
-    return NULL;
-}
-void sb_encoder_destroy(void *state)
-{
-}
-int sb_encode(void *state, void *vin, SpeexBits *bits)
-{
-    return 1;
-}
 #endif
 
 
@@ -1127,7 +1115,7 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
    return 0;
 }
 
-#if 0
+#ifndef SPEEX_DISABLE_ENCODER
 int sb_encoder_ctl(void *state, int request, void *ptr)
 {
    SBEncState *st;
@@ -1374,11 +1362,6 @@ int sb_encoder_ctl(void *state, int request, void *ptr)
       return -1;
    }
    return 0;
-}
-#else
-int sb_encoder_ctl(void *state, int request, void *ptr)
-{
-    return 0;
 }
 #endif
 

@@ -153,6 +153,7 @@ static const SpeexSubmode nb_submode1 = {
    1,
    0,
    0,
+#ifndef SPEEX_DISABLE_ENCODER
    /* LSP quantization */
    lsp_quant_lbr,
    lsp_unquant_lbr,
@@ -163,6 +164,18 @@ static const SpeexSubmode nb_submode1 = {
    /* No innovation quantization (noise only) */
    noise_codebook_quant,
    noise_codebook_unquant,
+#else
+   /* LSP quantization */
+   NULL,
+   lsp_unquant_lbr,
+   /* No pitch quantization */
+   NULL,
+   forced_pitch_unquant,
+   NULL,
+   /* No innovation quantization (noise only) */
+   NULL,
+   noise_codebook_unquant,
+#endif
    NULL,
    -1,
    43
@@ -174,6 +187,7 @@ static const SpeexSubmode nb_submode8 = {
    1,
    0,
    0,
+#ifndef SPEEX_DISABLE_ENCODER
    /*LSP quantization*/
    lsp_quant_lbr,
    lsp_unquant_lbr,
@@ -185,6 +199,19 @@ static const SpeexSubmode nb_submode8 = {
    split_cb_search_shape_sign,
    split_cb_shape_sign_unquant,
    &split_cb_nb_ulbr,
+#else
+   /*LSP quantization*/
+   NULL,
+   lsp_unquant_lbr,
+   /*No pitch quantization*/
+   NULL,
+   forced_pitch_unquant,
+   NULL,
+   /*Innovation quantization*/
+   NULL,
+   split_cb_shape_sign_unquant,
+   &split_cb_nb_ulbr,
+#endif
    QCONST16(.5,15),
    79
 };
@@ -195,6 +222,7 @@ static const SpeexSubmode nb_submode2 = {
    0,
    0,
    0,
+#ifndef SPEEX_DISABLE_ENCODER
    /*LSP quantization*/
    lsp_quant_lbr,
    lsp_unquant_lbr,
@@ -206,6 +234,19 @@ static const SpeexSubmode nb_submode2 = {
    split_cb_search_shape_sign,
    split_cb_shape_sign_unquant,
    &split_cb_nb_vlbr,
+#else
+   /*LSP quantization*/
+   NULL,
+   lsp_unquant_lbr,
+   /*No pitch quantization*/
+   NULL,
+   pitch_unquant_3tap,
+   &ltp_params_vlbr,
+   /*Innovation quantization*/
+   NULL,
+   split_cb_shape_sign_unquant,
+   &split_cb_nb_vlbr,
+#endif
    QCONST16(.6,15),
    119
 };
@@ -216,6 +257,7 @@ static const SpeexSubmode nb_submode3 = {
    0,
    1,
    0,
+#ifndef SPEEX_DISABLE_ENCODER
    /*LSP quantization*/
    lsp_quant_lbr,
    lsp_unquant_lbr,
@@ -227,6 +269,19 @@ static const SpeexSubmode nb_submode3 = {
    split_cb_search_shape_sign,
    split_cb_shape_sign_unquant,
    &split_cb_nb_lbr,
+#else
+   /*LSP quantization*/
+   NULL,
+   lsp_unquant_lbr,
+   /*Pitch quantization*/
+   NULL,
+   pitch_unquant_3tap,
+   &ltp_params_lbr,
+   /*Innovation quantization*/
+   NULL,
+   split_cb_shape_sign_unquant,
+   &split_cb_nb_lbr,
+#endif
    QCONST16(.55,15),
    160
 };
@@ -237,6 +292,7 @@ static const SpeexSubmode nb_submode4 = {
    0,
    1,
    0,
+#ifndef SPEEX_DISABLE_ENCODER
    /*LSP quantization*/
    lsp_quant_lbr,
    lsp_unquant_lbr,
@@ -248,6 +304,19 @@ static const SpeexSubmode nb_submode4 = {
    split_cb_search_shape_sign,
    split_cb_shape_sign_unquant,
    &split_cb_nb_med,
+#else
+   /*LSP quantization*/
+   NULL,
+   lsp_unquant_lbr,
+   /*Pitch quantization*/
+   NULL,
+   pitch_unquant_3tap,
+   &ltp_params_med,
+   /*Innovation quantization*/
+   NULL,
+   split_cb_shape_sign_unquant,
+   &split_cb_nb_med,
+#endif
    QCONST16(.45,15),
    220
 };
@@ -258,6 +327,7 @@ static const SpeexSubmode nb_submode5 = {
    0,
    3,
    0,
+#ifndef SPEEX_DISABLE_ENCODER
    /*LSP quantization*/
    lsp_quant_nb,
    lsp_unquant_nb,
@@ -269,6 +339,19 @@ static const SpeexSubmode nb_submode5 = {
    split_cb_search_shape_sign,
    split_cb_shape_sign_unquant,
    &split_cb_nb,
+#else
+   /*LSP quantization*/
+   NULL,
+   lsp_unquant_nb,
+   /*Pitch quantization*/
+   NULL,
+   pitch_unquant_3tap,
+   &ltp_params_nb,
+   /*Innovation quantization*/
+   NULL,
+   split_cb_shape_sign_unquant,
+   &split_cb_nb,
+#endif
    QCONST16(.3,15),
    300
 };
@@ -279,6 +362,7 @@ static const SpeexSubmode nb_submode6 = {
    0,
    3,
    0,
+#ifndef SPEEX_DISABLE_ENCODER
    /*LSP quantization*/
    lsp_quant_nb,
    lsp_unquant_nb,
@@ -290,6 +374,19 @@ static const SpeexSubmode nb_submode6 = {
    split_cb_search_shape_sign,
    split_cb_shape_sign_unquant,
    &split_cb_sb,
+#else
+   /*LSP quantization*/
+   NULL,
+   lsp_unquant_nb,
+   /*Pitch quantization*/
+   NULL,
+   pitch_unquant_3tap,
+   &ltp_params_nb,
+   /*Innovation quantization*/
+   NULL,
+   split_cb_shape_sign_unquant,
+   &split_cb_sb,
+#endif
    QCONST16(.2,15),
    364
 };
@@ -300,6 +397,7 @@ static const SpeexSubmode nb_submode7 = {
    0,
    3,
    1,
+#ifndef SPEEX_DISABLE_ENCODER
    /*LSP quantization*/
    lsp_quant_nb,
    lsp_unquant_nb,
@@ -311,6 +409,19 @@ static const SpeexSubmode nb_submode7 = {
    split_cb_search_shape_sign,
    split_cb_shape_sign_unquant,
    &split_cb_nb,
+#else
+   /*LSP quantization*/
+   NULL,
+   lsp_unquant_nb,
+   /*Pitch quantization*/
+   NULL,
+   pitch_unquant_3tap,
+   &ltp_params_nb,
+   /*Innovation quantization*/
+   NULL,
+   split_cb_shape_sign_unquant,
+   &split_cb_nb,
+#endif
    QCONST16(.1,15),
    492
 };
@@ -347,6 +458,7 @@ const SpeexMode speex_nb_mode = {
    "narrowband",
    0,
    4,
+#ifndef SPEEX_DISABLE_ENCODER
    &nb_encoder_init,
    &nb_encoder_destroy,
    &nb_encode,
@@ -355,6 +467,16 @@ const SpeexMode speex_nb_mode = {
    &nb_decode,
    &nb_encoder_ctl,
    &nb_decoder_ctl,
+#else
+   NULL,
+   NULL,
+   NULL,
+   &nb_decoder_init,
+   &nb_decoder_destroy,
+   &nb_decode,
+   NULL,
+   &nb_decoder_ctl,
+#endif
 };
 
 
@@ -388,6 +510,7 @@ static const SpeexSubmode nb_48k_submode = {
    0,
    0,
    0,
+#ifndef SPEEX_DISABLE_ENCODER
    /*LSP quantization*/
    lsp_quant_48k,
    lsp_unquant_48k,
@@ -399,6 +522,19 @@ static const SpeexSubmode nb_48k_submode = {
    split_cb_search_shape_sign,
    split_cb_shape_sign_unquant,
    &split_cb_nb_48k,
+#else
+   /*LSP quantization*/
+   NULL,
+   lsp_unquant_48k,
+   /*No pitch quantization*/
+   NULL,
+   pitch_unquant_3tap,
+   &ltp_params_48k,
+   /*Innovation quantization*/
+   NULL,
+   split_cb_shape_sign_unquant,
+   &split_cb_nb_48k,
+#endif
    QCONST16(.7,15),
    144
 };
@@ -429,6 +565,7 @@ const SpeexMode speex_nb_48k_mode = {
    "narrowband 4.8 kbps",
    1000,
    4,
+#ifndef SPEEX_DISABLE_ENCODER
    &nb_encoder_init,
    &nb_encoder_destroy,
    &nb_encode,
@@ -437,6 +574,16 @@ const SpeexMode speex_nb_48k_mode = {
    &nb_decode,
    &nb_encoder_ctl,
    &nb_decoder_ctl,
+#else
+   NULL,
+   NULL,
+   NULL,
+   &nb_decoder_init,
+   &nb_decoder_destroy,
+   &nb_decode,
+   NULL,
+   &nb_decoder_ctl,
+#endif
 };
 
 
