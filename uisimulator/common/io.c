@@ -650,13 +650,11 @@ int sim_fsync(int fd)
 
 #define TEMP_CODEC_FILE "archos/_temp_codec%d.dll"
 
-void *sim_codec_load_ram(char* codecptr, int size,
-        void* ptr2, int bufwrap, void **pd)
+void *sim_codec_load_ram(char* codecptr, int size, void **pd)
 {
     void *hdr;
     char path[MAX_PATH];
     int fd;
-    int copy_n;
     int codec_count;
 #ifdef WIN32
     char buf[MAX_PATH];
@@ -682,20 +680,9 @@ void *sim_codec_load_ram(char* codecptr, int size,
         return NULL;
     }
 
-    if (bufwrap == 0)
-        bufwrap = size;
-        
-    copy_n = bufwrap < size ? bufwrap : size;
-    if (write(fd, codecptr, copy_n) != copy_n) {
+    if (write(fd, codecptr, size) != size) {
         DEBUGF("write failed");
         return NULL;
-    }
-    size -= copy_n;
-    if (size > 0) {
-        if (write(fd, ptr2, size) != size) {
-            DEBUGF("write failed [2]");
-            return NULL;
-        }
     }
     close(fd);
 
