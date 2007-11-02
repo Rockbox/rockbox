@@ -24,7 +24,7 @@
 
 #define CONFIG_UART_BRSR    87
 #define MAX_UART_BUFFER     31
-unsigned char uart1buffer[MAX_UART_BUFFER], uart1_send_buffer_ring[512];
+static unsigned char uart1buffer[MAX_UART_BUFFER], uart1_send_buffer_ring[512];
 int uart1_send_count=0,uart1_send_point=0;
 int uart1read = 0, uart1write = 0, uart1count = 0;
 

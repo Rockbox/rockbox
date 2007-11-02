@@ -118,6 +118,22 @@
 #define PACMAN_COIN    BUTTON_FF
 #define PACMAN_MENU    BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+
+#define PACMAN_UP       BUTTON_RC_PLAY
+#define PACMAN_DOWN     BUTTON_RC_DOWN
+#define PACMAN_LEFT     BUTTON_RC_REW
+#define PACMAN_RIGHT    BUTTON_RC_FF
+#define PACMAN_1UP      BUTTON_RC_VOL_DOWN
+#define PACMAN_2UP      BUTTON_RC_VOL_UP
+#define PACMAN_COIN_PRE BUTTON_RC_MODE
+#define PACMAN_COIN     (BUTTON_RC_MODE | BUTTON_RC_DOWN)
+#define PACMAN_MENU     BUTTON_POWER
+
+#else
+
+#error Keymap not defined!
+
 #endif
 
 #if (LCD_HEIGHT >= 288)

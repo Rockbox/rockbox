@@ -64,7 +64,7 @@ static char *option_get_valuestring(struct settings_list *setting,
     if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
     {
         bool val = (bool)temp_var;
-        snprintf(buffer, buf_len, "%s", 
+        snprintf(buffer, buf_len, "%s",
             str(val? setting->bool_setting->lang_yes :
                      setting->bool_setting->lang_no));
     }

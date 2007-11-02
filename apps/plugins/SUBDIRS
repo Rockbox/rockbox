@@ -1,4 +1,4 @@
-#if !defined(IRIVER_IFP7XX_SERIES) && !defined(OLYMPUS_MROBE_500)
+#if !defined(IRIVER_IFP7XX_SERIES)
 
 /* For all targets */
 shortcuts
@@ -22,7 +22,7 @@ reversi
 #endif
 
 /* For all 2bpp and colour targets */
-#if (LCD_DEPTH >= 2)
+#if (LCD_DEPTH >= 2) && !defined(OLYMPUS_MROBE_500)
 zxbox
 #endif
 
@@ -37,8 +37,7 @@ pacbox
     (LCD_DEPTH == 2) && !defined(ARCHOS_AV300)
 doom
 #endif
-#endif /* mrobe 500 */
-#if !defined(IRIVER_IFP7XX_SERIES)
+
 /* For all the swcodec targets */
 #if CONFIG_CODEC == SWCODEC
 midi

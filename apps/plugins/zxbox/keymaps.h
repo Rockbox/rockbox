@@ -86,6 +86,17 @@
 #define ZX_UP BUTTON_UP
 #define ZX_DOWN BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#define ZX_UP           BUTTON_RC_PLAY
+#define ZX_DOWN         BUTTON_RC_DOWN
+#define ZX_LEFT         BUTTON_RC_REW
+#define ZX_RIGHT        BUTTON_RC_FF
+#define ZX_SELECT    BUTTON_RC_MODE
+#define ZX_MENU         (BUTTON_POWER | BUTTON_REL)
+
+#else
+#error Keymap not defined!
+
 #endif
 
 #endif

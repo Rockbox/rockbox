@@ -100,6 +100,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (height <= 0)
         return; /* nothing left to do */
 
+#if defined(SCREEN_ROTATE)
     dst = (fb_data *)FRAME + LCD_WIDTH*y + x;
     src = &lcd_framebuffer[y][x];
 
@@ -114,6 +115,27 @@ void lcd_update_rect(int x, int y, int width, int height)
         /* Full width - copy as one line */
         lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
     }
+#else
+
+#if 0
+    src = &lcd_framebuffer[y][x];
+    
+    register int xc, yc;
+    register fb_data *start=(fb_data *)FRAME + (LCD_HEIGHT-x)*LCD_WIDTH + y;
+
+    for(yc=0;yc<height;yc++)
+    {
+        dst=start+yc;
+        for(xc=0; xc<width; xc++)
+        {
+            *dst=*src++;
+            dst-=LCD_HEIGHT;
+        }
+    }
+#else
+    lcd_update();
+#endif
+#endif
 }
 
 void lcd_enable(bool state)
@@ -134,7 +156,7 @@ void lcd_update(void)
     register fb_data *dst, *src=&lcd_framebuffer[0][0];
     register unsigned int x, y;
     
-    register short *start=FRAME + LCD_HEIGHT*(LCD_WIDTH-1)+1;
+    register fb_data *start=FRAME + LCD_HEIGHT*(LCD_WIDTH-1)+1;
 
     for(y=0; y<LCD_HEIGHT;y++)
     {

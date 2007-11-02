@@ -54,6 +54,8 @@ INPUT(target/sh/crt0.o)
 #define IRAMSIZE 0xc000
 #elif CONFIG_CPU==PNX0101
 #define DRAMORIG 0xc00000 + STUBOFFSET
+#define IRAM0ORIG 0x000000
+#define IRAM0SIZE 0x7000
 #define IRAMORIG 0x400000
 #define IRAMSIZE 0x7000
 #elif CONFIG_CPU==S3C2440
@@ -83,17 +85,104 @@ INPUT(target/sh/crt0.o)
 
 MEMORY
 {
-   DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
 #if CONFIG_CPU != S3C2440
-   IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
 #endif
 #if CONFIG_CPU==PNX0101
-   IRAM0 : ORIGIN = 0x0, LENGTH = IRAMSIZE
+    IRAM0 : ORIGIN = IRAM0ORIG, LENGTH = IRAM0SIZE
 #endif
 }
 
 SECTIONS
 {
+#if (CONFIG_CPU==DM320)
+    .text :
+    {
+        loadaddress = .;
+        _loadaddress = .;
+        . = ALIGN(0x200);
+        *(.init.text)
+        *(.text*)
+        *(.glue_7)
+        *(.glue_7t)
+        . = ALIGN(0x4);
+    } > DRAM
+
+    .rodata :
+    {
+        *(.rodata)  /* problems without this, dunno why */
+        *(.rodata*)
+        *(.rodata.str1.1)
+        *(.rodata.str1.4)
+        . = ALIGN(0x4);
+
+        /* Pseudo-allocate the copies of the data sections */
+        _datacopy = .;
+    } > DRAM
+
+    /* TRICK ALERT! For RAM execution, we put the .data section at the
+       same load address as the copy. Thus, we don't waste extra RAM
+       when we don't actually need the copy.  */
+    .data : AT ( _datacopy )
+    {
+        _datastart = .;
+        *(.data*)
+        . = ALIGN(0x4);
+        _dataend  = .;
+    } > DRAM
+
+    /DISCARD/ :
+    {
+        *(.eh_frame)
+    }
+
+    .vectors IRAMORIG :
+    {
+        _vectorsstart = .;
+        *(.vectors);
+        _vectorsend = .;
+    } > IRAM AT> DRAM
+
+    _vectorscopy = LOADADDR(.vectors);
+
+    .iram :
+    {
+        _iramstart = .;
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        _iramend = .;
+    } > IRAM AT> DRAM
+
+    _iramcopy = LOADADDR(.iram);
+
+    .ibss (NOLOAD) :
+    {
+        _iedata = .;
+        *(.ibss)
+        . = ALIGN(0x4);
+        _iend = .;
+    } > IRAM
+
+    .stack :
+    {
+       *(.stack)
+       stackbegin = .;
+       . += 0x2000;
+       stackend = .;
+    } > IRAM
+
+    .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram) + SIZEOF(.vectors):
+    {
+       _edata = .;
+        *(.bss*)
+        *(COMMON)
+        . = ALIGN(0x4);
+       _end = .;
+    } > DRAM
+
+#else /* End DM320 */
 #if !defined(CPU_ARM)
     .vectors :
     {
@@ -248,6 +337,8 @@ SECTIONS
         . = ALIGN(0x4);
        _end = .;
     } > DRAM
+    
+#endif
 
     .audiobuf ALIGN(4) :
     {

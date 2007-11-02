@@ -325,7 +325,7 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
                                              gui_list->data,
                                              entry_buffer);
         entry_name = P2STR(s);
-        
+
 #ifdef HAVE_LCD_BITMAP
         int style = STYLE_DEFAULT;
         /* position the string at the correct offset place */
