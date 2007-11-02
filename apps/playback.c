@@ -1495,23 +1495,6 @@ static size_t codec_filebuf_callback(void *ptr, size_t size)
     if (copy_n == 0)
         return 0;
 
-
-    if (copy_n == ERR_DATA_NOT_READY)
-    {
-        buf_request_buffer_handle(CUR_TI->audio_hid);
-    }
-
-    /* Let the disk buffer catch fill until enough data is available */
-    while (copy_n == ERR_DATA_NOT_READY)
-    {
-        sleep(1);
-
-        if (ci.stop_codec || ci.new_track)
-            return 0;
-
-        copy_n = bufread(CUR_TI->audio_hid, size, ptr);
-    }
-
     /* Update read and other position pointers */
     codec_advance_buffer_counters(copy_n);
 
@@ -1540,25 +1523,6 @@ static void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
         *realsize = 0;
         return NULL;
     }
-
-    if (ret == ERR_DATA_NOT_READY)
-    {
-        buf_request_buffer_handle(CUR_TI->audio_hid);
-    }
-
-    /* Let the disk buffer catch fill until enough data is available */
-    while (ret == ERR_DATA_NOT_READY)
-    {
-        sleep(1);
-
-        if (ci.stop_codec || ci.new_track)
-        {
-            *realsize = 0;
-            return NULL;
-        }
-        ret = bufgetdata(CUR_TI->audio_hid, reqsize, &ptr);
-    }
-    copy_n = MIN((size_t)ret, reqsize);
 
     *realsize = copy_n;
 

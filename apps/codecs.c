@@ -228,17 +228,6 @@ int codec_load_buf(unsigned int hid, int size, struct codec_api *api) {
     int rc;
     rc = bufread(hid, size, codecbuf);
     if (rc < 0) {
-        if (rc == ERR_DATA_NOT_READY) {
-            buf_request_buffer_handle(hid);
-        } else {
-            logf("error loading codec");
-            return CODEC_ERROR;
-        }
-        do {
-            rc = bufread(hid, size, codecbuf);
-        } while (rc == ERR_DATA_NOT_READY);
-    }
-    if (rc < 0) {
         logf("error loading codec");
         return CODEC_ERROR;
     }

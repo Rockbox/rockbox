@@ -40,7 +40,6 @@ enum data_type {
 #define ERR_BUFFER_FULL         -2
 #define ERR_INVALID_VALUE       -3
 #define ERR_FILE_ERROR          -4
-#define ERR_DATA_NOT_READY      -5
 
 
 /* Initialise the buffering subsystem */
@@ -61,6 +60,9 @@ bool buffering_reset(char *buf, size_t buflen);
  * bufadvance: Move handle reading index, relatively to current position
  * bufread   : Copy data from a handle to a buffer
  * bufgetdata: Obtain a pointer for linear access to a "size" amount of data
+ *
+ * NOTE: bufread and bufgetdata will block the caller until the requested
+ * amount of data is ready (unless EOF is reached).
  ****************************************************************************/
 
 int bufopen(const char *file, size_t offset, enum data_type type);
