@@ -26,8 +26,8 @@
 
 enum data_type {
     TYPE_CODEC,
-    TYPE_AUDIO,
-    TYPE_STREAM,
+    TYPE_PACKET_AUDIO,
+    TYPE_ATOMIC_AUDIO,
     TYPE_ID3,
     TYPE_CUESHEET,
     TYPE_IMAGE,

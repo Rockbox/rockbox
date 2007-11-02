@@ -361,26 +361,6 @@ static struct mp3entry *bufgetid3(int handle_id)
     return id3;
 }
 
-static void *bufgetcodec(struct track_info *track)
-{
-    void *ptr;
-    ssize_t ret = bufgetdata(track->codec_hid, track->codecsize, &ptr);
-
-    if (ret == ERR_DATA_NOT_READY) {
-        buf_request_buffer_handle(track->codec_hid);
-    }
-
-    while (ret == ERR_DATA_NOT_READY) {
-        sleep(1);
-        ret = bufgetdata(track->codec_hid, track->codecsize, &ptr);
-    }
-
-    if (ret < 0)
-        return NULL;
-    else
-        return ptr;
-}
-
 static bool clear_track_info(struct track_info *track)
 {
     if (!track)
@@ -1876,8 +1856,6 @@ static void codec_thread(void)
 {
     struct queue_event ev;
     int status;
-    size_t wrap;
-    void *codecptr;
 
     while (1) {
         status = 0;
@@ -1933,10 +1911,8 @@ static void codec_thread(void)
 #endif
                 set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
-                codecptr = bufgetcodec(CUR_TI);
-                wrap = (size_t)&filebuf[filebuflen] - (size_t)codecptr;
-                status = codec_load_ram(codecptr, CUR_TI->codecsize,
-                                        &filebuf[0], wrap, &ci);
+                status =
+                    codec_load_buf(CUR_TI->codec_hid, CUR_TI->codecsize, &ci);
 #ifdef PLAYBACK_VOICE
                 semaphore_release(&sem_codecthread);
 #endif
@@ -2447,6 +2423,7 @@ static bool audio_load_track(int offset, bool start_play)
     }
 
     struct mp3entry *track_id3;
+    enum data_type type = TYPE_PACKET_AUDIO;
 
     if (track_widx == track_ridx)
         track_id3 = &curtrack_id3;
@@ -2487,12 +2464,16 @@ static bool audio_load_track(int offset, bool start_play)
         case AFMT_APE:
             track_id3->offset = offset;
             break;
+        case AFMT_NSF:
+        case AFMT_SPC:
+            type = TYPE_ATOMIC_AUDIO;
+            break;
         }
     }
 
     logf("alt:%s", trackname);
 
-    tracks[track_widx].audio_hid = bufopen(trackname, file_offset, TYPE_AUDIO);
+    tracks[track_widx].audio_hid = bufopen(trackname, file_offset, type);
 
     if (tracks[track_widx].audio_hid <= 0)
         return false;

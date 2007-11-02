@@ -398,8 +398,8 @@ static struct memory_handle *find_handle(const unsigned int handle_id)
            a memory_handle after correcting for wraps or if the handle is not
            found in the linked list for adjustment.  This function has no side
            effects if NULL is returned. */
-static bool move_handle(struct memory_handle **h,
-                        size_t *delta, const size_t data_size)
+static bool move_handle(struct memory_handle **h, size_t *delta,
+                        const size_t data_size, bool can_wrap)
 {
     struct memory_handle *dest;
     const struct memory_handle *src;
@@ -427,13 +427,13 @@ static bool move_handle(struct memory_handle **h,
 
     if (overlap > 0) {
         /* Some part of the struct + data would wrap, maybe ok */
-        size_t correction;
+        size_t correction = 0;
         /* If the overlap lands inside the memory_handle */
         if ((unsigned)overlap > data_size) {
             /* Correct the position and real delta to prevent the struct from
              * wrapping, this guarantees an aligned delta, I think */
             correction = overlap - data_size;
-        } else {
+        } else if (!can_wrap) {
             /* Otherwise the overlap falls in the data area and must all be
              * backed out.  This may become conditional if ever we move
              * data that is allowed to wrap (ie audio) */
@@ -441,15 +441,17 @@ static bool move_handle(struct memory_handle **h,
             /* Align correction to four bytes, up */
             correction = (correction+3) & ~3;
         }
-        if (final_delta < correction + sizeof(struct memory_handle)) {
-            /* Delta cannot end up less than the size of the struct */
-            mutex_unlock(&llist_mutex);
-            return false;
-        }
+        if (correction) {
+            if (final_delta < correction + sizeof(struct memory_handle)) {
+                /* Delta cannot end up less than the size of the struct */
+                mutex_unlock(&llist_mutex);
+                return false;
+            }
 
-        newpos -= correction;
-        overlap -= correction;   /* Used below to know how to split the data */
-        final_delta -= correction;
+            newpos -= correction;
+            overlap -= correction;/* Used below to know how to split the data */
+            final_delta -= correction;
+        }
     }
 
     dest = (struct memory_handle *)(&buffer[newpos]);
@@ -530,6 +532,7 @@ static bool yield_codec(void)
     while (pcmbuf_is_lowdata() && !filebuf_is_lowdata())
     {
         sleep(2);
+        trigger_cpu_boost();
 
         if (!queue_empty(&buffering_queue))
             return true;
@@ -540,7 +543,7 @@ static bool yield_codec(void)
 
 /* Buffer data for the given handle. Return the amount of data buffered
    or -1 if the handle wasn't found */
-static ssize_t buffer_handle(int handle_id, bool force)
+static ssize_t buffer_handle(int handle_id)
 {
     logf("buffer_handle(%d)", handle_id);
     struct memory_handle *h = find_handle(handle_id);
@@ -568,6 +571,7 @@ static ssize_t buffer_handle(int handle_id, bool force)
 
     trigger_cpu_boost();
 
+    bool breakable = h->type==TYPE_PACKET_AUDIO;
     ssize_t ret = 0;
     while (h->filerem > 0)
     {
@@ -611,11 +615,7 @@ static ssize_t buffer_handle(int handle_id, bool force)
         h->filerem -= rc;
 
         /* Stop buffering if new queue events have arrived */
-        /* FIXME: This may sleep, if it does it will untrigger the
-         * cpu boost for this thread.  If the codec's low data
-         * situation was very short lived that could leave us filling
-         * w/o boost */
-        if (!force && yield_codec())
+        if (breakable && yield_codec())
             break;
     }
 
@@ -692,8 +692,10 @@ static void shrink_handle(int handle_id)
     if (!h)
         return;
 
-    if (h->next && (h->type == TYPE_ID3 || h->type == TYPE_CUESHEET ||
-                    h->type == TYPE_IMAGE) && h->filerem == 0 )
+    if (h->next && h->filerem == 0 &&
+            (h->type == TYPE_ID3 || h->type == TYPE_CUESHEET ||
+             h->type == TYPE_IMAGE || h->type == TYPE_CODEC ||
+             h->type == TYPE_ATOMIC_AUDIO))
     {
         /* metadata handle: we can move all of it */
         size_t handle_distance = 
@@ -701,7 +703,7 @@ static void shrink_handle(int handle_id)
         delta = handle_distance - h->available;
 
         /* The value of delta might change for alignment reasons */
-        if (!move_handle(&h, &delta, h->available))
+        if (!move_handle(&h, &delta, h->available, h->type==TYPE_CODEC))
             return;
 
         size_t olddata = h->data;
@@ -720,7 +722,7 @@ static void shrink_handle(int handle_id)
     {
         /* only move the handle struct */
         delta = RINGBUF_SUB(h->ridx, h->data);
-        if (!move_handle(&h, &delta, 0))
+        if (!move_handle(&h, &delta, 0, true))
             return;
 
         h->data = RINGBUF_ADD(h->data, delta);
@@ -737,7 +739,7 @@ static void fill_buffer(void)
     struct memory_handle *m = first_handle;
     while (queue_empty(&buffering_queue) && m) {
         if (m->filerem > 0) {
-            buffer_handle(m->id, false);
+            buffer_handle(m->id);
         }
         m = m->next;
     }
@@ -805,8 +807,9 @@ int bufopen(const char *file, size_t offset, enum data_type type)
         return ERR_FILE_ERROR;
 
     size_t size = filesize(fd);
+    bool can_wrap = type==TYPE_PACKET_AUDIO || type==TYPE_CODEC;
 
-    struct memory_handle *h = add_handle(size-offset, type==TYPE_AUDIO, false);
+    struct memory_handle *h = add_handle(size-offset, can_wrap, false);
     if (!h)
     {
         DEBUGF("bufopen: failed to add handle\n");
@@ -1137,7 +1140,8 @@ static void shrink_buffer(bool audio, bool other) {
     /* shrink selected buffers */
     struct memory_handle *m = first_handle;
     while (m) {
-        if ((m->type==TYPE_AUDIO && audio) || (m->type!=TYPE_AUDIO && other))
+        if ((m->type==TYPE_PACKET_AUDIO && audio) ||
+                (m->type!=TYPE_PACKET_AUDIO && other))
             shrink_handle(m->id);
         m = m->next;
     }
@@ -1156,7 +1160,7 @@ void buffering_thread(void)
             case Q_BUFFER_HANDLE:
                 LOGFQUEUE("buffering < Q_BUFFER_HANDLE");
                 queue_reply(&buffering_queue, 1);
-                buffer_handle((int)ev.data, true);
+                buffer_handle((int)ev.data);
                 break;
 
             case Q_RESET_HANDLE:

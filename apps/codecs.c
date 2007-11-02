@@ -38,6 +38,7 @@
 #include "keyboard.h"
 #include "mpeg.h"
 #include "buffer.h"
+#include "buffering.h"
 #include "mp3_playback.h"
 #include "playback.h"
 #include "backlight.h"
@@ -57,8 +58,7 @@
 #if CONFIG_CODEC == SWCODEC
 unsigned char codecbuf[CODEC_SIZE];
 #endif
-void *sim_codec_load_ram(char* codecptr, int size,
-        void* ptr2, int bufwrap, void **pd);
+void *sim_codec_load_ram(char* codecptr, int size, void **pd);
 void sim_codec_close(void *pd);
 #else
 #define sim_codec_close(x)
@@ -171,23 +171,11 @@ void codec_get_full_path(char *path, const char *codec_root_fn)
              codec_root_fn);
 }
 
-int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
-                   struct codec_api *api)
+static int codec_load_ram(int size, struct codec_api *api)
 {
     struct codec_header *hdr;
     int status;
 #ifndef SIMULATOR
-    int copy_n;
-    
-    if ((char *)&codecbuf[0] != codecptr) {
-        size = MIN(size, CODEC_SIZE);
-        copy_n = MIN(size, bufwrap);
-        memcpy(codecbuf, codecptr, copy_n);         
-        if (size - copy_n > 0) {
-            memcpy(&codecbuf[copy_n], ptr2, size - copy_n);
-        }
-        api->discard_codec();
-    }
     hdr = (struct codec_header *)codecbuf;
         
     if (size <= (signed)sizeof(struct codec_header)
@@ -206,14 +194,16 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
 #else /* SIMULATOR */
     void *pd;
     
-    hdr = sim_codec_load_ram(codecptr, size, ptr2, bufwrap, &pd);
-    api->discard_codec();
+    hdr = sim_codec_load_ram(codecbuf, size, &pd);
 
     if (pd == NULL)
         return CODEC_ERROR;
 
     if (hdr == NULL
         || hdr->magic != CODEC_MAGIC
+#ifdef HAVE_RECORDING
+             && hdr->magic != CODEC_ENC_MAGIC
+#endif
         || hdr->target_id != TARGET_ID) {
         sim_codec_close(pd);
         return CODEC_ERROR;
@@ -231,6 +221,32 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
     sim_codec_close(pd);
 
     return status;
+}
+
+int codec_load_buf(unsigned int hid, int size, struct codec_api *api) {
+    int rc;
+    rc = bufread(hid, size, codecbuf);
+    if (rc < 0) {
+        if (rc == ERR_DATA_NOT_READY) {
+            buf_request_buffer_handle(hid);
+        } else {
+            logf("error loading codec");
+            return CODEC_ERROR;
+        }
+        do {
+            rc = bufread(hid, size, codecbuf);
+        } while (rc == ERR_DATA_NOT_READY);
+    }
+    if (rc < 0) {
+        logf("error loading codec");
+        return CODEC_ERROR;
+    }
+    if (rc < size) {
+        logf("codec ended %d early",size - rc);
+        return CODEC_ERROR;
+    }
+    api->discard_codec();
+    return codec_load_ram(size, api);
 }
 
 int codec_load_file(const char *plugin, struct codec_api *api)
@@ -257,5 +273,5 @@ int codec_load_file(const char *plugin, struct codec_api *api)
         return CODEC_ERROR;
     }
 
-    return codec_load_ram(codecbuf, (size_t)rc, NULL, 0, api);
+    return codec_load_ram((size_t)rc, api);
 }

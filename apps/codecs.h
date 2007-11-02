@@ -284,8 +284,7 @@ extern unsigned char plugin_end_addr[];
 void codec_get_full_path(char *path, const char *codec_root_fn);
 
 /* defined by the codec loader (codec.c) */
-int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
-                   struct codec_api *api);
+int codec_load_buf(unsigned int hid, int size, struct codec_api *api);
 int codec_load_file(const char* codec, struct codec_api *api);
 
 /* defined by the codec */
