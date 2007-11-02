@@ -200,10 +200,11 @@ static int codec_load_ram(int size, struct codec_api *api)
         return CODEC_ERROR;
 
     if (hdr == NULL
-        || hdr->magic != CODEC_MAGIC
+        || (hdr->magic != CODEC_MAGIC
 #ifdef HAVE_RECORDING
              && hdr->magic != CODEC_ENC_MAGIC
 #endif
+           )
         || hdr->target_id != TARGET_ID) {
         sim_codec_close(pd);
         return CODEC_ERROR;
