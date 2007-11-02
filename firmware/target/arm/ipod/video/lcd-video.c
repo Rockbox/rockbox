@@ -62,7 +62,7 @@ enum lcd_status {
 };
 
 struct {
-    long update_timeout;         
+    long update_timeout;
     enum lcd_status state;
     bool blocked;
 #if NUM_CORES > 1
@@ -107,6 +107,7 @@ static void bcm_setup_rect(unsigned x, unsigned y,
     BCM_DATA32 = y + height - 1;
 }
 
+#ifndef BOOTLOADER
 static void lcd_tick(void)
 {
     /* No set_irq_level - already in interrupt context */
@@ -186,6 +187,29 @@ static void lcd_unblock_and_update(void)
     set_irq_level(oldlevel);
 }
 
+#else /* BOOTLOADER */
+
+#define lcd_block_tick()
+
+static void lcd_unblock_and_update(void)
+{
+    unsigned data;
+    
+    if (lcd_state.state != LCD_INITIAL)
+    {
+        data = bcm_read32(0x1F8);
+        while (data == 0xFFFA0005 || data == 0xFFFF)
+        {
+            yield();
+            data = bcm_read32(0x1F8);
+        }
+    }
+    bcm_write32(0x1F8, 0xFFFA0005);  /* Kick off update */
+    BCM_CONTROL = 0x31;
+    lcd_state.state = LCD_IDLE;
+}
+#endif /* BOOTLOADER */
+
 /*** hardware configuration ***/
 
 void lcd_set_contrast(int val)
@@ -210,11 +234,15 @@ void lcd_set_flip(bool yesno)
 /* LCD init */
 void lcd_init_device(void)
 {
+    bcm_setup_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
     lcd_state.blocked = false;
     lcd_state.state = LCD_INITIAL;
+#ifndef BOOTLOADER
+#if NUM_CORES > 1
     corelock_init(&lcd_state.cl);
-    bcm_setup_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+#endif
     tick_add_task(&lcd_tick);
+#endif /* !BOOTLOADER */
 }
 
 /*** update functions ***/
