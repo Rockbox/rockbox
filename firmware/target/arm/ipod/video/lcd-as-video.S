@@ -22,16 +22,11 @@
     .align  2
     .global lcd_write_data
     .type   lcd_write_data, %function
-                                      /* r0 = addr */
-lcd_write_data:                       /* r1 = pixel count */
+                                      /* r0 = addr, must be aligned */
+lcd_write_data:                       /* r1 = pixel count, must be even */
     stmfd   sp!, {r4-r6}
     mov     r2, #0x30000000           /* LCD data port */
 
-    tst     r0, #2                    /* first pixel unaligned? */
-    ldrneh  r3, [r0], #2
-    strneh  r3, [r2]
-    subne   r1, r1, #1
-    
     subs    r1, r1, #16
 .loop16:
     ldmgeia r0!, {r3-r6}
@@ -51,17 +46,16 @@ lcd_write_data:                       /* r1 = pixel count */
     tst     r1, #2
     ldrne   r3, [r0], #4
     strne   r3, [r2]
-    tst     r1, #1
-    ldrneh  r3, [r0]
-    strneh  r3, [r2]
 
     ldmfd   sp!, {r4-r6}
     bx      lr
 
 /****************************************************************************
- * void lcd_write_yuv_420_lines(unsigned char const * const src[3],
- *                              int width,
- *                              int stride);
+ * void lcd_write_yuv_420_upper(unsigned char const * const src[3],
+ *                              unsigned char *croma_buf, int width);
+ *
+ * void lcd_write_yuv_420_lower(unsigned char *y_src,
+ *                              unsigned char *croma_buf, int width);
  *
  *   |R|   |1.000000 -0.000001  1.402000| |Y'|
  *   |G| = |1.000000 -0.334136 -0.714136| |Pb|
@@ -72,25 +66,18 @@ lcd_write_data:                       /* r1 = pixel count */
  *   |B|   |74 128   0| |Cr - 128| >> 9
  */
     .align      2
-    .global     lcd_write_yuv420_lines
-    .type       lcd_write_yuv420_lines, %function
-lcd_write_yuv420_lines:
+    .global     lcd_write_yuv420_upper
+    .type       lcd_write_yuv420_upper, %function
+lcd_write_yuv420_upper:
                                       /* r0 = yuv_src */
-                                      /* r1 = width */
-                                      /* r2 = stride */
+                                      /* r1 = chroma buffer */
+                                      /* r2 = width */
     stmfd       sp!, { r4-r12 }       /* save non-scratch */
     ldmia       r0, { r10, r11, r12 } /* r10 = yuv_src[0] = Y'_p */
                                       /* r11 = yuv_src[1] = Cb_p */
                                       /* r12 = yuv_src[2] = Cr_p */
-    add         r2, r10, r2           /* r2 = &ysrc[stride] */
-    add         r3, r1, r1, asl #1    /* number of bytes for chroma buffer */
-    add         r3, r3, #15           /*   plus room for 3 additional words, */
-    bic         r3, r3, #3            /*   rounded up to multiples of 4 byte */
-    sub         sp, sp, r3            /*   and allocate on stack */
-    stmia       sp, {r1, r2, r3}      /* width, &ysrc[stride], stack_alloc */
-
-    mov         r7, r1                /* r7 = loop count */
-    add         r8, sp, #12           /* chroma buffer */
+    mov         r7, r2                /* r7 = loop count */
+    mov         r8, r1                /* chroma buffer */
     mov         r9, #0x30000000       /* LCD data port */
 
     /* 1st loop start */
@@ -181,13 +168,27 @@ lcd_write_yuv420_lines:
     
     subs        r7, r7, #2            /* check for loop end */
     bgt         10b                   /* back to beginning  */
-    /* 1st loop end */
-    
-    add         r8, sp, #12           /* chroma buffer */
-    ldmia       sp, { r7, r10 }       /* r7 = loop count */
-                                      /* r10 = &ysrc[stride] */
 
-    /* 2nd loop start */
+    ldmfd       sp!, { r4-r12 }       /* restore registers */
+    bx          lr
+
+    .ltorg
+    .size   lcd_write_yuv420_upper, .-lcd_write_yuv420_upper
+
+
+    .align      2
+    .global     lcd_write_yuv420_lower
+    .type       lcd_write_yuv420_lower, %function
+lcd_write_yuv420_lower:
+                                      /* r0 = y_src */
+                                      /* r1 = croma buf */
+                                      /* r2 = width */
+    stmfd       sp!, { r4-r10 }       /* save non-scratch */
+    mov         r10, r0               /* r10 = y_src */
+    mov         r7, r2                /* r7 = loop count */
+    mov         r8, r1                /* chroma buffer */
+    mov         r9, #0x30000000       /* LCD data port */
+
 20:                                   /* loop start */
 
     /* restore r1, r3 and r0 from chroma buffer */
@@ -257,10 +258,8 @@ lcd_write_yuv420_lines:
     bgt         20b                   /* back to beginning  */
     /* 2nd loop end */
 
-    ldr         r3, [sp, #8]
-    add         sp, sp, r3            /* deallocate buffer */
-    ldmfd       sp!, { r4-r12 }       /* restore registers */
+    ldmfd       sp!, { r4-r10 }       /* restore registers */
     bx          lr
 
     .ltorg
-    .size   lcd_write_yuv420_lines, .-lcd_write_yuv420_lines
+    .size   lcd_write_yuv420_lower, .-lcd_write_yuv420_lower
