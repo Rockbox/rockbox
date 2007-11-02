@@ -200,6 +200,9 @@ enum {  ALARM_START_WPS = 0,
 /* a space which is defined in stubs.c */
 extern unsigned char vp_dummy[VIRT_SIZE];
 #define VIRT_PTR vp_dummy
+#elif CONFIG_CPU==DM320
+/* the DM320 has IRAM at 0, so we use 0xffff bytes right after that */
+#define VIRT_PTR ((unsigned char*)0x4000)
 #else
 /* a location where we won't store strings, 0 is the fastest */
 #define VIRT_PTR ((unsigned char*)0)
