@@ -65,7 +65,9 @@ struct {
     long update_timeout;         
     enum lcd_status state;
     bool blocked;
+#if NUM_CORES > 1
     struct corelock cl;   /* inter-core sync */
+#endif
 } lcd_state IBSS_ATTR;
 
 
@@ -108,7 +110,9 @@ static void bcm_setup_rect(unsigned x, unsigned y,
 static void lcd_tick(void)
 {
     /* No set_irq_level - already in interrupt context */
+#if NUM_CORES > 1
     corelock_lock(&lcd_state.cl);
+#endif
 
     if (!lcd_state.blocked && lcd_state.state >= LCD_NEED_UPDATE)
     {
@@ -131,17 +135,22 @@ static void lcd_tick(void)
             lcd_state.state = LCD_IDLE;
         }
     }
+#if NUM_CORES > 1
     corelock_unlock(&lcd_state.cl);
+#endif
 }
 
 static inline void lcd_block_tick(void)
 {
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
 
+#if NUM_CORES > 1
     corelock_lock(&lcd_state.cl);
     lcd_state.blocked = true;
     corelock_unlock(&lcd_state.cl);
-
+#else
+    lcd_state.blocked = true;
+#endif
     set_irq_level(oldlevel);
 }
 
@@ -151,8 +160,9 @@ static void lcd_unblock_and_update(void)
     bool bcm_is_busy;
     int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
 
+#if NUM_CORES > 1
     corelock_lock(&lcd_state.cl);
-
+#endif
     data = bcm_read32(0x1F8);
     bcm_is_busy = (data == 0xFFFA0005 || data == 0xFFFF);
     
@@ -169,8 +179,10 @@ static void lcd_unblock_and_update(void)
          lcd_state.state = LCD_NEED_UPDATE; /* Post update request */
     }
     lcd_state.blocked = false;
+    
+#if NUM_CORES > 1
     corelock_unlock(&lcd_state.cl);
-
+#endif
     set_irq_level(oldlevel);
 }
 
