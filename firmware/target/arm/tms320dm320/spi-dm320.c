@@ -30,6 +30,7 @@
 
 #define GIO_TS_ENABLE  (1<<2)
 #define GIO_RTC_ENABLE (1<<12)
+#define GIO_BL_ENABLE  (1<<13)
 
 struct spinlock spi_lock;
 
@@ -41,8 +42,9 @@ struct SPI_info {
 #define reg(a) ((volatile unsigned short *)(PHY_IO_BASE+a))
 struct SPI_info spi_targets[] =
 {
-    [SPI_target_TSC2100]   = { reg(0x0594), reg(0x058E), GIO_TS_ENABLE },
-    [SPI_target_RX5X348AB] = { reg(0x058C), reg(0x0592), GIO_RTC_ENABLE },
+    [SPI_target_TSC2100]   = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, GIO_TS_ENABLE },
+    [SPI_target_RX5X348AB] = { &IO_GIO_BITSET0, &IO_GIO_BITCLR0, GIO_RTC_ENABLE },
+    [SPI_target_BACKLIGHT] = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, GIO_BL_ENABLE },
 };
 
 static void spi_disable_all_targets(void)
@@ -92,8 +94,8 @@ int spi_block_transfer(enum SPI_target target,
 void spi_init(void)
 {
     spinlock_init(&spi_lock);
-    /* Set SCLK idle level = 1 */
-    IO_SERIAL0_MODE &= ~(1<<10);
+    /* Set SCLK idle level = 0 */
+    IO_SERIAL0_MODE |= 1<<10;
     /* Enable TX */
     IO_SERIAL0_TX_ENABLE = 0x0001;
 

@@ -98,6 +98,9 @@ void touchpad_calibrate_screen(void)
     set_calibration_points(&tl, &br);
 }
 #endif
+static const uint8_t bl_low [] = {0xa4, 0x00, 0x55, 0xbb};
+static const uint8_t bl_high[] = {0xa4, 0x00, 0x19, 0xbb};
+
 void mrdebug(void)
 {
     int button=0, *address=0x0;
@@ -127,6 +130,10 @@ void mrdebug(void)
             address+=0x1000;
         else if (button==BUTTON_RC_REW)
             address-=0x1000;
+        else if (button==BUTTON_RC_VOL_DOWN)
+            spi_block_transfer(SPI_target_BACKLIGHT, bl_low, 4, 0, 0);
+        else if (button==BUTTON_RC_VOL_UP)
+            spi_block_transfer(SPI_target_BACKLIGHT, bl_high, 4, 0, 0);
 //         {
 //             short x,y,z1,z2;
 //             tsc2100_read_values(&x, &y, &z1, &z2);

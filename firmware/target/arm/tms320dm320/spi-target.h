@@ -26,6 +26,7 @@
 enum SPI_target {
     SPI_target_TSC2100 = 0,
     SPI_target_RX5X348AB,
+    SPI_target_BACKLIGHT,
     SPI_MAX_TARGETS,
 };
 
