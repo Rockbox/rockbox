@@ -55,18 +55,18 @@ start:
     bhi    1b
 
     /* Disable data and instruction cache, high vectors (at 0xffff0000 instead of 0x00000000) */
-	mrc	p15, 0, r0, c1, c0, 0
-	/* clear bits 13, 9:8 (--VI --RS) */
-	bic	r0, r0, #0x00003300
-	/* clear bits 7, 2:0 (B--- -C-M) */
-	bic	r0, r0, #0x00000085
-	/* make sure bit 2 (A) Align is set */
-	orr	r0, r0, #0x00000002
-	mcr	p15, 0, r0, c1, c0, 0
+    mrc    p15, 0, r0, c1, c0, 0
+    /* clear bits 13, 9:8 (--VI --RS) */
+    bic    r0, r0, #0x00003300
+    /* clear bits 7, 2:0 (B--- -C-M) */
+    bic    r0, r0, #0x00000085
+    /* make sure bit 2 (A) Align is set */
+    orr    r0, r0, #0x00000002
+    mcr    p15, 0, r0, c1, c0, 0
 
 #if 0
-	/* mask interrupts */
-	ldr    r1, =INTC_MASK
+    /* mask interrupts */
+    ldr    r1, =INTC_MASK
     ldr    r2, =INTC_IRQ0
     strh   r1, [r2]
     ldr    r2, =INTC_IRQ1
@@ -136,7 +136,7 @@ start:
     strhi  r4, [r2], #4
     bhi    1b
 
-	 /* Set up stack for IRQ mode */
+    /* Set up stack for IRQ mode */
     msr    cpsr_c, #0x92 /* IRQ disabled, FIQ enabled */
     ldr    sp, =irq_stack
     /* Set up stack for FIQ mode */
