@@ -92,11 +92,10 @@
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING          0   /* 0.5 mA */
-#define MAX_DIM_BRIGHTNESS_SETTING      15  /* highest 'dimness' */
-#define MAX_BRIGHTNESS_SETTING          63  /* 32 mA */
-#define DEFAULT_BRIGHTNESS_SETTING      39  /* 20 mA */
-#define DEFAULT_DIMNESS_SETTING          9  /* 5 mA */
+#define MIN_BRIGHTNESS_SETTING          0
+#define MAX_BRIGHTNESS_SETTING          127
+#define DEFAULT_BRIGHTNESS_SETTING      85 /* OF "full brightness" */
+#define DEFAULT_DIMNESS_SETTING         22 /* OF "most dim" */
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
@@ -104,9 +103,7 @@
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x80000
 
-/* The number of bytes reserved for loadable plugins 
- *   - larger than other targets due to screen size
- */
+/* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
 /* Define this if you have the WM8975 audio codec */
