@@ -1481,6 +1481,74 @@ static bool dbg_cpufreq(void)
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
+#if defined(HAVE_TSC2100) && !defined(SIMULATOR)
+#include "tsc2100.h"
+char *itob(int n, int len)
+{
+    static char binary[64];
+    int i,j;
+    for (i=1, j=0;i<=len;i++)
+    {
+        binary[j++] = n&(1<<(len-i))?'1':'0';
+        if (i%4 == 0)
+            binary[j++] = ' ';
+    }
+    binary[j] = '\0';
+    return binary;
+}
+static char* tsc2100_debug_getname(int selected_item, void * data, char *buffer)
+{
+    int *page = (int*)data;
+    bool reserved = false;
+    switch (*page)
+    {
+        case 0:
+            if ((selected_item > 0x0a)  ||
+                (selected_item == 0x04) ||
+                (selected_item == 0x08))
+                reserved = true;
+            break;
+        case 1:
+            if ((selected_item > 0x05) ||
+                (selected_item == 0x02))
+                reserved = true;
+            break;
+        case 2:
+            if (selected_item > 0x1e)
+                reserved = true;
+            break;
+    }
+    if (reserved)
+        snprintf(buffer, MAX_PATH, "%02x: RESERVED", selected_item);
+    else
+        snprintf(buffer, MAX_PATH, "%02x: %s", selected_item,
+                    itob(tsc2100_readreg(*page, selected_item)&0xffff,16));
+    return buffer;
+}
+static int tsc2100debug_action_callback(int action, struct gui_synclist *lists)
+{
+    int *page = (int*)lists->gui_list[SCREEN_MAIN].data;
+    if (action == ACTION_STD_OK)
+    {
+        *page = (*page+1)%3;
+        snprintf(lists->gui_list[SCREEN_MAIN].title, 32, 
+                 "tsc2100 registers - Page %d", *page);
+        return ACTION_REDRAW;
+    }
+    return action;
+}
+bool tsc2100_debug(void)
+{
+    int page = 0;
+    char title[32] = "tsc2100 registers - Page 0";
+    struct simplelist_info info;
+    simplelist_info_init(&info, title, 32, &page);
+    info.timeout = HZ/100;
+    info.get_name = tsc2100_debug_getname;
+    info.action_callback= tsc2100debug_action_callback;
+    return simplelist_show_list(&info);
+}
+#endif
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
 /*
@@ -2277,6 +2345,9 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) || CONFIG_CPU == S3C2440
         { "View I/O ports", dbg_ports },
+#endif
+#if defined(HAVE_TSC2100) && !defined(SIMULATOR)
+        { "TSC2100 debug", tsc2100_debug },
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         { "CPU frequency", dbg_cpufreq },
