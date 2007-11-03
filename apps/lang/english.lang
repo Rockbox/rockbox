@@ -6962,8 +6962,8 @@
   </dest>
   <voice>
     *: none
-    e200,c200: "micro Secure Digital card:"
-    ondio*: "Multimedia card"
+    e200,c200: "micro S D"
+    ondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -6996,16 +6996,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "Current Time"
+    *: ""
   </dest>
   <voice>
-    *: "Current Time"
+    *: ""
   </voice>
 </phrase>
 <phrase>
