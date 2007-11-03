@@ -630,6 +630,11 @@ static bool dbg_hw_info(void)
 #elif CONFIG_CPU == PP5002
     int line = 0;
     char buf[32];
+    char pp_version[] = { (PP_VER4 >> 8) & 0xff, PP_VER4 & 0xff,
+                          (PP_VER3 >> 8) & 0xff, PP_VER3 & 0xff,
+                          (PP_VER2 >> 8) & 0xff, PP_VER2 & 0xff,
+                          (PP_VER1 >> 8) & 0xff, PP_VER1 & 0xff, '\0' };
+                          
 
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
@@ -641,6 +646,9 @@ static bool dbg_hw_info(void)
     snprintf(buf, sizeof(buf), "HW rev: 0x%08lx", IPOD_HW_REVISION);
     lcd_puts(0, line++, buf);
 #endif
+
+    snprintf(buf, sizeof(buf), "PP version: %s", pp_version);
+    lcd_puts(0, line++, buf);
 
     snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
     lcd_puts(0, line++, buf);

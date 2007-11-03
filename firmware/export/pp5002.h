@@ -136,6 +136,11 @@
 #define TIMING1_CTL      (*(volatile unsigned long *)(0xcf004000))
 #define TIMING2_CTL      (*(volatile unsigned long *)(0xcf004008))
 
+#define PP_VER1          (*(volatile unsigned long *)(0xcf004030))
+#define PP_VER2          (*(volatile unsigned long *)(0xcf004034))
+#define PP_VER3          (*(volatile unsigned long *)(0xcf004038))
+#define PP_VER4          (*(volatile unsigned long *)(0xcf00403c))
+
 #define CPU_CTL          (*(volatile unsigned char *)(0xcf004054))
 #define COP_CTL          (*(volatile unsigned char *)(0xcf004058))
 
