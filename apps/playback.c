@@ -1344,7 +1344,7 @@ static void voice_thread(void)
     logf("Loading voice codec");
     voice_codec_loaded = true;
     semaphore_wait(&sem_codecthread);
-    event_set_state(&event_codecthread, false);
+    event_set_state(&event_codecthread, STATE_NONSIGNALED);
     set_current_codec(CODEC_IDX_VOICE);
     dsp_configure(DSP_RESET, 0);
     voice_remaining = 0;
@@ -1839,7 +1839,7 @@ static void codec_thread(void)
                     queue_post(&voice_queue, Q_AUDIO_PLAY, 0);
                 }
                 semaphore_wait(&sem_codecthread);
-                event_set_state(&event_codecthread, true);
+                event_set_state(&event_codecthread, STATE_SIGNALED);
 #endif
                 set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
@@ -1871,7 +1871,7 @@ static void codec_thread(void)
                     queue_post(&voice_queue, Q_AUDIO_PLAY, 0);
                 }
                 semaphore_wait(&sem_codecthread);
-                event_set_state(&event_codecthread, true);
+                event_set_state(&event_codecthread, STATE_SIGNALED);
 #endif
                 set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
@@ -1893,7 +1893,7 @@ static void codec_thread(void)
                     queue_post(&voice_queue, Q_ENCODER_RECORD, 0);
                 }
                 semaphore_wait(&sem_codecthread);
-                event_set_state(&event_codecthread, true);
+                event_set_state(&event_codecthread, STATE_SIGNALED);
 #endif
                 logf("loading encoder");
                 set_current_codec(CODEC_IDX_AUDIO);
