@@ -217,7 +217,6 @@ struct track_info {
 
     size_t filesize;           /* File total length */
 
-    bool has_codec;            /* Codec length in bytes */
     bool taginfo_ready;        /* Is metadata read */
 
     bool event_sent;           /* Was this track's buffered event sent */
@@ -1686,7 +1685,6 @@ static void codec_discard_codec_callback(void)
     {
         bufclose(CUR_TI->codec_hid);
         CUR_TI->codec_hid = 0;
-        CUR_TI->has_codec = false;
     }
 }
 
@@ -2173,23 +2171,9 @@ static bool audio_loadcodec(bool start_play)
 
     codec_get_full_path(codec_path, codec_fn);
 
-    /* Found a codec filename */
-    tracks[track_widx].has_codec = true;
-
     tracks[track_widx].codec_hid = bufopen(codec_path, 0, TYPE_CODEC);
     if (tracks[track_widx].codec_hid < 0)
-    {
-        if (tracks[track_widx].codec_hid == ERR_FILE_ERROR)
-        {
-            logf("Codec file error");
-            tracks[track_widx].has_codec = false;
-        }
-        else
-        {
-            logf("Not enough space");
-        }
         return false;
-    }
 
     logf("Loaded codec");
 
@@ -2376,10 +2360,9 @@ static bool audio_load_track(int offset, bool start_play)
     /* Load the codec. */
     if (!audio_loadcodec(start_play))
     {
-        if (tracks[track_widx].has_codec)
+        if (tracks[track_widx].codec_hid == ERR_BUFFER_FULL)
         {
             /* No space for codec on buffer, not an error */
-            tracks[track_widx].has_codec = false;
             return false;
         }
 
