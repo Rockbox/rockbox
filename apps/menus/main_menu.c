@@ -211,9 +211,13 @@ static char* info_getname(int selected_item, void *data, char *buffer)
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
             if (charge_state == CHARGING)
                 snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_CHARGE));
-            else if (charge_state == TOPOFF)
+            else
+#if CONFIG_CHARGING == CHARGING_CONTROL
+            if (charge_state == TOPOFF)
                 snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_TOPOFF_CHARGE));
-            else if (charge_state == TRICKLE)
+            else
+#endif
+            if (charge_state == TRICKLE)
                 snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_TRICKLE_CHARGE));
             else
 #endif
@@ -295,9 +299,13 @@ static int info_speak_item(int selected_item, void * data)
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
             if (charge_state == CHARGING)
                 talk_id(LANG_BATTERY_CHARGE, true);
-            else if (charge_state == TOPOFF)
+            else
+#if CONFIG_CHARGING == CHARGING_CONTROL
+            if (charge_state == TOPOFF)
                 talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
-            else if (charge_state == TRICKLE)
+            else
+#endif
+            if (charge_state == TRICKLE)
                 talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
             else
 #endif
