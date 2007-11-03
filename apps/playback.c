@@ -2387,7 +2387,6 @@ static bool audio_load_track(int offset, bool start_play)
     }
 
     struct mp3entry *track_id3;
-    enum data_type type = TYPE_PACKET_AUDIO;
 
     if (track_widx == track_ridx)
         track_id3 = &curtrack_id3;
@@ -2399,41 +2398,47 @@ static bool audio_load_track(int offset, bool start_play)
     set_filebuf_watermark(buffer_margin, 0);
     track_id3->elapsed = 0;
 
-    if (offset > 0)
-    {
-        switch (track_id3->codectype) {
-        case AFMT_MPA_L1:
-        case AFMT_MPA_L2:
-        case AFMT_MPA_L3:
+    enum data_type type = TYPE_PACKET_AUDIO;
+
+    switch (track_id3->codectype) {
+    case AFMT_MPA_L1:
+    case AFMT_MPA_L2:
+    case AFMT_MPA_L3:
+        if (offset > 0) {
             file_offset = offset;
             track_id3->offset = offset;
             audio_set_elapsed(track_id3);
             ci.curpos = offset;
-            break;
+        }
+        break;
 
-        case AFMT_WAVPACK:
+    case AFMT_WAVPACK:
+        if (offset > 0) {
             file_offset = offset;
             track_id3->offset = offset;
             track_id3->elapsed = track_id3->length / 2;
             ci.curpos = offset;
-            break;
-
-        case AFMT_OGG_VORBIS:
-        case AFMT_SPEEX:
-        case AFMT_FLAC:
-        case AFMT_PCM_WAV:
-        case AFMT_A52:
-        case AFMT_AAC:
-        case AFMT_MPC:
-        case AFMT_APE:
-            track_id3->offset = offset;
-            break;
-        case AFMT_NSF:
-        case AFMT_SPC:
-            logf("Loading atomic %d",track_id3->codectype);
-            type = TYPE_ATOMIC_AUDIO;
-            break;
         }
+        break;
+
+    case AFMT_OGG_VORBIS:
+    case AFMT_SPEEX:
+    case AFMT_FLAC:
+    case AFMT_PCM_WAV:
+    case AFMT_A52:
+    case AFMT_AAC:
+    case AFMT_MPC:
+    case AFMT_APE:
+        if (offset > 0)
+            track_id3->offset = offset;
+        break;
+
+    case AFMT_NSF:
+    case AFMT_SPC:
+    case AFMT_SID:
+        logf("Loading atomic %d",track_id3->codectype);
+        type = TYPE_ATOMIC_AUDIO;
+        break;
     }
 
     logf("alt:%s", trackname);
@@ -2625,7 +2630,6 @@ static int audio_check_new_track(void)
     track_ridx &= MAX_TRACK_MASK;
 
     buf_set_base_handle(CUR_TI->audio_hid);
-    register_buffer_low_callback(low_buffer_callback);
 
     if (automatic_skip)
     {
@@ -3036,6 +3040,7 @@ static void audio_thread(void)
                 if (!playing || playlist_end || ci.stop_codec)
                     break;
                 audio_fill_file_buffer(false, 0);
+                register_buffer_low_callback(low_buffer_callback);
                 break;
 
             case Q_AUDIO_PLAY:

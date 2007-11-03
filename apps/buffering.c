@@ -733,8 +733,9 @@ static void shrink_handle(struct memory_handle *h)
 }
 
 /* Fill the buffer by buffering as much data as possible for handles that still
-   have data left to buffer */
-static void fill_buffer(void)
+   have data left to buffer
+   Return whether or not to continue filling after this */
+static bool fill_buffer(void)
 {
     logf("fill_buffer()");
     struct memory_handle *m = first_handle;
@@ -745,13 +746,18 @@ static void fill_buffer(void)
         m = m->next;
     }
 
+    if (m) {
+        return true;
+    }
+    else
+    {
 #ifndef SIMULATOR
-    if (queue_empty(&buffering_queue)) {
         /* only spin the disk down if the filling wasn't interrupted by an
            event arriving in the queue. */
         ata_sleep();
-    }
 #endif
+        return false;
+    }
 }
 
 void update_data_counters(void)
@@ -1165,6 +1171,7 @@ static void shrink_buffer(struct memory_handle *h) {
 
 void buffering_thread(void)
 {
+    bool filling = false;
     struct queue_event ev;
 
     while (true)
@@ -1227,39 +1234,38 @@ void buffering_thread(void)
 
         /* If the buffer is low, call the callbacks to get new data */
         if (num_handles > 0 && data_counters.useful <= conf_watermark)
-        {
             call_buffer_low_callbacks();
-        }
 
 #if MEM > 8
         /* If the disk is spinning, take advantage by filling the buffer */
-        if ((ata_disk_is_active() ||  ev.id == Q_BUFFER_HANDLE) &&
-            queue_empty(&buffering_queue))
+        else if (ata_disk_is_active() && queue_empty(&buffering_queue))
         {
-            if (data_counters.remaining > 0 &&
-                data_counters.buffered <= high_watermark)
-            {
-                fill_buffer();
-                update_data_counters();
-            }
-
             if (num_handles > 0 && data_counters.useful <= high_watermark)
-            {
                 call_buffer_low_callbacks();
+
+            if (data_counters.remaining > 0 && BUF_USED <= high_watermark)
+            {
+                filling = fill_buffer();
+                update_data_counters();
             }
         }
 #endif
 
-        if ((ev.id == SYS_TIMEOUT || ev.id == Q_BUFFER_HANDLE) &&
-                queue_empty(&buffering_queue))
+        if (ev.id == SYS_TIMEOUT && queue_empty(&buffering_queue))
         {
             if (data_counters.remaining > 0 &&
                 data_counters.useful <= conf_watermark)
             {
                 /* Recursively shrink the buffer, depth first */
                 shrink_buffer(first_handle);
-                fill_buffer();
+                filling = fill_buffer();
             }
+        }
+
+        if (filling && queue_empty(&buffering_queue))
+        {
+            if (data_counters.remaining > 0 && BUF_USED < buffer_len)
+                filling = fill_buffer();
         }
     }
 }
