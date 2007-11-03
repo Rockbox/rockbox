@@ -2430,6 +2430,7 @@ static bool audio_load_track(int offset, bool start_play)
             break;
         case AFMT_NSF:
         case AFMT_SPC:
+            logf("Loading atomic %d",track_id3->codectype);
             type = TYPE_ATOMIC_AUDIO;
             break;
         }
