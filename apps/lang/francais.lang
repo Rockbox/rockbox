@@ -16,7 +16,7 @@
 #    
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
 #    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007,
-#    Oct 2007
+#    Oct 2007, Nov 2007
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -6845,7 +6845,7 @@
     player: "Tamp.: %d.%03dMB"
   </dest>
   <voice>
-    *: ""
+    *: "Tampon"
   </voice>
 </phrase>
 <phrase>
@@ -6877,7 +6877,7 @@
     *: "Disque:"
   </dest>
   <voice>
-    *: ""
+    *: "Disque"
   </voice>
 </phrase>
 <phrase>
@@ -6917,18 +6917,18 @@
   user:
   <source>
     *: none
-    e200,c200: "mSD:"
+    e200,c200: "MSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200,c200: "mSD:"
+    e200,c200: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "Micro carte digitale sécurisée"
-    ondio*: "Carte mémoire multimédia"
+    e200,c200: "Micro S D"
+    ondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -6961,16 +6961,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "Durée courante"
+    *: ""
   </dest>
   <voice>
-    *: "Durée courante"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7457,7 +7457,7 @@
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[N° Piste]"
+    *: "[Num Piste]"
   </dest>
   <voice>
     *: ""
@@ -8615,11 +8615,11 @@
   </source>
   <dest>
     *: none
-    charging: "Batterie : en charge..."
+    charging: "Batterie: en charge..."
   </dest>
   <voice>
     *: none
-    charging: "En charge"
+    charging: "Batterie: en charge"
   </voice>
 </phrase>
 <phrase>
@@ -11402,5 +11402,36 @@
   </dest>
   <voice>
     *: "Liste vide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user:
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Absente"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "Absente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Prononcer le niveau batterie"
+  </dest>
+  <voice>
+    *: "Prononcer le niveau de la batterie"
   </voice>
 </phrase>
