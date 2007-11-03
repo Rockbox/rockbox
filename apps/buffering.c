@@ -543,9 +543,9 @@ static bool yield_codec(void)
     return false;
 }
 
-/* Buffer data for the given handle. Return the amount of data buffered
-   or -1 if the handle wasn't found */
-static ssize_t buffer_handle(int handle_id)
+/* Buffer data for the given handle.
+   Return whether or not the buffering should continue explicitly.  */
+static bool buffer_handle(int handle_id)
 {
     logf("buffer_handle(%d)", handle_id);
     struct memory_handle *h = find_handle(handle_id);
@@ -554,7 +554,7 @@ static ssize_t buffer_handle(int handle_id)
 
     if (h->filerem == 0) {
         /* nothing left to buffer */
-        return 0;
+        return false;
     }
 
     if (h->fd < 0)  /* file closed, reopen */
@@ -562,10 +562,10 @@ static ssize_t buffer_handle(int handle_id)
         if (*h->path)
             h->fd = open(h->path, O_RDONLY);
         else
-            return -1;
+            return false;
 
         if (h->fd < 0)
-            return -1;
+            return false;
 
         if (h->offset)
             lseek(h->fd, h->offset, SEEK_SET);
@@ -574,7 +574,7 @@ static ssize_t buffer_handle(int handle_id)
     trigger_cpu_boost();
 
     bool breakable = h->type==TYPE_PACKET_AUDIO;
-    ssize_t ret = 0;
+    bool ret = true;
     while (h->filerem > 0)
     {
         /* max amount to copy */
@@ -582,13 +582,16 @@ static ssize_t buffer_handle(int handle_id)
                              buffer_len - h->widx);
 
         /* stop copying if it would overwrite the reading position */
-        if (RINGBUF_ADD_CROSS(h->widx, copy_n, buf_ridx) >= 0)
+        if (RINGBUF_ADD_CROSS(h->widx, copy_n, buf_ridx) >= 0) {
+            ret = false;
             break;
+        }
 
         /* This would read into the next handle, this is broken */
         if (h->next && RINGBUF_ADD_CROSS(h->widx, copy_n,
                     (unsigned)((void *)h->next - (void *)buffer)) > 0) {
             logf("Handle allocation short");
+            ret = false;
             break;
         }
 
@@ -597,6 +600,7 @@ static ssize_t buffer_handle(int handle_id)
 
         if (rc < 0)
         {
+            /* Some kind of filesystem error, maybe recoverable if not codec */
             if (h->type == TYPE_CODEC) {
                 logf("Partial codec");
                 break;
@@ -613,7 +617,6 @@ static ssize_t buffer_handle(int handle_id)
         if (h == cur_handle)
             buf_widx = h->widx;
         h->available += rc;
-        ret += rc;
         h->filerem -= rc;
 
         /* Stop buffering if new queue events have arrived */
@@ -741,7 +744,10 @@ static bool fill_buffer(void)
     struct memory_handle *m = first_handle;
     while (queue_empty(&buffering_queue) && m) {
         if (m->filerem > 0) {
-            buffer_handle(m->id);
+            if (!buffer_handle(m->id)) {
+                m = NULL;
+                break;
+            }
         }
         m = m->next;
     }
@@ -1176,14 +1182,14 @@ void buffering_thread(void)
 
     while (true)
     {
-        queue_wait_w_tmo(&buffering_queue, &ev, HZ/2);
+        queue_wait_w_tmo(&buffering_queue, &ev, filling?5:HZ/2);
 
         switch (ev.id)
         {
             case Q_BUFFER_HANDLE:
                 LOGFQUEUE("buffering < Q_BUFFER_HANDLE");
                 queue_reply(&buffering_queue, 1);
-                buffer_handle((int)ev.data);
+                filling |= buffer_handle((int)ev.data);
                 break;
 
             case Q_RESET_HANDLE:
@@ -1245,27 +1251,29 @@ void buffering_thread(void)
 
             if (data_counters.remaining > 0 && BUF_USED <= high_watermark)
             {
+                /* This is a new fill, shrink the buffer up first */
+                if (!filling)
+                    shrink_buffer(first_handle);
                 filling = fill_buffer();
                 update_data_counters();
             }
         }
 #endif
 
-        if (ev.id == SYS_TIMEOUT && queue_empty(&buffering_queue))
-        {
-            if (data_counters.remaining > 0 &&
-                data_counters.useful <= conf_watermark)
-            {
-                /* Recursively shrink the buffer, depth first */
-                shrink_buffer(first_handle);
-                filling = fill_buffer();
+        if (queue_empty(&buffering_queue)) {
+            if (filling) {
+                if (data_counters.remaining > 0 && BUF_USED < buffer_len)
+                    filling = fill_buffer();
             }
-        }
-
-        if (filling && queue_empty(&buffering_queue))
-        {
-            if (data_counters.remaining > 0 && BUF_USED < buffer_len)
-                filling = fill_buffer();
+            else if (ev.id == SYS_TIMEOUT)
+            {
+                if (data_counters.remaining > 0 &&
+                    data_counters.useful <= conf_watermark)
+                {
+                    shrink_buffer(first_handle);
+                    filling = fill_buffer();
+                }
+            }
         }
     }
 }
