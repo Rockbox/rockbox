@@ -2652,17 +2652,26 @@ static int audio_check_new_track(void)
         goto skip_done;
     }
 
-    /* The track may be in memory, see if it really is */
+    /* When skipping backwards, it is possible that we've found a track that's
+     * buffered, but which is around the track-wrap and therefor not the track
+     * we are looking for */
     if (!forward)
     {
         int cur_idx = track_ridx;
         bool taginfo_ready = true;
+        /* We've wrapped the buffer backwards if new > old */
         bool wrap = track_ridx > old_track_ridx;
 
         while (1)
         {
             cur_idx++;
             cur_idx &= MAX_TRACK_MASK;
+
+            /* if we've advanced past the wrap when cur_idx is zeroed */
+            if (!cur_idx)
+                wrap = false;
+
+            /* if we aren't still on the wrap and we've caught the old track */
             if (!(wrap || cur_idx < old_track_ridx))
                 break;
 
