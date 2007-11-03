@@ -30,6 +30,9 @@
 
 static intptr_t button_data; /* data value from last message dequeued */
 
+#ifdef HAVE_TOUCHPAD
+static int mouse_coords = 0;
+#endif
 /* how long until repeat kicks in */
 #define REPEAT_START      6
 
@@ -83,12 +86,12 @@ bool remote_button_hold(void) {
 }
 #endif
 
+static int lastbtn;
 void button_event(int key, bool pressed)
 {
     int new_btn = 0;
     int diff = 0;
     static int count = 0;
-    static int lastbtn;
     static int repeat_speed = REPEAT_INTERVAL_START;
     static int repeat_count = 0;
     static bool repeat = false;
@@ -100,11 +103,18 @@ void button_event(int key, bool pressed)
 #endif
 #endif 
     static bool usb_connected = false;
+    int data = 0;
     if (usb_connected && key != SDLK_u)
         return;
     switch (key)
     {
 
+#ifdef HAVE_TOUCHPAD
+    case BUTTON_TOUCHPAD:
+        new_btn = BUTTON_TOUCHPAD;
+        data = mouse_coords;
+        break;
+#endif
     case SDLK_u:
         if (!pressed)
         {
@@ -650,17 +660,17 @@ void button_event(int key, bool pressed)
 #ifdef HAVE_REMOTE_LCD
         if(diff & BUTTON_REMOTE)
             if(!skip_remote_release)
-                queue_post(&button_queue, BUTTON_REL | diff, 0);
+                queue_post(&button_queue, BUTTON_REL | diff, data);
             else
                 skip_remote_release = false;
         else
 #endif
             if(!skip_release)
-                queue_post(&button_queue, BUTTON_REL | diff, 0);
+                queue_post(&button_queue, BUTTON_REL | diff, data);
             else
                 skip_release = false;
 #else
-        queue_post(&button_queue, BUTTON_REL | diff, 0);
+        queue_post(&button_queue, BUTTON_REL | diff, data);
 #endif
     }
 
@@ -712,7 +722,7 @@ void button_event(int key, bool pressed)
                 {
                     if (queue_empty(&button_queue))
                     {
-                        queue_post(&button_queue, BUTTON_REPEAT | btn, 0);
+                        queue_post(&button_queue, BUTTON_REPEAT | btn, data);
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                             if(btn & BUTTON_REMOTE)
@@ -734,18 +744,18 @@ void button_event(int key, bool pressed)
 #ifdef HAVE_REMOTE_LCD
                         if (btn & BUTTON_REMOTE) {
                             if (!remote_filter_first_keypress || is_remote_backlight_on())
-                                queue_post(&button_queue, btn, 0);
+                                queue_post(&button_queue, btn, data0);
                             else
                                 skip_remote_release = true;
                         }
                         else
 #endif                                    
                             if (!filter_first_keypress || is_backlight_on())
-                                queue_post(&button_queue, btn, 0);
+                                queue_post(&button_queue, btn, data);
                             else
                                 skip_release = true;
 #else /* no backlight, nothing to skip */
-                        queue_post(&button_queue, btn, 0);
+                        queue_post(&button_queue, btn, data);
 #endif
                     post = false;
                 }    
@@ -801,12 +811,39 @@ long button_get_w_tmo(int ticks)
 
 intptr_t button_get_data(void)
 {
+#ifdef HAVE_TOUCHPAD
+    return button_data;
+#else
     /* Needed by the accelerating wheel driver for Sansa e200 */
     return 1 << 24;
+#endif
 }
 
+#ifdef HAVE_TOUCHPAD
+void mouse_tick_task(void)
+{
+    static int last_check = 0;
+    int x,y;
+    if (TIME_BEFORE(current_tick, last_check+(HZ/10)))
+        return;
+    last_check = current_tick;
+    if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT))
+    {
+        mouse_coords = (x<<16)|y;
+        button_event(BUTTON_TOUCHPAD, true);
+    }
+    else if (lastbtn == BUTTON_TOUCHPAD)
+    {
+        button_event(BUTTON_TOUCHPAD, false);
+        mouse_coords = 0;
+    }
+}
+#endif
 void button_init(void)
 {
+#ifdef HAVE_TOUCHPAD
+    tick_add_task(mouse_tick_task);
+#endif
 }
 
 int button_status(void)
