@@ -45,6 +45,8 @@ enum {
     UNIT_MB,      /* Megabytes */
     UNIT_KBIT,    /* kilobits per sec */
     UNIT_PM_TICK, /* peak meter units per tick */
+    UNIT_TIME_EXACT,/* time duration/interval in seconds, says hours,mins,secs*/
+    UNIT_TIME,    /* as above but less verbose */
     UNIT_LAST     /* END MARKER */
 };
 

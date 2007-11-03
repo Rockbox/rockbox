@@ -734,6 +734,30 @@ int talk_number(long n, bool enqueue)
     return 0;
 }
 
+/* Say time duration/interval. Input is time in seconds,
+   say hours,minutes,seconds. */
+static int talk_time_unit(long secs, bool exact, bool enqueue)
+{
+    int hours, mins;
+    if (!enqueue)
+        talk_shutup();
+    if((hours = secs/3600)) {
+        secs %= 3600;
+        talk_value(hours, UNIT_HOUR, true);
+    }
+    if((mins = secs/60)) {
+        secs %= 60;
+        if(exact || !hours)
+            talk_value(mins, UNIT_MIN, true);
+        else talk_number(mins, true); /* don't say "minutes" */
+    }
+    if((exact && secs) || (!hours && !mins))
+        talk_value(secs, UNIT_SEC, true);
+    else if(!hours && secs)
+        talk_number(secs, true);
+    return 0;
+}
+
 /* singular/plural aware saying of a value */
 int talk_value(long n, int unit, bool enqueue)
 {
@@ -777,6 +801,10 @@ int talk_value(long n, int unit, bool enqueue)
     if (audio_status()) /* busy, buffer in use */
         return -1; 
 #endif
+
+    /* special case for time duration */
+    if (unit == UNIT_TIME || unit == UNIT_TIME_EXACT)
+        return talk_time_unit(n, unit == UNIT_TIME_EXACT, enqueue);
 
     if (unit < 0 || unit >= UNIT_LAST)
         unit_id = -1;
