@@ -230,6 +230,9 @@ static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
     size_t len;
     int overlap;
 
+    if (num_handles >= BUF_MAX_HANDLES)
+        return NULL;
+
     mutex_lock(&llist_mutex);
 
     if (cur_handle && cur_handle->filerem > 0) {
@@ -508,7 +511,6 @@ reset_handle    : Reset writing position and data buffer of a handle to its
 rebuffer_handle : Seek to a nonbuffered part of a handle by rebuffering the data
 shrink_handle   : Free buffer space by moving a handle
 fill_buffer     : Call buffer_handle for all handles that have data to buffer
-can_add_handle  : Indicate whether it's safe to add a handle
 
 These functions are used by the buffering thread to manage buffer space.
 */
@@ -684,10 +686,9 @@ static bool close_handle(int handle_id)
 
 /* Free buffer space by moving the handle struct right before the useful
    part of its data buffer or by moving all the data. */
-static void shrink_handle(int handle_id)
+static void shrink_handle(struct memory_handle *h)
 {
     size_t delta;
-    struct memory_handle *h = find_handle(handle_id);
 
     if (!h)
         return;
@@ -1152,15 +1153,14 @@ static void call_buffer_low_callbacks(void)
     }
 }
 
-static void shrink_buffer(bool audio, bool other) {
-    /* shrink selected buffers */
-    struct memory_handle *m = first_handle;
-    while (m) {
-        if ((m->type==TYPE_PACKET_AUDIO && audio) ||
-                (m->type!=TYPE_PACKET_AUDIO && other))
-            shrink_handle(m->id);
-        m = m->next;
-    }
+static void shrink_buffer(struct memory_handle *h) {
+
+    if (h == NULL)
+        return;
+
+    shrink_buffer(h->next);
+
+    shrink_handle(h);
 }
 
 void buffering_thread(void)
@@ -1255,12 +1255,9 @@ void buffering_thread(void)
             if (data_counters.remaining > 0 &&
                 data_counters.useful < conf_watermark)
             {
-                /* First work forward, shrinking any unmoveable handles */
-                shrink_buffer(true,false);
-                /* Then work forward following those up with moveable handles */
-                shrink_buffer(false,true);
+                /* Recursively shrink the buffer, depth first */
+                shrink_buffer(first_handle);
                 fill_buffer();
-                update_data_counters();
             }
         }
     }
