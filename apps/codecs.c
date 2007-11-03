@@ -224,19 +224,15 @@ static int codec_load_ram(int size, struct codec_api *api)
     return status;
 }
 
-int codec_load_buf(unsigned int hid, int size, struct codec_api *api) {
+int codec_load_buf(unsigned int hid, struct codec_api *api) {
     int rc;
-    rc = bufread(hid, size, codecbuf);
+    rc = bufread(hid, CODEC_SIZE, codecbuf);
     if (rc < 0) {
         logf("error loading codec");
         return CODEC_ERROR;
     }
-    if (rc < size) {
-        logf("codec ended %d early",size - rc);
-        return CODEC_ERROR;
-    }
     api->discard_codec();
-    return codec_load_ram(size, api);
+    return codec_load_ram(rc, api);
 }
 
 int codec_load_file(const char *plugin, struct codec_api *api)

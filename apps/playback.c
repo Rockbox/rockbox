@@ -215,9 +215,9 @@ struct track_info {
     int id3_hid;               /* The ID for the track's metadata handle */
     int codec_hid;             /* The ID for the track's codec handle */
 
-    size_t codecsize;          /* Codec length in bytes */
     size_t filesize;           /* File total length */
 
+    bool has_codec;            /* Codec length in bytes */
     bool taginfo_ready;        /* Is metadata read */
 
     bool event_sent;           /* Was this track's buffered event sent */
@@ -1686,7 +1686,7 @@ static void codec_discard_codec_callback(void)
     {
         bufclose(CUR_TI->codec_hid);
         CUR_TI->codec_hid = 0;
-        CUR_TI->codecsize = 0;
+        CUR_TI->has_codec = false;
     }
 }
 
@@ -1875,8 +1875,7 @@ static void codec_thread(void)
 #endif
                 set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
-                status =
-                    codec_load_buf(CUR_TI->codec_hid, CUR_TI->codecsize, &ci);
+                status = codec_load_buf(CUR_TI->codec_hid, &ci);
 #ifdef PLAYBACK_VOICE
                 semaphore_release(&sem_codecthread);
 #endif
@@ -2066,11 +2065,21 @@ static void audio_update_trackinfo(void)
     ci.taginfo_ready = &CUR_TI->taginfo_ready;
 }
 
+static void low_buffer_callback(void)
+{
+    LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
+    queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+}
+
 static void audio_clear_track_entries(bool clear_unbuffered)
 {
     int cur_idx = track_widx;
 
     logf("Clearing tracks:%d/%d, %d", track_ridx, track_widx, clear_unbuffered);
+
+    /* This function is always called in association with a stop or a rebuffer,
+     * we will reregister the callback at the end of a rebuffer if needed */
+    unregister_buffer_low_callback(low_buffer_callback);
 
     /* Loop over all tracks from write-to-read */
     while (1)
@@ -2115,7 +2124,6 @@ static bool audio_release_tracks(void)
 
 static bool audio_loadcodec(bool start_play)
 {
-    int fd;
     int prev_track;
     char codec_path[MAX_PATH]; /* Full path to codec */
 
@@ -2128,7 +2136,7 @@ static bool audio_loadcodec(bool start_play)
     if (codec_fn == NULL)
         return false;
 
-    tracks[track_widx].codec_hid = 0;
+    tracks[track_widx].codec_hid = false;
 
     if (start_play)
     {
@@ -2165,24 +2173,24 @@ static bool audio_loadcodec(bool start_play)
 
     codec_get_full_path(codec_path, codec_fn);
 
-    fd = open(codec_path, O_RDONLY);
-    if (fd < 0)
-    {
-        logf("Codec doesn't exist!");
-        return false;
-    }
-
-    tracks[track_widx].codecsize = filesize(fd);
+    /* Found a codec filename */
+    tracks[track_widx].has_codec = true;
 
     tracks[track_widx].codec_hid = bufopen(codec_path, 0, TYPE_CODEC);
     if (tracks[track_widx].codec_hid < 0)
     {
-        logf("Not enough space");
-        close(fd);
+        if (tracks[track_widx].codec_hid == ERR_FILE_ERROR)
+        {
+            logf("Codec file error");
+            tracks[track_widx].has_codec = false;
+        }
+        else
+        {
+            logf("Not enough space");
+        }
         return false;
     }
 
-    close(fd);
     logf("Loaded codec");
 
     return true;
@@ -2368,10 +2376,10 @@ static bool audio_load_track(int offset, bool start_play)
     /* Load the codec. */
     if (!audio_loadcodec(start_play))
     {
-        if (tracks[track_widx].codecsize)
+        if (tracks[track_widx].has_codec)
         {
             /* No space for codec on buffer, not an error */
-            tracks[track_widx].codecsize = 0;
+            tracks[track_widx].has_codec = false;
             return false;
         }
 
@@ -2486,12 +2494,6 @@ static void audio_generate_postbuffer_events(void)
     }
 }
 
-static void low_buffer_callback(void)
-{
-    LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
-    queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
-}
-
 static void audio_fill_file_buffer(bool start_play, size_t offset)
 {
     struct queue_event ev;
@@ -2533,6 +2535,9 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
         track_changed = true;
 
     audio_generate_postbuffer_events();
+
+    if (!continue_buffering)
+        register_buffer_low_callback(low_buffer_callback);
 }
 
 static void audio_rebuffer(void)
@@ -2544,9 +2549,6 @@ static void audio_rebuffer(void)
     /* Reset track pointers */
     track_widx = track_ridx;
     audio_clear_track_entries(true);
-
-    /* Just to make sure none were forgotten */
-    audio_release_tracks();
 
     /* Fill the buffer */
     last_peek_offset = -1;
@@ -2772,11 +2774,11 @@ static void audio_stop_playback(void)
     audio_stop_codec_flush();
     playing = false;
 
-    /* Close all tracks */
-    audio_release_tracks();
-
     /* Mark all entries null. */
     audio_clear_track_entries(false);
+
+    /* Close all tracks */
+    audio_release_tracks();
 
     memset(&curtrack_id3, 0, sizeof(struct mp3entry));
     memset(&nexttrack_id3, 0, sizeof(struct mp3entry));
@@ -3040,7 +3042,6 @@ static void audio_thread(void)
                 if (!playing || playlist_end || ci.stop_codec)
                     break;
                 audio_fill_file_buffer(false, 0);
-                register_buffer_low_callback(low_buffer_callback);
                 break;
 
             case Q_AUDIO_PLAY:
@@ -3133,6 +3134,10 @@ static void audio_thread(void)
 #endif
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&audio_queue);
+
+                /* Mark all entries null. */
+                audio_clear_track_entries(false);
+
                 /* release tracks to make sure all handles are closed */
                 audio_release_tracks();
                 break;
