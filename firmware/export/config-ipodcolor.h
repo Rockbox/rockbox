@@ -93,6 +93,9 @@
 /* Define this if you want to use the PP5020 i2c interface */
 #define CONFIG_I2C I2C_PP5020
 
+/* We're able to shut off power to the HDD */
+#define HAVE_ATA_POWER_OFF
+
 /* define this if the hardware can be powered off while charging */
 //#define HAVE_POWEROFF_WHILE_CHARGING
 

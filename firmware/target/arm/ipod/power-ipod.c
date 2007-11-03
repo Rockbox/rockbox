@@ -63,9 +63,19 @@ void ide_power_enable(bool on)
         GPIOC_OUTPUT_VAL &= ~0x40;
     else
         GPIOC_OUTPUT_VAL |= 0x40;
-#else
-    /* We do nothing on other iPods yet */
-    (void)on;
+#elif defined(IPOD_4G) || defined(IPOD_COLOR) \
+   || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    if (on)
+        GPIO_CLEAR_BITWISE(GPIOJ_OUTPUT_VAL, 0x04);
+    else
+        GPIO_SET_BITWISE(GPIOJ_OUTPUT_VAL, 0x04);
+#elif defined(IPOD_VIDEO)
+    if (on)
+        GPO32_VAL &= ~0x40000000;
+    else
+        GPO32_VAL |= 0x40000000;
+#else /* Nano */
+    (void)on;  /* Do nothing. */
 #endif
 }
 
@@ -73,9 +83,13 @@ bool ide_powered(void)
 {
 #if defined(IPOD_1G2G) || defined(IPOD_3G)
     return !(GPIOC_OUTPUT_VAL & 0x40);
-#else
-    /* pretend we are always powered - we don't turn it off on the ipod */
-    return true;
+#elif defined(IPOD_4G) || defined(IPOD_COLOR) \
+   || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    return !(GPIOJ_OUTPUT_VAL & 0x04);
+#elif defined(IPOD_VIDEO)
+    return !(GPO32_VAL & 0x40000000);
+#else /* Nano */
+    return true; /* Pretend we are always powered */
 #endif
 }
 

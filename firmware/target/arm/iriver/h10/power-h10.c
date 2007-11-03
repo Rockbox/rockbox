@@ -60,10 +60,9 @@ bool charger_inserted(void)
 void ide_power_enable(bool on)
 {
     if(on){
-        GPIOF_OUTPUT_VAL &=~ 0x1;
-        sleep(1);
+        GPIO_CLEAR_BITWISE(GPIOF_OUTPUT_VAL, 0x01);
     } else {
-        GPIOF_OUTPUT_VAL |= 0x1;
+        GPIO_SET_BITWISE(GPIOF_OUTPUT_VAL, 0x01);
     }
 }
 
