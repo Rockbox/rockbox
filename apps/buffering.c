@@ -1226,7 +1226,7 @@ void buffering_thread(void)
         update_data_counters();
 
         /* If the buffer is low, call the callbacks to get new data */
-        if (num_handles > 0 && data_counters.useful < conf_watermark)
+        if (num_handles > 0 && data_counters.useful <= conf_watermark)
         {
             call_buffer_low_callbacks();
         }
@@ -1237,23 +1237,24 @@ void buffering_thread(void)
             queue_empty(&buffering_queue))
         {
             if (data_counters.remaining > 0 &&
-                data_counters.buffered < high_watermark)
+                data_counters.buffered <= high_watermark)
             {
                 fill_buffer();
                 update_data_counters();
             }
 
-            if (num_handles > 0 && data_counters.useful < high_watermark)
+            if (num_handles > 0 && data_counters.useful <= high_watermark)
             {
                 call_buffer_low_callbacks();
             }
         }
 #endif
 
-        if (ev.id == SYS_TIMEOUT && queue_empty(&buffering_queue))
+        if ((ev.id == SYS_TIMEOUT || ev.id == Q_BUFFER_HANDLE) &&
+                queue_empty(&buffering_queue))
         {
             if (data_counters.remaining > 0 &&
-                data_counters.useful < conf_watermark)
+                data_counters.useful <= conf_watermark)
             {
                 /* Recursively shrink the buffer, depth first */
                 shrink_buffer(first_handle);
