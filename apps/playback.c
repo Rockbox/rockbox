@@ -217,6 +217,7 @@ struct track_info {
 
     size_t filesize;           /* File total length */
 
+    bool has_codec;            /* Codec length in bytes */
     bool taginfo_ready;        /* Is metadata read */
 
     bool event_sent;           /* Was this track's buffered event sent */
@@ -365,23 +366,23 @@ static bool clear_track_info(struct track_info *track)
     if (!track)
         return false;
 
-    if (track->codec_hid >= 0) {
+    if (track->codec_hid > 0) {
         if (bufclose(track->codec_hid))
-            track->codec_hid = -1;
+            track->codec_hid = 0;
         else
             return false;
     }
 
-    if (track->id3_hid >= 0) {
+    if (track->id3_hid > 0) {
         if (bufclose(track->id3_hid))
-            track->id3_hid = -1;
+            track->id3_hid = 0;
         else
             return false;
     }
 
-    if (track->audio_hid >= 0) {
+    if (track->audio_hid > 0) {
         if (bufclose(track->audio_hid))
-            track->audio_hid = -1;
+            track->audio_hid = 0;
         else
             return false;
     }
@@ -642,7 +643,7 @@ struct mp3entry* audio_current_track(void)
         return &curtrack_id3;
     else if (offset == -1 && *prevtrack_id3.path)
         return &prevtrack_id3;
-    else if (tracks[cur_idx].id3_hid >= 0)
+    else if (tracks[cur_idx].id3_hid > 0)
         return bufgetid3(tracks[cur_idx].id3_hid);
 
     memset(&temp_id3, 0, sizeof(struct mp3entry));
@@ -681,7 +682,7 @@ struct mp3entry* audio_next_track(void)
     next_idx++;
     next_idx &= MAX_TRACK_MASK;
 
-    if (tracks[next_idx].id3_hid < 0)
+    if (tracks[next_idx].id3_hid <= 0)
         return NULL;
 
     return &nexttrack_id3;
@@ -1681,10 +1682,11 @@ static void codec_pcmbuf_track_changed_callback(void)
 
 static void codec_discard_codec_callback(void)
 {
-    if (CUR_TI->codec_hid >= 0)
+    if (CUR_TI->codec_hid > 0)
     {
         bufclose(CUR_TI->codec_hid);
-        CUR_TI->codec_hid = -1;
+        CUR_TI->codec_hid = 0;
+        CUR_TI->has_codec = false;
     }
 }
 
@@ -1849,7 +1851,7 @@ static void codec_thread(void)
 
             case Q_CODEC_LOAD:
                 LOGFQUEUE("codec < Q_CODEC_LOAD");
-                if (CUR_TI->codec_hid < 0) {
+                if (CUR_TI->codec_hid <= 0) {
                     logf("Codec slot is empty!");
                     /* Wait for the pcm buffer to go empty */
                     while (pcm_is_playing())
@@ -1961,7 +1963,7 @@ static void codec_thread(void)
                         }
                     }
 
-                    if (CUR_TI->codec_hid >= 0)
+                    if (CUR_TI->codec_hid > 0)
                     {
                         LOGFQUEUE("codec > codec Q_CODEC_LOAD");
                         queue_post(&codec_queue, Q_CODEC_LOAD, 0);
@@ -2042,18 +2044,18 @@ long audio_filebufused(void)
 
 static void audio_update_trackinfo(void)
 {
-    if (CUR_TI->id3_hid >= 0)
+    if (CUR_TI->id3_hid > 0)
         copy_mp3entry(&curtrack_id3, bufgetid3(CUR_TI->id3_hid));
 
-    CUR_TI->taginfo_ready = (CUR_TI->id3_hid >= 0);
+    CUR_TI->taginfo_ready = (CUR_TI->id3_hid > 0);
 
     int next_idx = track_ridx + 1;
     next_idx &= MAX_TRACK_MASK;
 
-    if (tracks[next_idx].id3_hid >= 0)
+    if (tracks[next_idx].id3_hid > 0)
         copy_mp3entry(&nexttrack_id3, bufgetid3(tracks[next_idx].id3_hid));
 
-    tracks[next_idx].taginfo_ready = (tracks[next_idx].id3_hid >= 0);
+    tracks[next_idx].taginfo_ready = (tracks[next_idx].id3_hid > 0);
 
     ci.filesize = CUR_TI->filesize;
     curtrack_id3.elapsed = 0;
@@ -2094,7 +2096,7 @@ static void audio_clear_track_entries(bool clear_unbuffered)
         {
             /* If there is an unbuffer callback, call it, otherwise,
              * just clear the track */
-            if (track_unbuffer_callback && tracks[cur_idx].id3_hid >= 0)
+            if (track_unbuffer_callback && tracks[cur_idx].id3_hid > 0)
                 track_unbuffer_callback(bufgetid3(tracks[cur_idx].id3_hid));
 
             clear_track_info(&tracks[cur_idx]);
@@ -2125,7 +2127,7 @@ static bool audio_loadcodec(bool start_play)
     int prev_track;
     char codec_path[MAX_PATH]; /* Full path to codec */
 
-    if (tracks[track_widx].id3_hid < 0) {
+    if (tracks[track_widx].id3_hid <= 0) {
         return false;
     }
 
@@ -2134,7 +2136,7 @@ static bool audio_loadcodec(bool start_play)
     if (codec_fn == NULL)
         return false;
 
-    tracks[track_widx].codec_hid = -1;
+    tracks[track_widx].codec_hid = false;
 
     if (start_play)
     {
@@ -2171,11 +2173,26 @@ static bool audio_loadcodec(bool start_play)
 
     codec_get_full_path(codec_path, codec_fn);
 
+    /* Found a codec filename */
+    tracks[track_widx].has_codec = true;
+
     tracks[track_widx].codec_hid = bufopen(codec_path, 0, TYPE_CODEC);
     if (tracks[track_widx].codec_hid < 0)
+    {
+        if (tracks[track_widx].codec_hid == ERR_FILE_ERROR)
+        {
+            logf("Codec file error");
+            tracks[track_widx].has_codec = false;
+        }
+        else
+        {
+            logf("Not enough space");
+        }
         return false;
+    }
 
     logf("Loaded codec");
+
     return true;
 }
 
@@ -2298,16 +2315,15 @@ static bool audio_load_track(int offset, bool start_play)
     }
 
     /* Get track metadata if we don't already have it. */
-    if (tracks[track_widx].id3_hid < 0)
+    if (tracks[track_widx].id3_hid <= 0)
     {
         if (get_metadata(&id3, fd, trackname))
         {
-            tracks[track_widx].id3_hid =
-                bufalloc(&id3, sizeof(struct mp3entry), TYPE_ID3);
-            tracks[track_widx].taginfo_ready =
-                (tracks[track_widx].id3_hid >= 0);
+            tracks[track_widx].id3_hid = bufalloc(&id3, sizeof(struct mp3entry),
+                                                  TYPE_ID3);
+            tracks[track_widx].taginfo_ready = (tracks[track_widx].id3_hid > 0);
 
-            if (tracks[track_widx].id3_hid < 0)
+            if (tracks[track_widx].id3_hid <= 0)
             {
                 last_peek_offset--;
                 close(fd);
@@ -2360,9 +2376,10 @@ static bool audio_load_track(int offset, bool start_play)
     /* Load the codec. */
     if (!audio_loadcodec(start_play))
     {
-        if (tracks[track_widx].codec_hid == ERR_BUFFER_FULL)
+        if (tracks[track_widx].has_codec)
         {
             /* No space for codec on buffer, not an error */
+            tracks[track_widx].has_codec = false;
             return false;
         }
 
@@ -2436,7 +2453,7 @@ static bool audio_load_track(int offset, bool start_play)
 
     tracks[track_widx].audio_hid = bufopen(trackname, file_offset, type);
 
-    if (tracks[track_widx].audio_hid < 0)
+    if (tracks[track_widx].audio_hid <= 0)
         return false;
 
     if (start_play)
@@ -2466,7 +2483,7 @@ static void audio_generate_postbuffer_events(void)
             {
                 /* Mark the event 'sent' even if we don't really send one */
                 tracks[cur_idx].event_sent = true;
-                if (track_buffer_callback && tracks[cur_idx].id3_hid >= 0)
+                if (track_buffer_callback && tracks[cur_idx].id3_hid > 0)
                     track_buffer_callback(bufgetid3(tracks[cur_idx].id3_hid));
             }
             if (cur_idx == track_widx)
