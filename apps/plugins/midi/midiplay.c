@@ -316,6 +316,7 @@ static int midimain(void * filename)
                 {
                     /* Rewinding is tricky. Basically start the file over */
                     /* but run through the tracks without the synth running */
+                    rb->pcm_play_stop();
 
                     int desiredTime = playingTime - 5;  /* Rewind 5 sec */
 
@@ -357,6 +358,7 @@ static int midimain(void * filename)
                     while(playingTime < desiredTime)
                         tick();
 
+                    rb->pcm_play_data(&get_more, NULL, 0);
                     break;
                 }
 
@@ -370,8 +372,12 @@ static int midimain(void * filename)
                     /* Have the issue where numberOfSamples changes within this tick */
                     int tickCount = samp / numberOfSamples;
                     int a=0;
+
+                    rb->pcm_play_stop();
+
                     for(a=0; a<tickCount; a++)
                         tick();
+                    rb->pcm_play_data(&get_more, NULL, 0);
                     break;
                 }
 
