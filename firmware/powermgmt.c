@@ -93,26 +93,47 @@ charger_input_state_type charger_input_state IDATA_ATTR;
 #define BATT_MAXMVOLT   4500            /* maximum millivolts of battery */
 #define BATT_MAXRUNTIME (10 * 60)       /* maximum runtime with full battery in minutes */
 
-static unsigned int batt_millivolts = (unsigned int)BATT_MAXMVOLT;
-static int batt_level = 100;            /* battery capacity level in percent */
-static int batt_time = BATT_MAXRUNTIME; /* estimated remaining time in minutes */
-static time_t last_change = 0;
+static unsigned int battery_millivolts = (unsigned int)BATT_MAXMVOLT;
+static int battery_percent = 100;       /* battery capacity level in percent */
+static int powermgmt_est_runningtime_min = BATT_MAXRUNTIME; /* estimated remaining time in minutes */
 
 static void battery_status_update(void)
 {
-    time_t          now;
+    static time_t last_change = 0;
+    static bool charging = false;
+    time_t now;
 
     time(&now);
-    if (last_change < now) {
+    if (last_change < now)
+    {
         last_change = now;
 
         /* change the values: */
-        batt_millivolts -= (unsigned int)(BATT_MAXMVOLT - BATT_MINMVOLT) / 101;
-        if (batt_millivolts < (unsigned int)BATT_MINMVOLT)
-            batt_millivolts = (unsigned int)BATT_MAXMVOLT;
+        if (charging)
+        {
+            battery_millivolts += (unsigned int)(BATT_MAXMVOLT - BATT_MINMVOLT) / 101;
+            if (battery_millivolts >= (unsigned int)BATT_MAXMVOLT)
+            {
+                /* Pretend the charger was disconnected */
+                charging = false;
+                queue_broadcast(SYS_CHARGER_DISCONNECTED, 0);
+                last_sent_battery_level = 100;
+            }
+        }
+        else
+        {
+            battery_millivolts -= (unsigned int)(BATT_MAXMVOLT - BATT_MINMVOLT) / 101;
+            if (battery_millivolts <= (unsigned int)BATT_MINMVOLT)
+            {
+                /* Pretend the charger was connected */
+                charging = true;
+                queue_broadcast(SYS_CHARGER_CONNECTED, 0);
+                last_sent_battery_level = 0;
+            }
+        }
 
-        batt_level = 100 * (batt_millivolts - BATT_MINMVOLT) / (BATT_MAXMVOLT - BATT_MINMVOLT);
-        batt_time = batt_level * BATT_MAXRUNTIME / 100;
+        battery_percent = 100 * (battery_millivolts - BATT_MINMVOLT) / (BATT_MAXMVOLT - BATT_MINMVOLT);
+        powermgmt_est_runningtime_min = battery_percent * BATT_MAXRUNTIME / 100;
     }
     send_battery_level_event();
 }
@@ -122,28 +143,28 @@ void battery_read_info(int *voltage, int *level)
     battery_status_update();
 
     if (voltage)
-        *voltage = batt_millivolts;
+        *voltage = battery_millivolts;
 
     if (level)
-        *level = batt_level;
+        *level = battery_percent;
 }
 
 unsigned int battery_voltage(void)
 {
     battery_status_update();
-    return batt_millivolts;
+    return battery_millivolts;
 }
 
 int battery_level(void)
 {
     battery_status_update();
-    return batt_level;
+    return battery_percent;
 }
 
 int battery_time(void)
 {
     battery_status_update();
-    return batt_time;
+    return powermgmt_est_runningtime_min;
 }
 
 bool battery_level_safe(void)
@@ -401,7 +422,6 @@ static int voltage_to_battery_level(int battery_millivolts)
 static void battery_status_update(void)
 {
     int level = voltage_to_battery_level(battery_millivolts);
-
 
     /* calculate estimated remaining running time */
     /* discharging: remaining running time */
@@ -1200,17 +1220,16 @@ void shutdown_hw(void)
 #endif /* #ifndef SIMULATOR */
 }
 
-/* Send system battery level update events on reaching certain
-   significant levels. */
+/* Send system battery level update events on reaching certain significant 
+   levels.  This must be called after battery_percent has been updated. */
 static void send_battery_level_event(void)
 {
-    int current_level = battery_level();
     static const int levels[] = { 15, 30, 50, 0 };
     const int *level = levels;
     while (*level)
     {
-        if (current_level <= *level && last_sent_battery_level > *level)
-        {
+        if (battery_percent <= *level && last_sent_battery_level > *level)
+        { 
             last_sent_battery_level = *level;
             queue_broadcast(SYS_BATTERY_UPDATE, last_sent_battery_level);
             break;
