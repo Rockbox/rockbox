@@ -65,6 +65,7 @@ bool buffering_reset(char *buf, size_t buflen);
  * amount of data is ready (unless EOF is reached).
  ****************************************************************************/
 
+#define BUF_HANDLE_ID_MASK      0x7FFF
 #define BUF_MAX_HANDLES         256
 
 int bufopen(const char *file, size_t offset, enum data_type type);
