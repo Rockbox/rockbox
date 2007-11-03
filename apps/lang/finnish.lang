@@ -4314,8 +4314,8 @@
     charging: "Akku: latautuu"
   </dest>
   <voice>
-    *: none"
-    charging: "Ladataan"
+    *: none
+    charging: "Akku latautuu"
   </voice>
 </phrase>
 <phrase>
@@ -4426,13 +4426,13 @@
   </source>
   <dest>
     *: none
-    e200,c200: "mSD:"
+    e200,c200: "MSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "Muistikortti"
-    ondio*: "Muistikortti"
+    e200,c200: "micro S D muistikortti"
+    ondio*: "M M C muistikortti"
   </voice>
 </phrase>
 <phrase>
@@ -9636,16 +9636,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "Nykyinen aika"
+    *: ""
   </dest>
   <voice>
-    *: "Nykyinen aika"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11381,5 +11381,19 @@
   <voice>
     *: none
     multivolume: "Ei käytettävissä"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Ilmoita akun varauksen taso"
+  </dest>
+  <voice>
+    *: "Ilmoita akun varauksen taso"
   </voice>
 </phrase>
