@@ -204,7 +204,11 @@ static char* info_getname(int selected_item, void *data, char *buffer)
         }
         break;
         case INFO_BATTERY: /* battery */
-#if CONFIG_CHARGING == CHARGING_CONTROL
+#if CONFIG_CHARGING == CHARGING_SIMPLE
+            if (charger_input_state == CHARGER)
+                snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_CHARGE));
+            else
+#elif CONFIG_CHARGING >= CHARGING_MONITOR
             if (charge_state == CHARGING)
                 snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_CHARGE));
             else if (charge_state == TOPOFF)
@@ -284,25 +288,26 @@ static int info_speak_item(int selected_item, void * data)
             break;
         }
         case INFO_BATTERY: /* battery */
+#if CONFIG_CHARGING == CHARGING_SIMPLE
+            if (charger_input_state == CHARGER)
+                talk_id(LANG_BATTERY_CHARGE, true);
+            else
+#elif CONFIG_CHARGING >= CHARGING_MONITOR
+            if (charge_state == CHARGING)
+                talk_id(LANG_BATTERY_CHARGE, true);
+            else if (charge_state == TOPOFF)
+                talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
+            else if (charge_state == TRICKLE)
+                talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
+            else
+#endif
             if (battery_level() >= 0)
             {
                 talk_id(LANG_BATTERY_TIME, false);
                 talk_value(battery_level(), UNIT_PERCENT, true);
-                if(battery_time () / 60 > 0)
-                    talk_value(battery_time () / 60, UNIT_INT, true);
-                if(battery_time () % 60 > 0)
-                    talk_value(battery_time () % 60, UNIT_INT, true);
-#if CONFIG_CHARGING >= CHARGING_MONITOR
-                if (charge_state == CHARGING)
-                    talk_id(LANG_BATTERY_CHARGE, true);
-#if CONFIG_CHARGING == CHARGING_CONTROL
-                else if (charge_state == TOPOFF)
-                    talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
-#endif
-                else if (charge_state == TRICKLE)
-                    talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
-#endif
+                talk_value(battery_time() *60, UNIT_TIME, true);
             }
+            else talk_id(VOICE_BLANK, false);
             break;
         case INFO_DISK1: /* disk 1 */
 #ifdef HAVE_MULTIVOLUME

@@ -8654,7 +8654,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Charging"
+    charging: "Battery: Charging"
   </voice>
 </phrase>
 <phrase>
