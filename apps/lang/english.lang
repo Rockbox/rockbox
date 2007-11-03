@@ -11448,3 +11448,17 @@
     multivolume: "Not present"
   </voice>
 </phrase>
+<phrase>  
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Announce Battery Level"
+  </dest>
+  <voice>
+    *: "Announce Battery Level"
+  </voice>
+</phrase>

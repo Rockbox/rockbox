@@ -857,6 +857,16 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 {
     switch(event)
     {
+        case SYS_BATTERY_UPDATE:
+            if(global_settings.talk_battery_level)
+            {
+                talk_ids(true, VOICE_PAUSE, VOICE_PAUSE,
+                         LANG_BATTERY_TIME,
+                         TALK_ID(battery_level(), UNIT_PERCENT),
+                         VOICE_PAUSE);
+                talk_force_enqueue_next();
+            }
+            break;
         case SYS_USB_CONNECTED:
             if (callback != NULL)
                 callback(parameter);

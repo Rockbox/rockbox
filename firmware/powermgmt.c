@@ -80,6 +80,9 @@ static int shutdown_timeout = 0;
 charge_state_type charge_state;     /* charging mode */
 #endif
 
+static void send_battery_level_event(void);
+static int last_sent_battery_level = 100;
+
 #if CONFIG_CHARGING
 charger_input_state_type charger_input_state IDATA_ATTR;
 #endif
@@ -111,6 +114,7 @@ static void battery_status_update(void)
         batt_level = 100 * (batt_millivolts - BATT_MINMVOLT) / (BATT_MAXMVOLT - BATT_MINMVOLT);
         batt_time = batt_level * BATT_MAXRUNTIME / 100;
     }
+    send_battery_level_event();
 }
 
 void battery_read_info(int *voltage, int *level)
@@ -459,6 +463,7 @@ static void battery_status_update(void)
     }
 
     battery_percent = level;
+    send_battery_level_event();
 }
 
 /*
@@ -638,6 +643,7 @@ static void power_thread_sleep(int ticks)
                     return;
                 case CHARGER_PLUGGED:
                     queue_broadcast(SYS_CHARGER_CONNECTED, 0);
+                    last_sent_battery_level = 0;
                     charger_input_state = CHARGER;
                     break;
                 case CHARGER:
@@ -649,6 +655,7 @@ static void power_thread_sleep(int ticks)
                     break;
                 case CHARGER_UNPLUGGED:
                     queue_broadcast(SYS_CHARGER_DISCONNECTED, 0);
+                    last_sent_battery_level = 100;
                     charger_input_state = NO_CHARGER;
                     break;
                 case CHARGER_PLUGGED:
@@ -1191,4 +1198,23 @@ void shutdown_hw(void)
     sleep(HZ/4);
     power_off();
 #endif /* #ifndef SIMULATOR */
+}
+
+/* Send system battery level update events on reaching certain
+   significant levels. */
+static void send_battery_level_event(void)
+{
+    int current_level = battery_level();
+    static const int levels[] = { 15, 30, 50, 0 };
+    const int *level = levels;
+    while (*level)
+    {
+        if (current_level <= *level && last_sent_battery_level > *level)
+        {
+            last_sent_battery_level = *level;
+            queue_broadcast(SYS_BATTERY_UPDATE, last_sent_battery_level);
+            break;
+        }
+        level++;
+    }
 }
