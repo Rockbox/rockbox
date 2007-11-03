@@ -366,7 +366,7 @@ static void sendEvent(struct Event * ev)
     }
 }
 
-void rewindFile()
+void rewindFile(void)
 {
     int i=0;
     for(i=0; i<mf->numTracks; i++)
