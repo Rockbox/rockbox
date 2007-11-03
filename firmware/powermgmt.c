@@ -111,8 +111,7 @@ static void battery_status_update(void)
         /* change the values: */
         if (charging)
         {
-            battery_millivolts += (unsigned int)(BATT_MAXMVOLT - BATT_MINMVOLT) / 101;
-            if (battery_millivolts >= (unsigned int)BATT_MAXMVOLT)
+            if (battery_millivolts >= BATT_MAXMVOLT)
             {
                 /* Pretend the charger was disconnected */
                 charging = false;
@@ -122,8 +121,7 @@ static void battery_status_update(void)
         }
         else
         {
-            battery_millivolts -= (unsigned int)(BATT_MAXMVOLT - BATT_MINMVOLT) / 101;
-            if (battery_millivolts <= (unsigned int)BATT_MINMVOLT)
+            if (battery_millivolts <= BATT_MINMVOLT)
             {
                 /* Pretend the charger was connected */
                 charging = true;
@@ -131,6 +129,10 @@ static void battery_status_update(void)
                 last_sent_battery_level = 0;
             }
         }
+        if (charging)
+            battery_millivolts += (BATT_MAXMVOLT - BATT_MINMVOLT) / 50;
+        else
+            battery_millivolts -= (BATT_MAXMVOLT - BATT_MINMVOLT) / 100;
 
         battery_percent = 100 * (battery_millivolts - BATT_MINMVOLT) / (BATT_MAXMVOLT - BATT_MINMVOLT);
         powermgmt_est_runningtime_min = battery_percent * BATT_MAXRUNTIME / 100;
@@ -1220,7 +1222,7 @@ void shutdown_hw(void)
 #endif /* #ifndef SIMULATOR */
 }
 
-/* Send system battery level update events on reaching certain significant 
+/* Send system battery level update events on reaching certain significant
    levels.  This must be called after battery_percent has been updated. */
 static void send_battery_level_event(void)
 {
