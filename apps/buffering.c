@@ -105,7 +105,7 @@
 
 /* assert(sizeof(struct memory_handle)%4==0) */
 struct memory_handle {
-    unsigned int id;           /* A unique ID for the handle */
+    int id;                    /* A unique ID for the handle */
     enum data_type type;       /* Type of data buffered with this handle */
     char path[MAX_PATH];       /* Path if data originated in a file */
     int fd;                    /* File descriptor to path (-1 if closed) */
@@ -146,7 +146,7 @@ static struct memory_handle *first_handle;
 
 static int num_handles;  /* number of handles in the list */
 
-static unsigned int base_handle_id;
+static int base_handle_id;
 
 static struct mutex llist_mutex;
 
@@ -223,8 +223,8 @@ buf_ridx == buf_widx means the buffer is empty.
 static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
                                         const bool alloc_all)
 {
-    /* gives each handle a unique id, unsigned to handle wraps gracefully */
-    static unsigned int cur_handle_id = 1;
+    /* gives each handle a unique id */
+    static int cur_handle_id = 1;
     size_t shift;
     size_t new_widx;
     size_t len;
@@ -291,9 +291,8 @@ static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
     buf_widx = RINGBUF_ADD(buf_widx, sizeof(struct memory_handle));
 
     new_handle->id = cur_handle_id;
-    /* Use += 2 instead of ++ to guarantee that the low bit is always high and
-     * prevent the assignment of a zero id when wrapping. */
-    cur_handle_id += 2;
+    /* Wrap signed int is safe and 0 doesn't happen */
+    if (++cur_handle_id < 1) cur_handle_id = 1;
     new_handle->next = NULL;
     num_handles++;
 
@@ -358,7 +357,7 @@ static bool rm_handle(const struct memory_handle *h)
 
 /* Return a pointer to the memory handle of given ID.
    NULL if the handle wasn't found */
-static struct memory_handle *find_handle(const unsigned int handle_id)
+static struct memory_handle *find_handle(const int handle_id)
 {
     if (handle_id <= 0)
         return NULL;
