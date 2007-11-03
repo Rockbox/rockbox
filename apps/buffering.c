@@ -550,11 +550,11 @@ static bool buffer_handle(int handle_id)
     logf("buffer_handle(%d)", handle_id);
     struct memory_handle *h = find_handle(handle_id);
     if (!h)
-        return -1;
+        return true;
 
     if (h->filerem == 0) {
         /* nothing left to buffer */
-        return false;
+        return true;
     }
 
     if (h->fd < 0)  /* file closed, reopen */
@@ -562,10 +562,10 @@ static bool buffer_handle(int handle_id)
         if (*h->path)
             h->fd = open(h->path, O_RDONLY);
         else
-            return false;
+            return true;
 
         if (h->fd < 0)
-            return false;
+            return true;
 
         if (h->offset)
             lseek(h->fd, h->offset, SEEK_SET);
@@ -1189,6 +1189,9 @@ void buffering_thread(void)
             case Q_BUFFER_HANDLE:
                 LOGFQUEUE("buffering < Q_BUFFER_HANDLE");
                 queue_reply(&buffering_queue, 1);
+                /* Call buffer callbacks here because this is one of two ways
+                 * to begin a full buffer fill */
+                call_buffer_low_callbacks();
                 filling |= buffer_handle((int)ev.data);
                 break;
 
