@@ -43,12 +43,8 @@ void readTextBlock(int file, char * buf)
     rb->lseek(file, -1, SEEK_CUR);
 }
 
-/* Filename is the name of the config file              */
-/* The MIDI file should have been loaded at this point  */
-int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
+void resetControllers()
 {
-    char patchUsed[128];
-    char drumUsed[128];
     int a=0;
     for(a=0; a<MAX_VOICES; a++)
     {
@@ -71,6 +67,18 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         chLastCtrlMSB[a]=0;     /* Set to pitch bend depth */
         chLastCtrlLSB[a]=0;     /* Set to pitch bend depth */
     }
+}
+
+/* Filename is the name of the config file              */
+/* The MIDI file should have been loaded at this point  */
+int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
+{
+    char patchUsed[128];
+    char drumUsed[128];
+    int a=0;
+
+    resetControllers();
+
     for(a=0; a<128; a++)
     {
         patchSet[a]=NULL;

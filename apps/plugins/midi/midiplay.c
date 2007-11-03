@@ -32,18 +32,21 @@ PLUGIN_IRAM_DECLARE
 #define BTN_RIGHT    BUTTON_RIGHT
 #define BTN_UP       BUTTON_UP
 #define BTN_DOWN     BUTTON_DOWN
+#define BTN_LEFT     BUTTON_LEFT
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define BTN_QUIT         BUTTON_OFF
 #define BTN_RIGHT        BUTTON_RIGHT
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
+#define BTN_LEFT         BUTTON_LEFT
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define BTN_QUIT         BUTTON_OFF
 #define BTN_RIGHT        BUTTON_RIGHT
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
+#define BTN_LEFT         BUTTON_LEFT
 
 #define BTN_RC_QUIT      BUTTON_RC_STOP
 
@@ -51,12 +54,14 @@ PLUGIN_IRAM_DECLARE
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define BTN_QUIT         (BUTTON_SELECT | BUTTON_MENU)
 #define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_SCROLL_FWD
 #define BTN_DOWN         BUTTON_SCROLL_BACK
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define BTN_QUIT         BUTTON_POWER
 #define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 
@@ -64,24 +69,28 @@ PLUGIN_IRAM_DECLARE
 (CONFIG_KEYPAD == SANSA_C200_PAD)
 #define BTN_QUIT         BUTTON_POWER
 #define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define BTN_QUIT         BUTTON_POWER
 #define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define BTN_QUIT         BUTTON_POWER
 #define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_SCROLL_UP
 #define BTN_DOWN         BUTTON_SCROLL_DOWN
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define BTN_QUIT         BUTTON_POWER
 #define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_RC_PLAY
 #define BTN_DOWN         BUTTON_RC_DOWN
 
@@ -96,6 +105,10 @@ PLUGIN_IRAM_DECLARE
 struct MIDIfile * mf IBSS_ATTR;
 
 int numberOfSamples IBSS_ATTR; /* the number of samples in the current tick */
+int playingTime IBSS_ATTR;  /* How many seconds into the file have we been playing? */
+int samplesThisSecond IBSS_ATTR;    /* How many samples produced during this second so far? */
+
+
 long bpm IBSS_ATTR;
 
 int32_t gmbuf[BUF_SIZE*NBUF];
@@ -255,6 +268,9 @@ static int midimain(void * filename)
         tick();
     } while(notesUsed == 0);
 
+    playingTime = 0;
+    samplesThisSecond = 0;
+
     synthbuf();
     rb->pcm_play_data(&get_more, NULL, 0);
 
@@ -295,17 +311,71 @@ static int midimain(void * filename)
                     }
                     break;
 
+
+                case BTN_LEFT:
+                {
+                    /* Rewinding is tricky. Basically start the file over */
+                    /* but run through the tracks without the synth running */
+
+                    int desiredTime = playingTime - 5;  /* Rewind 5 sec */
+
+                    if(desiredTime < 0)
+                        desiredTime = 0;
+
+                    /* Set controllers to default values */
+                    resetControllers();
+
+                    /* Set the tempo to defalt */
+                    bpm=mf->div*1000000/tempo;
+                    numberOfSamples=SAMPLE_RATE/bpm;
+
+
+                    /* Reset the tracks to start */
+                    rewindFile();
+
+                    /* Reset the time counter to 0 */
+                    playingTime = 0;
+                    samplesThisSecond = 0;
+
+                    /* Quickly run through any initial things that occur before notes */
+                    do
+                    {
+                        notesUsed = 0;
+                        for(a=0; a<MAX_VOICES; a++)
+                            if(voices[a].isUsed == 1)
+                                notesUsed++;
+                        tick();
+                    } while(notesUsed == 0);
+
+                    /* Reset the time counter to 0 */
+                    playingTime = 0;
+                    samplesThisSecond = 0;
+
+
+
+                    /* Tick until goal is reached */
+                    while(playingTime < desiredTime)
+                        tick();
+
+                    break;
+                }
+
                 case BTN_RIGHT:
                 {
-                    /* Skip 3 seconds */
+                    /* Skip 5 seconds forward */
+                    /* Skipping forward is easy */
                     /* Should skip length be retrieved from the RB settings? */
-                    int samp = 3*SAMPLE_RATE;
+                    int samp = 5*SAMPLE_RATE;
+
+                    /* Have the issue where numberOfSamples changes within this tick */
                     int tickCount = samp / numberOfSamples;
                     int a=0;
                     for(a=0; a<tickCount; a++)
                         tick();
                     break;
                 }
+
+
 #ifdef BTN_RC_QUIT
                 case BTN_RC_QUIT:
 #endif

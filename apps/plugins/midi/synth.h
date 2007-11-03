@@ -20,6 +20,8 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig);
 void setPoint(struct SynthObject * so, int pt);
 void synthSamples(int32_t *buf_ptr, unsigned int num_samples);
 
+void resetControllers();
+
 static inline struct Event * getEvent(struct Track * tr, int evNum)
 {
     return tr->dataBlock + (evNum*sizeof(struct Event));

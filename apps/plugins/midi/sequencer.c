@@ -22,6 +22,8 @@
 #include "synth.h"
 
 extern struct plugin_api * rb;
+extern int playingTime IBSS_ATTR;
+extern int samplesThisSecond IBSS_ATTR;
 
 long tempo=375000;
 
@@ -239,7 +241,7 @@ inline void pressNote(int ch, int note, int vol)
     {
         if(drumSet[note]!=NULL)
         {
-                    if(note<35)
+            if(note<35)
                 printf("NOTE LESS THAN 35, AND A DRUM PATCH EXISTS FOR THIS? WHAT THE HELL?");
 
             struct GWaveform * wf = drumSet[note]->waveforms[0];
@@ -364,6 +366,16 @@ static void sendEvent(struct Event * ev)
     }
 }
 
+void rewindFile()
+{
+    int i=0;
+    for(i=0; i<mf->numTracks; i++)
+    {
+        mf->tracks[i]->delta = 0;
+        mf->tracks[i]->pos = 0;
+    }
+}
+
 int tick(void) ICODE_ATTR;
 int tick(void)
 {
@@ -417,6 +429,15 @@ int tick(void)
                     break;
             }
         }
+    }
+
+    samplesThisSecond += numberOfSamples;
+
+    while(samplesThisSecond >= SAMPLE_RATE)
+    {
+        samplesThisSecond -= SAMPLE_RATE;
+        playingTime++;
+//         printf("Time: %d sec\n", playingTime);
     }
 
     if(tracksAdv != 0)
