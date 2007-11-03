@@ -622,7 +622,7 @@ static bool dbg_hw_info(void)
 
     snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
     lcd_puts(0, line++, buf);
-
+    
     lcd_update();
 
     while (!(action_userabort(TIMEOUT_BLOCK)));
@@ -651,7 +651,7 @@ static bool dbg_hw_info(void)
     lcd_puts(0, line++, buf);
 
     snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
-    lcd_puts(0, line++, buf);
+    lcd_puts(0, line++, buf);             
 
     lcd_update();
 
@@ -1201,19 +1201,15 @@ bool dbg_ports(void)
         snprintf(buf, sizeof(buf), "GPIO_F: %02x GPIO_L: %02x", gpio_f, gpio_l);
         lcd_puts(0, line++, buf);
         line++;
-        
-        snprintf(buf, sizeof(buf), "DEV_EN:       %08lx", DEV_EN);
+
+        snprintf(buf, sizeof(buf), "GPO32:   %08lx", GPO32_VAL);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "CLOCK_SRC:    %08lx", CLOCK_SOURCE);
+        snprintf(buf, sizeof(buf), "DEV_EN:  %08lx", DEV_EN);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "CLCD_CLK_SRC: %08lx", CLCD_CLOCK_SRC);
+        snprintf(buf, sizeof(buf), "DEV_EN2: %08lx", DEV_EN2);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "PLL_CONTROL:  %08lx", PLL_CONTROL);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "PLL_STATUS:   %08lx", PLL_STATUS);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "DEV_TIMING1:  %08lx", DEV_TIMING1);
-        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DEV_EN3: %08lx", inl(0x60006044));
+        lcd_puts(0, line++, buf);                    /* to be verified */
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         line++;

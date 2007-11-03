@@ -300,6 +300,16 @@
 #define GPIOK_INT_CLR    (*(volatile unsigned long *)(0x6000d178))
 #define GPIOL_INT_CLR    (*(volatile unsigned long *)(0x6000d17c))
 
+/* Standard GPIO addresses + 0x800 allow atomic port manipulation on PP502x.
+ * Bits 8..15 of the written word define which bits are changed, bits 0..7
+ * define the value of those bits. */
+
+#define GPIO_SET_BITWISE(port, mask) \
+        do { *(&port + (0x800/sizeof(long))) = (mask << 8) | mask; } while(0)
+
+#define GPIO_CLEAR_BITWISE(port, mask) \
+        do { *(&port + (0x800/sizeof(long))) = mask << 8; } while(0)
+
 /* Device initialization */
 #define PP_VER1          (*(volatile unsigned long *)(0x70000000))
 #define PP_VER2          (*(volatile unsigned long *)(0x70000004))
@@ -318,6 +328,8 @@
 
 #define INIT_USB         0x80000000
 
+/* 32 bit GPO port */
+#define GPO32_VAL        (*(volatile unsigned long *)(0x70000080))
 
 /* IIS */
 #define IISDIV              (*(volatile unsigned long*)(0x60006080))
