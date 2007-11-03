@@ -3932,7 +3932,7 @@
   </dest>
   <voice>
     *: none
-    charging: "In carica"
+    charging: "Batteria In carica"
   </voice>
 </phrase>
 <phrase>
@@ -4049,7 +4049,7 @@
   <voice>
     *: none
     e200,c200: "Micro SD"
-    ondio*: "Multimedia Card"
+    ondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -9674,16 +9674,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "Tempo Attuale"
+    *: ""
   </dest>
   <voice>
-    *: "Tempo Attuale"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11401,5 +11401,19 @@
   <voice>
     *: none
     multivolume: "Non presente"
+  </voice>
+</phrase>
+<phrase>  
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Annuncia Livello Batteria"
+  </dest>
+  <voice>
+    *: "Annuncia Livello Batteria"
   </voice>
 </phrase>
