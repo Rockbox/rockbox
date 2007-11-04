@@ -1244,6 +1244,9 @@ void buffering_thread(void)
         if (num_handles > 0 && data_counters.useful <= conf_watermark)
             call_buffer_low_callbacks();
 
+#if 0
+        /* TODO: This needs to be fixed to use the idle callback, disable it
+         * for simplicity until its done right */
 #if MEM > 8
         /* If the disk is spinning, take advantage by filling the buffer */
         else if (ata_disk_is_active() && queue_empty(&buffering_queue))
@@ -1260,6 +1263,7 @@ void buffering_thread(void)
                 update_data_counters();
             }
         }
+#endif
 #endif
 
         if (queue_empty(&buffering_queue)) {
