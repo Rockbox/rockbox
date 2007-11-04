@@ -81,7 +81,7 @@ static bool clipboard_is_copy = false;
 #define MAKE_ONPLAYMENU( name, str, callback, icon, ... )               \
     static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};       \
     static const struct menu_callback_with_desc name##__ = {callback,str,icon};\
-    static const struct menu_item_ex name =                             \
+    const struct menu_item_ex name =                             \
         {MT_MENU|MENU_HAS_DESC|MENU_EXITAFTERTHISMENU|                  \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { (void*)name##_},{.callback_and_desc = & name##__}};

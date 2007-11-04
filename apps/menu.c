@@ -291,6 +291,12 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
     return false;
 }
 
+/* HACK ALERT: this is needed so pressing stop in the wps context menu returns to 
+   the main menu as it is expected. otherwise there can be nasty side-effects
+   if any of the items are selected. */
+extern const struct menu_item_ex wps_onplay_menu;
+
+/* display a menu */
 int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
 {
     int selected = start_selected? *start_selected : 0;
@@ -369,6 +375,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         else if (action == ACTION_TREE_STOP)
         {
             redraw_lists = list_stop_handler();
+            /*return to the main menu if stop is pressed in the WPS context menu */
+            if (menu == &wps_onplay_menu)
+            {
+                ret = GO_TO_ROOT;
+                done = true;
+            }
         }
         else if (action == ACTION_STD_CONTEXT &&
                  menu == &root_menu_)
