@@ -2386,7 +2386,9 @@ static bool audio_load_track(int offset, bool start_play)
     else
         track_id3 = bufgetid3(tracks[track_widx].id3_hid);
 
+#ifndef HAVE_FLASH_STORAGE
     set_filebuf_watermark(buffer_margin, 0);
+#endif
     track_id3->elapsed = 0;
 
     enum data_type type = TYPE_PACKET_AUDIO;
