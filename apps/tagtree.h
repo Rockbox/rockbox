@@ -48,6 +48,7 @@ char *tagtree_get_title(struct tree_context* c);
 int tagtree_get_attr(struct tree_context* c);
 int tagtree_get_icon(struct tree_context* c);
 int tagtree_get_filename(struct tree_context* c, char *buf, int buflen);
+void tagtree_buffer_event(struct mp3entry *id3);
 
 #endif
 #endif

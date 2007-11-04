@@ -633,10 +633,8 @@ static int compare(const void *p1, const void *p2)
     return strncasecmp(e1->name, e2->name, MAX_PATH);
 }
 
-static void tagtree_buffer_event(struct mp3entry *id3)
+void tagtree_buffer_event(struct mp3entry *id3)
 {
-    (void)id3;
-    
     /* Do not gather data unless proper setting has been enabled. */
     if (!global_settings.runtimedb)
         return;
@@ -923,7 +921,9 @@ void tagtree_init(void)
         root_menu = 0;
     
     uniqbuf = buffer_alloc(UNIQBUF_SIZE);
+#if CONFIG_CODEC != SWCODEC
     audio_set_track_buffer_event(tagtree_buffer_event);
+#endif
     audio_set_track_unbuffer_event(tagtree_unbuffer_event);
 }
 
