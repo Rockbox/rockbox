@@ -241,8 +241,10 @@ long gui_wps_show(void)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 show_remote_main_backdrop();
 #endif
-                if (onplay(wps_state.id3->path, FILE_ATTR_AUDIO, CONTEXT_WPS)
-                     == ONPLAY_MAINMENU)
+                /* if music is stopped in the context menu we want to exit the wps */
+                if (onplay(wps_state.id3->path, 
+                           FILE_ATTR_AUDIO, CONTEXT_WPS) == ONPLAY_MAINMENU 
+                    || !audio_status())
                     return GO_TO_ROOT;
 #if LCD_DEPTH > 1
                 show_wps_backdrop();

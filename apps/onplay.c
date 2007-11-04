@@ -81,7 +81,7 @@ static bool clipboard_is_copy = false;
 #define MAKE_ONPLAYMENU( name, str, callback, icon, ... )               \
     static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};       \
     static const struct menu_callback_with_desc name##__ = {callback,str,icon};\
-    const struct menu_item_ex name =                             \
+    static const struct menu_item_ex name =                             \
         {MT_MENU|MENU_HAS_DESC|MENU_EXITAFTERTHISMENU|                  \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { (void*)name##_},{.callback_and_desc = & name##__}};
@@ -949,17 +949,7 @@ static bool clipboard_paste(void)
     return true;
 }
 
-static int onplaymenu_callback(int action,const struct menu_item_ex *this_item)
-{
-    (void)this_item;
-    switch (action)
-    {
-        case ACTION_EXIT_MENUITEM:
-            return ACTION_EXIT_AFTER_THIS_MENUITEM;
-            break;
-    }
-    return action;
-}
+static int onplaymenu_callback(int action,const struct menu_item_ex *this_item);
 #ifdef HAVE_TAGCACHE
 char *rating_name(int selected_item, void * data, char *buffer)
 {
@@ -1191,6 +1181,24 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #endif
            &add_to_faves_item,
          );
+static int onplaymenu_callback(int action,const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    switch (action)
+    {
+        case ACTION_TREE_STOP:
+            if (this_item == &wps_onplay_menu)
+            {
+                list_stop_handler();
+                return ACTION_STD_CANCEL;
+            }
+            break;
+        case ACTION_EXIT_MENUITEM:
+            return ACTION_EXIT_AFTER_THIS_MENUITEM;
+            break;
+    }
+    return action;
+}
 int onplay(char* file, int attr, int from)
 {
     int menu_result;
