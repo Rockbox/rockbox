@@ -380,7 +380,8 @@ int touchpad_slider(struct rgb_pick *rgb, int *selected_slider)
     }
     if (pressed_slider != *selected_slider)
         *selected_slider = pressed_slider;
-    //if (pressed_slider == *selected_slider)
+    if (x < slider_left+slider_width && 
+        x > slider_left)
     {
         x -= slider_left;
         rgb->rgb_val[pressed_slider] = 
