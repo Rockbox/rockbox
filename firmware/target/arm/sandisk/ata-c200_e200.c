@@ -1171,10 +1171,17 @@ int ata_init(void)
 
 #ifdef HAVE_HOTSWAP
         /* enable card detection port - mask interrupt first */
+#ifdef SANSA_E200
         GPIOA_INT_EN     &= ~0x80;
 
         GPIOA_OUTPUT_EN  &= ~0x80;
         GPIOA_ENABLE     |=  0x80;
+#elif defined SANSA_C200
+        GPIOL_INT_EN     &= ~0x08;
+
+        GPIOL_OUTPUT_EN  &= ~0x08;
+        GPIOL_ENABLE     |=  0x08;
+#endif
 #endif
         sd_select_device(0);
 
@@ -1188,6 +1195,7 @@ int ata_init(void)
         /* enable interupt for the mSD card */
         sleep(HZ/10);
 #ifdef HAVE_HOTSWAP
+#ifdef SANSA_E200
         CPU_INT_EN = HI_MASK;
         CPU_HI_INT_EN = GPIO0_MASK;
 
@@ -1195,6 +1203,15 @@ int ata_init(void)
 
         GPIOA_INT_CLR = 0x80;
         GPIOA_INT_EN |= 0x80;
+#elif defined SANSA_C200
+        CPU_INT_EN = HI_MASK;
+        CPU_HI_INT_EN = GPIO2_MASK;
+
+        GPIOL_INT_LEV = (GPIOL_INT_LEV & ~0x08) | (~GPIOL_INPUT_VAL & 0x08);
+
+        GPIOL_INT_CLR = 0x08;
+        GPIOL_INT_EN |= 0x08;
+#endif
 #endif
         spinlock_unlock(&sd_spin);
     }
@@ -1239,8 +1256,11 @@ tCardInfo *card_get_info_target(int card_no)
 #ifdef HAVE_HOTSWAP
 bool card_detect_target(void)
 {
-    /* 0x00:inserted, 0x80:not inserted */
-    return (GPIOA_INPUT_VAL & 0x80) == 0;
+#ifdef SANSA_E200
+    return (GPIOA_INPUT_VAL & 0x80) == 0; /* low active */
+#elif defined SANSA_C200
+    return (GPIOL_INPUT_VAL & 0x08) != 0; /* high active */
+#endif
 }
 
 static bool sd1_oneshot_callback(struct timeout *tmo)
@@ -1256,6 +1276,7 @@ void microsd_int(void)
 {
     static struct timeout sd1_oneshot;
 
+#ifdef SANSA_E200
     int detect = GPIOA_INPUT_VAL & 0x80;
 
     GPIOA_INT_LEV = (GPIOA_INT_LEV & ~0x80) | (detect ^ 0x80);
@@ -1263,5 +1284,15 @@ void microsd_int(void)
 
     timeout_register(&sd1_oneshot, sd1_oneshot_callback,
                      detect ? 1 : HZ/2, detect == 0);
+#elif defined SANSA_C200
+    int detect = GPIOL_INPUT_VAL & 0x08;
+
+    GPIOL_INT_LEV = (GPIOL_INT_LEV & ~0x08) | (detect ^ 0x08);
+    GPIOL_INT_CLR = 0x08;
+
+    timeout_register(&sd1_oneshot, sd1_oneshot_callback,
+                     detect ? HZ/2 : 1, detect != 0);
+#endif
+
 }
 #endif /* HAVE_HOTSWAP */

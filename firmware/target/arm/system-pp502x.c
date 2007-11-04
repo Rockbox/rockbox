@@ -27,10 +27,10 @@ extern void TIMER1(void);
 extern void TIMER2(void);
 extern void ipod_mini_button_int(void); /* iPod Mini 1st gen only */
 extern void ipod_4g_button_int(void);   /* iPod 4th gen and higher only */
+extern void microsd_int(void);          /* Sansa E200 and C200 */
 #ifdef SANSA_E200
 extern void button_int(void);
 extern void clickwheel_int(void);
-extern void microsd_int(void);
 #endif
 
 #ifdef HAVE_USBSTACK
@@ -49,7 +49,7 @@ void irq(void)
         } else if (CPU_INT_STAT & TIMER2_MASK)
             TIMER2();
 #if defined(IPOD_MINI) /* Mini 1st gen only, mini 2nd gen uses iPod 4G code */
-        else if (CPU_HI_INT_STAT & GPIO_MASK)
+        else if (CPU_HI_INT_STAT & GPIO0_MASK)
             ipod_mini_button_int();
 #elif CONFIG_KEYPAD == IPOD_4G_PAD /* except Mini 1st gen, handled above */
         else if (CPU_HI_INT_STAT & I2C_MASK)
@@ -64,6 +64,11 @@ void irq(void)
                 button_int();
             if (GPIOH_INT_STAT & 0xc0)
                 clickwheel_int();
+        }
+#elif defined(SANSA_C200)
+        else if (CPU_HI_INT_STAT & GPIO2_MASK) {
+            if (GPIOL_INT_STAT & 0x08)
+                microsd_int();
         }
 #endif
     } else {

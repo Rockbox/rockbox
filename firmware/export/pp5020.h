@@ -96,7 +96,9 @@
 #define USB_IRQ      24
 #define FIREWIRE_IRQ 25
 #define HI_IRQ       30
-#define GPIO_IRQ     (32+0)
+#define GPIO0_IRQ    (32+0) /* Ports A..D */
+#define GPIO1_IRQ    (32+1) /* Ports E..H */
+#define GPIO2_IRQ    (32+2) /* Ports I..L */
 #define SER0_IRQ     (32+4)
 #define SER1_IRQ     (32+5)
 #define I2C_IRQ      (32+8)
@@ -109,7 +111,9 @@
 #define USB_MASK      (1 << USB_IRQ)
 #define FIREWIRE_MASK (1 << FIREWIRE_IRQ)
 #define HI_MASK       (1 << HI_IRQ)
-#define GPIO_MASK     (1 << (GPIO_IRQ-32))
+#define GPIO0_MASK    (1 << (GPIO0_IRQ-32))
+#define GPIO1_MASK    (1 << (GPIO1_IRQ-32))
+#define GPIO2_MASK    (1 << (GPIO2_IRQ-32))
 #define SER0_MASK     (1 << (SER0_IRQ-32))
 #define SER1_MASK     (1 << (SER1_IRQ-32))
 #define I2C_MASK      (1 << (I2C_IRQ-32))

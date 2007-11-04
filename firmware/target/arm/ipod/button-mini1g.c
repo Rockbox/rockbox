@@ -164,10 +164,10 @@ static int ipod_mini_button_read(void)
 
 void ipod_mini_button_int(void)
 {
-    CPU_HI_INT_CLR = GPIO_MASK;
+    CPU_HI_INT_CLR = GPIO0_MASK;
     int_btn = ipod_mini_button_read();
     //CPU_INT_EN = 0x40000000;
-    CPU_HI_INT_EN = GPIO_MASK;
+    CPU_HI_INT_EN = GPIO0_MASK;
 }
 
 void button_init_device(void)
@@ -190,7 +190,7 @@ void button_init_device(void)
     GPIOB_INT_EN = 0x30;
     /* unmask interrupt */
     CPU_INT_EN = 0x40000000;
-    CPU_HI_INT_EN = GPIO_MASK;
+    CPU_HI_INT_EN = GPIO0_MASK;
 }
 
 /*
