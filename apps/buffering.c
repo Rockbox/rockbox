@@ -752,22 +752,32 @@ static bool fill_buffer(void)
 void update_data_counters(void)
 {
     struct memory_handle *m = find_handle(base_handle_id);
-    if (!m)
-        base_handle_id = 0;
+    bool is_useful = m==NULL;
 
-    memset(&data_counters, 0, sizeof(data_counters));
+    size_t buffered = 0;
+    size_t wasted = 0;
+    size_t remaining = 0;
+    size_t useful = 0;
 
     m = first_handle;
     while (m) {
-        data_counters.buffered += m->available;
-        data_counters.wasted += RINGBUF_SUB(m->ridx, m->data);
-        data_counters.remaining += m->filerem;
+        buffered += m->available;
+        wasted += RINGBUF_SUB(m->ridx, m->data);
+        remaining += m->filerem;
 
-        if (m->id >= base_handle_id)
-            data_counters.useful += RINGBUF_SUB(m->widx, m->ridx);
+        if (m->id == base_handle_id)
+            is_useful = true;
+
+        if (is_useful)
+            useful += RINGBUF_SUB(m->widx, m->ridx);
 
         m = m->next;
     }
+
+    data_counters.buffered = buffered;
+    data_counters.wasted = wasted;
+    data_counters.remaining = remaining;
+    data_counters.useful = useful;
 }
 
 
