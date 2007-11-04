@@ -86,13 +86,13 @@ bool remote_button_hold(void) {
 }
 #endif
 
+static int lastbtn;
 void button_event(int key, bool pressed)
 {
     int new_btn = 0;
     int diff = 0;
     int data = 0;
     static int count = 0;
-    static int lastbtn;
     static int repeat_speed = REPEAT_INTERVAL_START;
     static int repeat_count = 0;
     static bool repeat = false;
