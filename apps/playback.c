@@ -1029,7 +1029,7 @@ static void set_filebuf_watermark(int seconds, size_t max)
     if (!filebuf)
         return;     /* Audio buffers not yet set up */
 
-    bytes = MAX(curtrack_id3.bitrate * seconds * (1000/8), max);
+    bytes = seconds?MAX(curtrack_id3.bitrate * seconds * (1000/8), max):max;
     bytes = MIN(bytes, filebuflen / 2);
     buf_set_conf(BUFFERING_SET_WATERMARK, bytes);
 }
