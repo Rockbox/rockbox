@@ -533,11 +533,14 @@ static bool buffer_handle(int handle_id)
     {
         if (*h->path)
             h->fd = open(h->path, O_RDONLY);
-        else
-            return true;
 
         if (h->fd < 0)
+        {
+            /* could not open the file, truncate it where it is */
+            h->filesize -= h->filerem;
+            h->filerem = 0;
             return true;
+        }
 
         if (h->offset)
             lseek(h->fd, h->offset, SEEK_SET);
@@ -545,8 +548,6 @@ static bool buffer_handle(int handle_id)
 
     trigger_cpu_boost();
 
-    bool breakable = h->type==TYPE_PACKET_AUDIO;
-    bool ret = true;
     while (h->filerem > 0)
     {
         /* max amount to copy */
@@ -554,17 +555,22 @@ static bool buffer_handle(int handle_id)
                              buffer_len - h->widx);
 
         /* stop copying if it would overwrite the reading position */
-        if (RINGBUF_ADD_CROSS(h->widx, copy_n, buf_ridx) >= 0) {
-            ret = false;
-            break;
-        }
+        if (RINGBUF_ADD_CROSS(h->widx, copy_n, buf_ridx) >= 0)
+            return false;
 
         /* This would read into the next handle, this is broken */
         if (h->next && RINGBUF_ADD_CROSS(h->widx, copy_n,
                     (unsigned)((void *)h->next - (void *)buffer)) > 0) {
             logf("Handle allocation short");
-            ret = false;
-            break;
+            /* Try to recover by truncating this file */
+            int overlap = RINGBUF_ADD_CROSS(h->widx, copy_n,
+                    (unsigned)((void *)h->next - (void *)buffer));
+            h->filerem -= overlap;
+            h->filesize -= overlap;
+            if (h->filerem)
+                continue;
+            else
+                break;
         }
 
         /* rc is the actual amount read */
@@ -594,7 +600,7 @@ static bool buffer_handle(int handle_id)
         yield();
         /* If this is a large file, see if we need to breakor give the codec
          * more time */
-        if (breakable) {
+        if (h->type==TYPE_PACKET_AUDIO) {
             if (!queue_empty(&buffering_queue))
                 break;
             if (pcmbuf_is_lowdata())
@@ -613,7 +619,7 @@ static bool buffer_handle(int handle_id)
         h->fd = -1;
     }
 
-    return ret;
+    return true;
 }
 
 /* Reset writing position and data buffer of a handle to its current offset.
@@ -725,6 +731,7 @@ static bool fill_buffer(void)
 {
     logf("fill_buffer()");
     struct memory_handle *m = first_handle;
+    shrink_handle(m);
     while (queue_empty(&buffering_queue) && m) {
         if (m->filerem > 0) {
             if (!buffer_handle(m->id)) {
@@ -1185,7 +1192,8 @@ void buffering_thread(void)
                 /* Call buffer callbacks here because this is one of two ways
                  * to begin a full buffer fill */
                 call_buffer_low_callbacks();
-                filling |= buffer_handle((int)ev.data);
+                buffer_handle((int)ev.data);
+                filling = true;
                 break;
 
             case Q_RESET_HANDLE:
@@ -1269,10 +1277,7 @@ void buffering_thread(void)
             {
                 if (data_counters.remaining > 0 &&
                     data_counters.useful <= conf_watermark)
-                {
-                    shrink_buffer(first_handle);
                     filling = fill_buffer();
-                }
             }
         }
     }
