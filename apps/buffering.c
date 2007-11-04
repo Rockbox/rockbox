@@ -515,33 +515,6 @@ These functions are used by the buffering thread to manage buffer space.
 */
 
 
-static inline bool filebuf_is_lowdata(void)
-{
-    return BUF_USED < BUFFERING_CRITICAL_LEVEL;
-}
-
-/* Yield to the codec thread for as long as possible if it is in need of data.
-   Return true if the caller should break to let the buffering thread process
-   new queue events */
-static bool yield_codec(void)
-{
-    yield();
-
-    if (!queue_empty(&buffering_queue))
-        return true;
-
-    while (pcmbuf_is_lowdata() && !filebuf_is_lowdata())
-    {
-        sleep(2);
-        trigger_cpu_boost();
-
-        if (!queue_empty(&buffering_queue))
-            return true;
-    }
-
-    return false;
-}
-
 /* Buffer data for the given handle.
    Return whether or not the buffering should continue explicitly.  */
 static bool buffer_handle(int handle_id)
@@ -618,9 +591,20 @@ static bool buffer_handle(int handle_id)
         h->available += rc;
         h->filerem -= rc;
 
-        /* Stop buffering if new queue events have arrived */
-        if (breakable && yield_codec())
-            break;
+        yield();
+        /* If this is a large file, see if we need to breakor give the codec
+         * more time */
+        if (breakable) {
+            if (!queue_empty(&buffering_queue))
+                break;
+            if (pcmbuf_is_lowdata())
+            {
+                sleep(2);
+                trigger_cpu_boost();
+                if (!queue_empty(&buffering_queue))
+                    break;
+            }
+        }
     }
 
     if (h->filerem == 0) {
