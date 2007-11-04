@@ -986,7 +986,11 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * lists)
             pressing the selected item will "enter" it */
         line = y / gui_list->display->char_height;
         if (line != gui_list->selected_item - gui_list->start_item)
+        {
+            if (gui_list->start_item+line > gui_list->nb_items)
+                return ACTION_NONE;
             gui_synclist_select_item(lists, gui_list->start_item+line);
+        }
         
         if (button == BUTTON_REPEAT)
             return ACTION_STD_CONTEXT;
