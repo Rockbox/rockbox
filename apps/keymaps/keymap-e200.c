@@ -36,15 +36,15 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_NEXT,        BUTTON_SCROLL_DOWN,               BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,  BUTTON_SCROLL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
 
-    { ACTION_STD_MENU,        BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
+    { ACTION_STD_MENU,        BUTTON_DOWN|BUTTON_REL,          BUTTON_DOWN },
     { ACTION_STD_REC,         BUTTON_REC|BUTTON_REPEAT,            BUTTON_NONE },
 
     { ACTION_STD_OK,          BUTTON_SELECT|BUTTON_REL,         BUTTON_SELECT },
     { ACTION_STD_OK,          BUTTON_RIGHT,                     BUTTON_NONE },
     { ACTION_STD_CANCEL,      BUTTON_LEFT,                      BUTTON_NONE },
 
-    { ACTION_STD_QUICKSCREEN, BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_NONE },
-    { ACTION_STD_CONTEXT,     BUTTON_DOWN|BUTTON_REL,           BUTTON_NONE },
+    { ACTION_STD_QUICKSCREEN, BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_DOWN },
+    { ACTION_STD_CONTEXT,     BUTTON_SELECT|BUTTON_REPEAT,           BUTTON_SELECT },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -52,7 +52,7 @@ static const struct button_mapping button_context_standard[]  = {
 
 static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,     BUTTON_UP|BUTTON_REL,        BUTTON_UP },
-    { ACTION_WPS_STOP,     BUTTON_UP|BUTTON_REPEAT,     BUTTON_UP },
+    { ACTION_WPS_STOP,     BUTTON_POWER|BUTTON_REL,     BUTTON_POWER },
    
     { ACTION_WPS_SKIPPREV, BUTTON_LEFT|BUTTON_REL,    BUTTON_LEFT },
     { ACTION_WPS_SEEKBACK, BUTTON_LEFT|BUTTON_REPEAT, BUTTON_NONE },
@@ -73,10 +73,10 @@ static const struct button_mapping button_context_wps[]  = {
     
     { ACTION_WPS_BROWSE,        BUTTON_SELECT|BUTTON_REL,  BUTTON_SELECT },
 
-    { ACTION_WPS_CONTEXT,       BUTTON_DOWN|BUTTON_REL,       BUTTON_DOWN },
+    { ACTION_WPS_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_SELECT },
     { ACTION_WPS_QUICKSCREEN,   BUTTON_DOWN|BUTTON_REPEAT,    BUTTON_DOWN },
 
-    { ACTION_WPS_MENU,          BUTTON_POWER|BUTTON_REL,      BUTTON_POWER },
+    { ACTION_WPS_MENU,          BUTTON_DOWN|BUTTON_REL,      BUTTON_DOWN },
     { ACTION_WPS_REC,           BUTTON_REC|BUTTON_REPEAT,        BUTTON_NONE },
     
     { ACTION_WPS_PITCHSCREEN,   BUTTON_SELECT|BUTTON_UP,      BUTTON_SELECT },
@@ -110,7 +110,7 @@ static const struct button_mapping button_context_list[]  = {
 
 static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_UP|BUTTON_REL,         BUTTON_UP },
-    { ACTION_TREE_STOP,   BUTTON_UP|BUTTON_REPEAT,      BUTTON_UP },
+    { ACTION_TREE_STOP,   BUTTON_POWER|BUTTON_REL,      BUTTON_POWER },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_tree */
