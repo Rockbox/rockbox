@@ -1215,11 +1215,23 @@ void buffering_thread(void)
             case Q_SET_WATERMARK:
                 LOGFQUEUE("buffering < Q_SET_WATERMARK");
                 conf_watermark = (size_t)ev.data;
+                if (conf_watermark < conf_filechunk)
+                {
+                    logf("wmark<chunk %ld<%ld", conf_watermark, conf_filechunk);
+                    conf_watermark = conf_filechunk;
+                }
                 break;
 
             case Q_SET_CHUNKSIZE:
                 LOGFQUEUE("buffering < Q_SET_CHUNKSIZE");
                 conf_filechunk = (size_t)ev.data;
+                if (conf_filechunk == 0)
+                    conf_filechunk = BUFFERING_DEFAULT_FILECHUNK;
+                if (conf_filechunk > conf_watermark)
+                {
+                    logf("chunk>wmark %ld>%ld", conf_filechunk, conf_watermark);
+                    conf_watermark = conf_filechunk;
+                }
                 break;
 
             case Q_SET_PRESEEK:
