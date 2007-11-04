@@ -118,8 +118,8 @@ static int track_write_idx = 0;
 
 /* Callback function to call when current track has really changed. */
 void (*track_changed_callback)(struct mp3entry *id3) = NULL;
-void (*track_buffer_callback)(struct mp3entry *id3);
-void (*track_unbuffer_callback)(struct mp3entry *id3);
+void (*track_buffer_callback)(struct mp3entry *id3) = NULL;
+void (*track_unbuffer_callback)(struct mp3entry *id3) = NULL;
 
 /* Cuesheet callback */
 static bool (*cuesheet_callback)(const char *filename) = NULL;
@@ -2874,8 +2874,6 @@ static void mpeg_thread(void)
 void audio_init(void)
 {
     mpeg_errno = 0;
-    track_buffer_callback = NULL;
-    track_unbuffer_callback = NULL;
 
 #ifndef SIMULATOR
     audiobuflen = audiobufend - audiobuf;
