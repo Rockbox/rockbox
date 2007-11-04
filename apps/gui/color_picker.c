@@ -327,6 +327,70 @@ static void draw_screen(struct screen *display, char *title,
     set_drawinfo(display, DRMODE_SOLID, text_color, background_color);
 }
 
+#ifdef HAVE_TOUCHPAD
+int touchpad_slider(struct rgb_pick *rgb, int *selected_slider)
+{
+    short     x,y;
+    int       text_top,i,x1;
+    int       slider_left, slider_width;
+    unsigned  button = action_get_touchpad_press(&x, &y);
+    bool      display_three_rows;
+    int       max_label_width;
+    struct screen *display = &screens[SCREEN_MAIN];
+    int      pressed_slider;
+    char buf[2];
+    
+    if (button == BUTTON_NONE)
+        return ACTION_NONE;
+    /* same logic as draw_screen */
+    /* Figure out widest label character in case they vary -
+       this function assumes labels are one character */
+    for (i = 0, max_label_width = 0; i < 3; i++)
+    {
+        buf[0] = str(LANG_COLOR_RGB_LABELS)[i];
+        buf[1] = '\0';
+        x1 = display->getstringsize(buf, NULL, NULL);
+        if (x1 > max_label_width)
+            max_label_width = x1;
+    }
+    /* Get slider positions and top starting position */
+    text_top     = MARGIN_TOP + display->char_height + TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
+    slider_left  = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN +
+                   max_label_width + SLIDER_MARGIN_LEFT;
+    slider_width = display->width - slider_left - SLIDER_MARGIN_RIGHT -
+                   display->char_width*2 - SELECTOR_LR_MARGIN - SELECTOR_WIDTH -
+                   MARGIN_RIGHT;
+    display_three_rows =
+        display->height >= MARGIN_TOP             +
+                           display->char_height*4 + /* Title + 3 sliders */
+                           TITLE_MARGIN_BOTTOM    +
+                           SELECTOR_TB_MARGIN*6   + /* 2 margins/slider  */
+                           MARGIN_BOTTOM;
+    if (y < MARGIN_TOP+display->char_height)
+    {
+        if (button == BUTTON_REL)
+            return ACTION_STD_CANCEL;
+    }
+    y -= text_top;
+    pressed_slider = y/display->char_height;
+    if (pressed_slider > (display_three_rows?2:0))
+    {
+        if (button == BUTTON_REL)
+            return ACTION_STD_OK;
+    }
+    if ((button == BUTTON_REL) &&
+        pressed_slider != *selected_slider)
+        *selected_slider = pressed_slider;
+    else if (pressed_slider == *selected_slider)
+    {
+        x -= slider_left;
+        rgb->rgb_val[pressed_slider] = 
+            (x*rgb_max[pressed_slider]/(slider_width-slider_left));
+        pack_rgb(rgb);
+    }
+    return ACTION_NONE;
+}
+#endif
 /***********
  set_color
  returns true if USB was inserted, false otherwise
@@ -359,6 +423,10 @@ bool set_color(struct screen *display, char *title, unsigned *color,
         }
 
         button = get_action(CONTEXT_SETTINGS_COLOURCHOOSER, TIMEOUT_BLOCK);
+#ifdef HAVE_TOUCHPAD
+        if (button == ACTION_TOUCHPAD)
+            button = touchpad_slider(&rgb, &slider);
+#endif
 
         switch (button)
         {
@@ -390,7 +458,7 @@ bool set_color(struct screen *display, char *title, unsigned *color,
                 if (banned_color != (unsigned)-1 &&
                     banned_color == rgb.color)
                 {
-                    gui_syncsplash(HZ*2, str(LANG_COLOR_UNACCEPTABLE));
+                    gui_syncsplash(HZ*2, ID2P(LANG_COLOR_UNACCEPTABLE));
                     break;
                 }
                 *color = rgb.color;
