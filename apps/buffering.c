@@ -91,6 +91,8 @@
 /* point at which the file buffer will fight for CPU time */
 #define BUFFERING_CRITICAL_LEVEL         (1024*128)
 
+#define BUF_HANDLE_MASK                  0x7FFFFFFF
+
 
 /* Ring buffer helper macros */
 /* Buffer pointer (p) plus value (v), wrapped if necessary */
@@ -224,7 +226,7 @@ static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
                                         const bool alloc_all)
 {
     /* gives each handle a unique id */
-    static int cur_handle_id = 1;
+    static int cur_handle_id = 0;
     size_t shift;
     size_t new_widx;
     size_t len;
@@ -292,7 +294,7 @@ static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
 
     new_handle->id = cur_handle_id;
     /* Wrap signed int is safe and 0 doesn't happen */
-    if (++cur_handle_id < 1) cur_handle_id = 1;
+    cur_handle_id = (cur_handle_id + 1) & BUF_HANDLE_MASK;
     new_handle->next = NULL;
     num_handles++;
 
@@ -314,7 +316,7 @@ static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
 static bool rm_handle(const struct memory_handle *h)
 {
     if (h == NULL)
-        return false;
+        return true;
 
     mutex_lock(&llist_mutex);
 
@@ -359,7 +361,7 @@ static bool rm_handle(const struct memory_handle *h)
    NULL if the handle wasn't found */
 static struct memory_handle *find_handle(const int handle_id)
 {
-    if (handle_id <= 0)
+    if (handle_id < 0)
         return NULL;
 
     mutex_lock(&llist_mutex);
@@ -664,16 +666,18 @@ static void rebuffer_handle(int handle_id, size_t newpos)
 static bool close_handle(int handle_id)
 {
     struct memory_handle *h = find_handle(handle_id);
+
+    /* If the handle is not found, it is closed */
     if (!h)
-        return false;
+        return true;
 
     if (h->fd >= 0) {
         close(h->fd);
         h->fd = -1;
     }
 
-    rm_handle(h);
-    return true;
+    /* rm_handle returns true unless the handle somehow persists after exit */
+    return rm_handle(h);
 }
 
 /* Free buffer space by moving the handle struct right before the useful
@@ -1327,7 +1331,7 @@ bool buffering_reset(char *buf, size_t buflen)
     cur_handle = NULL;
     cached_handle = NULL;
     num_handles = 0;
-    base_handle_id = 0;
+    base_handle_id = -1;
 
     buffer_callback_count = 0;
     memset(buffer_low_callback_funcs, 0, sizeof(buffer_low_callback_funcs));
