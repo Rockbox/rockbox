@@ -2105,7 +2105,7 @@ static bool audio_release_tracks(void)
 
     logf("releasing all tracks");
 
-    for(i = 0; i < MAX_TRACKS; i++)
+    for(i = 0; i < MAX_TRACK; i++)
     {
         cur_idx = (track_ridx + i) & MAX_TRACK_MASK;
         if (!clear_track_info(&tracks[cur_idx]))
@@ -3273,6 +3273,14 @@ void audio_init(void)
     buffering_init();
     /* ...now! Set up the buffers */
     audio_reset_buffer();
+
+    int i;
+    for(i = 0; i < MAX_TRACK; i++)
+    {
+        tracks[i].audio_hid = -1;
+        tracks[i].id3_hid = -1;
+        tracks[i].codec_hid = -1;
+    }
 
     /* Probably safe to say */
     audio_is_initialized = true;
