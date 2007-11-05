@@ -1207,14 +1207,13 @@ void buffering_thread(void)
                  * to begin a full buffer fill */
                 call_buffer_low_callbacks();
                 shrink_buffer();
-                filling = true;
                 queue_reply(&buffering_queue, 1);
                 break;
 
             case Q_BUFFER_HANDLE:
                 LOGFQUEUE("buffering < Q_BUFFER_HANDLE");
                 queue_reply(&buffering_queue, 1);
-                buffer_handle((int)ev.data);
+                filling |= buffer_handle((int)ev.data);
                 break;
 
             case Q_RESET_HANDLE:
