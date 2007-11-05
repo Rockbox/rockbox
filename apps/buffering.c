@@ -849,7 +849,7 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     h->available = 0;
     h->type = type;
 
-    if (type == TYPE_CODEC || type == TYPE_CUESHEET || type == TYPE_IMAGE) {
+    if (type == TYPE_CUESHEET || type == TYPE_IMAGE) {
         h->fd = fd;
         /* Immediately start buffering those */
         LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");
