@@ -60,7 +60,8 @@
 #endif
 
 /* Define LOGF_ENABLE to enable logf output in this file */
-/*#define LOGF_ENABLE*/
+#define LOGF_ENABLE
+#define BUFFERING_LOGQUEUES
 #include "logf.h"
 
 /* macros to enable logf for queues
@@ -556,8 +557,6 @@ static inline bool buffer_is_low(void)
    new queue events */
 static bool yield_codec(void)
 {
-    yield();
-
     if (!queue_empty(&buffering_queue))
         return true;
 
