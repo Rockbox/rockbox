@@ -36,7 +36,7 @@
 void usb_init_device(void)
 {
     int r0;
-    outl(inl(0x70000084) | 0x200, 0x70000084);  
+    GPO32_ENABLE |= 0x200;  
 
     outl(inl(0x7000002C) | 0x3000000, 0x7000002C);  
     DEV_EN |= DEV_USB;

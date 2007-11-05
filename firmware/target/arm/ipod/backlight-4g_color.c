@@ -43,6 +43,6 @@ inline void __backlight_on(void)
 inline void __backlight_off(void)
 {
    /* fades backlight off on 4g */
-   outl(inl(0x70000084) & ~0x2000000, 0x70000084);
+   GPO32_ENABLE &= ~0x2000000;
    outl(0x80000000, 0x7000a010);
 }

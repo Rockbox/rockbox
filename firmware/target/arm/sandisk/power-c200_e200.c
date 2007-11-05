@@ -86,7 +86,7 @@ bool tuner_power(bool status)
         {
             /* init mystery amplification device */
 #if defined(SANSA_E200)
-            outl(inl(0x70000084) | 0x1, 0x70000084);
+            GPO32_ENABLE |= 0x1;
 #else /* SANSA_C200 */
             DEV_INIT2 &= ~0x800;
 #endif
@@ -121,7 +121,7 @@ bool tuner_power(bool status)
 
             /* turn off mystery amplification device */
 #if defined (SANSA_E200)
-            outl(inl(0x70000084) & ~0x1, 0x70000084);
+            GPO32_ENABLE &= ~0x1;
 #else
             DEV_INIT2 |= 0x800;
 #endif

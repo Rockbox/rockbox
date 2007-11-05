@@ -370,7 +370,7 @@ void lcd_init_device(void)
 /* Init GPIO ports */
     lcd_init_gpio();
 /* Controller init */
-    outl((inl(0x70000084) | (1 << 28)), 0x70000084);
+    GPO32_ENABLE |= (1 << 28);
     GPO32_VAL &= ~(1 << 28);
     DEV_INIT1 = ( (DEV_INIT1 & 0x03ffffff) | (0x15 << 26) );
     outl(((inl(0x70000014) & (0x0fffffff)) | (0x5 << 28)), 0x70000014);

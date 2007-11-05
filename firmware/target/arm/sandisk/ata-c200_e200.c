@@ -1163,7 +1163,7 @@ int ata_init(void)
         /* init controller */
         outl(inl(0x70000088) & ~(0x4), 0x70000088);
         outl(inl(0x7000008c) & ~(0x4), 0x7000008c);
-        outl(inl(0x70000084) | 0x4, 0x70000084);
+        GPO32_ENABLE |= 0x4;
 
         GPIOG_ENABLE     |= (0x3 << 5);
         GPIOG_OUTPUT_EN  |= (0x3 << 5);

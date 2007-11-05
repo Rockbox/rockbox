@@ -334,6 +334,7 @@
 
 /* 32 bit GPO port */
 #define GPO32_VAL        (*(volatile unsigned long *)(0x70000080))
+#define GPO32_ENABLE     (*(volatile unsigned long *)(0x70000084))
 
 /* IIS */
 #define IISDIV              (*(volatile unsigned long*)(0x60006080))

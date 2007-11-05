@@ -170,7 +170,7 @@ void lcd_init_device(void)
 #ifdef IPOD_4G
     GPIOB_ENABLE |= 0x4; /* B02 enable */
     GPIOB_ENABLE |= 0x8; /* B03 enable */
-    outl(inl(0x70000084) | 0x2000000, 0x70000084); /* D01 enable */
+    GPO32_ENABLE |= 0x2000000; /* D01 enable */
     GPO32_VAL |= 0x2000000;  /* D01 =1 */
 
     DEV_EN |= 0x20000;   /* PWM enable */
