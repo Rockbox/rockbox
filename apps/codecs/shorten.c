@@ -66,9 +66,7 @@ next_track:
     ci->memset(&sc, 0, sizeof(ShortenContext));
 
     /* Skip id3v2 tags */
-    if (ci->id3->first_frame_offset) {
-        ci->seek_buffer(ci->id3->first_frame_offset);
-    }
+    ci->seek_buffer(ci->id3->first_frame_offset);
 
     /* Read the shorten & wave headers */
     buf = ci->request_buffer(&bytesleft, MAX_HEADER_SIZE);
