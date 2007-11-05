@@ -656,10 +656,10 @@ static void rebuffer_handle(int handle_id, size_t newpos)
 
     h->offset = newpos;
 
-    LOGFQUEUE("buffering >| buffering Q_RESET_HANDLE");
+    LOGFQUEUE("buffering >| Q_RESET_HANDLE");
     queue_send(&buffering_queue, Q_RESET_HANDLE, handle_id);
 
-    LOGFQUEUE("buffering >| buffering Q_BUFFER_HANDLE");
+    LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");
     queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
 
     h->ridx = h->data;
@@ -849,7 +849,7 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     if (type == TYPE_CODEC || type == TYPE_CUESHEET || type == TYPE_IMAGE) {
         h->fd = fd;
         /* Immediately start buffering those */
-        LOGFQUEUE("buffering >| buffering Q_BUFFER_HANDLE");
+        LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");
         queue_send(&buffering_queue, Q_BUFFER_HANDLE, h->id);
     } else {
         /* Other types will get buffered in the course of normal operations */
@@ -1085,16 +1085,16 @@ ssize_t buf_handle_offset(int handle_id)
 
 void buf_request_buffer_handle(int handle_id)
 {
-    LOGFQUEUE("buffering >| buffering Q_FILL_BUFFER");
+    LOGFQUEUE("buffering >| Q_FILL_BUFFER");
     queue_send(&buffering_queue, Q_FILL_BUFFER, 0);
 
-    LOGFQUEUE("buffering >| buffering Q_BUFFER_HANDLE %d", handle_id);
+    LOGFQUEUE("buffering >| Q_BUFFER_HANDLE %d", handle_id);
     queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
 }
 
 void buf_set_base_handle(int handle_id)
 {
-    LOGFQUEUE("buffering > buffering Q_BASE_HANDLE %d", handle_id);
+    LOGFQUEUE("buffering > Q_BASE_HANDLE %d", handle_id);
     queue_post(&buffering_queue, Q_BASE_HANDLE, handle_id);
 }
 
@@ -1162,6 +1162,7 @@ void unregister_buffer_low_callback(buffer_low_callback func)
 
 static void call_buffer_low_callbacks(void)
 {
+    logf("call_buffer_low_callbacks()");
     int i;
     for (i = 0; i < MAX_BUF_CALLBACKS; i++)
     {
@@ -1174,14 +1175,19 @@ static void call_buffer_low_callbacks(void)
     }
 }
 
-static void shrink_buffer(struct memory_handle *h) {
+static void shrink_buffer_inner(struct memory_handle *h) {
 
     if (h == NULL)
         return;
 
-    shrink_buffer(h->next);
+    shrink_buffer_inner(h->next);
 
     shrink_handle(h);
+}
+
+static void shrink_buffer(void) {
+    logf("shrink_buffer()");
+    shrink_buffer_inner(first_handle);
 }
 
 void buffering_thread(void)
@@ -1200,10 +1206,11 @@ void buffering_thread(void)
                 /* Call buffer callbacks here because this is one of two ways
                  * to begin a full buffer fill */
                 call_buffer_low_callbacks();
-                shrink_buffer(first_handle);
+                shrink_buffer();
                 filling = true;
                 queue_reply(&buffering_queue, 1);
                 break;
+
             case Q_BUFFER_HANDLE:
                 LOGFQUEUE("buffering < Q_BUFFER_HANDLE");
                 queue_reply(&buffering_queue, 1);
@@ -1286,7 +1293,7 @@ void buffering_thread(void)
             {
                 /* This is a new fill, shrink the buffer up first */
                 if (!filling)
-                    shrink_buffer(first_handle);
+                    shrink_buffer();
                 filling = fill_buffer();
                 update_data_counters();
             }
@@ -1303,7 +1310,7 @@ void buffering_thread(void)
             {
                 if (data_counters.remaining > 0 &&
                     data_counters.useful <= conf_watermark) {
-                    shrink_buffer(first_handle);
+                    shrink_buffer();
                     filling = fill_buffer();
                 }
             }
