@@ -142,7 +142,6 @@ const uint32_t pitchTbl[] ICONST_ATTR={
 
 static void findDelta(struct SynthObject * so, int ch, int note)
 {
-
     struct GWaveform * wf = patchSet[chPat[ch]]->waveforms[patchSet[chPat[ch]]->noteTable[note]];
     so->wf=wf;
     unsigned int delta= 0;
@@ -150,6 +149,18 @@ static void findDelta(struct SynthObject * so, int ch, int note)
     delta = (delta * chPBFractBend[ch])>> 16;
 
     so->delta = delta;
+}
+
+static inline void computeDeltas(int ch)
+{
+    int a=0;
+    for(a = 0; a<MAX_VOICES; a++)
+    {
+        if(voices[a].isUsed==1 && voices[a].ch == ch)
+        {
+            findDelta(&voices[a], ch, voices[a].note);
+        }
+    }
 }
 
 static inline void setPW(int ch, int msb, int lsb)
@@ -160,14 +171,7 @@ static inline void setPW(int ch, int msb, int lsb)
     chPBNoteOffset[ch] = totalBend >> 8;
     chPBFractBend[ch] = pitchTbl[(totalBend & 0xFF) + 256];
 
-    int a=0;
-    for(a = 0; a<MAX_VOICES; a++)
-    {
-        if(voices[a].isUsed==1 && voices[a].ch == ch)
-        {
-            findDelta(&voices[a], ch, voices[a].note);
-        }
-    }
+    computeDeltas(ch);
 }
 
 inline void pressNote(int ch, int note, int vol)
@@ -376,7 +380,58 @@ void rewindFile(void)
     }
 }
 
+
 int tick(void) ICODE_ATTR;
+
+void seekBackward(int nsec)
+{
+    int notesUsed = 0, a=0;
+    int desiredTime = playingTime - nsec;  /* Rewind 5 sec */
+
+    if(desiredTime < 0)
+        desiredTime = 0;
+
+    /* Set controllers to default values */
+    resetControllers();
+
+    /* Set the tempo to defalt */
+    bpm=mf->div*1000000/tempo;
+    numberOfSamples=SAMPLE_RATE/bpm;
+
+
+    /* Reset the tracks to start */
+    rewindFile();
+
+    /* Reset the time counter to 0 */
+    playingTime = 0;
+    samplesThisSecond = 0;
+
+    /* Quickly run through any initial things that occur before notes */
+    do
+    {
+        notesUsed = 0;
+        for(a=0; a<MAX_VOICES; a++)
+            if(voices[a].isUsed == 1)
+                notesUsed++;
+        tick();
+    } while(notesUsed == 0);
+
+    /* Reset the time counter to 0 */
+    playingTime = 0;
+    samplesThisSecond = 0;
+
+    /* Tick until goal is reached */
+    while(playingTime < desiredTime)
+        tick();
+}
+
+
+void seekForward(int nsec)
+{
+    int desiredTime = playingTime + nsec;
+    while(tick() && playingTime < desiredTime);
+}
+
 int tick(void)
 {
     if(mf==NULL)

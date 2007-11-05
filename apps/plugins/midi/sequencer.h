@@ -23,5 +23,8 @@ int tick(void);
 void pressNote(int ch, int note, int vol);
 void rewindFile(void);
 
+void seekForward(int nSec);
+void seekBackward(int nSec);
+
 extern long tempo;
 

@@ -108,7 +108,6 @@ int numberOfSamples IBSS_ATTR; /* the number of samples in the current tick */
 int playingTime IBSS_ATTR;  /* How many seconds into the file have we been playing? */
 int samplesThisSecond IBSS_ATTR;    /* How many samples produced during this second so far? */
 
-
 long bpm IBSS_ATTR;
 
 int32_t gmbuf[BUF_SIZE*NBUF];
@@ -122,6 +121,7 @@ static int midimain(void * filename);
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int retval = 0;
+
 
     PLUGIN_IRAM_INIT(api)
 
@@ -317,66 +317,16 @@ static int midimain(void * filename)
                     /* Rewinding is tricky. Basically start the file over */
                     /* but run through the tracks without the synth running */
                     rb->pcm_play_stop();
-
-                    int desiredTime = playingTime - 5;  /* Rewind 5 sec */
-
-                    if(desiredTime < 0)
-                        desiredTime = 0;
-
-                    /* Set controllers to default values */
-                    resetControllers();
-
-                    /* Set the tempo to defalt */
-                    bpm=mf->div*1000000/tempo;
-                    numberOfSamples=SAMPLE_RATE/bpm;
-
-
-                    /* Reset the tracks to start */
-                    rewindFile();
-
-                    /* Reset the time counter to 0 */
-                    playingTime = 0;
-                    samplesThisSecond = 0;
-
-                    /* Quickly run through any initial things that occur before notes */
-                    do
-                    {
-                        notesUsed = 0;
-                        for(a=0; a<MAX_VOICES; a++)
-                            if(voices[a].isUsed == 1)
-                                notesUsed++;
-                        tick();
-                    } while(notesUsed == 0);
-
-                    /* Reset the time counter to 0 */
-                    playingTime = 0;
-                    samplesThisSecond = 0;
-
-
-
-                    /* Tick until goal is reached */
-                    while(playingTime < desiredTime)
-                        tick();
-
+                    seekBackward(5);
                     rb->pcm_play_data(&get_more, NULL, 0);
+
                     break;
                 }
 
                 case BTN_RIGHT:
                 {
-                    /* Skip 5 seconds forward */
-                    /* Skipping forward is easy */
-                    /* Should skip length be retrieved from the RB settings? */
-                    int samp = 5*SAMPLE_RATE;
-
-                    /* Have the issue where numberOfSamples changes within this tick */
-                    int tickCount = samp / numberOfSamples;
-                    int a=0;
-
                     rb->pcm_play_stop();
-
-                    for(a=0; a<tickCount; a++)
-                        tick();
+                    seekForward(5);
                     rb->pcm_play_data(&get_more, NULL, 0);
                     break;
                 }
