@@ -117,11 +117,6 @@ enum codec_status codec_main(void)
      * they should be set differently based on quality setting
      */
 
-    /* The chunk size below is magic.  If set any lower, resume
-     * doesn't work properly (ov_raw_seek() does the wrong thing).
-     */
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*256);
-
 /* We need to flush reserver memory every track load. */
 next_track:
     if (codec_init()) {

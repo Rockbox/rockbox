@@ -124,7 +124,6 @@ enum codec_status codec_main(void)
     /* Generic codec initialisation */
     ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*128);
 
 next_track:
     if (codec_init()) {

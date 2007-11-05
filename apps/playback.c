@@ -90,8 +90,6 @@
 
 /* default point to start buffer refill */
 #define AUDIO_DEFAULT_WATERMARK      (1024*512)
-/* amount of data to read in one read() call */
-#define AUDIO_DEFAULT_FILECHUNK      (1024*32)
 /* amount of guess-space to allow for codecs that must hunt and peck
  * for their correct seeek target, 32k seems a good size */
 #define AUDIO_REBUFFER_GUESS_SIZE    (1024*32)
@@ -1036,7 +1034,7 @@ static void set_filebuf_watermark(int seconds, size_t max)
 
     bytes = seconds?MAX(curtrack_id3.bitrate * seconds * (1000/8), max):max;
     bytes = MIN(bytes, filebuflen / 2);
-    buf_set_conf(BUFFERING_SET_WATERMARK, bytes);
+    buf_set_watermark(bytes);
 }
 
 const char * get_codec_filename(int cod_spec)
@@ -1657,10 +1655,6 @@ static void codec_configure_callback(int setting, intptr_t value)
     switch (setting) {
     case CODEC_SET_FILEBUF_WATERMARK:
         set_filebuf_watermark(buffer_margin, value);
-        break;
-
-    case CODEC_SET_FILEBUF_CHUNKSIZE:
-        buf_set_conf(BUFFERING_SET_CHUNKSIZE, value);
         break;
 
     default:
@@ -2289,8 +2283,7 @@ static bool audio_load_track(int offset, bool start_play)
         int last_codec = current_codec;
 
         set_current_codec(CODEC_IDX_AUDIO);
-        buf_set_conf(BUFFERING_SET_WATERMARK, AUDIO_DEFAULT_WATERMARK);
-        buf_set_conf(BUFFERING_SET_CHUNKSIZE, AUDIO_DEFAULT_FILECHUNK);
+        buf_set_watermark(AUDIO_DEFAULT_WATERMARK);
         dsp_configure(DSP_RESET, 0);
         set_current_codec(last_codec);
 

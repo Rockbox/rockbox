@@ -117,7 +117,7 @@ enum {
     BUFFERING_SET_WATERMARK = 1,
     BUFFERING_SET_CHUNKSIZE,
 };
-void buf_set_conf(int setting, size_t value);
+void buf_set_watermark(size_t bytes);
 
 
 /* Debugging */

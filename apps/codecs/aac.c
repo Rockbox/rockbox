@@ -53,7 +53,6 @@ enum codec_status codec_main(void)
     unsigned char c = 0;
 
     /* Generic codec initialisation */
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, 1024*512);
 
     ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);

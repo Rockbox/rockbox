@@ -55,7 +55,6 @@ enum codec_status codec_main(void)
     /* Generic codec initialisation */
     /* we only render 16 bits */
     ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
-    /*ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*256);*/
   
 next_track:
     DEBUGF("ADX: next_track\n");

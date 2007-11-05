@@ -133,8 +133,6 @@ static volatile size_t buf_ridx;  /* current reading position */
 
 /* Configuration */
 static size_t conf_watermark = 0; /* Level to trigger filebuf fill */
-static size_t conf_filechunk = 0; /* Bytes-per-read for buffering (impacts
-                                     responsiveness of buffering thread) */
 #if MEM > 8
 static size_t high_watermark = 0; /* High watermark for rebuffer */
 #endif
@@ -167,7 +165,8 @@ static struct {
 
 /* Messages available to communicate with the buffering thread */
 enum {
-    Q_BUFFER_HANDLE = 1, /* Request buffering of a handle */
+    Q_BUFFER_HANDLE = 1, /* Request buffering of a handle, this should not be
+                            used in a low buffer situation. */
     Q_RESET_HANDLE,      /* (internal) Request resetting of a handle to its
                             offset (the offset has to be set beforehand) */
     Q_CLOSE_HANDLE,      /* Request closing a handle */
@@ -552,7 +551,7 @@ static bool buffer_handle(int handle_id)
     while (h->filerem > 0)
     {
         /* max amount to copy */
-        size_t copy_n = MIN( MIN(h->filerem, conf_filechunk),
+        size_t copy_n = MIN( MIN(h->filerem, BUFFERING_DEFAULT_FILECHUNK),
                              buffer_len - h->widx);
 
         /* stop copying if it would overwrite the reading position */
@@ -1101,23 +1100,10 @@ size_t buf_used(void)
     return BUF_USED;
 }
 
-void buf_set_conf(int setting, size_t value)
+void buf_set_watermark(size_t bytes)
 {
-    int msg;
-    switch (setting)
-    {
-        case BUFFERING_SET_WATERMARK:
-            msg = Q_SET_WATERMARK;
-            break;
-
-        case BUFFERING_SET_CHUNKSIZE:
-            msg = Q_SET_CHUNKSIZE;
-            break;
-
-        default:
-            return;
-    }
-    queue_post(&buffering_queue, msg, value);
+    LOGFQUEUE("buffering > Q_SET_WATERMARK %ld", bytes);
+    queue_post(&buffering_queue, Q_SET_WATERMARK, bytes);
 }
 
 bool register_buffer_low_callback(buffer_low_callback func)
@@ -1228,22 +1214,11 @@ void buffering_thread(void)
             case Q_SET_WATERMARK:
                 LOGFQUEUE("buffering < Q_SET_WATERMARK");
                 conf_watermark = (size_t)ev.data;
-                if (conf_watermark < conf_filechunk)
+                if (conf_watermark < BUFFERING_DEFAULT_FILECHUNK)
                 {
-                    logf("wmark<chunk %ld<%ld", conf_watermark, conf_filechunk);
-                    conf_watermark = conf_filechunk;
-                }
-                break;
-
-            case Q_SET_CHUNKSIZE:
-                LOGFQUEUE("buffering < Q_SET_CHUNKSIZE");
-                conf_filechunk = (size_t)ev.data;
-                if (conf_filechunk == 0)
-                    conf_filechunk = BUFFERING_DEFAULT_FILECHUNK;
-                if (conf_filechunk > conf_watermark)
-                {
-                    logf("chunk>wmark %ld>%ld", conf_filechunk, conf_watermark);
-                    conf_watermark = conf_filechunk;
+                    logf("wmark<chunk %ld<%d",
+                            conf_watermark, BUFFERING_DEFAULT_FILECHUNK);
+                    conf_watermark = BUFFERING_DEFAULT_FILECHUNK;
                 }
                 break;
 
@@ -1308,7 +1283,6 @@ void buffering_thread(void)
 void buffering_init(void) {
     mutex_init(&llist_mutex);
 
-    conf_filechunk = BUFFERING_DEFAULT_FILECHUNK;
     conf_watermark = BUFFERING_DEFAULT_WATERMARK;
 
     queue_init(&buffering_queue, true);

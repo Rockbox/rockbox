@@ -78,7 +78,6 @@ enum codec_status codec_main(void)
     int retval = CODEC_OK;
     
     ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
-    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
     
     /* Create a decoder instance */
     reader.read = read_impl;
@@ -133,14 +132,12 @@ next_track:
     /* Resume to saved sample offset. */
     if(samplesdone > 0) {
         /* hack to improve seek time if filebuf goes empty */
-        ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*512);
         if (mpc_decoder_seek_sample(&decoder, samplesdone)) {
             ci->set_elapsed(samplesdone/frequency);
         } else {
             samplesdone = 0;
         }
         /* reset chunksize */
-        ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
     }
 
     /* This is the decoding loop. */
@@ -149,7 +146,6 @@ next_track:
        /* Complete seek handler. */
         if (ci->seek_time) {
             /* hack to improve seek time if filebuf goes empty */
-            ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*512);
             mpc_int64_t new_offset = (ci->seek_time - 1)*frequency;
             if (mpc_decoder_seek_sample(&decoder, new_offset)) {
                 samplesdone = new_offset;
@@ -157,7 +153,6 @@ next_track:
             }
             ci->seek_complete();
             /* reset chunksize */
-            ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
 
         }
         #else
