@@ -650,6 +650,14 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     if (!h)
         return;
 
+    if (newpos > h->offset && newpos - h->offset < BUFFERING_DEFAULT_FILECHUNK)
+    {
+        LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");
+        queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
+        h->ridx = h->data + newpos;
+        return;
+    }
+        
     h->offset = newpos;
 
     LOGFQUEUE("buffering >| Q_RESET_HANDLE");
