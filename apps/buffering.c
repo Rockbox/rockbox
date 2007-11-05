@@ -655,9 +655,11 @@ static bool buffer_handle(int handle_id)
         h->available += rc;
         h->filerem -= rc;
 
+        yield();
+
         /* If this is a large file, see if we need to break or give the codec
          * more time */
-        if (h->type==TYPE_PACKET_AUDIO && yield_codec())
+        if (h->type == TYPE_PACKET_AUDIO && yield_codec())
             break;
     }
 
