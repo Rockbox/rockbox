@@ -116,7 +116,6 @@ void unregister_buffer_low_callback(buffer_low_callback func);
 enum {
     BUFFERING_SET_WATERMARK = 1,
     BUFFERING_SET_CHUNKSIZE,
-    BUFFERING_SET_PRESEEK,
 };
 void buf_set_conf(int setting, size_t value);
 

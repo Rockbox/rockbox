@@ -79,7 +79,6 @@ enum codec_status codec_main(void)
     
     ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, 1024*16);
-    ci->configure(CODEC_SET_FILEBUF_PRESEEK, 0);
     
     /* Create a decoder instance */
     reader.read = read_impl;

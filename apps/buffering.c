@@ -135,8 +135,6 @@ static volatile size_t buf_ridx;  /* current reading position */
 static size_t conf_watermark = 0; /* Level to trigger filebuf fill */
 static size_t conf_filechunk = 0; /* Bytes-per-read for buffering (impacts
                                      responsiveness of buffering thread) */
-static size_t conf_preseek   = 0; /* Distance a codec may look backwards after
-                                     seeking, to prevent double rebuffers */
 #if MEM > 8
 static size_t high_watermark = 0; /* High watermark for rebuffer */
 #endif
@@ -178,7 +176,6 @@ enum {
     /* Configuration: */
     Q_SET_WATERMARK,
     Q_SET_CHUNKSIZE,
-    Q_SET_PRESEEK,
     Q_FILL_BUFFER,       /* Request that the buffering thread initiate a buffer
                             fill at its earliest convenience */
 };
@@ -1117,10 +1114,6 @@ void buf_set_conf(int setting, size_t value)
             msg = Q_SET_CHUNKSIZE;
             break;
 
-        case BUFFERING_SET_PRESEEK:
-            msg = Q_SET_PRESEEK;
-            break;
-
         default:
             return;
     }
@@ -1252,11 +1245,6 @@ void buffering_thread(void)
                     logf("chunk>wmark %ld>%ld", conf_filechunk, conf_watermark);
                     conf_watermark = conf_filechunk;
                 }
-                break;
-
-            case Q_SET_PRESEEK:
-                LOGFQUEUE("buffering < Q_SET_PRESEEK");
-                conf_preseek = (size_t)ev.data;
                 break;
 
 #ifndef SIMULATOR

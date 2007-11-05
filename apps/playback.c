@@ -1663,10 +1663,6 @@ static void codec_configure_callback(int setting, intptr_t value)
         buf_set_conf(BUFFERING_SET_CHUNKSIZE, value);
         break;
 
-    case CODEC_SET_FILEBUF_PRESEEK:
-        buf_set_conf(BUFFERING_SET_PRESEEK, value);
-        break;
-
     default:
         if (!dsp_configure(setting, value)) { logf("Illegal key:%d", setting); }
     }
@@ -2295,7 +2291,6 @@ static bool audio_load_track(int offset, bool start_play)
         set_current_codec(CODEC_IDX_AUDIO);
         buf_set_conf(BUFFERING_SET_WATERMARK, AUDIO_DEFAULT_WATERMARK);
         buf_set_conf(BUFFERING_SET_CHUNKSIZE, AUDIO_DEFAULT_FILECHUNK);
-        buf_set_conf(BUFFERING_SET_PRESEEK, AUDIO_REBUFFER_GUESS_SIZE);
         dsp_configure(DSP_RESET, 0);
         set_current_codec(last_codec);
 
@@ -2441,8 +2436,12 @@ static bool audio_load_track(int offset, bool start_play)
 
     logf("alt:%s", trackname);
 
-    if (!file_offset && track_id3->first_frame_offset)
+    if (file_offset > AUDIO_REBUFFER_GUESS_SIZE)
+        file_offset -= AUDIO_REBUFFER_GUESS_SIZE;
+    else if (track_id3->first_frame_offset)
         file_offset = track_id3->first_frame_offset;
+    else
+        file_offset = 0;
 
     tracks[track_widx].audio_hid = bufopen(trackname, file_offset, type);
 
