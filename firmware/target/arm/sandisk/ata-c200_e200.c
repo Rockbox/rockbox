@@ -25,7 +25,7 @@
 #include "thread.h"
 #include "led.h"
 #include "disk.h"
-#include "pp5024.h"
+#include "cpu.h"
 #include "panic.h"
 #include "usb.h"
 
@@ -529,7 +529,7 @@ static void sd_card_mux(int card_no)
 #ifdef SANSA_E200
     if (card_no == 0)
     {
-        GPO32 |= 0x4;
+        GPO32_VAL |= 0x4;
 
         GPIOA_ENABLE     &= ~0x7a;
         GPIOA_OUTPUT_EN  &= ~0x7a;
@@ -541,7 +541,7 @@ static void sd_card_mux(int card_no)
     }
     else
     {
-        GPO32 &= ~0x4;
+        GPO32_VAL &= ~0x4;
 
         GPIOD_ENABLE     &= ~0x1f;
         GPIOD_OUTPUT_EN  &= ~0x1f;
@@ -554,7 +554,7 @@ static void sd_card_mux(int card_no)
 #else /* SANSA_C200 */
     if (card_no == 0)
     {
-        GPO32 |= 0x4;
+        GPO32_VAL |= 0x4;
 
         GPIOD_ENABLE     &= ~0x1f;
         GPIOD_OUTPUT_EN  &= ~0x1f;
@@ -566,7 +566,7 @@ static void sd_card_mux(int card_no)
     }
     else
     {
-        GPO32 &= ~0x4;
+        GPO32_VAL &= ~0x4;
 
         GPIOA_ENABLE     &= ~0x7a;
         GPIOA_OUTPUT_EN  &= ~0x7a;
