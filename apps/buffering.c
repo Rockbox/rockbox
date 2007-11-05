@@ -565,7 +565,7 @@ static bool buffer_handle(int handle_id)
                     (unsigned)((void *)h->next - (void *)buffer));
             h->filerem -= copy_n;
             h->filesize -= copy_n;
-            logf("buf alloc short %ld",copy_n);
+            logf("buf alloc short %ld", (long)copy_n);
             if (h->filerem)
                 continue;
             else
@@ -1106,7 +1106,7 @@ size_t buf_used(void)
 
 void buf_set_watermark(size_t bytes)
 {
-    LOGFQUEUE("buffering > Q_SET_WATERMARK %ld", bytes);
+    LOGFQUEUE("buffering > Q_SET_WATERMARK %ld", (long)bytes);
     queue_post(&buffering_queue, Q_SET_WATERMARK, bytes);
 }
 
@@ -1222,7 +1222,7 @@ void buffering_thread(void)
                 if (conf_watermark < BUFFERING_DEFAULT_FILECHUNK)
                 {
                     logf("wmark<chunk %ld<%d",
-                            conf_watermark, BUFFERING_DEFAULT_FILECHUNK);
+                         (long)conf_watermark, BUFFERING_DEFAULT_FILECHUNK);
                     conf_watermark = BUFFERING_DEFAULT_FILECHUNK;
                 }
                 break;

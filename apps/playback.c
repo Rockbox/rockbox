@@ -846,7 +846,7 @@ void audio_set_buffer_margin(int setting)
 {
     static const int lookup[] = {5, 15, 30, 60, 120, 180, 300, 600};
     buffer_margin = lookup[setting];
-    logf("buffer margin: %ld", buffer_margin);
+    logf("buffer margin: %ld", (long)buffer_margin);
     set_filebuf_watermark(buffer_margin, 0);
 }
 #endif
