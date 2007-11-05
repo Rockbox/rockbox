@@ -914,12 +914,12 @@ int lv24020lp_get(int setting)
         bool fmstatus = true;
 
         if (!(tuner_status & TUNER_PRESENCE_CHECKED))
-            fmstatus = tuner_power_nolock(true);
+            fmstatus = tuner_power(true);
 
         val = (tuner_status & TUNER_PRESENT) != 0;
 
         if (!fmstatus)
-            tuner_power_nolock(false);
+            tuner_power(false);
         break;
         }
 

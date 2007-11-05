@@ -69,12 +69,14 @@ void ide_power_enable(bool on)
 }
 
 #if CONFIG_TUNER
+
 /** Tuner **/
 static bool powered = false;
 
-bool tuner_power_nolock(bool status)
+bool tuner_power(bool status)
 {
     bool old_status;
+    lv24020lp_lock();
 
     old_status = powered;
 
@@ -128,16 +130,8 @@ bool tuner_power_nolock(bool status)
         powered = status;
     }
 
-    return old_status;
-}
-
-bool tuner_power(bool status)
-{
-    bool old_status;
-    lv24020lp_lock();
-    old_status = tuner_power_nolock(status);
     lv24020lp_unlock();
     return old_status;
 }
 
-#endif
+#endif /* CONFIG_TUNER */
