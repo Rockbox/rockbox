@@ -586,9 +586,9 @@ const struct settings_list settings[] = {
         TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC), 
         TALK_ID(3, UNIT_SEC), TALK_ID(5, UNIT_SEC), TALK_ID(10, UNIT_SEC)),
 #endif
-    INT_SETTING(0, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",                      
+    INT_SETTING(F_PADTITLE, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",                      
                 UNIT_INT, 0, 15, 1, NULL, NULL, lcd_scroll_speed),
-    INT_SETTING(0, scroll_delay, LANG_SCROLL_DELAY, 1000, "scroll delay",                      
+    INT_SETTING(F_PADTITLE, scroll_delay, LANG_SCROLL_DELAY, 1000, "scroll delay",                      
                 UNIT_MS, 0, 2500, 100, NULL,
                 NULL, lcd_scroll_delay) ,
     INT_SETTING(0, bidir_limit, LANG_BIDIR_SCROLL, 50, "bidir limit",                      
@@ -606,9 +606,9 @@ const struct settings_list settings[] = {
 #ifdef HAVE_LCD_BITMAP
     OFFON_SETTING(0, offset_out_of_view, LANG_SCREEN_SCROLL_VIEW,
                     false, "Screen Scrolls Out Of View", gui_list_screen_scroll_out_of_view),
-    INT_SETTING(0, scroll_step, LANG_SCROLL_STEP, 6, "scroll step",                      
+    INT_SETTING(F_PADTITLE, scroll_step, LANG_SCROLL_STEP, 6, "scroll step",                      
                     UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL, lcd_scroll_step),
-    INT_SETTING(0, screen_scroll_step, LANG_SCREEN_SCROLL_STEP,
+    INT_SETTING(F_PADTITLE, screen_scroll_step, LANG_SCREEN_SCROLL_STEP,
                     16, "screen scroll step",                      
                     UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL, gui_list_screen_scroll_step),
 #endif /* HAVE_LCD_BITMAP */

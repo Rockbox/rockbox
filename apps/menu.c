@@ -282,10 +282,34 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
                                                temp->variable,
                                                &setting_id);
     char *title;
+    char padded_title[MAX_PATH];
     if ((temp->flags&MENU_TYPE_MASK) == MT_SETTING_W_TEXT)
         title = temp->callback_and_desc->desc;
     else
         title = ID2P(setting->lang_id);
+    
+    /* this is needed so the scroll settings title
+       can actually be used to test the setting */
+    if (setting->flags&F_PADTITLE)
+    {
+        int i = 0, len;
+        if (setting->lang_id == -1)
+            title = (char*)setting->cfg_vals;
+        else
+            title = P2STR((unsigned char*)title);
+        len = strlen(title);
+        while (i<MAX_PATH)
+        {
+            strncpy(&padded_title[i], title, 
+                    len<MAX_PATH-1-i?len:MAX_PATH-1-i);
+            i += len;
+            if (i<MAX_PATH-1)
+                padded_title[i++] = ' ';
+        }
+        padded_title[i] = '\0';
+        title = padded_title;
+    }
+    
     option_screen((struct settings_list *)setting, 
                   setting->flags&F_TEMPVAR, title);
     return false;
