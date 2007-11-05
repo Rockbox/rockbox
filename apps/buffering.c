@@ -502,10 +502,11 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
 BUFFER SPACE MANAGEMENT
 =======================
 
+update_data_counters: Updates the values in data_counters
+buffer_is_low   : Returns true if the amount of useful data in the buffer is low
 yield_codec     : Used by buffer_handle to know if it should interrupt buffering
 buffer_handle   : Buffer data for a handle
-reset_handle    : Reset writing position and data buffer of a handle to its
-                  current offset
+reset_handle    : Reset write position and data buffer of a handle to its offset
 rebuffer_handle : Seek to a nonbuffered part of a handle by rebuffering the data
 shrink_handle   : Free buffer space by moving a handle
 fill_buffer     : Call buffer_handle for all handles that have data to buffer
@@ -513,6 +514,64 @@ fill_buffer     : Call buffer_handle for all handles that have data to buffer
 These functions are used by the buffering thread to manage buffer space.
 */
 
+static void update_data_counters(void)
+{
+    struct memory_handle *m = find_handle(base_handle_id);
+    bool is_useful = m==NULL;
+
+    size_t buffered = 0;
+    size_t wasted = 0;
+    size_t remaining = 0;
+    size_t useful = 0;
+
+    m = first_handle;
+    while (m) {
+        buffered += m->available;
+        wasted += RINGBUF_SUB(m->ridx, m->data);
+        remaining += m->filerem;
+
+        if (m->id == base_handle_id)
+            is_useful = true;
+
+        if (is_useful)
+            useful += RINGBUF_SUB(m->widx, m->ridx);
+
+        m = m->next;
+    }
+
+    data_counters.buffered = buffered;
+    data_counters.wasted = wasted;
+    data_counters.remaining = remaining;
+    data_counters.useful = useful;
+}
+
+static inline bool buffer_is_low(void)
+{
+    update_data_counters();
+    return data_counters.useful < BUFFERING_CRITICAL_LEVEL;
+}
+
+/* Yield to the codec thread for as long as possible if it is in need of data.
+   Return true if the caller should break to let the buffering thread process
+   new queue events */
+static bool yield_codec(void)
+{
+    yield();
+
+    if (!queue_empty(&buffering_queue))
+        return true;
+
+    while (pcmbuf_is_lowdata() && !buffer_is_low())
+    {
+        sleep(2);
+        trigger_cpu_boost();
+
+        if (!queue_empty(&buffering_queue))
+            return true;
+    }
+
+    return false;
+}
 
 /* Buffer data for the given handle.
    Return whether or not the buffering should continue explicitly.  */
@@ -596,20 +655,10 @@ static bool buffer_handle(int handle_id)
         h->available += rc;
         h->filerem -= rc;
 
-        yield();
-        /* If this is a large file, see if we need to breakor give the codec
+        /* If this is a large file, see if we need to break or give the codec
          * more time */
-        if (h->type==TYPE_PACKET_AUDIO) {
-            if (!queue_empty(&buffering_queue))
-                break;
-            if (pcmbuf_is_lowdata())
-            {
-                sleep(2);
-                trigger_cpu_boost();
-                if (!queue_empty(&buffering_queue))
-                    break;
-            }
-        }
+        if (h->type==TYPE_PACKET_AUDIO && yield_codec())
+            break;
     }
 
     if (h->filerem == 0) {
@@ -763,37 +812,6 @@ static bool fill_buffer(void)
 #endif
         return false;
     }
-}
-
-void update_data_counters(void)
-{
-    struct memory_handle *m = find_handle(base_handle_id);
-    bool is_useful = m==NULL;
-
-    size_t buffered = 0;
-    size_t wasted = 0;
-    size_t remaining = 0;
-    size_t useful = 0;
-
-    m = first_handle;
-    while (m) {
-        buffered += m->available;
-        wasted += RINGBUF_SUB(m->ridx, m->data);
-        remaining += m->filerem;
-
-        if (m->id == base_handle_id)
-            is_useful = true;
-
-        if (is_useful)
-            useful += RINGBUF_SUB(m->widx, m->ridx);
-
-        m = m->next;
-    }
-
-    data_counters.buffered = buffered;
-    data_counters.wasted = wasted;
-    data_counters.remaining = remaining;
-    data_counters.useful = useful;
 }
 
 
