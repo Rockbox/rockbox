@@ -6,23 +6,29 @@
   \item[LCD Settings:]
     This sub menu contains settings that relate to the display of the \dap.
     \begin{description}
-    \nopt{ondiofm,ondiosp}{
+    \opt{HAVE_BACKLIGHT}{
       \item[Backlight:]
       The amount of time the backlight shines after a key press. If set to
       \setting{Off}, the backlight will not light when a button is pressed. If
       set to \setting{On}, the backlight will never shut off. If set to a time
       (1 to 90 seconds), the backlight will stay lit for that amount of time
       after a button press.
-      \item[Backlight on When Plugged:]
-      This setting is equivalent to the Backlight setting except it applies when
-      the \dap\ is plugged into the charger. 
+      \item[Backlight (While Plugged In):]
+      This setting is equivalent to the \setting{Backlight} setting except it
+      applies when the \dap{} is plugged into the charger.
+      \item[Backlight on Hold:]
+      This setting controls the behavior of the backlight when the Hold switch
+      is toggled. If set to \setting{Normal} the backlight will behave as usual.
+      If set to \setting{Off} the backlight will be turned off immediately when
+      the Hold switch is engaged and if set to \setting{On} the backlight will
+      be turned on and stay on while the Hold switch is engaged.
       \item[Caption Backlight:]
       This option turns on the backlight a number of seconds before the start
       of a new track, and keeps it on for the same number of seconds after the
       beginning so that the display can be read to see song information. The
       amount of time is determined by the value of the backlight timeout
       setting, but is no less than 5 seconds.
-      \opt{h1xx,ipodmini,ipodnano,ipodvideo}{
+      \opt{HAVE_BACKLIGHT_PWM_FADING}{
         \item[Backlight fade in:]
         The amount of time that the backlight will take to fade from off to on
         after a button is pressed. If set to \setting{Off} the backlight will
@@ -39,34 +45,39 @@
       With this option enabled the first keypress while the backlight is turned
       off will only turn the backlight on without having any other effect. When
       disabled the first keypress will \emph{also} perform its appropriate action.
-      \opt{h300,x5}{
+      
+      \opt{HAVE_LCD_SLEEP}{
+        \item[Sleep (After Backlight Off):]
+        This setting controls how long rockbox will wait before turning off the
+        display after the backlight is turned off. Turning off the display
+        saves a little bit of battery power but turning on the display takes
+        noticeably longer than just turning on the backlight.
+      }
+      
+      \opt{HAVE_BACKLIGHT_BRIGHTNESS}{
         \item[Brightness:]
         Changes the brightness of your LCD display.
       }
-    } % \nopt{ondiofm,ondiosp}
+    } % \opt{HAVE_BACKLIGHT}
     
     \opt{archos,h1xx,ipodmini,ipod3g,ipod4g,x5}{
       \item[Contrast:]
       Changes the contrast of your LCD display.
       \warn{Setting the contrast too dark or too light can make it hard to
         find this menu option again!}
-      \nopt{HAVE_LCD_COLOR,player}{
-        \item[LCD Mode:]
-        This setting lets you invert the whole screen, so now you get a
-        black background and light text and graphics.
-      } % \opt{HAVE_LCD_BITMAP}
     } % \opt{archos,h1xx,ipodmini,ipod4g,x5}
-    
-    \opt{HAVE_LCD_BITMAP}{
-      \nopt{ipodcolor,ipodnano,ipodvideo}{
-        \item[Upside Down:]
-        Displays the screen so that the top of the display is nearest the buttons.
-        This is sometimes useful when carrying the \dap\ in a pocket for easy
-        access to the headphone socket.
-      } % \nopt{ipodcolor,ipodnano.ipodvideo}
 
-      
-    } % \opt{HAVE_LCD_BITMAP}
+    \opt{HAVE_LCD_INVERT}{
+      \item[LCD Mode:]
+      This setting lets you invert the colours of the display.
+    }
+
+    \opt{HAVE_LCD_FLIP}{
+      \item[Upside Down:]
+      Displays the screen so that the top of the display is nearest the buttons.
+      This is sometimes useful when carrying the \dap{} in a pocket for easy
+      access to the headphone socket.
+    }
     \end{description}
 %
   \opt{HAVE_REMOTE_LCD}{
