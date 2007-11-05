@@ -94,7 +94,10 @@ next_track:
     current_frequency = ci->id3->frequency;
     codec_set_replaygain(ci->id3);
     
-    ci->seek_buffer(ci->id3->first_frame_offset);
+    if (ci->id3->offset)
+        ci->seek_buffer(ci->id3->offset);
+    else
+        ci->seek_buffer(ci->id3->first_frame_offset);
 
     if (ci->id3->lead_trim >= 0 && ci->id3->tail_trim >= 0) {
         stop_skip = ci->id3->tail_trim - mpeg_latency[ci->id3->layer];
