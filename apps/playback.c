@@ -1803,7 +1803,7 @@ static bool codec_request_next_track_callback(void)
     /* Seek to the beginning of the new track because if the struct mp3entry was
        buffered, "elapsed" might not be zero (if the track has been played
        already but not unbuffered) */
-    codec_seek_buffer_callback(0);
+    codec_seek_buffer_callback(curtrack_id3.first_frame_offset);
 
     /* Check if the next codec is the same file. */
     if (prev_codectype == get_codec_base_type(curtrack_id3.codectype))
@@ -2440,6 +2440,9 @@ static bool audio_load_track(int offset, bool start_play)
     }
 
     logf("alt:%s", trackname);
+
+    if (!file_offset && track_id3->first_frame_offset)
+        file_offset = track_id3->first_frame_offset;
 
     tracks[track_widx].audio_hid = bufopen(trackname, file_offset, type);
 

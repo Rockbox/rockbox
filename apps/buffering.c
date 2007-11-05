@@ -563,12 +563,12 @@ static bool buffer_handle(int handle_id)
         /* This would read into the next handle, this is broken */
         if (h->next && RINGBUF_ADD_CROSS(h->widx, copy_n,
                     (unsigned)((void *)h->next - (void *)buffer)) > 0) {
-            logf("Handle allocation short");
             /* Try to recover by truncating this file */
-            int overlap = RINGBUF_ADD_CROSS(h->widx, copy_n,
+            copy_n = RINGBUF_ADD_CROSS(h->widx, copy_n,
                     (unsigned)((void *)h->next - (void *)buffer));
-            h->filerem -= overlap;
-            h->filesize -= overlap;
+            h->filerem -= copy_n;
+            h->filesize -= copy_n;
+            logf("buf alloc short %ld",copy_n);
             if (h->filerem)
                 continue;
             else

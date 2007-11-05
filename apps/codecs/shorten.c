@@ -68,8 +68,7 @@ next_track:
 
     /* Skip id3v2 tags */
     if (ci->id3->first_frame_offset) {
-        buf = ci->request_buffer(&bytesleft, ci->id3->first_frame_offset);
-        ci->advance_buffer(ci->id3->first_frame_offset);
+        ci->seek_buffer(ci->id3->first_frame_offset);
     }
 
     /* Read the shorten & wave headers */
