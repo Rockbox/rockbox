@@ -371,7 +371,7 @@ void lcd_init_device(void)
     lcd_init_gpio();
 /* Controller init */
     outl((inl(0x70000084) | (1 << 28)), 0x70000084);
-    outl((inl(0x70000080) & ~(1 << 28)), 0x70000080);
+    GPO32 &= ~(1 << 28);
     DEV_INIT1 = ( (DEV_INIT1 & 0x03ffffff) | (0x15 << 26) );
     outl(((inl(0x70000014) & (0x0fffffff)) | (0x5 << 28)), 0x70000014);
     outl((inl(0x70000020) & ~(0x3 << 10)), 0x70000020);
@@ -419,9 +419,9 @@ void lcd_init_device(void)
 
 /* LCD init */
     /* Pull RESET low, then high to reset driver IC */
-    outl((inl(0x70000080) & ~(1 << 28)), 0x70000080);
+    GPO32 &= ~(1 << 28);
     udelay(10000);
-    outl((inl(0x70000080) | (1 << 28)), 0x70000080);
+    GPO32 |= (1 << 28);
     udelay(10000);
 
     lcd_display_on();

@@ -529,7 +529,7 @@ static void sd_card_mux(int card_no)
 #ifdef SANSA_E200
     if (card_no == 0)
     {
-        outl(inl(0x70000080) | 0x4, 0x70000080);
+        GPO32 |= 0x4;
 
         GPIOA_ENABLE     &= ~0x7a;
         GPIOA_OUTPUT_EN  &= ~0x7a;
@@ -541,7 +541,7 @@ static void sd_card_mux(int card_no)
     }
     else
     {
-        outl(inl(0x70000080) & ~0x4, 0x70000080);
+        GPO32 &= ~0x4;
 
         GPIOD_ENABLE     &= ~0x1f;
         GPIOD_OUTPUT_EN  &= ~0x1f;
@@ -554,7 +554,7 @@ static void sd_card_mux(int card_no)
 #else /* SANSA_C200 */
     if (card_no == 0)
     {
-        outl(inl(0x70000080) | 0x4, 0x70000080);
+        GPO32 |= 0x4;
 
         GPIOD_ENABLE     &= ~0x1f;
         GPIOD_OUTPUT_EN  &= ~0x1f;
@@ -566,7 +566,7 @@ static void sd_card_mux(int card_no)
     }
     else
     {
-        outl(inl(0x70000080) & ~0x4, 0x70000080);
+        GPO32 &= ~0x4;
 
         GPIOA_ENABLE     &= ~0x7a;
         GPIOA_OUTPUT_EN  &= ~0x7a;
