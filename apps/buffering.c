@@ -174,8 +174,7 @@ enum {
 
     /* Configuration: */
     Q_SET_WATERMARK,
-    Q_SET_CHUNKSIZE,
-    Q_FILL_BUFFER,       /* Request that the buffering thread initiate a buffer
+    Q_START_FILL,        /* Request that the buffering thread initiate a buffer
                             fill at its earliest convenience */
 };
 
@@ -1089,11 +1088,8 @@ ssize_t buf_handle_offset(int handle_id)
 
 void buf_request_buffer_handle(int handle_id)
 {
-    LOGFQUEUE("buffering >| Q_FILL_BUFFER");
-    queue_send(&buffering_queue, Q_FILL_BUFFER, 0);
-
-    LOGFQUEUE("buffering >| Q_BUFFER_HANDLE %d", handle_id);
-    queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
+    LOGFQUEUE("buffering >| Q_START_FILL %d",handle_id);
+    queue_send(&buffering_queue, Q_START_FILL, handle_id);
 }
 
 void buf_set_base_handle(int handle_id)
@@ -1188,19 +1184,20 @@ void buffering_thread(void)
 
         switch (ev.id)
         {
-            case Q_FILL_BUFFER:
-                LOGFQUEUE("buffering < Q_FILL_BUFFER");
+            case Q_START_FILL:
+                LOGFQUEUE("buffering < Q_START_FILL");
                 /* Call buffer callbacks here because this is one of two ways
                  * to begin a full buffer fill */
                 call_buffer_low_callbacks();
                 shrink_buffer();
                 queue_reply(&buffering_queue, 1);
+                filling |= buffer_handle((int)ev.data);
                 break;
 
             case Q_BUFFER_HANDLE:
                 LOGFQUEUE("buffering < Q_BUFFER_HANDLE");
                 queue_reply(&buffering_queue, 1);
-                filling |= buffer_handle((int)ev.data);
+                buffer_handle((int)ev.data);
                 break;
 
             case Q_RESET_HANDLE:
