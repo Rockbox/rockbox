@@ -60,8 +60,7 @@
 #endif
 
 /* Define LOGF_ENABLE to enable logf output in this file */
-#define LOGF_ENABLE
-#define BUFFERING_LOGQUEUES
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 /* macros to enable logf for queues
