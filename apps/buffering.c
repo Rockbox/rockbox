@@ -982,8 +982,8 @@ static size_t prep_bufdata(const struct memory_handle *h, size_t size)
         /* File is finished reading */
         return 0;
 
-    if (size == 0 || size > h->available + h->filerem)
-        size = h->available + h->filerem;
+    if (size == 0 || size > avail + h->filerem)
+        size = avail + h->filerem;
 
     if (h->type == TYPE_PACKET_AUDIO && size > BUFFERING_DEFAULT_FILECHUNK)
     {
