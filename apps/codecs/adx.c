@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Copyright (C) 2006 Adam Gashlin (hcs)
+ * Copyright (C) 2006-2007 Adam Gashlin (hcs)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -15,7 +15,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include "codeclib.h"
 #include "inttypes.h"
 
@@ -42,7 +41,7 @@ enum codec_status codec_main(void)
     int sampleswritten, i;
     uint8_t *buf;
     int32_t ch1_1, ch1_2, ch2_1, ch2_2; /* ADPCM history */
-    size_t n, bufsize;
+    size_t n;
     int endofstream; /* end of stream flag */
     uint32_t avgbytespersec;
     int looping; /* looping flag */
@@ -72,17 +71,15 @@ next_track:
 
     codec_set_replaygain(ci->id3);
         
-    /* Read the entire file (or as much as possible) */
+    /* Get header */
     DEBUGF("ADX: request initial buffer\n");
-    ci->configure(CODEC_SET_FILEBUF_WATERMARK, ci->filesize);
     ci->seek_buffer(0);
-    buf = ci->request_buffer(&n, ci->filesize);
+    buf = ci->request_buffer(&n, 0x38);
     if (!buf || n < 0x38) {
         return CODEC_ERROR;
     }
-    bufsize = n;
     bufoff = 0;
-    DEBUGF("ADX: read size = %lx\n",(unsigned long)bufsize);
+    DEBUGF("ADX: read size = %lx\n",(unsigned long)n);
 
     /* Get file header for starting offset, channel count */
     
@@ -151,9 +148,12 @@ next_track:
     }
     
     /* advance to first frame */
-    /*ci->seek_buffer(chanstart);*/
     DEBUGF("ADX: first frame at %lx\n",chanstart);
     bufoff = chanstart;
+
+    /* get in position */
+    ci->seek_buffer(bufoff);
+
 
     /* setup pcm buffer format */
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
@@ -180,7 +180,7 @@ next_track:
         }
         
         /* do we need to loop? */
-        if (bufoff >= end_adr-18*channels && looping) {
+        if (bufoff > end_adr-18*channels && looping) {
             DEBUGF("ADX: loop!\n");
             /* check for endless looping */
             if (ci->global_settings->repeat_mode==REPEAT_ONE) {
@@ -198,6 +198,7 @@ next_track:
                 }
             }
             bufoff = start_adr;
+            ci->seek_buffer(bufoff);
         }
 
         /* do we need to seek? */
@@ -218,55 +219,40 @@ next_track:
                 bufoff-=end_adr-start_adr;
                 loop_count++;
             }
+            ci->seek_buffer(bufoff);
             ci->seek_complete();
         }
 
         if (bufoff>ci->filesize-channels*18) break; /* End of stream */
         
-        /* dance with the devil in the pale moonlight */
-        if ((bufoff > ci->curpos + (off_t)bufsize - channels*18) ||
-            bufoff < ci->curpos) {
-            DEBUGF("ADX: requesting another buffer at %lx size %lx\n",
-                bufoff,ci->filesize-bufoff);
-            ci->seek_buffer(bufoff);
-            buf = ci->request_buffer(&n, ci->filesize-bufoff);
-            bufsize = n;
-            DEBUGF("ADX: read size = %lx\n",(unsigned long)bufsize);
-            if ((off_t)bufsize < channels*18) {
-                /* if we can't get a full frame, just request a single
-                   frame (should be able to fit it in the guard buffer) */
-                DEBUGF("ADX: requesting single frame at %lx\n",bufoff);
-                buf = ci->request_buffer(&n, channels*18);
-                bufsize=n;
-                DEBUGF("ADX: read size = %lx\n",(unsigned long)bufsize);
-            }
-            if (!buf) {
-                DEBUGF("ADX: couldn't get buffer at %lx size %lx\n",
-                    bufoff,ci->filesize-bufoff);
-                return CODEC_ERROR;
-            }
-            buf-=bufoff;
-        }
-
-        if (bufsize == 0) break; /* End of stream */
-            
         sampleswritten=0;
           
         while (
-        /* Is there data in the file buffer? */
-        ((size_t)bufoff <= ci->curpos+bufsize-(18*channels)) &&
-        /* Is there space in the output buffer? */
-        (sampleswritten <= WAV_CHUNK_SIZE-(32*channels)) &&
-        /* Should we be looping? */
-        ((!looping) || bufoff < end_adr-18*channels)) {
-            /* decode 18 bytes to 32 samples (from bero) */
-            int32_t scale = ((buf[bufoff] << 8) | (buf[bufoff+1])) * BASE_VOL;
-  
+                /* Is there data left in the file? */
+                (bufoff <= ci->filesize-(18*channels)) &&
+                /* Is there space in the output buffer? */
+                (sampleswritten <= WAV_CHUNK_SIZE-(32*channels)) &&
+                /* Should we be looping? */
+                ((!looping) || bufoff <= end_adr-18*channels))
+        {
+            /* decode first/only channel */
+            int32_t scale;
             int32_t ch1_0, d;
 
+            /* fetch a frame */
+            buf = ci->request_buffer(&n, 18);
+
+            if (!buf || n!=18) {
+                DEBUGF("ADX: couldn't get buffer at %lx\n",
+                        bufoff);
+                return CODEC_ERROR;
+            }
+
+            scale = (((buf[0] << 8) | (buf[1])) +1) * BASE_VOL;
+  
             for (i = 2; i < 18; i++)
             {
-                d = (buf[bufoff+i] >> 4) & 15;
+                d = (buf[i] >> 4) & 15;
                 if (d & 8) d-= 16;
                 ch1_0 = (d*scale + 0x7298L*ch1_1 - 0x3350L*ch1_2) >> 14;
 	            if (ch1_0 > 32767) ch1_0 = 32767;
@@ -274,7 +260,8 @@ next_track:
 	            samples[sampleswritten] = ch1_0;
 	            sampleswritten+=channels;
                 ch1_2 = ch1_1; ch1_1 = ch1_0;
-                d = buf[bufoff+i] & 15;
+
+                d = buf[i] & 15;
                 if (d & 8) d -= 16;
                 ch1_0 = (d*scale + 0x7298L*ch1_1 - 0x3350L*ch1_2) >> 14;
                 if (ch1_0 > 32767) ch1_0 = 32767;
@@ -284,16 +271,28 @@ next_track:
 	            ch1_2 = ch1_1; ch1_1 = ch1_0;
             }
             bufoff+=18;
+            ci->advance_buffer(18);
             
             if (channels == 2) {
-                int32_t scale = ((buf[bufoff] << 8)|(buf[bufoff+1]))*BASE_VOL;
-  
+                /* decode second channel */
+                int32_t scale;
                 int32_t ch2_0, d;
+
+                buf = ci->request_buffer(&n, 18);
+
+                if (!buf || n!=18) {
+                    DEBUGF("ADX: couldn't get buffer at %lx\n",
+                            bufoff);
+                    return CODEC_ERROR;
+                }
+
+                scale = (((buf[0] << 8)|(buf[1]))+1)*BASE_VOL;
+  
                 sampleswritten-=63;
 
                 for (i = 2; i < 18; i++)
                 {
-                    d = (buf[bufoff+i] >> 4) & 15;
+                    d = (buf[i] >> 4) & 15;
                     if (d & 8) d-= 16;
                     ch2_0 = (d*scale + 0x7298L*ch2_1 - 0x3350L*ch2_2) >> 14;
 	                if (ch2_0 > 32767) ch2_0 = 32767;
@@ -301,7 +300,8 @@ next_track:
 	                samples[sampleswritten] = ch2_0;
 	                sampleswritten+=2;
                     ch2_2 = ch2_1; ch2_1 = ch2_0;
-                    d = buf[bufoff+i] & 15;
+
+                    d = buf[i] & 15;
                     if (d & 8) d -= 16;
                     ch2_0 = (d*scale + 0x7298L*ch2_1 - 0x3350L*ch2_2) >> 14;
                     if (ch2_0 > 32767) ch2_0 = 32767;
@@ -311,8 +311,10 @@ next_track:
   	                ch2_2 = ch2_1; ch2_1 = ch2_0;
                 }
                 bufoff+=18;
+                ci->advance_buffer(18);
                 sampleswritten--; /* go back to first channel's next sample */
             }
+
             if (fade_count>0) {
                 fade_count--;
                 for (i=0;i<(channels==1?32:64);i++) samples[sampleswritten-i-1]=
