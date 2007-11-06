@@ -806,7 +806,7 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     ata_led(true);
 
 ata_read_retry:
-    if (drive != 0 && (GPIOA_INPUT_VAL & 0x80) != 0)
+    if (drive != 0 && !card_detect_target())
     {
         /* no external sd-card inserted */
         ret = -EC_NOCARD;
@@ -921,7 +921,7 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
     ata_led(true);
 
 ata_write_retry:
-    if (drive != 0 && (GPIOA_INPUT_VAL & 0x80) != 0)
+    if (drive != 0 && !card_detect_target())
     {
         /* no external sd-card inserted */
         ret = -EC_NOCARD;
