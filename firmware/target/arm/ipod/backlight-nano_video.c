@@ -33,18 +33,12 @@
 
 inline void __backlight_on(void)
 {
-    /* set port B03 on */
-    outl(((0x100 | 1) << 3), 0x6000d824);
-
-    /* set port L07 on */
-    GPIOL_OUTPUT_VAL = ((0x100 | 1) << 7);
+    GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 1<<3);
+    GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 1<<7);
 }
 
 inline void __backlight_off(void)
 {
-    /* set port B03 off */
-    outl(((0x100 | 0) << 3), 0x6000d824);
-
-    /* set port L07 off */
-    GPIOL_OUTPUT_VAL = ((0x100 | 0) << 7);
+    GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 1<<3);
+    GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_VAL, 1<<7);
 }
