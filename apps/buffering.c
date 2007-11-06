@@ -970,6 +970,45 @@ int bufadvance(int handle_id, off_t offset)
     return bufseek(handle_id, newpos);
 }
 
+/* Used by bufread and bufgetdata to prepare the buffer and retrieve the
+ * actual amount of data available for reading.  This function explicitly
+ * does not check the validity of the input handle.  It does do range checks
+ * on size and returns a valid (and explicit) amount of data for reading */
+static size_t prep_bufdata(const struct memory_handle *h, size_t size)
+{
+    size_t avail = RINGBUF_SUB(h->widx, h->ridx);
+
+    if (avail == 0 && h->filerem == 0)
+        /* File is finished reading */
+        return 0;
+
+    if (size == 0 || size > h->available + h->filerem)
+        size = h->available + h->filerem;
+
+    if (h->type == TYPE_PACKET_AUDIO && size > BUFFERING_DEFAULT_FILECHUNK)
+    {
+        /* If more than a filechunk is requested, log it and provide no more
+         * than the amount of data on buffer or one file chunk */
+        logf("data request > filechunk");
+        size = MAX(avail,BUFFERING_DEFAULT_FILECHUNK);
+    }
+
+    if (h->filerem > 0 && avail < size)
+    {
+        /* Data isn't ready. Request buffering */
+        buf_request_buffer_handle(h->id);
+        /* Wait for the data to be ready */
+        do
+        {
+            sleep(1);
+            avail = RINGBUF_SUB(h->widx, h->ridx);
+        }
+        while (h->filerem > 0 && avail < size);
+    }
+
+    return MIN(size,avail);
+}
+
 /* Copy data from the given handle to the dest buffer.
    Return the number of bytes copied or < 0 for failure (handle not found).
    The caller is blocked until the requested amount of data is available.
@@ -980,41 +1019,21 @@ ssize_t bufread(int handle_id, size_t size, void *dest)
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
 
-    size_t ret;
-    size_t avail = RINGBUF_SUB(h->widx, h->ridx);
+    size = prep_bufdata(h, size);
 
-    if (avail == 0 && h->filerem == 0)
-        /* File is finished reading */
-        return 0;
-
-    if (h->filerem > 0 && (avail == 0 || avail < size))
-    {
-        /* Data isn't ready. Request buffering */
-        buf_request_buffer_handle(handle_id);
-        /* Wait for the data to be ready */
-        do
-        {
-            sleep(1);
-            avail = RINGBUF_SUB(h->widx, h->ridx);
-        }
-        while (h->filerem > 0 && (avail == 0 || avail < size));
-    }
-
-    ret = MIN(size, avail);
-
-    if (h->ridx + ret > buffer_len)
+    if (h->ridx + size > buffer_len)
     {
         /* the data wraps around the end of the buffer */
         size_t read = buffer_len - h->ridx;
         memcpy(dest, &buffer[h->ridx], read);
-        memcpy(dest+read, buffer, ret - read);
+        memcpy(dest+read, buffer, size - read);
     }
     else
     {
-        memcpy(dest, &buffer[h->ridx], ret);
+        memcpy(dest, &buffer[h->ridx], size);
     }
 
-    return ret;
+    return size;
 }
 
 /* Update the "data" pointer to make the handle's data available to the caller.
@@ -1032,41 +1051,19 @@ ssize_t bufgetdata(int handle_id, size_t size, void **data)
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
 
-    ssize_t ret;
-    size_t avail = RINGBUF_SUB(h->widx, h->ridx);
+    size = prep_bufdata(h, size);
 
-    if (avail == 0 && h->filerem == 0)
-        /* File is finished reading */
-        return 0;
-
-    if (h->filerem > 0 && (avail == 0 || avail < size))
-    {
-        /* Data isn't ready. Request buffering */
-        buf_request_buffer_handle(handle_id);
-        /* Wait for the data to be ready */
-        do
-        {
-            sleep(1);
-            avail = RINGBUF_SUB(h->widx, h->ridx);
-        }
-        while (h->filerem > 0 && (avail == 0 || avail < size));
-    }
-
-    if (h->ridx + size > buffer_len && avail >= size)
+    if (h->ridx + size > buffer_len)
     {
         /* the data wraps around the end of the buffer :
            use the guard buffer to provide the requested amount of data. */
         size_t copy_n = MIN(h->ridx + size - buffer_len, GUARD_BUFSIZE);
         memcpy(guard_buffer, (unsigned char *)buffer, copy_n);
-        ret = buffer_len - h->ridx + copy_n;
-    }
-    else
-    {
-        ret = MIN(avail, buffer_len - h->ridx);
+        size = buffer_len - h->ridx + copy_n;
     }
 
     *data = &buffer[h->ridx];
-    return ret;
+    return size;
 }
 
 /*
