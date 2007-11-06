@@ -126,7 +126,7 @@ char *speex_header_to_packet(SpeexHeader *header, int *size)
    *size = sizeof(SpeexHeader);
    return (char *)le_header;
 }
-#endif
+#endif /* SPEEX_DISABLE_ENCODER */
 
 static SpeexHeader global_le_header; /* Avoid malloc */
 SpeexHeader *speex_packet_to_header(char *packet, int size)

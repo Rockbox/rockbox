@@ -512,7 +512,7 @@ int   update_target
          target[j]=SUB16(target[j],PSHR16(r2[j],2));
    }
 }
-#endif
+#endif /* SPEEX_DISABLE_ENCODER*/
 
 
 void split_cb_shape_sign_unquant(
@@ -600,7 +600,7 @@ int   update_target
    for (i=0;i<nsf;i++)
       target[i]=0;
 }
-#endif
+#endif /* SPEEX_DISABLE_ENCODER */
 
 
 void noise_codebook_unquant(

@@ -134,6 +134,8 @@ Heavily modified by Jean-Marc Valin (c) 2002-2006 (fixed-point,
 
 \*---------------------------------------------------------------------------*/
 
+#ifndef SPEEX_DISABLE_ENCODER
+
 #ifdef FIXED_POINT
 
 #ifndef OVERRIDE_CHEB_POLY_EVA
@@ -386,6 +388,8 @@ int lpc_to_lsp (spx_coef_t *a,int lpcrdr,spx_lsp_t *freq,int nb,spx_word16_t del
     }
     return(roots);
 }
+
+#endif /* SPEEX_DISABLE_ENCODER */
 
 /*---------------------------------------------------------------------------*\
 

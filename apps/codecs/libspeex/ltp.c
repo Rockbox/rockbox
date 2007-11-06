@@ -660,7 +660,7 @@ spx_word32_t *cumul_gain
 #endif
    return pitch;
 }
-#endif
+#endif /* SPEEX_DISABLE_ENCODER */
 
 void pitch_unquant_3tap(
 spx_word16_t exc[],             /* Input excitation */
@@ -812,7 +812,7 @@ spx_word32_t *cumul_gain
       target[i]=EXTRACT16(SATURATE(SUB32(EXTEND32(target[i]),EXTEND32(res[i])),32700));
    return start;
 }
-#endif
+#endif /* SPEEX_DISABLE_ENCODER */
 
 /** Unquantize forced pitch delay and gain */
 void forced_pitch_unquant(

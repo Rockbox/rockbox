@@ -1024,7 +1024,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 
    return 1;
 }
-#endif
+#endif /* SPEEX_DISABLE_ENCODER */
 
 static DecState global_decstate IBSS_ATTR;
 
@@ -1947,7 +1947,7 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
    }
    return 0;
 }
-#endif
+#endif /* SPEEX_DISABLE_ENCODER */
 
 int nb_decoder_ctl(void *state, int request, void *ptr)
 {
