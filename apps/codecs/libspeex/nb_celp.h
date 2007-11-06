@@ -142,14 +142,14 @@ typedef struct DecState {
 
    char  *stack;                /**< Pseudo-stack allocation for temporary memory */
    /* Size calculated from maximum values of frameSize, max_pitch and
-    * subframeSize, being respectively 320, 144 and 80 (for uwb) */
-   spx_word16_t excBuf[556];    /**< Excitation buffer */
+    * subframeSize, being respectively 160, 144 and 40 */
+   spx_word16_t excBuf[500];    /**< Excitation buffer */
    spx_word16_t *exc;           /**< Start of excitation frame */
    spx_lsp_t old_qlsp[10];      /**< Quantized LSPs for previous frame */
    spx_coef_t interp_qlpc[10];  /**< Interpolated quantized LPCs */
    spx_mem_t mem_sp[10];        /**< Filter memory for synthesis signal */
    spx_mem_t mem_hp[2];         /**< High-pass filter memory */
-   spx_word32_t pi_gain[5];     /**< Gain of LPC filter at theta=pi (fe/2) */
+   spx_word32_t pi_gain[4];     /**< Gain of LPC filter at theta=pi (fe/2) */
    spx_word16_t *innov_save;    /** If non-NULL, innovation is copied here */
    
    spx_word16_t level;
