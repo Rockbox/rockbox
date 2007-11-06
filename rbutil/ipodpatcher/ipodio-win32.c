@@ -72,7 +72,7 @@ int ipod_open(struct ipod_t* ipod, int silent)
     DISK_GEOMETRY diskgeometry;
     unsigned long n;
 
-    ipod->dh = CreateFile(ipod->diskname, GENERIC_READ,
+    ipod->dh = CreateFileA(ipod->diskname, GENERIC_READ,
                     FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
                     FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
@@ -128,7 +128,7 @@ int ipod_reopen_rw(struct ipod_t* ipod)
     unlock_volume(ipod->dh);
     CloseHandle(ipod->dh);
 
-    ipod->dh = CreateFile(ipod->diskname, GENERIC_READ | GENERIC_WRITE,
+    ipod->dh = CreateFileA(ipod->diskname, GENERIC_READ | GENERIC_WRITE,
                      FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
                      FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
