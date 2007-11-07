@@ -301,53 +301,6 @@ void button_set_flip(bool yesno)
     (void)yesno;
 }
 
-#if CONFIG_CODEC != SWCODEC
-
-int talk_id(int id, bool enqueue)
-{
-    (void)id;
-    (void)enqueue;
-    return 0;
-}
-
-int talk_file(char* filename, bool enqueue)
-{
-    (void)filename;
-    (void)enqueue;
-    return 0;
-}
-
-int talk_value(int n, int unit, bool enqueue)
-{
-    (void)n;
-    (void)unit;
-    (void)enqueue;
-    return 0;
-}
-
-int talk_number(int n, bool enqueue)
-{
-    (void)n;
-    (void)enqueue;
-    return 0;
-}
-
-int talk_spell(char* spell, bool enqueue)
-{
-    (void)spell;
-    (void)enqueue;
-    return 0;
-}
-
-void talk_disable(bool disable)
-{
-    (void) disable;
-}
-
-const char* const dir_thumbnail_name = "_dirname.talk";
-const char* const file_thumbnail_ext = ".talk";
-#endif
-
 /* assure an unused place to direct virtual pointers to */
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
 unsigned char vp_dummy[VIRT_SIZE];

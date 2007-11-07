@@ -590,6 +590,25 @@ unsigned char* mp3_get_pos(void)
 {
     return (unsigned char*)SAR3;
 }
+#else  /* #ifndef SIMULATOR */
 
+void mp3_play_pause(bool play)
+{
+    (void)play;
+}
+void mp3_play_stop(void)
+{
+}
 
-#endif /* #ifndef SIMULATOR */
+unsigned char* mp3_get_pos(void)
+{
+    return NULL;
+}
+
+void mp3_play_data(const unsigned char* start, int size,
+    void (*get_more)(unsigned char** start, size_t* size) /* callback fn */
+)
+{
+    (void)start; (void)size; (void)get_more;
+}
+#endif 

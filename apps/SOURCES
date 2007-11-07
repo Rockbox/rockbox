@@ -36,9 +36,7 @@ settings.c
 settings_list.c
 status.c
 cuesheet.c
-#if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
 talk.c
-#endif
 tree.c
 #ifdef HAVE_TAGCACHE
 tagtree.c

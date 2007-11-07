@@ -1286,14 +1286,12 @@ static char* runtime_get_data(int selected_item, void* data, char* buffer)
 
 static int runtime_speak_data(int selected_item, void* data)
 {
-    (void) data;(void)selected_item;
-#if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
+    (void) data;
     long title_ids[] = {LANG_RUNNING_TIME, LANG_TOP_TIME};
     talk_ids(false,
              title_ids[selected_item/2],
              TALK_ID((selected_item == 0) ? global_status.runtime
                      : global_status.topruntime, UNIT_TIME));
-#endif
     return 0;
 }
 

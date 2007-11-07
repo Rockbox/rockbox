@@ -93,18 +93,6 @@ void talk_date(struct tm *tm, bool enqueue);
 /* This (otherwise invalid) ID signals the end of the array. */
 #define TALK_FINAL_ID LANG_LAST_INDEX_IN_ARRAY
 
-/* We don't build talk.c for hwcodec sims so we need to define these as empty */
-#if defined(SIMULATOR) && !(CONFIG_CODEC == SWCODEC)
-#define talk_init(...)
-#define talk_buffer_steal(...)
-#define talk_shutup(...)
-#define talk_force_enqueue_next(...)
-#define talk_idarray(...)
-#define talk_ids(...)
-#define cond_talk_ids(...)
-#define cond_talk_ids_fq(...)
-#else
-
 /* Enqueue next utterance even if enqueue parameter is false: don't
    interrupt the current utterance. */
 void talk_force_enqueue_next(void);
@@ -135,5 +123,5 @@ int talk_idarray(long *idarray, bool enqueue);
             talk_force_enqueue_next(); \
         } \
     }while(0)
-#endif /*defined(SIMULATOR) && !(CONFIG_CODEC == SWCODEC)*/
+
 #endif /* __TALK_H__ */

@@ -347,6 +347,9 @@ void talk_force_shutup(void)
 {
     /* Most of this is MAS only */
 #if CONFIG_CODEC != SWCODEC
+#ifdef SIMULATOR
+    return;
+#endif
     unsigned char* pos;
     unsigned char* search;
     unsigned char* end;
@@ -656,7 +659,7 @@ int talk_file(const char* filename, bool enqueue)
 
     if (size != 0 && size != size_for_thumbnail)    /* Don't play missing or truncated clips */
     {
-#if CONFIG_CODEC != SWCODEC
+#if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
         bitswap(p_thumbnail, size);
 #endif
         queue_clip(p_thumbnail, size, enqueue);
