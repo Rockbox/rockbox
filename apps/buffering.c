@@ -987,10 +987,11 @@ static size_t prep_bufdata(const struct memory_handle *h, size_t size)
 
     if (h->type == TYPE_PACKET_AUDIO && size > BUFFERING_DEFAULT_FILECHUNK)
     {
-        /* If more than a filechunk is requested, log it and provide no more
-         * than the amount of data on buffer or one file chunk */
         logf("data request > filechunk");
-        size = MAX(avail,BUFFERING_DEFAULT_FILECHUNK);
+        /* If more than a filechunk is requested, provide no more than the
+           amount of data on buffer or one file chunk, but without increasing
+           "size", which would be bad. */
+        size = MIN(size, MAX(avail, BUFFERING_DEFAULT_FILECHUNK));
     }
 
     if (h->filerem > 0 && avail < size)
