@@ -32,7 +32,7 @@ void tick_start(unsigned int interval_in_ms)
     /*  Setup the Prescalar (Divide by 10)
      *  Based on linux/include/asm-arm/arch-integrator/timex.h 
      */
-    IO_TIMER1_TMPRSCL = 0x000A;
+    IO_TIMER1_TMPRSCL = 0x0009;
 
     /* Setup the Divisor */
     IO_TIMER1_TMDIV = (TIMER_FREQ / (10*1000))*interval_in_ms;

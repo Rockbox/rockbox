@@ -87,7 +87,7 @@ void doomtime(void)
 
 int  I_GetTime (void)
 {
-#if defined(HAVE_LCD_COLOR) && !defined(TOSHIBA_GIGABEAT_F) && !defined(SIMULATOR) && !defined(RB_PROFILE)
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
    return doomtimer;
 #else
 #if HZ==100

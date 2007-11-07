@@ -109,6 +109,7 @@ void mrdebug(void)
     touchpad_calibrate_screen();
     use_calibration(true);
 #endif
+
     while(true)
     {
 #if 0
@@ -144,14 +145,14 @@ void mrdebug(void)
 //             tsc2100_read_values(&x, &y, &z1, &z2);
 //             printf("x: %04x y: %04x z1: %04x z2: %04x", x, y, z1, z2);
 //             printf("tsadc: %4x", tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS)&0xffff);
-//             printf("current tick: %04x", current_tick);
-//             printf("Address: 0x%08x Data: 0x%08x", address, *address);
-//             printf("Address: 0x%08x Data: 0x%08x", address+1, *(address+1));
-//             printf("Address: 0x%08x Data: 0x%08x", address+2, *(address+2));
+             printf("current tick: %04x", current_tick);
+             printf("Address: 0x%08x Data: 0x%08x", address, *address);
+             printf("Address: 0x%08x Data: 0x%08x", address+1, *(address+1));
+             printf("Address: 0x%08x Data: 0x%08x", address+2, *(address+2));
 // //            tsc2100_keyclick(); /* doesnt work :( */
 //             line -= 6;
 //         }
-#if 1
+#if 0
         if (button&BUTTON_TOUCHPAD)
         {
             if (button&BUTTON_REL)

@@ -169,6 +169,10 @@ void system_init(void)
 
     IO_INTC_ENTRY_TBA0 = 0;
     IO_INTC_ENTRY_TBA1 = 0;
+    
+    /* Turn off other timers */
+    IO_TIMER2_TMMD = CONFIG_TIMER2_TMMD_STOP;
+    IO_TIMER3_TMMD = CONFIG_TIMER3_TMMD_STOP;
 
     /* set GIO26 (reset pin) to output and low */
     IO_GIO_BITCLR1=(1<<10);
