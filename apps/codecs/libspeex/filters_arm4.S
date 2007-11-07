@@ -199,7 +199,7 @@ qmf_synth:
     bne     0b
 
     sub     r0, r8, r5              @ r0 = &xx1[N2]
-    sub     r1, r9, r5              @ r1 = %xx2[N2]
+    sub     r1, r9, r5              @ r1 = &xx2[N2]
     str     r4, [sp, #-4]           @ Stack N
     mov     r4, r5
     str     r4, [sp, #-8]           @ Stack M
@@ -299,4 +299,29 @@ qmf_synth:
     subs    r4, r4, #4
     bne     0b
     ldmia   sp!, { r4-r11, pc }     @ Exit
+
+
+/* void signal_mul(const spx_sig_t *x, spx_sig_t *y, spx_word32_t scale, int len) */
+    .global signal_mul
+signal_mul:
+    stmdb   sp!, { r4-r8, lr }
+0:
+    ldmia   r0!, { r5-r8 }                  @ Load four input samples
+    smull   r5, r12, r2, r5
+    mov     r12, r12, lsl #18               @ Recombine upper and lower parts
+    orr     r5, r12, r5, lsr #14
+    smull   r6, r12, r2, r6
+    mov     r12, r12, lsl #18
+    orr     r6, r12, r6, lsr #14
+    smull   r7, r12, r2, r7
+    mov     r12, r12, lsl #18
+    orr     r7, r12, r7, lsr #14
+    smull   r8, r12, r2, r8
+    mov     r12, r12, lsl #18
+    orr     r8, r12, r8, lsr #14
+    stmia   r1!, { r5-r8 }                  @ Store four output samples
+    subs    r3, r3, #4                      @ Are we done?
+    bne     0b
+
+    ldmia   sp!, { r4-r8, pc }              @ Exit
 

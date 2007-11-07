@@ -312,3 +312,45 @@ qmf_synth:
     lea.l    (44, %sp), %sp
     rts
 
+
+/* void signal_mul(const spx_sig_t *x, spx_sig_t *y, spx_word32_t scale, int len) */
+    .global signal_mul
+signal_mul:
+    lea.l    (-20, %sp), %sp
+    movem.l  %d2-%d6, (%sp)
+    movem.l  (20+4, %sp), %a0-%a1           | a0 = x, a1 = y
+    movem.l  (20+12, %sp), %d0-%d1          | d0 = scale, d1 = len
+    moveq.l  #0x20, %d6
+    move.l   %d6, %macsr                    | Set MAC unit to fractional mode
+    asl.l    #3, %d0                        | Pre-scale 'scale'
+    moveq.l  #9, %d6
+0:
+    movem.l  (%a0), %d2-%d5                 | Fetch input
+    asl.l    %d6, %d2                       | Shift each value 9 to the left
+    asl.l    %d6, %d3
+    asl.l    %d6, %d4
+    asl.l    %d6, %d5
+    mac.l    %d2, %d0, %acc0                | Do multiplies
+    mac.l    %d3, %d0, %acc1
+    mac.l    %d4, %d0, %acc2
+    mac.l    %d5, %d0, %acc3
+    lea.l    (16, %a0), %a0
+    movclr.l %acc0, %d2
+    movclr.l %acc1, %d3
+    movclr.l %acc2, %d4
+    movclr.l %acc3, %d5
+    asl.l    #5, %d2                        | Adjust to proper format
+    asl.l    #5, %d3
+    asl.l    #5, %d4
+    asl.l    #5, %d5
+    movem.l  %d2-%d5, (%a1)                 | Save output
+    lea.l    (16, %a1), %a1
+    subq.l   #4, %d1
+    jne      0b
+
+    clr.l    %d0
+    move.l   %d0, %macsr                    | Set MAC unit back to integer mode
+    movem.l  (%sp), %d2-%d6
+    lea.l    (20, %sp), %sp
+    rts
+

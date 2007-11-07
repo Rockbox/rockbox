@@ -47,9 +47,11 @@
 #include "filters_arm4.h"
 #define OVERRIDE_IIR_MEM16
 #define OVERRIDE_QMF_SYNTH
+#define OVERRIDE_SIGNAL_MUL
 #elif defined (COLDFIRE_ASM)
 #define OVERRIDE_IIR_MEM16
 #define OVERRIDE_QMF_SYNTH
+#define OVERRIDE_SIGNAL_MUL
 #elif defined (BFIN_ASM)
 #include "filters_bfin.h"
 #endif
@@ -114,6 +116,7 @@ void highpass(const spx_word16_t *x, spx_word16_t *y, int len, int filtID, spx_m
 
 #ifdef FIXED_POINT
 
+#ifndef OVERRIDE_SIGNAL_MUL
 /* FIXME: These functions are ugly and probably introduce too much error */
 void signal_mul(const spx_sig_t *x, spx_sig_t *y, spx_word32_t scale, int len)
 {
@@ -123,6 +126,7 @@ void signal_mul(const spx_sig_t *x, spx_sig_t *y, spx_word32_t scale, int len)
       y[i] = SHL32(MULT16_32_Q14(EXTRACT16(SHR32(x[i],7)),scale),7);
    }
 }
+#endif
 
 #ifndef SPEEX_DISABLE_ENCODER
 void signal_div(const spx_word16_t *x, spx_word16_t *y, spx_word32_t scale, int len)
