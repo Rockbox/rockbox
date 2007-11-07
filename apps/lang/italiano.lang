@@ -6802,11 +6802,11 @@
   </source>
   <dest>
     *: none
-    radio: "Modo Scan"
+    radio: "Scansione"
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Scansione"
   </voice>
 </phrase>
 <phrase>
@@ -10584,11 +10584,11 @@
   </source>
   <dest>
     *: none
-    radio: "Memorie"
+    radio: "Memorizzate"
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Memorizzate"
   </voice>
 </phrase>
 <phrase>
@@ -11415,5 +11415,19 @@
   </dest>
   <voice>
     *: "Annuncia Livello Batteria"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "Pronuncia tipo elemento"
+  </dest>
+  <voice>
+    *: "Pronuncia tipo elemento"
   </voice>
 </phrase>
