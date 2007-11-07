@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½rn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -1286,12 +1286,14 @@ static char* runtime_get_data(int selected_item, void* data, char* buffer)
 
 static int runtime_speak_data(int selected_item, void* data)
 {
-    (void) data;
+    (void) data;(void)selected_item;
+#if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
     long title_ids[] = {LANG_RUNNING_TIME, LANG_TOP_TIME};
     talk_ids(false,
              title_ids[selected_item/2],
              TALK_ID((selected_item == 0) ? global_status.runtime
                      : global_status.topruntime, UNIT_TIME));
+#endif
     return 0;
 }
 
