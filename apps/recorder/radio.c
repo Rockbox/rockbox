@@ -393,6 +393,31 @@ static void end_search(void)
     search_dir = 0;
 }
 
+/* Speak a frequency. */
+static void talk_freq(int freq, bool enqueue)
+{
+    freq /= 10000;
+    talk_number(freq / 100, enqueue);
+    talk_id(LANG_POINT, true);
+    talk_number(freq % 100 / 10, true);
+    if (freq % 10)
+        talk_number(freq % 10, true);
+}
+
+/* Speak a preset by number or by spelling its name, depending on settings. */
+static void talk_preset(int preset, bool fallback, bool enqueue)
+{
+    if (global_settings.talk_file == 1) /* number */
+        talk_number(preset + 1, enqueue);
+    else
+    { /* spell */
+        if(presets[preset].name[0])
+            talk_spell(presets[preset].name, enqueue);
+        else if(fallback)
+             talk_freq(presets[preset].frequency, enqueue);
+    }
+}
+
 int radio_screen(void)
 {
     char buf[MAX_PATH];
@@ -407,6 +432,7 @@ int radio_screen(void)
     bool screen_freeze = false;
     bool keep_playing = false;
     bool statusbar = global_settings.statusbar;
+    bool talk = false;
 #ifdef FM_RECORD_DBLPRE
     int lastbutton = BUTTON_NONE;
     unsigned long rec_lastclick = 0;
@@ -517,6 +543,7 @@ int radio_screen(void)
                 curr_preset = find_preset(curr_freq);
                 remember_frequency();
                 end_search();
+                talk = true;
             }
 
             trigger_cpu_boost();
@@ -627,6 +654,7 @@ int radio_screen(void)
                 next_station(button == ACTION_STD_PREV ? -1 : 1);
                 end_search();
                 update_screen = true;
+                talk = true;
                 break;
 
             case ACTION_STD_PREVREPEAT:
@@ -639,6 +667,7 @@ int radio_screen(void)
                     next_preset(search_dir);
                     end_search();
                     update_screen = true;
+                    talk = true;
                 }
                 else if (dir == 0)
                 {
@@ -670,6 +699,8 @@ int radio_screen(void)
                     radio_start();
 
                 update_screen = true;
+                talk = false;
+                talk_shutup();
                 break;
 
             case ACTION_FM_MENU:
@@ -761,6 +792,9 @@ int radio_screen(void)
                 else
                     radio_mode = RADIO_SCAN_MODE;
                 update_screen = true;
+                cond_talk_ids_fq(radio_mode ?
+                                 LANG_PRESET : LANG_RADIO_SCAN_MODE);
+                talk = true;
                 break;
 #endif /* FM_MODE */
 
@@ -769,6 +803,7 @@ int radio_screen(void)
                 next_preset(1);
                 end_search();
                 update_screen = true;
+                talk = true;
                 break;
 #endif
 
@@ -777,6 +812,7 @@ int radio_screen(void)
                 next_preset(-1);
                 end_search();
                 update_screen = true;
+                talk = true;
                 break;
 #endif
                 
@@ -900,6 +936,21 @@ int radio_screen(void)
         }
 
         update_screen = false;
+
+        if (global_settings.talk_file && talk
+            && radio_status == FMRADIO_PAUSED)
+        {
+            talk = false;
+            bool enqueue = false;
+            if (radio_mode == RADIO_SCAN_MODE)
+            {
+                talk_freq(curr_freq, enqueue);
+                enqueue = true;
+            }
+            if (curr_preset >= 0)
+                talk_preset(curr_preset, radio_mode == RADIO_PRESET_MODE,
+                            enqueue);
+        }
 
 #if CONFIG_CODEC != SWCODEC
         if(audio_status() & AUDIO_STATUS_ERROR)
@@ -1232,8 +1283,22 @@ MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_PRESET),
 char * presets_get_name(int selected_item, void * data, char *buffer)
 {
     (void)data;
-    (void)buffer;
-    return presets[selected_item].name;
+    struct fmstation *p = &presets[selected_item];
+    if(p->name[0])
+        return p->name;
+    int freq = p->frequency / 10000;
+    int frac = freq % 100;
+    freq /= 100;
+    snprintf(buffer, MAX_PATH,
+             str(LANG_FM_DEFAULT_PRESET_NAME), freq, frac);
+    return buffer;
+}
+
+static int presets_speak_name(int selected_item, void * data)
+{
+    (void)data;
+    talk_preset(selected_item, true, false);
+    return 0;
 }
 
 static int handle_radio_presets(void)
@@ -1259,16 +1324,18 @@ static int handle_radio_presets(void)
     gui_synclist_init(&lists, presets_get_name, NULL, false, 1);
     gui_synclist_set_title(&lists, str(LANG_PRESET), NOICON);
     gui_synclist_set_icon_callback(&lists, NULL);
+    if(global_settings.talk_file)
+        gui_synclist_set_voice_callback(&lists, presets_speak_name);
     gui_synclist_set_nb_items(&lists, num_presets);
     gui_synclist_select_item(&lists, curr_preset<0 ? 0 : curr_preset);
+    gui_synclist_speak_item(&lists);
 
     while (result == 0)
     {
         gui_synclist_draw(&lists);
         gui_syncstatusbar_draw(&statusbars, true);
-        action = get_action(CONTEXT_STD, HZ);
-
-        gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD);
+        list_do_action(CONTEXT_STD, HZ,
+                       &lists, &action, LIST_WRAP_UNLESS_HELD);
         switch (action)
         {
             case ACTION_STD_MENU:
@@ -1288,6 +1355,7 @@ static int handle_radio_presets(void)
             case ACTION_STD_CONTEXT:
                 selected_preset = gui_synclist_get_sel_pos(&lists);
                 do_menu(&handle_radio_preset_menu, NULL);
+                gui_synclist_speak_item(&lists);
                 break;
             default:
                 if(default_event_handler(action) == SYS_USB_CONNECTED)
@@ -1372,9 +1440,7 @@ static int scan_presets(void)
             if(tuner_set(RADIO_SCAN_FREQUENCY, curr_freq))
             {
                 /* add preset */
-                snprintf(buf, MAX_FMPRESET_LEN, 
-                    str(LANG_FM_DEFAULT_PRESET_NAME), freq, frac);
-                strcpy(presets[num_presets].name,buf);
+                presets[num_presets].name[0] = '\0';
                 presets[num_presets].frequency = curr_freq;
                 num_presets++;
             }

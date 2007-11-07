@@ -5364,7 +5364,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Preset"
   </voice>
 </phrase>
 <phrase>
@@ -5517,7 +5517,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Scan"
   </voice>
 </phrase>
 <phrase>
