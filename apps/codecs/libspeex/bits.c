@@ -106,6 +106,7 @@ void speex_bits_rewind(SpeexBits *bits)
    bits->overflow=0;
 }
 
+#if 0
 void speex_bits_read_from(SpeexBits *bits, char *chars, int len)
 {
    int i;
@@ -188,7 +189,9 @@ void speex_bits_read_whole_bytes(SpeexBits *bits, char *chars, int nbytes)
       bits->chars[pos+i]=HTOLS(chars[i]);
    bits->nbBits+=nchars<<LOG2_BITS_PER_CHAR;
 }
+#endif
 
+#ifndef SPEEX_DISABLE_ENCODER
 int speex_bits_write(SpeexBits *bits, char *chars, int max_nbytes)
 {
    int i;
@@ -274,6 +277,7 @@ void speex_bits_pack(SpeexBits *bits, int data, int nbBits)
       nbBits--;
    }
 }
+#endif /* SPEEX_DISABLE_ENCODER */
 
 int speex_bits_unpack_signed(SpeexBits *bits, int nbBits)
 {
@@ -369,6 +373,7 @@ int speex_bits_nbytes(SpeexBits *bits)
    return ((bits->nbBits+BITS_PER_CHAR-1)>>LOG2_BITS_PER_CHAR);
 }
 
+#ifndef SPEEX_DISABLE_ENCODER
 void speex_bits_insert_terminator(SpeexBits *bits)
 {
    if (bits->bitPtr)
@@ -376,3 +381,4 @@ void speex_bits_insert_terminator(SpeexBits *bits)
    while (bits->bitPtr)
       speex_bits_pack(bits, 1, 1);
 }
+#endif /* SPEEX_DISABLE_ENCODER */
