@@ -2605,8 +2605,12 @@ static int audio_check_new_track(void)
     for (i = 0; i < ci.new_track; i++)
     {
         idx = (track_ridx + i) & MAX_TRACK_MASK;
-        if (buf_handle_offset(tracks[idx].audio_hid) > 0)
+        if (buf_handle_offset(tracks[idx].audio_hid) >
+            bufgetid3(tracks[idx].id3_hid)->first_frame_offset)
+        {
+            /* We don't have all the audio data for that track, so clear it */
             clear_track_info(&tracks[idx]);
+        }
     }
 
     /* Move to the new track */
