@@ -19,6 +19,8 @@
 
 #include "textarea.h"
 #include "font.h"
+#include "lang.h"
+#include "talk.h"
 
 void gui_textarea_clear(struct screen * display)
 {
@@ -51,7 +53,8 @@ int gui_textarea_put_message(struct screen * display,
     int i;
     gui_textarea_clear(display);
     for(i=0;i<message->nb_lines && i+ystart<display->nb_lines;i++)
-        display->puts_scroll(0, i+ystart, (unsigned char *)message->message_lines[i]);
+         display->puts_scroll(0, i+ystart, P2STR((unsigned char *)message->
+                                                 message_lines[i]));
     gui_textarea_update(display);
     return(i);
 }
@@ -73,4 +76,19 @@ void gui_textarea_update_nblines(struct screen * display)
     display->char_height = 1;
 #endif
     display->nb_lines = height / display->char_height;
+}
+
+void talk_text_message(struct text_message * message, bool enqueue)
+{
+    int line;
+    if(message)
+        for(line=0; line<message->nb_lines; line++)
+        {
+            long id = P2ID((unsigned char *)message->message_lines[line]);
+            if(id>=0)
+            {
+                talk_id(id, enqueue);
+                enqueue = true;
+            }
+        }
 }

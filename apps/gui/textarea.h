@@ -59,6 +59,12 @@ extern int gui_textarea_put_message(struct screen * display,
  */
 extern void gui_textarea_update_nblines(struct screen * display);
 
+/*
+ * Speak a text_message. The message's lines may be virtual pointers
+ * representing language / voicefont IDs (see settings.h).
+ */
+extern void talk_text_message(struct text_message * message, bool enqueue);
+
 #ifdef HAVE_LCD_BITMAP
 /*
  * Compute the number of pixels from which text can be displayed
