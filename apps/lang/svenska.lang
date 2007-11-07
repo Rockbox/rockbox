@@ -1,4 +1,4 @@
-#             __________               __   ___.
+﻿#             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
@@ -1042,7 +1042,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "hertz band gain"
   </voice>
 </phrase>
 <phrase>
@@ -1089,7 +1089,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "High Shelf Filter"
+    swcodec: "High shelf-filter"
   </dest>
   <voice>
     *: none
@@ -2353,14 +2353,14 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    ipod*: "Building database... %d found (PREV to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Skapar databas... %d hittade (AV = Återgå)"
     h100,h120,h300: "Skapar databas... %d hittade (STOPP = Återgå)"
-    ipod*: "Skapar databas... %d hittade (SPELA/PAUS = Återgå)"
+    ipod*: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
     x5,m5: "Skapar databas... %d hittade (VÄNSTER = Återgå)"
     h10,h10_5gb,e200,c200: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
   </dest>
@@ -4047,7 +4047,7 @@
   </source>
   <dest>
     *: none
-    rtc: "Bestäm tid och datum"
+    rtc: "Tid och datum"
   </dest>
   <voice>
     *: none
@@ -4134,7 +4134,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200: "MENU = Revert"
+    ipod*,e200,c200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4628,7 +4628,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Waking up in"
   </voice>
 </phrase>
 <phrase>
@@ -4645,7 +4645,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm set"
   </voice>
 </phrase>
 <phrase>
@@ -4662,7 +4662,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm Time Is Too Soon!"
   </voice>
 </phrase>
 <phrase>
@@ -4698,7 +4698,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm Disabled"
   </voice>
 </phrase>
 <phrase>
@@ -4849,7 +4849,7 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Röstmeny"
+    *: "Röstmenyer"
   </dest>
   <voice>
     *: "Voice Menus"
@@ -5297,7 +5297,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Preset"
   </voice>
 </phrase>
 <phrase>
@@ -5450,7 +5450,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Scan"
   </voice>
 </phrase>
 <phrase>
@@ -6243,7 +6243,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Once"
   </voice>
 </phrase>
 <phrase>
@@ -6259,7 +6259,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Trigtype"
+    recording: "Trigger type"
   </voice>
 </phrase>
 <phrase>
@@ -6308,7 +6308,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Start Above"
   </voice>
 </phrase>
 <phrase>
@@ -6325,7 +6325,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "for at least"
   </voice>
 </phrase>
 <phrase>
@@ -6342,7 +6342,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Stop Below"
   </voice>
 </phrase>
 <phrase>
@@ -6359,7 +6359,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Presplit Gap"
   </voice>
 </phrase>
 <phrase>
@@ -6813,7 +6813,7 @@
     player: "Buf: %d.%03dMB"
   </dest>
   <voice>
-    *: ""
+    *: "Buffer size"
   </voice>
 </phrase>
 <phrase>
@@ -6845,7 +6845,7 @@
     *: "Disk:"
   </dest>
   <voice>
-    *: ""
+    *: "Disk size"
   </voice>
 </phrase>
 <phrase>
@@ -6895,8 +6895,8 @@
   </dest>
   <voice>
     *: none
-    e200,c200: "micro Secure Digital card:"
-    ondio*: "Multimedia card"
+    e200,c200: "micro S D"
+    ondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -6929,16 +6929,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "Aktuell tid"
+    *: ""
   </dest>
   <voice>
-    *: "Current Time"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7366,13 +7366,13 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
     *: "Visa spårinfo"
   </dest>
   <voice>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </voice>
 </phrase>
 <phrase>
@@ -8287,7 +8287,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "minus infinity"
   </voice>
 </phrase>
 <phrase>
@@ -11348,5 +11348,64 @@
   </dest>
   <voice>
     *: "Blank"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Empty list"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user:
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Inget"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "Not present"
+  </voice>
+</phrase>
+<phrase>  
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Meddela batterinivå"
+  </dest>
+  <voice>
+    *: "Announce Battery Level"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "Röstfiländelser"
+  </dest>
+  <voice>
+    *: "Say file type"
   </voice>
 </phrase>
