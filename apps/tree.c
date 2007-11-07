@@ -268,15 +268,19 @@ static int tree_voice_cb(int selected_item, void * data)
             talk_id(is_dir ? VOICE_DIR : VOICE_FILE, false);
             talk_number(selected_item+1        - (is_dir ? 0 : local_tc->dirsindir),
                         true);
-            if(!is_dir && *local_tc->dirfilter < NUM_FILTER_MODES)
+            if(global_settings.talk_filetype
+               && !is_dir && *local_tc->dirfilter < NUM_FILTER_MODES)
                 say_filetype(attr);
             break;
         case 2: /* spelled */
             talk_shutup();
-            if(is_dir)
-                 talk_id(VOICE_DIR, true);
-            else if(*local_tc->dirfilter < NUM_FILTER_MODES)
-                 say_filetype(attr);
+            if(global_settings.talk_filetype)
+            {
+                if(is_dir)
+                    talk_id(VOICE_DIR, true);
+                else if(*local_tc->dirfilter < NUM_FILTER_MODES)
+                    say_filetype(attr);
+            }
             talk_spell(name, true);
             break;
         }
@@ -1208,7 +1212,8 @@ static int ft_play_dirname(char* name)
     DEBUGF("Found: %s\n", dirname_mp3_filename);
 
     talk_file(dirname_mp3_filename, false);
-    talk_id(VOICE_DIR, true);
+    if(global_settings.talk_filetype)
+        talk_id(VOICE_DIR, true);
     return 1;
 }
 

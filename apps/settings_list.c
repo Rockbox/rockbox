@@ -753,6 +753,8 @@ const struct settings_list settings[] = {
         ID2P(LANG_OFF), ID2P(LANG_VOICE_NUMBER),
         ID2P(LANG_VOICE_SPELL)),
     OFFON_SETTING(F_TEMPVAR, talk_file_clip, LANG_VOICE_FILE_TALK, false, "talk file clip", NULL),
+    OFFON_SETTING(F_TEMPVAR, talk_filetype, LANG_VOICE_FILETYPE,
+                  false, "talk filetype", NULL),
     OFFON_SETTING(F_TEMPVAR, talk_battery_level,
                   LANG_TALK_BATTERY_LEVEL, false,
                   "Announce Battery Level", NULL),

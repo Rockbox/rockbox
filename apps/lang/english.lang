@@ -11462,3 +11462,17 @@
     *: "Announce Battery Level"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "Say file type"
+  </dest>
+  <voice>
+    *: "Say file type"
+  </voice>
+</phrase>

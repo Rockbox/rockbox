@@ -529,6 +529,7 @@ struct user_settings
     bool talk_dir_clip; /* use directory .talk clips */
     int talk_file; /* voice file mode: 0=off, 1=number, 2=spell */ 
     bool talk_file_clip; /* use file .talk clips */
+    bool talk_filetype; /* say file type */
     bool talk_battery_level;
 
     /* file browser sorting */
