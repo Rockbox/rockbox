@@ -411,17 +411,20 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         }
         else if (action == ACTION_STD_CANCEL)
         {
+            bool exiting_menu = false;
             in_stringlist = false;
             if (menu_callback)
                 menu_callback(ACTION_EXIT_MENUITEM, menu);
             
             if (menu->flags&MENU_EXITAFTERTHISMENU)
                 done = true;
+            else if ((menu->flags&MENU_TYPE_MASK) == MT_MENU)
+                exiting_menu = true;
             if (stack_top > 0)
             {
                 stack_top--;
                 menu = menu_stack[stack_top];
-                if (menu->flags&MENU_EXITAFTERTHISMENU)
+                if (!exiting_menu && (menu->flags&MENU_EXITAFTERTHISMENU))
                     done = true;
                 else
                     init_menu_lists(menu, &lists, 

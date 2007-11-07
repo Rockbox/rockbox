@@ -80,14 +80,8 @@ void talk_force_shutup(void); /* kill voice unconditionally */
 void talk_shutup(void); /* Interrupt voice, as when enqueue is false */
 
 #if CONFIG_RTC
-/* this is in talk.c which isnt compiled for hwcodec simulator */
-#if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
 void talk_time(struct tm *tm, bool enqueue);
 void talk_date(struct tm *tm, bool enqueue);
-#else
-#define talk_date(t, e)
-#define talk_time(t, e)
-#endif
 #endif /* CONFIG_RTC */
 
 /* This (otherwise invalid) ID signals the end of the array. */
