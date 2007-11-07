@@ -144,7 +144,7 @@ static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order)
     int sample = 0, samples;
 
     method_type = get_bits(&s->gb, 2);
-    if (method_type != 0){
+    if (method_type > 1){
         //fprintf(stderr,"illegal residual coding method %d\n", method_type);
         return -3;
     }
@@ -157,8 +157,8 @@ static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order)
     i= pred_order;
     for (partition = 0; partition < (1 << rice_order); partition++)
     {
-        tmp = get_bits(&s->gb, 4);
-        if (tmp == 15)
+        tmp = get_bits(&s->gb, method_type == 0 ? 4 : 5);
+        if (tmp == (method_type == 0 ? 15 : 31))
         {
             //fprintf(stderr,"fixed len partition\n");
             tmp = get_bits(&s->gb, 5);
