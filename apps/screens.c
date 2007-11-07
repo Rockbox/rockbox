@@ -1284,10 +1284,21 @@ static char* runtime_get_data(int selected_item, void* data, char* buffer)
 
 }
 
+static int runtime_speak_data(int selected_item, void* data)
+{
+    (void) data;
+    long title_ids[] = {LANG_RUNNING_TIME, LANG_TOP_TIME};
+    talk_ids(false,
+             title_ids[selected_item/2],
+             TALK_ID((selected_item == 0) ? global_status.runtime
+                     : global_status.topruntime, UNIT_TIME));
+    return 0;
+}
+
 
 bool view_runtime(void)
 {
-    unsigned char *lines[]={str(LANG_CLEAR_TIME)};
+    unsigned char *lines[]={ID2P(LANG_CLEAR_TIME)};
     struct text_message message={(char **)lines, 1};
 
     struct gui_synclist lists;
@@ -1298,8 +1309,11 @@ bool view_runtime(void)
 #else
     gui_synclist_set_title(&lists, NULL, NOICON);
 #endif
+    if(global_settings.talk_menu)
+        gui_synclist_set_voice_callback(&lists, runtime_speak_data);
     gui_synclist_set_icon_callback(&lists, NULL);
     gui_synclist_set_nb_items(&lists, 4);
+    gui_synclist_speak_item(&lists);
     while(1)
     {
 #if CONFIG_CHARGING
@@ -1319,8 +1333,8 @@ bool view_runtime(void)
         lasttime = current_tick;
         gui_synclist_draw(&lists);
         gui_syncstatusbar_draw(&statusbars, true);
-        action = get_action(CONTEXT_STD, HZ);
-        gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD);
+        list_do_action(CONTEXT_STD, HZ,
+                    &lists, &action, LIST_WRAP_UNLESS_HELD);
         if(action == ACTION_STD_CANCEL)
             break;
         if(action == ACTION_STD_OK) {
@@ -1330,6 +1344,7 @@ bool view_runtime(void)
                     global_status.runtime = 0;
                 else
                     global_status.topruntime = 0;
+                gui_synclist_speak_item(&lists);
             }
         }
         if(default_event_handler(action) == SYS_USB_CONNECTED)
