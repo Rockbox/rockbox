@@ -975,7 +975,7 @@ int bufadvance(int handle_id, off_t offset)
  * does not check the validity of the input handle.  It does do range checks
  * on size and returns a valid (and explicit) amount of data for reading */
 static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
-                                          bool filechunk_limit)
+                                          bool guardbuf_limit)
 {
     struct memory_handle *h = find_handle(handle_id);
     if (!h)
@@ -990,14 +990,12 @@ static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
     if (*size == 0 || *size > avail + h->filerem)
         *size = avail + h->filerem;
 
-    if (filechunk_limit &&
-        h->type == TYPE_PACKET_AUDIO && *size > BUFFERING_DEFAULT_FILECHUNK)
+    if (guardbuf_limit && h->type == TYPE_PACKET_AUDIO && *size > GUARD_BUFSIZE)
     {
-        logf("data request > filechunk");
-        /* If more than a filechunk is requested, provide no more than the
-           amount of data on buffer or one file chunk, but without increasing
-           "size", which would be bad. */
-        *size = MIN(*size, MAX(avail, BUFFERING_DEFAULT_FILECHUNK));
+        logf("data request > guardbuf");
+        /* If more than the size of the guardbuf is requested and this is a
+         * bufgetdata, limit to guard_bufsize over the end of the buffer */
+        *size = MIN(*size, buffer_len - h->ridx + GUARD_BUFSIZE);
     }
 
     if (h->filerem > 0 && avail < *size)
