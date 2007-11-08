@@ -974,7 +974,8 @@ int bufadvance(int handle_id, off_t offset)
  * actual amount of data available for reading.  This function explicitly
  * does not check the validity of the input handle.  It does do range checks
  * on size and returns a valid (and explicit) amount of data for reading */
-static size_t prep_bufdata(const struct memory_handle *h, size_t size)
+static size_t prep_bufdata(const struct memory_handle *h, size_t size,
+                           bool filechunk_limit)
 {
     size_t avail = RINGBUF_SUB(h->widx, h->ridx);
 
@@ -985,7 +986,8 @@ static size_t prep_bufdata(const struct memory_handle *h, size_t size)
     if (size == 0 || size > avail + h->filerem)
         size = avail + h->filerem;
 
-    if (h->type == TYPE_PACKET_AUDIO && size > BUFFERING_DEFAULT_FILECHUNK)
+    if (filechunk_limit &&
+        h->type == TYPE_PACKET_AUDIO && size > BUFFERING_DEFAULT_FILECHUNK)
     {
         logf("data request > filechunk");
         /* If more than a filechunk is requested, provide no more than the
@@ -1020,7 +1022,7 @@ ssize_t bufread(int handle_id, size_t size, void *dest)
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
 
-    size = prep_bufdata(h, size);
+    size = prep_bufdata(h, size, false);
 
     if (h->ridx + size > buffer_len)
     {
@@ -1052,7 +1054,7 @@ ssize_t bufgetdata(int handle_id, size_t size, void **data)
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
 
-    size = prep_bufdata(h, size);
+    size = prep_bufdata(h, size, true);
 
     if (h->ridx + size > buffer_len)
     {
