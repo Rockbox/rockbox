@@ -974,29 +974,33 @@ int bufadvance(int handle_id, off_t offset)
  * actual amount of data available for reading.  This function explicitly
  * does not check the validity of the input handle.  It does do range checks
  * on size and returns a valid (and explicit) amount of data for reading */
-static size_t prep_bufdata(const struct memory_handle *h, size_t size,
-                           bool filechunk_limit)
+static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
+                                          bool filechunk_limit)
 {
+    struct memory_handle *h = find_handle(handle_id);
+    if (!h)
+        return NULL;
+
     size_t avail = RINGBUF_SUB(h->widx, h->ridx);
 
     if (avail == 0 && h->filerem == 0)
         /* File is finished reading */
         return 0;
 
-    if (size == 0 || size > avail + h->filerem)
-        size = avail + h->filerem;
+    if (*size == 0 || *size > avail + h->filerem)
+        *size = avail + h->filerem;
 
     if (filechunk_limit &&
-        h->type == TYPE_PACKET_AUDIO && size > BUFFERING_DEFAULT_FILECHUNK)
+        h->type == TYPE_PACKET_AUDIO && *size > BUFFERING_DEFAULT_FILECHUNK)
     {
         logf("data request > filechunk");
         /* If more than a filechunk is requested, provide no more than the
            amount of data on buffer or one file chunk, but without increasing
            "size", which would be bad. */
-        size = MIN(size, MAX(avail, BUFFERING_DEFAULT_FILECHUNK));
+        *size = MIN(*size, MAX(avail, BUFFERING_DEFAULT_FILECHUNK));
     }
 
-    if (h->filerem > 0 && avail < size)
+    if (h->filerem > 0 && avail < *size)
     {
         /* Data isn't ready. Request buffering */
         buf_request_buffer_handle(h->id);
@@ -1004,12 +1008,14 @@ static size_t prep_bufdata(const struct memory_handle *h, size_t size,
         do
         {
             sleep(1);
+            h = find_handle(handle_id);
             avail = RINGBUF_SUB(h->widx, h->ridx);
         }
-        while (h->filerem > 0 && avail < size);
+        while (h->filerem > 0 && avail < *size);
     }
 
-    return MIN(size,avail);
+    *size = MIN(*size,avail);
+    return h;
 }
 
 /* Copy data from the given handle to the dest buffer.
@@ -1018,11 +1024,11 @@ static size_t prep_bufdata(const struct memory_handle *h, size_t size,
 */
 ssize_t bufread(int handle_id, size_t size, void *dest)
 {
-    const struct memory_handle *h = find_handle(handle_id);
+    const struct memory_handle *h;
+
+    h = prep_bufdata(handle_id, &size, false);
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
-
-    size = prep_bufdata(h, size, false);
 
     if (h->ridx + size > buffer_len)
     {
@@ -1050,11 +1056,11 @@ ssize_t bufread(int handle_id, size_t size, void *dest)
 */
 ssize_t bufgetdata(int handle_id, size_t size, void **data)
 {
-    const struct memory_handle *h = find_handle(handle_id);
+    const struct memory_handle *h;
+
+    h = prep_bufdata(handle_id, &size, true);
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
-
-    size = prep_bufdata(h, size, true);
 
     if (h->ridx + size > buffer_len)
     {
