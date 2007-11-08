@@ -9664,16 +9664,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "Huidige tijd"
+    *: ""
   </dest>
   <voice>
-    *: "Huidige tijd"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11404,5 +11404,33 @@
   <voice>
     *: none
     multivolume: "Niet aanwezig"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "Zeg Bestandstype"
+  </dest>
+  <voice>
+    *: "Zeg Bestandstype"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Zeg Batterijniveau"
+  </dest>
+  <voice>
+    *: "Zeg Batterijniveau"
   </voice>
 </phrase>
