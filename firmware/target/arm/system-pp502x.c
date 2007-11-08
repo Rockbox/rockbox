@@ -178,6 +178,9 @@ static void pp_set_cpu_frequency(long frequency)
       case CPUFREQ_MAX:
         CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
         DEV_TIMING1  = 0x00000303;
+#ifdef IPOD_MINI2G
+        MLCD_SCLK_DIV = 0x00000001; /* Mono LCD bridge serial clock divider */
+#endif
 #if CONFIG_CPU == PP5020
         PLL_CONTROL  = 0x8a020a03;  /* 10/3 * 24MHz */
         PLL_STATUS   = 0xd19b;      /* unlock frequencies > 66MHz */
@@ -196,6 +199,9 @@ static void pp_set_cpu_frequency(long frequency)
       case CPUFREQ_NORMAL:
         CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
         DEV_TIMING1  = 0x00000303;
+#ifdef IPOD_MINI2G
+        MLCD_SCLK_DIV = 0x00000000; /* Mono LCD bridge serial clock divider */
+#endif
 #if CONFIG_CPU == PP5020
         PLL_CONTROL  = 0x8a020504;  /* 5/4 * 24MHz */
         scale_suspend_core(false);
@@ -220,6 +226,9 @@ static void pp_set_cpu_frequency(long frequency)
       default:
         CLOCK_SOURCE = 0x10002222;  /* source #1, #2, #3, #4: 24MHz */
         DEV_TIMING1  = 0x00000303;
+#ifdef IPOD_MINI2G
+        MLCD_SCLK_DIV = 0x00000000; /* Mono LCD bridge serial clock divider */
+#endif
         PLL_CONTROL &= ~0x80000000; /* disable PLL */
         cpu_frequency = CPUFREQ_DEFAULT;
         PROC_CTL(CURRENT_CORE) = 0x4800001f; nop;

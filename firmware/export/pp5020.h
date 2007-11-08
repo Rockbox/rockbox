@@ -147,6 +147,8 @@
 
 /* clock control */
 #define CLOCK_SOURCE    (*(volatile unsigned long *)(0x60006020))
+#define MLCD_SCLK_DIV   (*(volatile unsigned long *)(0x6000602c))
+        /* bits 0..1: Mono LCD bridge serial clock divider: 1 / (n+1) */
 #define PLL_CONTROL     (*(volatile unsigned long *)(0x60006034))
 #define PLL_STATUS      (*(volatile unsigned long *)(0x6000603c))
 #define ADC_CLOCK_SRC   (*(volatile unsigned long *)(0x60006094))
