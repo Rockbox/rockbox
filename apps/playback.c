@@ -203,9 +203,13 @@ size_t filebuflen = 0;                      /* Size of buffer (A/C-) */
 #define BUFFER_STATE_VOICED_ONLY     1          /* voice-only */
 static int buffer_state = BUFFER_STATE_TRASHED; /* Buffer state */
 
+/* Used to keep the WPS up-to-date during track transtition */
 static struct mp3entry prevtrack_id3;
+
+/* Used to provide the codec with a pointer */
 static struct mp3entry curtrack_id3;
-static struct mp3entry nexttrack_id3;
+
+/* Used to make next track info available while playing last track on buffer */
 static struct mp3entry lasttrack_id3;
 
 /* Track info structure about songs in the file buffer (A/C-) */
@@ -690,8 +694,8 @@ struct mp3entry* audio_next_track(void)
 
     if (tracks[next_idx].id3_hid < 0)
         return NULL;
-
-    return &nexttrack_id3;
+    else
+        return bufgetid3(tracks[next_idx].id3_hid);
 }
 
 bool audio_has_changed_track(void)
@@ -2049,9 +2053,6 @@ static void audio_update_trackinfo(void)
     int next_idx = track_ridx + 1;
     next_idx &= MAX_TRACK_MASK;
 
-    if (tracks[next_idx].id3_hid >= 0)
-        copy_mp3entry(&nexttrack_id3, bufgetid3(tracks[next_idx].id3_hid));
-
     tracks[next_idx].taginfo_ready = (tracks[next_idx].id3_hid >= 0);
 
     ci.filesize = CUR_TI->filesize;
@@ -2314,8 +2315,6 @@ static bool audio_load_track(int offset, bool start_play)
 
             if (track_widx == track_ridx)
                 copy_mp3entry(&curtrack_id3, &id3);
-            else if (track_widx == ((track_ridx + 1) & MAX_TRACK_MASK))
-                copy_mp3entry(&nexttrack_id3, &id3);
 
             if (start_play)
             {
@@ -2379,8 +2378,6 @@ static bool audio_load_track(int offset, bool start_play)
 
     if (track_widx == track_ridx)
         track_id3 = &curtrack_id3;
-    else if (track_widx == ((track_ridx + 1) & MAX_TRACK_MASK))
-        track_id3 = &nexttrack_id3;
     else
         track_id3 = bufgetid3(tracks[track_widx].id3_hid);
 
@@ -2772,7 +2769,6 @@ static void audio_stop_playback(void)
     audio_release_tracks();
 
     memset(&curtrack_id3, 0, sizeof(struct mp3entry));
-    memset(&nexttrack_id3, 0, sizeof(struct mp3entry));
 }
 
 static void audio_play_start(size_t offset)
