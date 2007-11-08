@@ -94,11 +94,17 @@ static inline unsigned int processor_id(void)
 #define UNCACHED_ADDR(a) (a)
 #else
 #define UNCACHED_ADDR(a) \
-    ((typeof (a))((uintptr_t)(a) + 0x10000000))
+    ((typeof (a))((uintptr_t)(a) | 0x10000000))
 #endif
 
 #ifdef CPU_PP502x
 
+/* Certain data needs to be out of the way of cache line interference
+ * such as data for COP use or for use with UNCACHED_ADDR */
+#define PROC_NEEDS_CACHEALIGN
+#define CACHEALIGN_BITS (5) /* 2^5 = 32 bytes */
+
+/** cache functions **/
 #ifndef BOOTLOADER
 #define CACHE_FUNCTIONS_AS_CALL
 

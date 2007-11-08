@@ -37,6 +37,7 @@
 #include "config.h"
 #include "system.h"
 #include "dir.h"
+#include "general.h"
 #include "kernel.h"
 #include "thread.h"
 #include "button.h"
@@ -112,7 +113,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 88
+#define PLUGIN_API_VERSION 89
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -640,6 +641,10 @@ struct plugin_api {
 #endif
 
     void (*thread_wait)(struct thread_entry *thread);
+
+#ifdef PROC_NEEDS_CACHEALIGN
+    size_t (*align_buffer)(void **start, size_t size, size_t align);
+#endif
 };
 
 /* plugin header */
@@ -741,5 +746,13 @@ enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)
 #endif /* CACHE_FUNCTIONS_AS_CALL */
 
 #endif /* CACHE_FUNCTION_WRAPPERS */
+
+#ifndef ALIGN_BUFFER_WRAPPER
+#define ALIGN_BUFFER_WRAPPER(api) \
+        size_t align_buffer(void **start, size_t size, size_t align) \
+        { \
+            return (api)->align_buffer(start, size, align); \
+        }
+#endif /* ALIGN_BUFFER_WRAPPER */
 
 #endif

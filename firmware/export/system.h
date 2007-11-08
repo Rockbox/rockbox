@@ -229,4 +229,36 @@ static inline uint32_t swap_odd_even32(uint32_t value)
 #define flush_icache()
 #endif
 
+#ifdef PROC_NEEDS_CACHEALIGN
+/* Cache alignment attributes and sizes are enabled */
+
+/* 2^CACHEALIGN_BITS = the byte size */
+#define CACHEALIGN_SIZE (1u << CACHEALIGN_BITS)
+
+#define CACHEALIGN_ATTR __attribute__((aligned(CACHEALIGN_SIZE)))
+/* Aligns x up to a CACHEALIGN_SIZE boundary */
+#define CACHEALIGN_UP(x) \
+    ((typeof (x))ALIGN_UP_P2((uintptr_t)(x), CACHEALIGN_BITS))
+/* Aligns x down to a CACHEALIGN_SIZE boundary */
+#define CACHEALIGN_DOWN(x) \
+    ((typeof (x))ALIGN_DOWN_P2((uintptr_t)(x), CACHEALIGN_BITS))
+/* Aligns at least to the greater of size x or CACHEALIGN_SIZE */
+#define CACHEALIGN_AT_LEAST_ATTR(x) __attribute__((aligned(CACHEALIGN_UP(x))))
+/* Aligns a buffer pointer and size to proper boundaries */
+#define CACHEALIGN_BUFFER(start, size) \
+    ({ align_buffer((start), (size), CACHEALIGN_SIZE); })
+
+#else /* ndef PROC_NEEDS_CACHEALIGN */
+
+/* Cache alignment attributes and sizes are not enabled */
+#define CACHEALIGN_ATTR
+#define CACHEALIGN_AT_LEAST_ATTR(x) __attribute__((aligned(x)))
+#define CACHEALIGN_UP(x) (x)
+#define CACHEALIGN_DOWN(x) (x)
+/* Make no adjustments */
+#define CACHEALIGN_BUFFER(start, size) \
+    ({ (void)(start); (size); })
+
+#endif /* PROC_NEEDS_CACHEALIGN */
+
 #endif /* __SYSTEM_H__ */

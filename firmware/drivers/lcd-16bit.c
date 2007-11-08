@@ -42,7 +42,8 @@ enum fill_opt {
 };
 
 /*** globals ***/
-fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH] IRAM_LCDFRAMEBUFFER __attribute__ ((aligned (16)));
+fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
+    IRAM_LCDFRAMEBUFFER CACHEALIGN_AT_LEAST_ATTR(16);
 
 
 static fb_data* lcd_backdrop = NULL;

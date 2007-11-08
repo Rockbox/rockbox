@@ -109,9 +109,9 @@ static unsigned short r_drv_output_control  = R_DRV_OUTPUT_CONTROL_NORMAL;
 /* We don't know how to receive a DMA finished signal from the LCD controller
  * To avoid problems with flickering, we double-buffer the framebuffer and turn
  * off DMA while updates are taking place
- * Same alignment as in lcd-16bit.c and cache interference free */
+ * At least the alignment as in lcd-16bit.c and cache interference free */
 static fb_data lcd_driver_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
-    __attribute__((aligned(16)));
+    CACHEALIGN_AT_LEAST_ATTR(16);
 
 #ifdef BOOTLOADER
 static void lcd_init_gpio(void)

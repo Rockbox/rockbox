@@ -518,6 +518,10 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     thread_wait,
+
+#ifdef PROC_NEEDS_CACHEALIGN
+    align_buffer,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
