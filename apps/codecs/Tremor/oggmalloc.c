@@ -1,11 +1,11 @@
 #include <os_types.h>
 
 static unsigned char *mallocbuf;
-static long bufsize, tmp_ptr, mem_ptr;
+static size_t bufsize, tmp_ptr, mem_ptr;
 
 void ogg_malloc_init(void)
 {
-    mallocbuf = (unsigned char *)ci->get_codec_memory((size_t *)&bufsize);
+    mallocbuf = ci->get_codec_memory(&bufsize);
     tmp_ptr = bufsize & ~3;
     mem_ptr = 0;
 }
@@ -14,21 +14,25 @@ void *ogg_malloc(size_t size)
 {
     void* x;
 
-    if (mem_ptr + (long)size > tmp_ptr)
+    size = (size + 3) & ~3;
+
+    if (mem_ptr + size > tmp_ptr)
         return NULL;
     
     x = &mallocbuf[mem_ptr];
-    mem_ptr += (size + 3) & ~3; /* Keep memory 32-bit aligned */
+    mem_ptr += size; /* Keep memory 32-bit aligned */
 
     return x;
 }
 
 void *ogg_tmpmalloc(size_t size)
 {
-    if (mem_ptr + (long)size > tmp_ptr)
+    size = (size + 3) & ~3;
+
+    if (mem_ptr + size > tmp_ptr)
         return NULL;
     
-    tmp_ptr -= (size + 3) & ~3;
+    tmp_ptr -= size;
     return &mallocbuf[tmp_ptr];
 }
 
