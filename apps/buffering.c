@@ -996,6 +996,7 @@ static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
         /* If more than the size of the guardbuf is requested and this is a
          * bufgetdata, limit to guard_bufsize over the end of the buffer */
         *size = MIN(*size, buffer_len - h->ridx + GUARD_BUFSIZE);
+        /* this ensures *size <= buffer_len - h->ridx + GUARD_BUFSIZE */
     }
 
     if (h->filerem > 0 && avail < *size)
@@ -1068,9 +1069,10 @@ ssize_t bufgetdata(int handle_id, size_t size, void **data)
     {
         /* the data wraps around the end of the buffer :
            use the guard buffer to provide the requested amount of data. */
-        size_t copy_n = MIN(h->ridx + size - buffer_len, GUARD_BUFSIZE);
+        size_t copy_n = h->ridx + size - buffer_len;
+        /* prep_bufdata ensures size <= buffer_len - h->ridx + GUARD_BUFSIZE,
+           so copy_n <= GUARD_BUFSIZE */
         memcpy(guard_buffer, (unsigned char *)buffer, copy_n);
-        size = buffer_len - h->ridx + copy_n;
     }
 
     *data = &buffer[h->ridx];
