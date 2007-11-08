@@ -812,10 +812,8 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 "move.l     2(%[s], %[y1].l*2), %[y1] \r\n"
                 /* %acc0 = f*y1                          */
                 "mac.w      %[f]l, %[y1]l, %%acc0     \r\n"
-                /* msac.w is 2% boostier so add negative */
-                "neg.l      %[f]                      \r\n"
                 /* %acc0 -= f*y0                         */
-                "mac.w      %[f]l, %[y1]u, %%acc0     \r\n"
+                "msac.w     %[f]l, %[y1]u, %%acc0     \r\n"
                 /* separate out y0 and sign extend       */
                 "swap       %[y1]                     \r\n"
                 "movea.w    %[y1], %[y0]              \r\n"
