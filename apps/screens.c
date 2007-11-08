@@ -457,10 +457,9 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
     display->update();
 }
 
-static int pitch_increase(int pitch, int delta,
-                bool allow_cutoff, bool redraw_screens) {
+static int pitch_increase(int pitch, int delta, bool allow_cutoff)
+{
     int new_pitch;
-    int i;
     
     if (delta < 0) {
         if (pitch + delta >= PITCH_MIN) {
@@ -485,12 +484,7 @@ static int pitch_increase(int pitch, int delta,
         return pitch;
     }
     sound_set_pitch(new_pitch);
-    
-    if (redraw_screens) {
-        FOR_NB_SCREENS(i)
-            pitch_screen_draw(&screens[i], pitch, pitch_mode);
-    }
-    
+
     return new_pitch;
 }
 
@@ -512,7 +506,8 @@ static int pitch_increase(int pitch, int delta,
 #define PITCH_N_FCT           10
 #define PITCH_KN_FCT          1000000UL
 
-static int pitch_increase_semitone(int pitch, bool up) {
+static int pitch_increase_semitone(int pitch, bool up)
+{
     uint32_t tmp;
     uint32_t round_fct; /* How much to scale down at the end */
     tmp = pitch;
@@ -525,14 +520,14 @@ static int pitch_increase_semitone(int pitch, bool up) {
     }
     /* Scaling down with rounding */
     tmp = (tmp + round_fct / 2) / round_fct;
-    return pitch_increase(pitch, tmp - pitch, false, false);
+    return pitch_increase(pitch, tmp - pitch, false);
 }
 
 bool pitch_screen(void)
 {
     int button;
     int pitch = sound_get_pitch();
-    int new_pitch;
+    int new_pitch, delta = 0;
     bool nudged = false;
     bool exit = false;
     int i;
@@ -549,54 +544,43 @@ bool pitch_screen(void)
         button = get_action(CONTEXT_PITCHSCREEN,TIMEOUT_BLOCK);
         switch (button) {
             case ACTION_PS_INC_SMALL:
-                if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-                    pitch = pitch_increase(pitch, PITCH_SMALL_DELTA, true, false);
-                } else {
-                    pitch = pitch_increase_semitone(pitch, true);
-                }
+                delta = PITCH_SMALL_DELTA;
                 break;
 
             case ACTION_PS_INC_BIG:
-                if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-                    pitch = pitch_increase(pitch, PITCH_BIG_DELTA, true, false);
-                }
+                delta = PITCH_BIG_DELTA;
                 break;
 
             case ACTION_PS_DEC_SMALL:
-                if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-                    pitch = pitch_increase(pitch, -PITCH_SMALL_DELTA, true, false);
-                } else {
-                    pitch = pitch_increase_semitone(pitch, false);
-                }
+                delta = -PITCH_SMALL_DELTA;
                 break;
 
             case ACTION_PS_DEC_BIG:
-                if (pitch_mode == PITCH_MODE_ABSOLUTE) {
-                    pitch = pitch_increase(pitch, -PITCH_BIG_DELTA, true, false);
-                }
+                delta = -PITCH_BIG_DELTA;
                 break;
 
             case ACTION_PS_NUDGE_RIGHT:
-                new_pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false, true);
+                new_pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false);
                 nudged = (new_pitch != pitch);
                 pitch = new_pitch;
                 break;
+
             case ACTION_PS_NUDGE_RIGHTOFF:
                 if (nudged) {
-                    pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false, false);
+                    pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false);
                 }
                 nudged = false;
                 break;
 
             case ACTION_PS_NUDGE_LEFT:
-                new_pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false, true);
+                new_pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false);
                 nudged = (new_pitch != pitch);
                 pitch = new_pitch;
                 break;
                 
             case ACTION_PS_NUDGE_LEFTOFF:
                 if (nudged) {
-                    pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false, false);
+                    pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false);
                 }
                 nudged = false;
                 break;
@@ -619,6 +603,18 @@ bool pitch_screen(void)
                     return 1;
                 break;
         }
+        
+        if(delta)
+        {
+            if (pitch_mode == PITCH_MODE_ABSOLUTE) {
+                pitch = pitch_increase(pitch, delta, true);
+            } else {
+                pitch = pitch_increase_semitone(pitch, delta > 0 ? true:false);
+            }
+            
+            delta = 0;
+        }
+        
     }
 #if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(false);
