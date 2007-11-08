@@ -80,7 +80,7 @@ static wchar_t* utf8_to_ucs2(const unsigned char *utf8, void *buffer)
 
     while (*utf8)
         utf8 = utf8decode(utf8, ucs++);
-        
+
     *ucs = 0;
     return buffer;
 }
@@ -90,7 +90,7 @@ static unsigned char *ucs2_to_utf8(const wchar_t *ucs, unsigned char *buffer)
 
     while (*ucs)
         utf8 = utf8encode(*ucs++, utf8);
-        
+
     *utf8 = 0;
     return buffer;
 }
@@ -150,13 +150,13 @@ struct sim_dirent {
     int attribute;
     long size;
     long startcluster;
-    unsigned short wrtdate; /*  Last write date */ 
+    unsigned short wrtdate; /*  Last write date */
     unsigned short wrttime; /*  Last write time */
 };
 
 struct dirstruct {
     void *dir; /* actually a DIR* dir */
-    char *name;    
+    char *name;
 } SIM_DIR;
 
 struct mydir {
@@ -354,7 +354,7 @@ MYDIR *sim_opendir(const char *name)
 
 struct sim_dirent *sim_readdir(MYDIR *dir)
 {
-    char buffer[512]; /* sufficiently big */
+    char buffer[MAX_PATH]; /* sufficiently big */
     static struct sim_dirent secret;
     STAT_T s;
     DIRENT_T *x11 = READDIR(dir->dir);
@@ -375,7 +375,7 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     STAT(buffer, &s); /* get info */
 
 #define ATTR_DIRECTORY 0x10
-    
+
     secret.attribute = S_ISDIR(s.st_mode)?ATTR_DIRECTORY:0;
     secret.size = s.st_size;
 
@@ -448,7 +448,7 @@ int sim_creat(const char *name)
     if(name[0] == '/')
     {
         snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
-        
+
         debugf("We create the real file '%s'\n", buffer);
         return OPEN(buffer, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
     }
@@ -457,7 +457,7 @@ int sim_creat(const char *name)
 #else
     return OPEN(name, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
 #endif
-}      
+}
 
 ssize_t sim_read(int fd, void *buf, size_t count)
 {
@@ -518,7 +518,7 @@ int sim_rmdir(const char *name)
     return RMDIR(name);
 #else
     char buffer[MAX_PATH]; /* sufficiently big */
-    if(name[0] == '/') 
+    if(name[0] == '/')
     {
         snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
 
@@ -587,7 +587,7 @@ long sim_filesize(int fd)
     return _filelength(fd);
 #else
     struct stat buf;
-    
+
     if (!fstat(fd, &buf))
         return buf.st_size;
     else
@@ -601,7 +601,7 @@ void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free)
     if (volume != 0) {
         debugf("io.c: fat_size(volume=%d); simulator only supports volume 0\n",
             volume);
-        
+
         if (size) *size = 0;
         if (free) *free = 0;
         return;
@@ -671,9 +671,9 @@ void *sim_codec_load_ram(char* codecptr, int size, void **pd)
 
     *pd = NULL;
 
-    /* We have to create the dynamic link library file from ram so we 
+    /* We have to create the dynamic link library file from ram so we
        can simulate the codec loading. With voice and crossfade,
-       multiple codecs may be loaded at the same time, so we need 
+       multiple codecs may be loaded at the same time, so we need
        to find an unused filename */
     for (codec_count = 0; codec_count < 10; codec_count++)
     {
@@ -698,7 +698,7 @@ void *sim_codec_load_ram(char* codecptr, int size, void **pd)
     /* Now load the library. */
     *pd = dlopen(path, RTLD_NOW);
     if (*pd == NULL) {
-        DEBUGF("failed to load %s\n", path); 
+        DEBUGF("failed to load %s\n", path);
 #ifdef WIN32
         FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0,
                        buf, sizeof buf, NULL);
