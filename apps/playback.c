@@ -206,6 +206,7 @@ static int buffer_state = BUFFER_STATE_TRASHED; /* Buffer state */
 static struct mp3entry prevtrack_id3;
 static struct mp3entry curtrack_id3;
 static struct mp3entry nexttrack_id3;
+static struct mp3entry lasttrack_id3;
 
 /* Track info structure about songs in the file buffer (A/C-) */
 struct track_info {
@@ -683,6 +684,9 @@ struct mp3entry* audio_next_track(void)
 
     next_idx++;
     next_idx &= MAX_TRACK_MASK;
+
+    if (next_idx == track_widx)
+        return &lasttrack_id3;
 
     if (tracks[next_idx].id3_hid < 0)
         return NULL;
@@ -2304,6 +2308,7 @@ static bool audio_load_track(int offset, bool start_play)
             {
                 last_peek_offset--;
                 close(fd);
+                copy_mp3entry(&lasttrack_id3, &id3);
                 return false;
             }
 
