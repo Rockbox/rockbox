@@ -56,6 +56,7 @@ SDL_TimerID tick_timer_id;
 bool lcd_display_redraw = true;         /* Used for player simulator */
 char having_new_lcd = true;               /* Used for player simulator */
 bool sim_alarm_wakeup = false;
+const char *sim_root_dir = NULL;
 
 bool debug_audio = false;
 
@@ -195,40 +196,65 @@ bool gui_shutdown(void)
 
 int main(int argc, char *argv[])
 {
-    if (argc >= 1) {
+    if (argc >= 1) 
+    {
         int x;
-        for (x = 1; x < argc; x++) {
-            if (!strcmp("--debugaudio", argv[x])) {
+        for (x = 1; x < argc; x++) 
+        {
+            if (!strcmp("--debugaudio", argv[x])) 
+            {
                 debug_audio = true;
                 printf("Writing debug audio file.\n");
-            } else if (!strcmp("--debugwps", argv[x])) {
+            } 
+            else if (!strcmp("--debugwps", argv[x]))
+            {
                 debug_wps = true;
                 printf("WPS debug mode enabled.\n");
-            } else if (!strcmp("--background", argv[x])) {
+            } 
+            else if (!strcmp("--background", argv[x]))
+            {
                 background = true;
                 printf("Using background image.\n");
-            } else if (!strcmp("--old_lcd", argv[x])) {
+            } 
+            else if (!strcmp("--old_lcd", argv[x]))
+            {
                 having_new_lcd = false;
                 printf("Using old LCD layout.\n");
-            } else if (!strcmp("--zoom", argv[x])) {
+            }
+            else if (!strcmp("--zoom", argv[x]))
+            {
                 x++;
                 if(x < argc)
                     display_zoom=atoi(argv[x]);
                 else
                     display_zoom = 2;
                 printf("Window zoom is %d\n", display_zoom);
-            } else if (!strcmp("--alarm", argv[x])) {
+            }
+            else if (!strcmp("--alarm", argv[x]))
+            {
                 sim_alarm_wakeup = true;
                 printf("Simulating alarm wakeup.\n");
-            } else {
+            }
+            else if (!strcmp("--root", argv[x]))
+            {
+                x++;
+                if (x < argc)
+                {
+                    sim_root_dir = argv[x];
+                    printf("Root directory: %s\n", sim_root_dir);
+                }
+            }
+            else 
+            {
                 printf("rockboxui\n");
                 printf("Arguments:\n");
                 printf("  --debugaudio \t Write raw PCM data to audiodebug.raw\n");
                 printf("  --debugwps \t Print advanced WPS debug info\n");
                 printf("  --background \t Use background image of hardware\n");
                 printf("  --old_lcd \t [Player] simulate old playermodel (ROM version<4.51)\n");
-                printf("  --zoom [VAL]\t window zoom (will disable backgrounds)\n");
-                printf("  --alarm \t Simulate a wakup-up on Alarm\n");
+                printf("  --zoom [VAL]\t Window zoom (will disable backgrounds)\n");
+                printf("  --alarm \t Simulate a wake-up on alarm\n");
+                printf("  --root [DIR]\t Set root directory\n");
                 exit(0);
             }
         }

@@ -139,7 +139,9 @@ void dircache_remove(const char *name);
 void dircache_rename(const char *oldpath, const char *newpath);
 #endif
 
-#define SIMULATOR_ARCHOS_ROOT "archos"
+
+#define SIMULATOR_DEFAULT_ROOT "archos"
+extern const char *sim_root_dir;
 
 static int num_openfiles = 0;
 
@@ -317,6 +319,13 @@ static void io_trigger_and_wait(int cmd)
         yield();
 }
 
+static const char *get_sim_rootdir()
+{
+    if (sim_root_dir != NULL)
+        return sim_root_dir;
+    return SIMULATOR_DEFAULT_ROOT;
+}
+
 MYDIR *sim_opendir(const char *name)
 {
     char buffer[MAX_PATH]; /* sufficiently big */
@@ -325,7 +334,7 @@ MYDIR *sim_opendir(const char *name)
 #ifndef __PCTOOL__
     if(name[0] == '/')
     {
-        snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
         dir=(DIR_T *)OPENDIR(buffer);
     }
     else
@@ -360,8 +369,8 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
 #ifdef __PCTOOL__
     snprintf(buffer, sizeof(buffer), "%s/%s", dir->name, secret.d_name);
 #else
-    snprintf(buffer, sizeof(buffer), SIMULATOR_ARCHOS_ROOT "%s/%s",
-            dir->name, secret.d_name);
+    snprintf(buffer, sizeof(buffer), "%s/%s/%s",
+            get_sim_rootdir(), dir->name, secret.d_name);
 #endif
     STAT(buffer, &s); /* get info */
 
@@ -400,7 +409,7 @@ int sim_open(const char *name, int o)
 #ifndef __PCTOOL__
     if(name[0] == '/')
     {
-        snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
 
         debugf("We open the real file '%s'\n", buffer);
         if (num_openfiles < MAX_OPEN_FILES)
@@ -438,7 +447,7 @@ int sim_creat(const char *name)
     char buffer[MAX_PATH]; /* sufficiently big */
     if(name[0] == '/')
     {
-        snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
         
         debugf("We create the real file '%s'\n", buffer);
         return OPEN(buffer, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
@@ -496,7 +505,7 @@ int sim_mkdir(const char *name)
 #else
     char buffer[MAX_PATH]; /* sufficiently big */
 
-    snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+    snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
 
     debugf("We create the real directory '%s'\n", buffer);
     return MKDIR(buffer, 0777);
@@ -511,7 +520,7 @@ int sim_rmdir(const char *name)
     char buffer[MAX_PATH]; /* sufficiently big */
     if(name[0] == '/') 
     {
-        snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
 
         debugf("We remove the real directory '%s'\n", buffer);
         return RMDIR(buffer);
@@ -532,7 +541,7 @@ int sim_remove(const char *name)
 #endif
 
     if(name[0] == '/') {
-        snprintf(buffer, sizeof(buffer), "%s%s", SIMULATOR_ARCHOS_ROOT, name);
+        snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
 
         debugf("We remove the real file '%s'\n", buffer);
         return REMOVE(buffer);
@@ -554,9 +563,9 @@ int sim_rename(const char *oldpath, const char* newpath)
 #endif
 
     if(oldpath[0] == '/') {
-        snprintf(buffer1, sizeof(buffer1), "%s%s", SIMULATOR_ARCHOS_ROOT,
+        snprintf(buffer1, sizeof(buffer1), "%s%s", get_sim_rootdir(),
                                                    oldpath);
-        snprintf(buffer2, sizeof(buffer2), "%s%s", SIMULATOR_ARCHOS_ROOT,
+        snprintf(buffer2, sizeof(buffer2), "%s%s", get_sim_rootdir(),
                                                    newpath);
 
         debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2);
