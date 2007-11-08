@@ -984,8 +984,11 @@ static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
     size_t avail = RINGBUF_SUB(h->widx, h->ridx);
 
     if (avail == 0 && h->filerem == 0)
+    {
         /* File is finished reading */
-        return 0;
+        *size = 0;
+        return h;
+    }
 
     if (*size == 0 || *size > avail + h->filerem)
         *size = avail + h->filerem;
