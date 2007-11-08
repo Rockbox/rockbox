@@ -187,6 +187,7 @@ void signal_div(const spx_sig_t *x, spx_sig_t *y, spx_word32_t scale, int len)
 
 
 
+#ifndef SPEEX_DISABLE_ENCODER
 spx_word16_t compute_rms(const spx_sig_t *x, int len)
 {
    int i;
@@ -227,6 +228,7 @@ spx_word16_t compute_rms(const spx_sig_t *x, int len)
    
    return EXTRACT16(PSHR32(SHL32(EXTEND32(spx_sqrt(DIV32(sum,len))),(sig_shift+3)),SIG_SHIFT));
 }
+#endif /*SPEEX_DISABLE_ENCODER */
 
 spx_word16_t compute_rms16(const spx_word16_t *x, int len)
 {
