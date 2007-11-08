@@ -964,9 +964,21 @@ static int set_rating_inline(void)
         gui_syncsplash(HZ*2, ID2P(LANG_ID3_NO_INFO));
     return 0;
 }
+static int ratingitem_callback(int action,const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    switch (action)
+    {
+        case ACTION_REQUEST_MENUITEM:
+            if (!selected_file || !global_settings.runtimedb)
+                return ACTION_EXIT_MENUITEM;
+            break;
+    }
+    return action;
+}
 MENUITEM_FUNCTION(rating_item, 0, ID2P(LANG_MENU_SET_RATING), 
                   set_rating_inline, NULL, 
-                  NULL, Icon_Questionmark);
+                  ratingitem_callback, Icon_Questionmark);
 #endif
 
 static bool view_cue(void)
