@@ -240,7 +240,11 @@ static unsigned int battery_millivolts;/* filtered battery voltage, millivolts *
 /* battery level (0-100%) of this minute, updated once per minute */
 static int battery_percent  = -1;
 static int battery_capacity = BATTERY_CAPACITY_DEFAULT; /* default value, mAh */
+#if BATTERY_TYPES_COUNT > 1
 static int battery_type     = 0;
+#else
+#define battery_type 0
+#endif
 
 /* Power history: power_history[0] is the newest sample */
 unsigned short power_history[POWER_HISTORY_LEN];
