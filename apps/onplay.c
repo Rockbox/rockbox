@@ -951,48 +951,22 @@ static bool clipboard_paste(void)
 
 static int onplaymenu_callback(int action,const struct menu_item_ex *this_item);
 #ifdef HAVE_TAGCACHE
-char *rating_name(int selected_item, void * data, char *buffer)
-{
-    (void)selected_item; (void)data;
-    struct mp3entry* id3 = audio_current_track();
-    if(id3)
-        snprintf(buffer, MAX_PATH,
-             "%s: %d", str(LANG_MENU_SET_RATING), id3->rating);
-    else
-        snprintf(buffer, MAX_PATH,
-             "%s: -", str(LANG_MENU_SET_RATING));
-    return buffer;
-}
-
-static bool set_rating_inline(void)
+static int set_rating_inline(void)
 {
     struct mp3entry* id3 = audio_current_track();
-    if (id3 && id3->tagcache_idx) 
+    if (id3 && id3->tagcache_idx && global_settings.runtimedb) 
     {
-        if (id3->rating<10) 
-            id3->rating++;
-        else
-            id3->rating=0;
-        
+        set_int_ex(str(LANG_MENU_SET_RATING), "", UNIT_INT, (void*)(&id3->rating),
+                   NULL, 1, 0, 10, NULL, NULL);
         tagcache_update_numeric(id3->tagcache_idx, tag_rating, id3->rating);
     }
-    return false;
+    else
+        gui_syncsplash(HZ*2, ID2P(LANG_ID3_NO_INFO));
+    return 0;
 }
-static int ratingitem_callback(int action,const struct menu_item_ex *this_item)
-{
-    (void)this_item;
-    switch (action)
-    {
-        case ACTION_REQUEST_MENUITEM:
-            if (!selected_file || !global_settings.runtimedb)
-                return ACTION_EXIT_MENUITEM;
-            break;
-    }
-    return action;
-}
-MENUITEM_FUNCTION_DYNTEXT(rating_item, 0, set_rating_inline,
-                          NULL, rating_name, NULL, NULL, 
-                          ratingitem_callback, Icon_Questionmark);
+MENUITEM_FUNCTION(rating_item, 0, ID2P(LANG_MENU_SET_RATING), 
+                  set_rating_inline, NULL, 
+                  NULL, Icon_Questionmark);
 #endif
 
 static bool view_cue(void)
@@ -1201,26 +1175,16 @@ static int onplaymenu_callback(int action,const struct menu_item_ex *this_item)
 }
 int onplay(char* file, int attr, int from)
 {
-    int menu_result;
-    int selected_item = 0; /* this is a bit of a hack to reopen 
-                              the menu if certain items are selected */
+    const struct menu_item_ex *menu;
     onplay_result = ONPLAY_OK;
     context = from;
     selected_file = file;
     selected_file_attr = attr;
     if (context == CONTEXT_WPS)
-    {
-#ifdef HAVE_TAGCACHE
-        do {
-#endif
-            menu_result = do_menu(&wps_onplay_menu, &selected_item);
-#ifdef HAVE_TAGCACHE
-        } while ((wps_onplay_menu_[selected_item] == &rating_item));
-#endif
-    }
+        menu = &wps_onplay_menu;
     else
-        menu_result = do_menu(&tree_onplay_menu, NULL);
-    switch (menu_result)
+        menu = &tree_onplay_menu;
+    switch (do_menu(menu, NULL))
     {
         case GO_TO_WPS:
             return ONPLAY_START_PLAY;
