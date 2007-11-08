@@ -1006,7 +1006,11 @@ static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
         do
         {
             sleep(1);
+            /* it is not safe for a non-buffering thread to sleep while
+             * holding a handle */
             h = find_handle(handle_id);
+            if (!h)
+                return NULL;
             avail = RINGBUF_SUB(h->widx, h->ridx);
         }
         while (h->filerem > 0 && avail < *size);
