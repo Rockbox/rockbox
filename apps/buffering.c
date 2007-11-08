@@ -974,8 +974,8 @@ int bufadvance(int handle_id, off_t offset)
  * actual amount of data available for reading.  This function explicitly
  * does not check the validity of the input handle.  It does do range checks
  * on size and returns a valid (and explicit) amount of data for reading */
-static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
-                                          bool guardbuf_limit)
+static struct memory_handle *prep_bufdata(const int handle_id, size_t *size,
+                                          const bool guardbuf_limit)
 {
     struct memory_handle *h = find_handle(handle_id);
     if (!h)
@@ -1005,7 +1005,7 @@ static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
     if (h->filerem > 0 && avail < *size)
     {
         /* Data isn't ready. Request buffering */
-        buf_request_buffer_handle(h->id);
+        buf_request_buffer_handle(handle_id);
         /* Wait for the data to be ready */
         do
         {
