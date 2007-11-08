@@ -1226,7 +1226,7 @@ void shutdown_hw(void)
    levels.  This must be called after battery_percent has been updated. */
 static void send_battery_level_event(void)
 {
-    static const int levels[] = { 15, 30, 50, 0 };
+    static const int levels[] = { 5, 15, 30, 50, 0 };
     const int *level = levels;
     while (*level)
     {
