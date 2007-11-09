@@ -665,13 +665,17 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
    if (SUBMODE(forced_pitch_gain))
    {
       int quant;
+#ifdef FIXED_POINT
+      quant = PSHR16(MULT16_16_16(15, ol_pitch_coef),GAIN_SHIFT);
+#else
       quant = (int)floor(.5+15*ol_pitch_coef*GAIN_SCALING_1);
+#endif
       if (quant>15)
          quant=15;
       if (quant<0)
          quant=0;
       speex_bits_pack(bits, quant, 4);
-      ol_pitch_coef=GAIN_SCALING*0.066667*quant;
+      ol_pitch_coef=MULT16_16_P15(QCONST16(0.066667,15),SHL16(quant,GAIN_SHIFT));
    }
    
    
@@ -1410,7 +1414,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    {
       int quant;
       quant = speex_bits_unpack_unsigned(bits, 4);
-      ol_pitch_coef=GAIN_SCALING*0.066667*quant;
+      ol_pitch_coef=MULT16_16_P15(QCONST16(0.066667,15),SHL16(quant,GAIN_SHIFT));
    }
    
    /* Get global excitation gain */
@@ -1572,11 +1576,9 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
             /*Fixed codebook contribution*/
             SUBMODE(innovation_unquant)(innov, SUBMODE(innovation_params), st->subframeSize, bits, stack, &st->seed);
             /* De-normalize innovation and update excitation */
-#ifdef FIXED_POINT
+
             signal_mul(innov, innov, ener, st->subframeSize);
-#else
-            signal_mul(innov, innov, ener, st->subframeSize);
-#endif
+
             /* Decode second codebook (only for some modes) */
             if (SUBMODE(double_codebook))
             {
@@ -2026,6 +2028,8 @@ int nb_decoder_ctl(void *state, int request, void *ptr)
       break;
    case SPEEX_GET_ACTIVITY:
    {
+      /* We don't use this, dummy it out to get rid of the float stuff */
+#if 0 
       float ret;
       ret = log(st->level/st->min_level)/log(st->max_level/st->min_level);
       if (ret>1)
@@ -2035,6 +2039,9 @@ int nb_decoder_ctl(void *state, int request, void *ptr)
          ret = 0;
       /*printf ("%f %f %f %f\n", st->level, st->min_level, st->max_level, ret);*/
       (*(spx_int32_t*)ptr) = (int)(100*ret);
+#else
+      (*(spx_int32_t*)ptr) = (int)(0);
+#endif
    }
    break;
    case SPEEX_GET_PI_GAIN:
