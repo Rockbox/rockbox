@@ -150,7 +150,7 @@ void* main(void)
     if (crc32 == PATCHED_CRC32)
     {
         /* Bootloader already patched */
-        printf("Firmware unlocked");
+        printf("Already unlocked");
         printf("Proceed to Step 2");
     } else if ((crc32 == KNOWN_CRC32) && 
                 !memcmp(&sector[HACK_OFFSET], knownBytes, 
@@ -162,7 +162,7 @@ void* main(void)
         ata_write_sectors(IF_MV2(0,) 
                         pinfo->start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
                         1 , sector);
-        printf("Already unlocked");
+        printf("Firmware unlocked");
         printf("Proceed to Step 2");
     } else if (is_e200(crc32))
     {
