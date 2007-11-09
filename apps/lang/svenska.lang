@@ -2832,7 +2832,7 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
     *: none
@@ -2840,7 +2840,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </voice>
 </phrase>
 <phrase>
