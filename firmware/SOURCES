@@ -163,7 +163,6 @@ drivers/fmradio.c
 drivers/tuner/s1a0903x01.c
 #endif /* (CONFIG_TUNER & S1A0903X01) */
 #if (CONFIG_TUNER & TEA5767)
-drivers/fmradio_i2c.c
 drivers/tuner/tea5767.c
 #endif /* (CONFIG_TUNER & TEA5767) */
 #endif /*SIMULATOR */
@@ -406,6 +405,9 @@ target/sh/archos/ondio/button-ondio.c
 target/sh/archos/ondio/power-ondio.c
 target/sh/archos/ondio/powermgmt-ondio.c
 target/sh/archos/ondio/usb-ondio.c
+#if (CONFIG_TUNER & TEA5767)
+target/sh/archos/ondio/fmradio_i2c-ondio.c
+#endif
 #endif /* SIMULATOR */
 #endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */
 
@@ -459,6 +461,7 @@ target/coldfire/iaudio/usb-iaudio.c
 target/coldfire/iaudio/x5/backlight-x5.c
 target/coldfire/iaudio/x5/button-x5.c
 target/coldfire/iaudio/x5/ds2411-x5.c
+target/coldfire/iaudio/x5/fmradio_i2c-x5.c
 target/coldfire/iaudio/x5/lcd-as-x5.S
 target/coldfire/iaudio/x5/lcd-x5.c
 target/coldfire/iaudio/x5/m5636-x5.c
@@ -505,6 +508,7 @@ target/coldfire/pcf50606-coldfire.c
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
 target/coldfire/iriver/system-iriver.c
+target/coldfire/iriver/fmradio_i2c-iriver.c
 target/coldfire/iriver/h300/sw_i2c-h300.c
 target/coldfire/iriver/h300/adc-h300.c
 target/coldfire/iriver/h300/backlight-h300.c
@@ -527,6 +531,7 @@ target/coldfire/ata-as-coldfire.S
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
 target/coldfire/iriver/system-iriver.c
+target/coldfire/iriver/fmradio_i2c-iriver.c
 target/coldfire/iriver/h100/sw_i2c-h100.c
 target/coldfire/iriver/h100/adc-h100.c
 target/coldfire/iriver/h100/backlight-h100.c
