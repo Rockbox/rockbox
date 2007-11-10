@@ -214,7 +214,6 @@ void *sb_encoder_init(const SpeexMode *m)
    st->nbSubframes = mode->frameSize/mode->subframeSize;
    st->windowSize = st->frame_size+st->subframeSize;
    st->lpcSize=mode->lpcSize;
-   st->bufSize=mode->bufSize;
 
    st->encode_submode = 1;
    st->submodes=mode->submodes;
@@ -751,7 +750,7 @@ int sb_encode(void *state, void *vin, SpeexBits *bits)
 
    return 1;
 }
-#endif
+#endif /* SPEEX_DISABLE_ENCODER */
 
 
 
@@ -1363,7 +1362,7 @@ int sb_encoder_ctl(void *state, int request, void *ptr)
    }
    return 0;
 }
-#endif
+#endif /* SPEEX_DISABLE_ENCODER */
 
 int sb_decoder_ctl(void *state, int request, void *ptr)
 {
