@@ -2548,6 +2548,7 @@ static int audio_check_new_track(void)
 {
     int track_count = audio_track_count();
     int old_track_ridx = track_ridx;
+    int i, idx;
     bool forward;
 
     if (dir_skip)
@@ -2603,12 +2604,12 @@ static int audio_check_new_track(void)
     /* Save the old track */
     copy_mp3entry(&prevtrack_id3, &curtrack_id3);
 
-    int i, idx;
     for (i = 0; i < ci.new_track; i++)
     {
         idx = (track_ridx + i) & MAX_TRACK_MASK;
-        if ((unsigned)buf_handle_offset(tracks[idx].audio_hid) >
-            bufgetid3(tracks[idx].id3_hid)->first_frame_offset)
+        struct mp3entry *id3 = bufgetid3(tracks[idx].id3_hid);
+        ssize_t offset = buf_handle_offset(tracks[idx].audio_hid);
+        if (!id3 || offset < 0 || (unsigned)offset > id3->first_frame_offset)
         {
             /* We don't have all the audio data for that track, so clear it */
             clear_track_info(&tracks[idx]);
