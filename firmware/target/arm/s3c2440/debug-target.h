@@ -16,6 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
+#define DEBUG_CANCEL  BUTTON_A
 bool __dbg_hw_info(void);
 bool __dbg_ports(void);
+
