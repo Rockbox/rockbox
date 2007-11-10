@@ -12,8 +12,6 @@ gain_table_lbr.c
 hexc_10_32_table.c
 hexc_table.c
 high_lsp_tables.c
-lbr_48k_tables.c
-lpc.c
 lsp.c
 lsp_tables_nb.c
 ltp.c
