@@ -27,3 +27,30 @@ A first test when using tcctool on a new device can be to upload the
 original firmware.  If you do this, make sure you upload the same
 version that is installed on your player - otherwise you may find
 yourself with corrupted config files and music database.
+
+
+Building for Windows
+--------------------
+
+1) Download libusb-win32-device-bin-0.1.12.1.tar.gz from:
+
+http://sourceforge.net/project/showfiles.php?group_id=78138
+
+2) Extract libusb-win32-device-bin-0.1.12.1.tar.gz in the tcctool
+source directory.
+
+3) Type "make tcctool.exe" to compile.
+
+4) Copy the following four files from libusb-win32-device-bin-0.1.12.1/bin
+to tcctool-driver-win32/
+
+libusb0.dll
+libusb0.sys
+libusb0_x64.dll
+libusb0_x64.sys
+
+5) Create the tcctool-win32.zip file from the directory above tcctool as follows:
+
+zip tcctool-win32.zip tcctool/tcctool.exe tcctool/tcctool-windows.txt tcctool/tcctool-driver/win32/*
+
+6) See tcctool/tcctool-windows.txt for Windows usage instructions.

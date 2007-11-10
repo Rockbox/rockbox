@@ -1,0 +1,31 @@
+tcctool for Windows
+-------------------
+
+Installation
+------------
+
+When you first attach your device in USB boot mode to your computer,
+Windows should display the Found New Hardware Wizard.
+
+If this doesn't appear, and if you have previously used a firmware
+recovery tool with your device, you will need to uninstall the USB
+driver used by that application.
+
+Go into Control Panel -> System -> Hardware -> Device Manager, then
+click on Universal Serial Bus Controllers, look for something like
+"Telechips TCC77x VTC USB Driver", right-click on it and select
+Uninstall.
+
+After doing this, disconnect and reconnect your device and the Found
+New Hardware Wizard should appear.
+
+Select "No, not this time" to the question about connecting to Windows
+Update, and select "Install from a list or specific location
+(Advanced)" on the next screen.
+
+On the next screen, select "Search for the best driver in these
+locations", unselect "Search removable media", select "Include this
+location in the search:" and browse to the tcctool-driver-win32
+folder.
+
+You should now be able to run tcctool.exe
