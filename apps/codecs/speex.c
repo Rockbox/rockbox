@@ -26,7 +26,7 @@
 #include "libspeex/speex/speex_config_types.h"
 #include "codeclib.h"
 
-// Room for one stereo frame of max size, 2*640
+/* Room for one stereo frame of max size, 2*640 */
 #define MAX_FRAME_SIZE 1280
 #define CHUNKSIZE 10000  /*2kb*/
 #define SEEK_CHUNKSIZE 7*CHUNKSIZE
