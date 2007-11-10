@@ -603,7 +603,7 @@ struct plugin_api {
     bool (*peak_meter_get_use_dbfs)(void);
 #endif
 #ifdef HAVE_LCD_BITMAP
-    int (*read_bmp_file)(char* filename, struct bitmap *bm, int maxsize,
+    int (*read_bmp_file)(const char* filename, struct bitmap *bm, int maxsize,
                          int format);
     void (*screen_dump_set_hook)(void (*hook)(int fh));
 #endif

@@ -26,12 +26,17 @@
  * read_bmp_file()
  *
  * Reads a 8bit BMP file and puts the data in a 1-pixel-per-byte
- * array. 
+ * array.
  * Returns < 0 for error, or number of bytes used from the bitmap buffer
  *
  **********************************************/
-int read_bmp_file(char* filename,
+int read_bmp_file(const char* filename,
                   struct bitmap *bm,
                   int maxsize,
                   int format);
+
+int read_bmp_fd(int fd,
+                struct bitmap *bm,
+                int maxsize,
+                int format);
 #endif

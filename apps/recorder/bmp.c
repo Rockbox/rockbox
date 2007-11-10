@@ -143,15 +143,41 @@ static inline unsigned brightness(union rgb_union color)
  * Reads a BMP file and puts the data in rockbox format in *bitmap.
  *
  *****************************************************************************/
-int read_bmp_file(char* filename,
+int read_bmp_file(const char* filename,
                   struct bitmap *bm,
                   int maxsize,
                   int format)
 {
+    int fd, ret;
+    fd = open(filename, O_RDONLY);
+
+    /* Exit if file opening failed */
+    if (fd < 0) {
+        DEBUGF("read_bmp_file: can't open '%s', rc: %d\n", filename, fd);
+        return fd * 10 - 1;
+    }
+
+    ret = read_bmp_fd(fd, bm, maxsize, format);
+    close(fd);
+    return ret;
+}
+
+/******************************************************************************
+ * read_bmp_fd()
+ *
+ * Reads a BMP file in an open file descriptor and puts the data in rockbox
+ * format in *bitmap.
+ *
+ *****************************************************************************/
+int read_bmp_fd(int fd,
+                struct bitmap *bm,
+                int maxsize,
+                int format)
+{
     struct bmp_header bmph;
     int width, height, padded_width;
     int dst_height, dst_width;
-    int fd, row, col, ret;
+    int row, col, ret;
     int depth, numcolors, compression, totalsize;
 
     unsigned char *bitmap = bm->data;
@@ -185,32 +211,21 @@ int read_bmp_file(char* filename,
     (void)format;
 #endif /* (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) */
 
-    fd = open(filename, O_RDONLY);
-
-    /* Exit if file opening failed */
-    if (fd < 0) {
-        DEBUGF("read_bmp_file: can't open '%s', rc: %d\n", filename, fd);
-        return fd * 10 - 1;
-    }
-
     /* read fileheader */
     ret = read(fd, &bmph, sizeof(struct bmp_header));
     if (ret < 0) {
-        close(fd);
         return ret * 10 - 2;
     }
 
     if (ret != sizeof(struct bmp_header)) {
-        DEBUGF("read_bmp_file: can't read BMP header.");
-        close(fd);
+        DEBUGF("read_bmp_fd: can't read BMP header.");
         return -3;
     }
 
     width = readlong(&bmph.width);
     if (width > LCD_WIDTH) {
-        DEBUGF("read_bmp_file: Bitmap too wide (%d pixels, max is %d)\n",
+        DEBUGF("read_bmp_fd: Bitmap too wide (%d pixels, max is %d)\n",
                         width, LCD_WIDTH);
-        close(fd);
         return -4;
     }
 
@@ -267,9 +282,8 @@ int read_bmp_file(char* filename,
 
     /* Check if this fits the buffer */
     if (totalsize > maxsize) {
-        DEBUGF("read_bmp_file: Bitmap too large for buffer: "
+        DEBUGF("read_bmp_fd: Bitmap too large for buffer: "
                "%d bytes.\n", totalsize);
-        close(fd);
         return -6;
     }
 
@@ -285,8 +299,7 @@ int read_bmp_file(char* filename,
         if (read(fd, palette, numcolors * sizeof(uint32_t))
             != numcolors * (int)sizeof(uint32_t))
         {
-            DEBUGF("read_bmp_file: Can't read color palette\n");
-            close(fd);
+            DEBUGF("read_bmp_fd: Can't read color palette\n");
             return -7;
         }
     }
@@ -320,9 +333,8 @@ int read_bmp_file(char* filename,
 
       default:
         if (compression != 0) { /* not BI_RGB */
-            DEBUGF("read_bmp_file: Unsupported compression (type %d)\n",
+            DEBUGF("read_bmp_fd: Unsupported compression (type %d)\n",
                    compression);
-            close(fd);
             return -8;
         }
         break;
@@ -345,9 +357,8 @@ int read_bmp_file(char* filename,
         /* read one row */
         ret = read(fd, bmpbuf, padded_width);
         if (ret != padded_width) {
-            DEBUGF("read_bmp_file: error reading image, read returned: %d "
+            DEBUGF("read_bmp_fd: error reading image, read returned: %d "
                    "expected: %d\n", ret, padded_width);
-            close(fd);
             return -9;
         }
 
@@ -536,8 +547,6 @@ int read_bmp_file(char* filename,
                     *p |= mask;
         }
     }
-
-    close(fd);
 
     DEBUGF("totalsize: %d\n", totalsize);
     return totalsize; /* return the used buffer size. */
