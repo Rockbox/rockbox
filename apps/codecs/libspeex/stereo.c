@@ -35,11 +35,16 @@
 
 #include <speex/speex_stereo.h>
 #include <speex/speex_callbacks.h>
+#include "math_approx.h"
 #include "vq.h"
 #include <math.h>
 
 /*float e_ratio_quant[4] = {1, 1.26, 1.587, 2};*/
+#ifndef FIXED_POINT
 static const float e_ratio_quant[4] = {.25f, .315f, .397f, .5f};
+#else
+static const spx_word16_t e_ratio_quant[4] = {8192, 10332, 13009, 16384};
+#endif
 
 #ifndef SPEEX_DISABLE_ENCODER
 void speex_encode_stereo(float *data, int frame_size, SpeexBits *bits)
@@ -115,8 +120,10 @@ void speex_encode_stereo_int(spx_int16_t *data, int frame_size, SpeexBits *bits)
    tmp=vq_index(&e_ratio, e_ratio_quant, 1, 4);
    speex_bits_pack(bits, tmp, 2);
 }
-#endif
+#endif /* SPEEX_DISABLE_ENCODER */
 
+/* We don't want to decode to floats yet, disable */
+#if 0
 void speex_decode_stereo(float *data, int frame_size, SpeexStereoState *stereo)
 {
    float balance, e_ratio;
@@ -145,48 +152,46 @@ void speex_decode_stereo(float *data, int frame_size, SpeexStereoState *stereo)
       data[2*i+1] = stereo->smooth_right*ftmp;
    }
 }
+#endif
 
 void speex_decode_stereo_int(spx_int16_t *data, int frame_size, SpeexStereoState *stereo)
 {
-   float balance, e_ratio;
    int i;
-   float e_tot=0, e_left, e_right, e_sum;
+   spx_word32_t balance;
+   spx_word16_t e_left, e_right, e_ratio;
 
    balance=stereo->balance;
    e_ratio=stereo->e_ratio;
-   for (i=frame_size-1;i>=0;i--)
-   {
-      e_tot += ((float)data[i])*data[i];
-   }
-   e_sum=e_tot/e_ratio;
-   e_left  = e_sum*balance / (1+balance);
-   e_right = e_sum-e_left;
 
-   e_left  = sqrt(e_left/(e_tot+.01));
-   e_right = sqrt(e_right/(e_tot+.01));
+   /* These two are Q14, with max value just below 2. */
+   e_right = DIV32(QCONST32(1., 22), spx_sqrt(MULT16_32_Q15(e_ratio, ADD32(QCONST32(1., 16), balance))));
+   e_left = SHR32(MULT16_16(spx_sqrt(balance), e_right), 8);
 
    for (i=frame_size-1;i>=0;i--)
    {
-      float ftmp=data[i];
-      stereo->smooth_left  = .98*stereo->smooth_left  + .02*e_left;
-      stereo->smooth_right = .98*stereo->smooth_right + .02*e_right;
-      data[2*i] = stereo->smooth_left*ftmp;
-      data[2*i+1] = stereo->smooth_right*ftmp;
+      spx_word16_t tmp=data[i];
+      stereo->smooth_left = EXTRACT16(PSHR32(MAC16_16(MULT16_16(stereo->smooth_left, QCONST16(0.98, 15)), e_left, QCONST16(0.02, 15)), 15));
+      stereo->smooth_right = EXTRACT16(PSHR32(MAC16_16(MULT16_16(stereo->smooth_right, QCONST16(0.98, 15)), e_right, QCONST16(0.02, 15)), 15));
+      data[2*i] = MULT16_16_P14(stereo->smooth_left, tmp);
+      data[2*i+1] = MULT16_16_P14(stereo->smooth_right, tmp);
    }
 }
 
 int speex_std_stereo_request_handler(SpeexBits *bits, void *state, void *data)
 {
    SpeexStereoState *stereo;
-   float sign=1;
+   spx_word16_t sign=1;
    int tmp;
 
    stereo = (SpeexStereoState*)data;
    if (speex_bits_unpack_unsigned(bits, 1))
       sign=-1;
    tmp = speex_bits_unpack_unsigned(bits, 5);
+#ifndef FIXED_POINT
    stereo->balance = exp(sign*.25*tmp);
-
+#else
+   stereo->balance = spx_exp(MULT16_16(sign, SHL16(tmp, 9)));
+#endif
    tmp = speex_bits_unpack_unsigned(bits, 2);
    stereo->e_ratio = e_ratio_quant[tmp];
 

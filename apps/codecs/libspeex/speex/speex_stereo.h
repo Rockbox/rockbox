@@ -48,17 +48,29 @@ extern "C" {
 
 /** State used for decoding (intensity) stereo information */
 typedef struct SpeexStereoState {
+#ifndef FIXED_POINT
    float balance;      /**< Left/right balance info */
    float e_ratio;      /**< Ratio of energies: E(left+right)/[E(left)+E(right)]  */
    float smooth_left;  /**< Smoothed left channel gain */
    float smooth_right; /**< Smoothed right channel gain */
    float reserved1;    /**< Reserved for future use */
    float reserved2;    /**< Reserved for future use */
+#else
+   spx_int32_t balance;      /**< Left/right balance info */
+   spx_int16_t e_ratio;      /**< Ratio of energies: E(left+right)/[E(left)+E(right)]  */
+   spx_int16_t smooth_left;  /**< Smoothed left channel gain */
+   spx_int16_t smooth_right; /**< Smoothed right channel gain */
+   spx_int32_t reserved1;    /**< Reserved for future use */
+   spx_int32_t reserved2;    /**< Reserved for future use */
+#endif
 } SpeexStereoState;
 
 /** Initialization value for a stereo state */
+#ifndef FIXED_POINT
 #define SPEEX_STEREO_STATE_INIT {1,.5,1,1,0,0}
-
+#else
+#define SPEEX_STEREO_STATE_INIT {65536,16384,16384,16384,0,0}
+#endif
 /** Transforms a stereo frame into a mono frame and stores intensity stereo info in 'bits' */
 void speex_encode_stereo(float *data, int frame_size, SpeexBits *bits);
 

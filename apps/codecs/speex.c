@@ -26,7 +26,8 @@
 #include "libspeex/speex/speex_config_types.h"
 #include "codeclib.h"
 
-#define MAX_FRAME_SIZE 2000
+// Room for one stereo frame of max size, 2*640
+#define MAX_FRAME_SIZE 1280
 #define CHUNKSIZE 10000  /*2kb*/
 #define SEEK_CHUNKSIZE 7*CHUNKSIZE
 
@@ -346,7 +347,7 @@ static void *process_header(spx_ogg_packet *op,
     speex_decoder_ctl(st, SPEEX_SET_ENH, &enh_enabled);
     speex_decoder_ctl(st, SPEEX_GET_FRAME_SIZE, frame_size);
 
-    if (!(*channels==1)){
+    if (*channels!=1){
         callback.callback_id = SPEEX_INBAND_STEREO;
         callback.func = speex_std_stereo_request_handler;
         callback.data = stereo;
@@ -381,7 +382,8 @@ enum codec_status codec_main(void)
     int enh_enabled = 1;
     int nframes = 2;
     int eos = 0;
-    SpeexStereoState stereo = SPEEX_STEREO_STATE_INIT;
+    static const SpeexStereoState stereo_init = SPEEX_STEREO_STATE_INIT;
+    SpeexStereoState stereo = stereo_init;
     int channels = -1;
     int rate = 0, samplerate = 0;
     int extra_headers = 0;
@@ -531,13 +533,11 @@ next_page:
                         if (channels == 2)
                             speex_decode_stereo_int(output, frame_size, &stereo);
 
-                        int new_frame_size = frame_size;
-
-                        if (new_frame_size > 0) {  
-                            ci->pcmbuf_insert(output, NULL, new_frame_size);
+                        if (frame_size > 0) {
+                            ci->pcmbuf_insert(output, NULL, frame_size);
 
                             /* 2 bytes/sample */
-                            cur_granule += new_frame_size / 2;
+                            cur_granule += frame_size / 2;
 
                             ci->set_offset((long) ci->curpos);
 
@@ -566,9 +566,7 @@ done:
         cur_granule = stream_init = rate = samplerate = headerssize 
             = packet_count = eos = 0;
 
-        stereo.balance = stereo.smooth_left = stereo.smooth_right = 1;
-        stereo.e_ratio = .5;
-        stereo.reserved1 = stereo.reserved2 = 0;
+        stereo = stereo_init;
 
         goto next_track;
     }
