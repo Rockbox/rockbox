@@ -20,7 +20,6 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#include <stdbool.h>
 #include "config.h"
 
 #define HAS_BUTTON_HOLD
@@ -37,22 +36,21 @@ struct touch_calibration_point {
 };
 void use_calibration(bool enable);
 
-/* m:robe 500 specific button codes */
+/* M:Robe 500 specific button codes */
 
-#define BUTTON_POWER        0x00000001
+#define BUTTON_POWER        0x00000100
 
 /* Remote control buttons */
 
-#define BUTTON_RC_HEART     0x00000002
-#define BUTTON_RC_MODE      0x00000004
-#define BUTTON_RC_VOL_DOWN  0x00000008
+#define BUTTON_RC_PLAY      0x00000001
+#define BUTTON_RC_DOWN      0x00000002
+#define BUTTON_RC_FF        0x00000004
+#define BUTTON_RC_REW       0x00000008
 #define BUTTON_RC_VOL_UP    0x00000010
+#define BUTTON_RC_VOL_DOWN  0x00000020
+#define BUTTON_RC_MODE      0x00000040
+#define BUTTON_RC_HEART     0x00000080
 
-
-#define BUTTON_RC_PLAY      0x00000020
-#define BUTTON_RC_REW       0x00000040
-#define BUTTON_RC_FF        0x00000080
-#define BUTTON_RC_DOWN      0x00000100
 #define BUTTON_TOUCH        0x00000200
 
 /* compatibility hacks */

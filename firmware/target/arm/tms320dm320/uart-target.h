@@ -25,6 +25,7 @@ bool uart1_getch(char *c);
 void uart1_heartbeat(void);
 bool uart1_available(void);
 
+int uart1_gets_queue(char *, unsigned int);
 void uart1_puts(const char *str);
 void uart1_gets(char *str, unsigned int size);
 int  uart1_pollch(unsigned int ticks);

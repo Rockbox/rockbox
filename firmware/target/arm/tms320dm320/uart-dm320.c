@@ -19,34 +19,25 @@
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
+#include "string.h"
+#include "panic.h"
 
-/* UART 0/1 */
-
-#define CONFIG_UART_BRSR    87
 #define MAX_UART_BUFFER     31
-static unsigned char uart1buffer[MAX_UART_BUFFER], uart1_send_buffer_ring[512];
-int uart1_send_count=0,uart1_send_point=0;
-int uart1read = 0, uart1write = 0, uart1count = 0;
+#define SEND_RING_SIZE      256
+#define RECIEVE_RING_SIZE   20
 
-/*
-static void do_checksums(char *data, int len, char *xor, char *add)
-{
-    int i;
-    *xor = data[0];
-    *add = data[0];
-    for(i=1;i<len;i++)
-    {
-        *xor ^= data[i];
-        *add += data[i];
-    }
-}
-*/
+char
+//    uart1_send_buffer_ring[SEND_RING_SIZE],
+    uart1_recieve_buffer_ring[RECIEVE_RING_SIZE];
+
+//static unsigned int uart1_send_count, uart1_send_read, uart1_send_write;
+static unsigned int uart1_recieve_count, uart1_recieve_read, uart1_recieve_write;
 
 void uart_init(void)
 {
     // 8-N-1
     IO_UART1_MSR=0x8000;
-    IO_UART1_BRSR=CONFIG_UART_BRSR;
+    IO_UART1_BRSR=0x0057;
     IO_UART1_RFCR = 0x8010; /* Trigger later */
     /* gio 27 is input, uart1 rx
        gio 28 is output, uart1 tx */
@@ -54,10 +45,10 @@ void uart_init(void)
     IO_GIO_DIR1 &= ~(1<<12); /* gio 28 */
 
     /* init the recieve buffer */
-    uart1read = 0;
-    uart1write = 0;
-    uart1count = 0;
-    
+    uart1_recieve_count=0;
+    uart1_recieve_read=0;
+    uart1_recieve_write=0;
+
     /* Enable the interrupt */
     IO_INTC_EINT0 |= (1<<IRQ_UART1);
 }
@@ -71,18 +62,6 @@ void uart1_putc(char ch)
     IO_UART1_DTRR=ch;
 }
 
-/* Unsigned integer to ASCII hexadecimal conversion */
-void uart1_putHex(unsigned int n)
-{
-    unsigned int i;
-
-    for (i = 8; i != 0; i--) {
-        unsigned int digit = n >> 28;
-        uart1_putc(digit >= 10 ? digit - 10 + 'A' : digit + '0');
-        n <<= 4;
-    }
-}
-
 void uart1_puts(const char *str)
 {
     char ch;
@@ -91,62 +70,47 @@ void uart1_puts(const char *str)
     }
 }
 
-void uart1_gets(char *str, unsigned int size)
+/* This function returns the number of bytes left in the queue after a read is done (negative if fail)*/
+int uart1_gets_queue(char *str, unsigned int size)
 {
-    for (;;) {
-        char ch;
-        
-        /* Wait for FIFO to contain something */
-        while ((IO_UART1_RFCR & 0x3f) == 0);
-        
-        /* Read character */
-        ch = (char)IO_UART1_DTRR;
+    if(uart1_recieve_count<size)
+        return -uart1_recieve_count;
 
-        /* If CR, also echo LF, null-terminate, and return */
-        if (ch == '\r') {
-            IO_UART1_DTRR='\n';
-            if (size) {
-                *str++ = '\0';
-            }
-            return;
-        }
-        
-        /* Append to buffer */
-        if (size) {
-            *str++ = ch;
-            --size;
-        }
-    }
-}
-
-bool uart1_getch(char *c)
-{
-    if (uart1count > 0)
+    if(uart1_recieve_read+size<RECIEVE_RING_SIZE)
     {
-        if(uart1read>MAX_UART_BUFFER)
-            uart1read=0;
-
-        *c = uart1buffer[uart1read++];
-        uart1count--;
-        return true;
+        memcpy(str,uart1_recieve_buffer_ring+uart1_recieve_read,size);
     }
-    return false;
+    else
+    {
+        int tempcount=(RECIEVE_RING_SIZE-uart1_recieve_read);
+        memcpy(str,uart1_recieve_buffer_ring+uart1_recieve_read,tempcount);
+        memcpy(str+tempcount,uart1_recieve_buffer_ring,size-tempcount);
+    }
+
+    uart1_recieve_count-=size;
+
+    if(uart1_recieve_read+size<RECIEVE_RING_SIZE)
+        uart1_recieve_read+=size;
+    else
+        uart1_recieve_read=size-(RECIEVE_RING_SIZE-uart1_recieve_read);
+
+    return uart1_recieve_count;
 }
 
-/* UART1 receive intterupt handler */
+/* UART1 receive interupt handler */
 void UART1(void)
 {
     while (IO_UART1_RFCR & 0x3f)
     {
-        if (uart1count > MAX_UART_BUFFER)
+        if (uart1_recieve_count > RECIEVE_RING_SIZE)
             panicf("UART1 buffer overflow");
         else
         {
-            if(uart1write>MAX_UART_BUFFER)
-                uart1write=0;
+            if(uart1_recieve_write==RECIEVE_RING_SIZE)
+                uart1_recieve_write=0;
 
-            uart1buffer[uart1write++] = IO_UART1_DTRR & 0xff;
-            uart1count++;
+            uart1_recieve_buffer_ring[uart1_recieve_write++] = IO_UART1_DTRR & 0xff;
+            uart1_recieve_count++;
         }
     }
 

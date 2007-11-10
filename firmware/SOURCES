@@ -647,6 +647,7 @@ target/arm/tms320dm320/mrobe-500/pcm-mr500.c
 target/arm/tms320dm320/mrobe-500/powermgmt-mr500.c
 target/arm/tms320dm320/mrobe-500/power-mr500.c
 target/arm/tms320dm320/mrobe-500/usb-mr500.c
+target/arm/tms320dm320/debug-dm320.c
 target/arm/tms320dm320/i2c-dm320.c
 target/arm/tms320dm320/kernel-dm320.c
 target/arm/tms320dm320/spi-dm320.c

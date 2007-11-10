@@ -113,13 +113,11 @@ static void remote_heartbeat(void)
 #define TOUCH_MARGIN 8
 int button_read_device(int *data)
 {
-    char c;
-    int i = 0;
-    int btn = BUTTON_NONE;
+    char buffer[5];
+    int button = BUTTON_NONE, retval;
+    static int oldbutton = BUTTON_NONE;
     *data = 0;
-    
-    if ((IO_GIO_BITSET0&0x01) == 0)
-        btn |= BUTTON_POWER;
+
     if (touch_available)
     {
         short x,y;
@@ -143,47 +141,31 @@ int button_read_device(int *data)
             last_x = x;
             last_y = y;
             *data = touch_to_pixels(x, y);
-            btn |= BUTTON_TOUCHPAD;
+            button |= BUTTON_TOUCHPAD;
         }
         last_touch = current_tick;
         touch_available = false;
     }
     remote_heartbeat();
-    while (uart1_getch(&c))
+
+    if ((IO_GIO_BITSET0&0x01) == 0)
+        button |= BUTTON_POWER;
+
+    retval=uart1_gets_queue(buffer, 5);
+    do
     {
-        if (i==0 && (c == BUTTON_START_BYTE || c == BUTTON_START_BYTE2) )
+        if(retval>=0)
         {
-            i++;
+            button |= buffer[1];
+            oldbutton=button;
         }
-        else if (i)
+        else
         {
-            i++;
-            if(i==2)
-            {
-                if (c& (1<<7))
-                    btn |= BUTTON_RC_HEART;
-                if (c& (1<<6))
-                    btn |= BUTTON_RC_MODE;
-                if (c& (1<<5))
-                    btn |= BUTTON_RC_VOL_DOWN;
-                if (c& (1<<4))
-                    btn |= BUTTON_RC_VOL_UP;
-                if (c& (1<<3))
-                    btn |= BUTTON_RC_REW;
-                if (c& (1<<2))
-                    btn |= BUTTON_RC_FF;
-                if (c& (1<<1))
-                    btn |= BUTTON_RC_DOWN;
-                if (c& (1<<0))
-                    btn |= BUTTON_RC_PLAY;
-            }
-            else if(i==5)
-            {
-                i=0;
-            }
+            button=oldbutton;
         }
-    }
-    return btn;
+    } while((retval=uart1_gets_queue(buffer, 5))>=5);
+
+    return button;
 }
 
 /* Touchpad data available interupt */

@@ -188,7 +188,23 @@ PLUGIN_HEADER
 
 #define BOARD_HEIGHT 20
 
-#if (LCD_WIDTH == 480) && (LCD_HEIGHT == 640)
+#if (LCD_WIDTH == 640) && (LCD_HEIGHT == 480)
+
+#define BLOCK_WIDTH 30
+#define BLOCK_HEIGHT 30
+#define BOARD_X 14
+#define BOARD_Y 2
+#define PREVIEW_X 342
+#define PREVIEW_Y 482
+#define LABEL_X 344
+#define SCORE_Y 58
+#define LEVEL_Y 142
+#define LINES_Y 218
+#define HIGH_LABEL_X   344
+#define HIGH_SCORE_Y   326
+#define HIGH_LEVEL_Y   344
+
+#elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 640)
 
 #define BLOCK_WIDTH 30
 #define BLOCK_HEIGHT 30

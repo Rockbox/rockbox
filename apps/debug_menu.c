@@ -88,6 +88,10 @@
 #endif
 #include "hwcompat.h"
 
+#if CONFIG_CPU == DM320
+#include "debug-target.h"
+#endif
+
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -656,45 +660,9 @@ static bool dbg_hw_info(void)
     lcd_update();
 
     while (!(action_userabort(TIMEOUT_BLOCK)));
-#elif CONFIG_CPU == DM320
-    int line = 0, button;
-    int *address=0x0;
-    bool done=false;
-    char buf[100];
-    
-    lcd_setmargins(0, 0);
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_clear_display();
-    lcd_puts(0, line++, "[Hardware info]");
-
-    while(!done)
-    {
-        button = button_get(false);
-        button&=~BUTTON_REPEAT;
-        if (button == BUTTON_POWER)
-            done=true;
-        if(button==BUTTON_RC_PLAY)
-            address+=0x01;
-        else if (button==BUTTON_RC_DOWN)
-            address-=0x01;
-        else if (button==BUTTON_RC_FF)
-            address+=0x800;
-        else if (button==BUTTON_RC_REW)
-            address-=0x800;
-        {
-            snprintf(buf, sizeof(buf), "current tick: %04x", (unsigned int)current_tick);
-            lcd_puts(0, line++, buf);
-            snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x", (unsigned int)address, *address);
-            lcd_puts(0, line++, buf);
-            snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x", (unsigned int)(address+1), *(address+1));
-            lcd_puts(0, line++, buf);
-            snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x", (unsigned int)(address+2), *(address+2));
-            lcd_puts(0, line++, buf);
-            line -= 4;
-         }
-         lcd_update();
-    }
-
+#else
+    /* Define this function in your target tree */
+    return __dbg_hw_info();
 #endif /* CONFIG_CPU */
     return false;
 }
