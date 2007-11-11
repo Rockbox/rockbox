@@ -61,7 +61,7 @@ void audio_input_mux(int source, unsigned flags)
             }
         break;
 #endif
-#ifdef HAVE_LINEIN_REC
+#ifdef HAVE_LINE_REC
         case AUDIO_SRC_LINEIN:          /* recording only */
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
             /* Switch line in source to line-in */
