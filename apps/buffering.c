@@ -819,7 +819,7 @@ static bool fill_buffer(void)
     }
 }
 
-#ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_ALBUMART
 /* Given a file descriptor to a bitmap file, write the bitmap data to the
    buffer, with a struct bitmap and the actual data immediately following.
    Return value is the total size (struct + data). */
@@ -829,7 +829,11 @@ static int load_bitmap(const int fd)
     struct bitmap *bmp = (struct bitmap *)&buffer[buf_widx];
     /* FIXME: alignment may be needed for the data buffer. */
     bmp->data = &buffer[buf_widx + sizeof(struct bitmap)];
+
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     bmp->maskdata = NULL;
+#endif
+
     int free = (int)MIN(buffer_len - BUF_USED, buffer_len - buf_widx);
     rc = read_bmp_fd(fd, bmp, free, FORMAT_ANY|FORMAT_DITHER);
     return rc + (rc > 0 ? sizeof(struct bitmap) : 0);
