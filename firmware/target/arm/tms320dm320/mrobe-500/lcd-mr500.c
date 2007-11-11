@@ -100,7 +100,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (height <= 0)
         return; /* nothing left to do */
 
-#if defined(SCREEN_ROTATE)
+#if CONFIG_ORIENTATION == SCREEN_PORTAIT
     dst = (fb_data *)FRAME + LCD_WIDTH*y + x;
     src = &lcd_framebuffer[y][x];
 
@@ -149,7 +149,7 @@ void lcd_update(void)
 {
     if (!lcd_on)
         return;
-#if defined(SCREEN_ROTATE)
+#if CONFIG_ORIENTATION == SCREEN_PORTAIT
     lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
                          LCD_WIDTH*LCD_HEIGHT, 1);
 #else

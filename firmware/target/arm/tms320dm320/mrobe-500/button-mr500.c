@@ -66,7 +66,7 @@ static int touch_to_pixels(short val_x, short val_y)
 {
     short x,y;
 
-#ifdef SCREEN_ROTATE /* portait */
+#if CONFIG_ORIENTATION == SCREEN_PORTAIT
     x=val_x;
     y=val_y;
 #else
@@ -93,13 +93,13 @@ void button_init_device(void)
     /* GIO is the power button, set as input */
     IO_GIO_DIR0 |= 0x01;
 
-#ifdef SCREEN_ROTATE /* portait */
+#if CONFIG_ORIENTATION == SCREEN_PORTAIT
     topleft.val_x = 200;        
     topleft.val_y = 3900;
     
     bottomright.val_x = 3880;
     bottomright.val_y = 270;
-#else /* landscape */
+#else
     topleft.val_x = 270;
     topleft.val_y = 200;
     

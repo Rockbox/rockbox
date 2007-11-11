@@ -118,6 +118,11 @@
 #define RGB565 565
 #define RGB565SWAPPED 3553
 
+/* CONFIG_ORIENTATION */
+#define SCREEN_PORTAIT      0
+#define SCREEN_LANDSCAPE    1
+#define SCREEN_SQUARE       2
+
 /* CONFIG_I2C */
 #define I2C_PLAYREC  1 /* Archos Player/Recorder style */
 #define I2C_ONDIO    2 /* Ondio style */
@@ -249,6 +254,16 @@
 
 #ifndef CONFIG_RTC
 #define CONFIG_RTC 0
+#endif
+
+#ifndef CONFIG_ORIENTATION
+#if LCD_HEIGHT > LCD_WIDTH
+#define CONFIG_ORIENTATION SCREEN_PORTAIT
+#elif LCD_HEIGHT < LCD_WIDTH
+#define CONFIG_ORIENTATION SCREEN_LANDSCAPE
+#else
+#define CONFIG_ORIENTATION SCREEN_SQUARE
+#endif
 #endif
 
 /* define this in the target config.h to use a different size */

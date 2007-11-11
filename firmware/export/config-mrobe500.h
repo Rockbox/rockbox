@@ -49,8 +49,12 @@
 
 /* LCD dimensions */
 #define CONFIG_LCD LCD_MROBE500
-#define SCREEN_ROTATE
-#if defined(SCREEN_ROTATE)
+
+/* choose the lcd orientation. both work */
+/* #define CONFIG_ORIENTATION SCREEN_PORTAIT */
+#define CONFIG_ORIENTATION SCREEN_LANDSCAPE 
+
+#if CONFIG_ORIENTATION == SCREEN_PORTAIT
 #define LCD_WIDTH  480
 #define LCD_HEIGHT 640
 #else
