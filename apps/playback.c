@@ -651,7 +651,13 @@ void audio_remove_encoder(void)
 #ifdef HAVE_ALBUMART
 int audio_current_aa_hid(void)
 {
-    return CUR_TI->aa_hid;
+    int cur_idx;
+    int offset = ci.new_track + wps_offset;
+
+    cur_idx = track_ridx + offset;
+    cur_idx &= MAX_TRACK_MASK;
+
+    return tracks[cur_idx].aa_hid;
 }
 #endif
 
@@ -667,11 +673,26 @@ struct mp3entry* audio_current_track(void)
     cur_idx &= MAX_TRACK_MASK;
 
     if (cur_idx == track_ridx && *curtrack_id3.path)
+    {
+        /* The usual case */
         return &curtrack_id3;
+    }
     else if (offset == -1 && *prevtrack_id3.path)
+    {
+        /* We're in a track transition. The codec has moved on to the nex track,
+           but the audio being played is still the same (now previous) track.
+           prevtrack_id3.elapsed is being updated in an ISR by
+           codec_pcmbuf_position_callback */
         return &prevtrack_id3;
+    }
     else if (tracks[cur_idx].id3_hid >= 0)
+    {
+        /* Get the ID3 metadata from the main buffer */
         return bufgetid3(tracks[cur_idx].id3_hid);
+    }
+
+    /* We didn't find the ID3 metadata, so we fill temp_id3 with the little info
+       we have and return that. */
 
     memset(&temp_id3, 0, sizeof(struct mp3entry));
 
@@ -704,13 +725,21 @@ struct mp3entry* audio_next_track(void)
         return NULL;
 
     if (wps_offset == -1 && *prevtrack_id3.path)
+    {
+        /* We're in a track transition. The next track for the WPS is the one
+           currently being decoded. */
         return &curtrack_id3;
+    }
 
     next_idx++;
     next_idx &= MAX_TRACK_MASK;
 
     if (next_idx == track_widx)
+    {
+        /* The next track hasn't been buffered yet, so we return the static
+           version of its metadata. */
         return &lasttrack_id3;
+    }
 
     if (tracks[next_idx].id3_hid < 0)
         return NULL;
@@ -1455,6 +1484,10 @@ static void* codec_get_memory_callback(size_t *size)
     return malloc_buf;
 }
 
+/* Between the codec and PCM track change, we need to keep updating the
+   "elapsed" value of the previous (to the codec, but current to the
+   user/PCM/WPS) track, so that the progressbar reaches the end.
+   During that transition, the WPS will display prevtrack_id3. */
 static void codec_pcmbuf_position_callback(size_t size) ICODE_ATTR;
 static void codec_pcmbuf_position_callback(size_t size)
 {
@@ -2574,6 +2607,8 @@ static void audio_rebuffer(void)
     audio_fill_file_buffer(false, 0);
 }
 
+/* Called on request from the codec to get a new track. This is the codec part
+   of the track transition. */
 static int audio_check_new_track(void)
 {
     int track_count = audio_track_count();
@@ -2631,7 +2666,7 @@ static int audio_check_new_track(void)
         new_playlist = false;
     }
 
-    /* Save the old track */
+    /* Save the old track to allow the WPS to display it */
     copy_mp3entry(&prevtrack_id3, &curtrack_id3);
 
     for (i = 0; i < ci.new_track; i++)
@@ -2641,8 +2676,10 @@ static int audio_check_new_track(void)
         ssize_t offset = buf_handle_offset(tracks[idx].audio_hid);
         if (!id3 || offset < 0 || (unsigned)offset > id3->first_frame_offset)
         {
-            /* We don't have all the audio data for that track, so clear it */
-            clear_track_info(&tracks[idx]);
+            /* We don't have all the audio data for that track, so clear it,
+               but keep the metadata. */
+            if (tracks[idx].audio_hid >= 0 && bufclose(tracks[idx].audio_hid))
+                tracks[idx].audio_hid = -1;
         }
     }
 
@@ -2912,6 +2949,23 @@ static void audio_initiate_dir_change(long direction)
         skipped_during_pause = true;
 }
 
+/* Called when PCM track change is complete */
+static void audio_finalise_track_change(void)
+{
+    logf("audio_finalise_track_change");
+
+    if (automatic_skip)
+    {
+        wps_offset = 0;
+        automatic_skip = false;
+    }
+    prevtrack_id3.path[0] = 0;
+    if (track_changed_callback)
+        track_changed_callback(&curtrack_id3);
+    track_changed = true;
+    playlist_update_resume_info(audio_current_track());
+}
+
 /*
  * Layout audio buffer as follows - iram buffer depends on target:
  * [|SWAP:iram][|TALK]|MALLOC|FILE|GUARD|PCM|[SWAP:dram[|iram]|]
@@ -3135,17 +3189,9 @@ static void audio_thread(void)
                 break;
 
             case Q_AUDIO_TRACK_CHANGED:
+                /* PCM track change done */
                 LOGFQUEUE("audio < Q_AUDIO_TRACK_CHANGED");
-                if (automatic_skip)
-                {
-                    wps_offset = 0;
-                    automatic_skip = false;
-                }
-                prevtrack_id3.path[0] = 0;
-                if (track_changed_callback)
-                    track_changed_callback(&curtrack_id3);
-                track_changed = true;
-                playlist_update_resume_info(audio_current_track());
+                audio_finalise_track_change();
                 break;
 
 #ifndef SIMULATOR
