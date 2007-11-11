@@ -238,6 +238,8 @@ void audiohw_enable_recording(bool source_mic)
     codec_set_active(false);
     
     wm8731_regs[PDCTRL] &= ~PDCTRL_ADCPD;
+    /* NOTE: When switching to digital monitoring we will not want
+     * the DAC disabled. */
     wm8731_regs[PDCTRL] |= PDCTRL_DACPD;
     wm8731_regs[AAPCTRL] &= ~AAPCTRL_DACSEL;
     
@@ -247,7 +249,7 @@ void audiohw_enable_recording(bool source_mic)
         wm8731_regs[PDCTRL] &= ~PDCTRL_MICPD;
         wm8731_regs[PDCTRL] |= PDCTRL_LINEINPD;
         wm8731_regs[AAPCTRL] |= AAPCTRL_INSEL | AAPCTRL_SIDETONE;
-        wm8731_regs[AAPCTRL] &= ~AAPCTRL_MUTEMIC;
+        wm8731_regs[AAPCTRL] &= ~(AAPCTRL_MUTEMIC | AAPCTRL_BYPASS);
     } else {
         wm8731_regs[PDCTRL] |= PDCTRL_MICPD;
         wm8731_regs[PDCTRL] &= ~PDCTRL_LINEINPD;
@@ -259,9 +261,6 @@ void audiohw_enable_recording(bool source_mic)
     wm8731_write(AAPCTRL, wm8731_regs[AAPCTRL]);
 
     if (!source_mic) {
-        wm8731_regs[AAPCTRL] |= AAPCTRL_INSEL | AAPCTRL_SIDETONE;
-        wm8731_regs[AAPCTRL] &= ~(AAPCTRL_MUTEMIC | AAPCTRL_BYPASS);
-    } else {
         wm8731_write_and(LINVOL, ~LINVOL_LINMUTE);
         wm8731_write_and(RINVOL, ~RINVOL_RINMUTE);
     }
@@ -321,13 +320,11 @@ void audiohw_set_monitor(int enable)
 {
     if(enable)
     {
-        wm8731_regs[AAPCTRL] |=  AAPCTRL_BYPASS;
-        wm8731_regs[AAPCTRL] &=~ (AAPCTRL_DACSEL | AAPCTRL_SIDETONE);
-        wm8731_write(AAPCTRL, wm8731_regs[AAPCTRL]);
+        wm8731_write_and(PDCTRL, ~PDCTRL_LINEINPD);
+        wm8731_write_or(AAPCTRL, AAPCTRL_BYPASS);
     }
     else {
-        wm8731_regs[AAPCTRL] &=~ AAPCTRL_BYPASS;
-        wm8731_regs[AAPCTRL] |=  AAPCTRL_DACSEL | AAPCTRL_SIDETONE;
-        wm8731_write(AAPCTRL, wm8731_regs[AAPCTRL]);
+        wm8731_write_and(AAPCTRL, ~AAPCTRL_BYPASS);
+        wm8731_write_or(PDCTRL, PDCTRL_LINEINPD);
     }
 }

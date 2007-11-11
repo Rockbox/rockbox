@@ -47,8 +47,8 @@ void audio_input_mux(int source, unsigned flags)
 #ifdef HAVE_RECORDING
             if (source != last_source)
             {
-                audiohw_disable_recording();
                 audiohw_set_monitor(false);
+                audiohw_disable_recording();
             }
 #endif
         break;
@@ -56,8 +56,8 @@ void audio_input_mux(int source, unsigned flags)
         case AUDIO_SRC_MIC:             /* recording only */
             if (source != last_source)
             {
-                audiohw_enable_recording(true);  /* source mic */
                 audiohw_set_monitor(false);
+                audiohw_enable_recording(true);  /* source mic */
             }
         break;
 #endif
@@ -69,8 +69,8 @@ void audio_input_mux(int source, unsigned flags)
 #endif
             if (source != last_source)
             {
-                audiohw_enable_recording(false); /* source line */
                 audiohw_set_monitor(false);
+                audiohw_enable_recording(false); /* source line */
             }
         break;
 #endif
@@ -88,8 +88,16 @@ void audio_input_mux(int source, unsigned flags)
 
             last_recording = recording;
 
-            audiohw_enable_recording(false);    /* select line-in source */
-            audiohw_set_monitor(!recording);    /* enable bypass mode */
+            if (recording)
+            {
+                audiohw_set_monitor(false);  /* disable bypass mode */
+                audiohw_enable_recording(false); /* select line-in source */
+            }
+            else
+            {
+                audiohw_disable_recording();
+                audiohw_set_monitor(true);  /* enable bypass mode */
+            }
         break;
 #endif
     } /* end switch */
