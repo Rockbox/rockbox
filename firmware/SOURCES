@@ -333,8 +333,10 @@ target/arm/crt0-pp.S
 #endif
 #elif CONFIG_CPU == PNX0101
 target/arm/pnx0101/crt0-pnx0101.S
-#elif defined(OLYMPUS_MROBE_500)
+#elif CONFIG_CPU==DM320
 target/arm/tms320dm320/crt0.S
+#elif CONFIG_CPU==S3C2440
+target/arm/s3c2440/crt0.S
 #elif defined(CPU_TCC77X)
 target/arm/tcc77x/crt0.S
 #elif defined(CPU_ARM)

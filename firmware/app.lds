@@ -9,8 +9,10 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 #ifdef CPU_PP
 INPUT(target/arm/crt0-pp.o)
-#elif defined(OLYMPUS_MROBE_500)
+#elif CONFIG_CPU==DM320
 INPUT(target/arm/tms320dm320/crt0.o)
+#elif CONFIG_CPU==S3C2440
+INPUT(target/arm/s3c2440/crt0.o)
 #elif CONFIG_CPU == PNX0101
 INPUT(target/arm/pnx0101/crt0-pnx0101.o)
 #elif defined(CPU_ARM)
@@ -61,8 +63,8 @@ INPUT(target/sh/crt0.o)
 #elif CONFIG_CPU==S3C2440
 #define DRAMORIG 0x00000100 + STUBOFFSET
 #define IRAMORIG DRAMORIG
-#define IRAMSIZE 0x1000
 #define IRAM DRAM
+#define IRAMSIZE 0x1000
 #elif CONFIG_CPU==DM320
 #define DRAMORIG 0x00900000 + STUBOFFSET
 #define IRAMORIG 0x00000000
@@ -182,7 +184,94 @@ SECTIONS
        _end = .;
     } > DRAM
 
-#else /* End DM320 */
+#elif CONFIG_CPU==S3C2440
+    .text :
+    {
+        loadaddress = .;
+        _loadaddress = .;
+        . = ALIGN(0x200);
+        *(.init.text)
+        *(.text*)
+        *(.glue_7)
+        *(.glue_7t)
+        . = ALIGN(0x4);
+    } > DRAM
+
+    .rodata :
+    {
+        *(.rodata)  /* problems without this, dunno why */
+        *(.rodata*)
+        *(.rodata.str1.1)
+        *(.rodata.str1.4)
+        . = ALIGN(0x4);
+
+        /* Pseudo-allocate the copies of the data sections */
+        _datacopy = .;
+    } > DRAM
+
+    /* TRICK ALERT! For RAM execution, we put the .data section at the
+       same load address as the copy. Thus, we don't waste extra RAM
+       when we don't actually need the copy.  */
+    .data : AT ( _datacopy )
+    {
+        _datastart = .;
+        *(.data*)
+        . = ALIGN(0x4);
+        _dataend  = .;
+    } > DRAM
+
+    /DISCARD/ :
+    {
+        *(.eh_frame)
+    }
+
+    .vectors 0x0 :
+    {
+        _vectorsstart = .;
+        *(.vectors);
+        _vectorsend = .;
+    } AT> DRAM
+
+    _vectorscopy = LOADADDR(.vectors);
+
+    .iram :
+    {
+        _iramstart = .;
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        _iramend = .;
+    } > DRAM
+
+    _iramcopy = LOADADDR(.iram);
+
+    .ibss (NOLOAD) :
+    {
+        _iedata = .;
+        *(.ibss)
+        . = ALIGN(0x4);
+        _iend = .;
+    } > DRAM
+
+    .stack :
+    {
+       *(.stack)
+       stackbegin = .;
+       . += 0x2000;
+       stackend = .;
+    } > DRAM
+
+    .bss :
+    {
+       _edata = .;
+        *(.bss*)
+        *(COMMON)
+        . = ALIGN(0x4);
+       _end = .;
+    } > DRAM
+
+#else /* End CONFIG_CPU */
+
 #if !defined(CPU_ARM)
     .vectors :
     {
@@ -241,11 +330,7 @@ SECTIONS
     }
 
 #if defined(CPU_ARM)
-#if CONFIG_CPU==DM320
-    .vectors IRAMORIG :
-#else
     .vectors 0x0 :
-#endif
     {
         _vectorsstart = .;
         *(.vectors);
@@ -253,8 +338,6 @@ SECTIONS
 #if CONFIG_CPU==PNX0101
         *(.dmabuf)
     } >IRAM0 AT> DRAM
-#elif CONFIG_CPU==DM320
-    } > IRAM AT> DRAM
 #else
     } AT> DRAM
 #endif
@@ -264,8 +347,6 @@ SECTIONS
 
 #if CONFIG_CPU==PNX0101
     .iram IRAMORIG + SIZEOF(.vectors) :
-#elif CONFIG_CPU==S3C2440 || CONFIG_CPU==DM320
-    .iram :
 #else
     .iram IRAMORIG :
 #endif
@@ -325,7 +406,7 @@ SECTIONS
 
 #if defined(CPU_COLDFIRE)
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
-#elif defined(CPU_ARM) && CONFIG_CPU != S3C2440
+#elif defined(CPU_ARM)
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram) + SIZEOF(.vectors):
 #else
     .bss :
