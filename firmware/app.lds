@@ -32,16 +32,6 @@ INPUT(target/sh/crt0.o)
 #define STUBOFFSET 0
 #endif
 
-#if CONFIG_CPU==S3C2440
-#include "s3c2440.h"
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - 0x100 - PLUGINSIZE - STUBOFFSET - CODECSIZE - LCD_BUFFER_SIZE - TTB_SIZE
-#elif CONFIG_CPU==DM320
-#include "dm320.h"
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - STUBOFFSET - CODECSIZE - LCD_BUFFER_SIZE - TTB_SIZE
-#else
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - STUBOFFSET - CODECSIZE
-#endif
-
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300)
 #define DRAMORIG 0x31000000 + STUBOFFSET
 #define IRAMORIG 0x10000000
@@ -62,9 +52,8 @@ INPUT(target/sh/crt0.o)
 #define IRAMSIZE 0x7000
 #elif CONFIG_CPU==S3C2440
 #define DRAMORIG 0x00000100 + STUBOFFSET
-#define IRAMORIG DRAMORIG
-#define IRAM DRAM
 #define IRAMSIZE 0x1000
+#define IRAMORIG (MEMORYSIZE * 0x100000) - IRAMSIZE - LCD_BUFFER_SIZE - TTB_SIZE
 #elif CONFIG_CPU==DM320
 #define DRAMORIG 0x00900000 + STUBOFFSET
 #define IRAMORIG 0x00000000
@@ -79,6 +68,16 @@ INPUT(target/sh/crt0.o)
 #define IRAMSIZE 0x1000
 #endif
 
+#if CONFIG_CPU==S3C2440
+#include "s3c2440.h"
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - 0x100 - PLUGINSIZE - STUBOFFSET - CODECSIZE - LCD_BUFFER_SIZE - TTB_SIZE - IRAMSIZE
+#elif CONFIG_CPU==DM320
+#include "dm320.h"
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - STUBOFFSET - CODECSIZE - LCD_BUFFER_SIZE - TTB_SIZE
+#else
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - STUBOFFSET - CODECSIZE
+#endif
+
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
 
@@ -88,9 +87,8 @@ INPUT(target/sh/crt0.o)
 MEMORY
 {
     DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
-#if CONFIG_CPU != S3C2440
     IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
-#endif
+
 #if CONFIG_CPU==PNX0101
     IRAM0 : ORIGIN = IRAM0ORIG, LENGTH = IRAM0SIZE
 #endif
@@ -234,14 +232,14 @@ SECTIONS
 
     _vectorscopy = LOADADDR(.vectors);
 
-    .iram :
+    .iram IRAMORIG :
     {
         _iramstart = .;
         *(.icode)
         *(.irodata)
         *(.idata)
         _iramend = .;
-    } > DRAM
+    } >IRAM AT> DRAM
 
     _iramcopy = LOADADDR(.iram);
 
@@ -253,7 +251,7 @@ SECTIONS
         _iend = .;
     } > DRAM
 
-    .stack :
+    .stack ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram) + SIZEOF(.vectors) :
     {
        *(.stack)
        stackbegin = .;

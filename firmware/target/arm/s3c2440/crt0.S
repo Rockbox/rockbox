@@ -85,8 +85,6 @@ start:
     bhi    1b
     
 #ifdef BOOTLOADER
-/* Code for ARM bootloader targets other than iPod go here */
-
     /* Proper initialization pulled from 0x5070 */
 
     /* BWSCON

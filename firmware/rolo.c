@@ -161,7 +161,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     /* Wait for the COP to tell us it is rebooting */
     while(cpu_reply != 2);
 #endif
-
+    
     asm volatile(
         "mov   r0, #0x10000000   \n"
         "mov   pc, r0            \n"
