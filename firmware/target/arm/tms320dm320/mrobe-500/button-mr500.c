@@ -47,9 +47,13 @@ void use_calibration(bool enable)
     using_calibration = enable;
 }
 /* Jd's tests.. These will hopefully work for everyone so we dont have to
-    create a calibration screen. and 
-(0,0) = 0x00c0, 0xf40
-(480,320) = 0x0f19, 0x00fc
+ *  create a calibration screen.
+ *  Portait:
+ *      (0,0) = 200, 3900
+ *      (480,640) = 3880, 270
+ *  Landscape:
+ *      (0,0) = 200, 270
+ *      (640,480) = 3880, 3900
 */
 void set_calibration_points(struct touch_calibration_point *tl,
                             struct touch_calibration_point *br)
@@ -57,16 +61,25 @@ void set_calibration_points(struct touch_calibration_point *tl,
     memcpy(&topleft, tl, sizeof(struct touch_calibration_point));
     memcpy(&bottomright, br, sizeof(struct touch_calibration_point));
 }
+
 static int touch_to_pixels(short val_x, short val_y)
 {
     short x,y;
-    int x1,x2;
+
+#ifdef SCREEN_ROTATE /* portait */
+    x=val_x;
+    y=val_y;
+#else
+    x=val_y;
+    y=val_x;
+#endif
+
     if (!using_calibration)
         return (val_x<<16)|val_y;
-    x1 = topleft.val_x; x2 = bottomright.val_x;
-    x = (val_x-x1)*(bottomright.px_x - topleft.px_x) / (x2 - x1) + topleft.px_x;
-    x1 = topleft.val_y; x2 = bottomright.val_y;
-    y = (val_y-x1)*(bottomright.px_y - topleft.px_y) / (x2 - x1) + topleft.px_y;
+
+    x = (x-topleft.val_x)*(bottomright.px_x - topleft.px_x) / (bottomright.val_x - topleft.val_x) + topleft.px_x;
+    y = (y-topleft.val_y)*(bottomright.px_y - topleft.px_y) / (bottomright.val_y - topleft.val_y) + topleft.px_y;
+
     if (x < 0)
         x = 0;
     if (y < 0)
@@ -79,11 +92,27 @@ void button_init_device(void)
     touch_available = false;
     /* GIO is the power button, set as input */
     IO_GIO_DIR0 |= 0x01;
-    topleft.px_x = 0;       topleft.px_y = 0;
-    topleft.val_x = 0x00c0; topleft.val_y = 0xf40;
+
+#ifdef SCREEN_ROTATE /* portait */
+    topleft.val_x = 200;        
+    topleft.val_y = 3900;
     
-    bottomright.px_x = LCD_WIDTH;   bottomright.px_y = LCD_HEIGHT;
-    bottomright.val_x = 0x0f19;     bottomright.val_y = 0x00fc;
+    bottomright.val_x = 3880;
+    bottomright.val_y = 270;
+#else /* landscape */
+    topleft.val_x = 270;
+    topleft.val_y = 200;
+    
+    bottomright.val_x = 3900;
+    bottomright.val_y = 3880;
+#endif
+
+    topleft.px_x = 0;               
+    topleft.px_y = 0;
+    
+    bottomright.px_x = LCD_WIDTH;   
+    bottomright.px_y = LCD_HEIGHT;
+
     using_calibration = true;
     
     /* Enable the touchscreen interrupt */

@@ -103,7 +103,7 @@ int brightness = 0;
 
 void mrdebug(void)
 {
-    int button=0, *address=0x0;
+    int button=0;
 #if 0
     use_calibration(false);
     touchpad_calibrate_screen();
@@ -123,19 +123,14 @@ void mrdebug(void)
             printf("reset");
             IO_GIO_BITSET1|=1<<10;
         }
-        if(button==BUTTON_RC_PLAY)
-            address+=0x02;
-        else if (button==BUTTON_RC_DOWN)
-            address-=0x02;
-        else if (button==BUTTON_RC_FF)
-            address+=0x1000;
-        else if (button==BUTTON_RC_REW)
-            address-=0x1000;
-        else if (button==BUTTON_RC_VOL_DOWN) {
+        if (button==BUTTON_RC_VOL_DOWN) 
+        {
             brightness = (brightness - 5) & 0x7f;
             bl_command[2] = brightness;
             spi_block_transfer(SPI_target_BACKLIGHT, bl_command, 4, 0, 0);
-        } else if (button==BUTTON_RC_VOL_UP) {
+        } 
+        else if (button==BUTTON_RC_VOL_UP)
+        {
             brightness = (brightness + 5) & 0x7f;
             bl_command[2] = brightness;
             spi_block_transfer(SPI_target_BACKLIGHT, bl_command, 4, 0, 0);
@@ -145,14 +140,10 @@ void mrdebug(void)
 //             tsc2100_read_values(&x, &y, &z1, &z2);
 //             printf("x: %04x y: %04x z1: %04x z2: %04x", x, y, z1, z2);
 //             printf("tsadc: %4x", tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS)&0xffff);
-             printf("current tick: %04x", current_tick);
-             printf("Address: 0x%08x Data: 0x%08x", address, *address);
-             printf("Address: 0x%08x Data: 0x%08x", address+1, *(address+1));
-             printf("Address: 0x%08x Data: 0x%08x", address+2, *(address+2));
 // //            tsc2100_keyclick(); /* doesnt work :( */
 //             line -= 6;
 //         }
-#if 0
+#if 1
         if (button&BUTTON_TOUCHPAD)
         {
             if (button&BUTTON_REL)

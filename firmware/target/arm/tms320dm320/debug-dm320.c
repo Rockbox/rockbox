@@ -35,7 +35,7 @@ bool __dbg_ports(void)
 
 bool __dbg_hw_info(void)
 {
-    int line = 0, button;
+    int line = 0, button, oldline;
     int *address=0x0;
     bool done=false;
     char buf[100];
@@ -43,11 +43,25 @@ bool __dbg_hw_info(void)
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
+    
+    /* Put all the static text befor the while loop */
     lcd_puts(0, line++, "[Hardware info]");
+    
+    lcd_puts(0, line++, "Clock info:");
+    snprintf(buf, sizeof(buf), "IO_CLK_PLLA: 0x%04x IO_CLK_PLLB: 0x%04x IO_CLK_SEL0: 0x%04x IO_CLK_SEL1: 0x%04x",
+        IO_CLK_PLLA, IO_CLK_PLLB, IO_CLK_SEL0, IO_CLK_SEL1);    lcd_puts(0, line++, buf);
+    snprintf(buf, sizeof(buf), "IO_CLK_SEL2: 0x%04x IO_CLK_DIV0: 0x%04x IO_CLK_DIV1: 0x%04x IO_CLK_DIV2: 0x%04x",
+        IO_CLK_SEL2, IO_CLK_DIV0, IO_CLK_DIV1, IO_CLK_DIV2);    lcd_puts(0, line++, buf);
+    snprintf(buf, sizeof(buf), "IO_CLK_DIV3: 0x%04x IO_CLK_DIV4: 0x%04x IO_CLK_BYP : 0x%04x IO_CLK_INV : 0x%04x",
+        IO_CLK_DIV3, IO_CLK_DIV4, IO_CLK_BYP, IO_CLK_INV);    lcd_puts(0, line++, buf);
+    snprintf(buf, sizeof(buf), "IO_CLK_MOD0: 0x%04x IO_CLK_MOD1: 0x%04x IO_CLK_MOD2: 0x%04x IO_CLK_LPCTL0: 0x%04x",
+        IO_CLK_MOD0, IO_CLK_MOD1, IO_CLK_MOD2, IO_CLK_LPCTL0);    lcd_puts(0, line++, buf);
 
+    line++;
+    oldline=line;
     while(!done)
     {
-        line = 0;
+        line = oldline;
         button = button_get(false);
         button&=~BUTTON_REPEAT;
         if (button == BUTTON_POWER)
@@ -61,14 +75,14 @@ bool __dbg_hw_info(void)
         else if (button==BUTTON_RC_REW)
             address-=0x800;
 
-        snprintf(buf, sizeof(buf), "current tick: %04x", (unsigned int)current_tick);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x", (unsigned int)address, *address);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x", (unsigned int)(address+1), *(address+1));
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x", (unsigned int)(address+2), *(address+2));
-        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "current tick: %08x Seconds running: %08d",
+            (unsigned int)current_tick, (unsigned int)current_tick/100);  lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x", 
+            (unsigned int)address, *address);           lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x",
+            (unsigned int)(address+1), *(address+1));   lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x",
+            (unsigned int)(address+2), *(address+2));   lcd_puts(0, line++, buf);
 
         lcd_update();
     }
