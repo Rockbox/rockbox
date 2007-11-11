@@ -169,6 +169,17 @@ Do
         Case "EXEC"
             If bVerbose Then WScript.StdErr.WriteLine "> " & aLine(1)
             oShell.Run aLine(1), 0, true
+            If Err.Number <> 0 Then
+                If Not bVerbose Then 
+                    WScript.StdErr.Write "> " & aLine(1) & ": "
+                End If
+                If Err.Number = &H80070002 Then ' Actually file not found
+                    WScript.StdErr.WriteLine "command not found"
+                Else
+                    WScript.StdErr.WriteLine Err.Description
+                End If
+                WScript.Quit 2
+            End If
         Case "SYNC"
             If bVerbose Then WScript.StdErr.WriteLine "Syncing"
             WScript.StdOut.WriteLine aLine(1) ' Just echo what was passed
