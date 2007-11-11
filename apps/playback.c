@@ -401,8 +401,8 @@ static bool clear_track_info(struct track_info *track)
             track->aa_hid = -1;
         else
             return false;
-#endif
     }
+#endif
 
     track->filesize = 0;
     track->taginfo_ready = false;
