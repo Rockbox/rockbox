@@ -190,9 +190,9 @@ static inline unsigned lcd_color_to_native(unsigned color)
 
 /* pack/unpack 24-bit RGB values */
 #define _RGBPACK(r, g, b)    _RGBPACK_LCD((r) >> 3, (g) >> 2, (b) >> 3)
-#define _RGB_UNPACK_RED(x)   ( (((x) >> 8) & 0xf8) | (((x) >> 11) & 0x07) )
-#define _RGB_UNPACK_GREEN(x) ( (((x) >> 3) & 0xfc) | (((x) >>  5) & 0x03) )
-#define _RGB_UNPACK_BLUE(x)  ( (((x) << 3) & 0xf8) | (((x)      ) & 0x07) )
+#define _RGB_UNPACK_RED(x)   ( (((x) >> 8) & 0xf8) | (((x) >> 13) & 0x07) )
+#define _RGB_UNPACK_GREEN(x) ( (((x) >> 3) & 0xfc) | (((x) >>  9) & 0x03) )
+#define _RGB_UNPACK_BLUE(x)  ( (((x) << 3) & 0xf8) | (((x) >>  2) & 0x07) )
 
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)
 /* RGB3553 */
