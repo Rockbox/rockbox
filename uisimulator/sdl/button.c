@@ -820,6 +820,7 @@ intptr_t button_get_data(void)
 }
 
 #ifdef HAVE_TOUCHPAD
+extern bool debug_wps;
 void mouse_tick_task(void)
 {
     static int last_check = 0;
@@ -831,6 +832,8 @@ void mouse_tick_task(void)
     {
         mouse_coords = (x<<16)|y;
         button_event(BUTTON_TOUCHPAD, true);
+        if (debug_wps)
+            printf("Mouse at: (%d, %d)\n", x, y);
     }
     else if (lastbtn == BUTTON_TOUCHPAD)
     {

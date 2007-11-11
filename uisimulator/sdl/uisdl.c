@@ -107,6 +107,14 @@ void gui_message_loop(void)
                 button_event(event.key.keysym.sym, false);
                 sim_exit_irq_handler();
                 break;
+#ifndef HAVE_TOUCHPAD
+            case SDL_MOUSEBUTTONDOWN:
+                if (debug_wps && event.button.button == 1)
+                {
+                    printf("Mouse at: (%d, %d)\n", event.button.x, event.button.y);
+                }
+                break;
+#endif
             case SDL_QUIT:
                 done = true;
                 break;
