@@ -9,10 +9,8 @@ OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 #ifdef CPU_PP
 INPUT(target/arm/crt0-pp-bl.o)
-#elif CONFIG_CPU==DM320
+#elif defined(OLYMPUS_MROBE_500)
 INPUT(target/arm/tms320dm320/crt0.o)
-#elif CONFIG_CPU==S3C2440
-INPUT(target/arm/s3c2440/crt0.o)
 #elif defined(CPU_TCC77X)
 INPUT(target/arm/tcc77x/crt0.o)
 #else
