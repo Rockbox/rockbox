@@ -53,6 +53,7 @@ INPUT(target/sh/crt0.o)
 #elif CONFIG_CPU==S3C2440
 #define DRAMORIG 0x00000100 + STUBOFFSET
 #define IRAMSIZE 0x1000
+/* This is not really IRAM!! Should be 0x40000000, but it doesn't work */
 #define IRAMORIG (MEMORYSIZE * 0x100000) - IRAMSIZE - LCD_BUFFER_SIZE - TTB_SIZE
 #elif CONFIG_CPU==DM320
 #define DRAMORIG 0x00900000 + STUBOFFSET
