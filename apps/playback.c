@@ -2407,6 +2407,22 @@ static bool audio_load_track(int offset, bool start_play)
     }
 #endif
 
+    struct mp3entry *track_id3;
+
+    if (track_widx == track_ridx)
+        track_id3 = &curtrack_id3;
+    else
+        track_id3 = bufgetid3(tracks[track_widx].id3_hid);
+
+#ifdef HAVE_ALBUMART
+    if (gui_sync_wps_uses_albumart())
+    {
+        char aa_path[MAX_PATH];
+        if (find_albumart(track_id3, aa_path, sizeof(aa_path)))
+            tracks[track_widx].aa_hid = bufopen(aa_path, 0, TYPE_BITMAP);
+    }
+#endif
+
     /* Load the codec. */
     if (!audio_loadcodec(start_play))
     {
@@ -2426,23 +2442,6 @@ static bool audio_load_track(int offset, bool start_play)
         tracks[track_widx].taginfo_ready = false;
         goto peek_again;
     }
-
-    struct mp3entry *track_id3;
-
-    if (track_widx == track_ridx)
-        track_id3 = &curtrack_id3;
-    else
-        track_id3 = bufgetid3(tracks[track_widx].id3_hid);
-
-
-#ifdef HAVE_ALBUMART
-    if (gui_sync_wps_uses_albumart())
-    {
-        char aa_path[MAX_PATH];
-        if (find_albumart(track_id3, aa_path, sizeof(aa_path)))
-            tracks[track_widx].aa_hid = bufopen(aa_path, 0, TYPE_BITMAP);
-    }
-#endif
 
     track_id3->elapsed = 0;
 
