@@ -5,7 +5,7 @@
 '   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 '   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 '                     \/            \/     \/    \/            \/
-' $Id: sapi5_voice.vbs$
+' $Id$
 '
 ' Copyright (C) 2007 Steve Bavin, Jens Arnold, Mesar Hameed
 '
@@ -176,7 +176,8 @@ Do
                 If Err.Number = &H80070002 Then ' Actually file not found
                     WScript.StdErr.WriteLine "command not found"
                 Else
-                    WScript.StdErr.WriteLine Err.Description
+                    WScript.StdErr.WriteLine "error " & Err.Number & ":" _
+                                             & Err.Description
                 End If
                 WScript.Quit 2
             End If
