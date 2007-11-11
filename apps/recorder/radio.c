@@ -81,6 +81,10 @@
 #define FM_NEXT_PRESET
 #define FM_PREV_PRESET
 
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define FM_PRESET
+#define FM_MODE
+
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define FM_PRESET
 #define FM_MODE

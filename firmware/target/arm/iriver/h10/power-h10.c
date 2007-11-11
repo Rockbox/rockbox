@@ -35,7 +35,6 @@
 bool charger_enabled;
 #endif
 
-#if 0
 #if CONFIG_TUNER
 
 bool tuner_power(bool status)
@@ -46,7 +45,6 @@ bool tuner_power(bool status)
 }
 
 #endif /* #if CONFIG_TUNER */
-#endif
 
 void power_init(void)
 {

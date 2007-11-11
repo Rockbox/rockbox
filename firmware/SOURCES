@@ -557,6 +557,7 @@ target/arm/i2s-pp.c
 target/arm/iriver/h10/adc-h10.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
+target/arm/iriver/h10/fmradio_i2c-h10.c
 target/arm/iriver/h10/lcd-h10_20gb.c
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/powermgmt-h10.c
@@ -573,6 +574,7 @@ target/arm/i2s-pp.c
 target/arm/iriver/h10/adc-h10.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
+target/arm/iriver/h10/fmradio_i2c-h10.c
 target/arm/iriver/h10/lcd-h10_5gb.c
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/powermgmt-h10.c

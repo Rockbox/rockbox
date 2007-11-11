@@ -12,7 +12,7 @@
 #define HAVE_RECORDING
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
-#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN)
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_FMRADIO)
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_44)
@@ -74,8 +74,8 @@
 #define AB_REPEAT_ENABLE 1
 
 /* FM Tuner */
-/*#define CONFIG_TUNER TEA5767
-#define CONFIG_TUNER_XTAL  32768 *//* TODO: what is this? */
+#define CONFIG_TUNER TEA5767
+#define CONFIG_TUNER_XTAL  32768
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT

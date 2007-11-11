@@ -319,6 +319,15 @@ void audiohw_set_recvol(int left, int right, int type)
 
 void audiohw_set_monitor(int enable)
 {
-    /* TODO: Implement for FM monitoring */
-    (void)enable;
+    if(enable)
+    {
+        wm8731_regs[AAPCTRL] |=  AAPCTRL_BYPASS;
+        wm8731_regs[AAPCTRL] &=~ (AAPCTRL_DACSEL | AAPCTRL_SIDETONE);
+        wm8731_write(AAPCTRL, wm8731_regs[AAPCTRL]);
+    }
+    else {
+        wm8731_regs[AAPCTRL] &=~ AAPCTRL_BYPASS;
+        wm8731_regs[AAPCTRL] |=  AAPCTRL_DACSEL | AAPCTRL_SIDETONE;
+        wm8731_write(AAPCTRL, wm8731_regs[AAPCTRL]);
+    }
 }

@@ -305,6 +305,26 @@ const struct button_mapping button_context_recscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_recscreen */
 
+static const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_PRESET,      BUTTON_RIGHT | BUTTON_REL,             BUTTON_RIGHT },
+    { ACTION_FM_MENU,        BUTTON_RIGHT | BUTTON_REPEAT,          BUTTON_NONE },
+    { ACTION_FM_MODE,        BUTTON_LEFT,                           BUTTON_NONE },
+    { ACTION_FM_STOP,        BUTTON_PLAY | BUTTON_REPEAT,           BUTTON_PLAY },
+    { ACTION_FM_EXIT,        BUTTON_POWER,                          BUTTON_NONE },
+    { ACTION_FM_PLAY,        BUTTON_PLAY | BUTTON_REL,              BUTTON_PLAY },
+    { ACTION_SETTINGS_INC,       BUTTON_SCROLL_UP,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_SCROLL_UP|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_SCROLL_DOWN,                BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_SCROLL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_PREV,       BUTTON_REW,                            BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT, BUTTON_REW|BUTTON_REPEAT,              BUTTON_NONE },
+    { ACTION_STD_NEXT,       BUTTON_FF,                             BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT, BUTTON_FF|BUTTON_REPEAT,               BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+    
+};
+
 static const struct button_mapping* get_context_mapping_remote( int context )
 {
     context ^= CONTEXT_REMOTE;
@@ -385,7 +405,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_keyboard;
         case CONTEXT_RECSCREEN:
             return button_context_recscreen;
-
+        case CONTEXT_FM:
+            return button_context_radio;
         default:
             return button_context_standard;
     } 

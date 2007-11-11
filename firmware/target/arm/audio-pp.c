@@ -35,6 +35,7 @@ void audio_input_mux(int source, unsigned flags)
     /* Prevent pops from unneeded switching */
     static int last_source = AUDIO_SRC_PLAYBACK;
 #ifdef HAVE_FMRADIO_REC
+    bool recording = flags & SRCF_RECORDING;
     static bool last_recording = false;
 #endif
 
@@ -62,6 +63,10 @@ void audio_input_mux(int source, unsigned flags)
 #endif
 #ifdef HAVE_LINEIN_REC
         case AUDIO_SRC_LINEIN:          /* recording only */
+#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+            /* Switch line in source to line-in */
+            GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x04);
+#endif
             if (source != last_source)
             {
                 audiohw_enable_recording(false); /* source line */
@@ -71,17 +76,20 @@ void audio_input_mux(int source, unsigned flags)
 #endif
 #ifdef HAVE_FMRADIO_REC
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
+#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+            /* Switch line in source to tuner */
+            GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x04);
+#endif            /* Set line-in vol to 0dB*/
             if (!recording)
-                audiohw_set_recvol(0, 0, AUDIO_GAIN_LINEIN);
+                audiohw_set_recvol(0x17, 0x17, AUDIO_GAIN_LINEIN);
 
             if (source == last_source && recording == last_recording)
                 break;
 
             last_recording = recording;
 
-            /* I2S recording and playback */
-            audiohw_enable_recording(false);    /* source line */
-            audiohw_set_monitor(!recording);
+            audiohw_enable_recording(false);    /* select line-in source */
+            audiohw_set_monitor(!recording);    /* enable bypass mode */
         break;
 #endif
     } /* end switch */
