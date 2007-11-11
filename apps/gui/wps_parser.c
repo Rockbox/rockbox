@@ -113,6 +113,7 @@ static int parse_progressbar(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_dir_level(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
+
 #ifdef HAVE_LCD_BITMAP
 static int parse_image_special(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
@@ -125,6 +126,13 @@ static int parse_image_display(const char *wps_bufptr,
 static int parse_image_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 #endif /*HAVE_LCD_BITMAP */
+
+#ifdef HAVE_ALBUMART
+static int parse_albumart_load(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
+static int parse_albumart_conditional(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
+#endif /* HAVE_ALBUMART */
 
 #ifdef CONFIG_RTC
 #define WPS_RTC_REFRESH WPS_REFRESH_DYNAMIC
@@ -283,6 +291,11 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_TOKEN_IMAGE_DISPLAY,            "x",   0,       parse_image_load },
     { WPS_TOKEN_IMAGE_PROGRESS_BAR,       "P",   0,    parse_image_special },
+#ifdef HAVE_ALBUMART
+    { WPS_NO_TOKEN,                       "Cl",  0,    parse_albumart_load },
+    { WPS_TOKEN_ALBUMART_DISPLAY,         "C",   WPS_REFRESH_DYNAMIC,
+                                                parse_albumart_conditional },
+#endif
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
     { WPS_TOKEN_IMAGE_BACKDROP,           "X",   0,    parse_image_special },
 #endif
@@ -606,6 +619,215 @@ static int parse_progressbar(const char *wps_bufptr,
 #endif
 }
 
+#ifdef HAVE_ALBUMART
+static int parse_albumart_load(const char *wps_bufptr,
+                               struct wps_token *token,
+                               struct wps_data *wps_data)
+{
+    const char* _pos;
+    bool parsing;
+    const short xalign_mask = WPS_ALBUMART_ALIGN_LEFT |
+                              WPS_ALBUMART_ALIGN_CENTER |
+                              WPS_ALBUMART_ALIGN_RIGHT;
+    const short yalign_mask = WPS_ALBUMART_ALIGN_TOP |
+                              WPS_ALBUMART_ALIGN_CENTER |
+                              WPS_ALBUMART_ALIGN_BOTTOM;
+
+    (void)token; /* silence warning */
+
+    /* reset albumart info in wps */
+    wps_data->wps_uses_albumart = WPS_ALBUMART_NONE;
+    wps_data->albumart_max_width = -1;
+    wps_data->albumart_max_height = -1;
+    wps_data->albumart_xalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
+    wps_data->albumart_yalign = WPS_ALBUMART_ALIGN_CENTER; /* default */
+
+    /* format: %Cl|x|y|[[l|c|r][d|i|s]mwidth]|[[t|c|b][d|i|s]mheight]| */
+
+    /* initial validation and parsing of x and y components */
+    if (*wps_bufptr != '|')
+        return 0; /* malformed token: e.g. %Cl7  */
+
+    _pos = wps_bufptr + 1;
+    if (!isdigit(*_pos))
+        return 0; /* malformed token: e.g. %Cl|@  */
+    wps_data->albumart_x = atoi(_pos);
+
+    _pos = strchr(_pos, '|');
+    if (!_pos || !isdigit(*(++_pos)))
+        return 0; /* malformed token: e.g. %Cl|7\n or %Cl|7|@ */
+
+    wps_data->albumart_y = atoi(_pos);
+
+    _pos = strchr(_pos, '|');
+    if (!_pos)
+        return 0; /* malformed token: no | after y coordinate
+                     e.g. %Cl|7|59\n */
+
+    /* parsing width field */
+    parsing = true;
+    while (parsing)
+    {
+        /* apply each modifier in turn */
+        ++_pos;
+        switch (*_pos)
+        {
+            case 'l':
+            case 'L':
+            case '+':
+                wps_data->albumart_xalign =
+                    (wps_data->albumart_xalign & xalign_mask) |
+                    WPS_ALBUMART_ALIGN_LEFT;
+                break;
+            case 'c':
+            case 'C':
+                wps_data->albumart_xalign =
+                    (wps_data->albumart_xalign & xalign_mask) |
+                    WPS_ALBUMART_ALIGN_CENTER;
+                break;
+            case 'r':
+            case 'R':
+            case '-':
+                wps_data->albumart_xalign =
+                    (wps_data->albumart_xalign & xalign_mask) |
+                    WPS_ALBUMART_ALIGN_RIGHT;
+                break;
+            case 'd':
+            case 'D':
+                wps_data->albumart_xalign |= WPS_ALBUMART_DECREASE;
+                break;
+            case 'i':
+            case 'I':
+                wps_data->albumart_xalign |= WPS_ALBUMART_INCREASE;
+                break;
+            case 's':
+            case 'S':
+                wps_data->albumart_xalign |=
+                    (WPS_ALBUMART_DECREASE | WPS_ALBUMART_INCREASE);
+                break;
+            default:
+                parsing = false;
+                break;
+        }
+    }
+    /* extract max width data */
+    if (*_pos != '|')
+    {
+        if (!isdigit(*_pos))
+            return 0; /* malformed token:  e.g. %Cl|7|59|# */
+        wps_data->albumart_max_width = atoi(_pos);
+        _pos = strchr(_pos, '|');
+        if (!_pos)
+            return 0; /* malformed token: no | after width field
+                         e.g. %Cl|7|59|200\n */
+    }
+
+    /* parsing height field */
+    parsing = true;
+    while (parsing)
+    {
+        /* apply each modifier in turn */
+        ++_pos;
+        switch (*_pos)
+        {
+            case 't':
+            case 'T':
+            case '-':
+                wps_data->albumart_yalign =
+                    (wps_data->albumart_yalign & yalign_mask) |
+                    WPS_ALBUMART_ALIGN_TOP;
+                break;
+            case 'c':
+            case 'C':
+                wps_data->albumart_yalign =
+                    (wps_data->albumart_yalign & yalign_mask) |
+                    WPS_ALBUMART_ALIGN_CENTER;
+                break;
+            case 'b':
+            case 'B':
+            case '+':
+                wps_data->albumart_yalign =
+                    (wps_data->albumart_yalign & yalign_mask) |
+                    WPS_ALBUMART_ALIGN_BOTTOM;
+                break;
+            case 'd':
+            case 'D':
+                wps_data->albumart_yalign |= WPS_ALBUMART_DECREASE;
+                break;
+            case 'i':
+            case 'I':
+                wps_data->albumart_yalign |= WPS_ALBUMART_INCREASE;
+                break;
+            case 's':
+            case 'S':
+                wps_data->albumart_yalign |=
+                    (WPS_ALBUMART_DECREASE | WPS_ALBUMART_INCREASE);
+                break;
+            default:
+                parsing = false;
+                break;
+        }
+    }
+    /* extract max height data */
+    if (*_pos != '|')
+    {
+        if (!isdigit(*_pos))
+            return 0; /* malformed token  e.g. %Cl|7|59|200|@  */
+        wps_data->albumart_max_height = atoi(_pos);
+        _pos = strchr(_pos, '|');
+        if (!_pos)
+            return 0; /* malformed token: no closing |
+                         e.g. %Cl|7|59|200|200\n */
+    }
+
+    /* if we got here, we parsed everything ok .. ! */
+    if (wps_data->albumart_max_width < 0)
+        wps_data->albumart_max_width = 0;
+    else if (wps_data->albumart_max_width > LCD_WIDTH)
+        wps_data->albumart_max_width = LCD_WIDTH;
+
+    if (wps_data->albumart_max_height < 0)
+        wps_data->albumart_max_height = 0;
+    else if (wps_data->albumart_max_height > LCD_HEIGHT)
+        wps_data->albumart_max_height = LCD_HEIGHT;
+
+    wps_data->wps_uses_albumart = WPS_ALBUMART_LOAD;
+
+    /* Skip the rest of the line */
+    return skip_end_of_line(wps_bufptr);
+}
+
+static int parse_albumart_conditional(const char *wps_bufptr,
+                                      struct wps_token *token,
+                                      struct wps_data *wps_data)
+{
+    struct wps_token *prevtoken = token;
+    --prevtoken;
+    if (wps_data->num_tokens >= 1 && prevtoken->type == WPS_TOKEN_CONDITIONAL)
+    {
+        /* This %C is part of a %?C construct.
+           It's either %?C<blah> or %?Cn<blah> */
+        token->type = WPS_TOKEN_ALBUMART_FOUND;
+        if (*wps_bufptr == 'n' && *(wps_bufptr + 1) == '<')
+        {
+            token->next = true;
+            return 1;
+        }
+        else if (*wps_bufptr == '<')
+        {
+            return 0;
+        }
+        else
+        {
+            token->type = WPS_NO_TOKEN;
+            return 0;
+        }
+    }
+    else
+        return 0;
+};
+#endif /* HAVE_ALBUMART */
+
 /* Parse a generic token from the given string. Return the length read */
 static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
 {
@@ -915,6 +1137,9 @@ static void wps_reset(struct wps_data *data)
     bool rwps = data->remote_wps; /* remember whether the data is for a RWPS */
 #endif
     memset(data, 0, sizeof(*data));
+#ifdef HAVE_ALBUMART
+    data->wps_uses_albumart = WPS_ALBUMART_NONE;
+#endif
     wps_data_init(data);
 #ifdef HAVE_REMOTE_LCD
     data->remote_wps = rwps;

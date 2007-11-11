@@ -48,6 +48,7 @@
 /* Image stuff */
 #include "bmp.h"
 #include "atoi.h"
+#include "albumart.h"
 #endif
 #include "dsp.h"
 #include "action.h"
@@ -928,6 +929,19 @@ static char *get_token_value(struct gui_wps *gwps,
 
         case WPS_TOKEN_METADATA_COMMENT:
             return id3->comment;
+
+#ifdef HAVE_ALBUMART
+        case WPS_TOKEN_ALBUMART_DISPLAY:
+            draw_album_art(gwps, audio_current_aa_hid());
+            return NULL;
+
+        case WPS_TOKEN_ALBUMART_FOUND:
+            if (audio_current_aa_hid() >= 0) {
+                snprintf(buf, buf_size, "C");
+                return buf;
+            }
+            return NULL;
+#endif
 
         case WPS_TOKEN_FILE_BITRATE:
             if(id3->bitrate)

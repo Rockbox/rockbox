@@ -66,6 +66,7 @@
 #include "icons.h"
 #include "peakmeter.h"
 #include "action.h"
+#include "albumart.h"
 #endif
 #include "lang.h"
 #include "bookmark.h"
@@ -217,6 +218,9 @@ struct track_info {
     int audio_hid;             /* The ID for the track's buffer handle */
     int id3_hid;               /* The ID for the track's metadata handle */
     int codec_hid;             /* The ID for the track's codec handle */
+#ifdef HAVE_ALBUMART
+    int aa_hid;                /* The ID for the track's album art handle */
+#endif
 
     size_t filesize;           /* File total length */
 
@@ -389,6 +393,15 @@ static bool clear_track_info(struct track_info *track)
             track->audio_hid = -1;
         else
             return false;
+    }
+
+#ifdef HAVE_ALBUMART
+    if (track->aa_hid >= 0) {
+        if (bufclose(track->aa_hid))
+            track->aa_hid = -1;
+        else
+            return false;
+#endif
     }
 
     track->filesize = 0;
@@ -634,6 +647,13 @@ void audio_remove_encoder(void)
 } /* audio_remove_encoder */
 
 #endif /* HAVE_RECORDING */
+
+#ifdef HAVE_ALBUMART
+int audio_current_aa_hid(void)
+{
+    return CUR_TI->aa_hid;
+}
+#endif
 
 struct mp3entry* audio_current_track(void)
 {
@@ -2381,6 +2401,16 @@ static bool audio_load_track(int offset, bool start_play)
     else
         track_id3 = bufgetid3(tracks[track_widx].id3_hid);
 
+
+#ifdef HAVE_ALBUMART
+    if (gui_sync_wps_uses_albumart())
+    {
+        char aa_path[MAX_PATH];
+        if (find_albumart(track_id3, aa_path, sizeof(aa_path)))
+            tracks[track_widx].aa_hid = bufopen(aa_path, 0, TYPE_BITMAP);
+    }
+#endif
+
     track_id3->elapsed = 0;
 
     enum data_type type = TYPE_PACKET_AUDIO;
@@ -3286,6 +3316,9 @@ void audio_init(void)
         tracks[i].audio_hid = -1;
         tracks[i].id3_hid = -1;
         tracks[i].codec_hid = -1;
+#ifdef HAVE_ALBUMART
+        tracks[i].aa_hid = -1;
+#endif
     }
 
     /* Probably safe to say */

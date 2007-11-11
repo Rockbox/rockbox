@@ -39,6 +39,23 @@
 #define WPS_ALIGN_CENTER 64
 #define WPS_ALIGN_LEFT 128
 
+#ifdef HAVE_ALBUMART
+
+/* albumart definitions */
+#define WPS_ALBUMART_NONE           0      /* WPS does not contain AA tag */
+#define WPS_ALBUMART_CHECK          1      /* WPS contains AA conditional tag */
+#define WPS_ALBUMART_LOAD           2      /* WPS contains AA tag */
+
+#define WPS_ALBUMART_ALIGN_RIGHT    WPS_ALIGN_RIGHT    /* x align:   right */
+#define WPS_ALBUMART_ALIGN_CENTER   WPS_ALIGN_CENTER   /* x/y align: center */
+#define WPS_ALBUMART_ALIGN_LEFT     WPS_ALIGN_LEFT     /* x align:   left */
+#define WPS_ALBUMART_ALIGN_TOP      WPS_ALIGN_RIGHT    /* y align:   top */
+#define WPS_ALBUMART_ALIGN_BOTTOM   WPS_ALIGN_LEFT     /* y align:   bottom */
+#define WPS_ALBUMART_INCREASE       8                  /* increase if smaller */
+#define WPS_ALBUMART_DECREASE       16                 /* decrease if larger */
+
+#endif /* HAVE_ALBUMART */
+
 /* wps_data*/
 
 #ifdef HAVE_LCD_BITMAP
@@ -187,6 +204,12 @@ enum wps_token_type {
     WPS_TOKEN_IMAGE_DISPLAY,
 #endif
 
+#ifdef HAVE_ALBUMART
+    /* Albumart */
+    WPS_TOKEN_ALBUMART_DISPLAY,
+    WPS_TOKEN_ALBUMART_FOUND,
+#endif
+
     /* Metadata */
     WPS_TOKEN_METADATA_ARTIST,
     WPS_TOKEN_METADATA_COMPOSER,
@@ -309,6 +332,20 @@ struct wps_data
     short progress_start;
     short progress_end;
     bool peak_meter_enabled;
+
+#ifdef HAVE_ALBUMART
+    /* Album art support */
+    unsigned char wps_uses_albumart; /* WPS_ALBUMART_NONE, _CHECK, _LOAD */
+    short albumart_x;
+    short albumart_y;
+    unsigned short albumart_xalign; /* WPS_ALBUMART_ALIGN_LEFT, _CENTER, _RIGHT,
+                                       + .._INCREASE,  + .._DECREASE */
+    unsigned short albumart_yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM,
+                                       + .._INCREASE,  + .._DECREASE */
+    short albumart_max_width;
+    short albumart_max_height;
+#endif
+
 #else /*HAVE_LCD_CHARCELLS */
     unsigned short wps_progress_pat[8];
     bool full_line_progressbar;
@@ -416,5 +453,10 @@ extern struct gui_wps gui_wps[NB_SCREENS];
 
 void gui_sync_wps_init(void);
 void gui_sync_wps_screen_init(void);
+
+#ifdef HAVE_ALBUMART
+/* gives back if WPS contains an albumart tag */
+bool gui_sync_wps_uses_albumart(void);
+#endif
 
 #endif

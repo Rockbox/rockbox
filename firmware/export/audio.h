@@ -91,6 +91,9 @@ void audio_pre_ff_rewind(void); /* SWCODEC only */
 #endif /* CONFIG_CODEC == SWCODEC */
 void audio_ff_rewind(long newtime);
 void audio_flush_and_reload_tracks(void);
+#ifdef HAVE_ALBUMART
+int audio_current_aa_hid(void);
+#endif
 struct mp3entry* audio_current_track(void);
 struct mp3entry* audio_next_track(void);
 bool audio_has_changed_track(void);

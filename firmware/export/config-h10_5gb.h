@@ -26,6 +26,9 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
+/* define this if you want album art for this target */
+#define HAVE_ALBUMART
+
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 

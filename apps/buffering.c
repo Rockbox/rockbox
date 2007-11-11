@@ -48,6 +48,7 @@
 #include "playback.h"
 #include "pcmbuf.h"
 #include "buffer.h"
+#include "bmp.h"
 
 #ifdef SIMULATOR
 #define ata_disk_is_active() 1
@@ -745,7 +746,7 @@ static void shrink_handle(struct memory_handle *h)
 
     if (h->next && h->filerem == 0 &&
             (h->type == TYPE_ID3 || h->type == TYPE_CUESHEET ||
-             h->type == TYPE_IMAGE || h->type == TYPE_CODEC ||
+             h->type == TYPE_BITMAP || h->type == TYPE_CODEC ||
              h->type == TYPE_ATOMIC_AUDIO))
     {
         /* metadata handle: we can move all of it */
@@ -762,11 +763,15 @@ static void shrink_handle(struct memory_handle *h)
         h->ridx = RINGBUF_ADD(h->ridx, delta);
         h->widx = RINGBUF_ADD(h->widx, delta);
 
-        /* when moving a struct mp3entry we need to readjust its pointers. */
         if (h->type == TYPE_ID3 && h->filesize == sizeof(struct mp3entry)) {
+            /* when moving an mp3entry we need to readjust its pointers. */
             adjust_mp3entry((struct mp3entry *)&buffer[h->data],
                             (void *)&buffer[h->data],
                             (void *)&buffer[olddata]);
+        } else if (h->type == TYPE_BITMAP) {
+            /* adjust the bitmap's pointer */
+            struct bitmap *bmp = (struct bitmap *)&buffer[h->data];
+            bmp->data = &buffer[h->data + sizeof(struct bitmap)];
         }
     }
     else
@@ -814,6 +819,23 @@ static bool fill_buffer(void)
     }
 }
 
+#ifdef HAVE_LCD_BITMAP
+/* Given a file descriptor to a bitmap file, write the bitmap data to the
+   buffer, with a struct bitmap and the actual data immediately following.
+   Return value is the total size (struct + data). */
+static int load_bitmap(const int fd)
+{
+    int rc;
+    struct bitmap *bmp = (struct bitmap *)&buffer[buf_widx];
+    /* FIXME: alignment may be needed for the data buffer. */
+    bmp->data = &buffer[buf_widx + sizeof(struct bitmap)];
+    bmp->maskdata = NULL;
+    int free = (int)MIN(buffer_len - BUF_USED, buffer_len - buf_widx);
+    rc = read_bmp_fd(fd, bmp, free, FORMAT_ANY|FORMAT_DITHER);
+    return rc + (rc > 0 ? sizeof(struct bitmap) : 0);
+}
+#endif
+
 
 /*
 MAIN BUFFERING API CALLS
@@ -858,7 +880,6 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     }
 
     strncpy(h->path, file, MAX_PATH);
-    h->filesize = size;
     h->filerem = size - offset;
     h->offset = offset;
     h->ridx = buf_widx;
@@ -867,7 +888,25 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     h->available = 0;
     h->type = type;
 
-    if (type == TYPE_CUESHEET || type == TYPE_IMAGE) {
+#ifdef HAVE_LCD_BITMAP
+    if (type == TYPE_BITMAP) {
+        /* Bitmap file: we load the data instead of the file */
+        mutex_lock(&llist_mutex); /* Lock because load_bitmap yields */
+        size = load_bitmap(fd);
+        if (size <= 0)
+            return ERR_FILE_ERROR;
+
+        h->filerem = 0;
+        h->available = size;
+        h->widx = buf_widx + size; /* safe because the data doesn't wrap */
+        buf_widx += size;  /* safe too */
+        mutex_unlock(&llist_mutex);
+    }
+#endif
+
+    h->filesize = size;
+
+    if (type == TYPE_CUESHEET) {
         h->fd = fd;
         /* Immediately start buffering those */
         LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");

@@ -30,7 +30,7 @@ enum data_type {
     TYPE_ATOMIC_AUDIO,
     TYPE_ID3,
     TYPE_CUESHEET,
-    TYPE_IMAGE,
+    TYPE_BITMAP,
     TYPE_BUFFER,
     TYPE_UNKNOWN,
 };

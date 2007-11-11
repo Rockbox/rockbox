@@ -24,6 +24,9 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
 
+/* define this if you want album art for this target */
+#define HAVE_ALBUMART
+
 /* define this if you can invert the colours on your LCD */
 #define HAVE_LCD_INVERT
 

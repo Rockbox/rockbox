@@ -796,3 +796,18 @@ void gui_sync_wps_init(void)
     unload_remote_wps_backdrop();
 #endif
 }
+
+#ifdef HAVE_ALBUMART
+/* Returns true if at least one of the gui_wps screens has an album art
+   tag in its wps structure */
+bool gui_sync_wps_uses_albumart(void)
+{
+    int  i;
+    FOR_NB_SCREENS(i) {
+        struct gui_wps *gwps = &gui_wps[i];
+        if (gwps->data && (gwps->data->wps_uses_albumart != WPS_ALBUMART_NONE))
+            return true;
+    }
+    return false;
+}
+#endif

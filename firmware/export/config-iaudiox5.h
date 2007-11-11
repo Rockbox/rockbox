@@ -28,6 +28,9 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
+/* define this if you want album art for this target */
+#define HAVE_ALBUMART
+
 /* define this if you can invert the colours on your LCD */
 #define HAVE_LCD_INVERT
 

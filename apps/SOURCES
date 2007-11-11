@@ -75,6 +75,9 @@ recorder/bmp.c
 recorder/icons.c
 recorder/keyboard.c
 recorder/peakmeter.c
+#ifdef HAVE_ALBUMART
+recorder/albumart.c
+#endif
 #ifdef HAVE_LCD_COLOR
 gui/color_picker.c
 #endif
