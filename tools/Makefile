@@ -11,7 +11,7 @@ LDFLAGS := -g
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
  generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database \
- lngdump telechips gigabeats mktccboot
+ lngdump telechips gigabeats mktccboot mknkboot
 
 all:
 	@echo "Run make in your build directory!"
@@ -39,6 +39,9 @@ mkboot:	mkboot.c
 	$(SILENT)$(CC) -g $+ -o $@
 
 mktccboot: mktccboot.c telechips.o
+	$(SILENT)$(CC) -g $+ -o $@
+
+mknkboot: mknkboot.c
 	$(SILENT)$(CC) -g $+ -o $@
 
 lngdump: lngdump.c

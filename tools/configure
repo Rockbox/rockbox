@@ -1283,7 +1283,7 @@ EOF
     flash=""
     plugins=""
     swcodec="yes"
-    toolset=$gigabeatbitmaptools
+    toolset="$gigabeatbitmaptools mknkboot"
     boottool="$rootdir/tools/scramble -gigabeats"
     bootoutput="nk.bin"
     # architecture, manufacturer and model for the target-tree build
