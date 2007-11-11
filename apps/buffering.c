@@ -892,7 +892,7 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     h->available = 0;
     h->type = type;
 
-#ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_ALBUMART
     if (type == TYPE_BITMAP) {
         /* Bitmap file: we load the data instead of the file */
         mutex_lock(&llist_mutex); /* Lock because load_bitmap yields */
