@@ -156,7 +156,7 @@ static inline void computeDeltas(int ch)
     int a=0;
     for(a = 0; a<MAX_VOICES; a++)
     {
-        if(voices[a].isUsed==1 && voices[a].ch == ch)
+        if(voices[a].isUsed && voices[a].ch == ch)
         {
             findDelta(&voices[a], ch, voices[a].note);
         }
@@ -202,7 +202,7 @@ inline void pressNote(int ch, int note, int vol)
         if(voices[a].ch == ch && voices[a].note == note)
             break;
 
-        if(voices[a].isUsed==0)
+        if(!voices[a].isUsed)
             break;
     }
     if(a==MAX_VOICES)
@@ -227,7 +227,6 @@ inline void pressNote(int ch, int note, int vol)
 
     setVolScale(a);
 
-    voices[a].loopState=STATE_NONLOOPING;
     /*
      * OKAY. Gt = Gus Table value
      * rf = Root Frequency of wave
@@ -239,7 +238,7 @@ inline void pressNote(int ch, int note, int vol)
     {
         findDelta(&voices[a], ch, note);
         /* Turn it on */
-        voices[a].isUsed=1;
+        voices[a].isUsed=true;
         setPoint(&voices[a], 0);
     } else
     {
@@ -256,7 +255,7 @@ inline void pressNote(int ch, int note, int vol)
             wf->mode = wf->mode & (255-28);
 
             /* Turn it on */
-            voices[a].isUsed=1;
+            voices[a].isUsed=true;
             setPoint(&voices[a], 0);
 
         } else
@@ -411,7 +410,7 @@ void seekBackward(int nsec)
     {
         notesUsed = 0;
         for(a=0; a<MAX_VOICES; a++)
-            if(voices[a].isUsed == 1)
+            if(voices[a].isUsed)
                 notesUsed++;
         tick();
     } while(notesUsed == 0);

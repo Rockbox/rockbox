@@ -109,11 +109,12 @@ struct SynthObject
     int delta;
     int decay;
     unsigned int cp; /* unsigned int */
-    int state, loopState;
-    int note, vol, ch, isUsed;
+    int state;
+    int note, vol, ch;
     int curRate, curOffset, targetOffset;
     int curPoint;
     signed short int volscale;
+    bool isUsed;
 };
 
 struct Event

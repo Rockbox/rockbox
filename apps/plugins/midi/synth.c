@@ -51,7 +51,7 @@ void resetControllers()
         voices[a].cp=0;
         voices[a].vol=0;
         voices[a].ch=0;
-        voices[a].isUsed=0;
+        voices[a].isUsed=false;
         voices[a].note=0;
     }
 
@@ -271,13 +271,15 @@ inline void stopVoice(struct SynthObject * so)
 static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned int samples)
 {
     struct GWaveform * wf;
-    register int s;
     register int s1;
     register int s2;
 
     register unsigned int cp_temp = so->cp;
 
     wf = so->wf;
+
+    const unsigned int pan = chPan[so->ch];
+    const int volscale = so->volscale;
 
     const int mode_mask24 = wf->mode&24;
     const int mode_mask28 = wf->mode&28;
@@ -289,9 +291,8 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
     const unsigned int start_loop = wf->startLoop << FRACTSIZE;
     const int diff_loop = end_loop-start_loop;
 
-    while(samples > 0)
+    while(samples-- > 0)
     {
-        samples--;
         /* Is voice being ramped? */
         if(so->state == STATE_RAMPDOWN)
         {
@@ -300,12 +301,12 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
                 so->decay = so->decay / 2;
 
                 if(so->decay < 10 && so->decay > -10)
-                    so->isUsed = 0;
+                    so->isUsed = false;
 
                 s1=so->decay;
-                s2 = s1*chPan[so->ch];
+                s2 = s1*pan;
                 s1 = (s1<<7) -s2;
-                *(out++)+=(((s1&0x7FFF80) << 9) | ((s2&0x7FFF80) >> 7));
+                *(out++)+=((s1 << 9) & 0xFFFF0000) | ((s2 >> 7) &0xFFFF);
                 continue;
             }
         } else  /* OK to advance voice */
@@ -315,23 +316,8 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
 
         s2 = getSample((cp_temp >> FRACTSIZE)+1, wf);
 
-        /* LOOP_REVERSE|LOOP_PINGPONG  = 24  */
-        if(mode_mask24 && so->loopState == STATE_LOOPING && (cp_temp < start_loop))
+        if(mode_mask28 && cp_temp >= end_loop)
         {
-            if(mode_mask_looprev)
-            {
-                cp_temp += diff_loop;
-                s2=getSample((cp_temp >> FRACTSIZE), wf);
-            }
-            else
-            {
-                so->delta = -so->delta; /* At this point cp_temp is wrong. We need to take a step */
-            }
-        }
-
-        if(mode_mask28 && (cp_temp >= end_loop))
-        {
-            so->loopState = STATE_LOOPING;
             if(!mode_mask24)
             {
                 cp_temp -= diff_loop;
@@ -340,6 +326,20 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
             else
             {
                 so->delta = -so->delta;
+
+                /* LOOP_REVERSE|LOOP_PINGPONG  = 24  */
+                if(cp_temp < start_loop) /* this appears to never be true in here */
+                {
+                    if(mode_mask_looprev)
+                    {
+                        cp_temp += diff_loop;
+                        s2=getSample((cp_temp >> FRACTSIZE), wf);
+                    }
+                    else
+                    {
+                        so->delta = -so->delta; /* At this point cp_temp is wrong. We need to take a step */
+                    }
+                }
             }
         }
 
@@ -354,12 +354,12 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
         /* Better, working, linear interpolation    */
         s1=getSample((cp_temp >> FRACTSIZE), wf);
 
-        s = s1 + ((signed)((s2 - s1) * (cp_temp & ((1<<FRACTSIZE)-1)))>>FRACTSIZE);
+        s1 +=((signed)((s2 - s1) * (cp_temp & ((1<<FRACTSIZE)-1)))>>FRACTSIZE);
 
         if(so->curRate == 0)
         {
             stopVoice(so);
-//          so->isUsed = 0;
+//          so->isUsed = false;
 
         }
 
@@ -404,25 +404,23 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
             stopVoice(so);
         }
 
-        s = (s * (so->curOffset >> 22) >> 8);
+        s1 = s1 * (so->curOffset >> 22) >> 8;
+
+        /* Scaling by channel volume and note volume is done in sequencer.c */
+        /* That saves us some multiplication and pointer operations         */
+        s1 = s1 * volscale >> 14;
 
         /* need to set ramp beginning */
         if(so->state == STATE_RAMPDOWN && so->decay == 0)
         {
-            so->decay = s*so->volscale>>14;
+            so->decay = s1;
             if(so->decay == 0)
                 so->decay = 1;  /* stupid junk.. */
         }
 
-
-        /* Scaling by channel volume and note volume is done in sequencer.c */
-        /* That saves us some multiplication and pointer operations         */
-        s1=s*so->volscale>>14;
-
-        s2 = s1*chPan[so->ch];
+        s2 = s1*pan;
         s1 = (s1<<7) - s2;
-        *(out++)+=(((s1&0x7FFF80) << 9) | ((s2&0x7FFF80) >> 7));
-
+        *(out++)+=((s1 << 9) & 0xFFFF0000) | ((s2 >> 7) &0xFFFF);
     }
 
     so->cp=cp_temp; /* store this again */
@@ -451,7 +449,7 @@ void synthSamples(int32_t *buf_ptr, unsigned int num_samples)
         for(i=0; i < MAX_VOICES; i++)
         {
             voicept=&voices[i];
-            if(voicept->isUsed==1)
+            if(voicept->isUsed)
             {
                 synthVoice(voicept, samp_buf, num_samples);
             }

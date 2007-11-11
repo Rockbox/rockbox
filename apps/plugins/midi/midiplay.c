@@ -263,7 +263,7 @@ static int midimain(void * filename)
     {
         notesUsed = 0;
         for(a=0; a<MAX_VOICES; a++)
-            if(voices[a].isUsed == 1)
+            if(voices[a].isUsed)
                 notesUsed++;
         tick();
     } while(notesUsed == 0);
