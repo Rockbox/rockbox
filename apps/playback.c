@@ -234,6 +234,7 @@ static volatile int track_ridx = 0;  /* Track being decoded (A/C-) */
 static int track_widx = 0;           /* Track being buffered (A) */
 
 #define CUR_TI (&tracks[track_ridx]) /* Playing track info pointer (A/C-) */
+static struct track_info *prev_ti;   /* Pointer to the previous track played */
 
 /* Set by the audio thread when the current track information has updated
  * and the WPS may need to update its cached information */
@@ -2415,7 +2416,7 @@ static bool audio_load_track(int offset, bool start_play)
         track_id3 = bufgetid3(tracks[track_widx].id3_hid);
 
 #ifdef HAVE_ALBUMART
-    if (gui_sync_wps_uses_albumart())
+    if (tracks[track_widx].aa_hid < 0 && gui_sync_wps_uses_albumart())
     {
         char aa_path[MAX_PATH];
         if (find_albumart(track_id3, aa_path, sizeof(aa_path)))
@@ -2665,8 +2666,11 @@ static int audio_check_new_track(void)
         new_playlist = false;
     }
 
-    /* Save the old track to allow the WPS to display it */
+    /* Save the old track's metadata to allow the WPS to display it */
     copy_mp3entry(&prevtrack_id3, &curtrack_id3);
+
+    /* Save a pointer to the old track to allow later clearing */
+    prev_ti = CUR_TI;
 
     for (i = 0; i < ci.new_track; i++)
     {
@@ -2678,7 +2682,10 @@ static int audio_check_new_track(void)
             /* We don't have all the audio data for that track, so clear it,
                but keep the metadata. */
             if (tracks[idx].audio_hid >= 0 && bufclose(tracks[idx].audio_hid))
+            {
                 tracks[idx].audio_hid = -1;
+                tracks[idx].filesize = 0;
+            }
         }
     }
 
@@ -2959,6 +2966,13 @@ static void audio_finalise_track_change(void)
         automatic_skip = false;
     }
     prevtrack_id3.path[0] = 0;
+
+    if (prev_ti->audio_hid < 0)
+    {
+        /* No audio left so we clear all the track info. */
+        clear_track_info(prev_ti);
+    }
+
     if (track_changed_callback)
         track_changed_callback(&curtrack_id3);
     track_changed = true;
