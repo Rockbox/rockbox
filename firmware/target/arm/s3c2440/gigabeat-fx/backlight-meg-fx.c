@@ -67,18 +67,8 @@ static unsigned char buttonlight_target;
 
 static unsigned short buttonlight_trigger_now;
 
-void __backlight_on(void)
-{
-    backlight_control = BACKLIGHT_CONTROL_ON;
-}
-
-void __backlight_off(void)
-{
-    backlight_control = BACKLIGHT_CONTROL_OFF;
-}
-
 /* Assumes that the backlight has been initialized */
-void __backlight_set_brightness(int brightness)
+void _backlight_set_brightness(int brightness)
 {
     /* stop the interrupt from messing us up */
     backlight_control = BACKLIGHT_CONTROL_IDLE;
@@ -328,32 +318,7 @@ static void led_control_service(void)
 }
 #endif /* BOOTLOADER */
 
-void __buttonlight_on(void)
-{
-    buttonlight_control = BUTTONLIGHT_CONTROL_ON;
-}
-
-void __buttonlight_off(void)
-{
-    buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
-}
-
-void __buttonlight_dim(bool dim_now)
-{
-    buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
-    buttonlight_target = (dim_now == true) ? 0 : buttonlight_brightness;
-    if(buttonlight_target==0 && buttonlight_brightness==0)
-    {
-        if(dim_now == false)
-            buttonlight_control = BUTTONLIGHT_CONTROL_ON;
-        else
-            buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
-    }
-    else
-        buttonlight_control = BUTTONLIGHT_CONTROL_FADE;
-}
-
-void __backlight_dim(bool dim_now)
+static void __backlight_dim(bool dim_now)
 {
     /* dont let the interrupt tick happen */
     backlight_control = BACKLIGHT_CONTROL_IDLE;
@@ -369,14 +334,63 @@ void __backlight_dim(bool dim_now)
         backlight_control = BACKLIGHT_CONTROL_FADE;
 }
 
-void __buttonlight_set_brightness(int brightness)
+void _backlight_on(void)
+{
+    lcd_enable(true);
+    __backlight_dim(false);
+}    
+
+void _backlight_off(void)
+{
+    __backlight_dim(true);
+}
+
+static inline void __buttonlight_on(void)
+{
+    buttonlight_control = BUTTONLIGHT_CONTROL_ON;
+}
+
+static inline void __buttonlight_off(void)
+{
+    buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
+}
+
+static void __buttonlight_dim(bool dim_now)
+{
+    buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
+    buttonlight_target = (dim_now == true) ? 0 : buttonlight_brightness;
+    if(buttonlight_target==0 && buttonlight_brightness==0)
+    {
+        if(dim_now == false)
+            buttonlight_control = BUTTONLIGHT_CONTROL_ON;
+        else
+            buttonlight_control = BUTTONLIGHT_CONTROL_OFF;
+    }
+    else
+        buttonlight_control = BUTTONLIGHT_CONTROL_FADE;
+}
+
+void _buttonlight_on(void)
+{
+    __buttonlight_dim(false);
+}
+
+void _buttonlight_off(void)
+{
+    if(_buttonlight_timeout>0)
+        __buttonlight_dim(true);
+    else
+        __buttonlight_off();
+}
+
+void _buttonlight_set_brightness(int brightness)
 {
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
     buttonlight_brightness = brightness;
     buttonlight_control = BUTTONLIGHT_CONTROL_SET;
 }
 
-bool __backlight_init(void)
+bool _backlight_init(void)
 {
     buttonlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
     backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;

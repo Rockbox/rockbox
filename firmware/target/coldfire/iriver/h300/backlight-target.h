@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2006 by Linus Nielsen Feltzing
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -19,12 +19,11 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-#define _backlight_init() true
+bool _backlight_init(void); /* Returns backlight current state (true=ON). */
 void _backlight_on(void);
 void _backlight_off(void);
-void _backlight_set_brightness(int brightness);
-int  __backlight_is_on(void);
+void _backlight_set_brightness(int val);
+void _remote_backlight_on(void);
+void _remote_backlight_off(void);
 
-void _buttonlight_on(void);
-void _buttonlight_off(void);
 #endif

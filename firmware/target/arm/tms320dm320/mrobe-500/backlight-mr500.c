@@ -26,18 +26,18 @@
 #include "power.h"
 #include "spi-target.h"
 
-void __backlight_on(void)
+void _backlight_on(void)
 {
-    __backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
 }
 
-void __backlight_off(void)
+void _backlight_off(void)
 {
-    __backlight_set_brightness(0);
+    _backlight_set_brightness(0);
 }
 
 /* Assumes that the backlight has been initialized */
-void __backlight_set_brightness(int brightness)
+void _backlight_set_brightness(int brightness)
 {
     uint8_t bl_command[] = {0xa4, 0x00, brightness, 0xbb};
     spi_block_transfer(SPI_target_BACKLIGHT, bl_command, 4, 0, 0);
@@ -45,13 +45,13 @@ void __backlight_set_brightness(int brightness)
 
 void __backlight_dim(bool dim_now)
 {
-    __backlight_set_brightness(dim_now ?
+    _backlight_set_brightness(dim_now ?
         DEFAULT_BRIGHTNESS_SETTING :
         DEFAULT_DIMNESS_SETTING);
 }
 
-bool __backlight_init(void)
+bool _backlight_init(void)
 {
-    __backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
     return true;
 }

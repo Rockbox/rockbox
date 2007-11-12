@@ -57,7 +57,7 @@ void* main(void)
     lcd_init();
     font_init();
 
-    __backlight_on();
+    _backlight_on();
 
     while(!do_power_off) {
         line = 0;

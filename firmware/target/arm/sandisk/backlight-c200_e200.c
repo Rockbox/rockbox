@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include "backlight-target.h"
 #include "system.h"
 #include "lcd.h"
@@ -25,46 +26,57 @@
 
 static unsigned short backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
 
-void __backlight_set_brightness(int brightness)
+void _backlight_set_brightness(int brightness)
 {
     backlight_brightness = brightness;
 
     if (brightness > 0)
-        __backlight_on();
+        _backlight_on();
     else
-        __backlight_off();
+        _backlight_off();
 }
 
-void __backlight_on(void)
+void _backlight_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd */
 #endif
+#ifdef HAVE_LCD_SLEEP
+    _lcd_sleep_timer = 0; /* LCD should be awake already */
+#endif
     pp_i2c_send(AS3514_I2C_ADDR, DCDC15, backlight_brightness);
 }
 
-void __backlight_off(void)
+void _backlight_off(void)
 {
     pp_i2c_send(AS3514_I2C_ADDR, DCDC15, 0x0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off lcd */
 #endif
-}
-
-#ifdef HAVE_BUTTON_LIGHT
-void __buttonlight_on(void)
-{
-    GPIOG_OUTPUT_VAL |= 0x80;
-#ifdef SANSA_C200
-    GPIOB_OUTPUT_VAL |= 0x10; /* The "menu" backlight */
+#ifdef HAVE_LCD_SLEEP
+    /* Start LCD sleep countdown */
+    if (_lcd_sleep_timeout < 0)
+    {
+        _lcd_sleep_timer = 0; /* Setting == Always */
+        lcd_sleep();
+    }
+    else
+        _lcd_sleep_timer = _lcd_sleep_timeout;
 #endif
 }
 
-void __buttonlight_off(void)
+void _buttonlight_on(void)
 {
-    GPIOG_OUTPUT_VAL &=~ 0x80;
+    GPIO_SET_BITWISE(GPIOG_OUTPUT_VAL, 0x80);
 #ifdef SANSA_C200
-    GPIOB_OUTPUT_VAL &=~ 0x10; /* The "menu" backlight */
+    GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x10); /* The "menu" backlight */
 #endif
 }
+
+void _buttonlight_off(void)
+{
+    GPIO_CLEAR_BITWISE(GPIOG_OUTPUT_VAL, 0x80);
+#ifdef SANSA_C200
+    GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x10); /* The "menu" backlight */
 #endif
+}

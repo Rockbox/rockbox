@@ -64,7 +64,7 @@ bool ide_powered(void)
 void power_off(void)
 {
     /* turn off backlight and wait for 1 second */
-    __backlight_off();
+    _backlight_off();
     sleep(HZ);
     /* Hard shutdown */
     IO_GIO_BITSET1|=1<<10;

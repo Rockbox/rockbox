@@ -156,9 +156,9 @@ void shutdown(void)
     sleep(HZ*2);
     
     /* Backlight OFF */
-    __backlight_off();
+    _backlight_off();
 #ifdef HAVE_REMOTE_LCD
-    __remote_backlight_off();
+    _remote_backlight_off();
 #endif
     
     __reset_cookie();
@@ -395,12 +395,12 @@ void main(void)
     }
 
     /* Start with the main backlight OFF. */
-    __backlight_init();
-    __backlight_off();
+    _backlight_init();
+    _backlight_off();
     
     /* Remote backlight ON */
 #ifdef HAVE_REMOTE_LCD
-    __remote_backlight_on();
+    _remote_backlight_on();
 #endif
 
     system_init();
@@ -531,7 +531,7 @@ void main(void)
             sleep(HZ);
 
             /* Backlight OFF */
-            __backlight_off();
+            _backlight_off();
         }
 
         cpu_idle_mode(false);

@@ -22,12 +22,12 @@
 #include "backlight.h"
 #include "lcd.h"
 
-void __backlight_on(void)
+void _backlight_on(void)
 {
     GPIO3_SET = 1;
 }
 
-void __backlight_off(void)
+void _backlight_off(void)
 {
     GPIO3_CLR = 1;
 }

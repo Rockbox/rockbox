@@ -22,18 +22,27 @@
 #include "backlight.h"
 #include "lcd.h"
 
-void __backlight_on(void)
+void _backlight_on(void)
 {
-#if (CONFIG_LCD == LCD_H10_20GB)
+#ifdef HAVE_LCD_SLEEP
     lcd_enable(true);
+    _lcd_sleep_timer = 0;
 #endif
-    GPIOL_OUTPUT_VAL |= 0x20;
+    GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x20);
 }
 
-void __backlight_off(void)
+void _backlight_off(void)
 {
-    GPIOL_OUTPUT_VAL &=~ 0x20;
-#if (CONFIG_LCD == LCD_H10_20GB)
+    GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_VAL, 0x20);
+#ifdef HAVE_LCD_SLEEP
     lcd_enable(false);
+    /* Start LCD sleep countdown */
+    if (_lcd_sleep_timeout < 0)
+    {
+        _lcd_sleep_timer = 0; /* Setting == Always */
+        lcd_sleep();
+    }
+    else
+        _lcd_sleep_timer = _lcd_sleep_timeout;
 #endif
 }

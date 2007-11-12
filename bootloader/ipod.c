@@ -239,7 +239,7 @@ void* main(void)
 
 #ifndef HAVE_BACKLIGHT_INVERSION
     /* Turn on the backlight */
-    __backlight_on();
+    _backlight_on();
 #endif
 
     system_init();

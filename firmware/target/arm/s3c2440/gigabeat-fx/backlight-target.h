@@ -41,18 +41,12 @@ void __buttonlight_trigger(void);
 /* See enum buttonlight_mode for available functions */
 void __buttonlight_mode(enum buttonlight_mode mode);
 
-bool __backlight_init(void);
-void __backlight_on(void);
-void __backlight_off(void);
-void __backlight_set_brightness(int brightness);
+bool _backlight_init(void);
+void _backlight_on(void);
+void _backlight_off(void);
+void _backlight_set_brightness(int brightness);
 
-void __buttonlight_set_brightness(int brightness);
-
-void __buttonlight_on(void);
-void __buttonlight_off(void);
-
-/* true: backlight fades off - false: backlight fades on */
-void __backlight_dim(bool dim);
-void __buttonlight_dim(bool dim_now);
-
+void _buttonlight_set_brightness(int brightness);
+void _buttonlight_on(void);
+void _buttonlight_off(void);
 #endif

@@ -20,12 +20,12 @@
 #include "system.h"
 #include "backlight.h"
 
-inline void __backlight_on(void)
+void _backlight_on(void)
 {
     outl(inl(0xc0001000) | 0x02, 0xc0001000);
 }
 
-inline void __backlight_off(void)
+void _backlight_off(void)
 {
     outl(inl(0xc0001000) & ~0x02, 0xc0001000);
 }

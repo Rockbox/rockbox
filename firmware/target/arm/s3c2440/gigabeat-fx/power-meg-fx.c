@@ -63,8 +63,8 @@ bool ide_powered(void)
 void power_off(void)
 {
     /* turn off backlight and wait for 1 second */
-    __backlight_off();
-    __buttonlight_off();
+    _backlight_off();
+    _buttonlight_off();
     sleep(HZ);
     /* set SLEEP bit to on in CLKCON to turn off */
     CLKCON |=(1<<3);

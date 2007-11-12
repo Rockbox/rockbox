@@ -441,7 +441,7 @@ void* main(void)
     button_init();
 #if defined(SANSA_E200)
     i2c_init();
-    __backlight_on();
+    _backlight_on();
 #endif
 
     lcd_set_foreground(LCD_WHITE);

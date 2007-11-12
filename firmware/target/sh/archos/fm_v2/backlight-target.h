@@ -22,15 +22,15 @@
 #include "config.h"
 #include "rtc.h"
 
-#define __backlight_init() true
+#define _backlight_init() true
 
-static inline void __backlight_on(void)
+static inline void _backlight_on(void)
 {
     /* Enable square wave */
     rtc_write(0x0a, rtc_read(0x0a) | 0x40);
 }
 
-static inline void __backlight_off(void)
+static inline void _backlight_off(void)
 {
     /* Disable square wave */
     rtc_write(0x0a, rtc_read(0x0a) & ~0x40);

@@ -100,8 +100,8 @@ void shutdown(void)
 
     sleep(HZ*2);
     
-    __backlight_off();
-    __remote_backlight_off();
+    _backlight_off();
+    _remote_backlight_off();
     
     __reset_cookie();
     power_off();
@@ -177,10 +177,10 @@ void main(void)
     audiohw_reset();
     
     /* Start with the main backlight OFF. */
-    __backlight_init();
-    __backlight_off();
+    _backlight_init();
+    _backlight_off();
     
-    __remote_backlight_on();
+    _remote_backlight_on();
 
     system_init();
     kernel_init();

@@ -26,25 +26,25 @@
 #include "spi-imx31.h"
 #include "debug.h"
 
-bool __backlight_init(void)
+bool _backlight_init(void)
 {
     return true;
 }
 
-void __backlight_on(void)
+void _backlight_on(void)
 {
     // This relies on the SPI interface being initialised already
     spi_send(51, 1);
 }
 
-void __backlight_off(void)
+void _backlight_off(void)
 {
     // This relies on the SPI interface being initialised already
     spi_send(51, 0);
 }
 
 /* Assumes that the backlight has been initialized */
-void __backlight_set_brightness(int brightness)
+void _backlight_set_brightness(int brightness)
 {
     (void)brightness;
 }

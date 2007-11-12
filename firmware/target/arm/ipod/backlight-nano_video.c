@@ -31,14 +31,89 @@
 #include "timer.h"
 #include "backlight.h"
 
-inline void __backlight_on(void)
+static int brightness = 1;   /* 1 to 32 */
+static int current_dim = 16; /* default after enabling the backlight dimmer */
+static bool enabled = false;
+
+void _backlight_set_brightness(int val)
 {
-    GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 1<<3);
-    GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 1<<7);
+    int oldlevel;
+
+    if (current_dim < val)
+    {
+        do
+        {
+            oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+            GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
+            udelay(10);
+            GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
+            set_irq_level(oldlevel);
+            udelay(10);
+        }
+        while (++current_dim < val);
+    }
+    else if (current_dim > val)
+    {
+        do
+        {
+            oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+            GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
+            udelay(200);
+            GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
+            set_irq_level(oldlevel);
+            udelay(10);
+        }
+        while (--current_dim > val);
+    }
+    brightness = val;
 }
 
-inline void __backlight_off(void)
+void _backlight_hw_enable(bool on)
 {
-    GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 1<<3);
-    GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_VAL, 1<<7);
+    if (on == enabled)
+        return;
+        
+    if (on)
+    {
+        GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
+        GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
+        sleep(HZ/100);
+        current_dim = 16;
+        _backlight_set_brightness(brightness);
+    }
+    else
+    {
+        GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
+        GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
+        sleep(HZ/20);
+    }
+    enabled = on;
+}
+
+/* Switch the backlight on. Works only if the backlight circuit is enabled.
+ * Called in ISR context for fading, so it must be fast. */
+void _backlight_led_on(void)
+{
+    GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x80);
+}
+
+/* Switch the backlight off. Keeps the backlight circuit enabled.
+ * Called in ISR context for fading, so it must be fast. */
+void _backlight_led_off(void)
+{
+    GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_VAL, 0x80);
+}
+
+bool _backlight_init(void)
+{
+    GPIO_SET_BITWISE(GPIOB_ENABLE, 0x08);
+    GPIO_SET_BITWISE(GPIOB_OUTPUT_EN, 0x08);
+    GPIO_SET_BITWISE(GPIOD_ENABLE, 0x80);
+    GPIO_SET_BITWISE(GPIOD_OUTPUT_EN, 0x80);
+    _backlight_hw_enable(true);
+    GPIO_SET_BITWISE(GPIOL_ENABLE, 0x80);
+    GPIO_SET_BITWISE(GPIOL_OUTPUT_EN, 0x80);
+    GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x80);
+
+    return true;
 }

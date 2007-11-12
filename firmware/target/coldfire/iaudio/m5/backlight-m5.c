@@ -24,14 +24,14 @@
 #include "pcf50606.h"
 #include "lcd.h"
 
-bool __backlight_init(void)
+bool _backlight_init(void)
 {
-    __backlight_on();
+    _backlight_on();
 
     return true; /* Backlight always ON after boot. */
 }
 
-void __backlight_on(void)
+void _backlight_on(void)
 {
     int level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
@@ -39,7 +39,7 @@ void __backlight_on(void)
     set_irq_level(level);
 }
 
-void __backlight_off(void)
+void _backlight_off(void)
 {
     int level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
@@ -47,12 +47,12 @@ void __backlight_off(void)
     set_irq_level(level);
 }
 
-void __remote_backlight_on(void)
+void _remote_backlight_on(void)
 {
     and_l(~0x00200000, &GPIO_OUT);
 }
 
-void __remote_backlight_off(void)
+void _remote_backlight_off(void)
 {
     or_l(0x00200000, &GPIO_OUT);
 }

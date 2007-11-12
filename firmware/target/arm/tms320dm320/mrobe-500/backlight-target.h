@@ -20,10 +20,10 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-bool __backlight_init(void);
-void __backlight_on(void);
-void __backlight_off(void);
-void __backlight_set_brightness(int brightness);
+bool _backlight_init(void);
+void _backlight_on(void);
+void _backlight_off(void);
+void _backlight_set_brightness(int brightness);
 
 /* true: backlight fades off - false: backlight fades on */
 void __backlight_dim(bool dim);

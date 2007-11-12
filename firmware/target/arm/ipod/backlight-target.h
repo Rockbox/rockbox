@@ -19,8 +19,38 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-#define __backlight_init() true
-void __backlight_on(void);
-void __backlight_off(void);
+#if defined(IPOD_VIDEO) || defined(IPOD_NANO)
+
+bool _backlight_init(void);
+void _backlight_set_brightness(int val);
+void _backlight_led_on(void);
+void _backlight_led_off(void);
+void _backlight_hw_enable(bool on);
+
+#define _backlight_on_isr() _backlight_led_on()
+#define _backlight_off_isr() _backlight_led_off()
+#define _backlight_on_normal()  do { _backlight_hw_enable(true); \
+                                     _backlight_led_on(); } while(0)
+#define _backlight_off_normal() do { _backlight_led_off(); \
+                                     _backlight_hw_enable(false); } while(0)
+#define _BACKLIGHT_FADE_ENABLE
+
+#elif defined HAVE_BACKLIGHT_PWM_FADING
+
+#define _backlight_init() true
+void _backlight_hw_on(void);
+void _backlight_hw_off(void);
+
+#define _backlight_on_isr() _backlight_hw_on()
+#define _backlight_off_isr() _backlight_hw_off()
+#define _backlight_on_normal() _backlight_hw_on()
+#define _backlight_off_normal() _backlight_hw_off()
+
+#else
+
+#define _backlight_init() true
+void _backlight_on(void);
+void _backlight_off(void);
+#endif
 
 #endif

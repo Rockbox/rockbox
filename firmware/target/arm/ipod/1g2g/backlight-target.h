@@ -19,8 +19,8 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-#define __backlight_init() false
-void __backlight_on(void);
-void __backlight_off(void);
+#define _backlight_init() false
+void _backlight_on(void);
+void _backlight_off(void);
 
 #endif

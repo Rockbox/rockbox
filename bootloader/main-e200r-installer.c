@@ -102,7 +102,7 @@ void* main(void)
     font_init();
     button_init();
     i2c_init();
-    __backlight_on();
+    _backlight_on();
     
     lcd_set_foreground(LCD_WHITE);
     lcd_set_background(LCD_BLACK);

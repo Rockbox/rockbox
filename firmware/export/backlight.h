@@ -85,4 +85,13 @@ void buttonlight_off(void);
 void buttonlight_set_timeout(int index);
 #endif
 
+/* Private API for use in target tree backlight code only */
+#ifdef HAVE_BUTTON_LIGHT
+extern int _buttonlight_timeout;
+#endif
+#ifdef HAVE_LCD_SLEEP
+extern int _lcd_sleep_timer;
+extern int _lcd_sleep_timeout;
+#endif
+
 #endif /* BACKLIGHT_H */

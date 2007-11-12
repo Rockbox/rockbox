@@ -24,33 +24,42 @@
 #include "pcf50606.h"
 #include "lcd.h"
 
-bool __backlight_init(void)
+bool _backlight_init(void)
 {
-    __backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
-    __backlight_on();
+    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    _backlight_on();
     
     return true; /* Backlight always ON after boot. */
 }
 
-void __backlight_on(void)
+void _backlight_on(void)
 {
     int level;
     lcd_enable(true);
+    _lcd_sleep_timer = 0; /* LCD should be awake already */
     level = set_irq_level(HIGHEST_IRQ_LEVEL);
     pcf50606_write(0x38, 0xb0); /* Backlight ON, GPO1INV=1, GPO1ACT=011 */
     set_irq_level(level);
 }
 
-void __backlight_off(void)
+void _backlight_off(void)
 {
     int level = set_irq_level(HIGHEST_IRQ_LEVEL);
     pcf50606_write(0x38, 0x80); /* Backlight OFF, GPO1INV=1, GPO1ACT=000 */
     set_irq_level(level);
     lcd_enable(false);
+    /* Start LCD sleep countdown */
+    if (_lcd_sleep_timeout < 0)
+    {
+        _lcd_sleep_timer = 0; /* Setting == Always */
+        lcd_sleep();
+    }
+    else
+        _lcd_sleep_timer = _lcd_sleep_timeout;
 }
 
 /* set brightness by changing the PWM */
-void __backlight_set_brightness(int val)
+void _backlight_set_brightness(int val)
 {
     /* disable IRQs while bitbanging */
     int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
@@ -59,12 +68,12 @@ void __backlight_set_brightness(int val)
     set_irq_level(old_irq_level);
 }
 
-void __remote_backlight_on(void)
+void _remote_backlight_on(void)
 {
     and_l(~0x00200000, &GPIO_OUT);
 }
 
-void __remote_backlight_off(void)
+void _remote_backlight_off(void)
 {
     or_l(0x00200000, &GPIO_OUT);
 }

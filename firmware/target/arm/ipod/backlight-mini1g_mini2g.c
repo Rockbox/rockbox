@@ -31,14 +31,12 @@
 #include "timer.h"
 #include "backlight.h"
 
-inline void __backlight_on(void)
+void _backlight_hw_on(void)
 {
-    /* set port B03 on */
-    outl(((0x100 | 1) << 3), 0x6000d824);
+    GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
 }
 
-inline void __backlight_off(void)
+void _backlight_hw_off(void)
 {
-    /* set port B03 off */
-    outl(((0x100 | 0) << 3), 0x6000d824);
+    GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
 }
