@@ -214,6 +214,15 @@ static void dump_wps_tokens(struct wps_data *data)
                 break;
 #endif
 
+#ifdef HAVE_ALBUMART
+            case WPS_TOKEN_ALBUMART_DISPLAY:
+                snprintf(buf, sizeof(buf), "album art display at x=%d, y=%d, "
+                         "maxwidth=%d, maxheight=%d", data->albumart_x,
+                         data->albumart_y, data->albumart_max_width,
+                         data->albumart_max_height);
+                break;
+#endif
+
 #ifdef HAVE_LCD_BITMAP
             case WPS_TOKEN_IMAGE_BACKDROP:
                 snprintf(buf, sizeof(buf), "backdrop image");

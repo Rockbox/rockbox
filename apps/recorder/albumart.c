@@ -231,8 +231,9 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen)
     return search_files(id3, size_string, buf, buflen);
 }
 
-/* Draw the album art bitmap from the given handle ID onto the given WPS. */
-void draw_album_art(struct gui_wps *gwps, int handle_id)
+/* Draw the album art bitmap from the given handle ID onto the given WPS.
+   Call with clear = true to clear the bitmap instead of drawing it. */
+void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
 {
     if (!gwps || !gwps->data || !gwps->display || handle_id < 0)
         return;
@@ -277,9 +278,19 @@ void draw_album_art(struct gui_wps *gwps, int handle_id)
             y += (data->albumart_max_height - height) / 2;
     }
 
-    /* Draw the bitmap */
-    gwps->display->set_drawmode(DRMODE_FG);
-    gwps->display->bitmap_part((fb_data*)bmp->data, 0, 0, bmp->width,
-                               x, y, width, height);
-    gwps->display->set_drawmode(DRMODE_SOLID);
+    if (!clear)
+    {
+        /* Draw the bitmap */
+        gwps->display->set_drawmode(DRMODE_FG);
+        gwps->display->bitmap_part((fb_data*)bmp->data, 0, 0, bmp->width,
+                                   x, y, width, height);
+        gwps->display->set_drawmode(DRMODE_SOLID);
+    }
+    else
+    {
+        /* Clear the bitmap */
+        gwps->display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        gwps->display->fillrect(x, y, width, height);
+        gwps->display->set_drawmode(DRMODE_SOLID);
+    }
 }

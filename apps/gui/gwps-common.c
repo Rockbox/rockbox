@@ -932,7 +932,7 @@ static char *get_token_value(struct gui_wps *gwps,
 
 #ifdef HAVE_ALBUMART
         case WPS_TOKEN_ALBUMART_DISPLAY:
-            draw_album_art(gwps, audio_current_aa_hid());
+            draw_album_art(gwps, audio_current_aa_hid(), false);
             return NULL;
 
         case WPS_TOKEN_ALBUMART_FOUND:
@@ -1416,6 +1416,11 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
         if (data->img[i].cond_index == cond_index)
             clear_image_pos(gwps, i);
     }
+#endif
+
+#ifdef HAVE_ALBUMART
+    if (data->albumart_cond_index == cond_index)
+        draw_album_art(gwps, audio_current_aa_hid(), true);
 #endif
 
     return ret;

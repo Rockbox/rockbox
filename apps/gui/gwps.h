@@ -344,6 +344,8 @@ struct wps_data
                                        + .._INCREASE,  + .._DECREASE */
     short albumart_max_width;
     short albumart_max_height;
+
+    int albumart_cond_index;
 #endif
 
 #else /*HAVE_LCD_CHARCELLS */

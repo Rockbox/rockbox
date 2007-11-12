@@ -293,7 +293,7 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_IMAGE_PROGRESS_BAR,       "P",   0,    parse_image_special },
 #ifdef HAVE_ALBUMART
     { WPS_NO_TOKEN,                       "Cl",  0,    parse_albumart_load },
-    { WPS_TOKEN_ALBUMART_DISPLAY,         "C",   WPS_REFRESH_DYNAMIC,
+    { WPS_TOKEN_ALBUMART_DISPLAY,         "C",   WPS_REFRESH_STATIC,
                                                 parse_albumart_conditional },
 #endif
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
@@ -824,7 +824,11 @@ static int parse_albumart_conditional(const char *wps_bufptr,
         }
     }
     else
+    {
+        /* This %C tag is in a conditional construct. */
+        wps_data->albumart_cond_index = condindex[level];
         return 0;
+    }
 };
 #endif /* HAVE_ALBUMART */
 
