@@ -48,24 +48,6 @@ $(OBJDIR)/mpegplayer.elf: $(OBJS) $(LINKFILE) $(BUILDDIR)/libmad-mpegplayer.a
 $(OUTPUT): $(OBJDIR)/mpegplayer.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 else
-
-ifeq ($(SIMVER), x11)
-###################################################
-# This is the X11 simulator version
-
-$(OUTPUT): $(OBJS) $(BUILDDIR)/libmad-mpegplayer.a
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -lmad-mpegplayer -o $@
-ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
-# 'x' must be kept or you'll have "Win32 error 5"
-#     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
-#         #define ERROR_ACCESS_DENIED 5L
-else
-	@chmod -x $@
-endif
-
-else # end of x11-simulator
-ifeq ($(SIMVER), sdl)
-###################################################
 # This is the SDL simulator version
 
 $(OUTPUT): $(OBJS) $(BUILDDIR)/libmad-mpegplayer.a
@@ -78,27 +60,7 @@ else
 	@chmod -x $@
 endif
 
-else # end of sdl-simulator
-###################################################
-# This is the win32 simulator version
-DLLTOOLFLAGS = --export-all
-DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
-
-$(OUTPUT): $(OBJS) $(BUILDDIR)/libmad-mpegplayer.a
-	$(call PRINTS,DLL $(@F))$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $(OBJS)
-	$(SILENT)@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $(OBJS) \
-                $(BUILDDIR)/libplugin.a -o $@
-ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
-# 'x' must be kept or you'll have "Win32 error 5"
-#     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
-#         #define ERROR_ACCESS_DENIED 5L
-else
-	@chmod -x $@
-endif
-endif # end of win32-simulator
-endif
-endif # end of simulator section
-
+endif # end of sdl-simulator
 
 include $(TOOLSDIR)/make.inc
 
