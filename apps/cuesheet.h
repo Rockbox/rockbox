@@ -27,9 +27,9 @@
 #define MAX_TRACKS 99  /* Max number of tracks in a cuesheet */
 
 struct cue_track_info {
-    char title[MAX_NAME];
-    char performer[MAX_NAME];
-    char songwriter[MAX_NAME];
+    char title[MAX_NAME*3+1];
+    char performer[MAX_NAME*3+1];
+    char songwriter[MAX_NAME*3+1];
     unsigned long offset; /* ms from start of track */
 };
 
@@ -37,9 +37,9 @@ struct cuesheet {
     char path[MAX_PATH];
     char audio_filename[MAX_PATH];
 
-    char title[MAX_NAME];
-    char performer[MAX_NAME];
-    char songwriter[MAX_NAME];
+    char title[MAX_NAME*3+1];
+    char performer[MAX_NAME*3+1];
+    char songwriter[MAX_NAME*3+1];
 
     int track_count;
     struct cue_track_info tracks[MAX_TRACKS];

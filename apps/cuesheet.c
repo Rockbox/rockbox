@@ -194,8 +194,10 @@ bool parse_cuesheet(char *file, struct cuesheet *cue)
                     break;
             }
 
-            if (dest)
-                strncpy(dest, string, MAX_NAME);
+            if (dest) {
+                dest = iso_decode(string, dest, -1, MIN(strlen(string), MAX_NAME));
+                *dest = '\0';
+            }    
         }
     }
     close(fd);
