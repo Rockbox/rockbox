@@ -247,7 +247,8 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
 #endif
 
     struct bitmap *bmp;
-    bufgetdata(handle_id, 0, (void *)&bmp);
+    if (bufgetdata(handle_id, 0, (void *)&bmp) <= 0)
+        return;
 
     short x = data->albumart_x;
     short y = data->albumart_y;
