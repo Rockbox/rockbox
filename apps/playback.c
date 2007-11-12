@@ -234,7 +234,8 @@ static volatile int track_ridx = 0;  /* Track being decoded (A/C-) */
 static int track_widx = 0;           /* Track being buffered (A) */
 
 #define CUR_TI (&tracks[track_ridx]) /* Playing track info pointer (A/C-) */
-static struct track_info *prev_ti;   /* Pointer to the previous track played */
+static struct track_info *prev_ti = NULL;  /* Pointer to the previously played
+                                              track */
 
 /* Set by the audio thread when the current track information has updated
  * and the WPS may need to update its cached information */
@@ -2967,7 +2968,7 @@ static void audio_finalise_track_change(void)
     }
     prevtrack_id3.path[0] = 0;
 
-    if (prev_ti->audio_hid < 0)
+    if (prev_ti && prev_ti->audio_hid < 0)
     {
         /* No audio left so we clear all the track info. */
         clear_track_info(prev_ti);
