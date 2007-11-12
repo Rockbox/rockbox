@@ -69,7 +69,7 @@ void power_off(void)
     set_irq_level(HIGHEST_IRQ_LEVEL);
 #ifdef HAVE_BACKLIGHT
     /* Switch off the light on backlight-modded Ondios */
-    __backlight_off();
+    _backlight_off();
 #endif
     and_b(~0x20, &PBDRL);
     or_b(0x20, &PBIORL);

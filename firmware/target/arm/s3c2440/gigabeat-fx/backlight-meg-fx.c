@@ -377,9 +377,11 @@ void _buttonlight_on(void)
 
 void _buttonlight_off(void)
 {
+#ifndef BOOTLOADER
     if(_buttonlight_timeout>0)
         __buttonlight_dim(true);
     else
+#endif
         __buttonlight_off();
 }
 

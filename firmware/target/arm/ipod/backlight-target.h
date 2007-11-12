@@ -27,6 +27,12 @@ void _backlight_led_on(void);
 void _backlight_led_off(void);
 void _backlight_hw_enable(bool on);
 
+#ifdef BOOTLOADER
+#define _backlight_on()  do { _backlight_hw_enable(true); \
+                              _backlight_led_on(); } while(0)
+#define _backlight_off() do { _backlight_led_off(); \
+                              _backlight_hw_enable(false); } while(0)
+#else /* !BOOTLOADER */
 #define _backlight_on_isr() _backlight_led_on()
 #define _backlight_off_isr() _backlight_led_off()
 #define _backlight_on_normal()  do { _backlight_hw_enable(true); \
@@ -34,6 +40,7 @@ void _backlight_hw_enable(bool on);
 #define _backlight_off_normal() do { _backlight_led_off(); \
                                      _backlight_hw_enable(false); } while(0)
 #define _BACKLIGHT_FADE_ENABLE
+#endif /* !BOOTLOADER */
 
 #elif defined HAVE_BACKLIGHT_PWM_FADING
 
@@ -41,10 +48,15 @@ void _backlight_hw_enable(bool on);
 void _backlight_hw_on(void);
 void _backlight_hw_off(void);
 
+#ifdef BOOTLOADER
+#define _backlight_on() _backlight_hw_on()
+#define _backlight_off() _backlight_hw_off()
+#else
 #define _backlight_on_isr() _backlight_hw_on()
 #define _backlight_off_isr() _backlight_hw_off()
 #define _backlight_on_normal() _backlight_hw_on()
 #define _backlight_off_normal() _backlight_hw_off()
+#endif
 
 #else
 
