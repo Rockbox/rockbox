@@ -884,31 +884,40 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     }
 
     strncpy(h->path, file, MAX_PATH);
-    h->filerem = size - offset;
     h->offset = offset;
     h->ridx = buf_widx;
-    h->widx = buf_widx;
     h->data = buf_widx;
-    h->available = 0;
     h->type = type;
 
 #ifdef HAVE_ALBUMART
-    if (type == TYPE_BITMAP) {
+    if (type == TYPE_BITMAP)
+    {
         /* Bitmap file: we load the data instead of the file */
+        int rc;
         mutex_lock(&llist_mutex); /* Lock because load_bitmap yields */
-        size = load_bitmap(fd);
-        if (size <= 0)
+        rc = load_bitmap(fd);
+        if (rc <= 0)
+        {
+            rm_handle(h);
+            close(fd);
+            mutex_unlock(&llist_mutex);
             return ERR_FILE_ERROR;
-
+        }
         h->filerem = 0;
-        h->available = size;
-        h->widx = buf_widx + size; /* safe because the data doesn't wrap */
-        buf_widx += size;  /* safe too */
+        h->filesize = rc;
+        h->available = rc;
+        h->widx = buf_widx + rc; /* safe because the data doesn't wrap */
+        buf_widx += rc;  /* safe too */
         mutex_unlock(&llist_mutex);
     }
+    else
 #endif
-
-    h->filesize = size;
+    {
+        h->filerem = size - offset;
+        h->filesize = size;
+        h->available = 0;
+        h->widx = buf_widx;
+    }
 
     if (type == TYPE_CUESHEET) {
         h->fd = fd;
