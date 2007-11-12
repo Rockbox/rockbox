@@ -115,6 +115,8 @@ static int parse_dir_level(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 
 #ifdef HAVE_LCD_BITMAP
+static int parse_scrollmargin(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
 static int parse_image_special(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_statusbar_enable(const char *wps_bufptr,
@@ -277,7 +279,12 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_CROSSFADE,                "xf",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+    { WPS_TOKEN_ALIGN_SCROLLMARGIN,       "s",   WPS_REFRESH_SCROLL,
+                                                       parse_scrollmargin },
+#else
     { WPS_NO_TOKEN,                       "s",   WPS_REFRESH_SCROLL,  NULL },
+#endif
     { WPS_TOKEN_SUBLINE_TIMEOUT,          "t",   0,  parse_subline_timeout },
 
 #ifdef HAVE_LCD_BITMAP
@@ -831,6 +838,34 @@ static int parse_albumart_conditional(const char *wps_bufptr,
     }
 };
 #endif /* HAVE_ALBUMART */
+
+#ifdef HAVE_LCD_BITMAP
+static int parse_scrollmargin(const char *wps_bufptr, struct wps_token *token, 
+                              struct wps_data *wps_data)
+{
+    const char* p;
+    const char* pend;
+
+    (void)wps_data; /* Kill the warning */
+
+    /* valid tag looks like %s or %s|12|  */
+    if(*wps_bufptr == '|')
+    {
+        p = wps_bufptr + 1;
+
+        if(isdigit(*p) && (pend = strchr(p, '|')))
+        {
+            token->value.i = atoi(p);
+            return(pend - wps_bufptr + 1);
+        }
+    } else {
+        token->value.i = 0;
+    }
+            
+    return(0);
+}
+#endif
+
 
 /* Parse a generic token from the given string. Return the length read */
 static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)

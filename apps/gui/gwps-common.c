@@ -1352,6 +1352,13 @@ static char *get_token_value(struct gui_wps *gwps,
                 return NULL;
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+        case WPS_TOKEN_ALIGN_SCROLLMARGIN:
+            gwps->display->setmargins(token->value.i,
+                                      gwps->display->getymargin());
+            return NULL;
+#endif
+
         default:
             return NULL;
     }
@@ -1453,6 +1460,11 @@ static bool get_line(struct gui_wps *gwps,
     align->left = NULL;
     align->center = NULL;
     align->right = NULL;
+
+#ifdef HAVE_LCD_BITMAP
+    /* Reset margins - only bitmap targets modify them */
+    gwps->display->setmargins(0, gwps->display->getymargin());
+#endif
 
     /* Process all tokens of the desired subline */
     last_token_idx = wps_last_token_index(data, line, subline);
@@ -1677,12 +1689,13 @@ static void write_line(struct screen *display,
                        bool scroll)
 {
 
-    int left_width = 0; /* left_xpos would always be 0 */
+    int left_width = 0, left_xpos;
     int center_width = 0, center_xpos;
     int right_width = 0,  right_xpos;
     int ypos;
     int space_width;
     int string_height;
+    int scroll_width;
 
     /* calculate different string sizes and positions */
     display->getstringsize((unsigned char *)" ", &space_width, &string_height);
@@ -1691,19 +1704,21 @@ static void write_line(struct screen *display,
                                 &left_width, &string_height);
     }
 
-    if (format_align->center != 0) {
-        display->getstringsize((unsigned char *)format_align->center,
-                                &center_width, &string_height);
-    }
-
-    center_xpos=(display->width - center_width) / 2;
-
     if (format_align->right != 0) {
         display->getstringsize((unsigned char *)format_align->right,
                                 &right_width, &string_height);
     }
 
+    if (format_align->center != 0) {
+        display->getstringsize((unsigned char *)format_align->center,
+                                &center_width, &string_height);
+    }
+
+    left_xpos = display->getxmargin();
     right_xpos = (display->width - right_width);
+    center_xpos = (display->width + left_xpos - center_width) / 2;
+
+    scroll_width = display->width - left_xpos;
 
     /* Checks for overlapping strings.
         If needed the overlapping strings will be merged, separated by a
@@ -1712,7 +1727,7 @@ static void write_line(struct screen *display,
     /* CASE 1: left and centered string overlap */
     /* there is a left string, need to merge left and center */
     if ((left_width != 0 && center_width != 0) &&
-        (left_width + space_width > center_xpos)) {
+        (left_xpos + left_width + space_width > center_xpos)) {
         /* replace the former separator '\0' of left and
             center string with a space */
         *(--format_align->center) = ' ';
@@ -1723,7 +1738,7 @@ static void write_line(struct screen *display,
     }
     /* there is no left string, move center to left */
     if ((left_width == 0 && center_width != 0) &&
-        (left_width > center_xpos)) {
+        (left_xpos + left_width > center_xpos)) {
         /* move the center string to the left string */
         format_align->left = format_align->center;
         /* calculate the new width and position of the string */
@@ -1764,7 +1779,7 @@ static void write_line(struct screen *display,
         was one or it has been merged in case 1 or 2 */
     /* there is a left string, need to merge left and right */
     if ((left_width != 0 && center_width == 0 && right_width != 0) &&
-        (left_width + space_width > right_xpos)) {
+        (left_xpos + left_width + space_width > right_xpos)) {
         /* replace the former separator '\0' of left and
             right string with a space */
         *(--format_align->right) = ' ';
@@ -1787,7 +1802,9 @@ static void write_line(struct screen *display,
     ypos = (line * string_height) + display->getymargin();
 
 
-    if (scroll && left_width > display->width)
+    if (scroll && ((left_width > scroll_width) || 
+                   (center_width > scroll_width) ||
+                   (right_width > scroll_width)))
     {
         display->puts_scroll(0, line,
                              (unsigned char *)format_align->left);
@@ -1797,7 +1814,7 @@ static void write_line(struct screen *display,
 #ifdef HAVE_LCD_BITMAP
         /* clear the line first */
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        display->fillrect(0, ypos, display->width, string_height);
+        display->fillrect(left_xpos, ypos, display->width, string_height);
         display->set_drawmode(DRMODE_SOLID);
 #endif
 
@@ -1808,7 +1825,7 @@ static void write_line(struct screen *display,
         /* print aligned strings */
         if (left_width != 0)
         {
-            display->putsxy(0, ypos,
+            display->putsxy(left_xpos, ypos,
                             (unsigned char *)format_align->left);
         }
         if (center_width != 0)
