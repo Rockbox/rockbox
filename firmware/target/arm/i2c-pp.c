@@ -33,6 +33,7 @@
 #include "as3514.h"
 
 /* Local functions definitions */
+static struct mutex i2c_mtx NOCACHEBSS_ATTR;
 
 #define POLL_TIMEOUT (HZ)
 
@@ -133,18 +134,26 @@ static int pp_i2c_send_byte(unsigned int addr, int data0)
 }
 
 /* Public functions */
-struct spinlock i2c_spin NOCACHEBSS_ATTR;
+void i2c_lock(void)
+{
+    mutex_lock(&i2c_mtx);
+}
+
+void i2c_unlock(void)
+{
+    mutex_unlock(&i2c_mtx);
+}
 
 int i2c_readbytes(unsigned int dev_addr, int addr, int len, unsigned char *data) {
     unsigned int temp;
     int i;
-    spinlock_lock(&i2c_spin);
+    mutex_lock(&i2c_mtx);
     pp_i2c_send_byte(dev_addr, addr);
     for (i = 0; i < len; i++) {
         pp_i2c_read_byte(dev_addr, &temp);
         data[i] = temp;
     }
-    spinlock_unlock(&i2c_spin);
+    mutex_unlock(&i2c_mtx);
     return i;
 }
 
@@ -152,10 +161,10 @@ int i2c_readbyte(unsigned int dev_addr, int addr)
 {
     int data;
 
-    spinlock_lock(&i2c_spin);
+    mutex_lock(&i2c_mtx);
     pp_i2c_send_byte(dev_addr, addr);
     pp_i2c_read_byte(dev_addr, &data);
-    spinlock_unlock(&i2c_spin);
+    mutex_unlock(&i2c_mtx);
 
     return data;
 }
@@ -168,9 +177,9 @@ int pp_i2c_send(unsigned int addr, int data0, int data1)
     data[0] = data0;
     data[1] = data1;
 
-    spinlock_lock(&i2c_spin);
+    mutex_lock(&i2c_mtx);
     retval = pp_i2c_send_bytes(addr, 2, data);
-    spinlock_unlock(&i2c_spin);
+    mutex_unlock(&i2c_mtx);
 
     return retval;
 }
@@ -222,7 +231,7 @@ void i2c_init(void)
 #endif
 #endif
 
-    spinlock_init(&i2c_spin IF_COP(, SPINLOCK_TASK_SWITCH));
+    mutex_init(&i2c_mtx);
 
     i2c_readbyte(0x8, 0);
 }

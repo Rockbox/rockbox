@@ -28,7 +28,7 @@ unsigned short adc_read(int channel)
 
     if ((unsigned)channel < NUM_ADC_CHANNELS)
     {
-        spinlock_lock(&i2c_spin);
+        i2c_lock();
 
         /* Select channel */
         if (pp_i2c_send( AS3514_I2C_ADDR, ADC_0, (channel << 4)) >= 0)
@@ -42,7 +42,7 @@ unsigned short adc_read(int channel)
             }
         }
 
-        spinlock_unlock(&i2c_spin);
+        i2c_unlock();
     }
     
     return data;

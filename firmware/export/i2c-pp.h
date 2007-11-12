@@ -47,7 +47,8 @@
 
 /* To be used by drivers that need to do multiple i2c operations
    atomically */
-extern struct spinlock i2c_spin;
+void i2c_lock(void);
+void i2c_unlock(void);
 
 void i2c_init(void);
 int i2c_readbyte(unsigned int dev_addr, int addr);
