@@ -33,7 +33,7 @@ int rtc_read_datetime(unsigned char* buf)
     buf[0] = BCDSEC;
     buf[1] = BCDMIN;
     buf[2] = BCDHOUR;
-    buf[3] = BCDDAY;
+    buf[3] = BCDDAY-1;	/* timefuncs wants 0..6 for wday */
     buf[4] = BCDDATE;
     buf[5] = BCDMON;
     buf[6] = BCDYEAR;
@@ -46,7 +46,7 @@ int rtc_write_datetime(unsigned char* buf)
     BCDSEC  = buf[0];
     BCDMIN  = buf[1];
     BCDHOUR = buf[2];
-    BCDDAY  = buf[3];
+    BCDDAY  = buf[3]+1; /* chip wants 1..7 for wday */
     BCDDATE = buf[4];
     BCDMON  = buf[5];
     BCDYEAR = buf[6];
