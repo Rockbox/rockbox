@@ -961,6 +961,11 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                 data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_END;
                 if (lastcond[level])
                     data->tokens[lastcond[level]].value.i = data->num_tokens;
+                else
+                {
+                    fail = PARSE_FAIL_COND_SYNTAX_ERROR;
+                    break;
+                }
 
                 lastcond[level] = 0;
                 data->num_tokens++;
@@ -979,6 +984,11 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
                 data->tokens[data->num_tokens].type = WPS_TOKEN_CONDITIONAL_OPTION;
                 if (lastcond[level])
                     data->tokens[lastcond[level]].value.i = data->num_tokens;
+                else
+                {
+                    fail = PARSE_FAIL_COND_SYNTAX_ERROR;
+                    break;
+                }
 
                 lastcond[level] = data->num_tokens;
                 numoptions[level]++;
@@ -1085,7 +1095,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
         }
     }
 
-    if (level >= 0) /* there are unclosed conditionals */
+    if (!fail && level >= 0) /* there are unclosed conditionals */
         fail = PARSE_FAIL_UNCLOSED_COND;
 
 #ifdef DEBUG
