@@ -1426,8 +1426,11 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
 #endif
 
 #ifdef HAVE_ALBUMART
-    if (data->albumart_cond_index == cond_index)
+    if (data->wps_uses_albumart != WPS_ALBUMART_NONE &&
+        data->albumart_cond_index == cond_index)
+    {
         draw_album_art(gwps, audio_current_aa_hid(), true);
+    }
 #endif
 
     return ret;
