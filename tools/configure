@@ -219,6 +219,13 @@ arm946cc () {
  endian="little"
 }
 
+arm926ejscc () {
+ prefixtools arm-elf-
+ GCCOPTS="$CCOPTS -mcpu=arm926ej-s -mlong-calls"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="little"
+}
+
 whichadvanced () {
   ##################################################################
   # Prompt for specific developer options
@@ -1297,7 +1304,7 @@ EOF
     archos="mrobe500"
     target="-DMROBE_500"
     memory=64 # always
-    arm9tdmicc
+    arm926ejscc
     # tool="$rootdir/tools/scramble -add=m500"
     tool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
