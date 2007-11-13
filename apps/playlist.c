@@ -198,6 +198,68 @@ static long playlist_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char playlist_thread_name[] = "playlist cachectrl";
 #endif
 
+#define BOM "\xef\xbb\xbf"
+#define BOM_SIZE 3
+
+/* Check if the filename suggests M3U or M3U8 format. */
+static bool is_m3u8(const char* filename)
+{
+    int len = strlen(filename);
+
+    /* Default to M3U8 unless explicitly told otherwise. */
+    return !(len > 4 && strcasecmp(&filename[len - 4], ".m3u") == 0);
+}
+
+/* Check if a strings starts with an UTF-8 byte-order mark. */
+static bool is_utf8_bom(const char* str, int len)
+{
+    return len >= BOM_SIZE && memcmp(str, BOM, BOM_SIZE) == 0;
+}
+
+/* Convert a filename in an M3U playlist to UTF-8. 
+ *
+ * buf     - the filename to convert; can contain more than one line from the
+ *           playlist.
+ * buf_len - amount of buf that is used.
+ * buf_max - total size of buf.
+ * temp    - temporary conversion buffer, at least buf_max bytes.
+ * 
+ * Returns the length of the converted filename.
+ */
+static int convert_m3u(char* buf, int buf_len, int buf_max, char* temp)
+{
+    int i = 0;
+    char* dest;
+
+    /* Locate EOL. */
+    while ((buf[i] != '\n') && (buf[i] != '\r') && (i < buf_len))
+    {
+        i++;
+    }
+
+    /* Work back killing white space. */
+    while ((i > 0) && isspace(buf[i - 1]))
+    {
+        i--;
+    }
+    
+    buf_len = i;
+    dest = temp;
+    
+    /* Convert char by char, so as to not overflow temp (iso_decode should
+     * preferably handle this). No more than 4 bytes should be generated for
+     * each input char.
+     */
+    for (i = 0; i < buf_len && dest < (temp + buf_max - 4); i++)
+    {
+        dest = iso_decode(&buf[i], dest, -1, 1);
+    }
+    
+    *dest = 0;
+    strcpy(buf, temp);
+    return dest - temp;
+}
+
 /*
  * remove any files and indices associated with the playlist
  */
@@ -441,10 +503,8 @@ static void update_playlist_filename(struct playlist_info* playlist,
 {
     char *sep="";
     int dirlen = strlen(dir);
-    int filelen = strlen(file);
 
-    /* Default to utf8 unless explicitly told otherwise. */
-    playlist->utf8 = !(filelen > 4 && strcasecmp(&file[filelen - 4], ".m3u") == 0);
+    playlist->utf8 = is_m3u8(file);
     
     /* If the dir does not end in trailing slash, we use a separator.
        Otherwise we don't. */
@@ -511,11 +571,10 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         p = (unsigned char *)buffer;
 
         /* utf8 BOM at beginning of file? */
-        if(i == 0 && nread > 3 
-           && *p == 0xef && *(p+1) == 0xbb && *(p+2) == 0xbf) {
-            nread -= 3;
-            p += 3;
-            i += 3;
+        if(i == 0 && is_utf8_bom(p, nread)) {
+            nread -= BOM_SIZE;
+            p += BOM_SIZE;
+            i += BOM_SIZE;
             playlist->utf8 = true;  /* Override any earlier indication. */
         }
 
@@ -1308,6 +1367,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
     int max = -1;
     char tmp_buf[MAX_PATH+1];
     char dir_buf[MAX_PATH+1];
+    bool utf8 = playlist->utf8;
 
     if (buf_length > MAX_PATH+1)
         buf_length = MAX_PATH+1;
@@ -1336,7 +1396,10 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
         mutex_lock(&playlist->control_mutex);
 
         if (control_file)
+        {
             fd = playlist->control_fd;
+            utf8 = true;
+        }
         else
         {
             if(-1 == playlist->fd)
@@ -1354,33 +1417,12 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
             {
                 max = read(fd, tmp_buf, MIN((size_t) buf_length, sizeof(tmp_buf)));
                 
-                if ((max > 0) && !playlist->utf8)
+                if ((max > 0) && !utf8)
                 {
-                    char* end;
-                    int i = 0;
-
-                    /* Locate EOL. */
-                    while ((tmp_buf[i] != '\n') && (tmp_buf[i] != '\r')
-                        && (i < max))
-                    {
-                        i++;
-                    }
-                
-                    /* Now work back killing white space. */
-                    while ((i > 0) && isspace(tmp_buf[i - 1]))
-                    {
-                        i--;
-                    }
-
-                    /* Borrow dir_buf a little... */
-                    /* TODO: iso_decode can overflow dir_buf; it really 
-                     * should take a dest size argument.
+                    /* Use dir_buf as a temporary buffer. Note that dir_buf must
+                     * be as large as tmp_buf.
                      */
-                    end = iso_decode(tmp_buf, dir_buf, -1, i);
-                    *end = 0;
-                    strncpy(tmp_buf, dir_buf, sizeof(tmp_buf));
-                    tmp_buf[sizeof(tmp_buf) - 1] = 0;
-                    max = strlen(tmp_buf);
+                    max = convert_m3u(tmp_buf, max, sizeof(tmp_buf), dir_buf);
                 }
             }
         }
@@ -1928,7 +1970,7 @@ void playlist_init(void)
            playlist->max_playlist_size * sizeof(int));
     create_thread(playlist_thread, playlist_stack, sizeof(playlist_stack),
                   0, playlist_thread_name IF_PRIO(, PRIORITY_BACKGROUND)
-		          IF_COP(, CPU));
+                       IF_COP(, CPU));
     queue_init(&playlist_queue, true);
 #endif
 }
@@ -2938,6 +2980,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
     char trackname[MAX_PATH+1];
     int count = 0;
     int result = 0;
+    bool utf8 = is_m3u8(filename);
 
     if (!playlist)
         playlist = &current_playlist;
@@ -2985,10 +3028,24 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
         /* user abort */
         if (action_userabort(TIMEOUT_NOBLOCK))
             break;
+    
+        if (count == 0 && is_utf8_bom(temp_buf, max))
+        {
+            max -= BOM_SIZE;
+            memmove(temp_buf, temp_buf + BOM_SIZE, max);
+        }
 
         if (temp_buf[0] != '#' && temp_buf[0] != '\0')
         {
             int insert_pos;
+            
+            if (!utf8)
+            {
+                /* Use trackname as a temporay buffer. Note that trackname must
+                 * be as large as temp_buf.
+                 */
+                max = convert_m3u(temp_buf, max, sizeof(temp_buf), trackname);
+            }
 
             /* we need to format so that relative paths are correctly
                handled */
