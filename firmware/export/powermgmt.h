@@ -104,15 +104,15 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 # define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery from IriverRuntime wiki page */
 # define CURRENT_BACKLIGHT  23  /* FIXME: This needs to be measured, copied from H100 */
 # define CURRENT_RECORD    110  /* additional current while recording */
-#elif defined(IPOD_ARCH) && (MODEL_NUMBER==4)   /* iPOD Nano */
+#elif defined(IPOD_NANO)        /* iPOD Nano */
 # define CURRENT_NORMAL     35  /* 8.5-9.0h playback out of 300mAh battery from IpodRuntime */
-# define CURRENT_BACKLIGHT  20  /* FIXME: estimation took over from iPOD Video */
+# define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
 #if defined(HAVE_RECORDING)
 # define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
 #endif
-#elif defined(IPOD_ARCH) && (MODEL_NUMBER==5)   /* iPOD Video */
-# define CURRENT_NORMAL     50  /* 8h out of 400mAh battery (30GB) or 11h out of 600mAh (60GB) from IpodRuntime */
-# define CURRENT_BACKLIGHT  20  /* estimation calculated from IpodRuntime measurement */
+#elif defined(IPOD_VIDEO)       /* iPOD Video */
+# define CURRENT_NORMAL     42  /* 9.5h out of 400mAh battery (30GB) or 14h out of 600mAh (60GB) from IpodRuntime */
+# define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
 #if defined(HAVE_RECORDING)
 # define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
 #endif
