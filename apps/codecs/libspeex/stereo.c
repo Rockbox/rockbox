@@ -45,7 +45,7 @@ typedef struct RealSpeexStereoState {
    spx_word32_t e_ratio;      /**< Ratio of energies: E(left+right)/[E(left)+E(right)]  */
    spx_word32_t smooth_left;  /**< Smoothed left channel gain */
    spx_word32_t smooth_right; /**< Smoothed right channel gain */
-   spx_int32_t reserved1;     /**< Reserved for future use */
+   spx_uint32_t reserved1;     /**< Reserved for future use */
    spx_int32_t reserved2;     /**< Reserved for future use */
 } RealSpeexStereoState;
 
@@ -53,15 +53,17 @@ typedef struct RealSpeexStereoState {
 /*float e_ratio_quant[4] = {1, 1.26, 1.587, 2};*/
 #ifndef FIXED_POINT
 static const float e_ratio_quant[4] = {.25f, .315f, .397f, .5f};
+static const float e_ratio_quant_bounds[3] = {0.2825f, 0.356f, 0.4485f};
 #else
 static const spx_word16_t e_ratio_quant[4] = {8192, 10332, 13009, 16384};
+static const spx_word16_t e_ratio_quant_bounds[3] = {9257, 11665, 14696};
 #endif
 
 /* This is an ugly compatibility hack that properly resets the stereo state
    In case it it compiled in fixed-point, but initialised with the deprecated
    floating point static initialiser */
 #ifdef FIXED_POINT
-#define COMPATIBILITY_HACK(s) do {if ((s)->reserved1 != 0xdeadbeef) speex_stereo_state_init(s); } while (0);
+#define COMPATIBILITY_HACK(s) do {if ((s)->reserved1 != 0xdeadbeef) speex_stereo_state_reset((SpeexStereoState*)s); } while (0);
 #else
 #define COMPATIBILITY_HACK(s) 
 #endif
@@ -134,8 +136,8 @@ void speex_encode_stereo(float *data, int frame_size, SpeexBits *bits)
    
    speex_bits_pack(bits, (int)balance, 5);
    
-   /* FIXME: Convert properly */
-   tmp=vq_index(&e_ratio, e_ratio_quant, 1, 4);
+   /* FIXME: this is a hack */
+   tmp=scal_quant(e_ratio*Q15_ONE, e_ratio_quant_bounds, 3);
    speex_bits_pack(bits, tmp, 2);
 }
 
@@ -171,8 +173,8 @@ void speex_encode_stereo_int(spx_int16_t *data, int frame_size, SpeexBits *bits)
    
    speex_bits_pack(bits, (int)balance, 5);
    
-   /* FIXME: Convert properly */
-   tmp=vq_index(&e_ratio, e_ratio_quant, 1, 4);
+   /* FIXME: this is a hack */
+   tmp=scal_quant(e_ratio*Q15_ONE, e_ratio_quant_bounds, 3);
    speex_bits_pack(bits, tmp, 2);
 }
 #endif /* SPEEX_DISABLE_ENCODER */
