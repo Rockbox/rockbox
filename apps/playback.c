@@ -2457,7 +2457,6 @@ static bool audio_load_track(int offset, bool start_play)
             file_offset = offset;
             track_id3->offset = offset;
             audio_set_elapsed(track_id3);
-            ci.curpos = offset;
         }
         break;
 
@@ -2466,7 +2465,6 @@ static bool audio_load_track(int offset, bool start_play)
             file_offset = offset;
             track_id3->offset = offset;
             track_id3->elapsed = track_id3->length / 2;
-            ci.curpos = offset;
         }
         break;
 
@@ -2500,6 +2498,8 @@ static bool audio_load_track(int offset, bool start_play)
         file_offset = 0;
 
     tracks[track_widx].audio_hid = bufopen(trackname, file_offset, type);
+
+    ci.curpos=file_offset;
 
     if (tracks[track_widx].audio_hid < 0)
         return false;
