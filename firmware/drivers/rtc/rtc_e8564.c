@@ -24,8 +24,28 @@
 #include "i2c-pp.h"
 #include <stdbool.h>
 
+/* RTC registers */
+#define RTC_CTRL1   0x00
+#define RTC_CTRL2   0x01
+
+/* Control 2 register flags */
+#define RTC_TF  0x04
+#define RTC_AF  0x08
+
 void rtc_init(void)
 {
+    unsigned char tmp;
+    int rv;
+    
+    /* initialize Control 1 register */
+    tmp = 0;
+    pp_i2c_send(0x51, RTC_CTRL1,tmp);
+    
+    /* read value of the Control 2 register - we'll need it to preserve alarm and timer interrupt assertion flags */
+    rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
+    /* clear alarm and timer interrupts */
+    tmp &= (RTC_TF | RTC_AF);
+    pp_i2c_send(0x51, RTC_CTRL2,tmp);
 }
 
 int rtc_read_datetime(unsigned char* buf)
