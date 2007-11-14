@@ -23,7 +23,7 @@
 //#include "config-tremor.h"
 #include <string.h>
 #include "speex/ogg.h"
-#include "misc.h"
+#include "arch.h"
 
 /* A complete description of Ogg framing exists in docs/framing.html */
 

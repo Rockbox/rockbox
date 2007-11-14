@@ -45,7 +45,7 @@
 #include "vq.h"
 #include <speex/speex_bits.h>
 #include "vbr.h"
-#include "misc.h"
+#include "arch.h"
 #include "math_approx.h"
 #include "os_support.h"
 #include <speex/speex_callbacks.h>
@@ -108,6 +108,7 @@ const float exc_gain_quant_scal1[2]={0.70469f, 1.05127f};
 
 #define sqr(x) ((x)*(x))
 
+extern const spx_word16_t lag_window[];
 extern const spx_word16_t lpc_window[];
 #ifndef SPEEX_DISABLE_ENCODER
 void *nb_encoder_init(const SpeexMode *m)
@@ -137,7 +138,6 @@ void *nb_encoder_init(const SpeexMode *m)
    st->gamma2=mode->gamma2;
    st->min_pitch=mode->pitchStart;
    st->max_pitch=mode->pitchEnd;
-   st->lag_factor=mode->lag_factor;
    st->lpc_floor = mode->lpc_floor;
   
    st->submodes=mode->submodes;
@@ -166,17 +166,13 @@ void *nb_encoder_init(const SpeexMode *m)
    st->window= lpc_window;
    
    /* Create the window for autocorrelation (lag-windowing) */
-   st->lagWindow = (spx_word16_t*)speex_alloc((st->lpcSize+1)*sizeof(spx_word16_t));
-   for (i=0;i<st->lpcSize+1;i++)
-      st->lagWindow[i]=16384*exp(-.5*sqr(2*M_PI*st->lag_factor*i));
+   st->lagWindow = lag_window;
 
    st->old_lsp = (spx_lsp_t*)speex_alloc((st->lpcSize)*sizeof(spx_lsp_t));
    st->old_qlsp = (spx_lsp_t*)speex_alloc((st->lpcSize)*sizeof(spx_lsp_t));
    st->first = 1;
    for (i=0;i<st->lpcSize;i++)
-   {
-      st->old_lsp[i]=LSP_SCALING*(M_PI*((float)(i+1)))/(st->lpcSize+1);
-   }
+      st->old_lsp[i]= DIV32(MULT16_16(QCONST16(3.1415927f, LSP_SHIFT), i+1), st->lpcSize+1);
 
    st->mem_sp = (spx_mem_t*)speex_alloc((st->lpcSize)*sizeof(spx_mem_t));
    st->mem_sw = (spx_mem_t*)speex_alloc((st->lpcSize)*sizeof(spx_mem_t));
@@ -225,8 +221,6 @@ void nb_encoder_destroy(void *state)
    speex_free (st->old_qlsp);
    speex_free (st->swBuf);
 
-   speex_free (st->lagWindow);
-
    speex_free (st->old_lsp);
    speex_free (st->mem_sp);
    speex_free (st->mem_sw);
@@ -274,7 +268,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
    char *stack;
    VARDECL(spx_word16_t *syn_resp);
    VARDECL(spx_word16_t *real_exc);
-
+   
    spx_word32_t ener=0;
    spx_word16_t fine_gain;
    spx_word16_t *in = (spx_word16_t*)vin;
@@ -591,6 +585,8 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
    if (SUBMODE(forced_pitch_gain))
    {
       int quant;
+      /* This just damps the pitch a bit, because it tends to be too aggressive when forced */
+      ol_pitch_coef = MULT16_16_Q15(QCONST16(.9,15), ol_pitch_coef);
 #ifdef FIXED_POINT
       quant = PSHR16(MULT16_16_16(15, ol_pitch_coef),GAIN_SHIFT);
 #else
@@ -1120,7 +1116,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    VARDECL(spx_coef_t *ak);
    VARDECL(spx_lsp_t *qlsp);
    spx_word16_t pitch_average=0;
-
+   
    spx_word16_t *out = (spx_word16_t*)vout;
    VARDECL(spx_lsp_t *interp_qlsp);
 
@@ -1724,7 +1720,7 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
          st->bounded_pitch = 1;
          st->first = 1;
          for (i=0;i<st->lpcSize;i++)
-            st->old_lsp[i]=(M_PI*((float)(i+1)))/(st->lpcSize+1);
+            st->old_lsp[i]= DIV32(MULT16_16(QCONST16(3.1415927f, LSP_SHIFT), i+1), st->lpcSize+1);
          for (i=0;i<st->lpcSize;i++)
             st->mem_sw[i]=st->mem_sw_whole[i]=st->mem_sp[i]=st->mem_exc[i]=0;
          for (i=0;i<st->frameSize+st->max_pitch+1;i++)

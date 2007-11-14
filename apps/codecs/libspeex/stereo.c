@@ -213,7 +213,7 @@ void speex_decode_stereo_int(spx_int16_t *data, int frame_size, SpeexStereoState
    spx_word16_t e_left, e_right, e_ratio;
    RealSpeexStereoState *stereo = (RealSpeexStereoState*)_stereo;
 
-   COMPATIBILITY_HACK(stereo);
+   /* COMPATIBILITY_HACK(stereo); */
    
    balance=stereo->balance;
    e_ratio=stereo->e_ratio;
@@ -240,7 +240,7 @@ int speex_std_stereo_request_handler(SpeexBits *bits, void *state, void *data)
 
    stereo = (RealSpeexStereoState*)data;
    
-   COMPATIBILITY_HACK(stereo);
+   /* COMPATIBILITY_HACK(stereo); */
 
    if (speex_bits_unpack_unsigned(bits, 1))
       sign=-1;

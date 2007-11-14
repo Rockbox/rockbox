@@ -62,7 +62,7 @@
 #include <math.h>
 #include "speex/speex_preprocess.h"
 #include "speex/speex_echo.h"
-#include "misc.h"
+#include "arch.h"
 #include "fftwrap.h"
 #include "filterbank.h"
 #include "math_approx.h"
@@ -1127,16 +1127,16 @@ int speex_preprocess_ctl(SpeexPreprocessState *state, int request, void *ptr)
       break;
 
    case SPEEX_PREPROCESS_SET_PROB_START:
-      *(spx_int32_t*)ptr = MIN32(Q15_ONE,MAX32(0, *(spx_int32_t*)ptr));
-      st->speech_prob_start = DIV32_16(MULT16_16(32767,*(spx_int32_t*)ptr), 100);
+      *(spx_int32_t*)ptr = MIN32(100,MAX32(0, *(spx_int32_t*)ptr));
+      st->speech_prob_start = DIV32_16(MULT16_16(Q15ONE,*(spx_int32_t*)ptr), 100);
       break;
    case SPEEX_PREPROCESS_GET_PROB_START:
       (*(spx_int32_t*)ptr) = MULT16_16_Q15(st->speech_prob_start, 100);
       break;
 
    case SPEEX_PREPROCESS_SET_PROB_CONTINUE:
-      *(spx_int32_t*)ptr = MIN32(Q15_ONE,MAX32(0, *(spx_int32_t*)ptr));
-      st->speech_prob_continue = DIV32_16(MULT16_16(32767,*(spx_int32_t*)ptr), 100);
+      *(spx_int32_t*)ptr = MIN32(100,MAX32(0, *(spx_int32_t*)ptr));
+      st->speech_prob_continue = DIV32_16(MULT16_16(Q15ONE,*(spx_int32_t*)ptr), 100);
       break;
    case SPEEX_PREPROCESS_GET_PROB_CONTINUE:
       (*(spx_int32_t*)ptr) = MULT16_16_Q15(st->speech_prob_continue, 100);
@@ -1166,6 +1166,11 @@ int speex_preprocess_ctl(SpeexPreprocessState *state, int request, void *ptr)
    case SPEEX_PREPROCESS_GET_ECHO_STATE:
       ptr = (void*)st->echo_state;
       break;
+#ifndef FIXED_POINT
+   case SPEEX_PREPROCESS_GET_AGC_LOUDNESS:
+      (*(spx_int32_t*)ptr) = pow(st->loudness, 1.0/LOUDNESS_EXP);
+      break;
+#endif
 
    default:
       speex_warning_int("Unknown speex_preprocess_ctl request: ", request);

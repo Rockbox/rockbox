@@ -43,7 +43,7 @@
 #include "quant_lsp.h"
 #include "vq.h"
 #include "ltp.h"
-#include "misc.h"
+#include "arch.h"
 #include "math_approx.h"
 #include "os_support.h"
 
@@ -183,6 +183,7 @@ static const float h0[64] = {
 
 #endif
 
+extern const spx_word16_t lag_window[];
 extern const spx_word16_t lpc_window[];
 
 #ifndef SPEEX_DISABLE_ENCODER 
@@ -224,7 +225,6 @@ void *sb_encoder_init(const SpeexMode *m)
    tmp=1;
    speex_encoder_ctl(st->st_low, SPEEX_SET_WIDEBAND, &tmp);
 
-   st->lag_factor = mode->lag_factor;
    st->lpc_floor = mode->lpc_floor;
    st->gamma1=mode->gamma1;
    st->gamma2=mode->gamma2;
@@ -237,9 +237,7 @@ void *sb_encoder_init(const SpeexMode *m)
 
    st->window= lpc_window;
 
-   st->lagWindow = (spx_word16_t*)speex_alloc((st->lpcSize+1)*sizeof(spx_word16_t));
-   for (i=0;i<st->lpcSize+1;i++)
-      st->lagWindow[i]=16384*exp(-.5*sqr(2*M_PI*st->lag_factor*i));
+   st->lagWindow = lag_window;
 
    st->old_lsp = (spx_lsp_t*)speex_alloc(st->lpcSize*sizeof(spx_lsp_t));
    st->old_qlsp = (spx_lsp_t*)speex_alloc(st->lpcSize*sizeof(spx_lsp_t));
@@ -253,9 +251,7 @@ void *sb_encoder_init(const SpeexMode *m)
    st->mem_sw = (spx_mem_t*)speex_alloc((st->lpcSize)*sizeof(spx_mem_t));
 
    for (i=0;i<st->lpcSize;i++)
-   {
-      st->old_lsp[i]=LSP_SCALING*(M_PI*((float)(i+1)))/(st->lpcSize+1);
-   }
+      st->old_lsp[i]= DIV32(MULT16_16(QCONST16(3.1415927f, LSP_SHIFT), i+1), st->lpcSize+1);
 
    st->vbr_quality = 8;
    st->vbr_enabled = 0;
@@ -287,8 +283,6 @@ void sb_encoder_destroy(void *state)
 
    speex_free(st->h0_mem);
    speex_free(st->h1_mem);
-
-   speex_free(st->lagWindow);
 
    speex_free(st->old_lsp);
    speex_free(st->old_qlsp);
@@ -1271,7 +1265,7 @@ int sb_encoder_ctl(void *state, int request, void *ptr)
          int i;
          st->first = 1;
          for (i=0;i<st->lpcSize;i++)
-            st->old_lsp[i]=(M_PI*((float)(i+1)))/(st->lpcSize+1);
+            st->old_lsp[i]= DIV32(MULT16_16(QCONST16(3.1415927f, LSP_SHIFT), i+1), st->lpcSize+1);
          for (i=0;i<st->lpcSize;i++)
             st->mem_sw[i]=st->mem_sp[i]=st->mem_sp2[i]=0;
          for (i=0;i<QMF_ORDER;i++)
