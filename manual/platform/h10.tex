@@ -7,6 +7,7 @@
 \edef\UseOption{\UseOption,HAVE_LCD_SLEEP}
 \edef\UseOption{\UseOption,HAVE_LCD_COLOR}
 \edef\UseOption{\UseOption,CONFIG_RTC}
+\edef\UseOption{\UseOption,HAVE_RTC_ALARM}
 \edef\UseOption{\UseOption,SWCODEC}
 \edef\UseOption{\UseOption,IRIVER_H10_PAD}
 \edef\UseOption{\UseOption,HAVE_BACKLIGHT}
@@ -80,6 +81,12 @@
 %Button actions, Setting context
 \newcommand{\ActionSettingInc}{\ButtonScrollUp}
 \newcommand{\ActionSettingDec}{\ButtonScrollDown}
+
+%Button actions, Alarm screen
+\newcommand{\ActionAlarmSet}{\ActionStdOk}
+\newcommand{\ActionAlarmCancel}{\ActionStdCancel}
+\newcommand{\ActionAlarmHoursInc}{\ButtonRew}
+\newcommand{\ActionAlarmHoursDec}{\ButtonFF}
 
 %Button actions, Virtual Keyboard Context
 \newcommand{\ActionKbdLeft}{\ButtonLeft}
