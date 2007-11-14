@@ -426,9 +426,11 @@ static char *get_token_desc(struct wps_token *token, struct wps_data *data,
                     next_str(next), token->value.i);
             break;
 
+#if (CONFIG_CODEC != MAS3507D)
         case WPS_TOKEN_SOUND_PITCH:
             snprintf(buf, bufsize, "pitch value");
             break;
+#endif
 
         default:
             snprintf(buf, bufsize, "FIXME (code: %d)",

@@ -1246,6 +1246,7 @@ static char *get_token_value(struct gui_wps *gwps,
             return buf;
 #endif
 
+#ifdef HAVE_TAGCACHE
         case WPS_TOKEN_DATABASE_PLAYCOUNT:
             if (intval) {
                 *intval = id3->playcount + 1;
@@ -1266,6 +1267,7 @@ static char *get_token_value(struct gui_wps *gwps,
 
             snprintf(buf, buf_size, "%d", id3->score);
             return buf;
+#endif
 
 #if (CONFIG_CODEC == SWCODEC)
         case WPS_TOKEN_CROSSFADE:
