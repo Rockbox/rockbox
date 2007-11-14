@@ -2499,13 +2499,12 @@ static bool audio_load_track(int offset, bool start_play)
 
     tracks[track_widx].audio_hid = bufopen(trackname, file_offset, type);
 
-    ci.curpos=file_offset;
-
     if (tracks[track_widx].audio_hid < 0)
         return false;
 
     if (start_play)
     {
+        ci.curpos=file_offset;
         buf_request_buffer_handle(tracks[track_widx].audio_hid);
     }
 
