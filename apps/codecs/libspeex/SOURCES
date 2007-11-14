@@ -18,14 +18,15 @@ ltp.c
 modes.c
 modes_wb.c
 nb_celp.c
-oggframing.c
 quant_lsp.c
-rockbox.c
 sb_celp.c
 speex.c
 speex_callbacks.c
 speex_header.c
+#ifndef ROCKBOX_VOICE_CODEC
+oggframing.c
 stereo.c
+#endif
 #ifdef CPU_COLDFIRE
 filters_cf.S
 ltp_cf.S

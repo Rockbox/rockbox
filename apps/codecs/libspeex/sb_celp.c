@@ -755,7 +755,10 @@ int sb_encode(void *state, void *vin, SpeexBits *bits)
 
 
 static SBDecState global_decstate_wb IBSS_ATTR;
+/* Do not include this for voice codec, files will never be UWB */
+#ifndef SPEEX_ROCKBOX_VOICE_CODEC
 static SBDecState global_decstate_uwb IBSS_ATTR;
+#endif
 
 void *sb_decoder_init(const SpeexMode *m)
 {
@@ -767,10 +770,13 @@ void *sb_decoder_init(const SpeexMode *m)
    if (!st)
       return NULL;
 */
+#ifndef ROCKBOX_VOICE_CODEC
    if (m->modeID == SPEEX_MODEID_UWB)
       st = &global_decstate_uwb; 
    else
+#endif
       st = &global_decstate_wb;
+   memset(st, 0, sizeof(*st));
    st->mode = m;
    mode=(const SpeexSBMode*)m->mode;
    st->encode_submode = 1;

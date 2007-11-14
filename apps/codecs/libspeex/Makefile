@@ -23,6 +23,11 @@ else
    SPEEXOPTS += -O2
 endif
 
+# We build Speex separately for use as a voice codec
+ifdef ROCKBOX_VOICE_CODEC
+EXTRA_DEFINES += -DROCKBOX_VOICE_CODEC
+endif
+
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(SPEEXOPTS) $(TARGET)	\
 $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} ${PROFILE_OPTS} -Wno-unused-parameter
 

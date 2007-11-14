@@ -110,7 +110,12 @@ typedef struct SBDecState {
    char  *stack;
    spx_word16_t g0_mem[64], g1_mem[64];
 
+/* Voice codec files will be WB mode, which has sub frame size of 40 */
+#ifndef SPEEX_ROCKBOX_VOICE_CODEC
    spx_word16_t excBuf[80];
+#else
+   spx_word16_t excBuf[40];
+#endif
    spx_lsp_t old_qlsp[8];
    spx_coef_t interp_qlpc[8];
 

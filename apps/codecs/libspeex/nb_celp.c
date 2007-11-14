@@ -944,6 +944,7 @@ void *nb_decoder_init(const SpeexMode *m)
    if (!st)
       return NULL;
 */
+   memset(st, 0, sizeof(*st));
 #if defined(VAR_ARRAYS) || defined (USE_ALLOCA)
    st->stack = NULL;
 #else
