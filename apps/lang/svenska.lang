@@ -19,7 +19,7 @@
     *: "Ja"
   </dest>
   <voice>
-    *: "Yes"
+    *: "Ja"
   </voice>
 </phrase>
 <phrase>
@@ -33,7 +33,7 @@
     *: "Nej"
   </dest>
   <voice>
-    *: "No"
+    *: "Nej"
   </voice>
 </phrase>
 <phrase>
@@ -47,7 +47,7 @@
     *: "På"
   </dest>
   <voice>
-    *: "On"
+    *: "På"
   </voice>
 </phrase>
 <phrase>
@@ -61,7 +61,7 @@
     *: "Av"
   </dest>
   <voice>
-    *: "Off"
+    *: "Av"
   </voice>
 </phrase>
 <phrase>
@@ -75,7 +75,7 @@
     *: "Fråga"
   </dest>
   <voice>
-    *: "Ask"
+    *: "Fråga"
   </voice>
 </phrase>
 <phrase>
@@ -89,7 +89,7 @@
     *: "Alltid"
   </dest>
   <voice>
-    *: "Always"
+    *: "Alltid"
   </voice>
 </phrase>
 <phrase>
@@ -117,7 +117,7 @@
     *: "Förstärkning"
   </dest>
   <voice>
-    *: "Gain"
+    *: "Förstärkning"
   </voice>
 </phrase>
 <phrase>
@@ -131,7 +131,7 @@
     *: "Läser..."
   </dest>
   <voice>
-    *: "Loading"
+    *: "Läser"
   </voice>
 </phrase>
 <phrase>
@@ -159,7 +159,7 @@
     *: "Söker igenom disken..."
   </dest>
   <voice>
-    *: "Scanning disk"
+    *: "Söker igenom disken"
   </voice>
 </phrase>
 <phrase>
@@ -173,7 +173,7 @@
     *: "Stänger av..."
   </dest>
   <voice>
-    *: "Shutting down"
+    *: "Stänger av"
   </voice>
 </phrase>
 <phrase>
@@ -201,7 +201,7 @@
     *: "Avbrutet"
   </dest>
   <voice>
-    *: "Cancelled"
+    *: "Avbrutet"
   </voice>
 </phrase>
 <phrase>
@@ -215,7 +215,7 @@
     *: "misslyckades"
   </dest>
   <voice>
-    *: "Failed"
+    *: "misslyckades"
   </voice>
 </phrase>
 <phrase>
@@ -229,7 +229,7 @@
     *: "Kanaler"
   </dest>
   <voice>
-    *: "Channels"
+    *: "Kanaler"
   </voice>
 </phrase>
 <phrase>
@@ -243,7 +243,7 @@
     *: "Är du säker?"
   </dest>
   <voice>
-    *: "Are You Sure?"
+    *: "Är du säker?"
   </voice>
 </phrase>
 <phrase>
@@ -308,7 +308,7 @@
     *: "Nya bokmärken"
   </dest>
   <voice>
-    *: "Recent Bookmarks"
+    *: "Nya bokmärken"
   </voice>
 </phrase>
 <phrase>
@@ -322,7 +322,7 @@
     *: "Filer"
   </dest>
   <voice>
-    *: "Files"
+    *: "Filer"
   </voice>
 </phrase>
 <phrase>
@@ -336,7 +336,7 @@
     *: "Databas"
   </dest>
   <voice>
-    *: "Database"
+    *: "Databas"
   </voice>
 </phrase>
 <phrase>
@@ -350,7 +350,7 @@
     *: "Spelas nu"
   </dest>
   <voice>
-    *: "Now Playing"
+    *: "Spelas nu"
   </voice>
 </phrase>
 <phrase>
@@ -364,7 +364,7 @@
     *: "Återuppta uppspelning"
   </dest>
   <voice>
-    *: "Resume Playback"
+    *: "Återuppta uppspelning"
   </voice>
 </phrase>
 <phrase>
@@ -378,7 +378,7 @@
     *: "Inställningar"
   </dest>
   <voice>
-    *: "Settings"
+    *: "Inställningar"
   </voice>
 </phrase>
 <phrase>
@@ -395,7 +395,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Recording"
+    recording: "Inspelning"
   </voice>
 </phrase>
 <phrase>
@@ -412,7 +412,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio"
+    radio: "FM radio"
   </voice>
 </phrase>
 <phrase>
@@ -426,7 +426,7 @@
     *: "Spellistor"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "Spellistor"
   </voice>
 </phrase>
 <phrase>
@@ -440,7 +440,7 @@
     *: "Insticksmoduler"
   </dest>
   <voice>
-    *: "Plugins"
+    *: "Insticksmoduler"
   </voice>
 </phrase>
 <phrase>
@@ -468,7 +468,7 @@
     *: "Välj bokmärke"
   </dest>
   <voice>
-    *: "Select Bookmark"
+    *: "Välj bokmärke"
   </voice>
 </phrase>
 <phrase>
@@ -482,7 +482,7 @@
     *: "<Återuppta inte>"
   </dest>
   <voice>
-    *: "Do not resume"
+    *: "Återuppta inte"
   </voice>
 </phrase>
 <phrase>
@@ -510,7 +510,7 @@
     *: "<Felaktigt bokmärke>"
   </dest>
   <voice>
-    *: "Invalid Bookmark"
+    *: "Felaktigt bokmärke"
   </voice>
 </phrase>
 <phrase>
@@ -524,7 +524,7 @@
     *: "Bokmärke"
   </dest>
   <voice>
-    *: "Bookmark Actions"
+    *: "Bokmärke"
   </voice>
 </phrase>
 <phrase>
@@ -538,7 +538,7 @@
     *: "Återuppta"
   </dest>
   <voice>
-    *: "Resume"
+    *: "Återuppta"
   </voice>
 </phrase>
 <phrase>
@@ -552,7 +552,7 @@
     *: "Ta bort"
   </dest>
   <voice>
-    *: "Delete"
+    *: "Ta bort"
   </voice>
 </phrase>
 <phrase>
@@ -566,7 +566,7 @@
     *: "Skapa bokmärke?"
   </dest>
   <voice>
-    *: "Create a Bookmark?"
+    *: "Skapa bokmärke?"
   </voice>
 </phrase>
 <phrase>
@@ -580,7 +580,7 @@
     *: "Bokmärke skapat"
   </dest>
   <voice>
-    *: "Bookmark Created"
+    *: "Bokmärke skapat"
   </voice>
 </phrase>
 <phrase>
@@ -594,7 +594,7 @@
     *: "Kan inte skapa bokmärke"
   </dest>
   <voice>
-    *: "Bookmark Failed!"
+    *: "Kan inte skapa bokmärke"
   </voice>
 </phrase>
 <phrase>
@@ -608,7 +608,7 @@
     *: "Inga bokmärken"
   </dest>
   <voice>
-    *: "Bookmark Empty"
+    *: "Inga bokmärken"
   </voice>
 </phrase>
 <phrase>
@@ -622,7 +622,7 @@
     *: "Ljud"
   </dest>
   <voice>
-    *: "Sound Settings"
+    *: "Ljud"
   </voice>
 </phrase>
 <phrase>
@@ -636,7 +636,7 @@
     *: "Volym"
   </dest>
   <voice>
-    *: "Volume"
+    *: "Volym"
   </voice>
 </phrase>
 <phrase>
@@ -650,7 +650,7 @@
     *: "Bas"
   </dest>
   <voice>
-    *: "Bass"
+    *: "Bas"
   </voice>
 </phrase>
 <phrase>
@@ -664,7 +664,7 @@
     *: "Diskant"
   </dest>
   <voice>
-    *: "Treble"
+    *: "Diskant"
   </voice>
 </phrase>
 <phrase>
@@ -678,7 +678,7 @@
     *: "Balans"
   </dest>
   <voice>
-    *: "Balance"
+    *: "Balans"
   </voice>
 </phrase>
 <phrase>
@@ -692,7 +692,7 @@
     *: "Kanalkonfiguration"
   </dest>
   <voice>
-    *: "Channel Configuration"
+    *: "Kanalkonfiguration"
   </voice>
 </phrase>
 <phrase>
@@ -734,7 +734,7 @@
     *: "Anpassad"
   </dest>
   <voice>
-    *: "Custom"
+    *: "Anpassad"
   </voice>
 </phrase>
 <phrase>
@@ -748,7 +748,7 @@
     *: "Mono vänster"
   </dest>
   <voice>
-    *: "Mono Left"
+    *: "Mono vänster"
   </voice>
 </phrase>
 <phrase>
@@ -762,7 +762,7 @@
     *: "Mono höger"
   </dest>
   <voice>
-    *: "Mono Right"
+    *: "Mono höger"
   </voice>
 </phrase>
 <phrase>
@@ -790,7 +790,7 @@
     *: "Stereobredd"
   </dest>
   <voice>
-    *: "Stereo Width"
+    *: "Stereobredd"
   </voice>
 </phrase>
 <phrase>
@@ -807,7 +807,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfeed"
+    swcodec: "Korsmixa"
   </voice>
 </phrase>
 <phrase>
@@ -824,7 +824,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Direct gain"
+    swcodec: "Direkt dämpning"
   </voice>
 </phrase>
 <phrase>
@@ -840,7 +840,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cross gain"
+    swcodec: "Korsdämpning"
   </voice>
 </phrase>
 <phrase>
@@ -856,7 +856,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "High-frequency attenuation"
+    swcodec: "Högfrekvensdämpning"
   </voice>
 </phrase>
 <phrase>
@@ -872,7 +872,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "High-frequency cutoff"
+    swcodec: "Högfrekvensgräns"
   </voice>
 </phrase>
 <phrase>
@@ -906,7 +906,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Enable equalizer"
+    swcodec: "Aktivera equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -923,7 +923,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Graphical equalizer"
+    swcodec: "Parametrisk equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -940,7 +940,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Pre-cut"
+    swcodec: "Fördämpning"
   </voice>
 </phrase>
 <phrase>
@@ -957,7 +957,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Simple equalizer settings"
+    swcodec: "Enkla equalizerinställningar"
   </voice>
 </phrase>
 <phrase>
@@ -974,7 +974,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Advanced equalizer settings"
+    swcodec: "Avancerade equalizerinställningar"
   </voice>
 </phrase>
 <phrase>
@@ -991,7 +991,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Save equalizer preset"
+    swcodec: "Spara equalizerinställningar"
   </voice>
 </phrase>
 <phrase>
@@ -1008,7 +1008,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Browse equalizer presets"
+    swcodec: "Lista equalizerinställningar"
   </voice>
 </phrase>
 <phrase>
@@ -1042,7 +1042,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "hertz band gain"
+    swcodec: "hertz bandförstärkning"
   </voice>
 </phrase>
 <phrase>
@@ -1110,7 +1110,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Brytfrekvens"
   </voice>
 </phrase>
 <phrase>
@@ -1127,7 +1127,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Center frequency"
+    swcodec: "Mittfrekvens"
   </voice>
 </phrase>
 <phrase>
@@ -1161,7 +1161,7 @@
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hardware equalizer"
+    ipodvideo: "Hårdvaruequalizer"
   </voice>
 </phrase>
 <phrase>
@@ -1178,7 +1178,7 @@
   </dest>
   <voice>
     *: none
-    ipodvideo: "Enable hardware equalizer"
+    ipodvideo: "Aktivera hårdvaruequalizer"
   </voice>
 </phrase>
 <phrase>
@@ -1195,7 +1195,7 @@
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: "Bandbredd"
   </voice>
 </phrase>
 <phrase>
@@ -1212,7 +1212,7 @@
   </dest>
   <voice>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: "Smal"
   </voice>
 </phrase>
 <phrase>
@@ -1229,7 +1229,7 @@
   </dest>
   <voice>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: "Bred"
   </voice>
 </phrase>
 <phrase>
@@ -1280,7 +1280,7 @@
   </dest>
   <voice>
     *: none
-    masf: "Auto Volume"
+    masf: "Autovolym"
   </voice>
 </phrase>
 <phrase>
@@ -1314,7 +1314,7 @@
   </dest>
   <voice>
     *: none
-    masf: "Super Bass"
+    masf: "Superbas"
   </voice>
 </phrase>
 <phrase>
@@ -1331,7 +1331,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Enable"
+    masf: "Aktivera MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1348,7 +1348,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Strength"
+    masf: "MDB-Styrka"
   </voice>
 </phrase>
 <phrase>
@@ -1365,7 +1365,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Harmonics"
+    masf: "MDB-övertoner"
   </voice>
 </phrase>
 <phrase>
@@ -1382,7 +1382,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Center Frequency"
+    masf: "MDB-mittfrekvens"
   </voice>
 </phrase>
 <phrase>
@@ -1399,7 +1399,7 @@
   </dest>
   <voice>
     *: none
-    masf: "MDB Shape"
+    masf: "MDB-form"
   </voice>
 </phrase>
 <phrase>
@@ -1413,7 +1413,7 @@
     *: "Generella"
   </dest>
   <voice>
-    *: "General Settings"
+    *: "Generella"
   </voice>
 </phrase>
 <phrase>
@@ -1427,7 +1427,7 @@
     *: "Uppspelning"
   </dest>
   <voice>
-    *: "Playback"
+    *: "Uppspelning"
   </voice>
 </phrase>
 <phrase>
@@ -1441,7 +1441,7 @@
     *: "Blanda"
   </dest>
   <voice>
-    *: "Shuffle"
+    *: "Blanda"
   </voice>
 </phrase>
 <phrase>
@@ -1455,7 +1455,7 @@
     *: "Repetera"
   </dest>
   <voice>
-    *: "Repeat"
+    *: "Repetera"
   </voice>
 </phrase>
 <phrase>
@@ -1469,7 +1469,7 @@
     *: "Alla"
   </dest>
   <voice>
-    *: "All"
+    *: "Alla"
   </voice>
 </phrase>
 <phrase>
@@ -1483,7 +1483,7 @@
     *: "En"
   </dest>
   <voice>
-    *: "One"
+    *: "En"
   </voice>
 </phrase>
 <phrase>
@@ -1511,7 +1511,7 @@
     *: "Spela vald fil först"
   </dest>
   <voice>
-    *: "Play Selected File First"
+    *: "Spela vald fil först"
   </voice>
 </phrase>
 <phrase>
@@ -1525,7 +1525,7 @@
     *: "Snabbspolning"
   </dest>
   <voice>
-    *: "Fast forward and Rewind"
+    *: "Snabbspolning"
   </voice>
 </phrase>
 <phrase>
@@ -1539,7 +1539,7 @@
     *: "Minsta steg vid snabbspolning"
   </dest>
   <voice>
-    *: "Minimum Step"
+    *: "Minsta steg"
   </voice>
 </phrase>
 <phrase>
@@ -1569,7 +1569,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Anti-Skip Buffer"
+    *: "Antiskakbuffert"
     flash_storage: none
   </voice>
 </phrase>
@@ -1584,7 +1584,7 @@
     *: "Tona bort vid stopp/paus"
   </dest>
   <voice>
-    *: "Fade On Stop and Pause"
+    *: "Tona bort vid stopp och paus"
   </voice>
 </phrase>
 <phrase>
@@ -1598,7 +1598,7 @@
     *: "Partyläge"
   </dest>
   <voice>
-    *: "Party Mode"
+    *: "Partyläge"
   </voice>
 </phrase>
 <phrase>
@@ -1615,7 +1615,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Crossfade"
+    swcodec: "Korstona"
   </voice>
 </phrase>
 <phrase>
@@ -1632,7 +1632,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Enable Crossfade"
+    swcodec: "Aktivera korstoning"
   </voice>
 </phrase>
 <phrase>
@@ -1649,7 +1649,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Track Skip Only"
+    swcodec: "Manuellt byte"
   </voice>
 </phrase>
 <phrase>
@@ -1666,7 +1666,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Shuffle and Track Skip"
+    swcodec: "Blandning och manuellt byte"
   </voice>
 </phrase>
 <phrase>
@@ -1683,7 +1683,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In Delay"
+    swcodec: "Intoningsfördröjning"
   </voice>
 </phrase>
 <phrase>
@@ -1700,7 +1700,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-In Duration"
+    swcodec: "Intoningslängd"
   </voice>
 </phrase>
 <phrase>
@@ -1717,7 +1717,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Delay"
+    swcodec: "Uttoningsfördröjning"
   </voice>
 </phrase>
 <phrase>
@@ -1734,7 +1734,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Duration"
+    swcodec: "Uttoningslängd"
   </voice>
 </phrase>
 <phrase>
@@ -1751,7 +1751,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Fade-Out Mode"
+    swcodec: "Uttoningsläge"
   </voice>
 </phrase>
 <phrase>
@@ -1768,7 +1768,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Mix"
+    swcodec: "Mixa"
   </voice>
 </phrase>
 <phrase>
@@ -1782,7 +1782,7 @@
     *: "Volymutjämning"
   </dest>
   <voice>
-    *: "Replaygain"
+    *: "Volymutjämning"
   </voice>
 </phrase>
 <phrase>
@@ -1796,7 +1796,7 @@
     *: "Aktivera volymutjämning"
   </dest>
   <voice>
-    *: "Enable Replaygain"
+    *: "Aktivera volymutjämning"
   </voice>
 </phrase>
 <phrase>
@@ -1813,7 +1813,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Prevent Clipping"
+    swcodec: "Förhindra klippning"
   </voice>
 </phrase>
 <phrase>
@@ -1827,7 +1827,7 @@
     *: "Volymutjämningstyp"
   </dest>
   <voice>
-    *: "Replaygain Type"
+    *: "Volymutjämningstyp"
   </voice>
 </phrase>
 <phrase>
@@ -1841,7 +1841,7 @@
     *: "Per album"
   </dest>
   <voice>
-    *: "Album Gain"
+    *: "Per album"
   </voice>
 </phrase>
 <phrase>
@@ -1855,7 +1855,7 @@
     *: "Per spår"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: "Per spår"
   </voice>
 </phrase>
 <phrase>
@@ -1869,7 +1869,7 @@
     *: "Per spår vid blandning"
   </dest>
   <voice>
-    *: "Track Gain if Shuffling"
+    *: "Per spår vid blandning"
   </voice>
 </phrase>
 <phrase>
@@ -1883,7 +1883,7 @@
     *: "Förförstärkning"
   </dest>
   <voice>
-    *: "Preamp"
+    *: "Förförstärkning"
   </voice>
 </phrase>
 <phrase>
@@ -1900,7 +1900,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Pipvolym"
   </voice>
 </phrase>
 <phrase>
@@ -1917,7 +1917,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Weak"
+    swcodec: "Svag"
   </voice>
 </phrase>
 <phrase>
@@ -1934,7 +1934,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Moderate"
+    swcodec: "Mellan"
   </voice>
 </phrase>
 <phrase>
@@ -1951,7 +1951,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Strong"
+    swcodec: "Stark"
   </voice>
 </phrase>
 <phrase>
@@ -1968,7 +1968,7 @@
   </dest>
   <voice>
     *: none
-    spdif_power: "Optical Output"
+    spdif_power: "Optisk utgång"
   </voice>
 </phrase>
 <phrase>
@@ -2024,7 +2024,7 @@
     *: "Byt katalog automatiskt"
   </dest>
   <voice>
-    *: "Auto-Change Directory"
+    *: "Byt katalog automatiskt"
   </voice>
 </phrase>
 <phrase>
@@ -2037,7 +2037,7 @@
     *: "Till slumpad"
   </dest>
   <voice>
-    *: "Random"
+    *: "Till slumpad"
   </voice>
 </phrase>
 <phrase>
@@ -2051,7 +2051,7 @@
     *: "Last.fm-logg"
   </dest>
   <voice>
-    *: "Last.fm Log"
+    *: "Last.fm logg"
   </voice>
 </phrase>
 <phrase>
@@ -2065,7 +2065,7 @@
     *: "Cuesheet-stöd"
   </dest>
   <voice>
-    *: "Cuesheet Support"
+    *: "Cuesheet-stöd"
   </voice>
 </phrase>
 <phrase>
@@ -2082,7 +2082,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause on Headphone Unplug"
+    headphone_detection: "Pausa när hörlurar kopplas ur"
   </voice>
 </phrase>
 <phrase>
@@ -2099,7 +2099,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause and Resume"
+    headphone_detection: "Pausa and fortsätt"
   </voice>
 </phrase>
 <phrase>
@@ -2116,7 +2116,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Duration to Rewind"
+    headphone_detection: "Tid att spola bakåt"
   </voice>
 </phrase>
 <phrase>
@@ -2133,7 +2133,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "Återuppta inte vid start utan hörlurar"
   </voice>
 </phrase>
 <phrase>
@@ -2147,7 +2147,7 @@
     *: "Filvisning"
   </dest>
   <voice>
-    *: "File View"
+    *: "Filvisning"
   </voice>
 </phrase>
 <phrase>
@@ -2161,7 +2161,7 @@
     *: "Sortera skiftlägeskänsligt"
   </dest>
   <voice>
-    *: "Sort Case Sensitive"
+    *: "Sortera skiftlägeskänsligt"
   </voice>
 </phrase>
 <phrase>
@@ -2175,7 +2175,7 @@
     *: "Sortera kataloger"
   </dest>
   <voice>
-    *: "sort directories"
+    *: "Sortera kataloger"
   </voice>
 </phrase>
 <phrase>
@@ -2189,7 +2189,7 @@
     *: "Sortera filer"
   </dest>
   <voice>
-    *: "sort files"
+    *: "Sortera filer"
   </voice>
 </phrase>
 <phrase>
@@ -2203,7 +2203,7 @@
     *: "Alfabetiskt"
   </dest>
   <voice>
-    *: "Alphabetical"
+    *: "Alfabetiskt"
   </voice>
 </phrase>
 <phrase>
@@ -2214,10 +2214,10 @@
     *: "By Date"
   </source>
   <dest>
-    *: "På datum"
+    *: "Efter datum"
   </dest>
   <voice>
-    *: "By Date"
+    *: "Efter datum"
   </voice>
 </phrase>
 <phrase>
@@ -2228,10 +2228,10 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "På senaste datum"
+    *: "Efter senaste datum"
   </dest>
   <voice>
-    *: "By Newest Date"
+    *: "Efter senaste datum"
   </voice>
 </phrase>
 <phrase>
@@ -2242,10 +2242,10 @@
     *: "By Type"
   </source>
   <dest>
-    *: "På typ"
+    *: "Efter typ"
   </dest>
   <voice>
-    *: "By Type"
+    *: "Efter typ"
   </voice>
 </phrase>
 <phrase>
@@ -2259,7 +2259,7 @@
     *: "Visa filer"
   </dest>
   <voice>
-    *: "Show Files"
+    *: "Visa filer"
   </voice>
 </phrase>
 <phrase>
@@ -2273,7 +2273,7 @@
     *: "Alla som stödjs"
   </dest>
   <voice>
-    *: "Supported"
+    *: "Alla som stödjs"
   </voice>
 </phrase>
 <phrase>
@@ -2287,7 +2287,7 @@
     *: "Musikfiler"
   </dest>
   <voice>
-    *: "Music"
+    *: "Musikfiler"
   </voice>
 </phrase>
 <phrase>
@@ -2301,7 +2301,7 @@
     *: "Följ spellistan"
   </dest>
   <voice>
-    *: "Follow Playlist"
+    *: "Följ spellistan"
   </voice>
 </phrase>
 <phrase>
@@ -2315,7 +2315,7 @@
     *: "Visa sökväg"
   </dest>
   <voice>
-    *: "Show Path"
+    *: "Visa sökväg"
   </voice>
 </phrase>
 <phrase>
@@ -2329,7 +2329,7 @@
     *: "Aktuell katalog"
   </dest>
   <voice>
-    *: "Current Directory Only"
+    *: "Aktuell katalog"
   </voice>
 </phrase>
 <phrase>
@@ -2343,7 +2343,7 @@
     *: "Hela sökvägen"
   </dest>
   <voice>
-    *: "Full Path"
+    *: "Hela sökvägen"
   </voice>
 </phrase>
 <phrase>
@@ -2365,7 +2365,7 @@
     h10,h10_5gb,e200,c200: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
   </dest>
   <voice>
-    *: "entries found for database"
+    *: "objekt hittade för databasen"
   </voice>
 </phrase>
 <phrase>
@@ -2382,7 +2382,7 @@
   </dest>
   <voice>
     *: none
-    tc_ramcache: "Load to RAM"
+    tc_ramcache: "Ladda till RAM"
   </voice>
 </phrase>
 <phrase>
@@ -2396,7 +2396,7 @@
     *: "Uppdatera automatiskt"
   </dest>
   <voice>
-    *: "Auto Update"
+    *: "Uppdatera automatiskt"
   </voice>
 </phrase>
 <phrase>
@@ -2410,7 +2410,7 @@
     *: "Initiera nu"
   </dest>
   <voice>
-    *: "Initialize now"
+    *: "Initiera nu"
   </voice>
 </phrase>
 <phrase>
@@ -2424,7 +2424,7 @@
     *: "Uppdatera nu"
   </dest>
   <voice>
-    *: "Update Now"
+    *: "Uppdatera nu"
   </voice>
 </phrase>
 <phrase>
@@ -2438,7 +2438,7 @@
     *: "Samla kördata"
   </dest>
   <voice>
-    *: "Gather Runtime Data"
+    *: "Samla kördata"
   </voice>
 </phrase>
 <phrase>
@@ -2452,7 +2452,7 @@
     *: "Exportera ändringar"
   </dest>
   <voice>
-    *: "Export Modifications"
+    *: "Exportera ändringar"
   </voice>
 </phrase>
 <phrase>
@@ -2466,7 +2466,7 @@
     *: "Importera ändringar"
   </dest>
   <voice>
-    *: "Import Modifications"
+    *: "Importera ändringar"
   </voice>
 </phrase>
 <phrase>
@@ -2480,7 +2480,7 @@
     *: "Uppdaterar i bakgrunden"
   </dest>
   <voice>
-    *: "Updating in background"
+    *: "Uppdaterar i bakgrunden"
   </voice>
 </phrase>
 <phrase>
@@ -2494,7 +2494,7 @@
     *: "Sparar databas"
   </dest>
   <voice>
-    *: "Committing database"
+    *: "Sparar databas"
   </voice>
 </phrase>
 <phrase>
@@ -2507,7 +2507,7 @@
     *: "Databasen är inte klar"
   </dest>
   <voice>
-    *: "Database is not ready"
+    *: "Databasen är inte klar"
   </voice>
 </phrase>
 <phrase>
@@ -2521,7 +2521,7 @@
     *: "<Alla spår>"
   </dest>
   <voice>
-    *: "All tracks"
+    *: "Alla spår"
   </voice>
 </phrase>
 <phrase>
@@ -2535,7 +2535,7 @@
     *: "Skärm"
   </dest>
   <voice>
-    *: "Display"
+    *: "Skärm"
   </voice>
 </phrase>
 <phrase>
@@ -2552,7 +2552,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Lista teckensnitt"
   </voice>
 </phrase>
 <phrase>
@@ -2566,7 +2566,7 @@
     *: "Lista .wps-filer"
   </dest>
   <voice>
-    *: "Browse while-playing-screen files"
+    *: "Lista .wps filer"
   </voice>
 </phrase>
 <phrase>
@@ -2583,7 +2583,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Browse remote while-playing-screen files"
+    remote: "Lista .rwps files"
   </voice>
 </phrase>
 <phrase>
@@ -2597,7 +2597,7 @@
     *: "LCD"
   </dest>
   <voice>
-    *: "LCD Settings"
+    *: "LCD"
   </voice>
 </phrase>
 <phrase>
@@ -2611,7 +2611,7 @@
     *: "Belysning"
   </dest>
   <voice>
-    *: "Backlight"
+    *: "Belysning"
   </voice>
 </phrase>
 <phrase>
@@ -2628,7 +2628,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Backlight (While Plugged In)"
+    charging: "Belysning vid laddning"
   </voice>
 </phrase>
 <phrase>
@@ -2645,7 +2645,7 @@
   </dest>
   <voice>
     *: none
-    hold_button: "Backlight on hold"
+    hold_button: "Belysning när knapplåset är på"
   </voice>
 </phrase>
 <phrase>
@@ -2659,7 +2659,7 @@
     *: "Belysning vid spårbyte"
   </dest>
   <voice>
-    *: "Caption Backlight"
+    *: "Belysning vid spårbyte"
   </voice>
 </phrase>
 <phrase>
@@ -2676,7 +2676,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade: "Backlight Fade In"
+    backlight_fade: "Tona in belysning"
   </voice>
 </phrase>
 <phrase>
@@ -2693,7 +2693,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade: "Backlight Fade Out"
+    backlight_fade: "Tona ut belysning"
   </voice>
 </phrase>
 <phrase>
@@ -2707,7 +2707,7 @@
     *: "Första knapptryck tänder endast belysning"
   </dest>
   <voice>
-    *: "First Buttonpress Enables Backlight Only"
+    *: "Första knapptryck tänder endast belysning"
   </voice>
 </phrase>
 <phrase>
@@ -2724,7 +2724,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Sleep after backlight off"
+    lcd_sleep: "Stäng av när belysningen slocknar"
   </voice>
 </phrase>
 <phrase>
@@ -2741,7 +2741,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: "Aldrig"
   </voice>
 </phrase>
 <phrase>
@@ -2758,7 +2758,7 @@
   </dest>
   <voice>
     *: none
-    backlight_brightness: "Brightness"
+    backlight_brightness: "Ljusstyrka"
   </voice>
 </phrase>
 <phrase>
@@ -2772,7 +2772,7 @@
     *: "Kontrast"
   </dest>
   <voice>
-    *: "Contrast"
+    *: "Kontrast"
   </voice>
 </phrase>
 <phrase>
@@ -2789,7 +2789,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert: "LCD Mode"
+    lcd_invert: "LCD-läge"
   </voice>
 </phrase>
 <phrase>
@@ -2806,7 +2806,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert: "Inverse"
+    lcd_invert: "Inverterad"
   </voice>
 </phrase>
 <phrase>
@@ -2823,7 +2823,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: "Upp och ned"
   </voice>
 </phrase>
 <phrase>
@@ -2840,7 +2840,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Line Selector Type"
+    lcd_bitmap: "Radmarkör"
   </voice>
 </phrase>
 <phrase>
@@ -2857,7 +2857,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Pointer"
+    lcd_bitmap: "Pekare"
   </voice>
 </phrase>
 <phrase>
@@ -2874,7 +2874,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Inverse Bar"
+    lcd_bitmap: "Inverterad rad"
   </voice>
 </phrase>
 <phrase>
@@ -2891,7 +2891,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Clear Backdrop"
+    lcd_non-mono: "Rensa bakgrund"
   </voice>
 </phrase>
 <phrase>
@@ -2908,7 +2908,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Background Colour"
+    lcd_non-mono: "Bakgrundsfärg"
   </voice>
 </phrase>
 <phrase>
@@ -2925,7 +2925,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Foreground Colour"
+    lcd_non-mono: "Förgrundsfärg"
   </voice>
 </phrase>
 <phrase>
@@ -2942,7 +2942,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Reset Colours"
+    lcd_non-mono: "Återställ färger"
   </voice>
 </phrase>
 <phrase>
@@ -3010,7 +3010,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote LCD settings"
+    remote: "Fjärr-LCD"
   </voice>
 </phrase>
 <phrase>
@@ -3027,7 +3027,7 @@
   </dest>
   <voice>
     *: none
-    remote_ticking: "Reduce Ticking"
+    remote_ticking: "Reducera tickande"
   </voice>
 </phrase>
 <phrase>
@@ -3041,7 +3041,7 @@
     *: "Visa ikoner"
   </dest>
   <voice>
-    *: "Show Icons"
+    *: "Visa ikoner"
   </voice>
 </phrase>
 <phrase>
@@ -3055,7 +3055,7 @@
     *: "Rullning"
   </dest>
   <voice>
-    *: "Scrolling"
+    *: "Rullning"
   </voice>
 </phrase>
 <phrase>
@@ -3083,7 +3083,7 @@
     *: "Rullningshastighet"
   </dest>
   <voice>
-    *: "Scroll Speed"
+    *: "Rullningshastighet"
   </voice>
 </phrase>
 <phrase>
@@ -3097,7 +3097,7 @@
     *: "Rullningsstart"
   </dest>
   <voice>
-    *: "Scroll Start Delay"
+    *: "Rullningsstart"
   </voice>
 </phrase>
 <phrase>
@@ -3111,7 +3111,7 @@
     *: "Rullningssteg"
   </dest>
   <voice>
-    *: "Scroll Step Size"
+    *: "Rullningssteg"
   </voice>
 </phrase>
 <phrase>
@@ -3139,7 +3139,7 @@
     *: "Dubbelriktad rullning"
   </dest>
   <voice>
-    *: "Bidirectional Scroll Limit"
+    *: "Dubbelriktad rullning"
   </voice>
 </phrase>
 <phrase>
@@ -3156,7 +3156,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Scrolling Options"
+    remote: "Rullning på fjärrenhet"
   </voice>
 </phrase>
 <phrase>
@@ -3170,7 +3170,7 @@
     *: "Hopprullning"
   </dest>
   <voice>
-    *: "Jump Scroll"
+    *: "Hopprullning"
   </voice>
 </phrase>
 <phrase>
@@ -3184,7 +3184,7 @@
     *: "En gång"
   </dest>
   <voice>
-    *: "One time"
+    *: "En gång"
   </voice>
 </phrase>
 <phrase>
@@ -3198,7 +3198,7 @@
     *: "Hopprullningsfördröjning"
   </dest>
   <voice>
-    *: "Jump Scroll Delay"
+    *: "Hopprullningsfördröjning"
   </voice>
 </phrase>
 <phrase>
@@ -3212,7 +3212,7 @@
     *: "Skärmen rullar ur sikte"
   </dest>
   <voice>
-    *: "Screen Scrolls Out Of View"
+    *: "Skärmen rullar ur sikte"
   </voice>
 </phrase>
 <phrase>
@@ -3226,7 +3226,7 @@
     *: "Storlek på skärmrullningssteg"
   </dest>
   <voice>
-    *: "Screen Scroll Step Size"
+    *: "Storlek på skärmrullningssteg"
   </voice>
 </phrase>
 <phrase>
@@ -3240,7 +3240,7 @@
     *: "Sidvis rullning"
   </dest>
   <voice>
-    *: "Paged scrolling"
+    *: "Sidvis rullning"
   </voice>
 </phrase>
 <phrase>
@@ -3256,7 +3256,7 @@
     scrollwheel: none
   </dest>
   <voice>
-    *: "List Acceleration Start Delay"
+    *: "Listaccelerationsstart"
     scrollwheel: none
   </voice>
 </phrase>
@@ -3273,7 +3273,7 @@
     scrollwheel: none
   </dest>
   <voice>
-    *: "List Acceleration Speed"
+    *: "Listaccelerationssteg"
     scrollwheel: none
   </voice>
 </phrase>
@@ -3291,7 +3291,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status- and Scrollbar"
+    lcd_bitmap: "Status- och rullningslist"
   </voice>
 </phrase>
 <phrase>
@@ -3308,7 +3308,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: "Rullningslist"
   </voice>
 </phrase>
 <phrase>
@@ -3325,7 +3325,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: "Statuslist"
   </voice>
 </phrase>
 <phrase>
@@ -3342,7 +3342,7 @@
   </dest>
   <voice>
     *: none
-    recorder_pad: "Button Bar"
+    recorder_pad: "Knapprad"
   </voice>
 </phrase>
 <phrase>
@@ -3359,7 +3359,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Volume Display"
+    lcd_bitmap: "Volymvisning"
   </voice>
 </phrase>
 <phrase>
@@ -3376,7 +3376,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Battery Display"
+    lcd_bitmap: "Batterivisning"
   </voice>
 </phrase>
 <phrase>
@@ -3393,7 +3393,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Graphic"
+    lcd_bitmap: "Grafisk"
   </voice>
 </phrase>
 <phrase>
@@ -3410,7 +3410,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Numeric"
+    lcd_bitmap: "Numerisk"
   </voice>
 </phrase>
 <phrase>
@@ -3426,7 +3426,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Peak Meter"
+    *: "Toppmätare"
     masd: none
   </voice>
 </phrase>
@@ -3443,7 +3443,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Clip Hold Time"
+    *: "Klipphålltid"
     masd: none
   </voice>
 </phrase>
@@ -3460,7 +3460,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Peak Hold Time"
+    *: "Topphålltid"
     masd: none
   </voice>
 </phrase>
@@ -3477,7 +3477,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Eternal"
+    *: "Oändlig"
     masd: none
   </voice>
 </phrase>
@@ -3494,7 +3494,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Peak Release"
+    *: "Toppsläppning"
     masd: none
   </voice>
 </phrase>
@@ -3542,7 +3542,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Logarithmic decibel"
+    *: "Logaritmisk decibel"
     masd: none
   </voice>
 </phrase>
@@ -3559,7 +3559,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Linear percent"
+    *: "Linjär procent"
     masd: none
   </voice>
 </phrase>
@@ -3576,7 +3576,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Minimum Of Range"
+    *: "Minimalt värde"
     masd: none
   </voice>
 </phrase>
@@ -3593,7 +3593,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Maximum Of Range"
+    *: "Maximalt värde"
     masd: none
   </voice>
 </phrase>
@@ -3608,7 +3608,7 @@
     *: "Förvald teckentabell"
   </dest>
   <voice>
-    *: "Default codepage"
+    *: "Förvald teckentabell"
   </voice>
 </phrase>
 <phrase>
@@ -3636,7 +3636,7 @@
     *: "Grekiska (ISO-8859-7)"
   </dest>
   <voice>
-    *: "Greek"
+    *: "Grekiska"
   </voice>
 </phrase>
 <phrase>
@@ -3653,7 +3653,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Hebrew"
+    lcd_bitmap: "Hebreiska"
   </voice>
 </phrase>
 <phrase>
@@ -3667,7 +3667,7 @@
     *: "Kyrilliska (CP1251)"
   </dest>
   <voice>
-    *: "Cyrillic"
+    *: "Kyrilliska"
   </voice>
 </phrase>
 <phrase>
@@ -3684,7 +3684,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Thai"
+    lcd_bitmap: "Thailändska"
   </voice>
 </phrase>
 <phrase>
@@ -3701,7 +3701,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Arabic"
+    lcd_bitmap: "Arabiska"
   </voice>
 </phrase>
 <phrase>
@@ -3715,7 +3715,7 @@
     *: "Turkiska (ISO-8859-9)"
   </dest>
   <voice>
-    *: "Turkish"
+    *: "Turkiska"
   </voice>
 </phrase>
 <phrase>
@@ -3729,7 +3729,7 @@
     *: "Utökad latin (ISO-8859-2)"
   </dest>
   <voice>
-    *: "Latin extended"
+    *: "Utökad latin"
   </voice>
 </phrase>
 <phrase>
@@ -3746,7 +3746,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Japanese"
+    lcd_bitmap: "Japanska"
   </voice>
 </phrase>
 <phrase>
@@ -3763,7 +3763,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Simplified Chinese"
+    lcd_bitmap: "Förenklad kinesiska"
   </voice>
 </phrase>
 <phrase>
@@ -3780,7 +3780,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Korean"
+    lcd_bitmap: "Koreanska"
   </voice>
 </phrase>
 <phrase>
@@ -3797,7 +3797,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Traditional Chinese"
+    lcd_bitmap: "Traditionell kinesiska"
   </voice>
 </phrase>
 <phrase>
@@ -3830,8 +3830,8 @@
   </dest>
   <voice>
     *: none
-    e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    e200: "Hjulbelysning"
+    c200,gigabeatf: "Knappbelysning"
   </voice>
 </phrase>
 <phrase>
@@ -3848,7 +3848,7 @@
   </dest>
   <voice>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf: "Knappljusstyrka"
   </voice>
 </phrase>
 <phrase>
@@ -3862,7 +3862,7 @@
     *: "Startskärm"
   </dest>
   <voice>
-    *: "Start Screen"
+    *: "Startskärm"
   </voice>
 </phrase>
 <phrase>
@@ -3876,7 +3876,7 @@
     *: "Huvudmeny"
   </dest>
   <voice>
-    *: "Main Menu"
+    *: "Huvudmeny"
   </voice>
 </phrase>
 <phrase>
@@ -3890,7 +3890,7 @@
     *: "Föregående skärm"
   </dest>
   <voice>
-    *: "Previous Screen"
+    *: "Föregående skärm"
   </voice>
 </phrase>
 <phrase>
@@ -3904,7 +3904,7 @@
     *: "Batteri"
   </dest>
   <voice>
-    *: "Battery"
+    *: "Batteri"
   </voice>
 </phrase>
 <phrase>
@@ -3918,7 +3918,7 @@
     *: "Batterikapacitet"
   </dest>
   <voice>
-    *: "Battery Capacity"
+    *: "Batterikapacitet"
   </voice>
 </phrase>
 <phrase>
@@ -3935,7 +3935,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Battery type"
+    battery_types: "Batterityp"
   </voice>
 </phrase>
 <phrase>
@@ -3952,7 +3952,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Alkaline"
+    battery_types: "Alkalisk"
   </voice>
 </phrase>
 <phrase>
@@ -3969,7 +3969,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Nickel metal hydride"
+    battery_types: "Nickel-metal-hydrid"
   </voice>
 </phrase>
 <phrase>
@@ -3999,7 +3999,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Disk Spindown"
+    *: "Stanna disken"
     flash_storage: none
   </voice>
 </phrase>
@@ -4017,7 +4017,7 @@
   </dest>
   <voice>
     *: none
-    dircache: "Directory Cache"
+    dircache: "Katalogcache"
   </voice>
 </phrase>
 <phrase>
@@ -4034,7 +4034,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Time and Date"
+    rtc: "Tid och datum"
   </voice>
 </phrase>
 <phrase>
@@ -4051,7 +4051,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Set Time and Date"
+    rtc: "Ställ in tid och datum"
   </voice>
 </phrase>
 <phrase>
@@ -4068,7 +4068,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Time Format"
+    rtc: "Tidsformat"
   </voice>
 </phrase>
 <phrase>
@@ -4085,7 +4085,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "12 Hour Clock"
+    rtc: "12-timmarsvisning"
   </voice>
 </phrase>
 <phrase>
@@ -4102,7 +4102,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "24 Hour Clock"
+    rtc: "24-timmarsvisning"
   </voice>
 </phrase>
 <phrase>
@@ -4286,7 +4286,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "January"
+    rtc: "Januari"
   </voice>
 </phrase>
 <phrase>
@@ -4303,7 +4303,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "February"
+    rtc: "Februari"
   </voice>
 </phrase>
 <phrase>
@@ -4320,7 +4320,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "March"
+    rtc: "Mars"
   </voice>
 </phrase>
 <phrase>
@@ -4354,7 +4354,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "May"
+    rtc: "Maj"
   </voice>
 </phrase>
 <phrase>
@@ -4371,7 +4371,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "June"
+    rtc: "Juni"
   </voice>
 </phrase>
 <phrase>
@@ -4388,7 +4388,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "July"
+    rtc: "Juli"
   </voice>
 </phrase>
 <phrase>
@@ -4405,7 +4405,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "August"
+    rtc: "Augusti"
   </voice>
 </phrase>
 <phrase>
@@ -4439,7 +4439,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "October"
+    rtc: "Oktober"
   </voice>
 </phrase>
 <phrase>
@@ -4487,7 +4487,7 @@
     *: "Autoavstängning"
   </dest>
   <voice>
-    *: "Idle Poweroff"
+    *: "Autoavstängning"
   </voice>
 </phrase>
 <phrase>
@@ -4501,7 +4501,7 @@
     *: "Insomningstimer"
   </dest>
   <voice>
-    *: "Sleep Timer"
+    *: "Insomningstajmer"
   </voice>
 </phrase>
 <phrase>
@@ -4515,7 +4515,7 @@
     *: "Begränsningar"
   </dest>
   <voice>
-    *: "Limits"
+    *: "Begränsningar"
   </voice>
 </phrase>
 <phrase>
@@ -4529,7 +4529,7 @@
     *: "Max filer i kataloglista"
   </dest>
   <voice>
-    *: "Maximum files in directory browser"
+    *: "Max filer i kataloglista"
   </voice>
 </phrase>
 <phrase>
@@ -4543,7 +4543,7 @@
     *: "Max filer i spellista"
   </dest>
   <voice>
-    *: "Maximum playlist size"
+    *: "Max filer i spellista"
   </voice>
 </phrase>
 <phrase>
@@ -4560,7 +4560,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Car Adapter Mode"
+    charging: "Biltillsatsläge"
   </voice>
 </phrase>
 <phrase>
@@ -4577,7 +4577,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Wake-Up Alarm"
+    alarm: "Väckarklocka"
   </voice>
 </phrase>
 <phrase>
@@ -4594,7 +4594,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "Väckningsskärm"
   </voice>
 </phrase>
 <phrase>
@@ -4628,7 +4628,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Waking up in"
+    alarm: "Vaknar om"
   </voice>
 </phrase>
 <phrase>
@@ -4645,7 +4645,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm set"
+    alarm: "Alarmet aktiverat"
   </voice>
 </phrase>
 <phrase>
@@ -4662,7 +4662,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Time Is Too Soon!"
+    alarm: "Väckning om för kort tid"
   </voice>
 </phrase>
 <phrase>
@@ -4698,7 +4698,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Disabled"
+    alarm: "Alarmet avaktiverat"
   </voice>
 </phrase>
 <phrase>
@@ -4712,7 +4712,7 @@
     *: "Bokmärken"
   </dest>
   <voice>
-    *: "Bookmarking"
+    *: "Bokmärken"
   </voice>
 </phrase>
 <phrase>
@@ -4726,7 +4726,7 @@
     *: "Bokmärke vid stopp"
   </dest>
   <voice>
-    *: "Bookmark on Stop"
+    *: "Bokmärke vid stopp"
   </voice>
 </phrase>
 <phrase>
@@ -4740,7 +4740,7 @@
     *: "Ja - bara nya"
   </dest>
   <voice>
-    *: "Yes - Recent only"
+    *: "Ja, bara nya"
   </voice>
 </phrase>
 <phrase>
@@ -4754,7 +4754,7 @@
     *: "Fråga - Bara nya"
   </dest>
   <voice>
-    *: "Ask - Recent only"
+    *: "Fråga, bara nya"
   </voice>
 </phrase>
 <phrase>
@@ -4768,7 +4768,7 @@
     *: "Starta vid bokmärke"
   </dest>
   <voice>
-    *: "Load Last Bookmark"
+    *: "Starta vid bokmärke"
   </voice>
 </phrase>
 <phrase>
@@ -4782,7 +4782,7 @@
     *: "Spara en lista av nya bokmärken"
   </dest>
   <voice>
-    *: "Maintain a List of Recent Bookmarks?"
+    *: "Spara en lista av nya bokmärken"
   </voice>
 </phrase>
 <phrase>
@@ -4796,7 +4796,7 @@
     *: "Endast unika"
   </dest>
   <voice>
-    *: "Unique only"
+    *: "Endast unika"
   </voice>
 </phrase>
 <phrase>
@@ -4810,7 +4810,7 @@
     *: "Språk"
   </dest>
   <voice>
-    *: "Language"
+    *: "Språk"
   </voice>
 </phrase>
 <phrase>
@@ -4824,7 +4824,7 @@
     *: "Nytt språk"
   </dest>
   <voice>
-    *: "New Language"
+    *: "Nytt språk"
   </voice>
 </phrase>
 <phrase>
@@ -4838,7 +4838,7 @@
     *: "Röst"
   </dest>
   <voice>
-    *: "Voice"
+    *: "Röst"
   </voice>
 </phrase>
 <phrase>
@@ -4852,7 +4852,7 @@
     *: "Röstmenyer"
   </dest>
   <voice>
-    *: "Voice Menus"
+    *: "Röstmenyer"
   </voice>
 </phrase>
 <phrase>
@@ -4866,7 +4866,7 @@
     *: "Röstkataloger"
   </dest>
   <voice>
-    *: "Voice Directories"
+    *: "Röstkataloger"
   </voice>
 </phrase>
 <phrase>
@@ -4880,7 +4880,7 @@
     *: "Spela mp3-klipp för kataloger"
   </dest>
   <voice>
-    *: "Use Directory .talk Clips"
+    *: "Spela mp3-klipp för kataloger"
   </voice>
 </phrase>
 <phrase>
@@ -4894,7 +4894,7 @@
     *: "Röstfilnamn"
   </dest>
   <voice>
-    *: "Voice Filenames"
+    *: "Röstfilnamn"
   </voice>
 </phrase>
 <phrase>
@@ -4908,7 +4908,7 @@
     *: "Spela mp3-klipp för filer"
   </dest>
   <voice>
-    *: "Use File .talk Clips"
+    *: "Spela mp3-klipp för filer"
   </voice>
 </phrase>
 <phrase>
@@ -4922,7 +4922,7 @@
     *: "Siffror"
   </dest>
   <voice>
-    *: "Numbers"
+    *: "Siffror"
   </voice>
 </phrase>
 <phrase>
@@ -4936,7 +4936,7 @@
     *: "Stava"
   </dest>
   <voice>
-    *: "Spell"
+    *: "Stava"
   </voice>
 </phrase>
 <phrase>
@@ -4950,7 +4950,7 @@
     *: "Spela mp3-klipp"
   </dest>
   <voice>
-    *: "talk mp3 clip"
+    *: "Spela mp3-klipp"
   </voice>
 </phrase>
 <phrase>
@@ -4964,7 +4964,7 @@
     *: "Hantera inställningar"
   </dest>
   <voice>
-    *: "Manage Settings"
+    *: "Hantera inställningar"
   </voice>
 </phrase>
 <phrase>
@@ -4978,7 +4978,7 @@
     *: "Lista .cfg-filer"
   </dest>
   <voice>
-    *: "Browse configuration files"
+    *: "Lista konfigurationsfiler"
   </voice>
 </phrase>
 <phrase>
@@ -4992,7 +4992,7 @@
     *: "Inställningar inlästa"
   </dest>
   <voice>
-    *: "Settings Loaded"
+    *: "Inställningar inlästa"
   </voice>
 </phrase>
 <phrase>
@@ -5006,7 +5006,7 @@
     *: "Återställ inställningar"
   </dest>
   <voice>
-    *: "Reset Settings"
+    *: "Återställ inställningar"
   </voice>
 </phrase>
 <phrase>
@@ -5020,7 +5020,7 @@
     *: "återställda"
   </dest>
   <voice>
-    *: "Settings Cleared"
+    *: "Inställlningar återställda"
   </voice>
 </phrase>
 <phrase>
@@ -5034,7 +5034,7 @@
     *: "Skriv .cfg-fil"
   </dest>
   <voice>
-    *: "Write configuration file"
+    *: "Skriv Konfigurationsfil"
   </voice>
 </phrase>
 <phrase>
@@ -5048,7 +5048,7 @@
     *: "Inställningar sparade"
   </dest>
   <voice>
-    *: "Settings Saved"
+    *: "Inställningar sparade"
   </voice>
 </phrase>
 <phrase>
@@ -5062,7 +5062,7 @@
     *: "Skriv temainställningar"
   </dest>
   <voice>
-    *: "Save Theme Settings"
+    *: "Skriv temainställningar"
   </voice>
 </phrase>
 <phrase>
@@ -5076,7 +5076,7 @@
     *: "Lista teman"
   </dest>
   <voice>
-    *: "Browse Themes"
+    *: "Lista teman"
   </voice>
 </phrase>
 <phrase>
@@ -5093,7 +5093,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Recording Settings"
+    recording: "Inspelning"
   </voice>
 </phrase>
 <phrase>
@@ -5110,7 +5110,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio Menu"
+    radio: "FM-radiomeny"
   </voice>
 </phrase>
 <phrase>
@@ -5144,7 +5144,7 @@
   </dest>
   <voice>
     *: none
-    radio: "No presets"
+    radio: "Ingen kanallista"
   </voice>
 </phrase>
 <phrase>
@@ -5161,7 +5161,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Add Preset"
+    radio: "Lägg till kanal"
   </voice>
 </phrase>
 <phrase>
@@ -5178,7 +5178,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Edit Preset"
+    radio: "Redigera kanal"
   </voice>
 </phrase>
 <phrase>
@@ -5195,7 +5195,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Remove Preset"
+    radio: "Ta bort kanal"
   </voice>
 </phrase>
 <phrase>
@@ -5212,7 +5212,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset Save Failed"
+    radio: "Kan inte spara kanallista"
   </voice>
 </phrase>
 <phrase>
@@ -5229,7 +5229,7 @@
   </dest>
   <voice>
     *: none
-    radio: "The Preset List is Full"
+    radio: "Full kanallista"
   </voice>
 </phrase>
 <phrase>
@@ -5297,7 +5297,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset"
+    radio: "Kanaler"
   </voice>
 </phrase>
 <phrase>
@@ -5348,7 +5348,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Force mono"
+    radio: "Tvinga mono"
   </voice>
 </phrase>
 <phrase>
@@ -5382,7 +5382,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Auto scan presets"
+    radio: "Sök kanaler"
   </voice>
 </phrase>
 <phrase>
@@ -5399,7 +5399,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Clear Current Presets?"
+    radio: "Rensa kanallistan?"
   </voice>
 </phrase>
 <phrase>
@@ -5450,7 +5450,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Scan"
+    radio: "Sök"
   </voice>
 </phrase>
 <phrase>
@@ -5467,7 +5467,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Load Preset List"
+    radio: "Läs kanallista"
   </voice>
 </phrase>
 <phrase>
@@ -5484,7 +5484,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Save Preset List"
+    radio: "Spara kanallista"
   </voice>
 </phrase>
 <phrase>
@@ -5501,7 +5501,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Clear Preset List"
+    radio: "Rensa kanallista"
   </voice>
 </phrase>
 <phrase>
@@ -5518,7 +5518,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset List"
+    radio: "Kanallista"
   </voice>
 </phrase>
 <phrase>
@@ -5535,7 +5535,7 @@
   </dest>
   <voice>
     *: none
-    radio: "No settings found. Autoscan?"
+    radio: "Inga kanaler hittades. Starta sökning?"
   </voice>
 </phrase>
 <phrase>
@@ -5552,7 +5552,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Save Changes?"
+    radio: "Spara ändringar?"
   </voice>
 </phrase>
 <phrase>
@@ -5584,7 +5584,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Europe"
+    radio: "Europa"
   </voice>
 </phrase>
 <phrase>
@@ -5600,7 +5600,7 @@
   </dest>
   <voice>
     *: none
-    radio: "US and Canada"
+    radio: "USA och Canada"
   </voice>
 </phrase>
 <phrase>
@@ -5666,7 +5666,7 @@
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MPEG Lager 3"
   </voice>
 </phrase>
 <phrase>
@@ -5683,7 +5683,7 @@
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "PCM-vågform"
   </voice>
 </phrase>
 <phrase>
@@ -5734,7 +5734,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Encoder Settings"
+    recording: "Kodarinställningar"
   </voice>
 </phrase>
 <phrase>
@@ -5751,7 +5751,7 @@
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Bitrate"
+    recording_swcodec: "Datahastighet"
   </voice>
 </phrase>
 <phrase>
@@ -5768,7 +5768,7 @@
   </dest>
   <voice>
     *: none
-    recording: "No settings available"
+    recording: "Inga inställningar tillgängliga"
   </voice>
 </phrase>
 <phrase>
@@ -5785,7 +5785,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Quality"
+    recording_hwcodec: "Kvalitet"
   </voice>
 </phrase>
 <phrase>
@@ -5802,7 +5802,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Frequency"
+    recording: "Frekvens"
   </voice>
 </phrase>
 <phrase>
@@ -5819,7 +5819,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Same As Source"
+    recording: "Samma som källan"
   </voice>
 </phrase>
 <phrase>
@@ -5836,7 +5836,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "Källa"
   </voice>
 </phrase>
 <phrase>
@@ -5855,8 +5855,8 @@
   </dest>
   <voice>
     *: none
-    recording: "Microphone"
-    h100,h120,h300: "Internal Microphone"
+    recording: "Mikrofon"
+    h100,h120,h300: "Intern mikrofon"
   </voice>
 </phrase>
 <phrase>
@@ -5890,7 +5890,7 @@
   </dest>
   <voice>
     *: none
-    recording,player: "Line In"
+    recording,player: "Linjeingång"
   </voice>
 </phrase>
 <phrase>
@@ -5907,7 +5907,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Independent Frames"
+    recording_hwcodec: "Oberoende ramar"
   </voice>
 </phrase>
 <phrase>
@@ -5924,7 +5924,7 @@
   </dest>
   <voice>
     *: none
-    recording: "File Split Options"
+    recording: "Filuppdelning"
   </voice>
 </phrase>
 <phrase>
@@ -5940,7 +5940,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Measure"
+    recording: "Uppdelningsenhet"
   </voice>
 </phrase>
 <phrase>
@@ -5956,7 +5956,7 @@
   </dest>
   <voice>
     *: none
-    recording: "What to do when Splitting"
+    recording: "Aktivitet vid uppdelning"
   </voice>
 </phrase>
 <phrase>
@@ -5973,7 +5973,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Start new file"
+    recording: "Påbörja ny fil"
   </voice>
 </phrase>
 <phrase>
@@ -5990,7 +5990,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop recording"
+    recording: "Stoppa inspelning"
   </voice>
 </phrase>
 <phrase>
@@ -6006,7 +6006,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Time"
+    recording: "Uppdelningstid"
   </voice>
 </phrase>
 <phrase>
@@ -6022,7 +6022,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: "Uppdelningsstorlek"
   </voice>
 </phrase>
 <phrase>
@@ -6039,7 +6039,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Filesize"
+    recording: "Filstorlek"
   </voice>
 </phrase>
 <phrase>
@@ -6056,7 +6056,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Pre-Record time"
+    recording: "Förinspelningstid"
   </voice>
 </phrase>
 <phrase>
@@ -6073,7 +6073,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Directory"
+    recording: "Katalog"
   </voice>
 </phrase>
 <phrase>
@@ -6103,11 +6103,11 @@
   </source>
   <dest>
     *: none
-    recording: "Sätt som inspelningskatalog"
+    recording: "Använd som inspelningskatalog"
   </dest>
   <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "Använd som inspelningskatalog"
   </voice>
 </phrase>
 <phrase>
@@ -6124,7 +6124,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clear Recording Directory"
+    recording: "Rensa val av inspelningskatalog"
   </voice>
 </phrase>
 <phrase>
@@ -6141,7 +6141,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Can't write to recording directory"
+    recording: "Kan inte skriva till inspelningskatalog"
   </voice>
 </phrase>
 <phrase>
@@ -6158,7 +6158,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clipping Light"
+    recording: "Ljus vid klippning"
   </voice>
 </phrase>
 <phrase>
@@ -6171,11 +6171,11 @@
   </source>
   <dest>
     *: none
-    remote: "Huvudenhet endast"
+    remote: "Endast huvudenhet"
   </dest>
   <voice>
     *: none
-    remote: "Main unit only"
+    remote: "Endast huvudenhet"
   </voice>
 </phrase>
 <phrase>
@@ -6188,11 +6188,11 @@
   </source>
   <dest>
     *: none
-    remote: "Fjärrenhet endast"
+    remote: "Endast fjärrenhet"
   </dest>
   <voice>
     *: none
-    remote: "Remote unit only"
+    remote: "Endast fjärrenhet"
   </voice>
 </phrase>
 <phrase>
@@ -6209,7 +6209,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Main and remote unit"
+    remote: "Huvud- och fjärrenhet"
   </voice>
 </phrase>
 <phrase>
@@ -6226,7 +6226,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Startläge"
   </voice>
 </phrase>
 <phrase>
@@ -6243,7 +6243,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Once"
+    recording: "En gång"
   </voice>
 </phrase>
 <phrase>
@@ -6259,7 +6259,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Trigger type"
+    recording: "Startlägestyp"
   </voice>
 </phrase>
 <phrase>
@@ -6275,7 +6275,7 @@
   </dest>
   <voice>
     *: none
-    recording: "New file"
+    recording: "Ny fil"
   </voice>
 </phrase>
 <phrase>
@@ -6291,7 +6291,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "Stoppa"
   </voice>
 </phrase>
 <phrase>
@@ -6308,7 +6308,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Start Above"
+    recording: "Börja över"
   </voice>
 </phrase>
 <phrase>
@@ -6325,7 +6325,7 @@
   </dest>
   <voice>
     *: none
-    recording: "for at least"
+    recording: "under minst"
   </voice>
 </phrase>
 <phrase>
@@ -6342,7 +6342,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop Below"
+    recording: "Sluta under"
   </voice>
 </phrase>
 <phrase>
@@ -6359,7 +6359,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Presplit Gap"
+    recording: "Avbrott innan delning"
   </voice>
 </phrase>
 <phrase>
@@ -6426,7 +6426,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Automatic gain control"
+    agc: "Automatisk volymkontroll"
   </voice>
 </phrase>
 <phrase>
@@ -6442,7 +6442,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "Säker (klipp)"
   </voice>
 </phrase>
 <phrase>
@@ -6458,7 +6458,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "Live (långsam)"
   </voice>
 </phrase>
 <phrase>
@@ -6474,7 +6474,7 @@
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: "DJ (långsam)"
   </voice>
 </phrase>
 <phrase>
@@ -6490,7 +6490,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: "Mellan"
   </voice>
 </phrase>
 <phrase>
@@ -6506,7 +6506,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: "Röst (snabb)"
   </voice>
 </phrase>
 <phrase>
@@ -6522,7 +6522,7 @@
   </dest>
   <voice>
     *: none
-    agc: "AGC clip time"
+    agc: "Klipptid för automatisk volymkontroll"
   </voice>
 </phrase>
 <phrase>
@@ -6539,7 +6539,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Display OFF"
+    remote: "Stäng av fjärr-LCD"
   </voice>
 </phrase>
 <phrase>
@@ -6556,7 +6556,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Vol- : Sätt på)"
   </voice>
 </phrase>
 <phrase>
@@ -6570,7 +6570,7 @@
     *: "Skapa spellista"
   </dest>
   <voice>
-    *: "Create Playlist"
+    *: "Skapa spellista"
   </voice>
 </phrase>
 <phrase>
@@ -6584,7 +6584,7 @@
     *: "Spellistevisare"
   </dest>
   <voice>
-    *: "Playlist Viewer Settings"
+    *: "Spellistevisare"
   </voice>
 </phrase>
 <phrase>
@@ -6598,7 +6598,7 @@
     *: "Visa aktuell spellista"
   </dest>
   <voice>
-    *: "View Current Playlist"
+    *: "Visa aktuell spellista"
   </voice>
 </phrase>
 <phrase>
@@ -6612,7 +6612,7 @@
     *: "Flytta"
   </dest>
   <voice>
-    *: "Move"
+    *: "Flytta"
   </voice>
 </phrase>
 <phrase>
@@ -6626,7 +6626,7 @@
     *: "Visa index"
   </dest>
   <voice>
-    *: "Show Indices"
+    *: "Visa index"
   </voice>
 </phrase>
 <phrase>
@@ -6640,7 +6640,7 @@
     *: "Visa spår"
   </dest>
   <voice>
-    *: "Track Display"
+    *: "Visa spår"
   </voice>
 </phrase>
 <phrase>
@@ -6654,7 +6654,7 @@
     *: "Endast spårnamnet"
   </dest>
   <voice>
-    *: "Track Name Only"
+    *: "Endast spårnamnet"
   </voice>
 </phrase>
 <phrase>
@@ -6668,7 +6668,7 @@
     *: "Ta bort"
   </dest>
   <voice>
-    *: "Remove"
+    *: "Ta bort"
   </voice>
 </phrase>
 <phrase>
@@ -6682,7 +6682,7 @@
     *: "Spara aktuell spellista"
   </dest>
   <voice>
-    *: "Save Current Playlist"
+    *: "Spara aktuell spellista"
   </voice>
 </phrase>
 <phrase>
@@ -6696,7 +6696,7 @@
     *: "Sparade %d spår (%s)"
   </dest>
   <voice>
-    *: "tracks saved"
+    *: "sparade spår"
   </voice>
 </phrase>
 <phrase>
@@ -6710,7 +6710,7 @@
     *: "Spellistekatalog"
   </dest>
   <voice>
-    *: "Playlist Catalog"
+    *: "Spellistekatalog"
   </voice>
 </phrase>
 <phrase>
@@ -6724,7 +6724,7 @@
     *: "Infoga kataloger rekursivt"
   </dest>
   <voice>
-    *: "Recursively Insert Directories"
+    *: "Infoga kataloger rekursivt"
   </voice>
 </phrase>
 <phrase>
@@ -6738,7 +6738,7 @@
     *: "Rekursivt?"
   </dest>
   <voice>
-    *: "Recursively?"
+    *: "Rekursivt?"
   </voice>
 </phrase>
 <phrase>
@@ -6752,7 +6752,7 @@
     *: "Varna vid radering av dynamisk spellista"
   </dest>
   <voice>
-    *: "Warn When Erasing Dynamic Playlist"
+    *: "Varna vid radering av dynamisk spellista"
   </voice>
 </phrase>
 <phrase>
@@ -6766,7 +6766,7 @@
     *: "Radera dynamisk spellista?"
   </dest>
   <voice>
-    *: "Erase dynamic playlist?"
+    *: "Radera dynamisk spellista?"
   </voice>
 </phrase>
 <phrase>
@@ -6783,7 +6783,7 @@
   </dest>
   <voice>
     *: none
-    soft_shutdown: "Shut down"
+    soft_shutdown: "Stäng av"
   </voice>
 </phrase>
 <phrase>
@@ -6797,7 +6797,7 @@
     *: "Rockboxinfo"
   </dest>
   <voice>
-    *: "Rockbox Info"
+    *: "Rockboxinfo"
   </voice>
 </phrase>
 <phrase>
@@ -6813,7 +6813,7 @@
     player: "Buf: %d.%03dMB"
   </dest>
   <voice>
-    *: "Buffer size"
+    *: "Buffertstorlek"
   </voice>
 </phrase>
 <phrase>
@@ -6831,7 +6831,7 @@
     h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
-    *: "Battery level"
+    *: "Batterinivå"
   </voice>
 </phrase>
 <phrase>
@@ -6845,7 +6845,7 @@
     *: "Disk:"
   </dest>
   <voice>
-    *: "Disk size"
+    *: "Diskstorlek:"
   </voice>
 </phrase>
 <phrase>
@@ -6859,7 +6859,7 @@
     *: "Ledigt:"
   </dest>
   <voice>
-    *: "Free diskspace:"
+    *: "Ledigt diskutrymme:"
   </voice>
 </phrase>
 <phrase>
@@ -6876,7 +6876,7 @@
   </dest>
   <voice>
     *: none
-    multivolume: "Internal"
+    multivolume: "Internt:"
   </voice>
 </phrase>
 <phrase>
@@ -6895,7 +6895,7 @@
   </dest>
   <voice>
     *: none
-    e200,c200: "micro S D"
+    e200,c200: "mikro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
@@ -6924,7 +6924,7 @@
     *: "Körtid"
   </dest>
   <voice>
-    *: "Running Time"
+    *: "Körtid"
   </voice>
 </phrase>
 <phrase>
@@ -6952,7 +6952,7 @@
     *: "Längsta tid"
   </dest>
   <voice>
-    *: "Top Time"
+    *: "Längsta tid"
   </voice>
 </phrase>
 <phrase>
@@ -6966,7 +6966,7 @@
     *: "Nollställ tid?"
   </dest>
   <voice>
-    *: "Clear Time?"
+    *: "Nollställ tid?"
   </voice>
 </phrase>
 <phrase>
@@ -6980,7 +6980,7 @@
     *: "Felsök (Rör ej!)"
   </dest>
   <voice>
-    *: "Debug, keep out!"
+    *: "Felsök, rör ej!"
   </voice>
 </phrase>
 <phrase>
@@ -6994,7 +6994,7 @@
     *: "Spellista"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "Spellista"
   </voice>
 </phrase>
 <phrase>
@@ -7008,7 +7008,7 @@
     *: "Infoga"
   </dest>
   <voice>
-    *: "Insert"
+    *: "Infoga"
   </voice>
 </phrase>
 <phrase>
@@ -7022,7 +7022,7 @@
     *: "Infoga som nästa"
   </dest>
   <voice>
-    *: "Insert next"
+    *: "Infoga som nästa"
   </voice>
 </phrase>
 <phrase>
@@ -7036,7 +7036,7 @@
     *: "Infoga sist"
   </dest>
   <voice>
-    *: "Insert last"
+    *: "Infoga sist"
   </voice>
 </phrase>
 <phrase>
@@ -7050,7 +7050,7 @@
     *: "Infoga blandat"
   </dest>
   <voice>
-    *: "Insert shuffled"
+    *: "Infoga blandat"
   </voice>
 </phrase>
 <phrase>
@@ -7064,7 +7064,7 @@
     *: "Köa"
   </dest>
   <voice>
-    *: "Queue"
+    *: "Köa"
   </voice>
 </phrase>
 <phrase>
@@ -7078,7 +7078,7 @@
     *: "Köa som nästa"
   </dest>
   <voice>
-    *: "Queue next"
+    *: "Köa som nästa"
   </voice>
 </phrase>
 <phrase>
@@ -7092,7 +7092,7 @@
     *: "Köa sist"
   </dest>
   <voice>
-    *: "Queue last"
+    *: "Köa sist"
   </voice>
 </phrase>
 <phrase>
@@ -7106,7 +7106,7 @@
     *: "Köa blandat"
   </dest>
   <voice>
-    *: "Queue shuffled"
+    *: "Köa blandat"
   </voice>
 </phrase>
 <phrase>
@@ -7120,7 +7120,7 @@
     *: "Spela nästa"
   </dest>
   <voice>
-    *: "Play Next"
+    *: "Spela nästa"
   </voice>
 </phrase>
 <phrase>
@@ -7134,7 +7134,7 @@
     *: "Infogade %d spår (%s)"
   </dest>
   <voice>
-    *: "tracks inserted"
+    *: "infogade spår"
   </voice>
 </phrase>
 <phrase>
@@ -7148,7 +7148,7 @@
     *: "Köade %d spår (%s)"
   </dest>
   <voice>
-    *: "tracks queued"
+    *: "köade spår"
   </voice>
 </phrase>
 <phrase>
@@ -7162,7 +7162,7 @@
     *: "Visa"
   </dest>
   <voice>
-    *: "View"
+    *: "Visa"
   </voice>
 </phrase>
 <phrase>
@@ -7176,7 +7176,7 @@
     *: "Sök i spellista"
   </dest>
   <voice>
-    *: "Search In Playlist"
+    *: "Sök i spellista"
   </voice>
 </phrase>
 <phrase>
@@ -7204,7 +7204,7 @@
     *: "Blanda om"
   </dest>
   <voice>
-    *: "Reshuffle"
+    *: "Blanda om"
   </voice>
 </phrase>
 <phrase>
@@ -7218,7 +7218,7 @@
     *: "Visa katalog"
   </dest>
   <voice>
-    *: "View Catalog"
+    *: "Visa katalog"
   </voice>
 </phrase>
 <phrase>
@@ -7232,7 +7232,7 @@
     *: "Lägg till till spellista"
   </dest>
   <voice>
-    *: "Add to Playlist"
+    *: "Lägg till till spellista"
   </voice>
 </phrase>
 <phrase>
@@ -7246,7 +7246,7 @@
     *: "Lägg till till ny spellista"
   </dest>
   <voice>
-    *: "Add to New Playlist"
+    *: "Lägg till till ny spellista"
   </voice>
 </phrase>
 <phrase>
@@ -7288,7 +7288,7 @@
     *: "Bokmärken"
   </dest>
   <voice>
-    *: "Bookmarks"
+    *: "Bokmärken"
   </voice>
 </phrase>
 <phrase>
@@ -7302,7 +7302,7 @@
     *: "Skapa bokmärke"
   </dest>
   <voice>
-    *: "Create Bookmark"
+    *: "Skapa bokmärke"
   </voice>
 </phrase>
 <phrase>
@@ -7316,7 +7316,7 @@
     *: "Lista bokmärken"
   </dest>
   <voice>
-    *: "List Bookmarks"
+    *: "Lista bokmärken"
   </voice>
 </phrase>
 <phrase>
@@ -7330,7 +7330,7 @@
     *: "Snabbmeny"
   </dest>
   <voice>
-    *: "Context Menu"
+    *: "Snabbmeny"
   </voice>
 </phrase>
 <phrase>
@@ -7344,7 +7344,7 @@
     *: "Värdera sången"
   </dest>
   <voice>
-    *: "Set Song Rating"
+    *: "Värdera sången"
   </voice>
 </phrase>
 <phrase>
@@ -7358,7 +7358,7 @@
     *: "Lista cuesheet"
   </dest>
   <voice>
-    *: "Browse Cuesheet"
+    *: "Lista cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -7372,7 +7372,7 @@
     *: "Visa spårinfo"
   </dest>
   <voice>
-    *: "Show Track Info"
+    *: "Visa spårinfo"
   </voice>
 </phrase>
 <phrase>
@@ -7638,7 +7638,7 @@
     *: "Ändra namn"
   </dest>
   <voice>
-    *: "Rename"
+    *: "Ändra namn"
   </voice>
 </phrase>
 <phrase>
@@ -7652,7 +7652,7 @@
     *: "Klipp ut"
   </dest>
   <voice>
-    *: "Cut"
+    *: "Klipp ut"
   </voice>
 </phrase>
 <phrase>
@@ -7666,7 +7666,7 @@
     *: "Kopiera"
   </dest>
   <voice>
-    *: "Copy"
+    *: "Kopiera"
   </voice>
 </phrase>
 <phrase>
@@ -7680,7 +7680,7 @@
     *: "Klistra in"
   </dest>
   <voice>
-    *: "Paste"
+    *: "Klistra in"
   </voice>
 </phrase>
 <phrase>
@@ -7694,7 +7694,7 @@
     *: "Fil eller katalog existerar. Skriv över?"
   </dest>
   <voice>
-    *: "File or directory exists. Overwrite?"
+    *: "Fil eller katalog existerar. Skriv över?"
   </voice>
 </phrase>
 <phrase>
@@ -7708,7 +7708,7 @@
     *: "Ta bort"
   </dest>
   <voice>
-    *: "Delete"
+    *: "Ta bort"
   </voice>
 </phrase>
 <phrase>
@@ -7722,7 +7722,7 @@
     *: "Ta bort katalog"
   </dest>
   <voice>
-    *: "delete directory"
+    *: "Ta bort katalog"
   </voice>
 </phrase>
 <phrase>
@@ -7736,7 +7736,7 @@
     *: "Ta bort?"
   </dest>
   <voice>
-    *: "Really delete?"
+    *: "Bekräfta: Ta bort?"
   </voice>
 </phrase>
 <phrase>
@@ -7750,7 +7750,7 @@
     *: "Kopierar..."
   </dest>
   <voice>
-    *: "Copying"
+    *: "Kopierar"
   </voice>
 </phrase>
 <phrase>
@@ -7764,7 +7764,7 @@
     *: "Tar bort..."
   </dest>
   <voice>
-    *: "Deleting"
+    *: "Tar bort"
   </voice>
 </phrase>
 <phrase>
@@ -7778,7 +7778,7 @@
     *: "Flyttar..."
   </dest>
   <voice>
-    *: "Moving"
+    *: "Flyttar"
   </voice>
 </phrase>
 <phrase>
@@ -7792,7 +7792,7 @@
     *: "Borttagen"
   </dest>
   <voice>
-    *: "Deleted"
+    *: "Borttagen"
   </voice>
 </phrase>
 <phrase>
@@ -7809,7 +7809,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "Använd som bakgrund"
   </voice>
 </phrase>
 <phrase>
@@ -7857,7 +7857,7 @@
     *: "Öppna med..."
   </dest>
   <voice>
-    *: "open with"
+    *: "Öppna med"
   </voice>
 </phrase>
 <phrase>
@@ -7871,7 +7871,7 @@
     *: "Skapa katalog"
   </dest>
   <voice>
-    *: "Create Directory"
+    *: "Skapa katalog"
   </voice>
 </phrase>
 <phrase>
@@ -7885,7 +7885,7 @@
     *: "Egenskaper"
   </dest>
   <voice>
-    *: "Properties"
+    *: "Egenskaper"
   </voice>
 </phrase>
 <phrase>
@@ -7899,7 +7899,7 @@
     *: "Lägg till i genvägar"
   </dest>
   <voice>
-    *: "Add to shortcuts"
+    *: "Lägg till i genvägar"
   </voice>
 </phrase>
 <phrase>
@@ -7916,7 +7916,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Pitch"
+    pitchscreen: "Tonläge"
   </voice>
 </phrase>
 <phrase>
@@ -7998,7 +7998,7 @@
     *: "Full spellistebuffert"
   </dest>
   <voice>
-    *: "Playlist Buffer Full"
+    *: "Full spellistebuffert"
   </voice>
 </phrase>
 <phrase>
@@ -8014,8 +8014,7 @@
     player: "Listan slut"
   </dest>
   <voice>
-    *: "End of Song List"
-    player: "End of List"
+    *: "Slut på spellistan"
   </voice>
 </phrase>
 <phrase>
@@ -8043,7 +8042,7 @@
     *: "Inget att fortsätta"
   </dest>
   <voice>
-    *: "Nothing to resume"
+    *: "Inget att fortsätta"
   </voice>
 </phrase>
 <phrase>
@@ -8057,7 +8056,7 @@
     *: "Kan ej upppdatera filen för spellistekontroll"
   </dest>
   <voice>
-    *: "Error updating playlist control file"
+    *: "Kan ej upppdatera filen för spellistekontroll"
   </voice>
 </phrase>
 <phrase>
@@ -8071,7 +8070,7 @@
     *: "Kan ej nå filen med spellistan"
   </dest>
   <voice>
-    *: "Error accessing playlist file"
+    *: "Kan ej nå filen med spellistan"
   </voice>
 </phrase>
 <phrase>
@@ -8085,7 +8084,7 @@
     *: "Kan ej nå filen för spellistekontroll"
   </dest>
   <voice>
-    *: "Error accessing playlist control file"
+    *: "Kan ej nå filen för spellistekontroll"
   </voice>
 </phrase>
 <phrase>
@@ -8099,7 +8098,7 @@
     *: "Kan inte läsa katalogen"
   </dest>
   <voice>
-    *: "Error accessing directory"
+    *: "Kan inte läsa katalogen"
   </voice>
 </phrase>
 <phrase>
@@ -8113,7 +8112,7 @@
     *: "Filen för spellistekontroll är inte korrekt"
   </dest>
   <voice>
-    *: "Playlist control file is invalid"
+    *: "Filen för spellistekontroll är inte korrekt"
   </voice>
 </phrase>
 <phrase>
@@ -8127,7 +8126,7 @@
     *: "Spara misslyckades"
   </dest>
   <voice>
-    *: "Save Failed"
+    *: "Spara misslyckades"
   </voice>
 </phrase>
 <phrase>
@@ -8157,7 +8156,7 @@
     *: "Paus"
   </dest>
   <voice>
-    *: "Pause"
+    *: "Paus"
   </voice>
 </phrase>
 <phrase>
@@ -8185,7 +8184,7 @@
     *: "Tid"
   </dest>
   <voice>
-    *: "Time"
+    *: "Tid"
   </voice>
 </phrase>
 <phrase>
@@ -8202,7 +8201,7 @@
   </dest>
   <voice>
     *: none
-    usb_charging: "Charge During U S B Connection"
+    usb_charging: "Ladda via USB"
   </voice>
 </phrase>
 <phrase>
@@ -8287,7 +8286,7 @@
   </dest>
   <voice>
     *: none
-    recording: "minus infinity"
+    recording: "minus oändlighet"
   </voice>
 </phrase>
 <phrase>
@@ -8321,7 +8320,7 @@
   </dest>
   <voice>
     *: none
-    ondio*: "Please remove multimedia card"
+    ondio*: "Var vänlig ta bort MMC-kort"
   </voice>
 </phrase>
 <phrase>
@@ -8335,7 +8334,7 @@
     *: "Ny startfil"
   </dest>
   <voice>
-    *: "Boot changed"
+    *: "Ny startfil"
   </voice>
 </phrase>
 <phrase>
@@ -8349,7 +8348,7 @@
     *: "Starta om nu?"
   </dest>
   <voice>
-    *: "Reboot now?"
+    *: "Starta om nu?"
   </voice>
 </phrase>
 <phrase>
@@ -8385,7 +8384,7 @@
     *: "Inga filer"
   </dest>
   <voice>
-    *: "No files"
+    *: "Inga filer"
   </voice>
 </phrase>
 <phrase>
@@ -8399,7 +8398,7 @@
     *: "Nytt tangentbord"
   </dest>
   <voice>
-    *: "New Keyboard"
+    *: "Nytt tangentbord"
   </voice>
 </phrase>
 <phrase>
@@ -8483,7 +8482,7 @@
     *: "Full filändelselista"
   </dest>
   <voice>
-    *: "Extension array full"
+    *: "Full filändelselista"
   </voice>
 </phrase>
 <phrase>
@@ -8497,7 +8496,7 @@
     *: "Full filtypslista"
   </dest>
   <voice>
-    *: "Filetype array full"
+    *: "Full filtypslista"
   </voice>
 </phrase>
 <phrase>
@@ -8511,7 +8510,7 @@
     *: "Full katalogbuffert"
   </dest>
   <voice>
-    *: "Directory Buffer is Full!"
+    *: "Full katalogbuffert"
   </voice>
 </phrase>
 <phrase>
@@ -8525,7 +8524,7 @@
     *: "Ogiltigt filnamn"
   </dest>
   <voice>
-    *: "Invalid Filename"
+    *: "Ogiltigt filnamn"
   </voice>
 </phrase>
 <phrase>
@@ -8539,7 +8538,7 @@
     *: "Insticksnamnet är för långt"
   </dest>
   <voice>
-    *: "Plugin name too long"
+    *: "Insticksmodulens namn är för långt"
   </voice>
 </phrase>
 <phrase>
@@ -8570,7 +8569,7 @@
     *: "Starta om för att aktivera"
   </dest>
   <voice>
-    *: "Please reboot to enable"
+    *: "Starta om för att aktivera"
   </voice>
 </phrase>
 <phrase>
@@ -8587,7 +8586,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Charging"
+    charging: "Batteriladdning"
   </voice>
 </phrase>
 <phrase>
@@ -8600,11 +8599,11 @@
   </source>
   <dest>
     *: none
-    recorder: "Batteri: Normal laddning"
+    recorder: "Batteri: Toppladdning"
   </dest>
   <voice>
     *: none
-    recorder: "Top off charge"
+    recorder: "Toppladdning"
   </voice>
 </phrase>
 <phrase>
@@ -8621,7 +8620,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Trickle charge"
+    charging: "Underhållsladdning"
   </voice>
 </phrase>
 <phrase>
@@ -8635,7 +8634,7 @@
     *: "VARNING! Låg batterinivå!"
   </dest>
   <voice>
-    *: "WARNING! Low Battery!"
+    *: "VARNING! Låg batterinivå!"
   </voice>
 </phrase>
 <phrase>
@@ -8649,7 +8648,7 @@
     *: "Batteri tomt! LADDA!"
   </dest>
   <voice>
-    *: "Battery empty! RECHARGE!"
+    *: "Batteri tomt! LADDA!"
   </voice>
 </phrase>
 <phrase>
@@ -8719,7 +8718,7 @@
     *: ","
   </dest>
   <voice>
-    *: "point"
+    *: "komma"
   </voice>
 </phrase>
 <phrase>
@@ -9125,7 +9124,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hundred"
+    *: "hundra"
   </voice>
 </phrase>
 <phrase>
@@ -9139,7 +9138,7 @@
     *: ""
   </dest>
   <voice>
-    *: "thousand"
+    *: "tusen"
   </voice>
 </phrase>
 <phrase>
@@ -9153,7 +9152,7 @@
     *: ""
   </dest>
   <voice>
-    *: "million"
+    *: "miljon"
   </voice>
 </phrase>
 <phrase>
@@ -9167,7 +9166,7 @@
     *: ""
   </dest>
   <voice>
-    *: "billion"
+    *: "miljard"
   </voice>
 </phrase>
 <phrase>
@@ -9209,7 +9208,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milliseconds"
+    *: "millisekunder"
   </voice>
 </phrase>
 <phrase>
@@ -9223,7 +9222,7 @@
     *: ""
   </dest>
   <voice>
-    *: "second"
+    *: "sekund"
   </voice>
 </phrase>
 <phrase>
@@ -9237,7 +9236,7 @@
     *: ""
   </dest>
   <voice>
-    *: "seconds"
+    *: "sekunder"
   </voice>
 </phrase>
 <phrase>
@@ -9251,7 +9250,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minute"
+    *: "minut"
   </voice>
 </phrase>
 <phrase>
@@ -9265,7 +9264,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minutes"
+    *: "minuter"
   </voice>
 </phrase>
 <phrase>
@@ -9279,7 +9278,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hour"
+    *: "timme"
   </voice>
 </phrase>
 <phrase>
@@ -9293,7 +9292,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hours"
+    *: "timmar"
   </voice>
 </phrase>
 <phrase>
@@ -9335,7 +9334,7 @@
     *: ""
   </dest>
   <voice>
-    *: "percent"
+    *: "procent"
   </voice>
 </phrase>
 <phrase>
@@ -9349,7 +9348,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milli-amp hours"
+    *: "milliamperetimmar"
   </voice>
 </phrase>
 <phrase>
@@ -9377,7 +9376,7 @@
     *: ""
   </dest>
   <voice>
-    *: "per second"
+    *: "per sekund"
   </voice>
 </phrase>
 <phrase>
@@ -9405,7 +9404,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilobits per second"
+    *: "kilobits per sekund"
   </voice>
 </phrase>
 <phrase>
@@ -9783,7 +9782,7 @@
     *: ""
   </dest>
   <voice>
-    *: "dot"
+    *: "punkt"
   </voice>
 </phrase>
 <phrase>
@@ -9811,7 +9810,7 @@
     *: ""
   </dest>
   <voice>
-    *: "file"
+    *: "fil"
   </voice>
 </phrase>
 <phrase>
@@ -9825,7 +9824,7 @@
     *: ""
   </dest>
   <voice>
-    *: "folder"
+    *: "katalog"
   </voice>
 </phrase>
 <phrase>
@@ -9839,7 +9838,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "ljud"
   </voice>
 </phrase>
 <phrase>
@@ -9853,7 +9852,7 @@
     *: ""
   </dest>
   <voice>
-    *: "configuration"
+    *: "konfiguration"
   </voice>
 </phrase>
 <phrase>
@@ -9895,7 +9894,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plugin"
+    *: "insticksmodul"
   </voice>
 </phrase>
 <phrase>
@@ -9909,7 +9908,7 @@
     *: ""
   </dest>
   <voice>
-    *: "font"
+    *: "teckensnitt"
   </voice>
 </phrase>
 <phrase>
@@ -9923,7 +9922,7 @@
     *: ""
   </dest>
   <voice>
-    *: "bookmark"
+    *: "bokmärke"
   </voice>
 </phrase>
 <phrase>
@@ -9954,7 +9953,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote while-playing-screen"
+    remote: "W P S fjärrenhet"
   </voice>
 </phrase>
 <phrase>
@@ -9968,7 +9967,7 @@
     *: ""
   </dest>
   <voice>
-    *: "keyboard"
+    *: "tangentbord"
   </voice>
 </phrase>
 <phrase>
@@ -10013,7 +10012,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Current time:"
+    rtc: "Kockan är:"
   </voice>
 </phrase>
 <phrase>
@@ -10030,7 +10029,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Yes"
+    lcd_bitmap: "Ja"
   </voice>
 </phrase>
 <phrase>
@@ -10047,7 +10046,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: "Nej"
   </voice>
 </phrase>
 <phrase>
@@ -10064,7 +10063,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "On"
+    lcd_bitmap: "På"
   </voice>
 </phrase>
 <phrase>
@@ -10081,7 +10080,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Off"
+    lcd_bitmap: "Av"
   </voice>
 </phrase>
 <phrase>
@@ -10115,7 +10114,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Cutoff Frequency"
+    swcodec: "Brytfrekvens"
   </voice>
 </phrase>
 <phrase>
@@ -10132,7 +10131,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Gain"
+    lcd_bitmap: "Förstärkning"
   </voice>
 </phrase>
 <phrase>
@@ -10149,7 +10148,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Shuffle"
+    lcd_bitmap: "Blanda"
   </voice>
 </phrase>
 <phrase>
@@ -10166,7 +10165,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Repeat"
+    lcd_bitmap: "Repetera"
   </voice>
 </phrase>
 <phrase>
@@ -10183,7 +10182,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "All"
+    lcd_bitmap: "Alla"
   </voice>
 </phrase>
 <phrase>
@@ -10200,7 +10199,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "One"
+    lcd_bitmap: "En"
   </voice>
 </phrase>
 <phrase>
@@ -10234,7 +10233,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Show Files"
+    lcd_bitmap: "Visa filer"
   </voice>
 </phrase>
 <phrase>
@@ -10251,7 +10250,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Supported"
+    lcd_bitmap: "Alla som stödjs"
   </voice>
 </phrase>
 <phrase>
@@ -10268,7 +10267,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Music"
+    lcd_bitmap: "Musikfiler"
   </voice>
 </phrase>
 <phrase>
@@ -10285,7 +10284,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Playlists"
+    lcd_bitmap: "Spellistor"
   </voice>
 </phrase>
 <phrase>
@@ -10302,7 +10301,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: "Upp och ner"
   </voice>
 </phrase>
 <phrase>
@@ -10319,7 +10318,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: "Rullningslist"
   </voice>
 </phrase>
 <phrase>
@@ -10336,7 +10335,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: "Statuslist"
   </voice>
 </phrase>
 <phrase>
@@ -10442,7 +10441,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Volume"
+    recording: "Volym"
   </voice>
 </phrase>
 <phrase>
@@ -10493,7 +10492,7 @@
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Quality"
+    recording_hwcodec: "Kvalitet"
   </voice>
 </phrase>
 <phrase>
@@ -10510,7 +10509,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Frequency"
+    recording: "Frekvens"
   </voice>
 </phrase>
 <phrase>
@@ -10527,7 +10526,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "Källa"
   </voice>
 </phrase>
 <phrase>
@@ -10544,7 +10543,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Internal Microphone"
+    recording: "Intern mikrofon"
   </voice>
 </phrase>
 <phrase>
@@ -10561,7 +10560,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Line In"
+    recording: "Linjeingång"
   </voice>
 </phrase>
 <phrase>
@@ -10595,7 +10594,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Channels"
+    recording: "Kanaler"
   </voice>
 </phrase>
 <phrase>
@@ -10612,7 +10611,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Startläge"
   </voice>
 </phrase>
 <phrase>
@@ -10730,7 +10729,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: "Uppdelningsstorlek"
   </voice>
 </phrase>
 <phrase>
@@ -10763,7 +10762,7 @@
   </dest>
   <voice>
     *: none
-    agc: "AGC"
+    agc: "Automatisk volymkontroll"
   </voice>
 </phrase>
 <phrase>
@@ -10779,7 +10778,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "Säker (klipp)"
   </voice>
 </phrase>
 <phrase>
@@ -10795,7 +10794,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "Live (långsam)"
   </voice>
 </phrase>
 <phrase>
@@ -10811,7 +10810,7 @@
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: "DJ (långsam)"
   </voice>
 </phrase>
 <phrase>
@@ -10827,7 +10826,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: "Mellan"
   </voice>
 </phrase>
 <phrase>
@@ -10843,7 +10842,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: "Röst (snabb)"
   </voice>
 </phrase>
 <phrase>
@@ -10859,7 +10858,7 @@
   </dest>
   <voice>
     *: none
-    agc: "AGC maximum gain"
+    agc: "AVK max förstärkning"
   </voice>
 </phrase>
 <phrase>
@@ -10887,7 +10886,7 @@
     *: "Spel"
   </dest>
   <voice>
-    *: "Games"
+    *: "Spel"
   </voice>
 </phrase>
 <phrase>
@@ -10901,7 +10900,7 @@
     *: "Applikationer"
   </dest>
   <voice>
-    *: "Applications"
+    *: "Applikationer"
   </voice>
 </phrase>
 <phrase>
@@ -10915,7 +10914,7 @@
     *: "Demosar"
   </dest>
   <voice>
-    *: "Demos"
+    *: "Demosar"
   </voice>
 </phrase>
 <phrase>
@@ -10943,7 +10942,7 @@
     *: "Visa filändelser"
   </dest>
   <voice>
-    *: "Show Filename Extensions"
+    *: "Visa filändelser"
   </voice>
 </phrase>
 <phrase>
@@ -10957,7 +10956,7 @@
     *: "Bara för filer som ej stödjs"
   </dest>
   <voice>
-    *: "Only Unknown Types"
+    *: "Bara för filer som ej stödjs"
   </voice>
 </phrase>
 <phrase>
@@ -10971,7 +10970,7 @@
     *: "Bara när alla filer visas"
   </dest>
   <voice>
-    *: "Only When Viewing All Types"
+    *: "Bara när alla filer visas"
   </voice>
 </phrase>
 <phrase>
@@ -10985,7 +10984,7 @@
     *: ""
   </dest>
   <voice>
-    *: "units per tick"
+    *: "enheter per tick"
   </voice>
 </phrase>
 <phrase>
@@ -11002,7 +11001,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "o'clock"
+    rtc: "nollnoll"
   </voice>
 </phrase>
 <phrase>
@@ -11053,7 +11052,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "oh"
+    rtc: "noll"
   </voice>
 </phrase>
 <phrase>
@@ -11070,7 +11069,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clip Counter"
+    recording: "Klippräknare"
   </voice>
 </phrase>
 <phrase>
@@ -11104,7 +11103,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "USB Stack"
+    usbstack: "USB"
   </voice>
 </phrase>
 <phrase>
@@ -11121,7 +11120,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "USB Stack Mode"
+    usbstack: "USB-läge"
   </voice>
 </phrase>
 <phrase>
@@ -11138,7 +11137,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "Device"
+    usbstack: "Enhet"
   </voice>
 </phrase>
 <phrase>
@@ -11155,7 +11154,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "Host"
+    usbstack: "Värd"
   </voice>
 </phrase>
 <phrase>
@@ -11172,7 +11171,7 @@
   </dest>
   <voice>
     *: none
-    usbstack: "Device Driver"
+    usbstack: "Drivrutin"
   </voice>
 </phrase>
 <phrase>
@@ -11189,7 +11188,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Primary Colour"
+    lcd_color: "Primär färg"
   </voice>
 </phrase>
 <phrase>
@@ -11206,7 +11205,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Secondary Colour"
+    lcd_color: "Sekundär färg"
   </voice>
 </phrase>
 <phrase>
@@ -11223,7 +11222,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Text Colour"
+    lcd_color: "Textfärg"
   </voice>
 </phrase>
 <phrase>
@@ -11240,7 +11239,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Solid Colour)"
+    lcd_color: "Enfärgad rad"
   </voice>
 </phrase>
 <phrase>
@@ -11257,7 +11256,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Gradient Colour)"
+    lcd_color: "Gradientrad"
   </voice>
 </phrase>
 <phrase>
@@ -11271,7 +11270,7 @@
     *: "Centraleuropa (CP1250)"
   </dest>
   <voice>
-    *: "Central European"
+    *: "Centraleuropa"
   </voice>
 </phrase>
 <phrase>
@@ -11285,7 +11284,7 @@
     *: "Tema"
   </dest>
   <voice>
-    *: "Theme Settings"
+    *: "Tema"
   </voice>
 </phrase>
 <phrase>
@@ -11302,7 +11301,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Colours"
+    lcd_color: "Färger"
   </voice>
 </phrase>
 <phrase>
@@ -11319,7 +11318,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Line Selector Colours"
+    lcd_color: "Radmarkörsfärger"
   </voice>
 </phrase>
 <phrase>
@@ -11333,7 +11332,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Edit"
+    *: "Ändra"
   </voice>
 </phrase>
 <phrase>
@@ -11347,7 +11346,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Blank"
+    *: "Mellanslag"
   </voice>
 </phrase>
 <phrase>
@@ -11361,7 +11360,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Empty list"
+    *: "Listan tom"
   </voice>
 </phrase>
 <phrase>
@@ -11378,7 +11377,7 @@
   </dest>
   <voice>
     *: none
-    multivolume: "Not present"
+    multivolume: "Inget"
   </voice>
 </phrase>
 <phrase>  
@@ -11392,7 +11391,7 @@
     *: "Meddela batterinivå"
   </dest>
   <voice>
-    *: "Announce Battery Level"
+    *: "Meddela batterinivå"
   </voice>
 </phrase>
 <phrase>
@@ -11406,6 +11405,6 @@
     *: "Röstfiländelser"
   </dest>
   <voice>
-    *: "Say file type"
+    *: "Röstfiländelser"
   </voice>
 </phrase>

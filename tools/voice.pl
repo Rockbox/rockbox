@@ -166,6 +166,27 @@ sub correct_string {
                 }
             }
         }
+        case "svenska" {
+            # for all swedish engines (e.g. for english words)
+            $string =~ s/kilobyte/kilobajt/ig;
+            $string =~ s/megabyte/megabajt/ig;
+            $string =~ s/gigabyte/gigabajt/ig;
+            $string =~ s/\bloudness\b/laudness/ig;
+
+            switch($$tts_object{"name"}) {
+                 case "espeak" {   # just for eSpeak
+                     $string =~ s/ampere/ampär/ig;
+                     $string =~ s/bokmärken/bok-märken/ig;
+                     $string =~ s/generella/schenerella/ig;
+                     $string =~ s/dithering/diddering/ig;
+                     $string =~ s/\bunicode\b/jynikod/ig;
+                     $string =~ s/uttoning/utoning/ig;
+                     $string =~ s/procent/pro-cent/ig;
+                     $string =~ s/spellistor/spelistor/ig;
+                     $string =~ s/cuesheet/qjyschiit/ig;
+                 }
+            }
+        }
     }
     if ($orig ne $string) {
         printf("%s -> %s\n", $orig, $string) if $verbose;
