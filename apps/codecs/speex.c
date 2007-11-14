@@ -385,6 +385,7 @@ enum codec_status codec_main(void)
     int extra_headers = 0;
     int stream_init = 0;
     int page_nb_packets, frame_size, packet_count = 0;
+    int lookahead;
     int headerssize = -1;
     unsigned long strtoffset = 0;
     void *st = NULL;
@@ -464,6 +465,7 @@ next_page:
                                          &samplerate, &nframes, &channels,
                                          stereo, &extra_headers);
 
+                    speex_decoder_ctl(st, SPEEX_GET_LOOKAHEAD, &lookahead);
                     if (!nframes)
                         nframes=1;
 
@@ -527,8 +529,13 @@ next_page:
                             speex_decode_stereo_int(output, frame_size, stereo);
 
                         if (frame_size > 0) {
-                            ci->pcmbuf_insert(output, NULL, frame_size);
+                            spx_int16_t *frame_start = output + lookahead;
 
+                            if (channels == 2)
+                                frame_start += lookahead;
+                            ci->pcmbuf_insert(frame_start, NULL,
+                                              frame_size - lookahead);
+                            lookahead = 0;
                             /* 2 bytes/sample */
                             cur_granule += frame_size / 2;
 
