@@ -245,10 +245,16 @@ static const struct wps_tag all_tags[] = {
 
 #ifdef HAS_REMOTE_BUTTON_HOLD
     { WPS_TOKEN_REMOTE_HOLD,              "mr",  WPS_REFRESH_DYNAMIC, NULL },
+#else
+    { WPS_TOKEN_UNKNOWN,                  "mr",  0,                   NULL },
 #endif
 
     { WPS_TOKEN_REPEAT_MODE,              "mm",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_PLAYBACK_STATUS,          "mp",  WPS_REFRESH_DYNAMIC, NULL },
+
+#ifdef HAVE_LCD_BITMAP
+    { WPS_TOKEN_LEFTMARGIN,               "m",   0, parse_scrollmargin },
+#endif
 
 #ifdef HAVE_LCD_BITMAP
     { WPS_TOKEN_PEAKMETER,                "pm", WPS_REFRESH_PEAK_METER, NULL },
@@ -279,12 +285,7 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_CROSSFADE,                "xf",  WPS_REFRESH_DYNAMIC, NULL },
 #endif
 
-#ifdef HAVE_LCD_BITMAP
-    { WPS_TOKEN_ALIGN_SCROLLMARGIN,       "s",   WPS_REFRESH_SCROLL,
-                                                       parse_scrollmargin },
-#else
     { WPS_NO_TOKEN,                       "s",   WPS_REFRESH_SCROLL,  NULL },
-#endif
     { WPS_TOKEN_SUBLINE_TIMEOUT,          "t",   0,  parse_subline_timeout },
 
 #ifdef HAVE_LCD_BITMAP
@@ -848,7 +849,7 @@ static int parse_scrollmargin(const char *wps_bufptr, struct wps_token *token,
 
     (void)wps_data; /* Kill the warning */
 
-    /* valid tag looks like %s or %s|12|  */
+    /* valid tag looks like %m or %m|12|  */
     if(*wps_bufptr == '|')
     {
         p = wps_bufptr + 1;

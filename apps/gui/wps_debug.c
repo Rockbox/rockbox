@@ -81,6 +81,11 @@ static void dump_wps_tokens(struct wps_data *data)
             case WPS_TOKEN_ALIGN_RIGHT:
                 snprintf(buf, sizeof(buf), "align right");
                 break;
+
+            case WPS_TOKEN_LEFTMARGIN:
+                snprintf(buf, sizeof(buf), "left margin, value: %d",
+                         token->value.i);
+                break;
 #endif
 
             case WPS_TOKEN_SUBLINE_TIMEOUT:

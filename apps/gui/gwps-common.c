@@ -1353,7 +1353,7 @@ static char *get_token_value(struct gui_wps *gwps,
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-        case WPS_TOKEN_ALIGN_SCROLLMARGIN:
+        case WPS_TOKEN_LEFTMARGIN:
             gwps->display->setmargins(token->value.i,
                                       gwps->display->getymargin());
             return NULL;
