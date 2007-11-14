@@ -750,7 +750,7 @@ int sb_encode(void *state, void *vin, SpeexBits *bits)
 
 static SBDecState global_decstate_wb IBSS_ATTR;
 /* Do not include this for voice codec, files will never be UWB */
-#ifndef SPEEX_ROCKBOX_VOICE_CODEC
+#ifndef ROCKBOX_VOICE_CODEC
 static SBDecState global_decstate_uwb IBSS_ATTR;
 #endif
 

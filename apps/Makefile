@@ -20,6 +20,12 @@ endif
 
 ifdef SOFTWARECODECS
 CODECS=build-codecs
+
+# This sets up the parameters for building and linking libspeex for core voice
+VOICE=libspeex-rockbox
+VOICELIB=$(BUILDDIR)/libspeex-rockbox.a
+LINKVOICE= -lspeex-rockbox
+
 endif
 
 # Set up the bitmap libraries
@@ -92,6 +98,10 @@ dep: $(DEPFILE)
 
 features: $(OBJDIR)/features
 
+libspeex-rockbox:
+	$(SILENT)mkdir -p $(OBJDIR)/libspeex-rockbox
+	$(call PRINTS,MAKE in libspeex for rockbox core)$(MAKE) -C $(APPSDIR)/codecs/libspeex ROCKBOX_VOICE_CODEC=1 OBJDIR=$(OBJDIR)/libspeex-rockbox OUTPUT=$(BUILDDIR)/libspeex-rockbox.a
+
 build-codecs:
 	$(SILENT)$(MAKE) -C codecs/lib OBJDIR=$(OBJDIR)/codecs/lib
 	$(SILENT)$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
@@ -126,13 +136,13 @@ $(MAXOUTFILE):
 	$(SILENT)cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	$(SILENT)rm $(MAXINFILE)
 
-$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(DEPFILE) $(LIBROCKBOX) $(BITMAPLIBS)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc $(LINKBITMAPS) -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
+$(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(DEPFILE) $(LIBROCKBOX) $(VOICE) $(BITMAPLIBS)
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc $(LINKVOICE) $(LINKBITMAPS) -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
 ifndef SIMVER
 
-$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(BITMAPLIBS)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
+$(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(VOICE) $(BITMAPLIBS)
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKVOICE) $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
@@ -177,8 +187,8 @@ else
 endif
 
 $(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
-	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX) $(BITMAPLIBS)
-	$(call PRINTS,LD $(BINARY))$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) $(SIMULATOR_MAP)
+	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX) $(VOICE) $(BITMAPLIBS)
+	$(call PRINTS,LD $(BINARY))$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKVOICE) $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) $(SIMULATOR_MAP)
 endif
 
 $(BUILDDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
