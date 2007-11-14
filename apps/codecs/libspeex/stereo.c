@@ -38,6 +38,17 @@
 #include "math_approx.h"
 #include "vq.h"
 #include <math.h>
+#include "os_support.h"
+
+typedef struct RealSpeexStereoState {
+   spx_word32_t balance;      /**< Left/right balance info */
+   spx_word32_t e_ratio;      /**< Ratio of energies: E(left+right)/[E(left)+E(right)]  */
+   spx_word32_t smooth_left;  /**< Smoothed left channel gain */
+   spx_word32_t smooth_right; /**< Smoothed right channel gain */
+   spx_int32_t reserved1;     /**< Reserved for future use */
+   spx_int32_t reserved2;     /**< Reserved for future use */
+} RealSpeexStereoState;
+
 
 /*float e_ratio_quant[4] = {1, 1.26, 1.587, 2};*/
 #ifndef FIXED_POINT
@@ -45,6 +56,50 @@ static const float e_ratio_quant[4] = {.25f, .315f, .397f, .5f};
 #else
 static const spx_word16_t e_ratio_quant[4] = {8192, 10332, 13009, 16384};
 #endif
+
+/* This is an ugly compatibility hack that properly resets the stereo state
+   In case it it compiled in fixed-point, but initialised with the deprecated
+   floating point static initialiser */
+#ifdef FIXED_POINT
+#define COMPATIBILITY_HACK(s) do {if ((s)->reserved1 != 0xdeadbeef) speex_stereo_state_init(s); } while (0);
+#else
+#define COMPATIBILITY_HACK(s) 
+#endif
+
+static SpeexStereoState global_stereo_state;
+SpeexStereoState *speex_stereo_state_init()
+{
+   /* SpeexStereoState *stereo = speex_alloc(sizeof(SpeexStereoState)); */
+   SpeexStereoState *stereo = &global_stereo_state;
+   speex_stereo_state_reset(stereo);
+   return stereo;
+}
+
+void speex_stereo_state_reset(SpeexStereoState *_stereo)
+{
+   RealSpeexStereoState *stereo = (RealSpeexStereoState*)_stereo;
+#ifdef FIXED_POINT
+   stereo->balance = 65536;
+   stereo->e_ratio = 16384;
+   stereo->smooth_left = 16384;
+   stereo->smooth_right = 16384;
+   stereo->reserved1 = 0xdeadbeef;
+   stereo->reserved2 = 0;
+#else
+   stereo->balance = 1.0f;
+   stereo->e_ratio = .5f;
+   stereo->smooth_left = 1.f;
+   stereo->smooth_right = 1.f;
+   stereo->reserved1 = 0;
+   stereo->reserved2 = 0;
+#endif   
+}
+
+void speex_stereo_state_destroy(SpeexStereoState *stereo)
+{
+   (void)stereo;
+   /* speex_free(stereo); */
+}
 
 #ifndef SPEEX_DISABLE_ENCODER
 void speex_encode_stereo(float *data, int frame_size, SpeexBits *bits)
@@ -79,7 +134,7 @@ void speex_encode_stereo(float *data, int frame_size, SpeexBits *bits)
    
    speex_bits_pack(bits, (int)balance, 5);
    
-   /*Quantize energy ratio*/
+   /* FIXME: Convert properly */
    tmp=vq_index(&e_ratio, e_ratio_quant, 1, 4);
    speex_bits_pack(bits, tmp, 2);
 }
@@ -116,7 +171,7 @@ void speex_encode_stereo_int(spx_int16_t *data, int frame_size, SpeexBits *bits)
    
    speex_bits_pack(bits, (int)balance, 5);
    
-   /*Quantize energy ratio*/
+   /* FIXME: Convert properly */
    tmp=vq_index(&e_ratio, e_ratio_quant, 1, 4);
    speex_bits_pack(bits, tmp, 2);
 }
@@ -124,45 +179,18 @@ void speex_encode_stereo_int(spx_int16_t *data, int frame_size, SpeexBits *bits)
 
 /* We don't want to decode to floats yet, disable */
 #if 0
-void speex_decode_stereo(float *data, int frame_size, SpeexStereoState *stereo)
-{
-   float balance, e_ratio;
-   int i;
-   float e_tot=0, e_left, e_right, e_sum;
-
-   balance=stereo->balance;
-   e_ratio=stereo->e_ratio;
-   for (i=frame_size-1;i>=0;i--)
-   {
-      e_tot += ((float)data[i])*data[i];
-   }
-   e_sum=e_tot/e_ratio;
-   e_left  = e_sum*balance / (1+balance);
-   e_right = e_sum-e_left;
-
-   e_left  = sqrt(e_left/(e_tot+.01));
-   e_right = sqrt(e_right/(e_tot+.01));
-
-   for (i=frame_size-1;i>=0;i--)
-   {
-      float ftmp=data[i];
-      stereo->smooth_left  = .98*stereo->smooth_left  + .02*e_left;
-      stereo->smooth_right = .98*stereo->smooth_right + .02*e_right;
-      data[2*i] = stereo->smooth_left*ftmp;
-      data[2*i+1] = stereo->smooth_right*ftmp;
-   }
-}
-#endif
-
-void speex_decode_stereo_int(spx_int16_t *data, int frame_size, SpeexStereoState *stereo)
+void speex_decode_stereo(float *data, int frame_size, SpeexStereoState *_stereo)
 {
    int i;
    spx_word32_t balance;
    spx_word16_t e_left, e_right, e_ratio;
-
+   RealSpeexStereoState *stereo = (RealSpeexStereoState*)_stereo;
+   
+   COMPATIBILITY_HACK(stereo);
+   
    balance=stereo->balance;
    e_ratio=stereo->e_ratio;
-
+   
    /* These two are Q14, with max value just below 2. */
    e_right = DIV32(QCONST32(1., 22), spx_sqrt(MULT16_32_Q15(e_ratio, ADD32(QCONST32(1., 16), balance))));
    e_left = SHR32(MULT16_16(spx_sqrt(balance), e_right), 8);
@@ -172,25 +200,55 @@ void speex_decode_stereo_int(spx_int16_t *data, int frame_size, SpeexStereoState
       spx_word16_t tmp=data[i];
       stereo->smooth_left = EXTRACT16(PSHR32(MAC16_16(MULT16_16(stereo->smooth_left, QCONST16(0.98, 15)), e_left, QCONST16(0.02, 15)), 15));
       stereo->smooth_right = EXTRACT16(PSHR32(MAC16_16(MULT16_16(stereo->smooth_right, QCONST16(0.98, 15)), e_right, QCONST16(0.02, 15)), 15));
-      data[2*i] = MULT16_16_P14(stereo->smooth_left, tmp);
-      data[2*i+1] = MULT16_16_P14(stereo->smooth_right, tmp);
+      data[2*i] = (float)MULT16_16_P14(stereo->smooth_left, tmp);
+      data[2*i+1] = (float)MULT16_16_P14(stereo->smooth_right, tmp);
+   }
+}
+#endif
+
+void speex_decode_stereo_int(spx_int16_t *data, int frame_size, SpeexStereoState *_stereo)
+{
+   int i;
+   spx_word32_t balance;
+   spx_word16_t e_left, e_right, e_ratio;
+   RealSpeexStereoState *stereo = (RealSpeexStereoState*)_stereo;
+
+   COMPATIBILITY_HACK(stereo);
+   
+   balance=stereo->balance;
+   e_ratio=stereo->e_ratio;
+   
+   /* These two are Q14, with max value just below 2. */
+   e_right = DIV32(QCONST32(1., 22), spx_sqrt(MULT16_32_Q15(e_ratio, ADD32(QCONST32(1., 16), balance))));
+   e_left = SHR32(MULT16_16(spx_sqrt(balance), e_right), 8);
+
+   for (i=frame_size-1;i>=0;i--)
+   {
+      spx_int16_t tmp=data[i];
+      stereo->smooth_left = EXTRACT16(PSHR32(MAC16_16(MULT16_16(stereo->smooth_left, QCONST16(0.98, 15)), e_left, QCONST16(0.02, 15)), 15));
+      stereo->smooth_right = EXTRACT16(PSHR32(MAC16_16(MULT16_16(stereo->smooth_right, QCONST16(0.98, 15)), e_right, QCONST16(0.02, 15)), 15));
+      data[2*i] = (spx_int16_t)MULT16_16_P14(stereo->smooth_left, tmp);
+      data[2*i+1] = (spx_int16_t)MULT16_16_P14(stereo->smooth_right, tmp);
    }
 }
 
 int speex_std_stereo_request_handler(SpeexBits *bits, void *state, void *data)
 {
-   SpeexStereoState *stereo;
-   spx_word16_t sign=1;
+   RealSpeexStereoState *stereo;
+   spx_word16_t sign=1, dexp;
    int tmp;
 
-   stereo = (SpeexStereoState*)data;
+   stereo = (RealSpeexStereoState*)data;
+   
+   COMPATIBILITY_HACK(stereo);
+
    if (speex_bits_unpack_unsigned(bits, 1))
       sign=-1;
-   tmp = speex_bits_unpack_unsigned(bits, 5);
+   dexp = speex_bits_unpack_unsigned(bits, 5);
 #ifndef FIXED_POINT
-   stereo->balance = exp(sign*.25*tmp);
+   stereo->balance = exp(sign*.25*dexp);
 #else
-   stereo->balance = spx_exp(MULT16_16(sign, SHL16(tmp, 9)));
+   stereo->balance = spx_exp(MULT16_16(sign, SHL16(dexp, 9)));
 #endif
    tmp = speex_bits_unpack_unsigned(bits, 2);
    stereo->e_ratio = e_ratio_quant[tmp];

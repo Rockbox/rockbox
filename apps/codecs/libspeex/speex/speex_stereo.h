@@ -46,31 +46,28 @@
 extern "C" {
 #endif
 
-/** State used for decoding (intensity) stereo information */
+/** If you access any of these fields directly, I'll personally come and bite you */
 typedef struct SpeexStereoState {
-#ifndef FIXED_POINT
    float balance;      /**< Left/right balance info */
    float e_ratio;      /**< Ratio of energies: E(left+right)/[E(left)+E(right)]  */
    float smooth_left;  /**< Smoothed left channel gain */
    float smooth_right; /**< Smoothed right channel gain */
    float reserved1;    /**< Reserved for future use */
    float reserved2;    /**< Reserved for future use */
-#else
-   spx_int32_t balance;      /**< Left/right balance info */
-   spx_int16_t e_ratio;      /**< Ratio of energies: E(left+right)/[E(left)+E(right)]  */
-   spx_int16_t smooth_left;  /**< Smoothed left channel gain */
-   spx_int16_t smooth_right; /**< Smoothed right channel gain */
-   spx_int32_t reserved1;    /**< Reserved for future use */
-   spx_int32_t reserved2;    /**< Reserved for future use */
-#endif
 } SpeexStereoState;
 
-/** Initialization value for a stereo state */
-#ifndef FIXED_POINT
+/** Deprecated. Use speex_stereo_state_init() instead. */
 #define SPEEX_STEREO_STATE_INIT {1,.5,1,1,0,0}
-#else
-#define SPEEX_STEREO_STATE_INIT {65536,16384,16384,16384,0,0}
-#endif
+
+/** Initialise/create a stereo stereo state */
+SpeexStereoState *speex_stereo_state_init();
+
+/** Reset/re-initialise an already allocated stereo state */
+void speex_stereo_state_reset(SpeexStereoState *stereo);
+
+/** Destroy a stereo stereo state */
+void speex_stereo_state_destroy(SpeexStereoState *stereo);
+
 /** Transforms a stereo frame into a mono frame and stores intensity stereo info in 'bits' */
 void speex_encode_stereo(float *data, int frame_size, SpeexBits *bits);
 

@@ -206,9 +206,7 @@ int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
            the bitrate is relativly constant.
          */
 
-        curoffset = (int)((((float)(*curbyteoffset-(headerssize)) *
-                          (float)pos)/(float)curpos)*0.98);
-
+        curoffset = (((*curbyteoffset-headerssize) * pos)/curpos)*98/100;
         if (curoffset < 0)
             curoffset=0;
 
@@ -347,21 +345,20 @@ static void *process_header(spx_ogg_packet *op,
     speex_decoder_ctl(st, SPEEX_SET_ENH, &enh_enabled);
     speex_decoder_ctl(st, SPEEX_GET_FRAME_SIZE, frame_size);
 
-    if (*channels!=1){
+    if (header->nb_channels!=1){
         callback.callback_id = SPEEX_INBAND_STEREO;
         callback.func = speex_std_stereo_request_handler;
         callback.data = stereo;
         speex_decoder_ctl(st, SPEEX_SET_HANDLER, &callback);
     }
+    *channels = header->nb_channels;
+
     if (!*rate)
         *rate = header->rate;
 
     speex_decoder_ctl(st, SPEEX_SET_SAMPLING_RATE, rate);
 
     *nframes = header->frames_per_packet;
-
-    if (*channels == -1)
-        *channels = header->nb_channels;
 
     *extra_headers = header->extra_headers;
 
@@ -382,27 +379,25 @@ enum codec_status codec_main(void)
     int enh_enabled = 1;
     int nframes = 2;
     int eos = 0;
-    static const SpeexStereoState stereo_init = SPEEX_STEREO_STATE_INIT;
-    SpeexStereoState stereo = stereo_init;
+    SpeexStereoState *stereo;
     int channels = -1;
     int rate = 0, samplerate = 0;
     int extra_headers = 0;
     int stream_init = 0;
     int page_nb_packets, frame_size, packet_count = 0;
-    int lookahead = 0;
     int headerssize = -1;
     unsigned long strtoffset = 0;
     void *st = NULL;
     int j = 0;
 
-    /* We need to flush reserver memory every track load. */
+    /* Ogg handling still uses mallocs, so reset the malloc buffer per track */
 next_track:
 
     if (codec_init()) {
         error = CODEC_ERROR;
         goto exit;
     }
-
+    stereo = speex_stereo_state_init();
     strtoffset = ci->id3->offset;
 
     while (!*ci->taginfo_ready && !ci->stop_codec)
@@ -467,9 +462,7 @@ next_page:
                 if (packet_count==0){
                     st = process_header(&op, enh_enabled, &frame_size,
                                          &samplerate, &nframes, &channels,
-                                         &stereo, &extra_headers);
-
-                    speex_decoder_ctl(st, SPEEX_GET_LOOKAHEAD, &lookahead);
+                                         stereo, &extra_headers);
 
                     if (!nframes)
                         nframes=1;
@@ -531,7 +524,7 @@ next_page:
                             break;
 
                         if (channels == 2)
-                            speex_decode_stereo_int(output, frame_size, &stereo);
+                            speex_decode_stereo_int(output, frame_size, stereo);
 
                         if (frame_size > 0) {
                             ci->pcmbuf_insert(output, NULL, frame_size);
@@ -565,8 +558,6 @@ done:
 
         cur_granule = stream_init = rate = samplerate = headerssize 
             = packet_count = eos = 0;
-
-        stereo = stereo_init;
 
         goto next_track;
     }
