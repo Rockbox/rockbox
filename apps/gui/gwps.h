@@ -180,9 +180,11 @@ enum wps_token_type {
     WPS_TOKEN_CONDITIONAL_END,
 
     /* Database */
+#ifdef HAVE_TAGCACHE
     WPS_TOKEN_DATABASE_PLAYCOUNT,
     WPS_TOKEN_DATABASE_RATING,
     WPS_TOKEN_DATABASE_AUTOSCORE,
+#endif
 
     /* File */
     WPS_TOKEN_FILE_BITRATE,
@@ -237,7 +239,9 @@ enum wps_token_type {
 
     /* Progressbar */
     WPS_TOKEN_PROGRESSBAR,
+#ifdef HAVE_LCD_CHARCELLS
     WPS_TOKEN_PLAYER_PROGRESSBAR,
+#endif
 
 #ifdef HAVE_LCD_BITMAP
     /* Peakmeter */

@@ -42,9 +42,12 @@
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"
 
-#define PARSE_FAIL_UNCLOSED_COND     1
-#define PARSE_FAIL_INVALID_CHAR      2
-#define PARSE_FAIL_COND_SYNTAX_ERROR 3
+#define WPS_ERROR_INVALID_PARAM         -1
+
+#define PARSE_FAIL_UNCLOSED_COND        1
+#define PARSE_FAIL_INVALID_CHAR         2
+#define PARSE_FAIL_COND_SYNTAX_ERROR    3
+#define PARSE_FAIL_COND_INVALID_PARAM   4
 
 /* level of current conditional.
    -1 means we're not in a conditional. */
@@ -115,7 +118,7 @@ static int parse_dir_level(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 
 #ifdef HAVE_LCD_BITMAP
-static int parse_scrollmargin(const char *wps_bufptr,
+static int parse_leftmargin(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_image_special(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
@@ -253,7 +256,7 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_PLAYBACK_STATUS,          "mp",  WPS_REFRESH_DYNAMIC, NULL },
 
 #ifdef HAVE_LCD_BITMAP
-    { WPS_TOKEN_LEFTMARGIN,               "m",   0, parse_scrollmargin },
+    { WPS_TOKEN_LEFTMARGIN,               "m",   0, parse_leftmargin       },
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -277,9 +280,12 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_PLAYLIST_NAME,            "pn",  WPS_REFRESH_STATIC,  NULL },
     { WPS_TOKEN_PLAYLIST_SHUFFLE,         "ps",  WPS_REFRESH_DYNAMIC, NULL },
 
+#ifdef HAVE_TAGCACHE
     { WPS_TOKEN_DATABASE_PLAYCOUNT,       "rp",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_DATABASE_RATING,          "rr",  WPS_REFRESH_DYNAMIC, NULL },
     { WPS_TOKEN_DATABASE_AUTOSCORE,       "ra",  WPS_REFRESH_DYNAMIC, NULL },
+#endif
+
 #if CONFIG_CODEC == SWCODEC
     { WPS_TOKEN_REPLAYGAIN,               "rg",  WPS_REFRESH_STATIC,  NULL },
     { WPS_TOKEN_CROSSFADE,                "xf",  WPS_REFRESH_DYNAMIC, NULL },
@@ -425,8 +431,7 @@ static int parse_image_display(const char *wps_bufptr,
     if (n == -1)
     {
         /* invalid picture display tag */
-        token->type = WPS_TOKEN_UNKNOWN;
-        return 0;
+        return WPS_ERROR_INVALID_PARAM;
     }
 
     token->value.i = n;
@@ -444,15 +449,17 @@ static int parse_image_load(const char *wps_bufptr,
 {
     int n;
     const char *ptr = wps_bufptr;
-    char *pos = NULL;
+    const char *pos = NULL;
+    const char *newline;
 
     /* format: %x|n|filename.bmp|x|y|
        or %xl|n|filename.bmp|x|y|  */
 
     ptr = strchr(ptr, '|') + 1;
     pos = strchr(ptr, '|');
+    newline = strchr(ptr, '\n');
 
-    if (!pos)
+    if (!pos || pos > newline)
         return 0;
 
     /* get the image ID */
@@ -461,8 +468,8 @@ static int parse_image_load(const char *wps_bufptr,
     /* check the image number and load state */
     if(n < 0 || n >= MAX_IMAGES || wps_data->img[n].loaded)
     {
-        /* Skip the rest of the line */
-        return 0;
+        /* Invalid image ID */
+        return WPS_ERROR_INVALID_PARAM;
     }
 
     ptr = pos + 1;
@@ -475,23 +482,23 @@ static int parse_image_load(const char *wps_bufptr,
 
     /* get x-position */
     pos = strchr(ptr, '|');
-    if (pos)
+    if (pos && pos < newline)
         wps_data->img[n].x = atoi(ptr);
     else
     {
         /* weird syntax, bail out */
-        return 0;
+        return WPS_ERROR_INVALID_PARAM;
     }
 
     /* get y-position */
     ptr = pos + 1;
     pos = strchr(ptr, '|');
-    if (pos)
+    if (pos && pos < newline)
         wps_data->img[n].y = atoi(ptr);
     else
     {
         /* weird syntax, bail out */
-        return 0;
+        return WPS_ERROR_INVALID_PARAM;
     }
 
     if (token->type == WPS_TOKEN_IMAGE_DISPLAY)
@@ -505,6 +512,16 @@ static int parse_image_special(const char *wps_bufptr,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
+    (void)wps_data; /* kill warning */
+    const char *pos = NULL;
+    const char *newline;
+
+    pos = strchr(wps_bufptr + 1, '|');
+    newline = strchr(wps_bufptr, '\n');
+
+    if (pos > newline)
+        return WPS_ERROR_INVALID_PARAM;
+
     if (token->type == WPS_TOKEN_IMAGE_PROGRESS_BAR)
     {
         /* format: %P|filename.bmp| */
@@ -517,8 +534,6 @@ static int parse_image_special(const char *wps_bufptr,
         bmp_names[BACKDROP_BMP] = wps_bufptr + 1;
     }
 #endif
-
-    (void)wps_data; /* to avoid a warning */
 
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
@@ -632,7 +647,7 @@ static int parse_albumart_load(const char *wps_bufptr,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
-    const char* _pos;
+    const char *_pos, *newline;
     bool parsing;
     const short xalign_mask = WPS_ALBUMART_ALIGN_LEFT |
                               WPS_ALBUMART_ALIGN_CENTER |
@@ -652,25 +667,27 @@ static int parse_albumart_load(const char *wps_bufptr,
 
     /* format: %Cl|x|y|[[l|c|r][d|i|s]mwidth]|[[t|c|b][d|i|s]mheight]| */
 
+    newline = strchr(wps_bufptr, '\n');
+
     /* initial validation and parsing of x and y components */
     if (*wps_bufptr != '|')
-        return 0; /* malformed token: e.g. %Cl7  */
+        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
 
     _pos = wps_bufptr + 1;
     if (!isdigit(*_pos))
-        return 0; /* malformed token: e.g. %Cl|@  */
+        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl|@  */
     wps_data->albumart_x = atoi(_pos);
 
     _pos = strchr(_pos, '|');
-    if (!_pos || !isdigit(*(++_pos)))
-        return 0; /* malformed token: e.g. %Cl|7\n or %Cl|7|@ */
+    if (!_pos || _pos > newline || !isdigit(*(++_pos)))
+        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl|7\n or %Cl|7|@ */
 
     wps_data->albumart_y = atoi(_pos);
 
     _pos = strchr(_pos, '|');
-    if (!_pos)
-        return 0; /* malformed token: no | after y coordinate
-                     e.g. %Cl|7|59\n */
+    if (!_pos || _pos > newline)
+        return WPS_ERROR_INVALID_PARAM;  /* malformed token: no | after y coordinate
+                                            e.g. %Cl|7|59\n */
 
     /* parsing width field */
     parsing = true;
@@ -721,13 +738,15 @@ static int parse_albumart_load(const char *wps_bufptr,
     /* extract max width data */
     if (*_pos != '|')
     {
-        if (!isdigit(*_pos))
-            return 0; /* malformed token:  e.g. %Cl|7|59|# */
+        if (!isdigit(*_pos))   /* malformed token: e.g. %Cl|7|59|# */
+            return WPS_ERROR_INVALID_PARAM;
+
         wps_data->albumart_max_width = atoi(_pos);
+
         _pos = strchr(_pos, '|');
-        if (!_pos)
-            return 0; /* malformed token: no | after width field
-                         e.g. %Cl|7|59|200\n */
+        if (!_pos || _pos > newline)
+            return WPS_ERROR_INVALID_PARAM; /* malformed token: no | after width field
+                                               e.g. %Cl|7|59|200\n */
     }
 
     /* parsing height field */
@@ -780,12 +799,14 @@ static int parse_albumart_load(const char *wps_bufptr,
     if (*_pos != '|')
     {
         if (!isdigit(*_pos))
-            return 0; /* malformed token  e.g. %Cl|7|59|200|@  */
+            return WPS_ERROR_INVALID_PARAM; /* malformed token  e.g. %Cl|7|59|200|@  */
+
         wps_data->albumart_max_height = atoi(_pos);
+
         _pos = strchr(_pos, '|');
-        if (!_pos)
-            return 0; /* malformed token: no closing |
-                         e.g. %Cl|7|59|200|200\n */
+        if (!_pos || _pos > newline)
+            return WPS_ERROR_INVALID_PARAM; /* malformed token: no closing |
+                                               e.g. %Cl|7|59|200|200\n */
     }
 
     /* if we got here, we parsed everything ok .. ! */
@@ -841,29 +862,29 @@ static int parse_albumart_conditional(const char *wps_bufptr,
 #endif /* HAVE_ALBUMART */
 
 #ifdef HAVE_LCD_BITMAP
-static int parse_scrollmargin(const char *wps_bufptr, struct wps_token *token, 
-                              struct wps_data *wps_data)
+static int parse_leftmargin(const char *wps_bufptr, struct wps_token *token,
+                            struct wps_data *wps_data)
 {
     const char* p;
     const char* pend;
+    const char *newline;
 
     (void)wps_data; /* Kill the warning */
 
-    /* valid tag looks like %m or %m|12|  */
+    /* valid tag looks like %m|12| */
     if(*wps_bufptr == '|')
     {
         p = wps_bufptr + 1;
-
-        if(isdigit(*p) && (pend = strchr(p, '|')))
+        newline = strchr(wps_bufptr, '\n');
+        if(isdigit(*p) && (pend = strchr(p, '|')) && pend < newline)
         {
             token->value.i = atoi(p);
-            return(pend - wps_bufptr + 1);
+            return pend - wps_bufptr + 1;
         }
-    } else {
-        token->value.i = 0;
     }
-            
-    return(0);
+
+    /* invalid tag syntax */
+    return WPS_ERROR_INVALID_PARAM;
 }
 #endif
 
@@ -871,7 +892,7 @@ static int parse_scrollmargin(const char *wps_bufptr, struct wps_token *token,
 /* Parse a generic token from the given string. Return the length read */
 static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
 {
-    int skip = 0, taglen = 0;
+    int skip = 0, taglen = 0, ret;
     struct wps_token *token = wps_data->tokens + wps_data->num_tokens;
     const struct wps_tag *tag;
 
@@ -898,7 +919,9 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
             condindex[level] = wps_data->num_tokens;
             numoptions[level] = 1;
             wps_data->num_tokens++;
-            taglen = 1 + parse_token(wps_bufptr + 1, wps_data);
+            ret = parse_token(wps_bufptr + 1, wps_data);
+            if (ret < 0) return ret;
+            taglen = 1 + ret;
             break;
 
         default:
@@ -914,7 +937,11 @@ static int parse_token(const char *wps_bufptr, struct wps_data *wps_data)
 
             /* if the tag has a special parsing function, we call it */
             if (tag->parse_func)
-                skip += tag->parse_func(wps_bufptr + taglen, token, wps_data);
+            {
+                ret = tag->parse_func(wps_bufptr + taglen, token, wps_data);
+                if (ret < 0) return ret;
+                skip += ret;
+            }
 
             /* Some tags we don't want to save as tokens */
             if (tag->type == WPS_NO_TOKEN)
@@ -945,6 +972,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     char *stringbuf = data->string_buffer;
     int stringbuf_used = 0;
     int fail = 0;
+    int ret;
     line = 1;
     level = -1;
 
@@ -956,7 +984,12 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 
             /* Regular tag */
             case '%':
-                wps_bufptr += parse_token(wps_bufptr, data);
+                if ((ret = parse_token(wps_bufptr, data)) < 0)
+                {
+                    fail = PARSE_FAIL_COND_INVALID_PARAM;
+                    break;
+                }
+                wps_bufptr += ret;
                 break;
 
             /* Alternating sublines separator */
