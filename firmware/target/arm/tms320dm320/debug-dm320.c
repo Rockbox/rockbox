@@ -33,20 +33,22 @@ bool __dbg_ports(void)
     return false;
 }
 
+extern char r_buffer[5];
+extern int r_button;
 bool __dbg_hw_info(void)
 {
     int line = 0, button, oldline;
     int *address=0x0;
     bool done=false;
     char buf[100];
-    
+
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
-    
+
     /* Put all the static text befor the while loop */
     lcd_puts(0, line++, "[Hardware info]");
-    
+
     lcd_puts(0, line++, "Clock info:");
     snprintf(buf, sizeof(buf), "IO_CLK_PLLA: 0x%04x IO_CLK_PLLB: 0x%04x IO_CLK_SEL0: 0x%04x IO_CLK_SEL1: 0x%04x",
         IO_CLK_PLLA, IO_CLK_PLLB, IO_CLK_SEL0, IO_CLK_SEL1);    lcd_puts(0, line++, buf);
@@ -75,6 +77,10 @@ bool __dbg_hw_info(void)
         else if (button==BUTTON_RC_REW)
             address-=0x800;
 
+        snprintf(buf, sizeof(buf), "Buffer: 0x%02x%02x%02x%02x%02x",
+            r_buffer[0], r_buffer[1], r_buffer[2], r_buffer[3],r_buffer[4] );    lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "Button: 0x%08x, HWread: 0x%08x",
+            (unsigned int)button, r_button);  lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "current tick: %08x Seconds running: %08d",
             (unsigned int)current_tick, (unsigned int)current_tick/100);  lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x", 

@@ -62,39 +62,53 @@ void uart1_putc(char ch)
     IO_UART1_DTRR=ch;
 }
 
-void uart1_puts(const char *str)
+void uart1_puts(const char *str, int size)
 {
-    char ch;
-    while ((ch = *str++) != '\0') {
-        uart1_putc(ch);
+    int count=0;
+    while (count<size) 
+    {
+        uart1_putc(str[count]);
+        count++;
     }
 }
 
 /* This function returns the number of bytes left in the queue after a read is done (negative if fail)*/
 int uart1_gets_queue(char *str, unsigned int size)
 {
+    IO_INTC_EINT0 &= ~(1<<IRQ_UART1);
+    int retval;
+    
     if(uart1_recieve_count<size)
-        return -uart1_recieve_count;
-
-    if(uart1_recieve_read+size<RECIEVE_RING_SIZE)
     {
-        memcpy(str,uart1_recieve_buffer_ring+uart1_recieve_read,size);
-    }
+        retval= -1;
+    }    
     else
     {
-        int tempcount=(RECIEVE_RING_SIZE-uart1_recieve_read);
-        memcpy(str,uart1_recieve_buffer_ring+uart1_recieve_read,tempcount);
-        memcpy(str+tempcount,uart1_recieve_buffer_ring,size-tempcount);
+        if(uart1_recieve_read+size<RECIEVE_RING_SIZE)
+        {
+            memcpy(str,uart1_recieve_buffer_ring+uart1_recieve_read,size);
+        }
+        else
+        {
+            int tempcount=(RECIEVE_RING_SIZE-uart1_recieve_read);
+            memcpy(str,uart1_recieve_buffer_ring+uart1_recieve_read,tempcount);
+            memcpy(str+tempcount,uart1_recieve_buffer_ring,size-tempcount);
+        }
+    
+        uart1_recieve_count-=size;
+    
+        if(uart1_recieve_read+size<RECIEVE_RING_SIZE)
+            uart1_recieve_read+=size;
+        else
+            uart1_recieve_read=size-(RECIEVE_RING_SIZE-uart1_recieve_read);
+            
+        retval=uart1_recieve_count;
     }
 
-    uart1_recieve_count-=size;
+    /* Enable the interrupt */
+    IO_INTC_EINT0 |= (1<<IRQ_UART1);
 
-    if(uart1_recieve_read+size<RECIEVE_RING_SIZE)
-        uart1_recieve_read+=size;
-    else
-        uart1_recieve_read=size-(RECIEVE_RING_SIZE-uart1_recieve_read);
-
-    return uart1_recieve_count;
+    return retval;
 }
 
 /* UART1 receive interupt handler */
@@ -109,7 +123,8 @@ void UART1(void)
             if(uart1_recieve_write==RECIEVE_RING_SIZE)
                 uart1_recieve_write=0;
 
-            uart1_recieve_buffer_ring[uart1_recieve_write++] = IO_UART1_DTRR & 0xff;
+            uart1_recieve_buffer_ring[uart1_recieve_write] = IO_UART1_DTRR & 0xff;
+            uart1_recieve_write++;
             uart1_recieve_count++;
         }
     }

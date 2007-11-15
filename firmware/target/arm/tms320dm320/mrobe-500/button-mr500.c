@@ -41,11 +41,7 @@ static short last_x, last_y, last_z1, last_z2; /* for the touch screen */
 static bool touch_available = false;
 
 static struct touch_calibration_point topleft, bottomright;
-static bool using_calibration = false;
-void use_calibration(bool enable)
-{
-    using_calibration = enable;
-}
+
 /* Jd's tests.. These will hopefully work for everyone so we dont have to
  *  create a calibration screen.
  *  Portait:
@@ -55,12 +51,6 @@ void use_calibration(bool enable)
  *      (0,0) = 200, 270
  *      (640,480) = 3880, 3900
 */
-void set_calibration_points(struct touch_calibration_point *tl,
-                            struct touch_calibration_point *br)
-{
-    memcpy(&topleft, tl, sizeof(struct touch_calibration_point));
-    memcpy(&bottomright, br, sizeof(struct touch_calibration_point));
-}
 
 static int touch_to_pixels(short val_x, short val_y)
 {
@@ -74,16 +64,20 @@ static int touch_to_pixels(short val_x, short val_y)
     y=val_x;
 #endif
 
-    if (!using_calibration)
-        return (val_x<<16)|val_y;
-
     x = (x-topleft.val_x)*(bottomright.px_x - topleft.px_x) / (bottomright.val_x - topleft.val_x) + topleft.px_x;
     y = (y-topleft.val_y)*(bottomright.px_y - topleft.px_y) / (bottomright.val_y - topleft.val_y) + topleft.px_y;
 
     if (x < 0)
         x = 0;
+    else if (x>=LCD_WIDTH)
+        x=LCD_WIDTH-1;
+        
     if (y < 0)
         y = 0;
+    else if (y>=LCD_HEIGHT)
+        y=LCD_HEIGHT-1;
+
+
     return (x<<16)|y;
 }
 
@@ -107,14 +101,12 @@ void button_init_device(void)
     bottomright.val_y = 3880;
 #endif
 
-    topleft.px_x = 0;               
+    topleft.px_x = 0;
     topleft.px_y = 0;
-    
-    bottomright.px_x = LCD_WIDTH;   
+
+    bottomright.px_x = LCD_WIDTH;
     bottomright.px_y = LCD_HEIGHT;
 
-    using_calibration = true;
-    
     /* Enable the touchscreen interrupt */
     IO_INTC_EINT2 |= (1<<3); /* IRQ_GIO14 */
 #if 0
@@ -136,15 +128,18 @@ inline bool button_hold(void)
 static void remote_heartbeat(void)
 {
     char data[5] = {0x11, 0x30, 0x11^0x30, 0x11+0x30, '\0'};
-    uart1_puts(data);
+    uart1_puts(data, 5);
 }
 
 #define TOUCH_MARGIN 8
+char r_buffer[5];
+int r_button = BUTTON_NONE;
 int button_read_device(int *data)
 {
-    char buffer[5];
-    int button = BUTTON_NONE, retval;
+    int retval, calbuf;
     static int oldbutton = BUTTON_NONE;
+    
+    r_button=BUTTON_NONE;
     *data = 0;
 
     if (touch_available)
@@ -170,7 +165,7 @@ int button_read_device(int *data)
             last_x = x;
             last_y = y;
             *data = touch_to_pixels(x, y);
-            button |= BUTTON_TOUCHPAD;
+            r_button |= BUTTON_TOUCHPAD;
         }
         last_touch = current_tick;
         touch_available = false;
@@ -178,23 +173,34 @@ int button_read_device(int *data)
     remote_heartbeat();
 
     if ((IO_GIO_BITSET0&0x01) == 0)
-        button |= BUTTON_POWER;
+    {
+        r_button |= BUTTON_POWER;
+        oldbutton=r_button;
+    }
 
-    retval=uart1_gets_queue(buffer, 5);
+    retval=uart1_gets_queue(r_buffer, 5);
     do
     {
+        for(calbuf=0;calbuf<4;calbuf++)
+        {
+            if((r_buffer[calbuf]&0xF0)==0xF0 && (r_buffer[calbuf+1]&0xF0)!=0xF0)
+                break;
+        }
+        calbuf++;
+        if(calbuf==5)
+            calbuf=0;
         if(retval>=0)
         {
-            button |= buffer[1];
-            oldbutton=button;
+            r_button |= r_buffer[calbuf];
+            oldbutton=r_button;
         }
         else
         {
-            button=oldbutton;
+            r_button=oldbutton;
         }
-    } while((retval=uart1_gets_queue(buffer, 5))>=5);
+    } while((retval=uart1_gets_queue(r_buffer, 5))>=5);
 
-    return button;
+    return r_button;
 }
 
 /* Touchpad data available interupt */
