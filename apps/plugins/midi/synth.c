@@ -316,29 +316,33 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
 
         s2 = getSample((cp_temp >> FRACTSIZE)+1, wf);
 
-        if(mode_mask28 && cp_temp >= end_loop)
+        if(mode_mask28)
         {
-            if(!mode_mask24)
+            /* LOOP_REVERSE|LOOP_PINGPONG  = 24  */
+            if(mode_mask24 && so->loopState == STATE_LOOPING && (cp_temp < start_loop))
             {
-                cp_temp -= diff_loop;
-                s2=getSample((cp_temp >> FRACTSIZE), wf);
-            }
-            else
-            {
-                so->delta = -so->delta;
-
-                /* LOOP_REVERSE|LOOP_PINGPONG  = 24  */
-                if(cp_temp < start_loop) /* this appears to never be true in here */
+                if(mode_mask_looprev)
                 {
-                    if(mode_mask_looprev)
-                    {
-                        cp_temp += diff_loop;
-                        s2=getSample((cp_temp >> FRACTSIZE), wf);
-                    }
-                    else
-                    {
-                        so->delta = -so->delta; /* At this point cp_temp is wrong. We need to take a step */
-                    }
+                    cp_temp += diff_loop;
+                    s2=getSample((cp_temp >> FRACTSIZE), wf);
+                }
+                else
+                {
+                    so->delta = -so->delta; /* At this point cp_temp is wrong. We need to take a step */
+                }
+            }
+
+            if(cp_temp >= end_loop)
+            {
+                so->loopState = STATE_LOOPING;
+                if(!mode_mask24)
+                {
+                    cp_temp -= diff_loop;
+                    s2=getSample((cp_temp >> FRACTSIZE), wf);
+                }
+                else
+                {
+                    so->delta = -so->delta;
                 }
             }
         }

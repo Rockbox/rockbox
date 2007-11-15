@@ -109,7 +109,7 @@ struct SynthObject
     int delta;
     int decay;
     unsigned int cp; /* unsigned int */
-    int state;
+    int state, loopState;
     int note, vol, ch;
     int curRate, curOffset, targetOffset;
     int curPoint;

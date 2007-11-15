@@ -227,6 +227,7 @@ inline void pressNote(int ch, int note, int vol)
 
     setVolScale(a);
 
+    voices[a].loopState=STATE_NONLOOPING;
     /*
      * OKAY. Gt = Gus Table value
      * rf = Root Frequency of wave
