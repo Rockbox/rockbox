@@ -208,7 +208,7 @@ static void load_voicefile(void)
 
     file_size = filesize(filehandle);
     if (file_size > audiobufend - audiobuf) /* won't fit? */
-       goto load_err;
+        goto load_err;
 
 #ifdef HAVE_MMC /* load only the header for now */
     load_size = offsetof(struct voicefile, index);
@@ -230,9 +230,10 @@ static void load_voicefile(void)
     {
         p_voicefile = (struct voicefile*)audiobuf;
 
-        if (p_voicefile->target_id != TARGET_ID)
+        if (p_voicefile->version != VOICE_VERSION ||
+            p_voicefile->target_id != TARGET_ID)
         {
-            logf("Incompatible voice file (wrong target)");
+            logf("Incompatible voice file");
             goto load_err;
         }
 #if CONFIG_CODEC != SWCODEC
@@ -243,7 +244,7 @@ static void load_voicefile(void)
 #endif
     }
     else
-       goto load_err;
+        goto load_err;
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
     for (i = 0; i < p_voicefile->id1_max + p_voicefile->id2_max; i++)
@@ -257,7 +258,7 @@ static void load_voicefile(void)
     got_size = read(filehandle, 
                     (unsigned char *) p_voicefile + offsetof(struct voicefile, index), load_size);
     if (got_size != load_size) /* read error */
-       goto load_err;
+        goto load_err;
 #else
     close(filehandle); /* only the MMC variant leaves it open */
     filehandle = -1;
@@ -269,7 +270,7 @@ static void load_voicefile(void)
     return;
 
 load_err:
-    p_voicefile = NULL;  
+    p_voicefile = NULL;
     has_voicefile = false; /* don't try again */
     if (filehandle >= 0)
     {
@@ -555,7 +556,7 @@ void talk_buffer_steal(void)
         filehandle = -1;
     }
 #endif
-    reset_state();;
+    reset_state();
 }
 
 
