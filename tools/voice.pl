@@ -410,9 +410,6 @@ sub gentalkclips {
     my $d = new DirHandle $dir;
     while (my $file = $d->read) {
         my ($voice, $wav, $mp3);
-        $voice = $file;
-        $wav = sprintf("%s.talk.wav", $path);
-
         # Print some progress information
         if (++$i % 10 == 0 and !$verbose) {
             print(".");
@@ -420,6 +417,10 @@ sub gentalkclips {
 
         # Convert to a complete path
         my $path = sprintf("%s/%s", $dir, $file);
+
+        $voice = $file;
+        $wav = sprintf("%s.talk.wav", $path);
+
         # Ignore dot-dirs and talk files
         if ($file eq '.' || $file eq '..' || $file =~ /\.talk$/) {
             next;
