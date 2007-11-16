@@ -13,7 +13,7 @@ endif
 
 SPEEXSRC = ../../apps/codecs/libspeex
 
-INCLUDES = -I $(SPEEXSRC) -iquote $(SPEEXSRC)
+INCLUDES = -I $(SPEEXSRC)
 SPEEXOPTS = -DHAVE_CONFIG_H -DROCKBOX_VOICE_ENCODER
 
 CFLAGS = $(SPEEXOPTS) $(INCLUDES) -O3 -fomit-frame-pointer -Wno-unused-parameter
@@ -45,7 +45,7 @@ $(DEPFILE): $(SOURCES)
 	echo "oo" > /dev/null )
 
 ../rbspeexenc: $(OBJS) $(DEPFILE)
-	gcc -o ../rbspeexenc $(OBJS) -lm
+	$(CC) -o ../rbspeexenc $(OBJS) -lm
 
 %.o:
 	$(CC) $(CFLAGS) -c $< -o $@
