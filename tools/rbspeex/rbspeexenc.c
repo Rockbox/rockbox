@@ -72,7 +72,7 @@ bool get_wave_metadata(FILE *fd, int *numchan, int *bps, int *sr, int *numsample
             /* dwSampleLength */
             if (i >= 4) {
                 /* get rest of chunk */
-                if ((read_bytes = read(buf, 1, 4, fd)) < 4)
+                if ((read_bytes = fread(buf, 1, 4, fd)) < 4)
                     return false;
 
                 i -= 4;
