@@ -24,12 +24,22 @@ speex.c
 speex_callbacks.c
 speex_header.c
 #ifndef ROCKBOX_VOICE_CODEC
+#ifndef ROCKBOX_VOICE_ENCODER
 oggframing.c
+#endif
 stereo.c
 #endif
+#ifdef ROCKBOX_VOICE_ENCODER
+lpc.c
+vbr.c
+vq.c
+window.c
+resample.c
+#else
 #ifdef CPU_COLDFIRE
 filters_cf.S
 ltp_cf.S
 #elif defined(CPU_ARM)
 filters_arm4.S
+#endif
 #endif

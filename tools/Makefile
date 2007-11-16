@@ -11,7 +11,7 @@ LDFLAGS := -g
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
  generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database \
- lngdump telechips gigabeats mktccboot mknkboot
+ lngdump telechips gigabeats mktccboot mknkboot rbspeexenc
 
 all:
 	@echo "Run make in your build directory!"
@@ -76,6 +76,9 @@ player_unifont: player_unifont.c ../firmware/drivers/lcd-charset-player.c
 uclpack:
 	$(SILENT)$(MAKE) -C ucl
 
+rbspeexenc:
+	$(SILENT)$(MAKE) -C rbspeex
+
 wavtrim: wavtrim.c
 	$(SILENT)$(CC) -g $+ -o $@
 
@@ -86,4 +89,5 @@ clean:
 	@echo "Cleaning tools"
 	$(SILENT)rm -f $(CLEANALL) $(shell for f in $(CLEANALL) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~
 	$(SILENT)$(MAKE) -C ucl clean
+	$(SILENT)$(MAKE) -C rbspeex clean
 

@@ -1,8 +1,16 @@
+#ifndef ROCKBOX_VOICE_ENCODER
 #include "../codec.h" 
 #include "autoconf.h"
+#else
+#define ICODE_ATTR
+#define IDATA_ATTR
+#define IBSS_ATTR
+#define ICONST_ATTR
+#endif
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+#ifndef ROCKBOX_VOICE_ENCODER
 /* Make use of ARM4E assembly optimizations */
 #if defined(CPU_ARM)
 #define ARM4_ASM
@@ -15,6 +23,7 @@
 
 /* Make use of Blackfin assembly optimizations */
 /* #undef BFIN_ASM */
+#endif /* ROCKBOX_VOICE_ENCODER */
 
 /* Disable wideband codec */
 /* #undef DISABLE_WIDEBAND */
@@ -28,8 +37,13 @@
 /* Debug fixed-point implementation */
 /* #undef FIXED_DEBUG */
 
+#ifndef ROCKBOX_VOICE_ENCODER
 /* Compile target codec as fixed point */
 #define FIXED_POINT 
+#else
+/* Compile voice clip encoder as floating point */
+#define FLOATING_POINT 
+#endif
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 /* #undef HAVE_DLFCN_H */

@@ -106,7 +106,7 @@ void speex_bits_rewind(SpeexBits *bits)
    bits->overflow=0;
 }
 
-#if 0
+#ifndef SPEEX_VOICE_ENCODER
 void speex_bits_read_from(SpeexBits *bits, char *chars, int len)
 {
    int i;

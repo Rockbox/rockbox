@@ -19,6 +19,9 @@
 #ifndef SPEEX_ROCKBOX_H
 #define SPEEX_ROCKBOX_H
 
+/* We don't want all this stuff if we're building encoder */
+#ifndef ROCKBOX_VOICE_ENCODER
+
 #include "../codec.h"
 #include "../lib/codeclib.h"
 
@@ -105,6 +108,8 @@ static inline void _speex_putc(int ch, void *file)
     //FILE *f = (FILE *)file;
     //printf("%c", ch);
 }
+
+#endif /* ROCKBOX_VOICE_ENCODER */
 
 #endif
 
