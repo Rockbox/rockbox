@@ -18,6 +18,11 @@ SPEEXOPTS = -DHAVE_CONFIG_H -DROCKBOX_VOICE_ENCODER
 
 CFLAGS = $(SPEEXOPTS) $(INCLUDES) -O3 -fomit-frame-pointer -Wno-unused-parameter
 
+#build standalone win32 executables on cygwin
+ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
+CFLAGS+=-mno-cygwin
+endif
+
 # This sets up 'SRC' based on the files mentioned in SOURCES
 SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#")
 
@@ -45,7 +50,7 @@ $(DEPFILE): $(SOURCES)
 	echo "oo" > /dev/null )
 
 ../rbspeexenc: $(OBJS) $(DEPFILE)
-	$(CC) -o ../rbspeexenc $(OBJS) -lm
+	$(CC) $(CFLAGS) -o ../rbspeexenc $(OBJS) -lm
 
 %.o:
 	$(CC) $(CFLAGS) -c $< -o $@
