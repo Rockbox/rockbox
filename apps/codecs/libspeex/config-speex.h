@@ -3,9 +3,6 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Make use of ARM4 assembly optimizations */
-/* #undef ARM4_ASM */
-
 /* Make use of ARM4E assembly optimizations */
 #if defined(CPU_ARM)
 #define ARM4_ASM
@@ -31,7 +28,7 @@
 /* Debug fixed-point implementation */
 /* #undef FIXED_DEBUG */
 
-/* Compile as fixed-point */
+/* Compile target codec as fixed point */
 #define FIXED_POINT 
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
@@ -159,15 +156,4 @@
 #define restrict __restrict
 
 #define RELEASE 1
-#define OVERRIDE_SPEEX_ALLOC 1
-#define OVERRIDE_SPEEX_ALLOC_SCRATCH 1
-#define OVERRIDE_SPEEX_REALLOC 1
-#define OVERRIDE_SPEEX_FREE 1
-#define OVERRIDE_SPEEX_FREE_SCRATCH 1
-#define OVERRIDE_SPEEX_MOVE 1
-#define OVERRIDE_SPEEX_FATAL 1
-#define OVERRIDE_SPEEX_WARNING 1
-#define OVERRIDE_SPEEX_WARNING_INT 1
-#define OVERRIDE_SPEEX_NOTIFY 1
-#define OVERRIDE_SPEEX_PUTC 1
 

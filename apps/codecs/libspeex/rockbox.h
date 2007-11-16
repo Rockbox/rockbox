@@ -38,57 +38,68 @@
 
 extern struct codec_api* ci;
 
+#define OVERRIDE_SPEEX_ALLOC 1
 static inline void *speex_alloc (int size)
 {
     return codec_calloc(size, 1);
 }
 
+#define OVERRIDE_SPEEX_ALLOC_SCRATCH 1
 static inline void *speex_alloc_scratch (int size)
 {
     return codec_calloc(size,1);
 }
 
+#define OVERRIDE_SPEEX_REALLOC 1
 static inline void *speex_realloc (void *ptr, int size)
 {
     return codec_realloc(ptr, size);
 }
 
+#define OVERRIDE_SPEEX_FREE 1
 static inline void speex_free (void *ptr)
 {
     codec_free(ptr);
 }
 
+#define OVERRIDE_SPEEX_FREE_SCRATCH 1
 static inline void speex_free_scratch (void *ptr)
 {
     codec_free(ptr);
 }
 
+#define OVERRIDE_SPEEX_MOVE 1
 static inline void *speex_move (void *dest, void *src, int n)
 {
    return memmove(dest,src,n);
 }
 
+#define OVERRIDE_SPEEX_FATAL 1
 static inline void _speex_fatal(const char *str, const char *file, int line)
 {
     DEBUGF("Fatal error: %s\n", str);
    //exit(1);
 }
 
+#define OVERRIDE_SPEEX_WARNING 1
 static inline void speex_warning(const char *str)
 {
     DEBUGF("warning: %s\n", str);
 }
 
+#define OVERRIDE_SPEEX_WARNING_INT 1
 static inline void speex_warning_int(const char *str, int val)
 {
     DEBUGF("warning: %s %d\n", str, val);
 }
 
+#define OVERRIDE_SPEEX_NOTIFY 1
 static inline void speex_notify(const char *str)
 {
     DEBUGF("notice: %s\n", str);
 }
 
+#define OVERRIDE_SPEEX_PUTC 1
 static inline void _speex_putc(int ch, void *file)
 {
     //FILE *f = (FILE *)file;
