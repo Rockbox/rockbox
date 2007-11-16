@@ -708,7 +708,7 @@ static size_t crossfade_mix(const char *buf, size_t length)
 
     while (length)
     {
-        int sample = *input_buf++ + *output_buf;
+        int32_t sample = *input_buf++ + *output_buf;
         *output_buf++ = clip_sample_16(sample);
         length -= 2;
 
@@ -717,7 +717,7 @@ static size_t crossfade_mix(const char *buf, size_t length)
             crossfade_chunk = crossfade_chunk->link;
             if (!crossfade_chunk)
                 return length;
-            output_buf = (int16_t *)(crossfade_chunk->addr);
+            output_buf = (int16_t *)crossfade_chunk->addr;
             chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
         }
     }
@@ -1046,7 +1046,7 @@ void pcmbuf_mix_voice(int count)
         return;
 
     obuf = (int16_t *)pcmbuf_mix_chunk->addr;
-    chunk_samples = pcmbuf_mix_chunk->size / 2;
+    chunk_samples = pcmbuf_mix_chunk->size / sizeof (int16_t);
 
     count <<= 1;
 
