@@ -225,7 +225,7 @@ sub voicestring {
         }
         case "espeak" {
             # xxx: $tts_engine_opts isn't used
-            $cmd = "espeak $tts_engine_opts -w $output";
+            $cmd = "espeak $tts_engine_opts -w \"$output\"";
             print("> $cmd\n") if $verbose;
             open(ESPEAK, "| $cmd");
             print ESPEAK $string . "\n";
