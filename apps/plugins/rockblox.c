@@ -589,12 +589,22 @@ static void show_details (void)
 #endif
 }
 
-static void init_rockblox (void)
-{
 #ifdef HIGH_SCORE_Y
+static void show_highscores (void)
+{
     int i;
     char str[25];               /* for strings */
+
+    for (i = MAX_HIGH_SCORES-1; i>=0; i--)
+    {
+        rb->snprintf (str, sizeof (str), "%06d L%1d", Highest[i].score, Highest[i].level);
+        rb->lcd_putsxy (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * ((MAX_HIGH_SCORES-1) - i)), str);
+    }
+}
 #endif
+
+static void init_rockblox (void)
+{
     highscore_update(score, level, Highest, MAX_HIGH_SCORES);
 
     level = 1;
@@ -616,11 +626,7 @@ static void init_rockblox (void)
 #endif
     show_details ();
 #ifdef HIGH_SCORE_Y
-    for (i = MAX_HIGH_SCORES-1; i>=0; i--)
-    {
-        rb->snprintf (str, sizeof (str), "%06d L%1d", Highest[i].score, Highest[i].level);
-        rb->lcd_putsxy (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * ((MAX_HIGH_SCORES-1) - i)), str);
-    }
+    show_highscores ();
 #endif
 }
 
@@ -933,6 +939,9 @@ static int rockblox_loop (void)
             /* get rid of the splash text */
             rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
             show_details ();
+#ifdef HIGH_SCORE_Y
+            show_highscores ();
+#endif
             draw_next_block ();
             refresh_board ();
         }
