@@ -9,6 +9,8 @@
 CFLAGS := -O -ansi -g
 LDFLAGS := -g
 
+.PHONY: rbspeexenc uclpack
+
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
  generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database \
  lngdump telechips gigabeats mktccboot mknkboot rbspeexenc
