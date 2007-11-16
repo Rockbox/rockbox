@@ -427,7 +427,7 @@ sub gentalkclips {
         }
         # Element is a dir
         if ( -d $path) {
-            gentalkclips($path, $tts_object, $encoder, $encoder_opts, $i);
+            gentalkclips($path, $tts_object, $encoder, $encoder_opts, $tts_engine_opts, $i);
             $mp3 = sprintf("%s/_dirname.talk", $path);
         }
         # Element is a file
