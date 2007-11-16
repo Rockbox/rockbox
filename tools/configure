@@ -301,8 +301,6 @@ whichadvanced () {
   echo "done"
 
   if [ "yes" = "$voice" ]; then
-    toolset="${toolset} voicefont wavtrim"
-
     # Ask about languages to build
     echo "Select a number for the language to use (default is english)"
     # The multiple-language feature is currently broken
@@ -1803,6 +1801,12 @@ else
   simmagic2='/@SIMUL2@/D'
 fi
 
+if test "$swcodec" = "yes"; then
+  voicetoolset="rbspeexenc voicefont wavtrim"
+else
+  voicetoolset="voicefont wavtrim"
+fi
+
 sed > Makefile \
  -e "s,@ROOTDIR@,${rootdir},g" \
  -e "s,@DEBUG@,${debug},g" \
@@ -1859,6 +1863,7 @@ sed > Makefile \
  -e "s,@ENC_OPTS@,${ENC_OPTS},g" \
  -e "s,@TTS_ENGINE@,${TTS_ENGINE},g" \
  -e "s,@TTS_OPTS@,${TTS_OPTS},g" \
+ -e "s,@VOICETOOLSET@,${voicetoolset},g" \
 <<EOF
 ## Automaticly generated. http://www.rockbox.org/
 
@@ -1973,6 +1978,9 @@ clean:
 tools:
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
 
+voicetools:
+	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @VOICETOOLSET@
+
 tags:
 	\$(SILENT)rm -f TAGS
 	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) tags
@@ -2063,7 +2071,7 @@ if [ "yes" = "$voice" ]; then
 
  cat >> Makefile <<EOF
 
-voice: tools features
+voice: voicetools features
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/${apps}/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
 	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/voice.pl -V -l=\$\$lang -t=\$(ARCHOS)\$\$feat -i=\$(TARGET_ID) -e=\$(ENCODER) -E="\$(ENC_OPTS)" -s=\$(TTS_ENGINE) -S="\$(TTS_OPTS)"; done \\
 EOF
