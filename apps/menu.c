@@ -24,6 +24,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "config.h"
+#include "system.h"
 
 #include "lcd.h"
 #include "font.h"
@@ -288,8 +289,9 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
     else
         title = ID2P(setting->lang_id);
     
-    /* this is needed so the scroll settings title
-       can actually be used to test the setting */
+    /* Pad the title string by repeating it. This is needed
+       so the scroll settings title can actually be used to
+       test the setting */
     if (setting->flags&F_PADTITLE)
     {
         int i = 0, len;
@@ -298,11 +300,11 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
         else
             title = P2STR((unsigned char*)title);
         len = strlen(title);
-        while (i<MAX_PATH)
+        while (i < MAX_PATH-1)
         {
-            strncpy(&padded_title[i], title, 
-                    len<MAX_PATH-1-i?len:MAX_PATH-1-i);
-            i += len;
+            int padlen = MIN(len, MAX_PATH-1-i);
+            strncpy(&padded_title[i], title, padlen);
+            i += padlen;
             if (i<MAX_PATH-1)
                 padded_title[i++] = ' ';
         }
