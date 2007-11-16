@@ -24,6 +24,7 @@ use vars qw($V $C $t $l $e $E $s $S $i $v);
 use IPC::Open2;
 use IPC::Open3;
 use Digest::MD5 qw(md5_hex);
+use DirHandle;
 
 sub printusage {
     print <<USAGE
@@ -234,7 +235,7 @@ sub voicestring {
             print({$$tts_object{"stdin"}} "SPEAK\t$output\t$string\r\n");
         }
         case "swift" {
-            $cmd = "swift $tts_engine_opts -o $output \"$string\"";
+            $cmd = "swift $tts_engine_opts -o \"$output\" \"$string\"";
             print("> $cmd\n") if $verbose;
             system($cmd);
         }
@@ -251,7 +252,7 @@ sub wavtrim {
         print({$$tts_object{"stdin"}} "EXEC\t$cmd\r\n");
     }
     else {
-        my $cmd = dirname($0) . "/wavtrim $file $threshold";
+        my $cmd = dirname($0) . "/wavtrim \"$file\" $threshold";
         print("> $cmd\n") if $verbose;
         `$cmd`;
     }
@@ -402,6 +403,49 @@ sub panic_cleanup {
     die "moo";
 }
 
+# Generate .talk clips
+sub gentalkclips {
+    our $verbose;
+    my ($dir, $tts_object, $encoder, $encoder_opts, $tts_engine_opts, $i) = @_;
+    my $d = new DirHandle $dir;
+    while (my $file = $d->read) {
+        my ($voice, $wav, $mp3);
+        $voice = $file;
+        $wav = sprintf("%s.talk.wav", $path);
+
+        # Print some progress information
+        if (++$i % 10 == 0 and !$verbose) {
+            print(".");
+        }
+
+        # Convert to a complete path
+        my $path = sprintf("%s/%s", $dir, $file);
+        # Ignore dot-dirs and talk files
+        if ($file eq '.' || $file eq '..' || $file =~ /\.talk$/) {
+            next;
+        }
+        # Element is a dir
+        if ( -d $path) {
+            gentalkclips($path, $tts_object, $encoder, $encoder_opts, $i);
+            $mp3 = sprintf("%s/_dirname.talk", $path);
+        }
+        # Element is a file
+        else {
+            $mp3 = sprintf("%s.talk", $path);
+            $voice =~ s/\.[^\.]*$//; # Trim extension
+        }
+
+        printf("Talkclip %s: %s", $mp3, $voice) if $verbose;
+
+        voicestring($voice, $wav, $tts_engine_opts, $tts_object);
+        wavtrim($wav, 500, $tts_object);
+        # 500 seems to be a reasonable default for now
+        encodewav($wav, $mp3, $encoder, $encoder_opts, $tts_object);
+        unlink($wav);
+    }
+}
+
+
 # Check parameters
 my $printusage = 0;
 unless (defined($V) or defined($C)) { print("Missing either -V or -C\n"); $printusage = 1; }
@@ -419,9 +463,6 @@ unless (defined($s)) { print("Missing -s argument\n"); $printusage = 1; }
 unless (defined($S)) { print("Missing -S argument\n"); $printusage = 1; }
 if ($printusage == 1) { printusage(); exit 1; }
 
-$SIG{INT} = \&panic_cleanup;
-$SIG{KILL} = \&panic_cleanup;
-
 if (defined($v) or defined($ENV{'V'})) {
     our $verbose = 1;
 }
@@ -429,6 +470,10 @@ if (defined($v) or defined($ENV{'V'})) {
 
 # Do what we're told
 if ($V == 1) {
+    # Only do the panic cleanup for voicefiles
+    $SIG{INT} = \&panic_cleanup;
+    $SIG{KILL} = \&panic_cleanup;
+
     printf("Generating voice\n  Target: %s\n  Language: %s\n  Encoder (options): %s (%s)\n  TTS Engine (options): %s (%s)\n",
         $t, $l, $e, $E, $s, $S);
     generateclips($l, $t, $e, $E, $s, $S);
@@ -436,7 +481,10 @@ if ($V == 1) {
     deletemp3s();
 }
 elsif ($C) {
-    # xxx: Implement .talk clip generation
+    printf("Generating .talk clips\n  Path: %s\n  Language: %s\n  Encoder (options): %s (%s)\n  TTS Engine (options): %s (%s)\n", $ARGV[0], $l, $e, $E, $s, $S);
+    my $tts_object = init_tts($s, $S, $l);
+    gentalkclips($ARGV[0], $tts_object, $e, $E, 0);
+    shutdown_tts($tts_object);
 }
 else {
     printusage();
