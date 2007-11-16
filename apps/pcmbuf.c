@@ -680,7 +680,7 @@ static size_t crossfade_fade_mix(int factor, const char *buf, size_t fade_rem)
 
     while (fade_rem)
     {
-        int sample = *input_buf++;
+        int32_t sample = *input_buf++;
         sample = ((sample * factor) >> 8) + *output_buf;
         *output_buf++ = clip_sample_16(sample);
         fade_rem -= 2;
@@ -1050,8 +1050,9 @@ void pcmbuf_mix_voice(int count)
 
     count <<= 1;
 
-    while (count-- > 0) {
-        int sample = *ibuf++;
+    while (count-- > 0)
+    {
+        int32_t sample = *ibuf++;
         if (pcmbuf_mix_sample >= chunk_samples)
         {
             pcmbuf_mix_chunk = pcmbuf_mix_chunk->link;
