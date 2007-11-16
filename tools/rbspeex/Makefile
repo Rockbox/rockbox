@@ -4,7 +4,7 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id: Makefile,v 1.16 2006-09-02 22:34:13 bagder Exp $
+# $Id$
 #
 
 ifndef V
@@ -51,6 +51,6 @@ $(DEPFILE): $(SOURCES)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) dep-speex
+	rm -f $(OBJS) ../rbspeexenc dep-speex
 
 -include $(DEPFILE)
