@@ -42,6 +42,14 @@
 #define PCMBUF_MUTING
 #endif
 
+/* Clip sample to signed 16 bit range */
+static inline int32_t clip_sample_16(int32_t sample)
+{
+    if ((int16_t)sample != sample)
+        sample = 0x7fff ^ (sample >> 31);
+    return sample;
+}
+
 /* Keep watermark high for iPods at least (2s) */
 #define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 4 * 2)
 
@@ -564,8 +572,8 @@ static void crossfade_process_buffer(size_t fade_in_delay,
             while (block_rem > 0 && fade_out_chunk != NULL)
             {
                 /* Fade one sample */
-                short *buf = (short *)(fade_out_chunk->addr);
-                int sample = buf[fade_out_sample];
+                int16_t *buf = (int16_t *)fade_out_chunk->addr;
+                int32_t sample = buf[fade_out_sample];
                 buf[fade_out_sample++] = (sample * factor) >> 8;
 
                 block_rem -= 2;
@@ -665,16 +673,16 @@ static void crossfade_start(void)
 /* Returns the number of bytes _NOT_ mixed */
 static size_t crossfade_fade_mix(int factor, const char *buf, size_t fade_rem)
 {
-    const short *input_buf = (const short *)buf;
-    short *output_buf = (short *)(crossfade_chunk->addr);
-    short *chunk_end = (short *)((size_t)output_buf + crossfade_chunk->size);
+    const int16_t *input_buf = (const int16_t *)buf;
+    int16_t *output_buf = (int16_t *)(crossfade_chunk->addr);
+    int16_t *chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
     output_buf = &output_buf[crossfade_sample];
 
     while (fade_rem)
     {
         int sample = *input_buf++;
         sample = ((sample * factor) >> 8) + *output_buf;
-        *output_buf++ = MIN(32767, MAX(-32768, sample));
+        *output_buf++ = clip_sample_16(sample);
         fade_rem -= 2;
 
         if (output_buf >= chunk_end)
@@ -682,26 +690,26 @@ static size_t crossfade_fade_mix(int factor, const char *buf, size_t fade_rem)
             crossfade_chunk = crossfade_chunk->link;
             if (!crossfade_chunk)
                 return fade_rem;
-            output_buf = (short *)(crossfade_chunk->addr);
-            chunk_end = (short *)((size_t)output_buf + crossfade_chunk->size);
+            output_buf = (int16_t *)crossfade_chunk->addr;
+            chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
         }
     }
-    crossfade_sample = (size_t)(output_buf - (short *)(crossfade_chunk->addr));
+    crossfade_sample = output_buf - (int16_t *)crossfade_chunk->addr;
     return 0;
 }
 
 /* Returns the number of bytes _NOT_ mixed */
 static size_t crossfade_mix(const char *buf, size_t length)
 {
-    const short *input_buf = (const short *)buf;
-    short *output_buf = (short *)(crossfade_chunk->addr);
-    short *chunk_end = (short *)((size_t)output_buf + crossfade_chunk->size);
+    const int16_t *input_buf = (const int16_t *)buf;
+    int16_t *output_buf = (int16_t *)crossfade_chunk->addr;
+    int16_t *chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
     output_buf = &output_buf[crossfade_sample];
 
     while (length)
     {
         int sample = *input_buf++ + *output_buf;
-        *output_buf++ = MIN(32767, MAX(-32768, sample));
+        *output_buf++ = clip_sample_16(sample);
         length -= 2;
 
         if (output_buf >= chunk_end)
@@ -709,11 +717,11 @@ static size_t crossfade_mix(const char *buf, size_t length)
             crossfade_chunk = crossfade_chunk->link;
             if (!crossfade_chunk)
                 return length;
-            output_buf = (short *)(crossfade_chunk->addr);
-            chunk_end = (short *)((size_t)output_buf + crossfade_chunk->size);
+            output_buf = (int16_t *)(crossfade_chunk->addr);
+            chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
         }
     }
-    crossfade_sample = (size_t)(output_buf - (short *)(crossfade_chunk->addr));
+    crossfade_sample = output_buf - (int16_t *)crossfade_chunk->addr;
     return 0;
 }
 
@@ -742,7 +750,7 @@ static void flush_crossfade(char *buf, size_t length)
         if (crossfade_fade_in_rem)
         {
             size_t samples;
-            short *input_buf;
+            int16_t *input_buf;
 
             /* Fade factor for this packet */
             int factor =
@@ -768,11 +776,11 @@ static void flush_crossfade(char *buf, size_t length)
             }
 
             samples = fade_rem / 2;
-            input_buf = (short *)buf;
+            input_buf = (int16_t *)buf;
             /* Fade remaining samples in place */
             while (samples)
             {
-                int sample = *input_buf;
+                int32_t sample = *input_buf;
                 *input_buf++ = (sample * factor) >> 8;
                 samples--;
             }
@@ -940,9 +948,9 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
 {
     unsigned int count = 0, i = 0;
     unsigned int interval = NATIVE_FREQUENCY / frequency;
-    long sample;
-    short *buf;
-    short *pcmbuf_end = (short *)fadebuf;
+    int32_t sample;
+    int16_t *buf;
+    int16_t *pcmbuf_end = (int16_t *)fadebuf;
     size_t samples = NATIVE_FREQUENCY / 1000 * duration;
 
     if (pcm_is_playing() && pcmbuf_read != NULL)
@@ -952,7 +960,7 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
             /* Get the next chunk */
             char *pcmbuf_mix_buf = pcmbuf_read->link->addr;
             /* Give at least 1/8s clearance. */
-            buf = (short *)&pcmbuf_mix_buf[NATIVE_FREQUENCY * 4 / 8];
+            buf = (int16_t *)&pcmbuf_mix_buf[NATIVE_FREQUENCY * 4 / 8];
         }
         else
         {
@@ -963,11 +971,11 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
         while (i++ < samples)
         {
             sample = *buf;
-            *buf++ = MIN(MAX(sample + amplitude, -32768), 32767);
+            *buf++ = clip_sample_16(sample + amplitude);
             if (buf > pcmbuf_end)
-                buf = (short *)audiobuffer;
+                buf = (int16_t *)audiobuffer;
             sample = *buf;
-            *buf++ = MIN(MAX(sample + amplitude, -32768), 32767);
+            *buf++ = clip_sample_16(sample + amplitude);
 
             /* Toggle square wav side */
             if (++count >= interval)
@@ -976,17 +984,17 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
                 amplitude = -amplitude;
             }
             if (buf > pcmbuf_end)
-                buf = (short *)audiobuffer;
+                buf = (int16_t *)audiobuffer;
         }
     }
     else
     {
-        buf = (short *)audiobuffer;
+        buf = (int16_t *)audiobuffer;
         while (i++ < samples)
         {
             *buf++ = amplitude;
             if (buf > pcmbuf_end)
-                buf = (short *)audiobuffer;
+                buf = (int16_t *)audiobuffer;
             *buf++ = amplitude;
 
             /* Toggle square wav side */
@@ -996,7 +1004,7 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
                 amplitude = -amplitude;
             }
             if (buf > pcmbuf_end)
-                buf = (short *)audiobuffer;
+                buf = (int16_t *)audiobuffer;
         }
         pcm_play_data(NULL, (unsigned char *)audiobuffer, samples * 4);
     }
@@ -1013,7 +1021,7 @@ int pcmbuf_mix_free(void)
     if (pcmbuf_mix_chunk)
     {
         size_t my_mix_end =
-            (size_t)&((short *)pcmbuf_mix_chunk->addr)[pcmbuf_mix_sample];
+            (size_t)&((int16_t *)pcmbuf_mix_chunk->addr)[pcmbuf_mix_sample];
         size_t my_write_pos = (size_t)&audiobuffer[audiobuffer_pos];
         if (my_write_pos < my_mix_end)
             my_write_pos += pcmbuf_size;
@@ -1024,8 +1032,8 @@ int pcmbuf_mix_free(void)
 
 void pcmbuf_mix_voice(int count)
 {
-    short *ibuf = (short *)voicebuf;
-    short *obuf;
+    int16_t *ibuf = (int16_t *)voicebuf;
+    int16_t *obuf;
     size_t chunk_samples;
 
     if (pcmbuf_mix_chunk == NULL && pcmbuf_read != NULL)
@@ -1037,7 +1045,7 @@ void pcmbuf_mix_voice(int count)
     if (!pcmbuf_mix_chunk)
         return;
 
-    obuf = (short *)pcmbuf_mix_chunk->addr;
+    obuf = (int16_t *)pcmbuf_mix_chunk->addr;
     chunk_samples = pcmbuf_mix_chunk->size / 2;
 
     count <<= 1;
@@ -1054,7 +1062,7 @@ void pcmbuf_mix_voice(int count)
             chunk_samples = pcmbuf_mix_chunk->size / 2;
         }
         sample += obuf[pcmbuf_mix_sample] >> 2;
-        obuf[pcmbuf_mix_sample++] = MIN(MAX(sample, -32768), 32767);
+        obuf[pcmbuf_mix_sample++] = clip_sample_16(sample);
     }
 }
 
