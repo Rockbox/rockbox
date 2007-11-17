@@ -27,7 +27,7 @@ endif
 SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#")
 
 SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeexenc.c
-OBJS := $(SRC:%.c=%.o) rbspeexenc.o
+OBJS := $(SRC:%.c=%.o)
 DEPFILE = dep-speex
 DIRS = 
 
@@ -49,13 +49,19 @@ $(DEPFILE): $(SOURCES)
 	done > $(DEPFILE); \
 	echo "oo" > /dev/null )
 
-../rbspeexenc: $(OBJS) $(DEPFILE)
-	$(CC) $(CFLAGS) -o ../rbspeexenc $(OBJS) -lm
+libspeex.a: $(OBJS) $(DEPFILE)
+	@echo AR libspeex.a
+	$(SILENT)$(AR) ruv $@ $+ > /dev/null 2>&1
+
+../rbspeexenc: $(OBJS) libspeex.a rbspeexenc.o
+	@echo Linking ../rbspeexenc
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc rbspeexenc.o libspeex.a -lm
 
 %.o:
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo CC $<
+	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) ../rbspeexenc dep-speex
+	rm -f $(OBJS) libspeex.a rbspeexenc.o ../rbspeexenc dep-speex
 
 -include $(DEPFILE)
