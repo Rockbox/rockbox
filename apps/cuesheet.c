@@ -43,6 +43,9 @@
 
 #define CUE_DIR ROCKBOX_DIR "/cue"
 
+struct cuesheet *curr_cue;
+struct cuesheet *temp_cue;
+
 #if CONFIG_CODEC != SWCODEC
 /* special trickery because the hwcodec playback engine is in firmware/ */
 static bool cuesheet_handler(const char *filename)

@@ -48,8 +48,8 @@ struct cuesheet {
     struct cue_track_info *curr_track;
 };
 
-struct cuesheet *curr_cue;
-struct cuesheet *temp_cue;
+extern struct cuesheet *curr_cue;
+extern struct cuesheet *temp_cue;
 
 /* returns true if cuesheet support is initialised */
 bool cuesheet_is_enabled(void);
