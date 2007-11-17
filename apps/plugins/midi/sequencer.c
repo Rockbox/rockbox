@@ -144,10 +144,25 @@ static void findDelta(struct SynthObject * so, int ch, int note)
 {
     struct GWaveform * wf = patchSet[chPat[ch]]->waveforms[patchSet[chPat[ch]]->noteTable[note]];
     so->wf=wf;
-    unsigned int delta= 0;
-    delta = (((gustable[note+chPBNoteOffset[ch]]<<FRACTSIZE) / (wf->rootFreq)) * wf->sampRate / (SAMPLE_RATE));
-    delta = (delta * chPBFractBend[ch])>> 16;
 
+    /* Used to be unsigned int, but math had to be done in different order to avoid overflow */
+    unsigned long long delta= 0;
+
+/*
+    Old formula:
+    delta = (((gustable[note+chPBNoteOffset[ch]]<<FRACTSIZE) / (wf->rootFreq)) * wf->sampRate / (SAMPLE_RATE));
+
+    Plus some pitch stuff. See old SVN for how it used to be
+*/
+
+    delta = (((gustable[note+chPBNoteOffset[ch]]))); /* anywhere from 8000 to 8000000 */
+    delta = delta * wf->sampRate;           /* approx 20000 - 44000 but can vary with tuning */
+    delta = (delta * chPBFractBend[ch]);    /* approx 60000 - 70000 */
+    delta = delta / (SAMPLE_RATE);  /* 44100 or 22050 */
+    delta = delta / (wf->rootFreq); /* anywhere from 8000 to 8000000 */
+
+    /* Pitch bend is encoded as a fractional of 16 bits, hence the 16 */
+    delta = delta >> (16 - FRACTSIZE);  /* a shift of approx 4 bits */
     so->delta = delta;
 }
 
@@ -250,7 +265,7 @@ inline void pressNote(int ch, int note, int vol)
 
             struct GWaveform * wf = drumSet[note]->waveforms[0];
             voices[a].wf=wf;
-            voices[a].delta = (((gustable[note]<<10) / wf->rootFreq) * wf->sampRate / SAMPLE_RATE);
+            voices[a].delta = (((gustable[note]<<FRACTSIZE) / wf->rootFreq) * wf->sampRate / SAMPLE_RATE);
             if(wf->mode & 28)
 //                printf("\nWoah, a drum patch has a loop. Stripping the loop...");
             wf->mode = wf->mode & (255-28);

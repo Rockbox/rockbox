@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 
-#define FRACTSIZE 10
+#define FRACTSIZE 12
 
 #define BUF_SIZE 8192 /* 32 kB output buffers */
 #define NBUF   2
