@@ -24,22 +24,21 @@
 
 #include "../codec.h"
 #include "../lib/codeclib.h"
+#include "debug.h"
+
+#if !defined(ROCKBOX_VOICE_CODEC)
 
 #if defined(DEBUG) || defined(SIMULATOR)
 #undef DEBUGF
 #define DEBUGF ci->debugf
-#else
-#define DEBUGF(...)
 #endif
 
 #ifdef ROCKBOX_HAS_LOGF
 #undef LOGF
 #define LOGF ci->logf
-#else
-#define LOGF(...)
 #endif
 
-extern struct codec_api* ci;
+#endif /* ROCKBOX_VOICE_CODEC */
 
 #define OVERRIDE_SPEEX_ALLOC 1
 static inline void *speex_alloc (int size)
