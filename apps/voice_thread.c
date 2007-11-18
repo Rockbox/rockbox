@@ -52,7 +52,7 @@
 
 /* Voice thread variables */
 static struct thread_entry *voice_thread_p = NULL;
-static long voice_stack[0x740/sizeof(long)] IBSS_ATTR_VOICE_STACK;
+static long voice_stack[0x7c0/sizeof(long)] IBSS_ATTR_VOICE_STACK;
 static const char voice_thread_name[] = "voice";
 
 /* Voice thread synchronization objects */
