@@ -100,7 +100,7 @@ void lcd_init_device(void)
     LCD1_CONTROL |= 0x4;
     udelay(10);
 
-    LCD1_CONTROL = 0x4687;
+    LCD1_CONTROL = 0x0084; /* bits (9,10) = 00 -> fastest setting */
     udelay(10000);
 
     lcd_send_command(R_STANDBY_OFF);

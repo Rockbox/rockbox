@@ -153,9 +153,15 @@ void lcd_init_device(void)
                                  * f/32, for better blacklevel stability */
     else
         power_reg_h = 0x1100;
-#elif defined IPOD_MINI2G
+#endif
+
+#ifdef IPOD_MINI2G /* serial LCD hookup */
     lcd_wait_write();
-    LCD1_CONTROL = (LCD1_CONTROL & ~0x1f00000) | 0x1700000;
+    LCD1_CONTROL = 0x01730084; /* fastest setting */
+#elif defined(IPOD_1G2G) || defined(IPOD_3G)
+    LCD1_CONTROL = (LCD1_CONTROL & 0x0002) | 0x0084; /* fastest setting, keep backlight bit */
+#else
+    LCD1_CONTROL = 0x0084; /* fastest setting */
 #endif
 
     lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0xc);
