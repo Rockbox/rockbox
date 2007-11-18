@@ -1383,16 +1383,18 @@ static int find_conditional_end(struct wps_data *data, int index)
 /* Return the index of the appropriate case for the conditional
    that starts at cond_index.
 */
-static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
+static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 {
     if (!gwps)
-        return 0;
+        return false;
 
     struct wps_data *data = gwps->data;
 
-    int ret, i;
+    int i;
+    int cond_index = *token_index;
     char result[128], *value;
-    int num_options = data->tokens[cond_index].value.i;
+    unsigned char num_options = data->tokens[cond_index].value.i & 0xFF;
+    unsigned char prev_val = (data->tokens[cond_index].value.i & 0xFF00) >> 8;
 
     /* treat ?xx<true> constructs as if they had 2 options. */
     if (num_options < 2)
@@ -1410,13 +1412,22 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
     else if (intval > num_options || intval < 1)
         intval = num_options;
 
+    data->tokens[cond_index].value.i = (intval << 8) + num_options;
+
     /* skip to the right enum case */
     int next = cond_index + 2;
     for (i = 1; i < intval; i++)
     {
         next = data->tokens[next].value.i;
     }
-    ret = next;
+    *token_index = next;
+
+    if (prev_val == intval)
+    {
+        /* Same conditional case as previously. Return without clearing the
+           pictures */
+        return false;
+    }
 
 #ifdef HAVE_LCD_BITMAP
     /* clear all pictures in the conditional */
@@ -1435,7 +1446,7 @@ static int evaluate_conditional(struct gui_wps *gwps, int cond_index)
     }
 #endif
 
-    return ret;
+    return true;
 }
 
 /* Read a (sub)line to the given alignment format buffer.
@@ -1480,8 +1491,7 @@ static bool get_line(struct gui_wps *gwps,
         {
             case WPS_TOKEN_CONDITIONAL:
                 /* place ourselves in the right conditional case */
-                i = evaluate_conditional(gwps, i);
-                update = true;
+                update |= evaluate_conditional(gwps, &i);
                 break;
 
             case WPS_TOKEN_CONDITIONAL_OPTION:
@@ -1589,7 +1599,7 @@ static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
         {
             case WPS_TOKEN_CONDITIONAL:
                 /* place ourselves in the right conditional case */
-                i = evaluate_conditional(gwps, i);
+                evaluate_conditional(gwps, &i);
                 break;
 
             case WPS_TOKEN_CONDITIONAL_OPTION:
