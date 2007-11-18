@@ -113,4 +113,6 @@ void setvol(void);
 int hex_to_rgb(const char* hex);
 #endif
 
+char* strrsplt(char* str, int c);
+
 #endif /* MISC_H */

@@ -508,22 +508,6 @@ static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
     return bookmarks->start + bookmarks->count;
 }
 
-static char* strrsplt(char* str, int c)
-{
-    char* s = strrchr(str, c);
-
-    if (s != NULL)
-    {
-        *s++ = '\0';
-    }
-    else
-    {
-        s = str;
-    }
-    
-    return s;
-}
-
 static char* get_bookmark_info(int list_index, void* data, char *buffer)
 {
     struct bookmark_list* bookmarks = (struct bookmark_list*) data;

@@ -372,10 +372,7 @@ static void format_name(char* dest, const char* src)
             strcpy(dest, p+1);
 
             /* Remove the extension */
-            char* q = strrchr(dest, '.');
-
-            if (q != NULL)
-                *q = '\0';
+            strrsplt(dest, '.');
 
             break;
         }

@@ -1076,3 +1076,19 @@ int hex_to_rgb(const char* hex)
 }
 #endif /* HAVE_LCD_COLOR */
 
+char* strrsplt(char* str, int c)
+{
+    char* s = strrchr(str, c);
+
+    if (s != NULL)
+    {
+        *s++ = '\0';
+    }
+    else
+    {
+        s = str;
+    }
+    
+    return s;
+}
+
