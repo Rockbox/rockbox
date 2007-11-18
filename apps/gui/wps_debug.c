@@ -559,20 +559,6 @@ static void print_wps_strings(struct wps_data *data)
     }
 }
 
-#ifdef HAVE_LCD_BITMAP
-static void print_img_cond_indexes(struct wps_data *data)
-{
-    DEBUGF("Image conditional indexes:\n");
-    int i;
-    for (i = 0; i < MAX_IMAGES; i++)
-    {
-        if (data->img[i].cond_index)
-            DEBUGF("%2d: %d\n", i, data->img[i].cond_index);
-    }
-    DEBUGF("\n");
-}
-#endif /*HAVE_LCD_BITMAP */
-
 void print_debug_info(struct wps_data *data, int fail, int line)
 {
 #if defined(SIMULATOR) || defined(__PCTOOL__)
@@ -581,9 +567,6 @@ void print_debug_info(struct wps_data *data, int fail, int line)
         dump_wps_tokens(data);
         print_wps_strings(data);
         print_line_info(data);
-#ifdef HAVE_LCD_BITMAP
-        if (wps_verbose_level > 2) print_img_cond_indexes(data);
-#endif
     }
 #endif /* SIMULATOR */
 

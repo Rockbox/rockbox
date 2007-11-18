@@ -1390,7 +1390,7 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 
     struct wps_data *data = gwps->data;
 
-    int i;
+    int i, cond_end;
     int cond_index = *token_index;
     char result[128], *value;
     unsigned char num_options = data->tokens[cond_index].value.i & 0xFF;
@@ -1429,22 +1429,19 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
         return false;
     }
 
+    cond_end = find_conditional_end(data, cond_index + 2);
+    for (i = cond_index + 3; i < cond_end; i++)
+    {
 #ifdef HAVE_LCD_BITMAP
-    /* clear all pictures in the conditional */
-    for (i = 0; i < MAX_IMAGES; i++)
-    {
-        if (data->img[i].cond_index == cond_index)
-            clear_image_pos(gwps, i);
-    }
+        /* clear all pictures in the conditional and nested ones */
+        if (data->tokens[i].type == WPS_TOKEN_IMAGE_PRELOAD_DISPLAY)
+            clear_image_pos(gwps, data->tokens[i].value.i);
 #endif
-
 #ifdef HAVE_ALBUMART
-    if (data->wps_uses_albumart != WPS_ALBUMART_NONE &&
-        data->albumart_cond_index == cond_index)
-    {
-        draw_album_art(gwps, audio_current_aa_hid(), true);
-    }
+        if (data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
+            draw_album_art(gwps, audio_current_aa_hid(), true);
 #endif
+    }
 
     return true;
 }

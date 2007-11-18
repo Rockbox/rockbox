@@ -66,9 +66,6 @@ struct gui_img{
     bool loaded;            /* load state */
     bool display;           /* is to be displayed */
     bool always_display;    /* not using the preload/display mechanism */
-
-    /* the index of the conditional the image is in */
-    unsigned short cond_index;
 };
 
 struct prog_img{ /*progressbar image*/

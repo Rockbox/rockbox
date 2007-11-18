@@ -426,6 +426,7 @@ static int parse_image_display(const char *wps_bufptr,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
+    (void)wps_data;
     int n = get_image_id(*wps_bufptr);
 
     if (n == -1)
@@ -435,10 +436,6 @@ static int parse_image_display(const char *wps_bufptr,
     }
 
     token->value.i = n;
-
-    /* if the image is in a conditional, remember it */
-    if (level >= 0)
-        wps_data->img[n].cond_index = condindex[level];
 
     return 1;
 }
