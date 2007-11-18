@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define HEADER_SIZE 20
+
 /* endian conversion macros */
 #define SWAP2(x) ((((unsigned)(x)>>8) & 0x00ff) | (((unsigned)(x)<<8) & 0xff00))
 #define SWAP4(x) ((((unsigned)(x)>>24) & 0x000000ff) |\
@@ -138,7 +140,7 @@ int main (int argc, char** argv)
         printf("Error opening output file %s\n", argv[4]);
         return -2;
     }
-    fseek(pFile, 16 + count*8, SEEK_SET); /* space for header */
+    fseek(pFile, HEADER_SIZE + count*8, SEEK_SET); /* space for header */
 
     for (i=0; i<count; i++)
     {
@@ -187,7 +189,7 @@ int main (int argc, char** argv)
     fwrite(&value, sizeof(value), 1, pFile);
 
     /* 3rd 32 bit value in the file is the header size (= 1st table position) */
-    value = SWAP4(20); /* 20 bytes: for version, target id, header size, number1, number2 */
+    value = SWAP4(HEADER_SIZE); /* version, target id, header size, number1, number2 */
     fwrite(&value, sizeof(value), 1, pFile);
 
     /* 4th 32 bit value in the file is the number of clips in 1st table   */
