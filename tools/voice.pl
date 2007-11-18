@@ -84,7 +84,7 @@ sub init_tts {
         case "sapi" {
             my $toolsdir = dirname($0);
             my $path = `cygpath $toolsdir -a -w`;
-            chomp($path);
+            chomp($path);                                    
             $path = $path . '\\';
             my $cmd = $path . "sapi_voice.vbs /language:$language $tts_engine_opts";
             $cmd =~ s/\\/\\\\/g;
@@ -98,7 +98,6 @@ sub init_tts {
             %ret = (%ret,
                     "stdin" => *CMD_IN,
                     "stdout" => *CMD_OUT,
-                    "toolspath" => $path,
                     "vendor" => $vendor);
         }
     }
@@ -247,12 +246,11 @@ sub wavtrim {
     our $verbose;
     my ($file, $threshold, $tts_object) = @_;
     printf("Trim \"%s\"\n", $file) if $verbose;
+    my $cmd = "wavtrim \"$file\" $threshold";
     if ($$tts_object{"name"} eq "sapi") {
-        my $cmd = $$tts_object{"toolspath"}."wavtrim $file $threshold";
         print({$$tts_object{"stdin"}} "EXEC\t$cmd\r\n");
     }
     else {
-        my $cmd = dirname($0) . "/wavtrim \"$file\" $threshold";
         print("> $cmd\n") if $verbose;
         `$cmd`;
     }
@@ -262,9 +260,8 @@ sub wavtrim {
 sub encodewav {
     our $verbose;
     my ($input, $output, $encoder, $encoder_opts, $tts_object) = @_;
-    my $cmd = '';
     printf("Encode \"%s\" with %s in file %s\n", $input, $encoder, $output) if $verbose;
-    $cmd = "$encoder $encoder_opts \"$input\" \"$output\"";
+    my $cmd = "$encoder $encoder_opts \"$input\" \"$output\"";
     if ($$tts_object{"name"} eq "sapi") {
         print({$$tts_object{"stdin"}} "EXEC\t$cmd\r\n");
     }
@@ -288,12 +285,11 @@ sub synchronize {
 sub generateclips {
     our $verbose;
     my ($language, $target, $encoder, $encoder_opts, $tts_engine, $tts_engine_opts) = @_;
-    my $genlang = dirname($0) . '/genlang';
     my $english = dirname($0) . '/../apps/lang/english.lang';
     my $langfile = dirname($0) . '/../apps/lang/' . $language . '.lang';
     my $id = '';
     my $voice = '';
-    my $cmd = "$genlang -o -t=$target -e=$english $langfile 2>/dev/null";
+    my $cmd = "genlang -o -t=$target -e=$english $langfile 2>/dev/null";
     my $pool_file;
     open(VOICEFONTIDS, "> voicefontids");
     my $i = 0;
@@ -366,14 +362,13 @@ sub generateclips {
 sub createvoice {
     our $verbose;
     my ($language, $target_id) = @_;
-    my $voicefont = dirname($0) . '/voicefont';
     my $outfile = "";
     my $i = 0;
     do {
         $outfile = sprintf("%s%s.voice", $language, ($i++ == 0 ? '' : '-'.$i));
     } while (-f $outfile);
     printf("Saving voice file to %s\n", $outfile) if $verbose;
-    my $cmd = "$voicefont 'voicefontids' $target_id ./ $outfile";
+    my $cmd = "voicefont 'voicefontids' $target_id ./ $outfile";
     print("> $cmd\n") if $verbose;
     my $output = `$cmd`;
     print($output) if $verbose;
@@ -457,6 +452,9 @@ if ($printusage == 1) { printusage(); exit 1; }
 if (defined($v) or defined($ENV{'V'})) {
     our $verbose = 1;
 }
+
+# add the tools dir to the path temporarily, for calling various tools
+$ENV{'PATH'} = dirname($0) . ':' . $ENV{'PATH'};
 
 
 # Do what we're told

@@ -452,7 +452,7 @@ voiceconfig () {
 
     if [ "$swcodec" = "yes" ]; then
         ENCODER="rbspeexenc"
-        ENC_CMD="$rootdir/tools/rbspeexenc"
+        ENC_CMD="rbspeexenc"
         ENC_OPTS="-q 4 -c 10"
     else
         if [ -f "`which lame`" ]; then
