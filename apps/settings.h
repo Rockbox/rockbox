@@ -288,20 +288,23 @@ struct user_settings
 {
     /* audio settings */
 
-    int volume;     /* audio output volume:  0-100 0=off   100=max           */
-    int balance;    /* stereo balance:       0-100 0=left  50=bal 100=right  */
-    int bass;       /* bass eq:              0-100 0=off   100=max           */
-    int treble;     /* treble eq:            0-100 0=low   100=high          */
-    int loudness;   /* loudness eq:          0-100 0=off   100=max           */
-    int avc;        /* auto volume correct:  0=off, 1=20ms, 2=2s 3=4s 4=8s   */
+    int volume;     /* audio output volume in decibels range depends on the dac */
+    int balance;    /* stereo balance:          0-100 0=left  50=bal 100=right  */
+    int bass;       /* bass boost/cut in decibels                               */
+    int treble;     /* treble boost/cut in decibels                             */
     int channel_config; /* Stereo, Mono, Custom, Mono left, Mono right, Karaoke */
     int stereo_width; /* 0-255% */
+
+#if CONFIG_CODEC != SWCODEC
+    int loudness;   /* loudness eq:          0-100 0=off   100=max           */
+    int avc;        /* auto volume correct:  0=off, 1=20ms, 2=2s 3=4s 4=8s   */
     int mdb_strength; /* 0-127dB */
     int mdb_harmonics; /* 0-100% */
     int mdb_center; /* 20-300Hz */
     int mdb_shape; /* 50-300Hz */
     bool mdb_enable; /* true/false */
     bool superbass; /* true/false */
+#endif
 
 #if CONFIG_CODEC == SWCODEC
     int crossfade;     /* Enable crossfade (0=off,1=shuffle,2=trackskip,3=shuff&trackskip,4=always) */
@@ -388,17 +391,23 @@ struct user_settings
     int cursor_style; /* style of the selection cursor */
     bool flip_display; /* turn display (and button layout) by 180 degrees */
     int poweroff;   /* power off timer */
+#ifdef HAVE_BACKLIGHT
     int backlight_timeout;  /* backlight off timeout:  0-18 0=never,
                                1=always,
                                then according to timeout_values[] */
     int backlight_timeout_plugged;
+#endif
 #ifdef HAVE_BACKLIGHT_PWM_FADING
     int backlight_fade_in;  /* backlight fade in timing: 0..3 */
     int backlight_fade_out; /* backlight fade in timing: 0..7 */
 #endif
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS 
+    int brightness;
+#endif
     int battery_capacity; /* in mAh */
+#if BATTERY_TYPES_COUNT > 1
     int battery_type;  /* for units which can take multiple types (Ondio). */
-
+#endif
 #ifdef HAVE_SPDIF_POWER
     bool spdif_enable; /* S/PDIF power on/off */
 #endif
@@ -445,8 +454,10 @@ struct user_settings
     /* show status bar */
     bool statusbar;    /* 0=hide, 1=show */
 
+#if CONFIG_KEYPAD == RECORDER_PAD
     /* show button bar */
     bool buttonbar;    /* 0=hide, 1=show */
+#endif
 
     /* show scroll bar */
     bool scrollbar;    /* 0=hide, 1=show */
@@ -495,7 +506,9 @@ struct user_settings
     bool show_icons;   /* 0=hide 1=show */
     int recursive_dir_insert; /* should directories be inserted recursively */
 
-    bool   line_in;       /* false=off, true=active */
+#if CONFIG_CODEC == MAS3507D
+    bool line_in;       /* false=off, true=active */
+#endif
 
     /* playlist viewer settings */
     bool playlist_viewer_icons; /* display icons on viewer */
@@ -565,10 +578,6 @@ struct user_settings
     int default_codepage;   /* set default codepage for tag conversion */
 #ifdef HAVE_REMOTE_LCD
     unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */
-#endif
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS 
-    int brightness;         /* iriver h300: backlight PWM value: 2..15
-                                (0 and 1 are black) */
 #endif
 
 #if CONFIG_CODEC == SWCODEC
