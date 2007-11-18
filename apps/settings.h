@@ -394,7 +394,9 @@ struct user_settings
     int backlight_timeout;  /* backlight off timeout:  0-18 0=never,
                                1=always,
                                then according to timeout_values[] */
+#if CONFIG_CHARGING
     int backlight_timeout_plugged;
+#endif
 
 #ifdef HAVE_BACKLIGHT_PWM_FADING
     int backlight_fade_in;  /* backlight fade in timing: 0..3 */
