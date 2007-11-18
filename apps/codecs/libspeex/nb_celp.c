@@ -1032,6 +1032,7 @@ const spx_word16_t attenuation[10] = {1., 0.961, 0.852, 0.698, 0.527, 0.368, 0.2
 
 #endif
 
+#ifndef ROCKBOX_VOICE_CODEC
 static void nb_decode_lost(DecState *st, spx_word16_t *out, char *stack)
 {
    int i;
@@ -1093,6 +1094,7 @@ static void nb_decode_lost(DecState *st, spx_word16_t *out, char *stack)
    if (st->pitch_gain_buf_idx > 2) /* rollover */
       st->pitch_gain_buf_idx = 0;
 }
+#endif
 
 /* Just so we don't need to carry the complete wideband mode information */
 static const int wb_skip_table[8] = {0, 36, 112, 192, 352, 0, 0, 0};
@@ -1130,11 +1132,13 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    } else 
    {
       /* If bits is NULL, consider the packet to be lost (what could we do anyway) */
+#ifndef ROCKBOX_VOICE_CODEC
       if (!bits)
       {
          nb_decode_lost(st, out, stack);
          return 0;
       }
+#endif
 
       if (st->encode_submode)
       {

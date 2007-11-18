@@ -844,6 +844,7 @@ void sb_decoder_destroy(void *state)
 */
 }
 
+#ifndef ROCKBOX_VOICE_CODEC
 static void sb_decode_lost(SBDecState *st, spx_word16_t *out, int dtx, char *stack)
 {
    int i;
@@ -881,6 +882,7 @@ static void sb_decode_lost(SBDecState *st, spx_word16_t *out, int dtx, char *sta
 
    return;
 }
+#endif
 
 int sb_decode(void *state, SpeexBits *bits, void *vout)
 {
@@ -917,11 +919,13 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
       return ret;
    }
 
+#ifndef ROCKBOX_VOICE_CODEC
    if (!bits)
    {
       sb_decode_lost(st, out, dtx, stack);
       return 0;
    }
+#endif
 
    if (st->encode_submode)
    {
@@ -951,11 +955,13 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
    /* If null mode (no transmission), just set a couple things to zero*/
    if (st->submodes[st->submodeID] == NULL)
    {
+#ifndef ROCKBOX_VOICE_CODEC
       if (dtx)
       {
          sb_decode_lost(st, out, 1, stack);
          return 0;
       }
+#endif
 
       for (i=0;i<st->frame_size;i++)
          out[st->frame_size+i]=VERY_SMALL;
