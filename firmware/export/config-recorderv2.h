@@ -109,3 +109,9 @@
 #define BOOTDIR "/"
 
 #endif /* SIMULATOR */
+
+#define HAVE_LCD_CONTRAST
+
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        63
+

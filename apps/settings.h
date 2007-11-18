@@ -119,27 +119,6 @@ extern const struct opt_items trig_durations[TRIG_DURATION_COUNT];
 #define FOLDER_ADVANCE_NEXT 1
 #define FOLDER_ADVANCE_RANDOM 2
 
-/* system defines */
-#ifndef TARGET_TREE
-
-#ifndef HAVE_LCD_COLOR
-#define DEFAULT_CONTRAST_SETTING    40
-#endif
-
-#if defined HAVE_LCD_CHARCELLS
-#define MIN_CONTRAST_SETTING        5
-#define MAX_CONTRAST_SETTING        31
-#else
-#define MIN_CONTRAST_SETTING        5
-#define MAX_CONTRAST_SETTING        63
-#endif
-
-#endif /* !TARGET_TREE */
-
-#if !defined(HAVE_LCD_COLOR)
-#define HAVE_LCD_CONTRAST
-#endif
-
 /* repeat mode options */
 enum
 {
