@@ -70,6 +70,7 @@ struct bookmark_list
     int total_count;
     bool show_dont_resume;
     bool reload;
+    bool show_playlist_name;
     char* items[];
 };
 
@@ -507,6 +508,22 @@ static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
     return bookmarks->start + bookmarks->count;
 }
 
+static char* strrsplt(char* str, int c)
+{
+    char* s = strrchr(str, c);
+
+    if (s != NULL)
+    {
+        *s++ = '\0';
+    }
+    else
+    {
+        s = str;
+    }
+    
+    return s;
+}
+
 static char* get_bookmark_info(int list_index, void* data, char *buffer)
 {
     struct bookmark_list* bookmarks = (struct bookmark_list*) data;
@@ -568,22 +585,49 @@ static char* get_bookmark_info(int list_index, void* data, char *buffer)
     }
     
     if (!parse_bookmark(bookmarks->items[index - bookmarks->start],
-        &resume_index, NULL, NULL, NULL, NULL, 0, &resume_time, NULL, 
-        &shuffle, global_filename))
+        &resume_index, NULL, NULL, NULL, global_temp_buffer, 
+        sizeof(global_temp_buffer), &resume_time, NULL, &shuffle, 
+        global_filename))
     {
         return list_index % 2 == 0 ? (char*) str(LANG_BOOKMARK_INVALID) : " ";
     }
 
     if (list_index % 2 == 0)
     {
-        char* dot = strrchr(global_filename, '.');
-
-        if (dot)
+        char *name;
+        char *format;
+        int len = strlen(global_temp_buffer);
+        
+        if (bookmarks->show_playlist_name && len > 0)
         {
-            *dot = '\0';
-        }
+            name = global_temp_buffer;
+            len--;
+            
+            if (name[len] != '/')
+            {
+                strrsplt(name, '.');
+            }
+            else if (len > 1)
+            {
+                name[len] = '\0';
+            }
 
-        return global_filename;
+            if (len > 1)
+            {
+                name = strrsplt(name, '/');
+            }
+
+            format = "%s : %s";
+        }
+        else
+        {
+            name = global_filename;
+            format = "%s";
+        }
+        
+        strrsplt(global_filename, '.');
+        snprintf(buffer, MAX_PATH, format, name, global_filename);
+        return buffer;
     }
     else
     {
@@ -616,6 +660,8 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
     bookmarks->show_dont_resume = show_dont_resume;
     bookmarks->filename = bookmark_file_name;
     bookmarks->start = 0;
+    bookmarks->show_playlist_name
+        = strcmp(bookmark_file_name, RECENT_BOOKMARK_FILE) == 0;
     gui_synclist_init(&list, &get_bookmark_info, (void*) bookmarks, false, 2);
     gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK), 
         Icon_Bookmark);
@@ -791,11 +837,10 @@ static void say_bookmark(const char* bookmark,
 {
     int resume_index;
     long ms;
-    char dir[MAX_PATH];
     bool enqueue = false; /* only the first voice is not queued */
 
     if (!parse_bookmark(bookmark, &resume_index, NULL, NULL, NULL, 
-        dir, sizeof(dir), &ms, NULL, NULL, NULL))
+        global_temp_buffer, sizeof(global_temp_buffer), &ms, NULL, NULL, NULL))
     {
         talk_id(LANG_BOOKMARK_INVALID, true);
         return;
@@ -805,11 +850,12 @@ static void say_bookmark(const char* bookmark,
 #if 0 
     if (global_settings.talk_dir >= 3)
     {   /* "talkbox" enabled */
-        char* last = strrchr(dir, '/');
+        char* last = strrchr(global_temp_buffer, '/');
         if (last)
         {   /* compose filename for talkbox */
-            strncpy(last + 1, dir_thumbnail_name, sizeof(dir)-(last-dir)-1);
-            talk_file(dir, enqueue);
+            strncpy(last + 1, dir_thumbnail_name, 
+                sizeof(global_temp_buffer) - (last - global_temp_buffer) - 1);
+            talk_file(global_temp_buffer, enqueue);
             enqueue = true;
         }
     }
