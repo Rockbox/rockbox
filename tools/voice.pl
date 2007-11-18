@@ -264,17 +264,7 @@ sub encodewav {
     my ($input, $output, $encoder, $encoder_opts, $tts_object) = @_;
     my $cmd = '';
     printf("Encode \"%s\" with %s in file %s\n", $input, $encoder, $output) if $verbose;
-    switch ($encoder) {
-        case 'lame' {
-            $cmd = "lame $encoder_opts \"$input\" \"$output\"";
-        }
-        case 'vorbis' {
-            $cmd = "oggenc $encoder_opts \"$input\" -o \"$output\"";
-        }
-        case 'speexenc' {
-            $cmd = "speexenc $encoder_opts \"$input\" \"$output\"";
-        }
-    }
+    $cmd = "$encoder $encoder_opts \"$input\" \"$output\"";
     if ($$tts_object{"name"} eq "sapi") {
         print({$$tts_object{"stdin"}} "EXEC\t$cmd\r\n");
     }
@@ -484,7 +474,7 @@ if ($V == 1) {
 elsif ($C) {
     printf("Generating .talk clips\n  Path: %s\n  Language: %s\n  Encoder (options): %s (%s)\n  TTS Engine (options): %s (%s)\n", $ARGV[0], $l, $e, $E, $s, $S);
     my $tts_object = init_tts($s, $S, $l);
-    gentalkclips($ARGV[0], $tts_object, $e, $E, 0);
+    gentalkclips($ARGV[0], $tts_object, $e, $E, $S, 0);
     shutdown_tts($tts_object);
 }
 else {

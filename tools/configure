@@ -450,54 +450,22 @@ voiceconfig () {
 
     echo ""
 
-    if [ -f "`which oggenc`" ]; then
-        OGGENC="(O)ggenc "
-        DEFAULT_ENC="oggenc"
-        VORBIS_OPTS="-q0 --downmix"
-        DEFAULT_ENC_OPTS=$VORBIS_OPTS
-        DEFAULT_CHOICE="O"
+    if [ "$swcodec" = "yes" ]; then
+        ENCODER="rbspeexenc"
+        ENC_CMD="$rootdir/tools/rbspeexenc"
+        ENC_OPTS="-q 4 -c 10"
+    else
+        if [ -f "`which lame`" ]; then
+            ENCODER="lame"
+            ENC_CMD="lame"
+            ENC_OPTS="--resample 12 -t -m m -h -V 9 -S -B 64 --vbr-new"
+         else
+            echo "You need LAME in the system path to build voice files for"
+            echo "HWCODEC targets."
+            exit
+         fi
     fi
-    if [ -f "`which speexenc`" ]; then
-        SPEEXENC="(S)peexenc "
-        DEFAULT_ENC="speexenc"
-        SPEEX_OPTS="" # TODO: find appropriate options for speex
-        DEFAULT_ENC_OPTS=$SPEEX_OPTS
-        DEFAULT_CHOICE="S"
-    fi
-    if [ -f "`which lame`" ]; then
-        LAME="(L)ame "
-        DEFAULT_ENC="lame"
-        LAME_OPTS="--resample 12 -t -m m -h -V 9 -S -B 64 --vbr-new"
-        DEFAULT_ENC_OPTS=$LAME_OPTS
-        DEFAULT_CHOICE="L"
-    fi
-
-    if [ "$LAME" = "" ]; then
-        echo "You currently need to have Lame installed to build voice files"
-    fi
-
-#    echo "Encoder to use: ${LAME}${OGGENC}${SPEEXENC}(${DEFAULT_CHOICE})?"
-#    echo ""
-#    echo "Note: Use Lame - the other options won't work"
-#    option=`input`
-    option="l"
-    case "$option" in
-        [Oo])
-        ENCODER="oggenc"
-        ENC_OPTS=$VORBIS_OPTS
-        ;;
-        [Ss])
-        ENCODER="speexenc"
-        ENC_OPTS=$SPEEX_OPTS
-        ;;
-        [Ll])
-        ENCODER="lame"
-        ENC_OPTS=$LAME_OPTS
-        ;;
-        *)
-        ENCODER=$DEFAULT_ENC
-        ENC_OPTS=$DEFAULT_ENC_OPTS
-    esac
+ 
     echo "Using $ENCODER for encoding voice clips"
 
     # Allow the user to input manual commandline options
@@ -1859,7 +1827,7 @@ sed > Makefile \
  -e "${simmagic1}" \
  -e "${simmagic2}" \
  -e "s,@MANUALDEV@,${manualdev},g" \
- -e "s,@ENCODER@,${ENCODER},g" \
+ -e "s,@ENCODER@,${ENC_CMD},g" \
  -e "s,@ENC_OPTS@,${ENC_OPTS},g" \
  -e "s,@TTS_ENGINE@,${TTS_ENGINE},g" \
  -e "s,@TTS_OPTS@,${TTS_OPTS},g" \
@@ -2073,7 +2041,7 @@ if [ "yes" = "$voice" ]; then
 
 voice: voicetools features
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/${apps}/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
-	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/voice.pl -V -l=\$\$lang -t=\$(ARCHOS)\$\$feat -i=\$(TARGET_ID) -e=\$(ENCODER) -E="\$(ENC_OPTS)" -s=\$(TTS_ENGINE) -S="\$(TTS_OPTS)"; done \\
+	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/voice.pl -V -l=\$\$lang -t=\$(ARCHOS)\$\$feat -i=\$(TARGET_ID) -e="\$(ENCODER)" -E="\$(ENC_OPTS)" -s=\$(TTS_ENGINE) -S="\$(TTS_OPTS)"; done \\
 EOF
 
 fi
