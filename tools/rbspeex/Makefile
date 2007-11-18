@@ -51,7 +51,7 @@ $(DEPFILE): $(SOURCES)
 
 libspeex.a: $(OBJS) $(DEPFILE)
 	@echo AR libspeex.a
-	$(SILENT)$(AR) ruv $@ $+ > /dev/null 2>&1
+	$(SILENT)ar ruv $@ $+ > /dev/null 2>&1
 
 ../rbspeexenc: $(OBJS) libspeex.a rbspeexenc.o
 	@echo Linking ../rbspeexenc
