@@ -172,15 +172,6 @@ void lcd_init_device(void)
 #endif
     lcd_set_flip(false);
     lcd_cmd_and_data(R_ENTRY_MODE, 0x0000);
-
-#ifdef IPOD_4G
-    GPIOB_ENABLE |= 0x4; /* B02 enable */
-    GPIOB_ENABLE |= 0x8; /* B03 enable */
-    GPO32_ENABLE |= 0x2000000; /* D01 enable */
-    GPO32_VAL |= 0x2000000;  /* D01 =1 */
-
-    DEV_EN |= 0x20000;   /* PWM enable */
-#endif
 }
 
 /*** hardware configuration ***/

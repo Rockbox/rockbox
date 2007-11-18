@@ -42,7 +42,13 @@ void _backlight_hw_enable(bool on);
 #define _BACKLIGHT_FADE_ENABLE
 #endif /* !BOOTLOADER */
 
-#elif defined HAVE_BACKLIGHT_PWM_FADING
+#elif defined(IPOD_4G) || defined(IPOD_COLOR)
+
+bool _backlight_init(void);
+void _backlight_on(void);
+void _backlight_off(void);
+
+#elif defined HAVE_BACKLIGHT_PWM_FADING  /* Mini G1, G2 */
 
 #define _backlight_init() true
 void _backlight_hw_on(void);
@@ -58,7 +64,7 @@ void _backlight_hw_off(void);
 #define _backlight_off_normal() _backlight_hw_off()
 #endif
 
-#else
+#else /* G1, G2, G3 */
 
 #define _backlight_init() true
 void _backlight_on(void);

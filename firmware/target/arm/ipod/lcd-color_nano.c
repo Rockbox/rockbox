@@ -102,14 +102,6 @@ void lcd_init_device(void)
             lcd_type = 1;
         }
     }
-
-    GPIOB_ENABLE |= 0x4; /* B02 enable */
-    GPIOB_ENABLE |= 0x8; /* B03 enable */
-    GPO32_ENABLE |= 0x2000000; /* D01 enable */
-    GPO32_VAL |= 0x2000000;  /* D01 =1 */
-
-    DEV_EN |= 0x20000;   /* PWM enable */
-
 #elif CONFIG_LCD == LCD_IPODNANO
     /* iPodLinux doesn't appear have any LCD init code for the Nano */
 #endif

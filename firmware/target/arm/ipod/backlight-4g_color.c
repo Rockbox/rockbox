@@ -42,7 +42,19 @@ void _backlight_on(void)
 
 void _backlight_off(void)
 {
-   /* fades backlight off on 4g */
-   GPO32_ENABLE &= ~0x2000000;
-   outl(0x80000000, 0x7000a010);
+    /* fades backlight off on 4g */
+    GPO32_ENABLE &= ~0x2000000;
+    outl(0x80000000, 0x7000a010);
+}
+
+bool _backlight_init(void)
+{
+    GPIOB_ENABLE |= 0x4; /* B02 enable */
+    GPIOB_ENABLE |= 0x8; /* B03 enable */
+    GPO32_ENABLE |= 0x2000000; /* D01 enable */
+    GPO32_VAL |= 0x2000000;  /* D01 =1 */
+    DEV_EN |= 0x20000;   /* PWM enable */
+
+    _backlight_on();
+    return true;
 }
