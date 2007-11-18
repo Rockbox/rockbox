@@ -84,7 +84,7 @@ struct voice_info
 {
     pcm_more_callback_type get_more; /* Callback to get more clips */
     unsigned char *start;            /* Start of clip */
-    ssize_t size;                    /* Size of clip */
+    size_t size;                     /* Size of clip */
 };
 
 /* Private thread data for its current state that must be passed to its
@@ -116,7 +116,7 @@ void mp3_play_data(const unsigned char* start, int size,
      * safely cached it in its own private data */
     static struct voice_info voice_clip NOCACHEBSS_ATTR;
 
-    if (get_more != NULL && start != NULL && size > 0)
+    if (get_more != NULL && start != NULL && (ssize_t)size > 0)
     {
         mutex_lock(&voice_mutex);
 
@@ -322,7 +322,7 @@ static void voice_thread(void)
             if (td.vi.get_more != NULL)
                 td.vi.get_more(&td.vi.start, &td.vi.size);
 
-            if (td.vi.start != NULL && td.vi.size > 0)
+            if (td.vi.start != NULL && (ssize_t)td.vi.size > 0)
             {
                 /* Make bit buffer use our own buffer */
                 speex_bits_set_bit_buffer(&td.bits, td.vi.start, td.vi.size);
