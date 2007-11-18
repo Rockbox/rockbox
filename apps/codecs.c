@@ -67,8 +67,6 @@ extern unsigned char codecbuf[];
 
 extern void* plugin_get_audio_buffer(size_t *buffer_size);
 
-struct codec_api ci_voice;
-
 struct codec_api ci = {
 
     0, /* filesize */
@@ -163,6 +161,8 @@ struct codec_api ci = {
     flush_icache,
     invalidate_icache,
 #endif
+
+    NULL, /* struct sp_data *dsp */
 };
 
 void codec_get_full_path(char *path, const char *codec_root_fn)

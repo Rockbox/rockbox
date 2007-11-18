@@ -34,8 +34,14 @@ enum
 
 enum
 {
+    CODEC_IDX_AUDIO = 0,
+    CODEC_IDX_VOICE,
+};
+
+enum
+{
     CODEC_SET_FILEBUF_WATERMARK = 1,
-    DSP_SWITCH_CODEC,
+    DSP_MYDSP,
     DSP_SET_FREQUENCY,
     DSP_SWITCH_FREQUENCY,
     DSP_SET_SAMPLE_DEPTH,
@@ -201,23 +207,25 @@ enum {
 
 #define DIV64(x, y, z) (long)(((long long)(x) << (z))/(y))
 
-int dsp_process(char *dest, const char *src[], int count);
-int dsp_input_count(int count);
-int dsp_output_count(int count);
-int dsp_stereo_mode(void);
-bool dsp_configure(int setting, intptr_t value);
+struct dsp_config;
+
+int dsp_process(struct dsp_config *dsp, char *dest,
+                const char *src[], int count);
+int dsp_input_count(struct dsp_config *dsp, int count);
+int dsp_output_count(struct dsp_config *dsp, int count);
+intptr_t dsp_configure(struct dsp_config *dsp, int setting,
+                       intptr_t value);
 void dsp_set_replaygain(void);
 void dsp_set_crossfeed(bool enable);
 void dsp_set_crossfeed_direct_gain(int gain);
-void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff);
+void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain,
+                                    long cutoff);
 void dsp_set_eq(bool enable);
 void dsp_set_eq_precut(int precut);
 void dsp_set_eq_coefs(int band);
 void sound_set_pitch(int r);
 int sound_get_pitch(void);
 int dsp_callback(int msg, intptr_t param);
-void dsp_set_channel_config(int value);
-void dsp_set_stereo_width(int value);
 void dsp_dither_enable(bool enable);
 
 #endif

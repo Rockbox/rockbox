@@ -178,7 +178,7 @@ int main (int argc, char** argv)
     /* Create the file format: */
 
     /* 1st 32 bit value in the file is the version number    */
-    value = SWAP4(300); /* 3.00 */
+    value = SWAP4(400); /* 4.00 */
     fwrite(&value, sizeof(value), 1, pFile);
 
     /* 2nd 32 bit value in the file is the id number for the target

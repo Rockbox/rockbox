@@ -32,7 +32,7 @@
 
 #include "config-speex.h"
 
-const signed char exc_10_32_table[320] ICONST_ATTR = {
+const signed char exc_10_32_table[320] EXC_ICONST_ATTR = {
 7,17,17,27,25,22,12,4,-3,0,
 28,-36,39,-24,-15,3,-9,15,-5,10,
 31,-28,11,31,-21,9,-11,-11,-2,-7,

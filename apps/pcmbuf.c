@@ -34,6 +34,7 @@
 #include "buffer.h"
 #include "settings.h"
 #include "audio.h"
+#include "voice_thread.h"
 #include "dsp.h"
 #include "thread.h"
 
@@ -251,15 +252,21 @@ static inline void pcmbuf_add_chunk(void)
 #ifdef HAVE_PRIORITY_SCHEDULING
 static void boost_codec_thread(bool boost)
 {
+    /* Keep voice and codec threads at the same priority or else voice
+     * will starve if the codec thread's priority is boosted. */
     if (boost)
     {
         if (codec_thread_priority == 0)
+        {
             codec_thread_priority = thread_set_priority(
                 codec_thread_p, PRIORITY_REALTIME);
+            voice_thread_set_priority(PRIORITY_REALTIME);
+        }
     }
     else if (codec_thread_priority != 0)
     {
         thread_set_priority(codec_thread_p, codec_thread_priority);
+        voice_thread_set_priority(codec_thread_priority);
         codec_thread_priority = 0;
     }
 }
@@ -717,6 +724,7 @@ static size_t crossfade_mix(const char *buf, size_t length)
             crossfade_chunk = crossfade_chunk->link;
             if (!crossfade_chunk)
                 return length;
+
             output_buf = (int16_t *)crossfade_chunk->addr;
             chunk_end = SKIPBYTES(output_buf, crossfade_chunk->size);
         }
@@ -875,15 +883,18 @@ void* pcmbuf_request_buffer(int *count)
     }
 }
 
-void* pcmbuf_request_voice_buffer(int *count, bool mix)
+void * pcmbuf_request_voice_buffer(int *count)
 {
-    if (mix)
+    /* A get-it-to-work-for-now hack (audio status could change by
+       completion) */
+    if (audio_status() & AUDIO_STATUS_PLAY)
     {
-        if (pcmbuf_read ==  NULL)
+        if (pcmbuf_read == NULL)
         {
             return NULL;
         }
-        else if (pcmbuf_mix_chunk || pcmbuf_read->link)
+        else if (pcmbuf_usage() >= 10 && pcmbuf_mix_free() >= 30 &&
+                 (pcmbuf_mix_chunk || pcmbuf_read->link))
         {
             *count = MIN(*count, PCMBUF_MIX_CHUNK/4);
             return voicebuf;
@@ -894,7 +905,9 @@ void* pcmbuf_request_voice_buffer(int *count, bool mix)
         }
     }
     else
+    {
         return pcmbuf_request_buffer(count);
+    }
 }
 
 bool pcmbuf_is_crossfade_active(void)
@@ -1030,8 +1043,15 @@ int pcmbuf_mix_free(void)
     return 100;
 }
 
-void pcmbuf_mix_voice(int count)
+void pcmbuf_write_voice_complete(int count)
 {
+    /* A get-it-to-work-for-now hack (audio status could have changed) */
+    if (!(audio_status() & AUDIO_STATUS_PLAY))
+    {
+        pcmbuf_write_complete(count);
+        return;
+    }
+
     int16_t *ibuf = (int16_t *)voicebuf;
     int16_t *obuf;
     size_t chunk_samples;
@@ -1042,6 +1062,7 @@ void pcmbuf_mix_voice(int count)
         /* Start 1/8s into the next chunk */
         pcmbuf_mix_sample = NATIVE_FREQUENCY * 4 / 16;
     }
+
     if (!pcmbuf_mix_chunk)
         return;
 
@@ -1053,6 +1074,7 @@ void pcmbuf_mix_voice(int count)
     while (count-- > 0)
     {
         int32_t sample = *ibuf++;
+
         if (pcmbuf_mix_sample >= chunk_samples)
         {
             pcmbuf_mix_chunk = pcmbuf_mix_chunk->link;

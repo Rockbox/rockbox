@@ -109,10 +109,16 @@ void audio_beep(int duration);
 void audio_init_playback(void);
 /* Required call when audio buffer is require for some other purpose */
 unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size);
-#ifdef IRAM_STEAL
-/* Required call when codec IRAM is needed for some other purpose */
-void audio_iram_steal(void);
-#endif
+/* Stops audio from serving playback */
+void audio_hard_stop(void);
+/* Retores the audio buffer to handle the requested playback */
+enum
+{
+    AUDIO_WANT_PLAYBACK = 0,
+    AUDIO_WANT_VOICE,
+};
+
+bool audio_restore_playback(int type);
 
 /* channel modes */
 enum rec_channel_modes

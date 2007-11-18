@@ -162,6 +162,10 @@ struct dsp_config
     int  sample_bytes;
     int  stereo_mode;
     int  frac_bits;
+#ifdef HAVE_SW_TONE_CONTROLS
+    /* Filter struct for software bass/treble controls */
+    struct eqfilter tone_filter;
+#endif
     /* Functions that change depending upon settings - NULL if stage is
        disabled */
     sample_input_fn_type         input_samples;
@@ -171,6 +175,7 @@ struct dsp_config
        way */
     channels_process_dsp_fn_type apply_gain;
     channels_process_fn_type     apply_crossfeed;
+    channels_process_fn_type     eq_process;
     channels_process_fn_type     channels_process;
 };
 
@@ -187,13 +192,13 @@ struct crossfeed_data crossfeed_data IDATA_ATTR =    /* A */
 };
 
 /* Equalizer */
-static struct eq_state eq_data;                     /* A/V */
+static struct eq_state eq_data;                     /* A */
+
+/* Software tone controls */
 #ifdef HAVE_SW_TONE_CONTROLS
-static int prescale;
-static int bass;
-static int treble;
-/* Filter struct for software bass/treble controls */
-static struct eqfilter tone_filter;
+static int prescale;                                /* A/V */
+static int bass;                                    /* A/V */
+static int treble;                                  /* A/V */
 #endif
 
 /* Settings applicable to audio codec only */
@@ -202,7 +207,6 @@ static int  channels_mode;
        long dsp_sw_gain;
        long dsp_sw_cross;
 static bool dither_enabled;
-static bool eq_enabled IBSS_ATTR;
 static long eq_precut;
 static long track_gain;
 static bool new_gain;
@@ -212,9 +216,8 @@ static long album_peak;
 static long replaygain;
 static bool crossfeed_enabled;
 
-#define audio_dsp (&dsp_conf[CODEC_IDX_AUDIO])
-#define voice_dsp (&dsp_conf[CODEC_IDX_VOICE])
-static struct dsp_config *dsp IDATA_ATTR = audio_dsp;
+#define audio_dsp (dsp_conf[CODEC_IDX_AUDIO])
+#define voice_dsp (dsp_conf[CODEC_IDX_VOICE])
 
 /* The internal format is 32-bit samples, non-interleaved, stereo. This
  * format is similar to the raw output from several codecs, so the amount
@@ -223,14 +226,6 @@ static struct dsp_config *dsp IDATA_ATTR = audio_dsp;
 
 int32_t sample_buf[SAMPLE_BUF_COUNT] IBSS_ATTR;
 static int32_t resample_buf[RESAMPLE_BUF_COUNT] IBSS_ATTR;
-
-/* set a new dsp and return old one */
-static inline struct dsp_config * switch_dsp(struct dsp_config *_dsp)
-{
-    struct dsp_config * old_dsp = dsp;
-    dsp = _dsp;
-    return old_dsp;
-}
 
 #if 0
 /* Clip sample to arbitrary limits where range > 0 and min + range = max */
@@ -263,8 +258,8 @@ int sound_get_pitch(void)
 void sound_set_pitch(int permille)
 {
     pitch_ratio = permille;
-    
-    dsp_configure(DSP_SWITCH_FREQUENCY, dsp->codec_frequency);
+    dsp_configure(&audio_dsp, DSP_SWITCH_FREQUENCY,
+                  audio_dsp.codec_frequency);
 }
 
 /* Convert count samples to the internal format, if needed.  Updates src
@@ -386,7 +381,7 @@ static void sample_input_gt_native_ni_stereo(
  *  * dsp->stereo_mode (A/V)
  *  * dsp->sample_depth (A/V)
  */
-static void sample_input_new_format(void)
+static void sample_input_new_format(struct dsp_config *dsp)
 {
     static const sample_input_fn_type sample_input_functions[] =
     {
@@ -462,7 +457,7 @@ static void sample_output_dithered(int count, struct dsp_data *data,
     int ch;
     int16_t *d;
 
-    for (ch = 0; ch < dsp->data.num_channels; ch++)
+    for (ch = 0; ch < data->num_channels; ch++)
     {
         struct dither_data * const dither = &dither_data[ch];
         int32_t *s = src[ch];
@@ -505,7 +500,7 @@ static void sample_output_dithered(int count, struct dsp_data *data,
         }
     }
 
-    if (dsp->data.num_channels == 2)
+    if (data->num_channels == 2)
         return;
 
     /* Have to duplicate left samples into the right channel since
@@ -530,7 +525,7 @@ static void sample_output_dithered(int count, struct dsp_data *data,
  *  * dsp->stereo_mode (A/V)
  *  * dither_enabled (A)
  */
-static void sample_output_new_format(void)
+static void sample_output_new_format(struct dsp_config *dsp)
 {
     static const sample_output_fn_type sample_output_functions[] =
     {
@@ -542,7 +537,7 @@ static void sample_output_new_format(void)
 
     int out = dsp->data.num_channels - 1;
 
-    if (dsp == audio_dsp && dither_enabled)
+    if (dsp == &audio_dsp && dither_enabled)
         out += 2;
 
     dsp->output_samples = sample_output_functions[out];
@@ -638,7 +633,7 @@ static int dsp_upsample(int count, struct dsp_data *data,
 }
 #endif /* DSP_HAVE_ASM_RESAMPLING */
 
-static void resampler_new_delta(void)
+static void resampler_new_delta(struct dsp_config *dsp)
 {
     dsp->data.resample_data.delta = (unsigned long) 
         dsp->frequency * 65536LL / NATIVE_FREQUENCY;
@@ -663,7 +658,7 @@ static void resampler_new_delta(void)
  * done, to refer to the resampled data. Returns number of stereo samples
  * for further processing.
  */
-static inline int resample(int count, int32_t *src[])
+static inline int resample(struct dsp_config *dsp, int count, int32_t *src[])
 {
     int32_t *dst[2] =
     {
@@ -679,12 +674,8 @@ static inline int resample(int count, int32_t *src[])
     return count;
 }
 
-static void dither_init(void)
+static void dither_init(struct dsp_config *dsp)
 {
-    /* Voice codec should not reset the audio codec's dither data */
-    if (dsp != audio_dsp)
-        return;
-
     memset(dither_data, 0, sizeof (dither_data));
     dither_bias = (1L << (dsp->frac_bits - NATIVE_DEPTH));
     dither_mask = (1L << (dsp->frac_bits + 1 - NATIVE_DEPTH)) - 1;
@@ -692,11 +683,9 @@ static void dither_init(void)
 
 void dsp_dither_enable(bool enable)
 {
-    /* Be sure audio dsp is current to set correct function */
-    struct dsp_config *old_dsp = switch_dsp(audio_dsp);
+    struct dsp_config *dsp = &audio_dsp;
     dither_enabled = enable;
-    sample_output_new_format();
-    switch_dsp(old_dsp);    
+    sample_output_new_format(dsp);
 }
 
 /* Applies crossfeed to the stereo signal in src.
@@ -762,9 +751,8 @@ static void apply_crossfeed(int count, int32_t *buf[])
 void dsp_set_crossfeed(bool enable)
 {
     crossfeed_enabled = enable;
-    audio_dsp->apply_crossfeed =
-        (enable && audio_dsp->data.num_channels > 1)
-            ? apply_crossfeed : NULL;
+    audio_dsp.apply_crossfeed = (enable && audio_dsp.data.num_channels > 1)
+                                    ? apply_crossfeed : NULL;
 }
 
 void dsp_set_crossfeed_direct_gain(int gain)
@@ -830,12 +818,12 @@ static void set_gain(struct dsp_config *dsp)
     dsp->data.gain = DEFAULT_GAIN;
 
     /* Replay gain not relevant to voice */
-    if (dsp == audio_dsp && replaygain)
+    if (dsp == &audio_dsp && replaygain)
     {
         dsp->data.gain = replaygain;
     }
     
-    if (eq_enabled && eq_precut)
+    if (dsp->eq_process && eq_precut)
     {
         dsp->data.gain =
             (long) (((int64_t) dsp->data.gain * eq_precut) >> 24);
@@ -854,16 +842,6 @@ static void set_gain(struct dsp_config *dsp)
 }
 
 /**
- * Use to enable the equalizer.
- *
- * @param enable true to enable the equalizer
- */
-void dsp_set_eq(bool enable)
-{
-    eq_enabled = enable;
-}
-
-/**
  * Update the amount to cut the audio before applying the equalizer.
  *
  * @param precut to apply in decibels (multiplied by 10)
@@ -871,8 +849,7 @@ void dsp_set_eq(bool enable)
 void dsp_set_eq_precut(int precut)
 {
     eq_precut = get_replaygain_int(precut * -10);
-    set_gain(audio_dsp);
-    set_gain(voice_dsp); /* For EQ precut */
+    set_gain(&audio_dsp);
 }
 
 /**
@@ -929,7 +906,7 @@ static void eq_process(int count, int32_t *buf[])
         EQ_PEAK_SHIFT,   /* peaking    */
         EQ_SHELF_SHIFT,  /* high shelf */
     };
-    unsigned int channels = dsp->data.num_channels;
+    unsigned int channels = audio_dsp.data.num_channels;
     int i;
 
     /* filter configuration currently is 1 low shelf filter, 3 band peaking
@@ -942,6 +919,17 @@ static void eq_process(int count, int32_t *buf[])
             continue;
         eq_filter(buf, &eq_data.filters[i], count, channels, shifts[i]);
     }
+}
+
+/**
+ * Use to enable the equalizer.
+ *
+ * @param enable true to enable the equalizer
+ */
+void dsp_set_eq(bool enable)
+{
+    audio_dsp.eq_process = enable ? eq_process : NULL;
+    set_gain(&audio_dsp);
 }
 
 void dsp_set_stereo_width(int value)
@@ -965,50 +953,6 @@ void dsp_set_stereo_width(int value)
     dsp_sw_gain  = straight << 8;
     dsp_sw_cross = cross << 8;
 }
-
-#if CONFIG_CODEC == SWCODEC
-
-#ifdef HAVE_SW_TONE_CONTROLS
-static void set_tone_controls(void)
-{
-    filter_bishelf_coefs(0xffffffff/NATIVE_FREQUENCY*200,
-                         0xffffffff/NATIVE_FREQUENCY*3500,
-                         bass, treble, -prescale, tone_filter.coefs);
-}
-#endif
-
-/* Hook back from firmware/ part of audio, which can't/shouldn't call apps/
- * code directly.
- */
-int dsp_callback(int msg, intptr_t param)
-{
-    switch (msg) {
-#ifdef HAVE_SW_TONE_CONTROLS
-    case DSP_CALLBACK_SET_PRESCALE:
-        prescale = param;
-        set_tone_controls();
-        break;
-    /* prescaler is always set after calling any of these, so we wait with
-     * calculating coefs until the above case is hit.
-     */
-    case DSP_CALLBACK_SET_BASS:
-        bass = param;
-        break;
-    case DSP_CALLBACK_SET_TREBLE:
-        treble = param;
-#endif
-    case DSP_CALLBACK_SET_CHANNEL_CONFIG:
-        dsp_set_channel_config(param);
-        break;
-    case DSP_CALLBACK_SET_STEREO_WIDTH:
-        dsp_set_stereo_width(param);
-        break;
-    default:
-        break;
-    }
-    return 0;
-}
-#endif
 
 /**
  * Implements the different channel configurations and stereo width.
@@ -1098,13 +1042,63 @@ void dsp_set_channel_config(int value)
     };
 
     if ((unsigned)value >= ARRAYLEN(channels_process_functions) ||
-        audio_dsp->stereo_mode == STEREO_MONO)
+        audio_dsp.stereo_mode == STEREO_MONO)
+    {
         value = SOUND_CHAN_STEREO;
+    }
 
     /* This doesn't apply to voice */
     channels_mode = value;
-    audio_dsp->channels_process = channels_process_functions[value];
+    audio_dsp.channels_process = channels_process_functions[value];
 }
+
+#if CONFIG_CODEC == SWCODEC
+
+#ifdef HAVE_SW_TONE_CONTROLS
+static void set_tone_controls(void)
+{
+    filter_bishelf_coefs(0xffffffff/NATIVE_FREQUENCY*200,
+                         0xffffffff/NATIVE_FREQUENCY*3500,
+                         bass, treble, -prescale,
+                         audio_dsp.tone_filter.coefs);
+    /* Sync the voice dsp coefficients */
+    memcpy(&voice_dsp.tone_filter.coefs, audio_dsp.tone_filter.coefs,
+           sizeof (voice_dsp.tone_filter.coefs));
+}
+#endif
+
+/* Hook back from firmware/ part of audio, which can't/shouldn't call apps/
+ * code directly.
+ */
+int dsp_callback(int msg, intptr_t param)
+{
+    switch (msg) {
+#ifdef HAVE_SW_TONE_CONTROLS
+    case DSP_CALLBACK_SET_PRESCALE:
+        prescale = param;
+        set_tone_controls();
+        break;
+    /* prescaler is always set after calling any of these, so we wait with
+     * calculating coefs until the above case is hit.
+     */
+    case DSP_CALLBACK_SET_BASS:
+        bass = param;
+        break;
+    case DSP_CALLBACK_SET_TREBLE:
+        treble = param;
+#endif
+    case DSP_CALLBACK_SET_CHANNEL_CONFIG:
+        dsp_set_channel_config(param);
+        break;
+    case DSP_CALLBACK_SET_STEREO_WIDTH:
+        dsp_set_stereo_width(param);
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
+#endif
 
 /* Process and convert src audio to dst based on the DSP configuration,
  * reading count number of audio samples. dst is assumed to be large
@@ -1114,7 +1108,7 @@ void dsp_set_channel_config(int value)
  * non-interleaved stereo, it contains two pointers, one for each audio
  * channel. Returns number of bytes written to dst.
  */
-int dsp_process(char *dst, const char *src[], int count)
+int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 {
     int32_t *tmp[2];
     int written = 0;
@@ -1142,25 +1136,19 @@ int dsp_process(char *dst, const char *src[], int count)
         if (dsp->apply_gain)
             dsp->apply_gain(samples, &dsp->data, tmp);
 
-        if (dsp->resample && (samples = resample(samples, tmp)) <= 0)
+        if (dsp->resample && (samples = resample(dsp, samples, tmp)) <= 0)
             break; /* I'm pretty sure we're downsampling here */
 
         if (dsp->apply_crossfeed)
             dsp->apply_crossfeed(samples, tmp);
 
-        /* TODO: EQ and tone controls need separate structs for audio and voice
-         * DSP processing thanks to filter history. isn't really audible now, but
-         * might be the day we start handling voice more delicately. Planned
-         * changes may well run all relevent channels through the same EQ so
-         * perhaps not.
-         */
-        if (eq_enabled)
-            eq_process(samples, tmp);
+        if (dsp->eq_process)
+            dsp->eq_process(samples, tmp);
 
 #ifdef HAVE_SW_TONE_CONTROLS
         if ((bass | treble) != 0)
-            eq_filter(tmp, &tone_filter, samples, dsp->data.num_channels,
-                      FILTER_BISHELF_SHIFT);
+            eq_filter(tmp, &dsp->tone_filter, samples,
+                      dsp->data.num_channels, FILTER_BISHELF_SHIFT);
 #endif
 
         if (dsp->channels_process)
@@ -1187,7 +1175,7 @@ int dsp_process(char *dst, const char *src[], int count)
  * of the resampler).
  */
 /* dsp_input_size MUST be called afterwards */
-int dsp_output_count(int count)
+int dsp_output_count(struct dsp_config *dsp, int count)
 {
     if (dsp->resample)
     {
@@ -1209,7 +1197,7 @@ int dsp_output_count(int count)
 /* Given count output samples, calculate number of input samples
  * that would be consumed in order to fill the output buffer.
  */
-int dsp_input_count(int count)
+int dsp_input_count(struct dsp_config *dsp, int count)
 {
     /* count is now the number of resampled input samples. Convert to
        original input samples. */
@@ -1225,41 +1213,37 @@ int dsp_input_count(int count)
     return count;
 }
 
-int dsp_stereo_mode(void)
-{
-    return dsp->stereo_mode;
-}
-
 static void dsp_set_gain_var(long *var, long value)
 {
-    /* Voice shouldn't mess with these */
-    if (dsp == audio_dsp)
-    {
-        *var = value;
-        new_gain = true;
-    }
+    *var = value;
+    new_gain = true;
 }
 
-static void dsp_update_functions(void)
+static void dsp_update_functions(struct dsp_config *dsp)
 {
-    sample_input_new_format();
-    sample_output_new_format();
-    if (dsp == audio_dsp)
+    sample_input_new_format(dsp);
+    sample_output_new_format(dsp);
+    if (dsp == &audio_dsp)
         dsp_set_crossfeed(crossfeed_enabled);
 }
 
-bool dsp_configure(int setting, intptr_t value)
+intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
 {
     switch (setting)
     {
-    case DSP_SWITCH_CODEC:
-        if ((uintptr_t)value <= 1)
-            switch_dsp(&dsp_conf[value]);
-        break;
+    case DSP_MYDSP:
+        switch (value)
+        {
+        case CODEC_IDX_AUDIO:
+            return (intptr_t)&audio_dsp;
+        case CODEC_IDX_VOICE:
+            return (intptr_t)&voice_dsp;
+        default:
+            return (intptr_t)NULL;
+        }
 
     case DSP_SET_FREQUENCY:
-        memset(&dsp->data.resample_data, 0,
-               sizeof (dsp->data.resample_data));
+        memset(&dsp->data.resample_data, 0, sizeof (dsp->data.resample_data));
         /* Fall through!!! */
     case DSP_SWITCH_FREQUENCY:
         dsp->codec_frequency = (value == 0) ? NATIVE_FREQUENCY : value;
@@ -1267,12 +1251,12 @@ bool dsp_configure(int setting, intptr_t value)
            if we're called from the main audio thread. Voice UI thread should
            not need this feature.
          */
-        if (dsp == audio_dsp)
+        if (dsp == &audio_dsp)
             dsp->frequency = pitch_ratio * dsp->codec_frequency / 1000;
         else
             dsp->frequency = dsp->codec_frequency;
 
-        resampler_new_delta();
+        resampler_new_delta(dsp);
         break;
 
     case DSP_SET_SAMPLE_DEPTH:
@@ -1294,14 +1278,14 @@ bool dsp_configure(int setting, intptr_t value)
         }
 
         dsp->data.output_scale = dsp->frac_bits + 1 - NATIVE_DEPTH;
-        sample_input_new_format();
-        dither_init(); 
+        sample_input_new_format(dsp);
+        dither_init(dsp); 
         break;
 
     case DSP_SET_STEREO_MODE:
         dsp->stereo_mode = value;
         dsp->data.num_channels = value == STEREO_MONO ? 1 : 2;
-        dsp_update_functions();
+        dsp_update_functions(dsp);
         break;
 
     case DSP_RESET:
@@ -1315,7 +1299,7 @@ bool dsp_configure(int setting, intptr_t value)
         dsp->data.clip_min = -((1 << WORD_FRACBITS));
         dsp->codec_frequency = dsp->frequency = NATIVE_FREQUENCY;
 
-        if (dsp == audio_dsp)
+        if (dsp == &audio_dsp)
         {
             track_gain = 0;
             album_gain = 0;
@@ -1324,31 +1308,35 @@ bool dsp_configure(int setting, intptr_t value)
             new_gain   = true;
         }
 
-        dsp_update_functions();
-        resampler_new_delta();
+        dsp_update_functions(dsp);
+        resampler_new_delta(dsp);
         break;
 
     case DSP_FLUSH:
         memset(&dsp->data.resample_data, 0,
                sizeof (dsp->data.resample_data));
-        resampler_new_delta();
-        dither_init();
+        resampler_new_delta(dsp);
+        dither_init(dsp);
         break;
 
     case DSP_SET_TRACK_GAIN:
-        dsp_set_gain_var(&track_gain, value);
+        if (dsp == &audio_dsp)
+            dsp_set_gain_var(&track_gain, value);
         break;
 
     case DSP_SET_ALBUM_GAIN:
-        dsp_set_gain_var(&album_gain, value);
+        if (dsp == &audio_dsp)
+            dsp_set_gain_var(&album_gain, value);
         break;
 
     case DSP_SET_TRACK_PEAK:
-        dsp_set_gain_var(&track_peak, value);
+        if (dsp == &audio_dsp)
+            dsp_set_gain_var(&track_peak, value);
         break;
 
     case DSP_SET_ALBUM_PEAK:
-        dsp_set_gain_var(&album_peak, value);
+        if (dsp == &audio_dsp)
+            dsp_set_gain_var(&album_peak, value);
         break;
 
     default:
@@ -1404,5 +1392,5 @@ void dsp_set_replaygain(void)
 
     /* Store in S8.23 format to simplify calculations. */
     replaygain = gain;
-    set_gain(audio_dsp);
+    set_gain(&audio_dsp);
 }

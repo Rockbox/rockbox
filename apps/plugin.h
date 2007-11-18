@@ -568,7 +568,7 @@ struct plugin_api {
     void* (*plugin_get_audio_buffer)(size_t *buffer_size);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
     char* (*plugin_get_current_filename)(void);
-#ifdef IRAM_STEAL
+#ifdef PLUGIN_USE_IRAM
     void (*plugin_iram_init)(char *iramstart, char *iramcopy, size_t iram_size,
                              char *iedata, size_t iedata_size);
 #endif
@@ -674,7 +674,7 @@ extern unsigned char plugin_end_addr[];
         NULL, NULL, plugin_start };
 #endif /* SIMULATOR */
 
-#ifdef USE_IRAM
+#ifdef PLUGIN_USE_IRAM
 /* Declare IRAM variables */
 #define PLUGIN_IRAM_DECLARE \
     extern char iramcopy[]; \
@@ -689,13 +689,13 @@ extern unsigned char plugin_end_addr[];
 #else
 #define PLUGIN_IRAM_DECLARE
 #define PLUGIN_IRAM_INIT(api)
-#endif /* USE_IRAM */
+#endif /* PLUGIN_USE_IRAM */
 #endif /* PLUGIN */
 
 int plugin_load(const char* plugin, void* parameter);
 void* plugin_get_buffer(size_t *buffer_size);
 void* plugin_get_audio_buffer(size_t *buffer_size);
-#ifdef IRAM_STEAL
+#ifdef PLUGIN_USE_IRAM
 void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
                       char *iedata, size_t iedata_size);
 #endif

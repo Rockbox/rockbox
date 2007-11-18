@@ -45,6 +45,7 @@
 #define MAX_CHARS_PER_FRAME (2000/BYTES_PER_CHAR)
 #endif
 
+#ifndef ROCKBOX_VOICE_CODEC
 void speex_bits_init(SpeexBits *bits)
 {
    bits->chars = (char*)speex_alloc(MAX_CHARS_PER_FRAME);
@@ -57,6 +58,7 @@ void speex_bits_init(SpeexBits *bits)
 
    speex_bits_reset(bits);
 }
+#endif
 
 void speex_bits_init_buffer(SpeexBits *bits, void *buff, int buf_size)
 {
@@ -82,12 +84,14 @@ void speex_bits_set_bit_buffer(SpeexBits *bits, void *buff, int buf_size)
    
 }
 
+#ifndef ROCKBOX_VOICE_CODEC
 void speex_bits_destroy(SpeexBits *bits)
 {
    if (bits->owner)
       speex_free(bits->chars);
    /* Will do something once the allocation is dynamic */
 }
+#endif
 
 void speex_bits_reset(SpeexBits *bits)
 {
@@ -106,7 +110,7 @@ void speex_bits_rewind(SpeexBits *bits)
    bits->overflow=0;
 }
 
-#ifndef SPEEX_VOICE_ENCODER
+#if !defined(SPEEX_VOICE_ENCODER) && !defined(ROCKBOX_VOICE_CODEC)
 void speex_bits_read_from(SpeexBits *bits, char *chars, int len)
 {
    int i;

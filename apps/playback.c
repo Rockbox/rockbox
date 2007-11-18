@@ -47,6 +47,7 @@
 #include "codecs.h"
 #include "audio.h"
 #include "buffering.h"
+#include "voice_thread.h"
 #include "mp3_playback.h"
 #include "usb.h"
 #include "status.h"
@@ -87,7 +88,6 @@
 #endif
 
 #define PLAYBACK_VOICE
-
 
 /* default point to start buffer refill */
 #define AUDIO_DEFAULT_WATERMARK      (1024*512)
@@ -142,9 +142,6 @@ enum {
     Q_CODEC_REQUEST_COMPLETE,
     Q_CODEC_REQUEST_FAILED,
 
-    Q_VOICE_PLAY,
-    Q_VOICE_STOP,
-
     Q_CODEC_LOAD,
     Q_CODEC_LOAD_DISK,
 
@@ -173,10 +170,6 @@ enum {
 #else
 #define CODEC_IRAM_ORIGIN   ((unsigned char *)0x1000c000)
 #define CODEC_IRAM_SIZE     ((size_t)0xc000)
-#endif
-
-#ifndef IBSS_ATTR_VOICE_STACK
-#define IBSS_ATTR_VOICE_STACK IBSS_ATTR
 #endif
 
 bool audio_is_initialized = false;
@@ -267,7 +260,6 @@ void (*track_unbuffer_callback)(struct mp3entry *id3) = NULL;
 static size_t buffer_margin  = 0; /* Buffer margin aka anti-skip buffer (A/C-) */
 
 /* Multiple threads */
-static void set_current_codec(int codec_idx);
 /* Set the watermark to trigger buffer fill (A/C) FIXME */
 static void set_filebuf_watermark(int seconds, size_t max);
 
@@ -290,68 +282,6 @@ static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
 struct thread_entry *codec_thread_p; /* For modifying thread priority later. */
-
-static volatile int current_codec IDATA_ATTR; /* Current codec (normal/voice) */
-
-/* Voice thread */
-#ifdef PLAYBACK_VOICE
-
-extern struct codec_api ci_voice;
-
-static struct thread_entry *voice_thread_p = NULL;
-static struct event_queue voice_queue NOCACHEBSS_ATTR;
-static long voice_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
-IBSS_ATTR_VOICE_STACK;
-static const char voice_thread_name[] = "voice codec";
-
-/* Voice codec swapping control */
-extern unsigned char codecbuf[];                /* DRAM codec swap buffer */
-
-#ifdef SIMULATOR
-/* IRAM codec swap buffer for sim*/
-static unsigned char sim_iram[CODEC_IRAM_SIZE];
-#undef CODEC_IRAM_ORIGIN
-#define CODEC_IRAM_ORIGIN sim_iram
-#endif
-
-/* iram_buf and dram_buf are either both NULL or both non-NULL */
-/* Pointer to IRAM buffer for codec swapping */
-static unsigned char *iram_buf = NULL;
-/* Pointer to DRAM buffer for codec swapping */
-static unsigned char *dram_buf = NULL;
-/* Parity of swap_codec calls - needed because one codec swapping itself in
-   automatically swaps in the other and the swap when unlocking should not
-   happen if the parity is even.
- */
-static bool   swap_codec_parity NOCACHEBSS_ATTR = false; /* true=odd, false=even */
-/* Locking to control which codec (normal/voice) is running */
-static struct semaphore sem_codecthread NOCACHEBSS_ATTR;
-static struct event event_codecthread NOCACHEBSS_ATTR;
-
-/* Voice state */
-static volatile bool voice_thread_start = false; /* Triggers voice playback (A/V) */
-static volatile bool voice_is_playing NOCACHEBSS_ATTR = false; /* Is voice currently playing? (V) */
-static volatile bool voice_codec_loaded NOCACHEBSS_ATTR = false; /* Is voice codec loaded (V/A-) */
-static unsigned char *voicebuf = NULL;
-static size_t voice_remaining = 0;
-
-#ifdef IRAM_STEAL
-/* Voice IRAM has been stolen for other use */
-static bool voice_iram_stolen = false;
-#endif
-
-static void (*voice_getmore)(unsigned char** start, size_t* size) = NULL;
-
-struct voice_info {
-    void (*callback)(unsigned char **start, size_t* size);
-    size_t size;
-    unsigned char *buf;
-};
-static void voice_thread(void);
-static void voice_stop(void);
-
-#endif /* PLAYBACK_VOICE */
-
 
 /* --- Helper functions --- */
 
@@ -415,71 +345,33 @@ static bool clear_track_info(struct track_info *track)
 
 /* --- External interfaces --- */
 
-void mp3_play_data(const unsigned char* start, int size,
-                   void (*get_more)(unsigned char** start, size_t* size))
-{
-#ifdef PLAYBACK_VOICE
-    static struct voice_info voice_clip;
-    voice_clip.callback = get_more;
-    voice_clip.buf = (unsigned char*)start;
-    voice_clip.size = size;
-    LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
-    queue_post(&voice_queue, Q_VOICE_STOP, 0);
-    LOGFQUEUE("mp3 > voice Q_VOICE_PLAY");
-    queue_post(&voice_queue, Q_VOICE_PLAY, (intptr_t)&voice_clip);
-    voice_thread_start = true;
-    trigger_cpu_boost();
-#else
-    (void) start;
-    (void) size;
-    (void) get_more;
-#endif
-}
-
-void mp3_play_stop(void)
-{
-#ifdef PLAYBACK_VOICE
-    queue_remove_from_head(&voice_queue, Q_VOICE_STOP);
-    LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
-    queue_post(&voice_queue, Q_VOICE_STOP, 1);
-#endif
-}
-
-void mp3_play_pause(bool play)
-{
-    /* a dummy */
-    (void)play;
-}
-
-bool mp3_is_playing(void)
-{
-#ifdef PLAYBACK_VOICE
-    return voice_is_playing;
-#else
-    return false;
-#endif
-}
-
-/* If voice could be swapped out - wait for it to return
- * Used by buffer claming functions.
- */
-static void wait_for_voice_swap_in(void)
-{
-#ifdef PLAYBACK_VOICE
-    if (NULL == iram_buf)
-        return;
-
-    event_wait(&event_codecthread, STATE_NONSIGNALED);
-#endif /* PLAYBACK_VOICE */
-}
-
 /* This sends a stop message and the audio thread will dump all it's
    subsequenct messages */
-static void audio_hard_stop(void)
+void audio_hard_stop(void)
 {
     /* Stop playback */
     LOGFQUEUE("audio >| audio Q_AUDIO_STOP: 1");
     queue_send(&audio_queue, Q_AUDIO_STOP, 1);
+#ifdef PLAYBACK_VOICE
+    voice_stop();
+#endif
+}
+
+bool audio_restore_playback(int type)
+{
+    switch (type)
+    {
+    case AUDIO_WANT_PLAYBACK:
+        if (buffer_state != BUFFER_STATE_INITIALIZED)
+            audio_reset_buffer();
+        return true;
+    case AUDIO_WANT_VOICE:
+        if (buffer_state == BUFFER_STATE_TRASHED)
+            audio_reset_buffer();
+        return true;
+    default:
+        return false;
+    }
 }
 
 unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
@@ -489,10 +381,6 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
     if (audio_is_initialized)
     {
         audio_hard_stop();
-        wait_for_voice_swap_in();
-#ifdef PLAYBACK_VOICE
-        voice_stop();
-#endif
     }
     /* else buffer_state will be BUFFER_STATE_TRASHED at this point */
 
@@ -543,68 +431,15 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
     return buf;
 }
 
-#ifdef IRAM_STEAL
-void audio_iram_steal(void)
-{
-    /* We need to stop audio playback in order to use codec IRAM */
-    audio_hard_stop();
-
-#ifdef PLAYBACK_VOICE
-    if (NULL != iram_buf)
-    {
-        /* Can't already be stolen */
-        if (voice_iram_stolen)
-            return;
-
-        /* Must wait for voice to be current again if it is swapped which
-           would cause the caller's buffer to get clobbered when voice locks
-           and runs - we'll wait for it to lock and yield again then make sure
-           the ride has come to a complete stop */
-        wait_for_voice_swap_in();
-        voice_stop();
-
-        /* Save voice IRAM but just memcpy - safe to do here since voice
-           is current and no audio codec is loaded */
-        memcpy(iram_buf, CODEC_IRAM_ORIGIN, CODEC_IRAM_SIZE);
-        voice_iram_stolen = true;
-    }
-    else
-    {
-        /* Nothing much to do if no voice */
-        voice_iram_stolen = false;
-    }
-#endif
-}
-#endif /* IRAM_STEAL */
-
 #ifdef HAVE_RECORDING
 unsigned char *audio_get_recording_buffer(size_t *buffer_size)
 {
-    /* Don't allow overwrite of voice swap area or we'll trash the
-       swapped-out voice codec but can use whole thing if none */
-    unsigned char *end;
-
-    /* Stop audio and voice. Wait for voice to swap in and be clear
-       of pending events to ensure trouble-free operation of encoders */
+    /* Stop audio, voice and obtain all available buffer space */
     audio_hard_stop();
-    wait_for_voice_swap_in();
-#ifdef PLAYBACK_VOICE
-    voice_stop();
-#endif
     talk_buffer_steal();
 
-#ifdef PLAYBACK_VOICE
-    /* If no dram_buf, swap space not used and recording gets more
-       memory. Codec swap areas will remain unaffected by the next init
-       since they're allocated at the end of the buffer and their sizes
-       don't change between calls */
-    end = dram_buf;
-    if (NULL == end)
-#endif /* PLAYBACK_VOICE */
-        end = audiobufend;
-
+    unsigned char *end = audiobufend;
     buffer_state = BUFFER_STATE_TRASHED;
-
     *buffer_size = end - audiobuf;
 
     return (unsigned char *)audiobuf;
@@ -952,137 +787,6 @@ void audio_set_crossfade(int enable)
 }
 
 /* --- Routines called from multiple threads --- */
-static void set_current_codec(int codec_idx)
-{
-    current_codec = codec_idx;
-    dsp_configure(DSP_SWITCH_CODEC, codec_idx);
-}
-
-#ifdef PLAYBACK_VOICE
-static void swap_codec(void)
-{
-    int my_codec;
-
-    /* Swap nothing if no swap buffers exist */
-    if (dram_buf == NULL)
-    {
-        logf("swap: no swap buffers");
-        return;
-    }
-
-    my_codec = current_codec;
-
-    logf("swapping out codec: %d", my_codec);
-
-    /* Invert this when a codec thread enters and leaves */
-    swap_codec_parity = !swap_codec_parity;
-
-    /* If this is true, an odd number of calls has occurred and there's
-       no codec thread waiting to swap us out when it locks and runs. This
-       occurs when playback is stopped or when just starting playback and
-       the audio thread is loading a codec; parities should always be even
-       on entry when a thread calls this during playback */
-    if (swap_codec_parity)
-    {
-        /* Save our current IRAM and DRAM */
-#ifdef IRAM_STEAL
-        if (voice_iram_stolen)
-        {
-            logf("swap: iram restore");
-            voice_iram_stolen = false;
-            /* Don't swap trashed data into buffer as the voice IRAM will
-               already be swapped out - should _always_ be the case if
-               voice_iram_stolen is true since the voice has been swapped
-               in beforehand */
-            if (my_codec == CODEC_IDX_VOICE)
-            {
-                logf("voice iram already swapped");
-                goto skip_iram_swap;
-            }
-        }
-#endif
-
-        memswap128(iram_buf, CODEC_IRAM_ORIGIN, CODEC_IRAM_SIZE);
-
-#ifdef IRAM_STEAL
-    skip_iram_swap:
-#endif
-
-        memswap128(dram_buf, codecbuf, CODEC_SIZE);
-        /* No cache invalidation needed; it will be done in codec_load_ram
-           or we won't be here otherwise */
-    }
-
-    /* Release my semaphore */
-    semaphore_release(&sem_codecthread);
-    logf("unlocked: %d", my_codec);
-
-    /* Wait for other codec */
-    event_wait(&event_codecthread,
-        (my_codec == CODEC_IDX_AUDIO) ? STATE_NONSIGNALED : STATE_SIGNALED);
-
-    /* Wait for other codec to unlock */
-    logf("waiting for lock: %d", my_codec);
-    semaphore_wait(&sem_codecthread);
-
-    /* Take control */
-    set_current_codec(my_codec);
-    event_set_state(&event_codecthread,
-        (my_codec == CODEC_IDX_AUDIO) ? STATE_SIGNALED : STATE_NONSIGNALED);
-
-    /* Reload our IRAM and DRAM */
-    memswap128(iram_buf, CODEC_IRAM_ORIGIN, CODEC_IRAM_SIZE);
-    memswap128(dram_buf, codecbuf, CODEC_SIZE);
-    invalidate_icache();
-
-    /* Flip parity again */
-    swap_codec_parity = !swap_codec_parity;
-
-    logf("resuming codec: %d", my_codec);
-}
-
-/* This function is meant to be used by the buffer stealing functions to
-   ensure the codec is no longer active and so voice will be swapped-in
-   before it is called */
-static void voice_stop(void)
-{
-    /* Must have a voice codec loaded or we'll hang forever here */
-    if (!voice_codec_loaded)
-        return;
-
-    talk_force_shutup();
-
-    /* Loop until voice empties it's queue, stops and picks up on the new
-       track; the voice thread must be stopped and waiting for messages
-       outside the codec */
-    while (voice_is_playing || !queue_empty(&voice_queue) ||
-           ci_voice.new_track)
-        yield();
-
-    if (!playing)
-        pcmbuf_play_stop();
-} /* voice_stop */
-
-/* Is voice still speaking */
-/* Unfortunately only reliable when music is not also playing. */
-static bool is_voice_speaking(void)
-{
-    return is_voice_queued()
-        || voice_is_playing
-        || (!playing && pcm_is_playing());
-}
-
-#endif /* PLAYBACK_VOICE */
-
-/* Wait for voice to finish speaking. */
-/* Also only reliable when music is not also playing. */
-void voice_wait(void)
-{
-#ifdef PLAYBACK_VOICE
-    while (is_voice_speaking())
-        sleep(HZ/10);
-#endif
-}
 
 static void set_filebuf_watermark(int seconds, size_t max)
 {
@@ -1126,303 +830,6 @@ const char * get_codec_filename(int cod_spec)
     return fname;
 } /* get_codec_filename */
 
-
-/* --- Voice thread --- */
-
-#ifdef PLAYBACK_VOICE
-
-static bool voice_pcmbuf_insert_callback(
-        const void *ch1, const void *ch2, int count)
-{
-    const char *src[2] = { ch1, ch2 };
-
-    while (count > 0)
-    {
-        int out_count = dsp_output_count(count);
-        int inp_count;
-        char *dest;
-
-        while ((dest = pcmbuf_request_voice_buffer(
-                        &out_count, playing)) == NULL)
-        {
-            if (playing && audio_codec_loaded)
-                swap_codec();
-            else
-                yield();
-        }
-
-        /* Get the real input_size for output_size bytes, guarding
-         * against resampling buffer overflows. */
-        inp_count = dsp_input_count(out_count);
-
-        if (inp_count <= 0)
-            return true;
-
-        /* Input size has grown, no error, just don't write more than length */
-        if (inp_count > count)
-            inp_count = count;
-
-        out_count = dsp_process(dest, src, inp_count);
-
-        if (out_count <= 0)
-            return true;
-
-        if (playing)
-        {
-            pcmbuf_mix_voice(out_count);
-            if ((pcmbuf_usage() < 10 || pcmbuf_mix_free() < 30) &&
-                    audio_codec_loaded)
-                swap_codec();
-        }
-        else
-            pcmbuf_write_complete(out_count);
-
-        count -= inp_count;
-    }
-
-    return true;
-} /* voice_pcmbuf_insert_callback */
-
-static void* voice_get_memory_callback(size_t *size)
-{
-    /* Voice should have no use for this. If it did, we'd have to
-       swap the malloc buffer as well. */
-    *size = 0;
-    return NULL;
-}
-
-static void voice_set_elapsed_callback(unsigned int value)
-{
-    (void)value;
-}
-
-static void voice_set_offset_callback(size_t value)
-{
-    (void)value;
-}
-
-static void voice_configure_callback(int setting, intptr_t value)
-{
-    if (!dsp_configure(setting, value))
-    {
-        logf("Illegal key:%d", setting);
-    }
-}
-
-static size_t voice_filebuf_callback(void *ptr, size_t size)
-{
-    (void)ptr;
-    (void)size;
-
-    return 0;
-}
-
-/* Handle Q_VOICE_STOP and part of SYS_USB_CONNECTED */
-static bool voice_on_voice_stop(bool aborting, size_t *realsize)
-{
-    if (aborting && !playing)
-    {
-        /* Aborting: Slight hack - flush PCM buffer if
-           only being used for voice */
-        pcmbuf_play_stop();
-    }
-
-    if (voice_is_playing)
-    {
-        /* Clear the current buffer */
-        voice_is_playing = false;
-        voice_getmore = NULL;
-        voice_remaining = 0;
-        voicebuf = NULL;
-
-        /* Cancel any automatic boost if no more clips requested. */
-        if (!playing || !voice_thread_start)
-            sleep(0);
-
-        /* Force the codec to think it's changing tracks */
-        ci_voice.new_track = 1;
-
-        *realsize = 0;
-        return true; /* Yes, change tracks */
-    }
-
-    return false;
-}
-
-static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
-{
-    struct queue_event ev;
-
-    if (ci_voice.new_track)
-    {
-        *realsize = 0;
-        return NULL;
-    }
-
-    while (1)
-    {
-        if (voice_is_playing || playing)
-        {
-            queue_wait_w_tmo(&voice_queue, &ev, 0);
-            if (!voice_is_playing && ev.id == SYS_TIMEOUT)
-                ev.id = Q_AUDIO_PLAY;
-        }
-        else
-        {
-            queue_wait(&voice_queue, &ev);
-        }
-
-        switch (ev.id) {
-            case Q_AUDIO_PLAY:
-                LOGFQUEUE("voice < Q_AUDIO_PLAY");
-                if (playing)
-                {
-                    if (audio_codec_loaded)
-                        swap_codec();
-                    yield();
-                }
-                break;
-
-#ifdef AUDIO_HAVE_RECORDING
-            case Q_ENCODER_RECORD:
-                LOGFQUEUE("voice < Q_ENCODER_RECORD");
-                swap_codec();
-                break;
-#endif
-
-            case Q_VOICE_STOP:
-                LOGFQUEUE("voice < Q_VOICE_STOP");
-                if (voice_on_voice_stop(ev.data, realsize))
-                    return NULL;
-                break;
-
-            case Q_VOICE_PLAY:
-                LOGFQUEUE("voice < Q_VOICE_PLAY");
-                if (!voice_is_playing)
-                {
-                    /* Set up new voice data */
-                    struct voice_info *voice_data;
-#ifdef IRAM_STEAL
-                    if (voice_iram_stolen)
-                    {
-                        /* Voice is the first to run again and is currently
-                           loaded */
-                        logf("voice: iram restore");
-                        memcpy(CODEC_IRAM_ORIGIN, iram_buf, CODEC_IRAM_SIZE);
-                        voice_iram_stolen = false;
-                    }
-#endif
-                    /* Must reset the buffer before any playback begins if
-                       needed */
-                    if (buffer_state == BUFFER_STATE_TRASHED)
-                        audio_reset_buffer();
-
-                    voice_is_playing = true;
-                    trigger_cpu_boost();
-                    voice_data = (struct voice_info *)ev.data;
-                    voice_remaining = voice_data->size;
-                    voicebuf = voice_data->buf;
-                    voice_getmore = voice_data->callback;
-                }
-                goto voice_play_clip; /* To exit both switch and while */
-
-            case SYS_TIMEOUT:
-                LOGFQUEUE_SYS_TIMEOUT("voice < SYS_TIMEOUT");
-                goto voice_play_clip;
-
-            default:
-                LOGFQUEUE("voice < default");
-        }
-    }
-
-voice_play_clip:
-
-    if (voice_remaining == 0 || voicebuf == NULL)
-    {
-        if (voice_getmore)
-            voice_getmore((unsigned char **)&voicebuf, &voice_remaining);
-
-        /* If this clip is done */
-        if (voice_remaining == 0)
-        {
-            LOGFQUEUE("voice > voice Q_VOICE_STOP");
-            queue_post(&voice_queue, Q_VOICE_STOP, 0);
-            /* Force pcm playback. */
-            if (!pcm_is_playing())
-                pcmbuf_play_start();
-        }
-    }
-
-    *realsize = MIN(voice_remaining, reqsize);
-
-    if (*realsize == 0)
-        return NULL;
-
-    return voicebuf;
-} /* voice_request_buffer_callback */
-
-static void voice_advance_buffer_callback(size_t amount)
-{
-    amount = MIN(amount, voice_remaining);
-    voicebuf += amount;
-    voice_remaining -= amount;
-}
-
-static void voice_advance_buffer_loc_callback(void *ptr)
-{
-    size_t amount = (size_t)ptr - (size_t)voicebuf;
-
-    voice_advance_buffer_callback(amount);
-}
-
-static off_t voice_mp3_get_filepos_callback(int newtime)
-{
-    (void)newtime;
-
-    return 0;
-}
-
-static void voice_do_nothing(void)
-{
-    return;
-}
-
-static bool voice_seek_buffer_callback(size_t newpos)
-{
-    (void)newpos;
-
-    return false;
-}
-
-static bool voice_request_next_track_callback(void)
-{
-    ci_voice.new_track = 0;
-    return true;
-}
-
-static void voice_thread(void)
-{
-    logf("Loading voice codec");
-    voice_codec_loaded = true;
-    semaphore_wait(&sem_codecthread);
-    event_set_state(&event_codecthread, STATE_NONSIGNALED);
-    set_current_codec(CODEC_IDX_VOICE);
-    dsp_configure(DSP_RESET, 0);
-    voice_remaining = 0;
-    voice_getmore = NULL;
-
-    /* FIXME: If we being starting the voice thread without reboot, the
-       voice_queue could be full of old stuff and we must flush it. */
-    codec_load_file(get_codec_filename(AFMT_MPA_L3), &ci_voice);
-
-    logf("Voice codec finished");
-    voice_codec_loaded = false;
-    voice_thread_p = NULL;
-    semaphore_release(&sem_codecthread);
-} /* voice_thread */
-
-#endif /* PLAYBACK_VOICE */
-
 /* --- Codec thread --- */
 static bool codec_pcmbuf_insert_callback(
         const void *ch1, const void *ch2, int count)
@@ -1431,7 +838,7 @@ static bool codec_pcmbuf_insert_callback(
 
     while (count > 0)
     {
-        int out_count = dsp_output_count(count);
+        int out_count = dsp_output_count(ci.dsp, count);
         int inp_count;
         char *dest;
 
@@ -1448,7 +855,7 @@ static bool codec_pcmbuf_insert_callback(
 
         /* Get the real input_size for output_size bytes, guarding
          * against resampling buffer overflows. */
-        inp_count = dsp_input_count(out_count);
+        inp_count = dsp_input_count(ci.dsp, out_count);
 
         if (inp_count <= 0)
             return true;
@@ -1457,22 +864,12 @@ static bool codec_pcmbuf_insert_callback(
         if (inp_count > count)
             inp_count = count;
 
-        out_count = dsp_process(dest, src, inp_count);
+        out_count = dsp_process(ci.dsp, dest, src, inp_count);
 
         if (out_count <= 0)
             return true;
 
         pcmbuf_write_complete(out_count);
-
-#ifdef PLAYBACK_VOICE
-        if ((voice_is_playing || voice_thread_start)
-            && pcm_is_playing() && voice_codec_loaded &&
-            pcmbuf_usage() > 30 && pcmbuf_mix_free() > 80)
-        {
-            voice_thread_start = false;
-            swap_codec();
-        }
-#endif
 
         count -= inp_count;
     }
@@ -1690,7 +1087,7 @@ static void codec_seek_complete_callback(void)
     {
         /* If this is not a seamless seek, clear the buffer */
         pcmbuf_play_stop();
-        dsp_configure(DSP_FLUSH, 0);
+        dsp_configure(ci.dsp, DSP_FLUSH, 0);
 
         /* If playback was not 'deliberately' paused, unpause now */
         if (!paused)
@@ -1721,7 +1118,8 @@ static void codec_configure_callback(int setting, intptr_t value)
         break;
 
     default:
-        if (!dsp_configure(setting, value)) { logf("Illegal key:%d", setting); }
+        if (!dsp_configure(ci.dsp, setting, value))
+            { logf("Illegal key:%d", setting); }
     }
 }
 
@@ -1886,23 +1284,8 @@ static void codec_thread(void)
                 LOGFQUEUE("codec < Q_CODEC_LOAD_DISK");
                 queue_reply(&codec_queue, 1);
                 audio_codec_loaded = true;
-#ifdef PLAYBACK_VOICE
-                /* Don't sent messages to voice codec if it's already swapped
-                   out or it will never get this */
-                if (voice_codec_loaded && current_codec == CODEC_IDX_VOICE)
-                {
-                    LOGFQUEUE("codec > voice Q_AUDIO_PLAY");
-                    queue_post(&voice_queue, Q_AUDIO_PLAY, 0);
-                }
-                semaphore_wait(&sem_codecthread);
-                event_set_state(&event_codecthread, STATE_SIGNALED);
-#endif
-                set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
                 status = codec_load_file((const char *)ev.data, &ci);
-#ifdef PLAYBACK_VOICE
-                semaphore_release(&sem_codecthread);
-#endif
                 break;
 
             case Q_CODEC_LOAD:
@@ -1920,43 +1303,17 @@ static void codec_thread(void)
                 }
 
                 audio_codec_loaded = true;
-#ifdef PLAYBACK_VOICE
-                if (voice_codec_loaded && current_codec == CODEC_IDX_VOICE)
-                {
-                    LOGFQUEUE("codec > voice Q_AUDIO_PLAY");
-                    queue_post(&voice_queue, Q_AUDIO_PLAY, 0);
-                }
-                semaphore_wait(&sem_codecthread);
-                event_set_state(&event_codecthread, STATE_SIGNALED);
-#endif
-                set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_codec = false;
                 status = codec_load_buf(CUR_TI->codec_hid, &ci);
-#ifdef PLAYBACK_VOICE
-                semaphore_release(&sem_codecthread);
-#endif
                 break;
 
 #ifdef AUDIO_HAVE_RECORDING
             case Q_ENCODER_LOAD_DISK:
                 LOGFQUEUE("codec < Q_ENCODER_LOAD_DISK");
                 audio_codec_loaded = false; /* Not audio codec! */
-#ifdef PLAYBACK_VOICE
-                if (voice_codec_loaded && current_codec == CODEC_IDX_VOICE)
-                {
-                    LOGFQUEUE("codec > voice Q_ENCODER_RECORD");
-                    queue_post(&voice_queue, Q_ENCODER_RECORD, 0);
-                }
-                semaphore_wait(&sem_codecthread);
-                event_set_state(&event_codecthread, STATE_SIGNALED);
-#endif
                 logf("loading encoder");
-                set_current_codec(CODEC_IDX_AUDIO);
                 ci.stop_encoder = false;
                 status = codec_load_file((const char *)ev.data, &ci);
-#ifdef PLAYBACK_VOICE
-                semaphore_release(&sem_codecthread);
-#endif
                 logf("encoder stopped");
                 break;
 #endif /* AUDIO_HAVE_RECORDING */
@@ -2341,13 +1698,8 @@ static bool audio_load_track(int offset, bool start_play)
     /* Set default values */
     if (start_play)
     {
-        int last_codec = current_codec;
-
-        set_current_codec(CODEC_IDX_AUDIO);
         buf_set_watermark(AUDIO_DEFAULT_WATERMARK);
-        dsp_configure(DSP_RESET, 0);
-        set_current_codec(last_codec);
-
+        dsp_configure(ci.dsp, DSP_RESET, 0);
         track_changed = true;
         playlist_update_resume_info(audio_current_track());
     }
@@ -3001,67 +2353,7 @@ static void audio_reset_buffer(void)
     filebuf    = malloc_buf + MALLOC_BUFSIZE; /* filebuf line align implied */
     filebuflen = audiobufend - filebuf;
 
-    /* Allow for codec swap space at end of audio buffer */
-    if (talk_voice_required())
-    {
-        /* Layout of swap buffer:
-         * #ifdef IRAM_STEAL (dedicated iram_buf):
-         *      |iram_buf|...audiobuf...|dram_buf|audiobufend
-         * #else:
-         *      audiobuf...|dram_buf|iram_buf|audiobufend
-         */
-#ifdef PLAYBACK_VOICE
-        /* Check for an absolutely nasty situation which should never,
-           ever happen - frankly should just panic */
-        if (voice_codec_loaded && current_codec != CODEC_IDX_VOICE)
-        {
-            logf("buffer reset with voice swapped");
-        }
-        /* line align length which line aligns the calculations below since
-           all sizes are also at least line aligned - needed for memswap128 */
-        filebuflen &= ~15;
-#ifdef IRAM_STEAL
-        filebuflen -= CODEC_SIZE;
-#else
-        filebuflen -= CODEC_SIZE + CODEC_IRAM_SIZE;
-#endif
-        /* Allocate buffers for swapping voice <=> audio */
-        /* If using IRAM for plugins voice IRAM swap buffer must be dedicated
-           and out of the way of buffer usage or else a call to audio_get_buffer
-           and subsequent buffer use might trash the swap space. A plugin
-           initializing IRAM after getting the full buffer would present similar
-           problem. Options include: failing the request if the other buffer
-           has been obtained already or never allowing use of the voice IRAM
-           buffer within the audio buffer. Using buffer_alloc basically
-           implements the second in a more convenient way. */
-        dram_buf = filebuf + filebuflen;
-
-#ifdef IRAM_STEAL
-        /* Allocate voice IRAM swap buffer once */
-        if (iram_buf == NULL)
-        {
-            iram_buf = buffer_alloc(CODEC_IRAM_SIZE);
-            /* buffer_alloc moves audiobuf; this is safe because only the end
-             * has been touched so far in this function and the address of
-             * filebuf + filebuflen is not changed */
-            malloc_buf += CODEC_IRAM_SIZE;
-            filebuf    += CODEC_IRAM_SIZE;
-            filebuflen -= CODEC_IRAM_SIZE;
-        }
-#else
-        /* Allocate iram_buf after dram_buf */
-        iram_buf = dram_buf + CODEC_SIZE;
-#endif /* IRAM_STEAL */
-#endif /* PLAYBACK_VOICE */
-    }
-    else
-    {
-#ifdef PLAYBACK_VOICE
-        /* No swap buffers needed */
-        iram_buf = NULL;
-        dram_buf = NULL;
-#endif
-    }
+    filebuflen &= ~15;
 
     /* Subtract whatever the pcm buffer says it used plus the guard buffer */
     filebuflen -= pcmbuf_init(filebuf + filebuflen) + GUARD_BUFSIZE;
@@ -3090,16 +2382,6 @@ static void audio_reset_buffer(void)
         logf("gbufe:  %08X", (unsigned)(filebuf + filebuflen + GUARD_BUFSIZE));
         logf("pcmb:   %08X", (unsigned)pcmbuf);
         logf("pcmbe:  %08X", (unsigned)(pcmbuf + pcmbufsize));
-        if (dram_buf)
-        {
-            logf("dramb:  %08X", (unsigned)dram_buf);
-            logf("drambe: %08X", (unsigned)(dram_buf + CODEC_SIZE));
-        }
-        if (iram_buf)
-        {
-            logf("iramb:  %08X", (unsigned)iram_buf);
-            logf("irambe:  %08X", (unsigned)(iram_buf + CODEC_IRAM_SIZE));
-        }
     }
 #endif
 }
@@ -3109,21 +2391,6 @@ static void audio_thread(void)
     struct queue_event ev;
 
     pcm_postinit();
-
-#ifdef PLAYBACK_VOICE
-    /* Unlock semaphore that init stage locks before creating this thread */
-    semaphore_release(&sem_codecthread);
-
-    /* Buffers must be set up by now - should panic - really */
-    if (buffer_state != BUFFER_STATE_INITIALIZED)
-    {
-        logf("audio_thread start: no buffer");
-    }
-
-    /* Have to wait for voice to load up or else the codec swap will be
-       invalid when an audio codec is loaded */
-    wait_for_voice_swap_in();
-#endif
 
     while (1)
     {
@@ -3214,7 +2481,6 @@ static void audio_thread(void)
                 if (playing)
                     audio_stop_playback();
 #ifdef PLAYBACK_VOICE
-                wait_for_voice_swap_in();
                 voice_stop();
 #endif
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
@@ -3253,11 +2519,6 @@ static void audio_test_track_changed_event(struct mp3entry *id3)
  */
 void audio_init(void)
 {
-#ifdef PLAYBACK_VOICE
-    static bool voicetagtrue = true;
-    static struct mp3entry id3_voice;
-    struct thread_entry *voice_thread_p = NULL;
-#endif
     struct thread_entry *audio_thread_p;
 
     /* Can never do this twice */
@@ -3272,13 +2533,6 @@ void audio_init(void)
     /* Initialize queues before giving control elsewhere in case it likes
        to send messages. Thread creation will be delayed however so nothing
        starts running until ready if something yields such as talk_init. */
-#ifdef PLAYBACK_VOICE
-    /* Take ownership of lock to prevent playback of anything before audio
-       hardware is initialized - audio thread unlocks it after final init
-       stage */
-    semaphore_init(&sem_codecthread, 1, 0);
-    event_init(&event_codecthread, EVENT_MANUAL | STATE_SIGNALED);
-#endif
     queue_init(&audio_queue, true);
     queue_enable_queue_send(&audio_queue, &audio_queue_sender_list);
     queue_init(&codec_queue, false);
@@ -3305,30 +2559,8 @@ void audio_init(void)
     ci.set_offset          = codec_set_offset_callback;
     ci.configure           = codec_configure_callback;
     ci.discard_codec       = codec_discard_codec_callback;
-
-     /* Initialize voice codec api. */
-#ifdef PLAYBACK_VOICE
-    memcpy(&ci_voice, &ci, sizeof(ci_voice));
-    memset(&id3_voice, 0, sizeof(id3_voice));
-    ci_voice.read_filebuf        = voice_filebuf_callback;
-    ci_voice.pcmbuf_insert       = voice_pcmbuf_insert_callback;
-    ci_voice.get_codec_memory    = voice_get_memory_callback;
-    ci_voice.request_buffer      = voice_request_buffer_callback;
-    ci_voice.advance_buffer      = voice_advance_buffer_callback;
-    ci_voice.advance_buffer_loc  = voice_advance_buffer_loc_callback;
-    ci_voice.request_next_track  = voice_request_next_track_callback;
-    ci_voice.mp3_get_filepos     = voice_mp3_get_filepos_callback;
-    ci_voice.seek_buffer         = voice_seek_buffer_callback;
-    ci_voice.seek_complete       = voice_do_nothing;
-    ci_voice.set_elapsed         = voice_set_elapsed_callback;
-    ci_voice.set_offset          = voice_set_offset_callback;
-    ci_voice.configure           = voice_configure_callback;
-    ci_voice.discard_codec       = voice_do_nothing;
-    ci_voice.taginfo_ready       = &voicetagtrue;
-    ci_voice.id3                 = &id3_voice;
-    id3_voice.frequency          = 11200;
-    id3_voice.length             = 1000000L;
-#endif
+    ci.dsp                 = (struct dsp_config *)dsp_configure(NULL, DSP_MYDSP,
+                                                                CODEC_IDX_AUDIO);
 
     /* initialize the buffer */
     filebuf = audiobuf;
@@ -3349,16 +2581,7 @@ void audio_init(void)
                   IF_COP(, CPU));
 
 #ifdef PLAYBACK_VOICE
-    /* TODO: Change this around when various speech codecs can be used */
-    if (talk_voice_required())
-    {
-        logf("Starting voice codec");
-        queue_init(&voice_queue, false);
-        voice_thread_p = create_thread(voice_thread, voice_stack,
-                sizeof(voice_stack), CREATE_THREAD_FROZEN,
-                voice_thread_name
-                IF_PRIO(, PRIORITY_PLAYBACK) IF_COP(, CPU));
-    }
+    voice_thread_init();
 #endif
 
     /* Set crossfade setting for next buffer init which should be about... */
@@ -3393,11 +2616,10 @@ void audio_init(void)
 #endif
 
     /* it's safe to let the threads run now */
-    thread_thaw(codec_thread_p);
 #ifdef PLAYBACK_VOICE
-    if (voice_thread_p)
-        thread_thaw(voice_thread_p);
+    voice_thread_resume();
 #endif
+    thread_thaw(codec_thread_p);
     thread_thaw(audio_thread_p);
-} /* audio_init */
 
+} /* audio_init */

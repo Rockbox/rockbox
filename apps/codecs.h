@@ -80,7 +80,7 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 19
+#define CODEC_API_VERSION 20
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -234,6 +234,8 @@ struct codec_api {
     void (*flush_icache)(void);
     void (*invalidate_icache)(void);
 #endif
+
+    struct dsp_config *dsp;
 };
 
 /* codec header */

@@ -383,7 +383,7 @@
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
 #define USE_IRAM
 #if CONFIG_CPU != SH7034
-#define IRAM_STEAL
+#define PLUGIN_USE_IRAM
 #endif
 #if defined(CPU_ARM)
 /* GCC quirk workaround: arm-elf-gcc treats static functions as short_call

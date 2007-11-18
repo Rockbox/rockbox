@@ -56,8 +56,6 @@
                        |           | filebuf
                        |           |------------
                        |           | audio
-                       |           |------------
-                       |           | codec swap
   audiobufend----------+-----------+------------
 
   SWCODEC allocates dedicated buffers, MASCODEC reuses audiobuf. */
@@ -628,7 +626,9 @@ int talk_file(const char* filename, bool enqueue)
 {
     int fd;
     int size;
+#if CONFIG_CODEC != SWCODEC
     struct mp3entry info;
+#endif
 
     if (talk_temp_disable_count > 0)
         return -1;  /* talking has been disabled */
@@ -640,10 +640,12 @@ int talk_file(const char* filename, bool enqueue)
     if (p_thumbnail == NULL || size_for_thumbnail <= 0)
         return -1;
 
+#if CONFIG_CODEC != SWCODEC
     if(mp3info(&info, filename)) /* use this to find real start */
     {   
         return 0; /* failed to open, or invalid */
     }
+#endif
 
     fd = open(filename, O_RDONLY);
     if (fd < 0) /* failed to open */
@@ -651,14 +653,16 @@ int talk_file(const char* filename, bool enqueue)
         return 0;
     }
 
+#if CONFIG_CODEC != SWCODEC
     lseek(fd, info.first_frame_offset, SEEK_SET); /* behind ID data */
+#endif
 
     size = read(fd, p_thumbnail, size_for_thumbnail);
     close(fd);
 
     /* ToDo: find audio, skip ID headers and trailers */
 
-    if (size != 0 && size != size_for_thumbnail)    /* Don't play missing or truncated clips */
+    if (size > 0 && size != size_for_thumbnail)    /* Don't play missing or truncated clips */
     {
 #if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
         bitswap(p_thumbnail, size);

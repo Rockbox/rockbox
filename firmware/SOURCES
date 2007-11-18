@@ -282,7 +282,6 @@ target/coldfire/crt0.S
 target/coldfire/memcpy-coldfire.S
 target/coldfire/memmove-coldfire.S
 target/coldfire/memset-coldfire.S
-target/coldfire/memswap128-coldfire.S
 target/coldfire/strlen-coldfire.S
 #if defined(HAVE_LCD_COLOR) \
  || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
@@ -305,7 +304,6 @@ common/strlen.c
 #ifndef SIMULATOR
 target/arm/memset-arm.S
 target/arm/memset16-arm.S
-target/arm/memswap128-arm.S
 #if CONFIG_I2C == I2C_PP5024 || CONFIG_I2C == I2C_PP5020 || CONFIG_I2C == I2C_PP5002
 target/arm/i2c-pp.c
 #elif CONFIG_I2C == I2C_PNX0101
@@ -350,7 +348,6 @@ common/memcpy.c
 common/memmove.c
 common/memset.c
 common/memset16.c
-common/memswap128.c
 common/strlen.c
 #ifndef SIMULATOR
 crt0.S
