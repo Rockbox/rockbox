@@ -32,38 +32,51 @@
 
 /** Basic configuration options **/
 
+#define SPC_DUAL_CORE 1
+
+#if !defined(SPC_DUAL_CORE) || NUM_CORES == 1
+#undef  SPC_DUAL_CORE
+#define SPC_DUAL_CORE 0
+#endif
+
 /* TGB is the only target fast enough for gaussian and realtime BRR decode */
 /* echo is almost fast enough but not quite */
-#ifndef TOSHIBA_GIGABEAT_F
-    /* Cache BRR waves */
-    #define SPC_BRRCACHE 1
-
-    /* Disable gaussian interpolation */
-    #define SPC_NOINTERP 1
-
-#ifndef CPU_COLDFIRE
-    /* Disable echo processing */
-    #define SPC_NOECHO 1
-#else
-    /* Enable echo processing */
-    #define SPC_NOECHO 0
-#endif
-#else
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
     /* Don't cache BRR waves */
     #define SPC_BRRCACHE 0 
     
     /* Allow gaussian interpolation */
     #define SPC_NOINTERP 0
-    
+
     /* Allow echo processing */
     #define SPC_NOECHO 0
-#endif
+#elif defined(CPU_COLDFIRE)
+    /* Cache BRR waves */
+    #define SPC_BRRCACHE 1 
+    
+    /* Disable gaussian interpolation */
+    #define SPC_NOINTERP 1
 
-/* Samples per channel per iteration */
-#ifdef CPU_COLDFIRE
-#define WAV_CHUNK_SIZE 1024
+    /* Allow echo processing */
+    #define SPC_NOECHO 0
+#elif defined (CPU_PP) && SPC_DUAL_CORE
+    /* Cache BRR waves */
+    #define SPC_BRRCACHE 1 
+    
+    /* Disable gaussian interpolation */
+    #define SPC_NOINTERP 1
+
+    /* Allow echo processing */
+    #define SPC_NOECHO 0
 #else
-#define WAV_CHUNK_SIZE 2048
+    /* Cache BRR waves */
+    #define SPC_BRRCACHE 1 
+    
+    /* Disable gaussian interpolation */
+    #define SPC_NOINTERP 1
+
+    /* Disable echo processing */
+    #define SPC_NOECHO 1
 #endif
 
 #ifdef CPU_ARM
@@ -72,6 +85,26 @@
 
     #undef  IDATA_ATTR
     #define IDATA_ATTR
+
+    #undef  ICONST_ATTR
+    #define ICONST_ATTR
+
+    #undef  IBSS_ATTR
+    #define IBSS_ATTR
+
+#if SPC_DUAL_CORE
+    #undef NOCACHEBSS_ATTR
+    #define NOCACHEBSS_ATTR __attribute__ ((section(".ibss")))
+    #undef NOCACHEDATA_ATTR
+    #define NOCACHEDATA_ATTR __attribute__((section(".idata")))
+#endif
+#endif
+
+/* Samples per channel per iteration */
+#if defined(CPU_PP) && NUM_CORES == 1
+#define WAV_CHUNK_SIZE 2048
+#else
+#define WAV_CHUNK_SIZE 1024
 #endif
 
 /**************** Little-endian handling ****************/
@@ -231,16 +264,26 @@ extern int16_t BRRcache [BRR_CACHE_SIZE];
 
 enum { FIR_BUF_HALF = 8 };
 
-#ifdef CPU_COLDFIRE
+#if defined(CPU_COLDFIRE)
 /* global because of the large aligment requirement for hardware masking -
  * L-R interleaved 16-bit samples for easy loading and mac.w use.
  */
 enum
 {
-    FIR_BUF_SIZE = FIR_BUF_HALF * sizeof ( int32_t ),
-    FIR_BUF_MASK = ~FIR_BUF_SIZE
+    FIR_BUF_CNT   = FIR_BUF_HALF,
+    FIR_BUF_SIZE  = FIR_BUF_CNT * sizeof ( int32_t ),
+    FIR_BUF_ALIGN = FIR_BUF_SIZE * 2,
+    FIR_BUF_MASK  = ~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) - 1))
 };
-#endif /* CPU_COLDFIRE */
+#elif defined (CPU_ARM)
+enum
+{
+    FIR_BUF_CNT   = FIR_BUF_HALF * 2 * 2,
+    FIR_BUF_SIZE  = FIR_BUF_CNT * sizeof ( int32_t ),
+    FIR_BUF_ALIGN = FIR_BUF_SIZE,
+    FIR_BUF_MASK  = ~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) * 2 - 1))
+};
+#endif /* CPU_* */
 
 struct Spc_Dsp
 {
@@ -257,14 +300,19 @@ struct Spc_Dsp
     int noise_count;
     uint16_t noise; /* also read as int16_t */
     
-#ifdef CPU_COLDFIRE
+#if defined(CPU_COLDFIRE)
     /* circularly hardware masked address */
     int32_t *fir_ptr;
     /* wrapped address just behind current position -
        allows mac.w to increment and mask fir_ptr */
     int32_t *last_fir_ptr;
     /* copy of echo FIR constants as int16_t for use with mac.w */
-    int16_t fir_coeff[VOICE_COUNT];
+    int16_t fir_coeff [VOICE_COUNT];
+#elif defined (CPU_ARM)
+   /* fir_buf [i + 8] == fir_buf [i], to avoid wrap checking in FIR code */
+    int32_t *fir_ptr;
+    /* copy of echo FIR constants as int32_t, for faster access */
+    int32_t fir_coeff [VOICE_COUNT]; 
 #else
     /* fir_buf [i + 8] == fir_buf [i], to avoid wrap checking in FIR code */
     int fir_pos; /* (0 to 7) */

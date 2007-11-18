@@ -80,7 +80,7 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 20
+#define CODEC_API_VERSION 21
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -236,6 +236,23 @@ struct codec_api {
 #endif
 
     struct dsp_config *dsp;
+
+#if NUM_CORES > 1
+    struct thread_entry *
+        (*create_thread)(void (*function)(void), void* stack,
+                         int stack_size, unsigned flags, const char *name
+                         IF_PRIO(, int priority)
+                         IF_COP(, unsigned int core));
+
+    void (*thread_thaw)(struct thread_entry *thread);
+    void (*thread_wait)(struct thread_entry *thread);
+    void (*semaphore_init)(struct semaphore *s, int max, int start);
+    void (*semaphore_wait)(struct semaphore *s);
+    void (*semaphore_release)(struct semaphore *s);
+    void (*event_init)(struct event *e, unsigned int flags);
+    void (*event_wait)(struct event *e, unsigned int for_state);
+    void (*event_set_state)(struct event *e, unsigned int state);
+#endif /* NUM_CORES */
 };
 
 /* codec header */

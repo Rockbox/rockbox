@@ -25,14 +25,13 @@
 #include "spc_codec.h"
 #include "spc_profiler.h"
 
-#ifdef CPU_COLDFIRE
-static int32_t fir_buf[FIR_BUF_HALF]
-    __attribute__ ((aligned (FIR_BUF_SIZE*2))) IBSS_ATTR;
+#if defined(CPU_COLDFIRE) || defined (CPU_ARM)
+int32_t fir_buf[FIR_BUF_CNT]
+    __attribute__ ((aligned (FIR_BUF_ALIGN*1))) IBSS_ATTR;
 #endif
-
 #if SPC_BRRCACHE
 /* a little extra for samples that go past end */
-int16_t BRRcache [0x20000 + 32];
+int16_t BRRcache [BRR_CACHE_SIZE];
 #endif
 
 void DSP_write( struct Spc_Dsp* this, int i, int data )
@@ -58,11 +57,12 @@ void DSP_write( struct Spc_Dsp* this, int i, int data )
 
 /* if ( n < -32768 ) out = -32768; */
 /* if ( n >  32767 ) out =  32767; */
-#define CLAMP16( n, out )\
-{\
-    if ( (int16_t) n != n )\
-        out = 0x7FFF ^ (n >> 31);\
-}
+#define CLAMP16( n ) \
+({                              \
+    if ( (int16_t) n != n )     \
+        n = 0x7FFF ^ (n >> 31); \
+    n;                          \
+})
 
 #if SPC_BRRCACHE
 static void decode_brr( struct Spc_Dsp* this, unsigned start_addr,
@@ -181,7 +181,7 @@ static void decode_brr( struct Spc_Dsp* this, unsigned start_addr,
                     smp2 = smp1;
                 }
                 
-                CLAMP16( delta, delta );
+                delta = CLAMP16( delta );
                 smp1 = (int16_t) (delta * 2); /* sign-extend */
             }
             while ( (offset += 4) != 0 );
@@ -359,7 +359,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         #define VOICE_RATE(x) (INT16A(raw_voice->rate) & 0x3FFF)
         #define IF_RBE(...)
     #endif /* ROCKBOX_BIG_ENDIAN */
-    
+   
 #if !SPC_NOINTERP
     int const slow_gaussian = (this->r.g.pitch_mods >> 1) |
         this->r.g.noise_enables;
@@ -431,7 +431,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             
             /* Envelope */
             {
-                int const env_range = 0x800;
+                int const ENV_RANGE = 0x800;
                 int env_mode = voice->env_mode;
                 int adsr0 = raw_voice->adsr [0];
                 int env_timer;
@@ -482,14 +482,14 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                             
                             int envx = voice->envx;
                             
-                            int const step = env_range / 64;
+                            int const step = ENV_RANGE / 64;
                             envx += step;
                             if ( t == 15 )
-                                envx += env_range / 2 - step;
+                                envx += ENV_RANGE / 2 - step;
                             
-                            if ( envx >= env_range )
+                            if ( envx >= ENV_RANGE )
                             {
-                                envx = env_range - 1;
+                                envx = ENV_RANGE - 1;
                                 voice->env_mode = state_decay;
                             }
                             voice->envx = envx;
@@ -516,7 +516,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                             int mode = t >> 5;
                             if ( mode <= 5 ) /* decay */
                             {
-                                int step = env_range / 64;
+                                int step = ENV_RANGE / 64;
                                 if ( mode == 5 ) /* exponential */
                                 {
                                     envx--; /* envx *= 255 / 256 */
@@ -531,14 +531,14 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                             }
                             else /* attack */
                             {
-                                int const step = env_range / 64;
+                                int const step = ENV_RANGE / 64;
                                 envx += step;
                                 if ( mode == 7 &&
-                                     envx >= env_range * 3 / 4 + step )
-                                    envx += env_range / 256 - step;
+                                     envx >= ENV_RANGE * 3 / 4 + step )
+                                    envx += ENV_RANGE / 256 - step;
                                 
-                                if ( envx >= env_range )
-                                    envx = env_range - 1;
+                                if ( envx >= ENV_RANGE )
+                                    envx = ENV_RANGE - 1;
                             }
                             voice->envx = envx;
                             /* TODO: should this be 8? */
@@ -550,7 +550,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 else /* state_release */
                 {
                     int envx = voice->envx;
-                    if ( (envx -= env_range / 256) > 0 )
+                    if ( (envx -= ENV_RANGE / 256) > 0 )
                     {
                         voice->envx = envx;
                         raw_voice->envx = envx >> 8;
@@ -683,7 +683,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                         smp2 = smp1;
                     }
                     
-                    CLAMP16( delta, delta );
+                    delta = CLAMP16( delta );
                     smp1 = (int16_t) (delta * 2); /* sign-extend */
                 }
                 while ( (offset += 4) != 0 );
@@ -778,7 +778,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                     output = (output + rev [1] * interp [2]) >> 12;
                     output = (int16_t) (output * 2);
                     output += ((rev [0] * interp [3]) >> 12) * 2;
-                    CLAMP16( output, output );
+                    output = CLAMP16( output );
                 }
                 output = (output * voice->envx) >> 11 & ~1;
                 
@@ -788,7 +788,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 prev_outx = output;
                 raw_voice->outx = (int8_t) (output >> 8);
             }
-        #else
+        #else /* SPCNOINTERP */
         /* two-point linear interpolation */
         #ifdef CPU_COLDFIRE
             int amp_0 = (int16_t)this->noise;
@@ -822,7 +822,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 /* output = y0 + (result >> 12)          */
                 "asr.l      %[sh], %[y1]              \r\n"
                 "add.l      %[y0], %[y1]              \r\n"
-                : [f]"+&d"(f), [y0]"=&a"(y0), [y1]"=&d"(amp_0)
+                : [f]"+d"(f), [y0]"=&a"(y0), [y1]"=&d"(amp_0)
                 : [s]"a"(voice->samples), [sh]"d"(12)
                     );
             }
@@ -861,17 +861,49 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             "movclr.l %%acc1, %[amp_1] \r\n"
             : [amp_0]"=r"(amp_0), [amp_1]"=r"(amp_1)
             );
-        #else
+        #elif defined (CPU_ARM)
+            int amp_0, amp_1;
+            
+            if ( (this->r.g.noise_enables & vbit) != 0 ) {
+                amp_0 = *(int16_t *)&this->noise;
+            } else {
+                uint32_t f = voice->position;
+                amp_0 = (uint32_t)voice->samples;
 
-            /* Try this one out on ARM and see - similar to above but the asm
-               on coldfire removes a redundant register load worth 1 or 2%;
-               switching to loading two samples at once may help too. That's
-               done above and while 6 to 7% faster on cf over two 16 bit loads
-               it makes it endian dependant.
-               
-               measured small improvement (~1.5%) - hcs
-            */
+                asm volatile(
+                "mov    %[y1], %[f], lsr #12        \r\n"
+                "eor    %[f], %[f], %[y1], lsl #12  \r\n" 
+                "add    %[y1], %[y0], %[y1], lsl #1 \r\n"
+                "ldrsh  %[y0], [%[y1], #2]          \r\n"
+                "ldrsh  %[y1], [%[y1], #4]          \r\n"
+                "sub    %[y1], %[y1], %[y0]         \r\n"
+                "mul    %[f], %[y1], %[f]           \r\n"
+                "add    %[y0], %[y0], %[f], asr #12 \r\n"
+                : [f]"+r"(f), [y0]"+r"(amp_0), [y1]"=&r"(amp_1)
+                );
+            }
 
+            voice->position += rate;
+
+            asm volatile(
+            "mul    %[amp_1], %[amp_0], %[envx] \r\n"
+            "mov    %[amp_0], %[amp_1], asr #11 \r\n"
+            "mov    %[amp_1], %[amp_0], asr #8  \r\n"
+            : [amp_0]"+r"(amp_0), [amp_1]"=&r"(amp_1)
+            : [envx]"r"(voice->envx)
+            );
+
+            prev_outx = amp_0;
+            raw_voice->outx = (int8_t)amp_1;
+
+            asm volatile(
+            "mul    %[amp_1], %[amp_0], %[vol_1] \r\n"
+            "mul    %[amp_0], %[vol_0], %[amp_0] \r\n"
+            : [amp_0]"+r"(amp_0), [amp_1]"+r"(amp_1)
+            : [vol_0]"r"((int)voice->volume[0]),
+              [vol_1]"r"((int)voice->volume[1])
+            );
+        #else /* Unoptimized CPU */
             int output;
             
             if ( (this->r.g.noise_enables & vbit) == 0 )
@@ -884,19 +916,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             }
 
             voice->position += rate;
-            
-            /* old version */
-#if 0
-            int fraction = voice->position & 0xFFF;
-            short const* const pos = voice->samples + (voice->position >> 12);
-            voice->position += rate;
-            int output =
-                (pos [2] * fraction + pos [1] * (0x1000 - fraction)) >> 12;
-            /* no interpolation (hardly faster, and crappy sounding) */
-            /*int output = pos [0];*/
-            if ( this->r.g.noise_enables & vbit )
-                output = *(int16_t*) &this->noise;
-#endif
+
             output = (output * voice->envx) >> 11;
 
             /* duplicated here to give compiler more to run in parallel */
@@ -905,8 +925,8 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 
             prev_outx = output;
             raw_voice->outx = (int8_t) (output >> 8);
-        #endif /* CPU_COLDFIRE */
-        #endif
+        #endif /* CPU_* */
+        #endif /* SPCNOINTERP */
         
         #if SPC_BRRCACHE
             if ( voice->position >= voice->wave_end )
@@ -1033,7 +1053,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             "or.l       %[sh], %[e0]                \r\n"
             /* save final feedback into echo buffer    */
             "move.l     %[e0], (%[echo_ptr])        \r\n"
-            : [e0]"+&d"(echo_0), [e1]"+&d"(echo_1)
+            : [e0]"+d"(echo_0), [e1]"+d"(echo_1)
             : [out_0]"r"(out_0), [out_1]"r"(out_1),
               [ef]"r"((int)this->r.g.echo_feedback),
               [echo_ptr]"a"((int32_t *)echo_ptr),
@@ -1056,7 +1076,88 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         out_buf [             0] = out_0;
         out_buf [WAV_CHUNK_SIZE] = out_1;
         out_buf ++;
-    #else /* !CPU_COLDFIRE */
+    #elif defined (CPU_ARM)
+        /* Read feedback from echo buffer */
+        int echo_pos = this->echo_pos;
+        uint8_t* const echo_ptr = RAM +
+                ((this->r.g.echo_page * 0x100 + echo_pos) & 0xFFFF);
+        echo_pos += 4;
+        if ( echo_pos >= (this->r.g.echo_delay & 15) * 0x800 )
+            echo_pos = 0;
+        this->echo_pos = echo_pos;
+
+        int fb_0 = GET_LE16SA( echo_ptr     );
+        int fb_1 = GET_LE16SA( echo_ptr + 2 );
+
+        /* Keep last 8 samples */
+        int32_t *fir_ptr = this->fir_ptr;
+
+        /* Apply FIR */
+        asm volatile (
+        "str    %[fb_0], [%[fir_p]], #4  \r\n"
+        "str    %[fb_1], [%[fir_p]], #4  \r\n"
+        /* duplicate at +8 eliminates wrap checking below */
+        "str    %[fb_0], [%[fir_p], #56] \r\n"
+        "str    %[fb_1], [%[fir_p], #60] \r\n"
+        : [fir_p]"+r"(fir_ptr)
+        : [fb_0]"r"(fb_0), [fb_1]"r"(fb_1)
+        );
+
+        this->fir_ptr = (int32_t *)((intptr_t)fir_ptr & FIR_BUF_MASK);
+        int32_t *fir_coeff = this->fir_coeff;
+
+        asm volatile (
+        "ldmia  %[fir_c]!, { r0-r1 }     \r\n"
+        "ldmia  %[fir_p]!, { r4-r5 }     \r\n"
+        "mul    %[fb_0],     r0, %[fb_0] \r\n"
+        "mul    %[fb_1],     r0, %[fb_1] \r\n"
+        "mla    %[fb_0], r4, r1, %[fb_0] \r\n"
+        "mla    %[fb_1], r5, r1, %[fb_1] \r\n"
+        "ldmia  %[fir_c]!, { r0-r1 }     \r\n"
+        "ldmia  %[fir_p]!, { r2-r5 }     \r\n"
+        "mla    %[fb_0], r2, r0, %[fb_0] \r\n"
+        "mla    %[fb_1], r3, r0, %[fb_1] \r\n"
+        "mla    %[fb_0], r4, r1, %[fb_0] \r\n"
+        "mla    %[fb_1], r5, r1, %[fb_1] \r\n"
+        "ldmia  %[fir_c]!, { r0-r1 }     \r\n"
+        "ldmia  %[fir_p]!, { r2-r5 }     \r\n"
+        "mla    %[fb_0], r2, r0, %[fb_0] \r\n"
+        "mla    %[fb_1], r3, r0, %[fb_1] \r\n"
+        "mla    %[fb_0], r4, r1, %[fb_0] \r\n"
+        "mla    %[fb_1], r5, r1, %[fb_1] \r\n"
+        "ldmia  %[fir_c]!, { r0-r1 }     \r\n"
+        "ldmia  %[fir_p]!, { r2-r5 }     \r\n"
+        "mla    %[fb_0], r2, r0, %[fb_0] \r\n"
+        "mla    %[fb_1], r3, r0, %[fb_1] \r\n"
+        "mla    %[fb_0], r4, r1, %[fb_0] \r\n"
+        "mla    %[fb_1], r5, r1, %[fb_1] \r\n"
+        : [fb_0]"+r"(fb_0), [fb_1]"+r"(fb_1),
+          [fir_p]"+r"(fir_ptr), [fir_c]"+r"(fir_coeff)
+        :
+        : "r0", "r1", "r2", "r3", "r4", "r5"
+        );
+
+        /* Generate output */
+        int amp_0 = (chans_0 * global_vol_0 + fb_0 * this->r.g.echo_volume_0)
+                    >> global_muting;
+        int amp_1 = (chans_1 * global_vol_1 + fb_1 * this->r.g.echo_volume_1)
+                    >> global_muting;
+
+        out_buf [             0] = amp_0;
+        out_buf [WAV_CHUNK_SIZE] = amp_1;
+        out_buf ++;
+
+        if ( !(this->r.g.flags & 0x20) )
+        {
+            /* Feedback into echo buffer */
+            int e0 = (echo_0 >> 7) + ((fb_0 * this->r.g.echo_feedback) >> 14);
+            int e1 = (echo_1 >> 7) + ((fb_1 * this->r.g.echo_feedback) >> 14);
+            e0 = CLAMP16( e0 );
+            SET_LE16A( echo_ptr    , e0 );
+            e1 = CLAMP16( e1 );
+            SET_LE16A( echo_ptr + 2, e1 );
+        }
+    #else /* Unoptimized CPU */
         /* Read feedback from echo buffer */
         int echo_pos = this->echo_pos;
         uint8_t* const echo_ptr = RAM +
@@ -1102,25 +1203,25 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         out_buf [WAV_CHUNK_SIZE] = amp_1;
         out_buf ++;
         
-        /* Feedback into echo buffer */
-        int e0 = (echo_0 >> 7) + ((fb_0 * this->r.g.echo_feedback) >> 14);
-        int e1 = (echo_1 >> 7) + ((fb_1 * this->r.g.echo_feedback) >> 14);
         if ( !(this->r.g.flags & 0x20) )
         {
-            CLAMP16( e0, e0 );
+            /* Feedback into echo buffer */
+            int e0 = (echo_0 >> 7) + ((fb_0 * this->r.g.echo_feedback) >> 14);
+            int e1 = (echo_1 >> 7) + ((fb_1 * this->r.g.echo_feedback) >> 14);
+            e0 = CLAMP16( e0 );
             SET_LE16A( echo_ptr    , e0 );
-            CLAMP16( e1, e1 );
+            e1 = CLAMP16( e1 );
             SET_LE16A( echo_ptr + 2, e1 );
         }
-    #endif /* CPU_COLDFIRE */
-    #else
+    #endif /* CPU_* */
+    #else /* SPCNOECHO == 1*/
         /* Generate output  */
         int amp_0 = (chans_0 * global_vol_0) >> global_muting;
         int amp_1 = (chans_1 * global_vol_1) >> global_muting;
         out_buf [             0] = amp_0;
         out_buf [WAV_CHUNK_SIZE] = amp_1;
         out_buf ++;
-    #endif
+    #endif /* SPCNOECHO */
     }
     while ( --count );
 #if 0
@@ -1155,9 +1256,12 @@ void DSP_reset( struct Spc_Dsp* this )
             this->wave_entry [i].start_addr = -1;
     #endif
 
-#ifdef CPU_COLDFIRE
-    this->fir_ptr      = fir_buf;
+#if defined(CPU_COLDFIRE)
+    this->fir_ptr = fir_buf;
     this->last_fir_ptr = &fir_buf [7];
+    ci->memset( fir_buf, 0, sizeof fir_buf );
+#elif defined (CPU_ARM)
+    this->fir_ptr = fir_buf;
     ci->memset( fir_buf, 0, sizeof fir_buf );
 #else
     this->fir_pos = 0;

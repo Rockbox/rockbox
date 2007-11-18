@@ -162,7 +162,19 @@ struct codec_api ci = {
     invalidate_icache,
 #endif
 
-    NULL, /* struct sp_data *dsp */
+    NULL, /* struct dsp_config *dsp */
+
+#if NUM_CORES > 1
+    create_thread,
+    thread_thaw,
+    thread_wait,
+    semaphore_init,
+    semaphore_wait,
+    semaphore_release,
+    event_init,
+    event_wait,
+    event_set_state,
+#endif
 };
 
 void codec_get_full_path(char *path, const char *codec_root_fn)
