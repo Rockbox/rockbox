@@ -1879,6 +1879,7 @@ export ENABLEDPLUGINS=@PLUGINS@
 export SOFTWARECODECS=@CODECS@
 export EXTRA_DEFINES=@EXTRADEF@
 export HOSTCC=gcc
+export HOSTAR=ar
 export CC=@CC@
 export LD=@LD@
 export AR=@AR@
@@ -1944,10 +1945,10 @@ clean:
 	          voicefontids *.wav *.mp3 *.voice
 
 tools:
-	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
+	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) AR=\$(HOSTAR) @TOOLSET@
 
 voicetools:
-	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @VOICETOOLSET@
+	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) AR=\$(HOSTAR) @VOICETOOLSET@
 
 tags:
 	\$(SILENT)rm -f TAGS
