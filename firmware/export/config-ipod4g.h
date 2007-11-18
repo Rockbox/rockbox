@@ -47,6 +47,8 @@
 #define LCD_DEPTH  2   /* 4 colours - 2bpp */
 #define LCD_PIXELFORMAT HORIZONTAL_PACKING
 
+#define HAVE_LCD_CONTRAST
+
 /* LCD contrast */
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        63

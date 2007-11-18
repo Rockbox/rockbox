@@ -53,6 +53,8 @@
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
+#define HAVE_LCD_CONTRAST
+
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        63
 #define DEFAULT_CONTRAST_SETTING    40

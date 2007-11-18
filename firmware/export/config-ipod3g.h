@@ -41,6 +41,8 @@
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
 
+#define HAVE_LCD_CONTRAST
+
 /* LCD contrast */
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        63

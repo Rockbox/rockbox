@@ -166,6 +166,8 @@
 
 /** Port-specific settings **/
 
+#define HAVE_LCD_CONTRAST
+
 /* Main LCD backlight brightness range and defaults */
 #define MIN_CONTRAST_SETTING        14 /* White screen a bit higher than this */
 #define MAX_CONTRAST_SETTING        63 /* Black screen a bit lower than this */
