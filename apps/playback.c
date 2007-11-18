@@ -2332,6 +2332,7 @@ static bool audio_load_track(int offset, bool start_play)
     {
         logf("End-of-playlist");
         playlist_end = true;
+        memset(&lasttrack_id3, 0, sizeof(struct mp3entry));
         return false;
     }
 
