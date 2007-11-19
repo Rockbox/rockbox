@@ -33,6 +33,7 @@
 #include "disk.h"
 #include "crc32-mi4.h"
 #include <string.h>
+#include "power.h"
 #if defined(SANSA_E200)
 #include "i2c.h"
 #include "backlight-target.h"
@@ -443,11 +444,19 @@ void* main(void)
     i2c_init();
     _backlight_on();
 #endif
-
     lcd_set_foreground(LCD_WHITE);
     lcd_set_background(LCD_BLACK);
     lcd_clear_display();
     
+    if (button_hold())
+    {
+        verbose = true;
+        printf("Hold switch on");
+        printf("Shutting down...");
+        sleep(HZ);
+        power_off();
+    }
+        
     btn = button_read_device();
 #if defined(SANSA_E200) || defined(SANSA_C200)
     usb_init();
