@@ -1079,6 +1079,7 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
 {
     int settings_fd, i;
     struct bookmark_file_data *data;
+    struct bookmarked_file_info this_bookmark;
     
     /* read settings file */
     settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
@@ -1106,7 +1107,10 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
         rb->read(settings_fd, data->bookmarks, 
                  sizeof(struct bookmarked_file_info) * data->bookmarked_files_count);
         rb->close(settings_fd);
-    } 
+    }
+
+    file_pos = 0;
+    screen_top_ptr = buffer;
 
     /* check if current file is in list */
     for (i=0; i < data->bookmarked_files_count; i++)
@@ -1118,6 +1122,12 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
             break;
         }    
     }
+
+    this_bookmark.file_position = file_pos;
+    this_bookmark.top_ptr_pos = screen_top_ptr - buffer;
+
+    rb->memset(&this_bookmark.filename[0],0,MAX_PATH);
+    rb->strcpy(this_bookmark.filename,file_name);
 
     /* prevent potential slot overflow */
     if (i >= data->bookmarked_files_count) 
@@ -1133,12 +1143,15 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
     settings_fd = rb->open(BOOKMARKS_FILE, O_WRONLY|O_CREAT);
     if (settings_fd >=0 )
     {     
-        /* write count and skip first slot */
+        /* write count */
         rb->write (settings_fd, &data->bookmarked_files_count, sizeof(signed int));
-        rb->PREFIX(lseek)(settings_fd,sizeof(struct bookmarked_file_info),SEEK_CUR);
 
-        /* shuffle up bookmarks */
+        /* write the current bookmark */
+        rb->write (settings_fd, &this_bookmark, sizeof(struct bookmarked_file_info));
+
+        /* write everything that was before this bookmark */
         rb->write (settings_fd, data->bookmarks, sizeof(struct bookmarked_file_info)*i);
+
         rb->close(settings_fd);
     }
 
