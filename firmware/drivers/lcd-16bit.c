@@ -550,6 +550,40 @@ void lcd_gradient_rect(int x1, int x2, int y, int h)
     }
 }
 
+#define H_COLOR(lss, lse, cur_line, max_line) \
+        (((lse) - (lss)) * (cur_line) / (max_line) + (lss))
+
+/* Fill a rectangle with a gradient for scrolling line */
+void lcd_gradient_rect_scroll(int x1, int x2, int y, int h,
+                              unsigned char max_line, unsigned char cur_line)
+{
+    if (h == 0 || max_line == 0) return;
+
+    unsigned tmp_lss = lss_pattern;
+    unsigned tmp_lse = lse_pattern;
+    int lss_r = (signed)RGB_UNPACK_RED(lss_pattern);
+    int lss_b = (signed)RGB_UNPACK_BLUE(lss_pattern);
+    int lss_g = (signed)RGB_UNPACK_GREEN(lss_pattern);
+    int lse_r = (signed)RGB_UNPACK_RED(lse_pattern);
+    int lse_b = (signed)RGB_UNPACK_BLUE(lse_pattern);
+    int lse_g = (signed)RGB_UNPACK_GREEN(lse_pattern);
+
+    int h_r = H_COLOR(lss_r, lse_r, cur_line - 1, max_line);
+    int h_g = H_COLOR(lss_g, lse_g, cur_line - 1, max_line);
+    int h_b = H_COLOR(lss_b, lse_b, cur_line - 1, max_line);
+    lcd_set_selector_start(LCD_RGBPACK(h_r, h_g, h_b));
+
+    int l_r = H_COLOR(lss_r, lse_r, cur_line, max_line);
+    int l_g = H_COLOR(lss_g, lse_g, cur_line, max_line);
+    int l_b = H_COLOR(lss_b, lse_b, cur_line, max_line);
+    lcd_set_selector_end(LCD_RGBPACK(l_r, l_g, l_b));
+
+    lcd_gradient_rect(x1, x2, y, h);
+
+    lcd_set_selector_start(tmp_lss);
+    lcd_set_selector_end(tmp_lse);
+}
+
 /* About Rockbox' internal monochrome bitmap format:
  *
  * A bitmap contains one bit for every pixel that defines if that pixel is
@@ -864,7 +898,8 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
 
     if (style & STYLE_GRADIENT) {
         drawmode = DRMODE_FG;
-        lcd_gradient_rect(xpos, LCD_WIDTH, ypos, h*(style & STYLE_COLOR_MASK));
+        if (CURLN_UNPACK(style) == 1)
+            lcd_gradient_rect(xpos, LCD_WIDTH, ypos, h*MAXLN_UNPACK(style));
         fg_pattern = lst_pattern;
     }
     else if (style & STYLE_COLORBAR) {
@@ -1031,7 +1066,9 @@ void lcd_scroll_fn(void)
             case STYLE_GRADIENT:
                 /* Gradient line selector */
                 drawmode = DRMODE_FG;
-                lcd_gradient_rect(xpos, LCD_WIDTH, ypos, (signed)pf->height);
+                lcd_gradient_rect_scroll(xpos, LCD_WIDTH, ypos, (signed)pf->height,
+                                         MAXLN_UNPACK(s->style),
+                                         CURLN_UNPACK(s->style));
                 fg_pattern = lst_pattern;
                 break;
             default:

@@ -31,6 +31,14 @@
 #define STYLE_GRADIENT   0x80000000
 #define STYLE_MODE_MASK  0xF0000000
 #define STYLE_COLOR_MASK 0x0000FFFF
+#ifdef HAVE_LCD_COLOR
+#define STYLE_CURLN_MASK 0x0000FF00
+#define STYLE_MAXLN_MASK 0x000000FF
+#define CURLN_PACK(x)    (((x)<<8) & STYLE_CURLN_MASK)
+#define CURLN_UNPACK(x)  ((unsigned char)(((x)&STYLE_CURLN_MASK) >> 8))
+#define MAXLN_PACK(x)    ((x) & STYLE_MAXLN_MASK)
+#define MAXLN_UNPACK(x)  ((unsigned char)((x) & STYLE_MAXLN_MASK))
+#endif
 
 #ifdef SIMULATOR
 #ifndef MAX_PATH
