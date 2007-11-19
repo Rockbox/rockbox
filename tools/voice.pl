@@ -187,6 +187,42 @@ sub correct_string {
                  }
             }
         }
+        case "italiano" {
+            # for all italian engines (e.g. for english words)
+            $string =~ s/Replaygain/Ripleyghein/ig;
+            $string =~ s/Crossfade/Crossfeid/ig;
+            $string =~ s/beep/Bip/ig;
+            $string =~ s/cuesheet/chiushit/ig;
+            $string =~ s/fade/feid/ig;
+            $string =~ s/Crossfeed/crossfid/ig;
+            $string =~ s/Cache/chash/ig;
+            $string =~ s/\bfirmware(s?)\b/firmuer$1/ig;
+            $string =~ s/\bFile(s?)\b/fail$1/ig;
+            $string =~ s/\bloudness\b/laudness/ig;
+            $string =~ s/\bunicode\b/unikod/ig;
+            $string =~ s/Playlist/pleylist/ig;
+            $string =~ s/WavPack/wave pak/ig;
+            $string =~ s/BITRATE/bit reit/ig;
+            $string =~ s/Codepage/cod page/ig;
+            $string =~ s/PCM Wave/pcm ueiv/ig;
+            $string =~ s/Ã¨/è/ig;
+            $string =~ s/\b(s*)Ã¹\b/$1ù/ig;
+            $string =~ s/\b(s*)Ã\b/$1à/ig;
+            switch($$tts_object{"name"}) {
+                 case "sapi" {   # just for SAPI
+                    switch($$tts_object{"vendor"}) {
+                        case "Loquendo" {
+                            $string =~ s/Inizializza/inizializa/ig;
+                        }
+                        case "ScanSoft, Inc" {
+                            $string =~ s/V/v/ig;
+                            $string =~ s/X/x/ig;
+                            $string =~ s/stop/stohp/ig;
+                        }
+                    }
+                }
+            }
+        }
     }
     if ($orig ne $string) {
         printf("%s -> %s\n", $orig, $string) if $verbose;
