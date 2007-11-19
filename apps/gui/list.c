@@ -309,7 +309,7 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
             end++;
     }
 
-#ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_COLOR
     unsigned char cur_line = 1;
 #endif
     for (i = start; i < end; i++)
