@@ -19,7 +19,12 @@ codecs/lib/Makefile
 codecs/lib/SOURCES
 codecs/liba52/*
 codecs/libalac/*
-codecs/libfaad/*
+codecs/libfaad/COPYING
+codecs/libfaad/Makefile
+codecs/libfaad/README
+codecs/libfaad/README.rockbox
+codecs/libfaad/SOURCES
+codecs/libfaad/*.[ch]
 codecs/libfaad/codebook/*
 codecs/libffmpegFLAC/*
 codecs/libm4a/*
@@ -29,7 +34,9 @@ codecs/libspeex/*
 codecs/libspeex/speex/*
 codecs/libwavpack/*
 codecs/libwma/*
-codecs/spc/*
+codecs/spc/*.[ch]
+codecs/spc/Makefile
+codecs/spc/Sources
 codecs/Tremor/*
 eqs/*.cfg
 gui/*.[ch]
@@ -48,6 +55,9 @@ plugins/sokoban.levels
 plugins/viewers.config
 plugins/SOURCES
 plugins/SUBDIRS
+plugins/beatbox/Makefile
+plugins/beatbox/beatbox.c
+plugins/beatbox/SOURCES
 plugins/bitmaps/mono/*
 plugins/bitmaps/native/*
 plugins/bitmaps/remote_mono/*

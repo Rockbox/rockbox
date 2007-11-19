@@ -24,5 +24,7 @@ ucl/include/ucl/*.h
 profile_reader/*.pl
 ipodpatcher/Makefile
 ipodpatcher/*.[ch]
+rbspeex/Makefile
+rbspeex/rbspeexenc.c
 *.vbs
 VOICE_PAUSE.wav
