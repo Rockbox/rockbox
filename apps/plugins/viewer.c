@@ -974,10 +974,14 @@ static void viewer_top(void)
 {
     /* Read top of file into buffer
       and point screen pointer to top */
-    file_pos = 0;
-    buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
+    if (file_pos != 0)
+    {
+        file_pos = 0;
+        buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
+        fill_buffer(0, buffer, BUFFER_SIZE);
+    }
+
     screen_top_ptr = buffer;
-    fill_buffer(0, buffer, BUFFER_SIZE);
 }
 
 static void viewer_bottom(void)
@@ -995,10 +999,15 @@ static void viewer_bottom(void)
     else {
         last_sectors = 0;
     }
-    file_pos = last_sectors;
-    buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
+
+    if (file_pos != last_sectors)
+    {
+        file_pos = last_sectors;
+        buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
+        fill_buffer(last_sectors, buffer, BUFFER_SIZE);
+    }
+
     screen_top_ptr = buffer_end-1;
-    fill_buffer(last_sectors, buffer, BUFFER_SIZE);
 }
 
 #ifdef HAVE_LCD_BITMAP
