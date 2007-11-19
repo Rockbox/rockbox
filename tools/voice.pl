@@ -462,6 +462,7 @@ sub gentalkclips {
         wavtrim($wav, 500, $tts_object);
         # 500 seems to be a reasonable default for now
         encodewav($wav, $mp3, $encoder, $encoder_opts, $tts_object);
+        synchronize($tts_object);
         unlink($wav);
     }
 }
