@@ -174,6 +174,7 @@ enum {
 #endif
 
 bool audio_is_initialized = false;
+static bool audio_thread_ready NOCACHEBSS_ATTR = false;
 
 /* Variables are commented with the threads that use them: *
  * A=audio, C=codec, V=voice. A suffix of - indicates that *
@@ -2393,6 +2394,8 @@ static void audio_thread(void)
 
     pcm_postinit();
 
+    audio_thread_ready = true;
+
     while (1)
     {
         queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
@@ -2625,10 +2628,13 @@ void audio_init(void)
 
 } /* audio_init */
 
-/* Wait until audio thread can respond to messages - this implies
- * it has finished initialization */
 void audio_wait_for_init(void)
 {
-    LOGFQUEUE("audio >| Q_NULL");
-    queue_send(&audio_queue, Q_NULL, 0);
+    /* audio thread will only set this once after it finished the final
+     * audio hardware init so this little construct is safe - even
+     * cross-core. */
+    while (!audio_thread_ready)
+    {
+        sleep(0);
+    }
 }
