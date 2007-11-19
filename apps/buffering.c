@@ -654,7 +654,11 @@ static bool buffer_handle(int handle_id)
         h->available += rc;
         h->filerem -= rc;
 
+#ifdef SIMULATOR
+        sleep(1);
+#else
         yield();
+#endif
 
         /* If this is a large file, see if we need to break or give the codec
          * more time */
