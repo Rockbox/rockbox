@@ -508,8 +508,7 @@ struct mp3entry* audio_current_track(void)
     int cur_idx;
     int offset = ci.new_track + wps_offset;
 
-    cur_idx = track_ridx + offset;
-    cur_idx &= MAX_TRACK_MASK;
+    cur_idx = (track_ridx + offset) & MAX_TRACK_MASK;
 
     if (cur_idx == track_ridx && *curtrack_id3.path)
     {
@@ -570,8 +569,7 @@ struct mp3entry* audio_next_track(void)
         return &curtrack_id3;
     }
 
-    next_idx++;
-    next_idx &= MAX_TRACK_MASK;
+    next_idx = (next_idx + 1) & MAX_TRACK_MASK;
 
     if (next_idx == track_widx)
     {
@@ -1464,8 +1462,7 @@ static void audio_update_trackinfo(void)
 
     CUR_TI->taginfo_ready = (CUR_TI->id3_hid >= 0);
 
-    int next_idx = track_ridx + 1;
-    next_idx &= MAX_TRACK_MASK;
+    int next_idx = (track_ridx + 1) & MAX_TRACK_MASK;
 
     tracks[next_idx].taginfo_ready = (tracks[next_idx].id3_hid >= 0);
 
@@ -1496,8 +1493,7 @@ static void audio_clear_track_entries(bool clear_unbuffered)
     /* Loop over all tracks from write-to-read */
     while (1)
     {
-        cur_idx++;
-        cur_idx &= MAX_TRACK_MASK;
+        cur_idx = (cur_idx + 1) & MAX_TRACK_MASK;
 
         if (cur_idx == track_ridx)
             break;
@@ -1863,8 +1859,7 @@ static bool audio_load_track(int offset, bool start_play)
         buf_request_buffer_handle(tracks[track_widx].audio_hid);
     }
 
-    track_widx++;
-    track_widx &= MAX_TRACK_MASK;
+    track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
     return true;
 }
@@ -1890,8 +1885,7 @@ static void audio_generate_postbuffer_events(void)
             }
             if (cur_idx == track_widx)
                 break;
-            cur_idx++;
-            cur_idx &= MAX_TRACK_MASK;
+            cur_idx = (cur_idx + 1) & MAX_TRACK_MASK;
         }
     }
 }
@@ -2045,8 +2039,7 @@ static int audio_check_new_track(void)
     }
 
     /* Move to the new track */
-    track_ridx += ci.new_track;
-    track_ridx &= MAX_TRACK_MASK;
+    track_ridx = (track_ridx + ci.new_track) & MAX_TRACK_MASK;
 
     buf_set_base_handle(CUR_TI->audio_hid);
 
@@ -2088,8 +2081,7 @@ static int audio_check_new_track(void)
 
         while (1)
         {
-            cur_idx++;
-            cur_idx &= MAX_TRACK_MASK;
+            cur_idx = (cur_idx + 1) & MAX_TRACK_MASK;
 
             /* if we've advanced past the wrap when cur_idx is zeroed */
             if (!cur_idx)
@@ -2182,8 +2174,7 @@ static void audio_stop_playback(void)
          */
         if (playlist_end)
         {
-            track_ridx++;
-            track_ridx &= MAX_TRACK_MASK;
+            track_ridx = (track_ridx + 1) & MAX_TRACK_MASK;
         }
     }
 
@@ -2275,8 +2266,7 @@ static void audio_new_playlist(void)
         track_widx = track_ridx;
         audio_clear_track_entries(true);
 
-        track_widx++;
-        track_widx &= MAX_TRACK_MASK;
+        track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
         /* Mark the current track as invalid to prevent skipping back to it */
         CUR_TI->taginfo_ready = false;
