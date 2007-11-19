@@ -285,7 +285,10 @@ struct preferences {
 
     int autoscroll_speed;
     
-} prefs;
+};
+
+struct preferences prefs;
+struct preferences old_prefs;
 
 static unsigned char buffer[BUFFER_SIZE + 1];
 static unsigned char line_break[] = {0,0x20,9,0xB,0xC,'-'};
@@ -1093,6 +1096,8 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
         rb->close(settings_fd);
     }    
 
+    memcpy(&old_prefs, &prefs, sizeof(struct preferences));
+
     data = (struct bookmark_file_data*)buffer; /* grab the text buffer */
     data->bookmarked_files_count = 0;
 
@@ -1174,26 +1179,34 @@ static void viewer_save_settings(void)/* same name as global, but not the same f
 {
     int settings_fd;
 
-    /* don't save if the position didn't change */
-    if (file_pos + screen_top_ptr - buffer == start_position)
-        return;
-
-    settings_fd = rb->creat(SETTINGS_FILE); /* create the settings file */
-    
-    rb->write (settings_fd, &prefs, sizeof(struct preferences));
-    rb->close(settings_fd);
-    
-    settings_fd = rb->open(BOOKMARKS_FILE, O_WRONLY|O_CREAT);
-    if (settings_fd >= 0 )
+    /* save the viewer settings if they have been changed */
+    if (rb->memcmp(&prefs, &old_prefs, sizeof(struct preferences)))
     {
-        struct bookmarked_file_info b;
-        b.file_position = file_pos;
-        b.top_ptr_pos = screen_top_ptr - buffer;
-        rb->memset(&b.filename[0],0,MAX_PATH);
-        rb->strcpy(b.filename,file_name);
-        rb->PREFIX(lseek)(settings_fd,sizeof(signed int),SEEK_SET);
-        rb->write (settings_fd, &b, sizeof(struct bookmarked_file_info));
-        rb->close(settings_fd);
+        settings_fd = rb->creat(SETTINGS_FILE); /* create the settings file */
+
+        if (settings_fd >= 0 )
+        {
+            rb->write (settings_fd, &prefs, sizeof(struct preferences));
+            rb->close(settings_fd);
+        }
+    }
+    
+    /* save the bookmark if the position has changed */
+    if (file_pos + screen_top_ptr - buffer != start_position)
+    {
+        settings_fd = rb->open(BOOKMARKS_FILE, O_WRONLY|O_CREAT);
+
+        if (settings_fd >= 0 )
+        {
+            struct bookmarked_file_info b;
+            b.file_position = file_pos;
+            b.top_ptr_pos = screen_top_ptr - buffer;
+            rb->memset(&b.filename[0],0,MAX_PATH);
+            rb->strcpy(b.filename,file_name);
+            rb->PREFIX(lseek)(settings_fd,sizeof(signed int),SEEK_SET);
+            rb->write (settings_fd, &b, sizeof(struct bookmarked_file_info));
+            rb->close(settings_fd);
+        }
     }
 }
 
