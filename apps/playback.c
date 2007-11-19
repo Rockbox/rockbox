@@ -1443,20 +1443,23 @@ long audio_filebufused(void)
     return (long) buf_used();
 }
 
+/* Update track info after successful a codec track change */
 static void audio_update_trackinfo(void)
 {
+    /* Load the curent track's metadata into curtrack_id3 */
+    CUR_TI->taginfo_ready = (CUR_TI->id3_hid >= 0);
     if (CUR_TI->id3_hid >= 0)
         copy_mp3entry(&curtrack_id3, bufgetid3(CUR_TI->id3_hid));
 
-    CUR_TI->taginfo_ready = (CUR_TI->id3_hid >= 0);
-
     int next_idx = (track_ridx + 1) & MAX_TRACK_MASK;
-
     tracks[next_idx].taginfo_ready = (tracks[next_idx].id3_hid >= 0);
 
-    ci.filesize = CUR_TI->filesize;
+    /* Reset current position */
     curtrack_id3.elapsed = 0;
     curtrack_id3.offset = 0;
+
+    /* Update the codec API */
+    ci.filesize = CUR_TI->filesize;
     ci.id3 = &curtrack_id3;
     ci.curpos = 0;
     ci.taginfo_ready = &CUR_TI->taginfo_ready;
@@ -2298,6 +2301,14 @@ static void audio_finalise_track_change(void)
         wps_offset = 0;
         automatic_skip = false;
     }
+
+    /* Copy the track back to the main buffer */
+    if (prev_ti && prev_ti->id3_hid >= 0)
+    {
+        copy_mp3entry(bufgetid3(prev_ti->id3_hid), &prevtrack_id3);
+    }
+
+    /* Invalidate prevtrack_id3 */
     prevtrack_id3.path[0] = 0;
 
     if (prev_ti && prev_ti->audio_hid < 0)
@@ -2308,6 +2319,7 @@ static void audio_finalise_track_change(void)
 
     if (track_changed_callback)
         track_changed_callback(&curtrack_id3);
+
     track_changed = true;
     playlist_update_resume_info(audio_current_track());
 }
