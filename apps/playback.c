@@ -1422,32 +1422,20 @@ static void codec_thread(void)
 
 static bool audio_have_tracks(void)
 {
-    return track_ridx != track_widx || CUR_TI->filesize;
+    return (audio_track_count() != 0);
 }
 
-static bool audio_have_free_tracks(void)
+static int audio_free_track_count(void)
 {
-    if (track_widx < track_ridx)
-        return track_widx + 1 < track_ridx;
-    else if (track_ridx == 0)
-        return track_widx < MAX_TRACK - 1;
-
-    return true;
+    /* Used tracks + free tracks adds up to MAX_TRACK - 1 */
+    return MAX_TRACK - 1 - audio_track_count();
 }
 
 int audio_track_count(void)
 {
-    if (audio_have_tracks())
-    {
-        int relative_track_widx = track_widx;
-
-        if (track_ridx > track_widx)
-            relative_track_widx += MAX_TRACK;
-
-        return relative_track_widx - track_ridx + 1;
-    }
-
-    return 0;
+    /* Calculate difference from track_ridx to track_widx
+     * taking into account a possible wrap-around. */
+    return (MAX_TRACK + track_widx - track_ridx) & MAX_TRACK_MASK;
 }
 
 long audio_filebufused(void)
@@ -1659,7 +1647,7 @@ static bool audio_load_track(int offset, bool start_play)
     /* Stop buffer filling if there is no free track entries.
        Don't fill up the last track entry (we wan't to store next track
        metadata there). */
-    if (!audio_have_free_tracks())
+    if (!audio_free_track_count())
     {
         logf("No free tracks");
         return false;

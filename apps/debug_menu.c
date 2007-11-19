@@ -344,7 +344,7 @@ static bool dbg_buffering_thread(void)
         snprintf(buf, sizeof(buf), "data_rem: %ld", (long)d.data_rem);
         lcd_puts(0, line++, buf);
 
-        snprintf(buf, sizeof(buf), "track count: %2d", audio_track_count()-1);
+        snprintf(buf, sizeof(buf), "track count: %2d", audio_track_count());
         lcd_puts(0, line++, buf);
 
         snprintf(buf, sizeof(buf), "handle count: %d", (int)d.num_handles);
