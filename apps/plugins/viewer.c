@@ -1096,7 +1096,7 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
         rb->close(settings_fd);
     }    
 
-    memcpy(&old_prefs, &prefs, sizeof(struct preferences));
+    rb->memcpy(&old_prefs, &prefs, sizeof(struct preferences));
 
     data = (struct bookmark_file_data*)buffer; /* grab the text buffer */
     data->bookmarked_files_count = 0;
