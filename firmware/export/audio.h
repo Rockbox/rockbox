@@ -77,6 +77,7 @@ struct audio_debug
 };
 
 void audio_init(void);
+void audio_wait_for_init(void);
 void audio_play(long offset);
 void audio_stop(void);
 void audio_pause(void);

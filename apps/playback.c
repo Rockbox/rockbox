@@ -127,6 +127,7 @@
 #endif
 
 enum {
+    Q_NULL = 0,
     Q_AUDIO_PLAY = 1,
     Q_AUDIO_STOP,
     Q_AUDIO_PAUSE,
@@ -2623,3 +2624,11 @@ void audio_init(void)
     thread_thaw(audio_thread_p);
 
 } /* audio_init */
+
+/* Wait until audio thread can respond to messages - this implies
+ * it has finished initialization */
+void audio_wait_for_init(void)
+{
+    LOGFQUEUE("audio >| Q_NULL");
+    queue_send(&audio_queue, Q_NULL, 0);
+}

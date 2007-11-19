@@ -286,6 +286,7 @@ static void voice_thread(void)
     struct voice_thread_data td;
 
     voice_data_init(&td);
+    audio_wait_for_init();
     
     goto message_wait;
 
@@ -430,9 +431,6 @@ void voice_thread_resume(void)
 {
     logf("Thawing voice thread");
     thread_thaw(voice_thread_p);
-    /* Wait for initialization to complete (a very short wait until the
-     * voice thread is available to process messages) */
-    queue_send(&voice_queue, Q_VOICE_NULL, 0);
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
