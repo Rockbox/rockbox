@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 
-#define DEBUG_CANCEL  BUTTON_A
+#define DEBUG_CANCEL  BUTTON_POWER
 bool __dbg_hw_info(void);
 bool __dbg_ports(void);
 
