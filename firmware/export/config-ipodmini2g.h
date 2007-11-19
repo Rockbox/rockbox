@@ -83,6 +83,13 @@
 /* We can fade the backlight by using PWM */
 #define HAVE_BACKLIGHT_PWM_FADING
 
+/* define this if the unit uses a scrollwheel for navigation */
+#define HAVE_SCROLLWHEEL
+/* define from which rotation speed [degree/sec] on the acceleration starts */
+#define WHEEL_ACCEL_START 270
+/* define type of acceleration (1 = ^2, 2 = ^3, 3 = ^4) */
+#define WHEEL_ACCELERATION 3
+
 /* Define this if you can detect headphones */
 #define HAVE_HEADPHONE_DETECTION
 

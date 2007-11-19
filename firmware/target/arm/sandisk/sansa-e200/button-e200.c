@@ -27,6 +27,7 @@
 #define WHEEL_REPEAT_INTERVAL   300000
 #define WHEEL_FAST_ON_INTERVAL   20000
 #define WHEEL_FAST_OFF_INTERVAL  60000
+#define WHEELCLICKS_PER_ROTATION    48 /* wheelclicks per full rotation */
 
 /* Clickwheel */
 #ifndef BOOTLOADER
@@ -137,10 +138,8 @@ void clickwheel_int(void)
             unsigned long usec = USEC_TIMER;
             unsigned v = (usec - last_wheel_usec) & 0x7fffffff;
 
-            /* wheel velocity in 0.24 fixed point - clicks/uS */
-
-            /* velocity cap to 18 bits to allow up to x16 scaling */
-            v = (v < 0x40) ? 0xffffff / 0x40 : 0xffffff / v;
+            v = (v>0) ? 1000000 / v : 0;     /* clicks/sec = 1000000 * clicks/usec */
+            v = (v>0xffffff) ? 0xffffff : v; /* limit to 24 bit */
 
             /* some velocity filtering to smooth things out */
             wheel_velocity = (7*wheel_velocity + v) / 8;
@@ -173,12 +172,12 @@ void clickwheel_int(void)
             else
             {
                 /* fast ON gets filtered to avoid inadvertent jumps to fast mode */
-                if (repeat && wheel_velocity > 0xffffff/WHEEL_FAST_ON_INTERVAL)
+                if (repeat && wheel_velocity > 1000000/WHEEL_FAST_ON_INTERVAL)
                 {
                     /* moving into fast mode */
                     wheel_fast_mode = 1 << 31;
                     wheel_click_count = 0;
-                    wheel_velocity = 0xffffff/WHEEL_FAST_OFF_INTERVAL;
+                    wheel_velocity = 1000000/WHEEL_FAST_OFF_INTERVAL;
                 }
                 else if (++wheel_click_count < 2)
                 {
@@ -190,7 +189,7 @@ void clickwheel_int(void)
             }
 
             if (TIME_AFTER(current_tick, next_backlight_on) ||
-                v <= 0xffffff/(1000000/4))
+                v <= 4)
             {
                 /* poke backlight to turn it on or maintain it no more often
                    than every 1/4 second*/
@@ -214,7 +213,7 @@ void clickwheel_int(void)
                 if (queue_empty(&button_queue))
                 {
                     queue_post(&button_queue, btn, wheel_fast_mode |
-                               (wheel_delta << 24) | wheel_velocity);
+                               (wheel_delta << 24) | wheel_velocity*360/WHEELCLICKS_PER_ROTATION);
                     /* message posted - reset delta */
                     wheel_delta = 1;
                 }

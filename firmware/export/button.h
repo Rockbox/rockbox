@@ -52,7 +52,7 @@ void wheel_send_events(bool send);
 #endif
 
 #ifdef HAVE_SCROLLWHEEL
-int button_apply_acceleration(unsigned int data, unsigned int factor);
+int button_apply_acceleration(const unsigned int data);
 #endif
 
 #define BUTTON_NONE    0x00000000

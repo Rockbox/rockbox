@@ -100,9 +100,10 @@
 
 /* define this if the unit uses a scrollwheel for navigation */
 #define HAVE_SCROLLWHEEL
-/* define wheel acceleration scaling factor */
-/* Range for this target: 0xffffff*(0.0-16.000000894069724921567733381255) */
-#define WHEEL_ACCELERATION_FACTOR   (0xffffff*7)
+/* define from which rotation speed [degree/sec] on the acceleration starts */
+#define WHEEL_ACCEL_START 540
+/* define type of acceleration (1 = ^2, 2 = ^3, 3 = ^4) */
+#define WHEEL_ACCELERATION 1
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE

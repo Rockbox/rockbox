@@ -522,26 +522,40 @@ void button_clear_queue(void)
 #endif /* SIMULATOR */
 
 #ifdef HAVE_SCROLLWHEEL
+/* WHEEL_ACCEL_FACTOR = 2^16 / WHEEL_ACCEL_START */
+#define WHEEL_ACCEL_FACTOR (1<<16)/WHEEL_ACCEL_START
 /**
  * data:
  *    [31] Use acceleration
  * [30:24] Message post count (skipped + 1) (1-127)
- *  [23:0] Velocity - clicks/uS - 0.24 fixed point
+ *  [23:0] Velocity - degree/sec
  *
- * factor:
- * Wheel acceleration scaling factor - x.24 fixed point -
- * no greater than what will not overflow 64 bits when multiplied
- * by the driver's maximum velocity in (clicks/usec)^2 in 0.24 
+ * WHEEL_ACCEL_FACTOR:
+ * Value in degree/sec -- configurable via settings -- above which 
+ * the accelerated scrolling starts. Factor is internally scaled by 
+ * 1<<16 in respect to the following 32bit integer operations.
  */
-int button_apply_acceleration(unsigned int data, unsigned int factor)
+int button_apply_acceleration(const unsigned int data)
 {
     int delta = (data >> 24) & 0x7f;
 
     if ((data & (1 << 31)) != 0)
     {
+        /* read driver's velocity from data */
         unsigned int v = data & 0xffffff;
 
-        v = factor * (unsigned long long)v*v / 0xffffffffffffull;
+        /* v = 28.4 fixed point */
+        v = (WHEEL_ACCEL_FACTOR * v)>>(16-4);
+
+        /* Calculate real numbers item to scroll based upon acceleration
+         * setting, use correct roundoff */
+#if   (WHEEL_ACCELERATION == 1)
+        v = (v*v     + (1<< 7))>> 8;
+#elif (WHEEL_ACCELERATION == 2)
+        v = (v*v*v   + (1<<11))>>12;
+#elif (WHEEL_ACCELERATION == 3)
+        v = (v*v*v*v + (1<<15))>>16;
+#endif
 
         if (v > 1)
             delta *= v;

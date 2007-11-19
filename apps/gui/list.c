@@ -1011,8 +1011,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
     int i;
 
 #ifdef HAVE_SCROLLWHEEL
-    int next_item_modifier = button_apply_acceleration(get_action_data(),
-                                                       WHEEL_ACCELERATION_FACTOR);
+    int next_item_modifier = button_apply_acceleration(get_action_data());
 #else
     static int next_item_modifier = 1;
     static int last_accel_tick = 0;
