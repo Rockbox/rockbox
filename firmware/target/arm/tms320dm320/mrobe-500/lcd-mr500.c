@@ -81,7 +81,7 @@ void lcd_init_device(void)
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    fb_data *dst, *src;
+    register fb_data *dst, *src;
 
     if (!lcd_on)
         return;
@@ -116,12 +116,10 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
     }
 #else
-
-#if 0
     src = &lcd_framebuffer[y][x];
     
     register int xc, yc;
-    register fb_data *start=(fb_data *)FRAME + (LCD_HEIGHT-x)*LCD_WIDTH + y;
+    register fb_data *start=FRAME + LCD_HEIGHT*(LCD_WIDTH-x-1) + y + 1;
 
     for(yc=0;yc<height;yc++)
     {
@@ -131,10 +129,8 @@ void lcd_update_rect(int x, int y, int width, int height)
             *dst=*src++;
             dst-=LCD_HEIGHT;
         }
+        src+=x;
     }
-#else
-    lcd_update();
-#endif
 #endif
 }
 
@@ -153,20 +149,7 @@ void lcd_update(void)
     lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
                          LCD_WIDTH*LCD_HEIGHT, 1);
 #else
-    register fb_data *dst, *src=&lcd_framebuffer[0][0];
-    register unsigned int x, y;
-    
-    register fb_data *start=FRAME + LCD_HEIGHT*(LCD_WIDTH-1)+1;
-
-    for(y=0; y<LCD_HEIGHT;y++)
-    {
-        dst=start+y;
-        for(x=0; x<LCD_WIDTH; x++)
-        {
-            *dst=*src++;
-            dst-=LCD_HEIGHT;
-        }
-    }
+    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 }
 
