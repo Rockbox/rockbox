@@ -296,6 +296,7 @@ static int par_indent_spaces; /* number of spaces to indent first paragraph */
 static int fd;
 static char *file_name;
 static long file_size;
+static long start_position; /* position in the file after the viewer is started */
 static bool mac_text;
 static long file_pos; /* Position of the top of the buffer in the file */
 static unsigned char *buffer_end; /*Set to BUFFER_END() when file_pos changes*/
@@ -1142,11 +1143,18 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
     }
 
     fill_buffer(file_pos, buffer, BUFFER_SIZE);
+
+    /* remember the current position */
+    start_position = file_pos + screen_top_ptr - buffer;
 }
 
 static void viewer_save_settings(void)/* same name as global, but not the same file.. */
 {
     int settings_fd;
+
+    /* don't save if the position didn't change */
+    if (file_pos + screen_top_ptr - buffer == start_position)
+        return;
 
     settings_fd = rb->creat(SETTINGS_FILE); /* create the settings file */
     
