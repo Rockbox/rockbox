@@ -30,11 +30,6 @@ extern int audiohw_set_master_vol(int vol_l, int vol_r);
 extern int audiohw_set_lineout_vol(int vol_l, int vol_r);
 extern void audiohw_set_sample_rate(int sampling_control);
 
-extern void audiohw_enable_recording(bool source_mic);
-extern void audiohw_disable_recording(void);
-extern void audiohw_set_recvol(int left, int right, int type);
-extern void audiohw_set_monitor(int enable);
-
 /* Register Descriptions */
 #define LINE_OUT_R 0x00
 #define LINE_OUT_L 0x01

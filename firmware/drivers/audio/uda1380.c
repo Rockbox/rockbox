@@ -451,7 +451,7 @@ void audiohw_set_recvol(int left, int right, int type)
  * Enable or disable recording monitor (so one can listen to the recording)
  * 
  */
-void audiohw_set_monitor(int enable)
+void audiohw_set_monitor(bool enable)
 {
     if (enable)    /* enable channel 2 */
         uda1380_write_reg(REG_MUTE, uda1380_regs[REG_MUTE] & ~MUTE_CH2);

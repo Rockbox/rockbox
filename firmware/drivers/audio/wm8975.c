@@ -311,7 +311,7 @@ void audiohw_set_recvol(int left, int right, int type) {
     (void)type;
 }
 
-void audiohw_set_monitor(int enable) {
+void audiohw_set_monitor(bool enable) {
 
     (void)enable;
 }

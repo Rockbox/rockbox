@@ -177,7 +177,7 @@ void audiohw_postinit(void)
 {
     sleep(HZ);
 
-    /* 4) Set the ‘Active’ bit in register 12h. */
+    /* 4) Set the ï¿½Activeï¿½ bit in register 12h. */
     codec_set_active(true);
 
     audiohw_mute(false);
@@ -316,7 +316,7 @@ void audiohw_set_recvol(int left, int right, int type)
     }
 }
 
-void audiohw_set_monitor(int enable)
+void audiohw_set_monitor(bool enable)
 {
     if(enable)
     {

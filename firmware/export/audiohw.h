@@ -109,8 +109,38 @@ void audiohw_close(void);
 
 /**
  * Mute or enable sound.
- * @param mute true or false
+ * @param mute true or false.
  */
 void audiohw_mute(bool mute);
+
+#ifdef HAVE_RECORDING
+
+/**
+ * Enable recording.
+ * @param source_mic if this is true, we want to record from microphone,
+ *                   else we want to record FM/LineIn.
+ */
+void audiohw_enable_recording(bool source_mic);
+
+/**
+ * Disable recording.
+ */
+void audiohw_disable_recording(void);
+
+/**
+ * Set gain of recording source.
+ * @param left gain value.
+ * @param right will not be used if recording from micophone (mono).
+ * @param type AUDIO_GAIN_MIC, AUDIO_GAIN_LINEIN.
+ */
+void audiohw_set_recvol(int left, int right, int type);
+
+/**
+ * Enable or disable recording monitor.
+ * @param enable ture or false.
+ */
+void audiohw_set_monitor(bool enable);
+
+#endif /*HAVE_RECORDING*/
 
 #endif /* _AUDIOHW_H_ */

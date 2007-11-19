@@ -394,7 +394,7 @@ void audiohw_set_recvol(int left, int right, int type)
  * Enable line in 1 analog monitoring
  *
  */
-void audiohw_set_monitor(int enable)
+void audiohw_set_monitor(bool enable)
 {
     /* LI1R_Mute_on - default */
     unsigned int line_in1_r = as3514.regs[LINE_IN1_R] & ~(1 << 5);

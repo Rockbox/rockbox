@@ -45,10 +45,6 @@ extern void audiohw_set_treble(int value);
  *  88200: 3 = 50   to 100  SCLK, LRCK: Audio Clk / 2
  */
 extern void audiohw_set_frequency(unsigned fsel);
-extern void audiohw_enable_recording(bool source_mic);
-extern void audiohw_disable_recording(void);
-extern void audiohw_set_recvol(int left, int right, int type);
-extern void audiohw_set_monitor(int enable);
 
 #define UDA1380_ADDR        0x30
 

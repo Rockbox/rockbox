@@ -37,11 +37,6 @@ extern void audiohw_set_treble(int value);
 extern void audiohw_set_nsorder(int order);
 extern void audiohw_set_sample_rate(int sampling_control);
 
-extern void audiohw_enable_recording(bool source_mic);
-extern void audiohw_disable_recording(void);
-extern void audiohw_set_recvol(int left, int right, int type);
-extern void audiohw_set_monitor(int enable);
-
 extern void audiohw_set_equalizer_band(int band, int freq, int bw, int gain);
 
 #define RESET      0x00

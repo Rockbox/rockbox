@@ -40,10 +40,6 @@ extern void audiohw_reset(void);
 extern void audiohw_set_frequency(unsigned fsel);
 extern void audiohw_enable_output(bool enable);
 extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
-extern void audiohw_set_recvol(int left, int right, int type);
-extern void audiohw_enable_recording(bool source_mic);
-extern void audiohw_disable_recording(void);
-extern void audiohw_set_monitor(bool enable);
 
 #define HEADPHONE_MUTE 0x30 /* 0110000 = -73db */
 
