@@ -158,9 +158,8 @@ sub correct_string {
                             $string =~ s/\bdezibel\b/de-zibell/ig;
                             $string =~ s/diddering/didde-ring/ig;
                             $string =~ s/energie\b/ener-gie/ig;
+                            $string =~ s/\Blauf\b/-lauf/ig;
                             $string =~ s/\bnumerisch\b/numehrisch/ig;
-                            $string =~ s/\brücklauf\b/rück-lauf/ig;
-                            $string =~ s/\bsuchlauf\b/such-lauf/ig;
                         }
                     }
                 }
