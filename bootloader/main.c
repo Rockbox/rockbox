@@ -41,7 +41,6 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "file.h"
-#include "uda1380.h"
 #include "eeprom_settings.h"
 #include "rbunicode.h"
 #include "common.h"
@@ -444,8 +443,15 @@ void main(void)
 # endif
 
     backlight_init();
+
 #ifdef HAVE_UDA1380
-    audiohw_reset();
+    /* get rid of a nasty humming sound during boot
+      -> RESET signal */
+    or_l(1<<29, &GPIO_OUT);
+    or_l(1<<29, &GPIO_ENABLE);
+    or_l(1<<29, &GPIO_FUNCTION);
+    sleep(HZ/100);
+    and_l(~(1<<29), &GPIO_OUT);
 #endif
 
     lcd_init();

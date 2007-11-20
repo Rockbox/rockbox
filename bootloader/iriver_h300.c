@@ -41,7 +41,6 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "file.h"
-#include "uda1380.h"
 #include "pcf50606.h"
 #include "common.h"
 #include "rbunicode.h"
@@ -143,7 +142,8 @@ void main(void)
     int data;
     bool rtc_alarm;
     int button;
-    
+    int mask;
+
     /* We want to read the buttons as early as possible, before the user
        releases the ON button */
 
@@ -173,9 +173,13 @@ void main(void)
         __reset_cookie();
         power_off();
     }
-    
-    audiohw_reset();
-    
+
+    /* get rid of a nasty humming sound during boot */
+    mask = set_irq_level(HIGHEST_IRQ_LEVEL);
+    pcf50606_write(0x3b, 0x00);  /* GPOOD2 high Z */
+    pcf50606_write(0x3b, 0x07);  /* GPOOD2 low */
+    set_irq_level(mask);
+
     /* Start with the main backlight OFF. */
     _backlight_init();
     _backlight_off();

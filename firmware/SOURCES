@@ -202,7 +202,7 @@ drivers/mas.c
 #endif /* SWCODEC */
 
 /* Audio codec */
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && !defined(BOOTLOADER)
 #if defined(HAVE_UDA1380)
 drivers/audio/uda1380.c
 #elif defined(HAVE_WM8751)
@@ -222,7 +222,7 @@ drivers/audio/tlv320.c
 #elif defined(HAVE_MAS35XX)
 drivers/audio/mas35xx.c
 #endif /* defined(HAVE_*) */
-#endif /* SIMULATOR */
+#endif /* !defined(SIMULATOR) && !defined(BOOTLOADER) */
 
 /* USB Stack */
 #if !defined(SIMULATOR)
