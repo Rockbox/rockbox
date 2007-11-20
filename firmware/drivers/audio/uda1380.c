@@ -201,7 +201,7 @@ void audiohw_enable_output(bool enable)
     }
 }
 
-void audiohw_reset(void)
+static void reset(void)
 {
 #ifdef IRIVER_H300_SERIES
     int mask = set_irq_level(HIGHEST_IRQ_LEVEL);
@@ -261,7 +261,7 @@ void audiohw_init(void)
     recgain_mic = 0;
     recgain_line = 0;
 
-    audiohw_reset();
+    reset();
 
     if (audiohw_set_regs() == -1)
     {

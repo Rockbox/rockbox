@@ -26,7 +26,6 @@
 extern int tenthdb2master(int db);
 extern int tenthdb2mixer(int db);
 
-extern void audiohw_reset(void);
 extern void audiohw_preinit(void);
 extern void audiohw_enable_output(bool enable);
 extern int  audiohw_set_master_vol(int vol_l, int vol_r);

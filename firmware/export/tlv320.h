@@ -27,7 +27,6 @@ extern int tenthdb2master(int db);
 
 /*** definitions ***/
 
-extern void audiohw_reset(void);
 /**
  * Sets internal sample rate for DAC and ADC relative to MCLK
  * Selection for frequency:

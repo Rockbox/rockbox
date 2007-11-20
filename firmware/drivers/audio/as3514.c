@@ -125,8 +125,6 @@ int sound_val2phys(int setting, int value)
     return result;
 }
 
-void audiohw_reset(void);
-
 /*
  * Initialise the PP I2C and I2S.
  */

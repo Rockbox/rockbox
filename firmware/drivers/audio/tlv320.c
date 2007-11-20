@@ -118,14 +118,6 @@ void audiohw_postinit(void)
 }
 
 /**
- * Resets tlv320 to default values
- */
-void audiohw_reset(void)
-{
-    tlv320_write_reg(REG_RR, RR_RESET);
-}
-
-/**
  * Sets internal sample rate for DAC and ADC relative to MCLK
  * Selection for frequency:
  * Fs:        tlv:   with:

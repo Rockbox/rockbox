@@ -70,9 +70,6 @@ int tenthdb2mixer(int db)
     return 0;
 }
 
-
-void audiohw_reset(void);
-
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
 

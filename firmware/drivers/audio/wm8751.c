@@ -104,9 +104,6 @@ static int adaptivebass2hw(int value)
 }
 #endif
 
-
-void audiohw_reset(void);
-
 /* Reset and power up the WM8751 */
 void audiohw_preinit(void)
 {
