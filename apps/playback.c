@@ -2574,7 +2574,7 @@ void audio_init(void)
 
     audio_thread_p = create_thread(audio_thread, audio_stack,
                   sizeof(audio_stack), CREATE_THREAD_FROZEN,
-                  audio_thread_name IF_PRIO(, PRIORITY_BACKGROUND)
+                  audio_thread_name IF_PRIO(, PRIORITY_SYSTEM)
                   IF_COP(, CPU));
 
 #ifdef PLAYBACK_VOICE

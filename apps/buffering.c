@@ -88,7 +88,7 @@
 /* default point to start buffer refill */
 #define BUFFERING_DEFAULT_WATERMARK      (1024*512)
 /* amount of data to read in one read() call */
-#define BUFFERING_DEFAULT_FILECHUNK      (1024*32)
+#define BUFFERING_DEFAULT_FILECHUNK      (1024*16)
 /* point at which the file buffer will fight for CPU time */
 #define BUFFERING_CRITICAL_LEVEL         (1024*128)
 
@@ -505,7 +505,6 @@ BUFFER SPACE MANAGEMENT
 
 update_data_counters: Updates the values in data_counters
 buffer_is_low   : Returns true if the amount of useful data in the buffer is low
-yield_codec     : Used by buffer_handle to know if it should interrupt buffering
 buffer_handle   : Buffer data for a handle
 reset_handle    : Reset write position and data buffer of a handle to its offset
 rebuffer_handle : Seek to a nonbuffered part of a handle by rebuffering the data
@@ -550,25 +549,6 @@ static inline bool buffer_is_low(void)
 {
     update_data_counters();
     return data_counters.useful < BUFFERING_CRITICAL_LEVEL;
-}
-
-/* Yield to the codec thread for as long as possible if it is in need of data.
-   Return true if the caller should break to let the buffering thread process
-   new queue events */
-static bool yield_codec(void)
-{
-    if (!queue_empty(&buffering_queue))
-        return true;
-
-    while (pcmbuf_is_lowdata() && !buffer_is_low())
-    {
-        sleep(2);
-
-        if (!queue_empty(&buffering_queue))
-            return true;
-    }
-
-    return false;
 }
 
 /* Buffer data for the given handle.
@@ -653,15 +633,19 @@ static bool buffer_handle(int handle_id)
         h->available += rc;
         h->filerem -= rc;
 
-#ifdef SIMULATOR
-        sleep(1);
-#else
-        yield();
-#endif
-
         /* If this is a large file, see if we need to break or give the codec
          * more time */
-        if (h->type == TYPE_PACKET_AUDIO && yield_codec())
+        if (h->type == TYPE_PACKET_AUDIO &&
+            pcmbuf_is_lowdata() && !buffer_is_low())
+        {
+            sleep(1);
+        }
+        else
+        {
+            yield();
+        }
+
+        if (!queue_empty(&buffering_queue))
             break;
     }
 

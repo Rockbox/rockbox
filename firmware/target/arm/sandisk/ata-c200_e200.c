@@ -140,7 +140,7 @@ long last_disk_activity = -1;
 static bool initialized = false;
 
 static long next_yield = 0;
-#define MIN_YIELD_PERIOD 2000
+#define MIN_YIELD_PERIOD 1000
 
 static tSDCardInfo card_info[2];
 static tSDCardInfo *currcard = NULL; /* current active card */
