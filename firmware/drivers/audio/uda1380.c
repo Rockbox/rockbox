@@ -68,7 +68,7 @@ int tenthdb2mixer(int db)
 /* Local functions and variables */
 /* ------------------------------------------------- */
 
-int uda1380_write_reg(unsigned char reg, unsigned short value);
+static int uda1380_write_reg(unsigned char reg, unsigned short value);
 unsigned short uda1380_regs[0x30];
 short recgain_mic;
 short recgain_line;
@@ -101,10 +101,9 @@ unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
    REG_AGC,        0
 };
 
-  
 
 /* Returns 0 if register was written or -1 if write failed */
-int uda1380_write_reg(unsigned char reg, unsigned short value)
+static int uda1380_write_reg(unsigned char reg, unsigned short value)
 {
     unsigned char data[3];
 
@@ -172,7 +171,7 @@ void audiohw_mute(bool mute)
 }
 
 /* Returns 0 if successful or -1 if some register failed */
-int audiohw_set_regs(void)
+static int audiohw_set_regs(void)
 {
     int i;
     memset(uda1380_regs, 0, sizeof(uda1380_regs));

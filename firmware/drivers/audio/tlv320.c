@@ -65,7 +65,7 @@ struct tlv320_info
 /* Shadow registers */
 unsigned tlv320_regs[0xf];
 
-void tlv320_write_reg(unsigned reg, unsigned value)
+static void tlv320_write_reg(unsigned reg, unsigned value)
 {
     unsigned char data[2];
 
