@@ -459,7 +459,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 }
             }
             break;
-            case ACTION_STD_STOP:
             case ACTION_STD_CANCEL:
                 if (changed)
                 {
