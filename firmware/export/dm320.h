@@ -223,8 +223,8 @@
 #define IO_GIO_CARD_ST            DM320_REG(0x05B0)
 
 /* DSP Controller */
-#define IO_DSPC_HPIB_CONTROL      0x0600
-#define IO_DSPC_HPIB_STATUS       0x0602
+#define IO_DSPC_HPIB_CONTROL      DM320_REG(0x0600)
+#define IO_DSPC_HPIB_STATUS       DM320_REG(0x0602)
 
 /* OSD Controller */
 #define IO_OSD_MODE               DM320_REG(0x0680)
