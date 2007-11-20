@@ -4688,11 +4688,13 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Set OFF=Annuler"
     ipod*: "SELECT=Set MENU=Annuler"
+    h10,h10_5gb: "SELECT=Valider PREV=Annuler"
   </dest>
   <voice>
     *: none
@@ -5312,7 +5314,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Stations"
   </voice>
 </phrase>
 <phrase>
@@ -5465,7 +5467,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Recherche automatique"
   </voice>
 </phrase>
 <phrase>
@@ -7555,7 +7557,7 @@
     *: "[Discnum]"
   </source>
   <dest>
-    *: "[NumDisc]"
+    *: "[Num Disque]"
   </dest>
   <voice>
     *: ""
@@ -11433,5 +11435,19 @@
   </dest>
   <voice>
     *: "Prononcer le niveau de la batterie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "Prononcer le type de fichier"
+  </dest>
+  <voice>
+    *: "Prononcer le type de fichier"
   </voice>
 </phrase>
