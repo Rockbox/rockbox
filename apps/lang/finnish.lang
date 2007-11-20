@@ -7219,7 +7219,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Poistetaanko esivalinnat"
+    radio: "Poistetaanko esivalinnat?"
   </voice>
 </phrase>
 <phrase>
@@ -7270,7 +7270,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Kanavahaku"
   </voice>
 </phrase>
 <phrase>
@@ -10554,7 +10554,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Esivalinta"
   </voice>
 </phrase>
 <phrase>
@@ -11395,5 +11395,19 @@
   </dest>
   <voice>
     *: "Ilmoita akun varauksen taso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "Sano tiedostotyyppi"
+  </dest>
+  <voice>
+    *: "Sano tiedostotyyppi"
   </voice>
 </phrase>
