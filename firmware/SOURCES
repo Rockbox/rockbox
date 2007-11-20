@@ -656,6 +656,7 @@ target/arm/tms320dm320/spi-dm320.c
 target/arm/tms320dm320/system-dm320.c
 target/arm/tms320dm320/timer-dm320.c
 target/arm/tms320dm320/uart-dm320.c
+target/arm/tms320dm320/dsp-dm320.c
 #endif /* SIMULATOR */
 #endif /* MROBE_500 */
 
