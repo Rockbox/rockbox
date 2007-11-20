@@ -70,7 +70,13 @@ void tsc2100_writereg(int page, int address, short value);
 #define TSRESET_ADDRESS 0x04
 #define TSRESET_VALUE   0xBB00
 
+/* ts codec dac gain control */
+#define TSDACGAIN_PAGE			2
+#define TSDACGAIN_ADDRESS		0x02
 
+/* ts audio control 1*/
+#define TSAC1_PAGE			2
+#define TSAC1_ADDRESS		0x00
 
 /* ts audio control 2 */
 #define TSAC2_PAGE          2
@@ -88,17 +94,20 @@ void tsc2100_writereg(int page, int address, short value);
 #define TSAC2_DASTC         (1<<1)
 #define TSAC2_ADGAF         (1<<0) /* r only */
 
+/* ts codec power control */
+#define TSCPC_PAGE			2
+#define TSCPC_ADDRESS		0x05
 
+/* ts audio control 3 */
+#define TSAC3_PAGE			2
+#define TSAC3_ADDRESS		0x06
 
+/* ts audio control 4 */
+#define TSAC4_PAGE			2
+#define TSAC4_ADDRESS		0x1d
 
-
-
-
-
-
-
-
-
-
+/* ts audio control 5 */
+#define TSAC5_PAGE			2
+#define TSAC5_ADDRESS		0x1e
 
 #endif
