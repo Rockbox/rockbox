@@ -553,6 +553,11 @@ int radio_screen(void)
             trigger_cpu_boost();
         }
 
+        if (!update_screen)
+        {
+            cancel_cpu_boost();
+        }
+
 #if CONFIG_CODEC != SWCODEC
         /* TODO: Can we timeout at HZ when recording since peaks aren't
            displayed? This should quiet recordings too. */

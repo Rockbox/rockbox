@@ -92,9 +92,6 @@
 /* Cast to the the machine int type, whose size could be < 4. */
 struct core_entry cores[NUM_CORES] IBSS_ATTR;
 struct thread_entry threads[MAXTHREADS] IBSS_ATTR;
-#ifdef HAVE_SCHEDULER_BOOSTCTRL
-static int boosted_threads IBSS_ATTR;
-#endif
 
 static const char main_thread_name[] = "main";
 extern int stackbegin[];
@@ -1590,23 +1587,19 @@ void switch_thread(struct thread_entry *old)
 }
 
 /*---------------------------------------------------------------------------
- * Removes the boost flag from a thread and unboosts the CPU if thread count
- * of boosted threads reaches zero. Requires thread slot to be locked first.
+ * Change the boost state of a thread boosting or unboosting the CPU
+ * as required. Require thread slot to be locked first.
  *---------------------------------------------------------------------------
  */
-static inline void unboost_thread(struct thread_entry *thread)
+static inline void boost_thread(struct thread_entry *thread, bool boost)
 {
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
-    if (thread->boosted != 0)
+    if ((thread->boosted != 0) != boost)
     {
-        thread->boosted = 0;
-        if (--boosted_threads == 0)
-        {
-            cpu_boost(false);
-        }
+        thread->boosted = boost;
+        cpu_boost(boost);
     }
 #endif
-    (void)thread;
 }
 
 /*---------------------------------------------------------------------------
@@ -1626,9 +1619,6 @@ void sleep_thread(int ticks)
     /* Lock thread slot */
     GET_THREAD_STATE(current);
 #endif
-
-    /* Remove our boosted status if any */
-    unboost_thread(current);
 
     /* Set our timeout, change lists, and finally switch threads.
      * Unlock during switch on mulicore. */
@@ -1716,11 +1706,6 @@ void block_thread_w_tmo(struct thread_queue *list, int timeout)
     GET_THREAD_STATE(current);
 #endif
 
-    /* A block with a timeout is a sleep situation, whatever we are waiting
-     * for _may or may not_ happen, regardless of boost state, (user input
-     * for instance), so this thread no longer needs to boost */
-    unboost_thread(current);
-    
     /* Set the state to blocked with the specified timeout */
     current->tmo_tick = current_tick + timeout;
     /* Set the list for explicit wakeup */
@@ -2030,17 +2015,21 @@ void trigger_cpu_boost(void)
     unsigned state;
 
     state = GET_THREAD_STATE(current);
-
-    if (current->boosted == 0)
-    {
-        current->boosted = 1;
-        if (++boosted_threads == 1)
-        {
-            cpu_boost(true);
-        }
-    }
-
+    boost_thread(current, true);
     UNLOCK_THREAD(current, state);
+
+    (void)state;
+}
+
+void cancel_cpu_boost(void)
+{
+    struct thread_entry *current = cores[CURRENT_CORE].running;
+    unsigned state;
+
+    state = GET_THREAD_STATE(current);
+    boost_thread(current, false);
+    UNLOCK_THREAD(current, state);
+
     (void)state;
 }
 #endif /* HAVE_SCHEDULER_BOOSTCTRL */
@@ -2129,6 +2118,8 @@ void remove_thread(struct thread_entry *thread)
          * run yet */
         remove_from_list_tmo(thread);
     }
+
+    boost_thread(thread, false);
 
     if (thread == cores[core].running)
     {
@@ -2612,16 +2603,6 @@ int idle_stack_usage(unsigned int core)
     return usage;
 }
 #endif
-
-/*---------------------------------------------------------------------------
- * Returns the current thread status. This is a snapshot for debugging and
- * does not do any slot synchronization so it could return STATE_BUSY.
- *---------------------------------------------------------------------------
- */
-unsigned thread_get_status(const struct thread_entry *thread)
-{
-    return thread->state;
-}
 
 /*---------------------------------------------------------------------------
  * Fills in the buffer with the specified thread's name. If the name is NULL,

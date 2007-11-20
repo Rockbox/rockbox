@@ -848,6 +848,7 @@ static bool codec_pcmbuf_insert_callback(
 
         while ((dest = pcmbuf_request_buffer(&out_count)) == NULL)
         {
+            cancel_cpu_boost();
             sleep(1);
             if (ci.seek_time || ci.new_track || ci.stop_codec)
                 return true;
@@ -1277,6 +1278,7 @@ static void codec_thread(void)
 
     while (1) {
         status = 0;
+        cancel_cpu_boost();
         queue_wait(&codec_queue, &ev);
 
         switch (ev.id) {
@@ -2388,6 +2390,7 @@ static void audio_thread(void)
 
     while (1)
     {
+        cancel_cpu_boost();
         queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
 
         switch (ev.id) {

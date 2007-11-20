@@ -1034,6 +1034,7 @@ bool create_playlist(void)
     add_dir(filename, sizeof(filename), fd);
     close(fd);
 
+    cancel_cpu_boost();
     sleep(HZ);
 
     return true;

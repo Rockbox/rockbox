@@ -124,16 +124,14 @@ static char thread_status_char(unsigned status)
 static char* threads_getname(int selected_item, void * data, char *buffer)
 {
     (void)data;
+    struct thread_entry *thread;
     char name[32];
-    struct thread_entry *thread = NULL;
-    unsigned status;
-    int usage;
 
 #if NUM_CORES > 1
     if (selected_item < (int)NUM_CORES)
     {
-        usage = idle_stack_usage(selected_item);
-        snprintf(buffer, MAX_PATH, "Idle (%d): %2d%%", selected_item, usage);
+        snprintf(buffer, MAX_PATH, "Idle (%d): %2d%%", selected_item,
+                 idle_stack_usage(selected_item));
         return buffer;
     }
 
@@ -141,25 +139,26 @@ static char* threads_getname(int selected_item, void * data, char *buffer)
 #endif
 
     thread = &threads[selected_item];
-    status = thread_get_status(thread);
-    
-    if (status == STATE_KILLED)
+
+    if (thread->state == STATE_KILLED)
     {
         snprintf(buffer, MAX_PATH, "%2d: ---", selected_item);
         return buffer;
     }
 
     thread_get_name(name, 32, thread);
-    usage = thread_stack_usage(thread);
 
     snprintf(buffer, MAX_PATH,
              "%2d: " IF_COP("(%d) ") "%c%c " IF_PRIO("%d ") "%2d%% %s", 
              selected_item,
              IF_COP(thread->core,)
-             (status == STATE_RUNNING) ? '*' : ' ',
-             thread_status_char(status),
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+             (thread->boosted) ? '+' :
+#endif
+                 ((thread->state == STATE_RUNNING) ? '*' : ' '),
+             thread_status_char(thread->state),
              IF_PRIO(thread->priority,)
-             usage, name);
+             thread_stack_usage(thread), name);
 
     return buffer;
 }

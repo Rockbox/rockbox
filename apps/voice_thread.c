@@ -249,7 +249,7 @@ static void voice_message(struct voice_thread_data *td)
             }
 
             /* Cancel boost */
-            sleep(0);
+            cancel_cpu_boost();
 
             td->state = TSTATE_STOPPED;
             event_set_state(&voice_event, STATE_SIGNALED);

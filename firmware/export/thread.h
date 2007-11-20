@@ -469,8 +469,10 @@ struct thread_entry*
 
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
 void trigger_cpu_boost(void);
+void cancel_cpu_boost(void);
 #else
 #define trigger_cpu_boost()
+#define cancel_cpu_boost()
 #endif
 void thread_thaw(struct thread_entry *thread);
 void thread_wait(struct thread_entry *thread);
@@ -556,7 +558,6 @@ int thread_stack_usage(const struct thread_entry *thread);
 #if NUM_CORES > 1
 int idle_stack_usage(unsigned int core);
 #endif
-unsigned thread_get_status(const struct thread_entry *thread);
 void thread_get_name(char *buffer, int size,
                      struct thread_entry *thread);
 #ifdef RB_PROFILE

@@ -563,7 +563,6 @@ static bool yield_codec(void)
     while (pcmbuf_is_lowdata() && !buffer_is_low())
     {
         sleep(2);
-        trigger_cpu_boost();
 
         if (!queue_empty(&buffering_queue))
             return true;
@@ -1267,6 +1266,7 @@ void buffering_thread(void)
 
     while (true)
     {
+        cancel_cpu_boost();
         queue_wait_w_tmo(&buffering_queue, &ev, filling?5:HZ/2);
 
         switch (ev.id)
