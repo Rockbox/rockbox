@@ -46,6 +46,8 @@ void ata_device_init()
     IDE0_CFG |= (1<<5);
 #ifdef IPOD_NANO
     IDE0_CFG |= (0x10000000); /* cpu > 65MHz */
+#else
+    IDE0_CFG &=~(0x10000000); /* cpu < 65MHz */
 #endif
 
     IDE0_PRI_TIMING0 = 0x10;
