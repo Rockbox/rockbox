@@ -209,7 +209,7 @@ static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,         BUTTON_UP|BUTTON_REL,             BUTTON_UP    },
     { ACTION_STD_CANCEL,        BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
     { ACTION_REC_NEWFILE,       BUTTON_REC|BUTTON_REL,            BUTTON_REC   },
-    { ACTION_STD_MENU,          BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_NONE  },
+    { ACTION_STD_MENU,          BUTTON_DOWN|BUTTON_REL,           BUTTON_NONE  },
     { ACTION_SETTINGS_INC,      BUTTON_RIGHT,                     BUTTON_NONE  },
     { ACTION_SETTINGS_INC,      BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE  },
     { ACTION_SETTINGS_DEC,      BUTTON_LEFT,                      BUTTON_NONE  },
@@ -224,11 +224,11 @@ static const struct button_mapping button_context_recscreen[]  = {
 
 /** FM Radio Screen **/
 static const struct button_mapping button_context_radio[]  = {
-    { ACTION_FM_MENU,        BUTTON_DOWN,                       BUTTON_NONE },
-    { ACTION_FM_PRESET,      BUTTON_SELECT,                     BUTTON_NONE },
-    { ACTION_FM_STOP,        BUTTON_UP|BUTTON_REPEAT,           BUTTON_UP  },
+    { ACTION_FM_MENU,        BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_FM_PRESET,      BUTTON_SELECT|BUTTON_REL,          BUTTON_NONE },
+    { ACTION_FM_STOP,        BUTTON_POWER|BUTTON_REL,           BUTTON_UP  },
     { ACTION_FM_MODE,        BUTTON_REC,                        BUTTON_NONE },
-    { ACTION_FM_EXIT,        BUTTON_POWER,                      BUTTON_NONE },
+    { ACTION_FM_EXIT,        BUTTON_DOWN|BUTTON_REL,            BUTTON_NONE },
     { ACTION_FM_PLAY,        BUTTON_UP|BUTTON_REL,              BUTTON_UP },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */
