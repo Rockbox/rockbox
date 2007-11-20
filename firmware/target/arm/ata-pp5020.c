@@ -44,7 +44,9 @@ void ata_device_init()
 {
     /* From ipod-ide.c:ipod_ide_register() */
     IDE0_CFG |= (1<<5);
-    IDE0_CFG &=~(0x10000000);   /* cpu < 65MHz */
+#ifdef IPOD_NANO
+    IDE0_CFG |= (0x10000000); /* cpu > 65MHz */
+#endif
 
     IDE0_PRI_TIMING0 = 0x10;
     IDE0_PRI_TIMING1 = 0x80002150;

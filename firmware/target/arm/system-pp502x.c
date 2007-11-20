@@ -178,6 +178,9 @@ static void pp_set_cpu_frequency(long frequency)
       case CPUFREQ_MAX:
         CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
         DEV_TIMING1  = 0x00000303;
+#ifdef IPOD_NANO
+	IDE0_CFG |= (0x10000000); /* Set CPU > 65MHz bit */
+#endif
 #ifdef IPOD_MINI2G
         MLCD_SCLK_DIV = 0x00000001; /* Mono LCD bridge serial clock divider */
 #endif
@@ -199,6 +202,9 @@ static void pp_set_cpu_frequency(long frequency)
       case CPUFREQ_NORMAL:
         CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
         DEV_TIMING1  = 0x00000303;
+#ifdef IPOD_NANO
+	IDE0_CFG &=~(0x10000000); /* clear > 65MHz bit */
+#endif
 #ifdef IPOD_MINI2G
         MLCD_SCLK_DIV = 0x00000000; /* Mono LCD bridge serial clock divider */
 #endif
@@ -228,6 +234,9 @@ static void pp_set_cpu_frequency(long frequency)
         DEV_TIMING1  = 0x00000303;
 #ifdef IPOD_MINI2G
         MLCD_SCLK_DIV = 0x00000000; /* Mono LCD bridge serial clock divider */
+#endif
+#ifdef IPOD_NANO
+	IDE0_CFG &=~(0x10000000); /* clear > 65MHz bit */
 #endif
         PLL_CONTROL &= ~0x80000000; /* disable PLL */
         cpu_frequency = CPUFREQ_DEFAULT;
