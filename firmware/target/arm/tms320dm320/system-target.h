@@ -26,7 +26,4 @@
 #define CPUFREQ_NORMAL  30000000
 #define CPUFREQ_MAX     80000000
 
-#define inw(p)      (*((volatile unsigned short*)((p) + PHY_IO_BASE)))
-#define outw(v,p)   (*((volatile unsigned short*)((p) + PHY_IO_BASE)) = (v))
-
 #endif /* SYSTEM_TARGET_H */

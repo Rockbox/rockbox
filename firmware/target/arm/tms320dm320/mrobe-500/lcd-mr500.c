@@ -27,6 +27,7 @@
 #include "kernel.h"
 #include "memory.h"
 #include "system-target.h"
+#include "lcd-target.h"
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
    single transfer mode with width = num pixels, and height = 1 which
@@ -57,25 +58,25 @@ void lcd_init_device(void)
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
 
-    outw(0x00ff, IO_OSD_MODE);
-    outw(0x0002, IO_OSD_VIDWINMD);
-    outw(0x2001, IO_OSD_OSDWINMD0);
-    outw(0x0002, IO_OSD_OSDWINMD1);
-    outw(0x0000, IO_OSD_ATRMD);
-    outw(0x0000, IO_OSD_RECTCUR);
+    IO_OSD_MODE=0x00ff;
+    IO_OSD_VIDWINMD=0x0002;
+    IO_OSD_OSDWINMD0=0x2001;
+    IO_OSD_OSDWINMD1=0x0002;
+    IO_OSD_ATRMD=0x0000;
+    IO_OSD_RECTCUR=0x0000;
 
-    outw((480*2) / 32, IO_OSD_OSDWIN0OFST);
+    IO_OSD_OSDWIN0OFST=(480*2) / 32;
     addr = ((int)FRAME-CONFIG_SDRAM_START) / 32;
-    outw(addr >> 16, IO_OSD_OSDWINADH);
-    outw(addr & 0xFFFF, IO_OSD_OSDWIN0ADL);
+    IO_OSD_OSDWINADH=addr >> 16;
+    IO_OSD_OSDWIN0ADL=addr & 0xFFFF;
 
-    outw(80, IO_OSD_BASEPX);
-    outw(2, IO_OSD_BASEPY);
+    IO_OSD_BASEPX=80;
+    IO_OSD_BASEPY=2;
 
-    outw(0, IO_OSD_OSDWIN0XP);
-    outw(0, IO_OSD_OSDWIN0YP);
-    outw(480, IO_OSD_OSDWIN0XL);
-    outw(640, IO_OSD_OSDWIN0YL);
+    IO_OSD_OSDWIN0XP=0;
+    IO_OSD_OSDWIN0YP=0;
+    IO_OSD_OSDWIN0XL=480;
+    IO_OSD_OSDWIN0YL=640;
 }
 
 /* Update a fraction of the display. */
@@ -168,7 +169,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
 {
     /* Caches for chroma data so it only need be recaculated every other
        line */
-/*    unsigned char chroma_buf[LCD_HEIGHT/2*3];*/ /* 480 bytes */
+    unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 480 bytes */
     unsigned char const * yuv_src[3];
     off_t z;
 
@@ -188,9 +189,9 @@ void lcd_yuv_blit(unsigned char * const src[3],
 
     do
     {
-/*        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
+        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
                                stride);
-                               */
+
         yuv_src[0] += stride << 1; /* Skip down two luma lines */
         yuv_src[1] += stride >> 1; /* Skip down one chroma line */
         yuv_src[2] += stride >> 1;
