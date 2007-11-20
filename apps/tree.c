@@ -367,7 +367,7 @@ static int tree_get_file_position(char * filename)
  */
 static int update_dir(void)
 {
-  bool changed = false;
+    bool changed = false;
 #ifdef HAVE_TAGCACHE
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
     /* Checks for changes */
@@ -388,10 +388,10 @@ static int update_dir(void)
     }
     else 
 #endif
-        {
+    {
         /* if the tc.currdir has been changed, reload it ...*/
-        if (strncmp(tc.currdir, lastdir, sizeof(lastdir)) || reload_dir) {
-
+        if (strncmp(tc.currdir, lastdir, sizeof(lastdir)) || reload_dir)
+        {
             if (ft_load(&tc, NULL) < 0)
                 return -1;
             strcpy(lastdir, tc.currdir);
@@ -415,8 +415,7 @@ static int update_dir(void)
 #ifdef HAVE_TAGCACHE
         !id3db && 
 #endif
-        (tc.dirfull ||
-                      tc.filesindir == global_settings.max_files_in_dir) )
+        (tc.dirfull || tc.filesindir == global_settings.max_files_in_dir) )
         {
             gui_syncsplash(HZ, ID2P(LANG_SHOWDIR_BUFFER_FULL));
         }
@@ -641,7 +640,7 @@ static int dirbrowse()
     if (tc.selected_item < 0)
         tc.selected_item = 0;
 #ifdef HAVE_TAGCACHE
-    tc.firstpos=0;
+    tc.firstpos = 0;
     lasttable = -1;
     lastextra = -1;
     lastfirstpos = 0;
@@ -663,7 +662,7 @@ static int dirbrowse()
         struct entry *dircache = tc.dircache;
         bool restore = false;
         if (tc.dirlevel < 0)
-          tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
+            tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
 #ifdef BOOTFILE
         if (boot_changed) {
             char *lines[]={ID2P(LANG_BOOT_CHANGED), ID2P(LANG_REBOOT_NOW)};
@@ -849,7 +848,7 @@ static int dirbrowse()
         }
         if (start_wps)
             return GO_TO_WPS;
-        if ( button )
+        if (button)
         {
             ata_spin();
         }
@@ -861,7 +860,7 @@ static int dirbrowse()
             lastfilter != *tc.dirfilter ||
             lastsortcase != global_settings.sort_case)
         {
-            if ( reload_root ) {
+            if (reload_root) {
                 strcpy(currdir, "/");
                 tc.dirlevel = 0;
 #ifdef HAVE_TAGCACHE
@@ -873,7 +872,7 @@ static int dirbrowse()
                 reload_root = false;
             }
 
-            if (! reload_dir )
+            if (!reload_dir)
             {
                 gui_synclist_select_item(&tree_lists, 0);
                 gui_synclist_draw(&tree_lists);
@@ -975,17 +974,15 @@ static bool add_dir(char* dirname, int len, int fd)
                                     gui_textarea_update(&screens[i]);
                                 }
 #else
-                                x = 10;
                                 if (plsize > 999)
                                     x=7;
-                                else {
-                                    if (plsize > 99)
-                                        x=8;
-                                    else {
-                                        if (plsize > 9)
-                                            x=9;
-                                    }
-                                }
+                                else if (plsize > 99)
+                                    x=8;
+                                else if (plsize > 9)
+                                    x=9;
+                                else
+                                    x = 10;
+
                                 FOR_NB_SCREENS(i) {
                                     screens[i].puts(x,0,buf);
                                 }
