@@ -20,6 +20,7 @@
 #include "cpu.h"
 #include "system.h"
 #include "debug.h"
+#include "string.h"
 #include "dsp-target.h"
 
 /* A "DSP image" is an array of these, terminated by raw_data_size_half = 0. */
@@ -34,7 +35,6 @@ struct dsp_section {
 
 #ifdef DEBUG
 static void dsp_status(void) {
-	unsigned short addr_7fff = DSP_(0x7fff);
 	unsigned short hpib_ctl = IO_DSPC_HPIB_CONTROL;
 	unsigned short hpib_stat = IO_DSPC_HPIB_STATUS;
 	char buffer1[80], buffer2[80];
@@ -42,9 +42,10 @@ static void dsp_status(void) {
 	DEBUGF("dsp_status(): clkc_hpib=%u clkc_dsp=%u",
 		!!(IO_CLK_MOD0 & (1 << 11)), !!(IO_CLK_MOD0 & (1 << 10)));
 	
-	DEBUGF("dsp_status(): irq_dsphint=%u scratch_status=0x%04x"
+	DEBUGF("dsp_status(): irq_dsphint=%u 7fff=%04x scratch_status=%04x"
 		" acked=%04x",
-		(IO_INTC_IRQ0 >> IRQ_DSPHINT) & 1, DSP_(_status), DSP_(_acked));
+		(IO_INTC_IRQ0 >> IRQ_DSPHINT) & 1, DSP_(0x7fff), DSP_(_status),
+		DSP_(_acked));
 #define B(f,w,b,m) if ((w & (1 << b)) == 0) \
 					 strcat(f, "!"); \
 				 strcat(f, #m "|");

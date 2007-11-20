@@ -26,5 +26,6 @@ static const struct dsp_section dsp_image_helloworld[] = {
 
 /* Symbol table, usable with the DSP_() macro (see dsp-target.h). */
 #define _status 0x0000
+#define _acked  0x0000
 
 #endif
