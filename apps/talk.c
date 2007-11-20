@@ -559,17 +559,17 @@ void talk_buffer_steal(void)
 
 
 /* play a voice ID from voicefile */
-int talk_id(long id, bool enqueue)
+int talk_id(int32_t id, bool enqueue)
 {
     long clipsize;
     unsigned char* clipbuf;
-    int unit;
+    int32_t unit;
 
     if (talk_temp_disable_count > 0)
         return -1;  /* talking has been disabled */
 #if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
-        return -1; 
+        return -1;
 #endif
 
     if (p_voicefile == NULL && has_voicefile)
@@ -582,10 +582,10 @@ int talk_id(long id, bool enqueue)
         return -1;
 
     /* check if this is a special ID, with a value */
-    unit = ((unsigned long)id) >> UNIT_SHIFT;
+    unit = ((uint32_t)id) >> UNIT_SHIFT;
     if (unit)
     {   /* sign-extend the value */
-        id = (unsigned long)id << (32-UNIT_SHIFT);
+        id = (uint32_t)id << (32-UNIT_SHIFT);
         id >>= (32-UNIT_SHIFT);
         talk_value(id, unit, enqueue); /* speak it */
         return 0; /* and stop, end of special case */

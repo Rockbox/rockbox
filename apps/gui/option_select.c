@@ -152,9 +152,9 @@ static int option_talk(int selected_item, void * data)
     {
         struct int_setting *info = setting->int_setting;
         if (info->get_talk_id)
-            talk_id(info->get_talk_id((int)temp_var), false);
+            talk_id(info->get_talk_id(temp_var), false);
         else 
-            talk_value((int)temp_var, info->unit, false);
+            talk_value(temp_var, info->unit, false);
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
@@ -477,7 +477,7 @@ void set_option_formatter(char* buf, size_t size, int item, const char* unit)
     const unsigned char *text = set_option_options[item].string;
     snprintf(buf, size, "%s", P2STR(text));
 }
-long set_option_get_talk_id(int value)
+int32_t set_option_get_talk_id(int value)
 {
     return set_option_options[value].voice_id;
 }
@@ -518,7 +518,7 @@ bool set_int_ex(const unsigned char* string,
                 int min,
                 int max,
                 void (*formatter)(char*, size_t, int, const char*),
-                long (*get_talk_id)(int))
+                int32_t (*get_talk_id)(int))
 {
     (void)unit;
     struct settings_list item;

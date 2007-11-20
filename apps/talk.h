@@ -25,6 +25,7 @@
 #define __TALK_H__
 
 #include <stdbool.h>
+#include <inttypes.h>
 #include "time.h"
 
 #define VOICE_VERSION 400 /* 4.00 - if you change this, change it in voicefont too */
@@ -72,7 +73,7 @@ bool talk_voice_required(void); /* returns true if voice codec required */
 int talk_get_bufsize(void); /* get the loaded voice file size */
 void talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */
 bool is_voice_queued(void); /* Are there more voice clips to be spoken? */
-int talk_id(long id, bool enqueue); /* play a voice ID from voicefont */
+int talk_id(int32_t id, bool enqueue); /* play a voice ID from voicefont */
 int talk_file(const char* filename, bool enqueue); /* play a thumbnail from file */
 int talk_number(long n, bool enqueue); /* say a number */
 int talk_value(long n, int unit, bool enqueue); /* say a numeric value */

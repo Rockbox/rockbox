@@ -70,7 +70,7 @@ struct int_setting {
     int max;
     int step;
     void (*formatter)(char*, size_t, int, const char*);
-    long (*get_talk_id)(int);
+    int32_t (*get_talk_id)(int);
 };
 #define F_INT_SETTING 0x80
 

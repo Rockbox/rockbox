@@ -189,7 +189,7 @@ static const char trig_durations_conf [] =
 # endif
 #endif
 
-static long rectime_getlang(int value)
+static int32_t rectime_getlang(int value)
 {
     if (value == 0)
         return LANG_OFF;
@@ -221,7 +221,7 @@ static void backlight_formatter(char *buffer, size_t buffer_size,
     else
         snprintf(buffer, buffer_size, "%d s", backlight_timeout_value[val]);
 }
-static long backlight_getlang(int value)
+static int32_t backlight_getlang(int value)
 {
     if (value == 0)
         return LANG_OFF;
@@ -232,7 +232,7 @@ static long backlight_getlang(int value)
 #endif
 /* ffwd/rewind and scan acceleration stuff */
 static const unsigned char ff_rewind_min_stepvals[] = {1,2,3,4,5,6,8,10,15,20,25,30,45,60};
-static long ff_rewind_min_step_getlang(int value)
+static int32_t ff_rewind_min_step_getlang(int value)
 {
     return TALK_ID(ff_rewind_min_stepvals[value], UNIT_SEC);
 }
@@ -242,7 +242,7 @@ static void ff_rewind_min_step_formatter(char *buffer, size_t buffer_size,
     (void)unit;
     snprintf(buffer, buffer_size, "%ds", ff_rewind_min_stepvals[val]);
 }
-static long scanaccel_getlang(int value)
+static int32_t scanaccel_getlang(int value)
 {
     if (value == 0)
         return LANG_OFF;
@@ -259,7 +259,7 @@ static void scanaccel_formatter(char *buffer, size_t buffer_size,
 }
 
 static const unsigned char poweroff_idle_timer_times[] = {0,1,2,3,4,5,6,7,8,9,10,15,30,45,60};
-static long poweroff_idle_timer_getlang(int value)
+static int32_t poweroff_idle_timer_getlang(int value)
 {
     if (value == 0)
         return LANG_OFF;
@@ -276,7 +276,7 @@ static void poweroff_idle_timer_formatter(char *buffer, size_t buffer_size,
 }
 
 #ifndef HAVE_SCROLLWHEEL
-static long listaccel_getlang(int value)
+static int32_t listaccel_getlang(int value)
 {
     if (value == 0)
         return LANG_OFF;
@@ -352,7 +352,7 @@ static void jumpscroll_format(char* buffer, size_t buffer_size, int value,
             break;
     }
 }
-static long jumpscroll_getlang(int value)
+static int32_t jumpscroll_getlang(int value)
 {
     switch (value)
     {
