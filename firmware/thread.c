@@ -1600,6 +1600,7 @@ static inline void boost_thread(struct thread_entry *thread, bool boost)
         cpu_boost(boost);
     }
 #endif
+    (void)thread; (void)boost;
 }
 
 /*---------------------------------------------------------------------------
