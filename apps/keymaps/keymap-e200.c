@@ -42,6 +42,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_OK,          BUTTON_SELECT|BUTTON_REL,         BUTTON_SELECT },
     { ACTION_STD_OK,          BUTTON_RIGHT,                     BUTTON_NONE },
     { ACTION_STD_CANCEL,      BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_STD_CANCEL,      BUTTON_POWER,                      BUTTON_NONE },
 
     { ACTION_STD_QUICKSCREEN, BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_DOWN },
     { ACTION_STD_CONTEXT,     BUTTON_SELECT|BUTTON_REPEAT,           BUTTON_SELECT },
@@ -227,7 +228,7 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MENU,        BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_FM_PRESET,      BUTTON_SELECT|BUTTON_REL,          BUTTON_NONE },
     { ACTION_FM_STOP,        BUTTON_POWER|BUTTON_REL,           BUTTON_NONE  },
-    { ACTION_FM_MODE,        BUTTON_REC,                        BUTTON_NONE },
+    { ACTION_FM_MODE,        BUTTON_UP|BUTTON_REPEAT,           BUTTON_UP },
     { ACTION_FM_EXIT,        BUTTON_DOWN|BUTTON_REL,            BUTTON_NONE },
     { ACTION_FM_PLAY,        BUTTON_UP|BUTTON_REL,              BUTTON_UP },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
