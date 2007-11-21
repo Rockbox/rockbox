@@ -1166,7 +1166,11 @@ static int button_loop(void)
                     audio_str.status = STREAM_STOPPED;
                     goto quit;
                 }
+#ifndef MPEG_PAUSE2
+            } while (button != MPEG_PAUSE);
+#else
             } while (button != MPEG_PAUSE && button != MPEG_PAUSE2);
+#endif
 
             str_send_msg(&video_str, STREAM_PLAY, 0);
             audio_str.status = STREAM_PLAYING;
