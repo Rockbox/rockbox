@@ -136,6 +136,7 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_MENU       BUTTON_MENU
 #define MPEG_STOP       BUTTON_POWER
 #define MPEG_PAUSE      BUTTON_SELECT
+#define MPEG_PAUSE2     BUTTON_A
 #define MPEG_VOLDOWN    BUTTON_LEFT
 #define MPEG_VOLUP      BUTTON_RIGHT
 #define MPEG_VOLDOWN2   BUTTON_VOL_DOWN
@@ -1144,6 +1145,7 @@ static int button_loop(void)
             break;
 
         case MPEG_PAUSE:
+        case MPEG_PAUSE2:
             settings.resume_time = (int)(get_stream_time()/CLOCK_RATE/
                                          30-start_pts_time);
             save_settings();
@@ -1162,7 +1164,7 @@ static int button_loop(void)
                     audio_str.status = STREAM_STOPPED;
                     goto quit;
                 }
-            } while (button != MPEG_PAUSE);
+            } while (button != MPEG_PAUSE && button != MPEG_PAUSE2);
 
             str_send_msg(&video_str, STREAM_PLAY, 0);
             audio_str.status = STREAM_PLAYING;
