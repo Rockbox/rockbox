@@ -26,6 +26,7 @@
 #include "buffering.h"
 #include "dircache.h"
 #include "debug.h"
+#include "misc.h"
 
 
 /* Strip filename from a full path
@@ -87,26 +88,6 @@ static char* strip_extension(char* buf, int buf_size, const char* file)
     strncpy(buf, file, len);
     buf[len] = 0;
     return buf;
-}
-
-/* Test file existence, using dircache of possible */
-static bool file_exists(const char *file)
-{
-    int fd;
-
-    if (!file || strlen(file) <= 0)
-        return false;
-
-#ifdef HAVE_DIRCACHE
-    if (dircache_is_enabled())
-        return (dircache_get_entry_ptr(file) != NULL);
-#endif
-
-    fd = open(file, O_RDONLY);
-    if (fd < 0)
-        return false;
-    close(fd);
-    return true;
 }
 
 /* Make sure part of path only contain chars valid for a FAT32 long name.

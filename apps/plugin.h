@@ -113,7 +113,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 89
+#define PLUGIN_API_VERSION 90
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -645,6 +645,10 @@ struct plugin_api {
 #ifdef PROC_NEEDS_CACHEALIGN
     size_t (*align_buffer)(void **start, size_t size, size_t align);
 #endif
+
+    bool (*file_exists)(const char *file);
+    bool (*dir_exists)(const char *path);
+
 };
 
 /* plugin header */

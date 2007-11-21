@@ -79,9 +79,6 @@ bool remove_entry(sc_file_t *file, int entry_idx);
 /* Checks whether the index is a valid one for the file. */
 bool is_valid_index(sc_file_t *file, int entry_idx);
 
-bool file_exists(char *filename); /* Does the specified file exist? */
-bool dir_exists(char *path); /* Does the specified dir exist? */
-
 
 #ifdef SC_DEBUG
 void print_file(sc_file_t *file);

@@ -115,4 +115,8 @@ int hex_to_rgb(const char* hex);
 
 char* strrsplt(char* str, int c);
 
+bool file_exists(const char *file);
+bool dir_exists(const char *path);
+
+
 #endif /* MISC_H */

@@ -70,9 +70,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* void_parameter)
      * if it's a dir and then file (not vice versa) since
      * open() can also open a dir */
     found = true;
-    if (dir_exists(parameter)) {
+    if (rb->dir_exists(parameter)) {
         its_a_dir = true;
-    } else if (file_exists(parameter)) {
+    } else if (rb->file_exists(parameter)) {
         its_a_dir = false;
     } else {
         found = false;

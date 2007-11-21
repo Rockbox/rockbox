@@ -360,35 +360,3 @@ void write_entry_to_file(int fd, sc_entry_t *entry)
     }
     rb->fdprintf(fd, "\n");
 }
-
-
-bool file_exists(char *filename)
-{
-    int fd = rb->open(filename, O_RDONLY);
-    bool retval;
-    if (fd >= 0) {
-        rb->close(fd);
-        retval = true;
-    } else {
-        retval = false;
-    }
-    DEBUGF("Checked existence of the file '%s': %s\n",
-            filename, (retval ? "found" : "NOT FOUND"));
-    return retval;
-}
-
-
-bool dir_exists(char *path)
-{
-    DIR* d = rb->opendir(path);
-    bool retval;
-    if (d != NULL) {
-        rb->closedir(d);
-        retval = true;
-    } else {
-        retval = false;
-    }
-    DEBUGF("Checked existence of the dir '%s': %s\n",
-            path, (retval ? "found" : "NOT FOUND"));
-    return retval;
-}

@@ -522,6 +522,9 @@ static const struct plugin_api rockbox_api = {
 #ifdef PROC_NEEDS_CACHEALIGN
     align_buffer,
 #endif
+
+    file_exists,
+    dir_exists,
 };
 
 int plugin_load(const char* plugin, void* parameter)

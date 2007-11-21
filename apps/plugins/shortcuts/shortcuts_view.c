@@ -166,10 +166,10 @@ bool goto_entry(char *file_or_dir)
     char *what;
     if (is_dir) {
         what = "Directory";
-        exists = dir_exists(file_or_dir);
+        exists = rb->dir_exists(file_or_dir);
     } else {
         what = "File";
-        exists = file_exists(file_or_dir);
+        exists = rb->file_exists(file_or_dir);
     }
 
     if (!exists) {
