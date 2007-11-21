@@ -36,7 +36,7 @@ codecs/libwavpack/*
 codecs/libwma/*
 codecs/spc/*.[ch]
 codecs/spc/Makefile
-codecs/spc/Sources
+codecs/spc/SOURCES
 codecs/Tremor/*
 eqs/*.cfg
 gui/*.[ch]
