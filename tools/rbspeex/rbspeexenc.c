@@ -23,6 +23,17 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define USAGE_TEXT \
+"Usage: rbspeexenc [options] infile outfile\n"\
+"Options:\n"\
+"  -q x   Quality, floating point number in the range [0-10], default 8.0\n"\
+"  -c x   Complexity, increases quality for a given bitrate, but encodes\n"\
+"         slower, range [0-10], default 3\n"\
+"  -n     Enable narrowband mode, will resample input to 8 kHz\n\n"\
+"rbspeexenc expects a mono 16 bit WAV file as input. Files will be resampled\n"\
+"to either 16 kHz by default, or 8 kHz if narrowband mode is enabled.\n"\
+"WARNING: This tool will create files that are only usable by Rockbox!\n"
+
 /* Read an unaligned 32-bit little endian long from buffer. */
 unsigned int get_long_le(unsigned char *p)
 {
@@ -110,81 +121,83 @@ int main(int argc, char **argv)
     SpeexResamplerState *resampler = NULL;
     SpeexBits bits;
     int i, tmp;
-    float ftmp;
+    int complexity = 3;
+    float quality = 8.f;
+    bool narrowband = false;
+    int target_sr;
     int numchan, bps, sr, numsamples;
     int frame_size;
+    int lookahead;
 
     if (argc < 3) {
-        printf("Usage: rbspeexenc [options] infile outfile\n"
-               "Options:\n"
-               "  -q x   Quality, floating point number in the range [0-10]\n"
-               "  -c x   Complexity, affects quality and encoding time, where\n"
-               "         both increase with increasing values, range [0-10]\n"
-               "  Defaults are as in speexenc.\n"
-               "\nWARNING: This tool will create files that are only usable by Rockbox!\n"
-        );
+        printf(USAGE_TEXT);
         return 1;
     }
+
+    i = 1;
+    while (i < argc - 2) {
+        if (strncmp(argv[i], "-q", 2) == 0)
+            quality = atof(argv[++i]);
+        else if (strncmp(argv[i], "-c", 2) == 0)
+            complexity = atoi(argv[++i]);
+        else if (strncmp(argv[i], "-n", 2) == 0)
+            narrowband = true;
+        ++i;
+    }
+
+    /* Allocate an encoder of specified type, defaults to wideband */
+    st = speex_encoder_init(narrowband ? &speex_nb_mode : &speex_wb_mode);
+    if (narrowband)
+        target_sr = 8000;
+    else
+        target_sr = 16000;
 
     /* We'll eat an entire WAV file here, and encode it with Speex, packing the
      * bits as tightly as we can. Output is completely raw, with absolutely
      * nothing to identify the contents.
-	 */
-
-    /* Wideband encoding */
-    st = speex_encoder_init(&speex_wb_mode);
+     */
 
     /* VBR */
     tmp = 1;
     speex_encoder_ctl(st, SPEEX_SET_VBR, &tmp);
     /* Quality, 0-10 */
-    ftmp = 8.f;
-    for (i = 1; i < argc - 2; ++i) {
-        if (strncmp(argv[i], "-q", 2) == 0) {
-            ftmp = atof(argv[i + 1]);
-            break;
-        }
-    }
-    speex_encoder_ctl(st, SPEEX_SET_VBR_QUALITY, &ftmp);
+    speex_encoder_ctl(st, SPEEX_SET_VBR_QUALITY, &quality);
     /* Complexity, 0-10 */
-    tmp = 3;
-    for (i = 1; i < argc - 2; ++i) {
-        if (strncmp(argv[i], "-c", 2) == 0) {
-            tmp = atoi(argv[i + 1]);
-            break;
-        }
-    }
-    speex_encoder_ctl(st, SPEEX_SET_COMPLEXITY, &tmp);
+    speex_encoder_ctl(st, SPEEX_SET_COMPLEXITY, &complexity);
     speex_encoder_ctl(st, SPEEX_GET_FRAME_SIZE, &frame_size);
+    speex_encoder_ctl(st, SPEEX_GET_LOOKAHEAD, &lookahead);
 
     fin = fopen(argv[argc - 2], "rb");
     if (!get_wave_metadata(fin, &numchan, &bps, &sr, &numsamples)) {
-        printf("invalid wave file!\n");
+        printf("Error: invalid WAV file\n");
         return 1;
     }
-    if (sr != 16000) {
-        resampler = speex_resampler_init(1, sr, 16000, 10, NULL);
+    if (sr != target_sr) {
+        resampler = speex_resampler_init(1, sr, target_sr, 10, NULL);
         speex_resampler_skip_zeros(resampler);
-        printf("Resampling from %i Hz to 16000 Hz\n", sr);
     }
     if (numchan != 1) {
         printf("Error: input file must be mono\n");
         return 1;
     }
     if (bps != 16) {
-        printf("samples must be 16 bit!\n");
+        printf("Error: samples must be 16 bit\n");
         return 1;
     }
 
     /* Read input samples into a buffer */
-    in = malloc(numsamples*2);
-    if (malloc == NULL) {
-        printf("error on malloc\n");
+    in = calloc(numsamples + lookahead, sizeof(spx_int16_t));
+    if (in == NULL) {
+        printf("Error: could not allocate clip memory\n");
         return 1;
     }
     fread(in, 2, numsamples, fin);
     fclose(fin);
-    
+    /* There will be 'lookahead' samples of zero at the end of the array, to
+     * make sure the Speex encoder is allowed to spit out all its data at clip
+     * end */
+    numsamples += lookahead;
+   
     speex_bits_init(&bits);
     inpos = in;
     fout = fopen(argv[argc - 1], "wb");
@@ -193,12 +206,16 @@ int main(int argc, char **argv)
         int samples = frame_size;
 
         /* Check if we need to resample */
-        if (sr != 16000) {
+        if (sr != target_sr) {
             spx_uint32_t in_len = numsamples, out_len = frame_size;
+            double resample_factor = (double)sr/(double)target_sr;
+            /* Calculate how many input samples are needed for one full frame
+             * out, and add some, just in case. */
+            spx_uint32_t samples_in = frame_size*resample_factor + 50;
 
             /* Limit this or resampler will try to allocate it all on stack */
-            if (in_len > 2000)
-                in_len = 2000;
+            if (in_len > samples_in)
+                in_len = samples_in;
             speex_resampler_process_int(resampler, 0, inpos, &in_len,
                                         enc_buf, &out_len);
             inpos += in_len;
@@ -214,7 +231,10 @@ int main(int argc, char **argv)
         /* Pad out with zeros if we didn't fill all input */
         memset(enc_buf + samples, 0, (frame_size - samples)*2);
 
-        speex_encode_int(st, enc_buf, &bits);
+        if (speex_encode_int(st, enc_buf, &bits) < 0) {
+            printf("Error: encoder error\n");
+            return 1;
+        }
 
         /* Copy the bits to an array of char that can be written */
         nbytes = speex_bits_write_whole_bytes(&bits, cbits, 200);
@@ -222,8 +242,7 @@ int main(int argc, char **argv)
         /* Write the compressed data */
         fwrite(cbits, 1, nbytes, fout);
     }
- 
-     /* Squeeze out the last bits */
+    /* Squeeze out the last bits */
     nbytes = speex_bits_write(&bits, cbits, 200);
     fwrite(cbits, 1, nbytes, fout);
 
