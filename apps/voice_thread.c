@@ -313,11 +313,10 @@ static void voice_thread(void)
         }
 
     voice_decode:
-        /* Check if all data was exhausted for this clip */
-        if (speex_bits_remaining(&td.bits) < 8)
+        /* Decode the data */
+        if (speex_decode_int(td.st, &td.bits, voice_output_buf) < 0)
         {
-    voice_error:
-            /* Get next clip */
+            /* End of stream or error - get next clip */
             td.vi.size = 0;
 
             if (td.vi.get_more != NULL)
@@ -329,6 +328,8 @@ static void voice_thread(void)
                 speex_bits_set_bit_buffer(&td.bits, td.vi.start, td.vi.size);
                 speex_decoder_ctl(td.st, SPEEX_GET_LOOKAHEAD, &td.lookahead);
 
+                /* Paranoid check - be sure never to somehow get stuck in a
+                 * loop without listening to the queue */
                 yield();
 
                 if (!queue_empty(&voice_queue))
@@ -354,12 +355,7 @@ static void voice_thread(void)
             goto message_process;
         }
 
-        /* Decode the data */
-        int status = speex_decode_int(td.st, &td.bits, voice_output_buf);
         yield();
-
-        if (status == -2)
-            goto voice_error; /* error - try some more */
 
         /* Output the decoded frame */
         td.count = VOICE_FRAME_SIZE - td.lookahead;
