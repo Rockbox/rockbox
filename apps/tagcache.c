@@ -3796,11 +3796,21 @@ static bool check_dir(const char *dirname)
     DIR *dir;
     int len;
     int success = false;
+    char newpath[MAX_PATH];
 
     dir = opendir(dirname);
     if (!dir)
     {
         logf("tagcache: opendir() failed");
+        return false;
+    }
+    
+    /* check for a database.ignore file */
+    snprintf(newpath, MAX_PATH, "%s/database.ignore", dirname);
+    len = open(newpath, O_RDONLY);
+    if (len >= 0)
+    {
+        close(len);
         return false;
     }
     

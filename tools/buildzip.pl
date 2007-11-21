@@ -186,7 +186,9 @@ sub buildzip {
         # always disable fonts on non-bitmap targets
         $fonts = 0;
     }
-
+    # create the file so the database does not try indexing a folder
+    `touch .rockbox/database.ignore`;
+    
     if($fonts) {
         mkdir ".rockbox/fonts", 0777;
 
