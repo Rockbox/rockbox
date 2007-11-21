@@ -326,7 +326,8 @@ static void voice_thread(void)
             {
                 /* Make bit buffer use our own buffer */
                 speex_bits_set_bit_buffer(&td.bits, td.vi.start, td.vi.size);
-                speex_decoder_ctl(td.st, SPEEX_GET_LOOKAHEAD, &td.lookahead);
+                /* Don't skip any samples when we're stringing clips together */
+                td.lookahead = 0;
 
                 /* Paranoid check - be sure never to somehow get stuck in a
                  * loop without listening to the queue */
