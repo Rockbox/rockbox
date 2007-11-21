@@ -4839,16 +4839,19 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Instellen OFF=Afbreken"
     ipod*: "SELECT=Instellen MENU=Afbreken"
+    h10,h10_5gb: "SELECT=Instellen PREV=Afbreken"
   </dest>
   <voice>
     *: none
     alarm: "PLAY=Instellen OFF=Afbreken"
     ipod*: "SELECT=Instellen MENU=Afbreken"
+    h10,h10_5gb: "SELECT=Instellen PREV=Afbreken"
   </voice>
 </phrase>
 <phrase>
