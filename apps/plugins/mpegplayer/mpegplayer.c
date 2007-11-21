@@ -1145,7 +1145,9 @@ static int button_loop(void)
             break;
 
         case MPEG_PAUSE:
+#ifdef MPEG_PAUSE2
         case MPEG_PAUSE2:
+#endif
             settings.resume_time = (int)(get_stream_time()/CLOCK_RATE/
                                          30-start_pts_time);
             save_settings();
