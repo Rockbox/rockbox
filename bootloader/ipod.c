@@ -35,7 +35,7 @@
 #include "disk.h"
 #include "font.h"
 #include "adc.h"
-#include "backlight-target.h"
+#include "backlight.h"
 #include "panic.h"
 #include "power.h"
 #include "file.h"
@@ -237,13 +237,13 @@ void* main(void)
        reset the settings in rockbox. */
     button_was_held = button_hold();
 
-#ifndef HAVE_BACKLIGHT_INVERSION
-    /* Turn on the backlight */
-    _backlight_on();
-#endif
-
     system_init();
     kernel_init();
+
+#ifndef HAVE_BACKLIGHT_INVERSION
+    backlight_init(); /* Turns on the backlight */
+#endif
+
     lcd_init();
     font_init();
 
