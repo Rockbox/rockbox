@@ -305,6 +305,7 @@ Install Tools
 :Rockbox Utility:
 :ipodpatcher: Dave Chapman
 :sansapatcher: Dave Chapman, Barry Wardell
+:e200rpatcher: Dave Chapman
 
 
 Manual
@@ -312,6 +313,12 @@ Manual
 
 :Manual build system:
 [What to put here - maintainers for chapters?]
+
+Utilities
+---------
+
+:ARM disassembler:
+:tcctool: Dave Chapman
 
 Web site stuff
 --------------
