@@ -590,17 +590,14 @@ static void adjust_cursor(void)
         cursor = max_cursor;
 }
 
-static bool check_dir(char *folder)
+static bool check_dir(const char *folder)
 {
-    DIR *dir = opendir(folder);
-    if (!dir && strcmp(folder, "/"))
+    if (strcmp(folder, "/") && !dir_exists(folder))
     {
         int rc = mkdir(folder);
         if(rc < 0)
             return false;
-        return true;
     }
-    closedir(dir);
     return true;
 }
 

@@ -1115,12 +1115,8 @@ bool file_exists(const char *file)
 bool dir_exists(const char *path)
 {
     DIR* d = opendir(path);
-    bool retval;
-    if (d != NULL) {
-        closedir(d);
-        retval = true;
-    } else {
-        retval = false;
-    }
-    return retval;
+    if (!d)
+        return false;
+    closedir(d);
+    return true;
 }
