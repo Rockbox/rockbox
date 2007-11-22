@@ -1086,7 +1086,7 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
     
     /* read settings file */
     settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
-    if (settings_fd && (rb->filesize(settings_fd) == sizeof(struct preferences)))
+    if ((settings_fd >= 0) && (rb->filesize(settings_fd) == sizeof(struct preferences)))
     {
         rb->read(settings_fd, &prefs, sizeof(struct preferences));
         rb->close(settings_fd);
