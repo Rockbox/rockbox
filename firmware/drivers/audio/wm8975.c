@@ -63,13 +63,6 @@ int tenthdb2master(int db)
     }
 }
 
-/* convert tenth of dB volume (-780..0) to mixer volume register value */
-int tenthdb2mixer(int db)
-{
-    (void)db;
-    return 0;
-}
-
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
 
@@ -151,14 +144,6 @@ int audiohw_set_lineout_vol(int vol_l, int vol_r)
     /* OUT2 */
     wmcodec_write(LOUT2VOL, VOLUME_ZC_WAIT | vol_l);
     wmcodec_write(ROUT2VOL, VOLUME_ZC_WAIT | 0x100 | vol_r);
-
-    return 0;
-}
-
-int audiohw_set_mixer_vol(int channel1, int channel2)
-{
-    (void)channel1;
-    (void)channel2;
 
     return 0;
 }

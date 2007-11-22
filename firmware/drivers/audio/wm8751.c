@@ -73,13 +73,6 @@ int tenthdb2master(int db)
         return (db / 10) + 73 + 0x30;
 }
 
-/* convert tenth of dB volume (-780..0) to mixer volume register value */
-int tenthdb2mixer(int db)
-{
-    (void)db;
-    return 0;
-}
-
 static int tone_tenthdb2hw(int value)
 {
     /* -6.0db..+0db..+9.0db step 1.5db - translate -60..+0..+90 step 15
@@ -165,14 +158,6 @@ int audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     wmcodec_write(LOUT2, LOUT2_BITS | LOUT2_LOUT2VOL(vol_l));
     wmcodec_write(ROUT2, ROUT2_BITS | ROUT2_ROUT2VOL(vol_r));
-    return 0;
-}
-
-int audiohw_set_mixer_vol(int channel1, int channel2)
-{
-    (void)channel1;
-    (void)channel2;
-
     return 0;
 }
 
