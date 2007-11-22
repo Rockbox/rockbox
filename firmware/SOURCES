@@ -233,8 +233,14 @@ usbstack/usb_benchmark.c
 #ifdef CPU_PP502x
 target/arm/usb-drv-pp502x.c
 #endif
+#else /* !defined(HAVE_USBSTACK) */
+#if CONFIG_USBOTG == USBOTG_ISP1362	 
+drivers/isp1362.c	 
+#elif CONFIG_USBOTG == USBOTG_M5636	 
+drivers/m5636.c
 #endif
-#endif
+#endif /* !defined(HAVE_USBSTACK) */
+#endif /* !defined(SIMULATOR) */
 
 /* Other Random Hardware */
 #ifdef HAVE_TSC2100
