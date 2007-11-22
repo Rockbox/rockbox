@@ -11,6 +11,10 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 #ifndef ROCKBOX_VOICE_ENCODER
+
+#define DISABLE_FLOAT_API
+#define DISABLE_VBR
+
 /* Make use of ARM4E assembly optimizations */
 #if defined(CPU_ARM)
 #define ARM4_ASM

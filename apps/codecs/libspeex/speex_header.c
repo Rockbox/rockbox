@@ -48,7 +48,7 @@
 static inline spx_int32_t le_int(spx_int32_t i)
 {
 #ifdef ROCKBOX 
-	return letoh32(i);
+   return letoh32(i);
 #elif !defined(__LITTLE_ENDIAN__) && ( defined(WORDS_BIGENDIAN) || defined(__BIG_ENDIAN__) )
    spx_uint32_t ui, ret;
    ui = i;

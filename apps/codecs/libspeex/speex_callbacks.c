@@ -96,6 +96,7 @@ int speex_std_high_mode_request_handler(SpeexBits *bits, void *state, void *data
    return 0;
 }
 
+#ifndef DISABLE_VBR
 int speex_std_vbr_request_handler(SpeexBits *bits, void *state, void *data)
 {
    spx_int32_t vbr;
@@ -103,6 +104,7 @@ int speex_std_vbr_request_handler(SpeexBits *bits, void *state, void *data)
    speex_encoder_ctl(data, SPEEX_SET_VBR, &vbr);
    return 0;
 }
+#endif /* #ifndef DISABLE_VBR */
 
 int speex_std_enh_request_handler(SpeexBits *bits, void *state, void *data)
 {
@@ -112,17 +114,15 @@ int speex_std_enh_request_handler(SpeexBits *bits, void *state, void *data)
    return 0;
 }
 
+#ifndef DISABLE_VBR
 int speex_std_vbr_quality_request_handler(SpeexBits *bits, void *state, void *data)
 {
-   /* We don't use this, get rid of the float reference */
-#if 0
    float qual;
    qual = speex_bits_unpack_unsigned(bits, 4);
    speex_encoder_ctl(data, SPEEX_SET_VBR_QUALITY, &qual);
-#endif
    return 0;
 }
-
+#endif /* #ifndef DISABLE_VBR */
 
 int speex_std_char_handler(SpeexBits *bits, void *state, void *data)
 {

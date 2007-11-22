@@ -389,4 +389,3 @@ void lsp_unquant_high(spx_lsp_t *lsp, int order, SpeexBits *bits)
 
 #endif
 
-

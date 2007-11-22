@@ -110,6 +110,7 @@ const float exc_gain_quant_scal1[2]={0.70469f, 1.05127f};
 
 extern const spx_word16_t lag_window[];
 extern const spx_word16_t lpc_window[];
+
 #ifndef SPEEX_DISABLE_ENCODER
 void *nb_encoder_init(const SpeexMode *m)
 {
@@ -185,6 +186,7 @@ void *nb_encoder_init(const SpeexMode *m)
    
    st->pitch = (int*)speex_alloc((st->nbSubframes)*sizeof(int));
 
+#ifndef DISABLE_VBR
    st->vbr = (VBRState*)speex_alloc(sizeof(VBRState));
    vbr_init(st->vbr);
    st->vbr_quality = 8;
@@ -192,13 +194,15 @@ void *nb_encoder_init(const SpeexMode *m)
    st->vbr_max = 0;
    st->vad_enabled = 0;
    st->dtx_enabled = 0;
+   st->dtx_count=0;
    st->abr_enabled = 0;
    st->abr_drift = 0;
+   st->abr_drift2 = 0;
+#endif /* #ifndef DISABLE_VBR */
 
    st->plc_tuning = 2;
    st->complexity=2;
    st->sampling_rate=8000;
-   st->dtx_count=0;
    st->isWideband = 0;
    st->highpass_enabled = 1;
    
@@ -230,8 +234,10 @@ void nb_encoder_destroy(void *state)
    speex_free (st->pi_gain);
    speex_free (st->pitch);
 
+#ifndef DISABLE_VBR
    vbr_destroy(st->vbr);
    speex_free (st->vbr);
+#endif /* #ifndef DISABLE_VBR */
 
 #ifdef VORBIS_PSYCHO
    vorbis_psy_destroy(st->psy);
@@ -344,8 +350,11 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 
 
       /*Open-loop pitch*/
-      if (!st->submodes[st->submodeID] || (st->complexity>2 && SUBMODE(have_subframe_gain)<3) || st->vbr_enabled || st->vad_enabled || SUBMODE(forced_pitch_gain) ||
-          SUBMODE(lbr_pitch) != -1)
+      if (!st->submodes[st->submodeID] || (st->complexity>2 && SUBMODE(have_subframe_gain)<3) || SUBMODE(forced_pitch_gain) || SUBMODE(lbr_pitch) != -1 
+#ifndef DISABLE_VBR
+           || st->vbr_enabled || st->vad_enabled
+#endif
+                  )
       {
          int nol_pitch[6];
          spx_word16_t nol_pitch_coef[6];
@@ -418,6 +427,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 #endif
 
    /*VBR stuff*/
+#ifndef DISABLE_VBR
    if (st->vbr && (st->vbr_enabled||st->vad_enabled))
    {
       float lsp_dist=0;
@@ -529,6 +539,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
    } else {
       st->relative_quality = -1;
    }
+#endif /* #ifndef DISABLE_VBR */
 
    if (st->encode_submode)
    {
@@ -694,8 +705,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          bw_lpc(st->gamma2, interp_lpc, bw_lpc2, st->lpcSize);
       else
       {
-         bw_lpc2[0]=1;
-         for (i=1;i<=st->lpcSize;i++)
+         for (i=0;i<st->lpcSize;i++)
             bw_lpc2[i]=0;
       }
       /*print_vec(st->bw_lpc1, 10, "bw_lpc");*/
@@ -907,9 +917,11 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 
    if (st->submodeID==1)
    {
+#ifndef DISABLE_VBR
       if (st->dtx_count)
          speex_bits_pack(bits, 15, 4);
       else
+#endif
          speex_bits_pack(bits, 0, 4);
    }
 
@@ -1615,7 +1627,8 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
    case SPEEX_GET_MODE:
       (*(spx_int32_t*)ptr) = st->submodeID;
       break;
-   case SPEEX_SET_VBR:
+#ifndef DISABLE_VBR
+      case SPEEX_SET_VBR:
       st->vbr_enabled = (*(spx_int32_t*)ptr);
       break;
    case SPEEX_GET_VBR:
@@ -1663,12 +1676,15 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
    case SPEEX_GET_ABR:
       (*(spx_int32_t*)ptr) = st->abr_enabled;
       break;
+#endif /* #ifndef DISABLE_VBR */
+#if !defined(DISABLE_VBR) && !defined(DISABLE_FLOAT_API)
    case SPEEX_SET_VBR_QUALITY:
       st->vbr_quality = (*(float*)ptr);
       break;
    case SPEEX_GET_VBR_QUALITY:
       (*(float*)ptr) = st->vbr_quality;
       break;
+#endif /* !defined(DISABLE_VBR) && !defined(DISABLE_FLOAT_API) */
    case SPEEX_SET_QUALITY:
       {
          int quality = (*(spx_int32_t*)ptr);
@@ -1746,12 +1762,14 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
    case SPEEX_GET_PLC_TUNING:
       (*(spx_int32_t*)ptr)=(st->plc_tuning);
       break;
+#ifndef DISABLE_VBR
    case SPEEX_SET_VBR_MAX_BITRATE:
       st->vbr_max = (*(spx_int32_t*)ptr);
       break;
    case SPEEX_GET_VBR_MAX_BITRATE:
       (*(spx_int32_t*)ptr) = st->vbr_max;
       break;
+#endif /* #ifndef DISABLE_VBR */
    case SPEEX_SET_HIGHPASS:
       st->highpass_enabled = (*(spx_int32_t*)ptr);
       break;
@@ -1775,9 +1793,11 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
             ((spx_word16_t*)ptr)[i] = compute_rms16(st->exc+i*st->subframeSize, st->subframeSize);
       }
       break;
+#ifndef DISABLE_VBR
    case SPEEX_GET_RELATIVE_QUALITY:
       (*(float*)ptr)=st->relative_quality;
       break;
+#endif /* #ifndef DISABLE_VBR */
    case SPEEX_SET_INNOVATION_SAVE:
       st->innov_rms_save = (spx_word16_t*)ptr;
       break;
@@ -1870,10 +1890,10 @@ int nb_decoder_ctl(void *state, int request, void *ptr)
    case SPEEX_GET_HIGHPASS:
       (*(spx_int32_t*)ptr) = st->highpass_enabled;
       break;
+      /* FIXME: Convert to fixed-point and re-enable even when float API is disabled */
+#ifndef DISABLE_FLOAT_API
    case SPEEX_GET_ACTIVITY:
    {
-      /* We don't use this, dummy it out to get rid of the float stuff */
-#if 0 
       float ret;
       ret = log(st->level/st->min_level)/log(st->max_level/st->min_level);
       if (ret>1)
@@ -1883,11 +1903,9 @@ int nb_decoder_ctl(void *state, int request, void *ptr)
          ret = 0;
       /*printf ("%f %f %f %f\n", st->level, st->min_level, st->max_level, ret);*/
       (*(spx_int32_t*)ptr) = (int)(100*ret);
-#else
-      (*(spx_int32_t*)ptr) = (int)(0);
-#endif
    }
    break;
+#endif
    case SPEEX_GET_PI_GAIN:
       {
          int i;
