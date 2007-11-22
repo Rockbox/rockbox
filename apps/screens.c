@@ -80,6 +80,8 @@
 #define SCROLLBAR_WIDTH  6
 #endif
 
+/* only used in set_time screen */
+#if defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0)
 static int clamp_value_wrap(int value, int max, int min)
 {
     if (value > max)
@@ -88,6 +90,7 @@ static int clamp_value_wrap(int value, int max, int min)
         return max;
     return value;
 }
+#endif
 
 void usb_screen(void)
 {
