@@ -21,6 +21,9 @@
 #include "i2s.h"
 #include "i2c-pp.h"
 #include "as3514.h"
+#ifdef HAVE_USBSTACK
+#include "usb_drv.h"
+#endif
 
 #ifndef BOOTLOADER
 extern void TIMER1(void);
@@ -33,19 +36,12 @@ extern void button_int(void);
 extern void clickwheel_int(void);
 #endif
 
-#ifdef HAVE_USBSTACK
-#include "usbstack/core.h"
-#endif
-
 void irq(void)
 {
     if(CURRENT_CORE == CPU)
     {
         if (CPU_INT_STAT & TIMER1_MASK) {
             TIMER1();
-#ifdef HAVE_USBSTACK
-            usb_stack_irq();
-#endif
         } else if (CPU_INT_STAT & TIMER2_MASK)
             TIMER2();
 #if defined(IPOD_MINI) /* Mini 1st gen only, mini 2nd gen uses iPod 4G code */
@@ -69,6 +65,11 @@ void irq(void)
         else if (CPU_HI_INT_STAT & GPIO2_MASK) {
             if (GPIOL_INT_STAT & 0x08)
                 microsd_int();
+        }
+#endif
+#ifdef HAVE_USBSTACK
+        else if (CPU_INT_STAT & USB_MASK) {
+            usb_drv_int();
         }
 #endif
     } else {

@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:  $
  *
- * Copyright (C) 2007 by Peter D'Hoye
+ * Copyright (C) 2007 by Björn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,10 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef USB_BENCHMARK_H
+#define USB_BENCHMARK_H
 
-#ifndef _USBSTACK_UTILS_H_
-#define _USBSTACK_UTILS_H_
+void usb_benchmark_init(void);
+void usb_benchmark_control_request(struct usb_ctrlrequest* req);
+void usb_benchmark_transfer_complete(int endpoint, bool in);
 
-int usb_stack_get_string(struct usb_string* strings, int id, uint8_t* buf);
-    
-#endif /*_USBSTACK_UTILS_H_*/
+#endif

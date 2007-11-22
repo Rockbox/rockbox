@@ -17,9 +17,7 @@ drivers/usb/*.[ch]
 export/*.h
 include/*.h
 include/sys/*.h
-usbstack/*.h
-usbstack/core/*.c
-usbstack/drivers/device/*.[ch]
+usbstack/*.[ch]
 target/arm/*.[chS]
 target/arm/archos/av300/*.[chS]
 target/arm/imx31/gigabeat-s/*.[chS]

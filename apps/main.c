@@ -99,10 +99,6 @@
 #include "lcd-remote.h"
 #endif
 
-#ifdef HAVE_USBSTACK
-#include "usbstack.h"
-#endif
-
 #if CONFIG_USBOTG == USBOTG_ISP1362
 #include "isp1362.h"
 #endif
@@ -389,9 +385,6 @@ static void init(void)
 
     adc_init();
 
-#ifdef HAVE_USBSTACK
-    usb_stack_init();
-#endif
     usb_init();
 #if CONFIG_USBOTG == USBOTG_ISP1362
     isp1362_init();

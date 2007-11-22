@@ -87,9 +87,11 @@ static void usb_slave_mode(bool on)
     else
     {
         DEBUGF("Leaving USB slave mode\n");
-        
+
+#ifndef HAVE_USBSTACK
         /* Let the ISDx00 settle */
         sleep(HZ*1);
+#endif
         
         usb_enable(false);
 
@@ -402,7 +404,7 @@ bool usb_charging_enabled(void)
     /* TODO: implement it for other targets... */
 #endif
 
-    logf("usb_charging_enabled: %s\n", rc ? "true" : "false" );
+    logf("usb charging %s", rc ? "enabled" : "disabled" );
     return rc;
 }
 #endif

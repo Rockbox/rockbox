@@ -42,13 +42,6 @@
 #include "radio.h"
 #endif
 
-#ifdef HAVE_USBSTACK
-#include "list.h"
-#include "usbstack.h"
-#include "statusbar.h"
-#include "misc.h"
-#endif
-
 /***********************************/
 /*    TAGCACHE MENU                */
 #ifdef HAVE_TAGCACHE
@@ -453,88 +446,6 @@ MAKE_MENU(voice_settings_menu, ID2P(LANG_VOICE), 0, Icon_Voice,
 /*    VOICE MENU                   */
 /***********************************/
 
-#ifdef HAVE_USBSTACK
-/***********************************/
-/*    USB STACK MENU               */
-char drivers[16][32];
-static char* usb_menu_getname(int item, void * data, char *buffer)
-{
-    (void)data; (void)buffer;
-    return drivers[item];
-}
-int usbdriver_menuitem(void)
-{
-    struct gui_synclist lists;
-    int action, count = 0;
-    char *s = device_driver_names, *e;
-    do {
-        e = strchr(s, ',');
-        if (e)
-        {
-            strncpy(drivers[count++], s, e-s);
-            s = e+1;
-        }
-    } while (e && count < 16);
-    if (count < 16)
-        strcpy(drivers[count++], s);
-    for (action=0; action<count; action++)
-    {
-        if (!strcmp(drivers[action], 
-                   global_settings.usb_stack_device_driver))
-            break;
-    }
-
-    gui_synclist_init(&lists, usb_menu_getname, drivers, false, 1);
-    gui_synclist_set_title(&lists, str(LANG_USBSTACK_DEVICE_DRIVER), NOICON);
-    gui_synclist_set_icon_callback(&lists, NULL);
-    gui_synclist_set_nb_items(&lists, count);
-    gui_synclist_select_item(&lists, action==count?0:action);
-    gui_synclist_draw(&lists);
-
-    while(1)
-    {
-        gui_syncstatusbar_draw(&statusbars, true);
-        action = get_action(CONTEXT_STD, HZ/5); 
-        if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
-            continue;
-        if (action == ACTION_STD_CANCEL)
-        {
-            /* setting was canceled */
-            break;
-        }
-        else if (action == ACTION_STD_OK)
-        {
-            /* setting was accepted... save */
-            strcpy(global_settings.usb_stack_device_driver,
-                  drivers[gui_synclist_get_sel_pos(&lists)]);
-
-            /* switch device driver */
-            usb_device_driver_bind(drivers[gui_synclist_get_sel_pos(&lists)]);
-            break;
-        }
-        else if (action == ACTION_REDRAW)
-            gui_synclist_draw(&lists);
-        else if(default_event_handler(action) == SYS_USB_CONNECTED)
-            return true;
-    }
-    return false;
-}
-
-#if USBSTACK_CAPS == (CONTROLLER_DEVICE|CONTROLLER_HOST)
-MENUITEM_SETTING(usbstack_mode, &global_settings.usb_stack_mode, NULL);
-#endif
-MENUITEM_FUNCTION(usbdriver, 0, ID2P(LANG_USBSTACK_DEVICE_DRIVER),
-                  usbdriver_menuitem, 0,  NULL, Icon_NOICON);
-
-MAKE_MENU(usbstack_menu, ID2P(LANG_USBSTACK), 0, Icon_NOICON,
-#if USBSTACK_CAPS == (CONTROLLER_DEVICE|CONTROLLER_HOST)
-                &usbstack_mode,
-#endif
-                &usbdriver);
-/*    USB STACK MENU               */
-/***********************************/
-#endif
-
 /***********************************/
 
 /***********************************/
@@ -554,9 +465,6 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
 #endif
           &display_menu, &system_menu,
           &bookmark_settings_menu, &browse_langs, &voice_settings_menu
-#ifdef HAVE_USBSTACK
-          , &usbstack_menu
-#endif
           );
 /*    SETTINGS MENU                */
 /***********************************/

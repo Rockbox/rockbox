@@ -227,32 +227,14 @@ drivers/audio/mas35xx.c
 /* USB Stack */
 #if !defined(SIMULATOR)
 #ifdef HAVE_USBSTACK
-usbstack/core/core.c
-usbstack/core/epsetup.c
-usbstack/core/utils.c
-usbstack/core/config.c
-usbstack/drivers/device/usb_serial.c
-usbstack/drivers/device/usb_storage.c
+usbstack/usb_core.c
+usbstack/usb_storage.c
+usbstack/usb_benchmark.c
+#ifdef CPU_PP502x
+target/arm/usb-drv-pp502x.c
 #endif
 #endif
-
-/* USBOTG */
-#if !defined(SIMULATOR)
-#if CONFIG_USBOTG == USBOTG_ISP1362
-drivers/isp1362.c
 #endif
-#if defined(SANSA_E200) || defined(SANSA_C200) || !defined(BOOTLOADER)
-#if CONFIG_USBOTG == USBOTG_M5636
-drivers/m5636.c
-#elif CONFIG_USBOTG == USBOTG_ARC
-#ifdef HAVE_USBSTACK
-drivers/usb/arcotg_dcd.c
-#else
-drivers/usb/arcotg_udc.c
-#endif
-#endif /* CONFIG_USBOTG */
-#endif /* !defined(BOOTLOADER) */
-#endif /* !defined(SIMULATOR) */
 
 /* Other Random Hardware */
 #ifdef HAVE_TSC2100

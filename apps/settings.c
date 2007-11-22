@@ -97,10 +97,6 @@ struct system_status global_status;
 #include "lcd-remote.h"
 #endif
 
-#ifdef HAVE_USBSTACK
-#include "usbstack.h"
-#endif
-
 long lasttime = 0;
 
 /** NVRAM stuff, if the target doesnt have NVRAM it is saved in ROCKBOX_DIR /nvram.bin **/
@@ -879,18 +875,6 @@ void settings_apply(void)
         read_color_theme_file();
 #endif
 
-#ifdef HAVE_USBSTACK
-
-#if USBSTACK_CAPS == (CONTROLLER_DEVICE|CONTROLLER_HOST)
-    usb_controller_select(global_settings.usb_stack_mode);
-#elif USBSTACK_CAPS == (CONTROLLER_DEVICE)
-    usb_controller_select(DEVICE);
-#elif USBSTACK_CAPS == (CONTROLLER_HOST)
-    usb_controller_select(HOST);
-#endif
-
-    usb_device_driver_bind(global_settings.usb_stack_device_driver);
-#endif
 }
 
 

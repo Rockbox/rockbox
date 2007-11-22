@@ -27,15 +27,13 @@
 #include "button.h"
 #include "ata.h"
 #include "string.h"
-#include "arcotg_udc.h"
-
 #ifdef HAVE_USBSTACK
-#include "usbstack.h"
+#include "usb_core.h"
 #endif
 
 void usb_init_device(void)
 {
-    int r0;
+    /* enable usb module */
     GPO32_ENABLE |= 0x200;  
 
     outl(inl(0x7000002C) | 0x3000000, 0x7000002C);  
@@ -46,40 +44,8 @@ void usb_init_device(void)
 
     DEV_INIT2 |= INIT_USB;
     while ((inl(0x70000028) & 0x80) == 0);
-
-    UDC_PORTSC1 |= PORTSCX_PORT_RESET;  
-    while ((UDC_PORTSC1 & PORTSCX_PORT_RESET) != 0);
-
-    UDC_OTGSC |= 0x5F000000;
-    if( (UDC_OTGSC & 0x100) == 0) {  
-        UDC_USBMODE &=~ USB_MODE_CTRL_MODE_HOST;
-        UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;
-        outl(inl(0x70000028) | 0x4000, 0x70000028);
-        outl(inl(0x70000028) | 0x2, 0x70000028);
-    } else {
-        UDC_USBMODE |= USB_MODE_CTRL_MODE_DEVICE;
-        outl(inl(0x70000028) &~0x4000, 0x70000028);
-        outl(inl(0x70000028) | 0x2, 0x70000028);
-    }
-
-
-    UDC_USBCMD |= USB_CMD_CTRL_RESET;
-    while((UDC_USBCMD & USB_CMD_CTRL_RESET) != 0);
-
-    r0 = UDC_PORTSC1;
-
-    /* Note from IPL source (referring to next 5 lines of code:  
-       THIS NEEDS TO BE CHANGED ONCE THERE IS KERNEL USB */  
-    DEV_INIT2 |= INIT_USB;
-    DEV_EN |= DEV_USB;
-    while ((inl(0x70000028) & 0x80) == 0);
     outl(inl(0x70000028) | 0x2, 0x70000028);
-
     udelay(0x186A0);
-
-#ifndef HAVE_USBSTACK
-    dr_controller_setup();
-#endif
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
  || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
@@ -92,9 +58,10 @@ void usb_init_device(void)
 void usb_enable(bool on)
 {
 #ifdef HAVE_USBSTACK
-    if (!on) {
-        usb_stack_stop();
-    }
+    if (on)
+        usb_core_init();
+    else
+        usb_core_exit();
 #else
     /* This device specific code will eventually give way to proper USB
        handling, which should be the same for all PP502x targets. */
@@ -131,11 +98,6 @@ void usb_enable(bool on)
 
 int usb_detect(void)
 {
-    static int countdown = 0;
-    static int status = USB_EXTRACTED;
-    static bool prev_usbstatus1 = false;
-    bool usbstatus1, usbstatus2;
-
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
  || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
     /* GPIO C bit 1 is firewire detect */
@@ -143,75 +105,19 @@ int usb_detect(void)
         return USB_INSERTED;
 #endif
 
-    if (countdown > 0)
-    {
-        countdown--;
-
-        usbstatus2 = (UDC_PORTSC1 & PORTSCX_CURRENT_CONNECT_STATUS) ? true : false;
-        if ((countdown == 0) || usbstatus2)
-        {
-            countdown = 0;
-            status = usbstatus2 ? USB_INSERTED : USB_POWERED;
-#ifndef HAVE_USBSTACK
-            dr_controller_stop();
-#endif
-        }
-        return status;
-    }
-
-    /* UDC_ID should have the bit format:
-        [31:24] = 0x0
-        [23:16] = 0x22 (Revision number)
-        [15:14] = 0x3 (Reserved)
-        [13:8]  = 0x3a (NID - 1's compliment of ID)
-        [7:6]   = 0x0 (Reserved)
-        [5:0]   = 0x05 (ID) */
-    if (UDC_ID != 0x22FA05) {
-        /* This should never occur - do we even need to test? */
-        return USB_EXTRACTED;
-    }
-
-    usbstatus1 = (UDC_OTGSC & 0x800) ? true : false;
-
-    if (usbstatus1 == prev_usbstatus1)
-    {
-        /* Nothing has changed, so just return previous status */
-        return status;
-    }
-    prev_usbstatus1 = usbstatus1;
-
-    if (!usbstatus1)
-    {   /* We have just been disconnected */
-        status = USB_EXTRACTED;
-        return status;
-    }
-
-    /* We now know that we have just been connected to either a charger
-       or a computer */
-
-    if((button_status() & ~USBPOWER_BTN_IGNORE) == USBPOWER_BUTTON)
-    {   
-        /* The user wants to charge, so it doesn't matter what we are
-           connected to. */
-
-        status = USB_POWERED;
-        return status;
-    }
-
-    /* Run the USB controller for long enough to detect if we're connected
-       to a computer, then stop it again. */
-
-#ifndef HAVE_USBSTACK
-    dr_controller_run();
-#else
-    usb_stack_start();
+#if defined(SANSA_C200)
+    /* GPIO H bit 1 is usb detect */
+    if (GPIOH_INPUT_VAL & 0x02)
+        return USB_INSERTED;
+#elif defined(SANSA_E200)
+    /* GPIO B bit 4 is usb detect */
+    if (GPIOB_INPUT_VAL & 0x10)
+        return USB_INSERTED;
+#elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+    /* GPIO L bit 2 is usb detect */
+    if (GPIOL_INPUT_VAL & 0x4)
+        return USB_INSERTED;
 #endif
 
-    /* Wait for 50 ticks (500ms) before deciding there is no computer
-       attached.  The required value varied a lot between different users
-       when this feature was being tested. */
-
-    countdown = 50;
-
-    return status;
+    return USB_EXTRACTED;
 }

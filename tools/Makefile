@@ -87,6 +87,9 @@ wavtrim: wavtrim.c
 voicefont: voicefont.c
 	$(SILENT)$(CC) -g $+ -o $@
 
+usb_benchmark: usb_benchmark.c
+	$(SILENT)$(CC) -g -lusb $+ -o $@
+
 clean:
 	@echo "Cleaning tools"
 	$(SILENT)rm -f $(CLEANALL) $(shell for f in $(CLEANALL) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~

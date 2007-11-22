@@ -92,8 +92,8 @@
 #define TIMER2_IRQ   1
 #define MAILBOX_IRQ  4
 #define IIS_IRQ      10
+#define USB_IRQ      20
 #define IDE_IRQ      23
-#define USB_IRQ      24
 #define FIREWIRE_IRQ 25
 #define HI_IRQ       30
 #define GPIO0_IRQ    (32+0) /* Ports A..D */

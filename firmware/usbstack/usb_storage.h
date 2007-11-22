@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:  $
  *
- * Copyright (C) 2007 by Christian Gmeiner
+ * Copyright (C) 2007 by Björn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,16 +16,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef USB_STORAGE_H
+#define USB_STORAGE_H
 
-#ifndef _USBSTACK_HOST_H_
-#define _USBSTACK_HOST_H_
+#include "usb_ch9.h"
 
-/*
- * usb host driver
- */
-struct usb_host_driver {
-    const char* name;
-    void* data;        /* used to store controller specific ops struct */
-};
+void usb_storage_init(void);
+void usb_storage_transfer(void* data);
+void usb_storage_transfer_complete(int endpoint);
+bool usb_storage_control_request(struct usb_ctrlrequest* req);
 
-#endif /*_USBSTACK_HOST_H_*/
+#endif
+

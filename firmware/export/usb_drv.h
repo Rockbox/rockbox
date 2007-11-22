@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:  $
  *
- * Copyright (C) 2007 by Christian Gmeiner
+ * Copyright (C) 2007 by Björn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,18 +16,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef ARCOTG_DRV_H
+#define ARCOTG_DRV_H
+#include "usb_ch9.h"
+#include "kernel.h"
 
-#ifndef _SERIAL_H_
-#define _SERIAL_H_
+void usb_drv_init(void);
+void usb_drv_exit(void);
+void usb_drv_int(void);
+void usb_drv_stall(int endpoint, bool stall);
+void usb_drv_send(int endpoint, void* ptr, int length);
+void usb_drv_recv(int endpoint, void* ptr, int length);
+void usb_drv_ack(struct usb_ctrlrequest* req);
+void usb_drv_set_address(int address);
+void usb_drv_reset_endpoint(int endpoint, bool send);
+void usb_drv_wait(int endpoint, bool send);
 
-#include "usbstack/core.h"
-
-/* register serial driver in usb stack */
-void usb_serial_driver_init(void);
-
-int usb_serial_driver_bind(void* controller_ops);
-void usb_serial_driver_unbind(void);
-int usb_serial_driver_request(struct usb_ctrlrequest* req);
-void usb_serial_driver_speed(enum usb_device_speed speed);
-
-#endif /*_SERIAL_H_*/
+#endif
