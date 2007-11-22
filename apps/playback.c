@@ -316,6 +316,11 @@ static bool clear_track_info(struct track_info *track)
     }
 
     if (track->id3_hid >= 0) {
+        if (track->event_sent && track_unbuffer_callback) {
+            /* If there is an unbuffer callback, call it */
+            track_unbuffer_callback(bufgetid3(track->id3_hid));
+        }
+
         if (bufclose(track->id3_hid))
             track->id3_hid = -1;
         else
@@ -1473,6 +1478,7 @@ static void low_buffer_callback(void)
     queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
 }
 
+/* Clear tracks between write and read, non inclusive */
 static void audio_clear_track_entries(bool clear_unbuffered)
 {
     int cur_idx = track_widx;
@@ -1493,20 +1499,12 @@ static void audio_clear_track_entries(bool clear_unbuffered)
 
         /* If the track is buffered, conditionally clear/notify,
          * otherwise clear the track if that option is selected */
-        if (tracks[cur_idx].event_sent)
-        {
-            /* If there is an unbuffer callback, call it, otherwise,
-             * just clear the track */
-            if (track_unbuffer_callback && tracks[cur_idx].id3_hid >= 0)
-                track_unbuffer_callback(bufgetid3(tracks[cur_idx].id3_hid));
-
-            clear_track_info(&tracks[cur_idx]);
-        }
-        else if (clear_unbuffered)
+        if (tracks[cur_idx].event_sent || clear_unbuffered)
             clear_track_info(&tracks[cur_idx]);
     }
 }
 
+/* Clear all tracks */
 static bool audio_release_tracks(void)
 {
     int i, cur_idx;
@@ -2008,8 +2006,14 @@ static int audio_check_new_track(void)
         new_playlist = false;
     }
 
-    /* Save the old track's metadata to allow the WPS to display it */
+    /* Save the track metadata to allow the WPS to display it
+       while PCM finishes playing that track */
     copy_mp3entry(&prevtrack_id3, &curtrack_id3);
+
+    /* Update the main buffer copy of the track metadata with the one
+       the codec has been using (for the unbuffer callbacks) */
+    if (CUR_TI->id3_hid >= 0)
+        copy_mp3entry(bufgetid3(CUR_TI->id3_hid), &curtrack_id3);
 
     /* Save a pointer to the old track to allow later clearing */
     prev_ti = CUR_TI;
@@ -2302,12 +2306,6 @@ static void audio_finalise_track_change(void)
     {
         wps_offset = 0;
         automatic_skip = false;
-    }
-
-    /* Copy the track back to the main buffer */
-    if (prev_ti && prev_ti->id3_hid >= 0)
-    {
-        copy_mp3entry(bufgetid3(prev_ti->id3_hid), &prevtrack_id3);
     }
 
     /* Invalidate prevtrack_id3 */
