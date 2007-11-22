@@ -200,8 +200,8 @@ struct mp3entry {
 
     /* runtime database fields */
     long tagcache_idx;
-    short rating;
-    short score;
+    int rating;
+    int score;
     long playcount;
     long lastplayed;
     long playtime;
