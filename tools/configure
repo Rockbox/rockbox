@@ -2021,6 +2021,7 @@ help:
 	@echo "fontzip     - creates rockbox-fonts.zip"
 	@echo "mapzip      - creates rockbox-maps.zip with all .map files"
 	@echo "tools       - builds the tools only"
+	@echo "voicetools  - builds the voice tools only"
 	@echo "install     - installs your build (for simulator builds only)"
 
 EOF
