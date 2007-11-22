@@ -1081,11 +1081,9 @@ static void nb_decode_lost(DecState *st, spx_word16_t *out, char *stack)
             speex_rand(noise_gain, &st->seed);
    }
 
-   for (i=0;i<st->frameSize;i++)
-      out[i]=st->exc[i-st->subframeSize];
    bw_lpc(QCONST16(.98,15), st->interp_qlpc, st->interp_qlpc, st->lpcSize);
-   iir_mem16(out, st->interp_qlpc, out, st->frameSize, st->lpcSize, 
-             st->mem_sp, stack);
+   iir_mem16(&st->exc[-st->subframeSize], st->interp_qlpc, out,
+             st->frameSize, st->lpcSize, st->mem_sp, stack);
    highpass(out, out, st->frameSize, HIGHPASS_NARROWBAND|HIGHPASS_OUTPUT, st->mem_hp);
    
    st->first = 0;
@@ -1238,10 +1236,8 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
 
       st->first=1;
 
-      for (i=0;i<st->frameSize;i++)
-         out[i] = st->exc[i];
       /* Final signal synthesis from excitation */
-      iir_mem16(out, lpc, out, st->frameSize, st->lpcSize, st->mem_sp, stack);
+      iir_mem16(st->exc, lpc, out, st->frameSize, st->lpcSize, st->mem_sp, stack);
 
       st->count_lost=0;
       return 0;

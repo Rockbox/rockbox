@@ -1098,9 +1098,7 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
             innov_save[2*i]=EXTRACT16(PSHR32(exc[i],SIG_SHIFT));
       }
       
-      for (i=0;i<st->subframeSize;i++)
-         sp[i]=st->excBuf[i];
-      iir_mem16(sp, st->interp_qlpc, sp, st->subframeSize, st->lpcSize, 
+      iir_mem16(st->excBuf, st->interp_qlpc, sp, st->subframeSize, st->lpcSize, 
                st->mem_sp, stack);
       for (i=0;i<st->subframeSize;i++)
          st->excBuf[i]=EXTRACT16(PSHR32(exc[i],SIG_SHIFT));
