@@ -90,7 +90,7 @@
   </source>
   <dest>
     *: none
-    *: "OFF για τερματισμό"
+    soft_shutdown: "OFF για τερματισμό"
   </dest>
   <voice>
     *: none
@@ -121,7 +121,7 @@
   </source>
   <dest>
     *: none
-    *: "Επανεκκίνηση αναπαραγωγής..."
+    swcodec: "Επανεκκίνηση αναπαραγωγής..."
   </dest>
   <voice>
     *: none
@@ -138,11 +138,11 @@
   </source>
   <dest>
     *: none
-    *: "Παρακαλώ αφαιρέστε την κάρτα MMC"
+    ondio*: "Παρακαλώ αφαιρέστε την κάρτα MMC"
   </dest>
   <voice>
     *: none
-    *: "Παρακαλώ αφαιρέστε την κάρτα Εμ Εμ Σι"
+    ondio*: "Παρακαλώ αφαιρέστε την κάρτα Εμ Εμ Σι"
   </voice>
 </phrase>
 <phrase>
@@ -225,11 +225,11 @@
   </source>
   <dest>
     *: none
-    *: "Ραδιόφωνο FM"
+    radio: "Ραδιόφωνο FM"
   </dest>
   <voice>
     *: none
-    *: "Ραδιόφωνο Εφ Εμ"
+    radio: "Ραδιόφωνο Εφ Εμ"
   </voice>
 </phrase>
 <phrase>
@@ -242,11 +242,11 @@
   </source>
   <dest>
     *: none
-    *: "Ηχογράφηση"
+    recording: "Ηχογράφηση"
   </dest>
   <voice>
     *: none
-    *: "Ηχογράφηση"
+    recording: "Ηχογράφηση"
   </voice>
 </phrase>
 <phrase>
@@ -273,11 +273,11 @@
   </source>
   <dest>
     *: none
-    *: "Τερματισμός"
+    soft_shutdown: "Τερματισμός"
   </dest>
   <voice>
     *: none
-    *: "Τερματισμός"
+    soft_shutdown: "Τερματισμός"
   </voice>
 </phrase>
 <phrase>
@@ -444,11 +444,11 @@
   </source>
   <dest>
     *: none
-    *: "Όγκος ήχου"
+    masf: "Όγκος ήχου"
   </dest>
   <voice>
     *: none
-    *: "Όγκος ήχου"
+    masf: "Όγκος ήχου"
   </voice>
 </phrase>
 <phrase>
@@ -751,11 +751,11 @@
   </source>
   <dest>
     *: none
-    *: "Ρυθμίσεις ηχογράφησης"
+    recording: "Ρυθμίσεις ηχογράφησης"
   </dest>
   <voice>
     *: none
-    *: "Ρυθμίσεις ηχογράφησης"
+    recording: "Ρυθμίσεις ηχογράφησης"
   </voice>
 </phrase>
 <phrase>
@@ -967,11 +967,11 @@
   </source>
   <dest>
     *: none
-    *: "Ομαλή εναλλαγή"
+    swcodec: "Ομαλή εναλλαγή"
   </dest>
   <voice>
     *: none
-    *: "Ομαλή εναλλαγή"
+    swcodec: "Ομαλή εναλλαγή"
   </voice>
 </phrase>
 <phrase>
@@ -998,11 +998,11 @@
   </source>
   <dest>
     *: none
-    *: "Ένταση ηχητικού σήματος"
+    swcodec: "Ένταση ηχητικού σήματος"
   </dest>
   <voice>
     *: none
-    *: "Ένταση ηχητικού σήματος"
+    swcodec: "Ένταση ηχητικού σήματος"
   </voice>
 </phrase>
 <phrase>
@@ -1015,11 +1015,11 @@
   </source>
   <dest>
     *: none
-    *: "Αδύναμη"
+    swcodec: "Αδύναμη"
   </dest>
   <voice>
     *: none
-    *: "Αδύναμη"
+    swcodec: "Αδύναμη"
   </voice>
 </phrase>
 <phrase>
@@ -1032,11 +1032,11 @@
   </source>
   <dest>
     *: none
-    *: "Μέτρια"
+    swcodec: "Μέτρια"
   </dest>
   <voice>
     *: none
-    *: "Μέτρια"
+    swcodec: "Μέτρια"
   </voice>
 </phrase>
 <phrase>
@@ -1049,11 +1049,11 @@
   </source>
   <dest>
     *: none
-    *: "Δυνατή"
+    swcodec: "Δυνατή"
   </dest>
   <voice>
     *: none
-    *: "Δυνατή"
+    swcodec: "Δυνατή"
   </voice>
 </phrase>
 <phrase>
@@ -1066,11 +1066,11 @@
   </source>
   <dest>
     *: none
-    *: "Οπτική έξοδος"
+    spdif_power: "Οπτική έξοδος"
   </dest>
   <voice>
     *: none
-    *: "Οπτική έξοδος"
+    spdif_power: "Οπτική έξοδος"
   </voice>
 </phrase>
 <phrase>
@@ -1366,11 +1366,11 @@
   </source>
   <dest>
     *: none
-    *: "Επιλογές LCD-Χειριστηρίου"
+    remote: "Επιλογές LCD-Χειριστηρίου"
   </dest>
   <voice>
     *: none
-    *: "Επιλογές Ελ Σι Ντι Χειριστηρίου"
+    remote: "Επιλογές Ελ Σι Ντι Χειριστηρίου"
   </voice>
 </phrase>
 <phrase>
@@ -1504,11 +1504,11 @@
   </source>
   <dest>
     *: none
-    *: "Αφύπνιση"
+    alarm: "Αφύπνιση"
   </dest>
   <voice>
     *: none
-    *: "Αφύπνιση"
+    alarm: "Αφύπνιση"
   </voice>
 </phrase>
 <phrase>
@@ -9214,7 +9214,7 @@
     *: "Καταγραφή Last.fm"
   </dest>
   <voice>
-    *: "Καταγραφή λάστ εφέμ"
+    *: "Καταγραφή λάστ Eφ Εμ"
   </voice>
 </phrase>
 <phrase>
@@ -9543,7 +9543,7 @@
     *: "[Comment]"
   </source>
   <dest>
-    *: "[σχόλειο]"
+    *: "[Σχόλειο]"
   </dest>
   <voice>
     *: ""
@@ -10726,7 +10726,7 @@
     *: "Rockbox"
   </dest>
   <voice>
-    *: "Ροκ μπόξ"
+    *: "Ρόκμποξ"
   </voice>
 </phrase>
 <phrase>
