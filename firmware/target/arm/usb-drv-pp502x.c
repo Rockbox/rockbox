@@ -247,6 +247,9 @@
 #define USB_CTRL_IOENB                         (0x00000004)
 #define USB_CTRL_ULPI_INT0EN                   (0x00000001)
 
+/* OTGSC Register Bit Masks */
+#define OTGSC_B_SESSION_VALID                  (0x00000800)
+
 #define QH_MULT_POS                            (30)
 #define QH_ZLT_SEL                             (0x20000000)
 #define QH_MAX_PKT_LEN_POS                     (16)
@@ -322,6 +325,10 @@ static void init_queue_heads(void);
 static void init_endpoints(void);
 /*-------------------------------------------------------------------------*/
 
+bool usb_drv_powered(void)
+{
+    return (REG_OTGSC & OTGSC_B_SESSION_VALID) ? true : false;
+}
 
 /* manual: 32.14.1 Device Controller Initialization */
 void usb_drv_init(void)

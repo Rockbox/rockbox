@@ -40,7 +40,7 @@
 #endif
 #if defined(SANSA_E200) || defined(SANSA_C200)
 #include "usb.h"
-#include "arcotg_udc.h"
+#include "usb_drv.h"
 #endif
 
 
@@ -460,7 +460,7 @@ void* main(void)
     btn = button_read_device();
 #if defined(SANSA_E200) || defined(SANSA_C200)
     usb_init();
-    while ((UDC_OTGSC&0x800) && usb_retry < 5 && !usb)
+    while (usb_drv_powered() && usb_retry < 5 && !usb)
     {
         usb_retry++;
         sleep(HZ/4);
