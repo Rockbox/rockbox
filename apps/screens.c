@@ -80,6 +80,15 @@
 #define SCROLLBAR_WIDTH  6
 #endif
 
+static int clamp_value_wrap(int value, int max, int min)
+{
+    if (value > max)
+        return min;
+    if (value < min)
+        return max;
+    return value;
+}
+
 void usb_screen(void)
 {
 #ifdef USB_NONE
@@ -827,29 +836,26 @@ static void say_time(int cursorpos, const struct tm *tm)
 
 #define INDEX_X 0
 #define INDEX_Y 1
-#define INDEX_WIDTH 2
 
 #define SEPARATOR ":"
 bool set_time_screen(const char* title, struct tm *tm)
 {
     bool done = false;
     int button;
-    unsigned int i, s;
-    unsigned int cursorpos = 0;
-    unsigned int lastcursorpos = 1;
+    unsigned int i, j, s;
+    int cursorpos = 0;
     unsigned int julianday;
     unsigned int realyear;
     unsigned int width;
-    unsigned int min = 0, steps = 0;
+    unsigned int min, max;
     unsigned int statusbar_height = 0;
     unsigned int separator_width, weekday_width;
-    unsigned int line_height, prev_line_height;
-    unsigned char daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    unsigned int prev_line_height;
+    int daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     unsigned char buffer[20];
 
-    /* 6 possible cursor possitions, 3 values stored for each: x, y, width */
-    unsigned char cursor[6][3];
-    memset(cursor, 0, sizeof(cursor));
+    /* 6 possible cursor possitions, 2 values stored for each: x, y */
+    unsigned int cursor[6][2];
 
     int *valptr = NULL;
     unsigned char *ptr[6];
@@ -857,7 +863,10 @@ bool set_time_screen(const char* title, struct tm *tm)
     if(global_settings.statusbar)
         statusbar_height = STATUSBAR_HEIGHT;
 
-    while ( !done ) {
+    /* speak selection when screen is entered */
+    say_time(cursorpos, tm);
+
+    while (!done) {
         /* for easy acess in the drawing loop */
         ptr[0] = buffer;                     /* hours */
         ptr[1] = buffer + 3;                 /* minutes */
@@ -878,11 +887,11 @@ bool set_time_screen(const char* title, struct tm *tm)
             tm->tm_mday = daysinmonth[tm->tm_mon];
 
         /* calculate day of week */
-        julianday = 0;
+        julianday = tm->tm_mday;
         for(i = 0; (int)i < tm->tm_mon; i++) {
            julianday += daysinmonth[i];
         }
-        julianday += tm->tm_mday;
+
         tm->tm_wday = (realyear + julianday + (realyear - 1) / 4 -
                        (realyear - 1) / 100 + (realyear - 1) / 400 + 7 - 1) % 7;
 
@@ -916,49 +925,25 @@ bool set_time_screen(const char* title, struct tm *tm)
                 screens[s].getstringsize(title, NULL, &prev_line_height);
             else
                 prev_line_height = 0;
-            screens[s].getstringsize(buffer, NULL, &line_height);
+
             screens[s].getstringsize(SEPARATOR, &separator_width, NULL);
-
-
-            /* get width for each string except the last one and put them
-               in the cursor array */
-            for(i=0; i < 5; i++)
-            {
-                screens[s].getstringsize(ptr[i], &width, NULL);
-                cursor[i][INDEX_WIDTH] = width;
-            }
-
-            /* hour */
-            /* cursor[0][INDEX_X] is already 0 because of the memset */
-            cursor[0][INDEX_Y] = prev_line_height + statusbar_height;
-
-            /* minute */
-            cursor[1][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width;
-            cursor[1][INDEX_Y] = prev_line_height + statusbar_height;
-    
-            /* second */
-            cursor[2][INDEX_X] = cursor[0][INDEX_WIDTH] + separator_width +
-                                cursor[1][INDEX_WIDTH] + separator_width;
-            cursor[2][INDEX_Y] = prev_line_height + statusbar_height;
 
             /* weekday */
             screens[s].getstringsize(str(LANG_WEEKDAY_SUNDAY + tm->tm_wday), &weekday_width, NULL);
             screens[s].getstringsize(" ", &separator_width, NULL);
 
-            /* year */
-            cursor[3][INDEX_X] = weekday_width + separator_width;
-            cursor[3][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-
-            /* month */
-            cursor[4][INDEX_X] = weekday_width + 2 * separator_width +
-                                cursor[3][INDEX_WIDTH];
-            cursor[4][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
-
-            /* day */
-            cursor[5][INDEX_X] = weekday_width + 3 * separator_width +
-                                cursor[3][INDEX_WIDTH] +
-                                cursor[4][INDEX_WIDTH];
-            cursor[5][INDEX_Y] = cursor[0][INDEX_Y] + prev_line_height;
+            for(i=0, j=0; i < 6; i++)
+            {
+                if(i==3) /* second row */
+                {
+                    j = weekday_width + separator_width;;
+                    prev_line_height *= 2;
+                }
+                screens[s].getstringsize(ptr[i], &width, NULL);
+                cursor[i][INDEX_Y] = prev_line_height + statusbar_height;
+                cursor[i][INDEX_X] = j;
+                j += width + separator_width;
+            }
 
             /* draw the screen */
             screens[s].set_drawmode(DRMODE_SOLID);
@@ -968,23 +953,22 @@ bool set_time_screen(const char* title, struct tm *tm)
 
             /* these are not selectable, so we draw them outside the loop */
             screens[s].putsxy(0, cursor[3][INDEX_Y], str(LANG_WEEKDAY_SUNDAY + tm->tm_wday)); /* name of the week day */
-            screens[s].putsxy(cursor[1][INDEX_X] - separator_width, 
-                              cursor[0][INDEX_Y], SEPARATOR);
-            screens[s].putsxy(cursor[2][INDEX_X] - separator_width,
-                              cursor[0][INDEX_Y], SEPARATOR);
 
             /* draw the selected item with drawmode set to
                 DRMODE_SOLID|DRMODE_INVERSEVID, all other selectable
                 items with drawmode DRMODE_SOLID */
             for(i=0; i<6; i++)
             {
-                if (cursorpos == i)
+                if (cursorpos == (int)i)
                     screens[s].set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                else
-                    screens[s].set_drawmode(DRMODE_SOLID);
     
                 screens[s].putsxy(cursor[i][INDEX_X], 
                                   cursor[i][INDEX_Y], ptr[i]);
+
+                screens[s].set_drawmode(DRMODE_SOLID);
+
+                screens[s].putsxy(cursor[i/4 +1][INDEX_X] - separator_width, 
+                                  cursor[0][INDEX_Y], SEPARATOR);
             }
 
             /* print help text */
@@ -996,66 +980,55 @@ bool set_time_screen(const char* title, struct tm *tm)
         }
         gui_syncstatusbar_draw(&statusbars, true);
 
+        /* set the most common numbers */
+        min = 0;
+        max = 59;
         /* calculate the minimum and maximum for the number under cursor */
-        if(cursorpos!=lastcursorpos) {
-            lastcursorpos=cursorpos;
-            switch(cursorpos) {
-                case 0: /* hour */
-                    min = 0;
-                    steps = 24;
-                    valptr = &tm->tm_hour;
-                    break;
-                case 1: /* minute */
-                    min = 0;
-                    steps = 60;
-                    valptr = &tm->tm_min;
-                    break;
-                case 2: /* second */
-                    min = 0;
-                    steps = 60;
-                    valptr = &tm->tm_sec;
-                    break;
-                case 3: /* year */
-                    min = 1;
-                    steps = 200;
-                    valptr = &tm->tm_year;
-                    break;
-                case 4: /* month */
-                    min = 0;
-                    steps = 12;
-                    valptr = &tm->tm_mon;
-                    break;
-                case 5: /* day */
-                    min = 1;
-                    steps = daysinmonth[tm->tm_mon];
-                    valptr = &tm->tm_mday;
-                    break;
-            }
-            say_time(cursorpos, tm);
+        switch(cursorpos) {
+            case 0: /* hour */
+                max = 23;
+                valptr = &tm->tm_hour;
+                break;
+            case 1: /* minute */
+                valptr = &tm->tm_min;
+                break;
+            case 2: /* second */
+                valptr = &tm->tm_sec;
+                break;
+            case 3: /* year */
+                min = 1;
+                max = 200;
+                valptr = &tm->tm_year;
+                break;
+            case 4: /* month */
+                max = 11;
+                valptr = &tm->tm_mon;
+                break;
+            case 5: /* day */
+                min = 1;
+                max = daysinmonth[tm->tm_mon];
+                valptr = &tm->tm_mday;
+                break;
         }
 
         button = get_action(CONTEXT_SETTINGS_TIME, TIMEOUT_BLOCK);
         switch ( button ) {
             case ACTION_STD_PREV:
-                cursorpos = (cursorpos + 6 - 1) % 6;
+                cursorpos = clamp_value_wrap(--cursorpos, 5, 0);
+                say_time(cursorpos, tm);
                 break;
             case ACTION_STD_NEXT:
-                cursorpos = (cursorpos + 6 + 1) % 6;
+                cursorpos = clamp_value_wrap(++cursorpos, 5, 0);
+                say_time(cursorpos, tm);
                 break;
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_INCREPEAT:
-                *valptr = (*valptr + steps - min + 1) %
-                    steps + min;
-                if(*valptr == 0)
-                    *valptr = min;
+                *valptr = clamp_value_wrap(++(*valptr), max, min);
                 say_time(cursorpos, tm);
                 break;
             case ACTION_SETTINGS_DEC:
             case ACTION_SETTINGS_DECREPEAT:
-                *valptr = (*valptr + steps - min - 1) %
-                    steps + min;
-                if(*valptr == 0)
-                    *valptr = min;
+                *valptr = clamp_value_wrap(--(*valptr), max, min);
                 say_time(cursorpos, tm);
                 break;
 
