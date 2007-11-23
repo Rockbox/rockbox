@@ -1052,20 +1052,10 @@ static bool viewer_init(void)
     /* Init mac_text value used in processing buffer */
     mac_text = false;
 
-    /* Set codepage to system default */
-    prefs.encoding = rb->global_settings->default_codepage;
-
-    /* Read top of file into buffer;
-      init file_pos, buffer_end, screen_top_ptr */
-    viewer_top();
-
-    /* Init prefs.need_scrollbar value */
-    init_need_scrollbar();
-
     return true;
 }
 
-static void viewer_reset_settings(void)
+static void viewer_default_settings(void)
 {
     prefs.word_mode = WRAP;
     prefs.line_mode = NORMAL;
@@ -1076,6 +1066,8 @@ static void viewer_reset_settings(void)
     prefs.scrollbar_mode = SB_OFF;
 #endif
     prefs.autoscroll_speed = 1;
+    /* Set codepage to system default */
+    prefs.encoding = rb->global_settings->default_codepage;
 }
 
 static void viewer_load_settings(void) /* same name as global, but not the same file.. */
@@ -1090,8 +1082,14 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
     {
         rb->read(settings_fd, &prefs, sizeof(struct preferences));
         rb->close(settings_fd);
-        rb->memcpy(&old_prefs, &prefs, sizeof(struct preferences));
-    }    
+    }
+    else
+    {
+        /* load default settings if there is no settings file */
+        viewer_default_settings();
+    }
+
+    rb->memcpy(&old_prefs, &prefs, sizeof(struct preferences));
 
     data = (struct bookmark_file_data*)buffer; /* grab the text buffer */
     data->bookmarked_files_count = 0;
@@ -1155,8 +1153,6 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
         rb->close(settings_fd);
     }
 
-    init_need_scrollbar();
-
     buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
 
     if (BUFFER_OOB(screen_top_ptr)) 
@@ -1168,6 +1164,8 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
 
     /* remember the current position */
     start_position = file_pos + screen_top_ptr - buffer;
+
+    init_need_scrollbar();
 }
 
 static void viewer_save_settings(void)/* same name as global, but not the same file.. */
@@ -1419,8 +1417,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
         return PLUGIN_ERROR;
     }
 
-    viewer_reset_settings(); /* load defaults first */
-    viewer_load_settings(); /* .. then try to load from disk */
+    viewer_load_settings(); /* load the preferences and bookmark */
     
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
