@@ -29,8 +29,8 @@
 #include "string.h"
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
-#endif
 #include "usb_drv.h"
+#endif
 
 void usb_init_device(void)
 {
@@ -117,9 +117,6 @@ int usb_detect(void)
     if (GPIOL_INPUT_VAL & 0x4)
         return USB_INSERTED;
 #endif
-
-    if (usb_drv_powered())
-        return USB_INSERTED;
 
     return USB_EXTRACTED;
 }
