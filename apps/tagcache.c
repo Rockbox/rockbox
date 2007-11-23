@@ -3807,8 +3807,11 @@ static bool check_dir(const char *dirname)
     
     /* check for a database.ignore file */
     snprintf(newpath, MAX_PATH, "%s/database.ignore", dirname);
-    if(file_exists(newpath))
+    if (file_exists(newpath))
+    {
+        closedir(dir);
         return false;
+    }
     
     /* Recursively scan the dir. */
 #ifdef __PCTOOL__
