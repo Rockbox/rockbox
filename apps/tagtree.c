@@ -639,7 +639,7 @@ void tagtree_buffer_event(struct mp3entry *id3)
     if (!global_settings.runtimedb)
         return;
 
-    logf("be:%d%s", last_track, id3->path);
+    logf("be:%s", id3->path);
     
     if (!tagcache_find_index(&tcs, id3->path))
     {
@@ -698,7 +698,7 @@ static void tagtree_unbuffer_event(struct mp3entry *id3)
     playtime = id3->playtime + MIN(id3->length, id3->elapsed + 15 * 1000);
     
     logf("ube:%s", id3->path);
-    logf("-> %d/%ld/%ld", last_track, playcount, playtime);
+    logf("-> %ld/%ld", playcount, playtime);
     logf("-> %ld/%ld/%ld", id3->elapsed, id3->length, MIN(id3->length, id3->elapsed + 15 * 1000));
     
     /* Queue the updates to the tagcache system. */
