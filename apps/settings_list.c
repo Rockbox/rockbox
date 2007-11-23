@@ -792,7 +792,7 @@ const struct settings_list settings[] = {
         LANG_CHANNELS, INT(0),
         "rec channels","stereo,mono",UNUSED},
     CHOICE_SETTING(F_RECSETTING, rec_split_type, LANG_SPLIT_TYPE, 0 ,
-        "rec split type", "Split, Stop", NULL, 2,
+        "rec split type", "Split,Stop", NULL, 2,
         ID2P(LANG_START_NEW_FILE), ID2P(LANG_STOP_RECORDING)),
     CHOICE_SETTING(F_RECSETTING, rec_split_method, LANG_SPLIT_MEASURE, 0 ,
         "rec split method", "Time,Filesize", NULL, 2,
