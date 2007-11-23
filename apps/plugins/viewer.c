@@ -1356,9 +1356,7 @@ static bool viewer_options_menu(void)
     rb->lcd_setmargins(0,0);
 
     /* Show-scrollbar mode for current view-width mode */
-    if (!ONE_SCREEN_FITS_ALL())
-        if (prefs.scrollbar_mode == true)
-            init_need_scrollbar();
+    init_need_scrollbar();
 #endif
     return result;
 }
