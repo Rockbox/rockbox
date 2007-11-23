@@ -633,7 +633,7 @@ static int compare(const void *p1, const void *p2)
     return strncasecmp(e1->name, e2->name, MAX_PATH);
 }
 
-void tagtree_buffer_event(struct mp3entry *id3)
+static void tagtree_buffer_event(struct mp3entry *id3)
 {
     /* Do not gather data unless proper setting has been enabled. */
     if (!global_settings.runtimedb)
@@ -700,7 +700,7 @@ static void tagtree_unbuffer_event(struct mp3entry *id3)
     logf("ube:%s", id3->path);
     logf("-> %ld/%ld", playcount, playtime);
     logf("-> %ld/%ld/%ld", id3->elapsed, id3->length, MIN(id3->length, id3->elapsed + 15 * 1000));
-    
+
     /* Queue the updates to the tagcache system. */
     tagcache_update_numeric(id3->tagcache_idx, tag_playcount, playcount);
     tagcache_update_numeric(id3->tagcache_idx, tag_playtime, playtime);
@@ -921,9 +921,7 @@ void tagtree_init(void)
         root_menu = 0;
     
     uniqbuf = buffer_alloc(UNIQBUF_SIZE);
-#if CONFIG_CODEC != SWCODEC
     audio_set_track_buffer_event(tagtree_buffer_event);
-#endif
     audio_set_track_unbuffer_event(tagtree_unbuffer_event);
 }
 

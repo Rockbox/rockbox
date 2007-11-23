@@ -26,9 +26,6 @@
 #include "playback.h"
 #include "debug.h"
 #include "logf.h"
-#ifdef HAVE_TAGCACHE
-#include "tagtree.h"
-#endif
 #include "cuesheet.h"
 
 #if CONFIG_CODEC == SWCODEC
@@ -321,10 +318,6 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     
     lseek(fd, 0, SEEK_SET);
     strncpy(id3->path, trackname, sizeof(id3->path));
-
-#ifdef HAVE_TAGCACHE
-    tagtree_buffer_event(id3);
-#endif
 
     return true;
 }

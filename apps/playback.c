@@ -1698,6 +1698,9 @@ static bool audio_load_track(int offset, bool start_play)
     {
         if (get_metadata(&id3, fd, trackname))
         {
+            if (track_buffer_callback)
+                track_buffer_callback(&id3);
+            
             tracks[track_widx].id3_hid =
                 bufalloc(&id3, sizeof(struct mp3entry), TYPE_ID3);
             tracks[track_widx].taginfo_ready = (tracks[track_widx].id3_hid >= 0);
@@ -1871,8 +1874,6 @@ static void audio_generate_postbuffer_events(void)
             {
                 /* Mark the event 'sent' even if we don't really send one */
                 tracks[cur_idx].event_sent = true;
-                if (track_buffer_callback && tracks[cur_idx].id3_hid >= 0)
-                    track_buffer_callback(bufgetid3(tracks[cur_idx].id3_hid));
             }
             if (cur_idx == track_widx)
                 break;
