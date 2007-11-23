@@ -33,13 +33,12 @@ PLUGIN_HEADER
 #define READ_PREV_ZONE    910  /* Arbitrary number less than SMALL_BLOCK_SIZE */
 #define SMALL_BLOCK_SIZE  0x1000 /* 4k: Smallest file chunk we will read */
 #define LARGE_BLOCK_SIZE  0x2000 /* 8k: Preferable size of file chunk to read */
-#define BUFFER_SIZE       0x3000 /* 12k: Mem reserved for buffered file data */
 #define TOP_SECTOR     buffer
 #define MID_SECTOR     (buffer + SMALL_BLOCK_SIZE)
 #define BOTTOM_SECTOR  (buffer + 2*(SMALL_BLOCK_SIZE))
 #define SCROLLBAR_WIDTH     6
 
-#define MAX_BOOKMARKED_FILES (((signed)BUFFER_SIZE/(signed)sizeof(struct bookmarked_file_info))-1)
+#define MAX_BOOKMARKED_FILES ((buffer_size/(signed)sizeof(struct bookmarked_file_info))-1)
 
 /* Out-Of-Bounds test for any pointer to data in the buffer */
 #define BUFFER_OOB(p)    ((p) < buffer || (p) >= buffer_end)
@@ -48,11 +47,11 @@ PLUGIN_HEADER
 #define BUFFER_BOF()     (file_pos==0)
 
 /* Does the buffer contain the end of the file? */
-#define BUFFER_EOF()     (file_size-file_pos <= BUFFER_SIZE)
+#define BUFFER_EOF()     (file_size-file_pos <= buffer_size)
 
 /* Formula for the endpoint address outside of buffer data */
 #define BUFFER_END() \
- ((BUFFER_EOF()) ? (file_size-file_pos+buffer) : (buffer+BUFFER_SIZE))
+ ((BUFFER_EOF()) ? (file_size-file_pos+buffer) : (buffer+buffer_size))
 
 /* Is the entire file being shown in one screen? */
 #define ONE_SCREEN_FITS_ALL() \
@@ -290,7 +289,8 @@ struct preferences {
 struct preferences prefs;
 struct preferences old_prefs;
 
-static unsigned char buffer[BUFFER_SIZE + 1];
+static unsigned char *buffer;
+static long buffer_size;
 static unsigned char line_break[] = {0,0x20,9,0xB,0xC,'-'};
 static int display_columns; /* number of (pixel) columns on the display */
 static int display_lines; /* number of lines on the display */
@@ -981,7 +981,7 @@ static void viewer_top(void)
     {
         file_pos = 0;
         buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
-        fill_buffer(0, buffer, BUFFER_SIZE);
+        fill_buffer(0, buffer, buffer_size);
     }
 
     screen_top_ptr = buffer;
@@ -993,9 +993,9 @@ static void viewer_bottom(void)
       and point screen pointer to bottom */
     long last_sectors;
 
-    if (file_size > BUFFER_SIZE) {
+    if (file_size > buffer_size) {
         /* Find last buffer in file, round up to next sector boundary */
-        last_sectors = file_size - BUFFER_SIZE + SMALL_BLOCK_SIZE;
+        last_sectors = file_size - buffer_size + SMALL_BLOCK_SIZE;
         last_sectors /= SMALL_BLOCK_SIZE;
         last_sectors *= SMALL_BLOCK_SIZE;
     }
@@ -1007,7 +1007,7 @@ static void viewer_bottom(void)
     {
         file_pos = last_sectors;
         buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
-        fill_buffer(last_sectors, buffer, BUFFER_SIZE);
+        fill_buffer(last_sectors, buffer, buffer_size);
     }
 
     screen_top_ptr = buffer_end-1;
@@ -1115,8 +1115,10 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
     {
         if (!rb->strcmp(file_name, data->bookmarks[i].filename)) 
         {
-            file_pos = data->bookmarks[i].file_position;
-            screen_top_ptr = buffer + data->bookmarks[i].top_ptr_pos;
+            int screen_pos = data->bookmarks[i].file_position + data->bookmarks[i].top_ptr_pos;
+            int screen_top = screen_pos % buffer_size;
+            file_pos = screen_pos - screen_top;
+            screen_top_ptr = buffer + screen_top;
             break;
         }    
     }
@@ -1160,7 +1162,7 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
         screen_top_ptr = buffer;
     }
 
-    fill_buffer(file_pos, buffer, BUFFER_SIZE);
+    fill_buffer(file_pos, buffer, buffer_size);
 
     /* remember the current position */
     start_position = file_pos + screen_top_ptr - buffer;
@@ -1192,8 +1194,8 @@ static void viewer_save_settings(void)/* same name as global, but not the same f
         if (settings_fd >= 0 )
         {
             struct bookmarked_file_info b;
-            b.file_position = file_pos;
-            b.top_ptr_pos = screen_top_ptr - buffer;
+            b.file_position = file_pos + screen_top_ptr - buffer;
+            b.top_ptr_pos = 0; /* this is only kept for legassy reasons */
             rb->memset(&b.filename[0],0,MAX_PATH);
             rb->strcpy(b.filename,file_name);
             rb->PREFIX(lseek)(settings_fd,sizeof(signed int),SEEK_SET);
@@ -1406,6 +1408,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
     rb = api;
     old_tick = *rb->current_tick;
+
+    /* get the plugin buffer */
+    buffer = rb->plugin_get_buffer((size_t *)&buffer_size);
+
+    DEBUGF("Buffer size: %d\n", buffer_size);
 
     if (!file)
         return PLUGIN_ERROR;
