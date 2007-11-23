@@ -292,6 +292,7 @@ static const struct {
 
 static int usb_address = 0;
 static bool initialized = false;
+static bool data_connection = false;
 static struct event_queue usbcore_queue;
 
 #ifdef USB_STORAGE
@@ -305,6 +306,9 @@ static void ack_control(struct usb_ctrlrequest* req);
 
 void usb_core_init(void)
 {
+    if (initialized)
+        return;
+
     queue_init(&usbcore_queue, false);
     usb_drv_init();
 #ifdef USB_STORAGE
@@ -331,8 +335,14 @@ void usb_core_exit(void)
 #ifdef USB_STORAGE
         remove_thread(usbcore_thread);
 #endif
+        data_connection = false;
     }
     logf("usb_core_exit() finished");
+}
+
+bool usb_core_data_connection(void)
+{
+    return data_connection;
 }
 
 #ifdef USB_STORAGE
@@ -352,6 +362,7 @@ void usb_core_thread(void)
 void usb_core_control_request(struct usb_ctrlrequest* req)
 {
     /* note: interrupt context */
+    data_connection = true;
 
 #ifdef USB_BENCHMARK
     if ((req->bRequestType & 0x60) == USB_TYPE_VENDOR) {
@@ -499,6 +510,7 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
 void usb_core_bus_reset(void)
 {
     usb_address = 0;
+    data_connection = false;
 }
 
 /* called by usb_drv_transfer_completed() */

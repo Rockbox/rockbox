@@ -50,6 +50,7 @@ void usb_core_exit(void);
 void usb_core_control_request(struct usb_ctrlrequest* req);
 void usb_core_transfer_complete(int endpoint, bool in);
 void usb_core_bus_reset(void);
+bool usb_core_data_connection(void);
 
 #endif
 
