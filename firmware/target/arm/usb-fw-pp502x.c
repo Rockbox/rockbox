@@ -27,10 +27,8 @@
 #include "button.h"
 #include "ata.h"
 #include "string.h"
-#ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #include "usb_drv.h"
-#endif
 
 void usb_init_device(void)
 {
@@ -58,43 +56,10 @@ void usb_init_device(void)
 
 void usb_enable(bool on)
 {
-#ifdef HAVE_USBSTACK
     if (on)
         usb_core_init();
     else
         usb_core_exit();
-#else
-    /* This device specific code will eventually give way to proper USB
-       handling, which should be the same for all PP502x targets. */
-    if (on)
-    {
-#if defined(IPOD_ARCH) || defined(IRIVER_H10) || defined (IRIVER_H10_5GB) ||\
-    defined(SANSA_C200)
-        /* For the H10 and iPod, we can only do one thing with USB mode - reboot
-           into the flash-based disk-mode.  This does not return. */
-
-#if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
-        if(button_status()==BUTTON_RIGHT)
-#endif /* defined(IRIVER_H10) || defined (IRIVER_H10_5GB) */
-        {
-#ifndef HAVE_FLASH_STORAGE
-            ata_sleepnow(); /* Immediately spindown the disk. */
-            sleep(HZ*2);
-#endif
-
-#ifdef IPOD_ARCH  /* The following code is based on ipodlinux */
-#if CONFIG_CPU == PP5020
-            memcpy((void *)0x40017f00, "diskmode\0\0hotstuff\0\0\1", 21);
-#elif CONFIG_CPU == PP5022
-            memcpy((void *)0x4001ff00, "diskmode\0\0hotstuff\0\0\1", 21);
-#endif /* CONFIG_CPU */
-#endif /* IPOD_ARCH */
-
-            system_reboot(); /* Reboot */
-        }
-#endif /*defined(IPOD_ARCH) || defined(IRIVER_H10) || defined (IRIVER_H10_5GB)*/
-    }
-#endif /* !HAVE_USBSTACK */
 }
 
 int usb_detect(void)
@@ -117,6 +82,8 @@ int usb_detect(void)
     if (GPIOL_INPUT_VAL & 0x4)
         return USB_INSERTED;
 #endif
+    if (usb_drv_powered())
+        return USB_INSERTED;
 
     return USB_EXTRACTED;
 }

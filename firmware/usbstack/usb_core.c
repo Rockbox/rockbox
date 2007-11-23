@@ -268,14 +268,14 @@ static const struct {
 } usb_strings[] =
 {
     {
-        16,
+        24,
         USB_DT_STRING,
-        {'R','o','c','k','b','o','x'}
+        {'R','o','c','k','b','o','x','.','o','r','g'}
     },
     {
         42,
         USB_DT_STRING,
-        {'D','i','g','i','t','a','l',' ','a','u','d','i','o',' ','p','l','a','y','e','r'}
+        {'R','o','c','k','b','o','x',' ','m','e','d','i','a',' ','p','l','a','y','e','r'}
     },
     {
         40,
