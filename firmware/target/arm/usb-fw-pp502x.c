@@ -30,6 +30,7 @@
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #endif
+#include "usb_drv.h"
 
 void usb_init_device(void)
 {
@@ -103,9 +104,7 @@ int usb_detect(void)
     /* GPIO C bit 1 is firewire detect */
     if (!(GPIOC_INPUT_VAL & 0x02))
         return USB_INSERTED;
-#endif
-
-#if defined(SANSA_C200)
+#elif defined(SANSA_C200)
     /* GPIO H bit 1 is usb detect */
     if (GPIOH_INPUT_VAL & 0x02)
         return USB_INSERTED;
@@ -118,6 +117,9 @@ int usb_detect(void)
     if (GPIOL_INPUT_VAL & 0x4)
         return USB_INSERTED;
 #endif
+
+    if (usb_drv_powered())
+        return USB_INSERTED;
 
     return USB_EXTRACTED;
 }
