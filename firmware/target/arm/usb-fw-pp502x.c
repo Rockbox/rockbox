@@ -85,7 +85,13 @@ void usb_enable(bool on)
 
 bool usb_pin_detect(void)
 {
-#if defined(IPOD_ARCH)
+#if defined(IPOD_4G) || defined(IPOD_COLOR) \
+ || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    /* GPIO D bit 3 is usb detect */
+    if (GPIOD_INPUT_VAL & 0x08)
+        return true;
+
+#elif defined(IPOD_NANO) || defined(IPOD_VIDEO)
     /* GPIO L bit 4 is usb detect */
     if (GPIOL_INPUT_VAL & 0x10)
         return true;
