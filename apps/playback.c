@@ -2163,14 +2163,11 @@ static void audio_stop_playback(void)
 
         prev_track_elapsed = curtrack_id3.elapsed;
 
-        /* Increment index so runtime info is saved in audio_clear_track_entries().
-         * Done here, as audio_stop_playback() may be called more than once.
-         * Don't update runtime unless playback is stopped because of end of playlist.
-         * Updating runtime when manually stopping a tracks, can destroy autoscores
-         * and playcounts.
+        /* At end of playlist save current id3 (id3.elapsed!) to buffer and
+         * Increment index so runtime info is saved in audio_clear_track_entries().
          */
-        if (playlist_end)
-        {
+        if ((playlist_end) && (tracks[track_ridx].id3_hid >= 0)) {
+            copy_mp3entry(bufgetid3(tracks[track_ridx].id3_hid), &curtrack_id3);
             track_ridx = (track_ridx + 1) & MAX_TRACK_MASK;
         }
     }
