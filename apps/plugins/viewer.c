@@ -1412,8 +1412,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     /* get the plugin buffer */
     buffer = rb->plugin_get_buffer((size_t *)&buffer_size);
 
-    DEBUGF("Buffer size: %d\n", buffer_size);
-
     if (!file)
         return PLUGIN_ERROR;
 
