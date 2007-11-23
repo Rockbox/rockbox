@@ -32,7 +32,13 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "config.h"
+#if CONFIG_CPU == PP5002
+    .section .icode,"ax",%progbits
+#else
     .text
+#endif
+
 /* void iir_mem16(const spx_word16_t *x, const spx_coef_t *den, spx_word16_t *y, int N, int ord, spx_mem_t *mem, char *stack) */
     .global iir_mem16
 iir_mem16:
