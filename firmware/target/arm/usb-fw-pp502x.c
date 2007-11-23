@@ -83,7 +83,7 @@ void usb_enable(bool on)
         usb_core_exit();
 }
 
-bool usb_pin_detect(void)
+static bool usb_pin_detect(void)
 {
 #if defined(IPOD_4G) || defined(IPOD_COLOR) \
  || defined(IPOD_MINI) || defined(IPOD_MINI2G)
