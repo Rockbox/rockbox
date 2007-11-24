@@ -51,8 +51,14 @@
 
 #ifndef ROCKBOX_VOICE_CODEC
 #define EXC_ICONST_ATTR ICONST_ATTR
+#define GAIN_ICONST_ATTR ICONST_ATTR
+#define HEXC_ICONST_ATTR ICONST_ATTR
+#define LSP_ICONST_ATTR ICONST_ATTR
 #else
 #define EXC_ICONST_ATTR
+#define GAIN_ICONST_ATTR
+#define HEXC_ICONST_ATTR
+#define LSP_ICONST_ATTR
 #endif
 
 /* Define to 1 if you have the <dlfcn.h> header file. */

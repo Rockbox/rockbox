@@ -32,7 +32,7 @@
 
 #include "config-speex.h"
 
-const signed char hexc_table[1024] ICONST_ATTR = {
+const signed char hexc_table[1024] HEXC_ICONST_ATTR = {
 -24, 21, -20, 5, -5, -7, 14, -10, 
 2, -27, 16, -20, 0, -32, 26, 19, 
 8, -11, -41, 31, 28, -27, -32, 34, 

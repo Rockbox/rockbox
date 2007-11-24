@@ -31,7 +31,7 @@
 
 #include "config-speex.h"
 
-const signed char gain_cdbk_nb[512] ICONST_ATTR = {
+const signed char gain_cdbk_nb[512] GAIN_ICONST_ATTR = {
 -32, -32, -32, 0,
 -28, -67, -5, 33,
 -42, -6, -32, 18,

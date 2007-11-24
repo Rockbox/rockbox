@@ -31,7 +31,7 @@
 
 #include "config-speex.h"
 
-const signed char cdbk_nb[640] ICONST_ATTR = {
+const signed char cdbk_nb[640] LSP_ICONST_ATTR = {
 30,19,38,34,40,32,46,43,58,43,
 5,-18,-25,-40,-33,-55,-52,20,34,28,
 -20,-63,-97,-92,61,53,47,49,53,75,
@@ -97,7 +97,7 @@ const signed char cdbk_nb[640] ICONST_ATTR = {
 -6,-41,-67,6,-2,-9,19,2,85,74,
 -22,-67,-84,-71,-50,3,11,-9,2,62};
 
-const signed char cdbk_nb_low1[320] ICONST_ATTR = {
+const signed char cdbk_nb_low1[320] LSP_ICONST_ATTR = {
 -34,-52,-15,45,2,
 23,21,52,24,-33,
 -9,-1,9,-44,-41,
@@ -163,7 +163,7 @@ const signed char cdbk_nb_low1[320] ICONST_ATTR = {
 13,20,20,-19,-22,
 -2,-8,2,51,-51};
 
-const signed char cdbk_nb_low2[320] ICONST_ATTR = {
+const signed char cdbk_nb_low2[320] LSP_ICONST_ATTR = {
 -6,53,-21,-24,4,
 26,17,-4,-37,25,
 17,-36,-13,31,3,
@@ -229,7 +229,7 @@ const signed char cdbk_nb_low2[320] ICONST_ATTR = {
 -23,-29,-16,1,-3,
 -8,-10,31,64,-65};
 
-const signed char cdbk_nb_high1[320] ICONST_ATTR = {
+const signed char cdbk_nb_high1[320] LSP_ICONST_ATTR = {
 -26,-8,29,21,4,
 19,-39,33,-7,-36,
 56,54,48,40,29,
@@ -295,7 +295,7 @@ const signed char cdbk_nb_high1[320] ICONST_ATTR = {
 29,17,8,-29,-39,
 -69,18,15,-15,-5};
 
-const signed char cdbk_nb_high2[320] ICONST_ATTR = {
+const signed char cdbk_nb_high2[320] LSP_ICONST_ATTR = {
 11,47,16,-9,-46,
 -32,26,-64,34,-5,
 38,-7,47,20,2,
