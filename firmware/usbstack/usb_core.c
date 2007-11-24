@@ -381,7 +381,10 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
             usb_storage_control_request(req);
 #endif
             ack_control(req);
-            usb_state = CONFIGURED;
+            if (req->wValue)
+                usb_state = CONFIGURED;
+            else
+                usb_state = ADDRESS;
             break;
 
         case USB_REQ_GET_CONFIGURATION: {
