@@ -4837,11 +4837,13 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Aseta OFF=Peruuta"
     ipod*: "SELECT=Aseta MENU=Peruuta"
+    h10,h10_5gb: "SELECT=Aseta PREV=Peruuta"
   </dest>
   <voice>
     *: none
@@ -8856,87 +8858,87 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Laitteistopohjainen taajuuskorjain"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Laitteistopohjainen taajuuskorjain"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_ENABLED
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Käytä laitteistopohjaista taajuuskorjainta"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Käytä laitteistopohjaista taajuuskorjainta"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Kaistanleveys"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Kaistanleveys"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Kapea"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Kapea"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Leveä"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Leveä"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -11409,5 +11411,39 @@
   </dest>
   <voice>
     *: "Sano tiedostotyyppi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Basson katkaisu"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Basson katkaisu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Diskantin katkaisu"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Diskantin katkaisu"
   </voice>
 </phrase>
