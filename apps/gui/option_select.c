@@ -18,6 +18,7 @@
  *
  ****************************************************************************/
 #include <stdlib.h>
+#include <string.h>
 #include "config.h"
 #include "option_select.h"
 #include "sprintf.h"
