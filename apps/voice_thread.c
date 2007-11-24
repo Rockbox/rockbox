@@ -181,6 +181,9 @@ void voice_wait(void)
      * new clip by the time we wait. This should be resolvable if conditions
      * ever require knowing the very clip you requested has finished. */
     event_wait(&voice_event, STATE_SIGNALED);
+    /* Wait for PCM buffer to be exhausted. Works only if not playing. */
+    while(!playback_is_playing() && pcm_is_playing())
+        sleep(1);
 }
 
 /* Initialize voice thread data that must be valid upon starting and the
