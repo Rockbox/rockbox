@@ -158,12 +158,13 @@ static int option_talk(int selected_item, void * data)
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
-        int talkunit = UNIT_DB;
+        int talkunit = UNIT_INT;
         const char *unit = sound_unit(setting->sound_setting->setting);
-        /* crude reconstruction */
-        if (*unit == '%')
+        if (!strcmp(unit, "dB"))
+            talkunit = UNIT_DB;
+        else if (!strcmp(unit, "%"))
             talkunit = UNIT_PERCENT;
-        else if (*unit == 'H')
+        else if (!strcmp(unit, "Hz"))
             talkunit = UNIT_HERTZ;
         talk_value((int)temp_var, talkunit, false);
     }
