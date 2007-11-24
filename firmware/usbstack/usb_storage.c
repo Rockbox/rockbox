@@ -257,7 +257,7 @@ void handle_scsi(struct command_block_wrapper* cbw)
             }
 
             ata_read_sectors(IF_MV2(0,) current_cmd.sector, current_cmd.count,
-                             &transfer_buffer);
+                             transfer_buffer);
             state = SENDING;
             usb_drv_send(EP_TX, transfer_buffer,
                          MIN(current_cmd.count * SECTOR_SIZE, length));
