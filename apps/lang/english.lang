@@ -1216,19 +1216,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -1237,28 +1237,28 @@
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Enable hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
@@ -1267,36 +1267,36 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -11483,13 +11483,16 @@
   desc: Bass setting cut-off frequency
   user:
   <source>
-    *: "Bass Cutoff"
+    *: none
+    ipodvideo: "Bass Cutoff"
   </source>
   <dest>
-    *: "Bass Cutoff"
+    *: none
+    ipodvideo: "Bass Cutoff"
   </dest>
   <voice>
-    *: "Bass Cutoff"
+    *: none
+    ipodvideo: "Bass Cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -11497,13 +11500,16 @@
   desc: Treble setting cut-off frequency
   user:
   <source>
-    *: "Treble Cutoff"
+    *: none
+    ipodvideo: "Treble Cutoff"
   </source>
   <dest>
-    *: "Treble Cutoff"
+    *: none
+    ipodvideo: "Treble Cutoff"
   </dest>
   <voice>
-    *: "Treble Cutoff"
+    *: none
+    ipodvideo: "Treble Cutoff"
   </voice>
 </phrase>
 
