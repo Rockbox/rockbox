@@ -34,13 +34,25 @@ change to customise your listening experience.
   frequencies below 300Hz. Bass boost can be set from 0 to 24 dB in
   increments of 2 dB. A setting of 0 means that low frequencies are unaltered
   (flat response).}
-  \opt{ipodnano,ipodcolor,ipodvideo}{This emphasises or suppresses the
+  \opt{ipodnano,ipodcolor}{This emphasises or suppresses the
   lower frequency (bass) sounds in the track. 0dB means that bass in unaltered
   (flat response). The minimum setting is -6dB and the maximum is 9dB.}
+  \opt{ipodvideo}{This emphasises or suppresses the
+  lower frequency (bass) sounds in the track. 0dB means that bass in unaltered
+  (flat response). The minimum setting is -12dB and the maximum is 12dB.}
   \opt{x5}{This emphasises or suppresses the
   lower frequency (bass) sounds in the track. 0dB means that bass in unaltered
   (flat response). The minimum setting is -24dB and the maximum is 24dB.}
   \opt{sansa,h10,h10_5gb}{\fixme{add platform specific information here}}
+
+\opt{ipodvideo}{
+\section{Bass Cutoff}
+  This setting controls the frequency below which the bass gain
+  applies. The minimum setting is 1 and the maximum setting is 4 where a value
+  of 1 indicates the lowest possible cutoff and a value of 4 indicates the highest
+  possible cutoff. The actual cutoff frequency values will vary with sample rate.
+}
+
 
 \section{Treble}
   \opt{player,recorder,recorderv2fm,ondio}{This emphasises or suppresses the
@@ -50,13 +62,24 @@ change to customise your listening experience.
   frequencies above 1.5kHz. Treble boost can be set from 0 to 6 dB in
   increments of 2 dB. A setting of 0 means that high frequencies are unaltered
   (flat response).}
-  \opt{ipodnano,ipodcolor,ipodvideo}{This setting emphasises or suppresses
+  \opt{ipodnano,ipodcolor}{This setting emphasises or suppresses
   the higher frequency (treble) sounds in the track. 0dB means that treble is
   unaltered (flat response). The minimum setting -6dB and the maximum is 9dB.}
+  \opt{ipodvideo}{This setting emphasises or suppresses
+  the higher frequency (treble) sounds in the track. 0dB means that treble is
+  unaltered (flat response). The minimum setting -12dB and the maximum is 12dB.}
   \opt{x5}{This setting emphasises or suppresses
   the higher frequency (treble) sounds in the track. 0dB means that treble is
   unaltered (flat response). The minimum setting -24dB and the maximum is 24dB.}
   \opt{sansa,h10,h10_5gb}{\fixme{add platform specific information here}}
+
+\opt{ipodvideo}{
+\section{Treble Cutoff}
+  This setting controls the frequency above which the treble gain
+  applies. The minimum setting is 1 and the maximum setting is 4 where a value
+  of 1 indicates the lowest possible cutoff and a value of 4 indicates the highest
+  possible cutoff. The actual cutoff frequency values will vary with sample rate.
+}
 
 \section{Balance}
   This setting controls the balance between the left and right channels. The
@@ -383,21 +406,6 @@ configure the EQ, or use the presets for designing their own custom EQ
 settings.
 
 \end{description}
-}
-
-\opt{ipodvideo}{
-\section{Hardware EQ}
-
-This function controls the EQ that is built into the hardware of your 
-\playerman{}. The hardware EQ functions similarly to the Graphical EQ in that 
-it allows adjustment of several parameters.  However, unlike the Graphical EQ, 
-the Hardware EQ allows the user to choose from a limited number of settings 
-for ``Center Frequency'' and ``Bandwidth'' (``Bandwidth'' in the Hardware EQ 
-is similar to ``Q'' in the Graphical EQ).
-
-\note{While the \setting{Hardware EQ} menu shows Low Shelf, three peaking
-filters, and High Shelf, the peaking filters are not currently operational.}
-
 }
 
 \opt{SWCODEC}{
