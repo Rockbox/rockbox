@@ -1141,19 +1141,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Hardware-Equalizer"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hardware-Equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -1162,66 +1162,66 @@
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Hardware-EQ einschalten"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hardware-Equalizer einschalten"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Bandbreite"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bandbreite"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Schmal"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Schmal"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Breit"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Breit"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -4669,15 +4669,17 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=OK OFF=Abbruch"
     ipod*: "SELECT=OK MENU=Abbruch"
+    h10,h10_5gb: "SELECT=OK PREV=Abbruch"
   </dest>
   <voice>
     *: none
-    alarm,ipod*: ""
+    alarm,ipod*,h10,h10_5gb: ""
   </voice>
 </phrase>
 <phrase>
@@ -6925,16 +6927,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "Aktuelle Zeit"
+    *: ""
   </dest>
   <voice>
-    *: "Aktuelle Zeit"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11357,5 +11359,84 @@
   </dest>
   <voice>
     *: "Mitteleuropäisch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "Dateityp ansagen"
+  </dest>
+  <voice>
+    *: "Dateityp ansagen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user:
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Nicht vorhanden"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "Nicht vorhanden"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Batteriestand ansagen"
+  </dest>
+  <voice>
+    *: "Batteriestand ansagen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Tiefengrenzfrequenz"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Tiefengrenzfrequenz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Höhengrenzfrequenz"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Höhengrenzfrequenz"
   </voice>
 </phrase>
