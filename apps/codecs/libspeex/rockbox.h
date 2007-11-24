@@ -70,12 +70,6 @@ static inline void speex_free_scratch (void *ptr)
     codec_free(ptr);
 }
 
-#define OVERRIDE_SPEEX_MOVE 1
-static inline void *speex_move (void *dest, void *src, int n)
-{
-   return memmove(dest,src,n);
-}
-
 #define OVERRIDE_SPEEX_FATAL 1
 static inline void _speex_fatal(const char *str, const char *file, int line)
 {
