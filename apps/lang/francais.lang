@@ -1162,87 +1162,87 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Equaliseur matériel"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "équaliseur matériel"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_ENABLED
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Activer EQ matériel"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Activer l'équaliseur matériel"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Bande passante"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bande passante"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Etroite"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "étroite"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Large"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Large"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -11449,5 +11449,39 @@
   </dest>
   <voice>
     *: "Prononcer le type de fichier"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Fréquence de coupure pour basses"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Fréquence de coupure pour les basses"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Fréquence de coupure pour aigus"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Fréquence de coupure pour les aigus"
   </voice>
 </phrase>
