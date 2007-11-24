@@ -279,13 +279,6 @@ load_err:
 }
 
 
-/* Are more voice clips queued and waiting? */
-bool is_voice_queued()
-{
-    return (QUEUE_LEVEL != 0);
-}
-
-
 /* called in ISR context if mp3 data got consumed */
 static void mp3_callback(unsigned char** start, size_t* size)
 {
