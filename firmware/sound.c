@@ -70,6 +70,10 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
 #endif
+#if defined(HAVE_WM8758)
+    [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
+    [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
+#endif
 };
 #endif
 
@@ -131,6 +135,16 @@ sound_set_type* sound_get_fn(int setting)
         case SOUND_STEREO_WIDTH:
             result = sound_set_stereo_width;
             break;
+
+#ifdef HAVE_WM8758
+        case SOUND_BASS_CUTOFF:
+            result = sound_set_bass_cutoff;
+            break;
+
+        case SOUND_TREBLE_CUTOFF:
+            result = sound_set_treble_cutoff;
+            break;
+#endif
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
         case SOUND_LOUDNESS:
@@ -219,7 +233,8 @@ static void set_prescaled_volume(void)
 /* The WM codecs listed don't have suitable prescaler functionality, so we let
  * the prescaler stay at 0 for these unless SW tone controls are in use */
 #if defined(HAVE_SW_TONE_CONTROLS) || !(defined(HAVE_WM8975) \
-    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751))
+    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751) \
+    || defined(HAVE_WM8758))
 
     prescale = MAX(current_bass, current_treble);
     if (prescale < 0)
@@ -237,7 +252,7 @@ static void set_prescaled_volume(void)
     dsp_callback(DSP_CALLBACK_SET_PRESCALE, prescale);
 #elif CONFIG_CODEC == MAS3507D
     mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
-#elif defined(HAVE_UDA1380) || defined(HAVE_WM8758)
+#elif defined(HAVE_UDA1380)
     audiohw_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
 #endif
 
@@ -492,6 +507,24 @@ void sound_set_stereo_width(int value)
 #endif
 }
 
+#ifdef HAVE_WM8758
+void sound_set_bass_cutoff(int value)
+{
+    if(!audio_is_initialized)
+        return;
+
+    audiohw_set_bass_cutoff(value);
+}
+
+void sound_set_treble_cutoff(int value)
+{
+    if(!audio_is_initialized)
+        return;
+
+    audiohw_set_treble_cutoff(value);
+}
+#endif
+
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 void sound_set_loudness(int value)
 {
@@ -652,6 +685,19 @@ void sound_set_superbass(int value)
     (void)value;
 }
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
+
+#ifdef HAVE_WM8758
+void sound_set_bass_cutoff(int value)
+{
+    (void) value;
+}
+
+void sound_set_treble_cutoff(int value)
+{
+    (void) value;
+}
+#endif /* HAVE_WM8758 */
+
 #endif /* SIMULATOR */
 
 void sound_set(int setting, int value)

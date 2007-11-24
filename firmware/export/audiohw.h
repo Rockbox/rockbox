@@ -67,6 +67,10 @@ enum {
     SOUND_RIGHT_GAIN,
     SOUND_MIC_GAIN,
 #endif
+#ifdef HAVE_WM8758
+    SOUND_BASS_CUTOFF,
+    SOUND_TREBLE_CUTOFF,
+#endif
 };
 
 enum Channel {

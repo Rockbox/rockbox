@@ -1001,6 +1001,12 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, dithering_enabled, LANG_DITHERING,
         false, "dithering enabled", dsp_dither_enable),
 #endif
+#ifdef HAVE_WM8758
+    SOUND_SETTING(F_NO_WRAP, bass_cutoff, LANG_BASS_CUTOFF, "bass cutoff",
+                  SOUND_BASS_CUTOFF),
+    SOUND_SETTING(F_NO_WRAP, treble_cutoff, LANG_TREBLE_CUTOFF, "treble cutoff",
+                  SOUND_TREBLE_CUTOFF),
+#endif
 #ifdef HAVE_DIRCACHE
     OFFON_SETTING(0,dircache,LANG_DIRCACHE_ENABLE,false,"dircache",NULL),
     SYSTEM_SETTING(NVRAM(4),dircache_size,0),
@@ -1058,63 +1064,6 @@ const struct settings_list settings[] = {
         TALK_ID(45, UNIT_SEC),TALK_ID(60, UNIT_SEC), TALK_ID(90, UNIT_SEC)),
 #endif
 #endif /* HAVE_BACKLIGHT */
-
-#ifdef HAVE_WM8758
-    OFFON_SETTING(0,eq_hw_enabled,LANG_EQUALIZER_HARDWARE_ENABLED,false,
-        "eq hardware enabled",NULL),
-
-    STRINGCHOICE_SETTING(0, eq_hw_band0_cutoff, LANG_EQUALIZER_BAND_CUTOFF, 1,
-        "eq hardware band 0 cutoff", "80Hz,105Hz,135Hz,175Hz", NULL, 4,
-        TALK_ID(80, UNIT_HERTZ), TALK_ID(105, UNIT_HERTZ), 
-        TALK_ID(135, UNIT_HERTZ), TALK_ID(175, UNIT_HERTZ)),
-    INT_SETTING(0, eq_hw_band0_gain, LANG_GAIN, 0, 
-        "eq hardware band 0 gain", UNIT_DB, EQ_HW_GAIN_MIN, 
-        EQ_HW_GAIN_MAX, EQ_HW_GAIN_STEP, eq_hw_gain_format, NULL, NULL),
-
-    STRINGCHOICE_SETTING(0, eq_hw_band1_center, LANG_EQUALIZER_BAND_CENTER, 1,
-        "eq hardware band 1 center", "230Hz,300Hz,385Hz,500Hz", NULL, 4,
-        TALK_ID(230, UNIT_HERTZ), TALK_ID(300, UNIT_HERTZ), 
-        TALK_ID(385, UNIT_HERTZ), TALK_ID(500, UNIT_HERTZ)),
-    CHOICE_SETTING(0, eq_hw_band1_bandwidth, LANG_EQUALIZER_BANDWIDTH, 0, 
-        "eq hardware band 1 bandwidth", "narrow,wide", NULL, 2,
-        ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW), 
-        ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE)),
-    INT_SETTING(0, eq_hw_band1_gain, LANG_GAIN, 0, 
-        "eq hardware band 1 gain", UNIT_DB, EQ_HW_GAIN_MIN, 
-        EQ_HW_GAIN_MAX, EQ_HW_GAIN_STEP, eq_hw_gain_format, NULL, NULL),
-
-    STRINGCHOICE_SETTING(0, eq_hw_band2_center, LANG_EQUALIZER_BAND_CENTER, 1,
-        "eq hardware band 2 center", "650Hz,850Hz,1.1kHz,1.4kHz", NULL, 4,
-        TALK_ID(650, UNIT_HERTZ), TALK_ID(850, UNIT_HERTZ), 
-        TALK_ID(1100, UNIT_HERTZ), TALK_ID(1400, UNIT_HERTZ)),
-    CHOICE_SETTING(0, eq_hw_band2_bandwidth, LANG_EQUALIZER_BANDWIDTH, 0, 
-        "eq hardware band 2 bandwidth", "narrow,wide", NULL, 2,
-        ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW), 
-        ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE)),
-    INT_SETTING(0, eq_hw_band2_gain, LANG_GAIN, 0, 
-        "eq hardware band 2 gain", UNIT_DB, EQ_HW_GAIN_MIN, 
-        EQ_HW_GAIN_MAX, EQ_HW_GAIN_STEP, eq_hw_gain_format, NULL, NULL),
-
-    STRINGCHOICE_SETTING(0, eq_hw_band3_center, LANG_EQUALIZER_BAND_CENTER, 1,
-        "eq hardware band 3 center", "1.8kHz,2.4kHz,3.2kHz,4.1kHz", NULL, 4,
-        TALK_ID(1800, UNIT_HERTZ), TALK_ID(2400, UNIT_HERTZ), 
-        TALK_ID(3200, UNIT_HERTZ), TALK_ID(4100, UNIT_HERTZ)),
-    CHOICE_SETTING(0, eq_hw_band3_bandwidth, LANG_EQUALIZER_BANDWIDTH, 0, 
-        "eq hardware band 3 bandwidth", "narrow,wide", NULL, 2,
-        ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW), 
-        ID2P(LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE)),
-    INT_SETTING(0, eq_hw_band3_gain, LANG_GAIN, 0, 
-        "eq hardware band 3 gain", UNIT_DB, EQ_HW_GAIN_MIN, 
-        EQ_HW_GAIN_MAX, EQ_HW_GAIN_STEP, eq_hw_gain_format, NULL, NULL),
-
-    STRINGCHOICE_SETTING(0, eq_hw_band4_cutoff, LANG_EQUALIZER_BAND_CUTOFF, 1,
-        "eq hardware band 4 cutoff", "5.3kHz,6.9kHz,9kHz,11.7kHz", NULL, 4,
-        TALK_ID(5300, UNIT_HERTZ), TALK_ID(6900, UNIT_HERTZ), 
-        TALK_ID(9000, UNIT_HERTZ), TALK_ID(11700, UNIT_HERTZ)),
-    INT_SETTING(0, eq_hw_band4_gain, LANG_GAIN, 0, 
-        "eq hardware band 4 gain", UNIT_DB, EQ_HW_GAIN_MIN, 
-        EQ_HW_GAIN_MAX, EQ_HW_GAIN_STEP, eq_hw_gain_format, NULL, NULL),
-#endif
 
     OFFON_SETTING(0,hold_lr_for_scroll_in_list,-1,true,
         "hold_lr_for_scroll_in_list",NULL),

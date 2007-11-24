@@ -41,6 +41,10 @@ void sound_set_bass(int value);
 void sound_set_treble(int value);
 void sound_set_channels(int value);
 void sound_set_stereo_width(int value);
+#ifdef HAVE_WM8758
+void sound_set_bass_cutoff(int value);
+void sound_set_treble_cutoff(int value);
+#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 void sound_set_loudness(int value);
 void sound_set_avc(int value);

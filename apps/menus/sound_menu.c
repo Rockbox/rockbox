@@ -58,7 +58,13 @@ int soundmenu_callback(int action, const struct menu_item_ex *this_item)
 
 MENUITEM_SETTING(volume, &global_settings.volume, soundmenu_callback);
 MENUITEM_SETTING(bass, &global_settings.bass, soundmenu_callback);
+#ifdef HAVE_WM8758
+MENUITEM_SETTING(bass_cutoff, &global_settings.bass_cutoff, soundmenu_callback);
+#endif
 MENUITEM_SETTING(treble, &global_settings.treble, soundmenu_callback);
+#ifdef HAVE_WM8758
+MENUITEM_SETTING(treble_cutoff, &global_settings.treble_cutoff, soundmenu_callback);
+#endif
 MENUITEM_SETTING(balance, &global_settings.balance, soundmenu_callback);
 MENUITEM_SETTING(channel_config, &global_settings.channel_config, soundmenu_callback);
 MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, soundmenu_callback);
@@ -97,13 +103,17 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, soundmenu_callback
 
 MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
           &volume,
-          &bass,&treble,
+          &bass,
+#ifdef HAVE_WM8758
+          &bass_cutoff,
+#endif
+          &treble,
+#ifdef HAVE_WM8758
+          &treble_cutoff,
+#endif
           &balance,&channel_config,&stereo_width
 #if CONFIG_CODEC == SWCODEC
          ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
-#endif
-#ifdef HAVE_WM8758
-         ,&hw_eq_menu
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
          ,&loudness,&avc,&superbass,&mdb_enable,&mdb_strength

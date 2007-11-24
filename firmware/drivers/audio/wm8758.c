@@ -33,15 +33,21 @@
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -58,   6, -25},
-    [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0},
-    [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0},
+    [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   0},
+    [SOUND_TREBLE]        = {"dB", 0,  1, -12,  12,   0},
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
     [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
+    [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
+    [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
 };
+
+/* shadow registers */
+unsigned int eq1_reg;
+unsigned int eq5_reg;
 
 /* convert tenth of dB volume (-57..6) to master volume register value */
 int tenthdb2master(int db)
@@ -138,15 +144,28 @@ int audiohw_set_mixer_vol(int channel1, int channel2)
     return 0;
 }
 
-/* We are using Linear bass control */
 void audiohw_set_bass(int value)
 {
-    (void)value;
+    eq1_reg = (eq1_reg & ~EQ_GAIN_MASK) | EQ_GAIN_VALUE(value);
+    wmcodec_write(EQ1, 0x100 | eq1_reg);
+}
+
+void audiohw_set_bass_cutoff(int value)
+{
+    eq1_reg = (eq1_reg & ~EQ_CUTOFF_MASK) | EQ_CUTOFF_VALUE(value);
+    wmcodec_write(EQ1, 0x100 | eq1_reg);
 }
 
 void audiohw_set_treble(int value)
 {
-    (void)value;
+    eq5_reg = (eq5_reg & ~EQ_GAIN_MASK) | EQ_GAIN_VALUE(value);
+    wmcodec_write(EQ5, eq5_reg); 
+}
+
+void audiohw_set_treble_cutoff(int value)
+{
+    eq5_reg = (eq5_reg & ~EQ_CUTOFF_MASK) | EQ_CUTOFF_VALUE(value);
+    wmcodec_write(EQ5, eq5_reg); 
 }
 
 void audiohw_mute(bool mute)
@@ -271,27 +290,3 @@ void audiohw_set_monitor(bool enable) {
     (void)enable;
 }
 
-void audiohw_set_equalizer_band(int band, int freq, int bw, int gain)
-{
-    unsigned int eq = 0;
-
-    /* Band 1..3 are peak filters */
-    if (band >= 1 && band <= 3) {
-        eq |= (bw << 8);
-    }
-
-    eq |= (freq << 5);
-    eq |= 12 - gain;
-
-    if (band == 0) {
-        wmcodec_write(EQ1, eq | 0x100); /* Always apply EQ to the DAC path */
-    } else if (band == 1) {
-        wmcodec_write(EQ2, eq);
-    } else if (band == 2) {
-        wmcodec_write(EQ3, eq);
-    } else if (band == 3) {
-        wmcodec_write(EQ4, eq);
-    } else if (band == 4) {
-        wmcodec_write(EQ5, eq);
-    }
-}

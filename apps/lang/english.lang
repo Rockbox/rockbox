@@ -11478,3 +11478,32 @@
     *: "Say file type"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: "Bass Cutoff"
+  </source>
+  <dest>
+    *: "Bass Cutoff"
+  </dest>
+  <voice>
+    *: "Bass Cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user:
+  <source>
+    *: "Treble Cutoff"
+  </source>
+  <dest>
+    *: "Treble Cutoff"
+  </dest>
+  <voice>
+    *: "Treble Cutoff"
+  </voice>
+</phrase>
+

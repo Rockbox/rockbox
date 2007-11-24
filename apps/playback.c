@@ -83,10 +83,6 @@
 #include "talk.h"
 #endif
 
-#ifdef HAVE_WM8758
-#include "menus/eq_menu.h"
-#endif
-
 #define PLAYBACK_VOICE
 
 /* default point to start buffer refill */
@@ -2601,9 +2597,6 @@ void audio_init(void)
     audio_is_initialized = true;
 
     sound_settings_apply();
-#ifdef HAVE_WM8758
-    eq_hw_enable(global_settings.eq_hw_enabled);
-#endif
 #ifndef HAVE_FLASH_STORAGE
     audio_set_buffer_margin(global_settings.buffer_margin);
 #endif

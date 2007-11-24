@@ -306,6 +306,11 @@ struct user_settings
     bool superbass; /* true/false */
 #endif
 
+#ifdef HAVE_WM8758
+    int bass_cutoff;
+    int treble_cutoff;
+#endif
+
 #if CONFIG_CODEC == SWCODEC
     int crossfade;     /* Enable crossfade (0=off,1=shuffle,2=trackskip,3=shuff&trackskip,4=always) */
     int crossfade_fade_in_delay;      /* Fade in delay (0-15s)             */
@@ -616,6 +621,7 @@ struct user_settings
     bool dithering_enabled;
 #endif
 
+
 #if LCD_DEPTH > 1
     unsigned char backdrop_file[MAX_FILENAME+1];  /* backdrop bitmap file */
 #endif
@@ -656,27 +662,6 @@ struct user_settings
 #endif
 #endif
 
-#ifdef HAVE_WM8758
-    bool eq_hw_enabled;            /* Enable hardware equalizer */
-    
-    int eq_hw_band0_cutoff;
-    int eq_hw_band0_gain;  
-
-    int eq_hw_band1_center;
-    int eq_hw_band1_bandwidth;
-    int eq_hw_band1_gain;
-
-    int eq_hw_band2_center;
-    int eq_hw_band2_bandwidth;
-    int eq_hw_band2_gain;
-
-    int eq_hw_band3_center;
-    int eq_hw_band3_bandwidth;
-    int eq_hw_band3_gain;
-
-    int eq_hw_band4_cutoff;
-    int eq_hw_band4_gain;
-#endif
     bool hold_lr_for_scroll_in_list; /* hold L/R scrolls the list left/right */
     int show_path_in_browser; /* 0=off, 1=current directory, 2=full path */
 

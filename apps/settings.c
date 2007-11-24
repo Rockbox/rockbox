@@ -648,6 +648,11 @@ void sound_settings_apply(void)
     sound_set(SOUND_SUPERBASS, global_settings.superbass);
 #endif
 
+#ifdef HAVE_WM8758
+    sound_set(SOUND_BASS_CUTOFF, global_settings.bass_cutoff);
+    sound_set(SOUND_TREBLE_CUTOFF, global_settings.treble_cutoff);
+#endif
+
 #ifdef HAVE_USB_POWER
 #if CONFIG_CHARGING
     usb_charging_enable(global_settings.usb_charging);

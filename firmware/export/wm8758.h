@@ -32,11 +32,11 @@ extern int audiohw_set_master_vol(int vol_l, int vol_r);
 extern int audiohw_set_lineout_vol(int vol_l, int vol_r);
 extern int audiohw_set_mixer_vol(int channel1, int channel2);
 extern void audiohw_set_bass(int value);
+extern void audiohw_set_bass_cutoff(int value);
 extern void audiohw_set_treble(int value);
+extern void audiohw_set_treble_cutoff(int value);
 extern void audiohw_set_nsorder(int order);
 extern void audiohw_set_sample_rate(int sampling_control);
-
-extern void audiohw_set_equalizer_band(int band, int freq, int bw, int gain);
 
 #define RESET      0x00
 #define PWRMGMT1   0x01
@@ -70,6 +70,10 @@ extern void audiohw_set_equalizer_band(int band, int freq, int bw, int gain);
 #define EQ3        0x14
 #define EQ4        0x15
 #define EQ5        0x16
+#define EQ_GAIN_MASK       0x001f
+#define EQ_CUTOFF_MASK     0x0060
+#define EQ_GAIN_VALUE(x)   (((-x) + 12) & 0x1f)
+#define EQ_CUTOFF_VALUE(x) ((((x) - 1) & 0x03) << 5)
 
 /* Register settings for the supported samplerates: */
 #define WM8758_8000HZ      0x4d
