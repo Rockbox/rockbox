@@ -76,7 +76,7 @@ static const struct {
         .bNumInterfaces      = 1,
         .bConfigurationValue = 1,
         .iConfiguration      = 0,
-        .bmAttributes        = USB_CONFIG_ATT_ONE,
+        .bmAttributes        = USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
         .bMaxPower           = 250, /* 500mA in 2mA units */
     },
     
@@ -99,7 +99,7 @@ static const struct {
         .bDescriptorType  = USB_DT_ENDPOINT,
         .bEndpointAddress = EP_TX | USB_DIR_IN,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 64,
+        .wMaxPacketSize   = 512,
         .bInterval        = 0
     },
     {
@@ -107,7 +107,7 @@ static const struct {
         .bDescriptorType  = USB_DT_ENDPOINT,
         .bEndpointAddress = EP_RX | USB_DIR_OUT,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 64,
+        .wMaxPacketSize   = 512,
         .bInterval        = 0
     }
 #endif
@@ -294,6 +294,7 @@ static int usb_address = 0;
 static bool initialized = false;
 static bool data_connection = false;
 static struct event_queue usbcore_queue;
+static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
 #ifdef USB_STORAGE
 static const char usbcore_thread_name[] = "usb_core";
@@ -324,6 +325,7 @@ void usb_core_init(void)
     usb_benchmark_init();
 #endif
     initialized = true;
+    usb_state = DEFAULT;
     logf("usb_core_init() finished");
 }
 
@@ -335,8 +337,9 @@ void usb_core_exit(void)
 #ifdef USB_STORAGE
         remove_thread(usbcore_thread);
 #endif
-        data_connection = false;
     }
+    data_connection = false;
+    initialized = false;
     logf("usb_core_exit() finished");
 }
 
@@ -353,7 +356,7 @@ void usb_core_thread(void)
     
         queue_wait(&usbcore_queue, &ev);
 
-        usb_storage_transfer_complete(ev.id, ev.data);
+        usb_storage_transfer_complete(ev.id);
     }
 }
 #endif
@@ -378,8 +381,22 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
             usb_storage_control_request(req);
 #endif
             ack_control(req);
+            usb_state = CONFIGURED;
             break;
 
+        case USB_REQ_GET_CONFIGURATION: {
+            static char confignum;
+            char* tmp = (void*)UNCACHED_ADDR(&confignum);
+            logf("usb_core: GET_CONFIG");
+            if (usb_state == ADDRESS)
+                *tmp = 0;
+            else
+                *tmp = 1;
+            usb_drv_send(EP_CONTROL, tmp, 1);
+            ack_control(req);
+            break;
+        }
+            
         case USB_REQ_SET_INTERFACE:
             logf("usb_core: SET_INTERFACE");
             ack_control(req);
@@ -399,6 +416,7 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
             logf("usb_core: SET_ADR %d", usb_address);
             ack_control(req);
             usb_drv_set_address(usb_address);
+            usb_state = ADDRESS;
             break;
 
         case USB_REQ_GET_STATUS: {
@@ -511,6 +529,7 @@ void usb_core_bus_reset(void)
 {
     usb_address = 0;
     data_connection = false;
+    usb_state = DEFAULT;
 }
 
 /* called by usb_drv_transfer_completed() */
@@ -530,7 +549,7 @@ void usb_core_transfer_complete(int endpoint, bool in)
 #if defined(USB_BENCHMARK)
             usb_benchmark_transfer_complete(endpoint, in);
 #elif defined(USB_STORAGE)
-            queue_post(&usbcore_queue, endpoint);
+            queue_post(&usbcore_queue, endpoint, 0);
 #endif
             break;
                 
