@@ -177,8 +177,10 @@ static bool f3_rec_screen(void);
 
 #define MAX_FILE_SIZE 0x7F800000 /* 2 GB - 4 MB */
 
+#ifndef HAVE_REMOTE_LCD
+static const int screen_update = NB_SCREENS;
+#else
 static int screen_update = NB_SCREENS;
-#ifdef HAVE_REMOTE_LCD
 static bool remote_display_on = true;
 #endif
 
