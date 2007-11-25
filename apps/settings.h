@@ -88,20 +88,6 @@ struct opt_items {
 #define BOOKMARK_UNIQUE_ONLY 2
 #define BOOKMARK_RECENT_ONLY_YES 3
 #define BOOKMARK_RECENT_ONLY_ASK 4
-#define FF_REWIND_1000   0
-#define FF_REWIND_2000   1
-#define FF_REWIND_3000   2
-#define FF_REWIND_4000   3
-#define FF_REWIND_5000   4
-#define FF_REWIND_6000   5
-#define FF_REWIND_8000   6
-#define FF_REWIND_10000  7
-#define FF_REWIND_15000  8
-#define FF_REWIND_20000  9
-#define FF_REWIND_25000 10
-#define FF_REWIND_30000 11
-#define FF_REWIND_45000 12
-#define FF_REWIND_60000 13
 
 #define TRIG_MODE_OFF 0
 #define TRIG_MODE_NOREARM 1

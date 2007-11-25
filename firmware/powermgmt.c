@@ -197,11 +197,6 @@ void reset_poweroff_timer(void)
 
 #else /* not SIMULATOR ******************************************************/
 
-static const unsigned char poweroff_idle_timeout_value[15] =
-{
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60
-};
-
 #if CONFIG_CHARGING == CHARGING_CONTROL
 int long_delta;                     /* long term delta battery voltage */
 int short_delta;                    /* short term delta battery voltage */
@@ -506,7 +501,7 @@ static void battery_status_update(void)
  */
 static void handle_auto_poweroff(void)
 {
-    long timeout = poweroff_idle_timeout_value[poweroff_timeout]*60*HZ;
+    long timeout = poweroff_timeout*60*HZ;
     int  audio_stat = audio_status();
 
 #if CONFIG_CHARGING

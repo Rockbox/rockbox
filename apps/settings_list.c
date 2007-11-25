@@ -231,18 +231,6 @@ static int32_t backlight_getlang(int value)
     return TALK_ID(value, UNIT_SEC);
 }
 #endif
-/* ffwd/rewind and scan acceleration stuff */
-static const unsigned char ff_rewind_min_stepvals[] = {1,2,3,4,5,6,8,10,15,20,25,30,45,60};
-static int32_t ff_rewind_min_step_getlang(int value)
-{
-    return TALK_ID(ff_rewind_min_stepvals[value], UNIT_SEC);
-}
-static void ff_rewind_min_step_formatter(char *buffer, size_t buffer_size, 
-        int val, const char *unit)
-{
-    (void)unit;
-    snprintf(buffer, buffer_size, "%ds", ff_rewind_min_stepvals[val]);
-}
 static int32_t scanaccel_getlang(int value)
 {
     if (value == 0)
@@ -259,12 +247,11 @@ static void scanaccel_formatter(char *buffer, size_t buffer_size,
         snprintf(buffer, buffer_size, "2x/%ds", val);
 }
 
-static const unsigned char poweroff_idle_timer_times[] = {0,1,2,3,4,5,6,7,8,9,10,15,30,45,60};
 static int32_t poweroff_idle_timer_getlang(int value)
 {
     if (value == 0)
         return LANG_OFF;
-    return TALK_ID(poweroff_idle_timer_times[value], UNIT_MIN);
+    return TALK_ID(value, UNIT_MIN);
 }
 static void poweroff_idle_timer_formatter(char *buffer, size_t buffer_size, 
         int val, const char *unit)
@@ -273,7 +260,7 @@ static void poweroff_idle_timer_formatter(char *buffer, size_t buffer_size,
     if (val == 0)
         strcpy(buffer, str(LANG_OFF));
     else
-        snprintf(buffer, buffer_size, "%dm", poweroff_idle_timer_times[val]);
+        snprintf(buffer, buffer_size, "%dm", val);
 }
 
 #ifndef HAVE_SCROLLWHEEL
@@ -481,10 +468,10 @@ const struct settings_list settings[] = {
 #endif /* HAVE_LCD_BITMAP */
     OFFON_SETTING(0,show_icons, LANG_SHOW_ICONS ,true,"show icons", NULL),
     /* system */
-    INT_SETTING_W_CFGVALS(0, poweroff, LANG_POWEROFF_IDLE, 10, "idle poweroff",
-                    "off,1,2,3,4,5,6,7,8,9,10,15,30,45,60", UNIT_MIN,
-                    0, 14, 1, poweroff_idle_timer_formatter,
-                    poweroff_idle_timer_getlang, set_poweroff_timeout),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, poweroff, LANG_POWEROFF_IDLE, 10,
+                  "idle poweroff", "off", UNIT_MIN, poweroff_idle_timer_formatter,
+                  poweroff_idle_timer_getlang, set_poweroff_timeout, 15,
+                  0,1,2,3,4,5,6,7,8,9,10,15,30,45,60),
     SYSTEM_SETTING(NVRAM(4),runtime,0),
     SYSTEM_SETTING(NVRAM(4),topruntime,0),
 
@@ -639,10 +626,9 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,play_selected,LANG_PLAY_SELECTED,true,"play selected",NULL),
     OFFON_SETTING(0,party_mode,LANG_PARTY_MODE,false,"party mode",NULL),
     OFFON_SETTING(0,fade_on_stop,LANG_FADE_ON_STOP,true,"volume fade",NULL),
-    INT_SETTING_W_CFGVALS(0, ff_rewind_min_step, LANG_FFRW_STEP, FF_REWIND_1000,
-        "scan min step", "1,2,3,4,5,6,8,10,15,20,25,30,45,60", UNIT_SEC,
-        13, 0, -1, ff_rewind_min_step_formatter,
-        ff_rewind_min_step_getlang, NULL),        
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, ff_rewind_min_step,
+                  LANG_FFRW_STEP, 1, "scan min step", NULL, UNIT_SEC,
+                  NULL, NULL, NULL, 14,  1,2,3,4,5,6,8,10,15,20,25,30,45,60),
     INT_SETTING(0, ff_rewind_accel, LANG_FFRW_ACCEL, 3, "scan accel",
         UNIT_SEC, 16, 0, -1, scanaccel_formatter, scanaccel_getlang, NULL), 
 #if (CONFIG_CODEC == SWCODEC) && !defined(HAVE_FLASH_STORAGE)

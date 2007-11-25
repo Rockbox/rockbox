@@ -145,13 +145,6 @@ bool update_onvol_change(struct gui_wps * gwps)
 
 bool ffwd_rew(int button)
 {
-    static const uint16_t ff_rew_steps[] = {
-      1000, 2000, 3000, 4000,
-      5000, 6000, 8000, 10000,
-      15000, 20000, 25000, 30000,
-      45000, 60000
-    };
-
     unsigned int step = 0;     /* current ff/rewind step */ 
     unsigned int max_step = 0; /* maximum ff/rewind step */ 
     int ff_rewind_count = 0;   /* current ff/rewind count (in ticks) */
@@ -227,7 +220,7 @@ bool ffwd_rew(int button)
 
                         wps_state.ff_rewind = true;
 
-                        step = ff_rew_steps[global_settings.ff_rewind_min_step];
+                        step = 1000 * global_settings.ff_rewind_min_step;
 
                         accel_tick = current_tick +
                             global_settings.ff_rewind_accel*HZ; 

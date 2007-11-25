@@ -398,9 +398,9 @@ bool option_screen(struct settings_list *setting,
             const struct table_setting *info = setting->table_setting;
             int i;
             nb_items = info->count;
-            selected = 0;
+            selected = -1;
             table_setting_array_position = -1;
-            for (i=0;selected==0 && i<nb_items;i++)
+            for (i=0;selected==-1 && i<nb_items;i++)
             {
                 if (setting->flags&F_ALLOW_ARBITRARY_VALS &&
                     (oldvalue < info->values[i]))
