@@ -39,7 +39,7 @@ static void dsp_status(void)
     unsigned short hpib_ctl = IO_DSPC_HPIB_CONTROL;
     unsigned short hpib_stat = IO_DSPC_HPIB_STATUS;
     char buffer1[80], buffer2[80];
-	
+    
     DEBUGF("dsp_status(): clkc_hpib=%u clkc_dsp=%u",
            !!(IO_CLK_MOD0 & (1 << 11)), !!(IO_CLK_MOD0 & (1 << 10)));
     
@@ -48,8 +48,8 @@ static void dsp_status(void)
            (IO_INTC_IRQ0 >> IRQ_DSPHINT) & 1, DSP_(0x7fff), DSP_(_status),
            DSP_(_acked));
 #define B(f,w,b,m) if ((w & (1 << b)) == 0) \
-					 strcat(f, "!"); \
-				 strcat(f, #m "|");
+                       strcat(f, "!"); \
+                       strcat(f, #m "|");
     strcpy(buffer1, "");
     B(buffer1, hpib_ctl, 0, EN);
     B(buffer1, hpib_ctl, 3, NMI);
@@ -71,7 +71,7 @@ static void dsp_status(void)
 static void dsp_reset(void)
 {
     DSP_(0x7fff) = 0xdead;
-	
+    
     IO_DSPC_HPIB_CONTROL &= ~(1 << 8);
     /* HPIB bus cycles will lock up the ARM in here. Don't touch DSP RAM. */
     nop; nop;
