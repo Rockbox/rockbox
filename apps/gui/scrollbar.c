@@ -23,17 +23,11 @@
 #include "limits.h"
 #include "bmp.h"
 
-void gui_scrollbar_draw(struct screen * screen, int x, int y,
-                        int width, int height, int items,
-                        int min_shown, int max_shown,
-                        unsigned flags)
+/* calculates the start and size of the knob */
+static void scrollbar_helper(int min_shown, int max_shown, int items,
+                             int inner_len, int *size, int *start)
 {
-    int inner_x, inner_y, inner_wd, inner_ht, inner_len;
     int min, max, range;
-    int start, size;
-#ifdef HAVE_LCD_COLOR
-    int infill;
-#endif
 
     /* min should be min */
     if(min_shown < max_shown) {
@@ -58,6 +52,40 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
 
     range = max - min;
 
+    /* avoid overflows */
+    while (items > (INT_MAX / inner_len)) {
+        items >>= 1;
+        range >>= 1;
+    }
+
+    /* calc start and end of the knob */
+    if (items > 0 && items > range) {
+        *size = inner_len * range / items;
+        if (*size == 0) { /* width of knob is null */
+            *size = 1;
+            *start = (inner_len - 1) * min / items;
+        } else {
+            *start = (inner_len - *size) * min / (items - range);
+        }
+    } else {  /* if null draw full bar */
+        *size = inner_len;
+        *start = 0;
+    }
+    
+    return;
+}
+
+void gui_scrollbar_draw(struct screen * screen, int x, int y,
+                        int width, int height, int items,
+                        int min_shown, int max_shown,
+                        unsigned flags)
+{
+    int inner_x, inner_y, inner_wd, inner_ht, inner_len;
+    int start, size;
+#ifdef HAVE_LCD_COLOR
+    int infill;
+#endif
+
     inner_x  = x + 1;
     inner_y  = y + 1;
     inner_wd = width  - 2;
@@ -68,25 +96,7 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
     else
         inner_len = inner_ht;
 
-    /* avoid overflows */
-    while (items > (INT_MAX / inner_len)) {
-        items >>= 1;
-        range >>= 1;
-    }
-
-    /* calc start and end of the knob */
-    if (items > 0 && items > range) {
-        size = inner_len * range / items;
-        if (size == 0) { /* width of knob is null */
-            size = 1;
-            start = (inner_len - 1) * min / items;
-        } else {
-            start = (inner_len - size) * min / (items - range);
-        }
-    } else {  /* if null draw full bar */
-        size = inner_len;
-        start = 0;
-    }
+    scrollbar_helper(min_shown, max_shown, items, inner_len, &size, &start);
 
     /* draw box */
 #ifdef HAVE_LCD_COLOR
@@ -157,63 +167,21 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap bm, int x, 
                         int min_shown, int max_shown,
                         unsigned flags)
 {
-    int min;
-    int max;
-    int inner_len;
     int start;
     int size;
+    int inner_len;
 
     screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
 
     /* clear pixels in progress bar */
     screen->fillrect(x, y, width, height);
 
-    /* min should be min */
-    if(min_shown < max_shown) {
-        min = min_shown;
-        max = max_shown;
-    }
-    else {
-        min = max_shown;
-        max = min_shown;
-    }
-
-    /* limit min and max */
-    if(min < 0)
-        min = 0;
-    if(min > items)
-        min = items;
-
-    if(max < 0)
-        max = 0;
-    if(max > items)
-        max = items;
-
     if (flags & HORIZONTAL)
         inner_len = width;
     else
         inner_len = height;
 
-    /* avoid overflows */
-    while (items > (INT_MAX / inner_len)) {
-        items >>= 1;
-        min >>= 1;
-        max >>= 1;
-    }
-
-    /* calc start and end of the knob */
-    if (items > 0 && items > (max - min)) {
-        size = inner_len * (max - min) / items;
-        if (size == 0) { /* width of knob is null */
-            size = 1;
-            start = (inner_len - 1) * min / items;
-        } else {
-            start = (inner_len - size) * min / (items - (max - min));
-        }
-    } else {  /* if null draw full bar */
-        size = inner_len;
-        start = 0;
-    }
+    scrollbar_helper(min_shown, max_shown, items, inner_len, &size, &start);
 
     screen->set_drawmode(DRMODE_SOLID);
 
