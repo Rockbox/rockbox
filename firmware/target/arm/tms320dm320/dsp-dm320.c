@@ -130,6 +130,8 @@ void dsp_init(void)
     IO_INTC_IRQ0 = 1 << 11;
     IO_INTC_EINT0 |= 1 << 11;
     
+    IO_DSPC_HPIB_CONTROL = 1 << 10 | 1 << 9 | 1 << 8 | 1 << 7 | 1 << 3 | 1 << 0;
+    
     dsp_reset();
     dsp_load(dsp_image_helloworld);
 }
