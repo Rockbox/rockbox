@@ -20,6 +20,7 @@
 #include "config.h"
 #include <stdbool.h>
 #include <string.h>
+#include "system.h"
 #include "ata.h"
 #include "lang.h"
 #include "talk.h"
@@ -103,7 +104,7 @@
 #define FILENAME_SETTING(flags,var,name,default,prefix,suffix,len)  \
             {flags|F_T_UCHARPTR, &global_settings.var,-1,           \
                 CHARPTR(default),name,NULL,                         \
-                {.filename_setting=                                        \
+                {.filename_setting=                                 \
                     (struct filename_setting[]){{prefix,suffix,len}}} }
 
 /*  Used for settings which use the set_option() setting screen.
@@ -111,18 +112,18 @@
     These can either be literal strings, or ID2P(LANG_*) */
 #define CHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,cb,count,...)  \
             {flags|F_CHOICE_SETTING|F_T_INT,  &global_settings.var, lang_id,   \
-                INT(default), name, cfg_vals,                     \
-                {.choice_setting = (struct choice_setting[]){    \
-                    {cb, count, {.desc = (unsigned char*[]){__VA_ARGS__}}}}}}
+                INT(default), name, cfg_vals,                         \
+                {.choice_setting = (struct choice_setting[]){         \
+                    {cb, count, {.desc = (const unsigned char*[]){__VA_ARGS__}}}}}}
                     
 /* Similar to above, except the strings to display are taken from cfg_vals,
    the ... arg is a list of ID's to talk for the strings... can use TALK_ID()'s */
 #define STRINGCHOICE_SETTING(flags,var,lang_id,default,name,cfg_vals,cb,count,...)  \
-            {flags|F_CHOICE_SETTING|F_T_INT|F_CHOICETALKS,                  \
-                &global_settings.var, lang_id,                  \
-                INT(default), name, cfg_vals,                     \
-                {.choice_setting = (struct choice_setting[]){    \
-                    {cb, count, {.talks = (int[]){__VA_ARGS__}}}}}}
+            {flags|F_CHOICE_SETTING|F_T_INT|F_CHOICETALKS,             \
+                &global_settings.var, lang_id,                         \
+                INT(default), name, cfg_vals,                          \
+                {.choice_setting = (struct choice_setting[]){          \
+                    {cb, count, {.talks = (const int[]){__VA_ARGS__}}}}}}
                     
 /*  for settings which use the set_int() setting screen.
     unit is the UNIT_ define to display/talk.
@@ -134,14 +135,20 @@
                 lang_id, INT(default), name, cfg_vals,                  \
                  {.int_setting = (struct int_setting[]){                \
                     {cb, unit, min, max, step, formatter, get_talk_id}}}}
-#define INT_SETTING(flags, var, lang_id, default, name,                      \
-                    unit, min, max, step, formatter, get_talk_id, cb)       \
+#define INT_SETTING(flags, var, lang_id, default, name,                 \
+                    unit, min, max, step, formatter, get_talk_id, cb)   \
             {flags|F_INT_SETTING|F_T_INT, &global_settings.var,         \
-                lang_id, INT(default), name, NULL,                  \
+                lang_id, INT(default), name, NULL,                      \
                  {.int_setting = (struct int_setting[]){                \
                     {cb, unit, min, max, step, formatter, get_talk_id}}}}
 
-
+#define TABLE_SETTING(flags, var, lang_id, default, name, cfg_vals, \
+                      unit, formatter, get_talk_id, cb, count, ...) \
+            {flags|F_TABLE_SETTING|F_T_INT, &global_settings.var,   \
+                lang_id, INT(default), name, cfg_vals,              \
+                {.table_setting = (struct table_setting[]) {        \
+                    {cb, formatter, get_talk_id, unit, count,       \
+                    (const int[]){__VA_ARGS__}}}}}
 
 /* some sets of values which are used more than once, to save memory */
 static const char off_on[] = "off,on";
@@ -204,26 +211,24 @@ static void rectime_formatter(char *buffer, size_t buffer_size,
 #endif /* HAVE_RECORDING */
 
 #ifdef HAVE_BACKLIGHT
-static const char backlight_times_conf [] =
-                  "off,on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90";
-static void backlight_formatter(char *buffer, size_t buffer_size, 
+static void backlight_formatter(char *buffer, size_t buffer_size,
         int val, const char *unit)
 {
     (void)unit;
-    if (val == 0)
+    if (val == -1)
         strcpy(buffer, str(LANG_OFF));
-    else if (val == 1)
+    else if (val == 0)
         strcpy(buffer, str(LANG_ON));
     else
-        snprintf(buffer, buffer_size, "%d s", backlight_timeout_value[val]);
+        snprintf(buffer, buffer_size, "%d s", val);
 }
 static int32_t backlight_getlang(int value)
 {
-    if (value == 0)
+    if (value == -1)
         return LANG_OFF;
-    else if (value == 1)
+    else if (value == 0)
         return LANG_ON;
-    return TALK_ID(backlight_timeout_value[value], UNIT_SEC);
+    return TALK_ID(value, UNIT_SEC);
 }
 #endif
 /* ffwd/rewind and scan acceleration stuff */
@@ -424,16 +429,17 @@ const struct settings_list settings[] = {
                 MAX_CONTRAST_SETTING, 1, NULL, NULL}}}},
 #endif
 #ifdef HAVE_BACKLIGHT
-    INT_SETTING_W_CFGVALS(0, backlight_timeout, LANG_BACKLIGHT, 6,
-        "backlight timeout", backlight_times_conf, UNIT_SEC,
-        0, 18, 1, backlight_formatter, backlight_getlang, 
-        backlight_set_timeout),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout, LANG_BACKLIGHT, 5,
+                  "backlight timeout", off_on, UNIT_SEC, backlight_formatter,
+                  backlight_getlang, backlight_set_timeout, 20,
+                  -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
 #if CONFIG_CHARGING
-    INT_SETTING_W_CFGVALS(0, backlight_timeout_plugged,
-        LANG_BACKLIGHT_ON_WHEN_CHARGING, 11,
-        "backlight timeout plugged", backlight_times_conf, UNIT_SEC,
-        0, 18, 1, backlight_formatter, backlight_getlang, 
-        backlight_set_timeout_plugged),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout_plugged,
+                  LANG_BACKLIGHT_ON_WHEN_CHARGING, 10,
+                  "backlight timeout plugged", off_on, UNIT_SEC,
+                  backlight_formatter, backlight_getlang,
+                  backlight_set_timeout_plugged,  20,
+                  -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
 #endif
 #endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_LCD_BITMAP
@@ -527,16 +533,17 @@ const struct settings_list settings[] = {
         LANG_INVERT_LCD_INVERSE, LANG_NORMAL, lcd_remote_set_invert_display),
     OFFON_SETTING(0,remote_flip_display, LANG_FLIP_DISPLAY,
         false,"remote flip display", NULL),
-    INT_SETTING_W_CFGVALS(0, remote_backlight_timeout, LANG_BACKLIGHT, 6,
-        "remote backlight timeout", backlight_times_conf, UNIT_SEC,
-        0, 18, 1, backlight_formatter, backlight_getlang, 
-        remote_backlight_set_timeout),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, remote_backlight_timeout,
+                  LANG_BACKLIGHT, 5, "remote backlight timeout", off_on,
+                  UNIT_SEC, backlight_formatter, backlight_getlang,
+                  remote_backlight_set_timeout, 20,
+                  -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
 #if CONFIG_CHARGING
-    INT_SETTING_W_CFGVALS(0, remote_backlight_timeout_plugged,
-        LANG_BACKLIGHT_ON_WHEN_CHARGING, 11,
-        "remote backlight timeout plugged", backlight_times_conf, UNIT_SEC,
-        0, 18, 1, backlight_formatter, backlight_getlang, 
-        remote_backlight_set_timeout_plugged),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, remote_backlight_timeout_plugged,
+                  LANG_BACKLIGHT, 10, "remote backlight timeout plugged",
+                  off_on, UNIT_SEC, backlight_formatter, backlight_getlang,
+                  remote_backlight_set_timeout_plugged, 20,
+                  -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
 #endif
 #ifdef HAVE_REMOTE_LCD_TICKING
     OFFON_SETTING(0,remote_reduce_ticking, LANG_REDUCE_TICKING,
@@ -1196,11 +1203,11 @@ const struct settings_list settings[] = {
                      THEME_DIR "/", ".colours", MAX_FILENAME+1),
 #endif
 #ifdef HAVE_BUTTON_LIGHT
-    INT_SETTING_W_CFGVALS(0, buttonlight_timeout,
-                          LANG_BUTTONLIGHT_TIMEOUT, 6,
-        "button light timeout", backlight_times_conf, UNIT_SEC,
-        0, 18, 1, backlight_formatter, backlight_getlang, 
-        buttonlight_set_timeout),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, buttonlight_timeout,
+                  LANG_BUTTONLIGHT_TIMEOUT, 5, "button light timeout", off_on,
+                  UNIT_SEC, backlight_formatter, backlight_getlang,
+                  buttonlight_set_timeout, 20,
+                  -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
 #endif
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
     INT_SETTING(0, buttonlight_brightness, LANG_BUTTONLIGHT_BRIGHTNESS, DEFAULT_BRIGHTNESS_SETTING,

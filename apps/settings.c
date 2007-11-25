@@ -299,7 +299,17 @@ bool settings_load_config(const char* file, bool apply)
                         }
                         else
                         {
-                            cfg_string_to_int(i,(int*)settings[i].setting,value);
+                            int temp, *v = (int*)settings[i].setting;
+                            bool found = cfg_string_to_int(i, &temp, value);
+                            if (found)
+                            {
+                                if (settings[i].flags&F_TABLE_SETTING)
+                                    *v = settings[i].table_setting->values[temp];
+                                else
+                                    *v = temp;
+                            }
+                            else
+                                *v = atoi(value);
                         }
                         break;
                     case F_T_BOOL:
@@ -353,9 +363,40 @@ bool settings_load_config(const char* file, bool apply)
 
 bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
 {
+    int flags = settings[setting_id].flags;
     const char* start = settings[setting_id].cfg_vals;
     char* end = NULL;
     int count = 0;
+    
+    if ((flags&F_T_MASK)==F_T_INT &&
+        flags&F_TABLE_SETTING)
+    {
+        const int *value = settings[setting_id].table_setting->values;
+        while (start)
+        {
+            end = strchr(start,',');
+            if (value[count] == val)
+            {
+                if (end == NULL)
+                    strncpy(buf, start, buf_len);
+                else 
+                {
+                    int len = (buf_len > (end-start))? end-start: buf_len;
+                    strncpy(buf, start, len);
+                    buf[len] = '\0';
+                }
+                return true;
+            }
+            count++;
+            
+            if (end)
+                start = end+1;
+            else
+                break;
+        }
+        return false;
+    }
+                
     while (count < val)
     {
         start = strchr(start,',');
@@ -457,8 +498,11 @@ static bool settings_write_config(char* filename, int options)
                 }
                 else
                 {
-                    cfg_int_to_string(i, *(int*)settings[i].setting,
-                                        value, MAX_PATH);
+                    if (cfg_int_to_string(i, *(int*)settings[i].setting,
+                                        value, MAX_PATH) == false)
+                    {
+                        snprintf(value,MAX_PATH,"%d",*(int*)settings[i].setting);
+                    }
                 }
                 break;
             case F_T_BOOL:

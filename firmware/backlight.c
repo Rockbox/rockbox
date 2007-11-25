@@ -89,11 +89,6 @@ static inline void _remote_backlight_off(void)
 
 #if defined(HAVE_BACKLIGHT) && !defined(BOOTLOADER)
 
-const signed char backlight_timeout_value[19] =
-{
-    -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 45, 60, 90
-};
-
 enum {
     BACKLIGHT_ON,
     BACKLIGHT_OFF,
@@ -159,12 +154,9 @@ void buttonlight_off(void)
     queue_post(&backlight_queue, BUTTON_LIGHT_OFF, 0);
 }
 
-void buttonlight_set_timeout(int index)
+void buttonlight_set_timeout(int value)
 {
-    if((unsigned)index >= sizeof(backlight_timeout_value))
-        /* if given a weird value, use default */
-        index = 6;
-    _buttonlight_timeout = HZ * backlight_timeout_value[index];
+    _buttonlight_timeout = HZ * value;
     buttonlight_update_state();
 }
 
@@ -638,22 +630,16 @@ int backlight_get_current_timeout(void)
     return backlight_timeout;
 }
 
-void backlight_set_timeout(int index)
+void backlight_set_timeout(int value)
 {
-    if((unsigned)index >= sizeof(backlight_timeout_value))
-        /* if given a weird value, use default */
-        index = 6;
-    backlight_timeout_normal = HZ * backlight_timeout_value[index];
+    backlight_timeout_normal = HZ * value;
     backlight_update_state();
 }
 
 #if CONFIG_CHARGING
-void backlight_set_timeout_plugged(int index)
+void backlight_set_timeout_plugged(int value)
 {
-    if((unsigned)index >= sizeof(backlight_timeout_value))
-        /* if given a weird value, use default */
-        index = 6;
-    backlight_timeout_plugged = HZ * backlight_timeout_value[index];
+    backlight_timeout_plugged = HZ * value;
     backlight_update_state();
 }
 #endif /* CONFIG_CHARGING */
@@ -710,22 +696,16 @@ void remote_backlight_off(void)
     queue_post(&backlight_queue, REMOTE_BACKLIGHT_OFF, 0);
 }
 
-void remote_backlight_set_timeout(int index)
+void remote_backlight_set_timeout(int value)
 {
-    if((unsigned)index >= sizeof(backlight_timeout_value))
-        /* if given a weird value, use default */
-        index=6;
-    remote_backlight_timeout_normal = HZ * backlight_timeout_value[index];
+    remote_backlight_timeout_normal = HZ * value;
     remote_backlight_update_state();
 }
 
 #if CONFIG_CHARGING
-void remote_backlight_set_timeout_plugged(int index)
+void remote_backlight_set_timeout_plugged(int value)
 {
-    if((unsigned)index >= sizeof(backlight_timeout_value))
-        /* if given a weird value, use default */
-        index=6;
-    remote_backlight_timeout_plugged = HZ * backlight_timeout_value[index];
+    remote_backlight_timeout_plugged = HZ * value;
     remote_backlight_update_state();
 }
 #endif /* CONFIG_CHARGING */
@@ -805,12 +785,12 @@ void backlight_init(void)
 void backlight_on(void) {}
 void backlight_off(void) {}
 void buttonlight_on(void) {}
-void backlight_set_timeout(int index) {(void)index;}
+void backlight_set_timeout(int value) {(void)value;}
 bool is_backlight_on(void) {return true;}
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_on(void) {}
 void remote_backlight_off(void) {}
-void remote_backlight_set_timeout(int index) {(void)index;}
+void remote_backlight_set_timeout(int value) {(void)value;}
 bool is_remote_backlight_on(void) {return true;}
 #endif /* HAVE_REMOTE_LCD */
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS

@@ -78,13 +78,24 @@ struct choice_setting {
     void (*option_callback)(int);
     int count;
     union {
-        unsigned char **desc;
-        int           *talks;
+        const unsigned char **desc;
+        const int           *talks;
     };
 };
 #define F_CHOICE_SETTING 0x100
 #define F_CHOICETALKS    0x200 /* uses .talks in the above struct for the talks */
                                /* and cfg_vals for the strings to display */
+                               
+struct table_setting {
+    void (*option_callback)(int);
+    void (*formatter)(char*, size_t, int, const char*);
+    long (*get_talk_id)(int);
+    int unit;
+    int count;
+    const int * values;
+};
+#define F_TABLE_SETTING 0x2000
+#define F_ALLOW_ARBITRARY_VALS 0x4000
 /* these use the _isfunc_type type for the function */
 /* typedef int (*_isfunc_type)(void); */
 #define F_MIN_ISFUNC    0x100000 /* min(above) is function pointer to above type */
@@ -94,8 +105,8 @@ struct choice_setting {
 #define F_THEMESETTING  0x0800000
 #define F_RECSETTING    0x1000000
 
-#define F_NVRAM_BYTES_MASK     0xE000 /*0-4 bytes can be stored */
-#define F_NVRAM_MASK_SHIFT     13
+#define F_NVRAM_BYTES_MASK     0xE0000 /*0-4 bytes can be stored */
+#define F_NVRAM_MASK_SHIFT     17
 #define NVRAM_CONFIG_VERSION 4
 /* Above define should be bumped if
 - a new NVRAM setting is added between 2 other NVRAM settings
@@ -107,7 +118,7 @@ struct choice_setting {
 #define F_NO_WRAP     0x1000 /* used if the list should not wrap */
 
 struct settings_list {
-    uint32_t             flags;   /* ____ ___R TFFF ____ NNN_ PTVC IFRB STTT */
+    uint32_t             flags;   /* ____ ___R TFFF NNN_ _ATW PTVC IFRB STTT */
     void                *setting;
     int                  lang_id; /* -1 for none */
     union storage_type   default_val;
@@ -115,12 +126,13 @@ struct settings_list {
     const char          *cfg_vals; /*comma seperated legal values, or NULL */
                                    /* used with F_T_UCHARPTR this is the folder prefix */
     union {
-        void *RESERVED; /* to stop compile errors, will be removed */
-        struct sound_setting *sound_setting; /* use F_T_SOUND for this */
-        struct bool_setting  *bool_setting; /* F_BOOL_SETTING */
-        struct filename_setting *filename_setting; /* use F_FILENAME */
-        struct int_setting *int_setting; /* use F_INT_SETTING */
-        struct choice_setting *choice_setting; /* F_CHOICE_SETTING */
+        const void *RESERVED; /* to stop compile errors, will be removed */
+        const struct sound_setting *sound_setting; /* use F_T_SOUND for this */
+        const struct bool_setting  *bool_setting; /* F_BOOL_SETTING */
+        const struct filename_setting *filename_setting; /* use F_FILENAME */
+        const struct int_setting *int_setting; /* use F_INT_SETTING */
+        const struct choice_setting *choice_setting; /* F_CHOICE_SETTING */
+        const struct table_setting *table_setting; /* F_TABLE_SETTING */
     };
 };
 

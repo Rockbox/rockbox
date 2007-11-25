@@ -24,7 +24,7 @@
 bool is_backlight_on(void);
 void backlight_on(void);
 void backlight_off(void);
-void backlight_set_timeout(int index);
+void backlight_set_timeout(int value);
 
 #ifdef HAVE_BACKLIGHT
 void backlight_init(void);
@@ -36,8 +36,7 @@ void backlight_set_fade_in(int index);
 void backlight_set_fade_out(int index);
 #endif
 
-void backlight_set_timeout_plugged(int index);
-extern const signed char backlight_timeout_value[];
+void backlight_set_timeout_plugged(int value);
 
 #ifdef HAS_BUTTON_HOLD
 void backlight_hold_changed(bool hold_button);
@@ -56,8 +55,8 @@ extern const signed char lcd_sleep_timeout_value[];
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_on(void);
 void remote_backlight_off(void);
-void remote_backlight_set_timeout(int index);
-void remote_backlight_set_timeout_plugged(int index);
+void remote_backlight_set_timeout(int value);
+void remote_backlight_set_timeout_plugged(int value);
 bool is_remote_backlight_on(void);
 
 #ifdef HAS_REMOTE_BUTTON_HOLD
@@ -82,7 +81,7 @@ void buttonlight_set_brightness(int val);
 #ifdef HAVE_BUTTON_LIGHT
 void buttonlight_on(void);
 void buttonlight_off(void);
-void buttonlight_set_timeout(int index);
+void buttonlight_set_timeout(int value);
 #endif
 
 /* Private API for use in target tree backlight code only */

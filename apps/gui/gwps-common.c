@@ -2009,8 +2009,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     {
         /* turn on backlight n seconds before track ends, and turn it off n
            seconds into the new track. n == backlight_timeout, or 5s */
-        int n = backlight_timeout_value[global_settings.backlight_timeout]
-                * 1000;
+        int n = global_settings.backlight_timeout * 1000;
 
         if ( n < 1000 )
             n = 5000; /* use 5s if backlight is always on or off */
@@ -2027,8 +2026,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
         /* turn on remote backlight n seconds before track ends, and turn it
            off n seconds into the new track. n == remote_backlight_timeout,
            or 5s */
-        int n = backlight_timeout_value[global_settings.remote_backlight_timeout]
-                * 1000;
+        int n = global_settings.remote_backlight_timeout * 1000;
 
         if ( n < 1000 )
             n = 5000; /* use 5s if backlight is always on or off */

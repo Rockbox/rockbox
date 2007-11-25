@@ -57,7 +57,9 @@ static const char *unit_strings[] =
     [UNIT_MB]  = "MB",  [UNIT_KBIT]  = "kb/s",
     [UNIT_PM_TICK] = "units/10ms",
 };
-
+/* these two vars are needed so arbitrary values can be added to the
+   TABLE_SETTING settings if the F_ALLOW_ARBITRARY_VALS flag is set */
+static int table_setting_oldval = 0, table_setting_array_position = 0;
 static char *option_get_valuestring(struct settings_list *setting, 
                              char *buffer, int buf_len,
                              intptr_t temp_var)
@@ -77,16 +79,27 @@ static char *option_get_valuestring(struct settings_list *setting,
                  (char*)temp_var, info->suffix);
     }
 #endif
-    else if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
+    else if (((setting->flags & F_INT_SETTING) == F_INT_SETTING) ||
+             ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING))
     {
-        struct int_setting *info = setting->int_setting;
-        if (info->formatter)
-            info->formatter(buffer, buf_len, (int)temp_var,
-                            unit_strings[info->unit]);
+        const struct int_setting *int_info = setting->int_setting;
+        const struct table_setting *tbl_info = setting->table_setting;
+        const char *unit;
+        void (*formatter)(char*, size_t, int, const char*);
+        if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
+        {
+            formatter = int_info->formatter;
+            unit = unit_strings[int_info->unit];
+        }
         else
-            snprintf(buffer, buf_len, "%d %s", (int)temp_var,
-                     unit_strings[info->unit]?
-                             unit_strings[info->unit]:"");
+        {
+            formatter = tbl_info->formatter;
+            unit = unit_strings[tbl_info->unit];
+        }
+        if (formatter)
+            formatter(buffer, buf_len, (int)temp_var, unit);
+        else
+            snprintf(buffer, buf_len, "%d %s", (int)temp_var, unit?unit:"");
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
@@ -113,7 +126,7 @@ static char *option_get_valuestring(struct settings_list *setting,
         if (setting->flags & F_CHOICETALKS)
         {
             int setting_id;
-            struct choice_setting *info = setting->choice_setting;
+            const struct choice_setting *info = setting->choice_setting;
             if (info->talks[(int)temp_var] < LANG_LAST_INDEX_IN_ARRAY)
             {
                 snprintf(buffer, buf_len, "%s", str(info->talks[(int)temp_var]));
@@ -149,13 +162,27 @@ static int option_talk(int selected_item, void * data)
     {
     }
 #endif
-    else if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
+    else if (((setting->flags & F_INT_SETTING) == F_INT_SETTING) ||
+             ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING))
     {
-        struct int_setting *info = setting->int_setting;
-        if (info->get_talk_id)
-            talk_id(info->get_talk_id(temp_var), false);
-        else 
-            talk_value(temp_var, info->unit, false);
+        const struct int_setting *int_info = setting->int_setting;
+        const struct table_setting *tbl_info = setting->table_setting;
+        int unit;
+        long (*get_talk_id)(int);
+        if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
+        {
+            unit = int_info->unit;
+            get_talk_id = int_info->get_talk_id;
+        }
+        else
+        {
+            unit = tbl_info->unit;
+            get_talk_id = tbl_info->get_talk_id;
+        }
+        if (get_talk_id)
+            talk_id(get_talk_id((int)temp_var), false);
+        else
+            talk_value((int)temp_var, unit, false);
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
@@ -261,6 +288,20 @@ static int selection_to_val(struct settings_list *setting, int selection)
     if (((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING) ||
           ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING))
         return selection;
+    else if ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING)
+    {
+        const struct table_setting *info = setting->table_setting;
+        if (setting->flags&F_ALLOW_ARBITRARY_VALS && 
+            table_setting_array_position != -1    &&
+            (selection >= table_setting_array_position))
+        {
+            if (selection == table_setting_array_position)
+                return table_setting_oldval;
+            return info->values[selection-1];
+        }
+        else
+            return info->values[selection];
+    }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
         int setting_id = setting->sound_setting->setting;
@@ -276,7 +317,7 @@ static int selection_to_val(struct settings_list *setting, int selection)
     }
     else if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
     {
-        struct int_setting *info = setting->int_setting;
+        const struct int_setting *info = setting->int_setting;
 #ifndef ASCENDING_INT_SETTINGS
         min = info->min;
         max = info->max;
@@ -331,7 +372,7 @@ bool option_screen(struct settings_list *setting,
         temp_var = oldvalue = *(bool*)setting->setting?1:0;
     }
     else return false; /* only int/bools can go here */
-    gui_synclist_init(&lists, value_setting_get_name_cb, 
+    gui_synclist_init(&lists, value_setting_get_name_cb,
                       (void*)setting, false, 1);
     if (setting->lang_id == -1)
         title = (char*)setting->cfg_vals;
@@ -352,6 +393,28 @@ bool option_screen(struct settings_list *setting,
             selected = oldvalue;
             function = setting->choice_setting->option_callback;
         }
+        else if (setting->flags&F_TABLE_SETTING)
+        {
+            const struct table_setting *info = setting->table_setting;
+            int i;
+            nb_items = info->count;
+            selected = 0;
+            table_setting_array_position = -1;
+            for (i=0;selected==0 && i<nb_items;i++)
+            {
+                if (setting->flags&F_ALLOW_ARBITRARY_VALS &&
+                    (oldvalue < info->values[i]))
+                {
+                    table_setting_oldval = oldvalue;
+                    table_setting_array_position = i;
+                    selected = i;
+                    nb_items++;
+                }
+                else if (oldvalue == info->values[i])
+                    selected = i;
+            }
+            function = info->option_callback;
+        }
         else if (setting->flags&F_T_SOUND)
         {
             int setting_id = setting->sound_setting->setting;
@@ -368,7 +431,7 @@ bool option_screen(struct settings_list *setting,
         }
         else
         {
-            struct int_setting *info = setting->int_setting;
+            const struct int_setting *info = setting->int_setting;
             int min, max, step;
             max = info->max;
             min = info->min;
@@ -390,7 +453,6 @@ bool option_screen(struct settings_list *setting,
         if (boolfunction)
             function = bool_funcwrapper;
     }
-    
     gui_synclist_set_nb_items(&lists, nb_items);
     gui_synclist_select_item(&lists, selected);
     
