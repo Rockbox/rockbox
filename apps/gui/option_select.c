@@ -168,7 +168,7 @@ static int option_talk(int selected_item, void * data)
         const struct int_setting *int_info = setting->int_setting;
         const struct table_setting *tbl_info = setting->table_setting;
         int unit;
-        long (*get_talk_id)(int);
+        int32_t (*get_talk_id)(int);
         if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
         {
             unit = int_info->unit;

@@ -89,7 +89,7 @@ struct choice_setting {
 struct table_setting {
     void (*option_callback)(int);
     void (*formatter)(char*, size_t, int, const char*);
-    long (*get_talk_id)(int);
+    int32_t (*get_talk_id)(int);
     int unit;
     int count;
     const int * values;
