@@ -706,10 +706,11 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     LOGFQUEUE("buffering >| Q_RESET_HANDLE");
     queue_send(&buffering_queue, Q_RESET_HANDLE, handle_id);
 
-    /* There isn't enough space to rebuffer all of the track from its new
-       offset, so we ask the user to free some */
-    if (buffer_len - BUF_USED < h->filesize - newpos)
+    size_t next = (unsigned)((void *)h->next - (void *)buffer);
+    if (next - h->data < h->filesize - newpos)
     {
+        /* There isn't enough space to rebuffer all of the track from its new
+           offset, so we ask the user to free some */
         DEBUGF("rebuffer_handle: space is needed\n");
         call_buffering_callbacks(EVENT_HANDLE_REBUFFER, handle_id);
     }
