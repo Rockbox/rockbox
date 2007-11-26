@@ -91,8 +91,14 @@ int pcf50605_write(int address, unsigned char val)
 int pcf50605_write_multiple(int address, const unsigned char* buf, int count)
 {
     int i;
+
+    i2c_lock();
+
     for (i = 0; i < count; i++)
         pp_i2c_send(0x8, address + i, buf[i]);
+
+    i2c_unlock();
+
     return 0;
 }
 
