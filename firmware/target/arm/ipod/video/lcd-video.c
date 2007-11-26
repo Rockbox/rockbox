@@ -312,12 +312,12 @@ void lcd_update(void)
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
-/* Line write helper functions for lcd_yuv_blit. Write two lines of yuv420. */
-extern void lcd_write_yuv420_upper(unsigned char const * const src[3],
-                                   unsigned char *chroma_buf, int width);
-extern void lcd_write_yuv420_lower(unsigned const char *y_src,
-                                   unsigned char *chroma_buf, int width);
-
+/* Line write helper function for lcd_yuv_blit. Writes two lines of yuv420. */
+extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
+                                   unsigned bcmaddr,
+                                   int width,
+                                   int stride);
+                  
 /* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
@@ -326,7 +326,6 @@ void lcd_yuv_blit(unsigned char * const src[3],
     unsigned bcmaddr;
     off_t z;
     unsigned char const * yuv_src[3];
-    unsigned char chroma_buf[3*width]; /* dynamic */
 
     /* Sorry, but width and height must be >= 2 or else */
     width &= ~1;
@@ -342,36 +341,15 @@ void lcd_yuv_blit(unsigned char * const src[3],
     bcmaddr = BCM_FB_BASE + (LCD_WIDTH*2) * y + (x << 1);
     height >>= 1;
 
-    if (width == LCD_WIDTH)
+    do
     {
-        bcm_write_addr(bcmaddr);
-        do
-        {
-            lcd_write_yuv420_upper(yuv_src, chroma_buf, width);
-            yuv_src[0] += stride;
-            lcd_write_yuv420_lower(yuv_src[0], chroma_buf, width);
-            yuv_src[0] += stride;
-            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-            yuv_src[2] += stride >> 1;
-        }
-        while (--height > 0);
-    }
-    else
-    {
-        do
-        {
-            bcm_write_addr(bcmaddr);
-            bcmaddr += (LCD_WIDTH*2);
-            lcd_write_yuv420_upper(yuv_src, chroma_buf, width);
-            yuv_src[0] += stride;
-            bcm_write_addr(bcmaddr);
-            bcmaddr += (LCD_WIDTH*2);
-            lcd_write_yuv420_lower(yuv_src[0], chroma_buf, width);
-            yuv_src[0] += stride;
-            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-            yuv_src[2] += stride >> 1;
-        }
-        while (--height > 0);
-    }
+        lcd_write_yuv420_lines(yuv_src, bcmaddr, width, stride);
+        bcmaddr += (LCD_WIDTH*4);  /* Skip up two lines */
+        yuv_src[0] += stride << 1;
+        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+        yuv_src[2] += stride >> 1;
+    } 
+    while (--height > 0);
+    
     lcd_unblock_and_update();
 }
