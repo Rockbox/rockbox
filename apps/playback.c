@@ -1468,10 +1468,26 @@ static void audio_update_trackinfo(void)
     ci.taginfo_ready = &CUR_TI->taginfo_ready;
 }
 
-static void low_buffer_callback(void)
+static void buffering_audio_callback(enum callback_event ev, int value)
 {
-    LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
-    queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+    (void)value;
+    logf("buffering_audio_callback");
+
+    switch (ev)
+    {
+        case EVENT_BUFFER_LOW:
+            LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
+            queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+            break;
+
+        case EVENT_HANDLE_REBUFFER:
+            LOGFQUEUE("audio >| audio Q_AUDIO_FLUSH");
+            queue_send(&audio_queue, Q_AUDIO_FLUSH, 0);
+            break;
+
+        default:
+            break;
+    }
 }
 
 /* Clear tracks between write and read, non inclusive */
@@ -1480,10 +1496,6 @@ static void audio_clear_track_entries(bool clear_unbuffered)
     int cur_idx = track_widx;
 
     logf("Clearing tracks:%d/%d, %d", track_ridx, track_widx, clear_unbuffered);
-
-    /* This function is always called in association with a stop or a rebuffer,
-     * we will reregister the callback at the end of a rebuffer if needed */
-    unregister_buffer_low_callback(low_buffer_callback);
 
     /* Loop over all tracks from write-to-read */
     while (1)
@@ -1919,9 +1931,6 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
         track_changed = true;
 
     audio_generate_postbuffer_events();
-
-    if (!continue_buffering)
-        register_buffer_low_callback(low_buffer_callback);
 }
 
 static void audio_rebuffer(void)
@@ -2179,6 +2188,8 @@ static void audio_stop_playback(void)
     /* Close all tracks */
     audio_release_tracks();
 
+    unregister_buffering_callback(buffering_audio_callback);
+
     memset(&curtrack_id3, 0, sizeof(struct mp3entry));
 }
 
@@ -2221,6 +2232,7 @@ static void audio_play_start(size_t offset)
     set_filebuf_watermark(buffer_margin, 0);
 #endif
     audio_fill_file_buffer(true, offset);
+    register_buffering_callback(buffering_audio_callback);
 
     LOGFQUEUE("audio > audio Q_AUDIO_TRACK_CHANGED");
     queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);

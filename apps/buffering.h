@@ -35,6 +35,14 @@ enum data_type {
     TYPE_UNKNOWN,
 };
 
+enum callback_event {
+    EVENT_DEFAULT,
+    EVENT_BUFFER_LOW,
+    EVENT_HANDLE_REBUFFER,
+    EVENT_HANDLE_CLOSED,
+    EVENT_HANDLE_MOVED,
+};
+
 /* Error return values */
 #define ERR_HANDLE_NOT_FOUND    -1
 #define ERR_BUFFER_FULL         -2
@@ -98,7 +106,7 @@ size_t buf_used(void);
  * CALLBACK UTILITIES
  * ==================
  *
- * register_buffer_low_callback, unregister_buffer_low_callback:
+ * register_buffering_callback, unregister_buffering_callback:
  *
  * Register/Unregister callback functions that will get executed when the buffer
  * goes below the low watermark. They are executed once, then forgotten.
@@ -108,9 +116,9 @@ size_t buf_used(void);
  ****************************************************************************/
 
 #define MAX_BUF_CALLBACKS 4
-typedef void (*buffer_low_callback)(void);
-bool register_buffer_low_callback(buffer_low_callback func);
-void unregister_buffer_low_callback(buffer_low_callback func);
+typedef void (*buffering_callback)(enum callback_event ev, int value);
+bool register_buffering_callback(buffering_callback func);
+void unregister_buffering_callback(buffering_callback func);
 
 /* Settings */
 enum {

@@ -153,7 +153,7 @@ static struct mutex llist_mutex;
    This is global so that move_handle and rm_handle can invalidate it. */
 static struct memory_handle *cached_handle = NULL;
 
-static buffer_low_callback buffer_low_callback_funcs[MAX_BUF_CALLBACKS];
+static buffering_callback buffering_callback_funcs[MAX_BUF_CALLBACKS];
 static int buffer_callback_count = 0;
 
 static struct {
@@ -186,6 +186,9 @@ static const char buffering_thread_name[] = "buffering";
 static struct thread_entry *buffering_thread_p;
 static struct event_queue buffering_queue;
 static struct queue_sender_list buffering_queue_sender_list;
+
+
+static void call_buffering_callbacks(enum callback_event ev, int value);
 
 
 /*
@@ -330,6 +333,7 @@ static bool rm_handle(const struct memory_handle *h)
         }
     } else {
         struct memory_handle *m = first_handle;
+        /* Find the previous handle */
         while (m && m->next != h) {
             m = m->next;
         }
@@ -686,6 +690,8 @@ static void rebuffer_handle(int handle_id, size_t newpos)
     if (!h)
         return;
 
+    /* When seeking foward off of the buffer, if it is a short seek don't
+       rebuffer the whole track, just read enough to satisfy */
     if (newpos > h->offset && newpos - h->offset < BUFFERING_DEFAULT_FILECHUNK)
     {
         LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");
@@ -693,12 +699,22 @@ static void rebuffer_handle(int handle_id, size_t newpos)
         h->ridx = h->data + newpos;
         return;
     }
-        
+
     h->offset = newpos;
 
+    /* Reset the handle to its new offset */
     LOGFQUEUE("buffering >| Q_RESET_HANDLE");
     queue_send(&buffering_queue, Q_RESET_HANDLE, handle_id);
 
+    /* There isn't enough space to rebuffer all of the track from its new
+       offset, so we ask the user to free some */
+    if (buffer_len - BUF_USED < h->filesize - newpos)
+    {
+        DEBUGF("rebuffer_handle: space is needed\n");
+        call_buffering_callbacks(EVENT_HANDLE_REBUFFER, handle_id);
+    }
+
+    /* Now we ask for a rebuffer */
     LOGFQUEUE("buffering >| Q_BUFFER_HANDLE");
     queue_send(&buffering_queue, Q_BUFFER_HANDLE, handle_id);
 
@@ -737,7 +753,7 @@ static void shrink_handle(struct memory_handle *h)
              h->type == TYPE_ATOMIC_AUDIO))
     {
         /* metadata handle: we can move all of it */
-        size_t handle_distance = 
+        size_t handle_distance =
             RINGBUF_SUB((unsigned)((void *)h->next - (void*)buffer), h->data);
         delta = handle_distance - h->available;
 
@@ -1130,8 +1146,8 @@ buf_handle_offset
 buf_request_buffer_handle
 buf_set_base_handle
 buf_used
-register_buffer_low_callback
-unregister_buffer_low_callback
+register_buffering_callback
+unregister_buffering_callback
 
 These functions are exported, to allow interaction with the buffer.
 They take care of the content of the structs, and rely on the linked list
@@ -1180,50 +1196,48 @@ void buf_set_watermark(size_t bytes)
     queue_post(&buffering_queue, Q_SET_WATERMARK, bytes);
 }
 
-bool register_buffer_low_callback(buffer_low_callback func)
+bool register_buffering_callback(buffering_callback func)
 {
     int i;
     if (buffer_callback_count >= MAX_BUF_CALLBACKS)
         return false;
     for (i = 0; i < MAX_BUF_CALLBACKS; i++)
     {
-        if (buffer_low_callback_funcs[i] == NULL)
+        if (buffering_callback_funcs[i] == NULL)
         {
-            buffer_low_callback_funcs[i] = func;
+            buffering_callback_funcs[i] = func;
             buffer_callback_count++;
             return true;
         }
-        else if (buffer_low_callback_funcs[i] == func)
+        else if (buffering_callback_funcs[i] == func)
             return true;
     }
     return false;
 }
 
-void unregister_buffer_low_callback(buffer_low_callback func)
+void unregister_buffering_callback(buffering_callback func)
 {
     int i;
     for (i = 0; i < MAX_BUF_CALLBACKS; i++)
     {
-        if (buffer_low_callback_funcs[i] == func)
+        if (buffering_callback_funcs[i] == func)
         {
-            buffer_low_callback_funcs[i] = NULL;
+            buffering_callback_funcs[i] = NULL;
             buffer_callback_count--;
         }
     }
     return;
 }
 
-static void call_buffer_low_callbacks(void)
+static void call_buffering_callbacks(enum callback_event ev, int value)
 {
-    logf("call_buffer_low_callbacks()");
+    logf("call_buffering_callbacks()");
     int i;
     for (i = 0; i < MAX_BUF_CALLBACKS; i++)
     {
-        if (buffer_low_callback_funcs[i])
+        if (buffering_callback_funcs[i])
         {
-            buffer_low_callback_funcs[i]();
-            buffer_low_callback_funcs[i] = NULL;
-            buffer_callback_count--;
+            buffering_callback_funcs[i](ev, value);
         }
     }
 }
@@ -1259,7 +1273,7 @@ void buffering_thread(void)
                 LOGFQUEUE("buffering < Q_START_FILL");
                 /* Call buffer callbacks here because this is one of two ways
                  * to begin a full buffer fill */
-                call_buffer_low_callbacks();
+                call_buffering_callbacks(EVENT_BUFFER_LOW, 0);
                 shrink_buffer();
                 queue_reply(&buffering_queue, 1);
                 filling |= buffer_handle((int)ev.data);
@@ -1315,7 +1329,7 @@ void buffering_thread(void)
 
         /* If the buffer is low, call the callbacks to get new data */
         if (num_handles > 0 && data_counters.useful <= conf_watermark)
-            call_buffer_low_callbacks();
+            call_buffering_callbacks(EVENT_BUFFER_LOW, 0);
 
 #if 0
         /* TODO: This needs to be fixed to use the idle callback, disable it
@@ -1325,7 +1339,7 @@ void buffering_thread(void)
         else if (ata_disk_is_active() && queue_empty(&buffering_queue))
         {
             if (num_handles > 0 && data_counters.useful <= high_watermark)
-                call_buffer_low_callbacks();
+                call_buffering_callbacks(EVENT_BUFFER_LOW, 0);
 
             if (data_counters.remaining > 0 && BUF_USED <= high_watermark)
             {
@@ -1390,7 +1404,7 @@ bool buffering_reset(char *buf, size_t buflen)
     base_handle_id = -1;
 
     buffer_callback_count = 0;
-    memset(buffer_low_callback_funcs, 0, sizeof(buffer_low_callback_funcs));
+    memset(buffering_callback_funcs, 0, sizeof(buffering_callback_funcs));
 
     /* Set the high watermark as 75% full...or 25% empty :) */
 #if MEM > 8
