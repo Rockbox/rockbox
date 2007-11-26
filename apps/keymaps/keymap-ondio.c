@@ -136,9 +136,9 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,             BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },  
     { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
-    { ACTION_SETTINGS_INC,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,          BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */

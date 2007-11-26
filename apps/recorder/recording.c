@@ -1145,6 +1145,7 @@ bool recording_screen(bool no_source)
                 break;
        
             case ACTION_SETTINGS_INC:
+            case ACTION_SETTINGS_INCREPEAT:
                 switch(cursor)
                 {
                     case 0:
@@ -1211,6 +1212,7 @@ bool recording_screen(bool no_source)
                 break;
                 
             case ACTION_SETTINGS_DEC:
+            case ACTION_SETTINGS_DECREPEAT:
                 switch(cursor)
                 {
                     case 0:

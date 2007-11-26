@@ -236,9 +236,9 @@ static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,             BUTTON_ON,                  BUTTON_NONE },
     { ACTION_REC_NEWFILE,           BUTTON_REC,                 BUTTON_NONE },
     { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
-    { ACTION_SETTINGS_INC,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,          BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
@@ -600,9 +600,9 @@ static const struct button_mapping button_context_recscreen_h100remote[]  = {
     { ACTION_REC_PAUSE,           BUTTON_RC_ON,                       BUTTON_NONE },
     { ACTION_REC_NEWFILE,         BUTTON_RC_REC,                      BUTTON_NONE },
     { ACTION_SETTINGS_INC,        BUTTON_RC_BITRATE,                  BUTTON_NONE },
-    { ACTION_SETTINGS_INC,  BUTTON_RC_BITRATE|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,  BUTTON_RC_BITRATE|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DEC,        BUTTON_RC_SOURCE,                   BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,  BUTTON_RC_SOURCE|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,  BUTTON_RC_SOURCE|BUTTON_REPEAT,     BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen_h100remote */
