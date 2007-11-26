@@ -8859,87 +8859,87 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Equalizzatore Hardware"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Equalizzatore Hardware"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_ENABLED
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Abilita EQ Hardware"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Abilita equalizzatore hardware"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Larghezza di banda"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Larghezza di banda"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Stretta"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Stretta"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Ampia"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Ampia"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -11431,5 +11431,39 @@
   </dest>
   <voice>
     *: "Pronuncia tipo elemento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Taglio Bassi"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Taglio Bassi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Taglio Alti"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Taglio Alti"
   </voice>
 </phrase>
