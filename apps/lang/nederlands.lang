@@ -11437,8 +11437,6 @@
     *: "Zeg Batterijniveau"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_BASS_CUTOFF
   desc: Bass setting cut-off frequency
@@ -11449,15 +11447,13 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo: "Bass Afsnijfrequentie"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bass Cutoff"
+    ipodvideo: "Bass Afsnijfrequentie"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_TREBLE_CUTOFF
   desc: Treble setting cut-off frequency
@@ -11468,10 +11464,10 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo: "Treble Afsnijfrequentie"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Treble Cutoff"
+    ipodvideo: "Treble Afsnijfrequentie"
   </voice>
 </phrase>
