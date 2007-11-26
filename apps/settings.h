@@ -240,7 +240,7 @@ bool set_int_ex(const unsigned char* string, const char* unit, int voice_unit,
              int* variable,
              void (*function)(int), int step, int min, int max, 
              void (*formatter)(char*, size_t, int, const char*),
-             int32_t (*get_talk_id)(int));
+             int32_t (*get_talk_id)(int, int));
 
 /* the following are either not in setting.c or shouldnt be */
 bool set_time_screen(const char* string, struct tm *tm);

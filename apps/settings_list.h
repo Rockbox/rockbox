@@ -70,7 +70,7 @@ struct int_setting {
     int max;
     int step;
     void (*formatter)(char*, size_t, int, const char*);
-    int32_t (*get_talk_id)(int);
+    int32_t (*get_talk_id)(int, int);
 };
 #define F_INT_SETTING 0x80
 
@@ -89,7 +89,7 @@ struct choice_setting {
 struct table_setting {
     void (*option_callback)(int);
     void (*formatter)(char*, size_t, int, const char*);
-    int32_t (*get_talk_id)(int);
+    int32_t (*get_talk_id)(int, int);
     int unit;
     int count;
     const int * values;

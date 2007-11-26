@@ -192,52 +192,48 @@ static const char trig_durations_conf [] =
 # endif
 #endif
 
-static int32_t rectime_getlang(int value)
+#endif /* HAVE_RECORDING */
+
+static void formatter_unit_0_is_off(char *buffer, size_t buffer_size, 
+                                    int val, const char *unit)
 {
-    if (value == 0)
-        return LANG_OFF;
-    return TALK_ID(value, UNIT_SEC);
-}
-static void rectime_formatter(char *buffer, size_t buffer_size, 
-        int val, const char *unit)
-{
-    (void)unit;
     if (val == 0)
         strcpy(buffer, str(LANG_OFF));
     else
-        snprintf(buffer, buffer_size, "%d s", val);
+        snprintf(buffer, buffer_size, "%d %s", val, unit);
 }
 
-#endif /* HAVE_RECORDING */
+static int32_t getlang_unit_0_is_off(int value, int unit)
+{
+    if (value == 0)
+        return LANG_OFF;
+    else
+        return TALK_ID(value,unit);
+}
 
 #ifdef HAVE_BACKLIGHT
 static void backlight_formatter(char *buffer, size_t buffer_size,
         int val, const char *unit)
 {
-    (void)unit;
     if (val == -1)
         strcpy(buffer, str(LANG_OFF));
     else if (val == 0)
         strcpy(buffer, str(LANG_ON));
     else
-        snprintf(buffer, buffer_size, "%d s", val);
+        snprintf(buffer, buffer_size, "%d %s", val, unit);
 }
-static int32_t backlight_getlang(int value)
+static int32_t backlight_getlang(int value, int unit)
 {
     if (value == -1)
         return LANG_OFF;
     else if (value == 0)
         return LANG_ON;
-    return TALK_ID(value, UNIT_SEC);
+    else
+        return TALK_ID(value, unit);
 }
 #endif
-static int32_t scanaccel_getlang(int value)
-{
-    if (value == 0)
-        return LANG_OFF;
-    return TALK_ID(value, UNIT_SEC);
-}
-static void scanaccel_formatter(char *buffer, size_t buffer_size, 
+
+static void scanaccel_formatter(char *buffer, size_t buffer_size,
         int val, const char *unit)
 {
     (void)unit;
@@ -246,40 +242,6 @@ static void scanaccel_formatter(char *buffer, size_t buffer_size,
     else
         snprintf(buffer, buffer_size, "2x/%ds", val);
 }
-
-static int32_t poweroff_idle_timer_getlang(int value)
-{
-    if (value == 0)
-        return LANG_OFF;
-    return TALK_ID(value, UNIT_MIN);
-}
-static void poweroff_idle_timer_formatter(char *buffer, size_t buffer_size, 
-        int val, const char *unit)
-{
-    (void)unit;
-    if (val == 0)
-        strcpy(buffer, str(LANG_OFF));
-    else
-        snprintf(buffer, buffer_size, "%dm", val);
-}
-
-#ifndef HAVE_SCROLLWHEEL
-static int32_t listaccel_getlang(int value)
-{
-    if (value == 0)
-        return LANG_OFF;
-    return TALK_ID((HZ/2)*value, UNIT_MS);
-}
-static void listaccel_formatter(char *buffer, size_t buffer_size, 
-        int val, const char *unit)
-{
-    (void)unit;
-    if (val == 0)
-        strcpy(buffer, str(LANG_OFF));
-    else
-        snprintf(buffer, buffer_size, "%d ms", 5*HZ*val);
-}
-#endif /* HAVE_SCROLLWHEEL */
 
 #if CONFIG_CODEC == SWCODEC
 static void crossfeed_format(char* buffer, size_t buffer_size, int value,
@@ -469,8 +431,8 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,show_icons, LANG_SHOW_ICONS ,true,"show icons", NULL),
     /* system */
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, poweroff, LANG_POWEROFF_IDLE, 10,
-                  "idle poweroff", "off", UNIT_MIN, poweroff_idle_timer_formatter,
-                  poweroff_idle_timer_getlang, set_poweroff_timeout, 15,
+                  "idle poweroff", "off", UNIT_MIN, formatter_unit_0_is_off,
+                  getlang_unit_0_is_off, set_poweroff_timeout, 15,
                   0,1,2,3,4,5,6,7,8,9,10,15,30,45,60),
     SYSTEM_SETTING(NVRAM(4),runtime,0),
     SYSTEM_SETTING(NVRAM(4),topruntime,0),
@@ -566,15 +528,15 @@ const struct settings_list settings[] = {
 #endif
 #if defined(HAVE_BACKLIGHT_PWM_FADING)  && !defined(SIMULATOR)
     /* backlight fading */
-    STRINGCHOICE_SETTING(0,backlight_fade_in, LANG_BACKLIGHT_FADE_IN, 1,
-        "backlight fade in","off,500ms,1s,2s", backlight_set_fade_in, 4,
-        LANG_OFF, TALK_ID(500, UNIT_MS),
-        TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC)),
-    STRINGCHOICE_SETTING(0,backlight_fade_out, LANG_BACKLIGHT_FADE_OUT, 1,
-        "backlight fade out","off,500ms,1s,2s,3s,5s,10s", backlight_set_fade_out, 7,
-        LANG_OFF, TALK_ID(500, UNIT_MS), 
-        TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC), 
-        TALK_ID(3, UNIT_SEC), TALK_ID(5, UNIT_SEC), TALK_ID(10, UNIT_SEC)),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_fade_in,
+                  LANG_BACKLIGHT_FADE_IN, 300, "backlight fade in", "off",
+                  UNIT_MS, formatter_unit_0_is_off, getlang_unit_0_is_off,
+                  backlight_set_fade_in, 7,  0,100,200,300,500,1000,2000),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_fade_out,
+                  LANG_BACKLIGHT_FADE_OUT, 2000, "backlight fade out", "off",
+                  UNIT_MS, formatter_unit_0_is_off, getlang_unit_0_is_off,
+                  backlight_set_fade_out, 10,
+                  0,100,200,300,500,1000,2000,3000,5000,10000),
 #endif
     INT_SETTING(F_PADTITLE, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",                      
                 UNIT_INT, 0, 15, 1, NULL, NULL, lcd_scroll_speed),
@@ -630,7 +592,7 @@ const struct settings_list settings[] = {
                   LANG_FFRW_STEP, 1, "scan min step", NULL, UNIT_SEC,
                   NULL, NULL, NULL, 14,  1,2,3,4,5,6,8,10,15,20,25,30,45,60),
     INT_SETTING(0, ff_rewind_accel, LANG_FFRW_ACCEL, 3, "scan accel",
-        UNIT_SEC, 16, 0, -1, scanaccel_formatter, scanaccel_getlang, NULL), 
+        UNIT_SEC, 16, 0, -1, scanaccel_formatter, getlang_unit_0_is_off, NULL), 
 #if (CONFIG_CODEC == SWCODEC) && !defined(HAVE_FLASH_STORAGE)
     STRINGCHOICE_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0,"antiskip",
         "5s,15s,30s,1min,2min,3min,5min,10min",NULL, 8,
@@ -799,8 +761,8 @@ const struct settings_list settings[] = {
          HAVE_FMRADIO_REC_(",fmradio")[1]
         ,UNUSED},
     INT_SETTING(F_RECSETTING, rec_prerecord_time, LANG_RECORD_PRERECORD_TIME,
-            0, "prerecording time",
-            UNIT_SEC, 0, 30, 1, rectime_formatter, rectime_getlang, NULL),
+            0, "prerecording time", UNIT_SEC, 0, 30, 1,
+            formatter_unit_0_is_off, getlang_unit_0_is_off, NULL),
         
     FILENAME_SETTING(F_RECSETTING, rec_directory, "rec path", 
                      REC_BASE_DIR, NULL, NULL, MAX_FILENAME+1),
@@ -1203,10 +1165,10 @@ const struct settings_list settings[] = {
 #ifndef HAVE_SCROLLWHEEL
     INT_SETTING(0, list_accel_start_delay, LANG_LISTACCEL_START_DELAY,
                 2, "list_accel_start_delay", UNIT_MS, 0, 10, 1,
-                listaccel_formatter, listaccel_getlang, NULL),
+                formatter_unit_0_is_off, getlang_unit_0_is_off, NULL),
     INT_SETTING(0, list_accel_wait, LANG_LISTACCEL_ACCEL_SPEED,
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1, 
-                scanaccel_formatter, scanaccel_getlang, NULL),
+                scanaccel_formatter, getlang_unit_0_is_off, NULL),
 #endif /* HAVE_SCROLLWHEEL */
 };
 

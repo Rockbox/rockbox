@@ -49,7 +49,7 @@ static const char *unit_strings[] =
 {   
     [UNIT_INT] = "",    [UNIT_MS]  = "ms",
     [UNIT_SEC] = "s",   [UNIT_MIN] = "min", 
-    [UNIT_HOUR]= "hr",  [UNIT_KHZ] = "KHz", 
+    [UNIT_HOUR]= "hr",  [UNIT_KHZ] = "kHz",
     [UNIT_DB]  = "dB",  [UNIT_PERCENT] = "%",
     [UNIT_MAH] = "mAh", [UNIT_PIXEL] = "px",
     [UNIT_PER_SEC] = "per sec",
@@ -168,7 +168,7 @@ static int option_talk(int selected_item, void * data)
         const struct int_setting *int_info = setting->int_setting;
         const struct table_setting *tbl_info = setting->table_setting;
         int unit;
-        int32_t (*get_talk_id)(int);
+        int32_t (*get_talk_id)(int, int);
         if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
         {
             unit = int_info->unit;
@@ -180,7 +180,7 @@ static int option_talk(int selected_item, void * data)
             get_talk_id = tbl_info->get_talk_id;
         }
         if (get_talk_id)
-            talk_id(get_talk_id((int)temp_var), false);
+            talk_id(get_talk_id((int)temp_var, unit), false);
         else
             talk_value((int)temp_var, unit, false);
     }
@@ -541,8 +541,9 @@ void set_option_formatter(char* buf, size_t size, int item, const char* unit)
     const unsigned char *text = set_option_options[item].string;
     snprintf(buf, size, "%s", P2STR(text));
 }
-int32_t set_option_get_talk_id(int value)
+int32_t set_option_get_talk_id(int value, int unit)
 {
+    (void)unit;
     return set_option_options[value].voice_id;
 }
 bool set_option(const char* string, void* variable, enum optiontype type,
@@ -582,7 +583,7 @@ bool set_int_ex(const unsigned char* string,
                 int min,
                 int max,
                 void (*formatter)(char*, size_t, int, const char*),
-                int32_t (*get_talk_id)(int))
+                int32_t (*get_talk_id)(int, int))
 {
     (void)unit;
     struct settings_list item;

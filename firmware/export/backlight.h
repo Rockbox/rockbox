@@ -32,8 +32,8 @@ void backlight_init(void);
 int  backlight_get_current_timeout(void);
 
 #ifdef HAVE_BACKLIGHT_PWM_FADING
-void backlight_set_fade_in(int index);
-void backlight_set_fade_out(int index);
+void backlight_set_fade_in(int value);
+void backlight_set_fade_out(int value);
 #endif
 
 void backlight_set_timeout_plugged(int value);

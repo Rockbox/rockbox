@@ -185,37 +185,35 @@ int _lcd_sleep_timeout = 10*HZ;
 
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
 /* backlight fading */
-#define BL_PWM_INTERVAL 5000  /* Cycle interval in us */
-#define BL_PWM_COUNT    100
-static const char backlight_fade_value[8] = { 0, 1, 2, 4, 6, 8, 10, 20 };
-static int fade_in_count = 1;
-static int fade_out_count = 4;
+#define BL_PWM_INTERVAL 5  /* Cycle interval in ms */
+#define BL_PWM_BITS     8
+#define BL_PWM_COUNT    (1<<BL_PWM_BITS)
 
-static bool bl_timer_active = false;
-static int bl_dim_current = 0;
+/* s15.16 fixed point variables */
+static int32_t bl_fade_in_step  = ((BL_PWM_INTERVAL*BL_PWM_COUNT)<<16)/300;
+static int32_t bl_fade_out_step = ((BL_PWM_INTERVAL*BL_PWM_COUNT)<<16)/2000;
+static int32_t bl_dim_fraction  = 0;     
+
 static int bl_dim_target  = 0;
-static int bl_pwm_counter = 0;
-static volatile int bl_cycle_counter = 0;
+static int bl_dim_current = 0;
 static enum {DIM_STATE_START, DIM_STATE_MAIN} bl_dim_state = DIM_STATE_START;
+static bool bl_timer_active = false;
 
 static void backlight_isr(void)
 {
-    int timer_period;
+    int timer_period = (TIMER_FREQ*BL_PWM_INTERVAL/1000);
     bool idle = false;
 
-    timer_period = TIMER_FREQ / 1000 * BL_PWM_INTERVAL / 1000;
     switch (bl_dim_state)
     {
       /* New cycle */
       case DIM_STATE_START:
-        bl_pwm_counter = 0;
-        bl_cycle_counter++;
+        bl_dim_current = bl_dim_fraction >> 16;
 
         if (bl_dim_current > 0 && bl_dim_current < BL_PWM_COUNT)
         {
             _backlight_on_isr();
-            bl_pwm_counter = bl_dim_current;
-            timer_period = timer_period * bl_pwm_counter / BL_PWM_COUNT;
+            timer_period = (timer_period * bl_dim_current) >> BL_PWM_BITS;
             bl_dim_state = DIM_STATE_MAIN;
         }
         else
@@ -227,29 +225,25 @@ static void backlight_isr(void)
             if (bl_dim_current == bl_dim_target)
                 idle = true;
         }
-
-        break ;
+        if (bl_dim_current < bl_dim_target)
+        {
+            bl_dim_fraction = MIN(bl_dim_fraction + bl_fade_in_step,
+                                  (BL_PWM_COUNT<<16));
+        }
+        else if (bl_dim_current > bl_dim_target)
+        {
+            bl_dim_fraction = MAX(bl_dim_fraction - bl_fade_out_step, 0);
+        }
+        break;
 
       /* Dim main screen */
       case DIM_STATE_MAIN:
         _backlight_off_isr();
+        timer_period = (timer_period * (BL_PWM_COUNT - bl_dim_current))
+                     >> BL_PWM_BITS;
         bl_dim_state = DIM_STATE_START;
-        timer_period = timer_period * (BL_PWM_COUNT - bl_pwm_counter) / BL_PWM_COUNT;
         break ;
     }
-
-    if ((bl_dim_target > bl_dim_current) && (bl_cycle_counter >= fade_in_count))
-    {
-        bl_dim_current++;
-        bl_cycle_counter = 0;
-    }
-
-    if ((bl_dim_target < bl_dim_current) && (bl_cycle_counter >= fade_out_count))
-    {
-        bl_dim_current--;
-        bl_cycle_counter = 0;
-    }
-
     if (idle)
     {
 #if defined(_BACKLIGHT_FADE_BOOST) || defined(_BACKLIGHT_FADE_ENABLE)
@@ -267,12 +261,12 @@ static void backlight_switch(void)
     if (bl_dim_target > (BL_PWM_COUNT/2))
     {
         _backlight_on_normal();
-        bl_dim_current = BL_PWM_COUNT;
+        bl_dim_fraction = (BL_PWM_COUNT<<16);
     }
     else
     {
         _backlight_off_normal();
-        bl_dim_current = 0;
+        bl_dim_fraction = 0;
     }
 }
 
@@ -311,7 +305,7 @@ static void backlight_dim(int value)
 
 static void _backlight_on(void)
 {
-    if (fade_in_count > 0)
+    if (bl_fade_in_step > 0)
     {
 #ifdef _BACKLIGHT_FADE_ENABLE
         _backlight_hw_enable(true);
@@ -320,7 +314,8 @@ static void _backlight_on(void)
     }
     else
     {
-        bl_dim_target = bl_dim_current = BL_PWM_COUNT;
+        bl_dim_target = BL_PWM_COUNT;
+        bl_dim_fraction = (BL_PWM_COUNT<<16);
         _backlight_on_normal();
     }
 #ifdef HAVE_LCD_SLEEP
@@ -330,13 +325,13 @@ static void _backlight_on(void)
 
 static void _backlight_off(void)
 {
-    if (fade_out_count > 0)
+    if (bl_fade_out_step > 0)
     {
         backlight_dim(0);
     }
     else
     {
-        bl_dim_target = bl_dim_current = 0;
+        bl_dim_target = bl_dim_fraction = 0;
         _backlight_off_normal();
     }
 #ifdef HAVE_LCD_SLEEP
@@ -351,14 +346,20 @@ static void _backlight_off(void)
 #endif
 }
 
-void backlight_set_fade_in(int index)
+void backlight_set_fade_in(int value)
 {
-    fade_in_count = backlight_fade_value[index];
+    if (value > 0)
+        bl_fade_in_step = ((BL_PWM_INTERVAL*BL_PWM_COUNT)<<16) / value;
+    else
+        bl_fade_in_step = 0;
 }
 
-void backlight_set_fade_out(int index)
+void backlight_set_fade_out(int value)
 {
-    fade_out_count = backlight_fade_value[index];
+    if (value > 0)
+        bl_fade_out_step = ((BL_PWM_INTERVAL*BL_PWM_COUNT)<<16) / value;
+    else
+        bl_fade_out_step = 0;
 }
 #endif /* defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR) */
 
@@ -588,8 +589,8 @@ void backlight_init(void)
     {
 # ifdef HAVE_BACKLIGHT_PWM_FADING
         /* If backlight is already on, don't fade in. */
-        bl_dim_current = BL_PWM_COUNT;
         bl_dim_target = BL_PWM_COUNT;
+        bl_dim_fraction = (BL_PWM_COUNT<<16);
 # endif
     }
 #endif
