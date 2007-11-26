@@ -302,7 +302,7 @@ static void jumpscroll_format(char* buffer, size_t buffer_size, int value,
             break;
     }
 }
-static int32_t jumpscroll_getlang(int value)
+static int32_t jumpscroll_getlang(int value, int unit)
 {
     switch (value)
     {
@@ -313,7 +313,7 @@ static int32_t jumpscroll_getlang(int value)
         case 2:
         case 3:
         case 4:
-            return TALK_ID(2, UNIT_INT);
+            return TALK_ID(value, unit);
         case 5:
             return LANG_ALWAYS;
     }
