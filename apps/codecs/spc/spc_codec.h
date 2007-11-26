@@ -80,6 +80,8 @@
 #endif
 
 #ifdef CPU_ARM
+
+#if CONFIG_CPU != PP5002
     #undef  ICODE_ATTR
     #define ICODE_ATTR
 
@@ -91,6 +93,7 @@
 
     #undef  IBSS_ATTR
     #define IBSS_ATTR
+#endif
 
 #if SPC_DUAL_CORE
     #undef NOCACHEBSS_ATTR
