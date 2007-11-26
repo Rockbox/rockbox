@@ -8864,87 +8864,87 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_ENABLED
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Zet Hardware EQ aan"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Zet Hardware EQ aan"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Bandbreedte"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bandbreedte"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Smal"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Smal"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Wijd"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Wijd"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -11435,5 +11435,43 @@
   </dest>
   <voice>
     *: "Zeg Batterijniveau"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Treble Cutoff"
   </voice>
 </phrase>
