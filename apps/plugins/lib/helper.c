@@ -28,11 +28,11 @@ void backlight_force_on(struct plugin_api* rb)
 {
     if(!rb) return;
 /* #ifdef HAVE_BACKLIGHT */
-    if (rb->global_settings->backlight_timeout > 1)
-        rb->backlight_set_timeout(1);
+    if (rb->global_settings->backlight_timeout > 0)
+        rb->backlight_set_timeout(0);
 #if CONFIG_CHARGING
-    if (rb->global_settings->backlight_timeout_plugged > 1)
-        rb->backlight_set_timeout_plugged(1);
+    if (rb->global_settings->backlight_timeout_plugged > 0)
+        rb->backlight_set_timeout_plugged(0);
 #endif /* CONFIG_CHARGING */
 /* #endif */ /* HAVE_BACKLIGHT */
 }    
