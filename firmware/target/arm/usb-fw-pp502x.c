@@ -57,7 +57,6 @@ void usb_init_device(void)
 void usb_enable(bool on)
 {
     if (on) {
-#ifndef SANSA_E200
         /* until we have native mass-storage mode, we want to reboot on
            usb host connect */
 #if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
@@ -79,7 +78,6 @@ void usb_enable(bool on)
 
             system_reboot(); /* Reboot */
         }
-#endif /* SANSA_E200 */
     }
     else
         usb_core_exit();

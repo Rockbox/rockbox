@@ -332,7 +332,7 @@ void system_init(void)
 void system_reboot(void)
 {
     /* Reboot */
-#ifdef SANSA_C200
+#if defined(SANSA_E200) || defined(SANSA_C200)
     CACHE_CTL &= ~CACHE_CTL_VECT_REMAP;
 
     pp_i2c_send(AS3514_I2C_ADDR, DCDC15, 0x0); /* backlight off */
