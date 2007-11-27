@@ -74,6 +74,16 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
     [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
 #endif
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    [SOUND_LOUDNESS]      = {"dB", 0,  1,   0,  17,   0},
+    [SOUND_AVC]           = {"",   0,  1,  -1,   4,   0},
+    [SOUND_MDB_STRENGTH]  = {"dB", 0,  1,   0, 127,  48},
+    [SOUND_MDB_HARMONICS] = {"%",  0,  1,   0, 100,  50},
+    [SOUND_MDB_CENTER]    = {"Hz", 0, 10,  20, 300,  60},
+    [SOUND_MDB_SHAPE]     = {"Hz", 0, 10,  50, 300,  90},
+    [SOUND_MDB_ENABLE]    = {"",   0,  1,   0,   1,   0},
+    [SOUND_SUPERBASS]     = {"",   0,  1,   0,   1,   0},
+#endif
 };
 #endif
 
