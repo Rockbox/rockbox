@@ -27,6 +27,12 @@
 #include <unistd.h>
 #include <inttypes.h>
 
+/* New entry point for nk.bin - where our dualboot code is inserted */
+#define NK_ENTRY_POINT 0x88200000
+
+/* Entry point (and load address) for the main Rockbox bootloader */
+#define BL_ENTRY_POINT 0x8a000000
+
 /*
 
 Description of nk.bin from 
@@ -65,10 +71,29 @@ mknkboot.c appends two images:
 #define O_BINARY 0
 #endif
 
-
 #define DISABLE_ADDR    0x88065A10 /* in EBoot */
 #define DISABLE_INSN    0xe3a00001
 #define DISABLE_SUM     (0xe3+0xa0+0x00+0x01)  
+
+/* Code to dual-boot - this is inserted at NK_ENTRY_POINT */
+static uint32_t dualboot[] = 
+{
+    0xe59f900c,      /* ldr     r9, [pc, #12] -> 0x53fa4000 */
+    0xe5999000,      /* ldr     r9, [r9] */
+    0xe3190010,      /* tst     r9, #16 ; 0x10 */
+#if 1
+    /* Branch to Rockbox if hold is on */
+    0x159ff004,      /* ldrne   pc, [pc, #4]  -> 0x89000000 */
+#else
+    /* Branch to Rockbox if hold is off */
+    0x059ff004,      /* ldreq   pc, [pc, #4]  -> 0x89000000 */
+#endif
+    /* Branch to original firmware */
+    0xea0003fa,      /* b 0x1000 */
+
+    0x53fa4000,      /* GPIO3_DR */
+    BL_ENTRY_POINT   /* RB bootloader load address/entry point */
+};
 
 static void put_uint32le(uint32_t x, unsigned char* p)
 {
@@ -105,6 +130,7 @@ int main(int argc, char *argv[])
     int inlength,bootlength,newlength;
     unsigned char* buf;
     unsigned char* boot;
+    unsigned char* boot2;
     unsigned char* disable;
     uint32_t sum;
     
@@ -133,9 +159,9 @@ int main(int argc, char *argv[])
     bootlength = filesize(fdboot);
 
     /* Create buffer for original nk.bin, plus our bootloader (with 12
-       byte header), plus the 16-byte "disable record" */
+       byte header), plus the 16-byte "disable record", plus our dual-boot code */
 
-    newlength = inlength + (bootlength + 12) + 16;
+    newlength = inlength + (bootlength + 12) + 16 + (12 + 28);
     buf = malloc(newlength);
 
     if (buf==NULL)
@@ -156,6 +182,8 @@ int main(int argc, char *argv[])
     /****** STEP 2 - Move EOF record to the new EOF */
     memcpy(buf + newlength - 12, buf + inlength - 12, 12);
 
+    /* Overwrite default entry point with NK_ENTRY_POINT */
+    put_uint32le(NK_ENTRY_POINT, buf + newlength - 8);
 
     /****** STEP 3 - Create a record to disable the firmware signature
                 check in EBoot */
@@ -177,17 +205,35 @@ int main(int argc, char *argv[])
 
     /****** STEP 5 - Create header for bootloader record */
 
-    /* Calculate simple checksum */
+    /* Calculate checksum */
     sum = 0;
     for (i = 0; i < bootlength; i++) {
         sum += boot[12 + i];
     }
     
-    put_uint32le(0x88201000, boot); /* nk.exe start address */
+    put_uint32le(BL_ENTRY_POINT, boot); /* Our entry point */
     put_uint32le(bootlength, boot + 4);
     put_uint32le(sum, boot + 8);
 
-    /****** STEP 6 -  Now write the output file */
+    /****** STEP 6 -  Insert our dual-boot code */
+    boot2 = boot + bootlength + 12;
+
+    /* Copy dual-boot code in an endian-safe way */
+    for (i = 0; i < sizeof(dualboot) / 4; i++) {
+        put_uint32le(dualboot[i], boot2 + 12 + i*4);
+    }
+
+    /* Calculate checksum */
+    sum = 0;
+    for (i = 0; i < sizeof(dualboot); i++) {
+        sum += boot2[i+12];
+    }
+    
+    put_uint32le(NK_ENTRY_POINT, boot2); /* New entry point for our nk.bin */
+    put_uint32le(sizeof(dualboot), boot2 + 4);
+    put_uint32le(sum, boot2 + 8);
+
+    /****** STEP 7 -  Now write the output file */
 
     fdout = open(outfile, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
     if (fdout < 0)

@@ -292,7 +292,7 @@ SECTIONS
 }
 #elif (CONFIG_CPU==IMX31L)
 {
-  . = 0x88201000;
+  . = 0x8a000000;
   .vectors : 
   {  
     KEEP(*(.vectors*));
