@@ -6,7 +6,7 @@
 #define TOSHIBA_GIGABEAT_S 1
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 19
+#define MODEL_NUMBER 21
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP

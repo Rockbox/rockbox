@@ -30,6 +30,8 @@ static inline void udelay(unsigned int usecs)
     while (EPITCNT1 > stop);
 }
 
+#define __dbg_hw_info(...) 0
+#define __dbg_ports(...) 0
 
 #define HAVE_INVALIDATE_ICACHE
 static inline void invalidate_icache(void)

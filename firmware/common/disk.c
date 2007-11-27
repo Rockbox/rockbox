@@ -150,7 +150,12 @@ int disk_mount(int drive)
     /* The Elio's hard drive has no partition table and probing for partitions causes
        Rockbox to crash - so we temporarily disable the probing until we fix the
        real problem. */
-    for (i=0; volume != -1 && i<4; i++)
+#ifdef TOSHIBA_GIGABEAT_S
+    i = 1;  /* For the Gigabeat S, we mount the second partition */
+#else
+    i = 0;
+#endif
+    for (i; volume != -1 && i<4; i++)
     {
 #ifdef MAX_LOG_SECTOR_SIZE
         int j;

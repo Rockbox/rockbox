@@ -28,6 +28,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "ata.h"
+#include "dir.h"
 #include "fat.h"
 #include "disk.h"
 #include "font.h"
@@ -47,13 +48,18 @@
 #include <stdarg.h>
 
 char version[] = APPSVERSION;
+char buf[MAX_PATH];
+char basedir[] = "/Content/0b00/00/"; /* Where files sent via MTP are stored */
+char model[5];
+int (*kernel_entry)(void);
 
 void main(void)
 {
     lcd_clear_display();
     printf("Hello world!");
-    printf("Gigabeat S Rockbox Bootloader v.00000001");          
+    printf("Gigabeat S Rockbox Bootloader v.00000001");
     kernel_init();
+    printf("kernel init done");
     int rc;
 
     rc = ata_init();
@@ -62,8 +68,10 @@ void main(void)
         reset_screen();
         error(EATA, rc);
     }
+    printf("ata init done");
 
     disk_init();
+    printf("disk init done");
 
     rc = disk_mount_all();
     if (rc<=0)
@@ -71,24 +79,48 @@ void main(void)
         error(EDISK,rc);
     }
 
-    printf("Congratulations!");
-    while(1);
+    /* Look for the first valid firmware file */
+    struct dirent_uncached* entry;
+    DIR_UNCACHED* dir;
+    int fd;
+    dir = opendir_uncached(basedir);
+    while ((entry = readdir_uncached(dir)))
+    {
+        if (*entry->d_name != '.')
+        {
+            snprintf(buf, sizeof(buf), "%s%s", basedir, entry->d_name);
+            fd = open(buf, O_RDONLY);
+            if (fd >= 0)
+            {
+                lseek(fd, 4, SEEK_SET);
+                rc = read(fd, model, 4);
+                close(fd);
+                if (rc == 4)
+                {
+                    model[4] = 0;
+                    if (strcmp(model, "gigs") == 0)
+                        break;
+                }
+            }
+        }
+    }
 
-#if 0
+    printf("Firmware file: %s", buf);
     printf("Loading firmware");
 
-    loadbuffer = (unsigned char*) 0x100;
-    buffer_size = (unsigned char*)0x400000 - loadbuffer;
+    unsigned char *loadbuffer = (unsigned char *)0x88000000;
+    int buffer_size = 1024*1024;
 
-    rc = load_firmware(loadbuffer, BOOTFILE, buffer_size);
+    rc = load_firmware(loadbuffer, buf, buffer_size);
     if(rc < 0)
-        error(EBOOTFILE, rc);
+        error(buf, rc);
 
     if (rc == EOK)
     {
         kernel_entry = (void*) loadbuffer;
         rc = kernel_entry();
     }
-#endif
+
+    while (1);
 }
 
