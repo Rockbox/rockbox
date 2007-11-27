@@ -767,24 +767,8 @@ static char *get_token_value(struct gui_wps *gwps,
         limit = *intval;
         *intval = -1;
     }
-#if CONFIG_RTC
-    int new_token = token->type;
-    if (token->type == WPS_TOKEN_RTC_HOUR_CFG_ZERO_PADDED)
-    {
-        new_token = global_settings.timeformat == 0?
-                    WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED:
-                    WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED;
-    }
-    else if (token->type == WPS_TOKEN_RTC_HOUR_CFG)
-    {
-        new_token = global_settings.timeformat == 0?
-                    WPS_TOKEN_RTC_HOUR_24:
-                    WPS_TOKEN_RTC_HOUR_12;
-    }
-    switch (new_token)
-#else
+    
     switch (token->type)
-#endif
     {
         case WPS_TOKEN_CHARACTER:
             return &(token->value.c);
@@ -1110,7 +1094,11 @@ static char *get_token_value(struct gui_wps *gwps,
                 *intval = global_settings.repeat_mode + 1;
             snprintf(buf, buf_size, "%d", *intval);
             return buf;
-
+        case WPS_TOKEN_RTC_12HOUR_CFG:
+            if (intval)
+                *intval = global_settings.timeformat + 1;
+            snprintf(buf, buf_size, "%d", *intval);
+            return buf;
 #if CONFIG_RTC
         case WPS_TOKEN_RTC_DAY_OF_MONTH:
             /* d: day of month (01..31) */
