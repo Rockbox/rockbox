@@ -411,9 +411,6 @@ solitaire_suitsi.13x52x1.bmp
 
 /* Star */
 #ifdef HAVE_LCD_COLOR
-/* matrix */
-matrix_bold.bmp
-matrix_normal.bmp
 #if LCD_WIDTH >= 320 && LCD_HEIGHT >= 188
 star_tiles.20x20.bmp
 #elif LCD_WIDTH >= 240 && LCD_HEIGHT >= 143
@@ -505,6 +502,12 @@ superdom_boarditems.320x240x16.bmp
 #elif (LCD_WIDTH == 240 && LCD_HEIGHT == 320)
 superdom_boarditems.240x320x16.bmp
 #endif
+#endif
+
+#if LCD_DEPTH > 1
+/* matrix */
+matrix_bold.bmp
+matrix_normal.bmp
 #endif
 
 #endif /* HAVE_LCD_BITMAP */

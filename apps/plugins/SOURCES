@@ -44,6 +44,7 @@ disktidy.c
 flipit.c
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
+matrix.c
 maze.c
 mazezam.c
 text_editor.c
@@ -111,7 +112,6 @@ fireworks.c
 xobox.c
 spacerocks.c
 #if LCD_DEPTH >= 16
-matrix.c
 rockpaint.c
 #endif
 
