@@ -44,7 +44,6 @@ disktidy.c
 flipit.c
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
-matrix.c
 maze.c
 mazezam.c
 text_editor.c
@@ -132,6 +131,10 @@ alpine_cdc.c
 #endif
 splitedit.c
 #endif /* CONFIG_CODEC */
+
+#if LCD_DEPTH > 1                  /* non-mono bitmap targets */
+matrix.c
+#endif
 
 /* Platform-specific plugins */
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
