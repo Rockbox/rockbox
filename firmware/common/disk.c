@@ -155,7 +155,7 @@ int disk_mount(int drive)
 #else
     i = 0;
 #endif
-    for (i; volume != -1 && i<4; i++)
+    for (; volume != -1 && i<4; i++)
     {
 #ifdef MAX_LOG_SECTOR_SIZE
         int j;
