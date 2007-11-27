@@ -30,6 +30,7 @@
 "  -c x   Complexity, increases quality for a given bitrate, but encodes\n"\
 "         slower, range [0-10], default 3\n"\
 "  -n     Enable narrowband mode, will resample input to 8 kHz\n\n"\
+"  -v x   Volume, amplitude multiplier, default 1.0.\n"\
 "rbspeexenc expects a mono 16 bit WAV file as input. Files will be resampled\n"\
 "to either 16 kHz by default, or 8 kHz if narrowband mode is enabled.\n"\
 "WARNING: This tool will create files that are only usable by Rockbox!\n"
@@ -124,6 +125,7 @@ int main(int argc, char **argv)
     int complexity = 3;
     float quality = 8.f;
     bool narrowband = false;
+    float volume = 1.0f;
     int target_sr;
     int numchan, bps, sr, numsamples;
     int frame_size;
@@ -140,6 +142,8 @@ int main(int argc, char **argv)
             quality = atof(argv[++i]);
         else if (strncmp(argv[i], "-c", 2) == 0)
             complexity = atoi(argv[++i]);
+        else if (strncmp(argv[i], "-v", 2) == 0)
+            volume = atof(argv[++i]);
         else if (strncmp(argv[i], "-n", 2) == 0)
             narrowband = true;
         ++i;
@@ -193,6 +197,12 @@ int main(int argc, char **argv)
     }
     fread(in, 2, numsamples, fin);
     fclose(fin);
+
+    if(volume != 1.0f) {
+        for(i=0; i<numsamples; i++)
+            in[i] *= volume;
+    }
+
     /* There will be 'lookahead' samples of zero at the end of the array, to
      * make sure the Speex encoder is allowed to spit out all its data at clip
      * end */
