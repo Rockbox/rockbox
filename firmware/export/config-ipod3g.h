@@ -1,6 +1,10 @@
 /*
  * This config file is for the Apple iPod 3g
  */
+
+/* Temp measure until the low batt problem is figured out */
+#define NO_LOW_BATTERY_SHUTDOWN
+
 #define TARGET_TREE /* this target is using the target tree system */
 
 #define IPOD_ARCH 1
