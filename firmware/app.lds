@@ -369,14 +369,6 @@ SECTIONS
     } > IRAM
 
 #if defined(CPU_COLDFIRE) || defined(CPU_ARM)
-    .stack :
-    {
-       *(.stack)
-       stackbegin = .;
-       . += 0x2000;
-       stackend = .;
-    } > IRAM
-
 #ifdef CPU_PP
     .idle_stacks :
     {
@@ -391,6 +383,14 @@ SECTIONS
        cop_idlestackend = .;
     } > IRAM
 #endif
+
+    .stack :
+    {
+       *(.stack)
+       stackbegin = .;
+       . += 0x2000;
+       stackend = .;
+    } > IRAM
 
 #else
     /* TRICK ALERT! We want 0x2000 bytes of stack, but we set the section

@@ -245,6 +245,20 @@ static int * const idle_stacks[NUM_CORES] NOCACHEDATA_ATTR =
     [CPU] = cpu_idlestackbegin,
     [COP] = cop_idlestackbegin
 };
+
+#if CONFIG_CPU == PP5002
+/* Bytes to emulate the PP502x mailbox bits */
+struct core_semaphores
+{
+    volatile uint8_t intend_wake;  /* 00h */
+    volatile uint8_t stay_awake;   /* 01h */
+    volatile uint8_t intend_sleep; /* 02h */
+    volatile uint8_t unused;       /* 03h */
+};
+
+static struct core_semaphores core_semaphores[NUM_CORES] NOCACHEBSS_ATTR;
+#endif
+
 #endif /* NUM_CORES */
 
 #if CONFIG_CORELOCK == SW_CORELOCK
@@ -391,10 +405,22 @@ void corelock_unlock(struct corelock *cl)
  * no other core requested a wakeup for it to perform a task.
  *---------------------------------------------------------------------------
  */
-static inline void core_sleep(IF_COP(unsigned int core,) struct thread_entry **waking)
+#if NUM_CORES == 1
+/* Shared single-core build debugging version */
+static inline void core_sleep(struct thread_entry **waking)
 {
-#if NUM_CORES > 1
-#ifdef CPU_PP502x
+    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+    if (*waking == NULL)
+    {
+        PROC_CTL(CURRENT_CORE) = PROC_SLEEP;
+        nop; nop; nop;
+    }
+    set_interrupt_status(IRQ_FIQ_ENABLED, IRQ_FIQ_STATUS);
+}
+#elif defined (CPU_PP502x)
+static inline void core_sleep(unsigned int core,
+                              struct thread_entry **waking)
+{
 #if 1
     /* Disabling IRQ and FIQ is important to making the fixed-time sequence
      * non-interruptable */
@@ -448,29 +474,83 @@ static inline void core_sleep(IF_COP(unsigned int core,) struct thread_entry **w
     /* Enable IRQ, FIQ */
     set_interrupt_status(IRQ_FIQ_ENABLED, IRQ_FIQ_STATUS);
 #endif /* ASM/C selection */
-#else
-    /* TODO: PP5002 */
-#endif /* CONFIG_CPU == */
-#else
-    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
-    if (*waking == NULL)
-    {
-        PROC_CTL(IF_COP_CORE(core)) = PROC_SLEEP;
-    }
-    set_interrupt_status(IRQ_FIQ_ENABLED, IRQ_FIQ_STATUS);
-#endif /* NUM_CORES */
 }
+#elif CONFIG_CPU == PP5002
+/* PP5002 has no mailboxes - emulate using bytes */
+static inline void core_sleep(unsigned int core,
+                              struct thread_entry **waking)
+{
+#if 1
+    asm volatile (
+        "mrs    r1, cpsr                   \n" /* Disable IRQ, FIQ */
+        "orr    r1, r1, #0xc0              \n"
+        "msr    cpsr_c, r1                 \n"
+        "mov    r0, #1                     \n" /* Signal intent to sleep */
+        "strb   r0, [%[sem], #2]           \n"
+        "ldr    r0, [%[waking]]            \n" /* *waking == NULL? */
+        "cmp    r0, #0                     \n"
+        "ldreqb r0, [%[sem], #1]           \n" /* && stay_awake == 0? */
+        "cmpeq  r0, #0                     \n"
+        "moveq  r0, #0xca                  \n" /* Then sleep */
+        "streqb r0, [%[ctl], %[c], lsl #2] \n"
+        "nop                               \n" /* nop's needed because of pipeline */
+        "nop                               \n"
+        "nop                               \n"
+        "mov    r0, #0                     \n" /* Clear stay_awake and sleep intent */
+        "strb   r0, [%[sem], #1]           \n"
+        "strb   r0, [%[sem], #2]           \n"
+    "1:                                    \n" /* Wait for wake procedure to finish */
+        "ldrb   r0, [%[sem], #0]           \n"
+        "cmp    r0, #0                     \n"
+        "bne    1b                         \n"
+        "bic    r1, r1, #0xc0              \n" /* Enable interrupts */
+        "msr    cpsr_c, r1                 \n"
+        :
+        : [sem]"r"(&core_semaphores[core]), [c]"r"(core),
+          [waking]"r"(waking), [ctl]"r"(&PROC_CTL(CPU))
+        : "r0", "r1"
+        );
+#else /* C version for reference */
+    /* Disable IRQ, FIQ */
+    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+
+    /* Signal intent to sleep */
+    core_semaphores[core].intend_sleep = 1;
+
+    /* Something waking or other processor intends to wake us? */
+    if (*waking == NULL && core_semaphores[core].stay_awake == 0)
+    {
+        PROC_CTL(core) = PROC_SLEEP; /* Snooze */
+        nop; nop; nop;
+    }
+
+    /* Signal wake - clear wake flag */
+    core_semaphores[core].stay_awake = 0;
+    core_semaphores[core].intend_sleep = 0;
+
+    /* Wait for other processor to finish wake procedure */
+    while (core_semaphores[core].intend_wake != 0);
+
+    /* Enable IRQ, FIQ */
+    set_interrupt_status(IRQ_FIQ_ENABLED, IRQ_FIQ_STATUS);
+#endif /* ASM/C selection */
+}
+#endif /* CPU type */
 
 /*---------------------------------------------------------------------------
  * Wake another processor core that is sleeping or prevent it from doing so
  * if it was already destined. FIQ, IRQ should be disabled before calling.
  *---------------------------------------------------------------------------
  */
-void core_wake(IF_COP_VOID(unsigned int othercore))
-{
 #if NUM_CORES == 1
+/* Shared single-core build debugging version */
+void core_wake(void)
+{
     /* No wakey - core already wakey */
+}
 #elif defined (CPU_PP502x)
+void core_wake(unsigned int othercore)
+{
 #if 1
     /* avoid r0 since that contains othercore */
     asm volatile (
@@ -494,7 +574,8 @@ void core_wake(IF_COP_VOID(unsigned int othercore))
         "str    r1, [%[mbx], #8]            \n" /* Done with wake procedure */
         "msr    cpsr_c, r3                  \n" /* Restore int status */
         :
-        : [ctl]"r"(&PROC_CTL(CPU)), [mbx]"r"(MBX_BASE), [oc]"r" (othercore)
+        : [ctl]"r"(&PROC_CTL(CPU)), [mbx]"r"(MBX_BASE),
+          [oc]"r"(othercore)
         : "r1", "r2", "r3");
 #else /* C version for reference */
     /* Disable interrupts - avoid reentrancy from the tick */
@@ -509,18 +590,68 @@ void core_wake(IF_COP_VOID(unsigned int othercore))
 
     /* If sleeping, wake it up */
     if (PROC_CTL(othercore) & PROC_SLEEP)
-    {
         PROC_CTL(othercore) = 0;
-    }
 
     /* Done with wake procedure */
     MBX_MSG_CLR = 0x1 << othercore;
     set_irq_level(oldlevel);
 #endif /* ASM/C selection */
-#else
-    PROC_CTL(othercore) = PROC_WAKE;
-#endif
 }
+#elif CONFIG_CPU == PP5002
+/* PP5002 has no mailboxes - emulate using bytes */
+void core_wake(unsigned int othercore)
+{
+#if 1
+    /* avoid r0 since that contains othercore */
+    asm volatile (
+        "mrs    r3, cpsr                \n" /* Disable IRQ */
+        "orr    r1, r3, #0x80           \n"
+        "msr    cpsr_c, r1              \n"
+        "mov    r1, #1                  \n" /* Signal intent to wake other core */
+        "orr    r1, r1, r1, lsl #8      \n" /* and set stay_awake */
+        "strh   r1, [%[sem], #0]        \n"
+        "mov    r2, #0x8000             \n"
+    "1:                                 \n" /* If it intends to sleep, let it first */
+        "ldrb   r1, [%[sem], #2]        \n" /* intend_sleep != 0 ? */
+        "cmp    r1, #1                  \n"
+        "ldr    r1, [%[st]]             \n" /* && not sleeping ? */
+        "tsteq  r1, r2, lsr %[oc]       \n"
+        "beq    1b                      \n" /* Wait for sleep or wake */
+        "tst    r1, r2, lsr %[oc]       \n"
+        "ldrne  r2, =0xcf004054         \n" /* If sleeping, wake it */
+        "movne  r1, #0xce               \n"
+        "strneb r1, [r2, %[oc], lsl #2] \n"
+        "mov    r1, #0                  \n" /* Done with wake procedure */
+        "strb   r1, [%[sem], #0]        \n"
+        "msr    cpsr_c, r3              \n" /* Restore int status */
+        :
+        : [sem]"r"(&core_semaphores[othercore]),
+          [st]"r"(&PROC_STAT),
+          [oc]"r"(othercore)
+        : "r1", "r2", "r3"
+    );
+#else /* C version for reference */
+    /* Disable interrupts - avoid reentrancy from the tick */
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    /* Signal intent to wake other processor - set stay awake */
+    core_semaphores[othercore].intend_wake = 1;
+    core_semaphores[othercore].stay_awake = 1;
+
+    /* If it intends to sleep, wait until it does or aborts */
+    while (core_semaphores[othercore].intend_sleep != 0 &&
+           (PROC_STAT & PROC_SLEEPING(othercore)) == 0);
+
+    /* If sleeping, wake it up */
+    if (PROC_STAT & PROC_SLEEPING(othercore))
+        PROC_CTL(othercore) = PROC_WAKE;
+
+    /* Done with wake procedure */
+    core_semaphores[othercore].intend_wake = 0;
+    set_irq_level(oldlevel);
+#endif  /* ASM/C selection */
+}
+#endif /* CPU type */
 
 #if NUM_CORES > 1
 /*---------------------------------------------------------------------------
@@ -2539,10 +2670,13 @@ void init_threads(void)
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
         /* TODO: HAL interface for this */
         /* Wake up coprocessor and let it initialize kernel and threads */
+#ifdef CPU_PP502x
         MBX_MSG_CLR = 0x3f;
+#endif
         COP_CTL = PROC_WAKE;
         /* Sleep until finished */
         CPU_CTL = PROC_SLEEP;
+        nop; nop; nop; nop;
     } 
     else
     {

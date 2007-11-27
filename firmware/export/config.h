@@ -423,7 +423,7 @@
 #define IDLE_STACK_SIZE  0x80
 #define IDLE_STACK_WORDS 0x20
 
-#if !defined(FORCE_SINGLE_CORE) && CONFIG_CPU != PP5002
+#if !defined(FORCE_SINGLE_CORE)
 
 #define NUM_CORES 2
 #define CURRENT_CORE current_core()
@@ -436,7 +436,7 @@
 #define IF_COP_VOID(...)    __VA_ARGS__
 #define IF_COP_CORE(core)   core
 
-#if CONFIG_CPU == PP5020
+#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
 #define CONFIG_CORELOCK SW_CORELOCK /* SWP(B) is broken */
 #else
 #define CONFIG_CORELOCK CORELOCK_SWAP

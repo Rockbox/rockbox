@@ -77,7 +77,7 @@ static inline unsigned int current_core(void)
 /* Return the actual ID instead of core index */
 static inline unsigned int processor_id(void)
 {
-    unsigned char id;
+    unsigned int id;
 
     asm volatile (
         "ldrb   %0, [%1] \n"
@@ -92,12 +92,18 @@ static inline unsigned int processor_id(void)
 /* All addresses within rockbox are in IRAM in the bootloader so
    are therefore uncached */
 #define UNCACHED_ADDR(a) (a)
-#else
-#define UNCACHED_ADDR(a) \
-    ((typeof (a))((uintptr_t)(a) | 0x10000000))
+
+#else /* !BOOTLOADER */
+
+#if CONFIG_CPU == PP5002
+#define UNCACHED_BASE_ADDR 0x28000000
+#else /* PP502x */
+#define UNCACHED_BASE_ADDR 0x10000000
 #endif
 
-#ifdef CPU_PP502x
+#define UNCACHED_ADDR(a) \
+    ((typeof (a))((uintptr_t)(a) | UNCACHED_BASE_ADDR))
+#endif /* BOOTLOADER */
 
 /* Certain data needs to be out of the way of cache line interference
  * such as data for COP use or for use with UNCACHED_ADDR */
@@ -114,8 +120,6 @@ void invalidate_icache(void);
 #define HAVE_FLUSH_ICACHE
 void flush_icache(void);
 #endif
-
-#endif /* CPU_PP502x */
 
 #endif /* CPU_PP */
 

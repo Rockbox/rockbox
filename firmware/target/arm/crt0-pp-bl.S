@@ -32,23 +32,31 @@ start:
  *
  */
 #if CONFIG_CPU == PP5002
-    .equ    PROC_ID,    0xc4000000
-    .equ    COP_CTRL,   0xcf004058
-    .equ    COP_STATUS, 0xcf004050
-    .equ    IIS_CONFIG, 0xc0002500
-    .equ    SLEEP,      0xca
-    .equ    WAKE,       0xce
-    .equ    SLEEPING,   0x4000
+    .equ    PROC_ID,     0xc4000000
+    .equ    CPU_CTRL,    0xcf004054
+    .equ    CPU_STATUS,  0xcf004050
+    .equ    COP_CTRL,    0xcf004058
+    .equ    COP_STATUS,  0xcf004050
+    .equ    IIS_CONFIG,  0xc0002500
+    .equ    SLEEP,       0xca
+    .equ    WAKE,        0xce
+    .equ    CPUSLEEPING, 0x8000
+    .equ    COPSLEEPING, 0x4000
+    .equ    CACHE_CTRL,  0xcf004024
+    .equ    CACHE_ENAB,  0x2 /* Actually the CACHE_INIT flag */
 #else
-    .equ    PROC_ID,    0x60000000
-    .equ    COP_CTRL,   0x60007004
-    .equ    COP_STATUS, 0x60007004
-    .equ    IIS_CONFIG, 0x70002800
-    .equ    SLEEP,      0x80000000
-    .equ    WAKE,       0x0
-    .equ    SLEEPING,   0x80000000
-    .equ    CACHE_CTRL, 0x6000c000
-    .equ    CACHE_ENAB, 0x1
+    .equ    PROC_ID,     0x60000000
+    .equ    CPU_CTRL,    0x60007000
+    .equ    CPU_STATUS,  0x60007000
+    .equ    COP_CTRL,    0x60007004
+    .equ    COP_STATUS,  0x60007004
+    .equ    IIS_CONFIG,  0x70002800
+    .equ    SLEEP,       0x80000000
+    .equ    WAKE,        0x0
+    .equ    CPUSLEEPING, 0x80000000
+    .equ    COPSLEEPING, 0x80000000
+    .equ    CACHE_CTRL,  0x6000c000
+    .equ    CACHE_ENAB,  0x1
 #endif
 
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
@@ -94,23 +102,12 @@ cop:
     ldr    r0, =COP_CTRL
     mov    r1, #SLEEP
     str    r1, [r0]
-
-#ifdef CPU_PP502x
-     /* COP: Invalidate cache if enabled */
-    ldr    r2, =CACHE_CTRL
-    ldr    r1, [r2]
-    tst    r1, #CACHE_ENAB
-    beq    2f
-    ldr    r0, =0xf000f044
-    ldr    r1, [r0]
-    orr    r1, r1, #0x6
-    str    r1, [r0]
-1:
-    ldr    r1, [r2]
-    tst    r1, #0x8000
-    bne    1b
-2:
-#endif /* CPU_PP502x */
+    nop
+    nop
+    
+    /* Invalidate cache */
+    mov    r0, #1
+    bl     cache_op
 
     ldr    r0, =startup_loc
     ldr    pc, [r0]
@@ -120,7 +117,7 @@ cpu:
     ldr    r0, =COP_STATUS
 1:
     ldr    r1, [r0]
-    tst    r1, #SLEEPING
+    tst    r1, #COPSLEEPING
     beq    1b
     
     /* Initialise bss section to zero */
@@ -148,22 +145,9 @@ cpu:
     ldr    r1, =startup_loc
     str    r0, [r1]
 
-#ifdef CPU_PP502x
-    /* Flush cache if enabled */
-    ldr    r2, =CACHE_CTRL
-    ldr    r1, [r2]
-    tst    r1, #CACHE_ENAB
-    beq    2f
-    ldr    r0, =0xf000f044
-    ldr    r1, [r0]
-    orr    r1, r1, #0x2
-    str    r1, [r0]
-1:
-    ldr    r1, [r2]
-    tst    r1, #0x8000
-    bne    1b
-2:
-#endif /* CPU_PP502x */
+    /* flush cache */    
+    mov    r0, #0
+    bl     cache_op
 
     /* Wake up the coprocessor before executing the firmware */
     ldr    r0, =COP_CTRL
@@ -192,3 +176,32 @@ boot_table:
        code+data must stay <= 256 bytes */
     .space 400
 #endif
+
+cache_op:
+    ldr    r2, =CACHE_CTRL
+    ldr    r1, [r2]
+    tst    r1, #CACHE_ENAB
+    bxeq   lr
+    cmp    r0, #0
+#ifdef CPU_PP502x
+    ldr    r0, =0xf000f044
+    ldr    r1, [r0]
+    orrne  r1, r1, #0x6
+    orreq  r1, r1, #0x2
+    str    r1, [r0]
+1:
+    ldr    r1, [r2]
+    tst    r1, #0x8000
+    bne    1b
+#elif CONFIG_CPU == PP5002
+    ldrne  r0, =0xf0004000
+    ldreq  r0, =0xf000c000
+    add    r1, r0, #0x2000
+    mov    r2, #0
+1:
+    cmp    r1, r0
+    strhi  r2, [r0], #16
+    bhi    1b
+#endif /* CPU type */
+    bx     lr
+

@@ -44,9 +44,7 @@ void irq(void)
     } 
     else
     {
-        if (COP_INT_STAT & TIMER1_MASK)
-            TIMER1();
-        else if (COP_INT_STAT & TIMER2_MASK)
+        if (COP_INT_STAT & TIMER2_MASK)
             TIMER2();
     }
 }
@@ -61,24 +59,60 @@ void irq(void)
    some other CPU frequency scaling. */
 
 #ifndef BOOTLOADER
-static void ipod_init_cache(void)
+void flush_icache(void) ICODE_ATTR;
+void flush_icache(void)
 {
-    int i =0;
-/* Initialising the cache in the iPod bootloader prevents Rockbox from starting */
-    outl(inl(0xcf004050) & ~0x700, 0xcf004050);
-    outl(0x4000, 0xcf004020);
+    intptr_t b, e;
 
-    outl(0x2, 0xcf004024);
+    for (b = (intptr_t)&CACHE_FLUSH_BASE, e = b + CACHE_SIZE;
+         b < e; b += 16) {
+        outl(0x0, b);
+    }
+}
 
-    /* PP5002 has 8KB cache */
-    for (i = 0xf0004000; i < (int)(0xf0006000); i += 16) {
-        outl(0x0, i);
+void invalidate_icache(void) ICODE_ATTR;
+void invalidate_icache(void)
+{
+    intptr_t b, e;
+
+    /* Flush */
+    for (b = (intptr_t)&CACHE_FLUSH_BASE, e = b + CACHE_SIZE;
+         b < e; b += 16) {
+        outl(0x0, b);
     }
 
-    outl(0x0, 0xf000f020);
-    outl(0x3fc0, 0xf000f024);
+    /* Invalidate */
+    for (b = (intptr_t)&CACHE_INVALIDATE_BASE, e = b + CACHE_SIZE;
+         b < e; b += 16) {
+        outl(0x0, b);
+    }
+}
 
-    outl(0x3, 0xcf004024);
+static void ipod_init_cache(void)
+{
+    intptr_t b, e;
+
+/* Initialising the cache in the iPod bootloader prevents Rockbox from starting */
+    PROC_STAT &= ~0x700;
+    outl(0x4000, 0xcf004020);
+
+    CACHE_CTL = CACHE_INIT;
+
+    for (b = (intptr_t)&CACHE_INVALIDATE_BASE, e = b + CACHE_SIZE;
+         b < e; b += 16) {
+        outl(0x0, b);
+    }
+
+    /* Cache if (addr & mask) >> 16 == (mask & match) >> 16:
+     * yes: 0x00000000 - 0x03ffffff
+     *  no: 0x04000000 - 0x1fffffff
+     * yes: 0x20000000 - 0x23ffffff
+     *  no: 0x24000000 - 0x3fffffff <= range containing uncached alias
+     */
+    CACHE_MASK = 0x00001c00;
+    CACHE_OPERATION = 0x3fc0;
+
+    CACHE_CTL = CACHE_INIT | CACHE_RUN;
 }
     
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -132,9 +166,10 @@ void system_init(void)
 #ifndef BOOTLOADER
     if (CURRENT_CORE == CPU)
     {
-        /* Remap the flash ROM from 0x00000000 to 0x20000000. */
-        MMAP3_LOGICAL  = 0x20000000 | 0x3a00;
-        MMAP3_PHYSICAL = 0x00000000 | 0x3f84;
+        /* Remap the flash ROM on CPU, keep hidden from COP:
+         * 0x00000000-0x03ffffff = 0x20000000-0x23ffffff */
+        MMAP1_LOGICAL  = 0x20003c00;
+        MMAP1_PHYSICAL = 0x00003f84;
 
 #if defined(IPOD_1G2G) || defined(IPOD_3G)
         DEV_EN = 0x0b9f; /* don't clock unused PP5002 hardware components */
@@ -150,7 +185,11 @@ void system_init(void)
         GPIOC_INT_EN   = 0;
         GPIOD_INT_EN   = 0;
 
-#ifndef HAVE_ADJUSTABLE_CPU_FREQ
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#if NUM_CORES > 1
+        cpu_boost_init();
+#endif
+#else
         pp_set_cpu_frequency(CPUFREQ_MAX);
 #endif
     }

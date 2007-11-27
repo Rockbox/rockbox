@@ -32,45 +32,49 @@ start:
  *
  */
 #if CONFIG_CPU == PP5002
-    .equ    PROC_ID,    0xc4000000
-    .equ    CPU_ICLR,   0xcf001028
-    .equ    CPU_CTRL,   0xcf004054
-    .equ    COP_ICLR,   0xcf001038
-    .equ    COP_CTRL,   0xcf004058
-    .equ    COP_STATUS, 0xcf004050
-    .equ    IIS_CONFIG, 0xc0002500
-    .equ    SLEEP,      0x000000ca
-    .equ    WAKE,       0x000000ce
-    .equ    SLEEPING,   0x00004000
-    .equ    MMAP_LOG,   0xf000f010 /* MMAP2 */
-    .equ    MMAP_PHYS,  0xf000f014
+    .equ    PROC_ID,     0xc4000000
+    .equ    CPU_ICLR,    0xcf001028
+    .equ    CPU_CTRL,    0xcf004054
+    .equ    COP_ICLR,    0xcf001038
+    .equ    COP_CTRL,    0xcf004058
+    .equ    CPU_STATUS,  0xcf004050
+    .equ    COP_STATUS,  0xcf004050
+    .equ    IIS_CONFIG,  0xc0002500
+    .equ    SLEEP,       0x000000ca
+    .equ    WAKE,        0x000000ce
+    .equ    CPUSLEEPING, 0x00008000
+    .equ    COPSLEEPING, 0x00004000
+    .equ    CACHE_CTRL,  0xcf004024
+    .equ    MMAP_LOG,    0xf000f000 /* MMAP0 */
+    .equ    MMAP_PHYS,   0xf000f004
 #if MEM > 32
-    .equ    MMAP_MASK,  0x00007400
+    .equ    MMAP_MASK,   0x00003c00
 #else
-    .equ    MMAP_MASK,  0x00003a00
+    .equ    MMAP_MASK,   0x00003e00
 #endif
-    .equ    MMAP_FLAGS, 0x00003f84
+    .equ    MMAP_FLAGS,  0x00003f84
 #else
-    .equ    PROC_ID,    0x60000000
-    .equ    CPU_ICLR,   0x60004028
-    .equ    CPU_CTRL,   0x60007000
-    .equ    CPU_STATUS, 0x60007000
-    .equ    COP_ICLR,   0x60004038
-    .equ    COP_CTRL,   0x60007004
-    .equ    COP_STATUS, 0x60007004
-    .equ    IIS_CONFIG, 0x70002800
-    .equ    SLEEP,      0x80000000
-    .equ    WAKE,       0x00000000
-    .equ    SLEEPING,   0x80000000
-    .equ    CACHE_CTRL, 0x6000c000
-    .equ    MMAP_LOG,   0xf000f000 /* MMAP0 */
-    .equ    MMAP_PHYS,  0xf000f004
+    .equ    PROC_ID,     0x60000000
+    .equ    CPU_ICLR,    0x60004028
+    .equ    CPU_CTRL,    0x60007000
+    .equ    CPU_STATUS,  0x60007000
+    .equ    COP_ICLR,    0x60004038
+    .equ    COP_CTRL,    0x60007004
+    .equ    COP_STATUS,  0x60007004
+    .equ    IIS_CONFIG,  0x70002800
+    .equ    SLEEP,       0x80000000
+    .equ    WAKE,        0x00000000
+    .equ    CPUSLEEPING, 0x80000000
+    .equ    COPSLEEPING, 0x80000000    
+    .equ    CACHE_CTRL,  0x6000c000
+    .equ    MMAP_LOG,    0xf000f000 /* MMAP0 */
+    .equ    MMAP_PHYS,   0xf000f004
 #if MEM > 32
-    .equ    MMAP_MASK,  0x00003c00
+    .equ    MMAP_MASK,   0x00003c00
 #else
-    .equ    MMAP_MASK,  0x00003e00
+    .equ    MMAP_MASK,   0x00003e00
 #endif
-    .equ    MMAP_FLAGS, 0x00000f84
+    .equ    MMAP_FLAGS,  0x00000f84
 #endif
 
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
@@ -111,21 +115,22 @@ pad_skip:
     ldrne  r2, =COP_CTRL
     movne  r1, #SLEEP
     strne  r1, [r2]
+    nop
+    nop
+    nop
 
     /* wait for co-processor to sleep then CPU can begin its remapping */
     ldreq  r2, =COP_STATUS
 1:
     ldreq  r1, [r2]
-    tsteq  r1, #SLEEPING
+    tsteq  r1, #COPSLEEPING
     beq    1b
 
-#ifdef CPU_PP502x
     /* disable cache and local interrupt vectors - it is really not desireable
        to have them enabled here */
     ldr    r2, =CACHE_CTRL
     mov    r1, #0
     str    r1, [r2]
-#endif
 
     mov    r2, #0x40000000
     ldr    r3, =remap_start
@@ -165,6 +170,9 @@ remap_end:
     /* Sleep us (co-processor) and wait for CPU to do kernel initialization */
     movne  r3, #SLEEP
     str    r3, [r4]
+    nop
+    nop
+    nop
 
     /* Jump to co-processor init */
     ldrne  pc, =cop_init
@@ -174,7 +182,7 @@ cpu_init:
     ldr    r4, =COP_STATUS
 1:
     ldr    r3, [r4]
-    tst    r3, #SLEEPING
+    tst    r3, #COPSLEEPING
     beq    1b
 
     /* Copy exception handler code to address 0 */
@@ -275,7 +283,7 @@ cop_init:
     ldr    r4, =CPU_STATUS
 1:
     ldr    r3, [r4]
-    tst    r3, #SLEEPING
+    tst    r3, #CPUSLEEPING
     beq    1b
 #endif
 
@@ -377,7 +385,7 @@ UIE:
 #endif
 
 /* Align stacks to cache line boundary */
-    .balign 16
+    .balign 32
     
 /* 256 words of IRQ stack */
     .space 256*4

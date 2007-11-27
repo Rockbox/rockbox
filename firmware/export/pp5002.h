@@ -141,14 +141,32 @@
 #define PP_VER3          (*(volatile unsigned long *)(0xcf004038))
 #define PP_VER4          (*(volatile unsigned long *)(0xcf00403c))
 
+/* Processors Control */
+#define PROC_STAT        (*(volatile unsigned long *)(0xcf004050))
 #define CPU_CTL          (*(volatile unsigned char *)(0xcf004054))
 #define COP_CTL          (*(volatile unsigned char *)(0xcf004058))
+
+#define CPU_SLEEPING     0x8000
+#define COP_SLEEPING     0x4000
+#define PROC_SLEEPING(core) (0x8000 >> (core))
 
 #define PROC_CTL(core)   ((&CPU_CTL)[(core)*4])
 
 #define PROC_SLEEP       0xca
 #define PROC_WAKE        0xce
 
+/* Cache Control */
+#define CACHE_CTL        (*(volatile unsigned long *)(0xcf004024))
+#define CACHE_RUN        0x1
+#define CACHE_INIT       0x2
+
+#define CACHE_MASK       (*(volatile unsigned long *)(0xf000f020))
+#define CACHE_OPERATION  (*(volatile unsigned long *)(0xf000f024))
+#define CACHE_FLUSH_BASE (*(volatile unsigned long *)(0xf000c000))
+#define CACHE_INVALIDATE_BASE (*(volatile unsigned long *)(0xf0004000))
+#define CACHE_SIZE       0x2000  /* PP5002 has 8KB cache */
+
+#define CACHE_OP_UNKNOWN1 (1<<11) /* 0x800 */
 
 #define DEV_EN           (*(volatile unsigned long *)(0xcf005000))
 #define DEV_RS           (*(volatile unsigned long *)(0xcf005030))
