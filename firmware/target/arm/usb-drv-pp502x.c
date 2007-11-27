@@ -319,7 +319,7 @@ static const unsigned int pipe2mask[NUM_ENDPOINTS*2] = {
 
 /*-------------------------------------------------------------------------*/
 static void transfer_completed(void);
-static void prime_transfer(int endpoint, void* ptr, int len, bool send);
+static int prime_transfer(int endpoint, void* ptr, int len, bool send);
 static void bus_reset(void);
 static void init_queue_heads(void);
 static void init_endpoints(void);
@@ -445,15 +445,15 @@ void usb_drv_stall(int endpoint, bool stall)
     }
 }
 
-void usb_drv_send(int endpoint, void* ptr, int length)
+int usb_drv_send(int endpoint, void* ptr, int length)
 {
-    prime_transfer(endpoint, ptr, length, true);
+    return prime_transfer(endpoint, ptr, length, true);
 }
 
-void usb_drv_recv(int endpoint, void* ptr, int length)
+int usb_drv_recv(int endpoint, void* ptr, int length)
 {
     //logf("usbrecv(%x, %d)", ptr, length);
-    prime_transfer(endpoint, ptr, length, false);
+    return prime_transfer(endpoint, ptr, length, false);
 }
 
 void usb_drv_wait(int endpoint, bool send)
@@ -485,7 +485,7 @@ void usb_drv_reset_endpoint(int endpoint, bool send)
 /*-------------------------------------------------------------------------*/
 
 /* manual: 32.14.5.2 */
-static void prime_transfer(int endpoint, void* ptr, int len, bool send)
+static int prime_transfer(int endpoint, void* ptr, int len, bool send)
 {
     int timeout;
     int pipe = endpoint * 2 + (send ? 1 : 0);
@@ -515,14 +515,16 @@ static void prime_transfer(int endpoint, void* ptr, int len, bool send)
     timeout = 10000;
     while ((REG_ENDPTPRIME & mask) && --timeout) {
         if (REG_USBSTS & USBSTS_RESET)
-            break;
+            return -1;
     }
     if (!timeout) {
         logf("prime timeout");
+        return -2;
     }
 
     if (!(REG_ENDPTSTATUS & mask)) {
         logf("no prime! %d %d %x", endpoint, pipe, qh->dtd.size_ioc_sts & 0xff );
+        return -3;
     }
 
     if (send) {
@@ -533,13 +535,15 @@ static void prime_transfer(int endpoint, void* ptr, int len, bool send)
                 REG_ENDPTCOMPLETE |= mask;
 
             if (REG_USBSTS & USBSTS_RESET)
-                return;
+                return -4;
         }
         if (!timeout) {
             logf("td never finished");
-            return;
+            return -5;
         }
     }
+
+    return 0;
 }
 
 static void transfer_completed(void)
