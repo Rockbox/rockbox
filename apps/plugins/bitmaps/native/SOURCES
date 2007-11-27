@@ -411,6 +411,9 @@ solitaire_suitsi.13x52x1.bmp
 
 /* Star */
 #ifdef HAVE_LCD_COLOR
+/* matrix */
+matrix_bold.bmp
+matrix_normal.bmp
 #if LCD_WIDTH >= 320 && LCD_HEIGHT >= 188
 star_tiles.20x20.bmp
 #elif LCD_WIDTH >= 240 && LCD_HEIGHT >= 143
