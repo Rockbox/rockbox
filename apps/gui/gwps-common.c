@@ -767,8 +767,24 @@ static char *get_token_value(struct gui_wps *gwps,
         limit = *intval;
         *intval = -1;
     }
-
+#if CONFIG_RTC
+    int new_token = token->type;
+    if (token->type == WPS_TOKEN_RTC_HOUR_CFG_ZERO_PADDED)
+    {
+        new_token = global_settings.timeformat == 0?
+                    WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED:
+                    WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED;
+    }
+    else if (token->type == WPS_TOKEN_RTC_HOUR_CFG)
+    {
+        new_token = global_settings.timeformat == 0?
+                    WPS_TOKEN_RTC_HOUR_24:
+                    WPS_TOKEN_RTC_HOUR_12;
+    }
+    switch (new_token)
+#else
     switch (token->type)
+#endif
     {
         case WPS_TOKEN_CHARACTER:
             return &(token->value.c);

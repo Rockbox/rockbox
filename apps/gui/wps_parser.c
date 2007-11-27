@@ -166,6 +166,8 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_TOKEN_RTC_DAY_OF_MONTH,             "cd", WPS_RTC_REFRESH, NULL },
     { WPS_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED,"ce", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_HOUR_CFG_ZERO_PADDED,     "cf", WPS_RTC_REFRESH, NULL },
+    { WPS_TOKEN_RTC_HOUR_CFG,                 "cg", WPS_RTC_REFRESH, NULL },
     { WPS_TOKEN_RTC_HOUR_24_ZERO_PADDED,      "cH", WPS_RTC_REFRESH, NULL },
     { WPS_TOKEN_RTC_HOUR_24,                  "ck", WPS_RTC_REFRESH, NULL },
     { WPS_TOKEN_RTC_HOUR_12_ZERO_PADDED,      "cI", WPS_RTC_REFRESH, NULL },
