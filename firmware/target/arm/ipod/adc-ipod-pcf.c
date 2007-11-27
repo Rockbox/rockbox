@@ -24,6 +24,7 @@
 #include "string.h"
 #include "adc.h"
 #include "pcf50605.h"
+#include "i2c-pp.h"
 
 struct adc_struct {
     long timeout;
@@ -39,6 +40,9 @@ static unsigned short _adc_read(struct adc_struct *adc)
     if (adc->timeout < current_tick) {
         unsigned char data[2];
         unsigned short value;
+
+        i2c_lock();
+
         /* 5x per 2 seconds */
         adc->timeout = current_tick + (HZ * 2 / 5);
 
@@ -53,6 +57,8 @@ static unsigned short _adc_read(struct adc_struct *adc)
             adc->conversion(&value);
         }
         adc->data = value;
+
+        i2c_unlock();
         return value;
     } else
     {
