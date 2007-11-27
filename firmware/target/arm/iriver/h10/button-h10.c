@@ -34,15 +34,15 @@
 void button_init_device(void)
 {
     /* Enable REW, FF, Play, Left, Right, Hold buttons */
-    GPIOA_ENABLE |= 0xfc;
+    GPIO_SET_BITWISE(GPIOA_ENABLE, 0xfc);
     
     /* Enable POWER button */
-    GPIOB_ENABLE |= 0x1;
+    GPIO_SET_BITWISE(GPIOB_ENABLE, 0x01);
     
     /* We need to output to pin 6 of GPIOD when reading the scroll pad value */
-    GPIOD_ENABLE |= 0x40;
-    GPIOD_OUTPUT_EN |= 0x40;
-    GPIOD_OUTPUT_VAL |= 0x40;
+    GPIO_SET_BITWISE(GPIOD_ENABLE, 0x40);
+    GPIO_SET_BITWISE(GPIOD_OUTPUT_EN, 0x40);
+    GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x40);
 }
 
 bool button_hold(void)
@@ -97,10 +97,10 @@ int button_read_device(void)
         /* Read scroller */
         if ( GPIOD_INPUT_VAL & 0x20 )
         {
-            GPIOD_OUTPUT_VAL &=~ 0x40;
+            GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x40);
             udelay(250);
             data = adc_scan(ADC_SCROLLPAD);
-            GPIOD_OUTPUT_VAL |= 0x40;
+            GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x40);
             
             if(data < 0x224)
             {
