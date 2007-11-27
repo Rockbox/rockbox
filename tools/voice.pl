@@ -398,10 +398,7 @@ sub createvoice {
     our $verbose;
     my ($language, $target_id) = @_;
     my $outfile = "";
-    my $i = 0;
-    do {
-        $outfile = sprintf("%s%s.voice", $language, ($i++ == 0 ? '' : '-'.$i));
-    } while (-f $outfile);
+    $outfile = sprintf("%s.voice", $language);
     printf("Saving voice file to %s\n", $outfile) if $verbose;
     my $cmd = "voicefont 'voicefontids' $target_id ./ $outfile";
     print("> $cmd\n") if $verbose;
