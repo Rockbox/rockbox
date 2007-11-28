@@ -41,6 +41,7 @@ enum callback_event {
     EVENT_HANDLE_REBUFFER,
     EVENT_HANDLE_CLOSED,
     EVENT_HANDLE_MOVED,
+    EVENT_HANDLE_FINISHED,
 };
 
 /* Error return values */
@@ -48,6 +49,7 @@ enum callback_event {
 #define ERR_BUFFER_FULL         -2
 #define ERR_INVALID_VALUE       -3
 #define ERR_FILE_ERROR          -4
+#define ERR_HANDLE_NOT_DONE     -5
 
 
 /* Initialise the buffering subsystem */
@@ -68,9 +70,12 @@ bool buffering_reset(char *buf, size_t buflen);
  * bufadvance: Move handle reading index, relatively to current position
  * bufread   : Copy data from a handle to a buffer
  * bufgetdata: Obtain a pointer for linear access to a "size" amount of data
+ * bufgettail: Out-of-band get the last size bytes of a handle.
+ * bufcuttail: Out-of-band remove the trailing 'size' bytes of a handle.
  *
  * NOTE: bufread and bufgetdata will block the caller until the requested
  * amount of data is ready (unless EOF is reached).
+ * NOTE: Tail operations are only legal when the end of the file is buffered.
  ****************************************************************************/
 
 #define BUF_MAX_HANDLES         256
@@ -82,6 +87,8 @@ int bufseek(int handle_id, size_t newpos);
 int bufadvance(int handle_id, off_t offset);
 ssize_t bufread(int handle_id, size_t size, void *dest);
 ssize_t bufgetdata(int handle_id, size_t size, void **data);
+ssize_t bufgettail(int handle_id, size_t size, void **data);
+ssize_t bufcuttail(int handle_id, size_t size);
 
 
 /***************************************************************************

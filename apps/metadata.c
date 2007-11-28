@@ -30,6 +30,9 @@
 
 #if CONFIG_CODEC == SWCODEC
 
+/* For trailing tag stripping */
+#include "buffering.h"
+
 #include "metadata/metadata_common.h"
 #include "metadata/metadata_parsers.h"
 
@@ -322,3 +325,42 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     return true;
 }
 
+void strip_tags(int handle_id)
+{
+    int i;
+    static const unsigned char tag[] = "TAG";
+    static const unsigned char apetag[] = "APETAGEX";    
+    size_t len, version;
+    unsigned char *tail;
+
+    if (bufgettail(handle_id, 128, (void **)&tail) != 128)
+        return;
+
+    for(i = 0;i < 3;i++)
+        if(tail[i] != tag[i])
+            goto strip_ape_tag;
+
+    /* Skip id3v1 tag */
+    logf("Cutting off ID3v1 tag");
+    bufcuttail(handle_id, 128);
+
+strip_ape_tag:
+    /* Check for APE tag (look for the APE tag footer) */
+
+    if (bufgettail(handle_id, 32, (void **)&tail) != 32)
+        return;
+
+    for(i = 0;i < 8;i++)
+        if(tail[i] != apetag[i])
+            return;
+
+    /* Read the version and length from the footer */
+    version = tail[8] | (tail[9] << 8) | (tail[10] << 16) | (tail[11] << 24);
+    len = tail[12] | (tail[13] << 8) | (tail[14] << 16) | (tail[15] << 24);
+    if (version == 2000)
+        len += 32; /* APEv2 has a 32 byte header */
+
+    /* Skip APE tag */
+    logf("Cutting off APE tag (%ldB)", len);
+    bufcuttail(handle_id, len);
+}

@@ -1485,6 +1485,10 @@ static void buffering_audio_callback(enum callback_event ev, int value)
             queue_send(&audio_queue, Q_AUDIO_FLUSH, 0);
             break;
 
+        case EVENT_HANDLE_FINISHED:
+            strip_tags(value);
+            break;
+
         default:
             break;
     }

@@ -24,6 +24,7 @@
 
 unsigned int probe_file_format(const char *filename);
 bool get_metadata(struct mp3entry* id3, int fd, const char* trackname);
+void strip_tags(int handle_id);
 
 #endif
 

@@ -657,6 +657,7 @@ static bool buffer_handle(int handle_id)
         /* finished buffering the file */
         close(h->fd);
         h->fd = -1;
+        call_buffering_callbacks(EVENT_HANDLE_FINISHED, h->id);
     }
 
     return true;
@@ -1137,6 +1138,58 @@ ssize_t bufgetdata(int handle_id, size_t size, void **data)
     *data = &buffer[h->ridx];
     return size;
 }
+
+ssize_t bufgettail(int handle_id, size_t size, void **data)
+{
+    size_t tidx;
+
+    const struct memory_handle *h;
+    
+    h = find_handle(handle_id);
+
+    if (!h)
+        return ERR_HANDLE_NOT_FOUND;
+
+    if (h->filerem)
+        return ERR_HANDLE_NOT_DONE;
+
+    /* We don't support tail requests of > guardbuf_size, for simplicity */
+    if (size > GUARD_BUFSIZE)
+        return ERR_INVALID_VALUE;
+
+    tidx = RINGBUF_SUB(h->widx, size);
+
+    if (tidx + size > buffer_len)
+    {
+        size_t copy_n = tidx + size - buffer_len;
+        memcpy(guard_buffer, (unsigned char *)buffer, copy_n);
+    }
+
+    *data = &buffer[tidx];
+    return size;
+}
+
+ssize_t bufcuttail(int handle_id, size_t size)
+{
+    struct memory_handle *h;
+    
+    h = find_handle(handle_id);
+
+    if (!h)
+        return ERR_HANDLE_NOT_FOUND;
+
+    if (h->filerem)
+        return ERR_HANDLE_NOT_DONE;
+
+    if (h->available < size)
+        size = h->available;
+
+    h->available -= size;
+    h->filesize -= size;
+    h->widx = RINGBUF_SUB(h->widx, size);
+    return size;
+}
+
 
 /*
 SECONDARY EXPORTED FUNCTIONS
