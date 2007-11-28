@@ -1187,6 +1187,9 @@ ssize_t bufcuttail(int handle_id, size_t size)
     h->available -= size;
     h->filesize -= size;
     h->widx = RINGBUF_SUB(h->widx, size);
+    if (h == cur_handle) {
+        buf_widx = h->widx;
+    }
     return size;
 }
 
