@@ -30,7 +30,7 @@
 "  -c x   Complexity, increases quality for a given bitrate, but encodes\n"\
 "         slower, range [0-10], default 3\n"\
 "  -n     Enable narrowband mode, will resample input to 8 kHz\n\n"\
-"  -v x   Volume, amplitude multiplier, default 1.0.\n"\
+"  -v x   Volume, amplitude multiplier, default 1.0\n"\
 "rbspeexenc expects a mono 16 bit WAV file as input. Files will be resampled\n"\
 "to either 16 kHz by default, or 8 kHz if narrowband mode is enabled.\n"\
 "WARNING: This tool will create files that are only usable by Rockbox!\n"
@@ -146,6 +146,10 @@ int main(int argc, char **argv)
             volume = atof(argv[++i]);
         else if (strncmp(argv[i], "-n", 2) == 0)
             narrowband = true;
+        else {
+            printf("Error: unrecognized option '%s'\n", argv[i]);
+            return 1;
+        }
         ++i;
     }
 
@@ -210,7 +214,10 @@ int main(int argc, char **argv)
    
     speex_bits_init(&bits);
     inpos = in;
-    fout = fopen(argv[argc - 1], "wb");
+    if ((fout = fopen(argv[argc - 1], "wb")) == NULL) {
+        printf("Error: could not open output file\n");
+        return 1;
+    }
 
     while (numsamples > 0) {
         int samples = frame_size;

@@ -26,14 +26,14 @@ endif
 # This sets up 'SRC' based on the files mentioned in SOURCES
 SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#")
 
-SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeexenc.c
+SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeexenc.c rbspeexdec.c
 OBJS := $(SRC:%.c=%.o)
 DEPFILE = dep-speex
 DIRS = 
 
 .PHONY : all
 
-all: ../rbspeexenc
+all: ../rbspeexenc ../rbspeexdec
 
 $(DEPFILE): $(SOURCES)
 	$(SILENT)rm -f $(DEPFILE)
@@ -56,6 +56,10 @@ libspeex.a: $(OBJS) $(DEPFILE)
 ../rbspeexenc: $(OBJS) libspeex.a rbspeexenc.o
 	@echo Linking ../rbspeexenc
 	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc rbspeexenc.o libspeex.a -lm
+
+../rbspeexdec: $(OBJS) libspeex.a rbspeexdec.o
+	@echo Linking ../rbspeexdec
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec rbspeexdec.o libspeex.a -lm
 
 %.o:
 	@echo CC $<
