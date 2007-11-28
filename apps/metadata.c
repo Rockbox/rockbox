@@ -325,6 +325,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     return true;
 }
 
+#if CONFIG_CODEC == SWCODEC
 void strip_tags(int handle_id)
 {
     int i;
@@ -364,3 +365,4 @@ strip_ape_tag:
     logf("Cutting off APE tag (%ldB)", len);
     bufcuttail(handle_id, len);
 }
+#endif /* CONFIG_CODEC == SWCODEC */
