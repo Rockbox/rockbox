@@ -328,7 +328,6 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
 #if CONFIG_CODEC == SWCODEC
 void strip_tags(int handle_id)
 {
-    int i;
     static const unsigned char tag[] = "TAG";
     static const unsigned char apetag[] = "APETAGEX";    
     size_t len, version;
@@ -337,27 +336,24 @@ void strip_tags(int handle_id)
     if (bufgettail(handle_id, 128, (void **)&tail) != 128)
         return;
 
-    for(i = 0;i < 3;i++)
-        if(tail[i] != tag[i])
-            goto strip_ape_tag;
+    if (memcmp(tail, tag, 3) == 0)
+    {
+        /* Skip id3v1 tag */
+        logf("Cutting off ID3v1 tag");
+        bufcuttail(handle_id, 128);
+    }
 
-    /* Skip id3v1 tag */
-    logf("Cutting off ID3v1 tag");
-    bufcuttail(handle_id, 128);
-
-strip_ape_tag:
-    /* Check for APE tag (look for the APE tag footer) */
-
+    /* Get a new tail, as the old one may have been cut */
     if (bufgettail(handle_id, 32, (void **)&tail) != 32)
         return;
 
-    for(i = 0;i < 8;i++)
-        if(tail[i] != apetag[i])
-            return;
+    /* Check for APE tag (look for the APE tag footer) */
+    if (memcmp(tail, apetag, 8) != 0)
+        return;
 
     /* Read the version and length from the footer */
-    version = tail[8] | (tail[9] << 8) | (tail[10] << 16) | (tail[11] << 24);
-    len = tail[12] | (tail[13] << 8) | (tail[14] << 16) | (tail[15] << 24);
+    version = get_long_le(&tail[8]);
+    len = get_long_le(&tail[12]);
     if (version == 2000)
         len += 32; /* APEv2 has a 32 byte header */
 
