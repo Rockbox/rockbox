@@ -1118,8 +1118,7 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
 #endif
     /* Save user's HighScore */
     highscore_save(HIGH_SCORE,Highest,MAX_HIGH_SCORES);
-    /* Restore user's original backlight setting */
-    rb->backlight_set_timeout (rb->global_settings->backlight_timeout);
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
     return ret;
 }

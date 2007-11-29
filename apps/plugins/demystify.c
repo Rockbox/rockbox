@@ -23,6 +23,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "pluginlib_actions.h"
+#include "helper.h"
 PLUGIN_HEADER
 
 #define DEFAULT_WAIT_TIME 3
@@ -255,9 +256,9 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 
-    rb->screens[SCREEN_MAIN]->backlight_set_timeout(rb->global_settings->backlight_timeout);
-#if NB_SCREENS==2
-    rb->screens[SCREEN_REMOTE]->backlight_set_timeout(rb->global_settings->remote_backlight_timeout);
+    backlight_use_settings(rb);
+#ifdef HAVE_REMOTE_LCD
+    remote_backlight_use_settings(rb);
 #endif
 }
 
@@ -428,16 +429,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int ret;
 
     rb = api; /* copy to global api pointer */
+    (void)parameter;
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
-    (void)parameter;
-    if (rb->global_settings->backlight_timeout > 0)
-    {
-        int i;
-        FOR_NB_SCREENS(i)
-            rb->screens[i]->backlight_set_timeout(1);/* keep the light on */
-    }
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
+#ifdef HAVE_REMOTE_LCD
+    remote_backlight_force_on(rb); /* remote backlight control in lib/helper.c */
+#endif
     ret = plugin_main();
 
     return ret;

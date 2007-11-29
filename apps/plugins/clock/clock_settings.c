@@ -78,11 +78,11 @@ void clock_settings_reset(struct clock_settings* settings){
 void apply_backlight_setting(int backlight_setting)
 {
     if(backlight_setting == ALWAS_OFF)
-        rb->backlight_set_timeout(0);
+        rb->backlight_set_timeout(-1);
     else if(backlight_setting == ROCKBOX_SETTING)
         rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
     else if(backlight_setting == ALWAYS_ON)
-        rb->backlight_set_timeout(1);
+        rb->backlight_set_timeout(0);
 }
 
 void clock_settings_skin_next(struct clock_settings* settings){

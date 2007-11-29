@@ -60,6 +60,7 @@
 
 #include "plugin.h"
 #include "pluginlib_actions.h"
+#include "helper.h"
 
 PLUGIN_HEADER
 
@@ -405,7 +406,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     (void)parameter;
     rb = api;
 
-    rb->backlight_set_timeout(1);
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_background(LCD_DEFAULT_BG);
@@ -482,7 +483,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->yield();
     }
 
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
     return PLUGIN_OK;
 }
 

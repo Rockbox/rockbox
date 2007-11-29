@@ -19,37 +19,55 @@
 
 #include "plugin.h"
 
-/*
- *  force the backlight on
- *  now enabled regardless of HAVE_BACKLIGHT because it is not needed to
- *  build and makes modded targets easier to update
- */
+/*  Force the backlight on */
 void backlight_force_on(struct plugin_api* rb)
 {
-    if(!rb) return;
-/* #ifdef HAVE_BACKLIGHT */
+    if(!rb)
+        return;
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout(0);
 #if CONFIG_CHARGING
     if (rb->global_settings->backlight_timeout_plugged > 0)
         rb->backlight_set_timeout_plugged(0);
 #endif /* CONFIG_CHARGING */
-/* #endif */ /* HAVE_BACKLIGHT */
-}    
+}
 
-/*
- *  reset backlight operation to its settings
- *  now enabled regardless of HAVE_BACKLIGHT because it is not needed to
- *  build and makes modded targets easier to update
- */
+/*  Reset backlight operation to its settings */
 void backlight_use_settings(struct plugin_api* rb)
 {
-    if(!rb) return;
-/* #ifdef HAVE_BACKLIGHT */
+    if (!rb)
+        return;
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 #if CONFIG_CHARGING
-    rb->backlight_set_timeout_plugged(rb->global_settings-> \
-                                                     backlight_timeout_plugged);
+    rb->backlight_set_timeout_plugged(rb->global_settings->
+                                      backlight_timeout_plugged);
 #endif /* CONFIG_CHARGING */
-/* #endif */ /* HAVE_BACKLIGHT */
 }
+
+#ifdef HAVE_REMOTE_LCD
+/*  Force the backlight on */
+void remote_backlight_force_on(struct plugin_api* rb)
+{
+    if (!rb)
+        return;
+    if (rb->global_settings->remote_backlight_timeout > 0)
+        rb->remote_backlight_set_timeout(0);
+#if CONFIG_CHARGING
+    if (rb->global_settings->remote_backlight_timeout_plugged > 0)
+        rb->remote_backlight_set_timeout_plugged(0);
+#endif /* CONFIG_CHARGING */
+}
+
+/*  Reset backlight operation to its settings */
+void remote_backlight_use_settings(struct plugin_api* rb)
+{
+    if (!rb)
+        return;
+    rb->remote_backlight_set_timeout(rb->global_settings->
+                                     remote_backlight_timeout);
+#if CONFIG_CHARGING
+    rb->remote_backlight_set_timeout_plugged(rb->global_settings-> 
+                                             remote_backlight_timeout_plugged);
+#endif /* CONFIG_CHARGING */
+}
+#endif /* HAVE_REMOTE_LCD */

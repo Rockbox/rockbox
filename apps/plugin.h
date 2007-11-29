@@ -113,7 +113,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 90
+#define PLUGIN_API_VERSION 91
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -648,7 +648,13 @@ struct plugin_api {
 
     bool (*file_exists)(const char *file);
     bool (*dir_exists)(const char *path);
-
+    
+#ifdef HAVE_REMOTE_LCD
+    void (*remote_backlight_set_timeout)(int index);
+#if CONFIG_CHARGING
+    void (*remote_backlight_set_timeout_plugged)(int index);
+#endif
+#endif /* HAVE_REMOTE_LCD */
 };
 
 /* plugin header */

@@ -525,6 +525,13 @@ static const struct plugin_api rockbox_api = {
 
     file_exists,
     dir_exists,
+
+#ifdef HAVE_REMOTE_LCD
+    remote_backlight_set_timeout,
+#if CONFIG_CHARGING
+    remote_backlight_set_timeout_plugged,
+#endif
+#endif /* HAVE_REMOTE_LCD */
 };
 
 int plugin_load(const char* plugin, void* parameter)
