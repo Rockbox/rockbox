@@ -474,8 +474,6 @@ next_page:
                         goto exit;
                     }
 
-                    ci->id3->vbr = true;
-                    ci->id3->frequency = samplerate;
                     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
                     ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
                     if (channels == 2) {
