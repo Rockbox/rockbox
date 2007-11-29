@@ -1,0 +1,10 @@
+sansapatcher
+------------
+
+To compile sansapatcher, you need both the C200 and E200 Rockbox
+bootloaders.  The latest bootloaders can always be found here:
+
+http://download.rockbox.org/bootloader/sandisk-sansa/e200/PP5022.mi4
+http://download.rockbox.org/bootloader/sandisk-sansa/c200/firmware.mi4
+
+Place both these files in the sansapatcher source directory, and type "make".
