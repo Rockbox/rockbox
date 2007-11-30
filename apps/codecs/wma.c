@@ -386,7 +386,7 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
 
 /*entry point for seeks*/
  static int seek(int ms, asf_waveformatex_t* wfx){
-    int time, duration, delta, temp;
+    int time, duration, delta, temp, count=0;
 
     /*estimate packet number from bitrate*/
     int initial_packet = ci->curpos/wfx->packet_size;
@@ -396,7 +396,6 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
     if(packet_num > last_packet){
         packet_num = last_packet;
     }
-
     /*calculate byte address of the start of that packet*/
     int packet_offset = packet_num*wfx->packet_size;
 
@@ -404,6 +403,8 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
     ci->seek_buffer(ci->id3->first_frame_offset+packet_offset);
     temp = ms;
     while(1){
+        /*for very large files it can be difficult and unimportant to find the exact packet*/
+        count++;
 
         /*check the time stamp of our packet*/
         time = get_timestamp(&duration);
@@ -416,7 +417,7 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
             return ms;
         }
 
-        if(time+duration>=ms && time<=ms){
+        if((time+duration>=ms && time<=ms) || count > 10){
             /*the get_timestamp function advances us 12 bytes past the packet start*/
             ci->seek_buffer(ci->curpos-12);
             DEBUGF("Found our packet! Now at %d packet\n", packet_num);
@@ -424,14 +425,10 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
         }else {
             /*seek again*/
             delta = ms-time;
-            DEBUGF("delta is %d ms\n", delta);
-
             /*estimate new packet number from bitrate and our current position*/
             temp += delta;
-            packet_num = (temp*(wfx->bitrate>>3)/1000 - (wfx->packet_size>>1))/wfx->packet_size;    //round down!
-            DEBUGF("updated Packet_num is %d\n", packet_num);
+            packet_num = ((temp/1000)*(wfx->bitrate>>3) - (wfx->packet_size>>1))/wfx->packet_size;  //round down!
             packet_offset = packet_num*wfx->packet_size;
-
             ci->seek_buffer(ci->id3->first_frame_offset+packet_offset);
         }
      }
@@ -524,30 +521,31 @@ next_track:
                 ci->seek_complete();
                 goto next_track;
             }
+            DEBUGF("Seek returned %d\n", time);
             ci->set_elapsed(elapsedtime);
 
             /*flush the wma decoder state*/
-             wmadec.last_superframe_len = 0;
-             wmadec.last_bitoffset = 0;
-             ci->seek_complete();
+            wmadec.last_superframe_len = 0;
+            wmadec.last_bitoffset = 0;
+            ci->seek_complete();
         }
         errcount = 0;
 new_packet:
         res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx);
         if(res < 0){
 
-            /* We'll try to recover from a parse error a certain number of
-            * times. If we succeed, the error counter will be reset.
-            */
+        /* We'll try to recover from a parse error a certain number of
+        * times. If we succeed, the error counter will be reset.
+        */
 
-            errcount++;
-            DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
-            if (errcount > 5) {
-                goto done;
-            } else {
-                ci->advance_buffer(packetlength);
-                goto new_packet;
-            }
+        errcount++;
+        DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
+        if (errcount > 5) {
+            goto done;
+        } else {
+            ci->advance_buffer(packetlength);
+            goto new_packet;
+        }
 
         }else if (res > 0) {
             wma_decode_superframe_init(&wmadec,
@@ -558,10 +556,12 @@ new_packet:
                 wmares = wma_decode_superframe_frame(&wmadec,
                                                      decoded,
                                                      audiobuf, audiobufsize);
+
                 ci->yield ();
 
-                if (wmares < 0){
-                    /* Do the above, but for errors in decode.*/
+                 if (wmares < 0){
+                    /* Do the above, but for errors in decode.
+                     */
                     errcount++;
                     DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
                     if (errcount > 5) {
