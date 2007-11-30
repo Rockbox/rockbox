@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id:  $
  *
- * Copyright (C) 2007 by Björn Stenberg
+ * Copyright (C) 2007 by Bjï¿½rn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -24,6 +24,7 @@
 #include "logf.h"
 
 //#define USB_STORAGE
+//#define USB_SERIAL
 //#define USB_BENCHMARK
 #define USB_CHARGING_ONLY
 
@@ -33,6 +34,10 @@
 
 #if defined(USB_STORAGE)
 #include "usb_storage.h"
+#define USB_THREAD
+#elif defined(USB_SERIAL)
+#define USB_THREAD
+#include "usb_serial.h"
 #elif defined(USB_BENCHMARK)
 #include "usb_benchmark.h"
 #endif
@@ -79,7 +84,7 @@ static const struct {
         .bmAttributes        = USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
         .bMaxPower           = 250, /* 500mA in 2mA units */
     },
-    
+
 #ifdef USB_CHARGING_ONLY
     /* dummy interface for charging-only */
     {
@@ -163,7 +168,7 @@ static const struct {
         .bDescriptorType  = USB_DT_ENDPOINT,
         .bEndpointAddress = EP_TX | USB_DIR_IN,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
+        .wMaxPacketSize   = 64,
         .bInterval        = 0
     },
     {
@@ -171,7 +176,7 @@ static const struct {
         .bDescriptorType  = USB_DT_ENDPOINT,
         .bEndpointAddress = EP_RX | USB_DIR_OUT,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
+        .wMaxPacketSize   = 64,
         .bInterval        = 0
     }
 #endif
@@ -296,7 +301,7 @@ static bool data_connection = false;
 static struct event_queue usbcore_queue;
 static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
-#ifdef USB_STORAGE
+#ifdef USB_THREAD
 static const char usbcore_thread_name[] = "usb_core";
 static struct thread_entry* usbcore_thread;
 static long usbcore_stack[DEFAULT_STACK_SIZE];
@@ -314,6 +319,13 @@ void usb_core_init(void)
     usb_drv_init();
 #ifdef USB_STORAGE
     usb_storage_init();
+#endif
+
+#ifdef USB_SERIAL
+    usb_serial_init();
+#endif
+
+#ifdef USB_THREAD
     usbcore_thread =
         create_thread(usb_core_thread, usbcore_stack, sizeof(usbcore_stack), 0,
                       usbcore_thread_name
@@ -334,7 +346,7 @@ void usb_core_exit(void)
     if (initialized) {
         usb_drv_exit();
         queue_delete(&usbcore_queue);
-#ifdef USB_STORAGE
+#ifdef USB_THREAD
         remove_thread(usbcore_thread);
 #endif
     }
@@ -348,15 +360,22 @@ bool usb_core_data_connection(void)
     return data_connection;
 }
 
-#ifdef USB_STORAGE
+#ifdef USB_THREAD
 void usb_core_thread(void)
 {
     while (1) {
         struct queue_event ev;
-    
+
         queue_wait(&usbcore_queue, &ev);
 
+#ifdef USB_STORAGE
         usb_storage_transfer_complete(ev.id);
+#endif
+
+#ifdef USB_SERIAL
+        usb_serial_transfer_complete(ev.id);
+#endif
+
     }
 }
 #endif
@@ -380,6 +399,10 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
 #ifdef USB_STORAGE
             usb_storage_control_request(req);
 #endif
+
+#ifdef USB_SERIAL
+            usb_serial_control_request(req);
+#endif
             ack_control(req);
             if (req->wValue)
                 usb_state = CONFIGURED;
@@ -399,7 +422,7 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
             ack_control(req);
             break;
         }
-            
+
         case USB_REQ_SET_INTERFACE:
             logf("usb_core: SET_INTERFACE");
             ack_control(req);
@@ -517,6 +540,11 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
             /* does usb_storage know this request? */
             if (!usb_storage_control_request(req))
 #endif
+
+#ifdef USB_SERIAL
+            /* does usb_serial know this request? */
+            if (!usb_serial_control_request(req))
+#endif
             {
                 /* nope. flag error */
                 logf("usb bad req %d", req->bRequest);
@@ -551,11 +579,11 @@ void usb_core_transfer_complete(int endpoint, bool in)
         case EP_TX:
 #if defined(USB_BENCHMARK)
             usb_benchmark_transfer_complete(endpoint, in);
-#elif defined(USB_STORAGE)
+#elif defined(USB_STORAGE) || defined(USB_SERIAL)
             queue_post(&usbcore_queue, endpoint, 0);
 #endif
             break;
-                
+
         default:
             break;
     }

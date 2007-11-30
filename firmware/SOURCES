@@ -229,6 +229,7 @@ drivers/audio/mas35xx.c
 #ifdef HAVE_USBSTACK
 usbstack/usb_core.c
 usbstack/usb_storage.c
+usbstack/usb_serial.c
 usbstack/usb_benchmark.c
 #ifdef CPU_PP502x
 target/arm/usb-drv-pp502x.c
