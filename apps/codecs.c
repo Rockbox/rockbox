@@ -131,7 +131,6 @@ struct codec_api ci = {
     enc_set_parameters,
     enc_get_chunk,
     enc_finish_chunk,
-    enc_pcm_buf_near_empty,
     enc_get_pcm_data,
     enc_unget_pcm_data,
 
@@ -141,15 +140,6 @@ struct codec_api ci = {
     (read_func)read,
     PREFIX(lseek),
     (write_func)write,
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-#ifdef CPU_BOOST_LOGGING
-    cpu_boost_,
-#else
-    cpu_boost,
-#endif
-#endif
-
     round_value_to_list32,
 
 #endif

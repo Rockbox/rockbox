@@ -275,8 +275,6 @@ void   enc_set_parameters(struct enc_parameters *params);
 struct enc_chunk_hdr * enc_get_chunk(void);
 /* releases the current chunk into the available chunks */
 void   enc_finish_chunk(void);
-/* checks near empty state on pcm input buffer */
-int    enc_pcm_buf_near_empty(void);
 
 #define PCM_MAX_FEED_SIZE       20000 /* max pcm size passed to encoder    */
 

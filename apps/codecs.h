@@ -80,12 +80,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 21
+#define CODEC_API_VERSION 22
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 18
+#define CODEC_MIN_API_VERSION 22
 
 /* codec return codes */
 enum codec_status {
@@ -200,7 +200,6 @@ struct codec_api {
     void            (*enc_set_parameters)(struct enc_parameters *params);
     struct enc_chunk_hdr * (*enc_get_chunk)(void);
     void            (*enc_finish_chunk)(void);
-    int             (*enc_pcm_buf_near_empty)(void);
     unsigned char * (*enc_get_pcm_data)(size_t size);
     size_t          (*enc_unget_pcm_data)(size_t size);
 
@@ -210,21 +209,10 @@ struct codec_api {
     ssize_t (*read)(int fd, void* buf, size_t count);
     off_t (*PREFIX(lseek))(int fd, off_t offset, int whence);
     ssize_t (*write)(int fd, const void* buf, size_t count);
-    
-    /* Encoder codecs adjust CPU boost themselves */
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-#ifdef CPU_BOOST_LOGGING
-    void (*cpu_boost_)(bool on_off,char*location,int line);
-#else
-    void (*cpu_boost)(bool on_off);
-#endif
-#endif
-
     int (*round_value_to_list32)(unsigned long value,
                                  const unsigned long list[],
                                  int count,
                                  bool signd);
-
 #endif
 
     /* new stuff at the end, sort into place next time

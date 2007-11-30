@@ -108,17 +108,16 @@ static unsigned long  pre_record_ticks;  /* pre-record time in ticks       */
   3.encoder: enc_set_parameters();     set the encoder parameters
   4.encoder: enc_get_pcm_data();       get n bytes of unprocessed pcm data
   5.encoder: enc_unget_pcm_data();     put n bytes of data back (optional)
-  6.encoder: enc_pcm_buf_near_empty(); if !0: reduce cpu_boost
-  7.encoder: enc_get_chunk();          get a ptr to next enc chunk
-  8.encoder: <process enc chunk>       compress and store data to enc chunk
-  9.encoder: enc_finish_chunk();       inform main about chunk processed and
+  6.encoder: enc_get_chunk();          get a ptr to next enc chunk
+  7.encoder: <process enc chunk>       compress and store data to enc chunk
+  8.encoder: enc_finish_chunk();       inform main about chunk processed and
                                        is available to be written to a file.
                                        Encoder can place any number of chunks
                                        of PCM data in a single output chunk
                                        but must stay within its output chunk
                                        size
-  A.encoder: repeat 4. to 9.
-  B.pcmrec:  enc_events_callback();   called for certain events
+  9.encoder: repeat 4. to 8.
+  A.pcmrec:  enc_events_callback();   called for certain events
 
   (*) Optional step
 ****************************************************************************/
@@ -1541,6 +1540,7 @@ void enc_set_parameters(struct enc_parameters *params)
         /* Encoder is terminating */
         memset(&enc_config, 0, sizeof (enc_config));
         enc_sample_rate = 0;
+        cancel_cpu_boost(); /* Make sure no boost remains */
         return;
     }
 
@@ -1709,15 +1709,6 @@ void enc_finish_chunk(void)
     }
 } /* enc_finish_chunk */
 
-/* checks near empty state on pcm input buffer */
-int enc_pcm_buf_near_empty(void)
-{
-    /* less than 1sec raw data? => unboost encoder */
-    int    wp    = dma_wr_pos;
-    size_t avail = (wp - pcm_rd_pos) & PCM_CHUNK_MASK;
-    return avail < (sample_rate << 2) ? 1 : 0;
-} /* enc_pcm_buf_near_empty */
-
 /* passes a pointer to next chunk of unprocessed wav data */
 /* TODO: this really should give the actual size returned */
 unsigned char * enc_get_pcm_data(size_t size)
@@ -1744,12 +1735,24 @@ unsigned char * enc_get_pcm_data(size_t size)
                    pcm_buffer, pcm_rd_pos);
         }
 
+        if (avail >= (sample_rate << 2))
+        {
+            /* Filling up - boost codec */
+            trigger_cpu_boost();
+        }
+
         pcm_buffer_empty = false;
         return ptr;
     }
 
     /* not enough data available - encoder should idle */
     pcm_buffer_empty = true;
+
+    cancel_cpu_boost();
+
+    /* Sleep long enough to allow one frame on average */
+    sleep(0);
+
     return NULL;
 } /* enc_get_pcm_data */
 
