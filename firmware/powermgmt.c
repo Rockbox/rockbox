@@ -797,6 +797,9 @@ static void power_thread(void)
     int last_disk_activity = CHARGE_END_LONGD + 1; /* last hdd use x mins ago */
 #endif
 
+    /* Delay reading the first battery level */
+    sleep(HZ/100);
+
     /* initialize the voltages for the exponential filter */
     avgbat = battery_adc_voltage() + 15;
 
