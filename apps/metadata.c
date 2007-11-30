@@ -331,9 +331,9 @@ void strip_tags(int handle_id)
     static const unsigned char tag[] = "TAG";
     static const unsigned char apetag[] = "APETAGEX";    
     size_t len, version;
-    unsigned char *tail;
+    void *tail;
 
-    if (bufgettail(handle_id, 128, (void **)&tail) != 128)
+    if (bufgettail(handle_id, 128, &tail) != 128)
         return;
 
     if (memcmp(tail, tag, 3) == 0)
@@ -344,7 +344,7 @@ void strip_tags(int handle_id)
     }
 
     /* Get a new tail, as the old one may have been cut */
-    if (bufgettail(handle_id, 32, (void **)&tail) != 32)
+    if (bufgettail(handle_id, 32, &tail) != 32)
         return;
 
     /* Check for APE tag (look for the APE tag footer) */
@@ -352,8 +352,8 @@ void strip_tags(int handle_id)
         return;
 
     /* Read the version and length from the footer */
-    version = get_long_le(&tail[8]);
-    len = get_long_le(&tail[12]);
+    version = get_long_le(&((unsigned char *)tail)[8]);
+    len = get_long_le(&((unsigned char *)tail)[12]);
     if (version == 2000)
         len += 32; /* APEv2 has a 32 byte header */
 
