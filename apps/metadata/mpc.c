@@ -52,7 +52,7 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
             unsigned int gapless = (header[5] >> 31) & 0x0001;
             unsigned int last_frame_samples = (header[5] >> 20) & 0x07ff;
             int track_gain, album_gain;
-            unsigned int bufused;
+            unsigned int bufused = 0;
             
             id3->frequency = sfreqs_sv7[(header[2] >> 16) & 0x0003];
             samples = (uint64_t)header[1]*1152; /* 1152 is mpc frame size */
@@ -61,24 +61,40 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
             else
                 samples -= 481; /* Musepack subband synth filter delay */
            
-            /* Extract ReplayGain data from header */
+            /* Extract ReplayGain data from header, we use peak gain 0 to
+               indicate a given gain type isn't used. */
             track_gain = (int16_t)((header[3] >> 16) & 0xffff);
-            id3->track_gain = get_replaygain_int(track_gain);
             id3->track_peak = ((uint16_t)(header[3] & 0xffff)) << 9;
+            if (id3->track_peak != 0)
+                id3->track_gain = get_replaygain_int(track_gain);
+            else
+                id3->track_gain = 0;
             
             album_gain = (int16_t)((header[4] >> 16) & 0xffff);
-            id3->album_gain = get_replaygain_int(album_gain);
             id3->album_peak = ((uint16_t)(header[4] & 0xffff)) << 9;
+            if (id3->album_peak != 0)
+                id3->album_gain = get_replaygain_int(album_gain);
+            else
+                id3->album_gain = 0;
             
             /* Write replaygain values to strings for use in id3 screen. We use
                the XING header as buffer space since Musepack files shouldn't
                need to use it in any other way */
-            id3->track_gain_string = (char *)id3->toc;
-            bufused = snprintf(id3->track_gain_string, 45,
+            if (id3->track_peak != 0) {
+                id3->track_gain_string = (char *)id3->toc;
+                bufused = snprintf(id3->track_gain_string, 45,
                                "%d.%d dB", track_gain/100, abs(track_gain)%100);
-            id3->album_gain_string = (char *)id3->toc + bufused + 1;
-            bufused = snprintf(id3->album_gain_string, 45,
+            } else {
+                id3->track_gain_string = NULL;
+            }
+
+            if (id3->album_peak != 0) {
+                id3->album_gain_string = (char *)id3->toc + bufused + 1;
+                bufused = snprintf(id3->album_gain_string, 45,
                                "%d.%d dB", album_gain/100, abs(album_gain)%100);
+            } else {
+                id3->album_gain_string = NULL;
+            }
         }
     } else {
         header[0] = letoh32(header[0]);
