@@ -592,17 +592,6 @@ static void adjust_cursor(void)
         cursor = max_cursor;
 }
 
-static bool check_dir(const char *folder)
-{
-    if (strcmp(folder, "/") && !dir_exists(folder))
-    {
-        int rc = mkdir(folder);
-        if(rc < 0)
-            return false;
-    }
-    return true;
-}
-
 /* the list below must match enum audio_sources in audio.h */
 static const char* const prestr[] =
 {
@@ -617,15 +606,15 @@ char *rec_create_filename(char *buffer)
     char ext[16];
     const char *pref = "R_";
 
-    strcpy(buffer,global_settings.rec_directory);
-    if (!check_dir(buffer))
-        return NULL;
+    /* Directory existence and writeablility should have already been
+     * verified - do not pass NULL pointers to pcmrec */
 
-    if((global_settings.rec_source > AUDIO_SRC_PLAYBACK) &&
-       (global_settings.rec_source < AUDIO_NUM_SOURCES))
+    if((unsigned)global_settings.rec_source < AUDIO_NUM_SOURCES)
     {
         pref = prestr[global_settings.rec_source];
     }
+
+    strcpy(buffer, global_settings.rec_directory);
     
     snprintf(ext, sizeof(ext), ".%s",
              REC_FILE_ENDING(global_settings.rec_format));
@@ -652,7 +641,30 @@ static void rec_init_filename(void)
 
 int rec_create_directory(void)
 {
-    return check_dir(global_settings.rec_directory)?1:0;
+    int rc = 0;
+    const char * const folder = global_settings.rec_directory;
+
+    if (strcmp(folder, "/") && !dir_exists(folder))
+    {
+        rc = mkdir(folder);
+
+        if(rc < 0)
+        {
+            while (action_userabort(HZ) == false)
+            {
+                gui_syncsplash(0, "%s %s", 
+                               str(LANG_REC_DIR_NOT_WRITABLE), 
+                               str(LANG_OFF_ABORT));
+            }
+        }
+        else
+        {
+            rec_status |= RCSTAT_CREATED_DIRECTORY;
+            rc = 1;
+        }
+    }
+
+    return rc;
 }
 
 void rec_init_recording_options(struct audio_recording_options *options)
@@ -872,17 +884,14 @@ bool recording_screen(bool no_source)
 #endif
 
     struct audio_recording_options rec_options;
-    if (check_dir(global_settings.rec_directory) == false)
+    rec_status = RCSTAT_IN_RECSCREEN;
+
+    if (rec_create_directory() < 0)
     {
-        do {
-            gui_syncsplash(0, "%s %s", 
-                                     str(LANG_REC_DIR_NOT_WRITABLE), 
-                                     str(LANG_OFF_ABORT));
-        } while (action_userabort(HZ) == false);
+        rec_status = 0;
         return false;
     }
-    
-    rec_status = RCSTAT_IN_RECSCREEN;
+
     cursor = 0;
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
@@ -910,9 +919,6 @@ bool recording_screen(bool no_source)
     rec_set_recording_options(&rec_options);
 
     set_gain();
-
-    if(rec_create_directory() > 0)
-        rec_status |= RCSTAT_CREATED_DIRECTORY;
 
 #if CONFIG_RTC == 0
     /* Create new filename for recording start */
@@ -1320,8 +1326,10 @@ bool recording_screen(bool no_source)
                         rec_init_recording_options(&rec_options);
                         rec_set_recording_options(&rec_options);
 
-                        if(rec_create_directory() > 0)
-                            rec_status |= RCSTAT_CREATED_DIRECTORY;
+                        if(rec_create_directory() < 0)
+                        {
+                            goto rec_abort;
+                        }
 
 #if CONFIG_CODEC == SWCODEC && CONFIG_RTC == 0
                         /* If format changed, a new number is required */
@@ -1860,6 +1868,8 @@ bool recording_screen(bool no_source)
                 break;
         }
     }
+
+rec_abort:
 
 #if CONFIG_CODEC == SWCODEC
     rec_command(RECORDING_CMD_STOP);
