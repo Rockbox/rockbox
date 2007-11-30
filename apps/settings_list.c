@@ -495,8 +495,9 @@ const struct settings_list settings[] = {
                   -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
 #if CONFIG_CHARGING
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, remote_backlight_timeout_plugged,
-                  LANG_BACKLIGHT, 10, "remote backlight timeout plugged",
-                  off_on, UNIT_SEC, backlight_formatter, backlight_getlang,
+                  LANG_BACKLIGHT_ON_WHEN_CHARGING, 10,
+                  "remote backlight timeout plugged", off_on, UNIT_SEC,
+                  backlight_formatter, backlight_getlang,
                   remote_backlight_set_timeout_plugged, 20,
                   -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
 #endif
