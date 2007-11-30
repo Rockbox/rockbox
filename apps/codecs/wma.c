@@ -521,7 +521,7 @@ next_track:
                 ci->seek_complete();
                 goto next_track;
             }
-            DEBUGF("Seek returned %d\n", time);
+            DEBUGF("Seek returned %d\n", (int)time);
             ci->set_elapsed(elapsedtime);
 
             /*flush the wma decoder state*/
