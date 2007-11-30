@@ -59,8 +59,8 @@ struct bmp_header {
     uint16_t reserved2;     /* 0 */
     uint32_t off_bits;      /* offset to bitmap */
     uint32_t struct_size;   /* size of this struct (40) */
-    uint32_t width;         /* bmap width in pixels */
-    uint32_t height;        /* bmap height in pixels */
+    int32_t width;          /* bmap width in pixels */
+    int32_t height;         /* bmap height in pixels */
     uint16_t planes;        /* num planes - always 1 */
     uint16_t bit_count;     /* bits per pixel */
     uint32_t compression;   /* compression flag */
@@ -177,8 +177,9 @@ int read_bmp_fd(int fd,
     struct bmp_header bmph;
     int width, height, padded_width;
     int dst_height, dst_width;
-    int row, col, ret;
     int depth, numcolors, compression, totalsize;
+    int row, col, ret;
+    int rowstart, rowstop, rowstep;
 
     unsigned char *bitmap = bm->data;
     uint32_t bmpbuf[LCD_WIDTH]; /* Buffer for one line */
@@ -230,6 +231,17 @@ int read_bmp_fd(int fd,
     }
 
     height = readlong(&bmph.height);
+    if (height < 0) {     /* Top-down BMP file */
+        height = -height;
+        rowstart = 0;
+        rowstop = height;
+        rowstep = 1;
+    } else {              /* normal BMP */
+        rowstart = height - 1;
+        rowstop = -1;
+        rowstep = -1;
+    }
+
     depth = readshort(&bmph.bit_count);
     padded_width = ((width * depth + 31) >> 3) & ~3;  /* 4-byte boundary aligned */
 
@@ -346,7 +358,7 @@ int read_bmp_fd(int fd,
     memset(bitmap, 0, totalsize);
 
     /* loop to read rows and put them to buffer */
-    for (row = height - 1; row >= 0; row--) {
+    for (row = rowstart; row != rowstop; row += rowstep) {
         unsigned data, mask;
         unsigned char *p;
         uint16_t *p2;
