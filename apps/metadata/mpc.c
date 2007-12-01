@@ -28,6 +28,26 @@
 #include "logf.h"
 #include "replaygain.h"
 
+static int set_replaygain(struct mp3entry* id3, bool album, long value, 
+    long used)
+{
+    long gain = (int16_t) ((value >> 16) & 0xffff);
+    long peak = (uint16_t) (value & 0xffff);
+    
+    /* We use a peak value of 0 to indicate a given gain type isn't used. */
+    if (peak != 0)
+    {
+        /* Use the Xing TOC field to store ReplayGain strings for use in the
+         * ID3 screen, since Musepack files shouldn't need to use it in any
+         * other way.
+         */
+        used += parse_replaygain_int(album, gain * 512 / 100, peak << 9,
+            id3, id3->toc + used, sizeof(id3->toc) - used);
+    }
+    
+    return used;
+}
+
 bool get_musepack_metadata(int fd, struct mp3entry *id3)
 {
     const int32_t sfreqs_sv7[4] = { 44100, 48000, 37800, 32000 };
@@ -51,7 +71,6 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
         } else if (streamversion == 7) {
             unsigned int gapless = (header[5] >> 31) & 0x0001;
             unsigned int last_frame_samples = (header[5] >> 20) & 0x07ff;
-            int track_gain, album_gain;
             unsigned int bufused = 0;
             
             id3->frequency = sfreqs_sv7[(header[2] >> 16) & 0x0003];
@@ -61,40 +80,8 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
             else
                 samples -= 481; /* Musepack subband synth filter delay */
            
-            /* Extract ReplayGain data from header, we use peak gain 0 to
-               indicate a given gain type isn't used. */
-            track_gain = (int16_t)((header[3] >> 16) & 0xffff);
-            id3->track_peak = ((uint16_t)(header[3] & 0xffff)) << 9;
-            if (id3->track_peak != 0)
-                id3->track_gain = get_replaygain_int(track_gain);
-            else
-                id3->track_gain = 0;
-            
-            album_gain = (int16_t)((header[4] >> 16) & 0xffff);
-            id3->album_peak = ((uint16_t)(header[4] & 0xffff)) << 9;
-            if (id3->album_peak != 0)
-                id3->album_gain = get_replaygain_int(album_gain);
-            else
-                id3->album_gain = 0;
-            
-            /* Write replaygain values to strings for use in id3 screen. We use
-               the XING header as buffer space since Musepack files shouldn't
-               need to use it in any other way */
-            if (id3->track_peak != 0) {
-                id3->track_gain_string = (char *)id3->toc;
-                bufused = snprintf(id3->track_gain_string, 45,
-                               "%d.%d dB", track_gain/100, abs(track_gain)%100);
-            } else {
-                id3->track_gain_string = NULL;
-            }
-
-            if (id3->album_peak != 0) {
-                id3->album_gain_string = (char *)id3->toc + bufused + 1;
-                bufused = snprintf(id3->album_gain_string, 45,
-                               "%d.%d dB", album_gain/100, abs(album_gain)%100);
-            } else {
-                id3->album_gain_string = NULL;
-            }
+            bufused = set_replaygain(id3, false, header[3], bufused);
+            bufused = set_replaygain(id3, true, header[4], bufused);
         }
     } else {
         header[0] = letoh32(header[0]);
