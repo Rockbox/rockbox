@@ -309,35 +309,35 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
 }
 
 
- static int get_timestamp(int *duration){
+static int get_timestamp(int *duration)
+{
+    uint8_t tmp8, packet_flags, packet_property;
+    //int stream_id;
+    int ec_length, opaque_data, ec_length_type;
+    int datalen;
+    uint8_t data[18];
+    uint8_t* datap;
+    uint32_t length;
+    uint32_t padding_length;
+    uint32_t send_time;
 
-     uint8_t tmp8, packet_flags, packet_property;
-     //int stream_id;
-     int ec_length, opaque_data, ec_length_type;
-     int datalen;
-     uint8_t data[18];
-     uint8_t* datap;
-     uint32_t length;
-     uint32_t padding_length;
-     uint32_t send_time;
-
-     //uint16_t payload_count;
-     uint32_t bytesread = 0;
-     packet_count++;
-     if (ci->read_filebuf(&tmp8, 1) == 0) {
-         DEBUGF("ASF ERROR (EOF?)\n");
+    //uint16_t payload_count;
+    uint32_t bytesread = 0;
+    packet_count++;
+    if (ci->read_filebuf(&tmp8, 1) == 0) {
+        DEBUGF("ASF ERROR (EOF?)\n");
         return ASF_ERROR_EOF;
-     }
-     bytesread++;
+    }
+    bytesread++;
 
-     /* TODO: We need a better way to detect endofstream */
-     if (tmp8 != 0x82) {
-         DEBUGF("Get timestamp:  Detected end of stream\n");
+    /* TODO: We need a better way to detect endofstream */
+    if (tmp8 != 0x82) {
+        DEBUGF("Get timestamp:  Detected end of stream\n");
+        return ASF_ERROR_EOF;
+    }
 
-         return ASF_ERROR_EOF; }
 
-
-     if (tmp8 & 0x80) {
+    if (tmp8 & 0x80) {
         ec_length = tmp8 & 0x0f;
         opaque_data = (tmp8 >> 4) & 0x01;
         ec_length_type = (tmp8 >> 5) & 0x03;
@@ -350,42 +350,51 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
         /* Skip ec_data */
         ci->advance_buffer(ec_length);
         bytesread += ec_length;
-     } else {
-         ec_length = 0;
-     }
+    } else {
+        ec_length = 0;
+    }
 
-     if (ci->read_filebuf(&packet_flags, 1) == 0) { DEBUGF("Detected end of stream 2\n"); return ASF_ERROR_EOF; }
-     if (ci->read_filebuf(&packet_property, 1) == 0) {DEBUGF("Detected end of stream3\n"); return ASF_ERROR_EOF; }
-     bytesread += 2;
+    if (ci->read_filebuf(&packet_flags, 1) == 0) { 
+        DEBUGF("Detected end of stream 2\n");
+        return ASF_ERROR_EOF;
+    }
 
-     datalen = GETLEN2b((packet_flags >> 1) & 0x03) +
-               GETLEN2b((packet_flags >> 3) & 0x03) +
-               GETLEN2b((packet_flags >> 5) & 0x03) + 6;
+    if (ci->read_filebuf(&packet_property, 1) == 0) {
+        DEBUGF("Detected end of stream3\n");
+        return ASF_ERROR_EOF;
+    }
+    bytesread += 2;
 
-     if (ci->read_filebuf(data, datalen) == 0) {
-         DEBUGF("Detected end of stream4\n");
-         return ASF_ERROR_EOF;
-     }
+    datalen = GETLEN2b((packet_flags >> 1) & 0x03) +
+              GETLEN2b((packet_flags >> 3) & 0x03) +
+              GETLEN2b((packet_flags >> 5) & 0x03) + 6;
 
-     bytesread += datalen;
+    if (ci->read_filebuf(data, datalen) == 0) {
+        DEBUGF("Detected end of stream4\n");
+        return ASF_ERROR_EOF;
+    }
 
-     datap = data;
-     length = GETVALUE2b((packet_flags >> 5) & 0x03, datap);
-     datap += GETLEN2b((packet_flags >> 5) & 0x03);
-     /* sequence value is not used */
-     GETVALUE2b((packet_flags >> 1) & 0x03, datap);
-     datap += GETLEN2b((packet_flags >> 1) & 0x03);
-     padding_length = GETVALUE2b((packet_flags >> 3) & 0x03, datap);
-     datap += GETLEN2b((packet_flags >> 3) & 0x03);
-     send_time = get_long_le(datap);
-     datap += 4;
-     *duration = get_short_le(datap);
+    bytesread += datalen;
 
-     return send_time;
- }
+    datap = data;
+    length = GETVALUE2b((packet_flags >> 5) & 0x03, datap);
+    datap += GETLEN2b((packet_flags >> 5) & 0x03);
+
+    /* sequence value is not used */
+    GETVALUE2b((packet_flags >> 1) & 0x03, datap);
+    datap += GETLEN2b((packet_flags >> 1) & 0x03);
+    padding_length = GETVALUE2b((packet_flags >> 3) & 0x03, datap);
+    datap += GETLEN2b((packet_flags >> 3) & 0x03);
+    send_time = get_long_le(datap);
+    datap += 4;
+    *duration = get_short_le(datap);
+
+    return send_time;
+}
 
 /*entry point for seeks*/
- static int seek(int ms, asf_waveformatex_t* wfx){
+static int seek(int ms, asf_waveformatex_t* wfx)
+{
     int time, duration, delta, temp, count=0;
 
     /*estimate packet number from bitrate*/
@@ -393,16 +402,18 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
     int packet_num = (ms*(wfx->bitrate>>3))/wfx->packet_size/1000;
     int last_packet = ci->id3->filesize / wfx->packet_size;
 
-    if(packet_num > last_packet){
+    if (packet_num > last_packet) {
         packet_num = last_packet;
     }
+
     /*calculate byte address of the start of that packet*/
     int packet_offset = packet_num*wfx->packet_size;
 
     /*seek to estimated packet*/
     ci->seek_buffer(ci->id3->first_frame_offset+packet_offset);
     temp = ms;
-    while(1){
+    while (1)
+    {
         /*for very large files it can be difficult and unimportant to find the exact packet*/
         count++;
 
@@ -410,19 +421,19 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
         time = get_timestamp(&duration);
         DEBUGF("seeked to %d ms with duration %d\n", time, duration);
 
-        if(time < 0){
+        if (time < 0) {
             /*unknown error, try to recover*/
             DEBUGF("UKNOWN SEEK ERROR\n");
             ci->seek_buffer(ci->id3->first_frame_offset+initial_packet*wfx->packet_size);
             return ms;
         }
 
-        if((time+duration>=ms && time<=ms) || count > 10){
+        if ((time+duration>=ms && time<=ms) || count > 10) {
             /*the get_timestamp function advances us 12 bytes past the packet start*/
             ci->seek_buffer(ci->curpos-12);
             DEBUGF("Found our packet! Now at %d packet\n", packet_num);
             return time;
-        }else {
+        } else {
             /*seek again*/
             delta = ms-time;
             /*estimate new packet number from bitrate and our current position*/
@@ -431,8 +442,8 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
             packet_offset = packet_num*wfx->packet_size;
             ci->seek_buffer(ci->id3->first_frame_offset+packet_offset);
         }
-     }
- }
+    }
+}
 
 
 
@@ -517,7 +528,7 @@ next_track:
             }
 
             elapsedtime = seek(ci->seek_time, &wfx);
-            if(elapsedtime < 1){
+            if (elapsedtime < 1){
                 ci->seek_complete();
                 goto next_track;
             }
@@ -532,24 +543,22 @@ next_track:
         errcount = 0;
 new_packet:
         res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx);
-        if(res < 0){
 
-        /* We'll try to recover from a parse error a certain number of
-        * times. If we succeed, the error counter will be reset.
-        */
+        if (res < 0) {
+            /* We'll try to recover from a parse error a certain number of
+             * times. If we succeed, the error counter will be reset.
+             */
 
-        errcount++;
-        DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
-        if (errcount > 5) {
-            goto done;
-        } else {
-            ci->advance_buffer(packetlength);
-            goto new_packet;
-        }
-
-        }else if (res > 0) {
-            wma_decode_superframe_init(&wmadec,
-                                       audiobuf, audiobufsize);
+            errcount++;
+            DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
+            if (errcount > 5) {
+                goto done;
+            } else {
+                ci->advance_buffer(packetlength);
+                goto new_packet;
+            }
+        } else if (res > 0) {
+            wma_decode_superframe_init(&wmadec, audiobuf, audiobufsize);
 
             for (i=0; i < wmadec.nb_frames; i++)
             {
@@ -559,9 +568,8 @@ new_packet:
 
                 ci->yield ();
 
-                 if (wmares < 0){
-                    /* Do the above, but for errors in decode.
-                     */
+                if (wmares < 0) {
+                    /* Do the above, but for errors in decode. */
                     errcount++;
                     DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
                     if (errcount > 5) {
