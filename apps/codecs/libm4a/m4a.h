@@ -23,6 +23,19 @@
 #include <codecs.h>
 #include <inttypes.h>
 
+/* AAC codecdata appears to always be less than 8 bytes - see
+   AudioSpecificConfig2 in libfaad/mp4.c
+
+   ALAC codecdata appears to always be 44 bytes (see alac_set_info in
+   libalac/alac.c) but my test file contains 56 bytes.
+
+   So we go safe and round up to 64 bytes - if we find more than this,
+   we give an error (even though we could possibly continue), so we
+   can increase this buffer.
+*/
+
+#define MAX_CODECDATA_SIZE  64
+
 typedef struct {
   struct codec_api* ci;
   int eof;
@@ -57,7 +70,7 @@ typedef struct
     uint32_t num_sample_byte_sizes;
 
     uint32_t codecdata_len;
-    void *codecdata;
+    uint8_t codecdata[MAX_CODECDATA_SIZE];
 
     int mdat_offset;
     uint32_t mdat_len;

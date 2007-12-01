@@ -150,13 +150,14 @@ static bool read_chunk_esds(qtmovie_t *qtmovie, size_t chunk_len)
     
     /* read length */
     qtmovie->res->codecdata_len = mp4ff_read_mp4_descr_length(qtmovie->stream);
-    qtmovie->res->codecdata = malloc(qtmovie->res->codecdata_len);
-    if (qtmovie->res->codecdata)
+    if (qtmovie->res->codecdata_len > MAX_CODECDATA_SIZE)
     {
-        stream_read(qtmovie->stream, qtmovie->res->codecdata_len, qtmovie->res->codecdata);
-    } else {
-        qtmovie->res->codecdata_len = 0;
+        DEBUGF("codecdata too large (%d) in esds\n", 
+               (int)qtmovie->res->codecdata_len);
+        return false;
     }
+
+    stream_read(qtmovie->stream, qtmovie->res->codecdata_len, qtmovie->res->codecdata);
 
     /* will skip the remainder of the atom */
     return true;
@@ -225,19 +226,21 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
 
           /* 12 = audio format atom, 8 = padding */
           qtmovie->res->codecdata_len = entry_remaining + 12 + 8;
-          qtmovie->res->codecdata = malloc(qtmovie->res->codecdata_len);
-          
-          if (!qtmovie->res->codecdata)
+          if (qtmovie->res->codecdata_len > MAX_CODECDATA_SIZE)
           {
-             DEBUGF("stsd too large\n");
-             return false;
+             DEBUGF("codecdata too large (%d) in stsd\n", 
+                    (int)qtmovie->res->codecdata_len);
           }
 
           memset(qtmovie->res->codecdata, 0, qtmovie->res->codecdata_len);
           /* audio format atom */
+#if 0
+          /* The ALAC decoder skips these bytes, so there is no need to store them,
+             and this code isn't endian/alignment safe */
           ((unsigned int*)qtmovie->res->codecdata)[0] = 0x0c000000;
           ((unsigned int*)qtmovie->res->codecdata)[1] = MAKEFOURCC('a','m','r','f');
           ((unsigned int*)qtmovie->res->codecdata)[2] = MAKEFOURCC('c','a','l','a');
+#endif
 
           stream_read(qtmovie->stream,
                   entry_remaining,

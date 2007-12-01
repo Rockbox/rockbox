@@ -38,23 +38,25 @@
 #include "../codec.h"
 #include "decomp.h"
 
-#define _Swap32(v) do { \
-                   v = (((v) & 0x000000FF) << 0x18) | \
-                       (((v) & 0x0000FF00) << 0x08) | \
-                       (((v) & 0x00FF0000) >> 0x08) | \
-                       (((v) & 0xFF000000) >> 0x18); } while(0)
-
-#define _Swap16(v) do { \
-                   v = (((v) & 0x00FF) << 0x08) | \
-                       (((v) & 0xFF00) >> 0x08); } while (0)
-
 int16_t predictor_coef_table[32] IBSS_ATTR;
 int16_t predictor_coef_table_a[32] IBSS_ATTR;
 int16_t predictor_coef_table_b[32] IBSS_ATTR;
 
+
+/* Endian/aligment safe functions - only used in alac_set_info() */
+static uint32_t get_uint32be(unsigned char* p)
+{
+  return((p[0]<<24) | (p[1]<<16) | (p[2]<<8) | p[3]);
+}
+
+static uint16_t get_uint16be(unsigned char* p)
+{
+  return((p[0]<<8) | p[1]);
+}
+
 void alac_set_info(alac_file *alac, char *inputbuffer)
 {
-  char *ptr = inputbuffer;
+  unsigned char* ptr = (unsigned char*)inputbuffer;
   ptr += 4; /* size */
   ptr += 4; /* frma */
   ptr += 4; /* alac */
@@ -63,42 +65,22 @@ void alac_set_info(alac_file *alac, char *inputbuffer)
 
   ptr += 4; /* 0 ? */
 
-  alac->setinfo_max_samples_per_frame = *(uint32_t*)ptr; /* buffer size / 2 ? */
-#ifdef ROCKBOX_LITTLE_ENDIAN
-  _Swap32(alac->setinfo_max_samples_per_frame);
-#endif
+  alac->setinfo_max_samples_per_frame = get_uint32be(ptr); /* buffer size / 2 ? */
   ptr += 4;
-  alac->setinfo_7a = *(uint8_t*)ptr;
+  alac->setinfo_7a = *ptr++;
+  alac->setinfo_sample_size = *ptr++;
+  alac->setinfo_rice_historymult = *ptr++;
+  alac->setinfo_rice_initialhistory = *ptr++;
+  alac->setinfo_rice_kmodifier = *ptr++;
+  alac->setinfo_7f = *ptr++;
   ptr += 1;
-  alac->setinfo_sample_size = *(uint8_t*)ptr;
-  ptr += 1;
-  alac->setinfo_rice_historymult = *(uint8_t*)ptr;
-  ptr += 1;
-  alac->setinfo_rice_initialhistory = *(uint8_t*)ptr;
-  ptr += 1;
-  alac->setinfo_rice_kmodifier = *(uint8_t*)ptr;
-  ptr += 1;
-  alac->setinfo_7f = *(uint8_t*)ptr;
-  ptr += 1;
-  alac->setinfo_80 = *(uint16_t*)ptr;
-#ifdef ROCKBOX_LITTLE_ENDIAN
-  _Swap16(alac->setinfo_80);
-#endif
+  alac->setinfo_80 = get_uint16be(ptr);
   ptr += 2;
-  alac->setinfo_82 = *(uint32_t*)ptr;
-#ifdef ROCKBOX_LITTLE_ENDIAN
-  _Swap32(alac->setinfo_82);
-#endif
+  alac->setinfo_82 = get_uint32be(ptr);
   ptr += 4;
-  alac->setinfo_86 = *(uint32_t*)ptr;
-#ifdef ROCKBOX_LITTLE_ENDIAN
-  _Swap32(alac->setinfo_86);
-#endif
+  alac->setinfo_86 = get_uint32be(ptr);
   ptr += 4;
-  alac->setinfo_8a_rate = *(uint32_t*)ptr;
-#ifdef ROCKBOX_LITTLE_ENDIAN
-  _Swap32(alac->setinfo_8a_rate);
-#endif
+  alac->setinfo_8a_rate = get_uint32be(ptr);
   ptr += 4;
 }
 
