@@ -58,7 +58,8 @@ enum asf_error_e {
     ASF_ERROR_INVALID_OBJECT = -7,  /* ASF object missing or in wrong place */
     ASF_ERROR_OBJECT_SIZE    = -8,  /* invalid ASF object size (too small) */
     ASF_ERROR_SEEKABLE       = -9,  /* file not seekable */
-    ASF_ERROR_SEEK           = -10  /* file is seekable but seeking failed */
+    ASF_ERROR_SEEK           = -10, /* file is seekable but seeking failed */
+    ASF_ERROR_ENCRYPTED      = -11  /* file is encrypted */
 };
 
 static const guid_t asf_guid_null =
@@ -88,6 +89,12 @@ static const guid_t asf_guid_content_description =
 
 static const guid_t asf_guid_extended_content_description =
 {0xD2D0A440, 0xE307, 0x11D2, {0x97, 0xF0, 0x00, 0xA0, 0xC9, 0x5E, 0xA8, 0x50}};
+
+static const guid_t asf_guid_content_encryption =
+{0x2211b3fb, 0xbd23, 0x11d2, {0xb4, 0xb7, 0x00, 0xa0, 0xc9, 0x55, 0xfc, 0x6e}};
+
+static const guid_t asf_guid_extended_content_encryption =
+{0x298ae614, 0x2622, 0x4c17, {0xb9, 0x35, 0xda, 0xe0, 0x7e, 0xe9, 0x28, 0x9c}};
 
 /* stream type guids */
 
@@ -462,6 +469,10 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     }
 
                     lseek(fd, bytesleft, SEEK_CUR);
+            } else if (asf_guid_match(&current.guid, &asf_guid_content_encryption)
+                || asf_guid_match(&current.guid, &asf_guid_extended_content_encryption)) {
+                //DEBUGF("File is encrypted\n");
+                return ASF_ERROR_ENCRYPTED;
             } else {
                 //DEBUGF("Skipping %d bytes of object\n",(int)(current.size - 24));
                 lseek(fd,current.size - 24,SEEK_CUR);
