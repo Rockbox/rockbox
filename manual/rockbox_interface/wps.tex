@@ -77,7 +77,8 @@ your WPS (While Playing Screen).
       \ActionWpsContext & Enter \setting{WPS Context Menu}.\\
       %
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{%
-        \ActionWpsPitchScreen & Show pitch setting screen.\\}%
+        \ActionWpsPitchScreen & Show \setting{Pitch Screen}
+        (see \reference{sec:pitchscreen}).\\}%
       %
       \opt{ONDIO_PAD}{\ActionWpsContext{} twice}%
       \nopt{ONDIO_PAD}{\ActionWpsMenu}%
@@ -201,14 +202,15 @@ function in the \setting{File Context Menu}.
 \nopt{player}{
   \subsubsection{\label{sec:pitchscreen}Pitch}
   
-  The Pitch Screen allows you to change the pitch and (at the same time) the
-  playback speed of your \dap. The pitch value can be adjusted between 50\% and
-  200\%. 50\% means half the normal playback speed and the pitch that's an
-  octave lower than the normal pitch. 200\% means double playback speed and the
-  pitch that's an octave higher than the normal pitch. It's not possible to
-  change the pitch without changing the playback speed and vice versa. Changing
-  the pitch can be done in two modes: procentual and semitone. Initially (after
-  the \dap{} is switched on), procentual mode is active.
+  The \setting{Pitch Screen} allows you to change the pitch and (at the same
+  time) the playback speed of your \dap. The pitch value can be adjusted
+  between 50\% and 200\%. 50\% means half the normal playback speed and the
+  pitch that's an octave lower than the normal pitch. 200\% means double
+  playback speed and the pitch that's an octave higher than the normal pitch.
+  It's not possible to change the pitch without changing the playback speed and
+  vice versa. Changing the pitch can be done in two modes: procentual and
+  semitone. Initially (after the \dap{} is switched on), procentual mode
+  is active.
   
   \begin{table}
     \begin{btnmap}{}{}
@@ -220,7 +222,8 @@ function in the \setting{File Context Menu}.
         (in semitone mode)\\
       %
       \ActionPsIncBig{} / \ActionPsDecBig
-      & Increase / Decrease pitch by 1\% (only in procentual mode)\\
+      & Increase / Decrease pitch by 1\% (in procentual mode) or a semitone
+        (in semitone mode)\\
       %
       \ActionPsNudgeRight{} / \ActionPsNudgeLeft
       & Temporarily increase / decrease pitch by 2.0\% \\
@@ -233,10 +236,12 @@ function in the \setting{File Context Menu}.
       %
     \end{btnmap}
   \end{table}
+
+  \opt{MASCODEC}{
+    \warn{Changing the pitch can cause audible 'Artifacts' or 'Dropouts'.}
+  }
 }
-\opt{RECORDER_PAD,ONDIO_PAD}{
-  \warn{Changing the pitch can cause audible 'Artifacts' or 'Dropouts'.}
-}
+
 \opt{SWCODEC}{
   \subsubsection{Graphical EQ}
   This is a shortcut to the \setting{Equalizer}. See \reference{ref:EQ}.
