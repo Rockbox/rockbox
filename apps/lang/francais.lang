@@ -1000,7 +1000,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Sauvegarder config. EQ"
+    swcodec: "Sauvegarder la config. EQ"
   </dest>
   <voice>
     *: none
@@ -2367,16 +2367,16 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (LEFT to return)"
+    ipod*: "Building database... %d found (PREV to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Création base de données... %d trouvés (OFF = retour)"
     h100,h120,h300: "Création base de données... %d trouvés (STOP = retour)"
-    ipod*: "Création base de données... %d trouvés (LEFT = retour)"
+    ipod*: "Création base de données... %d trouvés (PREV = retour)"
     x5,m5: "Création base de données... %d trouvés (LEFT = retour)"
-    h10,h10_5gb,e200,c200: "Création base de données... %d trouvés (PREC = retour)"
+    h10,h10_5gb,e200,c200: "Création base de données... %d trouvés (PREV = retour)"
   </dest>
   <voice>
     *: "entrées trouvées pour base de données"
@@ -6919,17 +6919,17 @@
   user:
   <source>
     *: none
-    e200,c200: "MSD:"
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </source>
   <dest>
     *: none
-    e200,c200: "MSD:"
+    e200,c200: "mSD:"
     ondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    e200,c200: "Micro S D"
+    e200,c200: "micro S D"
     ondio*: "M M C"
   </voice>
 </phrase>
