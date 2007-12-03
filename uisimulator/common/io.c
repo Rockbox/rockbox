@@ -189,6 +189,8 @@ static unsigned int rockbox2sim(int opt)
 #endif
 
 /** Simulator I/O engine routines **/
+#define IO_YIELD_THRESHOLD 512
+
 enum
 {
     IO_READ,
@@ -198,11 +200,12 @@ enum
 struct sim_io
 {
     struct mutex sim_mutex; /* Rockbox mutex */
-    volatile int cmd; /* The command to perform */
-    volatile int ready; /* I/O ready flag - 1= ready */
-    volatile int fd; /* The file to read/write */
-    void* volatile buf; /* The buffer to read/write */
-    volatile size_t count; /* Number of bytes to read/write */
+    int cmd; /* The command to perform */
+    int ready; /* I/O ready flag - 1= ready */
+    int fd; /* The file to read/write */
+    void *buf; /* The buffer to read/write */
+    size_t count; /* Number of bytes to read/write */
+    size_t accum; /* Acculated bytes transferred */
 };
 
 static struct sim_io io;
@@ -211,16 +214,22 @@ int ata_init(void)
 {
     /* Initialize the rockbox kernel objects on a rockbox thread */
     mutex_init(&io.sim_mutex);
+    io.accum = 0;
     return 1;
 }
 
 static ssize_t io_trigger_and_wait(int cmd)
 {
-    void *mythread;
+    void *mythread = NULL;
     ssize_t result;
 
-    /* Allow other rockbox threads to run */
-    mythread = thread_sdl_thread_unlock();
+    if (io.count > IO_YIELD_THRESHOLD ||
+        (io.accum += io.count) >= IO_YIELD_THRESHOLD)
+    {
+        /* Allow other rockbox threads to run */
+        io.accum = 0;
+        mythread = thread_sdl_thread_unlock();
+    }
 
     switch (cmd)
     {
@@ -233,7 +242,10 @@ static ssize_t io_trigger_and_wait(int cmd)
     }
 
     /* Regain our status as current */
-    thread_sdl_thread_lock(mythread);
+    if (mythread != NULL)
+    {
+        thread_sdl_thread_lock(mythread);
+    }
 
     return result;
 }
