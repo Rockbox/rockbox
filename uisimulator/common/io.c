@@ -55,6 +55,8 @@
 #include "debug.h"
 #include "config.h"
 #include "ata.h" /* for IF_MV2 et al. */
+#include "thread-sdl.h"
+
 
 /* Windows (and potentially other OSes) distinguish binary and text files.
  * Define a dummy for the others. */
@@ -189,94 +191,21 @@ static unsigned int rockbox2sim(int opt)
 /** Simulator I/O engine routines **/
 enum
 {
-    IO_QUIT = -1,
-    IO_OPEN,
-    IO_CLOSE,
     IO_READ,
     IO_WRITE,
 };
 
 struct sim_io
 {
-    SDL_mutex *m; /* Mutex for condition */
-    SDL_cond *c;  /* Condition for synchronizing threads */
-    SDL_Thread *t; /* The I/O thread */
     struct mutex sim_mutex; /* Rockbox mutex */
     volatile int cmd; /* The command to perform */
     volatile int ready; /* I/O ready flag - 1= ready */
     volatile int fd; /* The file to read/write */
     void* volatile buf; /* The buffer to read/write */
     volatile size_t count; /* Number of bytes to read/write */
-    ssize_t result; /* Result of operation */
 };
 
 static struct sim_io io;
-
-static int io_thread(void *data)
-{
-    SDL_LockMutex(io.m);
-
-    io.ready = 1; /* Indication mutex has been locked */
-
-    for (;;)
-    {
-        SDL_CondWait(io.c, io.m); /* unlock mutex and wait */
-
-        switch (io.cmd)
-        {
-        case IO_READ:
-            io.result = read(io.fd, io.buf, io.count);
-            io.ready = 1;
-            break;
-        case IO_WRITE:
-            io.result = write(io.fd, io.buf, io.count);
-            io.ready = 1;
-            break;
-        case IO_QUIT:
-            SDL_UnlockMutex(io.m);
-            return 0;
-        }
-    }
-
-    (void)data;
-}
-
-bool sim_io_init(void)
-{
-    io.ready = 0;
-
-    io.m = SDL_CreateMutex();
-    if (io.m == NULL)
-    {
-        fprintf(stderr, "Failed to create IO mutex\n");
-        return false;
-    }
-
-    io.c = SDL_CreateCond();
-    if (io.c == NULL)
-    {
-        fprintf(stderr, "Failed to create IO cond\n");
-        return false;
-    }
-
-    io.t = SDL_CreateThread(io_thread, NULL);
-    if (io.t == NULL)
-    {
-        fprintf(stderr, "Failed to create IO thread\n");
-        return false;
-    }
-
-    /* Wait for IO thread to lock mutex */
-    while (!io.ready)
-        SDL_Delay(0);
-
-    /* Wait for it to unlock */
-    SDL_LockMutex(io.m);
-    /* Free it for another thread */
-    SDL_UnlockMutex(io.m);
-
-    return true;
-}
 
 int ata_init(void)
 {
@@ -285,38 +214,28 @@ int ata_init(void)
     return 1;
 }
 
-void sim_io_shutdown(void)
+static ssize_t io_trigger_and_wait(int cmd)
 {
-    SDL_LockMutex(io.m);
+    void *mythread;
+    ssize_t result;
 
-    io.cmd = IO_QUIT;
+    /* Allow other rockbox threads to run */
+    mythread = thread_sdl_thread_unlock();
 
-    SDL_CondSignal(io.c);
-    SDL_UnlockMutex(io.m);
+    switch (cmd)
+    {
+    case IO_READ:
+        result = read(io.fd, io.buf, io.count);
+        break;
+    case IO_WRITE:
+        result = write(io.fd, io.buf, io.count);
+        break;
+    }
 
-    SDL_WaitThread(io.t, NULL);
+    /* Regain our status as current */
+    thread_sdl_thread_lock(mythread);
 
-    SDL_DestroyMutex(io.m);
-    SDL_DestroyCond(io.c);
-}
-
-static void io_trigger_and_wait(int cmd)
-{
-    /* Lock mutex before setting up new params and signaling condition */
-    SDL_LockMutex(io.m);
-
-    io.cmd = cmd;
-    io.ready = 0;
-
-    /* Get thread started */
-    SDL_CondSignal(io.c);
-
-    /* Let it run */
-    SDL_UnlockMutex(io.m);
-
-    /* Wait for IO to complete */
-    while (!io.ready)
-        yield();
+    return result;
 }
 
 static const char *get_sim_rootdir()
@@ -470,9 +389,7 @@ ssize_t sim_read(int fd, void *buf, size_t count)
     io.buf = buf;
     io.count = count;
 
-    io_trigger_and_wait(IO_READ);
-
-    result = io.result;
+    result = io_trigger_and_wait(IO_READ);
 
     mutex_unlock(&io.sim_mutex);
 
@@ -489,9 +406,7 @@ ssize_t sim_write(int fd, const void *buf, size_t count)
     io.buf = (void*)buf;
     io.count = count;
 
-    io_trigger_and_wait(IO_WRITE);
-
-    result = io.result;
+    result = io_trigger_and_wait(IO_WRITE);
 
     mutex_unlock(&io.sim_mutex);
 

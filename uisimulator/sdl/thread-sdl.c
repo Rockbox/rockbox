@@ -157,6 +157,23 @@ bool thread_sdl_init(void *param)
     return true;
 }
 
+/* A way to yield and leave the threading system for extended periods */
+void thread_sdl_thread_lock(void *me)
+{
+    SDL_LockMutex(m);
+    running = (struct thread_entry *)me;
+
+    if (threads_exit)
+        remove_thread(NULL);
+}
+
+void * thread_sdl_thread_unlock(void)
+{
+    struct thread_entry *current = running;
+    SDL_UnlockMutex(m);
+    return current;
+}
+
 static int find_empty_thread_slot(void)
 {
     int n;

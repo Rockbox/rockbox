@@ -192,7 +192,6 @@ bool gui_shutdown(void)
        sync primitives by kernel threads */
     thread_sdl_shutdown();
     SDL_RemoveTimer(tick_timer_id);
-    sim_io_shutdown();
     sim_kernel_shutdown();
     return true;
 }
@@ -274,11 +273,6 @@ int main(int argc, char *argv[])
 
     if (!sim_kernel_init()) {
         fprintf(stderr, "sim_kernel_init failed\n");
-        return -1;
-    }
-
-    if (!sim_io_init()) {
-        fprintf(stderr, "sim_io_init failed\n");
         return -1;
     }
 
