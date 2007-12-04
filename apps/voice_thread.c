@@ -135,8 +135,9 @@ void mp3_play_stop(void)
 {
     mutex_lock(&voice_mutex); /* Sync against voice_stop */
 
-    LOGFQUEUE("mp3 >| voice Q_VOICE_STOP: 1");
-    queue_send(&voice_queue, Q_VOICE_STOP, 1);
+    LOGFQUEUE("mp3 > voice Q_VOICE_STOP: 1");
+    queue_remove_from_head(&voice_queue, Q_VOICE_STOP);
+    queue_post(&voice_queue, Q_VOICE_STOP, 1);
 
     mutex_unlock(&voice_mutex);
 }
@@ -163,7 +164,8 @@ void voice_stop(void)
     mutex_lock(&voice_mutex);
 
     /* Stop the output and current clip */
-    mp3_play_stop();
+    LOGFQUEUE("mp3 >| voice Q_VOICE_STOP: 1");
+    queue_send(&voice_queue, Q_VOICE_STOP, 1);
 
     /* Careful if using sync objects in talk.c - make sure locking order is
      * observed with one or the other always granted first */
