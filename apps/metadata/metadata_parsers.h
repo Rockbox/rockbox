@@ -30,4 +30,5 @@ bool get_speex_metadata(int fd, struct mp3entry* id3);
 bool get_vorbis_metadata(int fd, struct mp3entry* id3);
 bool get_wave_metadata(int fd, struct mp3entry* id3);
 bool get_wavpack_metadata(int fd, struct mp3entry* id3);
+bool get_a52_metadata(int fd, struct mp3entry* id3);
 bool get_asf_metadata(int fd, struct mp3entry* id3);

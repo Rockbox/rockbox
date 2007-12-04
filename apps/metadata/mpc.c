@@ -16,12 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <inttypes.h>
 
+#include <string.h>
+#include <inttypes.h>
 #include "system.h"
 #include "id3.h"
 #include "metadata_common.h"

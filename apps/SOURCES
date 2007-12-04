@@ -126,6 +126,7 @@ metadata/spc.c
 metadata/vorbis.c
 metadata/wave.c
 metadata/wavpack.c
+metadata/a52.c
 #endif
 #ifdef HAVE_TAGCACHE
 tagcache.c
