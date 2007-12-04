@@ -468,7 +468,7 @@ static void sample_output_dithered(int count, struct dsp_data *data,
             int32_t output, sample;
             int32_t random;
 
-            /* Noise shape and bias */
+            /* Noise shape and bias (for correct rounding later) */
             sample = *s;
             sample += dither->error[0] - dither->error[1] + dither->error[2];
             dither->error[2] = dither->error[1];
@@ -476,10 +476,16 @@ static void sample_output_dithered(int count, struct dsp_data *data,
 
             output = sample + bias;
 
-            /* Dither */
+            /* Dither, highpass triangle PDF */
             random = dither->random*0x0019660dL + 0x3c6ef35fL;
             output += (random & mask) - (dither->random & mask);
             dither->random = random;
+
+            /* Round sample to output range */
+            output &= ~mask;
+
+            /* Error feedback */
+            dither->error[0] = sample - output;
 
             /* Clip */
             if ((uint32_t)(output - min) > (uint32_t)range)
@@ -490,12 +496,7 @@ static void sample_output_dithered(int count, struct dsp_data *data,
                 output = c;
             }
 
-            output &= ~mask;
-
-            /* Error feedback */
-            dither->error[0] = sample - output;
-
-            /* Quantize */
+            /* Quantize and store */
             *d = output >> scale;
         }
     }
