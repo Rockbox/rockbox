@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: metadata.c 15859 2007-11-30 18:48:07Z lostlogic $
+ * $Id$
  *
  * Copyright (C) 2005 Magnus Holmgren
  *
