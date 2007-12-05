@@ -29,8 +29,8 @@
 "  -q x   Quality, floating point number in the range [0-10], default 8.0\n"\
 "  -c x   Complexity, increases quality for a given bitrate, but encodes\n"\
 "         slower, range [0-10], default 3\n"\
-"  -n     Enable narrowband mode, will resample input to 8 kHz\n\n"\
-"  -v x   Volume, amplitude multiplier, default 1.0\n"\
+"  -n     Enable narrowband mode, will resample input to 8 kHz\n"\
+"  -v x   Volume, amplitude multiplier, default 1.0\n\n"\
 "rbspeexenc expects a mono 16 bit WAV file as input. Files will be resampled\n"\
 "to either 16 kHz by default, or 8 kHz if narrowband mode is enabled.\n"\
 "WARNING: This tool will create files that are only usable by Rockbox!\n"
@@ -111,46 +111,35 @@ bool get_wave_metadata(FILE *fd, int *numchan, int *bps, int *sr, int *numsample
     return true;
 }
 
-int main(int argc, char **argv)
+/* We'll eat an entire WAV file here, and encode it with Speex, packing the
+ * bits as tightly as we can. Output is completely raw, with absolutely
+ * nothing to identify the contents. Files are left open, so remember to close
+ * them.
+ */
+bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
+                 bool narrowband, float volume, char *errstr, size_t errlen)
 {
-    FILE *fin, *fout;
-    spx_int16_t *in, *inpos;
+    spx_int16_t *in = NULL, *inpos;
     spx_int16_t enc_buf[640]; /* Max frame size */
     char cbits[200];
-    int nbytes;
-    void *st;
+    void *st = NULL;
     SpeexResamplerState *resampler = NULL;
     SpeexBits bits;
-    int i, tmp;
-    int complexity = 3;
-    float quality = 8.f;
-    bool narrowband = false;
-    float volume = 1.0f;
-    int target_sr;
-    int numchan, bps, sr, numsamples;
-    int frame_size;
-    int lookahead;
+    int i, tmp, target_sr, numchan, bps, sr, numsamples, frame_size, lookahead;
+    int nbytes;
+    bool ret = true;
 
-    if (argc < 3) {
-        printf(USAGE_TEXT);
-        return 1;
+    if (!get_wave_metadata(fin, &numchan, &bps, &sr, &numsamples)) {
+        snprintf(errstr, errlen, "invalid WAV file");
+        return false;
     }
-
-    i = 1;
-    while (i < argc - 2) {
-        if (strncmp(argv[i], "-q", 2) == 0)
-            quality = atof(argv[++i]);
-        else if (strncmp(argv[i], "-c", 2) == 0)
-            complexity = atoi(argv[++i]);
-        else if (strncmp(argv[i], "-v", 2) == 0)
-            volume = atof(argv[++i]);
-        else if (strncmp(argv[i], "-n", 2) == 0)
-            narrowband = true;
-        else {
-            printf("Error: unrecognized option '%s'\n", argv[i]);
-            return 1;
-        }
-        ++i;
+    if (numchan != 1) {
+        snprintf(errstr, errlen, "input file must be mono");
+        return false;
+    }
+    if (bps != 16) {
+        snprintf(errstr, errlen, "samples must be 16 bit");
+        return false;
     }
 
     /* Allocate an encoder of specified type, defaults to wideband */
@@ -159,11 +148,7 @@ int main(int argc, char **argv)
         target_sr = 8000;
     else
         target_sr = 16000;
-
-    /* We'll eat an entire WAV file here, and encode it with Speex, packing the
-     * bits as tightly as we can. Output is completely raw, with absolutely
-     * nothing to identify the contents.
-     */
+    speex_bits_init(&bits);
 
     /* VBR */
     tmp = 1;
@@ -175,36 +160,27 @@ int main(int argc, char **argv)
     speex_encoder_ctl(st, SPEEX_GET_FRAME_SIZE, &frame_size);
     speex_encoder_ctl(st, SPEEX_GET_LOOKAHEAD, &lookahead);
 
-    fin = fopen(argv[argc - 2], "rb");
-    if (!get_wave_metadata(fin, &numchan, &bps, &sr, &numsamples)) {
-        printf("Error: invalid WAV file\n");
-        return 1;
-    }
-    if (sr != target_sr) {
-        resampler = speex_resampler_init(1, sr, target_sr, 10, NULL);
-        speex_resampler_skip_zeros(resampler);
-    }
-    if (numchan != 1) {
-        printf("Error: input file must be mono\n");
-        return 1;
-    }
-    if (bps != 16) {
-        printf("Error: samples must be 16 bit\n");
-        return 1;
-    }
-
     /* Read input samples into a buffer */
     in = calloc(numsamples + lookahead, sizeof(spx_int16_t));
     if (in == NULL) {
-        printf("Error: could not allocate clip memory\n");
-        return 1;
+        snprintf(errstr, errlen, "could not allocate clip memory");
+        ret = false;
+        goto finish;
     }
-    fread(in, 2, numsamples, fin);
-    fclose(fin);
+    if (fread(in, 2, numsamples, fin) != numsamples) {
+        snprintf(errstr, errlen, "could not read input file data");
+        ret = false;
+        goto finish;
+   }
 
-    if(volume != 1.0f) {
-        for(i=0; i<numsamples; i++)
+    if (volume != 1.0f) {
+        for (i = 0; i < numsamples; ++i)
             in[i] *= volume;
+    }
+
+    if (sr != target_sr) {
+        resampler = speex_resampler_init(1, sr, target_sr, 10, NULL);
+        speex_resampler_skip_zeros(resampler);
     }
 
     /* There will be 'lookahead' samples of zero at the end of the array, to
@@ -212,13 +188,7 @@ int main(int argc, char **argv)
      * end */
     numsamples += lookahead;
    
-    speex_bits_init(&bits);
     inpos = in;
-    if ((fout = fopen(argv[argc - 1], "wb")) == NULL) {
-        printf("Error: could not open output file\n");
-        return 1;
-    }
-
     while (numsamples > 0) {
         int samples = frame_size;
 
@@ -249,27 +219,92 @@ int main(int argc, char **argv)
         memset(enc_buf + samples, 0, (frame_size - samples)*2);
 
         if (speex_encode_int(st, enc_buf, &bits) < 0) {
-            printf("Error: encoder error\n");
-            return 1;
+            snprintf(errstr, errlen, "encoder error");
+            ret = false;
+            goto finish;
         }
 
         /* Copy the bits to an array of char that can be written */
         nbytes = speex_bits_write_whole_bytes(&bits, cbits, 200);
 
         /* Write the compressed data */
-        fwrite(cbits, 1, nbytes, fout);
+        if (fwrite(cbits, 1, nbytes, fout) != nbytes) {
+            snprintf(errstr, errlen, "could not write output data");
+            ret = false;
+            goto finish;
+        }
     }
     /* Squeeze out the last bits */
     nbytes = speex_bits_write(&bits, cbits, 200);
-    fwrite(cbits, 1, nbytes, fout);
+    if (fwrite(cbits, 1, nbytes, fout) != nbytes) {
+        snprintf(errstr, errlen, "could not write output data");
+        ret = false;
+    }
 
-    /*Destroy the encoder state*/
-    speex_encoder_destroy(st);
-    /*Destroy the bit-packing struct*/
+finish:
+    if (st != NULL)
+        speex_encoder_destroy(st);
     speex_bits_destroy(&bits);
     if (resampler != NULL)
         speex_resampler_destroy(resampler);
+    if (in != NULL)
+        free(in);
+    return ret;
+}
+
+int main(int argc, char **argv)
+{
+    char *inname, *outname;
+    FILE *fin, *fout;
+    int i;
+    int complexity = 3;
+    float quality = 8.f, volume = 1.0f;
+    bool narrowband = false;
+    bool ret;
+    char errstr[512];
+
+    if (argc < 3) {
+        printf(USAGE_TEXT);
+        return 1;
+    }
+
+    i = 1;
+    while (i < argc - 2) {
+        if (strncmp(argv[i], "-q", 2) == 0)
+            quality = atof(argv[++i]);
+        else if (strncmp(argv[i], "-c", 2) == 0)
+            complexity = atoi(argv[++i]);
+        else if (strncmp(argv[i], "-v", 2) == 0)
+            volume = atof(argv[++i]);
+        else if (strncmp(argv[i], "-n", 2) == 0)
+            narrowband = true;
+        else {
+            printf("Error: unrecognized option '%s'\n", argv[i]);
+            return 1;
+        }
+        ++i;
+    }
+    inname = argv[argc - 2];
+    outname = argv[argc - 1];
+
+    if ((fin = fopen(inname, "rb")) == NULL) {
+        printf("Error: could not open input file\n");
+        return 1;
+    }
+    if ((fout = fopen(outname, "wb")) == NULL) {
+        printf("Error: could not open output file\n");
+        return 1;
+    }
+
+    ret = encode_file(fin, fout, quality, complexity, narrowband, volume,
+                      errstr, sizeof(errstr));
+    fclose(fin);
     fclose(fout);
-    free(in);
+    if (!ret) {
+        /* Attempt to delete unfinished output */
+        printf("Error: %s\n", errstr);
+        remove(outname);
+        return 1;
+    }
     return 0;
 }
