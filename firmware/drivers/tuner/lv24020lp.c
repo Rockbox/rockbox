@@ -832,11 +832,11 @@ void lv24020lp_power(bool status)
     }
     else
     {
-        tuner_status &= ~(TUNER_POWERED | TUNER_AWAKE);
-
         /* Power off */
         if (tuner_status & TUNER_PRESENT)
             lv24020lp_write_and(PW_SCTRL, ~PW_RAD);
+
+        tuner_status &= ~(TUNER_POWERED | TUNER_AWAKE);
     }
 }
 
