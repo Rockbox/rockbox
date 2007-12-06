@@ -266,6 +266,7 @@ static void lv24020lp_send_byte(unsigned int byte)
 
         GPIOH_OUTPUT_VAL = (GPIOH_OUTPUT_VAL & ~(1 << FM_DATA_PIN)) |
                             (byte & (1 << FM_DATA_PIN));
+        udelay(FM_CLK_DELAY);
 
         GPIOH_OUTPUT_VAL |= (1 << FM_CLOCK_PIN);
         udelay(FM_CLK_DELAY);
@@ -280,6 +281,7 @@ static void lv24020lp_end_write(void)
     /* switch back to read mode */
     GPIOH_OUTPUT_EN &= ~(1 << FM_DATA_PIN);
     GPIOH_OUTPUT_VAL &= ~(1 << FM_NRW_PIN);
+    udelay(FM_CLK_DELAY);
 }
 
 /* prepare a write cycle on the tuner */
@@ -294,7 +296,6 @@ static unsigned int lv24020lp_begin_write(unsigned int address)
         /* Prepare 3-wire bus pins for write cycle */
         GPIOH_OUTPUT_VAL |= (1 << FM_NRW_PIN);
         GPIOH_OUTPUT_EN |= (1 << FM_DATA_PIN);
-
         udelay(FM_CLK_DELAY);
 
         /* current block == register block? */
@@ -310,8 +311,6 @@ static unsigned int lv24020lp_begin_write(unsigned int address)
         lv24020lp_send_byte(BLK_SEL);
 
         lv24020lp_end_write();
-
-        udelay(FM_CLK_DELAY);
     }
 }
 
@@ -356,14 +355,14 @@ static void lv24020lp_write(unsigned int address, unsigned int data)
 }
 
 /* helpers to set/clear register bits */
-static void lv24020lp_write_or(unsigned int address, unsigned int bits)
+static void lv24020lp_write_set(unsigned int address, unsigned int bits)
 {
     lv24020lp_write(address, lv24020lp_regs[address] | bits);
 }
 
-static void lv24020lp_write_and(unsigned int address, unsigned int bits)
+static void lv24020lp_write_clear(unsigned int address, unsigned int bits)
 {
-    lv24020lp_write(address, lv24020lp_regs[address] & bits);
+    lv24020lp_write(address, lv24020lp_regs[address] & ~bits);
 }
 
 /* read a byte from a tuner register */
@@ -393,6 +392,7 @@ static unsigned int lv24020lp_read(unsigned int address)
         toread |= (GPIOH_INPUT_VAL & (1 << FM_DATA_PIN)) << i;
 
         GPIOH_OUTPUT_VAL |= (1 << FM_CLOCK_PIN);
+        udelay(FM_CLK_DELAY);
     }
 
     return toread >> FM_DATA_PIN;
@@ -445,25 +445,25 @@ static int tuner_measure(unsigned char type, int scale, int duration)
     int64_t finval;
 
     /* enable measuring */
-    lv24020lp_write_or(MSRC_SEL, type);
-    lv24020lp_write_and(CNT_CTRL, ~CNT_SEL);
-    lv24020lp_write_or(RADIO_CTRL1, EN_MEAS);
+    lv24020lp_write_set(MSRC_SEL, type);
+    lv24020lp_write_clear(CNT_CTRL, CNT_SEL);
+    lv24020lp_write_set(RADIO_CTRL1, EN_MEAS);
 
     /* reset counter */
-    lv24020lp_write_or(CNT_CTRL, CNT1_CLR);
-    lv24020lp_write_and(CNT_CTRL, ~CNT1_CLR);
+    lv24020lp_write_set(CNT_CTRL, CNT1_CLR);
+    lv24020lp_write_clear(CNT_CTRL, CNT1_CLR);
 
     /* start counter, delay for specified time and stop it */
-    lv24020lp_write_or(CNT_CTRL, CNT_EN);
+    lv24020lp_write_set(CNT_CTRL, CNT_EN);
     udelay(duration*1000 - 16);
-    lv24020lp_write_and(CNT_CTRL, ~CNT_EN);
+    lv24020lp_write_clear(CNT_CTRL, CNT_EN);
 
     /* read tick count */
     finval = (lv24020lp_read(CNT_H) << 8) | lv24020lp_read(CNT_L);
 
     /* restore measure mode */
-    lv24020lp_write_and(RADIO_CTRL1, ~EN_MEAS);
-    lv24020lp_write_and(MSRC_SEL, ~type);
+    lv24020lp_write_clear(RADIO_CTRL1, EN_MEAS);
+    lv24020lp_write_clear(MSRC_SEL, type);
 
     /* convert value */
     if (type == MSS_FM)
@@ -590,6 +590,11 @@ static void set_frequency(int freq)
     TUNER_LOG_SYNC();
 }
 
+#define TOO_SMALL       (1 << 0)
+#define TOO_BIG         (1 << 1)
+#define APPROACH_UP_1   (1 << 2)
+#define APPROACH_DOWN_1 (1 << 3)
+
 static void fine_step_tune(int (*setcmp)(int regval), int regval, int step)
 {
     /* Registers are not always stable, timeout if best fit not found soon
@@ -612,27 +617,27 @@ static void fine_step_tune(int (*setcmp)(int regval), int regval, int step)
 
         if (cmp < 0)
         {
-            flags |= 1;
+            flags |= TOO_SMALL;
             if (step == 1)
-                flags |= 4;
+                flags |= APPROACH_UP_1;
         }
         else
         {
             step = -step;
-            flags |= 2;
+            flags |= TOO_BIG;
             if (step == -1)
-                step |= 8;
+                step |= APPROACH_DOWN_1;
         }
 
-        if ((flags & 0xc) == 0xc)
-            break;
+        if ((flags & APPROACH_UP_1) && (flags & APPROACH_DOWN_1))
+            break;  /* approached with step=1: best fit value found */
 
-        if ((flags & 0x3) == 0x3)
+        if ((flags & TOO_SMALL) && (flags & TOO_BIG))
         {
             step /= 2;
             if (step == 0)
                 step = 1;
-            flags &= ~3;
+            flags &= ~(TOO_SMALL | TOO_BIG);
         }
     }
 }
@@ -678,14 +683,14 @@ static void set_sleep(bool sleep)
     enable_afc(false);
 
     /* 2. Calibrate the IF frequency at 110 kHz: */
-    lv24020lp_write_and(RADIO_CTRL2, ~IF_PM_L);
+    lv24020lp_write_clear(RADIO_CTRL2, IF_PM_L);
     fine_step_tune(if_setcmp, 0x80, 8);
-    lv24020lp_write_or(RADIO_CTRL2, IF_PM_L);
+    lv24020lp_write_set(RADIO_CTRL2, IF_PM_L);
 
     /* 3. Calibrate the stereo decoder clock at 38.3 kHz: */
-    lv24020lp_write_or(STEREO_CTRL, SD_PM);
+    lv24020lp_write_set(STEREO_CTRL, SD_PM);
     fine_step_tune(sd_setcmp, 0x80, 8);
-    lv24020lp_write_and(STEREO_CTRL, ~SD_PM);
+    lv24020lp_write_clear(STEREO_CTRL, SD_PM);
 
     /* calculate FM tuning coefficients */
     lv24020lp_write(FM_CAP, sw_cap_low);
@@ -704,8 +709,8 @@ static void set_sleep(bool sleep)
 
     /* set various audio level settings */
     lv24020lp_write(AUDIO_CTRL1, TONE_LVL_SET(0) | VOL_LVL_SET(0));
-    lv24020lp_write_or(RADIO_CTRL2, AGCSP);
-    lv24020lp_write_or(RADIO_CTRL3, VOLSH);
+    lv24020lp_write_set(RADIO_CTRL2, AGCSP);
+    lv24020lp_write_set(RADIO_CTRL3, VOLSH);
     lv24020lp_write(STEREO_CTRL, FMCS_SET(7) | AUTOSSR);
     lv24020lp_write(PW_SCTRL, SS_CTRL_SET(3) | SM_CTRL_SET(1) |
                     PW_RAD);
@@ -834,7 +839,7 @@ void lv24020lp_power(bool status)
     {
         /* Power off */
         if (tuner_status & TUNER_PRESENT)
-            lv24020lp_write_and(PW_SCTRL, ~PW_RAD);
+            lv24020lp_write_clear(PW_SCTRL, PW_RAD);
 
         tuner_status &= ~(TUNER_POWERED | TUNER_AWAKE);
     }
@@ -864,23 +869,23 @@ int lv24020lp_set(int setting, int value)
 
     case RADIO_MUTE:
         if (value)
-            lv24020lp_write_and(RADIO_CTRL3, ~AMUTE_L);
+            lv24020lp_write_clear(RADIO_CTRL3, AMUTE_L);
         else
-            lv24020lp_write_or(RADIO_CTRL3, AMUTE_L);
+            lv24020lp_write_set(RADIO_CTRL3, AMUTE_L);
         break;
 
     case RADIO_REGION:
         if (lv24020lp_region_data[value])
-            lv24020lp_write_or(AUDIO_CTRL2, DEEMP);
+            lv24020lp_write_set(AUDIO_CTRL2, DEEMP);
         else
-            lv24020lp_write_and(AUDIO_CTRL2, ~DEEMP);
+            lv24020lp_write_clear(AUDIO_CTRL2, DEEMP);
         break;
 
     case RADIO_FORCE_MONO:
         if (value)
-            lv24020lp_write_or(STEREO_CTRL, ST_M);
+            lv24020lp_write_set(STEREO_CTRL, ST_M);
         else
-            lv24020lp_write_and(STEREO_CTRL, ~ST_M);
+            lv24020lp_write_clear(STEREO_CTRL, ST_M);
         break;
 
     default:
