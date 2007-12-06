@@ -553,11 +553,14 @@ void lcd_gradient_rect(int x1, int x2, int y, int h)
 #define H_COLOR(lss, lse, cur_line, max_line) \
         (((lse) - (lss)) * (cur_line) / (max_line) + (lss))
 
-/* Fill a rectangle with a gradient for scrolling line */
+/* Fill a rectangle with a gradient for scrolling line. To draw a gradient that
+   covers several lines, we need to know how many lines will be covered
+   (the num_lines arg), and which one is the current line within the selection
+   (the cur_line arg). */
 void lcd_gradient_rect_scroll(int x1, int x2, int y, int h,
-                              unsigned char max_line, unsigned char cur_line)
+                              unsigned char num_lines, unsigned char cur_line)
 {
-    if (h == 0 || max_line == 0) return;
+    if (h == 0 || num_lines == 0) return;
 
     unsigned tmp_lss = lss_pattern;
     unsigned tmp_lse = lse_pattern;
@@ -568,14 +571,14 @@ void lcd_gradient_rect_scroll(int x1, int x2, int y, int h,
     int lse_b = (signed)RGB_UNPACK_BLUE(lse_pattern);
     int lse_g = (signed)RGB_UNPACK_GREEN(lse_pattern);
 
-    int h_r = H_COLOR(lss_r, lse_r, cur_line - 1, max_line);
-    int h_g = H_COLOR(lss_g, lse_g, cur_line - 1, max_line);
-    int h_b = H_COLOR(lss_b, lse_b, cur_line - 1, max_line);
+    int h_r = H_COLOR(lss_r, lse_r, cur_line, num_lines);
+    int h_g = H_COLOR(lss_g, lse_g, cur_line, num_lines);
+    int h_b = H_COLOR(lss_b, lse_b, cur_line, num_lines);
     lcd_set_selector_start(LCD_RGBPACK(h_r, h_g, h_b));
 
-    int l_r = H_COLOR(lss_r, lse_r, cur_line, max_line);
-    int l_g = H_COLOR(lss_g, lse_g, cur_line, max_line);
-    int l_b = H_COLOR(lss_b, lse_b, cur_line, max_line);
+    int l_r = H_COLOR(lss_r, lse_r, cur_line+1, num_lines);
+    int l_g = H_COLOR(lss_g, lse_g, cur_line+1, num_lines);
+    int l_b = H_COLOR(lss_b, lse_b, cur_line+1, num_lines);
     lcd_set_selector_end(LCD_RGBPACK(l_r, l_g, l_b));
 
     lcd_gradient_rect(x1, x2, y, h);
@@ -898,8 +901,8 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
 
     if (style & STYLE_GRADIENT) {
         drawmode = DRMODE_FG;
-        if (CURLN_UNPACK(style) == 1)
-            lcd_gradient_rect(xpos, LCD_WIDTH, ypos, h*MAXLN_UNPACK(style));
+        if (CURLN_UNPACK(style) == 0)
+            lcd_gradient_rect(xpos, LCD_WIDTH, ypos, h*NUMLN_UNPACK(style));
         fg_pattern = lst_pattern;
     }
     else if (style & STYLE_COLORBAR) {
@@ -1067,7 +1070,7 @@ void lcd_scroll_fn(void)
                 /* Gradient line selector */
                 drawmode = DRMODE_FG;
                 lcd_gradient_rect_scroll(xpos, LCD_WIDTH, ypos, (signed)pf->height,
-                                         MAXLN_UNPACK(s->style),
+                                         NUMLN_UNPACK(s->style),
                                          CURLN_UNPACK(s->style));
                 fg_pattern = lst_pattern;
                 break;

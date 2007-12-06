@@ -310,7 +310,7 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
     }
 
 #ifdef HAVE_LCD_COLOR
-    unsigned char cur_line = 1;
+    unsigned char cur_line = 0;
 #endif
     for (i = start; i < end; i++)
     {
@@ -379,9 +379,9 @@ static void gui_list_draw_smart(struct gui_list *gui_list)
 
                 /* Make the lcd driver know how many lines the gradient should
                    cover and current line number */
-                /* max line number*/
-                style |= MAXLN_PACK(gui_list->selected_size);
-                /* current line number */
+                /* number of selected lines */
+                style |= NUMLN_PACK(gui_list->selected_size);
+                /* current line number, zero based */
                 style |= CURLN_PACK(cur_line);
                 cur_line++;
             }

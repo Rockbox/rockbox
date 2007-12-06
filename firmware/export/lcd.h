@@ -36,8 +36,8 @@
 #define STYLE_MAXLN_MASK 0x000000FF
 #define CURLN_PACK(x)    (((x)<<8) & STYLE_CURLN_MASK)
 #define CURLN_UNPACK(x)  ((unsigned char)(((x)&STYLE_CURLN_MASK) >> 8))
-#define MAXLN_PACK(x)    ((x) & STYLE_MAXLN_MASK)
-#define MAXLN_UNPACK(x)  ((unsigned char)((x) & STYLE_MAXLN_MASK))
+#define NUMLN_PACK(x)    ((x) & STYLE_MAXLN_MASK)
+#define NUMLN_UNPACK(x)  ((unsigned char)((x) & STYLE_MAXLN_MASK))
 #endif
 
 #ifdef SIMULATOR
