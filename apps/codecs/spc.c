@@ -570,12 +570,6 @@ enum codec_status codec_main(void)
                 ID666.length=3*60*1000; /* 3 minutes */
                 ID666.fade=5*1000; /* 5 seconds */
             }
-            ci->id3->length = ID666.length+ID666.fade;
-            ci->id3->title = ID666.song;
-            ci->id3->album = ID666.game;
-            ci->id3->artist = ID666.artist;
-            ci->id3->year = ID666.year;
-            ci->id3->comment = ID666.comments;
 
             reset_profile_timers();
         }
