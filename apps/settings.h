@@ -207,6 +207,9 @@ enum {
 #ifdef HAVE_RECORDING
     SETTINGS_SAVE_RECPRESETS,
 #endif
+#if CONFIG_CODEC == SWCODEC
+    SETTINGS_SAVE_EQPRESET,
+#endif
 };
 bool settings_save_config(int options);
 

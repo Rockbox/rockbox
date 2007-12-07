@@ -104,6 +104,7 @@ struct table_setting {
 
 #define F_THEMESETTING  0x0800000
 #define F_RECSETTING    0x1000000
+#define F_EQSETTING     0x2000000
 
 #define F_NVRAM_BYTES_MASK     0xE0000 /*0-4 bytes can be stored */
 #define F_NVRAM_MASK_SHIFT     17

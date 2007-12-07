@@ -596,50 +596,17 @@ bool eq_menu_graphical(void)
     return result;
 }
 
-/* Preset saver.
- * TODO: Can the settings system be used to do this instead?
- */
 static bool eq_save_preset(void)
 {
-    int fd, i;
-    char filename[MAX_PATH];
-    int *setting;
-
-    create_numbered_filename(filename, EQS_DIR, "eq", ".cfg", 2
-        IF_CNFN_NUM_(, NULL));
-
-    /* allow user to modify filename */
-    while (true) {
-        if (!kbd_input(filename, sizeof filename)) {
-            fd = creat(filename);
-            if (fd < 0)
-                gui_syncsplash(HZ, ID2P(LANG_FAILED));
-            else
-                break;
-        }
-        else {
-            gui_syncsplash(HZ, ID2P(LANG_CANCEL));
-            return false;
-        }
-    }
-
-    /* TODO: Should we really do this? */
-    fdprintf(fd, "eq enabled: on\r\n");
-    fdprintf(fd, "eq precut: %d\r\n", global_settings.eq_precut);
+    /* make sure that the eq is enabled for setting saving */
+    bool enabled = global_settings.eq_enabled;
+    global_settings.eq_enabled = true;
     
-    setting = &global_settings.eq_band0_cutoff;
+    bool result = settings_save_config(SETTINGS_SAVE_EQPRESET);
     
-    for(i = 0; i < 5; ++i) {
-        fdprintf(fd, "eq band %d cutoff: %d\r\n", i, *setting++);
-        fdprintf(fd, "eq band %d q: %d\r\n", i, *setting++);
-        fdprintf(fd, "eq band %d gain: %d\r\n", i, *setting++);
-    }
+    global_settings.eq_enabled = enabled;
 
-    close(fd);
-
-    gui_syncsplash(HZ, ID2P(LANG_SETTINGS_SAVED));
-
-    return true;
+    return result;
 }
 
 /* Allows browsing of preset files */
@@ -647,7 +614,6 @@ bool eq_browse_presets(void)
 {
     return rockbox_browse(EQS_DIR, SHOW_CFG);
 }
-
 
 MENUITEM_FUNCTION(eq_graphical, 0, ID2P(LANG_EQUALIZER_GRAPHICAL),
                     (int(*)(void))eq_menu_graphical, NULL, NULL, 

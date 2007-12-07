@@ -477,6 +477,11 @@ static bool settings_write_config(char* filename, int options)
                  ((settings[i].flags&F_RECSETTING) == 0))
             continue;
 #endif
+#if CONFIG_CODEC == SWCODEC
+        else if ((options == SETTINGS_SAVE_EQPRESET) &&
+                 ((settings[i].flags&F_EQSETTING) == 0))
+            continue;
+#endif
         switch (settings[i].flags&F_T_MASK)
         {
             case F_T_INT:
@@ -612,6 +617,11 @@ bool settings_save_config(int options)
 #ifdef HAVE_RECORDING
         case SETTINGS_SAVE_RECPRESETS:
             folder = RECPRESETS_DIR;
+            break;
+#endif
+#if CONFIG_CODEC == SWCODEC
+        case SETTINGS_SAVE_EQPRESET:
+            folder = EQS_DIR;
             break;
 #endif
         default:
