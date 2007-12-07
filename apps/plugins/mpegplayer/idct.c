@@ -29,26 +29,11 @@
 #include "attributes.h"
 #include "mpeg2_internal.h"
 
-/* idct main entry point  */
-void (* mpeg2_idct_copy) (int16_t * block, uint8_t * dest, int stride);
-void (* mpeg2_idct_add) (int last, int16_t * block,
-                         uint8_t * dest, int stride);
+#if defined(CPU_COLDFIRE) || defined (CPU_ARM)
+#define IDCT_ASM
+#endif
 
-#ifdef CPU_COLDFIRE
-/* assembler functions */
-extern void mpeg2_idct_copy_coldfire(int16_t * block, uint8_t * dest,
-                                     const int stride);
-extern void mpeg2_idct_add_coldfire(const int last, int16_t * block,
-                                    uint8_t * dest, const int stride);
-
-#elif defined CPU_ARM
-/* assembler functions */
-extern void mpeg2_idct_copy_arm(int16_t * block, uint8_t * dest,
-                                const int stride);
-extern void mpeg2_idct_add_arm(const int last, int16_t * block,
-                               uint8_t * dest, const int stride);
-
-#else /* !CPU_COLDFIRE, !CPU_ARM */
+#ifndef IDCT_ASM
 
 #define W1 2841 /* 2048 * sqrt (2) * cos (1 * pi / 16) */
 #define W2 2676 /* 2048 * sqrt (2) * cos (2 * pi / 16) */
@@ -63,8 +48,11 @@ extern void mpeg2_idct_add_arm(const int last, int16_t * block,
  * to +-3826 - this is the worst case for a column IDCT where the
  * column inputs are 16-bit values.
  */
-uint8_t mpeg2_clip[3840 * 2 + 256] IBSS_ATTR;
-#define CLIP(i) ((mpeg2_clip + 3840)[i])
+#define CLIP(i) \
+    ({ typeof (i) _i = (i); \
+       if ((_i & 0xff) != _i) \
+           _i = ~(_i >> (8*sizeof(_i) - 1)); \
+       _i; })
 
 #if 0
 #define BUTTERFLY(t0,t1,W0,W1,d0,d1) \
@@ -89,7 +77,8 @@ static inline void idct_row (int16_t * const block)
 
     /* shortcut */
     if (likely (!(block[1] | ((int32_t *)block)[1] | ((int32_t *)block)[2] |
-                  ((int32_t *)block)[3]))) {
+                 ((int32_t *)block)[3])))
+    {
         uint32_t tmp = (uint16_t) (block[0] >> 1);
         tmp |= tmp << 16;
         ((int32_t *)block)[0] = tmp;
@@ -175,16 +164,19 @@ static inline void idct_col (int16_t * const block)
     block[8*7] = (a0 - b0) >> 17;
 }
 
-static void mpeg2_idct_copy_c (int16_t * block, uint8_t * dest,
-                               const int stride)
+void mpeg2_idct_copy (int16_t * block, uint8_t * dest,
+                      const int stride)
 {
     int i;
 
     for (i = 0; i < 8; i++)
         idct_row (block + 8 * i);
+
     for (i = 0; i < 8; i++)
         idct_col (block + i);
-    do {
+
+    do
+    {
         dest[0] = CLIP (block[0]);
         dest[1] = CLIP (block[1]);
         dest[2] = CLIP (block[2]);
@@ -194,25 +186,32 @@ static void mpeg2_idct_copy_c (int16_t * block, uint8_t * dest,
         dest[6] = CLIP (block[6]);
         dest[7] = CLIP (block[7]);
 
-        ((int32_t *)block)[0] = 0;        ((int32_t *)block)[1] = 0;
-        ((int32_t *)block)[2] = 0;        ((int32_t *)block)[3] = 0;
+        ((int32_t *)block)[0] = 0;
+        ((int32_t *)block)[1] = 0;
+        ((int32_t *)block)[2] = 0;
+        ((int32_t *)block)[3] = 0;
 
         dest += stride;
         block += 8;
-    } while (--i);
+    }
+    while (--i);
 }
 
-static void mpeg2_idct_add_c (const int last, int16_t * block,
-                              uint8_t * dest, const int stride)
+void mpeg2_idct_add (const int last, int16_t * block,
+                     uint8_t * dest, const int stride)
 {
     int i;
 
-    if (last != 129 || (block[0] & (7 << 4)) == (4 << 4)) {
+    if (last != 129 || (block[0] & (7 << 4)) == (4 << 4))
+    {
         for (i = 0; i < 8; i++)
             idct_row (block + 8 * i);
+
         for (i = 0; i < 8; i++)
             idct_col (block + i);
-        do {
+
+        do
+        {
             dest[0] = CLIP (block[0] + dest[0]);
             dest[1] = CLIP (block[1] + dest[1]);
             dest[2] = CLIP (block[2] + dest[2]);
@@ -222,19 +221,24 @@ static void mpeg2_idct_add_c (const int last, int16_t * block,
             dest[6] = CLIP (block[6] + dest[6]);
             dest[7] = CLIP (block[7] + dest[7]);
 
-            ((int32_t *)block)[0] = 0;        ((int32_t *)block)[1] = 0;
-            ((int32_t *)block)[2] = 0;        ((int32_t *)block)[3] = 0;
+            ((int32_t *)block)[0] = 0;
+            ((int32_t *)block)[1] = 0;
+            ((int32_t *)block)[2] = 0;
+            ((int32_t *)block)[3] = 0;
 
             dest += stride;
             block += 8;
-        } while (--i);
-    } else {
-        int DC;
-
-        DC = (block[0] + 64) >> 7;
+        }
+        while (--i);
+    }
+    else
+    {
+        int DC = (block[0] + 64) >> 7;
         block[0] = block[63] = 0;
         i = 8;
-        do {
+
+        do
+        {
             dest[0] = CLIP (DC + dest[0]);
             dest[1] = CLIP (DC + dest[1]);
             dest[2] = CLIP (DC + dest[2]);
@@ -244,33 +248,16 @@ static void mpeg2_idct_add_c (const int last, int16_t * block,
             dest[6] = CLIP (DC + dest[6]);
             dest[7] = CLIP (DC + dest[7]);
             dest += stride;
-        } while (--i);
+        }
+        while (--i);
     }
 }
 
-#endif /* CPU selection */
+#endif /* IDCT_ASM */
 
 void mpeg2_idct_init (void)
 {
-    extern uint8_t default_mpeg2_scan_norm[64];
-    extern uint8_t default_mpeg2_scan_alt[64];
-    extern uint8_t mpeg2_scan_norm[64];
-    extern uint8_t mpeg2_scan_alt[64];
     int i, j;
-
-#ifdef CPU_COLDFIRE
-    mpeg2_idct_copy = mpeg2_idct_copy_coldfire;
-    mpeg2_idct_add  = mpeg2_idct_add_coldfire;
-#elif defined CPU_ARM
-    mpeg2_idct_copy = mpeg2_idct_copy_arm;
-    mpeg2_idct_add  = mpeg2_idct_add_arm;
-#else
-    mpeg2_idct_copy = mpeg2_idct_copy_c;
-    mpeg2_idct_add  = mpeg2_idct_add_c;
-
-    for (i = -3840; i < 3840 + 256; i++)
-        CLIP(i) = (i < 0) ? 0 : ((i > 255) ? 255 : i);
-#endif
 
     for (i = 0; i < 64; i++)
     {

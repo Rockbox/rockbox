@@ -18,10 +18,10 @@
  *
  ****************************************************************************/
  
-    .global     mpeg2_idct_copy_coldfire
-    .type       mpeg2_idct_copy_coldfire, @function
-    .global     mpeg2_idct_add_coldfire
-    .type       mpeg2_idct_add_coldfire, @function
+    .global     mpeg2_idct_copy
+    .type       mpeg2_idct_copy, @function
+    .global     mpeg2_idct_add
+    .type       mpeg2_idct_add, @function
 
     /* The IDCT itself.
      * Input: %a0: block pointer
@@ -240,7 +240,7 @@
     
     .align  2
 
-mpeg2_idct_copy_coldfire:
+mpeg2_idct_copy:
     lea.l   (-11*4,%sp), %sp
     movem.l %d2-%d7/%a2-%a6, (%sp)  | save some registers
     move.l  (11*4+4,%sp), %a0       | %a0 - block pointer for idct
@@ -339,7 +339,7 @@ mpeg2_idct_copy_coldfire:
 
     .align  2
 
-mpeg2_idct_add_coldfire:
+mpeg2_idct_add:
     lea.l   (-11*4,%sp), %sp
     movem.l %d2-%d7/%a2-%a6, (%sp)
     movem.l (11*4+4,%sp), %d0/%a0-%a2   | %d0 - last value

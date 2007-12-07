@@ -17,10 +17,10 @@
  *
  ****************************************************************************/
 
-    .global     mpeg2_idct_copy_arm
-    .type       mpeg2_idct_copy_arm, %function
-    .global     mpeg2_idct_add_arm
-    .type       mpeg2_idct_add_arm, %function
+    .global     mpeg2_idct_copy
+    .type       mpeg2_idct_copy, %function
+    .global     mpeg2_idct_add
+    .type       mpeg2_idct_add, %function
 
 
 /* Custom calling convention:
@@ -265,7 +265,7 @@
     sub    r0, r0, #16
     bx     lr
 
-mpeg2_idct_copy_arm:
+mpeg2_idct_copy:
     stmfd  sp!, { r1-r2, r4-r12, lr }
     bl     .idct
     ldmfd  sp!, { r1-r2 }
@@ -313,7 +313,7 @@ mpeg2_idct_copy_arm:
     blo    1b
     ldmfd  sp!, { r4-r12, pc }
 
-mpeg2_idct_add_arm:
+mpeg2_idct_add:
     cmp    r0, #129
     mov    r0, r1
     ldreqsh r1, [r0, #0]

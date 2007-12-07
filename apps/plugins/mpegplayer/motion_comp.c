@@ -19,6 +19,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * $Id$
  */
 
 #include "plugin.h"
@@ -48,7 +50,7 @@ extern mpeg2_mc_fct MC_avg_y_8;
 extern mpeg2_mc_fct MC_avg_xy_16;
 extern mpeg2_mc_fct MC_avg_xy_8;
 
-mpeg2_mc_t mpeg2_mc =
+const mpeg2_mc_t mpeg2_mc =
 {
     {
         MC_put_o_16, MC_put_x_16, MC_put_y_16, MC_put_xy_16,
