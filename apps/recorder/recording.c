@@ -164,9 +164,9 @@ enum rec_status_flags
 static int rec_status = 0;
 
 bool in_recording_screen(void)
-{   
+{
     return (rec_status & RCSTAT_IN_RECSCREEN) != 0;
-} 
+}
 
 #define PM_HEIGHT ((LCD_HEIGHT >= 72) ? 2 : 1)
 
@@ -297,7 +297,7 @@ static bool read_peak_levels(int *peak_l, int *peak_r, int *balance)
         ((*peak_l < 32767)
 #ifndef SIMULATOR
          || ata_disk_is_active()
-#endif         
+#endif
          ))
             return false;
 
@@ -379,7 +379,7 @@ static void auto_gain_control(int *peak_l, int *peak_r, int *balance)
     else
         agc_right -= (agc_right - *peak_r + 3) >> 2;
     agc_mono = (agc_left + agc_right) / 2;
-    
+
     agc_mode = abs(agc_preset) - 1;
     if (agc_mode < 0) {
         agc_enable = false;
@@ -475,7 +475,7 @@ static void auto_gain_control(int *peak_l, int *peak_r, int *balance)
             agc_droptime++;
         else
             agc_droptime += !(peak_time % 2);
-    
+
         if (agc_droptime >= agc_tdrop[agc_mode])
         {
             change_recording_gain(false, true, true);
@@ -493,7 +493,7 @@ static void auto_gain_control(int *peak_l, int *peak_r, int *balance)
             agc_risetime += 2;
         else
             agc_risetime++;
-    
+
         if (agc_risetime >= agc_trise[agc_mode]) {
             if ((agc_mode != AGC_SAFETY_MODE) &&
                 (!agc_gain_is_max(true, true))) {
@@ -534,7 +534,7 @@ static char *fmt_gain(int snd, int val, char *str, int len)
     }
     numdec = sound_numdecimals(snd);
     unit = sound_unit(snd);
-    
+
     if(numdec)
     {
         i = val / (10*numdec);
@@ -543,7 +543,7 @@ static char *fmt_gain(int snd, int val, char *str, int len)
     }
     else
         snprintf(str, len, fmtstr[numdec], sign, val, unit);
-    
+
     return str;
 }
 
@@ -552,7 +552,7 @@ static int cursor;
 static void adjust_cursor(void)
 {
     int max_cursor;
-    
+
     if(cursor < 0)
         cursor = 0;
 
@@ -615,7 +615,7 @@ char *rec_create_filename(char *buffer)
     }
 
     strcpy(buffer, global_settings.rec_directory);
-    
+
     snprintf(ext, sizeof(ext), ".%s",
              REC_FILE_ENDING(global_settings.rec_format));
 
@@ -653,7 +653,7 @@ int rec_create_directory(void)
             while (action_userabort(HZ) == false)
             {
                 gui_syncsplash(0, "%s %s", 
-                               str(LANG_REC_DIR_NOT_WRITABLE), 
+                               str(LANG_REC_DIR_NOT_WRITABLE),
                                str(LANG_OFF_ABORT));
             }
         }
@@ -961,7 +961,7 @@ bool recording_screen(bool no_source)
     {
         screens[1].clear_display();
         snprintf(buf, sizeof(buf), str(LANG_REMOTE_LCD_ON));
-        screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1, 
+        screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1,
                             screens[1].height/(h*2) + 1, buf);
         screens[1].update();
         gui_syncsplash(0, str(LANG_REMOTE_LCD_OFF));
@@ -971,7 +971,7 @@ bool recording_screen(bool no_source)
     while(!done)
     {
         audio_stat = audio_status();
-        
+
 #if (CONFIG_LED == LED_REAL)
 
         /*
@@ -1020,7 +1020,8 @@ bool recording_screen(bool no_source)
 #endif /* CONFIG_LED */
 
         /* Wait for a button a while (HZ/10) drawing the peak meter */
-        button = peak_meter_draw_get_btn(pm_x, pm_y, h * PM_HEIGHT, screen_update);
+        button = peak_meter_draw_get_btn(pm_x, pm_y, h * PM_HEIGHT,
+                                         screen_update);
 
         if (last_audio_stat != audio_stat)
         {
@@ -1049,8 +1050,8 @@ bool recording_screen(bool no_source)
                     screen_update = 1;
                     screens[1].clear_display();
                     snprintf(buf, sizeof(buf), str(LANG_REMOTE_LCD_ON));
-                    screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1, 
-                                          screens[1].height/(h*2) + 1, buf);
+                    screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1,
+                                    screens[1].height/(h*2) + 1, buf);
                     screens[1].update();
                     gui_syncsplash(0, str(LANG_REMOTE_LCD_OFF));
                 }
@@ -1075,7 +1076,7 @@ bool recording_screen(bool no_source)
 #if CONFIG_CODEC != SWCODEC
                     peak_meter_playback(true);
                     peak_meter_enabled = false;
-#endif                    
+#endif
                     done = true;
                 }
                 update_countdown = 1; /* Update immediately */
@@ -1150,7 +1151,7 @@ bool recording_screen(bool no_source)
                 adjust_cursor();
                 update_countdown = 1; /* Update immediately */
                 break;
-       
+
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_INCREPEAT:
                 switch(cursor)
@@ -1217,7 +1218,7 @@ bool recording_screen(bool no_source)
                 set_gain();
                 update_countdown = 1; /* Update immediately */
                 break;
-                
+
             case ACTION_SETTINGS_DEC:
             case ACTION_SETTINGS_DECREPEAT:
                 switch(cursor)
@@ -1284,7 +1285,7 @@ bool recording_screen(bool no_source)
                 set_gain();
                 update_countdown = 1; /* Update immediately */
                 break;
-                
+
             case ACTION_STD_MENU:
 #if CONFIG_CODEC == SWCODEC
                 if(!(audio_stat & AUDIO_STATUS_RECORD))
@@ -1415,7 +1416,7 @@ bool recording_screen(bool no_source)
 #endif
                 }
                 break;
-                
+
             default:
                 default_event_handler(button);
                 break;
@@ -1433,11 +1434,11 @@ bool recording_screen(bool no_source)
             auto_gain_control(&peak_l, &peak_r, &balance);
 #endif
 
-            FOR_NB_SCREENS(i)       
+            FOR_NB_SCREENS(i)
                 screens[i].setfont(FONT_SYSFIXED);
 
         seconds = audio_recorded_time() / HZ;
-        
+
         update_countdown--;
         if(update_countdown == 0 || seconds > last_seconds)
         {
@@ -1451,7 +1452,7 @@ bool recording_screen(bool no_source)
             dseconds = rec_timesplit_seconds();
             dsize = rec_sizesplit_bytes();
             num_recorded_bytes = audio_num_recorded_bytes();
-            
+
             for(i = 0; i < screen_update; i++)
                 screens[i].clear_display(); 
 
@@ -1477,7 +1478,8 @@ bool recording_screen(bool no_source)
             }
             else
 #endif /* CONFIG_CODEC == SWCODEC */
-            if ((global_settings.rec_sizesplit) && (global_settings.rec_split_method))
+            if ((global_settings.rec_sizesplit) &&
+                (global_settings.rec_split_method))
             {
                 dmb = dsize/1024/1024;
                 snprintf(buf, sizeof(buf), "%s %dMB",
@@ -1491,19 +1493,21 @@ bool recording_screen(bool no_source)
                          str(LANG_SYSFONT_RECORDING_TIME),
                          hours, minutes, seconds%60);
             }
-            
+
             for(i = 0; i < screen_update; i++)
-                screens[i].puts(0, 0, buf); 
+                screens[i].puts(0, 0, buf);
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
             {
-                snprintf(buf, sizeof(buf), "%s...", str(LANG_SYSFONT_RECORD_PRERECORD));
+                snprintf(buf, sizeof(buf), "%s...",
+                         str(LANG_SYSFONT_RECORD_PRERECORD));
             }
             else
             {
                 /* Display the split interval if the record timesplit
                    is active */
-                if ((global_settings.rec_timesplit) && !(global_settings.rec_split_method))
+                if ((global_settings.rec_timesplit) &&
+                    !(global_settings.rec_split_method))
                 {
                     /* Display the record timesplit interval rather
                        than the file size if the record timer is
@@ -1547,14 +1551,15 @@ bool recording_screen(bool no_source)
             /* We will do file splitting regardless, either at the end of
                a split interval, or when the filesize approaches the 2GB
                FAT file size (compatibility) limit. */
-            if ((audio_stat && !(global_settings.rec_split_method) 
+            if ((audio_stat && !(global_settings.rec_split_method)
                  && global_settings.rec_timesplit && (seconds >= dseconds))
-                 || (audio_stat && global_settings.rec_split_method
-                 && global_settings.rec_sizesplit && (num_recorded_bytes >= dsize))
-                 || (num_recorded_bytes >= MAX_FILE_SIZE))
+                || (audio_stat && global_settings.rec_split_method
+                 && global_settings.rec_sizesplit
+                 && (num_recorded_bytes >= dsize))
+                || (num_recorded_bytes >= MAX_FILE_SIZE))
             {
                 if (!(global_settings.rec_split_type)
-                     || (num_recorded_bytes >= MAX_FILE_SIZE))
+                    || (num_recorded_bytes >= MAX_FILE_SIZE))
                 {
                     rec_command(RECORDING_CMD_START_NEWFILE);
                     last_seconds = 0;
@@ -1577,9 +1582,9 @@ bool recording_screen(bool no_source)
                 {
                     if(PM_HEIGHT > 1)
                         screens[i].puts(0, 2 + filename_offset[i],
-                                                str(LANG_SYSFONT_PM_CLIPCOUNT));
+                                        str(LANG_SYSFONT_PM_CLIPCOUNT));
                     screens[i].puts(0, 1 + PM_HEIGHT + filename_offset[i],
-                                                                        clpstr);
+                                    clpstr);
                 }
             }
 
@@ -1587,18 +1592,18 @@ bool recording_screen(bool no_source)
                      fmt_gain(SOUND_VOLUME,
                               global_settings.volume,
                               buf2, sizeof(buf2)));
-            
+
             if (global_settings.cursor_style && (pos++ == cursor))
             {
                 for(i = 0; i < screen_update; i++)
                     screens[i].puts_style_offset(0, filename_offset[i] +
-                                           PM_HEIGHT + 2, buf, style,0);
+                                                 PM_HEIGHT + 2, buf, style,0);
             }
             else
             {
                 for(i = 0; i < screen_update; i++)
                     screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 2, buf);
-            }                
+            }
 
             if(global_settings.rec_source == AUDIO_SRC_MIC)
             {
@@ -1621,9 +1626,11 @@ bool recording_screen(bool no_source)
                 }
             }
             else if(0
-                HAVE_LINE_REC_( || global_settings.rec_source == AUDIO_SRC_LINEIN)
-                HAVE_FMRADIO_REC_( || global_settings.rec_source == AUDIO_SRC_FMRADIO)
-            )
+                    HAVE_LINE_REC_( || global_settings.rec_source ==
+                                       AUDIO_SRC_LINEIN)
+                    HAVE_FMRADIO_REC_( || global_settings.rec_source ==
+                                          AUDIO_SRC_FMRADIO)
+                    )
             {
                 /* Draw LINE or FMRADIO recording gain */
                 snprintf(buf, sizeof(buf), "%s:%s",
@@ -1640,7 +1647,7 @@ bool recording_screen(bool no_source)
                 if(global_settings.cursor_style && ((1==cursor)||(2==cursor)))
                 {
                     for(i = 0; i < screen_update; i++)
-                        screens[i].puts_style_offset(0, filename_offset[i] + 
+                        screens[i].puts_style_offset(0, filename_offset[i] +
                                            PM_HEIGHT + 3, buf, style,0);
                 }
                 else
@@ -1648,7 +1655,7 @@ bool recording_screen(bool no_source)
                      for(i = 0; i < screen_update; i++)
                          screens[i].puts(0, filename_offset[i] +
                                              PM_HEIGHT + 3, buf);
-                }                
+                }
 
                 snprintf(buf, sizeof(buf), "%s:%s",
                          str(LANG_SYSFONT_RECORDING_RIGHT),
@@ -1672,7 +1679,7 @@ bool recording_screen(bool no_source)
                     for(i = 0; i < screen_update; i++)
                         screens[i].puts(0, filename_offset[i] + 
                                             PM_HEIGHT + 4, buf);
-                }                
+                }
             }
 #ifdef HAVE_LCD_COLOR
             /* special action for gradient - back to single line gradient */
@@ -1703,7 +1710,8 @@ bool recording_screen(bool no_source)
                     break;
                 } /* end switch */
 #ifdef HAVE_AGC
-                if (screens[i].height < h * (2 + filename_offset[i] + PM_HEIGHT + line[i]))
+                if (screens[i].height < h * (2 + filename_offset[i] +
+                                             PM_HEIGHT + line[i]))
                 {
                     line[i] -= 1;
                     display_agc[i] = false;
@@ -1749,23 +1757,24 @@ bool recording_screen(bool no_source)
                              agc_maxgain -
                             (global_settings.rec_left_gain +
                              global_settings.rec_right_gain)/2,
-                             buf2, sizeof(buf2)));                         
+                             buf2, sizeof(buf2)));
 
             if(global_settings.cursor_style && ((cursor==4) || (cursor==5)))
             {
                 for(i = 0; i < screen_update; i++)
-                    screens[i].puts_style_offset(0, filename_offset[i] + 
+                    screens[i].puts_style_offset(0, filename_offset[i] +
                                         PM_HEIGHT + line[i], buf, style,0);
             }
-            else if (
-                global_settings.rec_source == AUDIO_SRC_MIC
-                HAVE_LINE_REC_(|| global_settings.rec_source == AUDIO_SRC_LINEIN)
-                HAVE_FMRADIO_REC_(|| global_settings.rec_source == AUDIO_SRC_FMRADIO)
-                )    
+            else if (global_settings.rec_source == AUDIO_SRC_MIC
+                     HAVE_LINE_REC_(|| global_settings.rec_source ==
+                                       AUDIO_SRC_LINEIN)
+                     HAVE_FMRADIO_REC_(|| global_settings.rec_source ==
+                                          AUDIO_SRC_FMRADIO)
+                    )
             {
                 for(i = 0; i < screen_update; i++) {
                     if (display_agc[i]) {
-                        screens[i].puts(0, filename_offset[i] + 
+                        screens[i].puts(0, filename_offset[i] +
                                         PM_HEIGHT + line[i], buf);
                     }
                 }
@@ -1792,7 +1801,7 @@ bool recording_screen(bool no_source)
                 {
                     case 1:
                         for(i = 0; i < screen_update; i++)
-                            screen_put_cursorxy(&screens[i], 0, 
+                            screen_put_cursorxy(&screens[i], 0,
                                                     filename_offset[i] +
                                                     PM_HEIGHT + 3, true);
 
@@ -1807,13 +1816,13 @@ bool recording_screen(bool no_source)
                     case 2:
                         for(i = 0; i < screen_update; i++)
                             screen_put_cursorxy(&screens[i], 0, 
-                                                    filename_offset[i] + 
+                                                    filename_offset[i] +
                                                     PM_HEIGHT + 3, true);
                     break;
                     case 3:
                         for(i = 0; i < screen_update; i++)
                             screen_put_cursorxy(&screens[i], 0, 
-                                                    filename_offset[i] + 
+                                                    filename_offset[i] +
                                                     PM_HEIGHT + 4, true);
                     break;
 #ifdef HAVE_AGC
@@ -1821,14 +1830,14 @@ bool recording_screen(bool no_source)
                     case 5:
                         for(i = 0; i < screen_update; i++)
                             screen_put_cursorxy(&screens[i], 0,
-                                                filename_offset[i] + 
+                                                filename_offset[i] +
                                                 PM_HEIGHT + line[i], true);
                         break;
 #endif /* HAVE_AGC */
                     default:
                         for(i = 0; i < screen_update; i++)
                             screen_put_cursorxy(&screens[i], 0, 
-                                                    filename_offset[i] + 
+                                                    filename_offset[i] +
                                                     PM_HEIGHT + 2, true);
                 }
             }
@@ -1841,7 +1850,7 @@ bool recording_screen(bool no_source)
             {
                 gui_statusbar_draw(&(statusbars.statusbars[i]), true);
                 peak_meter_screen(&screens[i], pm_x, pm_y[i], h*PM_HEIGHT);
-                screens[i].update();                
+                screens[i].update();
             }
 
             /* draw the trigger status */
@@ -1853,7 +1862,8 @@ bool recording_screen(bool no_source)
                 trig_xpos[i] = screens[i].width - trig_width[i];
                 trig_ypos[i] =  ((screens[i].height < 72) && (PM_HEIGHT > 1)) ?
                                   h*2 :
-                                  h*(1 + filename_offset[i] + PM_HEIGHT + line[i]
+                                  h*(1 + filename_offset[i] + PM_HEIGHT +
+                                     line[i]
 #ifdef HAVE_AGC
                                + 1
 #endif
@@ -1882,10 +1892,10 @@ bool recording_screen(bool no_source)
     {
         gui_syncsplash(0, str(LANG_SYSFONT_DISK_FULL));
         gui_syncstatusbar_draw(&statusbars, true);
-        
+
         FOR_NB_SCREENS(i)
             screens[i].update();
-        
+
         audio_error_clear();
 
         while(1)
@@ -1937,7 +1947,7 @@ rec_abort:
     ata_set_led_enabled(true);
 #endif
 
-	settings_save();
+    settings_save();
 
     return (rec_status & RCSTAT_BEEN_IN_USB_MODE) != 0;
 } /* recording_screen */
@@ -1979,7 +1989,7 @@ static bool f2_rec_screen(void)
             screens[i].putsxy(0, LCD_HEIGHT/2 - h*2,
                 str(LANG_SYSFONT_RECORDING_QUALITY));
         }
-        
+
             snprintf(buf, sizeof(buf), "%d", global_settings.rec_quality);
         FOR_NB_SCREENS(i)
         {
@@ -2022,7 +2032,7 @@ static bool f2_rec_screen(void)
                        str(LANG_SYSFONT_MODE));
             screens[i].getstringsize(ptr, &w, &h);
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
-            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 
+            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
                         LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8);
 
             screens[i].update();
@@ -2075,7 +2085,7 @@ static bool f2_rec_screen(void)
     rec_set_recording_options(&rec_options);
 
     set_gain();
-    
+
     settings_save();
     FOR_NB_SCREENS(i)
         screens[i].setfont(FONT_UI);
@@ -2102,7 +2112,7 @@ static bool f3_rec_screen(void)
         screens[i].setfont(FONT_SYSFIXED);
         screens[i].getstringsize("A",&w,&h);
     }
-    
+
     while (!exit) {
         char* ptr=NULL;
         ptr = src_str[global_settings.rec_source];
@@ -2116,7 +2126,7 @@ static bool f3_rec_screen(void)
  
             screens[i].getstringsize(ptr, &w, &h);
             screens[i].putsxy(0, LCD_HEIGHT/2-h, ptr);
-            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
+            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
                             LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
         }
 
