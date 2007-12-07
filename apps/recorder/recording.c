@@ -873,13 +873,14 @@ bool recording_screen(bool no_source)
         ID2P(LANG_GIGABYTE)
     };
 
-    int style = STYLE_INVERT;
+    int base_style = STYLE_INVERT;
+    int style;
 #ifdef HAVE_LCD_COLOR
     if (global_settings.cursor_style == 2) {
-        style |= STYLE_COLORBAR;
+        base_style |= STYLE_COLORBAR;
     }
     else if (global_settings.cursor_style == 3) {
-        style |= STYLE_GRADIENT | 1;
+        base_style |= STYLE_GRADIENT;
     }
 #endif
 
@@ -1454,6 +1455,14 @@ bool recording_screen(bool no_source)
             for(i = 0; i < screen_update; i++)
                 screens[i].clear_display(); 
 
+            style = base_style;
+
+#ifdef HAVE_LCD_COLOR
+            /* special action for gradient - set default for 1 line gradient */
+            if(global_settings.cursor_style == 3)
+                style = base_style | CURLN_PACK(0) | NUMLN_PACK(1);
+#endif /* HAVE_LCD_COLOR */
+
 #if CONFIG_CODEC == SWCODEC
             if ((audio_stat & AUDIO_STATUS_WARNING)
                 && (warning_counter++ % WARNING_PERIOD) < WARNING_PERIOD/2)
@@ -1622,6 +1631,12 @@ bool recording_screen(bool no_source)
                          fmt_gain(SOUND_LEFT_GAIN,
                                   global_settings.rec_left_gain,
                                   buf2, sizeof(buf2)));
+#ifdef HAVE_LCD_COLOR
+                /* special action for gradient - double line gradient - line1 */
+                if((global_settings.cursor_style == 3) &&
+                   (1==cursor))
+                    style = base_style | CURLN_PACK(0) | NUMLN_PACK(2);
+#endif /* HAVE_LCD_COLOR */
                 if(global_settings.cursor_style && ((1==cursor)||(2==cursor)))
                 {
                     for(i = 0; i < screen_update; i++)
@@ -1640,6 +1655,12 @@ bool recording_screen(bool no_source)
                          fmt_gain(SOUND_RIGHT_GAIN,
                                   global_settings.rec_right_gain,
                                   buf2, sizeof(buf2)));
+#ifdef HAVE_LCD_COLOR
+                /* special action for gradient - double line gradient - line2 */
+                if((global_settings.cursor_style == 3) &&
+                    (1==cursor))
+                    style = base_style | CURLN_PACK(1) | NUMLN_PACK(2);
+#endif /* HAVE_LCD_COLOR */
                 if(global_settings.cursor_style && ((1==cursor)||(3==cursor)))
                 {
                     for(i = 0; i < screen_update; i++)
@@ -1653,6 +1674,11 @@ bool recording_screen(bool no_source)
                                             PM_HEIGHT + 4, buf);
                 }                
             }
+#ifdef HAVE_LCD_COLOR
+            /* special action for gradient - back to single line gradient */
+            if(global_settings.cursor_style == 3)
+                style = base_style | CURLN_PACK(0) | NUMLN_PACK(1);
+#endif /* HAVE_LCD_COLOR */
 
             FOR_NB_SCREENS(i)
             {
