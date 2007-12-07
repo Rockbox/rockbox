@@ -1096,7 +1096,7 @@ bool recording_screen(bool no_source)
                         rec_command(RECORDING_CMD_START);
                         last_seconds = 0;
                         if (global_settings.talk_menu)
-                        {   
+                        {
                             /* no voice possible here, but a beep */
                             audio_beep(HZ/2); /* longer beep on start */
                         }
@@ -1454,7 +1454,7 @@ bool recording_screen(bool no_source)
             num_recorded_bytes = audio_num_recorded_bytes();
 
             for(i = 0; i < screen_update; i++)
-                screens[i].clear_display(); 
+                screens[i].clear_display();
 
             style = base_style;
 
@@ -1671,13 +1671,13 @@ bool recording_screen(bool no_source)
                 if(global_settings.cursor_style && ((1==cursor)||(3==cursor)))
                 {
                     for(i = 0; i < screen_update; i++)
-                        screens[i].puts_style_offset(0, filename_offset[i] + 
+                        screens[i].puts_style_offset(0, filename_offset[i] +
                                             PM_HEIGHT + 4, buf, style,0);
                 }
                 else
                 {
                     for(i = 0; i < screen_update; i++)
-                        screens[i].puts(0, filename_offset[i] + 
+                        screens[i].puts(0, filename_offset[i] +
                                             PM_HEIGHT + 4, buf);
                 }
             }
@@ -1994,7 +1994,7 @@ static bool f2_rec_screen(void)
         FOR_NB_SCREENS(i)
         {
             screens[i].putsxy(0, LCD_HEIGHT/2-h, buf);
-            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
+            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
                         LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
         }
 
@@ -2123,7 +2123,7 @@ static bool f3_rec_screen(void)
             /* Recording source */
             screens[i].putsxy(0, LCD_HEIGHT/2 - h*2,
                 str(LANG_SYSFONT_RECORDING_SOURCE));
- 
+
             screens[i].getstringsize(ptr, &w, &h);
             screens[i].putsxy(0, LCD_HEIGHT/2-h, ptr);
             screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
