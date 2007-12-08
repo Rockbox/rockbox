@@ -556,9 +556,9 @@ struct user_settings
     
     /* Crossfeed settings */
     bool crossfeed;                             /* enable crossfeed */
-    unsigned int crossfeed_direct_gain;         /* - dB x 10 */
-    unsigned int crossfeed_cross_gain;          /* - dB x 10 */
-    unsigned int crossfeed_hf_attenuation;      /* - dB x 10 */
+    unsigned int crossfeed_direct_gain;         /* dB x 10 */
+    unsigned int crossfeed_cross_gain;          /* dB x 10 */
+    unsigned int crossfeed_hf_attenuation;      /* dB x 10 */
     unsigned int crossfeed_hf_cutoff;           /* Frequency in Hz */
 #endif
 #ifdef HAVE_DIRCACHE

@@ -51,14 +51,6 @@
  * Utility functions
  */
 
-void eq_gain_format(char* buffer, size_t buffer_size, int value, const char* unit)
-{
-    int v = abs(value);
-
-    snprintf(buffer, buffer_size, "%s%d.%d %s", value < 0 ? "-" : "",
-        v / EQ_USER_DIVISOR, v % EQ_USER_DIVISOR, unit);
-}
-
 void eq_q_format(char* buffer, size_t buffer_size, int value, const char* unit)
 {
     snprintf(buffer, buffer_size, "%d.%d %s", value / EQ_USER_DIVISOR, value % EQ_USER_DIVISOR, unit);

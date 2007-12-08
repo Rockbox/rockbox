@@ -758,27 +758,27 @@ void dsp_set_crossfeed(bool enable)
 
 void dsp_set_crossfeed_direct_gain(int gain)
 {
-    crossfeed_data.gain = get_replaygain_int(gain * -10) << 7;
+    crossfeed_data.gain = get_replaygain_int(gain * 10) << 7;
     /* If gain is negative, the calculation overflowed and we need to clamp */
     if (crossfeed_data.gain < 0)
         crossfeed_data.gain = 0x7fffffff;
 }
 
-/* Both gains should be below 0 dB (when inverted) */
+/* Both gains should be below 0 dB */
 void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
 {
     int32_t *c = crossfeed_data.coefs;
-    long scaler = get_replaygain_int(lf_gain * -10) << 7;
+    long scaler = get_replaygain_int(lf_gain * 10) << 7;
 
     cutoff = 0xffffffff/NATIVE_FREQUENCY*cutoff;
     hf_gain -= lf_gain;
-    /* Divide cutoff by sqrt(10^(-hf_gain/20)) to place cutoff at the -3 dB
+    /* Divide cutoff by sqrt(10^(hf_gain/20)) to place cutoff at the -3 dB
      * point instead of shelf midpoint. This is for compatibility with the old
      * crossfeed shelf filter and should be removed if crossfeed settings are
      * ever made incompatible for any other good reason.
      */
-    cutoff = DIV64(cutoff, get_replaygain_int(-hf_gain*5), 24);
-    filter_shelf_coefs(cutoff, -hf_gain, false, c);
+    cutoff = DIV64(cutoff, get_replaygain_int(hf_gain*5), 24);
+    filter_shelf_coefs(cutoff, hf_gain, false, c);
     /* Scale coefs by LF gain and shift them to s0.31 format. We have no gains
      * over 1 and can do this safely
      */

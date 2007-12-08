@@ -250,12 +250,6 @@ static void scanaccel_formatter(char *buffer, size_t buffer_size,
 }
 
 #if CONFIG_CODEC == SWCODEC
-static void crossfeed_format(char* buffer, size_t buffer_size, int value,
-    const char* unit)
-{
-    snprintf(buffer, buffer_size, "%s%d.%d %s", value == 0 ? " " : "-",
-        value / 10, value % 10, unit);
-}
 static void crossfeed_cross_set(int val)
 {
    (void)val;
@@ -264,7 +258,7 @@ static void crossfeed_cross_set(int val)
                                   global_settings.crossfeed_hf_cutoff);
 }
 
-static void replaygain_preamp_format(char* buffer, size_t buffer_size, int value,
+static void db_format(char* buffer, size_t buffer_size, int value,
     const char* unit)
 {
     int v = abs(value);
@@ -274,7 +268,7 @@ static void replaygain_preamp_format(char* buffer, size_t buffer_size, int value
 }
 
 #endif
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC -= MAS3539F)
 static void set_mdb_enable(bool value)
 {
     sound_set_mdb_enable((int)value);
@@ -868,7 +862,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, replaygain_noclip, LANG_REPLAYGAIN_NOCLIP,
         false, "replaygain noclip", NULL),
     INT_SETTING_NOWRAP(0, replaygain_preamp, LANG_REPLAYGAIN_PREAMP, 0, "replaygain preamp", 
-                UNIT_DB, -120, 120, 5, replaygain_preamp_format, NULL, NULL),
+                UNIT_DB, -120, 120, 5, db_format, NULL, NULL),
     
     CHOICE_SETTING(0, beep, LANG_BEEP, 0,
         "beep", "off,weak,moderate,strong", NULL, 4,
@@ -894,15 +888,15 @@ const struct settings_list settings[] = {
     /* crossfeed */
     OFFON_SETTING(0,crossfeed, LANG_CROSSFEED, false,
                     "crossfeed", dsp_set_crossfeed),
-    INT_SETTING_NOWRAP(0, crossfeed_direct_gain, LANG_CROSSFEED_DIRECT_GAIN, 15,
-                    "crossfeed direct gain", UNIT_DB, 0, 60, 5,
-                    crossfeed_format, NULL, dsp_set_crossfeed_direct_gain),
-    INT_SETTING_NOWRAP(0, crossfeed_cross_gain, LANG_CROSSFEED_CROSS_GAIN, 60,
-                    "crossfeed cross gain", UNIT_DB, 30, 120, 5,
-                    crossfeed_format, NULL, crossfeed_cross_set),
-    INT_SETTING_NOWRAP(0, crossfeed_hf_attenuation, LANG_CROSSFEED_HF_ATTENUATION, 160,
-                    "crossfeed hf attenuation", UNIT_DB, 60, 240, 5,
-                    crossfeed_format, NULL, crossfeed_cross_set),
+    INT_SETTING_NOWRAP(0, crossfeed_direct_gain, LANG_CROSSFEED_DIRECT_GAIN,
+                    -15, "crossfeed direct gain", UNIT_DB, -60, 0, 5,
+                    db_format, NULL, dsp_set_crossfeed_direct_gain),
+    INT_SETTING_NOWRAP(0, crossfeed_cross_gain, LANG_CROSSFEED_CROSS_GAIN, -60,
+                    "crossfeed cross gain", UNIT_DB, -120, -30, 5,
+                    db_format, NULL, crossfeed_cross_set),
+    INT_SETTING_NOWRAP(0, crossfeed_hf_attenuation, LANG_CROSSFEED_HF_ATTENUATION, -160,
+                    "crossfeed hf attenuation", UNIT_DB, -240, -60, 5,
+                    db_format, NULL, crossfeed_cross_set),
     INT_SETTING_NOWRAP(0, crossfeed_hf_cutoff, LANG_CROSSFEED_HF_CUTOFF, 700,
                     "crossfeed hf cutoff", UNIT_HERTZ, 500, 2000, 100,
                     NULL, NULL, crossfeed_cross_set),
@@ -948,19 +942,19 @@ const struct settings_list settings[] = {
     /* -240..240 (or -24db to +24db) */
     INT_SETTING_NOWRAP(F_EQSETTING, eq_band0_gain, LANG_GAIN, 0,
                     "eq band 0 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                    EQ_GAIN_STEP, eq_gain_format, NULL, NULL),
+                    EQ_GAIN_STEP, db_format, NULL, NULL),
     INT_SETTING_NOWRAP(F_EQSETTING, eq_band1_gain, LANG_GAIN, 0,
                     "eq band 1 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                    EQ_GAIN_STEP, eq_gain_format, NULL, NULL),
+                    EQ_GAIN_STEP, db_format, NULL, NULL),
     INT_SETTING_NOWRAP(F_EQSETTING, eq_band2_gain, LANG_GAIN, 0,
                     "eq band 2 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                    EQ_GAIN_STEP, eq_gain_format, NULL, NULL),
+                    EQ_GAIN_STEP, db_format, NULL, NULL),
     INT_SETTING_NOWRAP(F_EQSETTING, eq_band3_gain, LANG_GAIN, 0,
                     "eq band 3 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                    EQ_GAIN_STEP, eq_gain_format, NULL, NULL),
+                    EQ_GAIN_STEP, db_format, NULL, NULL),
     INT_SETTING_NOWRAP(F_EQSETTING, eq_band4_gain, LANG_GAIN, 0,
                     "eq band 4 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                    EQ_GAIN_STEP, eq_gain_format, NULL, NULL),
+                    EQ_GAIN_STEP, db_format, NULL, NULL),
 
     /* dithering */
     OFFON_SETTING(0, dithering_enabled, LANG_DITHERING,
