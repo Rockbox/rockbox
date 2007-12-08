@@ -35,9 +35,6 @@
 /* Enable valgrind extra checks */
 /* #undef ENABLE_VALGRIND */
 
-/* Enable support for Epic 4.8 kbps mode */
-/* #undef EPIC_48K */
-
 /* Debug fixed-point implementation */
 /* #undef FIXED_DEBUG */
 

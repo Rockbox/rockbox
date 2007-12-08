@@ -22,12 +22,12 @@ quant_lsp.c
 sb_celp.c
 speex.c
 speex_callbacks.c
-speex_header.c
 #ifndef ROCKBOX_VOICE_CODEC
 #ifndef ROCKBOX_VOICE_ENCODER
 oggframing.c
 #endif
 stereo.c
+speex_header.c
 #endif
 #ifdef ROCKBOX_VOICE_ENCODER
 lpc.c
