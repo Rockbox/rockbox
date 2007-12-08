@@ -268,7 +268,7 @@ static void db_format(char* buffer, size_t buffer_size, int value,
 }
 
 #endif
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC -= MAS3539F)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 static void set_mdb_enable(bool value)
 {
     sound_set_mdb_enable((int)value);
