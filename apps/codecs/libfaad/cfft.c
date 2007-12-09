@@ -849,12 +849,12 @@ static INLINE void cfftf1neg(uint16_t n, complex_t *c, complex_t *ch,
 
 void cfftf(cfft_info *cfft, complex_t *c)
 {
-    cfftf1neg(cfft->n, c, cfft->work, (const uint16_t*)cfft->ifac, (const complex_t*)cfft->tab, -1);
+    cfftf1neg(cfft->n, c, cfft->work, (const uint16_t*)cfft->ifac, (const complex_t*)cfft->tab, (const int8_t) -1);
 }
 
 void cfftb(cfft_info *cfft, complex_t *c)
 {
-    cfftf1pos(cfft->n, c, cfft->work, (const uint16_t*)cfft->ifac, (const complex_t*)cfft->tab, +1);
+    cfftf1pos(cfft->n, c, cfft->work, (const uint16_t*)cfft->ifac, (const complex_t*)cfft->tab, (const int8_t) +1);
 }
 
 static void cffti1(uint16_t n, complex_t *wa, uint16_t *ifac)
