@@ -532,6 +532,38 @@ static const struct plugin_api rockbox_api = {
     remote_backlight_set_timeout_plugged,
 #endif
 #endif /* HAVE_REMOTE_LCD */
+
+#if (CONFIG_CODEC == SWCODEC)
+    bufopen,
+    bufalloc,
+    bufclose,
+    bufseek,
+    bufadvance,
+    bufread,
+    bufgetdata,
+    bufgettail,
+    bufcuttail,
+
+    buf_get_offset,
+    buf_handle_offset,
+    buf_request_buffer_handle,
+    buf_set_base_handle,
+    buf_used,
+#endif
+
+#ifdef HAVE_TAGCACHE
+    tagcache_search,
+    tagcache_search_set_uniqbuf,
+    tagcache_search_add_filter,
+    tagcache_get_next,
+    tagcache_retrieve,
+    tagcache_search_finish,
+#endif
+
+#ifdef HAVE_ALBUMART
+    find_albumart,
+    search_albumart_files,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

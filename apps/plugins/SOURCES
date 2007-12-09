@@ -136,6 +136,10 @@ splitedit.c
 matrix.c
 #endif
 
+#if defined(HAVE_LCD_COLOR) && defined(HAVE_ALBUMART) && defined(HAVE_TAGCACHE)
+pictureflow.c
+#endif
+
 /* Platform-specific plugins */
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 iriverify.c

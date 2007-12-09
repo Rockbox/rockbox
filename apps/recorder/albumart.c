@@ -125,8 +125,8 @@ static void fix_path_part(char* path, int offset, int count)
  * If a matching bitmap is found, its filename is stored in buf.
  * Return value is true if a bitmap was found, false otherwise.
  */
-static bool search_files(const struct mp3entry *id3, const char *size_string,
-                         char *buf, int buflen)
+bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
+                           char *buf, int buflen)
 {
     char path[MAX_PATH + 1];
     char dir[MAX_PATH + 1];
@@ -228,12 +228,12 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen)
              data->albumart_max_width, data->albumart_max_height);
 
     /* First we look for a bitmap of the right size */
-    if (search_files(id3, size_string, buf, buflen))
+    if (search_albumart_files(id3, size_string, buf, buflen))
         return true;
 
     /* Then we look for generic bitmaps */
     *size_string = 0;
-    return search_files(id3, size_string, buf, buflen);
+    return search_albumart_files(id3, size_string, buf, buflen);
 }
 
 /* Draw the album art bitmap from the given handle ID onto the given WPS.

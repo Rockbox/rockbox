@@ -35,6 +35,9 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen);
    Call with clear = true to clear the bitmap instead of drawing it. */
 void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear);
 
+bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
+                           char *buf, int buflen);
+
 #endif /* HAVE_ALBUMART */
 
 #endif /* _ALBUMART_H_ */

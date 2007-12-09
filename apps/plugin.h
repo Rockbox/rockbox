@@ -78,6 +78,9 @@
 #include "list.h"
 #include "tree.h"
 #include "color_picker.h"
+#include "buffering.h"
+#include "tagcache.h"
+#include "albumart.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -655,6 +658,42 @@ struct plugin_api {
     void (*remote_backlight_set_timeout_plugged)(int index);
 #endif
 #endif /* HAVE_REMOTE_LCD */
+
+#if (CONFIG_CODEC == SWCODEC)
+    int (*bufopen)(const char *file, size_t offset, enum data_type type);
+    int (*bufalloc)(const void *src, size_t size, enum data_type type);
+    bool (*bufclose)(int handle_id);
+    int (*bufseek)(int handle_id, size_t newpos);
+    int (*bufadvance)(int handle_id, off_t offset);
+    ssize_t (*bufread)(int handle_id, size_t size, void *dest);
+    ssize_t (*bufgetdata)(int handle_id, size_t size, void **data);
+    ssize_t (*bufgettail)(int handle_id, size_t size, void **data);
+    ssize_t (*bufcuttail)(int handle_id, size_t size);
+
+    ssize_t (*buf_get_offset)(int handle_id, void *ptr);
+    ssize_t (*buf_handle_offset)(int handle_id);
+    void (*buf_request_buffer_handle)(int handle_id);
+    void (*buf_set_base_handle)(int handle_id);
+    size_t (*buf_used)(void);
+#endif
+
+#ifdef HAVE_TAGCACHE
+    bool (*tagcache_search)(struct tagcache_search *tcs, int tag);
+    void (*tagcache_search_set_uniqbuf)(struct tagcache_search *tcs,
+           void *buffer, long length);
+    bool (*tagcache_search_add_filter)(struct tagcache_search *tcs,
+                                    int tag, int seek);
+    bool (*tagcache_get_next)(struct tagcache_search *tcs);
+    bool (*tagcache_retrieve)(struct tagcache_search *tcs, int idxid,
+                           int tag, char *buf, long size);
+    void (*tagcache_search_finish)(struct tagcache_search *tcs);
+#endif
+
+#ifdef HAVE_ALBUMART
+    bool (*find_albumart)(const struct mp3entry *id3, char *buf, int buflen);
+    bool (*search_albumart_files)(const struct mp3entry *id3, const char *size_string,
+                                  char *buf, int buflen);
+#endif
 };
 
 /* plugin header */
