@@ -134,7 +134,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         break;
     
     case AFMT_OGG_VORBIS:
-        if (!get_vorbis_metadata(fd, id3))/*detects and handles Ogg/Speex files*/
+        if (!get_ogg_metadata(fd, id3))/*detects and handles Ogg/Speex files*/
         {
             return false;
         }
@@ -142,7 +142,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
         break;
 
     case AFMT_SPEEX:
-        if (!get_speex_metadata(fd, id3))
+        if (!get_ogg_metadata(fd, id3))
         {
             return false;
         }
