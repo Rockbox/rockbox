@@ -80,7 +80,10 @@
 #include "color_picker.h"
 #include "buffering.h"
 #include "tagcache.h"
+
+#ifdef HAVE_ALBUMART
 #include "albumart.h"
+#endif
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
