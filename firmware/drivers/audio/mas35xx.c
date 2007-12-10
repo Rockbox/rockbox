@@ -28,12 +28,13 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1,-100,  12, -25},
     [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   6},
     [SOUND_TREBLE]        = {"dB", 0,  1, -12,  12,   6},
+    [SOUND_BALANCE]       = {"dB", 0,  1,-128, 127,   0},
 #else /* MAS3507D */
     [SOUND_VOLUME]        = {"dB", 0,  1, -78,  18, -18},
     [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7},
     [SOUND_TREBLE]        = {"dB", 0,  1, -15,  15,   7},
+    [SOUND_BALANCE]       = {"dB", 0,  1, -96,  96,   0},
 #endif
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
