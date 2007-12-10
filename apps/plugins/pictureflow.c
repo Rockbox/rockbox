@@ -803,12 +803,16 @@ int read_pfraw(char* filename)
     int size =  sizeof(struct bitmap) + sizeof( fb_data ) * bmph.width * bmph.height;
 
     int hid = rb->bufalloc(NULL, size, TYPE_BITMAP);
-    if (hid < 0)
+    if (hid < 0) {
+        rb->close( fh );
         return -1;
+    }
 
     struct bitmap *bm;
-    if (rb->bufgetdata(hid, 0, (void *)&bm) < size)
+    if (rb->bufgetdata(hid, 0, (void *)&bm) < size) {
+        rb->close( fh );
         return -1;
+    }
 
     bm->width = bmph.width;
     bm->height = bmph.height;
