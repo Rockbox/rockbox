@@ -37,7 +37,7 @@ PLUGIN_HEADER
 static struct plugin_api *rb;   /* global api struct pointer */
 
 const struct button_mapping *plugin_contexts[]
-= {generic_directions, generic_actions};
+= {generic_actions, generic_directions};
 
 #define NB_ACTION_CONTEXTS sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
@@ -74,8 +74,11 @@ const struct button_mapping *plugin_contexts[]
 #define IANGLE_MASK 1023
 
 /* maximum size of an slide */
-#define MAX_IMG_WIDTH 100
-#define MAX_IMG_HEIGHT 100
+#define MAX_IMG_WIDTH LCD_WIDTH
+#define MAX_IMG_HEIGHT LCD_HEIGHT
+
+#define PREFERRED_IMG_WIDTH 100
+#define PREFERRED_IMG_HEIGHT 100
 
 #define BUFFER_WIDTH LCD_WIDTH
 #define BUFFER_HEIGHT LCD_HEIGHT
@@ -165,7 +168,7 @@ static PFreal offsetY;
 static bool show_fps; /* show fps in the main screen */
 static int number_of_slides;
 
-static struct slide_cache cache[SLIDE_CACHE_SIZE+1];
+static struct slide_cache cache[SLIDE_CACHE_SIZE];
 static int  slide_cache_in_use;
 
 /* use long for aligning */
@@ -188,8 +191,10 @@ static struct album_data album[MAX_ALBUMS];
 static char album_names[MAX_ALBUMS*AVG_ALBUM_NAME_LENGTH];
 static int album_count;
 
-static fb_data input_bmp_buffer[MAX_IMG_WIDTH * MAX_IMG_HEIGHT]; /* static buffer for reading the bitmaps */
-static fb_data output_bmp_buffer[MAX_IMG_WIDTH * MAX_IMG_HEIGHT * 2]; /* static buffer for reading the bitmaps */
+static fb_data *input_bmp_buffer;
+static fb_data *output_bmp_buffer;
+static int input_hid;
+static int output_hid;
 
 static bool thread_is_running;
 
@@ -449,7 +454,7 @@ bool get_albumart_for_index_from_db(int slide_index, char *buf, int buflen)
     if ( rb->tagcache_get_next(&tcs) ) {
         struct mp3entry id3;
         char size[9];
-        rb->snprintf(size, sizeof(size), ".%dx%d", MAX_IMG_WIDTH, MAX_IMG_HEIGHT);
+        rb->snprintf(size, sizeof(size), ".%dx%d", PREFERRED_IMG_WIDTH, PREFERRED_IMG_HEIGHT);
         rb->strncpy( (char*)&id3.path, tcs.result, MAX_PATH );
         id3.album = get_album_name(slide_index);
         if ( rb->search_albumart_files(&id3, size, buf, buflen) )
@@ -504,15 +509,52 @@ void draw_progressbar(int step)
     rb->lcd_set_foreground(LCD_RGBPACK(165, 231, 82));
 
     rb->lcd_fillrect(x+1, y+1, step * w / album_count, bar_height-2);
+    rb->lcd_set_foreground(LCD_RGBPACK(255,255,255));
     rb->lcd_update();
     rb->yield();
 }
 
+bool allocate_buffers(void)
+{
+    int input_size = MAX_IMG_WIDTH * MAX_IMG_HEIGHT * sizeof( fb_data );
+    int output_size = MAX_IMG_WIDTH * MAX_IMG_HEIGHT * sizeof( fb_data ) * 2;
+
+    input_hid = rb->bufalloc(NULL, input_size, TYPE_BITMAP);
+
+    if (input_hid < 0)
+        return false;
+
+    if (rb->bufgetdata(input_hid, 0, (void *)&input_bmp_buffer) < input_size) {
+        rb->bufclose(input_hid);
+        return false;
+    }
+
+    output_hid = rb->bufalloc(NULL, output_size, TYPE_BITMAP);
+
+    if (output_hid < 0) {
+        rb->bufclose(input_hid);
+        return false;
+    }
+
+    if (rb->bufgetdata(output_hid, 0, (void *)&output_bmp_buffer) < output_size) {
+        rb->bufclose(output_hid);
+        return false;
+    }
+    return true;
+}
+
+
+bool free_buffers(void)
+{
+    rb->bufclose(input_hid);
+    rb->bufclose(output_hid);
+    return true;
+}
 
 /**
  Precomupte the album art images and store them in CACHE_PREFIX.
  */
-bool create_albumart_cache(void)
+bool create_albumart_cache(bool force)
 {
     /* FIXME: currently we check for the file CACHE_PREFIX/ready
        We need a real menu etc. to recreate cache. For now, delete
@@ -520,10 +562,11 @@ bool create_albumart_cache(void)
 
     number_of_slides  = album_count;
 
-    if ( rb->file_exists( CACHE_PREFIX "/ready" ) ) return true;
+    if ( ! force && rb->file_exists( CACHE_PREFIX "/ready" ) ) return true;
 
     int i;
     struct bitmap input_bmp;
+
     for (i=0; i < album_count; i++)
     {
         draw_progressbar(i);
@@ -531,17 +574,23 @@ bool create_albumart_cache(void)
             continue;
 
         int ret;
-        input_bmp.data = (char *) &input_bmp_buffer;
-        ret = rb->read_bmp_file(tmp_path_name, &input_bmp, sizeof(input_bmp_buffer), FORMAT_NATIVE);
-        if (ret <= 0) continue; /* skip missing/broken files */
+        input_bmp.data = (char *)input_bmp_buffer;
+        ret = rb->read_bmp_file(tmp_path_name, &input_bmp,
+                                sizeof(fb_data)*MAX_IMG_WIDTH*MAX_IMG_HEIGHT,
+                                FORMAT_NATIVE);
+        if (ret <= 0) {
+            rb->splash(HZ, "couldn't read bmp");
+            continue; /* skip missing/broken files */
+        }
 
         rb->snprintf(tmp_path_name, sizeof(tmp_path_name), CACHE_PREFIX "/%d.pfraw", i);
-        create_bmp(&input_bmp, tmp_path_name);
+        if (!create_bmp(&input_bmp, tmp_path_name)) {
+            rb->splash(HZ, "couldn't write bmp");
+        }
         if ( rb->button_get(false) == PICTUREFLOW_MENU ) return false;
     }
     int fh = rb->creat( CACHE_PREFIX "/ready"  );
     rb->close(fh);
-
     return true;
 }
 
@@ -720,13 +769,13 @@ bool create_pf_thread(void)
 /**
  Safe the given bitmap as filename in the pfraw format
  */
-int save_pfraw(char* filename, struct bitmap *bm)
+bool save_pfraw(char* filename, struct bitmap *bm)
 {
     struct pfraw_header bmph;
     bmph.width = bm->width;
     bmph.height = bm->height;
     int fh = rb->creat( filename );
-    if( fh < 0 ) return -1;
+    if( fh < 0 ) return false;
     rb->write( fh, &bmph, sizeof( struct pfraw_header ) );
     int y;
     for( y = 0; y < bm->height; y++ )
@@ -735,7 +784,7 @@ int save_pfraw(char* filename, struct bitmap *bm)
         rb->write( fh, d, sizeof( fb_data ) * bm->width );
     }
     rb->close( fh );
-    return 0;
+    return true;
 }
 
 
@@ -789,7 +838,7 @@ bool create_bmp(struct bitmap *input_bmp, char *target_path)
     output_bmp.width = input_bmp->width * 2;
     output_bmp.height = input_bmp->height;
     output_bmp.format = input_bmp->format;
-    output_bmp.data = (char*) &output_bmp_buffer;
+    output_bmp.data = (char *)output_bmp_buffer;
 
     /* transpose the image, this is to speed-up the rendering
        because we process one column at a time
@@ -815,8 +864,7 @@ bool create_bmp(struct bitmap *input_bmp, char *target_path)
                     LCD_RGBPACK(r, g, b);
         }
     }
-    save_pfraw(target_path, &output_bmp);
-    return true;
+    return save_pfraw(target_path, &output_bmp);
 }
 
 
@@ -826,6 +874,7 @@ bool create_bmp(struct bitmap *input_bmp, char *target_path)
 static bool load_and_prepare_surface(int slide_index, int cache_index)
 {
     rb->snprintf(tmp_path_name, sizeof(tmp_path_name), CACHE_PREFIX "/%d.pfraw", slide_index);
+
     int hid = read_pfraw(tmp_path_name);
     if (hid < 0)
         return false;
@@ -957,10 +1006,10 @@ void recalc_table(void)
 
     itilt = 70 * IANGLE_MAX / 360;      /* approx. 70 degrees tilted */
 
-    offsetX = MAX_IMG_WIDTH / 2 * (PFREAL_ONE - fcos(itilt));
-    offsetY = MAX_IMG_WIDTH / 2 * fsin(itilt);
-    offsetX += MAX_IMG_WIDTH * PFREAL_ONE;
-    offsetY += MAX_IMG_WIDTH * PFREAL_ONE / 4;
+    offsetX = PREFERRED_IMG_WIDTH / 2 * (PFREAL_ONE - fcos(itilt));
+    offsetY = PREFERRED_IMG_HEIGHT / 2 * fsin(itilt);
+    offsetX += PREFERRED_IMG_WIDTH * PFREAL_ONE;
+    offsetY += PREFERRED_IMG_HEIGHT * PFREAL_ONE / 4;
     spacing = 40;
 }
 
@@ -1365,9 +1414,9 @@ void cleanup(void *parameter)
 }
 
 
-int create_empty_slide(void)
+int create_empty_slide(bool force)
 {
-    if ( ! rb->file_exists( EMPTY_SLIDE ) )  {
+    if ( force || ! rb->file_exists( EMPTY_SLIDE ) )  {
         struct bitmap input_bmp;
         input_bmp.width = BMPWIDTH_pictureflow_emptyslide;
         input_bmp.height = BMPHEIGHT_pictureflow_emptyslide;
@@ -1383,18 +1432,25 @@ int create_empty_slide(void)
     return true;
 }
 
+
 /**
   Shows the settings menu
  */
 int settings_menu(void) {
     int selection = 0;
 
-    MENUITEM_STRINGLIST(settings_menu,"PictureFlow Settings",NULL,"Show FPS");
+    MENUITEM_STRINGLIST(settings_menu,"PictureFlow Settings",NULL,"Show FPS", "Rebuild cache");
 
     selection=rb->do_menu(&settings_menu,&selection);
     switch(selection) {
         case 0:
             rb->set_bool("Show FPS", &show_fps);
+            break;
+
+        case 1:
+            rb->remove(CACHE_PREFIX "/ready");
+            rb->remove(EMPTY_SLIDE);
+            rb->splash(HZ, "Cache will be rebuilt on next restart");
             break;
 
         case MENU_ATTACHED_USB:
@@ -1450,7 +1506,12 @@ int main(void)
         }
     }
 
-    if (!create_empty_slide()) {
+    if (!allocate_buffers()) {
+        rb->splash(HZ, "Could allocate temporary buffers");
+        return PLUGIN_ERROR;
+    }
+
+    if (!create_empty_slide(false)) {
         rb->splash(HZ, "Could not load the empty slide");
         return PLUGIN_ERROR;
     }
@@ -1460,8 +1521,13 @@ int main(void)
         return PLUGIN_ERROR;
     }
 
-    if (!create_albumart_cache()) {
+    if (!create_albumart_cache(false)) {
         rb->splash(HZ, "Could not create album art cache");
+        return PLUGIN_ERROR;
+    }
+
+    if (!free_buffers()) {
+        rb->splash(HZ, "Could note free temporary buffers");
         return PLUGIN_ERROR;
     }
 
