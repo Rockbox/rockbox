@@ -512,8 +512,16 @@ matrix_normal.bmp
 
 /* pictureflow */
 #if defined(HAVE_LCD_COLOR) && defined(HAVE_ALBUMART) && defined(HAVE_TAGCACHE)
-pictureflow_logo.bmp
-pictureflow_emptyslide.bmp
+#if (LCD_WIDTH < 200)
+    pictureflow_logo.100x18x16.bmp
+#else
+    pictureflow_logo.193x34x16.bmp
+#endif
+#if (LCD_HEIGHT < 200 )
+    pictureflow_emptyslide.50x50x16.bmp
+#else
+    pictureflow_emptyslide.100x100x16.bmp
+#endif
 #endif
 
 #endif /* HAVE_LCD_BITMAP */

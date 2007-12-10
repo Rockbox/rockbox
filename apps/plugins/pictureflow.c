@@ -77,8 +77,13 @@ const struct button_mapping *plugin_contexts[]
 #define MAX_IMG_WIDTH LCD_WIDTH
 #define MAX_IMG_HEIGHT LCD_HEIGHT
 
+#if (LCD_WIDTH < 200)
+#define PREFERRED_IMG_WIDTH 50
+#define PREFERRED_IMG_HEIGHT 50
+#else
 #define PREFERRED_IMG_WIDTH 100
 #define PREFERRED_IMG_HEIGHT 100
+#endif
 
 #define BUFFER_WIDTH LCD_WIDTH
 #define BUFFER_HEIGHT LCD_HEIGHT
@@ -477,7 +482,6 @@ bool get_albumart_for_index_from_db(int slide_index, char *buf, int buflen)
  */
 void draw_splashscreen(void)
 {
-    int txt_w, txt_h;
     struct screen* display = rb->screens[0];
 
     rb->lcd_set_background(LCD_RGBPACK(0,0,0));
@@ -485,10 +489,7 @@ void draw_splashscreen(void)
     rb->lcd_clear_display();
 
     const struct picture* logo = &(logos[display->screen_type]);
-    picture_draw(display, logo, (LCD_WIDTH - logo->width) / 2, 20);
-
-    rb->lcd_getstringsize("Preparing album artwork", &txt_w, &txt_h);
-    rb->lcd_putsxy((LCD_WIDTH - txt_w)/2, 100, "Preparing album artwork");
+    picture_draw(display, logo, (LCD_WIDTH - logo->width) / 2, 10);
 
     rb->lcd_update();
 }
@@ -499,10 +500,17 @@ void draw_splashscreen(void)
  */
 void draw_progressbar(int step)
 {
+    int txt_w, txt_h;
     const int bar_height = 22;
     const int w = LCD_WIDTH - 20;
-    const int y = 130;
     const int x = 10;
+
+    rb->lcd_getstringsize("Preparing album artwork", &txt_w, &txt_h);
+
+    int y = (LCD_HEIGHT - txt_h)/2;
+
+    rb->lcd_putsxy((LCD_WIDTH - txt_w)/2, y, "Preparing album artwork");
+    y += (txt_h + 5);
 
     rb->lcd_set_foreground(LCD_RGBPACK(100,100,100));
     rb->lcd_drawrect(x, y, w+2, bar_height);
@@ -1576,7 +1584,10 @@ int main(void)
     long update_interval = 100;
     int fps = 0;
     int albumtxt_w, albumtxt_h;
-    int ret;
+    int albumtxt_x = 0, albumtxt_y = 0;
+    int albumtxt_dir = -1;
+    int ret, c;
+    int prev_center_index = -1;
 
     while (true) {
         current_update = *rb->current_tick;
@@ -1597,14 +1608,33 @@ int main(void)
         }
 
         albumtxt = get_album_name(center_index);
-        rb->lcd_set_foreground(LCD_RGBPACK(255, 255, 255));
+        if ( animation_is_active ) {
+            c = ((slide_frame & 0xffff )/ 256);
+            if (step > 0) c = 255-c;
+        }
+        else c= 255;
+        rb->lcd_set_foreground(LCD_RGBPACK(c,c,c));
         rb->lcd_getstringsize(albumtxt, &albumtxt_w, &albumtxt_h);
-        rb->lcd_putsxy((LCD_WIDTH - albumtxt_w) /2, LCD_HEIGHT-albumtxt_h-10, albumtxt);
+        if (center_index != prev_center_index) {
+            albumtxt_x = 0;
+            albumtxt_dir = -1;
+            albumtxt_y = LCD_HEIGHT-albumtxt_h-10;
+            prev_center_index = center_index;
+        }
+        if (albumtxt_w > LCD_WIDTH && ! animation_is_active ) {
+            rb->lcd_putsxy(albumtxt_x, albumtxt_y , albumtxt);
+            if ( albumtxt_w + albumtxt_x <= LCD_WIDTH ) albumtxt_dir = 1;
+            else if ( albumtxt_x >= 0 ) albumtxt_dir = -1;
+            albumtxt_x += albumtxt_dir;
+        }
+        else {
+            rb->lcd_putsxy((LCD_WIDTH - albumtxt_w) /2, albumtxt_y , albumtxt);
+        }
 
         rb->lcd_update();
         rb->yield();
 
-        button = pluginlib_getaction(rb, animation_is_active ? 0 : HZ/10,
+        button = pluginlib_getaction(rb, animation_is_active ? 0 : HZ/16,
                                      plugin_contexts, NB_ACTION_CONTEXTS);
 
         switch (button) {
