@@ -61,7 +61,7 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, VOLUME_MIN / 10, VOLUME_MAX / 10, -25},
     [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
     [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
-    [SOUND_BALANCE]       = {"dB", 0,  1, VOLUME_RANGE / 10, -VOLUME_RANGE / 10, 0},
+    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
 #if CONFIG_CODEC == MAS3587F || defined(HAVE_UDA1380) || defined(HAVE_TLV320)\
@@ -418,13 +418,13 @@ void sound_set_balance(int value)
     if(!audio_is_initialized)
         return;
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    unsigned tmp = ((unsigned)(value) & 0xff) << 8;
+    unsigned tmp = ((unsigned)(value * 127 / 100) & 0xff) << 8;
     mas_codec_writereg(0x11, tmp);
 #elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380 \
    || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
    || defined(HAVE_AS3514)
-    current_balance = value * 10; /* tenth of dB */
+    current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101
     /* TODO: implement for iFP */
