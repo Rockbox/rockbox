@@ -107,6 +107,10 @@ const struct button_mapping *plugin_contexts[]
 
 #define EMPTY_SLIDE CACHE_PREFIX "/emptyslide.pfraw"
 
+/* Error return values */
+#define ERROR_NO_ALBUMS     -1
+#define ERROR_BUFFER_FULL   -2
+
 
 /** structs we use */
 
@@ -400,7 +404,7 @@ inline PFreal fcos(int iangle)
   Create an index of all albums from the database.
   Also store the album names so we can access them later.
  */
-bool create_album_index(void)
+int create_album_index(void)
 {
     rb->memset(&tcs, 0, sizeof(struct tagcache_search) );
     album_count = 0;
@@ -416,7 +420,7 @@ bool create_album_index(void)
 
         if ( (album[album_count].name_idx + l) > MAX_ALBUMS*AVG_ALBUM_NAME_LENGTH )
             /* not enough memory */
-            return false;
+            return ERROR_BUFFER_FULL;
 
         rb->strcpy(album_names + album[album_count].name_idx, tcs.result);
         album[album_count].seek = tcs.result_seek;
@@ -424,7 +428,8 @@ bool create_album_index(void)
         album_count++;
     }
     rb->tagcache_search_finish(&tcs);
-    return true;
+
+    return (album_count > 0) ? 0 : ERROR_NO_ALBUMS;
 }
 
 /**
@@ -1478,6 +1483,8 @@ int main_menu(void) {
     int selection = 0;
     int result;
 
+    rb->lcd_set_foreground(LCD_RGBPACK(255,255,255));
+
     MENUITEM_STRINGLIST(main_menu,"PictureFlow Main Menu",NULL,
                         "Settings", "Return", "Quit");
 
@@ -1509,6 +1516,7 @@ int main_menu(void) {
  */
 int main(void)
 {
+    int ret;
     draw_splashscreen();
 
     if ( ! rb->dir_exists( CACHE_PREFIX ) ) {
@@ -1528,8 +1536,12 @@ int main(void)
         return PLUGIN_ERROR;
     }
 
-    if (!create_album_index()) {
+    ret = create_album_index();
+    if (ret == ERROR_BUFFER_FULL) {
         rb->splash(HZ, "Not enough memory for album names");
+        return PLUGIN_ERROR;
+    } else if (ret == ERROR_NO_ALBUMS) {
+        rb->splash(HZ, "No albums found. Please enable database");
         return PLUGIN_ERROR;
     }
 
@@ -1586,7 +1598,7 @@ int main(void)
     int albumtxt_w, albumtxt_h;
     int albumtxt_x = 0, albumtxt_y = 0;
     int albumtxt_dir = -1;
-    int ret, c;
+    int c;
     int prev_center_index = -1;
 
     while (true) {
