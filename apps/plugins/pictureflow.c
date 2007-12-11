@@ -24,7 +24,7 @@
 #include "plugin.h"
 #include "pluginlib_actions.h"
 #include "helper.h"
-#include "lib/bmp.h"
+#include "bmp.h"
 #include "picture.h"
 #include "pictureflow_logo.h"
 #include "pictureflow_emptyslide.h"
@@ -77,7 +77,7 @@ const struct button_mapping *plugin_contexts[]
 #define MAX_IMG_WIDTH LCD_WIDTH
 #define MAX_IMG_HEIGHT LCD_HEIGHT
 
-#if (LCD_WIDTH < 200)
+#if (LCD_HEIGHT < 100)
 #define PREFERRED_IMG_WIDTH 50
 #define PREFERRED_IMG_HEIGHT 50
 #else
@@ -90,8 +90,10 @@ const struct button_mapping *plugin_contexts[]
 
 #define SLIDE_CACHE_SIZE 100
 
-#define LEFT_SLIDES_COUNT 3
-#define RIGHT_SLIDES_COUNT 3
+#define MAX_SLIDES_COUNT 10
+
+#define SPACING_BETWEEN_SLIDE 40
+#define EXTRA_SPACING_FOR_CENTER_SLIDE 0
 
 #define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
 #define CACHE_PREFIX PLUGIN_DEMOS_DIR "/pictureflow"
@@ -106,6 +108,7 @@ const struct button_mapping *plugin_contexts[]
 #define UNIQBUF_SIZE (64*1024)
 
 #define EMPTY_SLIDE CACHE_PREFIX "/emptyslide.pfraw"
+#define CONFIG_FILE CACHE_PREFIX "/pictureflow.config"
 
 /* Error return values */
 #define ERROR_NO_ALBUMS     -1
@@ -154,7 +157,12 @@ const struct picture logos[]={
     {pictureflow_logo, BMPWIDTH_pictureflow_logo, BMPHEIGHT_pictureflow_logo},
 };
 
-
+struct config_data {
+    long avg_album_width;
+    int spacing_between_slides;
+    int extra_spacing_for_center_slide;
+    int show_slides;
+};
 
 /** below we allocate the memory we want to use **/
 
@@ -162,15 +170,14 @@ static fb_data *buffer; /* for now it always points to the lcd framebuffer */
 static PFreal rays[BUFFER_WIDTH];
 static bool animation_is_active; /* an animation is currently running */
 static struct slide_data center_slide;
-static struct slide_data left_slides[LEFT_SLIDES_COUNT];
-static struct slide_data right_slides[RIGHT_SLIDES_COUNT];
+static struct slide_data left_slides[MAX_SLIDES_COUNT];
+static struct slide_data right_slides[MAX_SLIDES_COUNT];
 static int slide_frame;
 static int step;
 static int target;
 static int fade;
 static int center_index; /* index of the slide that is in the center */
 static int itilt;
-static int spacing; /* spacing between slides */
 static int zoom;
 static PFreal offsetX;
 static PFreal offsetY;
@@ -204,6 +211,7 @@ static fb_data *input_bmp_buffer;
 static fb_data *output_bmp_buffer;
 static int input_hid;
 static int output_hid;
+static struct config_data config;
 
 static bool thread_is_running;
 
@@ -343,7 +351,7 @@ PFreal sinTable[] = { /* 10 */
 /** code */
 
 
-bool create_bmp(struct bitmap* input_bmp, char *target_path);
+bool create_bmp(struct bitmap* input_bmp, char *target_path, bool resize);
 int load_surface(int);
 
 /* There are some precision issues when not using (long long) which in turn
@@ -385,6 +393,7 @@ static inline PFreal fdiv(PFreal n, PFreal m)
     return (n<<(PFREAL_SHIFT))/m;
 }
 #endif
+
 
 inline PFreal fsin(int iangle)
 {
@@ -569,15 +578,12 @@ bool free_buffers(void)
  */
 bool create_albumart_cache(bool force)
 {
-    /* FIXME: currently we check for the file CACHE_PREFIX/ready
-       We need a real menu etc. to recreate cache. For now, delete
-       the file to recreate the cache. */
-
     number_of_slides  = album_count;
+    int fh,ret;
 
     if ( ! force && rb->file_exists( CACHE_PREFIX "/ready" ) ) return true;
 
-    int i;
+    int i, slides = 0;
     struct bitmap input_bmp;
 
     for (i=0; i < album_count; i++)
@@ -586,7 +592,6 @@ bool create_albumart_cache(bool force)
         if (!get_albumart_for_index_from_db(i, tmp_path_name, MAX_PATH))
             continue;
 
-        int ret;
         input_bmp.data = (char *)input_bmp_buffer;
         ret = rb->read_bmp_file(tmp_path_name, &input_bmp,
                                 sizeof(fb_data)*MAX_IMG_WIDTH*MAX_IMG_HEIGHT,
@@ -596,13 +601,21 @@ bool create_albumart_cache(bool force)
             continue; /* skip missing/broken files */
         }
 
+
         rb->snprintf(tmp_path_name, sizeof(tmp_path_name), CACHE_PREFIX "/%d.pfraw", i);
-        if (!create_bmp(&input_bmp, tmp_path_name)) {
+        if (!create_bmp(&input_bmp, tmp_path_name, false)) {
             rb->splash(HZ, "couldn't write bmp");
         }
+        config.avg_album_width += input_bmp.width;
+        slides++;
         if ( rb->button_get(false) == PICTUREFLOW_MENU ) return false;
     }
-    int fh = rb->creat( CACHE_PREFIX "/ready"  );
+    config.avg_album_width /= slides;
+    if ( config.avg_album_width == 0 ) {
+        rb->splash(HZ, "album size is 0");
+        return false;
+    }
+    fh = rb->creat( CACHE_PREFIX "/ready"  );
     rb->close(fh);
     return true;
 }
@@ -847,25 +860,38 @@ int read_pfraw(char* filename)
   Create the slide with it's reflection for the given slide_index and filename
   and store it as pfraw in CACHE_PREFIX/[slide_index].pfraw
  */
-bool create_bmp(struct bitmap *input_bmp, char *target_path)
+bool create_bmp(struct bitmap *input_bmp, char *target_path, bool resize)
 {
-    fb_data *src = (fb_data *)input_bmp->data;
     struct bitmap output_bmp;
 
-    output_bmp.width = input_bmp->width * 2;
-    output_bmp.height = input_bmp->height;
     output_bmp.format = input_bmp->format;
     output_bmp.data = (char *)output_bmp_buffer;
+    if ( resize ) { /* resize image and swap buffers */
+        output_bmp.width = config.avg_album_width;
+        output_bmp.height = config.avg_album_width;
+        simple_resize_bitmap(input_bmp, &output_bmp);
+        input_bmp->data = output_bmp.data;
+        input_bmp->width = output_bmp.width;
+        input_bmp->height = output_bmp.height;
+        output_bmp.data = (char *)input_bmp_buffer;
+        output_bmp.width = input_bmp->width * 2;
+        output_bmp.height = input_bmp->height;
+    }
+    output_bmp.width = input_bmp->width * 2;
+    output_bmp.height = input_bmp->height;
+
+    fb_data *src = (fb_data *)input_bmp->data;
+    fb_data *dst = (fb_data *)output_bmp.data;
 
     /* transpose the image, this is to speed-up the rendering
        because we process one column at a time
        (and much better and faster to work row-wise, i.e in one scanline) */
     int hofs = input_bmp->width / 3;
-    rb->memset(output_bmp_buffer, 0, sizeof(fb_data) * output_bmp.width * output_bmp.height);
+    rb->memset(dst, 0, sizeof(fb_data) * output_bmp.width * output_bmp.height);
     int x, y;
     for (x = 0; x < input_bmp->width; x++)
         for (y = 0; y < input_bmp->height; y++)
-            output_bmp_buffer[output_bmp.width * x + (hofs + y)] =
+            dst[output_bmp.width * x + (hofs + y)] =
                     src[y * input_bmp->width + x];
 
     /* create the reflection */
@@ -877,7 +903,7 @@ bool create_bmp(struct bitmap *input_bmp, char *target_path)
             int r = RGB_UNPACK_RED(color) * (hte - y) / hte * 3 / 5;
             int g = RGB_UNPACK_GREEN(color) * (hte - y) / hte * 3 / 5;
             int b = RGB_UNPACK_BLUE(color) * (hte - y) / hte * 3 / 5;
-            output_bmp_buffer[output_bmp.height + hofs + y + output_bmp.width * x] =
+            dst[output_bmp.height + hofs + y + output_bmp.width * x] =
                     LCD_RGBPACK(r, g, b);
         }
     }
@@ -988,18 +1014,18 @@ void reset_slides(void)
     center_slide.slide_index = center_index;
 
     int i;
-    for (i = 0; i < LEFT_SLIDES_COUNT; i++) {
+    for (i = 0; i < config.show_slides; i++) {
         struct slide_data *si = &left_slides[i];
         si->angle = itilt;
-        si->cx = -(offsetX + spacing * i * PFREAL_ONE);
+        si->cx = -(offsetX + config.spacing_between_slides * i * PFREAL_ONE);
         si->cy = offsetY;
         si->slide_index = center_index - 1 - i;
     }
 
-    for (i = 0; i < RIGHT_SLIDES_COUNT; i++) {
+    for (i = 0; i < config.show_slides; i++) {
         struct slide_data *si = &right_slides[i];
         si->angle = -itilt;
-        si->cx = offsetX + spacing * i * PFREAL_ONE;
+        si->cx = offsetX + config.spacing_between_slides * i * PFREAL_ONE;
         si->cy = offsetY;
         si->slide_index = center_index + 1 + i;
     }
@@ -1023,11 +1049,11 @@ void recalc_table(void)
 
     itilt = 70 * IANGLE_MAX / 360;      /* approx. 70 degrees tilted */
 
-    offsetX = PREFERRED_IMG_WIDTH / 2 * (PFREAL_ONE - fcos(itilt));
-    offsetY = PREFERRED_IMG_HEIGHT / 2 * fsin(itilt);
-    offsetX += PREFERRED_IMG_WIDTH * PFREAL_ONE;
-    offsetY += PREFERRED_IMG_HEIGHT * PFREAL_ONE / 4;
-    spacing = 40;
+    offsetX = config.avg_album_width / 2 * (PFREAL_ONE - fcos(itilt));
+    offsetY = config.avg_album_width / 2 * fsin(itilt);
+    offsetX += config.avg_album_width * PFREAL_ONE;
+    offsetY += config.avg_album_width * PFREAL_ONE / 4;
+    offsetX += config.extra_spacing_for_center_slide << PFREAL_SHIFT;
 }
 
 
@@ -1236,8 +1262,8 @@ void render(void)
     rb->lcd_set_background(LCD_RGBPACK(0,0,0));
     rb->lcd_clear_display(); /* TODO: Optimizes this by e.g. invalidating rects */
 
-    int nleft = LEFT_SLIDES_COUNT;
-    int nright = RIGHT_SLIDES_COUNT;
+    int nleft = config.show_slides;
+    int nright = config.show_slides;
 
     struct rect r;
     render_slide(&center_slide, &r, 256, -1, -1);
@@ -1271,6 +1297,7 @@ void render(void)
             }
         }
     } else {
+        if ( step < 0 ) c1 = BUFFER_WIDTH;
         /* the first and last slide must fade in/fade out */
         for (index = 0; index < nleft; index++) {
             int alpha = 256;
@@ -1289,6 +1316,7 @@ void render(void)
                 c1 = r.left;
             }
         }
+        if ( step > 0 ) c2 = 0;
         for (index = 0; index < nright; index++) {
             int alpha = (index < nright - 2) ? 256 : 128;
             if (index == nright - 1)
@@ -1354,9 +1382,9 @@ void update_animation(void)
         center_index = index;
         slide_frame = index << 16;
         center_slide.slide_index = center_index;
-        for (i = 0; i < LEFT_SLIDES_COUNT; i++)
+        for (i = 0; i < config.show_slides; i++)
             left_slides[i].slide_index = center_index - 1 - i;
-        for (i = 0; i < RIGHT_SLIDES_COUNT; i++)
+        for (i = 0; i < config.show_slides; i++)
             right_slides[i].slide_index = center_index + 1 + i;
     }
 
@@ -1372,19 +1400,19 @@ void update_animation(void)
         return;
     }
 
-    for (i = 0; i < LEFT_SLIDES_COUNT; i++) {
+    for (i = 0; i < config.show_slides; i++) {
         struct slide_data *si = &left_slides[i];
         si->angle = itilt;
         si->cx =
-            -(offsetX + spacing * i * PFREAL_ONE + step * spacing * ftick);
+            -(offsetX + config.spacing_between_slides * i * PFREAL_ONE + step * config.spacing_between_slides * ftick);
         si->cy = offsetY;
     }
 
-    for (i = 0; i < RIGHT_SLIDES_COUNT; i++) {
+    for (i = 0; i < config.show_slides; i++) {
         struct slide_data *si = &right_slides[i];
         si->angle = -itilt;
         si->cx =
-            offsetX + spacing * i * PFREAL_ONE - step * spacing * ftick;
+            offsetX + config.spacing_between_slides * i * PFREAL_ONE - step * config.spacing_between_slides * ftick;
         si->cy = offsetY;
     }
 
@@ -1438,9 +1466,8 @@ int create_empty_slide(bool force)
         input_bmp.width = BMPWIDTH_pictureflow_emptyslide;
         input_bmp.height = BMPHEIGHT_pictureflow_emptyslide;
         input_bmp.format = FORMAT_NATIVE;
-        DEBUGF("The empty slide is %d x %d\n", input_bmp.width, input_bmp.height);
         input_bmp.data = (char*) &pictureflow_emptyslide;
-        if ( ! create_bmp(&input_bmp, EMPTY_SLIDE) ) return false;
+        if ( ! create_bmp(&input_bmp, EMPTY_SLIDE, true) ) return false;
     }
 
     empty_slide_hid = read_pfraw( EMPTY_SLIDE );
@@ -1456,30 +1483,54 @@ int create_empty_slide(bool force)
 int settings_menu(void) {
     int selection = 0;
 
-    MENUITEM_STRINGLIST(settings_menu,"PictureFlow Settings",NULL,"Show FPS", "Rebuild cache");
+    MENUITEM_STRINGLIST(settings_menu,"PictureFlow Settings",NULL,"Show FPS", "Spacing", "Center margin", "Number of slides", "Rebuild cache");
 
-    selection=rb->do_menu(&settings_menu,&selection);
-    switch(selection) {
-        case 0:
-            rb->set_bool("Show FPS", &show_fps);
-            break;
+    do {
+        selection=rb->do_menu(&settings_menu,&selection);
+        switch(selection) {
+            case 0:
+                rb->set_bool("Show FPS", &show_fps);
+                break;
 
-        case 1:
-            rb->remove(CACHE_PREFIX "/ready");
-            rb->remove(EMPTY_SLIDE);
-            rb->splash(HZ, "Cache will be rebuilt on next restart");
-            break;
+            case 1:
+                rb->set_int("Spacing between slides", "", 1, &(config.spacing_between_slides),
+                            NULL, 1, 0, 100, NULL );
+                recalc_table();
+                reset_slides();
+                break;
 
-        case MENU_ATTACHED_USB:
-            return PLUGIN_USB_CONNECTED;
-    }
+            case 2:
+                rb->set_int("Center margin", "", 1, &(config.extra_spacing_for_center_slide),
+                            NULL, 1, -50, 50, NULL );
+                recalc_table();
+                reset_slides();
+                break;
+
+            case 3:
+                rb->set_int("Number of slides", "", 1, &(config.show_slides),
+                            NULL, 1, 1, MAX_SLIDES_COUNT, NULL );
+                recalc_table();
+                reset_slides();
+                break;
+
+            case 4:
+                rb->remove(CACHE_PREFIX "/ready");
+                rb->remove(EMPTY_SLIDE);
+                rb->splash(HZ, "Cache will be rebuilt on next restart");
+                break;
+
+            case MENU_ATTACHED_USB:
+                return PLUGIN_USB_CONNECTED;
+        }
+    } while ( selection >= 0 );
     return 0;
 }
 
 /**
   Show the main menu
  */
-int main_menu(void) {
+int main_menu(void)
+{
     int selection = 0;
     int result;
 
@@ -1510,6 +1561,30 @@ int main_menu(void) {
     }
 }
 
+bool read_pfconfig(void)
+{
+    /* defaults */
+    config.spacing_between_slides = 40;
+    config.extra_spacing_for_center_slide = 0;
+    config.show_slides = 3;
+    int fh = rb->open( CONFIG_FILE, O_RDONLY );
+    if ( fh < 0 ) { /* no config yet */
+        return true;
+    }
+    int ret = rb->read(fh, &config, sizeof(struct config_data));
+    rb->close(fh);
+    return ( ret == sizeof(struct config_data) );
+}
+
+bool write_pfconfig(void)
+{
+    int fh = rb->creat( CONFIG_FILE );
+    if( fh < 0 ) return false;
+    rb->write( fh, &config, sizeof( struct config_data ) );
+    rb->close( fh );
+    return true;
+}
+
 /**
   Main function that also contain the main plasma
   algorithm.
@@ -1526,13 +1601,13 @@ int main(void)
         }
     }
 
-    if (!allocate_buffers()) {
-        rb->splash(HZ, "Could not allocate temporary buffers");
+    if (!read_pfconfig()) {
+        rb->splash(HZ, "Error in config. Please delete " CONFIG_FILE);
         return PLUGIN_ERROR;
     }
 
-    if (!create_empty_slide(false)) {
-        rb->splash(HZ, "Could not load the empty slide");
+    if (!allocate_buffers()) {
+        rb->splash(HZ, "Could not allocate temporary buffers");
         return PLUGIN_ERROR;
     }
 
@@ -1545,8 +1620,13 @@ int main(void)
         return PLUGIN_ERROR;
     }
 
-    if (!create_albumart_cache(false)) {
+    if (!create_albumart_cache(config.avg_album_width == 0)) {
         rb->splash(HZ, "Could not create album art cache");
+        return PLUGIN_ERROR;
+    }
+
+    if (!create_empty_slide(false)) {
+        rb->splash(HZ, "Could not load the empty slide");
         return PLUGIN_ERROR;
     }
 
@@ -1563,12 +1643,13 @@ int main(void)
     int i;
 
     /* initialize */
-    for (i = 0; i < SLIDE_CACHE_SIZE; i++) {
+    int min_slide_cache = fmin(number_of_slides, SLIDE_CACHE_SIZE);
+    for (i = 0; i < min_slide_cache; i++) {
         cache[i].hid = -1;
         cache[i].touched = 0;
         slide_cache_stack[i] = SLIDE_CACHE_SIZE-i-1;
     }
-    slide_cache_stack_index = SLIDE_CACHE_SIZE-2;
+    slide_cache_stack_index = min_slide_cache-1;
     slide_cache_in_use = 0;
     buffer = rb->lcd_framebuffer;
     animation_is_active = false;
@@ -1676,6 +1757,8 @@ int main(void)
             break;
         }
     }
+
+
 }
 
 /*************************** Plugin entry point ****************************/
@@ -1692,6 +1775,13 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter)
     /* Turn off backlight timeout */
     backlight_force_on(rb);     /* backlight control in lib/helper.c */
     ret = main();
+    if ( ret == PLUGIN_OK ) {
+        if (!write_pfconfig()) {
+            rb->splash(HZ, "Error writing config.");
+            return PLUGIN_ERROR;
+        }
+    }
+
     end_pf_thread();
     cleanup(NULL);
     return ret;

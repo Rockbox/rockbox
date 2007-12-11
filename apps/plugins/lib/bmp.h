@@ -27,4 +27,10 @@
  */
 int save_bmp_file( char* filename, struct bitmap *bm, struct plugin_api* rb  );
 
+/**
+   Very simple image scale from src to dst (nearest neighbour).
+   Source and destination dimensions are read from the struct bitmap.
+*/
+void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst);
+
 #endif

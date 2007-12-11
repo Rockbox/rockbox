@@ -82,3 +82,36 @@ int save_bmp_file( char* filename, struct bitmap *bm, struct plugin_api* rb )
     rb->close( fh );
     return 1;
 }
+
+/**
+   Very simple image scale from src to dst (nearest neighbour).
+   Source and destination dimensions are read from the struct bitmap.
+*/
+void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst)
+{
+    const int srcw = src->width;
+    const int srch = src->height;
+    const int dstw = dst->width;
+    const int dsth = dst->height;
+    const fb_data *srcd = (fb_data*)(src->data);
+    const fb_data *dstd = (fb_data*)(dst->data);
+
+    const long xrstep = ((srcw-1) << 8) / (dstw-1);
+    const long yrstep = ((srch-1) << 8) / (dsth-1);
+    fb_data *src_row, *dst_row;
+    long xr, yr = 0;
+    int src_x, src_y, dst_x, dst_y;
+    for (dst_y=0; dst_y < dsth; dst_y++)
+    {
+        src_y = (yr >> 8);
+        src_row = (fb_data*)&srcd[src_y * srcw];
+        dst_row = (fb_data*)&dstd[dst_y * dstw];
+        for (xr=0,dst_x=0; dst_x < dstw; dst_x++)
+        {
+            src_x = (xr >> 8);
+            dst_row[dst_x] = src_row[src_x];
+            xr += xrstep;
+        }
+        yr += yrstep;
+    }
+}

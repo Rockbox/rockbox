@@ -517,7 +517,7 @@ matrix_normal.bmp
 #else
     pictureflow_logo.193x34x16.bmp
 #endif
-#if (LCD_HEIGHT < 200 )
+#if (LCD_HEIGHT < 100 )
     pictureflow_emptyslide.50x50x16.bmp
 #else
     pictureflow_emptyslide.100x100x16.bmp
