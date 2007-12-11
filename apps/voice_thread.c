@@ -173,6 +173,10 @@ void voice_stop(void)
     /* Unqueue all future clips */
     talk_force_shutup();
 
+    /* Wait for any final queue_post to be processed */
+    LOGFQUEUE("mp3 >| voice Q_VOICE_NULL");
+    queue_send(&voice_queue, Q_VOICE_NULL, 0);
+
     mutex_unlock(&voice_mutex);
 } /* voice_stop */
 
