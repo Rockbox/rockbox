@@ -10331,11 +10331,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Obrazek budzika"
+    alarm: "Ekran startowy budzika"
   </dest>
   <voice>
     *: none
-    alarm: "Obrazek budzika"
+    alarm: "Ekran startowy budzika"
   </voice>
 </phrase>
 <phrase>
