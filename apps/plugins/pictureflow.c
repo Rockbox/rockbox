@@ -1527,7 +1527,7 @@ int main(void)
     }
 
     if (!allocate_buffers()) {
-        rb->splash(HZ, "Could allocate temporary buffers");
+        rb->splash(HZ, "Could not allocate temporary buffers");
         return PLUGIN_ERROR;
     }
 
@@ -1551,7 +1551,7 @@ int main(void)
     }
 
     if (!free_buffers()) {
-        rb->splash(HZ, "Could note free temporary buffers");
+        rb->splash(HZ, "Could not free temporary buffers");
         return PLUGIN_ERROR;
     }
 
