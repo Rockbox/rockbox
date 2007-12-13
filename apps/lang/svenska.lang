@@ -4877,10 +4877,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Spela mp3-klipp för kataloger"
+    *: "Spela talklipp för kataloger"
   </dest>
   <voice>
-    *: "Spela mp3-klipp för kataloger"
+    *: "Spela talklipp för kataloger"
   </voice>
 </phrase>
 <phrase>
@@ -4905,10 +4905,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Spela mp3-klipp för filer"
+    *: "Spela talklipp för filer"
   </dest>
   <voice>
-    *: "Spela mp3-klipp för filer"
+    *: "Spela talklipp för filer"
   </voice>
 </phrase>
 <phrase>
@@ -4947,10 +4947,10 @@
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: "Spela mp3-klipp"
+    *: "Spela talklipp"
   </dest>
   <voice>
-    *: "Spela mp3-klipp"
+    *: "Spela talklipp"
   </voice>
 </phrase>
 <phrase>
