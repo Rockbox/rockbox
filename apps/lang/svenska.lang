@@ -4880,7 +4880,7 @@
     *: "Spela talklipp för kataloger"
   </dest>
   <voice>
-    *: "Spela talklipp för kataloger"
+    *: "Spela tal-klipp för kataloger"
   </voice>
 </phrase>
 <phrase>
@@ -4908,7 +4908,7 @@
     *: "Spela talklipp för filer"
   </dest>
   <voice>
-    *: "Spela talklipp för filer"
+    *: "Spela tal-klipp för filer"
   </voice>
 </phrase>
 <phrase>
@@ -4950,7 +4950,7 @@
     *: "Spela talklipp"
   </dest>
   <voice>
-    *: "Spela talklipp"
+    *: "Spela tal-klipp"
   </voice>
 </phrase>
 <phrase>
