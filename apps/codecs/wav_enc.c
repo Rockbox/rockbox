@@ -144,10 +144,12 @@ static bool on_end_file(struct enc_file_event_data *data)
     struct riff_header hdr;
     uint32_t data_size;
 
-    /* always _try_ to write the file header, even on error */
+    if (data->rec_file < 0)
+        return false; /* file already closed, nothing more we can do */
 
-    if (ci->lseek(data->rec_file, 0, SEEK_SET) != 0 ||
-        ci->read(data->rec_file, &hdr, sizeof (hdr)) != sizeof (hdr))
+    /* always _try_ to write the file header, even on error */
+    if ((ci->lseek(data->rec_file, 0, SEEK_SET)) ||
+        (ci->read(data->rec_file, &hdr, sizeof (hdr)) != sizeof (hdr)))
     {
         return false;
     }

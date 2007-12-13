@@ -2329,6 +2329,9 @@ static bool on_start_file(struct enc_file_event_data *data)
 
 static bool on_end_file(struct enc_file_event_data *data)
 {
+    if (data->rec_file < 0)
+        return false; /* file already closed, nothing more we can do */
+
     /* always _try_ to write the file header, even on error */
     if (ci->close(data->rec_file) != 0)
         return false;

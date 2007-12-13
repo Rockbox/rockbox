@@ -257,6 +257,9 @@ static bool on_end_file(struct enc_file_event_data *data)
 
     uint32_t data_size;
 
+    if (data->rec_file < 0)
+        return false; /* file already closed, nothing more we can do */
+
     /* always _try_ to write the file header, even on error */
 
     /* read template headers at start */

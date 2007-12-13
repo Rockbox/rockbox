@@ -548,6 +548,14 @@ static int readwrite(int fd, void* buf, long count, bool write)
                 file->fileoffset += nread;
             }
             file->cacheoffset = -1;
+            /* adjust file size to length written */
+            if ( write && file->fileoffset > file->size )
+            {
+                file->size = file->fileoffset;
+#ifdef HAVE_DIRCACHE
+                dircache_update_filesize(fd, file->size, file->fatfile.firstcluster);
+#endif
+            }
             return nread ? nread : rc * 10 - 4;
         }
         else {
@@ -580,6 +588,14 @@ static int readwrite(int fd, void* buf, long count, bool write)
                     errno = EIO;
                     file->fileoffset += nread;
                     file->cacheoffset = -1;
+                    /* adjust file size to length written */
+                    if ( file->fileoffset > file->size )
+                    {
+                        file->size = file->fileoffset;
+#ifdef HAVE_DIRCACHE
+                        dircache_update_filesize(fd, file->size, file->fatfile.firstcluster);
+#endif
+                    }
                     return nread ? nread : rc * 10 - 5;
                 }
                 /* seek back one sector to put file position right */
@@ -591,6 +607,14 @@ static int readwrite(int fd, void* buf, long count, bool write)
                     errno = EIO;
                     file->fileoffset += nread;
                     file->cacheoffset = -1;
+                    /* adjust file size to length written */
+                    if ( file->fileoffset > file->size )
+                    {
+                        file->size = file->fileoffset;
+#ifdef HAVE_DIRCACHE
+                        dircache_update_filesize(fd, file->size, file->fatfile.firstcluster);
+#endif
+                    }
                     return nread ? nread : rc * 10 - 6;
                 }
             }
