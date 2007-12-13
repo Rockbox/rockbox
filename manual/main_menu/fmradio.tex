@@ -15,15 +15,18 @@
 
     \begin{table}
       \begin{btnmap}{}{}
-          \ButtonLeft, \ButtonRight
+          \opt{IRIVER_H10_PAD}{\ButtonRew, \ButtonFF}
+          \nopt{IRIVER_H10_PAD}{\ButtonLeft, \ButtonRight}
           & Change frequency in \setting{SCAN} mode or jump to next/previous
           station in \setting{PRESET} mode\\
           %
-          Long \ButtonLeft, \ButtonRight & Seek to next station or preset in
+          \opt{IRIVER_H10_PAD}{Long \ButtonRew, \ButtonFF}
+          \nopt{IRIVER_H10_PAD}{Long \ButtonLeft, \ButtonRight}
+          & Seek to next station or preset in
             \setting{SCAN} mode.\\
           %
-          \opt{SANSA_E200_PAD}{\ButtonScrollUp, \ButtonScrollDown}
-          \nopt{SANSA_E200_PAD}{\ButtonUp, \ButtonDown}
+          \opt{IRIVER_H10_PAD,SANSA_E200_PAD}{\ButtonScrollUp, \ButtonScrollDown}
+          \nopt{IRIVER_H10_PAD,SANSA_E200_PAD}{\ButtonUp, \ButtonDown}
             & Change volume.\\
           \opt{RECORDER_PAD}{
             \ButtonPlay
@@ -35,30 +38,33 @@
           \opt{RECORDER_PAD}{\ButtonOn}
           \opt{ONDIO_PAD}{Long \ButtonOff}
           \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+          \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
           \opt{IAUDIO_X5_PAD}{\ButtonRec}
           \opt{SANSA_E200_PAD}{\ButtonDown}
           & Leave the radio screen with the radio playing.\\
           %
           \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
             {\ButtonOff}
-          \opt{IAUDIO_X5_PAD}{\ButtonPower}
-          \opt{SANSA_E200_PAD}{\ButtonPower}
+          \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,IRIVER_H10_PAD}{\ButtonPower}
           & Stops the radio and returns to \setting{Main Menu}.\\
           %
           \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn & Mutes radio playback.\\}
-          \opt{IAUDIO_X5_PAD}{\ButtonPlay & Mutes radio playback.\\}
+          \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay & Mutes radio playback.\\}
           \opt{SANSA_E200_PAD}{\ButtonUp & Mutes radio playback.\\}
           %
-          \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{
+          \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{
             \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{Long \ButtonOn}
             \opt{IAUDIO_X5_PAD}{Long \ButtonPlay}
             \opt{SANSA_E200_PAD}{\ButtonRec}
+            \opt{IRIVER_H10_PAD}{\ButtonLeft}
             & Switches between \setting{SCAN} and \setting{PRESET} mode.\\
           }
           %
-          \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{
+          \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,IRIVER_H10_PAD}
+          {
             \opt{RECORDER_PAD}{\ButtonFTwo}
             \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonSelect}
+            \opt{IRIVER_H10_PAD}{\ButtonRight}
             & Opens a list of radio presets. You can view all the presets that
               you have, and switch to the station.\\
           }
@@ -66,27 +72,28 @@
           \opt{RECORDER_PAD}{\ButtonFOne}
           \opt{ONDIO_PAD}{Long \ButtonMenu}
           \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{Long \ButtonSelect}
-
+          \opt{IRIVER_H10_PAD}{Long \ButtonRight}
           & Displays the FM radio settings menu.\\
        \end{btnmap}
     \end{table}
-    
+
   \begin{description}
-    
+
   \item[Saving a preset:]
     Up to 64 of your favourite stations can be saved as presets.
     \opt{RECORDER_PAD}{Press \ButtonFTwo\ to go to the presets list, press
     \ButtonFOne\ to add a preset.}%
-    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{%
+    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{%
       \opt{ONDIO_PAD}{Long \ButtonMenu}%
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Long \ButtonSelect}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Long \ButtonSelect}%
+      \opt{IRIVER_H10_PAD}{Long \ButtonRight}
       to go to the menu, then select \setting{Add preset}.%
     }
     Enter the name (maximum number of characters is 32).
     \opt{RECORDER_PAD}{Press \ButtonFTwo}%
     \opt{ONDIO_PAD}{Long \ButtonMenu}%
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Press \ButtonOn}%
-    \opt{IAUDIO_X5_PAD}{Press \ButtonPlay}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{Press \ButtonPlay}
     to save.
 
     \note{See this page for pre-made FM radio presets from all around the world.}
@@ -96,11 +103,15 @@
         \opt{ONDIO_PAD}{Long \ButtonMenu\ to open the menu, select
           \setting{Preset}}%
         \opt{RECORDER_PAD}{Press \ButtonFTwo}%
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Press \ButtonSelect}
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Press \ButtonSelect}%
+        \opt{IRIVER_H10_PAD}{Press \ButtonRight}
         to go to the presets list.
-        Use \ButtonUp\ and \ButtonDown\ to move the cursor and then press
+        Use
+        \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown}
+        \nopt{IRIVER_H10_PAD}{\ButtonUp\ and \ButtonDown}
+        to move the cursor and then press
         \opt{RECORDER_PAD}{\ButtonPlay}%
-        \opt{ONDIO_PAD}{\ButtonRight}%
+        \opt{ONDIO_PAD,IRIVER_H10_PAD}{\ButtonRight}%
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
         to select. Use \ButtonLeft\ to leave the preset without selecting
         anything.
@@ -108,11 +119,14 @@
   \item[Removing a preset:]
         \opt{ONDIO_PAD}{Long \ButtonMenu\ to open the menu, select \setting{Preset}}%
         \opt{RECORDER_PAD}{Press \ButtonFTwo}%
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Press \ButtonSelect}
-        to go to the presets list. Use \ButtonUp\ and \ButtonDown\ to move
-        the cursor and then
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Press \ButtonSelect}%
+        \opt{IRIVER_H10_PAD}{Press \ButtonRight}
+        to go to the presets list. Use
+        \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown}
+        \nopt{IRIVER_H10_PAD}{\ButtonUp\ and \ButtonDown}
+        to move the cursor and then
         \opt{RECORDER_PAD}{press \ButtonFThree}%
-        \opt{ONDIO_PAD}{Long \ButtonRight}%
+        \opt{ONDIO_PAD,IRIVER_H10_PAD}{Long \ButtonRight}%
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Long \ButtonSelect}
         on the preset that you wish to remove, then select \setting{Remove Preset}.
 
