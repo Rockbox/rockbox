@@ -23,8 +23,7 @@ change to customise your listening experience.
   \opt{ipodnano}{minimum of -72 dB to a maximum of +6 dB.}%
   \opt{ipodvideo}{minimum of -57 dB to a maximum of +6 dB.}%
   \opt{x5}{minimum of -73 dB to a maximum of +6 dB.}%
-  \opt{ipodcolor}{minimum of -\fixme{??} dB to a maximum of +\fixme{??} dB.}%
-  \opt{h10,h10_5gb,sansa}{minimum of -74 dB to a maximum of +6 db.}
+  \opt{ipodcolor,h10,h10_5gb,sansa}{minimum of -74 dB to a maximum of +6 db.}
 
 \section{Bass}
   \opt{player,recorder,recorderv2fm,ondio}{This emphasises or suppresses the
@@ -40,10 +39,9 @@ change to customise your listening experience.
   \opt{ipodvideo}{This emphasises or suppresses the
   lower frequency (bass) sounds in the track. 0dB means that bass in unaltered
   (flat response). The minimum setting is -12dB and the maximum is 12dB.}
-  \opt{x5}{This emphasises or suppresses the
+  \opt{x5,sansa,h10,h10_5gb}{This emphasises or suppresses the
   lower frequency (bass) sounds in the track. 0dB means that bass in unaltered
   (flat response). The minimum setting is -24dB and the maximum is 24dB.}
-  \opt{sansa,h10,h10_5gb}{\fixme{add platform specific information here}}
 
 \opt{ipodvideo}{
 \section{Bass Cutoff}
@@ -68,10 +66,9 @@ change to customise your listening experience.
   \opt{ipodvideo}{This setting emphasises or suppresses
   the higher frequency (treble) sounds in the track. 0dB means that treble is
   unaltered (flat response). The minimum setting -12dB and the maximum is 12dB.}
-  \opt{x5}{This setting emphasises or suppresses
+  \opt{x5,sansa,h10,h10_5gb}{This setting emphasises or suppresses
   the higher frequency (treble) sounds in the track. 0dB means that treble is
   unaltered (flat response). The minimum setting -24dB and the maximum is 24dB.}
-  \opt{sansa,h10,h10_5gb}{\fixme{add platform specific information here}}
 
 \opt{ipodvideo}{
 \section{Treble Cutoff}
@@ -128,7 +125,7 @@ change to customise your listening experience.
 
 \section{Stereo Width}
   Stereo width allows you to manually specify the effect that is applied
-  when the \setting{Channels} setting is set to \setting{Custom}.
+  when the \setting{Channels} setting is set to ``custom''.
   All values below 100\% will progressively mix the contents of one channel
   into the other. This has the effect of gradually centering the stereo image,
   until you have monophonic sound at 0\%. Values above 100\% will progressively
@@ -283,55 +280,51 @@ change to customise your listening experience.
 \opt{SWCODEC}{
 \section{\label{ref:EQ}Equalizer}
   \screenshot{configure_rockbox/images/ss-equalizer}{The graphical equalizer}{}
-  Rockbox features a parametric equalizer. As the name suggests, a parametric
-  equalizer lets you control several different parameters for each band of the
-  equalizer. Rockbox's parametric EQ is composed of five different EQ bands:
+  Rockbox features a parametric equalizer (EQ). As the name suggests, a
+  parametric EQ lets you control several different parameters for each
+  band of the EQ. In some ways the EQ is similar to the \setting{Bass}
+  and \setting{Treble} settings described earlier, but the EQ allows you to
+  control the sound much more carefully.
 
-  \begin{table}
-  \begin{center}
-  \begin{tabularx}{\textwidth}{lX}\toprule
-      \textbf{EQ Band(s)} & \textbf{Description} \\\midrule
-        Band 0: Low shelf filter
-        & A low shelf filter boosts or lowers all frequencies below the
-        designated cutoff point. The ``bass''control on most home or car
-        stereos is an example of a low shelf filter. The low shelf
-        filter in Rockbox is more flexible than a simple ``bass''
-        control, because a simple bass control only lets you adjust
-        the amount of gain that is applied. Rockbox lets you control
-        the amount of gain that is applied (i.e., the amount that the
-        bass is boosted or cut) too, but Rockbox also allows you to
-        adjust the ``cutoff'' frequency where the shelving starts to take
-        effect. For example, a cutoff frequency of 50 Hz will adjust only very
-        low frequencies. A cutoff frequency of 200 Hz, on the other hand, will
-        adjust a much wider range of bass frequencies.\\
-        %
-        Bands 1-3: Peaking filters
-        & Peaking EQ filters boost or low a center frequency that you select,
-        as well as the frequencies within a certain distance of that
-        center. Graphic equalizers in home stereos are usually peaking
-        filters. The peaking EQs on Rockbox's parametric equalizer let
-        you adjust three different parameters for each EQ band 1
-        through 3. The ``center'' parameter controls the center
-        frequency that is adjusted by that EQ band. The ``gain''
-        parameter controls how much each band is adjusted. Positive
-        numbers make the EQ band louder, while negative numbers make
-        that EQ band quieter. Finally, the ``Q'' parameter controls how wide
-        or narrow each EQ band is. Higher Q values will affect a
-        narrow band of frequencies, while lower Q values will affect
-        a wider band of frequencies.\\
-        %
-        Band 4: Hi shelf filter
-        & A high shelf filter boosts or lowers all frequencies above a
-        designated cutoff point. The ``treble'' control on most home or car
-        stereos is an example of a high shelf filter. The high shelf filter is
-        adjusted the same way as the low shelf filter, except that it works on
-        the high end of the frequency spectrum rather than the low end.\\
-        \bottomrule
-  \end{tabularx}
-  \end{center}
-  \end{table}
-
-  So, as a general guide, EQ band 0 should be used for lows, EQ bands 1
+  Rockbox's parametric EQ is composed of five different bands:
+  \begin{description}
+  \item[Band 0: Low shelf filter]
+        The low shelf filter boosts or lowers all frequencies below a certain
+        frequency limit, much like what a ``bass'' control found on ordinary
+        stereo systems does.
+        Adjust the ``cutoff'' frequency parameter to decide where the shelving
+        starts to take effect. For example, a cutoff frequency of 50 Hz will
+        adjust only very low frequencies. A cutoff frequency of 200 Hz, on the
+        other hand, will adjust a much wider range of bass frequencies.
+        The ``gain'' parameter controls how much the loudness of the band is
+        adjusted. Positive numbers make the EQ band louder, while negative
+        numbers make that EQ band quieter.
+        The ``Q'' parameter should always be set to 0.7 for the shelving
+        filters. Higher values will add a small boost around the cutoff
+        frequency that is almost always undesirable.
+  \item[Bands 1-3: Peaking filters]
+        Peaking EQ filters boost or lower a frequency range centered at the
+        center frequency chosen.
+        Graphic equalizers in home stereos are usually peaking
+        filters. The peaking filters in Rockbox's EQ lets you adjust three
+        different parameters for EQ bands 1 through 3. The ``center'' parameter
+        controls the center frequency of the frequency range that is affected
+        as described above.
+        The ``gain'' parameter controls how much each band is adjusted, and
+        works as for the low shelf filter.
+        Finally, the ``Q'' parameter controls how wide or narrow the affected
+        frequency range is. Higher Q values will affect a narrower band of
+        frequencies, while lower Q values will affect a wider band of
+        frequencies.
+  \item[Band 4: High shelf filter]
+        A high shelf filter boosts or lowers all frequencies above a certain
+        frequency limit, much like what a ``treble'' control found on ordinary
+        stereo systems does.
+        The high shelf filter is adjusted the same way as the low shelf filter,
+        except that it works on the high end of the frequency spectrum rather
+        than the low end.
+  \end{description}
+  As a general guide, EQ band 0 should be used for lows, EQ bands 1
   through 3 should be used for mids, and EQ band 4 should be used for highs.
 
 \begin {description}
