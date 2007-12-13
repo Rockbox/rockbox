@@ -88,7 +88,7 @@ your box.
 
 There's one ultimate safety net to bring back boxes with even completely 
 garbled flash content: the \emph{UART} boot mod, which in turn requires the 
-serial mod. It can bring the dead back to life, with that it's possible to 
+serial mod. It can bring the dead back to life, in that it is possible to 
 re-flash independently from the outside, even if the flash is completely erased.
 It has been used that during development, else Rockbox in flash wouldn't have 
 been possible. Extensive development effort went into the exploitation of the 
@@ -100,10 +100,10 @@ perform these mods. Others may feel uncomfortable using the first tool
 To comfort you a bit again: If you are starting with a known-good image, you 
 are unlikely to experience problems. The flash tools have been stable for quite
 a while. Several users have used them extensively, even flashing while playing!
-Although it worked, it's not the recommended method.
+Although it worked, it is not the recommended method.
 
 About the safety of operation: Since we have dual boot, you're not giving up 
-the Archos firmware. It's still there when you hold
+the Archos firmware. It is still there when you hold
 \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} during startup. So even if Rockbox from flash is not 100\% stable for
 everyone, you can still use the box, re-flash the second image with an updated 
 Rockbox copy, etc.
@@ -148,9 +148,9 @@ Long version, step by step procedure:
 \item Use the \opt{recorder,recorderv2fm}{\ButtonFTwo\ settings or }the menu (\setting{General settings $\rightarrow$ File view $\rightarrow$ Show files}) to 
   configure seeing all files within the browser.
 \item Connect the charger and make sure your batteries are also in good shape. 
-  That's just for security reasons, it's not that flashing needs more power.
+  This is purely for security reasons, flashing does not need more power than usual.
 \item Run the \fname{firmware\_flash.rock} plugin. It again tells you about your 
-  flash and the file it's gonna program. After \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} it checks the file. Your 
+  flash and the file it is going to program. After \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} it checks the file. Your 
   hardware mask value will be kept, it won't overwrite it. Hitting \opt{recorder,recorderv2fm}{\ButtonFTwo}\opt{ondio}{\ButtonUp}\opt{player}{\ButtonOn} gives you 
   a big warning. If we still didn't manage to scare you off, you can hit\opt{recorder,recorderv2fm}{\ButtonFThree}\opt{ondio}{\ButtonRight}\opt{player}{\ButtonRight} to actually program and verify. The programming takes just a few seconds. If 
   the sanity check fails, you have the wrong kind of boot ROM and are out of luck
@@ -158,7 +158,7 @@ Long version, step by step procedure:
 \item In the unlikely event that the programming should give you any error, don't
   switch off the box! Otherwise you'll have seen it working for the last time. 
   While Rockbox is still in DRAM and operational, we could upgrade the plugin via
-  USB and try again. If you switch it off, it's gone.
+  USB and try again. If you switch it off, it is gone.
 \end{enumerate}
 
 \nopt{player}{
@@ -211,13 +211,13 @@ Here are the steps:
 \item Normally, you'll simply download a \fname{.zip} distribution. Copy all the 
   content to the USB drive, replacing the old.
 \item Force a disk boot by holding \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} during power-up, or at least rolo into
-  the new Rockbox version by \emph{Playing} the \fname{ajbrec.ajz}/fname{archos.mod} file. This may not always be necessary, but it's better to first run the 
+  the new Rockbox version by \emph{Playing} the \fname{ajbrec.ajz}/fname{archos.mod} file. This may not always be necessary, but it is better to first run the 
   version you're about to flash. It is required if you are currently running 
   RomBox.
 \item Just \emph{play} the \fname{.ucl} file in the \fname{.rockbox} directory, 
-  this will kick off the \fname{rockbox\_flash.rock} plugin. It's a bit similar 
-  to the other one, but it's made different to make the user aware. It will check
-  the file, available size, etc. With \opt{recorder,recorderv2fm}{\ButtonFTwo}\opt{ondio}{\ButtonUp}\opt{player}{\ButtonOn} it's being programmed. No need for 
+  this will kick off the \fname{rockbox\_flash.rock} plugin. It is a bit similar 
+  to the other one, but it is made different to make the user aware. It will check
+  the file, available size, etc. With \opt{recorder,recorderv2fm}{\ButtonFTwo}\opt{ondio}{\ButtonUp}\opt{player}{\ButtonOn} it is being programmed. No need for 
   warning this time. If it goes wrong, you'll still have the permanent image.
 \item When done, you can restart the box and hopefully your new Rockbox image.
 \end{enumerate}
