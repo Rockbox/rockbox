@@ -12,7 +12,7 @@
     in the \dap.
   \begin{description}
     \item [Battery Capacity: ]This setting can be used to tell Rockbox what
-      capacity (in mAh) of battery is being used inside it. The default is
+      capacity (in mAh) the battery being used has. The default is
       \opt{player,recorder}{1500mAh}%
       \opt{recorderv2fm}{2200mAh}%
       \opt{ondiosp,ondiofm}{1000mAh}%
@@ -21,9 +21,10 @@
       \opt{ipodcolor}{700mAh}%
       \opt{ipodnano,ipodvideo,ipod4g,ipod3g}{\fixme{unknown}}%
       \opt{x5}{950mAh}%
-      , which is the capacity value for the standard batteries shipped with the
-      \dap. Rockbox uses this value to estimate remaining battery life for the 
-      statusbar and WPS. Changing this setting has no effect what-so-ever on 
+      , which is the capacity value for the standard
+      \opt{archos}{batteries}\nopt{archos}{battery} shipped with the \dap.
+	  Rockbox uses this value to estimate remaining battery life for the 
+      statusbar and WPS. Changing this setting has no effect whatsoever on 
       actual battery life. This setting only affects the accuracy of the 
       battery life estimation as shown on screen.
    
@@ -33,8 +34,8 @@
     
     \opt{ondiosp,ondiofm}{
     \item [Battery Type: ]This setting tells Rockbox which type of battery
-      that is currently used in the \dap{}. Select \setting{Alkaline} or
-      \setting{NiMH} with \ButtonUp/\ButtonDown.
+      is currently used in the \dap{}. The two supported battery types are
+      ``Alkaline'' or ``NiMH''.
     }
   \end{description}
 
@@ -43,6 +44,7 @@
     Options relating to the hard disk.
 
   \begin{description}
+    \nopt{ipodnano}{
     \item [Disk Spindown: ]Rockbox has a timer that makes it spin down the
       hard disk after it is idle for a certain amount of time. This setting
       controls the amount of time between the last user activity and the time
@@ -50,19 +52,20 @@
       activity, like navigating through the \setting{File Browser}. When the
       hard disk spins up to fill the audio buffer, it automatically spins down
       afterwards.
+    }
 
     \opt{SWCODEC}{
     \item [Directory Cache: ]Rockbox has the ability to cache the contents of
       your drive in RAM. The \setting{Directory Cache} takes a small amount of
       memory away from Rockbox that would otherwise be used to buffer music,
-      but it speeds up navigation in the \setting{File Browser} by eliminating
+      but it speeds up navigation in the file browser by eliminating
       the slight pause between the time a navigation button is pressed and the
-      time Rockbox responds. Turning this setting \setting{On} activates the
-      directory cache, and turning it \setting{Off} deactivates the directory
+      time Rockbox responds. Turning this setting on activates the
+      directory cache, and turning it off deactivates the directory
       cache.
-      \note{The first time you set the directory cache to \setting{On},
+      \note{The first time you enable the directory cache,
       Rockbox will request a reboot of the \dap{} and upon restarting take a few
-      minutes to scan the drive. Thereafter, the directory cache will work in the
+      minutes to scan the drive. After this, the directory cache will work in the
       background.}
     }
   \end{description}
@@ -72,8 +75,8 @@
   \subsection{Time and Date}
   Time related menu options.
     \begin{description}
-      \item [Set Time/Date: ]Set current time and date.
-      \item [Time Format: ] Choose 12 or 24 Hour clock.
+      \item [Set Time/Date: ] Set current time and date.
+      \item [Time Format: ] Choose 12 or 24 hour clock.
     \end{description}
 }
 
@@ -87,6 +90,7 @@ available.
 
 \opt{HAVE_RTC_ALARM}{
 \subsection{Wake-Up Alarm}
+% TODO this isn't quite right for all targets, I think
     This option turns the \dap{} off and then starts it up again at the
     specified time. Use \ActionSettingInc{} and \ActionSettingDec{} to adjust
     the minutes setting, \ActionAlarmHoursDec{} and \ActionAlarmHoursInc{} to adjust the hours.
@@ -105,7 +109,7 @@ This sub menu relates to limits in the Rockbox operating system.
   \begin{description}
     \item [Max files in dir browser: ]This setting controls the limit on
     the number of files that you can put in any particular directory in the
-    \setting{File Browser}. You can configure the size to be between 50 and
+    file browser. You can configure the size to be between 50 and
     10,000 files in steps of 50. The default is 400. Higher values will shorten
     the music buffer, so you should increase this setting \emph{only} if you have
     directories with a large number of files.
@@ -140,6 +144,7 @@ This sub menu relates to limits in the Rockbox operating system.
   playback.
 }
 
+% TODO: this needs to be rewritten in another style, but i really don't know what kind of "line in" this describes... isn't it used for recording?
 \opt{player}{
   \subsection{Line In} This option activates the line in port on \dap, which is
     off by default. This is useful for such applications as:
