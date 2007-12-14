@@ -69,6 +69,32 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="0" >
+       <widget class="QPushButton" name="change" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>Change</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
     </widget>
    </item>
@@ -206,6 +232,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>lineTalkFolder</tabstop>
+  <tabstop>buttonBrowse</tabstop>
+  <tabstop>change</tabstop>
+  <tabstop>talkFiles</tabstop>
+  <tabstop>talkFolders</tabstop>
+  <tabstop>OverwriteWav</tabstop>
+  <tabstop>RemoveWav</tabstop>
+  <tabstop>recursive</tabstop>
+  <tabstop>StripExtensions</tabstop>
+  <tabstop>OverwriteTalk</tabstop>
+  <tabstop>buttonOk</tabstop>
+  <tabstop>buttonCancel</tabstop>
+ </tabstops>
  <resources>
   <include location="rbutilqt.qrc" />
  </resources>

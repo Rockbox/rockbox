@@ -36,8 +36,12 @@ class InstallTalkWindow : public QDialog
         void setUserSettings(QSettings*);
         void setDeviceSettings(QSettings*);
 
+    signals:
+        void settingsUpdated(void);
+        
     public slots:
         void accept(void);
+        void change(void);
 
     private slots:
         void browseFolder(void);

@@ -747,6 +747,8 @@ void RbUtilQt::createTalkFiles(void)
     installWindow->setUserSettings(userSettings);
     installWindow->setDeviceSettings(devices);
     installWindow->show();
+    connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
+    connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
 
 }
 
@@ -757,6 +759,7 @@ void RbUtilQt::uninstall(void)
     uninstallWindow->setUserSettings(userSettings);
     uninstallWindow->setDeviceSettings(devices);
     uninstallWindow->show();
+
 }
 
 void RbUtilQt::uninstallBootloader(void)

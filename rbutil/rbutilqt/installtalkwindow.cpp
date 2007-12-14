@@ -21,6 +21,7 @@
 #include "ui_installtalkfrm.h"
 
 #include "browsedirtree.h"
+#include "configure.h"
 
 InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
 {
@@ -28,6 +29,7 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
     talkcreator = new TalkFileCreator(this);
 
     connect(ui.buttonBrowse, SIGNAL(clicked()), this, SLOT(browseFolder()));
+    connect(ui.change,SIGNAL(clicked()),this,SLOT(change()));
 
     ui.OverwriteWav->setChecked(true);
     ui.RemoveWav->setChecked(true);
@@ -61,6 +63,14 @@ void InstallTalkWindow::setTalkFolder(QString folder)
     ui.lineTalkFolder->setText(folder);
 }
 
+void InstallTalkWindow::change()
+{
+    Config *cw = new Config(this,4);
+    cw->setUserSettings(userSettings);
+    cw->setDevices(devices);
+    cw->show();
+    connect(cw, SIGNAL(settingsUpdated()), this, SIGNAL(settingsUpdated()));
+}
 
 void InstallTalkWindow::accept()
 {

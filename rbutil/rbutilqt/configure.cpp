@@ -36,11 +36,11 @@
 
 #define DEFAULT_LANG "English (C)"
 
-Config::Config(QWidget *parent) : QDialog(parent)
+Config::Config(QWidget *parent,int index) : QDialog(parent)
 {
     programPath = qApp->applicationDirPath() + "/";
     ui.setupUi(this);
-    ui.tabConfiguration->setCurrentIndex(0);
+    ui.tabConfiguration->setCurrentIndex(index);
     ui.radioManualProxy->setChecked(true);
     QRegExpValidator *proxyValidator = new QRegExpValidator(this);
     QRegExp validate("[0-9]*");

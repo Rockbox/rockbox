@@ -28,7 +28,7 @@ class Config : public QDialog
 {
     Q_OBJECT
     public:
-        Config(QWidget *parent = 0);
+        Config(QWidget *parent = 0,int index=0);
         void setUserSettings(QSettings*);
         void setDevices(QSettings*);
 
