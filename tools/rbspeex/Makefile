@@ -26,7 +26,7 @@ endif
 # This sets up 'SRC' based on the files mentioned in SOURCES
 SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#")
 
-SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeexenc.c rbspeexdec.c
+SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeex.c rbspeexenc.c rbspeexdec.c
 OBJS := $(SRC:%.c=%.o)
 DEPFILE = dep-speex
 DIRS = 
@@ -49,23 +49,24 @@ $(DEPFILE): $(SOURCES)
 	done > $(DEPFILE); \
 	echo "oo" > /dev/null )
 
-libspeex.a: $(OBJS) $(DEPFILE)
-	@echo AR libspeex.a
-	$(SILENT)$(AR) ruv $@ $+ > /dev/null 2>&1
+librbspeex.a: $(OBJS) $(DEPFILE) rbspeex.o 
+	@echo AR librbspeex.a
+	$(AR) ruv $@ $+ > /dev/null 2>&1
 
-../rbspeexenc: $(OBJS) libspeex.a rbspeexenc.o
+../rbspeexenc: $(OBJS) rbspeexenc.o librbspeex.a 
 	@echo Linking ../rbspeexenc
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc rbspeexenc.o libspeex.a -lm
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexenc rbspeexenc.o librbspeex.a -lm
 
-../rbspeexdec: $(OBJS) libspeex.a rbspeexdec.o
+../rbspeexdec: $(OBJS) librbspeex.a rbspeexdec.o 
 	@echo Linking ../rbspeexdec
-	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec rbspeexdec.o libspeex.a -lm
+	$(SILENT)$(CC) $(CFLAGS) -o ../rbspeexdec rbspeexdec.o librbspeex.a -lm
 
 %.o:
 	@echo CC $<
 	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
 
+
 clean:
-	rm -f $(OBJS) libspeex.a rbspeexenc.o ../rbspeexenc dep-speex
+	rm -f $(OBJS) libspeex.a librbspeex.a rbspeexenc.o ../rbspeexenc dep-speex
 
 -include $(DEPFILE)

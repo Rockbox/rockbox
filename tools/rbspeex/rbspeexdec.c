@@ -20,25 +20,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string.h"
+#include "rbspeex.h"
   
  #define USAGE_TEXT \
 "Usage: rbspeexdec infile outfile\n"\
 "rbspeexdec outputs mono 16 bit 16 kHz WAV files.\n"\
 "WARNING: This tool will only decode files made with rbspeexenc!\n"
 
-void put_ushort_le(unsigned short x, unsigned char *out)
-{
-    out[0] = x & 0xff;
-    out[1] = x >> 8;
-}
-
-void put_uint_le(unsigned int x, unsigned char *out)
-{
-    out[0] = x & 0xff;
-    out[1] = (x >> 8) & 0xff;
-    out[2] = (x >> 16) & 0xff;
-    out[3] = x >> 24;
-}
 
 int main(int argc, char **argv)
 {
