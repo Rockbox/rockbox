@@ -52,7 +52,7 @@ bool get_a52_metadata(int fd, struct mp3entry *id3)
 
     if ((buf[0] != 0x0b) || (buf[1] != 0x77)) 
     { 
-        logf("%s is not an A52/AC3 file\n",trackname);
+        logf("not an A52/AC3 file\n");
         return false;
     }
 
