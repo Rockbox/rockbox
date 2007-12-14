@@ -663,9 +663,12 @@ void RbUtilQt::installVoice()
     installer = new ZipInstaller(this);
     installer->setUnzip(false);
 
-    QString voiceurl = devices->value("voice_url").toString() + "/" +
-        userSettings->value("platform").toString() + "-" +
-        versmap.value("arch_date") + "-english.voice";
+    QString voiceurl = devices->value("voice_url").toString()  + "/" ;
+    
+    devices->beginGroup(userSettings->value("platform").toString());
+    voiceurl += devices->value("voicename").toString() + "-" +
+        versmap.value("arch_date") + "-english.voice"; 
+    devices->endGroup();
     qDebug() << voiceurl;
 
     installer->setProxy(proxy());
