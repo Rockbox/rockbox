@@ -12,16 +12,14 @@ related to audio playback.
   \nopt{ondiosp,ondiofm}{\setting{/A-B}}:
   \begin{description}
     %
-  \item[Off. ]The current directory or playlist will not repeat
-    when it is finished.
+  \item[Off. ]The current playlist will not repeat when it is finished.
     \note{If you have the \setting{Auto change directory} option set to
       \setting{Yes}, Rockbox will move on to the next directory on your
       hard drive. If the \setting{Auto Change Directory} option is set to
       \setting{No}, playback will stop when the current directory or
       playlist is finished.}
     %
-  \item[All. ]The current directory or playlist will repeat when it is
-    finished.
+  \item[All. ]The current playlist will repeat when it is finished.
     \note{This option does \emph{not} shuffle all files on your \dap.
       Rockbox is playlist oriented. When you play a song, a directory, or
       an album, Rockbox creates a playlist and plays it. Thus, to shuffle
@@ -31,8 +29,8 @@ related to audio playback.
     %
   \item[One. ]Repeat one track over and over.
     %
-  \item[Shuffle. ]When the current directory or playlist has finished
-    playing, it will be shuffled and then repeated.
+  \item[Shuffle. ]When the current playlist has finished playing, it will
+    be shuffled and then repeated.
     %
     \nopt{ondiosp,ondiofm}{
     \item[A-B. ]Repeats between two user defined points within a track,
@@ -228,7 +226,7 @@ related to audio playback.
   of a directory. If \setting{Auto-Change Directory} is set to \setting{Yes},
   Rockbox will continue to the next directory. If
   \setting{Auto-Change Directory} is set to \setting{No}, playback will stop at
-  the end of the current directory.
+  the end of the current playlist.
   \note{You must have the \setting{Repeat} option set to \setting{No} for
     \setting{Auto-Change Directory} to function properly.}
 
@@ -267,7 +265,7 @@ related to audio playback.
   start the logging. The log-file is called 
   \opt{CONFIG_RTC}{\fname{.scrobbler.log},}%
   \nopt{CONFIG_RTC}{\fname{.scrobbler-timeless.log},}%
-  and is to be found in  the root directory of your \dap{}. 
+  and is to be found in the root directory of your \dap{}.
   \note{See \wikilink{LastFMLog} for a further description, and for tools you 
     can use to submit your Last.fm log.}
 

@@ -12,7 +12,7 @@ in the font package at \url{http://www.rockbox.org/daily.shtml}}.
   Rockbox can load fonts dynamically. Simply copy the \fname{.fnt} file to the
   \dap{} and ``play'' it in the \setting{File Browser}. If you want a font to
   be loaded automatically every time you start up, it must be located in the
-  \fname{/.rockbox/fonts} folder and the filename must be at most 24 characters
+  \fname{/.rockbox/fonts} directory and the filename must be at most 24 characters
   long. You can browse the fonts in \fname{/.rockbox/fonts} under
   \setting{Settings $\rightarrow$ General Settings $\rightarrow$ Display
   $\rightarrow$ Browse Fonts} in the \setting{Main Menu}.
@@ -30,7 +30,7 @@ Rockbox directory browser or select \setting{Settings $\rightarrow$
 General Settings $\rightarrow$ Languages }from the \setting{Main Menu}.
 
 \note{If you want a language to be loaded automatically every time you start 
-up, it must be located in the \fname{/.rockbox/langs} folder and the filename
+up, it must be located in the \fname{/.rockbox/langs} directory and the filename
 must be a maximum of 24 characters long.}
 
 If your language is not yet supported and you want to write your own language
@@ -57,7 +57,7 @@ file find the instructions on the Rockbox website:
   (see \reference{ref:Filemenu}) on it and select the option
   \setting{Set As Backdrop}. If you want rockbox to remember your
   backdrop the next time you start your \dap{} the backdrop must be placed in
-  the \fname{/.rockbox/backdrops} folder.
+  the \fname{/.rockbox/backdrops} directory.
 }%
 
 \section{\label{ref:ConfiguringtheWPS}Configuring the WPS}
@@ -82,7 +82,7 @@ file find the instructions on the Rockbox website:
 \item [File Location: ]Custom WPS files may be located anywhere on the drive. 
   The only restriction is that they must end in \fname{.wps}. When you ``play''
   a \fname{.wps} file, it will be used for future WPS screens, and if the 
-  ``played'' \fname{.wps} file is located in the \fname{/.rockbox/wps} folder, it 
+  ``played'' \fname{.wps} file is located in the \fname{/.rockbox/wps} directory, it 
   will be remembered and used after reboot. The \fname{.wps} filename must be 
   no more than 24 characters long for it to be remembered.
 \end{description}
@@ -377,7 +377,7 @@ Example of a configuration file:
 \section{\label{ref:FirmwareLoading}Firmware Loading}
 \opt{player,recorder,recorderv2fm,ondio}{
   When your \dap{} powers on, it loads the Archos firmware in ROM, which
-  automatically checks your \daps{} root folder for a file named 
+  automatically checks your \daps{} root directory for a file named 
   \firmwarefilename. Note that Archos firmware can only read the first 
   ten characters of each filename in this process, so don't rename your old 
   firmware files with names like \firmwarefilename.\fname{old} and so on, 

@@ -113,7 +113,7 @@ For manual installation and customization additional software is required.
   \fname{.zip} format. Thus you need a tool to handle that compressed
   format. Usually your computer should have a tool installed that can
   handle the \fname{.zip} file format. Windows XP has built-in support for
-  \fname{.zip} files and presents them to you as folders unless you have
+  \fname{.zip} files and presents them to you as directories unless you have
   installed a third party program that handles compressed files. For
   other operating systems this may vary. If the \fname{.zip} file format
   is not recognised on your computer you can find a program to handle them
@@ -246,8 +246,8 @@ functional, but not perfect!
 
 Note that the entire contents of the \fname{.zip} file should be
 extracted directly to the root of your \daps{} drive. Do not try to
-create a separate directory or folder on your \dap{} for the Rockbox
-files! The \fname{.zip} file already contains the internal directory
+create a separate directory on your \dap{} for the Rockbox
+files! The \fname{.zip} file already contains the internal
 structure that Rockbox needs.
 
 \end{enumerate}
@@ -255,9 +255,9 @@ structure that Rockbox needs.
 \opt{archos}{
   \note{
     If the contents of the \fname{.zip} file are extracted correctly, you will
-    have a file called \fname{\firmwarefilename} in the main folder of your
-    \daps{} drive, and also a folder called \fname{/.rockbox}, which contains a
-    number of other folders and system files needed by Rockbox. If you receive a
+    have a file called \fname{\firmwarefilename} in the main directory of your
+    \daps{} drive, and also a directory called \fname{/.rockbox}, which contains a
+    number of other directories and system files needed by Rockbox. If you receive a
      ``-1'' error when you start Rockbox, you have not extracted the contents of
     the \fname{.zip} file to the proper location.
   }
@@ -268,8 +268,8 @@ structure that Rockbox needs.
 \opt{SWCODEC}{
   \note{
     If the contents of the \fname{.zip} file are extracted correctly, you will
-    have a folder called \fname{/.rockbox}, which contains all the files needed
-    by Rockbox, in the main folder of your \daps{} drive. If you receive a
+    have a directory called \fname{/.rockbox}, which contains all the files needed
+    by Rockbox, in the main directory of your \daps{} drive. If you receive a
     ``-1'' error when you start Rockbox, you have not extracted the contents of
     the \fname{.zip} file to the proper location.
   }
@@ -294,9 +294,9 @@ structure that Rockbox needs.
     all'' command of your unzip program to extract the files in the
     \fname{.zip} file onto your \dap{}. As with the firmware installation, the
     entire contents of the fonts \fname{.zip} should be extracted directly to the
-    root of your \daps{} drive. Do not try to create a separate directory or
-    folder on your \dap{} for the fonts! The \fname{.zip} already contains the
-    correct internal directory structure.
+    root of your \daps{} drive. Do not try to create a separate directory
+    on your \dap{} for the fonts! The \fname{.zip} already contains the
+    correct internal structure.
 
   \end{enumerate}
   }
@@ -317,7 +317,7 @@ structure that Rockbox needs.
 If you wish to use speech support you will also need a voice file, english ones
 are available from \url{http://www.rockbox.org/daily.shtml}. Download the
 ``voice'' for your player, rename it to \fname{english.voice}, copy it
-into the \fname{langs} folder which is inside the \fname{/.rockbox} folder on
+into the \fname{langs} directory which is inside the \fname{/.rockbox} directory on
 your \dap{} and reboot. Voice menus are turned on by default. See
 \reference{ref:Voiceconfiguration} for details on voice settings.
 
@@ -339,7 +339,7 @@ use.
     Rockbox starts in the \setting{File Browser}. If you have loaded music onto
     your player using Itunes, you will not be able to see your music because
     Itunes changes your files' names and hides them in directories in the
-    \fname{Ipod\_Control} folder. You can view files placed on your \dap{} by
+    \fname{Ipod\_Control} directory. You can view files placed on your \dap{} by
     Itunes by initializing and using Rockbox's database. See
     \reference{ref:database} for more information.
   }
@@ -420,7 +420,7 @@ completely follow the manual uninstallation instructions below.}}
     installing the distribution files.
     \opt{h1xx}{
       The Rockbox bootlaoder will automatically start the original firmware if
-      the \fname{.rockbox} folder has been deleted.
+      the \fname{.rockbox} directory has been deleted.
     }%
     \opt{h300}{%
       Although if you retain the Rockbox boot loader, you will need to hold the
@@ -430,7 +430,7 @@ completely follow the manual uninstallation instructions below.}}
 }
 
 If you wish to clean up your disk, you may also wish to delete the
-\fname{.rockbox} folder and its contents.
+\fname{.rockbox} directory and its contents.
 \nopt{m5,x5}{Turn the \playerman{} off.
   Turn the \dap{} back on and the original \playerman{} software will load.
 }

@@ -3,8 +3,8 @@
 \section{\label{ref:file_browser}File Browser}
 \screenshot{rockbox_interface/images/ss-file-browser}{The file browser}{}
 Rockbox lets you browse your music in either of two ways. The 
-\setting{File Browser} lets you navigate through the files and folders on 
-your \dap, entering folders and executing the default action on each file.
+\setting{File Browser} lets you navigate through the files and directories on 
+your \dap, entering directories and executing the default action on each file.
 To help differentiate files, each file format is displayed with an icon. 
 
 The \setting{Database Browser}, on the other hand, allows you to navigate 
@@ -29,14 +29,14 @@ Unlike the Archos Firmware, Rockbox provides multivolume support for the
 MultiMediaCard, this means the \dap{} can access both data volumes (internal
 memory and the MMC), thus being able to for instance, build playlists with
 files from both volumes.
-In the \setting{File Browser} a new folder will appear as soon as the device
-has read the content after inserting the card. This new folder's name is
-generated as \fname{<MMC1>}, and will behave exactly as any other folder
+In the \setting{File Browser} a new directory will appear as soon as the device
+has read the content after inserting the card. This new directory's name is
+generated as \fname{<MMC1>}, and will behave exactly as any other directory
 on the \dap{}.
 }
 
 \opt{h10,h10_5gb}{\note{
-If your \dap{} is a MTP model, the Music folder where all your music is stored
+If your \dap{} is a MTP model, the Music directory where all your music is stored
 may be hidden in the \setting{File Browser}. This may be fixed by either
 either changing its properties (on a computer) to not hidden, or by changing
 the \setting{Show Files} setting to all.
@@ -103,12 +103,12 @@ the \setting{Show Files} setting to all.
 \screenshot{rockbox_interface/images/ss-file-menu}{The File Menu}{}
 
 The \setting{File Menu} allows you to perform certain operations on files or 
-folders.  To access the \setting{File Menu}, position the selector over a file 
-or folder and access the context menu with \ActionStdContext{}.
+directories.  To access the \setting{File Menu}, position the selector over a file 
+or directory and access the context menu with \ActionStdContext{}.
 
 \note{The \setting{File Menu} is a context sensitive menu.  If the 
 \setting{File Menu} is invoked on a file, it will display options available 
-for files.  If the \setting{File Menu} is invoked on a folder or directory, 
+for files.  If the \setting{File Menu} is invoked on a directory, 
 it will display options for directories.}
 
 The \setting{File Menu} contains the following options (unless otherwise noted, 
@@ -137,9 +137,9 @@ each option pertains both to files and directories):
   Press \ActionYesNoAccept{}
   to confirm deletion or any other key to cancel.
 \item [Delete Directory.]
-  Deletes the currently selected directory and all of the files and folders
-  contained in the selected directory.  Deleted directories cannot be recovered.
-  Use this feature with caution!
+  Deletes the currently selected directory and all of the files and subdirectories
+  it may contain. Deleted directories cannot be recovered. Use this feature with
+  caution!
 \item [Open with.]
   Runs a viewer plugin on the file. Normally, when a file is selected in Rockbox,
   Rockbox automatically detects the file type and runs the appropriate plugin.
@@ -153,8 +153,8 @@ each option pertains both to files and directories):
   Create a new directory in the current directory on the disk.
 \item [Properties.]
   Shows properties such as size and the time and date of the last modification
-  for the selected file. If used on a directory, the number of files and sub
-  directories in that directory will be shown, as well as the total size.
+  for the selected file. If used on a directory, the number of files and
+  subdirectories will be shown, as well as the total size.
 \item [Set As Recording Directory.]
   Save recordings in the selected directory.
 \end{description}
