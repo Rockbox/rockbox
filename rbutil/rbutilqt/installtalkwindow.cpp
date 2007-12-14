@@ -114,6 +114,7 @@ void InstallTalkWindow::accept()
 
     userSettings->sync();
 
+    talkcreator->setUserSettings(userSettings);
     talkcreator->setDir(QDir(folderToTalk));
     talkcreator->setMountPoint(userSettings->value("mountpoint").toString());
     talkcreator->setTTSexe(pathTTS);
@@ -121,11 +122,6 @@ void InstallTalkWindow::accept()
     talkcreator->setTTsLanguage(ttsLanguage);
     talkcreator->setTTsType(ttsType);
     talkcreator->setTTsTemplate(ttsTemplate);
-   
-    talkcreator->setEncexe(pathEncoder);
-    talkcreator->setEncOpts(encOpts);
-    talkcreator->setEncTemplate(encTemplate);
-    talkcreator->setEncType(encType);
     
     talkcreator->setOverwriteTalk(ui.OverwriteTalk->isChecked());
     talkcreator->setOverwriteWav(ui.OverwriteWav->isChecked());
@@ -152,16 +148,15 @@ void InstallTalkWindow::setDeviceSettings(QSettings *dev)
         .arg(devices->value(profile, tr("Invalid TTS profile!")).toString()));
     qDebug() << profile;
     devices->endGroup();
-    profile = userSettings->value("encpreset", "none").toString();
-    devices->beginGroup("encoders");
-    ui.labelEncProfile->setText(tr("Encoder Profile: <b>%1</b>")
-        .arg(devices->value(profile, tr("Invalid encoder profile!")).toString()));
-    qDebug() << profile;
-    devices->endGroup();
+    
+    QString encoder = userSettings->value("encoder", "none").toString();
+    EncBase* enc = getEncoder(encoder);
+    enc->setUserCfg(userSettings);
+    if(enc->configOk())
+        ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg(encoder));
+    else
+        ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
 }
-
-
-
 
 void InstallTalkWindow::setUserSettings(QSettings *user)
 {

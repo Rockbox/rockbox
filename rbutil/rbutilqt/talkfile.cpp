@@ -24,21 +24,6 @@ TalkFileCreator::TalkFileCreator(QObject* parent): QObject(parent)
 
 }
 
-
-bool TalkFileCreator::initEncoder()
-{
-    QFileInfo enc(m_EncExec);
-    if(enc.exists())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-
 bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 {
     m_abort = false;
@@ -60,12 +45,18 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         m_logger->addItem("Init of TTS engine failed",LOGERROR);
         return false;
     }
-    if(!initEncoder())
+
+    // Encoder
+    m_enc = getEncoder(userSettings->value("encoder").toString());  
+    m_enc->setUserCfg(userSettings);
+  
+    if(!m_enc->start())
     {
-        m_logger->addItem("Init of encoder failed",LOGERROR);
+        m_logger->addItem("Init of Encoder engine failed",LOGERROR);
         m_tts->stop();
         return false;
     }
+
     QApplication::processEvents();
 
     connect(logger,SIGNAL(aborted()),this,SLOT(abort()));
@@ -88,13 +79,16 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         QString toSpeak;
         QString filename;
         QString wavfilename;
-        
-        //! skip dotdot and .talk files
-        if(fileInf.fileName() == ".." || fileInf.suffix() == "talk")
+
+        QString path = fileInf.filePath(); 
+        qDebug() << path;
+
+        if( path.endsWith("..") || path.endsWith(".talk") )
         {
             it.next();
             continue;
         }
+
         //! if it is a dir
         if(fileInf.isDir())  
         {
@@ -103,9 +97,14 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             {
               it.next();
               continue;
-            }            
-            toSpeak = fileInf.absoluteDir().dirName();
-            filename = fileInf.absolutePath() + "/_dirname.talk";
+            }
+            int index1 = path.lastIndexOf("/");
+            int index2 = path.lastIndexOf("/",index1-1);
+
+            toSpeak = path.mid(index2+1,(index1-index2)-1);
+
+            filename = path.left(index1) + "/_dirname.talk";
+            qDebug() << "toSpeak: " << toSpeak << "filename: " << filename; 
         }
         else   // if it is a file
         {
@@ -137,15 +136,17 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
                     m_logger->addItem("Voicing of " + toSpeak + " failed",LOGERROR);
                     m_logger->abort();
                     m_tts->stop();
+                    m_enc->stop();
                     return false;
                 }
             }
             m_logger->addItem("Encoding of " + toSpeak,LOGINFO);
-            if(!encode(wavfilename,filename))
+            if(!m_enc->encode(wavfilename,filename))
             {
                 m_logger->addItem("Encoding of " + wavfilename + " failed",LOGERROR);
                 m_logger->abort();
                 m_tts->stop();
+                m_enc->stop();
                 return false;
             }
         }
@@ -180,21 +181,6 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 void TalkFileCreator::abort()
 {
     m_abort = true;
-}
-
-bool TalkFileCreator::encode(QString input,QString output)
-{
-    qDebug() << "encoding..";
-    QString execstring = m_curEncTemplate;
-
-    execstring.replace("%exe",m_EncExec);
-    execstring.replace("%options",m_EncOpts);
-    execstring.replace("%input",input);
-    execstring.replace("%output",output);
-    qDebug() << execstring;
-    QProcess::execute(execstring);
-    return true;
-
 }
 
 bool TTSSapi::start()
@@ -257,7 +243,7 @@ bool TTSExes::voice(QString text,QString wavfile)
     execstring.replace("%options",m_TTSOpts);
     execstring.replace("%wavfile",wavfile);
     execstring.replace("%text",text);
-    qDebug() << "voicing" << execstring;
+    //qDebug() << "voicing" << execstring;
     QProcess::execute(execstring);
     return true;
 

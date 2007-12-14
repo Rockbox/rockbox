@@ -359,7 +359,7 @@
        <iconset resource="rbutilqt.qrc" >:/icons/icons/audio-input-microphone.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
-       <item row="0" column="0" colspan="2" >
+       <item row="0" column="0" >
         <widget class="QGroupBox" name="groupBox_2" >
          <property name="title" >
           <string>TTS Engine</string>
@@ -427,7 +427,7 @@
          </layout>
         </widget>
        </item>
-       <item rowspan="2" row="1" column="0" colspan="2" >
+       <item row="1" column="0" >
         <widget class="QGroupBox" name="groupBox_3" >
          <property name="title" >
           <string>Encoder Engine</string>
@@ -436,64 +436,62 @@
           <item row="0" column="0" >
            <widget class="QLabel" name="labelEncoder" >
             <property name="text" >
-             <string>Select &amp;encoder profile</string>
+             <string>Select &amp;encoder</string>
             </property>
             <property name="buddy" >
              <cstring>comboEncoder</cstring>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="2" >
+          <item row="0" column="1" colspan="3" >
            <widget class="QComboBox" name="comboEncoder" />
           </item>
           <item row="1" column="0" >
            <widget class="QLabel" name="labelEncoderExecutable" >
             <property name="text" >
-             <string>Encoder executable</string>
-            </property>
-            <property name="buddy" >
-             <cstring>encoderExecutable</cstring>
+             <string>Configure encoder</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1" >
-           <widget class="QLineEdit" name="encoderExecutable" />
+           <widget class="QLabel" name="configstatus" >
+            <property name="text" >
+             <string>Configuration invalid !</string>
+            </property>
+           </widget>
           </item>
           <item row="1" column="2" >
-           <widget class="QPushButton" name="browseEncoder" >
+           <widget class="QLabel" name="configstatusimg" >
             <property name="text" >
-             <string>B&amp;rowse</string>
+             <string/>
+            </property>
+            <property name="pixmap" >
+             <pixmap resource="rbutilqt.qrc" >:/icons/icons/dialog-error.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3" >
+           <widget class="QPushButton" name="configEncoder" >
+            <property name="text" >
+             <string>&amp;Configure</string>
             </property>
             <property name="icon" >
              <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" >
-           <widget class="QLabel" name="labelEncoderOptions" >
-            <property name="text" >
-             <string>Encoder options</string>
-            </property>
-            <property name="buddy" >
-             <cstring>encoderOptions</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="2" >
-           <widget class="QLineEdit" name="encoderOptions" />
-          </item>
          </layout>
         </widget>
        </item>
-       <item row="3" column="0" >
+       <item row="2" column="0" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" >
           <size>
-           <width>20</width>
-           <height>40</height>
+           <width>226</width>
+           <height>51</height>
           </size>
          </property>
         </spacer>

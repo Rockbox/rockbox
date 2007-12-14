@@ -35,7 +35,8 @@ SOURCES += rbutilqt.cpp \
  uninstallwindow.cpp \
  utils.cpp \
  browseof.cpp \
- preview.cpp 
+ preview.cpp \
+ encoders.cpp
 
 HEADERS += rbutilqt.h \
  install.h \
@@ -71,11 +72,14 @@ HEADERS += rbutilqt.h \
  uninstallwindow.h \
  utils.h \
  browseof.h \
- preview.h 
+ preview.h \
+ encoders.h
  
 # Needed by QT on Win
-INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher
+INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex
  
+LIBS += -L../../tools/rbspeex -lrbspeex
+
 TEMPLATE = app
 dbg {
     CONFIG += debug thread qt warn_on
@@ -100,7 +104,9 @@ FORMS += rbutilqtfrm.ui \
  installthemesfrm.ui \
  uninstallfrm.ui \
  browseoffrm.ui \
- previewfrm.ui
+ previewfrm.ui \
+ rbspeexcfgfrm.ui \
+ encexescfgfrm.ui
 
 RESOURCES += rbutilqt.qrc
 

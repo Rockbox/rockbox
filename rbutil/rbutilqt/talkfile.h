@@ -21,7 +21,11 @@
 #ifndef TALKFILE_H
 #define TALKFILE_H
 
+#include <QtGui>
 #include "progressloggerinterface.h"
+
+#include "encoders.h"
+
 
 class TTSBase : public QObject
 {
@@ -55,18 +59,16 @@ public:
 
     bool createTalkFiles(ProgressloggerInterface* logger);
 
+    void setUserSettings(QSettings* setting) { userSettings = setting;}
+    
     void setTTSexe(QString exe){m_TTSexec=exe;}
-    void setEncexe(QString exe){m_EncExec=exe;}
-
+  
     void setTTsType(QString tts) { m_curTTS = tts; }
     void setTTsOpts(QString opts) {m_TTSOpts=opts;}
     void setTTsLanguage(QString language) {m_TTSLanguage = language;}
     void setTTsTemplate(QString t) { m_curTTSTemplate = t; }
 
-    void setEncType(QString enc) { m_curEnc = enc; }
-    void setEncOpts(QString opts) {m_EncOpts=opts;}
-    void setEncTemplate(QString t) { m_curEncTemplate = t; }
-
+   
     void setDir(QDir dir){m_dir = dir; }
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
 
@@ -83,10 +85,9 @@ private slots:
 
 private:
     TTSBase* m_tts;
-    bool initEncoder();
-    
-    bool encode(QString input,QString output);
-
+    EncBase* m_enc;
+    QSettings *userSettings;
+   
     QDir   m_dir;
     QString m_mountpoint;
     QString m_curTTS;
@@ -94,11 +95,6 @@ private:
     QString m_TTSOpts;
     QString m_TTSLanguage;
     QString m_curTTSTemplate;
-
-    QString m_curEnc;
-    QString m_EncExec;
-    QString m_EncOpts;
-    QString m_curEncTemplate;
 
     bool m_overwriteTalk;
     bool m_overwriteWav;
@@ -136,6 +132,8 @@ public:
 private:
    
 };
+
+
 
 #endif
 

@@ -65,9 +65,9 @@ class Config : public QDialog
         void setCache(QString);
         void cacheClear(void);
         void browseTts(void);
-        void browseEnc(void);
+        void configEnc(void);
         void updateTtsOpts(int);
-        void updateEncOpts(int);
+        void updateEncState(int);
 };
 
 #endif

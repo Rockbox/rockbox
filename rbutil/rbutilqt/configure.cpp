@@ -23,6 +23,7 @@
 #include "autodetection.h"
 #include "ui_configurefrm.h"
 #include "browsedirtree.h"
+#include "encoders.h"
 
 #include <stdio.h>
 #if defined(Q_OS_WIN32)
@@ -75,9 +76,10 @@ Config::Config(QWidget *parent) : QDialog(parent)
     connect(ui.buttonCacheBrowse, SIGNAL(clicked()), this, SLOT(browseCache()));
     connect(ui.buttonCacheClear, SIGNAL(clicked()), this, SLOT(cacheClear()));
     connect(ui.browseTts, SIGNAL(clicked()), this, SLOT(browseTts()));
-    connect(ui.browseEncoder, SIGNAL(clicked()), this, SLOT(browseEnc()));
-    connect(ui.comboEncoder, SIGNAL(currentIndexChanged(int)), this, SLOT(updateEncOpts(int)));
+    connect(ui.configEncoder, SIGNAL(clicked()), this, SLOT(configEnc()));
     connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsOpts(int)));
+    connect(ui.comboEncoder, SIGNAL(currentIndexChanged(int)), this, SLOT(updateEncState(int)));
+    
 }
 
 
@@ -144,20 +146,9 @@ void Config::accept()
     devices->endGroup();
     userSettings->endGroup();
     
-    //encoder settings
-    preset = ui.comboEncoder->itemData(ui.comboEncoder->currentIndex(), Qt::UserRole).toString();
-    userSettings->setValue("encpreset", preset);
-    userSettings->beginGroup(preset);
-    
-    if(QFileInfo(ui.encoderExecutable->text()).isExecutable())
-        userSettings->setValue("binary", ui.encoderExecutable->text());
-    userSettings->setValue("options", ui.encoderOptions->text());
-    devices->beginGroup(preset);
-    userSettings->setValue("template", devices->value("template").toString());
-    userSettings->setValue("type", devices->value("tts").toString());
-    devices->endGroup();
-    userSettings->endGroup();
-        
+    //encoder settings 
+    userSettings->setValue("encoder",ui.comboEncoder->currentText());
+
     // sync settings
     userSettings->sync();
     this->close();
@@ -314,17 +305,19 @@ void Config::setDevices(QSettings *dev)
         ui.treeDevices->setCurrentItem(w3); // hilight old selection
 
     // tts / encoder tab
-    QStringList keys;
-
-    devices->beginGroup("encoders");
-    keys = devices->allKeys();
-    for(int i=0; i < keys.size();i++)
-        ui.comboEncoder->addItem(devices->value(keys.at(i), "null").toString(),
-                                 keys.at(i));
-    devices->endGroup();
-
+    
+    //encoders
+    ui.comboEncoder->addItems(getEncoderList());
+    
+    //update index of combobox
+    int index = ui.comboEncoder->findText(userSettings->value("encoder").toString(),Qt::MatchExactly);
+    if(index < 0) index = 0;
+    ui.comboEncoder->setCurrentIndex(index);
+    updateEncState(index);
+    
+    //tts
     devices->beginGroup("tts");
-    keys = devices->allKeys();
+    QStringList keys = devices->allKeys();
     for(int i=0; i < keys.size();i++)
     {
         devices->endGroup();
@@ -343,67 +336,13 @@ void Config::setDevices(QSettings *dev)
     }
     devices->endGroup();
 
-    int index;
+
     index = ui.comboTts->findData(userSettings->value("ttspreset").toString(),
                             Qt::UserRole, Qt::MatchExactly);
     if(index < 0) index = 0;
     ui.comboTts->setCurrentIndex(index);
     updateTtsOpts(index);
     
-    index = ui.comboEncoder->findData(userSettings->value("encpreset").toString(),
-                            Qt::UserRole, Qt::MatchExactly);
-    if(index < 0) index = 0;
-    ui.comboEncoder->setCurrentIndex(index);
-    updateEncOpts(index);
-
-}
-
-
-void Config::updateEncOpts(int index)
-{
-    qDebug() << "updateEncOpts()";
-    QString e;
-    bool edit;
-    QString c = ui.comboEncoder->itemData(index, Qt::UserRole).toString();
-    devices->beginGroup(c);
-    ui.encoderOptions->setText(devices->value("options").toString());
-    edit = devices->value("edit").toBool();
-    ui.encoderOptions->setEnabled(edit);
-    e = devices->value("encoder").toString();
-    devices->endGroup();
-
-    // try to autodetect encoder
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
-    QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
-#elif defined(Q_OS_WIN)
-    QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
-#endif
-    qDebug() << path;
-    ui.encoderExecutable->setEnabled(true);
-    for(int i = 0; i < path.size(); i++) {
-        QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + e;
-#if defined(Q_OS_WIN)
-    executable += ".exe";
-    QStringList ex = executable.split("\"", QString::SkipEmptyParts);
-    executable = ex.join("");
-#endif
-        if(QFileInfo(executable).isExecutable()) {
-            qDebug() << "found:" << executable;
-            ui.encoderExecutable->setText(QDir::toNativeSeparators(executable));
-            // disallow changing the detected path if non-customizable profile
-            if(!edit)
-                ui.encoderExecutable->setEnabled(false);
-            break;
-        }
-    }
-    
-    //user settings
-    userSettings->beginGroup(c);
-    QString temp = userSettings->value("binary","null").toString();
-    if(temp != "null")  ui.encoderExecutable->setText(temp);
-    temp = userSettings->value("options","null").toString();
-    if(temp != "null") ui.encoderOptions->setText(temp);
-    userSettings->endGroup();
 
 }
 
@@ -459,6 +398,23 @@ void Config::updateTtsOpts(int index)
     userSettings->endGroup();
 }
 
+void Config::updateEncState(int index)
+{
+    QString encoder = ui.comboEncoder->itemText(index);
+    EncBase* enc = getEncoder(encoder);
+    enc->setUserCfg(userSettings);
+    
+    if(enc->configOk())
+    {
+        ui.configstatus->setText("Configuration OK");
+        ui.configstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/icons/go-next.png")));
+    }
+    else
+    {
+        ui.configstatus->setText("Configuration INVALID");
+        ui.configstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/icons/dialog-error.png")));
+    }        
+}
 
 void Config::setNoProxy(bool checked)
 {
@@ -741,22 +697,11 @@ void Config::browseTts()
 }
 
 
-void Config::browseEnc()
+void Config::configEnc()
 {
-    BrowseDirtree browser(this);
-    browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-
-    if(QFileInfo(ui.encoderExecutable->text()).isDir())
-    {
-        browser.setDir(ui.encoderExecutable->text());
-    }
-    if(browser.exec() == QDialog::Accepted)
-    {
-        qDebug() << browser.getSelected();
-        QString exe = browser.getSelected();
-        if(!QFileInfo(exe).isExecutable())
-            return;
-        ui.encoderExecutable->setText(exe);
-    }
-
+    EncBase* enc =getEncoder(ui.comboEncoder->currentText());
+    
+    enc->setUserCfg(userSettings);
+    enc->showCfg();
+    updateEncState(ui.comboEncoder->currentIndex());
 }

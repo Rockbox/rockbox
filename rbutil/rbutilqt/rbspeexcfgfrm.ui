@@ -1,0 +1,154 @@
+<ui version="4.0" >
+ <class>RbSpeexCfgFrm</class>
+ <widget class="QDialog" name="RbSpeexCfgFrm" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>408</width>
+    <height>173</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Configuration</string>
+  </property>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" colspan="4" >
+    <widget class="QLabel" name="labelTitle" >
+     <property name="text" >
+      <string>Configure RbSpeex Encoder</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QDoubleSpinBox" name="volume" >
+     <property name="value" >
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Volume</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" colspan="2" >
+    <widget class="QCheckBox" name="narrowband" >
+     <property name="text" >
+      <string>Narrowband</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QDoubleSpinBox" name="quality" >
+     <property name="singleStep" >
+      <double>1.000000000000000</double>
+     </property>
+     <property name="value" >
+      <double>8.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Quality</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" >
+    <widget class="QSpinBox" name="complexity" >
+     <property name="value" >
+      <number>3</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" >
+    <widget class="QLabel" name="label_3" >
+     <property name="text" >
+      <string>Complexity</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="2" >
+    <widget class="QPushButton" name="buttonOk" >
+     <property name="text" >
+      <string>&amp;Ok</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="3" >
+    <widget class="QPushButton" name="buttonCancel" >
+     <property name="text" >
+      <string>&amp;Cancel</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" >
+    <widget class="QPushButton" name="reset" >
+     <property name="text" >
+      <string>Reset</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="rbutilqt.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonOk</sender>
+   <signal>clicked()</signal>
+   <receiver>RbSpeexCfgFrm</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>253</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>203</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonCancel</sender>
+   <signal>clicked()</signal>
+   <receiver>RbSpeexCfgFrm</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>352</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>203</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
