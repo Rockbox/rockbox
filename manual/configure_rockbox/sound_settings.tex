@@ -27,7 +27,7 @@ change to customise your listening experience.
 
 \section{Bass}
   \opt{player,recorder,recorderv2fm,ondio}{This emphasises or suppresses the
-  lower (bass) sounds in the track. 0 means that bass sounds are unaltered
+  lower (bass) frequencies in the track. 0 means that bass sounds are unaltered
   (flat response).}
   \opt{h1xx,h300}{The bass setting can be used to increase (but not decrease)
   frequencies below 300Hz. Bass boost can be set from 0 to 24 dB in
@@ -45,10 +45,10 @@ change to customise your listening experience.
 
 \opt{ipodvideo}{
 \section{Bass Cutoff}
-  This setting controls the frequency below which the bass gain
-  applies. The minimum setting is 1 and the maximum setting is 4 where a value
-  of 1 indicates the lowest possible cutoff and a value of 4 indicates the highest
-  possible cutoff. The actual cutoff frequency values will vary with sample rate.
+  This setting controls the frequency below which the bass adjustment applies.
+  The setting has a range from 1 to 4, where a bigger number affects a bigger
+  range of bass frequencies. The actual cutoff frequency used for each setting
+  value will vary with sample rate.
 }
 
 
@@ -72,10 +72,10 @@ change to customise your listening experience.
 
 \opt{ipodvideo}{
 \section{Treble Cutoff}
-  This setting controls the frequency above which the treble gain
-  applies. The minimum setting is 1 and the maximum setting is 4 where a value
-  of 1 indicates the lowest possible cutoff and a value of 4 indicates the highest
-  possible cutoff. The actual cutoff frequency values will vary with sample rate.
+  This setting controls the frequency above which the treble adjustment applies.
+  The setting has a range from 1 to 4, where a bigger number affects a smaller 
+  range of treble frequencies. The actual cutoff frequency used for each setting
+  value will vary with sample rate.
 }
 
 \section{Balance}
@@ -113,7 +113,7 @@ change to customise your listening experience.
         & Plays the right channel in both stereo channels. \\
         %
         Karaoke
-        & Removes all sound that is the same in both channels. Since most
+        & Removes all sound that is common to both channels. Since most
           music is recorded with vocals being equally present in both channels
           to make the singer sound centrally placed, this often (but not 
           always) has the effect of removing the voice track from a song. This 
@@ -135,19 +135,22 @@ change to customise your listening experience.
 
 \opt{recorder,recorderv2fm}{
   \section{Loudness}
-  Loudness is an effect which emphasises bass and treble. This makes the
-  track seem louder by amplifying the frequencies that the human ear finds
-  hard to hear. Frequencies in the vocal range are unaffected, since the human
-  ear picks these up very easily.
+  When listening at low volumes, the ear will tend to make bass and treble
+  frequencies sound quieter than they really are. To compensate for this, 
+  \setting{Loudness} is an effect which emphasises bass and treble in a fashion
+  suited to the human ear. Frequencies in the vocal range are unaffected, since
+  the human ear picks these up very easily at any sound level.
+  It is of course also possible to use this effect at higher volumes for 
+  enhanced bass and treble.
 }
   
 \opt{recorder,recorderv2fm}{
 \section{Auto Volume}
   Auto volume is a feature that automatically lowers the volume on loud parts,
   and then slowly restores the volume to the previous level over a time
-  interval. That time interval is configurable here. Short values like 20ms
-  are useful for ensuring a constant volume for in car use and other
-  applications where background noise makes a constant loudness desirable.
+  interval. This setting allows this time interval to be configured. Short
+  values like 20ms are useful for ensuring a constant volume for in-car use and
+  other applications where background noise makes a constant loudness desirable.
   A longer timeout means that the change in volume back to the previous level
   will be smoother, so there will be less sharp changes in volume level.
 }
@@ -162,8 +165,8 @@ change to customise your listening experience.
 
 \opt{recorder,recorderv2fm}{
 \section{MDB {}- Micronas Dynamic Bass}
-  The rest of the parameters on this menu relate to the Micronas Dynamic
-  Bass (MDB) function. This is designed to enable the user to hear bass
+  The rest of the parameters in this menu relate to the Micronas Dynamic
+  Bass (MDB) function. MDB is designed to enable the user to hear bass
   notes that the headphones and/or speakers are not capable of reproducing.
   Every tone has a fundamental frequency (the ``main tone'') and also several
   harmonics, which are related to that tone. The human brain has a mechanism
@@ -175,7 +178,7 @@ change to customise your listening experience.
   headphones or speakers aren't capable of reproducing. Try it and see
   what you think.
 
-  The MDB parameters are as follows.
+  The MDB parameters are as follows:
   %
   \begin{description}
   \item[MDB enable:]
@@ -183,12 +186,12 @@ change to customise your listening experience.
     only setting they need, since Rockbox picks sensible defaults for the
     other parameters. MDB is turned off by default.
   \item[MDB strength:]
-    How loud the harmonics generated by the MDB will be.
+    How loud the harmonics generated by MDB will be.
   \item[MDB Harmonics:]
     The percentage of the low notes that is converted into harmonics.
     If low notes are causing speaker distortion, this can be set to 100\%
     to eliminate the fundamental completely and only produce harmonics in the
-    signal.  If set to 0\% this is the same as turning the MDB feature off.
+    signal. If set to 0\% this is the same as turning the MDB feature off.
   \item[MDB Centre Frequency:]
     The cutoff frequency of your headphones or speakers. This is usually
     given in the specification for the headphones/speakers.
@@ -197,7 +200,7 @@ change to customise your listening experience.
 
     This is the frequency up to which harmonics are generated. Some of the
     lower fundamentals near the cut{}-off range will have their lower
-    harmonics cut off, since they will be below the range of the speakers.
+    harmonics cut, since they will be below the range of the speakers.
     Fundamentals between the cut{}-off frequency and the lower frequency
     will have their harmonics proportionally boosted to compensate and restore
     the `loudness' of these notes.
@@ -229,7 +232,7 @@ change to customise your listening experience.
   both speakers. However, the sound from the left speaker reaches your right
   ear slightly later than it does your left ear, and vice versa.
 
-  The human ear and brain together are very good at interpreting the timing
+  The human ear and brain together are very good at interpreting the time
   differences between direct sounds and reflected sounds and using that
   information to identify the direction that the sound is coming from. On the
   other hand, when listening to headphones, each ear hears only the stereo
@@ -247,7 +250,7 @@ change to customise your listening experience.
   just one of the speakers. Many people will find such records tiring to listen
   to using earphones and no crossfeed effect.
 
-  Crossfeed has the following settings.
+  Crossfeed has the following settings:
   \begin{description}
   \item[Crossfeed:]
     Selects whether the crossfeed effect is to be enabled or not.
@@ -392,7 +395,7 @@ adjusted through textual menus rather than through a graphic interface.
 This option saves the current EQ configuration in a \fname{.cfg} file.
 
 \item[Browse EQ Presets:]
-This menu displays a list EQ presets, as well as any EQ configurations saved
+This menu displays a list of EQ presets, as well as any EQ configurations saved
 using the \setting{Save EQ Preset} option. Users unfamiliar with the
 operation of a parametric EQ may wish to use the presets instead of trying to
 configure the EQ, or use the presets for designing their own custom EQ
@@ -406,7 +409,7 @@ settings.
 This setting controls the dithering and noise shaping functionality of Rockbox.
 
 Most of Rockbox' audio file decoders work at a higher bit depth than the 16 bits
-used for output on the \daps{} audio connectors. The simplest way in which to
+used for output on the \daps{} audio connectors. The simplest way to
 convert from one bit depth to another is simply discarding all the surplus bits.
 This is the default behaviour, and adds distortion to the signal that will
 vary in character along with the desired sound.
