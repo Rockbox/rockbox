@@ -22,6 +22,12 @@
    </item>
    <item row="1" column="0" >
     <widget class="QDoubleSpinBox" name="volume" >
+     <property name="maximum" >
+      <double>10.000000000000000</double>
+     </property>
+     <property name="singleStep" >
+      <double>0.010000000000000</double>
+     </property>
      <property name="value" >
       <double>1.000000000000000</double>
      </property>
@@ -43,6 +49,12 @@
    </item>
    <item row="2" column="0" >
     <widget class="QDoubleSpinBox" name="quality" >
+     <property name="decimals" >
+      <number>1</number>
+     </property>
+     <property name="maximum" >
+      <double>10.000000000000000</double>
+     </property>
      <property name="singleStep" >
       <double>1.000000000000000</double>
      </property>
@@ -60,8 +72,11 @@
    </item>
    <item row="3" column="0" >
     <widget class="QSpinBox" name="complexity" >
+     <property name="maximum" >
+      <number>10</number>
+     </property>
      <property name="value" >
-      <number>3</number>
+      <number>10</number>
      </property>
     </widget>
    </item>

@@ -238,9 +238,8 @@ EncRbSpeex::EncRbSpeex(QWidget *parent) : EncBase(parent)
 
     defaultQuality = 8.f;
     defaultVolume = 1.f;
-    defaultComplexity =3;
+    defaultComplexity = 10;
     defaultBand = false;
-
 }
 
 
