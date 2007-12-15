@@ -73,8 +73,7 @@ public slots:
     virtual void accept(void);
     virtual void reject(void);
     virtual void reset(void);
-    void browse(void);
-    
+     
 private:
     Ui::SapiCfgFrm ui;
     QProcess* voicescript;

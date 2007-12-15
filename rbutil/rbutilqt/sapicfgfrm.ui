@@ -20,33 +20,6 @@
      </property>
      <layout class="QVBoxLayout" >
       <item>
-       <widget class="QLabel" name="label" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
-          <horstretch>0</horstretch>
-          <verstretch>255</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string>Path to TTS Engine</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" >
-        <item>
-         <widget class="QLineEdit" name="ttspath" />
-        </item>
-        <item>
-         <widget class="QPushButton" name="browse" >
-          <property name="text" >
-           <string>&amp;Browse</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
        <widget class="QLabel" name="label_2" >
         <property name="text" >
          <string>TTS options</string>

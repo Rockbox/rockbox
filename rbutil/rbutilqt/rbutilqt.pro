@@ -150,3 +150,10 @@ static {
     message("using static plugin")
 }
 
+# copy sapi script
+win32 {
+    system(copy ..\..\tools\sapi_voice.vbs builtin\sapi_voice.vbs)
+}
+!win32 {
+    system(copy ../../tools/sapi_voice.vbs builtin/sapi_voice.vbs)
+}

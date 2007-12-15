@@ -249,7 +249,6 @@ TTSSapi::TTSSapi(QWidget *parent) : TTSBase(parent)
     ui.setupUi(this);
     this->hide();
     connect(ui.reset,SIGNAL(clicked()),this,SLOT(reset()));
-    connect(ui.browse,SIGNAL(clicked()),this,SLOT(browse()));
 }
 
 
@@ -257,11 +256,13 @@ bool TTSSapi::start()
 {    
 
     userSettings->beginGroup("sapi");
-    m_TTSexec = userSettings->value("ttspath","").toString();
     m_TTSOpts = userSettings->value("ttsoptions","").toString();
     m_TTSLanguage =userSettings->value("ttslanguage","").toString();
     userSettings->endGroup();
 
+    QFile::copy(":/builtin/builtin/sapi_voice.vbs",QDir::tempPath() + "/sapi_voice.vbs");
+    m_TTSexec = QDir::tempPath() +"/sapi_voice.vbs";
+    
     QFileInfo tts(m_TTSexec);
     if(!tts.exists())
         return false;
@@ -301,7 +302,6 @@ bool TTSSapi::stop()
 
 void TTSSapi::reset()
 {
-    ui.ttspath->setText("");
     ui.ttsoptions->setText("");  
     ui.ttslanguage->setText(defaultLanguage);  
 }
@@ -310,13 +310,10 @@ void TTSSapi::showCfg()
 {
     // try to get config from settings
     userSettings->beginGroup("sapi");
-    QString exepath =userSettings->value("ttspath","").toString();
     ui.ttsoptions->setText(userSettings->value("ttsoptions","").toString());  
-    ui.ttslanguage->setText(userSettings->value("ttsoptions",defaultLanguage).toString());     
+    ui.ttslanguage->setText(userSettings->value("ttslanguage",defaultLanguage).toString());     
     userSettings->endGroup();
-     
-    ui.ttspath->setText(exepath);
-    
+      
      //show dialog
     this->exec();
     
@@ -328,7 +325,6 @@ void TTSSapi::accept(void)
     {
         //save settings in user config
         userSettings->beginGroup("sapi");
-        userSettings->setValue("ttspath",ui.ttspath->text());
         userSettings->setValue("ttsoptions",ui.ttsoptions->text());
         userSettings->setValue("ttslanguage",ui.ttslanguage->text());
         userSettings->endGroup();
@@ -345,32 +341,7 @@ void TTSSapi::reject(void)
 
 bool TTSSapi::configOk()
 {
-    userSettings->beginGroup("sapi");
-    QString path = userSettings->value("ttspath","").toString();
-    userSettings->endGroup();
-    
-    if (QFileInfo(path).exists())
-        return true;
-  
-    return false;
+    return true;
 }
 
-void TTSSapi::browse()
-{
-    BrowseDirtree browser(this);
-    browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-
-    if(QFileInfo(ui.ttspath->text()).isDir())
-    {
-        browser.setDir(ui.ttspath->text());
-    }
-    if(browser.exec() == QDialog::Accepted)
-    {
-        qDebug() << browser.getSelected();
-        QString exe = browser.getSelected();
-        if(!QFileInfo(exe).isExecutable())
-            return;
-        ui.ttspath->setText(exe);
-    }
-}
 
