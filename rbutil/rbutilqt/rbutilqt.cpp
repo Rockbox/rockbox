@@ -31,7 +31,6 @@
 #include "installthemes.h"
 #include "uninstallwindow.h"
 #include "browseof.h"
-#include "encoders.h"
 
 #if defined(Q_OS_LINUX)
 #include <stdio.h>
@@ -120,7 +119,6 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     initIpodpatcher();
     initSansapatcher();
     downloadInfo();
-    initEncoderList();
 
 }
 

@@ -358,8 +358,8 @@
       <attribute name="icon" >
        <iconset resource="rbutilqt.qrc" >:/icons/icons/audio-input-microphone.png</iconset>
       </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
+      <layout class="QVBoxLayout" >
+       <item>
         <widget class="QGroupBox" name="groupBox_2" >
          <property name="title" >
           <string>TTS Engine</string>
@@ -368,66 +368,54 @@
           <item row="0" column="0" >
            <widget class="QLabel" name="labelTts" >
             <property name="text" >
-             <string>&amp;Select TTS profile</string>
+             <string>&amp;Select TTS Engine</string>
             </property>
             <property name="buddy" >
              <cstring>comboTts</cstring>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="2" >
+          <item row="0" column="1" colspan="3" >
            <widget class="QComboBox" name="comboTts" />
           </item>
           <item row="1" column="0" >
            <widget class="QLabel" name="labelTtsExecutable" >
             <property name="text" >
-             <string>TTS executable</string>
-            </property>
-            <property name="buddy" >
-             <cstring>ttsExecutable</cstring>
+             <string>Configure TTS Engine</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1" >
-           <widget class="QLineEdit" name="ttsExecutable" />
+           <widget class="QLabel" name="configTTSstatus" >
+            <property name="text" >
+             <string>Configuration invalid !</string>
+            </property>
+           </widget>
           </item>
           <item row="1" column="2" >
-           <widget class="QPushButton" name="browseTts" >
+           <widget class="QLabel" name="configTTSstatusimg" >
             <property name="text" >
-             <string>&amp;Browse</string>
+             <string/>
+            </property>
+            <property name="pixmap" >
+             <pixmap resource="rbutilqt.qrc" >:/icons/icons/dialog-error.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3" >
+           <widget class="QPushButton" name="configTts" >
+            <property name="text" >
+             <string>Configure &amp;TTS</string>
             </property>
             <property name="icon" >
              <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" >
-           <widget class="QLabel" name="labelTtsOptions" >
-            <property name="text" >
-             <string>TTS Options</string>
-            </property>
-            <property name="buddy" >
-             <cstring>ttsOptions</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="2" >
-           <widget class="QLineEdit" name="ttsOptions" />
-          </item>
-          <item row="3" column="0" >
-           <widget class="QLabel" name="ttsLanguageLabel" >
-            <property name="text" >
-             <string>TTS Language</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1" colspan="2" >
-           <widget class="QLineEdit" name="ttsLanguage" />
-          </item>
          </layout>
         </widget>
        </item>
-       <item row="1" column="0" >
+       <item>
         <widget class="QGroupBox" name="groupBox_3" >
          <property name="title" >
           <string>Encoder Engine</string>
@@ -454,14 +442,14 @@
            </widget>
           </item>
           <item row="1" column="1" >
-           <widget class="QLabel" name="configstatus" >
+           <widget class="QLabel" name="configEncstatus" >
             <property name="text" >
              <string>Configuration invalid !</string>
             </property>
            </widget>
           </item>
           <item row="1" column="2" >
-           <widget class="QLabel" name="configstatusimg" >
+           <widget class="QLabel" name="configEncstatusimg" >
             <property name="text" >
              <string/>
             </property>
@@ -473,7 +461,7 @@
           <item row="1" column="3" >
            <widget class="QPushButton" name="configEncoder" >
             <property name="text" >
-             <string>&amp;Configure</string>
+             <string> Configure &amp;Enc</string>
             </property>
             <property name="icon" >
              <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
@@ -483,15 +471,15 @@
          </layout>
         </widget>
        </item>
-       <item row="2" column="0" >
+       <item>
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" >
           <size>
-           <width>226</width>
-           <height>51</height>
+           <width>458</width>
+           <height>131</height>
           </size>
          </property>
         </spacer>

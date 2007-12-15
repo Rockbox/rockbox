@@ -79,45 +79,12 @@ void InstallTalkWindow::accept()
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
 
     QString folderToTalk = ui.lineTalkFolder->text();
-    
-    // tts
-    QString preset = userSettings->value("ttspreset").toString();
-    userSettings->beginGroup(preset);
-    QString pathTTS = userSettings->value("binary").toString();
-    QString ttsOpts = userSettings->value("options").toString();
-    QString ttsLanguage = userSettings->value("language").toString();
-    QString ttsTemplate = userSettings->value("template").toString();
-    QString ttsType =userSettings->value("type").toString();
-    userSettings->endGroup();
-    
-    //encoder
-    QString encoderPreset = userSettings->value("encpreset").toString();
-    userSettings->beginGroup(encoderPreset);
-    QString pathEncoder = userSettings->value("binary").toString();
-    QString encOpts = userSettings->value("options").toString();
-    QString encTemplate = userSettings->value("template").toString();
-    QString encType =userSettings->value("type").toString();
-    userSettings->endGroup();
-  
+     
     if(!QFileInfo(folderToTalk).isDir())
     {
         logger->addItem(tr("The Folder to Talk is wrong!"),LOGERROR);
         logger->abort();
         return;
-    }
-
-    if(!QFileInfo(pathEncoder).isExecutable())
-    {
-        logger->addItem(tr("Path to Encoder is wrong!"),LOGERROR);
-        logger->abort();
-        return;
-    }
-
-    if(!QFileInfo(pathTTS).exists())
-    {
-         logger->addItem(tr("Path to TTS is wrong!"),LOGERROR);
-         logger->abort();
-         return;
     }
 
     userSettings->setValue("last_talked_folder", folderToTalk);
@@ -127,11 +94,6 @@ void InstallTalkWindow::accept()
     talkcreator->setUserSettings(userSettings);
     talkcreator->setDir(QDir(folderToTalk));
     talkcreator->setMountPoint(userSettings->value("mountpoint").toString());
-    talkcreator->setTTSexe(pathTTS);
-    talkcreator->setTTsOpts(ttsOpts);
-    talkcreator->setTTsLanguage(ttsLanguage);
-    talkcreator->setTTsType(ttsType);
-    talkcreator->setTTsTemplate(ttsTemplate);
     
     talkcreator->setOverwriteTalk(ui.OverwriteTalk->isChecked());
     talkcreator->setOverwriteWav(ui.OverwriteWav->isChecked());
@@ -150,14 +112,13 @@ void InstallTalkWindow::setDeviceSettings(QSettings *dev)
     devices = dev;
     qDebug() << "Install::setDeviceSettings:" << devices;
 
-    QString profile;
-
-    profile = userSettings->value("ttspreset", "none").toString();
-    devices->beginGroup("tts");
-    ui.labelTtsProfile->setText(tr("TTS Profile: <b>%1</b>")
-        .arg(devices->value(profile, tr("Invalid TTS profile!")).toString()));
-    qDebug() << profile;
-    devices->endGroup();
+    QString ttsName = userSettings->value("tts", "none").toString();
+    TTSBase* tts = getTTS(ttsName);
+    tts->setUserCfg(userSettings);
+    if(tts->configOk())
+        ui.labelTtsProfile->setText(tr("Selected TTS engine : <b>%1</b>").arg(ttsName));
+    else
+        ui.labelTtsProfile->setText(tr("Selected TTS Engine: <b>%1</b>").arg("Invalid TTS configuration!"));
     
     QString encoder = userSettings->value("encoder", "none").toString();
     EncBase* enc = getEncoder(encoder);

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: talkfile.cpp 15212 2007-10-19 21:49:07Z domonoky $
+ *   $Id: encoders.cpp 15212 2007-10-19 21:49:07Z domonoky $
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -33,6 +33,9 @@ void initEncoderList()
 // function to get a specific encoder
 EncBase* getEncoder(QString encname)
 {
+  // init list if its empty
+    if(encoderList.count() == 0) initEncoderList();
+    
     QString encoder = encoderList.key(encname);
     
     // check cache
@@ -59,6 +62,9 @@ EncBase* getEncoder(QString encname)
 // get the list of encoders, nice names
 QStringList getEncoderList()
 {
+  // init list if its empty
+    if(encoderList.count() == 0) initEncoderList();
+    
     QStringList encList;
     QMapIterator<QString, QString> i(encoderList);
     while (i.hasNext()) {

@@ -30,15 +30,9 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     m_logger = logger;
     m_logger->addItem("Starting Talk file generation",LOGINFO);
     
-    if(m_curTTS == "sapi")
-        m_tts = new TTSSapi();
-    else
-        m_tts = new TTSExes();
-    
-    m_tts->setTTSexe(m_TTSexec);
-    m_tts->setTTsOpts(m_TTSOpts);
-    m_tts->setTTsLanguage(m_TTSLanguage);
-    m_tts->setTTsTemplate(m_curTTSTemplate);
+    //tts
+    m_tts = getTTS(userSettings->value("tts").toString());  
+    m_tts->setUserCfg(userSettings);
     
     if(!m_tts->start())
     {
@@ -183,68 +177,3 @@ void TalkFileCreator::abort()
     m_abort = true;
 }
 
-bool TTSSapi::start()
-{    
-    QFileInfo tts(m_TTSexec);
-    if(!tts.exists())
-        return false;
-        
-    // create the voice process
-    QString execstring = m_TTSTemplate;
-    execstring.replace("%exe",m_TTSexec);
-    execstring.replace("%options",m_TTSOpts);
-    execstring.replace("%lang",m_TTSLanguage);
-    qDebug() << "init" << execstring; 
-    voicescript = new QProcess(NULL);
-    voicescript->start(execstring);
-    if(!voicescript->waitForStarted())
-        return false;
-    return true;
-}
-
-bool TTSSapi::voice(QString text,QString wavfile)
-{
-    QString query = "SPEAK\t"+wavfile+"\t"+text+"\r\n";
-    qDebug() << "voicing" << query;
-    voicescript->write(query.toLocal8Bit());
-    voicescript->write("SYNC\tbla\r\n");
-    voicescript->waitForReadyRead();
-    return true;
-}
-
-bool TTSSapi::stop()
-{   
-    QString query = "QUIT\r\n";
-    voicescript->write(query.toLocal8Bit());
-    voicescript->waitForFinished();
-    delete voicescript;
-    return true;
-}
-
-bool TTSExes::start()
-{
-    QFileInfo tts(m_TTSexec);
-    qDebug() << "ttsexe init"; 
-    if(tts.exists())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool TTSExes::voice(QString text,QString wavfile)
-{
-    QString execstring = m_TTSTemplate;
-
-    execstring.replace("%exe",m_TTSexec);
-    execstring.replace("%options",m_TTSOpts);
-    execstring.replace("%wavfile",wavfile);
-    execstring.replace("%text",text);
-    //qDebug() << "voicing" << execstring;
-    QProcess::execute(execstring);
-    return true;
-
-}

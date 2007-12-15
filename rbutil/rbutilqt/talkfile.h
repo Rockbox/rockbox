@@ -25,30 +25,7 @@
 #include "progressloggerinterface.h"
 
 #include "encoders.h"
-
-
-class TTSBase : public QObject
-{
-    Q_OBJECT
-public:
-    TTSBase(){}
-    virtual ~TTSBase(){}
-    virtual bool voice(QString text,QString wavfile){(void)text; (void)wavfile; return false;}
-    virtual bool start(){return false;}
-    virtual bool stop(){return false;}
-    
-    void setTTSexe(QString exe){m_TTSexec=exe;}
-    void setTTsOpts(QString opts) {m_TTSOpts=opts;}
-    void setTTsLanguage(QString language) {m_TTSLanguage = language;}
-    void setTTsTemplate(QString t) { m_TTSTemplate = t; }
-    
-protected:
-    QString m_TTSexec;
-    QString m_TTSOpts;
-    QString m_TTSTemplate;
-    QString m_TTSLanguage;
-};
-
+#include "tts.h"
 
 class TalkFileCreator :public QObject
 {
@@ -61,14 +38,6 @@ public:
 
     void setUserSettings(QSettings* setting) { userSettings = setting;}
     
-    void setTTSexe(QString exe){m_TTSexec=exe;}
-  
-    void setTTsType(QString tts) { m_curTTS = tts; }
-    void setTTsOpts(QString opts) {m_TTSOpts=opts;}
-    void setTTsLanguage(QString language) {m_TTSLanguage = language;}
-    void setTTsTemplate(QString t) { m_curTTSTemplate = t; }
-
-   
     void setDir(QDir dir){m_dir = dir; }
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
 
@@ -90,12 +59,7 @@ private:
    
     QDir   m_dir;
     QString m_mountpoint;
-    QString m_curTTS;
-    QString m_TTSexec;
-    QString m_TTSOpts;
-    QString m_TTSLanguage;
-    QString m_curTTSTemplate;
-
+ 
     bool m_overwriteTalk;
     bool m_overwriteWav;
     bool m_removeWav;
@@ -108,31 +72,6 @@ private:
 
     bool m_abort;
 };
-
-class TTSSapi : public TTSBase
-{
-public:
-    TTSSapi() {};
-    virtual bool voice(QString text,QString wavfile);
-    virtual bool start();
-    virtual bool stop();
-    
-private:
-    QProcess* voicescript;
-};
-
-class TTSExes : public TTSBase
-{
-public:
-    TTSExes() {};
-    virtual bool voice(QString text,QString wavfile);
-    virtual bool start();
-    virtual bool stop() {return true;}
-    
-private:
-   
-};
-
 
 
 #endif

@@ -1,0 +1,168 @@
+<ui version="4.0" >
+ <class>SapiCfgFrm</class>
+ <widget class="QDialog" name="SapiCfgFrm" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>511</width>
+    <height>242</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Configuration</string>
+  </property>
+  <layout class="QHBoxLayout" >
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Configure TTS Engine</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <item>
+       <widget class="QLabel" name="label" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+          <horstretch>0</horstretch>
+          <verstretch>255</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>Path to TTS Engine</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <item>
+         <widget class="QLineEdit" name="ttspath" />
+        </item>
+        <item>
+         <widget class="QPushButton" name="browse" >
+          <property name="text" >
+           <string>&amp;Browse</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>TTS options</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ttsoptions" />
+      </item>
+      <item>
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Language</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ttslanguage" />
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <item>
+         <widget class="QPushButton" name="reset" >
+          <property name="text" >
+           <string>Reset</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="buttonOk" >
+          <property name="text" >
+           <string>&amp;Ok</string>
+          </property>
+          <property name="icon" >
+           <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="buttonCancel" >
+          <property name="text" >
+           <string>&amp;Cancel</string>
+          </property>
+          <property name="icon" >
+           <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="rbutilqt.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonOk</sender>
+   <signal>clicked()</signal>
+   <receiver>SapiCfgFrm</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>253</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>203</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonCancel</sender>
+   <signal>clicked()</signal>
+   <receiver>SapiCfgFrm</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>352</x>
+     <y>147</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>203</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

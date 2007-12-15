@@ -36,7 +36,8 @@ SOURCES += rbutilqt.cpp \
  utils.cpp \
  browseof.cpp \
  preview.cpp \
- encoders.cpp
+ encoders.cpp \
+ tts.cpp
 
 HEADERS += rbutilqt.h \
  install.h \
@@ -73,7 +74,8 @@ HEADERS += rbutilqt.h \
  utils.h \
  browseof.h \
  preview.h \
- encoders.h
+ encoders.h \
+ tts.h
  
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex
@@ -106,7 +108,9 @@ FORMS += rbutilqtfrm.ui \
  browseoffrm.ui \
  previewfrm.ui \
  rbspeexcfgfrm.ui \
- encexescfgfrm.ui
+ encexescfgfrm.ui \
+ ttsexescfgfrm.ui \
+ sapicfgfrm.ui
 
 RESOURCES += rbutilqt.qrc
 

@@ -24,6 +24,7 @@
 #include "ui_configurefrm.h"
 #include "browsedirtree.h"
 #include "encoders.h"
+#include "tts.h"
 
 #include <stdio.h>
 #if defined(Q_OS_WIN32)
@@ -75,9 +76,9 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     connect(ui.buttonAutodetect,SIGNAL(clicked()),this,SLOT(autodetect()));
     connect(ui.buttonCacheBrowse, SIGNAL(clicked()), this, SLOT(browseCache()));
     connect(ui.buttonCacheClear, SIGNAL(clicked()), this, SLOT(cacheClear()));
-    connect(ui.browseTts, SIGNAL(clicked()), this, SLOT(browseTts()));
+    connect(ui.configTts, SIGNAL(clicked()), this, SLOT(configTts()));
     connect(ui.configEncoder, SIGNAL(clicked()), this, SLOT(configEnc()));
-    connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsOpts(int)));
+    connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsState(int)));
     connect(ui.comboEncoder, SIGNAL(currentIndexChanged(int)), this, SLOT(updateEncState(int)));
     
 }
@@ -131,20 +132,7 @@ void Config::accept()
     userSettings->setValue("offline", ui.cacheOfflineMode->isChecked());
 
     // tts settings
-    QString preset;
-    preset = ui.comboTts->itemData(ui.comboTts->currentIndex(), Qt::UserRole).toString();
-    userSettings->setValue("ttspreset", preset);
-    userSettings->beginGroup(preset);
-    
-    if(QFileInfo(ui.ttsExecutable->text()).exists())
-        userSettings->setValue("binary", ui.ttsExecutable->text());
-    userSettings->setValue("options", ui.ttsOptions->text());
-    userSettings->setValue("language", ui.ttsLanguage->text());
-    devices->beginGroup(preset);
-    userSettings->setValue("template", devices->value("template").toString());
-    userSettings->setValue("type", devices->value("tts").toString());
-    devices->endGroup();
-    userSettings->endGroup();
+    userSettings->setValue("tts",ui.comboTts->currentText());
     
     //encoder settings 
     userSettings->setValue("encoder",ui.comboEncoder->currentText());
@@ -316,86 +304,34 @@ void Config::setDevices(QSettings *dev)
     updateEncState(index);
     
     //tts
-    devices->beginGroup("tts");
-    QStringList keys = devices->allKeys();
-    for(int i=0; i < keys.size();i++)
-    {
-        devices->endGroup();
-        devices->beginGroup(keys.at(i));
-        QString os = devices->value("os").toString();
-        devices->endGroup();
-        devices->beginGroup("tts");
-        
-        if(os == "all")
-            ui.comboTts->addItem(devices->value(keys.at(i), "null").toString(), keys.at(i));
-            
-#if defined(Q_OS_WIN32)
-        if(os == "win32")
-            ui.comboTts->addItem(devices->value(keys.at(i), "null").toString(), keys.at(i));
-#endif
-    }
-    devices->endGroup();
-
-
-    index = ui.comboTts->findData(userSettings->value("ttspreset").toString(),
-                            Qt::UserRole, Qt::MatchExactly);
+    ui.comboTts->addItems(getTTSList());
+    
+    
+    //update index of combobox
+    index = ui.comboTts->findText(userSettings->value("tts").toString(),Qt::MatchExactly);
     if(index < 0) index = 0;
     ui.comboTts->setCurrentIndex(index);
-    updateTtsOpts(index);
+    updateTtsState(index);
     
-
 }
 
 
-void Config::updateTtsOpts(int index)
+void Config::updateTtsState(int index)
 {
-    bool edit;
-    QString e;
-    bool needsLanguageCfg;
-    QString c = ui.comboTts->itemData(index, Qt::UserRole).toString();
-    devices->beginGroup(c);
-    edit = devices->value("edit").toBool();
-    needsLanguageCfg = devices->value("needslanguagecfg").toBool();
-    ui.ttsLanguage->setVisible(needsLanguageCfg);
-    ui.ttsLanguageLabel->setVisible(needsLanguageCfg);
-    ui.ttsOptions->setText(devices->value("options").toString());
-    ui.ttsOptions->setEnabled(devices->value("edit").toBool());
-    e = devices->value("tts").toString();
-    devices->endGroup();
-       
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
-    QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
-#elif defined(Q_OS_WIN)
-    QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
-#endif
-    qDebug() << path;
-    ui.ttsExecutable->setEnabled(true);
-    for(int i = 0; i < path.size(); i++) {
-        QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + e;
-#if defined(Q_OS_WIN)
-        executable += ".exe";
-        QStringList ex = executable.split("\"", QString::SkipEmptyParts);
-        executable = ex.join("");
-#endif
-        qDebug() << executable;
-        if(QFileInfo(executable).isExecutable()) {
-            ui.ttsExecutable->setText(QDir::toNativeSeparators(executable));
-            // disallow changing the detected path if non-customizable profile
-            if(!edit)
-                ui.ttsExecutable->setEnabled(false);
-            break;
-        }
-    }
+    QString ttsName = ui.comboTts->itemText(index);
+    TTSBase* tts = getTTS(ttsName);
+    tts->setUserCfg(userSettings);
     
-    //user settings
-    userSettings->beginGroup(c);
-    QString temp = userSettings->value("binary","null").toString();
-    if(temp != "null")  ui.ttsExecutable->setText(temp);
-    temp = userSettings->value("options","null").toString();
-    if(temp != "null") ui.ttsOptions->setText(temp);
-    temp = userSettings->value("language","null").toString();
-    if(temp != "null") ui.ttsLanguage->setText(temp);
-    userSettings->endGroup();
+    if(tts->configOk())
+    {
+        ui.configTTSstatus->setText("Configuration OK");
+        ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/icons/go-next.png")));
+    }
+    else
+    {
+        ui.configTTSstatus->setText("Configuration INVALID");
+        ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/icons/dialog-error.png")));
+    }        
 }
 
 void Config::updateEncState(int index)
@@ -406,13 +342,13 @@ void Config::updateEncState(int index)
     
     if(enc->configOk())
     {
-        ui.configstatus->setText("Configuration OK");
-        ui.configstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/icons/go-next.png")));
+        ui.configEncstatus->setText("Configuration OK");
+        ui.configEncstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/icons/go-next.png")));
     }
     else
     {
-        ui.configstatus->setText("Configuration INVALID");
-        ui.configstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/icons/dialog-error.png")));
+        ui.configEncstatus->setText("Configuration INVALID");
+        ui.configEncstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/icons/dialog-error.png")));
     }        
 }
 
@@ -676,24 +612,13 @@ void Config::cacheClear()
 }
 
 
-void Config::browseTts()
+void Config::configTts()
 {
-    BrowseDirtree browser(this);
-    browser.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-
-    if(QFileInfo(ui.ttsExecutable->text()).isDir())
-    {
-        browser.setDir(ui.ttsExecutable->text());
-    }
-    if(browser.exec() == QDialog::Accepted)
-    {
-        qDebug() << browser.getSelected();
-        QString exe = browser.getSelected();
-        if(!QFileInfo(exe).exists())
-            return;
-        ui.ttsExecutable->setText(exe);
-    }
-
+    TTSBase* tts =getTTS(ui.comboTts->currentText());
+    
+    tts->setUserCfg(userSettings);
+    tts->showCfg();
+    updateTtsState(ui.comboTts->currentIndex());
 }
 
 

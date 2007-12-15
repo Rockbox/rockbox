@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2007 by Dominik Wenger
- *   $Id: encoders.h 15212 2007-10-19 21:49:07Z domonoky $
+ *   $Id: tts.h 15212 2007-10-19 21:49:07Z domonoky $
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,42 +16,37 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
  
-#ifndef ENCODERS_H
-#define ENCODERS_H
- 
-#include "ui_rbspeexcfgfrm.h"
-#include "ui_encexescfgfrm.h"
+#ifndef TTS_H
+#define TTS_H
+
+#include "ui_ttsexescfgfrm.h"
+#include "ui_sapicfgfrm.h"
 #include <QtGui>
 
-extern "C"
-{
-    #include "rbspeex.h"
-}
 
-class EncBase;
+class TTSBase;
 
-//inits the encoder List
-void initEncoderList();
-// function to get a specific encoder
-EncBase* getEncoder(QString encname);
-// get the list of encoders, nice names
-QStringList getEncoderList();
+//inits the tts List
+void initTTSList();
+// function to get a specific tts
+TTSBase* getTTS(QString ttsname);
+// get the list of tts, nice names
+QStringList getTTSList();
 
 
-
-class EncBase : public QDialog
+class TTSBase : public QDialog
 {
     Q_OBJECT
 public:
-    EncBase(QWidget *parent );
-    
-    virtual bool encode(QString input,QString output){return false;}
+    TTSBase(QWidget *parent );
+    virtual bool voice(QString text,QString wavfile) {return false;}
     virtual bool start(){return false;}
     virtual bool stop(){return false;}
     virtual void showCfg(){}
     virtual bool configOk(){return false;}
-
+    
     void setUserCfg(QSettings *uSettings){userSettings = uSettings;}
      
 public slots:
@@ -60,20 +55,17 @@ public slots:
     virtual void reset(void){}
 
 protected:
-   
     QSettings *userSettings;
 };
 
-
-
-class EncExes : public EncBase
+class TTSSapi : public TTSBase
 {
-    Q_OBJECT
+ Q_OBJECT
 public:
-    EncExes(QString name,QWidget *parent = NULL);
-    virtual bool encode(QString input,QString output);
+    TTSSapi(QWidget *parent = NULL);
+    virtual bool voice(QString text,QString wavfile);
     virtual bool start();
-    virtual bool stop() {return true;}
+    virtual bool stop();
     virtual void showCfg();
     virtual bool configOk();
     
@@ -82,44 +74,43 @@ public slots:
     virtual void reject(void);
     virtual void reset(void);
     void browse(void);
-
+    
 private:
-    Ui::EncExesCfgFrm ui;
-    QString m_name;
-    QString m_EncExec;
-    QString m_EncOpts;
-    QMap<QString,QString> m_TemplateMap;
-    QString m_EncTemplate;
+    Ui::SapiCfgFrm ui;
+    QProcess* voicescript;
+    
+    QString defaultLanguage;
+    
+    QString m_TTSexec;
+    QString m_TTSOpts;
+    QString m_TTSTemplate;
+    QString m_TTSLanguage;
 };
 
-class EncRbSpeex : public EncBase 
+class TTSExes : public TTSBase
 {
-    Q_OBJECT
+ Q_OBJECT
 public:
-    EncRbSpeex(QWidget *parent = NULL);
-    virtual bool encode(QString input,QString output);
+    TTSExes(QString name,QWidget *parent = NULL);
+    virtual bool voice(QString text,QString wavfile);
     virtual bool start();
     virtual bool stop() {return true;}
     virtual void showCfg();
     virtual bool configOk();
-
+   
 public slots:
     virtual void accept(void);
     virtual void reject(void);
-    virtual void reset(void);
-
-private:
-    Ui::RbSpeexCfgFrm ui;
-    float quality;
-    float volume;
-    int complexity;
-    bool narrowband;
+    virtual void reset(void); 
+    void browse(void);
     
-    float defaultQuality;
-    float defaultVolume;
-    int defaultComplexity;
-    bool defaultBand;
+private:
+    Ui::TTSExesCfgFrm ui;
+    QString m_name;
+    QString m_TTSexec;
+    QString m_TTSOpts;
+    QString m_TTSTemplate;
+    QMap<QString,QString> m_TemplateMap;
 };
 
- 
 #endif
