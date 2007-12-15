@@ -22,6 +22,10 @@ CFLAGS = $(SPEEXOPTS) $(INCLUDES) -O3 -fomit-frame-pointer -Wno-unused-parameter
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 CFLAGS+=-mno-cygwin
 endif
+# on mingw32, make sure CC is set to gcc
+ifeq ($(findstring MINGW,$(shell uname)),MINGW)
+CC = gcc
+endif
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#")
@@ -51,7 +55,7 @@ $(DEPFILE): $(SOURCES)
 
 librbspeex.a: $(OBJS) $(DEPFILE) rbspeex.o 
 	@echo AR librbspeex.a
-	$(AR) ruv $@ $+ > /dev/null 2>&1
+	$(SILENT)$(AR) ruv $@ $+ > /dev/null 2>&1
 
 ../rbspeexenc: $(OBJS) rbspeexenc.o librbspeex.a 
 	@echo Linking ../rbspeexenc
