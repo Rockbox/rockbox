@@ -640,8 +640,18 @@ bool playlist_viewer_ex(char* filename)
         {
             case ACTION_TREE_WPS:
             case ACTION_STD_CANCEL:
-                exit = true;
+            {
+                if (viewer.move_track >= 0)
+                {
+                    viewer.selected_track = viewer.move_track;
+                    gui_synclist_select_item(&playlist_lists, viewer.move_track);
+                    viewer.move_track = -1;
+                    gui_synclist_draw(&playlist_lists);
+                }
+                else
+                    exit = true;
                 break;
+            }
             case ACTION_STD_OK:
             {
                 struct playlist_entry * current_track =
