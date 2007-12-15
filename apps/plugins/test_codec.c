@@ -514,7 +514,7 @@ static enum plugin_status test_track(char* filename)
 {
     size_t n;
     int fd;
-    enum plugin_status res = PLUGIN_OK;
+    enum plugin_status res = PLUGIN_ERROR;
     unsigned long starttick;
     unsigned long ticks;
     unsigned long speed;
@@ -538,7 +538,7 @@ static enum plugin_status test_track(char* filename)
     if (fd < 0)
     {
         log_text("Cannot open file",true);
-        return PLUGIN_ERROR;
+        goto exit;
     }
 
     track.filesize = rb->filesize(fd);
@@ -549,13 +549,13 @@ static enum plugin_status test_track(char* filename)
     if (!rb->get_metadata(&(track.id3), fd, filename))
     {
         log_text("Cannot read metadata",true);
-        return PLUGIN_ERROR;
+        goto exit;
     }
     
     if (track.filesize > audiosize)
     {
         log_text("File too large",true);
-        return PLUGIN_ERROR;
+        goto exit;
     }
 
     n = rb->read(fd, audiobuf, track.filesize);
@@ -563,7 +563,6 @@ static enum plugin_status test_track(char* filename)
     if (n != track.filesize)
     {
         log_text("Read failed.",true);
-        res = PLUGIN_ERROR;
         goto exit;
     }
 
@@ -606,11 +605,8 @@ static enum plugin_status test_track(char* filename)
 
     log_text(str,true);
     
-    /* Close WAV file (if there was one) */
-    if (wavinfo.fd >= 0) {
-        close_wav();
-        log_text("Wrote /test.wav",true);
-    } else {
+    if (wavinfo.fd < 0) 
+    {
         /* Display benchmark information */
         rb->snprintf(str,sizeof(str),"Decode time - %d.%02ds",(int)ticks/100,(int)ticks%100);
         log_text(str,true);
@@ -628,11 +624,16 @@ static enum plugin_status test_track(char* filename)
         log_text(str,true);
     }
 
-    /* Write an empty line to the log */
-    log_text("",true);
-    rb->backlight_on();
+    res = PLUGIN_OK;
 
 exit:
+    rb->backlight_on();
+
+    if (fd >= 0)
+    {
+        rb->close(fd);
+    }
+
     return res;
 }
 
@@ -761,15 +762,24 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 if (!(entry->attribute & ATTR_DIRECTORY)) {
                     rb->snprintf(filename,sizeof(filename),"%s%s",dirpath,entry->d_name);
                     test_track(filename);
+                    log_text("", true);
                 }
 
                 /* Read next entry */
                 entry = rb->readdir(dir);
             }
+            
+            rb->closedir(dir);
         }
     } else {
         /* Just test the file */
         res = test_track(parameter);
+
+        /* Close WAV file (if there was one) */
+        if (wavinfo.fd >= 0) {
+            close_wav();
+            log_text("Wrote /test.wav",true);
+        }
 
         while (rb->button_get(true) != TESTCODEC_EXITBUTTON);
     }
