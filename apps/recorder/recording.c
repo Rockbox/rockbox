@@ -1896,6 +1896,13 @@ bool recording_screen(bool no_source)
         FOR_NB_SCREENS(i)
             screens[i].update();
 
+#if CONFIG_CODEC == SWCODEC
+        /* stop recording - some players like H10 freeze otherwise
+           TO DO: find out why it freezes and fix properly */
+        rec_command(RECORDING_CMD_STOP);
+        audio_close_recording();
+#endif
+
         audio_error_clear();
 
         while(1)
