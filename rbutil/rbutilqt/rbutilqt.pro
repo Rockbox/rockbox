@@ -12,6 +12,11 @@ UI_DIR = build/ui
 MOC_DIR = build/moc
 RCC_DIR = build/rcc
 
+# add a custom rule for pre-building librbspeex
+rbspeex.commands = @$(MAKE) -C ../../tools/rbspeex librbspeex.a
+QMAKE_EXTRA_TARGETS = rbspeex
+PRE_TARGETDEPS = rbspeex
+
 SOURCES += rbutilqt.cpp \
            main.cpp \
  install.cpp \
