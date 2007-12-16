@@ -25,13 +25,13 @@
 enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     tag_filename, tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_year, 
     tag_discnumber, tag_tracknumber, tag_bitrate, tag_length, tag_playcount, tag_rating,
-    tag_playtime, tag_lastplayed, tag_commitid,
+    tag_playtime, tag_lastplayed, tag_commitid, tag_mtime,
     /* Virtual tags */
     tag_virt_length_min, tag_virt_length_sec,
     tag_virt_playtime_min, tag_virt_playtime_sec,
     tag_virt_entryage, tag_virt_autoscore };
 
-#define TAG_COUNT 19
+#define TAG_COUNT 20
 
 /* Maximum length of a single tag. */
 #define TAG_MAXLEN (MAX_PATH*2)
@@ -43,7 +43,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x5443480b
+#define TAGCACHE_MAGIC  0x5443480c
 
 /* How much to allocate extra space for ramcache. */
 #define TAGCACHE_RESERVE 32768
@@ -72,10 +72,23 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define TAGCACHE_MAX_CLAUSES 32
 
 /* Tag database files. */
+
+/* Temporary database containing new tags to be committed to the main db. */
 #define TAGCACHE_FILE_TEMP       ROCKBOX_DIR "/database_tmp.tcd"
+
+/* Database containing deleted entries with runtime statistics. */
+#define TAGCACHE_FILE_DELETED    ROCKBOX_DIR "/database_del.tcd"
+
+/* The main database master index and numeric data. */
 #define TAGCACHE_FILE_MASTER     ROCKBOX_DIR "/database_idx.tcd"
+
+/* The main database string data. */
 #define TAGCACHE_FILE_INDEX      ROCKBOX_DIR "/database_%d.tcd"
+
+/* ASCII dumpfile of the DB contents. */
 #define TAGCACHE_FILE_CHANGELOG  ROCKBOX_DIR "/database_changelog.txt"
+
+/* Serialized DB. */
 #define TAGCACHE_STATEFILE       ROCKBOX_DIR "/database_state.tcd"
 
 /* Flags */

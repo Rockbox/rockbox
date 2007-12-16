@@ -85,7 +85,6 @@
 #define do_timed_yield() do { } while(0)
 #endif
 
-
 #ifndef __PCTOOL__
 /* Tag Cache thread. */
 static struct event_queue tagcache_queue;
@@ -115,16 +114,18 @@ static const int unique_tags[] = { tag_artist, tag_album, tag_genre,
     tag_composer, tag_comment, tag_albumartist, tag_grouping };
 
 /* Numeric tags (we can use these tags with conditional clauses). */
-static const int numeric_tags[] = { tag_year, tag_discnumber, tag_tracknumber, tag_length,
-    tag_bitrate, tag_playcount, tag_rating, tag_playtime, tag_lastplayed, tag_commitid,
+static const int numeric_tags[] = { tag_year, tag_discnumber, 
+    tag_tracknumber, tag_length, tag_bitrate, tag_playcount, tag_rating,
+    tag_playtime, tag_lastplayed, tag_commitid, tag_mtime,
     tag_virt_length_min, tag_virt_length_sec,
     tag_virt_playtime_min, tag_virt_playtime_sec,
     tag_virt_entryage, tag_virt_autoscore };
 
 /* String presentation of the tags defined in tagcache.h. Must be in correct order! */
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
-    "filename", "composer", "comment", "albumartist", "grouping", "year", "discnumber", "tracknumber",
-    "bitrate", "length", "playcount", "rating", "playtime", "lastplayed", "commitid" };
+    "filename", "composer", "comment", "albumartist", "grouping", "year", 
+    "discnumber", "tracknumber", "bitrate", "length", "playcount", "rating", 
+    "playtime", "lastplayed", "commitid", "mtime" };
 
 /* Status information of the tagcache. */
 static struct tagcache_stat tc_stat;
@@ -188,7 +189,7 @@ struct master_header {
 
 /* For the endianess correction */
 static const char *tagfile_entry_ec   = "ss";
-static const char *index_entry_ec     = "llllllllllllllllllll"; /* (1 + TAG_COUNT) * l */
+static const char *index_entry_ec     = "lllllllllllllllllllll"; /* (1 + TAG_COUNT) * l */
 static const char *tagcache_header_ec = "lll";
 static const char *master_header_ec   = "llllll";
 
@@ -251,6 +252,8 @@ static int processed_dir_count;
 /* Thread safe locking */
 static volatile int write_lock;
 static volatile int read_lock;
+
+static bool delete_entry(long idx_id);
 
 const char* tagcache_tag_to_str(int tag)
 {
@@ -325,6 +328,46 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
         return -2;
     }
 
+    return fd;
+}
+
+static int open_master_fd(struct master_header *hdr, bool write)
+{
+    int fd;
+    int rc;
+    
+    fd = open(TAGCACHE_FILE_MASTER, write ? O_RDWR : O_RDONLY);
+    if (fd < 0)
+    {
+        logf("master file open failed for R/W");
+        tc_stat.ready = false;
+        return fd;
+    }
+    
+    tc_stat.econ = false;
+    
+    /* Check the header. */
+    rc = read(fd, hdr, sizeof(struct master_header));
+    if (hdr->tch.magic == TAGCACHE_MAGIC && rc == sizeof(struct master_header))
+    {
+        /* Success. */
+        return fd;
+    }
+    
+    /* Trying to read again, this time with endianess correction enabled. */
+    lseek(fd, 0, SEEK_SET);
+    
+    rc = ecread(fd, hdr, 1, master_header_ec, true);
+    if (hdr->tch.magic != TAGCACHE_MAGIC || rc != sizeof(struct master_header))
+    {
+        logf("header error");
+        tc_stat.ready = false;
+        close(fd);
+        return -2;
+    }
+
+    tc_stat.econ = true;
+    
     return fd;
 }
 
@@ -521,6 +564,8 @@ bool tagcache_find_index(struct tagcache_search *tcs, const char *filename)
 static bool get_index(int masterfd, int idxid, 
                       struct index_entry *idx, bool use_ram)
 {
+    bool localfd = false;
+    
     if (idxid < 0)
     {
         logf("Incorrect idxid: %d", idxid);
@@ -540,14 +585,30 @@ static bool get_index(int masterfd, int idxid,
     (void)use_ram;
 #endif
     
+    if (masterfd < 0)
+    {
+        struct master_header tcmh;
+        
+        localfd = true;
+        masterfd = open_master_fd(&tcmh, false);
+        if (masterfd < 0)
+            return false;
+    }
+    
     lseek(masterfd, idxid * sizeof(struct index_entry) 
           + sizeof(struct master_header), SEEK_SET);
     if (ecread(masterfd, idx, 1, index_entry_ec, tc_stat.econ) 
         != sizeof(struct index_entry))
     {
         logf("read error #3");
+        if (localfd)
+            close(masterfd);
+        
         return false;
     }
+    
+    if (localfd)
+        close(masterfd);
     
     if (idx->flag & FLAG_DELETED)
         return false;
@@ -1080,46 +1141,6 @@ static void remove_files(void)
 }
 
 
-static int open_master_fd(struct master_header *hdr, bool write)
-{
-    int fd;
-    int rc;
-    
-    fd = open(TAGCACHE_FILE_MASTER, write ? O_RDWR : O_RDONLY);
-    if (fd < 0)
-    {
-        logf("master file open failed for R/W");
-        tc_stat.ready = false;
-        return fd;
-    }
-    
-    tc_stat.econ = false;
-    
-    /* Check the header. */
-    rc = read(fd, hdr, sizeof(struct master_header));
-    if (hdr->tch.magic == TAGCACHE_MAGIC && rc == sizeof(struct master_header))
-    {
-        /* Success. */
-        return fd;
-    }
-    
-    /* Trying to read again, this time with endianess correction enabled. */
-    lseek(fd, 0, SEEK_SET);
-    
-    rc = ecread(fd, hdr, 1, master_header_ec, true);
-    if (hdr->tch.magic != TAGCACHE_MAGIC || rc != sizeof(struct master_header))
-    {
-        logf("header error");
-        tc_stat.ready = false;
-        close(fd);
-        return -2;
-    }
-
-    tc_stat.econ = true;
-    
-    return fd;
-}
-
 static bool check_all_headers(void)
 {
     struct master_header myhdr;
@@ -1602,16 +1623,17 @@ static int check_if_empty(char **tag)
     entry.tag_length[tag] = check_if_empty(data); \
     offset += entry.tag_length[tag]
     
+static void add_tagcache(char *path, unsigned long mtime
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-static void add_tagcache(char *path, const struct dirent *dc)
-#else
-static void add_tagcache(char *path)
+                         ,const struct dirent *dc
 #endif
+                         )
 {
     struct mp3entry id3;
     struct temp_file_entry entry;
     bool ret;
     int fd;
+    int idx_id = -1;
     char tracknumfix[3];
     int offset = 0;
     int path_length = strlen(path);
@@ -1637,16 +1659,40 @@ static void add_tagcache(char *path)
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     if (tc_stat.ramcache && dircache_is_enabled())
     {
-        if (find_entry_ram(path, dc) >= 0)
-            return ;
+        idx_id = find_entry_ram(path, dc);
     }
     else
 #endif
     {
         if (filenametag_fd >= 0)
         {
-            if (find_entry_disk(path) >= 0)
-                return ;
+            idx_id = find_entry_disk(path);
+        }
+    }
+    
+    /* Check if file has been modified. */
+    if (idx_id >= 0)
+    {
+        struct index_entry idx;
+        
+        if (!get_index(-1, idx_id, &idx, true))
+        {
+            logf("failed to retrieve index entry");
+            return ;
+        }
+        
+        if ((unsigned long)idx.tag_seek[tag_mtime] == mtime)
+        {
+            /* No changes to file. */
+            return ;
+        }
+        
+        /* Metadata might have been changed. Delete the entry. */
+        logf("Re-adding: %s", path);
+        if (!delete_entry(idx_id))
+        {
+            logf("delete_entry failed: %d", idx_id);
+            return ;
         }
     }
     
@@ -1706,6 +1752,7 @@ static void add_tagcache(char *path)
     entry.tag_offset[tag_tracknumber] = id3.tracknum;
     entry.tag_offset[tag_length] = id3.length;
     entry.tag_offset[tag_bitrate] = id3.bitrate;
+    entry.tag_offset[tag_mtime] = mtime;
     
     /* String tags. */
     has_albumartist = id3.albumartist != NULL
@@ -3241,7 +3288,8 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
 
 static bool delete_entry(long idx_id)
 {
-    int fd;
+    int fd = -1;
+    /*int dbdel_fd = -1;*/
     int tag, i;
     struct index_entry idx, myidx;
     struct master_header myhdr;
@@ -3259,13 +3307,23 @@ static bool delete_entry(long idx_id)
     if ( (fd = open_master_fd(&myhdr, true) ) < 0)
         return false;
     
+    /*
+     TODO: Implement soon.
+    dbdel_fd = open(TAGCACHE_FILE_DELETED, O_RDWR | O_APPEND | O_CREAT);
+    if (dbdel_fd < 0)
+    {
+        logf("delete_entry(): DBDEL open failed");
+        goto cleanup;
+    }
+    close(dbdel_fd);
+    dbdel_fd = -1;
+    */
     lseek(fd, idx_id * sizeof(struct index_entry), SEEK_CUR);
     if (ecread(fd, &myidx, 1, index_entry_ec, tc_stat.econ)
         != sizeof(struct index_entry))
     {
         logf("delete_entry(): read error");
-        close(fd);
-        return false;
+        goto cleanup;
     }
     
     myidx.flag |= FLAG_DELETED;
@@ -3274,8 +3332,7 @@ static bool delete_entry(long idx_id)
         != sizeof(struct index_entry))
     {
         logf("delete_entry(): write_error");
-        close(fd);
-        return false;
+        goto cleanup;
     }
     
     /* Now check which tags are no longer in use (if any) */
@@ -3298,8 +3355,7 @@ static bool delete_entry(long idx_id)
                 != sizeof(struct index_entry))
             {
                 logf("delete_entry(): read error #2");
-                close(fd);
-                return false;
+                goto cleanup;
             }
             idxp = &idx;
         }
@@ -3318,6 +3374,7 @@ static bool delete_entry(long idx_id)
     }
     
     close(fd);
+    fd = -1;
     
     /* Now delete all tags no longer in use. */
     for (tag = 0; tag < TAG_COUNT; tag++)
@@ -3347,7 +3404,7 @@ static bool delete_entry(long idx_id)
         if (fd < 0)
         {
             logf("open failed");
-            return false;
+            goto cleanup;
         }
         
         /* Skip the header block */
@@ -3368,6 +3425,14 @@ static bool delete_entry(long idx_id)
     }
     
     return true;
+    
+    cleanup:
+    if (fd >= 0)
+        close(fd);
+/*    if (dbdel_fd >= 0)
+        close(dbdel_fd);
+  */  
+    return false;
 }
 
 #ifndef __PCTOOL__
@@ -3846,11 +3911,13 @@ static bool check_dir(const char *dirname)
         else
         {
             tc_stat.curentry = curpath;
+            
+            /* Add a new entry to the temporary db file. */
+            add_tagcache(curpath, (entry->wrtdate << 16) | entry->wrttime
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-            add_tagcache(curpath, dir->internal_entry);
-#else
-            add_tagcache(curpath);
+                         , dir->internal_entry
 #endif
+                         );
             
             /* Wait until current path for debug screen is read and unset. */
             while (tc_stat.syncscreen && tc_stat.curentry != NULL)
