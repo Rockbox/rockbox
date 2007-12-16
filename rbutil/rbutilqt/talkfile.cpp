@@ -37,6 +37,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     if(!m_tts->start())
     {
         m_logger->addItem("Init of TTS engine failed",LOGERROR);
+        m_logger->abort();
         return false;
     }
 
@@ -47,6 +48,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     if(!m_enc->start())
     {
         m_logger->addItem("Init of Encoder engine failed",LOGERROR);
+        m_logger->abort();
         m_tts->stop();
         return false;
     }
@@ -64,6 +66,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         if(m_abort)
         {
             m_logger->addItem("Talk file creation aborted",LOGERROR);
+            m_logger->abort();
             m_tts->stop();
             return false;
         }
@@ -133,6 +136,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
                     m_enc->stop();
                     return false;
                 }
+                QApplication::processEvents();
             }
             m_logger->addItem("Encoding of " + toSpeak,LOGINFO);
             if(!m_enc->encode(wavfilename,filename))
@@ -143,6 +147,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
                 m_enc->stop();
                 return false;
             }
+            QApplication::processEvents();
         }
         
         //! remove the intermedia wav file, if requested
