@@ -857,7 +857,7 @@ int read_pfraw(char* filename)
 
 
 /**
-  Create the slide with it's reflection for the given slide_index and filename
+  Create the slide with its reflection for the given slide_index and filename
   and store it as pfraw in CACHE_PREFIX/[slide_index].pfraw
  */
 bool create_bmp(struct bitmap *input_bmp, char *target_path, bool resize)
@@ -866,17 +866,22 @@ bool create_bmp(struct bitmap *input_bmp, char *target_path, bool resize)
 
     output_bmp.format = input_bmp->format;
     output_bmp.data = (char *)output_bmp_buffer;
-    if ( resize ) { /* resize image and swap buffers */
+
+    if ( resize ) {
+        /* resize image */
         output_bmp.width = config.avg_album_width;
         output_bmp.height = config.avg_album_width;
         simple_resize_bitmap(input_bmp, &output_bmp);
-        input_bmp->data = output_bmp.data;
+
+        /* Resized bitmap is now in the output buffer,
+           copy it back to the input buffer */
+        rb->memcpy(input_bmp_buffer, output_bmp_buffer,
+                   config.avg_album_width * config.avg_album_width * sizeof(fb_data));
+        input_bmp->data = (char *)input_bmp_buffer;
         input_bmp->width = output_bmp.width;
         input_bmp->height = output_bmp.height;
-        output_bmp.data = (char *)input_bmp_buffer;
-        output_bmp.width = input_bmp->width * 2;
-        output_bmp.height = input_bmp->height;
     }
+
     output_bmp.width = input_bmp->width * 2;
     output_bmp.height = input_bmp->height;
 
