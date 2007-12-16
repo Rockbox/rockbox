@@ -242,7 +242,7 @@ void RbUtilQt::about()
 
 void RbUtilQt::help()
 {
-    QUrl helpurl("http://www.rockbox.org/wiki/RockboxUtilityQt");
+    QUrl helpurl("http://www.rockbox.org/wiki/RockboxUtility");
     QDesktopServices::openUrl(helpurl);
 }
 
