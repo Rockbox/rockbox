@@ -46,6 +46,10 @@ const struct button_mapping *plugin_contexts[]
  || (CONFIG_KEYPAD == IPOD_3G_PAD) \
  || (CONFIG_KEYPAD == IPOD_4G_PAD) \
  || (CONFIG_KEYPAD == SANSA_E200_PAD)
+#define SCROLLWHEEL
+#endif
+
+#ifdef SCROLLWHEEL
 #define PICTUREFLOW_NEXT_ALBUM          PLA_UP
 #define PICTUREFLOW_NEXT_ALBUM_REPEAT   PLA_UP_REPEAT
 #define PICTUREFLOW_PREV_ALBUM          PLA_DOWN
@@ -55,6 +59,10 @@ const struct button_mapping *plugin_contexts[]
 #define PICTUREFLOW_NEXT_ALBUM_REPEAT   PLA_RIGHT_REPEAT
 #define PICTUREFLOW_PREV_ALBUM          PLA_LEFT
 #define PICTUREFLOW_PREV_ALBUM_REPEAT   PLA_LEFT_REPEAT
+#define PICTUREFLOW_NEXT_TRACK          PLA_DOWN
+#define PICTUREFLOW_NEXT_TRACK_REPEAT   PLA_DOWN_REPEAT
+#define PICTUREFLOW_PREV_TRACK          PLA_UP
+#define PICTUREFLOW_PREV_TRACK_REPEAT   PLA_UP_REPEAT
 #endif
 #define PICTUREFLOW_MENU                PLA_MENU
 #define PICTUREFLOW_QUIT                PLA_QUIT
@@ -105,6 +113,10 @@ const struct button_mapping *plugin_contexts[]
 #define MAX_ALBUMS 1024
 #define AVG_ALBUM_NAME_LENGTH 20
 
+#define MAX_TRACKS 50
+#define AVG_TRACK_NAME_LENGTH 20
+
+
 #define UNIQBUF_SIZE (64*1024)
 
 #define EMPTY_SLIDE CACHE_PREFIX "/emptyslide.pfraw"
@@ -122,6 +134,7 @@ struct slide_data {
     int angle;
     PFreal cx;
     PFreal cy;
+    PFreal distance;
 };
 
 struct slide_cache {
@@ -131,6 +144,11 @@ struct slide_cache {
 };
 
 struct album_data {
+    int name_idx;
+    long seek;
+};
+
+struct track_data {
     int name_idx;
     long seek;
 };
@@ -162,13 +180,13 @@ struct config_data {
     int spacing_between_slides;
     int extra_spacing_for_center_slide;
     int show_slides;
+    int zoom;
 };
 
 /** below we allocate the memory we want to use **/
 
 static fb_data *buffer; /* for now it always points to the lcd framebuffer */
 static PFreal rays[BUFFER_WIDTH];
-static bool animation_is_active; /* an animation is currently running */
 static struct slide_data center_slide;
 static struct slide_data left_slides[MAX_SLIDES_COUNT];
 static struct slide_data right_slides[MAX_SLIDES_COUNT];
@@ -178,7 +196,6 @@ static int target;
 static int fade;
 static int center_index; /* index of the slide that is in the center */
 static int itilt;
-static int zoom;
 static PFreal offsetX;
 static PFreal offsetY;
 static bool show_fps; /* show fps in the main screen */
@@ -207,161 +224,74 @@ static struct album_data album[MAX_ALBUMS];
 static char album_names[MAX_ALBUMS*AVG_ALBUM_NAME_LENGTH];
 static int album_count;
 
+static char track_names[MAX_TRACKS * AVG_TRACK_NAME_LENGTH];
+static struct track_data tracks[MAX_TRACKS];
+static int track_count;
+static int track_index;
+static int selected_track;
+static int selected_track_pulse;
+
 static fb_data *input_bmp_buffer;
 static fb_data *output_bmp_buffer;
 static int input_hid;
 static int output_hid;
 static struct config_data config;
 
+static int old_drawmode;
+
 static bool thread_is_running;
 
+static int cover_animation_keyframe;
+static int extra_fade;
 
-PFreal sinTable[] = { /* 10 */
-    3,      9,     15,     21,     28,     34,     40,     47,
-    53,     59,     65,     72,     78,     84,     90,     97,
-    103,    109,    115,    122,    128,    134,    140,    147,
-    153,    159,    165,    171,    178,    184,    190,    196,
-    202,    209,    215,    221,    227,    233,    239,    245,
-    251,    257,    264,    270,    276,    282,    288,    294,
-    300,    306,    312,    318,    324,    330,    336,    342,
-    347,    353,    359,    365,    371,    377,    383,    388,
-    394,    400,    406,    412,    417,    423,    429,    434,
-    440,    446,    451,    457,    463,    468,    474,    479,
-    485,    491,    496,    501,    507,    512,    518,    523,
-    529,    534,    539,    545,    550,    555,    561,    566,
-    571,    576,    581,    587,    592,    597,    602,    607,
-    612,    617,    622,    627,    632,    637,    642,    647,
-    652,    656,    661,    666,    671,    675,    680,    685,
-    690,    694,    699,    703,    708,    712,    717,    721,
-    726,    730,    735,    739,    743,    748,    752,    756,
-    760,    765,    769,    773,    777,    781,    785,    789,
-    793,    797,    801,    805,    809,    813,    816,    820,
-    824,    828,    831,    835,    839,    842,    846,    849,
-    853,    856,    860,    863,    866,    870,    873,    876,
-    879,    883,    886,    889,    892,    895,    898,    901,
-    904,    907,    910,    913,    916,    918,    921,    924,
-    927,    929,    932,    934,    937,    939,    942,    944,
-    947,    949,    951,    954,    956,    958,    960,    963,
-    965,    967,    969,    971,    973,    975,    977,    978,
-    980,    982,    984,    986,    987,    989,    990,    992,
-    994,    995,    997,    998,    999,   1001,   1002,   1003,
-    1004,   1006,   1007,   1008,   1009,   1010,   1011,   1012,
-    1013,   1014,   1015,   1015,   1016,   1017,   1018,   1018,
-    1019,   1019,   1020,   1020,   1021,   1021,   1022,   1022,
-    1022,   1023,   1023,   1023,   1023,   1023,   1023,   1023,
-    1023,   1023,   1023,   1023,   1023,   1023,   1023,   1022,
-    1022,   1022,   1021,   1021,   1020,   1020,   1019,   1019,
-    1018,   1018,   1017,   1016,   1015,   1015,   1014,   1013,
-    1012,   1011,   1010,   1009,   1008,   1007,   1006,   1004,
-    1003,   1002,   1001,    999,    998,    997,    995,    994,
-    992,    990,    989,    987,    986,    984,    982,    980,
-    978,    977,    975,    973,    971,    969,    967,    965,
-    963,    960,    958,    956,    954,    951,    949,    947,
-    944,    942,    939,    937,    934,    932,    929,    927,
-    924,    921,    918,    916,    913,    910,    907,    904,
-    901,    898,    895,    892,    889,    886,    883,    879,
-    876,    873,    870,    866,    863,    860,    856,    853,
-    849,    846,    842,    839,    835,    831,    828,    824,
-    820,    816,    813,    809,    805,    801,    797,    793,
-    789,    785,    781,    777,    773,    769,    765,    760,
-    756,    752,    748,    743,    739,    735,    730,    726,
-    721,    717,    712,    708,    703,    699,    694,    690,
-    685,    680,    675,    671,    666,    661,    656,    652,
-    647,    642,    637,    632,    627,    622,    617,    612,
-    607,    602,    597,    592,    587,    581,    576,    571,
-    566,    561,    555,    550,    545,    539,    534,    529,
-    523,    518,    512,    507,    501,    496,    491,    485,
-    479,    474,    468,    463,    457,    451,    446,    440,
-    434,    429,    423,    417,    412,    406,    400,    394,
-    388,    383,    377,    371,    365,    359,    353,    347,
-    342,    336,    330,    324,    318,    312,    306,    300,
-    294,    288,    282,    276,    270,    264,    257,    251,
-    245,    239,    233,    227,    221,    215,    209,    202,
-    196,    190,    184,    178,    171,    165,    159,    153,
-    147,    140,    134,    128,    122,    115,    109,    103,
-    97,     90,     84,     78,     72,     65,     59,     53,
-    47,     40,     34,     28,     21,     15,      9,      3,
-    -4,    -10,    -16,    -22,    -29,    -35,    -41,    -48,
-    -54,    -60,    -66,    -73,    -79,    -85,    -91,    -98,
-    -104,   -110,   -116,   -123,   -129,   -135,   -141,   -148,
-    -154,   -160,   -166,   -172,   -179,   -185,   -191,   -197,
-    -203,   -210,   -216,   -222,   -228,   -234,   -240,   -246,
-    -252,   -258,   -265,   -271,   -277,   -283,   -289,   -295,
-    -301,   -307,   -313,   -319,   -325,   -331,   -337,   -343,
-    -348,   -354,   -360,   -366,   -372,   -378,   -384,   -389,
-    -395,   -401,   -407,   -413,   -418,   -424,   -430,   -435,
-    -441,   -447,   -452,   -458,   -464,   -469,   -475,   -480,
-    -486,   -492,   -497,   -502,   -508,   -513,   -519,   -524,
-    -530,   -535,   -540,   -546,   -551,   -556,   -562,   -567,
-    -572,   -577,   -582,   -588,   -593,   -598,   -603,   -608,
-    -613,   -618,   -623,   -628,   -633,   -638,   -643,   -648,
-    -653,   -657,   -662,   -667,   -672,   -676,   -681,   -686,
-    -691,   -695,   -700,   -704,   -709,   -713,   -718,   -722,
-    -727,   -731,   -736,   -740,   -744,   -749,   -753,   -757,
-    -761,   -766,   -770,   -774,   -778,   -782,   -786,   -790,
-    -794,   -798,   -802,   -806,   -810,   -814,   -817,   -821,
-    -825,   -829,   -832,   -836,   -840,   -843,   -847,   -850,
-    -854,   -857,   -861,   -864,   -867,   -871,   -874,   -877,
-    -880,   -884,   -887,   -890,   -893,   -896,   -899,   -902,
-    -905,   -908,   -911,   -914,   -917,   -919,   -922,   -925,
-    -928,   -930,   -933,   -935,   -938,   -940,   -943,   -945,
-    -948,   -950,   -952,   -955,   -957,   -959,   -961,   -964,
-    -966,   -968,   -970,   -972,   -974,   -976,   -978,   -979,
-    -981,   -983,   -985,   -987,   -988,   -990,   -991,   -993,
-    -995,   -996,   -998,   -999,  -1000,  -1002,  -1003,  -1004,
-    -1005,  -1007,  -1008,  -1009,  -1010,  -1011,  -1012,  -1013,
-    -1014,  -1015,  -1016,  -1016,  -1017,  -1018,  -1019,  -1019,
-    -1020,  -1020,  -1021,  -1021,  -1022,  -1022,  -1023,  -1023,
-    -1023,  -1024,  -1024,  -1024,  -1024,  -1024,  -1024,  -1024,
-    -1024,  -1024,  -1024,  -1024,  -1024,  -1024,  -1024,  -1023,
-    -1023,  -1023,  -1022,  -1022,  -1021,  -1021,  -1020,  -1020,
-    -1019,  -1019,  -1018,  -1017,  -1016,  -1016,  -1015,  -1014,
-    -1013,  -1012,  -1011,  -1010,  -1009,  -1008,  -1007,  -1005,
-    -1004,  -1003,  -1002,  -1000,   -999,   -998,   -996,   -995,
-    -993,   -991,   -990,   -988,   -987,   -985,   -983,   -981,
-    -979,   -978,   -976,   -974,   -972,   -970,   -968,   -966,
-    -964,   -961,   -959,   -957,   -955,   -952,   -950,   -948,
-    -945,   -943,   -940,   -938,   -935,   -933,   -930,   -928,
-    -925,   -922,   -919,   -917,   -914,   -911,   -908,   -905,
-    -902,   -899,   -896,   -893,   -890,   -887,   -884,   -880,
-    -877,   -874,   -871,   -867,   -864,   -861,   -857,   -854,
-    -850,   -847,   -843,   -840,   -836,   -832,   -829,   -825,
-    -821,   -817,   -814,   -810,   -806,   -802,   -798,   -794,
-    -790,   -786,   -782,   -778,   -774,   -770,   -766,   -761,
-    -757,   -753,   -749,   -744,   -740,   -736,   -731,   -727,
-    -722,   -718,   -713,   -709,   -704,   -700,   -695,   -691,
-    -686,   -681,   -676,   -672,   -667,   -662,   -657,   -653,
-    -648,   -643,   -638,   -633,   -628,   -623,   -618,   -613,
-    -608,   -603,   -598,   -593,   -588,   -582,   -577,   -572,
-    -567,   -562,   -556,   -551,   -546,   -540,   -535,   -530,
-    -524,   -519,   -513,   -508,   -502,   -497,   -492,   -486,
-    -480,   -475,   -469,   -464,   -458,   -452,   -447,   -441,
-    -435,   -430,   -424,   -418,   -413,   -407,   -401,   -395,
-    -389,   -384,   -378,   -372,   -366,   -360,   -354,   -348,
-    -343,   -337,   -331,   -325,   -319,   -313,   -307,   -301,
-    -295,   -289,   -283,   -277,   -271,   -265,   -258,   -252,
-    -246,   -240,   -234,   -228,   -222,   -216,   -210,   -203,
-    -197,   -191,   -185,   -179,   -172,   -166,   -160,   -154,
-    -148,   -141,   -135,   -129,   -123,   -116,   -110,   -104,
-    -98,    -91,    -85,    -79,    -73,    -66,    -60,    -54,
-    -48,    -41,    -35,    -29,    -22,    -16,    -10,     -4,
+static int albumtxt_x = 0;
+static int albumtxt_dir = -1;
+static int prev_center_index = -1;
+
+static int start_index_track_list = 0;
+static int track_list_visible_entries = 0;
+static int track_scroll_index = 0;
+static int track_scroll_dir = 1;
+
+/*
+    Proposals for transitions:
+
+    pf_idle -> pf_scrolling : NEXT_ALBUM/PREV_ALBUM pressed
+            -> pf_cover_in -> pf_show_tracks : SELECT_ALBUM clicked
+
+    pf_scrolling -> pf_idle : NEXT_ALBUM/PREV_ALBUM released
+
+    pf_show_tracks -> pf_cover_out -> pf_idle : SELECT_ALBUM pressed
+
+    TODO:
+    pf_show_tracks -> pf_cover_out -> pf_idle : MENU_PRESSED pressed
+    pf_show_tracks -> play_track() -> exit() : SELECT_ALBUM pressed
+
+    pf_idle, pf_scrolling -> show_menu(): MENU_PRESSED
+*/
+enum pf_states {
+    pf_idle = 0,
+    pf_scrolling,
+    pf_cover_in,
+    pf_show_tracks,
+    pf_cover_out
 };
 
+static int pf_state;
 
 /** code */
-
 
 bool create_bmp(struct bitmap* input_bmp, char *target_path, bool resize);
 int load_surface(int);
 
+static inline PFreal fmul(PFreal a, PFreal b)
+{
+    return (a*b) >> PFREAL_SHIFT;
+}
+
 /* There are some precision issues when not using (long long) which in turn
    takes very long to compute... I guess the best solution would be to optimize
    the computations so it only requires a single long */
-static inline PFreal fmul(PFreal a, PFreal b)
-{
-    return ((long long) (a)) * ((long long) (b)) >> PFREAL_SHIFT;
-}
-
 static inline PFreal fdiv(PFreal num, PFreal den)
 {
     long long p = (long long) (num) << (PFREAL_SHIFT * 2);
@@ -394,20 +324,36 @@ static inline PFreal fdiv(PFreal n, PFreal m)
 }
 #endif
 
+/* warning: regenerate the table if IANGLE_MAX and PFREAL_SHIFT are changed! */
+static const PFreal sin_tab[] = {
+    3,    103,    202,    300,    394,    485,    571,    652,
+    726,    793,    853,    904,    947,    980,   1004,   1019,
+    1023,   1018,   1003,    978,    944,    901,    849,    789,
+    721,    647,    566,    479,    388,    294,    196,     97,
+    -4,   -104,   -203,   -301,   -395,   -486,   -572,   -653,
+    -727,   -794,   -854,   -905,   -948,   -981,  -1005,  -1020,
+    -1024,  -1019,  -1004,   -979,   -945,   -902,   -850,   -790,
+    -722,   -648,   -567,   -480,   -389,   -295,   -197,    -98,
+    3
+};
 
-inline PFreal fsin(int iangle)
+static inline PFreal fsin(int iangle)
 {
-    while (iangle < 0)
+    while(iangle < 0)
         iangle += IANGLE_MAX;
-    return sinTable[iangle & IANGLE_MASK];
+    iangle &= IANGLE_MASK;
+
+    int i = (iangle >> 4);
+    PFreal p = sin_tab[i];
+    PFreal q = sin_tab[(i+1)];
+    PFreal g = (q - p);
+    return p + g * (iangle-i*16)/16;
 }
 
-inline PFreal fcos(int iangle)
+static inline PFreal fcos(int iangle)
 {
-    /* quarter phase shift */
     return fsin(iangle + (IANGLE_MAX >> 2));
 }
-
 
 /**
   Create an index of all albums from the database.
@@ -444,9 +390,66 @@ int create_album_index(void)
 /**
  Return a pointer to the album name of the given slide_index
  */
-char* get_album_name(int slide_index)
+char* get_album_name(const int slide_index)
 {
     return album_names + album[slide_index].name_idx;
+}
+
+/**
+ Return a pointer to the track name of the active album
+ create_track_index has to be called first.
+ */
+char* get_track_name(const int track_index)
+{
+    if ( track_index < track_count )
+        return track_names + tracks[track_index].name_idx;
+    return 0;
+}
+
+/**
+  Create the track index of the given slide_index.
+ */
+int create_track_index(const int slide_index)
+{
+    if ( slide_index == track_index ) {
+        return -1;
+    }
+
+    if (!rb->tagcache_search(&tcs, tag_title))
+        return -1;
+
+    int ret = 0;
+
+    rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
+    track_count=0;
+    int l, old_l = 0;
+    tracks[0].name_idx = 0;
+
+    while (rb->tagcache_get_next(&tcs) && track_count  < MAX_TRACKS)
+    {
+        l = rb->strlen(tcs.result) + 1;
+        if ( track_count > 0 )
+            tracks[track_count].name_idx = tracks[track_count-1].name_idx + old_l;
+
+        if ( (tracks[track_count].name_idx + l) > MAX_TRACKS * AVG_TRACK_NAME_LENGTH )
+        {
+            /* not enough memory */
+            ret = ERROR_BUFFER_FULL;
+            break;
+        }
+        rb->strcpy(track_names + tracks[track_count].name_idx, tcs.result);
+        tracks[track_count].seek = tcs.result_seek;
+        old_l = l;
+        track_count++;
+    }
+
+    rb->tagcache_search_finish(&tcs);
+    track_index = slide_index;
+
+    if (ret != 0)
+        return ret;
+    else
+        return (track_count > 0) ? 0 : -1;
 }
 
 
@@ -456,7 +459,7 @@ char* get_album_name(int slide_index)
   The algorithm looks for the first track of the given album uses
   find_albumart to find the filename.
  */
-bool get_albumart_for_index_from_db(int slide_index, char *buf, int buflen)
+bool get_albumart_for_index_from_db(const int slide_index, char *buf, int buflen)
 {
     if ( slide_index == -1 )
     {
@@ -473,7 +476,8 @@ bool get_albumart_for_index_from_db(int slide_index, char *buf, int buflen)
     if ( rb->tagcache_get_next(&tcs) ) {
         struct mp3entry id3;
         char size[9];
-        rb->snprintf(size, sizeof(size), ".%dx%d", PREFERRED_IMG_WIDTH, PREFERRED_IMG_HEIGHT);
+        rb->snprintf(size, sizeof(size), ".%dx%d", PREFERRED_IMG_WIDTH,
+                     PREFERRED_IMG_HEIGHT);
         rb->strncpy( (char*)&id3.path, tcs.result, MAX_PATH );
         id3.album = get_album_name(slide_index);
         if ( rb->search_albumart_files(&id3, size, buf, buflen) )
@@ -536,6 +540,9 @@ void draw_progressbar(int step)
     rb->yield();
 }
 
+/**
+  Allocate temporary buffers
+ */
 bool allocate_buffers(void)
 {
     int input_size = MAX_IMG_WIDTH * MAX_IMG_HEIGHT * sizeof( fb_data );
@@ -566,6 +573,9 @@ bool allocate_buffers(void)
 }
 
 
+/**
+  Free the temporary buffers
+ */
 bool free_buffers(void)
 {
     rb->bufclose(input_hid);
@@ -586,6 +596,7 @@ bool create_albumart_cache(bool force)
     int i, slides = 0;
     struct bitmap input_bmp;
 
+    config.avg_album_width = 0;
     for (i=0; i < album_count; i++)
     {
         draw_progressbar(i);
@@ -597,18 +608,22 @@ bool create_albumart_cache(bool force)
                                 sizeof(fb_data)*MAX_IMG_WIDTH*MAX_IMG_HEIGHT,
                                 FORMAT_NATIVE);
         if (ret <= 0) {
-            rb->splash(HZ, "couldn't read bmp");
+            rb->splash(HZ, "Could not read bmp");
             continue; /* skip missing/broken files */
         }
 
 
         rb->snprintf(tmp_path_name, sizeof(tmp_path_name), CACHE_PREFIX "/%d.pfraw", i);
         if (!create_bmp(&input_bmp, tmp_path_name, false)) {
-            rb->splash(HZ, "couldn't write bmp");
+            rb->splash(HZ, "Could not write bmp");
         }
         config.avg_album_width += input_bmp.width;
         slides++;
         if ( rb->button_get(false) == PICTUREFLOW_MENU ) return false;
+    }
+    if ( slides == 0 ) {
+        rb->splash(2*HZ, "No albums found");
+        return false;
     }
     config.avg_album_width /= slides;
     if ( config.avg_album_width == 0 ) {
@@ -624,7 +639,7 @@ bool create_albumart_cache(bool force)
    Return the index on the stack of slide_index.
    Return -1 if slide_index is not on the stack.
  */
-int slide_stack_get_index(int slide_index)
+static inline int slide_stack_get_index(const int slide_index)
 {
     int i = slide_cache_stack_index + 1;
     while (i--) {
@@ -639,7 +654,7 @@ int slide_stack_get_index(int slide_index)
    slide_index as high as possible (so second if center_index is
    on the stack).
  */
-void slide_stack_push(int slide_index)
+void slide_stack_push(const int slide_index)
 {
     rb->mutex_lock(&slide_cache_stack_lock);
 
@@ -701,7 +716,7 @@ void slide_stack_push(int slide_index)
 /**
   Pop the topmost item from the stack and decrease the stack size
  */
-inline int slide_stack_pop(void)
+static inline int slide_stack_pop(void)
 {
     rb->mutex_lock(&slide_cache_stack_lock);
     int result;
@@ -716,9 +731,10 @@ inline int slide_stack_pop(void)
 
 /**
   Load the slide into the cache.
-  Thus we have to queue the loading request in our thread while discarding the oldest slide.
+  Thus we have to queue the loading request in our thread while discarding the
+  oldest slide.
  */
-void request_surface(int slide_index)
+static inline void request_surface(const int slide_index)
 {
     slide_stack_push(slide_index);
     rb->queue_post(&thread_q, EV_WAKEUP, 0);
@@ -919,9 +935,11 @@ bool create_bmp(struct bitmap *input_bmp, char *target_path, bool resize)
 /**
   Load the surface for the given slide_index into the cache at cache_index.
  */
-static bool load_and_prepare_surface(int slide_index, int cache_index)
+static inline bool load_and_prepare_surface(const int slide_index,
+                                            const int cache_index)
 {
-    rb->snprintf(tmp_path_name, sizeof(tmp_path_name), CACHE_PREFIX "/%d.pfraw", slide_index);
+    rb->snprintf(tmp_path_name, sizeof(tmp_path_name), CACHE_PREFIX "/%d.pfraw",
+                 slide_index);
 
     int hid = read_pfraw(tmp_path_name);
     if (hid < 0)
@@ -942,7 +960,7 @@ static bool load_and_prepare_surface(int slide_index, int cache_index)
  Load the surface from a bmp and overwrite the oldest slide in the cache
  if necessary.
  */
-int load_surface(int slide_index)
+int load_surface(const int slide_index)
 {
     long oldest_tick = *rb->current_tick;
     int oldest_slide = 0;
@@ -971,7 +989,7 @@ int load_surface(int slide_index)
 /**
   Get a slide from the buffer
  */
-struct bitmap *get_slide(int hid)
+static inline struct bitmap *get_slide(const int hid)
 {
     if (hid < 0)
         return NULL;
@@ -989,7 +1007,7 @@ struct bitmap *get_slide(int hid)
 /**
  Return the requested surface
 */
-struct bitmap *surface(int slide_index)
+static inline struct bitmap *surface(const int slide_index)
 {
     if (slide_index < 0)
         return 0;
@@ -1016,6 +1034,7 @@ void reset_slides(void)
     center_slide.angle = 0;
     center_slide.cx = 0;
     center_slide.cy = 0;
+    center_slide.distance = 0;
     center_slide.slide_index = center_index;
 
     int i;
@@ -1025,6 +1044,7 @@ void reset_slides(void)
         si->cx = -(offsetX + config.spacing_between_slides * i * PFREAL_ONE);
         si->cy = offsetY;
         si->slide_index = center_index - 1 - i;
+        si->distance = 0;
     }
 
     for (i = 0; i < config.show_slides; i++) {
@@ -1033,6 +1053,7 @@ void reset_slides(void)
         si->cx = offsetX + config.spacing_between_slides * i * PFREAL_ONE;
         si->cy = offsetY;
         si->slide_index = center_index + 1 + i;
+        si->distance = 0;
     }
 }
 
@@ -1063,10 +1084,32 @@ void recalc_table(void)
 
 
 /**
+   Fade the given color by spreading the fb_data (ushort)
+   to an uint, multiply and compress the result back to a ushort.
+ */
+#if (LCD_PIXELFORMAT == RGB565SWAPPED)
+static inline fb_data fade_color(fb_data c, unsigned int a)
+{
+    c = swap16(c);
+    unsigned int p = ((((c|(c<<16)) & 0x07e0f81f) * a) >> 5) & 0x07e0f81f;
+    return swap16( (fb_data) (p | ( p >> 16 )) );
+}
+#else
+static inline fb_data fade_color(fb_data c, unsigned int a)
+{
+    unsigned int p = ((((c|(c<<16)) & 0x07e0f81f) * a) >> 5) & 0x07e0f81f;
+    return (p | ( p >> 16 ));
+}
+#endif
+
+
+
+
+/**
   Render a single slide
 */
 void render_slide(struct slide_data *slide, struct rect *result_rect,
-                  int alpha, int col1, int col2)
+                  const int alpha, int col1, int col2)
 {
     rb->memset(result_rect, 0, sizeof(struct rect));
     struct bitmap *bmp = surface(slide->slide_index);
@@ -1075,11 +1118,11 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
     }
     fb_data *src = (fb_data *)bmp->data;
 
-    int sw = bmp->height;
-    int sh = bmp->width;
+    const int sw = bmp->height;
+    const int sh = bmp->width;
 
-    int h = LCD_HEIGHT;
-    int w = LCD_WIDTH;
+    const int h = LCD_HEIGHT;
+    const int w = LCD_WIDTH;
 
     if (col1 > col2) {
         int c = col2;
@@ -1092,13 +1135,15 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
     col1 = fmin(col1, w - 1);
     col2 = fmin(col2, w - 1);
 
-    int distance = h * 100 / zoom;
+    int distance = (h + slide->distance) * 100 / config.zoom;
+    if (distance < 100 ) distance = 100; /* clamp distances */
     PFreal sdx = fcos(slide->angle);
     PFreal sdy = fsin(slide->angle);
     PFreal xs = slide->cx - bmp->width * sdx / 4;
     PFreal ys = slide->cy - bmp->width * sdy / 4;
     PFreal dist = distance * PFREAL_ONE;
 
+    const int alpha4 = alpha >> 3;
 
     int xi = fmax((PFreal) 0,
                   ((w * PFREAL_ONE / 2) +
@@ -1128,7 +1173,7 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
 
         PFreal hitdist = fdiv(hitx - slide->cx, sdx);
 
-        int column = sw / 2 + (hitdist >> PFREAL_SHIFT);
+        const int column = (sw >> 1) + (hitdist >> PFREAL_SHIFT);
         if (column >= sw)
             break;
 
@@ -1140,19 +1185,19 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
             result_rect->left = x;
         flag = true;
 
-        int y1 = h / 2;
+        int y1 = (h >> 1);
         int y2 = y1 + 1;
         fb_data *pixel1 = &buffer[y1 * BUFFER_WIDTH + x];
         fb_data *pixel2 = &buffer[y2 * BUFFER_WIDTH + x];
-        int pixelstep = pixel2 - pixel1;
+        const int pixelstep = pixel2 - pixel1;
 
-        int center = (sh / 2);
+        int center = (sh >> 1);
         int dy = dist / h;
-        int p1 = center * PFREAL_ONE - dy / 2;
-        int p2 = center * PFREAL_ONE + dy / 2;
-
+        int p1 = center * PFREAL_ONE - (dy >> 2);
+        int p2 = center * PFREAL_ONE + (dy >> 2);
 
         const fb_data *ptr = &src[column * bmp->width];
+
         if (alpha == 256)
             while ((y1 >= 0) && (y2 < h) && (p1 >= 0)) {
                 *pixel1 = ptr[p1 >> PFREAL_SHIFT];
@@ -1165,18 +1210,8 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
                 pixel2 += pixelstep;
         } else
             while ((y1 >= 0) && (y2 < h) && (p1 >= 0)) {
-                fb_data c1 = ptr[p1 >> PFREAL_SHIFT];
-                fb_data c2 = ptr[p2 >> PFREAL_SHIFT];
-
-                int r1 = RGB_UNPACK_RED(c1) * alpha / 256;
-                int g1 = RGB_UNPACK_GREEN(c1) * alpha / 256;
-                int b1 = RGB_UNPACK_BLUE(c1) * alpha / 256;
-                int r2 = RGB_UNPACK_RED(c2) * alpha / 256;
-                int g2 = RGB_UNPACK_GREEN(c2) * alpha / 256;
-                int b2 = RGB_UNPACK_BLUE(c2) * alpha / 256;
-
-                *pixel1 = LCD_RGBPACK(r1, g1, b1);
-                *pixel2 = LCD_RGBPACK(r2, g2, b2);
+                *pixel1 = fade_color(ptr[p1 >> PFREAL_SHIFT], alpha4);
+                *pixel2 = fade_color(ptr[p2 >> PFREAL_SHIFT], alpha4);
                 p1 -= dy;
                 p2 += dy;
                 y1--;
@@ -1197,7 +1232,7 @@ void render_slide(struct slide_data *slide, struct rect *result_rect,
 /**
   Jump the the given slide_index
  */
-static inline void set_current_slide(int slide_index)
+static inline void set_current_slide(const int slide_index)
 {
     step = 0;
     center_index = fbound(slide_index, 0, number_of_slides - 1);
@@ -1211,10 +1246,8 @@ static inline void set_current_slide(int slide_index)
  */
 void start_animation(void)
 {
-    if (!animation_is_active) {
-        step = (target < center_slide.slide_index) ? -1 : 1;
-        animation_is_active = true;
-    }
+    step = (target < center_slide.slide_index) ? -1 : 1;
+    pf_state = pf_scrolling;
 }
 
 /**
@@ -1222,11 +1255,14 @@ void start_animation(void)
  */
 void show_previous_slide(void)
 {
-    if (step >= 0) {
+    if (step == 0) {
         if (center_index > 0) {
             target = center_index - 1;
             start_animation();
         }
+    } else if ( step > 0 ) {
+        target = center_index;
+        start_animation();
     } else {
         target = fmax(0, center_index - 2);
     }
@@ -1238,11 +1274,14 @@ void show_previous_slide(void)
  */
 void show_next_slide(void)
 {
-    if (step <= 0) {
+    if (step == 0) {
         if (center_index < number_of_slides - 1) {
             target = center_index + 1;
             start_animation();
         }
+    } else if ( step < 0 ) {
+        target = center_index;
+        start_animation();
     } else {
         target = fmin(center_index + 2, number_of_slides - 1);
     }
@@ -1252,7 +1291,7 @@ void show_next_slide(void)
 /**
   Return true if the rect has size 0
 */
-bool is_empty_rect(struct rect *r)
+static inline bool is_empty_rect(struct rect *r)
 {
     return ((r->left == 0) && (r->right == 0) && (r->top == 0)
             && (r->bottom == 0));
@@ -1262,7 +1301,7 @@ bool is_empty_rect(struct rect *r)
 /**
   Render the slides. Updates only the offscreen buffer.
 */
-void render(void)
+void render_all_slides(void)
 {
     rb->lcd_set_background(LCD_RGBPACK(0,0,0));
     rb->lcd_clear_display(); /* TODO: Optimizes this by e.g. invalidating rects */
@@ -1271,6 +1310,7 @@ void render(void)
     int nright = config.show_slides;
 
     struct rect r;
+    r.left = LCD_WIDTH; r.top = 0; r.bottom = 0; r.right = 0;
     render_slide(&center_slide, &r, 256, -1, -1);
 #ifdef DEBUG_DRAW
     rb->lcd_drawrect(r.left, r.top, r.right - r.left, r.bottom - r.top);
@@ -1282,6 +1322,8 @@ void render(void)
         /* no animation, boring plain rendering */
         for (index = 0; index < nleft - 1; index++) {
             int alpha = (index < nleft - 2) ? 256 : 128;
+            alpha -= extra_fade;
+            if (alpha < 0 ) alpha = 0;
             render_slide(&left_slides[index], &r, alpha, 0, c1 - 1);
             if (!is_empty_rect(&r)) {
 #ifdef DEBUG_DRAW
@@ -1292,6 +1334,8 @@ void render(void)
         }
         for (index = 0; index < nright - 1; index++) {
             int alpha = (index < nright - 2) ? 256 : 128;
+            alpha -= extra_fade;
+            if (alpha < 0 ) alpha = 0;
             render_slide(&right_slides[index], &r, alpha, c2 + 1,
                          BUFFER_WIDTH);
             if (!is_empty_rect(&r)) {
@@ -1346,10 +1390,8 @@ void render(void)
 /**
   Updates the animation effect. Call this periodically from a timer.
 */
-void update_animation(void)
+void update_scroll_animation(void)
 {
-    if (!animation_is_active)
-        return;
     if (step == 0)
         return;
 
@@ -1399,7 +1441,7 @@ void update_animation(void)
 
     if (center_index == target) {
         reset_slides();
-        animation_is_active = false;
+        pf_state = pf_idle;
         step = 0;
         fade = 256;
         return;
@@ -1409,7 +1451,8 @@ void update_animation(void)
         struct slide_data *si = &left_slides[i];
         si->angle = itilt;
         si->cx =
-            -(offsetX + config.spacing_between_slides * i * PFREAL_ONE + step * config.spacing_between_slides * ftick);
+            -(offsetX + config.spacing_between_slides * i * PFREAL_ONE + step
+                        * config.spacing_between_slides * ftick);
         si->cy = offsetY;
     }
 
@@ -1417,7 +1460,8 @@ void update_animation(void)
         struct slide_data *si = &right_slides[i];
         si->angle = -itilt;
         si->cx =
-            offsetX + config.spacing_between_slides * i * PFREAL_ONE - step * config.spacing_between_slides * ftick;
+            offsetX + config.spacing_between_slides * i * PFREAL_ONE - step
+                      * config.spacing_between_slides * ftick;
         si->cy = offsetY;
     }
 
@@ -1461,9 +1505,13 @@ void cleanup(void *parameter)
     }
     if ( empty_slide_hid != - 1)
         rb->bufclose(empty_slide_hid);
+    rb->lcd_set_drawmode(old_drawmode);
 }
 
-
+/**
+  Create the "?" slide, that is shown while loading
+  or when no cover was found.
+ */
 int create_empty_slide(bool force)
 {
     if ( force || ! rb->file_exists( EMPTY_SLIDE ) )  {
@@ -1488,7 +1536,9 @@ int create_empty_slide(bool force)
 int settings_menu(void) {
     int selection = 0;
 
-    MENUITEM_STRINGLIST(settings_menu,"PictureFlow Settings",NULL,"Show FPS", "Spacing", "Center margin", "Number of slides", "Rebuild cache");
+    MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL, "Show FPS",
+                        "Spacing", "Center margin", "Number of slides", "Zoom",
+                        "Rebuild cache");
 
     do {
         selection=rb->do_menu(&settings_menu,&selection);
@@ -1498,14 +1548,16 @@ int settings_menu(void) {
                 break;
 
             case 1:
-                rb->set_int("Spacing between slides", "", 1, &(config.spacing_between_slides),
+                rb->set_int("Spacing between slides", "", 1,
+                            &(config.spacing_between_slides),
                             NULL, 1, 0, 100, NULL );
                 recalc_table();
                 reset_slides();
                 break;
 
             case 2:
-                rb->set_int("Center margin", "", 1, &(config.extra_spacing_for_center_slide),
+                rb->set_int("Center margin", "", 1,
+                            &(config.extra_spacing_for_center_slide),
                             NULL, 1, -50, 50, NULL );
                 recalc_table();
                 reset_slides();
@@ -1519,6 +1571,13 @@ int settings_menu(void) {
                 break;
 
             case 4:
+                rb->set_int("Number of slides", "", 1, &(config.zoom),
+                            NULL, 1, 10, 300, NULL );
+                recalc_table();
+                reset_slides();
+                break;
+
+            case 5:
                 rb->remove(CACHE_PREFIX "/ready");
                 rb->remove(EMPTY_SLIDE);
                 rb->splash(HZ, "Cache will be rebuilt on next restart");
@@ -1566,21 +1625,43 @@ int main_menu(void)
     }
 }
 
-bool read_pfconfig(void)
+/**
+  Fill the config struct with some defaults
+ */
+void set_default_config(void)
 {
-    /* defaults */
     config.spacing_between_slides = 40;
     config.extra_spacing_for_center_slide = 0;
     config.show_slides = 3;
+    config.avg_album_width = 0;
+    config.zoom = 100;
+}
+
+/**
+  Read the config file.
+  For now, the size has to match.
+  Later a version number might be appropiate.
+ */
+bool read_pfconfig(void)
+{
+    set_default_config();
+    /* defaults */
     int fh = rb->open( CONFIG_FILE, O_RDONLY );
     if ( fh < 0 ) { /* no config yet */
         return true;
     }
     int ret = rb->read(fh, &config, sizeof(struct config_data));
     rb->close(fh);
-    return ( ret == sizeof(struct config_data) );
+    if ( ret != sizeof(struct config_data) ) {
+        set_default_config();
+        rb->splash(2*HZ, "Config invalid. Using defaults");
+    }
+    return true;
 }
 
+/**
+  Write the config file
+ */
 bool write_pfconfig(void)
 {
     int fh = rb->creat( CONFIG_FILE );
@@ -1589,6 +1670,197 @@ bool write_pfconfig(void)
     rb->close( fh );
     return true;
 }
+
+/**
+   Animation step for zooming into the current cover
+ */
+void update_cover_in_animation(void)
+{
+    cover_animation_keyframe++;
+    if( cover_animation_keyframe < 20 ) {
+        center_slide.distance-=5;
+        center_slide.angle+=1;
+        extra_fade += 13;
+    }
+    else if( cover_animation_keyframe < 35 ) {
+        center_slide.angle+=16;
+    }
+    else {
+        cover_animation_keyframe = 0;
+        selected_track = 0;
+        pf_state = pf_show_tracks;
+    }
+}
+
+/**
+   Animation step for zooming out the current cover
+ */
+void update_cover_out_animation(void)
+{
+    cover_animation_keyframe++;
+    if( cover_animation_keyframe <= 15 ) {
+        center_slide.angle-=16;
+    }
+    else if( cover_animation_keyframe < 35 ) {
+        center_slide.distance+=5;
+        center_slide.angle-=1;
+        extra_fade -= 13;
+    }
+    else {
+        cover_animation_keyframe = 0;
+        pf_state = pf_idle;
+    }
+}
+
+/**
+   Draw a blue gradient at y with height h
+ */
+static inline void draw_gradient(int y, int h)
+{
+    static int r, inc, c;
+    inc = (100 << 8) / h;
+    c = 0;
+    selected_track_pulse = (selected_track_pulse+1) % 10;
+    int c2 = selected_track_pulse - 5;
+    for (r=0; r<h; r++) {
+        rb->lcd_set_foreground(LCD_RGBPACK(c2+80-(c >> 9), c2+100-(c >> 9),
+                                           c2+250-(c >> 8)));
+        rb->lcd_hline(0, LCD_WIDTH, r+y);
+        if ( r > h/2 )
+            c-=inc;
+        else
+            c+=inc;
+    }
+}
+
+
+/**
+    Reset the track list after a album change
+ */
+void reset_track_list(void)
+{
+    int albumtxt_w, albumtxt_h;
+    const char* albumtxt = get_album_name(center_index);
+    rb->lcd_getstringsize(albumtxt, &albumtxt_w, &albumtxt_h);
+    const int height = LCD_HEIGHT-albumtxt_h-10;
+    track_list_visible_entries = fmin( height/albumtxt_h , track_count );
+    start_index_track_list = 0;
+    track_scroll_index = 0;
+    track_scroll_dir = 1;
+    selected_track = 0;
+}
+
+/**
+  Display the list of tracks
+ */
+void show_track_list(void)
+{
+    rb->lcd_clear_display();
+    if ( center_slide.slide_index != track_index ) {
+        create_track_index(center_slide.slide_index);
+        reset_track_list();
+    }
+    static int titletxt_w, titletxt_h, titletxt_y, titletxt_x, i, color;
+    titletxt_y = 0;
+    int track_i;
+    for (i=0; i < track_list_visible_entries; i++) {
+        track_i = i+start_index_track_list;
+        rb->lcd_getstringsize(get_track_name(track_i), &titletxt_w, &titletxt_h);
+        titletxt_x = (LCD_WIDTH-titletxt_w)/2;
+        if ( track_i == selected_track ) {
+            draw_gradient(titletxt_y, titletxt_h);
+            rb->lcd_set_foreground(LCD_RGBPACK(255,255,255));
+            if (titletxt_w > LCD_WIDTH ) {
+                if ( titletxt_w + track_scroll_index <= LCD_WIDTH )
+                    track_scroll_dir = 1;
+                else if ( track_scroll_index >= 0 ) track_scroll_dir = -1;
+                track_scroll_index += track_scroll_dir*2;
+                titletxt_x = track_scroll_index;
+            }
+            rb->lcd_putsxy(titletxt_x,titletxt_y,get_track_name(track_i));
+        }
+        else {
+            color = 250 - (abs(selected_track - track_i) * 200 / track_count);
+            rb->lcd_set_foreground(LCD_RGBPACK(color,color,color));
+            rb->lcd_putsxy(titletxt_x,titletxt_y,get_track_name(track_i));
+        }
+        titletxt_y += titletxt_h;
+    }
+}
+
+void select_next_track(void)
+{
+    if (  selected_track < track_count - 1 ) {
+        selected_track++;
+        track_scroll_index = 0;
+        track_scroll_dir = 1;
+        if (selected_track==(track_list_visible_entries+start_index_track_list))
+            start_index_track_list++;
+    }
+}
+
+void select_prev_track(void)
+{
+    if (selected_track > 0 ) {
+        if (selected_track==start_index_track_list) start_index_track_list--;
+        track_scroll_index = 0;
+        track_scroll_dir = 1;
+        selected_track--;
+    }
+}
+
+/**
+   Draw the current album name
+ */
+void draw_album_text(void)
+{
+    int albumtxt_w, albumtxt_h;
+    int albumtxt_y = 0;
+
+    char *albumtxt;
+    int c;
+    /* Draw album text */
+    if ( pf_state == pf_scrolling ) {
+        c = ((slide_frame & 0xffff )/ 255);
+        if (step < 0) c = 255-c;
+        if (c > 128 ) { /* half way to next slide .. still not perfect! */
+            albumtxt = get_album_name(center_index+step);
+            c = (c-128)*2;
+        }
+        else {
+            albumtxt = get_album_name(center_index);
+            c = (128-c)*2;
+        }
+    }
+    else {
+        c= 255;
+        albumtxt = get_album_name(center_index);
+    }
+
+    rb->lcd_set_foreground(LCD_RGBPACK(c,c,c));
+    rb->lcd_getstringsize(albumtxt, &albumtxt_w, &albumtxt_h);
+    if (center_index != prev_center_index) {
+        albumtxt_x = 0;
+        albumtxt_dir = -1;
+        prev_center_index = center_index;
+    }
+    albumtxt_y = LCD_HEIGHT-albumtxt_h-10;
+
+    if (albumtxt_w > LCD_WIDTH ) {
+        rb->lcd_putsxy(albumtxt_x, albumtxt_y , albumtxt);
+        if ( pf_state == pf_idle || pf_state == pf_show_tracks ) {
+            if ( albumtxt_w + albumtxt_x <= LCD_WIDTH ) albumtxt_dir = 1;
+            else if ( albumtxt_x >= 0 ) albumtxt_dir = -1;
+            albumtxt_x += albumtxt_dir;
+        }
+    }
+    else {
+        rb->lcd_putsxy((LCD_WIDTH - albumtxt_w) /2, albumtxt_y , albumtxt);
+    }
+
+
+}
+
 
 /**
   Main function that also contain the main plasma
@@ -1601,7 +1873,7 @@ int main(void)
 
     if ( ! rb->dir_exists( CACHE_PREFIX ) ) {
         if ( rb->mkdir( CACHE_PREFIX ) < 0 ) {
-            rb->splash(HZ, "Could not create directory");
+            rb->splash(HZ, "Could not create directory " CACHE_PREFIX );
             return PLUGIN_ERROR;
         }
     }
@@ -1657,8 +1929,11 @@ int main(void)
     slide_cache_stack_index = min_slide_cache-1;
     slide_cache_in_use = 0;
     buffer = rb->lcd_framebuffer;
-    animation_is_active = false;
-    zoom = 100;
+
+    pf_state = pf_idle;
+
+    track_index = -1;
+    extra_fade = 0;
     center_index = 0;
     slide_frame = 0;
     step = 0;
@@ -1670,7 +1945,6 @@ int main(void)
     reset_slides();
 
     char fpstxt[10];
-    char *albumtxt;
     int button;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -1681,58 +1955,65 @@ int main(void)
     long current_update;
     long update_interval = 100;
     int fps = 0;
-    int albumtxt_w, albumtxt_h;
-    int albumtxt_x = 0, albumtxt_y = 0;
-    int albumtxt_dir = -1;
-    int c;
-    int prev_center_index = -1;
 
+    bool instant_update;
+    old_drawmode = rb->lcd_get_drawmode();
+    rb->lcd_set_drawmode(DRMODE_FG);
     while (true) {
         current_update = *rb->current_tick;
         frames++;
-        update_animation();
-        render();
 
+        /* Initial rendering */
+        instant_update = false;
+
+        /* Handle states */
+        switch ( pf_state ) {
+            case pf_scrolling:
+                update_scroll_animation();
+                render_all_slides();
+                instant_update = true;
+                break;
+            case pf_cover_in:
+                update_cover_in_animation();
+                render_all_slides();
+                instant_update = true;
+                break;
+            case pf_cover_out:
+                update_cover_out_animation();
+                render_all_slides();
+                instant_update = true;
+                break;
+            case pf_show_tracks:
+                show_track_list();
+                break;
+            case pf_idle:
+                render_all_slides();
+                break;
+        }
+
+        /* Calculate FPS */
         if (current_update - last_update > update_interval) {
             fps = frames * HZ / (current_update - last_update);
             last_update = current_update;
             frames = 0;
         }
 
+        /* Draw FPS */
         if (show_fps) {
             rb->lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
             rb->snprintf(fpstxt, sizeof(fpstxt), "FPS: %d", fps);
             rb->lcd_putsxy(0, 0, fpstxt);
         }
 
-        albumtxt = get_album_name(center_index);
-        if ( animation_is_active ) {
-            c = ((slide_frame & 0xffff )/ 256);
-            if (step > 0) c = 255-c;
-        }
-        else c= 255;
-        rb->lcd_set_foreground(LCD_RGBPACK(c,c,c));
-        rb->lcd_getstringsize(albumtxt, &albumtxt_w, &albumtxt_h);
-        if (center_index != prev_center_index) {
-            albumtxt_x = 0;
-            albumtxt_dir = -1;
-            albumtxt_y = LCD_HEIGHT-albumtxt_h-10;
-            prev_center_index = center_index;
-        }
-        if (albumtxt_w > LCD_WIDTH && ! animation_is_active ) {
-            rb->lcd_putsxy(albumtxt_x, albumtxt_y , albumtxt);
-            if ( albumtxt_w + albumtxt_x <= LCD_WIDTH ) albumtxt_dir = 1;
-            else if ( albumtxt_x >= 0 ) albumtxt_dir = -1;
-            albumtxt_x += albumtxt_dir;
-        }
-        else {
-            rb->lcd_putsxy((LCD_WIDTH - albumtxt_w) /2, albumtxt_y , albumtxt);
-        }
+        draw_album_text();
 
+
+        /* Copy offscreen buffer to LCD and give time to other threads */
         rb->lcd_update();
         rb->yield();
 
-        button = pluginlib_getaction(rb, animation_is_active ? 0 : HZ/16,
+        /*/ Handle buttons */
+        button = pluginlib_getaction(rb, instant_update ? 0 : HZ/16,
                                      plugin_contexts, NB_ACTION_CONTEXTS);
 
         switch (button) {
@@ -1740,19 +2021,56 @@ int main(void)
             return PLUGIN_OK;
 
         case PICTUREFLOW_MENU:
-            ret = main_menu();
-            if ( ret == -1 ) return PLUGIN_OK;
-            if ( ret != 0 ) return i;
+            if ( pf_state == pf_idle || pf_state == pf_scrolling ) {
+                ret = main_menu();
+                if ( ret == -1 ) return PLUGIN_OK;
+                if ( ret != 0 ) return i;
+                rb->lcd_set_drawmode(DRMODE_FG);
+            }
+            else {
+                pf_state = pf_cover_out;
+            }
             break;
 
         case PICTUREFLOW_NEXT_ALBUM:
         case PICTUREFLOW_NEXT_ALBUM_REPEAT:
-            show_next_slide();
+#ifdef SCROLLWHEEL
+            if ( pf_state == pf_show_tracks )
+                select_next_track();
+#endif
+            if ( pf_state == pf_idle || pf_state == pf_scrolling )
+                show_next_slide();
             break;
 
         case PICTUREFLOW_PREV_ALBUM:
         case PICTUREFLOW_PREV_ALBUM_REPEAT:
-            show_previous_slide();
+#ifdef SCROLLWHEEL
+            if ( pf_state == pf_show_tracks )
+                select_prev_track();
+#endif
+            if ( pf_state == pf_idle || pf_state == pf_scrolling )
+                show_previous_slide();
+            break;
+
+#ifndef SCROLLWHEEL
+        case PICTUREFLOW_NEXT_TRACK:
+        case PICTUREFLOW_NEXT_TRACK_REPEAT:
+            if ( pf_state == pf_show_tracks )
+                select_next_track();
+            break;
+
+        case PICTUREFLOW_PREV_TRACK:
+        case PICTUREFLOW_PREV_TRACK_REPEAT:
+            if ( pf_state == pf_show_tracks )
+                select_prev_track();
+            break;
+#endif
+
+        case PICTUREFLOW_SELECT_ALBUM:
+            if ( pf_state == pf_idle )
+                pf_state = pf_cover_in;
+            if ( pf_state == pf_show_tracks )
+                pf_state = pf_cover_out;
             break;
 
         default:
