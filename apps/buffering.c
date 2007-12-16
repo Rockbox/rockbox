@@ -1135,7 +1135,9 @@ ssize_t bufgetdata(int handle_id, size_t size, void **data)
         memcpy(guard_buffer, (unsigned char *)buffer, copy_n);
     }
 
-    *data = &buffer[h->ridx];
+    if (data)
+        *data = &buffer[h->ridx];
+
     return size;
 }
 
@@ -1144,7 +1146,7 @@ ssize_t bufgettail(int handle_id, size_t size, void **data)
     size_t tidx;
 
     const struct memory_handle *h;
-    
+
     h = find_handle(handle_id);
 
     if (!h)
@@ -1172,7 +1174,7 @@ ssize_t bufgettail(int handle_id, size_t size, void **data)
 ssize_t bufcuttail(int handle_id, size_t size)
 {
     struct memory_handle *h;
-    
+
     h = find_handle(handle_id);
 
     if (!h)
