@@ -1,11 +1,11 @@
 % $Id$ %
 
-  Installing the boot loader is the trickiest part of the installation.
-  The Rockbox boot loader allows users to boot into either the Rockbox 
+  Installing the bootloader is the trickiest part of the installation.
+  The Rockbox bootloader allows users to boot into either the Rockbox 
   firmware or the \playerman{} firmware. For legal reasons, we cannot distribute 
-  the boot loader. Instead, we have developed a program that will patch the 
-  Iriver firmware with the Rockbox boot loader. These instructions will explain 
-  how to download and patch the Iriver firmware with the Rockbox boot loader 
+  the bootloader. Instead, we have developed a program that will patch the 
+  Iriver firmware with the Rockbox bootloader. These instructions will explain 
+  how to download and patch the Iriver firmware with the Rockbox bootloader 
   and install it on your jukebox.
 
 
@@ -22,7 +22,7 @@
     your player.}
   \opt{IRIVER_H300_PAD}{1.28K, 1.28EU, 1.28J, 1.29K, 1.29J and 1.30EU.
     \note{The US \playername{} firmware is not supported and cannot be
-    patched to be used with the boot loader. If you wish to install Rockbox
+    patched to be used with the bootloader. If you wish to install Rockbox
     on a US \playername, you must first install a non-US version of the
     original firmware and then install one of the supported versions patched
     with the Rockbox bootloader. 
@@ -53,7 +53,7 @@
   to the \fname{.hex} file that you previously downloaded to your desktop.
   %
   \item Click \setting{Patch}. The firmware patcher will patch the
-    original firmware to include the Rockbox boot loader. The \fname{.hex}
+    original firmware to include the Rockbox bootloader. The \fname{.hex}
     file on your desktop is now a modified version of the original
     \fname{.hex} file.
   %
@@ -68,7 +68,7 @@
     or that it is connected to the power adaptor. Interrupting the next step
     due to a power failure most likely will brick your \dap{}.}
   %
-  \item Update your \daps{} firmware with the patched boot loader. To do this, turn
+  \item Update your \daps{} firmware with the patched bootloader. To do this, turn
     the jukebox on. Press and hold the
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect{} button }%
     to enter the main menu, and navigate to \setting{General $\rightarrow$ Firmware 
@@ -79,24 +79,24 @@
     firmware update is complete the player will turn itself off. (The update
     firmware process usually takes a minute or so.)
     
-    You have now installed the Rockbox boot loader.
+    You have now installed the Rockbox bootloader.
 \end{enumerate}
 
-\note{If you install the Rockbox boot loader but do not install the
-  Rockbox firmware the Rockbox boot loader will load the Iriver firmware when the
+\note{If you install the Rockbox bootloader but do not install the
+  Rockbox firmware the Rockbox bootloader will load the Iriver firmware when the
   jukebox is turned on.
   To load the \playerman{} firmware press and hold \ButtonRec{} before
   powering up the \dap{} until the \playerman{} logo appears.
   }
 
-\note{The boot loader has a built-in ``boot loader USB mode''. This function
+\note{The bootloader has a built-in ``bootloader USB mode''. This function
   switches to USB mode when the \dap{} is connected to a computer upon
   power-up. This way you can access the \daps{} hard disk without the need
   to boot any firmware (which is also useful when your hard disk is 
-  damaged). The screen will simply display the text ``boot loader USB mode''.
-  After you disconnect the \dap{} from USB the boot loader will
-  continue booting Rockbox. As in boot loader USB mode the firmware
+  damaged). The screen will simply display the text ``bootloader USB mode''.
+  After you disconnect the \dap{} from USB the bootloader will
+  continue booting Rockbox. As in bootloader USB mode the firmware
   itself hasn't been loaded this is also a simple way of updating Rockbox.
-  After the disconnect the boot loader will load the updated version of
+  After the disconnect the bootloader will load the updated version of
   Rockbox.
 }

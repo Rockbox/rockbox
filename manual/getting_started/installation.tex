@@ -27,24 +27,24 @@ installation options.
 
 \begin{description}
 \opt{HAVE_RB_BL_ON_DISK}{
-\item[The \playerman{} boot loader.]
-  The \playerman{} boot loader is the program that tells your \dap{} how to boot
+\item[The \playerman{} bootloader.]
+  The \playerman{} bootloader is the program that tells your \dap{} how to boot
   and load the remaining firmware from disk. It is also responsible for the
   disk mode on your \dap{}.
 
-  This boot loader is stored in special flash memory in your \playerman{}.
+  This bootloader is stored in special flash memory in your \playerman{}.
   It is already installed on your \dap{}, so it is never necessary to modify
   this in order to install Rockbox.}
 
-\item[The Rockbox boot loader.] \index{Boot loader}
-  \opt{HAVE_RB_BL_ON_DISK}{The Rockbox boot loader is loaded from disk by
-  the \playerman{} boot loader. It is responsible for loading the Rockbox
+\item[The Rockbox bootloader.] \index{Bootloader}
+  \opt{HAVE_RB_BL_ON_DISK}{The Rockbox bootloader is loaded from disk by
+  the \playerman{} bootloader. It is responsible for loading the Rockbox
   firmware and for providing the dual boot function. It directly replaces the
   \playerman{} firmware on the \daps{} disk.
   \opt{gigabeat}{\note{Dual boot does not currently work on the gigabeat.}}}
 
   \opt{HAVE_RB_BL_IN_FLASH}{
-  The boot loader is the program that tells your
+  The bootloader is the program that tells your
   \dap{} how to boot and load other components of Rockbox. This is the
   component of Rockbox that is installed to the flash memory of your
   \playerman.}
@@ -303,7 +303,7 @@ structure that Rockbox needs.
 }
 
 \opt{SWCODEC}{
-  \subsubsection{Installing the boot loader}
+  \subsubsection{Installing the bootloader}
   \opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
   \opt{ipod}{\input{getting_started/ipod_install.tex}}
   \opt{m5,x5}{\input{getting_started/iaudio_install.tex}}
@@ -413,17 +413,17 @@ completely follow the manual uninstallation instructions below.}}
 \opt{h1xx,h300}{
   \note{
     If you want to remove the Rockbox bootloader, simply flash an unpatched
-    \playerman{} firmware. Be aware that doing so will also remove the boot
-    loader USB mode. As that mode can come in quite handy (especially when
-    having disk errors) it is recommended to keep the boot loader. It also
+    \playerman{} firmware. Be aware that doing so will also remove the bootloader
+    USB mode. As that mode can come in quite handy (especially when
+    having disk errors) it is recommended to keep the bootloader. It also
     gives you the possibility of trying Rockbox anytime later by simply
     installing the distribution files.
     \opt{h1xx}{
-      The Rockbox bootlaoder will automatically start the original firmware if
+      The Rockbox bootloader will automatically start the original firmware if
       the \fname{.rockbox} directory has been deleted.
     }%
     \opt{h300}{%
-      Although if you retain the Rockbox boot loader, you will need to hold the
+      Although if you retain the Rockbox bootloader, you will need to hold the
       \ButtonRec{} button each time you want to start the original firmware.
     }
   }
