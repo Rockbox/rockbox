@@ -1449,11 +1449,11 @@ static char* tsc2100_debug_getname(int selected_item, void * data, char *buffer)
 }
 static int tsc2100debug_action_callback(int action, struct gui_synclist *lists)
 {
-    int *page = (int*)lists->gui_list[SCREEN_MAIN].data;
+    int *page = (int*)lists->data;
     if (action == ACTION_STD_OK)
     {
         *page = (*page+1)%3;
-        snprintf(lists->gui_list[SCREEN_MAIN].title, 32, 
+        snprintf(lists->title, 32, 
                  "tsc2100 registers - Page %d", *page);
         return ACTION_REDRAW;
     }
@@ -1667,10 +1667,10 @@ static bool view_battery(void)
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
     tCardInfo *card;
-    int *cardnum = (int*)lists->gui_list[SCREEN_MAIN].data;
+    int *cardnum = (int*)lists->data;
     unsigned char card_name[7];
     unsigned char pbuf[32];
-    char *title = lists->gui_list[SCREEN_MAIN].title;
+    char *title = lists->title;
     static const unsigned char i_vmin[] = { 0, 1, 5, 10, 25, 35, 60, 100 };
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
     static const unsigned char *kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };

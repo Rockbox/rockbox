@@ -443,7 +443,7 @@ char * openwith_get_name(int selected_item, void * data, char * buffer)
 }
 int openwith_action_callback(int action, struct gui_synclist *lists)
 {
-    struct cb_data *info = (struct cb_data *)lists->gui_list[SCREEN_MAIN].data;
+    struct cb_data *info = (struct cb_data *)lists->data;
     int *items = info->items;
     int i;
     if (action == ACTION_STD_OK)

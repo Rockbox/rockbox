@@ -82,7 +82,7 @@ typedef int list_speak_item(int selected_item, void * data);
 typedef int list_get_color(int selected_item, void * data);
 #endif
 
-struct gui_list
+struct gui_synclist
 {
     /* defines wether the list should stop when reaching the top/bottom
      * or should continue (by going to bottom/top) */
@@ -93,15 +93,15 @@ struct gui_list
 
     int nb_items;
     int selected_item;
-    int start_item; /* the item that is displayed at the top of the screen */
+    int start_item[NB_SCREENS]; /* the item that is displayed at the top of the screen */
     /* the number of lines that are selected at the same time */
     int selected_size;
     /* These are used to calculate how much of the screen content we need
        to redraw. */
     int last_displayed_selected_item;
-    int last_displayed_start_item;
+    int last_displayed_start_item[NB_SCREENS];
 #ifdef HAVE_LCD_BITMAP
-    int offset_position; /* the list's screen scroll placement in pixels */
+    int offset_position[NB_SCREENS]; /* the list's screen scroll placement in pixels */
 #endif
     /* Cache the width of the title string in pixels/characters */
     int title_width;
@@ -111,7 +111,6 @@ struct gui_list
     list_get_name *callback_get_item_name;
     list_speak_item *callback_speak_item;
 
-    struct screen * display;
     /* The data that will be passed to the callback function YOU implement */
     void * data;
     /* The optional title, set to NULL for none */
@@ -195,19 +194,6 @@ extern void gui_list_screen_scroll_out_of_view(bool enable);
 #define gui_list_limit_scroll(gui_list, scroll) \
     (gui_list)->limit_scroll=scroll
 
-/*
- * This part handles as many lists as there are connected screens
- * (the api is similar to the ones above)
- * The lists on the screens are synchronized ;
- * theirs items and selected items are the same, but of course,
- * they can be displayed on screens with different sizes
- * The final aim is to let the programmer handle many lists in one
- * function call and make its code independant from the number of screens
- */
-struct gui_synclist
-{
-    struct gui_list gui_list[NB_SCREENS];
-};
 
 extern void gui_synclist_init(
     struct gui_synclist * lists,
