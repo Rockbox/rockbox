@@ -803,12 +803,13 @@ void gui_synclist_speak_item(struct gui_synclist * lists)
 extern intptr_t get_action_data(void);
 
 #if  defined(HAVE_TOUCHPAD)
-unsigned gui_synclist_do_touchpad(struct gui_synclist * lists)
+/* this needs to be fixed if we ever get more than 1 touchscreen on a target */
+unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list)
 {
-    struct gui_list *gui_list = &(lists->gui_list[SCREEN_MAIN]);
     short x,y;
     unsigned button = action_get_touchpad_press(&x, &y);
     int line;
+    struct screen *display = &screens[SCREEN_MAIN];
     if (button == BUTTON_NONE)
         return ACTION_NONE;
     if (x<SCROLLBAR_WIDTH)
@@ -828,20 +829,19 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * lists)
         {
             int new_selection, nb_lines;
             int height, size;
-            nb_lines = gui_list->display->nb_lines - SHOW_LIST_TITLE;
+            nb_lines = display->nb_lines - SHOW_LIST_TITLE;
             if (nb_lines <  gui_list->nb_items)
             {
-                height = nb_lines * gui_list->display->char_height;
+                height = nb_lines * display->char_height;
                 size = height*nb_lines / gui_list->nb_items;
                 new_selection = (y*(gui_list->nb_items-nb_lines))/(height-size);
-                gui_synclist_select_item(lists, new_selection);
+                gui_synclist_select_item(gui_list, new_selection);
                 nb_lines /= 2;
-                if (new_selection - gui_list->start_item > nb_lines)
+                if (new_selection - gui_list->start_item[SCREEN_MAIN] > nb_lines)
                 {
-                    new_selection = gui_list->start_item+nb_lines;
+                    new_selection = gui_list->start_item[SCREEN_MAIN]+nb_lines;
                 }
-                FOR_NB_SCREENS(line)
-                    lists->gui_list[line].selected_item = new_selection;
+                gui_list->start_item[SCREEN_MAIN] = new_selection;
                 return ACTION_REDRAW;
             }
         }
@@ -853,10 +853,10 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * lists)
             if (global_settings.statusbar)
                 y -= STATUSBAR_HEIGHT;
             if (SHOW_LIST_TITLE)
-                y -= gui_list->display->char_height;
-            line = y / gui_list->display->char_height;
-            if (line != gui_list->selected_item - gui_list->start_item)
-                gui_synclist_select_item(lists, gui_list->start_item+line);
+                y -= display->char_height;
+            line = y / display->char_height;
+            if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN])
+                gui_synclist_select_item(gui_list, gui_list->start_item[SCREEN_MAIN]+line);
             return ACTION_REDRAW;
         }
         /* title or statusbar is cancel */
@@ -869,18 +869,18 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * lists)
         /* title goes up one level */
         if (SHOW_LIST_TITLE)
         {
-            if (y < gui_list->display->char_height)
+            if (y < display->char_height)
                 return ACTION_STD_CANCEL;
-            y -= gui_list->display->char_height;
+            y -= display->char_height;
         }
         /*  pressing an item will select it.
             pressing the selected item will "enter" it */
-        line = y / gui_list->display->char_height;
-        if (line != gui_list->selected_item - gui_list->start_item)
+        line = y / display->char_height;
+        if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN])
         {
-            if (gui_list->start_item+line > gui_list->nb_items)
+            if (gui_list->start_item[SCREEN_MAIN]+line > gui_list->nb_items)
                 return ACTION_NONE;
-            gui_synclist_select_item(lists, gui_list->start_item+line);
+            gui_synclist_select_item(gui_list, gui_list->start_item[SCREEN_MAIN]+line);
         }
         
         if (button == BUTTON_REPEAT)
