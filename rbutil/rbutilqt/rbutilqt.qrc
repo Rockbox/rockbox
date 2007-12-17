@@ -1,7 +1,4 @@
 <RCC>
-    <qresource prefix="/builtin" >
-        <file>builtin/sapi_voice.vbs</file>
-    </qresource>
     <qresource prefix="/docs" >
         <file>CREDITS</file>
         <file>gpl-2.0.html</file>

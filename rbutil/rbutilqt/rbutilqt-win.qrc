@@ -1,0 +1,5 @@
+<RCC>
+    <qresource>
+        <file alias="builtin/sapi_voice.vbs">../../tools/sapi_voice.vbs</file>
+    </qresource>
+</RCC>

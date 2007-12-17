@@ -260,7 +260,7 @@ bool TTSSapi::start()
     m_TTSLanguage =userSettings->value("ttslanguage","").toString();
     userSettings->endGroup();
 
-    QFile::copy(":/builtin/builtin/sapi_voice.vbs",QDir::tempPath() + "/sapi_voice.vbs");
+    QFile::copy(":/builtin/sapi_voice.vbs",QDir::tempPath() + "/sapi_voice.vbs");
     m_TTSexec = QDir::tempPath() +"/sapi_voice.vbs";
     
     QFileInfo tts(m_TTSexec);

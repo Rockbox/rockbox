@@ -118,6 +118,9 @@ FORMS += rbutilqtfrm.ui \
  sapicfgfrm.ui
 
 RESOURCES += rbutilqt.qrc
+win32 {
+    RESOURCES += rbutilqt-win.qrc
+}
 
 TRANSLATIONS += rbutil_de.ts \
  rbutil_fr.ts \
@@ -155,11 +158,3 @@ static {
     message("using static plugin")
 }
 
-# copy sapi script
-win32 {
-    system(copy ..\..\tools\sapi_voice.vbs builtin\sapi_voice.vbs)
-}
-!win32 {
-    system(mkdir builtin)
-    system(cp ../../tools/sapi_voice.vbs builtin/sapi_voice.vbs)
-}
