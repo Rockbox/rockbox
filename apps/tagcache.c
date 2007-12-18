@@ -2028,7 +2028,7 @@ inline static int tempbuf_find_location(int id)
 
 static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
 {
-    struct master_header   tcmh;
+    struct master_header tcmh;
     struct index_entry idx;
     int masterfd;
     int masterfd_pos;
@@ -2036,6 +2036,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
     int max_entries;
     int entries_processed = 0;
     int i, j;
+    char buf[TAG_MAXLEN];
     
     max_entries = tempbuf_size / sizeof(struct temp_file_entry) - 1;
     
@@ -2061,8 +2062,11 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
         /* Read in as many entries as possible. */
         for (i = 0; i < count; i++)
         {
+            struct temp_file_entry *tfe = &entrybuf[i];
+            int datastart;
+            
             /* Read in numeric data. */
-            if (read(tmpfd, &entrybuf[i], sizeof(struct temp_file_entry)) !=
+            if (read(tmpfd, tfe, sizeof(struct temp_file_entry)) !=
                 sizeof(struct temp_file_entry))
             {
                 logf("read fail #1");
@@ -2070,9 +2074,141 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
                 return false;
             }
 
-            /* Skip string data. */
-            lseek(tmpfd, entrybuf[i].data_length, SEEK_CUR);
+            datastart = lseek(tmpfd, 0, SEEK_CUR);
+            
+            /**
+             * Read string data from the following tags:
+             * - tag_filename
+             * - tag_artist
+             * - tag_album
+             * - tag_title
+             * 
+             * A crc32 hash is calculated from the read data
+             * and stored back to the data offset field kept in memory.
+             */
+#define tmpdb_read_string_tag(tag) \
+    lseek(tmpfd, tfe->tag_offset[tag], SEEK_CUR); \
+    if ((unsigned long)tfe->tag_length[tag] > sizeof buf) \
+    { \
+        logf("read fail: buffer overflow"); \
+        close(masterfd); \
+        return false; \
+    } \
+    \
+    if (read(tmpfd, buf, tfe->tag_length[tag]) != \
+        tfe->tag_length[tag]) \
+    { \
+        logf("read fail #2"); \
+        close(masterfd); \
+        return false; \
+    } \
+    \
+    tfe->tag_offset[tag] = crc_32(buf, strlen(buf), 0xffffffff); \
+    lseek(tmpfd, datastart, SEEK_SET)
+            
+            tmpdb_read_string_tag(tag_filename);
+            tmpdb_read_string_tag(tag_artist);
+            tmpdb_read_string_tag(tag_album);
+            tmpdb_read_string_tag(tag_title);
+            
+            /* Seek to the end of the string data. */
+            lseek(tmpfd, tfe->data_length, SEEK_CUR);
         }
+        
+        /* Backup the master index position. */
+        masterfd_pos = lseek(masterfd, 0, SEEK_CUR);
+        lseek(masterfd, sizeof(struct master_header), SEEK_SET);
+        
+        /* Check if we can resurrect some deleted runtime statistics data. */
+        for (i = 0; i < tcmh.tch.entry_count; i++)
+        {
+            /* Read the index entry. */
+            if (ecread(masterfd, &idx, 1, index_entry_ec, tc_stat.econ) 
+                != sizeof(struct index_entry))
+            {
+                logf("read fail #3");
+                close(masterfd);
+                return false;
+            }
+            
+            /**
+             * Skip unless the entry is marked as being deleted
+             * or the data has already been resurrected.
+             */
+            if (!(idx.flag & FLAG_DELETED) || idx.flag & FLAG_RESURRECTED)
+                continue;
+            
+            /* Now try to match the entry. */
+            /**
+             * To succesfully match a song, the following conditions
+             * must apply:
+             * 
+             * For numeric fields: tag_length
+             * - Full identical match is required
+             * 
+             * If tag_filename matches, no further checking necessary.
+             * 
+             * For string hashes: tag_artist, tag_album, tag_title
+             * - Two of these must match
+             */
+            for (j = 0; j < count; j++)
+            {
+                struct temp_file_entry *tfe = &entrybuf[j];
+                
+                /* Try to match numeric fields first. */
+                if (tfe->tag_offset[tag_length] != idx.tag_seek[tag_length])
+                    continue;
+                
+                /* Now it's time to do the hash matching. */
+                if (tfe->tag_offset[tag_filename] != idx.tag_seek[tag_filename])
+                {
+                    int match_count = 0;
+                    
+                    /* No filename match, check if we can match two other tags. */
+#define tmpdb_match(tag) \
+    if (tfe->tag_offset[tag] == idx.tag_seek[tag]) \
+        match_count++
+                    
+                    tmpdb_match(tag_artist);
+                    tmpdb_match(tag_album);
+                    tmpdb_match(tag_title);
+                    
+                    if (match_count < 2)
+                    {
+                        /* Still no match found, give up. */
+                        continue;
+                    }
+                }
+                
+                /* A match found, now copy & resurrect the statistical data. */
+#define tmpdb_copy_tag(tag) \
+    tfe->tag_offset[tag] = idx.tag_seek[tag]
+                
+                tmpdb_copy_tag(tag_playcount);
+                tmpdb_copy_tag(tag_rating);
+                tmpdb_copy_tag(tag_playtime);
+                tmpdb_copy_tag(tag_lastplayed);
+                tmpdb_copy_tag(tag_commitid);
+                
+                /* Avoid processing this entry again. */
+                idx.flag |= FLAG_RESURRECTED;
+                
+                lseek(masterfd, -sizeof(struct index_entry), SEEK_CUR);
+                if (ecwrite(masterfd, &idx, 1, index_entry_ec, tc_stat.econ) 
+                    != sizeof(struct index_entry))
+                {
+                    logf("masterfd writeback fail #1");
+                    close(masterfd);
+                    return false;
+                }
+                
+                logf("Entry resurrected");
+            }
+        }
+        
+        
+        /* Restore the master index position. */
+        lseek(masterfd, masterfd_pos, SEEK_SET);
         
         /* Commit the data to the index. */
         for (i = 0; i < count; i++)
@@ -2082,7 +2218,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
             if (ecread(masterfd, &idx, 1, index_entry_ec, tc_stat.econ) 
                 != sizeof(struct index_entry))
             {
-                logf("read fail #2");
+                logf("read fail #3");
                 close(masterfd);
                 return false;
             }
@@ -2096,7 +2232,12 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
             }
             idx.flag = entrybuf[i].flag;
             
-            if (tc_stat.ready && current_tcmh.commitid > 0)
+            if (idx.tag_seek[tag_commitid])
+            {
+                /* Data has been resurrected. */
+                idx.flag |= FLAG_DIRTYNUM;
+            }
+            else if (tc_stat.ready && current_tcmh.commitid > 0)
             {
                 idx.tag_seek[tag_commitid] = current_tcmh.commitid;
                 idx.flag |= FLAG_DIRTYNUM;
@@ -2452,7 +2593,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 if (idxbuf[j].flag & FLAG_DELETED)
                 {
                     /* We can just ignore deleted entries. */
-                    idxbuf[j].tag_seek[index_type] = 0;
+                    // idxbuf[j].tag_seek[index_type] = 0;
                     continue;
                 }
                 
@@ -2462,7 +2603,8 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 
                 if (idxbuf[j].tag_seek[index_type] < 0)
                 {
-                    logf("update error: %d/%ld", i+j, tcmh.tch.entry_count);
+                    logf("update error: %d/%d/%ld", 
+                         idxbuf[j].flag, i+j, tcmh.tch.entry_count);
                     error = true;
                     goto error_exit;
                 }
@@ -3289,7 +3431,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
 static bool delete_entry(long idx_id)
 {
     int fd = -1;
-    /*int dbdel_fd = -1;*/
+    int masterfd = -1;
     int tag, i;
     struct index_entry idx, myidx;
     struct master_header myhdr;
@@ -3304,42 +3446,34 @@ static bool delete_entry(long idx_id)
         hdr->indices[idx_id].flag |= FLAG_DELETED;
 #endif
     
-    if ( (fd = open_master_fd(&myhdr, true) ) < 0)
+    if ( (masterfd = open_master_fd(&myhdr, true) ) < 0)
         return false;
     
-    /*
-     TODO: Implement soon.
-    dbdel_fd = open(TAGCACHE_FILE_DELETED, O_RDWR | O_APPEND | O_CREAT);
-    if (dbdel_fd < 0)
-    {
-        logf("delete_entry(): DBDEL open failed");
-        goto cleanup;
-    }
-    close(dbdel_fd);
-    dbdel_fd = -1;
-    */
-    lseek(fd, idx_id * sizeof(struct index_entry), SEEK_CUR);
-    if (ecread(fd, &myidx, 1, index_entry_ec, tc_stat.econ)
+    lseek(masterfd, idx_id * sizeof(struct index_entry), SEEK_CUR);
+    if (ecread(masterfd, &myidx, 1, index_entry_ec, tc_stat.econ)
         != sizeof(struct index_entry))
     {
         logf("delete_entry(): read error");
         goto cleanup;
     }
     
-    myidx.flag |= FLAG_DELETED;
-    lseek(fd, -sizeof(struct index_entry), SEEK_CUR);
-    if (ecwrite(fd, &myidx, 1, index_entry_ec, tc_stat.econ)
-        != sizeof(struct index_entry))
+    if (myidx.flag & FLAG_DELETED)
     {
-        logf("delete_entry(): write_error");
+        logf("delete_entry(): already deleted!");
         goto cleanup;
     }
+    
+    myidx.flag |= FLAG_DELETED;
+#ifdef HAVE_TC_RAMCACHE
+    if (tc_stat.ramcache)
+        hdr->indices[idx_id].flag |= FLAG_DELETED;
+#endif
     
     /* Now check which tags are no longer in use (if any) */
     for (tag = 0; tag < TAG_COUNT; tag++)
         in_use[tag] = 0;
     
-    lseek(fd, sizeof(struct master_header), SEEK_SET);
+    lseek(masterfd, sizeof(struct master_header), SEEK_SET);
     for (i = 0; i < myhdr.tch.entry_count; i++)
     {
         struct index_entry *idxp;
@@ -3351,7 +3485,7 @@ static bool delete_entry(long idx_id)
         else
 #endif
         {
-            if (ecread(fd, &idx, 1, index_entry_ec, tc_stat.econ)
+            if (ecread(masterfd, &idx, 1, index_entry_ec, tc_stat.econ)
                 != sizeof(struct index_entry))
             {
                 logf("delete_entry(): read error #2");
@@ -3373,18 +3507,65 @@ static bool delete_entry(long idx_id)
         }
     }
     
-    close(fd);
-    fd = -1;
-    
     /* Now delete all tags no longer in use. */
     for (tag = 0; tag < TAG_COUNT; tag++)
     {
+        struct tagcache_header tch;
+        int oldseek = myidx.tag_seek[tag];
+        
         if (tagcache_is_numeric_tag(tag))
             continue;
+        
+        /** 
+         * Replace tag seek with a hash value of the field string data.
+         * That way runtime statistics of moved or altered files can be
+         * resurrected.
+         */
+#ifdef HAVE_TC_RAMCACHE
+        if (tc_stat.ramcache && tag != tag_filename)
+        {
+            struct tagfile_entry *tfe;
+            long *seek = &hdr->indices[idx_id].tag_seek[tag];
+            
+            tfe = (struct tagfile_entry *)&hdr->tags[tag][*seek];
+            *seek = crc_32(tfe->tag_data, strlen(tfe->tag_data), 0xffffffff);
+            myidx.tag_seek[tag] = *seek;
+        }
+        else
+#endif
+        {
+            struct tagfile_entry tfe;
+            
+            /* Open the index file, which contains the tag names. */
+            if ((fd = open_tag_fd(&tch, tag, true)) < 0)
+                goto cleanup;
+            
+            /* Skip the header block */
+            lseek(fd, myidx.tag_seek[tag], SEEK_SET);
+            if (ecread(fd, &tfe, 1, tagfile_entry_ec, tc_stat.econ) 
+                != sizeof(struct tagfile_entry))
+            {
+                logf("delete_entry(): read error #3");
+                goto cleanup;
+            }
+            
+            if (read(fd, buf, tfe.tag_length) != tfe.tag_length)
+            {
+                logf("delete_entry(): read error #4");
+                goto cleanup;
+            }
+            
+            myidx.tag_seek[tag] = crc_32(buf, strlen(buf), 0xffffffff);
+        }
         
         if (in_use[tag])
         {
             logf("in use: %d/%d", tag, in_use[tag]);
+            if (fd >= 0)
+            {
+                close(fd);
+                fd = -1;
+            }
             continue;
         }
         
@@ -3398,17 +3579,14 @@ static bool delete_entry(long idx_id)
 #endif
         
         /* Open the index file, which contains the tag names. */
-        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag);
-        fd = open(buf, O_RDWR);
-        
         if (fd < 0)
         {
-            logf("open failed");
-            goto cleanup;
+            if ((fd = open_tag_fd(&tch, tag, true)) < 0)
+                goto cleanup;
         }
         
         /* Skip the header block */
-        lseek(fd, myidx.tag_seek[tag] + sizeof(struct tagfile_entry), SEEK_SET);
+        lseek(fd, oldseek + sizeof(struct tagfile_entry), SEEK_SET);
        
         /* Debug, print 10 first characters of the tag
         read(fd, buf, 10);
@@ -3422,16 +3600,29 @@ static bool delete_entry(long idx_id)
     
         /* Now tag data has been removed */
         close(fd);
+        fd = -1;
     }
+    
+    /* Write index entry back into master index. */
+    lseek(masterfd, sizeof(struct master_header) +
+          (idx_id * sizeof(struct index_entry)), SEEK_SET);
+    if (ecwrite(masterfd, &myidx, 1, index_entry_ec, tc_stat.econ)
+        != sizeof(struct index_entry))
+    {
+        logf("delete_entry(): write_error");
+        goto cleanup;
+    }
+    
+    close(masterfd);
     
     return true;
     
     cleanup:
     if (fd >= 0)
         close(fd);
-/*    if (dbdel_fd >= 0)
-        close(dbdel_fd);
-  */  
+    if (masterfd >= 0)
+        close(masterfd);
+  
     return false;
 }
 
