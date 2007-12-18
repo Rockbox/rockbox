@@ -2619,15 +2619,15 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Linje vælger"
+    lcd_bitmap: "Linjevælger"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Linje vælger"
+    lcd_bitmap: "Linjevælger"
   </voice>
 </phrase>
 <phrase>
@@ -3318,7 +3318,7 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
     *: "Vis metadata"
@@ -3545,7 +3545,7 @@
     *: "Queue next"
   </source>
   <dest>
-    *: "Set i kø som næste"
+    *: "Sæt i kø som næste"
   </dest>
   <voice>
     *: "Sæt i kø som næste"
@@ -4151,11 +4151,13 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
   </source>
   <dest>
     *: none
     alarm: "SPIL=Sæt SLUK=Annuller"
     ipod*: "VÆLG=Sæt MENU=Annuller"
+    h10,h10_5gb: "VÆLG=Sæt FORRIGE=Annuller"
   </dest>
   <voice>
     *: none
@@ -7249,10 +7251,10 @@
     *: "Initialize now"
   </source>
   <dest>
-    *: "Opdater database"
+    *: "Genopbyg database"
   </dest>
   <voice>
-    *: "Opdater database"
+    *: "Genopbyg database"
   </voice>
 </phrase>
 <phrase>
@@ -8812,11 +8814,11 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
@@ -8871,11 +8873,11 @@
   </source>
   <dest>
     *: none
-    agc: "DJ-Set (langsom)"
+    agc: "DJ-Sæt (langsom)"
   </dest>
   <voice>
     *: none
-    agc: "DJ-Set (langsom)"
+    agc: "DJ-Sæt (langsom)"
   </voice>
 </phrase>
 <phrase>
@@ -8897,11 +8899,11 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_ENABLED
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
@@ -9013,11 +9015,11 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
@@ -9044,11 +9046,11 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
@@ -9109,11 +9111,11 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
@@ -9182,11 +9184,11 @@
   </source>
   <dest>
     *: none
-    agc: "DJ-Set (langsom)"
+    agc: "DJ-Sæt (langsom)"
   </dest>
   <voice>
     *: none
-    agc: "DJ-Set (langsom)"
+    agc: "DJ-Sæt (langsom)"
   </voice>
 </phrase>
 <phrase>
@@ -9298,7 +9300,7 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    ipod*: "Building database... %d found (PREV to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
@@ -9956,16 +9958,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "Klokkeslæt"
+    *: ""
   </dest>
   <voice>
-    *: "Klokkeslæt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11243,5 +11245,273 @@
   <voice>
     *: none
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "Sig filtype"
+  </dest>
+  <voice>
+    *: "Sig filtype"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user:
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Ikke til stede"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "Ikke til stede"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Bas cutoff"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Bas cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Primær farve"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Primær farve"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Blank"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Annoncer batteriniveau"
+  </dest>
+  <voice>
+    *: "Annoncer batteriniveau"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Farve for linjevælger"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Farve for linjevælger"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Tom liste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Tekst farve"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Tekst farve"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user:
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Tema"
+  </dest>
+  <voice>
+    *: "Tema"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Rediger"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Bar (farvegradient)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (farvegradient)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Bar (ensfarvet)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (ensfarvet)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user:
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Farver"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Farver"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Sekundær farve"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Sekundær farve"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Diskant cutoff"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Diskant cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Central europæisk (CP1250)"
+  </dest>
+  <voice>
+    *: "Central europæisk"
   </voice>
 </phrase>
