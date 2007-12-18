@@ -5089,11 +5089,11 @@
   </source>
   <dest>
     *: none
-    recording: "Inspelning"
+    recording: "Inspelningsinställningar"
   </dest>
   <voice>
     *: none
-    recording: "Inspelning"
+    recording: "Inspelningsinställningar"
   </voice>
 </phrase>
 <phrase>
