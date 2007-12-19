@@ -1417,44 +1417,44 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ORDER
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "ID3 Tag Priority"
+    *: ""
   </source>
   <dest>
-    *: "ID3標籤優先度"
+    *: ""
   </dest>
   <voice>
-    *: "ID3 Tag Priority"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V1_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "V1 then V2"
+    *: ""
   </source>
   <dest>
-    *: "V1優先於V2"
+    *: ""
   </dest>
   <voice>
-    *: "Version 1 then version 2"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_V2_FIRST
-  desc: in playback settings screen
+  desc: DEPRECATED
   user:
   <source>
-    *: "V2 then V1"
+    *: ""
   </source>
   <dest>
-    *: "V2優先於V1"
+    *: ""
   </dest>
   <voice>
-    *: "Version 2 then version 1"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2541,12 +2541,10 @@
     recording: ""
   </source>
   <dest>
-    *: none
-    recording: "目前目錄"
+    *: ""
   </dest>
   <voice>
-    *: none
-    recording: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3080,11 +3078,11 @@
   user:
   <source>
     *: none
-    lcd_bitmap: "Line Selector"
+    lcd_bitmap: "Line Selector Type"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "行選擇器"
+    lcd_bitmap: "項目選擇方式"
   </dest>
   <voice>
     *: none
@@ -3522,7 +3520,7 @@
     *: ""
   </source>
   <dest>
-    *: "每次讀取單位"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -3889,10 +3887,10 @@
   desc: Menu option to start tag viewer
   user:
   <source>
-    *: "Show ID3 Info"
+    *: "Show Track Info"
   </source>
   <dest>
-    *: "顯示標籤資訊"
+    *: "顯示音軌信息"
   </dest>
   <voice>
     *: "Show ID3 Info"
@@ -4854,16 +4852,19 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=設定 OFF=取消"
     ipod*: "SELECT=設定 MENU=取消"
+    h10,h10_5gb: "SELECT=設定 PREV=取消"
   </dest>
   <voice>
     *: none
     alarm: ""
     ipod*: ""
+    h10,h10_5gb: ""
   </voice>
 </phrase>
 <phrase>
@@ -6774,13 +6775,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "亂序中..."
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -8652,19 +8653,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "窄"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -8770,14 +8771,14 @@
   <source>
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PLAY/PAUSE to return)"
+    ipod*: "Building database... %d found (PREV to return)"
     x5,m5: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "建立資料庫... 找到%d項 (OFF: 回上一畫面)"
     h100,h120,h300: "建立資料庫... 找到%d項 (STOP: 回上一畫面)"
-    ipod*: "建立資料庫... 找到%d項 (PLAY/PAUSE: 回上一畫面)"
+    ipod*: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
     x5,m5: "建立資料庫... 找到%d項 (LEFT: 回上一畫面)"
     h10,h10_5gb,e200,c200: "建立資料庫... 找到%d項 (PREV: 回上一畫面)"
   </dest>
@@ -9076,19 +9077,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_ENABLED
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "啟用硬體等化器"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Enable hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -10416,19 +10417,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "硬體等化器"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -10568,19 +10569,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "頻寬"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -10810,19 +10811,19 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "寬"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -10841,16 +10842,16 @@
 </phrase>
 <phrase>
   id: LANG_CURRENT_TIME
-  desc: in run time screen
+  desc: deprecated
   user:
   <source>
-    *: "Current Time"
+    *: ""
   </source>
   <dest>
-    *: "現在時間"
+    *: ""
   </dest>
   <voice>
-    *: "Current Time"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11232,5 +11233,273 @@
   <voice>
     *: none
     rtc: "o'clock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user: 
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "讀出文件格式"
+  </dest>
+  <voice>
+    *: "Say file type"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user: 
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "不存在"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "Not present"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "低音截斷"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "項目選擇條主要顏色"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Primary Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Blank"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user: 
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "讀出電池剩余容量"
+  </dest>
+  <voice>
+    *: "Announce Battery Level"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user: 
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "項目選擇條顏色"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Empty list"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "字體顏色"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Text Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user: 
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "主题設定"
+  </dest>
+  <voice>
+    *: "Theme Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Edit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "漸變顏色條"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "實色條"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user: 
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "顏色"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Colours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "項目選擇條次要顏色"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Secondary Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "高聲截斷"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "歐洲中部 (CP1250)"
+  </dest>
+  <voice>
+    *: "Central European"
   </voice>
 </phrase>
