@@ -11467,3 +11467,17 @@
     ipodvideo: "Taglio Alti"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user:
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Casuale>"
+  </dest>
+  <voice>
+    *: "Casuale"
+  </voice>
+</phrase>
