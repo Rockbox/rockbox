@@ -1136,7 +1136,15 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
             dptr++;
             current_entry_count++;
         }
-        special_entry_count++;
+        if (offset <= 1)
+        {
+            dptr->newtable = navibrowse;
+            dptr->name = str(LANG_TAGNAVI_RANDOM);
+            dptr->extraseek = -1;
+            dptr++;
+            current_entry_count++;
+        }
+        special_entry_count+=2;
     }
     
     total_count += special_entry_count;
@@ -1374,8 +1382,14 @@ int tagtree_enter(struct tree_context* c)
     dptr = tagtree_get_entry(c, c->selected_item);
     
     c->dirfull = false;
+    seek = dptr->extraseek;   
+    if (seek == -1) 
+    {
+        srand(current_tick);
+        dptr = (tagtree_get_entry(c, 2+(rand() % (c->filesindir-2))));
+        seek = dptr->extraseek;
+    }
     newextra = dptr->newtable;
-    seek = dptr->extraseek;
 
     if (c->dirlevel >= MAX_DIR_LEVELS)
         return 0;

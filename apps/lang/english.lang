@@ -11512,4 +11512,17 @@
     ipodvideo: "Treble Cutoff"
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user:
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Random>"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
