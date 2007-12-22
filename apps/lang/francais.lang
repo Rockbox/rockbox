@@ -16,7 +16,7 @@
 #    
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
 #    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007,
-#    Oct 2007, Nov 2007
+#    Oct 2007, Nov 2007, Dec 2007
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -3841,12 +3841,12 @@
   <dest>
     *: none
     e200: "Durée de l'éclairage de la molette"
-    c200,gigabeatf: "Durée de l'éclairage des boutons"
+    c200,gigabeatf: "Durée de l'éclairage des touches"
   </dest>
   <voice>
     *: none
     e200: "Durée de l'éclairage de la molette"
-    c200,gigabeatf: "Durée de l'éclairage des boutons"
+    c200,gigabeatf: "Durée de l'éclairage des touches"
   </voice>
 </phrase>
 <phrase>
@@ -11485,3 +11485,18 @@
     ipodvideo: "Fréquence de coupure pour les aigus"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user:
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Aléatoire>"
+  </dest>
+  <voice>
+    *: "Aléatoire"
+  </voice>
+</phrase>
+
