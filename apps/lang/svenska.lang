@@ -1149,87 +1149,87 @@
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE
-  desc: in the sound settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Hardware Equalizer"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Hårdvaruequalizer"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hårdvaruequalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_ENABLED
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Enable Hardware EQ"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Aktivera hårdvaru-EQ"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Aktivera hårdvaruequalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_BANDWIDTH
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Bandwidth"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Bandbredd"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bandbredd"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Narrow"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Smal"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Smal"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
-  desc: in the equalizer settings menu
+  desc: deprecated
   user:
   <source>
     *: none
-    ipodvideo: "Wide"
+    ipodvideo: ""
   </source>
   <dest>
     *: none
-    ipodvideo: "Bred"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bred"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -2034,10 +2034,10 @@
     *: "Random"
   </source>
   <dest>
-    *: "Till slumpad"
+    *: "Till slumpvald"
   </dest>
   <voice>
-    *: "Till slumpad"
+    *: "Till slumpvald"
   </voice>
 </phrase>
 <phrase>
@@ -2078,7 +2078,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Paus när hörlurar kopplas ur"
+    headphone_detection: "Pausa när hörlurar kopplas ur"
   </dest>
   <voice>
     *: none
@@ -2129,7 +2129,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Återuppta inte vid start om hörlurar ej inkopplade"
+    headphone_detection: "Återuppta inte vid start utan hörlurar"
   </dest>
   <voice>
     *: none
@@ -4673,11 +4673,13 @@
     *: none
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
   </source>
   <dest>
     *: none
     alarm: "SPELA=Sätt AV=Avbryt"
     ipod*: "VÄLJ=Sätt MENY=Avbryt"
+    h10,h10_5gb: "VÄLJ=Sätt FÖREGÅENDE=Avbryt"
   </dest>
   <voice>
     *: none
@@ -8015,6 +8017,7 @@
   </dest>
   <voice>
     *: "Slut på spellistan"
+    player: "Listan slut"
   </voice>
 </phrase>
 <phrase>
@@ -11406,5 +11409,53 @@
   </dest>
   <voice>
     *: "Röstfiländelser"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Basgräns"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Basgräns"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Diskantgräns"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Diskantgräns"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user:
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Slumpvald>"
+  </dest>
+  <voice>
+    *: "Slumpvald"
   </voice>
 </phrase>
