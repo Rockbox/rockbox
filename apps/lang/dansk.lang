@@ -10495,7 +10495,7 @@
     player: "Buf: %d.%03dMB"
   </dest>
   <voice>
-    *: ""
+    *: "Buffer størrelse"
     player: "Buffer størrelse"
   </voice>
 </phrase>
