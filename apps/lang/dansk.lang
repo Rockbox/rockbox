@@ -3686,7 +3686,7 @@
     *: "Disk:"
   </dest>
   <voice>
-    *: ""
+    *: "Disk størrelse"
   </voice>
 </phrase>
 <phrase>
@@ -4001,7 +4001,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "En gang"
   </voice>
 </phrase>
 <phrase>
@@ -4018,7 +4018,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Start over"
   </voice>
 </phrase>
 <phrase>
@@ -4035,7 +4035,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Stop under"
   </voice>
 </phrase>
 <phrase>
@@ -4052,7 +4052,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Pause før deling"
   </voice>
 </phrase>
 <phrase>
@@ -4069,7 +4069,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Minus uendelig"
   </voice>
 </phrase>
 <phrase>
@@ -4103,7 +4103,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Vågner om"
   </voice>
 </phrase>
 <phrase>
@@ -4120,7 +4120,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm sat"
   </voice>
 </phrase>
 <phrase>
@@ -4137,7 +4137,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm tidspunkt for tidligt"
   </voice>
 </phrase>
 <phrase>
@@ -4176,7 +4176,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm slået fra"
   </voice>
 </phrase>
 <phrase>
@@ -6491,7 +6491,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Skan"
   </voice>
 </phrase>
 <phrase>
@@ -7457,7 +7457,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "hertz bånd forstærkning"
   </voice>
 </phrase>
 <phrase>
@@ -9946,11 +9946,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MP3"
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MP3"
   </voice>
 </phrase>
 <phrase>
@@ -10496,7 +10496,7 @@
   </dest>
   <voice>
     *: ""
-    player: ""
+    player: "Buffer størrelse"
   </voice>
 </phrase>
 <phrase>
@@ -10649,7 +10649,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Station"
   </voice>
 </phrase>
 <phrase>
@@ -10745,7 +10745,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "i mindst"
   </voice>
 </phrase>
 <phrase>
@@ -11071,7 +11071,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "A M"
   </voice>
 </phrase>
 <phrase>
@@ -11088,7 +11088,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "P M"
   </voice>
 </phrase>
 <phrase>
