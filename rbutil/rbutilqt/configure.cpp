@@ -380,12 +380,16 @@ void Config::setSystemProxy(bool checked)
         QUrl envproxy;
 #if defined(Q_OS_LINUX)
         envproxy = QUrl(getenv("http_proxy"));
+
+        ui.proxyHost->setText(envproxy.host());
 #endif
 #if defined(Q_OS_WIN32)
         HKEY hk;
         wchar_t proxyval[80];
         DWORD buflen = 80;
         long ret;
+        DWORD enable;
+        DWORD enalen = sizeof(DWORD);
 
         ret = RegOpenKeyEx(HKEY_CURRENT_USER, _TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"),
             0, KEY_QUERY_VALUE, &hk);
@@ -394,15 +398,19 @@ void Config::setSystemProxy(bool checked)
         ret = RegQueryValueEx(hk, _TEXT("ProxyServer"), NULL, NULL, (LPBYTE)proxyval, &buflen);
         if(ret != ERROR_SUCCESS) return;
 
+        ret = RegQueryValueEx(hk, _TEXT("ProxyEnable"), NULL, NULL, (LPBYTE)&enable, &enalen);
+        if(ret != ERROR_SUCCESS) return;
+
         RegCloseKey(hk);
         envproxy = QUrl("http://" + QString::fromWCharArray(proxyval));
         qDebug() << envproxy;
-        ui.proxyHost->setText(envproxy.host());
-        ui.proxyPort->setText(QString("%1").arg(envproxy.port()));
-        ui.proxyUser->setText(envproxy.userName());
-        ui.proxyPass->setText(envproxy.password());
+        if(enable != 0) {
+            ui.proxyHost->setText(envproxy.host());
+        }
+        else {
+            ui.proxyHost->setText(envproxy.host() + " " + tr("(system proxy is disabled)"));
+        }
 #endif
-        ui.proxyHost->setText(envproxy.host());
         ui.proxyPort->setText(QString("%1").arg(envproxy.port()));
         ui.proxyUser->setText(envproxy.userName());
         ui.proxyPass->setText(envproxy.password());

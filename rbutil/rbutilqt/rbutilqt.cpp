@@ -965,6 +965,8 @@ QUrl RbUtilQt::proxy()
     wchar_t proxyval[80];
     DWORD buflen = 80;
     long ret;
+    DWORD enable;
+    DWORD enalen = sizeof(DWORD);
 
     ret = RegOpenKeyEx(HKEY_CURRENT_USER,
         _TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"),
@@ -973,10 +975,15 @@ QUrl RbUtilQt::proxy()
 
     ret = RegQueryValueEx(hk, _TEXT("ProxyServer"), NULL, NULL, (LPBYTE)proxyval, &buflen);
     if(ret != ERROR_SUCCESS) return QUrl("");
+    
+    ret = RegQueryValueEx(hk, _TEXT("ProxyEnable"), NULL, NULL, (LPBYTE)&enable, &enalen);
+    if(ret != ERROR_SUCCESS) return QUrl("");
 
     RegCloseKey(hk);
-    qDebug() << QString::fromWCharArray(proxyval);
-    return QUrl("http://" + QString::fromWCharArray(proxyval));
+
+    qDebug() << QString::fromWCharArray(proxyval) << QString("%1").arg(enable);
+    if(enable != 0)
+        return QUrl("http://" + QString::fromWCharArray(proxyval));
 
 #endif
     return QUrl("");
