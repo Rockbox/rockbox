@@ -9,14 +9,11 @@
 #
 # Local conventions:
 # "Settings" is removed from translations used in the menu since it's all
-# settings there ("Sound Settings > Lyd").
+# settings there ("Sound Settings > Lyd"). "Recording Settings" is an exception
+# since it's used alongside "Recording" in some menus.
 # No excessive capitals ("Håndter opsætning" - not "Håndter Opsætning")
 #
 # Strings that need attention:
-# - LANG_CROSSFEED_HF_CUTOFF
-# - LANG_CROSSFEED_CROSS_GAIN
-# - LANG_CROSSFEED_HF_ATTENUATION
-# - LANG_CROSSFEED_DIRECT_GAIN
 # - LANG_EQUALIZER_BAND_LOW_SHELF
 # - LANG_EQUALIZER_BAND_HIGH_SHELF
 # - All strings with "Equalizer" in them.
@@ -7357,11 +7354,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Afskærings frekvens"
+    swcodec: "Grænse frekvens"
   </dest>
   <voice>
     *: none
-    swcodec: "Afskærings frekvens"
+    swcodec: "Grænse frekvens"
   </voice>
 </phrase>
 <phrase>
@@ -7829,11 +7826,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Høj-frekvens cutoff"
+    swcodec: "Højfrekvensgrænse"
   </dest>
   <voice>
     *: none
-    swcodec: "Høj-frekvens cutoff"
+    swcodec: "Højfrekvensgrænse"
   </voice>
 </phrase>
 <phrase>
@@ -7877,11 +7874,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Høj-frekvens dæmpning"
+    swcodec: "Højfrekvensdæmpning"
   </dest>
   <voice>
     *: none
-    swcodec: "Høj-frekvens dæmpning"
+    swcodec: "Højfrekvensdæmpning"
   </voice>
 </phrase>
 <phrase>
@@ -8788,11 +8785,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Afskærings frekvens"
+    swcodec: "Grænse frekvens"
   </dest>
   <voice>
     *: none
-    swcodec: "Afskærings frekvens"
+    swcodec: "Grænse frekvens"
   </voice>
 </phrase>
 <phrase>
@@ -11288,11 +11285,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Bas cutoff"
+    ipodvideo: "Basgrænse"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bas cutoff"
+    ipodvideo: "Basgrænse"
   </voice>
 </phrase>
 <phrase>
@@ -11494,11 +11491,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Diskant cutoff"
+    ipodvideo: "Diskantgrænse"
   </dest>
   <voice>
     *: none
-    ipodvideo: "Diskant cutoff"
+    ipodvideo: "Diskantgrænse"
   </voice>
 </phrase>
 <phrase>
@@ -11513,5 +11510,19 @@
   </dest>
   <voice>
     *: "Central europæisk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user:
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Tilfældig>"
+  </dest>
+  <voice>
+    *: "Tilfældig"
   </voice>
 </phrase>
