@@ -326,6 +326,8 @@ target/arm/tms320dm320/crt0.S
 target/arm/s3c2440/crt0.S
 #elif defined(CPU_TCC77X)
 target/arm/tcc77x/crt0.S
+#elif CONFIG_CPU==IMX31L
+target/arm/imx31/crt0.S
 #elif defined(CPU_ARM)
 target/arm/crt0.S
 #endif /* defined(CPU_*) */

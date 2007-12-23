@@ -15,6 +15,8 @@ INPUT(target/arm/tms320dm320/crt0.o)
 INPUT(target/arm/s3c2440/crt0.o)
 #elif CONFIG_CPU == PNX0101
 INPUT(target/arm/pnx0101/crt0-pnx0101.o)
+#elif CONFIG_CPU == IMX31L
+INPUT(target/arm/imx31/crt0.o)
 #elif defined(CPU_ARM)
 INPUT(target/arm/crt0.o)
 #endif
@@ -70,7 +72,7 @@ INPUT(target/sh/crt0.o)
 #define IRAMORIG 0x00000000
 #define IRAMSIZE 0x4000
 #elif CONFIG_CPU==IMX31L
-#define DRAMORIG (0x88000000 + STUBOFFSET)
+#define DRAMORIG (0x0 + STUBOFFSET)
 #define IRAMORIG 0x1FFFC000
 #define IRAMSIZE 0x4000
 #else

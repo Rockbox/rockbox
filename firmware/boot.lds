@@ -15,6 +15,8 @@ INPUT(target/arm/tms320dm320/crt0.o)
 INPUT(target/arm/s3c2440/crt0.o)
 #elif defined(CPU_TCC77X)
 INPUT(target/arm/tcc77x/crt0.o)
+#elif CONFIG_CPU==IMX31L
+INPUT(target/arm/imx31/crt0.o)
 #else
 INPUT(target/arm/crt0.o)
 #endif

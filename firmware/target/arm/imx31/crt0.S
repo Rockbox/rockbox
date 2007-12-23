@@ -35,12 +35,7 @@ start:
  */
 
 newstart:
-#if CONFIG_CPU == IMX31L
-    mov r0,#0xD3
-    msr cpsr, r0
-#else
     msr    cpsr, #0xd3 /* enter supervisor mode, disable IRQ */
-#endif  
 
 #if !defined(BOOTLOADER)
 #if !defined(DEBUG)
@@ -60,11 +55,7 @@ newstart:
     ldr    r0, =fiq_handler
     str    r0, [r1, #28]
 #endif
-#endif
 
-#if !defined(BOOTLOADER)
-
-#if !defined(STUB)
     /* Zero out IBSS */
     ldr    r2, =_iedata
     ldr    r3, =_iend
@@ -83,7 +74,6 @@ newstart:
     ldrhi  r5, [r2], #4
     strhi  r5, [r3], #4
     bhi    1b
-#endif /* !STUB */
 #endif /* !BOOTLOADER */
 
     /* Initialise bss section to zero */
@@ -108,8 +98,6 @@ newstart:
 #ifdef BOOTLOADER
 /* Code for ARM bootloader targets other than iPod go here */
 
-#if CONFIG_CPU == IMX31L
-          
     mov r0, #0
     mcr 15, 0, r0, c7, c7, 0        /* invalidate I cache and D cache */
     mcr 15, 0, r0, c8, c7, 0        /* invalidate TLBs */
@@ -169,13 +157,83 @@ L2_loop:
     mov    r0,#0xd3
     msr    cpsr, r0
     ldr    sp, =stackend
-    
+ 
     /*remap memory as well as exception vectors*/
     /*for now this will be done in bootloader, especially
       if usb will be needed within the bootloader to load the 
       main firmware file. Interrupts will be needed for this
       (whether they be swi or irq)*/
-    bl memory_init
+
+    /* TTB Initialisation */
+    ldr r3, =(0x80000000+64*1024*1024-TTB_SIZE)
+    mov  r1, #0
+    ldr r2, =(0x80000000+64*1024*1024)
+ttbloop:
+    str r1, [r3], #4
+    cmp r3, r2
+    bne ttbloop
+
+    /* Set TTB base address */
+    ldr r3, =(0x80000000+64*1024*1024-TTB_SIZE)
+    mcr 15, 0 ,r3, cr2, cr0, 0
+    /* Set all domains to manager status */
+    mvn r3, #0
+    mcr 15, 0, r3, cr3, cr0, 0
+
+    /* Set page tables */
+
+    /* Map each memory loc to itself, no cache */
+    mov r1, #0 /* Physical address */
+    ldr r3, =(0x80000000+64*1024*1024-TTB_SIZE) /* TTB pointer */
+    ldr r4, =(0x80000000+64*1024*1024-TTB_SIZE+0x4000) /* End position */
+maploop1:
+    mov r2, r1
+    orr r2, r2, #(1<<10)    /* superuser - r/w, user - no access */
+    //orr r2, r2, #(0<<5)   /* domain 0th */
+    orr r2, r2, #(1<<4)     /* should be "1" */
+    orr r2, r2, #(1<<1)     /* Section signature */
+    str r2, [r3], #4
+    add r1, r1, #(1<<20)
+    cmp r3, r4
+    bne maploop1
+
+    /* Map 0x80000000 -> 0x0, cached */
+    mov r1, #0x80000000 /* Physical address */
+    ldr r3, =(0x80000000+64*1024*1024-TTB_SIZE) /* TTB pointer */
+    ldr r4, =(0x80000000+64*1024*1024-TTB_SIZE+256) /* End position */
+maploop2:
+    mov r2, r1
+    orr r2, r2, #(1<<10)    /* superuser - r/w, user - no access */
+    //orr r2, r2, #(0<<5)   /* domain 0th */
+    orr r2, r2, #(1<<4)     /* should be "1" */
+    orr r2, r2, #(1<<3)     /* cache flags */
+    orr r2, r2, #(1<<2)     /* more cache stuff */
+    orr r2, r2, #(1<<1)     /* Section signature */
+    str r2, [r3], #4
+    add r1, r1, #(1<<20)
+    cmp r3, r4
+    bne maploop2
+
+    /* Enable MMU */
+    mrc 15, 0, r3, cr1, cr0, 0
+    tst r3, #0x4
+    bleq clean_dcache
+    tst r3, #0x1000
+    bleq clean_dcache
+    mov r0, #0
+
+    mcr 15, 0, r0, cr8, cr7, 0 /* Invalidate TLB */
+    mcr 15, 0, r0, cr7, cr7, 0 /* Invalidate icache and dcache */
+    mrc 15, 0, r0, cr1, cr0, 0
+    orr r0, r0, #1        /* enable mmu bit */
+    orr r0, r0, #(1<<2)  /* enable dcache */
+    orr r0, r0, #(1<<12) /* enable icache */
+    mcr 15, 0, r0, cr1, cr0, 0
+    nop
+    nop
+    nop
+    nop
+
     mov r0,#0
     ldr r1,=_vectorstart
     mov r2,#0
@@ -253,7 +311,6 @@ irq_stack:
     .space 256*4
 fiq_stack:
 
-#endif
 
 #else /* BOOTLOADER */
 
@@ -276,9 +333,7 @@ fiq_stack:
     /* main() should never return */
 
 /* Exception handlers. Will be copied to address 0 after memory remapping */
-#if CONFIG_CPU == IMX31L
 _vectorstart:
-#endif
     .section .vectors,"aw"
     ldr    pc, [pc, #24]
     ldr    pc, [pc, #24]
@@ -303,11 +358,9 @@ vectors:
 
     .text
 
-#ifndef STUB
     .global irq
     .global fiq
     .global UIE
-#endif
 
 /* All illegal exceptions call into UIE with exception address as first
    parameter. This is calculated differently depending on which exception
@@ -335,11 +388,6 @@ data_abort_handler:
     sub    r0, lr, #8 
     mov    r1, #2
     b      UIE
-
-#ifdef STUB
-UIE:
-    b UIE
-#endif
 
 /* 256 words of IRQ stack */
     .space 256*4

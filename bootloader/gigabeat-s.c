@@ -108,7 +108,7 @@ void main(void)
     printf("Firmware file: %s", buf);
     printf("Loading firmware");
 
-    unsigned char *loadbuffer = (unsigned char *)0x88000000;
+    unsigned char *loadbuffer = (unsigned char *)0x0;
     int buffer_size = 1024*1024;
 
     rc = load_firmware(loadbuffer, buf, buffer_size);
