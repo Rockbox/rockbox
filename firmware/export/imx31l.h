@@ -28,7 +28,7 @@
 									 //when background memory is written.
 #define LCD_BUFFER_SIZE ((320*240*2))
 #define TTB_SIZE (0x4000)
-#define TTB_BASE (0x80000000 + (32*1024*1024*2)-TTB_SIZE); /*64 megs*/
+#define TTB_BASE ((unsigned int *)(0x88000000 + (64*1024*1024)-TTB_SIZE))
 /*
  * AIPS 1
  */

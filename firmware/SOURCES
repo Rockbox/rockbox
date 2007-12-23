@@ -598,6 +598,7 @@ target/arm/s3c2440/gigabeat-fx/pcm-meg-fx.c
 
 #ifdef GIGABEAT_S
 #ifndef SIMULATOR
+target/arm/mmu-arm.c
 target/arm/imx31/gigabeat-s/adc-imx31.c
 target/arm/imx31/gigabeat-s/ata-imx31.c
 target/arm/imx31/gigabeat-s/backlight-imx31.c

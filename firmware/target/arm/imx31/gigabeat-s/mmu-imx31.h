@@ -17,19 +17,5 @@
  *
  ****************************************************************************/
 
-/* Invalidate DCache for this range  */
-/* Will do write back */
-void invalidate_dcache_range(const void *base, unsigned int size);
-
-/* clean DCache for this range  */
-/* forces DCache writeback for the specified range */
-void clean_dcache_range(const void *base, unsigned int size);
-
-/* Dump DCache for this range  */
-/* Will *NOT* do write back */
-void dump_dcache_range(const void *base, unsigned int size);
-
-/* Cleans entire DCache */
-void clean_dcache(void);
-
 void memory_init(void);
+void set_page_tables(void);

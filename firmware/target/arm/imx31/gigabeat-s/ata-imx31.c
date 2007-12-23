@@ -25,8 +25,6 @@
 #include "panic.h"
 #include "pcf50606.h"
 #include "ata-target.h"
-#include "mmu-imx31.h"
-#include "backlight-target.h"
 
 #define ATA_RST (1 << 6)
 
