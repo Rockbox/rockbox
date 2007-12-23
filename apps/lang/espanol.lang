@@ -96,7 +96,7 @@
     *: "Apagando..."
   </dest>
   <voice>
-    *: ""
+    *: "Apagando"
   </voice>
 </phrase>
 <phrase>
@@ -127,7 +127,7 @@
     *: "Fallido"
   </dest>
   <voice>
-    *: ""
+    *: "Fallido"
   </voice>
 </phrase>
 <phrase>
@@ -695,7 +695,7 @@
     *: "Borradas"
   </dest>
   <voice>
-    *: ""
+    *: "Borradas"
   </voice>
 </phrase>
 <phrase>
@@ -1908,7 +1908,7 @@
     *: "Ejemplo de Velocidad de Desplazamiento"
   </dest>
   <voice>
-    *: ""
+    *: "Ejemplo de Velocidad de Desplazamiento"
   </voice>
 </phrase>
 <phrase>
@@ -1950,7 +1950,7 @@
     *: "Texto Ejemplo del Tamaño del Paso de Desplazamiento"
   </dest>
   <voice>
-    *: ""
+    *: "Texto Ejemplo del Tamaño del Paso de Desplazamiento"
   </voice>
 </phrase>
 <phrase>
@@ -2565,7 +2565,7 @@
     *: "¿Borrar?"
   </dest>
   <voice>
-    *: ""
+    *: "¿Borrar?"
   </voice>
 </phrase>
 <phrase>
@@ -2579,7 +2579,7 @@
     *: "Borrado"
   </dest>
   <voice>
-    *: ""
+    *: "Borrado"
   </voice>
 </phrase>
 <phrase>
@@ -2747,7 +2747,7 @@
     *: "Información de Rockbox:"
   </dest>
   <voice>
-    *: ""
+    *: "Información de Rockbox"
   </voice>
 </phrase>
 <phrase>
@@ -2832,7 +2832,7 @@
     *: "Disco Duro:"
   </dest>
   <voice>
-    *: ""
+    *: "Disco Duro"
   </voice>
 </phrase>
 <phrase>
@@ -2925,7 +2925,7 @@
     *: "¿Crear un Marcador?"
   </dest>
   <voice>
-    *: ""
+    *: "¿Crear un Marcador?"
   </voice>
 </phrase>
 <phrase>
@@ -2939,7 +2939,7 @@
     *: "Marcador Creado"
   </dest>
   <voice>
-    *: ""
+    *: "Marcador Creado"
   </voice>
 </phrase>
 <phrase>
@@ -2953,7 +2953,7 @@
     *: "Falló el Marcador"
   </dest>
   <voice>
-    *: ""
+    *: "Falló el Marcador"
   </voice>
 </phrase>
 <phrase>
@@ -2967,7 +2967,7 @@
     *: "Marcador Vacío"
   </dest>
   <voice>
-    *: ""
+    *: "Marcador Vacío"
   </voice>
 </phrase>
 <phrase>
@@ -2984,22 +2984,22 @@
     gigabeatf: "A = Revert"
   </source>
   <dest>
-    *: "OFF para Cancelar"
+    *: "OFF = Cancelar"
     rtc: ""
-    h100,h120,h300: ""
-    ipod*,e200,c200: ""
-    x5,m5: ""
-    h10,h10_5gb: ""
-    gigabeatf: ""
+    h100,h120,h300: "STOP = Cancelar"
+    ipod*,e200,c200: "MENU = Cancelar"
+    x5,m5: "RECORD = Cancelar"
+    h10,h10_5gb: "PREV = Cancelar"
+    gigabeatf: "A = Cancelar"
   </dest>
   <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,e200,c200: ""
-    x5,m5: ""
-    h10,h10_5gb: ""
-    gigabeatf: ""
+    rtc: "OFF para Cancelar"
+    h100,h120,h300: "STOP para Cancelar"
+    ipod*,e200,c200: "MENU para Cancelar"
+    x5,m5: "RECORD para Cancelar"
+    h10,h10_5gb: "PREV para Cancelar"
+    gigabeatf: "A para Cancelar"
   </voice>
 </phrase>
 <phrase>
@@ -3032,7 +3032,7 @@
     recording: ""
   </dest>
   <voice>
-    *: none
+    *: "Pregrabación"
     recording: ""
   </voice>
 </phrase>
@@ -3083,10 +3083,10 @@
   </source>
   <dest>
     *: "Disco Duro Lleno. Pulsa OFF para Continuar"
-    recording: ""
-    h100,h120,h300: ""
-    m5,x5: ""
-    e200,c200: ""
+    recording: "Disco Duro Lleno. Pulsa OFF para Continuar"
+    h100,h120,h300: "Disco Duro Lleno. Pulsa STOP para Continuar"
+    m5,x5: "Disco Duro Lleno. Pulsa POWER para Continua"
+    e200,c200: "Disco Duro Lleno. Pulsa UP para Continua"
   </dest>
   <voice>
     *: none
@@ -7692,7 +7692,7 @@
     *: "Archivo/Carpeta Existe. ¿Sobreescribir?"
   </dest>
   <voice>
-    *: ""
+    *: "Archivo/Carpeta Existe. ¿Sobreescribir"
   </voice>
 </phrase>
 <phrase>
