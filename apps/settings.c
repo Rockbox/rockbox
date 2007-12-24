@@ -469,6 +469,9 @@ static bool settings_write_config(char* filename, int options)
         if ((options == SETTINGS_SAVE_CHANGED) &&
             !is_changed(i))
             continue;
+        else if ((options == SETTINGS_SAVE_SOUND) &&
+                 ((settings[i].flags&F_SOUNDSETTING) == 0))
+            continue;
         else if ((options == SETTINGS_SAVE_THEME) &&
                  ((settings[i].flags&F_THEMESETTING) == 0))
             continue;
@@ -624,6 +627,7 @@ bool settings_save_config(int options)
             folder = EQS_DIR;
             break;
 #endif
+        case SETTINGS_SAVE_SOUND:
         default:
             folder = ROCKBOX_DIR;
     }

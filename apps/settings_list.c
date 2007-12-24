@@ -74,7 +74,7 @@
 
 /* Use for int settings which use the set_sound() function to set them */
 #define SOUND_SETTING(flags,var,lang_id,name,setting)                   \
-            {flags|F_T_INT|F_T_SOUND, &global_settings.var,             \
+            {flags|F_T_INT|F_T_SOUND|F_SOUNDSETTING, &global_settings.var, \
                 lang_id, NODEFAULT,name,NULL,                           \
                 {.sound_setting=(struct sound_setting[]){{setting}}} }
 
@@ -331,20 +331,21 @@ const struct settings_list settings[] = {
     
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     SOUND_SETTING(0,loudness, LANG_LOUDNESS, "loudness", SOUND_LOUDNESS),
-    STRINGCHOICE_SETTING(0,avc,LANG_AUTOVOL,0,"auto volume",
+    STRINGCHOICE_SETTING(F_SOUNDSETTING,avc,LANG_AUTOVOL,0,"auto volume",
             "off,20ms,2,4,8,", sound_set_avc, 5,
             LANG_OFF,TALK_ID(20, UNIT_MS),TALK_ID(2, UNIT_SEC),
             TALK_ID(4, UNIT_SEC),TALK_ID(8, UNIT_SEC)), 
-    OFFON_SETTING(0, superbass, LANG_SUPERBASS, false, "superbass", set_superbass),
+    OFFON_SETTING(F_SOUNDSETTING, superbass, LANG_SUPERBASS, false, "superbass", set_superbass),
 #endif
          
-    CHOICE_SETTING(0,channel_config,LANG_CHANNEL_CONFIGURATION,0,"channels",
+    CHOICE_SETTING(F_SOUNDSETTING, channel_config, LANG_CHANNEL_CONFIGURATION,
+         0,"channels",
          "stereo,mono,custom,mono left,mono right,karaoke",
          sound_set_channels,
          6, ID2P(LANG_CHANNEL_STEREO), ID2P(LANG_CHANNEL_MONO),
             ID2P(LANG_CHANNEL_CUSTOM), ID2P(LANG_CHANNEL_LEFT),
             ID2P(LANG_CHANNEL_RIGHT), ID2P(LANG_CHANNEL_KARAOKE)),
-    SOUND_SETTING(0,stereo_width, LANG_STEREO_WIDTH,
+    SOUND_SETTING(F_SOUNDSETTING, stereo_width, LANG_STEREO_WIDTH,
             "stereo_width", SOUND_STEREO_WIDTH),
     /* playback */
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
@@ -679,19 +680,19 @@ const struct settings_list settings[] = {
 #endif /* HAVE_RECORDING */
 #endif /* HAVE_LCD_BITMAP */
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    SOUND_SETTING(0, mdb_strength, LANG_MDB_STRENGTH,
+    SOUND_SETTING(F_SOUNDSETTING, mdb_strength, LANG_MDB_STRENGTH,
         "mdb strength", SOUND_MDB_STRENGTH),
-    SOUND_SETTING(0, mdb_harmonics, LANG_MDB_HARMONICS,
+    SOUND_SETTING(F_SOUNDSETTING, mdb_harmonics, LANG_MDB_HARMONICS,
         "mdb harmonics", SOUND_MDB_HARMONICS),
-    SOUND_SETTING(0, mdb_center, LANG_MDB_CENTER,
+    SOUND_SETTING(F_SOUNDSETTING, mdb_center, LANG_MDB_CENTER,
         "mdb center", SOUND_MDB_CENTER),
-    SOUND_SETTING(0, mdb_shape, LANG_MDB_SHAPE,
+    SOUND_SETTING(F_SOUNDSETTING, mdb_shape, LANG_MDB_SHAPE,
         "mdb shape", SOUND_MDB_SHAPE),
-    OFFON_SETTING(0, mdb_enable, LANG_MDB_ENABLE,
+    OFFON_SETTING(F_SOUNDSETTING, mdb_enable, LANG_MDB_ENABLE,
         false, "mdb enable", set_mdb_enable),
 #endif
 #if CONFIG_CODEC == MAS3507D
-    OFFON_SETTING(0,line_in,LANG_LINE_IN,false,"line in",NULL),
+    OFFON_SETTING(F_SOUNDSETTING, line_in,LANG_LINE_IN,false,"line in",NULL),
 #endif
     /* voice */
     OFFON_SETTING(F_TEMPVAR, talk_menu, LANG_VOICE_MENU, true, "talk menu", NULL),
@@ -845,7 +846,7 @@ const struct settings_list settings[] = {
 #endif /* HAVE_RECORDING */
 
 #ifdef HAVE_SPDIF_POWER
-    OFFON_SETTING(0, spdif_enable, LANG_SPDIF_ENABLE, false,
+    OFFON_SETTING(F_SOUNDSETTING, spdif_enable, LANG_SPDIF_ENABLE, false,
         "spdif enable", spdif_power_enable),
 #endif
     CHOICE_SETTING(0, next_folder, LANG_NEXT_FOLDER, FOLDER_ADVANCE_OFF,
@@ -855,13 +856,13 @@ const struct settings_list settings[] = {
 
 #if CONFIG_CODEC == SWCODEC
     /* replay gain */
-    OFFON_SETTING(0, replaygain, LANG_REPLAYGAIN_ENABLE, false, "replaygain", NULL),
-    CHOICE_SETTING(0, replaygain_type, LANG_REPLAYGAIN_MODE, REPLAYGAIN_ALBUM,
+    OFFON_SETTING(F_SOUNDSETTING, replaygain, LANG_REPLAYGAIN_ENABLE, false, "replaygain", NULL),
+    CHOICE_SETTING(F_SOUNDSETTING, replaygain_type, LANG_REPLAYGAIN_MODE, REPLAYGAIN_ALBUM,
         "replaygain type", "track,album,track shuffle", NULL, 3,
         ID2P(LANG_TRACK_GAIN), ID2P(LANG_ALBUM_GAIN), ID2P(LANG_SHUFFLE_GAIN)),
-    OFFON_SETTING(0, replaygain_noclip, LANG_REPLAYGAIN_NOCLIP,
+    OFFON_SETTING(F_SOUNDSETTING, replaygain_noclip, LANG_REPLAYGAIN_NOCLIP,
         false, "replaygain noclip", NULL),
-    INT_SETTING_NOWRAP(0, replaygain_preamp, LANG_REPLAYGAIN_PREAMP, 0, "replaygain preamp", 
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, replaygain_preamp, LANG_REPLAYGAIN_PREAMP, 0, "replaygain preamp", 
                 UNIT_DB, -120, 120, 5, db_format, NULL, NULL),
     
     CHOICE_SETTING(0, beep, LANG_BEEP, 0,
@@ -869,35 +870,35 @@ const struct settings_list settings[] = {
         ID2P(LANG_OFF), ID2P(LANG_WEAK), ID2P(LANG_MODERATE), ID2P(LANG_STRONG)),
 
     /* crossfade */
-    CHOICE_SETTING(0, crossfade, LANG_CROSSFADE_ENABLE, 0, "crossfade",
+    CHOICE_SETTING(F_SOUNDSETTING, crossfade, LANG_CROSSFADE_ENABLE, 0, "crossfade",
         "off,shuffle,track skip,shuffle and track skip,always",NULL, 5,
         ID2P(LANG_OFF), ID2P(LANG_SHUFFLE), ID2P(LANG_TRACKSKIP),
         ID2P(LANG_SHUFFLE_TRACKSKIP), ID2P(LANG_ALWAYS)),
-    INT_SETTING(0, crossfade_fade_in_delay, LANG_CROSSFADE_FADE_IN_DELAY, 0,
+    INT_SETTING(F_SOUNDSETTING, crossfade_fade_in_delay, LANG_CROSSFADE_FADE_IN_DELAY, 0,
         "crossfade fade in delay", UNIT_SEC, 0, 7, 1, NULL, NULL, NULL),
-    INT_SETTING(0, crossfade_fade_out_delay, LANG_CROSSFADE_FADE_OUT_DELAY, 0,
+    INT_SETTING(F_SOUNDSETTING, crossfade_fade_out_delay, LANG_CROSSFADE_FADE_OUT_DELAY, 0,
         "crossfade fade out delay", UNIT_SEC, 0, 7, 1, NULL, NULL, NULL),
-    INT_SETTING(0, crossfade_fade_in_duration, LANG_CROSSFADE_FADE_IN_DURATION, 2,
+    INT_SETTING(F_SOUNDSETTING, crossfade_fade_in_duration, LANG_CROSSFADE_FADE_IN_DURATION, 2,
         "crossfade fade in duration", UNIT_SEC, 0, 15, 1, NULL, NULL, NULL),
-    INT_SETTING(0, crossfade_fade_out_duration, LANG_CROSSFADE_FADE_OUT_DURATION, 2,
+    INT_SETTING(F_SOUNDSETTING, crossfade_fade_out_duration, LANG_CROSSFADE_FADE_OUT_DURATION, 2,
         "crossfade fade out duration", UNIT_SEC, 0, 15, 1, NULL, NULL, NULL),
-    CHOICE_SETTING(0, crossfade_fade_out_mixmode, LANG_CROSSFADE_FADE_OUT_MODE,
+    CHOICE_SETTING(F_SOUNDSETTING, crossfade_fade_out_mixmode, LANG_CROSSFADE_FADE_OUT_MODE,
         0, "crossfade fade out mode", "crossfade,mix", NULL, 2,
         ID2P(LANG_CROSSFADE), ID2P(LANG_MIX)),
         
     /* crossfeed */
-    OFFON_SETTING(0,crossfeed, LANG_CROSSFEED, false,
+    OFFON_SETTING(F_SOUNDSETTING, crossfeed, LANG_CROSSFEED, false,
                     "crossfeed", dsp_set_crossfeed),
-    INT_SETTING_NOWRAP(0, crossfeed_direct_gain, LANG_CROSSFEED_DIRECT_GAIN,
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, crossfeed_direct_gain, LANG_CROSSFEED_DIRECT_GAIN,
                     -15, "crossfeed direct gain", UNIT_DB, -60, 0, 5,
                     db_format, NULL, dsp_set_crossfeed_direct_gain),
-    INT_SETTING_NOWRAP(0, crossfeed_cross_gain, LANG_CROSSFEED_CROSS_GAIN, -60,
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, crossfeed_cross_gain, LANG_CROSSFEED_CROSS_GAIN, -60,
                     "crossfeed cross gain", UNIT_DB, -120, -30, 5,
                     db_format, NULL, crossfeed_cross_set),
-    INT_SETTING_NOWRAP(0, crossfeed_hf_attenuation, LANG_CROSSFEED_HF_ATTENUATION, -160,
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, crossfeed_hf_attenuation, LANG_CROSSFEED_HF_ATTENUATION, -160,
                     "crossfeed hf attenuation", UNIT_DB, -240, -60, 5,
                     db_format, NULL, crossfeed_cross_set),
-    INT_SETTING_NOWRAP(0, crossfeed_hf_cutoff, LANG_CROSSFEED_HF_CUTOFF, 700,
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, crossfeed_hf_cutoff, LANG_CROSSFEED_HF_CUTOFF, 700,
                     "crossfeed hf cutoff", UNIT_HERTZ, 500, 2000, 100,
                     NULL, NULL, crossfeed_cross_set),
 
@@ -957,7 +958,7 @@ const struct settings_list settings[] = {
                     EQ_GAIN_STEP, db_format, NULL, NULL),
 
     /* dithering */
-    OFFON_SETTING(0, dithering_enabled, LANG_DITHERING,
+    OFFON_SETTING(F_SOUNDSETTING, dithering_enabled, LANG_DITHERING,
         false, "dithering enabled", dsp_dither_enable),
 #endif
 #ifdef HAVE_WM8758

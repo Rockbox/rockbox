@@ -105,6 +105,7 @@ struct table_setting {
 #define F_THEMESETTING  0x0800000
 #define F_RECSETTING    0x1000000
 #define F_EQSETTING     0x2000000
+#define F_SOUNDSETTING  0x4000000
 
 #define F_NVRAM_BYTES_MASK     0xE0000 /*0-4 bytes can be stored */
 #define F_NVRAM_MASK_SHIFT     17
@@ -119,7 +120,7 @@ struct table_setting {
 #define F_NO_WRAP     0x1000 /* used if the list should not wrap */
 
 struct settings_list {
-    uint32_t             flags;   /* ____ ___R TFFF NNN_ _ATW PTVC IFRB STTT */
+    uint32_t             flags;   /* ____ _SER TFFF NNN_ _ATW PTVC IFRB STTT */
     void                *setting;
     int                  lang_id; /* -1 for none */
     union storage_type   default_val;

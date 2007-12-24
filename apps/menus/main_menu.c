@@ -90,12 +90,14 @@ MENUITEM_FUNCTION(save_settings_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SETTING
         write_settings_file, (void*)SETTINGS_SAVE_ALL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(save_theme_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_THEME), 
         write_settings_file, (void*)SETTINGS_SAVE_THEME, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(save_sound_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SOUND), 
+        write_settings_file, (void*)SETTINGS_SAVE_SOUND, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(reset_settings_item, 0, ID2P(LANG_RESET),
                   reset_settings, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, Icon_Config,
           &browse_configs, &reset_settings_item,
-          &save_settings_item, &save_theme_item);
+          &save_settings_item, &save_sound_item, &save_theme_item);
 /*    MANAGE SETTINGS MENU        */
 /**********************************/
 

@@ -11526,3 +11526,17 @@
     *: "Random"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user:
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Save Sound Settings"
+  </dest>
+  <voice>
+    *: "Save Sound Settings"
+  </voice>
+</phrase>
