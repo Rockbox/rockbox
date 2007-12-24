@@ -10113,10 +10113,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Vis nummerliste"
+    *: "Vis cuesheet"
   </dest>
   <voice>
-    *: "Vis nummerliste"
+    *: "Vis cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -10366,10 +10366,10 @@
     *: "Scanning disk..."
   </source>
   <dest>
-    *: "Scanning disk..."
+    *: "Skanner disk..."
   </dest>
   <voice>
-    *: "Scanning disk"
+    *: "Skanner disk"
   </voice>
 </phrase>
 <phrase>
@@ -10496,7 +10496,6 @@
   </dest>
   <voice>
     *: "Buffer størrelse"
-    player: "Buffer størrelse"
   </voice>
 </phrase>
 <phrase>
