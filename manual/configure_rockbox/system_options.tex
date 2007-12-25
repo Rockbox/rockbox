@@ -7,9 +7,11 @@
     WPS. Selecting \setting{Previous Screen} will make Rockbox start in the
     screen it was when the \dap{} was shut off.
 
-\subsection{Battery}
-    Options relating to the \opt{archos}{batteries}\nopt{archos}{battery}
-    in the \dap.
+\nopt{sansa}%will probably be there on Sansas one day -  exclude it the simple way without specific option
+{
+  \subsection{Battery}
+  Options relating to the \opt{archos}{batteries}\nopt{archos}{battery}
+  in the \dap.
   \begin{description}
     \item [Battery Capacity: ]This setting can be used to tell Rockbox what
       capacity (in mAh) the battery being used has. The default is
@@ -20,31 +22,42 @@
       \opt{ipodmini}{400mAh (1G) or 630mAh (2G)}%
       \opt{ipodcolor}{700mAh}%
       \opt{ipodnano,ipodvideo,ipod4g,ipod3g}{\fixme{unknown}}%
-      \opt{x5}{950mAh}%
+      \opt{m5,x5}{950mAh}%
       , which is the capacity value for the standard
       \opt{archos}{batteries}\nopt{archos}{battery} shipped with the \dap.
-	  Rockbox uses this value to estimate remaining battery life for the 
-      statusbar and WPS. Changing this setting has no effect whatsoever on 
-      actual battery life. This setting only affects the accuracy of the 
-      battery life estimation as shown on screen.
-   
-      \opt{ipod}{This value is fairly meaningless in the \playerman{} family at
-        present, and work is on-going into finding a better way to determine 
-        battery life.}
-    
-    \opt{ondiosp,ondiofm}{
-    \item [Battery Type: ]This setting tells Rockbox which type of battery
-      is currently used in the \dap{}. The two supported battery types are
-      ``Alkaline'' or ``NiMH''.
-    }
-  \end{description}
+        Rockbox uses this value to estimate remaining battery life for the
+        info screen and WPS. Changing this setting has no effect whatsoever on
+        actual battery life. This setting only affects the accuracy of the
+        battery life estimation as shown on screen.
+      \opt{iaudio}{Rockbox does not automatically distinguish between the
+        ``L'' models and the ``simple'' models which determine the default
+        value. If your dap{} is an \opt{m5}{M5L}\opt{x5}{X5L} set the value
+        to 2250mAh for more accuracy in the runtime estimation.}
+      \opt{ipod,sansa}{This value is fairly meaningless in the \playerman{}
+        family at present, and work is on-going into finding a better way to
+        determine battery life.}
 
-\nopt{ondiosp,ondiofm}{
+      \opt{BATTERY_TYPES}{%Ondios only (currently), following the lang features.txt
+      \item [Battery Type: ]This setting tells Rockbox which type of battery
+        is currently used in the \dap{}. The two supported battery types are
+        ``Alkaline'' or ``NiMH''.}
+
+      \opt{HAVE_USB_CHARGING}{
+%TODO: check where it is working correctly (except H300) and append the option to the respective platform file
+      \item [Charge During USB Connection: ]This option lets you control whether
+        the \dap{} should charge during the USB connection and hence draw the
+        full 500mA. Turning it \setting{Off} is recommended if the dap{} is
+        connected through an unpowered USB hub or a laptop port.
+      }
+
+     \end{description}
+}
+\opt{HAVE_DIRCACHE,HAVE_DISK_STORAGE}{
 \subsection{Disk}
     Options relating to the hard disk.
 
   \begin{description}
-    \nopt{ipodnano}{
+    \opt{HAVE_DISK_STORAGE}{
     \item [Disk Spindown: ]Rockbox has a timer that makes it spin down the
       hard disk after it is idle for a certain amount of time. This setting
       controls the amount of time between the last user activity and the time
@@ -54,7 +67,7 @@
       afterwards.
     }
 
-    \opt{SWCODEC}{
+    \opt{HAVE_DIRCACHE}{
     \item [Directory Cache: ]Rockbox has the ability to cache the contents of
       your drive in RAM. The \setting{Directory Cache} takes a small amount of
       memory away from Rockbox that would otherwise be used to buffer music,
@@ -69,7 +82,7 @@
       background.}
     }
   \end{description}
-} % \nopt{ondiosp,ondiofm}
+} % \opt{HAVE_DIRCACHE,HAVE_DISK_STORAGE}
 
 \opt{CONFIG_RTC}{
   \subsection{Time and Date}
@@ -93,15 +106,17 @@ available.
 % TODO this isn't quite right for all targets, I think
     This option turns the \dap{} off and then starts it up again at the
     specified time. Use \ActionSettingInc{} and \ActionSettingDec{} to adjust
-    the minutes setting, \ActionAlarmHoursDec{} and \ActionAlarmHoursInc{} to adjust the hours.
+    the minutes setting, \ActionAlarmHoursDec{} and \ActionAlarmHoursInc{} to
+    adjust the hours.
     \ActionAlarmSet{} confirms the alarm and shuts the \dap{} down, and
     \ActionAlarmCancel{} cancels setting an alarm. If the \dap{} is turned on
     again before the alarm occurs, the alarm will be cancelled. Using this
     option disables the \setting{Sleep Timer}.
 
+  \opt{HAVE_RECORDING,CONFIG_TUNER}{
     \subsection{Alarm Wake up Screen}
     This option controls what the \dap{} does when it is woken up by the alarm.
-    
+  }
 }
 
 \subsection{Limits}
@@ -114,14 +129,25 @@ This sub menu relates to limits in the Rockbox operating system.
     the music buffer, so you should increase this setting \emph{only} if you have
     directories with a large number of files.
 
-    \item [Max playlist size: ]This setting controls the maximum size of 
+    \item [Max playlist size: ]This setting controls the maximum size of
     a playlist. The playlist size can be between 1,000 and 32,000 files,
     in steps of 1,000 (default is 10,000). Higher values will shorten the
     music buffer, so you should increase this setting \emph{only} if you
     have very large playlists.
   \end{description}
 
-\opt{player,recorder,recorderv2fm,gigabeat,ipodvideo,iriver,iaudio,e200}{
+% TODO: this needs to be rewritten in another style, it lets you mix sound from another source into the music
+\opt{player}{
+  \subsection{Line In} This option activates the line in port on \dap, which is
+    off by default. This is useful for such applications as:
+    \begin{itemize}
+    \item Game boy $\rightarrow$ \dap $\rightarrow$ human
+    \item laptop $\rightarrow$ \dap $\rightarrow$ human
+    \item LAN party computer $\rightarrow$ \dap $\rightarrow$ human
+    \end{itemize}
+}
+
+\opt{HAVE_CAR_ADAPTER_MODE}{
 \subsection{Car Adapter Mode}
       This option turns \setting{On} and \setting{Off} the car ignition
       auto stop function.
@@ -144,13 +170,25 @@ This sub menu relates to limits in the Rockbox operating system.
   playback.
 }
 
-% TODO: this needs to be rewritten in another style, but i really don't know what kind of "line in" this describes... isn't it used for recording?
-\opt{player}{
-  \subsection{Line In} This option activates the line in port on \dap, which is
-    off by default. This is useful for such applications as:
-    \begin{itemize}
-    \item Game boy $\rightarrow$ \dap $\rightarrow$ human
-    \item laptop $\rightarrow$ \dap $\rightarrow$ human
-    \item LAN party computer $\rightarrow$ \dap $\rightarrow$ human
-    \end{itemize}
+\opt{HAVE_BUTTON_LIGHTS}{
+  \opt{e200}{
+  \subsection{Wheel Light Timeout}
+    This setting controls the amount of time the wheel lights shine after a
+    button press or wheel turn. If set to \setting{Off}, the LEDs will not
+    light when a button is pressed. If set to \setting{On}, the lights will
+    never shut off. If set to a time (1 to 120 seconds), the wheel will stay
+    lit for that amount of time after a button press or wheel turn.
+  }
+  \nopt{e200}{
+  \subsection{Button Light Timeout}
+    This setting controls the amount of time the button lights shine after a
+    button press. If set to \setting{Off}, the LEDs will not light when a
+    button is pressed. If set to \setting{On}, the lights will never shut off.
+    If set to a time (1 to 120 seconds), the buttons will stay lit for
+    that amount of time after a button press.
+  }
+  \opt{gigabeatf}{
+    \subsection{Button Light Brightness}
+      Changes the brightness of the button lights.
+  }
 }
