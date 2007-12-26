@@ -11499,4 +11499,17 @@
     *: "Aléatoire"
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user:
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Sauvegarder la config. audio actuelle"
+  </dest>
+  <voice>
+    *: "Sauvegarder la configuration audio actuelle"
+  </voice>
+</phrase>
