@@ -9724,10 +9724,10 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "Salva le impostazioni del tema"
+    *: "Salva impostazioni tema"
   </dest>
   <voice>
-    *: "Salva le impostazioni del tema"
+    *: "Salva impostazioni tema"
   </voice>
 </phrase>
 <phrase>
@@ -11479,5 +11479,19 @@
   </dest>
   <voice>
     *: "Casuale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user:
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Salva Impostazioni Audio"
+  </dest>
+  <voice>
+    *: "Salva Impostazioni Audio"
   </voice>
 </phrase>
