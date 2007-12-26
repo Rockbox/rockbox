@@ -11461,3 +11461,17 @@
     *: "Satunnainen"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user:
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Tallenna ääniasetukset"
+  </dest>
+  <voice>
+    *: "Tallenna ääniasetukset"
+  </voice>
+</phrase>
