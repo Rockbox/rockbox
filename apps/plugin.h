@@ -119,7 +119,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 91
+#define PLUGIN_API_VERSION 92
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -648,7 +648,7 @@ struct plugin_api {
 
     void (*thread_wait)(struct thread_entry *thread);
 
-#ifdef PROC_NEEDS_CACHEALIGN
+#if (CONFIG_CODEC == SWCODEC)
     size_t (*align_buffer)(void **start, size_t size, size_t align);
 #endif
 
@@ -697,6 +697,25 @@ struct plugin_api {
     bool (*search_albumart_files)(const struct mp3entry *id3, const char *size_string,
                                   char *buf, int buflen);
 #endif
+
+#if CONFIG_CODEC == SWCODEC
+    void (*pcm_play_lock)(void);
+    void (*pcm_play_unlock)(void);
+    void (*queue_enable_queue_send)(struct event_queue *q,
+                                    struct queue_sender_list *send);
+    bool (*queue_empty)(const struct event_queue *q);
+    void (*queue_wait)(struct event_queue *q, struct queue_event *ev);
+    intptr_t (*queue_send)(struct event_queue *q, long id,
+                           intptr_t data);
+    void (*queue_reply)(struct event_queue *q, intptr_t retval);
+#ifndef HAVE_FLASH_STORAGE
+    void (*ata_spin)(void);
+#endif
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    void (*trigger_cpu_boost)(void);
+    void (*cancel_cpu_boost)(void);
+#endif
+#endif /* CONFIG_CODEC == SWCODEC */
 };
 
 /* plugin header */

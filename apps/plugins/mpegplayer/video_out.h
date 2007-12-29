@@ -21,7 +21,51 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef VIDEO_OUT_H
+#define VIDEO_OUT_H
+
+/* Structure to hold width and height values */
+struct vo_ext
+{
+    int w, h;
+};
+
+/* Structure that defines a rectangle by its edges */
+struct vo_rect
+{
+    int l, t, r, b;
+};
+
 void vo_draw_frame (uint8_t * const * buf);
-void vo_draw_frame_thumb (uint8_t * const * buf);
+bool vo_draw_frame_thumb (uint8_t * const * buf,
+                          const struct vo_rect *rc);
+bool vo_init (void);
+bool vo_show (bool show);
+bool vo_is_visible(void);
 void vo_setup (const mpeg2_sequence_t * sequence);
+void vo_dimensions(struct vo_ext *sz);
 void vo_cleanup (void);
+
+/* Sets all coordinates of a vo_rect to 0 */
+void vo_rect_clear(struct vo_rect *rc);
+/* Returns true if left >= right or top >= bottom */
+bool vo_rect_empty(const struct vo_rect *rc);
+/* Initializes a vo_rect using upper-left corner and extents */
+void vo_rect_set_ext(struct vo_rect *rc, int x, int y,
+                     int width, int height);
+/* Query if two rectangles intersect
+ * If either are empty returns false */
+bool vo_rects_intersect(const struct vo_rect *rc1,
+                        const struct vo_rect *rc2);
+
+/* Intersect two rectangles
+ * Resulting rectangle is placed in rc_dst.
+ * rc_dst is set to empty if they don't intersect.
+ * Empty source rectangles do not intersect any rectangle.
+ * rc_dst may be the same structure as rc1 or rc2.
+ * Returns true if the resulting rectangle is not empty. */
+bool vo_rect_intersect(struct vo_rect *rc_dst,
+                       const struct vo_rect *rc1,
+                       const struct vo_rect *rc2);
+
+#endif /* VIDEO_OUT_H */

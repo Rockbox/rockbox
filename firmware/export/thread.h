@@ -42,11 +42,20 @@
 #define PRIORITY_SYSTEM          6   /* All other firmware threads */
 #define PRIORITY_BACKGROUND      8   /* Normal application threads */
 
+/* TODO: Only a minor tweak to create_thread would be needed to let
+ * thread slots be caller allocated - no essential threading functionality
+ * depends upon an array */
 #if CONFIG_CODEC == SWCODEC
+
+#ifdef HAVE_RECORDING
+#define MAXTHREADS  18
+#else
 #define MAXTHREADS  17
+#endif
+
 #else
 #define MAXTHREADS  11
-#endif
+#endif /* CONFIG_CODE == * */
 
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
 

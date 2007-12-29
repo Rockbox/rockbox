@@ -519,7 +519,7 @@ static const struct plugin_api rockbox_api = {
 
     thread_wait,
 
-#ifdef PROC_NEEDS_CACHEALIGN
+#if (CONFIG_CODEC == SWCODEC)
     align_buffer,
 #endif
 
@@ -564,6 +564,23 @@ static const struct plugin_api rockbox_api = {
     find_albumart,
     search_albumart_files,
 #endif
+
+#if CONFIG_CODEC == SWCODEC
+    pcm_play_lock,
+    pcm_play_unlock,
+    queue_enable_queue_send,
+    queue_empty,
+    queue_wait,
+    queue_send,
+    queue_reply,
+#ifndef HAVE_FLASH_STORAGE
+    ata_spin,
+#endif
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    trigger_cpu_boost,
+    cancel_cpu_boost,
+#endif
+#endif /* CONFIG_CODEC == SWCODEC */
 };
 
 int plugin_load(const char* plugin, void* parameter)

@@ -18,5 +18,13 @@ motion_comp_c.c
 
 slice.c
 video_out_rockbox.c
+video_thread.c
+pcm_output.c
+audio_thread.c
+disk_buf.c
 mpeg_settings.c
+stream_mgr.c
 mpegplayer.c
+mpeg_linkedlist.c
+mpeg_parser.c
+mpeg_misc.c

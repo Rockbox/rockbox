@@ -1,9 +1,17 @@
 
 #include "plugin.h"
 
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
+#define MPEG_OPTION_DITHERING_ENABLED 1
+#endif
+
+#ifndef MPEG_OPTION_DITHERING_ENABLED
+#define MPEG_OPTION_DITHERING_ENABLED 0
+#endif
+
 enum mpeg_option_id
 {
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
+#if MPEG_OPTION_DITHERING_ENABLED
     MPEG_OPTION_DITHERING,
 #endif
     MPEG_OPTION_DISPLAY_FPS,
@@ -34,16 +42,16 @@ struct mpeg_settings {
     int enable_start_menu;     /* flag to enable/disable start menu */
     int resume_count;          /* total # of resumes in config file */
     int resume_time;           /* resume time for current mpeg (in half minutes) */
-    char resume_filename[128]; /* filename of current mpeg */
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
+    char resume_filename[MAX_PATH]; /* filename of current mpeg */
+#if MPEG_OPTION_DITHERING_ENABLED
     int displayoptions;
 #endif
 };
 
 extern struct mpeg_settings settings;
 
-int get_start_time(int play_time, int in_file);
-enum mpeg_start_id mpeg_start_menu(int play_time, int in_file);
+int get_start_time(uint32_t duration);
+enum mpeg_start_id mpeg_start_menu(uint32_t duration);
 enum mpeg_menu_id mpeg_menu(void);
 void init_settings(const char* filename);
 void save_settings(void);

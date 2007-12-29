@@ -189,7 +189,13 @@ typedef enum
 } mpeg2_alloc_t;
 
 void * mpeg2_malloc (unsigned size, mpeg2_alloc_t reason);
+#if 0
 void mpeg2_free (void * buf);
+#endif
+/* allocates a dedicated buffer and locks all previous allocation in place */
+void * mpeg2_bufalloc(unsigned size, mpeg2_alloc_t reason);
+/* clears all non-dedicated buffer space */
+void mpeg2_mem_reset(void);
 void mpeg2_alloc_init(unsigned char* buf, int mallocsize);
 
 #endif /* MPEG2_H */

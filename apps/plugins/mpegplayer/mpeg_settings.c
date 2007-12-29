@@ -2,27 +2,16 @@
 #include "lib/configfile.h"
 #include "lib/oldmenuapi.h"
 
+#include "mpegplayer.h"
 #include "mpeg_settings.h"
 
-extern struct plugin_api* rb;
-
 struct mpeg_settings settings;
-
-ssize_t seek_PTS(int in_file, int startTime, int accept_button);
-void display_thumb(int in_file);
-
-#ifndef HAVE_LCD_COLOR
-void gray_show(bool enable);
-#endif
 
 #define SETTINGS_VERSION 2
 #define SETTINGS_MIN_VERSION 1
 #define SETTINGS_FILENAME "mpegplayer.cfg"
 
-enum slider_state_t {state0, state1, state2, 
-                     state3, state4, state5} slider_state;
-                     
-volatile long thumbDelayTimer;
+#define THUMB_DELAY (75*HZ/100)
 
 /* button definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
@@ -30,16 +19,16 @@ volatile long thumbDelayTimer;
 #define MPEG_SELECT      BUTTON_ON
 #define MPEG_RIGHT       BUTTON_RIGHT
 #define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_SCROLL_DOWN BUTTON_UP
-#define MPEG_SCROLL_UP   BUTTON_DOWN
+#define MPEG_UP          BUTTON_UP
+#define MPEG_DOWN        BUTTON_DOWN
 #define MPEG_EXIT        BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define MPEG_SELECT      BUTTON_PLAY
 #define MPEG_RIGHT       BUTTON_RIGHT
 #define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_SCROLL_DOWN BUTTON_UP
-#define MPEG_SCROLL_UP   BUTTON_DOWN
+#define MPEG_UP          BUTTON_UP
+#define MPEG_DOWN        BUTTON_DOWN
 #define MPEG_EXIT        BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
@@ -48,8 +37,8 @@ volatile long thumbDelayTimer;
 #define MPEG_SELECT      BUTTON_SELECT
 #define MPEG_RIGHT       BUTTON_RIGHT
 #define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_SCROLL_DOWN BUTTON_SCROLL_FWD
-#define MPEG_SCROLL_UP   BUTTON_SCROLL_BACK
+#define MPEG_UP          BUTTON_SCROLL_FWD
+#define MPEG_DOWN        BUTTON_SCROLL_BACK
 #define MPEG_EXIT        BUTTON_MENU
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
@@ -64,10 +53,10 @@ volatile long thumbDelayTimer;
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define MPEG_SELECT      BUTTON_PLAY
-#define MPEG_SCROLL_UP   BUTTON_SCROLL_UP
-#define MPEG_SCROLL_DOWN BUTTON_SCROLL_DOWN
 #define MPEG_LEFT        BUTTON_LEFT
 #define MPEG_RIGHT       BUTTON_RIGHT
+#define MPEG_UP          BUTTON_SCROLL_UP
+#define MPEG_DOWN        BUTTON_SCROLL_DOWN
 #define MPEG_EXIT        BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
@@ -136,10 +125,10 @@ static void display_options(void)
     int options_quit = 0;
 
     static const struct menu_item items[] = {
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
+#if MPEG_OPTION_DITHERING_ENABLED
         [MPEG_OPTION_DITHERING] =
             { "Dithering", NULL },
-#endif /* #ifdef TOSHIBA_GIGABEAT_F */
+#endif
         [MPEG_OPTION_DISPLAY_FPS] =
             { "Display FPS", NULL },
         [MPEG_OPTION_LIMIT_FPS] =
@@ -159,7 +148,7 @@ static void display_options(void)
 
         switch (result)
         {
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
+#if MPEG_OPTION_DITHERING_ENABLED
             case MPEG_OPTION_DITHERING:
                 result = (settings.displayoptions & LCD_YUV_DITHER) ? 1 : 0;
                 rb->set_option("Dithering", &result, INT, noyes, 2, NULL);
@@ -167,7 +156,7 @@ static void display_options(void)
                   | ((result != 0) ? LCD_YUV_DITHER : 0);
                 rb->lcd_yuv_set_options(settings.displayoptions);
                 break;
-#endif /* #ifdef TOSHIBA_GIGABEAT_F */
+#endif /* MPEG_OPTION_DITHERING_ENABLED */
             case MPEG_OPTION_DISPLAY_FPS:
                 rb->set_option("Display FPS",&settings.showfps,INT,
                                noyes, 2, NULL);
@@ -189,168 +178,343 @@ static void display_options(void)
     menu_exit(menu_id);
 }
 
-void draw_slider(int slider_ypos, int max_val, int current_val)
+static void show_loading(struct vo_rect *rc)
 {
-    int slider_margin = LCD_WIDTH*12/100; /* 12% */
-    int slider_width = LCD_WIDTH-(slider_margin*2);
-    char resume_str[32];
-
-    /* max_val and current_val are in half minutes
-       determine value .0 or .5 to display */
-    int max_hol = max_val/2;
-    int max_rem = (max_val-(max_hol*2))*5;
-    int current_hol = current_val/2;
-    int current_rem = (current_val-(current_hol*2))*5;
-
-    rb->snprintf(resume_str, sizeof(resume_str), "0.0");
-    rb->lcd_putsxy(slider_margin, slider_ypos, resume_str);
-
-    rb->snprintf(resume_str, sizeof(resume_str), "%u.%u", max_hol, max_rem);
-    rb->lcd_putsxy(LCD_WIDTH-slider_margin-25, slider_ypos, resume_str);
-    
-    rb->lcd_drawrect(slider_margin, slider_ypos+17, slider_width, 8);
-    rb->lcd_fillrect(slider_margin, slider_ypos+17,
-                     current_val*slider_width/max_val, 8);
-
-    rb->snprintf(resume_str, sizeof(resume_str), "%u.%u", current_hol,
-                 current_rem);
-    rb->lcd_putsxy(slider_margin+(current_val*slider_width/max_val)-16,
-                   slider_ypos+29, resume_str);
-
-    rb->lcd_update_rect(0, slider_ypos, LCD_WIDTH, LCD_HEIGHT-slider_ypos);
+    int oldmode;
+#ifndef HAVE_LCD_COLOR
+    stream_gray_show(false);
+#endif
+    oldmode = rb->lcd_get_drawmode();
+    rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID);
+    rb->lcd_fillrect(rc->l-1, rc->t-1, rc->r - rc->l + 2, rc->b - rc->t + 2);
+    rb->lcd_set_drawmode(oldmode);
+    rb->splash(0, "Loading...");
 }
 
-int get_start_time(int play_time, int in_file)
+void draw_slider(uint32_t range, uint32_t pos, struct vo_rect *rc)
 {
-    int seek_quit = 0;
+    #define SLIDER_WIDTH   (LCD_WIDTH-SLIDER_LMARGIN-SLIDER_RMARGIN)
+    #define SLIDER_X       SLIDER_LMARGIN
+    #define SLIDER_Y       (LCD_HEIGHT-SLIDER_HEIGHT-SLIDER_BMARGIN)
+    #define SLIDER_HEIGHT  8
+    #define SLIDER_TEXTMARGIN 1
+    #define SLIDER_LMARGIN 1
+    #define SLIDER_RMARGIN 1
+    #define SLIDER_TMARGIN 1
+    #define SLIDER_BMARGIN 1
+    #define SCREEN_MARGIN  1
+
+    struct hms hms;
+    char str[32];
+    int text_w, text_h, text_y;
+
+    /* Put positition on left */
+    ts_to_hms(pos, &hms);
+    hms_format(str, sizeof(str), &hms);
+    rb->lcd_getstringsize(str, NULL, &text_h);
+    text_y = SLIDER_Y - SLIDER_TEXTMARGIN - text_h;
+
+    if (rc == NULL)
+    {
+        int oldmode = rb->lcd_get_drawmode();
+        rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID);
+        rb->lcd_fillrect(SLIDER_X, text_y, SLIDER_WIDTH,
+                         LCD_HEIGHT - SLIDER_BMARGIN - text_y
+                         - SLIDER_TMARGIN);
+        rb->lcd_set_drawmode(oldmode);
+
+        rb->lcd_putsxy(SLIDER_X, text_y, str);
+
+        /* Put duration on right */
+        ts_to_hms(range, &hms);
+        hms_format(str, sizeof(str), &hms);
+        rb->lcd_getstringsize(str, &text_w, NULL);
+
+        rb->lcd_putsxy(SLIDER_X + SLIDER_WIDTH - text_w, text_y, str);
+
+        /* Draw slider */
+        rb->lcd_drawrect(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT);
+        rb->lcd_fillrect(SLIDER_X, SLIDER_Y,
+                         muldiv_uint32(pos, SLIDER_WIDTH, range),
+                         SLIDER_HEIGHT);
+
+        /* Update screen */
+        rb->lcd_update_rect(SLIDER_X, text_y - SLIDER_TMARGIN, SLIDER_WIDTH,
+                            LCD_HEIGHT - SLIDER_BMARGIN - text_y + SLIDER_TEXTMARGIN);
+    }
+    else
+    {
+        /* Just return slider rectangle */
+        rc->l = SLIDER_X;
+        rc->t = text_y - SLIDER_TMARGIN;
+        rc->r = rc->l + SLIDER_WIDTH;
+        rc->b = rc->t + LCD_HEIGHT - SLIDER_BMARGIN - text_y;
+    }
+}
+
+bool display_thumb_image(const struct vo_rect *rc)
+{
+    if (!stream_display_thumb(rc))
+    {
+        rb->splash(0, "Frame not available");
+        return false;
+    }
+
+#ifdef HAVE_LCD_COLOR
+    /* Draw a raised border around the frame */
+    int oldcolor = rb->lcd_get_foreground();
+    rb->lcd_set_foreground(LCD_LIGHTGRAY);
+
+    rb->lcd_hline(rc->l-1, rc->r-1, rc->t-1);
+    rb->lcd_vline(rc->l-1, rc->t, rc->b-1);
+
+    rb->lcd_set_foreground(LCD_DARKGRAY);
+
+    rb->lcd_hline(rc->l-1, rc->r, rc->b);
+    rb->lcd_vline(rc->r, rc->t-1, rc->b);
+
+    rb->lcd_set_foreground(oldcolor);
+
+    rb->lcd_update_rect(rc->l-1, rc->t-1, rc->r - rc->l + 2, 1);
+    rb->lcd_update_rect(rc->l-1, rc->t, 1, rc->b - rc->t);
+    rb->lcd_update_rect(rc->l-1, rc->b, rc->r - rc->l + 2, 1);
+    rb->lcd_update_rect(rc->r, rc->t, 1, rc->b - rc->t);
+#else
+    /* Just show the thumbnail */
+    stream_gray_show(true);
+#endif
+
+    return true;
+}
+
+/* Add an amount to the specified time - with saturation */
+uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
+{
+    if (amount < 0)
+    {
+        uint32_t off = -amount;
+        if (range > off && val >= off)
+            val -= off;
+        else
+            val = 0;
+    }
+    else if (amount > 0)
+    {
+        uint32_t off = amount;
+        if (range > off && val <= range - off)
+            val += off;
+        else
+            val = range;
+    }
+
+    return val;
+}
+
+int get_start_time(uint32_t duration)
+{
     int button = 0;
-    int resume_time = settings.resume_time;
-    int slider_ypos = LCD_HEIGHT-45;
-    int seek_return;
-    
-    slider_state = state0;
-    thumbDelayTimer = *(rb->current_tick);
+    int tmo = TIMEOUT_NOBLOCK;
+    uint32_t resume_time = settings.resume_time;
+    struct vo_rect rc_vid, rc_bound;
+    uint32_t aspect_vid, aspect_bound;
+
+    enum state_enum slider_state = state0;
+
     rb->lcd_clear_display();
     rb->lcd_update();
-    
-    while(seek_quit == 0)
+
+    draw_slider(0, 100, &rc_bound);
+    rc_bound.b = rc_bound.t - SLIDER_TMARGIN;
+#ifdef HAVE_LCD_COLOR
+    rc_bound.t = SCREEN_MARGIN;
+#else
+    rc_bound.t = 0;
+    rc_bound.l = 0;
+    rc_bound.r = LCD_WIDTH;
+#endif
+
+    DEBUGF("rc_bound: %d, %d, %d, %d\n", rc_bound.l, rc_bound.t,
+           rc_bound.r, rc_bound.b);
+
+    rc_vid.l = rc_vid.t = 0;
+    if (!stream_vo_get_size((struct vo_ext *)&rc_vid.r))
     {
-        button = rb->button_get(false);
+        /* Can't get size - fill whole thing */
+        rc_vid.r = rc_bound.r - rc_bound.l;
+        rc_vid.b = rc_bound.b - rc_bound.t;
+    }
+
+#if !defined (HAVE_LCD_COLOR)
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
+    rc_bound.b &= ~7; /* Align bottom edge */
+#endif
+#endif
+
+    /* Get aspect ratio of bounding rectangle and video in u16.16 */
+    aspect_bound = ((rc_bound.r - rc_bound.l) << 16) /
+                    (rc_bound.b - rc_bound.t);
+
+    DEBUGF("aspect_bound: %ld.%02ld\n", aspect_bound >> 16,
+           100*(aspect_bound & 0xffff) >> 16);
+
+    aspect_vid = (rc_vid.r << 16) / rc_vid.b;
+
+    DEBUGF("aspect_vid: %ld.%02ld\n", aspect_vid >> 16,
+           100*(aspect_vid & 0xffff) >> 16);
+
+    if (aspect_vid >= aspect_bound)
+    {
+        /* Video proportionally wider than or same as bounding rectangle */
+        if (rc_vid.r > rc_bound.r - rc_bound.l)
+        {
+            rc_vid.r = rc_bound.r - rc_bound.l;
+            rc_vid.b = (rc_vid.r << 16) / aspect_vid;
+        }
+        /* else already fits */
+    }
+    else
+    {
+        /* Video proportionally narrower than bounding rectangle */
+        if (rc_vid.b > rc_bound.b - rc_bound.t)
+        {
+            rc_vid.b = rc_bound.b - rc_bound.t;
+            rc_vid.r = (aspect_vid * rc_vid.b) >> 16;
+        }
+        /* else already fits */
+    }
+
+    /* Even width and height >= 2 */
+    rc_vid.r = (rc_vid.r < 2) ? 2 : (rc_vid.r & ~1);
+    rc_vid.b = (rc_vid.b < 2) ? 2 : (rc_vid.b & ~1);
+
+    /* Center display in bounding rectangle */
+    rc_vid.l = ((rc_bound.l + rc_bound.r) - rc_vid.r) / 2;
+    rc_vid.r += rc_vid.l;
+
+    rc_vid.t = ((rc_bound.t + rc_bound.b) - rc_vid.b) / 2;
+    rc_vid.b += rc_vid.t;
+
+    DEBUGF("rc_vid: %d, %d, %d, %d\n", rc_vid.l, rc_vid.t,
+           rc_vid.r, rc_vid.b);
+
+#ifndef HAVE_LCD_COLOR
+    /* Set gray overlay to the bounding rectangle */
+    stream_set_gray_rect(&rc_bound);
+#endif
+
+    while(slider_state < state9)
+    {
+        button = tmo == TIMEOUT_BLOCK ?
+            rb->button_get(true) : rb->button_get_w_tmo(tmo);
+
         switch (button)
         {
-#if (CONFIG_KEYPAD == GIGABEAT_PAD)   || \
-    (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-    (CONFIG_KEYPAD == SANSA_C200_PAD)
-            case MPEG_DOWN:
-            case MPEG_DOWN | BUTTON_REPEAT:
-                if ((resume_time -= 20) < 0)
-                    resume_time = 0;
-                slider_state = state0;
-                thumbDelayTimer = *(rb->current_tick);
-                break;
-            case MPEG_UP:
-            case MPEG_UP | BUTTON_REPEAT:
-                if ((resume_time += 20) > play_time)
-                    resume_time = play_time;
-                slider_state = state0;
-                thumbDelayTimer = *(rb->current_tick);
-                break;
+        case BUTTON_NONE:
+            break;
+
+        /* Coarse (1 minute) control */
+        case MPEG_DOWN:
+        case MPEG_DOWN | BUTTON_REPEAT:
+            resume_time = increment_time(resume_time, -60*TS_SECOND, duration);
+            slider_state = state0;
+            break;
+
+        case MPEG_UP:
+        case MPEG_UP | BUTTON_REPEAT:
+            resume_time = increment_time(resume_time, 60*TS_SECOND, duration);
+            slider_state = state0;
+            break;
+
+        /* Fine (1 second) control */
+        case MPEG_LEFT:
+        case MPEG_LEFT | BUTTON_REPEAT:
+#ifdef MPEG_SCROLL_UP
+        case MPEG_SCROLL_UP:
+        case MPEG_SCROLL_UP | BUTTON_REPEAT:
 #endif
-            case MPEG_LEFT:
-            case MPEG_LEFT | BUTTON_REPEAT:
-            case MPEG_SCROLL_UP:
-            case MPEG_SCROLL_UP | BUTTON_REPEAT:
-                if (--resume_time < 0)
-                    resume_time = 0;
-                slider_state = state0;
-                thumbDelayTimer = *(rb->current_tick);
-                break;
-            case MPEG_RIGHT:
-            case MPEG_RIGHT | BUTTON_REPEAT:
-            case MPEG_SCROLL_DOWN:
-            case MPEG_SCROLL_DOWN | BUTTON_REPEAT:
-                if (++resume_time > play_time)
-                    resume_time = play_time;
-                slider_state = state0;
-                thumbDelayTimer = *(rb->current_tick);
-                break;
-            case MPEG_SELECT:
-                settings.resume_time = resume_time;
-            case MPEG_EXIT:
-                seek_quit = 1;
-                break;
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    seek_quit = 1;
-                break;
+            resume_time = increment_time(resume_time, -TS_SECOND, duration);
+            slider_state = state0;
+            break;
+
+        case MPEG_RIGHT:
+        case MPEG_RIGHT | BUTTON_REPEAT:
+#ifdef MPEG_SCROLL_DOWN
+        case MPEG_SCROLL_DOWN:
+        case MPEG_SCROLL_DOWN | BUTTON_REPEAT:
+#endif
+            resume_time = increment_time(resume_time, TS_SECOND, duration);
+            slider_state = state0;
+            break;
+
+        case MPEG_SELECT:
+            settings.resume_time = resume_time;
+        case MPEG_EXIT:
+            slider_state = state9;
+            break;
+
+        case SYS_USB_CONNECTED:
+            slider_state = state9;
+#ifndef HAVE_LCD_COLOR
+            stream_gray_show(false);
+#endif
+            cancel_cpu_boost();
+        default:
+            rb->default_event_handler(button);
+            rb->yield();
+            continue;
         }
-        
-        rb->yield();
-        
+
         switch(slider_state)
         {
-            case state0:
-                rb->lcd_clear_display();
-                rb->lcd_update();
-#ifdef HAVE_LCD_COLOR
-                if (resume_time > 0)
-                    rb->splash(0, "Loading...");
-#endif
-                slider_state = state1;
-                break;
-            case state1:
-                if (*(rb->current_tick) - thumbDelayTimer > 75)
-                    slider_state = state2;
-                if (resume_time == 0)
-                {
-                    seek_return = 0;
-                    slider_state = state5;
-                }
-                draw_slider(slider_ypos, play_time, resume_time);
-                break;
-            case state2:
-                if ( (seek_return = seek_PTS(in_file, resume_time, 1)) >= 0)
-                    slider_state = state3;
-                else if (seek_return == -101)
-                {
-                    slider_state = state0;
-                    thumbDelayTimer = *(rb->current_tick);
-                } 
-                else 
-                    slider_state = state4;
-                break;
-            case state3:
-                display_thumb(in_file);
-                draw_slider(slider_ypos, play_time, resume_time);
-                slider_state = state4;
-                break;
-            case state4:
-                draw_slider(slider_ypos, play_time, resume_time);
-                slider_state = state5;
-                break;
-            case state5:
-                break;
+        case state0:
+            trigger_cpu_boost();
+            stream_seek(resume_time, SEEK_SET);
+            show_loading(&rc_bound);
+            draw_slider(duration, resume_time, NULL);
+            slider_state = state1;
+            tmo = THUMB_DELAY;
+            break;
+        case state1:
+            display_thumb_image(&rc_vid);
+            slider_state = state2;
+        case state2:
+        case state9:
+            cancel_cpu_boost();
+            tmo = TIMEOUT_BLOCK;
+        default:
+            break;
         }
     }
+
+#ifndef HAVE_LCD_COLOR
+    /* Restore gray overlay dimensions */
+    stream_gray_show(false);
+    rc_bound.b = LCD_HEIGHT;
+    stream_set_gray_rect(&rc_bound);
+#endif
+
+    cancel_cpu_boost();
 
     return button;
 }
 
-enum mpeg_start_id  mpeg_start_menu(int play_time, int in_file)
+enum mpeg_start_id  mpeg_start_menu(uint32_t duration)
 {
     int menu_id;
     int result = 0;
     int menu_quit = 0;
-    
+
     /* add the resume time to the menu display */
     char resume_str[32];
-    int time_hol  = (int)(settings.resume_time/2);
-    int time_rem = ((settings.resume_time%2)==0) ? 0 : 5;
+    char hms_str[32];
+    struct hms hms;
+
+    ts_to_hms(settings.resume_time, &hms);
+    hms_format(hms_str, sizeof(hms_str), &hms);
 
     if (settings.enable_start_menu == 0)
     {
-        rb->snprintf(resume_str, sizeof(resume_str),
-                     "Yes (min): %d.%d", time_hol, time_rem);
+        rb->snprintf(resume_str, sizeof(resume_str), "Yes: %s", hms_str);
 
         struct opt_items resume_no_yes[2] =
         {
@@ -369,11 +533,10 @@ enum mpeg_start_id  mpeg_start_menu(int play_time, int in_file)
             return MPEG_START_RESTART;
         }
         else
-           return MPEG_START_RESUME;
+            return MPEG_START_RESUME;
     }
 
-    rb->snprintf(resume_str, sizeof(resume_str),
-                 "Resume time (min): %d.%d", time_hol, time_rem);
+    rb->snprintf(resume_str, sizeof(resume_str), "Resume at: %s", hms_str);
 
     struct menu_item items[] =
     {
@@ -382,7 +545,7 @@ enum mpeg_start_id  mpeg_start_menu(int play_time, int in_file)
         [MPEG_START_RESUME] =
             { resume_str, NULL },
         [MPEG_START_SEEK] =
-            { "Set start time (min)", NULL },
+            { "Set start time", NULL },
         [MPEG_START_QUIT] =
             { "Quit mpegplayer", NULL },
     };
@@ -390,9 +553,9 @@ enum mpeg_start_id  mpeg_start_menu(int play_time, int in_file)
 
     menu_id = menu_init(rb, items, sizeof(items) / sizeof(*items),
                         NULL, NULL, NULL, NULL);
-  
+
     rb->button_clear_queue();
-    
+
     while(menu_quit == 0)
     {
         result = menu_show(menu_id);
@@ -407,15 +570,19 @@ enum mpeg_start_id  mpeg_start_menu(int play_time, int in_file)
                 menu_quit = 1;
                 break;
             case MPEG_START_SEEK:
-#ifndef HAVE_LCD_COLOR
-                gray_show(true);
-#endif
-                if (get_start_time(play_time, in_file) == MPEG_SELECT)
+            {
+                if (!stream_can_seek())
+                {
+                    rb->splash(HZ, "Unavailable");
+                    break;
+                }
+
+                bool vis = stream_show_vo(false);
+                if (get_start_time(duration) == MPEG_SELECT)
                     menu_quit = 1;
-#ifndef HAVE_LCD_COLOR
-                gray_show(false);
-#endif
+                stream_show_vo(vis);
                 break;
+                }
             case MPEG_START_QUIT:
                 menu_quit = 1;
                 break;
@@ -428,13 +595,15 @@ enum mpeg_start_id  mpeg_start_menu(int play_time, int in_file)
 
     menu_exit(menu_id);
 
+    rb->lcd_clear_display();
+    rb->lcd_update();
+
     return result;
 }
 
 void clear_resume_count(void)
 {
-    configfile_save(SETTINGS_FILENAME, config,
-                    sizeof(config)/sizeof(*config),
+    configfile_save(SETTINGS_FILENAME, config, ARRAYLEN(config),
                     SETTINGS_VERSION);
 
     settings.resume_count = 0;
@@ -514,7 +683,7 @@ void init_settings(const char* filename)
     settings.skipframes = 1;  /* Skip frames */
     settings.enable_start_menu = 1; /* Enable start menu */
     settings.resume_count = -1;
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
+#if MPEG_OPTION_DITHERING_ENABLED
     settings.displayoptions = 0; /* No visual effects */
 #endif
 
@@ -530,7 +699,7 @@ void init_settings(const char* filename)
                         SETTINGS_VERSION);
     }
 
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
+#if MPEG_OPTION_DITHERING_ENABLED
     if ((settings.displayoptions =
          configfile_get_value(SETTINGS_FILENAME, "Display options")) < 0)
     {
@@ -546,7 +715,7 @@ void init_settings(const char* filename)
         configfile_update_entry(SETTINGS_FILENAME, "Resume count", 0);
     }
 
-    rb->strcpy(settings.resume_filename, filename);
+    rb->snprintf(settings.resume_filename, MAX_PATH, "%s", filename);
 
     /* get the resume time for the current mpeg if it exist */
     if ((settings.resume_time = configfile_get_value
@@ -558,11 +727,11 @@ void init_settings(const char* filename)
 
 void save_settings(void)
 {
-    configfile_update_entry(SETTINGS_FILENAME, "Show FPS", 
+    configfile_update_entry(SETTINGS_FILENAME, "Show FPS",
                             settings.showfps);
-    configfile_update_entry(SETTINGS_FILENAME, "Limit FPS", 
+    configfile_update_entry(SETTINGS_FILENAME, "Limit FPS",
                             settings.limitfps);
-    configfile_update_entry(SETTINGS_FILENAME, "Skip frames", 
+    configfile_update_entry(SETTINGS_FILENAME, "Skip frames",
                             settings.skipframes);
     configfile_update_entry(SETTINGS_FILENAME, "Enable start menu",
                             settings.enable_start_menu);
@@ -575,8 +744,8 @@ void save_settings(void)
                                 ++settings.resume_count);
     }
 
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
-    configfile_update_entry(SETTINGS_FILENAME, "Display options", 
+#if MPEG_OPTION_DITHERING_ENABLED
+    configfile_update_entry(SETTINGS_FILENAME, "Display options",
                             settings.displayoptions);
 #endif
 }

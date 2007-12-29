@@ -77,8 +77,6 @@ int make_list_from_caps32(unsigned long src_mask,
     return count;
 } /* make_list_from_caps32 */
 
-/* Only needed for cache aligning atm */
-#ifdef PROC_NEEDS_CACHEALIGN
 /* Align a buffer and size to a size boundary while remaining within
  * the original boundaries */
 size_t align_buffer(void **start, size_t size, size_t align)
@@ -98,4 +96,3 @@ size_t align_buffer(void **start, size_t size, size_t align)
     *start = newstart;
     return newend - newstart;
 }
-#endif /* PROC_NEEDS_CACHEALIGN */

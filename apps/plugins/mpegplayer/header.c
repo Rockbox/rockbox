@@ -92,12 +92,12 @@ void mpeg2_header_state_init (mpeg2dec_t * mpeg2dec)
 {
     if (mpeg2dec->sequence.width != (unsigned)-1)
     {
-        int i;
-
         mpeg2dec->sequence.width = (unsigned)-1;
-
+        mpeg2_mem_reset(); /* Clean the memory slate */
+#if 0
         if (!mpeg2dec->custom_fbuf)
         {
+            int i;
             for (i = mpeg2dec->alloc_index_user;
                  i < mpeg2dec->alloc_index; i++)
             {
@@ -109,6 +109,7 @@ void mpeg2_header_state_init (mpeg2dec_t * mpeg2dec)
 
         if (mpeg2dec->convert_start)
         {
+            int i;
             for (i = 0; i < 3; i++)
             {
                 mpeg2_free(mpeg2dec->yuv_buf[i][0]);
@@ -121,6 +122,7 @@ void mpeg2_header_state_init (mpeg2dec_t * mpeg2dec)
         {
             mpeg2_free(mpeg2dec->decoder.convert_id);
         }
+#endif
     }
 
     mpeg2dec->decoder.coding_type = I_TYPE;

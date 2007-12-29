@@ -497,8 +497,8 @@ mpeg2dec_t * mpeg2_init (void)
 
     mpeg2_idct_init ();
 
-    mpeg2dec = (mpeg2dec_t *)mpeg2_malloc(sizeof (mpeg2dec_t),
-					                      MPEG2_ALLOC_MPEG2DEC);
+    mpeg2dec = (mpeg2dec_t *)mpeg2_bufalloc(sizeof (mpeg2dec_t),
+					                        MPEG2_ALLOC_MPEG2DEC);
     if (mpeg2dec == NULL)
 	    return NULL;
 
@@ -509,8 +509,8 @@ mpeg2dec_t * mpeg2_init (void)
     rb->memset (mpeg2dec->decoder.DCTblock, 0, 64 * sizeof (int16_t));
     rb->memset (mpeg2dec->quantizer_matrix, 0, 4 * 64 * sizeof (uint8_t));
 
-    mpeg2dec->chunk_buffer = (uint8_t *)mpeg2_malloc(BUFFER_SIZE + 4,
-						                             MPEG2_ALLOC_CHUNK);
+    mpeg2dec->chunk_buffer = (uint8_t *)mpeg2_bufalloc(BUFFER_SIZE + 4,
+						                               MPEG2_ALLOC_CHUNK);
 
     mpeg2dec->sequence.width = (unsigned)-1;
     mpeg2_reset (mpeg2dec, 1);
@@ -521,6 +521,9 @@ mpeg2dec_t * mpeg2_init (void)
 void mpeg2_close (mpeg2dec_t * mpeg2dec)
 {
     mpeg2_header_state_init (mpeg2dec);
+#if 0
+    /* These are dedicated buffers in rockbox */
     mpeg2_free (mpeg2dec->chunk_buffer);
     mpeg2_free (mpeg2dec);
+#endif
 }

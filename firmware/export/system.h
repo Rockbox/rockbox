@@ -243,16 +243,18 @@ static inline uint32_t swap_odd_even32(uint32_t value)
 #define CACHEALIGN_DOWN(x) \
     ((typeof (x))ALIGN_DOWN_P2((uintptr_t)(x), CACHEALIGN_BITS))
 /* Aligns at least to the greater of size x or CACHEALIGN_SIZE */
-#define CACHEALIGN_AT_LEAST_ATTR(x) __attribute__((aligned(CACHEALIGN_UP(x))))
+#define CACHEALIGN_AT_LEAST_ATTR(x) \
+    __attribute__((aligned(CACHEALIGN_UP(x))))
 /* Aligns a buffer pointer and size to proper boundaries */
 #define CACHEALIGN_BUFFER(start, size) \
-    ({ align_buffer((start), (size), CACHEALIGN_SIZE); })
+    ({ align_buffer(PUN_PTR(void **, (start)), (size), CACHEALIGN_SIZE); })
 
 #else /* ndef PROC_NEEDS_CACHEALIGN */
 
 /* Cache alignment attributes and sizes are not enabled */
 #define CACHEALIGN_ATTR
-#define CACHEALIGN_AT_LEAST_ATTR(x) __attribute__((aligned(x)))
+#define CACHEALIGN_AT_LEAST_ATTR(x) \
+    __attribute__((aligned(x)))
 #define CACHEALIGN_UP(x) (x)
 #define CACHEALIGN_DOWN(x) (x)
 /* Make no adjustments */
@@ -260,5 +262,9 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     ({ (void)(start); (size); })
 
 #endif /* PROC_NEEDS_CACHEALIGN */
+
+/* Double-cast to avoid 'dereferencing type-punned pointer will
+ * break strict aliasing rules' B.S. */
+#define PUN_PTR(type, p) ((type)(intptr_t)(p))
 
 #endif /* __SYSTEM_H__ */
