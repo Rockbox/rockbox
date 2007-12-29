@@ -1024,6 +1024,7 @@ int stream_init(void)
     if (grayscales < 33 || (ssize_t)memsize <= 0)
     {
         rb->splash(HZ, "graylib init failed!");
+        stream_mgr.graymem = NULL;
         return STREAM_ERROR;
     }
 #endif /* !HAVE_LCD_COLOR */
@@ -1093,4 +1094,9 @@ void stream_exit(void)
         rb->thread_wait(stream_mgr.thread);
         stream_mgr.thread = NULL;
     }
+
+#ifndef HAVE_LCD_COLOR
+    if (stream_mgr.graymem != NULL)
+        gray_release();
+#endif
 }

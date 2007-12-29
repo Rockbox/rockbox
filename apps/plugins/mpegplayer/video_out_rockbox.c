@@ -398,7 +398,4 @@ bool vo_is_visible(void)
 void vo_cleanup(void)
 {
     vo.visible = false;
-#ifndef HAVE_LCD_COLOR
-    gray_release();
-#endif
 }

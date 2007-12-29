@@ -1030,11 +1030,4 @@ void video_thread_exit(void)
         IF_COP(invalidate_icache());
         video_str.thread = NULL;
     }
-    else
-    {
-        /* Some things were done before thread creation */
-#ifndef HAVE_LCD_COLOR
-        gray_release();
-#endif
-    }
 }
