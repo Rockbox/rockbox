@@ -354,13 +354,13 @@ int get_start_time(uint32_t duration)
     aspect_bound = ((rc_bound.r - rc_bound.l) << 16) /
                     (rc_bound.b - rc_bound.t);
 
-    DEBUGF("aspect_bound: %ld.%02ld\n", aspect_bound >> 16,
-           100*(aspect_bound & 0xffff) >> 16);
+    DEBUGF("aspect_bound: %u.%02u\n", (unsigned)(aspect_bound >> 16),
+           (unsigned)(100*(aspect_bound & 0xffff) >> 16));
 
     aspect_vid = (rc_vid.r << 16) / rc_vid.b;
 
-    DEBUGF("aspect_vid: %ld.%02ld\n", aspect_vid >> 16,
-           100*(aspect_vid & 0xffff) >> 16);
+    DEBUGF("aspect_vid: %u.%02u\n", (unsigned)(aspect_vid >> 16),
+           (unsigned)(100*(aspect_vid & 0xffff) >> 16));
 
     if (aspect_vid >= aspect_bound)
     {
