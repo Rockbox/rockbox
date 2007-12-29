@@ -11426,7 +11426,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (farvegradient)"
+    lcd_color: "Farvegradueret bar"
   </voice>
 </phrase>
 <phrase>
@@ -11443,7 +11443,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (ensfarvet)"
+    lcd_color: "Ensfarvet bar"
   </voice>
 </phrase>
 <phrase>
@@ -11523,5 +11523,19 @@
   </dest>
   <voice>
     *: "Tilfældig"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user:
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Gem lydindstillinger"
+  </dest>
+  <voice>
+    *: "Gem lydindstillinger"
   </voice>
 </phrase>
