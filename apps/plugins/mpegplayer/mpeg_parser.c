@@ -974,6 +974,8 @@ static int parse_elementary(struct stream *str, enum stream_parse_mode type)
         }
 
         p = str->curr_packet_end;
+        if (p >= disk_buf.end)
+            p -= disk_buf.size;
         break;
         /* STREAM_PM_STREAMING: */
 
