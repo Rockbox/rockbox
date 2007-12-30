@@ -44,6 +44,7 @@ disktidy.c
 flipit.c
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
+brickmania.c
 maze.c
 mazezam.c
 text_editor.c
@@ -64,10 +65,6 @@ bubbles.c
 invadrox.c
 #endif
 
-#if LCD_WIDTH != 128 && !defined SANSA_C200
-/* These need adjusting for the iRiver if'p and Sansa c200, small H10 screen */
-brickmania.c
-#endif
 calculator.c
 chip8.c
 chopper.c

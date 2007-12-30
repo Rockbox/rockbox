@@ -20,16 +20,6 @@ bubbles_bubble.220x176x1.bmp
 bubbles_bubble.320x240x1.bmp
 #endif
 
-/* BrickMania */
-#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-brickmania_menu_items.112x64x1.bmp
-brickmania_bricks.112x64x1.bmp
-brickmania_ball.112x64x1.bmp
-brickmania_pads.112x64x1.bmp
-brickmania_powerups.112x64x1.bmp
-
-#endif
-
 /* Rockblox */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 rockblox_background.112x64x1.bmp

@@ -35,9 +35,6 @@ PLUGIN_HEADER
 
 #define RC_QUIT BUTTON_RC_STOP
 
-/* Only iPod have scroll events */
-#define SCROLL_FWD(x) (0)
-#define SCROLL_BACK(x) (0)
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 
@@ -48,9 +45,6 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
-/* Only iPod have scroll events */
-#define SCROLL_FWD(x) (0)
-#define SCROLL_BACK(x) (0)
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
@@ -61,9 +55,6 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
-/* Only iPod have scroll events */
-#define SCROLL_FWD(x) (0)
-#define SCROLL_BACK(x) (0)
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 
@@ -74,9 +65,6 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
-/* Only iPod have scroll events */
-#define SCROLL_FWD(x) (0)
-#define SCROLL_BACK(x) (0)
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
@@ -92,6 +80,7 @@ PLUGIN_HEADER
 #define SCROLL_FWD(x) ((x) & BUTTON_SCROLL_FWD)
 #define SCROLL_BACK(x) ((x) & BUTTON_SCROLL_BACK)
 
+
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 
 #define QUIT BUTTON_POWER
@@ -101,10 +90,8 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
-#define SCROLL_FWD(x) (0)
-#define SCROLL_BACK(x) (0)
 
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD /* grayscale at the moment */
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 
 #define QUIT BUTTON_POWER
 #define LEFT BUTTON_LEFT
@@ -113,9 +100,6 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
-/* Only iPod have scroll events */
-#define SCROLL_FWD(x) (0)
-#define SCROLL_BACK(x) (0)
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 
@@ -126,10 +110,20 @@ PLUGIN_HEADER
 #define UP     BUTTON_SCROLL_UP
 #define DOWN   BUTTON_SCROLL_DOWN
 
-#define SCROLL_FWD(x) ((x) & BUTTON_SCROLL_DOWN)
-#define SCROLL_BACK(x) ((x) & BUTTON_SCROLL_UP)
 
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD /* grayscale at the moment */
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
+
+#define QUIT     BUTTON_POWER
+#define LEFT     BUTTON_LEFT
+#define RIGHT    BUTTON_RIGHT
+#define ALTLEFT  BUTTON_VOL_DOWN
+#define ALTRIGHT BUTTON_VOL_UP
+#define SELECT   BUTTON_SELECT
+#define UP       BUTTON_UP
+#define DOWN     BUTTON_DOWN
+
+
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
 
 #define QUIT BUTTON_POWER
 #define LEFT BUTTON_LEFT
@@ -138,13 +132,16 @@ PLUGIN_HEADER
 #define UP BUTTON_SCROLL_UP
 #define DOWN BUTTON_SCROLL_DOWN
 
-/* Only iPod have scroll events */
-#define SCROLL_FWD(x) (0)
-#define SCROLL_BACK(x) (0)
 
 #else
 #error Unsupported keypad
 #endif
+
+#ifndef SCROLL_FWD
+#define SCROLL_FWD(x) (0)
+#define SCROLL_BACK(x) (0)
+#endif
+
 
 static struct plugin_api* rb;
 
@@ -180,6 +177,35 @@ extern const fb_data brickmania_powerups[];
 /* purple, red, blue, pink, green, yellow orange */
 extern const fb_data brickmania_bricks[];
 
+#include "brickmania_pads.h"
+#include "brickmania_bricks.h"
+#include "brickmania_powerups.h"
+#include "brickmania_ball.h"
+#include "brickmania_menu_items.h"
+#include "brickmania_gameover.h"
+
+#define PAD_WIDTH        BMPWIDTH_brickmania_pads
+#define PAD_HEIGHT       (BMPHEIGHT_brickmania_pads/3)
+#define BRICK_HEIGHT     (BMPHEIGHT_brickmania_bricks/7)
+#define BRICK_WIDTH      BMPWIDTH_brickmania_bricks
+#define LEFTMARGIN       ((LCD_WIDTH-10*BRICK_WIDTH)/2)
+#define POWERUP_HEIGHT   (BMPHEIGHT_brickmania_powerups/7)
+#define POWERUP_WIDTH    BMPWIDTH_brickmania_powerups
+#define BALL             BMPHEIGHT_brickmania_ball
+#define HALFBALL         ((BALL+1)/2)
+#define MENU_ITEMXOFS    ((LCD_WIDTH - BMPWIDTH_brickmania_menu_items)/2)
+#define MENU_ITEMHEIGHT  (BMPHEIGHT_brickmania_menu_items/9)
+#define MENU_ITEMWIDTH   BMPWIDTH_brickmania_menu_items
+#define GAMEOVER_WIDTH   BMPWIDTH_brickmania_gameover
+#define GAMEOVER_HEIGHT  BMPHEIGHT_brickmania_gameover
+
+#if LCD_DEPTH > 1 /* currently no background bmp for mono screens */
+#include "brickmania_menu_bg.h"
+#define MENU_BGHEIGHT  BMPHEIGHT_brickmania_menu_bg
+#define MENU_BGWIDTH   BMPWIDTH_brickmania_menu_bg
+#endif
+
+
 #if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 
 /* The time (in ms) for one iteration through the game loop - decrease this
@@ -188,42 +214,16 @@ extern const fb_data brickmania_bricks[];
 */
 #define CYCLETIME 30
 
-#define GAMESCREEN_HEIGHT LCD_HEIGHT
-
-#define PAD_WIDTH 56
-#define PAD_HEIGHT 7
-#define PAD_POS_Y LCD_HEIGHT - 7
-#define BRICK_HEIGHT 12
-#define BRICK_WIDTH 32
-#define BALL 5
-#define HALFBALL 3
-#define LEFTMARGIN 0
 #define TOPMARGIN 30
 
-#define MENU_BMPHEIGHT 20
-#define MENU_BMPWIDTH 112
-
-#define BMPHEIGHT_powerup 10
-#define BMPWIDTH_powerup 16
-
-#define BMPHEIGHT_menu LCD_HEIGHT
-#define BMPWIDTH_menu LCD_WIDTH
-
-#define BMPXOFS_start 105
 #define BMPYOFS_start 110
-#define BMPXOFS_resume 112
-#define BMPYOFS_resume 132
-#define BMPXOFS_help 142
-#define BMPYOFS_help 150
-#define BMPXOFS_quit 143
-#define BMPYOFS_quit 170
 #define HIGHSCORE_XPOS 57
 #define HIGHSCORE_YPOS 88
 
-#define STRINGPOS_finsh 140
-#define STRINGPOS_congrats 157
-#define STRINGPOS_navi 150
-#define STRINGPOS_flipsides 150
+#define STRINGPOS_FINISH 140
+#define STRINGPOS_CONGRATS 157
+#define STRINGPOS_NAVI 150
+#define STRINGPOS_FLIP 150
 
 #elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
 
@@ -236,44 +236,19 @@ extern const fb_data brickmania_bricks[];
 /* Offsets for LCDS > 220x176 */
 
 #define GAMESCREEN_HEIGHT 176
-
-#define PAD_WIDTH 40
-#define PAD_HEIGHT 5
-#define PAD_POS_Y GAMESCREEN_HEIGHT - 7
-#define BRICK_HEIGHT 8
-#define BRICK_WIDTH 21
-#define BALL 5
-#define HALFBALL 3
-#define LEFTMARGIN (LCD_WIDTH-220)/2 + 5
 #define TOPMARGIN 30
 
 #define XOFS ((LCD_WIDTH-220)/BRICK_WIDTH/2)*BRICK_WIDTH
 #define YOFS ((LCD_HEIGHT-176)/BRICK_HEIGHT/2)*BRICK_HEIGHT
 
-#define MENU_BMPHEIGHT 20
-#define MENU_BMPWIDTH 112
-
-#define BMPHEIGHT_powerup 6
-#define BMPWIDTH_powerup 10
-
-#define BMPHEIGHT_menu LCD_HEIGHT
-#define BMPWIDTH_menu LCD_WIDTH
-
-#define BMPXOFS_start (55+XOFS)
 #define BMPYOFS_start (78+YOFS)
-#define BMPXOFS_resume (62+XOFS)
-#define BMPYOFS_resume (100+YOFS)
-#define BMPXOFS_help (92+XOFS)
-#define BMPYOFS_help (118+YOFS)
-#define BMPXOFS_quit (93+XOFS)
-#define BMPYOFS_quit (138+YOFS)
-#define HIGHSCORE_XPOS (7+XOFS)
+#define HIGHSCORE_XPOS (17+XOFS)
 #define HIGHSCORE_YPOS (56+YOFS)
 
-#define STRINGPOS_finsh 140
-#define STRINGPOS_congrats 157
-#define STRINGPOS_navi 150
-#define STRINGPOS_flipsides 150
+#define STRINGPOS_FINISH 140
+#define STRINGPOS_CONGRATS 157
+#define STRINGPOS_NAVI 150
+#define STRINGPOS_FLIP 150
 
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
 /* The time (in ms) for one iteration through the game loop - decrease this
@@ -282,57 +257,59 @@ extern const fb_data brickmania_bricks[];
 */
 #define CYCLETIME 50
 
-#define GAMESCREEN_HEIGHT LCD_HEIGHT
-
-#define PAD_WIDTH 30
-#define PAD_HEIGHT 5
-#define PAD_POS_Y LCD_HEIGHT - 7
-#define BRICK_HEIGHT 7
-#define BRICK_WIDTH 15
-#define BALL 5
-#define HALFBALL 3
-#define LEFTMARGIN 5
 #define TOPMARGIN 21
 
-#define MENU_BMPHEIGHT 17
-#define MENU_BMPWIDTH 88
-
-#define BMPHEIGHT_powerup 6
-#define BMPWIDTH_powerup 10
-
-#if LCD_DEPTH == 16
-#define BMPHEIGHT_menu 128
+#if LCD_DEPTH > 2
+#define BMPYOFS_start 58
 #else
-#define BMPHEIGHT_menu 45
+#define BMPYOFS_start 66
 #endif
-#define BMPWIDTH_menu 160
+#define HIGHSCORE_XPOS 10
+#define HIGHSCORE_YPOS 38
 
-#if LCD_DEPTH == 16
-#define BMPXOFS_start 38
-#define BMPYOFS_start 56
-#define BMPXOFS_resume 42
-#define BMPYOFS_resume 72
-#define BMPXOFS_help 65
-#define BMPYOFS_help 85
-#define BMPXOFS_quit 66
-#define BMPYOFS_quit 99
-#else
-#define BMPXOFS_start 34
-#define BMPYOFS_start 64
-#define BMPXOFS_resume 38
-#define BMPYOFS_resume 77
-#define BMPXOFS_help 64
-#define BMPYOFS_help 90
-#define BMPXOFS_quit 64
-#define BMPYOFS_quit 103
-#endif
-#define HIGHSCORE_XPOS 7
+#define STRINGPOS_FINISH 110
+#define STRINGPOS_CONGRATS 100
+#define STRINGPOS_NAVI 100
+#define STRINGPOS_FLIP 100
+
+#elif (LCD_WIDTH == 132) && (LCD_HEIGHT == 80)
+
+/* The time (in ms) for one iteration through the game loop - decrease this
+   to speed up the game - note that current_tick is (currently) only accurate
+   to 10ms.
+*/
+#define CYCLETIME 50
+
+#define TOPMARGIN 10
+
+#define BMPYOFS_start 30
+#define HIGHSCORE_XPOS 68
+#define HIGHSCORE_YPOS 8
+
+#define STRINGPOS_FINISH 55
+#define STRINGPOS_CONGRATS 45
+#define STRINGPOS_NAVI 60
+#define STRINGPOS_FLIP 60
+
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128)
+
+/* The time (in ms) for one iteration through the game loop - decrease this
+   to speed up the game - note that current_tick is (currently) only accurate
+   to 10ms.
+*/
+#define CYCLETIME 50
+
+#define GAMESCREEN_HEIGHT 100
+#define TOPMARGIN 15
+
+#define BMPYOFS_start 70
+#define HIGHSCORE_XPOS 8
 #define HIGHSCORE_YPOS 36
 
-#define STRINGPOS_finsh 110
-#define STRINGPOS_congrats 100
-#define STRINGPOS_navi 100
-#define STRINGPOS_flipsides 100
+#define STRINGPOS_FINISH 55
+#define STRINGPOS_CONGRATS 45
+#define STRINGPOS_NAVI 60
+#define STRINGPOS_FLIP 60
 
 /* iPod Mini */
 #elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
@@ -342,42 +319,16 @@ extern const fb_data brickmania_bricks[];
 */
 #define CYCLETIME 50
 
-#define GAMESCREEN_HEIGHT LCD_HEIGHT
-
-#define PAD_WIDTH 30
-#define PAD_HEIGHT 5
-#define PAD_POS_Y LCD_HEIGHT - 5
-#define BRICK_HEIGHT 7
-#define BRICK_WIDTH 13
-#define BALL 5
-#define HALFBALL 3
-#define LEFTMARGIN 4
 #define TOPMARGIN 10
 
-#define MENU_BMPHEIGHT 17
-#define MENU_BMPWIDTH 88
+#define BMPYOFS_start 51
+#define HIGHSCORE_XPOS 73
+#define HIGHSCORE_YPOS 25
 
-#define BMPHEIGHT_powerup 6
-#define BMPWIDTH_powerup 10
-
-#define BMPHEIGHT_menu 45
-#define BMPWIDTH_menu 160
-
-#define BMPXOFS_start 28
-#define BMPYOFS_start 41
-#define BMPXOFS_resume 33
-#define BMPYOFS_resume 58
-#define BMPXOFS_help 56
-#define BMPYOFS_help 74
-#define BMPXOFS_quit 56
-#define BMPYOFS_quit 90
-#define HIGHSCORE_XPOS 76
-#define HIGHSCORE_YPOS 22
-
-#define STRINGPOS_finsh 54
-#define STRINGPOS_congrats 44
-#define STRINGPOS_navi 44
-#define STRINGPOS_flipsides 44
+#define STRINGPOS_FINISH 54
+#define STRINGPOS_CONGRATS 44
+#define STRINGPOS_NAVI 44
+#define STRINGPOS_FLIP 44
 
 
 #elif (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
@@ -387,39 +338,16 @@ extern const fb_data brickmania_bricks[];
 */
 #define CYCLETIME 75
 
-#define GAMESCREEN_HEIGHT LCD_HEIGHT
-
-#define PAD_WIDTH 30
-#define PAD_HEIGHT 3
-#define PAD_POS_Y LCD_HEIGHT - 5
-#define BRICK_HEIGHT 4
-#define BRICK_WIDTH 11
-#define BALL 3
-#define HALFBALL 2
-#define LEFTMARGIN 1
 #define TOPMARGIN 10
 
-#define MENU_BMPHEIGHT 9
-#define MENU_BMPWIDTH 80
-
-#define BMPHEIGHT_powerup 6
-#define BMPWIDTH_powerup 7
-
-#define BMPXOFS_start 12
-#define BMPYOFS_start 20
-#define BMPXOFS_resume 18
-#define BMPYOFS_resume 31
-#define BMPXOFS_help 39
-#define BMPYOFS_help 42
-#define BMPXOFS_quit 40
-#define BMPYOFS_quit 53
+#define BMPYOFS_start 22
 #define HIGHSCORE_XPOS 0
 #define HIGHSCORE_YPOS 0
 
-#define STRINGPOS_finsh 54
-#define STRINGPOS_congrats 44
-#define STRINGPOS_navi 44
-#define STRINGPOS_flipsides 44
+#define STRINGPOS_FINISH 54
+#define STRINGPOS_CONGRATS 44
+#define STRINGPOS_NAVI 44
+#define STRINGPOS_FLIP 44
 
 /* nano and sansa */
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH==16)
@@ -430,50 +358,39 @@ extern const fb_data brickmania_bricks[];
 
 #define CYCLETIME 30
 
-#if (LCD_HEIGHT == 220)
 #define GAMESCREEN_HEIGHT 132
-#else
-#define GAMESCREEN_HEIGHT LCD_HEIGHT
-#endif
-
-#define PAD_WIDTH 40
-#define PAD_HEIGHT 5
-#define PAD_POS_Y GAMESCREEN_HEIGHT - 7
-#define BRICK_HEIGHT 7
-#define BRICK_WIDTH 17
-#define BALL 5
-#define HALFBALL 3
-#define LEFTMARGIN 3
 #define TOPMARGIN 21
 
-#define MENU_BMPHEIGHT 16
-#define MENU_BMPWIDTH 89
-
-#define BMPHEIGHT_powerup 6
-#define BMPWIDTH_powerup 10
-
-#define BMPHEIGHT_menu 132
-#define BMPWIDTH_menu 176
-
-#define BMPXOFS_start 44
 #define BMPYOFS_start 58
-#define BMPXOFS_resume 50
-#define BMPYOFS_resume 75
-#define BMPXOFS_help 74
-#define BMPYOFS_help 89
-#define BMPXOFS_quit 75
-#define BMPYOFS_quit 104
 #define HIGHSCORE_XPOS 7
 #define HIGHSCORE_YPOS 36
 
-#define STRINGPOS_finsh 110
-#define STRINGPOS_congrats 110
-#define STRINGPOS_navi 100
-#define STRINGPOS_flipsides 100
+#define STRINGPOS_FINISH 110
+#define STRINGPOS_CONGRATS 110
+#define STRINGPOS_NAVI 100
+#define STRINGPOS_FLIP 100
 
 #else
 #error Unsupported LCD Size
 #endif
+
+
+#ifndef GAMESCREEN_HEIGHT
+#define GAMESCREEN_HEIGHT LCD_HEIGHT
+#endif
+
+/* calculate menu item offsets from the first defined and the height*/
+#define BMPYOFS_resume (BMPYOFS_start + MENU_ITEMHEIGHT)
+#define BMPYOFS_help   (BMPYOFS_start + 2*MENU_ITEMHEIGHT)
+#define BMPYOFS_quit   (BMPYOFS_start + 3*MENU_ITEMHEIGHT)
+
+/*calculate paddle y-position */
+#if GAMESCREEN_HEIGHT >= 128
+#define PAD_POS_Y GAMESCREEN_HEIGHT -PAD_HEIGHT - 2
+#else
+#define PAD_POS_Y GAMESCREEN_HEIGHT -PAD_HEIGHT - 1
+#endif
+
 
 int levels_num = 29;
 
@@ -909,116 +826,116 @@ int game_menu(int when)
     char str[10];
     rb->lcd_clear_display();
 #if (LCD_WIDTH != 112) && (LCD_HEIGHT != 64)
-    rb->lcd_bitmap(brickmania_menu_bg, 0, 0, BMPWIDTH_menu, BMPHEIGHT_menu);
+    rb->lcd_bitmap(brickmania_menu_bg, 0, 0, MENU_BGWIDTH, MENU_BGHEIGHT);
 #endif
     while (true) {
         for(i=0;i<MENU_LENGTH;i++) {
 #ifdef HAVE_LCD_COLOR
             if (cur==0)
                 rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_SEL_START, MENU_BMPWIDTH,
-                               BMPXOFS_start, BMPYOFS_start, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_SEL_START, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_start, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
             else
                 rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_START, MENU_BMPWIDTH,
-                               BMPXOFS_start, BMPYOFS_start, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_START, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_start, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
 
             if (when==1) {
                 if (cur==1)
                     rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_SEL_RESUME, MENU_BMPWIDTH,
-                               BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_SEL_RESUME, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_resume, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
                 else
                     rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_RESUME, MENU_BMPWIDTH,
-                               BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_RESUME, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_resume, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
 
             } else {
                 rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_NO_RESUME, MENU_BMPWIDTH,
-                               BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_NO_RESUME, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_resume, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
             }
 
 
             if (cur==2)
                 rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_SEL_HELP, MENU_BMPWIDTH,
-                               BMPXOFS_help, BMPYOFS_help, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_SEL_HELP, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_help, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
             else
                 rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_HELP, MENU_BMPWIDTH,
-                               BMPXOFS_help, BMPYOFS_help, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_HELP, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_help, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
 
             if (cur==3)
                 rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_SEL_QUIT, MENU_BMPWIDTH,
-                               BMPXOFS_quit, BMPYOFS_quit, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_SEL_QUIT, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_quit, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
             else
                 rb->lcd_bitmap_transparent_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_QUIT, MENU_BMPWIDTH,
-                               BMPXOFS_quit, BMPYOFS_quit, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_QUIT, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_quit, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
 #else
             if (cur==0)
                 rb->lcd_bitmap_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_SEL_START, MENU_BMPWIDTH,
-                               BMPXOFS_start, BMPYOFS_start, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_SEL_START, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_start, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
             else
                 rb->lcd_bitmap_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_START, MENU_BMPWIDTH,
-                               BMPXOFS_start, BMPYOFS_start, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_START, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_start, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
 
             if (when==1) {
                 if (cur==1)
                     rb->lcd_bitmap_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_SEL_RESUME, MENU_BMPWIDTH,
-                               BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_SEL_RESUME, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_resume, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
                 else
                     rb->lcd_bitmap_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_RESUME, MENU_BMPWIDTH,
-                               BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_RESUME, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_resume, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
 
             } else {
                 rb->lcd_bitmap_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_NO_RESUME, MENU_BMPWIDTH,
-                               BMPXOFS_resume, BMPYOFS_resume, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_NO_RESUME, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_resume, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
             }
 
 
             if (cur==2)
                 rb->lcd_bitmap_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_SEL_HELP, MENU_BMPWIDTH,
-                               BMPXOFS_help, BMPYOFS_help, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_SEL_HELP, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_help, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
             else
                 rb->lcd_bitmap_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_HELP, MENU_BMPWIDTH,
-                               BMPXOFS_help, BMPYOFS_help, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_HELP, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_help, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
 
             if (cur==3)
                 rb->lcd_bitmap_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_SEL_QUIT, MENU_BMPWIDTH,
-                               BMPXOFS_quit, BMPYOFS_quit, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_SEL_QUIT, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_quit, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
             else
                 rb->lcd_bitmap_part(brickmania_menu_items, 0,
-                               MENU_BMPHEIGHT * BM_QUIT, MENU_BMPWIDTH,
-                               BMPXOFS_quit, BMPYOFS_quit, MENU_BMPWIDTH,
-                               MENU_BMPHEIGHT);
+                               MENU_ITEMHEIGHT * BM_QUIT, MENU_ITEMWIDTH,
+                               MENU_ITEMXOFS, BMPYOFS_quit, MENU_ITEMWIDTH,
+                               MENU_ITEMHEIGHT);
 #endif
         }
         rb->lcd_set_drawmode(DRMODE_FG);
@@ -1195,11 +1112,19 @@ int help(int when)
                 break;
             case LEFT:
             case LEFT | BUTTON_REPEAT:
+#ifdef ALTLEFT
+            case ALTLEFT:
+            case ALTLEFT | BUTTON_REPEAT:
+#endif
                 if( xoffset<0)
                     xoffset+=2;
                 break;
             case RIGHT:
             case RIGHT | BUTTON_REPEAT:
+#ifdef ALTRIGHT
+            case ALTRIGHT:
+            case ALTRIGHT | BUTTON_REPEAT:
+#endif
                 if(xoffset+maxX > LCD_WIDTH)
                     xoffset-=2;
                 break;
@@ -1309,7 +1234,7 @@ int game_loop(void)
                 }
                 rb->snprintf(s, sizeof(s), "%d", num_count);
                 rb->lcd_getstringsize(s, &sw, NULL);
-                rb->lcd_putsxy(LCD_WIDTH/2-2, STRINGPOS_flipsides, s);
+                rb->lcd_putsxy(LCD_WIDTH/2-2, STRINGPOS_FLIP, s);
             }
 
             /* write life num */
@@ -1350,7 +1275,7 @@ int game_loop(void)
                 rb->snprintf(s, sizeof(s), "Press SELECT To Continue");
 #endif
                 rb->lcd_getstringsize(s, &sw, NULL);
-                rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_navi, s);
+                rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_NAVI, s);
 
                 sec_count=*rb->current_tick+HZ;
             }
@@ -1380,15 +1305,15 @@ int game_loop(void)
                             if (con_game!=1)
                                 brick[i*10+j].powertop+=2;
                             rb->lcd_bitmap_part(brickmania_powerups,0,
-                                                BMPHEIGHT_powerup*brick[i*10+j
+                                                POWERUP_HEIGHT*brick[i*10+j
                                                     ].power,
-                                                BMPWIDTH_powerup,
+                                                POWERUP_WIDTH,
                                                 LEFTMARGIN+j*BRICK_WIDTH+
                                                 (BRICK_WIDTH/2-
-                                                 BMPWIDTH_powerup/2),
+                                                 POWERUP_WIDTH/2),
                                                 brick[i*10+j].powertop,
-                                                BMPWIDTH_powerup,
-                                                BMPHEIGHT_powerup);
+                                                POWERUP_WIDTH,
+                                                POWERUP_HEIGHT);
                         }
                     }
 
@@ -1803,16 +1728,16 @@ int game_loop(void)
                 }
                 else {
                     rb->lcd_getstringsize("Congratulations!", &sw, NULL);
-                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_congrats,
+                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_CONGRATS,
                                    "Congratulations!");
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
                     rb->lcd_getstringsize("No more levels", &sw, NULL);
-                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_finsh,
+                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_FINISH,
                                    "No more levels");
 #else
                     rb->lcd_getstringsize("You have finished the game!",
                                           &sw, NULL);
-                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_finsh,
+                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, STRINGPOS_FINISH,
                                    "You have finished the game!");
 #endif
                     vscore=score;
@@ -1855,9 +1780,13 @@ int game_loop(void)
 #endif
 
             move_button=rb->button_status();
-
+#ifdef ALTRIGHT
+            button_right=((move_button & RIGHT) || (move_button & ALTRIGHT));
+            button_left=((move_button & LEFT) || (move_button & ALTLEFT));
+#else
             button_right=((move_button & RIGHT) || (SCROLL_FWD(button)));
             button_left=((move_button & LEFT) || (SCROLL_BACK(button)));
+#endif
             if ((con_game== 1 && start_game!=1) && (button_right || button_left))
                 continue;
             if ((button_right && flip_sides==false) ||
@@ -1975,13 +1904,17 @@ int game_loop(void)
             }
         }
         else {
-#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-            rb->splash(HZ*2, "Game Over");
-#else
-            rb->lcd_bitmap(brickmania_gameover,LCD_WIDTH/2-55,LCD_HEIGHT-87,
-                           110,52);
-            rb->lcd_update();
+#ifdef HAVE_LCD_COLOR
+            rb->lcd_bitmap_transparent(brickmania_gameover,
+                           (LCD_WIDTH - GAMEOVER_WIDTH)/2,
+                           (GAMESCREEN_HEIGHT - GAMEOVER_HEIGHT)/2,
+                           GAMEOVER_WIDTH,GAMEOVER_HEIGHT);
+#else /* greyscale and mono */
+            rb->lcd_bitmap(brickmania_gameover,(LCD_WIDTH - GAMEOVER_WIDTH)/2,
+                           (GAMESCREEN_HEIGHT - GAMEOVER_HEIGHT)/2,
+                           GAMEOVER_WIDTH,GAMEOVER_HEIGHT);
 #endif
+            rb->lcd_update();
             if (score>highscore) {
                 sleep(2);
                 highscore=score;

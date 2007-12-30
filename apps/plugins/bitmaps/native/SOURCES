@@ -1,59 +1,81 @@
 #ifdef HAVE_LCD_BITMAP
 
 /* Brickmania */
-#if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)
-#if (LCD_WIDTH == 320)
+#ifdef HAVE_LCD_COLOR
+brickmania_gameover.112x54x16.bmp
+#if LCD_WIDTH >= 220 /* common to all big lcds */
+brickmania_ball.5x5x16.bmp
+brickmania_menu_items.220x176x16.bmp
+#if LCD_WIDTH >= 320 /* Ipod Video */
 brickmania_menu_bg.320x240x16.bmp
 brickmania_bricks.320x240x16.bmp
 brickmania_pads.320x240x16.bmp
 brickmania_break.320x240x16.bmp
 brickmania_powerups.320x240x16.bmp
 #else
-#if (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
-brickmania_menu_bg.240x320x16.bmp
-#else
-brickmania_menu_bg.220x176x16.bmp
-#endif
 brickmania_bricks.220x176x16.bmp
 brickmania_pads.220x176x16.bmp
 brickmania_break.220x176x16.bmp
 brickmania_powerups.220x176x16.bmp
+#if LCD_HEIGHT == 320
+brickmania_menu_bg.240x320x16.bmp
+#elif LCD_HEIGHT == 176
+brickmania_menu_bg.220x176x16.bmp
 #endif
-brickmania_ball.220x176x16.bmp
-brickmania_menu_items.220x176x16.bmp
-brickmania_gameover.220x176x16.bmp
-#elif (((LCD_WIDTH == 160) && (LCD_HEIGHT == 128)) || \
-       ((LCD_WIDTH == 138) && (LCD_HEIGHT == 110))) && (LCD_DEPTH == 2)
-brickmania_menu_items.160x128x2.bmp
-brickmania_ball.160x128x2.bmp
-#if (LCD_WIDTH == 160)
-brickmania_bricks.160x128x2.bmp
-#else
-brickmania_bricks.138x110x2.bmp
 #endif
-brickmania_gameover.160x128x2.bmp
-brickmania_menu_bg.160x128x2.bmp
-brickmania_pads.160x128x2.bmp
-brickmania_powerups.160x128x2.bmp
-brickmania_break.160x128x2.bmp
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 16)
-brickmania_menu_items.160x128x16.bmp
-brickmania_ball.160x128x16.bmp
-brickmania_bricks.160x128x16.bmp
-brickmania_gameover.160x128x16.bmp
-brickmania_menu_bg.160x128x16.bmp
-brickmania_pads.160x128x16.bmp
-brickmania_powerups.160x128x16.bmp
-brickmania_break.160x128x16.bmp
-#elif (LCD_WIDTH == 176)/* && (LCD_HEIGHT == 132) */&& (LCD_DEPTH == 16)
+#elif LCD_WIDTH >= 176
+brickmania_ball.5x5x16.bmp
 brickmania_menu_items.176x132x16.bmp
-brickmania_ball.176x132x16.bmp
 brickmania_bricks.176x132x16.bmp
-brickmania_gameover.176x132x16.bmp
 brickmania_menu_bg.176x132x16.bmp
 brickmania_pads.176x132x16.bmp
 brickmania_powerups.176x132x16.bmp
 brickmania_break.176x132x16.bmp
+#elif LCD_WIDTH >= 160
+brickmania_ball.5x5x16.bmp
+brickmania_menu_items.160x128x16.bmp
+brickmania_bricks.160x128x16.bmp
+brickmania_menu_bg.160x128x16.bmp
+brickmania_pads.160x128x16.bmp
+brickmania_powerups.160x128x16.bmp
+brickmania_break.160x128x16.bmp
+#elif LCD_WIDTH >= 132
+brickmania_ball.4x4x16.bmp
+brickmania_menu_items.132x80x16.bmp
+brickmania_bricks.132x80x16.bmp
+brickmania_menu_bg.132x80x16.bmp
+brickmania_pads.132x80x16.bmp
+brickmania_powerups.132x80x16.bmp
+brickmania_break.132x80x16.bmp
+#elif LCD_WIDTH >= 128
+brickmania_ball.4x4x16.bmp
+brickmania_menu_items.132x80x16.bmp
+brickmania_bricks.128x128x16.bmp
+brickmania_menu_bg.128x128x16.bmp
+brickmania_pads.132x80x16.bmp
+brickmania_powerups.132x80x16.bmp
+brickmania_break.132x80x16.bmp
+#endif /* different colour displays */
+#elif LCD_DEPTH > 1
+brickmania_gameover.86x43x2.bmp
+brickmania_menu_items.160x128x2.bmp
+brickmania_ball.5x5x2.bmp
+brickmania_menu_bg.160x128x2.bmp
+brickmania_pads.160x128x2.bmp
+brickmania_powerups.160x128x2.bmp
+brickmania_break.160x128x2.bmp
+#if (LCD_WIDTH >= 160)
+brickmania_bricks.160x128x2.bmp
+#else /* Mini currently */
+brickmania_bricks.138x110x2.bmp
+#endif
+#else /* mono */
+brickmania_gameover.59x30x1.bmp
+brickmania_menu_items.112x64x1.bmp
+brickmania_bricks.112x64x1.bmp
+brickmania_ball.3x3x1.bmp
+brickmania_pads.112x64x1.bmp
+brickmania_powerups.112x64x1.bmp
 #endif
 
 /* Jackpot */
