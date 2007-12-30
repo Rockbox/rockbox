@@ -24,15 +24,22 @@ must catch it with the paddle. Look out for the bad ones.\\
 
 \begin{table}
     \begin{btnmap}{}{}
-    \ButtonLeft\ / \ButtonRight & Moves the paddle\\
-    \opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
-    \opt{ONDIO_PAD}{\ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonSelect}
-    \opt{IRIVER_H10_PAD}{\ButtonPlay}
+    \ButtonLeft\ / \ButtonRight
+    \opt{SANSA_C200_PAD}{\\
+        \ButtonVolDown\ / \ButtonVolUp}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\\
+        \ButtonScrollBack\ / \ButtonScrollFwd}
+    & Moves the paddle\\
+    \opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay\ / \ButtonUp}
+    \opt{ONDIO_PAD}{\ButtonMenu\ / \ButtonUp}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_C200_PAD,GIGABEAT_PAD}
+        {\ButtonSelect\ / \ButtonUp}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\ButtonSelect}
+    \opt{IRIVER_H10_PAD}{\ButtonPlay\ / \ButtonScrollUp}
     & Release the ball / Fire\\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
-    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD}{\ButtonPower}
     & Open menu / Quit\\
     \end{btnmap}
 \end{table}
