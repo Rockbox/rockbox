@@ -69,7 +69,7 @@ PLUGIN_IRAM_DECLARE
 #define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
-#define BTN_PAUSE        BUTTON_A
+#define BTN_PLAY         BUTTON_A
 
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
