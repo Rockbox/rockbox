@@ -95,9 +95,10 @@ struct MIDIfile * loadFile(char * filename)
         {
             if(mfload->numTracks != track)
             {
-                printf("Error: file claims to have %d tracks. I only see %d here.",     mfload->numTracks, track);
+                printf("Warning: file claims to have %d tracks. I only see %d here.", mfload->numTracks, track);
                 mfload->numTracks = track;
             }
+            rb->close(file);
             return mfload;
         }
 
