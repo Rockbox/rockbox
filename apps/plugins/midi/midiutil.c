@@ -135,25 +135,32 @@ int eof(int fd)
 // Here is a hacked up printf command to get the output from the game.
 int printf(const char *fmt, ...)
 {
-   static int p_xtpt = 0;
-   char p_buf[50];
-   bool ok;
-   va_list ap;
+    static int p_xtpt = 0;
+    char p_buf[50];
+    bool ok;
+    va_list ap;
 
-   va_start(ap, fmt);
-   ok = rb->vsnprintf(p_buf,sizeof(p_buf), fmt, ap);
-   va_end(ap);
+    va_start(ap, fmt);
+    ok = rb->vsnprintf(p_buf,sizeof(p_buf), fmt, ap);
+    va_end(ap);
 
-   rb->lcd_putsxy(1,p_xtpt, (unsigned char *)p_buf);
-   rb->lcd_update();
+    int i=0;
 
-   p_xtpt+=8;
-   if(p_xtpt>LCD_HEIGHT-8)
-   {
-      p_xtpt=0;
-      rb->lcd_clear_display();
-   }
-   return 1;
+    /* Device LCDs display newlines funny. */
+    for(i=0; p_buf[i]!=0; i++)
+        if(p_buf[i] == '\n')
+            p_buf[i] = ' ';
+
+    rb->lcd_putsxy(1,p_xtpt, (unsigned char *)p_buf);
+    rb->lcd_update();
+
+    p_xtpt+=8;
+    if(p_xtpt>LCD_HEIGHT-8)
+    {
+        p_xtpt=0;
+        rb->lcd_clear_display();
+    }
+    return 1;
 }
 
 void exit(int code)

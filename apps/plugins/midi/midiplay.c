@@ -33,6 +33,7 @@ PLUGIN_IRAM_DECLARE
 #define BTN_UP       BUTTON_UP
 #define BTN_DOWN     BUTTON_DOWN
 #define BTN_LEFT     BUTTON_LEFT
+#define BTN_PLAY     BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define BTN_QUIT         BUTTON_OFF
@@ -40,6 +41,8 @@ PLUGIN_IRAM_DECLARE
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 #define BTN_LEFT         BUTTON_LEFT
+#define BTN_PLAY         (BUTTON_MENU | BUTTON_OFF)
+
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define BTN_QUIT         BUTTON_OFF
@@ -47,8 +50,8 @@ PLUGIN_IRAM_DECLARE
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 #define BTN_LEFT         BUTTON_LEFT
-
 #define BTN_RC_QUIT      BUTTON_RC_STOP
+#define BTN_PLAY         BUTTON_ON
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -57,6 +60,8 @@ PLUGIN_IRAM_DECLARE
 #define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_SCROLL_FWD
 #define BTN_DOWN         BUTTON_SCROLL_BACK
+#define BTN_PLAY         BUTTON_PLAY
+
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define BTN_QUIT         BUTTON_POWER
@@ -64,6 +69,8 @@ PLUGIN_IRAM_DECLARE
 #define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
+#define BTN_PAUSE        BUTTON_A
+
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
 (CONFIG_KEYPAD == SANSA_C200_PAD)
@@ -72,6 +79,8 @@ PLUGIN_IRAM_DECLARE
 #define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
+#define BTN_PLAY         BUTTON_REC
+
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define BTN_QUIT         BUTTON_POWER
@@ -79,6 +88,8 @@ PLUGIN_IRAM_DECLARE
 #define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
+#define BTN_PLAY         BUTTON_PLAY
+
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define BTN_QUIT         BUTTON_POWER
@@ -86,6 +97,8 @@ PLUGIN_IRAM_DECLARE
 #define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_SCROLL_UP
 #define BTN_DOWN         BUTTON_SCROLL_DOWN
+#define BTN_PLAY         BUTTON_PLAY
+
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define BTN_QUIT         BUTTON_POWER
@@ -93,6 +106,8 @@ PLUGIN_IRAM_DECLARE
 #define BTN_LEFT         BUTTON_LEFT
 #define BTN_UP           BUTTON_RC_PLAY
 #define BTN_DOWN         BUTTON_RC_DOWN
+#define BTN_PLAY         BUTTON_RC_HEART
+
 
 #endif
 
@@ -274,6 +289,7 @@ static int midimain(void * filename)
     synthbuf();
     rb->pcm_play_data(&get_more, NULL, 0);
 
+    int isPlaying = 1;  /* 0 = paused */
     int vol=0;
 
     while(!quit)
@@ -318,8 +334,10 @@ static int midimain(void * filename)
                     /* but run through the tracks without the synth running */
                     rb->pcm_play_stop();
                     seekBackward(5);
-                    rb->pcm_play_data(&get_more, NULL, 0);
+                    printf("Rewind to %d:%02d\n", playingTime/60, playingTime%60);
 
+                    if(isPlaying)
+                        rb->pcm_play_data(&get_more, NULL, 0);
                     break;
                 }
 
@@ -327,10 +345,28 @@ static int midimain(void * filename)
                 {
                     rb->pcm_play_stop();
                     seekForward(5);
-                    rb->pcm_play_data(&get_more, NULL, 0);
+                    printf("Skip to %d:%02d\n", playingTime/60, playingTime%60);
+
+                    if(isPlaying)
+                        rb->pcm_play_data(&get_more, NULL, 0);
                     break;
                 }
 
+                case BTN_PLAY:
+                {
+                    if(isPlaying == 1)
+                    {
+                        printf("Paused at %d:%02d\n", playingTime/60, playingTime%60);
+                        isPlaying = 0;
+                        rb->pcm_play_stop();
+                    } else
+                    {
+                        printf("Playing from %d:%02d\n", playingTime/60, playingTime%60);
+                        isPlaying = 1;
+                        rb->pcm_play_data(&get_more, NULL, 0);
+                    }
+                    break;
+                }
 
 #ifdef BTN_RC_QUIT
                 case BTN_RC_QUIT:
