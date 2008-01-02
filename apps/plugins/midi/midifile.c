@@ -149,8 +149,71 @@ int readEvent(int file, void * dest)
             /* Allocate and read in the data block */
             if(dest != NULL)
             {
-                ev->evData = readData(file, ev->len);
-/*                printf("\nDATA: <%s>", ev->evData); */
+                /* Null-terminate for text events */
+                ev->evData = malloc(ev->len+1); /* Extra byte for the null termination */
+
+                rb->read(file, ev->evData, ev->len);
+                ev->evData[ev->len] = 0;
+
+                switch(ev->d1)
+                {
+                    case 0x01:  /* Generic text */
+                    {
+                        printf("Text: %s", ev->evData);
+                        break;
+                    }
+
+                    case 0x02:  /* A copyright string within the file */
+                    {
+                        printf("Copyright: %s", ev->evData);
+                        break;
+                    }
+
+                    case 0x03:  /* Sequence of track name */
+                    {
+                        printf("Name: %s", ev->evData);
+                        break;
+                    }
+
+                    case 0x04:  /* Instrument (synth) name */
+                    {
+                        printf("Instrument: %s", ev->evData);
+                        break;
+                    }
+
+                    case 0x05:  /* Lyrics. These appear on the tracks at the right times */
+                    {           /* Usually only a small 'piece' of the lyrics.           */
+                                /* Maybe the sequencer should print these at play time?  */
+                        printf("Lyric: %s", ev->evData);
+                        break;
+                    }
+
+                    case 0x06:  /* Text marker */
+                    {
+                        printf("Marker: %s", ev->evData);
+                        break;
+                    }
+
+
+                    case 0x07:  /* Cue point */
+                    {
+                        printf("Cue point: %s", ev->evData);
+                        break;
+                    }
+
+                    case 0x08:  /* Program name */
+                    {
+                        printf("Patch: %s", ev->evData);
+                        break;
+                    }
+
+
+                    case 0x09:  /* Device name. Very much irrelevant here, though. */
+                    {
+                        printf("Port: %s", ev->evData);
+                        break;
+                    }
+                }
             }
             else
             {
