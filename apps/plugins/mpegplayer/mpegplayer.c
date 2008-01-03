@@ -303,11 +303,6 @@ static unsigned draw_blendcolor(unsigned c1, unsigned c2, unsigned char amount)
 }
 #endif
 
-static void draw_fill_rect(int x, int y, int width, int height)
-{
-    rb->lcd_fillrect(_X, _Y, _W, _H);
-}
-
 #ifdef HAVE_LCD_COLOR
 static void draw_update_rect(int x, int y, int width, int height)
 {
