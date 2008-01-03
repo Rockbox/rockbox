@@ -507,7 +507,7 @@ void vo_set_clip_rect(const struct vo_rect *rc)
 void vo_lock(void)
 {
 /* TODO: evaluate synchronization with graylib in the sim */
-#ifndef HAVE_LCD_COLOR && !defined(SIMULATOR)
+#if !defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
     set_irq_level(HIGHEST_IRQ_LEVEL);
 #endif
     video_lock();
@@ -516,7 +516,7 @@ void vo_lock(void)
 void vo_unlock(void)
 {
     video_unlock();
-#ifndef HAVE_LCD_COLOR && !defined(SIMULATOR)
+#if !defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
     set_irq_level(0);
 #endif
 }
