@@ -1385,6 +1385,8 @@ int tagtree_enter(struct tree_context* c)
     seek = dptr->extraseek;   
     if (seek == -1) 
     {
+        if(c->filesindir<=2)
+            return 0;
         srand(current_tick);
         dptr = (tagtree_get_entry(c, 2+(rand() % (c->filesindir-2))));
         seek = dptr->extraseek;
