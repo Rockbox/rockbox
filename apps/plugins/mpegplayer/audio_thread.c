@@ -140,9 +140,8 @@ static void audio_queue_reset(void)
     audio_queue.used = 0;
     audio_queue.read = 0;
     audio_queue.write = 0;
+    rb->memset(audio_queue.descs, 0, sizeof (audio_queue.descs));
     audio_queue.curr = audiodesc_queue_head();
-    audio_queue.curr->time = 0;
-    audio_queue.curr->size = 0;
 }
 
 static void audio_queue_advance_pos(ssize_t len)

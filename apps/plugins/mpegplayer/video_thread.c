@@ -75,7 +75,10 @@ static void draw_fps(struct video_thread_data *td)
                  fps / 100, fps % 100, td->num_skipped,
                  td->info->display_picture->temporal_reference);
     rb->lcd_putsxy(0, 0, str);
+
+    vo_lock();
     rb->lcd_update_rect(0, 0, LCD_WIDTH, 8);
+    vo_unlock();
 
     td->last_showfps = *rb->current_tick;
 }
@@ -522,7 +525,9 @@ static void video_thread_msg(struct video_thread_data *td)
             else
             {
                 IF_COP(invalidate_icache());
+                vo_lock();
                 rb->lcd_update();
+                vo_unlock();
             }
 #else
             GRAY_FLUSH_ICACHE();
@@ -578,6 +583,10 @@ static void video_thread_msg(struct video_thread_data *td)
                                     (struct vo_rect *)td->ev.data);
                 reply = true;
             }
+            break;
+
+        case VIDEO_SET_CLIP_RECT:
+            vo_set_clip_rect((const struct vo_rect *)td->ev.data);
             break;
 
         case VIDEO_PRINT_FRAME:

@@ -104,6 +104,9 @@ static inline bool disk_buf_is_data_ready(struct stream_hdr *sh,
 bool disk_buf_init(void);
 void disk_buf_exit(void);
 
+static inline int disk_buf_status(void)
+    { return disk_buf.status; }
+
 int disk_buf_open(const char *filename);
 void disk_buf_close(void);
 ssize_t _disk_buf_getbuffer(size_t size, void **pp, void **pwrap,

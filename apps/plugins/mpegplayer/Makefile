@@ -43,7 +43,7 @@ libmad-mpegplayer:
 ifndef SIMVER
 $(OBJDIR)/mpegplayer.elf: $(OBJS) $(LINKFILE) $(BUILDDIR)/libmad-mpegplayer.a
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lmad-mpegplayer -lgcc\
-           -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/mpegplayer.map
+           $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/mpegplayer.map
 
 $(OUTPUT): $(OBJDIR)/mpegplayer.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
@@ -51,7 +51,7 @@ else
 # This is the SDL simulator version
 
 $(OUTPUT): $(OBJS) $(BUILDDIR)/libmad-mpegplayer.a
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -lmad-mpegplayer -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin $(LINKBITMAPS) -lmad-mpegplayer -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1

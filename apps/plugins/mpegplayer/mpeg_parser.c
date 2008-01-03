@@ -1012,15 +1012,17 @@ intptr_t parser_send_video_msg(long id, intptr_t data)
         switch (id)
         {
         case VIDEO_DISPLAY_SHOW:
-            if (data != 0 && stream_status() != STREAM_PLAYING)
+            if (data != 0 && disk_buf_status() == STREAM_STOPPED)
             {   /* Only prepare image if showing and not playing */
                 prepare_image(str_parser.last_seek_time);
             }
             break;
 
         case VIDEO_PRINT_FRAME:
+            if (data)
+                break;
         case VIDEO_PRINT_THUMBNAIL:
-            if (stream_status() == STREAM_PLAYING)
+            if (disk_buf_status() != STREAM_STOPPED)
                 break; /* Prepare image if not playing */
 
             if (!prepare_image(str_parser.last_seek_time))

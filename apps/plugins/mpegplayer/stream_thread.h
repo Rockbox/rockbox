@@ -106,6 +106,7 @@ enum stream_message
     VIDEO_GET_SIZE,           /* Get the video dimensions */
     VIDEO_PRINT_FRAME,        /* Print the frame at the current position */
     VIDEO_PRINT_THUMBNAIL,    /* Print a thumbnail of the current position */
+    VIDEO_SET_CLIP_RECT,      /* Set the visible video area */
 #ifdef GRAY_CACHE_MAINT
     VIDEO_GRAY_CACHEOP,
 #endif

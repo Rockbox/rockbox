@@ -21,6 +21,9 @@
 #include "plugin.h"
 #include "mpegplayer.h"
 
+#define VO_NON_NULL_RECT 0x1
+#define VO_VISIBLE       0x2
+
 struct vo_data
 {
     int image_width;
@@ -34,8 +37,9 @@ struct vo_data
     int output_width;
     int output_height;
     bool visible;
-    bool thumb_mode;
-    void *last;
+    unsigned flags;
+    struct vo_rect rc_vid;
+    struct vo_rect rc_clip;
 };
 
 #ifdef PROC_NEEDS_CACHEALIGN
@@ -48,10 +52,40 @@ static uint8_t __vo_data[CACHEALIGN_UP(sizeof(struct vo_data))]
 static struct vo_data vo;
 #endif
 
+#if NUM_CORES > 1
+static struct mutex vo_mtx NOCACHEBSS_ATTR;
+#endif
+
+static inline void video_lock_init(void)
+{
+#if NUM_CORES > 1
+    rb->mutex_init(&vo_mtx);
+#endif
+}
+
+static inline void video_lock(void)
+{
+#if NUM_CORES > 1
+    rb->mutex_lock(&vo_mtx);
+#endif
+}
+
+static inline void video_unlock(void)
+{
+#if NUM_CORES > 1
+    rb->mutex_unlock(&vo_mtx);
+#endif
+}
+
+
 /* Draw a black rectangle if no video frame is available */
 static void vo_draw_black(void)
 {
-    int foreground = lcd_(get_foreground)();
+    int foreground;
+
+    video_lock();
+
+    foreground = lcd_(get_foreground)();
 
     lcd_(set_foreground)(DRAW_BLACK);
 
@@ -61,21 +95,27 @@ static void vo_draw_black(void)
                       vo.output_height);
 
     lcd_(set_foreground)(foreground);
+
+    video_unlock();
 }
 
 static inline void yuv_blit(uint8_t * const * buf, int src_x, int src_y,
                             int stride, int x, int y, int width, int height)
 {
+    video_lock();
+
 #ifdef HAVE_LCD_COLOR
     rb->lcd_yuv_blit(buf, src_x, src_y, stride, x, y , width, height);
 #else
     gray_ub_gray_bitmap_part(buf[0], src_x, src_y, stride, x, y, width, height);
 #endif
+
+    video_unlock();
 }
 
 void vo_draw_frame(uint8_t * const * buf)
 {
-    if (!vo.visible)
+    if (vo.flags == 0)
     {
         /* Frame is hidden - copout */
         DEBUGF("vo hidden\n");
@@ -93,14 +133,6 @@ void vo_draw_frame(uint8_t * const * buf)
              vo.output_x, vo.output_y, vo.output_width,
              vo.output_height);
 }
-
-#if LCD_WIDTH >= LCD_HEIGHT
-#define SCREEN_WIDTH LCD_WIDTH
-#define SCREEN_HEIGHT LCD_HEIGHT
-#else /* Assume the screen is rotated on portrait LCDs */
-#define SCREEN_WIDTH LCD_HEIGHT
-#define SCREEN_HEIGHT LCD_WIDTH
-#endif
 
 static inline void vo_rect_clear_inl(struct vo_rect *rc)
 {
@@ -170,6 +202,48 @@ bool vo_rect_intersect(struct vo_rect *rc_dst,
     }
 
     return false;
+}
+
+bool vo_rect_union(struct vo_rect *rc_dst,
+                   const struct vo_rect *rc1,
+                   const struct vo_rect *rc2)
+{
+    if (rc_dst != NULL)
+    {
+        if (!vo_rect_empty_inl(rc1))
+        {
+            if (!vo_rect_empty_inl(rc2))
+            {
+                rc_dst->l = MIN(rc1->l, rc2->l);
+                rc_dst->t = MIN(rc1->t, rc2->t);
+                rc_dst->r = MAX(rc1->r, rc2->r);
+                rc_dst->b = MAX(rc1->b, rc2->b);
+            }
+            else
+            {
+                *rc_dst = *rc1;
+            }
+
+            return true;
+        }
+        else if (!vo_rect_empty(rc2))
+        {
+            *rc_dst = *rc2;
+            return true;
+        }
+
+        vo_rect_clear_inl(rc_dst);
+    }
+
+    return false;
+}
+
+void vo_rect_offset(struct vo_rect *rc, int dx, int dy)
+{
+    rc->l += dx;
+    rc->t += dy;
+    rc->r += dx;
+    rc->b += dy;
 }
 
 /* Shink or stretch each axis - rotate counter-clockwise to retain upright
@@ -350,25 +424,27 @@ void vo_setup(const mpeg2_sequence_t * sequence)
 
     if (sequence->display_width >= SCREEN_WIDTH)
     {
-        vo.output_width = SCREEN_WIDTH;
-        vo.output_x = 0;
+        vo.rc_vid.l = 0;
+        vo.rc_vid.r = SCREEN_WIDTH;
     }
     else
     {
-        vo.output_width = sequence->display_width;
-        vo.output_x = (SCREEN_WIDTH - sequence->display_width) / 2;
+        vo.rc_vid.l = (SCREEN_WIDTH - sequence->display_width) / 2;
+        vo.rc_vid.r = vo.rc_vid.l + sequence->display_width;
     }
 
     if (sequence->display_height >= SCREEN_HEIGHT)
     {
-        vo.output_height = SCREEN_HEIGHT;
-        vo.output_y = 0;
+        vo.rc_vid.t = 0;
+        vo.rc_vid.b = SCREEN_HEIGHT;
     }
     else
     {
-        vo.output_height = sequence->display_height;
-        vo.output_y = (SCREEN_HEIGHT - sequence->display_height) / 2;
+        vo.rc_vid.t = (SCREEN_HEIGHT - sequence->display_height) / 2;
+        vo.rc_vid.b = vo.rc_vid.t + sequence->display_height;
     }
+
+    vo_set_clip_rect(&vo.rc_clip);
 }
 
 void vo_dimensions(struct vo_ext *sz)
@@ -379,23 +455,68 @@ void vo_dimensions(struct vo_ext *sz)
 
 bool vo_init(void)
 {
-    vo.visible = false;
+    vo.flags = 0;
+    vo_rect_set_ext(&vo.rc_clip, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    video_lock_init();
     return true;
 }
 
 bool vo_show(bool show)
 {
-    bool vis = vo.visible;
-    vo.visible = show;
+    bool vis = vo.flags & VO_VISIBLE;
+
+    if (show)
+        vo.flags |= VO_VISIBLE;
+    else
+        vo.flags &= ~VO_VISIBLE;
+
     return vis;
 }
 
 bool vo_is_visible(void)
 {
-    return vo.visible;
+    return vo.flags & VO_VISIBLE;
 }
 
 void vo_cleanup(void)
 {
-    vo.visible = false;
+    vo.flags = 0;
 }
+
+void vo_set_clip_rect(const struct vo_rect *rc)
+{
+    struct vo_rect rc_out;
+
+    if (rc == NULL)
+        vo_rect_set_ext(&vo.rc_clip, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    else
+        vo.rc_clip = *rc;
+
+    if (!vo_rect_intersect(&rc_out, &vo.rc_vid, &vo.rc_clip))
+        vo.flags &= ~VO_NON_NULL_RECT;
+    else
+        vo.flags |= VO_NON_NULL_RECT;
+
+    vo.output_x = rc_out.l;
+    vo.output_y = rc_out.t;
+    vo.output_width = rc_out.r - rc_out.l;
+    vo.output_height = rc_out.b - rc_out.t;
+}
+
+#if NUM_CORES > 1 || !defined (HAVE_LCD_COLOR)
+void vo_lock(void)
+{
+#ifndef HAVE_LCD_COLOR
+    set_irq_level(HIGHEST_IRQ_LEVEL);
+#endif
+    video_lock();
+}
+
+void vo_unlock(void)
+{
+    video_unlock();
+#ifndef HAVE_LCD_COLOR
+    set_irq_level(0);
+#endif
+}
+#endif

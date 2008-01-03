@@ -251,6 +251,7 @@ static void set_stream_clock(uint32_t time)
 static uint32_t time_from_whence(uint32_t time, int whence)
 {
     int64_t currtime;
+    uint32_t start;
 
     switch (whence)
     {
@@ -262,12 +263,8 @@ static uint32_t time_from_whence(uint32_t time, int whence)
     case SEEK_CUR:
         /* Seek forward or backward from the current time
          * (time = signed offset from current) */
-        if (stream_mgr.seeked)
-            currtime = str_parser.last_seek_time;
-        else
-            currtime = TICKS_TO_TS(pcm_output_get_clock());
-
-        currtime -= str_parser.start_pts;
+        currtime = stream_get_seek_time(&start);
+        currtime -= start;
         currtime += (int32_t)time;
 
         if (currtime < 0)
@@ -525,26 +522,27 @@ static void stream_on_stop(bool reply)
 
     if (status != STREAM_STOPPED)
     {
-        /* Not stopped = paused or playing */
-        stream_mgr.seeked = false;
-
         /* Pause the clock */
         pcm_output_play_pause(false);
 
+        /* Assume invalidity */
+        stream_mgr.resume_time = 0;
+
         if (stream_can_seek())
         {
-            /* Read the current stream time */
-            uint32_t time = TICKS_TO_TS(pcm_output_get_clock());
-
-            /* Assume invalidity */
-            stream_mgr.resume_time = 0;
+            /* Read the current stream time or the last seeked position */
+            uint32_t start;
+            uint32_t time = stream_get_seek_time(&start);
 
             if (time >= str_parser.start_pts && time < str_parser.end_pts)
             {
                 /* Save the current stream time */
-                stream_mgr.resume_time = time - str_parser.start_pts;
+                stream_mgr.resume_time = time - start;
             }
         }
+
+        /* Not stopped = paused or playing */
+        stream_mgr.seeked = false;
 
         /* Stop buffering */
         disk_buf_send_msg(STREAM_STOP, 0);
@@ -578,9 +576,9 @@ static void stream_on_seek(struct stream_seek_data *skd)
         if (stream_mgr.filename == NULL)
             break;
 
-        stream_mgr_reply_msg(STREAM_OK);
-
         stream_keep_disk_active();
+
+        stream_mgr_reply_msg(STREAM_OK);
 
         stream_mgr_lock();
 
@@ -705,9 +703,11 @@ bool stream_show_vo(bool show)
 
     vis = parser_send_video_msg(VIDEO_DISPLAY_SHOW, show);
 #ifndef HAVE_LCD_COLOR
-    GRAY_VIDEO_FLUSH_ICACHE();
+    GRAY_VIDEO_INVALIDATE_ICACHE();
     GRAY_INVALIDATE_ICACHE();
+
     gray_show(show);
+
     GRAY_FLUSH_ICACHE();
 #endif
     stream_mgr_unlock();
@@ -743,6 +743,32 @@ bool stream_vo_get_size(struct vo_ext *sz)
     return retval;
 }
 
+void stream_vo_set_clip(const struct vo_rect *rc)
+{
+    stream_mgr_lock();
+
+    if (rc)
+    {
+        stream_mgr.parms.rc = *rc;
+        rc = &stream_mgr.parms.rc;
+    }
+#ifndef HAVE_LCD_COLOR
+    else
+    {
+        vo_rect_set_ext(&stream_mgr.parms.rc, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        rc = &stream_mgr.parms.rc;
+    }
+#endif
+
+    parser_send_video_msg(VIDEO_SET_CLIP_RECT, (intptr_t)rc);
+
+#ifndef HAVE_LCD_COLOR
+    stream_set_gray_rect(rc);
+#endif
+
+    stream_mgr_unlock();
+}
+
 #ifndef HAVE_LCD_COLOR
 /* Set the rectangle for the gray video overlay - clipped to screen */
 bool stream_set_gray_rect(const struct vo_rect *rc)
@@ -756,21 +782,38 @@ bool stream_set_gray_rect(const struct vo_rect *rc)
 
     if (vo_rect_intersect(&rc_gray, &rc_gray, rc))
     {
-        bool vo_vis = stream_show_vo(false);
+        bool vis = parser_send_video_msg(VIDEO_DISPLAY_SHOW, false);
 
-        GRAY_VIDEO_FLUSH_ICACHE();
+        /* The impudence! Keeps the image from disappearing anyway. */
+#ifdef SIMULATOR
+        rb->sim_lcd_ex_init(0, NULL);
+#else
+        rb->timer_unregister();
+#endif
+        GRAY_VIDEO_INVALIDATE_ICACHE();
         GRAY_INVALIDATE_ICACHE();
+
+        vo_lock();
 
         gray_init(rb, stream_mgr.graymem, stream_mgr.graysize,
                   false, rc_gray.r - rc_gray.l, rc_gray.b - rc_gray.t,
                   32, 2<<8, NULL);
 
         gray_set_position(rc_gray.l, rc_gray.t);
-        GRAY_FLUSH_ICACHE();
 
-        if (vo_vis)
+        vo_unlock();
+
+        GRAY_INVALIDATE_ICACHE();
+
+        if (stream_mgr.status != STREAM_PLAYING)
+            parser_send_video_msg(VIDEO_PRINT_FRAME, true);
+
+        GRAY_VIDEO_FLUSH_ICACHE();
+
+        if (vis)
         {
-            stream_show_vo(true);
+            gray_show(true);
+            parser_send_video_msg(VIDEO_DISPLAY_SHOW, true);
         }
     }
 
@@ -784,9 +827,11 @@ void stream_gray_show(bool show)
 {
     stream_mgr_lock();
 
-    GRAY_VIDEO_FLUSH_ICACHE();
+    GRAY_VIDEO_INVALIDATE_ICACHE();
     GRAY_INVALIDATE_ICACHE();
+
     gray_show(show);
+
     GRAY_FLUSH_ICACHE();
 
     stream_mgr_unlock();
@@ -803,11 +848,32 @@ bool stream_display_thumb(const struct vo_rect *rc)
 
     stream_mgr_lock();
 
+    GRAY_INVALIDATE_ICACHE();
+
     stream_mgr.parms.rc = *rc;
     retval = parser_send_video_msg(VIDEO_PRINT_THUMBNAIL,
                 (intptr_t)&stream_mgr.parms.rc);
 
+    GRAY_VIDEO_FLUSH_ICACHE();
+
     stream_mgr_unlock();
+
+    return retval;
+}
+
+bool stream_draw_frame(bool no_prepare)
+{
+    bool retval;
+    stream_mgr_lock();
+
+    GRAY_INVALIDATE_ICACHE();
+
+    retval = parser_send_video_msg(VIDEO_PRINT_FRAME, no_prepare);
+
+    GRAY_VIDEO_FLUSH_ICACHE();
+
+    stream_mgr_unlock();
+
     return retval;
 }
 
@@ -824,6 +890,25 @@ uint32_t stream_get_resume_time(void)
     stream_mgr_unlock();
 
     return resume_time;
+}
+
+uint32_t stream_get_seek_time(uint32_t *start)
+{
+    uint32_t time;
+
+    stream_mgr_lock();
+
+    if (stream_mgr.seeked)
+        time = str_parser.last_seek_time;
+    else
+        time = TICKS_TO_TS(pcm_output_get_clock());
+
+    if (start != NULL)
+        *start = str_parser.start_pts;
+
+    stream_mgr_unlock();
+
+    return time;
 }
 
 /* Returns the smallest file window that includes all active streams'

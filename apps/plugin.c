@@ -580,6 +580,8 @@ static const struct plugin_api rockbox_api = {
     trigger_cpu_boost,
     cancel_cpu_boost,
 #endif
+    sound_unit,
+    sound_val2phys,
 #endif /* CONFIG_CODEC == SWCODEC */
 };
 

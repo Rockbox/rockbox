@@ -116,6 +116,8 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_PAUSE      BUTTON_ON
 #define MPEG_VOLDOWN    BUTTON_DOWN
 #define MPEG_VOLUP      BUTTON_UP
+#define MPEG_RW         BUTTON_LEFT
+#define MPEG_FF         BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -124,6 +126,8 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_STOP       (BUTTON_PLAY | BUTTON_REPEAT)
 #define MPEG_VOLDOWN    BUTTON_SCROLL_BACK
 #define MPEG_VOLUP      BUTTON_SCROLL_FWD
+#define MPEG_RW         BUTTON_LEFT
+#define MPEG_FF         BUTTON_RIGHT
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define MPEG_MENU       (BUTTON_REC | BUTTON_REL)
@@ -131,6 +135,8 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_PAUSE      BUTTON_PLAY
 #define MPEG_VOLDOWN    BUTTON_DOWN
 #define MPEG_VOLUP      BUTTON_UP
+#define MPEG_RW         BUTTON_LEFT
+#define MPEG_FF         BUTTON_RIGHT
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 #define MPEG_MENU       BUTTON_MENU
@@ -141,13 +147,17 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_VOLUP      BUTTON_RIGHT
 #define MPEG_VOLDOWN2   BUTTON_VOL_DOWN
 #define MPEG_VOLUP2     BUTTON_VOL_UP
+#define MPEG_RW         BUTTON_UP
+#define MPEG_FF         BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define MPEG_MENU       (BUTTON_REW | BUTTON_REL)
+#define MPEG_MENU       BUTTON_LEFT
 #define MPEG_STOP       BUTTON_POWER
 #define MPEG_PAUSE      BUTTON_PLAY
 #define MPEG_VOLDOWN    BUTTON_SCROLL_DOWN
 #define MPEG_VOLUP      BUTTON_SCROLL_UP
+#define MPEG_RW         BUTTON_REW
+#define MPEG_FF         BUTTON_FF
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
 #define MPEG_MENU       BUTTON_SELECT
@@ -155,6 +165,8 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_PAUSE      BUTTON_UP
 #define MPEG_VOLDOWN    BUTTON_SCROLL_UP
 #define MPEG_VOLUP      BUTTON_SCROLL_DOWN
+#define MPEG_RW         BUTTON_LEFT
+#define MPEG_FF         BUTTON_RIGHT
 
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
 #define MPEG_MENU       BUTTON_SELECT
@@ -162,6 +174,8 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_PAUSE      BUTTON_UP
 #define MPEG_VOLDOWN    BUTTON_VOL_DOWN
 #define MPEG_VOLUP      BUTTON_VOL_UP
+#define MPEG_RW         BUTTON_LEFT
+#define MPEG_FF         BUTTON_RIGHT
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
 #define MPEG_MENU       BUTTON_RC_HEART
@@ -169,6 +183,8 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_PAUSE      BUTTON_TOUCHPAD
 #define MPEG_VOLDOWN    BUTTON_RC_VOL_DOWN
 #define MPEG_VOLUP      BUTTON_RC_VOL_UP
+#define MPEG_RW         BUTTON_RC_REW
+#define MPEG_FF         BUTTON_RC_FF
 
 #else
 #error MPEGPLAYER: Unsupported keypad
@@ -179,31 +195,997 @@ struct plugin_api* rb;
 CACHE_FUNCTION_WRAPPERS(rb);
 ALIGN_BUFFER_WRAPPER(rb);
 
-static bool button_loop(void)
-{
-    bool ret = true;
+/* One thing we can do here for targets with remotes is having a display
+ * always on the remote instead of always forcing a popup on the main display */
 
+#define FF_REWIND_MAX_PERCENT 3 /* cap ff/rewind step size at max % of file */ 
+                                /* 3% of 30min file == 54s step size */
+#define MIN_FF_REWIND_STEP (TS_SECOND/2)
+#define WVS_MIN_UPDATE_INTERVAL (HZ/2)
+
+/* WVS status - same order as icon array */
+enum wvs_status_enum
+{
+    WVS_STATUS_STOPPED = 0,
+    WVS_STATUS_PAUSED,
+    WVS_STATUS_PLAYING,
+    WVS_STATUS_FF,
+    WVS_STATUS_RW,
+    WVS_STATUS_COUNT,
+    WVS_STATUS_MASK = 0x7
+};
+
+enum wvs_bits
+{
+    WVS_REFRESH_DEFAULT    = 0x0000,
+    WVS_REFRESH_VOLUME     = 0x0001,
+    WVS_REFRESH_TIME       = 0x0002,
+    WVS_REFRESH_STATUS     = 0x0004,
+    WVS_REFRESH_BACKGROUND = 0x0008,
+    WVS_REFRESH_VIDEO      = 0x0010,
+    WVS_REFRESH_RESUME     = 0x0020,
+    WVS_NODRAW             = 0x8000,
+    WVS_SHOW               = 0x4000,
+    WVS_HIDE               = 0x0000,
+    WVS_REFRESH_ALL        = 0x001f,
+};
+
+extern const unsigned char mpegplayer_status_icons_8x8x1[];
+extern const unsigned char mpegplayer_status_icons_12x12x1[];
+extern const unsigned char mpegplayer_status_icons_16x16x1[];
+
+#define WVS_BDR_L 2
+#define WVS_BDR_T 2
+#define WVS_BDR_R 2
+#define WVS_BDR_B 2
+
+struct wvs
+{
+    long hide_tick;
+    long show_for;
+    long print_tick;
+    long print_delay;
+    long resume_tick;
+    long resume_delay;
+    long next_auto_refresh;
+    int x;
+    int y;
+    int width;
+    int height;
+    unsigned fgcolor;
+    unsigned bgcolor;
+#ifdef HAVE_LCD_COLOR
+    unsigned prog_fillcolor;
+    struct vo_rect update_rect;
+#endif
+    struct vo_rect prog_rect;
+    struct vo_rect time_rect;
+    struct vo_rect dur_rect;
+    struct vo_rect vol_rect;
+    const unsigned char *icons;
+    struct vo_rect stat_rect;
+    int status;
+    uint32_t curr_time;
+    unsigned auto_refresh;
+    unsigned flags;
+};
+
+static struct wvs wvs;
+
+static void wvs_show(unsigned show);
+
+#ifdef LCD_LANDSCAPE
+    #define _X (x + wvs.x)
+    #define _Y (y + wvs.y)
+    #define _W width
+    #define _H height
+#else
+    #define _X (LCD_WIDTH - (y + wvs.y) - height)
+    #define _Y (x + wvs.x)
+    #define _W height
+    #define _H width
+#endif
+
+#ifdef HAVE_LCD_COLOR
+static unsigned draw_blendcolor(unsigned c1, unsigned c2, unsigned char amount)
+{
+    int r1 = RGB_UNPACK_RED(c1);
+    int g1 = RGB_UNPACK_GREEN(c1);
+    int b1 = RGB_UNPACK_BLUE(c1);
+
+    int r2 = RGB_UNPACK_RED(c2);
+    int g2 = RGB_UNPACK_GREEN(c2);
+    int b2 = RGB_UNPACK_BLUE(c2);
+
+    return LCD_RGBPACK(amount*(r2 - r1) / 255 + r1,
+                       amount*(g2 - g1) / 255 + g1,
+                       amount*(b2 - b1) / 255 + b1);
+}
+#endif
+
+static void draw_fill_rect(int x, int y, int width, int height)
+{
+    rb->lcd_fillrect(_X, _Y, _W, _H);
+}
+
+#ifdef HAVE_LCD_COLOR
+static void draw_update_rect(int x, int y, int width, int height)
+{
+    rb->lcd_update_rect(_X, _Y, _W, _H);
+}
+#endif
+
+static void draw_clear_area(int x, int y, int width, int height)
+{
+    rb->screen_clear_area(rb->screens[SCREEN_MAIN], _X, _Y, _W, _H);
+}
+
+static void draw_clear_area_rect(const struct vo_rect *rc)
+{
+    int x = rc->l;
+    int y = rc->t;
+    int width = rc->r - rc->l;
+    int height = rc->b - rc->t;
+    rb->screen_clear_area(rb->screens[SCREEN_MAIN], _X, _Y, _W, _H);
+}
+
+static void draw_scrollbar_draw(int x, int y, int width, int height,
+                                int items, int min_shown, int max_shown)
+{
+#ifdef HAVE_LCD_COLOR
+    int oldbg = rb->lcd_get_background();
+    rb->lcd_set_background(wvs.prog_fillcolor);
+#endif
+
+    rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN], _X, _Y,
+                           _W, _H, items, min_shown, max_shown,
+                           0
+#ifdef LCD_LANDSCAPE
+                           | HORIZONTAL
+#endif
+#ifdef HAVE_LCD_COLOR
+                           | INNER_BGFILL | FOREGROUND
+#endif
+                           );
+
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(oldbg);
+#endif
+}
+
+static void draw_scrollbar_draw_rect(const struct vo_rect *rc, int items,
+                                     int min_shown, int max_shown)
+{
+    draw_scrollbar_draw(rc->l, rc->t, rc->r - rc->l, rc->b - rc->t,
+                        items, min_shown, max_shown);
+}
+
+static void draw_hline(int x1, int x2, int y)
+{
+#ifdef LCD_LANDSCAPE
+    rb->lcd_hline(x1 + wvs.x, x2 + wvs.x, y + wvs.y);
+#else
+    y = LCD_WIDTH - (y + wvs.y) - 1;
+    rb->lcd_vline(y, x1 + wvs.x, x2 + wvs.x);
+#endif
+}
+
+#ifdef LCD_PORTRAIT
+/* Portrait displays need rotated text rendering */
+
+/* Limited function that only renders in DRMODE_FG */
+static void draw_oriented_mono_bitmap_part(const unsigned char *src,
+                                           int src_x, int src_y,
+                                           int stride, int x, int y,
+                                           int width, int height)
+{
+    const unsigned char *src_end;
+    fb_data *dst, *dst_end;
+    unsigned fg_pattern, bg_pattern;
+
+    if (x + width > SCREEN_WIDTH)
+        width = SCREEN_WIDTH - x; /* Clip right */
+    if (x < 0)
+        width += x, x = 0; /* Clip left */
+    if (width <= 0)
+        return; /* nothing left to do */
+
+    if (y + height > SCREEN_HEIGHT)
+        height = SCREEN_HEIGHT - y; /* Clip bottom */
+    if (y < 0)
+        height += y, y = 0; /* Clip top */
+    if (height <= 0)
+        return; /* nothing left to do */
+
+    fg_pattern = rb->lcd_get_foreground();
+    bg_pattern = rb->lcd_get_background();
+
+    src += stride * (src_y >> 3) + src_x; /* move starting point */
+    src_y  &= 7;
+    src_end = src + width;
+
+    dst = rb->lcd_framebuffer + (LCD_WIDTH - y) + x*LCD_WIDTH;
+    do 
+    {
+        const unsigned char *src_col = src++;
+        unsigned data = *src_col >> src_y;
+        int numbits = 8 - src_y;
+
+        fb_data *dst_col = dst;
+        dst_end = dst_col - height;
+        dst += LCD_WIDTH;
+
+        do 
+        {
+            dst_col--;
+
+            if (data & 1)
+                *dst_col = fg_pattern;
+#if 0
+            else
+                *dst_col = bg_pattern;
+#endif
+            data >>= 1;
+            if (--numbits == 0) {
+                src_col += stride;
+                data = *src_col;
+                numbits = 8;
+            }
+        }
+        while (dst_col > dst_end);
+    }
+    while (src < src_end);
+}
+
+static void draw_putsxy_oriented(int x, int y, const char *str)
+{
+    unsigned short ch;
+    unsigned short *ucs;
+    int ofs = MIN(x, 0);
+    struct font* pf = rb->font_get(FONT_UI);
+
+    ucs = rb->bidi_l2v(str, 1);
+
+    x += wvs.x;
+    y += wvs.y;
+
+    while ((ch = *ucs++) != 0 && x < SCREEN_WIDTH)
+    {
+        int width;
+        const unsigned char *bits;
+
+        /* get proportional width and glyph bits */
+        width = rb->font_get_width(pf, ch);
+
+        if (ofs > width) {
+            ofs -= width;
+            continue;
+        }
+
+        bits = rb->font_get_bits(pf, ch);
+
+        draw_oriented_mono_bitmap_part(bits, ofs, 0, width, x, y,
+                                       width - ofs, pf->height);
+
+        x += width - ofs;
+        ofs = 0;
+    }
+}
+#else
+static void draw_oriented_mono_bitmap_part(const unsigned char *src,
+                                           int src_x, int src_y,
+                                           int stride, int x, int y,
+                                           int width, int height)
+{
+    int mode = rb->lcd_get_drawmode();
+    rb->lcd_set_drawmode(DRMODE_FG);
+    rb->lcd_mono_bitmap_part(src, src_x, src_y, stride, x, y, width, height);
+    rb->lcd_set_drawmode(mode);
+}
+
+static void draw_putsxy_oriented(int x, int y, const char *str)
+{
+    int mode = rb->lcd_get_drawmode();
+    rb->lcd_set_drawmode(DRMODE_FG);
+    rb->lcd_putsxy(x + wvs.x, y + wvs.y, str);
+    rb->lcd_set_drawmode(mode);
+}
+#endif /* LCD_PORTRAIT */
+
+
+static void wvs_text_init(void)
+{
+    struct hms hms;
+    char buf[32];
+    int phys;
+    int spc_width;
+
+    rb->lcd_setfont(FONT_UI);
+
+    wvs.x = 0;
+    wvs.width = SCREEN_WIDTH;
+
+    vo_rect_clear(&wvs.time_rect);
+    vo_rect_clear(&wvs.stat_rect);
+    vo_rect_clear(&wvs.prog_rect);
+    vo_rect_clear(&wvs.vol_rect);
+
+    ts_to_hms(stream_get_duration(), &hms);
+    hms_format(buf, sizeof (buf), &hms);
+    rb->lcd_getstringsize(buf, &wvs.time_rect.r,
+                               &wvs.time_rect.b);
+
+    /* Choose well-sized bitmap images relative to font height */
+    if (wvs.time_rect.b < 12) {
+        wvs.icons = mpegplayer_status_icons_8x8x1;
+        wvs.stat_rect.r = wvs.stat_rect.b = 8;
+    } else if (wvs.time_rect.b < 16) {
+        wvs.icons = mpegplayer_status_icons_12x12x1;
+        wvs.stat_rect.r = wvs.stat_rect.b = 12;
+    } else {
+        wvs.icons = mpegplayer_status_icons_16x16x1;
+        wvs.stat_rect.r = wvs.stat_rect.b = 16;
+    }
+
+    if (wvs.stat_rect.b < wvs.time_rect.b) {
+        vo_rect_offset(&wvs.stat_rect, 0,
+                       (wvs.time_rect.b - wvs.stat_rect.b) / 2 + WVS_BDR_T);
+        vo_rect_offset(&wvs.time_rect, WVS_BDR_L, WVS_BDR_T);
+    } else {
+        vo_rect_offset(&wvs.time_rect, WVS_BDR_L,
+                       wvs.stat_rect.b - wvs.time_rect.b + WVS_BDR_T);
+        vo_rect_offset(&wvs.stat_rect, 0, WVS_BDR_T);
+    }
+
+    wvs.dur_rect = wvs.time_rect;
+
+    phys = rb->sound_val2phys(SOUND_VOLUME, rb->sound_min(SOUND_VOLUME));
+    rb->snprintf(buf, sizeof(buf), "%d%s", phys,
+                 rb->sound_unit(SOUND_VOLUME));
+
+    rb->lcd_getstringsize(" ", &spc_width, NULL);
+    rb->lcd_getstringsize(buf, &wvs.vol_rect.r, &wvs.vol_rect.b);
+
+    wvs.prog_rect.r = SCREEN_WIDTH - WVS_BDR_L - spc_width -
+                           wvs.vol_rect.r - WVS_BDR_R;
+    wvs.prog_rect.b = 3*wvs.stat_rect.b / 4;
+    vo_rect_offset(&wvs.prog_rect, wvs.time_rect.l,
+                   wvs.time_rect.b);
+
+    vo_rect_offset(&wvs.stat_rect,
+                   (wvs.prog_rect.r + wvs.prog_rect.l - wvs.stat_rect.r) / 2,
+                   0);
+
+    vo_rect_offset(&wvs.dur_rect,
+                   wvs.prog_rect.r - wvs.dur_rect.r, 0);
+
+    vo_rect_offset(&wvs.vol_rect, wvs.prog_rect.r + spc_width,
+                   (wvs.prog_rect.b + wvs.prog_rect.t - wvs.vol_rect.b) / 2);
+
+    wvs.height = WVS_BDR_T + MAX(wvs.prog_rect.b, wvs.vol_rect.b) -
+                    MIN(wvs.time_rect.t, wvs.stat_rect.t) + WVS_BDR_B;
+
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
+    wvs.height = ALIGN_UP(wvs.height, 8);
+#else
+    wvs.height = ALIGN_UP(wvs.height, 2);
+#endif
+    wvs.y = SCREEN_HEIGHT - wvs.height;
+
+    rb->lcd_setfont(FONT_SYSFIXED);
+}
+
+static void wvs_init(void)
+{
+    wvs.flags = 0;
+    wvs.show_for = HZ*4;
+    wvs.print_delay = 75*HZ/100;
+    wvs.resume_delay = HZ/2;
+#ifdef HAVE_LCD_COLOR
+    wvs.bgcolor = LCD_RGBPACK(0x73, 0x75, 0xbd);
+    wvs.fgcolor = LCD_WHITE;
+    wvs.prog_fillcolor = LCD_BLACK;
+#else
+    wvs.bgcolor = LCD_LIGHTGRAY;
+    wvs.fgcolor = LCD_BLACK;
+#endif
+    wvs.curr_time = 0;
+    wvs.status = WVS_STATUS_STOPPED;
+    wvs.auto_refresh = WVS_REFRESH_TIME;
+    wvs.next_auto_refresh = *rb->current_tick;
+    wvs_text_init();
+}
+
+static void wvs_schedule_refresh(unsigned refresh)
+{
+    long tick = *rb->current_tick;
+
+    if (refresh & WVS_REFRESH_VIDEO)
+        wvs.print_tick = tick + wvs.print_delay;
+
+    if (refresh & WVS_REFRESH_RESUME)
+        wvs.resume_tick = tick + wvs.resume_delay;
+
+    wvs.auto_refresh |= refresh;
+}
+
+static void wvs_cancel_refresh(unsigned refresh)
+{
+    wvs.auto_refresh &= ~refresh;
+}
+
+static void wvs_refresh_background(void)
+{
+    char buf[32];
+    struct hms hms;
+
+    int bg = rb->lcd_get_background();
+    rb->lcd_set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
+
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(draw_blendcolor(bg, LCD_WHITE, 192));
+    draw_hline(0, wvs.width, 0);
+
+    rb->lcd_set_background(draw_blendcolor(bg, LCD_WHITE, 80));
+    draw_hline(0, wvs.width, 1);
+
+    rb->lcd_set_background(draw_blendcolor(bg, LCD_BLACK, 48));
+    draw_hline(0, wvs.width, wvs.height-2);
+
+    rb->lcd_set_background(draw_blendcolor(bg, LCD_BLACK, 128));
+    draw_hline(0, wvs.width, wvs.height-1);
+
+    rb->lcd_set_background(bg);
+    draw_clear_area(0, 2, wvs.width, wvs.height - 4);
+
+    vo_rect_set_ext(&wvs.update_rect, 0, 0, wvs.width, wvs.height);
+#else
+    rb->lcd_set_background(LCD_DARKGRAY);
+    draw_hline(0, wvs.width, 0);
+
+    rb->lcd_set_background(bg);
+    draw_clear_area(0, 1, wvs.width, wvs.height - 1);
+#endif
+
+    rb->lcd_set_drawmode(DRMODE_SOLID);
+
+    if (stream_get_duration() != INVALID_TIMESTAMP) {
+        /* Don't know the duration */
+        ts_to_hms(stream_get_duration(), &hms);
+        hms_format(buf, sizeof (buf), &hms);
+        draw_putsxy_oriented(wvs.dur_rect.l, wvs.dur_rect.t, buf);
+    }
+}
+
+static void wvs_refresh_time(void)
+{
+    char buf[32];
+    struct hms hms;
+
+    uint32_t duration = stream_get_duration();
+
+    draw_scrollbar_draw_rect(&wvs.prog_rect, duration, 0,
+                             wvs.curr_time);
+
+    ts_to_hms(wvs.curr_time, &hms);
+    hms_format(buf, sizeof (buf), &hms);
+
+    draw_clear_area_rect(&wvs.time_rect);
+    draw_putsxy_oriented(wvs.time_rect.l, wvs.time_rect.t, buf);    
+
+#ifdef HAVE_LCD_COLOR
+    vo_rect_union(&wvs.update_rect, &wvs.update_rect,
+                  &wvs.prog_rect);
+    vo_rect_union(&wvs.update_rect, &wvs.update_rect,
+                  &wvs.time_rect);
+#endif
+}
+
+static void wvs_refresh_volume(void)
+{
+    char buf[32];
+    int width;
+
+    int volume = rb->global_settings->volume;
+    rb->snprintf(buf, sizeof (buf), "%d%s",
+                 rb->sound_val2phys(SOUND_VOLUME, volume),
+                 rb->sound_unit(SOUND_VOLUME));
+    rb->lcd_getstringsize(buf, &width, NULL);
+
+    /* Right-justified */
+    draw_clear_area_rect(&wvs.vol_rect);
+    draw_putsxy_oriented(wvs.vol_rect.r - width, wvs.vol_rect.t, buf);
+
+#ifdef HAVE_LCD_COLOR
+    vo_rect_union(&wvs.update_rect, &wvs.update_rect, &wvs.vol_rect);
+#endif
+}
+
+static void wvs_refresh_status(void)
+{
+    int icon_size = wvs.stat_rect.r - wvs.stat_rect.l;
+
+    draw_clear_area_rect(&wvs.stat_rect);
+
+#ifdef HAVE_LCD_COLOR
+    /* Draw status icon with a drop shadow */
+    unsigned oldfg = rb->lcd_get_foreground();
+    int i = 1;
+
+    rb->lcd_set_foreground(draw_blendcolor(rb->lcd_get_background(),
+                           LCD_BLACK, 96));
+
+    while (1)
+    {
+        draw_oriented_mono_bitmap_part(wvs.icons,
+                                       icon_size*wvs.status,
+                                       0,
+                                       icon_size*WVS_STATUS_COUNT,
+                                       wvs.stat_rect.l + wvs.x + i,
+                                       wvs.stat_rect.t + wvs.y + i,
+                                       icon_size, icon_size);
+
+        if (--i < 0)
+            break;
+
+        rb->lcd_set_foreground(oldfg);
+    }
+
+    vo_rect_union(&wvs.update_rect, &wvs.update_rect, &wvs.stat_rect);
+#else
+    draw_oriented_mono_bitmap_part(wvs.icons,
+                                   icon_size*wvs.status,
+                                   0,
+                                   icon_size*WVS_STATUS_COUNT,
+                                   wvs.stat_rect.l + wvs.x,
+                                   wvs.stat_rect.t + wvs.y,
+                                   icon_size, icon_size);
+#endif
+}
+
+static bool wvs_update_status(void)
+{
+    int status;
+
+    switch (stream_status())
+    {
+    default:
+        status = WVS_STATUS_STOPPED;
+        break;
+    case STREAM_PAUSED:
+        status = (wvs.auto_refresh & WVS_REFRESH_RESUME) ?
+            WVS_STATUS_PLAYING : WVS_STATUS_PAUSED;
+        break;
+    case STREAM_PLAYING:
+        status = WVS_STATUS_PLAYING;
+        break;
+    }
+
+    if (status != wvs.status) {
+        wvs.status = status;
+        return true;
+    }
+
+    return false;
+}
+
+static void wvs_update_time(void)
+{
+    uint32_t start;
+    wvs.curr_time = stream_get_seek_time(&start);
+    wvs.curr_time -= start;
+}
+
+static void wvs_refresh(int hint)
+{
+    long tick;
+    unsigned oldbg, oldfg;
+
+    tick = *rb->current_tick;
+
+    if (hint == WVS_REFRESH_DEFAULT) {
+
+        if ((wvs.auto_refresh & WVS_REFRESH_VIDEO) &&
+            TIME_AFTER(tick, wvs.print_tick)) {
+            wvs.auto_refresh &= ~WVS_REFRESH_VIDEO;
+            stream_draw_frame(false);
+        }
+
+        if ((wvs.auto_refresh & WVS_REFRESH_RESUME) &&
+            TIME_AFTER(tick, wvs.resume_tick)) {
+            wvs.auto_refresh &= ~(WVS_REFRESH_RESUME | WVS_REFRESH_VIDEO);
+            stream_resume();
+        }
+
+        if (!(wvs.flags & WVS_SHOW))
+            return;
+
+        if (TIME_AFTER(tick, wvs.hide_tick)) {
+            wvs_show(WVS_HIDE);
+            return;
+        }
+    } else {
+        if (!(wvs.flags & WVS_SHOW)) {
+            wvs_show(WVS_SHOW | WVS_NODRAW);
+            hint = WVS_REFRESH_ALL;
+        }
+
+        wvs.print_tick = tick + wvs.print_delay;
+        wvs.hide_tick = tick + wvs.show_for;
+    }
+
+    if (TIME_AFTER(tick, wvs.next_auto_refresh)) {
+        wvs.next_auto_refresh = tick + WVS_MIN_UPDATE_INTERVAL;
+
+        if (wvs.auto_refresh & WVS_REFRESH_STATUS) {
+            if (wvs_update_status())
+                hint |= WVS_REFRESH_STATUS;
+        }
+
+        if (wvs.auto_refresh & WVS_REFRESH_TIME) {
+            wvs_update_time();
+            hint |= WVS_REFRESH_TIME;
+        }
+    }
+
+    if (hint == 0)
+        return;
+
+    oldfg = rb->lcd_get_foreground();
+    oldbg = rb->lcd_get_background();
+
+    rb->lcd_setfont(FONT_UI);
+    rb->lcd_set_foreground(wvs.fgcolor);
+    rb->lcd_set_background(wvs.bgcolor);
+
+#ifdef HAVE_LCD_COLOR
+    vo_rect_clear(&wvs.update_rect);
+#endif
+
+    if (hint & WVS_REFRESH_BACKGROUND) {
+        wvs_refresh_background();
+        hint |= WVS_REFRESH_ALL; /* Requires a redraw of everything */
+    }
+
+    if (hint & WVS_REFRESH_TIME) {
+        wvs_refresh_time();
+    }
+
+    if (hint & WVS_REFRESH_VOLUME) {
+        wvs_refresh_volume();
+    }
+
+    if (hint & WVS_REFRESH_STATUS) {
+        wvs_refresh_status();
+    }
+
+    rb->lcd_setfont(FONT_SYSFIXED);
+    rb->lcd_set_foreground(oldfg);
+    rb->lcd_set_background(oldbg);
+
+#ifdef HAVE_LCD_COLOR
+    vo_lock();
+
+    draw_update_rect(wvs.update_rect.l,
+                     wvs.update_rect.t,
+                     wvs.update_rect.r - wvs.update_rect.l,
+                     wvs.update_rect.b - wvs.update_rect.t);
+
+    vo_unlock();
+#else
+    gray_deferred_lcd_update();
+#endif
+}
+
+static void wvs_show(unsigned show)
+{
+    if (((show ^ wvs.flags) & WVS_SHOW) == 0)
+        return;
+
+    if (show & WVS_SHOW) {
+        struct vo_rect rc = { 0, 0, SCREEN_WIDTH, wvs.y };
+
+        wvs.flags |= WVS_SHOW;
+
+        stream_vo_set_clip(&rc);
+
+        if (!(show & WVS_NODRAW))
+            wvs_refresh(WVS_REFRESH_ALL);
+    } else {
+        wvs.flags &= ~WVS_SHOW;
+
+        stream_vo_set_clip(NULL);
+
+        draw_clear_area(0, 0, wvs.width, wvs.height);
+
+        if (!(show & WVS_NODRAW)) {
+#ifdef HAVE_LCD_COLOR
+            vo_lock();
+            draw_update_rect(0, 0, wvs.width, wvs.height);
+            vo_unlock();
+#endif
+            stream_draw_frame(false);
+        }
+    }
+}
+
+static void wvs_set_status(int status)
+{
+    bool draw = (status & WVS_NODRAW) == 0;
+
+    status &= WVS_STATUS_MASK;
+
+    if (wvs.status != status) {
+
+        wvs.status = status;
+
+        if (draw)
+            wvs_refresh(WVS_REFRESH_STATUS);
+    }
+}
+
+/* Handle Fast-forward/Rewind keys using WPS settings (and some nicked code ;) */
+static uint32_t wvs_ff_rw(int btn, unsigned refresh)
+{
+    unsigned int step = TS_SECOND*rb->global_settings->ff_rewind_min_step;
+    const long ff_rw_accel = rb->global_settings->ff_rewind_accel;
+    long accel_tick = *rb->current_tick + ff_rw_accel*HZ;
+    uint32_t start;
+    uint32_t time = stream_get_seek_time(&start);
+    const uint32_t duration = stream_get_duration();
+    unsigned int max_step = 0;
+    uint32_t ff_rw_count = 0;
+    unsigned status = wvs.status;
+
+    wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME |
+                       WVS_REFRESH_TIME);
+
+    time -= start; /* Absolute clock => stream-relative */
+
+    switch (btn)
+    {
+    case MPEG_FF:
+        wvs_set_status(WVS_STATUS_FF);
+        break;
+    case MPEG_RW:
+        wvs_set_status(WVS_STATUS_RW);
+        break;
+    default:
+        btn = -1;
+    }
+
+    btn |= BUTTON_REPEAT;
+
+    while (1)
+    {
+        long tick = *rb->current_tick;
+        stream_keep_disk_active();
+
+        switch (btn)
+        {
+        case BUTTON_NONE:
+            wvs_refresh(WVS_REFRESH_DEFAULT);
+            break;
+
+        case MPEG_FF | BUTTON_REPEAT:
+        case MPEG_RW | BUTTON_REPEAT:
+            break;
+
+        case MPEG_FF | BUTTON_REL:
+        case MPEG_RW | BUTTON_REL:
+            if (wvs.status == WVS_STATUS_FF)
+                time += ff_rw_count;
+            else if (wvs.status == WVS_STATUS_RW)
+                time -= ff_rw_count;
+
+            /* Fall-through */
+        case -1:
+        default:
+            wvs_schedule_refresh(refresh);
+            wvs_set_status(status);
+            wvs_schedule_refresh(WVS_REFRESH_TIME);
+            return time;
+        }
+
+        if (wvs.status == WVS_STATUS_FF) {
+            /* fast forwarding, calc max step relative to end */
+            max_step = muldiv_uint32(duration - (time + ff_rw_count),
+                                     FF_REWIND_MAX_PERCENT, 100);
+        } else {
+            /* rewinding, calc max step relative to start */
+            max_step = muldiv_uint32(time - ff_rw_count,
+                                     FF_REWIND_MAX_PERCENT, 100);
+        }
+
+        max_step = MAX(max_step, MIN_FF_REWIND_STEP);
+
+        if (step > max_step)
+            step = max_step;
+
+        ff_rw_count += step;
+
+        if (ff_rw_accel != 0 && TIME_AFTER(tick, accel_tick)) { 
+            step *= 2;
+            accel_tick = tick + ff_rw_accel*HZ; 
+        }
+
+        if (wvs.status == WVS_STATUS_FF) {
+            if (duration - time <= ff_rw_count)
+                ff_rw_count = duration - time;
+
+            wvs.curr_time = time + ff_rw_count;
+        } else {
+            if (time <= ff_rw_count)
+                ff_rw_count = time;
+
+            wvs.curr_time = time - ff_rw_count;
+        }
+
+        wvs_refresh(WVS_REFRESH_TIME);
+
+        btn = rb->button_get_w_tmo(WVS_MIN_UPDATE_INTERVAL);
+    }
+}
+
+static int wvs_status(void)
+{
+    int status = stream_status();
+
+    /* Coerce to STREAM_PLAYING if paused with a pending resume */
+    if (status == STREAM_PAUSED) {
+        if (wvs.auto_refresh & WVS_REFRESH_RESUME)
+            status = STREAM_PLAYING;
+    }
+
+    return status;
+}
+
+static void wvs_set_volume(int delta)
+{
+    int vol = rb->global_settings->volume;
+    int limit;
+
+    vol += delta;
+
+    if (delta < 0) {
+        limit = rb->sound_min(SOUND_VOLUME);
+        if (vol < limit)
+            vol = limit;
+    } else {
+        limit = rb->sound_max(SOUND_VOLUME);
+        if (vol > limit)
+            vol = limit;
+    }
+
+    if (vol != rb->global_settings->volume) {
+        rb->sound_set(SOUND_VOLUME, vol);
+        rb->global_settings->volume = vol;
+    }
+
+    wvs_refresh(WVS_REFRESH_VOLUME);
+}
+
+static int wvs_play(uint32_t time)
+{
+    int retval;
+
+    wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
+
+    retval = stream_seek(time, SEEK_SET);
+
+    if (retval >= STREAM_OK) {
+        stream_show_vo(true);
+        retval = stream_play();
+
+        if (retval >= STREAM_OK)
+            wvs_set_status(WVS_STATUS_PLAYING | WVS_NODRAW);
+    }
+
+    return retval;
+}
+
+static int wvs_halt(void)
+{
+    int status = stream_pause();
+
+    /* Coerce to STREAM_PLAYING if paused with a pending resume */
+    if (status == STREAM_PAUSED) {
+        if (wvs.auto_refresh & WVS_REFRESH_RESUME)
+            status = STREAM_PLAYING;
+    }
+
+    wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
+
+    return status;
+}
+
+static int wvs_pause(void)
+{
+    unsigned refresh = wvs.auto_refresh;
+    int status = wvs_halt();
+
+    if (status == STREAM_PLAYING && (refresh & WVS_REFRESH_RESUME)) {
+        wvs_cancel_refresh(WVS_REFRESH_RESUME);
+        wvs_schedule_refresh(WVS_REFRESH_VIDEO);
+    }
+
+    wvs_set_status(WVS_STATUS_PAUSED);
+
+    return status;
+}
+
+static void wvs_resume(void)
+{
+    wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
+    wvs_set_status(WVS_STATUS_PLAYING);
+    stream_resume();
+}
+
+static void wvs_stop(void)
+{
+    wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
+    wvs_show(WVS_HIDE | WVS_NODRAW);
+
+    if (stream_stop() != STREAM_STOPPED)
+        settings.resume_time = stream_get_resume_time();
+}
+
+static void wvs_seek(int btn)
+{
+    int status;
+    unsigned refresh;
+    uint32_t time;
+
+    if (!stream_can_seek())
+        return;
+
+    status = wvs_halt();
+
+    if (status == STREAM_STOPPED)
+        return;
+
+    wvs_show(WVS_SHOW);
+
+    if (status == STREAM_PLAYING)
+        refresh = WVS_REFRESH_RESUME; /* delay resume if playing */
+    else
+        refresh = WVS_REFRESH_VIDEO;  /* refresh if paused */
+
+    time = wvs_ff_rw(btn, refresh);
+
+    stream_seek(time, SEEK_SET);
+}
+
+static void button_loop(void)
+{
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_clear_display();
     rb->lcd_update();
 
+    /* Turn off backlight timeout */
+    /* backlight control in lib/helper.c */
+    backlight_force_on(rb);
+
+    wvs_init();
+
     /* Start playback at the specified starting time */
-    if (stream_seek(settings.resume_time, SEEK_SET) < STREAM_OK ||
-        (stream_show_vo(true), stream_play()) < STREAM_OK)
-    {
+    if (wvs_play(settings.resume_time) < STREAM_OK) {
         rb->splash(HZ*2, "Playback failed");
-        return false;
+        return;
     }
 
     /* Gently poll the video player for EOS and handle UI */
     while (stream_status() != STREAM_STOPPED)
     {
-        int button = rb->button_get_w_tmo(HZ/2);
+        int button = rb->button_get_w_tmo(WVS_MIN_UPDATE_INTERVAL);
 
         switch (button)
         {
         case BUTTON_NONE:
+        {
+            wvs_refresh(WVS_REFRESH_DEFAULT);
             continue;
+            } /* BUTTON_NONE: */
 
         case MPEG_VOLUP:
         case MPEG_VOLUP|BUTTON_REPEAT:
@@ -212,14 +1194,7 @@ static bool button_loop(void)
         case MPEG_VOLUP2|BUTTON_REPEAT:
 #endif
         {
-            int vol = rb->global_settings->volume;
-            int maxvol = rb->sound_max(SOUND_VOLUME);
-
-            if (vol < maxvol) {
-                vol++;
-                rb->sound_set(SOUND_VOLUME, vol);
-                rb->global_settings->volume = vol;
-            }
+            wvs_set_volume(+1);
             break;
             } /* MPEG_VOLUP*: */
 
@@ -230,23 +1205,17 @@ static bool button_loop(void)
         case MPEG_VOLDOWN2|BUTTON_REPEAT:
 #endif
         {
-            int vol = rb->global_settings->volume;
-            int minvol = rb->sound_min(SOUND_VOLUME);
-
-            if (vol > minvol) {
-                vol--;
-                rb->sound_set(SOUND_VOLUME, vol);
-                rb->global_settings->volume = vol;
-            }
+            wvs_set_volume(-1);
             break;
             } /* MPEG_VOLDOWN*: */
 
         case MPEG_MENU:
         {
-            int state = stream_pause(); /* save previous state */
+            int state = wvs_halt(); /* save previous state */
             int result;
 
             /* Hide video output */
+            wvs_show(WVS_HIDE | WVS_NODRAW);
             stream_show_vo(false);
             backlight_use_settings(rb);
 
@@ -258,17 +1227,19 @@ static bool button_loop(void)
             switch (result)
             {
             case MPEG_MENU_QUIT:
-                stream_stop();
+                wvs_stop();
                 break;
             default:
                 /* If not stopped, show video again */
-                if (state != STREAM_STOPPED)
+                if (state != STREAM_STOPPED) {
+                    wvs_show(WVS_SHOW);
                     stream_show_vo(true);
+                }
 
                 /* If stream was playing, restart it */
                 if (state == STREAM_PLAYING) {
                     backlight_force_on(rb);
-                    stream_resume();
+                    wvs_resume();
                 }
                 break;
             }
@@ -277,7 +1248,7 @@ static bool button_loop(void)
 
         case MPEG_STOP:
         {
-            stream_stop();
+            wvs_stop();
             break;
             } /* MPEG_STOP: */
 
@@ -286,27 +1257,34 @@ static bool button_loop(void)
         case MPEG_PAUSE2:
 #endif
         {
-            if (stream_status() == STREAM_PLAYING) {
+            int status = wvs_status();
+
+            if (status == STREAM_PLAYING) {
                 /* Playing => Paused */
-                stream_pause();
+                wvs_pause();
                 backlight_use_settings(rb);
             }
-            else if (stream_status() == STREAM_PAUSED) {
+            else if (status == STREAM_PAUSED) {
                 /* Paused => Playing */
                 backlight_force_on(rb);
-                stream_resume();
+                wvs_resume();
             }
 
             break;
             } /* MPEG_PAUSE*: */
 
+        case MPEG_RW:
+        case MPEG_FF:
+        {
+            wvs_seek(button);
+            break;
+            } /* MPEG_RW: MPEG_FF: */
+
         case SYS_POWEROFF:
         case SYS_USB_CONNECTED:
             /* Stop and get the resume time before closing the file early */
-            stream_stop();
-            settings.resume_time = stream_get_resume_time();
+            wvs_stop();
             stream_close();
-            ret = false;
         /* Fall-through */
         default:
             rb->default_event_handler(button);
@@ -316,9 +1294,12 @@ static bool button_loop(void)
         rb->yield();
     } /* end while */
 
+    wvs_stop();
+
     rb->lcd_setfont(FONT_UI);
 
-    return ret;
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb);
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -367,17 +1348,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             result = mpeg_start_menu(stream_get_duration());
 
             if (result != MPEG_START_QUIT) {
-                /* Turn off backlight timeout */
-                /* backlight control in lib/helper.c */
-                backlight_force_on(rb);
-
                 /* Enter button loop and process UI */
-                if (button_loop()) {
-                     settings.resume_time = stream_get_resume_time();
-                }
-
-                /* Turn on backlight timeout (revert to settings) */
-                backlight_use_settings(rb);
+                button_loop();
             }
 
             stream_close();

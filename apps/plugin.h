@@ -119,7 +119,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 92
+#define PLUGIN_API_VERSION 93
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -715,6 +715,8 @@ struct plugin_api {
     void (*trigger_cpu_boost)(void);
     void (*cancel_cpu_boost)(void);
 #endif
+    const char * (*sound_unit)(int setting);
+    int (*sound_val2phys)(int setting, int value);
 #endif /* CONFIG_CODEC == SWCODEC */
 };
 

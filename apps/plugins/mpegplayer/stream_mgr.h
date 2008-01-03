@@ -105,6 +105,9 @@ int stream_seek(uint32_t time, int whence);
 /* Show/Hide the video image at the current seekpoint */
 bool stream_show_vo(bool show);
 
+/* Set the visible section of video */
+void stream_vo_set_clip(const struct vo_rect *rc);
+
 #ifndef HAVE_LCD_COLOR
 /* Set the gray overlay rectangle */
 bool stream_set_gray_rect(const struct vo_rect *rc);
@@ -114,11 +117,18 @@ void stream_gray_show(bool show);
 /* Display thumbnail of the current seekpoint */
 bool stream_display_thumb(const struct vo_rect *rc);
 
+/* Draw the frame at the current position */
+bool stream_draw_frame(bool no_prepare);
+
 /* Return video dimensions */
 bool stream_vo_get_size(struct vo_ext *sz);
 
 /* Returns the resume time in timestamp ticks */
 uint32_t stream_get_resume_time(void);
+
+/* Returns stream_get_time if no seek is pending or else the
+   last time give to seek */
+uint32_t stream_get_seek_time(uint32_t *start);
 
 /* Return the absolute stream time in clock ticks - adjusted by
  * master clock stream via audio timestamps */

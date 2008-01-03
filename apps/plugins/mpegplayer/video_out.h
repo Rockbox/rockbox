@@ -24,6 +24,16 @@
 #ifndef VIDEO_OUT_H
 #define VIDEO_OUT_H
 
+#if LCD_WIDTH >= LCD_HEIGHT
+#define SCREEN_WIDTH LCD_WIDTH
+#define SCREEN_HEIGHT LCD_HEIGHT
+#define LCD_LANDSCAPE
+#else /* Assume the screen is rotated on portrait LCDs */
+#define SCREEN_WIDTH LCD_HEIGHT
+#define SCREEN_HEIGHT LCD_WIDTH
+#define LCD_PORTRAIT
+#endif
+
 /* Structure to hold width and height values */
 struct vo_ext
 {
@@ -43,8 +53,17 @@ bool vo_init (void);
 bool vo_show (bool show);
 bool vo_is_visible(void);
 void vo_setup (const mpeg2_sequence_t * sequence);
+void vo_set_clip_rect(const struct vo_rect *rc);
 void vo_dimensions(struct vo_ext *sz);
 void vo_cleanup (void);
+
+#if NUM_CORES > 1 || !defined (HAVE_LCD_COLOR)
+void vo_lock(void);
+void vo_unlock(void);
+#else
+static inline void vo_lock(void) {}
+static inline void vo_unlock(void) {}
+#endif
 
 /* Sets all coordinates of a vo_rect to 0 */
 void vo_rect_clear(struct vo_rect *rc);
@@ -67,5 +86,11 @@ bool vo_rects_intersect(const struct vo_rect *rc1,
 bool vo_rect_intersect(struct vo_rect *rc_dst,
                        const struct vo_rect *rc1,
                        const struct vo_rect *rc2);
+
+bool vo_rect_union(struct vo_rect *rc_dst,
+                   const struct vo_rect *rc1,
+                   const struct vo_rect *rc2);
+
+void vo_rect_offset(struct vo_rect *rc, int dx, int dy);
 
 #endif /* VIDEO_OUT_H */

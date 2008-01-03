@@ -359,7 +359,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
 #if LCD_WIDTH >= LCD_HEIGHT
     lcd_update_rect(x, y, width, height);
 #else
-    lcd_update_rect(y, x, height, width);
+    lcd_update_rect(LCD_WIDTH - y - height, x, height, width);
 #endif
 }
 #endif /* HAVE_LCD_COLOR */
