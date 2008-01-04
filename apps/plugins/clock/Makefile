@@ -40,7 +40,7 @@ all: $(OUTPUT)
 ifndef SIMVER
 $(OBJDIR)/clock.elf: $(OBJS) $(LINKFILE) $(BITMAPLIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
-           $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/clock.map
+           $(LINKBITMAPS) -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/clock.map
 
 $(OUTPUT): $(OBJDIR)/clock.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@

@@ -36,14 +36,14 @@ all: $(OUTPUT)
 ifndef SIMVER
 $(OBJDIR)/shortcuts_view.elf: $(VIEW_OBJS) $(LINKFILE) $(BITMAPLIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(VIEW_OBJS) -L$(BUILDDIR) -lplugin -lgcc \
-           $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/shortcuts_view.map
+           $(LINKBITMAPS) -Wl,--gc-sections -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/shortcuts_view.map
 
 $(OUTDIR)/shortcuts_view.rock: $(OBJDIR)/shortcuts_view.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 
 $(OBJDIR)/shortcuts_append.elf: $(APPEND_OBJS) $(LINKFILE) $(BITMAPLIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(APPEND_OBJS) -L$(BUILDDIR) -lplugin -lgcc \
-           $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/shortcuts_append.map
+           $(LINKBITMAPS) -Wl,--gc-sections -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/shortcuts_append.map
 
 $(OUTDIR)/shortcuts_append.rock: $(OBJDIR)/shortcuts_append.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@

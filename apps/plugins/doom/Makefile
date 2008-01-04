@@ -101,7 +101,7 @@ all: $(OUTPUT)
 ifndef SIMVER
 $(OBJDIR)/doom.elf: $(OBJS) $(LINKFILE)
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc\
-           -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/doom.map
+           -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/doom.map
 
 $(OUTPUT): $(OBJDIR)/doom.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@

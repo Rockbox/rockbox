@@ -42,7 +42,7 @@ all: $(OUTPUT)
 ifndef SIMVER
 $(OBJDIR)/chessbox.elf: $(OBJS) $(LINKFILE) $(BITMAPLIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
-           $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/chessbox.map
+           $(LINKBITMAPS) -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/chessbox.map
 
 $(OUTPUT): $(OBJDIR)/chessbox.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@

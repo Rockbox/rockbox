@@ -39,7 +39,7 @@ all: $(OUTPUT)
 ifndef SIMVER
 $(OBJDIR)/sudoku.elf: $(OBJS) $(LINKFILE) $(BITMAPLIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
-           $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/sudoku.map
+           $(LINKBITMAPS) -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/sudoku.map
 
 $(OUTPUT): $(OBJDIR)/sudoku.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@

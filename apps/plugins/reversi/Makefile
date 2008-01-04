@@ -39,7 +39,7 @@ all: $(OUTPUT)
 ifndef SIMVER
 $(OBJDIR)/reversi.elf: $(OBJS) $(LINKFILE) $(BITMAPLIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
-           $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/reversi.map
+           $(LINKBITMAPS) -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/reversi.map
 
 $(OUTPUT): $(OBJDIR)/reversi.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@

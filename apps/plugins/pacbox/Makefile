@@ -35,7 +35,7 @@ all: $(OUTPUT)
 ifndef SIMVER
 $(OBJDIR)/pacbox.elf: $(OBJS) $(LINKFILE)
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
-           -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/pacbox.map
+           -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/pacbox.map
 
 $(OUTPUT): $(OBJDIR)/pacbox.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@

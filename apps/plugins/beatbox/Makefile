@@ -38,7 +38,7 @@ all: $(OUTPUT)
 ifndef SIMVER
 $(OBJDIR)/beatbox.elf: $(OBJS) $(LINKFILE) $(BITMAPLIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
-           $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/beatbox.map
+           $(LINKBITMAPS) -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/beatbox.map
 
 $(OUTPUT): $(OBJDIR)/beatbox.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@

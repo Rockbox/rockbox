@@ -32,7 +32,7 @@ all: $(OUTPUT)
 ifndef SIMVER
 $(OBJDIR)/searchengine.elf: $(OBJS) $(LINKFILE)
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
-           -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/searchengine.map
+           -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/searchengine.map
 
 $(OUTPUT): $(OBJDIR)/searchengine.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@

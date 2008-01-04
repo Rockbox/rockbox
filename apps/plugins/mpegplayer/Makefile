@@ -43,7 +43,7 @@ libmad-mpegplayer:
 ifndef SIMVER
 $(OBJDIR)/mpegplayer.elf: $(OBJS) $(LINKFILE) $(BUILDDIR)/libmad-mpegplayer.a
 	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lmad-mpegplayer -lgcc\
-           $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/mpegplayer.map
+           $(LINKBITMAPS) -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/mpegplayer.map
 
 $(OUTPUT): $(OBJDIR)/mpegplayer.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
