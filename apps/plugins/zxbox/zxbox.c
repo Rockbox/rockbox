@@ -50,7 +50,7 @@ unsigned char image_array [ HEIGHT * WIDTH ];
 
 static int previous_state;
 
-#ifdef USE_GRAY
+#ifdef USE_GREY
 static unsigned char *gbuf;
 static size_t         gbuf_size = 0;
 #endif
@@ -69,17 +69,17 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     sp_init();
 
-#ifdef USE_GRAY
+#ifdef USE_GREY
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
-#ifdef USE_BUFFERED_GRAY
-    gray_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, LCD_HEIGHT, 15, 0, NULL);
+#ifdef USE_BUFFERED_GREY
+    grey_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, LCD_HEIGHT, NULL);
 #else
-    gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT, 15, 0, NULL);
-#endif /* USE_BUFFERED_GRAY */
-    /* switch on grayscale overlay */
-   gray_show(true);
-#endif /* USE_GRAY */
+    grey_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT, NULL);
+#endif /* USE_BUFFERED_GREY */
+    /* switch on greyscale overlay */
+    grey_show(true);
+#endif /* USE_GREY */
 
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
@@ -102,9 +102,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->cpu_boost(false);
 #endif
 
-#ifdef USE_GRAY
-gray_show(false);
-gray_release();
+#ifdef USE_GREY
+grey_show(false);
+grey_release();
 #endif 
 
 #if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
@@ -133,8 +133,8 @@ void spkb_process_events( int evenframe )
             rb->cpu_boost(false);
 #endif
             exit_requested=1;
-#ifdef USE_GRAY
-            gray_show(false);
+#ifdef USE_GREY
+            grey_show(false);
 #endif
             return;
         }
@@ -151,8 +151,8 @@ void spkb_process_events( int evenframe )
             rb->cpu_boost(false);
 #endif
             exit_requested=1;
-#ifdef USE_GRAY
-            gray_show(false);
+#ifdef USE_GREY
+            grey_show(false);
 #endif
             return;
         }

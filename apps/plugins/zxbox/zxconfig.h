@@ -17,11 +17,10 @@ extern int intkeys[5];
 #define SETTINGS_MIN_VERSION 2
 #define SETTINGS_VERSION 2
 
-/* undef not to use grayscale lib */
-#if !defined HAVE_LCD_COLOR && LCD_PIXELFORMAT != HORIZONTAL_PACKING
-/* grayscale is far slower for now at least on ipods :( */
-#define USE_GRAY
-#define USE_BUFFERED_GRAY
+/* undef not to use greyscale lib */
+#if !defined HAVE_LCD_COLOR
+#define USE_GREY
+#define USE_BUFFERED_GREY
 #endif
 
 

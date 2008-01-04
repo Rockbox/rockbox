@@ -7,9 +7,9 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* Grayscale demo plugin
+* Greyscale demo plugin
 *
-* Copyright (C) 2004 Jens Arnold
+* Copyright (C) 2004-2008 Jens Arnold
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -23,62 +23,62 @@
 #include "helper.h" 
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
-#include "gray.h"
+#include "grey.h"
 
 PLUGIN_HEADER
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define GRAYSCALE_SHIFT BUTTON_ON
-#define GRAYSCALE_UP BUTTON_UP
-#define GRAYSCALE_DOWN BUTTON_DOWN
-#define GRAYSCALE_LEFT BUTTON_LEFT
-#define GRAYSCALE_RIGHT BUTTON_RIGHT
-#define GRAYSCALE_OFF BUTTON_OFF
+#define GREYSCALE_SHIFT BUTTON_ON
+#define GREYSCALE_UP BUTTON_UP
+#define GREYSCALE_DOWN BUTTON_DOWN
+#define GREYSCALE_LEFT BUTTON_LEFT
+#define GREYSCALE_RIGHT BUTTON_RIGHT
+#define GREYSCALE_OFF BUTTON_OFF
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define GRAYSCALE_SHIFT BUTTON_MENU
-#define GRAYSCALE_UP BUTTON_UP
-#define GRAYSCALE_DOWN BUTTON_DOWN
-#define GRAYSCALE_LEFT BUTTON_LEFT
-#define GRAYSCALE_RIGHT BUTTON_RIGHT
-#define GRAYSCALE_OFF BUTTON_OFF
+#define GREYSCALE_SHIFT BUTTON_MENU
+#define GREYSCALE_UP BUTTON_UP
+#define GREYSCALE_DOWN BUTTON_DOWN
+#define GREYSCALE_LEFT BUTTON_LEFT
+#define GREYSCALE_RIGHT BUTTON_RIGHT
+#define GREYSCALE_OFF BUTTON_OFF
 
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
-#define GRAYSCALE_SHIFT BUTTON_ON
-#define GRAYSCALE_UP BUTTON_UP
-#define GRAYSCALE_DOWN BUTTON_DOWN
-#define GRAYSCALE_LEFT BUTTON_LEFT
-#define GRAYSCALE_RIGHT BUTTON_RIGHT
-#define GRAYSCALE_OFF BUTTON_OFF
+#define GREYSCALE_SHIFT BUTTON_ON
+#define GREYSCALE_UP BUTTON_UP
+#define GREYSCALE_DOWN BUTTON_DOWN
+#define GREYSCALE_LEFT BUTTON_LEFT
+#define GREYSCALE_RIGHT BUTTON_RIGHT
+#define GREYSCALE_OFF BUTTON_OFF
 
-#define GRAYSCALE_RC_OFF BUTTON_RC_STOP
+#define GREYSCALE_RC_OFF BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define GRAYSCALE_SHIFT BUTTON_SELECT
-#define GRAYSCALE_UP BUTTON_SCROLL_BACK
-#define GRAYSCALE_DOWN BUTTON_SCROLL_FWD
-#define GRAYSCALE_LEFT BUTTON_LEFT
-#define GRAYSCALE_RIGHT BUTTON_RIGHT
-#define GRAYSCALE_OFF BUTTON_MENU
+#define GREYSCALE_SHIFT BUTTON_SELECT
+#define GREYSCALE_UP BUTTON_SCROLL_BACK
+#define GREYSCALE_DOWN BUTTON_SCROLL_FWD
+#define GREYSCALE_LEFT BUTTON_LEFT
+#define GREYSCALE_RIGHT BUTTON_RIGHT
+#define GREYSCALE_OFF BUTTON_MENU
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define GRAYSCALE_SHIFT BUTTON_PLAY
-#define GRAYSCALE_UP BUTTON_UP
-#define GRAYSCALE_DOWN BUTTON_DOWN
-#define GRAYSCALE_LEFT BUTTON_LEFT
-#define GRAYSCALE_RIGHT BUTTON_RIGHT
-#define GRAYSCALE_OFF BUTTON_EQ
+#define GREYSCALE_SHIFT BUTTON_PLAY
+#define GREYSCALE_UP BUTTON_UP
+#define GREYSCALE_DOWN BUTTON_DOWN
+#define GREYSCALE_LEFT BUTTON_LEFT
+#define GREYSCALE_RIGHT BUTTON_RIGHT
+#define GREYSCALE_OFF BUTTON_EQ
 #endif
 
 #define GFX_HEIGHT (LCD_HEIGHT-8)
 #if LCD_WIDTH < 160
-#define GFX_GRAYTONE_WIDTH 86
-#define GFX_GRAYTONE_STEP 3
+#define GFX_GREYTONE_WIDTH 86
+#define GFX_GREYTONE_STEP 3
 #else
-#define GFX_GRAYTONE_WIDTH 128
-#define GFX_GRAYTONE_STEP 2
+#define GFX_GREYTONE_WIDTH 128
+#define GFX_GREYTONE_STEP 2
 #endif
 /******************************* Globals ***********************************/
 
@@ -93,7 +93,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 
-    gray_release(); /* switch off overlay and deinitialize */
+    grey_release(); /* switch off overlay and deinitialize */
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(rb); /* backlight control in lib/helper.c */
 }
@@ -101,7 +101,7 @@ void cleanup(void *parameter)
 /* this is only a demo of what the framework can do */
 int main(void)
 {
-    int shades, time;
+    int time;
     int x, y, i;
     int button, scroll_amount;
     bool black_border = false;
@@ -139,7 +139,7 @@ int main(void)
        0x10, 0x3E, 0x00, 0x1C, 0x22, 0x22, 0x2A, 0x3A, 0x00
     };
     
-    static const unsigned char grayscale_gray[] = {
+    static const unsigned char grayscale_grey[] = {
     /* .......................................................
      * ..####.####...###..#...#..####..###...###..#.....#####.
      * .#.....#...#.#...#.#...#.#.....#...#.#...#.#.....#.....
@@ -188,82 +188,82 @@ int main(void)
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
     /* initialize the greyscale buffer:
-       Archos: 112 pixels wide, 7 rows (56 pixels) high, (try to) reserve
-       32 bitplanes for 33 shades of grey.
-       H1x0: 160 pixels wide, 30 rows (120 pixels) high, (try to) reserve
-       32 bitplanes for 33 shades of grey. */
-    shades = gray_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, GFX_HEIGHT,
-                       32, 0, NULL) + 1;
+       Archos: 112 pixels wide, 7 rows (56 pixels) high.
+       H1x0: 160 pixels wide, 30 rows (120 pixels) high. */
+    if (!grey_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, GFX_HEIGHT, NULL))
+    {
+        rb->splash(HZ, "Not enough memory.");
+        return PLUGIN_ERROR;
+    }
 
     /* place greyscale overlay 1 row down */
-    gray_set_position(0, 8);
+    grey_set_position(0, 8);
 
-    rb->snprintf(pbuf, sizeof(pbuf), "Shades: %d", shades);
-    rb->lcd_puts(0, 0, pbuf);
+    rb->lcd_puts(0, 0, "Shades: 129");
     rb->lcd_update();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
-    gray_show(true);          /* switch on greyscale overlay */
+    grey_show(true);          /* switch on greyscale overlay */
 
     time = *rb->current_tick; /* start time measurement */
 
-    gray_set_background(150);
-    gray_clear_display();     /* fill everything with grey 150 */
+    grey_set_background(150);
+    grey_clear_display();     /* fill everything with grey 150 */
 
     /* draw a dark grey line star background */
-    gray_set_foreground(80);
+    grey_set_foreground(80);
     for (y = 0; y < GFX_HEIGHT; y += 8)                   /* horizontal part */
     {
-        gray_drawline(0, y, (LCD_WIDTH-1), (GFX_HEIGHT-1) - y); /*grey lines */
+        grey_drawline(0, y, (LCD_WIDTH-1), (GFX_HEIGHT-1) - y); /*grey lines */
     }
     for (x = 10; x <= LCD_WIDTH; x += 10)                    /* vertical part */
     {
-        gray_drawline(x, 0, (LCD_WIDTH-1) - x, (GFX_HEIGHT-1)); /*grey lines */
+        grey_drawline(x, 0, (LCD_WIDTH-1) - x, (GFX_HEIGHT-1)); /*grey lines */
     }
 
-    gray_set_foreground(0);
-    gray_drawrect(0, 0, LCD_WIDTH, GFX_HEIGHT);   /* black border */
+    grey_set_foreground(0);
+    grey_drawrect(0, 0, LCD_WIDTH, GFX_HEIGHT);   /* black border */
 
     /* draw grey tones */
-    for (i = 0; i < GFX_GRAYTONE_WIDTH; i++)
+    for (i = 0; i < GFX_GREYTONE_WIDTH; i++)
     {
-        x = ((LCD_WIDTH-GFX_GRAYTONE_WIDTH)/2) + i;
-        gray_set_foreground(GFX_GRAYTONE_STEP * i);
+        x = ((LCD_WIDTH-GFX_GREYTONE_WIDTH)/2) + i;
+        grey_set_foreground(GFX_GREYTONE_STEP * i);
         /* vertical lines */
-        gray_vline(x, (GFX_HEIGHT/8), (GFX_HEIGHT-GFX_HEIGHT/8-1));
+        grey_vline(x, (GFX_HEIGHT/8), (GFX_HEIGHT-GFX_HEIGHT/8-1));
     }
 
-    gray_set_drawmode(DRMODE_COMPLEMENT);
+    grey_set_drawmode(DRMODE_COMPLEMENT);
     /* invert rectangle (lower half) */
-    gray_fillrect((LCD_WIDTH-GFX_GRAYTONE_WIDTH)/2, (GFX_HEIGHT/2+1),
-                  GFX_GRAYTONE_WIDTH, (GFX_HEIGHT/2-GFX_HEIGHT/8-1));
+    grey_fillrect((LCD_WIDTH-GFX_GREYTONE_WIDTH)/2, (GFX_HEIGHT/2+1),
+                  GFX_GREYTONE_WIDTH, (GFX_HEIGHT/2-GFX_HEIGHT/8-1));
     /* invert a line */
-    gray_hline((LCD_WIDTH-GFX_GRAYTONE_WIDTH)/2,
-               (LCD_WIDTH+GFX_GRAYTONE_WIDTH)/2, (GFX_HEIGHT/2-1));
+    grey_hline((LCD_WIDTH-GFX_GREYTONE_WIDTH)/2,
+               (LCD_WIDTH+GFX_GREYTONE_WIDTH)/2, (GFX_HEIGHT/2-1));
 
     /* show bitmaps (1 bit and 8 bit) */
     /* opaque */
-    gray_set_drawinfo(DRMODE_SOLID, 255, 100);
-    gray_mono_bitmap(rockbox,
-                     MAX((LCD_WIDTH/2-47), ((LCD_WIDTH-GFX_GRAYTONE_WIDTH)/2)),
+    grey_set_drawinfo(DRMODE_SOLID, 255, 100);
+    grey_mono_bitmap(rockbox,
+                     MAX((LCD_WIDTH/2-47), ((LCD_WIDTH-GFX_GREYTONE_WIDTH)/2)),
                      (5*GFX_HEIGHT/16-4), 43, 7);
     /* transparent */
-    gray_set_drawinfo(DRMODE_FG, 0, 100);
-    gray_mono_bitmap(showing, (LCD_WIDTH/2+4) , (5*GFX_HEIGHT/16-4), 39, 7);
+    grey_set_drawinfo(DRMODE_FG, 0, 100);
+    grey_mono_bitmap(showing, (LCD_WIDTH/2+4) , (5*GFX_HEIGHT/16-4), 39, 7);
     /* greyscale */
-    gray_gray_bitmap(grayscale_gray, ((LCD_WIDTH-55)/2), (11*GFX_HEIGHT/16-4),
+    grey_gray_bitmap(grayscale_grey, ((LCD_WIDTH-55)/2), (11*GFX_HEIGHT/16-4),
                      55, 7);
 
-    gray_update();
+    grey_update();
 
     time = *rb->current_tick - time;  /* end time measurement */
 
-    rb->snprintf(pbuf, sizeof(pbuf), "Shades: %d, %d.%02ds", shades,
+    rb->snprintf(pbuf, sizeof(pbuf), "Shades: 129, %d.%02ds", 
                  time / 100, time % 100);
     rb->lcd_puts(0, 0, pbuf);
-    gray_deferred_lcd_update();       /* schedule an lcd_update() */
+    grey_deferred_lcd_update();       /* schedule an lcd_update() */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
@@ -271,7 +271,7 @@ int main(void)
     /* drawing is now finished, play around with scrolling 
      * until you press OFF or connect USB
      */
-    gray_set_background(255);
+    grey_set_background(255);
     while (true)
     {
         scroll_amount = 1;
@@ -282,11 +282,11 @@ int main(void)
             == SYS_USB_CONNECTED)
             return PLUGIN_USB_CONNECTED;
 
-        if (button & GRAYSCALE_SHIFT)
+        if (button & GREYSCALE_SHIFT)
         {
             if (!black_border)
             {
-                gray_set_background(0);
+                grey_set_background(0);
                 black_border = true;
             }
         }
@@ -294,7 +294,7 @@ int main(void)
         {
             if (black_border)
             {
-                gray_set_background(255);
+                grey_set_background(255);
                 black_border = false;
             }
         }
@@ -302,35 +302,35 @@ int main(void)
         if (button & BUTTON_REPEAT)
             scroll_amount = 4;
 
-        switch (button & ~(GRAYSCALE_SHIFT | BUTTON_REPEAT))
+        switch (button & ~(GREYSCALE_SHIFT | BUTTON_REPEAT))
         {
-            case GRAYSCALE_LEFT:
+            case GREYSCALE_LEFT:
 
-                gray_scroll_left(scroll_amount);  /* scroll left */
-                gray_update();
+                grey_scroll_left(scroll_amount);  /* scroll left */
+                grey_update();
                 break;
 
-            case GRAYSCALE_RIGHT:
+            case GREYSCALE_RIGHT:
 
-                gray_scroll_right(scroll_amount); /* scroll right */
-                gray_update();
+                grey_scroll_right(scroll_amount); /* scroll right */
+                grey_update();
                 break;
 
-            case GRAYSCALE_UP:
+            case GREYSCALE_UP:
 
-                gray_scroll_up(scroll_amount);    /* scroll up */
-                gray_update();
+                grey_scroll_up(scroll_amount);    /* scroll up */
+                grey_update();
                 break;
 
-            case GRAYSCALE_DOWN:
+            case GREYSCALE_DOWN:
 
-                gray_scroll_down(scroll_amount);  /* scroll down */
-                gray_update();
+                grey_scroll_down(scroll_amount);  /* scroll down */
+                grey_update();
                 break;
-#ifdef GRAYSCALE_RC_OFF
-            case GRAYSCALE_RC_OFF:
+#ifdef GREYSCALE_RC_OFF
+            case GREYSCALE_RC_OFF:
 #endif
-            case GRAYSCALE_OFF:
+            case GREYSCALE_OFF:
 
                 cleanup(NULL);
                 return PLUGIN_OK;

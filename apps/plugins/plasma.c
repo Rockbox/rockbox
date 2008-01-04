@@ -28,7 +28,7 @@
 #ifdef HAVE_LCD_BITMAP
 
 #ifndef HAVE_LCD_COLOR
-#include "gray.h"
+#include "grey.h"
 #endif
 #include "fixedpoint.h"
 
@@ -45,7 +45,7 @@ static int redphase = 0, greenphase = 50, bluephase = 100;
            /* lower chance of gray at regular intervals */
 #else
 static unsigned char colours[256]; /* Smooth transition of shades */
-static unsigned char graybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
+static unsigned char greybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
 static unsigned char *gbuf;
 static size_t        gbuf_size = 0;
 #endif
@@ -171,7 +171,7 @@ void cleanup(void *parameter)
     (void)parameter;
     
 #ifndef HAVE_LCD_COLOR
-    gray_release();
+    grey_release();
 #endif
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(rb); /* backlight control in lib/helper.c */
@@ -203,9 +203,9 @@ int main(void)
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT, 32, 2<<8, NULL);
-    /* switch on grayscale overlay */
-    gray_show(true);
+    grey_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT, NULL);
+    /* switch on greyscale overlay */
+    grey_show(true);
 #endif
     sp1 = 4;
     sp2 = 2;
@@ -218,7 +218,7 @@ int main(void)
         shades_generate(time++); /* dynamically */
         ptr = rb->lcd_framebuffer;
 #else
-        ptr = graybuffer;
+        ptr = greybuffer;
 #endif
         t1=p1;
         t2=p2;
@@ -245,7 +245,7 @@ int main(void)
 #ifdef HAVE_LCD_COLOR
         rb->lcd_update();
 #else
-        gray_ub_gray_bitmap(graybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+        grey_ub_gray_bitmap(greybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 
         button = rb->button_get(false);

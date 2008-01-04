@@ -1,6 +1,6 @@
 #include "zxvid_com.h"
 
-#if !defined USE_GRAY && LCD_DEPTH < 4
+#if !defined USE_GREY && LCD_DEPTH < 4
 /* screen routines for greyscale targets not using greyscale lib */
 
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING 

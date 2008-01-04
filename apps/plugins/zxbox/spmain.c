@@ -42,8 +42,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#ifdef USE_GRAY
-#include "../lib/gray.h"
+#ifdef USE_GREY
+#include "../lib/grey.h"
 #endif
 
 #include "zxbox_keyb.h"
@@ -426,8 +426,8 @@ static bool zxbox_menu(void)
         else
             intkeys[i] = (unsigned) settings.keymap[i];
     }
-#ifdef USE_GRAY
-    gray_show(true);
+#ifdef USE_GREY
+    grey_show(true);
 #endif
     return (exit);
 }
@@ -465,8 +465,8 @@ static void run_singlemode(void)
           if (zxbox_menu()){
               /* Save the user settings if they have changed */
                 if (rb->memcmp(&settings,&old_settings,sizeof(settings))!=0) {
-#ifdef USE_GRAY
-                    gray_show(false);
+#ifdef USE_GREY
+                    grey_show(false);
 #endif
                     rb->splash(0, "Saving settings...");
                     configfile_save(GLOBALCFG, config,sizeof(config)/sizeof(*config),SETTINGS_VERSION);
@@ -531,7 +531,7 @@ static void init_load(void *parameter)
 
   check_params (parameter);
   if(spcf_init_snapshot != NULL) {
-#ifndef USE_GRAY
+#ifndef USE_GREY
     rb->splash(HZ, "Loading snapshot '%s'", spcf_init_snapshot);
 #endif
     

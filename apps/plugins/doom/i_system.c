@@ -72,7 +72,7 @@
 /* NOTE: 
 
    The user timer is used to generate a 70Hz tick for Doom.  But it
-   is unavailable for the grayscale targets (it's used by the grayscale
+   is unavailable for the greyscale targets (it's used by the greyscale
    lib) and is not implemented in the simulator - so we have to
    approximate it using current_tick.
 */

@@ -119,7 +119,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 93
+#define PLUGIN_API_VERSION 94
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -718,6 +718,11 @@ struct plugin_api {
     const char * (*sound_unit)(int setting);
     int (*sound_val2phys)(int setting, int value);
 #endif /* CONFIG_CODEC == SWCODEC */
+
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR)
+    void (*lcd_grey_phase_blit)(const struct grey_data *data, int bx, int by,
+                                int bwidth, int bheight, int stride);
+#endif
 };
 
 /* plugin header */

@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "mpegplayer.h"
-#include "gray.h"
+#include "grey.h"
 #include "mpeg_settings.h"
 
 static struct event_queue stream_mgr_queue NOCACHEBSS_ATTR;
@@ -712,7 +712,7 @@ bool stream_show_vo(bool show)
     GRAY_VIDEO_INVALIDATE_ICACHE();
     GRAY_INVALIDATE_ICACHE();
 
-    gray_show(show);
+    grey_show(show);
 
     GRAY_FLUSH_ICACHE();
 #endif
@@ -801,11 +801,10 @@ bool stream_set_gray_rect(const struct vo_rect *rc)
 
         vo_lock();
 
-        gray_init(rb, stream_mgr.graymem, stream_mgr.graysize,
-                  false, rc_gray.r - rc_gray.l, rc_gray.b - rc_gray.t,
-                  32, 2<<8, NULL);
+        grey_init(rb, stream_mgr.graymem, stream_mgr.graysize, false,
+                  rc_gray.r - rc_gray.l, rc_gray.b - rc_gray.t, NULL);
 
-        gray_set_position(rc_gray.l, rc_gray.t);
+        grey_set_position(rc_gray.l, rc_gray.t);
 
         vo_unlock();
 
@@ -818,7 +817,7 @@ bool stream_set_gray_rect(const struct vo_rect *rc)
 
         if (vis)
         {
-            gray_show(true);
+            grey_show(true);
             parser_send_video_msg(VIDEO_DISPLAY_SHOW, true);
         }
     }
@@ -836,7 +835,7 @@ void stream_gray_show(bool show)
     GRAY_VIDEO_INVALIDATE_ICACHE();
     GRAY_INVALIDATE_ICACHE();
 
-    gray_show(show);
+    grey_show(show);
 
     GRAY_FLUSH_ICACHE();
 
@@ -1095,16 +1094,14 @@ int stream_init(void)
 
     /* Initialize non-allocator blocks first */
 #ifndef HAVE_LCD_COLOR
-    int grayscales;
+    bool success;
 
     /* This can run on another processor - align data */
     memsize = CACHEALIGN_BUFFER(&mem, memsize);
     stream_mgr.graymem = mem;
 
-    /* initialize the grayscale buffer: 32 bitplanes for 33 shades of gray. */
-    grayscales = gray_init(rb, mem, memsize, false,
-                           LCD_WIDTH, LCD_HEIGHT,
-                           32, 2<<8, &stream_mgr.graysize) + 1;
+    success = grey_init(rb, mem, memsize, false, LCD_WIDTH, 
+                        LCD_HEIGHT, &stream_mgr.graysize);
 
     /* This can run on another processor - align size */
     stream_mgr.graysize = CACHEALIGN_UP(stream_mgr.graysize);
@@ -1112,9 +1109,9 @@ int stream_init(void)
     mem += stream_mgr.graysize;
     memsize -= stream_mgr.graysize;
 
-    if (grayscales < 33 || (ssize_t)memsize <= 0)
+    if (!success || (ssize_t)memsize <= 0)
     {
-        rb->splash(HZ, "graylib init failed!");
+        rb->splash(HZ, "greylib init failed!");
         stream_mgr.graymem = NULL;
         return STREAM_ERROR;
     }
@@ -1188,6 +1185,6 @@ void stream_exit(void)
 
 #ifndef HAVE_LCD_COLOR
     if (stream_mgr.graymem != NULL)
-        gray_release();
+        grey_release();
 #endif
 }

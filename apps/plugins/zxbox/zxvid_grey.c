@@ -1,5 +1,5 @@
 #include "zxvid_com.h"
-#if !defined HAVE_LCD_COLOR && defined USE_GRAY
+#if !defined HAVE_LCD_COLOR && defined USE_GREY
 /*
 use for slightly different colors
 #define N0 0x04
@@ -67,8 +67,8 @@ void update_screen(void)
         srcy &= 0xffff;     /* set up the y-coordinate between 0 and 1 */
     }
 
-#ifdef USE_BUFFERED_GRAY
-    gray_gray_bitmap(graybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+#ifdef USE_BUFFERED_GREY
+    grey_gray_bitmap(graybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 
     if ( settings.showfps ) {
@@ -77,8 +77,8 @@ void update_screen(void)
         if ((*rb->current_tick-start_time) > TPF )
             percent = 100*video_frames/((*rb->current_tick-start_time)/TPF);
         rb->snprintf(str,sizeof(str),"%d %%",percent);
-#if defined USE_BUFFERED_GRAY
-        gray_putsxy(0,0,str);
+#if defined USE_BUFFERED_GREY
+        grey_putsxy(0,0,str);
 #else
         LOGF(str);
 #endif
@@ -86,10 +86,10 @@ void update_screen(void)
     }
 
 
-#if defined USE_BUFFERED_GRAY
-    gray_update();
+#if defined USE_BUFFERED_GREY
+    grey_update();
 #else
-    gray_ub_gray_bitmap(graybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+    grey_ub_gray_bitmap(graybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 
 }

@@ -117,13 +117,13 @@
 #include "rockmacros.h"
 
 #ifndef HAVE_LCD_COLOR
-#include "../lib/gray.h"
-static unsigned char graybuffer[8*LCD_WIDTH] IBSS_ATTR; /* off screen buffer */
+#include "../lib/grey.h"
+static unsigned char greybuffer[LCD_WIDTH] IBSS_ATTR; /* off screen buffer */
 static unsigned char *gbuf;
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-#define GRAYBUFSIZE (((LCD_WIDTH+7)/8)*LCD_HEIGHT*32+200)
+#define GREYBUFSIZE (((LCD_WIDTH+7)/8)*LCD_HEIGHT*16+200)
 #else
-#define GRAYBUFSIZE (LCD_WIDTH*((LCD_HEIGHT+7)/8)*32+200)
+#define GREYBUFSIZE (LCD_WIDTH*((LCD_HEIGHT+7)/8)*16+200)
 #endif
 #endif
 
@@ -140,7 +140,7 @@ static fb_data *paldata=NULL;
 void I_ShutdownGraphics(void)
 {
 #ifndef HAVE_LCD_COLOR
-   gray_release();
+   grey_release();
 #endif
    noprintf=0;
 }
@@ -580,23 +580,17 @@ void I_FinishUpdate (void)
     }
     rb->lcd_update();
 #else /* !HAVE_LCD_COLOR */
-   int x, yd = 0;
+   int x;
 
    for (y = 0; y < SCREENHEIGHT; y++)
    {
       for (x = 0; x < SCREENWIDTH; x++)
       {
          paletteIndex = d_screens[0][y*SCREENWIDTH + x];
-         graybuffer[yd * SCREENWIDTH + x]=palette[paletteIndex];
+         greybuffer[x]=palette[paletteIndex];
       }
-      if (++yd == 8)
-      {
-         gray_ub_gray_bitmap(graybuffer, 0, y & ~7, SCREENWIDTH, 8);
-         yd = 0;
-      }
+      grey_ub_gray_bitmap(greybuffer, 0, y, SCREENWIDTH, 1);
    }
-   if (yd > 0)
-       gray_ub_gray_bitmap(graybuffer, 0, y & ~7, SCREENWIDTH, yd);
 #endif /* !HAVE_LCD_COLOR */
 #endif
 }
@@ -629,11 +623,10 @@ void I_InitGraphics(void)
    /* Note: The other screens are allocated as needed */
 
 #ifndef HAVE_LCD_COLOR
-   gbuf=malloc(GRAYBUFSIZE);
-   gray_init(rb, gbuf, GRAYBUFSIZE, false, LCD_WIDTH, LCD_HEIGHT, 32,
-             3<<7 /* 1.5 */, NULL);
-   /* switch on grayscale overlay */
-   gray_show(true);
+   gbuf=malloc(GREYBUFSIZE);
+   grey_init(rb, gbuf, GREYBUFSIZE, false, LCD_WIDTH, LCD_HEIGHT, NULL);
+   /* switch on greyscale overlay */
+   grey_show(true);
 #endif
 
 #ifdef CPU_COLDFIRE

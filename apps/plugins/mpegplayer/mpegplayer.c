@@ -868,7 +868,7 @@ static void wvs_refresh(int hint)
 
     vo_unlock();
 #else
-    gray_deferred_lcd_update();
+    grey_deferred_lcd_update();
 #endif
 }
 

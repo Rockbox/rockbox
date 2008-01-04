@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
@@ -94,7 +94,7 @@ char *spif_get_tape_fileinfo(int *startp, int *nump)
 
 void put_msg(const char *msg)
 {
-#ifndef USE_GRAY
+#ifndef USE_GREY
     rb->splash (HZ/2, msg );
 #else
 	LOGF(msg);
@@ -105,7 +105,7 @@ void put_msg(const char *msg)
 
 void put_tmp_msg(const char *msg)
 {
-#ifndef USE_GRAY
+#ifndef USE_GREY
     rb->splash (HZ/10, msg );
 #else
     LOGF(msg);

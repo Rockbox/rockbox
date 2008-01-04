@@ -299,6 +299,123 @@ void lcd_blit(const unsigned char* data, int bx, int y, int bwidth,
     }
 }
 
+/* Performance function that works with an external buffer
+   note that bx and bwidth are in 8-pixel units! */
+void lcd_grey_phase_blit(const struct grey_data *data, int bx, int y, 
+                         int bwidth, int height, int stride)
+{
+    const struct grey_data *addr;
+    int width;
+    
+    while (height--) {
+        lcd_cmd_and_data(R_RAM_ADDR_SET, (y++ << 5) + addr_offset - bx);
+        lcd_prepare_cmd(R_RAM_DATA);
+
+        addr = data;
+        width = bwidth;
+        asm volatile (
+        "10:                                 \n"
+            "ldmia   %[addr]!, {r0-r3}       \n" /* r0 = v1p1v0p0 ... */
+#ifdef IPOD_MINI2G
+            "mov     r5, #0x7600             \n"
+#else
+            "mov     r5, #0                  \n"
+#endif
+
+            "and     r4, r0, %[mask]         \n" /* r4 = --p1--p0 */
+            "and     r0, %[mask], r0, lsr #8 \n" /* r0 = --v1--v0 */
+            
+            "tst     r4, #0x80               \n"
+            "orreq   r5, r5, #0xc0           \n"
+            "tst     r4, #0x800000           \n"
+            "orreq   r5, r5, #0x30           \n"
+            "bic     r4, r4, %[clbt]         \n"
+            
+            "add     r4, r0, r4              \n" /* p0 += v0; p1 += v1; */
+            "strb    r4, [%[addr], #-16]     \n"
+            "mov     r4, r4, lsr #16         \n"
+            "strb    r4, [%[addr], #-14]     \n"
+
+            "and     r4, r1, %[mask]         \n"
+            "and     r1, %[mask], r1, lsr #8 \n"
+
+            "tst     r4, #0x80               \n"
+            "orreq   r5, r5, #0x0c           \n"
+            "tst     r4, #0x800000           \n"
+            "orreq   r5, r5, #0x03           \n"
+            "bic     r4, r4, %[clbt]         \n"
+            
+            "add     r4, r1, r4              \n"
+            "strb    r4, [%[addr], #-12]     \n"
+            "mov     r4, r4, lsr #16         \n"
+            "strb    r4, [%[addr], #-10]     \n"
+
+#ifdef IPOD_MINI2G
+            "mov     r5, r5, lsl #8          \n"
+#else
+        "1:                                  \n"
+            "ldr     r4, [%[lcdb]]           \n"
+            "tst     r4, #0x8000             \n"
+            "bne     1b                      \n"
+
+            "str     r5, [%[lcdb], #0x10]    \n"
+            "mov     r5, #0                  \n"
+#endif
+
+            "and     r4, r2, %[mask]         \n"
+            "and     r2, %[mask], r2, lsr #8 \n"
+
+            "tst     r4, #0x80               \n"
+            "orreq   r5, r5, #0xc0           \n"
+            "tst     r4, #0x800000           \n"
+            "orreq   r5, r5, #0x30           \n"
+            "bic     r4, r4, %[clbt]         \n"
+            
+            "add     r4, r2, r4              \n"
+            "strb    r4, [%[addr], #-8]      \n"
+            "mov     r4, r4, lsr #16         \n"
+            "strb    r4, [%[addr], #-6]      \n"
+
+            "and     r4, r3, %[mask]         \n"
+            "and     r3, %[mask], r3, lsr #8 \n"
+
+            "tst     r4, #0x80               \n"
+            "orreq   r5, r5, #0x0c           \n"
+            "tst     r4, #0x800000           \n"
+            "orreq   r5, r5, #0x03           \n"
+            "bic     r4, r4, %[clbt]         \n"
+            
+            "add     r4, r3, r4              \n"
+            "strb    r4, [%[addr], #-4]      \n"
+            "mov     r4, r4, lsr #16         \n"
+            "strb    r4, [%[addr], #-2]      \n"
+            
+        "1:                                  \n"
+            "ldr     r4, [%[lcdb]]           \n"
+            "tst     r4, #0x8000             \n"
+            "bne     1b                      \n"
+#ifdef IPOD_MINI2G
+            "str     r5, [%[lcdb], #0x08]    \n"
+#else
+            "str     r5, [%[lcdb], #0x10]    \n"
+#endif
+
+            "subs    %[wdth], %[wdth], #1    \n"
+            "bne     10b                     \n"
+            : /* outputs */
+            [addr]"+r"(addr),
+            [wdth]"+r"(width)
+            : /* inputs */
+            [mask]"r"(0x00ff00ff),
+            [clbt]"r"(0x00800080),
+            [lcdb]"r"(LCD1_BASE)
+            : /* clobbers */
+            "r0", "r1", "r2", "r3", "r4", "r5"
+        );
+        data += stride;
+    }
+}
+
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int xmax, ymax;

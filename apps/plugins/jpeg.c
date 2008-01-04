@@ -11,8 +11,7 @@
 * (This is a real mess if it has to be coded in one single C file)
 *
 * File scrolling addition (C) 2005 Alexander Spyridakis
-* Copyright (C) 2004 Jï¿½g Hohensohn aka [IDC]Dragon
-* Grayscale framework (C) 2004 Jens Arnold
+* Copyright (C) 2004 Jörg Hohensohn aka [IDC]Dragon
 * Heavily borrowed from the IJG implementation (C) Thomas G. Lane
 * Small & fast downscaling IDCT (C) 2002 by Guido Vollbeding  JPEGclub.org
 *
@@ -30,7 +29,7 @@
 #include "helper.h"
 
 #ifdef HAVE_LCD_BITMAP
-#include "gray.h"
+#include "grey.h"
 #include "xlcd.h"
 
 #ifdef HAVE_LCD_COLOR
@@ -185,9 +184,9 @@ PLUGIN_HEADER
 /* different graphics libraries */
 #if LCD_DEPTH < 8
 #define USEGSLIB
-#define MYLCD(fn) gray_ub_ ## fn
+#define MYLCD(fn) grey_ub_ ## fn
 #define MYLCD_UPDATE()
-#define MYXLCD(fn) gray_ub_ ## fn
+#define MYXLCD(fn) grey_ub_ ## fn
 #else
 #define MYLCD(fn) rb->lcd_ ## fn
 #define MYLCD_UPDATE() rb->lcd_update();
@@ -2409,7 +2408,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 #ifdef USEGSLIB
-    gray_show(false);
+    grey_show(false);
 #endif
 }
 
@@ -2791,13 +2790,13 @@ int scroll_bmp(struct t_disp* pdisp)
 #endif
         case JPEG_MENU:
 #ifdef USEGSLIB
-            gray_show(false); /* switch off grayscale overlay */
+            grey_show(false); /* switch off greyscale overlay */
 #endif
             if (show_menu() == 1)
                 return PLUGIN_OK;
 
 #ifdef USEGSLIB
-            gray_show(true); /* switch on grayscale overlay */
+            grey_show(true); /* switch on greyscale overlay */
 #else
             yuv_bitmap_part(
                 pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
@@ -3222,7 +3221,7 @@ int load_and_show(char* filename)
         MYLCD_UPDATE();
 
 #ifdef USEGSLIB
-        gray_show(true); /* switch on grayscale overlay */
+        grey_show(true); /* switch on greyscale overlay */
 #endif
 
         /* drawing is now finished, play around with scrolling
@@ -3260,7 +3259,7 @@ int load_and_show(char* filename)
         }
 
 #ifdef USEGSLIB
-        gray_show(false); /* switch off overlay */
+        grey_show(false); /* switch off overlay */
 #endif
         rb->lcd_clear_display();
     }
@@ -3280,8 +3279,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     int condition;
 #ifdef USEGSLIB
-    int grayscales;
-    long graysize; /* helper */
+    long greysize; /* helper */
 #endif
 #if LCD_DEPTH > 1
     old_backdrop = rb->lcd_get_backdrop();
@@ -3311,16 +3309,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
 #ifdef USEGSLIB
-    /* initialize the grayscale buffer: 32 bitplanes for 33 shades of gray. */
-    grayscales = gray_init(rb, buf, buf_size, false, LCD_WIDTH, LCD_HEIGHT,
-                           32, 2<<8, &graysize) + 1;
-    buf += graysize;
-    buf_size -= graysize;
-    if (grayscales < 33 || buf_size <= 0)
+    if (!grey_init(rb, buf, buf_size, false, LCD_WIDTH, LCD_HEIGHT, &greysize))
     {
-        rb->splash(HZ, "gray buf error");
+        rb->splash(HZ, "grey buf error");
         return PLUGIN_ERROR;
     }
+    buf += greysize;
+    buf_size -= greysize;
 #else
     xlcd_init(rb);
 #endif
@@ -3364,7 +3359,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
 #ifdef USEGSLIB
-    gray_release(); /* deinitialize */
+    grey_release(); /* deinitialize */
 #endif
 
     return condition;

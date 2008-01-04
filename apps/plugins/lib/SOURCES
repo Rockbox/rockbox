@@ -8,6 +8,10 @@ gray_core.c
 gray_draw.c
 gray_parm.c
 gray_scroll.c
+grey_core.c
+grey_draw.c
+grey_parm.c
+grey_scroll.c
 #endif
 highscore.c
 #ifndef SIMULATOR

@@ -155,10 +155,26 @@ void lcd_blit(const unsigned char* data, int x, int by, int width,
     }
 }
 
+/* Performance function that works with an external buffer
+   note that by and bheight are in 8-pixel units! */
+void lcd_grey_phase_blit(const struct grey_data *data, int x, int by,
+                         int width, int bheight, int stride)
+{
+    stride <<= 3; /* 8 pixels per block */
+    while (bheight--)
+    {
+        lcd_write_command (LCD_CNTL_PAGE | (by++ & 0xf));
+        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+xoffset)>>4) & 0xf));
+        lcd_write_command (LCD_CNTL_LOWCOL | ((x+xoffset) & 0xf));
+
+        lcd_grey_data(data, width);
+        data += stride;
+    }
+}
+
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
-void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
     int y;
@@ -175,7 +191,6 @@ void lcd_update(void)
 }
 
 /* Update a fraction of the display. */
-void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int ymax;

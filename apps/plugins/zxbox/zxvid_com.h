@@ -2,8 +2,8 @@
 #define ZXVIDCOMMON_H
 #include "zxconfig.h"
 
-#ifdef USE_GRAY
-#include "../lib/gray.h"
+#ifdef USE_GREY
+#include "../lib/grey.h"
 #endif
 
 #include "spscr_p.h"

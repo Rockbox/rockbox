@@ -95,15 +95,24 @@ extern void lcd_puts_scroll(int x, int y, const unsigned char* string);
 extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
                                   int style);
 
+#ifdef HAVE_LCD_BITMAP
+
 #if defined(HAVE_LCD_COLOR)
 #define LCD_YUV_DITHER 0x1
 extern void lcd_yuv_set_options(unsigned options);
 extern void lcd_yuv_blit(unsigned char * const src[3],
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);
+#else
+struct grey_data {
+    unsigned char phase; /* SH1 uses it signed (doesn't matter for high level) */
+    unsigned char value; /* 0..128 are allowed */
+} __attribute__((packed));
+extern void lcd_grey_data(const struct grey_data *data, int count); /* private */
+extern void lcd_grey_phase_blit(const struct grey_data *data, int bx, int by,
+                                int bwidth, int bheight, int stride);
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 /* performance function */
 extern void lcd_blit(const fb_data* data, int x, int by, int width,
                      int bheight, int stride);

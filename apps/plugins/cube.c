@@ -19,7 +19,7 @@
 *
 ***************************************************************************/
 #include "plugin.h"
-#include "gray.h"
+#include "grey.h"
 #include "playergfx.h"
 #include "xlcd.h"
 #include "fixedpoint.h"
@@ -221,16 +221,16 @@ struct my_lcd {
     void (*putsxy)(int x, int y, const unsigned char *string);
 };
 
-static struct my_lcd grayfuncs = {
-    gray_update, gray_clear_display, gray_drawline, gray_putsxy
+static struct my_lcd greyfuncs = {
+    grey_update, grey_clear_display, grey_drawline, grey_putsxy
 };
 static struct my_lcd lcdfuncs; /* initialised at runtime */
-static struct my_lcd *mylcd = &grayfuncs;
+static struct my_lcd *mylcd = &greyfuncs;
 
 #define MYLCD(fn) mylcd->fn
-#define MY_FILLTRIANGLE(x1, y1, x2, y2, x3, y3) gray_filltriangle(x1, y1, x2, y2, x3, y3)
-#define MY_SET_FOREGROUND(fg) gray_set_foreground(fg)
-#define MY_GET_FOREGROUND() gray_get_foreground()
+#define MY_FILLTRIANGLE(x1, y1, x2, y2, x3, y3) grey_filltriangle(x1, y1, x2, y2, x3, y3)
+#define MY_SET_FOREGROUND(fg) grey_set_foreground(fg)
+#define MY_GET_FOREGROUND() grey_get_foreground()
 
 #else
 #define MYLCD(fn) rb->lcd_ ## fn
@@ -314,8 +314,8 @@ static const unsigned face_colors[6] =
     LCD_RGBPACK(255, 0, 0), LCD_RGBPACK(255, 0, 0), LCD_RGBPACK(0, 255, 0),
     LCD_RGBPACK(0, 255, 0), LCD_RGBPACK(0, 0, 255), LCD_RGBPACK(0, 0, 255)
 #elif defined(USE_GSLIB)
-    GRAY_LIGHTGRAY, GRAY_LIGHTGRAY, GRAY_DARKGRAY,
-    GRAY_DARKGRAY,  GRAY_BLACK,     GRAY_BLACK
+    GREY_LIGHTGRAY, GREY_LIGHTGRAY, GREY_DARKGRAY,
+    GREY_DARKGRAY,  GREY_BLACK,     GREY_BLACK
 #else
     LCD_LIGHTGRAY, LCD_LIGHTGRAY, LCD_DARKGRAY,
     LCD_DARKGRAY,  LCD_BLACK,     LCD_BLACK
@@ -490,7 +490,7 @@ void cleanup(void *parameter)
     (void)parameter;
 
 #ifdef USE_GSLIB
-    gray_release();
+    grey_release();
 #elif defined HAVE_LCD_CHARCELLS
     pgfx_release();
 #endif
@@ -527,10 +527,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     xlcd_init(rb);
 #elif defined(USE_GSLIB)
     gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);
-    if (gray_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, LCD_HEIGHT, 3, 0, NULL)
-        != 3)
+    if (!grey_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, LCD_HEIGHT, NULL))
     {
-        rb->splash(HZ, "Couldn't get grayscale buffer");
+        rb->splash(HZ, "Couldn't init greyscale display");
         return PLUGIN_ERROR;
     }
     /* init lcd_ function pointers */
@@ -539,7 +538,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     lcdfuncs.drawline =      rb->lcd_drawline;
     lcdfuncs.putsxy =        rb->lcd_putsxy;
 
-    gray_setfont(FONT_SYSFIXED);
+    grey_setfont(FONT_SYSFIXED);
 #endif
     rb->lcd_setfont(FONT_SYSFIXED);
 #else /* LCD_CHARCELLS */
@@ -603,7 +602,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef USE_GSLIB
         if (mode_switch)
         {
-            gray_show(mode == SOLID);
+            grey_show(mode == SOLID);
             mode_switch = false;
         }
 #endif
@@ -744,7 +743,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 if (++mode >= NUM_MODES)
                     mode = 0;
 #ifdef USE_GSLIB
-                mylcd = (mode == SOLID) ? &grayfuncs : &lcdfuncs;
+                mylcd = (mode == SOLID) ? &greyfuncs : &lcdfuncs;
                 mode_switch = true;
 #endif
                 redraw = true;
@@ -785,7 +784,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
 
 #ifdef USE_GSLIB
-    gray_release();
+    grey_release();
 #elif defined(HAVE_LCD_CHARCELLS)
     pgfx_release();
 #endif

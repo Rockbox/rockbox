@@ -21,7 +21,7 @@
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
-#include "gray.h"
+#include "grey.h"
 #include "xlcd.h"
 
 PLUGIN_HEADER
@@ -180,9 +180,9 @@ PLUGIN_HEADER
 
 #if LCD_DEPTH < 8
 #define USEGSLIB
-#define MYLCD(fn) gray_ub_ ## fn
+#define MYLCD(fn) grey_ub_ ## fn
 #define MYLCD_UPDATE()
-#define MYXLCD(fn) gray_ub_ ## fn
+#define MYXLCD(fn) grey_ub_ ## fn
 #else
 #define UPDATE_FREQ (HZ/50)
 #define MYLCD(fn) rb->lcd_ ## fn
@@ -486,7 +486,7 @@ void calc_mandelbrot_low_prec(void)
             }
         }
 #ifdef USEGSLIB
-        gray_ub_gray_bitmap_part(imgbuffer, 0, py_min, 1,
+        grey_ub_gray_bitmap_part(imgbuffer, 0, py_min, 1,
                                  p_x, py_min, 1, py_max - py_min);
 #else
         rb->lcd_bitmap_part(imgbuffer, 0, py_min, 1,
@@ -549,7 +549,7 @@ void calc_mandelbrot_high_prec(void)
             }
         }
 #ifdef USEGSLIB
-        gray_ub_gray_bitmap_part(imgbuffer, 0, py_min, 1,
+        grey_ub_gray_bitmap_part(imgbuffer, 0, py_min, 1,
                                  p_x, py_min, 1, py_max - py_min);
 #else
         rb->lcd_bitmap_part(imgbuffer, 0, py_min, 1,
@@ -569,7 +569,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 #ifdef USEGSLIB
-    gray_release();
+    grey_release();
 #endif
 }
 
@@ -582,10 +582,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int button;
     int lastbutton = BUTTON_NONE;
     int redraw = REDRAW_FULL;
-#ifdef USEGSLIB
-    int grayscales;
-    char buff[32];
-#endif
 
     rb = api;
     (void)parameter;
@@ -594,19 +590,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    /* initialize the grayscale buffer:
-     * 8 bitplanes for 9 shades of gray.*/
-    grayscales = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT,
-                           8, 0, NULL) + 1;
-    if (grayscales != 9) {
-        rb->snprintf(buff, sizeof(buff), "%d", grayscales);
-        rb->lcd_puts(0, 1, buff);
-        rb->lcd_update();
-        rb->sleep(HZ*2);
-        return(0);
+    /* initialize the greyscale buffer.*/
+    if (!grey_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT, NULL))
+    {
+        rb->splash(HZ, "Couldn't init greyscale display");
+        return 0;
     }
-
-    gray_show(true); /* switch on grayscale overlay */
+    grey_show(true); /* switch on greyscale overlay */
 #else
     xlcd_init(rb);
 #endif
@@ -650,7 +640,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
         case MANDELBROT_QUIT:
 #ifdef USEGSLIB
-            gray_release();
+            grey_release();
 #endif
             return PLUGIN_OK;
 
@@ -755,7 +745,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             lastbutton = button;
     }
 #ifdef USEGSLIB
-    gray_release();
+    grey_release();
 #endif
     return PLUGIN_OK;
 }

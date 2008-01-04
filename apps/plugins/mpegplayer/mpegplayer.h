@@ -85,12 +85,12 @@ enum mpeg_malloc_reason_t
 #define GRAY_VIDEO_FLUSH_ICACHE()
 #define GRAY_VIDEO_INVALIDATE_ICACHE()
 #else
-#include "gray.h"
-#define DRAW_BLACK            GRAY_BLACK
-#define DRAW_DARKGRAY         GRAY_DARKGRAY
-#define DRAW_LIGHTGRAY        GRAY_LIGHTGRAY
-#define DRAW_WHITE            GRAY_WHITE
-#define lcd_(fn)              gray_##fn
+#include "grey.h"
+#define DRAW_BLACK            GREY_BLACK
+#define DRAW_DARKGRAY         GREY_DARKGRAY
+#define DRAW_LIGHTGRAY        GREY_LIGHTGRAY
+#define DRAW_WHITE            GREY_WHITE
+#define lcd_(fn)              grey_##fn
 
 #define GRAY_FLUSH_ICACHE() \
     IF_COP(flush_icache())
