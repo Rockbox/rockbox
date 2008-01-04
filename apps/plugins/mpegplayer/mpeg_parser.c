@@ -1141,6 +1141,8 @@ int parser_init_stream(void)
             str_parser.start_pts = video_str.start_pts;
             str_parser.end_pts = video_str.end_pts;
         }
+
+        str_parser.last_seek_time = str_parser.start_pts;
     }
     else
     {

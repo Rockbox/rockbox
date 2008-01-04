@@ -37,8 +37,6 @@ struct video_thread_data
     struct queue_event ev;  /* Our event queue to receive commands */
     int    num_drawn;       /* Number of frames drawn since reset */
     int    num_skipped;     /* Number of frames skipped since reset */
-    uint32_t curr_time;     /* Current due time of frame */
-    uint32_t period;        /* Frame period in clock ticks */
     uint32_t eta_stream;    /* Current time of stream */
     uint32_t eta_video;     /* Time that frame has been scheduled for */
     int32_t eta_early;      /* How early has the frame been decoded? */
@@ -47,9 +45,9 @@ struct video_thread_data
     int skip_level;         /* Skip severity */
     long last_showfps;      /* Last time the FPS display was updated */
     long last_render;       /* Last time a frame was drawn */
+    uint32_t curr_time;     /* Current due time of frame */
+    uint32_t period;        /* Frame period in clock ticks */
     int      syncf_perfect; /* Last sync fit result */
-    uint32_t syncf_time;    /* PTS of last synced frame */
-    uint32_t syncf_period;  /* TS duration of last synced frame */
 };
 
 /* TODO: Check if 4KB is appropriate - it works for my test streams,
@@ -221,7 +219,7 @@ static bool init_sequence(struct video_thread_data *td)
 
 static bool check_needs_sync(struct video_thread_data *td, uint32_t time)
 {
-    uint32_t syncf_end;
+    uint32_t end_time;
 
     DEBUGF("check_needs_sync:\n");
     if (td->info == NULL || td->info->display_fbuf == NULL)
@@ -237,16 +235,16 @@ static bool check_needs_sync(struct video_thread_data *td, uint32_t time)
     }
 
     time = clip_time(&video_str, time);
-    syncf_end = td->syncf_time + td->syncf_period;
+    end_time = td->curr_time + td->period;
 
-    DEBUGF("  sft:%u t:%u sfte:%u\n", (unsigned)td->syncf_time,
-           (unsigned)time, (unsigned)syncf_end);
+    DEBUGF("  sft:%u t:%u sfte:%u\n", (unsigned)td->curr_time,
+           (unsigned)time, (unsigned)end_time);
 
-    if (time < td->syncf_time)
+    if (time < td->curr_time)
         return true;
 
-    if (time >= syncf_end)
-        return time < video_str.end_pts || syncf_end < video_str.end_pts;
+    if (time >= end_time)
+        return time < video_str.end_pts || end_time < video_str.end_pts;
 
     return false;
 }
@@ -260,8 +258,6 @@ static int sync_decoder(struct video_thread_data *td,
     uint32_t time = clip_time(&video_str, sd->time);
 
     td->syncf_perfect = 0;
-    td->syncf_time = 0;
-    td->syncf_period = 0;
     td->curr_time = 0;
     td->period = 0;
 
@@ -358,7 +354,7 @@ static int sync_decoder(struct video_thread_data *td,
         case STATE_END:
         case STATE_INVALID_END:
         {
-            uint32_t syncf_end;
+            uint32_t end_time;
 
             if (td->info->display_picture == NULL)
             {
@@ -371,36 +367,33 @@ static int sync_decoder(struct video_thread_data *td,
 
             if (td->info->display_picture->flags & PIC_FLAG_TAGS)
             {
-                td->syncf_time = td->info->display_picture->tag;
-                DEBUGF("  frame tagged:%u (%c%s)\n", (unsigned)td->syncf_time,
+                td->curr_time = td->info->display_picture->tag;
+                DEBUGF("  frame tagged:%u (%c%s)\n", (unsigned)td->curr_time,
                        pic_coding_type_char(type),
                        (td->info->display_picture->flags & PIC_FLAG_SKIP) ?
                             " skipped" : "");
             }
             else
             {
-                td->syncf_time += td->syncf_period;
-                DEBUGF("  add period:%u (%c%s)\n", (unsigned)td->syncf_time,
+                td->curr_time += td->period;
+                DEBUGF("  add period:%u (%c%s)\n", (unsigned)td->curr_time,
                        pic_coding_type_char(type),
                        (td->info->display_picture->flags & PIC_FLAG_SKIP) ?
                             " skipped" : "");
             }
 
-            td->syncf_period = TC_TO_TS(td->info->sequence->frame_period);
-            syncf_end = td->syncf_time + td->syncf_period;
+            td->period = TC_TO_TS(td->info->sequence->frame_period);
+            end_time = td->curr_time + td->period;
 
             DEBUGF("  ft:%u t:%u fe:%u (%c%s)",
-                   (unsigned)td->syncf_time,
+                   (unsigned)td->curr_time,
                    (unsigned)time,
-                   (unsigned)(td->syncf_time + td->syncf_period),
+                   (unsigned)end_time,
                    pic_coding_type_char(type),
                    (td->info->display_picture->flags & PIC_FLAG_SKIP) ?
                         " skipped" : "");
 
-            td->curr_time = TS_TO_TICKS(td->syncf_time);
-            td->period = TS_TO_TICKS(td->syncf_period);
-
-            if (syncf_end <= time && syncf_end < video_str.end_pts)
+            if (end_time <= time && end_time < video_str.end_pts)
             {
                 /* Still too early and have not hit at EOS */
                 DEBUGF(" too early\n");
@@ -414,8 +407,8 @@ static int sync_decoder(struct video_thread_data *td,
                 if (type == PIC_FLAG_CODING_TYPE_B)
                    td->syncf_perfect &= ppic;
 
-                if ((td->syncf_time <= time && time < syncf_end) ||
-                    syncf_end >= video_str.end_pts)
+                if ((td->curr_time <= time && time < end_time) ||
+                    end_time >= video_str.end_pts)
                 {
                     /* One perfect point for matching time goal */
                     DEBUGF(" ft<=t<fe\n");
@@ -662,8 +655,8 @@ static void video_thread(void)
     td.mpeg2dec = mpeg2_init();
     td.info = NULL;
     td.syncf_perfect = 0;
-    td.syncf_time = 0;
-    td.syncf_period = 0;
+    td.curr_time = 0;
+    td.period = 0;
 
     if (td.mpeg2dec == NULL)
     {
@@ -814,10 +807,9 @@ static void video_thread(void)
             /* Get presentation times in audio samples - quite accurate
                enough - add previous frame duration if not stamped */
             td.curr_time = (td.info->display_picture->flags & PIC_FLAG_TAGS) ?
-                TS_TO_TICKS(td.info->display_picture->tag) :
-                (td.curr_time + td.period);
+                td.info->display_picture->tag : (td.curr_time + td.period);
 
-            td.period = TC_TO_TICKS(td.info->sequence->frame_period);
+            td.period = TC_TO_TS(td.info->sequence->frame_period);
 
             /* No limiting => no dropping - draw this frame */
             if (!settings.limitfps)
@@ -826,7 +818,7 @@ static void video_thread(void)
             }
 
             td.eta_video = td.curr_time;
-            td.eta_stream = stream_get_time();
+            td.eta_stream = TICKS_TO_TS(stream_get_time());
 
             /* How early/late are we? > 0 = late, < 0  early */
             offset = td.eta_stream - td.eta_video;
@@ -932,19 +924,19 @@ static void video_thread(void)
                the next however */
             td.skip_level = 0;
 
-            if (offset > CLOCK_RATE*110/1000)
+            if (offset > TS_SECOND*110/1000)
             {
                 /* Decide which skip level is needed in order to catch up */
 
                 /* TODO: Calculate this rather than if...else - this is rather
                    exponential though */
-                if (offset > CLOCK_RATE*367/1000)
+                if (offset > TS_SECOND*367/1000)
                     td.skip_level = 5; /* Decoder skip: I/D */
-                if (offset > CLOCK_RATE*233/1000)
+                if (offset > TS_SECOND*233/1000)
                     td.skip_level = 4; /* Decoder skip: P */
-                else if (offset > CLOCK_RATE*167/1000)
+                else if (offset > TS_SECOND*167/1000)
                     td.skip_level = 3; /* Render skip */
-                else if (offset > CLOCK_RATE*133/1000)
+                else if (offset > TS_SECOND*133/1000)
                     td.skip_level = 2; /* Decoder skip: B */
                 else
                     td.skip_level = 1; /* Decoder skip: B */
@@ -958,10 +950,10 @@ static void video_thread(void)
             {
                 /* Watch for messages while waiting for the frame time */
                 int32_t eta_remaining = td.eta_video - td.eta_stream;
-                if (eta_remaining > CLOCK_RATE/HZ)
+                if (eta_remaining > TS_SECOND/HZ)
                 {
                     /* Several ticks to wait - do some sleeping */
-                    int timeout = (eta_remaining - HZ) / (CLOCK_RATE/HZ);
+                    int timeout = (eta_remaining - HZ) / (TS_SECOND/HZ);
                     str_get_msg_w_tmo(&video_str, &td.ev, MAX(timeout, 1));
                     if (td.ev.id != SYS_TIMEOUT)
                         goto message_process;
@@ -974,7 +966,7 @@ static void video_thread(void)
                         goto message_wait;
                 }
 
-                td.eta_stream = stream_get_time();
+                td.eta_stream = TICKS_TO_TS(stream_get_time());
             }
        
         picture_draw:

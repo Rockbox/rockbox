@@ -319,6 +319,9 @@ static uint32_t stream_seek_intl(uint32_t time, int whence, int status)
         /* Set the master clock */
         set_stream_clock(time);
 
+        /* Make sure streams are back in active pool */
+        move_strl_to_actl();
+
         /* Prepare the parser and associated streams */
         parser_prepare_streaming();
 
@@ -489,6 +492,9 @@ static void stream_on_resume(void)
             /* Set the master clock */
             set_stream_clock(str_parser.last_seek_time);
 
+            /* Make sure streams are back in active pool */
+            move_strl_to_actl();
+
             /* Prepare the parser and associated streams */
             parser_prepare_streaming();
         }
@@ -582,28 +588,28 @@ static void stream_on_seek(struct stream_seek_data *skd)
 
         stream_mgr_lock();
 
-        if (!stream_can_seek())
+        if (stream_can_seek())
         {
-        }
-        else if (stream_mgr.status != STREAM_STOPPED)
-        {
-            if (stream_mgr.status != STREAM_PLAYING)
+            if (stream_mgr.status != STREAM_STOPPED)
             {
-                trigger_cpu_boost();
+                if (stream_mgr.status != STREAM_PLAYING)
+                {
+                    trigger_cpu_boost();
+                }
+
+                stream_seek_intl(time, whence, stream_mgr.status);
+
+                if (stream_mgr.status != STREAM_PLAYING)
+                {
+                    cancel_cpu_boost();
+                }
             }
-
-            stream_seek_intl(time, whence, stream_mgr.status);
-
-            if (stream_mgr.status != STREAM_PLAYING)
+            else
             {
-                cancel_cpu_boost();
+                stream_mgr.seeked = true;
+                time = time_from_whence(time, whence);
+                parser_seek_time(time);
             }
-        }
-        else
-        {
-            stream_mgr.seeked = true;
-            time = time_from_whence(time, whence);
-            parser_seek_time(time);
         }
 
         stream_mgr_unlock();
