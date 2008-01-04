@@ -11471,3 +11471,31 @@
     ipodvideo: "Treble Afsnijfrequentie"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user:
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Willekeurig>"
+  </dest>
+  <voice>
+    *: "Willekeurig"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user:
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Bewaar geluidsinstellingen"
+  </dest>
+  <voice>
+    *: "Bewaar geluidsinstellingen"
+  </voice>
+</phrase>
