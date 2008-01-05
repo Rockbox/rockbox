@@ -20,7 +20,7 @@ SECTIONS
 {
     .header : {
         _plugin_start_addr = .;
-        *(.header)
+        KEEP(*(.header))
     } > OVERLAY_RAM
 
     .text : {
