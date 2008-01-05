@@ -1584,6 +1584,10 @@ fi
       echo "Manual build selected"
       ;;
     *)
+      if [ "$archos" = "e200r" ]; then
+          echo "Do not use the e200R target for regular builds.  Use e200 instead."
+          exit
+      fi
       debug=""
       echo "Normal build selected"
       ;;
