@@ -72,7 +72,7 @@ static unsigned short *kbd_setupkeys(int page, int* len)
 #define KEYBOARD_ARROW 0xe10c
 
 /* helper function to spell a char if voice UI is enabled */
-static void kbd_spellchar(char c)
+static void kbd_spellchar(unsigned short c)
 {
     if (global_settings.talk_menu) /* voice UI? */
     {
