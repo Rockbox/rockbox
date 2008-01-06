@@ -5,8 +5,13 @@ OUTPUT=sansapatcher.exe
 CROSS=
 CFLAGS+=-mno-cygwin
 else
+ifeq ($(findstring MINGW,$(shell uname)),MINGW)
+OUTPUT=sansapatcher.exe
+CROSS
+else
 OUTPUT=sansapatcher
 CROSS=i586-mingw32msvc-
+endif
 endif
 
 NATIVECC = gcc
