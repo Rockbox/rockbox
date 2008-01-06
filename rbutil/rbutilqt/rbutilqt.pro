@@ -124,6 +124,7 @@ win32 {
 
 TRANSLATIONS += rbutil_de.ts \
  rbutil_fr.ts \
+ rbutil_tr.ts \
  rbutil_zh_CN.ts \
  rbutil_zh_TW.ts
 QT += network
@@ -157,4 +158,5 @@ static {
     DEFINES += STATIC
     message("using static plugin")
 }
+
 
