@@ -38,6 +38,7 @@
 #include "hu_stuff.h"
 #include "st_stuff.h"
 #include "lib/oldmenuapi.h"
+#include "lib/helper.h"
 
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
@@ -708,10 +709,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    if (result < 0)
    {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+       rb->cpu_boost(false);
 #endif
-       if( result == -1 ) return PLUGIN_OK; // Quit was selected
-       else if( result == -2 ) return PLUGIN_ERROR; // Missing base wads
+       if( result == -1 )
+           return PLUGIN_OK; // Quit was selected
+       else
+           return PLUGIN_ERROR; // Missing base wads
    }
 
 #if(LCD_HEIGHT>LCD_WIDTH)
@@ -736,6 +739,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    systemvol= rb->global_settings->volume-rb->global_settings->volume%((rb->sound_max(SOUND_VOLUME)-rb->sound_min(SOUND_VOLUME))/15);
    general_translucency = default_translucency;                    // phares
 
+   backlight_force_on(rb);
 #ifdef RB_PROFILE
    rb->profile_thread();
 #endif
@@ -747,6 +751,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef RB_PROFILE
    rb->profstop();
 #endif
+   backlight_use_settings(rb);
 
    M_SaveDefaults ();
 
