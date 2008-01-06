@@ -838,9 +838,6 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             framelen = bytes2int(0, header[3], header[4], header[5]);
         }
 
-        /* Keep track of the total size */
-        totframelen = framelen;
-
         logf("framelen = %ld", framelen);
         if(framelen == 0){
             if (header[0] == 0 && header[1] == 0 && header[2] == 0)
@@ -870,10 +867,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
 
             if(flags & 0x000c) /* Compression or encryption */
             {
-                /* Skip it using the total size in case
-                   it was truncated */
-                size -= totframelen;
-                lseek(fd, totframelen, SEEK_CUR);
+                /* Skip it */
+                size -= framelen;
+                lseek(fd, framelen, SEEK_CUR);
                 continue;
             }
 
@@ -890,6 +886,9 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 }
             }
         }
+
+        /* Keep track of the remaining frame size */
+        totframelen = framelen;
 
         /* If the frame is larger than the remaining buffer space we try
            to read as much as would fit in the buffer */
