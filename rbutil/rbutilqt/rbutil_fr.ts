@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="fr">
-<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -54,7 +53,7 @@
         <translation>Edition du journal d&apos;installation</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1083"/>
+        <location filename="installbootloader.cpp" line="1093"/>
         <source>Downloading file %1.%2</source>
         <translation>Téléchargement du fichier %1.%2</translation>
     </message>
@@ -89,22 +88,22 @@
         <translation>Impossible de renommer %1 vers %2</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1197"/>
+        <location filename="installbootloader.cpp" line="1207"/>
         <source>Could not copy: %1 to %2</source>
         <translation>Impossible de copier %1 vers %2</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1207"/>
+        <location filename="installbootloader.cpp" line="1217"/>
         <source>Bootloader install finished successfully.</source>
         <translation>Installation du bootloader terminée avec succès.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1208"/>
+        <location filename="installbootloader.cpp" line="1218"/>
         <source>To finish the Bootloader installation, follow the steps below.</source>
         <translation>Pour terminer l&apos;installation du bootloader, veuillez suivre les étapes ce-dessous.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1209"/>
+        <location filename="installbootloader.cpp" line="1219"/>
         <source>1. Eject/Unmount your Device.</source>
         <translation>1. Ejectez/Demontez votre périphérique.</translation>
     </message>
@@ -159,99 +158,99 @@
         <translation>Trop d&apos;iPods trouvés</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="776"/>
+        <location filename="installbootloader.cpp" line="781"/>
         <source>could not open ipod</source>
         <translation>impossible d&apos;ouvrir l&apos;iPod</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="986"/>
+        <location filename="installbootloader.cpp" line="996"/>
         <source>could not read partitiontable</source>
         <translation>impossible de lire la table des partitions</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="790"/>
+        <location filename="installbootloader.cpp" line="795"/>
         <source>No partition 0 on disk</source>
         <translation>Pas de partition 0 sur le disque</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="795"/>
+        <location filename="installbootloader.cpp" line="800"/>
         <source>[INFO] Part    Start Sector    End Sector   Size (MB)   Type
 </source>
         <translation>[INFO] Part    Premier secteur    Dernier Secteur   Taille (Mo)   Type
 </translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="801"/>
+        <location filename="installbootloader.cpp" line="806"/>
         <source>[INFO]    %1      %2    %3  %4   %5 (%6)</source>
         <translation>[INFO]    %1      %2    %3  %4   %5 (%6)</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="818"/>
+        <location filename="installbootloader.cpp" line="823"/>
         <source>Failed to read firmware directory</source>
         <translation>La lecture du dossier du firmware a échoué</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="824"/>
+        <location filename="installbootloader.cpp" line="829"/>
         <source>Unknown version number in firmware (%1)</source>
         <translation>Numéro de version inconnu dans le firmware (%1)</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="832"/>
         <source>Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod</source>
-        <translation>Avertissement : Ceci est un MacPod, Rockbox ne fonctionne pas dessus. Convertissez-le en un WinPod</translation>
+        <translation type="obsolete">Avertissement : Ceci est un MacPod, Rockbox ne fonctionne pas dessus. Convertissez-le en un WinPod</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="837"/>
+        <location filename="installbootloader.cpp" line="847"/>
         <source>Could not open Ipod in RW mode</source>
         <translation>Impossible d&apos;ouvir l&apos;iPod en mode Lecture-Ecriture</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="746"/>
+        <location filename="installbootloader.cpp" line="751"/>
         <source>No bootloader detected.</source>
         <translation>Aucun bootloader détecté.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="956"/>
+        <location filename="installbootloader.cpp" line="966"/>
         <source>Successfully removed Bootloader</source>
         <translation>Bootloader supprimé avec succès</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="964"/>
+        <location filename="installbootloader.cpp" line="974"/>
         <source>--delete-bootloader failed.</source>
         <translation>--delete-bootloader a échoué.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1021"/>
+        <location filename="installbootloader.cpp" line="1031"/>
         <source>Successfully added Bootloader</source>
         <translation>Bootloader ajouté avec succès</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1029"/>
+        <location filename="installbootloader.cpp" line="1039"/>
         <source>failed to add Bootloader</source>
         <translation>échec de l&apos;ajout du bootloader</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="872"/>
+        <location filename="installbootloader.cpp" line="882"/>
         <source>Searching for sansas</source>
         <translation>Recherche de sansas</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="878"/>
+        <location filename="installbootloader.cpp" line="888"/>
         <source>No Sansa found</source>
         <translation>Aucun sansa trouvé</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="884"/>
+        <location filename="installbootloader.cpp" line="894"/>
         <source>Too many Sansas found</source>
         <translation>Trop de sansas trouvés</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="979"/>
+        <location filename="installbootloader.cpp" line="989"/>
         <source>could not open Sansa</source>
         <translation>impossible d&apos;ouvrir le sansa</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1007"/>
+        <location filename="installbootloader.cpp" line="1017"/>
         <source>********************************************
 OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
 You must reinstall the original Sansa firmware before running
@@ -268,52 +267,52 @@ Voir http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install (en anglais)
 </translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1014"/>
+        <location filename="installbootloader.cpp" line="1024"/>
         <source>Could not open Sansa in RW mode</source>
         <translation>Impossible d&apos;ouvir le sansa en mode Lecture-Ecriture</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1045"/>
+        <location filename="installbootloader.cpp" line="1055"/>
         <source>Could not MD5Sum original firmware</source>
         <translation>Impossible de calculer la somme de contrôle MD5 du firmware original</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1075"/>
+        <location filename="installbootloader.cpp" line="1085"/>
         <source>Could not detect firmware type</source>
         <translation>Impossible de détecter le type de firmware</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1138"/>
+        <location filename="installbootloader.cpp" line="1148"/>
         <source>Error in descramble</source>
         <translation>Erreur dans descramble</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1148"/>
+        <location filename="installbootloader.cpp" line="1158"/>
         <source>Error in patching</source>
         <translation>Erreur dans la modification</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1158"/>
+        <location filename="installbootloader.cpp" line="1168"/>
         <source>Error in scramble</source>
         <translation>Erreur dans scramble</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1169"/>
+        <location filename="installbootloader.cpp" line="1179"/>
         <source>Error in checksumming</source>
         <translation>Erreur dans le calcul de la somme de contrôle</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1210"/>
+        <location filename="installbootloader.cpp" line="1220"/>
         <source>2. Boot into the original Firmware.</source>
         <translation>2. Démarrez le firmware original.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1211"/>
+        <location filename="installbootloader.cpp" line="1221"/>
         <source>3. Use the Firmware flash option in the Original Firmware.</source>
         <translation>3. Utilisez l&apos;option &quot;Firmware flash&quot; du firmware original.</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="1212"/>
+        <location filename="installbootloader.cpp" line="1222"/>
         <source>4. Reboot.</source>
         <translation>4. Redémarrez.</translation>
     </message>
@@ -323,9 +322,15 @@ Voir http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install (en anglais)
         <translation>Le firmware original n&apos;existe pas : %1</translation>
     </message>
     <message>
-        <location filename="installbootloader.cpp" line="995"/>
+        <location filename="installbootloader.cpp" line="1005"/>
         <source>Disk is not a Sansa (%1), aborting.</source>
         <translation>Ce disque n&apos;est pas un Sansa (%1), annulation.</translation>
+    </message>
+    <message>
+        <location filename="installbootloader.cpp" line="839"/>
+        <source>Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod
+See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -382,92 +387,102 @@ Voir http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install (en anglais)
 <context>
     <name>Config</name>
     <message>
-        <location filename="configure.cpp" line="107"/>
+        <location filename="configure.cpp" line="110"/>
         <source>Language changed</source>
         <translation>Changement de langue</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="108"/>
+        <location filename="configure.cpp" line="111"/>
         <source>You need to restart the application for the changed language to take effect.</source>
         <translation>Vous devez redémarrer l&apos;application pour que le changement de langue prenne effet.</translation>
     </message>
     <message>
         <location filename="configure.cpp" line="227"/>
         <source>Current cache size is %1 kiB.</source>
-        <translation>La taille actuelle du cache est %1 Ko.</translation>
+        <translation type="obsolete">La taille actuelle du cache est %1 Ko.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="679"/>
+        <location filename="configure.cpp" line="586"/>
         <source>Autodetection</source>
         <translation>Autodétection</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="673"/>
+        <location filename="configure.cpp" line="580"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>Impossible de détecter un point de montage.
 Veuillez sélectionner manuellement le point de montage.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="681"/>
+        <location filename="configure.cpp" line="588"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>Impossible de détecter le périphérique.
 Veuillez sélectionner manuellement le type de périphérique et le point de montage.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="689"/>
+        <location filename="configure.cpp" line="596"/>
         <source>Really delete cache?</source>
         <translation>Supprimer le cache ?</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="692"/>
+        <location filename="configure.cpp" line="599"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
         <translation>Voulez-vous supprimer le cache ? Vérifier bien que ce paramètre est correct car il supprimera &lt;b&gt;tous&lt;/b&gt; les fichiers de ce répertoire !</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="698"/>
+        <location filename="configure.cpp" line="605"/>
         <source>Path wrong!</source>
         <translation>Chemin incorrect !</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="699"/>
+        <location filename="configure.cpp" line="606"/>
         <source>The cache path is invalid. Aborting.</source>
         <translation>Le chemin du cache est invalide. Annulation.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="54"/>
+        <location filename="configure.cpp" line="56"/>
         <source> (%1)</source>
         <translation> (%1)</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="572"/>
+        <location filename="configure.cpp" line="478"/>
         <source>Select your device</source>
         <translation>Sélectionnez votre périphérique</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="655"/>
+        <location filename="configure.cpp" line="562"/>
         <source>Sansa e200 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation>Sansa e200 en mode MTP trouvé !
 Vous devez mettre votre lecteur audio en mode MSC pour l&apos;installation. </translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="658"/>
+        <location filename="configure.cpp" line="565"/>
         <source>H10 20GB in MTP mode found!
 You need to change your player to UMS mode for installation. </source>
         <translation>H10 20 Go en mode MTP trouvé !
 Vous devez mettre votre lecteur en mode UMS pour l&apos;installation. </translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="659"/>
+        <location filename="configure.cpp" line="566"/>
         <source>Unless you changed this installation will fail!</source>
         <translation>Si vous n&apos;avez pas changé ceci, l&apos;installation échouera !</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="661"/>
+        <location filename="configure.cpp" line="568"/>
         <source>Fatal error</source>
         <translation>Erreur fatale</translation>
+    </message>
+    <message>
+        <location filename="configure.cpp" line="213"/>
+        <source>Current cache size is %L1 kiB.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="configure.cpp" line="411"/>
+        <source>(system proxy is disabled)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -493,7 +508,7 @@ Vous devez mettre votre lecteur en mode UMS pour l&apos;installation. </translat
         <translation>Sélectionnez votre périphérique dans le &amp;Système de fichiers</translation>
     </message>
     <message>
-        <location filename="configurefrm.ui" line="397"/>
+        <location filename="configurefrm.ui" line="286"/>
         <source>&amp;Browse</source>
         <translation>&amp;Parcourir</translation>
     </message>
@@ -627,66 +642,139 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="371"/>
-        <source>&amp;Select TTS profile</source>
-        <translation>Profil &amp;TTS</translation>
+        <source>&amp;Select TTS Engine</source>
+        <translation type="unfinished">Profil &amp;TTS</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="384"/>
         <source>TTS executable</source>
-        <translation>Exécutable TTS</translation>
+        <translation type="obsolete">Exécutable TTS</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="407"/>
         <source>TTS Options</source>
-        <translation>Options TTS</translation>
+        <translation type="obsolete">Options TTS</translation>
     </message>
     <message>
-        <location filename="configurefrm.ui" line="433"/>
+        <location filename="configurefrm.ui" line="421"/>
         <source>Encoder Engine</source>
         <translation>Moteur d&apos;encodage</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="439"/>
         <source>Select &amp;encoder profile</source>
-        <translation>Profil d&apos;&amp;encodage</translation>
+        <translation type="obsolete">Profil d&apos;&amp;encodage</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="452"/>
         <source>Encoder executable</source>
-        <translation>Exécutable de l&apos;encodeur</translation>
+        <translation type="obsolete">Exécutable de l&apos;encodeur</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="465"/>
         <source>B&amp;rowse</source>
-        <translation>&amp;Parcourir</translation>
+        <translation type="obsolete">&amp;Parcourir</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="475"/>
         <source>Encoder options</source>
-        <translation>Options de l&apos;encodeur</translation>
+        <translation type="obsolete">Options de l&apos;encodeur</translation>
     </message>
     <message>
-        <location filename="configurefrm.ui" line="521"/>
+        <location filename="configurefrm.ui" line="507"/>
         <source>&amp;Ok</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="configurefrm.ui" line="531"/>
+        <location filename="configurefrm.ui" line="517"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuler</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="420"/>
         <source>TTS Language</source>
-        <translation>Langue TTS</translation>
+        <translation type="obsolete">Langue TTS</translation>
+    </message>
+    <message>
+        <location filename="configurefrm.ui" line="384"/>
+        <source>Configure TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="configurefrm.ui" line="447"/>
+        <source>Configuration invalid !</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="configurefrm.ui" line="408"/>
+        <source>Configure &amp;TTS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="configurefrm.ui" line="427"/>
+        <source>Select &amp;encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="configurefrm.ui" line="440"/>
+        <source>Configure encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="configurefrm.ui" line="464"/>
+        <source> Configure &amp;Enc</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>Configure</name>
     <message>
-        <location filename="configure.cpp" line="556"/>
+        <location filename="configure.cpp" line="462"/>
         <source>English</source>
         <translation>Français</translation>
+    </message>
+</context>
+<context>
+    <name>EncExesCfgFrm</name>
+    <message>
+        <location filename="encexescfgfrm.ui" line="13"/>
+        <source>Configuration</source>
+        <translation type="unfinished">Configuration</translation>
+    </message>
+    <message>
+        <location filename="encexescfgfrm.ui" line="19"/>
+        <source>Configure Encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="encexescfgfrm.ui" line="31"/>
+        <source>Path to Encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="encexescfgfrm.ui" line="43"/>
+        <source>&amp;Browse</source>
+        <translation type="unfinished">&amp;Parcourir</translation>
+    </message>
+    <message>
+        <location filename="encexescfgfrm.ui" line="52"/>
+        <source>Encoder options</source>
+        <translation type="unfinished">Options de l&apos;encodeur</translation>
+    </message>
+    <message>
+        <location filename="encexescfgfrm.ui" line="77"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="encexescfgfrm.ui" line="97"/>
+        <source>&amp;Ok</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <location filename="encexescfgfrm.ui" line="107"/>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Annuler</translation>
     </message>
 </context>
 <context>
@@ -723,8 +811,8 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     </message>
     <message>
         <location filename="install.cpp" line="175"/>
-        <source>These are automatically built each day from the current development source code. This generally has more features than the last release but may be much less stable. Features may change regularly.</source>
-        <translation>Elles sont mises à jour chaque jour à partir du code source courant. Il y a généralement plus de fonctionnalités que dans la dernière version publique officielle mais le stabilité n&apos;est pas garantie. les fonctionnalités peuvent changer.</translation>
+        <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
+        <translation type="unfinished">Elles sont mises à jour chaque jour à partir du code source courant. Il y a généralement plus de fonctionnalités que dans la dernière version publique officielle mais le stabilité n&apos;est pas garantie. les fonctionnalités peuvent changer.</translation>
     </message>
     <message>
         <location filename="install.cpp" line="177"/>
@@ -846,82 +934,112 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
         <translation>Profil TTS :</translation>
     </message>
     <message>
-        <location filename="installtalkfrm.ui" line="78"/>
+        <location filename="installtalkfrm.ui" line="104"/>
         <source>Generation options</source>
         <translation>Options de génération</translation>
     </message>
     <message>
-        <location filename="installtalkfrm.ui" line="84"/>
+        <location filename="installtalkfrm.ui" line="110"/>
         <source>Overwrite Wavefiles</source>
         <translation>Ecraser les fichiers WAV</translation>
     </message>
     <message>
-        <location filename="installtalkfrm.ui" line="91"/>
+        <location filename="installtalkfrm.ui" line="120"/>
         <source>Remove Wavefiles</source>
         <translation>Supprimer les fichiers WAV</translation>
     </message>
     <message>
-        <location filename="installtalkfrm.ui" line="98"/>
+        <location filename="installtalkfrm.ui" line="130"/>
         <source>Run recursive</source>
         <translation>Parcours récursif</translation>
     </message>
     <message>
-        <location filename="installtalkfrm.ui" line="105"/>
+        <location filename="installtalkfrm.ui" line="140"/>
         <source>Strip Extensions</source>
         <translation>Suppression des extensions</translation>
     </message>
     <message>
-        <location filename="installtalkfrm.ui" line="112"/>
+        <location filename="installtalkfrm.ui" line="150"/>
         <source>Overwrite Talkfiles</source>
         <translation>Ecraser les fichiers de voix</translation>
     </message>
     <message>
-        <location filename="installtalkfrm.ui" line="160"/>
+        <location filename="installtalkfrm.ui" line="224"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuler</translation>
     </message>
     <message>
-        <location filename="installtalkfrm.ui" line="150"/>
+        <location filename="installtalkfrm.ui" line="214"/>
         <source>&amp;Install</source>
         <translation>&amp;Installer</translation>
+    </message>
+    <message>
+        <location filename="installtalkfrm.ui" line="81"/>
+        <source>Change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="installtalkfrm.ui" line="160"/>
+        <source>Generate .talk files for Folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="installtalkfrm.ui" line="170"/>
+        <source>Generate .talk files for Files</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>InstallTalkWindow</name>
     <message>
-        <location filename="installtalkwindow.cpp" line="94"/>
+        <location filename="installtalkwindow.cpp" line="85"/>
         <source>The Folder to Talk is wrong!</source>
         <translation>Le dossier à dire est faux !</translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="101"/>
         <source>Path to Encoder is wrong!</source>
-        <translation>Le chemin vers l&apos;encodeur est faux !</translation>
+        <translation type="obsolete">Le chemin vers l&apos;encodeur est faux !</translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="108"/>
         <source>Path to TTS is wrong!</source>
-        <translation>Le chemin vers le TTS est faux !</translation>
+        <translation type="obsolete">Le chemin vers le TTS est faux !</translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="149"/>
         <source>TTS Profile: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Profil TTS : &lt;b&gt;%1&lt;/b&gt;</translation>
+        <translation type="obsolete">Profil TTS : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="149"/>
         <source>Invalid TTS profile!</source>
-        <translation>Profil TTS invalide !</translation>
+        <translation type="obsolete">Profil TTS invalide !</translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="155"/>
         <source>Encoder Profile: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Profil d&apos;encodage : &lt;b&gt;%1&lt;/b&gt;</translation>
+        <translation type="obsolete">Profil d&apos;encodage : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="155"/>
         <source>Invalid encoder profile!</source>
-        <translation>Profil d&apos;encodage invalide !</translation>
+        <translation type="obsolete">Profil d&apos;encodage invalide !</translation>
+    </message>
+    <message>
+        <location filename="installtalkwindow.cpp" line="119"/>
+        <source>Selected TTS engine : &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="installtalkwindow.cpp" line="121"/>
+        <source>Selected TTS Engine: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="installtalkwindow.cpp" line="129"/>
+        <source>Selected Encoder: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -946,203 +1064,257 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     </message>
 </context>
 <context>
+    <name>RbSpeexCfgFrm</name>
+    <message>
+        <location filename="rbspeexcfgfrm.ui" line="13"/>
+        <source>Configuration</source>
+        <translation type="unfinished">Configuration</translation>
+    </message>
+    <message>
+        <location filename="rbspeexcfgfrm.ui" line="19"/>
+        <source>Configure RbSpeex Encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbspeexcfgfrm.ui" line="39"/>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbspeexcfgfrm.ui" line="46"/>
+        <source>Narrowband</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbspeexcfgfrm.ui" line="69"/>
+        <source>Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbspeexcfgfrm.ui" line="86"/>
+        <source>Complexity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbspeexcfgfrm.ui" line="106"/>
+        <source>&amp;Ok</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <location filename="rbspeexcfgfrm.ui" line="116"/>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Annuler</translation>
+    </message>
+    <message>
+        <location filename="rbspeexcfgfrm.ui" line="126"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RbUtilQt</name>
     <message>
-        <location filename="rbutilqt.cpp" line="85"/>
+        <location filename="rbutilqt.cpp" line="77"/>
         <source>File</source>
         <translation>Fichier</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="85"/>
+        <location filename="rbutilqt.cpp" line="77"/>
         <source>Version</source>
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="202"/>
+        <location filename="rbutilqt.cpp" line="207"/>
         <source>Network error: %1. Please check your network and proxy settings.</source>
         <translation>Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="298"/>
+        <location filename="rbutilqt.cpp" line="303"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; sur &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="318"/>
+        <location filename="rbutilqt.cpp" line="323"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Manuel PDF&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="320"/>
+        <location filename="rbutilqt.cpp" line="325"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Manuel HTML (ouvre un navigateur)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="323"/>
+        <location filename="rbutilqt.cpp" line="328"/>
         <source>Select a device for a link to the correct manual</source>
         <translation>Sélectionnez un périphérique pour obtenir un lien vers le manuel approprié</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="325"/>
+        <location filename="rbutilqt.cpp" line="330"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Tous les manuels&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="691"/>
+        <location filename="rbutilqt.cpp" line="693"/>
         <source>Confirm Installation</source>
         <translation>Confirmation de l&apos;installation</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="334"/>
+        <location filename="rbutilqt.cpp" line="339"/>
         <source>Do you really want to make a complete Installation?</source>
         <translation>Etes-vous sûr de vouloir faire une installation complète ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="855"/>
+        <location filename="rbutilqt.cpp" line="864"/>
         <source>Mount point is wrong!</source>
         <translation>Le point de montage est erroné !</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="386"/>
+        <location filename="rbutilqt.cpp" line="391"/>
         <source>Do you really want to make a small Installation?</source>
         <translation>Etes-vous sûr de vouloir faire une installation légère ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="524"/>
+        <location filename="rbutilqt.cpp" line="531"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>Etes-vous sûr de vouloir installer le bootloader ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="782"/>
+        <location filename="rbutilqt.cpp" line="787"/>
         <source>Could not get the bootloader info file!</source>
         <translation>Impossible de trouver le fichier d&apos;informations du bootloader !</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="559"/>
+        <location filename="rbutilqt.cpp" line="566"/>
         <source>Bootloader Installation</source>
-        <translation>Installation du bootloader</translation>
+        <translation type="unfinished">Installation du bootloader annulée !</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="561"/>
         <source>It seem your Bootloader is already uptodate.
 Do really want to install it?</source>
-        <translation>Il semble que le bootloader soit déjà à jour.
+        <translation type="obsolete">Il semble que le bootloader soit déjà à jour.
 Voulez-vous vraiment l&apos;installer ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="566"/>
-        <source>Bootloader installation Canceled!</source>
-        <translation>Installation du bootloader annulée !</translation>
-    </message>
-    <message>
-        <location filename="rbutilqt.cpp" line="592"/>
+        <location filename="rbutilqt.cpp" line="591"/>
         <source>Original Firmware Path is wrong!</source>
         <translation>Le chemin du firmware original est invalide !</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="605"/>
+        <location filename="rbutilqt.cpp" line="604"/>
         <source>Original Firmware selection Canceled!</source>
         <translation>Installation du firmware original annulée !</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="620"/>
+        <location filename="rbutilqt.cpp" line="619"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Etes-vous sûr de vouloir installer le pack de polices de caractères ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="655"/>
+        <location filename="rbutilqt.cpp" line="654"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Etes-vous sûr de vouloir installer le fichier de voix ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="692"/>
+        <location filename="rbutilqt.cpp" line="694"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Etes-vous sûr de vouloir installer les fichiers additionnels de jeu ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="764"/>
+        <location filename="rbutilqt.cpp" line="769"/>
         <source>Confirm Uninstallation</source>
         <translation>Confirmation de la désinstallation</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="765"/>
+        <location filename="rbutilqt.cpp" line="770"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Etes-vous sûr de vouloir désinstaller le bootloader ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="795"/>
+        <location filename="rbutilqt.cpp" line="800"/>
         <source>Confirm download</source>
         <translation>Confirmation du téléchargement</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="797"/>
+        <location filename="rbutilqt.cpp" line="802"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Etes-vous sûr de vouloir télécharger le manuel ? Il sera sauvegardé dans le dossier racine de votre lecteur audio.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="843"/>
+        <location filename="rbutilqt.cpp" line="850"/>
         <source>Confirm installation</source>
         <translation>Confirmation de l&apos;installation</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="845"/>
+        <location filename="rbutilqt.cpp" line="852"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Etes-vous sûr de vouloir installer l&apos;utilitaire Rockbox sur votre lecteur audio ? Après l&apos;installation vous pourrez le lancer depuis le disque dur de votre lecteur audio.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="851"/>
+        <location filename="rbutilqt.cpp" line="860"/>
         <source>Installing Rockbox Utility</source>
         <translation>Installation de l&apos;utilitaire Rockbox</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="865"/>
+        <location filename="rbutilqt.cpp" line="874"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Erreur pendant l&apos;installation de l&apos;utilitaire Rockbox</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="869"/>
+        <location filename="rbutilqt.cpp" line="878"/>
         <source>Installing user configuration</source>
         <translation>Installation de la configuration utilisateur</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="871"/>
+        <location filename="rbutilqt.cpp" line="880"/>
         <source>Error installing user configuration</source>
         <translation>Erreur pendant l&apos;installation de la configuration utilisateur</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="875"/>
+        <location filename="rbutilqt.cpp" line="884"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Installation de l&apos;utilitaire Rockbox terminée avec succès.</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="573"/>
         <source>Bootloader installation Skipped!</source>
-        <translation>Etape d&apos;instllation du bootloader sautée !</translation>
+        <translation type="obsolete">Etape d&apos;instllation du bootloader sautée !</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="982"/>
+        <location filename="rbutilqt.cpp" line="1001"/>
         <source>Configuration error</source>
         <translation>Erreur de configuration</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="179"/>
+        <location filename="rbutilqt.cpp" line="184"/>
         <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuation dialog will now open to allow you correcting the problem.</source>
         <translation>Votre configuration est invalide. Ceci est probablement dû à une nouvelle installation de l&apos;utilitaire Rockbox ou à un changement du chemin du périphérique. La fenêtre de configuration va s&apos;ouvrir pour vous permettre de corriger le problème.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="687"/>
+        <location filename="rbutilqt.cpp" line="689"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="687"/>
+        <location filename="rbutilqt.cpp" line="689"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Votre périphérique n&apos;a pas de le plugin Doom. Annulation.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="984"/>
+        <location filename="rbutilqt.cpp" line="1003"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Votre configuration est invalide. Veuillez vérifier que les valeurs sélectionnées sont correctes dans la fenêtre de configuration.</translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="568"/>
+        <source>The bootloader is already installed and up to date.
+Do want to replace the current bootloader?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="572"/>
+        <source>Bootloader installation skipped!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1191,7 +1363,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="rbutilqtfrm.ui" line="176"/>
         <source>...</source>
-        <translation>...</translation>
+        <translation type="obsolete">...</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="162"/>
@@ -1230,7 +1402,7 @@ p, li { white-space: pre-wrap; }
         <translation>Installation basique de Rockbox</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="245"/>
+        <location filename="rbutilqtfrm.ui" line="940"/>
         <source>Install Bootloader</source>
         <translation>Installation du bootloader</translation>
     </message>
@@ -1248,7 +1420,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Avant de pouvoir lancer Rockbox sur votre lecteur audio, vous pouvez avoir à installer un bootloader. Ceci n&apos;est nécessaier que la première fois que vous installez Rockbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="278"/>
+        <location filename="rbutilqtfrm.ui" line="948"/>
         <source>Install Rockbox</source>
         <translation>Installer Rockbox</translation>
     </message>
@@ -1379,7 +1551,7 @@ p, li { white-space: pre-wrap; }
         <translation>&amp;Désinstallation</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="598"/>
+        <location filename="rbutilqtfrm.ui" line="1004"/>
         <source>Uninstall Rockbox</source>
         <translation>Désinstaller Rockbox</translation>
     </message>
@@ -1488,44 +1660,220 @@ p, li { white-space: pre-wrap; }
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="854"/>
+        <location filename="rbutilqtfrm.ui" line="901"/>
         <source>&amp;About</source>
         <translation>&amp;A propos</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="831"/>
+        <location filename="rbutilqtfrm.ui" line="878"/>
         <source>Empty local download cache</source>
         <translation>Vider le cache local de téléchargement</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="836"/>
+        <location filename="rbutilqtfrm.ui" line="883"/>
         <source>Install Rockbox Utility on player</source>
         <translation>Installer l&apos;utilitaire Rockbox sur le lecteur</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="841"/>
+        <location filename="rbutilqtfrm.ui" line="888"/>
         <source>&amp;Configure</source>
         <translation>&amp;Configuration</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="846"/>
+        <location filename="rbutilqtfrm.ui" line="893"/>
         <source>E&amp;xit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="849"/>
+        <location filename="rbutilqtfrm.ui" line="896"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="859"/>
+        <location filename="rbutilqtfrm.ui" line="906"/>
         <source>About &amp;Qt</source>
         <translation>A propos de &amp;Qt</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="864"/>
+        <location filename="rbutilqtfrm.ui" line="911"/>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="924"/>
+        <source>Complete Installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="932"/>
+        <source>Small Installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="827"/>
+        <source>Action&amp;s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="831"/>
+        <source>Installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="838"/>
+        <source>Quick Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="845"/>
+        <source>Extras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="853"/>
+        <source>Accessibility</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="860"/>
+        <source>Uninstallation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="916"/>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="956"/>
+        <source>Fonts Package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="964"/>
+        <source>Install Themes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="972"/>
+        <source>Install Game Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="980"/>
+        <source>Install Voice File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="988"/>
+        <source>Create Talk Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="996"/>
+        <source>Remove bootloader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="1009"/>
+        <source>Read PDF manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="1014"/>
+        <source>Read HTML manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="1019"/>
+        <source>Download PDF manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="1024"/>
+        <source>Download HTML manual (zip)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SapiCfgFrm</name>
+    <message>
+        <location filename="sapicfgfrm.ui" line="13"/>
+        <source>Configuration</source>
+        <translation type="unfinished">Configuration</translation>
+    </message>
+    <message>
+        <location filename="sapicfgfrm.ui" line="19"/>
+        <source>Configure TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="sapicfgfrm.ui" line="25"/>
+        <source>TTS options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="sapicfgfrm.ui" line="35"/>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="sapicfgfrm.ui" line="60"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="sapicfgfrm.ui" line="80"/>
+        <source>&amp;Ok</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <location filename="sapicfgfrm.ui" line="90"/>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Annuler</translation>
+    </message>
+</context>
+<context>
+    <name>TTSExesCfgFrm</name>
+    <message>
+        <location filename="ttsexescfgfrm.ui" line="13"/>
+        <source>Configuration</source>
+        <translation type="unfinished">Configuration</translation>
+    </message>
+    <message>
+        <location filename="ttsexescfgfrm.ui" line="19"/>
+        <source>Configure TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ttsexescfgfrm.ui" line="31"/>
+        <source>Path to TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ttsexescfgfrm.ui" line="43"/>
+        <source>&amp;Browse</source>
+        <translation type="unfinished">&amp;Parcourir</translation>
+    </message>
+    <message>
+        <location filename="ttsexescfgfrm.ui" line="52"/>
+        <source>TTS options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ttsexescfgfrm.ui" line="77"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ttsexescfgfrm.ui" line="97"/>
+        <source>&amp;Ok</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <location filename="ttsexescfgfrm.ui" line="107"/>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Annuler</translation>
     </message>
 </context>
 <context>
@@ -1604,8 +1952,8 @@ Veuillez vérifier vos paramètres réseau et proxy.</translation>
     </message>
     <message>
         <location filename="installthemes.cpp" line="171"/>
-        <source>Download size %1 kiB</source>
-        <translation>Taille du téléchargement %1 ko</translation>
+        <source>Download size %L1 kiB</source>
+        <translation type="unfinished">Taille du téléchargement %1 ko</translation>
     </message>
     <message>
         <location filename="installthemes.cpp" line="184"/>
@@ -1802,12 +2150,12 @@ Veuillez vérifier vos paramètres réseau et proxy.</translation>
         <translation>Désinstalle </translation>
     </message>
     <message>
-        <location filename="uninstall.cpp" line="63"/>
+        <location filename="uninstall.cpp" line="81"/>
         <source>Could not delete: </source>
         <translation>Impossible de supprimer : </translation>
     </message>
     <message>
-        <location filename="uninstall.cpp" line="86"/>
+        <location filename="uninstall.cpp" line="108"/>
         <source>Uninstallation finished</source>
         <translation>Désinstallation terminée</translation>
     </message>
