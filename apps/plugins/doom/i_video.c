@@ -495,102 +495,152 @@ static void I_UploadNewPalette(int pal)
 
 void I_FinishUpdate (void)
 {
+    int count;
+    byte *src = d_screens[0];
 #if (CONFIG_LCD == LCD_H300) && !defined(SIMULATOR)
+    count = SCREENWIDTH*SCREENHEIGHT;
 
-#if 1
-   /* ASM screen update (drops 200 tics (100 asm)) */
-   asm (
-      "move.w #33,(%[LCD])    \n" /* Setup the LCD controller */
-      "clr.w (%[LCD2])        \n"
-      "move.w #34,(%[LCD])    \n" /* End LCD controller setup */
-      "clr.l %%d1             \n"
-      "clr.l %%d0             \n"
-      "widthloop:             \n"
-      "move.l (%[screenptr])+, %%d0             \n"
-      "swap.w %%d0                              \n"
-      "move.w %%d0, %%d1                        \n"
-      "lsr.l #8,%%d1                            \n"
-      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
-      "move.b %%d0,%%d1                         \n"
-      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
-      "swap.w %%d0                              \n"
-      "move.w %%d0, %%d1                        \n"
-      "lsr.l #8,%%d1                            \n"
-      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
-      "move.b %%d0,%%d1                         \n"
-      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
-      "subq.l #4,%[WIDTH]         \n"
-      "bne widthloop          \n"
-      "move.w #220,%[WIDTH]       \n"
-      "subq.l #1,%[HEIGHT]         \n"
-      "bne widthloop          \n"
-   : /* outputs */
-   : /* inputs */
-      [screenptr] "a" (d_screens[0]),
-      [palette]   "a" (palette),
-      [LCD]       "a" (0xf0000000),
-      [LCD2]      "a" (0xf0000002), 
-      [WIDTH]     "d" (220),
-      [HEIGHT]    "d" (176)
-   : /* clobbers */
-      "d0", "d1"
+    /* ASM screen update (drops ~300 tics) */
+    asm volatile (
+        "move.w  #33, (%[LCD])                   \n" /* Setup the LCD controller */
+        "nop                                     \n"
+        "clr.w   (%[LCD2])                       \n"
+        "nop                                     \n"
+        "move.w  #34, (%[LCD])                   \n" /* End LCD controller setup */
+        "clr.l   %%d1                            \n"
+    ".loop:                                      \n"
+        "move.l  (%[scrp])+, %%d0                \n"
+        "swap.w  %%d0                            \n"
+        "move.w  %%d0, %%d1                      \n"
+        "lsr.l   #8,%%d1                         \n"
+        "move.w  (%[pal], %%d1.l:2), (%[LCD2])   \n"
+        "move.b  %%d0,%%d1                       \n"
+        "swap.w  %%d0                            \n"
+        "nop                                     \n"
+        "move.w  (%[pal], %%d1.l:2), (%[LCD2])   \n"
+        "move.w  %%d0, %%d1                      \n"
+        "lsr.l   #8,%%d1                         \n"
+        "nop                                     \n"
+        "move.w  (%[pal], %%d1.l:2), (%[LCD2])   \n"
+        "move.b  %%d0,%%d1                       \n"
+        "nop                                     \n"
+        "move.w  (%[pal], %%d1.l:2), (%[LCD2])   \n"
+        "subq.l  #4,%[cnt]                       \n"
+        "bne.b   .loop                           \n"
+        : /* outputs */
+        [scrp]"+a"(src),
+        [cnt] "+d"(count)
+        : /* inputs */
+        [pal] "a" (palette),
+        [LCD] "a" (0xf0000000),
+        [LCD2]"a" (0xf0000002)
+        : /* clobbers */
+        "d0", "d1"
+   );
+#elif (CONFIG_LCD == LCD_X5) && !defined(SIMULATOR)
+    count = SCREENWIDTH*SCREENHEIGHT;
+
+    /* ASM screen update (drops ~230 tics) */
+    asm volatile (
+        "clr.w   (%[LCD])                    \n" /* Setup the LCD controller */
+        "move.w  #(33<<1), (%[LCD])          \n" 
+        "clr.w   (%[LCD2])                   \n"
+        "clr.w   (%[LCD2])                   \n"
+        "clr.w   (%[LCD])                    \n" /* End LCD controller setup */
+        "move.w  #(34<<1), (%[LCD])          \n" 
+        "clr.l   %%d1                        \n"
+    ".loop:                                  \n"
+        "move.l  (%[scrp])+, %%d0            \n"
+        "swap.w  %%d0                        \n"
+        "move.w  %%d0, %%d1                  \n"
+        "lsr.l   #8,%%d1                     \n"
+        "move.w  (%[pal], %%d1.l:2), %%d2    \n"
+        "move.l  %%d2, %%d3                  \n"
+        "lsr.l   #7, %%d3                    \n"
+        "move.w  %%d3, (%[LCD2])             \n"
+        "lsl.l   #1, %%d2                    \n"
+        "move.w  %%d2, (%[LCD2])             \n"
+        "move.b  %%d0,%%d1                   \n"
+        "move.w  (%[pal], %%d1.l:2), %%d2    \n"
+        "move.l  %%d2, %%d3                  \n"
+        "lsr.l   #7, %%d3                    \n"
+        "move.w  %%d3, (%[LCD2])             \n"
+        "lsl.l   #1, %%d2                    \n"
+        "move.w  %%d2, (%[LCD2])             \n"
+        "swap.w  %%d0                        \n"
+        "move.w  %%d0, %%d1                  \n"
+        "lsr.l   #8,%%d1                     \n"
+        "move.w  (%[pal], %%d1.l:2), %%d2    \n"
+        "move.l  %%d2, %%d3                  \n"
+        "lsr.l   #7, %%d3                    \n"
+        "move.w  %%d3, (%[LCD2])             \n"
+        "lsl.l   #1, %%d2                    \n"
+        "move.w  %%d2, (%[LCD2])             \n"
+        "move.b  %%d0,%%d1                   \n"
+        "move.w  (%[pal], %%d1.l:2), %%d2    \n"
+        "move.l  %%d2, %%d3                  \n"
+        "lsr.l   #7, %%d3                    \n"
+        "move.w  %%d3, (%[LCD2])             \n"
+        "lsl.l   #1, %%d2                    \n"
+        "move.w  %%d2, (%[LCD2])             \n"
+        "subq.l  #4,%[cnt]                   \n"
+        "bne.b   .loop                       \n"
+        : /* outputs */
+        [scrp]"+a"(src),
+        [cnt] "+d"(count)
+        : /* inputs */
+        [pal] "a" (palette),
+        [LCD] "a" (0xf0008000),
+        [LCD2]"a" (0xf0008002)
+        : /* clobbers */
+        "d0", "d1", "d2", "d3"
    );
 #else
-   /* C version of above (drops 100 tics) */
-
-   // Start the write
-   *(volatile unsigned short *) 0xf0000000 = 0x21; // register
-   *(volatile unsigned short *) 0xf0000002 = 0;    // value
-   *(volatile unsigned short *) 0xf0000000 = 0x22; // GRAM
-
-   unsigned char *screenptr=d_screens[0];
-   int hcnt=LCD_HEIGHT*LCD_WIDTH;
-
-   while(hcnt--)
-   {
-      *(volatile unsigned short *)0xf0000002 = palette[*screenptr];
-      screenptr++;
-   }
-#endif
-
-#else
-   unsigned char paletteIndex;
-   int y;
-
 #ifdef HAVE_LCD_COLOR
 #if(LCD_HEIGHT>LCD_WIDTH)
     if(rotate_screen)
     {
-        int x;
-        for (y=0; y<LCD_HEIGHT; y++)
+        int y;
+        
+        for (y = 0; y < SCREENHEIGHT; y++)
         {
-            for (x=0; x < LCD_WIDTH; x++)
+            fb_data *dst = rb->lcd_framebuffer + LCD_WIDTH - y;
+            count = SCREENWIDTH;
+
+            do
             {
-                paletteIndex = d_screens[0][SCREENWIDTH*(SCREENHEIGHT-1-x) + y];
-                rb->lcd_framebuffer[y*LCD_WIDTH + x] = palette[paletteIndex];
+                *dst = palette[*src++];
+                dst += LCD_WIDTH;
             }
+            while (--count);
         }
     }
     else
 #endif
-    for (y = 0; y < LCD_HEIGHT *LCD_WIDTH; y++)
     {
-        paletteIndex = d_screens[0][y];
-        rb->lcd_framebuffer[y] = palette[paletteIndex];
+        fb_data *dst = rb->lcd_framebuffer;
+        count = SCREENWIDTH*SCREENHEIGHT;
+
+        do
+            *dst++ = palette[*src++];
+        while (--count);
     }
     rb->lcd_update();
 #else /* !HAVE_LCD_COLOR */
-   int x;
+    unsigned char *dst;
+    int y;
 
-   for (y = 0; y < SCREENHEIGHT; y++)
-   {
-      for (x = 0; x < SCREENWIDTH; x++)
-      {
-         paletteIndex = d_screens[0][y*SCREENWIDTH + x];
-         greybuffer[x]=palette[paletteIndex];
-      }
-      grey_ub_gray_bitmap(greybuffer, 0, y, SCREENWIDTH, 1);
-   }
+    for (y = 0; y < SCREENHEIGHT; y++)
+    {
+        dst = greybuffer;
+        count = SCREENWIDTH;
+
+        do
+            *dst++ = palette[*src++];
+        while (--count);
+
+        grey_ub_gray_bitmap(greybuffer, 0, y, SCREENWIDTH, 1);
+    }
 #endif /* !HAVE_LCD_COLOR */
 #endif
 }
