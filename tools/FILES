@@ -26,5 +26,8 @@ ipodpatcher/Makefile
 ipodpatcher/*.[ch]
 rbspeex/Makefile
 rbspeex/rbspeexenc.c
+rbspeex/rbspeex.c
+rbspeex/rbspeexdec.c
+rbspeex/rbspeex.h
 *.vbs
 VOICE_PAUSE.wav
