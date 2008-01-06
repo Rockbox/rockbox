@@ -354,7 +354,7 @@ static int get_timestamp(int *duration)
         ec_length = 0;
     }
 
-    if (ci->read_filebuf(&packet_flags, 1) == 0) { 
+    if (ci->read_filebuf(&packet_flags, 1) == 0) {
         DEBUGF("Detected end of stream 2\n");
         return ASF_ERROR_EOF;
     }
@@ -425,7 +425,8 @@ static int seek(int ms, asf_waveformatex_t* wfx)
             /*unknown error, try to recover*/
             DEBUGF("UKNOWN SEEK ERROR\n");
             ci->seek_buffer(ci->id3->first_frame_offset+initial_packet*wfx->packet_size);
-            return ms;
+            /*seek failed so return time stamp of the initial packet*/
+            return get_timestamp(&duration);
         }
 
         if ((time+duration>=ms && time<=ms) || count > 10) {
@@ -550,7 +551,7 @@ new_packet:
              */
 
             errcount++;
-            DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
+            DEBUGF("read_packet error %d, errcount %d\n",wmares, errcount);
             if (errcount > 5) {
                 goto done;
             } else {

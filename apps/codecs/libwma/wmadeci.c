@@ -130,7 +130,7 @@ void vector_fmul_add_add(fixed32 *dst, const fixed32 *data,
                          const fixed32 *window, int n)
 {
     /* Block sizes are always power of two. Smallest block is always way bigger
-     * than four too.*/ 
+     * than four too.*/
     asm volatile (
         "0:"
         "movem.l (%[d]), %%d0-%%d3;"
@@ -160,7 +160,7 @@ void vector_fmul_reverse(fixed32 *dst, const fixed32 *src0, const fixed32 *src1,
                          int len)
 {
     /* Block sizes are always power of two. Smallest block is always way bigger
-     * than four too.*/ 
+     * than four too.*/
     asm volatile (
         "lea.l (-16, %[s1], %[n]*4), %[s1];"
         "0:"
@@ -906,7 +906,7 @@ static int wma_decode_block(WMADecodeContext *s)
     int nb_coefs[MAX_CHANNELS];
     fixed32 mdct_norm;
 
-    DEBUGF("***decode_block: %d of (%d samples) (%d)\n",  s->block_num, s->frame_len, s->block_len);
+    DEBUGF("***decode_block: %d  (%d samples of %d in frame)\n",  s->block_num, s->frame_len, s->block_len);
 
    /* compute current block length */
     if (s->use_variable_block_len)
@@ -959,7 +959,7 @@ static int wma_decode_block(WMADecodeContext *s)
 
     if ((s->block_pos + s->block_len) > s->frame_len)
     {
-        return -5;
+        return -5;  //oddly 32k sample from tracker fails here
     }
 
     if (s->nb_channels == 2)
@@ -1421,7 +1421,7 @@ static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
         if (ret < 0)
         {
 
-            //rb->splash(HZ*4, "wma_decode_block failed with ret %d", ret);
+            DEBUGF("wma_decode_block failed with code %d\n", ret);
             return -1;
         }
         if (ret)
@@ -1500,7 +1500,6 @@ int wma_decode_superframe_frame(WMADecodeContext* s,
     int pos, len;
     uint8_t *q;
     int done = 0;
-
     if ((s->use_bit_reservoir) && (s->current_frame == 0))
     {
         if (s->last_superframe_len > 0)
@@ -1509,6 +1508,7 @@ int wma_decode_superframe_frame(WMADecodeContext* s,
             if ((s->last_superframe_len + ((s->bit_offset + 7) >> 3)) >
                     MAX_CODED_SUPERFRAME_SIZE)
             {
+                DEBUGF("superframe size too large error\n");
                 goto fail;
             }
             q = s->last_superframe + s->last_superframe_len;
@@ -1568,6 +1568,7 @@ int wma_decode_superframe_frame(WMADecodeContext* s,
         len = buf_size - pos;
         if (len > MAX_CODED_SUPERFRAME_SIZE || len < 0)
         {
+            DEBUGF("superframe size too large error after decodeing\n");
             goto fail;
         }
         s->last_superframe_len = len;
@@ -1578,6 +1579,7 @@ int wma_decode_superframe_frame(WMADecodeContext* s,
 
 fail:
     /* when error, we reset the bit reservoir */
+
     s->last_superframe_len = 0;
     return -1;
 }
