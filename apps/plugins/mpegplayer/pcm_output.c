@@ -152,11 +152,24 @@ void pcm_output_add_data(void)
 /* Flushes the buffer - clock keeps counting */
 void pcm_output_flush(void)
 {
+    bool playing, paused;
+
     rb->pcm_play_lock();
+
+    playing = rb->pcm_is_playing();
+    paused = rb->pcm_is_paused();
+
+    /* Stop PCM to clear current buffer */
+    if (playing)
+        rb->pcm_play_stop();
 
     pcmbuf_threshold = PCMOUT_PLAY_WM;
     pcmbuf_read = pcmbuf_written = 0;
     pcmbuf_head = pcmbuf_tail = pcm_buffer;
+
+    /* Restart if playing state was current */
+    if (playing && !paused)
+        rb->pcm_play_data(get_more, NULL, 0);
 
     rb->pcm_play_unlock();
 }

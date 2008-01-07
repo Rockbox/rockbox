@@ -247,6 +247,37 @@ static void set_stream_clock(uint32_t time)
     pcm_output_set_clock(TS_TO_TICKS(time));
 }
 
+static void stream_start_playback(uint32_t time, bool fill_buffer)
+{
+    if (stream_mgr.seeked)
+    {
+        /* Clear any seeked status */
+        stream_mgr.seeked = false;
+
+        /* Flush old PCM data */
+        pcm_output_flush();
+
+        /* Set the master clock */
+        set_stream_clock(time);
+
+        /* Make sure streams are back in active pool */
+        move_strl_to_actl();
+
+        /* Prepare the parser and associated streams */
+        parser_prepare_streaming();
+    }
+
+    /* Start buffer which optional force fill */
+    disk_buf_send_msg(STREAM_PLAY, fill_buffer);
+
+    /* Tell each stream to start - may generate end of stream signals
+     * now - we'll handle this when finished */
+    actl_stream_broadcast(STREAM_PLAY, 0);
+
+    /* Actually start the clock */
+    pcm_output_play_pause(true);
+}
+
 /* Return the play time relative to the specified play time */
 static uint32_t time_from_whence(uint32_t time, int whence)
 {
@@ -286,62 +317,28 @@ static uint32_t time_from_whence(uint32_t time, int whence)
 }
 
 /* Handle seeking details if playing or paused */
-static uint32_t stream_seek_intl(uint32_t time, int whence, int status)
+static uint32_t stream_seek_intl(uint32_t time, int whence,
+                                 int status, bool *was_buffering)
 {
-    /* seek start time */
-    bool was_buffering;
-
-    if (status == STREAM_PLAYING)
+    if (status != STREAM_STOPPED)
     {
-        /* Keep clock from advancing while seeking */
-        pcm_output_play_pause(false);
+        bool wb;
+
+        /* Place streams in a non-running state - keep them on actl */
+        actl_stream_broadcast(STREAM_STOP, 0);
+
+        /* Stop all buffering or else risk clobbering random-access data */
+        wb = disk_buf_send_msg(STREAM_STOP, 0);
+
+        if (was_buffering != NULL)
+            *was_buffering = wb;
     }
-
-    /* Place streams in a non-running state - keep them on actl */
-    actl_stream_broadcast(STREAM_STOP, 0);
-
-    /* Stop all buffering or else risk clobbering random-access data */
-    was_buffering = disk_buf_send_msg(STREAM_STOP, 0);
 
     time = time_from_whence(time, whence);
-    time = parser_seek_time(time);
 
-    if (status == STREAM_PLAYING)
-    {
-        /* Restart streams if currently playing */
+    stream_mgr.seeked = true;
 
-        /* Clear any seeked status */
-        stream_mgr.seeked = false;
-
-        /* Flush old PCM data */
-        pcm_output_flush();
-
-        /* Set the master clock */
-        set_stream_clock(time);
-
-        /* Make sure streams are back in active pool */
-        move_strl_to_actl();
-
-        /* Prepare the parser and associated streams */
-        parser_prepare_streaming();
-
-        /* Start buffer using previous buffering status */
-        disk_buf_send_msg(STREAM_PLAY, was_buffering);
-
-        /* Tell each stream to start - may generate end of stream signals
-         * now - we'll handle this when finished */
-        actl_stream_broadcast(STREAM_PLAY, 0);
-
-        /* Actually start the clock */
-        pcm_output_play_pause(true);
-    }
-    else
-    {
-        /* Performed the seek - leave it at that until restarted */
-        stream_mgr.seeked = true;
-    }
-
-    return time;
+    return parser_seek_time(time);
 }
 
 /* Handle STREAM_OPEN */
@@ -402,29 +399,11 @@ static void stream_on_play(void)
         start = str_parser.last_seek_time - str_parser.start_pts;
         stream_mgr.resume_time = start;
 
-        start = stream_seek_intl(start, SEEK_SET, STREAM_STOPPED);
+        /* Prepare seek to start point */
+        start = stream_seek_intl(start, SEEK_SET, STREAM_STOPPED, NULL);
 
-        /* Fill list of all streams that will be playing */
-        move_strl_to_actl();
-
-        /* Clear any seeked status */
-        stream_mgr.seeked = false;
-
-        /* Set the master clock */
-        set_stream_clock(start);
-
-        /* Prepare the parser and associated streams */
-        parser_prepare_streaming();
-
-        /* Force buffering */
-        disk_buf_send_msg(STREAM_PLAY, true);
-
-        /* Tell each stream to start - may generate end of stream signals
-         * now - we'll handle this when finished */
-        actl_stream_broadcast(STREAM_PLAY, 0);
-
-        /* Actually start the clock */
-        pcm_output_play_pause(true);
+        /* Sync and start - force buffer fill */
+        stream_start_playback(start, true);
     }
     else
     {
@@ -481,33 +460,8 @@ static void stream_on_resume(void)
         /* Boost the CPU */
         trigger_cpu_boost();
 
-        if (stream_mgr.seeked)
-        {
-            /* Have to give the parser notice to sync up streams */
-            stream_mgr.seeked = false;
-
-            /* Flush old PCM data */
-            pcm_output_flush();
-
-            /* Set the master clock */
-            set_stream_clock(str_parser.last_seek_time);
-
-            /* Make sure streams are back in active pool */
-            move_strl_to_actl();
-
-            /* Prepare the parser and associated streams */
-            parser_prepare_streaming();
-        }
-
-        /* Don't force buffering */
-        disk_buf_send_msg(STREAM_PLAY, false);
-
-        /* Tell each stream to start - may generate end of stream signals
-         * now - we'll handle this when finished */
-        actl_stream_broadcast(STREAM_PLAY, 0);
-
-        /* Actually start the clock */
-        pcm_output_play_pause(true);
+        /* Sync and start - no force buffering */
+        stream_start_playback(str_parser.last_seek_time, false);
 
         /* Officially playing */
         stream_mgr.status = STREAM_PLAYING;
@@ -582,33 +536,30 @@ static void stream_on_seek(struct stream_seek_data *skd)
         if (stream_mgr.filename == NULL)
             break;
 
+        /* Keep things spinning if already doing so */
         stream_keep_disk_active();
 
+        /* Have data - reply in order to acquire lock */
         stream_mgr_reply_msg(STREAM_OK);
 
         stream_mgr_lock();
 
         if (stream_can_seek())
         {
-            if (stream_mgr.status != STREAM_STOPPED)
+            bool buffer;
+
+            if (stream_mgr.status == STREAM_PLAYING)
             {
-                if (stream_mgr.status != STREAM_PLAYING)
-                {
-                    trigger_cpu_boost();
-                }
-
-                stream_seek_intl(time, whence, stream_mgr.status);
-
-                if (stream_mgr.status != STREAM_PLAYING)
-                {
-                    cancel_cpu_boost();
-                }
+                /* Keep clock from advancing while seeking */
+                pcm_output_play_pause(false);
             }
-            else
+
+            time = stream_seek_intl(time, whence, stream_mgr.status, &buffer);
+
+            if (stream_mgr.status == STREAM_PLAYING)
             {
-                stream_mgr.seeked = true;
-                time = time_from_whence(time, whence);
-                parser_seek_time(time);
+                /* Sync and restart - no force buffering */
+                stream_start_playback(time, buffer);
             }
         }
 
@@ -616,6 +567,7 @@ static void stream_on_seek(struct stream_seek_data *skd)
         return;
     }
 
+    /* Invalid parameter or no file */
     stream_mgr_reply_msg(STREAM_ERROR);
 }
 
@@ -904,9 +856,17 @@ uint32_t stream_get_seek_time(uint32_t *start)
     stream_mgr_lock();
 
     if (stream_mgr.seeked)
+    {
         time = str_parser.last_seek_time;
+    }
     else
+    {
         time = TICKS_TO_TS(pcm_output_get_clock());
+
+        /* Clock can be start early so keep in range */
+        if (time < str_parser.start_pts)
+            time = str_parser.start_pts;
+    }
 
     if (start != NULL)
         *start = str_parser.start_pts;
