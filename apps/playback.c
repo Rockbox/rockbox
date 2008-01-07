@@ -242,6 +242,7 @@ static unsigned long prev_track_elapsed = 0; /* Previous track elapsed time (C/A
 /* Track change controls */
 static bool automatic_skip = false; /* Who initiated in-progress skip? (C/A-) */
 static bool playlist_end = false;   /* Has the current playlist ended? (A) */
+static bool auto_dir_skip = false;  /* Have we changed dirs automatically? */
 static bool dir_skip = false;       /* Is a directory skip pending? (A) */
 static bool new_playlist = false;   /* Are we starting a new playlist? (A) */
 static int wps_offset = 0;          /* Pending track change offset, to keep WPS responsive (A) */
@@ -1964,7 +1965,9 @@ static int audio_check_new_track(void)
     int track_count = audio_track_count();
     int old_track_ridx = track_ridx;
     int i, idx;
+    int next_playlist_index;
     bool forward;
+    bool end_of_playlist;  /* Temporary flag, not the same as playlist_end */
 
     if (dir_skip)
     {
@@ -1985,6 +1988,9 @@ static int audio_check_new_track(void)
     if (new_playlist)
         ci.new_track = 0;
 
+    end_of_playlist = playlist_peek(ci.new_track) == NULL;
+    auto_dir_skip = end_of_playlist && global_settings.next_folder;
+
     /* If the playlist isn't that big */
     if (!playlist_check(ci.new_track))
     {
@@ -2004,10 +2010,17 @@ static int audio_check_new_track(void)
     /* Update the playlist */
     last_peek_offset -= ci.new_track;
 
-    if (playlist_next(ci.new_track) < 0)
+    if (auto_dir_skip || !automatic_skip)
     {
-        LOGFQUEUE("audio >|= codec Q_CODEC_REQUEST_FAILED");
-        return Q_CODEC_REQUEST_FAILED;
+        /* If the track change was manual or the result of an auto dir skip,
+           we need to update the playlist now */
+        next_playlist_index = playlist_next(ci.new_track);
+
+        if (next_playlist_index < 0)
+        {
+            LOGFQUEUE("audio >|= codec Q_CODEC_REQUEST_FAILED");
+            return Q_CODEC_REQUEST_FAILED;
+        }
     }
 
     if (new_playlist)
@@ -2314,9 +2327,14 @@ static void audio_finalise_track_change(void)
 
     if (automatic_skip)
     {
+        if (!auto_dir_skip)
+            playlist_next(-wps_offset);
+
         wps_offset = 0;
         automatic_skip = false;
     }
+
+    auto_dir_skip = false;
 
     /* Invalidate prevtrack_id3 */
     prevtrack_id3.path[0] = 0;
