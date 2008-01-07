@@ -6,7 +6,8 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-# Traditional Chinese language file translated from chinese-simp
+# Traditional Chinese language file
+#
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -11501,5 +11502,33 @@
   </dest>
   <voice>
     *: "Central European"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user: 
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<隨机>"
+  </dest>
+  <voice>
+    *: "隨机"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user: 
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "保存聲音設定"
+  </dest>
+  <voice>
+    *: "保存聲音設定"
   </voice>
 </phrase>
