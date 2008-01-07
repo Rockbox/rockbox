@@ -24,7 +24,16 @@
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 #ifndef HAVE_LCD_COLOR
-#include "gray.h"
+#include "grey.h"
+#endif
+
+#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+/* Archos has not enough plugin RAM for full-width fire :( */
+#define FIRE_WIDTH 108
+#define FIRE_XPOS 2
+#else
+#define FIRE_WIDTH LCD_WIDTH
+#define FIRE_XPOS 0
 #endif
 
 PLUGIN_HEADER
@@ -33,13 +42,13 @@ PLUGIN_HEADER
 
 static struct plugin_api* rb; /* global api struct pointer */
 
-static unsigned char fire[LCD_HEIGHT+3][LCD_WIDTH];
-static unsigned char cooling_map[LCD_HEIGHT][LCD_WIDTH];
+static unsigned char fire[LCD_HEIGHT+3][FIRE_WIDTH];
+static unsigned char cooling_map[LCD_HEIGHT][FIRE_WIDTH];
 
 #ifndef HAVE_LCD_COLOR
 static unsigned char *gbuf;
 static size_t gbuf_size = 0;
-static unsigned char draw_buffer[8*LCD_WIDTH];
+static unsigned char draw_buffer[FIRE_WIDTH];
 #endif
 
 /* Key assignement */
@@ -230,7 +239,7 @@ static inline void fire_generate(int mult, int flames_type, bool moving)
     if(moving)
     {/* moving must be true the first time the function is called */
         ptr = &fire[LCD_HEIGHT][0];
-        end = ptr + LCD_WIDTH;
+        end = ptr + FIRE_WIDTH;
 
         do
         {
@@ -243,17 +252,17 @@ static inline void fire_generate(int mult, int flames_type, bool moving)
     /* Convolve the pixels and handle cooling (to add nice shapes effects later) */
     cool = &cooling_map[0][0];
     ptr = &fire[0][0];
-    end = ptr + LCD_HEIGHT*LCD_WIDTH;
-    
+    end = ptr + LCD_HEIGHT*FIRE_WIDTH;
+
     switch (flames_type)
     {
       case 0:
         do
         {
-            pixel_value = ptr[LCD_WIDTH-1]  /* fire[y+1][x-1] */
-                        + ptr[2*LCD_WIDTH]  /* fire[y+2][x] */
-                        + ptr[LCD_WIDTH+1]  /* fire[y+1][x+1] */
-                        + ptr[3*LCD_WIDTH]; /* fire[y+3][x] */
+            pixel_value = ptr[FIRE_WIDTH-1]  /* fire[y+1][x-1] */
+                        + ptr[2*FIRE_WIDTH]  /* fire[y+2][x] */
+                        + ptr[FIRE_WIDTH+1]  /* fire[y+1][x+1] */
+                        + ptr[3*FIRE_WIDTH]; /* fire[y+3][x] */
             pixel_value = FMULU(pixel_value, mult) >> 10;
 
             cooling_value = *cool++;
@@ -273,10 +282,10 @@ static inline void fire_generate(int mult, int flames_type, bool moving)
         mult -= 2; 
         do
         {
-            pixel_value = ptr[LCD_WIDTH-1]  /* fire[y+1][x-1] */
-                        + ptr[LCD_WIDTH]    /* fire[y+1][x] */
-                        + ptr[LCD_WIDTH+1]  /* fire[y+1][x+1] */
-                        + ptr[2*LCD_WIDTH]; /* fire[y+2][x] */
+            pixel_value = ptr[FIRE_WIDTH-1]  /* fire[y+1][x-1] */
+                        + ptr[FIRE_WIDTH]    /* fire[y+1][x] */
+                        + ptr[FIRE_WIDTH+1]  /* fire[y+1][x+1] */
+                        + ptr[2*FIRE_WIDTH]; /* fire[y+2][x] */
             pixel_value = FMULU(pixel_value, mult) >> 10;
 
             cooling_value = *cool++;
@@ -300,31 +309,34 @@ static inline void fire_generate(int mult, int flames_type, bool moving)
 
 static inline void fire_draw(void)
 {
-#ifndef HAVE_LCD_COLOR
-    int block;
-    unsigned char *dest, *end;
+    int y;
     unsigned char *src = &fire[0][0];
+#ifndef HAVE_LCD_COLOR
+    unsigned char *dest, *end;
 
-    for (block = 0; block < LCD_HEIGHT; block += 8)
+    for (y = 0; y < LCD_HEIGHT; y++)
     {
         dest = draw_buffer;
-        end = dest + 8*LCD_WIDTH;
+        end = dest + FIRE_WIDTH;
 
         do
             *dest++ = palette[*src++];
-        while(dest < end);
+        while (dest < end);
 
-        gray_ub_gray_bitmap(draw_buffer, 0, block, LCD_WIDTH, 8);
+        grey_ub_gray_bitmap(draw_buffer, 0, y, FIRE_WIDTH, 1);
     }
 #else
-    fb_data* dest = rb->lcd_framebuffer;
-    fb_data* end = rb->lcd_framebuffer+(LCD_WIDTH*LCD_HEIGHT);
-    unsigned char* src = &fire[0][0];
+    fb_data *dest, *end;
 
-    do
-        *dest++ = colorpalette[*src++];
-    while (dest < end);
+    for (y = 0; y < LCD_HEIGHT; y++)
+    {
+        dest = rb->lcd_framebuffer + LCD_WIDTH * y + FIRE_XPOS;
+        end = dest + FIRE_WIDTH;
 
+        do
+            *dest++ = colorpalette[*src++];
+        while (dest < end);
+    }
     rb->lcd_update();
 #endif
 }
@@ -337,7 +349,7 @@ void cleanup(void *parameter)
     rb->cpu_boost(false);
 #endif
 #ifndef HAVE_LCD_COLOR
-    gray_release();
+    grey_release();
 #endif
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(rb); /* backlight control in lib/helper.c */
@@ -354,27 +366,26 @@ int main(void)
     int mult = 261;
     int flames_type=0;
     bool moving=true;
-#ifndef HAVE_LCD_COLOR
-    int shades;
 
+#ifndef HAVE_LCD_COLOR
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
-    shades = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT,
-                       32, 1<<8, NULL) + 1;
-    if(shades <= 1)
+
+    if (!grey_init(rb, gbuf, gbuf_size, false, FIRE_WIDTH, LCD_HEIGHT, NULL))
     {
         rb->splash(HZ, "not enough memory");
         return PLUGIN_ERROR;
     }
-    /* switch on grayscale overlay */
-    gray_show(true);
+    /* switch on greyscale overlay */
+    grey_set_position(FIRE_XPOS, 0);
+    grey_show(true);
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
     rb->memset(&fire[0][0], 0, sizeof(fire));
-    tab_init_rand(&cooling_map[0][0], LCD_HEIGHT*LCD_WIDTH, COOL_MAX);
+    tab_init_rand(&cooling_map[0][0], LCD_HEIGHT*FIRE_WIDTH, COOL_MAX);
     while (true)
     {
         fire_generate(mult, flames_type, moving);
