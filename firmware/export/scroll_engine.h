@@ -23,9 +23,17 @@
 #ifndef __SCROLL_ENGINE_H__
 #define __SCROLL_ENGINE_H__
 
+#include <lcd.h>
+
 void scroll_init(void);
+void lcd_scroll_stop(struct viewport* vp);
+void lcd_scroll_stop_line(struct viewport* vp, int y);
 void lcd_scroll_fn(void);
+#ifdef HAVE_REMOTE_LCD
 void lcd_remote_scroll_fn(void);
+void lcd_remote_scroll_stop(struct viewport* vp);
+void lcd_remote_scroll_stop_line(struct viewport* vp, int y);
+#endif
 
 /* internal usage, but in multiple drivers */
 #define SCROLL_SPACING   3
@@ -37,8 +45,10 @@ void lcd_remote_scroll_fn(void);
 
 struct scrollinfo
 {
+    struct viewport* vp;
     char line[SCROLL_LINE_SIZE];
     int len;    /* length of line in chars */
+    int y;      /* Position of the line on the screen (char co-ordinates) */
     int offset;
     int startx;
 #ifdef HAVE_LCD_BITMAP
@@ -54,7 +64,7 @@ struct scroll_screen_info
 {
     struct scrollinfo * const scroll;
     const int num_scroll; /* number of scrollable lines (also number of scroll structs) */
-    int lines;  /* Bitpattern of which lines are scrolling */
+    int lines;  /* Number of currently scrolling lines */
     long ticks; /* # of ticks between updates*/
     long delay; /* ticks delay before start */
     int bidir_limit;  /* percent */
@@ -74,7 +84,7 @@ struct scroll_screen_info
 #ifdef HAVE_LCD_BITMAP
 #define LCD_SCROLLABLE_LINES ((LCD_HEIGHT+4)/5 < 32 ? (LCD_HEIGHT+4)/5 : 32)
 #else
-#define LCD_SCROLLABLE_LINES LCD_HEIGHT
+#define LCD_SCROLLABLE_LINES LCD_HEIGHT * 2
 #endif
 
 extern struct scroll_screen_info lcd_scroll_info;

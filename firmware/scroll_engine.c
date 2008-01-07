@@ -82,6 +82,40 @@ void lcd_stop_scroll(void)
     lcd_scroll_info.lines = 0;
 }
 
+/* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
+void lcd_scroll_stop_line(struct viewport* current_vp, int y)
+{
+    int i = 0;
+
+    while (i < lcd_scroll_info.lines)
+    {
+        if ((lcd_scroll_info.scroll[i].vp == current_vp) && 
+            ((y < 0) || (lcd_scroll_info.scroll[i].y == y)))
+        {
+            /* If i is not the last active line in the array, then move
+               the last item to position i */
+            if ((i + 1) != lcd_scroll_info.lines)
+            {
+                lcd_scroll_info.scroll[i] = lcd_scroll_info.scroll[lcd_scroll_info.lines-1];
+            }
+            lcd_scroll_info.lines--;
+
+            /* A line can only appear once, so we're done. */
+            return ;
+        }
+        else
+        {
+            i++;
+        }
+    }
+}
+
+/* Stop all scrolling lines in the specified viewport */
+void lcd_scroll_stop(struct viewport* vp)
+{
+    lcd_scroll_stop_line(vp, -1);
+}
+
 void lcd_scroll_speed(int speed)
 {
     lcd_scroll_info.ticks = scroll_tick_table[speed];
@@ -120,6 +154,40 @@ void lcd_jump_scroll_delay(int ms)
 void lcd_remote_stop_scroll(void)
 {
     lcd_remote_scroll_info.lines = 0;
+}
+
+/* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
+void lcd_remote_scroll_stop_line(struct viewport* current_vp, int y)
+{
+    int i = 0;
+
+    while (i < lcd_remote_scroll_info.lines)
+    {
+        if ((lcd_remote_scroll_info.scroll[i].vp == current_vp) && 
+            ((y < 0) || (lcd_remote_scroll_info.scroll[i].y == y)))
+        {
+            /* If i is not the last active line in the array, then move
+               the last item to position i */
+            if ((i + 1) != lcd_remote_scroll_info.lines)
+            {
+                lcd_remote_scroll_info.scroll[i] = lcd_remote_scroll_info.scroll[lcd_remote_scroll_info.lines-1];
+            }
+            lcd_remote_scroll_info.lines--;
+
+            /* A line can only appear once, so we're done. */
+            return ;
+        }
+        else
+        {
+            i++;
+        }
+    }
+}
+
+/* Stop all scrolling lines in the specified viewport */
+void lcd_remote_scroll_stop(struct viewport* vp)
+{
+    lcd_remote_scroll_stop_line(vp, -1);
 }
 
 void lcd_remote_scroll_speed(int speed)

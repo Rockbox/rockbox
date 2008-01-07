@@ -49,24 +49,30 @@ fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
 
-#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
-static unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
-static unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
-static unsigned lss_pattern IDATA_ATTR = LCD_DEFAULT_LS;
-static unsigned lse_pattern IDATA_ATTR = LCD_DEFAULT_BG;
-static unsigned lst_pattern IDATA_ATTR = LCD_DEFAULT_FG;
-#else
-unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
-unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
-unsigned lss_pattern IDATA_ATTR = LCD_DEFAULT_LS;
-unsigned lse_pattern IDATA_ATTR = LCD_DEFAULT_BG;
-unsigned lst_pattern IDATA_ATTR = LCD_DEFAULT_FG;
-#endif
+static struct viewport default_vp =
+{
+    .x        = 0,
+    .y        = 0,
+    .width    = LCD_WIDTH,
+    .height   = LCD_HEIGHT,
+    .font     = FONT_SYSFIXED,
+    .drawmode = DRMODE_SOLID,
+    .xmargin  = 0,
+    .ymargin  = 0,
+    .fg_pattern = LCD_DEFAULT_FG,
+    .bg_pattern = LCD_DEFAULT_BG,
+    .lss_pattern = LCD_DEFAULT_BG,
+    .lse_pattern = LCD_DEFAULT_BG,
+    .lst_pattern = LCD_DEFAULT_BG,
+};
 
-static int drawmode = DRMODE_SOLID;
-static int xmargin = 0;
-static int ymargin = 0;
-static int curfont = FONT_SYSFIXED;
+/* The Gigabeat target build requires access to the current fg_pattern
+   in lcd-meg-fx.c */
+#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
+static struct viewport* current_vp IDATA_ATTR = &default_vp;
+#else
+struct viewport* current_vp IDATA_ATTR = &default_vp;
+#endif
 
 /* LCD init */
 void lcd_init(void)
@@ -78,84 +84,115 @@ void lcd_init(void)
     scroll_init();
 }
 
+/*** Viewports ***/
+
+void lcd_set_viewport(struct viewport* vp)
+{
+    if (vp == NULL)
+        current_vp = &default_vp;
+    else
+        current_vp = vp;
+}
+
+void lcd_update_viewport(void)
+{
+    lcd_update_rect(current_vp->x, current_vp->y,
+                    current_vp->width, current_vp->height);
+}
+
+void lcd_update_viewport_rect(int x, int y, int width, int height)
+{
+    lcd_update_rect(current_vp->x + x, current_vp->y + y, width, height);
+}
+
 /*** parameter handling ***/
 
 void lcd_set_drawmode(int mode)
 {
-    drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
+    current_vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
 }
 
 int lcd_get_drawmode(void)
 {
-    return drawmode;
+    return current_vp->drawmode;
 }
 
 void lcd_set_foreground(unsigned color)
 {
-    fg_pattern = color;
+    current_vp->fg_pattern = color;
 }
 
 unsigned lcd_get_foreground(void)
 {
-    return fg_pattern;
+    return current_vp->fg_pattern;
 }
 
 void lcd_set_background(unsigned color)
 {
-    bg_pattern = color;
+    current_vp->bg_pattern = color;
 }
 
 unsigned lcd_get_background(void)
 {
-    return bg_pattern;
+    return current_vp->bg_pattern;
 }
 
 void lcd_set_selector_start(unsigned color)
 {
-    lss_pattern = color;
+    current_vp->lss_pattern = color;
 }
 
 void lcd_set_selector_end(unsigned color)
 {
-    lse_pattern = color;
+    current_vp->lse_pattern = color;
 }
 
 void lcd_set_selector_text(unsigned color)
 {
-    lst_pattern = color;
+    current_vp->lst_pattern = color;
 }
 
 void lcd_set_drawinfo(int mode, unsigned fg_color, unsigned bg_color)
 {
     lcd_set_drawmode(mode);
-    fg_pattern = fg_color;
-    bg_pattern = bg_color;
+    current_vp->fg_pattern = fg_color;
+    current_vp->bg_pattern = bg_color;
 }
 
 void lcd_setmargins(int x, int y)
 {
-    xmargin = x;
-    ymargin = y;
+    current_vp->xmargin = x;
+    current_vp->ymargin = y;
+}
+
+int lcd_getwidth(void)
+{
+    return current_vp->width;
+}
+
+int lcd_getheight(void)
+{
+    return current_vp->height;
 }
 
 int lcd_getxmargin(void)
 {
-    return xmargin;
+    return current_vp->xmargin;
 }
 
 int lcd_getymargin(void)
 {
-    return ymargin;
+    return current_vp->ymargin;
 }
 
 void lcd_setfont(int newfont)
 {
-    curfont = newfont;
+    current_vp->font = newfont;
 }
 
 int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 {
-    return font_getstringsize(str, w, h, curfont);
+    return font_getstringsize(str, w, h, current_vp->font);
 }
 
 /*** low-level drawing functions ***/
@@ -165,13 +202,13 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 static void setpixel(fb_data *address) ICODE_ATTR;
 static void setpixel(fb_data *address)
 {
-    *address = fg_pattern;
+    *address = current_vp->fg_pattern;
 }
 
 static void clearpixel(fb_data *address) ICODE_ATTR;
 static void clearpixel(fb_data *address)
 {
-    *address = bg_pattern;
+    *address = current_vp->bg_pattern;
 }
 
 static void clearimgpixel(fb_data *address) ICODE_ATTR;
@@ -226,31 +263,74 @@ fb_data* lcd_get_backdrop(void)
 
 /*** drawing functions ***/
 
-/* Clear the whole display */
-void lcd_clear_display(void)
+/* Clear the current viewport */
+void lcd_clear_viewport(void)
 {
-    fb_data *dst = LCDADDR(0, 0);
+    fb_data *dst, *dst_end;
 
-    if (drawmode & DRMODE_INVERSEVID)
+    dst = LCDADDR(current_vp->x, current_vp->y);
+    dst_end = dst + current_vp->height * LCD_WIDTH;
+
+    if (current_vp->drawmode & DRMODE_INVERSEVID)
     {
-        memset16(dst, fg_pattern, LCD_WIDTH*LCD_HEIGHT);
+        do
+        {
+            memset16(dst, current_vp->fg_pattern, current_vp->width);
+            dst += LCD_WIDTH;
+        }
+        while (dst < dst_end);
     }
     else
     {
         if (!lcd_backdrop)
-            memset16(dst, bg_pattern, LCD_WIDTH*LCD_HEIGHT);
+        {
+            do
+            {
+                memset16(dst, current_vp->bg_pattern, current_vp->width);
+                dst += LCD_WIDTH;
+            }
+            while (dst < dst_end);
+        }
         else
-            memcpy(dst, lcd_backdrop, sizeof(lcd_framebuffer));
+        {
+            do
+            {
+                memcpy(dst, (void *)((long)dst + lcd_backdrop_offset),
+                       current_vp->width * sizeof(fb_data));
+                dst += LCD_WIDTH;
+            }
+            while (dst < dst_end);
+        }
     }
 
-    lcd_scroll_info.lines = 0;
+    if (current_vp == &default_vp)
+    {
+        lcd_scroll_info.lines = 0;
+    }
+    else
+    {
+        lcd_scroll_stop(current_vp);
+    }
+}
+
+/* Clear the whole display */
+void lcd_clear_display(void)
+{
+    struct viewport* old_vp = current_vp;
+
+    current_vp = &default_vp;
+
+    lcd_clear_viewport();
+
+    current_vp = old_vp;
 }
 
 /* Set a single pixel */
 void lcd_drawpixel(int x, int y)
 {
-    if (((unsigned)x < LCD_WIDTH) && ((unsigned)y < LCD_HEIGHT))
-        lcd_fastpixelfuncs[drawmode](LCDADDR(x, y));
+    if (((unsigned)x < (unsigned)current_vp->width) && 
+        ((unsigned)y < (unsigned)current_vp->height))
+        lcd_fastpixelfuncs[current_vp->drawmode](LCDADDR(current_vp->x+x, current_vp->y+y));
 }
 
 /* Draw a line */
@@ -262,7 +342,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
-    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[current_vp->drawmode];
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
@@ -306,8 +386,8 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 
     for (i = 0; i < numpixels; i++)
     {
-        if (((unsigned)x < LCD_WIDTH) && ((unsigned)y < LCD_HEIGHT))
-            pfunc(LCDADDR(x, y));
+        if (((unsigned)x < (unsigned)current_vp->width) && ((unsigned)y < (unsigned)current_vp->height))
+            pfunc(LCDADDR(x + current_vp->x, y + current_vp->y));
 
         if (d < 0)
         {
@@ -331,7 +411,7 @@ void lcd_hline(int x1, int x2, int y)
     unsigned bits = 0;
     enum fill_opt fillopt = OPT_NONE;
     fb_data *dst, *dst_end;
-    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[current_vp->drawmode];
 
     /* direction flip */
     if (x2 < x1)
@@ -342,23 +422,31 @@ void lcd_hline(int x1, int x2, int y)
     }
 
     /* nothing to draw? */
-    if (((unsigned)y >= LCD_HEIGHT) || (x1 >= LCD_WIDTH) || (x2 < 0))
+    if (((unsigned)y >= (unsigned)current_vp->height) || 
+        (x1 >= current_vp->width) ||
+        (x2 < 0))
         return;
 
     /* clipping */
     if (x1 < 0)
         x1 = 0;
-    if (x2 >= LCD_WIDTH)
-        x2 = LCD_WIDTH-1;
+    if (x2 >= current_vp->width)
+        x2 = current_vp->width-1;
 
-    if (drawmode & DRMODE_INVERSEVID)
+    width = x2 - x1 + 1;
+
+    /* Adjust x1 and y to viewport */
+    x1 += current_vp->x;
+    y += current_vp->y;
+
+    if (current_vp->drawmode & DRMODE_INVERSEVID)
     {
-        if (drawmode & DRMODE_BG)
+        if (current_vp->drawmode & DRMODE_BG)
         {
             if (!lcd_backdrop)
             {
                 fillopt = OPT_SET;
-                bits = bg_pattern;
+                bits = current_vp->bg_pattern;
             }
             else
                 fillopt = OPT_COPY;
@@ -366,14 +454,13 @@ void lcd_hline(int x1, int x2, int y)
     }
     else
     {
-        if (drawmode & DRMODE_FG)
+        if (current_vp->drawmode & DRMODE_FG)
         {
             fillopt = OPT_SET;
-            bits = fg_pattern;
+            bits = current_vp->fg_pattern;
         }
     }
     dst = LCDADDR(x1, y);
-    width = x2 - x1 + 1;
 
     switch (fillopt)
     {
@@ -400,7 +487,7 @@ void lcd_vline(int x, int y1, int y2)
 {
     int y;
     fb_data *dst, *dst_end;
-    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[current_vp->drawmode];
 
     /* direction flip */
     if (y2 < y1)
@@ -411,16 +498,18 @@ void lcd_vline(int x, int y1, int y2)
     }
 
     /* nothing to draw? */
-    if (((unsigned)x >= LCD_WIDTH) || (y1 >= LCD_HEIGHT) || (y2 < 0))
+    if ((x >= current_vp->width) || 
+        (y1 >= current_vp->height) ||
+        (y2 < 0))
         return;
 
     /* clipping */
     if (y1 < 0)
         y1 = 0;
-    if (y2 >= LCD_HEIGHT)
-        y2 = LCD_HEIGHT-1;
+    if (y2 >= current_vp->height)
+        y2 = current_vp->height-1;
 
-    dst = LCDADDR(x, y1);
+    dst = LCDADDR(x + current_vp->x, y1 + current_vp->y);
     dst_end = dst + (y2 - y1) * LCD_WIDTH;
 
     do
@@ -452,11 +541,11 @@ void lcd_fillrect(int x, int y, int width, int height)
     unsigned bits = 0;
     enum fill_opt fillopt = OPT_NONE;
     fb_data *dst, *dst_end;
-    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[drawmode];
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[current_vp->drawmode];
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
+    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) || 
+        (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
         return;
 
     /* clipping */
@@ -470,19 +559,19 @@ void lcd_fillrect(int x, int y, int width, int height)
         height += y;
         y = 0;
     }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
+    if (x + width > current_vp->width)
+        width = current_vp->width - x;
+    if (y + height > current_vp->height)
+        height = current_vp->height - y;
 
-    if (drawmode & DRMODE_INVERSEVID)
+    if (current_vp->drawmode & DRMODE_INVERSEVID)
     {
-        if (drawmode & DRMODE_BG)
+        if (current_vp->drawmode & DRMODE_BG)
         {
             if (!lcd_backdrop)
             {
                 fillopt = OPT_SET;
-                bits = bg_pattern;
+                bits = current_vp->bg_pattern;
             }
             else
                 fillopt = OPT_COPY;
@@ -490,13 +579,13 @@ void lcd_fillrect(int x, int y, int width, int height)
     }
     else
     {
-        if (drawmode & DRMODE_FG)
+        if (current_vp->drawmode & DRMODE_FG)
         {
             fillopt = OPT_SET;
-            bits = fg_pattern;
+            bits = current_vp->fg_pattern;
         }
     }
-    dst = LCDADDR(x, y);
+    dst = LCDADDR(current_vp->x + x, current_vp->y + y);
     dst_end = dst + height * LCD_WIDTH;
 
     do
@@ -530,24 +619,28 @@ void lcd_fillrect(int x, int y, int width, int height)
 /* Fill a rectangle with a gradient */
 void lcd_gradient_rect(int x1, int x2, int y, int h)
 {
+    int old_pattern = current_vp->fg_pattern;
+
     if (h == 0) return;
 
-    int h_r = RGB_UNPACK_RED(lss_pattern) << 16;
-    int h_b = RGB_UNPACK_BLUE(lss_pattern) << 16;
-    int h_g = RGB_UNPACK_GREEN(lss_pattern) << 16;
-    int rstep = (h_r - ((signed)RGB_UNPACK_RED(lse_pattern) << 16)) / h;
-    int gstep = (h_g - ((signed)RGB_UNPACK_GREEN(lse_pattern) << 16)) / h;
-    int bstep = (h_b - ((signed)RGB_UNPACK_BLUE(lse_pattern) << 16)) / h;
+    int h_r = RGB_UNPACK_RED(current_vp->lss_pattern) << 16;
+    int h_b = RGB_UNPACK_BLUE(current_vp->lss_pattern) << 16;
+    int h_g = RGB_UNPACK_GREEN(current_vp->lss_pattern) << 16;
+    int rstep = (h_r - ((signed)RGB_UNPACK_RED(current_vp->lse_pattern) << 16)) / h;
+    int gstep = (h_g - ((signed)RGB_UNPACK_GREEN(current_vp->lse_pattern) << 16)) / h;
+    int bstep = (h_b - ((signed)RGB_UNPACK_BLUE(current_vp->lse_pattern) << 16)) / h;
     int count;
 
-    fg_pattern = lss_pattern;
+    current_vp->fg_pattern = current_vp->lss_pattern;
     for(count = 0; count < h; count++) {
         lcd_hline(x1, x2, y + count);
         h_r -= rstep;
         h_g -= gstep;
         h_b -= bstep;
-        fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
+        current_vp->fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
     }
+
+    current_vp->fg_pattern = old_pattern;
 }
 
 #define H_COLOR(lss, lse, cur_line, max_line) \
@@ -562,14 +655,14 @@ void lcd_gradient_rect_scroll(int x1, int x2, int y, int h,
 {
     if (h == 0 || num_lines == 0) return;
 
-    unsigned tmp_lss = lss_pattern;
-    unsigned tmp_lse = lse_pattern;
-    int lss_r = (signed)RGB_UNPACK_RED(lss_pattern);
-    int lss_b = (signed)RGB_UNPACK_BLUE(lss_pattern);
-    int lss_g = (signed)RGB_UNPACK_GREEN(lss_pattern);
-    int lse_r = (signed)RGB_UNPACK_RED(lse_pattern);
-    int lse_b = (signed)RGB_UNPACK_BLUE(lse_pattern);
-    int lse_g = (signed)RGB_UNPACK_GREEN(lse_pattern);
+    unsigned tmp_lss = current_vp->lss_pattern;
+    unsigned tmp_lse = current_vp->lse_pattern;
+    int lss_r = (signed)RGB_UNPACK_RED(current_vp->lss_pattern);
+    int lss_b = (signed)RGB_UNPACK_BLUE(current_vp->lss_pattern);
+    int lss_g = (signed)RGB_UNPACK_GREEN(current_vp->lss_pattern);
+    int lse_r = (signed)RGB_UNPACK_RED(current_vp->lse_pattern);
+    int lse_b = (signed)RGB_UNPACK_BLUE(current_vp->lse_pattern);
+    int lse_g = (signed)RGB_UNPACK_GREEN(current_vp->lse_pattern);
 
     int h_r = H_COLOR(lss_r, lse_r, cur_line, num_lines);
     int h_g = H_COLOR(lss_g, lse_g, cur_line, num_lines);
@@ -583,8 +676,8 @@ void lcd_gradient_rect_scroll(int x1, int x2, int y, int h,
 
     lcd_gradient_rect(x1, x2, y, h);
 
-    lcd_set_selector_start(tmp_lss);
-    lcd_set_selector_end(tmp_lse);
+    current_vp->lss_pattern = tmp_lss;
+    current_vp->lse_pattern = tmp_lse;
 }
 
 /* About Rockbox' internal monochrome bitmap format:
@@ -613,8 +706,8 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     lcd_fastpixelfunc_type *fgfunc, *bgfunc;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
+    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) || 
+        (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
         return;
 
     /* clipping */
@@ -630,20 +723,20 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
         src_y -= y;
         y = 0;
     }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
+    if (x + width > current_vp->width)
+        width = current_vp->width - x;
+    if (y + height > current_vp->height)
+        height = current_vp->height - y;
 
     src += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     src_end = src + width;
 
-    dst = LCDADDR(x, y);
+    dst = LCDADDR(current_vp->x + x, current_vp->y + y);
     has_backdrop = (lcd_backdrop != NULL);
-    backdrop = lcd_backdrop + y * LCD_WIDTH + x;
-    fgfunc = lcd_fastpixelfuncs[drawmode];
-    bgfunc = lcd_fastpixelfuncs[drawmode ^ DRMODE_INVERSEVID];
+    backdrop = lcd_backdrop + (current_vp->y + y) * LCD_WIDTH + current_vp->x + x;
+    fgfunc = lcd_fastpixelfuncs[current_vp->drawmode];
+    bgfunc = lcd_fastpixelfuncs[current_vp->drawmode ^ DRMODE_INVERSEVID];
     do 
     {
         const unsigned char *src_col = src++;
@@ -654,23 +747,23 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
         dst_end = dst_col + height * LCD_WIDTH;
         do 
         {
-            switch (drawmode)
+            switch (current_vp->drawmode)
             {
                 case DRMODE_SOLID:
                     if (data & 0x01)
-                        *dst_col = fg_pattern;
+                        *dst_col = current_vp->fg_pattern;
                     else
-                        *dst_col = has_backdrop ? *backdrop_col : bg_pattern;
+                        *dst_col = has_backdrop ? *backdrop_col : current_vp->bg_pattern;
                     break;
                 case DRMODE_FG:
                     if (data & 0x01)
-                        *dst_col = fg_pattern;
+                        *dst_col = current_vp->fg_pattern;
                     break;
                 case (DRMODE_SOLID|DRMODE_INVERSEVID):
                     if (data & 0x01)
-                        *dst_col = has_backdrop ? *backdrop_col : bg_pattern;
+                        *dst_col = has_backdrop ? *backdrop_col : current_vp->bg_pattern;
                     else
-                        *dst_col = fg_pattern;
+                        *dst_col = current_vp->fg_pattern;
                     break;
                 default:
                     if (data & 0x01)
@@ -709,8 +802,8 @@ void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     fb_data *dst, *dst_end;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
+    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) || 
+        (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
         return;
 
     /* clipping */
@@ -726,13 +819,13 @@ void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
         src_y -= y;
         y = 0;
     }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
+    if (x + width > current_vp->width)
+        width = current_vp->width - x;
+    if (y + height > current_vp->height)
+        height = current_vp->height - y;
 
     src += stride * src_y + src_x; /* move starting point */
-    dst = LCDADDR(x, y);
+    dst = LCDADDR(current_vp->x + x, current_vp->y + y);
     dst_end = dst + height * LCD_WIDTH;
 
     do
@@ -763,8 +856,8 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
     fb_data *dst, *dst_end;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
+    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) || 
+        (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
         return;
 
     /* clipping */
@@ -780,13 +873,13 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
         src_y -= y;
         y = 0;
     }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
+    if (x + width > current_vp->width)
+        width = current_vp->width - x;
+    if (y + height > current_vp->height)
+        height = current_vp->height - y;
 
     src += stride * src_y + src_x; /* move starting point */
-    dst = LCDADDR(x, y);
+    dst = LCDADDR(current_vp->x + x, current_vp->y + y);
     dst_end = dst + height * LCD_WIDTH;
 
     do
@@ -795,7 +888,7 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
         for(i = 0;i < width;i++)
         {
             if (src[i] == REPLACEWITHFG_COLOR)
-                dst[i] = fg_pattern;
+                dst[i] = current_vp->fg_pattern;
             else if(src[i] != TRANSPARENT_COLOR)
                 dst[i] = src[i];
         }
@@ -818,11 +911,11 @@ static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
     unsigned short ch;
     unsigned short *ucs;
-    struct font* pf = font_get(curfont);
+    struct font* pf = font_get(current_vp->font);
 
     ucs = bidi_l2v(str, 1);
 
-    while ((ch = *ucs++) != 0 && x < LCD_WIDTH)
+    while ((ch = *ucs++) != 0 && x < current_vp->width)
     {
         int width;
         const unsigned char *bits;
@@ -875,51 +968,51 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str, int style,
                            int offset)
 {
     int xpos,ypos,w,h,xrect;
-    int lastmode = drawmode;
-    int oldfgcolor = fg_pattern;
-    int oldbgcolor = bg_pattern;
+    int lastmode = current_vp->drawmode;
+    int oldfgcolor = current_vp->fg_pattern;
+    int oldbgcolor = current_vp->bg_pattern;
 
     /* make sure scrolling is turned off on the line we are updating */
-    lcd_scroll_info.lines &= ~(1 << y);
+    lcd_scroll_stop_line(current_vp, y);
 
     if(!str || !str[0])
         return;
 
     lcd_getstringsize(str, &w, &h);
-    xpos = xmargin + x*w / utf8length(str);
-    ypos = ymargin + y*h;
-    drawmode = (style & STYLE_INVERT) ?
+    xpos = current_vp->xmargin + x*w / utf8length(str);
+    ypos = current_vp->ymargin + y*h;
+    current_vp->drawmode = (style & STYLE_INVERT) ?
                (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     if (style & STYLE_COLORED) {
-        if (drawmode == DRMODE_SOLID)
-            fg_pattern = style & STYLE_COLOR_MASK;
+        if (current_vp->drawmode == DRMODE_SOLID)
+            current_vp->fg_pattern = style & STYLE_COLOR_MASK;
         else
-            bg_pattern = style & STYLE_COLOR_MASK;
+            current_vp->bg_pattern = style & STYLE_COLOR_MASK;
     }
-    drawmode ^= DRMODE_INVERSEVID;
+    current_vp->drawmode ^= DRMODE_INVERSEVID;
     xrect = xpos + MAX(w - offset, 0);
 
     if (style & STYLE_GRADIENT) {
-        drawmode = DRMODE_FG;
+        current_vp->drawmode = DRMODE_FG;
         if (CURLN_UNPACK(style) == 0)
-            lcd_gradient_rect(xpos, LCD_WIDTH, ypos, h*NUMLN_UNPACK(style));
-        fg_pattern = lst_pattern;
+            lcd_gradient_rect(xpos, current_vp->width, ypos, h*NUMLN_UNPACK(style));
+        current_vp->fg_pattern = current_vp->lst_pattern;
     }
     else if (style & STYLE_COLORBAR) {
-        drawmode = DRMODE_FG;
-        fg_pattern = lss_pattern;
-        lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, h);
-        fg_pattern = lst_pattern;
+        current_vp->drawmode = DRMODE_FG;
+        current_vp->fg_pattern = current_vp->lss_pattern;
+        lcd_fillrect(xpos, ypos, current_vp->width - xpos, h);
+        current_vp->fg_pattern = current_vp->lst_pattern;
     }
     else {
-        lcd_fillrect(xrect, ypos, LCD_WIDTH - xrect, h);
-        drawmode = (style & STYLE_INVERT) ?
+        lcd_fillrect(xrect, ypos, current_vp->width - xrect, h);
+        current_vp->drawmode = (style & STYLE_INVERT) ?
         (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     }
     lcd_putsxyofs(xpos, ypos, offset, str);
-    drawmode = lastmode;
-    fg_pattern = oldfgcolor;
-    bg_pattern = oldbgcolor;
+    current_vp->drawmode = lastmode;
+    current_vp->fg_pattern = oldfgcolor;
+    current_vp->bg_pattern = oldbgcolor;
 }
 
 /*** scrolling ***/
@@ -938,15 +1031,23 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string, int offse
      lcd_puts_scroll_style_offset(x, y, string, STYLE_DEFAULT, offset);
 }
 
+/* Initialise a scrolling line at (x,y) in current viewport */
+
 void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
                                          int style, int offset)
 {
     struct scrollinfo* s;
     int w, h;
 
-    if(y>=LCD_SCROLLABLE_LINES) return;
+    if ((unsigned)y >= (unsigned)current_vp->height)
+        return;
 
-    s = &lcd_scroll_info.scroll[y];
+    /* remove any previously scrolling line at the same location */
+    lcd_scroll_stop_line(current_vp, y);
+
+    if (lcd_scroll_info.lines >= LCD_SCROLLABLE_LINES) return;
+
+    s = &lcd_scroll_info.scroll[lcd_scroll_info.lines];
 
     s->start_tick = current_tick + lcd_scroll_info.delay;
     s->style = style;
@@ -954,7 +1055,7 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
 
     lcd_getstringsize(string, &w, &h);
 
-    if (LCD_WIDTH - x * 8 - xmargin < w) {
+    if (current_vp->width - x * 8 - current_vp->xmargin < w) {
         /* prepare scroll line */
         char *end;
 
@@ -967,7 +1068,7 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         /* scroll bidirectional or forward only depending on the string
            width */
         if ( lcd_scroll_info.bidir_limit ) {
-            s->bidir = s->width < (LCD_WIDTH - xmargin) *
+            s->bidir = s->width < (current_vp->width - current_vp->xmargin) *
                 (100 + lcd_scroll_info.bidir_limit) / 100;
         }
         else
@@ -980,17 +1081,16 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         }
 
         end = strchr(s->line, '\0');
-        strncpy(end, string, LCD_WIDTH/2);
+        strncpy(end, string, current_vp->width/2);
 
+        s->vp = current_vp;
+        s->y = y;
         s->len = utf8length(string);
         s->offset = offset;
-        s->startx = xmargin + x * s->width / s->len;
+        s->startx = current_vp->xmargin + x * s->width / s->len;
         s->backward = false;
-        lcd_scroll_info.lines |= (1<<y);
+        lcd_scroll_info.lines++;
     }
-    else
-        /* force a bit switch-off since it doesn't scroll */
-        lcd_scroll_info.lines &= ~(1<<y);
 }
 
 void lcd_scroll_fn(void)
@@ -1000,28 +1100,29 @@ void lcd_scroll_fn(void)
     int index;
     int xpos, ypos;
     int lastmode;
-    unsigned old_fgcolor = fg_pattern;
-    unsigned old_bgcolor = bg_pattern;
+    unsigned old_fgcolor;
+    unsigned old_bgcolor;
+    struct viewport* old_vp = current_vp;
 
-    for ( index = 0; index < LCD_SCROLLABLE_LINES; index++ ) {
-        /* really scroll? */
-        if ((lcd_scroll_info.lines & (1 << index)) == 0)
-            continue;
-
+    for ( index = 0; index < lcd_scroll_info.lines; index++ ) {
         s = &lcd_scroll_info.scroll[index];
 
         /* check pause */
         if (TIME_BEFORE(current_tick, s->start_tick))
             continue;
 
+        lcd_set_viewport(s->vp);
+        old_fgcolor = current_vp->fg_pattern;
+        old_bgcolor = current_vp->bg_pattern;
+
         if (s->style&STYLE_COLORED) {
             if (s->style&STYLE_MODE_MASK) {
-                fg_pattern = old_fgcolor;
-                bg_pattern = s->style&STYLE_COLOR_MASK;
+                current_vp->fg_pattern = old_fgcolor;
+                current_vp->bg_pattern = s->style&STYLE_COLOR_MASK;
             }
             else {
-                fg_pattern = s->style&STYLE_COLOR_MASK;
-                bg_pattern = old_bgcolor;
+                current_vp->fg_pattern = s->style&STYLE_COLOR_MASK;
+                current_vp->bg_pattern = old_bgcolor;
             }
         }
 
@@ -1030,9 +1131,9 @@ void lcd_scroll_fn(void)
         else
             s->offset += lcd_scroll_info.step;
 
-        pf = font_get(curfont);
+        pf = font_get(current_vp->font);
         xpos = s->startx;
-        ypos = ymargin + index * pf->height;
+        ypos = current_vp->ymargin + s->y * pf->height;
 
         if (s->bidir) { /* scroll bidirectional */
             if (s->offset <= 0) {
@@ -1041,9 +1142,9 @@ void lcd_scroll_fn(void)
                 s->backward = false;
                 s->start_tick = current_tick + lcd_scroll_info.delay * 2;
             }
-            if (s->offset >= s->width - (LCD_WIDTH - xpos)) {
+            if (s->offset >= s->width - (current_vp->width - xpos)) {
                 /* at end of line */
-                s->offset = s->width - (LCD_WIDTH - xpos);
+                s->offset = s->width - (current_vp->width - xpos);
                 s->backward = true;
                 s->start_tick = current_tick + lcd_scroll_info.delay * 2;
             }
@@ -1054,35 +1155,36 @@ void lcd_scroll_fn(void)
                 s->offset %= s->width;
         }
 
-        lastmode = drawmode;
+        lastmode = current_vp->drawmode;
         switch (s->style&STYLE_MODE_MASK) {
             case STYLE_INVERT:
-                drawmode = DRMODE_SOLID|DRMODE_INVERSEVID;
+                current_vp->drawmode = DRMODE_SOLID|DRMODE_INVERSEVID;
                 break;
             case STYLE_COLORBAR:
                 /* Solid colour line selector */
-                drawmode = DRMODE_FG;
-                fg_pattern = lss_pattern;
-                lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
-                fg_pattern = lst_pattern;
+                current_vp->drawmode = DRMODE_FG;
+                current_vp->fg_pattern = current_vp->lss_pattern;
+                lcd_fillrect(xpos, ypos, current_vp->width - xpos, pf->height);
+                current_vp->fg_pattern = current_vp->lst_pattern;
                 break;
             case STYLE_GRADIENT:
                 /* Gradient line selector */
-                drawmode = DRMODE_FG;
-                lcd_gradient_rect_scroll(xpos, LCD_WIDTH, ypos, (signed)pf->height,
+                current_vp->drawmode = DRMODE_FG;
+                lcd_gradient_rect_scroll(xpos, current_vp->width, ypos, (signed)pf->height,
                                          NUMLN_UNPACK(s->style),
                                          CURLN_UNPACK(s->style));
-                fg_pattern = lst_pattern;
+                current_vp->fg_pattern = current_vp->lst_pattern;
                 break;
             default:
-                drawmode = DRMODE_SOLID;
+                current_vp->drawmode = DRMODE_SOLID;
                 break;
         }
         lcd_putsxyofs(xpos, ypos, s->offset, s->line);
-        drawmode = lastmode;
-        lcd_update_rect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
+        current_vp->drawmode = lastmode;
+        current_vp->fg_pattern = old_fgcolor;
+        current_vp->bg_pattern = old_bgcolor;
+        lcd_update_viewport_rect(xpos, ypos, current_vp->width - xpos, pf->height);
     }
 
-    fg_pattern = old_fgcolor;
-    bg_pattern = old_bgcolor;
+    lcd_set_viewport(old_vp);
 }

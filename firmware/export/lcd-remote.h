@@ -24,6 +24,7 @@
 #include "cpu.h"
 #include "config.h"
 #include "adc.h"
+#include "lcd.h"
 
 #ifdef HAVE_REMOTE_LCD
 
@@ -109,7 +110,9 @@ extern void lcd_remote_init(void);
 extern int  lcd_remote_default_contrast(void);
 extern void lcd_remote_set_contrast(int val);
 
+extern void lcd_remote_set_viewport(struct viewport* vp);
 extern void lcd_remote_clear_display(void);
+extern void lcd_remote_clear_viewport(void);
 extern void lcd_remote_puts(int x, int y, const unsigned char *str);
 extern void lcd_remote_puts_style(int x, int y, const unsigned char *str,
                                   int style);
@@ -132,6 +135,8 @@ extern void lcd_remote_puts_scroll_style_offset(int x, int y,
 
 extern void lcd_remote_update(void);
 extern void lcd_remote_update_rect(int x, int y, int width, int height);
+extern void lcd_remote_update_viewport(void);
+extern void lcd_remote_update_viewport_rect(int x, int y, int width, int height);
 
 extern void lcd_remote_set_invert_display(bool yesno);
 extern void lcd_remote_set_flip(bool yesno);
@@ -141,6 +146,8 @@ extern int  lcd_remote_get_drawmode(void);
 extern void lcd_remote_setmargins(int xmargin, int ymargin);
 extern int  lcd_remote_getxmargin(void);
 extern int  lcd_remote_getymargin(void);
+extern int  lcd_remote_getwidth(void);
+extern int  lcd_remote_getheight(void);
 extern void lcd_remote_setfont(int font);
 extern int  lcd_remote_getstringsize(const unsigned char *str, int *w, int *h);
 

@@ -24,6 +24,28 @@
 #include "cpu.h"
 #include "config.h"
 
+struct viewport {
+    int x;
+    int y;
+    int width;
+    int height;
+#ifdef HAVE_LCD_BITMAP
+    int font;
+    int drawmode;
+#endif
+    int xmargin;  /* During the transition only - to be removed */
+    int ymargin;  /* During the transition only - to be removed */
+#if LCD_DEPTH > 1
+    unsigned fg_pattern;
+    unsigned bg_pattern;
+#ifdef HAVE_LCD_COLOR
+    unsigned lss_pattern;
+    unsigned lse_pattern;
+    unsigned lst_pattern;
+#endif
+#endif
+};
+
 #define STYLE_DEFAULT    0x00000000
 #define STYLE_COLORED    0x10000000
 #define STYLE_INVERT     0x20000000
@@ -76,9 +98,14 @@ extern void lcd_set_contrast(int val);
 extern void lcd_setmargins(int xmargin, int ymargin);
 extern int  lcd_getxmargin(void);
 extern int  lcd_getymargin(void);
+extern int  lcd_getwidth(void);
+extern int  lcd_getheight(void);
 extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 
+extern void lcd_set_viewport(struct viewport* vp);
 extern void lcd_update(void);
+extern void lcd_update_viewport(void);
+extern void lcd_clear_viewport(void);
 extern void lcd_clear_display(void);
 extern void lcd_putsxy(int x, int y, const unsigned char *string);
 extern void lcd_puts(int x, int y, const unsigned char *string);
@@ -119,6 +146,7 @@ extern void lcd_blit(const fb_data* data, int x, int by, int width,
 
 /* update a fraction of the screen */
 extern void lcd_update_rect(int x, int y, int width, int height);
+extern void lcd_update_viewport_rect(int x, int y, int width, int height);
 
 #ifdef HAVE_REMOTE_LCD
 extern void lcd_remote_update(void);

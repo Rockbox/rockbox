@@ -52,8 +52,17 @@ static unsigned char xfont_variable[VARIABLE_XCHARS][HW_PATTERN_SIZE];
 static bool xfont_variable_locked[VARIABLE_XCHARS];
 static int xspace; /* stores xhcar id of ' ' - often needed */
 
-static int xmargin = 0;
-static int ymargin = 0;
+static struct viewport default_vp =
+  {
+    .x        = 0,
+    .y        = 0,
+    .width    = LCD_WIDTH,
+    .height   = LCD_HEIGHT,
+    .xmargin  = 0,
+    .ymargin  = 0,
+  };
+
+static struct viewport* current_vp = &default_vp;
 
 /* LCD init */
 void lcd_init (void)
@@ -66,22 +75,47 @@ void lcd_init (void)
     scroll_init();
 }
 
+/* Viewports */
+
+void lcd_set_viewport(struct viewport* vp)
+{
+    if (vp == NULL)
+        current_vp = &default_vp;
+    else
+        current_vp = vp;
+}
+
+void lcd_update_viewport(void)
+{
+    lcd_update();
+}
+
 /** parameter handling **/
 
 void lcd_setmargins(int x, int y)
 {
-    xmargin = x;
-    ymargin = y;
+    current_vp->xmargin = x;
+    current_vp->ymargin = y;
 }
 
 int lcd_getxmargin(void)
 {
-    return xmargin;
+    return current_vp->xmargin;
 }
 
 int lcd_getymargin(void)
 {
-    return ymargin;
+    return current_vp->ymargin;
+}
+
+int lcd_getwidth(void)
+{
+    return current_vp->width;
+}
+
+int lcd_getheight(void)
+{
+    return current_vp->height;
 }
 
 int lcd_getstringsize(const unsigned char *str, int *w, int *h)
@@ -225,7 +259,13 @@ static int map_xchar(int xchar, unsigned char *substitute)
 
 static void lcd_putxchar(int x, int y, int xchar)
 {
-    int lcd_char = lcd_charbuffer[y][x];
+    int lcd_char;
+
+    /* Adjust for viewport */
+    x += current_vp->x;
+    y += current_vp->y;
+
+    lcd_char  = lcd_charbuffer[y][x];
 
     if (lcd_char < lcd_pattern_count)        /* old char was soft */
         lcd_patterns[lcd_char].count--;      /* decrease old reference count */
@@ -283,19 +323,55 @@ void lcd_define_pattern(unsigned long ucs, const char *pattern)
 void lcd_clear_display(void)
 {
     int x, y;
+    struct viewport* old_vp = current_vp;
 
-    lcd_stop_scroll();
+    lcd_scroll_info.lines = 0;
     lcd_remove_cursor();
+
+    /* Set the default viewport - required for lcd_putxchar */
+    current_vp = &default_vp;
 
     for (x = 0; x < LCD_WIDTH; x++)
         for (y = 0; y < LCD_HEIGHT; y++)
             lcd_putxchar(x, y, xspace);
+
+    current_vp = old_vp;
+}
+
+/* Clear the current viewport */
+void lcd_clear_viewport(void)
+{
+    int x, y;
+
+    if (current_vp == &default_vp)
+    {
+        lcd_clear_display();
+    }
+    else
+    {
+        /* Remove the cursor if it is within the current viewport */
+        if (lcd_cursor.enabled &&
+            (lcd_cursor.x >= current_vp->x) && 
+            (lcd_cursor.x <= current_vp->x + current_vp->width) &&
+            (lcd_cursor.y >= current_vp->y) && 
+            (lcd_cursor.y <= current_vp->y + current_vp->height))
+        {
+            lcd_remove_cursor();
+        }
+
+        for (x = 0; x < current_vp->width; x++)
+            for (y = 0; y < current_vp->height; y++)
+                lcd_putxchar(x, y, xspace);
+
+        lcd_scroll_stop(current_vp);
+    }
 }
 
 /* Put an unicode character at the given position */
 void lcd_putc(int x, int y, unsigned long ucs)
 {
-    if ((unsigned)x >= LCD_WIDTH || (unsigned)y >= LCD_HEIGHT)
+    if ((unsigned)x >= (unsigned)current_vp->width || 
+        (unsigned)y >= (unsigned)current_vp->height)
         return;
 
     lcd_putxchar(x, y, find_xchar(ucs));
@@ -304,15 +380,16 @@ void lcd_putc(int x, int y, unsigned long ucs)
 /* Show cursor (alternating with existing character) at the given position */
 void lcd_put_cursor(int x, int y, unsigned long cursor_ucs)
 {
-    if ((unsigned)x >= LCD_WIDTH || (unsigned)y >= LCD_HEIGHT
-        || lcd_cursor.enabled)
+    if ((unsigned)x >= (unsigned)current_vp->width || 
+        (unsigned)y >= (unsigned)current_vp->height ||
+        lcd_cursor.enabled)
         return;
 
     lcd_cursor.enabled = true;
     lcd_cursor.visible = false;
     lcd_cursor.hw_char = map_xchar(find_xchar(cursor_ucs), &lcd_cursor.subst_char);
-    lcd_cursor.x = x;
-    lcd_cursor.y = y;
+    lcd_cursor.x = current_vp->x + x;
+    lcd_cursor.y = current_vp->y + y;
     lcd_cursor.downcount = 0;
     lcd_cursor.divider = MAX((HZ/2) / lcd_scroll_info.ticks, 1);
 }
@@ -335,7 +412,7 @@ static int lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
     unsigned short ucs;
     const unsigned char *utf8 = str;
 
-    while (*utf8 && x < LCD_WIDTH)
+    while (*utf8 && x < current_vp->width)
     {
         utf8 = utf8decode(utf8, &ucs);
         
@@ -352,7 +429,7 @@ static int lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 /* Put a string at a given position */
 void lcd_putsxy(int x, int y, const unsigned char *str)
 {
-    if ((unsigned)y >= LCD_HEIGHT)
+    if ((unsigned)y >= (unsigned)current_vp->height)
         return;
 
     lcd_putsxyofs(x, y, 0, str);
@@ -369,17 +446,14 @@ void lcd_puts(int x, int y, const unsigned char *str)
 /* Put a string at a given char position,  skipping first offset chars */
 void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)
 {
-    x += xmargin;
-    y += ymargin;
-
-    if ((unsigned)y >= LCD_HEIGHT)
+    if ((unsigned)y >= (unsigned)current_vp->height)
         return;
 
     /* make sure scrolling is turned off on the line we are updating */
-    lcd_scroll_info.lines &= ~(1 << y);
+    lcd_scroll_stop_line(current_vp, y);
 
     x = lcd_putsxyofs(x, y, offset, str);
-    while (x < LCD_WIDTH)
+    while (x < current_vp->width)
         lcd_putxchar(x++, y, xspace);
 }
 
@@ -395,16 +469,22 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
     struct scrollinfo* s;
     int len;
 
-    if(y>=LCD_SCROLLABLE_LINES) return;
+    if ((unsigned)y >= (unsigned)current_vp->height)
+        return;
 
-    s = &lcd_scroll_info.scroll[y];
+    /* remove any previously scrolling line at the same location */
+    lcd_scroll_stop_line(current_vp, y);
+
+    if (lcd_scroll_info.lines >= LCD_SCROLLABLE_LINES) return;
+
+    s = &lcd_scroll_info.scroll[lcd_scroll_info.lines];
 
     s->start_tick = current_tick + lcd_scroll_info.delay;
 
     lcd_puts_offset(x, y, string, offset);
     len = utf8length(string);
 
-    if (LCD_WIDTH - x - xmargin < len) 
+    if (current_vp->width - x - current_vp->xmargin < len) 
     {
         /* prepare scroll line */
         char *end;
@@ -418,7 +498,7 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
         /* scroll bidirectional or forward only depending on the string width */
         if (lcd_scroll_info.bidir_limit)
         {
-            s->bidir = s->len < (LCD_WIDTH - xmargin) *
+            s->bidir = s->len < (current_vp->width - current_vp->xmargin) *
                 (100 + lcd_scroll_info.bidir_limit) / 100;
         }
         else
@@ -432,16 +512,15 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
         }
 
         end = strchr(s->line, '\0');
-        strncpy(end, string, utf8seek(s->line, LCD_WIDTH));
+        strncpy(end, string, utf8seek(s->line, current_vp->width));
 
+        s->vp = current_vp;
+        s->y = y;
         s->offset = offset;
-        s->startx = xmargin + x;
+        s->startx = current_vp->xmargin + x;
         s->backward = false;
-        lcd_scroll_info.lines |= (1<<y);
+        lcd_scroll_info.lines++;
     }
-    else
-        /* force a bit switch-off since it doesn't scroll */
-        lcd_scroll_info.lines &= ~(1<<y);
 }
 
 void lcd_scroll_fn(void)
@@ -450,19 +529,17 @@ void lcd_scroll_fn(void)
     int index;
     int xpos, ypos;
     bool update;
+    struct viewport* old_vp = current_vp;
 
     update = false;
-    for (index = 0; index < LCD_SCROLLABLE_LINES; index++)
-    {
-        /* really scroll? */
-        if ((lcd_scroll_info.lines & (1 << index)) == 0)
-            continue;
-
+    for ( index = 0; index < lcd_scroll_info.lines; index++ ) {
         s = &lcd_scroll_info.scroll[index];
 
         /* check pause */
         if (TIME_BEFORE(current_tick, s->start_tick))
             continue;
+
+        lcd_set_viewport(s->vp);
 
         if (s->backward)
             s->offset--;
@@ -470,7 +547,7 @@ void lcd_scroll_fn(void)
             s->offset++;
 
         xpos = s->startx;
-        ypos = ymargin + index;
+        ypos = current_vp->ymargin + s->y;
 
         if (s->bidir)  /* scroll bidirectional */
         {
@@ -480,9 +557,9 @@ void lcd_scroll_fn(void)
                 s->backward = false;
                 s->start_tick = current_tick + lcd_scroll_info.delay * 2;
             }
-            if (s->offset >= s->len - (LCD_WIDTH - xpos)) {
+            if (s->offset >= s->len - (current_vp->width - xpos)) {
                 /* at end of line */
-                s->offset = s->len - (LCD_WIDTH - xpos);
+                s->offset = s->len - (current_vp->width - xpos);
                 s->backward = true;
                 s->start_tick = current_tick + lcd_scroll_info.delay * 2;
             }
@@ -496,6 +573,8 @@ void lcd_scroll_fn(void)
         lcd_putsxyofs(xpos, ypos, s->offset, s->line);
         update = true;
     }
+
+    lcd_set_viewport(old_vp);
 
     if (lcd_cursor.enabled)
     {

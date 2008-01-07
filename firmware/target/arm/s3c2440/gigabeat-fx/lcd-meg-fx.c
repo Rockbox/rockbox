@@ -11,10 +11,9 @@ static volatile bool lcd_on = true;
 volatile bool lcd_poweroff = false;
 static unsigned lcd_yuv_options = 0;
 /*
-** These are imported from lcd-16bit.c
+** This is imported from lcd-16bit.c
 */
-extern unsigned fg_pattern;
-extern unsigned bg_pattern;
+extern struct viewport* current_vp;
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
    single transfer mode with width = num pixels, and height = 1 which
@@ -245,7 +244,7 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
           [dstp]"r"(LCD_WIDTH - width),
           [transcolor]"r"(TRANSPARENT_COLOR),
           [fgcolor]"r"(REPLACEWITHFG_COLOR),
-          [fgpat]"r"(fg_pattern)
+          [fgpat]"r"(current_vp->fg_pattern)
     );
 }
 
