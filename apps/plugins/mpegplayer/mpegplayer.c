@@ -217,23 +217,26 @@ enum wvs_status_enum
 
 enum wvs_bits
 {
-    WVS_REFRESH_DEFAULT    = 0x0000,
-    WVS_REFRESH_VOLUME     = 0x0001,
-    WVS_REFRESH_TIME       = 0x0002,
-    WVS_REFRESH_STATUS     = 0x0004,
-    WVS_REFRESH_BACKGROUND = 0x0008,
-    WVS_REFRESH_VIDEO      = 0x0010,
-    WVS_REFRESH_RESUME     = 0x0020,
-    WVS_NODRAW             = 0x8000,
-    WVS_SHOW               = 0x4000,
-    WVS_HIDE               = 0x0000,
-    WVS_REFRESH_ALL        = 0x001f,
+    WVS_REFRESH_DEFAULT    = 0x0000, /* Only refresh elements when due */
+                                     /* Refresh the... */
+    WVS_REFRESH_VOLUME     = 0x0001, /* ...volume display */
+    WVS_REFRESH_TIME       = 0x0002, /* ...time display+progress */
+    WVS_REFRESH_STATUS     = 0x0004, /* ...playback status icon */
+    WVS_REFRESH_BACKGROUND = 0x0008, /* ...background (implies ALL) */
+    WVS_REFRESH_VIDEO      = 0x0010, /* ...video image upon timeout */
+    WVS_REFRESH_RESUME     = 0x0020, /* Resume playback upon timeout */
+    WVS_NODRAW             = 0x8000, /* OR bitflag - don't draw anything */
+    WVS_SHOW               = 0x4000, /* OR bitflag - show the WVS */
+    WVS_HIDE               = 0x0000, /* hide the WVS (aid readability) */
+    WVS_REFRESH_ALL        = 0x000f, /* Only immediate graphical elements */
 };
 
+/* Status icons selected according to font height */
 extern const unsigned char mpegplayer_status_icons_8x8x1[];
 extern const unsigned char mpegplayer_status_icons_12x12x1[];
 extern const unsigned char mpegplayer_status_icons_16x16x1[];
 
+/* Main border areas that contain WVS elements */
 #define WVS_BDR_L 2
 #define WVS_BDR_T 2
 #define WVS_BDR_R 2
@@ -287,6 +290,7 @@ static void wvs_show(unsigned show);
 #endif
 
 #ifdef HAVE_LCD_COLOR
+/* Blend two colors in 0-100% (0-255) mix of c2 into c1 */
 static unsigned draw_blendcolor(unsigned c1, unsigned c2, unsigned char amount)
 {
     int r1 = RGB_UNPACK_RED(c1);
@@ -303,6 +307,9 @@ static unsigned draw_blendcolor(unsigned c1, unsigned c2, unsigned char amount)
 }
 #endif
 
+/* Drawing functions that operate rotated on LCD_PORTRAIT displays -
+ * most are just wrappers of lcd_* functions with transforms applied.
+ * The origin is the upper-left corner of the WVS area */
 #ifdef HAVE_LCD_COLOR
 static void draw_update_rect(int x, int y, int width, int height)
 {
@@ -368,7 +375,8 @@ static void draw_hline(int x1, int x2, int y)
 #ifdef LCD_PORTRAIT
 /* Portrait displays need rotated text rendering */
 
-/* Limited function that only renders in DRMODE_FG */
+/* Limited function that only renders in DRMODE_FG and uses absolute screen
+ * coordinates */
 static void draw_oriented_mono_bitmap_part(const unsigned char *src,
                                            int src_x, int src_y,
                                            int stride, int x, int y,
@@ -609,6 +617,7 @@ static void wvs_cancel_refresh(unsigned refresh)
     wvs.auto_refresh &= ~refresh;
 }
 
+/* Refresh the background area */
 static void wvs_refresh_background(void)
 {
     char buf[32];
@@ -618,6 +627,7 @@ static void wvs_refresh_background(void)
     rb->lcd_set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
 
 #ifdef HAVE_LCD_COLOR
+    /* Draw a "raised" area for our graphics */
     rb->lcd_set_background(draw_blendcolor(bg, LCD_WHITE, 192));
     draw_hline(0, wvs.width, 0);
 
@@ -635,6 +645,7 @@ static void wvs_refresh_background(void)
 
     vo_rect_set_ext(&wvs.update_rect, 0, 0, wvs.width, wvs.height);
 #else
+    /* Give contrast with the main background */
     rb->lcd_set_background(LCD_DARKGRAY);
     draw_hline(0, wvs.width, 0);
 
@@ -645,13 +656,15 @@ static void wvs_refresh_background(void)
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     if (stream_get_duration() != INVALID_TIMESTAMP) {
-        /* Don't know the duration */
+        /* Draw the movie duration */
         ts_to_hms(stream_get_duration(), &hms);
         hms_format(buf, sizeof (buf), &hms);
         draw_putsxy_oriented(wvs.dur_rect.l, wvs.dur_rect.t, buf);
     }
+    /* else don't know the duration */
 }
 
+/* Refresh the current time display + the progress bar */
 static void wvs_refresh_time(void)
 {
     char buf[32];
@@ -676,6 +689,7 @@ static void wvs_refresh_time(void)
 #endif
 }
 
+/* Refresh the volume display area */
 static void wvs_refresh_volume(void)
 {
     char buf[32];
@@ -696,6 +710,7 @@ static void wvs_refresh_volume(void)
 #endif
 }
 
+/* Refresh the status icon */
 static void wvs_refresh_status(void)
 {
     int icon_size = wvs.stat_rect.r - wvs.stat_rect.l;
@@ -738,6 +753,7 @@ static void wvs_refresh_status(void)
 #endif
 }
 
+/* Update the current status which determines which icon is displayed */
 static bool wvs_update_status(void)
 {
     int status;
@@ -748,6 +764,7 @@ static bool wvs_update_status(void)
         status = WVS_STATUS_STOPPED;
         break;
     case STREAM_PAUSED:
+        /* If paused with a pending resume, coerce it to WVS_STATUS_PLAYING */
         status = (wvs.auto_refresh & WVS_REFRESH_RESUME) ?
             WVS_STATUS_PLAYING : WVS_STATUS_PAUSED;
         break;
@@ -757,6 +774,7 @@ static bool wvs_update_status(void)
     }
 
     if (status != wvs.status) {
+        /* A refresh is needed */
         wvs.status = status;
         return true;
     }
@@ -764,6 +782,7 @@ static bool wvs_update_status(void)
     return false;
 }
 
+/* Update the current time that will be displayed */
 static void wvs_update_time(void)
 {
     uint32_t start;
@@ -771,6 +790,7 @@ static void wvs_update_time(void)
     wvs.curr_time -= start;
 }
 
+/* Refresh various parts of the WVS - showing it if it is hidden */
 static void wvs_refresh(int hint)
 {
     long tick;
@@ -779,37 +799,48 @@ static void wvs_refresh(int hint)
     tick = *rb->current_tick;
 
     if (hint == WVS_REFRESH_DEFAULT) {
+        /* The default which forces no updates */
 
+        /* Redraw the current or possibly extract a new video frame */
         if ((wvs.auto_refresh & WVS_REFRESH_VIDEO) &&
             TIME_AFTER(tick, wvs.print_tick)) {
             wvs.auto_refresh &= ~WVS_REFRESH_VIDEO;
             stream_draw_frame(false);
         }
 
+        /* Restart playback if the timout was reached */
         if ((wvs.auto_refresh & WVS_REFRESH_RESUME) &&
             TIME_AFTER(tick, wvs.resume_tick)) {
             wvs.auto_refresh &= ~(WVS_REFRESH_RESUME | WVS_REFRESH_VIDEO);
             stream_resume();
         }
 
+        /* If not visible, return */
         if (!(wvs.flags & WVS_SHOW))
             return;
 
+        /* Hide if the visibility duration was reached */
         if (TIME_AFTER(tick, wvs.hide_tick)) {
             wvs_show(WVS_HIDE);
             return;
         }
     } else {
+        /* A forced update of some region */
+
+        /* Show if currently invisible */
         if (!(wvs.flags & WVS_SHOW)) {
+            /* Avoid call back into this function - it will be drawn */
             wvs_show(WVS_SHOW | WVS_NODRAW);
             hint = WVS_REFRESH_ALL;
         }
 
+        /* Move back timeouts for frame print and hide */
         wvs.print_tick = tick + wvs.print_delay;
         wvs.hide_tick = tick + wvs.show_for;
     }
 
     if (TIME_AFTER(tick, wvs.next_auto_refresh)) {
+        /* Refresh whatever graphical elements are due automatically */
         wvs.next_auto_refresh = tick + WVS_MIN_UPDATE_INTERVAL;
 
         if (wvs.auto_refresh & WVS_REFRESH_STATUS) {
@@ -824,8 +855,10 @@ static void wvs_refresh(int hint)
     }
 
     if (hint == 0)
-        return;
+        return; /* No drawing needed */
 
+    /* Set basic drawing params that are used. Elements that perform variations
+     * will restore them. */
     oldfg = rb->lcd_get_foreground();
     oldbg = rb->lcd_get_background();
 
@@ -854,11 +887,13 @@ static void wvs_refresh(int hint)
         wvs_refresh_status();
     }
 
+    /* Go back to defaults */
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_set_foreground(oldfg);
     rb->lcd_set_background(oldbg);
 
 #ifdef HAVE_LCD_COLOR
+    /* Update the dirty rectangle */
     vo_lock();
 
     draw_update_rect(wvs.update_rect.l,
@@ -868,16 +903,19 @@ static void wvs_refresh(int hint)
 
     vo_unlock();
 #else
+    /* Defer update to greylib */
     grey_deferred_lcd_update();
 #endif
 }
 
+/* Show/Hide the WVS */
 static void wvs_show(unsigned show)
 {
     if (((show ^ wvs.flags) & WVS_SHOW) == 0)
         return;
 
     if (show & WVS_SHOW) {
+        /* Clip away the part of video that is covered */
         struct vo_rect rc = { 0, 0, SCREEN_WIDTH, wvs.y };
 
         wvs.flags |= WVS_SHOW;
@@ -887,6 +925,7 @@ static void wvs_show(unsigned show)
         if (!(show & WVS_NODRAW))
             wvs_refresh(WVS_REFRESH_ALL);
     } else {
+        /* Uncover clipped video area and redraw it */
         wvs.flags &= ~WVS_SHOW;
 
         stream_vo_set_clip(NULL);
@@ -904,6 +943,7 @@ static void wvs_show(unsigned show)
     }
 }
 
+/* Set the current status - update screen if specified */
 static void wvs_set_status(int status)
 {
     bool draw = (status & WVS_NODRAW) == 0;
@@ -1035,6 +1075,7 @@ static int wvs_status(void)
     return status;
 }
 
+/* Change the current audio volume by a specified amount */
 static void wvs_set_volume(int delta)
 {
     int vol = rb->global_settings->volume;
@@ -1043,20 +1084,24 @@ static void wvs_set_volume(int delta)
     vol += delta;
 
     if (delta < 0) {
+        /* Volume down - clip to lower limit */
         limit = rb->sound_min(SOUND_VOLUME);
         if (vol < limit)
             vol = limit;
     } else {
+        /* Volume up - clip to upper limit */
         limit = rb->sound_max(SOUND_VOLUME);
         if (vol > limit)
             vol = limit;
     }
 
+    /* Sync the global settings */
     if (vol != rb->global_settings->volume) {
         rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
     }
 
+    /* Update the volume display */
     wvs_refresh(WVS_REFRESH_VOLUME);
 }
 
@@ -1079,6 +1124,7 @@ static int wvs_play(uint32_t time)
     return retval;
 }
 
+/* Halt playback - pause engine and return logical state */
 static int wvs_halt(void)
 {
     int status = stream_pause();
@@ -1089,18 +1135,20 @@ static int wvs_halt(void)
             status = STREAM_PLAYING;
     }
 
+    /* Cancel some auto refreshes - caller will restart them if desired */
     wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
 
     return status;
 }
 
+/* Pause playback if playing */
 static int wvs_pause(void)
 {
     unsigned refresh = wvs.auto_refresh;
     int status = wvs_halt();
 
     if (status == STREAM_PLAYING && (refresh & WVS_REFRESH_RESUME)) {
-        wvs_cancel_refresh(WVS_REFRESH_RESUME);
+        /* Resume pending - change to a still video frame update */
         wvs_schedule_refresh(WVS_REFRESH_VIDEO);
     }
 
@@ -1109,13 +1157,17 @@ static int wvs_pause(void)
     return status;
 }
 
+/* Resume playback if halted or paused */
 static void wvs_resume(void)
 {
+    /* Cancel video and resume auto refresh - the resyc when starting playback
+     * will perform those tasks */
     wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
     wvs_set_status(WVS_STATUS_PLAYING);
     stream_resume();
 }
 
+/* Stop playback - remember the resume point if not already stopped */
 static void wvs_stop(void)
 {
     wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
@@ -1125,6 +1177,8 @@ static void wvs_stop(void)
         settings.resume_time = stream_get_resume_time();
 }
 
+/* Perform a seek if seeking is possible for this stream - if playing, a delay
+ * will be inserted before restarting in case the user decides to seek again */
 static void wvs_seek(int btn)
 {
     int status;
@@ -1134,6 +1188,7 @@ static void wvs_seek(int btn)
     if (!stream_can_seek())
         return;
 
+    /* Halt playback - not strictly nescessary but nice */
     status = wvs_halt();
 
     if (status == STREAM_STOPPED)
@@ -1146,8 +1201,10 @@ static void wvs_seek(int btn)
     else
         refresh = WVS_REFRESH_VIDEO;  /* refresh if paused */
 
+    /* Obtain a new playback point */
     time = wvs_ff_rw(btn, refresh);
 
+    /* Tell engine to resume at that time */
     stream_seek(time, SEEK_SET);
 }
 
