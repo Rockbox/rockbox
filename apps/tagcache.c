@@ -3464,11 +3464,14 @@ static bool delete_entry(long idx_id)
     }
     
     myidx.flag |= FLAG_DELETED;
-#ifdef HAVE_TC_RAMCACHE
-    if (tc_stat.ramcache)
-        hdr->indices[idx_id].flag |= FLAG_DELETED;
-#endif
-    
+    lseek(masterfd, -sizeof(struct index_entry), SEEK_CUR);
+    if (ecwrite(masterfd, &myidx, 1, index_entry_ec, tc_stat.econ)
+        != sizeof(struct index_entry))
+    {
+        logf("delete_entry(): write_error #1");
+        goto cleanup;
+    }
+
     /* Now check which tags are no longer in use (if any) */
     for (tag = 0; tag < TAG_COUNT; tag++)
         in_use[tag] = 0;
@@ -3573,7 +3576,7 @@ static bool delete_entry(long idx_id)
         /* Delete from ram. */
         if (tc_stat.ramcache && tag != tag_filename)
         {
-            struct tagfile_entry *tagentry = get_tag(&myidx, tag);
+            struct tagfile_entry *tagentry = (struct tagfile_entry *)&hdr->tags[tag][oldseek];
             tagentry->tag_data[0] = '\0';
         }
 #endif
@@ -3609,7 +3612,7 @@ static bool delete_entry(long idx_id)
     if (ecwrite(masterfd, &myidx, 1, index_entry_ec, tc_stat.econ)
         != sizeof(struct index_entry))
     {
-        logf("delete_entry(): write_error");
+        logf("delete_entry(): write_error #2");
         goto cleanup;
     }
     
