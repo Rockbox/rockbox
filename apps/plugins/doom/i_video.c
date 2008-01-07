@@ -537,7 +537,8 @@ void I_FinishUpdate (void)
         : /* clobbers */
         "d0", "d1"
    );
-#elif (CONFIG_LCD == LCD_X5) && !defined(SIMULATOR)
+#elif (CONFIG_LCD == LCD_X5) && !defined(SIMULATOR) \
+   && defined(CPU_COLDFIRE) /* protect from using it on e200 (sic!) */
     count = SCREENWIDTH*SCREENHEIGHT;
 
     /* ASM screen update (drops ~230 tics) */
