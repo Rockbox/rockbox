@@ -303,7 +303,7 @@ void pcmbuf_set_event_handler(void (*event_handler)(void))
 
 unsigned int pcmbuf_get_latency(void)
 {
-    /* Be careful how this calculation is rearranted, it's easy to overflow */
+    /* Be careful how this calculation is rearranged, it's easy to overflow */
     size_t bytes = pcmbuf_unplayed_bytes + pcm_get_bytes_waiting();
     return bytes / 4 / (NATIVE_FREQUENCY/1000);
 }
