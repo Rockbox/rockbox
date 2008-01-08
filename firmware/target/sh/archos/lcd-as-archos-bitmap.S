@@ -240,112 +240,111 @@ _lcd_grey_data:
      * this would significantly decrease performance. */
 
     mov.b   @r3, r0         /* r0 = PBDRL */
-    mov     r4, r8          /* copy start address */
+    mov     #0x80, r9       /* for phase modification - "or #imm,xx" only allows r0 */
     mov.b   @r4+, r6        /* fetch first pixel phase */
     or      #(LCD_DS|LCD_SD), r0    /* r0 |= LCD_DS|LCD_SD */
     and     #(~(LCD_CS|LCD_SC)), r0 /* r0 &= ~(LCD_CS|LCD_SC) */
     neg     r0, r2          /* r2 = 0 - r0 */
-    mov     #0x80, r9       /* for phase modification - "or #imm,xx" only allows r0 */
-    
+    mov     #-3, r0         /* offset for storing phase */
+
     /* loop exploits that SD is on bit 0 for recorders and Ondios */
 
 .greyloop:
     cmp/pz  r6              /* phase non-negative? */
-    mov.b   @r4+, r0        /* fetch pixel value */
+    mov.b   @r4+, r8        /* fetch pixel value */
     negc    r2, r1          /* T -> SD, SC low */
     mov.b   r1, @r3         /* set port */
     or      r9, r6          /* r6 -= (r6 >= 0) ? 128 : 0; */
     mov.b   @r4+, r7        /* fetch next pixel phase */
     add     #(LCD_SC), r1   /* rise SC */
     mov.b   r1, @r3         /* set port */
-    add     r6, r0          /* calculate new phase */
-    mov.b   r0, @r8         /* store phase */
+    add     r8, r6          /* calculate new phase */
+    mov.b   r6, @(r0,r4)    /* store phase */
 
     cmp/pz  r7
-    mov.b   @r4+, r0
+    mov.b   @r4+, r8
     negc    r2, r1
     mov.b   r1, @r3
     or      r9, r7
     mov.b   @r4+, r6
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r7, r0
-    mov.b   r0, @(2,r8)
+    add     r8, r7
+    mov.b   r7, @(r0,r4)
 
     cmp/pz  r6
-    mov.b   @r4+, r0
+    mov.b   @r4+, r8
     negc    r2, r1
     mov.b   r1, @r3
     or      r9, r6
     mov.b   @r4+, r7
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r6, r0
-    mov.b   r0, @(4,r8)
+    add     r8, r6
+    mov.b   r6, @(r0,r4)
 
     cmp/pz  r7
-    mov.b   @r4+, r0
+    mov.b   @r4+, r8
     negc    r2, r1
     mov.b   r1, @r3
     or      r9, r7
     mov.b   @r4+, r6
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r7, r0
-    mov.b   r0, @(6,r8)
+    add     r8, r7
+    mov.b   r7, @(r0,r4)
 
     cmp/pz  r6
-    mov.b   @r4+, r0
+    mov.b   @r4+, r8
     negc    r2, r1
     mov.b   r1, @r3
     or      r9, r6
     mov.b   @r4+, r7
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r6, r0
-    mov.b   r0, @(8,r8)
+    add     r8, r6
+    mov.b   r6, @(r0,r4)
 
     cmp/pz  r7
-    mov.b   @r4+, r0
+    mov.b   @r4+, r8
     negc    r2, r1
     mov.b   r1, @r3
     or      r9, r7
     mov.b   @r4+, r6
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r7, r0
-    mov.b   r0, @(10,r8)
+    add     r8, r7
+    mov.b   r7, @(r0,r4)
 
     cmp/pz  r6
-    mov.b   @r4+, r0
+    mov.b   @r4+, r8
     negc    r2, r1
     mov.b   r1, @r3
     or      r9, r6
     mov.b   @r4+, r7
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r6, r0
-    mov.b   r0, @(12,r8)
+    add     r8, r6
+    mov.b   r6, @(r0,r4)
 
     cmp/pz  r7
-    mov.b   @r4+, r0
+    mov.b   @r4+, r8
     negc    r2, r1
     mov.b   r1, @r3
     or      r9, r7
     mov.b   @r4+, r6
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r7, r0
-    mov.b   r0, @(14,r8)
+    add     r8, r7
+    mov.b   r7, @(r0,r4)
 
-    add     #16, r8         /* advance current block address */
     cmp/hi  r4, r5          /* some blocks left? */
     bt      .greyloop
 
-    mov.l   @r15+, r9       /* restore r9 */
     mov     #(LCD_CS|LCD_DS|LCD_SD|LCD_SC), r0
-    mov.l   @r15+, r8       /* restore r8 */
+    mov.l   @r15+, r9       /* restore r9 */
     or      r0, r1          /* restore port */
+    mov.l   @r15+, r8       /* restore r8 */
     rts
     mov.b   r1, @r3
 
