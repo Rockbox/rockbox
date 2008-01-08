@@ -1200,9 +1200,6 @@ static bool codec_load_next_track(void)
 
     prev_track_elapsed = curtrack_id3.elapsed;
 
-    if (ci.seek_time)
-        codec_seek_complete_callback();
-
 #ifdef AB_REPEAT_ENABLE
     ab_end_of_track_report();
 #endif
@@ -1253,11 +1250,6 @@ static bool codec_request_next_track_callback(void)
 
     if (!codec_load_next_track())
         return false;
-
-    /* Seek to the beginning of the new track because if the struct mp3entry was
-       buffered, "elapsed" might not be zero (if the track has been played
-       already but not unbuffered) */
-    codec_seek_buffer_callback(curtrack_id3.first_frame_offset);
 
     /* Check if the next codec is the same file. */
     if (prev_codectype == get_codec_base_type(curtrack_id3.codectype))
@@ -2345,6 +2337,13 @@ static void audio_finalise_track_change(void)
         clear_track_info(prev_ti);
     }
 
+    if (prev_ti && prev_ti->id3_hid >= 0)
+    {
+        /* Reset the elapsed time to force the progressbar to be empty if
+           the user skips back to this track */
+        bufgetid3(prev_ti->id3_hid)->elapsed = 0;
+    }
+
     if (track_changed_callback)
         track_changed_callback(&curtrack_id3);
 
@@ -2473,6 +2472,13 @@ static void audio_thread(void)
                 LOGFQUEUE("audio < Q_AUDIO_FF_REWIND");
                 if (!playing)
                     break;
+                if (automatic_skip)
+                {
+                    /* An automatic track skip is in progress. Finalize it,
+                       then go back to the previous track */
+                    audio_finalise_track_change();
+                    ci.new_track = -1;
+                }
                 ci.seek_time = (long)ev.data+1;
                 break;
 
