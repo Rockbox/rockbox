@@ -880,6 +880,9 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     size_t size = filesize(fd);
     bool can_wrap = type==TYPE_PACKET_AUDIO || type==TYPE_CODEC;
 
+    if (offset > size)
+        offset = 0;
+
     struct memory_handle *h = add_handle(size-offset, can_wrap, false);
     if (!h)
     {

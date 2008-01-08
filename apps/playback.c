@@ -1683,6 +1683,9 @@ static bool audio_load_track(int offset, bool start_play)
 
     tracks[track_widx].filesize = filesize(fd);
 
+    if ((unsigned)offset > tracks[track_widx].filesize)
+        offset = 0;
+
     /* Set default values */
     if (start_play)
     {
