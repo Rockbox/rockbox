@@ -17,12 +17,6 @@
  *
  ****************************************************************************/
 
-/* TODO: Can use the track changed callback to detect end of track and seek
- * in the previous track until this happens */
-/* Design: we have prev_ti already, have a conditional for what type of seek
- * to do on a seek request, if it is a previous track seek, skip previous,
- * and in the request_next_track callback set the offset up the same way that
- * starting from an offset works. */
 /* TODO: Pause should be handled in here, rather than PCMBUF so that voice can
  * play whilst audio is paused */
 
