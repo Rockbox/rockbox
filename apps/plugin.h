@@ -119,12 +119,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 94
+#define PLUGIN_API_VERSION 95
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 88
+#define PLUGIN_MIN_API_VERSION 95
 
 /* plugin return codes */
 enum plugin_status {
@@ -266,6 +266,10 @@ struct plugin_api {
                                    int stride, int x, int y, int width, int height);
     void (*lcd_remote_bitmap)(const fb_remote_data *src, int x, int y, int width,
                               int height);
+#endif
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR)
+    void (*lcd_grey_phase_blit)(const struct grey_data *data, int bx, int by,
+                                int bwidth, int bheight, int stride);
 #endif
 #if defined(HAVE_LCD_COLOR)
     void (*lcd_yuv_blit)(unsigned char * const src[3],
@@ -718,11 +722,6 @@ struct plugin_api {
     const char * (*sound_unit)(int setting);
     int (*sound_val2phys)(int setting, int value);
 #endif /* CONFIG_CODEC == SWCODEC */
-
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR)
-    void (*lcd_grey_phase_blit)(const struct grey_data *data, int bx, int by,
-                                int bwidth, int bheight, int stride);
-#endif
 };
 
 /* plugin header */

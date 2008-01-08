@@ -81,6 +81,7 @@ test_disk,apps
 test_fps,apps
 test_sampr,apps
 test_scanrate,apps
+test_viewports,apps
 text_editor,apps
 vbrfix,viewers
 video,viewers

@@ -71,12 +71,16 @@ struct screen
 #ifdef HAS_BUTTONBAR
     bool has_buttonbar;
 #endif
+    void (*set_viewport)(struct viewport* vp);
     void (*setmargins)(int x, int y);
+    int (*getwidth)(void);
+    int (*getheight)(void);
     int (*getxmargin)(void);
     int (*getymargin)(void);
     int (*getstringsize)(const unsigned char *str, int *w, int *h);
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
     void (*setfont)(int newfont);
+    int (*getfont)(void);
 
     void (*scroll_step)(int pixels);
     void (*puts_style_offset)(int x, int y, const unsigned char *str,
@@ -113,6 +117,7 @@ struct screen
     void (*set_selector_text)(unsigned selector_text);
 #endif
     void (*update_rect)(int x, int y, int width, int height);
+    void (*update_viewport_rect)(int x, int y, int width, int height);
     void (*fillrect)(int x, int y, int width, int height);
     void (*drawrect)(int x, int y, int width, int height);
     void (*drawpixel)(int x, int y);
@@ -139,7 +144,11 @@ struct screen
     void (*scroll_delay)(int ms);
     void (*stop_scroll)(void);
     void (*clear_display)(void);
+    void (*clear_viewport)(void);
+    void (*scroll_stop)(struct viewport* vp);
+    void (*scroll_stop_line)(struct viewport* vp, int y);
     void (*update)(void);
+    void (*update_viewport)(void);
     void (*backlight_on)(void);
     void (*backlight_off)(void);
     bool (*is_backlight_on)(void);

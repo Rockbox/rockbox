@@ -181,6 +181,9 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_bitmap,
 #endif
 
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR)
+    lcd_grey_phase_blit,
+#endif
 #if defined(HAVE_LCD_COLOR)
     lcd_yuv_blit,
 #endif
@@ -583,10 +586,6 @@ static const struct plugin_api rockbox_api = {
     sound_unit,
     sound_val2phys,
 #endif /* CONFIG_CODEC == SWCODEC */
-
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR)
-    lcd_grey_phase_blit,
-#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

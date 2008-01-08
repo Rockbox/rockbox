@@ -190,6 +190,11 @@ void lcd_setfont(int newfont)
     current_vp->font = newfont;
 }
 
+int lcd_getfont(void)
+{
+    return current_vp->font;
+}
+
 int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 {
     return font_getstringsize(str, w, h, current_vp->font);

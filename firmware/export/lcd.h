@@ -372,6 +372,7 @@ extern void lcd_set_flip(bool yesno);
 extern void lcd_set_drawmode(int mode);
 extern int  lcd_get_drawmode(void);
 extern void lcd_setfont(int font);
+extern int lcd_getfont(void);
 
 extern void lcd_puts_style_offset(int x, int y, const unsigned char *str,
                                   int style, int offset);
