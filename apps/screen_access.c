@@ -150,6 +150,7 @@ struct screen screens[NB_SCREENS] =
         .getxmargin=&lcd_remote_getxmargin,
         .getstringsize=&lcd_remote_getstringsize,
 #if 1 /* all remote LCDs are bitmapped so far */
+        .setfont=&lcd_remote_setfont,
         .getfont=&lcd_remote_getfont,
         .mono_bitmap=&lcd_remote_mono_bitmap,
         .mono_bitmap_part=&lcd_remote_mono_bitmap_part,
