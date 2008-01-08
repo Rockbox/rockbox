@@ -499,7 +499,7 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
         if (global_settings.scroll_paginated)
         {
             if (gui_list->start_item[screen] > gui_list->selected_item)
-                gui_list->start_item[screen] = MAX(0, gui_list->start_item[screen] - nb_lines);
+                gui_list->start_item[screen] = (gui_list->selected_item/nb_lines)*nb_lines;
         }
         else
         {
