@@ -654,8 +654,12 @@ static int create_and_play_dir(int direction, bool play_last)
             playlist_start(index, 0);
 #endif
         }
+
+        /* we've overwritten the dircache when getting the next/previous dir,
+           so the tree browser context will need to be reloaded */
+        reload_directory();
     }
-    
+
     return index;
 }
 
@@ -1576,10 +1580,6 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
                 break;
         }
     }
-
-    /* we've overwritten the dircache so tree browser will need to be
-       reloaded */
-    reload_directory();
 
     /* restore dirfilter & sort_dir */
     *(tc->dirfilter) = dirfilter;

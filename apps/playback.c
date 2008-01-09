@@ -1375,9 +1375,12 @@ static void codec_thread(void)
                     {
                         const char *codec_fn =
                             get_codec_filename(curtrack_id3.codectype);
-                        LOGFQUEUE("codec > codec Q_CODEC_LOAD_DISK");
-                        queue_post(&codec_queue, Q_CODEC_LOAD_DISK,
-                            (intptr_t)codec_fn);
+                        if (codec_fn)
+                        {
+                            LOGFQUEUE("codec > codec Q_CODEC_LOAD_DISK");
+                            queue_post(&codec_queue, Q_CODEC_LOAD_DISK,
+                                       (intptr_t)codec_fn);
+                        }
                     }
                 }
                 break;
