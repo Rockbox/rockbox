@@ -54,6 +54,9 @@
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
 #define BOOTLOADER_BOOT_OF      BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == MROBE100_PAD
+#define BOOTLOADER_BOOT_OF      BUTTON_LEFT
+
 #endif
 
 /* Maximum allowed firmware image size. 10MB is more than enough */
@@ -444,8 +447,11 @@ void* main(void)
     i2c_init();
     _backlight_on();
 #endif
+
+#if LCD_DEPTH > 1
     lcd_set_foreground(LCD_WHITE);
     lcd_set_background(LCD_BLACK);
+#endif
     lcd_clear_display();
     
     if (button_hold())

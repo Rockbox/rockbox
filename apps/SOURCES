@@ -162,4 +162,6 @@ keymaps/keymap-c200.c
 keymaps/keymap-av300.c
 #elif CONFIG_KEYPAD == MROBE500_PAD
 keymaps/keymap-mr500.c
+#elif CONFIG_KEYPAD == MROBE100_PAD
+keymaps/keymap-mr100.c
 #endif

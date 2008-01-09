@@ -983,7 +983,8 @@ static bool dbg_spdif(void)
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #   define DEBUG_CANCEL  BUTTON_REC
 
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD) || \
+      (CONFIG_KEYPAD == MROBE100_PAD)
 #   define DEBUG_CANCEL  BUTTON_REW
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \

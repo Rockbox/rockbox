@@ -71,10 +71,11 @@
 #define SANSA_C200_PAD     14
 #define ELIO_TPJ1022_PAD   15
 #define ARCHOS_AV300_PAD   16
-#define MROBE500_PAD       17
-#define GIGABEAT_S_PAD     18
-#define LOGIK_DAX_PAD      19
-#define IAUDIO67_PAD       20 
+#define MROBE100_PAD       17
+#define MROBE500_PAD       18
+#define GIGABEAT_S_PAD     19
+#define LOGIK_DAX_PAD      20
+#define IAUDIO67_PAD       21 
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -107,8 +108,9 @@
 #define LCD_DSC25    16 /* as used by Archos AV300 */
 #define LCD_C200     17 /* as used by Sandisk Sansa c200 */
 #define LCD_MROBE500 18 /* as used by Olympus M:Robe 500i */
-#define LCD_LOGIKDAX 19 /* as used by Logik DAX - SSD1815 */
-#define LCD_IAUDIO67 20 /* as used by iAudio 6/7 - unknown */
+#define LCD_MROBE100 19 /* as used by Olympus M:Robe 100 */
+#define LCD_LOGIKDAX 20 /* as used by Logik DAX - SSD1815 */
+#define LCD_IAUDIO67 21 /* as used by iAudio 6/7 - unknown */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -221,6 +223,8 @@
 #include "config-c200.h"
 #elif defined(ELIO_TPJ1022)
 #include "config-tpj1022.h"
+#elif defined(MROBE_100)
+#include "config-mrobe100.h"
 #elif defined(MROBE_500)
 #include "config-mrobe500.h"
 #elif defined(LOGIK_DAX)

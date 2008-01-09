@@ -137,7 +137,6 @@ static int get_free_volume(void)
 
 int disk_mount(int drive)
 {
-    int i;
     int mounted = 0; /* reset partition-on-drive flag */
     int volume = get_free_volume();
     struct partinfo* pinfo = disk_init(IF_MV(drive));
@@ -146,14 +145,14 @@ int disk_mount(int drive)
     {
         return 0;
     }
-#ifndef ELIO_TPJ1022
+#if !defined(ELIO_TPJ1022) && !defined(MROBE_100)
     /* The Elio's hard drive has no partition table and probing for partitions causes
        Rockbox to crash - so we temporarily disable the probing until we fix the
        real problem. */
 #ifdef TOSHIBA_GIGABEAT_S
-    i = 1;  /* For the Gigabeat S, we mount the second partition */
+    int i = 1;  /* For the Gigabeat S, we mount the second partition */
 #else
-    i = 0;
+    int i = 0;
 #endif
     for (; volume != -1 && i<4; i++)
     {

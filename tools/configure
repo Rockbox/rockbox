@@ -603,6 +603,7 @@ cat <<EOF
 
  ==Tatung==            ==Olympus==            ==Logik==
  60) Elio TPJ-1022     70) M:Robe 500         80) DAX 1GB MP3/DAB
+                       71) M:Robe 100
 EOF
 
   buildfor=`input`;
@@ -1290,6 +1291,34 @@ EOF
     t_cpu="arm"
     t_manufacturer="tms320dm320"
     t_model="mrobe-500"
+    ;;
+
+    71|mrobe100)
+    target_id=31
+    archos="mrobe100"
+    target="-DMROBE_100"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBOS"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
+    output="rockbox.mi4"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins=""
+    swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBBL"
+    bootoutput="pp5020.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools scramble"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="olympus"
+    t_model="mrobe-100"
     ;;
 
    80|logikdax)

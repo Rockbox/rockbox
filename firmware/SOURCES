@@ -652,6 +652,22 @@ target/arm/tms320dm320/dsp-dm320.c
 #endif /* SIMULATOR */
 #endif /* MROBE_500 */
 
+#ifdef MROBE_100
+#ifndef SIMULATOR
+target/arm/ata-as-arm.S
+target/arm/ata-pp5020.c
+target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
+target/arm/olympus/mrobe-100/adc-mr100.c
+target/arm/olympus/mrobe-100/backlight-mr100.c
+target/arm/olympus/mrobe-100/button-mr100.c
+target/arm/olympus/mrobe-100/lcd-mr100.c
+target/arm/olympus/mrobe-100/power-mr100.c
+target/arm/olympus/mrobe-100/powermgmt-mr100.c
+target/arm/usb-fw-pp502x.c
+#endif /* SIMULATOR */
+#endif /* MROBE_100 */
+
 #ifdef ELIO_TPJ1022
 #ifndef SIMULATOR
 target/arm/ata-as-arm.S
