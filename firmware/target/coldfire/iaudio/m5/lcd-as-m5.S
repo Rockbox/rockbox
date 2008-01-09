@@ -88,57 +88,146 @@ lcd_write_data:
     .type       lcd_grey_data,@function
 
 lcd_grey_data:
-    lea.l   (-4*4, %sp), %sp
-    movem.l %d2-%d5, (%sp)
-    movem.l (4*4+4, %sp), %a0-%a1 /* Data pointer */
-    move.l  %a1, %d0            /* Length */
-    lea     0xf0008002, %a1     /* LCD data port */
-    move.l  #0xff00ff00, %d2    /* mask for splitting value/phase pairs */
+    lea.l   (-9*4, %sp), %sp
+    movem.l %d2-%d5/%a2-%a6, (%sp)  /* free some registers */
+    movem.l (9*4+4, %sp), %a0-%a2   /* values, phases, length */
+    lea.l   (%a1, %a2.l*4), %a2     /* end address */
+    lea     0xf0008002, %a3     /* LCD data port */
 
-.greyloop:
-    movem.l (%a0), %d4-%d5      /* fetch 4 pixel phase/value pairs at once */
-                                /* %d4 = p0v0p1v1, %d5 = p2v2p3v3 */
-    move.l  %d2, %d3            /* copy mask */
-    and.l   %d4, %d3            /* %d3 = p0--p1-- */
-    eor.l   %d3, %d4            /* %d4 = --v0--v1 */
-    lsr.l   #8, %d3             /* %d3 = --p0--p1 */
+    moveq.l #15, %d3
+    add.l   %a1, %d3
+    and.l   #0xfffffff0, %d3    /* first line bound */
+    move.l  %a2, %d1
+    and.l   #0xfffffff0, %d1    /* last line bound */
+    cmp.l   %d3, %d1
+    bls.w   .g_tloop            /* no lines to copy - jump to tail loop */
+    cmp.l   %a1, %d0
+    bls.s   .g_lloop            /* no head blocks - jump to line loop */
 
-    bclr.l  #23, %d3            /* Z = !(p0 & 0x80); p0 &= ~0x80; */
-    seq.b   %d1                 /* %d1 = ........................00000000 */
-    lsl.l   #2, %d1             /* %d1 = ......................00000000.. */
-    bclr.l  #7, %d3             /* Z = !(p1 & 0x80); p1 &= ~0x80; */
-    seq.b   %d1                 /* %d1 = ......................0011111111 */
-    lsl.l   #2, %d1             /* %d1 = ....................0011111111.. */
+.g_hloop:
+    move.l  (%a1), %d2          /* fetch 4 pixel phases */
+
+    bclr.l  #31, %d2            /* Z = !(p0 & 0x80); p0 &= ~0x80; */
+    seq.b   %d0                 /* %d0 = ........................00000000 */
+    lsl.l   #2, %d0             /* %d0 = ......................00000000.. */
+    bclr.l  #23, %d2            /* Z = !(p1 & 0x80); p1 &= ~0x80; */
+    seq.b   %d0                 /* %d0 = ......................0011111111 */
+    lsl.l   #2, %d0             /* %d0 = ....................0011111111.. */
+    bclr.l  #15, %d2            /* Z = !(p2 & 0x80); p2 &= ~0x80; */
+    seq.b   %d0                 /* %d0 = ....................001122222222 */
+    lsl.l   #2, %d0             /* %d0 = ..................001122222222.. */
+    bclr.l  #7, %d2             /* Z = !(p3 & 0x80); p3 &= ~0x80; */
+    seq.b   %d0                 /* %d0 = ..................00112233333333 */
+    lsr.l   #6, %d0             /* %d0 = ........................00112233 */
+    move.w  %d0, (%a3)          /* write pixel block */
     
-    add.l   %d4, %d3            /* p0 += v0; p1 += v1; */
-    move.b  %d3, (2, %a0)       /* store p1 */
-    swap    %d3
-    move.b  %d3, (%a0)          /* store p0 */
+    add.l   (%a0)+, %d2         /* add 4 pixel values to the phases */
+    move.l  %d2, (%a1)+         /* store new phases, advance pointer */
 
-    move.l  %d2, %d3            /* copy mask */
-    and.l   %d5, %d3            /* %d3 = p2--p3-- */
-    eor.l   %d3, %d5            /* %d5 = --v2--v3 */
-    lsr.l   #8, %d3             /* %d3 = --p2--p3 */
+    cmp.l   %a1, %d3            /* go up to first line bound */
+    bhi.s   .g_hloop
+    
+.g_lloop:
+    movem.l (%a1), %d2-%d5
+    
+    bclr.l  #31, %d2
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #23, %d2
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #15, %d2
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #7, %d2
+    seq.b   %d0
+    lsr.l   #6, %d0
+    move.w  %d0, (%a3)
 
-    bclr.l  #23, %d3            /* Z = !(p2 & 0x80); p2 &= ~0x80; */
-    seq.b   %d1                 /* %d1 = ....................001122222222 */
-    lsl.l   #2, %d1             /* %d1 = ..................001122222222.. */
-    bclr.l  #7, %d3             /* Z = !(p3 & 0x80); p3 &= ~0x80; */
-    seq.b   %d1                 /* %d1 = ..................00112233333333 */
-    lsr.l   #6, %d1             /* %d1 = ........................00112233 */
+    bclr.l  #31, %d3
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #23, %d3
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #15, %d3
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #7, %d3
+    seq.b   %d0
+    lsr.l   #6, %d0
+    move.w  %d0, (%a3)
+    
+    bclr.l  #31, %d4
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #23, %d4
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #15, %d4
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #7, %d4
+    seq.b   %d0
+    lsr.l   #6, %d0
+    move.w  %d0, (%a3)
+    
+    bclr.l  #31, %d5
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #23, %d5
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #15, %d5
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #7, %d5
+    seq.b   %d0
+    lsr.l   #6, %d0
+    move.w  %d0, (%a3)
+    
+    movem.l (%a0), %d0/%a4-%a6
+    lea.l   (16, %a0), %a0
+    add.l   %d0, %d2
+    add.l   %a4, %d3
+    add.l   %a5, %d4
+    add.l   %a6, %d5
+    movem.l %d2-%d5, (%a1)
+    lea.l   (16, %a1), %a1
 
-    add.l   %d5, %d3            /* p2 += v2; p3 += v3; */
-    move.b  %d3, (6, %a0)       /* store p3 */
-    swap    %d3
-    move.b  %d3, (4, %a0)       /* store p2 */
+    cmp.l   %a1, %d1            /* go up to last line bound */
+    bhi.w   .g_lloop
+    
+    cmp.l   %a1, %a2
+    bls.s   .g_no_tail
 
-    move.w  %d1, (%a1)          /* write pixel block */
-    addq.l  #8, %a0             /* advance address pointer */
-    subq.l  #1, %d0             /* any blocks left? */
-    bne.b   .greyloop
+.g_tloop:
+    move.l  (%a1), %d2
 
-    movem.l (%sp), %d2-%d5
-    lea.l   (4*4, %sp), %sp
+    bclr.l  #31, %d2
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #23, %d2
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #15, %d2
+    seq.b   %d0
+    lsl.l   #2, %d0
+    bclr.l  #7, %d2
+    seq.b   %d0
+    lsr.l   #6, %d0
+    move.w  %d0, (%a3)
+
+    add.l   (%a0)+, %d2         /* go up to end address */
+    move.l  %d2, (%a1)+
+
+    cmp.l   %a1, %a2
+    bhi.s   .g_tloop
+
+.g_no_tail:
+    movem.l (%sp), %d2-%d5/%a2-%a6  /* restore registers */
+    lea.l   (9*4, %sp), %sp
     rts
+
 .gd_end:
     .size   lcd_grey_data,.gd_end-lcd_grey_data

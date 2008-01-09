@@ -601,17 +601,10 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
 void grey_ub_clear_display(void)
 {
     int value = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-                 _grey_info.fg_val : _grey_info.bg_val;
-    unsigned char *dst = &_grey_info.data[0].value;
-    unsigned char *dst_end = dst + sizeof(struct grey_data) 
-                            * _GREY_MULUQ(_grey_info.width, _grey_info.height);
-    
-    do
-    {
-        *dst = value;
-        dst += sizeof(struct grey_data);
-    }
-    while (dst < dst_end);
+                     _grey_info.fg_val : _grey_info.bg_val;
+                     
+    _grey_rb->memset(_grey_info.values, value, 
+                     _GREY_MULUQ(_grey_info.width, _grey_info.height));
 }
 
 /* Draw a partial greyscale bitmap, canonical format */
@@ -654,7 +647,7 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
         int idx = _GREY_MULUQ(_grey_info.width, y & ~3) + (x << 2) + (~y & 3);
 #endif
 #endif /* LCD_PIXELFORMAT */
-        unsigned char *dst_row = &_grey_info.data[idx].value;
+        unsigned char *dst_row = _grey_info.values + idx;
         const unsigned char *src_row = src;
         const unsigned char *src_end = src + width;
 

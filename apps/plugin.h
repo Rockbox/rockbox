@@ -119,12 +119,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 95
+#define PLUGIN_API_VERSION 96
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 95
+#define PLUGIN_MIN_API_VERSION 96
 
 /* plugin return codes */
 enum plugin_status {
@@ -268,8 +268,9 @@ struct plugin_api {
                               int height);
 #endif
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR)
-    void (*lcd_grey_phase_blit)(const struct grey_data *data, int bx, int by,
-                                int bwidth, int bheight, int stride);
+    void (*lcd_grey_phase_blit)(unsigned char *values, unsigned char *phases,
+                                int bx, int by, int bwidth, int bheight,
+                                int stride);
 #endif
 #if defined(HAVE_LCD_COLOR)
     void (*lcd_yuv_blit)(unsigned char * const src[3],

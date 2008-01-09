@@ -155,10 +155,13 @@ void lcd_blit(const unsigned char* data, int x, int by, int width,
     }
 }
 
+/* Helper function for lcd_grey_phase_blit(). */
+void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
+
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
-void lcd_grey_phase_blit(const struct grey_data *data, int x, int by,
-                         int width, int bheight, int stride)
+void lcd_grey_phase_blit(unsigned char *values, unsigned char *phases,
+                         int x, int by, int width, int bheight, int stride)
 {
     stride <<= 3; /* 8 pixels per block */
     while (bheight--)
@@ -167,8 +170,9 @@ void lcd_grey_phase_blit(const struct grey_data *data, int x, int by,
         lcd_write_command (LCD_CNTL_HIGHCOL | (((x+xoffset)>>4) & 0xf));
         lcd_write_command (LCD_CNTL_LOWCOL | ((x+xoffset) & 0xf));
 
-        lcd_grey_data(data, width);
-        data += stride;
+        lcd_grey_data(values, phases, width);
+        values += stride;
+        phases += stride;
     }
 }
 

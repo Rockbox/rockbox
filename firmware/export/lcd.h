@@ -131,13 +131,9 @@ extern void lcd_yuv_blit(unsigned char * const src[3],
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);
 #else
-struct grey_data {
-    unsigned char phase; /* SH1 uses it signed (doesn't matter for high level) */
-    unsigned char value; /* 0..128 are allowed */
-} __attribute__((packed));
-extern void lcd_grey_data(const struct grey_data *data, int count); /* private */
-extern void lcd_grey_phase_blit(const struct grey_data *data, int bx, int by,
-                                int bwidth, int bheight, int stride);
+extern void lcd_grey_phase_blit(unsigned char *values, unsigned char *phases,
+                                int bx, int by, int bwidth, int bheight,
+                                int stride);
 #endif
 
 /* performance function */

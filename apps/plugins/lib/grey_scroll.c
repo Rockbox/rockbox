@@ -169,7 +169,7 @@ void grey_ub_scroll_left(int count)
         idx = _GREY_MULUQ(_grey_info.width, y & ~3) + (~y & 3);
 #endif
 #endif /* LCD_PIXELFORMAT */
-        dst = &_grey_info.data[idx].value;
+        dst = _grey_info.values + idx;
         src = dst + count * _GREY_X_ADVANCE;
         end = dst + _grey_info.width * _GREY_X_ADVANCE;
         
@@ -213,7 +213,7 @@ void grey_ub_scroll_right(int count)
         idx = _GREY_MULUQ(_grey_info.width, y & ~3) + (~y & 3);
 #endif
 #endif /* LCD_PIXELFORMAT */
-        start = &_grey_info.data[idx].value;
+        start = _grey_info.values + idx;
         dst = start + _grey_info.width * _GREY_X_ADVANCE;
         src = dst - count * _GREY_X_ADVANCE;
         
@@ -259,8 +259,8 @@ void grey_ub_scroll_up(int count)
         is = _GREY_MULUQ(_grey_info.width, ys & ~3) + (~ys & 3);
 #endif
 #endif /* LCD_PIXELFORMAT */
-        dst = &_grey_info.data[id].value;
-        src = &_grey_info.data[is].value;
+        dst = _grey_info.values + id;
+        src = _grey_info.values + is;
         dst_end = dst + _grey_info.width * _GREY_X_ADVANCE;
 
         do
@@ -282,7 +282,7 @@ void grey_ub_scroll_up(int count)
         id = _GREY_MULUQ(_grey_info.width, yd & ~3) + (~yd & 3);
 #endif
 #endif /* LCD_PIXELFORMAT */
-        dst = &_grey_info.data[id].value;
+        dst = _grey_info.values + id;
         dst_end = dst + _grey_info.width * _GREY_X_ADVANCE;
 
         do
@@ -320,8 +320,8 @@ void grey_ub_scroll_down(int count)
         is = _GREY_MULUQ(_grey_info.width, ys & ~3) + (~ys & 3);
 #endif
 #endif /* LCD_PIXELFORMAT */
-        dst = &_grey_info.data[id].value;
-        src = &_grey_info.data[is].value;
+        dst = _grey_info.values + id;
+        src = _grey_info.values + is;
         dst_end = dst + _grey_info.width * _GREY_X_ADVANCE;
 
         do
@@ -343,7 +343,7 @@ void grey_ub_scroll_down(int count)
         id = _GREY_MULUQ(_grey_info.width, yd & ~3) + (~yd & 3);
 #endif
 #endif /* LCD_PIXELFORMAT */
-        dst = &_grey_info.data[id].value;
+        dst = _grey_info.values + id;
         dst_end = dst + _grey_info.width * _GREY_X_ADVANCE;
 
         do

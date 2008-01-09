@@ -301,118 +301,88 @@ void lcd_blit(const unsigned char* data, int bx, int y, int bwidth,
 
 /* Performance function that works with an external buffer
    note that bx and bwidth are in 8-pixel units! */
-void lcd_grey_phase_blit(const struct grey_data *data, int bx, int y, 
-                         int bwidth, int height, int stride)
+void lcd_grey_phase_blit(unsigned char *values, unsigned char *phases,
+                         int bx, int y, int bwidth, int height, int stride)
 {
-    const struct grey_data *addr;
-    int width;
-    
+    unsigned char *val, *ph;
+    int bw;
+
     while (height--) {
         lcd_cmd_and_data(R_RAM_ADDR_SET, (y++ << 5) + addr_offset - bx);
         lcd_prepare_cmd(R_RAM_DATA);
 
-        addr = data;
-        width = bwidth;
+        val = values;
+        ph = phases;
+        bw = bwidth;
         asm volatile (
         "10:                                 \n"
-            "ldmia   %[addr]!, {r0-r3}       \n" /* r0 = v1p1v0p0 ... */
+            "ldmia   %[ph], {r0-r1}          \n" /* Fetch 8 pixel phases */
+            "ldmia   %[val]!, {r2-r3}        \n" /* Fetch 8 pixel values */
 #ifdef IPOD_MINI2G
-            "mov     r5, #0x7600             \n"
+            "mov     r4, #0x7600             \n"
 #else
-            "mov     r5, #0                  \n"
+            "mov     r4, #0                  \n"
 #endif
-
-            "and     r4, r0, %[mask]         \n" /* r4 = --p1--p0 */
-            "and     r0, %[mask], r0, lsr #8 \n" /* r0 = --v1--v0 */
-            
-            "tst     r4, #0x80               \n"
-            "orreq   r5, r5, #0xc0           \n"
-            "tst     r4, #0x800000           \n"
-            "orreq   r5, r5, #0x30           \n"
-            "bic     r4, r4, %[clbt]         \n"
-            
-            "add     r4, r0, r4              \n" /* p0 += v0; p1 += v1; */
-            "strb    r4, [%[addr], #-16]     \n"
-            "mov     r4, r4, lsr #16         \n"
-            "strb    r4, [%[addr], #-14]     \n"
-
-            "and     r4, r1, %[mask]         \n"
-            "and     r1, %[mask], r1, lsr #8 \n"
-
-            "tst     r4, #0x80               \n"
-            "orreq   r5, r5, #0x0c           \n"
-            "tst     r4, #0x800000           \n"
-            "orreq   r5, r5, #0x03           \n"
-            "bic     r4, r4, %[clbt]         \n"
-            
-            "add     r4, r1, r4              \n"
-            "strb    r4, [%[addr], #-12]     \n"
-            "mov     r4, r4, lsr #16         \n"
-            "strb    r4, [%[addr], #-10]     \n"
+            "tst     r0, #0x80               \n"
+            "orreq   r4, r4, #0xc0           \n"
+            "tst     r0, #0x8000             \n"
+            "orreq   r4, r4, #0x30           \n"
+            "tst     r0, #0x800000           \n"
+            "orreq   r4, r4, #0x0c           \n"
+            "tst     r0, #0x80000000         \n"
+            "orreq   r4, r4, #0x03           \n"
+            "bic     r0, r0, %[clbt]         \n"
+            "add     r0, r0, r2              \n"
 
 #ifdef IPOD_MINI2G
-            "mov     r5, r5, lsl #8          \n"
+            "mov     r4, r4, lsl #8          \n"
 #else
         "1:                                  \n"
-            "ldr     r4, [%[lcdb]]           \n"
-            "tst     r4, #0x8000             \n"
+            "ldr     r2, [%[lcdb]]           \n"
+            "tst     r2, #0x8000             \n"
             "bne     1b                      \n"
 
-            "str     r5, [%[lcdb], #0x10]    \n"
-            "mov     r5, #0                  \n"
+            "str     r4, [%[lcdb], #0x10]    \n"
+            "mov     r4, #0                  \n"
 #endif
 
-            "and     r4, r2, %[mask]         \n"
-            "and     r2, %[mask], r2, lsr #8 \n"
+            "tst     r1, #0x80               \n"
+            "orreq   r4, r4, #0xc0           \n"
+            "tst     r1, #0x8000             \n"
+            "orreq   r4, r4, #0x30           \n"
+            "tst     r1, #0x800000           \n"
+            "orreq   r4, r4, #0x0c           \n"
+            "tst     r1, #0x80000000         \n"
+            "orreq   r4, r4, #0x03           \n"
+            "bic     r1, r1, %[clbt]         \n"
+            "add     r1, r1, r3              \n"
 
-            "tst     r4, #0x80               \n"
-            "orreq   r5, r5, #0xc0           \n"
-            "tst     r4, #0x800000           \n"
-            "orreq   r5, r5, #0x30           \n"
-            "bic     r4, r4, %[clbt]         \n"
-            
-            "add     r4, r2, r4              \n"
-            "strb    r4, [%[addr], #-8]      \n"
-            "mov     r4, r4, lsr #16         \n"
-            "strb    r4, [%[addr], #-6]      \n"
+            "stmia   %[ph]!, {r0-r1}         \n"
 
-            "and     r4, r3, %[mask]         \n"
-            "and     r3, %[mask], r3, lsr #8 \n"
-
-            "tst     r4, #0x80               \n"
-            "orreq   r5, r5, #0x0c           \n"
-            "tst     r4, #0x800000           \n"
-            "orreq   r5, r5, #0x03           \n"
-            "bic     r4, r4, %[clbt]         \n"
-            
-            "add     r4, r3, r4              \n"
-            "strb    r4, [%[addr], #-4]      \n"
-            "mov     r4, r4, lsr #16         \n"
-            "strb    r4, [%[addr], #-2]      \n"
-            
         "1:                                  \n"
-            "ldr     r4, [%[lcdb]]           \n"
-            "tst     r4, #0x8000             \n"
+            "ldr     r2, [%[lcdb]]           \n"
+            "tst     r2, #0x8000             \n"
             "bne     1b                      \n"
 #ifdef IPOD_MINI2G
-            "str     r5, [%[lcdb], #0x08]    \n"
+            "str     r4, [%[lcdb], #0x08]    \n"
 #else
-            "str     r5, [%[lcdb], #0x10]    \n"
+            "str     r4, [%[lcdb], #0x10]    \n"
 #endif
 
-            "subs    %[wdth], %[wdth], #1    \n"
+            "subs    %[bw], %[bw], #1        \n"
             "bne     10b                     \n"
             : /* outputs */
-            [addr]"+r"(addr),
-            [wdth]"+r"(width)
+            [val]"+r"(val),
+            [ph] "+r"(ph),
+            [bw] "+r"(bw)
             : /* inputs */
-            [mask]"r"(0x00ff00ff),
-            [clbt]"r"(0x00800080),
+            [clbt]"r"(0x80808080),
             [lcdb]"r"(LCD1_BASE)
             : /* clobbers */
-            "r0", "r1", "r2", "r3", "r4", "r5"
+            "r0", "r1", "r2", "r3", "r4"
         );
-        data += stride;
+        values += stride;
+        phases += stride;
     }
 }
 

@@ -222,11 +222,13 @@ static inline void _deferred_update(void)
 static void _timer_isr(void)
 {
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    _grey_rb->lcd_grey_phase_blit(_grey_info.data, _grey_info.bx, _grey_info.y,
+    _grey_rb->lcd_grey_phase_blit(_grey_info.values, _grey_info.phases,
+                                  _grey_info.bx, _grey_info.y,
                                   _grey_info.bwidth, _grey_info.height,
                                   _grey_info.width);
 #else
-    _grey_rb->lcd_grey_phase_blit(_grey_info.data, _grey_info.x, _grey_info.by,
+    _grey_rb->lcd_grey_phase_blit(_grey_info.values, _grey_info.phases,
+                                  _grey_info.x, _grey_info.by,
                                   _grey_info.width, _grey_info.bheight,
                                   _grey_info.width);
 #endif
@@ -321,7 +323,7 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     long plane_size, buftaken;
     unsigned data;
 #ifndef SIMULATOR
-    struct grey_data *grey_data, *grey_end;
+    unsigned *dst, *end;
 #endif
 
     _grey_rb = newrb;
@@ -343,35 +345,41 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
 #endif
 #endif
 
-    /* the buffer has to be long aligned */
-    buftaken = (-(long)gbuf) & 3;
-    gbuf += buftaken;
-
     plane_size = _GREY_MULUQ(width, height);
+#ifdef CPU_COLDFIRE
+    plane_size += (-plane_size) & 0xf;  /* All buffers should be line aligned */
+    buftaken    = (-(long)gbuf) & 0xf;
+#else
+    buftaken    = (-(long)gbuf) & 3;    /* All buffers must be long aligned. */
+#endif
+    gbuf += buftaken;
 
     if (buffered) /* chunky buffer */
     {
-        buftaken += plane_size;
         _grey_info.buffer = gbuf;
-        gbuf += plane_size;
+        gbuf     += plane_size;
+        buftaken += plane_size;
     }
-    buftaken += sizeof(struct grey_data) * plane_size;
-    if (buftaken > gbuf_size)
-        return false;
-
 #ifdef SIMULATOR
     _grey_info.buffer = gbuf;
 #else
-    grey_data = (struct grey_data *)gbuf;
-    grey_end = grey_data + plane_size;
-    _grey_info.data = grey_data;
+    _grey_info.values = gbuf;
+    gbuf += plane_size;
+    _grey_info.phases = gbuf;
+#endif
+    buftaken += 2 * plane_size;
 
-    while (grey_data < grey_end)
-    {
-        grey_data->phase = _grey_rb->rand() & 0xff;
-        grey_data->value = 128; /* init to white */
-        grey_data++;
-    }
+    if (buftaken > gbuf_size)
+        return false;
+        
+#ifndef SIMULATOR
+    _grey_rb->memset(_grey_info.values, 0x80, plane_size);
+    dst = (unsigned*)(_grey_info.phases);
+    end = (unsigned*)(_grey_info.phases + plane_size);
+
+    do
+        *dst++ = _grey_rb->rand();
+    while (dst < end);
 #endif
 
     _grey_info.x = 0;
@@ -393,8 +401,7 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     _grey_info.drawmode = DRMODE_SOLID;
     _grey_info.curfont = FONT_SYSFIXED;
 
-
-    /* precalculate the value -> pattern index conversion table, taking 
+    /* precalculate the value -> pattern index conversion table, taking
        linearisation and gamma correction into account */
     for (i = 0; i < 256; i++)
     {
@@ -532,7 +539,7 @@ void grey_update_rect(int x, int y, int width, int height)
         int idx = _GREY_MULUQ(_grey_info.width, y & ~3) + (x << 2) + (~y & 3);
 #endif
 #endif /* LCD_PIXELFORMAT */
-        unsigned char *dst_row = &_grey_info.data[idx].value;
+        unsigned char *dst_row = _grey_info.values + idx;
         unsigned char *src_row = src;
         unsigned char *src_end = src + width;
         
@@ -684,8 +691,8 @@ static void grey_screendump_hook(int fd)
                 for (i = 0; i < 4; i++)
                     linebuf[x + i] = BMP_FIXEDCOLORS + *src++;
 #else
-                unsigned char *src = &_grey_info.data[_GREY_MULUQ(_grey_info.width,
-                                                               gy) + gx].value;
+                unsigned char *src = _grey_info.values
+                                   + _GREY_MULUQ(_grey_info.width, gy) + gx;
                 for (i = 0; i < 4; i++)
                 {
                     linebuf[x + i] = BMP_FIXEDCOLORS + *src;
@@ -722,8 +729,8 @@ static void grey_screendump_hook(int fd)
                                                                      gy) + gx];
 #else
                 linebuf[x] = BMP_FIXEDCOLORS
-                           + _grey_info.data[_GREY_MULUQ(_grey_info.width,
-                                       gy & ~7) + (gx << 3) + (~gy & 7)].value;
+                           + _grey_info.values[_GREY_MULUQ(_grey_info.width,
+                                             gy & ~7) + (gx << 3) + (~gy & 7)];
 #endif
             }
             else
@@ -749,8 +756,8 @@ static void grey_screendump_hook(int fd)
                                                                      gy) + gx];
 #else
                 linebuf[x] = BMP_FIXEDCOLORS
-                           + _grey_info.data[_GREY_MULUQ(_grey_info.width,
-                                        gy & ~3) + (gx << 2) + (~gy & 7)].value;
+                           + _grey_info.values[_GREY_MULUQ(_grey_info.width,
+                                             gy & ~3) + (gx << 2) + (~gy & 3)];
 #endif
             }
             else

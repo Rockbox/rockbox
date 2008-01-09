@@ -210,28 +210,35 @@ _lcd_write_data:
  * one or multiple pixels.
  *
  * Arguments:
- *   r4 - data address, (phase,value)-pairs
- *   r5 - pixel block count
+ *   r4 - pixel value data address
+ *   r5 - pixel phase data address
+ *   r6 - pixel block count
  *
  * Register usage:
- *   r0 - current pixel value
+ *   r0 - scratch / phase signs mask
  *   r1 - scratch
  *   r2 - precalculated port value (CS and SC low, DS and SD high),
  *        negated (neg)!
  *   r3 - lcd port address
- *   r5 - end address
- *   r6/r7 - current/next pixel phase
- *   r8 - current block address (for writing back phase)
- *   r9 - 0x80 (for phase modification)
+ *   r4 - current value address
+ *   r5 - current phase address
+ *   r6 - end address
+ *   r7/r8 - current/next pixel phase
+ *   r9 - current pixel value
+ *   r10  - 0x00000080 \
+ *   r11 - 0x00008000  > for phase sign check
+ *   r12 - 0x00800000 /
  */
 
 _lcd_grey_data:
     mov.l   r8, @-r15       /* save r8 */
-    shll2   r5              /*    v */
+    shll2   r6              /*    v */
     mov.l   r9, @-r15       /* save r9 */
-    shll2   r5              /* r5 *= 16; (8 pixel per block * 2 bytes/pixel) */
+    shll    r6              /* r6 *= 8; (8 pixels per block) */
+    mov.l   r10, @-r15      /* save r10 */
+    add     r4, r6          /* end address */
     mov.l   .lcdr, r3       /* put lcd data port address in r3 */
-    add     r4, r5          /* end address */
+    nop                     /* keep alignment */
 
     /* This code will fail if an interrupt changes the contents of PBDRL.
      * If so, we must disable the interrupt here. If disabling interrupts
@@ -240,110 +247,90 @@ _lcd_grey_data:
      * this would significantly decrease performance. */
 
     mov.b   @r3, r0         /* r0 = PBDRL */
-    mov     #0x80, r9       /* for phase modification - "or #imm,xx" only allows r0 */
-    mov.b   @r4+, r6        /* fetch first pixel phase */
     or      #(LCD_DS|LCD_SD), r0    /* r0 |= LCD_DS|LCD_SD */
+    mov.l   r11, @-r15      /* save r11 */
     and     #(~(LCD_CS|LCD_SC)), r0 /* r0 &= ~(LCD_CS|LCD_SC) */
+    mov.l   r12, @-r15      /* save r12 */
     neg     r0, r2          /* r2 = 0 - r0 */
-    mov     #-3, r0         /* offset for storing phase */
 
     /* loop exploits that SD is on bit 0 for recorders and Ondios */
 
+    mov.w   .ptest, r10
+    swap.b  r10, r11
+    mov.l   @r5, r7
+    swap.w  r10, r12
+    mov.l   .pmask, r0
+
 .greyloop:
-    cmp/pz  r6              /* phase non-negative? */
-    mov.b   @r4+, r8        /* fetch pixel value */
-    negc    r2, r1          /* T -> SD, SC low */
-    mov.b   r1, @r3         /* set port */
-    or      r9, r6          /* r6 -= (r6 >= 0) ? 128 : 0; */
-    mov.b   @r4+, r7        /* fetch next pixel phase */
-    add     #(LCD_SC), r1   /* rise SC */
-    mov.b   r1, @r3         /* set port */
-    add     r8, r6          /* calculate new phase */
-    mov.b   r6, @(r0,r4)    /* store phase */
-
     cmp/pz  r7
-    mov.b   @r4+, r8
+    mov.l   @r4+, r9
     negc    r2, r1
     mov.b   r1, @r3
-    or      r9, r7
-    mov.b   @r4+, r6
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r8, r7
-    mov.b   r7, @(r0,r4)
 
-    cmp/pz  r6
-    mov.b   @r4+, r8
+    tst     r12, r7
+    mov.l   @(4,r5), r8
     negc    r2, r1
     mov.b   r1, @r3
-    or      r9, r6
-    mov.b   @r4+, r7
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r8, r6
-    mov.b   r6, @(r0,r4)
 
-    cmp/pz  r7
-    mov.b   @r4+, r8
+    tst     r11, r7
+    negc    r2, r1
+    tst     r10, r7
+    mov.b   r1, @r3
+    add     #(LCD_SC), r1
+    mov.b   r1, @r3
+
+    or      r0, r7
+    sub     r9, r7
     negc    r2, r1
     mov.b   r1, @r3
-    or      r9, r7
-    mov.b   @r4+, r6
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r8, r7
-    mov.b   r7, @(r0,r4)
 
-    cmp/pz  r6
-    mov.b   @r4+, r8
+    cmp/pz  r8
+    mov.l   r7, @r5
     negc    r2, r1
     mov.b   r1, @r3
-    or      r9, r6
-    mov.b   @r4+, r7
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r8, r6
-    mov.b   r6, @(r0,r4)
 
-    cmp/pz  r7
-    mov.b   @r4+, r8
+    tst     r12, r8
+    mov.l   @r4+, r9
     negc    r2, r1
     mov.b   r1, @r3
-    or      r9, r7
-    mov.b   @r4+, r6
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r8, r7
-    mov.b   r7, @(r0,r4)
 
-    cmp/pz  r6
-    mov.b   @r4+, r8
+    tst     r11, r8
+    mov.l   @(8,r5), r7
     negc    r2, r1
     mov.b   r1, @r3
-    or      r9, r6
-    mov.b   @r4+, r7
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r8, r6
-    mov.b   r6, @(r0,r4)
 
-    cmp/pz  r7
-    mov.b   @r4+, r8
+    tst     r10, r8
+    or      r0, r8
     negc    r2, r1
     mov.b   r1, @r3
-    or      r9, r7
-    mov.b   @r4+, r6
     add     #(LCD_SC), r1
     mov.b   r1, @r3
-    add     r8, r7
-    mov.b   r7, @(r0,r4)
 
-    cmp/hi  r4, r5          /* some blocks left? */
+    sub     r9, r8
+    mov.l   r8, @(4,r5)
+    
+    add     #8, r5
+    cmp/hi  r4, r6
     bt      .greyloop
 
+    mov.l   @r15+, r12      /* restore r12 */
     mov     #(LCD_CS|LCD_DS|LCD_SD|LCD_SC), r0
-    mov.l   @r15+, r9       /* restore r9 */
+    mov.l   @r15+, r11      /* restore r11 */
     or      r0, r1          /* restore port */
+    mov.l   @r15+, r10      /* restore r10 */
+    mov.l   @r15+, r9       /* restore r9 */
     mov.l   @r15+, r8       /* restore r8 */
     rts
     mov.b   r1, @r3
@@ -351,7 +338,11 @@ _lcd_grey_data:
     /* This is the place to reenable the interrupts, if we have disabled
      * them. See above. */
 
+.ptest:
+    .short  0x0080
 
     .align  2
 .lcdr:
     .long   LCDR
+.pmask:
+    .long   0x80808080

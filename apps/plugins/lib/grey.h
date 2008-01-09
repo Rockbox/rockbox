@@ -121,12 +121,12 @@ void grey_ub_scroll_down(int count);
 #endif
 
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-#define _GREY_X_ADVANCE sizeof(struct grey_data)
+#define _GREY_X_ADVANCE 1
 #else
 #if LCD_DEPTH == 1
-#define _GREY_X_ADVANCE (8*sizeof(struct grey_data))
+#define _GREY_X_ADVANCE 8
 #elif LCD_DEPTH == 2
-#define _GREY_X_ADVANCE (4*sizeof(struct grey_data))
+#define _GREY_X_ADVANCE 4
 #endif
 #endif /* LCD_PIXELFORMAT */
 
@@ -146,7 +146,8 @@ struct _grey_info
 #endif
     unsigned long flags;       /* various flags, see #defines */
 #ifndef SIMULATOR
-    struct grey_data *data;    /* start of greyscale display data */
+    unsigned char *values;     /* start of greyscale pixel values */
+    unsigned char *phases;     /* start of greyscale pixel phases */
 #endif
     unsigned char *buffer;     /* start of chunky pixel buffer (for buffered mode) */
     unsigned char gvalue[256]; /* calculated brightness -> greyvalue table */
