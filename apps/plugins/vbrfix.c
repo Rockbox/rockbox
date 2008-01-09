@@ -24,6 +24,8 @@ static struct plugin_api* rb;
 
 static char   *audiobuf;
 static ssize_t audiobuflen;
+unsigned char xingbuf[1500];
+char tmpname[MAX_PATH];
 
 static void xingupdate(int percent)
 {
@@ -39,7 +41,6 @@ static int insert_data_in_file(char *fname, int fpos, char *buf, int num_bytes)
     int readlen;
     int rc;
     int orig_fd, fd;
-    char tmpname[MAX_PATH];
     
     rb->snprintf(tmpname, MAX_PATH, "%s.tmp", fname);
 
@@ -127,7 +128,6 @@ static const unsigned char empty_id3_header[] =
 
 static bool vbr_fix(char *selected_file)
 {
-    unsigned char xingbuf[1500];
     struct mp3entry entry;
     int fd;
     int rc;
