@@ -110,6 +110,9 @@ PLUGIN_HEADER
 #define UP     BUTTON_SCROLL_UP
 #define DOWN   BUTTON_SCROLL_DOWN
 
+#define SCROLL_FWD(x) ((x) & BUTTON_SCROLL_DOWN)
+#define SCROLL_BACK(x) ((x) & BUTTON_SCROLL_UP)
+
 
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
 
@@ -137,7 +140,7 @@ PLUGIN_HEADER
 #error Unsupported keypad
 #endif
 
-#ifndef SCROLL_FWD
+#ifndef SCROLL_FWD /* targets without scroll wheel*/
 #define SCROLL_FWD(x) (0)
 #define SCROLL_BACK(x) (0)
 #endif
