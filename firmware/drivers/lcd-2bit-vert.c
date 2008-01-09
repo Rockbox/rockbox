@@ -128,7 +128,7 @@ unsigned lcd_get_foreground(void)
 
 void lcd_set_background(unsigned brightness)
 {
-    current_vp->fg_pattern = brightness;
+    current_vp->bg_pattern = brightness;
     bg_pattern = 0x55 * (~brightness & 3);
 }
 
