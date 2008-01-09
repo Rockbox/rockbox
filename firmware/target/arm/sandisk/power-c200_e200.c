@@ -117,7 +117,7 @@ bool tuner_power(bool status)
 
             /* set all as inputs */
             GPIOH_OUTPUT_EN &= ~((1 << 5) | (1 << 3) | (1 << 4));
-            GPIOH_ENABLE &= ~((1 << 5) | (1 << 3) | (1 << 4)); 
+            GPIOH_ENABLE &= ~((1 << 3) | (1 << 4)); 
 
             /* turn off mystery amplification device */
 #if defined (SANSA_E200)
