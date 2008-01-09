@@ -9964,17 +9964,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Tempo di spegnimento illuminazione rotella"
-    c200,gigabeatf: "Tempo di spegnimento illuminazione tasti"
+    c200,gigabeatf,mrobe100: "Tempo di spegnimento illuminazione tasti"
   </dest>
   <voice>
     *: none
     e200: "Tempo di spegnimento illuminazione rotella"
-    c200,gigabeatf: "Tempo di spegnimento illuminazione tasti"
+    c200,gigabeatf,mrobe100: "Tempo di spegnimento illuminazione tasti"
   </voice>
 </phrase>
 <phrase>
@@ -11467,6 +11467,22 @@
     ipodvideo: "Taglio Alti"
   </voice>
 </phrase>
+<<<<<<< .mine
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user:
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Casuale>"
+  </dest>
+  <voice>
+    *: "Casuale"
+  </voice>
+</phrase>
+=======
 <phrase>
   id: LANG_TAGNAVI_RANDOM
   desc: "<Random>" entry in tag browser
