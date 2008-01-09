@@ -1231,6 +1231,10 @@ static void button_loop(void)
     {
         int button = rb->button_get_w_tmo(WVS_MIN_UPDATE_INTERVAL);
 
+        /* Make sure Rockbox doesn't turn off the player because of
+           too little activity */
+        rb->reset_poweroff_timer();
+
         switch (button)
         {
         case BUTTON_NONE:
@@ -1337,6 +1341,7 @@ static void button_loop(void)
             /* Stop and get the resume time before closing the file early */
             wvs_stop();
             stream_close();
+            save_settings();  /* Save settings (if they have changed) */
         /* Fall-through */
         default:
             rb->default_event_handler(button);
