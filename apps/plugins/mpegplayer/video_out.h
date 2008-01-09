@@ -57,7 +57,7 @@ void vo_set_clip_rect(const struct vo_rect *rc);
 void vo_dimensions(struct vo_ext *sz);
 void vo_cleanup (void);
 
-#if NUM_CORES > 1 || !defined (HAVE_LCD_COLOR)
+#if NUM_CORES > 1
 void vo_lock(void);
 void vo_unlock(void);
 #else

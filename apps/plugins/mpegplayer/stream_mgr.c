@@ -710,75 +710,13 @@ void stream_vo_set_clip(const struct vo_rect *rc)
         stream_mgr.parms.rc = *rc;
         rc = &stream_mgr.parms.rc;
     }
-#ifndef HAVE_LCD_COLOR
-    else
-    {
-        vo_rect_set_ext(&stream_mgr.parms.rc, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-        rc = &stream_mgr.parms.rc;
-    }
-#endif
 
     parser_send_video_msg(VIDEO_SET_CLIP_RECT, (intptr_t)rc);
 
-#ifndef HAVE_LCD_COLOR
-    stream_set_gray_rect(rc);
-#endif
-
     stream_mgr_unlock();
 }
 
 #ifndef HAVE_LCD_COLOR
-/* Set the rectangle for the gray video overlay - clipped to screen */
-bool stream_set_gray_rect(const struct vo_rect *rc)
-{
-    bool retval = false;
-    struct vo_rect rc_gray;
-
-    stream_mgr_lock();
-
-    vo_rect_set_ext(&rc_gray, 0, 0, LCD_WIDTH, LCD_HEIGHT);
-
-    if (vo_rect_intersect(&rc_gray, &rc_gray, rc))
-    {
-        bool vis = parser_send_video_msg(VIDEO_DISPLAY_SHOW, false);
-
-        /* The impudence! Keeps the image from disappearing anyway. */
-#ifdef SIMULATOR
-        rb->sim_lcd_ex_init(0, NULL);
-#else
-        rb->timer_unregister();
-#endif
-        GRAY_VIDEO_INVALIDATE_ICACHE();
-        GRAY_INVALIDATE_ICACHE();
-
-        vo_lock();
-
-        grey_init(rb, stream_mgr.graymem, stream_mgr.graysize, false,
-                  rc_gray.r - rc_gray.l, rc_gray.b - rc_gray.t, NULL);
-
-        grey_set_position(rc_gray.l, rc_gray.t);
-
-        vo_unlock();
-
-        GRAY_INVALIDATE_ICACHE();
-
-        if (stream_mgr.status != STREAM_PLAYING)
-            parser_send_video_msg(VIDEO_PRINT_FRAME, true);
-
-        GRAY_VIDEO_FLUSH_ICACHE();
-
-        if (vis)
-        {
-            grey_show(true);
-            parser_send_video_msg(VIDEO_DISPLAY_SHOW, true);
-        }
-    }
-
-    stream_mgr_unlock();
-
-    return retval;
-}
-
 /* Show/hide the gray video overlay (independently of vo visibility). */
 void stream_gray_show(bool show)
 {
@@ -793,6 +731,29 @@ void stream_gray_show(bool show)
 
     stream_mgr_unlock();
 }
+
+#ifdef GRAY_CACHE_MAINT
+void stream_gray_pause(bool pause)
+{
+    static bool gray_paused = false;
+
+    if (pause && !gray_paused)
+    {
+        if (_grey_info.flags & _GREY_RUNNING)
+        {
+            rb->timer_unregister();
+            _grey_info.flags &= ~_GREY_RUNNING;
+            gray_paused = true;
+        }
+    }
+    else if (!pause && gray_paused)
+    {
+        gray_paused = false;
+        grey_show(true);
+    }
+}
+#endif
+
 #endif
 
 /* Display a thumbnail at the last seek point */
@@ -805,13 +766,9 @@ bool stream_display_thumb(const struct vo_rect *rc)
 
     stream_mgr_lock();
 
-    GRAY_INVALIDATE_ICACHE();
-
     stream_mgr.parms.rc = *rc;
     retval = parser_send_video_msg(VIDEO_PRINT_THUMBNAIL,
                 (intptr_t)&stream_mgr.parms.rc);
-
-    GRAY_VIDEO_FLUSH_ICACHE();
 
     stream_mgr_unlock();
 
@@ -823,11 +780,7 @@ bool stream_draw_frame(bool no_prepare)
     bool retval;
     stream_mgr_lock();
 
-    GRAY_INVALIDATE_ICACHE();
-
     retval = parser_send_video_msg(VIDEO_PRINT_FRAME, no_prepare);
-
-    GRAY_VIDEO_FLUSH_ICACHE();
 
     stream_mgr_unlock();
 
@@ -1055,26 +1008,27 @@ int stream_init(void)
     /* Initialize non-allocator blocks first */
 #ifndef HAVE_LCD_COLOR
     bool success;
+    long graysize;
 
     /* This can run on another processor - align data */
     memsize = CACHEALIGN_BUFFER(&mem, memsize);
-    stream_mgr.graymem = mem;
 
-    success = grey_init(rb, mem, memsize, false, LCD_WIDTH, 
-                        LCD_HEIGHT, &stream_mgr.graysize);
+    success = grey_init(rb, mem, memsize, true, LCD_WIDTH,
+                        LCD_HEIGHT, &graysize);
 
     /* This can run on another processor - align size */
-    stream_mgr.graysize = CACHEALIGN_UP(stream_mgr.graysize);
+    graysize = CACHEALIGN_UP(graysize);
 
-    mem += stream_mgr.graysize;
-    memsize -= stream_mgr.graysize;
+    mem += graysize;
+    memsize -= graysize;
 
     if (!success || (ssize_t)memsize <= 0)
     {
         rb->splash(HZ, "greylib init failed!");
-        stream_mgr.graymem = NULL;
         return STREAM_ERROR;
     }
+
+    grey_clear_display();
 #endif /* !HAVE_LCD_COLOR */
 
     stream_mgr.thread = rb->create_thread(stream_mgr_thread,
@@ -1144,7 +1098,6 @@ void stream_exit(void)
     }
 
 #ifndef HAVE_LCD_COLOR
-    if (stream_mgr.graymem != NULL)
-        grey_release();
+    grey_release();
 #endif
 }

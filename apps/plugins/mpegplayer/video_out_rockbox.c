@@ -503,21 +503,14 @@ void vo_set_clip_rect(const struct vo_rect *rc)
     vo.output_height = rc_out.b - rc_out.t;
 }
 
-#if NUM_CORES > 1 || !defined (HAVE_LCD_COLOR)
+#if NUM_CORES > 1
 void vo_lock(void)
 {
-/* TODO: evaluate synchronization with graylib in the sim */
-#if !defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
-    set_irq_level(HIGHEST_IRQ_LEVEL);
-#endif
     video_lock();
 }
 
 void vo_unlock(void)
 {
     video_unlock();
-#if !defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
-    set_irq_level(0);
-#endif
 }
 #endif

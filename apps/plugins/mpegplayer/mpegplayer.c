@@ -257,10 +257,8 @@ struct wvs
     int height;
     unsigned fgcolor;
     unsigned bgcolor;
-#ifdef HAVE_LCD_COLOR
     unsigned prog_fillcolor;
     struct vo_rect update_rect;
-#endif
     struct vo_rect prog_rect;
     struct vo_rect time_rect;
     struct vo_rect dur_rect;
@@ -310,16 +308,21 @@ static unsigned draw_blendcolor(unsigned c1, unsigned c2, unsigned char amount)
 /* Drawing functions that operate rotated on LCD_PORTRAIT displays -
  * most are just wrappers of lcd_* functions with transforms applied.
  * The origin is the upper-left corner of the WVS area */
-#ifdef HAVE_LCD_COLOR
 static void draw_update_rect(int x, int y, int width, int height)
 {
-    rb->lcd_update_rect(_X, _Y, _W, _H);
+    lcd_(update_rect)(_X, _Y, _W, _H);
 }
-#endif
 
 static void draw_clear_area(int x, int y, int width, int height)
 {
+#ifdef HAVE_LCD_COLOR
     rb->screen_clear_area(rb->screens[SCREEN_MAIN], _X, _Y, _W, _H);
+#else
+    int oldmode = grey_get_drawmode();
+    grey_set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
+    grey_fillrect(_X, _Y, _W, _H);
+    grey_set_drawmode(oldmode);
+#endif
 }
 
 static void draw_clear_area_rect(const struct vo_rect *rc)
@@ -328,48 +331,69 @@ static void draw_clear_area_rect(const struct vo_rect *rc)
     int y = rc->t;
     int width = rc->r - rc->l;
     int height = rc->b - rc->t;
+#ifdef HAVE_LCD_COLOR
     rb->screen_clear_area(rb->screens[SCREEN_MAIN], _X, _Y, _W, _H);
-}
-
-static void draw_scrollbar_draw(int x, int y, int width, int height,
-                                int items, int min_shown, int max_shown)
-{
-#ifdef HAVE_LCD_COLOR
-    int oldbg = rb->lcd_get_background();
-    rb->lcd_set_background(wvs.prog_fillcolor);
-#endif
-
-    rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN], _X, _Y,
-                           _W, _H, items, min_shown, max_shown,
-                           0
-#ifdef LCD_LANDSCAPE
-                           | HORIZONTAL
-#endif
-#ifdef HAVE_LCD_COLOR
-                           | INNER_BGFILL | FOREGROUND
-#endif
-                           );
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(oldbg);
+#else
+    int oldmode = grey_get_drawmode();
+    grey_set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
+    grey_fillrect(_X, _Y, _W, _H);
+    grey_set_drawmode(oldmode);
 #endif
 }
 
-static void draw_scrollbar_draw_rect(const struct vo_rect *rc, int items,
-                                     int min_shown, int max_shown)
+static void draw_fillrect(int x, int y, int width, int height)
 {
-    draw_scrollbar_draw(rc->l, rc->t, rc->r - rc->l, rc->b - rc->t,
-                        items, min_shown, max_shown);
+    lcd_(fillrect)(_X, _Y, _W, _H);
 }
 
 static void draw_hline(int x1, int x2, int y)
 {
 #ifdef LCD_LANDSCAPE
-    rb->lcd_hline(x1 + wvs.x, x2 + wvs.x, y + wvs.y);
+    lcd_(hline)(x1 + wvs.x, x2 + wvs.x, y + wvs.y);
 #else
     y = LCD_WIDTH - (y + wvs.y) - 1;
-    rb->lcd_vline(y, x1 + wvs.x, x2 + wvs.x);
+    lcd_(vline)(y, x1 + wvs.x, x2 + wvs.x);
 #endif
+}
+
+static void draw_vline(int x, int y1, int y2)
+{
+#ifdef LCD_LANDSCAPE
+    lcd_(vline)(x + wvs.x, y1 + wvs.y, y2 + wvs.y);
+#else
+    y1 = LCD_WIDTH - (y1 + wvs.y) - 1;
+    y2 = LCD_WIDTH - (y2 + wvs.y) - 1;
+    lcd_(hline)(y1, y2, x + wvs.x);
+#endif
+}
+
+static void draw_scrollbar_draw(int x, int y, int width, int height,
+                                uint32_t min, uint32_t max, uint32_t val)
+{
+    unsigned oldfg = lcd_(get_foreground)();
+
+    draw_hline(x + 1, x + width - 2, y);
+    draw_hline(x + 1, x + width - 2, y + height - 1);
+    draw_vline(x, y + 1, y + height - 2);
+    draw_vline(x + width - 1, y + 1, y + height - 2);
+
+    val = muldiv_uint32(width - 2, val, max - min);
+    val = MIN(val, (uint32_t)(width - 2));
+
+    draw_fillrect(x + 1, y + 1, val, height - 2);
+
+    lcd_(set_foreground)(wvs.prog_fillcolor);
+
+    draw_fillrect(x + 1 + val, y + 1, width - 2 - val, height - 2);
+
+    lcd_(set_foreground)(oldfg);
+}
+
+static void draw_scrollbar_draw_rect(const struct vo_rect *rc, int min,
+                                     int max, int val)
+{
+    draw_scrollbar_draw(rc->l, rc->t, rc->r - rc->l, rc->b - rc->t,
+                        min, max, val);
 }
 
 #ifdef LCD_PORTRAIT
@@ -480,18 +504,18 @@ static void draw_oriented_mono_bitmap_part(const unsigned char *src,
                                            int stride, int x, int y,
                                            int width, int height)
 {
-    int mode = rb->lcd_get_drawmode();
-    rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_mono_bitmap_part(src, src_x, src_y, stride, x, y, width, height);
-    rb->lcd_set_drawmode(mode);
+    int mode = lcd_(get_drawmode)();
+    lcd_(set_drawmode)(DRMODE_FG);
+    lcd_(mono_bitmap_part)(src, src_x, src_y, stride, x, y, width, height);
+    lcd_(set_drawmode)(mode);
 }
 
 static void draw_putsxy_oriented(int x, int y, const char *str)
 {
-    int mode = rb->lcd_get_drawmode();
-    rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_putsxy(x + wvs.x, y + wvs.y, str);
-    rb->lcd_set_drawmode(mode);
+    int mode = lcd_(get_drawmode)();
+    lcd_(set_drawmode)(DRMODE_FG);
+    lcd_(putsxy)(x + wvs.x, y + wvs.y, str);
+    lcd_(set_drawmode)(mode);
 }
 #endif /* LCD_PORTRAIT */
 
@@ -503,7 +527,7 @@ static void wvs_text_init(void)
     int phys;
     int spc_width;
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_(setfont)(FONT_UI);
 
     wvs.x = 0;
     wvs.width = SCREEN_WIDTH;
@@ -515,8 +539,7 @@ static void wvs_text_init(void)
 
     ts_to_hms(stream_get_duration(), &hms);
     hms_format(buf, sizeof (buf), &hms);
-    rb->lcd_getstringsize(buf, &wvs.time_rect.r,
-                               &wvs.time_rect.b);
+    lcd_(getstringsize)(buf, &wvs.time_rect.r, &wvs.time_rect.b);
 
     /* Choose well-sized bitmap images relative to font height */
     if (wvs.time_rect.b < 12) {
@@ -546,8 +569,8 @@ static void wvs_text_init(void)
     rb->snprintf(buf, sizeof(buf), "%d%s", phys,
                  rb->sound_unit(SOUND_VOLUME));
 
-    rb->lcd_getstringsize(" ", &spc_width, NULL);
-    rb->lcd_getstringsize(buf, &wvs.vol_rect.r, &wvs.vol_rect.b);
+    lcd_(getstringsize)(" ", &spc_width, NULL);
+    lcd_(getstringsize)(buf, &wvs.vol_rect.r, &wvs.vol_rect.b);
 
     wvs.prog_rect.r = SCREEN_WIDTH - WVS_BDR_L - spc_width -
                            wvs.vol_rect.r - WVS_BDR_R;
@@ -568,14 +591,12 @@ static void wvs_text_init(void)
     wvs.height = WVS_BDR_T + MAX(wvs.prog_rect.b, wvs.vol_rect.b) -
                     MIN(wvs.time_rect.t, wvs.stat_rect.t) + WVS_BDR_B;
 
-#if LCD_PIXELFORMAT == VERTICAL_PACKING
-    wvs.height = ALIGN_UP(wvs.height, 8);
-#else
+#ifdef HAVE_LCD_COLOR
     wvs.height = ALIGN_UP(wvs.height, 2);
 #endif
     wvs.y = SCREEN_HEIGHT - wvs.height;
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_(setfont)(FONT_SYSFIXED);
 }
 
 static void wvs_init(void)
@@ -589,8 +610,9 @@ static void wvs_init(void)
     wvs.fgcolor = LCD_WHITE;
     wvs.prog_fillcolor = LCD_BLACK;
 #else
-    wvs.bgcolor = LCD_LIGHTGRAY;
-    wvs.fgcolor = LCD_BLACK;
+    wvs.bgcolor = GREY_LIGHTGRAY;
+    wvs.fgcolor = GREY_BLACK;
+    wvs.prog_fillcolor = GREY_WHITE;
 #endif
     wvs.curr_time = 0;
     wvs.status = WVS_STATUS_STOPPED;
@@ -623,37 +645,39 @@ static void wvs_refresh_background(void)
     char buf[32];
     struct hms hms;
 
-    int bg = rb->lcd_get_background();
-    rb->lcd_set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
+    unsigned bg = lcd_(get_background)();
+    lcd_(set_drawmode)(DRMODE_SOLID | DRMODE_INVERSEVID);
 
 #ifdef HAVE_LCD_COLOR
     /* Draw a "raised" area for our graphics */
-    rb->lcd_set_background(draw_blendcolor(bg, LCD_WHITE, 192));
+    lcd_(set_background)(draw_blendcolor(bg, DRAW_WHITE, 192));
     draw_hline(0, wvs.width, 0);
 
-    rb->lcd_set_background(draw_blendcolor(bg, LCD_WHITE, 80));
+    lcd_(set_background)(draw_blendcolor(bg, DRAW_WHITE, 80));
     draw_hline(0, wvs.width, 1);
 
-    rb->lcd_set_background(draw_blendcolor(bg, LCD_BLACK, 48));
+    lcd_(set_background)(draw_blendcolor(bg, DRAW_BLACK, 48));
     draw_hline(0, wvs.width, wvs.height-2);
 
-    rb->lcd_set_background(draw_blendcolor(bg, LCD_BLACK, 128));
+    lcd_(set_background)(draw_blendcolor(bg, DRAW_BLACK, 128));
     draw_hline(0, wvs.width, wvs.height-1);
 
-    rb->lcd_set_background(bg);
+    lcd_(set_background)(bg);
     draw_clear_area(0, 2, wvs.width, wvs.height - 4);
-
-    vo_rect_set_ext(&wvs.update_rect, 0, 0, wvs.width, wvs.height);
 #else
     /* Give contrast with the main background */
-    rb->lcd_set_background(LCD_DARKGRAY);
+    lcd_(set_background)(GREY_WHITE);
     draw_hline(0, wvs.width, 0);
 
-    rb->lcd_set_background(bg);
-    draw_clear_area(0, 1, wvs.width, wvs.height - 1);
+    lcd_(set_background)(GREY_DARKGRAY);
+    draw_hline(0, wvs.width, wvs.height-1);
+
+    lcd_(set_background)(bg);
+    draw_clear_area(0, 1, wvs.width, wvs.height - 2);
 #endif
 
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    vo_rect_set_ext(&wvs.update_rect, 0, 0, wvs.width, wvs.height);
+    lcd_(set_drawmode)(DRMODE_SOLID);
 
     if (stream_get_duration() != INVALID_TIMESTAMP) {
         /* Draw the movie duration */
@@ -672,7 +696,7 @@ static void wvs_refresh_time(void)
 
     uint32_t duration = stream_get_duration();
 
-    draw_scrollbar_draw_rect(&wvs.prog_rect, duration, 0,
+    draw_scrollbar_draw_rect(&wvs.prog_rect, 0, duration,
                              wvs.curr_time);
 
     ts_to_hms(wvs.curr_time, &hms);
@@ -681,12 +705,10 @@ static void wvs_refresh_time(void)
     draw_clear_area_rect(&wvs.time_rect);
     draw_putsxy_oriented(wvs.time_rect.l, wvs.time_rect.t, buf);    
 
-#ifdef HAVE_LCD_COLOR
     vo_rect_union(&wvs.update_rect, &wvs.update_rect,
                   &wvs.prog_rect);
     vo_rect_union(&wvs.update_rect, &wvs.update_rect,
                   &wvs.time_rect);
-#endif
 }
 
 /* Refresh the volume display area */
@@ -699,15 +721,13 @@ static void wvs_refresh_volume(void)
     rb->snprintf(buf, sizeof (buf), "%d%s",
                  rb->sound_val2phys(SOUND_VOLUME, volume),
                  rb->sound_unit(SOUND_VOLUME));
-    rb->lcd_getstringsize(buf, &width, NULL);
+    lcd_(getstringsize)(buf, &width, NULL);
 
     /* Right-justified */
     draw_clear_area_rect(&wvs.vol_rect);
     draw_putsxy_oriented(wvs.vol_rect.r - width, wvs.vol_rect.t, buf);
 
-#ifdef HAVE_LCD_COLOR
     vo_rect_union(&wvs.update_rect, &wvs.update_rect, &wvs.vol_rect);
-#endif
 }
 
 /* Refresh the status icon */
@@ -719,11 +739,11 @@ static void wvs_refresh_status(void)
 
 #ifdef HAVE_LCD_COLOR
     /* Draw status icon with a drop shadow */
-    unsigned oldfg = rb->lcd_get_foreground();
+    unsigned oldfg = lcd_(get_foreground)();
     int i = 1;
 
-    rb->lcd_set_foreground(draw_blendcolor(rb->lcd_get_background(),
-                           LCD_BLACK, 96));
+    lcd_(set_foreground)(draw_blendcolor(lcd_(get_background)(),
+                         DRAW_BLACK, 96));
 
     while (1)
     {
@@ -738,7 +758,7 @@ static void wvs_refresh_status(void)
         if (--i < 0)
             break;
 
-        rb->lcd_set_foreground(oldfg);
+        lcd_(set_foreground)(oldfg);
     }
 
     vo_rect_union(&wvs.update_rect, &wvs.update_rect, &wvs.stat_rect);
@@ -750,6 +770,7 @@ static void wvs_refresh_status(void)
                                    wvs.stat_rect.l + wvs.x,
                                    wvs.stat_rect.t + wvs.y,
                                    icon_size, icon_size);
+    vo_rect_union(&wvs.update_rect, &wvs.update_rect, &wvs.stat_rect);
 #endif
 }
 
@@ -859,16 +880,14 @@ static void wvs_refresh(int hint)
 
     /* Set basic drawing params that are used. Elements that perform variations
      * will restore them. */
-    oldfg = rb->lcd_get_foreground();
-    oldbg = rb->lcd_get_background();
+    oldfg = lcd_(get_foreground)();
+    oldbg = lcd_(get_background)();
 
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_set_foreground(wvs.fgcolor);
-    rb->lcd_set_background(wvs.bgcolor);
+    lcd_(setfont)(FONT_UI);
+    lcd_(set_foreground)(wvs.fgcolor);
+    lcd_(set_background)(wvs.bgcolor);
 
-#ifdef HAVE_LCD_COLOR
     vo_rect_clear(&wvs.update_rect);
-#endif
 
     if (hint & WVS_REFRESH_BACKGROUND) {
         wvs_refresh_background();
@@ -888,11 +907,10 @@ static void wvs_refresh(int hint)
     }
 
     /* Go back to defaults */
-    rb->lcd_setfont(FONT_SYSFIXED);
-    rb->lcd_set_foreground(oldfg);
-    rb->lcd_set_background(oldbg);
+    lcd_(setfont)(FONT_SYSFIXED);
+    lcd_(set_foreground)(oldfg);
+    lcd_(set_background)(oldbg);
 
-#ifdef HAVE_LCD_COLOR
     /* Update the dirty rectangle */
     vo_lock();
 
@@ -902,10 +920,6 @@ static void wvs_refresh(int hint)
                      wvs.update_rect.b - wvs.update_rect.t);
 
     vo_unlock();
-#else
-    /* Defer update to greylib */
-    grey_deferred_lcd_update();
-#endif
 }
 
 /* Show/Hide the WVS */
@@ -930,7 +944,9 @@ static void wvs_show(unsigned show)
 
         stream_vo_set_clip(NULL);
 
+#ifdef HAVE_LCD_COLOR
         draw_clear_area(0, 0, wvs.width, wvs.height);
+#endif
 
         if (!(show & WVS_NODRAW)) {
 #ifdef HAVE_LCD_COLOR
@@ -1393,7 +1409,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         DEBUGF("Could not initialize streams\n");
     } else {
         rb->splash(0, "Loading...");
-
         init_settings((char*)parameter);
 
         err = stream_open((char *)parameter);

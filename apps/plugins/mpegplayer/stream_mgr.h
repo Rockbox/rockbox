@@ -37,10 +37,6 @@ struct stream_mgr
     struct list_item actl;  /* List of active streams */
     struct mutex str_mtx;   /* Main stream manager mutex */
     struct mutex actl_mtx;  /* Lock for current-streams list */
-#ifndef HAVE_LCD_COLOR
-    void *graymem;
-    size_t graysize;
-#endif
     union /* A place for reusable non-cacheable parameters */
     {
         struct vo_rect rc;
@@ -109,9 +105,10 @@ bool stream_show_vo(bool show);
 void stream_vo_set_clip(const struct vo_rect *rc);
 
 #ifndef HAVE_LCD_COLOR
-/* Set the gray overlay rectangle */
-bool stream_set_gray_rect(const struct vo_rect *rc);
 void stream_gray_show(bool show);
+#ifdef GRAY_CACHE_MAINT
+void stream_gray_pause(bool pause);
+#endif
 #endif
 
 /* Display thumbnail of the current seekpoint */

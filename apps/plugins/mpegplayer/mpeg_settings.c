@@ -178,17 +178,56 @@ static void display_options(void)
     menu_exit(menu_id);
 }
 
+#ifndef HAVE_LCD_COLOR
+/* Cheapo splash implementation for the grey surface */
+static void grey_splash(int ticks, const unsigned char *fmt, ...)
+{
+    unsigned char buffer[256];
+    int x, y, w, h;
+    int oldfg, oldmode;
+
+    va_list ap;
+    va_start(ap, fmt);
+
+    rb->vsnprintf(buffer, sizeof (buffer), fmt, ap);
+
+    va_end(ap);
+
+    grey_getstringsize(buffer, &w, &h);
+
+    oldfg = grey_get_foreground();
+    oldmode = grey_get_drawmode();
+
+    grey_set_drawmode(DRMODE_FG);
+    grey_set_foreground(GREY_LIGHTGRAY);
+
+    x = (LCD_WIDTH - w) / 2;
+    y = (LCD_HEIGHT - h) / 2;
+
+    grey_fillrect(x - 1, y - 1, w + 2, h + 2);
+
+    grey_set_foreground(GREY_BLACK);
+
+    grey_putsxy(x, y, buffer);
+    grey_drawrect(x - 2, y - 2, w + 4, h + 4);
+
+    grey_set_foreground(oldfg);
+    grey_set_drawmode(oldmode);
+
+    grey_update();
+
+    if (ticks > 0)
+        rb->sleep(ticks);
+}
+#endif /* !HAVE_LCD_COLOR */
+
 static void show_loading(struct vo_rect *rc)
 {
-    int oldmode;
-#ifndef HAVE_LCD_COLOR
-    stream_gray_show(false);
-#endif
-    oldmode = rb->lcd_get_drawmode();
-    rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID);
-    rb->lcd_fillrect(rc->l-1, rc->t-1, rc->r - rc->l + 2, rc->b - rc->t + 2);
-    rb->lcd_set_drawmode(oldmode);
-    rb->splash(0, "Loading...");
+    int oldmode = lcd_(get_drawmode)();
+    lcd_(set_drawmode)(DRMODE_SOLID | DRMODE_INVERSEVID);
+    lcd_(fillrect)(rc->l-1, rc->t-1, rc->r - rc->l + 2, rc->b - rc->t + 2);
+    lcd_(set_drawmode)(oldmode);
+    lcd_(splash)(0, "Loading...");
 }
 
 void draw_slider(uint32_t range, uint32_t pos, struct vo_rect *rc)
@@ -211,36 +250,36 @@ void draw_slider(uint32_t range, uint32_t pos, struct vo_rect *rc)
     /* Put positition on left */
     ts_to_hms(pos, &hms);
     hms_format(str, sizeof(str), &hms);
-    rb->lcd_getstringsize(str, NULL, &text_h);
+    lcd_(getstringsize)(str, NULL, &text_h);
     text_y = SLIDER_Y - SLIDER_TEXTMARGIN - text_h;
 
     if (rc == NULL)
     {
-        int oldmode = rb->lcd_get_drawmode();
-        rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID);
-        rb->lcd_fillrect(SLIDER_X, text_y, SLIDER_WIDTH,
-                         LCD_HEIGHT - SLIDER_BMARGIN - text_y
-                         - SLIDER_TMARGIN);
-        rb->lcd_set_drawmode(oldmode);
+        int oldmode = lcd_(get_drawmode)();
+        lcd_(set_drawmode)(DRMODE_BG | DRMODE_INVERSEVID);
+        lcd_(fillrect)(SLIDER_X, text_y, SLIDER_WIDTH,
+                       LCD_HEIGHT - SLIDER_BMARGIN - text_y
+                       - SLIDER_TMARGIN);
+        lcd_(set_drawmode)(oldmode);
 
-        rb->lcd_putsxy(SLIDER_X, text_y, str);
+        lcd_(putsxy)(SLIDER_X, text_y, str);
 
         /* Put duration on right */
         ts_to_hms(range, &hms);
         hms_format(str, sizeof(str), &hms);
-        rb->lcd_getstringsize(str, &text_w, NULL);
+        lcd_(getstringsize)(str, &text_w, NULL);
 
-        rb->lcd_putsxy(SLIDER_X + SLIDER_WIDTH - text_w, text_y, str);
+        lcd_(putsxy)(SLIDER_X + SLIDER_WIDTH - text_w, text_y, str);
 
         /* Draw slider */
-        rb->lcd_drawrect(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT);
-        rb->lcd_fillrect(SLIDER_X, SLIDER_Y,
-                         muldiv_uint32(pos, SLIDER_WIDTH, range),
-                         SLIDER_HEIGHT);
+        lcd_(drawrect)(SLIDER_X, SLIDER_Y, SLIDER_WIDTH, SLIDER_HEIGHT);
+        lcd_(fillrect)(SLIDER_X, SLIDER_Y,
+                       muldiv_uint32(pos, SLIDER_WIDTH, range),
+                       SLIDER_HEIGHT);
 
         /* Update screen */
-        rb->lcd_update_rect(SLIDER_X, text_y - SLIDER_TMARGIN, SLIDER_WIDTH,
-                            LCD_HEIGHT - SLIDER_BMARGIN - text_y + SLIDER_TEXTMARGIN);
+        lcd_(update_rect)(SLIDER_X, text_y - SLIDER_TMARGIN, SLIDER_WIDTH,
+                          LCD_HEIGHT - SLIDER_BMARGIN - text_y + SLIDER_TEXTMARGIN);
     }
     else
     {
@@ -256,33 +295,28 @@ bool display_thumb_image(const struct vo_rect *rc)
 {
     if (!stream_display_thumb(rc))
     {
-        rb->splash(0, "Frame not available");
+        lcd_(splash)(0, "Frame not available");
         return false;
     }
 
-#ifdef HAVE_LCD_COLOR
     /* Draw a raised border around the frame */
-    int oldcolor = rb->lcd_get_foreground();
-    rb->lcd_set_foreground(LCD_LIGHTGRAY);
+    int oldcolor = lcd_(get_foreground)();
+    lcd_(set_foreground)(DRAW_LIGHTGRAY);
 
-    rb->lcd_hline(rc->l-1, rc->r-1, rc->t-1);
-    rb->lcd_vline(rc->l-1, rc->t, rc->b-1);
+    lcd_(hline)(rc->l-1, rc->r-1, rc->t-1);
+    lcd_(vline)(rc->l-1, rc->t, rc->b-1);
 
-    rb->lcd_set_foreground(LCD_DARKGRAY);
+    lcd_(set_foreground)(DRAW_DARKGRAY);
 
-    rb->lcd_hline(rc->l-1, rc->r, rc->b);
-    rb->lcd_vline(rc->r, rc->t-1, rc->b);
+    lcd_(hline)(rc->l-1, rc->r, rc->b);
+    lcd_(vline)(rc->r, rc->t-1, rc->b);
 
-    rb->lcd_set_foreground(oldcolor);
+    lcd_(set_foreground)(oldcolor);
 
-    rb->lcd_update_rect(rc->l-1, rc->t-1, rc->r - rc->l + 2, 1);
-    rb->lcd_update_rect(rc->l-1, rc->t, 1, rc->b - rc->t);
-    rb->lcd_update_rect(rc->l-1, rc->b, rc->r - rc->l + 2, 1);
-    rb->lcd_update_rect(rc->r, rc->t, 1, rc->b - rc->t);
-#else
-    /* Just show the thumbnail */
-    stream_gray_show(true);
-#endif
+    lcd_(update_rect)(rc->l-1, rc->t-1, rc->r - rc->l + 2, 1);
+    lcd_(update_rect)(rc->l-1, rc->t, 1, rc->b - rc->t);
+    lcd_(update_rect)(rc->l-1, rc->b, rc->r - rc->l + 2, 1);
+    lcd_(update_rect)(rc->r, rc->t, 1, rc->b - rc->t);
 
     return true;
 }
@@ -320,18 +354,12 @@ int get_start_time(uint32_t duration)
 
     enum state_enum slider_state = state0;
 
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_(clear_display)();
+    lcd_(update)();
 
     draw_slider(0, 100, &rc_bound);
     rc_bound.b = rc_bound.t - SLIDER_TMARGIN;
-#ifdef HAVE_LCD_COLOR
     rc_bound.t = SCREEN_MARGIN;
-#else
-    rc_bound.t = 0;
-    rc_bound.l = 0;
-    rc_bound.r = LCD_WIDTH;
-#endif
 
     DEBUGF("rc_bound: %d, %d, %d, %d\n", rc_bound.l, rc_bound.t,
            rc_bound.r, rc_bound.b);
@@ -343,12 +371,6 @@ int get_start_time(uint32_t duration)
         rc_vid.r = rc_bound.r - rc_bound.l;
         rc_vid.b = rc_bound.b - rc_bound.t;
     }
-
-#if !defined (HAVE_LCD_COLOR)
-#if LCD_PIXELFORMAT == VERTICAL_PACKING
-    rc_bound.b &= ~7; /* Align bottom edge */
-#endif
-#endif
 
     /* Get aspect ratio of bounding rectangle and video in u16.16 */
     aspect_bound = ((rc_bound.r - rc_bound.l) << 16) /
@@ -398,8 +420,8 @@ int get_start_time(uint32_t duration)
            rc_vid.r, rc_vid.b);
 
 #ifndef HAVE_LCD_COLOR
-    /* Set gray overlay to the bounding rectangle */
-    stream_set_gray_rect(&rc_bound);
+    /* Restore gray overlay dimensions */
+    stream_gray_show(true);
 #endif
 
     while(slider_state < state9)
@@ -487,10 +509,9 @@ int get_start_time(uint32_t duration)
     }
 
 #ifndef HAVE_LCD_COLOR
-    /* Restore gray overlay dimensions */
     stream_gray_show(false);
-    rc_bound.b = LCD_HEIGHT;
-    stream_set_gray_rect(&rc_bound);
+    grey_clear_display();
+    grey_update();
 #endif
 
     cancel_cpu_boost();

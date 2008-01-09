@@ -72,10 +72,10 @@ static void draw_fps(struct video_thread_data *td)
     rb->snprintf(str, sizeof(str), "%d.%02d %d %d    ",
                  fps / 100, fps % 100, td->num_skipped,
                  td->info->display_picture->temporal_reference);
-    rb->lcd_putsxy(0, 0, str);
+    lcd_(putsxy)(0, 0, str);
 
     vo_lock();
-    rb->lcd_update_rect(0, 0, LCD_WIDTH, 8);
+    lcd_(update_rect)(0, 0, LCD_WIDTH, 8);
     vo_unlock();
 
     td->last_showfps = *rb->current_tick;
@@ -489,7 +489,7 @@ static void video_thread_msg(struct video_thread_data *td)
 
         case STREAM_STOP:
             if (td->state == TSTATE_DATA)
-                stream_clear_notify(&audio_str, DISK_BUF_DATA_NOTIFY);
+                stream_clear_notify(&video_str, DISK_BUF_DATA_NOTIFY);
 
             td->status = STREAM_STOPPED;
             td->state = TSTATE_EOS;
@@ -522,14 +522,12 @@ static void video_thread_msg(struct video_thread_data *td)
                 rb->lcd_update();
                 vo_unlock();
             }
-#else
-            GRAY_FLUSH_ICACHE();
 #endif
             break;
 
         case STREAM_RESET:
             if (td->state == TSTATE_DATA)
-                stream_clear_notify(&audio_str, DISK_BUF_DATA_NOTIFY);
+                stream_clear_notify(&video_str, DISK_BUF_DATA_NOTIFY);
 
             td->state = TSTATE_INIT;
             td->status = STREAM_STOPPED;
