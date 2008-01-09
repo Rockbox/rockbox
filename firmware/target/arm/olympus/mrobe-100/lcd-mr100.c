@@ -117,8 +117,8 @@ void lcd_set_flip(bool yesno)
 /*** update functions ***/
 
 /* Performance function that works with an external buffer
-   note that by and bheight are in 4-pixel units! */
-void lcd_blit(const fb_data* data, int x, int by, int width,
+   note that by and bheight are in 8-pixel units! */
+void lcd_blit(const unsigned char* data, int x, int by, int width,
               int bheight, int stride)
 {
     /* TODO: Implement lcd_blit() */
@@ -130,19 +130,18 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
     (void)stride;
 }
 
-/* Performance function to blit a YUV bitmap directly to the LCD */
-void lcd_yuv_blit(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
+/* Performance function that works with an external buffer
+   note that by and bheight are in 4-pixel units! */
+void lcd_grey_phase_blit(const struct grey_data *data, int x, int by, 
+                         int width, int bheight, int stride)
 {
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
+    /* TODO: Implement lcd_grey_phase_blit() */
+    (void)data;
     (void)x;
-    (void)y;
+    (void)by;
     (void)width;
-    (void)height;
+    (void)bheight;
+    (void)stride;
 }
 
 /* Update the display.

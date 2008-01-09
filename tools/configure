@@ -1293,8 +1293,8 @@ EOF
     t_model="mrobe-500"
     ;;
 
-    71|mrobe100)
-    target_id=31
+   71|mrobe100)
+    target_id=33
     archos="mrobe100"
     target="-DMROBE_100"
     memory=32 # always
