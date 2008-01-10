@@ -742,7 +742,11 @@ void stream_gray_pause(bool pause)
         if (_grey_info.flags & _GREY_RUNNING)
         {
             rb->timer_unregister();
+#if defined(CPU_PP) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+            rb->cpu_boost(false);
+#endif
             _grey_info.flags &= ~_GREY_RUNNING;
+            rb->screen_dump_set_hook(NULL);
             gray_paused = true;
         }
     }
@@ -754,7 +758,7 @@ void stream_gray_pause(bool pause)
 }
 #endif
 
-#endif
+#endif /* !HAVE_LCD_COLOR */
 
 /* Display a thumbnail at the last seek point */
 bool stream_display_thumb(const struct vo_rect *rc)
