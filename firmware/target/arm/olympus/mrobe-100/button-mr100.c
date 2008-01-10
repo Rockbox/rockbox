@@ -27,10 +27,6 @@
 #include "backlight-target.h"
 #include "system.h"
 
-void button_int(void)
-{
-}
-
 void button_init_device(void)
 {
     /* taken from the mr-100 bootloader (offset 0x1e72) */
@@ -46,12 +42,17 @@ void button_init_device(void)
  */
 int button_read_device(void)
 {
-    return BUTTON_NONE;
+    int btn = BUTTON_NONE;
+    
+    if(~GPIOA_INPUT_VAL & 0x40)
+        btn |= BUTTON_POWER;
+    
+    return btn;
 }
 
 bool button_hold(void)
 {
-    return (GPIOD_INPUT_VAL & BUTTON_HOLD) ? false : true;
+    return (GPIOD_INPUT_VAL & 0x10) ? false : true;
 }
 
 bool headphones_inserted(void)

@@ -4,6 +4,9 @@
  
 #define TARGET_TREE
 
+/* until voltages are sorted out */
+#define  NO_LOW_BATTERY_SHUTDOWN
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 23
 #define MODEL_NAME   "Olympus m:robe MR-100"

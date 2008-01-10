@@ -29,18 +29,14 @@ bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
 
-/* Power button is on GPIOA */
-#define BUTTON_POWER        0x80
 #define POWEROFF_BUTTON     BUTTON_POWER
 #define POWEROFF_COUNT      10
-
-/* Hold button is on GPIOD */
-#define BUTTON_HOLD         0x10
 
 /* FIXME: Until the buttons are figured out, we use the button definitions
    for the H10 keypad & remote. THESE ARE NOT CORRECT! */
 
 /* Main unit's buttons */
+#define BUTTON_POWER        0x00000001
 #define BUTTON_LEFT         0x00000002
 #define BUTTON_RIGHT        0x00000004
 #define BUTTON_REW          0x00000008
