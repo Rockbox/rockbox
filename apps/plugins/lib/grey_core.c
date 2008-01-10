@@ -373,7 +373,10 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
         return false;
         
 #ifndef SIMULATOR
+    /* Init to white */
     _grey_rb->memset(_grey_info.values, 0x80, plane_size);
+    
+    /* Init phases with random bits */
     dst = (unsigned*)(_grey_info.phases);
     end = (unsigned*)(_grey_info.phases + plane_size);
 
@@ -516,7 +519,7 @@ void grey_update_rect(int x, int y, int width, int height)
 
 void grey_update_rect(int x, int y, int width, int height)
 {
-    unsigned char *src;
+    unsigned char *src, *dst;
 
     if ((width <= 0) || (height <= 0))
         return; /* nothing to do */
@@ -527,26 +530,31 @@ void grey_update_rect(int x, int y, int width, int height)
         width = _grey_info.width - x;
         
     src = _grey_info.buffer + _GREY_MULUQ(_grey_info.width, y) + x;
-    
-    do 
-    {
+
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        int idx = _GREY_MULUQ(_grey_info.width, y) + x;
-#else
-#if LCD_DEPTH == 1
-        int idx = _GREY_MULUQ(_grey_info.width, y & ~7) + (x << 3) + (~y & 7);
-#elif LCD_DEPTH == 2
-        int idx = _GREY_MULUQ(_grey_info.width, y & ~3) + (x << 2) + (~y & 3);
-#endif
-#endif /* LCD_PIXELFORMAT */
-        unsigned char *dst_row = _grey_info.values + idx;
+    dst = _grey_info.values + _GREY_MULUQ(_grey_info.width, y) + x;
+    
+    do
+    {
+        _grey_rb->memcpy(dst, src, width);
+        dst += _grey_info.width;
+        src += _grey_info.width;
+    }
+    while (--height > 0);
+
+#else /* LCD_PIXELFORMAT == VRTICAL_PACKING */
+    do
+    {
         unsigned char *src_row = src;
         unsigned char *src_end = src + width;
-        
+
+        dst = _grey_info.values
+            + _GREY_MULUQ(_grey_info.width, y & ~_GREY_BMASK)
+            + (x << _GREY_BSHIFT) + (~y & _GREY_BMASK);
         do
         {
-            *dst_row = *src_row++;
-            dst_row += _GREY_X_ADVANCE;
+            *dst = *src_row++;
+            dst += _GREY_BSIZE;
         }
         while (src_row < src_end);
         
@@ -554,6 +562,8 @@ void grey_update_rect(int x, int y, int width, int height)
         src += _grey_info.width;
     }
     while (--height > 0);
+
+#endif /* LCD_PIXELFORMAT */
 }
 
 #endif /* !SIMULATOR */
@@ -687,18 +697,12 @@ static void grey_screendump_hook(int fd)
 #ifdef SIMULATOR
                 unsigned char *src = _grey_info.buffer
                                    + _GREY_MULUQ(_grey_info.width, gy) + gx;
-
-                for (i = 0; i < 4; i++)
-                    linebuf[x + i] = BMP_FIXEDCOLORS + *src++;
 #else
                 unsigned char *src = _grey_info.values
                                    + _GREY_MULUQ(_grey_info.width, gy) + gx;
-                for (i = 0; i < 4; i++)
-                {
-                    linebuf[x + i] = BMP_FIXEDCOLORS + *src;
-                    src += _GREY_X_ADVANCE;
-                }
 #endif
+                for (i = 0; i < 4; i++)
+                    linebuf[x + i] = BMP_FIXEDCOLORS + *src++;
             }
             else
             {
@@ -730,7 +734,9 @@ static void grey_screendump_hook(int fd)
 #else
                 linebuf[x] = BMP_FIXEDCOLORS
                            + _grey_info.values[_GREY_MULUQ(_grey_info.width,
-                                             gy & ~7) + (gx << 3) + (~gy & 7)];
+                                                           gy & ~_GREY_BMASK) 
+                                               + (gx << _GREY_BSHIFT) 
+                                               + (~gy & _GREY_BMASK)];
 #endif
             }
             else
@@ -757,7 +763,9 @@ static void grey_screendump_hook(int fd)
 #else
                 linebuf[x] = BMP_FIXEDCOLORS
                            + _grey_info.values[_GREY_MULUQ(_grey_info.width,
-                                             gy & ~3) + (gx << 2) + (~gy & 3)];
+                                                           gy & ~_GREY_BMASK)
+                                               + (gx << _GREY_BSHIFT)
+                                               + (~gy & _GREY_BMASK)];
 #endif
             }
             else

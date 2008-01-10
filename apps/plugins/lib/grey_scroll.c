@@ -46,8 +46,9 @@ void grey_scroll_left(int count)
     do
     {
         _grey_rb->memmove(data, data + count, length);
-        _grey_rb->memset(data + length, blank, count);
-        data += _grey_info.width;
+        data += length;
+        _grey_rb->memset(data, blank, count);
+        data += count;
     }
     while (data < data_end);
 }
@@ -149,210 +150,184 @@ void grey_ub_scroll_down(int count)
 /* Scroll left */
 void grey_ub_scroll_left(int count)
 {
-    unsigned char *dst, *src, *end;
-    int blank, y, idx;
+    unsigned char *data, *data_end;
+    int blank, length;
 
-    if ((count == 0) || ((unsigned)count >= (unsigned)_grey_info.width))
+    if ((unsigned)count >= (unsigned)_grey_info.width)
         return;
-        
+    
+    data = _grey_info.values;
+    data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
+    length = (_grey_info.width - count) << _GREY_BSHIFT;
+    count <<= _GREY_BSHIFT;
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
              _grey_info.fg_val : _grey_info.bg_val;
 
-    for (y = 0; y < _grey_info.height; y++)
+    do
     {
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        idx = _GREY_MULUQ(_grey_info.width, y);
-#else
-#if LCD_DEPTH == 1
-        idx = _GREY_MULUQ(_grey_info.width, y & ~7) + (~y & 7);
-#elif LCD_DEPTH == 2
-        idx = _GREY_MULUQ(_grey_info.width, y & ~3) + (~y & 3);
-#endif
-#endif /* LCD_PIXELFORMAT */
-        dst = _grey_info.values + idx;
-        src = dst + count * _GREY_X_ADVANCE;
-        end = dst + _grey_info.width * _GREY_X_ADVANCE;
-        
-        do
-        {
-            *dst = *src;
-            dst += _GREY_X_ADVANCE;
-            src += _GREY_X_ADVANCE;
-        }
-        while (src < end);
-        
-        do
-        {
-            *dst = blank;
-            dst += _GREY_X_ADVANCE;
-        }
-        while (dst < end);
+        _grey_rb->memmove(data, data + count, length);
+        data += length;
+        _grey_rb->memset(data, blank, count);
+        data += count;
     }
+    while (data < data_end);
 }
 
 /* Scroll right */
 void grey_ub_scroll_right(int count)
 {
-    unsigned char *dst, *src, *start;
-    int blank, y, idx;
+    unsigned char *data, *data_end;
+    int blank, length;
 
-    if ((count == 0) || ((unsigned)count >= (unsigned)_grey_info.width))
+    if ((unsigned)count >= (unsigned)_grey_info.width)
         return;
-        
+    
+    data = _grey_info.values;
+    data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
+    length = (_grey_info.width - count) << _GREY_BSHIFT;
+    count <<= _GREY_BSHIFT;
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
              _grey_info.fg_val : _grey_info.bg_val;
 
-    for (y = 0; y < _grey_info.height; y++)
+    do
     {
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        idx = _GREY_MULUQ(_grey_info.width, y);
-#else
-#if LCD_DEPTH == 1
-        idx = _GREY_MULUQ(_grey_info.width, y & ~7) + (~y & 7);
-#elif LCD_DEPTH == 2
-        idx = _GREY_MULUQ(_grey_info.width, y & ~3) + (~y & 3);
-#endif
-#endif /* LCD_PIXELFORMAT */
-        start = _grey_info.values + idx;
-        dst = start + _grey_info.width * _GREY_X_ADVANCE;
-        src = dst - count * _GREY_X_ADVANCE;
-        
-        do 
-        {
-            dst -= _GREY_X_ADVANCE;
-            src -= _GREY_X_ADVANCE;
-            *dst = *src;
-        }
-        while (src > start);
-        
-        do
-        {
-            dst -= _GREY_X_ADVANCE;
-            *dst = blank;
-        }
-        while (dst > start);
+        _grey_rb->memmove(data + count, data, length);
+        _grey_rb->memset(data, blank, count);
+        data += _grey_info.width << _GREY_BSHIFT;
     }
+    while (data < data_end);
 }
 
+/* Scroll up */
 void grey_ub_scroll_up(int count)
 {
-    unsigned char *dst, *dst_end, *src;
-    int blank, ys, yd, is, id;
+    unsigned char *dst, *end, *src;
+    int blank;
 
     if ((unsigned)count >= (unsigned)_grey_info.height)
         return;
         
+    dst   = _grey_info.values;
+    end   = dst + _GREY_MULUQ(_grey_info.height, _grey_info.width);
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
              _grey_info.fg_val : _grey_info.bg_val;
 
-    for (ys = count, yd = 0; ys < _grey_info.height; ys++, yd++)
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
+    if (count & _GREY_BMASK)
     {
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        id = _GREY_MULUQ(_grey_info.width, yd);
-        is = _GREY_MULUQ(_grey_info.width, ys);
-#else
-#if LCD_DEPTH == 1
-        id = _GREY_MULUQ(_grey_info.width, yd & ~7) + (~yd & 7);
-        is = _GREY_MULUQ(_grey_info.width, ys & ~7) + (~ys & 7);
-#elif LCD_DEPTH == 2
-        id = _GREY_MULUQ(_grey_info.width, yd & ~3) + (~yd & 3);
-        is = _GREY_MULUQ(_grey_info.width, ys & ~3) + (~ys & 3);
-#endif
-#endif /* LCD_PIXELFORMAT */
-        dst = _grey_info.values + id;
-        src = _grey_info.values + is;
-        dst_end = dst + _grey_info.width * _GREY_X_ADVANCE;
+        /* Scrolling by fractional blocks - move pixel wise. */
+        unsigned char *line_end;
+        int ys, yd;
 
-        do
+        for (ys = count, yd = 0; ys < _grey_info.height; ys++, yd++)
         {
-            *dst = *src;
-            dst += _GREY_X_ADVANCE;
-            src += _GREY_X_ADVANCE;
+            dst = _grey_info.values
+                + _GREY_MULUQ(_grey_info.width, yd & ~_GREY_BMASK)
+                + (~yd & _GREY_BMASK);
+            src = _grey_info.values
+                + _GREY_MULUQ(_grey_info.width, ys & ~_GREY_BMASK)
+                + (~ys & _GREY_BMASK);
+            line_end = dst + _grey_info.width * _GREY_BSIZE;
+
+            do
+            {
+                *dst = *src;
+                dst += _GREY_BSIZE;
+                src += _GREY_BSIZE;
+            }
+            while (dst < line_end);
         }
-        while (dst < dst_end);
+        for (; yd & _GREY_BMASK; yd++)   /* Fill remainder of current block. */
+        {
+            dst = _grey_info.values
+                + _GREY_MULUQ(_grey_info.width, yd & ~_GREY_BMASK)
+                + (~yd & _GREY_BMASK);
+            line_end = dst + _grey_info.width * _GREY_BSIZE;
+
+            do
+            {
+                *dst = blank;
+                dst += _GREY_BSIZE;
+            }
+            while (dst < line_end);
+        }
     }
-    for (; yd < _grey_info.height; yd++)
+    else
+#endif
     {
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        id = _GREY_MULUQ(_grey_info.width, yd);
-#else
-#if LCD_DEPTH == 1
-        id = _GREY_MULUQ(_grey_info.width, yd & ~7) + (~yd & 7);
-#elif LCD_DEPTH == 2
-        id = _GREY_MULUQ(_grey_info.width, yd & ~3) + (~yd & 3);
-#endif
-#endif /* LCD_PIXELFORMAT */
-        dst = _grey_info.values + id;
-        dst_end = dst + _grey_info.width * _GREY_X_ADVANCE;
+        int blen = _GREY_MULUQ(_grey_info.height - count, _grey_info.width);
 
-        do
-        {
-            *dst = blank;
-            dst += _GREY_X_ADVANCE;
-        }
-        while (dst < dst_end);
+        src = dst + _GREY_MULUQ(count, _grey_info.width);
+        _grey_rb->memmove(dst, src, blen);
+        dst += blen;
     }
+    _grey_rb->memset(dst, blank, end - dst); /* Fill remainder at once. */
 }
 
+/* Scroll down */
 void grey_ub_scroll_down(int count)
 {
-    unsigned char *dst, *dst_end, *src;
-    int blank, ys, yd, is, id;
+    unsigned char *start, *dst, *src;
+    int blank;
 
     if ((unsigned)count >= (unsigned)_grey_info.height)
         return;
         
+    start = _grey_info.values;
+    dst   = start + _GREY_MULUQ(_grey_info.height, _grey_info.width);
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
              _grey_info.fg_val : _grey_info.bg_val;
 
-    yd = _grey_info.height - 1;
-    for (ys = yd - count; ys >= 0; ys--, yd--)
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
+    if (count & _GREY_BMASK)
     {
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        id = _GREY_MULUQ(_grey_info.width, yd);
-        is = _GREY_MULUQ(_grey_info.width, ys);
-#else
-#if LCD_DEPTH == 1
-        id = _GREY_MULUQ(_grey_info.width, yd & ~7) + (~yd & 7);
-        is = _GREY_MULUQ(_grey_info.width, ys & ~7) + (~ys & 7);
-#elif LCD_DEPTH == 2
-        id = _GREY_MULUQ(_grey_info.width, yd & ~3) + (~yd & 3);
-        is = _GREY_MULUQ(_grey_info.width, ys & ~3) + (~ys & 3);
-#endif
-#endif /* LCD_PIXELFORMAT */
-        dst = _grey_info.values + id;
-        src = _grey_info.values + is;
-        dst_end = dst + _grey_info.width * _GREY_X_ADVANCE;
+        /* Scrolling by fractional blocks - move pixel wise. */
+        unsigned char *line_end;
+        int ys, yd;
 
-        do
+        yd = _grey_info.height - 1;
+        for (ys = yd - count; ys >= 0; ys--, yd--)
         {
-            *dst = *src;
-            dst += _GREY_X_ADVANCE;
-            src += _GREY_X_ADVANCE;
+            dst = _grey_info.values
+                + _GREY_MULUQ(_grey_info.width, yd & ~_GREY_BMASK)
+                + (~yd & _GREY_BMASK);
+            src = _grey_info.values
+                + _GREY_MULUQ(_grey_info.width, ys & ~_GREY_BMASK)
+                + (~ys & _GREY_BMASK);
+            line_end = dst + _grey_info.width * _GREY_BSIZE;
+
+            do
+            {
+                *dst = *src;
+                dst += _GREY_BSIZE;
+                src += _GREY_BSIZE;
+            }
+            while (dst < line_end);
         }
-        while (dst < dst_end);
+        for (; ~yd & _GREY_BMASK; yd--)   /* Fill remainder of current block. */
+        {
+            dst = _grey_info.values
+                + _GREY_MULUQ(_grey_info.width, yd & ~_GREY_BMASK)
+                + (~yd & _GREY_BMASK);
+            line_end = dst + _grey_info.width * _GREY_BSIZE;
+
+            do
+            {
+                line_end -= _GREY_BSIZE;
+                *line_end = blank;
+            }
+            while (dst < line_end);
+        }
     }
-    for (; yd >= 0; yd--)
+    else
+#endif
     {
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        id = _GREY_MULUQ(_grey_info.width, yd);
-#else
-#if LCD_DEPTH == 1
-        id = _GREY_MULUQ(_grey_info.width, yd & ~7) + (~yd & 7);
-#elif LCD_DEPTH == 2
-        id = _GREY_MULUQ(_grey_info.width, yd & ~3) + (~yd & 3);
-#endif
-#endif /* LCD_PIXELFORMAT */
-        dst = _grey_info.values + id;
-        dst_end = dst + _grey_info.width * _GREY_X_ADVANCE;
+        int blen = _GREY_MULUQ(_grey_info.height - count, _grey_info.width);
 
-        do
-        {
-            *dst = blank;
-            dst += _GREY_X_ADVANCE;
-        }
-        while (dst < dst_end);
+        dst -= blen;
+        _grey_rb->memmove(dst, start, blen);
     }
+    _grey_rb->memset(start, blank, dst - start); /* Fill remainder at once. */
 }
 
 #endif /* !SIMULATOR */

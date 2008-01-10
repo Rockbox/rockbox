@@ -121,14 +121,17 @@ void grey_ub_scroll_down(int count);
 #endif
 
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-#define _GREY_X_ADVANCE 1
+#define _GREY_BSHIFT 0
 #else
 #if LCD_DEPTH == 1
-#define _GREY_X_ADVANCE 8
+#define _GREY_BSHIFT 3
 #elif LCD_DEPTH == 2
-#define _GREY_X_ADVANCE 4
+#define _GREY_BSHIFT 2
 #endif
 #endif /* LCD_PIXELFORMAT */
+
+#define _GREY_BSIZE (1<<_GREY_BSHIFT)
+#define _GREY_BMASK (_GREY_BSIZE-1)
 
 /* The greyscale buffer management structure */
 struct _grey_info

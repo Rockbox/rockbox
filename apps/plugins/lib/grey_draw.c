@@ -634,18 +634,15 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if (y + height > _grey_info.height)
         height = _grey_info.height - y;
 
-    src += _GREY_MULUQ(stride, src_y) + src_x; /* move starting point */
-    
+    src += _GREY_MULUQ(stride, src_y) + src_x; /* move starting point */   
+
     do
     {
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
         int idx = _GREY_MULUQ(_grey_info.width, y) + x;
 #else
-#if LCD_DEPTH == 1
-        int idx = _GREY_MULUQ(_grey_info.width, y & ~7) + (x << 3) + (~y & 7);
-#elif LCD_DEPTH == 2
-        int idx = _GREY_MULUQ(_grey_info.width, y & ~3) + (x << 2) + (~y & 3);
-#endif
+        int idx = _GREY_MULUQ(_grey_info.width, y & ~_GREY_BMASK) 
+                + (x << _GREY_BSHIFT) + (~y & _GREY_BMASK);
 #endif /* LCD_PIXELFORMAT */
         unsigned char *dst_row = _grey_info.values + idx;
         const unsigned char *src_row = src;
@@ -654,7 +651,7 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
         do
         {
             *dst_row = _grey_info.gvalue[*src_row++];
-            dst_row += _GREY_X_ADVANCE;
+            dst_row += _GREY_BSIZE;
         }
         while (src_row < src_end);
         
