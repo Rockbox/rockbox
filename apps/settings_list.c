@@ -1175,6 +1175,9 @@ const struct settings_list settings[] = {
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1, 
                 scanaccel_formatter, getlang_unit_0_is_off, NULL),
 #endif /* HAVE_SCROLLWHEEL */
+#if CONFIG_TUNER
+    SYSTEM_SETTING(0, statusbar_forced, 0),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

@@ -462,6 +462,7 @@ int radio_screen(void)
     in_screen = true;
 
     /* always display status bar in radio screen for now */
+    global_status.statusbar_forced = statusbar?0:1;
     global_settings.statusbar = true;
     FOR_NB_SCREENS(i)
     {
@@ -1029,7 +1030,7 @@ int radio_screen(void)
 
     /* restore status bar settings */
     global_settings.statusbar = statusbar;
-
+    global_status.statusbar_forced = 0;
     in_screen = false;
 #if CONFIG_CODEC != SWCODEC
     return have_recorded;

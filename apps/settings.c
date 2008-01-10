@@ -458,6 +458,11 @@ static bool settings_write_config(char* filename, int options)
     fd = open(filename,O_CREAT|O_TRUNC|O_WRONLY);
     if (fd < 0)
         return false;
+#if CONFIG_TUNER
+    bool statusbar = global_settings.statusbar;
+    if (global_status.statusbar_forced != 0 && statusbar)
+        global_settings.statusbar = false;
+#endif
     fdprintf(fd, "# .cfg file created by rockbox %s - "
                  "http://www.rockbox.org\r\n\r\n", appsversion);
     for(i=0; i<nb_settings; i++)
@@ -536,6 +541,9 @@ static bool settings_write_config(char* filename, int options)
             fdprintf(fd,"%s: %s\r\n",settings[i].cfg_name,value);
     } /* for(...) */
     close(fd);
+#if CONFIG_TUNER
+    global_settings.statusbar = statusbar;
+#endif
     return true;
 }
 #ifndef HAVE_RTC_RAM
