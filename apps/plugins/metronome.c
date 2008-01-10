@@ -20,12 +20,21 @@
 #include "metronome.h"
 
 PLUGIN_HEADER
-
 #define METRONOME_QUIT          PLA_QUIT
+
+/* for volume changes, PLA with scrollwheel isn't proper */
+
+#ifdef HAVE_SCROLLWHEEL
+#define METRONOME_VOL_UP        PLA_DOWN
+#define METRONOME_VOL_DOWN      PLA_UP
+#define METRONOME_VOL_UP_REP    PLA_DOWN_REPEAT
+#define METRONOME_VOL_DOWN_REP  PLA_UP_REPEAT
+#else
 #define METRONOME_VOL_UP        PLA_UP
 #define METRONOME_VOL_DOWN      PLA_DOWN
 #define METRONOME_VOL_UP_REP    PLA_UP_REPEAT
 #define METRONOME_VOL_DOWN_REP  PLA_DOWN_REPEAT
+#endif
 #define METRONOME_LEFT          PLA_LEFT
 #define METRONOME_RIGHT         PLA_RIGHT
 #define METRONOME_LEFT_REP      PLA_LEFT_REPEAT

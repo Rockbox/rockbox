@@ -40,8 +40,8 @@ int button_read_device(void);
 #define BUTTON_UP           0x00000020
 #define BUTTON_POWER        0x00000040
 
-#define BUTTON_SCROLL_UP    0x00000080
-#define BUTTON_SCROLL_DOWN  0x00000100
+#define BUTTON_SCROLL_BACK  0x00000080
+#define BUTTON_SCROLL_FWD   0x00000100
 
 #define BUTTON_MAIN         0x00000fff
 

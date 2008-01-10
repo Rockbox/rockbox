@@ -128,9 +128,9 @@ void clickwheel_int(void)
         unsigned int btn = BUTTON_NONE;
 
         if (old_wheel_value == wheel_tbl[0][wheel_value >> 6])
-            btn = BUTTON_SCROLL_DOWN;
+            btn = BUTTON_SCROLL_FWD;
         else if (old_wheel_value == wheel_tbl[1][wheel_value >> 6])
-            btn = BUTTON_SCROLL_UP;
+            btn = BUTTON_SCROLL_BACK;
 
         if (btn != BUTTON_NONE)
         {

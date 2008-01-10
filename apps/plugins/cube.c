@@ -153,8 +153,8 @@ PLUGIN_HEADER
 #define CUBE_QUIT          BUTTON_POWER
 #define CUBE_X_INC         BUTTON_LEFT
 #define CUBE_X_DEC         BUTTON_RIGHT
-#define CUBE_Y_INC         BUTTON_SCROLL_UP
-#define CUBE_Y_DEC         BUTTON_SCROLL_DOWN
+#define CUBE_Y_INC         BUTTON_SCROLL_FWD
+#define CUBE_Y_DEC         BUTTON_SCROLL_BACK
 #define CUBE_Z_INC         BUTTON_UP
 #define CUBE_Z_DEC         BUTTON_DOWN
 #define CUBE_MODE_PRE      BUTTON_SELECT

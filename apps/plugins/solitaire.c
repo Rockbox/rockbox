@@ -185,8 +185,8 @@ static struct plugin_api* rb;
 #   define SOL_QUIT          BUTTON_POWER
 #   define SOL_UP            BUTTON_UP
 #   define SOL_DOWN          BUTTON_DOWN
-#   define SOL_LEFT          BUTTON_SCROLL_UP
-#   define SOL_RIGHT         BUTTON_SCROLL_DOWN
+#   define SOL_LEFT          BUTTON_SCROLL_BACK
+#   define SOL_RIGHT         BUTTON_SCROLL_FWD
 #   define SOL_MOVE          BUTTON_SELECT
 #   define SOL_DRAW          BUTTON_REC
 #   define SOL_REM2CUR       BUTTON_LEFT
@@ -1408,7 +1408,7 @@ int solitaire( int skipmenu )
         /* what to do when a key is pressed ... */
         button = rb->button_get( true );
 #if (CONFIG_KEYPAD == SANSA_E200_PAD)
-        if (button&(BUTTON_SCROLL_UP|BUTTON_SCROLL_DOWN))
+        if (button&(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD))
             button = button & (~BUTTON_REPEAT);
 #endif
         switch( button )
