@@ -267,7 +267,7 @@ void grey_ub_scroll_up(int count)
 /* Scroll down */
 void grey_ub_scroll_down(int count)
 {
-    unsigned char *start, *dst, *src;
+    unsigned char *start, *dst;
     int blank;
 
     if ((unsigned)count >= (unsigned)_grey_info.height)
@@ -282,7 +282,7 @@ void grey_ub_scroll_down(int count)
     if (count & _GREY_BMASK)
     {
         /* Scrolling by fractional blocks - move pixel wise. */
-        unsigned char *line_end;
+        unsigned char *src, *line_end;
         int ys, yd;
 
         yd = _grey_info.height - 1;
