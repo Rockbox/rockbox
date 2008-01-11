@@ -48,6 +48,21 @@ sub mapscan {
     return hex($end) - hex($start);
 }
 
+sub features {
+    my ($f)=@_;
+    my $feat;
+    open(M, "<$f");
+    while(<M>) {
+        chomp;
+        if($feat) {
+            $feat.=":";
+        }
+        $feat.=$_;
+    }
+    close(M);
+    return $feat;
+}
+
 if(!$output) {
     print "Usage: mkinfo.pl <filename>\n";
     exit;
@@ -70,6 +85,7 @@ printf O ("Binary: %s\n", $ENV{'BINARY'});
 printf O ("Binary size: %s\n", filesize($ENV{'BINARY'}));
 printf O ("Actual size: %s\n", filesize("apps/rockbox.bin"));
 printf O ("RAM usage: %s\n", mapscan("apps/rockbox.map"));
+printf O ("Features: %s\n", features("apps/features"));
 
 # Variables identifying tool and build environment details
 printf O ("gcc: %s\n", cmd1line("$ENV{'CC'} --version"));
