@@ -23,6 +23,8 @@
 #include <stdio.h>  /* for file I/O */
 #include <stdlib.h> /* for malloc */
 
+#include "wavtrim.h"
+
 /* place a 32 bit value into memory, little endian */
 void Write32(unsigned char* pByte, unsigned long value)
 {
@@ -66,9 +68,8 @@ unsigned long Read16(unsigned char* pByte)
     return value;
 }
 
-
-int main (int argc, char** argv)
-{
+int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize)
+{    
     FILE* pFile;
     long lFileSize, lGot;
     unsigned char* pBuf;
@@ -79,29 +80,17 @@ int main (int argc, char** argv)
     unsigned char *databuf; /* Pointer to the data chunk payload */
     int skip_head, skip_tail, pad_head, pad_tail;
     int i;
-    int max_silence = 0;
+    int max_silence = maxsilence;
     signed char sample8;
     short sample16;
 
-    if (argc < 2)
-    {
-        printf("wavtrim removes silence at the begin and end of a WAV file.\n");
-        printf("usage: wavtrim <filename.wav> [<max_silence>]\n");
-        return 0;
-    }
-    
-    if (argc == 3)
-    {
-        max_silence = atoi(argv[2]);
-    }
-
-    pFile = fopen(argv[1], "rb");
+    pFile = fopen(filename, "rb");
     if (pFile == NULL)
     {
-        printf("Error opening file %s for reading\n", argv[1]);
+        snprintf(errstring,errsize,"Error opening file %s for reading\n", filename);
         return -1;
     }
-
+    
     fseek(pFile, 0, SEEK_END);
     lFileSize = ftell(pFile);
     fseek(pFile, 0, SEEK_SET);
@@ -109,7 +98,7 @@ int main (int argc, char** argv)
     pBuf = malloc(lFileSize);
     if (pBuf == NULL)
     {
-        printf("Out of memory to allocate %ld bytes for file.\n", lFileSize);
+        snprintf(errstring,errsize,"Out of memory to allocate %ld bytes for file.\n", lFileSize);
         fclose(pFile);
         return -1;
     }
@@ -118,11 +107,12 @@ int main (int argc, char** argv)
     fclose(pFile);
     if (lGot != lFileSize)
     {
-        printf("File read error, got only %ld bytes out of %ld.\n", lGot, lFileSize);
+        snprintf(errstring,errsize,"File read error, got only %ld bytes out of %ld.\n", lGot, lFileSize);
         free(pBuf);
         return -1;
     }
-
+    
+    
     bps = Read16(pBuf + 32);
     datapos = 28 + Read16(pBuf + 16);
     databuf = &pBuf[datapos];
@@ -132,7 +122,7 @@ int main (int argc, char** argv)
      || Read32(pBuf+12) != 0x20746d66 /* "fmt " */
      || Read32(pBuf+datapos-8) != 0x61746164) /* "data" */
     {
-        printf("No valid input WAV file?\n", lGot, lFileSize);
+        snprintf(errstring,errsize,"No valid input WAV file?\n");
         free(pBuf);
         return -1;
     }
@@ -198,10 +188,10 @@ int main (int argc, char** argv)
     Write32(pBuf+4, Read32(pBuf+4) - skip_head - skip_tail);
     Write32(pBuf+datapos-4, datalen - skip_head - skip_tail);
 
-    pFile = fopen(argv[1], "wb");
+    pFile = fopen(filename, "wb");
     if (pFile == NULL)
     {
-        printf("Error opening file %s for writing\n", argv[1]);
+        snprintf(errstring,errsize,"Error opening file %s for writing\n",filename);
         return -1;
     }
 
@@ -212,8 +202,37 @@ int main (int argc, char** argv)
 
     free(pBuf);
     return 0;
+
 }
 
+#ifndef RBUTIL
+int main (int argc, char** argv)
+{
+    int max_silence = 0;
+    char errbuffer[255];
+    int ret=0;
+    
+    if (argc < 2)
+    {
+        printf("wavtrim removes silence at the begin and end of a WAV file.\n");
+        printf("usage: wavtrim <filename.wav> [<max_silence>]\n");
+        return 0;
+    }
+    
+    if (argc == 3)
+    {
+        max_silence = atoi(argv[2]);
+    }
+    
+    
+    ret = wavtrim(argv[1],max_silence,errbuffer,255 ); 
+    if( ret< 0)
+    {
+        printf(errbuffer);
+    }
+    return ret;
+}
+#endif
 /*
 RIFF Chunk (12 bytes in length total) 
 0 - 3  "RIFF" (ASCII Characters)

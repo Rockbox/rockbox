@@ -22,6 +22,8 @@
  *
  ****************************************************************************/
 
+#include "voicefont.h" 
+ 
 #include <stdio.h>
 #include <string.h>
 
@@ -64,11 +66,9 @@ int BitswapAudio (unsigned char* pDest, unsigned char* pSrc, size_t len)
     return 0;
 }
 
-
-int main (int argc, char** argv)
+int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output)
 {
-    FILE* pFile;
-
+    
     int i,j;
     
     /* two tables, one for normal strings, one for voice-only (>0x8000) */
@@ -90,35 +90,18 @@ int main (int argc, char** argv)
     int target_id;
     int do_bitswap_audio = 0;
 
-
-    if (argc < 2)
-    {
-        printf("Makes a Rockbox voicefont from a collection of mp3 clips.\n");
-        printf("Usage: voicefont <string id list file> <target id> <mp3 path> <output file>\n");
-        printf("\n");
-        printf("Example: \n");
-        printf("voicefont voicefontids.txt 2 voice\\ voicefont.bin\n");
-        return -1;
-    }
     
-    pFile = fopen(argv[1], "r");
-    if (pFile == NULL)
-    {
-        printf("Error opening language file %s\n", argv[1]);
-        return -2;
-    }
-
     /* We bitswap the voice file only SH based archos players, target IDs
-       equal to or lower than 8. See the target_id line for each target in
-       configure */
-    target_id = atoi(argv[2]);
+         equal to or lower than 8. See the target_id line for each target in
+         configure */
+    target_id = targetnum;
     if (target_id <= 8)
         do_bitswap_audio = 1;
 
     memset(voiceonly, 0, sizeof(voiceonly));
-    while (!feof(pFile))
+    while (!feof(voicefontids))
     {
-        fgets(line, sizeof(line), pFile);
+        fgets(line, sizeof(line), voicefontids);
         if (line[0] == '#') /* comment */
             continue;
 
@@ -132,24 +115,18 @@ int main (int argc, char** argv)
             continue;
         }
     }
-    fclose(pFile);
+    fclose(voicefontids);
 
-    pFile = fopen(argv[4], "wb");
-    if (pFile == NULL)
-    {
-        printf("Error opening output file %s\n", argv[4]);
-        return -2;
-    }
-    fseek(pFile, HEADER_SIZE + count*8, SEEK_SET); /* space for header */
+    fseek(output, HEADER_SIZE + count*8, SEEK_SET); /* space for header */
 
     for (i=0; i<count; i++)
     {
         if (voiceonly[i] == 1)
             count_voiceonly++;
         
-        pos[i] = ftell(pFile);
-        sprintf(mp3filename1, "%s%s.mp3", argv[3], names[i]);
-        sprintf(mp3filename2, "%s%s.wav.mp3", argv[3], names[i]);
+        pos[i] = ftell(output);
+        sprintf(mp3filename1, "%s%s.mp3", filedir, names[i]);
+        sprintf(mp3filename2, "%s%s.wav.mp3", filedir, names[i]);
         mp3filename = mp3filename1;
         pMp3File = fopen(mp3filename, "rb");
         if (pMp3File == NULL)
@@ -169,36 +146,36 @@ int main (int argc, char** argv)
         fclose(pMp3File);
         if (do_bitswap_audio)
             BitswapAudio(buffer, buffer, size[i]);
-        fwrite(buffer, 1, size[i], pFile);
+        fwrite(buffer, 1, size[i], output);
 
         printf("%d %s %d\n", i, names[i], size[i]); /* debug */
     } /*  for i */
 
 
-    fseek(pFile, 0, SEEK_SET);
+    fseek(output, 0, SEEK_SET);
 
     /* Create the file format: */
 
     /* 1st 32 bit value in the file is the version number    */
     value = SWAP4(400); /* 4.00 */
-    fwrite(&value, sizeof(value), 1, pFile);
+    fwrite(&value, sizeof(value), 1, output);
 
     /* 2nd 32 bit value in the file is the id number for the target
        we made the voce file for */
-    value = SWAP4(atoi(argv[2]));
-    fwrite(&value, sizeof(value), 1, pFile);
+    value = SWAP4(targetnum);
+    fwrite(&value, sizeof(value), 1, output);
 
     /* 3rd 32 bit value in the file is the header size (= 1st table position) */
     value = SWAP4(HEADER_SIZE); /* version, target id, header size, number1, number2 */
-    fwrite(&value, sizeof(value), 1, pFile);
+    fwrite(&value, sizeof(value), 1, output);
 
     /* 4th 32 bit value in the file is the number of clips in 1st table   */
     value = SWAP4(count-count_voiceonly);
-    fwrite(&value, sizeof(value), 1, pFile);
+    fwrite(&value, sizeof(value), 1, output);
 
     /* 5th bit value in the file is the number of clips in 2nd table */
     value = SWAP4(count_voiceonly);
-    fwrite(&value, sizeof(value), 1, pFile);
+    fwrite(&value, sizeof(value), 1, output);
 
     /* then followed by offset/size pairs for each clip */
     for (j=0; j<2; j++) /* now 2 tables */
@@ -217,9 +194,9 @@ int main (int argc, char** argv)
             }
 
             value = SWAP4(pos[i]); /* position */
-            fwrite(&value, sizeof(value), 1, pFile);
+            fwrite(&value, sizeof(value), 1,output);
             value = SWAP4(size[i]); /* size */
-            fwrite(&value, sizeof(value), 1, pFile);
+            fwrite(&value, sizeof(value), 1, output);
         } /* for i */
     } /* for j */
 
@@ -229,7 +206,41 @@ int main (int argc, char** argv)
      * which we already have written, see above.
      */
 
-    fclose(pFile);
+    fclose(output);
 
     return 0;
+
+    
 }
+#ifndef RBUTIL
+int main (int argc, char** argv)
+{
+
+    if (argc < 2)
+    {
+        printf("Makes a Rockbox voicefont from a collection of mp3 clips.\n");
+        printf("Usage: voicefont <string id list file> <target id> <mp3 path> <output file>\n");
+        printf("\n");
+        printf("Example: \n");
+        printf("voicefont voicefontids.txt 2 voice\\ voicefont.bin\n");
+        return -1;
+    }
+    
+    FILE* ids = fopen(argv[1], "r");
+    if (ids == NULL)
+    {
+        printf("Error opening language file %s\n", argv[1]);
+        return -2;
+    }
+
+    FILE* output = fopen(argv[4], "wb");
+    if (output == NULL)
+    {
+        printf("Error opening output file %s\n", argv[4]);
+        return -2;
+    }
+    
+    voicefont(ids, atoi(argv[2]),argv[3],output);
+    return 0;
+}
+#endif
