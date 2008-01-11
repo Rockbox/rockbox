@@ -3,6 +3,9 @@
         <file>CREDITS</file>
         <file>gpl-2.0.html</file>
     </qresource>
+     <qresource>
+        <file alias="builtin/VOICE_PAUSE.wav">../../tools/VOICE_PAUSE.wav</file>
+    </qresource>
     <qresource prefix="/icons" >
         <file>icons/audio-input-microphone.png</file>
         <file>icons/bootloader_btn.png</file>

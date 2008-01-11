@@ -284,7 +284,7 @@ bool TTSSapi::voice(QString text,QString wavfile)
 {
     QString query = "SPEAK\t"+wavfile+"\t"+text+"\r\n";
     qDebug() << "voicing" << query;
-    voicescript->write(query.toLocal8Bit());
+    voicescript->write(query.toUtf8());
     voicescript->write("SYNC\tbla\r\n");
     voicescript->waitForReadyRead();
     return true;
@@ -293,7 +293,7 @@ bool TTSSapi::voice(QString text,QString wavfile)
 bool TTSSapi::stop()
 {   
     QString query = "QUIT\r\n";
-    voicescript->write(query.toLocal8Bit());
+    voicescript->write(query.toUtf8());
     voicescript->waitForFinished();
     delete voicescript;
     return true;

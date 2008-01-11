@@ -91,6 +91,7 @@ class RbUtilQt : public QMainWindow
         void installDoom(void);
 
         void createTalkFiles(void);
+        void createVoiceFile(void);
         void downloadDone(bool);
         void downloadDone(int, bool);
         void downloadBleedingDone(bool);

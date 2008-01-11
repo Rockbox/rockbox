@@ -26,6 +26,7 @@
 #include "configure.h"
 #include "install.h"
 #include "installtalkwindow.h"
+#include "createvoicewindow.h"
 #include "httpget.h"
 #include "installbootloader.h"
 #include "installthemes.h"
@@ -89,6 +90,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonFonts, SIGNAL(clicked()), this, SLOT(installFontsBtn()));
     connect(ui.buttonGames, SIGNAL(clicked()), this, SLOT(installDoomBtn()));
     connect(ui.buttonTalk, SIGNAL(clicked()), this, SLOT(createTalkFiles()));
+    connect(ui.buttonCreateVoice, SIGNAL(clicked()), this, SLOT(createVoiceFile()));
     connect(ui.buttonVoice, SIGNAL(clicked()), this, SLOT(installVoice()));
     connect(ui.buttonThemes, SIGNAL(clicked()), this, SLOT(installThemes()));
     connect(ui.buttonRemoveRockbox, SIGNAL(clicked()), this, SLOT(uninstall()));
@@ -106,6 +108,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.actionInstall_Themes, SIGNAL(triggered()), this, SLOT(installThemes()));
     connect(ui.actionInstall_Game_Files, SIGNAL(triggered()), this, SLOT(installDoomBtn()));
     connect(ui.actionInstall_Voice_File, SIGNAL(triggered()), this, SLOT(installVoice()));
+    connect(ui.actionCreate_Voice_File, SIGNAL(triggered()), this, SLOT(createVoiceFile()));
     connect(ui.actionCreate_Talk_Files, SIGNAL(triggered()), this, SLOT(createTalkFiles()));
     connect(ui.actionRemove_bootloader, SIGNAL(triggered()), this, SLOT(uninstallBootloader()));
     connect(ui.actionUninstall_Rockbox, SIGNAL(triggered()), this, SLOT(uninstall()));
@@ -751,6 +754,19 @@ void RbUtilQt::createTalkFiles(void)
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
 
+}
+
+void RbUtilQt::createVoiceFile(void)
+{
+    if(chkConfig(true)) return;
+    CreateVoiceWindow *installWindow = new CreateVoiceWindow(this);
+    installWindow->setUserSettings(userSettings);
+    installWindow->setDeviceSettings(devices);
+    installWindow->setProxy(proxy());
+    
+    installWindow->show();
+    connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
+    connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
 }
 
 void RbUtilQt::uninstall(void)

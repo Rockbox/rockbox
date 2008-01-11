@@ -42,8 +42,12 @@ SOURCES += rbutilqt.cpp \
  browseof.cpp \
  preview.cpp \
  encoders.cpp \
- tts.cpp
-
+ tts.cpp \
+ ../../tools/wavtrim.c \
+ ../../tools/voicefont.c \
+ voicefile.cpp \
+ createvoicewindow.cpp
+ 
 HEADERS += rbutilqt.h \
  install.h \
  httpget.h \
@@ -80,10 +84,14 @@ HEADERS += rbutilqt.h \
  browseof.h \
  preview.h \
  encoders.h \
- tts.h
+ tts.h \
+ ../../tools/wavtrim.h \
+ ../../tools/voicefont.h \
+ voicefile.h \
+ createvoicewindow.h
  
 # Needed by QT on Win
-INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex
+INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex ../../tools
  
 LIBS += -L../../tools/rbspeex -lrbspeex
 
@@ -115,7 +123,8 @@ FORMS += rbutilqtfrm.ui \
  rbspeexcfgfrm.ui \
  encexescfgfrm.ui \
  ttsexescfgfrm.ui \
- sapicfgfrm.ui
+ sapicfgfrm.ui \
+ createvoicefrm.ui
 
 RESOURCES += rbutilqt.qrc
 win32 {
