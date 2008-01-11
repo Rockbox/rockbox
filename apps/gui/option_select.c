@@ -566,12 +566,15 @@ bool set_option(const char* string, void* variable, enum optiontype type,
         temp = *(bool*)variable? 1: 0;
     else 
         temp = *(int*)variable;
-    option_screen(&item, false, NULL);
-    if (type == BOOL)
-        *(bool*)variable = (temp == 1? true: false);
-    else
-        *(int*)variable = temp;
-    return false;
+    if (!option_screen(&item, false, NULL))
+    {
+        if (type == BOOL)
+            *(bool*)variable = (temp == 1? true: false);
+        else
+            *(int*)variable = temp;
+        return false;
+    }
+    return true;
 }
 
 bool set_int_ex(const unsigned char* string,
