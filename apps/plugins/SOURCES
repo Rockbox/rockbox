@@ -1,4 +1,3 @@
-autostart.c
 #ifndef OLYMPUS_MROBE_100
 
 /* plugins common to all models */
