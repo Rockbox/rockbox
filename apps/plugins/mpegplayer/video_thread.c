@@ -612,14 +612,6 @@ static void video_thread_msg(struct video_thread_data *td)
             reply = video_str_scan(td, (struct str_sync_data *)td->ev.data);
             break;
 
-#ifdef GRAY_CACHE_MAINT
-        case VIDEO_GRAY_CACHEOP:
-            td->ev.data ? 
-                GRAY_INVALIDATE_ICACHE() :
-                GRAY_FLUSH_ICACHE();
-            break;
-#endif
-
         case STREAM_QUIT:
             /* Time to go - make thread exit */
             td->state = TSTATE_EOS;

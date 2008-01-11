@@ -1032,28 +1032,7 @@ intptr_t parser_send_video_msg(long id, intptr_t data)
             break;
         }
 
-        switch (id)
-        {
-#ifdef GRAY_CACHE_MAINT
-        /* This must be done internally here or refresh may be delayed far
-         * too long */
-        case VIDEO_DISPLAY_SHOW:
-        case VIDEO_PRINT_FRAME:
-        case VIDEO_PRINT_THUMBNAIL:
-            stream_gray_pause(true);
-
-            GRAY_INVALIDATE_ICACHE();
-
-            retval = str_send_msg(&video_str, id, data);
-
-            GRAY_VIDEO_FLUSH_ICACHE();
-
-            stream_gray_pause(false);
-            break;
-#endif            
-        default:
-            retval = str_send_msg(&video_str, id, data);
-        }
+        retval = str_send_msg(&video_str, id, data);
     }
 
     return retval;

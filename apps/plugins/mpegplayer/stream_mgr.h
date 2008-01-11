@@ -106,9 +106,6 @@ void stream_vo_set_clip(const struct vo_rect *rc);
 
 #ifndef HAVE_LCD_COLOR
 void stream_gray_show(bool show);
-#ifdef GRAY_CACHE_MAINT
-void stream_gray_pause(bool pause);
-#endif
 #endif
 
 /* Display thumbnail of the current seekpoint */

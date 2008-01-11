@@ -89,25 +89,6 @@ enum mpeg_malloc_reason_t
 #define DRAW_WHITE            GREY_WHITE
 #define lcd_(fn)              grey_##fn
 
-#if defined(CPU_PP) && NUM_CORES > 1
-#define GRAY_FLUSH_ICACHE() \
-    IF_COP(flush_icache())
-#define GRAY_INVALIDATE_ICACHE() \
-    IF_COP(invalidate_icache())
-#define GRAY_VIDEO_FLUSH_ICACHE() \
-    IF_COP(parser_send_video_msg(VIDEO_GRAY_CACHEOP, 0))
-#define GRAY_VIDEO_INVALIDATE_ICACHE() \
-    IF_COP(parser_send_video_msg(VIDEO_GRAY_CACHEOP, 1))
-
-#define GRAY_CACHE_MAINT
-#endif
-#endif
-
-#ifndef GRAY_CACHE_MAINT
-#define GRAY_FLUSH_ICACHE()
-#define GRAY_INVALIDATE_ICACHE()
-#define GRAY_VIDEO_FLUSH_ICACHE()
-#define GRAY_VIDEO_INVALIDATE_ICACHE()
 #endif
 
 #include "mpeg2.h"

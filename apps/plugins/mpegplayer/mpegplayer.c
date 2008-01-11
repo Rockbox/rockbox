@@ -944,16 +944,13 @@ static void wvs_show(unsigned show)
 
         stream_vo_set_clip(NULL);
 
-#ifdef HAVE_LCD_COLOR
         draw_clear_area(0, 0, wvs.width, wvs.height);
-#endif
 
         if (!(show & WVS_NODRAW)) {
-#ifdef HAVE_LCD_COLOR
             vo_lock();
             draw_update_rect(0, 0, wvs.width, wvs.height);
             vo_unlock();
-#endif
+
             stream_draw_frame(false);
         }
     }

@@ -661,12 +661,7 @@ bool stream_show_vo(bool show)
 
     vis = parser_send_video_msg(VIDEO_DISPLAY_SHOW, show);
 #ifndef HAVE_LCD_COLOR
-    GRAY_VIDEO_INVALIDATE_ICACHE();
-    GRAY_INVALIDATE_ICACHE();
-
     grey_show(show);
-
-    GRAY_FLUSH_ICACHE();
 #endif
     stream_mgr_unlock();
 
@@ -722,41 +717,10 @@ void stream_gray_show(bool show)
 {
     stream_mgr_lock();
 
-    GRAY_VIDEO_INVALIDATE_ICACHE();
-    GRAY_INVALIDATE_ICACHE();
-
     grey_show(show);
-
-    GRAY_FLUSH_ICACHE();
 
     stream_mgr_unlock();
 }
-
-#ifdef GRAY_CACHE_MAINT
-void stream_gray_pause(bool pause)
-{
-    static bool gray_paused = false;
-
-    if (pause && !gray_paused)
-    {
-        if (_grey_info.flags & _GREY_RUNNING)
-        {
-            rb->timer_unregister();
-#if defined(CPU_PP) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
-            rb->cpu_boost(false);
-#endif
-            _grey_info.flags &= ~_GREY_RUNNING;
-            rb->screen_dump_set_hook(NULL);
-            gray_paused = true;
-        }
-    }
-    else if (!pause && gray_paused)
-    {
-        gray_paused = false;
-        grey_show(true);
-    }
-}
-#endif
 
 #endif /* !HAVE_LCD_COLOR */
 
@@ -1013,11 +977,17 @@ int stream_init(void)
 #ifndef HAVE_LCD_COLOR
     bool success;
     long graysize;
+    void *graymem;
 
+#ifdef PROC_NEEDS_CACHEALIGN
     /* This can run on another processor - align data */
     memsize = CACHEALIGN_BUFFER(&mem, memsize);
+    graymem = UNCACHED_ADDR(mem); 
+#else
+    graymem = mem;
+#endif
 
-    success = grey_init(rb, mem, memsize, true, LCD_WIDTH,
+    success = grey_init(rb, graymem, memsize, true, LCD_WIDTH,
                         LCD_HEIGHT, &graysize);
 
     /* This can run on another processor - align size */
