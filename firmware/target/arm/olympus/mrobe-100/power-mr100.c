@@ -37,19 +37,19 @@ void power_init(void)
 
 bool charger_inserted(void)
 {     
-    return false;
+    return (GPIOB_INPUT_VAL & 0x02) ? false : true ;
 }
 
 void ide_power_enable(bool on)
 {
     (void)on;
-    /* We do nothing on the iPod */
+    /* We do nothing */
 }
 
 
 bool ide_powered(void)
 {
-    /* pretend we are always powered - we don't turn it off on the ipod */
+    /* pretend we are always powered - we don't turn it off */
     return true;
 }
 

@@ -132,11 +132,12 @@ void lcd_blit(const unsigned char* data, int x, int by, int width,
 
 /* Performance function that works with an external buffer
    note that by and bheight are in 4-pixel units! */
-void lcd_grey_phase_blit(const struct grey_data *data, int x, int by, 
-                         int width, int bheight, int stride)
+void lcd_grey_phase_blit(unsigned char *values, unsigned char *phases,
+                         int x, int by, int width, int bheight, int stride)
 {
     /* TODO: Implement lcd_grey_phase_blit() */
-    (void)data;
+    (void)values;
+    (void)phases;
     (void)x;
     (void)by;
     (void)width;

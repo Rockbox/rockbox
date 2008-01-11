@@ -1,3 +1,4 @@
+autostart,apps
 matrix,demos
 alpine_cdc,apps
 battery_bench,apps

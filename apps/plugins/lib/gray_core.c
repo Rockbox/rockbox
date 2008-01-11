@@ -40,9 +40,9 @@ struct _gray_info _gray_info;       /* global info structure */
 #ifndef SIMULATOR
 short _gray_random_buffer;          /* buffer for random number generator */
 
-#if CONFIG_LCD == LCD_SSD1815 || CONFIG_LCD == LCD_IFP7XX
+#if CONFIG_LCD == LCD_SSD1815 || CONFIG_LCD == LCD_IFP7XX || CONFIG_LCD == LCD_MROBE100
 /* measured and interpolated curve */
-/* TODO: check for iFP */
+/* TODO: check for iFP & m:robe 100 */
 static const unsigned char lcdlinear[256] = {
       0,   3,   5,   8,  11,  13,  16,  18,
      21,  23,  26,  28,  31,  33,  36,  38,

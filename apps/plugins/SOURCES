@@ -1,3 +1,6 @@
+autostart.c
+#ifndef OLYMPUS_MROBE_100
+
 /* plugins common to all models */
 battery_bench.c
 chessclock.c
@@ -151,3 +154,4 @@ iriver_flash.c
 superdom.c
 #endif
 #endif /* m:robe 500 */
+#endif /* m:robe 100 */

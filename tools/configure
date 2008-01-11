@@ -1308,7 +1308,7 @@ EOF
     appextra="recorder:gui"
     archosrom=""
     flash=""
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBBL"
     bootoutput="pp5020.mi4"
