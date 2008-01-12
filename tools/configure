@@ -615,7 +615,7 @@ EOF
   archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb"
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb"
   iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb"
-  ipodbitmaptools="$toolset scramble ipod_fw bmp2rb"
+  ipodbitmaptools="$toolset scramble bmp2rb"
   gigabeatbitmaptools="$toolset scramble descramble bmp2rb"
   tccbitmaptools="$toolset scramble mktccboot bmp2rb"
   # generic is used by IFP, H10, Sansa-e200
