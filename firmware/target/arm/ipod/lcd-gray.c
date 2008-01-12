@@ -74,34 +74,13 @@ static unsigned short contrast_reg_h;
 static int addr_offset;
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
 static int pix_offset;
+void lcd_write_data_shifted(const fb_data* p_bytes, int count);
 #endif
-
-static const unsigned char dibits[16] ICONST_ATTR = {
-    0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F,
-    0xC0, 0xC3, 0xCC, 0xCF, 0xF0, 0xF3, 0xFC, 0xFF
-};
 
 /* wait for LCD with timeout */
 static inline void lcd_wait_write(void)
 {
     while (LCD1_CONTROL & LCD1_BUSY_MASK);
-}
-
-/* send LCD data */
-#if CONFIG_CPU == PP5002
-STATICIRAM void ICODE_ATTR lcd_send_data(unsigned data)
-#else
-static void lcd_send_data(unsigned data)
-#endif
-{
-    lcd_wait_write();
-#ifdef IPOD_MINI2G
-    LCD1_CMD = data | 0x760000;
-#else
-    LCD1_DATA = data >> 8;
-    lcd_wait_write();
-    LCD1_DATA = data & 0xff;
-#endif
 }
 
 /* send LCD command */
@@ -120,8 +99,20 @@ static void lcd_prepare_cmd(unsigned cmd)
 /* send LCD command and data */
 static void lcd_cmd_and_data(unsigned cmd, unsigned data)
 {
-    lcd_prepare_cmd(cmd);
-    lcd_send_data(data);
+    lcd_wait_write();
+#ifdef IPOD_MINI2G
+    LCD1_CMD = cmd | 0x740000;
+    lcd_wait_write();
+    LCD1_CMD = data | 0x760000;
+#else
+    LCD1_CMD = 0;
+    lcd_wait_write();
+    LCD1_CMD = cmd;
+    lcd_wait_write();
+    LCD1_DATA = data >> 8;
+    lcd_wait_write();
+    LCD1_DATA = data & 0xff;
+#endif
 }
 
 /* LCD init */
@@ -230,27 +221,29 @@ void lcd_set_invert_display(bool yesno)
 void lcd_set_flip(bool yesno)
 {
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
-    if (yesno) {
-         /* 168x112, inverse COM order */
+    if (yesno) 
+    {    /* 168x112, inverse COM order */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x020d);
         lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x8316);    /* 22..131 */
         addr_offset = (22 << 5) | (20 - 4);
         pix_offset = -2;
-    } else {
-        /* 168x112,  inverse SEG order */
+    }
+    else 
+    {   /* 168x112,  inverse SEG order */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x010d);
         lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x6d00);    /* 0..109 */
         addr_offset = 20;
         pix_offset = 0;
     }
 #else
-    if (yesno) {
-        /* 168x128, inverse SEG & COM order */
+    if (yesno) 
+    {   /* 168x128, inverse SEG & COM order */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x030f);
         lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x8304);    /* 4..131 */
         addr_offset = (4 << 5) | (20 - 1);
-    } else {
-        /* 168x128 */
+    } 
+    else 
+    {   /* 168x128 */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x000f);
         lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x7f00);    /* 0..127 */
         addr_offset = 20;
@@ -279,108 +272,38 @@ void lcd_enable(bool on)
 
 /*** update functions ***/
 
+/* Helper function. */
+void lcd_mono_data(const unsigned char *data, int count);
+
 /* Performance function that works with an external buffer
    note that x, bwidtht and stride are in 8-pixel units! */
 void lcd_blit(const unsigned char* data, int bx, int y, int bwidth,
               int height, int stride)
 {
-    const unsigned char *src, *src_end;
-
-    while (height--) {
-        src = data;
-        src_end = data + bwidth;
+    while (height--)
+    {
         lcd_cmd_and_data(R_RAM_ADDR_SET, (y++ << 5) + addr_offset - bx);
         lcd_prepare_cmd(R_RAM_DATA);
-        do {
-            unsigned byte = *src++;
-            lcd_send_data((dibits[byte>>4] << 8) | dibits[byte&0x0f]);
-        } while (src < src_end);
+
+        lcd_mono_data(data, bwidth);
         data += stride;
     }
 }
+
+/* Helper function for lcd_grey_phase_blit(). */
+void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 
 /* Performance function that works with an external buffer
    note that bx and bwidth are in 8-pixel units! */
 void lcd_grey_phase_blit(unsigned char *values, unsigned char *phases,
                          int bx, int y, int bwidth, int height, int stride)
 {
-    unsigned char *val, *ph;
-    int bw;
-
-    while (height--) {
+    while (height--) 
+    {
         lcd_cmd_and_data(R_RAM_ADDR_SET, (y++ << 5) + addr_offset - bx);
         lcd_prepare_cmd(R_RAM_DATA);
 
-        val = values;
-        ph = phases;
-        bw = bwidth;
-        asm volatile (
-        "10:                                 \n"
-            "ldmia   %[ph], {r0-r1}          \n" /* Fetch 8 pixel phases */
-            "ldmia   %[val]!, {r2-r3}        \n" /* Fetch 8 pixel values */
-#ifdef IPOD_MINI2G
-            "mov     r4, #0x7600             \n"
-#else
-            "mov     r4, #0                  \n"
-#endif
-            "tst     r0, #0x80               \n"
-            "orreq   r4, r4, #0xc0           \n"
-            "tst     r0, #0x8000             \n"
-            "orreq   r4, r4, #0x30           \n"
-            "tst     r0, #0x800000           \n"
-            "orreq   r4, r4, #0x0c           \n"
-            "tst     r0, #0x80000000         \n"
-            "orreq   r4, r4, #0x03           \n"
-            "bic     r0, r0, %[clbt]         \n"
-            "add     r0, r0, r2              \n"
-
-#ifdef IPOD_MINI2G
-            "mov     r4, r4, lsl #8          \n"
-#else
-        "1:                                  \n"
-            "ldr     r2, [%[lcdb]]           \n"
-            "tst     r2, #0x8000             \n"
-            "bne     1b                      \n"
-
-            "str     r4, [%[lcdb], #0x10]    \n"
-            "mov     r4, #0                  \n"
-#endif
-
-            "tst     r1, #0x80               \n"
-            "orreq   r4, r4, #0xc0           \n"
-            "tst     r1, #0x8000             \n"
-            "orreq   r4, r4, #0x30           \n"
-            "tst     r1, #0x800000           \n"
-            "orreq   r4, r4, #0x0c           \n"
-            "tst     r1, #0x80000000         \n"
-            "orreq   r4, r4, #0x03           \n"
-            "bic     r1, r1, %[clbt]         \n"
-            "add     r1, r1, r3              \n"
-
-            "stmia   %[ph]!, {r0-r1}         \n"
-
-        "1:                                  \n"
-            "ldr     r2, [%[lcdb]]           \n"
-            "tst     r2, #0x8000             \n"
-            "bne     1b                      \n"
-#ifdef IPOD_MINI2G
-            "str     r4, [%[lcdb], #0x08]    \n"
-#else
-            "str     r4, [%[lcdb], #0x10]    \n"
-#endif
-
-            "subs    %[bw], %[bw], #1        \n"
-            "bne     10b                     \n"
-            : /* outputs */
-            [val]"+r"(val),
-            [ph] "+r"(ph),
-            [bw] "+r"(bw)
-            : /* inputs */
-            [clbt]"r"(0x80808080),
-            [lcdb]"r"(LCD1_BASE)
-            : /* clobbers */
-            "r0", "r1", "r2", "r3", "r4"
-        );
+        lcd_grey_data(values, phases, bwidth);
         values += stride;
         phases += stride;
     }
@@ -407,30 +330,17 @@ void lcd_update_rect(int x, int y, int width, int height)
     x >>= 3;
     width = xmax - x + 1;
 
-    for (; y <= ymax; y++) {
-        unsigned char *data, *data_end;
-
+    for (; y <= ymax; y++) 
+    {
         lcd_cmd_and_data(R_RAM_ADDR_SET, (y << 5) + addr_offset - x);
         lcd_prepare_cmd(R_RAM_DATA);
 
-        data = &lcd_framebuffer[y][2*x];
-        data_end = data + 2 * width;
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
-        if (pix_offset == -2) {
-            unsigned cur_word = *data++;
-            do {
-                cur_word = (cur_word << 8) | *data++;
-                cur_word = (cur_word << 8) | *data++;
-                lcd_send_data((cur_word >> 4) & 0xffff);
-            } while (data <= data_end);
-        } else
+        if (pix_offset == -2)
+            lcd_write_data_shifted(&lcd_framebuffer[y][2*x], width);
+        else
 #endif
-        {
-            do {
-                unsigned highbyte = *data++;
-                lcd_send_data((highbyte << 8) | *data++);
-            } while (data < data_end);
-        }
+            lcd_write_data(&lcd_framebuffer[y][2*x], width);
     }
 }
 
