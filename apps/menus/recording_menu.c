@@ -549,7 +549,7 @@ bool rectrigger(void)
             option_value[PRERECORD_TIME],
             sizeof option_value[PRERECORD_TIME],
             "%s",
-            prerecord_times[global_settings.rec_prerecord_time].string);
+            P2STR(prerecord_times[global_settings.rec_prerecord_time].string));
 
         /* due to value range shift (peak_meter_define_trigger) -1 is 0db */
         if (global_settings.rec_start_thres == -1) {
