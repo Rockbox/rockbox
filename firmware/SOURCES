@@ -544,7 +544,7 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/iriver/h10/adc-h10.c
+target/arm/adc-pp5020.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
 target/arm/iriver/h10/fmradio_i2c-h10.c
@@ -561,7 +561,7 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/iriver/h10/adc-h10.c
+target/arm/adc-pp5020.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
 target/arm/iriver/h10/fmradio_i2c-h10.c
@@ -658,7 +658,7 @@ target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
-target/arm/olympus/mrobe-100/adc-mr100.c
+target/arm/adc-pp5020.c
 target/arm/olympus/mrobe-100/backlight-mr100.c
 target/arm/olympus/mrobe-100/button-mr100.c
 target/arm/olympus/mrobe-100/lcd-mr100.c

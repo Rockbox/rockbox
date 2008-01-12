@@ -37,7 +37,7 @@ void power_init(void)
 
 bool charger_inserted(void)
 {     
-    return (GPIOB_INPUT_VAL & 0x02) ? false : true ;
+    return (GPIOL_INPUT_VAL & 0x24) ? true : false ;
 }
 
 void ide_power_enable(bool on)

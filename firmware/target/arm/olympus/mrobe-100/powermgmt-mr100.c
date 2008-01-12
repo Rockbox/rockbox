@@ -27,33 +27,41 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3760
+    3450 
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3650
+    3400
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3760, 3800, 3850, 3870, 3900, 3950, 4020, 4070, 4110, 4180, 4240 }
+    { 3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990 },
 };
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    3990, 4030, 4060, 4080, 4100, 4120, 4150, 4180, 4220, 4260, 4310
+    3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990 
 };
 #endif /* CONFIG_CHARGING */
 
-#define BATTERY_SCALE_FACTOR 4650
+#define BATTERY_SCALE_FACTOR 6052
 /* full-scale ADC readout (2^10) in millivolt */
+
+/* adc readout
+ * max with charger connected: 690
+ * max fully charged:          682
+ * min just before shutdown:   
+ */
 
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
+    /* work around the inital (false) high readout */
+    int readout=adc_read(ADC_UNREG_POWER);
+    return (readout>700) ? 3990 : (readout * BATTERY_SCALE_FACTOR) >> 10;
 }

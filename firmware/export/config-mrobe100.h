@@ -4,9 +4,6 @@
  
 #define TARGET_TREE
 
-/* until voltages are sorted out */
-#define  NO_LOW_BATTERY_SHUTDOWN
-
 #define OLYMPUS_MROBE_100 1 
 
 /* For Rolo and boot loader */

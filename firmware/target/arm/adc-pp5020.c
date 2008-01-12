@@ -71,10 +71,10 @@ static void adc_tick(void)
     if(++adc_counter == HZ)
     {
         adc_counter = 0;
-        adc_scan(ADC_BATTERY);
-        adc_scan(ADC_UNKNOWN_1);
-        adc_scan(ADC_REMOTE);
-        adc_scan(ADC_SCROLLPAD);
+        adc_scan(0);
+        adc_scan(1);
+        adc_scan(2);
+        adc_scan(3);
     }
 }
 
@@ -114,28 +114,28 @@ void adc_init(void)
     ADC_ADDR   |= 0x1000000;
     ADC_STATUS |= 0x20;
 
-    /* Enable channel 1 (unknown, temperature?) */
+    /* Enable channel 1 (unknown) */
     DEV_INIT1  &=~30;
     ADC_ADDR   |= 0x2000000;
     ADC_STATUS |= 0x2000;
 
-    /* Enable channel 2 (remote) */
+    /* Enable channel 2 (H10:remote) */
     DEV_INIT1  &=~0x300;
     DEV_INIT1  |= 0x100;
     ADC_ADDR   |= 0x4000000;
     ADC_STATUS |= 0x200000;
 
-    /* Enable channel 3 (scroll pad) */
+    /* Enable channel 3 (H10:scroll pad) */
     DEV_INIT1  &=~0x3000;
     DEV_INIT1  |= 0x1000;
     ADC_ADDR   |= 0x8000000;
     ADC_STATUS |= 0x20000000;
 
     /* Force a scan of all channels to get initial values */
-    adc_scan(ADC_BATTERY);
-    adc_scan(ADC_UNKNOWN_1);
-    adc_scan(ADC_REMOTE);
-    adc_scan(ADC_SCROLLPAD);
+    adc_scan(0);
+    adc_scan(1);
+    adc_scan(2);
+    adc_scan(3);
 
     tick_add_task(adc_tick);
 }
