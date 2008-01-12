@@ -822,6 +822,11 @@ static void wvs_refresh(int hint)
     if (hint == WVS_REFRESH_DEFAULT) {
         /* The default which forces no updates */
 
+        /* Make sure Rockbox doesn't turn off the player because of
+           too little activity */
+        if (wvs.status == WVS_STATUS_PLAYING)
+            rb->reset_poweroff_timer();
+
         /* Redraw the current or possibly extract a new video frame */
         if ((wvs.auto_refresh & WVS_REFRESH_VIDEO) &&
             TIME_AFTER(tick, wvs.print_tick)) {
@@ -942,8 +947,6 @@ static void wvs_show(unsigned show)
         /* Uncover clipped video area and redraw it */
         wvs.flags &= ~WVS_SHOW;
 
-        stream_vo_set_clip(NULL);
-
         draw_clear_area(0, 0, wvs.width, wvs.height);
 
         if (!(show & WVS_NODRAW)) {
@@ -951,7 +954,10 @@ static void wvs_show(unsigned show)
             draw_update_rect(0, 0, wvs.width, wvs.height);
             vo_unlock();
 
+            stream_vo_set_clip(NULL);
             stream_draw_frame(false);
+        } else {
+            stream_vo_set_clip(NULL);
         }
     }
 }
@@ -1180,14 +1186,20 @@ static void wvs_resume(void)
     stream_resume();
 }
 
-/* Stop playback - remember the resume point if not already stopped */
+/* Stop playback - remember the resume point if not closed */
 static void wvs_stop(void)
 {
+    uint32_t resume_time;
+
     wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
     wvs_show(WVS_HIDE | WVS_NODRAW);
 
-    if (stream_stop() != STREAM_STOPPED)
-        settings.resume_time = stream_get_resume_time();
+    stream_stop();
+
+    resume_time = stream_get_resume_time();
+
+    if (resume_time != INVALID_TIMESTAMP)
+        settings.resume_time = resume_time;
 }
 
 /* Perform a seek if seeking is possible for this stream - if playing, a delay
@@ -1242,11 +1254,12 @@ static void button_loop(void)
     /* Gently poll the video player for EOS and handle UI */
     while (stream_status() != STREAM_STOPPED)
     {
-        int button = rb->button_get_w_tmo(WVS_MIN_UPDATE_INTERVAL);
+        int button;
 
-        /* Make sure Rockbox doesn't turn off the player because of
-           too little activity */
-        rb->reset_poweroff_timer();
+        mpeg_menu_sysevent_clear();
+        button = rb->button_get_w_tmo(WVS_MIN_UPDATE_INTERVAL);
+
+        button = mpeg_menu_sysevent_callback(button, -1);
 
         switch (button)
         {
@@ -1288,7 +1301,7 @@ static void button_loop(void)
             stream_show_vo(false);
             backlight_use_settings(rb);
 
-            result = mpeg_menu();
+            result = mpeg_menu(0);
 
             /* The menu can change the font, so restore */
             rb->lcd_setfont(FONT_SYSFIXED);
@@ -1298,6 +1311,7 @@ static void button_loop(void)
             case MPEG_MENU_QUIT:
                 wvs_stop();
                 break;
+
             default:
                 /* If not stopped, show video again */
                 if (state != STREAM_STOPPED) {
@@ -1316,6 +1330,7 @@ static void button_loop(void)
             } /* MPEG_MENU: */
 
         case MPEG_STOP:
+        case ACTION_STD_CANCEL:
         {
             wvs_stop();
             break;
@@ -1349,16 +1364,11 @@ static void button_loop(void)
             break;
             } /* MPEG_RW: MPEG_FF: */
 
-        case SYS_POWEROFF:
-        case SYS_USB_CONNECTED:
-            /* Stop and get the resume time before closing the file early */
-            wvs_stop();
-            stream_close();
-            save_settings();  /* Save settings (if they have changed) */
-        /* Fall-through */
         default:
+        {
             rb->default_event_handler(button);
             break;
+            } /* default: */
         }
 
         rb->yield();
@@ -1428,6 +1438,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
             save_settings();  /* Save settings (if they have changed) */
             status = PLUGIN_OK;
+
+            mpeg_menu_sysevent_handle();
         } else {
             DEBUGF("Could not open %s\n", (char*)parameter);
             switch (err)

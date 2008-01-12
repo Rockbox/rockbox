@@ -7,87 +7,83 @@
 
 struct mpeg_settings settings;
 
-#define SETTINGS_VERSION 2
-#define SETTINGS_MIN_VERSION 1
-#define SETTINGS_FILENAME "mpegplayer.cfg"
-
 #define THUMB_DELAY (75*HZ/100)
 
 /* button definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define MPEG_SELECT      BUTTON_ON
-#define MPEG_RIGHT       BUTTON_RIGHT
-#define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_UP          BUTTON_UP
-#define MPEG_DOWN        BUTTON_DOWN
-#define MPEG_EXIT        BUTTON_OFF
+#define MPEG_START_TIME_SELECT      BUTTON_ON
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#define MPEG_SELECT      BUTTON_PLAY
-#define MPEG_RIGHT       BUTTON_RIGHT
-#define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_UP          BUTTON_UP
-#define MPEG_DOWN        BUTTON_DOWN
-#define MPEG_EXIT        BUTTON_POWER
+#define MPEG_START_TIME_SELECT      BUTTON_PLAY
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define MPEG_SELECT      BUTTON_SELECT
-#define MPEG_RIGHT       BUTTON_RIGHT
-#define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_UP          BUTTON_SCROLL_FWD
-#define MPEG_DOWN        BUTTON_SCROLL_BACK
-#define MPEG_EXIT        BUTTON_MENU
+#define MPEG_START_TIME_SELECT      BUTTON_SELECT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_UP          BUTTON_SCROLL_FWD
+#define MPEG_START_TIME_DOWN        BUTTON_SCROLL_BACK
+#define MPEG_START_TIME_EXIT        BUTTON_MENU
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define MPEG_SELECT      BUTTON_SELECT
-#define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_RIGHT       BUTTON_RIGHT
-#define MPEG_UP          BUTTON_UP
-#define MPEG_DOWN        BUTTON_DOWN
-#define MPEG_SCROLL_DOWN BUTTON_VOL_DOWN
-#define MPEG_SCROLL_UP   BUTTON_VOL_UP
-#define MPEG_EXIT        BUTTON_POWER
+#define MPEG_START_TIME_SELECT      BUTTON_SELECT
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_SCROLL_DOWN BUTTON_VOL_DOWN
+#define MPEG_START_TIME_SCROLL_UP   BUTTON_VOL_UP
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define MPEG_SELECT      BUTTON_PLAY
-#define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_RIGHT       BUTTON_RIGHT
-#define MPEG_UP          BUTTON_SCROLL_UP
-#define MPEG_DOWN        BUTTON_SCROLL_DOWN
-#define MPEG_EXIT        BUTTON_POWER
+#define MPEG_START_TIME_SELECT      BUTTON_PLAY
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_UP          BUTTON_SCROLL_UP
+#define MPEG_START_TIME_DOWN        BUTTON_SCROLL_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#define MPEG_SELECT      BUTTON_SELECT
-#define MPEG_SCROLL_UP   BUTTON_SCROLL_BACK
-#define MPEG_SCROLL_DOWN BUTTON_SCROLL_FWD
-#define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_RIGHT       BUTTON_RIGHT
-#define MPEG_UP          BUTTON_UP
-#define MPEG_DOWN        BUTTON_DOWN
-#define MPEG_EXIT        BUTTON_POWER
+#define MPEG_START_TIME_SELECT      BUTTON_SELECT
+#define MPEG_START_TIME_SCROLL_UP   BUTTON_SCROLL_BACK
+#define MPEG_START_TIME_SCROLL_DOWN BUTTON_SCROLL_FWD
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD)
-#define MPEG_SELECT      BUTTON_SELECT
-#define MPEG_SCROLL_UP   BUTTON_VOL_UP
-#define MPEG_SCROLL_DOWN BUTTON_VOL_DOWN
-#define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_RIGHT       BUTTON_RIGHT
-#define MPEG_UP          BUTTON_UP
-#define MPEG_DOWN        BUTTON_DOWN
-#define MPEG_EXIT        BUTTON_POWER
+#define MPEG_START_TIME_SELECT      BUTTON_SELECT
+#define MPEG_START_TIME_SCROLL_UP   BUTTON_VOL_UP
+#define MPEG_START_TIME_SCROLL_DOWN BUTTON_VOL_DOWN
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
-#define MPEG_SELECT      BUTTON_RC_HEART
-#define MPEG_SCROLL_UP   BUTTON_RC_VOL_UP
-#define MPEG_SCROLL_DOWN BUTTON_RC_VOL_DOWN
-#define MPEG_LEFT        BUTTON_LEFT
-#define MPEG_RIGHT       BUTTON_RIGHT
-#define MPEG_UP          BUTTON_RC_PLAY
-#define MPEG_DOWN        BUTTON_RC_DOWN
-#define MPEG_EXIT        BUTTON_POWER
+#define MPEG_START_TIME_SELECT      BUTTON_RC_HEART
+#define MPEG_START_TIME_SCROLL_UP   BUTTON_RC_VOL_UP
+#define MPEG_START_TIME_SCROLL_DOWN BUTTON_RC_VOL_DOWN
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_UP          BUTTON_RC_PLAY
+#define MPEG_START_TIME_DOWN        BUTTON_RC_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
 
 #else
 #error MPEGPLAYER: Unsupported keypad
@@ -100,8 +96,8 @@ static struct configdata config[] =
     {TYPE_INT, 0, 2, &settings.skipframes, "Skip frames", NULL, NULL},
     {TYPE_INT, 0, INT_MAX, &settings.resume_count, "Resume count",
      NULL, NULL},
-    {TYPE_INT, 0, 2, &settings.enable_start_menu, "Enable start menu",
-     NULL, NULL},
+    {TYPE_INT, 0, MPEG_RESUME_NUM_OPTIONS, &settings.resume_options,
+     "Resume options", NULL, NULL},
 #if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
     {TYPE_INT, 0, INT_MAX, &settings.displayoptions, "Display options",
      NULL, NULL},
@@ -118,65 +114,69 @@ static const struct opt_items enabledisable[2] = {
     { "Enable", -1 },
 };
 
-static void display_options(void)
+static long mpeg_menu_sysevent_id;
+
+void mpeg_menu_sysevent_clear(void)
 {
-    int result;
-    int menu_id;
-    int options_quit = 0;
+    mpeg_menu_sysevent_id = 0;
+}
 
-    static const struct menu_item items[] = {
-#if MPEG_OPTION_DITHERING_ENABLED
-        [MPEG_OPTION_DITHERING] =
-            { "Dithering", NULL },
-#endif
-        [MPEG_OPTION_DISPLAY_FPS] =
-            { "Display FPS", NULL },
-        [MPEG_OPTION_LIMIT_FPS] =
-            { "Limit FPS", NULL },
-        [MPEG_OPTION_SKIP_FRAMES] =
-            { "Skip frames", NULL },
-    };
-
-    menu_id = menu_init(rb, items, ARRAYLEN(items),
-                            NULL, NULL, NULL, NULL);
-
-    rb->button_clear_queue();
-
-    while(options_quit == 0)
+int mpeg_menu_sysevent_callback(int btn, int menu)
+{
+    switch (btn)
     {
-        result = menu_show(menu_id);
-
-        switch (result)
-        {
-#if MPEG_OPTION_DITHERING_ENABLED
-            case MPEG_OPTION_DITHERING:
-                result = (settings.displayoptions & LCD_YUV_DITHER) ? 1 : 0;
-                rb->set_option("Dithering", &result, INT, noyes, 2, NULL);
-                settings.displayoptions = (settings.displayoptions & ~LCD_YUV_DITHER)
-                  | ((result != 0) ? LCD_YUV_DITHER : 0);
-                rb->lcd_yuv_set_options(settings.displayoptions);
-                break;
-#endif /* MPEG_OPTION_DITHERING_ENABLED */
-            case MPEG_OPTION_DISPLAY_FPS:
-                rb->set_option("Display FPS",&settings.showfps,INT,
-                               noyes, 2, NULL);
-                break;
-            case MPEG_OPTION_LIMIT_FPS:
-                rb->set_option("Limit FPS",&settings.limitfps,INT,
-                               noyes, 2, NULL);
-                break;
-            case MPEG_OPTION_SKIP_FRAMES:
-                rb->set_option("Skip frames",&settings.skipframes,INT,
-                               noyes, 2, NULL);
-                break;
-            default:
-                options_quit=1;
-                break;
-        }
+    case SYS_USB_CONNECTED:
+    case SYS_POWEROFF:
+        mpeg_menu_sysevent_id = btn;
+        return ACTION_STD_CANCEL;
     }
 
-    menu_exit(menu_id);
+    return btn;
+    (void)menu;
 }
+
+long mpeg_menu_sysevent(void)
+{
+    return mpeg_menu_sysevent_id;
+}
+
+void mpeg_menu_sysevent_handle(void)
+{
+    long id = mpeg_menu_sysevent();
+    if (id != 0)
+        rb->default_event_handler(id);
+}
+
+static void format_menu_item(struct menu_item *item, int bufsize,
+                             const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+
+    rb->vsnprintf(item->desc, bufsize, fmt, ap);
+
+    va_end(ap);
+}
+
+static bool mpeg_set_option(const char* string,
+                            void* variable,
+                            enum optiontype type,
+                            const struct opt_items* options,
+                            int numoptions,
+                            void (*function)(int))
+{
+    mpeg_menu_sysevent_clear();
+
+    /* This eats SYS_POWEROFF - :\ */
+    bool usb = rb->set_option(string, variable, type, options, numoptions,
+                              function);
+
+    if (usb)
+        mpeg_menu_sysevent_id = ACTION_STD_CANCEL;
+
+    return usb;
+}
+
 
 #ifndef HAVE_LCD_COLOR
 /* Cheapo splash implementation for the grey surface */
@@ -230,7 +230,7 @@ static void show_loading(struct vo_rect *rc)
     lcd_(splash)(0, "Loading...");
 }
 
-void draw_slider(uint32_t range, uint32_t pos, struct vo_rect *rc)
+static void draw_slider(uint32_t range, uint32_t pos, struct vo_rect *rc)
 {
     #define SLIDER_WIDTH   (LCD_WIDTH-SLIDER_LMARGIN-SLIDER_RMARGIN)
     #define SLIDER_X       SLIDER_LMARGIN
@@ -291,7 +291,7 @@ void draw_slider(uint32_t range, uint32_t pos, struct vo_rect *rc)
     }
 }
 
-bool display_thumb_image(const struct vo_rect *rc)
+static bool display_thumb_image(const struct vo_rect *rc)
 {
     if (!stream_display_thumb(rc))
     {
@@ -322,7 +322,7 @@ bool display_thumb_image(const struct vo_rect *rc)
 }
 
 /* Add an amount to the specified time - with saturation */
-uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
+static uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
 {
     if (amount < 0)
     {
@@ -344,7 +344,7 @@ uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
     return val;
 }
 
-int get_start_time(uint32_t duration)
+static int get_start_time(uint32_t duration)
 {
     int button = 0;
     int tmo = TIMEOUT_NOBLOCK;
@@ -420,14 +420,16 @@ int get_start_time(uint32_t duration)
            rc_vid.r, rc_vid.b);
 
 #ifndef HAVE_LCD_COLOR
-    /* Restore gray overlay dimensions */
     stream_gray_show(true);
 #endif
 
-    while(slider_state < state9)
+    while (slider_state < state9)
     {
+        mpeg_menu_sysevent_clear();
         button = tmo == TIMEOUT_BLOCK ?
             rb->button_get(true) : rb->button_get_w_tmo(tmo);
+
+        button = mpeg_menu_sysevent_callback(button, -1);
 
         switch (button)
         {
@@ -435,58 +437,62 @@ int get_start_time(uint32_t duration)
             break;
 
         /* Coarse (1 minute) control */
-        case MPEG_DOWN:
-        case MPEG_DOWN | BUTTON_REPEAT:
+        case MPEG_START_TIME_DOWN:
+        case MPEG_START_TIME_DOWN | BUTTON_REPEAT:
             resume_time = increment_time(resume_time, -60*TS_SECOND, duration);
             slider_state = state0;
             break;
 
-        case MPEG_UP:
-        case MPEG_UP | BUTTON_REPEAT:
+        case MPEG_START_TIME_UP:
+        case MPEG_START_TIME_UP | BUTTON_REPEAT:
             resume_time = increment_time(resume_time, 60*TS_SECOND, duration);
             slider_state = state0;
             break;
 
         /* Fine (1 second) control */
-        case MPEG_LEFT:
-        case MPEG_LEFT | BUTTON_REPEAT:
-#ifdef MPEG_SCROLL_UP
-        case MPEG_SCROLL_UP:
-        case MPEG_SCROLL_UP | BUTTON_REPEAT:
+        case MPEG_START_TIME_LEFT:
+        case MPEG_START_TIME_LEFT | BUTTON_REPEAT:
+#ifdef MPEG_START_TIME_SCROLL_UP
+        case MPEG_START_TIME_SCROLL_UP:
+        case MPEG_START_TIME_SCROLL_UP | BUTTON_REPEAT:
 #endif
             resume_time = increment_time(resume_time, -TS_SECOND, duration);
             slider_state = state0;
             break;
 
-        case MPEG_RIGHT:
-        case MPEG_RIGHT | BUTTON_REPEAT:
-#ifdef MPEG_SCROLL_DOWN
-        case MPEG_SCROLL_DOWN:
-        case MPEG_SCROLL_DOWN | BUTTON_REPEAT:
+        case MPEG_START_TIME_RIGHT:
+        case MPEG_START_TIME_RIGHT | BUTTON_REPEAT:
+#ifdef MPEG_START_TIME_SCROLL_DOWN
+        case MPEG_START_TIME_SCROLL_DOWN:
+        case MPEG_START_TIME_SCROLL_DOWN | BUTTON_REPEAT:
 #endif
             resume_time = increment_time(resume_time, TS_SECOND, duration);
             slider_state = state0;
             break;
 
-        case MPEG_SELECT:
+        case MPEG_START_TIME_SELECT:
             settings.resume_time = resume_time;
-        case MPEG_EXIT:
+            button = MPEG_START_SEEK;
             slider_state = state9;
             break;
 
-        case SYS_USB_CONNECTED:
+        case MPEG_START_TIME_EXIT:
+            button = MPEG_START_EXIT;
             slider_state = state9;
-#ifndef HAVE_LCD_COLOR
-            stream_gray_show(false);
-#endif
-            cancel_cpu_boost();
+            break;
+
+        case ACTION_STD_CANCEL:
+            button = MPEG_START_QUIT;
+            slider_state = state9;
+            break;
+
         default:
             rb->default_event_handler(button);
             rb->yield();
             continue;
         }
 
-        switch(slider_state)
+        switch (slider_state)
         {
         case state0:
             trigger_cpu_boost();
@@ -500,12 +506,13 @@ int get_start_time(uint32_t duration)
             display_thumb_image(&rc_vid);
             slider_state = state2;
         case state2:
-        case state9:
             cancel_cpu_boost();
             tmo = TIMEOUT_BLOCK;
         default:
             break;
         }
+
+        rb->yield();
     }
 
 #ifndef HAVE_LCD_COLOR
@@ -519,45 +526,16 @@ int get_start_time(uint32_t duration)
     return button;
 }
 
-enum mpeg_start_id  mpeg_start_menu(uint32_t duration)
+static int show_start_menu(uint32_t duration)
 {
     int menu_id;
     int result = 0;
-    int menu_quit = 0;
+    bool menu_quit = false;
 
     /* add the resume time to the menu display */
     char resume_str[32];
     char hms_str[32];
     struct hms hms;
-
-    ts_to_hms(settings.resume_time, &hms);
-    hms_format(hms_str, sizeof(hms_str), &hms);
-
-    if (settings.enable_start_menu == 0)
-    {
-        rb->snprintf(resume_str, sizeof(resume_str), "Yes: %s", hms_str);
-
-        struct opt_items resume_no_yes[2] =
-        {
-            { "No", -1 },
-            { resume_str, -1 },
-        };
-        if (settings.resume_time == 0)
-            return MPEG_START_RESTART;
-
-        rb->set_option("Resume", &result, INT,
-                       resume_no_yes, 2, NULL);
-
-        if (result == 0)
-        {
-            settings.resume_time = 0;
-            return MPEG_START_RESTART;
-        }
-        else
-            return MPEG_START_RESUME;
-    }
-
-    rb->snprintf(resume_str, sizeof(resume_str), "Resume at: %s", hms_str);
 
     struct menu_item items[] =
     {
@@ -567,50 +545,65 @@ enum mpeg_start_id  mpeg_start_menu(uint32_t duration)
             { resume_str, NULL },
         [MPEG_START_SEEK] =
             { "Set start time", NULL },
+        [MPEG_START_SETTINGS] =
+            { "Settings", NULL },
         [MPEG_START_QUIT] =
             { "Quit mpegplayer", NULL },
     };
 
+    ts_to_hms(settings.resume_time, &hms);
+    hms_format(hms_str, sizeof(hms_str), &hms);
+    format_menu_item(&items[MPEG_START_RESUME], sizeof (resume_str),
+                     "Resume at: %s", hms_str);
 
-    menu_id = menu_init(rb, items, sizeof(items) / sizeof(*items),
-                        NULL, NULL, NULL, NULL);
+    menu_id = menu_init(rb, items, ARRAYLEN(items),
+                        mpeg_menu_sysevent_callback, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
-    while(menu_quit == 0)
+    while (!menu_quit)
     {
+        mpeg_menu_sysevent_clear();
         result = menu_show(menu_id);
 
         switch (result)
         {
-            case MPEG_START_RESTART:
-                settings.resume_time = 0;
-                menu_quit = 1;
-                break;
-            case MPEG_START_RESUME:
-                menu_quit = 1;
-                break;
-            case MPEG_START_SEEK:
-            {
-                if (!stream_can_seek())
-                {
-                    rb->splash(HZ, "Unavailable");
-                    break;
-                }
+        case MPEG_START_RESTART:
+            settings.resume_time = 0;
+            menu_quit = true;
+            break;
 
-                bool vis = stream_show_vo(false);
-                if (get_start_time(duration) == MPEG_SELECT)
-                    menu_quit = 1;
-                stream_show_vo(vis);
+        case MPEG_START_RESUME:
+            menu_quit = true;
+            break;
+
+        case MPEG_START_SEEK:
+            if (!stream_can_seek())
+            {
+                rb->splash(HZ, "Unavailable");
                 break;
-                }
-            case MPEG_START_QUIT:
-                menu_quit = 1;
+            }
+
+            result = get_start_time(duration);
+
+            if (result != MPEG_START_EXIT)
+                menu_quit = true;
+            break;
+
+        case MPEG_START_SETTINGS:
+            if (mpeg_menu(MPEG_MENU_HIDE_QUIT_ITEM) != MPEG_MENU_QUIT)
                 break;
-            default:
-                result = MPEG_START_QUIT;
-                menu_quit = 1;
-                break;
+            /* Fall-through */
+        default:
+            result = MPEG_START_QUIT;
+            menu_quit = true;
+            break;
+        }
+
+        if (mpeg_menu_sysevent() != 0)
+        {
+            result = MPEG_START_QUIT;
+            menu_quit = true;
         }
     }
 
@@ -622,7 +615,116 @@ enum mpeg_start_id  mpeg_start_menu(uint32_t duration)
     return result;
 }
 
-void clear_resume_count(void)
+/* Return the desired resume action */
+int mpeg_start_menu(uint32_t duration)
+{
+    mpeg_menu_sysevent_clear();
+
+    switch (settings.resume_options)
+    {
+    case MPEG_RESUME_MENU_IF_INCOMPLETE:
+        if (!stream_can_seek() || settings.resume_time == 0)
+        {
+    case MPEG_RESUME_RESTART:
+            settings.resume_time = 0;
+            return MPEG_START_RESTART;
+        }
+    default:
+    case MPEG_RESUME_MENU_ALWAYS:
+        return show_start_menu(duration);
+    case MPEG_RESUME_ALWAYS:
+        return MPEG_START_SEEK;
+    }
+}
+
+/** MPEG Menu **/
+static void display_options(void)
+{
+    int result;
+    int menu_id;
+    bool menu_quit = false;
+
+    static const struct menu_item items[] = {
+#if MPEG_OPTION_DITHERING_ENABLED
+        [MPEG_OPTION_DITHERING] =
+            { "Dithering", NULL },
+#endif
+        [MPEG_OPTION_DISPLAY_FPS] =
+            { "Display FPS", NULL },
+        [MPEG_OPTION_LIMIT_FPS] =
+            { "Limit FPS", NULL },
+        [MPEG_OPTION_SKIP_FRAMES] =
+            { "Skip frames", NULL },
+    };
+
+    menu_id = menu_init(rb, items, ARRAYLEN(items),
+                        mpeg_menu_sysevent_callback, NULL, NULL, NULL);
+
+    rb->button_clear_queue();
+
+    while (!menu_quit)
+    {
+        mpeg_menu_sysevent_clear();
+        result = menu_show(menu_id);
+
+        switch (result)
+        {
+#if MPEG_OPTION_DITHERING_ENABLED
+        case MPEG_OPTION_DITHERING:
+            result = (settings.displayoptions & LCD_YUV_DITHER) ? 1 : 0;
+            mpeg_set_option("Dithering", &result, INT, noyes, 2, NULL);
+            settings.displayoptions =
+                (settings.displayoptions & ~LCD_YUV_DITHER)
+                      | ((result != 0) ? LCD_YUV_DITHER : 0);
+            rb->lcd_yuv_set_options(settings.displayoptions);
+            break;
+#endif /* MPEG_OPTION_DITHERING_ENABLED */
+
+        case MPEG_OPTION_DISPLAY_FPS:
+            mpeg_set_option("Display FPS", &settings.showfps, INT,
+                            noyes, 2, NULL);
+            break;
+
+        case MPEG_OPTION_LIMIT_FPS:
+            mpeg_set_option("Limit FPS", &settings.limitfps, INT,
+                            noyes, 2, NULL);
+            break;
+
+        case MPEG_OPTION_SKIP_FRAMES:
+            mpeg_set_option("Skip frames", &settings.skipframes, INT,
+                            noyes, 2, NULL);
+            break;
+
+        default:
+            menu_quit = true;
+            break;
+        }
+
+        if (mpeg_menu_sysevent() != 0)
+            menu_quit = true;
+    }
+
+    menu_exit(menu_id);
+}
+
+static void resume_options(void)
+{
+    static const struct opt_items items[MPEG_RESUME_NUM_OPTIONS] = {
+        [MPEG_RESUME_MENU_ALWAYS] =
+            { "Start menu", -1 },
+        [MPEG_RESUME_MENU_IF_INCOMPLETE] =
+            { "Start menu if not completed", -1 },
+        [MPEG_RESUME_ALWAYS] =
+            { "Resume automatically", -1 },
+        [MPEG_RESUME_RESTART] =
+            { "Play from beginning", -1 },
+    };
+
+    mpeg_set_option("Resume Options", &settings.resume_options,
+                    INT, items, MPEG_RESUME_NUM_OPTIONS, NULL);
+}
+
+static void clear_resume_count(void)
 {
     configfile_save(SETTINGS_FILENAME, config, ARRAYLEN(config),
                     SETTINGS_VERSION);
@@ -633,58 +735,69 @@ void clear_resume_count(void)
     configfile_update_entry(SETTINGS_FILENAME, "Resume count", 0);
 }
 
-enum mpeg_menu_id mpeg_menu(void)
+int mpeg_menu(unsigned flags)
 {
     int menu_id;
     int result;
-    int menu_quit=0;
-
-    /* add the clear resume option to the menu display */
+    bool menu_quit = false;
+    int item_count;
     char clear_str[32];
-    rb->snprintf(clear_str, sizeof(clear_str),
-                 "Clear all resumes: %u", settings.resume_count);
 
     struct menu_item items[] = {
         [MPEG_MENU_DISPLAY_SETTINGS] =
             { "Display Options", NULL },
         [MPEG_MENU_ENABLE_START_MENU] =
-            { "Start menu", NULL },
+            { "Resume Options", NULL },
         [MPEG_MENU_CLEAR_RESUMES] =
             { clear_str, NULL },
         [MPEG_MENU_QUIT] =
             { "Quit mpegplayer", NULL },
     };
 
-    menu_id = menu_init(rb, items, ARRAYLEN(items),
-                        NULL, NULL, NULL, NULL);
+    item_count = ARRAYLEN(items);
+
+    if (flags & MPEG_MENU_HIDE_QUIT_ITEM)
+        item_count--;
+
+    menu_id = menu_init(rb, items, item_count,
+                        mpeg_menu_sysevent_callback, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
-    while (menu_quit == 0)
+    while (!menu_quit)
     {
-        result=menu_show(menu_id);
+        mpeg_menu_sysevent_clear();
 
-        switch(result)
+        /* Format and add resume option to the menu display */
+        format_menu_item(&items[MPEG_MENU_CLEAR_RESUMES], sizeof(clear_str),
+                         "Clear all resumes: %u", settings.resume_count);
+
+        result = menu_show(menu_id);
+
+        switch (result)
         {
-            case MPEG_MENU_DISPLAY_SETTINGS:
-                display_options();
-                break;
-            case MPEG_MENU_ENABLE_START_MENU:
-                rb->set_option("Start menu",
-                               &settings.enable_start_menu,
-                               INT, enabledisable, 2, NULL);
-                break;
-            case MPEG_MENU_CLEAR_RESUMES:
-                clear_resume_count();
-                rb->snprintf(clear_str, sizeof(clear_str),
-                           "Clear all resumes: %u", 0);
-                break;
-            case MPEG_MENU_QUIT:
-            default:
-                menu_quit=1;
-                if (result == MENU_ATTACHED_USB)
-                    result = MPEG_MENU_QUIT;
-                break;
+        case MPEG_MENU_DISPLAY_SETTINGS:
+            display_options();
+            break;
+
+        case MPEG_MENU_ENABLE_START_MENU:
+            resume_options();
+            break;
+
+        case MPEG_MENU_CLEAR_RESUMES:
+            clear_resume_count();
+            break;
+
+        case MPEG_MENU_QUIT:
+        default:
+            menu_quit = true;
+            break;
+        }
+
+        if (mpeg_menu_sysevent() != 0)
+        {
+            result = MPEG_MENU_QUIT;
+            menu_quit = true;
         }
     }
 
@@ -702,7 +815,7 @@ void init_settings(const char* filename)
     settings.showfps = 0;     /* Do not show FPS */
     settings.limitfps = 1;    /* Limit FPS */
     settings.skipframes = 1;  /* Skip frames */
-    settings.enable_start_menu = 1; /* Enable start menu */
+    settings.resume_options = MPEG_RESUME_MENU_ALWAYS; /* Enable start menu */
     settings.resume_count = -1;
 #if MPEG_OPTION_DITHERING_ENABLED
     settings.displayoptions = 0; /* No visual effects */
@@ -754,8 +867,8 @@ void save_settings(void)
                             settings.limitfps);
     configfile_update_entry(SETTINGS_FILENAME, "Skip frames",
                             settings.skipframes);
-    configfile_update_entry(SETTINGS_FILENAME, "Enable start menu",
-                            settings.enable_start_menu);
+    configfile_update_entry(SETTINGS_FILENAME, "Resume options",
+                            settings.resume_options);
 
     /* If this was a new resume entry then update the total resume count */
     if (configfile_update_entry(SETTINGS_FILENAME, settings.resume_filename,

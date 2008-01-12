@@ -133,7 +133,7 @@ void str_data_notify_received(struct stream *str)
 static void stream_mgr_init_state(void)
 {
     stream_mgr.filename = NULL;
-    stream_mgr.resume_time = 0;
+    stream_mgr.resume_time = INVALID_TIMESTAMP;
     stream_mgr.seeked = false;
 }
 
@@ -341,6 +341,26 @@ static uint32_t stream_seek_intl(uint32_t time, int whence,
     return parser_seek_time(time);
 }
 
+/* Store the resume time at the last seek/current clock point */
+static void stream_remember_resume_time(void)
+{
+    /* Assume invalidity */
+    stream_mgr.resume_time = 0;
+
+    if (stream_can_seek())
+    {
+        /* Read the current stream time or the last seeked position */
+        uint32_t start;
+        uint32_t time = stream_get_seek_time(&start);
+
+        if (time >= str_parser.start_pts && time < str_parser.end_pts)
+        {
+            /* Save the current stream time */
+            stream_mgr.resume_time = time - start;
+        }
+    }
+}
+
 /* Handle STREAM_OPEN */
 void stream_on_open(const char *filename)
 {
@@ -396,11 +416,11 @@ static void stream_on_play(void)
         /* Seek to initial position and set clock to that time */
 
         /* Save the resume time */
-        start = str_parser.last_seek_time - str_parser.start_pts;
-        stream_mgr.resume_time = start;
+        stream_remember_resume_time();
 
         /* Prepare seek to start point */
-        start = stream_seek_intl(start, SEEK_SET, STREAM_STOPPED, NULL);
+        start = stream_seek_intl(stream_mgr.resume_time, SEEK_SET,
+                                 STREAM_STOPPED, NULL);
 
         /* Sync and start - force buffer fill */
         stream_start_playback(start, true);
@@ -485,21 +505,8 @@ static void stream_on_stop(bool reply)
         /* Pause the clock */
         pcm_output_play_pause(false);
 
-        /* Assume invalidity */
-        stream_mgr.resume_time = 0;
-
-        if (stream_can_seek())
-        {
-            /* Read the current stream time or the last seeked position */
-            uint32_t start;
-            uint32_t time = stream_get_seek_time(&start);
-
-            if (time >= str_parser.start_pts && time < str_parser.end_pts)
-            {
-                /* Save the current stream time */
-                stream_mgr.resume_time = time - start;
-            }
-        }
+        /* Update the resume time info */
+        stream_remember_resume_time();
 
         /* Not stopped = paused or playing */
         stream_mgr.seeked = false;
@@ -555,6 +562,7 @@ static void stream_on_seek(struct stream_seek_data *skd)
             }
 
             time = stream_seek_intl(time, whence, stream_mgr.status, &buffer);
+            stream_remember_resume_time();
 
             if (stream_mgr.status == STREAM_PLAYING)
             {
