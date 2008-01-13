@@ -4,10 +4,6 @@ fixedpoint.c
 playback_control.c
 rgb_hsv.c
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
-gray_core.c
-gray_draw.c
-gray_parm.c
-gray_scroll.c
 grey_core.c
 grey_draw.c
 grey_parm.c
