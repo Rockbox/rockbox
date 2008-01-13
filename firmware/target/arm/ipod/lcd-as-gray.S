@@ -44,20 +44,20 @@ lcd_write_data:
     orr     r3, r3, #0x760000
 1:
     ldr     r4, [r2]
-    tst     r4, #0x8000
+    tst     r4, #LCD1_BUSY_MASK
     bne     1b
     str     r3, [r2, #0x08]
 #else
 1:
     ldr     r4, [r2]
-    tst     r4, #0x8000
+    tst     r4, #LCD1_BUSY_MASK
     bne     1b
     str     r3, [r2, #0x10]
 
     ldrb    r3, [r0], #1
 1:
     ldr     r4, [r2]
-    tst     r4, #0x8000
+    tst     r4, #LCD1_BUSY_MASK
     bne     1b
     str     r3, [r2, #0x10]
 #endif
@@ -66,9 +66,7 @@ lcd_write_data:
     bne     .loop
 
     ldmfd   sp!, {r4, pc}
-
-.wd_end:
-    .size   lcd_write_data,.wd_end-lcd_write_data
+    .size   lcd_write_data,.-lcd_write_data
     
 
 #ifdef IPOD_MINI2G
@@ -91,7 +89,7 @@ lcd_write_data_shifted:
     orr     r5, r6, r5, lsr #16
 1:
     ldr     r4, [r2]
-    tst     r4, #0x8000
+    tst     r4, #LCD1_BUSY_MASK
     bne     1b
     str     r5, [r2, #0x08]
 
@@ -99,9 +97,7 @@ lcd_write_data_shifted:
     bne     .sloop
 
     ldmfd   sp!, {r4-r6, pc}
-
-.wds_end:
-    .size   lcd_write_data_shifted,.wds_end-lcd_write_data_shifted
+    .size   lcd_write_data_shifted,.-lcd_write_data_shifted
     
 #elif defined IPOD_MINI
 
@@ -119,7 +115,7 @@ lcd_write_data_shifted:
     mov     r5, r3, lsr #4
 1:
     ldr     r4, [r2]
-    tst     r4, #0x8000
+    tst     r4, #LCD1_BUSY_MASK
     bne     1b
     str     r5, [r2, #0x10]
 
@@ -128,7 +124,7 @@ lcd_write_data_shifted:
     mov     r5, r3, lsr #4
 1:
     ldr     r4, [r2]
-    tst     r4, #0x8000
+    tst     r4, #LCD1_BUSY_MASK
     bne     1b
     str     r5, [r2, #0x10]
 
@@ -136,9 +132,8 @@ lcd_write_data_shifted:
     bne     .sloop
 
     ldmfd   sp!, {r4, r5, pc}
-.wds_end:
-    .size   lcd_write_data_shifted,.wds_end-lcd_write_data_shifted
-    
+    .size   lcd_write_data_shifted,.-lcd_write_data_shifted
+
 #endif
 
     .global     lcd_mono_data
@@ -161,13 +156,13 @@ lcd_mono_data:
     orr     r5, r5, #0x760000
 1:
     ldr     r4, [r2]
-    tst     r4, #0x8000
+    tst     r4, #LCD1_BUSY_MASK
     bne     1b
     str     r5, [r2, #0x08]
 #else
 1:
     ldr     r4, [r2]
-    tst     r4, #0x8000
+    tst     r4, #LCD1_BUSY_MASK
     bne     1b
     str     r5, [r2, #0x10]
 
@@ -175,7 +170,7 @@ lcd_mono_data:
     ldrb    r5, [r6, r4]
 1:
     ldr     r4, [r2]
-    tst     r4, #0x8000
+    tst     r4, #LCD1_BUSY_MASK
     bne     1b
     str     r5, [r2, #0x10]
 #endif
@@ -189,9 +184,8 @@ lcd_mono_data:
     .byte   0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F
     .byte   0xC0, 0xC3, 0xCC, 0xCF, 0xF0, 0xF3, 0xFC, 0xFF
 
-.md_end:
-    .size   lcd_mono_data,.md_end-lcd_mono_data
-    
+    .size   lcd_mono_data,.-lcd_mono_data
+
 
     .global     lcd_grey_data
     .type       lcd_grey_data,%function
@@ -250,7 +244,7 @@ lcd_grey_data:
 
 1:
     ldr     r5, [r9]
-    tst     r5, #0x8000
+    tst     r5, #LCD1_BUSY_MASK
     bne     1b
 
     str     r7, [r9, #0x10]
@@ -272,7 +266,7 @@ lcd_grey_data:
 
 1:
     ldr     r5, [r9]
-    tst     r5, #0x8000
+    tst     r5, #LCD1_BUSY_MASK
     bne     1b
 #ifdef IPOD_MINI2G
     str     r7, [r9, #0x08]
@@ -284,7 +278,5 @@ lcd_grey_data:
     bne     .greyloop
 
     ldmfd   sp!, {r4-r9, pc}
-
-.gd_end:
-    .size   lcd_grey_data,.gd_end-lcd_grey_data
+    .size   lcd_grey_data,.-lcd_grey_data
 
