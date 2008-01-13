@@ -29,7 +29,7 @@ jpeg.c
 
 #ifndef OLYMPUS_MROBE_500
 
-#if CONFIG_CODEC == SWCODEC
+#if (CONFIG_CODEC == SWCODEC) || !defined(SIMULATOR)
 metronome.c
 #endif
 

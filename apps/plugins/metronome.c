@@ -113,7 +113,7 @@ int bpm_step_counter = 0;
 
 void callback(unsigned char** start, size_t* size){
     (void)start; /* unused parameter, avoid warning */
-    *size = NULL; /* end of data */
+    *size = 0; /* end of data */
     sound_active = false;
     rb->led(0);
 }
