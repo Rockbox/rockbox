@@ -9,7 +9,7 @@
     *: "Ja"
   </dest>
   <voice>
-    *: "Yes"
+    *: "Ja"
   </voice>
 </phrase>
 <phrase>
@@ -23,7 +23,7 @@
     *: "Nei"
   </dest>
   <voice>
-    *: "No"
+    *: "nei"
   </voice>
 </phrase>
 <phrase>
@@ -37,7 +37,7 @@
     *: "På"
   </dest>
   <voice>
-    *: "On"
+    *: "pa"
   </voice>
 </phrase>
 <phrase>
@@ -51,7 +51,7 @@
     *: "Av"
   </dest>
   <voice>
-    *: "Off"
+    *: "av"
   </voice>
 </phrase>
 <phrase>
@@ -65,7 +65,7 @@
     *: "Alltid"
   </dest>
   <voice>
-    *: "Always"
+    *: "alltid"
   </voice>
 </phrase>
 <phrase>
@@ -79,7 +79,7 @@
     *: "Laster ..."
   </dest>
   <voice>
-    *: ""
+    *: "laster"
   </voice>
 </phrase>
 <phrase>
@@ -96,7 +96,7 @@
   </dest>
   <voice>
     *: none
-    soft_shutdown: ""
+    soft_shutdown: "Trykk AV for å avslutte"
   </voice>
 </phrase>
 <phrase>
@@ -110,7 +110,7 @@
     *: "Avslutter..."
   </dest>
   <voice>
-    *: ""
+    *: "avslutter"
   </voice>
 </phrase>
 <phrase>
@@ -127,7 +127,7 @@
   </dest>
   <voice>
     *: ""
-    swcodec: ""
+    swcodec: "Starter avspilling på nytt..."
   </voice>
 </phrase>
 <phrase>
@@ -158,7 +158,7 @@
     *: "mislykket"
   </dest>
   <voice>
-    *: ""
+    *: "mislykket"
   </voice>
 </phrase>
 <phrase>
@@ -172,7 +172,7 @@
     *: "Nyeste bokmerker"
   </dest>
   <voice>
-    *: "Recent Bookmarks"
+    *: "Nyeste bokmerker"
   </voice>
 </phrase>
 <phrase>
@@ -405,7 +405,7 @@
     *: "Mono venstre"
   </dest>
   <voice>
-    *: "Mono Left"
+    *: "Mono venstre"
   </voice>
 </phrase>
 <phrase>
@@ -419,7 +419,7 @@
     *: "Mono høyre"
   </dest>
   <voice>
-    *: "Mono Right"
+    *: "Mono hoyre"
   </voice>
 </phrase>
 <phrase>
@@ -447,7 +447,7 @@
     *: "Stereobredde"
   </dest>
   <voice>
-    *: "Stereo width"
+    *: "Stereobredde"
   </voice>
 </phrase>
 <phrase>
@@ -648,7 +648,7 @@
     *: "Spilleinnstillinger"
   </dest>
   <voice>
-    *: "Playback"
+    *: "Spilleinnstillinger"
   </voice>
 </phrase>
 <phrase>
@@ -662,7 +662,7 @@
     *: "Filliste"
   </dest>
   <voice>
-    *: "File View"
+    *: "filleste"
   </voice>
 </phrase>
 <phrase>
@@ -676,7 +676,7 @@
     *: "Skjerm"
   </dest>
   <voice>
-    *: "Display"
+    *: "skjerm"
   </voice>
 </phrase>
 <phrase>
@@ -704,7 +704,7 @@
     *: "Bokmerking"
   </dest>
   <voice>
-    *: "Bookmarking"
+    *: "Bokmerking"
   </voice>
 </phrase>
 <phrase>
@@ -718,7 +718,7 @@
     *: "Språk"
   </dest>
   <voice>
-    *: "Language"
+    *: "Sprak"
   </voice>
 </phrase>
 <phrase>
@@ -732,7 +732,7 @@
     *: "Stemme"
   </dest>
   <voice>
-    *: "Voice"
+    *: "stemme"
   </voice>
 </phrase>
 <phrase>
@@ -746,7 +746,7 @@
     *: "Bla igjennom .cfg-filer"
   </dest>
   <voice>
-    *: "Browse configuration files"
+    *: "Bla igjennom .cfg-filer"
   </voice>
 </phrase>
 <phrase>
@@ -760,7 +760,7 @@
     *: "Nullstill innstillinger"
   </dest>
   <voice>
-    *: "Reset Settings"
+    *: "Nullstill innstillinger"
   </voice>
 </phrase>
 <phrase>
@@ -774,7 +774,7 @@
     *: "Nullstillt"
   </dest>
   <voice>
-    *: ""
+    *: "Nullstillt"
   </voice>
 </phrase>
 <phrase>
@@ -788,7 +788,7 @@
     *: "Skriv .cfg-fil"
   </dest>
   <voice>
-    *: "Write configuration file"
+    *: "Write Configuration File"
   </voice>
 </phrase>
 <phrase>
@@ -819,7 +819,7 @@
     *: "Lag spilleliste"
   </dest>
   <voice>
-    *: "Create Playlist"
+    *: "Lag spilleliste"
   </voice>
 </phrase>
 <phrase>
@@ -833,7 +833,7 @@
     *: "Vis nåværende spilleliste"
   </dest>
   <voice>
-    *: "View Current Playlist"
+    *: "Vis nåværende spilleliste"
   </voice>
 </phrase>
 <phrase>
@@ -847,7 +847,7 @@
     *: "Lagre nåværende spilleliste"
   </dest>
   <voice>
-    *: "Save Current Playlist"
+    *: "Lagre nåværende spilleliste"
   </voice>
 </phrase>
 <phrase>
@@ -861,7 +861,7 @@
     *: "Sett inn kataloger rekursivt"
   </dest>
   <voice>
-    *: "Recursively Insert Directories"
+    *: "Sett inn kataloger rekursivt"
   </voice>
 </phrase>
 <phrase>
@@ -875,7 +875,7 @@
     *: "Versjon"
   </dest>
   <voice>
-    *: "Version"
+    *: "Versjon"
   </voice>
 </phrase>
 <phrase>
@@ -889,7 +889,7 @@
     *: "Debug (ikke rør!)"
   </dest>
   <voice>
-    *: "Debug, keep out!"
+    *: "Debug, ikke rør!"
   </voice>
 </phrase>
 <phrase>
@@ -903,7 +903,7 @@
     *: "Stokk om"
   </dest>
   <voice>
-    *: "Shuffle"
+    *: "Stokk om"
   </voice>
 </phrase>
 <phrase>
@@ -917,7 +917,7 @@
     *: "Gjenta"
   </dest>
   <voice>
-    *: "Repeat"
+    *: "Gjenta"
   </voice>
 </phrase>
 <phrase>
@@ -931,7 +931,7 @@
     *: "En"
   </dest>
   <voice>
-    *: "One"
+    *: "en"
   </voice>
 </phrase>
 <phrase>
@@ -959,7 +959,7 @@
     *: "Spill valgte først"
   </dest>
   <voice>
-    *: "Play Selected File First"
+    *: "Spill valgte først"
   </voice>
 </phrase>
 <phrase>
@@ -973,7 +973,7 @@
     *: "Spol forover/bakover"
   </dest>
   <voice>
-    *: "Fast forward and Rewind"
+    *: "Spol forover/bakover"
   </voice>
 </phrase>
 <phrase>
@@ -1176,7 +1176,7 @@
     *: "Bytt katalog automatisk"
   </dest>
   <voice>
-    *: "Auto change directory"
+    *: "Bytt katalog automatisk"
   </voice>
 </phrase>
 <phrase>
@@ -1190,7 +1190,7 @@
     *: "Samle bruksdata"
   </dest>
   <voice>
-    *: "Gather runtime data"
+    *: "Samle bruksdata"
   </voice>
 </phrase>
 <phrase>
@@ -1218,7 +1218,7 @@
     *: "Sorter kataloger"
   </dest>
   <voice>
-    *: "sort directories"
+    *: "Sorter kataloger"
   </voice>
 </phrase>
 <phrase>
@@ -1232,7 +1232,7 @@
     *: "Sorter filer"
   </dest>
   <voice>
-    *: "sort files"
+    *: "Sorter filer"
   </voice>
 </phrase>
 <phrase>
@@ -1246,7 +1246,7 @@
     *: "Alfabetisk"
   </dest>
   <voice>
-    *: "Alphabetical"
+    *: "Alfabetisk"
   </voice>
 </phrase>
 <phrase>
@@ -1260,7 +1260,7 @@
     *: "Etter dato"
   </dest>
   <voice>
-    *: "by date"
+    *: "Etter dato"
   </voice>
 </phrase>
 <phrase>
@@ -1274,7 +1274,7 @@
     *: "Etter nyeste dato"
   </dest>
   <voice>
-    *: "by newest date"
+    *: "Etter nyeste dato"
   </voice>
 </phrase>
 <phrase>
@@ -1288,7 +1288,7 @@
     *: "Etter type"
   </dest>
   <voice>
-    *: "by type"
+    *: "Etter type"
   </voice>
 </phrase>
 <phrase>
@@ -1302,7 +1302,7 @@
     *: "Vis filer"
   </dest>
   <voice>
-    *: "Show Files"
+    *: "Vis filer"
   </voice>
 </phrase>
 <phrase>
@@ -1316,7 +1316,7 @@
     *: "Støttede"
   </dest>
   <voice>
-    *: "Supported"
+    *: "Støttede"
   </voice>
 </phrase>
 <phrase>
@@ -1330,9 +1330,9 @@
     *: "Musikk"
   </dest>
   <voice>
-    *: "Music"
+    *: "Musikk"
   </voice>
-</phrase>
+<	/phrase>
 <phrase>
   id: LANG_FOLLOW
   desc: in settings_menu
@@ -1344,7 +1344,7 @@
     *: "Følg spilleliste"
   </dest>
   <voice>
-    *: "Follow Playlist"
+    *: "Følg spilleliste"
   </voice>
 </phrase>
 <phrase>
@@ -1358,7 +1358,7 @@
     *: "Vis ikoner"
   </dest>
   <voice>
-    *: "Show Icons"
+    *: "Vis ikoner"
   </voice>
 </phrase>
 <phrase>
@@ -1389,7 +1389,7 @@
     *: "Bla igjennom .wps-filer"
   </dest>
   <voice>
-    *: "Browse while-playing-screen files"
+    *: "Browse Configuration Files"
   </voice>
 </phrase>
 <phrase>
@@ -1406,7 +1406,7 @@
   </dest>
   <voice>
     *: ""
-    remote: "Bla igjennom R W P S filer"
+    remote: "Browse remote while-playing-screen files"
   </voice>
 </phrase>
 <phrase>
@@ -1420,7 +1420,7 @@
     *: "LCD-innstillinger"
   </dest>
   <voice>
-    *: "LCD Settings"
+    *: "LCD-innstillinger"
   </voice>
 </phrase>
 <phrase>
@@ -1451,7 +1451,7 @@
     *: "Rulling"
   </dest>
   <voice>
-    *: "Scrolling"
+    *: "rulling"
   </voice>
 </phrase>
 <phrase>
@@ -1499,7 +1499,7 @@
     *: "Standard tegnsett"
   </dest>
   <voice>
-    *: ""
+    *: "Standard tegnsett"
   </voice>
 </phrase>
 <phrase>
@@ -1513,7 +1513,7 @@
     *: "Latin1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: ""
+    *: "Latin1"
   </voice>
 </phrase>
 <phrase>
@@ -1527,7 +1527,7 @@
     *: "Gresk (ISO-8859-7)"
   </dest>
   <voice>
-    *: ""
+    *: "gresk"
   </voice>
 </phrase>
 <phrase>
@@ -1558,7 +1558,7 @@
    *: "Cyrillisk (CP1251)"
   </dest>
   <voice>
-    *: ""
+    *: "Cyrillisk"
   </voice>
 </phrase>
 <phrase>
@@ -1606,7 +1606,7 @@
     *: "Tyrkisk (ISO-8859-9)"
   </dest>
   <voice>
-    *: ""
+    *: "tyrkisk"
   </voice>
 </phrase>
 <phrase>
@@ -1620,7 +1620,7 @@
     *: "Latin utvidet (ISO-8859-2)"
   </dest>
   <voice>
-    *: ""
+    *: "Latin utvidet"
   </voice>
 </phrase>
 <phrase>
@@ -1654,7 +1654,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Forenklet kinesisk (GB2312)"
+    lcd_bitmap: "Forenklet kinesisk"
   </voice>
 </phrase>
 <phrase>
@@ -1671,7 +1671,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Koreansk (KSX1001)"
+    lcd_bitmap: "Koreansk"
   </voice>
 </phrase>
 <phrase>
@@ -1688,7 +1688,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Tradisjonelt kinesisk (BIG5)"
+    lcd_bitmap: "Tradisjonelt kinesisk"
   </voice>
 </phrase>
 <phrase>
@@ -1702,7 +1702,7 @@
     *: "Unicode (UTF-8)"
   </dest>
   <voice>
-    *: ""
+    *: "unicode"
   </voice>
 </phrase>
 <phrase>
@@ -1716,7 +1716,7 @@
     *: "Batteri"
   </dest>
   <voice>
-    *: "Battery"
+    *: "Batteri"
   </voice>
 </phrase>
 <phrase>
@@ -1761,7 +1761,7 @@
     *: "Slå av når ikke i bruk"
   </dest>
   <voice>
-    *: "Idle Poweroff"
+    *: "Slå av når ikke i bruk"
   </voice>
 </phrase>
 <phrase>
@@ -1775,7 +1775,7 @@
     *: "Innsovningstid"
   </dest>
   <voice>
-    *: "Sleep Timer"
+    *: "Innsovningstid"
   </voice>
 </phrase>
 <phrase>
@@ -1806,7 +1806,7 @@
     *: "Begrensninger"
   </dest>
   <voice>
-    *: "Limits"
+    *: "Begrensninger"
   </voice>
 </phrase>
 <phrase>
@@ -1854,7 +1854,7 @@
     *: "Lag bokmerke ved stopp"
   </dest>
   <voice>
-    *: "Bookmark on Stop"
+    *: "Lag bokmerke ved stopp"
   </voice>
 </phrase>
 <phrase>
@@ -1868,7 +1868,7 @@
     *: "Ja - Kun nylige"
   </dest>
   <voice>
-    *: "Yes - Recent only"
+    *: "Ja - Kun nylige"
   </voice>
 </phrase>
 <phrase>
@@ -1882,7 +1882,7 @@
     *: "Spør - Kun nylige"
   </dest>
   <voice>
-    *: "Ask - Recent only"
+    *: "Spør - Kun nylige"
   </voice>
 </phrase>
 <phrase>
@@ -1896,7 +1896,7 @@
     *: "Last inn siste bokmerke"
   </dest>
   <voice>
-    *: "Load Last Bookmark"
+    *: "Last inn siste bokmerke"
   </voice>
 </phrase>
 <phrase>
@@ -1924,7 +1924,7 @@
     *: "Kun unike"
   </dest>
   <voice>
-    *: "Unique only"
+    *: "Kun unike"
   </voice>
 </phrase>
 <phrase>
@@ -1938,7 +1938,7 @@
     *: "Snakkende menyer"
   </dest>
   <voice>
-    *: "Voice Menus"
+    *: "Snakkende menyer"
   </voice>
 </phrase>
 <phrase>
@@ -1980,7 +1980,7 @@
     *: "Tall"
   </dest>
   <voice>
-    *: "Numbers"
+    *: "Tall"
   </voice>
 </phrase>
 <phrase>
@@ -1994,7 +1994,7 @@
     *: "Stav"
   </dest>
   <voice>
-    *: "Spell"
+    *: "Stav"
   </voice>
 </phrase>
 <phrase>
@@ -2008,7 +2008,7 @@
     *: ".talk-mp3-klipp"
   </dest>
   <voice>
-    *: "talk mp3 clip"
+    *: "talk-mp3-clip"
   </voice>
 </phrase>
 <phrase>
@@ -2210,7 +2210,7 @@
     *: "Minimum søkesteg"
   </dest>
   <voice>
-    *: "Minimum Step"
+    *: "Minimum søkesteg"
   </voice>
 </phrase>
 <phrase>
@@ -2224,7 +2224,7 @@
     *: "Søkeaksellerasjon"
   </dest>
   <voice>
-    *: "Acceleration"
+    *: "Søkeaksellerasjon"
   </voice>
 </phrase>
 <phrase>
@@ -2388,7 +2388,7 @@
     *: "Avspillingsnivåtype"
   </dest>
   <voice>
-    *: "Replaygain type"
+    *: "Avspillingsnivåtype"
   </voice>
 </phrase>
 <phrase>
@@ -2402,7 +2402,7 @@
     *: "Albumnivå"
   </dest>
   <voice>
-    *: "Album gain"
+    *: "Albumnivå"
   </voice>
 </phrase>
 <phrase>
@@ -2416,7 +2416,7 @@
     *: "Spornivå"
   </dest>
   <voice>
-    *: "Track gain"
+    *: "Spornivå"
   </voice>
 </phrase>
 <phrase>
@@ -2444,7 +2444,7 @@
     *: "Forforsterker"
   </dest>
   <voice>
-    *: "Preamp"
+    *: "Forforsterker"
   </voice>
 </phrase>
 <phrase>
@@ -2458,7 +2458,7 @@
     *: "Skjermlys"
   </dest>
   <voice>
-    *: "Backlight"
+    *: "Skjermlys"
   </voice>
 </phrase>
 <phrase>
@@ -2489,7 +2489,7 @@
     *: "Skjermlys ved sporbytte"
   </dest>
   <voice>
-    *: "Caption backlight"
+    *: "Skjermlys ved sporbytte"
   </voice>
 </phrase>
 <phrase>
@@ -2554,7 +2554,7 @@
     *: "Kontrast"
   </dest>
   <voice>
-    *: "Contrast"
+    *: "Kontrast"
   </voice>
 </phrase>
 <phrase>
@@ -2687,7 +2687,7 @@
     *: "Rullefart"
   </dest>
   <voice>
-    *: "Scroll Speed"
+    *: "Rullefart"
   </voice>
 </phrase>
 <phrase>
@@ -2701,7 +2701,7 @@
     *: "Eksempel for rullehastighetsinnstilling"
   </dest>
   <voice>
-    *: ""
+    *: "Eksempel for rullehastighetsinnstilling"
   </voice>
 </phrase>
 <phrase>
@@ -2715,7 +2715,7 @@
     *: "Pause før rullestart"
   </dest>
   <voice>
-    *: "Scroll Start Delay"
+    *: "Pause før rullestart"
   </voice>
 </phrase>
 <phrase>
@@ -2729,7 +2729,7 @@
     *: "Rullesteglengde"
   </dest>
   <voice>
-    *: "Scroll Step Size"
+    *: "Rullesteglengde"
   </voice>
 </phrase>
 <phrase>
@@ -2743,7 +2743,7 @@
     *: "Eksempeltekst for å sette rullesteglengde"
   </dest>
   <voice>
-    *: ""
+    *: "Eksempeltekst for å sette rullesteglengde"
   </voice>
 </phrase>
 <phrase>
@@ -2757,7 +2757,7 @@
     *: "Grense for toveis rulling"
   </dest>
   <voice>
-    *: "Bidirectional Scroll Limit"
+    *: "Grense for toveis rulling"
   </voice>
 </phrase>
 <phrase>
@@ -2771,7 +2771,7 @@
     *: "Hopprulling"
   </dest>
   <voice>
-    *: "Jump scroll"
+    *: "Hopprulling"
   </voice>
 </phrase>
 <phrase>
@@ -2785,7 +2785,7 @@
     *: "Én gang"
   </dest>
   <voice>
-    *: "One time"
+    *: "Én gang"
   </voice>
 </phrase>
 <phrase>
@@ -2799,7 +2799,7 @@
     *: "Hopprullingforsinkelse"
   </dest>
   <voice>
-    *: "Jump Scroll Delay"
+    *: "Hopprullingforsinkelse"
   </voice>
 </phrase>
 <phrase>
@@ -2999,7 +2999,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Eternal"
+    *: "Uendelig"
     masd: none
   </voice>
 </phrase>
@@ -3016,7 +3016,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Scale"
+    *: "Skala"
     masd: none
   </voice>
 </phrase>
@@ -3099,7 +3099,7 @@
     *: "Batterikapasitet"
   </dest>
   <voice>
-    *: "Battery Capacity"
+    *: "Batterikapasitet"
   </voice>
 </phrase>
 <phrase>
@@ -3291,7 +3291,7 @@
     *: "Spilleliste"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "Spilleliste"
   </voice>
 </phrase>
 <phrase>
@@ -3305,7 +3305,7 @@
     *: "Bokmerker"
   </dest>
   <voice>
-    *: "Bookmarks"
+    *: "Bokmerker"
   </voice>
 </phrase>
 <phrase>
@@ -3347,7 +3347,7 @@
     *: "Gi nytt navn"
   </dest>
   <voice>
-    *: "Rename"
+    *: "Gi nytt navn"
   </voice>
 </phrase>
 <phrase>
@@ -3361,7 +3361,7 @@
     *: "Slette"
   </dest>
   <voice>
-    *: "Delete"
+    *: "Slette"
   </voice>
 </phrase>
 <phrase>
@@ -3375,7 +3375,7 @@
     *: "Slett katalog"
   </dest>
   <voice>
-    *: "delete directory"
+    *: "Slett katalog"
   </voice>
 </phrase>
 <phrase>
@@ -3389,7 +3389,7 @@
     *: "Slette?"
   </dest>
   <voice>
-    *: ""
+    *: "Slette?"
   </voice>
 </phrase>
 <phrase>
@@ -3403,7 +3403,7 @@
     *: "Slettet"
   </dest>
   <voice>
-    *: ""
+    *: "Slettet"
   </voice>
 </phrase>
 <phrase>
@@ -3417,7 +3417,7 @@
     *: "Åpne med ..."
   </dest>
   <voice>
-    *: "open with"
+    *: "Åpne med"
   </voice>
 </phrase>
 <phrase>
@@ -3431,7 +3431,7 @@
     *: "Opprett katalog"
   </dest>
   <voice>
-    *: "Create directory"
+    *: "Opprett katalog"
   </voice>
 </phrase>
 <phrase>
@@ -3445,7 +3445,7 @@
     *: "Vis"
   </dest>
   <voice>
-    *: "View"
+    *: "Vis"
   </voice>
 </phrase>
 <phrase>
@@ -3459,7 +3459,7 @@
     *: "Stokk om"
   </dest>
   <voice>
-    *: "Reshuffle"
+    *: "Stokk om"
   </voice>
 </phrase>
 <phrase>
@@ -3473,7 +3473,7 @@
     *: "Sett inn"
   </dest>
   <voice>
-    *: "Insert"
+    *: "Sett inn"
   </voice>
 </phrase>
 <phrase>
@@ -3491,7 +3491,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_INSERT_LAST
+  LANG_INSERT_LAST
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user:
   <source>
@@ -3501,7 +3501,7 @@
     *: "Sett inn sist"
   </dest>
   <voice>
-    *: "Insert last"
+    *: "Sett inn sist"
   </voice>
 </phrase>
 <phrase>
@@ -3515,7 +3515,7 @@
     *: "Sett inn tilfeldig"
   </dest>
   <voice>
-    *: "Insert shuffled"
+    *: "Sett inn tilfeldig"
   </voice>
 </phrase>
 <phrase>
@@ -3529,7 +3529,7 @@
     *: "Legg til i kø"
   </dest>
   <voice>
-    *: "Queue"
+    *: "Legg til i kø"
   </voice>
 </phrase>
 <phrase>
@@ -3543,7 +3543,7 @@
     *: "Legg til som neste i kø"
   </dest>
   <voice>
-    *: "Queue next"
+    *: "Legg til som neste i kø"
   </voice>
 </phrase>
 <phrase>
@@ -3557,7 +3557,7 @@
     *: "Legg til sist i kø"
   </dest>
   <voice>
-    *: "Queue last"
+    *: "Legg til sist i kø"
   </voice>
 </phrase>
 <phrase>
@@ -3571,7 +3571,7 @@
     *: "Lag bokmerke"
   </dest>
   <voice>
-    *: "Create Bookmark"
+    *: "Lag bokmerke"
   </voice>
 </phrase>
 <phrase>
@@ -3585,7 +3585,7 @@
     *: "List opp bokmerker"
   </dest>
   <voice>
-    *: "List Bookmarks"
+    *: "List opp bokmerker"
   </voice>
 </phrase>
 <phrase>
@@ -3664,7 +3664,7 @@
   </source>
   <dest>
     *: "Batteri: %d%% %dh %dm"
-    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: ""
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
     h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
@@ -3684,7 +3684,7 @@
     *: "Disk:"
   </dest>
   <voice>
-    *: ""
+    *: "disk:"
   </voice>
 </phrase>
 <phrase>
@@ -3698,7 +3698,7 @@
     *: "Ledig:"
   </dest>
   <voice>
-    *: "Free diskspace:"
+    *: "Ledig disc: "
   </voice>
 </phrase>
 <phrase>
@@ -3769,7 +3769,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Høyere tonehøyde"
   </voice>
 </phrase>
 <phrase>
@@ -3786,7 +3786,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Lavere tonehøyde"
   </voice>
 </phrase>
 <phrase>
@@ -3800,7 +3800,7 @@
     *: "Pause"
   </dest>
   <voice>
-    *: ""
+    *: "Pause"
   </voice>
 </phrase>
 <phrase>
@@ -3814,7 +3814,7 @@
     *: "Lage bokmerke?"
   </dest>
   <voice>
-    *: ""
+    *: "Lage bokmerke?"
   </voice>
 </phrase>
 <phrase>
@@ -3828,7 +3828,7 @@
     *: "Bokmerke laget"
   </dest>
   <voice>
-    *: ""
+    *: "Bokmerke laget"
   </voice>
 </phrase>
 <phrase>
@@ -3842,7 +3842,7 @@
     *: "Bokmerking feilet!"
   </dest>
   <voice>
-    *: ""
+    *: "Bokmerking feilet!"
   </voice>
 </phrase>
 <phrase>
@@ -3856,7 +3856,7 @@
     *: "Tomt bokmerke"
   </dest>
   <voice>
-    *: ""
+    *: "Tomt bokmerke"
   </voice>
 </phrase>
 <phrase>
@@ -3883,12 +3883,12 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,e200,c200: ""
-    x5,m5: ""
-    h10,h10_5gb: ""
-    gigabeatf: ""
+    rtc: "AV = Tilbakestill"
+    h100,h120,h300: "STOPP = Tilbakestill"
+    ipod*,e200,c200: "MENY = Tilbakestill"
+    x5,m5: "OPPTAK = Tilbakestill"
+    h10,h10_5gb: "FORRIGE = Tilbakestill"
+    gigabeatf: "a=Tilbakestill"
   </voice>
 </phrase>
 <phrase>
@@ -4373,7 +4373,7 @@
   <voice>
     *: ""
   </voice>
-</phrase>
+</phrase> ###next 7 voice strings by mokkurkalve
 <phrase>
   id: LANG_WEEKDAY_SUNDAY
   desc: Maximum 3-letter abbreviation for weekday
@@ -4388,7 +4388,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "søndag"
   </voice>
 </phrase>
 <phrase>
@@ -4405,7 +4405,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "mandag"
   </voice>
 </phrase>
 <phrase>
@@ -4422,7 +4422,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "tirsdag"
   </voice>
 </phrase>
 <phrase>
@@ -4439,7 +4439,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "onsdag"
   </voice>
 </phrase>
 <phrase>
@@ -4456,7 +4456,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "torsdag"
   </voice>
 </phrase>
 <phrase>
@@ -4473,7 +4473,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "fredag"
   </voice>
 </phrase>
 <phrase>
@@ -4490,7 +4490,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "lørdag"
   </voice>
 </phrase>
 <phrase>
@@ -6013,7 +6013,7 @@
     *: "Spillelistebufferet er fullt"
   </dest>
   <voice>
-    *: ""
+    *: "Spillelistebufferet er fullt"
   </voice>
 </phrase>
 <phrase>
@@ -6083,7 +6083,7 @@
     *: "Rekursivt?"
   </dest>
   <voice>
-    *: ""
+    *: "Rekursivt?"
   </voice>
 </phrase>
 <phrase>
@@ -6097,7 +6097,7 @@
     *: "Ingenting å fortsette"
   </dest>
   <voice>
-    *: ""
+    *: "Ingenting å fortsette"
   </voice>
 </phrase>
 <phrase>
@@ -6111,7 +6111,7 @@
     *: "Feil under oppdatering av spillelistekontrollfil"
   </dest>
   <voice>
-    *: ""
+    *: "Feil under oppdatering av spillelistekontrollfil"
   </voice>
 </phrase>
 <phrase>
@@ -6125,7 +6125,7 @@
     *: "Problemer med tilgang til spillelistefilen"
   </dest>
   <voice>
-    *: ""
+    *: "Problemer med tilgang til spillelistefilen"
   </voice>
 </phrase>
 <phrase>
@@ -6139,7 +6139,7 @@
     *: "Problemer med tilgang til spillelistekontrollfilen"
   </dest>
   <voice>
-    *: ""
+    *: "Problemer med tilgang til spillelistekontrollfilen"
   </voice>
 </phrase>
 <phrase>
@@ -6153,7 +6153,7 @@
     *: "Problemer med tilgang til katalog"
   </dest>
   <voice>
-    *: ""
+    *: "Problemer med tilgang til katalog"
   </voice>
 </phrase>
 <phrase>
@@ -6167,7 +6167,7 @@
     *: "Spillelistekontrollfilen er ugyldig"
   </dest>
   <voice>
-    *: ""
+    *: "Spillelistekontrollfilen er ugyldig"
   </voice>
 </phrase>
 <phrase>
@@ -6490,7 +6490,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Søk"
   </voice>
 </phrase>
 <phrase>
@@ -6504,7 +6504,7 @@
     *: "Katalogbufferen er full!"
   </dest>
   <voice>
-    *: ""
+    *: "Katalogbufferen er full!"
   </voice>
 </phrase>
 <phrase>
@@ -6518,7 +6518,7 @@
     *: "Nytt språk"
   </dest>
   <voice>
-    *: ""
+    *: "Nytt språk"
   </voice>
 </phrase>
 <phrase>
@@ -6532,7 +6532,7 @@
     *: "Innstillingene er lastet"
   </dest>
   <voice>
-    *: ""
+    *: "Innstillingene er lastet"
   </voice>
 </phrase>
 <phrase>
@@ -6546,7 +6546,7 @@
     *: "Innstillingene er lagret"
   </dest>
   <voice>
-    *: ""
+    *: "Innstillingene er lagret"
   </voice>
 </phrase>
 <phrase>
@@ -6560,7 +6560,7 @@
     *: "Boot-fil endret"
   </dest>
   <voice>
-    *: ""
+    *: "Boot-fil endret"
   </voice>
 </phrase>
 <phrase>
@@ -6574,7 +6574,7 @@
     *: "Omstart nå?"
   </dest>
   <voice>
-    *: ""
+    *: "Omstart nå?"
   </voice>
 </phrase>
 <phrase>
@@ -6597,10 +6597,10 @@
   </dest>
   <voice>
     *: ""
-    player,h100,h120,h300: ""
-    ipod*: ""
-    x5,m5: ""
-    h10,h10_5gb,e200,c200: ""
+    player,h100,h120,h300: "AV for å avbryte"
+    ipod*: "SPILL/PAUSE for å avbryte"
+    x5,m5: "Hold SPILL for å avbryte"
+    h10,h10_5gb,e200,c200: "TILBAKE for å avbryte"
   </voice>
 </phrase>
 <phrase>
@@ -6614,7 +6614,7 @@
     *: "Ingen filer"
   </dest>
   <voice>
-    *: ""
+    *: "Ingen filer"
   </voice>
 </phrase>
 <phrase>
@@ -6628,7 +6628,7 @@
     *: "Flytt"
   </dest>
   <voice>
-    *: "Move"
+    *: "Flytt"
   </voice>
 </phrase>
 <phrase>
@@ -6642,7 +6642,7 @@
     *: "Vis indekser"
   </dest>
   <voice>
-    *: "Show Indices"
+    *: "Vis indekser"
   </voice>
 </phrase>
 <phrase>
@@ -6656,7 +6656,7 @@
     *: "Sporvisning"
   </dest>
   <voice>
-    *: "Track Display"
+    *: "Sporvisning"
   </voice>
 </phrase>
 <phrase>
@@ -6670,7 +6670,7 @@
     *: "Kun spornavn"
   </dest>
   <voice>
-    *: "Track name only"
+    *: "Kun spornavn"
   </voice>
 </phrase>
 <phrase>
@@ -6684,7 +6684,7 @@
     *: "Full sti"
   </dest>
   <voice>
-    *: "Full path"
+    *: "Full sti"
   </voice>
 </phrase>
 <phrase>
@@ -6698,7 +6698,7 @@
     *: "Fjern"
   </dest>
   <voice>
-    *: "Remove"
+    *: "Fjern"
   </voice>
 </phrase>
 <phrase>
@@ -6858,7 +6858,7 @@
     *: "Advar når den dynamiske spillelisten slettes"
   </dest>
   <voice>
-    *: ""
+    *: "Advar når den dynamiske spillelisten slettes"
   </voice>
 </phrase>
 <phrase>
@@ -6889,7 +6889,7 @@
   </dest>
   <voice>
     *: ""
-    swcodec: "Graphical equalizer"
+    swcodec: "Grafisk equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -6954,7 +6954,7 @@
     *: "Legg til tilfeldig i køen"
   </dest>
   <voice>
-    *: "Queue shuffled"
+    *: "Legg til tilfeldig i køen"
   </voice>
 </phrase>
 <phrase>
@@ -6968,7 +6968,7 @@
     *: "Lim inn"
   </dest>
   <voice>
-    *: "Paste"
+    *: "Lim inn"
   </voice>
 </phrase>
 <phrase>
@@ -6999,7 +6999,7 @@
     *: "Slett dynamisk spilleliste?"
   </dest>
   <voice>
-    *: ""
+    *: "Slett dynamisk spilleliste?"
   </voice>
 </phrase>
 <phrase>
@@ -7143,7 +7143,7 @@
     *: "Kopier"
   </dest>
   <voice>
-    *: "Copy"
+    *: "Kopier"
   </voice>
 </phrase>
 <phrase>
@@ -7174,7 +7174,7 @@
     *: "Skjermrulletrinnstørrelse"
   </dest>
   <voice>
-    *: "Screen Scroll Step Size"
+    *: "Skjermrulletrinnstørrelse"
   </voice>
 </phrase>
 <phrase>
@@ -7188,7 +7188,7 @@
     *: "Siderulling"
   </dest>
   <voice>
-    *: "Paged scrolling"
+    *: "Siderulling"
   </voice>
 </phrase>
 <phrase>
@@ -7236,7 +7236,7 @@
     *: "Skal skjermen kunne rulle ut av syne?"
   </dest>
   <voice>
-    *: "Screen Scrolls Out Of View"
+    *: "Skal skjermen kunne rulle ut av syne"
   </voice>
 </phrase>
 <phrase>
@@ -7253,7 +7253,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: ""
+    lcd_non-mono: "Ugyldig farge"
   </voice>
 </phrase>
 <phrase>
@@ -7295,7 +7295,7 @@
     *: "Søk i spillelisten"
   </dest>
   <voice>
-    *: "Search In Playlist"
+    *: "Søk i spillelisten"
   </voice>
 </phrase>
 <phrase>
@@ -7309,7 +7309,7 @@
     *: "Festmodus"
   </dest>
   <voice>
-    *: "Party Mode"
+    *: "Festmodus"
   </voice>
 </phrase>
 <phrase>
@@ -7357,7 +7357,7 @@
     *: "Fila/katalogen finnes. Skriv over?"
   </dest>
   <voice>
-    *: ""
+    *: "Fila/katalogen finnes. Skriv over?"
   </voice>
 </phrase>
 <phrase>
@@ -7538,7 +7538,7 @@
     *: "Nytt tastatur"
   </dest>
   <voice>
-    *: ""
+    *: "Nytt tastatur"
   </voice>
 </phrase>
 <phrase>
@@ -7702,7 +7702,7 @@
     *: "Klipp ut"
   </dest>
   <voice>
-    *: "Cut"
+    *: "Klipp Ut"
   </voice>
 </phrase>
 <phrase>
@@ -7818,7 +7818,7 @@
     *: "Oppdaterer i bakgrunnen"
   </dest>
   <voice>
-    *: ""
+    *: "Oppdaterer i bakgrunnen"
   </voice>
 </phrase>
 <phrase>
@@ -7832,7 +7832,7 @@
     *: "<Alle spor>"
   </dest>
   <voice>
-    *: "All tracks"
+    *: "Alle spor"
   </voice>
 </phrase>
 <phrase>
@@ -7846,7 +7846,7 @@
     *: "Databasen er ikke klar"
   </dest>
   <voice>
-    *: "Database is not ready"
+    *: "Databasen er ikke klar"
   </voice>
 </phrase>
 <phrase>
