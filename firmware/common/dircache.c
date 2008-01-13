@@ -739,7 +739,7 @@ void dircache_set_appflag(long mask)
  */
 bool dircache_get_appflag(long mask)
 {
-    return appflags & mask;
+    return dircache_is_enabled() && (appflags & mask);
 }
 
 /**
