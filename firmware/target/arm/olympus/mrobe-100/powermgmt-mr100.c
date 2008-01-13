@@ -49,13 +49,13 @@ const unsigned short percent_to_volt_charge[11] =
 };
 #endif /* CONFIG_CHARGING */
 
-#define BATTERY_SCALE_FACTOR 6052
+#define BATTERY_SCALE_FACTOR 6003
 /* full-scale ADC readout (2^10) in millivolt */
 
 /* adc readout
  * max with charger connected: 690
  * max fully charged:          682
- * min just before shutdown:   
+ * min just before shutdown:   570
  */
 
 /* Returns battery voltage from ADC [millivolts] */
@@ -63,5 +63,5 @@ unsigned int battery_adc_voltage(void)
 {
     /* work around the inital (false) high readout */
     int readout=adc_read(ADC_UNREG_POWER);
-    return (readout>700) ? 3990 : (readout * BATTERY_SCALE_FACTOR) >> 10;
+    return (readout>700) ? 3480 : (readout * BATTERY_SCALE_FACTOR) >> 10;
 }
