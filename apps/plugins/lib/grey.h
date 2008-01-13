@@ -36,6 +36,12 @@
 #define GREY_LIGHTGRAY GREY_BRIGHTNESS(170)
 #define GREY_WHITE     GREY_BRIGHTNESS(255)
 
+/* Greyscale library management structure declaration. You need one of these
+ * in every plugin using the library, depending on whether the structure should
+ * use IRAM or not. */
+#define GREY_INFO_STRUCT struct _grey_info _grey_info;
+#define GREY_INFO_STRUCT_IRAM struct _grey_info _grey_info IBSS_ATTR;
+
 /* Library initialisation and release */
 bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
                bool buffered, int width, int height, long *buf_taken);
@@ -148,6 +154,7 @@ struct _grey_info
     int bheight;    /* 4-pixel or 8-pixel units */
 #endif
     unsigned long flags;       /* various flags, see #defines */
+    struct plugin_api *rb;     /* plugin API pointer */
 #ifndef SIMULATOR
     unsigned char *values;     /* start of greyscale pixel values */
     unsigned char *phases;     /* start of greyscale pixel phases */
@@ -162,8 +169,7 @@ struct _grey_info
     int curfont;               /* current selected font */
 };
 
-/* Global variables */
-extern struct plugin_api *_grey_rb;
+/* Global variable, defined in the plugin */
 extern struct _grey_info _grey_info;
 
 #endif /* HAVE_LCD_BITMAP && (LCD_DEPTH < 4) */

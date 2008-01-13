@@ -82,6 +82,7 @@ PLUGIN_HEADER
 #endif
 /******************************* Globals ***********************************/
 
+GREY_INFO_STRUCT
 static struct plugin_api* rb; /* global api struct pointer */
 static char pbuf[32];         /* global printf buffer */
 static unsigned char *gbuf;

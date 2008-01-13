@@ -45,9 +45,9 @@ void grey_scroll_left(int count)
 
     do
     {
-        _grey_rb->memmove(data, data + count, length);
+        _grey_info.rb->memmove(data, data + count, length);
         data += length;
-        _grey_rb->memset(data, blank, count);
+        _grey_info.rb->memset(data, blank, count);
         data += count;
     }
     while (data < data_end);
@@ -70,8 +70,8 @@ void grey_scroll_right(int count)
 
     do
     {
-        _grey_rb->memmove(data + count, data, length);
-        _grey_rb->memset(data, blank, count);
+        _grey_info.rb->memmove(data + count, data, length);
+        _grey_info.rb->memset(data, blank, count);
         data += _grey_info.width;
     }
     while (data < data_end);
@@ -91,8 +91,9 @@ void grey_scroll_up(int count)
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
              _grey_info.fg_val : _grey_info.bg_val;
 
-    _grey_rb->memmove(_grey_info.buffer, _grey_info.buffer + shift, length);
-    _grey_rb->memset(_grey_info.buffer + length, blank, shift);
+    _grey_info.rb->memmove(_grey_info.buffer, _grey_info.buffer + shift,
+                           length);
+    _grey_info.rb->memset(_grey_info.buffer + length, blank, shift);
 }
 
 /* Scroll down */
@@ -109,8 +110,9 @@ void grey_scroll_down(int count)
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
              _grey_info.fg_val : _grey_info.bg_val;
 
-    _grey_rb->memmove(_grey_info.buffer + shift, _grey_info.buffer, length);
-    _grey_rb->memset(_grey_info.buffer, blank, shift);
+    _grey_info.rb->memmove(_grey_info.buffer + shift, _grey_info.buffer,
+                           length);
+    _grey_info.rb->memset(_grey_info.buffer, blank, shift);
 }
 
 /*** Unbuffered scrolling functions ***/
@@ -155,7 +157,7 @@ void grey_ub_scroll_left(int count)
 
     if ((unsigned)count >= (unsigned)_grey_info.width)
         return;
-    
+
     data = _grey_info.values;
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
     length = (_grey_info.width - count) << _GREY_BSHIFT;
@@ -165,9 +167,9 @@ void grey_ub_scroll_left(int count)
 
     do
     {
-        _grey_rb->memmove(data, data + count, length);
+        _grey_info.rb->memmove(data, data + count, length);
         data += length;
-        _grey_rb->memset(data, blank, count);
+        _grey_info.rb->memset(data, blank, count);
         data += count;
     }
     while (data < data_end);
@@ -181,7 +183,7 @@ void grey_ub_scroll_right(int count)
 
     if ((unsigned)count >= (unsigned)_grey_info.width)
         return;
-    
+
     data = _grey_info.values;
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
     length = (_grey_info.width - count) << _GREY_BSHIFT;
@@ -191,8 +193,8 @@ void grey_ub_scroll_right(int count)
 
     do
     {
-        _grey_rb->memmove(data + count, data, length);
-        _grey_rb->memset(data, blank, count);
+        _grey_info.rb->memmove(data + count, data, length);
+        _grey_info.rb->memset(data, blank, count);
         data += _grey_info.width << _GREY_BSHIFT;
     }
     while (data < data_end);
@@ -206,7 +208,7 @@ void grey_ub_scroll_up(int count)
 
     if ((unsigned)count >= (unsigned)_grey_info.height)
         return;
-        
+
     dst   = _grey_info.values;
     end   = dst + _GREY_MULUQ(_grey_info.height, _grey_info.width);
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
@@ -258,10 +260,10 @@ void grey_ub_scroll_up(int count)
         int blen = _GREY_MULUQ(_grey_info.height - count, _grey_info.width);
 
         src = dst + _GREY_MULUQ(count, _grey_info.width);
-        _grey_rb->memmove(dst, src, blen);
+        _grey_info.rb->memmove(dst, src, blen);
         dst += blen;
     }
-    _grey_rb->memset(dst, blank, end - dst); /* Fill remainder at once. */
+    _grey_info.rb->memset(dst, blank, end - dst); /* Fill remainder at once. */
 }
 
 /* Scroll down */
@@ -272,7 +274,7 @@ void grey_ub_scroll_down(int count)
 
     if ((unsigned)count >= (unsigned)_grey_info.height)
         return;
-        
+
     start = _grey_info.values;
     dst   = start + _GREY_MULUQ(_grey_info.height, _grey_info.width);
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
@@ -304,7 +306,7 @@ void grey_ub_scroll_down(int count)
             }
             while (dst < line_end);
         }
-        for (; ~yd & _GREY_BMASK; yd--)   /* Fill remainder of current block. */
+        for (; ~yd & _GREY_BMASK; yd--)  /* Fill remainder of current block. */
         {
             dst = _grey_info.values
                 + _GREY_MULUQ(_grey_info.width, yd & ~_GREY_BMASK)
@@ -325,9 +327,10 @@ void grey_ub_scroll_down(int count)
         int blen = _GREY_MULUQ(_grey_info.height - count, _grey_info.width);
 
         dst -= blen;
-        _grey_rb->memmove(dst, start, blen);
+        _grey_info.rb->memmove(dst, start, blen);
     }
-    _grey_rb->memset(start, blank, dst - start); /* Fill remainder at once. */
+    _grey_info.rb->memset(start, blank, dst - start); 
+    /* Fill remainder at once. */
 }
 
 #endif /* !SIMULATOR */

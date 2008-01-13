@@ -214,6 +214,7 @@ static int y_off = LCD_HEIGHT/2;
 
 #if LCD_DEPTH == 1
 #define USE_GSLIB
+GREY_INFO_STRUCT
 struct my_lcd {
     void (*update)(void);
     void (*clear_display)(void);

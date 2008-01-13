@@ -46,6 +46,7 @@ static unsigned char fire[LCD_HEIGHT+3][FIRE_WIDTH];
 static unsigned char cooling_map[LCD_HEIGHT][FIRE_WIDTH];
 
 #ifndef HAVE_LCD_COLOR
+GREY_INFO_STRUCT
 static unsigned char *gbuf;
 static size_t gbuf_size = 0;
 static unsigned char draw_buffer[FIRE_WIDTH];

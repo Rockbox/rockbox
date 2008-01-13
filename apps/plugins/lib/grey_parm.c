@@ -112,5 +112,5 @@ void grey_setfont(int newfont)
 /* Get width and height of a text when printed with the current font */
 int  grey_getstringsize(const unsigned char *str, int *w, int *h)
 {
-    return _grey_rb->font_getstringsize(str, w, h, _grey_info.curfont);
+    return _grey_info.rb->font_getstringsize(str, w, h, _grey_info.curfont);
 }

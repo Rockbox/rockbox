@@ -118,6 +118,7 @@
 
 #ifndef HAVE_LCD_COLOR
 #include "../lib/grey.h"
+GREY_INFO_STRUCT_IRAM
 static unsigned char greybuffer[LCD_WIDTH] IBSS_ATTR; /* off screen buffer */
 static unsigned char *gbuf;
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING

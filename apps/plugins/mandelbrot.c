@@ -211,6 +211,7 @@ static int step_log2;
 static unsigned max_iter;
 
 #ifdef USEGSLIB
+GREY_INFO_STRUCT
 static unsigned char *gbuf;
 static size_t  gbuf_size = 0;
 static unsigned char imgbuffer[LCD_HEIGHT];

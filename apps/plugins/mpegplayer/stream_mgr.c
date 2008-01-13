@@ -23,6 +23,10 @@
 #include "grey.h"
 #include "mpeg_settings.h"
 
+#ifndef HAVE_LCD_COLOR
+GREY_INFO_STRUCT_IRAM
+#endif
+
 static struct event_queue stream_mgr_queue NOCACHEBSS_ATTR;
 static struct queue_sender_list stream_mgr_queue_send NOCACHEBSS_ATTR;
 static uint32_t stream_mgr_thread_stack[DEFAULT_STACK_SIZE*2/sizeof(uint32_t)];

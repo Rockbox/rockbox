@@ -61,8 +61,8 @@ void grey_clear_display(void)
     int value = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
                  _grey_info.fg_val : _grey_info.bg_val;
 
-    _grey_rb->memset(_grey_info.buffer, value,
-                     _GREY_MULUQ(_grey_info.width, _grey_info.height));
+    _grey_info.rb->memset(_grey_info.buffer, value,
+                          _GREY_MULUQ(_grey_info.width, _grey_info.height));
 }
 
 /* Set a single pixel */
@@ -194,7 +194,7 @@ void grey_hline(int x1, int x2, int y)
     dst   = &_grey_info.buffer[_GREY_MULUQ(_grey_info.width, y) + x1];
 
     if (fillopt)
-        _grey_rb->memset(dst, value, x2 - x1 + 1);
+        _grey_info.rb->memset(dst, value, x2 - x1 + 1);
     else
     {
         unsigned char *dst_end = dst + x2 - x1;
@@ -379,7 +379,7 @@ void grey_fillrect(int x, int y, int width, int height)
     do
     {
         if (fillopt)
-            _grey_rb->memset(dst, value, width);
+            _grey_info.rb->memset(dst, value, width);
         else
         {
             unsigned char *dst_row = dst;
@@ -539,7 +539,7 @@ void grey_gray_bitmap(const unsigned char *src, int x, int y, int width,
 void grey_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
     int ch;
-    struct font* pf = _grey_rb->font_get(_grey_info.curfont);
+    struct font* pf = _grey_info.rb->font_get(_grey_info.curfont);
 
     while ((ch = *str++) != '\0' && x < _grey_info.width)
     {
@@ -603,8 +603,8 @@ void grey_ub_clear_display(void)
     int value = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
                      _grey_info.fg_val : _grey_info.bg_val;
                      
-    _grey_rb->memset(_grey_info.values, value, 
-                     _GREY_MULUQ(_grey_info.width, _grey_info.height));
+    _grey_info.rb->memset(_grey_info.values, value,
+                          _GREY_MULUQ(_grey_info.width, _grey_info.height));
 }
 
 /* Draw a partial greyscale bitmap, canonical format */

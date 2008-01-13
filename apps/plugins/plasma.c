@@ -44,6 +44,7 @@ static int redfactor = 1, greenfactor = 2, bluefactor = 3;
 static int redphase = 0, greenphase = 50, bluephase = 100;
            /* lower chance of gray at regular intervals */
 #else
+GREY_INFO_STRUCT
 static unsigned char colours[256]; /* Smooth transition of shades */
 static unsigned char greybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
 static unsigned char *gbuf;

@@ -257,6 +257,8 @@ static void time_remote_update(void)
 #endif
 
 #if LCD_DEPTH < 4
+
+GREY_INFO_STRUCT
 static unsigned char greydata[LCD_HEIGHT][LCD_WIDTH];
 
 static void make_grey_rect(int width, int height)
@@ -312,7 +314,7 @@ static void time_greyscale(void)
 
     grey_release();
     fps = calc_tenth_fps(frames_2, time_2);
-    load = 100 - (100* frames_2 * time_1) / (frames_1 * time_2);
+    load = 100 - (100 * frames_2 * time_1) / (frames_1 * time_2);
     rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
     log_text(str);
 

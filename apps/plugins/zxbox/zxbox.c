@@ -51,6 +51,7 @@ unsigned char image_array [ HEIGHT * WIDTH ];
 static int previous_state;
 
 #ifdef USE_GREY
+GREY_INFO_STRUCT_IRAM
 static unsigned char *gbuf;
 static size_t         gbuf_size = 0;
 #endif

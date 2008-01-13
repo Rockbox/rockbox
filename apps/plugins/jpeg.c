@@ -184,6 +184,7 @@ PLUGIN_HEADER
 /* different graphics libraries */
 #if LCD_DEPTH < 8
 #define USEGSLIB
+GREY_INFO_STRUCT
 #define MYLCD(fn) grey_ub_ ## fn
 #define MYLCD_UPDATE()
 #define MYXLCD(fn) grey_ub_ ## fn
