@@ -53,6 +53,7 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
     if(!info.open(QIODevice::ReadOnly))
     {
         m_logger->addItem("failed to open rockbox-info.txt",LOGERROR);
+        m_logger->abort();
         return false;
     }
     
