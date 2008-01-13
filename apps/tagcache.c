@@ -299,6 +299,15 @@ bool tagcache_is_sorted_tag(int type)
     return false;
 }
 
+/**
+ * Returns true if specified flag is still present, i.e., dircache
+ * has not been reloaded.
+ */
+static bool is_dircache_intact(void)
+{
+    return dircache_get_appflag(DIRCACHE_APPFLAG_TAGCACHE);
+}
+
 static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
 {
     int fd;
@@ -531,7 +540,7 @@ static int find_index(const char *filename)
     long idx_id = -1;
     
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-    if (tc_stat.ramcache && dircache_is_enabled())
+    if (tc_stat.ramcache && is_dircache_intact())
         idx_id = find_entry_ram(filename, NULL);
 #endif
     
@@ -703,7 +712,8 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
         struct tagfile_entry *ep;
         
 # ifdef HAVE_DIRCACHE
-        if (tag == tag_filename && idx->flag & FLAG_DIRCACHE)
+        if (tag == tag_filename && (idx->flag & FLAG_DIRCACHE)
+            && is_dircache_intact())
         {
             dircache_copy_path((struct dirent *)seek,
                                buf, size);
@@ -1292,7 +1302,7 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
 }
 
 #define TAG_FILENAME_RAM(tcs) ((tcs->type == tag_filename) \
-                                   ? (flag & FLAG_DIRCACHE) : 1)
+    ? ((flag & FLAG_DIRCACHE) && is_dircache_intact()) : 1)
 
 static bool get_next(struct tagcache_search *tcs)
 {
@@ -1657,7 +1667,7 @@ static void add_tagcache(char *path, unsigned long mtime
     
     /* Check if the file is already cached. */
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-    if (tc_stat.ramcache && dircache_is_enabled())
+    if (tc_stat.ramcache && is_dircache_intact())
     {
         idx_id = find_entry_ram(path, dc);
     }
@@ -3776,6 +3786,8 @@ static bool load_tagcache(void)
         sleep(1);
 # endif
     
+    dircache_set_appflag(DIRCACHE_APPFLAG_TAGCACHE);
+    
     logf("loading tagcache to ram...");
     
     fd = open(TAGCACHE_FILE_MASTER, O_RDONLY);
@@ -3931,25 +3943,20 @@ static bool load_tagcache(void)
                 else
 # endif
                 {
-                    
-                    /* Enabled for flash based targets. Too slow otherwise. */
-# ifdef HAVE_FLASH_STORAGE
+                    /* This will be very slow unless dircache is enabled
+                       or target is flash based, but do it anyway for
+                       consistency. */
                     /* Check if entry has been removed. */
                     if (global_settings.tagcache_autoupdate)
                     {
-                        int testfd;
-                        
-                        testfd = open(buf, O_RDONLY);
-                        if (testfd < 0)
+                        if (!file_exists(buf))
                         {
                             logf("Entry no longer valid.");
                             logf("-> %s", buf);
                             delete_entry(fe->idx_id);
                             continue;
                         }
-                        close(testfd);
                     }
-# endif
                 }
                 
                 continue ;
@@ -3992,7 +3999,7 @@ static bool load_tagcache(void)
 
 static bool check_deleted_files(void)
 {
-    int fd, testfd;
+    int fd;
     char buf[TAG_MAXLEN+32];
     struct tagfile_entry tfe;
     
@@ -4033,14 +4040,12 @@ static bool check_deleted_files(void)
             continue;
         
         /* Now check if the file exists. */
-        testfd = open(buf, O_RDONLY);
-        if (testfd < 0)
+        if (!file_exists(buf))
         {
             logf("Entry no longer valid.");
             logf("-> %s / %d", buf, tfe.tag_length);
             delete_entry(tfe.idx_id);
         }
-        close(testfd);
     }
     
     close(fd);
@@ -4336,16 +4341,11 @@ static void tagcache_thread(void)
                 if (global_settings.tagcache_autoupdate)
                 {
                     build_tagcache("/");
-                    /* Don't do auto removal without dircache or flash
-                     * storage (very slow). */
-#ifdef HAVE_FLASH_STORAGE
+                    
+                    /* This will be very slow unless dircache is enabled
+                       or target is flash based, but do it anyway for
+                       consistency. */
                     check_deleted_files();
-#else
-# ifdef HAVE_DIRCACHE
-                    if (dircache_is_enabled())
-                        check_deleted_files();
-# endif
-#endif
                 }
             
                 logf("tagcache check done");

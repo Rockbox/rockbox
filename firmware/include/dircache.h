@@ -28,6 +28,8 @@
 /* FIXME: We should use ROCKBOX_DIR here but it's defined in apps/ */
 #define DIRCACHE_FILE     "/.rockbox/dircache.dat"
 
+#define DIRCACHE_APPFLAG_TAGCACHE  0x0001
+
 /* Internal structures. */
 struct travel_data {
     struct dircache_entry *first;
@@ -49,6 +51,7 @@ struct dircache_maindata {
     long magic;
     long size;
     long entry_count;
+    long appflags;
     struct dircache_entry *root_entry;
 };
 
@@ -87,6 +90,8 @@ int dircache_build(int last_size);
 void* dircache_steal_buffer(long *size);
 bool dircache_is_enabled(void);
 bool dircache_is_initializing(void);
+void dircache_set_appflag(long mask);
+bool dircache_get_appflag(long mask);
 int dircache_get_entry_count(void);
 int dircache_get_cache_size(void);
 int dircache_get_reserve_used(void);

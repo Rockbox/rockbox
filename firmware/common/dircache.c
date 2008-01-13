@@ -60,6 +60,7 @@ static unsigned long dircache_size = 0;
 static unsigned long entry_count = 0;
 static unsigned long reserve_used = 0;
 static unsigned int  cache_build_ticks = 0;
+static unsigned long appflags = 0;
 static char dircache_cur_path[MAX_PATH*2];
 
 static struct event_queue dircache_queue;
@@ -450,6 +451,7 @@ int dircache_load(void)
     
     dircache_root = buffer_alloc(maindata.size + DIRCACHE_RESERVE);
     entry_count = maindata.entry_count;
+    appflags = maindata.appflags;
     bytes_read = read(fd, dircache_root, MIN(DIRCACHE_LIMIT, maindata.size));
     close(fd);
     remove(DIRCACHE_FILE);
@@ -493,6 +495,7 @@ int dircache_save(void)
     maindata.size = dircache_size;
     maindata.root_entry = dircache_root;
     maindata.entry_count = entry_count;
+    maindata.appflags = appflags;
 
     /* Save the info structure */
     bytes_written = write(fd, &maindata, sizeof(struct dircache_maindata));
@@ -532,6 +535,7 @@ static int dircache_do_rebuild(void)
     /* Measure how long it takes build the cache. */
     start_tick = current_tick;
     dircache_initializing = true;
+    appflags = 0;
     
 #ifdef SIMULATOR
     pdir = opendir_uncached("/");
@@ -720,6 +724,22 @@ bool dircache_is_enabled(void)
 bool dircache_is_initializing(void)
 {
     return dircache_initializing || thread_enabled;
+}
+
+/**
+ * Set application flags used to determine if dircache is still intact.
+ */
+void dircache_set_appflag(long mask)
+{
+    appflags |= mask;
+}
+
+/**
+ * Get application flags used to determine if dircache is still intact.
+ */
+bool dircache_get_appflag(long mask)
+{
+    return appflags & mask;
 }
 
 /**
