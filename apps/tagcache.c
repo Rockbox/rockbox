@@ -299,6 +299,7 @@ bool tagcache_is_sorted_tag(int type)
     return false;
 }
 
+#ifdef HAVE_DIRCACHE
 /**
  * Returns true if specified flag is still present, i.e., dircache
  * has not been reloaded.
@@ -307,6 +308,7 @@ static bool is_dircache_intact(void)
 {
     return dircache_get_appflag(DIRCACHE_APPFLAG_TAGCACHE);
 }
+#endif
 
 static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
 {
@@ -1301,8 +1303,13 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
     return true;
 }
 
+/* TODO: Remove this mess. */
+#ifdef HAVE_DIRCACHE
 #define TAG_FILENAME_RAM(tcs) ((tcs->type == tag_filename) \
     ? ((flag & FLAG_DIRCACHE) && is_dircache_intact()) : 1)
+#else
+#define TAG_FILENAME_RAM(tcs) (tcs->type != tag_filename)
+#endif
 
 static bool get_next(struct tagcache_search *tcs)
 {
