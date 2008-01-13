@@ -82,6 +82,7 @@ void CreateVoiceWindow::setDeviceSettings(QSettings *dev)
     }
     devices->endGroup();
     
+    languages.sort();
     ui.comboLanguage->addItems(languages);
     // set saved lang
     ui.comboLanguage->setCurrentIndex(ui.comboLanguage->findText(userSettings->value("voicelanguage").toString()));

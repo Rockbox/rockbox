@@ -38,7 +38,7 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
 {
     m_abort = false;
     m_logger = logger;
-    m_logger->addItem("Starting Voicefile generation",LOGINFO);
+    m_logger->addItem(tr("Starting Voicefile generation"),LOGINFO);
     
     // test if tempdir exists
     if(!QDir(QDir::tempPath()+"/rbvoice/").exists())
@@ -52,8 +52,7 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
     QFile info(m_mountpoint+"/.rockbox/rockbox-info.txt");
     if(!info.open(QIODevice::ReadOnly))
     {
-        m_logger->addItem("failed to open rockbox-info.txt",LOGERROR);
-        m_logger->abort();
+        m_logger->addItem(tr("failed to open rockbox-info.txt"),LOGERROR);
         return false;
     }
     
@@ -141,7 +140,7 @@ void VoiceFileCreator::downloadDone(bool error)
     QFile genlang(filename);
     if(!genlang.open(QIODevice::ReadOnly))
     {
-        m_logger->addItem("failed to open downloaded file",LOGERROR);
+        m_logger->addItem(tr("failed to open downloaded file"),LOGERROR);
         m_logger->abort();
         return;
     }    
@@ -152,7 +151,7 @@ void VoiceFileCreator::downloadDone(bool error)
     
     if(!m_tts->start())
     {
-        m_logger->addItem("Init of TTS engine failed",LOGERROR);
+        m_logger->addItem(tr("Init of TTS engine failed"),LOGERROR);
         m_logger->abort();
         return;
     }
@@ -163,49 +162,84 @@ void VoiceFileCreator::downloadDone(bool error)
   
     if(!m_enc->start())
     {
-        m_logger->addItem("Init of Encoder engine failed",LOGERROR);
+        m_logger->addItem(tr("Init of Encoder engine failed"),LOGERROR);
         m_tts->stop();
         m_logger->abort();
         return;
     }
 
     QApplication::processEvents();
-    
     connect(m_logger,SIGNAL(aborted()),this,SLOT(abort()));
-    QStringList mp3files;
-    
+   
+    //read in downloaded file
+    QList<QPair<QString,QString> > voicepairs;    
     QTextStream in(&genlang);
     in.setCodec("UTF-8");
-    
-    bool emptyfile = true;
+    QString id, voice;
+    bool idfound = false;
+    bool voicefound=false;
     while (!in.atEnd()) 
     {
+        QString line = in.readLine();
+        if(line.contains("id:"))  //ID found
+        {
+            id = line.remove("id:").remove('"').trimmed();
+            idfound = true;
+        }
+        else if(line.contains("voice:"))  // voice found
+        {
+            voice = line.remove("voice:").remove('"').trimmed();
+            voicefound=true;
+        }
+        
+        if(idfound && voicefound)
+        {
+            voicepairs.append(QPair<QString,QString>(id,voice));
+            idfound=false;
+            voicefound=false;
+        }        
+    }
+    genlang.close();
+    
+    // check for empty list
+    if(voicepairs.size() == 0)
+    {
+        m_logger->addItem(tr("The downloaded file was empty!"),LOGERROR);    
+        m_logger->abort();
+        m_tts->stop();
+        return;
+    }
+    
+    m_logger->setProgressMax(voicepairs.size());
+    m_logger->setProgressValue(0);
+  
+    // create voice clips
+    QStringList mp3files;
+    for(int i=0; i< voicepairs.size(); i++)
+    {  
         if(m_abort)
         {
             m_logger->addItem("aborted.",LOGERROR);    
-            break;
+            m_logger->abort();
+            m_tts->stop();
+            return;
         }   
-
-        QString comment = in.readLine();
-        QString id = in.readLine();
-        QString voice = in.readLine();    
         
-        id = id.remove("id:").remove('"').trimmed();
-        voice = voice.remove("voice:").remove('"').trimmed();
-    
-        QString wavname = m_path + "/" + id + ".wav";
-        QString toSpeak = voice;
-        QString encodedname = m_path + "/" + id +".mp3";
+        m_logger->setProgressValue(i);
+        
+        QString wavname = m_path + "/" + voicepairs.at(i).first + ".wav";
+        QString toSpeak = voicepairs.at(i).second;
+        QString encodedname = m_path + "/" + voicepairs.at(i).first +".mp3";
     
         // todo PAUSE
-        if(id == "VOICE_PAUSE")
+        if(voicepairs.at(i).first == "VOICE_PAUSE")
         {
             QFile::copy(":/builtin/builtin/VOICE_PAUSE.wav",m_path + "/VOICE_PAUSE.wav");
      
         }
         else
         {    
-            if(voice == "") continue;
+            if(toSpeak == "") continue;
            
             m_logger->addItem(tr("creating ")+toSpeak,LOGINFO);    
             QApplication::processEvents();       
@@ -222,25 +256,15 @@ void VoiceFileCreator::downloadDone(bool error)
         // remove the wav file 
         QFile::remove(wavname);
         // remember the mp3 file for later removing
-        mp3files << encodedname;
-        // remember that we have done something
-        emptyfile = false;
-            
+        mp3files << encodedname;            
     }
-    genlang.close();
-
-    if(emptyfile)
-    {
-        m_logger->addItem(tr("The downloaded file was empty!"),LOGERROR);    
-        m_logger->abort();
-        return;
-    }
+    
     
     //make voicefile    
     FILE* ids2 = fopen(filename.toUtf8(), "r");
     if (ids2 == NULL)
     {
-        m_logger->addItem("Error opening downloaded file",LOGERROR);    
+        m_logger->addItem(tr("Error opening downloaded file"),LOGERROR);    
         m_logger->abort();
         return;
     }
@@ -248,7 +272,7 @@ void VoiceFileCreator::downloadDone(bool error)
     FILE* output = fopen(QString(m_mountpoint + "/.rockbox/langs/" + m_lang + ".voice").toUtf8(), "wb");
     if (output == NULL)
     {
-        m_logger->addItem("Error opening output file",LOGERROR);    
+        m_logger->addItem(tr("Error opening output file"),LOGERROR);    
         return;
     }
     
@@ -262,7 +286,7 @@ void VoiceFileCreator::downloadDone(bool error)
     
     m_logger->setProgressMax(100);
     m_logger->setProgressValue(100);
-    m_logger->addItem("successfully created.",LOGOK);    
+    m_logger->addItem(tr("successfully created."),LOGOK);    
     m_logger->abort();    
 }
 
