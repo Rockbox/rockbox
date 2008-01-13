@@ -622,7 +622,7 @@ void lcd_fillrect(int x, int y, int width, int height)
 }
 
 /* Fill a rectangle with a gradient */
-void lcd_gradient_rect(int x1, int x2, int y, int h)
+static void lcd_gradient_rect(int x1, int x2, int y, int h)
 {
     int old_pattern = current_vp->fg_pattern;
 
@@ -655,8 +655,8 @@ void lcd_gradient_rect(int x1, int x2, int y, int h)
    covers several lines, we need to know how many lines will be covered
    (the num_lines arg), and which one is the current line within the selection
    (the cur_line arg). */
-void lcd_gradient_rect_scroll(int x1, int x2, int y, int h,
-                              unsigned char num_lines, unsigned char cur_line)
+static void lcd_gradient_rect_scroll(int x1, int x2, int y, int h,
+                                     unsigned char num_lines, unsigned char cur_line)
 {
     if (h == 0 || num_lines == 0) return;
 
