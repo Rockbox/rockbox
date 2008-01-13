@@ -441,6 +441,7 @@ static char *get_token_desc(struct wps_token *token, struct wps_data *data,
     return buf;
 }
 
+#if defined(SIMULATOR) || defined(__PCTOOL__)
 static void dump_wps_tokens(struct wps_data *data)
 {
     struct wps_token *token;
@@ -558,6 +559,7 @@ static void print_wps_strings(struct wps_data *data)
         DEBUGF("\n");
     }
 }
+#endif
 
 void print_debug_info(struct wps_data *data, int fail, int line)
 {
