@@ -85,9 +85,9 @@ PLUGIN_IRAM_DECLARE
 #define BTN_QUIT         BUTTON_POWER
 #define BTN_RIGHT        BUTTON_RIGHT
 #define BTN_LEFT         BUTTON_LEFT
-#define BTN_UP           BUTTON_UP
-#define BTN_DOWN         BUTTON_DOWN
-#define BTN_PLAY         BUTTON_REC
+#define BTN_UP           BUTTON_VOL_UP
+#define BTN_DOWN         BUTTON_VOL_DOWN
+#define BTN_PLAY         BUTTON_UP
 
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
@@ -122,7 +122,7 @@ PLUGIN_IRAM_DECLARE
 #undef SYNC
 
 #ifdef SIMULATOR
-	#define SYNC
+#define SYNC
 #endif
 
 struct MIDIfile * mf IBSS_ATTR;
