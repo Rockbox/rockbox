@@ -1027,9 +1027,11 @@ const struct settings_list settings[] = {
 
     OFFON_SETTING(0,hold_lr_for_scroll_in_list,-1,true,
         "hold_lr_for_scroll_in_list",NULL),
+#ifdef HAVE_LCD_BITMAP
     CHOICE_SETTING(0, show_path_in_browser, LANG_SHOW_PATH, SHOW_PATH_OFF,
         "show path in browser", "off,current directory,full path", NULL, 3,
         ID2P(LANG_OFF), ID2P(LANG_SHOW_PATH_CURRENT), ID2P(LANG_DISPLAY_FULL_PATH)),
+#endif
 
 #ifdef HAVE_AGC
     {F_T_INT,&global_settings.rec_agc_preset_mic,LANG_RECORD_AGC_PRESET,INT(1),

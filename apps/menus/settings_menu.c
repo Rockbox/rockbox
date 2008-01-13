@@ -94,7 +94,9 @@ MENUITEM_SETTING(sort_file, &global_settings.sort_file, fileview_callback);
 MENUITEM_SETTING(dirfilter, &global_settings.dirfilter, NULL);
 MENUITEM_SETTING(show_filename_ext, &global_settings.show_filename_ext, NULL);
 MENUITEM_SETTING(browse_current, &global_settings.browse_current, NULL);
+#ifdef HAVE_LCD_BITMAP
 MENUITEM_SETTING(show_path_in_browser, &global_settings.show_path_in_browser, NULL);
+#endif
 static int fileview_callback(int action,const struct menu_item_ex *this_item)
 {
     static int oldval;
@@ -115,7 +117,10 @@ static int fileview_callback(int action,const struct menu_item_ex *this_item)
 MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, Icon_file_view_menu,
                 &sort_case, &sort_dir, &sort_file,
                 &dirfilter, &show_filename_ext, &browse_current,
-                &show_path_in_browser);
+#ifdef HAVE_LCD_BITMAP
+                &show_path_in_browser
+#endif
+                );
 /*    FILE VIEW MENU               */
 /***********************************/
 

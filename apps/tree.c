@@ -423,6 +423,7 @@ static int update_dir(void)
 #ifdef HAVE_TAGCACHE
     if (id3db) 
     {
+#ifdef HAVE_LCD_BITMAP
         if (global_settings.show_path_in_browser == SHOW_PATH_FULL
             || global_settings.show_path_in_browser == SHOW_PATH_CURRENT)
         {
@@ -434,10 +435,12 @@ static int update_dir(void)
             /* Must clear the title as the list is reused */
             gui_synclist_set_title(&tree_lists, NULL, NOICON);
         } 
+#endif
     }
     else
 #endif
     {
+#ifdef HAVE_LCD_BITMAP
         if (global_settings.show_path_in_browser && 
             *(tc.dirfilter) == SHOW_PLUGINS)
         {
@@ -474,6 +477,7 @@ static int update_dir(void)
             /* Must clear the title as the list is reused */
             gui_synclist_set_title(&tree_lists, NULL, NOICON);
         } 
+#endif
     }
     
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
