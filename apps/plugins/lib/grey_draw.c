@@ -30,17 +30,17 @@
 
 static void setpixel(unsigned char *address)
 {
-    *address = _grey_info.fg_val;
+    *address = _grey_info.fg_brightness;
 }
 
 static void clearpixel(unsigned char *address)
 {
-    *address = _grey_info.bg_val;
+    *address = _grey_info.bg_brightness;
 }
 
 static void flippixel(unsigned char *address)
 {
-    *address = 128 - *address;
+    *address = ~(*address);
 }
 
 static void nopixel(unsigned char *address)
@@ -59,7 +59,7 @@ void (* const _grey_pixelfuncs[8])(unsigned char *address) = {
 void grey_clear_display(void)
 {
     int value = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-                 _grey_info.fg_val : _grey_info.bg_val;
+                 _grey_info.fg_brightness : _grey_info.bg_brightness;
 
     _grey_info.rb->memset(_grey_info.buffer, value,
                           _GREY_MULUQ(_grey_info.width, _grey_info.height));
@@ -179,7 +179,7 @@ void grey_hline(int x1, int x2, int y)
         if (_grey_info.drawmode & DRMODE_BG)
         {
             fillopt = true;
-            value = _grey_info.bg_val;
+            value = _grey_info.bg_brightness;
         }
     }
     else
@@ -187,7 +187,7 @@ void grey_hline(int x1, int x2, int y)
         if (_grey_info.drawmode & DRMODE_FG)
         {
             fillopt = true;
-            value = _grey_info.fg_val;
+            value = _grey_info.fg_brightness;
         }
     }
     pfunc = _grey_pixelfuncs[_grey_info.drawmode];
@@ -361,7 +361,7 @@ void grey_fillrect(int x, int y, int width, int height)
         if (_grey_info.drawmode & DRMODE_BG)
         {
             fillopt = true;
-            value = _grey_info.bg_val;
+            value = _grey_info.bg_brightness;
         }
     }
     else
@@ -369,7 +369,7 @@ void grey_fillrect(int x, int y, int width, int height)
         if (_grey_info.drawmode & DRMODE_FG)
         {
             fillopt = true;
-            value = _grey_info.fg_val;
+            value = _grey_info.fg_brightness;
         }
     }
     pfunc = _grey_pixelfuncs[_grey_info.drawmode];
@@ -514,16 +514,9 @@ void grey_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     do
     {
-        const unsigned char *src_row = src;
-        unsigned char *dst_row = dst;
-        unsigned char *row_end = dst_row + width;
-
-        do
-            *dst_row++ = _grey_info.gvalue[*src_row++];
-        while (dst_row < row_end);
-
-        src += stride;
+        _grey_info.rb->memcpy(dst, src, width);
         dst += _grey_info.width;
+        src += stride;
     }
     while (dst < dst_end);
 }
@@ -578,39 +571,27 @@ void grey_putsxy(int x, int y, const unsigned char *str)
 
 /*** Unbuffered drawing functions ***/
 
-#ifdef SIMULATOR
-
-/* Clear the whole display */
-void grey_ub_clear_display(void)
-{
-    grey_clear_display();
-    grey_update();
-}
-
-/* Draw a partial greyscale bitmap, canonical format */
-void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
-                              int stride, int x, int y, int width, int height)
-{
-    grey_gray_bitmap_part(src, src_x, src_y, stride, x, y, width, height);
-    grey_update_rect(x, y, width, height);
-}
-
-#else /* !SIMULATOR */
-
 /* Clear the greyscale display (sets all pixels to white) */
 void grey_ub_clear_display(void)
 {
-    int value = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-                     _grey_info.fg_val : _grey_info.bg_val;
-                     
+    int value = _grey_info.gvalue[(_grey_info.drawmode & DRMODE_INVERSEVID) ?
+                                  _grey_info.fg_brightness :
+                                  _grey_info.bg_brightness];
+
     _grey_info.rb->memset(_grey_info.values, value,
                           _GREY_MULUQ(_grey_info.width, _grey_info.height));
+#ifdef SIMULATOR
+    _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+                                          _grey_info.width, _grey_info.height);
+#endif
 }
 
 /* Draw a partial greyscale bitmap, canonical format */
 void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                               int stride, int x, int y, int width, int height)
 {
+    int yc, ye;
+
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= _grey_info.width)
         || (y >= _grey_info.height) || (x + width <= 0) || (y + height <= 0))
@@ -634,15 +615,17 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if (y + height > _grey_info.height)
         height = _grey_info.height - y;
 
-    src += _GREY_MULUQ(stride, src_y) + src_x; /* move starting point */   
+    src += _GREY_MULUQ(stride, src_y) + src_x; /* move starting point */ 
+    yc = y;
+    ye = y + height;
 
     do
     {
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        int idx = _GREY_MULUQ(_grey_info.width, y) + x;
+        int idx = _GREY_MULUQ(_grey_info.width, yc) + x;
 #else
-        int idx = _GREY_MULUQ(_grey_info.width, y & ~_GREY_BMASK) 
-                + (x << _GREY_BSHIFT) + (~y & _GREY_BMASK);
+        int idx = _GREY_MULUQ(_grey_info.width, yc & ~_GREY_BMASK)
+                + (x << _GREY_BSHIFT) + (~yc & _GREY_BMASK);
 #endif /* LCD_PIXELFORMAT */
         unsigned char *dst_row = _grey_info.values + idx;
         const unsigned char *src_row = src;
@@ -655,13 +638,14 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
         }
         while (src_row < src_end);
         
-        y++;
         src += stride;
     }
-    while (--height > 0);
+    while (++yc < ye);
+#ifdef SIMULATOR
+    _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x + x, _grey_info.y + y,
+                                          width, height);
+#endif
 }
-
-#endif /* !SIMULATOR */
 
 /* Draw a full greyscale bitmap, canonical format */
 void grey_ub_gray_bitmap(const unsigned char *src, int x, int y, int width,

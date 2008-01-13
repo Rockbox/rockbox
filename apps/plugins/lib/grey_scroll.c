@@ -41,7 +41,7 @@ void grey_scroll_left(int count)
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
     length = _grey_info.width - count;
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-             _grey_info.fg_val : _grey_info.bg_val;
+             _grey_info.fg_brightness : _grey_info.bg_brightness;
 
     do
     {
@@ -66,7 +66,7 @@ void grey_scroll_right(int count)
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
     length = _grey_info.width - count;
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-             _grey_info.fg_val : _grey_info.bg_val;
+             _grey_info.fg_brightness : _grey_info.bg_brightness;
 
     do
     {
@@ -89,7 +89,7 @@ void grey_scroll_up(int count)
     shift = _GREY_MULUQ(_grey_info.width, count);
     length = _GREY_MULUQ(_grey_info.width, _grey_info.height - count);
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-             _grey_info.fg_val : _grey_info.bg_val;
+             _grey_info.fg_brightness : _grey_info.bg_brightness;
 
     _grey_info.rb->memmove(_grey_info.buffer, _grey_info.buffer + shift,
                            length);
@@ -108,7 +108,7 @@ void grey_scroll_down(int count)
     shift = _GREY_MULUQ(_grey_info.width, count);
     length = _GREY_MULUQ(_grey_info.width, _grey_info.height - count);
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-             _grey_info.fg_val : _grey_info.bg_val;
+             _grey_info.fg_brightness : _grey_info.bg_brightness;
 
     _grey_info.rb->memmove(_grey_info.buffer + shift, _grey_info.buffer,
                            length);
@@ -117,38 +117,6 @@ void grey_scroll_down(int count)
 
 /*** Unbuffered scrolling functions ***/
 
-#ifdef SIMULATOR
-
-/* Scroll left */
-void grey_ub_scroll_left(int count)
-{
-    grey_scroll_left(count);
-    grey_update();
-}
-
-/* Scroll right */
-void grey_ub_scroll_right(int count)
-{
-    grey_scroll_right(count);
-    grey_update();
-}
-
-/* Scroll up */
-void grey_ub_scroll_up(int count)
-{
-    grey_scroll_up(count);
-    grey_update();
-}
-
-/* Scroll down */
-void grey_ub_scroll_down(int count)
-{
-    grey_scroll_down(count);
-    grey_update();
-}
-
-#else /* !SIMULATOR */
-
 /* Scroll left */
 void grey_ub_scroll_left(int count)
 {
@@ -162,9 +130,9 @@ void grey_ub_scroll_left(int count)
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
     length = (_grey_info.width - count) << _GREY_BSHIFT;
     count <<= _GREY_BSHIFT;
-    blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-             _grey_info.fg_val : _grey_info.bg_val;
-
+    blank = _grey_info.gvalue[(_grey_info.drawmode & DRMODE_INVERSEVID) ?
+                              _grey_info.fg_brightness :
+                              _grey_info.bg_brightness];
     do
     {
         _grey_info.rb->memmove(data, data + count, length);
@@ -173,6 +141,10 @@ void grey_ub_scroll_left(int count)
         data += count;
     }
     while (data < data_end);
+#ifdef SIMULATOR
+    _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+                                          _grey_info.width, _grey_info.height);
+#endif
 }
 
 /* Scroll right */
@@ -188,9 +160,9 @@ void grey_ub_scroll_right(int count)
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
     length = (_grey_info.width - count) << _GREY_BSHIFT;
     count <<= _GREY_BSHIFT;
-    blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-             _grey_info.fg_val : _grey_info.bg_val;
-
+    blank = _grey_info.gvalue[(_grey_info.drawmode & DRMODE_INVERSEVID) ?
+                              _grey_info.fg_brightness :
+                              _grey_info.bg_brightness];
     do
     {
         _grey_info.rb->memmove(data + count, data, length);
@@ -198,6 +170,10 @@ void grey_ub_scroll_right(int count)
         data += _grey_info.width << _GREY_BSHIFT;
     }
     while (data < data_end);
+#ifdef SIMULATOR
+    _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+                                          _grey_info.width, _grey_info.height);
+#endif
 }
 
 /* Scroll up */
@@ -211,8 +187,9 @@ void grey_ub_scroll_up(int count)
 
     dst   = _grey_info.values;
     end   = dst + _GREY_MULUQ(_grey_info.height, _grey_info.width);
-    blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-             _grey_info.fg_val : _grey_info.bg_val;
+    blank = _grey_info.gvalue[(_grey_info.drawmode & DRMODE_INVERSEVID) ?
+                              _grey_info.fg_brightness :
+                              _grey_info.bg_brightness];
 
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
     if (count & _GREY_BMASK)
@@ -264,6 +241,10 @@ void grey_ub_scroll_up(int count)
         dst += blen;
     }
     _grey_info.rb->memset(dst, blank, end - dst); /* Fill remainder at once. */
+#ifdef SIMULATOR
+    _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+                                          _grey_info.width, _grey_info.height);
+#endif
 }
 
 /* Scroll down */
@@ -277,8 +258,9 @@ void grey_ub_scroll_down(int count)
 
     start = _grey_info.values;
     dst   = start + _GREY_MULUQ(_grey_info.height, _grey_info.width);
-    blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-             _grey_info.fg_val : _grey_info.bg_val;
+    blank = _grey_info.gvalue[(_grey_info.drawmode & DRMODE_INVERSEVID) ?
+                              _grey_info.fg_brightness :
+                              _grey_info.bg_brightness];
 
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
     if (count & _GREY_BMASK)
@@ -331,6 +313,8 @@ void grey_ub_scroll_down(int count)
     }
     _grey_info.rb->memset(start, blank, dst - start); 
     /* Fill remainder at once. */
+#ifdef SIMULATOR
+    _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+                                          _grey_info.width, _grey_info.height);
+#endif
 }
-
-#endif /* !SIMULATOR */

@@ -155,14 +155,10 @@ struct _grey_info
 #endif
     unsigned long flags;       /* various flags, see #defines */
     struct plugin_api *rb;     /* plugin API pointer */
-#ifndef SIMULATOR
     unsigned char *values;     /* start of greyscale pixel values */
     unsigned char *phases;     /* start of greyscale pixel phases */
-#endif
     unsigned char *buffer;     /* start of chunky pixel buffer (for buffered mode) */
     unsigned char gvalue[256]; /* calculated brightness -> greyvalue table */
-    int fg_val;                /* current foreground value */
-    int bg_val;                /* current background value */
     int fg_brightness;         /* current foreground brightness */
     int bg_brightness;         /* current background brightness */
     int drawmode;              /* current draw mode */

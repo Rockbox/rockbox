@@ -214,7 +214,27 @@ static inline void _deferred_update(void)
         _grey_info.rb->lcd_update_rect(x2, y1, LCD_WIDTH - x2, y2 - y1);
 }
 
-#ifndef SIMULATOR
+#ifdef SIMULATOR
+
+/* Callback function for grey_ub_gray_bitmap_part() to read a pixel from the
+ * greybuffer. Note that x and y are in LCD coordinates, not greybuffer
+ * coordinates! */
+static unsigned long _grey_get_pixel(int x, int y)
+{
+    int xg = x - _grey_info.x;
+    int yg = y - _grey_info.y;
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    int idx = _grey_info.width * yg + xg;
+#else
+    int idx = _grey_info.width * (yg & ~_GREY_BMASK) 
+            + (xg << _GREY_BSHIFT) + (~yg & _GREY_BMASK);
+#endif
+
+    return _grey_info.values[idx] + (1 << LCD_DEPTH);
+}
+
+#else /* !SIMULATOR */
+
 /* Timer interrupt handler: display next frame */
 static void _timer_isr(void)
 {
@@ -236,6 +256,7 @@ static void _timer_isr(void)
         _grey_info.flags &= ~_GREY_DEFERRED_UPDATE; /* clear request */
     }
 }
+
 #endif /* !SIMULATOR */
 
 /* fixed point exp() */
@@ -357,22 +378,18 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
         gbuf     += plane_size;
         buftaken += plane_size;
     }
-#ifdef SIMULATOR
-    _grey_info.buffer = gbuf;
-#else
     _grey_info.values = gbuf;
     gbuf += plane_size;
     _grey_info.phases = gbuf;
-#endif
     buftaken += 2 * plane_size;
 
     if (buftaken > gbuf_size)
         return false;
 
-#ifndef SIMULATOR
     /* Init to white */
     _grey_info.rb->memset(_grey_info.values, 0x80, plane_size);
 
+#ifndef SIMULATOR
     /* Init phases with random bits */
     dst = (unsigned*)(_grey_info.phases);
     end = (unsigned*)(_grey_info.phases + plane_size);
@@ -394,8 +411,6 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     _grey_info.bheight = bdim;
 #endif
     _grey_info.flags = 0;
-    _grey_info.fg_val = 0;
-    _grey_info.bg_val = 128;
     _grey_info.fg_brightness = 0;
     _grey_info.bg_brightness = 255;
     _grey_info.drawmode = DRMODE_SOLID;
@@ -442,7 +457,8 @@ void grey_show(bool enable)
         _grey_info.flags |= _GREY_RUNNING;
 #ifdef SIMULATOR
         _grey_info.rb->sim_lcd_ex_init(129, _grey_get_pixel);
-        grey_update();
+        _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+                                              _grey_info.width, _grey_info.height);
 #else /* !SIMULATOR */
 #ifdef NEED_BOOST
         _grey_info.rb->cpu_boost(true);
@@ -484,91 +500,17 @@ void grey_show(bool enable)
     }
 }
 
-#ifdef SIMULATOR
-/* Callback function for grey_update_rect() to read a pixel from the greybuffer.
-   Note that x and y are in LCD coordinates, not greybuffer coordinates! */
-static unsigned long _grey_get_pixel(int x, int y)
-{
-    return _grey_info.buffer[(y - _grey_info.y) * _grey_info.width
-                                + x - _grey_info.x] + (1 << LCD_DEPTH);
-}
-
-/* Update a rectangular area of the greyscale overlay */
 void grey_update_rect(int x, int y, int width, int height)
 {
-    if (x + width > _grey_info.width)
-        width = _grey_info.width - x;
-    if (y + height > _grey_info.height)
-        height = _grey_info.height - y;
-
-    x += _grey_info.x;
-    y += _grey_info.y;
-
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
-
-    _grey_info.rb->sim_lcd_ex_update_rect(x, y, width, height);
+    grey_ub_gray_bitmap_part(_grey_info.buffer, x, y, _grey_info.width,
+                             x, y, width, height);
 }
-
-#else /* !SIMULATOR */
-
-void grey_update_rect(int x, int y, int width, int height)
-{
-    unsigned char *src, *dst;
-
-    if ((width <= 0) || (height <= 0))
-        return; /* nothing to do */
-
-    if (y + height > _grey_info.height)
-        height = _grey_info.height - y;
-    if (x + width > _grey_info.width)
-        width = _grey_info.width - x;
-
-    src = _grey_info.buffer + _GREY_MULUQ(_grey_info.width, y) + x;
-
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    dst = _grey_info.values + _GREY_MULUQ(_grey_info.width, y) + x;
-
-    do
-    {
-        _grey_info.rb->memcpy(dst, src, width);
-        dst += _grey_info.width;
-        src += _grey_info.width;
-    }
-    while (--height > 0);
-
-#else /* LCD_PIXELFORMAT == VRTICAL_PACKING */
-    do
-    {
-        unsigned char *src_row = src;
-        unsigned char *src_end = src + width;
-
-        dst = _grey_info.values
-            + _GREY_MULUQ(_grey_info.width, y & ~_GREY_BMASK)
-            + (x << _GREY_BSHIFT) + (~y & _GREY_BMASK);
-        do
-        {
-            *dst = *src_row++;
-            dst += _GREY_BSIZE;
-        }
-        while (src_row < src_end);
-
-        y++;
-        src += _grey_info.width;
-    }
-    while (--height > 0);
-
-#endif /* LCD_PIXELFORMAT */
-}
-
-#endif /* !SIMULATOR */
 
 /* Update the whole greyscale overlay */
 void grey_update(void)
 {
-    grey_update_rect(0, 0, _grey_info.width, _grey_info.height);
+    grey_ub_gray_bitmap_part(_grey_info.buffer, 0, 0, _grey_info.width,
+                             0, 0, _grey_info.width, _grey_info.height);
 }
 
 /* Do an lcd_update() to show changes done by rb->lcd_xxx() functions
@@ -691,13 +633,8 @@ static void grey_screendump_hook(int fd)
             if (((unsigned)gy < (unsigned)_grey_info.height)
                 && ((unsigned)gx < (unsigned)_grey_info.width))
             {
-#ifdef SIMULATOR
-                unsigned char *src = _grey_info.buffer
-                                   + _GREY_MULUQ(_grey_info.width, gy) + gx;
-#else
                 unsigned char *src = _grey_info.values
                                    + _GREY_MULUQ(_grey_info.width, gy) + gx;
-#endif
                 for (i = 0; i < 4; i++)
                     linebuf[x + i] = BMP_FIXEDCOLORS + *src++;
             }
@@ -724,17 +661,11 @@ static void grey_screendump_hook(int fd)
             if (((unsigned)gy < (unsigned)_grey_info.height)
                 && ((unsigned)gx < (unsigned)_grey_info.width))
             {
-#ifdef SIMULATOR
-                linebuf[x] = BMP_FIXEDCOLORS
-                           + _grey_info.buffer[_GREY_MULUQ(_grey_info.width,
-                                                                     gy) + gx];
-#else
                 linebuf[x] = BMP_FIXEDCOLORS
                            + _grey_info.values[_GREY_MULUQ(_grey_info.width,
                                                            gy & ~_GREY_BMASK)
                                                + (gx << _GREY_BSHIFT)
                                                + (~gy & _GREY_BMASK)];
-#endif
             }
             else
             {
@@ -753,17 +684,11 @@ static void grey_screendump_hook(int fd)
             if (((unsigned)gy < (unsigned)_grey_info.height)
                 && ((unsigned)gx < (unsigned)_grey_info.width))
             {
-#ifdef SIMULATOR
-                linebuf[x] = BMP_FIXEDCOLORS
-                           + _grey_info.buffer[_GREY_MULUQ(_grey_info.width,
-                                                                     gy) + gx];
-#else
                 linebuf[x] = BMP_FIXEDCOLORS
                            + _grey_info.values[_GREY_MULUQ(_grey_info.width,
                                                            gy & ~_GREY_BMASK)
                                                + (gx << _GREY_BSHIFT)
                                                + (~gy & _GREY_BMASK)];
-#endif
             }
             else
             {

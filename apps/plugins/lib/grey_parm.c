@@ -49,8 +49,10 @@ void grey_set_position(int x, int y)
     if (_grey_info.flags & _GREY_RUNNING)
     {
 #ifdef SIMULATOR
+        _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+                                              _grey_info.width,
+                                              _grey_info.height);
         grey_deferred_lcd_update();
-        grey_update();
 #else
         _grey_info.flags |= _GREY_DEFERRED_UPDATE;
 #endif
@@ -72,7 +74,6 @@ int  grey_get_drawmode(void)
 /* Set the foreground shade for subsequent drawing operations */
 void grey_set_foreground(unsigned brightness)
 {
-    _grey_info.fg_val = _grey_info.gvalue[brightness];
     _grey_info.fg_brightness = brightness;
 }
 
@@ -85,7 +86,6 @@ unsigned grey_get_foreground(void)
 /* Set the background shade for subsequent drawing operations */
 void grey_set_background(unsigned brightness)
 {
-    _grey_info.bg_val = _grey_info.gvalue[brightness];
     _grey_info.bg_brightness = brightness;
 }
 
