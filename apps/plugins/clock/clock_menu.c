@@ -29,7 +29,7 @@ static const struct opt_items noyes_text[] = {
 
 static const struct opt_items backlight_settings_text[] = {
     { "Always Off", -1 },
-    { "Rockbox setting", -1 },
+    { "Use Rockbox Setting", -1 },
     { "Always On", -1 }
 };
 
@@ -40,14 +40,14 @@ static const struct opt_items idle_poweroff_text[] = {
 
 static const struct opt_items date_format_text[] = {
     { "No date", -1 },
-    { "English format", -1 },
-    { "European format", -1 },
-    { "Japanese format", -1 },
+    { "US (M-D-Y)", -1 },
+    { "European (D-M-Y)", -1 },
+    { "Japanese (Y-M-D)", -1 },
 };
 
 static const struct opt_items hour_format_text[] = {
-    { "24-hour Format", -1 },
-    { "12-hour Format", -1 }
+    { "24-Hour", -1 },
+    { "12-Hour", -1 }
 };
 
 /***************
