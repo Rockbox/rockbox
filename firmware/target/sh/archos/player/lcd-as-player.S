@@ -82,7 +82,7 @@
 _lcd_write_command:
     mov.l   .lcdr, r3       /* put lcd data port address in r3 */
     mov     r4, r1          /* copy data byte to r1 */
-    mov     #1, r5          /* set byte count to 1 (!) */
+    mov     #0, r5          /* fake end address - stop after first iteration */
 
     /* This code will fail if an interrupt changes the contents of PBDRL.
      * If so, we must disable the interrupt here. */
@@ -110,7 +110,7 @@ _lcd_write_command:
  *   r1 - command/data byte (copied)
  *   r2 - precalculated port value (CS, DS and SC low, SD high)
  *   r3 - lcd port address
- *   r5 - 1 (byte count for reuse of the loop in _lcd_write_data)
+ *   r5 - fake end address
  *   r6 - data byte (saved)
  *   r7 - saved pr
  */
@@ -119,7 +119,7 @@ _lcd_write_command_e:
     mov.l   .lcdr, r3       /* put lcd data port address in r3 */
     mov     r4, r1          /* copy data byte to r1 */
     mov     r5, r6
-    mov     #1, r5          /* set byte count to 1 (!) */
+    mov     #0, r5          /* fake end address - stop after first iteration */
 
     /* This code will fail if an interrupt changes the contents of PBDRL.
      * If so, we must disable the interrupt here. */
@@ -134,7 +134,6 @@ _lcd_write_command_e:
 
     lds     r7, pr
     mov     r6, r1
-    mov     #1, r5          /* set byte count to 1 (!) */
     or      #(LCD_DS|LCD_SD), r0    /* r0 |= LCD_DS|LCD_SD */
     and     #(~(LCD_CS|LCD_SC)), r0 /* r0 &= ~(LCD_CS|LCD_SC) */
     bra     .single_transfer /* jump into the transfer loop */
@@ -156,14 +155,15 @@ _lcd_write_command_e:
  * Register usage:
  *   r0 - scratch
  *   r1 - current data byte
- *   r2 - precalculated port value (CS and SC low, DS and SD high),
- *        negated (neg)!
+ *   r2 - precalculated port value (CS and SC low, DS and SD high)
  *   r3 - lcd port address
+ *   r4 - current address
+ *   r5 - end address
  */
 
 _lcd_write_data:
     mov.l   .lcdr, r3       /* put lcd data port address in r3 */
-    nop                     /* align here */
+    add     r4, r5          /* end address */
 
     /* This code will fail if an interrupt changes the contents of PBDRL.
      * If so, we must disable the interrupt here. If disabling interrupts
@@ -189,7 +189,7 @@ _lcd_write_data:
     mov     r2, r0          /* copy precalculated port value */
     bt      1f              /* data bit = 1? */
     and     #(~LCD_SD), r0  /* no: r0 &= ~LCD_SD */
-    1:
+1:
     shll    r1              /* next shift here for alignment */
     mov.b   r0, @r3         /* set data to port */
     or      #(LCD_SC), r0   /* rise SC (independent of SD level) */
@@ -198,7 +198,7 @@ _lcd_write_data:
     mov     r2, r0
     bt      1f
     and     #(~LCD_SD), r0
-    1:
+1:
     mov.b   r0, @r3
     or      #(LCD_SC), r0
     mov.b   r0, @r3
@@ -207,7 +207,7 @@ _lcd_write_data:
     mov     r2, r0
     bt      1f
     and     #(~LCD_SD), r0
-    1:
+1:
     shll    r1
     mov.b   r0, @r3
     or      #(LCD_SC), r0
@@ -216,7 +216,7 @@ _lcd_write_data:
     mov     r2, r0
     bt      1f
     and     #(~LCD_SD), r0
-    1:
+1:
     mov.b   r0, @r3
     or      #(LCD_SC), r0
     mov.b   r0, @r3
@@ -225,7 +225,7 @@ _lcd_write_data:
     mov     r2, r0
     bt      1f
     and     #(~LCD_SD), r0
-    1:
+1:
     shll    r1
     mov.b   r0, @r3
     or      #(LCD_SC), r0
@@ -234,7 +234,7 @@ _lcd_write_data:
     mov     r2, r0
     bt      1f
     and     #(~LCD_SD), r0
-    1:
+1:
     mov.b   r0, @r3
     or      #(LCD_SC), r0
     mov.b   r0, @r3
@@ -243,7 +243,7 @@ _lcd_write_data:
     mov     r2, r0
     bt      1f
     and     #(~LCD_SD), r0
-    1:
+1:
     shll    r1
     mov.b   r0, @r3
     or      #(LCD_SC), r0
@@ -252,14 +252,13 @@ _lcd_write_data:
     mov     r2, r0
     bt      1f
     and     #(~LCD_SD), r0
-    1:
+1:
     mov.b   r0, @r3
     or      #(LCD_SC), r0
     mov.b   r0, @r3
 
-    add     #-1, r5         /* decrease byte count */
-    tst     r5, r5          /* r5 == 0 ? */
-    bf      .multi_transfer /* no: next iteration */
+    cmp/hi  r4, r5          /* some blocks left? */
+    bt      .multi_transfer
 
     or      #(LCD_CS|LCD_DS|LCD_SD|LCD_SC),r0  /* restore port */
     rts
@@ -271,6 +270,3 @@ _lcd_write_data:
     .align  2
 .lcdr:
     .long   LCDR
-
-.end:
-    .size   _lcd_write_command,.end-_lcd_write_command

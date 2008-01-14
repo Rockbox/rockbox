@@ -88,7 +88,7 @@ _lcd_write_command:
      * If so, we must disable the interrupt here. */
 
     mov.b   @r3, r0         /* r0 = PBDRL */
-    mov     r4, r5          /* (fake) end address = current address */
+    mov     #0, r5          /* fake end address - stop after first iteration */
     or      #(LCD_SD), r0   /* r0 |= LCD_SD */
     and     #(~(LCD_CS|LCD_DS|LCD_SC)), r0  /* r0 &= ~(LCD_CS|LCD_DS|LCD_SC) */
 
@@ -320,7 +320,7 @@ _lcd_grey_data:
 
     sub     r10, r8
     mov.l   r8, @(4,r5)
-    
+
     add     #8, r5
     cmp/hi  r4, r6
     bt      .greyloop
