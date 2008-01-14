@@ -130,6 +130,15 @@ const struct button_mapping generic_directions[] =
     { PLA_DOWN_REPEAT,       BUTTON_RC_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,       BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE},
+#elif (CONFIG_KEYPAD == COWOND2_PAD)
+    { PLA_UP,                BUTTON_UP,                         BUTTON_NONE},
+    { PLA_DOWN,              BUTTON_DOWN,                       BUTTON_NONE},
+    { PLA_LEFT,              BUTTON_UP,                         BUTTON_MENU},
+    { PLA_RIGHT,             BUTTON_DOWN,                       BUTTON_MENU},
+    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_UP|BUTTON_REPEAT,           BUTTON_MENU},
+    { PLA_RIGHT_REPEAT,      BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_MENU},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -209,6 +218,13 @@ const struct button_mapping generic_left_right_fire[] =
     { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE},
     { PLA_FIRE,              BUTTON_RC_HEART,                   BUTTON_NONE},
     { PLA_FIRE_REPEAT,       BUTTON_RC_HEART|BUTTON_REPEAT,     BUTTON_NONE},
+#elif (CONFIG_KEYPAD == COWOND2_PAD)
+    { PLA_LEFT,              BUTTON_UP,                         BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_DOWN,                       BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_MENU,                       BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_MENU|BUTTON_REPEAT,         BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif
@@ -307,6 +323,12 @@ const struct button_mapping generic_actions[] =
     {PLA_MENU,          BUTTON_RC_MODE,                     BUTTON_NONE},
     {PLA_FIRE,          BUTTON_RC_HEART,                    BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_RC_HEART|BUTTON_REPEAT,      BUTTON_NONE},
+#elif (CONFIG_KEYPAD == COWOND2_PAD)
+    {PLA_QUIT,          BUTTON_POWER,                       BUTTON_NONE},
+    {PLA_START,         BUTTON_UP,                          BUTTON_NONE},
+    {PLA_MENU,          BUTTON_DOWN,                        BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_MENU,                        BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
 #else
     #error pluginlib_actions: Unsupported keypad
 #endif

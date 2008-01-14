@@ -53,6 +53,7 @@
 #define IMX31L         31
 #define TCC771L       771
 #define TCC773L       773
+#define TCC7801      7801
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -75,7 +76,8 @@
 #define MROBE500_PAD       18
 #define GIGABEAT_S_PAD     19
 #define LOGIK_DAX_PAD      20
-#define IAUDIO67_PAD       21 
+#define IAUDIO67_PAD       21
+#define COWOND2_PAD        22
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -111,6 +113,7 @@
 #define LCD_MROBE100 19 /* as used by Olympus M:Robe 100 */
 #define LCD_LOGIKDAX 20 /* as used by Logik DAX - SSD1815 */
 #define LCD_IAUDIO67 21 /* as used by iAudio 6/7 - unknown */
+#define LCD_COWOND2  21 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -136,6 +139,7 @@
 #define I2C_PP5024   8 /* PP5024 style */
 #define I2C_IMX31L   9
 #define I2C_TCC77X  10
+#define I2C_TCC780X 11
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -156,6 +160,7 @@
 #define RTC_IMX31L   8
 #define RTC_RX5X348AB 9
 #define RTC_TCC77X   10
+#define RTC_TCC780X  11
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */
@@ -231,6 +236,8 @@
 #include "config-logikdax.h"
 #elif defined(IAUDIO_7)
 #include "config-iaudio7.h"
+#elif defined(COWON_D2)
+#include "config-cowond2.h"
 #else
 /* no known platform */
 #endif
@@ -345,6 +352,11 @@
 #define CPU_TCC77X
 #endif
 
+/* define for all cpus from TCC780 family */
+#if (CONFIG_CPU == TCC7801)
+#define CPU_TCC780X
+#endif
+
 /* define for all cpus from ARM7TDMI family (for specific optimisations) */
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == DSC25)
 #define CPU_ARM7TDMI
@@ -353,7 +365,7 @@
 /* define for all cpus from ARM family */
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
   || (CONFIG_CPU == DSC25) || (CONFIG_CPU == IMX31L) || (CONFIG_CPU == DM320) \
-  || defined(CPU_TCC77X)
+  || defined(CPU_TCC77X) || defined(CPU_TCC780X)
 #define CPU_ARM
 #endif
 
@@ -380,6 +392,7 @@
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
     defined(CPU_TCC77X) ||  /* Telechips: core, plugins, codecs */ \
+    defined(CPU_TCC780X) || /* Telechips: core, plugins, codecs */ \
     (CONFIG_CPU == PNX0101))
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))

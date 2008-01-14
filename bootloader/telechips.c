@@ -41,6 +41,10 @@
 #include "file.h"
 #include "common.h"
 
+#if defined(COWON_D2)
+#include "i2c.h"
+#endif
+
 char version[] = APPSVERSION;
 
 extern int line;
@@ -50,12 +54,17 @@ void* main(void)
     int button;
     int power_count = 0;
     int count = 0;
+    int i;
     bool do_power_off = false;
 
     system_init();
     adc_init();
     lcd_init();
     font_init();
+
+#if defined(COWON_D2)
+    lcd_enable(true);
+#endif
 
     _backlight_on();
 
@@ -68,7 +77,7 @@ void* main(void)
         /* Power-off if POWER button has been held for a long time
            This loop is currently running at about 100 iterations/second
          */
-        if (button & BUTTON_POWERPLAY) {
+        if (button & POWEROFF_BUTTON) {
             power_count++;
             if (power_count > 200)
                do_power_off = true;
@@ -78,6 +87,40 @@ void* main(void)
 
         printf("Btn: 0x%08x",button);
 
+#if defined(COWON_D2)
+        printf("GPIOA: 0x%08x",GPIOA);
+        printf("GPIOB: 0x%08x",GPIOB);
+        printf("GPIOC: 0x%08x",GPIOC);
+        printf("GPIOD: 0x%08x",GPIOD);
+        printf("GPIOE: 0x%08x",GPIOE);
+        
+        for (i = 0; i<4; i++)
+        {
+            printf("ADC%d: 0x%04x",i,adc_read(i));
+        }
+
+        /* TODO: Establish how the touchscreen driver is going to work. 
+           Since it needs I2C read/write, it can't easily go on a tick task */
+        {
+            unsigned char buf[] = { 0x2f, (0xE<<1) | 1, /* ADC start for X+Y */
+                                    0, 0, 0 };
+            int x,y;
+            i2c_write(0x10, buf, 2);
+            i2c_readmem(0x10, 0x2e, buf, 5);
+            x = (buf[2] << 2) | (buf[3] & 3);
+            y = (buf[4] << 2) | ((buf[3] & 0xC) >> 2);
+            printf("X: 0x%03x Y: 0x%03x",x,y);
+
+            buf[0] = 0x2f;
+            buf[1] = (0xF<<1) | 1;   /* ADC start for P1+P2 */
+            i2c_write(0x10, buf, 2);
+            i2c_readmem(0x10, 0x2e, buf, 5);
+            x = (buf[2] << 2) | (buf[3] & 3);
+            y = (buf[4] << 2) | ((buf[3] & 0xC) >> 2);
+            printf("P1: 0x%03x P2: 0x%03x",x,y);
+        }
+#endif
+
         count++;
         printf("Count: %d",count);
     }
@@ -85,6 +128,10 @@ void* main(void)
     lcd_clear_display();
     line = 0;
     printf("POWER-OFF");
+
+#if defined(COWON_D2)
+    lcd_enable(false);
+#endif
 
     /* TODO: Power-off */
     while(1);

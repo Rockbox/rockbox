@@ -23,7 +23,7 @@ iaudio_x5.c
 iriver_h300.c
 #elif defined(MROBE_500)
 mrobe500.c
-#elif defined(CPU_TCC77X)
+#elif defined(CPU_TCC77X) || defined(CPU_TCC780X)
 telechips.c
 #else
 main.c

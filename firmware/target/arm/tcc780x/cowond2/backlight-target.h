@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * Copyright (C) 2008 by Rob Purchase
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,41 +16,25 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
+#ifndef BACKLIGHT_TARGET_H
+#define BACKLIGHT_TARGET_H
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
-#endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
-#include "pp5024.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-#if CONFIG_CPU == DM320
-#include "dm320.h"
-#endif
-#if CONFIG_CPU == IMX31L
-#include "imx31l.h"
-#endif
-#ifdef CPU_TCC77X
-#include "tcc77x.h"
-#endif
-#ifdef CPU_TCC780X
 #include "tcc780x.h"
+
+#define _backlight_init() true
+
+/* nb: we can set the backlight intensity using PCF50606 register 0x35 */
+   
+static inline void _backlight_on(void)
+{
+    /* Enable backlight */
+    GPIOA_SET = (1<<6);
+}
+
+static inline void _backlight_off(void)
+{
+    /* Disable backlight */
+    GPIOA_CLEAR = (1<<6);
+}
+
 #endif

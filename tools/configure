@@ -600,6 +600,7 @@ cat <<EOF
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
  31) M5/M5L            41) Gigabeat S         51) Sansa e200R
  32) 7                                        52) Sansa c200
+ 33) Cowon D2
 
  ==Tatung==            ==Olympus==            ==Logik==
  60) Elio TPJ-1022     70) M:Robe 500         80) DAX 1GB MP3/DAB
@@ -1478,6 +1479,31 @@ EOF
     t_cpu="arm"
     t_manufacturer="tcc77x"
     t_model="iaudio7"
+    ;;
+
+    33|cowond2)
+    target_id=34
+    archos="cowond2"
+    target="-DCOWON_D2"
+    memory=32
+    arm926ejscc
+    tool="cp "
+    boottool="$rootdir/tools/scramble -tcc=crc"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
+    output="rockbox.iaudio"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="no"
+    swcodec="yes"
+    toolset="$tccbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tcc780x"
+    t_model="cowond2"
     ;;
     
    *)

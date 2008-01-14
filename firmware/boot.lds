@@ -15,6 +15,8 @@ INPUT(target/arm/tms320dm320/crt0.o)
 INPUT(target/arm/s3c2440/crt0.o)
 #elif defined(CPU_TCC77X)
 INPUT(target/arm/tcc77x/crt0.o)
+#elif defined(CPU_TCC780X)
+INPUT(target/arm/tcc780x/crt0.o)
 #elif CONFIG_CPU==IMX31L
 INPUT(target/arm/imx31/crt0.o)
 #else
@@ -89,6 +91,12 @@ INPUT(target/sh/crt0.o)
 #define IRAMSIZE 64K
 #define FLASHORIG 0x0000000
 #define FLASHSIZE 1M
+#elif defined(CPU_TCC780X)
+#define DRAMORIG 0x20000000
+#define IRAMORIG 0x00000000
+#define IRAMSIZE 4K
+#define FLASHORIG 0x0000000
+#define FLASHSIZE 1M
 #else
 #define DRAMORIG 0x09000000
 #define IRAMORIG 0x0f000000
@@ -97,7 +105,7 @@ INPUT(target/sh/crt0.o)
 #define FLASHSIZE 256K - ROM_START
 #endif
 
-#if defined(CPU_TCC77X)
+#if defined(CPU_TCC77X) || defined(CPU_TCC780X)
 MEMORY
 {
 #ifdef TCCBOOT
@@ -190,7 +198,7 @@ SECTIONS
          _end = .;
      }
 }
-#elif defined(CPU_TCC77X)
+#elif defined(CPU_TCC77X) || defined(CPU_TCC780X)
 {
     .text : {
         *(.init.text)

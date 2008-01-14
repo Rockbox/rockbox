@@ -31,7 +31,7 @@
  #define TIMER_FREQ (CPU_FREQ/2)
 #elif CONFIG_CPU == PNX0101
  #define TIMER_FREQ 3000000
-#elif CONFIG_CPU == S3C2440 || CONFIG_CPU == DM320
+#elif CONFIG_CPU == S3C2440 || CONFIG_CPU == DM320 || CONFIG_CPU == TCC7801
  #include "timer-target.h"
 #elif defined(SIMULATOR)
  #define TIMER_FREQ 1000000

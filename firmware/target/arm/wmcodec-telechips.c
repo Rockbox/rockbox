@@ -7,7 +7,14 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * TCC specific code for Wolfson audio codecs
+ *
+ * Based on code from the ipodlinux project - http://ipodlinux.org/
+ * Adapted for Rockbox in December 2005
+ *
+ * Original file: linux/arch/armnommu/mach-ipod/audio.c
+ *
+ * Copyright (c) 2003-2005 Bernard Leach (leachbj@bouncycastle.org)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,41 +23,29 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
+#include "system.h"
+#include "audiohw.h"
+#include "i2c.h"
+
+#if defined(COWON_D2)
+/* The D2's audio codec uses an I2C address of 0x34 */
+#define I2C_AUDIO_ADDRESS 0x34
+#else
+#error wmcodec not implemented for this target!
 #endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
-#include "pp5024.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-#if CONFIG_CPU == DM320
-#include "dm320.h"
-#endif
-#if CONFIG_CPU == IMX31L
-#include "imx31l.h"
-#endif
-#ifdef CPU_TCC77X
-#include "tcc77x.h"
-#endif
-#ifdef CPU_TCC780X
-#include "tcc780x.h"
-#endif
+
+
+void audiohw_init(void)
+{
+    #warning function not implemented
+}
+
+void wmcodec_write(int reg, int data)
+{
+    unsigned char d[2];
+    d[0] = (reg << 1) | ((data & 0x100) >> 8);
+    d[1] = data;
+    
+    i2c_write(I2C_AUDIO_ADDRESS, d, 2);
+}
