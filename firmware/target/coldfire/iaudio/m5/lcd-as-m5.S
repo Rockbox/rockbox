@@ -87,10 +87,14 @@ lcd_write_data:
     .global     lcd_grey_data
     .type       lcd_grey_data,@function
 
+    /* The main loop assumes the buffers are in SDRAM. Otherwise the LCD
+     * controller timing won't be met at 124 MHz and graphical glitches 
+     * will occur. */
+
 lcd_grey_data:
-    lea.l   (-9*4, %sp), %sp
-    movem.l %d2-%d5/%a2-%a6, (%sp)  /* free some registers */
-    movem.l (9*4+4, %sp), %a0-%a2   /* values, phases, length */
+    lea.l   (-10*4, %sp), %sp
+    movem.l %d2-%d6/%a2-%a6, (%sp)  /* free some registers */
+    movem.l (10*4+4, %sp), %a0-%a2  /* values, phases, length */
     lea.l   (%a1, %a2.l*4), %a2     /* end address */
     lea     0xf0008002, %a3     /* LCD data port */
 
@@ -128,9 +132,9 @@ lcd_grey_data:
     bhi.s   .g_hloop
     
 .g_lloop:
-    movem.l (%a1), %d2-%d5
+    movem.l (%a1), %d2-%d5      /* fetch 4 blocks of 4 pixel phases each */
     
-    bclr.l  #31, %d2
+    bclr.l  #31, %d2            /* calculate first pixel block */
     seq.b   %d0
     lsl.l   #2, %d0
     bclr.l  #23, %d2
@@ -142,23 +146,23 @@ lcd_grey_data:
     bclr.l  #7, %d2
     seq.b   %d0
     lsr.l   #6, %d0
-    move.w  %d0, (%a3)
 
-    bclr.l  #31, %d3
-    seq.b   %d0
-    lsl.l   #2, %d0
+    move.w  %d0, (%a3)          /* write first block to LCD */
+
+    bclr.l  #31, %d3            /* calculate second pixel block */
+    seq.b   %d6
+    lsl.l   #2, %d6
     bclr.l  #23, %d3
-    seq.b   %d0
-    lsl.l   #2, %d0
+    seq.b   %d6
+    lsl.l   #2, %d6
     bclr.l  #15, %d3
-    seq.b   %d0
-    lsl.l   #2, %d0
+    seq.b   %d6
+    lsl.l   #2, %d6
     bclr.l  #7, %d3
-    seq.b   %d0
-    lsr.l   #6, %d0
-    move.w  %d0, (%a3)
-    
-    bclr.l  #31, %d4
+    seq.b   %d6
+    lsr.l   #6, %d6
+
+    bclr.l  #31, %d4            /* calculate third pixel block */
     seq.b   %d0
     lsl.l   #2, %d0
     bclr.l  #23, %d4
@@ -170,9 +174,15 @@ lcd_grey_data:
     bclr.l  #7, %d4
     seq.b   %d0
     lsr.l   #6, %d0
-    move.w  %d0, (%a3)
-    
-    bclr.l  #31, %d5
+
+    move.w  %d6, (%a3)          /* write second block to LCD */
+
+    movem.l (%a0), %d6/%a4-%a6  /* fetch 4 blocks of 4 pixel values each */
+    lea.l   (16, %a0), %a0
+
+    move.w  %d0, (%a3)          /* write third block to LCD */
+
+    bclr.l  #31, %d5            /* calculate fourth pixel block */
     seq.b   %d0
     lsl.l   #2, %d0
     bclr.l  #23, %d5
@@ -184,20 +194,20 @@ lcd_grey_data:
     bclr.l  #7, %d5
     seq.b   %d0
     lsr.l   #6, %d0
-    move.w  %d0, (%a3)
-    
-    movem.l (%a0), %d0/%a4-%a6
-    lea.l   (16, %a0), %a0
-    add.l   %d0, %d2
-    add.l   %a4, %d3
+
+    add.l   %d6, %d2            /* calculate 4*4 new pixel phases */
+    add.l   %a4, %d3            /* (packed addition) */
     add.l   %a5, %d4
     add.l   %a6, %d5
-    movem.l %d2-%d5, (%a1)
+
+    movem.l %d2-%d5, (%a1)      /* store 4*4 new pixel phases */
     lea.l   (16, %a1), %a1
+
+    move.w  %d0, (%a3)          /* write fourth block to LCD */
 
     cmp.l   %a1, %d1            /* go up to last line bound */
     bhi.w   .g_lloop
-    
+
     cmp.l   %a1, %a2
     bls.s   .g_no_tail
 
@@ -225,8 +235,8 @@ lcd_grey_data:
     bhi.s   .g_tloop
 
 .g_no_tail:
-    movem.l (%sp), %d2-%d5/%a2-%a6  /* restore registers */
-    lea.l   (9*4, %sp), %sp
+    movem.l (%sp), %d2-%d6/%a2-%a6  /* restore registers */
+    lea.l   (10*4, %sp), %sp
     rts
 
 .gd_end:
