@@ -5033,10 +5033,10 @@
     *: "Write .cfg file"
   </source>
   <dest>
-    *: "Skriv .cfg-fil"
+    *: "Spara inställningar"
   </dest>
   <voice>
-    *: "Skriv Konfigurationsfil"
+    *: "Spara inställningar"
   </voice>
 </phrase>
 <phrase>
@@ -5061,10 +5061,10 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "Skriv temainställningar"
+    *: "Spara temainställningar"
   </dest>
   <voice>
-    *: "Skriv temainställningar"
+    *: "Spara temainställningar"
   </voice>
 </phrase>
 <phrase>
@@ -11457,5 +11457,19 @@
   </dest>
   <voice>
     *: "Slumpvald"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user:
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Spara ljudinställningar"
+  </dest>
+  <voice>
+    *: "Spara ljudinställningar"
   </voice>
 </phrase>
