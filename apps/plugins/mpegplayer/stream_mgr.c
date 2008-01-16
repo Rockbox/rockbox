@@ -357,7 +357,7 @@ static void stream_remember_resume_time(void)
         uint32_t start;
         uint32_t time = stream_get_seek_time(&start);
 
-        if (time >= str_parser.start_pts && time < str_parser.end_pts)
+        if (time >= str_parser.start_pts && time <= str_parser.end_pts)
         {
             /* Save the current stream time */
             stream_mgr.resume_time = time - start;
