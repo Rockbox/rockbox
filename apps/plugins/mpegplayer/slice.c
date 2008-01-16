@@ -860,22 +860,16 @@ static void get_mpeg1_intra_block (mpeg2_decoder_t * const decoder)
 
 static int get_mpeg1_non_intra_block (mpeg2_decoder_t * const decoder)
 {
-    int i;
-    int j;
-    int val;
+    uint32_t bit_buf = decoder->bitstream_buf;
+    int bits = decoder->bitstream_bits;
+    const uint8_t * bit_ptr = decoder->bitstream_ptr;
     const uint8_t * const scan = decoder->scan;
     const uint16_t * const quant_matrix = decoder->quantizer_matrix[1];
-    const DCTtab * tab;
-    uint32_t bit_buf;
-    int bits;
-    const uint8_t * bit_ptr;
     int16_t * const dest = decoder->DCTblock;
-
-    i = -1;
-
-    bit_buf = decoder->bitstream_buf;
-    bits = decoder->bitstream_bits;
-    bit_ptr = decoder->bitstream_ptr;
+    int i = -1;
+    int j;
+    int val;
+    const DCTtab * tab;
 
     NEEDBITS (bit_buf, bits, bit_ptr);
     if (bit_buf >= 0x28000000)
