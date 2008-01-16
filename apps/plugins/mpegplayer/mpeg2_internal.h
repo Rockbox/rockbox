@@ -54,7 +54,7 @@ typedef void mpeg2_mc_fct (uint8_t *, const uint8_t *, int, int);
 
 typedef struct
 {
-    uint8_t * ref[2][3];
+    uint8_t * ref[2][MPEG2_COMPONENTS];
     uint8_t ** ref2[2];
     int pmv[2][2];
     int f_code[2];
@@ -74,7 +74,7 @@ struct mpeg2_decoder_s
     int bitstream_bits;			/* used bits in working set */
     const uint8_t * bitstream_ptr;	/* buffer with stream data */
 
-    uint8_t * dest[3];
+    uint8_t * dest[MPEG2_COMPONENTS];
 
     int offset;
     int stride;
@@ -95,16 +95,12 @@ struct mpeg2_decoder_s
     motion_parser_t * motion_parser[5];
 
     /* predictor for DC coefficients in intra blocks */
-    int16_t dc_dct_pred[3];
+    int16_t dc_dct_pred[MPEG2_COMPONENTS];
 
     /* DCT coefficients */
-#ifdef CPU_COLDFIRE
-    int16_t *DCTblock;  /* put buffer separately to have it in IRAM */
-#else
-    int16_t DCTblock[64] ATTR_ALIGN(64);
-#endif
+    int16_t * ATTR_ALIGN(16) DCTblock;  /* put buffer separately to have it in IRAM */
 
-    uint8_t * picture_dest[3];
+    uint8_t * picture_dest[MPEG2_COMPONENTS];
     void (* convert) (void * convert_id, uint8_t * const * src,
 		              unsigned int v_offset);
     void * convert_id;
@@ -174,7 +170,7 @@ struct mpeg2dec_s
     uint32_t ext_state;
 
     /* allocated in init - gcc has problems allocating such big structures */
-    uint8_t * chunk_buffer;
+    uint8_t * ATTR_ALIGN(4) chunk_buffer;
     /* pointer to start of the current chunk */
     uint8_t * chunk_start;
     /* pointer to current position in chunk_buffer */
@@ -207,7 +203,7 @@ struct mpeg2dec_s
     fbuf_alloc_t fbuf_alloc[3];
     int custom_fbuf;
 
-    uint8_t * yuv_buf[3][3];
+    uint8_t * yuv_buf[3][MPEG2_COMPONENTS];
     int yuv_index;
     mpeg2_convert_t * convert;
     void * convert_arg;

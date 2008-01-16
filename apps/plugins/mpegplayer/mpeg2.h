@@ -24,6 +24,8 @@
 #ifndef MPEG2_H
 #define MPEG2_H
 
+#include "mpeg2dec_config.h"
+
 #define MPEG2_VERSION(a,b,c) (((a)<<16)|((b)<<8)|(c))
 #define MPEG2_RELEASE MPEG2_VERSION (0, 4, 0)	/* 0.4.0 */
 
@@ -100,7 +102,7 @@ typedef struct mpeg2_picture_s
 
 typedef struct mpeg2_fbuf_s
 {
-    uint8_t * buf[3];
+    uint8_t * buf[MPEG2_COMPONENTS];
     void * id;
 } mpeg2_fbuf_t;
 
@@ -140,7 +142,7 @@ typedef enum
 typedef struct mpeg2_convert_init_s
 {
     unsigned int id_size;
-    unsigned int buf_size[3];
+    unsigned int buf_size[MPEG2_COMPONENTS];
     void (* start)(void * id, const mpeg2_fbuf_t * fbuf,
 		           const mpeg2_picture_t * picture, const mpeg2_gop_t * gop);
     void (* copy)(void * id, uint8_t * const * src, unsigned int v_offset);
@@ -158,7 +160,8 @@ typedef int mpeg2_convert_t (int stage, void * id,
 			     void * arg, mpeg2_convert_init_t * result);
 int mpeg2_convert (mpeg2dec_t * mpeg2dec, mpeg2_convert_t convert, void * arg);
 int mpeg2_stride (mpeg2dec_t * mpeg2dec, int stride);
-void mpeg2_set_buf (mpeg2dec_t * mpeg2dec, uint8_t * buf[3], void * id);
+void mpeg2_set_buf (mpeg2dec_t * mpeg2dec, uint8_t * buf[MPEG2_COMPONENTS],
+                    void * id);
 void mpeg2_custom_fbuf (mpeg2dec_t * mpeg2dec, int custom_fbuf);
 
 mpeg2dec_t * mpeg2_init (void);
@@ -175,8 +178,10 @@ void mpeg2_slice_region (mpeg2dec_t * mpeg2dec, int start, int end);
 
 void mpeg2_tag_picture (mpeg2dec_t * mpeg2dec, uint32_t tag, uint32_t tag2);
 
-void mpeg2_init_fbuf (mpeg2_decoder_t * decoder, uint8_t * current_fbuf[3],
-		      uint8_t * forward_fbuf[3], uint8_t * backward_fbuf[3]);
+void mpeg2_init_fbuf (mpeg2_decoder_t * decoder,
+                      uint8_t * current_fbuf[MPEG2_COMPONENTS],
+                      uint8_t * forward_fbuf[MPEG2_COMPONENTS],
+                      uint8_t * backward_fbuf[MPEG2_COMPONENTS]);
 void mpeg2_slice (mpeg2_decoder_t * decoder, int code, const uint8_t * buffer);
 
 typedef enum

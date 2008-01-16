@@ -102,8 +102,10 @@ void mpeg2_header_state_init (mpeg2dec_t * mpeg2dec)
                  i < mpeg2dec->alloc_index; i++)
             {
                 mpeg2_free(mpeg2dec->fbuf_alloc[i].fbuf.buf[0]);
+#if MPEG2_COLOR
                 mpeg2_free(mpeg2dec->fbuf_alloc[i].fbuf.buf[1]);
                 mpeg2_free(mpeg2dec->fbuf_alloc[i].fbuf.buf[2]);
+#endif
             }
         }
 
@@ -113,8 +115,10 @@ void mpeg2_header_state_init (mpeg2dec_t * mpeg2dec)
             for (i = 0; i < 3; i++)
             {
                 mpeg2_free(mpeg2dec->yuv_buf[i][0]);
+#if MPEG2_COLOR
                 mpeg2_free(mpeg2dec->yuv_buf[i][1]);
                 mpeg2_free(mpeg2dec->yuv_buf[i][2]);
+#endif
             }
         }
 
@@ -840,8 +844,6 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec)
 
             if (!mpeg2dec->convert_start)
             {
-                int y_size, uv_size;
-
                 mpeg2dec->decoder.convert_id =
                     mpeg2_malloc (mpeg2dec->convert_id_size,
                                   MPEG2_ALLOC_CONVERT_ID);
@@ -855,32 +857,39 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec)
                 mpeg2dec->convert_start = convert_init.start;
                 mpeg2dec->decoder.convert = convert_init.copy;
 
-                y_size = decoder->stride_frame * mpeg2dec->sequence.height;
-                uv_size = y_size >> (2 - mpeg2dec->decoder.chroma_format);
+                int y_size = decoder->stride_frame * mpeg2dec->sequence.height;
 
                 mpeg2dec->yuv_buf[0][0] =
                     (uint8_t *) mpeg2_malloc(y_size, MPEG2_ALLOC_YUV);
+#if MPEG2_COLOR
+                int uv_size = y_size >> (2 - mpeg2dec->decoder.chroma_format);
+
                 mpeg2dec->yuv_buf[0][1] =
                     (uint8_t *) mpeg2_malloc(uv_size, MPEG2_ALLOC_YUV);
                 mpeg2dec->yuv_buf[0][2] =
                     (uint8_t *) mpeg2_malloc(uv_size, MPEG2_ALLOC_YUV);
+#endif
 
                 mpeg2dec->yuv_buf[1][0] =
                     (uint8_t *) mpeg2_malloc(y_size, MPEG2_ALLOC_YUV);
+#if MPEG2_COLOR
                 mpeg2dec->yuv_buf[1][1] =
                     (uint8_t *) mpeg2_malloc(uv_size, MPEG2_ALLOC_YUV);
                 mpeg2dec->yuv_buf[1][2] =
                     (uint8_t *) mpeg2_malloc(uv_size, MPEG2_ALLOC_YUV);
-
+#endif
                 y_size = decoder->stride_frame * 32;
-                uv_size = y_size >> (2 - mpeg2dec->decoder.chroma_format);
 
                 mpeg2dec->yuv_buf[2][0] =
                     (uint8_t *) mpeg2_malloc(y_size, MPEG2_ALLOC_YUV);
+#if MPEG2_COLOR
+                uv_size = y_size >> (2 - mpeg2dec->decoder.chroma_format);
+
                 mpeg2dec->yuv_buf[2][1] =
                     (uint8_t *) mpeg2_malloc(uv_size, MPEG2_ALLOC_YUV);
                 mpeg2dec->yuv_buf[2][2] =
                     (uint8_t *) mpeg2_malloc(uv_size, MPEG2_ALLOC_YUV);
+#endif
             }
 
             if (!mpeg2dec->custom_fbuf)
@@ -895,13 +904,16 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec)
                     fbuf->buf[0] =
                         (uint8_t *) mpeg2_malloc (convert_init.buf_size[0],
                                                   MPEG2_ALLOC_CONVERTED);
+#if MPEG2_COLOR
                     fbuf->buf[1] =
                         (uint8_t *) mpeg2_malloc (convert_init.buf_size[1],
                                                   MPEG2_ALLOC_CONVERTED);
                     fbuf->buf[2] =
                         (uint8_t *) mpeg2_malloc (convert_init.buf_size[2],
                                                   MPEG2_ALLOC_CONVERTED);
+#endif
                 }
+
                 mpeg2_set_fbuf (mpeg2dec, (decoder->coding_type == B_TYPE));
             }
         }
@@ -910,21 +922,23 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec)
             while (mpeg2dec->alloc_index < 3)
             {
                 mpeg2_fbuf_t * fbuf;
-                int y_size, uv_size;
 
                 fbuf = &mpeg2dec->fbuf_alloc[mpeg2dec->alloc_index++].fbuf;
 
                 fbuf->id = NULL;
 
-                y_size = decoder->stride_frame * mpeg2dec->sequence.height;
-                uv_size = y_size >> (2 - decoder->chroma_format);
+                int y_size = decoder->stride_frame * mpeg2dec->sequence.height;
 
                 fbuf->buf[0] = (uint8_t *) mpeg2_malloc (y_size,
                                                          MPEG2_ALLOC_YUV);
+#if MPEG2_COLOR
+                int uv_size = y_size >> (2 - decoder->chroma_format);
+
                 fbuf->buf[1] = (uint8_t *) mpeg2_malloc (uv_size,
                                                          MPEG2_ALLOC_YUV);
                 fbuf->buf[2] = (uint8_t *) mpeg2_malloc (uv_size,
                                                          MPEG2_ALLOC_YUV);
+#endif
             }
 
             mpeg2_set_fbuf (mpeg2dec, (decoder->coding_type == B_TYPE));

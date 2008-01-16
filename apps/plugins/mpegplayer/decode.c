@@ -37,6 +37,10 @@ extern struct plugin_api* rb;
 /* twice as large as on other targets because coldfire uses
  * a secondary, transposed buffer for optimisation */
 static int16_t static_dct_block[128] IBSS_ATTR ATTR_ALIGN(16);
+#define DCT_BLOCKSIZE (128 * sizeof (int16_t))
+#else
+static int16_t static_dct_block[64] IBSS_ATTR ATTR_ALIGN(16);
+#define DCT_BLOCKSIZE (64 * sizeof (int16_t))
 #endif
 
 const mpeg2_info_t * mpeg2_info (mpeg2dec_t * mpeg2dec)
@@ -410,7 +414,7 @@ int mpeg2_stride (mpeg2dec_t * mpeg2dec, int stride)
     return stride;
 }
 
-void mpeg2_set_buf (mpeg2dec_t * mpeg2dec, uint8_t * buf[3], void * id)
+void mpeg2_set_buf (mpeg2dec_t * mpeg2dec, uint8_t * buf[MPEG2_COMPONENTS], void * id)
 {
     mpeg2_fbuf_t * fbuf;
 
@@ -434,8 +438,10 @@ void mpeg2_set_buf (mpeg2dec_t * mpeg2dec, uint8_t * buf[3], void * id)
     }
 
     fbuf->buf[0] = buf[0];
+#if MPEG2_COLOR
     fbuf->buf[1] = buf[1];
     fbuf->buf[2] = buf[2];
+#endif
 
     fbuf->id = id;
 }
@@ -502,12 +508,11 @@ mpeg2dec_t * mpeg2_init (void)
     if (mpeg2dec == NULL)
 	    return NULL;
 
-#ifdef CPU_COLDFIRE
     mpeg2dec->decoder.DCTblock = static_dct_block;
-#endif
 
-    rb->memset (mpeg2dec->decoder.DCTblock, 0, 64 * sizeof (int16_t));
-    rb->memset (mpeg2dec->quantizer_matrix, 0, 4 * 64 * sizeof (uint8_t));
+    rb->memset (mpeg2dec->decoder.DCTblock, 0, DCT_BLOCKSIZE);
+
+    DEBUGF("DCTblock: %p\n", mpeg2dec->decoder.DCTblock);
 
     mpeg2dec->chunk_buffer = (uint8_t *)mpeg2_bufalloc(BUFFER_SIZE + 4,
 						                               MPEG2_ALLOC_CHUNK);

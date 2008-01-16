@@ -326,6 +326,7 @@ static inline int get_luma_dc_dct_diff (mpeg2_decoder_t * const decoder)
 #undef bit_ptr
 }
 
+#if MPEG2_COLOR
 static inline int get_chroma_dc_dct_diff (mpeg2_decoder_t * const decoder)
 {
 #define bit_buf (decoder->bitstream_buf)
@@ -371,6 +372,7 @@ static inline int get_chroma_dc_dct_diff (mpeg2_decoder_t * const decoder)
 #undef bits
 #undef bit_ptr
 }
+#endif /* MPEG2_COLOR */
 
 #define SATURATE(val) \
     do {                                        \
@@ -382,23 +384,16 @@ static inline int get_chroma_dc_dct_diff (mpeg2_decoder_t * const decoder)
 static void get_intra_block_B14 (mpeg2_decoder_t * const decoder,
                                  const uint16_t * const quant_matrix)
 {
-    int i;
+    uint32_t bit_buf = decoder->bitstream_buf;
+    int bits = decoder->bitstream_bits;
+    const uint8_t * bit_ptr = decoder->bitstream_ptr;
+    const uint8_t * const scan = decoder->scan;
+    int16_t * const dest = decoder->DCTblock;
+    int mismatch = ~dest[0];
+    int i = 0;
     int j;
     int val;
-    const uint8_t * const scan = decoder->scan;
-    int mismatch;
     const DCTtab * tab;
-    uint32_t bit_buf;
-    int bits;
-    const uint8_t * bit_ptr;
-    int16_t * const dest = decoder->DCTblock;
-
-    i = 0;
-    mismatch = ~dest[0];
-
-    bit_buf = decoder->bitstream_buf;
-    bits = decoder->bitstream_bits;
-    bit_ptr = decoder->bitstream_ptr;
 
     NEEDBITS (bit_buf, bits, bit_ptr);
 
@@ -502,23 +497,16 @@ static void get_intra_block_B14 (mpeg2_decoder_t * const decoder,
 static void get_intra_block_B15 (mpeg2_decoder_t * const decoder,
                                  const uint16_t * const quant_matrix)
 {
-    int i;
+    uint32_t bit_buf = decoder->bitstream_buf;
+    int bits = decoder->bitstream_bits;
+    const uint8_t * bit_ptr = decoder->bitstream_ptr;
+    const uint8_t * const scan = decoder->scan;
+    int16_t * const dest = decoder->DCTblock;
+    int mismatch = ~dest[0];
+    int i = 0;
     int j;
     int val;
-    const uint8_t * const scan = decoder->scan;
-    int mismatch;
     const DCTtab * tab;
-    uint32_t bit_buf;
-    int bits;
-    const uint8_t * bit_ptr;
-    int16_t * const dest = decoder->DCTblock;
-
-    i = 0;
-    mismatch = ~dest[0];
-
-    bit_buf = decoder->bitstream_buf;
-    bits = decoder->bitstream_bits;
-    bit_ptr = decoder->bitstream_ptr;
 
     NEEDBITS (bit_buf, bits, bit_ptr);
 
@@ -622,23 +610,16 @@ static void get_intra_block_B15 (mpeg2_decoder_t * const decoder,
 static int get_non_intra_block (mpeg2_decoder_t * const decoder,
                                 const uint16_t * const quant_matrix)
 {
-    int i;
+    uint32_t bit_buf = decoder->bitstream_buf;
+    int bits = decoder->bitstream_bits;
+    const uint8_t * bit_ptr = decoder->bitstream_ptr;
+    const uint8_t * const scan = decoder->scan;
+    int16_t * const dest = decoder->DCTblock;
+    int mismatch = -1;
+    int i = -1;
     int j;
     int val;
-    const uint8_t * const scan = decoder->scan;
-    int mismatch;
     const DCTtab * tab;
-    uint32_t bit_buf;
-    int bits;
-    const uint8_t * bit_ptr;
-    int16_t * const dest = decoder->DCTblock;
-
-    i = -1;
-    mismatch = -1;
-
-    bit_buf = decoder->bitstream_buf;
-    bits = decoder->bitstream_bits;
-    bit_ptr = decoder->bitstream_ptr;
 
     NEEDBITS (bit_buf, bits, bit_ptr);
 
@@ -756,22 +737,16 @@ static int get_non_intra_block (mpeg2_decoder_t * const decoder,
 
 static void get_mpeg1_intra_block (mpeg2_decoder_t * const decoder)
 {
-    int i;
-    int j;
-    int val;
+    uint32_t bit_buf = decoder->bitstream_buf;
+    int bits = decoder->bitstream_bits;
+    const uint8_t * bit_ptr = decoder->bitstream_ptr;
     const uint8_t * const scan = decoder->scan;
     const uint16_t * const quant_matrix = decoder->quantizer_matrix[0];
-    const DCTtab * tab;
-    uint32_t bit_buf;
-    int bits;
-    const uint8_t * bit_ptr;
     int16_t * const dest = decoder->DCTblock;
-
-    i = 0;
-
-    bit_buf = decoder->bitstream_buf;
-    bits = decoder->bitstream_bits;
-    bit_ptr = decoder->bitstream_ptr;
+    int i = 0;
+    int j;
+    int val;
+    const DCTtab * tab;
 
     NEEDBITS (bit_buf, bits, bit_ptr);
 
@@ -1043,11 +1018,13 @@ static inline void slice_intra_DCT (mpeg2_decoder_t * const decoder,
         decoder->DCTblock[0] = decoder->dc_dct_pred[0];
 
     }
+#if MPEG2_COLOR
     else
     {
         decoder->dc_dct_pred[cc] += get_chroma_dc_dct_diff (decoder);
         decoder->DCTblock[0] = decoder->dc_dct_pred[cc];
     }
+#endif
 
     if (decoder->mpeg1)
     {
@@ -1089,6 +1066,482 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
     mpeg2_idct_add (last, decoder->DCTblock, dest, stride);
 }
 
+#if !MPEG2_COLOR
+static void skip_mpeg1_intra_block (mpeg2_decoder_t * const decoder)
+{
+    uint32_t bit_buf = decoder->bitstream_buf;
+    int bits = decoder->bitstream_bits;
+    const uint8_t * bit_ptr = decoder->bitstream_ptr;
+    int i = 0;
+    const DCTtab * tab;
+
+    NEEDBITS (bit_buf, bits, bit_ptr);
+
+    while (1)
+    {
+        if (bit_buf >= 0x28000000)
+        {
+            tab = DCT_B14AC_5 + (UBITS (bit_buf, 5) - 5);
+
+            i += tab->run;
+            if (i >= 64)
+                break;        /* end of block */
+
+        normal_code:
+            bit_buf <<= tab->len + 1;
+            bits += tab->len + 1;
+            NEEDBITS (bit_buf, bits, bit_ptr);
+            continue;
+        }
+        else if (bit_buf >= 0x04000000)
+        {
+            tab = DCT_B14_8 + (UBITS (bit_buf, 8) - 4);
+
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+
+            /* escape code */
+
+            i += UBITS (bit_buf << 6, 6) - 64;
+            if (i >= 64)
+                break;        /* illegal, check needed to avoid buffer overflow */
+
+            DUMPBITS (bit_buf, bits, 12);
+            NEEDBITS (bit_buf, bits, bit_ptr);
+
+            if (!(SBITS (bit_buf, 8) & 0x7f))
+                DUMPBITS (bit_buf, bits, 8);
+
+            DUMPBITS (bit_buf, bits, 8);
+            NEEDBITS (bit_buf, bits, bit_ptr);
+
+            continue;
+        }
+        else if (bit_buf >= 0x02000000)
+        {
+            tab = DCT_B14_10 + (UBITS (bit_buf, 10) - 8);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else if (bit_buf >= 0x00800000)
+        {
+            tab = DCT_13 + (UBITS (bit_buf, 13) - 16);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else if (bit_buf >= 0x00200000)
+        {
+            tab = DCT_15 + (UBITS (bit_buf, 15) - 16);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else
+        {
+            tab = DCT_16 + UBITS (bit_buf, 16);
+            bit_buf <<= 16;
+            GETWORD (bit_buf, bits + 16, bit_ptr);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        break;        /* illegal, check needed to avoid buffer overflow */
+    }
+
+    DUMPBITS (bit_buf, bits, 2);        /* dump end of block code */
+    decoder->bitstream_buf = bit_buf;
+    decoder->bitstream_bits = bits;
+    decoder->bitstream_ptr = bit_ptr;
+}
+
+static void skip_intra_block_B14 (mpeg2_decoder_t * const decoder)
+{
+    uint32_t bit_buf = decoder->bitstream_buf;
+    int bits = decoder->bitstream_bits;
+    const uint8_t * bit_ptr = decoder->bitstream_ptr;
+    int i = 0;
+    const DCTtab * tab;
+
+    NEEDBITS (bit_buf, bits, bit_ptr);
+
+    while (1)
+    {
+        if (bit_buf >= 0x28000000)
+        {
+            tab = DCT_B14AC_5 + (UBITS (bit_buf, 5) - 5);
+
+            i += tab->run;
+            if (i >= 64)
+                break;        /* end of block */
+
+        normal_code:
+            bit_buf <<= tab->len + 1;
+            bits += tab->len + 1;
+            NEEDBITS (bit_buf, bits, bit_ptr);
+            continue;
+        }
+        else if (bit_buf >= 0x04000000)
+        {
+            tab = DCT_B14_8 + (UBITS (bit_buf, 8) - 4);
+
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+
+            /* escape code */
+
+            i += UBITS (bit_buf << 6, 6) - 64;
+            if (i >= 64)
+                break;        /* illegal, check needed to avoid buffer overflow */
+
+            DUMPBITS (bit_buf, bits, 12); /* Can't dump more than 16 atm */
+            NEEDBITS (bit_buf, bits, bit_ptr);
+            DUMPBITS (bit_buf, bits, 12);
+            NEEDBITS (bit_buf, bits, bit_ptr);
+            continue;
+        }
+        else if (bit_buf >= 0x02000000)
+        {
+            tab = DCT_B14_10 + (UBITS (bit_buf, 10) - 8);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else if (bit_buf >= 0x00800000)
+        {
+            tab = DCT_13 + (UBITS (bit_buf, 13) - 16);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else if (bit_buf >= 0x00200000)
+        {
+            tab = DCT_15 + (UBITS (bit_buf, 15) - 16);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else
+        {
+            tab = DCT_16 + UBITS (bit_buf, 16);
+            bit_buf <<= 16;
+            GETWORD (bit_buf, bits + 16, bit_ptr);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        break;        /* illegal, check needed to avoid buffer overflow */
+    }
+
+    DUMPBITS (bit_buf, bits, 2);        /* dump end of block code */
+    decoder->bitstream_buf = bit_buf;
+    decoder->bitstream_bits = bits;
+    decoder->bitstream_ptr = bit_ptr;
+}
+
+static void skip_intra_block_B15 (mpeg2_decoder_t * const decoder)
+{
+    uint32_t bit_buf = decoder->bitstream_buf;
+    int bits = decoder->bitstream_bits;
+    const uint8_t * bit_ptr = decoder->bitstream_ptr;
+    int i = 0;
+    const DCTtab * tab;
+
+    NEEDBITS (bit_buf, bits, bit_ptr);
+
+    while (1)
+    {
+        if (bit_buf >= 0x04000000)
+        {
+            tab = DCT_B15_8 + (UBITS (bit_buf, 8) - 4);
+
+            i += tab->run;
+
+            if (i < 64)
+            {
+            normal_code:
+                bit_buf <<= tab->len + 1;
+                bits += tab->len + 1;
+                NEEDBITS (bit_buf, bits, bit_ptr);
+                continue;
+            }
+            else
+            {
+                /* end of block. I commented out this code because if we */
+                /* dont exit here we will still exit at the later test :) */
+
+                /* if (i >= 128) break;        */        /* end of block */
+
+                /* escape code */
+
+                i += UBITS (bit_buf << 6, 6) - 64;
+                if (i >= 64)
+                    break;        /* illegal, check against buffer overflow */
+
+                DUMPBITS (bit_buf, bits, 12); /* Can't dump more than 16 atm */
+                NEEDBITS (bit_buf, bits, bit_ptr);
+                DUMPBITS (bit_buf, bits, 12);
+                NEEDBITS (bit_buf, bits, bit_ptr);
+                continue;
+            }
+        }
+        else if (bit_buf >= 0x02000000)
+        {
+            tab = DCT_B15_10 + (UBITS (bit_buf, 10) - 8);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else if (bit_buf >= 0x00800000)
+        {
+            tab = DCT_13 + (UBITS (bit_buf, 13) - 16);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else if (bit_buf >= 0x00200000)
+        {
+            tab = DCT_15 + (UBITS (bit_buf, 15) - 16);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else
+        {
+            tab = DCT_16 + UBITS (bit_buf, 16);
+            bit_buf <<= 16;
+            GETWORD (bit_buf, bits + 16, bit_ptr);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        break;        /* illegal, check needed to avoid buffer overflow */
+    }
+
+    DUMPBITS (bit_buf, bits, 4);        /* dump end of block code */
+    decoder->bitstream_buf = bit_buf;
+    decoder->bitstream_bits = bits;
+    decoder->bitstream_ptr = bit_ptr;
+}
+
+static void skip_non_intra_block (mpeg2_decoder_t * const decoder)
+{
+    uint32_t bit_buf = decoder->bitstream_buf;
+    int bits = decoder->bitstream_bits;
+    const uint8_t * bit_ptr = decoder->bitstream_ptr;
+    int i = -1;
+    const DCTtab * tab;
+
+    NEEDBITS (bit_buf, bits, bit_ptr);
+
+    if (bit_buf >= 0x28000000)
+    {
+        tab = DCT_B14DC_5 + (UBITS (bit_buf, 5) - 5);
+        goto entry_1;
+    }
+    else
+    {
+        goto entry_2;
+    }
+
+    while (1)
+    {
+        if (bit_buf >= 0x28000000)
+        {
+            tab = DCT_B14AC_5 + (UBITS (bit_buf, 5) - 5);
+
+        entry_1:
+            i += tab->run;
+            if (i >= 64)
+                break;        /* end of block */
+
+        normal_code:
+            bit_buf <<= tab->len + 1;
+            bits += tab->len + 1;
+            NEEDBITS (bit_buf, bits, bit_ptr);
+
+            continue;
+        }
+
+    entry_2:
+        if (bit_buf >= 0x04000000)
+        {
+            tab = DCT_B14_8 + (UBITS (bit_buf, 8) - 4);
+
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+
+            /* escape code */
+
+            i += UBITS (bit_buf << 6, 6) - 64;
+            if (i >= 64)
+                break;        /* illegal, check needed to avoid buffer overflow */
+
+            if (decoder->mpeg1)
+            {    
+                DUMPBITS (bit_buf, bits, 12);
+                NEEDBITS (bit_buf, bits, bit_ptr);
+
+                if (!(SBITS (bit_buf, 8) & 0x7f))
+                    DUMPBITS (bit_buf, bits, 8);
+
+                DUMPBITS (bit_buf, bits, 8);
+            }
+            else
+            {
+                DUMPBITS (bit_buf, bits, 12); 
+                NEEDBITS (bit_buf, bits, bit_ptr);
+                DUMPBITS (bit_buf, bits, 12);
+            }
+
+            NEEDBITS (bit_buf, bits, bit_ptr);
+            continue;
+        }
+        else if (bit_buf >= 0x02000000)
+        {
+            tab = DCT_B14_10 + (UBITS (bit_buf, 10) - 8);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else if (bit_buf >= 0x00800000)
+        {
+            tab = DCT_13 + (UBITS (bit_buf, 13) - 16);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else if (bit_buf >= 0x00200000)
+        {
+            tab = DCT_15 + (UBITS (bit_buf, 15) - 16);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        else
+        {
+            tab = DCT_16 + UBITS (bit_buf, 16);
+            bit_buf <<= 16;
+            GETWORD (bit_buf, bits + 16, bit_ptr);
+            i += tab->run;
+            if (i < 64)
+                goto normal_code;
+        }
+        break;        /* illegal, check needed to avoid buffer overflow */
+    }
+
+    DUMPBITS (bit_buf, bits, 2);        /* dump end of block code */
+    decoder->bitstream_buf = bit_buf;
+    decoder->bitstream_bits = bits;
+    decoder->bitstream_ptr = bit_ptr;
+}
+
+static void skip_chroma_dc_dct_diff (mpeg2_decoder_t * const decoder)
+{
+#define bit_buf (decoder->bitstream_buf)
+#define bits (decoder->bitstream_bits)
+#define bit_ptr (decoder->bitstream_ptr)
+
+    const DCtab * tab;
+    int size;
+
+    if (bit_buf < 0xf8000000)
+    {
+        tab = DC_chrom_5 + UBITS (bit_buf, 5);
+        size = tab->size;
+
+        if (size)
+        {
+            bits += tab->len + size;
+            bit_buf <<= tab->len;
+            bit_buf <<= size;
+        }
+        else
+        {
+            DUMPBITS (bit_buf, bits, 2);
+        }
+    }
+    else
+    {
+        tab = DC_long + (UBITS (bit_buf, 10) - 0x3e0);
+        size = tab->size;
+        DUMPBITS (bit_buf, bits, tab->len + 1);
+        NEEDBITS (bit_buf, bits, bit_ptr);
+        DUMPBITS (bit_buf, bits, size);
+    }
+
+#undef bit_buf
+#undef bits
+#undef bit_ptr
+}
+
+static void skip_chroma_non_intra (mpeg2_decoder_t * const decoder,
+                                   uint32_t coded_block_pattern)
+{
+    static const uint32_t cbp_mask[3] =
+    {
+        0x00000030,
+        0xc0000030,
+        0xfc000030,
+    };
+
+    uint32_t cbp = coded_block_pattern &
+                    cbp_mask[MIN((unsigned)decoder->chroma_format, 2u)];
+
+    while (cbp)
+    {
+        skip_non_intra_block (decoder);
+        cbp &= (cbp - 1);
+    }
+}
+
+static void skip_chroma_intra (mpeg2_decoder_t * const decoder)
+{
+#define bit_buf (decoder->bitstream_buf)
+#define bits (decoder->bitstream_bits)
+#define bit_ptr (decoder->bitstream_ptr)
+    int i = 2 << decoder->chroma_format;
+
+    if ((unsigned)i > 8)
+        i = 8;
+
+    while (i-- > 0)
+    {
+        NEEDBITS (bit_buf, bits, bit_ptr);
+
+        skip_chroma_dc_dct_diff (decoder);
+
+        if (decoder->mpeg1)
+        {
+            if (decoder->coding_type != D_TYPE)
+                skip_mpeg1_intra_block (decoder);
+        }
+        else if (decoder->intra_vlc_format)
+        {
+            skip_intra_block_B15 (decoder);
+        }
+        else
+        {
+            skip_intra_block_B14 (decoder);
+        }
+    }
+
+    if (decoder->chroma_format == 0 && decoder->coding_type == D_TYPE)
+    {
+        NEEDBITS (bit_buf, bits, bit_ptr);
+        DUMPBITS (bit_buf, bits, 1);
+    }
+
+#undef bit_buf
+#undef bits
+#undef bit_ptr
+}
+#endif /* !MPEG2_COLOR */
+
 #define MOTION_420(table, ref, motion_x, motion_y, size, y) \
     pos_x = 2 * decoder->offset + motion_x;                                   \
     pos_y = 2 * decoder->v_offset + motion_y + 2 * y;                         \
@@ -1110,6 +1563,8 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                     ref[0] + (pos_x >> 1) + (pos_y >> 1) * decoder->stride,   \
                     decoder->stride, size);                                   \
                                                                               \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     motion_x /= 2;                                                            \
     motion_y /= 2;                                                            \
     xy_half = ((motion_y & 1) << 1) | (motion_x & 1);                         \
@@ -1122,7 +1577,8 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                       decoder->uv_stride, size/2);                            \
     table[4+xy_half] (decoder->dest[2] + y/2 * decoder->uv_stride +           \
                       (decoder->offset >> 1), ref[2] + offset,                \
-                      decoder->uv_stride, size/2)
+                      decoder->uv_stride, size/2);                            \
+    }
 
 #define MOTION_FIELD_420(table, ref, motion_x, motion_y, \
                          dest_field, op, src_field)      \
@@ -1148,6 +1604,8 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                         ((pos_y op) + src_field) * decoder->stride),          \
                     2 * decoder->stride, 8);                                  \
                                                                               \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     motion_x /= 2;                                                            \
     motion_y /= 2;                                                            \
     xy_half = ((motion_y & 1) << 1) | (motion_x & 1);                         \
@@ -1160,7 +1618,8 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                       2 * decoder->uv_stride, 4);                             \
     table[4+xy_half] (decoder->dest[2] + dest_field * decoder->uv_stride +    \
                       (decoder->offset >> 1), ref[2] + offset,                \
-                      2 * decoder->uv_stride, 4)
+                      2 * decoder->uv_stride, 4);                             \
+    }
 
 #define MOTION_DMV_420(table, ref, motion_x, motion_y) \
     pos_x = 2 * decoder->offset + motion_x;                                   \
@@ -1186,6 +1645,8 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                     ref[0] + decoder->stride + offset,                        \
                     2 * decoder->stride, 8);                                  \
                                                                               \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     motion_x /= 2;                                                            \
     motion_y /= 2;                                                            \
     xy_half = ((motion_y & 1) << 1) | (motion_x & 1);                         \
@@ -1204,20 +1665,24 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
     table[4+xy_half] (decoder->dest[2] + decoder->uv_stride +                 \
                       (decoder->offset >> 1),                                 \
                       ref[2] + decoder->uv_stride + offset,                   \
-                      2 * decoder->uv_stride, 4)
+                      2 * decoder->uv_stride, 4);                             \
+    }
 
 #define MOTION_ZERO_420(table, ref) \
     table[0] (decoder->dest[0] + decoder->offset,                             \
               (ref[0] + decoder->offset +                                     \
                decoder->v_offset * decoder->stride), decoder->stride, 16);    \
                                                                               \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     offset = ((decoder->offset >> 1) +                                        \
               (decoder->v_offset >> 1) * decoder->uv_stride);                 \
                                                                               \
     table[4] (decoder->dest[1] + (decoder->offset >> 1),                      \
               ref[1] + offset, decoder->uv_stride, 8);                        \
     table[4] (decoder->dest[2] + (decoder->offset >> 1),                      \
-              ref[2] + offset, decoder->uv_stride, 8)
+              ref[2] + offset, decoder->uv_stride, 8);                        \
+    }
 
 #define MOTION_422(table, ref, motion_x, motion_y, size, y) \
     pos_x = 2 * decoder->offset + motion_x;                                   \
@@ -1241,6 +1706,8 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
     table[xy_half] (decoder->dest[0] + y * decoder->stride + decoder->offset, \
                     ref[0] + offset, decoder->stride, size);                  \
                                                                               \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     offset = (offset + (motion_x & (motion_x < 0))) >> 1;                     \
     motion_x /= 2;                                                            \
     xy_half = ((pos_y & 1) << 1) | (motion_x & 1);                            \
@@ -1250,7 +1717,8 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                       decoder->uv_stride, size);                              \
     table[4+xy_half] (decoder->dest[2] + y * decoder->uv_stride +             \
                       (decoder->offset >> 1), ref[2] + offset,                \
-                      decoder->uv_stride, size)
+                      decoder->uv_stride, size);                              \
+    }
 
 #define MOTION_FIELD_422(table, ref, motion_x, motion_y, \
                          dest_field, op, src_field)      \
@@ -1276,6 +1744,8 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                     decoder->offset, ref[0] + offset,                         \
                     2 * decoder->stride, 8);                                  \
                                                                               \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     offset = (offset + (motion_x & (motion_x < 0))) >> 1;                     \
     motion_x /= 2;                                                            \
     xy_half = ((pos_y & 1) << 1) | (motion_x & 1);                            \
@@ -1285,7 +1755,8 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                       2 * decoder->uv_stride, 8);                             \
     table[4+xy_half] (decoder->dest[2] + dest_field * decoder->uv_stride +    \
                       (decoder->offset >> 1), ref[2] + offset,                \
-                      2 * decoder->uv_stride, 8)
+                      2 * decoder->uv_stride, 8);                             \
+    }
 
 #define MOTION_DMV_422(table, ref, motion_x, motion_y) \
     pos_x = 2 * decoder->offset + motion_x;                                   \
@@ -1312,6 +1783,8 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                     ref[0] + decoder->stride + offset,                        \
                     2 * decoder->stride, 8);                                  \
                                                                               \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     offset = (offset + (motion_x & (motion_x < 0))) >> 1;                     \
     motion_x /= 2;                                                            \
     xy_half = ((pos_y & 1) << 1) | (motion_x & 1);                            \
@@ -1327,17 +1800,22 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
     table[4+xy_half] (decoder->dest[2] + decoder->uv_stride +                 \
                       (decoder->offset >> 1),                                 \
                       ref[2] + decoder->uv_stride + offset,                   \
-                      2 * decoder->uv_stride, 8)
+                      2 * decoder->uv_stride, 8);                             \
+    }
 
 #define MOTION_ZERO_422(table, ref) \
     offset = decoder->offset + decoder->v_offset * decoder->stride;           \
     table[0] (decoder->dest[0] + decoder->offset,                             \
               ref[0] + offset, decoder->stride, 16);                          \
+                                                                              \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     offset >>= 1;                                                             \
     table[4] (decoder->dest[1] + (decoder->offset >> 1),                      \
               ref[1] + offset, decoder->uv_stride, 16);                       \
     table[4] (decoder->dest[2] + (decoder->offset >> 1),                      \
-              ref[2] + offset, decoder->uv_stride, 16)
+              ref[2] + offset, decoder->uv_stride, 16);                       \
+    }
 
 #define MOTION_444(table, ref, motion_x, motion_y, size, y) \
     pos_x = 2 * decoder->offset + motion_x;                                   \
@@ -1360,10 +1838,14 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                                                                               \
     table[xy_half] (decoder->dest[0] + y * decoder->stride + decoder->offset, \
                     ref[0] + offset, decoder->stride, size);                  \
+                                                                              \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     table[xy_half] (decoder->dest[1] + y * decoder->stride + decoder->offset, \
                     ref[1] + offset, decoder->stride, size);                  \
     table[xy_half] (decoder->dest[2] + y * decoder->stride + decoder->offset, \
-                    ref[2] + offset, decoder->stride, size)
+                    ref[2] + offset, decoder->stride, size);                  \
+    }
 
 #define MOTION_FIELD_444(table, ref, motion_x, motion_y, \
                          dest_field, op, src_field)      \
@@ -1388,12 +1870,16 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
     table[xy_half] (decoder->dest[0] + dest_field * decoder->stride +         \
                     decoder->offset, ref[0] + offset,                         \
                     2 * decoder->stride, 8);                                  \
+                                                                              \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     table[xy_half] (decoder->dest[1] + dest_field * decoder->stride +         \
                     decoder->offset, ref[1] + offset,                         \
                     2 * decoder->stride, 8);                                  \
     table[xy_half] (decoder->dest[2] + dest_field * decoder->stride +         \
                     decoder->offset, ref[2] + offset,                         \
-                    2 * decoder->stride, 8)
+                    2 * decoder->stride, 8);                                  \
+    }
 
 #define MOTION_DMV_444(table, ref, motion_x, motion_y) \
     pos_x = 2 * decoder->offset + motion_x;                                   \
@@ -1419,6 +1905,9 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
     table[xy_half] (decoder->dest[0] + decoder->stride + decoder->offset,     \
                     ref[0] + decoder->stride + offset,                        \
                     2 * decoder->stride, 8);                                  \
+                                                                              \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     table[xy_half] (decoder->dest[1] + decoder->offset,                       \
                     ref[1] + offset, 2 * decoder->stride, 8);                 \
     table[xy_half] (decoder->dest[1] + decoder->stride + decoder->offset,     \
@@ -1428,17 +1917,22 @@ static inline void slice_non_intra_DCT (mpeg2_decoder_t * const decoder,
                     ref[2] + offset, 2 * decoder->stride, 8);                 \
     table[xy_half] (decoder->dest[2] + decoder->stride + decoder->offset,     \
                     ref[2] + decoder->stride + offset,                        \
-                    2 * decoder->stride, 8)
+                    2 * decoder->stride, 8);                                  \
+    }
 
 #define MOTION_ZERO_444(table, ref) \
     offset = decoder->offset + decoder->v_offset * decoder->stride;           \
                                                                               \
     table[0] (decoder->dest[0] + decoder->offset,                             \
               ref[0] + offset, decoder->stride, 16);                          \
+                                                                              \
+    if (MPEG2_COLOR)                                                          \
+    {                                                                         \
     table[4] (decoder->dest[1] + decoder->offset,                             \
               ref[1] + offset, decoder->stride, 16);                          \
     table[4] (decoder->dest[2] + (decoder->offset >> 1),                      \
-              ref[2] + offset, decoder->stride, 16)
+              ref[2] + offset, decoder->stride, 16);                          \
+    }
 
 #define bit_buf (decoder->bitstream_buf)
 #define bits (decoder->bitstream_bits)
@@ -1779,8 +2273,11 @@ do {                                                                  \
             }                                                         \
                                                                       \
             decoder->dest[0] += decoder->slice_stride;                \
+            if (MPEG2_COLOR)                                          \
+            {                                                         \
             decoder->dest[1] += decoder->slice_uv_stride;             \
             decoder->dest[2] += decoder->slice_uv_stride;             \
+            }                                                         \
         } while (0);                                                  \
                                                                       \
         decoder->v_offset += 16;                                      \
@@ -1792,8 +2289,10 @@ do {                                                                  \
     }                                                                 \
 } while (0)
 
-void mpeg2_init_fbuf (mpeg2_decoder_t * decoder, uint8_t * current_fbuf[3],
-                      uint8_t * forward_fbuf[3], uint8_t * backward_fbuf[3])
+void mpeg2_init_fbuf (mpeg2_decoder_t * decoder,
+                      uint8_t * current_fbuf[MPEG2_COMPONENTS],
+                      uint8_t * forward_fbuf[MPEG2_COMPONENTS],
+                      uint8_t * backward_fbuf[MPEG2_COMPONENTS])
 {
     int offset, stride, height, bottom_field;
 
@@ -1803,16 +2302,22 @@ void mpeg2_init_fbuf (mpeg2_decoder_t * decoder, uint8_t * current_fbuf[3],
     height = decoder->height;
 
     decoder->picture_dest[0] = current_fbuf[0] + offset;
+#if MPEG2_COLOR
     decoder->picture_dest[1] = current_fbuf[1] + (offset >> 1);
     decoder->picture_dest[2] = current_fbuf[2] + (offset >> 1);
+#endif
 
     decoder->f_motion.ref[0][0] = forward_fbuf[0] + offset;
+#if MPEG2_COLOR
     decoder->f_motion.ref[0][1] = forward_fbuf[1] + (offset >> 1);
     decoder->f_motion.ref[0][2] = forward_fbuf[2] + (offset >> 1);
+#endif
 
     decoder->b_motion.ref[0][0] = backward_fbuf[0] + offset;
+#if MPEG2_COLOR
     decoder->b_motion.ref[0][1] = backward_fbuf[1] + (offset >> 1);
     decoder->b_motion.ref[0][2] = backward_fbuf[2] + (offset >> 1);
+#endif
 
     if (decoder->picture_structure != FRAME_PICTURE)
     {
@@ -1827,22 +2332,26 @@ void mpeg2_init_fbuf (mpeg2_decoder_t * decoder, uint8_t * current_fbuf[3],
             forward_fbuf = current_fbuf;
 
         decoder->f_motion.ref[1][0] = forward_fbuf[0] + offset;
+#if MPEG2_COLOR
         decoder->f_motion.ref[1][1] = forward_fbuf[1] + (offset >> 1);
         decoder->f_motion.ref[1][2] = forward_fbuf[2] + (offset >> 1);
-
+#endif
         decoder->b_motion.ref[1][0] = backward_fbuf[0] + offset;
+#if MPEG2_COLOR
         decoder->b_motion.ref[1][1] = backward_fbuf[1] + (offset >> 1);
         decoder->b_motion.ref[1][2] = backward_fbuf[2] + (offset >> 1);
-
+#endif
         stride <<= 1;
         height >>= 1;
     }
 
     decoder->stride = stride;
-    decoder->uv_stride = stride >> 1;
     decoder->slice_stride = 16 * stride;
+#if MPEG2_COLOR
+    decoder->uv_stride = stride >> 1;
     decoder->slice_uv_stride =
         decoder->slice_stride >> (2 - decoder->chroma_format);
+#endif
     decoder->limit_x = 2 * decoder->width - 32;
     decoder->limit_y_16 = 2 * height - 32;
     decoder->limit_y_8 = 2 * height - 16;
@@ -1919,8 +2428,12 @@ static inline int slice_init (mpeg2_decoder_t * const decoder, int code)
     int offset;
     const MBAtab * mba;
 
+#if MPEG2_COLOR
     decoder->dc_dct_pred[0] = decoder->dc_dct_pred[1] =
         decoder->dc_dct_pred[2] = 16384;
+#else
+    decoder->dc_dct_pred[0] = 16384;
+#endif
 
     decoder->f_motion.pmv[0][0] = decoder->f_motion.pmv[0][1] = 0;
     decoder->f_motion.pmv[1][0] = decoder->f_motion.pmv[1][1] = 0;
@@ -1942,9 +2455,11 @@ static inline int slice_init (mpeg2_decoder_t * const decoder, int code)
     }
 
     decoder->dest[0] = decoder->picture_dest[0] + offset;
+#if MPEG2_COLOR
     offset >>= (2 - decoder->chroma_format);
     decoder->dest[1] = decoder->picture_dest[1] + offset;
     decoder->dest[2] = decoder->picture_dest[2] + offset;
+#endif
 
     get_quantizer_scale (decoder);
 
@@ -1999,8 +2514,10 @@ static inline int slice_init (mpeg2_decoder_t * const decoder, int code)
         if (!(decoder->convert) || decoder->coding_type != B_TYPE)
         {
             decoder->dest[0] += decoder->slice_stride;
+#if MPEG2_COLOR
             decoder->dest[1] += decoder->slice_uv_stride;
             decoder->dest[2] += decoder->slice_uv_stride;
+#endif
         }
 
         decoder->v_offset += 16;
@@ -2081,6 +2598,7 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
             slice_intra_DCT (decoder, 0, dest_y + DCT_offset, DCT_stride);
             slice_intra_DCT (decoder, 0, dest_y + DCT_offset + 8, DCT_stride);
 
+#if MPEG2_COLOR
             if (likely (decoder->chroma_format == 0))
             {
                 slice_intra_DCT (decoder, 1, decoder->dest[1] + (offset >> 1),
@@ -2123,6 +2641,9 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
                 slice_intra_DCT (decoder, 2, dest_v + DCT_offset + 8,
                                  DCT_stride);
             }
+#else
+            skip_chroma_intra(decoder);
+#endif /* MPEG2_COLOR */
         }
         else
         {
@@ -2170,7 +2691,7 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
                         slice_non_intra_DCT (decoder, 0,
                                              dest_y + DCT_offset + 8,
                                              DCT_stride);
-
+#if MPEG2_COLOR
                     if (coded_block_pattern & 16)
                         slice_non_intra_DCT (decoder, 1,
                                              decoder->dest[1] + (offset >> 1),
@@ -2180,6 +2701,7 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
                         slice_non_intra_DCT (decoder, 2,
                                              decoder->dest[2] + (offset >> 1),
                                              decoder->uv_stride);
+#endif /* MPEG2_COLOR */
                 }
                 else if (likely (decoder->chroma_format == 1))
                 {
@@ -2207,7 +2729,7 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
                         slice_non_intra_DCT (decoder, 0,
                                              dest_y + DCT_offset + 8,
                                              DCT_stride);
-
+#if MPEG2_COLOR
                     DCT_stride >>= 1;
                     DCT_offset = (DCT_offset + offset) >> 1;
 
@@ -2230,19 +2752,18 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
                         slice_non_intra_DCT (decoder, 2,
                                              decoder->dest[2] + DCT_offset,
                                              DCT_stride);
+#endif /* MPEG2_COLOR */
                 }
                 else
                 {
-                    int offset;
-                    uint8_t * dest_y, * dest_u, * dest_v;
-
+                    int offset = decoder->offset;
+                    uint8_t * dest_y = decoder->dest[0] + offset;
+#if MPEG2_COLOR
+                    uint8_t * dest_u = decoder->dest[1] + offset;
+                    uint8_t * dest_v = decoder->dest[2] + offset;
+#endif
                     coded_block_pattern |= bit_buf & (63 << 26);
                     DUMPBITS (bit_buf, bits, 6);
-
-                    offset = decoder->offset;
-                    dest_y = decoder->dest[0] + offset;
-                    dest_u = decoder->dest[1] + offset;
-                    dest_v = decoder->dest[2] + offset;
 
                     if (coded_block_pattern & 1)
                         slice_non_intra_DCT (decoder, 0, dest_y, DCT_stride);
@@ -2259,7 +2780,7 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
                         slice_non_intra_DCT (decoder, 0,
                                              dest_y + DCT_offset + 8,
                                              DCT_stride);
-
+#if MPEG2_COLOR
                     if (coded_block_pattern & 16)
                         slice_non_intra_DCT (decoder, 1, dest_u, DCT_stride);
 
@@ -2291,11 +2812,19 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
                         slice_non_intra_DCT (decoder, 2,
                                              dest_v + DCT_offset + 8,
                                              DCT_stride);
+#endif /* MPEG2_COLOR */
                 }
+#if !MPEG2_COLOR
+                skip_chroma_non_intra(decoder, coded_block_pattern);
+#endif
             }
 
+#if MPEG2_COLOR
             decoder->dc_dct_pred[0] = decoder->dc_dct_pred[1] =
                 decoder->dc_dct_pred[2] = 16384;
+#else
+            decoder->dc_dct_pred[0] = 16384;
+#endif
         }
 
         NEXT_MACROBLOCK;
@@ -2337,9 +2866,12 @@ void mpeg2_slice (mpeg2_decoder_t * const decoder, const int code,
 
         if (mba_inc)
         {
+#if MPEG2_COLOR
             decoder->dc_dct_pred[0] = decoder->dc_dct_pred[1] =
                 decoder->dc_dct_pred[2] = 16384;
-
+#else
+            decoder->dc_dct_pred[0] = 16384;
+#endif
             if (decoder->coding_type == P_TYPE)
             {
                 do
