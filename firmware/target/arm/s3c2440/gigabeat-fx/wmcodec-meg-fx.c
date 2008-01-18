@@ -30,9 +30,6 @@
 
 void audiohw_init(void)
 {
-    /* reset I2C */
-    i2c_init();
-
     /* GPC5 controls headphone output */
     GPCCON &= ~(0x3 << 10);
     GPCCON |= (1 << 10);
