@@ -1127,15 +1127,12 @@ void mutex_unlock(struct mutex *m)
 /****************************************************************************
  * Simpl-er mutex functions ;)
  ****************************************************************************/
-void spinlock_init(struct spinlock *l IF_COP(, unsigned int flags))
+#if NUM_CORES > 1
+void spinlock_init(struct spinlock *l)
 {
-    l->locked = 0;
+    corelock_init(&l->cl);
     l->thread = NULL;
     l->count = 0;
-#if NUM_CORES > 1
-    l->task_switch = flags & SPINLOCK_TASK_SWITCH;
-    corelock_init(&l->cl);
-#endif
 }
 
 void spinlock_lock(struct spinlock *l)
@@ -1148,24 +1145,7 @@ void spinlock_lock(struct spinlock *l)
         return;
     }
 
-#if NUM_CORES > 1
-    if (l->task_switch != 0)
-#endif
-    {
-        /* Let other threads run until the lock is free */
-        while(test_and_set(&l->locked, 1, &l->cl) != 0)
-        {
-            /* spin and switch until the lock is open... */
-            switch_thread(NULL);
-        }
-    }
-#if NUM_CORES > 1
-    else
-    {
-        /* Use the corelock purely */
-        corelock_lock(&l->cl);
-    }
-#endif
+    corelock_lock(&l->cl);
 
     l->thread = thread;
 }
@@ -1186,23 +1166,10 @@ void spinlock_unlock(struct spinlock *l)
     /* clear owner */
     l->thread = NULL;
 
-#if NUM_CORES > 1
-    if (l->task_switch != 0)
-#endif
-    {
-        /* release lock */
-#if CONFIG_CORELOCK == SW_CORELOCK
-        /* This must be done since our unlock could be missed by the
-           test_and_set and leave the object locked permanently */
-        corelock_lock(&l->cl);
-#endif
-        l->locked = 0;
-    }
-
-#if NUM_CORES > 1
+    /* release lock */
     corelock_unlock(&l->cl);
-#endif
 }
+#endif /* NUM_CORES > 1 */
 
 /****************************************************************************
  * Simple semaphore functions ;)

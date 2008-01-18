@@ -39,7 +39,7 @@ static bool cpu_idle NOCACHEBSS_ATTR = false;
 struct spinlock boostctrl_spin NOCACHEBSS_ATTR;
 void cpu_boost_init(void)
 {
-    spinlock_init(&boostctrl_spin, SPINLOCK_NO_TASK_SWITCH);
+    spinlock_init(&boostctrl_spin);
 }
 #endif
 

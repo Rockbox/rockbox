@@ -162,7 +162,7 @@ static struct sd_card_status sd_status[NUM_VOLUMES] =
 /* Shoot for around 75% usage */
 static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
 static const char         sd_thread_name[] = "ata/sd";
-static struct spinlock    sd_spin NOCACHEBSS_ATTR;
+static struct mutex       sd_mtx NOCACHEBSS_ATTR;
 static struct event_queue sd_queue;
 
 /* Posted when card plugged status has changed */
@@ -801,7 +801,7 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
     
     /* TODO: Add DMA support. */
 
-    spinlock_lock(&sd_spin);
+    mutex_lock(&sd_mtx);
 
     ata_led(true);
 
@@ -888,7 +888,7 @@ ata_read_retry:
     while (1)
     {
         ata_led(false);
-        spinlock_unlock(&sd_spin);
+        mutex_unlock(&sd_mtx);
 
         return ret;
 
@@ -916,7 +916,7 @@ int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
     const unsigned char *buf, *buf_end;
     int bank;
 
-    spinlock_lock(&sd_spin);
+    mutex_lock(&sd_mtx);
 
     ata_led(true);
 
@@ -1016,7 +1016,7 @@ ata_write_retry:
     while (1)
     {
         ata_led(false);
-        spinlock_unlock(&sd_spin);
+        mutex_unlock(&sd_mtx);
 
         return ret;
 
@@ -1050,7 +1050,7 @@ static void sd_thread(void)
 
             /* Lock to keep us from messing with this variable while an init
                may be in progress */
-            spinlock_lock(&sd_spin);
+            mutex_lock(&sd_mtx);
             card_info[1].initialized = 0;
             sd_status[1].retry = 0;
 
@@ -1073,7 +1073,7 @@ static void sd_thread(void)
             if (action != SDA_NONE)
                 queue_broadcast(SYS_FS_CHANGED, 0);
 
-            spinlock_unlock(&sd_spin);
+            mutex_unlock(&sd_mtx);
             break;
             } /* SD_HOTSWAP */
 #endif /* HAVE_HOTSWAP */
@@ -1150,9 +1150,9 @@ int ata_init(void)
     int ret = 0;
 
     if (!initialized)
-        spinlock_init(&sd_spin IF_COP(, SPINLOCK_TASK_SWITCH));
+        mutex_init(&sd_mtx);
 
-    spinlock_lock(&sd_spin);
+    mutex_lock(&sd_mtx);
 
     ata_led(false);
 
@@ -1215,7 +1215,7 @@ int ata_init(void)
 #endif
     }
 
-    spinlock_unlock(&sd_spin);
+    mutex_unlock(&sd_mtx);
 
     return ret;
 }

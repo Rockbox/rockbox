@@ -119,18 +119,14 @@ struct mutex
     unsigned char locked;        /* locked semaphore */
 };
 
+#if NUM_CORES > 1
 struct spinlock
 {
-#if NUM_CORES > 1
     struct corelock cl;          /* inter-core sync */
-#endif
     struct thread_entry *thread; /* lock owner */
     int count;                   /* lock owner recursion count */
-    unsigned char locked;        /* is locked if nonzero */
-#if NUM_CORES > 1
-    unsigned char task_switch;   /* can task switch? */
-#endif
 };
+#endif
 
 #ifdef HAVE_SEMAPHORE_OBJECTS
 struct semaphore
@@ -229,12 +225,11 @@ extern int queue_broadcast(long id, intptr_t data);
 extern void mutex_init(struct mutex *m);
 extern void mutex_lock(struct mutex *m);
 extern void mutex_unlock(struct mutex *m);
-#define SPINLOCK_TASK_SWITCH 0x10
-#define SPINLOCK_NO_TASK_SWITCH 0x00
-extern void spinlock_init(struct spinlock *l IF_COP(, unsigned int flags));
+#if NUM_CORES > 1
+extern void spinlock_init(struct spinlock *l);
 extern void spinlock_lock(struct spinlock *l);
 extern void spinlock_unlock(struct spinlock *l);
-extern int spinlock_lock_w_tmo(struct spinlock *l, int ticks);
+#endif
 #ifdef HAVE_SEMAPHORE_OBJECTS
 extern void semaphore_init(struct semaphore *s, int max, int start);
 extern void semaphore_wait(struct semaphore *s);

@@ -597,7 +597,7 @@ void mutex_unlock(struct mutex *m)
     /* unlocker not being the owner is an unlocking violation */
     if(m->thread != thread_get_current())
     {
-        fprintf(stderr, "spinlock_unlock->wrong thread");
+        fprintf(stderr, "mutex_unlock->wrong thread");
         exit(-1);
     }    
 
@@ -615,52 +615,6 @@ void mutex_unlock(struct mutex *m)
         /* release lock */
         m->locked = 0;
     }
-}
-
-void spinlock_init(struct spinlock *l)
-{
-    l->locked = 0;
-    l->thread = NULL;
-    l->count = 0;
-}
-
-void spinlock_lock(struct spinlock *l)
-{
-    struct thread_entry *const thread = thread_get_current();
-
-    if (l->thread == thread)
-    {
-        l->count++;
-        return;
-    }
-
-    while(test_and_set(&l->locked, 1))
-    {
-        switch_thread(NULL);
-    }
-
-    l->thread = thread;
-}
-
-void spinlock_unlock(struct spinlock *l)
-{
-    /* unlocker not being the owner is an unlocking violation */
-    if(l->thread != thread_get_current())
-    {
-        fprintf(stderr, "spinlock_unlock->wrong thread");
-        exit(-1);
-    }    
-
-    if (l->count > 0)
-    {
-        /* this thread still owns lock */
-        l->count--;
-        return;
-    }
-
-    /* clear owner */
-    l->thread = NULL;
-    l->locked = 0;
 }
 
 #ifdef HAVE_SEMAPHORE_OBJECTS

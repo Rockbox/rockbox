@@ -32,7 +32,7 @@
 #define GIO_RTC_ENABLE (1<<12)
 #define GIO_BL_ENABLE  (1<<13)
 
-struct spinlock spi_lock;
+struct mutex spi_mtx;
 
 struct SPI_info {
     volatile unsigned short *setreg;
@@ -60,7 +60,7 @@ int spi_block_transfer(enum SPI_target target,
                        const uint8_t *tx_bytes, unsigned int tx_size,
                              uint8_t *rx_bytes, unsigned int rx_size)
 {
-    spinlock_lock(&spi_lock);
+    mutex_lock(&spi_mtx);
     /* Activate the slave select pin */
     *spi_targets[target].setreg = spi_targets[target].bit;
 
@@ -87,13 +87,13 @@ int spi_block_transfer(enum SPI_target target,
 
     *spi_targets[target].clrreg = spi_targets[target].bit;
     
-    spinlock_unlock(&spi_lock);
+    mutex_unlock(&spi_mtx);
     return 0;
 }
 
 void spi_init(void)
 {
-    spinlock_init(&spi_lock);
+    mutex_init(&spi_mtx);
     /* Set SCLK idle level = 0 */
     IO_SERIAL0_MODE |= 1<<10;
     /* Enable TX */
