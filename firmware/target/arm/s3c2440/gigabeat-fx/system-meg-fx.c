@@ -46,7 +46,7 @@ static void (* const irqvector[32])(void) =
     EINT4_7, EINT8_23, CAM, nBATT_FLT, TICK, WDT_AC97,
     TIMER0, TIMER1, TIMER2, TIMER3, TIMER4, UART2,
     LCD, DMA0, DMA1, DMA2, DMA3, SDI,
-    SPI0, UART1, NFCON, USBD, IIC,
+    SPI0, UART1, NFCON, USBD, USBH, IIC,
     UART0, SPI1, RTC, ADC,
 };
 
