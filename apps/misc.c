@@ -1120,3 +1120,22 @@ bool dir_exists(const char *path)
     closedir(d);
     return true;
 }
+
+/*
+ * removes the extension of filename (if it doesn't start with a .)
+ * puts the result in buffer
+ */
+char *strip_extension(const char *filename, char *buffer)
+{
+    int dotpos;
+    char *dot = strrchr(filename, '.');
+    if (dot != 0 && filename[0] != '.')
+    {
+        dotpos = dot - filename;
+        strncpy(buffer, filename, dotpos);
+        buffer[dotpos] = '\0';
+    }
+    else
+        strcpy(buffer, filename);
+    return buffer;
+}

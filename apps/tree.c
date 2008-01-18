@@ -115,25 +115,6 @@ static int ft_play_dirname(char* name);
 static void ft_play_filename(char *dir, char *file);
 static void say_filetype(int attr);
 
-/*
- * removes the extension of filename (if it doesn't start with a .)
- * puts the result in buffer
- */
-static char * strip_extension(char * filename, char * buffer)
-{
-    int dotpos;
-    char * dot=strrchr(filename, '.');
-    if(dot!=0 && filename[0]!='.')
-    {
-        dotpos = dot-filename;
-        strncpy(buffer, filename, dotpos);
-        buffer[dotpos]='\0';
-        return(buffer);
-    }
-    else
-        return(filename);
-}
-
 static char * tree_get_filename(int selected_item, void * data, char *buffer)
 {
     struct tree_context * local_tc=(struct tree_context *)data;

@@ -118,5 +118,10 @@ char* strrsplt(char* str, int c);
 bool file_exists(const char *file);
 bool dir_exists(const char *path);
 
+/*
+ * removes the extension of filename (if it doesn't start with a .)
+ * puts the result in buffer
+ */
+char *strip_extension(const char *filename, char *buffer);
 
 #endif /* MISC_H */

@@ -62,34 +62,6 @@ static char* strip_filename(char* buf, int buf_size, const char* fullpath)
     return (sep + 1);
 }
 
-/* Strip extension from a filename.
- *
- * buf      - buffer to output the result to.
- * buf_size - size of the output buffer buffer.
- * file     - filename to strip extension from.
- *
- * Return value is a pointer to buf, which contains the result.
- */
-static char* strip_extension(char* buf, int buf_size, const char* file)
-{
-    char* sep;
-    int len;
-
-    if (!buf || buf_size <= 0 || !file)
-        return NULL;
-
-    buf[0] = 0;
-
-    sep = strrchr(file,'.');
-    if (sep == NULL)
-        return NULL;
-
-    len = MIN(sep - file, buf_size - 1);
-    strncpy(buf, file, len);
-    buf[len] = 0;
-    return buf;
-}
-
 /* Make sure part of path only contain chars valid for a FAT32 long name.
  * Double quotes are replaced with single quotes, other unsupported chars 
  * are replaced with an underscore.
@@ -144,7 +116,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     albumlen = id3->album ? strlen(id3->album) : 0;
 
     /* the first file we look for is one specific to the track playing */
-    strip_extension(path, sizeof(path) - strlen(size_string) - 4, trackname);
+    strip_extension(trackname, path);
     strcat(path, size_string);
     strcat(path, ".bmp");
     found = file_exists(path);
