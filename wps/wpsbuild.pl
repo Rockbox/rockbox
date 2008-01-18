@@ -65,7 +65,7 @@ STOP
     close(GCC);
 
     my $c="cat gcctemp | gcc $cppdef -I. -I$firmdir/export -E -P -";
-
+    
     #print "CMD $c\n";
 
     open(GETSIZE, "$c|");
@@ -104,6 +104,13 @@ sub mkdirs {
     {
        mkdir ".rockbox/wps/$wpsdir", 0777;
     }
+}
+
+sub copybackdrop {
+	#copy the backdrop file into the build dir
+
+	$backdrop =~ /\/(.*backdrops\/(.*))/i;
+	`cp $ROOT/backdrops/$2 $1`;
 }
 
 sub copywps {
@@ -180,10 +187,33 @@ MOO
     if($statusbar) {
         push @out, "statusbar: $statusbar\n";
     }
+    if($backdrop) {
+        push @out, "backdrop: $backdrop\n";
+    }    
+    if($lineselectstart) {
+        push @out, "line selector start color: $lineselectstart\n";
+    }
+    if($lineselectend) {
+        push @out, "line selector end color: $lineselectend\n";
+    }
+    if($selecttype) {
+        push @out, "selector type: $selecttype\n";
+    }
+    if($iconset) {
+        push @out, "iconset: $iconset\n";
+    }
+    if($viewericon) {
+        push @out, "viewers iconset: $viewericon\n";
+    }
+    if($lineselecttextcolor) {
+        push @out, "line selector text color: $lineselecttextcolor\n";
+    }
+    if($filetylecolor) {
+        push @out, "filetype colours: $filetylecolor\n";
+    }
     if($rwps && $has_remote ) {
         push @out, "rwps: /.rockbox/wps/$rwps\n";
     }
-
     if(-f ".rockbox/wps/$cfg") {
         print STDERR "wpsbuild warning: wps/$cfg already exists!\n";
     }
@@ -224,6 +254,15 @@ while(<WPS>) {
         undef $author;
         undef $req_g_wps;
         undef $req_t_wps;
+        undef $backdrop;
+        undef $lineselectstart;
+        undef $lineselectend;
+        undef $selecttype;
+        undef $iconset;
+        undef $viewericon;
+        undef $lineselecttextcolor;
+        undef $filetylecolor;
+        
         next;
     }
     if($within) {
@@ -308,9 +347,15 @@ while(<WPS>) {
         elsif($l =~ /^Width: (.*)/i) {
             $width = $1;
         }
+        elsif($l =~ /^Width\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+            $width = $1;
+        }          
         elsif($l =~ /^Height: (.*)/i) {
             $height = $1;
         }
+        elsif($l =~ /^Height\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+            $height = $1;
+        }        
         elsif($l =~ /^Font: (.*)/i) {
             $font = $1;
         }
@@ -326,6 +371,44 @@ while(<WPS>) {
         elsif($l =~ /^Statusbar: (.*)/i) {
             $statusbar = $1;
         }
+        elsif($l =~ /^Statusbar\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+            $statusbar = $1;
+        }        
+	elsif($l =~ /^Backdrop: (.*)/i) {
+	    $backdrop = $1;
+	    copybackdrop();
+	}
+	elsif($l =~ /^Backdrop\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+	    $backdrop = $1;
+	    copybackdrop();
+	}	
+	elsif($l =~ /^line selector start color: (.*)/i) {
+	    $lineselectstart = $1;
+	}
+	elsif($l =~ /^line selector end color: (.*)/i) {
+	    $lineselectend = $1;
+	}
+	elsif($l =~ /^selector type: (.*)/i) {
+	    $selecttype = $1;
+	}
+	elsif($l =~ /^iconset: (.*)/i) {
+	    $iconset = $1;
+	}
+	elsif($l =~ /^viewers iconset: (.*)/i) {
+	    $viewericon = $1;
+	}		
+	elsif($l =~ /^line selector text color: (.*)/i) {
+	    $lineselecttextcolor = $1;
+	}	
+	elsif($l =~ /^filetype colours: (.*)/i) {
+	    $filetylecolor = $1;
+	}
+	else{
+		#print "Unknown line:  $l!\n";
+	}
+	
+	
+	
     }
 }
 
