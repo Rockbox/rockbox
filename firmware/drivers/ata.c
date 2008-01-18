@@ -1128,12 +1128,18 @@ static int init_and_check(bool hard_reset)
 
 int ata_init(void)
 {
-    int rc;
-    bool coldstart = ata_is_coldstart();
-         /* must be called before ata_device_init() */          
+    int rc = 0;
+    bool coldstart;
 
-    spinlock_init(&ata_spinlock IF_COP(, SPINLOCK_TASK_SWITCH));
+    if ( !initialized ) {
+        spinlock_init(&ata_spinlock IF_COP(, SPINLOCK_TASK_SWITCH));
+        queue_init(&ata_queue, true);
+    }
 
+    spinlock_lock(&ata_spinlock);
+
+    /* must be called before ata_device_init() */
+    coldstart = ata_is_coldstart();
     ata_led(false);
     ata_device_init();
     sleeping = false;
@@ -1143,6 +1149,9 @@ int ata_init(void)
 #endif
 
     if ( !initialized ) {
+        /* First call won't have multiple thread contention */
+        spinlock_unlock(&ata_spinlock);
+
         if (!ide_powered()) /* somebody has switched it off */
         {
             ide_power_enable(true);
@@ -1202,8 +1211,6 @@ int ata_init(void)
         if (rc)
             return -60 + rc;
 
-        queue_init(&ata_queue, true);
-
         last_disk_activity = current_tick;
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), 0, ata_thread_name
@@ -1214,9 +1221,10 @@ int ata_init(void)
     }
     rc = set_multiple_mode(multisectors);
     if (rc)
-        return -70 + rc;
+        rc = -70 + rc;
 
-    return 0;
+    spinlock_unlock(&ata_spinlock);
+    return rc;
 }
 
 #if (CONFIG_LED == LED_REAL)

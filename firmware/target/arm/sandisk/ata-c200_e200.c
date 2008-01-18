@@ -1149,16 +1149,16 @@ int ata_init(void)
 {
     int ret = 0;
 
+    if (!initialized)
+        spinlock_init(&sd_spin IF_COP(, SPINLOCK_TASK_SWITCH));
+
+    spinlock_lock(&sd_spin);
+
     ata_led(false);
 
-    /* NOTE: This init isn't dual core safe */
     if (!initialized)
     {
         initialized = true;
-
-        spinlock_init(&sd_spin IF_COP(, SPINLOCK_TASK_SWITCH));
-
-        spinlock_lock(&sd_spin);
 
         /* init controller */
         outl(inl(0x70000088) & ~(0x4), 0x70000088);
@@ -1213,8 +1213,9 @@ int ata_init(void)
         GPIOL_INT_EN |= 0x08;
 #endif
 #endif
-        spinlock_unlock(&sd_spin);
     }
+
+    spinlock_unlock(&sd_spin);
 
     return ret;
 }
