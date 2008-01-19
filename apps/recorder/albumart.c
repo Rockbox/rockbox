@@ -27,6 +27,7 @@
 #include "dircache.h"
 #include "debug.h"
 #include "misc.h"
+#include "settings.h"
 
 
 /* Strip filename from a full path
@@ -79,6 +80,8 @@ static void fix_path_part(char* path, int offset, int count)
     
     for (i = 0; i <= count; i++, path++)
     {
+        if (*path == 0)
+            return;
         if (*path == '"')
             *path = '\'';
         else if (strchr(invalid_chars, *path))
@@ -92,6 +95,7 @@ static void fix_path_part(char* path, int offset, int count)
  *  ./cover<size>.bmp
  *  ../<albumname><size>.bmp
  *  ../cover<size>.bmp
+ *  ROCKBOX_DIR/albumart/<artist>-<albumname><size>.bmp
  * <size> is the value of the size_string parameter, <trackname> and
  * <albumname> are read from the ID3 metadata.
  * If a matching bitmap is found, its filename is stored in buf.
@@ -135,6 +139,18 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
         /* if it still doesn't exist, we look for a generic file */
         snprintf(path, sizeof(path),
                  "%scover%s.bmp", dir, size_string);
+        found = file_exists(path);
+    }
+
+    if (!found)
+    {
+        /* look in the albumart subdir of .rockbox */
+        snprintf(path, sizeof(path),
+                ROCKBOX_DIR "/albumart/%s-%s%s.bmp",
+                id3->artist,
+                id3->album,
+                size_string);
+        fix_path_part(path, strlen(ROCKBOX_DIR "/albumart/"), MAX_PATH);
         found = file_exists(path);
     }
 
