@@ -33,7 +33,7 @@ Const SPSF_44kHz16BitMono = 34
 Const SPSF_48kHz16BitMono = 38
 
 Dim oShell, oArgs, oEnv
-Dim bVerbose, bSAPI4
+Dim bVerbose, bSAPI4, bList
 Dim sLanguage, sVoice, sSpeed
 
 Dim oSpVoice, oSpFS ' SAPI5 voice and filestream
@@ -42,6 +42,7 @@ Dim nLangID, sSelectString
 
 Dim aLine, aData    ' used in command reading
 
+Dim counter, ende, list
 
 On Error Resume Next
 
@@ -51,9 +52,46 @@ bVerbose = (oEnv("V") <> "")
 
 Set oArgs = WScript.Arguments.Named
 bSAPI4 = oArgs.Exists("sapi4")
+bList = oArgs.Exists("listvoices")
 sLanguage = oArgs.Item("language")
 sVoice = oArgs.Item("voice")
 sSpeed = oArgs.Item("speed")
+
+' display a list of voices for the selected language
+if bList Then
+    'Create SAPI5 object
+    Set oSpVoice = CreateObject("SAPI.SpVoice")
+    If Err.Number <> 0 Then
+        WScript.StdErr.WriteLine "Error - could not get SpVoice object." _
+                        & " SAPI 5 not installed?"
+        WScript.Quit 1
+    End If
+    
+    list = ""
+    ' Select matching voice
+    For Each nLangID in LangIDs(sLanguage)
+        sSelectString = "Language=" & Hex(nLangID)
+        counter =0
+        ende =0
+        While ende <= 0
+            Err.Clear
+            Set oSpVoice.Voice = oSpVoice.GetVoices(sSelectString).Item(counter)
+          
+            If Err.Number = 0 Then
+                list = list & oSpVoice.Voice.GetDescription & ","    
+            Else
+                ende = 1
+                 Err.Clear
+            End if    
+            counter = counter + 1  
+        Wend
+    Next
+    
+    WScript.StdErr.WriteLine list
+    
+    WScript.Quit 0
+End If
+
 
 If bSAPI4 Then
     ' Create SAPI4 ActiveVoice object
@@ -261,7 +299,7 @@ Function AudioFormat(ByRef sVendor)
             AudioFormat = SPSF_16kHz16BitMono
         Case Else
             AudioFormat = SPSF_22kHz16BitMono
-            WScript.StdErr.WriteLine "Warning - unknown vendor """ & sVendor _
+            WScript.StdOut.WriteLine "Warning - unknown vendor """ & sVendor _
                                      & """ - using default wave format"
     End Select
 End Function
@@ -356,3 +394,5 @@ Function LangIDs(ByRef sLanguage)
             LangIDs = Array(&h807) ' Swiss German
     End Select
 End Function
+
+
