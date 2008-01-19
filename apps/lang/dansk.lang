@@ -9909,17 +9909,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Hjul-lys sluk"
-    c200,gigabeatf: "Knap-lys sluk"
+    c200,gigabeatf,mrobe100: "Knap-lys sluk"
   </dest>
   <voice>
     *: none
     e200: "Hjul-lys sluk"
-    c200,gigabeatf: "Knap-lys sluk"
+    c200,gigabeatf,mrobe100: "Knap-lys sluk"
   </voice>
 </phrase>
 <phrase>

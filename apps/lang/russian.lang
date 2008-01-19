@@ -10912,17 +10912,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Таймаут подсветки колёсика"
-    c200,gigabeatf: "Таймаут подсветки кнопок"
+    c200,gigabeatf,mrobe100: "Таймаут подсветки кнопок"
   </dest>
   <voice>
     *: none
     e200: "Таймаут подсветки колёсика"
-    c200,gigabeatf: "Таймаут подсветки кнопок"
+    c200,gigabeatf,mrobe100: "Таймаут подсветки кнопок"
   </voice>
 </phrase>
 <phrase>

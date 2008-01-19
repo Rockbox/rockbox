@@ -10683,17 +10683,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "转盘灯自动关时间"
-    c200,gigabeatf: "按钮灯自动关时间"
+    c200,gigabeatf,mrobe100: "按钮灯自动关时间"
   </dest>
   <voice>
     *: none
     e200: "转盘灯自动关时间"
-    c200,gigabeatf: "按钮灯自动关时间"
+    c200,gigabeatf,mrobe100: "按钮灯自动关时间"
   </voice>
 </phrase>
 <phrase>

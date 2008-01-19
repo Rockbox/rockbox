@@ -3811,17 +3811,17 @@
  <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
  </source>
  <dest>
     *: none
     e200: "Pahintuin gulong sa ilaw"
-    c200,gigabeatf: "Pahintuin buttones sa ilaw"
+    c200,gigabeatf,mrobe100: "Pahintuin buttones sa ilaw"
  </dest>
  <voice>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
  </voice>
 </phrase>
 <phrase>

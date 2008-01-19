@@ -9634,17 +9634,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Avbrotstid for hjullys"
-    c200,gigabeatf: "Avbrotstid for knapplys"
+    c200,gigabeatf,mrobe100: "Avbrotstid for knapplys"
   </dest>
   <voice>
     *: ""
     e200: "Avbrotstid for hjullys"
-    c200,gigabeatf: "Avbrotstid for knapplys"
+    c200,gigabeatf,mrobe100: "Avbrotstid for knapplys"
   </voice>
 </phrase>
 <phrase>

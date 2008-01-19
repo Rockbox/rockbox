@@ -10015,17 +10015,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Tid før lys på hjul slukker"
-    c200,gigabeatf: "Tid før lys på knapper slukker"
+    c200,gigabeatf,mrobe100: "Tid før lys på knapper slukker"
   </dest>
   <voice>
     *: none
     e200: "Tid før lys på hjul slukker"
-    c200,gigabeatf: "Tid før lys på knapper slukker"
+    c200,gigabeatf,mrobe100: "Tid før lys på knapper slukker"
   </voice>
 </phrase>
 <phrase>

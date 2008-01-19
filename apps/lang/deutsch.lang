@@ -3815,17 +3815,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Scrollradbeleuchtungsdauer"
-    c200,gigabeatf: "Tastenbeleuchtungsdauer"
+    c200,gigabeatf,mrobe100: "Tastenbeleuchtungsdauer"
   </dest>
   <voice>
     *: none
     e200: "Scrollradbeleuchtungsdauer"
-    c200,gigabeatf: "Tastenbeleuchtungsdauer"
+    c200,gigabeatf,mrobe100: "Tastenbeleuchtungsdauer"
   </voice>
 </phrase>
 <phrase>

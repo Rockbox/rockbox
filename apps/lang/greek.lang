@@ -3823,17 +3823,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Χρόνος σβησίματος τροχού"
-    c200,gigabeatf: "Χρόνος σβησίματος κουμπιών"
+    c200,gigabeatf,mrobe100: "Χρόνος σβησίματος κουμπιών"
   </dest>
   <voice>
     *: none
     e200: "Χρόνος σβησίματος τροχού"
-    c200,gigabeatf: "Χρόνος σβησίματος κουμπιών"
+    c200,gigabeatf,mrobe100: "Χρόνος σβησίματος κουμπιών"
   </voice>
 </phrase>
 <phrase>

@@ -3817,17 +3817,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Kerék világításának hossza"
-    c200,gigabeatf: "Gomb világításának hossza"
+    c200,gigabeatf,mrobe100: "Gomb világításának hossza"
   </dest>
   <voice>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf: "Button Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
   </voice>
 </phrase>
 <phrase>
