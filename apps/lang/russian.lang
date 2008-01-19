@@ -318,10 +318,10 @@
     *: "Bass"
   </source>
   <dest>
-    *: "Низкие"
+    *: "Бас"
   </dest>
   <voice>
-    *: "Низкие"
+    *: "Бас"
   </voice>
 </phrase>
 <phrase>
@@ -332,10 +332,10 @@
     *: "Treble"
   </source>
   <dest>
-    *: "Высокие"
+    *: "Высокие частоты"
   </dest>
   <voice>
-    *: "Высокие"
+    *: "Высокие частоты"
   </voice>
 </phrase>
 <phrase>
@@ -460,11 +460,11 @@
   </source>
   <dest>
     *: none
-    masf: "Средние"
+    masf: "Средние частоты"
   </dest>
   <voice>
     *: none
-    masf: "Средние"
+    masf: "Средние частоты"
   </voice>
 </phrase>
 <phrase>
@@ -818,11 +818,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Включить экв."
+    swcodec: "Включить эквалайзер"
   </dest>
   <voice>
     *: none
-    swcodec: "Включить экв."
+    swcodec: "Включить эквалайзер"
   </voice>
 </phrase>
 <phrase>
@@ -835,11 +835,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Графический экв."
+    swcodec: "Графический эквалайзер"
   </dest>
   <voice>
     *: none
-    swcodec: "Графический экв."
+    swcodec: "Графический эквалайзер"
   </voice>
 </phrase>
 <phrase>
@@ -852,11 +852,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Простые установки экв."
+    swcodec: "Простые настройки"
   </dest>
   <voice>
     *: none
-    swcodec: "Простые установки экв."
+    swcodec: "Простые настройки"
   </voice>
 </phrase>
 <phrase>
@@ -869,11 +869,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Расширенные установки экв."
+    swcodec: "Расширенные настройки"
   </dest>
   <voice>
     *: none
-    swcodec: "Расширенные установки экв."
+    swcodec: "Расширенные настройки"
   </voice>
 </phrase>
 <phrase>
@@ -886,11 +886,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Сохранить установки экв."
+    swcodec: "Сохранить настройки"
   </dest>
   <voice>
     *: none
-    swcodec: "Сохранить установки экв."
+    swcodec: "Сохранить настройки"
   </voice>
 </phrase>
 <phrase>
@@ -903,11 +903,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Загрузить установки экв."
+    swcodec: "Загрузить настройки"
   </dest>
   <voice>
     *: none
-    swcodec: "Загрузить установки экв."
+    swcodec: "Загрузить настройки"
   </voice>
 </phrase>
 <phrase>
@@ -920,7 +920,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Режим редактир.: %s"
+    swcodec: "Режим редактирования: %s"
   </dest>
   <voice>
     *: none
@@ -1110,10 +1110,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Подтверждать очистку динамич. списка песен"
+    *: "Подтверждать очистку динамического списка"
   </dest>
   <voice>
-    *: "Подтверждать очистку динамич. списка песен"
+    *: "Подтверждать очистку динамического списка"
   </voice>
 </phrase>
 <phrase>
@@ -1152,10 +1152,10 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Случайно"
+    *: "Случайное"
   </dest>
   <voice>
-    *: "Случайно"
+    *: "Случайное"
   </voice>
 </phrase>
 <phrase>
@@ -1166,10 +1166,10 @@
     *: "Repeat"
   </source>
   <dest>
-    *: "Повтор"
+    *: "Повторять"
   </dest>
   <voice>
-    *: "Повтор"
+    *: "Повторять"
   </voice>
 </phrase>
 <phrase>
@@ -1180,10 +1180,10 @@
     *: "One"
   </source>
   <dest>
-    *: "Трека"
+    *: "Трек"
   </dest>
   <voice>
-    *: "Трека"
+    *: "Трек"
   </voice>
 </phrase>
 <phrase>
@@ -1208,10 +1208,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Играть выбраные файлы первыми"
+    *: "Начинать с выбранного файла"
   </dest>
   <voice>
-    *: "Играть выбраные файлы первыми"
+    *: "Начинать с выбранного файла"
   </voice>
 </phrase>
 <phrase>
@@ -1284,10 +1284,10 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Усиление воспроизвед."
+    *: "Усиление"
   </dest>
   <voice>
-    *: "Усиление воспроизвед."
+    *: "Усиление"
   </voice>
 </phrase>
 <phrase>
@@ -1317,11 +1317,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Тихая"
+    swcodec: "Низкая"
   </dest>
   <voice>
     *: none
-    swcodec: "Тихая"
+    swcodec: "Низкая"
   </voice>
 </phrase>
 <phrase>
@@ -1351,11 +1351,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Громкая"
+    swcodec: "Высокая"
   </dest>
   <voice>
     *: none
-    swcodec: "Громкая"
+    swcodec: "Высокая"
   </voice>
 </phrase>
 <phrase>
@@ -1383,10 +1383,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Авт. смена папки"
+    *: "Автоматическая смена папки"
   </dest>
   <voice>
-    *: "Авт. смена папки"
+    *: "Автоматическая смена папки"
   </voice>
 </phrase>
 <phrase>
@@ -1860,11 +1860,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Упр. Китайская (GB2312)"
+    lcd_bitmap: "Упрощённая Китайская (GB2312)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Упр. Китайская"
+    lcd_bitmap: "Упрощённая Китайская"
   </voice>
 </phrase>
 <phrase>
@@ -1894,11 +1894,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Трад. Китайская (BIG5)"
+    lcd_bitmap: "Традиционная Китайская (BIG5)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Трад. Китайская"
+    lcd_bitmap: "Традиционная Китайская"
   </voice>
 </phrase>
 <phrase>
@@ -2061,10 +2061,10 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Создать закладку на Паузе"
+    *: "Создавать закладку на Паузе"
   </dest>
   <voice>
-    *: "Создать закладку на Паузе"
+    *: "Создавать закладку на Паузе"
   </voice>
 </phrase>
 <phrase>
@@ -2103,10 +2103,10 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "Загрузить посл. закладку"
+    *: "Загружать последнюю закладку"
   </dest>
   <voice>
-    *: "Загрузить посл. закладку"
+    *: "Загружать последнюю закладку"
   </voice>
 </phrase>
 <phrase>
@@ -2470,10 +2470,10 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "Мин. шаг перемотки"
+    *: "Минимальный шаг"
   </dest>
   <voice>
-    *: "Мин. шаг перемотки"
+    *: "Минимальный шаг"
   </voice>
 </phrase>
 <phrase>
@@ -2484,10 +2484,10 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "Ускорение перемотки"
+    *: "Ускорение"
   </dest>
   <voice>
-    *: "Ускорение перемотки"
+    *: "Ускорение"
   </voice>
 </phrase>
 <phrase>
@@ -2602,11 +2602,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Микшировать"
+    swcodec: "Смешивание"
   </dest>
   <voice>
     *: none
-    swcodec: "Микшировать"
+    swcodec: "Смешивание"
   </voice>
 </phrase>
 <phrase>
@@ -2617,10 +2617,10 @@
     *: "Enable Replaygain"
   </source>
   <dest>
-    *: "Включить усиление воспр."
+    *: "Включить усиление"
   </dest>
   <voice>
-    *: "Включить усиление воспр."
+    *: "Включить усиление"
   </voice>
 </phrase>
 <phrase>
@@ -2633,11 +2633,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Предотвратить перегрузки"
+    swcodec: "Предотвращать перегрузки"
   </dest>
   <voice>
     *: none
-    swcodec: "Предотвратить перегрузки"
+    swcodec: "Предотвращать перегрузки"
   </voice>
 </phrase>
 <phrase>
@@ -2648,10 +2648,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Тип усиления воспроизвед."
+    *: "Тип усиления."
   </dest>
   <voice>
-    *: "Тип усиления воспроизвед."
+    *: "Тип усиления"
   </voice>
 </phrase>
 <phrase>
@@ -2662,10 +2662,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Усиление по альбому"
+    *: "По альбому"
   </dest>
   <voice>
-    *: "Усиление по альбому"
+    *: "По альбому"
   </voice>
 </phrase>
 <phrase>
@@ -2676,10 +2676,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Усиление по треку"
+    *: "По треку"
   </dest>
   <voice>
-    *: "Усиление по треку"
+    *: "По треку"
   </voice>
 </phrase>
 <phrase>
@@ -2734,11 +2734,11 @@
   </source>
   <dest>
     *: none
-    charging: "Подсветка при внешн. питании"
+    charging: "Подсветка при внешнем питании"
   </dest>
   <voice>
     *: none
-    charging: "Подсветка при внешн. питании"
+    charging: "Подсветка при внешнем питании"
   </voice>
 </phrase>
 <phrase>
@@ -2749,10 +2749,10 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "Подсв. при смене названия"
+    *: "Подсветка при смене названия"
   </dest>
   <voice>
-    *: "Подсв. при смене названия"
+    *: "Подсветка при смене названия"
   </voice>
 </phrase>
 <phrase>
@@ -2992,10 +2992,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Задержка начала прокрутки"
+    *: "Задержка начала"
   </dest>
   <voice>
-    *: "Задержка начала прокрутки"
+    *: "Задержка начала"
   </voice>
 </phrase>
 <phrase>
@@ -3034,10 +3034,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Огр. двунаправленной прокрутки"
+    *: "Ограничение двунаправленной прокрутки"
   </dest>
   <voice>
-    *: "Огр. двунаправленной прокрутки"
+    *: "Ограничение двунаправленной прокрутки"
   </voice>
 </phrase>
 <phrase>
@@ -3252,12 +3252,12 @@
     masd: none
   </source>
   <dest>
-    *: none
-    masd: "Сброс пиков"
+    *: "Сброс пиков"
+    masd: none
   </dest>
   <voice>
-    *: none
-    masd: "Сброс пиков"
+    *: "Сброс пиков"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3269,12 +3269,12 @@
     masd: none
   </source>
   <dest>
-    *: none
-    masd: "Время удержания пиков"
+    *: "Время удержания пиков"
+    masd: none
   </dest>
   <voice>
-    *: none
-    masd: "Время удержания пиков"
+    *: "Время удержания пиков"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3333,7 +3333,7 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Logarithmic(dB)"
+    *: "Logarithmic (dB)"
     masd: none
   </source>
   <dest>
@@ -3350,7 +3350,7 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Linear(%)"
+    *: "Linear (%)"
     masd: none
   </source>
   <dest>
@@ -3371,11 +3371,11 @@
     masd: none
   </source>
   <dest>
-    *: "Мин. граница диапазона"
+    *: "Нижняя граница диапазона"
     masd: none
   </dest>
   <voice>
-    *: "Мин. граница диапазона"
+    *: "Нижняя граница диапазона"
     masd: none
   </voice>
 </phrase>
@@ -3388,11 +3388,11 @@
     masd: none
   </source>
   <dest>
-    *: "Макс. граница диапазона"
+    *: "Верхняя граница диапазона"
     masd: none
   </dest>
   <voice>
-    *: "Макс. граница диапазона"
+    *: "Верхняя граница диапазона"
     masd: none
   </voice>
 </phrase>
@@ -3568,10 +3568,10 @@
     *: "Max Files in Dir Browser"
   </source>
   <dest>
-    *: "Макс. файлов в папке"
+    *: "Максимум файлов в папке"
   </dest>
   <voice>
-    *: "Макс. файлов в папке"
+    *: "Максимум файлов в папке"
   </voice>
 </phrase>
 <phrase>
@@ -3582,10 +3582,10 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Макс. размер списка песен"
+    *: "Максимальный размер списка песен"
   </dest>
   <voice>
-    *: "Макс. размер списка песен"
+    *: "Максимальный размер списка песен"
   </voice>
 </phrase>
 <phrase>
@@ -3624,10 +3624,10 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Показывать инф. ID3"
+    *: "Информация о треке"
   </dest>
   <voice>
-    *: "Показывать инф. ID3"
+    *: "Информация о треке"
   </voice>
 </phrase>
 <phrase>
@@ -8287,11 +8287,11 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "Режим сна (После откл. подсветки)"
+    lcd_sleep: "Режим сна (после отключения подсветки)"
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Режим сна (После откл. подсветки)"
+    lcd_sleep: "Режим сна (после отключения подсветки)"
   </voice>
 </phrase>
 <phrase>
@@ -8509,11 +8509,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Цвет строки выбора"
+    lcd_color: "Цвет черты выбора"
   </dest>
   <voice>
     *: none
-    lcd_color: "Цвет строки выбора"
+    lcd_color: "Цвет черты выбора"
   </voice>
 </phrase>
 <phrase>
@@ -8526,11 +8526,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Предв. обрезание"
+    swcodec: "Предварительное обрезание"
   </dest>
   <voice>
     *: none
-    swcodec: "Предв. обрезание"
+    swcodec: "Предварительное обрезание"
   </voice>
 </phrase>
 <phrase>
@@ -9137,10 +9137,10 @@
     *: "Random"
   </source>
   <dest>
-    *: "Случайный"
+    *: "Случайно"
   </dest>
   <voice>
-    *: "Случайный"
+    *: "Случайно"
   </voice>
 </phrase>
 <phrase>
@@ -10670,11 +10670,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Дрожжание"
+    swcodec: "Фасонирование"
   </dest>
   <voice>
     *: none
-    swcodec: "Дрожжание"
+    swcodec: "Фасонирование"
   </voice>
 </phrase>
 <phrase>
@@ -11129,11 +11129,11 @@
   </source>
   <dest>
     *: none
-    hold_button: "Подсветка при блоке"
+    hold_button: "Подсветка при блокировке"
   </dest>
   <voice>
     *: none
-    hold_button: "Подсветка при блоке"
+    hold_button: "Подсветка при блокировке"
   </voice>
 </phrase>
 <phrase>
