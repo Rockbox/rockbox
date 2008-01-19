@@ -44,12 +44,12 @@ public:
     bool createVoiceFile(ProgressloggerInterface* logger);
 
     // set infos
-    void setUserSettings(QSettings* setting) { userSettings = setting;}
-    void setDeviceSettings(QSettings* setting) { deviceSettings = setting;}
+    void setSettings(QSettings* uSettings,QSettings* dSettings) { userSettings = uSettings;deviceSettings = dSettings;}
     
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
     void setTargetId(int id){m_targetid = id;}
     void setLang(QString name){m_lang =name;}
+    void setWavtrimThreshold(int th){m_wavtrimThreshold = th;}
     void setProxy(QUrl proxy){m_proxy = proxy;}
     
 private slots:
@@ -75,6 +75,7 @@ private:
     QString m_path;   //path where the wav and mp3 files are stored to
     int m_targetid;  //the target id
     QString m_lang;  // the language which will be spoken
+    int m_wavtrimThreshold;
   
     ProgressloggerInterface* m_logger;
 

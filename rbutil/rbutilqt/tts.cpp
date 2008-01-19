@@ -104,7 +104,7 @@ TTSExes::TTSExes(QString name,QWidget *parent) : TTSBase(parent)
     connect(ui.browse,SIGNAL(clicked()),this,SLOT(browse()));
 }
 
-bool TTSExes::start()
+bool TTSExes::start(QString *errStr)
 {
     userSettings->beginGroup(m_name);
     m_TTSexec = userSettings->value("ttspath","").toString();
@@ -120,6 +120,7 @@ bool TTSExes::start()
     }
     else
     {
+        *errStr = tr("TTS executable not found");
         return false;
     }
 }
@@ -244,40 +245,109 @@ void TTSExes::browse()
 **********************************************************************/
 TTSSapi::TTSSapi(QWidget *parent) : TTSBase(parent)
 {
-    m_TTSTemplate = "cscript //nologo \"%exe\" /language:%lang \"%options\"";
+    m_TTSTemplate = "cscript //nologo \"%exe\" /language:%lang /voice:\"%voice\" /speed:%speed \"%options\"";
     defaultLanguage ="english";
     ui.setupUi(this);
     this->hide();
     connect(ui.reset,SIGNAL(clicked()),this,SLOT(reset()));
+    connect(ui.languagecombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateVoices(QString)));
 }
 
 
-bool TTSSapi::start()
+bool TTSSapi::start(QString *errStr)
 {    
 
     userSettings->beginGroup("sapi");
     m_TTSOpts = userSettings->value("ttsoptions","").toString();
     m_TTSLanguage =userSettings->value("ttslanguage","").toString();
+    m_TTSVoice=userSettings->value("ttsvoice","").toString();
+    m_TTSSpeed=userSettings->value("ttsspeed","").toString();
     userSettings->endGroup();
 
+    QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
     QFile::copy(":/builtin/sapi_voice.vbs",QDir::tempPath() + "/sapi_voice.vbs");
     m_TTSexec = QDir::tempPath() +"/sapi_voice.vbs";
     
     QFileInfo tts(m_TTSexec);
     if(!tts.exists())
+    {
+        *errStr = tr("Could not copy the Sapi-script");
         return false;
-        
+    }    
     // create the voice process
     QString execstring = m_TTSTemplate;
     execstring.replace("%exe",m_TTSexec);
     execstring.replace("%options",m_TTSOpts);
     execstring.replace("%lang",m_TTSLanguage);
+    execstring.replace("%voice",m_TTSVoice);
+    execstring.replace("%speed",m_TTSSpeed);
+    
+    qDebug() << "init" << execstring; 
+    voicescript = new QProcess(NULL);
+    //connect(voicescript,SIGNAL(readyReadStandardError()),this,SLOT(error()));
+    
+    voicescript->start(execstring);
+    if(!voicescript->waitForStarted())
+    {
+        *errStr = tr("Could not start the Sapi-script");
+        return false;
+    }
+    
+    if(!voicescript->waitForReadyRead(100))  
+    {
+        *errStr = voicescript->readAllStandardError();
+        if(*errStr != "")
+            return false;    
+    }
+    return true;
+}
+
+
+QStringList TTSSapi::getVoiceList(QString language)
+{
+    QStringList result;
+ 
+    QFile::copy(":/builtin/sapi_voice.vbs",QDir::tempPath() + "/sapi_voice.vbs");
+    m_TTSexec = QDir::tempPath() +"/sapi_voice.vbs";
+    
+    QFileInfo tts(m_TTSexec);
+    if(!tts.exists())
+        return result;
+        
+    // create the voice process
+    QString execstring = "cscript //nologo \"%exe\" /language:%lang /listvoices";;
+    execstring.replace("%exe",m_TTSexec);
+    execstring.replace("%lang",language);
     qDebug() << "init" << execstring; 
     voicescript = new QProcess(NULL);
     voicescript->start(execstring);
     if(!voicescript->waitForStarted())
-        return false;
-    return true;
+        return result;
+ 
+    voicescript->waitForReadyRead();
+    
+    QString dataRaw = voicescript->readAllStandardError().data();
+    result = dataRaw.split(",",QString::SkipEmptyParts);
+    result.sort();
+    result.removeFirst();
+    
+    delete voicescript;
+    QFile::setPermissions(QDir::tempPath() +"/sapi_voice.vbs",QFile::ReadOwner |QFile::WriteOwner|QFile::ExeOwner 
+                                                             |QFile::ReadUser| QFile::WriteUser| QFile::ExeUser
+                                                             |QFile::ReadGroup  |QFile::WriteGroup	|QFile::ExeGroup
+                                                             |QFile::ReadOther  |QFile::WriteOther	|QFile::ExeOther );
+    QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
+    
+    return result;
+}
+
+void TTSSapi::updateVoices(QString language)
+{
+    QStringList Voices = getVoiceList(language);  
+    ui.voicecombo->clear();
+    ui.voicecombo->addItems(Voices);    
+   
+
 }
 
 bool TTSSapi::voice(QString text,QString wavfile)
@@ -296,6 +366,11 @@ bool TTSSapi::stop()
     voicescript->write(query.toUtf8());
     voicescript->waitForFinished();
     delete voicescript;
+    QFile::setPermissions(QDir::tempPath() +"/sapi_voice.vbs",QFile::ReadOwner |QFile::WriteOwner|QFile::ExeOwner 
+                                                             |QFile::ReadUser| QFile::WriteUser| QFile::ExeUser
+                                                             |QFile::ReadGroup  |QFile::WriteGroup	|QFile::ExeGroup
+                                                             |QFile::ReadOther  |QFile::WriteOther	|QFile::ExeOther );
+    QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
     return true;
 }
 
@@ -303,7 +378,7 @@ bool TTSSapi::stop()
 void TTSSapi::reset()
 {
     ui.ttsoptions->setText("");  
-    ui.ttslanguage->setText(defaultLanguage);  
+    ui.languagecombo->setCurrentIndex(ui.languagecombo->findText(defaultLanguage));  
 }
 
 void TTSSapi::showCfg()
@@ -311,8 +386,34 @@ void TTSSapi::showCfg()
     // try to get config from settings
     userSettings->beginGroup("sapi");
     ui.ttsoptions->setText(userSettings->value("ttsoptions","").toString());  
-    ui.ttslanguage->setText(userSettings->value("ttslanguage",defaultLanguage).toString());     
+    QString selLang = userSettings->value("ttslanguage",defaultLanguage).toString();
+    QString selVoice = userSettings->value("ttsvoice","").toString();    
+    ui.speed->setValue(userSettings->value("ttsspeed",0).toInt());
     userSettings->endGroup();
+      
+     // fill in language combobox
+
+    deviceSettings->beginGroup("languages");
+    QStringList keys = deviceSettings->allKeys();
+    QStringList languages;
+    for(int i =0 ; i < keys.size();i++)
+    {
+        languages << deviceSettings->value(keys.at(i)).toString();
+    }
+    deviceSettings->endGroup();
+    
+    languages.sort();
+    ui.languagecombo->clear();
+    ui.languagecombo->addItems(languages);
+    
+    // set saved lang
+    ui.languagecombo->setCurrentIndex(ui.languagecombo->findText(selLang));
+
+    // fill in voice combobox      
+    updateVoices(selLang);
+      
+     // set saved lang
+    ui.voicecombo->setCurrentIndex(ui.voicecombo->findText(selVoice));  
       
      //show dialog
     this->exec();
@@ -326,7 +427,9 @@ void TTSSapi::accept(void)
         //save settings in user config
         userSettings->beginGroup("sapi");
         userSettings->setValue("ttsoptions",ui.ttsoptions->text());
-        userSettings->setValue("ttslanguage",ui.ttslanguage->text());
+        userSettings->setValue("ttslanguage",ui.languagecombo->currentText());
+        userSettings->setValue("ttsvoice",ui.voicecombo->currentText());
+        userSettings->setValue("ttsspeed",QString("%1").arg(ui.speed->value()));
         userSettings->endGroup();
         // sync settings
         userSettings->sync();

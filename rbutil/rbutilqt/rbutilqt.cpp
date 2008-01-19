@@ -253,8 +253,7 @@ void RbUtilQt::help()
 void RbUtilQt::configDialog()
 {
     Config *cw = new Config(this);
-    cw->setUserSettings(userSettings);
-    cw->setDevices(devices);
+    cw->setSettings(userSettings,devices);
     cw->show();
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
@@ -748,8 +747,7 @@ void RbUtilQt::createTalkFiles(void)
 {
     if(chkConfig(true)) return;
     InstallTalkWindow *installWindow = new InstallTalkWindow(this);
-    installWindow->setUserSettings(userSettings);
-    installWindow->setDeviceSettings(devices);
+    installWindow->setSettings(userSettings,devices);
     installWindow->show();
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
@@ -760,8 +758,7 @@ void RbUtilQt::createVoiceFile(void)
 {
     if(chkConfig(true)) return;
     CreateVoiceWindow *installWindow = new CreateVoiceWindow(this);
-    installWindow->setUserSettings(userSettings);
-    installWindow->setDeviceSettings(devices);
+    installWindow->setSettings(userSettings,devices);
     installWindow->setProxy(proxy());
     
     installWindow->show();

@@ -150,10 +150,17 @@ void Config::abort()
     this->close();
 }
 
-
-void Config::setUserSettings(QSettings *user)
+void Config::setSettings(QSettings* user,QSettings* device)
 {
     userSettings = user;
+    devices = device;
+    
+    setUserSettings();
+    setDevices();
+}
+
+void Config::setUserSettings()
+{
     // set proxy
     proxy = userSettings->value("proxy").toString();
 
@@ -214,9 +221,9 @@ void Config::updateCacheInfo(QString path)
 }
 
 
-void Config::setDevices(QSettings *dev)
+void Config::setDevices()
 {
-    devices = dev;
+    
     // setup devices table
     qDebug() << "Config::setDevices()";
     devices->beginGroup("platforms");
@@ -320,7 +327,7 @@ void Config::updateTtsState(int index)
 {
     QString ttsName = ui.comboTts->itemText(index);
     TTSBase* tts = getTTS(ttsName);
-    tts->setUserCfg(userSettings);
+    tts->setCfg(userSettings,devices);
     
     if(tts->configOk())
     {
@@ -624,7 +631,7 @@ void Config::configTts()
 {
     TTSBase* tts =getTTS(ui.comboTts->currentText());
     
-    tts->setUserCfg(userSettings);
+    tts->setCfg(userSettings,devices);
     tts->showCfg();
     updateTtsState(ui.comboTts->currentIndex());
 }

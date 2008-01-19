@@ -33,8 +33,7 @@ class CreateVoiceWindow : public QDialog
     Q_OBJECT
     public:
         CreateVoiceWindow(QWidget *parent = 0);
-        void setUserSettings(QSettings*);
-        void setDeviceSettings(QSettings*);
+        void setSettings(QSettings* user,QSettings* device);
         void setProxy(QUrl proxy){m_proxy = proxy;}
         
     signals:

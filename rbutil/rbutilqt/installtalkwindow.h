@@ -33,8 +33,7 @@ class InstallTalkWindow : public QDialog
     Q_OBJECT
     public:
         InstallTalkWindow(QWidget *parent = 0);
-        void setUserSettings(QSettings*);
-        void setDeviceSettings(QSettings*);
+        void setSettings(QSettings* user,QSettings* device);
 
     signals:
         void settingsUpdated(void);

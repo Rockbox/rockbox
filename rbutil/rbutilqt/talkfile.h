@@ -36,7 +36,7 @@ public:
 
     bool createTalkFiles(ProgressloggerInterface* logger);
 
-    void setUserSettings(QSettings* setting) { userSettings = setting;}
+    void setSettings(QSettings* uSettings,QSettings* dSettings) { userSettings = uSettings; deviceSettings = dSettings;}
     
     void setDir(QDir dir){m_dir = dir; }
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
@@ -56,6 +56,7 @@ private:
     TTSBase* m_tts;
     EncBase* m_enc;
     QSettings *userSettings;
+    QSettings *deviceSettings;
    
     QDir   m_dir;
     QString m_mountpoint;

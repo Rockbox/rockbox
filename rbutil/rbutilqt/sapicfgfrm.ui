@@ -18,41 +18,68 @@
      <property name="title" >
       <string>Configure TTS Engine</string>
      </property>
-     <layout class="QVBoxLayout" >
-      <item>
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
-         <string>TTS options</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="ttsoptions" />
-      </item>
-      <item>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>Language</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLineEdit" name="ttslanguage" />
+      <item row="0" column="1" >
+       <widget class="QComboBox" name="languagecombo" />
       </item>
-      <item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Voice</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QComboBox" name="voicecombo" />
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Speed</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QSpinBox" name="speed" >
+        <property name="minimum" >
+         <number>-10</number>
+        </property>
+        <property name="maximum" >
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>TTS options</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="QLineEdit" name="ttsoptions" />
+      </item>
+      <item row="4" column="0" colspan="2" >
        <spacer>
         <property name="orientation" >
          <enum>Qt::Vertical</enum>
         </property>
         <property name="sizeHint" >
          <size>
-          <width>20</width>
-          <height>40</height>
+          <width>473</width>
+          <height>21</height>
          </size>
         </property>
        </spacer>
       </item>
-      <item>
+      <item row="5" column="0" colspan="2" >
        <layout class="QHBoxLayout" >
         <item>
          <widget class="QPushButton" name="reset" >

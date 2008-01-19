@@ -42,12 +42,12 @@ class TTSBase : public QDialog
 public:
     TTSBase(QWidget *parent );
     virtual bool voice(QString text,QString wavfile) {return false;}
-    virtual bool start(){return false;}
+    virtual bool start(QString *errStr){return false;}
     virtual bool stop(){return false;}
     virtual void showCfg(){}
     virtual bool configOk(){return false;}
     
-    void setUserCfg(QSettings *uSettings){userSettings = uSettings;}
+    void setCfg(QSettings *uSettings, QSettings *dSettings){userSettings = uSettings;deviceSettings = dSettings;}
      
 public slots:
     virtual void accept(void){}
@@ -56,6 +56,8 @@ public slots:
 
 protected:
     QSettings *userSettings;
+    QSettings *deviceSettings;     
+    
 };
 
 class TTSSapi : public TTSBase
@@ -64,7 +66,7 @@ class TTSSapi : public TTSBase
 public:
     TTSSapi(QWidget *parent = NULL);
     virtual bool voice(QString text,QString wavfile);
-    virtual bool start();
+    virtual bool start(QString *errStr);
     virtual bool stop();
     virtual void showCfg();
     virtual bool configOk();
@@ -74,7 +76,10 @@ public slots:
     virtual void reject(void);
     virtual void reset(void);
      
+    void updateVoices(QString language); 
 private:
+    QStringList getVoiceList(QString language);
+
     Ui::SapiCfgFrm ui;
     QProcess* voicescript;
     
@@ -84,6 +89,9 @@ private:
     QString m_TTSOpts;
     QString m_TTSTemplate;
     QString m_TTSLanguage;
+    QString m_TTSVoice;
+    QString m_TTSSpeed;
+    
 };
 
 class TTSExes : public TTSBase
@@ -92,7 +100,7 @@ class TTSExes : public TTSBase
 public:
     TTSExes(QString name,QWidget *parent = NULL);
     virtual bool voice(QString text,QString wavfile);
-    virtual bool start();
+    virtual bool start(QString *errStr);
     virtual bool stop() {return true;}
     virtual void showCfg();
     virtual bool configOk();

@@ -34,8 +34,7 @@ CreateVoiceWindow::CreateVoiceWindow(QWidget *parent) : QDialog(parent)
 void CreateVoiceWindow::change()
 {
     Config *cw = new Config(this,4);
-    cw->setUserSettings(userSettings);
-    cw->setDevices(devices);
+    cw->setSettings(userSettings,devices);
     cw->show();
     connect(cw, SIGNAL(settingsUpdated()), this, SIGNAL(settingsUpdated()));
 }
@@ -47,19 +46,21 @@ void CreateVoiceWindow::accept()
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
     
     QString platform = userSettings->value("platform").toString();
-    QString lang = ui.comboLanguage->currentText();    
+    QString lang = ui.comboLanguage->currentText();   
+    int wvThreshold = ui.wavtrimthreshold->value();
     
     //safe selected language
     userSettings->setValue("voicelanguage",lang);
+    userSettings->setValue("wavtrimthreshold",wvThreshold);
     userSettings->sync();
     
     //configure voicecreator
-    voicecreator->setUserSettings(userSettings);
-    voicecreator->setDeviceSettings(devices);
+    voicecreator->setSettings(userSettings,devices);
     voicecreator->setMountPoint(userSettings->value("mountpoint").toString());
     voicecreator->setTargetId(devices->value(platform + "/targetid").toInt());
     voicecreator->setLang(lang);
     voicecreator->setProxy(m_proxy);
+    voicecreator->setWavtrimThreshold(wvThreshold);
        
     //start creating
     voicecreator->createVoiceFile(logger);
@@ -67,9 +68,10 @@ void CreateVoiceWindow::accept()
 
 
 
-void CreateVoiceWindow::setDeviceSettings(QSettings *dev)
+void CreateVoiceWindow::setSettings(QSettings *user,QSettings *dev)
 {
     devices = dev;
+     userSettings = user;
     qDebug() << "Install::setDeviceSettings:" << devices;
 
     // fill in language combobox
@@ -86,15 +88,10 @@ void CreateVoiceWindow::setDeviceSettings(QSettings *dev)
     ui.comboLanguage->addItems(languages);
     // set saved lang
     ui.comboLanguage->setCurrentIndex(ui.comboLanguage->findText(userSettings->value("voicelanguage").toString()));
-}
-
-void CreateVoiceWindow::setUserSettings(QSettings *user)
-{
-    userSettings = user;
     
     QString ttsName = userSettings->value("tts", "none").toString();
     TTSBase* tts = getTTS(ttsName);
-    tts->setUserCfg(userSettings);
+    tts->setCfg(userSettings,devices);
     if(tts->configOk())
         ui.labelTtsProfile->setText(tr("Selected TTS engine : <b>%1</b>").arg(ttsName));
     else
@@ -107,8 +104,12 @@ void CreateVoiceWindow::setUserSettings(QSettings *user)
         ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg(encoder));
     else
         ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
-    
+        
+    ui.wavtrimthreshold->setValue(userSettings->value("wavtrimthreshold", 500).toInt());    
+        
 }
+
+
 
 
 

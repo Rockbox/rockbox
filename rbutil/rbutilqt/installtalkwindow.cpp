@@ -66,8 +66,7 @@ void InstallTalkWindow::setTalkFolder(QString folder)
 void InstallTalkWindow::change()
 {
     Config *cw = new Config(this,4);
-    cw->setUserSettings(userSettings);
-    cw->setDevices(devices);
+    cw->setSettings(userSettings,devices);
     cw->show();
     connect(cw, SIGNAL(settingsUpdated()), this, SIGNAL(settingsUpdated()));
 }
@@ -91,7 +90,7 @@ void InstallTalkWindow::accept()
 
     userSettings->sync();
 
-    talkcreator->setUserSettings(userSettings);
+    talkcreator->setSettings(userSettings,devices);
     talkcreator->setDir(QDir(folderToTalk));
     talkcreator->setMountPoint(userSettings->value("mountpoint").toString());
     
@@ -107,14 +106,15 @@ void InstallTalkWindow::accept()
 }
 
 
-void InstallTalkWindow::setDeviceSettings(QSettings *dev)
+void InstallTalkWindow::setSettings(QSettings *user,QSettings *dev)
 {
     devices = dev;
+    userSettings = user;
     qDebug() << "Install::setDeviceSettings:" << devices;
 
     QString ttsName = userSettings->value("tts", "none").toString();
     TTSBase* tts = getTTS(ttsName);
-    tts->setUserCfg(userSettings);
+    tts->setCfg(userSettings,devices);
     if(tts->configOk())
         ui.labelTtsProfile->setText(tr("Selected TTS engine : <b>%1</b>").arg(ttsName));
     else
@@ -127,12 +127,8 @@ void InstallTalkWindow::setDeviceSettings(QSettings *dev)
         ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg(encoder));
     else
         ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
-}
-
-void InstallTalkWindow::setUserSettings(QSettings *user)
-{
-    userSettings = user;
-
+        
     setTalkFolder(userSettings->value("last_talked_folder").toString());
 
 }
+

@@ -28,15 +28,17 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 {
     m_abort = false;
     m_logger = logger;
-    m_logger->addItem("Starting Talk file generation",LOGINFO);
+    m_logger->addItem(tr("Starting Talk file generation"),LOGINFO);
     
     //tts
     m_tts = getTTS(userSettings->value("tts").toString());  
-    m_tts->setUserCfg(userSettings);
+    m_tts->setCfg(userSettings,deviceSettings);
     
-    if(!m_tts->start())
+    QString errStr;
+    if(!m_tts->start(&errStr))
     {
-        m_logger->addItem("Init of TTS engine failed",LOGERROR);
+        m_logger->addItem(errStr,LOGERROR);
+        m_logger->addItem(tr("Init of TTS engine failed"),LOGERROR);
         m_logger->abort();
         return false;
     }
@@ -47,7 +49,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
   
     if(!m_enc->start())
     {
-        m_logger->addItem("Init of Encoder engine failed",LOGERROR);
+        m_logger->addItem(tr("Init of Encoder engine failed"),LOGERROR);
         m_logger->abort();
         m_tts->stop();
         return false;
@@ -65,7 +67,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     {
         if(m_abort)
         {
-            m_logger->addItem("Talk file creation aborted",LOGERROR);
+            m_logger->addItem(tr("Talk file creation aborted"),LOGERROR);
             m_logger->abort();
             m_tts->stop();
             return false;
@@ -127,10 +129,10 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         {
             if(!wavfilenameInf.exists() || m_overwriteWav)
             {
-                m_logger->addItem("Voicing of " + toSpeak,LOGINFO);
+                m_logger->addItem(tr("Voicing of %1").arg(toSpeak),LOGINFO);
                 if(!m_tts->voice(toSpeak,wavfilename))
                 {
-                    m_logger->addItem("Voicing of " + toSpeak + " failed",LOGERROR);
+                    m_logger->addItem(tr("Voicing of %s failed").arg(toSpeak),LOGERROR);
                     m_logger->abort();
                     m_tts->stop();
                     m_enc->stop();
@@ -138,10 +140,10 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
                 }
                 QApplication::processEvents();
             }
-            m_logger->addItem("Encoding of " + toSpeak,LOGINFO);
+            m_logger->addItem(tr("Encoding of %1").arg(toSpeak),LOGINFO);
             if(!m_enc->encode(wavfilename,filename))
             {
-                m_logger->addItem("Encoding of " + wavfilename + " failed",LOGERROR);
+                m_logger->addItem(tr("Encoding of %1 failed").arg(wavfilename),LOGERROR);
                 m_logger->abort();
                 m_tts->stop();
                 m_enc->stop();
@@ -168,7 +170,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 
     installlog.endGroup();
     m_tts->stop();
-    m_logger->addItem("Finished creating Talk files",LOGOK);
+    m_logger->addItem(tr("Finished creating Talk files"),LOGOK);
     m_logger->setProgressMax(1);
     m_logger->setProgressValue(1);
     m_logger->abort();

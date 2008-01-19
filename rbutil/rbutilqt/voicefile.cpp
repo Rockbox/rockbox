@@ -26,7 +26,7 @@
 
 VoiceFileCreator::VoiceFileCreator(QObject* parent) :QObject(parent)
 {
-
+    m_wavtrimThreshold=500;
 }
 
 void VoiceFileCreator::abort()
@@ -147,10 +147,12 @@ void VoiceFileCreator::downloadDone(bool error)
 
     //tts
     m_tts = getTTS(userSettings->value("tts").toString());  
-    m_tts->setUserCfg(userSettings);
+    m_tts->setCfg(userSettings,deviceSettings);
     
-    if(!m_tts->start())
+    QString errStr;
+    if(!m_tts->start(&errStr))
     {
+        m_logger->addItem(errStr,LOGERROR);
         m_logger->addItem(tr("Init of TTS engine failed"),LOGERROR);
         m_logger->abort();
         return;
@@ -249,7 +251,7 @@ void VoiceFileCreator::downloadDone(bool error)
         // todo strip
         char buffer[255];
         
-        wavtrim((char*)qPrintable(wavname),500,buffer,255);
+        wavtrim((char*)qPrintable(wavname),m_wavtrimThreshold,buffer,255);
         
         // encode wav 
         m_enc->encode(wavname,encodedname);

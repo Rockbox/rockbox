@@ -29,9 +29,8 @@ class Config : public QDialog
     Q_OBJECT
     public:
         Config(QWidget *parent = 0,int index=0);
-        void setUserSettings(QSettings*);
-        void setDevices(QSettings*);
-
+        void setSettings(QSettings* user,QSettings* device);
+        
     signals:
         void settingsUpdated(void);
 
@@ -40,6 +39,9 @@ class Config : public QDialog
         void abort(void);
 
     private:
+        void setUserSettings();
+        void setDevices();
+    
         Ui::ConfigForm ui;
         QSettings *userSettings;
         QSettings *devices;
