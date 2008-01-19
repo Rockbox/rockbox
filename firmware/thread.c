@@ -144,9 +144,11 @@ static void core_schedule_wakeup(struct thread_entry *thread)
 static inline void core_perform_wakeup(IF_COP_VOID(unsigned int core))
         __attribute__((always_inline));
 
+#if NUM_CORES > 1
 static inline void run_blocking_ops(
-    IF_COP_VOID(unsigned int core, struct thread_entry *thread))
+    unsigned int core, struct thread_entry *thread)
         __attribute__((always_inline));
+#endif
 
 static void thread_stkov(struct thread_entry *thread)
         __attribute__((noinline));
@@ -1361,7 +1363,7 @@ static void check_tmo_threads(void)
  */
 #if NUM_CORES > 1
 static inline void run_blocking_ops(
-    IF_COP_VOID(unsigned int core, struct thread_entry *thread))
+    unsigned int core, struct thread_entry *thread)
 {
     struct thread_blk_ops *ops = &cores[IF_COP_CORE(core)].blk_ops;
     const unsigned flags = ops->flags;
@@ -1600,7 +1602,7 @@ void switch_thread(struct thread_entry *old)
 
 #if NUM_CORES > 1
     /* Run any blocking operations requested before switching/sleeping */
-    run_blocking_ops(IF_COP(core, old));
+    run_blocking_ops(core, old);
 #endif
 
     /* Go through the list of sleeping task to check if we need to wake up
