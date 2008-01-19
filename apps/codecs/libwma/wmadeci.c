@@ -858,7 +858,7 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
     {
         last_exp = get_bits(&s->gb, 5) + 10;
         /* XXX: use a table */
-        v = pow_10_to_yover16[last_exp];
+        v = pow_10_to_yover16_ptr[last_exp];
         max_scale = v;
         n = *ptr++;
         do
