@@ -1,0 +1,11473 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+# $Id$
+#
+<phrase>
+  id: LANG_SET_BOOL_YES
+  desc: bool true representation
+  user:
+  <source>
+    *: "Yes"
+  </source>
+  <dest>
+    *: "हां"
+  </dest>
+  <voice>
+    *: "हां"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_BOOL_NO
+  desc: bool false representation
+  user:
+  <source>
+    *: "No"
+  </source>
+  <dest>
+    *: "नहीं"
+  </dest>
+  <voice>
+    *: "नहीं"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ON
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "On"
+  </source>
+  <dest>
+    *: "चालू करो"
+  </dest>
+  <voice>
+    *: "चालू करो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OFF
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "Off"
+  </source>
+  <dest>
+    *: "बंद"
+  </dest>
+  <voice>
+    *: "बंद"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASK
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Ask"
+  </source>
+  <dest>
+    *: "पूछना"
+  </dest>
+  <voice>
+    *: "पूछना"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS
+  desc: used in various places
+  user:
+  <source>
+    *: "Always"
+  </source>
+  <dest>
+    *: "हमेशा"
+  </dest>
+  <voice>
+    *: "हमेशा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NORMAL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "साधा"
+  </dest>
+  <voice>
+    *: "साधा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN
+  desc: Generic string for gain used in EQ menu and recording screen
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Gain"
+  </dest>
+  <voice>
+    *: "Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT
+  desc: general please wait splash
+  user:
+  <source>
+    *: "Loading..."
+  </source>
+  <dest>
+    *: "लोड होरा है..."
+  </dest>
+  <voice>
+    *: "लोड होरा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user:
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "लोड होरा है... %d%% ख़त्म (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCANNING_DISK
+  desc: when booting up and rebuilding the cache and calculating free space
+  user:
+  <source>
+    *: "Scanning disk..."
+  </source>
+  <dest>
+    *: "डिसक सकान होरी है"
+  </dest>
+  <voice>
+    *: "डिसक सकान होरी है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUTTINGDOWN
+  desc: in main menu
+  user:
+  <source>
+    *: "Shutting down..."
+  </source>
+  <dest>
+    *: "बंद होरा है..."
+  </dest>
+  <voice>
+    *: "बंद होरा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SHUFFLE
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL
+  desc: Visual confirmation of canceling a changed setting
+  user:
+  <source>
+    *: "Cancelled"
+  </source>
+  <dest>
+    *: "कटगया"
+  </dest>
+  <voice>
+    *: "कटगया"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAILED
+  desc: Something failed. To be appended after actions
+  user:
+  <source>
+    *: "Failed"
+  </source>
+  <dest>
+    *: "नहीं चला"
+  </dest>
+  <voice>
+    *: "नहीं चला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNELS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "Channels"
+  </dest>
+  <voice>
+    *: "Channels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_ASK
+  desc: confirm to reset settings
+  user:
+  <source>
+    *: "Are You Sure?"
+  </source>
+  <dest>
+    *: "पकका?"
+  </dest>
+  <voice>
+    *: "पकका?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONFIRM_WITH_BUTTON
+  desc: Generic string to use to confirm
+  user:
+  <source>
+    *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    player: "(PLAY/STOP)"
+  </source>
+  <dest>
+    *: "बजाना = हां"
+    h100,h120,h300: "NAVI = हां"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "चुन = हां"
+    player: "(बजाना/रोक)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_WITH_ANY
+  desc: Generic string to use to cancel
+  user:
+  <source>
+    *: "Any Other = No"
+    player: none
+  </source>
+  <dest>
+    *: "दूसरों = नहीं"
+    player: none
+  </dest>
+  <voice>
+    *: ""
+    player: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: main menu title
+  user:
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "रोकबोकस"
+  </dest>
+  <voice>
+    *: "रोकबोकस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Recent Bookmarks"
+  </source>
+  <dest>
+    *: "अभी क बूकमारक"
+  </dest>
+  <voice>
+    *: "अभी क बूकमारक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: main menu title
+  user:
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "फऍल"
+  </dest>
+  <voice>
+    *: "फऍल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE
+  desc: in the main menu and the settings menu
+  user:
+  <source>
+    *: "Database"
+  </source>
+  <dest>
+    *: "डाटाबेस"
+  </dest>
+  <voice>
+    *: "डाटाबेस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in the main menu
+  user:
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "अभी चलना"
+  </dest>
+  <voice>
+    *: "अभी चलना"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in the main menu
+  user:
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "शुरू चलना"
+  </dest>
+  <voice>
+    *: "शुरू चलना"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS
+  desc:  in main menu and visual confirmation after settings reset
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "सेटिनगस"
+  </dest>
+  <voice>
+    *: "सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING
+  desc: in the main menu
+  user:
+  <source>
+    *: none
+    recording: "Recording"
+  </source>
+  <dest>
+    *: none
+    recording: "रिकोरडिनग"
+  </dest>
+  <voice>
+    *: none
+    recording: "रिकोरडिनग"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RADIO
+  desc: in the main menu
+  user:
+  <source>
+    *: none
+    radio: "FM Radio"
+  </source>
+  <dest>
+    *: none
+    radio: "FM रेडिओ"
+  </dest>
+  <voice>
+    *: none
+    radio: "FM रेडिओ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTS
+  desc: in the main menu and  file vew setting
+  user:
+  <source>
+    *: "Playlists"
+  </source>
+  <dest>
+    *: "पलेलिसट"
+  </dest>
+  <voice>
+    *: "पलेलिसट"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGINS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Plugins"
+  </source>
+  <dest>
+    *: "पलगिन"
+  </dest>
+  <voice>
+    *: "पलगिन"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSTEM
+  desc: in the main menu and settings menu
+  user:
+  <source>
+    *: "System"
+  </source>
+  <dest>
+    *: "सिसटम"
+  </dest>
+  <voice>
+    *: "सिसटम"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK
+  desc: bookmark selection list title
+  user:
+  <source>
+    *: "Select Bookmark"
+  </source>
+  <dest>
+    *: "बूकमारक चुनो"
+  </dest>
+  <voice>
+    *: "बूकमारक चुनो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_DONT_RESUME
+  desc: top item in the list when asking user about bookmark auto load
+  user:
+  <source>
+    *: "<Don't Resume>"
+  </source>
+  <dest>
+    *: "<शुरू मत कर>"
+  </dest>
+  <voice>
+    *: "शुरू मत कर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SHUFFLE
+  desc: bookmark selection list, bookmark enables shuffle
+  user:
+  <source>
+    *: ", Shuffle"
+  </source>
+  <dest>
+    *: ", मिला"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_INVALID
+  desc: bookmark selection list, bookmark couldn't be parsed
+  user:
+  <source>
+    *: "<Invalid Bookmark>"
+  </source>
+  <dest>
+    *: "<गलत बूकमारक>"
+  </dest>
+  <voice>
+    *: "गलत बूकमारक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_MENU
+  desc: bookmark selection list context menu
+  user:
+  <source>
+    *: "Bookmark Actions"
+  </source>
+  <dest>
+    *: "बूकमारक क्या करेगा"
+  </dest>
+  <voice>
+    *: "बूकमारक क्या करेगा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_RESUME
+  desc: bookmark context menu, resume this bookmark
+  user:
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "शुरू"
+  </dest>
+  <voice>
+    *: "शुरू"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_DELETE
+  desc: bookmark context menu, delete this bookmark
+  user:
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "मिटा"
+  </dest>
+  <voice>
+    *: "मिटा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_BOOKMARK_QUERY
+  desc: prompt for user to decide to create an bookmark
+  user:
+  <source>
+    *: "Create a Bookmark?"
+  </source>
+  <dest>
+    *: "बूकमारक बनाना है?"
+  </dest>
+  <voice>
+    *: "बूकमारक बनाना है?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CREATE_SUCCESS
+  desc: Indicates bookmark was successfully created
+  user:
+  <source>
+    *: "Bookmark Created"
+  </source>
+  <dest>
+    *: "बूकमारक बन गया"
+  </dest>
+  <voice>
+    *: "बूकमारक बन गया"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CREATE_FAILURE
+  desc: Indicates bookmark was not created
+  user:
+  <source>
+    *: "Bookmark Failed!"
+  </source>
+  <dest>
+    *: "बूकमारक चला नहीं!"
+  </dest>
+  <voice>
+    *: "बूकमारक चला नहीं!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_LOAD_EMPTY
+  desc: Indicates bookmark was empty
+  user:
+  <source>
+    *: "Bookmark Empty"
+  </source>
+  <dest>
+    *: "बूकमारक ख़ाली है"
+  </dest>
+  <voice>
+    *: "बूकमारक ख़ाली है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOUND_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Sound Settings"
+  </source>
+  <dest>
+    *: "आवाज के सेटिनगस"
+  </dest>
+  <voice>
+    *: "आवाज के सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Volume"
+  </source>
+  <dest>
+    *: "Volume"
+  </dest>
+  <voice>
+    *: "Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Bass"
+  </source>
+  <dest>
+    *: "Bass"
+  </dest>
+  <voice>
+    *: "Bass"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Treble"
+  </source>
+  <dest>
+    *: "Treble"
+  </dest>
+  <voice>
+    *: "Treble"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BALANCE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Balance"
+  </source>
+  <dest>
+    *: "Balance"
+  </dest>
+  <voice>
+    *: "Balance"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_CONFIGURATION
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channel Configuration"
+  </source>
+  <dest>
+    *: "Channel Configuration"
+  </dest>
+  <voice>
+    *: "Channel Configuration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_STEREO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Stereo"
+  </source>
+  <dest>
+    *: "Stereo"
+  </dest>
+  <voice>
+    *: "Stereo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_MONO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono"
+  </source>
+  <dest>
+    *: "Mono"
+  </dest>
+  <voice>
+    *: "Mono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_CUSTOM
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Custom"
+  </dest>
+  <voice>
+    *: "Custom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFT
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono Left"
+  </source>
+  <dest>
+    *: "Mono Left"
+  </dest>
+  <voice>
+    *: "Mono Left"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_RIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono Right"
+  </source>
+  <dest>
+    *: "Mono Right"
+  </dest>
+  <voice>
+    *: "Mono Right"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_KARAOKE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Karaoke"
+  </source>
+  <dest>
+    *: "Karaoke"
+  </dest>
+  <voice>
+    *: "Karaoke"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STEREO_WIDTH
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Stereo Width"
+  </source>
+  <dest>
+    *: "Stereo Width"
+  </dest>
+  <voice>
+    *: "Stereo Width"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED
+  desc: in sound settings
+  user:
+  <source>
+    *: none
+    swcodec: "Crossfeed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Crossfeed"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Crossfeed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: none
+    swcodec: "Direct Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Direct Gain"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Direct gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>
+    *: none
+    swcodec: "Cross Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Cross Gain"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Cross gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: none
+    swcodec: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: none
+    swcodec: "High-Frequency Attenuation"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "High-frequency attenuation"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: none
+    swcodec: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: none
+    swcodec: "High-Frequency Cutoff"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "High-frequency cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Equalizer"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Equalizer"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Enable EQ"
+  </source>
+  <dest>
+    *: none
+    swcodec: "EQ चालू कर"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Equalizer चालू कर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GRAPHICAL
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Graphical EQ"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Graphical EQ"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Graphical equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user:
+  <source>
+    *: none
+    swcodec: "Precut"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Precut"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Pre-cut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Simple EQ Settings"
+  </source>
+  <dest>
+    *: none
+    swcodec: "सिमपल EQ सेटिनगस"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "सिमपल equalizer सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ADVANCED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Advanced EQ Settings"
+  </source>
+  <dest>
+    *: none
+    swcodec: "अडवानसड EQ सेटिनगस"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "अडवानसड equalizer सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_SAVE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Save EQ Preset"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Save EQ Preset"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Save equalizer preset"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BROWSE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Browse EQ Presets"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Browse EQ Presets"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Browse equalizer presets"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Edit mode: %s"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Edit mode: %s"
+  </dest>
+  <voice>
+    *: none
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN_ITEM
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "%d Hz Band Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "%d Hz Band Gain"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "hertz band gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_LOW_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Low Shelf Filter"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Low Shelf Filter"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Low shelf filter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_PEAK
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Peak Filter %d"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Peak Filter %d"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Peak filter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_HIGH_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "High Shelf Filter"
+  </source>
+  <dest>
+    *: none
+    swcodec: "High Shelf Filter"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "High shelf filter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Cutoff Frequency"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Cutoff Frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CENTER
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Center Frequency"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Center Frequency"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Center frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: deprecated
+  user:
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: deprecated
+  user:
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: deprecated
+  user:
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: deprecated
+  user:
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: deprecated
+  user:
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Dithering"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Dithering"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOUDNESS
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    masf: "Loudness"
+  </source>
+  <dest>
+    *: none
+    masf: "Loudness"
+  </dest>
+  <voice>
+    *: none
+    masf: "Loudness"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOVOL
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    masf: "Auto Volume"
+  </source>
+  <dest>
+    *: none
+    masf: "Auto Volume"
+  </dest>
+  <voice>
+    *: none
+    masf: "Auto Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DECAY
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    masf: "AV Decay Time"
+  </source>
+  <dest>
+    *: none
+    masf: "AV Decay Time"
+  </dest>
+  <voice>
+    *: none
+    masf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SUPERBASS
+  desc: in sound settings
+  user:
+  <source>
+    *: none
+    masf: "Super Bass"
+  </source>
+  <dest>
+    *: none
+    masf: "जोरदार Bass"
+  </dest>
+  <voice>
+    *: none
+    masf: "जोरदार Bass"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_ENABLE
+  desc: in sound settings
+  user:
+  <source>
+    *: none
+    masf: "MDB Enable"
+  </source>
+  <dest>
+    *: none
+    masf: "MDB Enable"
+  </dest>
+  <voice>
+    *: none
+    masf: "MDB Enable"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_STRENGTH
+  desc: in sound settings
+  user:
+  <source>
+    *: none
+    masf: "MDB Strength"
+  </source>
+  <dest>
+    *: none
+    masf: "MDB Strength"
+  </dest>
+  <voice>
+    *: none
+    masf: "MDB Strength"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_HARMONICS
+  desc: in sound settings
+  user:
+  <source>
+    *: none
+    masf: "MDB Harmonics"
+  </source>
+  <dest>
+    *: none
+    masf: "MDB Harmonics"
+  </dest>
+  <voice>
+    *: none
+    masf: "MDB Harmonics"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_CENTER
+  desc: in sound settings
+  user:
+  <source>
+    *: none
+    masf: "MDB Center Frequency"
+  </source>
+  <dest>
+    *: none
+    masf: "MDB Center Frequency"
+  </dest>
+  <voice>
+    *: none
+    masf: "MDB Center Frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_SHAPE
+  desc: in sound settings
+  user:
+  <source>
+    *: none
+    masf: "MDB Shape"
+  </source>
+  <dest>
+    *: none
+    masf: "MDB Shape"
+  </dest>
+  <voice>
+    *: none
+    masf: "MDB Shape"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERAL_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "General Settings"
+  </source>
+  <dest>
+    *: "जनरल सेटिनगस"
+  </dest>
+  <voice>
+    *: "जनरल सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Playback"
+  </source>
+  <dest>
+    *: "पलेबाक"
+  </dest>
+  <voice>
+    *: "पलेबाक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle"
+  </source>
+  <dest>
+    *: "मिला"
+  </dest>
+  <voice>
+    *: "मिला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Repeat"
+  </source>
+  <dest>
+    *: "फिर"
+  </dest>
+  <voice>
+    *: "फिर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALL
+  desc: generic string used both in dir file filter and repeat mode selection
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "सब"
+  </dest>
+  <voice>
+    *: "सब"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_ONE
+  desc: repeat one song
+  user:
+  <source>
+    *: "One"
+  </source>
+  <dest>
+    *: "एक"
+  </dest>
+  <voice>
+    *: "एक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_AB
+  desc: repeat range from point A to B
+  user:
+  <source>
+    *: "A-B"
+  </source>
+  <dest>
+    *: "A-B"
+  </dest>
+  <voice>
+    *: "A-B"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SELECTED
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Play Selected First"
+  </source>
+  <dest>
+    *: "चुना वाला पहले चलाना"
+  </dest>
+  <voice>
+    *: "चुना वाला पहले चलाना"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WIND_MENU
+  desc: in the playback sub menu
+  user:
+  <source>
+    *: "Fast-Forward/Rewind"
+  </source>
+  <dest>
+    *: "आगे/पीछ"
+  </dest>
+  <voice>
+    *: "आगे और पीछ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FFRW_STEP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "FF/RW Min Step"
+  </source>
+  <dest>
+    *: "आगे/पीछ Min Step"
+  </dest>
+  <voice>
+    *: "Minimum Step"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FFRW_ACCEL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "FF/RW Accel"
+  </source>
+  <dest>
+    *: "आगे/पीछ Accel"
+  </dest>
+  <voice>
+    *: "Acceleration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MP3BUFFER_MARGIN
+  desc: MP3 buffer margin time
+  user:
+  <source>
+    *: "Anti-Skip Buffer"
+    flash_storage: none
+  </source>
+  <dest>
+    *: "Anti-Skip Buffer"
+    flash_storage: none
+  </dest>
+  <voice>
+    *: "Anti-Skip Buffer"
+    flash_storage: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FADE_ON_STOP
+  desc: options menu to set fade on stop or pause
+  user:
+  <source>
+    *: "Fade on Stop/Pause"
+  </source>
+  <dest>
+    *: "Fade on Stop/Pause"
+  </dest>
+  <voice>
+    *: "Fade On Stop and Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARTY_MODE
+  desc: party mode
+  user:
+  <source>
+    *: "Party Mode"
+  </source>
+  <dest>
+    *: "Party Mode"
+  </dest>
+  <voice>
+    *: "Party Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE
+  desc: in playback settings
+  user:
+  <source>
+    *: none
+    swcodec: "Crossfade"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Crossfade"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Crossfade"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_ENABLE
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Enable Crossfade"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Crossfade चालू करो"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Crossfade चालू करो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKSKIP
+  desc: in crossfade settings
+  user:
+  <source>
+    *: none
+    swcodec: "Track Skip Only"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Track Skip Only"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Track Skip Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    swcodec: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Shuffle and Track Skip"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Shuffle and Track Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Fade-In Delay"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Fade-In Delay"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Fade-In Delay"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DURATION
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Fade-In Duration"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Fade-In Duration"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Fade-In Duration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Fade-Out Delay"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Fade-Out Delay"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Fade-Out Delay"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DURATION
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Fade-Out Duration"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Fade-Out Duration"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Fade-Out Duration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_MODE
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Fade-Out Mode"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Fade-Out Mode"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Fade-Out Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIX
+  desc: in playback settings, crossfade option
+  user:
+  <source>
+    *: none
+    swcodec: "Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "मिला"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "मिला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN
+  desc: in replaygain
+  user:
+  <source>
+    *: "Replaygain"
+  </source>
+  <dest>
+    *: "Replaygain"
+  </dest>
+  <voice>
+    *: "Replaygain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_ENABLE
+  desc: in replaygain
+  user:
+  <source>
+    *: "Enable Replaygain"
+  </source>
+  <dest>
+    *: "Replaygain चालू करो"
+  </dest>
+  <voice>
+    *: "Replaygain चालू करो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_NOCLIP
+  desc: in replaygain
+  user:
+  <source>
+    *: none
+    swcodec: "Prevent Clipping"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Clipping कम करो"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Clipping कम करो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_MODE
+  desc: in replaygain
+  user:
+  <source>
+    *: "Replaygain Type"
+  </source>
+  <dest>
+    *: "Replaygain Type"
+  </dest>
+  <voice>
+    *: "Replaygain Type"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_GAIN
+  desc: in replaygain
+  user:
+  <source>
+    *: "Album Gain"
+  </source>
+  <dest>
+    *: "Album Gain"
+  </dest>
+  <voice>
+    *: "Album Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_GAIN
+  desc: in replaygain
+  user:
+  <source>
+    *: "Track Gain"
+  </source>
+  <dest>
+    *: "Track Gain"
+  </dest>
+  <voice>
+    *: "Track Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_GAIN
+  desc: use track gain if shuffle mode is on, album gain otherwise
+  user:
+  <source>
+    *: "Track Gain if Shuffling"
+  </source>
+  <dest>
+    *: "Track Gain if Shuffling"
+  </dest>
+  <voice>
+    *: "Track Gain if Shuffling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_PREAMP
+  desc: in replaygain settings
+  user:
+  <source>
+    *: "Pre-amp"
+  </source>
+  <dest>
+    *: "Pre-amp"
+  </dest>
+  <voice>
+    *: "Preamp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BEEP
+  desc: in playback settings
+  user:
+  <source>
+    *: none
+    swcodec: "Beep Volume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Beep Volume"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Beep Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEAK
+  desc: in beep volume in playback settings
+  user:
+  <source>
+    *: none
+    swcodec: "Weak"
+  </source>
+  <dest>
+    *: none
+    swcodec: "धीमा"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "धीमा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MODERATE
+  desc: in beep volume in playback settings
+  user:
+  <source>
+    *: none
+    swcodec: "Moderate"
+  </source>
+  <dest>
+    *: none
+    swcodec: "बीच का"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "बीच का"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRONG
+  desc: in beep volume in playback settings
+  user:
+  <source>
+    *: none
+    swcodec: "Strong"
+  </source>
+  <dest>
+    *: none
+    swcodec: "जोरदार"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "जोरदार"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPDIF_ENABLE
+  desc: in playback settings menu. enable/disable the optical out
+  user:
+  <source>
+    *: none
+    spdif_power: "Optical Output"
+  </source>
+  <dest>
+    *: none
+    spdif_power: "Optical Output"
+  </dest>
+  <voice>
+    *: none
+    spdif_power: "Optical Output"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ORDER
+  desc: DEPRECATED 
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_V1_FIRST
+  desc: DEPRECATED 
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_V2_FIRST
+  desc: DEPRECATED 
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_FOLDER
+  desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
+  user:
+  <source>
+    *: "Auto-Change Directory"
+  </source>
+  <dest>
+    *: "Auto-Change Directory"
+  </dest>
+  <voice>
+    *: "Auto-Change Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "Random"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user:
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "Last.fm Log"
+  </dest>
+  <voice>
+    *: "Last.fm Log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user:
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Cuesheet Support"
+  </dest>
+  <voice>
+    *: "Cuesheet Support"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: none
+    headphone_detection: "Pause on Headphone Unplug"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "रूकना जब हेडफोन निकालदिया"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "रूकना जब हेडफोन निकालदिया"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: none
+    headphone_detection: "Pause and Resume"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "रूकना और शुरू करना"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "रूकना और शुरू करना"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: none
+    headphone_detection: "Duration to Rewind"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "Duration to Rewind"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "Duration to Rewind"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: none
+    headphone_detection: "Disable resume on startup if phones unplugged"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "रूकना मत शुरूआत में अगर हेडफोन निकाले हो"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: "रूकना मत शुरूआत में अगर हेडफोन निकाले हो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "File View"
+  </source>
+  <dest>
+    *: "फऍल देखने का तरीका"
+  </dest>
+  <voice>
+    *: "फऍल देखने का तरीका"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_CASE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Sort Case Sensitive"
+  </source>
+  <dest>
+    *: "Sort Case Sensitive"
+  </dest>
+  <voice>
+    *: "Sort Case Sensitive"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DIR
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "Sort Directories"
+  </source>
+  <dest>
+    *: "Sort Directories"
+  </dest>
+  <voice>
+    *: "sort directories"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_FILE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "Sort Files"
+  </source>
+  <dest>
+    *: "Sort फऍल"
+  </dest>
+  <voice>
+    *: "sort फऍल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALPHA
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "Alphabetical"
+  </source>
+  <dest>
+    *: "Alphabetical"
+  </dest>
+  <voice>
+    *: "Alphabetical"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DATE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "By Date"
+  </source>
+  <dest>
+    *: "तारीख़ से"
+  </dest>
+  <voice>
+    *: "तारीख़ से"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DATE_REVERSE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "By Newest Date"
+  </source>
+  <dest>
+    *: "नयी तारीख़ से"
+  </dest>
+  <voice>
+    *: "नयी तारीख़ से"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_TYPE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "By Type"
+  </source>
+  <dest>
+    *: "टाइप से"
+  </dest>
+  <voice>
+    *: "टाइप से"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER
+  desc: setting name for dir filter
+  user:
+  <source>
+    *: "Show Files"
+  </source>
+  <dest>
+    *: "फऍल दिखा"
+  </dest>
+  <voice>
+    *: "फऍल दिखा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPPORTED
+  desc: show all file types supported by Rockbox
+  user:
+  <source>
+    *: "Supported"
+  </source>
+  <dest>
+    *: "चलने वाले"
+  </dest>
+  <voice>
+    *: "चलने वाले"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MUSIC
+  desc: show only music-related files
+  user:
+  <source>
+    *: "Music"
+  </source>
+  <dest>
+    *: "संगीत"
+  </dest>
+  <voice>
+    *: "संगीत"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOLLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Follow Playlist"
+  </source>
+  <dest>
+    *: "पलेलिसट पर चलो"
+  </dest>
+  <voice>
+    *: "पलेलिसट पर चलो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "पाथ दिखा"
+  </dest>
+  <voice>
+    *: "पाथ दिखा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user:
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "Current Directory Only"
+  </dest>
+  <voice>
+    *: "Current Directory Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FULL_PATH
+  desc: track display options
+  user:
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "पूरा पाथ"
+  </dest>
+  <voice>
+    *: "पूरा पाथ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user:
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PREV to return)"
+    x5,m5: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "डाटाबेस बन रहा है... %d मिले (OFF to बढ़)"
+    h100,h120,h300: "डाटाबेस बन रहा है... %d मिले (STOP to बढ़)"
+    ipod*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
+    x5,m5: "डाटाबेस बन रहा है... %d मिले (LEFT to बढ़)"
+    h10,h10_5gb,e200,c200: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
+  </dest>
+  <voice>
+    *: "entries found for database"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_RAM
+  desc: in tag cache settings
+  user:
+  <source>
+    *: none
+    tc_ramcache: "Load to RAM"
+  </source>
+  <dest>
+    *: none
+    tc_ramcache: "RAM में लोड करो"
+  </dest>
+  <voice>
+    *: none
+    tc_ramcache: "RAM में लोड करो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto Update"
+  </source>
+  <dest>
+    *: "अपनेआप अपडेट कर"
+  </dest>
+  <voice>
+    *: "अपनेआप अपडेट कर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Initialize now"
+  </source>
+  <dest>
+    *: "अभी Initialize कर"
+  </dest>
+  <voice>
+    *: "अभी Initialize कर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update Now"
+  </source>
+  <dest>
+    *: "अभी अपडेट कर"
+  </dest>
+  <voice>
+    *: "अभी अपडेट कर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNTIMEDB_ACTIVE
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Gather Runtime Data"
+  </source>
+  <dest>
+    *: "Runtime Data इकठ्ठा कर"
+  </dest>
+  <voice>
+    *: "Runtime Data इकठ्ठा कर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export Modifications"
+  </source>
+  <dest>
+    *: "Modifications बाहर निकाल"
+  </dest>
+  <voice>
+    *: "Modifications बाहर निकाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import Modifications"
+  </source>
+  <dest>
+    *: "Modifications अंदर ला"
+  </dest>
+  <voice>
+    *: "Modifications अंदर ला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Updating in background"
+  </source>
+  <dest>
+    *: "बिन दिखा अपडेट होरा है"
+  </dest>
+  <voice>
+    *: "बिन दिखा अपडेट होरा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_INIT
+  desc: while initializing tagcache on boot
+  user:
+  <source>
+    *: "Committing database"
+  </source>
+  <dest>
+    *: "डाटाबेस कमेट कोरा है"
+  </dest>
+  <voice>
+    *: "डाटाबेस कमेट कोरा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Database is not ready"
+  </source>
+  <dest>
+    *: "डाटाबेस तयार नही है"
+  </dest>
+  <voice>
+    *: "डाटाबेस तयार नही है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<सब tracks>"
+  </dest>
+  <voice>
+    *: "सब tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Display"
+  </source>
+  <dest>
+    *: "Display"
+  </dest>
+  <voice>
+    *: "Display"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_FONT
+  desc: in setting_menu()
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Browse Fonts"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Browse Fonts"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Browse Fonts"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_PLAYING
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Browse .wps files"
+  </source>
+  <dest>
+    *: "Browse .wps files"
+  </dest>
+  <voice>
+    *: "Browse while-playing-screen files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_WHILE_PLAYING
+  desc: in settings_menu()
+  user:
+  <source>
+    *: none
+    remote: "Browse .rwps files"
+  </source>
+  <dest>
+    *: none
+    remote: "Browse .rwps files"
+  </dest>
+  <voice>
+    *: none
+    remote: "Browse remote while-playing-screen files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_MENU
+  desc: in the display sub menu
+  user:
+  <source>
+    *: "LCD Settings"
+  </source>
+  <dest>
+    *: "LCD सेटिनगस"
+  </dest>
+  <voice>
+    *: "LCD सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Backlight"
+  </source>
+  <dest>
+    *: "Backlight"
+  </dest>
+  <voice>
+    *: "Backlight"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+  desc: in display_settings_menu, backlight timeout with charger connected
+  user:
+  <source>
+    *: none
+    charging: "Backlight (While Plugged In)"
+  </source>
+  <dest>
+    *: none
+    charging: "Backlight (While Plugged In)"
+  </dest>
+  <voice>
+    *: none
+    charging: "Backlight (While Plugged In)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: none
+    hold_button: "Backlight on Hold"
+  </source>
+  <dest>
+    *: none
+    hold_button: "Backlight on Hold"
+  </dest>
+  <voice>
+    *: none
+    hold_button: "Backlight on hold"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAPTION_BACKLIGHT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Caption Backlight"
+  </source>
+  <dest>
+    *: "Caption Backlight"
+  </dest>
+  <voice>
+    *: "Caption Backlight"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FADE_IN
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    backlight_fade: "Backlight Fade In"
+  </source>
+  <dest>
+    *: none
+    backlight_fade: "Backlight Fade In"
+  </dest>
+  <voice>
+    *: none
+    backlight_fade: "Backlight Fade In"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FADE_OUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    backlight_fade: "Backlight Fade Out"
+  </source>
+  <dest>
+    *: none
+    backlight_fade: "Backlight Fade Out"
+  </dest>
+  <voice>
+    *: none
+    backlight_fade: "Backlight Fade Out"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+  desc: Backlight behaviour setting
+  user:
+  <source>
+    *: "First Buttonpress Enables Backlight Only"
+  </source>
+  <dest>
+    *: "First Buttonpress Enables Backlight Only"
+  </dest>
+  <voice>
+    *: "First Buttonpress Enables Backlight Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user:
+  <source>
+    *: none
+    lcd_sleep: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: none
+    lcd_sleep: "Sleep (After Backlight Off)"
+  </dest>
+  <voice>
+    *: none
+    lcd_sleep: "Sleep after backlight off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user:
+  <source>
+    *: none
+    lcd_sleep: "Never"
+  </source>
+  <dest>
+    *: none
+    lcd_sleep: "कभी नहीं"
+  </dest>
+  <voice>
+    *: none
+    lcd_sleep: "कभी नहीं"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    backlight_brightness: "Brightness"
+  </source>
+  <dest>
+    *: none
+    backlight_brightness: "Brightness"
+  </dest>
+  <voice>
+    *: none
+    backlight_brightness: "Brightness"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTRAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Contrast"
+  </source>
+  <dest>
+    *: "Contrast"
+  </dest>
+  <voice>
+    *: "Contrast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_invert: "LCD Mode"
+  </source>
+  <dest>
+    *: none
+    lcd_invert: "LCD Mode"
+  </dest>
+  <voice>
+    *: none
+    lcd_invert: "LCD Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_LCD_INVERSE
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_invert: "Inverse"
+  </source>
+  <dest>
+    *: none
+    lcd_invert: "Inverse"
+  </dest>
+  <voice>
+    *: none
+    lcd_invert: "Inverse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FLIP_DISPLAY
+  desc: in settings_menu, option to turn display+buttos by 180 degrees
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Upside Down"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "ऊलटा"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "ऊलटा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Line Selector Type"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Line Selector Type"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Line Selector Type"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_POINTER
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Pointer"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Pointer"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Pointer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_BAR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Bar (Inverse)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Bar (Inverse)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Inverse Bar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_BACKDROP
+  desc: text for LCD settings menu
+  user:
+  <source>
+    *: none
+    lcd_non-mono: "Clear Backdrop"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Backdrop मिटा"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: "Backdrop मिटा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKGROUND_COLOR
+  desc: menu entry to set the background color
+  user:
+  <source>
+    *: none
+    lcd_non-mono: "Background Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "पीछे का रंग"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: "पीछे का रंग"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOREGROUND_COLOR
+  desc: menu entry to set the foreground color
+  user:
+  <source>
+    *: none
+    lcd_non-mono: "Foreground Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "आगे का रंग"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: "आगे का रंग"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_COLORS
+  desc: menu
+  user:
+  <source>
+    *: none
+    lcd_non-mono: "Reset Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "रंग मिटा"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: "रंग मिटा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_LABELS
+  desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+  user:
+  <source>
+    *: none
+    lcd_color: "RGB"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "RGB"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_VALUE
+  desc: in color screen
+  user:
+  <source>
+    *: none
+    lcd_color: "RGB: %02X%02X%02X"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "RGB: %02X%02X%02X"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_UNACCEPTABLE
+  desc: splash when user selects an invalid colour
+  user:
+  <source>
+    *: none
+    lcd_non-mono: "Invalid colour"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "गलत रंग"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_REMOTE_MENU
+  desc: in the display sub menu
+  user:
+  <source>
+    *: none
+    remote: "Remote-LCD Settings"
+  </source>
+  <dest>
+    *: none
+    remote: "Remote-LCD सेटिनगस"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote LCD सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REDUCE_TICKING
+  desc: in remote lcd settings menu
+  user:
+  <source>
+    *: none
+    remote_ticking: "Reduce Ticking"
+  </source>
+  <dest>
+    *: none
+    remote_ticking: "Reduce Ticking"
+  </dest>
+  <voice>
+    *: none
+    remote_ticking: "Reduce Ticking"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ICONS
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Icons"
+  </source>
+  <dest>
+    *: "Icons दिखा"
+  </dest>
+  <voice>
+    *: "Icons दिखा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_MENU
+  desc: in display_settings_menu()
+  user:
+  <source>
+    *: "Scrolling"
+  </source>
+  <dest>
+    *: "Scrolling"
+  </dest>
+  <voice>
+    *: "Scrolling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Scroll Speed Setting Example"
+  </source>
+  <dest>
+    *: "Scroll Speed Setting Example"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_SPEED
+  desc: in display_settings_menu()
+  user:
+  <source>
+    *: "Scroll Speed"
+  </source>
+  <dest>
+    *: "Scroll Speed"
+  </dest>
+  <voice>
+    *: "Scroll Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_DELAY
+  desc: Delay before scrolling
+  user:
+  <source>
+    *: "Scroll Start Delay"
+  </source>
+  <dest>
+    *: "Scroll Start Delay"
+  </dest>
+  <voice>
+    *: "Scroll Start Delay"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_STEP
+  desc: Pixels to advance per scroll
+  user:
+  <source>
+    *: "Scroll Step Size"
+  </source>
+  <dest>
+    *: "Scroll Step Size"
+  </dest>
+  <voice>
+    *: "Scroll Step Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_STEP_EXAMPLE
+  desc: Pixels to advance per scroll
+  user:
+  <source>
+    *: "Scroll Step Size Setting Example Text"
+  </source>
+  <dest>
+    *: "Scroll Step Size सेटिनगस Example Text"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BIDIR_SCROLL
+  desc: Bidirectional scroll limit
+  user:
+  <source>
+    *: "Bidirectional Scroll Limit"
+  </source>
+  <dest>
+    *: "Bidirectional Scroll Limit"
+  </dest>
+  <voice>
+    *: "Bidirectional Scroll Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: none
+    remote: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: none
+    remote: "Remote Scrolling Options"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote Scrolling Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_JUMP_SCROLL
+  desc: (player) menu alternative for jump scroll
+  user:
+  <source>
+    *: "Jump Scroll"
+  </source>
+  <dest>
+    *: "Jump Scroll"
+  </dest>
+  <voice>
+    *: "Jump Scroll"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONE_TIME
+  desc: (player) the jump scroll shall be done "one time"
+  user:
+  <source>
+    *: "One time"
+  </source>
+  <dest>
+    *: "एक बार"
+  </dest>
+  <voice>
+    *: "एक बार"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_JUMP_SCROLL_DELAY
+  desc: (player) Delay before making a jump scroll
+  user:
+  <source>
+    *: "Jump Scroll Delay"
+  </source>
+  <dest>
+    *: "Jump Scroll Delay"
+  </dest>
+  <voice>
+    *: "Jump Scroll Delay"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_VIEW
+  desc: should lines scroll out of the screen
+  user:
+  <source>
+    *: "Screen Scrolls Out Of View"
+  </source>
+  <dest>
+    *: "Screen Scrolls Out Of View"
+  </dest>
+  <voice>
+    *: "Screen Scrolls Out Of View"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_STEP
+  desc: Pixels to advance per Screen scroll
+  user:
+  <source>
+    *: "Screen Scroll Step Size"
+  </source>
+  <dest>
+    *: "Screen Scroll Step Size"
+  </dest>
+  <voice>
+    *: "Screen Scroll Step Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_PAGINATED
+  desc: jump to new page when scrolling
+  user:
+  <source>
+    *: "Paged Scrolling"
+  </source>
+  <dest>
+    *: "Paged Scrolling"
+  </dest>
+  <voice>
+    *: "Paged scrolling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_START_DELAY
+  desc: Delay before list starts accelerating
+  user:
+  <source>
+    *: "List Acceleration Start Delay"
+    scrollwheel: none
+  </source>
+  <dest>
+    *: "List Acceleration Start Delay"
+    scrollwheel: none
+  </dest>
+  <voice>
+    *: "List Acceleration Start Delay"
+    scrollwheel: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_ACCEL_SPEED
+  desc: list acceleration speed
+  user:
+  <source>
+    *: "List Acceleration Speed"
+    scrollwheel: none
+  </source>
+  <dest>
+    *: "List Acceleration Speed"
+    scrollwheel: none
+  </dest>
+  <voice>
+    *: "List Acceleration Speed"
+    scrollwheel: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BARS_MENU
+  desc: in the display sub menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Status-/Scrollbar"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Status-/Scrollbar"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Status- and Scrollbar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Scroll Bar"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scroll Bar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUS_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Status Bar"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Status Bar"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Status Bar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTON_BAR
+  desc: in settings menu
+  user:
+  <source>
+    *: none
+    recorder_pad: "Button Bar"
+  </source>
+  <dest>
+    *: none
+    recorder_pad: "Button Bar"
+  </dest>
+  <voice>
+    *: none
+    recorder_pad: "Button Bar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_DISPLAY
+  desc: Volume type title
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Volume Display"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Volume Display"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Volume Display"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_DISPLAY
+  desc: Battery type title
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Battery Display"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Battery Display"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Battery Display"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_GRAPHIC
+  desc: Label for type of icon display
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Graphic"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Graphic"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Graphic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_NUMERIC
+  desc: Label for type of icon display
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Numeric"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Numeric"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Numeric"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MENU
+  desc: in the display menu
+  user:
+  <source>
+    *: "Peak Meter"
+    masd: none
+  </source>
+  <dest>
+    *: "Peak Meter"
+    masd: none
+  </dest>
+  <voice>
+    *: "Peak Meter"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIP_HOLD
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Clip Hold Time"
+    masd: none
+  </source>
+  <dest>
+    *: "Clip Hold Time"
+    masd: none
+  </dest>
+  <voice>
+    *: "Clip Hold Time"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_PEAK_HOLD
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Peak Hold Time"
+    masd: none
+  </source>
+  <dest>
+    *: "Peak Hold Time"
+    masd: none
+  </dest>
+  <voice>
+    *: "Peak Hold Time"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_ETERNAL
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Eternal"
+    masd: none
+  </source>
+  <dest>
+    *: "Eternal"
+    masd: none
+  </dest>
+  <voice>
+    *: "Eternal"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_RELEASE
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Peak Release"
+    masd: none
+  </source>
+  <dest>
+    *: "Peak Release"
+    masd: none
+  </dest>
+  <voice>
+    *: "Peak Release"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_UNITS_PER_READ
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_SCALE
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Scale"
+    masd: none
+  </source>
+  <dest>
+    *: "Scale"
+    masd: none
+  </dest>
+  <voice>
+    *: "Scale"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_DBFS
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Logarithmic (dB)"
+    masd: none
+  </source>
+  <dest>
+    *: "Logarithmic (dB)"
+    masd: none
+  </dest>
+  <voice>
+    *: "Logarithmic decibel"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_LINEAR
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Linear (%)"
+    masd: none
+  </source>
+  <dest>
+    *: "Linear (%)"
+    masd: none
+  </dest>
+  <voice>
+    *: "Linear percent"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MIN
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Minimum Of Range"
+    masd: none
+  </source>
+  <dest>
+    *: "Minimum Of Range"
+    masd: none
+  </dest>
+  <voice>
+    *: "Minimum Of Range"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MAX
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Maximum Of Range"
+    masd: none
+  </source>
+  <dest>
+    *: "Maximum Of Range"
+    masd: none
+  </dest>
+  <voice>
+    *: "Maximum Of Range"
+    masd: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_CODEPAGE
+  desc: default encoding used with id3 tags
+  user:
+  <source>
+    *: "Default Codepage"
+  </source>
+  <dest>
+    *: "Default Codepage"
+  </dest>
+  <voice>
+    *: "Default codepage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN1
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Latin1 (ISO-8859-1)"
+  </source>
+  <dest>
+    *: "Latin1 (ISO-8859-1)"
+  </dest>
+  <voice>
+    *: "Latin 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_GREEK
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Greek (ISO-8859-7)"
+  </source>
+  <dest>
+    *: "Greek (ISO-8859-7)"
+  </dest>
+  <voice>
+    *: "Greek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_HEBREW
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Hebrew (ISO-8859-8)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Hebrew (ISO-8859-8)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Hebrew"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CYRILLIC
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Cyrillic (CP1251)"
+  </source>
+  <dest>
+    *: "Cyrillic (CP1251)"
+  </dest>
+  <voice>
+    *: "Cyrillic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_THAI
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Thai (ISO-8859-11)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Thai (ISO-8859-11)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Thai"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_ARABIC
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Arabic (CP1256)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Arabic (CP1256)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Arabic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TURKISH
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Turkish (ISO-8859-9)"
+  </source>
+  <dest>
+    *: "Turkish (ISO-8859-9)"
+  </dest>
+  <voice>
+    *: "Turkish"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN_EXTENDED
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Latin Extended (ISO-8859-2)"
+  </source>
+  <dest>
+    *: "Latin Extended (ISO-8859-2)"
+  </dest>
+  <voice>
+    *: "Latin extended"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_JAPANESE
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Japanese (SJIS)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Japanese (SJIS)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Japanese"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_SIMPLIFIED
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Simp. Chinese (GB2312)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Simp. Chinese (GB2312)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Simplified Chinese"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_KOREAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Korean (KSX1001)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Korean (KSX1001)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Korean"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TRADITIONAL
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Trad. Chinese (BIG5)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Trad. Chinese (BIG5)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Traditional Chinese"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_UTF8
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Unicode (UTF-8)"
+  </source>
+  <dest>
+    *: "Unicode (UTF-8)"
+  </dest>
+  <voice>
+    *: "Unicode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    e200: "Wheel Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
+  </source>
+  <dest>
+    *: none
+    e200: "Wheel Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
+  </dest>
+  <voice>
+    *: none
+    e200: "Wheel Light Timeout"
+    c200,gigabeatf: "Button Light Timeout"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Button Light Brightness"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Button Light Brightness"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "शुरूआत की Screen"
+  </dest>
+  <voice>
+    *: "शुरूआत की Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in start screen setting
+  user:
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "शुरूआत की Menu"
+  </dest>
+  <voice>
+    *: "शुरूआत की Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in start screen setting
+  user:
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "पहले की Screen"
+  </dest>
+  <voice>
+    *: "पहले की Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Battery"
+  </source>
+  <dest>
+    *: "Battery"
+  </dest>
+  <voice>
+    *: "Battery"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_CAPACITY
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Battery Capacity"
+  </source>
+  <dest>
+    *: "Battery Capacity"
+  </dest>
+  <voice>
+    *: "Battery Capacity"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TYPE
+  desc: in battery settings
+  user:
+  <source>
+    *: none
+    battery_types: "Battery Type"
+  </source>
+  <dest>
+    *: none
+    battery_types: "Battery Type"
+  </dest>
+  <voice>
+    *: none
+    battery_types: "Battery type"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TYPE_ALKALINE
+  desc: in battery settings
+  user:
+  <source>
+    *: none
+    battery_types: "Alkaline"
+  </source>
+  <dest>
+    *: none
+    battery_types: "Alkaline"
+  </dest>
+  <voice>
+    *: none
+    battery_types: "Alkaline"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TYPE_NIMH
+  desc: in battery settings
+  user:
+  <source>
+    *: none
+    battery_types: "NiMH"
+  </source>
+  <dest>
+    *: none
+    battery_types: "NiMH"
+  </dest>
+  <voice>
+    *: none
+    battery_types: "Nickel metal hydride"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Disk"
+  </source>
+  <dest>
+    *: "डिसक"
+  </dest>
+  <voice>
+    *: "डिसक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPINDOWN
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Disk Spindown"
+    flash_storage: none
+  </source>
+  <dest>
+    *: "Disk Spindown"
+    flash_storage: none
+  </dest>
+  <voice>
+    *: "Disk Spindown"
+    flash_storage: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_ENABLE
+  desc: in directory cache settings
+  user:
+  <source>
+    *: none
+    dircache: "Directory Cache"
+  </source>
+  <dest>
+    *: none
+    dircache: "Directory Cache"
+  </dest>
+  <voice>
+    *: none
+    dircache: "Directory Cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: none
+    rtc: "Time & Date"
+  </source>
+  <dest>
+    *: none
+    rtc: "वक्त और तारीख"
+  </dest>
+  <voice>
+    *: none
+    rtc: "वक्त और तारीख"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_TIME
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    rtc: "Set Time/Date"
+  </source>
+  <dest>
+    *: none
+    rtc: "वक्त और तारीख सेट कर"
+  </dest>
+  <voice>
+    *: none
+    rtc: "वक्त और तारीख सेट कर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEFORMAT
+  desc: select the time format of time in status bar
+  user:
+  <source>
+    *: none
+    rtc: "Time Format"
+  </source>
+  <dest>
+    *: none
+    rtc: "वक्त का Format"
+  </dest>
+  <voice>
+    *: none
+    rtc: "वक्त का Format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_12_HOUR_CLOCK
+  desc: option for 12 hour clock
+  user:
+  <source>
+    *: none
+    rtc: "12 Hour Clock"
+  </source>
+  <dest>
+    *: none
+    rtc: "बारा घंटओ की घड़ी"
+  </dest>
+  <voice>
+    *: none
+    rtc: "बारा घंटओ की घड़ी"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_24_HOUR_CLOCK
+  desc: option for 24 hour clock
+  user:
+  <source>
+    *: none
+    rtc: "24 Hour Clock"
+  </source>
+  <dest>
+    *: none
+    rtc: "चौबीस घंटओ की घड़ी"
+  </dest>
+  <voice>
+    *: none
+    rtc: "चौबीस घंटओ की घड़ी"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_SET_BUTTON
+  desc: used in set_time()
+  user:
+  <source>
+    *: none
+    rtc: "ON = Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+  </source>
+  <dest>
+    *: none
+    rtc: "ON = Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+  </dest>
+  <voice>
+    *: none
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_REVERT
+  desc: used in set_time()
+  user:
+  <source>
+    *: none
+    rtc: "OFF = Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*,e200,c200: "MENU = Revert"
+    x5,m5: "RECORD = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "A = Revert"
+  </source>
+  <dest>
+    *: none
+    rtc: "OFF = Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*,e200,c200: "MENU = Revert"
+    x5,m5: "RECORD = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "A = Revert"
+  </dest>
+  <voice>
+    *: none
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_SUNDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: none
+    rtc: "Sun"
+  </source>
+  <dest>
+    *: none
+    rtc: "रवि"
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_MONDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: none
+    rtc: "Mon"
+  </source>
+  <dest>
+    *: none
+    rtc: "सोम"
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_TUESDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: none
+    rtc: "Tue"
+  </source>
+  <dest>
+    *: none
+    rtc: "मंग"
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_WEDNESDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: none
+    rtc: "Wed"
+  </source>
+  <dest>
+    *: none
+    rtc: "बुध"
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_THURSDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: none
+    rtc: "Thu"
+  </source>
+  <dest>
+    *: none
+    rtc: "गुर"
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_FRIDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: none
+    rtc: "Fri"
+  </source>
+  <dest>
+    *: none
+    rtc: "शुक"
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_SATURDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: none
+    rtc: "Sat"
+  </source>
+  <dest>
+    *: none
+    rtc: "शनि"
+  </dest>
+  <voice>
+    *: none
+    rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JANUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Jan"
+  </source>
+  <dest>
+    *: none
+    rtc: "जन"
+  </dest>
+  <voice>
+    *: none
+    rtc: "जनवरी"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_FEBRUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Feb"
+  </source>
+  <dest>
+    *: none
+    rtc: "फर"
+  </dest>
+  <voice>
+    *: none
+    rtc: "फरवरी"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MARCH
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Mar"
+  </source>
+  <dest>
+    *: none
+    rtc: "मार"
+  </dest>
+  <voice>
+    *: none
+    rtc: "मार्च"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_APRIL
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Apr"
+  </source>
+  <dest>
+    *: none
+    rtc: "अप्"
+  </dest>
+  <voice>
+    *: none
+    rtc: "अप्रेल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MAY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "May"
+  </source>
+  <dest>
+    *: none
+    rtc: "मई"
+  </dest>
+  <voice>
+    *: none
+    rtc: "मई"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JUNE
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Jun"
+  </source>
+  <dest>
+    *: none
+    rtc: "जून"
+  </dest>
+  <voice>
+    *: none
+    rtc: "जून"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JULY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Jul"
+  </source>
+  <dest>
+    *: none
+    rtc: "जूल"
+  </dest>
+  <voice>
+    *: none
+    rtc: "जूलाई"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_AUGUST
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Aug"
+  </source>
+  <dest>
+    *: none
+    rtc: "अगस"
+  </dest>
+  <voice>
+    *: none
+    rtc: "अगस्त"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_SEPTEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Sep"
+  </source>
+  <dest>
+    *: none
+    rtc: "सित"
+  </dest>
+  <voice>
+    *: none
+    rtc: "सितम्बर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_OCTOBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Oct"
+  </source>
+  <dest>
+    *: none
+    rtc: "अक्"
+  </dest>
+  <voice>
+    *: none
+    rtc: "अक्टूबर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_NOVEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Nov"
+  </source>
+  <dest>
+    *: none
+    rtc: "नवम"
+  </dest>
+  <voice>
+    *: none
+    rtc: "नवम्बर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_DECEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: none
+    rtc: "Dec"
+  </source>
+  <dest>
+    *: none
+    rtc: "दिस"
+  </dest>
+  <voice>
+    *: none
+    rtc: "दिसम्बर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POWEROFF_IDLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Idle Poweroff"
+  </source>
+  <dest>
+    *: "Idle Poweroff"
+  </dest>
+  <voice>
+    *: "Idle Poweroff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER
+  desc: sleep timer setting
+  user:
+  <source>
+    *: "Sleep Timer"
+  </source>
+  <dest>
+    *: "Sleep Timer"
+  </dest>
+  <voice>
+    *: "Sleep Timer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMITS_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Limits"
+  </source>
+  <dest>
+    *: "Limits"
+  </dest>
+  <voice>
+    *: "Limits"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAX_FILES_IN_DIR
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Max Files in Dir Browser"
+  </source>
+  <dest>
+    *: "Max Files in Dir Browser"
+  </dest>
+  <voice>
+    *: "Maximum files in directory browser"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAX_FILES_IN_PLAYLIST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Max Playlist Size"
+  </source>
+  <dest>
+    *: "Max पलेलिसट Size"
+  </dest>
+  <voice>
+    *: "Maximum पलेलिसट size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE
+  desc: Displayed for setting car adapter mode to on/off
+  user:
+  <source>
+    *: none
+    charging: "Car Adapter Mode"
+  </source>
+  <dest>
+    *: none
+    charging: "Car Adapter Mode"
+  </dest>
+  <voice>
+    *: none
+    charging: "Car Adapter Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ALARM_MENU
+  desc: The name of the additional entry in the main menu for the RTC alarm mod.
+  user:
+  <source>
+    *: none
+    alarm: "Wake-Up Alarm"
+  </source>
+  <dest>
+    *: none
+    alarm: "Wake-Up Alarm"
+  </dest>
+  <voice>
+    *: none
+    alarm: "Wake-Up Alarm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user:
+  <source>
+    *: none
+    alarm: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: none
+    alarm: "Alarm Wake up Screen"
+  </dest>
+  <voice>
+    *: none
+    alarm: "Alarm Wake up Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_TIME
+  desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+  user:
+  <source>
+    *: none
+    alarm: "Alarm Time: %02d:%02d"
+  </source>
+  <dest>
+    *: none
+    alarm: "Alarm Time: %02d:%02d"
+  </dest>
+  <voice>
+    *: none
+    alarm: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_TIME_TO_GO
+  desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+  user:
+  <source>
+    *: none
+    alarm: "Waking Up In %d:%02d"
+  </source>
+  <dest>
+    *: none
+    alarm: "Waking Up In %d:%02d"
+  </dest>
+  <voice>
+    *: none
+    alarm: "Waking up in"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_SHUTDOWN
+  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+  user:
+  <source>
+    *: none
+    alarm: "Alarm Set"
+  </source>
+  <dest>
+    *: none
+    alarm: "Alarm Set"
+  </dest>
+  <voice>
+    *: none
+    alarm: "Alarm set"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ERROR
+  desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+  user:
+  <source>
+    *: none
+    alarm: "Alarm Time Is Too Soon!"
+  </source>
+  <dest>
+    *: none
+    alarm: "Alarm Time Is Too Soon!"
+  </dest>
+  <voice>
+    *: none
+    alarm: "Alarm Time Is Too Soon!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_KEYS
+  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  user:
+  <source>
+    *: none
+    alarm: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+  </source>
+  <dest>
+    *: none
+    alarm: "PLAY=लगा OFF=बंद"
+    ipod*: "SELECT=लगा MENU=बंद"
+    h10,h10_5gb: "SELECT=लगा PREV=बंद"
+  </dest>
+  <voice>
+    *: none
+    alarm,ipod*: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_DISABLE
+  desc: Announce that the RTC alarm has been turned off
+  user:
+  <source>
+    *: none
+    alarm: "Alarm Disabled"
+  </source>
+  <dest>
+    *: none
+    alarm: "Alarm बंद"
+  </dest>
+  <voice>
+    *: none
+    alarm: "Alarm बंद"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS
+  desc: in general settings
+  user:
+  <source>
+    *: "Bookmarking"
+  </source>
+  <dest>
+    *: "बूकमारक"
+  </dest>
+  <voice>
+    *: "बूकमारक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+  desc: prompt for user to decide to create an bookmark
+  user:
+  <source>
+    *: "Bookmark on Stop"
+  </source>
+  <dest>
+    *: "बूकमारक रोकने के समय"
+  </dest>
+  <voice>
+    *: "बूकमारक रोकने के समय"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+  desc: Save in recent bookmarks only
+  user:
+  <source>
+    *: "Yes - Recent only"
+  </source>
+  <dest>
+    *: "हाँ - सिर्फ अभी के"
+  </dest>
+  <voice>
+    *: "हाँ - सिर्फ अभी के"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+  desc: Save in recent bookmarks only
+  user:
+  <source>
+    *: "Ask - Recent only"
+  </source>
+  <dest>
+    *: "पूछँ - सिर्फ अभी के"
+  </dest>
+  <voice>
+    *: "पूछँ - सिर्फ अभी के"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+  desc: prompt for user to decide to create a bookmark
+  user:
+  <source>
+    *: "Load Last Bookmark"
+  </source>
+  <dest>
+    *: "लोड पिछला बूकमारक"
+  </dest>
+  <voice>
+    *: "लोड पिछला बूकमारक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+  desc: Configuration option to maintain a list of recent bookmarks
+  user:
+  <source>
+    *: "Maintain a List of Recent Bookmarks?"
+  </source>
+  <dest>
+    *: "Maintain a List of Recent Bookmarks?"
+  </dest>
+  <voice>
+    *: "Maintain a List of Recent Bookmarks?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+  desc: Save only on bookmark for each playlist in recent bookmarks
+  user:
+  <source>
+    *: "Unique only"
+  </source>
+  <dest>
+    *: "सिर्फ अलग"
+  </dest>
+  <voice>
+    *: "सिर्फ अलग"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LANGUAGE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Language"
+  </source>
+  <dest>
+    *: "भाषा"
+  </dest>
+  <voice>
+    *: "भाषा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LANGUAGE_LOADED
+  desc: shown when a language has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Language"
+  </source>
+  <dest>
+    *: "नयी भाषा"
+  </dest>
+  <voice>
+    *: "नयी भाषा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE
+  desc: root of voice menu
+  user:
+  <source>
+    *: "Voice"
+  </source>
+  <dest>
+    *: "आवाज़"
+  </dest>
+  <voice>
+    *: "आवाज़"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_MENU
+  desc: item of voice menu, enable/disable the voice UI
+  user:
+  <source>
+    *: "Voice Menus"
+  </source>
+  <dest>
+    *: "आवाज़ Menus"
+  </dest>
+  <voice>
+    *: "आवाज़ Menus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR
+  desc: item of voice menu, set the voice mode for directories
+  user:
+  <source>
+    *: "Voice Directories"
+  </source>
+  <dest>
+    *: "आवाज़ Directories"
+  </dest>
+  <voice>
+    *: "आवाज़ Directories"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR_TALK
+  desc: Item of voice menu, whether to use directory .talk clips
+  user:
+  <source>
+    *: "Use Directory .talk Clips"
+  </source>
+  <dest>
+    *: "Use Directory .talk Clips"
+  </dest>
+  <voice>
+    *: "Use Directory .talk Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE
+  desc: item of voice menu, set the voice mode for files
+  user:
+  <source>
+    *: "Voice Filenames"
+  </source>
+  <dest>
+    *: "आवाज़ Filenames"
+  </dest>
+  <voice>
+    *: "आवाज़ Filenames"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE_TALK
+  desc: Item of voice menu, whether to use file .talk clips
+  user:
+  <source>
+    *: "Use File .talk Clips"
+  </source>
+  <dest>
+    *: "Use File .talk Clips"
+  </dest>
+  <voice>
+    *: "Use File .talk Clips"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_NUMBER
+  desc: "talkbox" mode for files+directories
+  user:
+  <source>
+    *: "Numbers"
+  </source>
+  <dest>
+    *: "नमबरस"
+  </dest>
+  <voice>
+    *: "नमबरस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_SPELL
+  desc: "talkbox" mode for files+directories
+  user:
+  <source>
+    *: "Spell"
+  </source>
+  <dest>
+    *: "Spell"
+  </dest>
+  <voice>
+    *: "Spell"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR_HOVER
+  desc: "talkbox" mode for directories + files
+  user:
+  <source>
+    *: ".talk mp3 clip"
+  </source>
+  <dest>
+    *: ".talk mp3 clip"
+  </dest>
+  <voice>
+    *: "talk mp3 clip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MANAGE_MENU
+  desc: in the main menu
+  user:
+  <source>
+    *: "Manage Settings"
+  </source>
+  <dest>
+    *: "Manage सेटिनगस"
+  </dest>
+  <voice>
+    *: "Manage सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_CFG
+  desc: in setting_menu()
+  user:
+  <source>
+    *: "Browse .cfg files"
+  </source>
+  <dest>
+    *: "Browse .cfg files"
+  </dest>
+  <voice>
+    *: "Browse configuration files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_LOADED
+  desc: Feedback shown when a .cfg file is loaded
+  user:
+  <source>
+    *: "Settings Loaded"
+  </source>
+  <dest>
+    *: "सेटिनगस लोडेड"
+  </dest>
+  <voice>
+    *: "सेटिनगस लोडेड"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET
+  desc: in system_settings_menu()
+  user:
+  <source>
+    *: "Reset Settings"
+  </source>
+  <dest>
+    *: "Reset सेटिनगस"
+  </dest>
+  <voice>
+    *: "Reset सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_CLEAR
+  desc: visual confirmation after settings reset
+  user:
+  <source>
+    *: "Cleared"
+  </source>
+  <dest>
+    *: "निकाल दियेे"
+  </dest>
+  <voice>
+    *: "निकाल दियेे"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SETTINGS
+  desc: in system_settings_menu()
+  user:
+  <source>
+    *: "Write .cfg file"
+  </source>
+  <dest>
+    *: "Write .cfg file"
+  </dest>
+  <voice>
+    *: "Write configuration file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVED
+  desc: Feedback shown when a .cfg file is saved
+  user:
+  <source>
+    *: "Settings Saved"
+  </source>
+  <dest>
+    *: "सेटिनगस बच गये"
+  </dest>
+  <voice>
+    *: "सेटिनगस बच गये"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user:
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "Theme सेटिनगस बचा"
+  </dest>
+  <voice>
+    *: "Theme सेटिनगस बचा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_THEME
+  desc: in the main menu
+  user:
+  <source>
+    *: "Browse Themes"
+  </source>
+  <dest>
+    *: "Browse Themes"
+  </dest>
+  <voice>
+    *: "Browse Themes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: none
+    recording: "Recording Settings"
+  </source>
+  <dest>
+    *: none
+    recording: "रिकोरडिनग क सेटिनगस"
+  </dest>
+  <voice>
+    *: none
+    recording: "रिकोरडिनग क सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user:
+  <source>
+    *: none
+    radio: "FM Radio Menu"
+  </source>
+  <dest>
+    *: none
+    radio: "FM रेडिओ Menu"
+  </dest>
+  <voice>
+    *: none
+    radio: "FM रेडिओ Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION
+  desc: in radio screen
+  user:
+  <source>
+    *: none
+    radio: "Station: %d.%02d MHz"
+  </source>
+  <dest>
+    *: none
+    radio: "Station: %d.%02d MHz"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_NO_PRESETS
+  desc: error when preset list is empty
+  user:
+  <source>
+    *: none
+    radio: "No presets"
+  </source>
+  <dest>
+    *: none
+    radio: "कोई presets नहीं हैं"
+  </dest>
+  <voice>
+    *: none
+    radio: "कोई presets नहीं हैं"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ADD_PRESET
+  desc: in radio menu
+  user:
+  <source>
+    *: none
+    radio: "Add Preset"
+  </source>
+  <dest>
+    *: none
+    radio: "Preset मिला"
+  </dest>
+  <voice>
+    *: none
+    radio: "Preset मिला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EDIT_PRESET
+  desc: in radio screen
+  user:
+  <source>
+    *: none
+    radio: "Edit Preset"
+  </source>
+  <dest>
+    *: none
+    radio: "Edit Preset"
+  </dest>
+  <voice>
+    *: none
+    radio: "Edit Preset"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_DELETE_PRESET
+  desc: in radio screen
+  user:
+  <source>
+    *: none
+    radio: "Remove Preset"
+  </source>
+  <dest>
+    *: none
+    radio: "Preset निकाल"
+  </dest>
+  <voice>
+    *: none
+    radio: "Preset निकाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE_FAILED
+  desc: in radio screen
+  user:
+  <source>
+    *: none
+    radio: "Preset Save Failed"
+  </source>
+  <dest>
+    *: none
+    radio: "Preset बचा नही"
+  </dest>
+  <voice>
+    *: none
+    radio: "Preset बचा नही"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_NO_FREE_PRESETS
+  desc: in radio screen
+  user:
+  <source>
+    *: none
+    radio: "The Preset List is Full"
+  </source>
+  <dest>
+    *: none
+    radio: "The Preset List is Full"
+  </dest>
+  <voice>
+    *: none
+    radio: "The Preset List is Full"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONBAR_MENU
+  desc: in button bar
+  user:
+  <source>
+    *: none
+    radio_screen_button_bar: "Menu"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "Menu"
+  </dest>
+  <voice>
+    *: none
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_EXIT
+  desc: in radio screen
+  user:
+  <source>
+    *: none
+    radio_screen_button_bar: "Exit"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "भार जा"
+  </dest>
+  <voice>
+    *: none
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_ACTION
+  desc: in radio screen
+  user:
+  <source>
+    *: none
+    radio_screen_button_bar: "Action"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "Action"
+  </dest>
+  <voice>
+    *: none
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESET
+  desc: in button bar and radio screen / menu
+  user:
+  <source>
+    *: none
+    radio: "Preset"
+  </source>
+  <dest>
+    *: none
+    radio: "Preset"
+  </dest>
+  <voice>
+    *: none
+    radio: "Preset"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_ADD
+  desc: in radio screen
+  user:
+  <source>
+    *: none
+    radio_screen_button_bar: "Add"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "मिला"
+  </dest>
+  <voice>
+    *: none
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_RECORD
+  desc: in radio screen
+  user:
+  <source>
+    *: none
+    radio_screen_button_bar: "Record"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "रिकोरड"
+  </dest>
+  <voice>
+    *: none
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MONO_MODE
+  desc: in radio screen
+  user:
+  <source>
+    *: none
+    radio: "Force mono"
+  </source>
+  <dest>
+    *: none
+    radio: "Force mono"
+  </dest>
+  <voice>
+    *: none
+    radio: "Force mono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FREEZE
+  desc: splash screen during freeze in radio mode
+  user:
+  <source>
+    *: none
+    radio: "Screen frozen!"
+  </source>
+  <dest>
+    *: none
+    radio: "Screen फँसी है!"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCAN_PRESETS
+  desc: in radio menu
+  user:
+  <source>
+    *: none
+    radio: "Auto-Scan Presets"
+  </source>
+  <dest>
+    *: none
+    radio: "Auto-Scan Presets"
+  </dest>
+  <voice>
+    *: none
+    radio: "Auto scan presets"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_CLEAR_PRESETS
+  desc: confirmation if presets can be cleared
+  user:
+  <source>
+    *: none
+    radio: "Clear Current Presets?"
+  </source>
+  <dest>
+    *: none
+    radio: "अभी क Presets निकालदे?"
+  </dest>
+  <voice>
+    *: none
+    radio: "अभी क Presets निकालदे?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCANNING
+  desc: during auto scan
+  user:
+  <source>
+    *: none
+    radio: "Scanning %d.%02d MHz"
+  </source>
+  <dest>
+    *: none
+    radio: "सकान करा है %d.%02d MHz"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_DEFAULT_PRESET_NAME
+  desc: default preset name for auto scan mode
+  user:
+  <source>
+    *: none
+    radio: "%d.%02d MHz"
+  </source>
+  <dest>
+    *: none
+    radio: "%d.%02d MHz"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIO_SCAN_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: none
+    radio: "Scan"
+  </source>
+  <dest>
+    *: none
+    radio: "सकान"
+  </dest>
+  <voice>
+    *: none
+    radio: "सकान"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_LOAD
+  desc: load preset list in fm radio
+  user:
+  <source>
+    *: none
+    radio: "Load Preset List"
+  </source>
+  <dest>
+    *: none
+    radio: "लोड Preset List"
+  </dest>
+  <voice>
+    *: none
+    radio: "लोड Preset List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE
+  desc: Save preset list in fm radio
+  user:
+  <source>
+    *: none
+    radio: "Save Preset List"
+  </source>
+  <dest>
+    *: none
+    radio: "Preset List बचा"
+  </dest>
+  <voice>
+    *: none
+    radio: "Preset List बचा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_CLEAR
+  desc: clear preset list in fm radio
+  user:
+  <source>
+    *: none
+    radio: "Clear Preset List"
+  </source>
+  <dest>
+    *: none
+    radio: "Preset List निकाल"
+  </dest>
+  <voice>
+    *: none
+    radio: "Preset List निकाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FMR
+  desc: Used when you need to say Preset List, also voiced
+  user:
+  <source>
+    *: none
+    radio: "Preset List"
+  </source>
+  <dest>
+    *: none
+    radio: "Preset List"
+  </dest>
+  <voice>
+    *: none
+    radio: "Preset List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FIRST_AUTOSCAN
+  desc: When you run the radio without an fmr file in settings
+  user:
+  <source>
+    *: none
+    radio: "No settings found. Autoscan?"
+  </source>
+  <dest>
+    *: none
+    radio: "No सेटिनगस found. Autoscan?"
+  </dest>
+  <voice>
+    *: none
+    radio: "No सेटिनगस found. Autoscan?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SAVE_CHANGES
+  desc: When you try to exit radio to confirm save
+  user:
+  <source>
+    *: none
+    radio: "Save Changes?"
+  </source>
+  <dest>
+    *: none
+    radio: "Changes बचा?"
+  </dest>
+  <voice>
+    *: none
+    radio: "Changes बचा?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  <source>
+    *: none
+    radio: "Region"
+  </source>
+  <dest>
+    *: none
+    radio: "Region"
+  </dest>
+  <voice>
+    *: none
+    radio: "Region"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  <source>
+    *: none
+    radio: "Europe"
+  </source>
+  <dest>
+    *: none
+    radio: "Europe"
+  </dest>
+  <voice>
+    *: none
+    radio: "Europe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  <source>
+    *: none
+    radio: "US / Canada"
+  </source>
+  <dest>
+    *: none
+    radio: "US / Canada"
+  </dest>
+  <voice>
+    *: none
+    radio: "US and Canada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  <source>
+    *: none
+    radio: "Japan"
+  </source>
+  <dest>
+    *: none
+    radio: "Japan"
+  </dest>
+  <voice>
+    *: none
+    radio: "Japan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  <source>
+    *: none
+    radio: "Korea"
+  </source>
+  <dest>
+    *: none
+    radio: "Korea"
+  </dest>
+  <voice>
+    *: none
+    radio: "Korea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user:
+  <source>
+    *: none
+    recording: "Format"
+  </source>
+  <dest>
+    *: none
+    recording: "Format"
+  </dest>
+  <voice>
+    *: none
+    recording: "Format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user:
+  <source>
+    *: none
+    recording: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: none
+    recording: "MPEG Layer 3"
+  </dest>
+  <voice>
+    *: none
+    recording: "MPEG Layer 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user:
+  <source>
+    *: none
+    recording: "PCM Wave"
+  </source>
+  <dest>
+    *: none
+    recording: "PCM Wave"
+  </dest>
+  <voice>
+    *: none
+    recording: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user:
+  <source>
+    *: none
+    recording_swcodec: "WavPack"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "WavPack"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "WavPack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user:
+  <source>
+    *: none
+    recording: "AIFF"
+  </source>
+  <dest>
+    *: none
+    recording: "AIFF"
+  </dest>
+  <voice>
+    *: none
+    recording: "AIFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user:
+  <source>
+    *: none
+    recording: "Encoder Settings"
+  </source>
+  <dest>
+    *: none
+    recording: "इनकोडर सेटिनगस"
+  </dest>
+  <voice>
+    *: none
+    recording: "इनकोडर सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user:
+  <source>
+    *: none
+    recording_swcodec: "Bitrate"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Bitrate"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: "Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user:
+  <source>
+    *: none
+    recording: "(No Settings)"
+  </source>
+  <dest>
+    *: none
+    recording: "(कोई नही सेटिनगस हैं)"
+  </dest>
+  <voice>
+    *: none
+    recording: "कोई नही सेटिनगस हैं"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_QUALITY
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_hwcodec: "Quality"
+  </source>
+  <dest>
+    *: none
+    recording_hwcodec: "Quality"
+  </dest>
+  <voice>
+    *: none
+    recording_hwcodec: "Quality"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FREQUENCY
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Frequency"
+  </source>
+  <dest>
+    *: none
+    recording: "Frequency"
+  </dest>
+  <voice>
+    *: none
+    recording: "Frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user:
+  <source>
+    *: none
+    recording: "(Same As Source)"
+  </source>
+  <dest>
+    *: none
+    recording: "(Same As Source)"
+  </dest>
+  <voice>
+    *: none
+    recording: "Same As Source"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SOURCE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Source"
+  </source>
+  <dest>
+    *: none
+    recording: "Source"
+  </dest>
+  <voice>
+    *: none
+    recording: "Source"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_MIC
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Microphone"
+    h100,h120,h300: "Internal Microphone"
+  </source>
+  <dest>
+    *: none
+    recording: "Microphone"
+    h100,h120,h300: "Internal Microphone"
+  </dest>
+  <voice>
+    *: none
+    recording: "Microphone"
+    h100,h120,h300: "Internal Microphone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_DIGITAL
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Digital"
+  </source>
+  <dest>
+    *: none
+    recording: "Digital"
+  </dest>
+  <voice>
+    *: none
+    recording: "Digital"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINE_IN
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording,player: "Line In"
+  </source>
+  <dest>
+    *: none
+    recording,player: "Line In"
+  </dest>
+  <voice>
+    *: none
+    recording,player: "Line In"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_EDITABLE
+  desc: Editable recordings setting
+  user:
+  <source>
+    *: none
+    recording_hwcodec: "Independent Frames"
+  </source>
+  <dest>
+    *: none
+    recording_hwcodec: "Independent Frames"
+  </dest>
+  <voice>
+    *: none
+    recording_hwcodec: "Independent Frames"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TIMESPLIT
+  desc: Record split menu
+  user:
+  <source>
+    *: none
+    recording: "File Split Options"
+  </source>
+  <dest>
+    *: none
+    recording: "File Split Options"
+  </dest>
+  <voice>
+    *: none
+    recording: "File Split Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: none
+    recording: "Split Measure"
+  </source>
+  <dest>
+    *: none
+    recording: "Split Measure"
+  </dest>
+  <voice>
+    *: none
+    recording: "Split Measure"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: none
+    recording: "What to do when Splitting"
+  </source>
+  <dest>
+    *: none
+    recording: "What to do when Splitting"
+  </dest>
+  <voice>
+    *: none
+    recording: "What to do when Splitting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: none
+    recording: "Start new file"
+  </source>
+  <dest>
+    *: none
+    recording: "नया फऍल चालू कर"
+  </dest>
+  <voice>
+    *: none
+    recording: "नया फऍल चालू कर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: none
+    recording: "Stop recording"
+  </source>
+  <dest>
+    *: none
+    recording: "सेटिनगस रोक"
+  </dest>
+  <voice>
+    *: none
+    recording: "सेटिनगस रोक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: none
+    recording: "Split Time"
+  </source>
+  <dest>
+    *: none
+    recording: "Split Time"
+  </dest>
+  <voice>
+    *: none
+    recording: "Split Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: none
+    recording: "Split Filesize"
+  </source>
+  <dest>
+    *: none
+    recording: "Split Filesize"
+  </dest>
+  <voice>
+    *: none
+    recording: "Split Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: none
+    recording: "Filesize"
+  </source>
+  <dest>
+    *: none
+    recording: "Filesize"
+  </dest>
+  <voice>
+    *: none
+    recording: "Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_PRERECORD_TIME
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "Prerecord Time"
+  </source>
+  <dest>
+    *: none
+    recording: "Prerecord Time"
+  </dest>
+  <voice>
+    *: none
+    recording: "Pre-Record time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_DIRECTORY
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Directory"
+  </dest>
+  <voice>
+    *: none
+    recording: "Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_CURRENT_DIR
+  desc: DEPRECATED
+  user:
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: deprecated
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_REC_DIR
+  desc: used in the onplay menu to set a recording dir
+  user:
+  <source>
+    *: none
+    recording: "Set As Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Set As Recording Directory"
+  </dest>
+  <voice>
+    *: none
+    recording: "Set As Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_REC_DIR
+  desc:
+  user:
+  <source>
+    *: none
+    recording: "Clear Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Recording Directory निकाल"
+  </dest>
+  <voice>
+    *: none
+    recording: "Recording Directory निकाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR_NOT_WRITABLE
+  desc:
+  user:
+  <source>
+    *: none
+    recording: "Can't write to recording directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Recording directory में नहीं लिख़ पाय"
+  </dest>
+  <voice>
+    *: none
+    recording: "Recording directory में नहीं लिख़ पाय"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLIP_LIGHT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: none
+    recording: "Clipping Light"
+  </source>
+  <dest>
+    *: none
+    recording: "Clipping Light"
+  </dest>
+  <voice>
+    *: none
+    recording: "Clipping Light"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: none
+    remote: "Main Unit Only"
+  </source>
+  <dest>
+    *: none
+    remote: "Main Unit Only"
+  </dest>
+  <voice>
+    *: none
+    remote: "Main unit only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: none
+    remote: "Remote Unit Only"
+  </source>
+  <dest>
+    *: none
+    remote: "Remote Unit Only"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote unit only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_MAIN
+  desc: in record settings menu.
+  user:
+  <source>
+    *: none
+    remote: "Main and Remote Unit"
+  </source>
+  <dest>
+    *: none
+    remote: "Main and Remote Unit"
+  </dest>
+  <voice>
+    *: none
+    remote: "Main and remote unit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "Trigger"
+  </source>
+  <dest>
+    *: none
+    recording: "Trigger"
+  </dest>
+  <voice>
+    *: none
+    recording: "Trigger"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIG_NOREARM
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "Once"
+  </source>
+  <dest>
+    *: none
+    recording: "एक बार"
+  </dest>
+  <voice>
+    *: none
+    recording: "एक बार"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: none
+    recording: "Trigtype"
+  </source>
+  <dest>
+    *: none
+    recording: "Trigtype"
+  </dest>
+  <voice>
+    *: none
+    recording: "Trigger type"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: none
+    recording: "New file"
+  </source>
+  <dest>
+    *: none
+    recording: "नयी फऍल"
+  </dest>
+  <voice>
+    *: none
+    recording: "नयी फऍल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: none
+    recording: "Stop"
+  </source>
+  <dest>
+    *: none
+    recording: "रोक"
+  </dest>
+  <voice>
+    *: none
+    recording: "रोक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_START_THRESHOLD
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "Start Above"
+  </source>
+  <dest>
+    *: none
+    recording: "ऊपर चालू करना"
+  </dest>
+  <voice>
+    *: none
+    recording: "ऊपर चालू करना"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIN_DURATION
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "for at least"
+  </source>
+  <dest>
+    *: none
+    recording: "for at least"
+  </dest>
+  <voice>
+    *: none
+    recording: "for at least"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STOP_THRESHOLD
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "Stop Below"
+  </source>
+  <dest>
+    *: none
+    recording: "नीचे रोक"
+  </dest>
+  <voice>
+    *: none
+    recording: "नीचे रोक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STOP_GAP
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "Presplit Gap"
+  </source>
+  <dest>
+    *: none
+    recording: "Presplit Gap"
+  </dest>
+  <voice>
+    *: none
+    recording: "Presplit Gap"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_PRERECORD
+  desc: in recording and radio screen
+  user:
+  <source>
+    *: none
+    recording: "Pre-Recording"
+  </source>
+  <dest>
+    *: none
+    recording: "रिकोरडिनग क पहल"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_LEFT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain Left"
+  </source>
+  <dest>
+    *: none
+    recording: "Gain Left"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_RIGHT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain Right"
+  </source>
+  <dest>
+    *: none
+    recording: "Gain Right"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
+  <source>
+    *: none
+    agc: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: none
+    agc: "Automatic Gain Control"
+  </dest>
+  <voice>
+    *: none
+    agc: "Automatic gain control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Safety (clip)"
+  </source>
+  <dest>
+    *: none
+    agc: "Safety (clip)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Safety (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Live (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "Live (धीमा)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Live (धीमा)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "DJ-Set (धीमा)"
+  </dest>
+  <voice>
+    *: none
+    agc: "DJ set (धीमा)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Medium"
+  </source>
+  <dest>
+    *: none
+    agc: "माध्यम"
+  </dest>
+  <voice>
+    *: none
+    agc: "माध्यम"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Voice (fast)"
+  </source>
+  <dest>
+    *: none
+    agc: "आवाज़ (तेज)"
+  </dest>
+  <voice>
+    *: none
+    agc: "आवाज़ (तेज)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  <source>
+    *: none
+    agc: "AGC clip time"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC clip time"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC clip time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash in recording screen
+  user:
+  <source>
+    *: none
+    remote: "Remote Display OFF"
+  </source>
+  <dest>
+    *: none
+    remote: "Remote Display OFF"
+  </dest>
+  <voice>
+    *: none
+    remote: "Remote Display OFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash in recording screen
+  user:
+  <source>
+    *: none
+    remote: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: none
+    remote: "(Vol- : Re-enable)"
+  </dest>
+  <voice>
+    *: none
+    remote: "(Vol- : Re-enable)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATE_PLAYLIST
+  desc: Menu option for creating a playlist
+  user:
+  <source>
+    *: "Create Playlist"
+  </source>
+  <dest>
+    *: "पलेलिसट बना"
+  </dest>
+  <voice>
+    *: "पलेलिसट बना"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user:
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "पलेलिसट Viewer सेटिनगस"
+  </dest>
+  <voice>
+    *: "पलेलिसट Viewer सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_DYNAMIC_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "View Current Playlist"
+  </source>
+  <dest>
+    *: "View Current पलेलिसट"
+  </dest>
+  <voice>
+    *: "View Current पलेलिसट"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE
+  desc: The verb/action Move
+  user:
+  <source>
+    *: "Move"
+  </source>
+  <dest>
+    *: "हटा"
+  </dest>
+  <voice>
+    *: "हटा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_INDICES
+  desc: in playlist viewer menu
+  user:
+  <source>
+    *: "Show Indices"
+  </source>
+  <dest>
+    *: "Indices दिखा"
+  </dest>
+  <voice>
+    *: "Indices दिखा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_DISPLAY
+  desc: in playlist viewer on+play menu
+  user:
+  <source>
+    *: "Track Display"
+  </source>
+  <dest>
+    *: "Track Display"
+  </dest>
+  <voice>
+    *: "Track Display"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TRACK_NAME_ONLY
+  desc: track display options
+  user:
+  <source>
+    *: "Track Name Only"
+  </source>
+  <dest>
+    *: "सिर्फ़ Track का नाम"
+  </dest>
+  <voice>
+    *: "सिर्फ़ Track का नाम"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE
+  desc: in playlist viewer on+play menu
+  user:
+  <source>
+    *: "Remove"
+  </source>
+  <dest>
+    *: "निकाल"
+  </dest>
+  <voice>
+    *: "निकाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_DYNAMIC_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "Save Current Playlist"
+  </source>
+  <dest>
+    *: "अभी की पलेलिसट बचा"
+  </dest>
+  <voice>
+    *: "अभी की पलेलिसट बचा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SAVE_COUNT
+  desc: splash number of tracks saved
+  user:
+  <source>
+    *: "Saved %d tracks (%s)"
+  </source>
+  <dest>
+    *: "Saved %d tracks (%s)"
+  </dest>
+  <voice>
+    *: "tracks saved"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist Catalog"
+  </source>
+  <dest>
+    *: "पलेलिसट काटालोग"
+  </dest>
+  <voice>
+    *: "पलेलिसट काटालोग"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECURSE_DIRECTORY
+  desc: In playlist menu
+  user:
+  <source>
+    *: "Recursively Insert Directories"
+  </source>
+  <dest>
+    *: "Recursively Insert Directories"
+  </dest>
+  <voice>
+    *: "Recursively Insert Directories"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECURSE_DIRECTORY_QUESTION
+  desc: Asked from onplay screen
+  user:
+  <source>
+    *: "Recursively?"
+  </source>
+  <dest>
+    *: "Recursively?"
+  </dest>
+  <voice>
+    *: "Recursively?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+  desc: in playlist options menu, option to warn when erasing dynamic playlist
+  user:
+  <source>
+    *: "Warn When Erasing Dynamic Playlist"
+  </source>
+  <dest>
+    *: "Warn When Erasing Dynamic Playlist"
+  </dest>
+  <voice>
+    *: "Warn When Erasing Dynamic Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+  desc: prompt shown when about to erase a modified dynamic playlist
+  user:
+  <source>
+    *: "Erase dynamic playlist?"
+  </source>
+  <dest>
+    *: "Erase dynamic playlist?"
+  </dest>
+  <voice>
+    *: "Erase dynamic playlist?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUTDOWN
+  desc: in main menu
+  user:
+  <source>
+    *: none
+    soft_shutdown: "Shut down"
+  </source>
+  <dest>
+    *: none
+    soft_shutdown: "Shut down"
+  </dest>
+  <voice>
+    *: none
+    soft_shutdown: "Shut down"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_INFO
+  desc: displayed topmost on the info screen and in the info menu
+  user:
+  <source>
+    *: "Rockbox Info"
+  </source>
+  <dest>
+    *: "रोकबोकस इनफो"
+  </dest>
+  <voice>
+    *: "रोकबोकस इनफो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT
+  desc: the buffer size, %d MB %d fraction of MB
+  user:
+  <source>
+    *: "Buffer: %d.%03dMB"
+    player: "Buf: %d.%03dMB"
+  </source>
+  <dest>
+    *: "Buffer: %d.%03dMB"
+    player: "Buf: %d.%03dMB"
+  </dest>
+  <voice>
+    *: "Buffer size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TIME
+  desc: battery level in % and estimated time remaining
+  user:
+  <source>
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+  </source>
+  <dest>
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
+  </dest>
+  <voice>
+    *: "Battery level"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_SIZE_INFO
+  desc: disk size info
+  user:
+  <source>
+    *: "Disk:"
+  </source>
+  <dest>
+    *: "डिसक:"
+  </dest>
+  <voice>
+    *: "डिसक size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_FREE_INFO
+  desc: disk size info
+  user:
+  <source>
+    *: "Free:"
+  </source>
+  <dest>
+    *: "खाली जगा डिसक पर:"
+  </dest>
+  <voice>
+    *: "खाली जगा डिसक पर:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_NAME_INTERNAL
+  desc: in info menu; name for internal disk with multivolume (keep short!)
+  user:
+  <source>
+    *: none
+    multivolume: "Int:"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Int:"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "Internal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_NAME_MMC
+  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  user:
+  <source>
+    *: none
+    e200,c200: "mSD:"
+    ondio*: "MMC:"
+  </source>
+  <dest>
+    *: none
+    e200,c200: "MSD:"
+    ondio*: "MMC:"
+  </dest>
+  <voice>
+    *: none
+    e200,c200: "micro S D"
+    ondio*: "M M C"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERSION
+  desc: in the info menu
+  user:
+  <source>
+    *: "Version"
+  </source>
+  <dest>
+    *: "वरशन"
+  </dest>
+  <voice>
+    *: "वरशन"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "Running Time"
+  </dest>
+  <voice>
+    *: "Running Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: deprecated
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "Top Time"
+  </dest>
+  <voice>
+    *: "Top Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "Clear Time?"
+  </dest>
+  <voice>
+    *: "Clear Time?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEBUG
+  desc: in the info menu
+  user:
+  <source>
+    *: "Debug (Keep Out!)"
+  </source>
+  <dest>
+    *: "Debug (Keep Out!)"
+  </dest>
+  <voice>
+    *: "Debug, keep out!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user:
+  <source>
+    *: "Playlist"
+  </source>
+  <dest>
+    *: "पलेलिसट"
+  </dest>
+  <voice>
+    *: "पलेलिसट"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT
+  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Insert"
+  </source>
+  <dest>
+    *: "डाल"
+  </dest>
+  <voice>
+    *: "डाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_FIRST
+  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Insert next"
+  </source>
+  <dest>
+    *: "अगला डाल"
+  </dest>
+  <voice>
+    *: "अगला डाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST
+  desc: in onplay menu.  append a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Insert last"
+  </source>
+  <dest>
+    *: "पिछला डाल"
+  </dest>
+  <voice>
+    *: "पिछला डाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_SHUFFLED
+  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+  user:
+  <source>
+    *: "Insert shuffled"
+  </source>
+  <dest>
+    *: "मिलावा डाल"
+  </dest>
+  <voice>
+    *: "मिलावा डाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE
+  desc: The verb/action Queue
+  user:
+  <source>
+    *: "Queue"
+  </source>
+  <dest>
+    *: "Queue"
+  </dest>
+  <voice>
+    *: "Queue"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_FIRST
+  desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Queue next"
+  </source>
+  <dest>
+    *: "Queue अगला"
+  </dest>
+  <voice>
+    *: "Queue अगला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST
+  desc: in onplay menu.  queue a track/playlist at end of playlist.
+  user:
+  <source>
+    *: "Queue last"
+  </source>
+  <dest>
+    *: "Queue पिछला"
+  </dest>
+  <voice>
+    *: "Queue पिछला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_SHUFFLED
+  desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+  user:
+  <source>
+    *: "Queue shuffled"
+  </source>
+  <dest>
+    *: "Queue मिलावा"
+  </dest>
+  <voice>
+    *: "Queue मिलावा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "अगला पलाय कर"
+  </dest>
+  <voice>
+    *: "अगला पलाय कर"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_INSERT_COUNT
+  desc: splash number of tracks inserted
+  user:
+  <source>
+    *: "Inserted %d tracks (%s)"
+  </source>
+  <dest>
+    *: "Inserted %d tracks (%s)"
+  </dest>
+  <voice>
+    *: "tracks inserted"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_QUEUE_COUNT
+  desc: splash number of tracks queued
+  user:
+  <source>
+    *: "Queued %d tracks (%s)"
+  </source>
+  <dest>
+    *: "Queued %d tracks (%s)"
+  </dest>
+  <voice>
+    *: "tracks queued"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW
+  desc: in on+play menu
+  user:
+  <source>
+    *: "View"
+  </source>
+  <dest>
+    *: "देख"
+  </dest>
+  <voice>
+    *: "देख"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_IN_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "Search In Playlist"
+  </source>
+  <dest>
+    *: "Search In पलेलिसट"
+  </dest>
+  <voice>
+    *: "Search In पलेलिसट"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SEARCH_MSG
+  desc: splash number of tracks inserted
+  user:
+  <source>
+    *: "Searching... %d found (%s)"
+  </source>
+  <dest>
+    *: "खोज... %d मिले (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_PLAYLIST
+  desc: in playlist menu, reshuffles the order in which songs are played
+  user:
+  <source>
+    *: "Reshuffle"
+  </source>
+  <dest>
+    *: "वापस मिला"
+  </dest>
+  <voice>
+    *: "वापस मिला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View Catalog"
+  </source>
+  <dest>
+    *: "काटालोग देख"
+  </dest>
+  <voice>
+    *: "काटालोग देख"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to Playlist"
+  </source>
+  <dest>
+    *: "पलेलिसट म मिला"
+  </dest>
+  <voice>
+    *: "पलेलिसट म मिला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to New Playlist"
+  </source>
+  <dest>
+    *: "नयी पलेलिसट में मिला"
+  </dest>
+  <voice>
+    *: "नयी पलेलिसट में मिला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s नही है"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No Playlists"
+  </source>
+  <dest>
+    *: "कोई पलेलिसट नही है"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU
+  desc: Text on main menu to get to bookmark commands
+  user:
+  <source>
+    *: "Bookmarks"
+  </source>
+  <dest>
+    *: "बूकमारक"
+  </dest>
+  <voice>
+    *: "बूकमारक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_CREATE
+  desc: Used off of the bookmark menu to create a bookmark
+  user:
+  <source>
+    *: "Create Bookmark"
+  </source>
+  <dest>
+    *: "बूकमारक बना"
+  </dest>
+  <voice>
+    *: "बूकमारक बना"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_LIST
+  desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+  user:
+  <source>
+    *: "List Bookmarks"
+  </source>
+  <dest>
+    *: "बूकमारक दिखा"
+  </dest>
+  <voice>
+    *: "बूकमारक दिखा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user:
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "Context Menu"
+  </dest>
+  <voice>
+    *: "Context Menu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SET_RATING
+  desc: Set the rating of a file in the wps context menu
+  user:
+  <source>
+    *: "Set Song Rating"
+  </source>
+  <dest>
+    *: "Set Song Rating"
+  </dest>
+  <voice>
+    *: "Set Song Rating"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE_CUESHEET
+  desc:
+  user:
+  <source>
+    *: "Browse Cuesheet"
+  </source>
+  <dest>
+    *: "Browse Cuesheet"
+  </dest>
+  <voice>
+    *: "Browse Cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SHOW_ID3_INFO
+  desc: Menu option to start tag viewer
+  user:
+  <source>
+    *: "Show Track Info"
+  </source>
+  <dest>
+    *: "Track इनफो दिखा"
+  </dest>
+  <voice>
+    *: "Track इनफो दिखा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TITLE
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Title]"
+  </source>
+  <dest>
+    *: "[Title]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Artist]"
+  </source>
+  <dest>
+    *: "[Artist]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUM
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[Album]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TRACKNUM
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Tracknum]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_GENRE
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Genre]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_YEAR
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[साल]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[Length]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_PLAYLIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Playlist]"
+  </source>
+  <dest>
+    *: "[पलेलिसट]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_BITRATE
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Bitrate]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Album Artist]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_DISCNUM
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Discnum]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Comment]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_VBR
+  desc: in browse_id3
+  user:
+  <source>
+    *: " (VBR)"
+  </source>
+  <dest>
+    *: " (VBR)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_FREQUENCY
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Frequency]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TRACK_GAIN
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Track Gain]"
+  </source>
+  <dest>
+    *: "[Track Gain]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUM_GAIN
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Gain]"
+  </source>
+  <dest>
+    *: "[Album Gain]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_PATH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Path]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_NO_INFO
+  desc: in tag viewer
+  user:
+  <source>
+    *: "<No Info>"
+  </source>
+  <dest>
+    *: "<कोई इनफो नही है>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RENAME
+  desc: The verb/action Rename
+  user:
+  <source>
+    *: "Rename"
+  </source>
+  <dest>
+    *: "वापस नाम दे"
+  </dest>
+  <voice>
+    *: "Rename"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUT
+  desc: The verb/action Cut
+  user:
+  <source>
+    *: "Cut"
+  </source>
+  <dest>
+    *: "कट"
+  </dest>
+  <voice>
+    *: "कट"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPY
+  desc: The verb/action Copy
+  user:
+  <source>
+    *: "Copy"
+  </source>
+  <dest>
+    *: "कोपी"
+  </dest>
+  <voice>
+    *: "कोपी"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PASTE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "Paste"
+  </source>
+  <dest>
+    *: "डाल"
+  </dest>
+  <voice>
+    *: "डाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_OVERWRITE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "File/directory exists. Overwrite?"
+  </source>
+  <dest>
+    *: "File/directory exists. Overwrite?"
+  </dest>
+  <voice>
+    *: "File or directory exists. Overwrite?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETE
+  desc: The verb/action Delete
+  user:
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "निकाल"
+  </dest>
+  <voice>
+    *: "निकाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETE_DIR
+  desc: in on+play menu
+  user:
+  <source>
+    *: "Delete Directory"
+  </source>
+  <dest>
+    *: "Directory निकाल"
+  </dest>
+  <voice>
+    *: "Directory निकाल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_DELETE
+  desc: Really Delete?
+  user:
+  <source>
+    *: "Delete?"
+  </source>
+  <dest>
+    *: "निकाल?"
+  </dest>
+  <voice>
+    *: "Really निकाल?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPYING
+  desc:
+  user:
+  <source>
+    *: "Copying..."
+  </source>
+  <dest>
+    *: "कोपी होरा है..."
+  </dest>
+  <voice>
+    *: "कोपी होरा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETING
+  desc:
+  user:
+  <source>
+    *: "Deleting..."
+  </source>
+  <dest>
+    *: "निकल रहा है..."
+  </dest>
+  <voice>
+    *: "निकल रहा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVING
+  desc:
+  user:
+  <source>
+    *: "Moving..."
+  </source>
+  <dest>
+    *: "डाल रहा है..."
+  </dest>
+  <voice>
+    *: "डाल रहा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETED
+  desc: A file has beed deleted
+  user:
+  <source>
+    *: "Deleted"
+  </source>
+  <dest>
+    *: "निकाल दिया"
+  </dest>
+  <voice>
+    *: "निकाल दिया"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_BACKDROP
+  desc: text for onplay menu entry
+  user:
+  <source>
+    *: none
+    lcd_non-mono: "Set As Backdrop"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Set As Backdrop"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: "Set As Backdrop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_LOADED
+  desc: text for splash to indicate a new backdrop has been loaded successfully
+  user:
+  <source>
+    *: none
+    lcd_non-mono: "Backdrop Loaded"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Backdrop Loaded"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_FAILED
+  desc: text for splash to indicate a failure to load a bitmap as backdrop
+  user:
+  <source>
+    *: none
+    lcd_non-mono: "Backdrop Failed"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Backdrop Failed"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_OPEN_WITH
+  desc: Onplay open with
+  user:
+  <source>
+    *: "Open With..."
+  </source>
+  <dest>
+    *: "साथ में खोल..."
+  </dest>
+  <voice>
+    *: "साथ में खोल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATE_DIR
+  desc: in main menu
+  user:
+  <source>
+    *: "Create Directory"
+  </source>
+  <dest>
+    *: "Directory बना"
+  </dest>
+  <voice>
+    *: "Directory बना"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "परोपरटीस"
+  </dest>
+  <voice>
+    *: "परोपरटीस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_FAVES
+  desc:
+  user:
+  <source>
+    *: "Add to shortcuts"
+  </source>
+  <dest>
+    *: "शोरटकटस में मिला"
+  </dest>
+  <voice>
+    *: "शोरटकटस में मिला"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH
+  desc: "pitch" in the pitch screen
+  user:
+  <source>
+    *: none
+    pitchscreen: "Pitch"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Pitch"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Pitch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_UP
+  desc: in wps
+  user:
+  <source>
+    *: none
+    pitchscreen: "Pitch Up"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Pitch ऊपर"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_DOWN
+  desc: in wps
+  user:
+  <source>
+    *: none
+    pitchscreen: "Pitch Down"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Pitch नीचे"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: none
+    pitchscreen: "Semitone Up"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Semitone ऊपर"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: none
+    pitchscreen: "Semitone Down"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Semitone नीचे"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_BUFFER_FULL
+  desc: in playlist.indices() when playlist is full
+  user:
+  <source>
+    *: "Playlist Buffer Full"
+  </source>
+  <dest>
+    *: "पलेलिसट बफफर भरा है"
+  </dest>
+  <voice>
+    *: "पलेलिसट बफफर भरा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST
+  desc: when playlist has finished
+  user:
+  <source>
+    *: "End of Song List"
+    player: "End of List"
+  </source>
+  <dest>
+    *: "गाने खतम हो गये"
+    player: "खतम हो गये"
+  </dest>
+  <voice>
+    *: "गाने खतम हो गये"
+    player: "खतम हो गये"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATING
+  desc: Screen feedback during playlist creation
+  user:
+  <source>
+    *: "Creating"
+  </source>
+  <dest>
+    *: "बन रहा है"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOTHING_TO_RESUME
+  desc: Error message displayed when resume button pressed but no playlist
+  user:
+  <source>
+    *: "Nothing to resume"
+  </source>
+  <dest>
+    *: "शुरू करने केले कुछ नहीं है"
+  </dest>
+  <voice>
+    *: "शुरू करने केले कुछ नहीं है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error updating playlist control file"
+  </source>
+  <dest>
+    *: "Error updating पलेलिसट control file"
+  </dest>
+  <voice>
+    *: "Error updating पलेलिसट control file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_ACCESS_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error accessing playlist file"
+  </source>
+  <dest>
+    *: "Error accessing पलेलिसट file"
+  </dest>
+  <voice>
+    *: "Error accessing पलेलिसट file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error accessing playlist control file"
+  </source>
+  <dest>
+    *: "Error accessing पलेलिसट control file"
+  </dest>
+  <voice>
+    *: "Error accessing पलेलिसट control file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error accessing directory"
+  </source>
+  <dest>
+    *: "Error accessing directory"
+  </dest>
+  <voice>
+    *: "Error accessing directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_INVALID
+  desc: Playlist resume error
+  user:
+  <source>
+    *: "Playlist control file is invalid"
+  </source>
+  <dest>
+    *: "पलेलिसट control file is invalid"
+  </dest>
+  <voice>
+    *: "पलेलिसट control file is invalid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_FAILED
+  desc: displayed if save settings has failed
+  user:
+  <source>
+    *: "Save Failed"
+  </source>
+  <dest>
+    *: "बच नहीं सका"
+  </dest>
+  <voice>
+    *: "बच नहीं सका"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_PARTITION
+  desc: if save settings has failed
+  user:
+  <source>
+    *: "No partition?"
+    player: "Partition?"
+  </source>
+  <dest>
+    *: "पारटिशन नहीं है?"
+    player: "पारटिशन?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE
+  desc: in wps and recording trigger menu
+  user:
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "रोक"
+  </dest>
+  <voice>
+    *: "रोक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MODE
+  desc: in wps F2 pressed and radio screen
+  user:
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "Mode:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME
+  desc: Used on the bookmark select window to label elapsed time
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "समय"
+  </dest>
+  <voice>
+    *: "समय"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user:
+  <source>
+    *: none
+    usb_charging: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: none
+    usb_charging: "Charge During USB Connection"
+  </dest>
+  <voice>
+    *: none
+    usb_charging: "Charge During U S B Connection"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON
+  desc: displayed when key lock is on
+  user:
+  <source>
+    *: "Buttons Locked"
+  </source>
+  <dest>
+    *: "Buttons Locked"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF
+  desc: displayed when key lock is turned off
+  user:
+  <source>
+    *: "Buttons Unlocked"
+  </source>
+  <dest>
+    *: "Buttons Unlocked"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIME
+  desc: Display of recorded time
+  user:
+  <source>
+    *: none
+    recording: "Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "समय:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_FULL
+  desc: in recording screen
+  user:
+  <source>
+    *: none
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5: "The disk is full. Press POWER to continue."
+    e200,c200: "The disk is full. Press UP to continue."
+  </source>
+  <dest>
+    *: none
+    recording: "दिसक भरी ह. Press OFF to continue."
+    h100,h120,h300: "दिसक भरी ह. Press STOP to continue."
+    m5,x5: "दिसक भरी ह. Press POWER to continue."
+    e200,c200: "दिसक भरी ह. Press UP to continue."
+  </dest>
+  <voice>
+    *: none
+    recording,h100,h120,h300,m5,x5,e200,c200: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DB_INF
+  desc: -inf db for values below measurement
+  user:
+  <source>
+    *: none
+    recording: "-inf"
+  </source>
+  <dest>
+    *: none
+    recording: "-inf"
+  </dest>
+  <voice>
+    *: none
+    recording: "minus infinity"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONFIRM_SHUTDOWN
+  desc: in shutdown screen
+  user:
+  <source>
+    *: none
+    soft_shutdown: "Press OFF to shut down"
+  </source>
+  <dest>
+    *: none
+    soft_shutdown: "Press OFF बंद करने केहलिये"
+  </dest>
+  <voice>
+    *: none
+    soft_shutdown: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_MMC
+  desc: before acknowledging usb in case an MMC is inserted (Ondio)
+  user:
+  <source>
+    *: none
+    ondio*: "Please remove inserted MMC"
+  </source>
+  <dest>
+    *: none
+    ondio*: "ैूनिकालो MMC"
+  </dest>
+  <voice>
+    *: none
+    ondio*: "multimedia card ैूनिकालो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOT_CHANGED
+  desc: File browser discovered the boot file was changed
+  user:
+  <source>
+    *: "Boot changed"
+  </source>
+  <dest>
+    *: "बूट निकल गया"
+  </dest>
+  <voice>
+    *: "बूट निकल गया"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBOOT_NOW
+  desc: Do you want to reboot?
+  user:
+  <source>
+    *: "Reboot now?"
+  </source>
+  <dest>
+    *: "रीबूट अभी करना है?"
+  </dest>
+  <voice>
+    *: "रीबूट अभी करना है?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OFF_ABORT
+  desc: Used on recorder models
+  user:
+  <source>
+    *: "OFF to abort"
+    player,h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5,m5: "Long PLAY to abort"
+    h10,h10_5gb,e200,c200: "PREV to abort"
+  </source>
+  <dest>
+    *: "OFF to abort"
+    player,h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5,m5: "Long PLAY to abort"
+    h10,h10_5gb,e200,c200: "PREV to abort"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_FILES
+  desc: in settings_menu
+  user:
+  <source>
+    *: "No files"
+  </source>
+  <dest>
+    *: "कोई नहीं फऍल है"
+  </dest>
+  <voice>
+    *: "कोई नहीं फऍल है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYBOARD_LOADED
+  desc: shown when a keyboard has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Keyboard"
+  </source>
+  <dest>
+    *: "नया कीयबोरड"
+  </dest>
+  <voice>
+    *: "नया कीयबोरड"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_CANT_OPEN
+  desc: Plugin open error message
+  user:
+  <source>
+    *: "Can't open %s"
+  </source>
+  <dest>
+    *: "नही खोल पाय %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_READ_FAILED
+  desc: There was an error reading a file
+  user:
+  <source>
+    *: "Failed reading %s"
+  </source>
+  <dest>
+    *: "पड नहीं पाय %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_WRONG_MODEL
+  desc: The plugin is not compatible with the archos model trying to run it
+  user:
+  <source>
+    *: "Incompatible model"
+  </source>
+  <dest>
+    *: "गलत मोडल"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_WRONG_VERSION
+  desc: The plugin is not compatible with the rockbox version trying to run it
+  user:
+  <source>
+    *: "Incompatible version"
+  </source>
+  <dest>
+    *: "गलत वरशन"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_ERROR
+  desc: The plugin return an error code
+  user:
+  <source>
+    *: "Plugin returned error"
+  </source>
+  <dest>
+    *: "पलगिन नहीं चल सका"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_EXTENSION_FULL
+  desc: Extension array full
+  user:
+  <source>
+    *: "Extension array full"
+  </source>
+  <dest>
+    *: "Extension array भरा है"
+  </dest>
+  <voice>
+    *: "Extension array भरा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_FULL
+  desc: Filetype array full
+  user:
+  <source>
+    *: "Filetype array full"
+  </source>
+  <dest>
+    *: "Filetype array भरा है"
+  </dest>
+  <voice>
+    *: "Filetype array भरा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOWDIR_BUFFER_FULL
+  desc: in showdir(), displayed on screen when you reach buffer limit
+  user:
+  <source>
+    *: "Dir Buffer is Full!"
+  </source>
+  <dest>
+    *: "Dir बफफर भरा है!"
+  </dest>
+  <voice>
+    *: "Directory Buffer भरा है!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "फऍल का नाम गलत है!"
+  </dest>
+  <voice>
+    *: "फऍल का नाम गलत है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_PLUGIN_NAME_LONG
+  desc: Viewer plugin name too long
+  user:
+  <source>
+    *: "Plugin name too long"
+  </source>
+  <dest>
+    *: "फऍल का नाम लमबा है"
+  </dest>
+  <voice>
+    *: "फऍल का नाम लमबा है"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTARTING_PLAYBACK
+  desc: splash screen displayed when pcm buffer size is changed
+  user:
+  <source>
+    *: none
+    swcodec: "Restarting playback..."
+  </source>
+  <dest>
+    *: none
+    swcodec: "Restarting playback..."
+  </dest>
+  <voice>
+    *: none
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user:
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "Please reboot to enable"
+  </dest>
+  <voice>
+    *: "Please reboot to enable"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_CHARGE
+  desc: tells that the battery is charging, instead of battery level
+  user:
+  <source>
+    *: none
+    charging: "Battery: Charging"
+  </source>
+  <dest>
+    *: none
+    charging: "Battery: Charging"
+  </dest>
+  <voice>
+    *: none
+    charging: "Battery: Charging"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TOPOFF_CHARGE
+  desc: in info display, shows that top off charge is running Only for V1 recorder
+  user:
+  <source>
+    *: none
+    recorder: "Battery: Top-Off Chg"
+  </source>
+  <dest>
+    *: none
+    recorder: "Battery: Top-Off Chg"
+  </dest>
+  <voice>
+    *: none
+    recorder: "Top off charge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TRICKLE_CHARGE
+  desc: in info display, shows that trickle charge is running
+  user:
+  <source>
+    *: none
+    charging: "Battery: Trickle Chg"
+  </source>
+  <dest>
+    *: none
+    charging: "Battery: Trickle Chg"
+  </dest>
+  <voice>
+    *: none
+    charging: "Trickle charge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user:
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "WARNING! Low Battery!"
+  </dest>
+  <voice>
+    *: "WARNING! Low Battery!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user:
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "Battery empty! RECHARGE!"
+  </dest>
+  <voice>
+    *: "Battery empty! RECHARGE!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BYTE
+  desc: a unit postfix
+  user:
+  <source>
+    *: "B"
+  </source>
+  <dest>
+    *: "B"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KILOBYTE
+  desc: a unit postfix, also voiced
+  user:
+  <source>
+    *: "KB"
+  </source>
+  <dest>
+    *: "KB"
+  </dest>
+  <voice>
+    *: "kilobyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEGABYTE
+  desc: a unit postfix, also voiced
+  user:
+  <source>
+    *: "MB"
+  </source>
+  <dest>
+    *: "MB"
+  </dest>
+  <voice>
+    *: "megabyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIGABYTE
+  desc: a unit postfix, also voiced
+  user:
+  <source>
+    *: "GB"
+  </source>
+  <dest>
+    *: "GB"
+  </dest>
+  <voice>
+    *: "gigabyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POINT
+  desc: decimal separator for composing numbers
+  user:
+  <source>
+    *: "."
+  </source>
+  <dest>
+    *: "."
+  </dest>
+  <voice>
+    *: "point"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ZERO
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "०"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ONE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "१"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWO
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "२"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THREE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "३"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FOUR
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "४"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "५"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIX
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "६"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "७"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHT
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "८"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "९"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "१०"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ELEVEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "११"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWELVE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "१२"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THIRTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "१३"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FOURTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "१४"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "१५"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIXTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "१६"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVENTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "१७"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "१८"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINETEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "१९"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWENTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "२०"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THIRTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "३०"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FORTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "४०"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "५०"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIXTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "६०"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVENTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "७०"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "८०"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINETY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "९०"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HUNDRED
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "सौ"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THOUSAND
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "एक हज़ार"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLION
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "मिल्यन"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BILLION
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "बिलियन"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUS
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "कम"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLUS
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "मिला"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLISECONDS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "milliseconds"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SECOND
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "second"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SECONDS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "seconds"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUTE
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "मिनट"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUTES
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "मिनट"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HOUR
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "घंटा"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HOURS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "घंटे"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KHZ
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilohertz"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DB
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "decibel"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PERCENT
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "percent"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLIAMPHOURS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "milli-amp hours"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PIXEL
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "pixel"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PER_SEC
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "per second"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HERTZ
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "hertz"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobits per second"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_A
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "A"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_B
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "B"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_C
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "C"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_D
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "D"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_E
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "E"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_F
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "F"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_G
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "G"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_H
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "H"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_I
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "I"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_J
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "J"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_K
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "K"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_L
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "L"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_M
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_N
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "N"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_O
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "O"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_P
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "P"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Q
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_R
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "R"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_S
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "S"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_T
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "T"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_U
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "U"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_V
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "V"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_W
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "W"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_X
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "X"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Y
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Y"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Z
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Z"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DOT
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "dot"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAUSE
+  desc: spoken only, for spelling, a split second of silence (difficult to author)
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: " "
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FILE
+  desc: spoken only, prefix for file number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "फऍल"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DIR
+  desc: spoken only, prefix for directory number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "folder"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_MPA
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "आवाज़"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_CFG
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "configuration"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_WPS
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "while-playing-screen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_TXT
+  desc: DEPRECATED
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: deprecated
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_ROCK
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FONT
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "font"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_BMARK
+  desc: spoken only, for file extension and the word in general
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "bookmark"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_AJZ
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "firmware"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RWPS
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: none
+    remote: ""
+  </source>
+  <dest>
+    *: none
+    remote: ""
+  </dest>
+  <voice>
+    *: none
+    remote: "remote while-playing-screen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_KBD
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "keyboard"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_CUESHEET
+  desc:
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+     *: ""
+  </dest>
+  <voice>
+    *: "cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_INDEX_TEXT
+  desc: voice only, used in the bookmark list to label index number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Index"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CURRENT_TIME
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "अभी का समय:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SET_BOOL_YES
+  desc: bool true representation
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Yes"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "हां"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "हा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SET_BOOL_NO
+  desc: bool false representation
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "No"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "नहीं"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "नहीं"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_ON
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "On"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "चालू"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "चालू"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_OFF
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Off"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "बंद"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "बंद"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Edit mode: %s"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Edit mode: %s"
+  </dest>
+  <voice>
+    *: none
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Cutoff Frequency"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Cutoff Frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Gain"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Gain"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SHUFFLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Shuffle"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Shuffle"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Shuffle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_REPEAT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Repeat"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Repeat"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Repeat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_ALL
+  desc: repeat playlist once all songs have completed
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "All"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "सब"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "सब"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_REPEAT_ONE
+  desc: repeat one song
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "One"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "एक"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "एक"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_REPEAT_AB
+  desc: repeat range from point A to B
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "A-B"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "A-B"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "A-B"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER
+  desc: setting name for dir filter
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Show Files"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "फऍल दिखा"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "फऍल दिखा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_SUPPORTED
+  desc: show all file types supported by Rockbox
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Supported"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Supported"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Supported"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_MUSIC
+  desc: show only music-related files
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Music"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "गाने"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "गाने"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_PLAYLIST
+  desc: show only playlist
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Playlists"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "पलेलिसट"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "पलेलिसट"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FLIP_DISPLAY
+  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Upside Down"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "ऊलटा"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "ऊलटा"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SCROLL_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Scroll Bar"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scroll Bar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_STATUS_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Status Bar"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Status Bar"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Status Bar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_MODE
+  desc: in wps F2 pressed
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Mode:"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mode:"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_DIRBROWSE_F1
+  desc: in dir browser, F1 button bar text
+  user:
+  <source>
+    *: none
+    recorder_pad: "Menu"
+  </source>
+  <dest>
+    *: none
+    recorder_pad: "Menu"
+  </dest>
+  <voice>
+    *: none
+    recorder_pad: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_DIRBROWSE_F2
+  desc: in dir browser, F2 button bar text
+  user:
+  <source>
+    *: none
+    recorder_pad: "Option"
+  </source>
+  <dest>
+    *: none
+    recorder_pad: "Option"
+  </dest>
+  <voice>
+    *: none
+    recorder_pad: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_DIRBROWSE_F3
+  desc: in dir browser, F3 button bar text
+  user:
+  <source>
+    *: none
+    recorder_pad: "LCD"
+  </source>
+  <dest>
+    *: none
+    recorder_pad: "LCD"
+  </dest>
+  <voice>
+    *: none
+    recorder_pad: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_DISK_FULL
+  desc: in recording screen
+  user:
+  <source>
+    *: none
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
+  </source>
+  <dest>
+    *: none
+    recording: "दिसक भरी ह. Press OFF to continue."
+    h100,h120,h300: "दिसक भरी ह. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "दिसक भरी ह. Press LEFT to continue."
+  </dest>
+  <voice>
+    *: none
+    recording,h100,h120,h300,m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_VOLUME
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording: "Volume"
+  </source>
+  <dest>
+    *: none
+    recording: "Volume"
+  </dest>
+  <voice>
+    *: none
+    recording: "Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_CHANNEL_STEREO
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording: "Stereo"
+  </source>
+  <dest>
+    *: none
+    recording: "Stereo"
+  </dest>
+  <voice>
+    *: none
+    recording: "Stereo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_CHANNEL_MONO
+  desc: in sound_settings
+  user:
+  <source>
+    *: none
+    recording: "Mono"
+  </source>
+  <dest>
+    *: none
+    recording: "Mono"
+  </dest>
+  <voice>
+    *: none
+    recording: "Mono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_QUALITY
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording_hwcodec: "Quality"
+  </source>
+  <dest>
+    *: none
+    recording_hwcodec: "Quality"
+  </dest>
+  <voice>
+    *: none
+    recording_hwcodec: "Quality"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FREQUENCY
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Frequency"
+  </source>
+  <dest>
+    *: none
+    recording: "Frequency"
+  </dest>
+  <voice>
+    *: none
+    recording: "Frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SOURCE
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Source"
+  </source>
+  <dest>
+    *: none
+    recording: "Source"
+  </dest>
+  <voice>
+    *: none
+    recording: "Source"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SRC_MIC
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Int. Mic"
+  </source>
+  <dest>
+    *: none
+    recording: "Int. Mic"
+  </dest>
+  <voice>
+    *: none
+    recording: "Internal Microphone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_LINE_IN
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Line In"
+  </source>
+  <dest>
+    *: none
+    recording: "Line In"
+  </dest>
+  <voice>
+    *: none
+    recording: "Line In"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Digital"
+  </source>
+  <dest>
+    *: none
+    recording: "Digital"
+  </dest>
+  <voice>
+    *: none
+    recording: "Digital"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_CHANNELS
+  desc: in the recording settings
+  user:
+  <source>
+    *: none
+    recording: "Channels"
+  </source>
+  <dest>
+    *: none
+    recording: "Channels"
+  </dest>
+  <voice>
+    *: none
+    recording: "Channels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORD_TRIGGER
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "Trigger"
+  </source>
+  <dest>
+    *: none
+    recording: "Trigger"
+  </dest>
+  <voice>
+    *: none
+    recording: "Trigger"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_TIME
+  desc: Display of recorded time
+  user:
+  <source>
+    *: none
+    recording: "Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "समय:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
+  desc: Display of record timer interval setting, on the record screen
+  user:
+  <source>
+    *: none
+    recording: "Split Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "Split Time:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SIZE
+  desc: Display of recorded file size
+  user:
+  <source>
+    *: none
+    recording: "Size:"
+  </source>
+  <dest>
+    *: none
+    recording: "Size:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORD_PRERECORD
+  desc: in recording and radio screen
+  user:
+  <source>
+    *: none
+    recording: "Pre-Recording"
+  </source>
+  <dest>
+    *: none
+    recording: "Pre-Recording"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_LEFT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain Left"
+  </source>
+  <dest>
+    *: none
+    recording: "Gain Left"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_RIGHT
+  desc: in the recording screen
+  user:
+  <source>
+    *: none
+    recording: "Gain Right"
+  </source>
+  <dest>
+    *: none
+    recording: "Gain Right"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: none
+    recording: "Split Filesize"
+  </source>
+  <dest>
+    *: none
+    recording: "Split Filesize"
+  </dest>
+  <voice>
+    *: none
+    recording: "Split Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: none
+    recording: "Filename:"
+  </source>
+  <dest>
+    *: none
+    recording: "Filename:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  <source>
+    *: none
+    agc: "AGC"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Safety (clip)"
+  </source>
+  <dest>
+    *: none
+    agc: "Safety (clip)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Safety (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Live (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "Live (धीमा)"
+  </dest>
+  <voice>
+    *: none
+    agc: "Live (धीमा)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "DJ-Set (धीमा)"
+  </dest>
+  <voice>
+    *: none
+    agc: "DJ set (धीमा)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Medium"
+  </source>
+  <dest>
+    *: none
+    agc: "माध्यम"
+  </dest>
+  <voice>
+    *: none
+    agc: "माध्यम"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: none
+    agc: "Voice (fast)"
+  </source>
+  <dest>
+    *: none
+    agc: "आवाज़ (तेज)"
+  </dest>
+  <voice>
+    *: none
+    agc: "आवाज़ (तेज)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: none
+    agc: "AGC max. gain"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC max. gain"
+  </dest>
+  <voice>
+    *: none
+    agc: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OF
+  desc: spoken only, as in 3/8 => 3 of 8
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "of"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_GAMES
+  desc: in the main menu
+  user:
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "खेल"
+  </dest>
+  <voice>
+    *: "खेल"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_APPS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Applications"
+  </source>
+  <dest>
+    *: "आपलिकेशन"
+  </dest>
+  <voice>
+    *: "आपलिकेशन"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_DEMOS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Demos"
+  </source>
+  <dest>
+    *: "डेमोस"
+  </dest>
+  <voice>
+    *: "डेमोस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_GROUPING
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Work]"
+  </source>
+  <dest>
+    *: "[Work]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FILENAME_EXT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Filename Extensions"
+  </source>
+  <dest>
+    *: "Show Filename Extensions"
+  </dest>
+  <voice>
+    *: "Show Filename Extensions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN_TYPES
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Only Unknown Types"
+  </source>
+  <dest>
+    *: "Only Unknown Types"
+  </dest>
+  <voice>
+    *: "Only Unknown Types"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXT_ONLY_VIEW_ALL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Only When Viewing All Types"
+  </source>
+  <dest>
+    *: "Only When Viewing All Types"
+  </dest>
+  <voice>
+    *: "Only When Viewing All Types"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "units per tick"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "o'clock"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "P M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_AM
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "A M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: none
+    rtc: "oh"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user:
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Clip Counter"
+  </dest>
+  <voice>
+    *: none
+    recording: "Clip Counter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user:
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB Stack"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB Stack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "USB Stack Mode"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB Stack Mode"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "USB Stack Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Device"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Device"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Host"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user:
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Device Driver"
+  </dest>
+  <voice>
+    *: none
+    usbstack: "Device Driver"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "पहला रंग"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "पहला रंग"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "दूसरा रंग"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "दूसरा रंग"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user:
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "शब्द क रंग"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "शब्द क रंग"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Central European (CP1250)"
+  </dest>
+  <voice>
+    *: "Central European"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user:
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "तीम सेटिनगस"
+  </dest>
+  <voice>
+    *: "तीम सेटिनगस"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user:
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "रंग"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "रंग"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user:
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Line Selector का रंग"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: "Line Selector का रंग"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Edit"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Blank"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Empty list"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user:
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "नही है"
+  </dest>
+  <voice>
+    *: none
+    multivolume: "नही है"
+  </voice>
+</phrase>
+<phrase>  
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user:
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Announce Battery Level"
+  </dest>
+  <voice>
+    *: "Announce Battery Level"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user:
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "फऍल टऍप बोलो"
+  </dest>
+  <voice>
+    *: "फऍल टऍप बोलो"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user:
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user:
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<Random>"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user:
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "आवाज के सेटिनगस बचा"
+  </dest>
+  <voice>
+    *: "आवाज के सेटिनगस बचा"
+  </voice>
+</phrase>
