@@ -135,8 +135,7 @@ bool thread_sdl_init(void *param)
     running->name = "main";
     running->state = STATE_RUNNING;
     running->context.c = SDL_CreateCond();
-    cores[CURRENT_CORE].irq_level = STAY_IRQ_LEVEL;
-
+ 
     if (running->context.c == NULL)
     {
         fprintf(stderr, "Failed to create main condition variable\n");
@@ -230,15 +229,9 @@ static void remove_from_list_l(struct thread_entry **list,
     thread->l.next->l.prev = thread->l.prev;
 }
 
-static void run_blocking_ops(void)
+static inline void run_blocking_ops(void)
 {
-    int level = cores[CURRENT_CORE].irq_level;
-
-    if (level != STAY_IRQ_LEVEL)
-    {
-        cores[CURRENT_CORE].irq_level = STAY_IRQ_LEVEL;
-        set_irq_level(level);
-    }
+    set_irq_level(0);
 }
 
 struct thread_entry *thread_get_current(void)

@@ -298,16 +298,13 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
         do
         {
 #if CONFIG_CORELOCK == CORELOCK_NONE
-            cores[CURRENT_CORE].irq_level = oldlevel;
 #elif CONFIG_CORELOCK == SW_CORELOCK
             const unsigned int core = CURRENT_CORE;
-            cores[core].blk_ops.irq_level = oldlevel;
-            cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK | TBOP_IRQ_LEVEL;
+            cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK;
             cores[core].blk_ops.cl_p = &q->cl;
 #elif CONFIG_CORELOCK == CORELOCK_SWAP
             const unsigned int core = CURRENT_CORE;
-            cores[core].blk_ops.irq_level = oldlevel;
-            cores[core].blk_ops.flags = TBOP_SET_VARu8 | TBOP_IRQ_LEVEL;
+            cores[core].blk_ops.flags = TBOP_SET_VARu8;
             cores[core].blk_ops.var_u8p = &q->cl.locked;
             cores[core].blk_ops.var_u8v = 0;
 #endif /* CONFIG_CORELOCK */
@@ -352,16 +349,13 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
     if (q->read == q->write && ticks > 0)
     {
 #if CONFIG_CORELOCK == CORELOCK_NONE
-        cores[CURRENT_CORE].irq_level = oldlevel;
 #elif CONFIG_CORELOCK == SW_CORELOCK
         const unsigned int core = CURRENT_CORE;
-        cores[core].blk_ops.irq_level = oldlevel;
-        cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK | TBOP_IRQ_LEVEL;
+        cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK;
         cores[core].blk_ops.cl_p  = &q->cl;
 #elif CONFIG_CORELOCK == CORELOCK_SWAP
         const unsigned int core = CURRENT_CORE;
-        cores[core].blk_ops.irq_level = oldlevel;
-        cores[core].blk_ops.flags = TBOP_SET_VARu8 | TBOP_IRQ_LEVEL;
+        cores[core].blk_ops.flags = TBOP_SET_VARu8;
         cores[core].blk_ops.var_u8p = &q->cl.locked;
         cores[core].blk_ops.var_u8v = 0;
 #endif
@@ -458,14 +452,11 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
         wakeup_thread(&q->queue);
 
 #if CONFIG_CORELOCK == CORELOCK_NONE
-        cores[core].irq_level = oldlevel;
 #elif CONFIG_CORELOCK == SW_CORELOCK
-        cores[core].blk_ops.irq_level = oldlevel;
-        cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK | TBOP_IRQ_LEVEL;
+        cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK;
         cores[core].blk_ops.cl_p  = &q->cl; 
 #elif CONFIG_CORELOCK == CORELOCK_SWAP
-        cores[core].blk_ops.irq_level = oldlevel;
-        cores[core].blk_ops.flags = TBOP_SET_VARu8 | TBOP_IRQ_LEVEL;
+        cores[core].blk_ops.flags = TBOP_SET_VARu8;
         cores[core].blk_ops.var_u8p = &q->cl.locked;
         cores[core].blk_ops.var_u8v = 0;
 #endif

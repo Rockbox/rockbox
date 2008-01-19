@@ -98,23 +98,17 @@ extern int stackbegin[];
 extern int stackend[];
 
 /* core_sleep procedure to implement for any CPU to ensure an asychronous wakup
- * never results in requiring a wait until the next tick (up to 10000uS!). Likely
- * requires assembly and careful instruction ordering. Multicore requires
- * carefully timed sections in order to have synchronization without locking of
- * any sort.
+ * never results in requiring a wait until the next tick (up to 10000uS!). May
+ * require assembly and careful instruction ordering.
  *
- * 1) Disable all interrupts (FIQ and IRQ for ARM for instance)
- * 2) Check *waking == NULL.
- * 3) *waking not NULL? Goto step 7.
- * 4) On multicore, stay awake if directed to do so by another. If so, goto step 7.
- * 5) If processor requires, atomically reenable interrupts and perform step 6.
- * 6) Sleep the CPU core. If wakeup itself enables interrupts (stop #0x2000 on Coldfire)
- *    goto step 8.
- * 7) Reenable interrupts.
- * 8) Exit procedure.
+ * 1) On multicore, stay awake if directed to do so by another. If so, goto step 4.
+ * 2) If processor requires, atomically reenable interrupts and perform step 3.
+ * 3) Sleep the CPU core. If wakeup itself enables interrupts (stop #0x2000 on Coldfire)
+ *    goto step 5.
+ * 4) Enable interrupts.
+ * 5) Exit procedure.
  */
-static inline void core_sleep(
-    IF_COP(unsigned int core,) struct thread_entry **waking)
+static inline void core_sleep(IF_COP_VOID(unsigned int core))
         __attribute__((always_inline));
 
 static void check_tmo_threads(void)
@@ -407,34 +401,22 @@ void corelock_unlock(struct corelock *cl)
  */
 #if NUM_CORES == 1
 /* Shared single-core build debugging version */
-static inline void core_sleep(struct thread_entry **waking)
+static inline void core_sleep(void)
 {
-    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
-    if (*waking == NULL)
-    {
-        PROC_CTL(CURRENT_CORE) = PROC_SLEEP;
-        nop; nop; nop;
-    }
+    PROC_CTL(CURRENT_CORE) = PROC_SLEEP;
+    nop; nop; nop;
     set_interrupt_status(IRQ_FIQ_ENABLED, IRQ_FIQ_STATUS);
 }
 #elif defined (CPU_PP502x)
-static inline void core_sleep(unsigned int core,
-                              struct thread_entry **waking)
+static inline void core_sleep(unsigned int core)
 {
 #if 1
-    /* Disabling IRQ and FIQ is important to making the fixed-time sequence
-     * non-interruptable */
     asm volatile (
-        "mrs    r2, cpsr                   \n" /* Disable IRQ, FIQ */
-        "orr    r2, r2, #0xc0              \n"
-        "msr    cpsr_c, r2                 \n"
         "mov    r0, #4                     \n" /* r0 = 0x4 << core */
         "mov    r0, r0, lsl %[c]           \n"
         "str    r0, [%[mbx], #4]           \n" /* signal intent to sleep */
-        "ldr    r1, [%[waking]]            \n" /* *waking == NULL ? */
-        "cmp    r1, #0                     \n"
-        "ldreq  r1, [%[mbx], #0]           \n" /* && !(MBX_MSG_STAT & (0x10<<core)) ? */
-        "tsteq  r1, r0, lsl #2             \n"  
+        "ldr    r1, [%[mbx], #0]           \n" /* && !(MBX_MSG_STAT & (0x10<<core)) ? */
+        "tst    r1, r0, lsl #2             \n"  
         "moveq  r1, #0x80000000            \n" /* Then sleep */
         "streq  r1, [%[ctl], %[c], lsl #2] \n"
         "moveq  r1, #0                     \n" /* Clear control reg */
@@ -445,21 +427,18 @@ static inline void core_sleep(unsigned int core,
         "ldr    r1, [%[mbx], #0]           \n"
         "tst    r1, r0, lsr #2             \n"
         "bne    1b                         \n"
-        "bic    r2, r2, #0xc0              \n" /* Enable interrupts */
-        "msr    cpsr_c, r2                 \n"
+        "mrs    r1, cpsr                   \n" /* Enable interrupts */
+        "bic    r1, r1, #0xc0              \n"
+        "msr    cpsr_c, r1                 \n"
         :
-        :  [ctl]"r"(&PROC_CTL(CPU)), [mbx]"r"(MBX_BASE),
-           [waking]"r"(waking), [c]"r"(core)
-        : "r0", "r1", "r2");
+        :  [ctl]"r"(&PROC_CTL(CPU)), [mbx]"r"(MBX_BASE), [c]"r"(core)
+        : "r0", "r1");
 #else /* C version for reference */
-    /* Disable IRQ, FIQ */
-    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
-
     /* Signal intent to sleep */
     MBX_MSG_SET = 0x4 << core;
 
     /* Something waking or other processor intends to wake us? */
-    if (*waking == NULL && (MBX_MSG_STAT & (0x10 << core)) == 0)
+    if ((MBX_MSG_STAT & (0x10 << core)) == 0)
     {
         PROC_CTL(core) = PROC_SLEEP; nop; /* Snooze */
         PROC_CTL(core) = 0;               /* Clear control reg */
@@ -477,20 +456,14 @@ static inline void core_sleep(unsigned int core,
 }
 #elif CONFIG_CPU == PP5002
 /* PP5002 has no mailboxes - emulate using bytes */
-static inline void core_sleep(unsigned int core,
-                              struct thread_entry **waking)
+static inline void core_sleep(unsigned int core)
 {
 #if 1
     asm volatile (
-        "mrs    r1, cpsr                   \n" /* Disable IRQ, FIQ */
-        "orr    r1, r1, #0xc0              \n"
-        "msr    cpsr_c, r1                 \n"
         "mov    r0, #1                     \n" /* Signal intent to sleep */
         "strb   r0, [%[sem], #2]           \n"
-        "ldr    r0, [%[waking]]            \n" /* *waking == NULL? */
+        "ldrb   r0, [%[sem], #1]           \n" /* && stay_awake == 0? */
         "cmp    r0, #0                     \n"
-        "ldreqb r0, [%[sem], #1]           \n" /* && stay_awake == 0? */
-        "cmpeq  r0, #0                     \n"
         "moveq  r0, #0xca                  \n" /* Then sleep */
         "streqb r0, [%[ctl], %[c], lsl #2] \n"
         "nop                               \n" /* nop's needed because of pipeline */
@@ -503,22 +476,20 @@ static inline void core_sleep(unsigned int core,
         "ldrb   r0, [%[sem], #0]           \n"
         "cmp    r0, #0                     \n"
         "bne    1b                         \n"
-        "bic    r1, r1, #0xc0              \n" /* Enable interrupts */
-        "msr    cpsr_c, r1                 \n"
+        "mrs    r0, cpsr                   \n" /* Enable interrupts */
+        "bic    r0, r0, #0xc0              \n"
+        "msr    cpsr_c, r0                 \n"
         :
         : [sem]"r"(&core_semaphores[core]), [c]"r"(core),
-          [waking]"r"(waking), [ctl]"r"(&PROC_CTL(CPU))
-        : "r0", "r1"
+          [ctl]"r"(&PROC_CTL(CPU))
+        : "r0"
         );
 #else /* C version for reference */
-    /* Disable IRQ, FIQ */
-    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
-
     /* Signal intent to sleep */
     core_semaphores[core].intend_sleep = 1;
 
     /* Something waking or other processor intends to wake us? */
-    if (*waking == NULL && core_semaphores[core].stay_awake == 0)
+    if (core_semaphores[core].stay_awake == 0)
     {
         PROC_CTL(core) = PROC_SLEEP; /* Snooze */
         nop; nop; nop;
@@ -747,48 +718,40 @@ static void switch_thread_core(unsigned int core, struct thread_entry *thread)
  * Put core in a power-saving state if waking list wasn't repopulated.
  *---------------------------------------------------------------------------
  */
-static inline void core_sleep(struct thread_entry **waking)
+static inline void core_sleep(void)
 {
     /* FIQ also changes the CLKCON register so FIQ must be disabled
        when changing it here */
     asm volatile (
-        "mrs    r0, cpsr        \n" /* Disable IRQ, FIQ */
-        "orr    r0, r0, #0xc0   \n"
-        "msr    cpsr_c, r0      \n"
-        "ldr    r1, [%0]        \n" /* Check *waking */
-        "cmp    r1, #0          \n"
-        "bne    2f              \n" /* != NULL -> exit */
-        "bic    r0, r0, #0xc0   \n" /* Prepare IRQ, FIQ enable */
+        "mrs    r0, cpsr        \n" /* Prepare IRQ, FIQ enable */
+        "bic    r0, r0, #0xc0   \n"
         "mov    r1, #0x4c000000 \n" /* CLKCON = 0x4c00000c */
         "ldr    r2, [r1, #0xc]  \n" /* Set IDLE bit */
         "orr    r2, r2, #4      \n"
         "str    r2, [r1, #0xc]  \n"
         "msr    cpsr_c, r0      \n" /* Enable IRQ, FIQ */
-        "mov    r3, #0          \n" /* wait for IDLE */
+        "mov    r2, #0          \n" /* wait for IDLE */
     "1:                         \n"
-        "add    r3, r3, #1      \n"
-        "cmp    r3, #10         \n"
+        "add    r2, r2, #1      \n"
+        "cmp    r2, #10         \n"
         "bne    1b              \n"
-        "orr    r0, r0, #0xc0   \n" /* Disable IRQ, FIQ */
-        "msr    cpsr_c, r0      \n"
+        "orr    r2, r0, #0xc0   \n" /* Disable IRQ, FIQ */
+        "msr    cpsr_c, r2      \n"
         "ldr    r2, [r1, #0xc]  \n" /* Reset IDLE bit */
         "bic    r2, r2, #4      \n"
         "str    r2, [r1, #0xc]  \n"
-    "2:                         \n"
-        "bic    r0, r0, #0xc0   \n" /* Enable IRQ, FIQ */
-        "msr    cpsr_c, r0      \n"
-        :  : "r"(waking) : "r0", "r1", "r2", "r3");
+        "msr    cpsr_c, r0      \n" /* Enable IRQ, FIQ */
+        :  :  : "r0", "r1", "r2");
 }
 #elif defined(CPU_TCC77X)
-static inline void core_sleep(struct thread_entry **waking)
+static inline void core_sleep(void)
 {
     #warning TODO: Implement core_sleep
 }
 #else
-static inline void core_sleep(struct thread_entry **waking)
+static inline void core_sleep(void)
 {
-    (void) waking;
-#warning core_sleep not implemented, battery life will be decreased
+    #warning core_sleep not implemented, battery life will be decreased
 }
 #endif /* CONFIG_CPU == */
 
@@ -864,23 +827,10 @@ static inline void load_context(const void* addr)
  * Put core in a power-saving state if waking list wasn't repopulated.
  *---------------------------------------------------------------------------
  */
-static inline void core_sleep(struct thread_entry **waking)
+static inline void core_sleep(void)
 {
-    asm volatile (
-        "moveq.l    %1, %%d0    \n" /* Disable interrupts (not audio DMA) */
-        "lsl.l      #8, %%d0    \n"
-        "move.w     %%d0, %%sr  \n"
-        "tst.l      (%0)        \n" /* Check *waking */
-        "beq.b      1f          \n" /* != NULL -> exit */
-        "moveq.l    #0x20, %%d0 \n" /* Enable interrupts */
-        "lsl.l      #8, %%d0    \n"
-        "move.w     %%d0, %%sr  \n"
-        ".word      0x51fb      \n" /* tpf.l - eat stop instruction */
-    "1:                         \n"
-        "stop       #0x2000     \n" /* Supervisor mode, interrupts enabled
-                                       upon wakeup */
-        : : "a"(waking), "i"((0x2000 | HIGHEST_IRQ_LEVEL) >> 8) : "d0"
-    );
+    /* Supervisor mode, interrupts enabled upon wakeup */
+    asm volatile ("stop #0x2000");
 };
 
 #elif CONFIG_CPU == SH7034
@@ -965,26 +915,14 @@ static inline void load_context(const void* addr)
  * Put core in a power-saving state if waking list wasn't repopulated.
  *---------------------------------------------------------------------------
  */
-static inline void core_sleep(struct thread_entry **waking)
+static inline void core_sleep(void)
 {
     asm volatile (
-        "mov    %2, r1            \n" /* Disable interrupts */
-        "ldc    r1, sr            \n"
-        "mov.l  @%1, r1           \n" /* Check *waking */
-        "tst    r1, r1            \n" 
-        "bf     1f                \n" /* *waking != NULL ? exit */
         "and.b  #0x7f, @(r0, gbr) \n" /* Clear SBY (bit 7) in SBYCR */
         "mov    #0, r1            \n" /* Enable interrupts */
         "ldc    r1, sr            \n" /* Following instruction cannot be interrupted */
-        "bra    2f                \n" /* bra and sleep are executed at once */
         "sleep                    \n" /* Execute standby */
-    "1:                           \n"
-        "mov    #0, r1            \n" /* Enable interrupts */
-        "ldc    r1, sr            \n"
-    "2:                           \n"
-        :
-        : "z"(&SBYCR-GBR), "r"(waking), "i"(HIGHEST_IRQ_LEVEL)
-        : "r1");
+        : : "z"(&SBYCR-GBR) : "r1");
 }
 
 #endif /* CONFIG_CPU == */
@@ -1318,7 +1256,6 @@ static void core_schedule_wakeup(struct thread_entry *thread)
  */
 static inline void core_perform_wakeup(IF_COP_VOID(unsigned int core))
 {
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     struct thread_entry *w = LOCK_LIST(&cores[IF_COP_CORE(core)].waking);
     struct thread_entry *r = cores[IF_COP_CORE(core)].running;
 
@@ -1346,7 +1283,6 @@ static inline void core_perform_wakeup(IF_COP_VOID(unsigned int core))
 
     /* Waking list is clear - NULL and unlock it */
     UNLOCK_LIST_SET_PTR(&cores[IF_COP_CORE(core)].waking, NULL);
-    set_irq_level(oldlevel);
 }
 
 /*---------------------------------------------------------------------------
@@ -1367,8 +1303,6 @@ static void check_tmo_threads(void)
     if (next != NULL)
     {
         /* Check sleeping threads. */
-        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-
         do
         {
             /* Must make sure noone else is examining the state, wait until
@@ -1414,8 +1348,6 @@ static void check_tmo_threads(void)
              * sleeping processes or have removed them all. */
         }
         while (next != NULL);
-
-        set_irq_level(oldlevel);
     }
 
     cores[core].next_tmo_check = next_tmo_check;
@@ -1427,10 +1359,10 @@ static void check_tmo_threads(void)
  * assumed to be nonzero.
  *---------------------------------------------------------------------------
  */
+#if NUM_CORES > 1
 static inline void run_blocking_ops(
     IF_COP_VOID(unsigned int core, struct thread_entry *thread))
 {
-#if NUM_CORES > 1
     struct thread_blk_ops *ops = &cores[IF_COP_CORE(core)].blk_ops;
     const unsigned flags = ops->flags;
 
@@ -1479,22 +1411,9 @@ static inline void run_blocking_ops(
         UNLOCK_THREAD(thread, ops->state);
     }
 
-    /* Reset the IRQ level */
-    if (flags & TBOP_IRQ_LEVEL)
-    {
-        set_irq_level(ops->irq_level);
-    }
-
     ops->flags = 0;
-#else
-    int level = cores[CURRENT_CORE].irq_level;
-    if (level == STAY_IRQ_LEVEL)
-        return;
-
-    cores[CURRENT_CORE].irq_level = STAY_IRQ_LEVEL;
-    set_irq_level(level);
-#endif /* NUM_CORES */
 }
+#endif /* NUM_CORES > 1 */
 
 
 /*---------------------------------------------------------------------------
@@ -1506,6 +1425,7 @@ static inline struct thread_entry * sleep_core(IF_COP_VOID(unsigned int core))
 {
     for (;;)
     {
+        set_irq_level(HIGHEST_IRQ_LEVEL);
         /* We want to do these ASAP as it may change the decision to sleep
          * the core or a core has woken because an interrupt occurred
          * and posted a message to a queue. */
@@ -1524,16 +1444,17 @@ static inline struct thread_entry * sleep_core(IF_COP_VOID(unsigned int core))
 
         /* If there is a ready to run task, return its ID and keep core
          * awake. */
-        if (cores[IF_COP_CORE(core)].running != NULL)
+        if (cores[IF_COP_CORE(core)].running == NULL)
         {
-            return cores[IF_COP_CORE(core)].running;
+            /* Enter sleep mode to reduce power usage - woken up on interrupt
+             * or wakeup request from another core - expected to enable all
+             * interrupts. */
+            core_sleep(IF_COP(core));
+            continue;
         }
 
-        /* Enter sleep mode to reduce power usage - woken up on interrupt or
-         * wakeup request from another core. May abort if the waking list
-         * became populated (again). See beginning of this file for the
-         * algorithm to atomically determine this. */
-        core_sleep(IF_COP(core, ) &cores[IF_COP_CORE(core)].waking.queue);
+        set_irq_level(0);
+        return cores[IF_COP_CORE(core)].running;
     }
 }
 
@@ -1677,8 +1598,10 @@ void switch_thread(struct thread_entry *old)
     if(((unsigned int *)old->stack)[0] != DEADBEEF)
         thread_stkov(old);
 
+#if NUM_CORES > 1
     /* Run any blocking operations requested before switching/sleeping */
     run_blocking_ops(IF_COP(core, old));
+#endif
 
     /* Go through the list of sleeping task to check if we need to wake up
      * any of them due to timeout. Also puts core into sleep state until
@@ -2036,8 +1959,11 @@ static int find_empty_thread_slot(void)
  */
 void core_idle(void)
 {
+#if NUM_CORES > 1
     const unsigned int core = CURRENT_CORE;
-    core_sleep(IF_COP(core,) &cores[core].waking.queue);
+#endif
+    set_irq_level(HIGHEST_IRQ_LEVEL);
+    core_sleep(IF_COP(core));
 }
 
 /*---------------------------------------------------------------------------
@@ -2257,12 +2183,6 @@ void remove_thread(struct thread_entry *thread)
     {
         /* Suicide - thread has unconditional rights to do this */
         /* Maintain locks until switch-out */
-#if NUM_CORES > 1
-        cores[core].blk_ops.flags = TBOP_IRQ_LEVEL;
-        cores[core].blk_ops.irq_level = oldlevel;
-#else
-        cores[core].irq_level = oldlevel;
-#endif
         block_thread_on_l(NULL, thread, STATE_KILLED);
 
 #if NUM_CORES > 1
@@ -2389,10 +2309,6 @@ void thread_wait(struct thread_entry *thread)
 
     if (thread_state != STATE_KILLED)
     {
-#if NUM_CORES > 1
-        cores[core].blk_ops.flags = TBOP_IRQ_LEVEL;
-        cores[core].blk_ops.irq_level = oldlevel;
-#endif
         /* Unlock the waitee state at task switch - not done for self-wait
            because the would double-unlock the state and potentially
            corrupt another's busy assert on the slot */
@@ -2586,8 +2502,7 @@ unsigned int switch_core(unsigned int new_core)
      * that execution may resume on the new core, unlock our slot and finally
      * restore the interrupt level */
     cores[core].blk_ops.flags = TBOP_SWITCH_CORE | TBOP_UNLOCK_CURRENT |
-                                TBOP_UNLOCK_LIST | TBOP_IRQ_LEVEL;
-    cores[core].blk_ops.irq_level = oldlevel;
+                                TBOP_UNLOCK_LIST;
     cores[core].blk_ops.list_p = &cores[new_core].waking;
 #if CONFIG_CORELOCK == CORELOCK_SWAP
     cores[core].blk_ops.state = STATE_RUNNING;
@@ -2639,9 +2554,6 @@ void init_threads(void)
     /* Initialize initially non-zero members of core */
     thread_queue_init(&cores[core].waking);
     cores[core].next_tmo_check = current_tick; /* Something not in the past */
-#if NUM_CORES == 1
-    cores[core].irq_level = STAY_IRQ_LEVEL;
-#endif
 #ifdef HAVE_PRIORITY_SCHEDULING
     cores[core].highest_priority = LOWEST_PRIORITY;
 #endif

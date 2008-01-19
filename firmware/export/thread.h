@@ -279,12 +279,10 @@ struct thread_entry
 #define TBOP_UNLOCK_CORELOCK 0x04
 #define TBOP_UNLOCK_THREAD   0x08 /* Unlock a thread's slot */
 #define TBOP_UNLOCK_CURRENT  0x10 /* Unlock the current thread's slot */
-#define TBOP_IRQ_LEVEL       0x20 /* Set a new irq level */
-#define TBOP_SWITCH_CORE     0x40 /* Call the core switch preparation routine */
+#define TBOP_SWITCH_CORE     0x20 /* Call the core switch preparation routine */
 
 struct thread_blk_ops
 {
-    int irq_level;                    /* new IRQ level to set */
 #if CONFIG_CORELOCK != SW_CORELOCK
     union
     {
@@ -330,9 +328,6 @@ struct core_entry
 #if NUM_CORES > 1
     struct thread_blk_ops blk_ops; /* operations to perform when
                                       blocking a thread */
-#else
-    #define STAY_IRQ_LEVEL (-1)
-    int irq_level;                 /* sets the irq level to irq_level */
 #endif /* NUM_CORES */
 #ifdef HAVE_PRIORITY_SCHEDULING
     unsigned char highest_priority;

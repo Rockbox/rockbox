@@ -269,7 +269,6 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
     {
         do
         {
-            cores[CURRENT_CORE].irq_level = oldlevel;
             block_thread(&q->queue);
             oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
         }
@@ -304,7 +303,6 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
     if (q->read == q->write && ticks > 0)
     {
-        cores[CURRENT_CORE].irq_level = oldlevel;
         block_thread_w_tmo(&q->queue, ticks);
         oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
     }
@@ -379,7 +377,6 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 
         wakeup_thread(&q->queue);
 
-        cores[CURRENT_CORE].irq_level = oldlevel;
         block_thread_no_listlock(spp);
         return thread_get_current()->retval;
     }
