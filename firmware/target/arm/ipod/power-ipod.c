@@ -42,8 +42,12 @@ void power_init(void)
 
 bool charger_inserted(void)
 {
-#ifdef IPOD_VIDEO
+#if defined(IPOD_VIDEO)
     return (GPIOL_INPUT_VAL & 0x08)?false:true;
+#elif defined(IPOD_4G) || defined(IPOD_COLOR) \
+       || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    /* C2 is firewire power */
+    return (GPIOC_INPUT_VAL & 0x04)?false:true; 
 #else
     /* This needs filling in for other ipods. */
     return false;
