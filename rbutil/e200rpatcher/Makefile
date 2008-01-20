@@ -14,6 +14,7 @@ WINLIBS = -I libusb-win32-device-bin-0.1.12.1/include libusb-win32-device-bin-0.
 
 NATIVECC = gcc
 CC = $(CROSS)gcc
+WINDRES = $(CROSS)windres
 
 all: $(OUTPUT)
 
@@ -21,9 +22,12 @@ e200rpatcher: e200rpatcher.c bootimg.c
 	gcc $(CFLAGS) $(LIBS) -o e200rpatcher e200rpatcher.c bootimg.c
 	strip e200rpatcher
 
-e200rpatcher.exe:  e200rpatcher.c bootimg.c
-	$(CC) $(CFLAGS) $(WINLIBS) -o e200rpatcher.exe e200rpatcher.c bootimg.c
+e200rpatcher.exe:  e200rpatcher.c bootimg.c  e200rpatcher-rc.o
+	$(CC) $(CFLAGS) $(WINLIBS) -o e200rpatcher.exe e200rpatcher.c bootimg.c e200rpatcher-rc.o
 	$(CROSS)strip e200rpatcher.exe
+    
+e200rpatcher-rc.o: e200rpatcher.rc e200rpatcher.manifest
+	$(WINDRES) -i e200rpatcher.rc -o e200rpatcher-rc.o
 
 e200rpatcher-mac: e200rpatcher-i386 e200rpatcher-ppc
 	lipo -create e200rpatcher-ppc e200rpatcher-i386 -output e200rpatcher-mac

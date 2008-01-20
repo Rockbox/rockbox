@@ -16,6 +16,7 @@ endif
 
 NATIVECC = gcc
 CC = $(CROSS)gcc
+WINDRES = $(CROSS)windres
 
 all: $(OUTPUT)
 
@@ -23,10 +24,13 @@ sansapatcher: main.c sansapatcher.c sansaio-posix.c parttypes.h bootimg_c200.c b
 	gcc $(CFLAGS) -o sansapatcher main.c sansapatcher.c sansaio-posix.c bootimg_c200.c bootimg_e200.c
 	strip sansapatcher
 
-sansapatcher.exe: main.c sansapatcher.c sansaio-win32.c parttypes.h bootimg_c200.c bootimg_e200.c
-	$(CC) $(CFLAGS) -o sansapatcher.exe main.c sansapatcher.c sansaio-win32.c bootimg_c200.c bootimg_e200.c
+sansapatcher.exe: main.c sansapatcher.c sansaio-win32.c parttypes.h bootimg_c200.c bootimg_e200.c  sansapatcher-rc.o
+	$(CC) $(CFLAGS) -o sansapatcher.exe main.c sansapatcher.c sansaio-win32.c bootimg_c200.c bootimg_e200.c  sansapatcher-rc.o
 	$(CROSS)strip sansapatcher.exe
 
+sansapatcher-rc.o: sansapatcher.rc sansapatcher.manifest
+	$(WINDRES) -i sansapatcher.rc -o sansapatcher-rc.o
+    
 sansapatcher-mac: sansapatcher-i386 sansapatcher-ppc
 	lipo -create sansapatcher-ppc sansapatcher-i386 -output sansapatcher-mac
 
