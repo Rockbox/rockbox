@@ -632,6 +632,42 @@ void button_event(int key, bool pressed)
     case SDLK_INSERT:
         new_btn = BUTTON_RC_MODE;
         break;
+#elif CONFIG_KEYPAD == MROBE100_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_SCROLL_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_SCROLL_DOWN;
+        break;
+    case SDLK_KP_PLUS:
+    case SDLK_F8:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_ESCAPE:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_KP_DIVIDE:
+    case SDLK_F1:
+        new_btn = BUTTON_REW;
+        break;
+    case SDLK_KP_MULTIPLY:
+    case SDLK_F2:
+        new_btn = BUTTON_FF;
+        break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+        new_btn = BUTTON_PLAY;
+        break;
 #else
 #error No keymap defined!
 #endif /* CONFIG_KEYPAD */

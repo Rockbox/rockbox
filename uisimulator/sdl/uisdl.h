@@ -310,6 +310,17 @@
 #define UI_LCD_BGCOLORLIGHT         173, 216, 230 /* bkgnd color of LCD (backlight) */
 #define UI_LCD_BLACK                0, 0, 0 /* black */
 
+#elif defined(MROBE_100)
+#define UI_TITLE                    "Olympus M:Robe 100"
+#define UI_WIDTH                    247 /* width of GUI window */
+#define UI_HEIGHT                   416 /* height of GUI window */
+#define UI_LCD_BGCOLOR              94, 2, 2 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         241, 6, 3 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_POSX                 43 /* x position of lcd */
+#define UI_LCD_POSY                 25 /* y position of lcd */
+#define UI_LCD_WIDTH                160
+#define UI_LCD_HEIGHT               128
 #endif
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */
