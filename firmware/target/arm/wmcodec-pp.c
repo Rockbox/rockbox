@@ -28,7 +28,7 @@
 #include "audiohw.h"
 #include "i2c-pp.h"
 
-#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(MROBE_100)
 /* The H10's audio codec uses an I2C address of 0x1b */
 #define I2C_AUDIO_ADDRESS 0x1b
 #else
@@ -96,13 +96,13 @@ void audiohw_init(void) {
 #endif /* IPOD_1G2G/3G */
 #endif
     
-#ifdef HAVE_WM8731
+#if defined(HAVE_WM8731) || defined(HAVE_WM8751)
     audiohw_preinit();
 #endif
    
 }
 
-#ifndef HAVE_WM8731
+#if !defined(HAVE_WM8731) && !defined(HAVE_WM8751)
 void audiohw_postinit(void)
 {
 }

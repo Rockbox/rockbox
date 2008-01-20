@@ -56,11 +56,7 @@
 #define PLUGIN_BUFFER_SIZE 0x80000
 
 /* Wolfsom audio codec */
-/* TODO: #define HAVE_WM8751 */
-#define HAVE_WM8731
-
-/* WM8731 has no tone controls, so we use the software ones */
-#define HAVE_SW_TONE_CONTROLS
+#define HAVE_WM8751
 
 #define AB_REPEAT_ENABLE 1
 

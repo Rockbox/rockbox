@@ -100,6 +100,10 @@ static int adaptivebass2hw(int value)
 /* Reset and power up the WM8751 */
 void audiohw_preinit(void)
 {
+#ifdef CPU_PP502x
+    i2s_reset();
+#endif
+
     /*
      * 1. Switch on power supplies.
      *    By default the WM8751 is in Standby Mode, the DAC is

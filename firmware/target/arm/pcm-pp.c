@@ -23,6 +23,10 @@
 #include "audio.h"
 #include "sound.h"
 
+#ifdef HAVE_WM8751
+#define MROBE100_44100HZ     (0x40|(0x11 << 1)|1)
+#endif
+
 /** DMA **/
 
 #ifdef CPU_PP502x
@@ -81,15 +85,25 @@ struct dma_data dma_play_data NOCACHEBSS_ATTR =
 };
 
 static unsigned long pcm_freq NOCACHEDATA_ATTR = HW_SAMPR_DEFAULT; /* 44.1 is default */
+#ifdef HAVE_WM8751
+/* Samplerate control for audio codec */
+static int sr_ctrl = MROBE100_44100HZ;
+#endif
 
 void pcm_set_frequency(unsigned int frequency)
 {
     (void)frequency;
     pcm_freq = HW_SAMPR_DEFAULT;
+#ifdef HAVE_WM8751
+    sr_ctrl  = MROBE100_44100HZ;
+#endif
 }
 
 void pcm_apply_settings(void)
 {
+#ifdef HAVE_WM8751
+    audiohw_set_frequency(sr_ctrl);
+#endif
     pcm_curr_sampr = pcm_freq;
 }
 
@@ -308,7 +322,7 @@ void pcm_play_dma_init(void)
     /* Initialize default register values. */
     audiohw_init();
 
-#ifndef HAVE_WM8731
+#if !defined(HAVE_WM8731) && !defined(HAVE_WM8751)
     /* Power on */
     audiohw_enable_output(true);
     /* Unmute the master channel (DAC should be at zero point now). */
