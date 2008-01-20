@@ -398,80 +398,80 @@ Ayrintili bilgi i�in: http://www.rockbox.org/twiki/bin/view/Main/SansaE200Inst
         <translation>Se�ilen dilin etkin olmasi i�in uygulamayi yeniden baslatmalisiniz.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="213"/>
+        <location filename="configure.cpp" line="220"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation>Mevcut �nbellek boyutu %L1 KB.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="478"/>
+        <location filename="configure.cpp" line="485"/>
         <source>Select your device</source>
         <translation>Aygitinizi se�in</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="562"/>
+        <location filename="configure.cpp" line="569"/>
         <source>Sansa e200 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation>MTP modunda bir Sansa e200 bulundu!
 Kurulum i�in aygiti MSC moduna almalisiniz. </translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="565"/>
+        <location filename="configure.cpp" line="572"/>
         <source>H10 20GB in MTP mode found!
 You need to change your player to UMS mode for installation. </source>
         <translation>MTP modunda bir H10 20GB bulundu!
 Kurulum i�in aygiti UMS moduna almalisiniz. </translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="566"/>
+        <location filename="configure.cpp" line="573"/>
         <source>Unless you changed this installation will fail!</source>
         <translation>Degistirmezseniz kurulum ger�eklestirilemez!</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="568"/>
+        <location filename="configure.cpp" line="575"/>
         <source>Fatal error</source>
         <translation>�nemli hata</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="586"/>
+        <location filename="configure.cpp" line="593"/>
         <source>Autodetection</source>
         <translation>Otomatik algilama</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="580"/>
+        <location filename="configure.cpp" line="587"/>
         <source>Could not detect a Mountpoint.
 Select your Mountpoint manually.</source>
         <translation>Herhangi bir baglama noktasi algilanamadi.
 Baglama noktasini kendiniz se�iniz.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="588"/>
+        <location filename="configure.cpp" line="595"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>Herhangi bir aygit algilanamadi.
 Aygitinizi ve baglama noktasini kendiniz se�iniz.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="596"/>
+        <location filename="configure.cpp" line="603"/>
         <source>Really delete cache?</source>
         <translation>�nbellegi silmek istediginizden emin misiniz?</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="599"/>
+        <location filename="configure.cpp" line="606"/>
         <source>Do you really want to delete the cache? Make absolutely sure this setting is correct as it will remove &lt;b&gt;all&lt;/b&gt; files in this folder!</source>
         <translation>�nbellegi silmeyi onayliyor musunuz? Bu se�enek ilgili dizindeki &lt;b&gt;t�m&lt;/b&gt; dosyalari silecek!</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="605"/>
+        <location filename="configure.cpp" line="612"/>
         <source>Path wrong!</source>
         <translation>Konum hatali!</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="606"/>
+        <location filename="configure.cpp" line="613"/>
         <source>The cache path is invalid. Aborting.</source>
         <translation>�nbellek konumu ge�ersiz. Islem durduruluyor.</translation>
     </message>
     <message>
-        <location filename="configure.cpp" line="411"/>
+        <location filename="configure.cpp" line="418"/>
         <source>(system proxy is disabled)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -722,9 +722,75 @@ Aygitinizi ve baglama noktasini kendiniz se�iniz.</translation>
 <context>
     <name>Configure</name>
     <message>
-        <location filename="configure.cpp" line="462"/>
+        <location filename="configure.cpp" line="469"/>
         <source>English</source>
         <translation>T�rk�e</translation>
+    </message>
+</context>
+<context>
+    <name>CreateVoiceFrm</name>
+    <message>
+        <location filename="createvoicefrm.ui" line="16"/>
+        <source>Create Voice File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="createvoicefrm.ui" line="41"/>
+        <source>Select the Language you want to generate a voicefile for:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="createvoicefrm.ui" line="51"/>
+        <source>Generation settings</source>
+        <translation type="unfinished">Olusturma ayarlari</translation>
+    </message>
+    <message>
+        <location filename="createvoicefrm.ui" line="57"/>
+        <source>Encoder profile:</source>
+        <translation type="unfinished">Kodlayici profili:</translation>
+    </message>
+    <message>
+        <location filename="createvoicefrm.ui" line="64"/>
+        <source>TTS profile:</source>
+        <translation type="unfinished">TTS profili:</translation>
+    </message>
+    <message>
+        <location filename="createvoicefrm.ui" line="77"/>
+        <source>Change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="createvoicefrm.ui" line="128"/>
+        <source>&amp;Install</source>
+        <translation type="unfinished">&amp;Y�kle</translation>
+    </message>
+    <message>
+        <location filename="createvoicefrm.ui" line="138"/>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Iptal</translation>
+    </message>
+    <message>
+        <location filename="createvoicefrm.ui" line="152"/>
+        <source>Wavtrim Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CreateVoiceWindow</name>
+    <message>
+        <location filename="createvoicewindow.cpp" line="96"/>
+        <source>Selected TTS engine : &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="createvoicewindow.cpp" line="98"/>
+        <source>Selected TTS Engine: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="createvoicewindow.cpp" line="106"/>
+        <source>Selected Encoder: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -985,7 +1051,7 @@ Aygitinizi ve baglama noktasini kendiniz se�iniz.</translation>
 <context>
     <name>InstallTalkWindow</name>
     <message>
-        <location filename="installtalkwindow.cpp" line="85"/>
+        <location filename="installtalkwindow.cpp" line="84"/>
         <source>The Folder to Talk is wrong!</source>
         <translation>Konusma dizini hatali!</translation>
     </message>
@@ -1069,37 +1135,37 @@ Aygitinizi ve baglama noktasini kendiniz se�iniz.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbspeexcfgfrm.ui" line="39"/>
+        <location filename="rbspeexcfgfrm.ui" line="38"/>
         <source>Volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbspeexcfgfrm.ui" line="46"/>
+        <location filename="rbspeexcfgfrm.ui" line="45"/>
         <source>Narrowband</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbspeexcfgfrm.ui" line="69"/>
+        <location filename="rbspeexcfgfrm.ui" line="68"/>
         <source>Quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbspeexcfgfrm.ui" line="86"/>
+        <location filename="rbspeexcfgfrm.ui" line="85"/>
         <source>Complexity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="rbspeexcfgfrm.ui" line="106"/>
+        <location filename="rbspeexcfgfrm.ui" line="115"/>
         <source>&amp;Ok</source>
         <translation type="unfinished">&amp;Tamam</translation>
     </message>
     <message>
-        <location filename="rbspeexcfgfrm.ui" line="116"/>
+        <location filename="rbspeexcfgfrm.ui" line="125"/>
         <source>&amp;Cancel</source>
         <translation type="unfinished">&amp;Iptal</translation>
     </message>
     <message>
-        <location filename="rbspeexcfgfrm.ui" line="126"/>
+        <location filename="rbspeexcfgfrm.ui" line="95"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1107,194 +1173,194 @@ Aygitinizi ve baglama noktasini kendiniz se�iniz.</translation>
 <context>
     <name>RbUtilQt</name>
     <message>
-        <location filename="rbutilqt.cpp" line="77"/>
+        <location filename="rbutilqt.cpp" line="78"/>
         <source>File</source>
         <translation>Dosya</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="77"/>
+        <location filename="rbutilqt.cpp" line="78"/>
         <source>Version</source>
         <translation>S�r�m</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1001"/>
+        <location filename="rbutilqt.cpp" line="1014"/>
         <source>Configuration error</source>
         <translation>Yapilandirma hatasi</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="184"/>
+        <location filename="rbutilqt.cpp" line="187"/>
         <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuation dialog will now open to allow you correcting the problem.</source>
         <translation>Yapilandirmaniz ge�ersiz. Bunun nedeni yeni bir Rockbox Araci kullanmaniz ya da aygitinizin yolunu degistirmeniz olabilir. Bu problemi d�zeltmeniz i�in simdi yapilandirma ekrani a�ilacaktir.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="207"/>
+        <location filename="rbutilqt.cpp" line="210"/>
         <source>Network error: %1. Please check your network and proxy settings.</source>
         <translation>Ag hatasi: %1. L�tfen ag ve vekil sunucu ayarlarinizi kontrol ediniz.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="303"/>
+        <location filename="rbutilqt.cpp" line="305"/>
         <source>&lt;b&gt;%1 %2&lt;/b&gt; at &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>&lt;b&gt;%1 %2&lt;/b&gt; Baglanti Noktasi: &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="323"/>
+        <location filename="rbutilqt.cpp" line="325"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Kilavuz (PDF)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="325"/>
+        <location filename="rbutilqt.cpp" line="327"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Kilavuz (HTML) -- tarayicida a�ilir&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="328"/>
+        <location filename="rbutilqt.cpp" line="330"/>
         <source>Select a device for a link to the correct manual</source>
         <translation>Uygun kilavuz i�in aygit se�iniz</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="330"/>
+        <location filename="rbutilqt.cpp" line="332"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;%1&apos;&gt;Kilavuz Genel A�iklamasi&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="693"/>
+        <location filename="rbutilqt.cpp" line="695"/>
         <source>Confirm Installation</source>
         <translation>Kurulumu onayla</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="339"/>
+        <location filename="rbutilqt.cpp" line="341"/>
         <source>Do you really want to make a complete Installation?</source>
         <translation>T�m bilesenleri y�klemek istediginize emin misiniz?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="391"/>
+        <location filename="rbutilqt.cpp" line="393"/>
         <source>Do you really want to make a small Installation?</source>
         <translation>Mini kurulum yapmak istediginize emin misiniz?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="864"/>
+        <location filename="rbutilqt.cpp" line="877"/>
         <source>Mount point is wrong!</source>
         <translation>Baglama noktasi hatali!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="531"/>
+        <location filename="rbutilqt.cpp" line="533"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>�ny�kleyiciyi kurmak istediginizden emin misiniz?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="787"/>
+        <location filename="rbutilqt.cpp" line="800"/>
         <source>Could not get the bootloader info file!</source>
         <translation>�ny�kleyici bilgi dosyasi alinamadi!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="566"/>
+        <location filename="rbutilqt.cpp" line="568"/>
         <source>Bootloader Installation</source>
         <translation>�ny�kleyici Kurulumu</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="568"/>
+        <location filename="rbutilqt.cpp" line="570"/>
         <source>The bootloader is already installed and up to date.
 Do want to replace the current bootloader?</source>
         <translation>�ny�kleyici daha �nce kurulmus ve g�ncel.
 Mevcut �ny�kleyiciyi degistirmek istiyor musunuz?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="572"/>
+        <location filename="rbutilqt.cpp" line="574"/>
         <source>Bootloader installation skipped!</source>
         <translation>�ny�kleyici kurulumu atlandi!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="591"/>
+        <location filename="rbutilqt.cpp" line="593"/>
         <source>Original Firmware Path is wrong!</source>
         <translation>Orijinal bellenim (firmware) konumu hatali!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="604"/>
+        <location filename="rbutilqt.cpp" line="606"/>
         <source>Original Firmware selection Canceled!</source>
         <translation>Orijinal bellenim (firmware) se�imi iptal edildi!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="619"/>
+        <location filename="rbutilqt.cpp" line="621"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Yazi tipi paketini kurmak istediginizden emin misiniz?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="654"/>
+        <location filename="rbutilqt.cpp" line="656"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Seslendirme dosyasini y�klemek istediginizden emin misiniz?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="689"/>
+        <location filename="rbutilqt.cpp" line="691"/>
         <source>Error</source>
         <translation>Hata</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="689"/>
+        <location filename="rbutilqt.cpp" line="691"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Aygitinizda doom eklentisi bulunmamaktadir. Islem durduruluyor.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="694"/>
+        <location filename="rbutilqt.cpp" line="696"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Oyun eklenti dosyalarini y�klemek istediginizden emin misiniz?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="769"/>
+        <location filename="rbutilqt.cpp" line="782"/>
         <source>Confirm Uninstallation</source>
         <translation>Kaldirma islemini onayla</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="770"/>
+        <location filename="rbutilqt.cpp" line="783"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>�ny�kleyiciyi kaldirmak istediginizden emin misiniz?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="800"/>
+        <location filename="rbutilqt.cpp" line="813"/>
         <source>Confirm download</source>
         <translation>Indirme islemini onayla</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="802"/>
+        <location filename="rbutilqt.cpp" line="815"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Kilavuzu indirmek istiyor musunuz? Aygitinizin bulundugu konuma kaydedilecektir.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="850"/>
+        <location filename="rbutilqt.cpp" line="863"/>
         <source>Confirm installation</source>
         <translation>Kurulumu onayla</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="852"/>
+        <location filename="rbutilqt.cpp" line="865"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Rockbox Aracini aygitiniza kurmak istediginizden emin misiniz? Kurulum sonrasi aygitinizin diskinden �alistirabilirsiniz.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="860"/>
+        <location filename="rbutilqt.cpp" line="873"/>
         <source>Installing Rockbox Utility</source>
         <translation>Rockbox Araci Kuruluyor</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="874"/>
+        <location filename="rbutilqt.cpp" line="887"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Rockbox Araci kurulumunda hata</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="878"/>
+        <location filename="rbutilqt.cpp" line="891"/>
         <source>Installing user configuration</source>
         <translation>Kullanici yapilandirmasi y�kleniyor</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="880"/>
+        <location filename="rbutilqt.cpp" line="893"/>
         <source>Error installing user configuration</source>
         <translation>Kullanici yapilandirmasi y�kleme isleminde hata</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="884"/>
+        <location filename="rbutilqt.cpp" line="897"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox Araci basariyla kuruldu.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1003"/>
+        <location filename="rbutilqt.cpp" line="1016"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Yapilandirmaniz ge�ersiz. Yapilandirma ekranina giderek se�ilen degerlerin dogrulugundan emin olun.</translation>
     </message>
@@ -1343,7 +1409,7 @@ p, li { white-space: pre-wrap; }
         <translation>Hos Geldiniz</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="924"/>
+        <location filename="rbutilqtfrm.ui" line="953"/>
         <source>Complete Installation</source>
         <translation>Tam Kurulum</translation>
     </message>
@@ -1361,7 +1427,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Bu se�enek, �ny�kleyiciyi, mevcut insayi ve ekstra paketleri kurar. Yeni kurulumlar i�in �nerilen y�ntemdir.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="932"/>
+        <location filename="rbutilqtfrm.ui" line="961"/>
         <source>Small Installation</source>
         <translation>Mini Kurulum</translation>
     </message>
@@ -1388,7 +1454,7 @@ p, li { white-space: pre-wrap; }
         <translation>Temel Rockbox kurulumu</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="940"/>
+        <location filename="rbutilqtfrm.ui" line="969"/>
         <source>Install Bootloader</source>
         <translation>�ny�kleyiciyi Kur</translation>
     </message>
@@ -1406,7 +1472,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ses oynaticinizda Rockbox&apos;in �alisabilmesi i�in �ncelikle �ny�kleyicinin kurulmasi gerekmektedir. Bu sadece Rockbox&apos;in ilk kurulumunda gereklidir.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="948"/>
+        <location filename="rbutilqtfrm.ui" line="977"/>
         <source>Install Rockbox</source>
         <translation>Rockbox&apos;i Kur</translation>
     </message>
@@ -1504,10 +1570,10 @@ p, li { white-space: pre-wrap; }
         <location filename="rbutilqtfrm.ui" line="491"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Voice file&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Install Voice file&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Seslendirme Dosyasini Y�kle&lt;/span&gt;&lt;/p&gt;
@@ -1532,22 +1598,22 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Konusma dosyalari Rockbox&apos;in dosya ve dizin isimlerini seslendirmesi i�in gereklidir.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="559"/>
+        <location filename="rbutilqtfrm.ui" line="587"/>
         <source>&amp;Uninstallation</source>
         <translation>&amp;Kaldirma</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1004"/>
+        <location filename="rbutilqtfrm.ui" line="1033"/>
         <source>Uninstall Rockbox</source>
         <translation>Rockbox&apos;i Kaldir</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="568"/>
+        <location filename="rbutilqtfrm.ui" line="596"/>
         <source>Uninstall Bootloader</source>
         <translation>�ny�kleyiciyi Kaldir</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="584"/>
+        <location filename="rbutilqtfrm.ui" line="612"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -1560,7 +1626,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;�ny�kleyiciyi kaldirdiktan sonra Rockbox&apos;i baslatamazsiniz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="614"/>
+        <location filename="rbutilqtfrm.ui" line="642"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -1573,57 +1639,57 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;�ny�kleyiciniz kaldirilmayacaktir, isterseniz daha sonra kendiniz kaldirabilirsiniz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="661"/>
+        <location filename="rbutilqtfrm.ui" line="689"/>
         <source>&amp;Manual</source>
         <translation>&amp;Kilavuz</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="664"/>
+        <location filename="rbutilqtfrm.ui" line="692"/>
         <source>View and download the manual</source>
         <translation>Kilavuzu g�ster ve indir</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="670"/>
+        <location filename="rbutilqtfrm.ui" line="698"/>
         <source>Read the manual</source>
         <translation>Kilavuzu oku</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="676"/>
+        <location filename="rbutilqtfrm.ui" line="704"/>
         <source>PDF manual</source>
         <translation>Kilavuz (PDF)</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="689"/>
+        <location filename="rbutilqtfrm.ui" line="717"/>
         <source>HTML manual</source>
         <translation>Kilavuz (HTML)</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="705"/>
+        <location filename="rbutilqtfrm.ui" line="733"/>
         <source>Download the manual</source>
         <translation>Kilavuzu indir</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="713"/>
+        <location filename="rbutilqtfrm.ui" line="741"/>
         <source>&amp;PDF version</source>
         <translation>&amp;PDF formati</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="720"/>
+        <location filename="rbutilqtfrm.ui" line="748"/>
         <source>&amp;HTML version (zip file)</source>
         <translation>&amp;HTML formati (zip dosyasi)</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="742"/>
+        <location filename="rbutilqtfrm.ui" line="770"/>
         <source>Down&amp;load</source>
         <translation>&amp;Indir</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="766"/>
+        <location filename="rbutilqtfrm.ui" line="794"/>
         <source>Inf&amp;o</source>
         <translation>&amp;Bilgi</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="772"/>
+        <location filename="rbutilqtfrm.ui" line="800"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -1632,139 +1698,165 @@ p, li { white-space: pre-wrap; }
         <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;p, li { white-space: pre-wrap; }&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Y�klenmis paketler.&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Not&lt;/span&gt;: Paketleri kendiniz kurduysaniz, bu bilgiler dogru olmayabilir!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="787"/>
+        <location filename="rbutilqtfrm.ui" line="815"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="809"/>
+        <location filename="rbutilqtfrm.ui" line="837"/>
         <source>&amp;File</source>
         <translation>&amp;Dosya</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="901"/>
+        <location filename="rbutilqtfrm.ui" line="930"/>
         <source>&amp;About</source>
         <translation>&amp;Hakkinda</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="827"/>
+        <location filename="rbutilqtfrm.ui" line="855"/>
         <source>Action&amp;s</source>
         <translation>I&amp;slemler</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="831"/>
+        <location filename="rbutilqtfrm.ui" line="859"/>
         <source>Installation</source>
         <translation>Kurulum</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="838"/>
+        <location filename="rbutilqtfrm.ui" line="866"/>
         <source>Quick Start</source>
         <translation>Hizli Baslangi�</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="845"/>
+        <location filename="rbutilqtfrm.ui" line="873"/>
         <source>Extras</source>
         <translation>Ekstralar</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="853"/>
+        <location filename="rbutilqtfrm.ui" line="881"/>
         <source>Accessibility</source>
         <translation>Erisilebilirlik</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="860"/>
+        <location filename="rbutilqtfrm.ui" line="889"/>
         <source>Uninstallation</source>
         <translation>Kaldirma</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="878"/>
+        <location filename="rbutilqtfrm.ui" line="907"/>
         <source>Empty local download cache</source>
         <translation>Yerel indirme �nbellegi bos</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="883"/>
+        <location filename="rbutilqtfrm.ui" line="912"/>
         <source>Install Rockbox Utility on player</source>
         <translation>Rockbox Aracini Kur</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="888"/>
+        <location filename="rbutilqtfrm.ui" line="917"/>
         <source>&amp;Configure</source>
         <translation>&amp;Yapilandir</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="893"/>
+        <location filename="rbutilqtfrm.ui" line="922"/>
         <source>E&amp;xit</source>
         <translation>&amp;�ikis</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="896"/>
+        <location filename="rbutilqtfrm.ui" line="925"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="906"/>
+        <location filename="rbutilqtfrm.ui" line="935"/>
         <source>About &amp;Qt</source>
         <translation>&amp;Qt Hakkinda</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="911"/>
+        <location filename="rbutilqtfrm.ui" line="940"/>
         <source>&amp;Help</source>
         <translation>&amp;Yardim</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="916"/>
+        <location filename="rbutilqtfrm.ui" line="945"/>
         <source>Info</source>
         <translation>Bilgi</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="956"/>
+        <location filename="rbutilqtfrm.ui" line="985"/>
         <source>Fonts Package</source>
         <translation>Yazi Tipi Paketi</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="964"/>
+        <location filename="rbutilqtfrm.ui" line="993"/>
         <source>Install Themes</source>
         <translation>Temalari Y�kle</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="972"/>
+        <location filename="rbutilqtfrm.ui" line="1001"/>
         <source>Install Game Files</source>
         <translation>Oyun Dosyalarini Y�kle</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="980"/>
+        <location filename="rbutilqtfrm.ui" line="1009"/>
         <source>Install Voice File</source>
         <translation>Seslendirme Dosyasini Y�kle</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="988"/>
+        <location filename="rbutilqtfrm.ui" line="1017"/>
         <source>Create Talk Files</source>
         <translation>Konusma Dosyalari Olustur</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="996"/>
+        <location filename="rbutilqtfrm.ui" line="1025"/>
         <source>Remove bootloader</source>
         <translation>�ny�kleyiciyi Kaldir</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1009"/>
+        <location filename="rbutilqtfrm.ui" line="1038"/>
         <source>Read PDF manual</source>
         <translation> Kilavuzu (PDF) oku</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1014"/>
+        <location filename="rbutilqtfrm.ui" line="1043"/>
         <source>Read HTML manual</source>
         <translation>Kilavuzu (HTML) oku</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1019"/>
+        <location filename="rbutilqtfrm.ui" line="1048"/>
         <source>Download PDF manual</source>
         <translation>Kilavuzu (PDF) indir</translation>
     </message>
     <message>
-        <location filename="rbutilqtfrm.ui" line="1024"/>
+        <location filename="rbutilqtfrm.ui" line="1053"/>
         <source>Download HTML manual (zip)</source>
         <translation>Kilavuzu (HTML zip) indir</translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="558"/>
+        <source>Create Voice files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="574"/>
+        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;Create Voice file&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans Serif&apos;; font-size:9pt;&quot;&gt; if you installed the voice file Rockbox will speak.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="1061"/>
+        <source>Create Voice File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="rbutilqtfrm.ui" line="1064"/>
+        <source>Create Voic&lt;resource type=&quot;image&quot; qrc=&quot;C:/cygwin/home/Domonoky/rockbox-svn/rockbox-rbspeex/rbutil/rbutilqt/rbutilqt.qrc&quot; file=&quot;:/icons/icons/talkfile_btn.png&quot; /&gt;
+e File</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1780,29 +1872,47 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="sapicfgfrm.ui" line="25"/>
+        <location filename="sapicfgfrm.ui" line="62"/>
         <source>TTS options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="sapicfgfrm.ui" line="35"/>
+        <location filename="sapicfgfrm.ui" line="25"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="sapicfgfrm.ui" line="60"/>
+        <location filename="sapicfgfrm.ui" line="87"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="sapicfgfrm.ui" line="80"/>
+        <location filename="sapicfgfrm.ui" line="107"/>
         <source>&amp;Ok</source>
         <translation type="unfinished">&amp;Tamam</translation>
     </message>
     <message>
-        <location filename="sapicfgfrm.ui" line="90"/>
+        <location filename="sapicfgfrm.ui" line="117"/>
         <source>&amp;Cancel</source>
         <translation type="unfinished">&amp;Iptal</translation>
+    </message>
+    <message>
+        <location filename="sapicfgfrm.ui" line="35"/>
+        <source>Voice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="sapicfgfrm.ui" line="45"/>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TTSExes</name>
+    <message>
+        <location filename="tts.cpp" line="123"/>
+        <source>TTS executable not found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1846,6 +1956,67 @@ p, li { white-space: pre-wrap; }
         <location filename="ttsexescfgfrm.ui" line="107"/>
         <source>&amp;Cancel</source>
         <translation type="unfinished">&amp;Iptal</translation>
+    </message>
+</context>
+<context>
+    <name>TTSSapi</name>
+    <message>
+        <location filename="tts.cpp" line="274"/>
+        <source>Could not copy the Sapi-script</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="tts.cpp" line="292"/>
+        <source>Could not start the Sapi-script</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TalkFileCreator</name>
+    <message>
+        <location filename="talkfile.cpp" line="31"/>
+        <source>Starting Talk file generation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="41"/>
+        <source>Init of TTS engine failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="52"/>
+        <source>Init of Encoder engine failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="70"/>
+        <source>Talk file creation aborted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="132"/>
+        <source>Voicing of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="135"/>
+        <source>Voicing of %s failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="143"/>
+        <source>Encoding of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="146"/>
+        <source>Encoding of %1 failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="talkfile.cpp" line="173"/>
+        <source>Finished creating Talk files</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2130,6 +2301,79 @@ L�tfen ag ve vekil sunucu ayarlarinizi kontrol ediniz.</translation>
         <location filename="uninstall.cpp" line="108"/>
         <source>Uninstallation finished</source>
         <translation>Kaldirma islemi tamamlandi</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceFileCreator</name>
+    <message>
+        <location filename="voicefile.cpp" line="41"/>
+        <source>Starting Voicefile generation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="55"/>
+        <source>failed to open rockbox-info.txt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="124"/>
+        <source>Download error: received HTTP error %1.</source>
+        <translation type="unfinished">Indirme hatasi: HTTP %1 hatasi.</translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="128"/>
+        <source>Cached file used.</source>
+        <translation type="unfinished">�nbellekteki dosya kullanildi.</translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="130"/>
+        <source>Download error: %1</source>
+        <translation type="unfinished">Indirme hatasi: %1</translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="134"/>
+        <source>Download finished.</source>
+        <translation type="unfinished">Indirme islemi tamamlandi.</translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="143"/>
+        <source>failed to open downloaded file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="156"/>
+        <source>Init of TTS engine failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="167"/>
+        <source>Init of Encoder engine failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="209"/>
+        <source>The downloaded file was empty!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="246"/>
+        <source>creating </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="269"/>
+        <source>Error opening downloaded file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="277"/>
+        <source>Error opening output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="voicefile.cpp" line="291"/>
+        <source>successfully created.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
