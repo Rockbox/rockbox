@@ -1117,8 +1117,12 @@ int ata_init(void)
 {
     int rc = 0;
 
-    mutex_init(&mmc_mutex);
-
+    if (!initialized) 
+    {
+        mutex_init(&mmc_mutex);
+        queue_init(&mmc_queue, true);
+    }
+    mutex_lock(&mmc_mutex);
     led(false);
 
     /* Port setup */
@@ -1151,7 +1155,6 @@ int ata_init(void)
         if (!last_mmc_status)
             mmc_status = MMC_UNTOUCHED;
 
-        queue_init(&mmc_queue, true);
         create_thread(mmc_thread, mmc_stack,
                       sizeof(mmc_stack), 0, mmc_thread_name
                       IF_PRIO(, PRIORITY_SYSTEM)
@@ -1160,6 +1163,7 @@ int ata_init(void)
         initialized = true;
     }
 
+    mutex_unlock(&mmc_mutex);
     return rc;
 }
 
