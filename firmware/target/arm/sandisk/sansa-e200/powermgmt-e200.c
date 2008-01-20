@@ -35,15 +35,15 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* Sansa Li Ion 750mAH FIXME this is a first linear approach */
-    { 3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200 },
+    /* Sansa Li Ion 750mAH, took from battery benchs */
+    { 3300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    /* Sansa Li Ion 750mAH FIXME*/
-    3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200
+    /* Sansa Li Ion 750mAH FIXME */
+    3300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160
 };
 
 /* ADC should read 0x3ff=5.12V */
