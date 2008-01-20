@@ -51,17 +51,17 @@
           \opt{SANSA_C200_PAD}{\ButtonPower}
           & Leave the radio screen with the radio playing.\\
           %
-          \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
-            {\ButtonOff}
-          \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,IRIVER_H10_PAD}{\ButtonPower}
-          \opt{SANSA_C200_PAD}{Long \ButtonUp}
-          & Stops the radio and returns to \setting{Main Menu}.\\
+          \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}%
+            {\ButtonOff}%
+          \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,IRIVER_H10_PAD}{\ButtonPower}%
+          \opt{SANSA_C200_PAD}{Long \ButtonUp}%
+          & Stops the radio and returns to \setting{Main Menu}.\\%
           %
           \nopt{ONDIO_PAD}{%
             \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
             \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}%
             \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonUp}%
-            & Mutes radio playback.\\
+            & Mutes radio playback.\\%
             %
             \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{Long \ButtonOn}
             \opt{IAUDIO_X5_PAD}{Long \ButtonPlay}
@@ -74,15 +74,15 @@
             \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}
                 {\ButtonSelect}
             \opt{IRIVER_H10_PAD}{\ButtonRight}
-            & Opens a list of radio presets. You can view all the presets that
+            & Opens a list of radio presets. You can view all the presets that 
               you have, and switch to the station.\\
-          }
+          }%
           %
-          \opt{RECORDER_PAD}{\ButtonFOne}
-          \opt{ONDIO_PAD}{Long \ButtonMenu}
-          \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{Long \ButtonSelect}
-          \opt{IRIVER_H10_PAD}{Long \ButtonRight}
-          \opt{SANSA_C200_PAD}{\ButtonDown}
+          \opt{RECORDER_PAD}{\ButtonFOne}%
+          \opt{ONDIO_PAD}{Long \ButtonMenu}%
+          \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{Long \ButtonSelect}%
+          \opt{IRIVER_H10_PAD}{Long \ButtonRight}%
+          \opt{SANSA_C200_PAD}{\ButtonDown}%
           & Displays the FM radio settings menu.\\
        \end{btnmap}
     \end{table}
@@ -101,7 +101,8 @@
       to go to the menu, then select \setting{Add preset}.%
     }
     Enter the name (maximum number of characters is 32).
-    \nopt{ONDIO_PAD}{Press }\ActionKbdDone\ to save.
+    \opt{ONDIO_PAD}{Long \ButtonMenu\ to save.}%
+    \nopt{ONDIO_PAD}{Press \ActionKbdDone\ to save.}
 
     \note{See this page for pre-made FM radio presets from all around the world.}
     \wikilink{FmPresets}
