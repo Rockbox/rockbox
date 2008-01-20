@@ -14,80 +14,89 @@
   </property>
   <layout class="QGridLayout" >
    <item row="0" column="0" colspan="4" >
-    <widget class="QLabel" name="labelTitle" >
-     <property name="text" >
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
       <string>Configure RbSpeex Encoder</string>
      </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QDoubleSpinBox" name="volume" >
+        <property name="maximum" >
+         <double>10.000000000000000</double>
+        </property>
+        <property name="singleStep" >
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value" >
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Volume</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QCheckBox" name="narrowband" >
+        <property name="text" >
+         <string>Narrowband</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QDoubleSpinBox" name="quality" >
+        <property name="decimals" >
+         <number>1</number>
+        </property>
+        <property name="maximum" >
+         <double>10.000000000000000</double>
+        </property>
+        <property name="singleStep" >
+         <double>1.000000000000000</double>
+        </property>
+        <property name="value" >
+         <double>8.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Quality</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QSpinBox" name="complexity" >
+        <property name="maximum" >
+         <number>10</number>
+        </property>
+        <property name="value" >
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Complexity</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="1" column="0" >
-    <widget class="QDoubleSpinBox" name="volume" >
-     <property name="maximum" >
-      <double>10.000000000000000</double>
-     </property>
-     <property name="singleStep" >
-      <double>0.010000000000000</double>
-     </property>
-     <property name="value" >
-      <double>1.000000000000000</double>
+    <widget class="QPushButton" name="reset" >
+     <property name="text" >
+      <string>Reset</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>Volume</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" colspan="2" >
-    <widget class="QCheckBox" name="narrowband" >
-     <property name="text" >
-      <string>Narrowband</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" >
-    <widget class="QDoubleSpinBox" name="quality" >
-     <property name="decimals" >
-      <number>1</number>
-     </property>
-     <property name="maximum" >
-      <double>10.000000000000000</double>
-     </property>
-     <property name="singleStep" >
-      <double>1.000000000000000</double>
-     </property>
-     <property name="value" >
-      <double>8.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Quality</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" >
-    <widget class="QSpinBox" name="complexity" >
-     <property name="maximum" >
-      <number>10</number>
-     </property>
-     <property name="value" >
-      <number>10</number>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
-      <string>Complexity</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
@@ -100,7 +109,7 @@
      </property>
     </spacer>
    </item>
-   <item row="4" column="2" >
+   <item row="1" column="2" >
     <widget class="QPushButton" name="buttonOk" >
      <property name="text" >
       <string>&amp;Ok</string>
@@ -110,20 +119,13 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="3" >
+   <item row="1" column="3" >
     <widget class="QPushButton" name="buttonCancel" >
      <property name="text" >
       <string>&amp;Cancel</string>
      </property>
      <property name="icon" >
       <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" >
-    <widget class="QPushButton" name="reset" >
-     <property name="text" >
-      <string>Reset</string>
      </property>
     </widget>
    </item>
