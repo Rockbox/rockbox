@@ -417,6 +417,9 @@ while(<WPS>) {
 	elsif($l =~ /^selector type: (.*)/i) {
 	    $selecttype = $1;
 	}
+	elsif($l =~ /^selector type\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+	    $selecttype = $1;
+	}	
 	elsif($l =~ /^iconset: (.*)/i) {
 	    $iconset = $1;
 	    copythemeicon();

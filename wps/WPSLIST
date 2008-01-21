@@ -209,9 +209,9 @@ Author: Jens Arnold
 <wps>
 Name: cabbiev2.wps
 # Real name of the creator of the WPS
-Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawkus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
-rwps: /.rockbox/wps/cabbiev2.rwps-128x96x2.rwps
-rwps: /.rockbox/wps/cabbiev2.rwps-128x64x2.rwps
+Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
+rwps: cabbiev2.rwps-128x96x2.rwps
+rwps: cabbiev2.rwps-128x64x2.rwps
 # Preferred font (including .fnt extension - leave blank for player):
 Font.320x240x16: helvR12.fnt
 Font.240x320x16: helvR14.fnt
@@ -238,8 +238,18 @@ backdrop.220x176x16: /.rockbox/backdrops/cabbiev2.220x176x16.bmp
 backdrop.240x320x16: /.rockbox/backdrops/cabbiev2.240x320x16.bmp
 line selector start color: fde89e
 line selector end color: b58c00
-selector type: bar (gradient)
-iconset: /.rockbox/icons/tango_small.bmp
+
+#selection bar settings for color targets
+selector type.320x240x16: bar (gradient)
+selector type.128x128x16: bar (gradient)
+selector type.132x80x16:  bar (gradient)
+selector type.220x176x16: bar (gradient)
+selector type.160x128x16: bar (gradient)
+selector type.240x320x16: bar (gradient)
+selector type.176x132x16: bar (gradient)
+selector type.176x220x16: bar (gradient)
+
+iconset: /.rockbox/icons/tango_small.bmp 
 viewers iconset: /.rockbox/icons/tango_small_viewers.bmp
 line selector text color: 000000
 filetype colours: -
