@@ -312,6 +312,16 @@ MENUITEM_SETTING(max_files_in_playlist, &global_settings.max_files_in_playlist, 
 MAKE_MENU(limits_menu, ID2P(LANG_LIMITS_MENU), 0, Icon_NOICON,
            &max_files_in_dir, &max_files_in_playlist);
 
+
+/* Keyclick menu */
+#if CONFIG_CODEC == SWCODEC
+MENUITEM_SETTING(keyclick, &global_settings.keyclick, NULL);
+MENUITEM_SETTING(keyclick_repeats, &global_settings.keyclick_repeats, NULL);
+MAKE_MENU(keyclick_menu, ID2P(LANG_KEYCLICK), 0, Icon_NOICON,
+           &keyclick, &keyclick_repeats);
+#endif
+
+
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
 static int linein_callback(int action,const struct menu_item_ex *this_item)
@@ -341,6 +351,7 @@ MENUITEM_SETTING(buttonlight_timeout, &global_settings.buttonlight_timeout, NULL
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
 MENUITEM_SETTING(buttonlight_brightness, &global_settings.buttonlight_brightness, NULL);
 #endif
+
 
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM), 
           0, Icon_System_menu,
@@ -372,7 +383,10 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &buttonlight_timeout,
 #endif
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-            &buttonlight_brightness
+            &buttonlight_brightness,
+#endif
+#if CONFIG_CODEC == SWCODEC
+            &keyclick_menu,
 #endif
          );
 

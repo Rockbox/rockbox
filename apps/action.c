@@ -8,7 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 Jonathan Gordon
- * 
+ *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
  *
@@ -28,8 +28,10 @@
 #include "kernel.h"
 #include "debug.h"
 #include "splash.h"
+#include "settings.h"
+#include "pcmbuf.h"
 
-static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to 
+static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
 static intptr_t last_data = 0;
 static int last_action = ACTION_NONE;
@@ -63,7 +65,7 @@ static inline int do_button_check(const struct button_mapping *items,
 
     while (items[i].button_code != BUTTON_NONE)
     {
-        if (items[i].button_code == button) 
+        if (items[i].button_code == button)
         {
             if ((items[i].pre_button_code == BUTTON_NONE)
                 || (items[i].pre_button_code == last_button))
@@ -82,8 +84,8 @@ static inline int get_next_context(const struct button_mapping *items, int i)
 {
     while (items[i].button_code != BUTTON_NONE)
         i++;
-    return (items[i].action_code == ACTION_NONE ) ? 
-            CONTEXT_STD : 
+    return (items[i].action_code == ACTION_NONE ) ?
+            CONTEXT_STD :
             items[i].action_code;
 }
 /*
@@ -96,11 +98,11 @@ static inline int get_next_context(const struct button_mapping *items, int i)
         the last item in the list "points" to the next context in a chain
         so the "chain" is followed until the button is found.
         putting ACTION_NONE will get CONTEXT_STD which is always the last list checked.
-        
+
    Timeout can be TIMEOUT_NOBLOCK to return immediatly
                   TIMEOUT_BLOCK   to wait for a button press
-Any number >0   to wait that many ticks for a press
-                  
+   Any number >0   to wait that many ticks for a press
+
  */
 static int get_action_worker(int context, int timeout,
                              const struct button_mapping* (*get_context_map)(int) )
@@ -110,7 +112,7 @@ static int get_action_worker(int context, int timeout,
     int i=0;
     int ret = ACTION_UNKNOWN;
     static int last_context = CONTEXT_STD;
-    
+
     if (timeout == TIMEOUT_NOBLOCK)
         button = button_get(false);
     else if  (timeout == TIMEOUT_BLOCK)
@@ -119,14 +121,19 @@ static int get_action_worker(int context, int timeout,
         button = button_get_w_tmo(timeout);
 
     /* Data from sys events can be pulled with button_get_data */
-    if (button == BUTTON_NONE || button&SYS_EVENT)
-    {
+    if (button == BUTTON_NONE || button & SYS_EVENT)
         return button;
-    }
-    
-    if ((context != last_context) && ((last_button&BUTTON_REL) == 0))
+
+#if CONFIG_CODEC == SWCODEC
+    /* Produce keyclick */
+    if (global_settings.keyclick && !(button & BUTTON_REL))
+        if (!(button & BUTTON_REPEAT) || global_settings.keyclick_repeats)
+            pcmbuf_beep(5000, 2, 2500*global_settings.keyclick);
+#endif
+
+    if ((context != last_context) && ((last_button & BUTTON_REL) == 0))
     {
-        if (button&BUTTON_REL)
+        if (button & BUTTON_REL)
         {
             last_button = button;
             last_action = ACTION_NONE;
@@ -137,18 +144,18 @@ static int get_action_worker(int context, int timeout,
     }
     last_context = context;
 #ifdef HAVE_TOUCHPAD
-    if (button&BUTTON_TOUCHPAD)
+    if (button & BUTTON_TOUCHPAD)
     {
         repeated = false;
         short_press = false;
-        if (last_button&BUTTON_TOUCHPAD)
+        if (last_button & BUTTON_TOUCHPAD)
         {
-            if ((button&BUTTON_REL) &&
-                ((last_button&BUTTON_REPEAT)==0))
+            if ((button & BUTTON_REL) &&
+                ((last_button & BUTTON_REPEAT)==0))
             {
                 short_press = true;
             }
-            else if (button&BUTTON_REPEAT)
+            else if (button & BUTTON_REPEAT)
                 repeated = true;
         }
         last_button = button;
@@ -156,48 +163,48 @@ static int get_action_worker(int context, int timeout,
     }
 #endif
 #ifndef HAS_BUTTON_HOLD
-    screen_has_lock = ((context&ALLOW_SOFTLOCK)==ALLOW_SOFTLOCK);
+    screen_has_lock = ((context & ALLOW_SOFTLOCK) == ALLOW_SOFTLOCK);
     if (screen_has_lock && (keys_locked == true))
     {
-        if (button == unlock_combo) 
+        if (button == unlock_combo)
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
             gui_syncsplash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
-        } 
-        else 
-#if (BUTTON_REMOTE != 0)   
-            if ((button&BUTTON_REMOTE) == 0) 
+        }
+        else
+#if (BUTTON_REMOTE != 0)
+            if ((button & BUTTON_REMOTE) == 0)
 #endif
         {
-            if ((button&BUTTON_REL))
+            if ((button & BUTTON_REL))
                 gui_syncsplash(HZ/2, str(LANG_KEYLOCK_ON));
             return ACTION_REDRAW;
         }
     }
     context &= ~ALLOW_SOFTLOCK;
 #endif /* HAS_BUTTON_HOLD */
-    
+
     /*   logf("%x,%x",last_button,button); */
-    do 
+    do
     {
         /*     logf("context = %x",context); */
 #if (BUTTON_REMOTE != 0)
-        if (button&BUTTON_REMOTE)
+        if (button & BUTTON_REMOTE)
             context |= CONTEXT_REMOTE;
 #endif
-        if ((context&CONTEXT_CUSTOM) && get_context_map)
+        if ((context & CONTEXT_CUSTOM) && get_context_map)
             items = get_context_map(context);
         else
             items = get_context_mapping(context);
-        
+
         ret = do_button_check(items,button,last_button,&i);
-        
+
         if ((context ==(int)CONTEXT_STOPSEARCHING) ||
              items == NULL )
             break;
-        
+
         if (ret == ACTION_UNKNOWN )
         {
             context = get_next_context(items,i);
@@ -208,19 +215,19 @@ static int get_action_worker(int context, int timeout,
     /* DEBUGF("ret = %x\n",ret); */
 #ifndef HAS_BUTTON_HOLD
     if (screen_has_lock && (ret == ACTION_STD_KEYLOCK))
-    {       
+    {
         unlock_combo = button;
         keys_locked = true;
         gui_syncsplash(HZ/2, str(LANG_KEYLOCK_ON));
-        
+
         button_clear_queue();
         return ACTION_REDRAW;
     }
 #endif
-    if ((current_tick - last_action_tick < REPEAT_WINDOW_TICKS) 
+    if ((current_tick - last_action_tick < REPEAT_WINDOW_TICKS)
          && (ret == last_action))
         repeated = true;
-    else 
+    else
         repeated = false;
 
     last_button = button;
@@ -266,7 +273,7 @@ int get_action_statuscode(int *button)
     if (button)
         *button = last_button;
 
-    if (last_button&BUTTON_REMOTE)
+    if (last_button & BUTTON_REMOTE)
         ret |= ACTION_REMOTE;
     if (repeated)
         ret |= ACTION_REPEAT;
@@ -283,10 +290,10 @@ int action_get_touchpad_press(short *x, short *y)
 {
     static int last_data = 0;
     int data;
-    if ((last_button&BUTTON_TOUCHPAD) == 0)
+    if ((last_button & BUTTON_TOUCHPAD) == 0)
         return BUTTON_NONE;
     data = button_get_data();
-    if (last_button&BUTTON_REL)
+    if (last_button & BUTTON_REL)
     {
         *x = (last_data&0xffff0000)>>16;
         *y = (last_data&0xffff);

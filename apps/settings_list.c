@@ -1180,6 +1180,13 @@ const struct settings_list settings[] = {
 #if CONFIG_TUNER
     SYSTEM_SETTING(0, statusbar_forced, 0),
 #endif
+#if CONFIG_CODEC == SWCODEC
+    /* keyclick */
+    CHOICE_SETTING(0, keyclick, LANG_KEYCLICK, 0,
+        "keyclick", "off,weak,moderate,strong", NULL, 4,
+        ID2P(LANG_OFF), ID2P(LANG_WEAK), ID2P(LANG_MODERATE), ID2P(LANG_STRONG)),
+    OFFON_SETTING(0, keyclick_repeats, LANG_KEYCLICK_REPEATS, false, "keyclick repeats", NULL),
+#endif /* CONFIG_CODEC == SWCODEC */
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

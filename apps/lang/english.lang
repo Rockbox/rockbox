@@ -11540,3 +11540,37 @@
     *: "Save Sound Settings"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings men
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Keyclick"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Keyclick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings men
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </voice>
+</phrase>

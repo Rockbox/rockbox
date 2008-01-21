@@ -237,12 +237,12 @@ bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int));
 bool set_int(const unsigned char* string, const char* unit, int voice_unit,
              int* variable,
-             void (*function)(int), int step, int min, int max, 
+             void (*function)(int), int step, int min, int max,
              void (*formatter)(char*, size_t, int, const char*) );
 /* use this one if you need to create a lang from the value (i.e with TALK_ID()) */
 bool set_int_ex(const unsigned char* string, const char* unit, int voice_unit,
              int* variable,
-             void (*function)(int), int step, int min, int max, 
+             void (*function)(int), int step, int min, int max,
              void (*formatter)(char*, size_t, int, const char*),
              int32_t (*get_talk_id)(int, int));
 
@@ -353,7 +353,7 @@ struct user_settings
                       1 = main lcd
                       2 = main and remote lcd
                       3 = remote lcd */
-    
+
     int rec_start_thres;    /* negative: db, positive: % range -87 .. 100 */
     int rec_start_duration; /* index of trig_durations */
     int rec_stop_thres;     /* negative: db, positive: % */
@@ -520,7 +520,7 @@ struct user_settings
     bool talk_menu; /* enable voice UI */
     int talk_dir; /* voiced directories mode: 0=off 1=number 2=spell */
     bool talk_dir_clip; /* use directory .talk clips */
-    int talk_file; /* voice file mode: 0=off, 1=number, 2=spell */ 
+    int talk_file; /* voice file mode: 0=off, 1=number, 2=spell */
     bool talk_file_clip; /* use file .talk clips */
     bool talk_filetype; /* say file type */
     bool talk_battery_level;
@@ -528,7 +528,7 @@ struct user_settings
     /* file browser sorting */
     int sort_file; /* 0=alpha, 1=date, 2=date (new first), 3=type */
     int sort_dir; /* 0=alpha, 1=date (old first), 2=date (new first) */
-    
+
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
     int remote_contrast;   /* lcd contrast:          0-63 0=low 63=high            */
@@ -548,7 +548,7 @@ struct user_settings
                                    1=EMI reduce on with cost more CPU. */
 #endif
 #endif /* HAVE_REMOTE_LCD */
-    
+
     int next_folder; /* move to next folder */
     bool runtimedb;   /* runtime database active? */
 
@@ -559,7 +559,7 @@ struct user_settings
                                shuffle is on, album gain otherwise */
     int  replaygain_preamp; /* scale replaygained tracks by this */
     int  beep;              /* system beep volume when changing tracks etc. */
-    
+
     /* Crossfeed settings */
     bool crossfeed;                             /* enable crossfeed */
     unsigned int crossfeed_direct_gain;         /* dB x 10 */
@@ -631,7 +631,7 @@ struct user_settings
     int lst_color; /* color of the text for the selector */
 #endif
     bool party_mode;    /* party mode - unstoppable music */
-    
+
 #ifdef HAVE_BACKLIGHT
     bool bl_filter_first_keypress;   /* filter first keypress when dark? */
 #ifdef HAVE_REMOTE_LCD
@@ -718,6 +718,10 @@ struct user_settings
 #ifdef HAVE_USBSTACK
     int usb_stack_mode;	/* device or host */
     unsigned char usb_stack_device_driver[32]; /* usb device driver to load */
+#endif
+#if CONFIG_CODEC == SWCODEC
+    int keyclick; /* keyclick volume */
+    int keyclick_repeats; /* keyclick on repeats */
 #endif
 };
 
