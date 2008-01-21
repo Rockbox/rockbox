@@ -113,6 +113,16 @@ sub copybackdrop {
 	`cp $ROOT/backdrops/$2 $1`;
 }
 
+sub copythemefont {
+	#copy the font specified by the theme
+	
+	$o=$font; 
+	$o =~ s/\.fnt/\.bdf/;
+	`mkdir .rockbox/fonts/ >/dev/null 2>&1`;
+	$cmd ="$ROOT/tools/convbdf -f -o \".rockbox/fonts/$font\" \"$ROOT/fonts/$o\" ";
+	`$cmd`;
+}
+
 sub copywps {
     # we assume that we copy the WPS files from the same dir the WPSLIST
     # file is located in
@@ -367,6 +377,7 @@ while(<WPS>) {
         }
         elsif($l =~ /^Font\.${main_width}x${main_height}x$main_depth: (.*)/i) {
             $font = $1;
+            copythemefont();
         }
         elsif($l =~ /^Statusbar: (.*)/i) {
             $statusbar = $1;
