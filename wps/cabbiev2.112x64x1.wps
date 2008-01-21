@@ -1,0 +1,46 @@
+# cabbie 2.0 default for the Archos Series by Marianne Arnold
+# derived from cabbie 2.0 default (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+%wd
+%x|z|wpsbackdrop-112x64x1.bmp|0|0|
+%P|pb-112x64x1.bmp|
+%xl|A|lockclosed-112x64x1.bmp|4|56|
+%xl|B|battpl-112x64x1.bmp|23|56|
+%xl|C|battch-112x64x1.bmp|23|56|
+%xl|D|batt01-112x64x1.bmp|23|57|
+%xl|E|batt02-112x64x1.bmp|23|57|
+%xl|F|batt03-112x64x1.bmp|23|57|
+%xl|G|batt04-112x64x1.bmp|23|57|
+%xl|H|batt05-112x64x1.bmp|23|57|
+%xl|I|batt06-112x64x1.bmp|23|57|
+%xl|J|vol1-112x64x1.bmp|41|56|
+%xl|K|vol2-112x64x1.bmp|41|56|
+%xl|L|vol3-112x64x1.bmp|41|56|
+%xl|M|vol4-112x64x1.bmp|41|56|
+%xl|N|vol5-112x64x1.bmp|41|56|
+%xl|O|vol6-112x64x1.bmp|41|56|
+%xl|P|vol7-112x64x1.bmp|41|56|
+%xl|Q|vol8-112x64x1.bmp|41|56|
+%xl|R|shuffle-112x64x1.bmp|59|56|
+%xl|S|repeatall-112x64x1.bmp|81|56|
+%xl|T|repeatone-112x64x1.bmp|81|56|
+%xl|U|repeatshuffle-112x64x1.bmp|81|56|
+%xl|V|repeatab-112x64x1.bmp|81|56|
+%xl|W|play-112x64x1.bmp|98|56|
+%xl|X|pause-112x64x1.bmp|98|56|
+%xl|Y|ff-112x64x1.bmp|98|56|
+%xl|Z|rew-112x64x1.bmp|98|56|
+#NowPlaying
+
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d2<%d2|(root)>>
+%s%ac%?id<%id|%?d1<%d1|(root)>>
+%t5%ac%s%?Fn<Next: %?It<%It|%Fn>|%ac%pp of %pe>;%t5%ac%s%?Fn<Next: %?Ia<%Ia|%Fn>|%ac%pp of %pe>
+%pb|4|1|111|42|
+%pc%ar%pr
+#Bottom status bar
+%?mh<%xdA|>
+%?bp<%xdB|%?bc<%xdC|%?bl<||%xdD|%xdE|%xdF|%xdG|%xdH|%xdI>>>
+%?pv<|%xdJ|%xdK|%xdL|%xdM|%xdN|%xdO|%xdP|%xdQ>
+%?ps<%xdR|>
+%?mm<|%xdS|%xdT|%xdU|%xdV>
+%?mp<|%xdW|%xdX|%xdY|%xdZ>

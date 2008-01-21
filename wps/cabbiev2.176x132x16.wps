@@ -1,0 +1,55 @@
+# cabbie 2.0 default
+# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+#derived from "cabbie" (C) Yohann Misquitta
+#Ported to nano by crzyboyster
+%wd
+%P|pb-176x132x16.bmp|
+%X|wpsbackdrop-176x132x16.bmp|0|0|
+%xl|A|lockclosed-176x132x16.bmp|65|116|
+%xl|B|lockopen-176x132x16.bmp|65|116|
+%xl|C|battpl-176x132x16.bmp|83|117|
+%xl|D|battch-176x132x16.bmp|83|117|
+%xl|E|batt00-176x132x16.bmp|83|117|
+%xl|F|batt01-176x132x16.bmp|83|117|
+%xl|G|batt02-176x132x16.bmp|83|117|
+%xl|H|batt03-176x132x16.bmp|83|117|
+%xl|I|batt04-176x132x16.bmp|83|117|
+%xl|J|batt05-176x132x16.bmp|83|117|
+%xl|K|batt06-176x132x16.bmp|83|117|
+%xl|L|batt07-176x132x16.bmp|83|117|
+%xl|M|vol0-176x132x16.bmp|102|117|
+%xl|N|vol1-176x132x16.bmp|102|117|
+%xl|O|vol2-176x132x16.bmp|102|117|
+%xl|P|vol3-176x132x16.bmp|102|117|
+%xl|Q|shuffle-176x132x16.bmp|120|117|
+%xl|R|repeatall-176x132x16.bmp|139|113|
+%xl|S|repeatone-176x132x16.bmp|139|113|
+%xl|T|repeatshuffle-176x132x16.bmp|139|113|
+%xl|U|repeatab-176x132x16.bmp|139|113|
+%xl|V|stop-176x132x16.bmp|156|115|
+%xl|W|play-176x132x16.bmp|156|115|
+%xl|X|pause-176x132x16.bmp|156|115|
+%xl|Y|ff-176x132x16.bmp|156|115|
+%xl|Z|rew-176x132x16.bmp|156|115|
+%xl|a|vol4-176x132x16.bmp|102|117|
+%xl|b|vol5-176x132x16.bmp|102|117|
+%xl|c|vol6-176x132x16.bmp|102|117|
+%xl|d|vol7-176x132x16.bmp|102|117|
+%xl|e|vol8-176x132x16.bmp|102|117|
+%xl|f|vol9-176x132x16.bmp|102|117|
+%Cl|9|16|s65|s65|
+%pb|8|8|168|86|
+#NowPlaying
+%?C<%s%m|81|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
+%?C<%s%m|81|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
+%?C<%s%m|81|%al%?id<%id|%?d1<%d1|(root)>>|%s%ac%?id<%id|%?d1<%d1|(root)>>>
+
+%?C<%s%m|81|%alNext Track:|%acNext Track:>
+%?C<%s%m|81|%al%?It<%It|%Fn>|%s%ac%?It<%It|%Fn>>
+
+%al   %pc%ac%pc%ac%pp of %pe%ar%pr%ar%pr   
+%?mh<%xdA|%xdB>
+%?bp<%?bc<%xdD|%xdC>|%?bl<|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK|%xdL>>
+%?pv<%xdM|%xdN|%xdO|%xdP|%xda|%xdb|%xdc|%xdd|%xde|%xdf>%?ps<%xdQ>
+%?mm<|%xdR|%xdS|%xdT|%xdU>
+%?mp<%xdV|%xdW|%xdX|%xdY|%xdZ>%?C<%C>

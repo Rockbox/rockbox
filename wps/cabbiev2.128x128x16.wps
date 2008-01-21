@@ -1,0 +1,57 @@
+# cabbie 2.0 default
+# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+#derived from "cabbie" (C) Yohann Misquitta
+%wd
+%X|wpsbackdrop-128x128x16.bmp|0|0|
+%P|pb-128x128x16.bmp|
+%xl|A|lockclosed-128x128x16.bmp|3|110|
+%xl|B|lockopen-128x128x16.bmp|3|110|
+%xl|C|battpl-128x128x16.bmp|23|110|
+%xl|D|battch-128x128x16.bmp|23|110|
+%xl|E|batt00-128x128x16.bmp|23|110|
+%xl|F|batt01-128x128x16.bmp|23|110|
+%xl|G|batt02-128x128x16.bmp|23|110|
+%xl|H|batt03-128x128x16.bmp|23|110|
+%xl|I|batt04-128x128x16.bmp|23|110|
+%xl|J|batt05-128x128x16.bmp|23|110|
+%xl|K|batt06-128x128x16.bmp|23|110|
+%xl|L|batt07-128x128x16.bmp|23|110|
+%xl|M|vol0-128x128x16.bmp|51|110|
+%xl|N|vol1-128x128x16.bmp|51|110|
+%xl|O|vol2-128x128x16.bmp|51|110|
+%xl|P|vol3-128x128x16.bmp|51|110|
+%xl|Q|vol4-128x128x16.bmp|51|110|
+%xl|b|vol5-128x128x16.bmp|51|110|
+%xl|c|vol6-128x128x16.bmp|51|110|
+%xl|d|vol7-128x128x16.bmp|51|110|
+%xl|e|vol8-128x128x16.bmp|51|110|
+%xl|f|vol9-128x128x16.bmp|51|110|
+%xl|R|shuffle-128x128x16.bmp|74|110|
+%xl|S|repeatall-128x128x16.bmp|97|110|
+%xl|T|repeatone-128x128x16.bmp|97|110|
+%xl|U|repeatshuffle-128x128x16.bmp|97|110|
+%xl|V|repeatab-128x128x16.bmp|97|110|
+%xl|W|stop-128x128x16.bmp|111|110|
+%xl|X|play-128x128x16.bmp|111|110|
+%xl|Y|pause-128x128x16.bmp|111|110|
+%xl|Z|ff-128x128x16.bmp|111|110|
+%xl|a|rew-128x128x16.bmp|111|110|
+%Cl|4|12|s60|s60|
+%pb|6|3|125|87|
+#NowPlaying
+%?C<%s%m|70|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
+%?C<%s%m|70|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
+%?C<%s%m|70|%al%?id<%id|%?d1<%d1|(root)>>|%s%ac%?id<%id|%?d1<%d1|(root)>>>
+%?C<%s%m|70|%al%iy|%s%ac%iy>
+
+%s%acNext:%?It<%It|%Fn>
+
+%al %pc%ac%pp of %pe%ar%pr 
+
+%?mh<%xdA|%xdB>
+%?bp<%?bc<%xdD|%xdC>|%?bl<|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK|%xdL>>
+%?pv<%xdM|%xdN|%xdO|%xdP|%xdQ|%xdb|%xdc|%xdd|%xde|%xdf>
+%?ps<%xdR>
+%?mm<|%xdS|%xdT|%xdU|%xdV>
+%?mp<%xdW|%xdX|%xdY|%xdZ|%xda>
+%?C<%C>

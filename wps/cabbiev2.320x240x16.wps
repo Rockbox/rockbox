@@ -1,0 +1,61 @@
+# cabbie 2.0 default
+# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+#derived from "cabbie" (C) Yohann Misquitta
+%wd
+%X|wpsbackdrop-320x240x16.bmp|0|0|
+%P|pb-320x240x16.bmp|
+%xl|A|lockclosed-320x240x16.bmp|91|207|
+%xl|B|lockopen-320x240x16.bmp|91|207|
+%xl|C|battpl-320x240x16.bmp|126|207|
+%xl|D|battch-320x240x16.bmp|126|207|
+%xl|E|batt00-320x240x16.bmp|126|207|
+%xl|F|batt01-320x240x16.bmp|126|207|
+%xl|G|batt02-320x240x16.bmp|126|207|
+%xl|H|batt03-320x240x16.bmp|126|207|
+%xl|I|batt04-320x240x16.bmp|126|207|
+%xl|J|batt05-320x240x16.bmp|126|207|
+%xl|K|batt06-320x240x16.bmp|126|207|
+%xl|L|batt07-320x240x16.bmp|126|207|
+%xl|M|vol0-320x240x16.bmp|177|207|
+%xl|N|vol1-320x240x16.bmp|177|207|
+%xl|O|vol2-320x240x16.bmp|177|207|
+%xl|P|vol3-320x240x16.bmp|177|207|
+%xl|Q|vol4-320x240x16.bmp|177|207|
+%xl|b|vol5-320x240x16.bmp|177|207|
+%xl|c|vol6-320x240x16.bmp|177|207|
+%xl|d|vol7-320x240x16.bmp|177|207|
+%xl|e|vol8-320x240x16.bmp|177|207|
+%xl|f|vol9-320x240x16.bmp|177|207|
+%xl|R|shuffle-320x240x16.bmp|218|211|
+%xl|S|repeatall-320x240x16.bmp|261|207|
+%xl|T|repeatone-320x240x16.bmp|261|207|
+%xl|U|repeatshuffle-320x240x16.bmp|261|207|
+%xl|V|repeatab-320x240x16.bmp|261|207|
+%xl|W|stop-320x240x16.bmp|286|207|
+%xl|X|play-320x240x16.bmp|286|207|
+%xl|Y|pause-320x240x16.bmp|286|207|
+%xl|Z|ff-320x240x16.bmp|286|207|
+%xl|a|rew-320x240x16.bmp|286|207|
+%Cl|16|32|s120|s120|
+%pb|15|10|310|162|
+#NowPlaying
+
+%?C<%s%m|153|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
+%?C<%s%m|153|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
+%?C<%s%m|153|%al%?id<%id|%?d1<%d1|(root)>>|%s%ac%?id<%id|%?d1<%d1|(root)>>>
+%?C<%s%m|153|%al%iy|%s%ac%iy>
+
+%?C<%s%m|153|%alNext Track:|%acNext Track:>
+%?C<%s%m|153|%al%?It<%It|%Fn>|%s%ac%?It<%It|%Fn>>
+%?C<%s%m|153|%al%Ia|%s%ac%Ia>
+
+
+%al   %pc%ac%pp of %pe%ar%pr   
+
+%?mh<%xdA|%xdB>
+%?bp<%?bc<%xdD|%xdC>|%?bl<|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK|%xdL>>
+%?pv<%xdM|%xdN|%xdO|%xdP|%xdQ|%xdb|%xdc|%xdd|%xde|%xdf>
+%?ps<%xdR>
+%?mm<|%xdS|%xdT|%xdU|%xdV>
+%?mp<%xdW|%xdX|%xdY|%xdZ|%xda>
+%?C<%C>

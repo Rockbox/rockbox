@@ -1,0 +1,56 @@
+# cabbie 2.0 default
+# 160*128 greyscale port by Mark Fawcus (yapper)
+# works with 64*64 album art if present
+# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+# derived from "cabbie" (C) Yohann Misquitta
+%wd
+%X|wpsbackdrop-160x128x2.bmp|0|0|
+%P|pb-160x128x2.bmp|
+%xl|A|lockclosed-160x128x2.bmp|56|114|
+%xl|B|lockopen-160x128x2.bmp|56|114|
+%xl|C|battpl-160x128x2.bmp|74|115|
+%xl|D|battch-160x128x2.bmp|74|115|
+%xl|E|batt00-160x128x2.bmp|74|115|
+%xl|F|batt01-160x128x2.bmp|74|115|
+%xl|G|batt02-160x128x2.bmp|74|115|
+%xl|H|batt03-160x128x2.bmp|74|115|
+%xl|I|batt04-160x128x2.bmp|74|115|
+%xl|J|batt05-160x128x2.bmp|74|115|
+%xl|K|batt06-160x128x2.bmp|74|115|
+%xl|L|batt07-160x128x2.bmp|74|115|
+%xl|M|vol00-160x128x2.bmp|95|115|
+%xl|N|vol01-160x128x2.bmp|95|115|
+%xl|O|vol02-160x128x2.bmp|95|115|
+%xl|P|vol03-160x128x2.bmp|95|115|
+%xl|p|vol04-160x128x2.bmp|95|115|
+%xl|q|vol05-160x128x2.bmp|95|115|
+%xl|r|vol06-160x128x2.bmp|95|115|
+%xl|s|vol07-160x128x2.bmp|95|115|
+%xl|t|vol08-160x128x2.bmp|95|115|
+%xl|Q|shuffle-160x128x2.bmp|117|115|
+%xl|R|repeatall-160x128x2.bmp|131|113|
+%xl|S|repeatone-160x128x2.bmp|131|113|
+%xl|T|repeatshuffle-160x128x2.bmp|131|113|
+%xl|U|repeatab-160x128x2.bmp|131|114|
+%xl|V|stop-160x128x2.bmp|145|114|
+%xl|W|play-160x128x2.bmp|145|114|
+%xl|X|pause-160x128x2.bmp|145|114|
+%xl|Y|ff-160x128x2.bmp|145|114|
+%xl|Z|rew-160x128x2.bmp|145|114|
+%Cl|2|16|s64|s64|
+%pb|8|1|159|88|
+%?C<%s%m|70|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
+%?C<%s%m|70|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
+%?C<%s%m|70|%al%?id<%id|%?d1<%d1|(root)>>|%s%ac%?id<%id|%?d1<%d1|(root)>>>
+
+%?C<%s%m|70|%al%?It<%It|%Fn>|%s%ac%?It<%It|%Fn>>
+
+%al %pc%ac%pp of %pe%ar%pr 
+
+%?mh<%xdA|%xdB>
+%?bp<%?bc<%xdD|%xdC>|%?bl<|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK|%xdL>>
+%?pv<%xdM|%xdN|%xdO|%xdP|%xdp|%xdq|%xdr|%xds|%xdt>
+%?ps<%xdQ>
+%?mm<|%xdR|%xdS|%xdT|%xdU>
+%?mp<%xdV|%xdW|%xdX|%xdY|%xdZ>
+%?C<%C>
