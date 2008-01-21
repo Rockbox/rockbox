@@ -51,9 +51,6 @@ Build Your Own Rockbox
 7. unzip the rockbox.zip on your music player, reboot it and
    *smile*.
 
-Whenever the tools/configure script gets updated, you can make your makefile
-updated too by running 'tools/configure update'.
-
 If you want to build for more than one target, just create several build
 directories and create a setup for each target:
 
