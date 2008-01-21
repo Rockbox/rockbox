@@ -550,26 +550,23 @@ void gui_synclist_select_item(struct gui_synclist * gui_list, int item_number)
 static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                                       int offset)
 {
-    int new_selection = gui_list->selected_item + offset;
+    int new_selection;
     if (gui_list->selected_size > 1)
     {
         offset *= gui_list->selected_size;
         /* always select the first item of multi-line lists */
         offset -= offset%gui_list->selected_size;
     }
+    new_selection = gui_list->selected_item + offset;
     if (new_selection >= gui_list->nb_items)
     {
-        if (gui_list->limit_scroll)
-            gui_list->selected_item = gui_list->nb_items - 1;
-        else
-            gui_list->selected_item = new_selection - gui_list->nb_items;
+        gui_list->selected_item = gui_list->limit_scroll ?
+          gui_list->nb_items - gui_list->selected_size : 0;
     }
     else if (new_selection < 0)
     {
-        if (gui_list->limit_scroll)
-            gui_list->selected_item = 0;
-        else
-            gui_list->selected_item = new_selection + gui_list->nb_items;
+        gui_list->selected_item = gui_list->limit_scroll ?
+          0 : gui_list->nb_items - gui_list->selected_size;
     }
     else if (gui_list->show_selection_marker == false)
     {
@@ -599,7 +596,6 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
     }
     else gui_list->selected_item += offset;
     gui_synclist_select_item(gui_list, gui_list->selected_item);
-    
 }
 
 /*
