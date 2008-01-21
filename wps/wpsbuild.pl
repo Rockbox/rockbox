@@ -123,6 +123,21 @@ sub copythemefont {
 	`$cmd`;
 }
 
+sub copythemeicon {
+	#copy the icon specified by the theme
+	
+	$iconset =~ /\/(.*icons\/(.*))/i;
+	`cp $ROOT/icons/$2 $1`;
+}
+
+sub copythemeviewericon {
+	#copy the viewer icon specified by the theme
+	
+	$viewericon =~ /\/(.*icons\/(.*))/i;
+	`cp $ROOT/icons/$2 $1`;
+}
+
+
 sub copywps {
     # we assume that we copy the WPS files from the same dir the WPSLIST
     # file is located in
@@ -404,9 +419,11 @@ while(<WPS>) {
 	}
 	elsif($l =~ /^iconset: (.*)/i) {
 	    $iconset = $1;
+	    copythemeicon();
 	}
 	elsif($l =~ /^viewers iconset: (.*)/i) {
 	    $viewericon = $1;
+	    copythemeviewericon();
 	}		
 	elsif($l =~ /^line selector text color: (.*)/i) {
 	    $lineselecttextcolor = $1;
