@@ -424,10 +424,18 @@ while(<WPS>) {
 	    $iconset = $1;
 	    copythemeicon();
 	}
+	elsif($l =~ /^iconset\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+	    $iconset = $1;
+	    copythemeicon();
+	}
 	elsif($l =~ /^viewers iconset: (.*)/i) {
 	    $viewericon = $1;
 	    copythemeviewericon();
 	}		
+	elsif($l =~ /^viewers iconset\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+	    $viewericon = $1;
+	    copythemeviewericon();
+	}
 	elsif($l =~ /^line selector text color: (.*)/i) {
 	    $lineselecttextcolor = $1;
 	}	
