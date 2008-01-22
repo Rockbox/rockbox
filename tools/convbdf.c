@@ -458,7 +458,6 @@ int bdf_read_header(FILE *fp, struct font* pf)
         return 0;
     }
 
-    fprintf(stderr, "Header parsed\n");
     return 1;
 }
 
