@@ -33,7 +33,7 @@
 # other string matches for the particular model you build the language for. If
 # you want a particular string for the iriver h300 series you'd write it like:
 # h300: "h300-specific string" (below the default line). If your string isn't
-# used for all targets set the default to none like: *: none (no qoutes!) this
+# used for all targets set the default to none like: *: none (no quotes!) this
 # will not include the string for target that will not need it, see
 # apps/features.txt for available categories that can be used instead of the
 # target name, for example: swcodec: "swcodec-specific string".
