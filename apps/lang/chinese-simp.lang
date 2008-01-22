@@ -11522,3 +11522,37 @@
     *: "保存声音设定"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings men
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "关键点"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "关键点"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings men
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "关键点击重"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "关键点击重"
+  </voice>
+</phrase>
