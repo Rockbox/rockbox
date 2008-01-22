@@ -36,7 +36,7 @@ int button_read_device(void)
     {
         adc = adc_read(ADC_BUTTONS);
 
-        /* The following contains some abitrary, but working, guesswork */
+        /* The following contains some arbitrary, but working, guesswork */
         if (adc < 0x038) {
             btn |= (BUTTON_MINUS | BUTTON_PLUS | BUTTON_MENU);
         } else if (adc < 0x048) {
