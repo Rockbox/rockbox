@@ -1145,7 +1145,13 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
                 if (i < playlist_amount())
                     index = i;
                 else
+                {
+                    /* File not found, so bail out. Maybe not the best
+                     * message; perhaps "Bookmarked file not found"?
+                     */
+                    gui_syncsplash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
                     return;
+                }
             }
             playlist_start(index,offset);
         }
