@@ -38,10 +38,12 @@ flipit_cursor.16x13x1.bmp
 #endif
 #endif
 
+#if CONFIG_CODEC == SWCODEC
 /* MPEGplayer */
 mpegplayer_status_icons_8x8x1.bmp
 mpegplayer_status_icons_12x12x1.bmp
 mpegplayer_status_icons_16x16x1.bmp
+#endif
 
 #if LCD_WIDTH == 160 && LCD_HEIGHT == 128 && LCD_DEPTH < 16
 superdom_boarditems.160x128x1.bmp
