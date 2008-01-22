@@ -276,7 +276,7 @@ void cleanup(void *parameter)
 
 
 #ifndef HAVE_LCD_COLOR
-int init_gray()
+int init_grey(void)
 {
     unsigned char *gbuf;
     size_t gbuf_size = 0;
@@ -302,7 +302,7 @@ int main(void)
     int action;
 
 #ifndef HAVE_LCD_COLOR
-    if(init_gray()!=PLUGIN_OK)
+    if(init_grey()!=PLUGIN_OK)
         return(PLUGIN_ERROR);
 #endif
     color_palette_init(palette);
