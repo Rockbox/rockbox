@@ -11495,3 +11495,37 @@
     *: "Salva Impostazioni Audio"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings men
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Click Tasti"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Click Tasti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings men
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Click Tasti Ripetuto"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Click Tasti Ripetuto"
+  </voice>
+</phrase>
