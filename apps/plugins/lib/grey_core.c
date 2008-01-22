@@ -480,6 +480,8 @@ void grey_show(bool enable)
         _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / 88, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_IFP7XX
         _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / 83, 1, _timer_isr);
+#elif CONFIG_LCD == LCD_MROBE100
+        _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / 83, 1, _timer_isr); /* not calibrated/tested */
 #endif /* CONFIG_LCD */
 #endif /* !SIMULATOR */
         _grey_info.rb->screen_dump_set_hook(grey_screendump_hook);
