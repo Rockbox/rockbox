@@ -321,6 +321,19 @@
 #define UI_LCD_POSY                 25 /* y position of lcd */
 #define UI_LCD_WIDTH                160
 #define UI_LCD_HEIGHT               128
+
+#elif defined(COWON_D2)
+#define UI_TITLE                    "Cowon D2"
+#define UI_WIDTH                    420 /* width of GUI window */
+#define UI_HEIGHT                   340 /* height of GUI window */
+#define UI_LCD_POSX                 50 /* x position of lcd */
+#define UI_LCD_POSY                 50 /* y position of lcd */
+#define UI_LCD_WIDTH                320
+#define UI_LCD_HEIGHT               240
+#define UI_LCD_BGCOLOR              32, 32, 32 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         192, 192, 192 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_BLACK                0, 0, 0 /* black */
+
 #endif
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */

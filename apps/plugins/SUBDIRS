@@ -1,4 +1,4 @@
-#if !defined(IRIVER_IFP7XX_SERIES) && !defined(OLYMPUS_MROBE_100)
+#if !defined(IRIVER_IFP7XX_SERIES) && !defined(OLYMPUS_MROBE_100) && !defined(COWON_D2)
 
 /* For all targets */
 shortcuts

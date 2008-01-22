@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 /* Button Code Definitions for the Cowon D2 target */
-/* Some of these mappings are rather 'creative', given it only has 3 buttons! */
+/* NB: Up/Down/Left/Right are not physical buttons - touchscreen emulation */
 
 #include <stdio.h>
 #include <string.h>
@@ -37,21 +37,25 @@
  */
 
 static const struct button_mapping button_context_standard[]  = {
+    { ACTION_STD_PREV,        BUTTON_UP,                  BUTTON_NONE },
     { ACTION_STD_PREV,        BUTTON_MINUS,               BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,  BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,  BUTTON_MINUS|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_STD_NEXT,        BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_STD_NEXT,        BUTTON_PLUS,                BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,  BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,  BUTTON_PLUS|BUTTON_REPEAT,  BUTTON_NONE },
 
     { ACTION_STD_OK,          BUTTON_MENU|BUTTON_REL,     BUTTON_NONE },
-    //{ ACTION_STD_OK,          BUTTON_RIGHT,               BUTTON_NONE },
-    //{ ACTION_STD_OK,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_RIGHT },
+    { ACTION_STD_OK,          BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
 
     { ACTION_STD_MENU,        BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
    // { ACTION_STD_QUICKSCREEN, BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_STD_CONTEXT,     BUTTON_MINUS|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_STD_CONTEXT,     BUTTON_PLUS|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_CONTEXT,     BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_STD_CANCEL,      BUTTON_POWER,               BUTTON_NONE },
-//    { ACTION_STD_CANCEL,      BUTTON_LEFT,                BUTTON_NONE },
-//    { ACTION_STD_CANCEL,      BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_CANCEL,      BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_STD_CANCEL,      BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
@@ -77,9 +81,13 @@ static const struct button_mapping button_context_listtree_scroll_without_combo[
 };
 
 static const struct button_mapping button_context_settings[]  = {
+    { ACTION_SETTINGS_INC,          BUTTON_UP,                    BUTTON_NONE },
     { ACTION_SETTINGS_INC,          BUTTON_PLUS,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,    BUTTON_UP|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_PLUS|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_DOWN,                  BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_MINUS,                 BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_MINUS|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_STD_OK,                BUTTON_MENU,                  BUTTON_NONE },
     { ACTION_STD_CANCEL,            BUTTON_POWER,                 BUTTON_NONE },
