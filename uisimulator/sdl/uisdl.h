@@ -324,10 +324,10 @@
 
 #elif defined(COWON_D2)
 #define UI_TITLE                    "Cowon D2"
-#define UI_WIDTH                    420 /* width of GUI window */
-#define UI_HEIGHT                   340 /* height of GUI window */
-#define UI_LCD_POSX                 50 /* x position of lcd */
-#define UI_LCD_POSY                 50 /* y position of lcd */
+#define UI_WIDTH                    472 /* width of GUI window */
+#define UI_HEIGHT                   368 /* height of GUI window */
+#define UI_LCD_POSX                 58 /* x position of lcd */
+#define UI_LCD_POSY                 67 /* y position of lcd */
 #define UI_LCD_WIDTH                320
 #define UI_LCD_HEIGHT               240
 #define UI_LCD_BGCOLOR              32, 32, 32 /* bkgnd color of LCD (no backlight) */
