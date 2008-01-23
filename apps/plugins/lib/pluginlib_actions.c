@@ -335,6 +335,54 @@ const struct button_mapping generic_actions[] =
     {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
 };
 
+const struct button_mapping generic_increase_decrease[] =
+{
+#if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
+    || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
+    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)     \
+    || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
+    || (CONFIG_KEYPAD == RECORDER_PAD)      \
+    || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)  \
+    || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
+    || (CONFIG_KEYPAD == ONDIO_PAD) \
+    || (CONFIG_KEYPAD == COWOND2_PAD)
+    {PLA_INC,              BUTTON_UP,                  BUTTON_NONE},
+    {PLA_DEC,              BUTTON_DOWN,                BUTTON_NONE},
+    {PLA_INC_REPEAT,       BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},
+    {PLA_DEC_REPEAT,       BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
+#elif (CONFIG_KEYPAD == SANSA_C200_PAD)
+    {PLA_INC,              BUTTON_VOL_UP,                  BUTTON_NONE},
+    {PLA_DEC,              BUTTON_VOL_DOWN,                BUTTON_NONE},
+    {PLA_INC_REPEAT,       BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
+    {PLA_DEC_REPEAT,       BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == SANSA_E200_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+    {PLA_INC,              BUTTON_SCROLL_FWD,      BUTTON_NONE},
+    {PLA_DEC,              BUTTON_SCROLL_BACK,     BUTTON_NONE},
+    {PLA_INC_REPEAT,       BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE},
+    {PLA_DEC_REPEAT,       BUTTON_SCROLL_BACK|BUTTON_REPEAT, BUTTON_NONE},
+#elif CONFIG_KEYPAD == PLAYER_PAD
+    {PLA_INC,              BUTTON_STOP,  BUTTON_NONE},
+    {PLA_DEC,              BUTTON_PLAY,  BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD) \
+    || (CONFIG_KEYPAD == MROBE100_PAD)
+    {PLA_INC,              BUTTON_SCROLL_UP,           BUTTON_NONE},
+    {PLA_DEC,              BUTTON_SCROLL_DOWN,         BUTTON_NONE},
+    {PLA_INC_REPEAT,       BUTTON_SCROLL_UP|BUTTON_REPEAT,    BUTTON_NONE},
+    {PLA_DEC_REPEAT,       BUTTON_SCROLL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
+#elif (CONFIG_KEYPAD == MROBE500_PAD)
+    {PLA_INC,             BUTTON_RC_PLAY,                    BUTTON_NONE},
+    {PLA_DEC,             BUTTON_RC_DOWN,                    BUTTON_NONE},
+    {PLA_INC_REPEAT,      BUTTON_RC_PLAY|BUTTON_REPEAT,      BUTTON_NONE},
+    {PLA_DEC_REPEAT,      BUTTON_RC_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
+#else
+#error pluginlib_actions: Unsupported keypad
+#endif
+    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
+};
+
 static struct button_mapping **plugin_context_order;
 static int plugin_context_count = 0;
 static int last_context = 0; /* index into plugin_context_order 

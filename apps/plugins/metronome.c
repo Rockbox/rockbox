@@ -21,20 +21,10 @@
 
 PLUGIN_HEADER
 #define METRONOME_QUIT          PLA_QUIT
-
-/* for volume changes, PLA with scrollwheel isn't proper */
-
-#ifdef HAVE_SCROLLWHEEL
-#define METRONOME_VOL_UP        PLA_DOWN
-#define METRONOME_VOL_DOWN      PLA_UP
-#define METRONOME_VOL_UP_REP    PLA_DOWN_REPEAT
-#define METRONOME_VOL_DOWN_REP  PLA_UP_REPEAT
-#else
-#define METRONOME_VOL_UP        PLA_UP
-#define METRONOME_VOL_DOWN      PLA_DOWN
-#define METRONOME_VOL_UP_REP    PLA_UP_REPEAT
-#define METRONOME_VOL_DOWN_REP  PLA_DOWN_REPEAT
-#endif
+#define METRONOME_VOL_UP        PLA_INC
+#define METRONOME_VOL_DOWN      PLA_DEC
+#define METRONOME_VOL_UP_REP    PLA_INC_REPEAT
+#define METRONOME_VOL_DOWN_REP  PLA_DEC_REPEAT
 #define METRONOME_LEFT          PLA_LEFT
 #define METRONOME_RIGHT         PLA_RIGHT
 #define METRONOME_LEFT_REP      PLA_LEFT_REPEAT
@@ -77,6 +67,7 @@ static const struct button_mapping iriver_syncaction[] =
 #endif /* #if CONFIG_KEYPAD == ONDIO_PAD */
 
 const struct button_mapping *plugin_contexts[]={
+    generic_increase_decrease,
     generic_directions,
 #if CONFIG_KEYPAD == ONDIO_PAD
     ondio_action,
@@ -85,6 +76,7 @@ const struct button_mapping *plugin_contexts[]={
 #endif
     generic_actions
 };
+#define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
 static struct plugin_api* rb;
 
@@ -308,13 +300,6 @@ void tap(void)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     int button;
-#if (CONFIG_KEYPAD == ONDIO_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H100_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define PLA_ARRAY_COUNT 3
-#else
-#define PLA_ARRAY_COUNT 2
-#endif
     enum plugin_status status;
 
     (void)parameter;

@@ -35,7 +35,12 @@ enum {
     PLA_DOWN_REPEAT,
     PLA_LEFT_REPEAT,
     PLA_RIGHT_REPEAT,
-    
+
+    PLA_INC,
+    PLA_DEC,
+    PLA_INC_REPEAT,
+    PLA_DEC_REPEAT,
+
     PLA_QUIT,
     PLA_START,
     PLA_MENU,
@@ -51,6 +56,7 @@ extern const struct button_mapping remote_directions[];
 extern const struct button_mapping generic_directions[];
 extern const struct button_mapping generic_left_right_fire[];
 extern const struct button_mapping generic_actions[];
+extern const struct button_mapping generic_increase_decrease[];
 
 int pluginlib_getaction(struct plugin_api *api,int timeout,
                         const struct button_mapping *plugin_contexts[],

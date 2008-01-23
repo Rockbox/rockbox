@@ -33,13 +33,14 @@ PLUGIN_HEADER
 /* Keymaps */
 const struct button_mapping* plugin_contexts[]={
     generic_actions,
+    generic_increase_decrease,
     generic_directions,
 #if NB_SCREENS == 2
     remote_directions
 #endif
 };
+#define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
-#define NB_ACTION_CONTEXTS sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 #define ACTION_COUNTER_TOGGLE PLA_FIRE
 #define ACTION_COUNTER_RESET PLA_FIRE_REPEAT
 #define ACTION_MENU PLA_MENU
@@ -48,10 +49,10 @@ const struct button_mapping* plugin_contexts[]={
 #define ACTION_MODE_NEXT_REPEAT PLA_RIGHT_REPEAT
 #define ACTION_MODE_PREV PLA_LEFT
 #define ACTION_MODE_PREV_REPEAT PLA_LEFT_REPEAT
-#define ACTION_SKIN_NEXT PLA_UP
-#define ACTION_SKIN_NEXT_REPEAT PLA_UP_REPEAT
-#define ACTION_SKIN_PREV PLA_DOWN
-#define ACTION_SKIN_PREV_REPEAT PLA_DOWN_REPEAT
+#define ACTION_SKIN_NEXT PLA_INC
+#define ACTION_SKIN_NEXT_REPEAT PLA_INC_REPEAT
+#define ACTION_SKIN_PREV PLA_DEC
+#define ACTION_SKIN_PREV_REPEAT PLA_DEC_REPEAT
 
 extern struct plugin_api* rb;
 
@@ -139,7 +140,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
         /*************************
          * Scan for button presses
          ************************/
-        button =  pluginlib_getaction(rb, HZ/10, plugin_contexts, NB_ACTION_CONTEXTS);
+        button =  pluginlib_getaction(rb, HZ/10, plugin_contexts, PLA_ARRAY_COUNT);
         redraw=true;/* we'll set it to false afterwards if there was no action */
         switch (button){
             case ACTION_COUNTER_TOGGLE: /* start/stop counter */
