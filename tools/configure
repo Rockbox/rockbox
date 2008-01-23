@@ -236,7 +236,7 @@ whichadvanced () {
   if [ "$memory" = "2" ]; then
     echo -n ", (8)MB MOD"
   fi
-  if [ "$archos" = "h120" ]; then
+  if [ "$modelname" = "h120" ]; then
     echo -n ", (R)TC MOD"
   fi
   echo ""
@@ -285,7 +285,7 @@ whichadvanced () {
         fi
         ;;
       [Rr])
-        if [ "$archos" = "h120" ]; then
+        if [ "$modelname" = "h120" ]; then
           config_rtc="#define CONFIG_RTC RTC_DS1339_DS3231"
           have_rtc_alarm="#define HAVE_RTC_ALARM"
           echo "RTC functions enabled (DS1339/DS3231)"
@@ -340,7 +340,7 @@ whichadvanced () {
 # Configure voice settings
 voiceconfig () {
     thislang=$1
-    echo "Building $thislang voice for $archos. Select options"
+    echo "Building $thislang voice for $modelname. Select options"
     echo ""
 
     if [ -f "`which flite`" ]; then
@@ -626,10 +626,10 @@ EOF
   #  ---- For each target ----
   #
   #   *Variables*
-  # target_id: a unique number identifying this target, DOES NOT necessarily
-  #            have to be the menu number. Just use the currently highest
-  #            number+1 when you add a new target.
-  # archos:    short model name used all over to identify this target
+  # target_id: a unique number identifying this target, IS NOT the menu number.
+  #            Just use the currently highest number+1 when you add a new
+  #            target.
+  # modelname: short model name used all over to identify this target
   # memory:    number of megabytes of RAM this target has. If the amount can
   #            be selected by the size prompt, let memory be unset here
   # target:    -Ddefine passed to the build commands to make the correct
@@ -644,8 +644,9 @@ EOF
   # appextra:  passed to the APPEXTRA variable in the Makefiles.
   #            TODO: add proper explanation
   # archosrom: used only for Archos targets that build a special flashable .ucl
-  #            image. Set to blank for other builds.
-  # flash:     the same as archosrom. These two should be merged
+  #            image.
+  # flash:     name of output for flashing, for targets where there's a special
+  #            file output for this.
   # plugins:   set to 'yes' to build the plugins. Early development builds can
   #            set this to no in the early stages to have an easier life for a
   #            while
@@ -662,7 +663,7 @@ EOF
 
    0|player)
     target_id=1
-    archos="player"
+    modelname="player"
     target="-DARCHOS_PLAYER"
     shcc
     tool="$rootdir/tools/scramble"
@@ -688,7 +689,7 @@ EOF
 
    1|recorder)
     target_id=2
-    archos="recorder"
+    modelname="recorder"
     target="-DARCHOS_RECORDER"
     shcc
     tool="$rootdir/tools/scramble"
@@ -696,7 +697,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom="" #"$pwd/rombox.ucl"
+    #archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     swcodec=""
@@ -710,7 +711,7 @@ EOF
 
    2|fmrecorder)
     target_id=3
-    archos="fmrecorder"
+    modelname="fmrecorder"
     target="-DARCHOS_FMRECORDER"
     shcc
     tool="$rootdir/tools/scramble -fm"
@@ -718,7 +719,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom="" #"$pwd/rombox.ucl"
+    #archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     swcodec=""
@@ -732,7 +733,7 @@ EOF
 
    3|recorderv2)
     target_id=4
-    archos="recorderv2"
+    modelname="recorderv2"
     target="-DARCHOS_RECORDERV2"
     shcc
     tool="$rootdir/tools/scramble -v2"
@@ -740,7 +741,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom="" #"$pwd/rombox.ucl"
+    #archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     swcodec=""
@@ -754,7 +755,7 @@ EOF
 
    4|ondiosp)
     target_id=7
-    archos="ondiosp"
+    modelname="ondiosp"
     target="-DARCHOS_ONDIOSP"
     shcc
     tool="$rootdir/tools/scramble -osp"
@@ -776,7 +777,7 @@ EOF
 
    5|ondiofm)
     target_id=8
-    archos="ondiofm"
+    modelname="ondiofm"
     target="-DARCHOS_ONDIOFM"
     shcc
     tool="$rootdir/tools/scramble -ofm"
@@ -784,7 +785,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="ajbrec.ajz"
     appextra="recorder:gui"
-    archosrom="" #"$pwd/rombox.ucl"
+    #archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     swcodec=""
@@ -796,7 +797,7 @@ EOF
 
    6|av300)
     target_id=26
-    archos="av300"
+    modelname="av300"
     target="-DARCHOS_AV300"
     memory=16 # always
     arm7tdmicc
@@ -805,8 +806,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="cjbm.ajz"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec=""
     # toolset is the tools within the tools directory that we build for
@@ -820,7 +819,7 @@ EOF
 
   10|h120)
     target_id=9
-    archos="h120"
+    modelname="h120"
     target="-DIRIVER_H120"
     memory=32 # always
     coldfirecc
@@ -831,7 +830,6 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iriver"
     appextra="recorder:gui"
-    archosrom=""
     flash="$pwd/rombox.iriver"
     plugins="yes"
     swcodec="yes"
@@ -845,7 +843,7 @@ EOF
 
    11|h300)
     target_id=10
-    archos="h300"
+    modelname="h300"
     target="-DIRIVER_H300"
     memory=32 # always
     coldfirecc
@@ -856,8 +854,6 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iriver"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
@@ -870,7 +866,7 @@ EOF
 
    12|h100)
     target_id=11
-    archos="h100"
+    modelname="h100"
     target="-DIRIVER_H100"
     memory=16 # always
     coldfirecc
@@ -881,8 +877,6 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iriver"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
@@ -895,7 +889,7 @@ EOF
 
    13|ifp7xx)
     target_id=19
-    archos="ifp7xx"
+    modelname="ifp7xx"
     target="-DIRIVER_IFP7XX"
     memory=1
     arm7tdmicc short
@@ -904,8 +898,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.wma"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
@@ -918,7 +910,7 @@ EOF
 
    14|h10)
     target_id=22
-    archos="h10"
+    modelname="h10"
     target="-DIRIVER_H10"
     memory=32 # always
     arm7tdmicc
@@ -927,8 +919,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.mi4"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBBL"
@@ -944,7 +934,7 @@ EOF
 
    15|h10_5gb)
     target_id=24
-    archos="h10_5gb"
+    modelname="h10_5gb"
     target="-DIRIVER_H10_5GB"
     memory=32 # always
     arm7tdmicc
@@ -953,8 +943,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.mi4"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=h105 -type=RBBL"
@@ -970,7 +958,7 @@ EOF
 
    20|ipodcolor)
     target_id=13
-    archos="ipodcolor"
+    modelname="ipodcolor"
     target="-DIPOD_COLOR"
     memory=32 # always
     arm7tdmicc
@@ -979,11 +967,9 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.ipod"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
-    bootoutput="bootloader-$archos.ipod"
+    bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -995,7 +981,7 @@ EOF
 
    21|ipodnano)
     target_id=14
-    archos="ipodnano"
+    modelname="ipodnano"
     target="-DIPOD_NANO"
     memory=32 # always
     arm7tdmicc
@@ -1004,11 +990,9 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.ipod"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
-    bootoutput="bootloader-$archos.ipod"
+    bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -1020,7 +1004,7 @@ EOF
 
    22|ipodvideo)
     target_id=15
-    archos="ipodvideo"
+    modelname="ipodvideo"
     target="-DIPOD_VIDEO"
     arm7tdmicc
     tool="$rootdir/tools/scramble -add=ipvd"
@@ -1028,11 +1012,9 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.ipod"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
-    bootoutput="bootloader-$archos.ipod"
+    bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -1044,7 +1026,7 @@ EOF
 
    23|ipod3g)
     target_id=16
-    archos="ipod3g"
+    modelname="ipod3g"
     target="-DIPOD_3G"
     memory=32 # always
     arm7tdmicc
@@ -1053,11 +1035,9 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
-    bootoutput="bootloader-$archos.ipod"
+    bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -1069,7 +1049,7 @@ EOF
 
    24|ipod4g)
     target_id=17
-    archos="ipod4g"
+    modelname="ipod4g"
     target="-DIPOD_4G"
     memory=32 # always
     arm7tdmicc
@@ -1078,11 +1058,9 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
-    bootoutput="bootloader-$archos.ipod"
+    bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -1094,7 +1072,7 @@ EOF
 
    25|ipodmini)
     target_id=18
-    archos="ipodmini"
+    modelname="ipodmini"
     target="-DIPOD_MINI"
     memory=32 # always
     arm7tdmicc
@@ -1103,11 +1081,9 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
-    bootoutput="bootloader-$archos.ipod"
+    bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -1119,7 +1095,7 @@ EOF
 
    26|ipodmini2g)
     target_id=21
-    archos="ipodmini2g"
+    modelname="ipodmini2g"
     target="-DIPOD_MINI2G"
     memory=32 # always
     arm7tdmicc
@@ -1128,11 +1104,9 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
-    bootoutput="bootloader-$archos.ipod"
+    bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -1144,7 +1118,7 @@ EOF
 
    27|ipod1g2g)
     target_id=29
-    archos="ipod1g2g"
+    modelname="ipod1g2g"
     target="-DIPOD_1G2G"
     memory=32 # always
     arm7tdmicc
@@ -1153,11 +1127,9 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
-    bootoutput="bootloader-$archos.ipod"
+    bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -1169,7 +1141,7 @@ EOF
 
    30|x5)
     target_id=12
-    archos="x5"
+    modelname="x5"
     target="-DIAUDIO_X5"
     memory=16 # always
     coldfirecc
@@ -1180,8 +1152,6 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 7"
     output="rockbox.iaudio"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
@@ -1195,7 +1165,7 @@ EOF
 
    31|m5)
     target_id=28
-    archos="m5"
+    modelname="m5"
     target="-DIAUDIO_M5"
     memory=16 # always
     coldfirecc
@@ -1206,8 +1176,6 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 7"
     output="rockbox.iaudio"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
@@ -1221,7 +1189,7 @@ EOF
 
    40|gigabeatf)
     target_id=20
-    archos="gigabeatf"
+    modelname="gigabeatf"
     target="-DGIGABEAT_F"
     memory=32 # always
     arm9tdmicc
@@ -1230,8 +1198,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.gigabeat"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     toolset=$gigabeatbitmaptools
@@ -1245,7 +1211,7 @@ EOF
 
     41|gigabeats)
     target_id=26
-    archos="gigabeats"
+    modelname="gigabeats"
     target="-DGIGABEAT_S"
     memory=32 # always
     arm9tdmicc
@@ -1254,8 +1220,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.gigabeat"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins=""
     swcodec="yes"
     toolset="$gigabeatbitmaptools mknkboot"
@@ -1269,7 +1233,7 @@ EOF
 
     70|mrobe500)
     target_id=20
-    archos="mrobe500"
+    modelname="mrobe500"
     target="-DMROBE_500"
     memory=64 # always
     arm926ejscc
@@ -1281,8 +1245,6 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.mrobe500"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     toolset=$gigabeatbitmaptools
@@ -1296,7 +1258,7 @@ EOF
 
    71|mrobe100)
     target_id=33
-    archos="mrobe100"
+    modelname="mrobe100"
     target="-DMROBE_100"
     memory=32 # always
     arm7tdmicc
@@ -1307,8 +1269,6 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.mi4"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBBL"
@@ -1324,7 +1284,7 @@ EOF
 
    80|logikdax)
     target_id=31
-    archos="logikdax"
+    modelname="logikdax"
     target="-DLOGIK_DAX"
     memory=2 # always
     arm946cc
@@ -1335,8 +1295,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.logik"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="no"
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
@@ -1350,7 +1308,7 @@ EOF
 
    50|e200)
     target_id=23
-    archos="e200"
+    modelname="e200"
     target="-DSANSA_E200"
     memory=32 # supposedly
     arm7tdmicc
@@ -1359,8 +1317,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mi4"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=e200 -type=RBBL"
@@ -1379,7 +1335,7 @@ EOF
     # different option to the scramble tool when building a bootloader and
     # makes the bootloader output file name in all lower case.
     target_id=27
-    archos="e200r"
+    modelname="e200r"
     target="-DSANSA_E200"
     memory=32 # supposedly
     arm7tdmicc
@@ -1388,8 +1344,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mi4"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4r -model=e20r -type=RBBL"
@@ -1405,7 +1359,7 @@ EOF
 
    52|c200)
     target_id=30
-    archos="c200"
+    modelname="c200"
     target="-DSANSA_C200"
     memory=32 # supposedly
     arm7tdmicc
@@ -1414,8 +1368,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mi4"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=c200 -type=RBBL"
@@ -1431,7 +1383,7 @@ EOF
 
    60|tpj1022)
     target_id=25
-    archos="tpj1022"
+    modelname="tpj1022"
     target="-DELIO_TPJ1022"
     memory=32 # always
     arm7tdmicc
@@ -1440,8 +1392,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.elio"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v2"
@@ -1457,7 +1407,7 @@ EOF
 
    32|iaudio7)
     target_id=32
-    archos="iaudio7"
+    modelname="iaudio7"
     target="-DIAUDIO_7"
     memory=16 # always
     arm946cc
@@ -1467,8 +1417,6 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.iaudio"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="yes"
     swcodec="yes"
     bootoutput="I7_FW.BIN"
@@ -1483,7 +1431,7 @@ EOF
 
     33|cowond2)
     target_id=34
-    archos="cowond2"
+    modelname="cowond2"
     target="-DCOWON_D2"
     memory=32
     arm926ejscc
@@ -1495,8 +1443,6 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iaudio"
     appextra="recorder:gui"
-    archosrom=""
-    flash=""
     plugins="no"
     swcodec="yes"
     toolset="$tccbitmaptools"
@@ -1513,7 +1459,7 @@ EOF
 
   esac
 
-  echo "Platform set to $archos"
+  echo "Platform set to $modelname"
 
 
 #remove start
@@ -1562,7 +1508,7 @@ fi
 
   # the ifp7x0 is the only platform that supports building a gdb stub like
   # this
-  case $archos in
+  case $modelname in
     ifp7xx)
        gdbstub="(G)DB stub, "
        ;;
@@ -1621,7 +1567,7 @@ fi
       extradefines="-DSTUB" # for target makefile symbol EXTRA_DEFINES
       appsdir='\$(ROOTDIR)/gdb'
       apps="stub"
-      case $archos in
+      case $modelname in
           ifp7xx)
               output="stub.wma"
               ;;
@@ -1639,7 +1585,7 @@ fi
       echo "Manual build selected"
       ;;
     *)
-      if [ "$archos" = "e200r" ]; then
+      if [ "$modelname" = "e200r" ]; then
           echo "Do not use the e200R target for regular builds.  Use e200 instead."
           exit
       fi
@@ -1649,7 +1595,7 @@ fi
 
   esac
   # to be able running "make manual" from non-manual configuration
-  case $archos in
+  case $modelname in
       fmrecorder)
           manualdev="recorderv2fm"
           ;;
@@ -1663,7 +1609,7 @@ fi
           manualdev="ipodmini"
           ;;
       *)
-          manualdev=$archos
+          manualdev=$modelname
           ;;
   esac
 
@@ -1842,7 +1788,7 @@ sed > Makefile \
  -e "s,@TARGET@,${target},g" \
  -e "s,@CPU@,${t_cpu},g" \
  -e "s,@MANUFACTURER@,${t_manufacturer},g" \
- -e "s,@ARCHOS@,${archos},g" \
+ -e "s,@MODELNAME@,${modelname},g" \
  -e "s,@LANGUAGE@,${language},g" \
  -e "s:@VOICELANGUAGE@:${voicelanguage}:g" \
  -e "s,@PWD@,${pwd},g" \
@@ -1913,7 +1859,7 @@ export TOOLSDIR=@TOOLSDIR@
 export DOCSDIR=\$(ROOTDIR)/docs
 export MANUALDIR=\${ROOTDIR}/manual
 export DEBUG=@DEBUG@
-export ARCHOS=@ARCHOS@
+export MODELNAME=@MODELNAME@
 export ARCHOSROM=@ARCHOSROM@
 export FLASHFILE=@FLASHFILE@
 export TARGET_ID=@TARGET_ID@
@@ -2017,27 +1963,27 @@ tags:
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR)/plugins/lib tags
 
 fontzip:
-	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" -f 1 -o rockbox-fonts.zip \$(TARGET) \$(BINARY)
+	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\" -r "\$(ROOTDIR)" -f 1 -o rockbox-fonts.zip \$(TARGET) \$(BINARY)
 
 zip:
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\$\$feat\" -i \"\$(TARGET_ID)\"  -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 mapzip:
 	\$(SILENT)find . -name "*.map" | xargs zip rockbox-maps.zip
 
 fullzip:
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\$\$feat\" -i \"\$(TARGET_ID)\"  -r "\$(ROOTDIR)" -f 2 -o rockbox-full.zip \$(TARGET) \$(BINARY)
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -r "\$(ROOTDIR)" -f 2 -o rockbox-full.zip \$(TARGET) \$(BINARY)
 
 7zip:
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\$\$feat\" -i \"\$(TARGET_ID)\"  -o "rockbox.7z" -z "7za a" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -o "rockbox.7z" -z "7za a" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 tar:
 	\$(SILENT)rm -f rockbox.tar
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/@APPS@/features\`; do feat="\$\$feat:\$\$f" ; done; \\
-	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\$\$feat\" -i \"\$(TARGET_ID)\"  -o "rockbox.tar" -z "tar --no-recursion -uf" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(MODELNAME)\$\$feat\" -i \"\$(TARGET_ID)\"  -o "rockbox.tar" -z "tar --no-recursion -uf" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 bzip2: tar
 	\$(SILENT)bzip2 -f9 rockbox.tar
@@ -2102,7 +2048,7 @@ if [ "yes" = "$voice" ]; then
 
 voice: voicetools features
 	\$(SILENT)for f in \`cat \$(BUILDDIR)/${apps}/features\`; do feat="\$\$feat:\$\$f" ; done ; \\
-	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/voice.pl -V -l=\$\$lang -t=\$(ARCHOS)\$\$feat -i=\$(TARGET_ID) -e="\$(ENCODER)" -E="\$(ENC_OPTS)" -s=\$(TTS_ENGINE) -S="\$(TTS_OPTS)"; done \\
+	for lang in \`echo \$(VOICELANGUAGE) |sed "s/,/ /g"\`; do \$(TOOLSDIR)/voice.pl -V -l=\$\$lang -t=\$(MODELNAME)\$\$feat -i=\$(TARGET_ID) -e="\$(ENCODER)" -E="\$(ENC_OPTS)" -s=\$(TTS_ENGINE) -S="\$(TTS_OPTS)"; done \\
 EOF
 
 fi

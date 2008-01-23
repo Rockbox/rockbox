@@ -7,7 +7,7 @@
 # $Id$
 #
 
-ifeq ($(ARCHOS),ifp7xx)
+ifeq ($(MODELNAME),ifp7xx)
 
 INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)	\
  -I$(BUILDDIR)

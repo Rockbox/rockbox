@@ -7,7 +7,7 @@
 #                     \/            \/     \/    \/            \/ 
 # $Id$
 #
-# Copyright (C) 2002 by Daniel Stenberg <daniel@haxx.se>
+# Copyright (C) 2002, 2008 by Daniel Stenberg <daniel@haxx.se>
 #
 # All files in this archive are subject to the GNU General Public License.
 # See the file COPYING in the source tree root for full license agreement.
@@ -25,8 +25,8 @@ RM = rm -f
 DEBUG = -g
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(SIMCOMMON) -I$(OBJDIR) $(TARGET_INC) -I$(FIRMDIR)/export -I$(APPSDIR) \
- -I$(BUILDDIR)
+INCLUDES = -I. -I$(SIMCOMMON) -I$(OBJDIR) $(TARGET_INC) -I$(FIRMDIR)/export \
+-I$(APPSDIR) -I$(BUILDDIR)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
@@ -58,7 +58,7 @@ clean:
 	$(SILENT)$(MAKE) -C $(SIMCOMMON) clean
 
 ################## Specific dependencies ##################
-$(BUILDDIR)/UI256.bmp: UI-$(ARCHOS).bmp
+$(BUILDDIR)/UI256.bmp: UI-$(MODELNAME).bmp
 	$(call PRINTS,UI)cp $< $@
 
 -include $(DEPFILE)

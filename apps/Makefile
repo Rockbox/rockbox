@@ -62,7 +62,7 @@ endif
 
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(BUILDDATE) $(DEFINES) -DTARGET_ID=$(TARGET_ID)	\
  -DAPPSVERSION=\"$(VERSION)\" $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} \
- -DTARGET_NAME=\"$(ARCHOS)\"
+ -DTARGET_NAME=\"$(MODELNAME)\"
 
 OBJS2 := $(OBJDIR)/lang.o $(patsubst %.c, $(OBJDIR)/%.o, $(SRC))
 OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
@@ -218,11 +218,12 @@ $(OBJDIR)/features: features.txt
 	$(SILENT)cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
 	$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
 	grep -v "^\#" | grep -v "^$$" > $@; \
-	echo "" >/dev/null 
+	for f in `cat $(OBJDIR)/features`; do feat="$$feat:$$f" ; done ; \
+	echo "$$feat" >$(OBJDIR)/genlang-features
 
 $(OBJDIR)/lang.o: lang/$(LANGUAGE).lang $(OBJDIR)/features
 	$(SILENT)for f in `cat $(OBJDIR)/features`; do feat="$$feat:$$f" ; done; \
-	perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(ARCHOS)$$feat $<
+	perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
 	$(call PRINTS,CC lang.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@
 
 clean:
