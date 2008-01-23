@@ -22,8 +22,11 @@
 #define UTILS_H
 
 #include <QString>
+#include <QUrl>
 
 bool recRmdir( const QString &dirName );
+
+QUrl systemProxy(void);
 
 #endif
 
