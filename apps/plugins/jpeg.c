@@ -27,14 +27,11 @@
 #include "playback_control.h"
 #include "oldmenuapi.h"
 #include "helper.h"
+#include "lib/configfile.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "grey.h"
 #include "xlcd.h"
-
-#ifdef HAVE_LCD_COLOR
-#include "lib/configfile.h"
-#endif
 
 PLUGIN_HEADER
 
@@ -229,9 +226,7 @@ static int running_slideshow = false;   /* loading image because of slideshw */
 static int immediate_ata_off = false;   /* power down disk after loading */
 #endif
 
-#ifdef HAVE_LCD_COLOR
-
-/* Persistent configuration  - only needed for color displays atm */
+/* Persistent configuration */
 #define JPEG_CONFIGFILE             "jpeg.cfg"
 #define JPEG_SETTINGS_MINVERSION    1
 #define JPEG_SETTINGS_VERSION       2
@@ -269,15 +264,16 @@ static struct jpeg_settings old_settings;
 
 static struct configdata jpeg_config[] =
 {
+#ifdef HAVE_LCD_COLOR
    { TYPE_ENUM, 0, COLOUR_NUM_MODES, &jpeg_settings.colour_mode,
      "Colour Mode", (char *[]){ "Colour", "Grayscale" }, NULL },
    { TYPE_ENUM, 0, DITHER_NUM_MODES, &jpeg_settings.dither_mode,
      "Dither Mode", (char *[]){ "None", "Ordered", "Diffusion" }, NULL },
+#endif
    { TYPE_INT, SS_MIN_TIMEOUT, SS_MAX_TIMEOUT, &jpeg_settings.ss_timeout,
      "Slideshow Time", NULL, NULL},
 };
 
-#endif /* HAVE_LCD_COLOR */
 #if LCD_DEPTH > 1
 fb_data* old_backdrop;
 #endif
@@ -3301,14 +3297,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     xlcd_init(rb);
 #endif
 
-#ifdef HAVE_LCD_COLOR
     /* should be ok to just load settings since a parameter is present
        here and the drive should be spinning */
     configfile_init(rb);
     configfile_load(JPEG_CONFIGFILE, jpeg_config,
                     ARRAYLEN(jpeg_config), JPEG_SETTINGS_MINVERSION);
     old_settings = jpeg_settings;
-#endif
 
     buf_images = buf; buf_images_size = buf_size;
 
@@ -3321,7 +3315,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }while (condition != PLUGIN_OK && condition != PLUGIN_USB_CONNECTED
                                           && condition != PLUGIN_ERROR);
 
-#ifdef HAVE_LCD_COLOR
     if (rb->memcmp(&jpeg_settings, &old_settings, sizeof (jpeg_settings)))
     {
         /* Just in case drive has to spin, keep it from looking locked */
@@ -3329,7 +3322,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         configfile_save(JPEG_CONFIGFILE, jpeg_config,
                         ARRAYLEN(jpeg_config), JPEG_SETTINGS_VERSION);
     }
-#endif
 
 #if !defined(SIMULATOR) && !defined(HAVE_FLASH_STORAGE)
     /* set back ata spindown time in case we changed it */
