@@ -32,6 +32,7 @@
 #include "installthemes.h"
 #include "uninstallwindow.h"
 #include "browseof.h"
+#include "utils.h"
 
 #if defined(Q_OS_LINUX)
 #include <stdio.h>
