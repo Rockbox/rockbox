@@ -228,14 +228,18 @@ static int running_slideshow = false;   /* loading image because of slideshw */
 #ifndef SIMULATOR
 static int immediate_ata_off = false;   /* power down disk after loading */
 #endif
-static int button_timeout    = HZ*5;
 
 #ifdef HAVE_LCD_COLOR
 
 /* Persistent configuration  - only needed for color displays atm */
 #define JPEG_CONFIGFILE             "jpeg.cfg"
 #define JPEG_SETTINGS_MINVERSION    1
-#define JPEG_SETTINGS_VERSION       1
+#define JPEG_SETTINGS_VERSION       2
+
+/* Slideshow times */
+#define SS_MIN_TIMEOUT 1
+#define SS_MAX_TIMEOUT 20
+#define SS_DEFAULT_TIMEOUT 5
 
 enum color_modes
 {
@@ -256,10 +260,11 @@ struct jpeg_settings
 {
     int colour_mode;
     int dither_mode;
+    int ss_timeout;
 };
 
 static struct jpeg_settings jpeg_settings =
-    { COLOURMODE_COLOUR, DITHER_NONE };
+    { COLOURMODE_COLOUR, DITHER_NONE, SS_DEFAULT_TIMEOUT };
 static struct jpeg_settings old_settings;
 
 static struct configdata jpeg_config[] =
@@ -268,6 +273,8 @@ static struct configdata jpeg_config[] =
      "Colour Mode", (char *[]){ "Colour", "Grayscale" }, NULL },
    { TYPE_ENUM, 0, DITHER_NUM_MODES, &jpeg_settings.dither_mode,
      "Dither Mode", (char *[]){ "None", "Ordered", "Diffusion" }, NULL },
+   { TYPE_INT, SS_MIN_TIMEOUT, SS_MAX_TIMEOUT, &jpeg_settings.ss_timeout,
+     "Slideshow Time", NULL, NULL},
 };
 
 #endif /* HAVE_LCD_COLOR */
@@ -2508,21 +2515,6 @@ int show_menu(void) /* return 1 to quit */
         { "Enable", -1 },
     };
 
-    static const struct opt_items timeout[12] = {
-        { "1 second", -1 },
-        { "2 seconds", -1 },
-        { "3 seconds", -1 },
-        { "4 seconds", -1 },
-        { "5 seconds", -1 },
-        { "6 seconds", -1 },
-        { "7 seconds", -1 },
-        { "8 seconds", -1 },
-        { "9 seconds", -1 },
-        { "10 seconds", -1 },
-        { "15 seconds", -1 },
-        { "20 seconds", -1 },
-    };
-
     m = menu_init(rb, items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
     result=menu_show(m);
@@ -2538,23 +2530,11 @@ int show_menu(void) /* return 1 to quit */
                            slideshow , 2, NULL);
             break;
         case MIID_CHANGE_SS_MODE:
-            switch (button_timeout/HZ)
-            {
-                case 10: result = 9; break;
-                case 15: result = 10; break;
-                case 20: result = 11; break;
-                default: result = (button_timeout/HZ)-1; break;
-            }
-            rb->set_option("Slideshow Time", &result, INT,
-                           timeout , 12, NULL);
-            switch (result)
-            {
-                case 9: button_timeout = 10*HZ; break;
-                case 10: button_timeout = 15*HZ; break;
-                case 11: button_timeout = 20*HZ; break;
-                default: button_timeout = (result+1)*HZ; break;
-            }
+            rb->set_int("Slideshow Time", "s", UNIT_SEC,
+                        &jpeg_settings.ss_timeout, NULL, 1,
+                        SS_MIN_TIMEOUT, SS_MAX_TIMEOUT, NULL);
             break;
+
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
         case MIID_SHOW_PLAYBACK_MENU:
             playback_control(rb);
@@ -2576,7 +2556,7 @@ int show_menu(void) /* return 1 to quit */
 
     if (slideshow_enabled)
     {
-        if(button_timeout/HZ < 10)
+        if(jpeg_settings.ss_timeout < 10)
         {
             /* slideshow times < 10s keep disk spinning */
             rb->ata_spindown(0);
@@ -2608,7 +2588,7 @@ int scroll_bmp(struct t_disp* pdisp)
         int move;
 
         if (slideshow_enabled)
-            button = rb->button_get_w_tmo(button_timeout);
+            button = rb->button_get_w_tmo(jpeg_settings.ss_timeout * HZ);
         else button = rb->button_get(true);
 
         running_slideshow = false;
