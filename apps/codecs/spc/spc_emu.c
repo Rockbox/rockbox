@@ -27,7 +27,7 @@
 /* DSP Based on Brad Martin's OpenSPC DSP emulator */
 /* tag reading from sexyspc by John Brawn (John_Brawn@yahoo.com) and others */
 
-struct cpu_ram_t ram;
+struct cpu_ram_t ram CACHEALIGN_ATTR;
 
 /**************** Timers ****************/
 
@@ -76,6 +76,10 @@ void SPC_Init( THIS )
     this->boot_rom [sizeof this->boot_rom - 2] = 0xC0;
     this->boot_rom [sizeof this->boot_rom - 1] = 0xFF;
     ci->memset( this->boot_rom, 0, sizeof this->boot_rom - 2 );
+
+    /* Have DSP in a defined state in case EMU is run and hasn't loaded
+     * a program yet */
+    DSP_reset(&this->dsp);
 }
 
 static void SPC_load_state( THIS, struct cpu_regs_t const* cpu_state,

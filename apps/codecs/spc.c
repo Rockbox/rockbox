@@ -7,6 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
+ * Copyright (C) 2007-2008 Michael Sevakis (jhMikeS)
  * Copyright (C) 2006-2007 Adam Gashlin (hcs)
  * Copyright (C) 2004-2007 Shay Green (blargg)
  * Copyright (C) 2002 Brad Martin
@@ -278,8 +279,12 @@ static intptr_t emu_thread_send_msg(long id, intptr_t data)
     chunk->data = data;
     /* Release it to the emu thread */
     samples_release_rdbuf();
-    /* Wait for a response */
-    ci->event_wait(&sample_queue.emu_evt_reply, STATE_SIGNALED);
+
+    if (id != SPC_EMU_QUIT) {
+        /* Wait for a response */
+        ci->event_wait(&sample_queue.emu_evt_reply, STATE_SIGNALED);
+    }
+
     return sample_queue.retval;    
 }
 
@@ -298,16 +303,19 @@ static bool emu_thread_process_msg(struct sample_queue_chunk *chunk)
         invalidate_icache();
         SPC_Init(&spc_emu);
         sample_queue.retval = SPC_load_spc(&spc_emu, ld->buf, ld->size);
+
+        /* Empty the audio queue */
+        /* This is a dirty hack a timeout based wait would make unnescessary but
+           still safe because the other thread is known to be waiting for a reply
+           and is not using the objects. */
+        ci->semaphore_init(&sample_queue.emu_sem_tail, 2, 2);
+        ci->semaphore_init(&sample_queue.emu_sem_head, 2, 0);
+        sample_queue.head = sample_queue.tail = 0;
     }
 
-    /* Empty the audio queue */
-    /* This is a dirty hack a timeout based wait would make unnescessary but
-       still safe because the other thread is known to be waiting for a reply
-       and is not using the objects. */
-    ci->semaphore_init(&sample_queue.emu_sem_tail, 2, 2);
-    ci->semaphore_init(&sample_queue.emu_sem_head, 2, 0);
-    sample_queue.head = sample_queue.tail = 0;
-    ci->event_set_state(&sample_queue.emu_evt_reply, STATE_SIGNALED);
+    if (id != SPC_EMU_QUIT) {
+        ci->event_set_state(&sample_queue.emu_evt_reply, STATE_SIGNALED);
+    }
 
     return ret;
 }
@@ -373,9 +381,12 @@ static inline int load_spc_buffer(uint8_t *buf, size_t size)
 
 static inline void spc_emu_quit(void)
 {
-    emu_thread_send_msg(SPC_EMU_QUIT, 0);
-    /* Wait for emu thread to be killed */
-    ci->thread_wait(emu_thread_p);
+    if (emu_thread_p != NULL) {
+        emu_thread_send_msg(SPC_EMU_QUIT, 0);
+        /* Wait for emu thread to be killed */
+        ci->thread_wait(emu_thread_p);
+        invalidate_icache();
+    }
 }
 
 static inline bool spc_play_get_samples(int32_t **samples)

@@ -7,6 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
+ * Copyright (C) 2007-2008 Michael Sevakis (jhMikeS)
  * Copyright (C) 2006-2007 Adam Gashlin (hcs)
  * Copyright (C) 2004-2007 Shay Green (blargg)
  * Copyright (C) 2002 Brad Martin
@@ -31,7 +32,7 @@ int32_t fir_buf[FIR_BUF_CNT]
 #endif
 #if SPC_BRRCACHE
 /* a little extra for samples that go past end */
-int16_t BRRcache [BRR_CACHE_SIZE];
+int16_t BRRcache [BRR_CACHE_SIZE] CACHEALIGN_ATTR;
 #endif
 
 void DSP_write( struct Spc_Dsp* this, int i, int data )

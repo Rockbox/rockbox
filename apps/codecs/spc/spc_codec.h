@@ -7,6 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
+ * Copyright (C) 2007-2008 Michael Sevakis (jhMikeS)
  * Copyright (C) 2006-2007 Adam Gashlin (hcs)
  * Copyright (C) 2004-2007 Shay Green (blargg)
  * Copyright (C) 2002 Brad Martin
