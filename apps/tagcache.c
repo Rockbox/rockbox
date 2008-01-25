@@ -1608,7 +1608,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
 static inline void write_item(const char *item)
 {
     int len = strlen(item) + 1;
-    
+
     data_size += len;
     write(cachefd, item, len);
 }
@@ -1616,21 +1616,21 @@ static inline void write_item(const char *item)
 static int check_if_empty(char **tag)
 {
     int length;
-    
-    if (*tag == NULL || *tag[0] == '\0')
+
+    if (*tag == NULL || **tag == '\0')
     {
         *tag = UNTAGGED;
         return sizeof(UNTAGGED); /* Tag length */
     }
-    
+
     length = strlen(*tag);
     if (length > TAG_MAXLEN)
     {
         logf("over length tag: %s", *tag);
         length = TAG_MAXLEN;
-        *tag[length] = '\0';
+        (*tag)[length] = '\0';
     }
-    
+
     return length + 1;
 }
 
