@@ -16,12 +16,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+ 
+#include "config.h" 
+/* Codecs should not normally do this, but we need to check a macro, and
+ * codecs.h would confuse the assembler. */
 
 #define cPI3_8 (0x30fbc54d)
 #define cPI2_8 (0x5a82799a)
 #define cPI1_8 (0x7641af3d)
 
+#ifdef USE_IRAM
     .section    .icode,"ax",%progbits
+#else
+    .text
+#endif
     .align
 
     .global mdct_butterfly_32

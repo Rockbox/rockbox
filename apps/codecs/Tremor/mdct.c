@@ -39,6 +39,7 @@
 #include "mdct_lookup.h"
 
 #if defined(CPU_ARM) && CONFIG_CPU != S3C2440
+/* C code is faster on S3C2440 */
 
 extern void mdct_butterfly_32(DATA_TYPE *x);
 extern void mdct_butterfly_generic_loop(DATA_TYPE *x1, DATA_TYPE *x2,
