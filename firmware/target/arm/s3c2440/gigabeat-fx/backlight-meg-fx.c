@@ -28,9 +28,10 @@
 #define BUTTONLIGHT_MENU (SC606_LED_B1)
 #define BUTTONLIGHT_ALL  (SC606_LED_B1 | SC606_LED_B2 | SC606_LED_C1 | SC606_LED_C2)
 
+static const int log_brightness[12] = {0,1,2,3,5,7,10,15,22,31,44,63};
+
 #ifndef BOOTLOADER
 static void led_control_service(void);
-const int log_brightness[12] = {0,1,2,3,5,7,10,15,22,31,44,63};
 
 static enum sc606_states
 {
@@ -390,8 +391,11 @@ void _buttonlight_off(void)
 
 void _buttonlight_set_brightness(int brightness)
 {
+    /* clamp the brightness value */
+    brightness = MAX(1, MIN(12, brightness));
+    /* stop the interrupt from messing us up */
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
-    buttonlight_brightness = brightness;
+    buttonlight_brightness = log_brightness[brightness - 1];
     buttonlight_control = BUTTONLIGHT_CONTROL_SET;
 }
 
