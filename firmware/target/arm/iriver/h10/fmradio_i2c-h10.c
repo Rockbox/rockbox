@@ -135,6 +135,8 @@ static void fmradio_i2c_outb(unsigned char byte)
       SCL_HI;
       DELAY;
       SCL_LO;
+
+      DELAY;
    }
 }
 
