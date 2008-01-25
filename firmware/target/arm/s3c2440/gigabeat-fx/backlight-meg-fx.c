@@ -30,6 +30,7 @@
 
 #ifndef BOOTLOADER
 static void led_control_service(void);
+const int log_brightness[12] = {0,1,2,3,5,7,10,15,22,31,44,63};
 
 static enum sc606_states
 {
@@ -70,9 +71,11 @@ static unsigned short buttonlight_trigger_now;
 /* Assumes that the backlight has been initialized */
 void _backlight_set_brightness(int brightness)
 {
+    /* clamp the brightness value */
+    brightness = MAX(1, MIN(12, brightness));
     /* stop the interrupt from messing us up */
     backlight_control = BACKLIGHT_CONTROL_IDLE;
-    backlight_brightness = brightness;
+    backlight_brightness = log_brightness[brightness - 1];
     backlight_control = BACKLIGHT_CONTROL_SET;
 }
 
