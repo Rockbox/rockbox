@@ -85,6 +85,22 @@
 #define CKSEL_PLL1 1
 #define CKSEL_XIN  4
 
+/* Device bits for SWRESET & BCLKCTR */
+
+#define DEV_LCDC  (1<<2)
+#define DEV_SDMMC (1<<6)
+#define DEV_NAND  (1<<9)
+#define DEV_DAI   (1<<14)
+#define DEV_ECC   (1<<16)
+#define DEV_RTC   (1<<21)
+#define DEV_SDRAM (1<<22)
+#define DEV_COP   (1<<23)
+#define DEV_ADC   (1<<24)
+#define DEV_TIMER (1<<26)
+#define DEV_CPU   (1<<27)
+#define DEV_IRQ   (1<<28)
+#define DEV_MAIN  (1<<31)
+
 /* IRQ Controller */
 
 #define IEN     (*(volatile unsigned long *)0xF3001000)
@@ -111,12 +127,12 @@
 #define TREF1      (*(volatile unsigned long *)0xF3003018)
 
 #define TIREQ      (*(volatile unsigned long *)0xF3003060)
-/* ref. value reached */
-#define TF0 (1<<8)
-#define TF1 (1<<9)
-/* irq. status */
-#define TI0 (1<<0)
-#define TI1 (1<<1)
+
+/* TIREQ flags */
+#define TF0 (1<<8) /* Timer 0 reference value reached */
+#define TF1 (1<<9) /* Timer 1 reference value reached */
+#define TI0 (1<<0) /* Timer 0 IRQ flag */
+#define TI1 (1<<1) /* Timer 1 IRQ flag */
 
 #define TC32EN     (*(volatile unsigned long *)0xF3003080)
 #define TC32LDV    (*(volatile unsigned long *)0xF3003084)

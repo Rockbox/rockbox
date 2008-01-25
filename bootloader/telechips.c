@@ -68,6 +68,10 @@ void* main(void)
 
     _backlight_on();
 
+#if defined(COWON_D2)
+    ata_init();
+#endif
+
     while(!do_power_off) {
         line = 0;
         printf("Hello World!");
