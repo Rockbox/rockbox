@@ -67,18 +67,12 @@ void UninstallWindow::UninstallMethodChanged(bool complete)
        ui.smartGroupBox->setEnabled(true);
 }
 
-void UninstallWindow::setDeviceSettings(QSettings *dev)
+
+void UninstallWindow::setSettings(RbSettings *sett)
 {
-    devices = dev;
-    qDebug() << "Install::setDeviceSettings:" << devices;
-}
+    settings = sett;
 
-
-void UninstallWindow::setUserSettings(QSettings *user)
-{
-    userSettings = user;
-
-    QString mountpoint =userSettings->value("mountpoint").toString();
+    QString mountpoint =settings->mountpoint();
     uninstaller = new Uninstaller(this,mountpoint);
 
     // disable smart uninstall, if not possible

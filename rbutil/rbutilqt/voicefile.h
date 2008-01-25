@@ -27,6 +27,7 @@
 #include "encoders.h"
 #include "tts.h"
 #include "httpget.h"
+#include "rbsettings.h"
 
 extern "C"
 {
@@ -44,7 +45,7 @@ public:
     bool createVoiceFile(ProgressloggerInterface* logger);
 
     // set infos
-    void setSettings(QSettings* uSettings,QSettings* dSettings) { userSettings = uSettings;deviceSettings = dSettings;}
+    void setSettings(RbSettings* sett) { settings = sett;}
     
     void setMountPoint(QString mountpoint) {m_mountpoint =mountpoint; }
     void setTargetId(int id){m_targetid = id;}
@@ -63,9 +64,7 @@ private:
     // ptr to encoder, tts and settings
     TTSBase* m_tts;
     EncBase* m_enc;
-    QSettings *userSettings;
-    QSettings *deviceSettings;
-    
+    RbSettings* settings;
     HttpGet *getter;
    
     QUrl m_proxy;  //proxy

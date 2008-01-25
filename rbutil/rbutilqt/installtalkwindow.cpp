@@ -66,7 +66,7 @@ void InstallTalkWindow::setTalkFolder(QString folder)
 void InstallTalkWindow::change()
 {
     Config *cw = new Config(this,4);
-    cw->setSettings(userSettings,devices);
+    cw->setSettings(settings);
     cw->show();
     connect(cw, SIGNAL(settingsUpdated()), this, SIGNAL(settingsUpdated()));
 }
@@ -86,13 +86,13 @@ void InstallTalkWindow::accept()
         return;
     }
 
-    userSettings->setValue("last_talked_folder", folderToTalk);
+    settings->setLastTalkedDir(folderToTalk);
 
-    userSettings->sync();
+    settings->sync();
 
-    talkcreator->setSettings(userSettings,devices);
+    talkcreator->setSettings(settings);
     talkcreator->setDir(QDir(folderToTalk));
-    talkcreator->setMountPoint(userSettings->value("mountpoint").toString());
+    talkcreator->setMountPoint(settings->mountpoint());
     
     talkcreator->setOverwriteTalk(ui.OverwriteTalk->isChecked());
     talkcreator->setOverwriteWav(ui.OverwriteWav->isChecked());
@@ -106,29 +106,27 @@ void InstallTalkWindow::accept()
 }
 
 
-void InstallTalkWindow::setSettings(QSettings *user,QSettings *dev)
+void InstallTalkWindow::setSettings(RbSettings* sett)
 {
-    devices = dev;
-    userSettings = user;
-    qDebug() << "Install::setDeviceSettings:" << devices;
-
-    QString ttsName = userSettings->value("tts", "none").toString();
+    settings = sett;
+    
+    QString ttsName = settings->curTTS();
     TTSBase* tts = getTTS(ttsName);
-    tts->setCfg(userSettings,devices);
+    tts->setCfg(settings);
     if(tts->configOk())
         ui.labelTtsProfile->setText(tr("Selected TTS engine : <b>%1</b>").arg(ttsName));
     else
         ui.labelTtsProfile->setText(tr("Selected TTS Engine: <b>%1</b>").arg("Invalid TTS configuration!"));
     
-    QString encoder = userSettings->value("encoder", "none").toString();
+    QString encoder = settings->curEncoder();
     EncBase* enc = getEncoder(encoder);
-    enc->setUserCfg(userSettings);
+    enc->setCfg(settings);
     if(enc->configOk())
         ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg(encoder));
     else
         ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
         
-    setTalkFolder(userSettings->value("last_talked_folder").toString());
+    setTalkFolder(settings->lastTalkedFolder());
 
 }
 

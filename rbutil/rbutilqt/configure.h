@@ -22,6 +22,7 @@
 
 #include "ui_configurefrm.h"
 #include "browsedirtree.h"
+#include "rbsettings.h"
 #include <QtGui>
 
 class Config : public QDialog
@@ -29,7 +30,7 @@ class Config : public QDialog
     Q_OBJECT
     public:
         Config(QWidget *parent = 0,int index=0);
-        void setSettings(QSettings* user,QSettings* device);
+        void setSettings(RbSettings* sett);
         
     signals:
         void settingsUpdated(void);
@@ -43,8 +44,8 @@ class Config : public QDialog
         void setDevices();
     
         Ui::ConfigForm ui;
-        QSettings *userSettings;
-        QSettings *devices;
+        RbSettings* settings;
+       
         QStringList findLanguageFiles(void);
         QString languageName(const QString&);
         QMap<QString, QString> lang;

@@ -46,24 +46,7 @@ ThemesInstallWindow::~ThemesInstallWindow()
 
 QString ThemesInstallWindow::resolution()
 {
-    QString resolution;
-    devices->beginGroup(userSettings->value("platform").toString());
-    resolution = devices->value("resolution").toString();
-    devices->endGroup();
-    return resolution;
-}
-
-
-void ThemesInstallWindow::setDeviceSettings(QSettings *dev)
-{
-    devices = dev;
-    qDebug() << "setDeviceSettings()" << devices;
-}
-
-
-void ThemesInstallWindow::setUserSettings(QSettings *user)
-{
-    userSettings = user;
+    return settings->curResolution();
 }
 
 
@@ -79,12 +62,12 @@ void ThemesInstallWindow::downloadInfo()
     themesInfo.close();
 
     QUrl url;
-    url = QUrl(devices->value("themes_url").toString() + "/rbutilqt.php?res=" + resolution());
+    url = QUrl(settings->themeUrl() + "/rbutilqt.php?res=" + resolution());
     qDebug() << "downloadInfo()" << url;
     qDebug() << url.queryItems();
     getter->setProxy(proxy);
-    if(userSettings->value("offline").toBool())
-        getter->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
+    if(settings->cacheOffline())
+        getter->setCache(settings->cachePath());
     getter->setFile(&themesInfo);
     getter->getFile(url);
 }
@@ -173,9 +156,9 @@ void ThemesInstallWindow::updateDetails(int row)
     iniDetails.beginGroup(ui.listThemes->item(row)->data(Qt::UserRole).toString());
 
     QUrl img, txt;
-    txt = QUrl(QString(devices->value("themes_url").toString() + "/"
+    txt = QUrl(QString(settings->themeUrl() + "/"
         + iniDetails.value("descriptionfile").toString()));
-    img = QUrl(QString(devices->value("themes_url").toString() + "/"
+    img = QUrl(QString(settings->themeUrl() + "/"
         + iniDetails.value("image").toString()));
     qDebug() << "txt:" << txt;
     qDebug() << "img:" << img;
@@ -190,8 +173,8 @@ void ThemesInstallWindow::updateDetails(int row)
 
     igetter.abort();
     igetter.setProxy(proxy);
-    if(!userSettings->value("cachedisable").toBool())
-        igetter.setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
+    if(!settings->cacheDisabled())
+        igetter.setCache(settings->cachePath());
     else
     {
         if(infocachedir=="")
@@ -291,7 +274,7 @@ void ThemesInstallWindow::accept()
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
     for(int i = 0; i < ui.listThemes->selectedItems().size(); i++) {
         iniDetails.beginGroup(ui.listThemes->selectedItems().at(i)->data(Qt::UserRole).toString());
-        zip = devices->value("themes_url").toString()
+        zip = settings->themeUrl()
                 + "/" + iniDetails.value("archive").toString();
         themes.append(zip);
         names.append("Theme: " +
@@ -305,8 +288,8 @@ void ThemesInstallWindow::accept()
 
     logger = new ProgressLoggerGui(this);
     logger->show();
-    QString mountPoint = userSettings->value("mountpoint").toString();
-    qDebug() << "mountpoint:" << userSettings->value("mountpoint").toString();
+    QString mountPoint = settings->mountpoint();
+    qDebug() << "mountpoint:" << mountPoint;
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
@@ -320,8 +303,8 @@ void ThemesInstallWindow::accept()
     installer->setLogSection(names);
     installer->setLogVersion(version);
     installer->setMountPoint(mountPoint);
-    if(!userSettings->value("cachedisable").toBool())
-        installer->setCache(userSettings->value("cachepath", QDir::tempPath()).toString());
+    if(!settings->cacheDisabled())
+        installer->setCache(settings->cachePath());
     installer->install(logger);
     connect(logger, SIGNAL(closed()), this, SLOT(close()));
 }

@@ -101,10 +101,8 @@ EncExes::EncExes(QString name,QWidget *parent) : EncBase(parent)
 
 bool EncExes::start()
 {
-    userSettings->beginGroup(m_name);
-    m_EncExec = userSettings->value("encoderpath","").toString();
-    m_EncOpts = userSettings->value("encoderoptions","").toString();
-    userSettings->endGroup();
+    m_EncExec = settings->encoderPath(m_name);
+    m_EncOpts = settings->encoderOptions(m_name);
     
     m_EncTemplate = m_TemplateMap.value(m_name);
 
@@ -142,10 +140,8 @@ void EncExes::reset()
 void EncExes::showCfg()
 {
     // try to get config from settings
-    userSettings->beginGroup(m_name);
-    QString exepath =userSettings->value("encoderpath","").toString();
-    ui.encoderoptions->setText(userSettings->value("encoderoptions","").toString());   
-    userSettings->endGroup();
+    QString exepath =settings->encoderPath(m_name);
+    ui.encoderoptions->setText(settings->encoderOptions(m_name));   
     
     if(exepath == "")
     {
@@ -184,16 +180,12 @@ void EncExes::showCfg()
 
 void EncExes::accept(void)
 {
-    if(userSettings != NULL)
-    {
-        //save settings in user config
-        userSettings->beginGroup(m_name);
-        userSettings->setValue("encoderpath",ui.encoderpath->text());
-        userSettings->setValue("encoderoptions",ui.encoderoptions->text());
-        userSettings->endGroup();
-        // sync settings
-        userSettings->sync();
-    }
+    //save settings in user config
+    settings->setEncoderPath(m_name,ui.encoderpath->text());
+    settings->setEncoderOptions(m_name,ui.encoderoptions->text());
+    
+    // sync settings
+    settings->sync();
     this->close();
 }
 
@@ -204,9 +196,7 @@ void EncExes::reject(void)
 
 bool EncExes::configOk()
 {
-    userSettings->beginGroup(m_name);
-    QString path = userSettings->value("encoderpath","").toString();
-    userSettings->endGroup();
+    QString path = settings->encoderPath(m_name);
     
     if (QFileInfo(path).exists())
         return true;
@@ -251,19 +241,13 @@ EncRbSpeex::EncRbSpeex(QWidget *parent) : EncBase(parent)
 
 bool EncRbSpeex::start()
 {
-    // no user config
-    if(userSettings == NULL)
-    {
-        return false;
-    }
-    // try to get config from settings
-    userSettings->beginGroup("rbspeex");
-    quality = userSettings->value("quality",defaultQuality).toDouble();
-    complexity = userSettings->value("complexity",defaultComplexity).toInt();
-    volume =userSettings->value("volume",defaultVolume).toDouble();
-    narrowband = userSettings->value("narrowband",false).toBool();
    
-    userSettings->endGroup();
+    // try to get config from settings
+    quality = settings->encoderQuality("rbspeex");
+    complexity = settings->encoderComplexity("rbspeex");
+    volume = settings->encoderVolume("rbspeex");
+    narrowband = settings->encoderNarrowband("rbspeex");
+   
 
     return true;
 }
@@ -309,17 +293,14 @@ void EncRbSpeex::reset()
 void EncRbSpeex::showCfg()
 {
     //fill in the usersettings
-    userSettings->beginGroup("rbspeex");
-    ui.volume->setValue(userSettings->value("volume",defaultVolume).toDouble());
-    ui.quality->setValue(userSettings->value("quality",defaultQuality).toDouble());
-    ui.complexity->setValue(userSettings->value("complexity",defaultComplexity).toInt());
+    ui.volume->setValue(settings->encoderVolume("rbspeex"));
+    ui.quality->setValue(settings->encoderQuality("rbspeex"));
+    ui.complexity->setValue(settings->encoderComplexity("rbspeex"));
     
-    if(userSettings->value("narrowband","False").toString() == "True")
+    if(settings->encoderNarrowband("rbspeex"))
         ui.narrowband->setCheckState(Qt::Checked);
     else
         ui.narrowband->setCheckState(Qt::Unchecked);
-
-    userSettings->endGroup();
 
     //show dialog
     this->exec();
@@ -327,19 +308,14 @@ void EncRbSpeex::showCfg()
 
 void EncRbSpeex::accept(void)
 {
-    if(userSettings != NULL)
-    {
-        //save settings in user config
-        userSettings->beginGroup("rbspeex");
-        userSettings->setValue("volume",ui.volume->value());
-        userSettings->setValue("quality",ui.quality->value());
-        userSettings->setValue("complexity",ui.complexity->value());
-        userSettings->setValue("narrowband",ui.narrowband->isChecked() ? true : false);
+    //save settings in user config
+    settings->setEncoderVolume("rbspeex",ui.volume->value());
+    settings->setEncoderQuality("rbspeex",ui.quality->value());
+    settings->setEncoderComplexity("rbspeex",ui.complexity->value());
+    settings->setEncoderNarrowband("rbspeex",ui.narrowband->isChecked() ? true : false);
 
-        userSettings->endGroup();
-        // sync settings
-        userSettings->sync();
-    }
+    // sync settings
+    settings->sync();
     this->close();
 }
 
@@ -353,18 +329,15 @@ bool EncRbSpeex::configOk()
 {
     bool result=true;
     // check config
-    userSettings->beginGroup("rbspeex"); 
     
-    if(userSettings->value("volume","null").toDouble() <= 0)
+    if(settings->encoderVolume("rbspeex") <= 0)
         result =false;
     
-    if(userSettings->value("quality","null").toDouble() <= 0)
+    if(settings->encoderQuality("rbspeex") <= 0)
         result =false;
         
-    if(userSettings->value("complexity","null").toInt() <= 0)
+    if(settings->encoderComplexity("rbspeex") <= 0)
         result =false;
-        
-    userSettings->endGroup();
        
     return result;
 }

@@ -97,49 +97,49 @@ void Config::accept()
         proxy.setHost(ui.proxyHost->text());
         proxy.setPort(ui.proxyPort->text().toInt());
     }
-    userSettings->setValue("proxy", proxy.toString());
+    
+    settings->setProxy(proxy.toString());
     qDebug() << "new proxy:" << proxy;
     // proxy type
     QString proxyType;
     if(ui.radioNoProxy->isChecked()) proxyType = "none";
     else if(ui.radioSystemProxy->isChecked()) proxyType = "system";
     else proxyType = "manual";
-    userSettings->setValue("proxytype", proxyType);
+    settings->setProxyType(proxyType);
 
     // language
-    if(userSettings->value("lang").toString() != language)
+    if(settings->curLang() != language)
         QMessageBox::information(this, tr("Language changed"),
             tr("You need to restart the application for the changed language to take effect."));
-    userSettings->setValue("lang", language);
+    settings->setLang(language);
 
     // mountpoint
     QString mp = ui.mountPoint->text();
     if(QFileInfo(mp).isDir())
-        userSettings->setValue("mountpoint", mp);
+        settings->setMountpoint( mp);
 
     // platform
     QString nplat;
     if(ui.treeDevices->selectedItems().size() != 0) {
         nplat = ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole).toString();
-        userSettings->setValue("platform", nplat);
+        settings->setCurPlatform(nplat);
     }
 
     // cache settings
     if(QFileInfo(ui.cachePath->text()).isDir())
-        userSettings->setValue("cachepath", ui.cachePath->text());
+        settings->setCachePath(ui.cachePath->text());
     else // default to system temp path
-        userSettings->setValue("cachepath", QDir::tempPath());
-    userSettings->setValue("cachedisable", ui.cacheDisable->isChecked());
-    userSettings->setValue("offline", ui.cacheOfflineMode->isChecked());
+        settings->setCachePath( QDir::tempPath());
+    settings->setCacheDisable(ui.cacheDisable->isChecked());
+    settings->setCacheOffline(ui.cacheOfflineMode->isChecked());
 
     // tts settings
-    userSettings->setValue("tts",ui.comboTts->currentText());
-    
-    //encoder settings 
-    userSettings->setValue("encoder",ui.comboEncoder->currentText());
+    settings->setCurTTS(ui.comboTts->currentText());
+    //encoder settings
+    settings->setCurEncoder(ui.comboEncoder->currentText());
 
     // sync settings
-    userSettings->sync();
+    settings->sync();
     this->close();
     emit settingsUpdated();
 }
@@ -151,11 +151,10 @@ void Config::abort()
     this->close();
 }
 
-void Config::setSettings(QSettings* user,QSettings* device)
+void Config::setSettings(RbSettings* sett)
 {
-    userSettings = user;
-    devices = device;
-    
+    settings = sett;
+      
     setUserSettings();
     setDevices();
 }
@@ -163,7 +162,7 @@ void Config::setSettings(QSettings* user,QSettings* device)
 void Config::setUserSettings()
 {
     // set proxy
-    proxy = userSettings->value("proxy").toString();
+    proxy = settings->proxy();
 
     if(proxy.port() > 0)
         ui.proxyPort->setText(QString("%1").arg(proxy.port()));
@@ -172,7 +171,7 @@ void Config::setUserSettings()
     ui.proxyUser->setText(proxy.userName());
     ui.proxyPass->setText(proxy.password());
 
-    QString proxyType = userSettings->value("proxytype", "system").toString();
+    QString proxyType = settings->proxyType();
     if(proxyType == "manual") ui.radioManualProxy->setChecked(true);
     else if(proxyType == "system") ui.radioSystemProxy->setChecked(true);
     else ui.radioNoProxy->setChecked(true);
@@ -183,7 +182,7 @@ void Config::setUserSettings()
     // find key for lang value
     QMap<QString, QString>::const_iterator i = lang.constBegin();
     while (i != lang.constEnd()) {
-        if(i.value() == userSettings->value("lang").toString()) {
+        if(i.value() == settings->curLang()) {
             b = i.key();
             break;
         }
@@ -196,15 +195,15 @@ void Config::setUserSettings()
         ui.listLanguages->setCurrentItem(a.at(0));
 
     // devices tab
-    ui.mountPoint->setText(userSettings->value("mountpoint").toString());
+    ui.mountPoint->setText(settings->mountpoint());
 
     // cache tab
-    if(!QFileInfo(userSettings->value("cachepath").toString()).isDir())
-        userSettings->setValue("cachepath", QDir::tempPath());
-    ui.cachePath->setText(userSettings->value("cachepath").toString());
-    ui.cacheDisable->setChecked(userSettings->value("cachedisable", true).toBool());
-    ui.cacheOfflineMode->setChecked(userSettings->value("offline").toBool());
-    updateCacheInfo(userSettings->value("cachepath").toString());
+    if(!QFileInfo(settings->cachePath()).isDir())
+        settings->setCachePath(QDir::tempPath());
+    ui.cachePath->setText(settings->cachePath());
+    ui.cacheDisable->setChecked(settings->cacheDisabled());
+    ui.cacheOfflineMode->setChecked(settings->cacheOffline());
+    updateCacheInfo(settings->cachePath());
 }
 
 
@@ -227,28 +226,21 @@ void Config::setDevices()
     
     // setup devices table
     qDebug() << "Config::setDevices()";
-    devices->beginGroup("platforms");
-    QStringList a = devices->childKeys();
-    devices->endGroup();
+    
+    QStringList platformList = settings->allPlatforms();
 
     QMap <QString, QString> manuf;
     QMap <QString, QString> devcs;
-    for(int it = 0; it < a.size(); it++) {
-        QString curdev;
-        devices->beginGroup("platforms");
-        curdev = devices->value(a.at(it), "null").toString();
-        devices->endGroup();
-        QString curname;
-        devices->beginGroup(curdev);
-        curname = devices->value("name", "null").toString();
-        QString curbrand = devices->value("brand", "").toString();
-        devices->endGroup();
-        manuf.insertMulti(curbrand, curdev);
-        devcs.insert(curdev, curname);
+    for(int it = 0; it < platformList.size(); it++) 
+    {
+        QString curname = settings->name(platformList.at(it));
+        QString curbrand = settings->brand(platformList.at(it));
+        manuf.insertMulti(curbrand, platformList.at(it));
+        devcs.insert(platformList.at(it), curname);
     }
 
     QString platform;
-    platform = devcs.value(userSettings->value("platform").toString());
+    platform = devcs.value(settings->curPlatform());
 
     // set up devices table
     ui.treeDevices->header()->hide();
@@ -269,25 +261,16 @@ void Config::setDevices()
         items.append(w);
 
         // go through platforms again for sake of order
-        for(int it = 0; it < a.size(); it++) {
-            QString curdev;
-            devices->beginGroup("platforms");
-            curdev = devices->value(a.at(it), "null").toString();
-            devices->endGroup();
-            QString curname;
-            devices->beginGroup(curdev);
-            curname = devices->value("name", "null").toString();
-            QString curbrand = devices->value("brand", "").toString();
-            QString curicon = devices->value("icon", "").toString();
-            devices->endGroup();
+        for(int it = 0; it < platformList.size(); it++) {
+           
+            QString curname = settings->name(platformList.at(it));
+            QString curbrand = settings->brand(platformList.at(it));
+       
             if(curbrand != brands.at(c)) continue;
-            qDebug() << "adding:" << brands.at(c) << curname << curdev;
+            qDebug() << "adding:" << brands.at(c) << curname;
             w2 = new QTreeWidgetItem(w, QStringList(curname));
-            w2->setData(0, Qt::UserRole, curdev);
-//            QIcon icon;
-//            icon.addFile(":/icons/devices/" + curicon + "-tiny.png");
-//            w2->setIcon(0, icon);
-//            ui.treeDevices->setIconSize(QSize(32, 32));
+            w2->setData(0, Qt::UserRole, platformList.at(it));
+
             if(platform.contains(curname)) {
                 w2->setSelected(true);
                 w->setExpanded(true);
@@ -306,7 +289,7 @@ void Config::setDevices()
     ui.comboEncoder->addItems(getEncoderList());
     
     //update index of combobox
-    int index = ui.comboEncoder->findText(userSettings->value("encoder").toString(),Qt::MatchExactly);
+    int index = ui.comboEncoder->findText(settings->curEncoder(),Qt::MatchExactly);
     if(index < 0) index = 0;
     ui.comboEncoder->setCurrentIndex(index);
     updateEncState(index);
@@ -316,7 +299,7 @@ void Config::setDevices()
     
     
     //update index of combobox
-    index = ui.comboTts->findText(userSettings->value("tts").toString(),Qt::MatchExactly);
+    index = ui.comboTts->findText(settings->curTTS(),Qt::MatchExactly);
     if(index < 0) index = 0;
     ui.comboTts->setCurrentIndex(index);
     updateTtsState(index);
@@ -328,7 +311,7 @@ void Config::updateTtsState(int index)
 {
     QString ttsName = ui.comboTts->itemText(index);
     TTSBase* tts = getTTS(ttsName);
-    tts->setCfg(userSettings,devices);
+    tts->setCfg(settings);
     
     if(tts->configOk())
     {
@@ -346,7 +329,7 @@ void Config::updateEncState(int index)
 {
     QString encoder = ui.comboEncoder->itemText(index);
     EncBase* enc = getEncoder(encoder);
-    enc->setUserCfg(userSettings);
+    enc->setCfg(settings);
     
     if(enc->configOk())
     {
@@ -594,7 +577,7 @@ void Config::cacheClear()
         QFile::remove(f);
         qDebug() << "removed:" << f;
     }
-    updateCacheInfo(userSettings->value("cachepath").toString());
+    updateCacheInfo(settings->cachePath());
 }
 
 
@@ -602,7 +585,7 @@ void Config::configTts()
 {
     TTSBase* tts =getTTS(ui.comboTts->currentText());
     
-    tts->setCfg(userSettings,devices);
+    tts->setCfg(settings);
     tts->showCfg();
     updateTtsState(ui.comboTts->currentIndex());
 }
@@ -612,7 +595,7 @@ void Config::configEnc()
 {
     EncBase* enc =getEncoder(ui.comboEncoder->currentText());
     
-    enc->setUserCfg(userSettings);
+    enc->setCfg(settings);
     enc->showCfg();
     updateEncState(ui.comboEncoder->currentIndex());
 }

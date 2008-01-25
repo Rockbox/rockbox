@@ -27,6 +27,7 @@
 #include "httpget.h"
 #include "installzip.h"
 #include "progressloggergui.h"
+#include "rbsettings.h"
 
 class ThemesInstallWindow : public QDialog
 {
@@ -35,8 +36,7 @@ class ThemesInstallWindow : public QDialog
     public:
         ThemesInstallWindow(QWidget* parent = 0);
         ~ThemesInstallWindow();
-        void setDeviceSettings(QSettings*);
-        void setUserSettings(QSettings *);
+        void setSettings(RbSettings* sett){settings=sett;}
         void setProxy(QUrl);
         void downloadInfo(void);
         void show(void);
@@ -47,8 +47,7 @@ class ThemesInstallWindow : public QDialog
 
     private:
         Ui::ThemeInstallFrm ui;
-        QSettings *devices;
-        QSettings *userSettings;
+        RbSettings* settings;
         HttpGet *getter;
         HttpGet igetter;
         QTemporaryFile themesInfo;

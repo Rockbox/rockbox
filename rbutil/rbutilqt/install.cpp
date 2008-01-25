@@ -48,8 +48,8 @@ void Install::accept()
 {
     logger = new ProgressLoggerGui(this);
     logger->show();
-    QString mountPoint = userSettings->value("mountpoint").toString();
-    qDebug() << "mountpoint:" << userSettings->value("mountpoint").toString();
+    QString mountPoint = settings->mountpoint();
+    qDebug() << "mountpoint:" << settings->mountpoint();
     // show dialog with error if mount point is wrong
     if(!QFileInfo(mountPoint).isDir()) {
         logger->addItem(tr("Mount point is wrong!"),LOGERROR);
@@ -58,50 +58,46 @@ void Install::accept()
     }
 
     QString myversion;
-    QString buildname;
-    devices->beginGroup(userSettings->value("platform").toString());
-    buildname = devices->value("platform").toString();
-    devices->endGroup();
+    QString buildname = settings->curPlatform();
     if(ui.radioStable->isChecked()) {
         file = QString("%1/rockbox-%2-%3.zip")
-                .arg(devices->value("download_url").toString(),
-                    devices->value("last_release").toString(), buildname);
+                .arg(settings->downloadUrl(),
+                    settings->lastRelease(), buildname);
         fileName = QString("rockbox-%1-%2.zip")
-                   .arg(devices->value("last_release").toString(), buildname);
-        userSettings->setValue("build", "stable");
+                   .arg(settings->lastRelease(), buildname);
+        settings->setBuild("stable");
         myversion = version.value("rel_rev");
     }
     else if(ui.radioArchived->isChecked()) {
         file = QString("%1%2/rockbox-%3-%4.zip")
-            .arg(devices->value("daily_url").toString(),
+            .arg(settings->dailyUrl(),
             buildname, buildname, version.value("arch_date"));
         fileName = QString("rockbox-%1-%2.zip")
             .arg(buildname, version.value("arch_date"));
-        userSettings->setValue("build", "archived");
+        settings->setBuild("archived");
         myversion = "r" + version.value("arch_rev") + "-" + version.value("arch_date");
     }
     else if(ui.radioCurrent->isChecked()) {
         file = QString("%1%2/rockbox.zip")
-            .arg(devices->value("bleeding_url").toString(), buildname);
+            .arg(settings->bleedingUrl(), buildname);
         fileName = QString("rockbox.zip");
-        userSettings->setValue("build", "current");
+        settings->setBuild("current");
         myversion = "r" + version.value("bleed_rev");
     }
     else {
         qDebug() << "no build selected -- this shouldn't happen";
         return;
     }
-    userSettings->sync();
+    settings->sync();
 
     installer = new ZipInstaller(this);
     installer->setUrl(file);
     installer->setProxy(proxy);
     installer->setLogSection("Rockbox (Base)");
-    if(!userSettings->value("cachedisable").toBool()
+    if(!settings->cacheDisabled()
         && !ui.radioCurrent->isChecked()
         && !ui.checkBoxCache->isChecked())
-        installer->setCache(userSettings->value("cachepath",
-                            QDir::tempPath()).toString());
+        installer->setCache(settings->cachePath());
 
     installer->setLogVersion(myversion);
     installer->setMountPoint(mountPoint);
@@ -125,9 +121,9 @@ void Install::done(bool error)
     // no error, close the window, when the logger is closed
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
     // add platform info to log file for later detection
-    QSettings installlog(userSettings->value("mountpoint").toString()
+    QSettings installlog(settings->mountpoint()
             + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
-    installlog.setValue("platform", userSettings->value("platform").toString());
+    installlog.setValue("platform", settings->curPlatform());
     installlog.sync();
 }
 
@@ -179,12 +175,6 @@ void Install::setDetailsArchived(bool show)
 }
 
 
-void Install::setDeviceSettings(QSettings *dev)
-{
-    devices = dev;
-    qDebug() << "Install::setDeviceSettings:" << devices;
-}
-
 
 void Install::setVersionStrings(QMap<QString, QString> ver)
 {
@@ -217,7 +207,7 @@ void Install::setVersionStrings(QMap<QString, QString> ver)
     qDebug() << "Install::setVersionStrings" << version;
 }
 
-void Install::setUserSettings(QSettings *user)
+void Install::setSettings(RbSettings *sett)
 {
-    userSettings = user;
+    settings = sett;
 }

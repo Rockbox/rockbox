@@ -77,7 +77,7 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
     info.close();
         
     //prepare download url
-    QUrl genlangUrl = deviceSettings->value("genlang_url").toString() +"?lang=" +m_lang+"&t="+target+"&rev="+version+"&f="+features;
+    QUrl genlangUrl = settings->genlangUrl() +"?lang=" +m_lang+"&t="+target+"&rev="+version+"&f="+features;
     
     qDebug() << "downloading " << genlangUrl;
     
@@ -146,8 +146,8 @@ void VoiceFileCreator::downloadDone(bool error)
     }    
 
     //tts
-    m_tts = getTTS(userSettings->value("tts").toString());  
-    m_tts->setCfg(userSettings,deviceSettings);
+    m_tts = getTTS(settings->curTTS());  
+    m_tts->setCfg(settings);
     
     QString errStr;
     if(!m_tts->start(&errStr))
@@ -159,8 +159,8 @@ void VoiceFileCreator::downloadDone(bool error)
     }
 
     // Encoder
-    m_enc = getEncoder(userSettings->value("encoder").toString());  
-    m_enc->setUserCfg(userSettings);
+    m_enc = getEncoder(settings->curEncoder());  
+    m_enc->setCfg(settings);
   
     if(!m_enc->start())
     {

@@ -22,18 +22,17 @@
 
 #include <QtGui>
 
-#include <QSettings>
-
 #include "ui_createvoicefrm.h"
 #include "progressloggergui.h"
 #include "voicefile.h"
+#include "rbsettings.h"
 
 class CreateVoiceWindow : public QDialog
 {
     Q_OBJECT
     public:
         CreateVoiceWindow(QWidget *parent = 0);
-        void setSettings(QSettings* user,QSettings* device);
+        void setSettings(RbSettings* sett);
         void setProxy(QUrl proxy){m_proxy = proxy;}
         
     signals:
@@ -47,8 +46,7 @@ class CreateVoiceWindow : public QDialog
         VoiceFileCreator* voicecreator;
         Ui::CreateVoiceFrm ui;
         ProgressLoggerGui* logger;
-        QSettings *devices;
-        QSettings *userSettings;
+        RbSettings* settings;
         QUrl m_proxy;
 };
 

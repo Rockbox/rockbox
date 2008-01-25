@@ -30,6 +30,7 @@
 #include "progressloggergui.h"
 #include "installbootloader.h"
 
+#include "rbsettings.h"
 
 class RbUtilQt : public QMainWindow
 {
@@ -40,8 +41,8 @@ class RbUtilQt : public QMainWindow
 
     private:
         Ui::RbUtilQtFrm ui;
-        QSettings *devices;
-        QSettings *userSettings;
+        RbSettings* settings;
+       
         void initDeviceNames(void);
         QString deviceName(QString);
         QString platform;

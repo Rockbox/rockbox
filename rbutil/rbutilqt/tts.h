@@ -23,6 +23,7 @@
 
 #include "ui_ttsexescfgfrm.h"
 #include "ui_sapicfgfrm.h"
+#include "rbsettings.h"
 #include <QtGui>
 
 
@@ -47,7 +48,7 @@ public:
     virtual void showCfg(){}
     virtual bool configOk(){return false;}
     
-    void setCfg(QSettings *uSettings, QSettings *dSettings){userSettings = uSettings;deviceSettings = dSettings;}
+    void setCfg(RbSettings* sett){settings = sett;}
      
 public slots:
     virtual void accept(void){}
@@ -55,9 +56,7 @@ public slots:
     virtual void reset(void){}
 
 protected:
-    QSettings *userSettings;
-    QSettings *deviceSettings;     
-    
+    RbSettings* settings;
 };
 
 class TTSSapi : public TTSBase

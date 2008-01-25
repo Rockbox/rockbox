@@ -20,9 +20,11 @@
 #ifndef ENCODERS_H
 #define ENCODERS_H
  
+#include <QtGui>
+ 
 #include "ui_rbspeexcfgfrm.h"
 #include "ui_encexescfgfrm.h"
-#include <QtGui>
+#include "rbsettings.h"
 
 extern "C"
 {
@@ -39,7 +41,6 @@ EncBase* getEncoder(QString encname);
 QStringList getEncoderList();
 
 
-
 class EncBase : public QDialog
 {
     Q_OBJECT
@@ -52,7 +53,7 @@ public:
     virtual void showCfg(){}
     virtual bool configOk(){return false;}
 
-    void setUserCfg(QSettings *uSettings){userSettings = uSettings;}
+    void setCfg(RbSettings *sett){settings = sett;}
      
 public slots:
     virtual void accept(void){}
@@ -61,7 +62,7 @@ public slots:
 
 protected:
    
-    QSettings *userSettings;
+    RbSettings* settings;
 };
 
 

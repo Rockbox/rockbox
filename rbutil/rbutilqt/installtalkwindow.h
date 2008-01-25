@@ -22,18 +22,17 @@
 
 #include <QtGui>
 
-#include <QSettings>
-
 #include "ui_installtalkfrm.h"
 #include "progressloggergui.h"
 #include "talkfile.h"
+#include "rbsettings.h"
 
 class InstallTalkWindow : public QDialog
 {
     Q_OBJECT
     public:
         InstallTalkWindow(QWidget *parent = 0);
-        void setSettings(QSettings* user,QSettings* device);
+        void setSettings(RbSettings* sett);
 
     signals:
         void settingsUpdated(void);
@@ -50,8 +49,7 @@ class InstallTalkWindow : public QDialog
         TalkFileCreator* talkcreator;
         Ui::InstallTalkFrm ui;
         ProgressLoggerGui* logger;
-        QSettings *devices;
-        QSettings *userSettings;
+        RbSettings* settings;
 
 };
 

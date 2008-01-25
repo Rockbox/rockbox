@@ -31,8 +31,8 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     m_logger->addItem(tr("Starting Talk file generation"),LOGINFO);
     
     //tts
-    m_tts = getTTS(userSettings->value("tts").toString());  
-    m_tts->setCfg(userSettings,deviceSettings);
+    m_tts = getTTS(settings->curTTS());  
+    m_tts->setCfg(settings);
     
     QString errStr;
     if(!m_tts->start(&errStr))
@@ -44,8 +44,8 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     }
 
     // Encoder
-    m_enc = getEncoder(userSettings->value("encoder").toString());  
-    m_enc->setUserCfg(userSettings);
+    m_enc = getEncoder(settings->curEncoder());  
+    m_enc->setCfg(settings);
   
     if(!m_enc->start())
     {

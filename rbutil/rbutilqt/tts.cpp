@@ -106,10 +106,8 @@ TTSExes::TTSExes(QString name,QWidget *parent) : TTSBase(parent)
 
 bool TTSExes::start(QString *errStr)
 {
-    userSettings->beginGroup(m_name);
-    m_TTSexec = userSettings->value("ttspath","").toString();
-    m_TTSOpts = userSettings->value("ttsoptions","").toString();
-    userSettings->endGroup();
+    m_TTSexec = settings->ttsPath(m_name);
+    m_TTSOpts = settings->ttsOptions(m_name);
     
     m_TTSTemplate = m_TemplateMap.value(m_name);
 
@@ -149,10 +147,8 @@ void TTSExes::reset()
 void TTSExes::showCfg()
 {
     // try to get config from settings
-    userSettings->beginGroup(m_name);
-    QString exepath =userSettings->value("ttspath","").toString();
-    ui.ttsoptions->setText(userSettings->value("ttsoptions","").toString());   
-    userSettings->endGroup();
+    QString exepath =settings->ttsPath(m_name);
+    ui.ttsoptions->setText(settings->ttsOptions(m_name));   
     
     if(exepath == "")
     {
@@ -191,16 +187,12 @@ void TTSExes::showCfg()
 
 void TTSExes::accept(void)
 {
-    if(userSettings != NULL)
-    {
-        //save settings in user config
-        userSettings->beginGroup(m_name);
-        userSettings->setValue("ttspath",ui.ttspath->text());
-        userSettings->setValue("ttsoptions",ui.ttsoptions->text());
-        userSettings->endGroup();
-        // sync settings
-        userSettings->sync();
-    }
+    //save settings in user config
+    settings->setTTSPath(m_name,ui.ttspath->text());
+    settings->setTTSOptions(m_name,ui.ttsoptions->text());
+    // sync settings
+    settings->sync();
+    
     this->close();
 }
 
@@ -211,9 +203,7 @@ void TTSExes::reject(void)
 
 bool TTSExes::configOk()
 {
-    userSettings->beginGroup(m_name);
-    QString path = userSettings->value("ttspath","").toString();
-    userSettings->endGroup();
+    QString path = settings->ttsPath(m_name);
     
     if (QFileInfo(path).exists())
         return true;
@@ -257,12 +247,10 @@ TTSSapi::TTSSapi(QWidget *parent) : TTSBase(parent)
 bool TTSSapi::start(QString *errStr)
 {    
 
-    userSettings->beginGroup("sapi");
-    m_TTSOpts = userSettings->value("ttsoptions","").toString();
-    m_TTSLanguage =userSettings->value("ttslanguage","").toString();
-    m_TTSVoice=userSettings->value("ttsvoice","").toString();
-    m_TTSSpeed=userSettings->value("ttsspeed","").toString();
-    userSettings->endGroup();
+    m_TTSOpts = settings->ttsOptions("sapi");
+    m_TTSLanguage =settings->ttsLang("sapi");
+    m_TTSVoice=settings->ttsVoice("sapi");
+    m_TTSSpeed=settings->ttsSpeed("sapi");
 
     QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
     QFile::copy(":/builtin/sapi_voice.vbs",QDir::tempPath() + "/sapi_voice.vbs");
@@ -384,23 +372,14 @@ void TTSSapi::reset()
 void TTSSapi::showCfg()
 {
     // try to get config from settings
-    userSettings->beginGroup("sapi");
-    ui.ttsoptions->setText(userSettings->value("ttsoptions","").toString());  
-    QString selLang = userSettings->value("ttslanguage",defaultLanguage).toString();
-    QString selVoice = userSettings->value("ttsvoice","").toString();    
-    ui.speed->setValue(userSettings->value("ttsspeed",0).toInt());
-    userSettings->endGroup();
+    ui.ttsoptions->setText(settings->ttsOptions("sapi"));  
+    QString selLang = settings->ttsLang("sapi");
+    QString selVoice = settings->ttsVoice("sapi");    
+    ui.speed->setValue(settings->ttsSpeed("sapi"));
+    
       
      // fill in language combobox
-
-    deviceSettings->beginGroup("languages");
-    QStringList keys = deviceSettings->allKeys();
-    QStringList languages;
-    for(int i =0 ; i < keys.size();i++)
-    {
-        languages << deviceSettings->value(keys.at(i)).toString();
-    }
-    deviceSettings->endGroup();
+    QStringList languages = settings->allLanguages();
     
     languages.sort();
     ui.languagecombo->clear();
@@ -422,18 +401,14 @@ void TTSSapi::showCfg()
 
 void TTSSapi::accept(void)
 {
-    if(userSettings != NULL)
-    {
-        //save settings in user config
-        userSettings->beginGroup("sapi");
-        userSettings->setValue("ttsoptions",ui.ttsoptions->text());
-        userSettings->setValue("ttslanguage",ui.languagecombo->currentText());
-        userSettings->setValue("ttsvoice",ui.voicecombo->currentText());
-        userSettings->setValue("ttsspeed",QString("%1").arg(ui.speed->value()));
-        userSettings->endGroup();
-        // sync settings
-        userSettings->sync();
-    }
+    //save settings in user config
+    settings->setTTSOptions("sapi",ui.ttsoptions->text());
+    settings->setTTSLang("sapi",ui.languagecombo->currentText());
+    settings->setTTSVoice("sapi",ui.voicecombo->currentText());
+    settings->setTTSSpeed("sapi",ui.speed->value());
+    // sync settings
+    settings->sync();
+    
     this->close();
 }
 
