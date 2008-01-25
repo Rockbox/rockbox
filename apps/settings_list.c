@@ -524,7 +524,7 @@ const struct settings_list settings[] = {
 #endif
 #endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    INT_SETTING(0, brightness, LANG_BRIGHTNESS, DEFAULT_BRIGHTNESS_SETTING,
+    INT_SETTING(F_NO_WRAP, brightness, LANG_BRIGHTNESS, DEFAULT_BRIGHTNESS_SETTING,
         "brightness",UNIT_INT, MIN_BRIGHTNESS_SETTING, MAX_BRIGHTNESS_SETTING, 1,
         NULL, NULL, backlight_set_brightness),
 #endif
@@ -1165,7 +1165,7 @@ const struct settings_list settings[] = {
                   -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
 #endif
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-    INT_SETTING(0, buttonlight_brightness, LANG_BUTTONLIGHT_BRIGHTNESS, DEFAULT_BRIGHTNESS_SETTING,
+    INT_SETTING(F_NO_WRAP, buttonlight_brightness, LANG_BUTTONLIGHT_BRIGHTNESS, DEFAULT_BRIGHTNESS_SETTING,
         "button light brightness",UNIT_INT, MIN_BRIGHTNESS_SETTING, MAX_BRIGHTNESS_SETTING, 1,
         NULL, NULL, buttonlight_set_brightness),
 #endif
