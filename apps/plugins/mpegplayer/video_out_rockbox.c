@@ -36,7 +36,6 @@ struct vo_data
     int output_y;
     int output_width;
     int output_height;
-    bool visible;
     unsigned flags;
     struct vo_rect rc_vid;
     struct vo_rect rc_clip;
@@ -226,7 +225,7 @@ bool vo_rect_union(struct vo_rect *rc_dst,
 
             return true;
         }
-        else if (!vo_rect_empty(rc2))
+        else if (!vo_rect_empty_inl(rc2))
         {
             *rc_dst = *rc2;
             return true;
@@ -430,6 +429,9 @@ void vo_setup(const mpeg2_sequence_t * sequence)
     else
     {
         vo.rc_vid.l = (SCREEN_WIDTH - sequence->display_width) / 2;
+#ifdef HAVE_LCD_COLOR
+        vo.rc_vid.l &= ~1;
+#endif
         vo.rc_vid.r = vo.rc_vid.l + sequence->display_width;
     }
 
@@ -441,6 +443,9 @@ void vo_setup(const mpeg2_sequence_t * sequence)
     else
     {
         vo.rc_vid.t = (SCREEN_HEIGHT - sequence->display_height) / 2;
+#ifdef HAVE_LCD_COLOR
+        vo.rc_vid.t &= ~1;
+#endif
         vo.rc_vid.b = vo.rc_vid.t + sequence->display_height;
     }
 
