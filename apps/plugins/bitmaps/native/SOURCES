@@ -551,7 +551,7 @@ matrix_normal.bmp
     sliding_puzzle.80x80x16.bmp
 #elif (LCD_WIDTH==128 || LCD_HEIGHT==128)
     sliding_puzzle.128x128x16.bmp
-#elif (LCD_WIDTH==176 || LCD_WIDTH==176)
+#elif (LCD_WIDTH==176 || LCD_HEIGHT==176)
     sliding_puzzle.176x176x16.bmp
 #elif (LCD_WIDTH==240 || LCD_HEIGHT==240)
     sliding_puzzle.240x240x16.bmp

@@ -574,7 +574,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->lcd_putsxy(0, 28, "[SELECT] shuffle");
         rb->lcd_putsxy(0, 38, "[A] change pic");
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-      (CONFIG_KEYPAD == SANSE_C200_PAD)
+      (CONFIG_KEYPAD == SANSA_C200_PAD)
         rb->lcd_putsxy(0, 18, "[OFF] to stop");
         rb->lcd_putsxy(0, 28, "[REC] shuffle");
         rb->lcd_putsxy(0, 38, "[SELECT] change pic");
