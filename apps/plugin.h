@@ -119,12 +119,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 97
+#define PLUGIN_API_VERSION 98
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 97
+#define PLUGIN_MIN_API_VERSION 98
 
 /* plugin return codes */
 enum plugin_status {
@@ -278,7 +278,8 @@ struct plugin_api {
                          int x, int y, int width, int height);
 #endif
 
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
+    || defined (IRIVER_H10)
     void (*lcd_yuv_set_options)(unsigned options);
 #endif
 

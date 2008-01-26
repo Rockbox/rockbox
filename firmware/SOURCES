@@ -555,6 +555,7 @@ target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
 target/arm/iriver/h10/fmradio_i2c-h10.c
 target/arm/iriver/h10/lcd-h10_20gb.c
+target/arm/iriver/h10/lcd-as-h10.S
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/powermgmt-h10.c
 target/arm/usb-fw-pp502x.c
