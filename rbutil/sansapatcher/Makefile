@@ -7,7 +7,7 @@ CFLAGS+=-mno-cygwin
 else
 ifeq ($(findstring MINGW,$(shell uname)),MINGW)
 OUTPUT=sansapatcher.exe
-CROSS
+CROSS=
 else
 OUTPUT=sansapatcher
 CROSS=i586-mingw32msvc-
