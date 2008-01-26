@@ -24,6 +24,7 @@
 #include "lcd.h"
 #include "system.h"
 
+#ifdef HAVE_LCD_COLOR
 #define LE16(x) (htole16(x))&0xff, ((htole16(x))>>8)&0xff
 #define LE32(x) (htole32(x))&0xff, ((htole32(x))>>8)&0xff, ((htole32(x))>>16)&0xff, ((htole32(x))>>24)&0xff
 /**
@@ -82,6 +83,7 @@ int save_bmp_file( char* filename, struct bitmap *bm, struct plugin_api* rb )
     rb->close( fh );
     return 1;
 }
+#endif
 
 /**
    Very simple image scale from src to dst (nearest neighbour).

@@ -22,10 +22,12 @@
 #include "lcd.h"
 #include "plugin.h"
 
+#ifdef HAVE_LCD_COLOR
 /**
  * Save bitmap to file
  */
 int save_bmp_file( char* filename, struct bitmap *bm, struct plugin_api* rb  );
+#endif
 
 /**
    Very simple image scale from src to dst (nearest neighbour).

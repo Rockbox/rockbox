@@ -25,7 +25,7 @@ picture.c
 xlcd_core.c
 xlcd_draw.c
 xlcd_scroll.c
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH>1
 bmp.c
 #endif
 #endif
