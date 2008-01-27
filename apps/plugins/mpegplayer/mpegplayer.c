@@ -234,6 +234,7 @@ enum wvs_bits
     WVS_REFRESH_RESUME     = 0x0020, /* Resume playback upon timeout */
     WVS_NODRAW             = 0x8000, /* OR bitflag - don't draw anything */
     WVS_SHOW               = 0x4000, /* OR bitflag - show the WVS */
+    WVS_HP_PAUSE           = 0x2000,
     WVS_HIDE               = 0x0000, /* hide the WVS (aid readability) */
     WVS_REFRESH_ALL        = 0x000f, /* Only immediate graphical elements */
 };
@@ -938,7 +939,12 @@ static void wvs_refresh(int hint)
 static void wvs_show(unsigned show)
 {
     if (((show ^ wvs.flags) & WVS_SHOW) == 0)
+    {
+        if (show & WVS_SHOW) {
+            wvs.hide_tick = *rb->current_tick + wvs.show_for;
+        }
         return;
+    }
 
     if (show & WVS_SHOW) {
         /* Clip away the part of video that is covered */
@@ -983,6 +989,12 @@ static void wvs_set_status(int status)
         if (draw)
             wvs_refresh(WVS_REFRESH_STATUS);
     }
+}
+
+/* Get the current status value */
+static int wvs_get_status(void)
+{
+    return wvs.status & WVS_STATUS_MASK;
 }
 
 /* Handle Fast-forward/Rewind keys using WPS settings (and some nicked code ;) */
@@ -1145,6 +1157,7 @@ static void wvs_set_volume(int delta)
     wvs_refresh(WVS_REFRESH_VOLUME);
 }
 
+/* Begin playback at the specified time */
 static int wvs_play(uint32_t time)
 {
     int retval;
@@ -1171,7 +1184,7 @@ static int wvs_halt(void)
 
     /* Coerce to STREAM_PLAYING if paused with a pending resume */
     if (status == STREAM_PAUSED) {
-        if (wvs.auto_refresh & WVS_REFRESH_RESUME)
+        if (wvs_get_status() == WVS_STATUS_PLAYING)
             status = STREAM_PLAYING;
     }
 
@@ -1213,6 +1226,7 @@ static void wvs_stop(void)
     uint32_t resume_time;
 
     wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
+    wvs_set_status(WVS_STATUS_STOPPED | WVS_NODRAW);
     wvs_show(WVS_HIDE | WVS_NODRAW);
 
     stream_stop();
@@ -1253,6 +1267,43 @@ static void wvs_seek(int btn)
     /* Tell engine to resume at that time */
     stream_seek(time, SEEK_SET);
 }
+
+#ifdef HAVE_HEADPHONE_DETECTION
+/* Handle SYS_PHONE_PLUGGED/UNPLUGGED */
+static void wvs_handle_phone_plug(bool inserted)
+{
+    if (rb->global_settings->unplug_mode == 0)
+        return;
+
+    /* Wait for any incomplete state transition to complete first */
+    stream_wait_status();
+
+    int status = wvs_status();
+
+    if (inserted) {
+        if (rb->global_settings->unplug_mode > 1) {
+            if (status == STREAM_PAUSED) {
+                backlight_force_on(rb);
+                wvs_resume();
+            }
+        }
+    } else {
+        if (status == STREAM_PLAYING) {
+            wvs_pause();
+            backlight_use_settings(rb);
+
+            if (stream_can_seek() && rb->global_settings->unplug_rw) {
+                stream_seek(-rb->global_settings->unplug_rw*TS_SECOND,
+                            SEEK_CUR);
+                wvs_schedule_refresh(WVS_REFRESH_VIDEO);
+                /* Update time display now */
+                wvs_update_time();
+                wvs_refresh(WVS_REFRESH_TIME);
+            }
+        }
+    }
+}
+#endif
 
 static void button_loop(void)
 {
@@ -1405,6 +1456,15 @@ static void button_loop(void)
             wvs_seek(button);
             break;
             } /* MPEG_RW: MPEG_FF: */
+
+#ifdef HAVE_HEADPHONE_DETECTION
+        case SYS_PHONE_PLUGGED:
+        case SYS_PHONE_UNPLUGGED:
+        {
+            wvs_handle_phone_plug(button == SYS_PHONE_PLUGGED);
+            break;
+            } /* SYS_PHONE_*: */
+#endif
 
         default:
         {

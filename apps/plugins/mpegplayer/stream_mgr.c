@@ -809,6 +809,13 @@ uint32_t stream_get_seek_time(uint32_t *start)
     return time;
 }
 
+/* Wait for a state transistion to complete */
+void stream_wait_status(void)
+{
+    stream_mgr_lock();
+    stream_mgr_unlock();
+}
+
 /* Returns the smallest file window that includes all active streams'
  * windows */
 static bool stream_get_window_callback(struct list_item *item,

@@ -137,6 +137,9 @@ static inline uint32_t stream_get_ticks(uint32_t *start)
 static inline int stream_status(void)
     { return stream_mgr.status; }
 
+/* Wait for a state transistion to complete */
+void stream_wait_status(void);
+
 /* Returns the playback length of the stream */
 static inline uint32_t stream_get_duration(void)
     { return str_parser.duration; }
