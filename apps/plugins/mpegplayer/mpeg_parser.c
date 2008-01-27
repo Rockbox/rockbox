@@ -679,13 +679,22 @@ static int parse_demux(struct stream *str, enum stream_parse_mode type)
         {
         case STREAM_PM_STREAMING:
             /* Has the end been reached already? */
-            if (str->state == SSTATE_END)
+            switch (str->state)
+            {
+            case SSTATE_PARSE: /* Expected case first if no jumptable */
+                /* Are we at the end of file? */
+                if (str->hdr.win_left < disk_buf.filesize)
+                    break;
+                str_end_of_stream(str);
                 return STREAM_DATA_END;
 
-            /* Are we at the end of file? */
-            if (str->hdr.win_left >= disk_buf.filesize)
-            {
+            case SSTATE_SYNC:
+                /* Is sync at the end of file? */
+                if (str->hdr.win_right < disk_buf.filesize)
+                    break;
                 str_end_of_stream(str);
+                /* Fall-through */
+            case SSTATE_END:
                 return STREAM_DATA_END;
             }
 
