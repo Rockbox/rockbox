@@ -489,4 +489,11 @@
 
 #endif /* NUM_CORES */
 
+#ifdef HAVE_HEADPHONE_DETECTION
+/* Timeout objects required if headphone detection is enabled */
+#ifndef INCLUDE_TIMEOUT_API
+#define INCLUDE_TIMEOUT_API
+#endif
+#endif /* HAVE_HEADPHONE_DETECTION */
+
 #endif /* __CONFIG_H__ */

@@ -76,6 +76,16 @@ int button_read_device(void)
     /* Only one button can be sensed at a time on the remote. */
     /* Need to filter the remote button because the ADC is so fast */
     remote_adc = adc_read(ADC_HPREMOTE);
+
+    if (remote_adc != ADC_READ_ERROR)
+    {
+        /* If there is nothing in the headphone socket, the ADC reads high */
+        if (remote_adc < 940)
+            headphones_detect = true;
+        else
+            headphones_detect = false;
+    }
+
     btn = remote_buttons[(remote_adc + 64) / 128];
     if (btn != lastbutton)
     {
@@ -136,14 +146,5 @@ int button_read_device(void)
 
 bool headphones_inserted(void)
 {
-    unsigned short remote_adc = adc_read(ADC_HPREMOTE);
-    if (remote_adc != ADC_READ_ERROR)
-    {
-        /* If there is nothing in the headphone socket, the ADC reads high */
-        if (remote_adc < 940)
-            headphones_detect = true;
-        else
-            headphones_detect = false;
-    }
     return headphones_detect;
 }

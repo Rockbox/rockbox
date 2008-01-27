@@ -61,7 +61,7 @@ static bool remote_filter_first_keypress;
 #endif
 #endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_HEADPHONE_DETECTION
-bool phones_present = false;
+static bool phones_present = false;
 #endif
 
 /* how long until repeat kicks in, in ticks */
@@ -77,6 +77,20 @@ bool phones_present = false;
 static int button_read(int *data);
 #else
 static int button_read(void);
+#endif
+
+#if defined(HAVE_HEADPHONE_DETECTION)
+static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
+/* This callback can be used for many different functions if needed -
+   just check to which object tmo points */
+static bool btn_detect_callback(struct timeout *tmo)
+{
+    /* Try to post only transistions */
+    const long id = tmo->data ? SYS_PHONE_PLUGGED : SYS_PHONE_UNPLUGGED;
+    queue_remove_from_head(&button_queue, id);
+    queue_post(&button_queue, id, 0);
+    return false;
+}
 #endif
 
 static void button_tick(void)
@@ -109,27 +123,20 @@ static void button_tick(void)
     }
 #endif
 
-#ifdef HAVE_HEADPHONE_DETECTION
-    if ( headphones_inserted() )
-    {
-        if (! phones_present )
-        {
-            queue_post(&button_queue, SYS_PHONE_PLUGGED, 0);
-            phones_present = true;
-        }
-    } else {
-        if ( phones_present )
-        {
-            queue_post(&button_queue, SYS_PHONE_UNPLUGGED, 0);
-            phones_present = false;
-        }
-    }
-#endif
-
 #ifdef HAVE_BUTTON_DATA
     btn = button_read(&data);
 #else
     btn = button_read();
+#endif
+
+#if defined(HAVE_HEADPHONE_DETECTION)
+    if (headphones_inserted() != phones_present)
+    {
+        /* Use the autoresetting oneshot to debounce the detection signal */
+        phones_present = !phones_present;
+        timeout_register(&hp_detect_timeout, btn_detect_callback,
+                         HZ, phones_present);
+    }
 #endif
 
     /* Find out if a key has been released */
@@ -369,13 +376,14 @@ intptr_t button_get_data(void)
 
 void button_init(void)
 {
+    /* Init used objects first */
+    queue_init(&button_queue, true);
+
 #ifdef HAVE_BUTTON_DATA
     int temp;
 #endif
     /* hardware inits */
     button_init_device();
-
-    queue_init(&button_queue, true);
 
 #ifdef HAVE_BUTTON_DATA
     button_read(&temp);
@@ -385,7 +393,6 @@ void button_init(void)
     lastbtn = button_read();
 #endif
     
-    tick_add_task(button_tick);
     reset_poweroff_timer();
 
 #ifdef HAVE_LCD_BITMAP
@@ -397,6 +404,9 @@ void button_init(void)
     remote_filter_first_keypress = false;
 #endif    
 #endif
+
+    /* Start polling last */
+    tick_add_task(button_tick);
 }
 
 #ifdef HAVE_LCD_BITMAP /* only bitmap displays can be flipped */
