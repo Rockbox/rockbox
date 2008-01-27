@@ -38,7 +38,6 @@ static bool initialized = false;
 static long next_yield = 0;
 #define MIN_YIELD_PERIOD 2000
 
-
 /* TCC780x NAND Flash Controller */
 
 #define NFC_CMD    (*(volatile unsigned long *)0xF0053000)
@@ -49,30 +48,30 @@ static long next_yield = 0;
 #define NFC_IREQ   (*(volatile unsigned long *)0xF0053060)
 #define NFC_RST    (*(volatile unsigned long *)0xF0053064)
 
+/* NFC_CTRL flags */
 #define NFC_16BIT (1<<26)
 #define NFC_CS0   (1<<23)
 #define NFC_CS1   (1<<22)
 #define NFC_READY (1<<20)
 
+/* Chip characteristics, initialised by nand_get_chip_info() */
 
-#if defined(COWON_D2)
-/*
-   ===== Temporary D2 testing code =====
+static int page_size       = 0;
+static int spare_size      = 0;
+static int pages_per_block = 0;
+static int total_blocks    = 0;
+static int total_pages     = 0;
+static int row_cycles      = 0;
+static int col_cycles      = 0;
+static int total_banks     = 0;
 
-   (assumes SAMSUNG K9LAG08UOM (2GB) in 1, 2 or 4 banks)
+/* Static page buffer */
 
-   Manufacturer Id: {0xec, 0xd5, 0x55, 0x25, 0x68}
+#define MAX_PAGE_SIZE  4096
+#define MAX_SPARE_SIZE 128
 
-*/
-#define PAGE_SIZE       2048
-#define SPARE_SIZE      64
-#define PAGES_PER_BLOCK 128
-#define TOTAL_BLOCKS    8192
-#define TOTAL_PAGES     (TOTAL_BLOCKS * PAGES_PER_BLOCK)
-#define COL_CYCLES      2
-#define ROW_CYCLES      3
+static int page_buf[(MAX_PAGE_SIZE+MAX_SPARE_SIZE)/4];
 
-static int page_buf[PAGE_SIZE/4];
 
 static void nand_chip_select(int chip)
 {
@@ -108,10 +107,9 @@ static void nand_chip_select(int chip)
     }
 }
 
+
 static void nand_read_id(int chip, unsigned char* id_buf)
 {
-    int i;
-
     /* Enable NFC bus clock */
     BCLKCTR |= DEV_NAND;
 
@@ -150,7 +148,7 @@ static void nand_read_id(int chip, unsigned char* id_buf)
 }
 
 
-static void nand_read_uid(int chip)
+static void nand_read_uid(int chip, unsigned int* uid_buf)
 {
     int i;
 
@@ -177,8 +175,8 @@ static void nand_read_uid(int chip)
     NFC_CMD = 0x00;
 
     /* Write row/column address */
-    for (i = 0; i < COL_CYCLES; i++) NFC_SADDR = 0;
-    for (i = 0; i < ROW_CYCLES; i++) NFC_SADDR = 0;
+    for (i = 0; i < col_cycles; i++) NFC_SADDR = 0;
+    for (i = 0; i < row_cycles; i++) NFC_SADDR = 0;
 
     /* End of read */
     NFC_CMD = 0x30;
@@ -189,7 +187,7 @@ static void nand_read_uid(int chip)
     /* Copy data to buffer (data repeats after 8 words) */
     for (i = 0; i < 8; i++)
     {
-        page_buf[i] = NFC_WDATA;
+        uid_buf[i] = NFC_WDATA;
     }
 
     /* Reset the chip back to normal mode */
@@ -225,14 +223,14 @@ static void nand_read(int chip, int row, int column, int size)
     NFC_CMD = 0x00;
 
     /* Write column address */
-    for (i = 0; i < COL_CYCLES; i++)
+    for (i = 0; i < col_cycles; i++)
     {
         NFC_SADDR = column & 0xFF;
         column = column >> 8;
     }
 
     /* Write row address */
-    for (i = 0; i < ROW_CYCLES; i++)
+    for (i = 0; i < row_cycles; i++)
     {
         NFC_SADDR = row & 0xFF;
         row = row >> 8;
@@ -258,56 +256,38 @@ static void nand_read(int chip, int row, int column, int size)
 
 
 /* TEMP testing function */
-#include <string.h>
 #include "lcd.h"
 
 extern int line;
-
+static unsigned char str_buf[MAX_PAGE_SIZE];
+    
 static void nand_test(void)
 {
     int i,j,row;
-    unsigned char id_buf[5];
-    unsigned char str_buf[PAGE_SIZE];
+    int pages_per_mb = 1048576/page_size;
 
-    /* Display ID codes & UID block for each bank */
-    for (i = 0; i < 4; i++)
-    {
-        printf("NAND bank %d:", i);
-
-        nand_read_id(i, id_buf);
-
-        printf("ID: 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x",
-                id_buf[0],id_buf[1],id_buf[2],id_buf[3],id_buf[4]);
-
-        nand_read_uid(i);
-
-        for (j = 0; j < 8; j += 4)
-        {
-            printf("0x%08x 0x%08x 0x%08x 0x%08x",
-                    page_buf[j],page_buf[j+1],page_buf[j+2],page_buf[j+3]);
-        }
-
-        line++;
-    }
+    printf("%d banks", total_banks);
+    printf("* %d pages", total_pages);
+    printf("* %d bytes per page", page_size);
 
     while (!button_read_device()) {};
 
     /* Now for fun, scan the raw pages for 'TAG' and display the contents */
 
     row = 0;
-    while (row < TOTAL_PAGES)
+    while (row < total_pages)
     {
         bool found = false;
         unsigned char* buf_ptr = (unsigned char*)page_buf;
 
         line = 0;
 
+        if (row % pages_per_mb == 0) printf("%dMb", row/pages_per_mb);
+        
         /* Read a page from chip 0 */
-        nand_read(0, row, 0, PAGE_SIZE);
+        nand_read(0, row, 0, page_size);
 
-        if (row % 512 == 0) printf("%dMb", row/512);
-
-        for (j = 0; j < PAGE_SIZE; j++)
+        for (j = 0; j < page_size; j++)
         {
             if (buf_ptr[j] == 'T' && buf_ptr[j+1] == 'A' && buf_ptr[j+2] == 'G')
                 found = true;
@@ -320,7 +300,7 @@ static void nand_test(void)
             printf("Row %d:", row);
 
             /* Copy ascii-readable parts out to a string */
-            for (i = 0; i < PAGE_SIZE; i++)
+            for (i = 0; i < page_size; i++)
             {
                 str_buf[i] = ' ';
                 if (buf_ptr[i] > 31 && buf_ptr[i] < 128)
@@ -347,7 +327,8 @@ static void nand_test(void)
             /* Alternate hex display code
             for (i = 0; i<112; i+=4)
             {
-                printf("0x%08x 0x%08x 0x%08x 0x%08x",buf[i],buf[i+1],buf[i+2],buf[i+3]);
+                printf("0x%08x 0x%08x 0x%08x 0x%08x",
+                       page_buf[i],page_buf[i+1],page_buf[i+2],page_buf[i+3]);
             }
             */
 
@@ -358,7 +339,101 @@ static void nand_test(void)
         row++;
     }
 }
-#endif
+
+
+static void nand_get_chip_info(void)
+{
+    bool found = false;
+    unsigned char manuf_id;
+    unsigned char id_buf[5];
+
+    /* Read chip id from bank 0 */
+    nand_read_id(0, id_buf);
+
+    manuf_id = id_buf[0];
+
+    switch (manuf_id)
+    {
+        case 0xEC:  /* SAMSUNG */
+
+            switch(id_buf[1]) /* Chip Id */
+            {
+                case 0xD5:  /* K9LAG08UOM */
+
+                    page_size       = 2048;
+                    spare_size      = 64;
+                    pages_per_block = 128;
+                    total_blocks    = 8192;
+                    col_cycles      = 2;
+                    row_cycles      = 3;
+
+                    found = true;
+                    break;
+
+                case 0xD7:  /* K9LBG08UOM */
+
+                    page_size       = 4096;
+                    spare_size      = 128;
+                    pages_per_block = 128;
+                    total_blocks    = 8192;
+                    col_cycles      = 2;
+                    row_cycles      = 3;
+
+                    found = true;
+                    break;
+            }
+            break;
+    }
+
+    if (!found)
+    {
+        panicf("Unknown NAND: 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x",
+                id_buf[0],id_buf[1],id_buf[2],id_buf[3],id_buf[4]);
+    }
+
+    total_pages = total_blocks * pages_per_block;
+
+    /* Establish how many banks are present */
+
+    nand_read_id(1, id_buf);
+
+    if (id_buf[0] == manuf_id)
+    {
+        /* Bank 1 is populated, now check if banks 2/3 are valid */
+        nand_read_id(2, id_buf);
+
+        if (id_buf[0] == manuf_id)
+        {
+            /* Bank 2 returned matching id - check if 2/3 are shadowing 0/1 */
+            unsigned int uid_buf0[8];
+            unsigned int uid_buf2[8];
+
+            nand_read_uid(0, uid_buf0);
+            nand_read_uid(2, uid_buf2);
+
+            if (memcmp(uid_buf0, uid_buf2, 32) == 0)
+            {
+                /* UIDs match, assume banks 2/3 are shadowing 0/1 */
+                total_banks = 2;
+            }
+            else
+            {
+                /* UIDs differ, assume banks 2/3 are valid */
+                total_banks = 4;
+            }
+        }
+        else
+        {
+            /* Bank 2 returned differing id - assume 2/3 are junk */
+            total_banks = 2;
+        }
+    }
+    else
+    {
+        /* Bank 1 returned differing id - assume it is junk */
+        total_banks = 1;
+    }
+}
 
 
 /* API Functions */
@@ -425,22 +500,24 @@ int ata_soft_reset(void)
 
 void ata_enable(bool on)
 {
-    #warning function not implemented
+    /* null - flash controller is enabled/disabled as needed. */
     (void)on;
 }
 
 int ata_init(void)
 {
-    #warning function not implemented
+    if (!initialized)
+    {
+        /* Get chip characteristics and number of banks */
+        nand_get_chip_info();
 
-    /* This needs to:
-        a) establish how many banks are present
-            (using nand_read_id() and nand_read_uid() above)
-        b) scan all banks for bad blocks
-        c) use this info to build a physical->logical address translation
-            (using an as yet unknown scheme)
-     */
+        /* TODO: Scan all banks for bad blocks */
 
+        /* TODO: Build physical->logical address translation */
+        
+        initialized = true;
+    }
+    
     /* TEMP - print out some diagnostics */
     nand_test();
 
