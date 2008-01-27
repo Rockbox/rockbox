@@ -47,6 +47,13 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_SCROLL_UP   BUTTON_VOL_UP
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
+#define MPEG_START_TIME_RC_SELECT      (BUTTON_RC_PLAY | BUTTON_REL)
+#define MPEG_START_TIME_RC_LEFT        BUTTON_RC_REW
+#define MPEG_START_TIME_RC_RIGHT       BUTTON_RC_FF
+#define MPEG_START_TIME_RC_UP          BUTTON_RC_VOL_UP
+#define MPEG_START_TIME_RC_DOWN        BUTTON_RC_VOL_DOWN
+#define MPEG_START_TIME_RC_EXIT        (BUTTON_RC_PLAY | BUTTON_REPEAT)
+
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define MPEG_START_TIME_SELECT      BUTTON_PLAY
 #define MPEG_START_TIME_LEFT        BUTTON_LEFT
@@ -439,12 +446,20 @@ static int get_start_time(uint32_t duration)
         /* Coarse (1 minute) control */
         case MPEG_START_TIME_DOWN:
         case MPEG_START_TIME_DOWN | BUTTON_REPEAT:
+#if MPEG_START_TIME_RC_DOWN
+        case MPEG_START_TIME_RC_DOWN:
+        case MPEG_START_TIME_RC_DOWN | BUTTON_REPEAT:
+#endif
             resume_time = increment_time(resume_time, -60*TS_SECOND, duration);
             slider_state = state0;
             break;
 
         case MPEG_START_TIME_UP:
         case MPEG_START_TIME_UP | BUTTON_REPEAT:
+#if MPEG_START_TIME_RC_UP
+        case MPEG_START_TIME_RC_UP:
+        case MPEG_START_TIME_RC_UP | BUTTON_REPEAT:
+#endif
             resume_time = increment_time(resume_time, 60*TS_SECOND, duration);
             slider_state = state0;
             break;
@@ -452,6 +467,10 @@ static int get_start_time(uint32_t duration)
         /* Fine (1 second) control */
         case MPEG_START_TIME_LEFT:
         case MPEG_START_TIME_LEFT | BUTTON_REPEAT:
+#if MPEG_START_TIME_RC_LEFT
+        case MPEG_START_TIME_RC_LEFT:
+        case MPEG_START_TIME_RC_LEFT | BUTTON_REPEAT:
+#endif
 #ifdef MPEG_START_TIME_SCROLL_UP
         case MPEG_START_TIME_SCROLL_UP:
         case MPEG_START_TIME_SCROLL_UP | BUTTON_REPEAT:
@@ -462,6 +481,10 @@ static int get_start_time(uint32_t duration)
 
         case MPEG_START_TIME_RIGHT:
         case MPEG_START_TIME_RIGHT | BUTTON_REPEAT:
+#if MPEG_START_TIME_RC_RIGHT
+        case MPEG_START_TIME_RC_RIGHT:
+        case MPEG_START_TIME_RC_RIGHT | BUTTON_REPEAT:
+#endif
 #ifdef MPEG_START_TIME_SCROLL_DOWN
         case MPEG_START_TIME_SCROLL_DOWN:
         case MPEG_START_TIME_SCROLL_DOWN | BUTTON_REPEAT:
@@ -471,12 +494,18 @@ static int get_start_time(uint32_t duration)
             break;
 
         case MPEG_START_TIME_SELECT:
+#if MPEG_START_TIME_RC_SELECT
+        case MPEG_START_TIME_RC_SELECT:
+#endif
             settings.resume_time = resume_time;
             button = MPEG_START_SEEK;
             slider_state = state9;
             break;
 
         case MPEG_START_TIME_EXIT:
+#if MPEG_START_TIME_RC_EXIT
+        case MPEG_START_TIME_RC_EXIT:
+#endif
             button = MPEG_START_EXIT;
             slider_state = state9;
             break;

@@ -149,6 +149,13 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_VOLUP2     BUTTON_VOL_UP
 #define MPEG_RW         BUTTON_UP
 #define MPEG_FF         BUTTON_DOWN
+#define MPEG_RC_MENU    BUTTON_RC_DSP
+#define MPEG_RC_STOP    (BUTTON_RC_PLAY | BUTTON_REPEAT)
+#define MPEG_RC_PAUSE   (BUTTON_RC_PLAY | BUTTON_REL)
+#define MPEG_RC_VOLDOWN BUTTON_RC_VOL_DOWN
+#define MPEG_RC_VOLUP   BUTTON_RC_VOL_UP
+#define MPEG_RC_RW      BUTTON_RC_REW
+#define MPEG_RC_FF      BUTTON_RC_FF
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define MPEG_MENU       BUTTON_LEFT
@@ -999,9 +1006,15 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
     switch (btn)
     {
     case MPEG_FF:
+#ifdef MPEG_RC_FF
+    case MPEG_RC_FF:
+#endif
         wvs_set_status(WVS_STATUS_FF);
         break;
     case MPEG_RW:
+#ifdef MPEG_RC_RW
+    case MPEG_RC_RW:
+#endif
         wvs_set_status(WVS_STATUS_RW);
         break;
     default:
@@ -1023,10 +1036,18 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
 
         case MPEG_FF | BUTTON_REPEAT:
         case MPEG_RW | BUTTON_REPEAT:
+#ifdef MPEG_RC_FF
+        case MPEG_RC_FF | BUTTON_REPEAT:
+        case MPEG_RC_RW | BUTTON_REPEAT:
+#endif
             break;
 
         case MPEG_FF | BUTTON_REL:
         case MPEG_RW | BUTTON_REL:
+#ifdef MPEG_RC_FF
+        case MPEG_RC_FF | BUTTON_REL:
+        case MPEG_RC_RW | BUTTON_REL:
+#endif
             if (wvs.status == WVS_STATUS_FF)
                 time += ff_rw_count;
             else if (wvs.status == WVS_STATUS_RW)
@@ -1275,6 +1296,10 @@ static void button_loop(void)
         case MPEG_VOLUP2:
         case MPEG_VOLUP2|BUTTON_REPEAT:
 #endif
+#ifdef MPEG_RC_VOLUP
+        case MPEG_RC_VOLUP:
+        case MPEG_RC_VOLUP|BUTTON_REPEAT:
+#endif
         {
             wvs_set_volume(+1);
             break;
@@ -1286,12 +1311,19 @@ static void button_loop(void)
         case MPEG_VOLDOWN2:
         case MPEG_VOLDOWN2|BUTTON_REPEAT:
 #endif
+#ifdef MPEG_RC_VOLDOWN
+        case MPEG_RC_VOLDOWN:
+        case MPEG_RC_VOLDOWN|BUTTON_REPEAT:
+#endif
         {
             wvs_set_volume(-1);
             break;
             } /* MPEG_VOLDOWN*: */
 
         case MPEG_MENU:
+#ifdef MPEG_RC_MENU
+        case MPEG_RC_MENU:
+#endif
         {
             int state = wvs_halt(); /* save previous state */
             int result;
@@ -1330,6 +1362,9 @@ static void button_loop(void)
             } /* MPEG_MENU: */
 
         case MPEG_STOP:
+#ifdef MPEG_RC_STOP
+        case MPEG_RC_STOP:
+#endif
         case ACTION_STD_CANCEL:
         {
             wvs_stop();
@@ -1339,6 +1374,9 @@ static void button_loop(void)
         case MPEG_PAUSE:
 #ifdef MPEG_PAUSE2
         case MPEG_PAUSE2:
+#endif
+#ifdef MPEG_RC_PAUSE
+        case MPEG_RC_PAUSE:
 #endif
         {
             int status = wvs_status();
@@ -1359,6 +1397,10 @@ static void button_loop(void)
 
         case MPEG_RW:
         case MPEG_FF:
+#ifdef MPEG_RC_RW
+        case MPEG_RC_RW:
+        case MPEG_RC_FF:
+#endif
         {
             wvs_seek(button);
             break;
