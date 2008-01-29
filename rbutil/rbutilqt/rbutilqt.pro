@@ -48,7 +48,9 @@ SOURCES += rbutilqt.cpp \
  browseof.cpp \
  preview.cpp \
  encoders.cpp \
+ encodersgui.cpp \
  tts.cpp \
+ ttsgui.cpp \
  ../../tools/wavtrim.c \
  ../../tools/voicefont.c \
  voicefile.cpp \
@@ -91,7 +93,9 @@ HEADERS += rbutilqt.h \
  browseof.h \
  preview.h \
  encoders.h \
+ encodersgui.h \
  tts.h \
+ ttsgui.h \
  ../../tools/wavtrim.h \
  ../../tools/voicefont.h \
  voicefile.h \

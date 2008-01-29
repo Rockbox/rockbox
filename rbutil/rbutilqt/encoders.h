@@ -22,8 +22,6 @@
  
 #include <QtGui>
  
-#include "ui_rbspeexcfgfrm.h"
-#include "ui_encexescfgfrm.h"
 #include "rbsettings.h"
 
 extern "C"
@@ -78,14 +76,7 @@ public:
     virtual void showCfg();
     virtual bool configOk();
     
-public slots:
-    virtual void accept(void);
-    virtual void reject(void);
-    virtual void reset(void);
-    void browse(void);
-
 private:
-    Ui::EncExesCfgFrm ui;
     QString m_name;
     QString m_EncExec;
     QString m_EncOpts;
@@ -104,13 +95,7 @@ public:
     virtual void showCfg();
     virtual bool configOk();
 
-public slots:
-    virtual void accept(void);
-    virtual void reject(void);
-    virtual void reset(void);
-
 private:
-    Ui::RbSpeexCfgFrm ui;
     float quality;
     float volume;
     int complexity;

@@ -272,82 +272,82 @@ int RbSettings::wavtrimTh()
 
 QString RbSettings::ttsPath(QString tts)
 {
-    devices->beginGroup(tts);
-    QString path = devices->value("ttspath").toString();
-    devices->endGroup();
+    userSettings->beginGroup(tts);
+    QString path = userSettings->value("ttspath").toString();
+    userSettings->endGroup();
     return path;
     
 }
 QString RbSettings::ttsOptions(QString tts)
 {
-    devices->beginGroup(tts);
-    QString op = devices->value("ttsoptions").toString();
-    devices->endGroup();
+    userSettings->beginGroup(tts);
+    QString op = userSettings->value("ttsoptions").toString();
+    userSettings->endGroup();
     return op;
 }
 QString RbSettings::ttsVoice(QString tts)
 {
-    devices->beginGroup(tts);
-    QString op = devices->value("ttsvoice").toString();
-    devices->endGroup();
+    userSettings->beginGroup(tts);
+    QString op = userSettings->value("ttsvoice").toString();
+    userSettings->endGroup();
     return op;
 }
 int RbSettings::ttsSpeed(QString tts)
 {
-    devices->beginGroup(tts);
-    int sp = devices->value("ttsspeed",0).toInt();
-    devices->endGroup();
+    userSettings->beginGroup(tts);
+    int sp = userSettings->value("ttsspeed",0).toInt();
+    userSettings->endGroup();
     return sp;
 }
 QString RbSettings::ttsLang(QString tts)
 {
-    devices->beginGroup(tts);
-    QString op = devices->value("ttslanguage").toString();
-    devices->endGroup();
+    userSettings->beginGroup(tts);
+    QString op = userSettings->value("ttslanguage").toString();
+    userSettings->endGroup();
     return op;
 }
 
 QString RbSettings::encoderPath(QString enc)
 {
-    devices->beginGroup(enc);
-    QString path = devices->value("encoderpath").toString();
-    devices->endGroup();
+    userSettings->beginGroup(enc);
+    QString path = userSettings->value("encoderpath").toString();
+    userSettings->endGroup();
     return path;
 }
 QString RbSettings::encoderOptions(QString enc)
 {
-    devices->beginGroup(enc);
-    QString op = devices->value("encoderpath").toString();
-    devices->endGroup();
+    userSettings->beginGroup(enc);
+    QString op = userSettings->value("encoderpath").toString();
+    userSettings->endGroup();
     return op;
 }
 
 double RbSettings::encoderQuality(QString enc)
 {
-    devices->beginGroup(enc);
-    double q = devices->value("quality",8.f).toDouble();
-    devices->endGroup();
+    userSettings->beginGroup(enc);
+    double q =userSettings->value("quality",8.f).toDouble();
+    userSettings->endGroup();
     return q;
 }
 int RbSettings::encoderComplexity(QString enc)
 {
-    devices->beginGroup(enc);
-    int c = devices->value("complexity",1.f).toInt();
-    devices->endGroup();
+    userSettings->beginGroup(enc);
+    int c = userSettings->value("complexity",1.f).toInt();
+    userSettings->endGroup();
     return c;
 }
 double RbSettings::encoderVolume(QString enc)
 {
-    devices->beginGroup(enc);
-    double v = devices->value("volume",10).toDouble();
-    devices->endGroup();
+    userSettings->beginGroup(enc);
+    double v = userSettings->value("volume",10).toDouble();
+    userSettings->endGroup();
     return v;
 }
 bool RbSettings::encoderNarrowband(QString enc)
 {
-    devices->beginGroup(enc);
-    bool nb = devices->value("narrowband",false).toBool();
-    devices->endGroup();
+    userSettings->beginGroup(enc);
+    bool nb = userSettings->value("narrowband",false).toBool();
+    userSettings->endGroup();
     return nb;
 }
  

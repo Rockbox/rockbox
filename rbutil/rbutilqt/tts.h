@@ -21,11 +21,13 @@
 #ifndef TTS_H
 #define TTS_H
 
-#include "ui_ttsexescfgfrm.h"
-#include "ui_sapicfgfrm.h"
+
 #include "rbsettings.h"
 #include <QtGui>
 
+#ifndef CONSOLE
+#include "ttsgui.h"
+#endif
 
 class TTSBase;
 
@@ -37,11 +39,11 @@ TTSBase* getTTS(QString ttsname);
 QStringList getTTSList();
 
 
-class TTSBase : public QDialog
+class TTSBase : public QObject
 {
     Q_OBJECT
 public:
-    TTSBase(QWidget *parent );
+    TTSBase();
     virtual bool voice(QString text,QString wavfile) {return false;}
     virtual bool start(QString *errStr){return false;}
     virtual bool stop(){return false;}
@@ -63,23 +65,16 @@ class TTSSapi : public TTSBase
 {
  Q_OBJECT
 public:
-    TTSSapi(QWidget *parent = NULL);
+    TTSSapi();
     virtual bool voice(QString text,QString wavfile);
     virtual bool start(QString *errStr);
     virtual bool stop();
     virtual void showCfg();
     virtual bool configOk();
-    
-public slots:
-    virtual void accept(void);
-    virtual void reject(void);
-    virtual void reset(void);
-     
-    void updateVoices(QString language); 
+   
+   QStringList getVoiceList(QString language);
 private:
-    QStringList getVoiceList(QString language);
-
-    Ui::SapiCfgFrm ui;
+    
     QProcess* voicescript;
     
     QString defaultLanguage;
@@ -97,21 +92,17 @@ class TTSExes : public TTSBase
 {
  Q_OBJECT
 public:
-    TTSExes(QString name,QWidget *parent = NULL);
+    TTSExes(QString name);
     virtual bool voice(QString text,QString wavfile);
     virtual bool start(QString *errStr);
     virtual bool stop() {return true;}
     virtual void showCfg();
     virtual bool configOk();
    
-public slots:
-    virtual void accept(void);
-    virtual void reject(void);
-    virtual void reset(void); 
-    void browse(void);
+
     
 private:
-    Ui::TTSExesCfgFrm ui;
+
     QString m_name;
     QString m_TTSexec;
     QString m_TTSOpts;
