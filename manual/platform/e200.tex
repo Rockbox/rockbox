@@ -37,15 +37,15 @@
 \newcommand{\ButtonDown}{\btnfnt{Submenu}}
 \newcommand{\ButtonSelect}{\btnfnt{Select}}
 \newcommand{\ButtonPower}{\btnfnt{Power}}
-\newcommand{\ButtonScrollUp}{\btnfnt{Scroll Up}}
-\newcommand{\ButtonScrollDown}{\btnfnt{Scroll Down}}
+\newcommand{\ButtonScrollBack}{\btnfnt{Scroll Backward}}
+\newcommand{\ButtonScrollFwd}{\btnfnt{Scroll Forward}}
 \newcommand{\ButtonHold}{\btnfnt{Hold}}
 
 %Button actions, standard context
-\newcommand{\ActionStdPrev}{\ButtonScrollUp}
-\newcommand{\ActionStdPrevRepeat}{Long \ButtonScrollUp}
-\newcommand{\ActionStdNext}{\ButtonScrollDown}
-\newcommand{\ActionStdNextRepeat}{Long \ButtonScrollDown}
+\newcommand{\ActionStdPrev}{\ButtonScrollBack}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonScrollBack}
+\newcommand{\ActionStdNext}{\ButtonScrollFwd}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonScrollFwd}
 \newcommand{\ActionStdCancel}{\ButtonLeft}
 \newcommand{\ActionStdContext}{Long \ButtonSelect}
 \newcommand{\ActionStdQuickScreen}{Long \ButtonDown}
@@ -61,8 +61,8 @@
 \newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
 
 \newcommand{\ActionWpsStop}{\ButtonPower}
-\newcommand{\ActionWpsVolDown}{\ButtonScrollDown}
-\newcommand{\ActionWpsVolUp}{\ButtonScrollUp}
+\newcommand{\ActionWpsVolDown}{\ButtonScrollFwd}
+\newcommand{\ActionWpsVolUp}{\ButtonScrollBack}
 
 \newcommand{\ActionWpsQuickScreen}{Long \ButtonDown}
 \newcommand{\ActionWpsMenu}{\ButtonDown}
@@ -83,8 +83,8 @@
 \newcommand{\ActionYesNoAccept}{\ButtonSelect}
 
 %Button actions, Setting context
-\newcommand{\ActionSettingInc}{\ButtonScrollUp}
-\newcommand{\ActionSettingDec}{\ButtonScrollDown}
+\newcommand{\ActionSettingInc}{\ButtonScrollBack}
+\newcommand{\ActionSettingDec}{\ButtonScrollFwd}
 
 %Button actions, Virtual Keyboard Context
 \newcommand{\ActionKbdLeft}{\ButtonLeft}
@@ -92,8 +92,8 @@
 \newcommand{\ActionKbdSelect}{\ButtonSelect}
 \newcommand{\ActionKbdDone}{\ButtonUp}
 \newcommand{\ActionKbdAbort}{\ButtonPower}
-\newcommand{\ActionKbdUp}{\ButtonScrollUp}
-\newcommand{\ActionKbdDown}{\ButtonScrollDown}
+\newcommand{\ActionKbdUp}{\ButtonScrollBack}
+\newcommand{\ActionKbdDown}{\ButtonScrollFwd}
 \newcommand{\ActionKbdCursorLeft}{\ButtonRec{} + \ButtonLeft}
 \newcommand{\ActionKbdCursorRight}{\ButtonRec{} + \ButtonRight}
 \newcommand{\ActionKbdBackSpace}{\ButtonDown}
@@ -101,10 +101,10 @@
 
 %Button actions, Pitch Screen context
 \newcommand{\ActionPsToggleMode}{\ButtonRec}
-\newcommand{\ActionPsIncSmall}{\ButtonScrollUp}
-\newcommand{\ActionPsIncBig}{Long \ButtonScrollUp}
-\newcommand{\ActionPsDecSmall}{\ButtonScrollDown}
-\newcommand{\ActionPsDecBig}{Long \ButtonScrollDown}
+\newcommand{\ActionPsIncSmall}{\ButtonScrollBack}
+\newcommand{\ActionPsIncBig}{Long \ButtonScrollBack}
+\newcommand{\ActionPsDecSmall}{\ButtonScrollFwd}
+\newcommand{\ActionPsDecBig}{Long \ButtonScrollFwd}
 \newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
 \newcommand{\ActionPsNudgeRight}{\ButtonRight}
 \newcommand{\ActionPsReset}{\ButtonSelect}
