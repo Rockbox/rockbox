@@ -74,6 +74,7 @@ struct opt_items {
 #define CODECS_DIR  ROCKBOX_DIR "/codecs"
 #define RECPRESETS_DIR  ROCKBOX_DIR "/recpresets"
 #define FMPRESET_PATH ROCKBOX_DIR "/fmpresets"
+#define PLAYLIST_CATALOG_DEFAULT_DIR "/Playlists"
 
 #define VIEWERS_CONFIG      ROCKBOX_DIR "/viewers.config"
 #define CONFIGFILE          ROCKBOX_DIR "/config.cfg"
@@ -723,6 +724,7 @@ struct user_settings
     int keyclick; /* keyclick volume */
     int keyclick_repeats; /* keyclick on repeats */
 #endif
+    unsigned char playlist_catalog_dir[MAX_FILENAME+1];
 };
 
 /** global variables **/

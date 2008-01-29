@@ -40,8 +40,6 @@
 #include "filetypes.h"
 #include "debug.h"
 
-#define PLAYLIST_CATALOG_CFG ROCKBOX_DIR "/playlist_catalog.config"
-#define PLAYLIST_CATALOG_DEFAULT_DIR "/Playlists"
 #define MAX_PLAYLISTS 400
 #define PLAYLIST_DISPLAY_COUNT 10
 
@@ -54,8 +52,7 @@ struct add_track_context {
 /* keep track of most recently used playlist */
 static char most_recent_playlist[MAX_PATH];
 
-/* directory where our playlists our stored (configured in
-   PLAYLIST_CATALOG_CFG) */
+/* directory where our playlists our stored */
 static char playlist_dir[MAX_PATH];
 static int  playlist_dir_length;
 static bool playlist_dir_exists = false;
@@ -67,31 +64,15 @@ static int initialize_catalog(void)
 
     if (!initialized)
     {
-        int f;
         DIR* dir;
         bool default_dir = true;
 
-        f = open(PLAYLIST_CATALOG_CFG, O_RDONLY);
-        if (f >= 0)
+        
+        /* directory config is of the format: "dir: /path/to/dir" */
+        if (global_settings.playlist_catalog_dir[0])
         {
-            char buf[MAX_PATH+5];
-
-            while (read_line(f, buf, sizeof(buf)))
-            {
-                char* name;
-                char* value;
-
-                /* directory config is of the format: "dir: /path/to/dir" */
-                if (settings_parseline(buf, &name, &value) &&
-                    !strncasecmp(name, "dir:", strlen(name)) &&
-                    strlen(value) > 0)
-                {
-                    strncpy(playlist_dir, value, strlen(value));
-                    default_dir = false;
-                }
-            }
-
-            close(f);
+            strcpy(playlist_dir, global_settings.playlist_catalog_dir);
+            default_dir = false;
         }
 
         /* fall back to default directory if no or invalid config */

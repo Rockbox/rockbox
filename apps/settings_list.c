@@ -1187,6 +1187,8 @@ const struct settings_list settings[] = {
         ID2P(LANG_OFF), ID2P(LANG_WEAK), ID2P(LANG_MODERATE), ID2P(LANG_STRONG)),
     OFFON_SETTING(0, keyclick_repeats, LANG_KEYCLICK_REPEATS, false, "keyclick repeats", NULL),
 #endif /* CONFIG_CODEC == SWCODEC */
+    FILENAME_SETTING(0, playlist_catalog_dir, "playlist catalog directory",
+                    PLAYLIST_CATALOG_DEFAULT_DIR, "", "", MAX_FILENAME+1),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
