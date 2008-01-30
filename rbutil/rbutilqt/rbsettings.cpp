@@ -32,13 +32,13 @@ void RbSettings::open()
     if(config.isFile()) 
     {
         userSettings = new QSettings(qApp->applicationDirPath() + "/RockboxUtility.ini",
-            QSettings::IniFormat, 0);
+            QSettings::IniFormat, this);
         qDebug() << "config: portable";
     }
     else
     {
         userSettings = new QSettings(QSettings::IniFormat,
-            QSettings::UserScope, "rockbox.org", "RockboxUtility");
+            QSettings::UserScope, "rockbox.org", "RockboxUtility",this);
         qDebug() << "config: system";
     }
 }

@@ -122,7 +122,7 @@ EncRbSpeexGui::EncRbSpeexGui(QDialog* parent) : QDialog(parent)
 
 }
 
-void EncRbSpeexGui::showCfg(float defQ,float defV,float defC, bool defB)
+void EncRbSpeexGui::showCfg(float defQ,float defV,int defC, bool defB)
 {
     defaultQuality =defQ;
     defaultVolume = defV;

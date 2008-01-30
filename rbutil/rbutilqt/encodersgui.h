@@ -55,7 +55,7 @@ class EncRbSpeexGui : public QDialog
 public:
     EncRbSpeexGui(QDialog* parent = NULL);
     
-    void showCfg(float defQ,float defV,float defC, bool defB);
+    void showCfg(float defQ,float defV,int defC, bool defB);
     void setCfg(RbSettings* sett){settings = sett;}
 
 public slots:
