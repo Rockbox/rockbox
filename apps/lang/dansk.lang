@@ -11539,3 +11539,37 @@
     *: "Gem lydindstillinger"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings men
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Tastaturtoner"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Tastaturtoner"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings men
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Tastaturtonegentagelser"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Tastaturtonegentagelser"
+  </voice>
+</phrase>
