@@ -593,7 +593,6 @@ matrix_normal.bmp
 #else
     rockboxlogo.91x32x2.bmp
 #endif
-#endif
 
 #elif LCD_DEPTH == 1
 #if (LCD_WIDTH > 112)
