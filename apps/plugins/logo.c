@@ -32,7 +32,7 @@ PLUGIN_HEADER
 #define REMOTE_LOGO_WIDTH 91
 #define REMOTE_LOGO_HEIGHT 32
 #define REMOTE_LOGO remote_rockboxlogo
-extern const fb_data remote_rockboxlogo[];
+extern const fb_remote_data remote_rockboxlogo[];
 #endif /* HAVE_REMOTE_LCD */
 
 #if LCD_DEPTH == 16
