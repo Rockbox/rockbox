@@ -15,3 +15,10 @@ clock_smalldigits_remote.112x64x1.bmp
 
 clock_segments_remote.112x64x1.bmp
 clock_smallsegments_remote.112x64x1.bmp
+
+/* Logo */
+#if (LCD_REMOTE_DEPTH == 1)
+    remote_rockboxlogo.91x32x1.bmp
+#elif (LCD_REMOTE_DEPTH == 2)
+    remote_rockboxlogo.91x32x2.bmp
+#endif

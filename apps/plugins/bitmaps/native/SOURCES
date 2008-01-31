@@ -577,5 +577,32 @@ matrix_normal.bmp
     sliding_puzzle.80x64x1.bmp
 #endif
 
+/* Logo */
+#if LCD_DEPTH == 16
+#if (LCD_WIDTH >= 320)
+    rockboxlogo.220x68x16.bmp
+#elif (LCD_WIDTH > 160)
+    rockboxlogo.128x40x16.bmp
+#else
+    rockboxlogo.90x28x16.bmp
+#endif
+
+#elif LCD_DEPTH == 2
+#if (LCD_WIDTH > 138)
+    rockboxlogo.138x46x2.bmp
+#else
+    rockboxlogo.91x32x2.bmp
+#endif
+#endif
+
+#elif LCD_DEPTH == 1
+#if (LCD_WIDTH > 112)
+    /* Such a screen isn't currently in any target */
+    rockboxlogo.112x30x1.bmp
+#else
+    rockboxlogo.91x32x1.bmp
+#endif
+#endif
+
 
 #endif /* HAVE_LCD_BITMAP */
