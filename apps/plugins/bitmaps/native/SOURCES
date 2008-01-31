@@ -526,8 +526,8 @@ superdom_boarditems.240x320x16.bmp
 #endif
 #endif
 
+/* Matrix */
 #if LCD_DEPTH > 1
-/* matrix */
 matrix_bold.bmp
 matrix_normal.bmp
 #endif
@@ -546,23 +546,34 @@ matrix_normal.bmp
 #endif
 #endif
 
-#if defined(HAVE_LCD_COLOR)
-#if (LCD_WIDTH==132 && LCD_HEIGHT==80)
+/* Sliding puzzle */
+#if (LCD_WIDTH != LCD_HEIGHT)
+#define SMALLER_DIMENSION ((LCD_WIDTH < LCD_HEIGHT) ? LCD_WIDTH : LCD_HEIGHT)
+#else /* 5/6GB H10 with square display */
+#define SMALLER_DIMENSION (LCD_HEIGHT - 18)
+#endif
+
+#if defined HAVE_LCD_COLOR
+#if SMALLER_DIMENSION <= 80
     sliding_puzzle.80x80x16.bmp
-#elif (LCD_WIDTH==128 || LCD_HEIGHT==128)
+#elif SMALLER_DIMENSION <= 112
+    sliding_puzzle.110x110x16.bmp
+#elif SMALLER_DIMENSION <= 128
     sliding_puzzle.128x128x16.bmp
-#elif (LCD_WIDTH==176 || LCD_HEIGHT==176)
+#elif SMALLER_DIMENSION <= 132
+    sliding_puzzle.132x132x16.bmp
+#elif SMALLER_DIMENSION <= 176
     sliding_puzzle.176x176x16.bmp
-#elif (LCD_WIDTH==240 || LCD_HEIGHT==240)
+#elif SMALLER_DIMENSION <= 240
     sliding_puzzle.240x240x16.bmp
 #endif
-#elif (LCD_DEPTH>1)
-#if (LCD_WIDTH==110 || LCD_HEIGHT==110)
+#elif (LCD_DEPTH > 1)
+#if SMALLER_DIMENSION <= 110
     sliding_puzzle.110x110x2.bmp
-#elif (LCD_WIDTH==128 || LCD_HEIGHT==128)
+#elif SMALLER_DIMENSION <= 128
     sliding_puzzle.128x128x2.bmp
 #endif
-#elif (LCD_WIDTH>=80 && LCD_HEIGHT==64)
+#else /* mono targets, one size currently */
     sliding_puzzle.80x64x1.bmp
 #endif
 

@@ -95,16 +95,17 @@ PLUGIN_HEADER
 
 #endif
 
+
+#include "sliding_puzzle.h"
+#define IMAGE_WIDTH BMPWIDTH_sliding_puzzle
+#define IMAGE_HEIGHT BMPHEIGHT_sliding_puzzle
+#define IMAGE_SIZE IMAGE_WIDTH
+
 static struct plugin_api* rb;
 #if LCD_DEPTH==1
-/* for recorder, use rectangular image, 5x4 puzzle */
+/* for Archos, use rectangular image, 5x4 puzzle */
 #define SPOTS_X 5
 #define SPOTS_Y 4
-#define SPOTS_WIDTH 16
-#define SPOTS_HEIGHT 16
-#define IMAGE_WIDTH 80
-#define IMAGE_HEIGHT 64
-#define IMAGE_SIZE 80
 #else
 /* for other targets, use a square image, 4x4 puzzle
    Puzzle image dimension is min(lcd_height,lcd_width)
@@ -113,15 +114,12 @@ static struct plugin_api* rb;
    and SPOTS_Y, otherwise lcd_bitmap_part stride won't be correct */
 #define SPOTS_X 4
 #define SPOTS_Y 4
-#define IMAGE_SIZE ( (LCD_WIDTH<LCD_HEIGHT)?LCD_WIDTH:LCD_HEIGHT )
-#define IMAGE_WIDTH IMAGE_SIZE
-#define IMAGE_HEIGHT IMAGE_SIZE
-#define SPOTS_WIDTH (IMAGE_WIDTH/SPOTS_X)
-#define SPOTS_HEIGHT (IMAGE_HEIGHT/SPOTS_Y)
 #endif
 
-#define NUM_SPOTS (SPOTS_X*SPOTS_Y)
-#define HOLE_ID (NUM_SPOTS)
+#define SPOTS_WIDTH  (IMAGE_WIDTH / SPOTS_X)
+#define SPOTS_HEIGHT (IMAGE_HEIGHT / SPOTS_Y)
+#define NUM_SPOTS    (SPOTS_X*SPOTS_Y)
+#define HOLE_ID      (NUM_SPOTS)
 #define INITIAL_HOLE (HOLE_ID-1)
 
 enum picmodes
