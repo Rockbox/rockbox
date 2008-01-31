@@ -29,26 +29,17 @@ PLUGIN_HEADER
 #ifdef HAVE_REMOTE_LCD
 #define REMOTE_WIDTH LCD_REMOTE_WIDTH
 #define REMOTE_HEIGHT LCD_REMOTE_HEIGHT
-#define REMOTE_LOGO_WIDTH 91
-#define REMOTE_LOGO_HEIGHT 32
+#include "remote_rockboxlogo.h"
+#define REMOTE_LOGO_WIDTH BMPWIDTH_remote_rockboxlogo
+#define REMOTE_LOGO_HEIGHT BMPHEIGHT_remote_rockboxlogo
 #define REMOTE_LOGO remote_rockboxlogo
 extern const fb_remote_data remote_rockboxlogo[];
 #endif /* HAVE_REMOTE_LCD */
 
-#if LCD_DEPTH == 16
-#define LOGO_WIDTH 128
-#define LOGO_HEIGHT 40
-
-#elif LCD_DEPTH == 2
-#define LOGO_WIDTH 138
-#define LOGO_HEIGHT 46
-
-#elif LCD_DEPTH == 1
-#define LOGO_WIDTH 112
-#define LOGO_HEIGHT 30
-#endif
-
 #define LOGO rockboxlogo
+#include "rockboxlogo.h"
+#define LOGO_WIDTH BMPWIDTH_rockboxlogo
+#define LOGO_HEIGHT BMPHEIGHT_rockboxlogo
 extern const fb_data rockboxlogo[];
 
 #else /* !LCD_BITMAP */
