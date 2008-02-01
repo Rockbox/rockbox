@@ -27,10 +27,13 @@
 struct pts_queue_slot;
 struct audio_thread_data
 {
-    struct queue_event ev; /* Our event queue to receive commands */
-    int state;             /* Thread state */
-    int status;            /* Media status (STREAM_PLAYING, etc.) */
-    int mad_errors;        /* A count of the errors in each frame */
+    struct queue_event ev;  /* Our event queue to receive commands */
+    int state;              /* Thread state */
+    int status;             /* Media status (STREAM_PLAYING, etc.) */
+    int mad_errors;         /* A count of the errors in each frame */
+    unsigned samplerate;    /* Current stream sample rate */
+    int nchannels;          /* Number of audio channels */
+    struct dsp_config *dsp; /* The DSP we're using */
 };
 
 /* The audio stack is stolen from the core codec thread (but not in uisim) */
@@ -402,6 +405,8 @@ static void audio_thread_msg(struct audio_thread_data *td)
 
             td->status = STREAM_STOPPED;
             td->state = TSTATE_INIT;
+            td->samplerate = 0;
+            td->nchannels = 0;
 
             init_mad();
             td->mad_errors = 0;
@@ -460,11 +465,18 @@ static void audio_thread(void)
 {
     struct audio_thread_data td;
 
+    rb->memset(&td, 0, sizeof (td));
     td.status = STREAM_STOPPED;
     td.state = TSTATE_EOS;
 
     /* We need this here to init the EMAC for Coldfire targets */
     init_mad();
+
+    td.dsp = (struct dsp_config *)rb->dsp_configure(NULL, DSP_MYDSP,
+                                                    CODEC_IDX_AUDIO);
+    rb->sound_set_pitch(1000);
+    rb->dsp_configure(td.dsp, DSP_RESET, 0);
+    rb->dsp_configure(td.dsp, DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
 
     goto message_wait;
 
@@ -594,64 +606,56 @@ static void audio_thread(void)
         mad_synth_frame(&synth, &frame);
 
         /** Output **/
+        if (frame.header.samplerate != td.samplerate)
+        {
+            td.samplerate = frame.header.samplerate;
+            rb->dsp_configure(td.dsp, DSP_SWITCH_FREQUENCY,
+                              td.samplerate);
+        }
 
-        /* TODO: Output through core dsp. We'll still use our own PCM buffer
-           since the core pcm buffer has no timestamping or clock facilities */
+        if (MAD_NCHANNELS(&frame.header) != td.nchannels)
+        {
+            td.nchannels = MAD_NCHANNELS(&frame.header);
+            rb->dsp_configure(td.dsp, DSP_SET_STEREO_MODE,
+                              td.nchannels == 1 ?
+                                STEREO_MONO : STEREO_NONINTERLEAVED);
+        }
+
+        td.state  = TSTATE_RENDER_WAIT;
 
         /* Add a frame of audio to the pcm buffer. Maximum is 1152 samples. */
     render_wait:
         if (synth.pcm.length > 0)
         {
-            struct pcm_frame_header *pcm_insert = pcm_output_get_buffer();
-            int16_t *audio_data = (int16_t *)pcm_insert->data;
-            unsigned length = synth.pcm.length;
-            ssize_t size = sizeof(*pcm_insert) + length*4;
-
-            td.state = TSTATE_RENDER_WAIT;
+            struct pcm_frame_header *dst_hdr = pcm_output_get_buffer();
+            const char *src[2] =
+                { (char *)synth.pcm.samples[0], (char *)synth.pcm.samples[1] };
+            int out_count = (synth.pcm.length * CLOCK_RATE
+                                + (td.samplerate - 1)) / td.samplerate;
+            ssize_t size = sizeof(*dst_hdr) + out_count*4;
 
             /* Wait for required amount of free buffer space */
             while (pcm_output_free() < size)
             {
                 /* Wait one frame */
-                int timeout = synth.pcm.length*HZ / synth.pcm.samplerate;
+                int timeout = out_count*HZ / td.samplerate;
                 str_get_msg_w_tmo(&audio_str, &td.ev, MAX(timeout, 1));
                 if (td.ev.id != SYS_TIMEOUT)
                     goto message_process;
             }
 
-            pcm_insert->time = audio_queue.curr->time;
-            pcm_insert->size = size;
+            out_count = rb->dsp_process(td.dsp, dst_hdr->data, src,
+                                        synth.pcm.length);
 
-            /* As long as we're on this timestamp, the time is just incremented
-               by the number of samples */
-            audio_queue.curr->time += length;
+            if (out_count <= 0)
+                break;
 
-            if (MAD_NCHANNELS(&frame.header) == 2)
-            {
-                int32_t *left = &synth.pcm.samples[0][0];
-                int32_t *right = &synth.pcm.samples[1][0];
+            dst_hdr->size = sizeof(*dst_hdr) + out_count*4;
+            dst_hdr->time = audio_queue.curr->time;
 
-                do
-                {
-                    /* libmad outputs s3.28 */
-                    *audio_data++ = clip_sample(*left++ >> 13);
-                    *audio_data++ = clip_sample(*right++ >> 13);
-                }
-                while (--length > 0);
-            }
-            else  /* mono */
-            {
-                int32_t *mono = &synth.pcm.samples[0][0];
-
-                do
-                {
-                    int32_t s = clip_sample(*mono++ >> 13);
-                    *audio_data++ = s;
-                    *audio_data++ = s;
-                }
-                while (--length > 0);
-            }
-            /**/
+            /* As long as we're on this timestamp, the time is just
+               incremented by the number of samples */
+            audio_queue.curr->time += out_count;
 
             /* Make this data available to DMA */
             pcm_output_add_data();
@@ -712,9 +716,10 @@ bool audio_thread_init(void)
     rb->queue_init(audio_str.hdr.q, false);
     rb->queue_enable_queue_send(audio_str.hdr.q, &audio_str_queue_send);
 
+    /* One-up on the priority since the core DSP over-yields internally */
     audio_str.thread = rb->create_thread(
         audio_thread, audio_stack, audio_stack_size, 0,
-        "mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, CPU));
+        "mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK-1) IF_COP(, CPU));
 
     if (audio_str.thread == NULL)
         return false;

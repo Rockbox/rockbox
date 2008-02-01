@@ -109,6 +109,11 @@ static struct configdata config[] =
     {TYPE_INT, 0, INT_MAX, &settings.displayoptions, "Display options",
      NULL, NULL},
 #endif
+    {TYPE_INT, 0, 2, &settings.tone_controls, "Tone controls", NULL, NULL},
+    {TYPE_INT, 0, 2, &settings.channel_modes, "Channel modes", NULL, NULL},
+    {TYPE_INT, 0, 2, &settings.crossfeed, "Crossfeed", NULL, NULL},
+    {TYPE_INT, 0, 2, &settings.equalizer, "Equalizer", NULL, NULL},
+    {TYPE_INT, 0, 2, &settings.dithering, "Dithering", NULL, NULL},
 };
 
 static const struct opt_items noyes[2] = {
@@ -119,6 +124,11 @@ static const struct opt_items noyes[2] = {
 static const struct opt_items enabledisable[2] = {
     { "Disable", -1 },
     { "Enable", -1 },
+};
+
+static const struct opt_items globaloff[2] = {
+    { "Force off", -1 },
+    { "Use sound setting", -1 },
 };
 
 static long mpeg_menu_sysevent_id;
@@ -184,6 +194,70 @@ static bool mpeg_set_option(const char* string,
     return usb;
 }
 
+/* Sync a particular audio setting to global or mpegplayer forced off */
+static void sync_audio_setting(int setting, bool global)
+{
+    int val0, val1;
+
+    switch (setting)
+    {
+    case MPEG_AUDIO_TONE_CONTROLS:
+        if (global || settings.tone_controls)
+        {
+            val0 = rb->global_settings->bass;
+            val1 = rb->global_settings->treble;
+        }
+        else
+        {
+            val0 = rb->sound_default(SOUND_BASS);
+            val1 = rb->sound_default(SOUND_TREBLE);
+        }
+        rb->sound_set(SOUND_BASS, val0);
+        rb->sound_set(SOUND_TREBLE, val1);
+        break;
+
+    case MPEG_AUDIO_CHANNEL_MODES:
+        val0 = (global || settings.channel_modes) ?
+                rb->global_settings->channel_config :
+                SOUND_CHAN_STEREO;
+        rb->sound_set(SOUND_CHANNELS, val0);
+        break;
+
+    case MPEG_AUDIO_CROSSFEED:
+        rb->dsp_set_crossfeed((global || settings.crossfeed) ?
+                              rb->global_settings->crossfeed : false);
+        break;
+
+    case MPEG_AUDIO_EQUALIZER:
+        rb->dsp_set_eq((global || settings.equalizer) ?
+                       rb->global_settings->eq_enabled : false);
+        break;
+
+    case MPEG_AUDIO_DITHERING:
+        rb->dsp_dither_enable((global || settings.dithering) ?
+                              rb->global_settings->dithering_enabled : false);
+       break;
+    }
+}
+
+/* Sync all audio settings to global or mpegplayer forced off */
+static void sync_audio_settings(bool global)
+{
+    static const int setting_index[] =
+    {
+        MPEG_AUDIO_TONE_CONTROLS,
+        MPEG_AUDIO_CHANNEL_MODES,
+        MPEG_AUDIO_CROSSFEED,
+        MPEG_AUDIO_EQUALIZER,
+        MPEG_AUDIO_DITHERING,
+    };
+    unsigned i;
+
+    for (i = 0; i < ARRAYLEN(setting_index); i++)
+    {
+        sync_audio_setting(setting_index[i], global);
+    }
+}
 
 #ifndef HAVE_LCD_COLOR
 /* Cheapo splash implementation for the grey surface */
@@ -736,6 +810,79 @@ static void display_options(void)
     menu_exit(menu_id);
 }
 
+static void audio_options(void)
+{
+    int result;
+    int menu_id;
+    bool menu_quit = false;
+
+    static const struct menu_item items[] = {
+        [MPEG_AUDIO_TONE_CONTROLS] =
+            { "Tone Controls", NULL },
+        [MPEG_AUDIO_CHANNEL_MODES] =
+            { "Channel Modes", NULL },
+        [MPEG_AUDIO_CROSSFEED] =
+            { "Crossfeed", NULL },
+        [MPEG_AUDIO_EQUALIZER] =
+            { "Equalizer", NULL },
+        [MPEG_AUDIO_DITHERING] =
+            { "Dithering", NULL },
+    };
+
+    menu_id = menu_init(rb, items, ARRAYLEN(items),
+                        mpeg_menu_sysevent_callback, NULL, NULL, NULL);
+
+    rb->button_clear_queue();
+
+    while (!menu_quit)
+    {
+        mpeg_menu_sysevent_clear();
+        result = menu_show(menu_id);
+
+        switch (result)
+        {
+        case MPEG_AUDIO_TONE_CONTROLS:
+            mpeg_set_option("Tone Controls", &settings.tone_controls, INT,
+                            globaloff, 2, NULL);
+            sync_audio_setting(result, false);
+            break;
+
+        case MPEG_AUDIO_CHANNEL_MODES:
+            mpeg_set_option("Channel Modes", &settings.channel_modes,
+                            INT, globaloff, 2, NULL);
+            sync_audio_setting(result, false);
+            break;
+
+        case MPEG_AUDIO_CROSSFEED:
+            mpeg_set_option("Crossfeed", &settings.crossfeed, INT,
+                            globaloff, 2, NULL);
+            sync_audio_setting(result, false);
+            break;
+
+        case MPEG_AUDIO_EQUALIZER:
+            mpeg_set_option("Equalizer", &settings.equalizer, INT,
+                            globaloff, 2, NULL);
+            sync_audio_setting(result, false);
+            break;
+
+        case MPEG_AUDIO_DITHERING:
+            mpeg_set_option("Dithering", &settings.dithering, INT,
+                            globaloff, 2, NULL);
+            sync_audio_setting(result, false);
+            break;
+
+        default:
+            menu_quit = true;
+            break;
+        }
+
+        if (mpeg_menu_sysevent() != 0)
+            menu_quit = true;
+    }
+
+    menu_exit(menu_id);
+}
+
 static void resume_options(void)
 {
     static const struct opt_items items[MPEG_RESUME_NUM_OPTIONS] = {
@@ -775,6 +922,8 @@ int mpeg_menu(unsigned flags)
     struct menu_item items[] = {
         [MPEG_MENU_DISPLAY_SETTINGS] =
             { "Display Options", NULL },
+        [MPEG_MENU_AUDIO_SETTINGS] =
+            { "Audio Options", NULL },
         [MPEG_MENU_ENABLE_START_MENU] =
             { "Resume Options", NULL },
         [MPEG_MENU_CLEAR_RESUMES] =
@@ -807,6 +956,10 @@ int mpeg_menu(unsigned flags)
         {
         case MPEG_MENU_DISPLAY_SETTINGS:
             display_options();
+            break;
+
+        case MPEG_MENU_AUDIO_SETTINGS:
+            audio_options();
             break;
 
         case MPEG_MENU_ENABLE_START_MENU:
@@ -849,6 +1002,11 @@ void init_settings(const char* filename)
 #if MPEG_OPTION_DITHERING_ENABLED
     settings.displayoptions = 0; /* No visual effects */
 #endif
+    settings.tone_controls = false;
+    settings.channel_modes = false;
+    settings.crossfeed = false;
+    settings.equalizer = false;
+    settings.dithering = false;
 
     configfile_init(rb);
 
@@ -886,6 +1044,9 @@ void init_settings(const char* filename)
     {
         settings.resume_time = 0;
     }
+
+    /* Set our audio options */
+    sync_audio_settings(false);
 }
 
 void save_settings(void)
@@ -911,4 +1072,17 @@ void save_settings(void)
     configfile_update_entry(SETTINGS_FILENAME, "Display options",
                             settings.displayoptions);
 #endif
+    configfile_update_entry(SETTINGS_FILENAME, "Tone controls",
+                            settings.tone_controls);
+    configfile_update_entry(SETTINGS_FILENAME, "Channel modes",
+                            settings.channel_modes);
+    configfile_update_entry(SETTINGS_FILENAME, "Crossfeed",
+                            settings.crossfeed);
+    configfile_update_entry(SETTINGS_FILENAME, "Equalizer",
+                            settings.equalizer);
+    configfile_update_entry(SETTINGS_FILENAME, "Dithering",
+                            settings.dithering);
+
+    /* Restore audio options */
+    sync_audio_settings(true);
 }

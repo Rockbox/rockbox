@@ -33,6 +33,7 @@ static struct pcm_frame_header * ALIGNED_ATTR(4) pcmbuf_head IBSS_ATTR;
 static struct pcm_frame_header * ALIGNED_ATTR(4) pcmbuf_tail IBSS_ATTR;
 
 /* Bytes */
+static ssize_t  pcmbuf_curr_size IBSS_ATTR; /* Size of currently playing frame */
 static uint64_t pcmbuf_read      IBSS_ATTR; /* Number of bytes read by DMA */
 static uint64_t pcmbuf_written   IBSS_ATTR; /* Number of bytes written by source */
 static ssize_t  pcmbuf_threshold IBSS_ATTR; /* Non-silence threshold */
@@ -41,6 +42,9 @@ static ssize_t  pcmbuf_threshold IBSS_ATTR; /* Non-silence threshold */
 static uint32_t clock_base   IBSS_ATTR; /* Our base clock */
 static uint32_t clock_start  IBSS_ATTR; /* Clock at playback start */
 static int32_t  clock_adjust IBSS_ATTR; /* Clock drift adjustment */
+
+int pcm_skipped = 0;
+int pcm_underruns = 0;
 
 /* Small silence clip. ~5.80ms @ 44.1kHz */
 static int16_t silence[256*2] ALIGNED_ATTR(4) = { 0 };
@@ -51,7 +55,7 @@ static inline void pcm_advance_buffer(struct pcm_frame_header **p,
 {
     *p = SKIPBYTES(*p, size);
     if (*p >= pcmbuf_end)
-        *p = pcm_buffer;
+        *p = SKIPBYTES(*p, -PCMOUT_BUFSIZE);
 }
 
 /* Inline internally but not externally */
@@ -68,7 +72,13 @@ inline ssize_t pcm_output_free(void)
 /* Audio DMA handler */
 static void get_more(unsigned char **start, size_t *size)
 {
-    ssize_t sz = pcm_output_used();
+    ssize_t sz;
+
+    /* Free-up the last frame played frame if any */
+    pcmbuf_read += pcmbuf_curr_size;
+    pcmbuf_curr_size = 0;
+
+    sz = pcm_output_used();
 
     if (sz > pcmbuf_threshold)
     {
@@ -95,16 +105,20 @@ static void get_more(unsigned char **start, size_t *size)
                 /* Frame more than 100ms late - drop it */
                 pcm_advance_buffer(&pcmbuf_head, sz);
                 pcmbuf_read += sz;
+                pcm_skipped++;
                 if (pcmbuf_read < pcmbuf_written)
                     continue;
+
+                /* Ran out so revert to default watermark */
+                pcmbuf_threshold = PCMOUT_PLAY_WM;
             }
             else if (offset < 100*CLOCK_RATE/1000)
             {
                 /* Frame less than 100ms early - play it */
-                *start = (unsigned char *)pcmbuf_head->data;
+                *start = pcmbuf_head->data;
 
                 pcm_advance_buffer(&pcmbuf_head, sz);
-                pcmbuf_read += sz;
+                pcmbuf_curr_size = sz;
 
                 sz -= sizeof (struct pcm_frame_header);
 
@@ -124,6 +138,9 @@ static void get_more(unsigned char **start, size_t *size)
     else
     {
         /* Ran out so revert to default watermark */
+        if (pcmbuf_threshold == PCMOUT_LOW_WM)
+            pcm_underruns++;
+
         pcmbuf_threshold = PCMOUT_PLAY_WM;
     }
 
@@ -164,8 +181,9 @@ void pcm_output_flush(void)
         rb->pcm_play_stop();
 
     pcmbuf_threshold = PCMOUT_PLAY_WM;
-    pcmbuf_read = pcmbuf_written = 0;
+    pcmbuf_curr_size = pcmbuf_read = pcmbuf_written = 0;
     pcmbuf_head = pcmbuf_tail = pcm_buffer;
+    pcm_skipped = pcm_underruns = 0;
 
     /* Restart if playing state was current */
     if (playing && !paused)
@@ -251,10 +269,9 @@ bool pcm_output_init(void)
     pcmbuf_head = pcm_buffer;
     pcmbuf_tail = pcm_buffer;
     pcmbuf_end  = SKIPBYTES(pcm_buffer, PCMOUT_BUFSIZE);
-    pcmbuf_read = 0;
-    pcmbuf_written = 0;
+    pcmbuf_curr_size = pcmbuf_read = pcmbuf_written = 0;
 
-    rb->pcm_set_frequency(SAMPR_44);
+    rb->pcm_set_frequency(NATIVE_FREQUENCY);
 
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
@@ -264,7 +281,7 @@ bool pcm_output_init(void)
 
 #if SILENCE_TEST_TONE
     /* Make the silence clip a square wave */
-    const int16_t silence_amp = 32767 / 16;
+    const int16_t silence_amp = INT16_MAX / 16;
     unsigned i;
 
     for (i = 0; i < ARRAYLEN(silence); i += 2)

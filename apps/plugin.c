@@ -586,6 +586,11 @@ static const struct plugin_api rockbox_api = {
 #endif
     sound_unit,
     sound_val2phys,
+    dsp_set_crossfeed,
+    dsp_set_eq,
+    dsp_dither_enable,
+    dsp_configure,
+    dsp_process,
 #endif /* CONFIG_CODEC == SWCODEC */
 };
 

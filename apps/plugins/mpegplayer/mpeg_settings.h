@@ -1,7 +1,7 @@
 
 #include "plugin.h"
 
-#define SETTINGS_VERSION 3
+#define SETTINGS_VERSION 4
 #define SETTINGS_MIN_VERSION 1
 #define SETTINGS_FILENAME "mpegplayer.cfg"
 
@@ -22,6 +22,15 @@ enum mpeg_option_id
     MPEG_OPTION_DISPLAY_FPS,
     MPEG_OPTION_LIMIT_FPS,
     MPEG_OPTION_SKIP_FRAMES,
+};
+
+enum mpeg_audio_option_id
+{
+    MPEG_AUDIO_TONE_CONTROLS,
+    MPEG_AUDIO_CHANNEL_MODES,
+    MPEG_AUDIO_CROSSFEED,
+    MPEG_AUDIO_EQUALIZER,
+    MPEG_AUDIO_DITHERING,
 };
 
 enum mpeg_resume_id
@@ -46,6 +55,7 @@ enum mpeg_start_id
 enum mpeg_menu_id
 {
     MPEG_MENU_DISPLAY_SETTINGS,
+    MPEG_MENU_AUDIO_SETTINGS,
     MPEG_MENU_ENABLE_START_MENU,
     MPEG_MENU_CLEAR_RESUMES,
     MPEG_MENU_QUIT,
@@ -62,6 +72,12 @@ struct mpeg_settings {
 #if MPEG_OPTION_DITHERING_ENABLED
     int displayoptions;
 #endif
+    /* Audio options - simple on/off specification */
+    int tone_controls;
+    int channel_modes;
+    int crossfeed;
+    int equalizer;
+    int dithering;
 };
 
 extern struct mpeg_settings settings;

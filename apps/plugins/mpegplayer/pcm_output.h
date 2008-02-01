@@ -29,6 +29,8 @@ struct pcm_frame_header   /* Header added to pcm data every time a decoded
     unsigned char data[]; /* open array of audio data */
 } ALIGNED_ATTR(4);
 
+extern int pcm_skipped, pcm_underruns;
+
 bool pcm_output_init(void);
 void pcm_output_exit(void);
 void pcm_output_flush(void);

@@ -168,15 +168,6 @@ void stream_scan_normalize(struct stream_scan *sk);
  * direction, otherwise opposite the scan direction */
 void stream_scan_offset(struct stream_scan *sk, off_t by);
 
-/** Audio helpers **/
-static inline int32_t clip_sample(int32_t sample)
-{
-    if ((int16_t)sample != sample)
-        sample = 0x7fff ^ (sample >> 31);
-
-    return sample;
-}
-
 /** Time helpers **/
 struct hms
 {

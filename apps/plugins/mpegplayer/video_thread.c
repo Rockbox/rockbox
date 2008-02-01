@@ -63,15 +63,21 @@ static void draw_fps(struct video_thread_data *td)
     uint32_t start;
     uint32_t clock_ticks = stream_get_ticks(&start);
     int fps = 0;
+    int buf_pct;
     char str[80];
 
     clock_ticks -= start;
     if (clock_ticks != 0)
         fps = muldiv_uint32(CLOCK_RATE*100, td->num_drawn, clock_ticks);
 
-    rb->snprintf(str, sizeof(str), "%d.%02d %d %d    ",
+    buf_pct = muldiv_uint32(100, pcm_output_used(), PCMOUT_BUFSIZE);
+
+    rb->snprintf(str, sizeof(str), "v:%d.%02d %d %d a:%02d%% %d %d  ",
+                 /* Video information */
                  fps / 100, fps % 100, td->num_skipped,
-                 td->info->display_picture->temporal_reference);
+                 td->info->display_picture->temporal_reference,
+                 /* Audio information */
+                 buf_pct, pcm_underruns, pcm_skipped);
     lcd_(putsxy)(0, 0, str);
 
     vo_lock();
@@ -277,7 +283,6 @@ static int sync_decoder(struct video_thread_data *td,
     while (1)
     {
         mpeg2_state_t mp2state = mpeg2_parse(td->mpeg2dec);
-        rb->yield();
 
         switch (mp2state)
         {
@@ -697,7 +702,6 @@ static void video_thread(void)
 
     picture_decode:
         mp2state = mpeg2_parse (td.mpeg2dec);
-        rb->yield();
 
         switch (mp2state)
         {

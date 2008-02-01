@@ -119,7 +119,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 98
+#define PLUGIN_API_VERSION 99
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -723,6 +723,13 @@ struct plugin_api {
 #endif
     const char * (*sound_unit)(int setting);
     int (*sound_val2phys)(int setting, int value);
+    void (*dsp_set_crossfeed)(bool enable);
+    void (*dsp_set_eq)(bool enable);
+    void (*dsp_dither_enable)(bool enable);
+    intptr_t (*dsp_configure)(struct dsp_config *dsp, int setting,
+                              intptr_t value);
+    int (*dsp_process)(struct dsp_config *dsp, char *dest,
+                       const char *src[], int count);
 #endif /* CONFIG_CODEC == SWCODEC */
 };
 
