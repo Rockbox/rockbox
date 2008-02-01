@@ -115,7 +115,8 @@ lcd_write_yuv420_lines:
     ldr         r3, [r0]                @
     tst         r3, #LCD2_BUSY_MASK     @
     bne         20b                     @
-    stmia       r0, { r7, r11 }         @
+    str         r7, [r0]                @
+    str         r11, [r0]               @
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*74
     add         r12, r7, r7, asl #2     @
@@ -151,7 +152,8 @@ lcd_write_yuv420_lines:
     ldr         r3, [r0]                @
     tst         r3, #LCD2_BUSY_MASK     @
     bne         20b                     @
-    stmia       r0, { r7, r11 }         @
+    str         r7, [r0]                @
+    str         r11, [r0]               @
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*74
     add         r12, r7, r7, asl #2     @
@@ -187,7 +189,8 @@ lcd_write_yuv420_lines:
     ldr         r3, [r0]                @
     tst         r3, #LCD2_BUSY_MASK     @
     bne         20b                     @
-    stmia       r0, { r7, r11 }         @
+    str         r7, [r0]                @
+    str         r11, [r0]               @
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*74
     add         r12, r7, r7, asl #2     @
@@ -221,7 +224,8 @@ lcd_write_yuv420_lines:
     ldr         r3, [r0]                @
     tst         r3, #LCD2_BUSY_MASK     @
     bne         20b                     @
-    stmia       r0, { r7, r11 }         @
+    str         r7, [r0]                @
+    str         r11, [r0]               @
                                         @
     subs        r1, r1, #2              @ subtract block from width
     bgt         10b @ loop line         @
@@ -359,7 +363,8 @@ lcd_write_yuv420_lines_odither:
     ldr         r3, [r0]                @
     tst         r3, #LCD2_BUSY_MASK     @
     bne         20b                     @
-    stmia       r0, { r7, r11 }         @
+    str         r7, [r0]                @
+    str         r11, [r0]               @
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*149
     add         r12, r7, r7, asl #2     @
@@ -412,7 +417,8 @@ lcd_write_yuv420_lines_odither:
     ldr         r3, [r0]                @
     tst         r3, #LCD2_BUSY_MASK     @
     bne         20b                     @
-    stmia       r0, { r7, r11 }         @
+    str         r7, [r0]                @
+    str         r11, [r0]               @
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*149
     add         r12, r7, r7, asl #2     @
@@ -467,7 +473,8 @@ lcd_write_yuv420_lines_odither:
     ldr         r3, [r0]                @
     tst         r3, #LCD2_BUSY_MASK     @
     bne         20b                     @
-    stmia       r0, { r7, r11 }         @
+    str         r7, [r0]                @
+    str         r11, [r0]               @
                                         @
     sub         r7, r12, #16            @ r7 = Y = (Y' - 16)*149
     add         r12, r7, r7, asl #2     @
@@ -518,7 +525,8 @@ lcd_write_yuv420_lines_odither:
     ldr         r3, [r0]                @
     tst         r3, #LCD2_BUSY_MASK     @
     bne         20b                     @
-    stmia       r0, { r7, r11 }         @
+    str         r7, [r0]                @
+    str         r11, [r0]               @
                                         @
     subs        r1, r1, #2              @ subtract block from width
     bgt         10b @ loop line         @
