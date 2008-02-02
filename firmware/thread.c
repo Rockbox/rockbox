@@ -1615,12 +1615,13 @@ void switch_thread(struct thread_entry *old)
      * got CPU time. */
     for (;;)
     {
-        int priority = MIN(thread->priority, thread->priority_x);
+        int priority = thread->priority;
 
         if (priority < cores[core].highest_priority)
             cores[core].highest_priority = priority;
 
         if (priority == cores[core].highest_priority ||
+            thread->priority_x < cores[core].highest_priority ||
             (current_tick - thread->last_run > priority * 8))
         {
             cores[core].running = thread;
@@ -2402,7 +2403,6 @@ void priority_yield(void)
     thread->priority_x = HIGHEST_PRIORITY;
     switch_thread(NULL);
     thread->priority_x = LOWEST_PRIORITY;
-    cores[core].highest_priority = LOWEST_PRIORITY;
 }
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
