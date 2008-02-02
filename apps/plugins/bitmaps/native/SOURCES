@@ -550,14 +550,14 @@ matrix_normal.bmp
 #if (LCD_WIDTH != LCD_HEIGHT)
 #define SMALLER_DIMENSION ((LCD_WIDTH < LCD_HEIGHT) ? LCD_WIDTH : LCD_HEIGHT)
 #else /* 5/6GB H10 with square display */
-#define SMALLER_DIMENSION (LCD_HEIGHT - 18)
+#define SMALLER_DIMENSION (LCD_HEIGHT - 20)
 #endif
 
 #if defined HAVE_LCD_COLOR
 #if SMALLER_DIMENSION <= 80
     sliding_puzzle.80x80x16.bmp
-#elif SMALLER_DIMENSION <= 112
-    sliding_puzzle.110x110x16.bmp
+#elif SMALLER_DIMENSION <= 108
+    sliding_puzzle.108x108x16.bmp
 #elif SMALLER_DIMENSION <= 128
     sliding_puzzle.128x128x16.bmp
 #elif SMALLER_DIMENSION <= 132
@@ -569,7 +569,7 @@ matrix_normal.bmp
 #endif
 #elif (LCD_DEPTH > 1)
 #if SMALLER_DIMENSION <= 110
-    sliding_puzzle.110x110x2.bmp
+    sliding_puzzle.108x108x2.bmp
 #elif SMALLER_DIMENSION <= 128
     sliding_puzzle.128x128x2.bmp
 #endif

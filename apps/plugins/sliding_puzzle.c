@@ -102,20 +102,14 @@ PLUGIN_HEADER
 #define IMAGE_SIZE IMAGE_WIDTH
 
 static struct plugin_api* rb;
-#if LCD_DEPTH==1
-/* for Archos, use rectangular image, 5x4 puzzle */
-#define SPOTS_X 5
-#define SPOTS_Y 4
-#else
-/* for other targets, use a square image, 4x4 puzzle
+
+/* use a square image, (the default Archos bitmap looks square on its display)
    Puzzle image dimension is min(lcd_height,lcd_width)
-   4x4 is more convenient than 5x4 for square puzzles
+   4x4 is more convenient for square puzzles
    Note: sliding_puzzle.bmp should be evenly divisible by SPOTS_X
    and SPOTS_Y, otherwise lcd_bitmap_part stride won't be correct */
 #define SPOTS_X 4
 #define SPOTS_Y 4
-#endif
-
 #define SPOTS_WIDTH  (IMAGE_WIDTH / SPOTS_X)
 #define SPOTS_HEIGHT (IMAGE_HEIGHT / SPOTS_Y)
 #define NUM_SPOTS    (SPOTS_X*SPOTS_Y)
@@ -321,12 +315,11 @@ static void move_spot(int x, int y)
     moves++;
     rb->snprintf(s, sizeof(s), "%d", moves);
     s[sizeof(s)-1] = '\0';
-#if (LCD_WIDTH>IMAGE_SIZE)
+#if ((LCD_WIDTH - IMAGE_SIZE) > (LCD_HEIGHT - IMAGE_HEIGHT))
     rb->lcd_putsxy(IMAGE_WIDTH+5, 20, (unsigned char *)s);
 #else
-    rb->lcd_putsxy(5, IMAGE_HEIGHT+20, (unsigned char *)s);
+    rb->lcd_putsxy(40, IMAGE_HEIGHT+7, (unsigned char *)s);
 #endif
-
     for(i=1;i<=4;i++)
     {
        draw_spot(HOLE_ID,
@@ -358,14 +351,15 @@ static void puzzle_init(void)
     rb->lcd_clear_display();
     rb->snprintf(s, sizeof(s), "%d", moves);
 
-#if (LCD_WIDTH>IMAGE_SIZE)
-    rb->lcd_drawrect(IMAGE_WIDTH, 0, 32, 64);
+#if ((LCD_WIDTH - IMAGE_SIZE) > (LCD_HEIGHT - IMAGE_HEIGHT))
+    rb->lcd_drawrect(IMAGE_WIDTH, 0, LCD_WIDTH-IMAGE_WIDTH, IMAGE_HEIGHT);
     rb->lcd_putsxy(IMAGE_WIDTH+1, 10, (unsigned char *)"Moves");
     rb->lcd_putsxy(IMAGE_WIDTH+5, 20, (unsigned char *)s);
 #else
-    rb->lcd_drawrect(0, IMAGE_HEIGHT, 32, 64);
-    rb->lcd_putsxy(1, IMAGE_HEIGHT+10, (unsigned char *)"Moves");
-    rb->lcd_putsxy(5, IMAGE_HEIGHT+20, (unsigned char *)s);
+    rb->lcd_drawrect(0, IMAGE_HEIGHT, IMAGE_WIDTH,
+                     (LCD_HEIGHT-IMAGE_HEIGHT));
+    rb->lcd_putsxy(3, IMAGE_HEIGHT+7, (unsigned char *)"Moves: ");
+    rb->lcd_putsxy(40, IMAGE_HEIGHT+7, (unsigned char *)s);
 #endif
 
     /* shuffle spots */
@@ -468,14 +462,15 @@ static int puzzle_loop(void)
                 /* tell the user what mode we picked in the end! */
                 rb->splash(HZ,picmode_descriptions[ picmode ] );
                 rb->lcd_clear_display();
-#if (LCD_WIDTH>IMAGE_SIZE)
-                rb->lcd_drawrect(IMAGE_WIDTH, 0, 32, 64);
+#if ((LCD_WIDTH - IMAGE_SIZE) > (LCD_HEIGHT - IMAGE_HEIGHT))
+                rb->lcd_drawrect(IMAGE_WIDTH, 0, LCD_WIDTH-IMAGE_WIDTH,
+                                 IMAGE_HEIGHT);
                 rb->lcd_putsxy(IMAGE_WIDTH+1, 10, (unsigned char *)"Moves");
 #else
-                rb->lcd_drawrect(0,IMAGE_HEIGHT,32,64);
-                rb->lcd_putsxy(1,IMAGE_HEIGHT+10, (unsigned char *)"Moves");
+                rb->lcd_drawrect(0, IMAGE_HEIGHT, IMAGE_WIDTH,
+                                 (LCD_HEIGHT-IMAGE_HEIGHT));
+                rb->lcd_putsxy(3, IMAGE_HEIGHT+7, (unsigned char *)"Moves: ");
 #endif
-
                 for (i=0; i<NUM_SPOTS; i++)
                     draw_spot(spots[i],
                               (i%SPOTS_X)*SPOTS_WIDTH,
@@ -606,14 +601,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     rb->lcd_clear_display();
-#if (LCD_WIDTH>IMAGE_SIZE)
-    rb->lcd_drawrect(IMAGE_WIDTH, 0, 32, 64);
+#if ((LCD_WIDTH - IMAGE_SIZE) > (LCD_HEIGHT - IMAGE_HEIGHT))
+    rb->lcd_drawrect(IMAGE_WIDTH, 0, LCD_WIDTH-IMAGE_WIDTH, IMAGE_HEIGHT);
     rb->lcd_putsxy(IMAGE_WIDTH+1, 10, (unsigned char *)"Moves");
 #else
-    rb->lcd_drawrect(0,IMAGE_HEIGHT,32,64);
-    rb->lcd_putsxy(1,IMAGE_HEIGHT+10, (unsigned char *)"Moves");
+    rb->lcd_drawrect(0, IMAGE_HEIGHT, IMAGE_WIDTH,
+                     (LCD_HEIGHT-IMAGE_HEIGHT));
+    rb->lcd_putsxy(3, IMAGE_HEIGHT+7, (unsigned char *)"Moves: ");
 #endif
-
     for (i=0; i<NUM_SPOTS; i++) {
         spots[i]=(i+1);
         draw_spot(spots[i], (i%SPOTS_X)*SPOTS_WIDTH, (i/SPOTS_X)*SPOTS_HEIGHT);
