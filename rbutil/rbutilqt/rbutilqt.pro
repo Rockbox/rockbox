@@ -14,13 +14,13 @@ RCC_DIR = build/rcc
 
 # add a custom rule for pre-building librbspeex
 rbspeex.commands = @$(MAKE) -C ../../tools/rbspeex librbspeex.a
-QMAKE_EXTRA_TARGETS = rbspeex
-PRE_TARGETDEPS = rbspeex
+QMAKE_EXTRA_TARGETS += rbspeex
+PRE_TARGETDEPS += rbspeex
 
 # add a custom rule for makeing the translations
-lrelease.commands = lrelease rbutilqt.pro
+lrelease.commands = $$[QT_INSTALL_BINS]/lrelease -silent rbutilqt.pro
 QMAKE_EXTRA_TARGETS += lrelease
-PRE_TARGETDEPS = lrelease
+PRE_TARGETDEPS += lrelease
 
 
 SOURCES += rbutilqt.cpp \
