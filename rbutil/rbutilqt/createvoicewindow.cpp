@@ -87,15 +87,20 @@ void CreateVoiceWindow::setSettings(RbSettings* sett)
         ui.labelTtsProfile->setText(tr("Selected TTS Engine: <b>%1</b>").arg("Invalid TTS configuration!"));
     
     QString encoder = settings->curEncoder();
-    EncBase* enc = getEncoder(encoder);
-    enc->setCfg(settings);
-    if(enc->configOk())
-        ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg(encoder));
+    // only proceed if encoder setting is set
+    if(!encoder.isEmpty()) {
+        // FIXME: getEncoder CAN return a NULL pointer. Additional error
+        // checking is required or getEncoder should use the default engine
+        EncBase* enc = getEncoder(encoder);
+        enc->setCfg(settings);
+        if(enc->configOk())
+            ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg(encoder));
+        else
+            ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
+    }
     else
         ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
-        
-    ui.wavtrimthreshold->setValue(settings->wavtrimTh());    
-        
+    ui.wavtrimthreshold->setValue(settings->wavtrimTh());
 }
 
 
