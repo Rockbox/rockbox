@@ -16,7 +16,7 @@
 #    
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
 #    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007,
-#    Oct 2007, Nov 2007, Dec 2007
+#    Oct 2007, Nov 2007, Dec 2007, Jan 2008
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -11511,5 +11511,39 @@
   </dest>
   <voice>
     *: "Sauvegarder la configuration audio actuelle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Cliquetis des touches"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Cliquetis des touches"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Répéter les cliquetis"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Répéter les cliquetis"
   </voice>
 </phrase>
