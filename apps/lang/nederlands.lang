@@ -11501,7 +11501,7 @@
 </phrase>
 <phrase>
   id: LANG_KEYCLICK
-  desc: in keyclick settings men
+  desc: in keyclick settings menu
   user:
   <source>
     *: none
@@ -11518,7 +11518,7 @@
 </phrase>
 <phrase>
   id: LANG_KEYCLICK_REPEATS
-  desc: in keyclick settings men
+  desc: in keyclick settings menu
   user:
   <source>
     *: none
