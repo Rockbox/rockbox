@@ -24,7 +24,6 @@
 %xl|b|vol6-176x220x16.bmp|97|206|
 %xl|c|vol7-176x220x16.bmp|97|206|
 %xl|d|vol8-176x220x16.bmp|97|206|
-
 %xl|e|vol9-176x220x16.bmp|97|206|
 %xl|Q|shuffle-176x220x16.bmp|119|207|
 %xl|R|repeatall-176x220x16.bmp|144|204|
@@ -37,8 +36,9 @@
 %xl|Y|ff-176x220x16.bmp|159|204|
 %xl|Z|rew-176x220x16.bmp|159|204|
 %Cl|29|20|c120|c120|
-%pb|8|9|171|182|
+%pb|8|5|171|182|
 #NowPlaying
+
 
 %?C<|%s%ac%?it<%it|%fn>>
 %?C<|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>

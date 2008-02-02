@@ -38,15 +38,15 @@
 %xl|Y|ff-160x128x2.bmp|145|114|
 %xl|Z|rew-160x128x2.bmp|145|114|
 %Cl|2|16|s64|s64|
-%pb|8|1|159|88|
+%pb|8|1|159|86|
 %?C<%s%m|70|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
 %?C<%s%m|70|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
 %?C<%s%m|70|%al%?id<%id|%?d1<%d1|(root)>>|%s%ac%?id<%id|%?d1<%d1|(root)>>>
 
+%?C<%s%m|70|%alNext Track:|%s%acNext Track:>
 %?C<%s%m|70|%al%?It<%It|%Fn>|%s%ac%?It<%It|%Fn>>
 
 %al %pc%ac%pp of %pe%ar%pr 
-
 %?mh<%xdA|%xdB>
 %?bp<%?bc<%xdD|%xdC>|%?bl<|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK|%xdL>>
 %?pv<%xdM|%xdN|%xdO|%xdP|%xdp|%xdq|%xdr|%xds|%xdt>

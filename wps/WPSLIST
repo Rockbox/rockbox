@@ -208,12 +208,9 @@ Author: Jens Arnold
 
 <wps>
 Name: cabbiev2.wps
+RWPS: cabbiev2.rwps
 # Real name of the creator of the WPS
 Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
-
-#remote WPS settings
-rwps: cabbiev2.rwps-128x96x2.rwps
-rwps: cabbiev2.rwps-128x64x2.rwps
 
 # Preferred font (including .fnt extension - leave blank for player):
 Font.320x240x16: helvR12.fnt
@@ -222,7 +219,7 @@ Font.220x176x16: helvR10.fnt
 Font.176x220x16: helvR10.fnt
 Font.176x132x16: helvR10.fnt
 Font.160x128x16: helvR10.fnt
-Font.160x128x2: mix12.fnt
+Font.160x128x2: helvR10.fnt
 Font.138x110x2: helvR10.fnt
 Font.128x128x16: helvR10.fnt
 Font.132x80x16: Sazanami-Mincho-Regular-11.fnt
@@ -283,43 +280,12 @@ viewers iconset.220x176x16: /.rockbox/icons/tango_small_viewers.bmp
 viewers iconset.240x320x16: /.rockbox/icons/tango_small_viewers.bmp 
 
 # Whether the WPS is designed to have the statusbar on or off
-Statusbar.320x240x16: on
-Statusbar.240x320x16: on
-Statusbar.220x176x16: on
-Statusbar.176x220x16: on
-Statusbar.176x132x16: on
-Statusbar.160x128x16: on
-Statusbar.160x128x2: on
-Statusbar.138x110x2: on
-Statusbar.128x128x16: on
-Statusbar.132x80x16: on
-Statusbar.112x64x1: on
-
-# The minimum required pixel height for the WPS
-# 176 for H3xx, 128 for H1xx, 64 for Recorder/Ondio, 14 for player
-Height.320x240x16: 240
-Height.240x320x16: 320
-Height.220x176x16: 176
-Height.176x220x16: 220
-Height.176x132x16: 132
-Height.160x128x16: 128
-Height.160x128x2: 128
-Height.138x110x2: 110
-Height.128x128x16: 128
-Height.132x80x16: 80
-Height.112x64x1: 64
-
-# The minimum required pixel width for the WPS (160 for iRiver,
-# 220 for H3xx, 160 for H1xx, 112 for Recorder/Ondio, 55 for player
-Width.320x240x16: 320
-Width.240x320x16: 240
-Width.220x176x16: 220
-Width.176x220x16: 176
-Width.176x132x16: 176
-Width.160x128x16: 160
-Width.160x128x2: 160
-Width.138x110x2: 138
-Width.128x128x16: 128
-Width.132x80x16: 132
-Width.112x64x1: 112
+Statusbar: on
 </wps>
+
+<rwps>
+Name: cabbiev2.rwps
+Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
+Font: helvR10.fnt
+Statusbar: on
+</rwps>
