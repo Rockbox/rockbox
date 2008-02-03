@@ -29,7 +29,7 @@ void sw_i2c_init(void)
        /* no extra init required */ 
 }       
 
-int sw_i2c_write(unsigned char chip, unsigned char location, const unsigned char* buf, int count)
+int sw_i2c_write(unsigned char chip, unsigned char location, unsigned char* buf, int count)
 {
     int i;
 
