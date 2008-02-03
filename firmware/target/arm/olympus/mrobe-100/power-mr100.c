@@ -55,8 +55,13 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    /* Give things a second to settle before cutting power */
-    sleep(HZ);
-    
-    //GPIOF_OUTPUT_VAL &=~ 0x20;
+    /* Disable interrupts on this core */
+    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+
+    /* Mask them on both cores */
+    CPU_INT_CLR = -1;
+    COP_INT_CLR = -1;
+
+    while (1)
+        GPIOB_OUTPUT_VAL |= 0x80;
 }

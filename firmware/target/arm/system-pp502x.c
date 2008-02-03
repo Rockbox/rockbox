@@ -270,12 +270,12 @@ void system_init(void)
         DEV_RS2 = -1;
         DEV_RS = 0;
         DEV_RS2 = 0;
- #elif defined (IRIVER_H10)
+#elif defined (IRIVER_H10) || defined(MROBE_100)
         DEV_RS = 0x3ffffef8;
         DEV_RS2 = -1;
-        outl(inl(0x70000024) | 0xc0, 0x70000024);
         DEV_RS = 0;
         DEV_RS2 = 0;
+        outl(inl(0x70000024) | 0xc0, 0x70000024);
 #endif
 
 #if !defined(SANSA_E200) && !defined(SANSA_C200)
