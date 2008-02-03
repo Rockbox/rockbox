@@ -43,7 +43,7 @@
 
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER
-//#define CONFIG_RTC RTC_E8564
+#define CONFIG_RTC RTC_MR100
 #endif
 
 /* Define this if you have a software controlled poweroff */

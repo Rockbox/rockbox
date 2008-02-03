@@ -161,6 +161,7 @@
 #define RTC_RX5X348AB 9
 #define RTC_TCC77X   10
 #define RTC_TCC780X  11
+#define RTC_MR100  12
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */

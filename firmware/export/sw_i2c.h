@@ -24,7 +24,7 @@
 #define SW_I2C_READ  1
 
 void sw_i2c_init(void);
-int sw_i2c_write(unsigned char chip, unsigned char location, const unsigned char* buf, int count);
-int sw_i2c_read (unsigned char chip, unsigned char location,       unsigned char* buf, int count);
+int sw_i2c_write(unsigned char chip, unsigned char location, unsigned char* buf, int count);
+int sw_i2c_read (unsigned char chip, unsigned char location, unsigned char* buf, int count);
 
 #endif

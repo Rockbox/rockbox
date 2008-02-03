@@ -148,6 +148,8 @@ drivers/rtc/rtc_s3c2440.c
 drivers/rtc/rtc_as3514.c
 #elif (CONFIG_RTC == RTC_RX5X348AB)
 drivers/rtc/rtc_rx5x348ab.c
+#elif (CONFIG_RTC == RTC_MR100)
+drivers/rtc/rtc_mr100.c
 #endif /* (CONFIG_RTC == RTC_) */
 #endif /* SIMULATOR */
 
@@ -523,12 +525,12 @@ target/coldfire/iriver/audio-iriver.c
 
 #ifdef IRIVER_H100_SERIES
 #ifndef SIMULATOR
+drivers/sw_i2c.c
 target/coldfire/ata-as-coldfire.S
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
 target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/fmradio_i2c-iriver.c
-target/coldfire/iriver/h100/sw_i2c-h100.c
 target/coldfire/iriver/h100/adc-h100.c
 target/coldfire/iriver/h100/backlight-h100.c
 target/coldfire/iriver/h100/button-h100.c
@@ -661,6 +663,7 @@ target/arm/tms320dm320/dsp-dm320.c
 
 #ifdef MROBE_100
 #ifndef SIMULATOR
+drivers/sw_i2c.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c

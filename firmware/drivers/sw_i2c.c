@@ -24,10 +24,29 @@
 
 /**
  * I2C-functions are copied and ported from fmradio.c.
- * later fixed, adapted and moved to a seperate file so they can be re-used by the rtc-ds1339c code by Robert Kukla
+ * later fixed, adapted and moved to a seperate file so they can be re-used 
+ * by the rtc-ds1339c and later by the m:robe-100 code by Robert Kukla
  */
 
 /* cute little functions, atomic read-modify-write */
+
+#ifdef MROBE_100
+
+/* SCL is GPIOC, 4 */
+#define SCL       (GPIOC_INPUT_VAL &  0x00000010)
+#define SCL_OUT_LO GPIOC_OUTPUT_VAL&=~0x00000010
+#define SCL_LO     GPIOC_OUTPUT_EN |= 0x00000010
+#define SCL_HI     GPIOC_OUTPUT_EN &=~0x00000010
+
+/* SDA is GPIOC, 5 */
+#define SDA       (GPIOC_INPUT_VAL &  0x00000020)
+#define SDA_OUT_LO GPIOC_OUTPUT_VAL&=~0x00000020
+#define SDA_LO     GPIOC_OUTPUT_EN |= 0x00000020
+#define SDA_HI     GPIOC_OUTPUT_EN &=~0x00000020
+
+#define DELAY  do { volatile int _x; for(_x=0;_x<22;_x++);} while(0)
+
+#else
 
 /* SCL is GPIO, 12 */
 #define SCL             ( 0x00001000 & GPIO_READ)
@@ -54,10 +73,15 @@
         );                            \
     })
 
+#endif
+
 void sw_i2c_init(void)
 {
+#ifndef MROBE_100
     or_l(0x00001000, &GPIO_FUNCTION);
     or_l(0x00002000, &GPIO1_FUNCTION);
+#endif
+  
     SDA_HI;
     SCL_HI;
     SDA_OUT_LO;
@@ -192,7 +216,7 @@ static unsigned char sw_i2c_inb(void)
     return byte;
 }
 
-int sw_i2c_write(unsigned char chip, unsigned char location, const unsigned char* buf, int count)
+int sw_i2c_write(unsigned char chip, unsigned char location, unsigned char* buf, int count)
 {
     int i;
 
@@ -203,14 +227,18 @@ int sw_i2c_write(unsigned char chip, unsigned char location, const unsigned char
         sw_i2c_stop();
         return -1;
     }
-    
+
+#ifdef MROBE_100 /* does not use register addressing */
+    (void) location;
+#else    
     sw_i2c_outb(location);
     if (!sw_i2c_getack())
     {
         sw_i2c_stop();
         return -2;
     }
-    
+#endif  
+
     for (i=0; i<count; i++)
     {
         sw_i2c_outb(buf[i]);
@@ -229,7 +257,10 @@ int sw_i2c_write(unsigned char chip, unsigned char location, const unsigned char
 int sw_i2c_read(unsigned char chip, unsigned char location, unsigned char* buf, int count)
 {
     int i;
-  
+
+#ifdef MROBE_100 /* does not use register addressing */
+    (void) location;
+#else    
     sw_i2c_start();
     sw_i2c_outb((chip & 0xfe) | SW_I2C_WRITE);
     if (!sw_i2c_getack())
@@ -244,7 +275,8 @@ int sw_i2c_read(unsigned char chip, unsigned char location, unsigned char* buf, 
         sw_i2c_stop();
         return -2;
     }
-    
+#endif  
+
     sw_i2c_start();
     sw_i2c_outb((chip & 0xfe) | SW_I2C_READ);
     if (!sw_i2c_getack())
