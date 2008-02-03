@@ -72,11 +72,23 @@ void CreateVoiceWindow::setSettings(RbSettings* sett)
     settings = sett;
 
     // fill in language combobox
-    QStringList languages = settings->allLanguages();   
+    QStringList languages = settings->allLanguages();
     languages.sort();
     ui.comboLanguage->addItems(languages);
     // set saved lang
-    ui.comboLanguage->setCurrentIndex(ui.comboLanguage->findText(settings->voiceLanguage()));
+    int sel = ui.comboLanguage->findText(settings->voiceLanguage());
+    // if no saved language is found try to figure the language from the UI lang
+    if(sel == -1) {
+        QString f = settings->curLang();
+        // if no language is set default to english. Make sure not to check an empty string.
+        if(f.isEmpty()) f = "english";
+        sel = ui.comboLanguage->findText(f, Qt::MatchStartsWith);
+        qDebug() << "sel =" << sel;
+        // still nothing found?
+        if(sel == -1)
+            sel = ui.comboLanguage->findText("english", Qt::MatchStartsWith);
+    }
+    ui.comboLanguage->setCurrentIndex(sel);
     
     QString ttsName = settings->curTTS();
     TTSBase* tts = getTTS(ttsName);
@@ -99,6 +111,7 @@ void CreateVoiceWindow::setSettings(RbSettings* sett)
     else
         ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
     ui.wavtrimthreshold->setValue(settings->wavtrimTh());
+
 }
 
 
