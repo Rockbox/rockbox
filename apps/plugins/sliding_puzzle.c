@@ -140,8 +140,11 @@ static const char* const picmode_descriptions[] = {
 
 static int spots[NUM_SPOTS];
 static int hole = INITIAL_HOLE, moves;
-static char s[5];
+static unsigned char s[32];
 static enum picmodes picmode = PICMODE_INITIAL_PICTURE;
+static int num_font = FONT_UI;
+static int moves_font = FONT_UI;
+static int moves_y = 0;
 
 static unsigned char img_buf[IMAGE_WIDTH*IMAGE_HEIGHT*sizeof(fb_data)]
 __attribute__ ((aligned(16)));
@@ -155,7 +158,6 @@ static char albumart_path[MAX_PATH+1];
 static char img_buf_path[MAX_PATH+1];
 
 static const fb_data * puzzle_bmp_ptr;
-extern const fb_data sliding_puzzle[];
 /* initial_bmp_path points to selected bitmap if this game is launched
    as a viewer for a .bmp file, or NULL if game is launched regular way */
 static const char * initial_bmp_path=NULL;
@@ -265,6 +267,8 @@ static bool load_resize_bitmap(void)
 /* draws a spot at the coordinates (x,y), range of p is 1-20 */
 static void draw_spot(int p, int x, int y)
 {
+    int w, h;
+
     if (p == HOLE_ID)
     {
 #if LCD_DEPTH==1
@@ -275,10 +279,10 @@ static void draw_spot(int p, int x, int y)
                                 IMAGE_WIDTH, x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
 #else
         /* just draw a black rectangle */
-        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        rb->lcd_set_background(LCD_BLACK);
+        int old_fg = rb->lcd_get_foreground();
+        rb->lcd_set_foreground(LCD_BLACK);
         rb->lcd_fillrect(x,y,SPOTS_WIDTH,SPOTS_HEIGHT);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
+        rb->lcd_set_foreground(old_fg);
 #endif
     }
     else if (picmode != PICMODE_NUMERALS)
@@ -292,7 +296,10 @@ static void draw_spot(int p, int x, int y)
         rb->lcd_fillrect(x+1, y+1, SPOTS_WIDTH-2, SPOTS_HEIGHT-2);
         rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->snprintf(s, sizeof(s), "%d", p);
-        rb->lcd_putsxy(x+2, y+4, (unsigned char *)s);
+        rb->lcd_setfont(num_font);
+        rb->lcd_getstringsize(s, &w, &h);
+        rb->lcd_putsxy(x + (SPOTS_WIDTH/2) - w / 2,
+                       y + (SPOTS_HEIGHT/2) - h / 2, s);
     }
 }
 
@@ -309,16 +316,20 @@ static bool puzzle_finished(void)
 /* move a piece in any direction */
 static void move_spot(int x, int y)
 {
-    int i;
+    int i, w;
     spots[hole] = spots[hole-x-SPOTS_X*y];
     hole -= (x+SPOTS_X*y);
     moves++;
+    rb->lcd_setfont(moves_font);
+#if LCD_WIDTH > LCD_HEIGHT
     rb->snprintf(s, sizeof(s), "%d", moves);
-    s[sizeof(s)-1] = '\0';
-#if ((LCD_WIDTH - IMAGE_SIZE) > (LCD_HEIGHT - IMAGE_HEIGHT))
-    rb->lcd_putsxy(IMAGE_WIDTH+5, 20, (unsigned char *)s);
+    w = rb->lcd_getstringsize(s, NULL, NULL);
+    rb->lcd_putsxy((IMAGE_WIDTH+1+(LCD_WIDTH-IMAGE_WIDTH-1)/2) - w / 2,
+                   moves_y, s);
 #else
-    rb->lcd_putsxy(40, IMAGE_HEIGHT+7, (unsigned char *)s);
+    (void)w;
+    rb->snprintf(s, sizeof(s), "Moves: %d", moves);
+    rb->lcd_putsxy(3, moves_y, s);
 #endif
     for(i=1;i<=4;i++)
     {
@@ -342,25 +353,41 @@ static void move_spot(int x, int y)
     spots[hole] = HOLE_ID;
 }
 
+static void draw_playfield(void)
+{
+    int i, w;
+
+    rb->lcd_clear_display();
+    rb->lcd_setfont(moves_font);
+#if LCD_WIDTH > LCD_HEIGHT
+    rb->lcd_vline(IMAGE_WIDTH, 0, LCD_HEIGHT-1);
+    w = rb->lcd_getstringsize("Moves", NULL, NULL);
+    rb->lcd_putsxy((IMAGE_WIDTH+1+(LCD_WIDTH-IMAGE_WIDTH-1)/2) - w / 2,
+                   10, "Moves");
+    rb->snprintf(s, sizeof(s), "%d", moves);
+    w = rb->lcd_getstringsize(s, NULL, NULL);
+    rb->lcd_putsxy((IMAGE_WIDTH+1+(LCD_WIDTH-IMAGE_WIDTH-1)/2) - w / 2,
+                   moves_y, s);
+#else
+    (void)w;
+    rb->lcd_hline(0, LCD_WIDTH-1, IMAGE_HEIGHT);
+    rb->snprintf(s, sizeof(s), "Moves: %d", moves);
+    rb->lcd_putsxy(3, moves_y, s);
+#endif
+
+    /* draw spots to the lcd */
+    for (i=0; i<NUM_SPOTS; i++)
+        draw_spot(spots[i], (i%SPOTS_X)*SPOTS_WIDTH, (i/SPOTS_X)*SPOTS_HEIGHT);
+
+    rb->lcd_update();
+}
+
 /* initializes the puzzle */
 static void puzzle_init(void)
 {
     int i, r, temp, tsp[NUM_SPOTS];
 
     moves = 0;
-    rb->lcd_clear_display();
-    rb->snprintf(s, sizeof(s), "%d", moves);
-
-#if ((LCD_WIDTH - IMAGE_SIZE) > (LCD_HEIGHT - IMAGE_HEIGHT))
-    rb->lcd_drawrect(IMAGE_WIDTH, 0, LCD_WIDTH-IMAGE_WIDTH, IMAGE_HEIGHT);
-    rb->lcd_putsxy(IMAGE_WIDTH+1, 10, (unsigned char *)"Moves");
-    rb->lcd_putsxy(IMAGE_WIDTH+5, 20, (unsigned char *)s);
-#else
-    rb->lcd_drawrect(0, IMAGE_HEIGHT, IMAGE_WIDTH,
-                     (LCD_HEIGHT-IMAGE_HEIGHT));
-    rb->lcd_putsxy(3, IMAGE_HEIGHT+7, (unsigned char *)"Moves: ");
-    rb->lcd_putsxy(40, IMAGE_HEIGHT+7, (unsigned char *)s);
-#endif
 
     /* shuffle spots */
     for (i=NUM_SPOTS-1; i>=0; i--) {
@@ -407,11 +434,7 @@ static void puzzle_init(void)
         }
     }
 
-    /* draw spots to the lcd */
-    for (i=0; i<NUM_SPOTS; i++)
-        draw_spot(spots[i], (i%SPOTS_X)*SPOTS_WIDTH, (i/SPOTS_X)*SPOTS_HEIGHT);
-
-    rb->lcd_update();
+    draw_playfield();
 }
 
 /* the main game loop */
@@ -419,7 +442,6 @@ static int puzzle_loop(void)
 {
     int button;
     int lastbutton = BUTTON_NONE;
-    int i;
     bool load_success;
 
     puzzle_init();
@@ -461,22 +483,7 @@ static int puzzle_loop(void)
 
                 /* tell the user what mode we picked in the end! */
                 rb->splash(HZ,picmode_descriptions[ picmode ] );
-                rb->lcd_clear_display();
-#if ((LCD_WIDTH - IMAGE_SIZE) > (LCD_HEIGHT - IMAGE_HEIGHT))
-                rb->lcd_drawrect(IMAGE_WIDTH, 0, LCD_WIDTH-IMAGE_WIDTH,
-                                 IMAGE_HEIGHT);
-                rb->lcd_putsxy(IMAGE_WIDTH+1, 10, (unsigned char *)"Moves");
-#else
-                rb->lcd_drawrect(0, IMAGE_HEIGHT, IMAGE_WIDTH,
-                                 (LCD_HEIGHT-IMAGE_HEIGHT));
-                rb->lcd_putsxy(3, IMAGE_HEIGHT+7, (unsigned char *)"Moves: ");
-#endif
-                for (i=0; i<NUM_SPOTS; i++)
-                    draw_spot(spots[i],
-                              (i%SPOTS_X)*SPOTS_WIDTH,
-                              (i/SPOTS_X)*SPOTS_HEIGHT);
-                rb->lcd_update();
-
+                draw_playfield();
                 break;
 
             case BUTTON_LEFT:
@@ -594,27 +601,41 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_OK;
     }
 
-#if LCD_DEPTH>1
+    /* Calculate possible font sizes and text positions */
+    rb->lcd_setfont(FONT_UI);
+    rb->lcd_getstringsize("15", &w, &h);
+    if ((w > (SPOTS_WIDTH-2)) || (h > (SPOTS_HEIGHT-2)))
+        num_font = FONT_SYSFIXED;
+
+#if LCD_WIDTH > LCD_HEIGHT
+    rb->lcd_getstringsize("Moves", &w, &h);
+    if (w > (LCD_WIDTH-IMAGE_WIDTH-1))
+        moves_font = FONT_SYSFIXED;
+    rb->lcd_setfont(moves_font);
+    rb->lcd_getstringsize("Moves", &w, &h);
+    moves_y = 10 + h;
+#else
+    rb->lcd_getstringsize("Moves: 999", &w, &h);
+    if ((w > LCD_WIDTH) || (h > (LCD_HEIGHT-IMAGE_HEIGHT-1)))
+        moves_font = FONT_SYSFIXED;
+    rb->lcd_setfont(moves_font);
+    rb->lcd_getstringsize("Moves: 999", &w, &h);
+    moves_y = (IMAGE_HEIGHT+1+(LCD_HEIGHT-IMAGE_HEIGHT-1)/2) - h / 2;
+#endif
+    for (i=0; i<NUM_SPOTS; i++)
+        spots[i]=(i+1);
+
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_backdrop(NULL);
+#elif LCD_DEPTH > 1
+    rb->lcd_set_background(LCD_WHITE);
+    rb->lcd_set_foreground(LCD_BLACK);
+    rb->lcd_set_backdrop(NULL);
 #endif
 
-    rb->lcd_clear_display();
-#if ((LCD_WIDTH - IMAGE_SIZE) > (LCD_HEIGHT - IMAGE_HEIGHT))
-    rb->lcd_drawrect(IMAGE_WIDTH, 0, LCD_WIDTH-IMAGE_WIDTH, IMAGE_HEIGHT);
-    rb->lcd_putsxy(IMAGE_WIDTH+1, 10, (unsigned char *)"Moves");
-#else
-    rb->lcd_drawrect(0, IMAGE_HEIGHT, IMAGE_WIDTH,
-                     (LCD_HEIGHT-IMAGE_HEIGHT));
-    rb->lcd_putsxy(3, IMAGE_HEIGHT+7, (unsigned char *)"Moves: ");
-#endif
-    for (i=0; i<NUM_SPOTS; i++) {
-        spots[i]=(i+1);
-        draw_spot(spots[i], (i%SPOTS_X)*SPOTS_WIDTH, (i/SPOTS_X)*SPOTS_HEIGHT);
-    }
-
-    rb->lcd_update();
+    draw_playfield();
     rb->sleep(HZ*2);
 
     return puzzle_loop();
