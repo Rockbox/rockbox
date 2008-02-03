@@ -21,69 +21,40 @@
 
     \begin{table}
       \begin{btnmap}{}{}
-          \opt{IRIVER_H10_PAD}{\ButtonRew, \ButtonFF}
-          \nopt{IRIVER_H10_PAD}{\ButtonLeft, \ButtonRight}
+          \ActionFMPrev, \ActionFMNext
           & Change frequency in \setting{SCAN} mode or jump to next/previous
           station in \setting{PRESET} mode\\
           %
-          \opt{IRIVER_H10_PAD}{Long \ButtonRew, \ButtonFF}
-          \nopt{IRIVER_H10_PAD}{Long \ButtonLeft, \ButtonRight}
-          & Seek to next station or preset in
-            \setting{SCAN} mode.\\
+          Long \ActionFMPrev, \ActionFMNext
+          & Seek to next station or preset in \setting{SCAN} mode.\\
           %
-          \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown}
-          \opt{SANSA_E200_PAD}{\ButtonScrollBack, \ButtonScrollFwd}
-          \opt{SANSA_C200_PAD}{\ButtonVolUp, \ButtonVolDown}
-          \nopt{IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonUp, \ButtonDown}
-            & Change volume.\\
+          \ActionFMSettingsInc, \ActionFMSettingsDec
+          & Change volume.\\
           \opt{RECORDER_PAD}{
             \ButtonPlay
-            & freezes all screen updates. May enhance radio reception in some
+            & Freezes all screen updates. May enhance radio reception in some
               cases.\\
           }
 
           %
-          \opt{RECORDER_PAD}{\ButtonOn}
-          \opt{ONDIO_PAD}{Long \ButtonOff}
-          \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-          \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
-          \opt{IAUDIO_X5_PAD}{\ButtonRec}
-          \opt{SANSA_E200_PAD}{\ButtonDown}
-          \opt{SANSA_C200_PAD}{\ButtonPower}
+          \ActionFMExit
           & Leave the radio screen with the radio playing.\\
           %
-          \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}%
-            {\ButtonOff}%
-          \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,IRIVER_H10_PAD}{\ButtonPower}%
-          \opt{SANSA_C200_PAD}{Long \ButtonUp}%
+          \ActionFMStop
           & Stops the radio and returns to \setting{Main Menu}.\\%
           %
           \nopt{ONDIO_PAD}{%
-            \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
-            \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}%
-            \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonUp}%
-            & Mutes radio playback.\\%
+            \nopt{RECORDER_PAD}{\ActionFMPlay & Mutes radio playback.\\}%
             %
-            \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{Long \ButtonOn}
-            \opt{IAUDIO_X5_PAD}{Long \ButtonPlay}
-            \opt{SANSA_E200_PAD}{Long \ButtonUp}
-            \opt{SANSA_C200_PAD}{\ButtonRec}
-            \opt{IRIVER_H10_PAD}{\ButtonLeft}
+            \ActionFMMode
             & Switches between \setting{SCAN} and \setting{PRESET} mode.\\
             %
-            \opt{RECORDER_PAD}{\ButtonFTwo}
-            \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}
-                {\ButtonSelect}
-            \opt{IRIVER_H10_PAD}{\ButtonRight}
+            \ActionFMPreset
             & Opens a list of radio presets. You can view all the presets that 
               you have, and switch to the station.\\
           }%
           %
-          \opt{RECORDER_PAD}{\ButtonFOne}%
-          \opt{ONDIO_PAD}{Long \ButtonMenu}%
-          \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{Long \ButtonSelect}%
-          \opt{IRIVER_H10_PAD}{Long \ButtonRight}%
-          \opt{SANSA_C200_PAD}{\ButtonDown}%
+          \ActionFMMenu
           & Displays the FM radio settings menu.\\
        \end{btnmap}
     \end{table}
@@ -92,69 +63,44 @@
 
   \item[Saving a preset:]
     Up to 64 of your favourite stations can be saved as presets.
-    \opt{RECORDER_PAD}{Press \ButtonFTwo\ to go to the presets list, press
-    \ButtonFOne\ to add a preset.}%
+    \opt{RECORDER_PAD}{Press \ButtonFTwo{} to go to the presets list, press
+    \ButtonFOne{} to add a preset.}%
     \nopt{RECORDER_PAD}{%
-      \opt{ONDIO_PAD}{Long \ButtonMenu}%
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD}{Long \ButtonSelect}%
-      \opt{IRIVER_H10_PAD}{Long \ButtonRight}%
-      \opt{SANSA_C200_PAD}{\ButtonDown}
-      to go to the menu, then select \setting{Add preset}.%
+      \ActionFMMenu{} to go to the menu, then select \setting{Add preset}.%
     }
     Enter the name (maximum number of characters is 32).
-    \opt{ONDIO_PAD}{Long \ButtonMenu\ to save.}%
-    \nopt{ONDIO_PAD}{Press \ActionKbdDone\ to save.}
+    Press \ActionKbdDone{} to save.
 
     \note{See this page for pre-made FM radio presets from all around the world.}
     \wikilink{FmPresets}
 
   \item[Selecting a preset:]
-        \opt{ONDIO_PAD}{Long \ButtonMenu\ to open the menu, select
+        \opt{ONDIO_PAD}{\ActionFMMenu{} to open the menu, select
           \setting{Preset}}%
-        \opt{RECORDER_PAD}{Press \ButtonFTwo}%
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}
-            {Press \ButtonSelect}%
-        \opt{IRIVER_H10_PAD}{Press \ButtonRight}
-        to go to the presets list.
-        Use
-        \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown}
-        \opt{SANSA_E200_PAD}{\ButtonScrollBack, \ButtonScrollFwd}%
-        \nopt{IRIVER_H10_PAD,SANSA_E200_PAD}{\ButtonUp\ and \ButtonDown}
-        to move the cursor and then press
-        \opt{RECORDER_PAD}{\ButtonPlay}%
-        \opt{ONDIO_PAD,IRIVER_H10_PAD}{\ButtonRight}%
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}
-            {\ButtonSelect}
-        to select. Use \ButtonLeft\ to leave the preset without selecting
+        \nopt{ONDIO_PAD}{\ActionFMPreset} to go to the presets list.
+        Use \ActionFMSettingsInc{} and \ActionFMSettingsDec{}
+        to move the cursor and then press \ActionStdOk{}
+        to select. Use \ButtonLeft{} to leave the preset without selecting
         anything.
 
   \item[Removing a preset:]
-        \opt{ONDIO_PAD}{Long \ButtonMenu\ to open the menu, select \setting{Preset}}%
-        \opt{RECORDER_PAD}{Press \ButtonFTwo}%
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}
-            {Press \ButtonSelect}%
-        \opt{IRIVER_H10_PAD}{Press \ButtonRight}
-        to go to the presets list. Use
-        \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown}
-        \opt{SANSA_E200_PAD}{\ButtonScrollBack, \ButtonScrollFwd}%
-        \nopt{IRIVER_H10_PAD,SANSA_E200_PAD}{\ButtonUp\ and \ButtonDown}
-        to move the cursor and then
-        \opt{RECORDER_PAD}{press \ButtonFThree}%
-        \opt{ONDIO_PAD,IRIVER_H10_PAD}{Long \ButtonRight}%
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}
-            {Long \ButtonSelect}
+        \opt{ONDIO_PAD}{\ActionFMMenu{} to open the menu, select
+          \setting{Preset}}%
+        \nopt{ONDIO_PAD}{\ActionPreset} to go to the presets list.
+        Use \ActionFMSettingsInc{} and \ActionFMSettingsDec{}
+        to move the cursor and then press \ActionStdContext{}
         on the preset that you wish to remove, then select \setting{Remove Preset}.
 
       \opt{RECORDER_PAD,ONDIO_PAD}{
           \item[Recording:]
             \opt{RECORDER_PAD}{Press \ButtonFThree}%
             \opt{ONDIO_PAD}{Double press \ButtonMenu}
-            to start recording the currently playing station. Press \ButtonOff\ to
+            to start recording the currently playing station. Press \ButtonOff{} to
               stop recording.%
-            \opt{RECORDER_PAD}{ Press \ButtonPlay\ again to seamlessly start recording
+            \opt{RECORDER_PAD}{ Press \ButtonPlay{} again to seamlessly start recording
               to a new file.}
             The settings for the recording can be changed in the
-            \opt{RECORDER_PAD}{\ButtonFOne\ menu}%
+            \opt{RECORDER_PAD}{\ButtonFOne{} menu}%
             \opt{ONDIO_PAD}{respective menu reached through the FM radio settings menu
               (Long \ButtonMenu)}
             before starting the recording. See \reference{ref:Recordingsettings}
