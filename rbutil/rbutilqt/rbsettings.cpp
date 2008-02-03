@@ -317,7 +317,7 @@ QString RbSettings::encoderPath(QString enc)
 QString RbSettings::encoderOptions(QString enc)
 {
     userSettings->beginGroup(enc);
-    QString op = userSettings->value("encoderpath").toString();
+    QString op = userSettings->value("encoderoptions").toString();
     userSettings->endGroup();
     return op;
 }
