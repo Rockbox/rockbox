@@ -45,7 +45,7 @@ void CreateVoiceWindow::accept()
     logger->show();
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
     
-    QString lang = ui.comboLanguage->currentText();   
+    QString lang = ui.comboLanguage->currentText();
     int wvThreshold = ui.wavtrimthreshold->value();
     
     //safe selected language
@@ -88,10 +88,8 @@ void CreateVoiceWindow::setSettings(RbSettings* sett)
     
     QString encoder = settings->curEncoder();
     // only proceed if encoder setting is set
-    if(!encoder.isEmpty()) {
-        // FIXME: getEncoder CAN return a NULL pointer. Additional error
-        // checking is required or getEncoder should use the default engine
-        EncBase* enc = getEncoder(encoder);
+    EncBase* enc = getEncoder(encoder);
+    if(enc != NULL) {
         enc->setCfg(settings);
         if(enc->configOk())
             ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg(encoder));
