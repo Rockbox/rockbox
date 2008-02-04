@@ -4062,11 +4062,12 @@ static bool check_deleted_files(void)
     return true;
 }
 
-static bool check_dir(const char *dirname)
+static bool check_dir(const char *dirname, int add_files)
 {
     DIR *dir;
     int len;
     int success = false;
+    int ignore, unignore;
     char newpath[MAX_PATH];
 
     dir = opendir(dirname);
@@ -4078,12 +4079,15 @@ static bool check_dir(const char *dirname)
     
     /* check for a database.ignore file */
     snprintf(newpath, MAX_PATH, "%s/database.ignore", dirname);
-    if (file_exists(newpath))
-    {
-        closedir(dir);
-        return false;
-    }
-    
+    ignore = file_exists(newpath);
+    /* check for a database.unignore file */
+    snprintf(newpath, MAX_PATH, "%s/database.unignore", dirname);
+    unignore = file_exists(newpath);
+
+    /* don't do anything if both ignore and unignore are there */
+    if (ignore != unignore)
+        add_files = unignore;
+
     /* Recursively scan the dir. */
 #ifdef __PCTOOL__
     while (1)
@@ -4113,8 +4117,8 @@ static bool check_dir(const char *dirname)
         
         processed_dir_count++;
         if (entry->attribute & ATTR_DIRECTORY)
-            check_dir(curpath);
-        else
+            check_dir(curpath, add_files);
+        else if (add_files)
         {
             tc_stat.curentry = curpath;
             
@@ -4193,7 +4197,7 @@ void build_tagcache(const char *path)
 
     if (strcmp("/", path) != 0)
         strcpy(curpath, path);
-    ret = check_dir(path);
+    ret = check_dir(path, true);
     
     /* Write the header. */
     header.magic = TAGCACHE_MAGIC;
