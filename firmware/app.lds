@@ -78,7 +78,7 @@ INPUT(target/sh/crt0.o)
 #define IRAMSIZE 0x4000
 #elif CONFIG_CPU==IMX31L
 #define DRAMORIG (0x0 + STUBOFFSET)
-#define IRAMORIG 0x1FFFC000
+/* #define IRAMORIG 0x1FFFC000 */
 #define IRAMORIG DRAMORIG
 #define IRAM     DRAM
 #define IRAMSIZE 0x4000
