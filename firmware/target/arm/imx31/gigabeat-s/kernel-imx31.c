@@ -41,7 +41,6 @@ void tick_start(unsigned int interval_in_ms)
      * Count from load value */
     EPITCR1 = (0x3 << 24) | (1 << 19) | (32 << 4) |
               (1 << 3) | (1 << 2) | (1 << 1);
-    EPITSR1 = 1;                /* Clear any pending interrupt */
 #ifndef BOOTLOADER
     EPITLR1 = interval_in_ms;
     EPITCMPR1 = 0;              /* Event when counter reaches 0 */
@@ -49,12 +48,8 @@ void tick_start(unsigned int interval_in_ms)
 #else
     (void)interval_in_ms;
 #endif
+    EPITSR1 = 1;                /* Clear any pending interrupt after
+                                   enabling the vector */
 
     EPITCR1 |= (1 << 0);        /* Enable the counter */
-
-    /* Why does only this trigger the counter? Remove when we find out. */
-    asm volatile (
-        "mcr p15, 0, %0, c7, c0, 4 \n"
-        : : "r" (0)
-    );
 }
