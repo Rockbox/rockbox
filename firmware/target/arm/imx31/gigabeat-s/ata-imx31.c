@@ -44,7 +44,7 @@ void ata_enable(bool on)
 
 bool ata_is_coldstart(void)
 {
-    return true;
+    return 0;
 }
 
 unsigned long get_pll(bool serial) {
