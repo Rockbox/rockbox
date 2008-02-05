@@ -1188,17 +1188,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, keyclick_repeats, LANG_KEYCLICK_REPEATS, false, "keyclick repeats", NULL),
 #endif /* CONFIG_CODEC == SWCODEC */
     FILENAME_SETTING(0, playlist_catalog_dir, "playlist catalog directory",
-                     PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL, MAX_FILENAME+1),
-#ifdef HAVE_QUICKSCREEN
-    FILENAME_SETTING(0, quickscreen_left, "quickscreen left",
-                    "shuffle", NULL, NULL, MAX_FILENAME+1),
-    FILENAME_SETTING(0, quickscreen_right, "quickscreen right",
-                    "repeat", NULL, NULL, MAX_FILENAME+1),
-    FILENAME_SETTING(0, quickscreen_top, "quickscreen top",
-                    "", NULL, NULL, MAX_FILENAME+1),
-    FILENAME_SETTING(0, quickscreen_bottom, "quickscreen bottom",
-                    "show files", NULL, NULL, MAX_FILENAME+1),
-#endif
+                    PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL, MAX_FILENAME+1),
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

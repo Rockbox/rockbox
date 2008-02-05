@@ -224,7 +224,6 @@ void settings_display(void);
 enum optiontype { INT, BOOL };
 
 const struct settings_list* find_setting(void* variable, int *id);
-const struct settings_list* find_setting_from_string(char* setting, int *id);
 bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len);
 void talk_setting(void *global_settings_variable);
 bool set_sound(const unsigned char * string,
@@ -726,13 +725,6 @@ struct user_settings
     int keyclick_repeats; /* keyclick on repeats */
 #endif
     unsigned char playlist_catalog_dir[MAX_FILENAME+1];
-    
-#ifdef HAVE_QUICKSCREEN
-    unsigned char quickscreen_left[MAX_FILENAME+1];
-    unsigned char quickscreen_right[MAX_FILENAME+1];
-    unsigned char quickscreen_top[MAX_FILENAME+1];
-    unsigned char quickscreen_bottom[MAX_FILENAME+1];
-#endif
 };
 
 /** global variables **/

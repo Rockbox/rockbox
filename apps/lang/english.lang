@@ -10087,53 +10087,53 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
-  desc: deprecated
+  desc: bool true representation
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Yes"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Yes"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Yes"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_NO
-  desc: deprecated
+  desc: bool false representation
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "No"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "No"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "No"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ON
-  desc: deprecated
+  desc: Used in a lot of places
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "On"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "On"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "On"
   </voice>
 </phrase>
 <phrase>
@@ -10206,206 +10206,206 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SHUFFLE
-  desc: deprecated
+  desc: in settings_menu
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Shuffle"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Shuffle"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Shuffle"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT
-  desc: deprecated
+  desc: in settings_menu
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Repeat"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Repeat"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Repeat"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ALL
-  desc: deprecated
+  desc: repeat playlist once all songs have completed
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "All"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "All"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "All"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
-  desc: deprecated
+  desc: repeat one song
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "One"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "One"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "One"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
-  desc: deprecated
+  desc: repeat range from point A to B
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "A-B"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "A-B"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "A-B"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER
-  desc: deprecated
+  desc: setting name for dir filter
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Show Files"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Show Files"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Show Files"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: deprecated
+  desc: show all file types supported by Rockbox
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Supported"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Supported"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Supported"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_MUSIC
-  desc: deprecated
+  desc: show only music-related files
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Music"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Music"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Music"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: deprecated
+  desc: show only playlist
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Playlists"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Playlists"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Playlists"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: deprecated
+  desc: in settings_menu, option to turn display+buttos by 180 degreed
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Upside Down"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Upside Down"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Upside Down"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SCROLL_BAR
-  desc: deprecated
+  desc: display menu, F3 substitute
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Scroll Bar"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Scroll Bar"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Scroll Bar"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_STATUS_BAR
-  desc: deprecated
+  desc: display menu, F3 substitute
   user:
   <source>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Status Bar"
   </source>
   <dest>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Status Bar"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Status Bar"
   </voice>
 </phrase>
 <phrase>
