@@ -76,16 +76,26 @@ bool cuesheet_is_enabled(void)
 bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path)
 {
     DEBUGF("look for cue file\n");
+
     char cuepath[MAX_PATH];
+    char *dot, *slash;
+
+    slash = strrchr(trackpath, '/');
+    if (!slash)
+    {
+        found_cue_path = NULL;
+        return false;
+    }
+
     strncpy(cuepath, trackpath, MAX_PATH);
-    char *dot = strrchr(cuepath, '.');
+    dot = strrchr(cuepath, '.');
     strcpy(dot, ".cue");
 
     int fd = open(cuepath,O_RDONLY);
     if (fd < 0)
     {
         strcpy(cuepath, CUE_DIR);
-        strcat(cuepath, strrchr(trackpath, '/'));
+        strcat(cuepath, slash);
         char *dot = strrchr(cuepath, '.');
         strcpy(dot, ".cue");
         fd = open(cuepath,O_RDONLY);
