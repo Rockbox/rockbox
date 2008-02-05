@@ -60,7 +60,7 @@ static const char *unit_strings[] =
 /* these two vars are needed so arbitrary values can be added to the
    TABLE_SETTING settings if the F_ALLOW_ARBITRARY_VALS flag is set */
 static int table_setting_oldval = 0, table_setting_array_position = 0;
-static char *option_get_valuestring(struct settings_list *setting, 
+char *option_get_valuestring(struct settings_list *setting, 
                              char *buffer, int buf_len,
                              intptr_t temp_var)
 {
@@ -210,19 +210,20 @@ static int option_talk(int selected_item, void * data)
     }
     return 0;
 }
-#if 0
-int option_select_next_val(struct settings_list *setting,
-                           intptr_t temp_var)
+
+void option_select_next_val(struct settings_list *setting)
 {
     int val = 0;
+    int *value = setting->setting;
     if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
     {
-        val = (bool)temp_var ? 0 : 1;
+        *(bool*)value = !*(bool*)value;
+        return;
     }
     else if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
     {
-        struct int_setting *info = setting->int_setting;
-        val = (int)temp_var + info->step;
+        struct int_setting *info = (struct int_setting *)setting->int_setting;
+        val = *value + info->step;
         if (val > info->max)
             val = info->min;
     }
@@ -232,55 +233,19 @@ int option_select_next_val(struct settings_list *setting,
         int steps = sound_steps(setting_id);
         int min = sound_min(setting_id);
         int max = sound_max(setting_id);
-        val = (int)temp_var + steps;
-        if (val > max)
+        val = *value + steps;
+        if (val >= max)
             val = min;
     }
     else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
     {
-        struct choice_setting *info = setting->choice_setting;
-        val = (int)temp_var;
-        if (val > info->count)
+        struct choice_setting *info = (struct choice_setting *)setting->choice_setting;
+        val = *value + 1;
+        if (val >= info->count)
             val = 0;
     }
-    return val;
+    *value = val;
 }
-
-int option_select_prev_val(struct settings_list *setting,
-                           intptr_t temp_var)
-{
-    int val = 0;
-    if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
-    {
-        val = (bool)temp_var ? 0 : 1;
-    }
-    else if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
-    {
-        struct int_setting *info = setting->int_setting;
-        val = (int)temp_var - info->step;
-        if (val < info->min)
-            val = info->max;
-    }
-    else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
-    {
-        int setting_id = setting->sound_setting->setting;
-        int steps = sound_steps(setting_id);
-        int min = sound_min(setting_id);
-        int max = sound_max(setting_id);
-        val = (int)temp_var -+ steps;
-        if (val < min)
-            val = max;
-    }
-    else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
-    {
-        struct choice_setting *info = setting->choice_setting;
-        val = (int)temp_var;
-        if (val < 0)
-            val = info->count - 1;
-    }
-    return val;
-}
-#endif
 
 static int selection_to_val(struct settings_list *setting, int selection)
 {

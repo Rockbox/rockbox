@@ -1000,7 +1000,20 @@ const struct settings_list* find_setting(void* variable, int *id)
     }
     return NULL;
 }
-
+const struct settings_list* find_setting_from_string(char* setting, int *id)
+{
+    int i;
+    for(i=0;i<nb_settings;i++)
+    {
+        if (settings[i].cfg_name && !strcmp(setting, settings[i].cfg_name))
+        {
+            if (id)
+                *id = i;
+            return &settings[i];
+        }
+    }
+    return NULL;
+}
 void talk_setting(void *global_settings_variable)
 {
     const struct settings_list *setting;

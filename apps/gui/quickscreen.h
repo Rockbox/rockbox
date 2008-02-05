@@ -27,45 +27,30 @@
 #include "option_select.h"
 #include "screen_access.h"
 
-struct gui_quickscreen;
-/*
- * Callback function called each time the quickscreen gets modified
- *  - qs : the quickscreen that did the modification
- */
-typedef void (quickscreen_callback)(struct gui_quickscreen * qs);
+enum QUICKSCREEN_ITEM {
+    QUICKSCREEN_LEFT = 0,
+    QUICKSCREEN_RIGHT,
+    QUICKSCREEN_TOP,
+    QUICKSCREEN_BOTTOM,
+    QUICKSCREEN_ITEM_COUNT,
+};
 
 struct gui_quickscreen
 {
-    struct option_select *left_option;
-    struct option_select *bottom_option;
-    struct option_select *right_option;
-    quickscreen_callback *callback;
+    const struct settings_list *items[QUICKSCREEN_ITEM_COUNT];
+    void (*callback)(struct gui_quickscreen * qs);
 };
 
-/*
- * Initializes a quickscreen
- *  - qs : the quickscreen
- *  - left_option, bottom_option, right_option : a list of choices
- *                                               for each option
- *  - left_right_title : the 2nd line of the title
- *                       on the left and on the right
- *  - callback : a callback function called each time the quickscreen
- *               gets modified
- */
-void gui_quickscreen_init(struct gui_quickscreen * qs,
-                          struct option_select *left_option,
-                          struct option_select *bottom_option,
-                          struct option_select *right_option,
-                          quickscreen_callback *callback);
 
-
-/*
- * Runs the quickscreen on all available screens, if button_enter is released, quits
- *  - qs : the quickscreen
- *  - button_enter : button pressed at the same time the quickscreen is displayed
- * returns : true if usb was connected, false otherwise
- */
+struct gui_quickscreen;
 bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter);
+
+
+#ifdef BUTTON_F3
+extern bool quick_screen_f3(int button_enter);
+#endif
+extern bool quick_screen_quick(int button_enter);
+
 
 #endif /*_GUI_QUICK_SCREEN_H_*/
 #endif /* HAVE_QUICKSCREEN */

@@ -77,6 +77,7 @@
 #include "buttonbar.h"
 #include "textarea.h"
 #include "action.h"
+#include "quickscreen.h"
 
 #include "root_menu.h"
 
