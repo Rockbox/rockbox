@@ -40,30 +40,30 @@ static void reverse_bits(unsigned char* v, int size) {
 
     for(j=0; j<size; j++) {   
         in = v[j];
-        for(i=0; i<8; i++) {
-           out |= (in & 1);
+        out = in;
+        for(i=0; i<7; i++) {
            in  = in >>1;
            out = out<<1;
+           out |= (in & 1);
         }   
-        v[j] = out>>1;
+        v[j] = out;
     }   
 }    
 
-static int sw_i2c(int access, unsigned char chip, unsigned char cmd, 
-                              unsigned char* buf, int count) {
-    int i;
+static int sw_i2c(int access, int cmd, unsigned char* buf, int count) {
+    int i, addr;
 
     i2c_lock();
     GPIOC_ENABLE |=  0x00000030;
 
-    chip|=cmd<<1;
+    addr = RTC_ADDR | (cmd<<1);
 
     if(access == SW_I2C_READ) {
-        i = sw_i2c_read(chip, 0, buf, count);
+        i = sw_i2c_read(addr, 0, buf, count);
         reverse_bits(buf, count);
     } else {
         reverse_bits(buf, count);
-        i = sw_i2c_write(chip, 0, buf, count);
+        i = sw_i2c_write(addr, 0, buf, count);
     }    
 
     GPIOC_ENABLE &= ~0x00000030;
@@ -77,11 +77,49 @@ static int sw_i2c(int access, unsigned char chip, unsigned char cmd,
 void rtc_init(void)
 {
     sw_i2c_init();
+ 
+#if 0    
+    /* init sequence from OF for reference */
+    /* currently we rely on the bootloader doing it for us */       
+    
+    bool flag = true;
+    unsigned char data;   
+    unsigned char v[7] = {0x00,0x47,0x17,0x06,0x03,0x02,0x08}; /* random time */
+    
+    if(flag) { 
+        
+        GPIOB_ENABLE |= 0x80;
+        GPIOB_OUTPUT_EN |= 0x80;
+        GPIOB_OUTPUT_VAL &= ~0x80;
+        
+        DEV_EN |= 0x1000;
+        /* some more stuff that is not clear */ 
+        
+        sw_i2c(SW_I2C_READ, RTC_CMD_CTRL, &data, 1);       
+        if((data<<0x18)>>0x1e) {        /* bit 7 & 6 */
+            
+            data = 1;
+            sw_i2c(SW_I2C_WRITE, RTC_CMD_CTRL, &data, 1);
+    
+            data = 1;
+            sw_i2c(SW_I2C_WRITE, RTC_CMD_CTRL, &data, 1);
+        
+            data = 8;
+            sw_i2c(SW_I2C_WRITE, RTC_CMD_UNKN, &data, 1);
+        
+            /* more stuff, perhaps set up time array? */
+            
+            rtc_write_datetime(v);
+                
+        }
+        data = 2;
+        sw_i2c(SW_I2C_WRITE, RTC_CMD_CTRL, &data, 1);
+    
+    }
+    data = 2;
+    sw_i2c(SW_I2C_WRITE, RTC_CMD_CTRL, &data, 1);   
+#endif    
 
-    /* to set a time while buttons are stil not working
-    unsigned char v[7] = {0x00,0x47,0x17,0x06,0x03,0x02,0x08};
-    rtc_write_datetime(v);
-    */
 }
 
 int rtc_read_datetime(unsigned char* buf)
@@ -89,7 +127,7 @@ int rtc_read_datetime(unsigned char* buf)
     int i;
     unsigned char v[7];
 
-    i = sw_i2c(SW_I2C_READ, RTC_ADDR, RTC_CMD_DATA, v, 7);
+    i = sw_i2c(SW_I2C_READ, RTC_CMD_DATA, v, 7);
 
     v[4] &= 0x3f; /* mask out p.m. flag */
     
@@ -107,7 +145,7 @@ int rtc_write_datetime(unsigned char* buf)
     for(i=0; i<7; i++) 
         v[i]=buf[6-i];
         
-    i = sw_i2c(SW_I2C_WRITE, RTC_ADDR, RTC_CMD_DATA, v, 7);
+    i = sw_i2c(SW_I2C_WRITE, RTC_CMD_DATA, v, 7);
     
     return i;
 }
