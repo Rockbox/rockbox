@@ -268,6 +268,8 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
     gui_syncstatusbar_draw(&statusbars, true);
     FOR_NB_SCREENS(i)
     {
+        screens[i].set_viewport(NULL);
+        screens[i].scroll_stop(NULL);
         vp[i].x = 0;
         vp[i].width = screens[i].width;
         vp[i].y = STATUSBAR_HEIGHT;
@@ -275,8 +277,8 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
 #ifdef HAVE_LCD_COLOR
         if (screens[i].is_color)
         {
-            vp[i].fg_pattern = screens[i].get_foreground();
-            vp[i].bg_pattern = screens[i].get_background();
+            vp[i].fg_pattern = global_settings.fg_color;
+            vp[i].bg_pattern = global_settings.bg_color;
         }
 #endif
         vp[i].xmargin = 0;

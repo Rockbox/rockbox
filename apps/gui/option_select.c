@@ -211,6 +211,7 @@ static int option_talk(int selected_item, void * data)
     return 0;
 }
 
+#ifdef HAVE_QUICKSCREEN /* only the quickscreen uses this so far */
 void option_select_next_val(struct settings_list *setting)
 {
     int val = 0;
@@ -246,6 +247,7 @@ void option_select_next_val(struct settings_list *setting)
     }
     *value = val;
 }
+#endif
 
 static int selection_to_val(struct settings_list *setting, int selection)
 {
