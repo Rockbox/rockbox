@@ -43,7 +43,7 @@ static const char * avic_int_names[64] =
     "EXT_SENS1", "EXT_SENS2",     "EXT_WDOG",  "EXT_TV"
 };
 
-static void UIE_VECTOR(void) 
+static void UIE_VECTOR(void)
 {
     set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
     long offset = FIVECSR;
@@ -76,13 +76,13 @@ void __attribute__((naked)) fiq_handler(void)
     );
 }
 
-void avic_init(void) 
+void avic_init(void)
 {
-	/* Disable all interrupts and set to unhandled */
-	avic_disable_int(ALL);
-	
-	/* Init all interrupts to type IRQ */
-	avic_set_int_type(ALL, IRQ);
+    /* Disable all interrupts and set to unhandled */
+    avic_disable_int(ALL);
+
+    /* Init all interrupts to type IRQ */
+    avic_set_int_type(ALL, IRQ);
 
     /* Set NM bit to enable VIC */
     INTCNTL |= INTCNTL_NM;
@@ -90,11 +90,11 @@ void avic_init(void)
     /* Enable IRQ/FIQ in imx31 INTCNTL reg */
     INTCNTL &= ~(INTCNTL_ABFEN | INTCNTL_NIDIS | INTCNTL_FIDIS);
 
-	/* Enable VE bit in CP15 Control reg to enable VIC */
-	asm volatile (
+    /* Enable VE bit in CP15 Control reg to enable VIC */
+    asm volatile (
         "mrc p15, 0, r0, c1, c0, 0 \n"
-	    "orr r0, r0, #(1 << 24)    \n"
-	    "mcr p15, 0, r0, c1, c0, 0 \n"
+        "orr r0, r0, #(1 << 24)    \n"
+        "mcr p15, 0, r0, c1, c0, 0 \n"
         : : : "r0");
 
     /* Enable normal interrupts at all priorities */
@@ -107,11 +107,11 @@ void avic_enable_int(enum IMX31_INT_LIST ints, enum INT_TYPE intstype,
     int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED,
                                          IRQ_FIQ_STATUS);
 
-	if (ints != ALL) /* No mass-enable allowed */
-	{
+    if (ints != ALL) /* No mass-enable allowed */
+    {
         avic_set_int_type(ints, intstype);
         VECTOR(ints) = (long)handler;
-    	INTENNUM = ints;
+        INTENNUM = ints;
     }
 
     set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
@@ -121,17 +121,17 @@ void avic_disable_int(enum IMX31_INT_LIST ints)
 {
     long i;
 
-	if (ints == ALL)
-	{
-		for (i = 0; i < 64; i++)
+    if (ints == ALL)
+    {
+        for (i = 0; i < 64; i++)
         {
-			INTDISNUM = i;
+            INTDISNUM = i;
             VECTOR(i) = (long)UIE_VECTOR;
         }
-	}
+    }
     else
     {
-    	INTDISNUM = ints;
+        INTDISNUM = ints;
         VECTOR(ints) = (long)UIE_VECTOR;
     }
 }
@@ -165,12 +165,12 @@ void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype)
     int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED,
                                          IRQ_FIQ_STATUS);
 
-	if (ints == ALL)
-	{	
+    if (ints == ALL)
+    {
         int i;
-		for (i = 0; i < 64; i++)
+        for (i = 0; i < 64; i++)
             set_int_type(i, intstype);
-	}
+    }
     else
     {
         set_int_type(ints, intstype);
