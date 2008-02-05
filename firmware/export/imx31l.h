@@ -32,8 +32,7 @@
 #define LCD_BUFFER_SIZE ((320*240*2))
 #define TTB_SIZE (0x4000)
 #define TTB_BASE ((unsigned int *)TTB_BASE_ADDR)
-#define FRAME1 ALIGN_DOWN((TTB_BASE - LCD_BUFFER_SIZE), 32)
-#define FRAME2 ALIGN_DOWN((TTB_BASE - LCD_BUFFER_SIZE), 32)
+
 /*
  * AIPS 1
  */

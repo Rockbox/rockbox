@@ -2554,9 +2554,6 @@ void init_threads(void)
     struct thread_entry *thread;
     int slot;
 
-    memset(threads, 0, sizeof(threads));
-    memset(cores, 0, sizeof(cores));
-
     /* CPU will initialize first and then sleep */
     slot = find_empty_thread_slot();
 
