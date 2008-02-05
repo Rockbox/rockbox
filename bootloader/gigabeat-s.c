@@ -57,7 +57,7 @@ void main(void)
 {
     lcd_clear_display();
     printf("Hello world!");
-    printf("Gigabeat S Rockbox Bootloader v.00000001");
+    printf("Gigabeat S Rockbox Bootloader v.00000002");
     kernel_init();
     printf("kernel init done");
     int rc;
@@ -118,6 +118,7 @@ void main(void)
     if (rc == EOK)
     {
         kernel_entry = (void*) loadbuffer;
+        invalidate_icache();
         rc = kernel_entry();
     }
 

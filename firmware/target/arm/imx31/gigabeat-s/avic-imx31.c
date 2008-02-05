@@ -20,204 +20,161 @@
 #include "system.h"
 #include "imx31l.h"
 #include "avic-imx31.h"
+#include "panic.h"
 #include "debug.h"
+
+static const char * avic_int_names[64] =
+{
+    "RESERVED0", "RESERVED1",     "RESERVED2", "I2C3",
+    "I2C2",      "MPEG4_ENCODER", "RTIC",      "FIR",
+    "MMC/SDHC2", "MMC/SDHC1",     "I2C1",      "SSI2",
+    "SSI1",      "CSPI2",         "CSPI1",     "ATA",
+    "MBX",       "CSPI3",         "UART3",     "IIM",
+    "SIM1",      "SIM2",          "RNGA",      "EVTMON",
+    "KPP",       "RTC",           "PWN",       "EPIT2",
+    "EPIT1",     "GPT",           "PWR_FAIL",  "CCM_DVFS",
+    "UART2",     "NANDFC",        "SDMA",      "USB_HOST1",
+    "USB_HOST2", "USB_OTG",       "RESERVED3", "MSHC1",
+    "MSHC2",     "IPU_ERR",       "IPU",       "RESERVED4",
+    "RESERVED5", "UART1",         "UART4",     "UART5",
+    "ETC_IRQ",   "SCC_SCM",       "SCC_SMN",   "GPIO2",
+    "GPIO1",     "CCM_CLK",       "PCMCIA",    "WDOG",
+    "GPIO3",     "RESERVED6",     "EXT_PWMG",  "EXT_TEMP",
+    "EXT_SENS1", "EXT_SENS2",     "EXT_WDOG",  "EXT_TV"
+};
+
+static void UIE_VECTOR(void) 
+{
+    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+    long offset = FIVECSR;
+    long offsetn = (long)NIVECSR >> 16;
+
+    if (offsetn == -1)
+        offset = offsetn; /* Could be FIQ */
+
+    panicf("Unhandled %s %ld: %s",
+           offsetn >= 0 ? "IRQ" : "FIQ", offset,
+           offset >= 0 ? avic_int_names[offset] : "");
+}
+
+/* We use the AVIC */
+void __attribute__((naked)) irq_handler(void)
+{
+    panicf("Unhandled IRQ");
+}
+
+/* Accoring to section 9.3.5 of the UM, the AVIC doesn't accelerate
+ * fast interrupts and they must be dispatched */
+void __attribute__((naked)) fiq_handler(void)
+{
+    asm volatile (
+        "mov r10, #0x6c000000      \n" /* load AVIC base address */
+        "ldr r9, [r10, #0x44]      \n" /* read FIVECSR of AVIC */
+        "add r10, r10, #100        \n" /* move pointer to base of VECTOR table */
+        "ldr r8, [r10, r9, lsl #2] \n" /* read FIQ vector from VECTOR table */
+        "bx  r8                    \n" /* jump to FIQ service routine */
+    );
+}
 
 void avic_init(void) 
 {
-	/*following the steps in the AVIC setup in imx31 man*/
+	/* Disable all interrupts and set to unhandled */
+	avic_disable_int(ALL);
 	
-	/*Initialize interrupt structures*/
-	int i,avicstart;
-	/*get start of avic_init section for address calculation*/
-	__asm__ ("ldr %0,=_avicstart\n\t"
-		     :"=r"(avicstart):);
+	/* Init all interrupts to type IRQ */
+	avic_set_int_type(ALL, IRQ);
 
-	for(i=0; i < 64;i++)
-	{
-		imx31_int[i].name = (char *)&imx31_int_names[i];
-		imx31_int[i].int_type=IRQ;
-		/*integer i MUST be multiplied by 8 b/c gnu as
-		  generates 2 instructions for each vector instruction
-		  in vector_init(). Hence the value of 8 byte intervals
-		  between each vector start address*/
-		imx31_int[i].addr=(avicstart+(i*8));
-		imx31_int[i].priority=0;
-		imx31_int[i].pInt_Handler=Unhandled_Int;
-	}
-	
-	/*enable all Interrupts*/
-	avic_enable_int(ALL,IRQ,0);
-	
-	/*Setup all interrupt type IRQ*/
-	avic_set_int_type(ALL,IRQ);
-	
-	/*Set NM bit to enable VIC*/
-	INTCNTL |= (1 << 18);
+    /* Set NM bit to enable VIC */
+    INTCNTL |= INTCNTL_NM;
 
-	/*Setup Registers Vector0-Vector63 for interrupt handler functions*/
-	for(i=0; i < 64;i++)
-		writel(imx31_int[i].addr,(VECTOR_BASE_ADDR+(i*8)));
-	
-	/*disable FIQ for now until the interrupt handlers are more mature...*/
-	disable_fiq();
-	/*enable_fiq();*/
-	
-	/*enable IRQ in imx31 INTCNTL reg*/
-	INTCNTL &= ~(NIDIS);	
-	/*disable FIQ in imx31 INTCNTL reg*/
-	INTCNTL |= FIDIS;
+    /* Enable IRQ/FIQ in imx31 INTCNTL reg */
+    INTCNTL &= ~(INTCNTL_ABFEN | INTCNTL_NIDIS | INTCNTL_FIDIS);
 
-	/*enable IRQ in ARM11 core, enable VE bit in CP15 Control reg to enable VIC*/
-	__asm__ ("mrs r0,cpsr\t\n"
-		  "bic r0,r0,#0x80\t\n"
-		  "msr cpsr,r0\t\n"
-		  "mrc p15,0,r0,c1,c0,0\n\t"
-	          "orr r0,r0,#0x1000000\n\t"
-		  "mcr p15,0,r0,c1,c0,0\n\t":::
-		  "r0");
+	/* Enable VE bit in CP15 Control reg to enable VIC */
+	asm volatile (
+        "mrc p15, 0, r0, c1, c0, 0 \n"
+	    "orr r0, r0, #(1 << 24)    \n"
+	    "mcr p15, 0, r0, c1, c0, 0 \n"
+        : : : "r0");
+
+    /* Enable normal interrupts at all priorities */
+    NIMASK = 16;
 }
 
 void avic_enable_int(enum IMX31_INT_LIST ints, enum INT_TYPE intstype,
-		     void (*pInt_Handler) (void))
-{	
-	int i;
+                     void (*handler)(void))
+{
+    int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED,
+                                         IRQ_FIQ_STATUS);
 
-	if(ints == ALL) 
+	if (ints != ALL) /* No mass-enable allowed */
 	{
-		avic_set_int_type(ALL,intstype);
-		for(i=0;i<64;i++)
-			INTENNUM= (long)i;
-		if(!(*pInt_Handler))
-			pInt_Handler=Unhandled_Int;
-		return;
-	} 
+        avic_set_int_type(ints, intstype);
+        VECTOR(ints) = (long)handler;
+    	INTENNUM = ints;
+    }
 
-	imx31_int[ints].int_type=intstype;
-	imx31_int[ints].pInt_Handler=pInt_Handler;
-	avic_set_int_type(ints,intstype);
-	INTENNUM=(long)ints;
+    set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
 }
 
 void avic_disable_int(enum IMX31_INT_LIST ints)
 {
-	int i;
+    long i;
 
-	if(ints == ALL)
+	if (ints == ALL)
 	{
-		for(i=0;i<64;i++)		
-			INTDISNUM=(long)i;
-		imx31_int[ints].pInt_Handler=Unhandled_Int;
-		return;
+		for (i = 0; i < 64; i++)
+        {
+			INTDISNUM = i;
+            VECTOR(i) = (long)UIE_VECTOR;
+        }
 	}
-	
-	INTDISNUM=(long)ints;
+    else
+    {
+    	INTDISNUM = ints;
+        VECTOR(ints) = (long)UIE_VECTOR;
+    }
+}
+
+static void set_int_type(int i, enum INT_TYPE intstype)
+{
+    volatile unsigned long *reg;
+    long val;
+
+    if (i >= 32)
+    {
+        reg = &INTTYPEH;
+        val = 1L << (i - 32);
+    }
+    else
+    {
+        reg = &INTTYPEL;
+        val = 1L << i;
+    }
+
+    if (intstype == IRQ)
+        val = *reg & ~val;
+    else
+        val = *reg | val;
+
+    *reg = val;
 }
 
 void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype)
 {
-	int i;
-	if(ints == ALL)
+    int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED,
+                                         IRQ_FIQ_STATUS);
+
+	if (ints == ALL)
 	{	
-		imx31_int[ints].int_type=intstype;
-		for(i=0;i<64;i++)
-		{
-			if(intstype > CCM_DVFS)
-				INTTYPEH=(long)(intstype-32);
-			else INTTYPEL=(long)intstype;
-		}
-		return;
+        int i;
+		for (i = 0; i < 64; i++)
+            set_int_type(i, intstype);
 	}
-	
-	imx31_int[ints].int_type=intstype;
-	if(intstype > CCM_DVFS)
-		INTTYPEH=(long)(intstype-32);
-	else INTTYPEL=(long)intstype;
-}
+    else
+    {
+        set_int_type(ints, intstype);
+    }
 
-void Unhandled_Int(void) 
-{
-	enum IMX31_INT_LIST ints = 0;
-	DEBUGF("Unhandled Interrupt:\n");
-	DEBUGF("Name : %s\n",imx31_int[ints].name);
-	DEBUGF("Interrupt Type : ");
-	if(imx31_int[ints].int_type==IRQ)
-		DEBUGF("IRQ\n");
-	else DEBUGF("FIQ\n");
-	DEBUGF("Handler Address : 0x%x\n",imx31_int[ints].addr);
-	DEBUGF("Priority : %d",imx31_int[ints].priority);
-}
-
-void vector_init(void)
-{
-		
-		/*64 branch instructions, one for every vector in avic
-		A better idea would to calculate the shellcode for each of these 
-		instructions...*/
-		
-		
-	    __asm__("ldr pc, %0\n\t"::"g"(imx31_int[RESERVED0].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[RESERVED1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[RESERVED2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[I2C3].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[I2C2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[MPEG4_ENCODER].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[RTIC].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[FIR].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[MMC_SDHC2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[MMC_SDHC1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[I2C1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[SSI2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[SSI1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[CSPI2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[CSPI1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[ATA].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[MBX].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[CSPI3].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[UART3].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[IIM].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[SIM1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[SIM2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[RNGA].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[EVTMON].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[KPP].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[RTC].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[PWN].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[EPIT2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[EPIT1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[GPT].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[PWR_FAIL].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[CCM_DVFS].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[UART2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[NANDFC].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[SDMA].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[USB_HOST1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[USB_HOST2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[USB_OTG].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[RESERVED3].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[MSHC1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[MSHC2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[IPU_ERR].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[IPU].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[RESERVED4].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[RESERVED5].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[UART1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[UART4].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[UART5].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[ETC_IRQ].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[SCC_SCM].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[SCC_SMN].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[GPIO2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[GPIO1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[CCM_CLK].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[PCMCIA].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[WDOG].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[GPIO3].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[RESERVED6].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[EXT_PWMG].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[EXT_TEMP].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[EXT_SENS1].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[EXT_SENS2].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[EXT_WDOG].pInt_Handler));
-		__asm__("ldr pc, %0\n\t"::"g"(imx31_int[EXT_TV].pInt_Handler));
-        
+    set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
 }

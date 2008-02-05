@@ -9,11 +9,14 @@
 
 static volatile bool lcd_on = true;
 volatile bool lcd_poweroff = false;
+static unsigned lcd_yuv_options = 0;
 /*
 ** These are imported from lcd-16bit.c
 */
 extern unsigned fg_pattern;
 extern unsigned bg_pattern;
+
+extern struct viewport* current_vp;
 
 #if 0
 bool lcd_enabled()
@@ -22,68 +25,60 @@ bool lcd_enabled()
 }
 #endif
 
-void printscreen(unsigned int colour) {
+void printscreen(unsigned int colour)
+{
     int i;
-    int base = 0x84100000;
-    for(i=0;i<(320*240*2);i++) {
-        writel(colour,base);
+    char * base = (char *)FRAME;
+    for(i = 0; i < (320*240*2); i++)
+    {
+        writel(colour, base);
         base++;
     }
 }
 
-unsigned int LCDBANK(unsigned int address)
-{
-    return ((address >> 22) & 0xff);
-}
-
-unsigned int LCDBASEU(unsigned int address)
-{
-    return (address & ((1 << 22)-1)) >> 1;
-}
-
-unsigned int LCDBASEL(unsigned int address)
-{
-    address += 320*240*2;
-    return (address & ((1 << 22)-1)) >> 1;
-}
-
-
 /* LCD init */
 void lcd_init_device(void)
 {
-    int i;
-#ifdef BOOTLOADER
-    /* When the Rockbox bootloader starts, we are changing framebuffer address,
-       but we don't want what's shown on the LCD to change until we do an
-       lcd_update(), so copy the data from the old framebuffer to the new one */
-    unsigned short *buf = (unsigned short*)FRAME1;
-	
-    memcpy(FRAME1, (short *)((LCDSADDR1)<<1), 320*240*2);
-
-    /* The Rockbox bootloader is transitioning from RGB555I to RGB565 mode
-       so convert the frambuffer data accordingly */
-    for(i=0; i< 320*240; i++){
-        *buf = ((*buf>>1) & 0x1F) | (*buf & 0xffc0);
-        buf++;
-    }
-    return;
-#endif
 }
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    (void)x;
-    (void)width;
-    (void)y;
-    (void)height;
+    fb_data *dst, *src;
 
-    if(!lcd_on)
-    {
-        sleep(200);
+    if (!lcd_on)
         return;
+
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x; /* Clip right */
+    if (x < 0)
+        width += x, x = 0; /* Clip left */
+    if (width <= 0)
+        return; /* nothing left to do */
+
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y; /* Clip bottom */
+    if (y < 0)
+        height += y, y = 0; /* Clip top */
+    if (height <= 0)
+        return; /* nothing left to do */
+
+    /* TODO: It may be faster to swap the addresses of lcd_driver_framebuffer
+     * and lcd_framebuffer */
+    dst = (fb_data *)FRAME + LCD_WIDTH*y + x;
+    src = &lcd_framebuffer[y][x];
+
+    /* Copy part of the Rockbox framebuffer to the second framebuffer */
+    if (width < LCD_WIDTH)
+    {
+        /* Not full width - do line-by-line */
+        lcd_copy_buffer_rect(dst, src, width, height);
     }
-    memcpy(((char*)FRAME2) + (y * sizeof(fb_data) * LCD_WIDTH), ((char *)&lcd_framebuffer) + (y * sizeof(fb_data) * LCD_WIDTH), ((height * sizeof(fb_data) * LCD_WIDTH)));
+    else
+    {
+        /* Full width - copy as one line */
+        lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
+    }
 }
 
 void lcd_enable(bool state)
@@ -100,68 +95,82 @@ bool lcd_enabled(void)
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
 {
-    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    if (!lcd_on)
+        return;
+
+    lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
+                         LCD_WIDTH*LCD_HEIGHT, 1);
 }
 
 void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
                                  int stride, int x, int y, int width,
                                  int height)
 {
-    fb_data *dst, *dst_end;
-    unsigned int transcolor;
+#if 0
+    int w, px;
+    fb_data *dst;
 
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
-        return;
-
-    /* clipping */
-    if (x < 0)
-    {
-        width += x;
-        src_x -= x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        src_y -= y;
-        y = 0;
-    }
     if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
+        width = LCD_WIDTH - x; /* Clip right */
+    if (x < 0)
+        width += x, x = 0; /* Clip left */
+    if (width <= 0)
+        return; /* nothing left to do */
+
     if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
+        height = LCD_HEIGHT - y; /* Clip bottom */
+    if (y < 0)
+        height += y, y = 0; /* Clip top */
+    if (height <= 0)
+        return; /* nothing left to do */
 
     src += stride * src_y + src_x; /* move starting point */
-    dst = &lcd_framebuffer[(y)][(x)];
-    dst_end = dst + height * LCD_WIDTH;
-    width *= 2;
-    stride *= 2;
-    transcolor = TRANSPARENT_COLOR;
-    asm volatile(
-    "rowstart:  \n"
-        "mov    r0, #0  \n"
-    "nextpixel:  \n"
-        "ldrh   r1, [%0, r0]   \n"  /* Load word src+r0 */
-        "cmp    r1, %5 \n"             /* Compare to transparent color */
-        "strneh r1, [%1, r0]   \n"  /* Store dst+r0 if not transparent */
-        "add    r0, r0, #2  \n"
-        "cmp    r0, %2 \n"             /* r0 == width? */         
-        "bne    nextpixel \n"        /* More in this row? */
-        "add    %0, %0, %4  \n"     /* src += stride */
-        "add    %1, %1, #480 \n"    /* dst += LCD_WIDTH (x2) */
-        "cmp    %1, %3 \n"             
-        "bne    rowstart \n"        /* if(dst != dst_end), keep going */
-        : : "r" (src), "r" (dst), "r" (width), "r" (dst_end), "r" (stride), "r" (transcolor) : "r0", "r1" );
+    dst = &lcd_framebuffer[y][x];
+
+    asm volatile (
+    ".rowstart:                             \r\n"
+        "mov    %[w], %[width]              \r\n" /* Load width for inner loop */
+    ".nextpixel:                            \r\n"
+        "ldrh   %[px], [%[s]], #2           \r\n" /* Load src pixel */
+        "add    %[d], %[d], #2              \r\n" /* Uncoditionally increment dst */
+        "cmp    %[px], %[fgcolor]           \r\n" /* Compare to foreground color */
+        "streqh %[fgpat], [%[d], #-2]       \r\n" /* Store foregroud if match */
+        "cmpne  %[px], %[transcolor]        \r\n" /* Compare to transparent color */
+        "strneh %[px], [%[d], #-2]          \r\n" /* Store dst if not transparent */
+        "subs   %[w], %[w], #1              \r\n" /* Width counter has run down? */
+        "bgt    .nextpixel                  \r\n" /* More in this row? */
+        "add    %[s], %[s], %[sstp], lsl #1 \r\n" /* Skip over to start of next line */
+        "add    %[d], %[d], %[dstp], lsl #1 \r\n"
+        "subs   %[h], %[h], #1              \r\n" /* Height counter has run down? */
+        "bgt    .rowstart                   \r\n" /* More rows? */
+        : [w]"=&r"(w), [h]"+&r"(height), [px]"=&r"(px),
+          [s]"+&r"(src), [d]"+&r"(dst)
+        : [width]"r"(width),
+          [sstp]"r"(stride - width),
+          [dstp]"r"(LCD_WIDTH - width),
+          [transcolor]"r"(TRANSPARENT_COLOR),
+          [fgcolor]"r"(REPLACEWITHFG_COLOR),
+          [fgpat]"r"(current_vp->fg_pattern)
+    );
+#endif
+}
+
+void lcd_yuv_set_options(unsigned options)
+{
+    lcd_yuv_options = options;
 }
 
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
 extern void lcd_write_yuv420_lines(fb_data *dst,
-                                   unsigned char chroma_buf[LCD_HEIGHT/2*3],
                                    unsigned char const * const src[3],
                                    int width,
                                    int stride);
+extern void lcd_write_yuv420_lines_odither(fb_data *dst,
+                                           unsigned char const * const src[3],
+                                           int width,
+                                           int stride,
+                                           int x_screen, /* To align dither pattern */
+                                           int y_screen);
 /* Performance function to blit a YUV bitmap directly to the LCD */
 /* For the Gigabeat - show it rotated */
 /* So the LCD_WIDTH is now the height */
@@ -171,7 +180,6 @@ void lcd_yuv_blit(unsigned char * const src[3],
 {
     /* Caches for chroma data so it only need be recaculated every other
        line */
-    unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 480 bytes */
     unsigned char const * yuv_src[3];
     off_t z;
 
@@ -182,23 +190,39 @@ void lcd_yuv_blit(unsigned char * const src[3],
     width &= ~1;
     height >>= 1;
 
-    fb_data *dst = (fb_data*)FRAME1 + x * LCD_WIDTH + (LCD_WIDTH - y) - 1;
+    y = LCD_WIDTH - 1 - y;
+    fb_data *dst = (fb_data*)FRAME + x * LCD_WIDTH + y;
 
     z = stride*src_y;
     yuv_src[0] = src[0] + z + src_x;
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
-    do
+    if (lcd_yuv_options & LCD_YUV_DITHER)
     {
-        lcd_write_yuv420_lines(dst, chroma_buf, yuv_src, width,
-                               stride);
-        yuv_src[0] += stride << 1; /* Skip down two luma lines */
-        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-        yuv_src[2] += stride >> 1;
-        dst -= 2;
+        do
+        {
+            lcd_write_yuv420_lines_odither(dst, yuv_src, width, stride, y, x);
+            yuv_src[0] += stride << 1; /* Skip down two luma lines */
+            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+            yuv_src[2] += stride >> 1;
+            dst -= 2;
+            y -= 2;
+        }
+        while (--height > 0);
     }
-    while (--height > 0);
+    else
+    {
+        do
+        {
+            lcd_write_yuv420_lines(dst, yuv_src, width, stride);
+            yuv_src[0] += stride << 1; /* Skip down two luma lines */
+            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
+            yuv_src[2] += stride >> 1;
+            dst -= 2;
+        }
+        while (--height > 0);
+    }
 }
 
 void lcd_set_contrast(int val) {

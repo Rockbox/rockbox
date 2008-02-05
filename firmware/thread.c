@@ -750,6 +750,18 @@ static inline void core_sleep(void)
 {
     #warning TODO: Implement core_sleep
 }
+#elif CONFIG_CPU == IMX31L
+static inline void core_sleep(void)
+{
+    asm volatile (
+        "mov r0, #0                \n"
+        "mcr p15, 0, r0, c7, c0, 4 \n" /* Wait for interrupt */
+        "mrs r0, cpsr              \n" /* Unmask IRQ/FIQ at core level */
+        "bic r0, r0, #0xc0         \n"
+        "msr cpsr_c, r0            \n"
+        : : : "r0"
+    );
+}
 #else
 static inline void core_sleep(void)
 {
@@ -2541,6 +2553,9 @@ void init_threads(void)
     const unsigned int core = CURRENT_CORE;
     struct thread_entry *thread;
     int slot;
+
+    memset(threads, 0, sizeof(threads));
+    memset(cores, 0, sizeof(cores));
 
     /* CPU will initialize first and then sleep */
     slot = find_empty_thread_slot();

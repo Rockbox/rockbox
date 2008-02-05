@@ -13,27 +13,15 @@ int system_memory_guard(int newmode)
     return 0;
 }
 
-extern void timer4(void);
-extern void dma0(void); /* free */
-extern void dma1(void);
-extern void dma3(void);
-
-void irq_handler(void)
-{
-}
-
-#ifdef BOOTLOADER
-void fiq_handler(void)
-{
-}
-#endif
-
 void system_reboot(void)
 {
 }
 
 void system_init(void)
 {
+#ifndef BOOTLOADER
+    avic_init();
+#endif
 }
 
 inline void dumpregs(void) 

@@ -819,48 +819,6 @@ void tick_start(unsigned int interval_in_ms)
 
     TIMER0.ctrl |= 0x80;  /* Enable the counter */
 }
-#elif CONFIG_CPU == IMX31L
-void tick_start(unsigned int interval_in_ms)
-{
-    EPITCR1 &= ~0x1;        /* Disable the counter */
-
-    EPITCR1 &= ~0xE;        /* Disable interrupt, count down from 0xFFFFFFFF */
-    EPITCR1 &= ~0xFFF0;     /* Clear prescaler */
-#ifdef BOOTLOADER
-    EPITCR1 |= (2700 << 2); /* Prescaler = 2700 */
-#endif
-    EPITCR1 &= ~(0x3 << 24);
-    EPITCR1 |= (0x2 << 24); /* Set clock source to external clock (27mhz) */
-    EPITSR1 = 1;            /* Clear the interrupt request */
-#ifndef BOOTLOADER
-    EPITLR1 = 27000000 * interval_in_ms / 1000;
-    EPITCMPR1 = 27000000 * interval_in_ms / 1000;
-#else
-    (void)interval_in_ms;
-#endif
-
-    //avic_enable_int(EPIT1, IRQ, EPIT_HANDLER);
-
-    EPITCR1 |= 0x1;           /* Enable the counter */
-}
-
-#ifndef BOOTLOADER
-void EPIT_HANDLER(void) __attribute__((interrupt("IRQ")));
-void EPIT_HANDLER(void) {
-    int i;
-
-    /* Run through the list of tick tasks */
-    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
-    {
-        if(tick_funcs[i])
-            tick_funcs[i]();
-    }
-
-    current_tick++;
-
-    EPITSR1 = 1;            /* Clear the interrupt request */
-}
-#endif
 #endif
 
 int tick_add_task(void (*f)(void))

@@ -302,37 +302,47 @@ SECTIONS
 }
 #elif (CONFIG_CPU==IMX31L)
 {
-  . = 0x8a000000;
-  .vectors : 
-  {  
-    KEEP(*(.vectors*));
-    *(.vectors*);
-  }  
-  .text : {
-    *(.init.text)
-    *(.text*)
-  }
-  .data : {
-    *(.icode)
-    *(.irodata)
-    *(.idata)
-    *(.data*)
-    _dataend = . ;
+#if 0
+    .vectors 0x0 :
+    {
+        _vectorsstart = .;
+        *(.vectors);
+        _vectorsend = .;
+    } AT> DRAM
+#endif
+    . = 0x82000000;
+    
+   .text :
+   {
+       *(.init.text)
+       *(.text*)
    }
-  .stack :
-  {
-     *(.stack)
-     _stackbegin = .;
-     stackbegin = .;
-     . += 0x2000;
-     _stackend = .;
-     stackend = .;
-  }
-  .bss : {
-     _edata = .;
-     *(.bss*);
-     *(.ibss);
-     _end = .;
+
+   .data :
+   {
+       *(.icode)
+       *(.irodata)
+       *(.idata)
+       *(.data*)
+       _dataend = . ;
+   }
+
+   .stack :
+   {
+       *(.stack)
+       _stackbegin = .;
+       stackbegin = .;
+       . += 0x2000;
+       _stackend = .;
+       stackend = .;
+   }
+
+   .bss :
+   {
+        _edata = .;
+        *(.bss*);
+        *(.ibss);
+        _end = .;
    }
 }
 #else

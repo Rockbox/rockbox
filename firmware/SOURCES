@@ -609,24 +609,25 @@ target/arm/s3c2440/gigabeat-fx/pcm-meg-fx.c
 
 #ifdef GIGABEAT_S
 #ifndef SIMULATOR
+target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.c
 target/arm/imx31/gigabeat-s/adc-imx31.c
 target/arm/imx31/gigabeat-s/ata-imx31.c
+target/arm/imx31/gigabeat-s/avic-imx31.c
 target/arm/imx31/gigabeat-s/backlight-imx31.c
 target/arm/imx31/gigabeat-s/button-imx31.c
+target/arm/imx31/gigabeat-s/dma_start.c
+target/arm/imx31/gigabeat-s/kernel-imx31.c
 target/arm/imx31/gigabeat-s/i2c-imx31.c
 target/arm/imx31/gigabeat-s/i2s-imx31.c
-target/arm/imx31/gigabeat-s/lcd-as-imx31.S
 target/arm/imx31/gigabeat-s/lcd-imx31.c
+target/arm/imx31/gigabeat-s/mmu-imx31.c
 target/arm/imx31/gigabeat-s/power-imx31.c
 target/arm/imx31/gigabeat-s/powermgmt-imx31.c
+target/arm/imx31/gigabeat-s/spi-imx31.c
+target/arm/imx31/gigabeat-s/system-imx31.c
 target/arm/imx31/gigabeat-s/usb-imx31.c
 target/arm/imx31/gigabeat-s/wmcodec-imx31.c
-target/arm/imx31/gigabeat-s/dma_start.c
-target/arm/imx31/gigabeat-s/system-imx31.c
-target/arm/imx31/gigabeat-s/mmu-imx31.c
-target/arm/imx31/gigabeat-s/avic-imx31.c
-target/arm/imx31/gigabeat-s/spi-imx31.c
 #ifndef BOOTLOADER
 target/arm/imx31/gigabeat-s/pcm-imx31.c
 #endif

@@ -19,15 +19,15 @@
 #ifndef SYSTEM_TARGET_H
 #define SYSTEM_TARGET_H
 
-#include "mmu-imx31.h"
 #include "system-arm.h"
+#include "mmu-arm.h"
 
 #define CPUFREQ_NORMAL 532000000
 
 static inline void udelay(unsigned int usecs)
 {
     volatile signed int stop = EPITCNT1 - usecs;
-    while (EPITCNT1 > stop);
+    while ((signed int)EPITCNT1 > stop);
 }
 
 #define __dbg_hw_info(...) 0
@@ -36,6 +36,22 @@ static inline void udelay(unsigned int usecs)
 #define HAVE_INVALIDATE_ICACHE
 static inline void invalidate_icache(void)
 {
+    long rd = 0;
+    asm volatile(
+        "mcr p15, 0, %0, c7, c10, 0 \n"
+        "mcr p15, 0, %0, c7, c5, 0  \n"
+        : : "r"(rd)
+    );
+}
+
+#define HAVE_FLUSH_ICACHE
+static inline void flush_icache(void)
+{
+    long rd = 0;
+    asm volatile (
+        "mcr p15, 0, %0, c7, c10, 0 \n"
+        : : "r"(rd)
+    );
 }
 
 struct ARM_REGS {

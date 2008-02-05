@@ -27,8 +27,6 @@
 
 static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
 
-void fiq_handler(void) __attribute__((naked));
-
 void pcm_play_lock(void)
 {
 }
@@ -74,12 +72,6 @@ void pcm_play_dma_stop(void)
 }
 
 void pcm_play_dma_pause(bool pause)
-{
-}
-
-/* Get more samples to play out - call pcm_play_dma_stop and
-   pcm_play_dma_stopped_callback if the data runs out */
-void fiq_handler(void)
 {
 }
 
