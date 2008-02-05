@@ -727,10 +727,12 @@ struct user_settings
 #endif
     unsigned char playlist_catalog_dir[MAX_FILENAME+1];
     
+#ifdef HAVE_QUICKSCREEN
     unsigned char quickscreen_left[MAX_FILENAME+1];
     unsigned char quickscreen_right[MAX_FILENAME+1];
     unsigned char quickscreen_top[MAX_FILENAME+1];
     unsigned char quickscreen_bottom[MAX_FILENAME+1];
+#endif
 };
 
 /** global variables **/
