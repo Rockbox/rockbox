@@ -201,15 +201,56 @@ Rockbox History
   Jens and Jörg started porting Rockbox to the Archos Ondio, Archos' flash
   memory based player series.
 
-  The work on a iRiver port starts for real. We buy one working and one broken
-  one to the project. Another article (about the porting) appears on slashdot.
+  The work on a iRiver port starts for real. We bought one working and one
+  broken one to the project. Another article (about the porting) appears on
+  slashdot.
 
   September 24: rockbox.org is ours thanks to Jeff!
+
+* February 2006
+
+  the LaTeX manual was born
+
+  ipod video audio playback
+
+* March 2006
+
+  iAudio X5 bootloader
+
+  ipod Mini 2G audio
+
+* April 2006
+
+  ipod Mini 1G audio
+
+* July 2006
+
+  FM radio and recording on the X5
 
 * December 2006
 
   Support for Toshiba Gigabeat
 
+  Auto-detect 2048 bytes block-size to work fine on 5.5G ipod video
+
 * January 2007
 
   Changed to Subversion
+
+* March 2007
+
+  Sound on the Sansa e200 models
+
+* June 2007
+
+  Monkey's audio support
+
+* September 2007
+
+  Rockbox installs fine on the e200R models
+
+  Sound on the Sansa c200 models
+
+* November 2007
+
+  Alburm Art support
