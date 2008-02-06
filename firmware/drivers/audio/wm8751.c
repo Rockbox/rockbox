@@ -28,6 +28,7 @@
 #include "i2s.h"
 #include "audio.h"
 #include "audiohw.h"
+#include "system.h"
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},
@@ -100,6 +101,13 @@ static int adaptivebass2hw(int value)
 /* Reset and power up the WM8751 */
 void audiohw_preinit(void)
 {
+#ifdef MROBE_100
+    /* controls headphone ouput */
+    GPIOL_ENABLE     |= 0x10;
+    GPIOL_OUTPUT_EN  |= 0x10;
+    GPIOL_OUTPUT_VAL |= 0x10; /* disable */
+#endif
+
 #ifdef CPU_PP502x
     i2s_reset();
 #endif
@@ -132,9 +140,14 @@ void audiohw_postinit(void)
     wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR);
 
      /* 4. Enable line and / or headphone output buffers as required. */
+#ifdef MROBE_100
+    wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
+                  PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
+#else
     wmcodec_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR |
                   PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1 | PWRMGMT2_LOUT2 |
                   PWRMGMT2_ROUT2);
+#endif
 
     wmcodec_write(ADDITIONAL1, ADDITIONAL1_TSDEN | ADDITIONAL1_TOEN |
                     ADDITIONAL1_DMONOMIX_LLRR | ADDITIONAL1_VSEL_DEFAULT);
@@ -143,6 +156,12 @@ void audiohw_postinit(void)
     wmcodec_write(RIGHTMIX2, RIGHTMIX2_RD2RO | RIGHTMIX2_RI2RO_DEFAULT);
 
     audiohw_mute(false);
+
+#ifdef MROBE_100
+    /* enable headphone output */
+    GPIOL_OUTPUT_VAL &= ~0x10;
+    GPIOL_OUTPUT_EN  |=  0x10;
+#endif
 }
 
 int audiohw_set_master_vol(int vol_l, int vol_r)
@@ -158,12 +177,14 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
     return 0;
 }
 
+#ifndef MROBE_100
 int audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     wmcodec_write(LOUT2, LOUT2_BITS | LOUT2_LOUT2VOL(vol_l));
     wmcodec_write(ROUT2, ROUT2_BITS | ROUT2_ROUT2VOL(vol_r));
     return 0;
 }
+#endif
 
 void audiohw_set_bass(int value)
 {

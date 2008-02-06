@@ -290,7 +290,8 @@ static void set_prescaled_volume(void)
    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751) \
    || defined(HAVE_AS3514)
     audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
-#if defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8751)
+#if defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+   || (defined(HAVE_WM8751) && !defined(MROBE_100))
     audiohw_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
 #endif
 
