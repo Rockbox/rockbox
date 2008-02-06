@@ -283,7 +283,7 @@ void RbUtilQt::updateDevice()
     if(name.isEmpty()) name = "&lt;none&gt;";
     if(mountpoint.isEmpty()) mountpoint = "&lt;invalid&gt;";
     ui.labelDevice->setText(tr("<b>%1 %2</b> at <b>%3</b>")
-            .arg(brand, name, mountpoint));
+            .arg(brand, name, QDir::toNativeSeparators(mountpoint)));
 }
 
 
