@@ -134,9 +134,11 @@ void Config::accept()
     settings->setCacheOffline(ui.cacheOfflineMode->isChecked());
 
     // tts settings
-    settings->setCurTTS(ui.comboTts->currentText());
+    int i = ui.comboTts->currentIndex();
+    settings->setCurTTS(ui.comboTts->itemData(i).toString());
     //encoder settings
-    settings->setCurEncoder(ui.comboEncoder->currentText());
+    i = ui.comboEncoder->currentIndex();
+    settings->setCurEncoder(ui.comboEncoder->itemData(i).toString());
 
     // sync settings
     settings->sync();
@@ -286,20 +288,22 @@ void Config::setDevices()
     // tts / encoder tab
     
     //encoders
-    ui.comboEncoder->addItems(getEncoderList());
-    
+    int index;
+    QStringList encoders = getEncoderList();
+    for(int a = 0; a < encoders.size(); a++)
+        ui.comboEncoder->addItem(getEncoderName(encoders.at(a)), encoders.at(a));
     //update index of combobox
-    int index = ui.comboEncoder->findText(settings->curEncoder(),Qt::MatchExactly);
+    index = ui.comboEncoder->findData(settings->curEncoder());
     if(index < 0) index = 0;
     ui.comboEncoder->setCurrentIndex(index);
     updateEncState(index);
-    
+
     //tts
-    ui.comboTts->addItems(getTTSList());
-    
-    
+    QStringList ttslist = getTTSList();
+    for(int a = 0; a < ttslist.size(); a++)
+        ui.comboTts->addItem(getTTSName(ttslist.at(a)), ttslist.at(a));
     //update index of combobox
-    index = ui.comboTts->findText(settings->curTTS(),Qt::MatchExactly);
+    index = ui.comboTts->findData(settings->curTTS());
     if(index < 0) index = 0;
     ui.comboTts->setCurrentIndex(index);
     updateTtsState(index);
@@ -309,7 +313,7 @@ void Config::setDevices()
 
 void Config::updateTtsState(int index)
 {
-    QString ttsName = ui.comboTts->itemText(index);
+    QString ttsName = ui.comboTts->itemData(index).toString();
     TTSBase* tts = getTTS(ttsName);
     tts->setCfg(settings);
     
@@ -322,12 +326,12 @@ void Config::updateTtsState(int index)
     {
         ui.configTTSstatus->setText("Configuration INVALID");
         ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/icons/dialog-error.png")));
-    }        
+    }
 }
 
 void Config::updateEncState(int index)
 {
-    QString encoder = ui.comboEncoder->itemText(index);
+    QString encoder = ui.comboEncoder->itemData(index).toString();
     EncBase* enc = getEncoder(encoder);
     enc->setCfg(settings);
     
@@ -583,7 +587,8 @@ void Config::cacheClear()
 
 void Config::configTts()
 {
-    TTSBase* tts =getTTS(ui.comboTts->currentText());
+    int index = ui.comboTts->currentIndex();
+    TTSBase* tts = getTTS(ui.comboTts->itemData(index).toString());
     
     tts->setCfg(settings);
     tts->showCfg();
@@ -593,7 +598,8 @@ void Config::configTts()
 
 void Config::configEnc()
 {
-    EncBase* enc =getEncoder(ui.comboEncoder->currentText());
+    int index = ui.comboEncoder->currentIndex();
+    EncBase* enc = getEncoder(ui.comboEncoder->itemData(index).toString());
     
     enc->setCfg(settings);
     enc->showCfg();

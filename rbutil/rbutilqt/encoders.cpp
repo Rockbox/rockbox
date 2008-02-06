@@ -26,56 +26,55 @@
 
 static QMap<QString,QString> encoderList;
 static QMap<QString,EncBase*> encoderCache;
- 
-void initEncoderList()
+
+
+// initialize list of encoders
+void initEncodernamesList()
 {
     encoderList["rbspeex"] = "Rockbox Speex Encoder";
     encoderList["lame"] = "Lame Mp3 Encoder";
 }
 
-// function to get a specific encoder
-EncBase* getEncoder(QString encname)
+
+// get nice name for a specific encoder
+QString getEncoderName(QString encoder)
 {
-  // init list if its empty
-    if(encoderList.count() == 0) initEncoderList();
-    
-    QString encoder = encoderList.key(encname);
-    
+    if(encoderList.isEmpty())
+        initEncodernamesList();
+    return encoderList.value(encoder);
+}
+
+
+// get a specific encoder object
+EncBase* getEncoder(QString encoder)
+{
     // check cache
     if(encoderCache.contains(encoder))
         return encoderCache.value(encoder);
-        
-    EncBase* enc;    
+
+    EncBase* enc;
     if(encoder == "rbspeex")
     {
         enc = new EncRbSpeex();
-        encoderCache[encoder] = enc; 
+        encoderCache[encoder] = enc;
         return enc;
     }
     else if(encoder == "lame")
     {
         enc = new EncExes(encoder);
-        encoderCache[encoder] = enc; 
+        encoderCache[encoder] = enc;
         return enc;
     }
     else
         return NULL;
 }
 
-// get the list of encoders, nice names
+
 QStringList getEncoderList()
 {
-  // init list if its empty
-    if(encoderList.count() == 0) initEncoderList();
-    
-    QStringList encList;
-    QMapIterator<QString, QString> i(encoderList);
-    while (i.hasNext()) {
-     i.next();
-     encList << i.value();
-    }
-    
-    return encList;
+    if(encoderList.isEmpty())
+        initEncodernamesList();
+    return encoderList.keys();
 }
 
 

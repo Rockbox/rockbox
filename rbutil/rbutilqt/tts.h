@@ -37,6 +37,7 @@ void initTTSList();
 TTSBase* getTTS(QString ttsname);
 // get the list of tts, nice names
 QStringList getTTSList();
+QString getTTSName(QString tts);
 
 
 class TTSBase : public QObject
@@ -44,8 +45,8 @@ class TTSBase : public QObject
     Q_OBJECT
 public:
     TTSBase();
-    virtual bool voice(QString text,QString wavfile) {return false;}
-    virtual bool start(QString *errStr){return false;}
+    virtual bool voice(QString text,QString wavfile) {(void)text; (void)wavfile; return false;}
+    virtual bool start(QString *errStr){(void)errStr; return false;}
     virtual bool stop(){return false;}
     virtual void showCfg(){}
     virtual bool configOk(){return false;}

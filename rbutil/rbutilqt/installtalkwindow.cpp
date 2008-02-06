@@ -114,7 +114,7 @@ void InstallTalkWindow::setSettings(RbSettings* sett)
     TTSBase* tts = getTTS(ttsName);
     tts->setCfg(settings);
     if(tts->configOk())
-        ui.labelTtsProfile->setText(tr("Selected TTS engine : <b>%1</b>").arg(ttsName));
+        ui.labelTtsProfile->setText(tr("Selected TTS engine : <b>%1</b>").arg(getTTSName(ttsName)));
     else
         ui.labelTtsProfile->setText(tr("Selected TTS Engine: <b>%1</b>").arg("Invalid TTS configuration!"));
     
@@ -123,7 +123,7 @@ void InstallTalkWindow::setSettings(RbSettings* sett)
     if(enc != NULL) {
         enc->setCfg(settings);
         if(enc->configOk())
-            ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg(encoder));
+            ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg(getEncoderName(encoder)));
         else
             ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
     }

@@ -32,11 +32,12 @@ extern "C"
 class EncBase;
 
 //inits the encoder List
-void initEncoderList();
+void initEncodernamesList(void);
 // function to get a specific encoder
 EncBase* getEncoder(QString encname);
 // get the list of encoders, nice names
-QStringList getEncoderList();
+QString getEncoderName(QString encoder);
+QStringList getEncoderList(void);
 
 
 class EncBase : public QDialog
@@ -45,7 +46,8 @@ class EncBase : public QDialog
 public:
     EncBase(QWidget *parent );
     
-    virtual bool encode(QString input,QString output){return false;}
+    virtual bool encode(QString input,QString output)
+        {(void)input; (void)output; return false;}
     virtual bool start(){return false;}
     virtual bool stop(){return false;}
     virtual void showCfg(){}

@@ -36,18 +36,13 @@ void initTTSList()
 }
 
 // function to get a specific encoder
-TTSBase* getTTS(QString ttsname)
+TTSBase* getTTS(QString ttsName)
 {
-    // init list if its empty
-    if(ttsList.count() == 0) initTTSList();
-    
-    QString ttsName = ttsList.key(ttsname);
-    
     // check cache
     if(ttsCache.contains(ttsName))
         return ttsCache.value(ttsName);
-        
-    TTSBase* tts;    
+
+    TTSBase* tts;
     if(ttsName == "sapi")
     {
         tts = new TTSSapi();
@@ -66,18 +61,18 @@ TTSBase* getTTS(QString ttsname)
 QStringList getTTSList()
 {
     // init list if its empty
-    if(ttsList.count() == 0) initTTSList();
+    if(ttsList.count() == 0)
+        initTTSList();
 
-    QStringList ttsNameList;
-    QMapIterator<QString, QString> i(ttsList);
-    while (i.hasNext()) {
-     i.next();
-     ttsNameList << i.value();
-    }
-    
-    return ttsNameList;
+    return ttsList.keys();
 }
 
+QString getTTSName(QString tts)
+{
+    if(ttsList.isEmpty())
+        initTTSList();
+    return ttsList.value(tts);
+}
 
 /*********************************************************************
 * TTS Base
