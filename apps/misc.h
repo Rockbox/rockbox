@@ -122,6 +122,6 @@ bool dir_exists(const char *path);
  * removes the extension of filename (if it doesn't start with a .)
  * puts the result in buffer
  */
-char *strip_extension(const char *filename, char *buffer);
+char *strip_extension(char* buffer, int buffer_size, const char *filename);
 
 #endif /* MISC_H */

@@ -163,7 +163,7 @@ static char * tree_get_filename(int selected_item, void * data, char *buffer)
 
     if(stripit)
     {
-        return(strip_extension(name, buffer));
+        return(strip_extension(buffer, MAX_PATH, name));
     }
     return(name);
 }
