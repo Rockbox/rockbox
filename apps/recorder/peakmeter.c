@@ -939,7 +939,12 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     int left = 0, right = 0;
     int meterwidth = width - 3;
     int i, delta;
+#if defined(HAVE_REMOTE_LCD) && !defined (ROCKBOX_HAS_LOGF)
+    static long peak_release_tick[2] = {0,0};
+    int screen_nr = display->screen_type == SCREEN_MAIN ? 0 : 1;
+#else
     static long peak_release_tick = 0;
+#endif
 
 #ifdef PM_DEBUG
     static long pm_tick = 0;
@@ -994,8 +999,13 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         }
 
         /* apply release */
+#if defined(HAVE_REMOTE_LCD) && !defined (ROCKBOX_HAS_LOGF)
+        delta = current_tick - peak_release_tick[screen_nr];
+        peak_release_tick[screen_nr] = current_tick;
+#else
         delta = current_tick - peak_release_tick;
         peak_release_tick = current_tick;
+#endif
         left  = MAX(left , scales->last_left  - delta * pm_peak_release);
         right = MAX(right, scales->last_right - delta * pm_peak_release);
 
