@@ -847,9 +847,10 @@ static INLINE void cfftf1neg(uint16_t n, complex_t *c, complex_t *ch,
     }
 }
 
-#if (__GNUC__ == 4) && (__GNUC_MINOR__ == 2) && (__GNUC_PATCHLEVEL__ == 3)
+#if (__GNUC__ == 4) && (__GNUC_MINOR__ == 2) && (__GNUC_PATCHLEVEL__ >= 1)
 /* To me (Daniel S) this looks like a compiler error/problem so we only
-   silence it this way on this specific compiler version we know causes this */
+   silence it this way on this specific compiler version we know causes this
+   Known to happen for 4.2.1 until 4.2.3 */
 #define COMPLEXPTR *(const complex_t **)
 #else
 #define COMPLEXPTR (const complex_t *)
