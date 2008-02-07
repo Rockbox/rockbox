@@ -2,7 +2,7 @@ Rockbox History
 
 * Dec 2001
 
-  Björn Stenberg set up and announced the mailing list for Archos Open Source
+  BjÃ¶rn Stenberg set up and announced the mailing list for Archos Open Source
   Jukebox software hacking dicsussions. People started to join up. The
   scrambling algorithm was "broken" and the first ever LED-flashing program
   was downloaded and run.
@@ -22,12 +22,12 @@ Rockbox History
   or blinking on the screen.
 
   A vote page was setup for people to vote on a project name, and even while
-  Rockbox was not the winning one, Björn showed his dictator-side and set the
+  Rockbox was not the winning one, BjÃ¶rn showed his dictator-side and set the
   project name. Rockbox it shall be.
 
   Discussions about development environments.
 
-  The issue of locked hard disks were discussed a lot, since Björn got this
+  The issue of locked hard disks were discussed a lot, since BjÃ¶rn got this
   problem on a whole range of his disks!
 
   More hardware pins and functionality was detected and researched.
@@ -62,11 +62,11 @@ Rockbox History
   UI-wise functionality is getting written, as by the help of the simulator we
   write code even though the lower levels aren't quite there yet.
 
-  April 19th. Björn, Linus, Daniel and Kjell gathered at the "Rockbox
+  April 19th. BjÃ¶rn, Linus, Daniel and Kjell gathered at the "Rockbox
   Developer Conference 2002" at Linus' place and drew up a basic design of the
   Rockbox software.
 
-  Julien Labruyére donated a slightly broken Archos Jukebox 6000 to the
+  Julien LabruyÃ©re donated a slightly broken Archos Jukebox 6000 to the
   project.
 
   70 mails was posted to the list.
@@ -133,7 +133,7 @@ Rockbox History
 
 * Dec 2002
 
-  On Dec 19th, Björn posted the first ever test version for the FM Recorder.
+  On Dec 19th, BjÃ¶rn posted the first ever test version for the FM Recorder.
   Didn't work much...
 
 * Jan 2003.
@@ -166,12 +166,12 @@ Rockbox History
 
 * June 2003
 
-  On June 29th, Björn committed the first plugin interface and things, and
+  On June 29th, BjÃ¶rn committed the first plugin interface and things, and
   now Rockbox runs plugins.
 
 * July 2003
 
-  On July 9th, Jörg Hohensohn announced the first official release of Rockbox
+  On July 9th, JÃ¶rg Hohensohn announced the first official release of Rockbox
   in flash! It only works on the Recorders and the FM Recorders.
 
 * December 2003
@@ -182,7 +182,7 @@ Rockbox History
 
   Rockbox 2.2 is released
 
-  Jörg Hohensohn introduces the voice concept that now allows Rockbox to talk
+  JÃ¶rg Hohensohn introduces the voice concept that now allows Rockbox to talk
   (speak) the menus and more.
 
 * May 2004
@@ -198,7 +198,7 @@ Rockbox History
 
 * September 2004
 
-  Jens and Jörg started porting Rockbox to the Archos Ondio, Archos' flash
+  Jens and JÃ¶rg started porting Rockbox to the Archos Ondio, Archos' flash
   memory based player series.
 
   The work on a iRiver port starts for real. We bought one working and one
@@ -229,7 +229,7 @@ Rockbox History
 
 * December 2006
 
-  Support for Toshiba Gigabeat
+  Support for Toshiba Gigabeat F
 
   Auto-detect 2048 bytes block-size to work fine on 5.5G ipod video
 
@@ -241,16 +241,8 @@ Rockbox History
 
   Sound on the Sansa e200 models
 
-* June 2007
-
-  Monkey's audio support
-
 * September 2007
 
   Rockbox installs fine on the e200R models
 
   Sound on the Sansa c200 models
-
-* November 2007
-
-  Alburm Art support
