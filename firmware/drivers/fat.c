@@ -1202,6 +1202,10 @@ static int fat_checkname(const unsigned char* newname)
             return -1;
         newname++;
     }
+    /* check trailing space(s) */
+    if(*(--newname) == ' ')
+        return -1;
+
     return 0;
 }
 

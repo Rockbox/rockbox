@@ -385,9 +385,6 @@ int rename(const char* path, const char* newpath)
         return - 5;
 
     file = &openfiles[fd];
-#ifdef HAVE_DIRCACHE
-    dircache_rename(path, newpath);
-#endif
 
     rc = fat_rename(&file->fatfile, &dir->fatdir, nameptr,
                     file->size, file->attr);
@@ -403,6 +400,10 @@ int rename(const char* path, const char* newpath)
         errno = EIO;
         return rc * 10 - 7;
     }
+
+#ifdef HAVE_DIRCACHE
+    dircache_rename(path, newpath);
+#endif
 
     rc = close(fd);
     if (rc<0) {
