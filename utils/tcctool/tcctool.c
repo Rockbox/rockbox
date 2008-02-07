@@ -56,7 +56,8 @@ static struct device_t devices[] =
     {"cowond2",  "Cowon D2",                     0xb011, 0x20000000, 0xa2e92010 },
     {"iaudio6",  "iAudio 6",                     0xb021, 0x20000000, 0x62e97010 },
     {"iaudio7",  "iAudio 7",                     0xb021, 0x20000000, 0x62e97010 },
-    {"logikdax", "Logik DAX 1GB DAB/MP3 player", 0xb021, 0x20000000, 0x52e97410 }
+    {"logikdax", "Logik DAX 1GB DAB/MP3 player", 0xb021, 0x20000000, 0x52e97410 },
+    {"samsungp2","Samsung YP P2",                0xb011, 0x20000000, 0x22e92010 },
 };
 
 #define NUM_DEVICES ((sizeof(devices) / sizeof(struct device_t)))
