@@ -942,7 +942,7 @@ void settings_apply(void)
     icons_init();
 
 #ifdef HAVE_LCD_COLOR
-    if (global_settings.colors_file)
+    if (global_settings.colors_file[0])
         read_color_theme_file();
 #endif
 
