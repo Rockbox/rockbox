@@ -229,6 +229,16 @@
 #define UI_LCD_WIDTH                240
 #define UI_LCD_HEIGHT               320
 
+#elif defined(GIGABEAT_S)
+#define UI_TITLE                    "Toshiba Gigabeat"
+#define UI_WIDTH                    450 /* width of GUI window */
+#define UI_HEIGHT                   688 /* height of GUI window */
+/* high-colour */
+#define UI_LCD_POSX                 96 /* x position of lcd */
+#define UI_LCD_POSY                 90 /* y position of lcd */
+#define UI_LCD_WIDTH                240
+#define UI_LCD_HEIGHT               320
+
 #elif defined(MROBE_500)
 #define UI_TITLE                    "Olympus M:Robe 500"
 #define UI_WIDTH                    401 /* width of GUI window */

@@ -121,7 +121,7 @@ static const struct button_mapping button_context_list[]  = {
 }; /* button_context_list */
 
 static const struct button_mapping button_context_tree[]  = {
-    { ACTION_TREE_WPS,    BUTTON_BACK|BUTTON_REL,         BUTTON_BACK },
+    { ACTION_TREE_WPS,    BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY },
     { ACTION_TREE_STOP,   BUTTON_POWER,                   BUTTON_NONE },
     { ACTION_TREE_STOP,   BUTTON_POWER|BUTTON_REL,        BUTTON_POWER },
     { ACTION_TREE_STOP,   BUTTON_POWER|BUTTON_REPEAT,     BUTTON_NONE },
