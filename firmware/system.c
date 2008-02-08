@@ -273,5 +273,11 @@ void __div0(void)
 }
 #endif
 
+#ifdef BOOTLOADER
+void reference_system_c(void)
+{
+}
+#endif
+
 #endif /* CPU_ARM */
 

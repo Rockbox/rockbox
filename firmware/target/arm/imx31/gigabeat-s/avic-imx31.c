@@ -84,17 +84,23 @@ void __attribute__((naked)) fiq_handler(void)
 
 void avic_init(void)
 {
+    int i;
+
     /* Disable all interrupts and set to unhandled */
     avic_disable_int(ALL);
+
+    /* Reset AVIC control */
+    INTCNTL = 0;
 
     /* Init all interrupts to type IRQ */
     avic_set_int_type(ALL, IRQ);
 
+    /* Set all normal to lowest priority */
+    for (i = 0; i < 8; i++)
+        NIPRIORITY(i) = 0;
+
     /* Set NM bit to enable VIC */
     INTCNTL |= INTCNTL_NM;
-
-    /* Enable IRQ/FIQ in imx31 INTCNTL reg */
-    INTCNTL &= ~(INTCNTL_ABFEN | INTCNTL_NIDIS | INTCNTL_FIDIS);
 
     /* Enable VE bit in CP15 Control reg to enable VIC */
     asm volatile (
@@ -104,11 +110,20 @@ void avic_init(void)
         : : : "r0");
 
     /* Enable normal interrupts at all priorities */
-    NIMASK = 16;
+    NIMASK = 0x1f;
+}
+
+void avic_set_int_priority(enum IMX31_INT_LIST ints,
+                           unsigned long ni_priority)
+{
+    volatile unsigned long *reg = &NIPRIORITY((63 - ints) / 8);
+    unsigned int shift = 4*(ints % 8);
+    unsigned long mask = 0xful << shift;
+    *reg = (*reg & ~mask) | ((ni_priority << shift) & mask);
 }
 
 void avic_enable_int(enum IMX31_INT_LIST ints, enum INT_TYPE intstype,
-                     void (*handler)(void))
+                     unsigned long ni_priority, void (*handler)(void))
 {
     int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED,
                                          IRQ_FIQ_STATUS);
@@ -118,6 +133,7 @@ void avic_enable_int(enum IMX31_INT_LIST ints, enum INT_TYPE intstype,
         avic_set_int_type(ints, intstype);
         VECTOR(ints) = (long)handler;
         INTENNUM = ints;
+        avic_set_int_priority(ints, ni_priority);
     }
 
     set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);

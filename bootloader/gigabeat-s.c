@@ -52,15 +52,26 @@ char buf[MAX_PATH];
 char basedir[] = "/Content/0b00/00/"; /* Where files sent via MTP are stored */
 char model[5];
 int (*kernel_entry)(void);
+extern void reference_system_c(void);
+
+/* Dummy stub that creates C references for C functions only used by
+   assembly - never called */
+void reference_files(void)
+{
+    reference_system_c();
+}
 
 void main(void)
 {
     lcd_clear_display();
     printf("Hello world!");
-    printf("Gigabeat S Rockbox Bootloader v.00000002");
+    printf("Gigabeat S Rockbox Bootloader v.00000003");
+    system_init();
     kernel_init();
     printf("kernel init done");
     int rc;
+
+    set_interrupt_status(IRQ_FIQ_ENABLED, IRQ_FIQ_STATUS);
 
     rc = ata_init();
     if(rc)
@@ -109,11 +120,13 @@ void main(void)
     printf("Loading firmware");
 
     unsigned char *loadbuffer = (unsigned char *)0x0;
-    int buffer_size = 1024*1024;
+    int buffer_size = 31*1024*1024;
 
     rc = load_firmware(loadbuffer, buf, buffer_size);
     if(rc < 0)
-        error(buf, rc);
+        error((int)buf, rc);
+
+    system_prepare_fw_start();
 
     if (rc == EOK)
     {

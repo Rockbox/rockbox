@@ -24,9 +24,6 @@
 #include "cpu.h"
 #include "system.h"
 #include "panic.h"
-#if CONFIG_CPU == IMX31L
-#include "avic-imx31.h"
-#endif
 
 /* Make this nonzero to enable more elaborate checks on objects */
 #ifdef DEBUG
@@ -42,7 +39,7 @@
 #define KERNEL_ASSERT(exp, msg...) ({})
 #endif
 
-#if (!defined(CPU_PP) && (CONFIG_CPU != IMX31L)) || !defined(BOOTLOADER) 
+#if !defined(CPU_PP) || !defined(BOOTLOADER) 
 volatile long current_tick NOCACHEDATA_ATTR = 0;
 #endif
 
@@ -107,7 +104,7 @@ void sleep(int ticks)
 
 void yield(void)
 {
-#if ((CONFIG_CPU == S3C2440 || defined(ELIO_TPJ1022) || CONFIG_CPU == IMX31L) && defined(BOOTLOADER))
+#if ((CONFIG_CPU == S3C2440 || defined(ELIO_TPJ1022)) && defined(BOOTLOADER))
     /* Some targets don't like yielding in the bootloader */
 #else
     switch_thread(NULL);

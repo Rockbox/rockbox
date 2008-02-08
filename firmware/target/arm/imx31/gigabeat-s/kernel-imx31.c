@@ -7,7 +7,6 @@
 
 extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
-#ifndef BOOTLOADER
 static __attribute__((interrupt("IRQ"))) void EPIT1_HANDLER(void)
 {
     int i;
@@ -23,14 +22,11 @@ static __attribute__((interrupt("IRQ"))) void EPIT1_HANDLER(void)
 
     current_tick++;
 }
-#endif
 
 void tick_start(unsigned int interval_in_ms)
 {
-    EPITCR1 &= ~(1 << 0);        /* Disable the counter */
-    EPITCR1 |= (1 << 16);        /* Reset */
-
-    CLKCTL_CGR0 |= (0x3 << 6);   /* Clock ON */
+    CLKCTL_CGR0 |= (3 << 6);   /* EPIT1 module clock ON - before writing regs! */
+    EPITCR1 &= ~((1 << 2) | (1 << 0)); /* Disable the counter */
     CLKCTL_WIMR0 &= ~(1 << 23);  /* Clear wakeup mask */
 
     /* NOTE: This isn't really accurate yet but it's close enough to work
@@ -39,17 +35,21 @@ void tick_start(unsigned int interval_in_ms)
     /* CLKSRC=32KHz, EPIT Output Disconnected, Enabled
      * prescale 1/32, Reload from modulus register, Compare interrupt enabled,
      * Count from load value */
-    EPITCR1 = (0x3 << 24) | (1 << 19) | (32 << 4) |
+    EPITCR1 = (3 << 24) | (1 << 19) | (32 << 4) |
               (1 << 3) | (1 << 2) | (1 << 1);
-#ifndef BOOTLOADER
-    EPITLR1 = interval_in_ms;
-    EPITCMPR1 = 0;              /* Event when counter reaches 0 */
-    avic_enable_int(EPIT1, IRQ, EPIT1_HANDLER);
-#else
-    (void)interval_in_ms;
-#endif
-    EPITSR1 = 1;                /* Clear any pending interrupt after
-                                   enabling the vector */
 
+    EPITLR1 = interval_in_ms;   /* Count down from interval */
+    EPITCMPR1 = 0;              /* Event when counter reaches 0 */
+    EPITSR1 = 1;                /* Clear any pending interrupt */
+    avic_enable_int(EPIT1, IRQ, 7, EPIT1_HANDLER);
     EPITCR1 |= (1 << 0);        /* Enable the counter */
 }
+
+#ifdef BOOTLOADER
+void tick_stop(void)
+{
+    avic_disable_int(EPIT1);    /* Disable insterrupt */
+    EPITCR1 &= ~((1 << 2) | (1 << 0)); /* Disable counter */
+    CLKCTL_CGR0 &= ~(3 << 6);   /* EPIT1 module clock OFF */
+}
+#endif

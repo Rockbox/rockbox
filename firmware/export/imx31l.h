@@ -23,7 +23,8 @@
 #define REG16_PTR_T volatile unsigned short *
 #define REG32_PTR_T volatile unsigned long *
 
-#define TTB_BASE_ADDR           (0x80000000 + (64*1024*1024)-TTB_SIZE)
+/* Place in the section with the framebuffer */
+#define TTB_BASE_ADDR           (0x80100000 + 0x00100000 - TTB_SIZE)
 #define IRAM_BASE_ADDR          0x1fffc000
 #define L2CC_BASE_ADDR          0x30000000
  
@@ -275,6 +276,7 @@
 #define INTENABLEL             (*(REG32_PTR_T)(AVIC_BASE_ADDR+0x14))
 #define INTTYPEH               (*(REG32_PTR_T)(AVIC_BASE_ADDR+0x18))
 #define INTTYPEL               (*(REG32_PTR_T)(AVIC_BASE_ADDR+0x1C))
+#define NIPRIORITY(n)          (((REG32_PTR_T)(AVIC_BASE_ADDR+0x20))[n])
 #define NIPRIORITY7            (*(REG32_PTR_T)(AVIC_BASE_ADDR+0x20))
 #define NIPRIORITY6            (*(REG32_PTR_T)(AVIC_BASE_ADDR+0x24))
 #define NIPRIORITY5            (*(REG32_PTR_T)(AVIC_BASE_ADDR+0x28))
@@ -294,7 +296,7 @@
 #define FIPNDH                 (*(REG32_PTR_T)(AVIC_BASE_ADDR+0x60))
 #define FIPNDL                 (*(REG32_PTR_T)(AVIC_BASE_ADDR+0x64))
 #define VECTOR_BASE_ADDR       (AVIC_BASE_ADDR+0x100)
-#define VECTOR(n)              (*(REG32_PTR_T)(VECTOR_BASE_ADDR+((n)*4)))
+#define VECTOR(n)              (((REG32_PTR_T)VECTOR_BASE_ADDR)[n])
 
 /* The vectors go all the way up to 63. 4 bytes for each */
 #define INTCNTL_ABFLAG         (1 << 25)

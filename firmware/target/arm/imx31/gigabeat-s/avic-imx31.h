@@ -49,7 +49,9 @@ enum IMX31_INT_LIST
 
 void avic_init(void);
 void avic_enable_int(enum IMX31_INT_LIST ints, enum INT_TYPE intstype,
-                     void (*handler)(void));
+                     unsigned long ni_priority, void (*handler)(void));
+void avic_set_int_priority(enum IMX31_INT_LIST ints,
+                           unsigned long ni_priority);
 void avic_disable_int(enum IMX31_INT_LIST ints);
 void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype);
 #endif

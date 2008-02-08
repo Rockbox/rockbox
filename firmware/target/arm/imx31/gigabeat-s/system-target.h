@@ -33,24 +33,28 @@ static inline void udelay(unsigned int usecs)
 #define __dbg_hw_info(...) 0
 #define __dbg_ports(...) 0
 
+void system_prepare_fw_start(void);
+void tick_stop(void);
+
 #define HAVE_INVALIDATE_ICACHE
 static inline void invalidate_icache(void)
 {
-    long rd = 0;
     asm volatile(
-        "mcr p15, 0, %0, c7, c10, 0 \n"
+        /* Clean and invalidate entire data cache */
+        "mcr p15, 0, %0, c7, c14, 0 \n"
+        /* Invalidate entire instruction cache */
         "mcr p15, 0, %0, c7, c5, 0  \n"
-        : : "r"(rd)
+        : : "r"(0)
     );
 }
 
 #define HAVE_FLUSH_ICACHE
 static inline void flush_icache(void)
 {
-    long rd = 0;
     asm volatile (
+        /* Clean entire data cache */
         "mcr p15, 0, %0, c7, c10, 0 \n"
-        : : "r"(rd)
+        : : "r"(0)
     );
 }
 

@@ -107,7 +107,7 @@ void usage(void)
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
            "\t                   ip3g, ip4g, mini, iax5, h10, h10_5gb, tpj2,\n"
-           "\t                   c200, e200, giga, m100, m500)\n"
+           "\t                   c200, e200, giga, gigs, m100, m500)\n"
            "\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);

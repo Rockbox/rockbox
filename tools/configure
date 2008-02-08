@@ -1213,7 +1213,7 @@ EOF
     target_id=26
     modelname="gigabeats"
     target="-DGIGABEAT_S"
-    memory=32 # always
+    memory=64
     arm9tdmicc
     tool="$rootdir/tools/scramble -add=gigs"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"

@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "panic.h"
+#include "avic-imx31.h"
 #include "mmu-imx31.h"
 #include "system-target.h"
 #include "lcd.h"
@@ -19,10 +20,19 @@ void system_reboot(void)
 
 void system_init(void)
 {
-#ifndef BOOTLOADER
+    /* MCR WFI enables wait mode */
+    CLKCTL_CCMR &= ~(3 << 14);
     avic_init();
-#endif
 }
+
+#ifdef BOOTLOADER
+void system_prepare_fw_start(void)
+{
+    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+    avic_disable_int(ALL);
+    tick_stop();
+}
+#endif
 
 inline void dumpregs(void) 
 {

@@ -157,8 +157,6 @@ struct event
 /* We don't enable interrupts in the iPod bootloader, so we need to fake
    the current_tick variable */
 #define current_tick (signed)(USEC_TIMER/10000)
-#elif (CONFIG_CPU == IMX31L) && defined(BOOTLOADER)
-#define current_tick (signed)((0xFFFFFFFF - EPITCNT1)/10000)
 #else
 extern volatile long current_tick;
 #endif

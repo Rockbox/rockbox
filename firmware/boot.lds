@@ -80,7 +80,10 @@ INPUT(target/sh/crt0.o)
 #define FLASHORIG 0x001f0000
 #define FLASHSIZE 2M
 #elif CONFIG_CPU == IMX31L
-#define DRAMORIG 0x80000000
+#define DRAMORIG (0x02000000-0x00100000)
+#undef  DRAMSIZE
+#define DRAMSIZE (1 << 20) /* Limit 1 MB for bootloader */
+#define IRAM DRAM
 #define IRAMORIG 0x1FFFC000
 #define IRAMSIZE 16K
 #define FLASHORIG 0x0000000
@@ -115,7 +118,12 @@ MEMORY
 #endif
    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
 }
-#elif !defined(CPU_PP) && (CONFIG_CPU!=S3C2440) && (CONFIG_CPU!=IMX31L)
+#elif CONFIG_CPU == IMX31L
+MEMORY
+{
+   DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+}
+#elif !defined(CPU_PP) && (CONFIG_CPU!=S3C2440)
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
@@ -302,48 +310,66 @@ SECTIONS
 }
 #elif (CONFIG_CPU==IMX31L)
 {
-#if 0
+    . = DRAMORIG;
+
+    .text :
+    {
+        *(.init.text)
+        *(.text*)
+	*(.icode)
+        *(.glue_7)
+        *(.glue_7t)
+        . = ALIGN(0x4);
+    } > DRAM
+
+    .rodata :
+    {
+        *(.rodata)  /* problems without this, dunno why */
+        *(.rodata*)
+        *(.rodata.str1.1)
+        *(.rodata.str1.4)
+        . = ALIGN(0x4);
+
+        /* Pseudo-allocate the copies of the data sections */
+        _datacopy = .;
+    } > DRAM
+
+    .data :
+    {
+        *(.irodata)
+        *(.idata)
+        *(.data*)
+        . = ALIGN(0x4);
+        _dataend = . ;
+    } > DRAM
+
+    .stack :
+    {
+        *(.stack)
+        _stackbegin = .;
+        stackbegin = .;
+        . += 0x2000;
+        _stackend = .;
+        stackend = .;
+    } > IRAM
+
+    .bss :
+    {
+         _edata = .;
+         *(.bss*);
+         *(.ibss);
+         *(COMMON)
+         _end = .;
+    } > DRAM
+
     .vectors 0x0 :
     {
         _vectorsstart = .;
         *(.vectors);
+        KEEP(*(.vectors));
         _vectorsend = .;
-    } AT> DRAM
-#endif
-    . = 0x82000000;
-    
-   .text :
-   {
-       *(.init.text)
-       *(.text*)
-   }
-
-   .data :
-   {
-       *(.icode)
-       *(.irodata)
-       *(.idata)
-       *(.data*)
-       _dataend = . ;
-   }
-
-   .stack :
-   {
-       *(.stack)
-       _stackbegin = .;
-       stackbegin = .;
-       . += 0x2000;
-       _stackend = .;
-       stackend = .;
-   }
-
-   .bss :
-   {
-        _edata = .;
-        *(.bss*);
-        *(.ibss);
-        _end = .;
-   }
+    } AT > DRAM
+    _vectorscopy = LOADADDR(.vectors);
 }
 #else
 {
