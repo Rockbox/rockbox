@@ -49,7 +49,7 @@ iir_mem16:
     beq     .order_10
     cmp     r5, #8
     beq     .order_8
-    ldmia   sp!, { r4-r11, pc }     @ Mon-supported order, return
+    ldmia   sp!, { r4-r11, pc }     @ Non-supported order, return
 
     @ TODO: try using direct form 1 filtering
 .order_8:
@@ -67,28 +67,28 @@ iir_mem16:
     strh    r14, [r2], #2           @ Write result to y[i]
 
     ldrsh   r4, [r1]
-    mul     r5, r4, r14 
+    mul     r5, r4, r14
     sub     r5, r6, r5              @ mem[0] = mem[1] - den[0]*y[i]
     ldrsh   r4, [r1, #2]
-    mul     r6, r4, r14 
+    mul     r6, r4, r14
     sub     r6, r7, r6              @ mem[1] = mem[2] - den[1]*y[i]
     ldrsh   r4, [r1, #4]
-    mul     r7, r4, r14 
+    mul     r7, r4, r14
     sub     r7, r8, r7              @ mem[2] = mem[3] - den[2]*y[i]
     ldrsh   r4, [r1, #6]
-    mul     r8, r4, r14 
+    mul     r8, r4, r14
     sub     r8, r9, r8              @ mem[3] = mem[4] - den[3]*y[i]
     ldrsh   r4, [r1, #8]
-    mul     r9, r4, r14 
+    mul     r9, r4, r14
     sub     r9, r10, r9             @ mem[4] = mem[5] - den[4]*y[i]
     ldrsh   r4, [r1, #10]
-    mul     r10, r4, r14 
+    mul     r10, r4, r14
     sub     r10, r11, r10           @ mem[5] = mem[6] - den[5]*y[i]
     ldrsh   r4, [r1, #12]
-    mul     r11, r4, r14 
+    mul     r11, r4, r14
     sub     r11, r12, r11           @ mem[6] = mem[7] - den[6]*y[i]
     ldrsh   r4, [r1, #14]
-    mul     r12, r4, r14 
+    mul     r12, r4, r14
     rsb     r12, r12, #0            @ mem[7] = -den[7]*y[i]
     subs    r3, r3, #1
     bne     0b
@@ -112,48 +112,48 @@ iir_mem16:
     ldmia   r1!, { r10-r12 }        @ r10-r12 = den[0..5]
     mov     r5, r10, lsl #16
     mov     r5, r5, asr #16
-    mul     r5, r14, r5 
+    mul     r5, r14, r5
     sub     r5, r6, r5              @ mem[0] = mem[1] - den[0]*y[i]
     mov     r10, r10, asr #16
-    mul     r6, r14, r10 
+    mul     r6, r14, r10
     sub     r6, r7, r6              @ mem[1] = mem[2] - den[1]*y[i]
     mov     r10, r11, lsl #16
     mov     r10, r10, asr #16
-    mul     r7, r14, r10 
+    mul     r7, r14, r10
     sub     r7, r8, r7              @ mem[2] = mem[3] - den[2]*y[i]
     mov     r10, r11, asr #16
-    mul     r8, r14, r10 
+    mul     r8, r14, r10
     sub     r8, r9, r8              @ mem[3] = mem[4] - den[3]*y[i]
     stmia   r4!, { r5-r8 }          @ Write back mem[0..3], r4 = &mem[4]
     mov     r10, r12, lsl #16
     mov     r10, r10, asr #16
-    mul     r5, r14, r10 
+    mul     r5, r14, r10
 
     ldmib   r4, { r6-r10 }          @ r6-r10 = mem[5..9]
     sub     r5, r6, r5              @ mem[4] = mem[5] - den[4]*y[i]
     mov     r12, r12, asr #16
-    mul     r6, r14, r12 
+    mul     r6, r14, r12
     sub     r6, r7, r6              @ mem[5] = mem[6] - den[5]*y[i]
     ldmia   r1!, { r11-r12 }        @ r11-r12 = den[6..9]
     mov     r7, r11, lsl #16
     mov     r7, r7, asr #16
-    mul     r7, r14, r7 
+    mul     r7, r14, r7
     sub     r7, r8, r7              @ mem[6] = mem[7] - den[6]*y[i]
     mov     r11, r11, asr #16
-    mul     r8, r14, r11 
+    mul     r8, r14, r11
     sub     r8, r9, r8              @ mem[7] = mem[8] - den[7]*y[i]
     mov     r11, r12, lsl #16
     mov     r11, r11, asr #16
-    mul     r9, r14, r11 
+    mul     r9, r14, r11
     sub     r9, r10, r9             @ mem[8] = mem[9] - den[8]*y[i]
     mov     r12, r12, asr #16
-    mul     r10, r14, r12 
+    mul     r10, r14, r12
     rsb     r10, r10, #0            @ mem[9] = -den[9]*y[i]
     stmia   r4!, { r5-r10 }         @ Write back mem[4..9]
     sub     r4, r4, #10*4
     sub     r1, r1, #10*2
     subs    r3, r3, #1
-    bne     .order_10 
+    bne     .order_10
     ldmia   sp!, { r4-r11, pc }     @ Exit
 
 
@@ -255,31 +255,27 @@ qmf_synth:
     sub     r2, r2, r4, lsl #1      @ r2 = &a[0]
     sub     r0, r0, r4              @ r0 = &xx1[N2 - 2 - i]
     sub     r1, r1, r4              @ r1 = &xx2[N2 - 2 - i]
-    
+
     mov     r10, r10, asr #15       @ Shift outputs down
     mov     r11, r11, asr #15
     mov     r12, r12, asr #15
     mov     r14, r14, asr #15
 
-    @ TODO: this can be optimized further
-    mov     r9, #0x7f00             @ Clip all four outputs
-    orr     r9, r9, #0xff           @ r9 = 32767
-    cmp     r10, r9
-    movgt   r10, r9
-    cmn     r10, r9
-    rsblt   r10, r9, #0 
-    cmp     r11, r9
-    movgt   r11, r9
-    cmn     r11, r9
-    rsblt   r11, r9, #0 
-    cmp     r12, r9
-    movgt   r12, r9
-    cmn     r12, r9
-    rsblt   r12, r9, #0 
-    cmp     r14, r9
-    movgt   r14, r9
-    cmn     r14, r9
-    rsblt   r14, r9, #0 
+    @ Clip output to -32768..32767 range, which works fine despite not being
+    @ Speex' usual clipping range.
+    mvn     r9, #0x8000
+    mov     r5, r10, asr #15
+    teq     r5, r5, asr #31
+    eorne   r10, r9, r5, asr #31
+    mov     r5, r11, asr #15
+    teq     r5, r5, asr #31
+    eorne   r11, r9, r5, asr #31
+    mov     r5, r12, asr #15
+    teq     r5, r5, asr #31
+    eorne   r12, r9, r5, asr #31
+    mov     r5, r14, asr #15
+    teq     r5, r5, asr #31
+    eorne   r14, r9, r5, asr #31
 
     strh    r10, [r3], #2           @ Write outputs
     strh    r11, [r3], #2
