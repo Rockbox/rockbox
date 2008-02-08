@@ -36,31 +36,27 @@ void button_init_device(void)
 {
     unsigned int reg_val;
     /* Enable keypad clock */
-    //mxc_clks_enable(KPP_CLK);
+    CLKCTL_CGR1 |= (3 << 2*10);
     
-   /* Enable number of rows in keypad (KPCR[7:0])
-    * Configure keypad columns as open-drain (KPCR[15:8])
-    *
-    * Configure the rows/cols in KPP
-    * LSB nibble in KPP is for 8 rows
-    * MSB nibble in KPP is for 8 cols
-    */
-   reg_val = KPP_KPCR;
-   reg_val |= (1 << 8) - 1;   /* LSB */
-   reg_val |= ((1 << 8) - 1) << 8;    /* MSB */
-   KPP_KPCR = reg_val;
+    /* Enable number of rows in keypad (KPCR[7:0])
+     * Configure keypad columns as open-drain (KPCR[15:8])
+     *
+     * Configure the rows/cols in KPP
+     * LSB nibble in KPP is for 8 rows
+     * MSB nibble in KPP is for 8 cols
+     */
+#if 0
+    KPP_KPCR = (0xff << 8) | 0xff;
+    /* Write 0's to KPDR[15:8] */
+    reg_val = KPP_KPDR;
+    reg_val &= 0x00ff;
+    KPP_KPDR = reg_val;
 
-   /* Write 0's to KPDR[15:8] */
-   reg_val = KPP_KPDR;
-   reg_val &= 0x00ff;
-   KPP_KPDR = reg_val;
+    /* Configure columns as output, rows as input (KDDR[15:0]) */
+    KPP_KDDR = 0xff00;
+#endif
 
-   /* Configure columns as output, rows as input (KDDR[15:0]) */
-   KPP_KDDR = 0xff00;
-
-   reg_val = 0xD;
-   reg_val |= (1 << 8);
-   KPP_KPSR = reg_val;
+    KPP_KPSR = (1 << 3) | (1 << 2);
 }
 
 inline bool button_hold(void)

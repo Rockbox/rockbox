@@ -23,20 +23,19 @@
 #define PREFER_C_READING
 #define PREFER_C_WRITING
 #if !defined(BOOTLOADER)
-#define ATA_OPTIMIZED_READING
-void copy_read_sectors(unsigned char* buf, int wordcount);
+#define ATA_OPTIMIZED_WRITING
+void copy_write_sectors(const unsigned char* buf, int wordcount);
 #endif
 
-#define ATA_IOBASE      0x43F8C000
-#define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE + 0xA0)))
-#define ATA_ERROR       (*((volatile unsigned char*)(ATA_IOBASE + 0xA4)))
-#define ATA_NSECTOR     (*((volatile unsigned char*)(ATA_IOBASE + 0xA8)))
-#define ATA_SECTOR      (*((volatile unsigned char*)(ATA_IOBASE + 0xAC)))
-#define ATA_LCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0xB0)))
-#define ATA_HCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0xB4)))
-#define ATA_SELECT      (*((volatile unsigned char*)(ATA_IOBASE + 0xB8)))
-#define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0xBC)))
-#define ATA_CONTROL     (*((volatile unsigned char*)(ATA_IOBASE + 0xD8)))
+#define ATA_DATA        ATA_DRIVE_DATA
+#define ATA_ERROR       ATA_DRIVE_FEATURES
+#define ATA_NSECTOR     ATA_DRIVE_SECTOR_COUNT
+#define ATA_SECTOR      ATA_DRIVE_SECTOR_NUM
+#define ATA_LCYL        ATA_DRIVE_CYL_LOW
+#define ATA_HCYL        ATA_DRIVE_CYL_HIGH
+#define ATA_SELECT      ATA_DRIVE_CYL_HEAD
+#define ATA_COMMAND     ATA_DRIVE_COMMAND
+#define ATA_CONTROL     ATA_DRIVE_CONTROL
 
 #define STATUS_BSY      0x80
 #define STATUS_RDY      0x40

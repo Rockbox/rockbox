@@ -26,14 +26,14 @@
 #include "pcf50606.h"
 #include "ata-target.h"
 
-#define ATA_RST (1 << 6)
-
 void ata_reset(void)
 {
-    ATA_CONTROL &= ~ATA_RST;
+    ATA_INTF_CONTROL &= ~ATA_ATA_RST;
     sleep(1);
-    ATA_CONTROL |= ATA_RST;
+    ATA_INTF_CONTROL |= ATA_ATA_RST;
     sleep(1);
+
+    while (!(ATA_INTERRUPT_PENDING & ATA_CONTROLLER_IDLE));
 }
 
 /* This function is called before enabling the USB bus */
@@ -44,7 +44,7 @@ void ata_enable(bool on)
 
 bool ata_is_coldstart(void)
 {
-    return 0;
+    return true;
 }
 
 unsigned long get_pll(bool serial) {
@@ -110,26 +110,27 @@ unsigned long get_ata_clock(void) {
 
 void ata_device_init(void)
 {
-    ATA_CONTROL |= ATA_RST; /* Make sure we're not in reset mode */
+    ATA_INTF_CONTROL |= ATA_ATA_RST; /* Make sure we're not in reset mode */
+
+    while (!(ATA_INTERRUPT_PENDING & ATA_CONTROLLER_IDLE));
 
     /* Setup the timing for PIO mode */
     int T = 1000 * 1000 * 1000 / get_ata_clock();
-    TIME_OFF = 3;
-    TIME_ON = 3;
+    ATA_TIME_OFF = 3;
+    ATA_TIME_ON = 3;
 
-    TIME_1 = (T + 70)/T;
-    TIME_2W = (T + 290)/T;
-    TIME_2R = (T + 290)/T;
-    TIME_AX = (T + 50)/T;
-    TIME_PIO_RDX = 1;
-    TIME_4 = (T + 30)/T;
-    TIME_9 = (T + 20)/T;
+    ATA_TIME_1 = (T + 70)/T;
+    ATA_TIME_2W = (T + 290)/T;
+    ATA_TIME_2R = (T + 290)/T;
+    ATA_TIME_AX = (T + 50)/T;
+    ATA_TIME_PIO_RDX = 1;
+    ATA_TIME_4 = (T + 30)/T;
+    ATA_TIME_9 = (T + 20)/T;
 }
 
 #if !defined(BOOTLOADER)
-void copy_read_sectors(unsigned char* buf, int wordcount)
+void copy_write_sectors(const unsigned char* buf, int wordcount)
 {
-    (void)buf;
-    (void)wordcount;
+    (void)buf; (void)wordcount;
 }
 #endif

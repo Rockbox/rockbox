@@ -1,6 +1,8 @@
 /*
  * This config file is for toshiba Gigabeat S
  */
+
+#define NO_LOW_BATTERY_SHUTDOWN
 #define TARGET_TREE /* this target is using the target tree system */
 
 #define TOSHIBA_GIGABEAT_S 1

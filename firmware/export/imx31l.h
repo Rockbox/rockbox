@@ -25,8 +25,6 @@
 
 /* Place in the section with the framebuffer */
 #define TTB_BASE_ADDR           (0x80100000 + 0x00100000 - TTB_SIZE)
-#define IRAM_BASE_ADDR          0x1fffc000
-#define L2CC_BASE_ADDR          0x30000000
  
 /*Frame Buffer and TTB defines from gigabeat f/x build*/
 #define FRAME ((short *)0x80100000) /* Framebuffer */
@@ -37,6 +35,8 @@
 /*
  * AIPS 1
  */
+#define IRAM_BASE_ADDR          0x1fffc000
+#define L2CC_BASE_ADDR          0x30000000
 #define AIPS1_BASE_ADDR         0x43F00000
 #define AIPS1_CTRL_BASE_ADDR    AIPS1_BASE_ADDR
 #define MAX_BASE_ADDR           0x43F04000
@@ -133,15 +133,70 @@
 
 
 /* ATA */
-#define TIME_OFF                (*(REG8_PTR_T)0x43F8C000)
-#define TIME_ON                 (*(REG8_PTR_T)0x43F8C001)
-#define TIME_1                  (*(REG8_PTR_T)0x43F8C002)
-#define TIME_2W                 (*(REG8_PTR_T)0x43F8C003)
-#define TIME_2R                 (*(REG8_PTR_T)0x43F8C004)
-#define TIME_AX                 (*(REG8_PTR_T)0x43F8C005)
-#define TIME_PIO_RDX            (*(REG8_PTR_T)0x43F8C00F)
-#define TIME_4                  (*(REG8_PTR_T)0x43F8C007)
-#define TIME_9                  (*(REG8_PTR_T)0x43F8C008)
+#define ATA_TIME_OFF            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x00))
+#define ATA_TIME_ON             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x01))
+#define ATA_TIME_1              (*(REG8_PTR_T)(ATA_BASE_ADDR+0x02))
+#define ATA_TIME_2W             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x03))
+    /* PIO */
+#define ATA_TIME_2R             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x04))
+#define ATA_TIME_AX             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x05))
+#define ATA_TIME_4              (*(REG8_PTR_T)(ATA_BASE_ADDR+0x07))
+#define ATA_TIME_9              (*(REG8_PTR_T)(ATA_BASE_ADDR+0x08))
+    /* MDMA */
+#define ATA_TIME_M              (*(REG8_PTR_T)(ATA_BASE_ADDR+0x09))
+#define ATA_TIME_JN             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x0A))
+#define ATA_TIME_D              (*(REG8_PTR_T)(ATA_BASE_ADDR+0x0B))
+#define ATA_TIME_K              (*(REG8_PTR_T)(ATA_BASE_ADDR+0x0C))
+    /* UDMA */
+#define ATA_TIME_ACK            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x0D))
+#define ATA_TIME_ENV            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x0E))
+#define ATA_TIME_PIO_RDX        (*(REG8_PTR_T)(ATA_BASE_ADDR+0x0F))
+#define ATA_TIME_ZAH            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x10))
+#define ATA_TIME_MLIX           (*(REG8_PTR_T)(ATA_BASE_ADDR+0x11))
+#define ATA_TIME_DVH            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x12))
+#define ATA_TIME_DZFS           (*(REG8_PTR_T)(ATA_BASE_ADDR+0x13))
+#define ATA_TIME_DVS            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x14))
+#define ATA_TIME_CVS            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x15))
+#define ATA_TIME_SS             (*(REG8_PTR_T)(ATA_BASE_ADDR+0x16))
+#define ATA_TIME_CYC            (*(REG8_PTR_T)(ATA_BASE_ADDR+0x17))
+    /* */
+#define ATA_FIFO_DATA_32        (*(REG32_PTR_T)(ATA_BASE_ADDR+0x18))
+#define ATA_FIFO_DATA_16        (*(REG16_PTR_T)(ATA_BASE_ADDR+0x1c))
+#define ATA_FIFO_FILL           (*(REG8_PTR_T)(ATA_BASE_ADDR+0x20))
+    /* Actually ATA_CONTROL but conflicts arise */
+#define ATA_INTF_CONTROL        (*(REG8_PTR_T)(ATA_BASE_ADDR+0x24))
+#define ATA_INTERRUPT_PENDING   (*(REG8_PTR_T)(ATA_BASE_ADDR+0x28))
+#define ATA_INTERRUPT_ENABLE    (*(REG8_PTR_T)(ATA_BASE_ADDR+0x2c))
+#define ATA_INTERRUPT_CLEAR     (*(REG8_PTR_T)(ATA_BASE_ADDR+0x30))
+#define ATA_FIFO_ALARM          (*(REG8_PTR_T)(ATA_BASE_ADDR+0x34))
+#define ATA_DRIVE_DATA          (*(REG16_PTR_T)(ATA_BASE_ADDR+0xA0))
+#define ATA_DRIVE_FEATURES      (*(REG8_PTR_T)(ATA_BASE_ADDR+0xA4))
+#define ATA_DRIVE_SECTOR_COUNT  (*(REG8_PTR_T)(ATA_BASE_ADDR+0xA8))
+#define ATA_DRIVE_SECTOR_NUM    (*(REG8_PTR_T)(ATA_BASE_ADDR+0xAC))
+#define ATA_DRIVE_CYL_LOW       (*(REG8_PTR_T)(ATA_BASE_ADDR+0xB0))
+#define ATA_DRIVE_CYL_HIGH      (*(REG8_PTR_T)(ATA_BASE_ADDR+0xB4))
+#define ATA_DRIVE_CYL_HEAD      (*(REG8_PTR_T)(ATA_BASE_ADDR+0xB8))
+#define ATA_DRIVE_STATUS        (*(REG8_PTR_T)(ATA_BASE_ADDR+0xBC)) /* rd */
+#define ATA_DRIVE_COMMAND       (*(REG8_PTR_T)(ATA_BASE_ADDR+0xBC)) /* wr */
+#define ATA_ALT_DRIVE_STATUS    (*(REG8_PTR_T)(ATA_BASE_ADDR+0xD8)) /* rd */
+#define ATA_DRIVE_CONTROL       (*(REG8_PTR_T)(ATA_BASE_ADDR+0xD8)) /* wr */
+
+/* ATA_INTF_CONTROL flags */
+#define ATA_FIFO_RST            (1 << 7)
+#define ATA_ATA_RST             (1 << 6)
+#define ATA_FIFO_TX_EN          (1 << 5)
+#define ATA_FIFO_RCV_EN         (1 << 4)
+#define ATA_DMA_PENDING         (1 << 3)
+#define ATA_DMA_ULTRA_SELECTED  (1 << 2)
+#define ATA_DMA_WRITE           (1 << 1)
+#define ATA_IORDY_EN            (1 << 0)
+
+/* ATA_INTERRUPT_PENDING, ATA_INTERRUPT_ENABLE, ATA_INTERRUPT_CLEAR flags */
+#define ATA_INTRQ1              (1 << 7)
+#define ATA_FIFO_UNDERFLOW      (1 << 6)
+#define ATA_FIFO_OVERFLOW       (1 << 5)
+#define ATA_CONTROLLER_IDLE     (1 << 4)
+#define ATA_INTRQ2              (1 << 3)
 
 /* Timers */
 #define EPITCR1                 (*(REG32_PTR_T)(EPIT1_BASE_ADDR+0x00))
