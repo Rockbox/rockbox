@@ -96,7 +96,7 @@ static int browser(void* param)
         case GO_TO_FILEBROWSER:
             filter = global_settings.dirfilter;
             if (global_settings.browse_current && 
-                    last_screen == GO_TO_WPS && audio_status() &&
+                    last_screen == GO_TO_WPS &&
                     wps_state.current_track_path[0] != '\0')
             {
                 strcpy(folder, wps_state.current_track_path);
