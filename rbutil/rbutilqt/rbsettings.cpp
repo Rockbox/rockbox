@@ -288,7 +288,7 @@ QString RbSettings::ttsOptions(QString tts)
 QString RbSettings::ttsVoice(QString tts)
 {
     userSettings->beginGroup(tts);
-    QString op = userSettings->value("ttsvoice").toString();
+    QString op = userSettings->value("ttsvoice","Microsoft Sam").toString();
     userSettings->endGroup();
     return op;
 }
@@ -302,7 +302,7 @@ int RbSettings::ttsSpeed(QString tts)
 QString RbSettings::ttsLang(QString tts)
 {
     userSettings->beginGroup(tts);
-    QString op = userSettings->value("ttslanguage").toString();
+    QString op = userSettings->value("ttslanguage","english").toString();
     userSettings->endGroup();
     return op;
 }
@@ -332,14 +332,14 @@ double RbSettings::encoderQuality(QString enc)
 int RbSettings::encoderComplexity(QString enc)
 {
     userSettings->beginGroup(enc);
-    int c = userSettings->value("complexity",1.f).toInt();
+    int c = userSettings->value("complexity",10).toInt();
     userSettings->endGroup();
     return c;
 }
 double RbSettings::encoderVolume(QString enc)
 {
     userSettings->beginGroup(enc);
-    double v = userSettings->value("volume",10).toDouble();
+    double v = userSettings->value("volume",1.f).toDouble();
     userSettings->endGroup();
     return v;
 }
