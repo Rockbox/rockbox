@@ -102,7 +102,7 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
     /* 10. Re-enable the appropriate keypad interrupt(s) so that the KDIE
      *     detects a key hold condition, or the KRIE detects a key-release
      *     event. */
-    if (int_btn != BUTTON_NONE)
+    if (button != BUTTON_NONE)
         KPP_KPSR |= KPP_KPSR_KRIE;
     else
         KPP_KPSR |= KPP_KPSR_KDIE;
