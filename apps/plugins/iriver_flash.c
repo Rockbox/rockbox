@@ -349,6 +349,7 @@ unsigned long valid_bootloaders[][2] = {
     { 48764, 0xc674323e }, /* 7-pre4. Fixed audio thump & remote bootup */
 #endif
 #ifdef IRIVER_H100
+    { 48760, 0x2efc3323 }, /* 7-pre4 */
 #endif
     { 0,     0 }
 };
