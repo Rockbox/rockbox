@@ -119,6 +119,12 @@ void audiohw_close(void);
  */
 void audiohw_mute(bool mute);
 
+/**
+ * Silently en/disable audio output.
+ * @param enable true or false.
+ */
+void audiohw_enable_output(bool enable);
+
 #ifdef HAVE_RECORDING
 
 /**

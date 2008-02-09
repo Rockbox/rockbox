@@ -37,7 +37,6 @@ extern int tenthdb2master(int db);
  * 88200: 2 = MCLK*2 MCLK    SCLK, LRCK: Audio Clk / 2
  */
 extern void audiohw_set_frequency(unsigned fsel);
-extern void audiohw_enable_output(bool enable);
 extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
 
 #define HEADPHONE_MUTE 0x30 /* 0110000 = -73db */
