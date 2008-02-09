@@ -60,10 +60,10 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     connect(logger,SIGNAL(aborted()),this,SLOT(abort()));
     m_logger->setProgressMax(0);
   
-	QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags;
-	if(m_recursive)
-		flags = QDirIterator::Subdirectories;
-		
+    QDirIterator::IteratorFlags flags = QDirIterator::NoIteratorFlags;
+    if(m_recursive)
+        flags = QDirIterator::Subdirectories;
+        
     QDirIterator it(m_dir,flags);
     QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
     installlog.beginGroup("talkfiles");
@@ -141,6 +141,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
                     m_logger->abort();
                     m_tts->stop();
                     m_enc->stop();
+
                     return false;
                 }
                 QApplication::processEvents();
@@ -152,6 +153,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
                 m_logger->abort();
                 m_tts->stop();
                 m_enc->stop();
+
                 return false;
             }
             QApplication::processEvents();

@@ -48,7 +48,7 @@ public:
     void setStripExtensions(bool ov) {m_stripExtensions = ov;}
     void setTalkFolders(bool ov) {m_talkFolders = ov;} 
     void setTalkFiles(bool ov) {m_talkFiles = ov;}
-
+    
 private slots:
     void abort();
 

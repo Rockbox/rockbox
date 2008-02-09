@@ -54,6 +54,7 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
     {
         m_logger->addItem(tr("failed to open rockbox-info.txt"),LOGERROR);
         m_logger->abort();
+        emit done(false);
         return false;
     }
     
@@ -94,20 +95,10 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
     getter->getFile(genlangUrl);
 
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    connect(getter, SIGNAL(downloadDone(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
     connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
     connect(m_logger, SIGNAL(aborted()), getter, SLOT(abort()));
     return true;
  }
-
-
-void VoiceFileCreator::downloadRequestFinished(int id, bool error)
-{
-    qDebug() << "Install::downloadRequestFinished" << id << error;
-    qDebug() << "error:" << getter->errorString();
-
-    downloadDone(error);
-}
 
 
 void VoiceFileCreator::downloadDone(bool error)
@@ -124,12 +115,14 @@ void VoiceFileCreator::downloadDone(bool error)
     if(getter->httpResponse() != 200 && !getter->isCached()) {
         m_logger->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()),LOGERROR);
         m_logger->abort();
+        emit done(false);
         return;
     }
     if(getter->isCached()) m_logger->addItem(tr("Cached file used."), LOGINFO);
     if(error) {
         m_logger->addItem(tr("Download error: %1").arg(getter->errorString()),LOGERROR);
         m_logger->abort();
+        emit done(false);
         return;
     }
     else m_logger->addItem(tr("Download finished."),LOGOK);
@@ -143,6 +136,7 @@ void VoiceFileCreator::downloadDone(bool error)
     {
         m_logger->addItem(tr("failed to open downloaded file"),LOGERROR);
         m_logger->abort();
+        emit done(false);
         return;
     }    
 
@@ -156,6 +150,7 @@ void VoiceFileCreator::downloadDone(bool error)
         m_logger->addItem(errStr,LOGERROR);
         m_logger->addItem(tr("Init of TTS engine failed"),LOGERROR);
         m_logger->abort();
+        emit done(false);
         return;
     }
 
@@ -168,6 +163,7 @@ void VoiceFileCreator::downloadDone(bool error)
         m_logger->addItem(tr("Init of Encoder engine failed"),LOGERROR);
         m_tts->stop();
         m_logger->abort();
+        emit done(false);
         return;
     }
 
@@ -210,6 +206,7 @@ void VoiceFileCreator::downloadDone(bool error)
         m_logger->addItem(tr("The downloaded file was empty!"),LOGERROR);    
         m_logger->abort();
         m_tts->stop();
+        emit done(false);
         return;
     }
     
@@ -225,6 +222,7 @@ void VoiceFileCreator::downloadDone(bool error)
             m_logger->addItem("aborted.",LOGERROR);    
             m_logger->abort();
             m_tts->stop();
+            emit done(false);
             return;
         }   
         
@@ -269,13 +267,15 @@ void VoiceFileCreator::downloadDone(bool error)
     {
         m_logger->addItem(tr("Error opening downloaded file"),LOGERROR);    
         m_logger->abort();
+        emit done(false);
         return;
     }
 
     FILE* output = fopen(QString(m_mountpoint + "/.rockbox/langs/" + m_lang + ".voice").toUtf8(), "wb");
     if (output == NULL)
     {
-        m_logger->addItem(tr("Error opening output file"),LOGERROR);    
+        m_logger->addItem(tr("Error opening output file"),LOGERROR); 
+        emit done(false);        
         return;
     }
     
@@ -290,7 +290,9 @@ void VoiceFileCreator::downloadDone(bool error)
     m_logger->setProgressMax(100);
     m_logger->setProgressValue(100);
     m_logger->addItem(tr("successfully created."),LOGOK);    
-    m_logger->abort();    
+    m_logger->abort();  
+
+    emit done(true);    
 }
 
 void VoiceFileCreator::updateDataReadProgress(int read, int total)

@@ -27,6 +27,8 @@
 
 #ifndef CONSOLE
 #include "ttsgui.h"
+#else
+#include "ttsguicli.h"
 #endif
 
 class TTSBase;

@@ -53,9 +53,11 @@ public:
     void setWavtrimThreshold(int th){m_wavtrimThreshold = th;}
     void setProxy(QUrl proxy){m_proxy = proxy;}
     
+signals:
+    void done(bool error);
+    
 private slots:
     void abort();
-    void downloadRequestFinished(int id, bool error);
     void downloadDone(bool error);
     void updateDataReadProgress(int read, int total);
     

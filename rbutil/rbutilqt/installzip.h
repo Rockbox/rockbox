@@ -56,7 +56,6 @@ signals:
 private slots:
     void updateDataReadProgress(int, int);
     void downloadDone(bool);
-    void downloadRequestFinished(int, bool);
     void installStart(void);
     void installContinue(void);
 

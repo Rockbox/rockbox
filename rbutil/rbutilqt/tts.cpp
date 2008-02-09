@@ -130,7 +130,11 @@ bool TTSExes::voice(QString text,QString wavfile)
 
 void TTSExes::showCfg()
 {
+#ifndef CONSOLE
     TTSExesGui gui;
+#else
+	TTSExesGuiCli gui;
+#endif
     gui.setCfg(settings);
     gui.showCfg(m_name);
 }
@@ -270,7 +274,11 @@ bool TTSSapi::stop()
 
 void TTSSapi::showCfg()
 {
+#ifndef CONSOLE
     TTSSapiGui gui(this);
+#else
+	TTSSapiGuiCli gui(this);
+#endif
     gui.setCfg(settings);
     gui.showCfg();
 }

@@ -62,7 +62,7 @@ void ZipInstaller::installContinue()
         m_dp->addItem(tr("Installation finished successfully."),LOGOK);
         m_dp->abort();
 
-        emit done(false);
+        emit done(true);
         return;
     }
 
@@ -89,24 +89,14 @@ void ZipInstaller::installStart()
     getter->setProxy(m_proxy);
     if(m_cache.exists()) {
         getter->setCache(m_cache);
-        qDebug() << "installzip: setting cache to" << m_cache;
+
     }
     getter->setFile(downloadFile);
     getter->getFile(QUrl(m_url));
 
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    connect(getter, SIGNAL(downloadDone(int, bool)), this, SLOT(downloadRequestFinished(int, bool)));
     connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
     connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
-}
-
-
-void ZipInstaller::downloadRequestFinished(int id, bool error)
-{
-    qDebug() << "Install::downloadRequestFinished" << id << error;
-    qDebug() << "error:" << getter->errorString();
-
-    downloadDone(error);
 }
 
 
@@ -125,14 +115,14 @@ void ZipInstaller::downloadDone(bool error)
     if(getter->httpResponse() != 200 && !getter->isCached()) {
         m_dp->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()),LOGERROR);
         m_dp->abort();
-        emit done(true);
+        emit done(false);
         return;
     }
     if(getter->isCached()) m_dp->addItem(tr("Cached file used."), LOGINFO);
     if(error) {
         m_dp->addItem(tr("Download error: %1").arg(getter->errorString()),LOGERROR);
         m_dp->abort();
-        emit done(true);
+        emit done(false);
         return;
     }
     else m_dp->addItem(tr("Download finished."),LOGOK);

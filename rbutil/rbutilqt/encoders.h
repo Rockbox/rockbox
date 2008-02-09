@@ -40,11 +40,11 @@ QString getEncoderName(QString encoder);
 QStringList getEncoderList(void);
 
 
-class EncBase : public QDialog
+class EncBase : public QObject
 {
     Q_OBJECT
 public:
-    EncBase(QWidget *parent );
+    EncBase(QObject *parent );
     
     virtual bool encode(QString input,QString output)
         {(void)input; (void)output; return false;}
@@ -71,7 +71,7 @@ class EncExes : public EncBase
 {
     Q_OBJECT
 public:
-    EncExes(QString name,QWidget *parent = NULL);
+    EncExes(QString name,QObject *parent = NULL);
     virtual bool encode(QString input,QString output);
     virtual bool start();
     virtual bool stop() {return true;}
@@ -90,7 +90,7 @@ class EncRbSpeex : public EncBase
 {
     Q_OBJECT
 public:
-    EncRbSpeex(QWidget *parent = NULL);
+    EncRbSpeex(QObject *parent = NULL);
     virtual bool encode(QString input,QString output);
     virtual bool start();
     virtual bool stop() {return true;}

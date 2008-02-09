@@ -22,6 +22,8 @@
 
 #ifndef CONSOLE
 #include "encodersgui.h"
+#else
+#include "encodersguicli.h"
 #endif
 
 static QMap<QString,QString> encoderList;
@@ -53,20 +55,18 @@ EncBase* getEncoder(QString encoder)
         return encoderCache.value(encoder);
 
     EncBase* enc;
-    if(encoder == "rbspeex")
-    {
-        enc = new EncRbSpeex();
-        encoderCache[encoder] = enc;
-        return enc;
-    }
-    else if(encoder == "lame")
+	if(encoder == "lame")
     {
         enc = new EncExes(encoder);
         encoderCache[encoder] = enc;
         return enc;
     }
-    else
-        return NULL;
+    else  // rbspeex is default
+    {
+        enc = new EncRbSpeex();
+        encoderCache[encoder] = enc;
+        return enc;
+    }
 }
 
 
@@ -81,7 +81,7 @@ QStringList getEncoderList()
 /*********************************************************************
 * Encoder Base
 **********************************************************************/
-EncBase::EncBase(QWidget *parent): QDialog(parent)
+EncBase::EncBase(QObject *parent): QObject(parent)
 {
 
 }
@@ -89,7 +89,7 @@ EncBase::EncBase(QWidget *parent): QDialog(parent)
 /*********************************************************************
 *  GEneral Exe Encoder
 **********************************************************************/
-EncExes::EncExes(QString name,QWidget *parent) : EncBase(parent)
+EncExes::EncExes(QString name,QObject *parent) : EncBase(parent)
 {
     m_name = name;
     
@@ -132,7 +132,11 @@ bool EncExes::encode(QString input,QString output)
 
 void EncExes::showCfg()
 {
+#ifndef CONSOLE
     EncExesGui gui;
+#else
+	EncExesGuiCli gui;
+#endif
     gui.setCfg(settings);
     gui.showCfg(m_name);
 }
@@ -152,7 +156,7 @@ bool EncExes::configOk()
 /*********************************************************************
 *  RB SPEEX ENCODER
 **********************************************************************/
-EncRbSpeex::EncRbSpeex(QWidget *parent) : EncBase(parent)
+EncRbSpeex::EncRbSpeex(QObject *parent) : EncBase(parent)
 {
    
     defaultQuality = 8.f;
@@ -208,7 +212,11 @@ bool EncRbSpeex::encode(QString input,QString output)
 
 void EncRbSpeex::showCfg()
 {
+#ifndef CONSOLE
     EncRbSpeexGui gui;
+#else
+	EncRbSpeexGuiCli gui;
+#endif
     gui.setCfg(settings);
     gui.showCfg(defaultQuality,defaultVolume,defaultComplexity,defaultBand);
 }
