@@ -35,6 +35,8 @@ void spi_init(void) {
 }
 
 static int spi_transfer(int address, long data, long* buffer, bool read) {
+    return -1; /* Disable for now - hangs - and we'll use interrupts */
+
     unsigned long packet = 0;
     if(!read) {
         /* Set the appropriate bit in the packet to indicate a write */

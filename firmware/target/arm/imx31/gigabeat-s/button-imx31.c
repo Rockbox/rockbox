@@ -21,156 +21,143 @@
 #include "cpu.h"
 #include "system.h"
 #include "button.h"
-#include "kernel.h"
 #include "backlight.h"
-#include "adc.h"
 #include "system.h"
 #include "backlight-target.h"
-#include "debug.h"
-#include "stdio.h"
+#include "avic-imx31.h"
 
 /* Most code in here is taken from the Linux BSP provided by Freescale
  * Copyright 2004-2006 Freescale Semiconductor, Inc. All Rights Reserved. */
 
-void button_init_device(void)
+static uint32_t int_btn = BUTTON_NONE;
+static bool hold_button     = false;
+static bool hold_button_old = false;
+#define _button_hold() (GPIO3_DR & 0x10)
+
+static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
 {
-    unsigned int reg_val;
-    /* Enable keypad clock */
-    CLKCTL_CGR1 |= (3 << 2*10);
-    
-    /* Enable number of rows in keypad (KPCR[7:0])
-     * Configure keypad columns as open-drain (KPCR[15:8])
-     *
-     * Configure the rows/cols in KPP
-     * LSB nibble in KPP is for 8 rows
-     * MSB nibble in KPP is for 8 cols
-     */
-#if 0
-    KPP_KPCR = (0xff << 8) | 0xff;
-    /* Write 0's to KPDR[15:8] */
-    reg_val = KPP_KPDR;
-    reg_val &= 0x00ff;
-    KPP_KPDR = reg_val;
+    static const int key_mtx[5][3] =
+    {
+        { BUTTON_LEFT,   BUTTON_BACK, BUTTON_VOL_UP   },
+        { BUTTON_UP,     BUTTON_MENU, BUTTON_VOL_DOWN },
+        { BUTTON_DOWN,   BUTTON_NONE, BUTTON_PREV     },
+        { BUTTON_RIGHT,  BUTTON_NONE, BUTTON_PLAY     },
+        { BUTTON_SELECT, BUTTON_NONE, BUTTON_NEXT     },
+    };
 
-    /* Configure columns as output, rows as input (KDDR[15:0]) */
-    KPP_KDDR = 0xff00;
-#endif
+    unsigned short reg_val;
+    int col, row;
+    int i;
+    int button = BUTTON_NONE;
 
-    KPP_KPSR = (1 << 3) | (1 << 2);
+    /* 1. Disable both (depress and release) keypad interrupts. */
+    KPP_KPSR &= ~(KPP_KPSR_KRIE | KPP_KPSR_KDIE);
+
+    for (col = 0; col < 3; col++) /* Col */
+    {
+        /* 2. Write 1s to KPDR[10:8] setting column data to 1s */
+        KPP_KPDR |= (0x7 << 8);
+
+        /* 3. Configure columns as totem pole outputs(for quick
+         * discharging of keypad capacitance) */
+        KPP_KPCR &= ~(0x7 << 8);
+
+        /* Give the columns time to discharge */
+        for (i = 0; i < 256; i++)
+            asm volatile ("");
+
+        /* 4. Configure columns as open-drain */
+        KPP_KPCR |= (0x7 << 8);
+
+        /* 5. Write a single column to 0, others to 1.
+         * 6. Sample row inputs and save data. Multiple key presses
+         *    can be detected on a single column.
+         * 7. Repeat steps 2 - 6 for remaining columns. */
+
+        /* Col bit starts at 8th bit in KPDR */
+        KPP_KPDR &= ~(1 << (8 + col));
+
+        /* Delay added to avoid propagating the 0 from column to row
+         * when scanning. */
+        for (i = 0; i < 256; i++)
+            asm volatile ("");
+
+        /* Read row input */
+        reg_val = KPP_KPDR;
+        for (row = 0; row < 5; row++)   /* sample row */
+        {
+            if (!(reg_val & (1 << row)))
+                button |= key_mtx[row][col];
+        }
+    }
+
+    /* 8. Return all columns to 0 in preparation for standby mode. */
+    KPP_KPDR &= ~(0x7 << 8);
+
+    /* 9. Clear KPKD and KPKR status bit(s) by writing to a .1.,
+     *    set the KPKR synchronizer chain by writing "1" to KRSS register,
+     *    clear the KPKD synchronizer chain by writing "1" to KDSC register */
+    KPP_KPSR = KPP_KPSR_KRSS | KPP_KPSR_KDSC | KPP_KPSR_KPKR | KPP_KPSR_KPKD;
+
+    /* 10. Re-enable the appropriate keypad interrupt(s) so that the KDIE
+     *     detects a key hold condition, or the KRIE detects a key-release
+     *     event. */
+    if (int_btn != BUTTON_NONE)
+        KPP_KPSR |= KPP_KPSR_KRIE;
+    else
+        KPP_KPSR |= KPP_KPSR_KDIE;
+
+    int_btn = button;
 }
 
-inline bool button_hold(void)
+void button_init_device(void)
 {
-    return GPIO3_DR & 0x10;
+    /* Enable keypad clock */
+    CLKCTL_CGR1 |= (3 << 2*10);
+
+    /* 1. Enable number of rows in keypad (KPCR[4:0])
+     *
+     * Configure the rows/cols in KPP
+     * LSB nybble in KPP is for 5 rows
+     * MSB nybble in KPP is for 3 cols */
+    KPP_KPCR |= 0x1f;
+
+    /* 2. Write 0's to KPDR[10:8] */
+    KPP_KPDR &= ~(0x7 << 8);
+
+    /* 3. Configure the keypad columns as open-drain (KPCR[10:8]). */
+    KPP_KPCR |= (0x7 << 8);
+
+    /* 4. Configure columns as output, rows as input (KDDR[10:8,4:0]) */
+    KPP_KDDR = (KPP_KDDR | (0x7 << 8)) & ~0x1f;
+
+    /* 5. Clear the KPKD Status Flag and Synchronizer chain.
+     * 6. Set the KDIE control bit, and set the KRIE control
+     *    bit (to force immediate scan). */
+    KPP_KPSR = KPP_KPSR_KRIE | KPP_KPSR_KDIE | KPP_KPSR_KRSS |
+               KPP_KPSR_KDSC | KPP_KPSR_KPKR | KPP_KPSR_KPKD;
+
+    /* KPP IRQ at priority 3 */
+    avic_enable_int(KPP, IRQ, 3, KPP_HANDLER);
+}
+
+bool button_hold(void)
+{
+    return _button_hold();
 }
 
 int button_read_device(void)
 {
-    unsigned short reg_val;
-    int col, row;
-    int button = BUTTON_NONE;
+    /* Simple poll of GPIO status */
+    hold_button = _button_hold();
 
-    if(!button_hold()) {
-        for (col = 0; col < 3; col++) {  /* Col */
-            /* 1. Write 1s to KPDR[15:8] setting column data to 1s */
-            reg_val = KPP_KPDR;
-            reg_val |= 0xff00;
-            KPP_KPDR = reg_val;
-
-            /*
-             * 2. Configure columns as totem pole outputs(for quick
-             * discharging of keypad capacitance)
-             */
-            reg_val = KPP_KPCR;
-            reg_val &= 0x00ff;
-            KPP_KPCR = reg_val;
-
-            /* Give the columns time to discharge */
-            udelay(2);
-
-            /* 3. Configure columns as open-drain */
-            reg_val = KPP_KPCR;
-            reg_val |= ((1 << 8) - 1) << 8;
-            KPP_KPCR = reg_val;
-
-            /* 4. Write a single column to 0, others to 1.
-             * 5. Sample row inputs and save data. Multiple key presses
-             * can be detected on a single column.
-             * 6. Repeat steps 1 - 5 for remaining columns.
-             */
-
-            /* Col bit starts at 8th bit in KPDR */
-            reg_val = KPP_KPDR;
-            reg_val &= ~(1 << (8 + col));
-            KPP_KPDR = reg_val;
-
-            /* Delay added to avoid propagating the 0 from column to row
-             * when scanning. */
-            udelay(2);
-
-            /* Read row input */
-            reg_val = KPP_KPDR;
-            for (row = 0; row < 5; row++) {  /* sample row */
-                if (!(reg_val & (1 << row))) {
-                    if(row == 0) {
-                            if(col == 0) {
-                                button |= BUTTON_LEFT;
-                            }
-                            if(col == 1) {
-                                button |= BUTTON_BACK;
-                            }
-                            if(col == 2) {
-                                button |= BUTTON_VOL_UP;
-                            }
-                    } else if(row == 1) {
-                            if(col == 0) {
-                                button |= BUTTON_UP;
-                            }
-                            if(col == 1) {
-                                button |= BUTTON_MENU;
-                            }
-                            if(col == 2) {
-                                button |= BUTTON_VOL_DOWN;
-                            }
-                    } else if(row == 2) {
-                            if(col == 0) {
-                                button |= BUTTON_DOWN;
-                            }
-                            if(col == 2) {
-                                button |= BUTTON_PREV;
-                            }
-                    } else if(row == 3) {
-                            if(col == 0) {
-                                button |= BUTTON_RIGHT;
-                            }
-                            if(col == 2) {
-                                button |= BUTTON_PLAY;
-                            }
-                    } else if(row == 4) {
-                            if(col == 0) {
-                                button |= BUTTON_SELECT;
-                            }
-                            if(col == 2) {
-                                button |= BUTTON_NEXT;
-                            }
-                    }
-                }
-            }
-        }
-
-        /*
-         * 7. Return all columns to 0 in preparation for standby mode.
-         * 8. Clear KPKD and KPKR status bit(s) by writing to a .1.,
-         * set the KPKR synchronizer chain by writing "1" to KRSS register,
-         * clear the KPKD synchronizer chain by writing "1" to KDSC register
-         */
-        reg_val = 0x00;
-        KPP_KPDR = reg_val;
-        reg_val = KPP_KPDR;
-        reg_val = KPP_KPSR;
-        reg_val |= 0xF;
-        KPP_KPSR = reg_val;
+    /* Backlight hold handling */
+    if (hold_button != hold_button_old)
+    {
+        hold_button_old = hold_button;
+        backlight_hold_changed(hold_button);
     }
 
-    return button;
+    /* If hold, ignore any pressed button */
+    return hold_button ? BUTTON_NONE : int_btn;
 }
