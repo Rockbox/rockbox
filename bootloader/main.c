@@ -240,9 +240,10 @@ static const char *options[] = {
 };
 
 #define FAILSAFE_OPTIONS 4
+#define TIMEOUT (15*HZ)
 void failsafe_menu(void)
 {
-    int timeout = 15;
+    long start_tick = current_tick;
     int option = 3;
     int button;
     int defopt = -1;
@@ -267,7 +268,7 @@ void failsafe_menu(void)
             defopt = option;
     }
     
-    while (timeout > 0)
+    while (current_tick - start_tick < TIMEOUT)
     {
         /* Draw the menu. */
         line = 3;
@@ -284,18 +285,17 @@ void failsafe_menu(void)
             printf("%s %s %s", arrow, options[i], def);
         }
         
-        snprintf(buf, sizeof(buf), "Time left: %ds", timeout);
+        snprintf(buf, sizeof(buf), "Time left: %ds", 
+                 (TIMEOUT - (current_tick - start_tick)) / HZ);
         lcd_puts(0, 10, buf);
         lcd_update();
         button = button_get_w_tmo(HZ);
-
-        if (button == BUTTON_NONE)
-        {
-            timeout--;
+        
+        if (button == BUTTON_NONE || button & SYS_EVENT)
             continue ;
-        }
 
-        timeout = 15;
+        start_tick = current_tick;
+        
         /* Ignore the ON/PLAY -button because it can cause trouble 
            with the RTC alarm mod. */
         switch (button & ~(BUTTON_ON))
@@ -314,8 +314,7 @@ void failsafe_menu(void)
 
             case BUTTON_SELECT:
             case BUTTON_RC_ON:
-                timeout = 0;
-                break ;
+                goto execute;
             
             case BUTTON_REC:
             case BUTTON_RC_REC:
@@ -328,6 +327,8 @@ void failsafe_menu(void)
                 break ;
         }
     }
+    
+    execute:
     
     lcd_puts(0, 10, "Executing command...");
     lcd_update();
@@ -353,6 +354,24 @@ void failsafe_menu(void)
     shutdown();
 }
 #endif
+
+/* get rid of a nasty humming sound during boot
+ -> RESET signal */
+inline static void __uda1380_reset_hi(void)
+{
+#ifdef HAVE_UDA1380
+    or_l(1<<29, &GPIO_OUT);
+    or_l(1<<29, &GPIO_ENABLE);
+    or_l(1<<29, &GPIO_FUNCTION);
+#endif
+}
+
+inline static void __uda1380_reset_lo(void)
+{
+#ifdef HAVE_UDA1380
+    and_l(~(1<<29), &GPIO_OUT);
+#endif
+}
 
 void main(void)
 {
@@ -387,12 +406,14 @@ void main(void)
     power_init();
 
     /* Turn off if neither ON button is pressed */
-    if(!(on_button || rc_on_button || (usb_detect() == USB_INSERTED)))
+    if (!(on_button || rc_on_button))
     {
         __reset_cookie();
         power_off();
     }
 
+    __uda1380_reset_hi();
+    
     /* Start with the main backlight OFF. */
     _backlight_init();
     _backlight_off();
@@ -405,6 +426,8 @@ void main(void)
     system_init();
     kernel_init();
 
+    __uda1380_reset_lo();
+    
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     /* Set up waitstates for the peripherals */
     set_cpu_frequency(0); /* PLL off */
@@ -418,11 +441,28 @@ void main(void)
     initialize_eeprom();
 #endif
     
+    usb_init();
+    /* A small delay after usb_init is necessary to read the I/O port correctly
+       (if ports are read _immediately_ after the init). */
+    /* sleep(1); */
+
     adc_init();
     button_init();
     
-    if ((on_button && button_hold()) ||
-         (rc_on_button && remote_button_hold()))
+    /* Only check remote hold status if remote power button was actually used. */
+    if (rc_on_button)
+    {
+        lcd_remote_init();
+        
+        /* Allow the button driver to check the buttons */
+        sleep(HZ/50);
+        
+        if (remote_button_hold())
+            hold_status = true;
+    }
+    
+    /* Check main hold switch status too. */
+    if (on_button && button_hold())
     {
         hold_status = true;
     }
@@ -437,35 +477,33 @@ void main(void)
         ide_power_enable(true);
     }
     
-# ifdef EEPROM_SETTINGS
+# ifdef HAVE_EEPROM_SETTINGS
     if (!hold_status && (usb_detect() != USB_INSERTED) && !recovery_mode)
         try_flashboot();
 # endif
 
     backlight_init();
 
-#ifdef HAVE_UDA1380
-    /* get rid of a nasty humming sound during boot
-      -> RESET signal */
-    or_l(1<<29, &GPIO_OUT);
-    or_l(1<<29, &GPIO_ENABLE);
-    or_l(1<<29, &GPIO_FUNCTION);
-    sleep(HZ/100);
-    and_l(~(1<<29), &GPIO_OUT);
-#endif
 
     lcd_init();
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_init();
-#endif
+
+    if (!rc_on_button)
+        lcd_remote_init();
+    
+    /* Bootloader uses simplified backlight thread, so we need to enable
+       remote display here. */
+    if (remote_detect())
+        lcd_remote_on();
+    
     font_init();
 
     lcd_setfont(FONT_SYSFIXED);
-
+    
     printf("Rockbox boot loader");
     printf("Version %s", version);
 
-    sleep(HZ/50); /* Allow the button driver to check the buttons */
+    /* No need to wait here more because lcd_init and others already do that. */
+    // sleep(HZ/50); /* Allow the button driver to check the buttons */
     rec_button = ((button_status() & BUTTON_REC) == BUTTON_REC)
         || ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC);
 
@@ -496,8 +534,6 @@ void main(void)
         printf("Starting original firmware...");
         start_iriver_fw();
     }
-
-    usb_init();
 
     /* A hack to enter USB mode without using the USB thread */
     if(usb_detect() == USB_INSERTED)

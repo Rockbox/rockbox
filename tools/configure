@@ -877,6 +877,7 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iriver"
     appextra="recorder:gui"
+    flash="$pwd/rombox.iriver"
     plugins="yes"
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for

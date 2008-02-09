@@ -114,7 +114,7 @@
 
 /* Define this if you can run rockbox from flash memory */
 /* In theory we can, but somebody needs to verify there are no issues. */
-// #define HAVE_FLASHED_ROCKBOX
+#define HAVE_FLASHED_ROCKBOX
 
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
@@ -149,9 +149,10 @@
 #define FLASH_MAGIC            0xfbfbfbf2
 
 /* Define this if there is an EEPROM chip */
-/* Someone with H100 and BDM, please verify if this works and remove these
-   ugly comments then. */
-// #define HAVE_EEPROM
+#define HAVE_EEPROM
+
+/* Define this if the EEPROM chip is used */
+#define HAVE_EEPROM_SETTINGS
 
 #endif /* !SIMULATOR */
 

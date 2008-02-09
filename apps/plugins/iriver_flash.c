@@ -27,7 +27,7 @@
 unsigned char *audiobuf;
 ssize_t audiobuf_size;
 
-#if defined(IRIVER_H120)
+#ifdef IRIVER_H100_SERIES
 #define PLATFORM_ID ID_IRIVER_H100
 #else
 #undef PLATFORM_ID /* this platform is not (yet) flashable */
@@ -329,7 +329,7 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
     }
     
     /* Verify the checksum */
-    sum = 0;
+    sum = MODEL_NUMBER;
     for (i = 0; i < len; i++)
         sum += audiobuf[i];
     
@@ -344,7 +344,12 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
 
 unsigned long valid_bootloaders[][2] = { 
     /* Size-8   CRC32 */
+#ifdef IRIVER_H120 /* Iriver H120/H140 checksums */
     { 63788, 0x08ff01a9 }, /* 7-pre3, improved failsafe functions */
+    { 48764, 0xc674323e }, /* 7-pre4. Fixed audio thump & remote bootup */
+#endif
+#ifdef IRIVER_H100
+#endif
     { 0,     0 }
 };
 
@@ -483,7 +488,7 @@ int flash_rockbox(const char *filename, int section)
     
     p8 = (char *)get_section_address(section);
     p8 += sizeof(struct flash_header);
-    sum = 0;
+    sum = MODEL_NUMBER;
     for (i = 0; i < len; i++)
         sum += p8[i];
     
@@ -573,7 +578,7 @@ int flash_bootloader(const char *filename)
     
     /* Verify */
     p8 = (char *)BOOTLOADER_ENTRYPOINT;
-    sum = 0;
+    sum = MODEL_NUMBER;
     for (i = 0; i < len; i++)
         sum += p8[i];
     
