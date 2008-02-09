@@ -695,7 +695,7 @@ static void sd_init_device(int card_no)
         c_size = ((currcard->csd[2] & 0x3f) << 16) + (currcard->csd[1]>>16) + 1;
         currcard->max_read_bl_len = 1 << ((currcard->csd[2] >> 16) & 0xf);
         currcard->block_size = BLOCK_SIZE;     /* Always use 512 byte blocks */
-        currcard->numblocks = c_size;
+        currcard->numblocks = c_size << 10;
         currcard->capacity = currcard->numblocks * currcard->block_size;
     }
 #endif /* HAVE_HOTSWAP */
