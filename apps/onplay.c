@@ -1051,6 +1051,7 @@ static bool set_recdir(void)
 {
     strncpy(global_settings.rec_directory,
             selected_file, MAX_FILENAME+1);
+    settings_save();
     return false;
 }
 MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_SET_AS_REC_DIR),
