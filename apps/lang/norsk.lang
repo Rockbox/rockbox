@@ -1332,7 +1332,7 @@
   <voice>
     *: "Musikk"
   </voice>
-<	/phrase>
+</phrase>
 <phrase>
   id: LANG_FOLLOW
   desc: in settings_menu
@@ -3491,7 +3491,7 @@
   </voice>
 </phrase>
 <phrase>
-  LANG_INSERT_LAST
+  id: LANG_INSERT_LAST
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user:
   <source>
@@ -4373,7 +4373,7 @@
   <voice>
     *: ""
   </voice>
-</phrase> ###next 7 voice strings by mokkurkalve
+</phrase>
 <phrase>
   id: LANG_WEEKDAY_SUNDAY
   desc: Maximum 3-letter abbreviation for weekday

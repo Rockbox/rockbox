@@ -11111,7 +11111,7 @@
     usbstack: "Στοίβα Γιού Ες Μπι"
   </voice>
 </phrase>
-phrase>
+<phrase>
   id: LANG_USBSTACK_MODE
   desc: in usbstack settings
   user:

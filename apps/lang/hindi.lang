@@ -5180,7 +5180,7 @@
 </phrase>
 <phrase>
   id: LANG_SELECTOR_START_COLOR
-  desc  line selector color option
+  desc: line selector color option
   user:
   <source>
     *: none
