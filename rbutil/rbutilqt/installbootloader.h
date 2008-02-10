@@ -20,7 +20,11 @@
 #ifndef INSTALLBOOTLOADER_H
 #define INSTALLBOOTLOADER_H
 
+#ifndef CONSOLE
 #include <QtGui>
+#else
+#include <QtCore>
+#endif
 
 #include "progressloggerinterface.h"
 #include "httpget.h"

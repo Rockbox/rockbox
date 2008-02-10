@@ -21,7 +21,7 @@
 #ifndef AUTODETECTION_H_
 #define AUTODETECTION_H_
 
-#include <QtGui>
+#include <QtCore>
 
 extern "C" {
     // Ipodpatcher

@@ -20,7 +20,7 @@
 #ifndef ENCODERS_H
 #define ENCODERS_H
  
-#include <QtGui>
+#include <QtCore>
  
 #include "rbsettings.h"
 

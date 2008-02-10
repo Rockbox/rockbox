@@ -198,7 +198,7 @@ bool BootloaderInstaller::downloadInfo()
    infoDownloaded=false;
    infoError = false;
    while(!infoDownloaded )
-       QApplication::processEvents();
+       QCoreApplication::processEvents();
    return !infoError;
 }
 
@@ -222,8 +222,10 @@ void BootloaderInstaller::infoRequestFinished(int id, bool error)
         QString errorString;
         errorString = tr("Network error: %1. Please check your network and proxy settings.")
                .arg(infodownloader->errorString());
+#ifndef CONSOLE
         if(error) QMessageBox::about(NULL, "Network Error", errorString);
-          qDebug() << "downloadDone:" << id << error;
+#endif
+        qDebug() << "downloadDone:" << id << error;
 
         infoError = true;
         infoDownloaded = true;

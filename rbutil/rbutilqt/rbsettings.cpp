@@ -28,10 +28,10 @@ void RbSettings::open()
      // portable installation:
     // check for a configuration file in the program folder.
     QFileInfo config;
-    config.setFile(qApp->applicationDirPath() + "/RockboxUtility.ini");
+    config.setFile(QCoreApplication::instance()->applicationDirPath() + "/RockboxUtility.ini");
     if(config.isFile()) 
     {
-        userSettings = new QSettings(qApp->applicationDirPath() + "/RockboxUtility.ini",
+        userSettings = new QSettings(QCoreApplication::instance()->applicationDirPath() + "/RockboxUtility.ini",
             QSettings::IniFormat, this);
         qDebug() << "config: portable";
     }

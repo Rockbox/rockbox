@@ -126,13 +126,13 @@ void ZipInstaller::downloadDone(bool error)
         return;
     }
     else m_dp->addItem(tr("Download finished."),LOGOK);
-    QApplication::processEvents();
+    QCoreApplication::processEvents();
     if(m_unzip) {
         // unzip downloaded file
         qDebug() << "about to unzip the downloaded file" << m_file << "to" << m_mountpoint;
 
         m_dp->addItem(tr("Extracting file."),LOGINFO);
-        QApplication::processEvents();
+        QCoreApplication::processEvents();
 
         qDebug() << "file to unzip: " << m_file;
         UnZip::ErrorCode ec;

@@ -55,7 +55,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         return false;
     }
 
-    QApplication::processEvents();
+    QCoreApplication::processEvents();
 
     connect(logger,SIGNAL(aborted()),this,SLOT(abort()));
     m_logger->setProgressMax(0);
@@ -78,7 +78,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             return false;
         }
 
-        QApplication::processEvents();
+        QCoreApplication::processEvents();
         QFileInfo fileInf = it.fileInfo();
         QString toSpeak;
         QString filename;
@@ -144,7 +144,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 
                     return false;
                 }
-                QApplication::processEvents();
+                QCoreApplication::processEvents();
             }
             m_logger->addItem(tr("Encoding of %1").arg(toSpeak),LOGINFO);
             if(!m_enc->encode(wavfilename,filename))
@@ -156,7 +156,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 
                 return false;
             }
-            QApplication::processEvents();
+            QCoreApplication::processEvents();
         }
         
         //! remove the intermedia wav file, if requested

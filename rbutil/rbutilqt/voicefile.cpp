@@ -126,7 +126,7 @@ void VoiceFileCreator::downloadDone(bool error)
         return;
     }
     else m_logger->addItem(tr("Download finished."),LOGOK);
-    QApplication::processEvents();
+    QCoreApplication::processEvents();
      
      
     m_logger->setProgressMax(0); 
@@ -167,7 +167,7 @@ void VoiceFileCreator::downloadDone(bool error)
         return;
     }
 
-    QApplication::processEvents();
+    QCoreApplication::processEvents();
     connect(m_logger,SIGNAL(aborted()),this,SLOT(abort()));
    
     //read in downloaded file
@@ -242,8 +242,8 @@ void VoiceFileCreator::downloadDone(bool error)
         {    
             if(toSpeak == "") continue;
            
-            m_logger->addItem(tr("creating ")+toSpeak,LOGINFO);    
-            QApplication::processEvents();       
+            m_logger->addItem(tr("creating ")+toSpeak,LOGINFO);
+            QCoreApplication::processEvents();
             m_tts->voice(toSpeak,wavname); // generate wav
         }
         
@@ -257,7 +257,7 @@ void VoiceFileCreator::downloadDone(bool error)
         // remove the wav file 
         QFile::remove(wavname);
         // remember the mp3 file for later removing
-        mp3files << encodedname;            
+        mp3files << encodedname;
     }
     
     

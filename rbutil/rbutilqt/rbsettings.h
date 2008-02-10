@@ -20,7 +20,8 @@
 #ifndef RBSETTINGS_H
 #define RBSETTINGS_H
 
-#include <QtGui>
+#include <QtCore>
+
 class QSettings;
 
 class RbSettings : public QObject
@@ -79,7 +80,7 @@ class RbSettings : public QObject
         QString name(QString plattform);
         QString brand(QString plattform);
         QStringList allLanguages();
-        
+
         bool curNeedsBootloader();
         QString curBrand();
         QString curName();
@@ -94,9 +95,7 @@ class RbSettings : public QObject
         QString curTTS();
         QString curResolution();
         int curTargetId();
-        
-        
-       
+
         void setOfPath(QString path);
         void setCachePath(QString path);
         void setBuild(QString build);
@@ -123,11 +122,7 @@ class RbSettings : public QObject
         void setEncoderComplexity(QString enc, int c);
         void setEncoderVolume(QString enc,double v);
         void setEncoderNarrowband(QString enc,bool nb);
-        
-        
-        
-        
-            
+
     private:
         QSettings *devices;
         QSettings *userSettings;

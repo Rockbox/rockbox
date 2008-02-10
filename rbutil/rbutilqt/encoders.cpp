@@ -18,10 +18,10 @@
  ****************************************************************************/
 
 #include "encoders.h"
-#include "browsedirtree.h"
 
 #ifndef CONSOLE
 #include "encodersgui.h"
+#include "browsedirtree.h"
 #else
 #include "encodersguicli.h"
 #endif

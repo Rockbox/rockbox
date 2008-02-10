@@ -22,7 +22,7 @@
 #ifndef IRIVERTOOLS_H_INCLUDED
 #define IRIVERTOOLS_H_INCLUDED
 
-#include <QtGui>
+#include <QtCore>
 
 #include "md5sum.h"
 #include "progressloggerinterface.h"

@@ -21,7 +21,7 @@
 #ifndef TALKFILE_H
 #define TALKFILE_H
 
-#include <QtGui>
+#include <QtCore>
 #include "progressloggerinterface.h"
 
 #include "encoders.h"

@@ -23,7 +23,7 @@
 
 
 #include "rbsettings.h"
-#include <QtGui>
+#include <QtCore>
 
 #ifndef CONSOLE
 #include "ttsgui.h"

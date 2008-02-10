@@ -31,7 +31,7 @@
 #define uint32 unsigned long int
 #endif
 
-#include <QtGui>
+#include <QtCore>
 
 typedef struct
 {
