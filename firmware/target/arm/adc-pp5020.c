@@ -119,7 +119,7 @@ void adc_init(void)
     ADC_ADDR   |= 0x2000000;
     ADC_STATUS |= 0x2000;
 
-#if defined (IRIVER_H10) || defined(IRIVER_H10_5GB)
+#if defined (IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(MROBE_100)
     /* Enable channel 2 (H10:remote) */
     DEV_INIT1  &=~0x300;
     DEV_INIT1  |= 0x100;
