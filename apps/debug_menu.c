@@ -153,7 +153,7 @@ static char* threads_getname(int selected_item, void * data, char *buffer)
     thread_get_name(name, 32, thread);
 
     snprintf(buffer, MAX_PATH,
-             "%2d: " IF_COP("(%d) ") "%c%c " IF_PRIO("%d ") "%2d%% %s", 
+             "%2d: " IF_COP("(%d) ") "%c%c " IF_PRIO("%d ") "%2d%% %s",
              selected_item,
              IF_COP(thread->core,)
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
@@ -605,7 +605,7 @@ static bool dbg_hw_info(void)
                           (PP_VER2 >> 8) & 0xff, (PP_VER2) & 0xff,
                           (PP_VER1 >> 24) & 0xff, (PP_VER1 >> 16) & 0xff,
                           (PP_VER1 >> 8) & 0xff, (PP_VER1) & 0xff, '\0' };
-                          
+
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
@@ -629,7 +629,7 @@ static bool dbg_hw_info(void)
 
     snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
     lcd_puts(0, line++, buf);
-    
+
     lcd_update();
 
     while (!(action_userabort(TIMEOUT_BLOCK)));
@@ -641,7 +641,7 @@ static bool dbg_hw_info(void)
                           (PP_VER3 >> 8) & 0xff, PP_VER3 & 0xff,
                           (PP_VER2 >> 8) & 0xff, PP_VER2 & 0xff,
                           (PP_VER1 >> 8) & 0xff, PP_VER1 & 0xff, '\0' };
-                          
+
 
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
@@ -658,7 +658,7 @@ static bool dbg_hw_info(void)
     lcd_puts(0, line++, buf);
 
     snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
-    lcd_puts(0, line++, buf);             
+    lcd_puts(0, line++, buf);
 
     lcd_update();
 
@@ -1363,7 +1363,7 @@ bool dbg_ports(void)
 #endif /* !HAVE_LCD_BITMAP */
 #endif /* !SIMULATOR */
 
-#if CONFIG_RTC == RTC_PCF50605
+#if (CONFIG_RTC == RTC_PCF50605) && !defined(SIMULATOR)
 static bool dbg_pcf(void)
 {
     char buf[128];
@@ -1405,7 +1405,7 @@ static bool dbg_pcf(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "LPREG1: %02x", pcf50605_read(0x27));
         lcd_puts(0, line++, buf);
-        
+
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
         {
@@ -1439,7 +1439,7 @@ static bool dbg_cpufreq(void)
 
         snprintf(buf, sizeof(buf), "boost_counter: %d", get_cpu_boost_counter());
         lcd_puts(0, line++, buf);
-        
+
         lcd_update();
         button = get_action(CONTEXT_STD,HZ/10);
 
@@ -1518,7 +1518,7 @@ static int tsc2100debug_action_callback(int action, struct gui_synclist *lists)
     if (action == ACTION_STD_OK)
     {
         *page = (*page+1)%3;
-        snprintf(lists->title, 32, 
+        snprintf(lists->title, 32,
                  "tsc2100 registers - Page %d", *page);
         return ACTION_REDRAW;
     }
@@ -1757,48 +1757,48 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         {
             card_name[6] = '\0';
             strncpy(card_name, ((unsigned char*)card->cid) + 3, 6);
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "%s Rev %d.%d", card_name,
                     (int) card_extract_bits(card->cid, 72, 4),
                     (int) card_extract_bits(card->cid, 76, 4));
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Prod: %d/%d",
                     (int) card_extract_bits(card->cid, 112, 4),
                     (int) card_extract_bits(card->cid, 116, 4) + 1997);
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Ser#: 0x%08lx",
                     card_extract_bits(card->cid, 80, 32));
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "M=%02x, O=%04x",
                     (int) card_extract_bits(card->cid, 0, 8),
                     (int) card_extract_bits(card->cid, 8, 16));
             int temp = card_extract_bits(card->csd, 2, 4);
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                      CARDTYPE " v%s", temp < 5 ?
                             spec_vers[temp] : "?.?");
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Blocks: 0x%06lx", card->numblocks);
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Blksz.: %d P:%c%c", card->blocksize,
                     card_extract_bits(card->csd, 48, 1) ? 'R' : '-',
                     card_extract_bits(card->csd, 106, 1) ? 'W' : '-');
             output_dyn_value(pbuf, sizeof pbuf, card->speed / 1000,
                                             kbit_units, false);
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Speed: %s", pbuf);
             output_dyn_value(pbuf, sizeof pbuf, card->tsac,
                             nsec_units, false);
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Tsac: %s", pbuf);
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "Nsac: %d clk", card->nsac);
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "R2W: *%d", card->r2w_factor);
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "IRmax: %d..%d mA",
                     i_vmin[card_extract_bits(card->csd, 66, 3)],
                     i_vmax[card_extract_bits(card->csd, 69, 3)]);
-            simplelist_addline(SIMPLELIST_ADD_LINE, 
+            simplelist_addline(SIMPLELIST_ADD_LINE,
                     "IWmax: %d..%d mA",
                     i_vmin[card_extract_bits(card->csd, 72, 3)],
                     i_vmax[card_extract_bits(card->csd, 75, 3)]);
@@ -1848,22 +1848,22 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     snprintf(buf, sizeof buf, "%ld MB",
              ((unsigned long)identify_info[61] << 16 |
               (unsigned long)identify_info[60]) / 2048 );
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
              "Size: %s", buf);
     unsigned long free;
     fat_size( IF_MV2(0,) NULL, &free );
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
              "Free: %ld MB", free / 1024);
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
              "Spinup time: %d ms", ata_spinup_time * (1000/HZ));
     i = identify_info[83] & (1<<3);
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
              "Power mgmt: %s", i ? "enabled" : "unsupported");
     i = identify_info[83] & (1<<9);
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
              "Noise mgmt: %s", i ? "enabled" : "unsupported");
     i = identify_info[82] & (1<<6);
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
              "Read-ahead: %s", i ? "enabled" : "unsupported");
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
@@ -1871,36 +1871,36 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         pio4[1] = 0;
         pio3[0] = (identify_info[64] & (1<<0)) ? '3' : 0;
         pio4[0] = (identify_info[64] & (1<<1)) ? '4' : 0;
-        simplelist_addline(SIMPLELIST_ADD_LINE, 
+        simplelist_addline(SIMPLELIST_ADD_LINE,
                  "PIO modes: 0 1 2 %s %s", pio3, pio4);
     }
     else {
-        simplelist_addline(SIMPLELIST_ADD_LINE, 
+        simplelist_addline(SIMPLELIST_ADD_LINE,
                  "No PIO mode info");
     }
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
-        simplelist_addline(SIMPLELIST_ADD_LINE, 
+        simplelist_addline(SIMPLELIST_ADD_LINE,
                  "Cycle times %dns/%dns",
                  identify_info[67],
                  identify_info[68] );
     } else {
-        simplelist_addline(SIMPLELIST_ADD_LINE, 
+        simplelist_addline(SIMPLELIST_ADD_LINE,
                  "No timing info");
     }
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
         i = identify_info[49] & (1<<11);
-        simplelist_addline(SIMPLELIST_ADD_LINE, 
+        simplelist_addline(SIMPLELIST_ADD_LINE,
             "IORDY support: %s", i ? "yes" : "no");
         i = identify_info[49] & (1<<10);
-        simplelist_addline(SIMPLELIST_ADD_LINE, 
+        simplelist_addline(SIMPLELIST_ADD_LINE,
                 "IORDY disable: %s", i ? "yes" : "no");
     } else {
-        simplelist_addline(SIMPLELIST_ADD_LINE, 
+        simplelist_addline(SIMPLELIST_ADD_LINE,
                 "No timing info");
     }
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
              "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
     return btn;
 }
@@ -1928,21 +1928,21 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
     simplelist_set_line_count(0);
     simplelist_addline(SIMPLELIST_ADD_LINE, "Cache initialized: %s",
              dircache_is_enabled() ? "Yes" : "No");
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Cache size: %d B", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Cache size: %d B",
              dircache_get_cache_size());
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Last size: %d B", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Last size: %d B",
              global_status.dircache_size);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Limit: %d B", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Limit: %d B",
              DIRCACHE_LIMIT);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Reserve: %d/%d B", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Reserve: %d/%d B",
              dircache_get_reserve_used(), DIRCACHE_RESERVE);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Scanning took: %d s", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Scanning took: %d s",
              dircache_get_build_ticks() / HZ);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Entry count: %d", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Entry count: %d",
              dircache_get_entry_count());
     return btn;
 }
-    
+
 static bool dbg_dircache_info(void)
 {
     struct simplelist_info info;
@@ -1960,42 +1960,42 @@ static int database_callback(int btn, struct gui_synclist *lists)
     (void)lists;
     struct tagcache_stat *stat = tagcache_get_stat();
     static bool synced = false;
-    
+
     simplelist_set_line_count(0);
-    
+
     simplelist_addline(SIMPLELIST_ADD_LINE, "Initialized: %s",
              stat->initialized ? "Yes" : "No");
-    simplelist_addline(SIMPLELIST_ADD_LINE, "DB Ready: %s", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "DB Ready: %s",
              stat->ready ? "Yes" : "No");
-    simplelist_addline(SIMPLELIST_ADD_LINE, "RAM Cache: %s", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "RAM Cache: %s",
              stat->ramcache ? "Yes" : "No");
-    simplelist_addline(SIMPLELIST_ADD_LINE, "RAM: %d/%d B", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "RAM: %d/%d B",
              stat->ramcache_used, stat->ramcache_allocated);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Progress: %d%% (%d entries)", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Progress: %d%% (%d entries)",
              stat->progress, stat->processed_entries);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Curfile: %s", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Curfile: %s",
                        stat->curentry ? stat->curentry : "---");
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Commit step: %d", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Commit step: %d",
              stat->commit_step);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Commit delayed: %s", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Commit delayed: %s",
              stat->commit_delayed ? "Yes" : "No");
-    
-    
+
+
     if (synced)
     {
         synced = false;
         tagcache_screensync_event();
     }
-    
+
     if (!btn && stat->curentry)
     {
         synced = true;
         return ACTION_REDRAW;
     }
-    
+
     if (btn == ACTION_STD_CANCEL)
         tagcache_screensync_enable(false);
-    
+
     return btn;
 }
 static bool dbg_tagcache_info(void)
@@ -2105,23 +2105,23 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     simplelist_set_line_count(1);
 
 #if (CONFIG_TUNER & LV24020LP)
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
                         "CTRL_STAT: %02X", lv24020lp_get(LV24020LP_CTRL_STAT) );
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
                         "RADIO_STAT: %02X", lv24020lp_get(LV24020LP_REG_STAT) );
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
                         "MSS_FM: %d kHz", lv24020lp_get(LV24020LP_MSS_FM) );
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
                         "MSS_IF: %d Hz", lv24020lp_get(LV24020LP_MSS_IF) );
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
                         "MSS_SD: %d Hz", lv24020lp_get(LV24020LP_MSS_SD) );
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
                         "if_set: %d Hz", lv24020lp_get(LV24020LP_IF_SET) );
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
                         "sd_set: %d Hz", lv24020lp_get(LV24020LP_SD_SET) );
 #endif
 #if (CONFIG_TUNER & S1A0903X01)
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
                         "Samsung regs: %08X", s1a0903x01_get(RADIO_ALL));
     /* This one doesn't return dynamic data atm */
 #endif
@@ -2129,12 +2129,12 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     struct tea5767_dbg_info nfo;
     tea5767_dbg_info(&nfo);
     simplelist_addline(SIMPLELIST_ADD_LINE, "Philips regs:");
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
              "   Read: %02X %02X %02X %02X %02X",
              (unsigned)nfo.read_regs[0], (unsigned)nfo.read_regs[1],
              (unsigned)nfo.read_regs[2], (unsigned)nfo.read_regs[3],
              (unsigned)nfo.read_regs[4]);
-    simplelist_addline(SIMPLELIST_ADD_LINE, 
+    simplelist_addline(SIMPLELIST_ADD_LINE,
              "   Write: %02X %02X %02X %02X %02X",
              (unsigned)nfo.write_regs[0], (unsigned)nfo.write_regs[1],
              (unsigned)nfo.write_regs[2], (unsigned)nfo.write_regs[3],
@@ -2147,7 +2147,7 @@ static bool dbg_fm_radio(void)
     struct simplelist_info info;
     simplelist_info_init(&info, "FM Radio", 1, NULL);
     simplelist_set_line_count(0);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "HW detected: %s", 
+    simplelist_addline(SIMPLELIST_ADD_LINE, "HW detected: %s",
                        radio_hardware_present() ? "yes" : "no");
 
     info.action_callback = radio_hardware_present()?radio_callback : NULL;
@@ -2327,17 +2327,17 @@ static bool dbg_scrollwheel(void)
 {
     char buf[64];
     unsigned int speed;
-    
+
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
-    
+
     while (1)
     {
         if (action_userabort(HZ/10))
             return false;
-            
+
         lcd_clear_display();
-        
+
         /* show internal variables of scrollwheel driver */
         snprintf(buf, sizeof(buf), "wheel touched: %s", (wheel_is_touched) ? "true" : "false");
         lcd_puts(0, 0, buf);
@@ -2351,12 +2351,12 @@ static bool dbg_scrollwheel(void)
         lcd_puts(0, 4, buf);
         snprintf(buf, sizeof(buf), "velo [deg/s]: %4d", (int)wheel_velocity);
         lcd_puts(0, 5, buf);
-        
+
         /* show effective accelerated scrollspeed */
         speed = button_apply_acceleration( (1<<31)|(1<<24)|wheel_velocity);
         snprintf(buf, sizeof(buf), "accel. speed: %4d", speed);
         lcd_puts(0, 6, buf);
-        
+
         lcd_update();
     }
     return false;
@@ -2463,7 +2463,7 @@ static char* dbg_menu_getname(int item, void * data, char *buffer)
 bool debug_menu(void)
 {
     struct simplelist_info info;
-    
+
     simplelist_info_init(&info, "Debug Menu", ARRAYLEN(menuitems), NULL);
     info.action_callback = menu_action_callback;
     info.get_name = dbg_menu_getname;
