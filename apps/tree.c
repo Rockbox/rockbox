@@ -1076,11 +1076,12 @@ void tree_mem_init(void)
     tree_get_filetypes(&filetypes, &filetypes_count);
 }
 
-void bookmark_play(char *resume_file, int index, int offset, int seed,
+bool bookmark_play(char *resume_file, int index, int offset, int seed,
                    char *filename)
 {
     int i;
     char* suffix = strrchr(resume_file, '.');
+    bool started = false;
 
     if (suffix != NULL &&
         (!strcasecmp(suffix, ".m3u") || !strcasecmp(suffix, ".m3u8")))
@@ -1090,7 +1091,7 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
         /* check that the file exists */
         int fd = open(resume_file, O_RDONLY);
         if(fd<0)
-            return;
+            return false;
         close(fd);
 
         slash = strrchr(resume_file,'/');
@@ -1108,6 +1109,7 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
                 if (global_settings.playlist_shuffle)
                     playlist_shuffle(seed, -1);
                 playlist_start(index,offset);
+                started = true;
             }
             *slash='/';
         }
@@ -1128,7 +1130,7 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
             peek_filename = playlist_peek(index);
             
             if (peek_filename == NULL)
-                return;
+                return false;
                 
             if (strcmp(strrchr(peek_filename, '/') + 1, filename))
             {
@@ -1137,7 +1139,7 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
                     peek_filename = playlist_peek(i);
 
                     if (peek_filename == NULL)
-                        return;
+                        return false;
 
                     if (!strcmp(strrchr(peek_filename, '/') + 1, filename))
                         break;
@@ -1145,19 +1147,16 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
                 if (i < playlist_amount())
                     index = i;
                 else
-                {
-                    /* File not found, so bail out. Maybe not the best
-                     * message; perhaps "Bookmarked file not found"?
-                     */
-                    gui_syncsplash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
-                    return;
-                }
+                    return false;
             }
             playlist_start(index,offset);
+            started = true;
         }
     }
 
-    start_wps=true;
+    if (started)
+        start_wps = true;
+    return started;
 }
 
 static void say_filetype(int attr)

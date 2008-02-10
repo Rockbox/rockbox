@@ -404,7 +404,16 @@ bool bookmark_autoload(const char* file)
         
         if (bookmark != NULL)
         {
-            return play_bookmark(bookmark);
+            if (!play_bookmark(bookmark))
+            {
+                /* Selected bookmark not found. */
+                gui_syncsplash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
+            }
+
+            /* Act as if autoload was done even if it failed, since the 
+             * user did make an active selection.
+             */
+            return true;
         }
 
         return false;
@@ -418,7 +427,7 @@ bool bookmark_autoload(const char* file)
 bool bookmark_load(const char* file, bool autoload)
 {
     int  fd;
-    char* bookmark = NULL;;
+    char* bookmark = NULL;
 
     if(autoload)
     {
@@ -438,7 +447,12 @@ bool bookmark_load(const char* file, bool autoload)
 
     if (bookmark != NULL)
     {
-        return play_bookmark(bookmark);
+        if (!play_bookmark(bookmark))
+        {
+            /* Selected bookmark not found. */
+            gui_syncsplash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
+            return false;
+        }
     }
 
     return true;
@@ -875,9 +889,8 @@ static bool play_bookmark(const char* bookmark)
                        &global_settings.playlist_shuffle,
                        global_filename))
     {
-        bookmark_play(global_temp_buffer, index, offset, seed,
+        return bookmark_play(global_temp_buffer, index, offset, seed,
             global_filename);
-        return true;
     }
     
     return false;
