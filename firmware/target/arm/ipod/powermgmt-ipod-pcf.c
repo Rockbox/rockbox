@@ -27,7 +27,7 @@ const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 #ifdef IPOD_NANO
     3330
 #elif defined IPOD_VIDEO
-    3450
+    3300
 #else
     /* FIXME: calibrate value for other 3G+ ipods */
     3380
@@ -39,7 +39,7 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 #ifdef IPOD_NANO
     3230
 #elif defined IPOD_VIDEO
-    3450
+    3300
 #else
     /* FIXME: calibrate value for other 3G+ ipods */
     3020

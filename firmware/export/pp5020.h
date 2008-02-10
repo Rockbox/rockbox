@@ -132,7 +132,9 @@
 #define DEV_EN       (*(volatile unsigned long *)(0x6000600c))
 #define DEV_EN2      (*(volatile unsigned long *)(0x60006010))
 
+#define DEV_EXTCLOCKS   0x00000002
 #define DEV_SYSTEM      0x00000004
+#define DEV_USB0        0x00000008
 #define DEV_SER0        0x00000040
 #define DEV_SER1        0x00000080
 #define DEV_I2S         0x00000800
@@ -140,7 +142,8 @@
 #define DEV_ATA         0x00004000
 #define DEV_OPTO        0x00010000
 #define DEV_PIEZO       0x00010000
-#define DEV_USB         0x00400000
+#define DEV_PWM         0x00020000
+#define DEV_USB1        0x00400000
 #define DEV_FIREWIRE    0x00800000
 #define DEV_IDE0        0x02000000
 #define DEV_LCD         0x04000000
@@ -332,6 +335,8 @@
 #define XMB_NOR_CFG      (*(volatile unsigned long *)(0x70000038))
 #define XMB_RAM_CFG      (*(volatile unsigned long *)(0x7000003c))
 
+#define INIT_BUTTONS     0x00040000
+#define INIT_PLL         0x40000000
 #define INIT_USB         0x80000000
 
 /* 32 bit GPO port */

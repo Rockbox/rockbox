@@ -73,64 +73,40 @@ int int_btn = BUTTON_NONE;
 
 static void opto_i2c_init(void)
 {
-    int i, curr_value;
-
-    /* wait for value to settle */
-    i = 1000;
-    curr_value = (inl(0x7000c104) << 16) >> 24;
-    while (i > 0)
-    {
-        int new_value = (inl(0x7000c104) << 16) >> 24;
-
-        if (new_value != curr_value) {
-            i = 10000;
-            curr_value = new_value;
-        }
-        else {
-            i--;
-        }
-    }
-
-    GPIOB_OUTPUT_VAL |= 0x10;
-    DEV_EN |= 0x10000;
-    DEV_RS |= 0x10000;
+    DEV_EN |= DEV_OPTO;
+    DEV_RS |= DEV_OPTO;
     udelay(5);
-    DEV_RS &= ~0x10000; /* finish reset */
+    DEV_RS &= ~DEV_OPTO; /* finish reset */
+    DEV_INIT1 |= INIT_BUTTONS; /* enable buttons (needed for "hold"-detection) */
 
-    outl(0xffffffff, 0x7000c120);
-    outl(0xffffffff, 0x7000c124);
     outl(0xc00a1f00, 0x7000c100);
-    outl(0x1000000, 0x7000c104);
+    outl(0x01000000, 0x7000c104);
 }
 
 static inline int ipod_4g_button_read(void)
 {
     int whl = -1;
-    
-    /* The ipodlinux source had a udelay(250) here, but testing has shown that
-       it is not needed - tested on Nano, Color/Photo and Video. */
-    /* udelay(250);*/
-
     int btn = BUTTON_NONE;
-    unsigned reg = 0x7000c104;
-    if ((inl(0x7000c104) & 0x4000000) != 0) 
+    
+    /* The following delay was 250 in the ipodlinux source, but 50 seems to 
+       work fine - tested on Nano, Color/Photo and Video. */
+    udelay(50);
+
+    if ((inl(0x7000c104) & 0x04000000) != 0) 
     {
         unsigned status = inl(0x7000c140);
 
-        reg = reg + 0x3C;      /* 0x7000c140 */
-        outl(0x0, 0x7000c140); /* clear interrupt status? */
-
         if ((status & 0x800000ff) == 0x8000001a) 
         {
-            if (status & 0x100)
+            if (status & 0x00000100)
                 btn |= BUTTON_SELECT;
-            if (status & 0x200)
+            if (status & 0x00000200)
                 btn |= BUTTON_RIGHT;
-            if (status & 0x400)
+            if (status & 0x00000400)
                 btn |= BUTTON_LEFT;
-            if (status & 0x800)
+            if (status & 0x00000800)
                 btn |= BUTTON_PLAY;
-            if (status & 0x1000)
+            if (status & 0x00001000)
                 btn |= BUTTON_MENU;
             if (status & 0x40000000) 
             {
@@ -263,19 +239,10 @@ static inline int ipod_4g_button_read(void)
             }
 
         }
-        else if (status == 0xffffffff) 
-        {
-            opto_i2c_init();
-        }
     }
 
-    if ((inl(reg) & 0x8000000) != 0) 
-    {
-        outl(0xffffffff, 0x7000c120);
-        outl(0xffffffff, 0x7000c124);
-    }
-    /* Save the new absolute wheel position */
 #ifdef HAVE_WHEEL_POSITION
+    /* Save the new absolute wheel position */
     wheel_position = whl;
 #endif
     return btn;
@@ -296,16 +263,12 @@ void wheel_send_events(bool send)
 void ipod_4g_button_int(void)
 {
     CPU_HI_INT_CLR = I2C_MASK;
-    /* The following delay was 250 in the ipodlinux source, but 50 seems to 
-       work fine - tested on Nano, Color/Photo and Video. */
-    udelay(50); 
-    outl(0x0, 0x7000c140); 
+
     int_btn = ipod_4g_button_read();
-    outl(inl(0x7000c104) | 0xC000000, 0x7000c104);
+    
+    outl(inl(0x7000c104) | 0x0c000000, 0x7000c104);
     outl(0x400a1f00, 0x7000c100);
 
-    GPIOB_OUTPUT_VAL |= 0x10;
-    CPU_INT_EN = 0x40000000;
     CPU_HI_INT_EN = I2C_MASK;
 }
 
@@ -317,15 +280,8 @@ void button_init_device(void)
     GPIOA_ENABLE |= 0x20;
     GPIOA_OUTPUT_EN &= ~0x20; 
     
-    /* hold button - set interrupt levels */
-    GPIOA_INT_LEV = ~(GPIOA_INPUT_VAL & 0x20);
-    GPIOA_INT_CLR = GPIOA_INT_STAT & 0x20;
-
-    /* enable interrupts */
-    GPIOA_INT_EN = 0x20;
-    
     /* unmask interrupt */
-    CPU_INT_EN = 0x40000000;
+    CPU_INT_EN = HI_MASK;
     CPU_HI_INT_EN = I2C_MASK;
 }
 
@@ -342,7 +298,20 @@ int button_read_device(void)
     hold_button = button_hold();
 
     if (hold_button != hold_button_old)
+    {
         backlight_hold_changed(hold_button);
+        
+        if (hold_button)
+        {
+            /* lock -> disable wheel sensor */
+            DEV_EN &= ~DEV_OPTO;
+        }
+        else
+        {
+            /* unlock -> enable wheel sensor */
+            DEV_EN |= DEV_OPTO;
+        }
+    }
 
     /* The int_btn variable is set in the button interrupt handler */
     return int_btn;

@@ -105,22 +105,26 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 # define CURRENT_BACKLIGHT  23  /* FIXME: This needs to be measured, copied from H100 */
 # define CURRENT_RECORD    110  /* additional current while recording */
 #elif defined(IPOD_NANO)        /* iPOD Nano */
-# define CURRENT_NORMAL     35  /* 8.5-9.0h playback out of 300mAh battery from IpodRuntime */
+# define CURRENT_NORMAL     32  /* MP3: ~9h playback out of 300mAh battery */
 # define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
 #if defined(HAVE_RECORDING)
 # define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
 #endif
 #elif defined(IPOD_VIDEO)       /* iPOD Video */
-# define CURRENT_NORMAL     42  /* 9.5h out of 400mAh battery (30GB) or 14h out of 600mAh (60GB) from IpodRuntime */
+# define CURRENT_NORMAL     35  /* MP3: ~11h out of 400mAh battery (30GB) or ~17h out of 600mAh (60GB) */
 # define CURRENT_BACKLIGHT  20  /* FIXME: this needs adjusting */
 #if defined(HAVE_RECORDING)
 # define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
 #endif
-#elif defined(SANSA_E200)    /* Sandisk players */
-# define CURRENT_NORMAL     50  /* Toni's measurements in spring 2007 suggests 50 ma during normal operation */
-# define CURRENT_BACKLIGHT  20  /* seems like a reasonible value for now */
-# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
-#else /* Not iriver H1x0, H3x0, nor Archos Ondio, nor iPODVideo, nor Sansas */
+#elif defined(SANSA_E200)    /* Sandisk E200v1  */
+# define CURRENT_NORMAL     45  /* Mike's measurements in Jan 2008  */
+# define CURRENT_BACKLIGHT  40  /* Screen is about 20, blue LEDs are another 20, so 40 if both */
+# define CURRENT_RECORD     40  /* flash player, so this is just unboosted current*/
+#elif defined(SANSA_C200)    /* Sandisk C200v1 */
+# define CURRENT_NORMAL     45  /* Should be nearly identical to E200 */
+# define CURRENT_BACKLIGHT  40  /* Screen is about 20, blue LEDs are another 20, so 40 if both */
+# define CURRENT_RECORD     40  /* flash player, so this is just unboosted current*/
+#else /* Not iriver H1x0, H3x0, nor Archos Ondio, nor iPod nano/Video, nor Sansas */
 # define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
 # define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
 #if defined(HAVE_RECORDING)

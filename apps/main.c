@@ -351,6 +351,8 @@ static void init(void)
 
     settings_reset();
 
+    i2c_init();
+    
     power_init();
 
     set_irq_level(0);
@@ -373,8 +375,6 @@ static void init(void)
     serial_setup();
 #endif
 #endif
-
-    i2c_init();
 
 #if CONFIG_RTC
     rtc_init();

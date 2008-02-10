@@ -87,6 +87,10 @@
 #include "ds2411.h"
 #endif
 #include "hwcompat.h"
+#include "button.h"
+#if CONFIG_RTC == RTC_PCF50605
+#include "pcf50605.h"
+#endif
 
 #if CONFIG_CPU == DM320 || CONFIG_CPU == S3C2440
 #include "debug-target.h"
@@ -1167,14 +1171,20 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         line++;
 
-        snprintf(buf, sizeof(buf), "GPO32:   %08lx", GPO32_VAL);
+        snprintf(buf, sizeof(buf), "GPO32_VAL: %08lx", GPO32_VAL);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "DEV_EN:  %08lx", DEV_EN);
+        snprintf(buf, sizeof(buf), "GPO32_EN:  %08lx", GPO32_ENABLE);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "DEV_EN2: %08lx", DEV_EN2);
+        snprintf(buf, sizeof(buf), "DEV_EN:    %08lx", DEV_EN);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "DEV_EN3: %08lx", inl(0x60006044));
+        snprintf(buf, sizeof(buf), "DEV_EN2:   %08lx", DEV_EN2);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DEV_EN3:   %08lx", inl(0x60006044));
         lcd_puts(0, line++, buf);                    /* to be verified */
+        snprintf(buf, sizeof(buf), "DEV_INIT1: %08lx", DEV_INIT1);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DEV_INIT2: %08lx", DEV_INIT2);
+        lcd_puts(0, line++, buf);
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         line++;
@@ -1352,6 +1362,60 @@ bool dbg_ports(void)
 }
 #endif /* !HAVE_LCD_BITMAP */
 #endif /* !SIMULATOR */
+
+#if CONFIG_RTC == RTC_PCF50605
+static bool dbg_pcf(void)
+{
+    char buf[128];
+    int line;
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+#endif
+    lcd_clear_display();
+
+    while(1)
+    {
+        line = 0;
+
+        snprintf(buf, sizeof(buf), "DCDC1:  %02x", pcf50605_read(0x1b));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DCDC2:  %02x", pcf50605_read(0x1c));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DCDC3:  %02x", pcf50605_read(0x1d));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DCDC4:  %02x", pcf50605_read(0x1e));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DCDEC1: %02x", pcf50605_read(0x1f));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DCDEC2: %02x", pcf50605_read(0x20));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DCUDC1: %02x", pcf50605_read(0x21));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DCUDC2: %02x", pcf50605_read(0x22));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "IOREGC: %02x", pcf50605_read(0x23));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "D1REGC: %02x", pcf50605_read(0x24));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "D2REGC: %02x", pcf50605_read(0x25));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "D3REGC: %02x", pcf50605_read(0x26));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "LPREG1: %02x", pcf50605_read(0x27));
+        lcd_puts(0, line++, buf);
+        
+        lcd_update();
+        if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
+        {
+            return false;
+        }
+    }
+
+    return false;
+}
+#endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static bool dbg_cpufreq(void)
@@ -2251,6 +2315,53 @@ static bool cpu_boost_log(void)
 }
 #endif
 
+#if (defined(HAVE_SCROLLWHEEL) && (CONFIG_KEYPAD==IPOD_4G_PAD) && !defined(SIMULATOR))
+extern bool wheel_is_touched;
+extern int old_wheel_value;
+extern int new_wheel_value;
+extern int wheel_delta;
+extern unsigned int accumulated_wheel_delta;
+extern unsigned int wheel_velocity;
+
+static bool dbg_scrollwheel(void)
+{
+    char buf[64];
+    unsigned int speed;
+    
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+    
+    while (1)
+    {
+        if (action_userabort(HZ/10))
+            return false;
+            
+        lcd_clear_display();
+        
+        /* show internal variables of scrollwheel driver */
+        snprintf(buf, sizeof(buf), "wheel touched: %s", (wheel_is_touched) ? "true" : "false");
+        lcd_puts(0, 0, buf);
+        snprintf(buf, sizeof(buf), "new position: %2d", new_wheel_value);
+        lcd_puts(0, 1, buf);
+        snprintf(buf, sizeof(buf), "old position: %2d", old_wheel_value);
+        lcd_puts(0, 2, buf);
+        snprintf(buf, sizeof(buf), "wheel delta: %2d", wheel_delta);
+        lcd_puts(0, 3, buf);
+        snprintf(buf, sizeof(buf), "accumulated delta: %2d", accumulated_wheel_delta);
+        lcd_puts(0, 4, buf);
+        snprintf(buf, sizeof(buf), "velo [deg/s]: %4d", (int)wheel_velocity);
+        lcd_puts(0, 5, buf);
+        
+        /* show effective accelerated scrollspeed */
+        speed = button_apply_acceleration( (1<<31)|(1<<24)|wheel_velocity);
+        snprintf(buf, sizeof(buf), "accel. speed: %4d", speed);
+        lcd_puts(0, 6, buf);
+        
+        lcd_update();
+    }
+    return false;
+}
+#endif
 
 
 /****** The menu *********/
@@ -2268,6 +2379,9 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) || CONFIG_CPU == S3C2440
         { "View I/O ports", dbg_ports },
+#endif
+#if CONFIG_RTC == RTC_PCF50605
+        { "View PCF registers", dbg_pcf },
 #endif
 #if defined(HAVE_TSC2100) && !defined(SIMULATOR)
         { "TSC2100 debug", tsc2100_debug },
@@ -2327,6 +2441,9 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #ifdef CPU_BOOST_LOGGING
         {"cpu_boost log",cpu_boost_log},
+#endif
+#if (defined(HAVE_SCROLLWHEEL) && (CONFIG_KEYPAD==IPOD_4G_PAD) && !defined(SIMULATOR))
+        {"Debug scrollwheel", dbg_scrollwheel},
 #endif
     };
 static int menu_action_callback(int btn, struct gui_synclist *lists)

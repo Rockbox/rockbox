@@ -63,11 +63,20 @@
 #define PSSC   0x18
 #define PWROKM 0x19
 #define PWROKS 0x1a
+#define DCDC1   0x1b
+#define DCDC2   0x1c
+#define DCDC3   0x1d
+#define DCDC4   0x1e
+#define DCDEC1  0x1f
+#define DCDEC2  0x20
+#define DCUDC1  0x21
+#define DCUDC2  0x22
+#define IOREGC  0x23
 #define D1REGC1 0x24
-  #define VOUT_3000mV 0xf5
-  #define VOUT_3300mV 0xf8
 #define D2REGC1 0x25
 #define D3REGC1 0x26
+#define LPREG1C 0x27
+
 
 unsigned char pcf50605_wakeup_flags = 0;
 
@@ -113,8 +122,30 @@ void pcf50605_standby_mode(void)
 
 void pcf50605_init(void)
 {
-    /* The following values were taken from the ipodlinux kernel source */
-    pcf50605_write(D1REGC1, VOUT_3000mV); /* Unknown */
-    pcf50605_write(D2REGC1, VOUT_3300mV); /* Dock Connector pin 17 */
-    pcf50605_write(D3REGC1, VOUT_3000mV); /* Unknown */
+#if defined (IPOD_VIDEO)    
+    /* I/O and GPO voltage supply (default: 0xf8 = 3.3V ON) */
+    /* ECO not allowed regarding data sheet */
+    pcf50605_write(IOREGC,  0xf8);  /* 3.3V ON */
+    
+    /* core voltage supply (default DCDC1/DCDC2: 0xec = 1.2V ON) */
+    /* ECO not stable, assumed due to less precision of voltage in ECO mode */
+    pcf50605_write(DCDC1,   0xec);  /* 1.2V ON */
+    pcf50605_write(DCDC2,   0x0c);  /* OFF */
+    
+    /* unknown (default: 0xe3 = 1.8V ON) */
+    pcf50605_write(DCUDC1,  0xe3);  /* 1.8V ON */
+    
+    /* WM8758 voltage supply (default: 0xf5 = 3.0V ON) */
+    /* ECO not allowed as max. current of 5mA is not sufficient */
+    pcf50605_write(D1REGC1, 0xf0);  /* 2.5V ON */
+    
+    /* LCD voltage supply (default: 0xf5 = 3.0V ON) */
+    pcf50605_write(D3REGC1, 0xf1);  /* 2.6V ON */
+#else
+    /* keep initialization from svn for other iPods */
+    pcf50605_write(D1REGC1, 0xf5); /* 3.0V ON */
+    pcf50605_write(D3REGC1, 0xf5); /* 3.0V ON */
+#endif
+    /* Dock Connector pin 17 (default: OFF) */
+    pcf50605_write(D2REGC1, 0xf8); /* 3.3V ON */
 }

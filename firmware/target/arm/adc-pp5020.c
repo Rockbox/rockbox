@@ -119,6 +119,7 @@ void adc_init(void)
     ADC_ADDR   |= 0x2000000;
     ADC_STATUS |= 0x2000;
 
+#if defined (IRIVER_H10) || defined(IRIVER_H10_5GB)
     /* Enable channel 2 (H10:remote) */
     DEV_INIT1  &=~0x300;
     DEV_INIT1  |= 0x100;
@@ -130,6 +131,7 @@ void adc_init(void)
     DEV_INIT1  |= 0x1000;
     ADC_ADDR   |= 0x8000000;
     ADC_STATUS |= 0x20000000;
+#endif
 
     /* Force a scan of all channels to get initial values */
     adc_scan(0);

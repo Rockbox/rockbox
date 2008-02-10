@@ -33,18 +33,29 @@
 void usb_init_device(void)
 {
     /* enable usb module */
-    GPO32_ENABLE |= 0x200;  
-
     outl(inl(0x7000002C) | 0x3000000, 0x7000002C);  
-    DEV_EN |= DEV_USB;
+    DEV_EN |= DEV_USB0;
+    DEV_EN |= DEV_USB1;
 
-    DEV_RS |= DEV_USB; /* reset usb start */  
-    DEV_RS &=~DEV_USB;/* reset usb end */  
+    /* reset both USBs */
+    DEV_RS |= DEV_USB0;
+    DEV_RS &=~DEV_USB0;
+    DEV_RS |= DEV_USB1;
+    DEV_RS &=~DEV_USB1;
 
+#if CONFIG_CPU == PP5020
     DEV_INIT2 |= INIT_USB;
+#endif
     while ((inl(0x70000028) & 0x80) == 0);
     outl(inl(0x70000028) | 0x2, 0x70000028);
     udelay(0x186A0);
+    
+    /* disable USB-devices until USB is detected via GPIO */
+    DEV_EN &= ~DEV_USB0;
+    DEV_EN &= ~DEV_USB1;
+#if CONFIG_CPU == PP5020
+    DEV_INIT2 &= ~INIT_USB;
+#endif
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
  || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
@@ -85,33 +96,46 @@ void usb_enable(bool on)
 
 static bool usb_pin_detect(void)
 {
+    bool retval = false;
+    
 #if defined(IPOD_4G) || defined(IPOD_COLOR) \
  || defined(IPOD_MINI) || defined(IPOD_MINI2G)
     /* GPIO D bit 3 is usb detect */
     if (GPIOD_INPUT_VAL & 0x08)
-        return true;
+        retval = true;
 
 #elif defined(IPOD_NANO) || defined(IPOD_VIDEO)
     /* GPIO L bit 4 is usb detect */
     if (GPIOL_INPUT_VAL & 0x10)
-        return true;
+        retval = true;
 
 #elif defined(SANSA_C200)
     /* GPIO H bit 1 is usb detect */
     if (GPIOH_INPUT_VAL & 0x02)
-        return true;
+        retval = true;
 
 #elif defined(SANSA_E200)
     /* GPIO B bit 4 is usb detect */
     if (GPIOB_INPUT_VAL & 0x10)
-        return true;
+        retval = true;
 
 #elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
     /* GPIO L bit 2 is usb detect */
     if (GPIOL_INPUT_VAL & 0x4)
-        return true;
+        retval = true;
 #endif
-    return false;
+
+    /* if USB is detected, re-enable the USB-devices */
+    if (retval)
+    {
+        DEV_EN |= DEV_USB0;
+        DEV_EN |= DEV_USB1;
+#if CONFIG_CPU == PP5020
+        DEV_INIT2 |= INIT_USB;
+#endif
+    }
+    
+    return retval;
 }
 
 /* detect host or charger (INSERTED or POWERED) */

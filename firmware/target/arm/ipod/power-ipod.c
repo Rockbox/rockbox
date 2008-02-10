@@ -70,14 +70,26 @@ void ide_power_enable(bool on)
 #elif defined(IPOD_4G) || defined(IPOD_COLOR) \
    || defined(IPOD_MINI) || defined(IPOD_MINI2G)
     if (on)
+    {
         GPIO_CLEAR_BITWISE(GPIOJ_OUTPUT_VAL, 0x04);
+        DEV_EN |= DEV_IDE0;
+    }
     else
+    {
+        DEV_EN &= ~DEV_IDE0;
         GPIO_SET_BITWISE(GPIOJ_OUTPUT_VAL, 0x04);
+    }
 #elif defined(IPOD_VIDEO)
     if (on)
+    {
         GPO32_VAL &= ~0x40000000;
+        DEV_EN |= DEV_IDE0;
+    }
     else
+    {
+        DEV_EN &= ~DEV_IDE0;
         GPO32_VAL |= 0x40000000;
+    }
 #else /* Nano */
     (void)on;  /* Do nothing. */
 #endif

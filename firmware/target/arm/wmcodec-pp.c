@@ -52,15 +52,15 @@ void audiohw_init(void) {
     DEV_INIT1 &=~0x3000000;
     /*mini2?*/
 
-    /* device reset */
+    /* I2S device reset */
     DEV_RS |= DEV_I2S;
     DEV_RS &=~DEV_I2S;
 
-    /* device enable */
-    DEV_EN |= (DEV_I2S | 0x7);
+    /* I2S device enable */
+    DEV_EN |= DEV_I2S;
 
     /* enable external dev clock clocks */
-    DEV_EN |= 0x2;
+    DEV_EN |= DEV_EXTCLOCKS;
 
     /* external dev clock to 24MHz */
     outl(inl(0x70000018) & ~0xc, 0x70000018);

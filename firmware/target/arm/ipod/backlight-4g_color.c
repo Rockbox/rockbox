@@ -53,7 +53,7 @@ bool _backlight_init(void)
     GPIOB_ENABLE |= 0x8; /* B03 enable */
     GPO32_ENABLE |= 0x2000000; /* D01 enable */
     GPO32_VAL |= 0x2000000;  /* D01 =1 */
-    DEV_EN |= 0x20000;   /* PWM enable */
+    DEV_EN |= DEV_PWM;   /* PWM enable */
 
     _backlight_on();
     return true;

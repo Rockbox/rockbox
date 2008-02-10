@@ -161,97 +161,118 @@ void set_cpu_frequency(long frequency)
 #else
 static void pp_set_cpu_frequency(long frequency)
 #endif
-{
+{      
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
     spinlock_lock(&boostctrl_spin);
 #endif
 
-    scale_suspend_core(true);
-
-    cpu_frequency = frequency;
-
     switch (frequency)
     {
-      /* Note: The PP5022 PLL must be run at >= 96MHz
+      /* Note1: The PP5022 PLL must be run at >= 96MHz
        * Bits 20..21 select the post divider (1/2/4/8).
        * PP5026 is similar to PP5022 except it doesn't
-       * have this limitation (and the post divider?) */
-      case CPUFREQ_MAX:
-        CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
-        DEV_TIMING1  = 0x00000303;
-#ifdef IPOD_NANO
-	IDE0_CFG |= (0x10000000); /* Set CPU > 65MHz bit */
-#endif
-#ifdef IPOD_MINI2G
-        MLCD_SCLK_DIV = 0x00000001; /* Mono LCD bridge serial clock divider */
-#endif
-#if CONFIG_CPU == PP5020
-        PLL_CONTROL  = 0x8a020a03;  /* 10/3 * 24MHz */
-        PLL_STATUS   = 0xd19b;      /* unlock frequencies > 66MHz */
-        PLL_CONTROL  = 0x8a020a03;  /* repeat setup */
-        scale_suspend_core(false);
-        udelay(500);                /* wait for relock */
-#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
-        PLL_CONTROL  = 0x8a121403;  /* (20/3 * 24MHz) / 2 */
-        scale_suspend_core(false);
-        udelay(250);
-        while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
-#endif
-        scale_suspend_core(true);
-        break;
-
-      case CPUFREQ_NORMAL:
-        CLOCK_SOURCE = 0x10007772;  /* source #1: 24MHz, #2, #3, #4: PLL */
-        DEV_TIMING1  = 0x00000303;
-#ifdef IPOD_NANO
-	IDE0_CFG &=~(0x10000000); /* clear > 65MHz bit */
-#endif
-#ifdef IPOD_MINI2G
-        MLCD_SCLK_DIV = 0x00000000; /* Mono LCD bridge serial clock divider */
-#endif
-#if CONFIG_CPU == PP5020
-        PLL_CONTROL  = 0x8a020504;  /* 5/4 * 24MHz */
-        scale_suspend_core(false);
-        udelay(500);                /* wait for relock */
-#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
-        PLL_CONTROL  = 0x8a220501;  /* (5/1 * 24MHz) / 4 */
-        scale_suspend_core(false);
-        udelay(250);
-        while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
-#endif
-        scale_suspend_core(true);
-        break;
-
+       * have this limitation (and the post divider?) 
+       * Note2: CLOCK_SOURCE is set via 0=32kHz, 1=16MHz,
+       * 2=24MHz, 3=33MHz, 4=48MHz, 5=SLOW, 6=FAST, 7=PLL. 
+       * SLOW = 24MHz / (DIV_SLOW + 1), DIV = Bits 16-19
+       * FAST = PLL   / (DIV_FAST + 1), DIV = Bits 20-23 */
       case CPUFREQ_SLEEP:
-        CLOCK_SOURCE = 0x10002202;  /* source #2: 32kHz, #1, #3, #4: 24MHz */
-        PLL_CONTROL &= ~0x80000000; /* disable PLL */
-        scale_suspend_core(false);
-        udelay(10000);              /* let 32kHz source stabilize? */
+        cpu_frequency =  CPUFREQ_SLEEP;
+        PLL_CONTROL  |=  0x0c000000;
         scale_suspend_core(true);
+        CLOCK_SOURCE  =  0x20000000; /* source #1, #2, #3, #4: 32kHz (#2 active) */
+        scale_suspend_core(false);
+        PLL_CONTROL  &= ~0x80000000; /* disable PLL */
+        DEV_INIT2    &= ~INIT_PLL;   /* disable PLL power */
         break;
-
+        
+      case CPUFREQ_MAX:
+        cpu_frequency = CPUFREQ_MAX;
+        DEV_INIT2    |= INIT_PLL;   /* enable PLL power */
+        PLL_CONTROL  |= 0x88000000; /* enable PLL */
+        scale_suspend_core(true);
+        CLOCK_SOURCE  = 0x20002222; /* source #1, #2, #3, #4: 24MHz (#2 active) */
+        DEV_TIMING1   = 0x00000303;
+        scale_suspend_core(false);
+#if   defined(IPOD_MINI2G)
+        MLCD_SCLK_DIV = 0x00000001; /* Mono LCD bridge serial clock divider */
+#elif defined(IPOD_NANO)
+        IDE0_CFG     |= 0x10000000; /* set ">65MHz" bit */
+#endif
+#if CONFIG_CPU == PP5020
+        PLL_CONTROL   = 0x8a020a03; /* 80 MHz = 10/3 * 24MHz */
+        PLL_STATUS    = 0xd19b;     /* unlock frequencies > 66MHz */
+        PLL_CONTROL   = 0x8a020a03; /* repeat setup */
+        udelay(500);                /* wait for relock */
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+        PLL_CONTROL   = 0x8a121403; /*  80 MHz = (20/3 * 24MHz) / 2 */
+        while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
+#endif
+        scale_suspend_core(true);
+        DEV_TIMING1   = 0x00000808;
+        CLOCK_SOURCE  = 0x20007777; /* source #1, #2, #3, #4: PLL (#2 active) */
+        scale_suspend_core(false);
+        break;
+#if 0 /******** CPUFREQ_NORMAL = 24MHz without PLL ********/
+      case CPUFREQ_NORMAL:
+        cpu_frequency =  CPUFREQ_NORMAL;
+        PLL_CONTROL  |=  0x08000000;
+        scale_suspend_core(true);
+        CLOCK_SOURCE  =  0x20002222; /* source #1, #2, #3, #4: 24MHz (#2 active) */
+        DEV_TIMING1   =  0x00000303;
+#if   defined(IPOD_MINI2G)
+        MLCD_SCLK_DIV =  0x00000000; /* Mono LCD bridge serial clock divider */
+#elif defined(IPOD_NANO)
+        IDE0_CFG     &= ~0x10000000; /* clear ">65MHz" bit */
+#endif
+        scale_suspend_core(false);
+        PLL_CONTROL  &= ~0x80000000; /* disable PLL */
+        DEV_INIT2    &= ~INIT_PLL;   /* disable PLL power */
+        break;
+#else /******** CPUFREQ_NORMAL = 30MHz with PLL ********/
+    case CPUFREQ_NORMAL:
+        cpu_frequency = CPUFREQ_NORMAL;
+        DEV_INIT2    |= INIT_PLL;   /* enable PLL power */
+        PLL_CONTROL  |= 0x88000000; /* enable PLL */
+        scale_suspend_core(true);
+        CLOCK_SOURCE  = 0x20002222; /* source #1, #2, #3, #4: 24MHz (#2 active) */
+        DEV_TIMING1   = 0x00000303;
+        scale_suspend_core(false);
+#if   defined(IPOD_MINI2G)
+        MLCD_SCLK_DIV =  0x00000000; /* Mono LCD bridge serial clock divider */
+#elif defined(IPOD_NANO)
+        IDE0_CFG     &= ~0x10000000; /* clear ">65MHz" bit */
+#endif
+#if CONFIG_CPU == PP5020
+        PLL_CONTROL   = 0x8a020504; /* 30 MHz = 5/4 * 24MHz */
+        udelay(500);                /* wait for relock */
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+        PLL_CONTROL   = 0x8a220501; /* 30 MHz = (5/1 * 24MHz) / 4 */
+        while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
+#endif
+        scale_suspend_core(true);
+        DEV_TIMING1   = 0x00000808;
+        CLOCK_SOURCE  = 0x20007777; /* source #1, #2, #3, #4: PLL (#2 active) */
+        scale_suspend_core(false);
+        break;
+#endif /******** CPUFREQ_NORMAL end ********/
       default:
-        CLOCK_SOURCE = 0x10002222;  /* source #1, #2, #3, #4: 24MHz */
-        DEV_TIMING1  = 0x00000303;
-#ifdef IPOD_MINI2G
-        MLCD_SCLK_DIV = 0x00000000; /* Mono LCD bridge serial clock divider */
+        cpu_frequency =  CPUFREQ_DEFAULT;
+        PLL_CONTROL  |=  0x08000000;
+        scale_suspend_core(true);
+        CLOCK_SOURCE  =  0x20002222; /* source #1, #2, #3, #4: 24MHz (#2 active) */
+        DEV_TIMING1   =  0x00000303;
+#if   defined(IPOD_MINI2G)
+        MLCD_SCLK_DIV =  0x00000000; /* Mono LCD bridge serial clock divider */
+#elif defined(IPOD_NANO)
+        IDE0_CFG     &= ~0x10000000; /* clear ">65MHz" bit */
 #endif
-#ifdef IPOD_NANO
-	IDE0_CFG &=~(0x10000000); /* clear > 65MHz bit */
-#endif
-        PLL_CONTROL &= ~0x80000000; /* disable PLL */
-        cpu_frequency = CPUFREQ_DEFAULT;
-        PROC_CTL(CURRENT_CORE) = 0x4800001f; nop;
+        scale_suspend_core(false);
+        PLL_CONTROL  &= ~0x80000000; /* disable PLL */
+        DEV_INIT2    &= ~INIT_PLL;   /* disable PLL power */
         break;
     }
-
-    if (frequency == CPUFREQ_MAX)
-        DEV_TIMING1 = 0x00000808;
-
-    CLOCK_SOURCE = (CLOCK_SOURCE & ~0xf0000000) | 0x20000000;  /* select source #2 */
-
-    scale_suspend_core(false);
-
+    
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
     spinlock_unlock(&boostctrl_spin);
 #endif
@@ -263,19 +284,84 @@ void system_init(void)
 #ifndef BOOTLOADER
     if (CURRENT_CORE == CPU)
     {
-#if defined(SANSA_E200) || defined(SANSA_C200)
-        /* Reset all devices */
-        DEV_RS2 |= 0x20;
-        DEV_RS = 0x3bfffef8;
-        DEV_RS2 = -1;
-        DEV_RS = 0;
-        DEV_RS2 = 0;
-#elif defined (IRIVER_H10) || defined(MROBE_100)
-        DEV_RS = 0x3ffffef8;
-        DEV_RS2 = -1;
-        DEV_RS = 0;
-        DEV_RS2 = 0;
-        outl(inl(0x70000024) | 0xc0, 0x70000024);
+#if defined (IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(IPOD_COLOR)
+        /* set minimum startup configuration */
+        DEV_EN         = 0xc2000124;
+        DEV_EN2        = 0x00002000;
+        CACHE_PRIORITY = 0x0000003f;
+        GPO32_VAL      = 0x20000000;
+        DEV_INIT1      = 0xdc000000;
+        DEV_INIT2      = 0x40000000;
+
+        /* reset all allowed devices */
+        DEV_RS         = 0x3ffffef8;
+        DEV_RS2        = 0xffffdfff;
+        DEV_RS         = 0x00000000;
+        DEV_RS2        = 0x00000000;
+#elif defined (IPOD_VIDEO)    
+        /* set minimum startup configuration */
+        DEV_EN         = 0xc2000124;
+        DEV_EN2        = 0x00000000;
+        CACHE_PRIORITY = 0x0000003f;
+        GPO32_VAL      = 0x00004000;
+        DEV_INIT1      = 0x00000000;
+        DEV_INIT2      = 0x40000000;
+
+        /* reset all allowed devices */
+        DEV_RS         = 0x3ffffef8;
+        DEV_RS2        = 0xffffffff;
+        DEV_RS         = 0x00000000;
+        DEV_RS2        = 0x00000000;
+#elif defined (IPOD_NANO)    
+        /* set minimum startup configuration */
+        DEV_EN         = 0xc2000124;
+        DEV_EN2        = 0x00002000;
+        CACHE_PRIORITY = 0x0000003f;
+        GPO32_VAL      = 0x50000000;
+        DEV_INIT1      = 0xa8000000;
+        DEV_INIT2      = 0x40000000;
+
+        /* reset all allowed devices */
+        DEV_RS         = 0x3ffffef8;
+        DEV_RS2        = 0xffffdfff;
+        DEV_RS         = 0x00000000;
+        DEV_RS2        = 0x00000000;
+#elif defined(SANSA_C200) || defined (SANSA_E200)
+        /* set minimum startup configuration */
+        DEV_EN         = 0xc4000124;
+        DEV_EN2        = 0x00000000;
+        CACHE_PRIORITY = 0x0000003f;
+        GPO32_VAL      = 0x10000000;
+        DEV_INIT1      = 0x54000000;
+        DEV_INIT2      = 0x40000000;
+
+        /* reset all allowed devices */
+        DEV_RS         = 0x3bfffef8;
+        DEV_RS2        = 0xffffffff;
+        DEV_RS         = 0x00000000;
+        DEV_RS2        = 0x00000000;
+#elif defined(IPOD_4G)
+        /* set minimum startup configuration */
+        DEV_EN         = 0xc2020124;
+        DEV_EN2        = 0x00000000;
+        CACHE_PRIORITY = 0x0000003f;
+        GPO32_VAL      = 0x02000000;
+        DEV_INIT1      = 0x00000000;
+        DEV_INIT2      = 0x40000000;
+
+        /* reset all allowed devices */
+        DEV_RS         = 0x3ffdfef8;
+        DEV_RS2        = 0xffffffff;
+        DEV_RS         = 0x00000000;
+        DEV_RS2        = 0x00000000;
+#elif defined (IPOD_MINI)
+        /* to be done */
+#elif defined (IPOD_MINI2G)
+        /* to be done */
+#elif defined (MROBE_100)
+        /* to be done */
+#elif defined (ELIO_TPJ1022)
+        /* to be done */
 #endif
 
 #if !defined(SANSA_E200) && !defined(SANSA_C200)
@@ -313,8 +399,6 @@ void system_init(void)
         /* outl(0x00000000, 0x6000b000); */
         outl(inl(0x6000a000) | 0x80000000, 0x6000a000); /* Init DMA controller? */
 #endif 
-
-        DEV_INIT2 |= 1 << 30; /* enable PLL power */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #if NUM_CORES > 1

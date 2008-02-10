@@ -113,9 +113,9 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-#define BATTERY_CAPACITY_DEFAULT 750    /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 750        /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 530    /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 530        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 530        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0          /* capacity increment */
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
