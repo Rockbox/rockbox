@@ -510,7 +510,7 @@ void BootloaderInstaller::h10Prepare()
         QString firmwarename = m_bootloadername.section('/', -1);
 
         QString firmware = m_mountpoint + "/SYSTEM/" + firmwarename;
-        QString firmwareOrig = m_mountpoint + "/SYSTEM/Original.mi4";
+        QString firmwareOrig = m_mountpoint + "/SYSTEM/OF.mi4";
 
         QFileInfo firmwareFI(firmware);
         if(!firmwareFI.exists())  //Firmware dosent exists on player
@@ -568,7 +568,7 @@ void BootloaderInstaller::h10Finish()
     QString firmwarename = m_bootloadername.section('/', -1);
 
     QString firmware = m_mountpoint + "/SYSTEM/" + firmwarename;
-    QString firmwareOrig = m_mountpoint + "/SYSTEM/Original.mi4";
+    QString firmwareOrig = m_mountpoint + "/SYSTEM/OF.mi4";
 
     QFileInfo firmwareFI(firmware);
 
