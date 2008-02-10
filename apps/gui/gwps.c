@@ -246,6 +246,10 @@ long gui_wps_show(void)
                            FILE_ATTR_AUDIO, CONTEXT_WPS) == ONPLAY_MAINMENU 
                     || !audio_status())
                     return GO_TO_ROOT;
+
+                /* track might have changed */
+                update_track = true;
+
 #if LCD_DEPTH > 1
                 show_wps_backdrop();
 #endif
