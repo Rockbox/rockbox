@@ -161,12 +161,14 @@ pages of information.}
   Displays some basic system information. This is, from top to bottom,
   the amount of memory Rockbox has available for storing music (the buffer).
   The battery status.
-\opt{ondio}{%
+\opt{multivolume}{%
   Memory size and amount of free space on the two data volumes, this info is
-  given seperately for internal memory (\emph{Int}) and for a plugged in MMC
-(\emph{MMC}).
+  given seperately for internal memory (\emph{Int}) and for a plugged in
+  memory card
+  \opt{ondio}{(\emph{MMC})}
+  \opt{sansa}{(\emph{MSD})}.
 }%
-\nopt{ondio}{Hard disk size and the amount of free space on the disk.}
+\nopt{multivolume}{Hard disk size and the amount of free space on the disk.}
 
 \item[Version:]
   Software version and credits display.
