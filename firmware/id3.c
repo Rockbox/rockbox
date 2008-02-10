@@ -423,7 +423,8 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
 static int parserva2( struct mp3entry* entry, char* tag, int bufferpos )
 {
     int desc_len = strlen(tag);
-    int end_pos = tag - entry->id3v2buf + desc_len + 5;
+    int start_pos = tag - entry->id3v2buf;
+    int end_pos = start_pos + desc_len + 5;
     int value_len = 0;
     unsigned char* value = tag + desc_len + 1;
 
@@ -471,14 +472,19 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos )
         if (strcasecmp(tag, "album") == 0) {
             album = true;
         } else if (strcasecmp(tag, "track") != 0) {
-            gain = 0;
+            /* Only accept non-track values if we don't have any previous
+             * value.
+             */
+            if (entry->track_gain != 0) {
+                return start_pos;
+            }
         }
             
         value_len = parse_replaygain_int(album, gain, peak * 2, entry,
-            tag, sizeof(entry->id3v2buf) - (tag - entry->id3v2buf));
+            tag, sizeof(entry->id3v2buf) - start_pos);
     }
 
-    return tag - entry->id3v2buf + value_len;
+    return start_pos + value_len;
 }
 #endif
 
