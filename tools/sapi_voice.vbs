@@ -38,11 +38,10 @@ Dim sLanguage, sVoice, sSpeed
 
 Dim oSpVoice, oSpFS ' SAPI5 voice and filestream
 Dim oTTS, nMode ' SAPI4 TTS object, mode selector
+Dim oVoice ' for traversing the list of voices
 Dim nLangID, sSelectString
 
 Dim aLine, aData    ' used in command reading
-
-Dim counter, ende, list
 
 On Error Resume Next
 
@@ -56,41 +55,6 @@ bList = oArgs.Exists("listvoices")
 sLanguage = oArgs.Item("language")
 sVoice = oArgs.Item("voice")
 sSpeed = oArgs.Item("speed")
-
-' display a list of voices for the selected language
-if bList Then
-    'Create SAPI5 object
-    Set oSpVoice = CreateObject("SAPI.SpVoice")
-    If Err.Number <> 0 Then
-        WScript.StdErr.WriteLine "Error - could not get SpVoice object." _
-                        & " SAPI 5 not installed?"
-        WScript.Quit 1
-    End If
-    
-    list = ""
-    ' Select matching voice
-    For Each nLangID in LangIDs(sLanguage)
-        sSelectString = "Language=" & Hex(nLangID)
-        counter =0
-        ende =0
-        While ende <= 0
-            Err.Clear
-            Set oSpVoice.Voice = oSpVoice.GetVoices(sSelectString).Item(counter)
-          
-            If Err.Number = 0 Then
-                list = list & oSpVoice.Voice.GetDescription & ","    
-            Else
-                ende = 1
-                 Err.Clear
-            End if    
-            counter = counter + 1  
-        Wend
-    Next
-    
-    WScript.StdErr.WriteLine list
-    
-    WScript.Quit 0
-End If
 
 
 If bSAPI4 Then
@@ -106,6 +70,19 @@ If bSAPI4 Then
         End If
     End If
     oTTS.Initialized = 1
+
+    If bList Then 
+        ' Just list available voices for the selected language
+        For Each nLangID in LangIDs(sLanguage)
+            For nMode = 1 To oTTS.CountEngines
+                If oTTS.LanguageID(nMode) = nLangID Then
+                    WScript.StdErr.Write oTTS.ModeName(nMode) & ","
+                End If
+            Next
+        Next
+        WScript.StdErr.WriteLine
+        WScript.Quit 0
+    End If
 
     ' Select matching voice
     For Each nLangID in LangIDs(sLanguage)
@@ -139,6 +116,18 @@ Else ' SAPI5
         WScript.StdErr.WriteLine "Error - could not get SpVoice object." _
                                  & " SAPI 5 not installed?"
         WScript.Quit 1
+    End If
+    
+    If bList Then 
+        ' Just list available voices for the selected language
+        For Each nLangID in LangIDs(sLanguage)
+            sSelectString = "Language=" & Hex(nLangID)
+            For Each oVoice in oSpVoice.GetVoices(sSelectString)
+                WScript.StdErr.Write oVoice.GetDescription & ","
+            Next
+        Next
+        WScript.StdErr.WriteLine
+        WScript.Quit 0
     End If
 
     ' Select matching voice
