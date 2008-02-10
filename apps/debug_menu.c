@@ -2380,7 +2380,7 @@ static const struct the_menu_item menuitems[] = {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) || CONFIG_CPU == S3C2440
         { "View I/O ports", dbg_ports },
 #endif
-#if CONFIG_RTC == RTC_PCF50605
+ #if (CONFIG_RTC == RTC_PCF50605) && !defined(SIMULATOR)
         { "View PCF registers", dbg_pcf },
 #endif
 #if defined(HAVE_TSC2100) && !defined(SIMULATOR)
