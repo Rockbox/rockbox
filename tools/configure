@@ -337,23 +337,6 @@ whichadvanced () {
   fi
 }
 
-getespeakopts () {
-    langcode=$1
-    i=1
-    espeak --voices=$langcode |grep -v ^Pty | sed -e 's/ \+/ /g' |(while read line; do
-        IFS=" "
-        echo $line| (read pty lang agegender voicename file otherlangs
-            printf "%2d. %s (%s)\n" $i "$voicename" "$agegender"
-        )
-        i=`expr $i + 1`
-    done)
-    printf "Which voice should be used [1]?: "
-    read reply
-    if [ "$reply" = "" ]; then reply=1; fi
-    VOICE=`espeak --voices=$langcode |head -n \`expr $reply + 1\` |tail -n 1 |sed -e 's/ \+/ /g' -e 's/ *[^\ ]\+ [^\ ]\+ [^\ ]\+ \([^\ ]\+\).*/\1/'`
-    ESPEAK_OPTS="-v $VOICE"
-}
-
 # Configure voice settings
 voiceconfig () {
     thislang=$1
@@ -457,75 +440,6 @@ voiceconfig () {
         NOISEFLOOR=$DEFAULT_NOISEFLOOR
     esac
     echo "Using $TTS_ENGINE for TTS"
-
-    if [ "$TTS_ENGINE" = "espeak" ]; then
-        case "$thislang" in
-            "afrikaans")
-                getespeakopts "af"
-                ;;
-            chinese-*)
-                getespeakopts "zh"
-                ;;
-            "czech")
-                getespeakopts "cs"
-                ;;
-            "deutsch")
-                getespeakopts "de"
-                ;;
-            "greek")
-                getespeakopts "el"
-                ;;
-            "english")
-                getespeakopts "en"
-                ;;
-            "esperanto")
-                getespeakopts "eo"
-                ;;
-            "espanol")
-                getespeakopts "es"
-                ;;
-            "finnish")
-                getespeakopts "fi"
-                ;;
-            "francais")
-                getespeakopts "fr"
-                ;;
-            "hindi")
-                getespeakopts "hi"
-                ;;
-            "islenska")
-                getespeakopts "is"
-                ;;
-            "italiano")
-                getespeakopts "it"
-                ;;
-            "nederlands")
-                getespeakopts "nl"
-                ;;
-            "norsk")
-                getespeakopts "no"
-                ;;
-            "polski")
-                getespeakopts "pl"
-                ;;
-            portugues*)
-                getespeakopts "pt"
-                ;;
-            "romaneste")
-                getespeakopts "ro"
-                ;;
-            "russian")
-                getespeakopts "ru"
-                ;;
-            "svenska")
-                getespeakopts "sv"
-                ;;
-            *)
-            ESPEAK_OPTS=""
-            ;;
-        esac
-        TTS_OPTS="${TTS_OPTS}${ESPEAK_OPTS}"
-    fi
 
     # Allow the user to input manual commandline options
     printf "Enter $TTS_ENGINE options (enter for defaults \"$TTS_OPTS\"): "
