@@ -479,6 +479,7 @@ static void identify2inquiry(int lun)
     unsigned short* dest;
     unsigned short* src;
     unsigned short* identify = ata_get_identify();
+    (void)lun;
     memset(inquiry, 0, sizeof _inquiry);
     
     if (identify[82] & 4)
