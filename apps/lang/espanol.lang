@@ -2847,8 +2847,8 @@
     rtc: none
   </dest>
   <voice>
-    *: "Hora Actual:"
-    rtc: none
+    *: none
+    rtc: "Hora Actual:"
   </voice>
 </phrase>
 <phrase>
@@ -8253,7 +8253,7 @@
   </dest>
   <voice>
     *: none
-    remote:  "Configuraciones de LCD Remoto"
+    remote: "Configuraciones de LCD Remoto"
   </voice>
 </phrase>
 <phrase>
@@ -11164,12 +11164,12 @@
   <dest>
     *: none
     e200: "Tiempo de espera en la luz de la rueda"
-    c200,gigabeatf: "Tiempo de espera en la luz del botón"
+    c200,gigabeatf,mrobe100: "Tiempo de espera en la luz del botón"
   </dest>
   <voice>
     *: none
     e200: "Tiempo de espera en la luz de la rueda"
-    c200,gigabeatf: "Tiempo de espera en la luz del botón"
+    c200,gigabeatf,mrobe100: "Tiempo de espera en la luz del botón"
   </voice>
 </phrase>
 <phrase>
