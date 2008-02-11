@@ -1142,32 +1142,30 @@ bool dbg_ports(void)
         gpio_a = GPIOA_INPUT_VAL;
         gpio_b = GPIOB_INPUT_VAL;
         gpio_c = GPIOC_INPUT_VAL;
-
-        gpio_g = GPIOG_INPUT_VAL;
-        gpio_h = GPIOH_INPUT_VAL;
-        gpio_i = GPIOI_INPUT_VAL;
-
-        line = 0;
-        snprintf(buf, sizeof(buf), "GPIO_A: %02x GPIO_G: %02x", gpio_a, gpio_g);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_B: %02x GPIO_H: %02x", gpio_b, gpio_h);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_C: %02x GPIO_I: %02x", gpio_c, gpio_i);
-        lcd_puts(0, line++, buf);
-
         gpio_d = GPIOD_INPUT_VAL;
         gpio_e = GPIOE_INPUT_VAL;
         gpio_f = GPIOF_INPUT_VAL;
-
+        gpio_g = GPIOG_INPUT_VAL;
+        gpio_h = GPIOH_INPUT_VAL;
+        gpio_i = GPIOI_INPUT_VAL;
         gpio_j = GPIOJ_INPUT_VAL;
         gpio_k = GPIOK_INPUT_VAL;
         gpio_l = GPIOL_INPUT_VAL;
 
-        snprintf(buf, sizeof(buf), "GPIO_D: %02x GPIO_J: %02x", gpio_d, gpio_j);
+        line = 0;
+        snprintf(buf, sizeof(buf), "GPIO STATES:");
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_E: %02x GPIO_K: %02x", gpio_e, gpio_k);
+        snprintf(buf, sizeof(buf), "A: %02x  E: %02x  I: %02x",
+                                   gpio_a, gpio_e, gpio_i);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_F: %02x GPIO_L: %02x", gpio_f, gpio_l);
+        snprintf(buf, sizeof(buf), "B: %02x  F: %02x  J: %02x",
+                                   gpio_b, gpio_f, gpio_j);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "C: %02x  G: %02x  K: %02x",
+                                   gpio_c, gpio_g, gpio_k);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "D: %02x  H: %02x  L: %02x",
+                                   gpio_d, gpio_h, gpio_l);
         lcd_puts(0, line++, buf);
         line++;
 
