@@ -1190,7 +1190,8 @@ int ata_init(void)
 
         queue_init(&sd_queue, true);
         create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
-            sd_thread_name IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU));
+            sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
+            IF_COP(, CPU));
 
         /* enable interupt for the mSD card */
         sleep(HZ/10);

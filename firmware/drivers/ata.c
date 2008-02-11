@@ -816,45 +816,46 @@ static void ata_thread(void)
     static long last_seen_mtx_unlock = 0;
     
     while (1) {
-        while ( queue_empty( &ata_queue ) ) {
-            if (!spinup && !sleeping)
-            {
-                if (!ata_mtx.locked)
+        queue_wait_w_tmo(&ata_queue, &ev, HZ/2);
+
+        switch ( ev.id ) {
+            case SYS_TIMEOUT:
+                if (!spinup && !sleeping)
                 {
-                    if (!last_seen_mtx_unlock)
-                        last_seen_mtx_unlock = current_tick;
-                    if (TIME_AFTER(current_tick, last_seen_mtx_unlock+(HZ*2)))
+                    if (!ata_mtx.locked)
                     {
-                        call_ata_idle_notifys(false);
-                        last_seen_mtx_unlock = 0;
+                        if (!last_seen_mtx_unlock)
+                            last_seen_mtx_unlock = current_tick;
+                        if (TIME_AFTER(current_tick, last_seen_mtx_unlock+(HZ*2)))
+                        {
+                            call_ata_idle_notifys(false);
+                            last_seen_mtx_unlock = 0;
+                        }
+                    }
+                    if ( sleep_timeout &&
+                         TIME_AFTER( current_tick, 
+                                    last_user_activity + sleep_timeout ) &&
+                         TIME_AFTER( current_tick, 
+                                    last_disk_activity + sleep_timeout ) )
+                    {
+                        call_ata_idle_notifys(true);
+                        ata_perform_sleep();
+                        last_sleep = current_tick;
                     }
                 }
-                if ( sleep_timeout &&
-                     TIME_AFTER( current_tick, 
-                                last_user_activity + sleep_timeout ) &&
-                     TIME_AFTER( current_tick, 
-                                last_disk_activity + sleep_timeout ) )
-                {
-                    call_ata_idle_notifys(true);
-                    ata_perform_sleep();
-                    last_sleep = current_tick;
-                }
-            }
-#ifdef HAVE_ATA_POWER_OFF
-            if ( !spinup && sleeping && !poweroff &&
-                 TIME_AFTER( current_tick, last_sleep + ATA_POWER_OFF_TIMEOUT ))
-            {
-                mutex_lock(&ata_mtx);
-                ide_power_enable(false);
-                mutex_unlock(&ata_mtx);
-                poweroff = true;
-            }
-#endif
 
-            sleep(HZ/4);
-        }
-        queue_wait(&ata_queue, &ev);
-        switch ( ev.id ) {
+#ifdef HAVE_ATA_POWER_OFF
+                if ( !spinup && sleeping && !poweroff &&
+                     TIME_AFTER( current_tick, last_sleep + ATA_POWER_OFF_TIMEOUT ))
+                {
+                    mutex_lock(&ata_mtx);
+                    ide_power_enable(false);
+                    mutex_unlock(&ata_mtx);
+                    poweroff = true;
+                }
+#endif
+                break;
+
 #ifndef USB_NONE
             case SYS_USB_CONNECTED:
                 if (poweroff) {
@@ -1149,7 +1150,8 @@ int ata_init(void)
 #endif
 
     if ( !initialized ) {
-        /* First call won't have multiple thread contention */
+        /* First call won't have multiple thread contention - this
+         * may return at any point without having to unlock */
         mutex_unlock(&ata_mtx);
 
         if (!ide_powered()) /* somebody has switched it off */
@@ -1211,10 +1213,12 @@ int ata_init(void)
         if (rc)
             return -60 + rc;
 
+        mutex_lock(&ata_mtx); /* Balance unlock below */
+
         last_disk_activity = current_tick;
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), 0, ata_thread_name
-                      IF_PRIO(, PRIORITY_SYSTEM)
+                      IF_PRIO(, PRIORITY_USER_INTERFACE)
 		              IF_COP(, CPU));
         initialized = true;
 
