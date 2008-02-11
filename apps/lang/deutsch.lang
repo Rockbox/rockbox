@@ -1,4 +1,4 @@
-<phrase>
+﻿<phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
   user:
@@ -11492,10 +11492,10 @@
     *: "Save Sound Settings"
   </source>
   <dest>
-    *: "Soundeinstellungen speichern"
+    *: "Klangeinstellungen speichern"
   </dest>
   <voice>
-    *: "Soundeinstellungen speichern"
+    *: "Klangeinstellungen speichern"
   </voice>
 </phrase>
 <phrase>
