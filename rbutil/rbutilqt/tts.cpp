@@ -30,7 +30,7 @@ void initTTSList()
     ttsList["flite"] = "Flite TTS Engine";
     ttsList["swift"] = "Swift TTS Engine";
 #if defined(Q_OS_WIN)
-    ttsList["sapi"] = "Sapi 5 TTS Engine";
+    ttsList["sapi"] = "Sapi TTS Engine";
 #endif
   
 }
@@ -156,7 +156,7 @@ TTSSapi::TTSSapi() : TTSBase()
 {
     m_TTSTemplate = "cscript //nologo \"%exe\" /language:%lang /voice:\"%voice\" /speed:%speed \"%options\"";
     defaultLanguage ="english";
-   
+    m_sapi4 =false;
 }
 
 
@@ -166,8 +166,9 @@ bool TTSSapi::start(QString *errStr)
     m_TTSOpts = settings->ttsOptions("sapi");
     m_TTSLanguage =settings->ttsLang("sapi");
     m_TTSVoice=settings->ttsVoice("sapi");
-    m_TTSSpeed=settings->ttsSpeed("sapi");
-
+    m_TTSSpeed=QString("%1").arg(settings->ttsSpeed("sapi"));
+    m_sapi4 = settings->ttsUseSapi4();
+    
     QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
     QFile::copy(":/builtin/sapi_voice.vbs",QDir::tempPath() + "/sapi_voice.vbs");
     m_TTSexec = QDir::tempPath() +"/sapi_voice.vbs";
@@ -185,6 +186,9 @@ bool TTSSapi::start(QString *errStr)
     execstring.replace("%lang",m_TTSLanguage);
     execstring.replace("%voice",m_TTSVoice);
     execstring.replace("%speed",m_TTSSpeed);
+    
+    if(m_sapi4)
+        execstring.append(" /sapi4 ");
     
     qDebug() << "init" << execstring; 
     voicescript = new QProcess(NULL);
@@ -219,9 +223,13 @@ QStringList TTSSapi::getVoiceList(QString language)
         return result;
         
     // create the voice process
-    QString execstring = "cscript //nologo \"%exe\" /language:%lang /listvoices";;
+    QString execstring = "cscript //nologo \"%exe\" /language:%lang /listvoices";
     execstring.replace("%exe",m_TTSexec);
     execstring.replace("%lang",language);
+    
+    if(settings->ttsUseSapi4())
+        execstring.append(" /sapi4 ");
+    
     qDebug() << "init" << execstring; 
     voicescript = new QProcess(NULL);
     voicescript->start(execstring);
@@ -234,6 +242,11 @@ QStringList TTSSapi::getVoiceList(QString language)
     result = dataRaw.split(",",QString::SkipEmptyParts);
     result.sort();
     result.removeFirst();
+    for(int i = 0; i< result.size();i++)
+    {
+        result[i] = result.at(i).simplified();
+    }
+    
     
     delete voicescript;
     QFile::setPermissions(QDir::tempPath() +"/sapi_voice.vbs",QFile::ReadOwner |QFile::WriteOwner|QFile::ExeOwner 

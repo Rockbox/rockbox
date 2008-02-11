@@ -42,6 +42,7 @@ public slots:
     virtual void reject(void);
     virtual void reset(void);
     void updateVoices(QString language);
+    void useSapi4Changed(int);
 private:
     Ui::SapiCfgFrm ui;
     RbSettings* settings;

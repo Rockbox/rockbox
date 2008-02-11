@@ -307,6 +307,14 @@ QString RbSettings::ttsLang(QString tts)
     return op;
 }
 
+bool RbSettings::ttsUseSapi4()
+{
+    userSettings->beginGroup("sapi");
+    bool op = userSettings->value("useSapi4",false).toBool();
+    userSettings->endGroup();
+    return op;
+}
+
 QString RbSettings::encoderPath(QString enc)
 {
     userSettings->beginGroup(enc);
@@ -522,6 +530,14 @@ void RbSettings::setTTSLang(QString tts, QString lang)
     userSettings->setValue("ttslanguage",lang);
     userSettings->endGroup();
 }
+
+void RbSettings::setTTSUseSapi4(bool value)
+{
+    userSettings->beginGroup("sapi");
+    userSettings->setValue("useSapi4",value);
+    userSettings->endGroup();
+} 
+
 
 void RbSettings::setEncoderPath(QString enc, QString path)
 {

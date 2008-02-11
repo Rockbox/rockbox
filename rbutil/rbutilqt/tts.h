@@ -88,7 +88,7 @@ private:
     QString m_TTSLanguage;
     QString m_TTSVoice;
     QString m_TTSSpeed;
-    
+    bool m_sapi4;
 };
 
 class TTSExes : public TTSBase

@@ -69,6 +69,7 @@ class RbSettings : public QObject
         QString ttsVoice(QString tts);
         int ttsSpeed(QString tts);
         QString ttsLang(QString tts);
+        bool ttsUseSapi4();
         QString encoderPath(QString enc);
         QString encoderOptions(QString enc);
         double encoderQuality(QString enc);
@@ -116,6 +117,7 @@ class RbSettings : public QObject
         void setTTSSpeed(QString tts, int speed);
         void setTTSVoice(QString tts, QString voice);
         void setTTSLang(QString tts, QString lang);
+        void setTTSUseSapi4(bool value);
         void setEncoderPath(QString enc, QString path);
         void setEncoderOptions(QString enc, QString options);
         void setEncoderQuality(QString enc, double q);

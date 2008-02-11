@@ -30,7 +30,7 @@ TTSSapiGui::TTSSapiGui(TTSSapi* sapi,QDialog* parent) : QDialog(parent)
     this->hide();
     connect(ui.reset,SIGNAL(clicked()),this,SLOT(reset()));
     connect(ui.languagecombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateVoices(QString)));
-
+    connect(ui.usesapi4,SIGNAL(stateChanged(int)),this,SLOT(useSapi4Changed(int)));
 } 
 
 void TTSSapiGui::showCfg()
@@ -40,8 +40,11 @@ void TTSSapiGui::showCfg()
     QString selLang = settings->ttsLang("sapi");
     QString selVoice = settings->ttsVoice("sapi");    
     ui.speed->setValue(settings->ttsSpeed("sapi"));
+    if(settings->ttsUseSapi4())
+        ui.usesapi4->setCheckState(Qt::Checked);
+    else
+        ui.usesapi4->setCheckState(Qt::Unchecked);
     
-      
      // fill in language combobox
     QStringList languages = settings->allLanguages();
     
@@ -79,6 +82,10 @@ void TTSSapiGui::accept(void)
     settings->setTTSLang("sapi",ui.languagecombo->currentText());
     settings->setTTSVoice("sapi",ui.voicecombo->currentText());
     settings->setTTSSpeed("sapi",ui.speed->value());
+    if(ui.usesapi4->checkState() == Qt::Checked)
+        settings->setTTSUseSapi4(true);
+    else
+        settings->setTTSUseSapi4(false);
     // sync settings
     settings->sync();
     
@@ -96,6 +103,18 @@ void TTSSapiGui::updateVoices(QString language)
     ui.voicecombo->clear();
     ui.voicecombo->addItems(Voices);    
 
+}
+
+void TTSSapiGui::useSapi4Changed(int)
+{
+    if(ui.usesapi4->checkState() == Qt::Checked)
+        settings->setTTSUseSapi4(true);
+    else
+        settings->setTTSUseSapi4(false);
+    // sync settings
+    settings->sync();
+    updateVoices(ui.languagecombo->currentText());
+   
 }
 
 TTSExesGui::TTSExesGui(QDialog* parent) : QDialog(parent)
