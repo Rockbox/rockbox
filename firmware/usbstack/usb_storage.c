@@ -486,15 +486,11 @@ static void identify2inquiry(int lun)
         inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
 
     /* ATA only has a 'model' field, so we copy the 
-       first 8 bytes to 'vendor' and the rest to 'product' */
+       first 8 bytes to 'vendor' and the rest to 'product' (they are
+       consecutive in the inquiry struct) */
     src = (unsigned short*)&identify[27];
     dest = (unsigned short*)&inquiry->VendorId;
-    for (i=0;i<4;i++)
-        dest[i] = htobe16(src[i]);
-
-    src = (unsigned short*)&identify[27+8];
-    dest = (unsigned short*)&inquiry->ProductId;
-    for (i=0;i<8;i++)
+    for (i=0;i<12;i++)
         dest[i] = htobe16(src[i]);
     
     src = (unsigned short*)&identify[23];
