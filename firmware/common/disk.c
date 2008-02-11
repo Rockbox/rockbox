@@ -48,6 +48,9 @@
 static struct partinfo part[8]; /* space for 4 partitions on 2 drives */
 static int vol_drive[NUM_VOLUMES]; /* mounted to which drive (-1 if none) */
 
+#ifdef MAX_LOG_SECTOR_SIZE
+int disk_sector_multiplier = 1;
+#endif
 struct partinfo* disk_init(IF_MV_NONVOID(int drive))
 {
     int i;
@@ -168,6 +171,8 @@ int disk_mount(int drive)
                 mounted++;
                 vol_drive[volume] = drive; /* remember the drive for this volume */
                 volume = get_free_volume(); /* prepare next entry */
+                if (drive == 0)
+                    disk_sector_multiplier = j;
                 break;
             }
         }

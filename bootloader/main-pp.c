@@ -465,6 +465,7 @@ void* main(void)
         
     btn = button_read_device();
 #if defined(SANSA_E200) || defined(SANSA_C200)
+#if !defined(USE_ROCKBOX_USB)
     usb_init();
     while (usb_drv_powered() && usb_retry < 5 && !usb)
     {
@@ -474,6 +475,7 @@ void* main(void)
     }
     if (usb)
         btn |= BOOTLOADER_BOOT_OF;
+#endif /* USE_ROCKBOX_USB */
 #endif
     /* Enable bootloader messages if any button is pressed */
     if (btn)

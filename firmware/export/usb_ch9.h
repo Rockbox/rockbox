@@ -244,7 +244,7 @@ struct usb_string_descriptor {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
 
-    uint16_t wData[1]; /* UTF-16LE encoded */
+    uint16_t wString[]; /* UTF-16LE encoded */
 } __attribute__ ((packed));
 
 /* note that "string" zero is special, it holds language codes that

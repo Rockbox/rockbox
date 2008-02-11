@@ -23,10 +23,17 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
-//#define USB_STORAGE
+#ifndef BOOTLOADER
 //#define USB_SERIAL
 //#define USB_BENCHMARK
+#ifdef USE_ROCKBOX_USB
+#define USB_STORAGE
+#else
 #define USB_CHARGING_ONLY
+#endif /* USE_ROCKBOX_USB */
+#else
+#define USB_CHARGING_ONLY
+#endif
 
 #include "usb_ch9.h"
 #include "usb_drv.h"
@@ -63,21 +70,21 @@ static const struct usb_device_descriptor device_descriptor = {
     .bcdDevice          = 0x0100,
     .iManufacturer      = 1,
     .iProduct           = 2,
-    .iSerialNumber      = 0,
+    .iSerialNumber      = 3,
     .bNumConfigurations = 1
 };
 
 static const struct {
     struct usb_config_descriptor config_descriptor;
     struct usb_interface_descriptor interface_descriptor;
-    struct usb_endpoint_descriptor ep1_hs_in_descriptor;
-    struct usb_endpoint_descriptor ep1_hs_out_descriptor;
-} config_data = 
+    struct usb_endpoint_descriptor ep1_in_descriptor;
+    struct usb_endpoint_descriptor ep1_out_descriptor;
+} config_data_fs = 
 {
     {
         .bLength             = sizeof(struct usb_config_descriptor),
         .bDescriptorType     = USB_DT_CONFIG,
-        .wTotalLength        = sizeof config_data,
+        .wTotalLength        = sizeof config_data_fs,
         .bNumInterfaces      = 1,
         .bConfigurationValue = 1,
         .iConfiguration      = 0,
@@ -96,7 +103,148 @@ static const struct {
         .bInterfaceClass    = USB_CLASS_VENDOR_SPEC,
         .bInterfaceSubClass = 0,
         .bInterfaceProtocol = 0,
+        .iInterface         = 5
+    },
+
+    {
+        .bLength          = sizeof(struct usb_endpoint_descriptor),
+        .bDescriptorType  = USB_DT_ENDPOINT,
+        .bEndpointAddress = EP_TX | USB_DIR_IN,
+        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
+        .wMaxPacketSize   = 512,
+        .bInterval        = 0
+    },
+    {
+        .bLength          = sizeof(struct usb_endpoint_descriptor),
+        .bDescriptorType  = USB_DT_ENDPOINT,
+        .bEndpointAddress = EP_RX | USB_DIR_OUT,
+        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
+        .wMaxPacketSize   = 512,
+        .bInterval        = 0
+    }
+#endif
+
+#ifdef USB_STORAGE
+    /* storage interface */
+    {
+        .bLength            = sizeof(struct usb_interface_descriptor),
+        .bDescriptorType    = USB_DT_INTERFACE,
+        .bInterfaceNumber   = 0,
+        .bAlternateSetting  = 0,
+        .bNumEndpoints      = 2,
+        .bInterfaceClass    = USB_CLASS_MASS_STORAGE,
+        .bInterfaceSubClass = USB_SC_SCSI,
+        .bInterfaceProtocol = USB_PROT_BULK,
+        .iInterface         = 0
+    },
+
+    {
+        .bLength          = sizeof(struct usb_endpoint_descriptor),
+        .bDescriptorType  = USB_DT_ENDPOINT,
+        .bEndpointAddress = EP_TX | USB_DIR_IN,
+        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
+        .wMaxPacketSize   = 16,
+        .bInterval        = 0
+    },
+    {
+        .bLength          = sizeof(struct usb_endpoint_descriptor),
+        .bDescriptorType  = USB_DT_ENDPOINT,
+        .bEndpointAddress = EP_RX | USB_DIR_OUT,
+        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
+        .wMaxPacketSize   = 16,
+        .bInterval        = 0
+    }
+#endif
+
+#ifdef USB_SERIAL
+    /* serial interface */
+    {
+        .bLength            = sizeof(struct usb_interface_descriptor),
+        .bDescriptorType    = USB_DT_INTERFACE,
+        .bInterfaceNumber   = 0,
+        .bAlternateSetting  = 0,
+        .bNumEndpoints      = 2,
+        .bInterfaceClass    = USB_CLASS_CDC_DATA,
+        .bInterfaceSubClass = 0,
+        .bInterfaceProtocol = 0,
+        .iInterface         = 0
+    },
+
+    {
+        .bLength          = sizeof(struct usb_endpoint_descriptor),
+        .bDescriptorType  = USB_DT_ENDPOINT,
+        .bEndpointAddress = EP_TX | USB_DIR_IN,
+        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
+        .wMaxPacketSize   = 64,
+        .bInterval        = 0
+    },
+    {
+        .bLength          = sizeof(struct usb_endpoint_descriptor),
+        .bDescriptorType  = USB_DT_ENDPOINT,
+        .bEndpointAddress = EP_RX | USB_DIR_OUT,
+        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
+        .wMaxPacketSize   = 64,
+        .bInterval        = 0
+    }
+#endif
+
+#ifdef USB_BENCHMARK
+    /* bulk test interface */
+    {
+        .bLength            = sizeof(struct usb_interface_descriptor),
+        .bDescriptorType    = USB_DT_INTERFACE,
+        .bInterfaceNumber   = 0,
+        .bAlternateSetting  = 0,
+        .bNumEndpoints      = 2,
+        .bInterfaceClass    = USB_CLASS_VENDOR_SPEC,
+        .bInterfaceSubClass = 255,
+        .bInterfaceProtocol = 255,
         .iInterface         = 4
+    },
+
+    {
+        .bLength          = sizeof(struct usb_endpoint_descriptor),
+        .bDescriptorType  = USB_DT_ENDPOINT,
+        .bEndpointAddress = EP_RX | USB_DIR_OUT,
+        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
+        .wMaxPacketSize   = 64,
+        .bInterval        = 0
+    },
+    {
+        .bLength          = sizeof(struct usb_endpoint_descriptor),
+        .bDescriptorType  = USB_DT_ENDPOINT,
+        .bEndpointAddress = EP_TX | USB_DIR_IN,
+        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
+        .wMaxPacketSize   = 64,
+        .bInterval        = 0
+    }
+#endif
+},
+config_data_hs = 
+{
+    {
+        .bLength             = sizeof(struct usb_config_descriptor),
+        .bDescriptorType     = USB_DT_CONFIG,
+        .wTotalLength        = sizeof config_data_hs,
+        .bNumInterfaces      = 1,
+        .bConfigurationValue = 1,
+        .iConfiguration      = 0,
+        .bmAttributes        = USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
+        .bMaxPower           = 250, /* 500mA in 2mA units */
+    },
+
+#ifdef USB_CHARGING_ONLY
+    /* dummy interface for charging-only */
+    {
+        .bLength            = sizeof(struct usb_interface_descriptor),
+        .bDescriptorType    = USB_DT_INTERFACE,
+        .bInterfaceNumber   = 0,
+        .bAlternateSetting  = 0,
+        .bNumEndpoints      = 2,
+        .bInterfaceClass    = USB_CLASS_VENDOR_SPEC,
+        .bInterfaceSubClass = 0,
+        .bInterfaceProtocol = 0,
+        .iInterface         = 5
     },
 
     {
@@ -168,7 +316,7 @@ static const struct {
         .bDescriptorType  = USB_DT_ENDPOINT,
         .bEndpointAddress = EP_TX | USB_DIR_IN,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 64,
+        .wMaxPacketSize   = 512,
         .bInterval        = 0
     },
     {
@@ -176,7 +324,7 @@ static const struct {
         .bDescriptorType  = USB_DT_ENDPOINT,
         .bEndpointAddress = EP_RX | USB_DIR_OUT,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 64,
+        .wMaxPacketSize   = 512,
         .bInterval        = 0
     }
 #endif
@@ -192,7 +340,7 @@ static const struct {
         .bInterfaceClass    = USB_CLASS_VENDOR_SPEC,
         .bInterfaceSubClass = 255,
         .bInterfaceProtocol = 255,
-        .iInterface         = 3
+        .iInterface         = 4
     },
 
     {
@@ -200,7 +348,6 @@ static const struct {
         .bDescriptorType  = USB_DT_ENDPOINT,
         .bEndpointAddress = EP_RX | USB_DIR_OUT,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-//        .wMaxPacketSize   = 64,
         .wMaxPacketSize   = 512,
         .bInterval        = 0
     },
@@ -209,7 +356,6 @@ static const struct {
         .bDescriptorType  = USB_DT_ENDPOINT,
         .bEndpointAddress = EP_TX | USB_DIR_IN,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-//        .wMaxPacketSize   = 64,
         .wMaxPacketSize   = 512,
         .bInterval        = 0
     }
@@ -228,72 +374,61 @@ static const struct usb_qualifier_descriptor qualifier_descriptor =
     .bNumConfigurations = 1
 };
 
-/* full speed = 12 Mbit */
-static const struct usb_endpoint_descriptor ep1_fs_in_descriptor =
+static struct usb_string_descriptor usb_string_iManufacturer =
 {
-    .bLength          = sizeof(struct usb_endpoint_descriptor),
-    .bDescriptorType  = USB_DT_ENDPOINT,
-    .bEndpointAddress = 1 | USB_DIR_IN,
-    .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize   = 64,
-    .bInterval        = 0
+    24,
+    USB_DT_STRING,
+    {'R','o','c','k','b','o','x','.','o','r','g'}
 };
 
-static const struct usb_endpoint_descriptor ep1_fs_out_descriptor =
+static struct usb_string_descriptor usb_string_iProduct =
 {
-    .bLength          = sizeof(struct usb_endpoint_descriptor),
-    .bDescriptorType  = USB_DT_ENDPOINT,
-    .bEndpointAddress = 1 | USB_DIR_OUT,
-    .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize   = 64,
-    .bInterval        = 0
+    42,
+    USB_DT_STRING,
+    {'R','o','c','k','b','o','x',' ','m','e','d','i','a',' ','p','l','a','y','e','r'}
 };
 
-static const struct usb_endpoint_descriptor* ep_descriptors[4] =
+static struct usb_string_descriptor usb_string_iSerial =
 {
-    &config_data.ep1_hs_in_descriptor,
-    &config_data.ep1_hs_out_descriptor,
-    &ep1_fs_in_descriptor,
-    &ep1_fs_out_descriptor
+    34, 
+    USB_DT_STRING, 
+    {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'}
 };
+
+
+/* Generic for all targets */
 
 /* this is stringid #0: languages supported */
-static const struct usb_string_descriptor lang_descriptor =
+static struct usb_string_descriptor lang_descriptor =
 {
-    sizeof(struct usb_string_descriptor),
+    4,
     USB_DT_STRING,
     {0x0409} /* LANGID US English */
 };
 
-/* this is stringid #1 and up: the actual strings */
-static const struct {
-    unsigned char size;
-    unsigned char type;
-    unsigned short string[32];
-} usb_strings[] =
+static struct usb_string_descriptor usb_string_usb_benchmark =
 {
-    {
-        24,
-        USB_DT_STRING,
-        {'R','o','c','k','b','o','x','.','o','r','g'}
-    },
-    {
-        42,
-        USB_DT_STRING,
-        {'R','o','c','k','b','o','x',' ','m','e','d','i','a',' ','p','l','a','y','e','r'}
-    },
-    {
-        40,
-        USB_DT_STRING,
-        {'B','u','l','k',' ','t','e','s','t',' ','i','n','t','e','r','f','a','c','e'}
-    },
-    {
-        28,
-        USB_DT_STRING,
-        {'C','h','a','r','g','i','n','g',' ','o','n','l','y'}
-    }
+    40,
+    USB_DT_STRING,
+    {'B','u','l','k',' ','t','e','s','t',' ','i','n','t','e','r','f','a','c','e'}
 };
 
+static struct usb_string_descriptor usb_string_charging_only =
+{
+    28,
+    USB_DT_STRING,
+    {'C','h','a','r','g','i','n','g',' ','o','n','l','y'}
+};
+
+static struct usb_string_descriptor* usb_strings[] =
+{
+   &lang_descriptor,
+   &usb_string_iManufacturer,
+   &usb_string_iProduct,
+   &usb_string_iSerial,
+   &usb_string_usb_benchmark,
+   &usb_string_charging_only
+};
 
 static int usb_address = 0;
 static bool initialized = false;
@@ -310,10 +445,44 @@ static void usb_core_thread(void);
 
 static void ack_control(struct usb_ctrlrequest* req);
 
+#ifdef IPOD_ARCH
+void set_serial_descriptor(void)
+{
+    static short hex[16] = {'0','1','2','3','4','5','6','7',
+                            '8','9','A','B','C','D','E','F'};
+#ifdef IPOD_VIDEO
+    uint32_t* serial = (uint32_t*)(0x20004034);
+#else
+    uint32_t* serial = (uint32_t*)(0x20002034);
+#endif
+
+    /* We need to convert from a little-endian 64-bit int
+       into a utf-16 string of hex characters */
+    short* p = &usb_string_iSerial.wString[15];
+    uint32_t x;
+    int i,j;
+
+    for (i = 0; i < 2; i++)
+    {
+       x = serial[i];
+       for (j=0;j<8;j++)
+       {
+          *p-- = hex[x & 0xf];
+          x >>= 4;
+       }
+    }
+
+}
+#endif
+
 void usb_core_init(void)
 {
     if (initialized)
         return;
+
+#ifdef IPOD_ARCH
+    set_serial_descriptor();
+#endif
 
     queue_init(&usbcore_queue, false);
     usb_drv_init();
@@ -469,43 +638,25 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
                     break;
 
                 case USB_DT_CONFIG:
-                    ptr = &config_data;
-                    size = sizeof config_data;
+                    if(usb_drv_port_speed())
+                    {
+                        ptr = &config_data_hs;
+                        size = sizeof config_data_hs;
+                    }
+                    else
+                    {
+                        ptr = &config_data_fs;
+                        size = sizeof config_data_fs;
+                    }
                     break;
 
                 case USB_DT_STRING:
-                    switch (index) {
-                        case 0: /* lang descriptor */
-                            ptr = &lang_descriptor;
-                            size = sizeof lang_descriptor;
-                            break;
-
-                        default:
-                            if ((unsigned)index <= (sizeof(usb_strings)/sizeof(usb_strings[0]))) {
-                                index -= 1;
-                                ptr = &usb_strings[index];
-                                size = usb_strings[index].size;
-                            }
-                            else {
-                                logf("bad string id %d", index);
-                                usb_drv_stall(EP_CONTROL, true);
-                            }
-                            break;
-                    }
-                    break;
-
-                case USB_DT_INTERFACE:
-                    ptr = &config_data.interface_descriptor;
-                    size = sizeof config_data.interface_descriptor;
-                    break;
-
-                case USB_DT_ENDPOINT:
-                    if (index <= NUM_ENDPOINTS) {
-                        ptr = &ep_descriptors[index];
-                        size = sizeof ep_descriptors[index];
+                    if ((unsigned)index < (sizeof(usb_strings)/sizeof(struct usb_string_descriptor*))) {
+                        ptr = usb_strings[index];
+                        size = usb_strings[index]->bLength;
                     }
                     else {
-                        logf("bad endpoint %d", index);
+                        logf("bad string id %d", index);
                         usb_drv_stall(EP_CONTROL, true);
                     }
                     break;
@@ -515,12 +666,6 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
                     size = sizeof qualifier_descriptor;
                     break;
 
-/*
-  case USB_DT_OTHER_SPEED_CONFIG:
-  ptr = &other_speed_descriptor;
-  size = sizeof other_speed_descriptor;
-  break;
-*/
                 default:
                     logf("bad desc %d", req->wValue >> 8);
                     usb_drv_stall(EP_CONTROL, true);

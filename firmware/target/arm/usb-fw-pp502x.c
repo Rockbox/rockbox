@@ -68,6 +68,9 @@ void usb_init_device(void)
 void usb_enable(bool on)
 {
     if (on) {
+#ifdef USE_ROCKBOX_USB
+        usb_core_init();
+#else
         /* until we have native mass-storage mode, we want to reboot on
            usb host connect */
 #if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
@@ -89,6 +92,7 @@ void usb_enable(bool on)
 
             system_reboot(); /* Reboot */
         }
+#endif  /* USE_ROCKBOX_USB */
     }
     else
         usb_core_exit();
@@ -195,9 +199,9 @@ int usb_detect(void)
         return status;
     }
 
-    /* Wait up to 50 ticks (500ms) before deciding there is no computer
+    /* Wait up to 100 ticks (1s) before deciding there is no computer
        attached. */
-    countdown = 50;
+    countdown = 100;
 
     return status;
 }

@@ -32,5 +32,8 @@ void usb_drv_set_address(int address);
 void usb_drv_reset_endpoint(int endpoint, bool send);
 void usb_drv_wait(int endpoint, bool send);
 bool usb_drv_powered(void);
+int usb_drv_get_last_transfer_status(void);
+int usb_drv_get_last_transfer_length(void);
+int usb_drv_port_speed(void);
 
 #endif

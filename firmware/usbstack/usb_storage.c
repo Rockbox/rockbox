@@ -24,6 +24,7 @@
 #include "logf.h"
 #include "ata.h"
 #include "hotswap.h"
+#include "disk.h"
 
 #define SECTOR_SIZE 512
 
@@ -40,13 +41,19 @@
 #define SCSI_TEST_UNIT_READY      0x00
 #define SCSI_INQUIRY              0x12
 #define SCSI_MODE_SENSE           0x1a
+#define SCSI_REQUEST_SENSE        0x03
 #define SCSI_ALLOW_MEDIUM_REMOVAL 0x1e
 #define SCSI_READ_CAPACITY        0x25
+#define SCSI_READ_FORMAT_CAPACITY 0x23
 #define SCSI_READ_10              0x28
 #define SCSI_WRITE_10             0x2a
+#define SCSI_START_STOP_UNIT      0x1b
 
 #define SCSI_STATUS_GOOD            0x00
+#define SCSI_STATUS_FAIL            0x01
 #define SCSI_STATUS_CHECK_CONDITION 0x02
+
+#define SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA 0x02000000
 
 
 struct inquiry_data {
@@ -60,6 +67,20 @@ struct inquiry_data {
     unsigned char VendorId[8];
     unsigned char ProductId[16];
     unsigned char ProductRevisionLevel[4];
+} __attribute__ ((packed));
+
+struct sense_data {
+    unsigned char ResponseCode;
+    unsigned char Obsolete;
+    unsigned char filemark_eom_ili_sensekey;
+    unsigned int Information;
+    unsigned char AdditionalSenseLength;
+    unsigned int  CommandSpecificInformation;
+    unsigned char AdditionalSenseCode;
+    unsigned char AdditionalSenseCodeQualifier;
+    unsigned char FieldReplaceableUnitCode;
+    unsigned char SKSV;
+    unsigned short SenseKeySpecific;
 } __attribute__ ((packed));
 
 struct command_block_wrapper {
@@ -84,26 +105,34 @@ struct capacity {
     unsigned int block_size;
 } __attribute__ ((packed));
 
-/* the ARC USB controller can at most buffer 16KB unaligned data */
-static unsigned char _transfer_buffer[16384];
-static unsigned char* transfer_buffer;
-static struct inquiry_data _inquiry;
-static struct inquiry_data* inquiry;
-static struct capacity _capacity_data;
-static struct capacity* capacity_data;
+struct format_capacity {
+    unsigned int following_length;
+    unsigned int block_count;
+    unsigned int block_size;
+} __attribute__ ((packed));
 
-//static unsigned char partial_sector[SECTOR_SIZE];
+/* the ARC USB controller can at most buffer 16KB unaligned data */
+static unsigned char _transfer_buffer[16384*8] __attribute((aligned (4096)));
+static unsigned char* transfer_buffer;
+static struct inquiry_data _inquiry CACHEALIGN_ATTR;
+static struct inquiry_data* inquiry;
+static struct capacity _capacity_data CACHEALIGN_ATTR;
+static struct capacity* capacity_data;
+static struct format_capacity _format_capacity_data CACHEALIGN_ATTR;
+static struct format_capacity* format_capacity_data;
+static struct sense_data _sense_data CACHEALIGN_ATTR;
+static struct sense_data *sense_data;
 
 static struct {
     unsigned int sector;
-    unsigned int offset; /* if partial sector */
     unsigned int count;
     unsigned int tag;
+    unsigned int lun;
 } current_cmd;
 
- void handle_scsi(struct command_block_wrapper* cbw);
- void send_csw(unsigned int tag, int status);
-static void identify2inquiry(void);
+static void handle_scsi(struct command_block_wrapper* cbw);
+static void send_csw(unsigned int tag, int status);
+static void identify2inquiry(int lun);
 
 static enum {
     IDLE,
@@ -117,7 +146,10 @@ void usb_storage_init(void)
     inquiry = (void*)UNCACHED_ADDR(&_inquiry);
     transfer_buffer = (void*)UNCACHED_ADDR(&_transfer_buffer);
     capacity_data = (void*)UNCACHED_ADDR(&_capacity_data);
-    identify2inquiry();
+    format_capacity_data = (void*)UNCACHED_ADDR(&_format_capacity_data);
+    sense_data = (void*)UNCACHED_ADDR(&_sense_data);
+    state = IDLE;
+    logf("usb_storage_init done");
 }
 
 /* called by usb_core_transfer_complete() */
@@ -128,21 +160,44 @@ void usb_storage_transfer_complete(int endpoint)
     switch (endpoint) {
         case EP_RX:
             //logf("ums: %d bytes in", length);
-            switch (state) {
-                case IDLE:
-                    handle_scsi(cbw);
-                    break;
-
-                default:
-                    break;
+            if(state == RECEIVING)
+            {
+                int receive_count=usb_drv_get_last_transfer_length();
+                logf("scsi write %d %d", current_cmd.sector, current_cmd.count);
+                if(usb_drv_get_last_transfer_status()==0)
+                {
+                    if((unsigned int)receive_count!=(SECTOR_SIZE*current_cmd.count))
+                    {
+                        logf("%d >= %d",SECTOR_SIZE*current_cmd.count,receive_count);
+                    }
+                    ata_write_sectors(IF_MV2(current_cmd.lun,)
+                                      current_cmd.sector, current_cmd.count,
+                                      transfer_buffer);
+                    send_csw(current_cmd.tag, SCSI_STATUS_GOOD);
+                }
+                else
+                {
+                    logf("Transfer failed %X",usb_drv_get_last_transfer_status());
+                    send_csw(current_cmd.tag, SCSI_STATUS_CHECK_CONDITION);
+                }
             }
-
-            /* re-prime endpoint */
-            usb_drv_recv(EP_RX, transfer_buffer, sizeof _transfer_buffer);
+            else
+            {
+                state = SENDING;
+                handle_scsi(cbw);
+            }
+            
             break;
 
         case EP_TX:
-            //logf("ums: %d bytes out", length);
+            //logf("ums: out complete");
+            if(state != IDLE)
+            {
+                /* re-prime endpoint. We only need room for commands */
+                state = IDLE;
+                usb_drv_recv(EP_RX, transfer_buffer, 1024);
+            }
+
             break;
     }
 }
@@ -156,7 +211,7 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req)
 
     switch (req->bRequest) {
         case USB_BULK_GET_MAX_LUN: {
-            static char maxlun = 0;
+            static char maxlun = NUM_VOLUMES - 1;
             logf("ums: getmaxlun");
             usb_drv_send(EP_CONTROL, UNCACHED_ADDR(&maxlun), 1);
             usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
@@ -174,8 +229,9 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req)
 
         case USB_REQ_SET_CONFIGURATION:
             logf("ums: set config");
-            /* prime rx endpoint */
-            usb_drv_recv(EP_RX, transfer_buffer, sizeof _transfer_buffer);
+            /* prime rx endpoint. We only need room for commands */
+            state = IDLE;
+            usb_drv_recv(EP_RX, transfer_buffer, 1024);
             handled = true;
             break;
     }
@@ -185,50 +241,138 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req)
 
 /****************************************************************************/
 
-void handle_scsi(struct command_block_wrapper* cbw)
+static void handle_scsi(struct command_block_wrapper* cbw)
 {
     /* USB Mass Storage assumes LBA capability.
        TODO: support 48-bit LBA */
 
+    unsigned int sectors_per_transfer=0;
     unsigned int length = cbw->data_transfer_length;
+    unsigned int block_size;
+    unsigned char lun = cbw->lun;
+    unsigned int block_size_mult = 1;
+#ifdef HAVE_HOTSWAP
+    tCardInfo* cinfo = card_get_info(lun);
+    block_size = cinfo->blocksize;
+    if(cinfo->initialized==1)
+    {
+       sectors_per_transfer=(sizeof _transfer_buffer/ block_size);
+    }
+#else
+    block_size = SECTOR_SIZE;
+    sectors_per_transfer=(sizeof _transfer_buffer/ block_size);
+#endif
+
+#ifdef MAX_LOG_SECTOR_SIZE
+    block_size_mult = disk_sector_multiplier;
+#endif
 
     switch (cbw->command_block[0]) {
         case SCSI_TEST_UNIT_READY:
-            logf("scsi test_unit_ready");
+            logf("scsi test_unit_ready %d",lun);
+#ifdef HAVE_HOTSWAP
+            if(cinfo->initialized==1)
+                send_csw(cbw->tag, SCSI_STATUS_GOOD);
+            else
+                send_csw(cbw->tag, SCSI_STATUS_FAIL);
+#else
             send_csw(cbw->tag, SCSI_STATUS_GOOD);
+#endif
             break;
 
         case SCSI_INQUIRY:
-            logf("scsi inquiry");
+            logf("scsi inquiry %d",lun);
+            identify2inquiry(lun);
             length = MIN(length, cbw->command_block[4]);
             usb_drv_send(EP_TX, inquiry, MIN(sizeof _inquiry, length));
             send_csw(cbw->tag, SCSI_STATUS_GOOD);
             break;
 
+        case SCSI_REQUEST_SENSE: {
+            sense_data->ResponseCode=0x70;
+            sense_data->filemark_eom_ili_sensekey=2;
+            sense_data->Information=2;
+            sense_data->AdditionalSenseLength=10;
+            sense_data->CommandSpecificInformation=0;
+            sense_data->AdditionalSenseCode=0x3a;
+            sense_data->AdditionalSenseCodeQualifier=0;
+            sense_data->FieldReplaceableUnitCode=0;
+            sense_data->SKSV=0;
+            sense_data->SenseKeySpecific=0;
+            logf("scsi request_sense %d",lun);
+            usb_drv_send(EP_TX, sense_data,
+                         sizeof(_sense_data));
+            send_csw(cbw->tag, SCSI_STATUS_GOOD);
+            break;
+        }
+
         case SCSI_MODE_SENSE: {
             static unsigned char sense_data[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-            logf("scsi mode_sense");
+            logf("scsi mode_sense %d",lun);
             usb_drv_send(EP_TX, UNCACHED_ADDR(&sense_data),
                          MIN(sizeof sense_data, length));
             send_csw(cbw->tag, SCSI_STATUS_GOOD);
             break;
         }
 
-        case SCSI_ALLOW_MEDIUM_REMOVAL:
-            logf("scsi allow_medium_removal");
+        case SCSI_START_STOP_UNIT:
+            logf("scsi start_stop unit %d",lun);
             send_csw(cbw->tag, SCSI_STATUS_GOOD);
             break;
 
-        case SCSI_READ_CAPACITY: {
-            logf("scsi read_capacity");
-#ifdef HAVE_FLASH_STORAGE
-            tCardInfo* cinfo = card_get_info(0);
-            capacity_data->block_count = htobe32(cinfo->numblocks);
-            capacity_data->block_size = htobe32(cinfo->blocksize);
+        case SCSI_ALLOW_MEDIUM_REMOVAL:
+            logf("scsi allow_medium_removal %d",lun);
+            send_csw(cbw->tag, SCSI_STATUS_GOOD);
+            break;
+
+        case SCSI_READ_FORMAT_CAPACITY: {
+            logf("scsi read_format_capacity %d",lun);
+            format_capacity_data->following_length=htobe32(8);
+#ifdef HAVE_HOTSWAP
+            /* Careful: "block count" actually means "number of last block" */
+            if(cinfo->initialized==1)
+            {
+                format_capacity_data->block_count = htobe32(cinfo->numblocks - 1);
+                format_capacity_data->block_size = htobe32(cinfo->blocksize);
+            }
+            else
+            {
+                format_capacity_data->block_count = htobe32(0);
+                format_capacity_data->block_size = htobe32(0);
+            }
 #else
             unsigned short* identify = ata_get_identify();
-            capacity_data->block_count = htobe32(identify[60] << 16 | identify[61]);
-            capacity_data->block_size = htobe32(SECTOR_SIZE);
+            /* Careful: "block count" actually means "number of last block" */
+            format_capacity_data->block_count = htobe32((identify[61] << 16 | identify[60]) / block_size_mult - 1);
+            format_capacity_data->block_size = htobe32(block_size * block_size_mult);
+#endif
+            format_capacity_data->block_size |= SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA;
+
+            usb_drv_send(EP_TX, format_capacity_data,
+                         MIN(sizeof _format_capacity_data, length));
+            send_csw(cbw->tag, SCSI_STATUS_GOOD);
+            break;
+        }
+
+        case SCSI_READ_CAPACITY: {
+            logf("scsi read_capacity %d",lun);
+#ifdef HAVE_HOTSWAP
+            /* Careful: "block count" actually means "number of last block" */
+            if(cinfo->initialized==1)
+            {
+                capacity_data->block_count = htobe32(cinfo->numblocks - 1);
+                capacity_data->block_size = htobe32(cinfo->blocksize);
+            }
+            else
+            {
+                capacity_data->block_count = htobe32(0);
+                capacity_data->block_size = htobe32(0);
+            }
+#else
+            unsigned short* identify = ata_get_identify();
+            /* Careful : "block count" actually means the number of the last block */
+            capacity_data->block_count = htobe32((identify[61] << 16 | identify[60]) / block_size_mult - 1);
+            capacity_data->block_size = htobe32(block_size * block_size_mult);
 #endif
             usb_drv_send(EP_TX, capacity_data,
                          MIN(sizeof _capacity_data, length));
@@ -237,43 +381,71 @@ void handle_scsi(struct command_block_wrapper* cbw)
         }
 
         case SCSI_READ_10:
-            current_cmd.sector =
-                cbw->command_block[2] << 24 |
+            current_cmd.sector = block_size_mult *
+               (cbw->command_block[2] << 24 |
                 cbw->command_block[3] << 16 |
                 cbw->command_block[4] << 8  |
-                cbw->command_block[5] ;
-            current_cmd.count =
-                cbw->command_block[7] << 16 |
-                cbw->command_block[8];
-            current_cmd.offset = 0;
+                cbw->command_block[5] );
+            current_cmd.count = block_size_mult *
+               (cbw->command_block[7] << 16 |
+                cbw->command_block[8]);
             current_cmd.tag = cbw->tag;
+            current_cmd.lun = cbw->lun;
 
-            logf("scsi read %d %d", current_cmd.sector, current_cmd.count);
+            //logf("scsi read %d %d", current_cmd.sector, current_cmd.count);
 
-            /* too much? */
-            if (current_cmd.count > (sizeof _transfer_buffer / SECTOR_SIZE)) {
-                send_csw(current_cmd.tag, SCSI_STATUS_CHECK_CONDITION);
-                break;
+            //logf("Asked for %d sectors",current_cmd.count);
+            if(current_cmd.count > sectors_per_transfer)
+            {
+                current_cmd.count = sectors_per_transfer;
             }
+            //logf("Sending %d sectors",current_cmd.count);
 
-            ata_read_sectors(IF_MV2(0,) current_cmd.sector, current_cmd.count,
-                             transfer_buffer);
-            state = SENDING;
-            usb_drv_send(EP_TX, transfer_buffer,
-                         MIN(current_cmd.count * SECTOR_SIZE, length));
+            if(current_cmd.count*block_size > sizeof(_transfer_buffer)) {
+                send_csw(current_cmd.tag, SCSI_STATUS_CHECK_CONDITION);
+            }
+            else {
+                ata_read_sectors(IF_MV2(lun,) current_cmd.sector,
+                                 current_cmd.count, transfer_buffer);
+                usb_drv_send(EP_TX, transfer_buffer,
+                             current_cmd.count*block_size);
+                send_csw(current_cmd.tag, SCSI_STATUS_GOOD);
+            }
             break;
 
         case SCSI_WRITE_10:
-            logf("scsi write10");
+            //logf("scsi write10");
+            current_cmd.sector = block_size_mult *
+               (cbw->command_block[2] << 24 |
+                cbw->command_block[3] << 16 |
+                cbw->command_block[4] << 8  |
+                cbw->command_block[5] );
+            current_cmd.count = block_size_mult *
+               (cbw->command_block[7] << 16 |
+                cbw->command_block[8]);
+            current_cmd.tag = cbw->tag;
+            current_cmd.lun = cbw->lun;
+            /* expect data */
+            if(current_cmd.count*block_size > sizeof(_transfer_buffer)) {
+                send_csw(current_cmd.tag, SCSI_STATUS_CHECK_CONDITION);
+            }
+            else {
+                usb_drv_recv(EP_RX, transfer_buffer,
+                             current_cmd.count*block_size);
+                state = RECEIVING;
+            }
+
             break;
 
         default:
-            logf("scsi unknown cmd %x", cbw->command_block[0]);
+            logf("scsi unknown cmd %x",cbw->command_block[0x0]);
+            usb_drv_stall(EP_TX, true);
+            send_csw(current_cmd.tag, SCSI_STATUS_GOOD);
             break;
     }
 }
 
-void send_csw(unsigned int tag, int status)
+static void send_csw(unsigned int tag, int status)
 {
     static struct command_status_wrapper _csw;
     struct command_status_wrapper* csw = UNCACHED_ADDR(&_csw);
@@ -287,16 +459,23 @@ void send_csw(unsigned int tag, int status)
 }
 
 /* convert ATA IDENTIFY to SCSI INQUIRY */
-static void identify2inquiry(void)
+static void identify2inquiry(int lun)
 {
-    unsigned int i;
 #ifdef HAVE_FLASH_STORAGE
-    for (i=0; i<8; i++)
-        inquiry->VendorId[i] = i + 'A';
-
-    for (i=0; i<8; i++)
-        inquiry->ProductId[i] = i + 'm';
+    if(lun==0)
+    {
+        memcpy(&inquiry->VendorId,"Rockbox ",8);
+        memcpy(&inquiry->ProductId,"Internal Storage",16);
+        memcpy(&inquiry->ProductRevisionLevel,"0.00",4);
+    }
+    else
+    {
+        memcpy(&inquiry->VendorId,"Rockbox ",8);
+        memcpy(&inquiry->ProductId,"SD Card Slot    ",16);
+        memcpy(&inquiry->ProductRevisionLevel,"0.00",4);
+    }
 #else
+    unsigned int i;
     unsigned short* dest;
     unsigned short* src;
     unsigned short* identify = ata_get_identify();
@@ -310,22 +489,27 @@ static void identify2inquiry(void)
     src = (unsigned short*)&identify[27];
     dest = (unsigned short*)&inquiry->VendorId;
     for (i=0;i<4;i++)
-        dest[i] = src[i];
+        dest[i] = htobe16(src[i]);
 
     src = (unsigned short*)&identify[27+8];
     dest = (unsigned short*)&inquiry->ProductId;
     for (i=0;i<8;i++)
-        dest[i] = src[i];
+        dest[i] = htobe16(src[i]);
     
     src = (unsigned short*)&identify[23];
     dest = (unsigned short*)&inquiry->ProductRevisionLevel;
     for (i=0;i<2;i++)
-        dest[i] = src[i];
+        dest[i] = htobe16(src[i]);
 #endif
 
     inquiry->DeviceType = DIRECT_ACCESS_DEVICE;
     inquiry->AdditionalLength = 0x1f;
     inquiry->Versions = 3; /* ANSI SCSI level 2 */
     inquiry->Format   = 3; /* ANSI SCSI level 2 INQUIRY format */
+
+#ifdef HAVE_HOTSWAP
+    inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
+#endif
+
 }
 
