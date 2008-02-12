@@ -1000,9 +1000,6 @@ static bool dbg_spdif(void)
 bool dbg_ports(void)
 {
 #if CONFIG_CPU == SH7034
-    unsigned short porta;
-    unsigned short portb;
-    unsigned char portc;
     char buf[32];
     int adc_battery_voltage, adc_battery_level;
 
@@ -1012,13 +1009,9 @@ bool dbg_ports(void)
 
     while(1)
     {
-        porta = PADR;
-        portb = PBDR;
-        portc = PCDR;
-
-        snprintf(buf, 32, "PADR: %04x", porta);
+        snprintf(buf, 32, "PADR: %04x", (unsigned short)PADR);
         lcd_puts(0, 0, buf);
-        snprintf(buf, 32, "PBDR: %04x", portb);
+        snprintf(buf, 32, "PBDR: %04x", (unsigned short)PBDR);
         lcd_puts(0, 1, buf);
 
         snprintf(buf, 32, "AN0: %03x AN4: %03x", adc_read(0), adc_read(4));
@@ -1126,10 +1119,6 @@ bool dbg_ports(void)
 
 #elif defined(CPU_PP502x)
 
-    unsigned int gpio_a, gpio_b, gpio_c, gpio_d;
-    unsigned int gpio_e, gpio_f, gpio_g, gpio_h;
-    unsigned int gpio_i, gpio_j, gpio_k, gpio_l;
-
     char buf[128];
     int line;
 
@@ -1139,36 +1128,29 @@ bool dbg_ports(void)
 
     while(1)
     {
-        gpio_a = GPIOA_INPUT_VAL;
-        gpio_b = GPIOB_INPUT_VAL;
-        gpio_c = GPIOC_INPUT_VAL;
-        gpio_d = GPIOD_INPUT_VAL;
-        gpio_e = GPIOE_INPUT_VAL;
-        gpio_f = GPIOF_INPUT_VAL;
-        gpio_g = GPIOG_INPUT_VAL;
-        gpio_h = GPIOH_INPUT_VAL;
-        gpio_i = GPIOI_INPUT_VAL;
-        gpio_j = GPIOJ_INPUT_VAL;
-        gpio_k = GPIOK_INPUT_VAL;
-        gpio_l = GPIOL_INPUT_VAL;
-
         line = 0;
-        snprintf(buf, sizeof(buf), "GPIO STATES:");
-        lcd_puts(0, line++, buf);
+        lcd_puts(0, line++, "GPIO STATES:");
         snprintf(buf, sizeof(buf), "A: %02x  E: %02x  I: %02x",
-                                   gpio_a, gpio_e, gpio_i);
+                                   (unsigned int)GPIOA_INPUT_VAL,
+                                   (unsigned int)GPIOE_INPUT_VAL,
+                                   (unsigned int)GPIOI_INPUT_VAL);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "B: %02x  F: %02x  J: %02x",
-                                   gpio_b, gpio_f, gpio_j);
+                                   (unsigned int)GPIOB_INPUT_VAL,
+                                   (unsigned int)GPIOF_INPUT_VAL,
+                                   (unsigned int)GPIOJ_INPUT_VAL);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "C: %02x  G: %02x  K: %02x",
-                                   gpio_c, gpio_g, gpio_k);
+                                   (unsigned int)GPIOC_INPUT_VAL,
+                                   (unsigned int)GPIOG_INPUT_VAL,
+                                   (unsigned int)GPIOK_INPUT_VAL);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "D: %02x  H: %02x  L: %02x",
-                                   gpio_d, gpio_h, gpio_l);
+                                   (unsigned int)GPIOD_INPUT_VAL,
+                                   (unsigned int)GPIOH_INPUT_VAL,
+                                   (unsigned int)GPIOL_INPUT_VAL);
         lcd_puts(0, line++, buf);
         line++;
-
         snprintf(buf, sizeof(buf), "GPO32_VAL: %08lx", GPO32_VAL);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPO32_EN:  %08lx", GPO32_ENABLE);
@@ -1186,11 +1168,11 @@ bool dbg_ports(void)
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         line++;
-        snprintf(buf, sizeof(buf), "BATT: %03x UNK1: %03x", adc_read(ADC_BATTERY),
-                                                            adc_read(ADC_UNKNOWN_1));
+        snprintf(buf, sizeof(buf), "BATT: %03x UNK1: %03x",
+                                adc_read(ADC_BATTERY), adc_read(ADC_UNKNOWN_1));
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "REM:  %03x PAD: %03x", adc_read(ADC_REMOTE),
-                                                           adc_read(ADC_SCROLLPAD));
+        snprintf(buf, sizeof(buf), "REM:  %03x PAD: %03x",
+                                 adc_read(ADC_REMOTE), adc_read(ADC_SCROLLPAD));
         lcd_puts(0, line++, buf);
 #elif defined(SANSA_E200)
         line++;
@@ -1238,15 +1220,12 @@ bool dbg_ports(void)
 
     while(1)
     {
-        gpio_a = GPIOA_INPUT_VAL;
-        gpio_b = GPIOB_INPUT_VAL;
-        gpio_c = GPIOC_INPUT_VAL;
-        gpio_d = GPIOD_INPUT_VAL;
-
         line = 0;
-        snprintf(buf, sizeof(buf), "GPIO_A: %02x GPIO_B: %02x", gpio_a, gpio_b);
+        snprintf(buf, sizeof(buf), "GPIO_A: %02x GPIO_B: %02x",
+                 (unsigned int)GPIOA_INPUT_VAL, (unsigned int)GPIOB_INPUT_VAL);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_C: %02x GPIO_D: %02x", gpio_c, gpio_d);
+        snprintf(buf, sizeof(buf), "GPIO_C: %02x GPIO_D: %02x",
+                 (unsigned int)GPIOC_INPUT_VAL, (unsigned int)GPIOD_INPUT_VAL);
         lcd_puts(0, line++, buf);
 
         snprintf(buf, sizeof(buf), "DEV_EN:       %08lx", DEV_EN);
@@ -1278,9 +1257,6 @@ bool dbg_ports(void)
 #else /* !HAVE_LCD_BITMAP */
 bool dbg_ports(void)
 {
-    unsigned short porta;
-    unsigned short portb;
-    unsigned char portc;
     char buf[32];
     int button;
     int adc_battery_voltage;
@@ -1290,17 +1266,13 @@ bool dbg_ports(void)
 
     while(1)
     {
-        porta = PADR;
-        portb = PBDR;
-        portc = PCDR;
-
         switch(currval)
         {
         case 0:
-            snprintf(buf, 32, "PADR: %04x", porta);
+            snprintf(buf, 32, "PADR: %04x", (unsigned short)PADR);
             break;
         case 1:
-            snprintf(buf, 32, "PBDR: %04x", portb);
+            snprintf(buf, 32, "PBDR: %04x", (unsigned short)PBDR);
             break;
         case 2:
             snprintf(buf, 32, "AN0: %03x", adc_read(0));
