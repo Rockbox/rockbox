@@ -199,7 +199,7 @@ struct mp3entry {
     int index;             /* playlist index */
 
     /* runtime database fields */
-    long tagcache_idx;
+    long tagcache_idx;     /* 0=invalid, otherwise idx+1 */
     int rating;
     int score;
     long playcount;

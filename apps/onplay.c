@@ -958,7 +958,7 @@ static int set_rating_inline(void)
     {
         set_int_ex(str(LANG_MENU_SET_RATING), "", UNIT_INT, (void*)(&id3->rating),
                    NULL, 1, 0, 10, NULL, NULL);
-        tagcache_update_numeric(id3->tagcache_idx, tag_rating, id3->rating);
+        tagcache_update_numeric(id3->tagcache_idx-1, tag_rating, id3->rating);
     }
     else
         gui_syncsplash(HZ*2, ID2P(LANG_ID3_NO_INFO));

@@ -655,7 +655,7 @@ static void tagtree_buffer_event(struct mp3entry *id3)
     id3->playtime   = tagcache_get_numeric(&tcs, tag_playtime);
     
     /* Store our tagcache index pointer. */
-    id3->tagcache_idx = tcs.idx_id;
+    id3->tagcache_idx = tcs.idx_id+1;
     
     tagcache_search_finish(&tcs);
 }
@@ -665,6 +665,7 @@ static void tagtree_unbuffer_event(struct mp3entry *id3)
     long playcount;
     long playtime;
     long lastplayed;
+    long tagcache_idx;
     
     /* Do not gather data unless proper setting has been enabled. */
     if (!global_settings.runtimedb)
@@ -673,11 +674,13 @@ static void tagtree_unbuffer_event(struct mp3entry *id3)
         return;
     }
     
-    if (!id3->tagcache_idx)
+    tagcache_idx=id3->tagcache_idx;
+    if (!tagcache_idx)
     {
         logf("No tagcache index pointer found");
         return;
     }
+    tagcache_idx--;
     
     /* Don't process unplayed tracks. */
     if (id3->elapsed == 0)
@@ -702,9 +705,9 @@ static void tagtree_unbuffer_event(struct mp3entry *id3)
     logf("-> %ld/%ld/%ld", id3->elapsed, id3->length, MIN(id3->length, id3->elapsed + 15 * 1000));
 
     /* Queue the updates to the tagcache system. */
-    tagcache_update_numeric(id3->tagcache_idx, tag_playcount, playcount);
-    tagcache_update_numeric(id3->tagcache_idx, tag_playtime, playtime);
-    tagcache_update_numeric(id3->tagcache_idx, tag_lastplayed, lastplayed);
+    tagcache_update_numeric(tagcache_idx, tag_playcount, playcount);
+    tagcache_update_numeric(tagcache_idx, tag_playtime, playtime);
+    tagcache_update_numeric(tagcache_idx, tag_lastplayed, lastplayed);
 }
 
 bool tagtree_export(void)
