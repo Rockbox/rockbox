@@ -1209,8 +1209,6 @@ bool dbg_ports(void)
     }
 
 #elif CONFIG_CPU == PP5002
-    unsigned int gpio_a, gpio_b, gpio_c, gpio_d;
-
     char buf[128];
     int line;
 
