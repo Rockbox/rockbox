@@ -177,6 +177,8 @@ enum {
     Q_SET_WATERMARK,
     Q_START_FILL,        /* Request that the buffering thread initiate a buffer
                             fill at its earliest convenience */
+    Q_HANDLE_ADDED,      /* Inform the buffering thread that a handle was added,
+                            (which means the disk is spinning) */
 };
 
 /* Buffering thread */
@@ -936,6 +938,10 @@ int bufopen(const char *file, size_t offset, enum data_type type)
         /* Other types will get buffered in the course of normal operations */
         h->fd = -1;
         close(fd);
+
+        /* Inform the buffering thread that we added a handle */
+        LOGFQUEUE("buffering > Q_HANDLE_ADDED %d", h->id);
+        queue_post(&buffering_queue, Q_HANDLE_ADDED, h->id);
     }
 
     logf("bufopen: new hdl %d", h->id);
@@ -1356,6 +1362,12 @@ void buffering_thread(void)
             case Q_CLOSE_HANDLE:
                 LOGFQUEUE("buffering < Q_CLOSE_HANDLE");
                 queue_reply(&buffering_queue, close_handle((int)ev.data));
+                break;
+
+            case Q_HANDLE_ADDED:
+                LOGFQUEUE("buffering < Q_HANDLE_ADDED %d", (int)ev.data);
+                /* A handle was added: the disk is spinning, so we can fill */
+                filling = true;
                 break;
 
             case Q_BASE_HANDLE:
