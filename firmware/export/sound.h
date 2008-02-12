@@ -22,8 +22,6 @@
 #include <inttypes.h>
 #include <audiohw.h>
 
-extern void audiohw_postinit(void);
-
 typedef void sound_set_type(int value);
 
 const char *sound_unit(int setting);

@@ -109,6 +109,11 @@ extern const struct sound_settings_info audiohw_settings[];
 void audiohw_init(void);
 
 /**
+ * Do some stuff (codec related) after audiohw_init.
+ */
+void audiohw_postinit(void);
+
+/**
  * Close audio codec.
  */
 void audiohw_close(void);
