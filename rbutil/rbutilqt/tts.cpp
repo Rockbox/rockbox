@@ -20,11 +20,12 @@
 #include "tts.h"
 
 
+// static variables
+QMap<QString,QString> TTSBase::ttsList;
+QMap<QString,TTSBase*> TTSBase::ttsCache;
 
-static QMap<QString,QString> ttsList;
-static QMap<QString,TTSBase*> ttsCache;
- 
-void initTTSList()
+// static functions
+void TTSBase::initTTSList()
 {
     ttsList["espeak"] = "Espeak TTS Engine";
     ttsList["flite"] = "Flite TTS Engine";
@@ -32,11 +33,11 @@ void initTTSList()
 #if defined(Q_OS_WIN)
     ttsList["sapi"] = "Sapi TTS Engine";
 #endif
-  
+
 }
 
 // function to get a specific encoder
-TTSBase* getTTS(QString ttsName)
+TTSBase* TTSBase::getTTS(QString ttsName)
 {
     // check cache
     if(ttsCache.contains(ttsName))
@@ -52,13 +53,13 @@ TTSBase* getTTS(QString ttsName)
     else 
     {
         tts = new TTSExes(ttsName);
-        ttsCache[ttsName] = tts; 
+        ttsCache[ttsName] = tts;
         return tts;
     }
 }
 
 // get the list of encoders, nice names
-QStringList getTTSList()
+QStringList TTSBase::getTTSList()
 {
     // init list if its empty
     if(ttsList.count() == 0)
@@ -67,7 +68,8 @@ QStringList getTTSList()
     return ttsList.keys();
 }
 
-QString getTTSName(QString tts)
+// get nice name of a specific tts
+QString TTSBase::getTTSName(QString tts)
 {
     if(ttsList.isEmpty())
         initTTSList();

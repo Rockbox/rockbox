@@ -31,7 +31,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     m_logger->addItem(tr("Starting Talk file generation"),LOGINFO);
     
     //tts
-    m_tts = getTTS(settings->curTTS());  
+    m_tts = TTSBase::getTTS(settings->curTTS());  
     m_tts->setCfg(settings);
     
     QString errStr;

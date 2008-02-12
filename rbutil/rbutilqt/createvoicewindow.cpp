@@ -91,10 +91,10 @@ void CreateVoiceWindow::setSettings(RbSettings* sett)
     ui.comboLanguage->setCurrentIndex(sel);
     
     QString ttsName = settings->curTTS();
-    TTSBase* tts = getTTS(ttsName);
+    TTSBase* tts = TTSBase::getTTS(ttsName);
     tts->setCfg(settings);
     if(tts->configOk())
-        ui.labelTtsProfile->setText(tr("Selected TTS engine : <b>%1</b>").arg(getTTSName(ttsName)));
+        ui.labelTtsProfile->setText(tr("Selected TTS engine : <b>%1</b>").arg(TTSBase::getTTSName(ttsName)));
     else
         ui.labelTtsProfile->setText(tr("Selected TTS Engine: <b>%1</b>").arg("Invalid TTS configuration!"));
     

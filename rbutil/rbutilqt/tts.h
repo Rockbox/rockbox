@@ -31,86 +31,84 @@
 #include "ttsguicli.h"
 #endif
 
-class TTSBase;
-
-//inits the tts List
-void initTTSList();
-// function to get a specific tts
-TTSBase* getTTS(QString ttsname);
-// get the list of tts, nice names
-QStringList getTTSList();
-QString getTTSName(QString tts);
-
 
 class TTSBase : public QObject
 {
     Q_OBJECT
-public:
-    TTSBase();
-    virtual bool voice(QString text,QString wavfile) {(void)text; (void)wavfile; return false;}
-    virtual bool start(QString *errStr){(void)errStr; return false;}
-    virtual bool stop(){return false;}
-    virtual void showCfg(){}
-    virtual bool configOk(){return false;}
-    
-    void setCfg(RbSettings* sett){settings = sett;}
-     
-public slots:
-    virtual void accept(void){}
-    virtual void reject(void){}
-    virtual void reset(void){}
+    public:
+        TTSBase();
+        virtual bool voice(QString text,QString wavfile)
+            { (void)text; (void)wavfile; return false; }
+        virtual bool start(QString *errStr) { (void)errStr; return false; }
+        virtual bool stop() { return false; }
+        virtual void showCfg(){}
+        virtual bool configOk() { return false; }
 
-protected:
-    RbSettings* settings;
+        void setCfg(RbSettings* sett) { settings = sett; }
+        
+        static TTSBase* getTTS(QString ttsname);
+        static QStringList getTTSList();
+        static QString getTTSName(QString tts);
+        
+    public slots:
+        virtual void accept(void){}
+        virtual void reject(void){}
+        virtual void reset(void){}
+        
+    private:
+        //inits the tts List
+        static void initTTSList();
+
+    protected:
+        RbSettings* settings;
+        static QMap<QString,QString> ttsList;
+        static QMap<QString,TTSBase*> ttsCache;
 };
 
 class TTSSapi : public TTSBase
 {
  Q_OBJECT
-public:
-    TTSSapi();
-    virtual bool voice(QString text,QString wavfile);
-    virtual bool start(QString *errStr);
-    virtual bool stop();
-    virtual void showCfg();
-    virtual bool configOk();
-   
-   QStringList getVoiceList(QString language);
-private:
+    public:
+        TTSSapi();
+        virtual bool voice(QString text,QString wavfile);
+        virtual bool start(QString *errStr);
+        virtual bool stop();
+        virtual void showCfg();
+        virtual bool configOk();
     
-    QProcess* voicescript;
-    
-    QString defaultLanguage;
-    
-    QString m_TTSexec;
-    QString m_TTSOpts;
-    QString m_TTSTemplate;
-    QString m_TTSLanguage;
-    QString m_TTSVoice;
-    QString m_TTSSpeed;
-    bool m_sapi4;
+        QStringList getVoiceList(QString language);
+    private:
+        QProcess* voicescript;
+        
+        QString defaultLanguage;
+        
+        QString m_TTSexec;
+        QString m_TTSOpts;
+        QString m_TTSTemplate;
+        QString m_TTSLanguage;
+        QString m_TTSVoice;
+        QString m_TTSSpeed;
+        bool m_sapi4;
 };
+
 
 class TTSExes : public TTSBase
 {
- Q_OBJECT
-public:
-    TTSExes(QString name);
-    virtual bool voice(QString text,QString wavfile);
-    virtual bool start(QString *errStr);
-    virtual bool stop() {return true;}
-    virtual void showCfg();
-    virtual bool configOk();
-   
+    Q_OBJECT
+    public:
+        TTSExes(QString name);
+        virtual bool voice(QString text,QString wavfile);
+        virtual bool start(QString *errStr);
+        virtual bool stop() {return true;}
+        virtual void showCfg();
+        virtual bool configOk();
 
-    
-private:
-
-    QString m_name;
-    QString m_TTSexec;
-    QString m_TTSOpts;
-    QString m_TTSTemplate;
-    QMap<QString,QString> m_TemplateMap;
+    private:
+        QString m_name;
+        QString m_TTSexec;
+        QString m_TTSOpts;
+        QString m_TTSTemplate;
+        QMap<QString,QString> m_TemplateMap;
 };
 
 #endif

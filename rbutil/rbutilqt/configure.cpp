@@ -299,9 +299,9 @@ void Config::setDevices()
     updateEncState(index);
 
     //tts
-    QStringList ttslist = getTTSList();
+    QStringList ttslist = TTSBase::getTTSList();
     for(int a = 0; a < ttslist.size(); a++)
-        ui.comboTts->addItem(getTTSName(ttslist.at(a)), ttslist.at(a));
+        ui.comboTts->addItem(TTSBase::getTTSName(ttslist.at(a)), ttslist.at(a));
     //update index of combobox
     index = ui.comboTts->findData(settings->curTTS());
     if(index < 0) index = 0;
@@ -314,7 +314,7 @@ void Config::setDevices()
 void Config::updateTtsState(int index)
 {
     QString ttsName = ui.comboTts->itemData(index).toString();
-    TTSBase* tts = getTTS(ttsName);
+    TTSBase* tts = TTSBase::getTTS(ttsName);
     tts->setCfg(settings);
     
     if(tts->configOk())
@@ -588,7 +588,7 @@ void Config::cacheClear()
 void Config::configTts()
 {
     int index = ui.comboTts->currentIndex();
-    TTSBase* tts = getTTS(ui.comboTts->itemData(index).toString());
+    TTSBase* tts = TTSBase::getTTS(ui.comboTts->itemData(index).toString());
     
     tts->setCfg(settings);
     tts->showCfg();

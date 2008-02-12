@@ -141,7 +141,7 @@ void VoiceFileCreator::downloadDone(bool error)
     }    
 
     //tts
-    m_tts = getTTS(settings->curTTS());  
+    m_tts = TTSBase::getTTS(settings->curTTS());  
     m_tts->setCfg(settings);
     
     QString errStr;
