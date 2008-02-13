@@ -86,6 +86,7 @@ class RbSettings : public QObject
         QString curBrand();
         QString curName();
         QString curPlatform();
+        QString curPlatformName();
         QString curManual();
         bool curReleased();
         QString curBootloaderMethod();

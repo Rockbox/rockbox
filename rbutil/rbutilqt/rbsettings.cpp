@@ -190,6 +190,15 @@ QString RbSettings::curPlatform()
     return userSettings->value("platform").toString();
 }
 
+QString RbSettings::curPlatformName()
+{
+    QString platform = userSettings->value("platform").toString();
+    devices->beginGroup(platform);
+    QString name = devices->value("platform").toString();
+    devices->endGroup();
+    return name;
+}
+
 QString RbSettings::curManual()
 {
     QString platform = userSettings->value("platform").toString();

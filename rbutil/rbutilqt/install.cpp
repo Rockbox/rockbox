@@ -58,7 +58,7 @@ void Install::accept()
     }
 
     QString myversion;
-    QString buildname = settings->curPlatform();
+    QString buildname = settings->curPlatformName();
     if(ui.radioStable->isChecked()) {
         file = QString("%1/rockbox-%2-%3.zip")
                 .arg(settings->downloadUrl(),
