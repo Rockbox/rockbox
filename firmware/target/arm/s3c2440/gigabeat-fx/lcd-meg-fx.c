@@ -70,7 +70,7 @@ void reset_LCD(bool reset)
         GPBDAT&=~0x80;
 }
 
-void SPI_Send_Bytes(unsigned char *array, int count)
+void SPI_Send_Bytes(const unsigned char *array, int count)
 {
     while (count--)       
     {
@@ -113,6 +113,7 @@ void Setup_LCD_CTRL(void)
 void lcd_init_device(void)
 {
 #ifdef BOOTLOADER
+    int i;
     /* When the Rockbox bootloader starts, we are changing framebuffer address,
        but we don't want what's shown on the LCD to change until we do an
        lcd_update(), so copy the data from the old framebuffer to the new one */
