@@ -37,7 +37,7 @@ the Archos firmware to there, too.
 \note{For now, the binary contained in the brand new player flash package does 
 contain Rockbox built from current CVS in the second image slot. This is to 
 lower the risk of flashing (at least one of the images will hopefully work) in 
-case you don't program a second image yourself in the first step. Of course the
+case you do not program a second image yourself in the first step. Of course the
 second image can be replaced like with the other models.}
 
 There are two programming tools supplied:
@@ -45,18 +45,18 @@ There are two programming tools supplied:
 \begin{itemize}
 \item The first one is called \fname{firmware\_flash.rock} and is used to 
   program the whole flash with a new content. You can also use it to revert 
-  back to the original firmware you've hopefully backup-ed. In the ideal case, 
+  back to the original firmware you have hopefully backup-ed. In the ideal case, 
   you'll need this tool only once. You can view this as "formatting" the flash 
   with the desired image structure.
 \item The second one is called \fname{rockbox\_flash.rock} and is used to 
-  reprogram only the second image. It won't touch any other byte, should be 
+  reprogram only the second image. It will not touch any other byte, should be 
   safe to fool around with. If the programmed firmware is in-operational, you 
   can still use the \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} start with the Archos firmware and Rockbox booted
   from disk to try better.
 \end{itemize}
 
 The non-user tools are in the \fname{flash} subdirectory of the CVS source 
-files. There's an authoring tool which composed the firmware file with the 
+files. There is an authoring tool which composed the firmware file with the 
 bootloader and the 2 images. The bootloader project, a firmware extraction 
 tool, the plugin sources, and the tools for the UART boot feature: a monitor 
 program for the box and a PC tool to drive it. Feel free to review the sources 
@@ -72,7 +72,7 @@ to bulletproof this code. The new firmware file is completely read before it
 starts programming, there are a lot of sanity checks. If any fails, it will not
 program. Before releasing this, we have checked the flow with exactly these 
 files supplied here, starting from the original firmware in flash. It worked 
-reliably, there's no reason why such low level code should behave different on 
+reliably, there is no reason why such low level code should behave different on 
 your box.
 
 \opt{player}{
@@ -86,11 +86,11 @@ your box.
   }
 }
 
-There's one ultimate safety net to bring back boxes with even completely 
+There is one ultimate safety net to bring back boxes with even completely 
 garbled flash content: the \emph{UART} boot mod, which in turn requires the 
 serial mod. It can bring the dead back to life, in that it is possible to 
 re-flash independently from the outside, even if the flash is completely erased.
-It has been used that during development, else Rockbox in flash wouldn't have 
+It has been used that during development, else Rockbox in flash would not have 
 been possible. Extensive development effort went into the exploitation of the 
 UART boot mod. Mechanically adept users with good soldering skills can easily 
 perform these mods. Others may feel uncomfortable using the first tool 
@@ -102,23 +102,23 @@ are unlikely to experience problems. The flash tools have been stable for quite
 a while. Several users have used them extensively, even flashing while playing!
 Although it worked, it is not the recommended method.
 
-About the safety of operation: Since we have dual boot, you're not giving up 
+About the safety of operation: Since we have dual boot, you are not giving up 
 the Archos firmware. It is still there when you hold
 \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} during startup. So even if Rockbox from flash is not 100\% stable for
 everyone, you can still use the box, re-flash the second image with an updated 
 Rockbox copy, etc.
 
-The flash chip being used by Archos is specified for 100,000 cycles, so you don't need to worry about that wearing out.
+The flash chip being used by Archos is specified for 100,000 cycles, so you do not need to worry about that wearing out.
 
 \subsection{Requirements}
 You need two things:
 \begin{itemize}
-\item The first is a \playername. Be sure you're using the correct package, 
+\item The first is a \playername. Be sure you are using the correct package, 
   they are different!
 \item Second, you need an in-circuit programmable flash. \opt{recorder,recorderv2fm,player}{The older chips are not flashable.}\opt{ondio}{This should always 
   be flashable on Ondios, because Archos does itself provide flash updates for 
   these.} You can find out via Rockbox (\setting{Info $\rightarrow$ Debug $\rightarrow$ Hardware Info}). If the flash info gives you question marks (Flash M=?? D=??), 
-  you're out of luck. The only chance then is to solder in the right chip 
+  you are out of luck. The only chance then is to solder in the right chip 
   (SST39VF020), at best with the firmware already in. If the chip is blank, 
   you'll need the UART boot mod as well.
 \end{itemize}
@@ -151,11 +151,11 @@ Long version, step by step procedure:
   This is purely for security reasons, flashing does not need more power than usual.
 \item Run the \fname{firmware\_flash.rock} plugin. It again tells you about your 
   flash and the file it is going to program. After \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} it checks the file. Your 
-  hardware mask value will be kept, it won't overwrite it. Hitting \opt{recorder,recorderv2fm}{\ButtonFTwo}\opt{ondio}{\ButtonUp}\opt{player}{\ButtonOn} gives you 
-  a big warning. If we still didn't manage to scare you off, you can hit\opt{recorder,recorderv2fm}{\ButtonFThree}\opt{ondio}{\ButtonRight}\opt{player}{\ButtonRight} to actually program and verify. The programming takes just a few seconds. If 
+  hardware mask value will be kept, it will not overwrite it. Hitting \opt{recorder,recorderv2fm}{\ButtonFTwo}\opt{ondio}{\ButtonUp}\opt{player}{\ButtonOn} gives you 
+  a big warning. If we still did not manage to scare you off, you can hit\opt{recorder,recorderv2fm}{\ButtonFThree}\opt{ondio}{\ButtonRight}\opt{player}{\ButtonRight} to actually program and verify. The programming takes just a few seconds. If 
   the sanity check fails, you have the wrong kind of boot ROM and are out of luck
   by now, sorry.
-\item In the unlikely event that the programming should give you any error, don't
+\item In the unlikely event that the programming should give you any error, do not
   switch off the box! Otherwise you'll have seen it working for the last time. 
   While Rockbox is still in DRAM and operational, we could upgrade the plugin via
   USB and try again. If you switch it off, it is gone.
@@ -188,9 +188,9 @@ Long version:
 
 The second image is the working copy, the \fname{rockbox\_flash.rock} plugin from
 this package re-programs it. The plugins needs to be consistent with the Rockbox 
-plugin API version, otherwise it will detect mismatch and won't run.
+plugin API version, otherwise it will detect mismatch and will not run.
 
-It requires an exotic input, a UCL-compressed image, because that's the internal 
+It requires an exotic input, a UCL-compressed image, because that is the internal 
 format. UCL is a nice open-source compression library. The decompression is very 
 fast and less than a page of C-code. The efficiency is even better than Zip with 
 maximum compression, reduces file size to about 58\% of the original size. For 
@@ -212,7 +212,7 @@ Here are the steps:
   content to the USB drive, replacing the old.
 \item Force a disk boot by holding \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} during power-up, or at least rolo into
   the new Rockbox version by \emph{Playing} the \fname{ajbrec.ajz}/fname{archos.mod} file. This may not always be necessary, but it is better to first run the 
-  version you're about to flash. It is required if you are currently running 
+  version you are about to flash. It is required if you are currently running 
   RomBox.
 \item Just \emph{play} the \fname{.ucl} file in the \fname{.rockbox} directory, 
   this will kick off the \fname{rockbox\_flash.rock} plugin. It is a bit similar 
@@ -229,7 +229,7 @@ and can run directly from flash ROM, saving some RAM. The second way is the newe
 and now preferred one. Use this if available.
 
 If you like or have to, you can also flash the Archos image as the second one. 
-E.g. in case Rockbox from flash doesn't work for you. This way you keep the dual 
+E.g. in case Rockbox from flash does not work for you. This way you keep the dual 
 bootloader and you can easily try different later. The \fname{.ucl} of the Archos
 firmware is included in the package.
 

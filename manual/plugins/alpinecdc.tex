@@ -13,11 +13,11 @@ Hookup to Archos works by connecting the headphone output including the remote
 pin (you need a 4-ring 3.5 mm plug for that) to the changer jack of the radio.
 M-Bus radios have a DIN-style circular jack with 8 pins (7 in a $\sim$ 270 degree
 circle, one in the center). A standard 5-pin DIN plug is OK for this, since we
-don't use the other (power) pins.
+do not use the other (power) pins.
 
 As OEM, they shuffled the pins around a bit, better check first if it is not
 genuine Alpine. The bus pin is pulled high to 12 volts with a $\sim$ 2kOhm resistor,
-pulses driven low. Because it's open collector, this is not harmful to the
+pulses driven low. Because it is open collector, this is not harmful to the
 Archos.\\
 ASCII art of the 4-pin headphone plug:
 \begin{verbatim}
@@ -28,12 +28,12 @@ ASCII art of the 4-pin headphone plug:
 |_| ground  -> Alpine pin 2 + 3
 \end{verbatim}
 
-The remote pin can be programmed bidirectional, that's the reason this works.
+The remote pin can be programmed bidirectional, that is the reason this works.
 Very luckily the M-Bus uses a single wire communication and the two radios I
 tried are happy with the 3.3 Volt level the Arcos can deliver. So the
 connection is a simple cable! For all protocols requiring more lines, an
 external controller would be necessary.
 
-\note{Archos FMs don't have the remote pin internally connected, but
+\note{Archos FMs do not have the remote pin internally connected, but
   one unit that was opened was internally prepared for it, a matter of closing a
   bridge.} 
