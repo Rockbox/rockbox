@@ -17,6 +17,18 @@ If you shut down your player, the scan will continue next time you turn it on.
 After the scan is finished you may be prompted to restart your \dap{} before
 you can use the database.
 
+\subsubsection{Ignoring directories during database initialization}
+
+You may have directories on your \dap{} whose contents should not be added
+to the database. Placing a file named \fname{database.ignore} in a directory
+will exclude the files in that directory and all its subdirectories from
+scanning their tags and adding them to the database. This will speed up the
+database initialization.
+
+If a subdirectory of an 'ignored' directory should still be scanned, place a
+file named \fname{database.unignore} in it. The files in that directory and
+its subdirectories will be scanned and added to the database.
+
 \subsection{\label{ref:databasemenu}The Database Menu}
 
 \begin{description}
@@ -103,16 +115,32 @@ to RAM.}
 \begin{center}
   \begin{tabularx}{.75\textwidth}{XX}%
   \toprule%
-  \textbf{Supported Tags}   & \textbf{Unsupported Tags} \\
+  \textbf{Tag}   & \textbf{Type}  & \textbf{Origin} \\
   \midrule
-  Artist           & Comment \\
-  Album            & Performer\\
-  Bitrate          & \\
-  Composer         & \\
-  Genre            & \\
-  Length           & \\
-  Title            & \\
-  Track Number     & \\
+  filename              & string    & system \\ 
+  album                 & string    & id tag \\
+  albumartist           & string    & id tag \\
+  artist                & string    & id tag \\
+  comment               & string    & id tag \\
+  composer              & string    & id tag \\
+  genre                 & string    & id tag \\
+  grouping              & string    & id tag \\
+  title                 & string    & id tag \\
+  bitrate               & numeric   & id tag \\
+  discnum               & numeric   & id tag \\
+  year                  & numeric   & id tag \\
+  tracknum              & numeric   & id tag/filename \\
+  autoscore             & numeric   & runtime db \\
+  lastplayed            & numeric   & runtime db \\
+  playcount             & numeric   & runtime db \\
+  Pm (play time - min)  & numeric   & runtime db \\
+  Ps (play time - sec)  & numeric   & runtime db \\
+  rating                & numeric   & runtime db \\
+  commitid              & numeric   & system \\
+  entryage              & numeric   & system \\
+  length                & numeric   & system \\
+  Lm (track len - min)  & numeric   & system \\
+  Ls (track len - sec)  & numeric   & system \\
   \bottomrule
   \end{tabularx}
 \end{center}
