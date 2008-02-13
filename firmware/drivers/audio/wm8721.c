@@ -141,7 +141,7 @@ void audiohw_enable_output(bool enable)
     }
 }
 
-int audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_master_vol(int vol_l, int vol_r)
 {
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
     /* 1111111 == +6dB */
@@ -150,8 +150,6 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
     /* 0101111 == mute (0x2f) */
     wmcodec_write(LOUTVOL, VOLUME_ZC_WAIT | vol_l);
     wmcodec_write(ROUTVOL, VOLUME_ZC_WAIT | vol_r);
- 
-    return 0;
 }
 
 /* Nice shutdown of WM8721 codec */

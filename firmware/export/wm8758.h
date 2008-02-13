@@ -27,9 +27,9 @@
 extern int tenthdb2master(int db);
 extern int tenthdb2mixer(int db);
 
-extern int audiohw_set_master_vol(int vol_l, int vol_r);
-extern int audiohw_set_lineout_vol(int vol_l, int vol_r);
-extern int audiohw_set_mixer_vol(int channel1, int channel2);
+extern void audiohw_set_master_vol(int vol_l, int vol_r);
+extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
+extern void audiohw_set_mixer_vol(int channel1, int channel2);
 extern void audiohw_set_bass(int value);
 extern void audiohw_set_bass_cutoff(int value);
 extern void audiohw_set_treble(int value);

@@ -218,7 +218,7 @@ void audiohw_enable_output(bool enable)
     }
 }
 
-int audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_master_vol(int vol_l, int vol_r)
 {
     unsigned int hph_r = as3514.regs[HPH_OUT_R] & ~0x1f;
     unsigned int hph_l = as3514.regs[HPH_OUT_L] & ~0x1f;
@@ -262,16 +262,12 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
     as3514_write(mix_reg_l, mix_l);
     as3514_write(HPH_OUT_R, hph_r);
     as3514_write(HPH_OUT_L, hph_l);
-
-    return 0;
 }
 
-int audiohw_set_lineout_vol(int vol_l, int vol_r)
+void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     as3514_write(LINE_OUT_R, vol_r);
     as3514_write(LINE_OUT_L, (1 << 6) | vol_l);
-
-    return 0;
 }
 
 void audiohw_mute(bool mute)

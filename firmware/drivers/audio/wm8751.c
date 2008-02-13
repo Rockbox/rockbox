@@ -164,7 +164,7 @@ void audiohw_postinit(void)
 #endif
 }
 
-int audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_master_vol(int vol_l, int vol_r)
 {
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
     /* 1111111 ==  +6dB                                    */
@@ -174,15 +174,13 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
 
     wmcodec_write(LOUT1, LOUT1_BITS | LOUT1_LOUT1VOL(vol_l));
     wmcodec_write(ROUT1, ROUT1_BITS | ROUT1_ROUT1VOL(vol_r));
-    return 0;
 }
 
 #ifndef MROBE_100
-int audiohw_set_lineout_vol(int vol_l, int vol_r)
+void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     wmcodec_write(LOUT2, LOUT2_BITS | LOUT2_LOUT2VOL(vol_l));
     wmcodec_write(ROUT2, ROUT2_BITS | ROUT2_ROUT2VOL(vol_r));
-    return 0;
 }
 #endif
 

@@ -125,18 +125,18 @@ static int uda1380_write_reg(unsigned char reg, unsigned short value)
 /**
  * Sets left and right master volume  (0(max) to 252(muted))
  */
-int audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_master_vol(int vol_l, int vol_r)
 {
-    return uda1380_write_reg(REG_MASTER_VOL,
+    uda1380_write_reg(REG_MASTER_VOL,
                              MASTER_VOL_LEFT(vol_l) | MASTER_VOL_RIGHT(vol_r));
 }
 
 /**
  * Sets mixer volume for both channels (0(max) to 228(muted))
  */
-int audiohw_set_mixer_vol(int channel1, int channel2)
+void audiohw_set_mixer_vol(int channel1, int channel2)
 {
-    return uda1380_write_reg(REG_MIX_VOL,
+    uda1380_write_reg(REG_MIX_VOL,
                              MIX_VOL_CH_1(channel1) | MIX_VOL_CH_2(channel2));
 }
 

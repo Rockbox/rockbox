@@ -188,7 +188,7 @@ void audiohw_postinit(void)
 #endif
 }
 
-int audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_master_vol(int vol_l, int vol_r)
 {
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
     /* 1111111 == +6dB */
@@ -197,7 +197,6 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
     /* 0101111 == mute (0x2f) */
     wm8731_write(LOUTVOL, LOUTVOL_LZCEN | (vol_l & LOUTVOL_LHPVOL_MASK));
     wm8731_write(ROUTVOL, ROUTVOL_RZCEN | (vol_r & ROUTVOL_RHPVOL_MASK));
-    return 0;
 }
 
 /* Nice shutdown of WM8731 codec */

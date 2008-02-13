@@ -118,30 +118,24 @@ void audiohw_enable_output(bool enable)
     }
 }
 
-int audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_master_vol(int vol_l, int vol_r)
 {
     /* OUT1 */
     wmcodec_write(LOUT1VOL, 0x080 | vol_l);
     wmcodec_write(ROUT1VOL, 0x180 | vol_r);
-
-    return 0;
 }
 
-int audiohw_set_lineout_vol(int vol_l, int vol_r)
+void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     /* OUT2 */
     wmcodec_write(LOUT2VOL, vol_l);
     wmcodec_write(ROUT2VOL, 0x100 | vol_r);
-    
-    return 0;
 }
 
-int audiohw_set_mixer_vol(int channel1, int channel2)
+void audiohw_set_mixer_vol(int channel1, int channel2)
 {
     (void)channel1;
     (void)channel2;
-
-    return 0;
 }
 
 void audiohw_set_bass(int value)

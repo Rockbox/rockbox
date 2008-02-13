@@ -124,7 +124,7 @@ void audiohw_enable_output(bool enable)
 
 
 
-int audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_master_vol(int vol_l, int vol_r)
 {
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
     /* 1111111 == +6dB */
@@ -135,17 +135,13 @@ int audiohw_set_master_vol(int vol_l, int vol_r)
     /* OUT1 */
     wmcodec_write(LOUT1VOL, VOLUME_ZC_WAIT | vol_l);
     wmcodec_write(ROUT1VOL, VOLUME_ZC_WAIT | 0x100 | vol_r);
-
-    return 0;
 }
 
-int audiohw_set_lineout_vol(int vol_l, int vol_r)
+void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     /* OUT2 */
     wmcodec_write(LOUT2VOL, VOLUME_ZC_WAIT | vol_l);
     wmcodec_write(ROUT2VOL, VOLUME_ZC_WAIT | 0x100 | vol_r);
-
-    return 0;
 }
 
 void audiohw_set_bass(int value)

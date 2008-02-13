@@ -55,22 +55,20 @@ void audiohw_enable_output(bool enable)
     (void)enable;
 }
 
-int audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_master_vol(int vol_l, int vol_r)
 {
     #warning function not implemented
 
     (void)vol_l;
     (void)vol_r;
-    return 0;
 }
 
-int audiohw_set_lineout_vol(int vol_l, int vol_r)
+void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
      #warning function not implemented
 
     (void)vol_l;
     (void)vol_r;
-     return 0;
 }
 
 void audiohw_set_bass(int value)
