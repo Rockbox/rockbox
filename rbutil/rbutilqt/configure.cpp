@@ -289,9 +289,9 @@ void Config::setDevices()
     
     //encoders
     int index;
-    QStringList encoders = getEncoderList();
+    QStringList encoders = EncBase::getEncoderList();
     for(int a = 0; a < encoders.size(); a++)
-        ui.comboEncoder->addItem(getEncoderName(encoders.at(a)), encoders.at(a));
+        ui.comboEncoder->addItem(EncBase::getEncoderName(encoders.at(a)), encoders.at(a));
     //update index of combobox
     index = ui.comboEncoder->findData(settings->curEncoder());
     if(index < 0) index = 0;
@@ -332,7 +332,7 @@ void Config::updateTtsState(int index)
 void Config::updateEncState(int index)
 {
     QString encoder = ui.comboEncoder->itemData(index).toString();
-    EncBase* enc = getEncoder(encoder);
+    EncBase* enc = EncBase::getEncoder(encoder);
     enc->setCfg(settings);
     
     if(enc->configOk())
@@ -599,7 +599,7 @@ void Config::configTts()
 void Config::configEnc()
 {
     int index = ui.comboEncoder->currentIndex();
-    EncBase* enc = getEncoder(ui.comboEncoder->itemData(index).toString());
+    EncBase* enc = EncBase::getEncoder(ui.comboEncoder->itemData(index).toString());
     
     enc->setCfg(settings);
     enc->showCfg();

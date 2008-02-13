@@ -26,12 +26,13 @@
 #include "encodersguicli.h"
 #endif
 
-static QMap<QString,QString> encoderList;
-static QMap<QString,EncBase*> encoderCache;
+
+QMap<QString,QString> EncBase::encoderList;
+QMap<QString,EncBase*> EncBase::encoderCache;
 
 
 // initialize list of encoders
-void initEncodernamesList()
+void EncBase::initEncodernamesList()
 {
     encoderList["rbspeex"] = "Rockbox Speex Encoder";
     encoderList["lame"] = "Lame Mp3 Encoder";
@@ -39,7 +40,7 @@ void initEncodernamesList()
 
 
 // get nice name for a specific encoder
-QString getEncoderName(QString encoder)
+QString EncBase::getEncoderName(QString encoder)
 {
     if(encoderList.isEmpty())
         initEncodernamesList();
@@ -48,7 +49,7 @@ QString getEncoderName(QString encoder)
 
 
 // get a specific encoder object
-EncBase* getEncoder(QString encoder)
+EncBase* EncBase::getEncoder(QString encoder)
 {
     // check cache
     if(encoderCache.contains(encoder))
@@ -70,7 +71,7 @@ EncBase* getEncoder(QString encoder)
 }
 
 
-QStringList getEncoderList()
+QStringList EncBase::getEncoderList()
 {
     if(encoderList.isEmpty())
         initEncodernamesList();

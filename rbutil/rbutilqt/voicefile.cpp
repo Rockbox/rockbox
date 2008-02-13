@@ -155,7 +155,7 @@ void VoiceFileCreator::downloadDone(bool error)
     }
 
     // Encoder
-    m_enc = getEncoder(settings->curEncoder());  
+    m_enc = EncBase::getEncoder(settings->curEncoder());  
     m_enc->setCfg(settings);
   
     if(!m_enc->start())
