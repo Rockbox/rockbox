@@ -54,13 +54,28 @@ void* main(void)
     int button;
     int power_count = 0;
     int count = 0;
-    int i;
     bool do_power_off = false;
+    
+#if defined(COWON_D2)
+    int i,rc,fd,len;
+    int* buf = (int*)0x21000000; /* Unused DRAM */
+#endif
 
-    system_init();
-    adc_init();
+    power_init();
     lcd_init();
+    system_init();
+    
+#if defined(COWON_D2)
+    kernel_init();
+#endif
+
+    adc_init();
+    button_init();
+    backlight_init();
+
     font_init();
+
+    lcd_setfont(FONT_SYSFIXED);
 
 #if defined(COWON_D2)
     lcd_enable(true);
@@ -69,7 +84,50 @@ void* main(void)
     _backlight_on();
 
 #if defined(COWON_D2)
-    ata_init();
+    printf("ATA");
+    rc = ata_init();
+    if(rc)
+    {
+        reset_screen();
+        error(EATA, rc);
+    }
+
+    printf("mount");
+    rc = disk_mount_all();
+    if (rc<=0)
+    {
+        error(EDISK,rc);
+    }
+
+#if 0
+    printf("opening test file...");
+
+    fd = open("/test.bin", O_RDONLY);
+    if (fd < 0) panicf("could not open test file");
+    
+    len = filesize(fd);
+    printf("Length: %x", len);
+
+    lseek(fd, 0, SEEK_SET);
+    read(fd, buf, len);
+    close(fd);
+    
+    printf("testing contents...");
+    
+    i = 0;
+    while (buf[i] == i && i<(len/4)) { i++; }
+
+    if (i < len/4)
+    {
+        printf("mismatch at %x [0x%x]", i, buf[i]);
+    }
+    else
+    {
+        printf("passed!");
+    }
+    while (!button_read_device()) {};
+    while (button_read_device()) {};
+#endif
 #endif
 
     while(!do_power_off) {
@@ -103,8 +161,9 @@ void* main(void)
             printf("ADC%d: 0x%04x",i,adc_read(i));
         }
 
-        /* TODO: Establish how the touchscreen driver is going to work. 
-           Since it needs I2C read/write, it can't easily go on a tick task */
+        /* TODO: Move this stuff out to a touchscreen driver and establish
+           how such a beast is going to work. Since it needs I2C read/write,
+           it can't easily go on an interrupt-based tick task. */
         {
             unsigned char buf[] = { 0x2f, (0xE<<1) | 1, /* ADC start for X+Y */
                                     0, 0, 0 };
@@ -115,6 +174,11 @@ void* main(void)
             y = (buf[4] << 2) | ((buf[3] & 0xC) >> 2);
             printf("X: 0x%03x Y: 0x%03x",x,y);
 
+            x = (x*LCD_WIDTH) / 1024;
+            y = (y*LCD_HEIGHT) / 1024;
+            lcd_hline(x-5, x+5, y);
+            lcd_vline(x, y-5, y+5);
+            
             buf[0] = 0x2f;
             buf[1] = (0xF<<1) | 1;   /* ADC start for P1+P2 */
             i2c_write(0x10, buf, 2);
