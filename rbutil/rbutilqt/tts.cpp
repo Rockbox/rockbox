@@ -300,6 +300,8 @@ void TTSSapi::showCfg()
 
 bool TTSSapi::configOk()
 {
+    if(settings->ttsVoice("sapi").isEmpty())
+        return false;
     return true;
 }
 
