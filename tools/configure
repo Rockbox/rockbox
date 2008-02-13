@@ -1585,9 +1585,6 @@ fi
       echo "GDB stub build selected"
       ;;
     [Mm])
-      appsdir='\$(ROOTDIR)/manual'
-      firmdir='\$(ROOTDIR)/manual/platform' # No Makefile here.  Effectively ig:res target
-      toolsdir=$firmdir;
       toolset='';
       apps="manual"
       echo "Manual build selected"

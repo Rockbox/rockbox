@@ -7,11 +7,16 @@
 # $Id$
 #
 
+# Needed to build the features list.
+INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDIR)	\
+ -I$(BUILDDIR)/bitmaps -I$(OBJDIR)
 
 .PHONY: all buildmanual clean
 MANFILE := rockbox-build
 
 all: manual-pdf 
+
+features: $(OBJDIR)/features
 
 manual-prep: rockbox.tex
 	@if [ "$(OBJDIR)" = "" ]; then echo Run make in you build directory!; false; fi
@@ -25,7 +30,15 @@ manual-prep: rockbox.tex
 	@printf "\\\\input{rockbox.tex}\n" >> $(OBJDIR)/$(MANFILE).tex
 	@mv $(OBJDIR)/Makefile.pdflatex $(OBJDIR)/Makefile
 
-manual-pdf: manual-prep rockbox.tex
+$(OBJDIR)/features: $(ROOTDIR)/apps/features.txt
+	$(SILENT)mkdir -p `dirname $@`
+	$(SILENT)cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
+	$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
+	grep -v "^\#" | grep -v "^$$" > $@; \
+	for f in `cat $(OBJDIR)/features`; do feat="$$feat\n\\\edef\\UseOption{\\UseOption,$$f}" ; done ; \
+	echo -e "$$feat" >$(OBJDIR)/features.tex
+
+manual-pdf: features manual-prep rockbox.tex
 	$(MAKE) -C $(OBJDIR) buildmanual
 
 manual-html: manual-prep rockbox.tex
