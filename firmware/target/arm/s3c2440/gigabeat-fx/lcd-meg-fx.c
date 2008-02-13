@@ -42,10 +42,76 @@ unsigned int LCDBASEL(unsigned int address)
     return (address & ((1 << 22)-1)) >> 1;
 }
 
+inline void delay_cycles(volatile int delay)
+{
+    while(delay>0) delay--;
+}
+
+void SPI_LCD_CS(bool select)
+{
+    delay_cycles(0x4FFF);
+
+    GPBCON&=~0x30000;
+    GPBCON|=0x10000;
+
+    if(select)
+        GPBDAT|=0x100;
+    else 
+        GPBDAT&=~0x100;
+}
+
+void reset_LCD(bool reset)
+{
+    GPBCON&=~0xC000;
+    GPBCON|=0x4000;
+    if(reset)
+        GPBDAT|=0x80;
+    else
+        GPBDAT&=~0x80;
+}
+
+void SPI_Send_Bytes(unsigned char *array, int count)
+{
+    while (count--)       
+    {
+        while ((SPSTA0&0x01)==0){};
+        SPTDAT0=*array++;
+    }
+}
+
+void Setup_LCD_SPI(void)
+{
+    CLKCON|=0x40000;
+    SPI_LCD_CS(false);
+    SPCON0=0x3E;
+    SPPRE0=24;
+}
+
+void Setup_LCD_CTRL(void)
+{
+    /* ENVID = 0, BPPMODE = 16 bpp, PNRMODE = TFT, MMODE = Each Frame, CLKVAL = 8 */
+    LCDCON1 = 0x878;
+
+    /* VCPW = 1, VFPD = 5, LINEVAL = 319, VBPD = 7 */
+    LCDCON2 = 0x74FC141;
+    
+    /* HFPD = 9, HOZVAL = 239, HBPD = 7 */
+    LCDCON3 = 0x38EF09;
+
+    /* HSPW = 7 */
+    LCDCON4 = 7;
+    
+    /* HWSWP = 1, INVVFRAM = 1, INVVLINE = 1, FRM565 = 1, All others = 0 */
+    LCDCON5 = 0xB01;
+
+    LCDSADDR1 = (LCDBANK((unsigned)FRAME) << 21) | (LCDBASEU((unsigned)FRAME));
+    LCDSADDR2 = LCDBASEL((unsigned)FRAME);
+    LCDSADDR3 = 0x000000F0;
+}
+
 /* LCD init */
 void lcd_init_device(void)
 {
-    int i;
 #ifdef BOOTLOADER
     /* When the Rockbox bootloader starts, we are changing framebuffer address,
        but we don't want what's shown on the LCD to change until we do an
@@ -62,66 +128,82 @@ void lcd_init_device(void)
     }
 #endif
 
-    LCDSADDR1 = (LCDBANK((unsigned)FRAME) << 21) | (LCDBASEU((unsigned)FRAME));
-    LCDSADDR2 = LCDBASEL((unsigned)FRAME);
-    LCDSADDR3 = 0x000000F0;
+    /* Set pins up */
+    GPCCON  |= 0xAAA000A8;
+    GPCUP   |= 0xFC0E;
+
+    GPDCON  |= 0xAAA0AAA0;
+    GPDUP   |= 0xFCFC;
+
+    GPHUP   &= 0x600;
+
+    GPECON  |= 0x0A800000;
+    GPEUP   |= 0x3800;
+
+    GPBUP   |= 0x181;
 
 #if !defined(BOOTLOADER)
     lcd_poweroff = false;
 #endif
-
-    /* ENVID = 1, BPPMODE = 16 bpp, PNRMODE = TFT, MMODE = Each Frame, CLKVAL = 8 */
-    LCDCON1 = 0x879;
-
-    /* VCPW = 1, VFPD = 5, LINEVAL = 319, VBPD = 7 */
-    LCDCON2 = 0x74FC141;
     
-    /* HFPD = 9, HOZVAL = 239, HBPD = 7 */
-    LCDCON3 = 0x38EF09;
+    CLKCON  |= 0x20;       /* enable LCD clock */
 
-    /* HSPW = 7 */
-    LCDCON4 = 7;
+    Setup_LCD_SPI();
+
+    Setup_LCD_CTRL();
+
+    delay_cycles(0xA000);
+
+    reset_LCD(true);    
+    LCDCON1|=0x01;
+
+    delay_cycles(0x80000);
+
+#if 0
+    /* Setup the appropriate screen modes */
+    TCONSEL= 0xCE6;
+#endif
     
-    /* HWSWP = 1, INVVFRAM = 1, INVVLINE = 1, FRM565 = 1, All others = 0 */
-    LCDCON5 = 0xB01;
-
-    /* LCD controller reset */
-    GPBCON = (GPBCON & ~((1<<15)|(1<<17))) | (1<<16)|(1<<14); /* GPB7=OUT, GPB8=OUT */
-    GPBDAT |= (1<<7);               /* LCD reset */
-    GPBUP  |= (1<<8) | (1<<7) | 1;  /* pullup GPB8, GPB7, GPB0(?) */
-    CLKCON |= (1<<5);               /* enable LCD clock */
-
-    /* SPI bus transfer */
-    GPBDAT &= ~(1<<8);  /* LCD CS off */
-
-    /* Start the SPI interface */
-    CLKCON |= 1<<18;    /* enable SPI clock */
-    SPCON0 = 0x3E;      /* enable iterrupt mode, master,active low,format B    */
-    SPPRE0 = 0x18;      /* Baud rate = PCLK(50MHz) / 2 / (Prescaler value + 1) */
-
     /* SPI data - Right now we are not sure what each of these SPI writes is actually
-     *    telling the lcd.  Many thanks to Alex Gerchanovsky for discovering them.
+     *      telling the lcd.  Many thanks to Alex Gerchanovsky for discovering them.
+     *
+     * This looks like a register, data combination, 0 denoting a register address,
+     *      1 denoting data.  Addr 0x04 is used more than once and may be an enable.
      */
-    const unsigned char initbuf[] = {
-        0,0x0F,1,0x01, 0,0x09,1,0x06, 0,0x16,1,0xA6, 0,0x1E,1,0x49, 0,0x1F,1,0x26, 
-        0,0x0B,1,0x2F, 0,0x0C,1,0x2B, 0,0x19,1,0x5E, 0,0x1A,1,0x15, 0,0x1B,1,0x15, 
-        0,0x1D,1,0x01, 0,0x00,1,0x03, 0,0x01,1,0x10, 0,0x02,1,0x0A, 0,0x06,1,0x04, 
-        0,0x08,1,0x2E, 0,0x24,1,0x12, 0,0x25,1,0x3F, 0,0x26,1,0x0B, 0,0x27,1,0x00,
-        0,0x28,1,0x00, 0,0x29,1,0xF6, 0,0x2A,1,0x03, 0,0x2B,1,0x0A, 0,0x04,1,0x01};
-
-    /* Send the SPI data */
-    for (i=0;i<(int)sizeof(initbuf);i++)
+    const unsigned char initbuf[] = 
     {
-        while ((SPSTA0&1)==0);
-        SPRDAT0 = initbuf[i];
-        do{int x;for(x=1000*51/2;x;x--);} while (0);
-    }
+        0,0x0F,1,0x01, 
+        0,0x09,1,0x06, 
+        0,0x16,1,0xA6, 
+        0,0x1E,1,0x49, 
+        0,0x1F,1,0x26, 
+        0,0x0B,1,0x2F, 
+        0,0x0C,1,0x2B, 
+        0,0x19,1,0x5E, 
+        0,0x1A,1,0x15, 
+        0,0x1B,1,0x15, 
+        0,0x1D,1,0x01, 
+        0,0x00,1,0x03, 
+        0,0x01,1,0x10, 
+        0,0x02,1,0x0A, 
+        0,0x06,1,0x04, 
+        0,0x08,1,0x2E, 
+        0,0x24,1,0x12, 
+        0,0x25,1,0x3F,
+        0,0x26,1,0x0B, 
+        0,0x27,1,0x00,
+        0,0x28,1,0x00, 
+        0,0x29,1,0xF6, 
+        0,0x2A,1,0x03, 
+        0,0x2B,1,0x0A, 
+        0,0x04,1,0x01,
+    };
 
-    /* Stop the SPI interface */
-    SPPRE0 = 0;
-    SPCON0 = 0;
-    CLKCON &= ~(1<<18); /* disable SPI clock */
-    GPBDAT |= (1<<8);   /* LCD CS on */
+    SPI_LCD_CS(true);
+    SPI_Send_Bytes(initbuf, sizeof(initbuf));
+    SPI_LCD_CS(false);
+
+    CLKCON  &= ~0x40000;    /* disable SPI clock */  
 }
 
 /* Update a fraction of the display. */
