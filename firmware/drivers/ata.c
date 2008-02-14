@@ -90,7 +90,7 @@ static long last_user_activity = -1;
 long last_disk_activity = -1;
 
 static int multisectors; /* number of supported multisectors */
-static unsigned short identify_info[SECTOR_SIZE];
+static unsigned short identify_info[SECTOR_SIZE/2];
 
 #ifdef MAX_PHYS_SECTOR_SIZE
 struct sector_cache_entry {
