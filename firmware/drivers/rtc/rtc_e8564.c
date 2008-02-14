@@ -48,6 +48,8 @@
 /* Timer register flags */
 #define RTC_TE     0x80
 
+bool rtc_lock_alarm_clear=true;
+
 void rtc_init(void)
 {
     unsigned char tmp;
@@ -59,8 +61,8 @@ void rtc_init(void)
     
     /* read value of the Control 2 register - we'll need it to preserve alarm and timer interrupt assertion flags */
     rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
-    /* clear alarm and timer interrupts */
-    tmp &= (RTC_TF | RTC_AF);
+    /* preserve alarm and timer interrupt flags */
+    tmp &= (RTC_TF | RTC_AF | RTC_TIE | RTC_AIE);
     pp_i2c_send(0x51, RTC_CTRL2,tmp);
 }
 
@@ -149,19 +151,23 @@ bool rtc_enable_alarm(bool enable)
 {
     unsigned char tmp=0;
     int rv=0;
-    
+
     if(enable)
     {
         /* enable alarm interrupt */
         rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
         tmp |= RTC_AIE;
+        tmp &= ~RTC_AF;
         pp_i2c_send(0x51, RTC_CTRL2,tmp);
     }
     else
     {
-        /* disable alarm interrupt */
+        /* disable alarm interrupt */       
+        if(rtc_lock_alarm_clear)
+            /* lock disabling alarm before it was checked whether or not the unit was started by RTC alarm */
+            return false;        
         rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
-        tmp &= ~RTC_AIE;
+        tmp &= ~(RTC_AIE | RTC_AF);
         pp_i2c_send(0x51, RTC_CTRL2,tmp);
     }
     
@@ -185,9 +191,9 @@ bool rtc_check_alarm_started(bool release_alarm)
         /* read Control 2 register which contains alarm flag */
         rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
 
-        alarm_state = started = tmp & (RTC_AF | RTC_AIE);
+        alarm_state = started = ( (tmp & RTC_AF) && (tmp & RTC_AIE) );
         
-        if(release_alarm)
+        if(release_alarm && started)
         {
             rv = i2c_readbytes(0x51,RTC_CTRL2,1,&tmp);
             /* clear alarm interrupt enable and alarm flag */
@@ -195,6 +201,7 @@ bool rtc_check_alarm_started(bool release_alarm)
             pp_i2c_send(0x51, RTC_CTRL2,tmp);
         }
         run_before = true;
+        rtc_lock_alarm_clear = false;
     }
     
     return started;
