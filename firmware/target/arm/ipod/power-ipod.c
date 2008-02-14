@@ -120,8 +120,12 @@ void power_off(void)
     lcd_clear_display();
     lcd_update();
 #ifndef BOOTLOADER
+#if defined(IPOD_VIDEO) || defined(IPOD_NANO)
     _backlight_off_normal();
+#else
+    _backlight_off();
 #endif
+#endif /* BOOTLOADER */
     sleep(HZ/16);
 #endif
 
