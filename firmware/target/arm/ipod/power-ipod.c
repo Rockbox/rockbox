@@ -27,7 +27,6 @@
 #include "pcf50605.h"
 #include "usb.h"
 #include "lcd.h"
-#include "backlight-target.h"
 
 void power_init(void)
 {
@@ -119,13 +118,6 @@ void power_off(void)
     lcd_set_background(LCD_WHITE);
     lcd_clear_display();
     lcd_update();
-#ifndef BOOTLOADER
-#if defined(IPOD_VIDEO) || defined(IPOD_NANO)
-    _backlight_off_normal();
-#else
-    _backlight_off();
-#endif
-#endif /* BOOTLOADER */
     sleep(HZ/16);
 #endif
 
