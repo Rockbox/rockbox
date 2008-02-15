@@ -92,7 +92,7 @@
 #include "pcf50605.h"
 #endif
 
-#if CONFIG_CPU == DM320 || CONFIG_CPU == S3C2440
+#if CONFIG_CPU == DM320 || CONFIG_CPU == S3C2440 || CONFIG_CPU == TCC7801
 #include "debug-target.h"
 #endif
 

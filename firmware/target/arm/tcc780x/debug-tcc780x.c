@@ -26,8 +26,8 @@
 #include "lcd.h"
 #include "sprintf.h"
 #include "font.h"
+#include "debug-target.h"
 
-bool __dbg_ports(void);
 bool __dbg_ports(void)
 {
     return false;
@@ -36,7 +36,6 @@ bool __dbg_ports(void)
 //extern char r_buffer[5];
 //extern int r_button;
 
-bool __dbg_hw_info(void);
 bool __dbg_hw_info(void)
 {
     int line = 0, button, oldline;
