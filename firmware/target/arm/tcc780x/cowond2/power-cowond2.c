@@ -59,22 +59,6 @@ void charger_enable(bool on)
 
 void power_off(void)
 {
-    /* Disable interrupts on this core */
-    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
-
-    /* Mask them on both cores */
-    CPU_INT_CLR = -1;
-    COP_INT_CLR = -1;
-
-    /* Shutdown: stop XIN oscillator */
-    CLKCTRL &= ~(1 << 31);
-
-    /* Halt everything and wait for device to power off */
-    while (1)
-    {
-        CPU_CTL = PROC_SLEEP;
-        COP_CTL = PROC_SLEEP;
-    }
 }
 
 void ide_power_enable(bool on)
