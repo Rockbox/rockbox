@@ -42,7 +42,11 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    #warning function not implemented
+    /* Disable interrupts on this core */
+    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+
+    /* Shutdown: stop XIN oscillator */
+    CLKCTRL &= ~(1 << 31);
 }
 
 #else /* SIMULATOR */
