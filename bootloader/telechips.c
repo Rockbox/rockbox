@@ -197,12 +197,8 @@ void* main(void)
     line = 0;
     printf("POWER-OFF");
 
-#if defined(COWON_D2)
-    lcd_enable(false);
-#endif
-
-    /* TODO: Power-off */
-    while(1);
+    /* Power-off */
+    power_off();
 
     return 0;
 }
