@@ -438,6 +438,41 @@ static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
 #endif /* (CONFIG_CPU == SH7034 || CPU_COLDFIRE) */
 
 #ifndef SIMULATOR
+#ifdef CPU_PP
+static int perfcheck(void)
+{
+    int result;
+
+    asm (
+        "mrs     r2, CPSR            \n"
+        "orr     r0, r2, #0xc0       \n" /* disable IRQ and FIQ */
+        "msr     CPSR_c, r0          \n"
+        "mov     %[res], #0          \n"
+        "ldr     r0, [%[timr]]       \n"
+        "add     r0, r0, %[tmo]      \n"
+    "1:                              \n"
+        "add     %[res], %[res], #1  \n"
+        "ldr     r1, [%[timr]]       \n"
+        "cmp     r1, r0              \n"
+        "bmi     1b                  \n"
+        "msr     CPSR_c, r2          \n" /* reset IRQ and FIQ state */
+        :
+        [res]"=&r"(result)
+        :
+        [timr]"r"(&USEC_TIMER),
+        [tmo]"r"(
+#if CONFIG_CPU == PP5002
+        16000
+#else /* PP5020/5022/5024 */
+        10226
+#endif
+        )
+        :
+        "r0", "r1", "r2"
+    );
+    return result;
+}
+#endif
 
 #ifdef HAVE_LCD_BITMAP
 static bool dbg_hw_info(void)
