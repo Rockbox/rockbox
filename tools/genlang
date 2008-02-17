@@ -196,7 +196,7 @@ if($english) {
 
     my $idnum=0; # start with a true number
     my $vidnum=0x8000; # first voice id
-    open(ENG, "<$english") || die "can't open $english";
+    open(ENG, "<$english") || die "Error: can't open $english";
     my @phrase;
     my $id;
     my $maybeid;
@@ -357,7 +357,7 @@ my $voiceid=0x8000; # counter for voice-only ID numbers
 # Now start the scanning of the selected language string
 #
 
-open(LANG, "<$input") || die "couldn't read language file named $input\n";
+open(LANG, "<$input") || die "Error: couldn't read language file named $input\n";
 my @phrase;
 while(<LANG>) {
 
@@ -419,7 +419,7 @@ while(<LANG>) {
                         print STDERR "Warning: source before $input line $line lacks quotes ($src)!\n";
                         $src='""';
                     }
-                    if($voice !~ /^\"/) {
+                    if($voice !~ /^\"/ and $voice !~ /^none\z/i) {
                         print STDERR "Warning: voice before $input line $line lacks quotes ($voice)!\n";
                         $voice='""';
                     }
@@ -510,9 +510,9 @@ if($prefix) {
     # We create a .c and .h file
 
     open(HFILE, ">$prefix.h") ||
-        die "couldn't create file $prefix.h\n";
+        die "Error: couldn't create file $prefix.h\n";
     open(CFILE, ">$prefix.c") ||
-        die "couldn't create file $prefix.c\n";        
+        die "Error: couldn't create file $prefix.c\n";        
 
     print HFILE <<MOO
 /* This file was automatically generated using genlang */
@@ -609,7 +609,7 @@ elsif($binary) {
     # files. The english file is scanned before the translated file was
     # scanned.
 
-    open(OUTF, ">$binary") or die "Can't create $binary";
+    open(OUTF, ">$binary") or die "Error: Can't create $binary";
     binmode OUTF;
     printf OUTF ("\x1a%c%c", $langversion, $target_id); # magic lang file header
 
