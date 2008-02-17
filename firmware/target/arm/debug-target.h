@@ -17,5 +17,9 @@
  *
  ****************************************************************************/
 
+#ifndef BUTTON_POWER
+#define DEBUG_CANCEL  BUTTON_MENU
+#else
 #define DEBUG_CANCEL  BUTTON_POWER
+#endif
 bool __dbg_hw_info(void);

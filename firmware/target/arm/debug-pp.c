@@ -27,6 +27,10 @@
 #include "font.h"
 #include "debug-target.h"
 
+#ifdef IPOD_ARCH
+#include "hwcompat.h"       /* needed for IPOD_HW_REVISION */
+#endif
+
 static int perfcheck(void)
 {
     int result;
