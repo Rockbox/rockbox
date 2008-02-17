@@ -167,7 +167,7 @@ sub buildlangs {
 
     # Exclude more languages on the player which won't work on charcell display
     if ($archos =~ /^"?player:/ ) {
-        @files = grep(!/(chinese-simp|bulgarian|chinese-trad|hindi|japanese|korean|thai)\.lang/, @files);
+        @files = grep(!/(chinese-simp|chinese-trad|hindi|japanese|korean|thai)\.lang/, @files);
     }
 
     for(@files) {
