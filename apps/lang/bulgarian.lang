@@ -34,7 +34,7 @@
     *: "On"
   </source>
   <dest>
-    *: "Включване"
+    *: "Включено"
   </dest>
   <voice>
     *: ""
@@ -48,21 +48,7 @@
     *: "Off"
   </source>
   <dest>
-    *: "Изключване"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME_SETTING_ASK
-  desc: in settings_menu
-  user:
-  <source>
-    *: "Ask"
-  </source>
-  <dest>
-    *: "Попитай"
+    *: "Изключено"
   </dest>
   <voice>
     *: ""
@@ -76,7 +62,7 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "Звукови Настройки"
+    *: "Звукови настройки"
   </dest>
   <voice>
     *: ""
@@ -90,7 +76,7 @@
     *: "General Settings"
   </source>
   <dest>
-    *: "Общи Настройки"
+    *: "Общи настройки"
   </dest>
   <voice>
     *: ""
@@ -101,27 +87,16 @@
   desc: in the main menu
   user:
   <source>
-    *: "Recording"
+    *: none
+    recording: "Recording"
   </source>
   <dest>
-    *: "Запис"
+    *: none
+    recording: "Запис"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INFO
-  desc: in the main menu
-  user:
-  <source>
-    *: "Info"
-  </source>
-  <dest>
-    *: "Инфо"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    recording: none
   </voice>
 </phrase>
 <phrase>
@@ -160,7 +135,7 @@
     *: "Treble"
   </source>
   <dest>
-    *: "Требъл"
+    *: "Високи"
   </dest>
   <voice>
     *: ""
@@ -175,34 +150,6 @@
   </source>
   <dest>
     *: "Баланс"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL_MENU
-  desc: in sound_settings
-  user:
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Канали"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CHANNEL
-  desc: in sound_settings
-  user:
-  <source>
-    *: "Channel Configuration"
-  </source>
-  <dest>
-    *: "Настройка на каналите"
   </dest>
   <voice>
     *: ""
@@ -244,7 +191,7 @@
     *: "Mono Left"
   </source>
   <dest>
-    *: "Ляво Моно"
+    *: "Ляво моно"
   </dest>
   <voice>
     *: ""
@@ -258,7 +205,7 @@
     *: "Mono Right"
   </source>
   <dest>
-    *: "Дясно Моно"
+    *: "Дясно моно"
   </dest>
   <voice>
     *: ""
@@ -269,13 +216,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Loudness"
+    *: none
+    masf: "Loudness"
   </source>
   <dest>
-    *: "Сила"
+    *: none
+    masf: "Сила"
   </dest>
   <voice>
-    *: ""
+    *: none
+    masf: none
   </voice>
 </phrase>
 <phrase>
@@ -283,13 +233,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Auto Volume"
+    *: none
+    masf: "Auto Volume"
   </source>
   <dest>
-    *: "Автоматично Volume"
+    *: none
+    masf: "Автоматична сила на звука"
   </dest>
   <voice>
-    *: ""
+    *: none
+    masf: none
   </voice>
 </phrase>
 <phrase>
@@ -297,13 +250,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "AV Decay Time"
+    *: none
+    masf: "AV Decay Time"
   </source>
   <dest>
-    *: "AV Decay Time"
+    *: none
+    masf: "AV Decay Time"
   </dest>
   <voice>
-    *: ""
+    *: none
+    masf: ""
   </voice>
 </phrase>
 <phrase>
@@ -342,7 +298,7 @@
     *: "Display"
   </source>
   <dest>
-    *: "Настройки на дисплея"
+    *: "Дисплей"
   </dest>
   <voice>
     *: ""
@@ -350,13 +306,13 @@
 </phrase>
 <phrase>
   id: LANG_SYSTEM
-  desc: in settings_menu()
+  desc: in the main menu and settings menu
   user:
   <source>
     *: "System"
   </source>
   <dest>
-    *: "Система"
+    *: "Системни"
   </dest>
   <voice>
     *: ""
@@ -367,38 +323,10 @@
   desc: in system_settings_menu()
   user:
   <source>
-    *: "Reset settings"
+    *: "Reset Settings"
   </source>
   <dest>
     *: "Връщане на настройките"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_ASK_RECORDER
-  desc: confirm to reset settings
-  user:
-  <source>
-    *: "Are you sure?"
-  </source>
-  <dest>
-    *: "Сигурен ли си?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_DONE_SETTING
-  desc: visual confirmation after settings reset
-  user:
-  <source>
-    *: "Settings"
-  </source>
-  <dest>
-    *: "Настройки"
   </dest>
   <voice>
     *: ""
@@ -419,92 +347,24 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RESET_DONE_CANCEL
-  desc: Visual confirmation of cancelation
-  user:
-  <source>
-    *: "Canceled"
-  </source>
-  <dest>
-    *: "Анулирано"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_PLAYER
-  desc: displayed if save settings has failed
-  user:
-  <source>
-    *: "Save failed"
-  </source>
-  <dest>
-    *: "Запаметяването неуспешно"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_PLAYER
-  desc: if save settings has failed
-  user:
-  <source>
-    *: "Batt. low?"
-  </source>
-  <dest>
-    *: "Батерията е почти празна"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_SAVE_RECORDER
-  desc: displayed if save settings has failed
-  user:
-  <source>
-    *: "Save failed"
-  </source>
-  <dest>
-    *: "Запаметяването неуспешно"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SETTINGS_BATTERY_RECORDER
-  desc: if save settings has failed
-  user:
-  <source>
-    *: "Is battery low?"
-  </source>
-  <dest>
-    *: "Батерията почти празна ли е?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_SETTINGS
   desc: in the main menu
   user:
   <source>
-    *: "Recording settings"
+    *: none
+    recording: "Recording Settings"
   </source>
   <dest>
-    *: "Записващи настройки"
+    *: none
+    recording: "Настройки запис"
   </dest>
   <voice>
-    *: ""
+    *: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Version"
@@ -518,27 +378,13 @@
 </phrase>
 <phrase>
   id: LANG_DEBUG
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
-    *: "Debug (keep out!)"
+    *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Дебъг (не пипай!)"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB
-  desc: in the main menu
-  user:
-  <source>
-    *: "USB (sim)"
-  </source>
-  <dest>
-    *: "USB (сим)"
+    *: "Дебъг (Не пипай!)"
   </dest>
   <voice>
     *: ""
@@ -573,20 +419,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Всички"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REPEAT_ONE
   desc: repeat one song
   user:
@@ -608,21 +440,7 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Слушайте първо избраната"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME
-  desc: in settings_menu
-  user:
-  <source>
-    *: "Resume"
-  </source>
-  <dest>
-    *: "Продължаване"
+    *: "Свирене първо на избраната"
   </dest>
   <voice>
     *: ""
@@ -633,10 +451,12 @@
   desc: MP3 buffer margin time
   user:
   <source>
-    *: "Anti-skip buffer"
+    *: "Anti-Skip Buffer"
+    flash_storage: none
   </source>
   <dest>
-    *: "Анти-прескачач"
+    *: "Буфер против прекъсване"
+    flash_storage: none
   </dest>
   <voice>
     *: ""
@@ -650,7 +470,7 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Големината на буквите има значение (сортиране)"
+    *: "Големината на буквите при сортиране има значение"
   </dest>
   <voice>
     *: ""
@@ -665,20 +485,6 @@
   </source>
   <dest>
     *: "Показване на Файлове"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FILTER_ALL
-  desc: show all files
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Всички"
   </dest>
   <voice>
     *: ""
@@ -713,20 +519,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILTER_PLAYLIST
-  desc: show only playlist
-  user:
-  <source>
-    *: "Playlists"
-  </source>
-  <dest>
-    *: "Списъци"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FOLLOW
   desc: in settings_menu
   user:
@@ -734,7 +526,7 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "Придържай се към списъка"
+    *: "Следвай плейлиста"
   </dest>
   <voice>
     *: ""
@@ -745,7 +537,7 @@
   desc: in display_settings_menu()
   user:
   <source>
-    *: "Scroll"
+    *: "Scrolling"
   </source>
   <dest>
     *: "Скролиране"
@@ -760,9 +552,11 @@
   user:
   <source>
     *: "Peak Meter"
+    masd: none
   </source>
   <dest>
-    *: "Peak Измервач"
+    *: "Пик-метър"
+    masd: none
   </dest>
   <voice>
     *: ""
@@ -787,7 +581,7 @@
   desc: sleep timer setting
   user:
   <source>
-    *: "Sleep timer"
+    *: "Sleep Timer"
   </source>
   <dest>
     *: "Часовник за изключване"
@@ -801,10 +595,12 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Quality"
+    *: none
+    recording_hwcodec: "Quality"
   </source>
   <dest>
-    *: "Качество"
+    *: none
+    recording_hwcodec: "Качество"
   </dest>
   <voice>
     *: ""
@@ -815,10 +611,12 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Frequency"
+    *: none
+    recording: "Frequency"
   </source>
   <dest>
-    *: "Честота"
+    *: none
+    recording: "Честота"
   </dest>
   <voice>
     *: ""
@@ -829,10 +627,12 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Source"
+    *: none
+    recording: "Source"
   </source>
   <dest>
-    *: "Източник"
+    *: none
+    recording: "Източник"
   </dest>
   <voice>
     *: ""
@@ -843,24 +643,14 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: none
+    recording: "Microphone"
+    h100,h120,h300: "Internal Microphone"
   </source>
   <dest>
-    *: "Микрофон"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Line in"
+    *: none
+    recording: "Микрoфон"
+    h100,h120,h300: "Вграден микрофон"
   </dest>
   <voice>
     *: ""
@@ -871,24 +661,12 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Digital"
+    *: none
+    recording: "Digital"
   </source>
   <dest>
-    *: "Цифров"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_CHANNELS
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Канали"
+    *: none
+    recording: "Дигитален"
   </dest>
   <voice>
     *: ""
@@ -902,7 +680,7 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "Напр./Наз. Минимум"
+    *: "Напр./Наз. Минимална стъпка"
   </dest>
   <voice>
     *: ""
@@ -930,7 +708,7 @@
     *: "Backlight"
   </source>
   <dest>
-    *: "Подсветка"
+    *: "Подсветка на екрана"
   </dest>
   <voice>
     *: ""
@@ -938,13 +716,15 @@
 </phrase>
 <phrase>
   id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-  desc: in display_settings_menu
+  desc: in display_settings_menu, backlight timeout with charger connected
   user:
   <source>
-    *: "Backlight On When Plugged"
+    *: none
+    charging: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Свети при включване в контакт"
+    *: none
+    charging: "Подсветка (докато се зарежда)"
   </dest>
   <voice>
     *: ""
@@ -986,7 +766,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Примерни настройки за скоростта на скролиране"
+    *: "Пример за настройката на скоростта на скролиране"
   </dest>
   <voice>
     *: ""
@@ -1014,7 +794,7 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Стъпка при скролиране"
+    *: "Сменящ се текст при скролиране"
   </dest>
   <voice>
     *: ""
@@ -1028,7 +808,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Примерни настройки за стъпката при скролиране"
+    *: "Пример за настройката на стъпката на скролиране"
   </dest>
   <voice>
     *: ""
@@ -1042,7 +822,7 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Ограничение на двупосочно скролиране"
+    *: "Ограничение на двупосочното скролиране"
   </dest>
   <voice>
     *: ""
@@ -1053,10 +833,12 @@
   desc: display menu, F3 substitute
   user:
   <source>
-    *: "Scroll Bar"
+    *: none
+    lcd_bitmap: "Scroll Bar"
   </source>
   <dest>
-    *: "Скролираща черта"
+    *: none
+    lcd_bitmap: "Лента за скролиране"
   </dest>
   <voice>
     *: ""
@@ -1067,10 +849,12 @@
   desc: display menu, F3 substitute
   user:
   <source>
-    *: "Status Bar"
+    *: none
+    lcd_bitmap: "Status Bar"
   </source>
   <dest>
-    *: "Статус черта"
+    *: none
+    lcd_bitmap: "Лента за състоянието"
   </dest>
   <voice>
     *: ""
@@ -1081,10 +865,12 @@
   desc: Volume type title
   user:
   <source>
-    *: "Volume Display"
+    *: none
+    lcd_bitmap: "Volume Display"
   </source>
   <dest>
-    *: "Виждане на силата на звука"
+    *: none
+    lcd_bitmap: "Показване на сила на звука"
   </dest>
   <voice>
     *: ""
@@ -1095,10 +881,12 @@
   desc: Battery type title
   user:
   <source>
-    *: "Battery Display"
+    *: none
+    lcd_bitmap: "Battery Display"
   </source>
   <dest>
-    *: "Виждане на Батерия"
+    *: none
+    lcd_bitmap: "Показване на батерия"
   </dest>
   <voice>
     *: ""
@@ -1109,13 +897,16 @@
   desc: Label for type of icon display
   user:
   <source>
-    *: "Graphic"
+    *: none
+    lcd_bitmap: "Graphic"
   </source>
   <dest>
-    *: "Графика"
+    *: none
+    lcd_bitmap: "Графичен"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: 
   </voice>
 </phrase>
 <phrase>
@@ -1123,13 +914,16 @@
   desc: Label for type of icon display
   user:
   <source>
-    *: "Numeric"
+    *: none
+    lcd_bitmap: "Numeric"
   </source>
   <dest>
-    *: "Цифрово"
+    *: none
+    lcd_bitmap: "Цифров"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: none
   </voice>
 </phrase>
 <phrase>
@@ -1138,23 +932,26 @@
   user:
   <source>
     *: "Peak Release"
+    masd: none
   </source>
   <dest>
-    *: "Peak Пускане"
+    *: "Освобождаване на пик"
+    masd: none
   </dest>
   <voice>
     *: ""
+    masd:"" 
   </voice>
 </phrase>
 <phrase>
   id: LANG_PM_UNITS_PER_READ
-  desc: in the peak meter menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Units Per Read"
+    *: ""
   </source>
   <dest>
-    *: "Бройка при прочитане"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -1166,12 +963,15 @@
   user:
   <source>
     *: "Peak Hold Time"
+    masd: none
   </source>
   <dest>
-    *: "Задържане на Peak"
+    *: "Задържане на пик"
+    masd: none
   </dest>
   <voice>
     *: ""
+    masd: ""
   </voice>
 </phrase>
 <phrase>
@@ -1180,12 +980,15 @@
   user:
   <source>
     *: "Clip Hold Time"
+    masd: none
   </source>
   <dest>
-    *: "Задържане на Clip"
+    *: "Задържане на clip"
+    masd: none
   </dest>
   <voice>
-    *: ""
+    *:"" 
+    masd:""
   </voice>
 </phrase>
 <phrase>
@@ -1194,12 +997,15 @@
   user:
   <source>
     *: "Eternal"
+    masd: none
   </source>
   <dest>
     *: "Вечно"
+    masd: none
   </dest>
   <voice>
-    *: ""
+    *:"" 
+    masd:""
   </voice>
 </phrase>
 <phrase>
@@ -1207,13 +1013,16 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "dBfs  linear"
+    *: "Scale"
+    masd: none
   </source>
   <dest>
-    *: "dBfs  линеално"
+    *: "Скала"
+    masd: none
   </dest>
   <voice>
-    *: ""
+    *:"" 
+    masd:""
   </voice>
 </phrase>
 <phrase>
@@ -1221,13 +1030,16 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "dBfs"
+    *: "Logarithmic (dB)"
+    masd: none
   </source>
   <dest>
-    *: "dBfs"
+    *: "Логаритмична (dB)"
+    masd: none
   </dest>
   <voice>
     *: ""
+    masd: "" 
   </voice>
 </phrase>
 <phrase>
@@ -1235,13 +1047,16 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "linear"
+    *: "Linear (%)"
+    masd: none
   </source>
   <dest>
-    *: "линейно"
+    *: "Линейна (%)"
+    masd: none
   </dest>
   <voice>
     *: ""
+    masd: ""
   </voice>
 </phrase>
 <phrase>
@@ -1249,13 +1064,16 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Minimum of range"
+    *: "Minimum Of Range"
+    masd: none
   </source>
   <dest>
-    *: "Минимум обхват"
+    *: "Минимален обхват"
+    masd: none
   </dest>
   <voice>
     *: ""
+    masd: ""
   </voice>
 </phrase>
 <phrase>
@@ -1263,13 +1081,16 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Maximum of range"
+    *: "Maximum Of Range"
+    masd: none
   </source>
   <dest>
-    *: "Максимум обхват"
+    *: "Максимален обхват"
+    masd: none
   </dest>
   <voice>
     *: ""
+    masd: ""
   </voice>
 </phrase>
 <phrase>
@@ -1292,37 +1113,26 @@
   user:
   <source>
     *: "Disk Spindown"
+    flash_storage: none
   </source>
   <dest>
-    *: "Въртене на диска"
+    *: "Спиране на диска"
+    flash_storage: none
   </dest>
   <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_POWEROFF
-  desc: disk poweroff flag
-  user:
-  <source>
-    *: "Disk Poweroff"
-  </source>
-  <dest>
-    *: "Изключване на диска"
-  </dest>
-  <voice>
-    *: ""
+    flash_storage: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_TIME
-  desc: in settings_menu
+  desc: Used on the bookmark select window to label elapsed time
   user:
   <source>
-    *: "Set Time/Date"
+    *: "Time"
   </source>
   <dest>
-    *: "Настройки на час/дата"
+    *: "Час/Дата"
   </dest>
   <voice>
     *: ""
@@ -1333,13 +1143,16 @@
   desc: select the time format of time in status bar
   user:
   <source>
-    *: "Time Format"
+    *: none
+    rtc: "Time Format"
   </source>
   <dest>
-    *: "Формат на времето"
+    *: none
+    rtc: "Формат на часа"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: none
   </voice>
 </phrase>
 <phrase>
@@ -1347,13 +1160,16 @@
   desc: option for 12 hour clock
   user:
   <source>
-    *: "12 hour clock"
+    *: none
+    rtc: "12 Hour Clock"
   </source>
   <dest>
-    *: "12ч часовник"
+    *: none
+    rtc: "12ч часовник"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: none
   </voice>
 </phrase>
 <phrase>
@@ -1361,52 +1177,27 @@
   desc: option for 24 hour clock
   user:
   <source>
-    *: "24 hour clock"
+    *: none
+    rtc: "24 Hour Clock"
   </source>
   <dest>
-    *: "24ч часовник"
+    *: none
+    rtc: "24ч часовник"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_ROCKBOX_INFO
-  desc: displayed topmost on the info screen
+  desc: displayed topmost on the info screen and in the info menu
   user:
   <source>
-    *: "Rockbox Info:"
+    *: "Rockbox Info"
   </source>
   <dest>
-    *: "Инфо за Rockbox:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUFFER_STAT_PLAYER
-  desc: the buffer size player-screen width, %d MB %d fraction of MB
-  user:
-  <source>
-    *: "Buf: %d.%03dMB"
-  </source>
-  <dest>
-    *: "Буфер: %d.%03dMB"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUFFER_STAT_RECORDER
-  desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-  user:
-  <source>
-    *: "Buffer: %d.%03dMB"
-  </source>
-  <dest>
-    *: "Буфер: %d.%03dMB"
+    *: "Информация за Rockbox"
   </dest>
   <voice>
     *: ""
@@ -1417,27 +1208,33 @@
   desc: tells that the battery is charging, instead of battery level
   user:
   <source>
-    *: "Battery: charging"
+    *: none
+    charging: "Battery: Charging"
   </source>
   <dest>
-    *: "Батерия: зарежда се"
+    *: none
+    charging: "Батерия: зарежда се"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running
+  desc: in info display, shows that top off charge is running Only for V1 recorder
   user:
   <source>
-    *: "Battery: Top-Off Chg"
+    *: none
+    recorder: "Battery: Top-Off Chg"
   </source>
   <dest>
-    *: "Батерия: Нерегулирано зареждане"
+    *: none
+    recorder: "Батерия: нерегулирано зареждане"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recorder: none
   </voice>
 </phrase>
 <phrase>
@@ -1445,13 +1242,16 @@
   desc: in info display, shows that trickle charge is running
   user:
   <source>
-    *: "Battery: Trickle Chg"
+    *: none
+    charging: "Battery: Trickle Chg"
   </source>
   <dest>
-    *: "Ieoaiea: Регулирано зареждане"
+    *: none
+    charging: "Батерия: регулирано зареждане"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: none
   </voice>
 </phrase>
 <phrase>
@@ -1459,13 +1259,19 @@
   desc: battery level in % and estimated time remaining
   user:
   <source>
-    *: "%d%% %dh %dm"
+    *: "Battery: %d%% %dh %dm"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dh %dm"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "%d%% %dчас %dмин"
+    *: "Батерия: %d%% %dч %dмин"
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: "%d%% %dч %dмин"
+    h10,ipodmini,ipodmini2g: "Batt: %d%% %dч %dмин"
   </dest>
   <voice>
     *: ""
+    player,recorder,fmrecorder,recorderv2,ondio*,ifp7xx: ""
+    h10,ipodmini,ipodmini2g: ""
   </voice>
 </phrase>
 <phrase>
@@ -1473,13 +1279,16 @@
   desc: in wps
   user:
   <source>
-    *: "Pitch up"
+    *: none
+    pitchscreen: "Pitch Up"
   </source>
   <dest>
-    *: "Увеличи височина на звука"
+    *: none
+    pitchscreen: "Ускори"
   </dest>
   <voice>
-    *: ""
+    *: none
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
@@ -1487,18 +1296,21 @@
   desc: in wps
   user:
   <source>
-    *: "Pitch down"
+    *: none
+    pitchscreen: "Pitch Down"
   </source>
   <dest>
-    *: "Намали височина на звука"
+    *: none
+    pitchscreen: "Забави"
   </dest>
   <voice>
-    *: ""
+    *: none
+    pitchscreen: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PAUSE
-  desc: in wps
+  desc: in wps and recording trigger menu
   user:
   <source>
     *: "Pause"
@@ -1511,143 +1323,35 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_F2_MODE
-  desc: in wps F2 pressed
-  user:
-  <source>
-    *: "mode:"
-  </source>
-  <dest>
-    *: "Начин:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_STATUS
-  desc: in wps F3 pressed
-  user:
-  <source>
-    *: "Status"
-  </source>
-  <dest>
-    *: "Статус"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_SCROLL
-  desc: in wps F3 pressed
-  user:
-  <source>
-    *: "Scroll"
-  </source>
-  <dest>
-    *: "Скролиране"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_F3_BAR
-  desc: in wps F3 pressed
-  user:
-  <source>
-    *: "bar"
-  </source>
-  <dest>
-    *: "черта"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TIME_REVERT
   desc: used in set_time()
   user:
   <source>
-    *: "OFF to revert"
+    *: none
+    rtc: "OFF = Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*,e200,c200: "MENU = Revert"
+    x5,m5: "RECORD = Revert"
+    h10,h10_5gb: "PREV = Revert"
+    gigabeatf: "A = Revert"
   </source>
   <dest>
-    *: "Изключване за обръщане"
+    *: none
+    rtc: "OFF за отказ"
+    h100,h120,h300: "STOP за отказ"
+    ipod*,e200,c200: "MENU за отказ"
+    x5,m5: "RECORD за отказ"
+    h10,h10_5gb: "PREV за отказ"
+    gigabeatf: "A за отказ"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_PLAYER
-  desc: displayed when key lock is on
-  user:
-  <source>
-    *: "Keylock ON"
-  </source>
-  <dest>
-    *: "Бутони: заключени"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_PLAYER
-  desc: displayed when key lock is turned off
-  user:
-  <source>
-    *: "Keylock OFF"
-  </source>
-  <dest>
-    *: "Бутони: отключени"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_ON_RECORDER
-  desc: displayed when key lock is on
-  user:
-  <source>
-    *: "Key lock is ON"
-  </source>
-  <dest>
-    *: "Бутоните са заключени"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYLOCK_OFF_RECORDER
-  desc: displayed when key lock is turned off
-  user:
-  <source>
-    *: "Key lock is OFF"
-  </source>
-  <dest>
-    *: "Бутоните са отключени"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_GAIN
-  desc: in the recording screen
-  user:
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Записване на"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,e200,c200: ""
+    x5,m5: ""
+    h10,h10_5gb: ""
+    gigabeatf: ""
   </voice>
 </phrase>
 <phrase>
@@ -1655,13 +1359,16 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Left"
+    *: none
+    recording: "Gain Left"
   </source>
   <dest>
-    *: "Ляво"
+    *: none
+    recording: "Усилване ляво"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -1669,18 +1376,21 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Right"
+    *: none
+    recording: "Gain Right"
   </source>
   <dest>
-    *: "Дясно"
+    *: none
+    recording: "Усилване дясно"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_TITLE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Title]"
@@ -1694,7 +1404,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ARTIST
-  desc: in wps 
+  desc: in tag viewer
   user:
   <source>
     *: "[Artist]"
@@ -1708,7 +1418,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Album]"
@@ -1722,13 +1432,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACKNUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[Песен№]"
+    *: "[Трак№]"
   </dest>
   <voice>
     *: ""
@@ -1736,13 +1446,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PLAYLIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Playlist]"
   </source>
   <dest>
-    *: "[Опис]"
+    *: "[Плейлист]"
   </dest>
   <voice>
     *: ""
@@ -1750,13 +1460,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_BITRATE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Bitrate]"
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: "[Битрейт]"
   </dest>
   <voice>
     *: ""
@@ -1764,7 +1474,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_FREQUENCY
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Frequency]"
@@ -1778,7 +1488,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PATH
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Path]"
@@ -1795,13 +1505,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Sun"
+    *: none
+    rtc: "Sun"
   </source>
   <dest>
-    *: "Нед"
+    *: none
+    rtc: "Нед"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1809,13 +1522,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Mon"
+    *: none
+    rtc: "Mon"
   </source>
   <dest>
-    *: "Пон"
+    *: none
+    rtc: "Пон"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1823,13 +1539,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Tue"
+    *: none
+    rtc: "Tue"
   </source>
   <dest>
-    *: "Вт"
+    *: none
+    rtc: "Вт"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1837,13 +1556,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Wed"
+    *: none
+    rtc: "Wed"
   </source>
   <dest>
-    *: "Ср"
+    *: none
+    rtc: "Ср"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1851,13 +1573,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Thu"
+    *: none
+    rtc: "Thu"
   </source>
   <dest>
-    *: "Чет"
+    *: none
+    rtc: "Чет"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1865,13 +1590,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Fri"
+    *: none
+    rtc: "Fri"
   </source>
   <dest>
-    *: "Пет"
+    *: none
+    rtc: "Пет"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1879,13 +1607,16 @@
   desc: Maximum 3-letter abbreviation for weekday
   user:
   <source>
-    *: "Sat"
+    *: none
+    rtc: "Sat"
   </source>
   <dest>
-    *: "Съб"
+    *: none
+    rtc: "Съб"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1893,13 +1624,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Jan"
+    *: none
+    rtc: "Jan"
   </source>
   <dest>
-    *: "Ян"
+    *: none
+    rtc: "Ян"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1907,13 +1641,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Feb"
+    *: none
+    rtc: "Feb"
   </source>
   <dest>
-    *: "Фев"
+    *: none
+    rtc: "Фев"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1921,13 +1658,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Mar"
+    *: none
+    rtc: "Mar"
   </source>
   <dest>
-    *: "Мар"
+    *: none
+    rtc: "Мар"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1935,13 +1675,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Apr"
+    *: none
+    rtc: "Apr"
   </source>
   <dest>
-    *: "Апр"
+    *: none
+    rtc: "Апр"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1949,13 +1692,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "May"
+    *: none
+    rtc: "May"
   </source>
   <dest>
-    *: "Май"
+    *: none
+    rtc: "Май"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1963,13 +1709,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Jun"
+    *: none
+    rtc: "Jun"
   </source>
   <dest>
-    *: "Юни"
+    *: none
+    rtc: "Юни"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1977,13 +1726,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Jul"
+    *: none
+    rtc: "Jul"
   </source>
   <dest>
-    *: "Юли"
+    *: none
+    rtc: "Юли"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1991,13 +1743,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Aug"
+    *: none
+    rtc: "Aug"
   </source>
   <dest>
-    *: "Авг"
+    *: none
+    rtc: "Авг"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -2005,13 +1760,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Sep"
+    *: none
+    rtc: "Sep"
   </source>
   <dest>
-    *: "Сеп"
+    *: none
+    rtc: "Сеп"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -2019,13 +1777,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Oct"
+    *: none
+    rtc: "Oct"
   </source>
   <dest>
-    *: "Окт"
+    *: none
+    rtc: "Окт"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -2033,13 +1794,16 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Nov"
+    *: none
+    rtc: "Nov"
   </source>
   <dest>
-    *: "Ное"
+    *: none
+    rtc: "Ное"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -2047,38 +1811,27 @@
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
-    *: "Dec"
+    *: none
+    rtc: "Dec"
   </source>
   <dest>
-    *: "Дек"
+    *: none
+    rtc: "Дек"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYLIST_LOAD
-  desc: displayed on screen while loading a playlist
-  user:
-  <source>
-    *: "Loading..."
-  </source>
-  <dest>
-    *: "Зарежда се..."
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    rtc: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_SHUFFLE
-  desc: displayed on screen while shuffling a playlist
+  desc: DEPRECATED
   user:
   <source>
-    *: "Shuffling..."
+    *: ""
   </source>
   <dest>
-    *: "Разбърква се..."
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -2089,38 +1842,10 @@
   desc: in playlist.indices() when playlist is full
   user:
   <source>
-    *: "Playlist buffer full"
+    *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Опис Пълна Директорията "
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_PLAYER
-  desc: when playlist has finished
-  user:
-  <source>
-    *: "End of list"
-  </source>
-  <dest>
-    *: "Край на списъка"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_END_PLAYLIST_RECORDER
-  desc: when playlist has finished
-  user:
-  <source>
-    *: "End of song list"
-  </source>
-  <dest>
-    *: "Край на описа"
+    *: "Буферът за плейлист e пълен"
   </dest>
   <voice>
     *: ""
@@ -2131,10 +1856,10 @@
   desc: in showdir(), displayed on screen when you reach buffer limit
   user:
   <source>
-    *: "Dir Buffer is full!"
+    *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Dir Buffer е пълен!"
+    *: "Директориен буфер пълен!"
   </dest>
   <voice>
     *: ""
@@ -2145,10 +1870,10 @@
   desc: shown when a language has been loaded from the dir browser
   user:
   <source>
-    *: "new language"
+    *: "New Language"
   </source>
   <dest>
-    *: "езикът е променен"
+    *: "Нов език"
   </dest>
   <voice>
     *: ""
@@ -2156,13 +1881,13 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_LOADED
-  desc: 
+  desc: Feedback shown when a .cfg file is loaded
   user:
   <source>
-    *: ""
+    *: "Settings Loaded"
   </source>
   <dest>
-    *: ""
+    *: "Настройките заредени"
   </dest>
   <voice>
     *: ""
@@ -2170,27 +1895,13 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVED
-  desc: 
+  desc: Feedback shown when a .cfg file is saved
   user:
   <source>
-    *: ""
+    *: "Settings Saved"
   </source>
   <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESUME_CONFIRM_PLAYER
-  desc: possible answers to resume question
-  user:
-  <source>
-    *: "(PLAY/STOP)"
-  </source>
-  <dest>
-    *: "(Старт/Стоп)"
+    *: "Настройките запазени"
   </dest>
   <voice>
     *: ""
@@ -2201,13 +1912,16 @@
   desc: bool true representation
   user:
   <source>
-    *: "Yes"
+    *: none
+    lcd_bitmap: "Yes"
   </source>
   <dest>
-    *: "Да"
+    *: none
+    lcd_bitmap: "Da"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: none
   </voice>
 </phrase>
 <phrase>
@@ -2215,13 +1929,16 @@
   desc: bool false representation
   user:
   <source>
-    *: "No"
+    *: none
+    lcd_bitmap: "No"
   </source>
   <dest>
-    *: "Не"
+    *: none
+    lcd_bitmap: "Ne"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: none
   </voice>
 </phrase>
 <phrase>
@@ -2229,13 +1946,16 @@
   desc: Used in a lot of places
   user:
   <source>
-    *: "On"
+    *: none
+    lcd_bitmap: "On"
   </source>
   <dest>
-    *: "Включено"
+    *: none
+    lcd_bitmap: "Vkl."
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: none
   </voice>
 </phrase>
 <phrase>
@@ -2243,13 +1963,16 @@
   desc: Used in a lot of places
   user:
   <source>
-    *: "Off"
+    *: none
+    lcd_bitmap: "Off"
   </source>
   <dest>
-    *: "Изключване"
+    *: none
+    lcd_bitmap: "Izkl."
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: none
   </voice>
 </phrase>
 <phrase>
@@ -2257,13 +1980,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Volume"
+    *: none
+    recording: "Volume"
   </source>
   <dest>
-    *: "Сила на звука"
+    *: none
+    recording: "Sila na zvuka"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: none
   </voice>
 </phrase>
 <phrase>
@@ -2271,13 +1997,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Stereo"
+    *: none
+    recording: "Stereo"
   </source>
   <dest>
-    *: "Стерео"
+    *: none
+    recording: "Stereo"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: none
   </voice>
 </phrase>
 <phrase>
@@ -2285,13 +2014,16 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Mono"
+    *: none
+    recording: "Mono"
   </source>
   <dest>
-    *: "Моно"
+    *: none
+    recording: "Mono"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: none
   </voice>
 </phrase>
 <phrase>
@@ -2299,13 +2031,16 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Shuffle"
+    *: none
+    lcd_bitmap: "Shuffle"
   </source>
   <dest>
-    *: "Разбъркване"
+    *: none
+    lcd_bitmap: "Razburkvane"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: none
   </voice>
 </phrase>
 <phrase>
@@ -2313,61 +2048,3523 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Repeat"
+    *: none
+    lcd_bitmap: "Repeat"
   </source>
   <dest>
-    *: "Повторение"
+    *: none
+    lcd_bitmap: "Povtariane"
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Всички"
-  </dest>
-  <voice>
-    *: ""
+    *: none
+    lcd_bitmap: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
   desc: repeat one song
-  user:
+  user: 
   <source>
-    *: "One"
+    *: none
+    lcd_bitmap: "One"
   </source>
   <dest>
-    *: "Една"
+    *: none
+    lcd_bitmap: "Edna"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: none
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER
   desc: setting name for dir filter
-  user:
+  user: 
   <source>
-    *: "Show Files"
+    *: none
+    lcd_bitmap: "Show Files"
   </source>
   <dest>
-    *: "Покажи файловете"
+    *: none
+    lcd_bitmap: "Pokazvane na failove"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_SUPPORTED
+  desc: show all file types supported by Rockbox
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Supported"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Poddurjani"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_MUSIC
+  desc: show only music-related files
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Music"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Muzika"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_PLAYLIST
+  desc: show only playlist
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Playlists"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Pleilistove"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_QUALITY
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording_hwcodec: "Quality"
+  </source>
+  <dest>
+    *: none
+    recording_hwcodec: "Kachestvo"
+  </dest>
+  <voice>
+    *: none
+    recording_hwcodec: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FREQUENCY
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording: "Frequency"
+  </source>
+  <dest>
+    *: none
+    recording: "Chestota"
+  </dest>
+  <voice>
+    *: none
+    recording: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SOURCE
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording: "Source"
+  </source>
+  <dest>
+    *: none
+    recording: "Iztochnik"
+  </dest>
+  <voice>
+    *: none
+    recording: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SRC_MIC
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording: "Int. Mic"
+  </source>
+  <dest>
+    *: none
+    recording: "Vgraden mikrofon"
+  </dest>
+  <voice>
+    *: none
+    recording: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording: "Digital"
+  </source>
+  <dest>
+    *: none
+    recording: "Cifrov"
+  </dest>
+  <voice>
+    *: none
+    recording: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SCROLL_BAR
+  desc: display menu, F3 substitute
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Skrolbar"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_STATUS_BAR
+  desc: display menu, F3 substitute
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Status Bar"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Lenta za Sustoianie"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_LEFT
+  desc: in the recording screen
+  user: 
+  <source>
+    *: none
+    recording: "Gain Left"
+  </source>
+  <dest>
+    *: none
+    recording: "Usilvane liavo"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  user: 
+  <source>
+    *: none
+    agc: "AGC max. gain"
+  </source>
+  <dest>
+    *: none
+    recording: ""
+    agc: "AGC max usilvane"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+    agc: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SAVE_CHANGES
+  desc: When you try to exit radio to confirm save
+  user: 
+  <source>
+    *: none
+    radio: "Save Changes?"
+  </source>
+  <dest>
+    *: none
+    radio: "Запазване на промените?"
+  </dest>
+  <voice>
+    *: none
+    radio: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: deprecated
+  user: 
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user: 
+  <source>
+    *: none
+    recording: "PCM Wave"
+  </source>
+  <dest>
+    *: none
+    recording: "PCM Wave"
+  </dest>
+  <voice>
+    *: none
+    recording: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TIMESPLIT
+  desc: Record split menu
+  user: 
+  <source>
+    *: none
+    recording: "File Split Options"
+  </source>
+  <dest>
+    *: none
+    recording: "Опции за разделяне на файлове"
+  </dest>
+  <voice>
+    *: none
+    recording: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILETYPE
+  desc: voice settings menu
+  user: 
+  <source>
+    *: "Say file type"
+  </source>
+  <dest>
+    *: "Казвай типа на файла"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_FILTER_ALL
-  desc: show all files
+  id: LANG_RECORD_CURRENT_DIR
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORD_TRIGGER
+  desc: in recording settings_menu
+  user: 
+  <source>
+    *: none
+    recording: "Trigger"
+  </source>
+  <dest>
+    *: none
+    recording: "Triger"
+  </dest>
+  <voice>
+    *: none
+    recording: "Trigger"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DIR
+  desc: spoken only, prefix for directory number
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "folder"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KILOBYTE
+  desc: a unit postfix, also voiced
+  user: 
+  <source>
+    *: "KB"
+  </source>
+  <dest>
+    *: "KB"
+  </dest>
+  <voice>
+    *: "kilobyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Edit mode: %s"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Rejim na redaktirane: %s"
+  </dest>
+  <voice>
+    *: none
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EDIT_PRESET
+  desc: in radio screen
+  user: 
+  <source>
+    *: none
+    radio: "Edit Preset"
+  </source>
+  <dest>
+    *: none
+    radio: "Редактиране на presets"
+  </dest>
+  <voice>
+    *: none
+    radio: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ALARM_MENU
+  desc: The name of the additional entry in the main menu for the RTC alarm mod.
+  user: 
+  <source>
+    *: none
+    alarm: "Wake-Up Alarm"
+  </source>
+  <dest>
+    *: none
+    alarm: "Аларма за събуждане"
+  </dest>
+  <voice>
+    *: none
+    alarm: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Line Selector Type"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Вид избирач на ред"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Line Selector Type"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM_UNITS_PER_TICK
+  desc: spoken only, peak meter release unit
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "units per tick"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FULL_PATH
+  desc: track display options
+  user: 
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "Пълен път"
+  </dest>
+  <voice>
+    *: "Full Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WIND_MENU
+  desc: in the playback sub menu
+  user: 
+  <source>
+    *: "Fast-Forward/Rewind"
+  </source>
+  <dest>
+    *: "Бързо напред/пренавиване(FF/REW)"
+  </dest>
+  <voice>
+    *: "Fast forward and Rewind"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_G
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "G"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ADVANCED
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Advanced EQ Settings"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Разширени настройки на еквалайзера"
+  </dest>
+  <voice>
+    *: none
+    swcodec: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+  desc: Save only on bookmark for each playlist in recent bookmarks
+  user: 
+  <source>
+    *: "Unique only"
+  </source>
+  <dest>
+    *: "Само уникални"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_PRESENT
+  desc: when external memory is not present
+  user: 
+  <source>
+    *: none
+    multivolume: "Not present"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Не е налична"
+  </dest>
+  <voice>
+    *: none
+    multivolume: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
   user:
+  <source>
+    *: none
+    agc: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: none
+    agc: "Контрол на автоматичното усилване(AGC)"
+  </dest>
+  <voice>
+    *: none
+    agc: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SECONDS
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "seconds"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+  desc: in playlist options menu, option to warn when erasing dynamic playlist
+  user: 
+  <source>
+    *: "Warn When Erasing Dynamic Playlist"
+  </source>
+  <dest>
+    *: "Предупреждаване при изтриване на динамичния плейлист"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    usbstack: "USB Stack"
+  </source>
+  <dest>
+    *: none
+    usbstack: "USB Стек"
+  </dest>
+  <voice>
+    *: none
+    usbstack: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPDIF_ENABLE
+  desc: in playback settings menu. enable/disable the optical out
+  user: 
+  <source>
+    *: none
+    spdif_power: "Optical Output"
+  </source>
+  <dest>
+    *: none
+    spdif_power: "Оптичен изход"
+  </dest>
+  <voice>
+    *: none
+    spdif_power: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORD_PRERECORD
+  desc: in recording and radio screen
+  user: 
+  <source>
+    *: none
+    recording: "Pre-Recording"
+  </source>
+  <dest>
+    *: none
+    recording: "Predvaritelno zapisvane"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS_CUTOFF
+  desc: Bass setting cut-off frequency
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Bass Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Отрязване на бас"
+  </dest>
+  <voice>
+    *: none
+    ipodvideo: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHTY
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION
+  desc: in radio screen
+  user: 
+  <source>
+    *: none
+    radio: "Station: %d.%02d MHz"
+  </source>
+  <dest>
+    *: none
+    radio: "Станция: %d.%02d MHz"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SET_RATING
+  desc: Set the rating of a file in the wps context menu
+  user: 
+  <source>
+    *: "Set Song Rating"
+  </source>
+  <dest>
+    *: "Настройване на рейтинга на песен"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ICONS
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Show Icons"
+  </source>
+  <dest>
+    *: "Показване на икони"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user: 
+  <source>
+    *: none
+    lcd_sleep: "Never"
+  </source>
+  <dest>
+    *: none
+    lcd_sleep: "Никога"
+  </dest>
+  <voice>
+    *: none
+    lcd_sleep: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_START_COLOR
+  desc: line selector color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Primary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Основен цвят"
+  </dest>
+  <voice>
+    *: none
+    lcd_color: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_LINE_IN
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording: "Line In"
+  </source>
+  <dest>
+    *: none
+    recording: "Lineen vhod"
+  </dest>
+  <voice>
+    *: none
+    recording: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+  desc: Playlist error
+  user: 
+  <source>
+    *: "Error accessing directory"
+  </source>
+  <dest>
+    *: "Грешка при достъпване на директорията"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_FIRST
+  desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+  user: 
+  <source>
+    *: "Queue next"
+  </source>
+  <dest>
+    *: "Сложи еднократно за следващ"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_INIT
+  desc: while initializing tagcache on boot
+  user: 
+  <source>
+    *: "Committing database"
+  </source>
+  <dest>
+    *: "Committing database"
+  </dest>
+  <voice>
+    *: "Committing database"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user: 
+  <source>
+    *: "Building database... %d found (OFF to return)"
+    h100,h120,h300: "Building database... %d found (STOP to return)"
+    ipod*: "Building database... %d found (PREV to return)"
+    x5,m5: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
+  </source>
+  <dest>
+    *: "Изграждане на базата данни...  намерени %d (OFF за връщане)"
+    h100,h120,h300: "Изграждане на базата данни...  намерени %d (STOP за връщане)"
+    ipod*: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
+    x5,m5: "Изграждане на базата данни...  намерени %d (LEFT за връщане)"
+    h10,h10_5gb,e200,c200: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
+  </dest>
+  <voice>
+    *: "entries found for database"
+    h100,h120,h300: ""
+    ipod*: ""
+    x5,m5: ""
+    h10,h10_5gb,e200,c200: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_FOLDER
+  desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
+  user: 
+  <source>
+    *: "Auto-Change Directory"
+  </source>
+  <dest>
+    *: "Автоматична промяна на директорията"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCANNING_DISK
+  desc: when booting up and rebuilding the cache and calculating free space
+  user: 
+  <source>
+    *: "Scanning disk..."
+  </source>
+  <dest>
+    *: "Сканиране на диска..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_VBR
+  desc: in browse_id3
+  user: 
+  <source>
+    *: " (VBR)"
+  </source>
+  <dest>
+    *: " (VBR)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user: 
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Всички тракове>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GRAPHICAL
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Graphical EQ"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Графичен еквалайзер"
+  </dest>
+  <voice>
+    *: none
+    swcodec: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLANK
+  desc: keyboard
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Blank"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FORTY
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TYPE_ALKALINE
+  desc: in battery settings
+  user: 
+  <source>
+    *: none
+    battery_types: "Alkaline"
+  </source>
+  <dest>
+    *: none
+    battery_types: "Алкална"
+  </dest>
+  <voice>
+    *: ""
+    battery_types: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DB
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIR_BROWSER
+  desc: main menu title
+  user: 
+  <source>
+    *: "Files"
+  </source>
+  <dest>
+    *: "Файлове"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FONT
+  desc: spoken only, for file extension
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_BACKDROP
+  desc: text for LCD settings menu
+  user: 
+  <source>
+    *: none
+    lcd_non-mono: "Clear Backdrop"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Изчистване на фоновото изображение"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_THEME
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Browse Themes"
+  </source>
+  <dest>
+    *: "Разглеждане на темите"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_SHUTDOWN
+  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+  user: 
+  <source>
+    *: none
+    alarm: "Alarm Set"
+  </source>
+  <dest>
+    *: none
+    alarm: "Настройка на алармата"
+  </dest>
+  <voice>
+    *: none
+    alarm: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_V1_FIRST
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PIXEL
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMMENT
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Коментар]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_DJSET
+  desc: AGC preset
+  user:
+  <source>
+    *: none
+    agc: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "DJ-Set (бавно)"
+  </dest>
+  <voice>
+    *: none
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CREATE_SUCCESS
+  desc: Indicates bookmark was successfully created
+  user: 
+  <source>
+    *: "Bookmark Created"
+  </source>
+  <dest>
+    *: "Отметката е създадена"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIPCOUNTER
+  desc: in settings, for recording peak meter
+  user: 
+  <source>
+    *: none
+    recording: "Clip Counter"
+  </source>
+  <dest>
+    *: none
+    recording: "Брояч на clips"
+  </dest>
+  <voice>
+    *: none
+    recording: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_KARAOKE
+  desc: in sound_settings
+  user: 
+  <source>
+    *: "Karaoke"
+  </source>
+  <dest>
+    *: "Караоке"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MODERATE
+  desc: in beep volume in playback settings
+  user: 
+  <source>
+    *: none
+    swcodec: "Moderate"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Средно"
+  </dest>
+  <voice>
+    *: none
+    swcodec: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_DIRECTORY
+  desc: in recording settings_menu
+  user: 
+  <source>
+    *: none
+    recording: "Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Директория"
+  </dest>
+  <voice>
+    *: none
+    recording: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBOOT_NOW
+  desc: Do you want to reboot?
+  user: 
+  <source>
+    *: "Reboot now?"
+  </source>
+  <dest>
+    *: "Рестартиране сега?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PER_SEC
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST
+  desc: in onplay menu.  append a track/playlist into dynamic playlist.
+  user: 
+  <source>
+    *: "Insert last"
+  </source>
+  <dest>
+    *: "Вмъкни най-отзад"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Chestota na otriazvane"
+  </dest>
+  <voice>
+    *: none
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_FILES
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "No files"
+  </source>
+  <dest>
+    *: "Няма файлове"
+  </dest>
+  <voice>
+    *: "No files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAPTION_BACKLIGHT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Caption Backlight"
+  </source>
+  <dest>
+    *: "Подсветка при смяна на песен"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_WHILE_PLAYING
+  desc: in settings_menu()
+  user: 
+  <source>
+    *: none
+    remote: "Browse .rwps files"
+  </source>
+  <dest>
+    *: none
+    remote: "Разглеждане на .rwps-файловете"
+  </dest>
+  <voice>
+    *: none
+    remote: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user: 
+  <source>
+    *: "Import Modifications"
+  </source>
+  <dest>
+    *: "Вкарване на модификациите"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user: 
+  <source>
+    *: none
+    recording_swcodec: "WavPack"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "WavPack"
+  </dest>
+  <voice>
+    *: none
+    recording_swcodec: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_DEFAULT_PRESET_NAME
+  desc: default preset name for auto scan mode
+  user: 
+  <source>
+    *: none
+    radio: "%d.%02d MHz"
+  </source>
+  <dest>
+    *: none
+    radio: "%d.%02d MHz"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_ALL
+  desc: repeat playlist once all songs have completed
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "All"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Vsichki"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user: 
+  <source>
+    *: none
+    lcd_sleep: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: none
+    lcd_sleep: "Заспиване (след спиране на подсветката)"
+  </dest>
+  <voice>
+    *: none
+    lcd_sleep: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_DISK_FULL
+  desc: in recording screen
+  user: 
+  <source>
+    *: none
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "The disk is full. Press LEFT to continue."
+  </source>
+  <dest>
+    *: none
+    recording: "Diskut e pulen. Natisnete OFF za da produljite"
+    h100,h120,h300: "Diskut e pulen. Natisnete STOP za da produljite за да продължите"
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Diskut e pulen. Natisnete LEFT za da produljite"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+    h100,h120,h300: ""
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_INDICES
+  desc: in playlist viewer menu
+  user: 
+  <source>
+    *: "Show Indices"
+  </source>
+  <dest>
+    *: "Показване на индекси"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Filesize"
+  </source>
+  <dest>
+    *: none
+    recording: "Размер на файла"
+  </dest>
+  <voice>
+    *: none
+    recording: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DATE_REVERSE
+  desc: browser sorting setting
+  user: 
+  <source>
+    *: "By Newest Date"
+  </source>
+  <dest>
+    *: "По най-нова дата"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_OPEN_WITH
+  desc: Onplay open with
+  user: 
+  <source>
+    *: "Open With..."
+  </source>
+  <dest>
+    *: "Отвори с..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GAIN
+  desc: Generic string for gain used in EQ menu and recording screen
+  user: 
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Усилване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DATE
+  desc: browser sorting setting
+  user: 
+  <source>
+    *: "By Date"
+  </source>
+  <dest>
+    *: "По дата"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETING
+  desc: 
+  user: 
+  <source>
+    *: "Deleting..."
+  </source>
+  <dest>
+    *: "Изтриване..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MONO_MODE
+  desc: in radio screen
+  user: 
+  <source>
+    *: none
+    radio: "Force mono"
+  </source>
+  <dest>
+    *: none
+    radio: "Принудително моно"
+  </dest>
+  <voice>
+    *: none
+    radio: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_ENABLE
+  desc: in crossfade settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Enable Crossfade"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Включване на Crossfade"
+  </dest>
+  <voice>
+    *: none
+    swcodec: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKGROUND_COLOR
+  desc: menu entry to set the background color
+  user: 
+  <source>
+    *: none
+    lcd_non-mono: "Background Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Фонов цвят"
+  </dest>
+  <voice>
+    *: none
+    lcd_non-mono: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_MPA
+  desc: spoken only, for file extension
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_DIRBROWSE_F1
+  desc: in dir browser, F1 button bar text
+  user: 
+  <source>
+    *: none
+    recorder_pad: "Menu"
+  </source>
+  <dest>
+    *: none
+    recorder_pad: "Meniu"
+  </dest>
+  <voice>
+    *: none
+    recorder_pad: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_NO_INFO
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "<No Info>"
+  </source>
+  <dest>
+    *: "<Няма информация>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALPHA
+  desc: browser sorting setting
+  user: 
+  <source>
+    *: "Alphabetical"
+  </source>
+  <dest>
+    *: "Азбучно"
+  </dest>
+  <voice>
+    *: "Alphabetical"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU
+  desc: Text on main menu to get to bookmark commands
+  user: 
+  <source>
+    *: "Bookmarks"
+  </source>
+  <dest>
+    *: "Отметки"
+  </dest>
+  <voice>
+    *: "Bookmarks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_LCD_INVERSE
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_invert: "Inverse"
+  </source>
+  <dest>
+    *: none
+    lcd_invert: "Инвертиран"
+  </dest>
+  <voice>
+    *: none
+    lcd_invert: "Inverse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_SHUFFLED
+  desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+  user: 
+  <source>
+    *: "Queue shuffled"
+  </source>
+  <dest>
+    *: "Опашката е разбъркана"
+  </dest>
+  <voice>
+    *: "Queue shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGING
+  desc: in Battery menu
+  user: 
+  <source>
+    *: none
+    usb_charging: "Charge During USB Connection"
+  </source>
+  <dest>
+    *: none
+    usb_charging: "Зареждане пo време на USB връзка"
+  </dest>
+  <voice>
+    *: none
+    usb_charging: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETE
+  desc: The verb/action Delete
+  user: 
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "Изтриване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATE_DIR
+  desc: in main menu
+  user: 
+  <source>
+    *: "Create Directory"
+  </source>
+  <dest>
+    *: "Създаване на директория"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash in recording screen
+  user: 
+  <source>
+    *: none
+    remote: "Remote Display OFF"
+  </source>
+  <dest>
+    *: none
+    remote: "Изключен дисплей на дистанционното"
+  </dest>
+  <voice>
+    *: none
+    remote: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user: 
+  <source>
+    *: none
+    recording: "(Same As Source)"
+  </source>
+  <dest>
+    *: none
+    recording: "(Същата като на източника)"
+  </dest>
+  <voice>
+    *: none
+    recording: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REDUCE_TICKING
+  desc: in remote lcd settings menu
+  user: 
+  <source>
+    *: none
+    remote_ticking: "Reduce Ticking"
+  </source>
+  <dest>
+    *: none
+    remote_ticking: "Намаляване на цъканията"
+  </dest>
+  <voice>
+    *: none
+    remote_ticking: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user: 
+  <source>
+    *: none
+    headphone_detection: "Disable resume on startup if phones unplugged"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "Подновяването при стартиране спряно, ако няма слушалки"
+  </dest>
+  <voice>
+    *: none
+    headphone_detection: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_SAFETY
+  desc: AGC preset
+  user:
+  <source>
+    *: none
+    agc: "Safety (clip)"
+  </source>
+  <dest>
+    *: none
+    agc: "Sigurno (clip)"
+  </dest>
+  <voice>
+    *: none
+    agc: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+  desc: Playlist error
+  user: 
+  <source>
+    *: "Error accessing playlist control file"
+  </source>
+  <dest>
+    *: "Грешка при достъпване на playlist control файла"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_THAI
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Thai (ISO-8859-11)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Тайландски (ISO-8859-11)"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_RESUME
+  desc: bookmark context menu, resume this bookmark
+  user: 
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "Подновяване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PASTE
+  desc: The verb/action Paste
+  user: 
+  <source>
+    *: "Paste"
+  </source>
+  <dest>
+    *: "Поставяне"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_BATTERY_LEVEL
+  desc: Setting for spontaneous battery level announcement
+  user: 
+  <source>
+    *: "Announce Battery Level"
+  </source>
+  <dest>
+    *: "Съобщаване за нивото на батерията"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_PARTITION
+  desc: if save settings has failed
+  user: 
+  <source>
+    *: "No partition?"
+    player: "Partition?"
+  </source>
+  <dest>
+    *: "Няма дял на диска?"
+    player: "Дял?"
+  </dest>
+  <voice>
+    *: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+  desc: Playlist error
+  user: 
+  <source>
+    *: "Error updating playlist control file"
+  </source>
+  <dest>
+    *: "Грешка при обновяването на playlist control файла"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  user:
+  <source>
+    *: none
+    radio: "Europe"
+  </source>
+  <dest>
+    *: none
+    radio: "Европа"
+  </dest>
+  <voice>
+    *: none
+    radio: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_GENRE
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Стил]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN
+  desc: in replaygain
+  user: 
+  <source>
+    *: "Replaygain"
+  </source>
+  <dest>
+    *: "Replaygain"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFTY
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRONG
+  desc: in beep volume in playback settings
+  user: 
+  <source>
+    *: none
+    swcodec: "Strong"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Силен"
+  </dest>
+  <voice>
+    *: none
+    swcodec: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAX_FILES_IN_DIR
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Max Files in Dir Browser"
+  </source>
+  <dest>
+    *: "Максимален брой файлове при разглеждане на директория"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_DIRBROWSE_F2
+  desc: in dir browser, F2 button bar text
+  user: 
+  <source>
+    *: none
+    recorder_pad: "Option"
+  </source>
+  <dest>
+    *: none
+    recorder_pad: "Opcia"
+  </dest>
+  <voice>
+    *: ""
+    recorder_pad: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_COLOR_MENU
+  desc: line selector color menu title
+  user: 
+  <source>
+    *: none
+    lcd_color: "Line Selector Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Цветове на избирача на линии"
+  </dest>
+  <voice>
+    *: ""
+    lcd_color: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FADE_IN
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    backlight_fade: "Backlight Fade In"
+  </source>
+  <dest>
+    *: none
+    backlight_fade: "Постепенна подсведка при вкл"
+  </dest>
+  <voice>
+    *: ""
+    backlight_fade: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user: 
+  <source>
+    *: none
+    swcodec: "Precut"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Precut"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTON_BAR
+  desc: in settings menu
+  user: 
+  <source>
+    *: none
+    recorder_pad: "Button Bar"
+  </source>
+  <dest>
+    *: none
+    recorder_pad: "Лента с бутони"
+  </dest>
+  <voice>
+    *: ""
+    recorder_pad: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: deprecated
+  user: 
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: ""
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ZERO
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "0"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_JAPANESE
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Japanese (SJIS)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Японски (SJIS)"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user: 
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "Внимание! Изтощена батерия!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_U
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "U"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user: 
+  <source>
+    *: none
+    recording: "Encoder Settings"
+  </source>
+  <dest>
+    *: none
+    recording: "Настройки на encoder"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTVIEWER_SETTINGS
+  desc: title for the playlist viewer settings menus
+  user: 
+  <source>
+    *: "Playlist Viewer Settings"
+  </source>
+  <dest>
+    *: "Настройки на разглеждането на плейлисти"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_TIME
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    rtc: "Set Time/Date"
+  </source>
+  <dest>
+    *: none
+    rtc: "Настройки на час/дата"
+  </dest>
+  <voice>
+    *: ""
+    rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user: 
+  <source>
+    *: "Auto Update"
+  </source>
+  <dest>
+    *: "Автоматично обновяване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUM_GAIN
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Album Gain]"
+  </source>
+  <dest>
+    *: "[Усилване на албума]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHT
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_HEBREW
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Hebrew (ISO-8859-8)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Иврит (ISO-8859-8)"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOW_PLAYING
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Now Playing"
+  </source>
+  <dest>
+    *: "В момента свири"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Stop recording"
+  </source>
+  <dest>
+    *: none
+    recording: "Спиране на записването"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_ROCK
+  desc: spoken only, for file extension
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE_FAILED
+  desc: in radio screen
+  user: 
+  <source>
+    *: none
+    radio: "Preset Save Failed"
+  </source>
+  <dest>
+    *: none
+    radio: "Запазването на станциите е неуспешно"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEGABYTE
+  desc: a unit postfix, also voiced
+  user: 
+  <source>
+    *: "MB"
+  </source>
+  <dest>
+    *: "MB"
+  </dest>
+  <voice>
+    *: "megabyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+  desc: prompt shown when about to erase a modified dynamic playlist
+  user: 
+  <source>
+    *: "Erase dynamic playlist?"
+  </source>
+  <dest>
+    *: "Изтриване на динамичния плейлист?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_NOCLIP
+  desc: in replaygain
+  user: 
+  <source>
+    *: none
+    swcodec: "Prevent Clipping"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Предотвратяване на clipping"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER
+  desc: in recording settings_menu
+  user: 
+  <source>
+    *: none
+    recording: "Trigger"
+  </source>
+  <dest>
+    *: none
+    recording: "Тригер"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  user:
+  <source>
+    *: "Database is not ready"
+  </source>
+  <dest>
+    *: "Базата данни не е готова"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUS
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_KOREAN
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Korean (KSX1001)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Корейски (KSX1001)"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ELEVEN
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EMPTY_LIST
+  desc: spoken only, when a list dialog contains no elements
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_FAILED
+  desc: displayed if save settings has failed
+  user: 
+  <source>
+    *: "Save Failed"
+  </source>
+  <dest>
+    *: "Запазването е неуспешно"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_ACCEL_SPEED
+  desc: list acceleration speed
+  user: 
+  <source>
+    *: "List Acceleration Speed"
+    scrollwheel: none
+  </source>
+  <dest>
+    *: "Скорост на ускоряване в списъците"
+    scrollwheel: none
+  </dest>
+  <voice>
+    *: ""
+    scrollwheel: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BYTE
+  desc: a unit postfix
+  user: 
+  <source>
+    *: "B"
+  </source>
+  <dest>
+    *: "B"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user: 
+  <source>
+    *: none
+    recording: "Format"
+  </source>
+  <dest>
+    *: none
+    recording: "Формат"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TURKISH
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: "Turkish (ISO-8859-9)"
+  </source>
+  <dest>
+    *: "Турски (ISO-8859-9)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST
+  desc: in onplay menu.  queue a track/playlist at end of playlist.
+  user: 
+  <source>
+    *: "Queue last"
+  </source>
+  <dest>
+    *: "Вмъкни като последен еднократно"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_MENU
+  desc: bookmark selection list context menu
+  user: 
+  <source>
+    *: "Bookmark Actions"
+  </source>
+  <dest>
+    *: "Действия с отметките"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_FULL
+  desc: in recording screen
+  user: 
+  <source>
+    *: none
+    recording: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
+    m5,x5: "The disk is full. Press POWER to continue."
+    e200,c200: "The disk is full. Press UP to continue."
+  </source>
+  <dest>
+    *: none
+    recording: "Дискът е пълен. Натиснете OFF за да продължите."
+    h100,h120,h300: "Дискът е пълен. Натиснете STOP за да продължите."
+    m5,x5: "Дискът е пълен. Натиснете POWER за да продължите."
+    e200,c200: "Дискът е пълен. Натиснете UP за да продължите."
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+    h100,h120,h300: ""
+    m5,x5: ""
+    e200,c200: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Разбъркване и пропускане на трак"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOREGROUND_COLOR
+  desc: menu entry to set the foreground color
+  user: 
+  <source>
+    *: none
+    lcd_non-mono: "Foreground Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Основен цвят"
+  </dest>
+  <voice>
+    *: ""
+    lcd_non-mono: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NORMAL
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "Нормален"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_SIMPLIFIED
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Simp. Chinese (GB2312)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Опростен китайски (GB2312)"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_AM
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: ""
+    rtc: "A M"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SIZE
+  desc: Display of recorded file size
+  user: 
+  <source>
+    *: none
+    recording: "Size:"
+  </source>
+  <dest>
+    *: none
+    recording: "Razmer:"
+  </dest>
+  <voice>
+    *: none
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT
+  desc: the buffer size, %d MB %d fraction of MB
+  user: 
+  <source>
+    *: "Buffer: %d.%03dMB"
+    player: "Buf: %d.%03dMB"
+  </source>
+  <dest>
+    *: "Буфер: %d.%03dMB"
+    player: "Буф: %d.%03dMB"
+  </dest>
+  <voice>
+    *: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+  desc: Backlight behaviour setting
+  user: 
+  <source>
+    *: "First Buttonpress Enables Backlight Only"
+  </source>
+  <dest>
+    *: "Първото натискане на бутон само осветява екрана"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_MAIN
+  desc: in record settings menu.
+  user: 
+  <source>
+    *: none
+    remote: "Main and Remote Unit"
+  </source>
+  <dest>
+    *: none
+    remote: "Главен и дистанционно"
+  </dest>
+  <voice>
+    *: ""
+    remote: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_HOST
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "Host"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Host"
+  </dest>
+  <voice>
+    *: ""
+    usbstack: "Host"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DIR
+  desc: browser sorting setting
+  user: 
+  <source>
+    *: "Sort Directories"
+  </source>
+  <dest>
+    *: "Сортиране на директориите"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMITS_MENU
+  desc: in the system sub menu
+  user: 
+  <source>
+    *: "Limits"
+  </source>
+  <dest>
+    *: "Ограничения"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_MMC
+  desc: before acknowledging usb in case an MMC is inserted (Ondio)
+  user: 
+  <source>
+    *: none
+    ondio*: "Please remove inserted MMC"
+  </source>
+  <dest>
+    *: none
+    ondio*: "Моля извадете MMC картата"
+  </dest>
+  <voice>
+    *: ""
+    ondio*: "Please remove multimedia card"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_H
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "H"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_WRONG_VERSION
+  desc: The plugin is not compatible with the rockbox version trying to run it
+  user: 
+  <source>
+    *: "Incompatible version"
+  </source>
+  <dest>
+    *: "Несъвместима версия"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user: 
+  <source>
+    *: none
+    headphone_detection: "Pause and Resume"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "Пауза и подновяване"
+  </dest>
+  <voice>
+    *: ""
+    headphone_detection: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_ACCESS_ERROR
+  desc: Playlist error
+  user: 
+  <source>
+    *: "Error accessing playlist file"
+  </source>
+  <dest>
+    *: "Грешка при достъп до playlist-файла"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR_NOT_WRITABLE
+  desc: 
+  user: 
+  <source>
+    *: none
+    recording: "Can't write to recording directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Невъзможно писането в директорията за запис"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_ACTION
+  desc: in radio screen
+  user: 
+  <source>
+    *: none
+    radio_screen_button_bar: "Action"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "Действие"
+  </dest>
+  <voice>
+    *: ""
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_CONFIGURATION
+  desc: in sound_settings
+  user: 
+  <source>
+    *: "Channel Configuration"
+  </source>
+  <dest>
+    *: "Конфигурация на каналите"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONFIRM_WITH_BUTTON
+  desc: Generic string to use to confirm
+  user: 
+  <source>
+    *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    player: "(PLAY/STOP)"
+  </source>
+  <dest>
+    *: "PLAY = Да"
+    h100,h120,h300: "NAVI = Да"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Да"
+    player: "(PLAY/STOP)"
+  </dest>
+  <voice>
+    *: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_BMARK
+  desc: spoken only, for file extension and the word in general
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "bookmark"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_SET_BUTTON
+  desc: used in set_time()
+  user: 
+  <source>
+    *: none
+    rtc: "ON = Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+  </source>
+  <dest>
+    *: none
+    rtc: "ON = Запази"
+    h100,h120,h300: "NAVI = Запази"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Запази"
+  </dest>
+  <voice>
+    *: ""
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_WITH_ANY
+  desc: Generic string to use to cancel
+  user: 
+  <source>
+    *: "Any Other = No"
+    player: none
+  </source>
+  <dest>
+    *: "Всеки друг = Не"
+    player: none
+  </dest>
+  <voice>
+    *: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_M
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_KBD
+  desc: spoken only, for file extension
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "keyboard"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user: 
+  <source>
+    *: "Update Now"
+  </source>
+  <dest>
+    *: "Обновяване сега"
+  </dest>
+  <voice>
+    *: "Update Now"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BEEP
+  desc: in playback settings
+  user: 
+  <source>
+    *: none
+    swcodec: "Beep Volume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Сила на бибиткането"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_MEDIUM
+  desc: AGC preset
+  user:
+  <source>
+    *: none
+    agc: "Medium"
+  </source>
+  <dest>
+    *: none
+    agc: "Sredno"
+  </dest>
+  <voice>
+    *: ""
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIGABYTE
+  desc: a unit postfix, also voiced
+  user: 
+  <source>
+    *: "GB"
+  </source>
+  <dest>
+    *: "GB"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE_CUESHEET
+  desc: 
+  user: 
+  <source>
+    *: "Browse Cuesheet"
+  </source>
+  <dest>
+    *: "Разглеждане на Cuesheet"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BRIGHTNESS
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    backlight_brightness: "Brightness"
+  </source>
+  <dest>
+    *: none
+    backlight_brightness: "Яркост"
+  </dest>
+  <voice>
+    *: ""
+    backlight_brightness: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_DEMOS
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Demos"
+  </source>
+  <dest>
+    *: "Демонстрационни"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user: 
+  <source>
+    *: none
+    recording_swcodec: "Bitrate"
+  </source>
+  <dest>
+    *: none
+    recording_swcodec: "Битрейт"
+  </dest>
+  <voice>
+    *: ""
+    recording_swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_SAVE
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Save EQ Preset"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Запазване на настройките на еквалайзера"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_UNIT
+  desc: in record settings menu.
+  user: 
+  <source>
+    *: none
+    remote: "Main Unit Only"
+  </source>
+  <dest>
+    *: none
+    remote: "Само на плейъра"
+  </dest>
+  <voice>
+    *: ""
+    remote: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_CENTER
+  desc: in sound settings
+  user: 
+  <source>
+    *: none
+    masf: "MDB Center Frequency"
+  </source>
+  <dest>
+    *: none
+    masf: "MDB централна честота"
+  </dest>
+  <voice>
+    *: ""
+    masf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_LOAD
+  desc: load preset list in fm radio
+  user: 
+  <source>
+    *: none
+    radio: "Load Preset List"
+  </source>
+  <dest>
+    *: none
+    radio: "Зареждане на списък със станции"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FADE_OUT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    backlight_fade: "Backlight Fade Out"
+  </source>
+  <dest>
+    *: none
+    backlight_fade: "Постепенно угасване на подсветката"
+  </dest>
+  <voice>
+    *: ""
+    backlight_fade: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_RANDOM
+  desc: "<Random>" entry in tag browser
+  user: 
+  <source>
+    *: "<Random>"
+  </source>
+  <dest>
+    *: "<случайно>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user: 
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "Върхово време"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTARTING_PLAYBACK
+  desc: splash screen displayed when pcm buffer size is changed
+  user: 
+  <source>
+    *: none
+    swcodec: "Restarting playback..."
+  </source>
+  <dest>
+    *: none
+    swcodec: "Рестартиране на свиренето"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATING
+  desc: Screen feedback during playlist creation
+  user: 
+  <source>
+    *: "Creating"
+  </source>
+  <dest>
+    *: "Създаване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_FIRST
+  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  user: 
+  <source>
+    *: "Insert next"
+  </source>
+  <dest>
+    *: "Вмъкване като следващ"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE_TALK
+  desc: Item of voice menu, whether to use file .talk clips
+  user: 
+  <source>
+    *: "Use File .talk Clips"
+  </source>
+  <dest>
+    *: "Използване на .talk клипчета"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_RAM
+  desc: in tag cache settings
+  user: 
+  <source>
+    *: none
+    tc_ramcache: "Load to RAM"
+  </source>
+  <dest>
+    *: none
+    tc_ramcache: "Зареждане в паметта"
+  </dest>
+  <voice>
+    *: ""
+    tc_ramcache: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THIRTEEN
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_TEXT_COLOR
+  desc: line selector text color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Text Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Цвят на текста"
+  </dest>
+  <voice>
+    *: ""
+    lcd_color: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_YEAR
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[година]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OFF_ABORT
+  desc: Used on recorder models
+  user: 
+  <source>
+    *: "OFF to abort"
+    player,h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5,m5: "Long PLAY to abort"
+    h10,h10_5gb,e200,c200: "PREV to abort"
+  </source>
+  <dest>
+    *: "OFF за отказ"
+    player,h100,h120,h300: "STOP за отказ"
+    ipod*: "PLAY/PAUSE за отказ"
+    x5,m5: "Продължително PLAY за отказ"
+    h10,h10_5gb,e200,c200: "PREV за отказ"
+  </dest>
+  <voice>
+    *: ""
+    player,h100,h120,h300: ""
+    ipod*: ""
+    x5,m5: ""
+    h10,h10_5gb,e200,c200: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_CREATE
+  desc: Used off of the bookmark menu to create a bookmark
+  user: 
+  <source>
+    *: "Create Bookmark"
+  </source>
+  <dest>
+    *: "Създаване на отметка"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_THEME_MENU
+  desc: in the settings menu
+  user: 
+  <source>
+    *: "Theme Settings"
+  </source>
+  <dest>
+    *: "Настройки на темите"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_F
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "F"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  user:
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "Случайно"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUTDOWN
+  desc: in main menu
+  user: 
+  <source>
+    *: none
+    soft_shutdown: "Shut down"
+  </source>
+  <dest>
+    *: none
+    soft_shutdown: "Изключване"
+  </dest>
+  <voice>
+    *: ""
+    soft_shutdown: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED
+  desc: in sound settings
+  user: 
+  <source>
+    *: none
+    swcodec: "Crossfeed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Кросфийд"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALL
+  desc: generic string used both in dir file filter and repeat mode selection
+  user: 
   <source>
     *: "All"
   </source>
@@ -2379,135 +5576,969 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
-  user:
+  id: LANG_CREATE_PLAYLIST
+  desc: Menu option for creating a playlist
+  user: 
   <source>
-    *: "Supported"
+    *: "Create Playlist"
   </source>
   <dest>
-    *: "Поддържани"
+    *: "Създаване на плейлист"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
   user:
   <source>
-    *: "Music"
+    *: none
+    recording: "New file"
   </source>
   <dest>
-    *: "Музика"
+    *: none
+    recording: "Нов файл"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OH
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: "" 
+    rtc: "oh"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_FAVES
+  desc: 
+  user: 
+  <source>
+    *: "Add to shortcuts"
+  </source>
+  <dest>
+    *: "Добавяне към кратките пътища"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
-  user:
+  id: LANG_PRESET
+  desc: in button bar and radio screen / menu
+  user: 
   <source>
-    *: "Playlists"
+    *: none
+    radio: "Preset"
   </source>
   <dest>
-    *: "Списъци"
+    *: none
+    radio: "Станция"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU
+  desc: in start screen setting
+  user: 
+  <source>
+    *: "Main Menu"
+  </source>
+  <dest>
+    *: "Главно меню"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user:
+  id: VOICE_NINETY
+  desc: spoken only, for composing numbers
+  user: 
   <source>
-    *: "Quality"
+    *: ""
   </source>
   <dest>
-    *: "Качество"
+    *: ""
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_FREQUENCY
-  desc: in the recording settings
-  user:
+  id: LANG_FILETYPES_PLUGIN_NAME_LONG
+  desc: Viewer plugin name too long
+  user: 
   <source>
-    *: "Frequency"
+    *: "Plugin name too long"
   </source>
   <dest>
-    *: "Честота"
+    *: "Името на плъгина е твърде дълго"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_SOURCE
-  desc: in the recording settings
-  user:
+  id: LANG_USBSTACK_MODE
+  desc: in usbstack settings
+  user: 
   <source>
-    *: "Source"
+    *: none
+    usbstack: "USB Stack Mode"
   </source>
   <dest>
-    *: "Източник"
+    *: none
+    usbstack: "Режим на USB стека"
+  </dest>
+  <voice>
+    *: ""
+    usbstack: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_GAMES
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "Игри"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_MIC
-  desc: in the recording settings
-  user:
+  id: VOICE_CHAR_P
+  desc: spoken only, for spelling
+  user: 
   <source>
-    *: "Mic"
+    *: ""
   </source>
   <dest>
-    *: "Микр"
+    *: ""
+  </dest>
+  <voice>
+    *: "P"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETED
+  desc: A file has beed deleted
+  user: 
+  <source>
+    *: "Deleted"
+  </source>
+  <dest>
+    *: "Изтрит"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user:
+  id: VOICE_CHAR_E
+  desc: spoken only, for spelling
+  user: 
   <source>
-    *: "Line In"
+    *: ""
   </source>
   <dest>
-    *: "Line in"
+    *: ""
+  </dest>
+  <voice>
+    *: "E"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST
+  desc: when playlist has finished
+  user: 
+  <source>
+    *: "End of Song List"
+    player: "End of List"
+  </source>
+  <dest>
+    *: "Край на списъка с песни"
+    player: "Kрай на списъка"
+  </dest>
+  <voice>
+    *: ""
+    player: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_GAIN
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Gain"
+  </source>
+  <dest>
+    *: ""
+    lcd_bitmap: "Usilvane"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_GREEK
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: "Greek (ISO-8859-7)"
+  </source>
+  <dest>
+    *: "Гръцки (ISO-8859-7)"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
-  desc: in the recording settings
-  user:
+  id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+  desc: in the main menu
+  user: 
   <source>
-    *: "Digital"
+    *: "Recent Bookmarks"
   </source>
   <dest>
-    *: "Цифров"
+    *: "Скорощни отметки"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_CHANNELS
-  desc: in the recording settings
+  id: VOICE_THIRTY
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONFIRM_SHUTDOWN
+  desc: in shutdown screen
+  user: 
+  <source>
+    *: none
+    soft_shutdown: "Press OFF to shut down"
+  </source>
+  <dest>
+    *: none
+    soft_shutdown: "Натиснете OFF за изключване"
+  </dest>
+  <voice>
+    *: ""
+    soft_shutdown: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user: 
+  <source>
+    *: none
+    remote: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: none
+    remote: "Настройки на scrolling на дистанционното"
+  </dest>
+  <voice>
+    *: ""
+    remote: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_HARMONICS
+  desc: in sound settings
+  user: 
+  <source>
+    *: none
+    masf: "MDB Harmonics"
+  </source>
+  <dest>
+    *: none
+    masf: "MDB Хармонични"
+  </dest>
+  <voice>
+    *: ""
+    masf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "Device"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Устройство"
+  </dest>
+  <voice>
+    *: ""
+    usbstack: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_WPS
+  desc: spoken only, for file extension
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user: 
+  <source>
+    *: none
+    alarm: "Alarm Wake up Screen"
+  </source>
+  <dest>
+    *: none
+    alarm: "Екран при събуждане от алармата"
+  </dest>
+  <voice>
+    *: ""
+    alarm: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAX_FILES_IN_PLAYLIST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Max Playlist Size"
+  </source>
+  <dest>
+    *: "Максимален размер на плейлиста"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_NAME_INTERNAL
+  desc: in info menu; name for internal disk with multivolume (keep short!)
+  user: 
+  <source>
+    *: none
+    multivolume: "Int:"
+  </source>
+  <dest>
+    *: none
+    multivolume: "Вгр:"
+  </dest>
+  <voice>
+    *: ""
+    multivolume: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_MODE
+  desc: in replaygain
+  user: 
+  <source>
+    *: "Replaygain Type"
+  </source>
+  <dest>
+    *: "Тип на Replaygain"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_REC_DIR
+  desc: 
+  user: 
+  <source>
+    *: none
+    recording: "Clear Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Изчистване на директорията за запис"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF
+  desc: displayed when key lock is turned off
+  user: 
+  <source>
+    *: "Buttons Unlocked"
+  </source>
+  <dest>
+    *: "Бутоните отключени"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FILE
+  desc: spoken only, prefix for file number
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
   user:
+  <source>
+    *: none
+    agc: "Live (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "На живо (бавно)"
+  </dest>
+  <voice>
+    *: ""
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SUPERBASS
+  desc: in sound settings
+  user: 
+  <source>
+    *: none
+    masf: "Super Bass"
+  </source>
+  <dest>
+    *: none
+    masf: "Супер бас"
+  </dest>
+  <voice>
+    *: ""
+    masf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TRADITIONAL
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Trad. Chinese (BIG5)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Традиционен китайски (BIG5)"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_ENABLE
+  desc: in sound settings
+  user: 
+  <source>
+    *: none
+    masf: "MDB Enable"
+  </source>
+  <dest>
+    *: none
+    masf: "Включване на MDB"
+  </dest>
+  <voice>
+    *: ""
+    masf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+  desc: prompt for user to decide to create a bookmark
+  user: 
+  <source>
+    *: "Load Last Bookmark"
+  </source>
+  <dest>
+    *: "Зареждане на последната отметка"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ORDER
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_SPELL
+  desc: "talkbox" mode for files+directories
+  user: 
+  <source>
+    *: "Spell"
+  </source>
+  <dest>
+    *: "Произнасяне по букви"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_V
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECURSE_DIRECTORY_QUESTION
+  desc: Asked from onplay screen
+  user: 
+  <source>
+    *: "Recursively?"
+  </source>
+  <dest>
+    *: "Рекурсивно?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user: 
+  <source>
+    *: "Save Theme Settings"
+  </source>
+  <dest>
+    *: "Запазване на настройките на темата"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PM
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: ""
+    rtc: "P M"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TRACK_GAIN
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Track Gain]"
+  </source>
+  <dest>
+    *: "[усилване на трак]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_NO_PRESETS
+  desc: error when preset list is empty
+  user: 
+  <source>
+    *: none
+    radio: "No presets"
+  </source>
+  <dest>
+    *: none
+    radio: "Няма станции"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user: 
+  <source>
+    *: none
+    recording: "AIFF"
+  </source>
+  <dest>
+    *: none
+    recording: "AIFF"
+  </dest>
+  <voice>
+    *: ""
+    recording: "AIFF"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BILLION
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "billion"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWENTY
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "20"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPY
+  desc: The verb/action Copy
+  user: 
+  <source>
+    *: "Copy"
+  </source>
+  <dest>
+    *: "Копиране"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFE
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_NO_FREE_PRESETS
+  desc: in radio screen
+  user: 
+  <source>
+    *: none
+    radio: "The Preset List is Full"
+  </source>
+  <dest>
+    *: none
+    radio: "Списъкът със станции е пълен"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_MODE
+  desc: in wps F2 pressed
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Mode:"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Rejim:"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  user:
+  <source>
+    *: none
+    agc: "Voice (fast)"
+  </source>
+  <dest>
+    *: none
+    agc: "Глас (бързо)"
+  </dest>
+  <voice>
+    *: ""
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user: 
+  <source>
+    *: "Export Modifications"
+  </source>
+  <dest>
+    *: "Експорт на промените"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FOUR
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVENTY
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE
+  desc: in playlist viewer on+play menu
+  user: 
+  <source>
+    *: "Remove"
+  </source>
+  <dest>
+    *: "Премахване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_DYNAMIC_PLAYLIST
+  desc: in playlist menu.
+  user: 
+  <source>
+    *: "Save Current Playlist"
+  </source>
+  <dest>
+    *: "Запазване на текущия плейлист"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user: 
+  <source>
+    *: none
+    recording: "(No Settings)"
+  </source>
+  <dest>
+    *: none
+    recording: "(Няма настройки)"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIN_DURATION
+  desc: in recording settings_menu
+  user: 
+  <source>
+    *: none
+    recording: "for at least"
+  </source>
+  <dest>
+    *: none
+    recording: "за поне"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_CFG
+  desc: spoken only, for file extension
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_TXT
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_INVALID
+  desc: Playlist resume error
+  user: 
+  <source>
+    *: "Playlist control file is invalid"
+  </source>
+  <dest>
+    *: "Playlist control-файлът е невалиден"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: none
+    recording: "Split Filesize"
+  </source>
+  <dest>
+    *: none
+    recording: "Размер на парчетата"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TEN
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNELS
+  desc: in sound_settings
+  user: 
   <source>
     *: "Channels"
   </source>
@@ -2519,113 +6550,4981 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
-  user:
+  id: LANG_VOICE_DIR_HOVER
+  desc: "talkbox" mode for directories + files
+  user: 
   <source>
-    *: "Scroll Bar"
+    *: ".talk mp3 clip"
   </source>
   <dest>
-    *: "Скролираща черта"
+    *: ".talk mp3 клипче"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
-  user:
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash in recording screen
+  user: 
   <source>
-    *: "Status Bar"
+    *: none
+    remote: "(Vol- : Re-enable)"
   </source>
   <dest>
-    *: "Статус черта"
+    *: none
+    remote: "(Vol- : активиране отново)"
+  </dest>
+  <voice>
+    *: ""
+    remote: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASK
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Ask"
+  </source>
+  <dest>
+    *: "Питане"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_PITCH_UP
-  desc: in wps
-  user:
+  id: LANG_WHILE_PLAYING
+  desc: in settings_menu()
+  user: 
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Pitch up"
-    *: "Pitch Up"
+    *: "Browse .wps files"
   </source>
   <dest>
-    *: "Увеличи височина на звука"
+    *: "Разглеждане на .wps-файловете"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_PITCH_DOWN
-  desc: in wps
-  user:
+  id: LANG_MODE
+  desc: in wps F2 pressed and radio screen
+  user: 
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Pitch down"
-    *: "Pitch Down"
-  </source>
-  <dest>
-    *: "Намали височина на звука"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_F2_MODE
-  desc: in wps F2 pressed
-  user:
-  <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "mode:"
     *: "Mode:"
   </source>
   <dest>
-    *: "Начин:"
+    *: "Режим:"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_GAIN
-  desc: in the recording screen
-  user:
+  id: LANG_FM_BUTTONBAR_RECORD
+  desc: in radio screen
+  user: 
   <source>
-    *: "Gain"
+    *: none
+    radio_screen_button_bar: "Record"
   </source>
   <dest>
-    *: "Записване на"
+    *: none
+    radio_screen_button_bar: "Запис"
+  </dest>
+  <voice>
+    *: ""
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_JUMP_SCROLL_DELAY
+  desc: (player) Delay before making a jump scroll
+  user: 
+  <source>
+    *: "Jump Scroll Delay"
+  </source>
+  <dest>
+    *: "Задържане преди scroll скок"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_LEFT
-  desc: in the recording screen
-  user:
+  id: LANG_REPLAYGAIN_PREAMP
+  desc: in replaygain settings
+  user: 
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Left"
-    *: "Gain Left"
+    *: "Pre-amp"
   </source>
   <dest>
-    *: "Ляво"
+    *: "предусилвател"
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  user:
+  <source>
+    *: none
+    agc: "Medium"
+  </source>
+  <dest>
+    *: none
+    agc: "Среден"
+  </dest>
+  <voice>
+    *: ""
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONE_TIME
+  desc: (player) the jump scroll shall be done "one time"
+  user: 
+  <source>
+    *: "One time"
+  </source>
+  <dest>
+    *: "Еднократно"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user: 
+  <source>
+    *: none
+    pitchscreen: "Semitone Down"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Полутон надолу"
+  </dest>
+  <voice>
+    *: ""
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FADE_ON_STOP
+  desc: options menu to set fade on stop or pause
+  user: 
+  <source>
+    *: "Fade on Stop/Pause"
+  </source>
+  <dest>
+    *: "Затихване при стоп/пауза"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RENAME
+  desc: The verb/action Rename
+  user: 
+  <source>
+    *: "Rename"
+  </source>
+  <dest>
+    *: "Преименуване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SOUND
+  desc: save a sound config file
+  user: 
+  <source>
+    *: "Save Sound Settings"
+  </source>
+  <dest>
+    *: "Запазване на звуковите настройки"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCANNING
+  desc: during auto scan
+  user: 
+  <source>
+    *: none
+    radio: "Scanning %d.%02d MHz"
+  </source>
+  <dest>
+    *: none
+    radio: "Сканиране %d.%02d MHz"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TYPE
+  desc: in battery settings
+  user: 
+  <source>
+    *: none
+    battery_types: "Battery Type"
+  </source>
+  <dest>
+    *: none
+    battery_types: "Тип на батерията"
+  </dest>
+  <voice>
+    *: ""
+    battery_types: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_EXTENSION_FULL
+  desc: Extension array full
+  user: 
+  <source>
+    *: "Extension array full"
+  </source>
+  <dest>
+    *: "Масивът с разширения е пълен"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user: 
+  <source>
+    *: none
+    recording: "Filename:"
+  </source>
+  <dest>
+    *: none
+    recording: "Ime na fail:"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH
+  desc: "pitch" in the pitch screen
+  user: 
+  <source>
+    *: none
+    pitchscreen: "Pitch"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Pitch"
+  </dest>
+  <voice>
+    *: ""
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FREEZE
+  desc: splash screen during freeze in radio mode
+  user: 
+  <source>
+    *: none
+    radio: "Screen frozen!"
+  </source>
+  <dest>
+    *: none
+    radio: "Екранът е замразен!"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_EDITABLE
+  desc: Editable recordings setting
+  user: 
+  <source>
+    *: none
+    recording_hwcodec: "Independent Frames"
+  </source>
+  <dest>
+    *: none
+    recording_hwcodec: "Независими кадри"
+  </dest>
+  <voice>
+    *: ""
+    recording_hwcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PM_CLIPCOUNT
+  desc: in recording GUI, for recording peak meter. MAX 5 characters!
+  user: 
+  <source>
+    *: none
+    recording: "CLIP:"
+  </source>
+  <dest>
+    *: none
+    recording: "CLIP:"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_O
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "O"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  user:
+  <source>
+    *: none
+    agc: "Safety (clip)"
+  </source>
+  <dest>
+    *: none
+    agc: "Безопасно (clip)"
+  </dest>
+  <voice>
+    *: ""
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TYPE_NIMH
+  desc: in battery settings
+  user: 
+  <source>
+    *: none
+    battery_types: "NiMH"
+  </source>
+  <dest>
+    *: none
+    battery_types: "NiMH"
+  </dest>
+  <voice>
+    *: ""
+    battery_types: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_STEP
+  desc: Pixels to advance per Screen scroll
+  user: 
+  <source>
+    *: "Screen Scroll Step Size"
+  </source>
+  <dest>
+    *: "Стъпка при scroll на екрана"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EDIT
+  desc: keyboard
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Edit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_PLAYBACK
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Resume Playback"
+  </source>
+  <dest>
+    *: "Подновяване на свиренето"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_W
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "W"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLUS
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "plus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG
+  desc: in settings_menu.
+  user: 
+  <source>
+    *: none
+    headphone_detection: "Pause on Headphone Unplug"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "Пауза при изваждане на слушалките"
+  </dest>
+  <voice>
+    *: ""
+    headphone_detection: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: 
+  <source>
+    *: "Playlist"
+  </source>
+  <dest>
+    *: "Плейлист"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVENTEEN
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "17"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIO_SCAN_MODE
+  desc: in radio screen / menu
+  user: 
+  <source>
+    *: none
+    radio: "Scan"
+  </source>
+  <dest>
+    *: none
+    radio: "Сканиране"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user: 
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Свирене като следваща"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user: 
+  <source>
+    *: "Playlist Catalog"
+  </source>
+  <dest>
+    *: "Каталог с плейлисти"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CYRILLIC
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: "Cyrillic (CP1251)"
+  </source>
+  <dest>
+    *: "Kирилица (CP1251)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETE_DIR
+  desc: in on+play menu
+  user: 
+  <source>
+    *: "Delete Directory"
+  </source>
+  <dest>
+    *: "Изтриване на директория"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: none
+    recording: "Split Measure"
+  </source>
+  <dest>
+    *: none
+    recording: "Мерки на разделянето"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POINT
+  desc: decimal separator for composing numbers
+  user: 
+  <source>
+    *: "."
+  </source>
+  <dest>
+    *: "."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LANGUAGE
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Language"
+  </source>
+  <dest>
+    *: "Език"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_K
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "K"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_PAGINATED
+  desc: jump to new page when scrolling
+  user: 
+  <source>
+    *: "Paged Scrolling"
+  </source>
+  <dest>
+    *: "Scroll на страници"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: none
+    swcodec: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Горна честота на Cutoff"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAUSE
+  desc: spoken only, for spelling, a split second of silence (difficult to author)
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: " "
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FMR
+  desc: Used when you need to say Preset List, also voiced
+  user: 
+  <source>
+    *: none
+    radio: "Preset List"
+  </source>
+  <dest>
+    *: none
+    radio: "Списък със станции"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DELAY
+  desc: in crossfade settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Fade-Out Delay"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Задържане на затихването"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USBSTACK_DEVICE_DRIVER
+  desc: in usbstack settings
+  user: 
+  <source>
+    *: none
+    usbstack: "Device Driver"
+  </source>
+  <dest>
+    *: none
+    usbstack: "Драйвер за устройство"
+  </dest>
+  <voice>
+    *: ""
+    usbstack: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_UTF8
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: "Unicode (UTF-8)"
+  </source>
+  <dest>
+    *: "Unicode (UTF-8)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_GROUPING
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Work]"
+  </source>
+  <dest>
+    *: "[произведение]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_MENU
+  desc: in the display sub menu
+  user: 
+  <source>
+    *: "LCD Settings"
+  </source>
+  <dest>
+    *: "Настройки на LCD"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_VIEW
+  desc: should lines scroll out of the screen
+  user: 
+  <source>
+    *: "Screen Scrolls Out Of View"
+  </source>
+  <dest>
+    *: "Scroll на екрана извън изглед"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HUNDRED
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_INSERT_COUNT
+  desc: splash number of tracks inserted
+  user: 
+  <source>
+    *: "Inserted %d tracks (%s)"
+  </source>
+  <dest>
+    *: "Вмъкнати %d трака (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_ERROR
+  desc: The plugin return an error code
+  user: 
+  <source>
+    *: "Plugin returned error"
+  </source>
+  <dest>
+    *: "Плъгинът върна грешка"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_UNACCEPTABLE
+  desc: splash when user selects an invalid colour
+  user: 
+  <source>
+    *: none
+    lcd_non-mono: "Invalid colour"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Невалиден цвят"
+  </dest>
+  <voice>
+    *: ""
+    lcd_non-mono: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Z
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE
+  desc: root of voice menu
+  user: 
+  <source>
+    *: "Voice"
+  </source>
+  <dest>
+    *: "Глас"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Keyclick"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Цъкане на бутоните"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS
+  desc: in general settings
+  user: 
+  <source>
+    *: "Bookmarking"
+  </source>
+  <dest>
+    *: "Правене на отметки"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE
+  desc: in tag cache settings
+  user: 
+  <source>
+    *: "Initialize now"
+  </source>
+  <dest>
+    *: "Инициализиране сега"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECURSE_DIRECTORY
+  desc: In playlist menu
+  user: 
+  <source>
+    *: "Recursively Insert Directories"
+  </source>
+  <dest>
+    *: "Рекурсивно вмъкване на директориите"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIXTEEN
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[дължина]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user: 
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "Батерията е празна! ЗАРЕДИ!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DOT
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_SHUFFLED
+  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+  user: 
+  <source>
+    *: "Insert shuffled"
+  </source>
+  <dest>
+    *: "Разбъркано вмъкване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT
+  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  user: 
+  <source>
+    *: "Insert"
+  </source>
+  <dest>
+    *: "Вмъкване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW
+  desc: in on+play menu
+  user: 
+  <source>
+    *: "View"
+  </source>
+  <dest>
+    *: "Преглед"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  user:
+  <source>
+    *: none
+    radio: "Korea"
+  </source>
+  <dest>
+    *: none
+    radio: "Корея"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STEREO_WIDTH
+  desc: in sound_settings
+  user: 
+  <source>
+    *: "Stereo Width"
+  </source>
+  <dest>
+    *: "Широчина на стереото"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user: 
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "Включен от"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVEN
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Y
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Y"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_MENU
+  desc: item of voice menu, enable/disable the voice UI
+  user: 
+  <source>
+    *: "Voice Menus"
+  </source>
+  <dest>
+    *: "Произнасяй менютата"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user: 
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Невалидно име на файл!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_IN_PLAYLIST
+  desc: in playlist menu.
+  user: 
+  <source>
+    *: "Search In Playlist"
+  </source>
+  <dest>
+    *: "Търсене в плейлиста"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_DJSET
+  desc: AGC preset
+  user:
+  <source>
+    *: none
+    agc: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "DJ-Set (bavno)"
+  </dest>
+  <voice>
+    *: ""
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_PLAYLIST
+  desc: in playlist menu, reshuffles the order in which songs are played
+  user: 
+  <source>
+    *: "Reshuffle"
+  </source>
+  <dest>
+    *: "Разбъркай отново"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARTY_MODE
+  desc: party mode
+  user: 
+  <source>
+    *: "Party Mode"
+  </source>
+  <dest>
+    *: "Режим 'парти'"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINE_IN
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording,player: "Line In"
+  </source>
+  <dest>
+    *: none
+    recording,player: "Line In"
+  </dest>
+  <voice>
+    *: ""
+    recording,player: "Line In"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_TYPE
+  desc: browser sorting setting
+  user: 
+  <source>
+    *: "By Type"
+  </source>
+  <dest>
+    *: "По тип"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_QUEUE_COUNT
+  desc: splash number of tracks queued
+  user: 
+  <source>
+    *: "Queued %d tracks (%s)"
+  </source>
+  <dest>
+    *: "Временно вмъкнати %d трака (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_POINTER
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Pointer"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Стрелка"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_FAILED
+  desc: text for splash to indicate a failure to load a bitmap as backdrop
+  user: 
+  <source>
+    *: none
+    lcd_non-mono: "Backdrop Failed"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Зареждането на картинка за фон неуспешно"
+  </dest>
+  <voice>
+    *: ""
+    lcd_non-mono: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_UNIT
+  desc: in record settings menu.
+  user: 
+  <source>
+    *: none
+    remote: "Remote Unit Only"
+  </source>
+  <dest>
+    *: none
+    remote: "Само дистанционното"
+  </dest>
+  <voice>
+    *: ""
+    remote: "no"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_OVERWRITE
+  desc: The verb/action Paste
+  user: 
+  <source>
+    *: "File/directory exists. Overwrite?"
+  </source>
+  <dest>
+    *: "Файлът/Директорията съществува? Презаписване?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIG_NOREARM
+  desc: in recording settings_menu
+  user: 
+  <source>
+    *: none
+    recording: "Once"
+  </source>
+  <dest>
+    *: none
+    recording: "Еднократно"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLISECONDS
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_ADD
+  desc: in radio screen
+  user: 
+  <source>
+    *: none
+    radio_screen_button_bar: "Add"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "Добавяне"
+  </dest>
+  <voice>
+    *: ""
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_FREE_INFO
+  desc: disk size info
+  user: 
+  <source>
+    *: "Free:"
+  </source>
+  <dest>
+    *: "Свободно:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIX
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "6"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOT_CHANGED
+  desc: File browser discovered the boot file was changed
+  user: 
+  <source>
+    *: "Boot changed"
+  </source>
+  <dest>
+    *: "Фирмуерът е променен"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Cutoff Честота"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWO
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "2"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  user:
+  <source>
+    *: none
+    radio: "US / Canada"
+  </source>
+  <dest>
+    *: none
+    radio: "САЩ / Канада"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT
+  desc: general please wait splash
+  user: 
+  <source>
+    *: "Loading..."
+  </source>
+  <dest>
+    *: "Зареждане..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_S
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "S"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_MENU
+  desc: in the system sub menu
+  user: 
+  <source>
+    *: "Battery"
+  </source>
+  <dest>
+    *: "Батерия"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_invert: "LCD Mode"
+  </source>
+  <dest>
+    *: none
+    lcd_invert: "LCD режим"
+  </dest>
+  <voice>
+    *: ""
+    lcd_invert: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_CFG
+  desc: in setting_menu()
+  user: 
+  <source>
+    *: "Browse .cfg files"
+  </source>
+  <dest>
+    *: "Разглеждане на .cfg-файловете"
+  </dest>
+  <voice>
+    *: "" 
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLIP_LIGHT
+  desc: in record settings menu.
+  user: 
+  <source>
+    *: none
+    recording: "Clipping Light"
+  </source>
+  <dest>
+    *: none
+    recording: "Осветяване при clipping"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_DELETE_PRESET
+  desc: in radio screen
+  user: 
+  <source>
+    *: none
+    radio: "Remove Preset"
+  </source>
+  <dest>
+    *: none
+    radio: "Премахване на станция"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_REPEAT_AB
+  desc: repeat range from point A to B
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "A-B"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "A-B"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: "A-B"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+  desc: Save in recent bookmarks only
+  user: 
+  <source>
+    *: "Ask - Recent only"
+  </source>
+  <dest>
+    *: "Питане - само скорощни"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIME
+  desc: Display of recorded time
+  user: 
+  <source>
+    *: none
+    recording: "Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "Час:"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_COLORS
+  desc: menu
+  user: 
+  <source>
+    *: none
+    lcd_non-mono: "Reset Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Възстановяване на цветовете"
+  </dest>
+  <voice>
+    *: ""
+    lcd_non-mono: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS
+  desc: used in various places
+  user: 
+  <source>
+    *: "Always"
+  </source>
+  <dest>
+    *: "Винаги"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFTEEN
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "15"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  user:
+  <source>
+    *: none
+    agc: "AGC"
+  </source>
+  <dest>
+    *: none
+    agc: "AGC"
+  </dest>
+  <voice>
+    *: ""
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  user:
+  <source>
+    *: none
+    radio: "Region"
+  </source>
+  <dest>
+    *: none
+    radio: "Регион"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_B
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "B"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HEADPHONE_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user: 
+  <source>
+    *: none
+    headphone_detection: "Duration to Rewind"
+  </source>
+  <dest>
+    *: none
+    headphone_detection: "Продължителност на превъртането"
+  </dest>
+  <voice>
+    *: ""
+    headphone_detection: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_UP_SEMITONE
+  desc: in wps
+  user: 
+  <source>
+    *: none
+    pitchscreen: "Semitone Up"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Полутон нагоре"
+  </dest>
+  <voice>
+    *: ""
+    pitchscreen: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_TITLE
+  desc: main menu title
+  user: 
+  <source>
+    *: "Rockbox"
+  </source>
+  <dest>
+    *: "Рокбокс"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR
+  desc: item of voice menu, set the voice mode for directories
+  user: 
+  <source>
+    *: "Voice Directories"
+  </source>
+  <dest>
+    *: "Произнасяне на директориите"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user: 
+  <source>
+    *: "Add to New Playlist"
+  </source>
+  <dest>
+    *: "Добавяне към нов плейлист"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_FILE
+  desc: browser sorting setting
+  user: 
+  <source>
+    *: "Sort Files"
+  </source>
+  <dest>
+    *: "Сортиране на файловете"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  user:
+  <source>
+    *: none
+    recording: "Stop"
+  </source>
+  <dest>
+    *: none
+    recording: "Спиране"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_MENU
+  desc: in the system sub menu
+  user: 
+  <source>
+    *: none
+    rtc: "Time & Date"
+  </source>
+  <dest>
+    *: none
+    rtc: "Час и дата"
+  </dest>
+  <voice>
+    *: ""
+    rtc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_X
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "X"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DURATION
+  desc: in crossfade settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Fade-In Duration"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Продължителност на постепенното започване"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_VOICE
+  desc: AGC preset
+  user:
+  <source>
+    *: none
+    agc: "Voice (fast)"
+  </source>
+  <dest>
+    *: none
+    agc: "Glas (burzo)"
+  </dest>
+  <voice>
+    *: ""
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
+  desc: Display of record timer interval setting, on the record screen
+  user: 
+  <source>
+    *: none
+    recording: "Split Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "Vreme za razdeliane:"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DURATION
+  desc: in crossfade settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Fade-Out Duration"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Продължителност на затихването"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_AJZ
+  desc: spoken only, for file extension
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "firmware"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BOOKMARK_SELECT_INDEX_TEXT
+  desc: voice only, used in the bookmark list to label index number
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Index"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: none
+    recording: "Split Time"
+  </source>
+  <dest>
+    *: none
+    recording: "Време на разделяне"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FIRST_AUTOSCAN
+  desc: When you run the radio without an fmr file in settings
+  user: 
+  <source>
+    *: none
+    radio: "No settings found. Autoscan?"
+  </source>
+  <dest>
+    *: none
+    radio: "Не са намерени настройки. Автоматично сканиране?"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_LABELS
+  desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+  user: 
+  <source>
+    *: none
+    lcd_color: "RGB"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "RGB"
+  </dest>
+  <voice>
+    *: ""
+    lcd_color: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user: 
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "Моля рестартирайте за включване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SAVE_COUNT
+  desc: splash number of tracks saved
+  user: 
+  <source>
+    *: "Saved %d tracks (%s)"
+  </source>
+  <dest>
+    *: "%d трака запазени (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_ENABLE
+  desc: in directory cache settings
+  user: 
+  <source>
+    *: none
+    dircache: "Directory Cache"
+  </source>
+  <dest>
+    *: none
+    dircache: "Кеширане на директориите"
+  </dest>
+  <voice>
+    *: ""
+    dircache: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SEARCH_MSG
+  desc: splash number of tracks inserted
+  user: 
+  <source>
+    *: "Searching... %d found (%s)"
+  </source>
+  <dest>
+    *: "Търсене...  намерени %d (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_LOAD_EMPTY
+  desc: Indicates bookmark was empty
+  user: 
+  <source>
+    *: "Bookmark Empty"
+  </source>
+  <dest>
+    *: "Отметката е празна"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN_ITEM
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "%d Hz Band Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Усилване на лента %d Hz"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_EXIT
+  desc: in radio screen
+  user: 
+  <source>
+    *: none
+    radio_screen_button_bar: "Exit"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "Изход"
+  </dest>
+  <voice>
+    *: ""
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_V2_FIRST
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKSKIP
+  desc: in crossfade settings
+  user: 
+  <source>
+    *: none
+    swcodec: "Track Skip Only"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Само при пропускане на трак"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_MENU_TITLE
+  desc: title for the onplay menus
+  user: 
+  <source>
+    *: "Context Menu"
+  </source>
+  <dest>
+    *: "Контекстно меню"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FLIP_DISPLAY
+  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Upside Down"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Otgore nadolu"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CENTER
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Center Frequency"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Централна честота"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in start screen setting
+  user: 
+  <source>
+    *: "Previous Screen"
+  </source>
+  <dest>
+    *: "Предишен екран"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_DISPLAY
+  desc: in playlist viewer on+play menu
+  user: 
+  <source>
+    *: "Track Display"
+  </source>
+  <dest>
+    *: "Показване на трак"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYBOARD_LOADED
+  desc: shown when a keyboard has been loaded from the dir browser
+  user: 
+  <source>
+    *: "New Keyboard"
+  </source>
+  <dest>
+    *: "Нова клавиатура"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_CLEAR
+  desc: clear preset list in fm radio
+  user: 
+  <source>
+    *: none
+    radio: "Clear Preset List"
+  </source>
+  <dest>
+    *: none
+    radio: "Изчистване на списъка със станциите"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUTTINGDOWN
+  desc: in main menu
+  user: 
+  <source>
+    *: "Shutting down..."
+  </source>
+  <dest>
+    *: "Изключване..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN_EXTENDED
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: "Latin Extended (ISO-8859-2)"
+  </source>
+  <dest>
+    *: "Разширена латиница (ISO-8859-2)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_L
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "L"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_R
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "R"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user: 
+  <source>
+    *: "Add to Playlist"
+  </source>
+  <dest>
+    *: "Добавяне към плейлиста"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ERROR
+  desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+  user: 
+  <source>
+    *: none
+    alarm: "Alarm Time Is Too Soon!"
+  </source>
+  <dest>
+    *: none
+    alarm: "Времето на алармата е твърде скоро!"
+  </dest>
+  <voice>
+    *:  ""
+    alarm: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_NAME_MMC
+  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  user: 
+  <source>
+    *: none
+    e200,c200: "mSD:"
+    ondio*: "MMC:"
+  </source>
+  <dest>
+    *: none
+    e200,c200: "MSD:"
+    ondio*: "MMC:"
+  </dest>
+  <voice>
+    *: ""
+    e200,c200: "micro S D"
+    ondio*: "M M C"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Button Light Brightness"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Яркост на осветяването на бутоните"
+  </dest>
+  <voice>
+    *: ""
+    gigabeatf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGINS
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Plugins"
+  </source>
+  <dest>
+    *: "Плъгини"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE
+  desc: in the main menu and the settings menu
+  user: 
+  <source>
+    *: "Database"
+  </source>
+  <dest>
+    *: "База данни"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user: 
+  <source>
+    *: "Cuesheet Support"
+  </source>
+  <dest>
+    *: "Поддръжка на cuesheet"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_GRADIENT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_color: "Bar (Gradient Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Лента (преливащ цвят)"
+  </dest>
+  <voice>
+    *: ""
+    lcd_color: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_GAIN
+  desc: use track gain if shuffle mode is on, album gain otherwise
+  user: 
+  <source>
+    *: "Track Gain if Shuffling"
+  </source>
+  <dest>
+    *: "Усилване на траковете ако е в режим на разбъркване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_DISCNUM
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[ДискNo]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_FILENAME_EXT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Show Filename Extensions"
+  </source>
+  <dest>
+    *: "Показване на разширенията на файловете"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_AB
+  desc: repeat range from point A to B
+  user: 
+  <source>
+    *: "A-B"
+  </source>
+  <dest>
+    *: "A-B"
+  </dest>
+  <voice>
+    *: "A-B"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE
+  desc: The verb/action Move
+  user: 
+  <source>
+    *: "Move"
+  </source>
+  <dest>
+    *: "Преместване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RADIO
+  desc: in the main menu
+  user: 
+  <source>
+    *: none
+    radio: "FM Radio"
+  </source>
+  <dest>
+    *: none
+    radio: "FM Радио"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STOP_GAP
+  desc: in recording settings_menu
+  user: 
+  <source>
+    *: none
+    recording: "Presplit Gap"
+  </source>
+  <dest>
+    *: none
+    recording: "Дупка преди разделяне"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user: 
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "Зареждане... Завършени %d%% (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Q
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_PRERECORD
+  desc: in recording and radio screen
+  user: 
+  <source>
+    *: none
+    recording: "Pre-Recording"
+  </source>
+  <dest>
+    *: none
+    recording: "Предварителен запис"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNTIMEDB_ACTIVE
+  desc: in settings_menu.
+  user: 
+  <source>
+    *: "Gather Runtime Data"
+  </source>
+  <dest>
+    *: "Добиване на данни по време на работа"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWELVE
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "12"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_GAIN
+  desc: in replaygain
+  user: 
+  <source>
+    *: "Album Gain"
+  </source>
+  <dest>
+    *: "Усилване по албум"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Start new file"
+  </source>
+  <dest>
+    *: none
+    recording: "Започване на нов файл"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: none
+    recording: "What to do when Splitting"
+  </source>
+  <dest>
+    *: none
+    recording: "Какво да се прави при разделяне"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_SCREEN
+  desc: in the system sub menu
+  user: 
+  <source>
+    *: "Start Screen"
+  </source>
+  <dest>
+    *: "Екран при стартиране"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+  desc: Save in recent bookmarks only
+  user: 
+  <source>
+    *: "Yes - Recent only"
+  </source>
+  <dest>
+    *: "Да - само скорошните"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: none
+    recording: "Split Filesize"
+  </source>
+  <dest>
+    *: none
+    recording: "Razmer na faila pri razdeliane"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_LIST
+  desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+  user: 
+  <source>
+    *: "List Bookmarks"
+  </source>
+  <dest>
+    *: "Списък с отметки"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: deprecated
+  user: 
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: ""
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_CANT_OPEN
+  desc: Plugin open error message
+  user: 
+  <source>
+    *: "Can't open %s"
+  </source>
+  <dest>
+    *: "%s не може да се отвори"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN1
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: "Latin1 (ISO-8859-1)"
+  </source>
+  <dest>
+    *: "Латиница 1 (ISO-8859-1)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_STRENGTH
+  desc: in sound settings
+  user: 
+  <source>
+    *: none
+    masf: "MDB Strength"
+  </source>
+  <dest>
+    *: none
+    masf: "Сила на MDB"
+  </dest>
+  <voice>
+    *: ""
+    masf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_COLOR
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_color: "Bar (Solid Colour)"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Лента (запълнен цвят)"
+  </dest>
+  <voice>
+    *: ""
+    lcd_color: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_ENABLE
+  desc: in replaygain
+  user: 
+  <source>
+    *: "Enable Replaygain"
+  </source>
+  <dest>
+    *: "Включване на replaygain"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ONE
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE
+  desc: The verb/action Queue
+  user: 
+  <source>
+    *: "Queue"
+  </source>
+  <dest>
+    *: "Опашка"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_DONT_RESUME
+  desc: top item in the list when asking user about bookmark auto load
+  user: 
+  <source>
+    *: "<Don't Resume>"
+  </source>
+  <dest>
+    *: "<Не подновявай>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CONTEXT_DELETE
+  desc: bookmark context menu, delete this bookmark
+  user: 
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "Изтриване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: none
+    swcodec: "Cross Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Cross усилване"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  user:
+  <source>
+    *: none
+    radio: "Japan"
+  </source>
+  <dest>
+    *: none
+    radio: "Япония"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_PRERECORD_TIME
+  desc: in recording settings_menu
+  user: 
+  <source>
+    *: none
+    recording: "Prerecord Time"
+  </source>
+  <dest>
+    *: none
+    recording: "Време на предварителен запис"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OCLOCK
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: ""
+    rtc: "o'clock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "Показване на пътя"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK
+  desc: bookmark selection list title
+  user: 
+  <source>
+    *: "Select Bookmark"
+  </source>
+  <dest>
+    *: "Избиране на отметка"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_DISABLE
+  desc: Announce that the RTC alarm has been turned off
+  user: 
+  <source>
+    *: none
+    alarm: "Alarm Disabled"
+  </source>
+  <dest>
+    *: none
+    alarm: "Aлармата е изключена"
+  </dest>
+  <voice>
+    *: ""
+    alarm: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Dithering"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Dithering"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_ARABIC
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Arabic (CP1256)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Арабски (CP1256)"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE
+  desc: Save preset list in fm radio
+  user: 
+  <source>
+    *: none
+    radio: "Save Preset List"
+  </source>
+  <dest>
+    *: none
+    radio: "Запазване на списъка със станции"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_APPS
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Applications"
+  </source>
+  <dest>
+    *: "Приложения"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LISTACCEL_START_DELAY
+  desc: Delay before list starts accelerating
+  user: 
+  <source>
+    *: "List Acceleration Start Delay"
+    scrollwheel: none
+  </source>
+  <dest>
+    *: "Начално задържане на ускоряването на списъците"
+    scrollwheel: none
+  </dest>
+  <voice>
+    *: ""
+    scrollwheel: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINE
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "9"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_VALUE
+  desc: in color screen
+  user: 
+  <source>
+    *: none
+    lcd_color: "RGB: %02X%02X%02X"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "RGB: %02X%02X%02X"
+  </dest>
+  <voice>
+    *: ""
+    lcd_color: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THOUSAND
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "thousand"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVING
+  desc: 
+  user: 
+  <source>
+    *: "Moving..."
+  </source>
+  <dest>
+    *: "Преместване..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: deprecated
+  user: 
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: ""
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_REMOTE_MENU
+  desc: in the display sub menu
+  user: 
+  <source>
+    *: none
+    remote: "Remote-LCD Settings"
+  </source>
+  <dest>
+    *: none
+    remote: "Настройки на LCD на дистанционното"
+  </dest>
+  <voice>
+    *: ""
+    remote: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Simple EQ Settings"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Прости настройки на EQ"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR_TALK
+  desc: Item of voice menu, whether to use directory .talk clips
+  user: 
+  <source>
+    *: "Use Directory .talk Clips"
+  </source>
+  <dest>
+    *: "Използване на .talk клипчета за директориите"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_LOW_SHELF
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Low Shelf Filter"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Low Shelf филтър"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_TIME
+  desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+  user: 
+  <source>
+    *: none
+    alarm: "Alarm Time: %02d:%02d"
+  </source>
+  <dest>
+    *: none
+    alarm: "Време на алармата: %02d:%02d"
+  </dest>
+  <voice>
+    *: ""
+    alarm: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_LIVE
+  desc: AGC preset
+  user:
+  <source>
+    *: none
+    agc: "Live (slow)"
+  </source>
+  <dest>
+    *: none
+    agc: "Na jivo (bavno)"
+  </dest>
+  <voice>
+    *: ""
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ADD_PRESET
+  desc: in radio menu
+  user: 
+  <source>
+    *: none
+    radio: "Add Preset"
+  </source>
+  <dest>
+    *: none
+    radio: "Добавяне на станция"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user: 
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "Свойства"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_WRONG_MODEL
+  desc: The plugin is not compatible with the archos model trying to run it
+  user: 
+  <source>
+    *: "Incompatible model"
+  </source>
+  <dest>
+    *: "Несъвместим модел"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEAK
+  desc: in beep volume in playback settings
+  user: 
+  <source>
+    *: none
+    swcodec: "Weak"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Слабо"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DB_INF
+  desc: -inf db for values below measurement
+  user: 
+  <source>
+    *: none
+    recording: "-inf"
+  </source>
+  <dest>
+    *: none
+    recording: "-безкр"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_D
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "D"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HERTZ
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "hertz"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HOUR
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "hour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Edit mode: %s"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Режим на редактиране: %s"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: none
+    swcodec: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Намаляване на високите честоти"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SHOW_ID3_INFO
+  desc: Menu option to start tag viewer
+  user: 
+  <source>
+    *: "Show Track Info"
+  </source>
+  <dest>
+    *: "Показване на информация за трака"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE
+  desc: in playback settings
+  user: 
+  <source>
+    *: none
+    swcodec: "Crossfade"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Crossfade"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_MENU
+  desc: in the system sub menu
+  user: 
+  <source>
+    *: "Disk"
+  </source>
+  <dest>
+    *: "Диск"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MANAGE_MENU
+  desc: in the main menu
+  user: 
+  <source>
+    *: "Manage Settings"
+  </source>
+  <dest>
+    *: "Управление на настройките"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONBAR_MENU
+  desc: in button bar
+  user: 
+  <source>
+    *: none
+    radio_screen_button_bar: "Menu"
+  </source>
+  <dest>
+    *: none
+    radio_screen_button_bar: "Меню"
+  </dest>
+  <voice>
+    *: ""
+    radio_screen_button_bar: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ENABLED
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Enable EQ"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Включване на EQ"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user: 
+  <source>
+    *: "View Catalog"
+  </source>
+  <dest>
+    *: "Разглеждане на каталога"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_CUESHEET
+  desc: 
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "cuesheet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SETTINGS
+  desc: in system_settings_menu()
+  user: 
+  <source>
+    *: "Write .cfg file"
+  </source>
+  <dest>
+    *: "Записване на .cfg файл"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SHUFFLE
+  desc: bookmark selection list, bookmark enables shuffle
+  user: 
+  <source>
+    *: ", Shuffle"
+  </source>
+  <dest>
+    *: ", Разбъркване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLORS_MENU
+  desc: colours menu under theme settings
+  user: 
+  <source>
+    *: none
+    lcd_color: "Colours"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Цветове"
+  </dest>
+  <voice>
+    *: ""
+    lcd_color: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_J
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "J"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_INVALID
+  desc: bookmark selection list, bookmark couldn't be parsed
+  user: 
+  <source>
+    *: "<Invalid Bookmark>"
+  </source>
+  <dest>
+    *: "<Невалидна отметка>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  user:
+  <source>
+    *: none
+    agc: "AGC clip time"
+  </source>
+  <dest>
+    *: none
+    agc: "Време на AGC clip"
+  </dest>
+  <voice>
+    *: ""
+    agc: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_DYNAMIC_PLAYLIST
+  desc: in playlist menu.
+  user: 
+  <source>
+    *: "View Current Playlist"
+  </source>
+  <dest>
+    *: "Разглеждане на текущия плейлист"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CURRENT_TIME
+  desc: spoken only, for wall clock announce
+  user: 
+  <source>
+    *: none
+    rtc: ""
+  </source>
+  <dest>
+    *: none
+    rtc: ""
+  </dest>
+  <voice>
+    *: ""
+    rtc: "Current time:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_SHAPE
+  desc: in sound settings
+  user: 
+  <source>
+    *: none
+    masf: "MDB Shape"
+  </source>
+  <dest>
+    *: none
+    masf: "Форма на MDB"
+  </dest>
+  <voice>
+    *: ""
+    masf: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE
+  desc: Displayed for setting car adapter mode to on/off
+  user: 
+  <source>
+    *: none
+    charging: "Car Adapter Mode"
+  </source>
+  <dest>
+    *: none
+    charging: "Режим адаптер за кола"
+  </dest>
+  <voice>
+    *: ""
+    charging: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STOP_THRESHOLD
+  desc: in recording settings_menu
+  user: 
+  <source>
+    *: none
+    recording: "Stop Below"
+  </source>
+  <dest>
+    *: none
+    recording: "Спиране под"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUT
+  desc: The verb/action Cut
+  user: 
+  <source>
+    *: "Cut"
+  </source>
+  <dest>
+    *: "Отрязване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    e200: "Wheel Light Timeout"
+    c200,gigabeatf,mrobe100: "Button Light Timeout"
+  </source>
+  <dest>
+    *: none
+    e200: "Изключване на осветяването на колелото"
+    c200,gigabeatf,mrobe100: "Изключване на осветяването на бутоните"
+  </dest>
+  <voice>
+    *: ""
+    e200: ""
+    c200,gigabeatf,mrobe100: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FLIP_DISPLAY
+  desc: in settings_menu, option to turn display+buttos by 180 degrees
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Upside Down"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Отгоре надолу"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_CUSTOM
+  desc: in sound_settings
+  user: 
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Персонално"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUMARTIST
+  desc: in tag viewer
+  user: 
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Албумен изпълнител]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_HIGH_SHELF
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "High Shelf Filter"
+  </source>
+  <dest>
+    *: none
+    swcodec: "High Shelf филтър"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RWPS
+  desc: spoken only, for file extension
+  user: 
+  <source>
+    *: none
+    remote: ""
+  </source>
+  <dest>
+    *: none
+    remote: ""
+  </dest>
+  <voice>
+    *: ""
+    remote: "remote while-playing-screen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KHZ
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilohertz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user: 
+  <source>
+    *: none
+    recording: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: none
+    recording: "MPEG Layer 3"
+  </dest>
+  <voice>
+    *: ""
+    recording: "MPEG Layer 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user: 
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "Само текущата директория"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECTOR_END_COLOR
+  desc: line selector color option
+  user: 
+  <source>
+    *: none
+    lcd_color: "Secondary Colour"
+  </source>
+  <dest>
+    *: none
+    lcd_color: "Втори цвят"
+  </dest>
+  <voice>
+    *: ""
+    lcd_color: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_NUMBER
+  desc: "talkbox" mode for files+directories
+  user: 
+  <source>
+    *: "Numbers"
+  </source>
+  <dest>
+    *: "Числа"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TRACK_NAME_ONLY
+  desc: track display options
+  user: 
+  <source>
+    *: "Track Name Only"
+  </source>
+  <dest>
+    *: "Само името на трака"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_TIME_TO_GO
+  desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+  user: 
+  <source>
+    *: none
+    alarm: "Waking Up In %d:%02d"
+  </source>
+  <dest>
+    *: none
+    alarm: "Събуждане в %d:%02d"
+  </dest>
+  <voice>
+    *: ""
+    alarm: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE
+  desc: item of voice menu, set the voice mode for files
+  user: 
+  <source>
+    *: "Voice Filenames"
+  </source>
+  <dest>
+    *: "Произнасяне на имената на файловете"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE_CUTOFF
+  desc: Treble setting cut-off frequency
+  user: 
+  <source>
+    *: none
+    ipodvideo: "Treble Cutoff"
+  </source>
+  <dest>
+    *: none
+    ipodvideo: "Отрязване на високите"
+  </dest>
+  <voice>
+    *: ""
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_CHANNELS
+  desc: in the recording settings
+  user: 
+  <source>
+    *: none
+    recording: "Channels"
+  </source>
+  <dest>
+    *: none
+    recording: "Kanali"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINETEEN
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "19"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAILED
+  desc: Something failed. To be appended after actions
+  user: 
+  <source>
+    *: "Failed"
+  </source>
+  <dest>
+    *: "неуспешно"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_GAIN
+  desc: in replaygain
+  user: 
+  <source>
+    *: "Track Gain"
+  </source>
+  <dest>
+    *: "Усилване на трак"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_JUMP_SCROLL
+  desc: (player) menu alternative for jump scroll
+  user: 
+  <source>
+    *: "Jump Scroll"
+  </source>
+  <dest>
+    *: "Подскачане при скролиране"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCAN_PRESETS
+  desc: in radio menu
+  user: 
+  <source>
+    *: none
+    radio: "Auto-Scan Presets"
+  </source>
+  <dest>
+    *: none
+    radio: "Автоматично сканиране на станциите"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BROWSE
+  desc: in the equalizer settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Browse EQ Presets"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Разглеждане на EQ настройки"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_N
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "N"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SECOND
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "second"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_DIRBROWSE_F3
+  desc: in dir browser, F3 button bar text
+  user: 
+  <source>
+    *: none
+    recorder_pad: "LCD"
+  </source>
+  <dest>
+    *: none
+    recorder_pad: "LCD"
+  </dest>
+  <voice>
+    *: ""
+    recorder_pad: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLISTS
+  desc: in the main menu and  file vew setting
+  user: 
+  <source>
+    *: "Playlists"
+  </source>
+  <dest>
+    *: "Плейлисти"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXT_ONLY_VIEW_ALL
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Only When Viewing All Types"
+  </source>
+  <dest>
+    *: "Само при показване на всичките файлове"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_I
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "I"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_CODEPAGE
+  desc: default encoding used with id3 tags
+  user: 
+  <source>
+    *: "Default Codepage"
+  </source>
+  <dest>
+    *: "Кодова страница по подразбиране"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN_TYPES
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Only Unknown Types"
+  </source>
+  <dest>
+    *: "Само на непознати типове файлове"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: deprecated
+  user: 
+  <source>
+    *: none
+    ipodvideo: ""
+  </source>
+  <dest>
+    *: none
+    ipodvideo: ""
+  </dest>
+  <voice>
+    *: ""
+    ipodvideo: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CENTRAL_EUROPEAN
+  desc: in codepage setting menu
+  user: 
+  <source>
+    *: "Central European (CP1250)"
+  </source>
+  <dest>
+    *: "Централноевропейски (CP1250)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_SIZE_INFO
+  desc: disk size info
+  user: 
+  <source>
+    *: "Disk:"
+  </source>
+  <dest>
+    *: "Диск:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUTES
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FOURTEEN
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "14"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_BAR
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    lcd_bitmap: "Bar (Inverse)"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Лента (инвертирана)"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+  desc: Configuration option to maintain a list of recent bookmarks
+  user: 
+  <source>
+    *: "Maintain a List of Recent Bookmarks?"
+  </source>
+  <dest>
+    *: "Поддържане на списък с последните отметки?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_A
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "A"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON
+  desc: displayed when key lock is on
+  user: 
+  <source>
+    *: "Buttons Locked"
+  </source>
+  <dest>
+    *: "Бутоните са заключени"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: deprecated
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_MODE
+  desc: in crossfade settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Fade-Out Mode"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Режим на затихване"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_C
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "C"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER
+  desc: in the sound settings menu
+  user: 
+  <source>
+    *: none
+    swcodec: "Equalizer"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Еквалайзер"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOTHING_TO_RESUME
+  desc: Error message displayed when resume button pressed but no playlist
+  user: 
+  <source>
+    *: "Nothing to resume"
+  </source>
+  <dest>
+    *: "Няма нищо за подновяване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user: 
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "Изчистване на времето?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THREE
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_LOADED
+  desc: text for splash to indicate a new backdrop has been loaded successfully
+  user:
+  <source>
+    *: none
+    lcd_non-mono: "Backdrop Loaded"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Изображението за фон е заредено"
+  </dest>
+  <voice>
+    *: ""
+    lcd_non-mono: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_TIME
+  desc: Display of recorded time
+  user:
+  <source>
+    *: none
+    recording: "Time:"
+  </source>
+  <dest>
+    *: none
+    recording: "Vreme:"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLION
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "million"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BARS_MENU
+  desc: in the display sub menu
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Status-/Scrollbar"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Лента за състоянието-/Scrollbar"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user:
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "Last.fm лог"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_START_THRESHOLD
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: none
+    recording: "Start Above"
+  </source>
+  <dest>
+    *: none
+    recording: "Започване над"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: none
+    hold_button: "Backlight on Hold"
+  </source>
+  <dest>
+    *: none
+    hold_button: "Подсветка при hold бутон"
+  </dest>
+  <voice>
+    *: ""
+    hold_button: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_BACKDROP
+  desc: text for onplay menu entry
+  user:
+  <source>
+    *: none
+    lcd_non-mono: "Set As Backdrop"
+  </source>
+  <dest>
+    *: none
+    lcd_non-mono: "Установи като изображение за фон"
+  </dest>
+  <voice>
+    *: ""
+    lcd_non-mono: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_FULL
+  desc: Filetype array full
+  user:
+  <source>
+    *: "Filetype array full"
+  </source>
+  <dest>
+    *: "Масивът с типове файлове е пълен"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS
+  desc:  in main menu and visual confirmation after settings reset
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Настройки"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIXTY
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "60"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_REPEATS
+  desc: in keyclick settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Keyclick Repeats"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Повтаряне на цъканията на бутоните"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: none
+    swcodec: "Direct Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Директно усилване"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL
+  desc: Visual confirmation of canceling a changed setting
+  user:
+  <source>
+    *: "Cancelled"
+  </source>
+  <dest>
+    *: "Отказано"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_DELETE
+  desc: Really Delete?
+  user:
+  <source>
+    *: "Delete?"
+  </source>
+  <dest>
+    *: "Изтриване?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUTE
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "minute"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_CLEAR_PRESETS
+  desc: confirmation if presets can be cleared
+  user:
+  <source>
+    *: none
+    radio: "Clear Current Presets?"
+  </source>
+  <dest>
+    *: none
+    radio: "Изтриване на текущите станции?"
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_PEAK
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Peak Filter %d"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Филтър на пикове %d"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OF
+  desc: spoken only, as in 3/8 => 3 of 8
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "of"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: none
+    swcodec: "Fade-In Delay"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Задържане на засилването"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+  desc: prompt for user to decide to create an bookmark
+  user:
+  <source>
+    *: "Bookmark on Stop"
+  </source>
+  <dest>
+    *: "Отметка при спиране"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_T
+  desc: spoken only, for spelling
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "T"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PERCENT
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "percent"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HOURS
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "hours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_ASK
+  desc: confirm to reset settings
+  user:
+  <source>
+    *: "Are You Sure?"
+  </source>
+  <dest>
+    *: "Сигурен ли сте?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+  desc: in tag cache settings
+  user: 
+  <source>
+    *: "Updating in background"
+  </source>
+  <dest>
+    *: "Фоново обновяване"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user: 
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s не съществува"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_FONT
+  desc: in setting_menu()
+  user:
+  <source>
+    *: none
+    lcd_bitmap: "Browse Fonts"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Разглеждане на шрифтовете"
+  </dest>
+  <voice>
+    *: ""
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user: 
+  <source>
+    *: "No Playlists"
+  </source>
+  <dest>
+    *: "Няма плейлисти"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHTEEN
+  desc: spoken only, for composing numbers
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "18"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_KEYS
+  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  user:
+  <source>
+    *: none
+    alarm: "PLAY=Set OFF=Cancel"
+    ipod*: "SELECT=Set MENU=Cancel"
+    h10,h10_5gb: "SELECT=Set PREV=Cancel"
+  </source>
+  <dest>
+    *: none
+    alarm: "PLAY=Установяване OFF=Отказ"
+    ipod*: "SELECT=Установяване MENU=Отказ"
+    h10,h10_5gb: "SELECT=Установяване PREV=Отказ"
+  </dest>
+  <voice>
+    *: ""
+    alarm: ""
+    ipod*: ""
+    h10,h10_5gb: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLIAMPHOURS
+  desc: spoken only, a unit postfix
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "milli-amp hours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_READ_FAILED
+  desc: There was an error reading a file
+  user:
+  <source>
+    *: "Failed reading %s"
+  </source>
+  <dest>
+    *: "Четенето на %s е неуспешно"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPYING
+  desc: 
+  user: 
+  <source>
+    *: "Copying..."
+  </source>
+  <dest>
+    *: "Копиране..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CREATE_FAILURE
+  desc: Indicates bookmark was not created
+  user: 
+  <source>
+    *: "Bookmark Failed!"
+  </source>
+  <dest>
+    *: "Неуспешна отметка!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIX
+  desc: in playback settings, crossfade option
+  user: 
+  <source>
+    *: none
+    swcodec: "Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Смесване"
+  </dest>
+  <voice>
+    *: ""
+    swcodec: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  user:
+  <source>
+    *: none
+    recording: "Trigtype"
+  </source>
+  <dest>
+    *: none
+    recording: "Тип тригер"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_REC_DIR
+  desc: used in the onplay menu to set a recording dir
+  user: 
+  <source>
+    *: none
+    recording: "Set As Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Установяване като директория за запис"
+  </dest>
+  <voice>
+    *: ""
+    recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_BOOKMARK_QUERY
+  desc: prompt for user to decide to create an bookmark
+  user: 
+  <source>
+    *: "Create a Bookmark?"
+  </source>
+  <dest>
+    *: "Създаване на отметка?"
+  </dest>
+  <voice>
+    *: "ноне"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user: 
+  <source>
+    *: none
+    radio: "FM Radio Menu"
+  </source>
+  <dest>
+    *: none
+    radio: "Меню на FM радио "
+  </dest>
+  <voice>
+    *: ""
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -2633,15 +11532,15 @@
   desc: in the recording screen
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Right"
-    *: "Gain Right"
+    *: none
+    recording: "Gain Right"
   </source>
   <dest>
-    *: "Дясно"
+    *: none
+    recording: "Usilvane diasno"
   </dest>
   <voice>
     *: ""
+    recording: ""
   </voice>
 </phrase>
