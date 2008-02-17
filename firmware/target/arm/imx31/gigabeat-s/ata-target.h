@@ -22,9 +22,11 @@
 /* Plain C read & write loops */
 #define PREFER_C_READING
 #define PREFER_C_WRITING
+#if 0
 #if !defined(BOOTLOADER)
 #define ATA_OPTIMIZED_WRITING
 void copy_write_sectors(const unsigned char* buf, int wordcount);
+#endif
 #endif
 
 #define ATA_DATA        ATA_DRIVE_DATA

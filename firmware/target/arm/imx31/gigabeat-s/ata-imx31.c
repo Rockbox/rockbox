@@ -128,9 +128,11 @@ void ata_device_init(void)
     ATA_TIME_9 = (T + 20)/T;
 }
 
+#if 0
 #if !defined(BOOTLOADER)
 void copy_write_sectors(const unsigned char* buf, int wordcount)
 {
     (void)buf; (void)wordcount;
 }
+#endif
 #endif
