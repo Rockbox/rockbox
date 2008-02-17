@@ -1037,7 +1037,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: ""
+    swcodec: "%d Hz-Band Verstärkung"
   </voice>
 </phrase>
 <phrase>
@@ -4627,7 +4627,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Einschalten in %d:%02d"
   </voice>
 </phrase>
 <phrase>
@@ -4644,7 +4644,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Alarm eingestellt"
   </voice>
 </phrase>
 <phrase>
@@ -4661,7 +4661,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Weckzeit ist zu früh!"
   </voice>
 </phrase>
 <phrase>
@@ -5294,11 +5294,11 @@
   </source>
   <dest>
     *: none
-    radio: "Preset"
+    radio: "Sender"
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Sender"
   </voice>
 </phrase>
 <phrase>
@@ -5451,7 +5451,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Abstimmen"
   </voice>
 </phrase>
 <phrase>
@@ -5519,7 +5519,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset List"
+    radio: "Senderliste"
   </voice>
 </phrase>
 <phrase>
@@ -6253,7 +6253,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Einmal"
   </voice>
 </phrase>
 <phrase>
@@ -6321,7 +6321,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Starte oberhalb"
   </voice>
 </phrase>
 <phrase>
@@ -6338,7 +6338,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Für mindestens"
   </voice>
 </phrase>
 <phrase>
@@ -6355,7 +6355,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Stoppe unterhalb"
   </voice>
 </phrase>
 <phrase>
@@ -6372,7 +6372,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Aufnahme teilen nach"
   </voice>
 </phrase>
 <phrase>
@@ -6786,7 +6786,7 @@
     *: "Dynamische Wiedergabeliste löschen?"
   </dest>
   <voice>
-    *:""
+    *: "Dynamische Wiedergabeliste löschen?"
   </voice>
 </phrase>
 <phrase>
@@ -6829,11 +6829,11 @@
     player: "Buf: %d.%03dMB"
   </source>
   <dest>
-    *: "Buffer: %d.%03dMB"
-    player: "Buf: %d.%03dMB"
+    *: "Puffer: %d.%03dMB"
+    player: "Puf: %d.%03dMB"
   </dest>
   <voice>
-    *: ""
+    *: "Puffergröße"
   </voice>
 </phrase>
 <phrase>
@@ -6851,7 +6851,7 @@
     h10,ipodmini,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
-    *: "Batterieladung:"
+    *: "Batterieladung"
   </voice>
 </phrase>
 <phrase>
@@ -7445,7 +7445,7 @@
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[Song Nr.]"
+    *: "[Titelnr.]"
   </dest>
   <voice>
     *: ""
@@ -7543,7 +7543,7 @@
     *: "[Discnum]"
   </source>
   <dest>
-    *: "[Discnum]"
+    *: "[Disknr.]"
   </dest>
   <voice>
     *: ""
@@ -8018,7 +8018,7 @@
     *: "Wiedergabelisten-Puffer voll"
   </dest>
   <voice>
-    *: ""
+    *: "Wiedergabelisten-Puffer voll"
   </voice>
 </phrase>
 <phrase>
@@ -8143,10 +8143,10 @@
     *: "Save Failed"
   </source>
   <dest>
-    *: "Save Failed"
+    *: "Speichern fehlgeschlagen"
   </dest>
   <voice>
-    *: "Save Failed"
+    *: "Speichern fehlgeschlagen"
   </voice>
 </phrase>
 <phrase>
