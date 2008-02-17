@@ -2017,6 +2017,7 @@ help:
 	@echo ""
 	@echo "all         - builds a full Rockbox (default), including tools"
 	@echo "bin         - builds only the Rockbox.<target name> file"
+	@echo "rocks       - builds only plugins and codecs"
 	@echo "clean       - cleans a build directory (not tools)"
 	@echo "veryclean   - cleans the build and tools directories"
 	@echo "manual      - builds a manual"
