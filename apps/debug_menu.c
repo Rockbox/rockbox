@@ -92,7 +92,7 @@
 #include "pcf50605.h"
 #endif
 
-#if CONFIG_CPU == DM320 || CONFIG_CPU == S3C2440 || CONFIG_CPU == TCC7801 || defined(CPU_PP)
+#if CONFIG_CPU == DM320 || CONFIG_CPU == S3C2440 || CONFIG_CPU == TCC7801
 #include "debug-target.h"
 #endif
 
@@ -558,6 +558,72 @@ static bool dbg_hw_info(void)
         lcd_puts(0, ++line, buf);
     }
 #endif
+
+    lcd_update();
+
+    while (!(action_userabort(TIMEOUT_BLOCK)));
+
+#elif defined(CPU_PP502x)
+    int line = 0;
+    char buf[32];
+    char pp_version[] = { (PP_VER2 >> 24) & 0xff, (PP_VER2 >> 16) & 0xff,
+                          (PP_VER2 >> 8) & 0xff, (PP_VER2) & 0xff,
+                          (PP_VER1 >> 24) & 0xff, (PP_VER1 >> 16) & 0xff,
+                          (PP_VER1 >> 8) & 0xff, (PP_VER1) & 0xff, '\0' };
+
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+
+    lcd_puts(0, line++, "[Hardware info]");
+
+#ifdef IPOD_ARCH
+    snprintf(buf, sizeof(buf), "HW rev: 0x%08lx", IPOD_HW_REVISION);
+    lcd_puts(0, line++, buf);
+#endif
+
+#ifdef IPOD_COLOR
+    extern int lcd_type; /* Defined in lcd-colornano.c */
+
+    snprintf(buf, sizeof(buf), "LCD type: %d", lcd_type);
+    lcd_puts(0, line++, buf);
+#endif
+
+    snprintf(buf, sizeof(buf), "PP version: %s", pp_version);
+    lcd_puts(0, line++, buf);
+
+    snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
+    lcd_puts(0, line++, buf);
+
+    lcd_update();
+
+    while (!(action_userabort(TIMEOUT_BLOCK)));
+
+#elif CONFIG_CPU == PP5002
+    int line = 0;
+    char buf[32];
+    char pp_version[] = { (PP_VER4 >> 8) & 0xff, PP_VER4 & 0xff,
+                          (PP_VER3 >> 8) & 0xff, PP_VER3 & 0xff,
+                          (PP_VER2 >> 8) & 0xff, PP_VER2 & 0xff,
+                          (PP_VER1 >> 8) & 0xff, PP_VER1 & 0xff, '\0' };
+
+
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+
+    lcd_puts(0, line++, "[Hardware info]");
+
+#ifdef IPOD_ARCH
+    snprintf(buf, sizeof(buf), "HW rev: 0x%08lx", IPOD_HW_REVISION);
+    lcd_puts(0, line++, buf);
+#endif
+
+    snprintf(buf, sizeof(buf), "PP version: %s", pp_version);
+    lcd_puts(0, line++, buf);
+
+    snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
+    lcd_puts(0, line++, buf);
 
     lcd_update();
 
