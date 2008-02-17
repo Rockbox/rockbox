@@ -161,6 +161,15 @@ sub buildlangs {
     my @files = grep { /\.lang$/ } readdir(DIR);
     closedir(DIR);
 
+    # Exclude some bad languages (uncomment and adjust in case of release
+    # and/or End Times)
+    # @files = grep(!/(afrikaans|hindi|slovenscina|turkce)\.lang/, @files);
+
+    # Exclude more languages on the player which won't work on charcell display
+    if ($archos =~ /^"?player:/ ) {
+        @files = grep(!/(chinese-simp|bulgarian|chinese-trad|hindi|japanese|korean|thai)\.lang/, @files);
+    }
+
     for(@files) {
         my $output = $_;
         $output =~ s/(.*)\.lang/$1.lng/;
