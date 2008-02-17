@@ -7,7 +7,7 @@
 #                     \/            \/     \/    \/            \/
 # $Id$
 #
-# Copyright (C) 2006 - 2007 by Daniel Stenberg
+# Copyright (C) 2006 - 2008 by Daniel Stenberg
 #
 
 # binary version for the binary lang file
@@ -412,15 +412,15 @@ while(<LANG>) {
                     # basic syntax error alerts, if there are no quotes we
                     # will assume an empty string was intended
                     if($dest !~ /^\"/) {
-                        print STDERR "Warning: dest before $input line $line lacks quotes ($dest)!\n";
+                        print STDERR "$input:$line:1: warning: dest before line lacks quotes ($dest)!\n";
                         $dest='""';
                     }
                     if($src !~ /^\"/) {
-                        print STDERR "Warning: source before $input line $line lacks quotes ($src)!\n";
+                        print STDERR "$input:$line:1: warning: source before line lacks quotes ($src)!\n";
                         $src='""';
                     }
                     if($voice !~ /^\"/ and $voice !~ /^none\z/i) {
-                        print STDERR "Warning: voice before $input line $line lacks quotes ($voice)!\n";
+                        print STDERR "$input:$line:1: warning: voice before line lacks quotes ($voice)!\n";
                         $voice='""';
                     }
 
