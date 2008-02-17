@@ -17,7 +17,19 @@
  *
  ****************************************************************************/
 
-#ifndef DEBUG_CANCEL
-#define DEBUG_CANCEL  BUTTON_MENU
+/* key definitions */
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD)
+#   define DEBUG_CANCEL  BUTTON_MENU
+
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD) || \
+      (CONFIG_KEYPAD == MROBE100_PAD)
+#   define DEBUG_CANCEL  BUTTON_REW
+
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_C200_PAD)
+#   define DEBUG_CANCEL  BUTTON_LEFT
 #endif
+
 bool __dbg_hw_info(void);
