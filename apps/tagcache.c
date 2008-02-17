@@ -57,6 +57,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "config.h"
+#include "ata_idle_notify.h"
 #include "thread.h"
 #include "kernel.h"
 #include "system.h"
@@ -154,9 +155,6 @@ static struct tagcache_command_entry command_queue[TAGCACHE_COMMAND_QUEUE_LENGTH
 static volatile int command_queue_widx = 0;
 static volatile int command_queue_ridx = 0;
 static struct mutex command_queue_mutex;
-/* Timestamp of the last added event, so we can wait a bit before committing the
- * whole queue at once. */
-static long command_queue_timestamp = 0;
 
 /* Tag database structures. */
 
@@ -3030,26 +3028,16 @@ static bool command_queue_is_full(void)
     
     return (next == command_queue_ridx);
 }
-
-void run_command_queue(bool force)
+bool command_queue_sync_callback(void)
 {
+    
     struct master_header myhdr;
     int masterfd;
-    
-    if (COMMAND_QUEUE_IS_EMPTY)
-        return;
-    
-    if (!force && !command_queue_is_full() 
-        && current_tick - TAGCACHE_COMMAND_QUEUE_COMMIT_DELAY 
-           < command_queue_timestamp)
-    {
-        return;
-    }
         
     mutex_lock(&command_queue_mutex);
 	
     if ( (masterfd = open_master_fd(&myhdr, true)) < 0)
-        return;
+        return false;
     
     while (command_queue_ridx != command_queue_widx)
     {
@@ -3064,7 +3052,7 @@ void run_command_queue(bool force)
                 
                 /* Re-open the masterfd. */
                 if ( (masterfd = open_master_fd(&myhdr, true)) < 0)
-                    return;
+                    return true;
                 
                 break;
             }
@@ -3081,7 +3069,20 @@ void run_command_queue(bool force)
     
     close(masterfd);
     
+    tc_stat.queue_length = 0;
     mutex_unlock(&command_queue_mutex);
+    return true;
+}
+
+void run_command_queue(bool force)
+{
+    if (COMMAND_QUEUE_IS_EMPTY)
+        return;
+    
+    if (force || command_queue_is_full())
+        command_queue_sync_callback();
+    else
+        register_ata_idle_func(command_queue_sync_callback);
 }
 
 static void queue_command(int cmd, long idx_id, int tag, long data)
@@ -3106,7 +3107,9 @@ static void queue_command(int cmd, long idx_id, int tag, long data)
             ce->data = data;
             
             command_queue_widx = next;
-            command_queue_timestamp = current_tick;
+            
+            tc_stat.queue_length++;
+            
             mutex_unlock(&command_queue_mutex);
             break;
         }

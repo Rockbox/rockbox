@@ -1913,7 +1913,9 @@ static int database_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(SIMPLELIST_ADD_LINE, "Commit delayed: %s",
              stat->commit_delayed ? "Yes" : "No");
 
-
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Queue length: %d", 
+             stat->queue_length);
+    
     if (synced)
     {
         synced = false;
@@ -1937,7 +1939,11 @@ static bool dbg_tagcache_info(void)
     simplelist_info_init(&info, "Database Info", 8, NULL);
     info.action_callback = database_callback;
     info.hide_selection = true;
-    info.timeout = TIMEOUT_NOBLOCK;
+    
+    /* Don't do nonblock here, must give enough processing time
+       for tagcache thread. */
+    /* info.timeout = TIMEOUT_NOBLOCK; */
+    info.timeout = 1;
     tagcache_screensync_enable(true);
     return simplelist_show_list(&info);
 }
