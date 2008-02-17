@@ -133,6 +133,14 @@ enum minesweeper_status {
 #   define MINESWP_DISCOVER BUTTON_REW
 #   define MINESWP_INFO     (BUTTON_REW | BUTTON_PLAY)
 
+#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+#   define MINESWP_UP       BUTTON_UP
+#   define MINESWP_DOWN     BUTTON_DOWN
+#   define MINESWP_QUIT     BUTTON_BACK
+#   define MINESWP_TOGGLE   BUTTON_PLAY
+#   define MINESWP_DISCOVER BUTTON_SELECT
+#   define MINESWP_INFO     BUTTON_MENU
+
 #else
 #   warning Missing key definitions for this keypad
 #endif

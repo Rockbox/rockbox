@@ -239,6 +239,24 @@ static struct plugin_api* rb;
 #   define HK_CUR2STACK      "REW"
 #   define HK_REM2STACK      "RIGHT.."
 
+#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+#   define SOL_QUIT         BUTTON_BACK
+#   define SOL_UP           BUTTON_UP
+#   define SOL_DOWN         BUTTON_DOWN
+#   define SOL_LEFT         BUTTON_LEFT
+#   define SOL_RIGHT        BUTTON_RIGHT
+#   define SOL_MOVE_PRE     BUTTON_SELECT
+#   define SOL_MOVE         (BUTTON_SELECT | BUTTON_REL)
+#   define SOL_DRAW         BUTTON_MENU
+#   define SOL_REM2CUR      (BUTTON_LEFT | BUTTON_SELECT)
+#   define SOL_CUR2STACK    (BUTTON_SELECT | BUTTON_REPEAT)
+#   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_SELECT)
+#   define HK_MOVE         "SELECT"
+#   define HK_DRAW         "MENU"
+#   define HK_REM2CUR      "SELECT+LEFT"
+#   define HK_CUR2STACK    "SELECT.."
+#   define HK_REM2STACK    "SELECT+RIGHT"
+
 #else
 #   error "Unknown keypad"
 #endif

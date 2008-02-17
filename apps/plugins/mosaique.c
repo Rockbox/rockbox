@@ -107,6 +107,11 @@ PLUGIN_HEADER
 #define MOSAIQUE_SPEED BUTTON_RC_FF
 #define MOSAIQUE_RESTART BUTTON_RC_PLAY
 
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+#define MOSAIQUE_QUIT BUTTON_BACK
+#define MOSAIQUE_SPEED BUTTON_SELECT
+#define MOSAIQUE_RESTART BUTTON_MENU
+
 #endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)

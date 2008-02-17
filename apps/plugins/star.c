@@ -168,6 +168,17 @@ PLUGIN_HEADER
 #define STAR_LEVEL_REPEAT   (BUTTON_PLAY | BUTTON_RIGHT)
 #define STAR_MENU_RUN       BUTTON_FF
 
+#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+
+#define STAR_QUIT           BUTTON_BACK
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_SELECT
+#define STAR_LEVEL_UP       BUTTON_VOL_UP
+#define STAR_LEVEL_DOWN     BUTTON_VOL_DOWN
+#define STAR_LEVEL_REPEAT   BUTTON_MENU
+#define STAR_MENU_RUN       BUTTON_SELECT
+
 #endif
 
 /* function returns because of USB? */

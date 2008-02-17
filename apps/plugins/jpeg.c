@@ -176,6 +176,17 @@ PLUGIN_HEADER
 #define JPEG_NEXT       BUTTON_RC_HEART
 #define JPEG_PREVIOUS   BUTTON_RC_MODE
 
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+#define JPEG_ZOOM_IN    BUTTON_VOL_UP
+#define JPEG_ZOOM_OUT   BUTTON_VOL_DOWN
+#define JPEG_UP         BUTTON_UP
+#define JPEG_DOWN       BUTTON_DOWN
+#define JPEG_LEFT       BUTTON_LEFT
+#define JPEG_RIGHT      BUTTON_RIGHT
+#define JPEG_MENU       BUTTON_MENU
+#define JPEG_NEXT       BUTTON_NEXT
+#define JPEG_PREVIOUS   BUTTON_PREV
+
 #endif
 
 /* different graphics libraries */

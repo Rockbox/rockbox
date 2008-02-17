@@ -107,6 +107,13 @@ PLUGIN_HEADER
 #define RIGHT BUTTON_RIGHT
 #define FIRE BUTTON_MENU
 
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+
+#define QUIT BUTTON_BACK
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define FIRE BUTTON_SELECT
+
 #else
     #error INVADROX: Unsupported keypad
 #endif

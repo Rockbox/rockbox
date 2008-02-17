@@ -129,6 +129,16 @@ PLUGIN_HEADER
 #define FLIPIT_TOGGLE_PRE   BUTTON_REW
 #define FLIPIT_TOGGLE       (BUTTON_REW | BUTTON_REL)
 
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         BUTTON_BACK
+#define FLIPIT_SHUFFLE      BUTTON_MENU
+#define FLIPIT_SOLVE        BUTTON_VOL_UP
+#define FLIPIT_STEP_BY_STEP BUTTON_VOL_DOWN
+#define FLIPIT_TOGGLE       BUTTON_SELECT
+
 #endif
 
 static struct plugin_api* rb;

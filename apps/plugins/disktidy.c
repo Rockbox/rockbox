@@ -73,6 +73,9 @@ enum tidy_system
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define TIDY_STOP BUTTON_POWER
 
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+#define TIDY_STOP BUTTON_BACK
+
 #else
   #error DISKTIDY: Unsupported keypad
 #endif

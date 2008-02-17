@@ -112,6 +112,15 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define PAUSE BUTTON_MENU
 
+#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+
+#define QUIT BUTTON_BACK
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+#define PAUSE BUTTON_PLAY
+
 #else
 #error Unsupported keypad
 #endif

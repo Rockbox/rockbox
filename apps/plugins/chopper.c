@@ -86,6 +86,12 @@ Still To do:
 #define ACTION2 BUTTON_MENU
 #define ACTIONTEXT "UP"
 
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+#define QUIT BUTTON_BACK
+#define ACTION BUTTON_SELECT
+#define ACTION2 BUTTON_MENU
+#define ACTIONTEXT "SELECT"
+
 #else
 #error Unsupported keypad
 #endif

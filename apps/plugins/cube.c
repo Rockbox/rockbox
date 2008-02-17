@@ -204,6 +204,19 @@ PLUGIN_HEADER
 #define CUBE_PAUSE         (BUTTON_RC_HEART | BUTTON_REL)
 #define CUBE_HIGHSPEED     BUTTON_RC_HEART
 
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+#define CUBE_QUIT          BUTTON_BACK
+#define CUBE_X_INC         BUTTON_LEFT
+#define CUBE_X_DEC         BUTTON_RIGHT
+#define CUBE_Y_INC         BUTTON_UP
+#define CUBE_Y_DEC         BUTTON_DOWN
+#define CUBE_Z_INC         BUTTON_VOL_UP
+#define CUBE_Z_DEC         BUTTON_VOL_DOWN
+#define CUBE_MODE          BUTTON_PREV
+#define CUBE_PAUSE_PRE     BUTTON_PLAY
+#define CUBE_PAUSE         (BUTTON_PLAY | BUTTON_REL)
+#define CUBE_HIGHSPEED     (BUTTON_NEXT | BUTTON_REL)
+
 #endif
 
 #ifdef HAVE_LCD_BITMAP

@@ -1228,7 +1228,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.gigabeat"
     appextra="recorder:gui"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     toolset="$gigabeatbitmaptools mknkboot"
     boottool="$rootdir/tools/scramble -gigabeats"

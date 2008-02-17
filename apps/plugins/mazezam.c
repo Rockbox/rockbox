@@ -141,6 +141,18 @@ MEM_FUNCTION_WRAPPERS(rb);
 #define MAZEZAM_QUIT                BUTTON_POWER
 #define MAZEZAM_QUIT_KEYNAME        "[POWER]"
 
+#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+#define MAZEZAM_UP                  BUTTON_UP
+#define MAZEZAM_DOWN                BUTTON_DOWN
+#define MAZEZAM_LEFT                BUTTON_LEFT
+#define MAZEZAM_RIGHT               BUTTON_RIGHT
+#define MAZEZAM_SELECT              BUTTON_SELECT
+
+#define MAZEZAM_RETRY               BUTTON_PLAY
+#define MAZEZAM_RETRY_KEYNAME       "[PLAY]"
+#define MAZEZAM_QUIT                BUTTON_BACK
+#define MAZEZAM_QUIT_KEYNAME        "[BACK]"
+
 #endif
 
 /* The gap for the border around the heading in text pages. In fact, 2 is

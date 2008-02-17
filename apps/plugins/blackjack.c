@@ -203,6 +203,21 @@ PLUGIN_HEADER
 #define BJACK_RIGHT      BUTTON_RIGHT
 #define BJACK_LEFT       BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+#define BJACK_START      BUTTON_PLAY
+#define BJACK_QUIT       BUTTON_BACK
+#define BJACK_MAX        BUTTON_VOL_UP
+#define BJACK_MIN        BUTTON_VOL_DOWN
+#define BJACK_HIT        BUTTON_VOL_UP
+#define BJACK_STAY       BUTTON_VOL_DOWN
+#define BJACK_DOUBLEDOWN BUTTON_SELECT
+#define BJACK_SCORES     BUTTON_RIGHT
+#define BJACK_RESUME     BUTTON_MENU
+#define BJACK_UP         BUTTON_UP
+#define BJACK_DOWN       BUTTON_DOWN
+#define BJACK_RIGHT      BUTTON_RIGHT
+#define BJACK_LEFT       BUTTON_LEFT
+
 #else
     #error BLACKJACK: Unsupported keypad
 #endif
