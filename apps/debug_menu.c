@@ -92,7 +92,7 @@
 #include "pcf50605.h"
 #endif
 
-#if CONFIG_CPU == DM320 || CONFIG_CPU == S3C2440 || CONFIG_CPU == TCC7801
+#if CONFIG_CPU == DM320 || CONFIG_CPU == S3C2440 || CONFIG_CPU == TCC7801 || defined(CPU_PP)
 #include "debug-target.h"
 #endif
 
@@ -438,41 +438,6 @@ static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
 #endif /* (CONFIG_CPU == SH7034 || CPU_COLDFIRE) */
 
 #ifndef SIMULATOR
-#ifdef CPU_PP
-static int perfcheck(void)
-{
-    int result;
-
-    asm (
-        "mrs     r2, CPSR            \n"
-        "orr     r0, r2, #0xc0       \n" /* disable IRQ and FIQ */
-        "msr     CPSR_c, r0          \n"
-        "mov     %[res], #0          \n"
-        "ldr     r0, [%[timr]]       \n"
-        "add     r0, r0, %[tmo]      \n"
-    "1:                              \n"
-        "add     %[res], %[res], #1  \n"
-        "ldr     r1, [%[timr]]       \n"
-        "cmp     r1, r0              \n"
-        "bmi     1b                  \n"
-        "msr     CPSR_c, r2          \n" /* reset IRQ and FIQ state */
-        :
-        [res]"=&r"(result)
-        :
-        [timr]"r"(&USEC_TIMER),
-        [tmo]"r"(
-#if CONFIG_CPU == PP5002
-        16000
-#else /* PP5020/5022/5024 */
-        10226
-#endif
-        )
-        :
-        "r0", "r1", "r2"
-    );
-    return result;
-}
-#endif
 
 #ifdef HAVE_LCD_BITMAP
 static bool dbg_hw_info(void)
@@ -593,72 +558,6 @@ static bool dbg_hw_info(void)
         lcd_puts(0, ++line, buf);
     }
 #endif
-
-    lcd_update();
-
-    while (!(action_userabort(TIMEOUT_BLOCK)));
-
-#elif defined(CPU_PP502x)
-    int line = 0;
-    char buf[32];
-    char pp_version[] = { (PP_VER2 >> 24) & 0xff, (PP_VER2 >> 16) & 0xff,
-                          (PP_VER2 >> 8) & 0xff, (PP_VER2) & 0xff,
-                          (PP_VER1 >> 24) & 0xff, (PP_VER1 >> 16) & 0xff,
-                          (PP_VER1 >> 8) & 0xff, (PP_VER1) & 0xff, '\0' };
-
-    lcd_setmargins(0, 0);
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_clear_display();
-
-    lcd_puts(0, line++, "[Hardware info]");
-
-#ifdef IPOD_ARCH
-    snprintf(buf, sizeof(buf), "HW rev: 0x%08lx", IPOD_HW_REVISION);
-    lcd_puts(0, line++, buf);
-#endif
-
-#ifdef IPOD_COLOR
-    extern int lcd_type; /* Defined in lcd-colornano.c */
-
-    snprintf(buf, sizeof(buf), "LCD type: %d", lcd_type);
-    lcd_puts(0, line++, buf);
-#endif
-
-    snprintf(buf, sizeof(buf), "PP version: %s", pp_version);
-    lcd_puts(0, line++, buf);
-
-    snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
-    lcd_puts(0, line++, buf);
-
-    lcd_update();
-
-    while (!(action_userabort(TIMEOUT_BLOCK)));
-
-#elif CONFIG_CPU == PP5002
-    int line = 0;
-    char buf[32];
-    char pp_version[] = { (PP_VER4 >> 8) & 0xff, PP_VER4 & 0xff,
-                          (PP_VER3 >> 8) & 0xff, PP_VER3 & 0xff,
-                          (PP_VER2 >> 8) & 0xff, PP_VER2 & 0xff,
-                          (PP_VER1 >> 8) & 0xff, PP_VER1 & 0xff, '\0' };
-
-
-    lcd_setmargins(0, 0);
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_clear_display();
-
-    lcd_puts(0, line++, "[Hardware info]");
-
-#ifdef IPOD_ARCH
-    snprintf(buf, sizeof(buf), "HW rev: 0x%08lx", IPOD_HW_REVISION);
-    lcd_puts(0, line++, buf);
-#endif
-
-    snprintf(buf, sizeof(buf), "PP version: %s", pp_version);
-    lcd_puts(0, line++, buf);
-
-    snprintf(buf, sizeof(buf), "Est. clock (kHz): %d", perfcheck());
-    lcd_puts(0, line++, buf);
 
     lcd_update();
 

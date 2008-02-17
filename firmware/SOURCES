@@ -411,6 +411,7 @@ target/sh/archos/ondio/fmradio_i2c-ondio.c
 
 #ifdef SANSA_E200
 #ifndef SIMULATOR
+target/arm/debug-pp.c
 target/arm/lcd-as-memframe.S
 target/arm/sandisk/ata-c200_e200.c
 target/arm/sandisk/sansa-e200/lcd-e200.c
@@ -429,6 +430,7 @@ target/arm/sandisk/audio-c200_e200.c
 
 #ifdef SANSA_C200
 #ifndef SIMULATOR
+target/arm/debug-pp.c
 target/arm/sandisk/ata-c200_e200.c
 target/arm/sandisk/sansa-c200/lcd-c200.c
 target/arm/sandisk/sansa-c200/lcd-as-c200.S
@@ -548,6 +550,7 @@ target/coldfire/iriver/h100/usb-h100.c
 
 #ifdef IRIVER_H10
 #ifndef SIMULATOR
+target/arm/debug-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -566,6 +569,7 @@ target/arm/usb-fw-pp502x.c
 
 #ifdef IRIVER_H10_5GB
 #ifndef SIMULATOR
+target/arm/debug-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -665,6 +669,7 @@ target/arm/tms320dm320/dsp-dm320.c
 #ifdef MROBE_100
 #ifndef SIMULATOR
 drivers/sw_i2c.c
+target/arm/debug-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -681,6 +686,7 @@ target/arm/usb-fw-pp502x.c
 
 #ifdef ELIO_TPJ1022
 #ifndef SIMULATOR
+target/arm/debug-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -698,6 +704,7 @@ target/arm/usb-fw-pp502x.c
 #ifdef IPOD_4G
 #ifndef SIMULATOR
 drivers/pcf50605.c
+target/arm/debug-pp.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
 target/arm/ata-as-arm.S
@@ -716,6 +723,7 @@ target/arm/usb-fw-pp502x.c
 #ifdef IPOD_COLOR
 #ifndef SIMULATOR
 drivers/pcf50605.c
+target/arm/debug-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -733,6 +741,7 @@ target/arm/usb-fw-pp502x.c
 #ifdef IPOD_NANO
 #ifndef SIMULATOR
 drivers/pcf50605.c
+target/arm/debug-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -750,6 +759,7 @@ target/arm/usb-fw-pp502x.c
 #ifdef IPOD_VIDEO
 #ifndef SIMULATOR
 drivers/pcf50605.c
+target/arm/debug-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -768,6 +778,7 @@ target/arm/usb-fw-pp502x.c
 #ifdef IPOD_3G
 #ifndef SIMULATOR
 drivers/pcf50605.c
+target/arm/debug-pp.c
 target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -784,6 +795,7 @@ target/arm/usb-fw-pp5002.c
 
 #ifdef IPOD_1G2G
 #ifndef SIMULATOR
+target/arm/debug-pp.c
 target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
 target/arm/i2s-pp.c
@@ -801,6 +813,7 @@ target/arm/usb-fw-pp5002.c
 #ifdef IPOD_MINI
 #ifndef SIMULATOR
 drivers/pcf50605.c
+target/arm/debug-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
@@ -819,6 +832,7 @@ target/arm/usb-fw-pp502x.c
 #ifdef IPOD_MINI2G
 #ifndef SIMULATOR
 drivers/pcf50605.c
+target/arm/debug-pp.c
 target/arm/ata-as-arm.S
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
