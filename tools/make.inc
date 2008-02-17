@@ -40,7 +40,8 @@ $(DEPFILE): $(SOURCES)
 	        rm $$del; \
 	        del=""; \
 	    fi \
-	done | sed -e "s:[^[:space:]]*lang.h:$(OBJDIR)/lang.o:" > $(DEPFILE); \
+	done | sed -e "s:[^[:space:]]*lang.h:$(OBJDIR)/lang.o:" \
+	-e "s:[^[:space:]]*sysfont.h:$(BUILDDIR)/sysfont.h:" > $(DEPFILE); \
 	echo "oo" > /dev/null )
 
 tags:
