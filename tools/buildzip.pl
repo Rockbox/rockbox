@@ -154,6 +154,30 @@ sub filesize {
     return $size;
 }
 
+sub buildlangs {
+    my ($outputlang)=@_;
+    my $dir = "$ROOT/apps/lang";
+    opendir(DIR, $dir);
+    my @files = grep { /\.lang$/ } readdir(DIR);
+    closedir(DIR);
+
+    # Exclude some bad languages (uncomment and adjust in case of release
+    # and/or End Times)
+    # @files = grep(!/(afrikaans|hindi|slovenscina|turkce)\.lang/, @files);
+
+    # Exclude more languages on the player which won't work on charcell display
+    if ($archos =~ /^"?player:/ ) {
+        @files = grep(!/(chinese-simp|chinese-trad|hindi|japanese|korean|thai)\.lang/, @files);
+    }
+
+    for(@files) {
+        my $output = $_;
+        $output =~ s/(.*)\.lang/$1.lng/;
+        print "$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -i=$target_id -b=$outputlang/$output $dir/$_\n" if($verbose);
+        system ("$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -i=$target_id -b=$outputlang/$output $dir/$_ >/dev/null 2>&1");
+    }
+}
+
 sub buildzip {
     my ($zip, $image, $fonts)=@_;
 
@@ -389,8 +413,15 @@ STOP
     # and the info file
     system("cp rockbox-info.txt .rockbox/");
 
-    # copy the already built lng files
-    `cp apps/lang/*lng .rockbox/langs/`
+    # now copy the file made for reading on the unit:
+    #if($notplayer) {
+    #    `cp $webroot/docs/Help-JBR.txt .rockbox/docs/`;
+    #}
+    #else {
+    #    `cp $webroot/docs/Help-Stu.txt .rockbox/docs/`;
+    #}
+
+    buildlangs(".rockbox/langs");
 
 }
 
