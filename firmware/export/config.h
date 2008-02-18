@@ -114,6 +114,7 @@
 #define LCD_LOGIKDAX 20 /* as used by Logik DAX - SSD1815 */
 #define LCD_IAUDIO67 21 /* as used by iAudio 6/7 - unknown */
 #define LCD_COWOND2  21 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
+#define LCD_CREATIVEZVM 22 /* as used by Creative Zen Vision:M */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -239,6 +240,8 @@
 #include "config-iaudio7.h"
 #elif defined(COWON_D2)
 #include "config-cowond2.h"
+#elif defined(CREATIVE_ZVM)
+#include "config-creativezvm.h"
 #else
 /* no known platform */
 #endif
