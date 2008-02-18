@@ -41,6 +41,7 @@ codecs/Tremor/*
 eqs/*.cfg
 gui/*.[ch]
 keymaps/*.[ch]
+lang/SOURCES
 lang/*.lang
 menus/*.[ch]
 metadata/*.[ch]

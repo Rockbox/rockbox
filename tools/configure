@@ -1785,6 +1785,11 @@ else
   voicetoolset="voicefont wavtrim"
 fi
 
+if test "$apps" = "apps"; then
+  # only when we build "real" apps we build the .lng files
+  buildlangs="langs"
+fi
+
 sed > Makefile \
  -e "s,@ROOTDIR@,${rootdir},g" \
  -e "s,@DEBUG@,${debug},g" \
@@ -1842,6 +1847,7 @@ sed > Makefile \
  -e "s,@TTS_ENGINE@,${TTS_ENGINE},g" \
  -e "s,@TTS_OPTS@,${TTS_OPTS},g" \
  -e "s,@VOICETOOLSET@,${voicetoolset},g" \
+ -e "s,@LANGS@,${buildlangs},g" \
 <<EOF
 ## Automaticly generated. http://www.rockbox.org/
 
@@ -1919,14 +1925,14 @@ export ENCODER=@ENCODER@
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
 
-.PHONY: all clean tags zip tools manual bin build info
+.PHONY: all clean tags zip tools manual bin build info langs
 
 all: info
 
 info: build
 	\$(SILENT)\$(TOOLSDIR)/mkinfo.pl \$(BUILDDIR)/rockbox-info.txt
 
-build: tools
+build: tools @LANGS@
 	@SIMUL1@
 	@SIMUL2@
 	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
@@ -1952,7 +1958,7 @@ clean:
                   manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
                   @ARCHOSROM@ @FLASHFILE@ UI256.bmp rockbox-full.zip \
 	          html txt rockbox-manual*.zip sysfont.h rockbox-info.txt \
-	          voicefontids *.wav *.mp3 *.voice
+	          voicefontids *.wav *.mp3 *.voice max_language_size.h
 
 tools:
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) AR=\$(HOSTAR) @TOOLSET@
@@ -1995,6 +2001,10 @@ bzip2: tar
 
 gzip: tar
 	\$(SILENT)gzip -f9 rockbox.tar
+
+langs: features
+	\$(SILENT)mkdir -p \$(BUILDDIR)/apps/lang
+	\$(SILENT)\$(MAKE) -C \$(APPSDIR)/lang OBJDIR=\$(BUILDDIR)/apps/lang
 
 manual: manual-pdf
 manual-pdf:

@@ -24,6 +24,11 @@ $(OBJDIR)/%.o: %.S
 # play nicely into this as it then adds a dependency to the lang.h file
 # without the proper path.
 #
+# The trailing sed hack for a range of files is present because how gcc works
+# for generating dependencies when the include file doesn't exist. Then it
+# makes the dependency without any path, and that breaks how things work for
+# us. We thus add the correct path for a few generated files!
+#
 $(DEPFILE): $(SOURCES)
 	$(SILENT)mkdir -p $(dir $(DEPFILE))
 	$(SILENT)rm -f $(DEPFILE)
@@ -40,7 +45,10 @@ $(DEPFILE): $(SOURCES)
 	        rm $$del; \
 	        del=""; \
 	    fi \
-	done | sed -e "s:[^[:space:]]*lang.h:$(OBJDIR)/lang.o:" > $(DEPFILE); \
+	done | sed -e "s:[^[:space:]]*lang.h:$(OBJDIR)/lang.o:" \
+	-e "s:[^[:space:]]*sysfont.h:$(BUILDDIR)/sysfont.h:" \
+	-e "s:[^[:space:]]*max_language_size.h:$(BUILDDIR)/max_language_size.h:" \
+	> $(DEPFILE); \
 	echo "oo" > /dev/null )
 
 tags:
