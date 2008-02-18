@@ -1,6 +1,3 @@
-#ifdef HAVE_LCD_BITMAP             /* Not for the Player */
-*.lang
-#else
 afrikaans.lang
 bulgarian.lang
 catala.lang
@@ -18,6 +15,8 @@ greek.lang
 hebrew.lang
 islenska.lang
 italiano.lang
+japanese.lang
+korean.lang
 magyar.lang
 nederlands.lang
 norsk.lang
@@ -32,4 +31,9 @@ svenska.lang
 tagalog.lang
 turkce.lang
 wallisertitsch.lang
+#ifdef HAVE_LCD_BITMAP /* Not for the Player */
+chinese-simp.lang
+chinese-trad.lang
+hindi.lang
+thai.lang
 #endif /* HAVE_LCD_BITMAP */

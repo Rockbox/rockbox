@@ -7,6 +7,9 @@
 # $Id$
 #
 
+INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
+-I. -I$(BUILDDIR) -I$(OBJDIR)
+
 # the header we generate
 HEADER = $(BUILDDIR)/max_language_size.h
 
