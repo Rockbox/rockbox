@@ -618,7 +618,7 @@ cat <<EOF
 
  ==Tatung==            ==Olympus==            ==Logik==
  60) Elio TPJ-1022     70) M:Robe 500         80) DAX 1GB MP3/DAB
-                       71) M:Robe 10
+                       71) M:Robe 100
  ==Creative==
  90) Zen Vision:M
 EOF
@@ -1328,7 +1328,7 @@ EOF
     modelname="creativezvm"
     target="-DCREATIVE_ZVM"
     memory=32 # always
-    arm9cc
+    arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
