@@ -15,8 +15,6 @@ greek.lang
 hebrew.lang
 islenska.lang
 italiano.lang
-japanese.lang
-korean.lang
 magyar.lang
 nederlands.lang
 norsk.lang
@@ -35,5 +33,7 @@ wallisertitsch.lang
 chinese-simp.lang
 chinese-trad.lang
 hindi.lang
+japanese.lang
+korean.lang
 thai.lang
 #endif /* HAVE_LCD_BITMAP */
