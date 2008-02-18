@@ -906,7 +906,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: 
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>

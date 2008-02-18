@@ -6453,7 +6453,7 @@
   </dest>
   <voice>
     *: "none
-    agc: Live (slow)"
+    agc: "Live (slow)"
   </voice>
 </phrase>
 <phrase>

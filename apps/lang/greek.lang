@@ -7166,7 +7166,7 @@
     *: "Προβολή"
   </dest>
   <voice>
-    *: Προβολή"
+    *: "Προβολή"
   </voice>
 </phrase>
 <phrase>
@@ -10680,7 +10680,7 @@
   </source>
   <dest>
     *: none
-    recording: Pre-Recording"
+    recording: "Pre-Recording"
   </dest>
   <voice>
     *: none
