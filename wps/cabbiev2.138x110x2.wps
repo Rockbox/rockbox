@@ -26,7 +26,6 @@
 %xl|r|vol06-160x128x2.bmp|54|98|
 %xl|s|vol07-160x128x2.bmp|54|98|
 %xl|t|vol08-160x128x2.bmp|54|98|
-%xl|u|vol09-160x128x2.bmp|54|98|
 %xl|Q|shuffle-160x128x2.bmp|86|97|
 %xl|R|repeatall-160x128x2.bmp|107|95|
 %xl|S|repeatone-160x128x2.bmp|107|95|
@@ -48,7 +47,7 @@
 %al %pc%ac%pp of %pe%ar%pr 
 %?mh<%xdA|%xdB>
 %?bp<%?bc<%xdD|%xdC>|%?bl<|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK|%xdL>>
-%?pv<%xdM|%xdN|%xdO|%xdP|%xdp|%xdq|%xdr|%xds|%xdt|%xdu>
+%?pv<%xdM|%xdN|%xdO|%xdP|%xdp|%xdq|%xdr|%xds|%xdt>
 %?ps<%xdQ>
 %?mm<|%xdR|%xdS|%xdT|%xdU>
 %?mp<%xdV|%xdW|%xdX|%xdY|%xdZ>
