@@ -43,6 +43,7 @@ gui/*.[ch]
 keymaps/*.[ch]
 lang/SOURCES
 lang/*.lang
+lang/Makefile
 menus/*.[ch]
 metadata/*.[ch]
 player/*.[ch]
