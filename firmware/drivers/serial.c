@@ -174,7 +174,7 @@ void serial_setup (void)
 void serial_setup(void)
 {
 #ifdef UART_INT /*enable UART Interrupts */
-    UCR1_1 |= (EUARTUCR1_TRDYEN | EUaRTUCR1_RRDYEN | EUARTUCR1_TXMPTYEN);
+    UCR1_1 |= (EUARTUCR1_TRDYEN | EUARTUCR1_RRDYEN | EUARTUCR1_TXMPTYEN);
     UCR4_1 |= (EUARTUCR4_TCEN);
 #else /*disable UART Interrupts*/
     UCR1_1 &= ~(EUARTUCR1_TRDYEN | EUARTUCR1_RRDYEN | EUARTUCR1_TXMPTYEN);
