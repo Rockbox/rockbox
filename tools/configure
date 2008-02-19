@@ -1970,7 +1970,7 @@ build: tools @LANGS@
 	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
 
-bin: tools
+bin: tools @LANGS@
 	@SIMUL1@
 	@SIMUL2@
 	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
