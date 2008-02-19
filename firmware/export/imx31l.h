@@ -682,92 +682,90 @@
 /*
  * UART Control Register 0 Bit Fields.
  */
-#define EUartUCR1_ADEN      (1 << 15)   // Auto detect interrupt
-#define EUartUCR1_ADBR      (1 << 14)   // Auto detect baud rate
-#define EUartUCR1_TRDYEN    (1 << 13)   // Transmitter ready interrupt enable
-#define EUartUCR1_IDEN      (1 << 12)   // Idle condition interrupt
-#define EUartUCR1_RRDYEN    (1 << 9)    // Recv ready interrupt enable
-#define EUartUCR1_RDMAEN    (1 << 8)    // Recv ready DMA enable
-#define EUartUCR1_IREN      (1 << 7)    // Infrared interface enable
-#define EUartUCR1_TXMPTYEN  (1 << 6)    // Transimitter empt  interrupt enable
-#define EUartUCR1_RTSDEN    (1 << 5)    // RTS delta interrupt enable
-#define EUartUCR1_SNDBRK    (1 << 4)    // Send break
-#define EUartUCR1_TDMAEN    (1 << 3)    // Transmitter ready DMA enable
-#define EUartUCR1_DOZE      (1 << 1)    // Doze
-#define EUartUCR1_UARTEN    (1 << 0)    // UART enabled
-#define EUartUCR2_ESCI      (1 << 15)   // Escape seq interrupt enable
-#define EUartUCR2_IRTS      (1 << 14)   // Ignore RTS pin
-#define EUartUCR2_CTSC      (1 << 13)   // CTS pin control
-#define EUartUCR2_CTS       (1 << 12)   // Clear to send
-#define EUartUCR2_ESCEN     (1 << 11)   // Escape enable
-#define EUartUCR2_PREN      (1 << 8)    // Parity enable
-#define EUartUCR2_PROE      (1 << 7)    // Parity odd/even
-#define EUartUCR2_STPB      (1 << 6)    // Stop
-#define EUartUCR2_WS        (1 << 5)    // Word size
-#define EUartUCR2_RTSEN     (1 << 4)    // Request to send interrupt enable
-#define EUartUCR2_ATEN      (1 << 3)    // Aging timer enable
-#define EUartUCR2_TXEN      (1 << 2)    // Transmitter enabled
-#define EUartUCR2_RXEN      (1 << 1)    // Receiver enabled
-#define EUartUCR2_SRST_     (1 << 0)    // SW reset
-#define EUartUCR3_PARERREN  (1 << 12)   // Parity enable
-#define EUartUCR3_FRAERREN  (1 << 11)   // Frame error interrupt enable
-#define EUartUCR3_ADNIMP    (1 << 7)    // Autobaud detection not improved
-#define EUartUCR3_RXDSEN    (1 << 6)    // Receive status interrupt  enable
-#define EUartUCR3_AIRINTEN  (1 << 5)    // Async IR wake interrupt enable
-#define EUartUCR3_AWAKEN    (1 << 4)    // Async wake interrupt enable
-#define EUartUCR3_RXDMUXSEL (1 << 2)    // RXD muxed input selected
-#define EUartUCR3_INVT      (1 << 1)    // Inverted Infrared transmission
-#define EUartUCR3_ACIEN     (1 << 0)    // Autobaud counter interrupt  enable
-#define EUartUCR4_CTSTL_32  (32 << 10)  // CTS trigger level (32 chars)
-#define EUartUCR4_INVR      (1 << 9)    // Inverted infrared reception
-#define EUartUCR4_ENIRI     (1 << 8)    // Serial infrared interrupt enable
-#define EUartUCR4_WKEN      (1 << 7)    // Wake interrupt enable
-#define EUartUCR4_IRSC      (1 << 5)    // IR special case
-#define EUartUCR4_LPBYP     (1 << 4)    // Low power bypass
-#define EUartUCR4_TCEN      (1 << 3)    // Transmit complete interrupt  enable
-#define EUartUCR4_BKEN      (1 << 2)    // Break condition interrupt enable
-#define EUartUCR4_OREN      (1 << 1)    // Receiver overrun interrupt enable
-#define EUartUCR4_DREN      (1 << 0)    // Recv data ready interrupt enable
-#define EUartUFCR_RXTL_SHF  0           // Receiver trigger level shift
-#define EUartUFCR_RFDIV_1   (5 << 7)    // Reference freq divider (div> 1)
-#define EUartUFCR_RFDIV_2   (4 << 7)    // Reference freq divider (div> 2)
-#define EUartUFCR_RFDIV_3   (3 << 7)            // Reference freq  divider (div 3)
-#define EUartUFCR_RFDIV_4   (2 << 7)            // Reference freq divider (div 4)
-#define EUartUFCR_RFDIV_5   (1 << 7)            // Reference freq divider (div 5)
-#define EUartUFCR_RFDIV_6   (0 << 7)            // Reference freq divider (div 6)
-#define EUartUFCR_RFDIV_7   (6 << 7)            // Reference freq divider (div 7)
-#define EUartUFCR_TXTL_SHF  10          // Transmitter trigger level shift
-#define EUartUSR1_PARITYERR (1 << 15)   // Parity error interrupt flag
-#define EUartUSR1_RTSS      (1 << 14)   // RTS pin status
-#define EUartUSR1_TRDY      (1 << 13)   // Transmitter ready interrupt/dma flag
-#define EUartUSR1_RTSD      (1 << 12)   // RTS delta
-#define EUartUSR1_ESCF      (1 << 11)   // Escape seq interrupt flag
-#define EUartUSR1_FRAMERR   (1 << 10)   // Frame error interrupt flag
-#define EUartUSR1_RRDY      (1 << 9)    // Receiver ready  interrupt/dma flag
-#define EUartUSR1_AGTIM     (1 << 8)    // Aging timeout interrupt status
-#define EUartUSR1_RXDS      (1 << 6)    // Receiver idle interrupt flag
-#define EUartUSR1_AIRINT    (1 << 5)    // Async IR wake interrupt flag
-#define EUartUSR1_AWAKE     (1 << 4)    // Aysnc wake interrupt flag
-#define EUartUSR2_ADET      (1 << 15)   // Auto baud rate detect  complete
-#define EUartUSR2_TXFE      (1 << 14)   // Transmit buffer FIFO empty
-#define EUartUSR2_IDLE      (1 << 12)   // Idle condition
-#define EUartUSR2_ACST      (1 << 11)   // Autobaud counter stopped
-#define EUartUSR2_IRINT     (1 << 8)    // Serial infrared interrupt flag
-#define EUartUSR2_WAKE      (1 << 7)    // Wake
-#define EUartUSR2_RTSF      (1 << 4)    // RTS edge interrupt flag
-#define EUartUSR2_TXDC      (1 << 3)    // Transmitter complete
-#define EUartUSR2_BRCD      (1 << 2)    // Break condition
-#define EUartUSR2_ORE       (1 << 1)    // Overrun error
-#define EUartUSR2_RDR       (1 << 0)    // Recv data ready
-#define EUartUTS_FRCPERR    (1 << 13)   // Force parity error
-#define EUartUTS_LOOP       (1 << 12)   // Loop tx and rx
-#define EUartUTS_TXEMPTY    (1 << 6)    // TxFIFO empty
-#define EUartUTS_RXEMPTY    (1 << 5)    // RxFIFO empty
-#define EUartUTS_TXFULL     (1 << 4)    // TxFIFO full
-#define EUartUTS_RXFULL     (1 << 3)    // RxFIFO full
-#define EUartUTS_SOFTRST    (1 << 0)    // Software reset
-
-#define DelayTimerPresVal   3
+#define EUARTUCR1_ADEN      (1 << 15)   // Auto detect interrupt
+#define EUARTUCR1_ADBR      (1 << 14)   // Auto detect baud rate
+#define EUARTUCR1_TRDYEN    (1 << 13)   // Transmitter ready interrupt enable
+#define EUARTUCR1_IDEN      (1 << 12)   // Idle condition interrupt
+#define EUARTUCR1_RRDYEN    (1 << 9)    // Recv ready interrupt enable
+#define EUARTUCR1_RDMAEN    (1 << 8)    // Recv ready DMA enable
+#define EUARTUCR1_IREN      (1 << 7)    // Infrared interface enable
+#define EUARTUCR1_TXMPTYEN  (1 << 6)    // Transimitter empt  interrupt enable
+#define EUARTUCR1_RTSDEN    (1 << 5)    // RTS delta interrupt enable
+#define EUARTUCR1_SNDBRK    (1 << 4)    // Send break
+#define EUARTUCR1_TDMAEN    (1 << 3)    // Transmitter ready DMA enable
+#define EUARTUCR1_DOZE      (1 << 1)    // Doze
+#define EUARTUCR1_UARTEN    (1 << 0)    // UART enabled
+#define EUARTUCR2_ESCI      (1 << 15)   // Escape seq interrupt enable
+#define EUARTUCR2_IRTS      (1 << 14)   // Ignore RTS pin
+#define EUARTUCR2_CTSC      (1 << 13)   // CTS pin control
+#define EUARTUCR2_CTS       (1 << 12)   // Clear to send
+#define EUARTUCR2_ESCEN     (1 << 11)   // Escape enable
+#define EUARTUCR2_PREN      (1 << 8)    // Parity enable
+#define EUARTUCR2_PROE      (1 << 7)    // Parity odd/even
+#define EUARTUCR2_STPB      (1 << 6)    // Stop
+#define EUARTUCR2_WS        (1 << 5)    // Word size
+#define EUARTUCR2_RTSEN     (1 << 4)    // Request to send interrupt enable
+#define EUARTUCR2_ATEN      (1 << 3)    // Aging timer enable
+#define EUARTUCR2_TXEN      (1 << 2)    // Transmitter enabled
+#define EUARTUCR2_RXEN      (1 << 1)    // Receiver enabled
+#define EUARTUCR2_SRST_     (1 << 0)    // SW reset
+#define EUARTUCR3_PARERREN  (1 << 12)   // Parity enable
+#define EUARTUCR3_FRAERREN  (1 << 11)   // Frame error interrupt enable
+#define EUARTUCR3_ADNIMP    (1 << 7)    // Autobaud detection not improved
+#define EUARTUCR3_RXDSEN    (1 << 6)    // Receive status interrupt  enable
+#define EUARTUCR3_AIRINTEN  (1 << 5)    // Async IR wake interrupt enable
+#define EUARTUCR3_AWAKEN    (1 << 4)    // Async wake interrupt enable
+#define EUARTUCR3_RXDMUXSEL (1 << 2)    // RXD muxed input selected
+#define EUARTUCR3_INVT      (1 << 1)    // Inverted Infrared transmission
+#define EUARTUCR3_ACIEN     (1 << 0)    // Autobaud counter interrupt  enable
+#define EUARTUCR4_CTSTL_32  (32 << 10)  // CTS trigger level (32 chars)
+#define EUARTUCR4_INVR      (1 << 9)    // Inverted infrared reception
+#define EUARTUCR4_ENIRI     (1 << 8)    // Serial infrared interrupt enable
+#define EUARTUCR4_WKEN      (1 << 7)    // Wake interrupt enable
+#define EUARTUCR4_IRSC      (1 << 5)    // IR special case
+#define EUARTUCR4_LPBYP     (1 << 4)    // Low power bypass
+#define EUARTUCR4_TCEN      (1 << 3)    // Transmit complete interrupt  enable
+#define EUARTUCR4_BKEN      (1 << 2)    // Break condition interrupt enable
+#define EUARTUCR4_OREN      (1 << 1)    // Receiver overrun interrupt enable
+#define EUARTUCR4_DREN      (1 << 0)    // Recv data ready interrupt enable
+#define EUARTUFCR_RXTL_SHF  0           // Receiver trigger level shift
+#define EUARTUFCR_RFDIV_1   (5 << 7)    // Reference freq divider (div> 1)
+#define EUARTUFCR_RFDIV_2   (4 << 7)    // Reference freq divider (div> 2)
+#define EUARTUFCR_RFDIV_3   (3 << 7)    // Reference freq  divider (div 3)
+#define EUARTUFCR_RFDIV_4   (2 << 7)    // Reference freq divider (div 4)
+#define EUARTUFCR_RFDIV_5   (1 << 7)    // Reference freq divider (div 5)
+#define EUARTUFCR_RFDIV_6   (0 << 7)    // Reference freq divider (div 6)
+#define EUARTUFCR_RFDIV_7   (6 << 7)    // Reference freq divider (div 7)
+#define EUARTUFCR_TXTL_SHF  10          // Transmitter trigger level shift
+#define EUARTUSR1_PARITYERR (1 << 15)   // Parity error interrupt flag
+#define EUARTUSR1_RTSS      (1 << 14)   // RTS pin status
+#define EUARTUSR1_TRDY      (1 << 13)   // Transmitter ready interrupt/dma flag
+#define EUARTUSR1_RTSD      (1 << 12)   // RTS delta
+#define EUARTUSR1_ESCF      (1 << 11)   // Escape seq interrupt flag
+#define EUARTUSR1_FRAMERR   (1 << 10)   // Frame error interrupt flag
+#define EUARTUSR1_RRDY      (1 << 9)    // Receiver ready  interrupt/dma flag
+#define EUARTUSR1_AGTIM     (1 << 8)    // Aging timeout interrupt status
+#define EUARTUSR1_RXDS      (1 << 6)    // Receiver idle interrupt flag
+#define EUARTUSR1_AIRINT    (1 << 5)    // Async IR wake interrupt flag
+#define EUARTUSR1_AWAKE     (1 << 4)    // Aysnc wake interrupt flag
+#define EUARTUSR2_ADET      (1 << 15)   // Auto baud rate detect  complete
+#define EUARTUSR2_TXFE      (1 << 14)   // Transmit buffer FIFO empty
+#define EUARTUSR2_IDLE      (1 << 12)   // Idle condition
+#define EUARTUSR2_ACST      (1 << 11)   // Autobaud counter stopped
+#define EUARTUSR2_IRINT     (1 << 8)    // Serial infrared interrupt flag
+#define EUARTUSR2_WAKE      (1 << 7)    // Wake
+#define EUARTUSR2_RTSF      (1 << 4)    // RTS edge interrupt flag
+#define EUARTUSR2_TXDC      (1 << 3)    // Transmitter complete
+#define EUARTUSR2_BRCD      (1 << 2)    // Break condition
+#define EUARTUSR2_ORE       (1 << 1)    // Overrun error
+#define EUARTUSR2_RDR       (1 << 0)    // Recv data ready
+#define EUARTUTS_FRCPERR    (1 << 13)   // Force parity error
+#define EUARTUTS_LOOP       (1 << 12)   // Loop tx and rx
+#define EUARTUTS_TXEMPTY    (1 << 6)    // TxFIFO empty
+#define EUARTUTS_RXEMPTY    (1 << 5)    // RxFIFO empty
+#define EUARTUTS_TXFULL     (1 << 4)    // TxFIFO full
+#define EUARTUTS_RXFULL     (1 << 3)    // RxFIFO full
+#define EUARTUTS_SOFTRST    (1 << 0)    // Software reset
 
 #define L2CC_ENABLED
 

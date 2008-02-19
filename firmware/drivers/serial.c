@@ -174,36 +174,38 @@ void serial_setup (void)
 void serial_setup(void)
 {
 #ifdef UART_INT /*enable UART Interrupts */
-    UCR1_1 |= (EUartUCR1_TRDYEN | EUartUCR1_RRDYEN | EUartUCR1_TXMPTYEN);
-    UCR4_1 |= (EUartUCR4_TCEN);
+    UCR1_1 |= (EUARTUCR1_TRDYEN | EUaRTUCR1_RRDYEN | EUARTUCR1_TXMPTYEN);
+    UCR4_1 |= (EUARTUCR4_TCEN);
 #else /*disable UART Interrupts*/
-    UCR1_1 &= ~(EUartUCR1_TRDYEN | EUartUCR1_RRDYEN | EUartUCR1_TXMPTYEN);
-    UCR4_1 &= ~(EUartUCR4_TCEN);
+    UCR1_1 &= ~(EUARTUCR1_TRDYEN | EUARTUCR1_RRDYEN | EUARTUCR1_TXMPTYEN);
+    UCR4_1 &= ~(EUARTUCR4_TCEN);
 #endif
-    UCR1_1 |= EUartUCR1_UARTEN;
-    UCR2_1 |= (EUartUCR2_TXEN  | EUartUCR2_RXEN | EUartUCR2_IRTS);
+    UCR1_1 |= EUARTUCR1_UARTEN;
+    UCR2_1 |= (EUARTUCR2_TXEN  | EUARTUCR2_RXEN | EUARTUCR2_IRTS);
 
     /* Tx,Rx Interrupt Trigger levels, Disable for now*/
     /*UFCR1 |= (UFCR1_TXTL_32 | UFCR1_RXTL_32);*/
 }
 
-int Tx_Rdy(void)
+int tx_rdy(void)
 {
-    if((UTS1 & EUartUTS_TXEMPTY))
+    if((UTS1 & EUARTUTS_TXEMPTY))
         return 1;
-    else return 0;
+    else
+        return 0;
 }
 
 /*Not ready...After first Rx, UTS1 & UTS1_RXEMPTY 
   keeps returning true*/
-int Rx_Rdy(void) 
+int rx_rdy(void) 
 {
-    if(!(UTS1 & EUartUTS_RXEMPTY))
+    if(!(UTS1 & EUARTUTS_RXEMPTY))
         return 1;
-    else return 0;
+    else
+        return 0;
 }
 
-void Tx_Writec(char c)
+void tx_writec(char c)
 {
     UTXD1=(int) c;
 }
@@ -227,12 +229,12 @@ void serial_tx(const unsigned char * buf)
 {
     /*Tx*/
     for(;;) {
-        if(Tx_Rdy()) {
+        if(tx_rdy()) {
             if(*buf == '\0')
                 return;
             if(*buf == '\n')
-                Tx_Writec('\r');
-            Tx_Writec(*buf);
+                tx_writec('\r');
+            tx_writec(*buf);
             buf++;
         }
     }
