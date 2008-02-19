@@ -129,16 +129,6 @@ static bool usb_pin_detect(void)
         retval = true;
 #endif
 
-    /* if USB is detected, re-enable the USB-devices */
-    if (retval)
-    {
-        DEV_EN |= DEV_USB0;
-        DEV_EN |= DEV_USB1;
-#if CONFIG_CPU == PP5020
-        DEV_INIT2 |= INIT_USB;
-#endif
-    }
-    
     return retval;
 }
 
@@ -185,7 +175,22 @@ int usb_detect(void)
     if (!usbstatus1)
     {   /* We have just been disconnected */
         status = USB_EXTRACTED;
+
+        /* Disable USB devices */
+        DEV_EN &=~ DEV_USB0;
+        DEV_EN &=~ DEV_USB1;
+#if CONFIG_CPU == PP5020
+        DEV_INIT2 &=~ INIT_USB;
+#endif
+
         return status;
+    } else {
+        /* if USB is detected, re-enable the USB-devices, otherwise make sure it's disabled */
+        DEV_EN |= DEV_USB0;
+        DEV_EN |= DEV_USB1;
+#if CONFIG_CPU == PP5020
+        DEV_INIT2 |= INIT_USB;
+#endif
     }
 
     /* Run the USB stack to request full bus power */
