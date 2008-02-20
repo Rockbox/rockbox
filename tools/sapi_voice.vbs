@@ -184,7 +184,7 @@ Do
                 oTTS.FileName = aData(0)
                 oTTS.Speak aData(1)
                 While oTTS.Speaking
-                    WScript.Sleep 100
+                    WScript.Sleep 1
                 Wend
                 oTTS.FileName = ""
             Else
