@@ -108,7 +108,7 @@ If bSAPI4 Then
     oTTS.Select nMode
 
     ' Speed selection
-    If sSpeed <> "" Then oSpVoice.Speed = sSpeed
+    If sSpeed <> "" Then oTTS.Speed = sSpeed
 Else ' SAPI5
     ' Create SAPI5 object
     Set oSpVoice = CreateObject("SAPI.SpVoice")
@@ -123,7 +123,7 @@ Else ' SAPI5
         For Each nLangID in LangIDs(sLanguage)
             sSelectString = "Language=" & Hex(nLangID)
             For Each oVoice in oSpVoice.GetVoices(sSelectString)
-                WScript.StdErr.Write oVoice.GetDescription & ","
+                WScript.StdErr.Write oVoice.GetAttribute("Name") & ","
             Next
         Next
         WScript.StdErr.WriteLine
