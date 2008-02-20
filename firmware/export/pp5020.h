@@ -451,8 +451,37 @@
 #define LCD1_BUSY_MASK      0x8000
 
 /* Serial Controller */
-#define SERIAL0             (*(volatile unsigned long*)(0x70006000))
-#define SERIAL1             (*(volatile unsigned long*)(0x70006040))
+#define SER0_BASE           (*(volatile unsigned long*)(0x70006000))
+
+#define SER0_RBR            (*(volatile unsigned long*)(0x70006000))
+#define SER0_THR            (*(volatile unsigned long*)(0x70006000))
+#define SER0_IER            (*(volatile unsigned long*)(0x70006004))
+#define SER0_FCR            (*(volatile unsigned long*)(0x70006008))
+#define SER0_IIR            (*(volatile unsigned long*)(0x70006008))
+#define SER0_LCR            (*(volatile unsigned long*)(0x7000600c))
+#define SER0_MCR            (*(volatile unsigned long*)(0x70006010))
+#define SER0_LSR            (*(volatile unsigned long*)(0x70006014))
+#define SER0_MSR            (*(volatile unsigned long*)(0x70006018))
+#define SER0_SPR            (*(volatile unsigned long*)(0x7000601c))
+
+#define SER0_DLL            (*(volatile unsigned long*)(0x70006000))
+#define SER0_DLM            (*(volatile unsigned long*)(0x70006004))
+
+#define SER1_BASE           (*(volatile unsigned long*)(0x70006040))
+
+#define SER1_RBR            (*(volatile unsigned long*)(0x70006040))
+#define SER1_THR            (*(volatile unsigned long*)(0x70006040))
+#define SER1_IER            (*(volatile unsigned long*)(0x70006044))
+#define SER1_FCR            (*(volatile unsigned long*)(0x70006048))
+#define SER1_IIR            (*(volatile unsigned long*)(0x70006048))
+#define SER1_LCR            (*(volatile unsigned long*)(0x7000604c))
+#define SER1_MCR            (*(volatile unsigned long*)(0x70006050))
+#define SER1_LSR            (*(volatile unsigned long*)(0x70006054))
+#define SER1_MSR            (*(volatile unsigned long*)(0x70006058))
+#define SER1_SPR            (*(volatile unsigned long*)(0x7000605c))
+
+#define SER1_DLL            (*(volatile unsigned long*)(0x70006040))
+#define SER1_DLM            (*(volatile unsigned long*)(0x70006044))
 
 /* Second ("color") LCD bridge */
 #define LCD2_BASE           0x70008a00
