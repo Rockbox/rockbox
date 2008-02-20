@@ -30,6 +30,10 @@
 
 #define REG_ID               (*(volatile unsigned int *)(USB_BASE+0x000))
 #define REG_HWGENERAL        (*(volatile unsigned int *)(USB_BASE+0x004))
+#define REG_HWHOST           (*(volatile unsigned int *)(USB_BASE+0x008))
+#define REG_HWDEVICE         (*(volatile unsigned int *)(USB_BASE+0x00c))
+#define REG_TXBUF            (*(volatile unsigned int *)(USB_BASE+0x010))
+#define REG_RXBUF            (*(volatile unsigned int *)(USB_BASE+0x014))
 #define REG_CAPLENGTH        (*(volatile unsigned char*)(USB_BASE+0x100))
 #define REG_DCIVERSION       (*(volatile unsigned int *)(USB_BASE+0x120))
 #define REG_DCCPARAMS        (*(volatile unsigned int *)(USB_BASE+0x124))
@@ -278,6 +282,10 @@
                                                DTD_STATUS_DATA_BUFF_ERR | \
                                                DTD_STATUS_TRANSACTION_ERR)
 
+#define DTD_RESERVED_LENGTH_MASK             0x0001ffff
+#define DTD_RESERVED_IN_USE                  0x80000000
+#define DTD_RESERVED_PIPE_MASK               0x0ff00000
+#define DTD_RESERVED_PIPE_OFFSET             20
 /*-------------------------------------------------------------------------*/
 
 /* manual: 32.13.2 Endpoint Transfer Descriptor (dTD) */
@@ -294,7 +302,7 @@ struct transfer_descriptor {
     unsigned int reserved;
 } __attribute__ ((packed));
 
-static struct transfer_descriptor _td_array[32] __attribute((aligned (32)));
+static struct transfer_descriptor _td_array[NUM_ENDPOINTS*2] __attribute((aligned (32)));
 static struct transfer_descriptor* td_array;
 
 /* manual: 32.13.1 Endpoint Queue Head (dQH) */
@@ -304,30 +312,36 @@ struct queue_head {
     unsigned int curr_dtd_ptr;      /* Current dTD Pointer(31-5) */
     struct transfer_descriptor dtd; /* dTD overlay */
     unsigned int setup_buffer[2];   /* Setup data 8 bytes */
-    unsigned int reserved[4];
+    unsigned int reserved;          /* for software use, pointer to the first TD */
+    unsigned int status;            /* for software use, status of chain in progress */
+    unsigned int length;            /* for software use, transfered bytes of chain in progress */
+    unsigned int wait;              /* for softwate use, indicates if the transfer is blocking */
 } __attribute__((packed));
 
 static struct queue_head _qh_array[NUM_ENDPOINTS*2] __attribute((aligned (2048)));
 static struct queue_head* qh_array;
+static struct event_queue transfer_completion_queue[NUM_ENDPOINTS*2];
 
 
-static const unsigned int pipe2mask[NUM_ENDPOINTS*2] = {
+static const unsigned int pipe2mask[] = {
     0x01, 0x010000,
     0x02, 0x020000,
     0x04, 0x040000,
+    0x08, 0x080000,
+    0x10, 0x100000,
 };
-
-static struct transfer_descriptor* first_td;
-static struct transfer_descriptor* last_td;
 
 /*-------------------------------------------------------------------------*/
 static void transfer_completed(void);
-static int prime_transfer(int endpoint, void* ptr, int len, bool send);
+static void control_received(void);
+static int prime_transfer(int endpoint, void* ptr,
+                          int len, bool send, bool wait);
 static void prepare_td(struct transfer_descriptor* td,
                        struct transfer_descriptor* previous_td,
-                       void *ptr, int len);
+                       void *ptr, int len,int pipe);
 static void bus_reset(void);
-static void init_queue_heads(void);
+static void init_control_queue_heads(void);
+static void init_bulk_queue_heads(void);
 static void init_endpoints(void);
 /*-------------------------------------------------------------------------*/
 
@@ -344,6 +358,7 @@ void usb_drv_init(void)
     REG_USBCMD |= USBCMD_CTRL_RESET;
     while (REG_USBCMD & USBCMD_CTRL_RESET);
 
+
     REG_USBMODE = USBMODE_CTRL_MODE_DEVICE;
 
     /* Force device to full speed */
@@ -352,7 +367,7 @@ void usb_drv_init(void)
 
     td_array = (struct transfer_descriptor*)UNCACHED_ADDR(&_td_array);
     qh_array = (struct queue_head*)UNCACHED_ADDR(&_qh_array);
-    init_queue_heads();
+    init_control_queue_heads();
     memset(td_array, 0, sizeof _td_array);
 
     REG_ENDPOINTLISTADDR = (unsigned int)qh_array;
@@ -371,6 +386,7 @@ void usb_drv_init(void)
 
     /* go go go */
     REG_USBCMD |= USBCMD_RUN;
+
 
     logf("usb_drv_init() finished");
     logf("usb id %x", REG_ID);
@@ -407,15 +423,7 @@ void usb_drv_int(void)
 
         /* a control packet? */
         if (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0) {
-            /* copy setup data from packet */
-            unsigned int tmp[2];
-            tmp[0] = qh_array[0].setup_buffer[0];
-            tmp[1] = qh_array[0].setup_buffer[1];
-
-            /* acknowledge packet recieved */
-            REG_ENDPTSETUPSTAT |= EPSETUP_STATUS_EP0;
-
-            usb_core_control_request((struct usb_ctrlrequest*)tmp);
+            control_received();
         }
 
         if (REG_ENDPTCOMPLETE)
@@ -441,29 +449,52 @@ void usb_drv_int(void)
     }
 }
 
-void usb_drv_stall(int endpoint, bool stall)
+bool usb_drv_stalled(int endpoint,bool in)
+{
+    if(in) {
+        return ((REG_ENDPTCTRL(endpoint) & EPCTRL_TX_EP_STALL)!=0);
+    }
+    else {
+        return ((REG_ENDPTCTRL(endpoint) & EPCTRL_RX_EP_STALL)!=0);
+    }
+
+}
+void usb_drv_stall(int endpoint, bool stall,bool in)
 {
     logf("%sstall %d", stall?"":"un", endpoint);
 
-    if (stall) {
-        REG_ENDPTCTRL(endpoint) |= EPCTRL_RX_EP_STALL;
-        REG_ENDPTCTRL(endpoint) |= EPCTRL_TX_EP_STALL;
+    if(in) {
+        if (stall) {
+            REG_ENDPTCTRL(endpoint) |= EPCTRL_TX_EP_STALL;
+        }
+        else {
+            REG_ENDPTCTRL(endpoint) &= ~EPCTRL_TX_EP_STALL;
+        }
     }
     else {
-        REG_ENDPTCTRL(endpoint) &= ~EPCTRL_RX_EP_STALL;
-        REG_ENDPTCTRL(endpoint) &= ~EPCTRL_TX_EP_STALL;
+        if (stall) {
+            REG_ENDPTCTRL(endpoint) |= EPCTRL_RX_EP_STALL;
+        }
+        else {
+            REG_ENDPTCTRL(endpoint) &= ~EPCTRL_RX_EP_STALL;
+        }
     }
+}
+
+int usb_drv_send_nonblocking(int endpoint, void* ptr, int length)
+{
+    return prime_transfer(endpoint, ptr, length, true, false);
 }
 
 int usb_drv_send(int endpoint, void* ptr, int length)
 {
-    return prime_transfer(endpoint, ptr, length, true);
+    return prime_transfer(endpoint, ptr, length, true, true);
 }
 
 int usb_drv_recv(int endpoint, void* ptr, int length)
 {
     //logf("usbrecv(%x, %d)", ptr, length);
-    return prime_transfer(endpoint, ptr, length, false);
+    return prime_transfer(endpoint, ptr, length, false, false);
 }
 
 void usb_drv_wait(int endpoint, bool send)
@@ -485,6 +516,7 @@ int usb_drv_port_speed(void)
 void usb_drv_set_address(int address)
 {
     REG_DEVICEADDR = address << USBDEVICEADDRESS_BIT_POS;
+    init_bulk_queue_heads();
     init_endpoints();
 }
 
@@ -496,77 +528,42 @@ void usb_drv_reset_endpoint(int endpoint, bool send)
     while (REG_ENDPTFLUSH & mask);
 }
 
-int usb_drv_get_last_transfer_length(void)
-{
-    struct transfer_descriptor* current_td = first_td;
-    int length = 0;
-
-    while (!((unsigned int)current_td & DTD_NEXT_TERMINATE)) {
-        if ((current_td->size_ioc_sts & 0xff) != 0)
-            return -1;
-
-        length += current_td->reserved -
-            ((current_td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS);
-        current_td = (struct transfer_descriptor*)current_td->next_td_ptr;
-    }
-    return length;
-}
-int usb_drv_get_last_transfer_status(void)
-{
-    struct transfer_descriptor* current_td = first_td;
-
-    while (!((unsigned int)current_td & DTD_NEXT_TERMINATE)) {
-        if ((current_td->size_ioc_sts & 0xff) != 0)
-            return current_td->size_ioc_sts & 0xff;
-
-        current_td = (struct transfer_descriptor*)current_td->next_td_ptr;
-    }
-    return 0;
-}
 
 /*-------------------------------------------------------------------------*/
 
 /* manual: 32.14.5.2 */
-static int prime_transfer(int endpoint, void* ptr, int len, bool send)
+static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait)
 {
     int pipe = endpoint * 2 + (send ? 1 : 0);
     unsigned int mask = pipe2mask[pipe];
-    last_td = 0;
     struct queue_head* qh = &qh_array[pipe];
     static long last_tick;
+    struct transfer_descriptor* new_td;
 
 /*
     if (send && endpoint > EP_CONTROL) {
         logf("usb: sent %d bytes", len);
     }
 */
+    qh->status = 0;
+    qh->length = 0;
+    qh->wait   = wait;
 
-    if (len==0) {
-        struct transfer_descriptor* new_td = &td_array[0];
-        prepare_td(new_td, 0, ptr, 0);
 
-        last_td = new_td;
-        first_td = new_td;
-    }
-    else {
-        int td_idx = 0;
-        while (len > 0) {
-            int current_transfer_length = MIN(16384,len);
-            struct transfer_descriptor* new_td = &td_array[td_idx];
-            prepare_td(new_td, last_td, ptr, current_transfer_length);
+    new_td=&td_array[pipe];
+    prepare_td(new_td, 0, ptr, len,pipe);
+    //logf("starting ep %d %s",endpoint,send?"send":"receive");
 
-            last_td = new_td;
-            len -= current_transfer_length;
-            td_idx++;
-            ptr += current_transfer_length;
-        }
-        first_td = &td_array[0];
-    }
-
-    qh->dtd.next_td_ptr = (unsigned int)first_td;
+    qh->dtd.next_td_ptr = (unsigned int)new_td;
     qh->dtd.size_ioc_sts &= ~(QH_STATUS_HALT | QH_STATUS_ACTIVE);
 
     REG_ENDPTPRIME |= mask;
+
+    if(endpoint == EP_CONTROL && (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0)) {
+        /* 32.14.3.2.2 */
+        logf("new setup arrived");
+        return -4;
+    }
 
     last_tick = current_tick;
     while ((REG_ENDPTPRIME & mask)) {
@@ -583,38 +580,43 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send)
         logf("no prime! %d %d %x", endpoint, pipe, qh->dtd.size_ioc_sts & 0xff );
         return -3;
     }
+    if(endpoint == EP_CONTROL && (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0)) {
+        /* 32.14.3.2.2 */
+        logf("new setup arrived");
+        return -4;
+    }
 
-    if (send) {
+    if (wait) {
         /* wait for transfer to finish */
-        struct transfer_descriptor* current_td = first_td;
-
-        while (!((unsigned int)current_td & DTD_NEXT_TERMINATE)) {
-            while ((current_td->size_ioc_sts & 0xff) == DTD_STATUS_ACTIVE) {
-                if (REG_ENDPTCOMPLETE & mask)
-                    REG_ENDPTCOMPLETE |= mask;
-
-                /* let the host handle timeouts */
-                if (REG_USBSTS & USBSTS_RESET) {
-                    logf("td interrupted by reset");
-                    return -4;
-                }
-            }
-            if ((current_td->size_ioc_sts & 0xff) != 0) {
-                logf("td failed with error %X",(current_td->size_ioc_sts & 0xff));
-                return -6;
-            }
-            //logf("td finished : %X",current_td->size_ioc_sts & 0xff);
-            current_td=(struct transfer_descriptor*)current_td->next_td_ptr;
+        struct queue_event ev;
+        queue_wait(&transfer_completion_queue[pipe], &ev);
+        if(qh->status!=0) {
+            return -5;
         }
         //logf("all tds done");
     }
-
     return 0;
+}
+
+void usb_drv_cancel_all_transfers(void)
+{
+    int i;
+    REG_ENDPTFLUSH = ~0;
+    while (REG_ENDPTFLUSH);
+
+    memset(td_array, 0, sizeof _td_array);
+    for(i=0;i<NUM_ENDPOINTS*2;i++) {
+        if(qh_array[i].wait) {
+            qh_array[i].wait=0;
+            qh_array[i].status=DTD_STATUS_HALTED;
+            queue_post(&transfer_completion_queue[i],0, 0);
+        }
+    }
 }
 
 static void prepare_td(struct transfer_descriptor* td,
                        struct transfer_descriptor* previous_td,
-                       void *ptr, int len)
+                       void *ptr, int len,int pipe)
 {
     //logf("adding a td : %d",len);
     memset(td, 0, sizeof(struct transfer_descriptor));
@@ -626,35 +628,72 @@ static void prepare_td(struct transfer_descriptor* td,
     td->buff_ptr2 = ((unsigned int)ptr & 0xfffff000) + 0x2000;
     td->buff_ptr3 = ((unsigned int)ptr & 0xfffff000) + 0x3000;
     td->buff_ptr4 = ((unsigned int)ptr & 0xfffff000) + 0x4000;
-    td->reserved = len;
+    td->reserved |= DTD_RESERVED_LENGTH_MASK & len;
+    td->reserved |= DTD_RESERVED_IN_USE;
+    td->reserved |= (pipe << DTD_RESERVED_PIPE_OFFSET);
 
     if (previous_td != 0) {
-       previous_td->next_td_ptr=(unsigned int)td;
-       previous_td->size_ioc_sts&=~DTD_IOC;// Only an interrupt on the last one
+        previous_td->next_td_ptr=(unsigned int)td;
     }
+}
+
+static void control_received(void)
+{
+    int i;
+    logf("control stuff");
+    /* copy setup data from packet */
+    static unsigned int tmp[2];
+    tmp[0] = qh_array[0].setup_buffer[0];
+    tmp[1] = qh_array[0].setup_buffer[1];
+
+    /* acknowledge packet recieved */
+    REG_ENDPTSETUPSTAT |= EPSETUP_STATUS_EP0;
+
+    /* Stop pending interrupt transfers */
+    for(i=0;i<2;i++) {
+        if(qh_array[i].wait) {
+            qh_array[i].wait=0;
+            qh_array[i].status=DTD_STATUS_HALTED;
+            queue_post(&transfer_completion_queue[i],0, 0);
+        }
+    }
+
+    usb_core_control_request((struct usb_ctrlrequest*)tmp);
 }
 
 static void transfer_completed(void)
 {
-    int i;
+    int ep;
     unsigned int mask = REG_ENDPTCOMPLETE;
     REG_ENDPTCOMPLETE |= mask;
 
-    //logf("usb comp %x", mask);
+    for (ep=0; ep<NUM_ENDPOINTS; ep++) {
+        int dir;
+        for (dir=0; dir<2; dir++) {
+            int pipe = ep * 2 + dir;
+            if (mask & pipe2mask[pipe]) {
+                struct queue_head* qh = &qh_array[pipe];
+                struct transfer_descriptor *td = &td_array[pipe];
 
-    for (i=0; i<NUM_ENDPOINTS; i++) {
-        int x;
-        for (x=0; x<2; x++) {
-            unsigned int status;
-            int pipe = i * 2 + x;
-
-            if (mask & pipe2mask[pipe])
-                usb_core_transfer_complete(i, x ? true : false);
-                                           
-            status = usb_drv_get_last_transfer_status();
-            if ((mask & pipe2mask[pipe]) &&
-                status & DTD_ERROR_MASK) {
-                logf("pipe %d err %x", pipe, status & DTD_ERROR_MASK);
+                if(td->size_ioc_sts & DTD_STATUS_ACTIVE) {
+                    /* TODO this shouldn't happen, but...*/
+                    break;
+                }
+                if((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS != 0 && dir==0) {
+                    /* We got less data than we asked for. */
+                }
+                qh->length = (td->reserved & DTD_RESERVED_LENGTH_MASK) - 
+                    ((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS);
+                if(td->size_ioc_sts & DTD_ERROR_MASK) {
+                    logf("pipe %d err %x", pipe, td->size_ioc_sts & DTD_ERROR_MASK);
+                    qh->status |= td->size_ioc_sts & DTD_ERROR_MASK;
+                    /* TODO we need to handle this somehow. Flush the endpoint ? */
+                }
+                if(qh->wait) {
+                    qh->wait=0;
+                    queue_post(&transfer_completion_queue[pipe],0, 0);
+                }
+                usb_core_transfer_complete(ep, dir, qh->status, qh->length);
             }
         }
     }
@@ -685,36 +724,17 @@ static void bus_reset(void)
         logf("usb: short reset timeout");
     }
 
-    REG_ENDPTFLUSH = ~0;
-    //while (REG_ENDPTFLUSH);
+    usb_drv_cancel_all_transfers();
     
     if (!(REG_PORTSC1 & PORTSCX_PORT_RESET)) {
         logf("usb: slow reset!");
     }
-
-    logf("PTS : %X",(REG_PORTSC1 & 0xC0000000)>>30);
-    logf("STS : %X",(REG_PORTSC1 & 0x20000000)>>29);
-    logf("PTW : %X",(REG_PORTSC1 & 0x10000000)>>28);
-    logf("PSPD : %X",(REG_PORTSC1 & 0x0C000000)>>26);
-    logf("PFSC : %X",(REG_PORTSC1 & 0x01000000)>>24);
-    logf("PTC : %X",(REG_PORTSC1 & 0x000F0000)>>16);
-    logf("PO  : %X",(REG_PORTSC1 & 0x00002000)>>13);
 }
 
 /* manual: 32.14.4.1 Queue Head Initialization */
-static void init_queue_heads(void)
+static void init_control_queue_heads(void)
 {
-    int tx_packetsize;
-    int rx_packetsize;
-
-    if (usb_drv_port_speed()) {
-        rx_packetsize = 512;
-        tx_packetsize = 512;
-    }
-    else {
-        rx_packetsize = 16;
-        tx_packetsize = 16;
-    }
+    int i;
     memset(qh_array, 0, sizeof _qh_array);
 
     /*** control ***/
@@ -723,23 +743,47 @@ static void init_queue_heads(void)
     qh_array[EP_CONTROL+1].max_pkt_length = 64 << QH_MAX_PKT_LEN_POS;
     qh_array[EP_CONTROL+1].dtd.next_td_ptr = QH_NEXT_TERMINATE;
 
+    for(i=0;i<2;i++) {
+        queue_init(&transfer_completion_queue[i], false);
+    }
+}
+/* manual: 32.14.4.1 Queue Head Initialization */
+static void init_bulk_queue_heads(void)
+{
+    int tx_packetsize;
+    int rx_packetsize;
+    int i;
+
+    if (usb_drv_port_speed()) {
+        rx_packetsize = 512;
+        tx_packetsize = 512;
+    }
+    else {
+        rx_packetsize = 64;
+        tx_packetsize = 64;
+    }
+
     /*** bulk ***/
-    qh_array[EP_RX*2].max_pkt_length = rx_packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
-    qh_array[EP_RX*2].dtd.next_td_ptr = QH_NEXT_TERMINATE;
-    qh_array[EP_TX*2+1].max_pkt_length = tx_packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
-    qh_array[EP_TX*2+1].dtd.next_td_ptr = QH_NEXT_TERMINATE;
+    for(i=1;i<NUM_ENDPOINTS;i++) {
+        qh_array[i*2].max_pkt_length = rx_packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
+        qh_array[i*2].dtd.next_td_ptr = QH_NEXT_TERMINATE;
+        qh_array[i*2+1].max_pkt_length = tx_packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
+        qh_array[i*2+1].dtd.next_td_ptr = QH_NEXT_TERMINATE;
+    }
+    for(i=2;i<NUM_ENDPOINTS*2;i++) {
+        queue_init(&transfer_completion_queue[i], false);
+    }
 }
 
 static void init_endpoints(void)
 {
+    int i;
     /* bulk */
-    REG_ENDPTCTRL(EP_RX) =
-        EPCTRL_RX_DATA_TOGGLE_RST | EPCTRL_RX_ENABLE |
-        (EPCTRL_EP_TYPE_BULK << EPCTRL_RX_EP_TYPE_SHIFT) |
-        (EPCTRL_EP_TYPE_BULK << EPCTRL_TX_EP_TYPE_SHIFT);
-
-    REG_ENDPTCTRL(EP_TX) =
-        EPCTRL_TX_DATA_TOGGLE_RST | EPCTRL_TX_ENABLE |
-        (EPCTRL_EP_TYPE_BULK << EPCTRL_RX_EP_TYPE_SHIFT) |
-        (EPCTRL_EP_TYPE_BULK << EPCTRL_TX_EP_TYPE_SHIFT);
+    for(i=1;i<NUM_ENDPOINTS;i++) {
+        REG_ENDPTCTRL(i) =
+            EPCTRL_RX_DATA_TOGGLE_RST | EPCTRL_RX_ENABLE |
+            EPCTRL_TX_DATA_TOGGLE_RST | EPCTRL_TX_ENABLE |
+            (EPCTRL_EP_TYPE_BULK << EPCTRL_RX_EP_TYPE_SHIFT) |
+            (EPCTRL_EP_TYPE_BULK << EPCTRL_TX_EP_TYPE_SHIFT);
+    }
 }

@@ -21,6 +21,6 @@
 
 void usb_benchmark_init(void);
 void usb_benchmark_control_request(struct usb_ctrlrequest* req);
-void usb_benchmark_transfer_complete(int endpoint, bool in);
+void usb_benchmark_transfer_complete(bool in);
 
 #endif

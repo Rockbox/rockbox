@@ -23,31 +23,31 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
-#ifndef BOOTLOADER
-//#define USB_SERIAL
-//#define USB_BENCHMARK
-#ifdef USE_ROCKBOX_USB
-#define USB_STORAGE
-#else
-#define USB_CHARGING_ONLY
-#endif /* USE_ROCKBOX_USB */
-#else
-#define USB_CHARGING_ONLY
-#endif
-
 #include "usb_ch9.h"
 #include "usb_drv.h"
 #include "usb_core.h"
 
+#define USB_THREAD
+
 #if defined(USB_STORAGE)
 #include "usb_storage.h"
-#define USB_THREAD
-#elif defined(USB_SERIAL)
-#define USB_THREAD
+#endif
+
+#if defined(USB_SERIAL)
 #include "usb_serial.h"
-#elif defined(USB_BENCHMARK)
+#endif
+
+#if defined(USB_BENCHMARK)
 #include "usb_benchmark.h"
 #endif
+
+/* TODO: Move this target-specific stuff somewhere else (serial number reading) */
+
+#ifdef HAVE_AS3514
+#include "i2c-pp.h"
+#include "as3514.h"
+#endif
+
 
 /*-------------------------------------------------------------------------*/
 /* USB protocol descriptors: */
@@ -55,12 +55,10 @@
 #define USB_SC_SCSI      0x06            /* Transparent */
 #define USB_PROT_BULK    0x50            /* bulk only */
 
-int usb_max_pkt_size = 512;
-
-static const struct usb_device_descriptor device_descriptor = {
+static const struct usb_device_descriptor device_descriptor= {
     .bLength            = sizeof(struct usb_device_descriptor),
     .bDescriptorType    = USB_DT_DEVICE,
-    .bcdUSB             = 0x0200, /* USB version 2.0 */
+    .bcdUSB             = 0x0200,
     .bDeviceClass       = USB_CLASS_PER_INTERFACE,
     .bDeviceSubClass    = 0,
     .bDeviceProtocol    = 0,
@@ -74,17 +72,34 @@ static const struct usb_device_descriptor device_descriptor = {
     .bNumConfigurations = 1
 };
 
-static const struct {
+static struct {
     struct usb_config_descriptor config_descriptor;
-    struct usb_interface_descriptor interface_descriptor;
-    struct usb_endpoint_descriptor ep1_in_descriptor;
-    struct usb_endpoint_descriptor ep1_out_descriptor;
-} config_data_fs = 
+#ifdef USB_CHARGING_ONLY
+    struct usb_interface_descriptor charging_interface_descriptor;
+    struct usb_endpoint_descriptor charging_ep_in_descriptor;
+    struct usb_endpoint_descriptor charging_ep_out_descriptor;
+#endif
+#ifdef USB_STORAGE
+    struct usb_interface_descriptor mass_storage_interface_descriptor;
+    struct usb_endpoint_descriptor mass_storage_ep_in_descriptor;
+    struct usb_endpoint_descriptor mass_storage_ep_out_descriptor;
+#endif
+#ifdef USB_SERIAL
+    struct usb_interface_descriptor serial_interface_descriptor;
+    struct usb_endpoint_descriptor serial_ep_in_descriptor;
+    struct usb_endpoint_descriptor serial_ep_out_descriptor;
+#endif
+#ifdef USB_BENCHMARK
+    struct usb_interface_descriptor benchmark_interface_descriptor;
+    struct usb_endpoint_descriptor benchmark_ep_in_descriptor;
+    struct usb_endpoint_descriptor benchmark_ep_out_descriptor;
+#endif
+} __attribute__((packed)) *config_data, _config_data = 
 {
     {
         .bLength             = sizeof(struct usb_config_descriptor),
         .bDescriptorType     = USB_DT_CONFIG,
-        .wTotalLength        = sizeof config_data_fs,
+        .wTotalLength        = sizeof _config_data,
         .bNumInterfaces      = 1,
         .bConfigurationValue = 1,
         .iConfiguration      = 0,
@@ -105,23 +120,23 @@ static const struct {
         .bInterfaceProtocol = 0,
         .iInterface         = 5
     },
-
+/* TODO: try with zero endpoints */
     {
         .bLength          = sizeof(struct usb_endpoint_descriptor),
         .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_TX | USB_DIR_IN,
+        .bEndpointAddress = EP_CHARGING_ONLY | USB_DIR_IN,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
+        .wMaxPacketSize   = 16,
         .bInterval        = 0
     },
     {
         .bLength          = sizeof(struct usb_endpoint_descriptor),
         .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_RX | USB_DIR_OUT,
+        .bEndpointAddress = EP_CHARGING_ONLY | USB_DIR_OUT,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
+        .wMaxPacketSize   = 16,
         .bInterval        = 0
-    }
+    },
 #endif
 
 #ifdef USB_STORAGE
@@ -141,7 +156,7 @@ static const struct {
     {
         .bLength          = sizeof(struct usb_endpoint_descriptor),
         .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_TX | USB_DIR_IN,
+        .bEndpointAddress = EP_MASS_STORAGE | USB_DIR_IN,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
         .wMaxPacketSize   = 16,
         .bInterval        = 0
@@ -149,11 +164,11 @@ static const struct {
     {
         .bLength          = sizeof(struct usb_endpoint_descriptor),
         .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_RX | USB_DIR_OUT,
+        .bEndpointAddress = EP_MASS_STORAGE | USB_DIR_OUT,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
         .wMaxPacketSize   = 16,
         .bInterval        = 0
-    }
+    },
 #endif
 
 #ifdef USB_SERIAL
@@ -173,19 +188,19 @@ static const struct {
     {
         .bLength          = sizeof(struct usb_endpoint_descriptor),
         .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_TX | USB_DIR_IN,
+        .bEndpointAddress = EP_SERIAL | USB_DIR_IN,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 64,
+        .wMaxPacketSize   = 16,
         .bInterval        = 0
     },
     {
         .bLength          = sizeof(struct usb_endpoint_descriptor),
         .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_RX | USB_DIR_OUT,
+        .bEndpointAddress = EP_SERIAL | USB_DIR_OUT,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 64,
+        .wMaxPacketSize   = 16,
         .bInterval        = 0
-    }
+    },
 #endif
 
 #ifdef USB_BENCHMARK
@@ -205,160 +220,19 @@ static const struct {
     {
         .bLength          = sizeof(struct usb_endpoint_descriptor),
         .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_RX | USB_DIR_OUT,
+        .bEndpointAddress = EP_BENCHMARK | USB_DIR_OUT,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 64,
+        .wMaxPacketSize   = 16,
         .bInterval        = 0
     },
     {
         .bLength          = sizeof(struct usb_endpoint_descriptor),
         .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_TX | USB_DIR_IN,
+        .bEndpointAddress = EP_BENCHMARK | USB_DIR_IN,
         .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 64,
-        .bInterval        = 0
-    }
-#endif
-},
-config_data_hs = 
-{
-    {
-        .bLength             = sizeof(struct usb_config_descriptor),
-        .bDescriptorType     = USB_DT_CONFIG,
-        .wTotalLength        = sizeof config_data_hs,
-        .bNumInterfaces      = 1,
-        .bConfigurationValue = 1,
-        .iConfiguration      = 0,
-        .bmAttributes        = USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
-        .bMaxPower           = 250, /* 500mA in 2mA units */
-    },
-
-#ifdef USB_CHARGING_ONLY
-    /* dummy interface for charging-only */
-    {
-        .bLength            = sizeof(struct usb_interface_descriptor),
-        .bDescriptorType    = USB_DT_INTERFACE,
-        .bInterfaceNumber   = 0,
-        .bAlternateSetting  = 0,
-        .bNumEndpoints      = 2,
-        .bInterfaceClass    = USB_CLASS_VENDOR_SPEC,
-        .bInterfaceSubClass = 0,
-        .bInterfaceProtocol = 0,
-        .iInterface         = 5
-    },
-
-    {
-        .bLength          = sizeof(struct usb_endpoint_descriptor),
-        .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_TX | USB_DIR_IN,
-        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
+        .wMaxPacketSize   = 16,
         .bInterval        = 0
     },
-    {
-        .bLength          = sizeof(struct usb_endpoint_descriptor),
-        .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_RX | USB_DIR_OUT,
-        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
-        .bInterval        = 0
-    }
-#endif
-
-#ifdef USB_STORAGE
-    /* storage interface */
-    {
-        .bLength            = sizeof(struct usb_interface_descriptor),
-        .bDescriptorType    = USB_DT_INTERFACE,
-        .bInterfaceNumber   = 0,
-        .bAlternateSetting  = 0,
-        .bNumEndpoints      = 2,
-        .bInterfaceClass    = USB_CLASS_MASS_STORAGE,
-        .bInterfaceSubClass = USB_SC_SCSI,
-        .bInterfaceProtocol = USB_PROT_BULK,
-        .iInterface         = 0
-    },
-
-    {
-        .bLength          = sizeof(struct usb_endpoint_descriptor),
-        .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_TX | USB_DIR_IN,
-        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
-        .bInterval        = 0
-    },
-    {
-        .bLength          = sizeof(struct usb_endpoint_descriptor),
-        .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_RX | USB_DIR_OUT,
-        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
-        .bInterval        = 0
-    }
-#endif
-
-#ifdef USB_SERIAL
-    /* serial interface */
-    {
-        .bLength            = sizeof(struct usb_interface_descriptor),
-        .bDescriptorType    = USB_DT_INTERFACE,
-        .bInterfaceNumber   = 0,
-        .bAlternateSetting  = 0,
-        .bNumEndpoints      = 2,
-        .bInterfaceClass    = USB_CLASS_CDC_DATA,
-        .bInterfaceSubClass = 0,
-        .bInterfaceProtocol = 0,
-        .iInterface         = 0
-    },
-
-    {
-        .bLength          = sizeof(struct usb_endpoint_descriptor),
-        .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_TX | USB_DIR_IN,
-        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
-        .bInterval        = 0
-    },
-    {
-        .bLength          = sizeof(struct usb_endpoint_descriptor),
-        .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_RX | USB_DIR_OUT,
-        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
-        .bInterval        = 0
-    }
-#endif
-
-#ifdef USB_BENCHMARK
-    /* bulk test interface */
-    {
-        .bLength            = sizeof(struct usb_interface_descriptor),
-        .bDescriptorType    = USB_DT_INTERFACE,
-        .bInterfaceNumber   = 0,
-        .bAlternateSetting  = 0,
-        .bNumEndpoints      = 2,
-        .bInterfaceClass    = USB_CLASS_VENDOR_SPEC,
-        .bInterfaceSubClass = 255,
-        .bInterfaceProtocol = 255,
-        .iInterface         = 4
-    },
-
-    {
-        .bLength          = sizeof(struct usb_endpoint_descriptor),
-        .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_RX | USB_DIR_OUT,
-        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
-        .bInterval        = 0
-    },
-    {
-        .bLength          = sizeof(struct usb_endpoint_descriptor),
-        .bDescriptorType  = USB_DT_ENDPOINT,
-        .bEndpointAddress = EP_TX | USB_DIR_IN,
-        .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-        .wMaxPacketSize   = 512,
-        .bInterval        = 0
-    }
 #endif
 };
 
@@ -388,13 +262,22 @@ static struct usb_string_descriptor usb_string_iProduct =
     {'R','o','c','k','b','o','x',' ','m','e','d','i','a',' ','p','l','a','y','e','r'}
 };
 
+#if defined(HAVE_AS3514)
 static struct usb_string_descriptor usb_string_iSerial =
 {
-    34, 
-    USB_DT_STRING, 
-    {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'}
+    66,
+    USB_DT_STRING,
+    {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0',
+     '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'}
 };
-
+#else
+static struct usb_string_descriptor usb_string_iSerial =
+{
+    34,
+    USB_DT_STRING,
+     {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'}
+ };
+#endif
 
 /* Generic for all targets */
 
@@ -443,10 +326,25 @@ static long usbcore_stack[DEFAULT_STACK_SIZE];
 static void usb_core_thread(void);
 #endif
 
-static void ack_control(struct usb_ctrlrequest* req);
+static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
+static int ack_control(struct usb_ctrlrequest* req);
+
+static unsigned char *response_data;
+static unsigned char __response_data[CACHEALIGN_UP(2)] CACHEALIGN_ATTR;
+
+struct usb_core_event 
+{
+    unsigned char endpoint;
+    bool in;
+    int status;
+    int length;
+    void* data;
+};
+
+static struct usb_core_event events[NUM_ENDPOINTS];
 
 #ifdef IPOD_ARCH
-void set_serial_descriptor(void)
+static void set_serial_descriptor(void)
 {
     static short hex[16] = {'0','1','2','3','4','5','6','7',
                             '8','9','A','B','C','D','E','F'};
@@ -471,7 +369,23 @@ void set_serial_descriptor(void)
           x >>= 4;
        }
     }
+}
+#elif defined(HAVE_AS3514)
+static void set_serial_descriptor(void)
+{
+    static short hex[16] = {'0','1','2','3','4','5','6','7',
+                            '8','9','A','B','C','D','E','F'};
 
+    unsigned char serial[16];
+    short* p = usb_string_iSerial.wString;
+    int i;
+
+    i2c_readbytes(AS3514_I2C_ADDR, 0x30, 0x10, serial);
+    for (i = 0; i < 16; i++)
+    {
+        *p++ = hex[(serial[i] >> 4) & 0xF];
+        *p++ = hex[(serial[i] >> 0) & 0xF];
+    }
 }
 #endif
 
@@ -480,9 +394,8 @@ void usb_core_init(void)
     if (initialized)
         return;
 
-#ifdef IPOD_ARCH
-    set_serial_descriptor();
-#endif
+    config_data = (void*)UNCACHED_ADDR(&_config_data);
+    response_data = (void*)UNCACHED_ADDR(&__response_data);
 
     queue_init(&usbcore_queue, false);
     usb_drv_init();
@@ -514,10 +427,11 @@ void usb_core_exit(void)
 {
     if (initialized) {
         usb_drv_exit();
-        queue_delete(&usbcore_queue);
 #ifdef USB_THREAD
-        remove_thread(usbcore_thread);
+        queue_post(&usbcore_queue, USB_CORE_QUIT, 0);
+        thread_wait(usbcore_thread);
 #endif
+        queue_delete(&usbcore_queue);
     }
     data_connection = false;
     initialized = false;
@@ -532,25 +446,52 @@ bool usb_core_data_connection(void)
 #ifdef USB_THREAD
 void usb_core_thread(void)
 {
+#if defined(IPOD_ARCH) || defined(HAVE_AS3514)
+    set_serial_descriptor();
+#endif
+
     while (1) {
         struct queue_event ev;
 
         queue_wait(&usbcore_queue, &ev);
+        if (ev.id == USB_CORE_QUIT) {
+            cancel_cpu_boost();
+            return;
+        }
 
+        if (ev.id == USB_CORE_TRANSFER_COMPLETION) {
+            struct usb_core_event* event = (struct usb_core_event*)ev.data;
+            switch(event->endpoint) {
+                case EP_CONTROL:
+                    logf("ctrl handled %ld",current_tick);
+                    usb_core_control_request_handler((struct usb_ctrlrequest*)event->data);
+                    break;
 #ifdef USB_STORAGE
-        usb_storage_transfer_complete(ev.id);
+                case EP_MASS_STORAGE:
+                    usb_storage_transfer_complete(event->in,event->status,event->length);
+                    break;
 #endif
-
 #ifdef USB_SERIAL
-        usb_serial_transfer_complete(ev.id);
+                case EP_SERIAL:
+                    usb_serial_transfer_complete(event->in,event->status,event->length);
+                    break;
 #endif
-
+#ifdef USB_BENCHMARK
+                case EP_BENCHMARK:
+                    usb_benchmark_transfer_complete(event->in);
+                    break;
+#endif
+#ifdef USB_CHARGING_ONLY
+                case EP_CHARGING_ONLY:
+                    break;
+#endif
+            }
+        }
     }
 }
 #endif
 
-/* called by usb_drv_int() */
-void usb_core_control_request(struct usb_ctrlrequest* req)
+static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
 {
     /* note: interrupt context */
     data_connection = true;
@@ -565,29 +506,31 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
     switch (req->bRequest) {
         case USB_REQ_SET_CONFIGURATION:
             logf("usb_core: SET_CONFIG");
+            usb_drv_cancel_all_transfers();
+            if (req->wValue){
+                usb_state = CONFIGURED;
 #ifdef USB_STORAGE
-            usb_storage_control_request(req);
+                usb_storage_control_request(req);
 #endif
 
 #ifdef USB_SERIAL
-            usb_serial_control_request(req);
+                usb_serial_control_request(req);
 #endif
-            ack_control(req);
-            if (req->wValue)
-                usb_state = CONFIGURED;
-            else
+            }
+            else {
                 usb_state = ADDRESS;
+            }
+            ack_control(req);
             break;
 
         case USB_REQ_GET_CONFIGURATION: {
-            static char confignum;
-            char* tmp = (void*)UNCACHED_ADDR(&confignum);
             logf("usb_core: GET_CONFIG");
             if (usb_state == ADDRESS)
-                *tmp = 0;
+                response_data[0] = 0;
             else
-                *tmp = 1;
-            usb_drv_send(EP_CONTROL, tmp, 1);
+                response_data[0] = 1;
+            if(usb_drv_send(EP_CONTROL, response_data, 1)!= 0)
+                break;
             ack_control(req);
             break;
         }
@@ -597,29 +540,54 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
             ack_control(req);
             break;
 
+        case USB_REQ_GET_INTERFACE:
+            logf("usb_core: GET_INTERFACE");
+            response_data[0] = 0;
+            if(usb_drv_send(EP_CONTROL, response_data, 1)!=0)
+                break;
+            ack_control(req);
+            break;
         case USB_REQ_CLEAR_FEATURE:
             logf("usb_core: CLEAR_FEATURE");
             if (req->wValue)
-                usb_drv_stall(req->wIndex, true);
+                usb_drv_stall(req->wIndex & 0xf, false,(req->wIndex & 0x80) !=0);
             else
-                usb_drv_stall(req->wIndex, false);
+                usb_drv_stall(req->wIndex & 0xf, false,(req->wIndex & 0x80) !=0);
             ack_control(req);
             break;
 
-        case USB_REQ_SET_ADDRESS:
-            usb_address = req->wValue;
-            logf("usb_core: SET_ADR %d", usb_address);
+        case USB_REQ_SET_FEATURE:
+            logf("usb_core: SET_FEATURE");
+            if (req->wValue)
+                usb_drv_stall(req->wIndex & 0xf, true,(req->wIndex & 0x80) !=0);
+            else
+                usb_drv_stall(req->wIndex & 0xf, false,(req->wIndex & 0x80) !=0);
             ack_control(req);
+            break;
+
+        case USB_REQ_SET_ADDRESS: {
+            unsigned char address = req->wValue;
+            logf("usb_core: SET_ADR %d", address);
+            if(ack_control(req)!=0)
+                break;
+            usb_drv_cancel_all_transfers();
+            usb_address = address;
             usb_drv_set_address(usb_address);
             usb_state = ADDRESS;
             break;
+        }
 
         case USB_REQ_GET_STATUS: {
-            static char tmp[2] = {0,0};
-            tmp[0] = 0;
-            tmp[1] = 0;
+            response_data[0]= 0;
+            response_data[1]= 0;
             logf("usb_core: GET_STATUS"); 
-            usb_drv_send(EP_CONTROL, UNCACHED_ADDR(&tmp), 2);
+            if(req->wIndex>0) {
+                if(usb_drv_stalled(req->wIndex&0xf,(req->wIndex&0x80)!=0))
+                    response_data[0] = 1;
+            }
+            logf("usb_core: %X %X",response_data[0],response_data[1]); 
+            if(usb_drv_send(EP_CONTROL, response_data, 2)!=0)
+                break;
             ack_control(req);
             break;
         }
@@ -637,18 +605,59 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
                     size = sizeof device_descriptor;
                     break;
 
-                case USB_DT_CONFIG:
-                    if(usb_drv_port_speed())
-                    {
-                        ptr = &config_data_hs;
-                        size = sizeof config_data_hs;
+                case USB_DT_OTHER_SPEED_CONFIG:
+                case USB_DT_CONFIG: {
+                    int max_packet_size;
+                    int interface_number=0;
+
+                    if(req->wValue >> 8 == USB_DT_CONFIG) {
+                        if(usb_drv_port_speed()) {
+                            max_packet_size=512;
+                        }
+                        else {
+                            max_packet_size=64;
+                        }
+                        config_data->config_descriptor.bDescriptorType=USB_DT_CONFIG;
                     }
-                    else
-                    {
-                        ptr = &config_data_fs;
-                        size = sizeof config_data_fs;
+                    else {
+                        if(usb_drv_port_speed()) {
+                            max_packet_size=64;
+                        }
+                        else {
+                            max_packet_size=512;
+                        }
+                        config_data->config_descriptor.bDescriptorType=USB_DT_OTHER_SPEED_CONFIG;
                     }
+
+#ifdef USB_CHARGING_ONLY
+                    memcpy(&config_data->charging_ep_in_descriptor.wMaxPacketSize,&max_packet_size,sizeof(unsigned short));
+                    memcpy(&config_data->charging_ep_out_descriptor.wMaxPacketSize,&max_packet_size,sizeof(unsigned short));
+                    config_data->charging_interface_descriptor.bInterfaceNumber=interface_number;
+                    interface_number++;
+#endif
+#ifdef USB_STORAGE
+                    memcpy(&config_data->mass_storage_ep_in_descriptor.wMaxPacketSize,&max_packet_size,sizeof(unsigned short));
+                    memcpy(&config_data->mass_storage_ep_out_descriptor.wMaxPacketSize,&max_packet_size,sizeof(unsigned short));
+                    config_data->mass_storage_interface_descriptor.bInterfaceNumber=interface_number;
+                    interface_number++;
+#endif
+#ifdef USB_SERIAL
+                    memcpy(&config_data->serial_ep_in_descriptor.wMaxPacketSize,&max_packet_size,sizeof(unsigned short));
+                    memcpy(&config_data->serial_ep_out_descriptor.wMaxPacketSize,&max_packet_size,sizeof(unsigned short));
+                    config_data->serial_interface_descriptor.bInterfaceNumber=interface_number;
+                    interface_number++;
+#endif
+#ifdef USB_BENCHMARK
+                    memcpy(&config_data->benchmark_ep_in_descriptor.wMaxPacketSize,&max_packet_size,sizeof(unsigned short));
+                    memcpy(&config_data->benchmark_ep_out_descriptor.wMaxPacketSize,&max_packet_size,sizeof(unsigned short));
+                    config_data.benchmark_interface_descriptor.bInterfaceNumber=interface_number;
+                    interface_number++;
+#endif
+                    config_data->config_descriptor.bNumInterfaces=interface_number;
+                    ptr = config_data;
+                    size = sizeof _config_data;
                     break;
+                    }
 
                 case USB_DT_STRING:
                     if ((unsigned)index < (sizeof(usb_strings)/sizeof(struct usb_string_descriptor*))) {
@@ -657,7 +666,7 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
                     }
                     else {
                         logf("bad string id %d", index);
-                        usb_drv_stall(EP_CONTROL, true);
+                        usb_drv_stall(EP_CONTROL, true,true);
                     }
                     break;
 
@@ -668,13 +677,14 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
 
                 default:
                     logf("bad desc %d", req->wValue >> 8);
-                    usb_drv_stall(EP_CONTROL, true);
+                    usb_drv_stall(EP_CONTROL, true,true);
                     break;
             }
 
             if (ptr) {
                 length = MIN(size, length);
-                usb_drv_send(EP_CONTROL, (void*)UNCACHED_ADDR(ptr), length);
+                if(usb_drv_send(EP_CONTROL, (void*)UNCACHED_ADDR(ptr), length)!=0)
+                    break;
             }
             ack_control(req);
             break;
@@ -693,7 +703,7 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
             {
                 /* nope. flag error */
                 logf("usb bad req %d", req->bRequest);
-                usb_drv_stall(EP_CONTROL, true);
+                usb_drv_stall(EP_CONTROL, true,true);
                 ack_control(req);
             }
             break;
@@ -709,9 +719,9 @@ void usb_core_bus_reset(void)
 }
 
 /* called by usb_drv_transfer_completed() */
-void usb_core_transfer_complete(int endpoint, bool in)
+void usb_core_transfer_complete(int endpoint, bool in, int status,int length)
 {
-#ifdef USB_CHARGING_ONLY
+#if defined(USB_CHARGING_ONLY) || defined(USB_STORAGE)
     (void)in;
 #endif
 
@@ -720,25 +730,35 @@ void usb_core_transfer_complete(int endpoint, bool in)
             /* already handled */
             break;
 
-        case EP_RX:
-        case EP_TX:
-#if defined(USB_BENCHMARK)
-            usb_benchmark_transfer_complete(endpoint, in);
-#elif defined(USB_STORAGE) || defined(USB_SERIAL)
-            queue_post(&usbcore_queue, endpoint, 0);
-#endif
-            break;
-
         default:
+            events[endpoint].endpoint=endpoint;
+            events[endpoint].in=in;
+            events[endpoint].data=0;
+            events[endpoint].status=status;
+            events[endpoint].length=length;
+            /* All other endoints. Let the thread deal with it */
+            queue_post(&usbcore_queue, USB_CORE_TRANSFER_COMPLETION, (intptr_t)&events[endpoint]);
             break;
     }
 }
 
-static void ack_control(struct usb_ctrlrequest* req)
+/* called by usb_drv_int() */
+void usb_core_control_request(struct usb_ctrlrequest* req)
+{
+    events[0].endpoint=0;
+    events[0].in=0;
+    events[0].data=(void *)req;
+    events[0].status=0;
+    events[0].length=0;
+    logf("ctrl received %ld",current_tick);
+    queue_post(&usbcore_queue, USB_CORE_TRANSFER_COMPLETION,(intptr_t)&events[0]);
+}
+
+static int ack_control(struct usb_ctrlrequest* req)
 {
     if (req->bRequestType & 0x80)
-        usb_drv_recv(EP_CONTROL, NULL, 0);
+        return usb_drv_recv(EP_CONTROL, NULL, 0);
     else
-        usb_drv_send(EP_CONTROL, NULL, 0);
+        return usb_drv_send(EP_CONTROL, NULL, 0);
 }
 

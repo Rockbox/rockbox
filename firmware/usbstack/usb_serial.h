@@ -22,7 +22,7 @@
 #include "usb_ch9.h"
 
 void usb_serial_init(void);
-void usb_serial_transfer_complete(int endpoint);
+void usb_serial_transfer_complete(bool in, int status, int length);
 bool usb_serial_control_request(struct usb_ctrlrequest* req);
 
 #endif

@@ -23,6 +23,8 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
+#ifdef USB_SERIAL
+
 static unsigned char _transfer_buffer[16];
 static unsigned char* transfer_buffer;
 
@@ -34,20 +36,26 @@ void usb_serial_init(void)
 }
 
 /* called by usb_core_transfer_complete() */
-void usb_serial_transfer_complete(int endpoint)
+void usb_serial_transfer_complete(bool in, int status, int length)
 {
-    switch (endpoint) {
-        case EP_RX:
+    int i;
+    switch (in) {
+        case false:
             logf("serial: %s", transfer_buffer);
-
-            /* re-prime endpoint */
-            usb_drv_recv(EP_RX, transfer_buffer, sizeof _transfer_buffer);
-
-            /* echo back :) */
-            usb_drv_send(EP_TX, transfer_buffer, sizeof transfer_buffer);
+            /* Data received. Send it back */
+            for(i=0;i<length;i++) {
+                if(transfer_buffer[i]>0x40 && transfer_buffer[i]<0x5b)
+                    transfer_buffer[i]+=0x20;
+                else if(transfer_buffer[i]>0x60 && transfer_buffer[i]<0x7b)
+                    transfer_buffer[i]-=0x20;
+            }
+            usb_drv_send_nonblocking(EP_SERIAL, transfer_buffer, length);
             break;
 
-        case EP_TX:
+        case true:
+            /* Data sent out (maybe correctly, but we don't actually care.
+             * Re-prime read endpoint */
+            usb_drv_recv(EP_SERIAL, transfer_buffer, sizeof _transfer_buffer);
             break;
     }
 }
@@ -55,14 +63,12 @@ void usb_serial_transfer_complete(int endpoint)
 /* called by usb_core_control_request() */
 bool usb_serial_control_request(struct usb_ctrlrequest* req)
 {
-    /* note: interrupt context */
-
     bool handled = false;
     switch (req->bRequest) {
         case USB_REQ_SET_CONFIGURATION:
             logf("serial: set config");
             /* prime rx endpoint */
-            usb_drv_recv(EP_RX, transfer_buffer, sizeof _transfer_buffer);
+            usb_drv_recv(EP_SERIAL, transfer_buffer, sizeof _transfer_buffer);
             handled = true;
             break;
 
@@ -72,3 +78,5 @@ bool usb_serial_control_request(struct usb_ctrlrequest* req)
 
     return handled;
 }
+
+#endif /*USB_SERIAL*/

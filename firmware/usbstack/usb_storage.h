@@ -22,8 +22,7 @@
 #include "usb_ch9.h"
 
 void usb_storage_init(void);
-void usb_storage_transfer(void* data);
-void usb_storage_transfer_complete(int endpoint);
+void usb_storage_transfer_complete(bool in,int state,int length);
 bool usb_storage_control_request(struct usb_ctrlrequest* req);
 
 #endif

@@ -19,6 +19,22 @@
 #ifndef USB_CORE_H
 #define USB_CORE_H
 
+#ifndef BOOTLOADER
+#define USB_THREAD
+
+#ifdef USE_ROCKBOX_USB
+//#define USB_SERIAL
+//#define USB_BENCHMARK
+#define USB_STORAGE
+
+#else
+#define USB_CHARGING_ONLY
+
+#endif /* USE_ROCKBOX_USB */
+#else
+#define USB_CHARGING_ONLY
+#endif /* BOOTLOADER */
+
 #include "usb_ch9.h"
 
 #if defined(CPU_PP)
@@ -26,13 +42,30 @@
 #define USB_IRAM_SIZE     ((size_t)0xc000)
 #endif
 
+
+enum {
+	USB_CORE_QUIT,
+	USB_CORE_TRANSFER_COMPLETION
+};
+
 /* endpoints */
 enum {
-    EP_CONTROL = 0,
-    EP_RX,
-    EP_TX,
-    NUM_ENDPOINTS
+	EP_CONTROL = 0,
+#ifdef USB_STORAGE
+	EP_MASS_STORAGE,
+#endif
+#ifdef USB_SERIAL
+	EP_SERIAL,
+#endif
+#ifdef USB_CHARGING_ONLY
+	EP_CHARGING_ONLY,
+#endif
+#ifdef USB_BENCHMARK
+	EP_BENCHMARK,
+#endif
+	NUM_ENDPOINTS
 };
+
 
 /* queue events */
 #define USB_TRANSFER_COMPLETE 1
@@ -48,7 +81,7 @@ extern int usb_max_pkt_size;
 void usb_core_init(void);
 void usb_core_exit(void);
 void usb_core_control_request(struct usb_ctrlrequest* req);
-void usb_core_transfer_complete(int endpoint, bool in);
+void usb_core_transfer_complete(int endpoint, bool in, int status, int length);
 void usb_core_bus_reset(void);
 bool usb_core_data_connection(void);
 

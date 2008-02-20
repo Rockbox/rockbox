@@ -22,6 +22,8 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
+#ifdef USB_BENCHMARK
+
 static int current_length;
 
 static unsigned char _input_buffer[16384];
@@ -56,8 +58,8 @@ void usb_benchmark_control_request(struct usb_ctrlrequest* req)
             logf("bench: read %d", current_length);
             todo = MIN(usb_max_pkt_size, current_length);
             state = SENDING;
-            usb_drv_reset_endpoint(EP_TX, true);
-            usb_drv_send(EP_TX, &input_buffer, todo);
+            usb_drv_reset_endpoint(EP_BENCHMARK, true);
+            usb_drv_send(EP_BENCHMARK, &input_buffer, todo);
             current_length -= todo;
             break;
 
@@ -66,13 +68,13 @@ void usb_benchmark_control_request(struct usb_ctrlrequest* req)
             current_length = req->wValue * req->wIndex;
             logf("bench: write %d", current_length);
             state = RECEIVING;
-            usb_drv_reset_endpoint(EP_RX, false);
-            usb_drv_recv(EP_RX, &input_buffer, sizeof _input_buffer);
+            usb_drv_reset_endpoint(EP_BENCHMARK, false);
+            usb_drv_recv(EP_BENCHMARK, &input_buffer, sizeof _input_buffer);
             break;
     }
 }
 
-void usb_benchmark_transfer_complete(int endpoint, bool in)
+void usb_benchmark_transfer_complete(bool in)
 {
     (void)in;
 
@@ -87,26 +89,26 @@ void usb_benchmark_transfer_complete(int endpoint, bool in)
     {
         case SENDING: {
             int todo = MIN(usb_max_pkt_size, current_length);
-            if (endpoint == EP_RX) {
+            if (in == false) {
                 logf("unexpected ep_rx");
                 break;
             }
     
             logf("bench: %d more tx", current_length);
-            usb_drv_send(EP_TX, &input_buffer, todo);
+            usb_drv_send(EP_BENCHMARK, &input_buffer, todo);
             current_length -= todo;
             input_buffer[0]++;
             break;
         }
 
         case RECEIVING:
-            if (endpoint == EP_TX) {
+            if (in == true) {
                 logf("unexpected ep_tx");
                 break;
             }
 
             /* re-prime endpoint */
-            usb_drv_recv(EP_RX, &input_buffer, sizeof _input_buffer);
+            usb_drv_recv(EP_BENCHMARK, &input_buffer, sizeof _input_buffer);
             input_buffer[0]++;
             break;
 
@@ -123,3 +125,4 @@ static void ack_control(struct usb_ctrlrequest* req)
     else
         usb_drv_send(EP_CONTROL, NULL, 0);
 }
+#endif /*USB_BENCHMARK*/

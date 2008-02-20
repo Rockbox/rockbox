@@ -34,6 +34,7 @@ void usb_init_device(void)
 {
     /* enable usb module */
     outl(inl(0x7000002C) | 0x3000000, 0x7000002C);  
+
     DEV_EN |= DEV_USB0;
     DEV_EN |= DEV_USB1;
 
@@ -46,6 +47,7 @@ void usb_init_device(void)
 #if CONFIG_CPU == PP5020
     DEV_INIT2 |= INIT_USB;
 #endif
+
     while ((inl(0x70000028) & 0x80) == 0);
     outl(inl(0x70000028) | 0x2, 0x70000028);
     udelay(0x186A0);
@@ -68,9 +70,8 @@ void usb_init_device(void)
 void usb_enable(bool on)
 {
     if (on) {
-#ifdef USE_ROCKBOX_USB
         usb_core_init();
-#else
+#if !defined(USE_ROCKBOX_USB)
         /* until we have native mass-storage mode, we want to reboot on
            usb host connect */
 #if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
