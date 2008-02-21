@@ -17,7 +17,7 @@ rbspeex.commands = @$(MAKE) -C ../../tools/rbspeex librbspeex.a
 QMAKE_EXTRA_TARGETS += rbspeex
 PRE_TARGETDEPS += rbspeex
 
-# add a custom rule for makeing the translations
+# add a custom rule for making the translations
 lrelease.commands = $$[QT_INSTALL_BINS]/lrelease -silent rbutilqt.pro
 QMAKE_EXTRA_TARGETS += lrelease
 PRE_TARGETDEPS += lrelease
@@ -161,7 +161,15 @@ win32 {
 unix {
     SOURCES +=  ../ipodpatcher/ipodio-posix.c
     SOURCES +=  ../sansapatcher/sansaio-posix.c
+}
+unix:!static {
     LIBS += -lusb
+}
+unix:static {
+    # force statically linking of libusb. Use gcc to get its path.
+    # if you have libusb.a in a non-standard lib path add it to
+    # the INCLUDEPATH variable above.
+    LIBS += $$system($$QMAKE_CC $$INCLUDEPATH -print-file-name=libusb.a)
 }
 
 macx {
