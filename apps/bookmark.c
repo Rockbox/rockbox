@@ -450,7 +450,11 @@ bool bookmark_load(const char* file, bool autoload)
         if (!play_bookmark(bookmark))
         {
             /* Selected bookmark not found. */
-            gui_syncsplash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
+            if (!autoload)
+            {
+                gui_syncsplash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
+            }
+            
             return false;
         }
     }
