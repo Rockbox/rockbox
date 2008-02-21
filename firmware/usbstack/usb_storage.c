@@ -635,7 +635,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
             logf("scsi read %d %d", current_cmd.sector, current_cmd.count);
 
-            if((current_cmd.sector + current_cmd.count) * block_size_mult > block_count) {
+            if((current_cmd.sector + current_cmd.count) > block_count) {
                 send_csw(SCSI_STATUS_CHECK_CONDITION);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
@@ -670,7 +670,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                (cbw->command_block[7] << 16 |
                 cbw->command_block[8]);
             /* expect data */
-            if((current_cmd.sector + current_cmd.count) * block_size_mult > block_count) {
+            if((current_cmd.sector + current_cmd.count) > block_count) {
                 send_csw(SCSI_STATUS_CHECK_CONDITION);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
