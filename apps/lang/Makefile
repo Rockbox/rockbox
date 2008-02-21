@@ -37,4 +37,4 @@ $(OBJDIR)/%.lng : %.lang $(FEATS)
 
 $(HEADER): $(OUTP)
 	$(call PRINTS,Make $(HEADER))
-	echo "#define MAX_LANGUAGE_SIZE `du -b $(OBJDIR)/* |sort -n |tail -n 1 |cut -f 1`" > $(HEADER)
+	$(SILENT)echo "#define MAX_LANGUAGE_SIZE `ls -l $(OBJDIR)/* | awk '{print $$5}' | sort -n | tail -1`" > $(HEADER)
