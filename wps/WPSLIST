@@ -233,17 +233,17 @@ line selector end color: b58c00
 line selector text color: 000000
 filetype colours: -
 
-#backdrop
-backdrop.320x240x16: /.rockbox/backdrops/cabbiev2.320x240x16.bmp
-backdrop.128x128x16: /.rockbox/backdrops/cabbiev2.128x128x16.bmp
-backdrop.132x80x16: /.rockbox/backdrops/cabbiev2.132x80x16.bmp 
-backdrop.138x110x2: /.rockbox/backdrops/cabbiev2.138x110x2.bmp
-backdrop.160x128x16: /.rockbox/backdrops/cabbiev2.160x128x16.bmp
-backdrop.160x128x2: /.rockbox/backdrops/cabbiev2.160x128x2.bmp
-backdrop.176x132x16: /.rockbox/backdrops/cabbiev2.176x132x16.bmp
-backdrop.176x220x16: /.rockbox/backdrops/cabbiev2.176x220x16.bmp
-backdrop.220x176x16: /.rockbox/backdrops/cabbiev2.220x176x16.bmp
-backdrop.240x320x16: /.rockbox/backdrops/cabbiev2.240x320x16.bmp
+#backdrop - remember this is the source file name in your SVN folder, not dest name!
+backdrop.320x240x16: backdrops/cabbiev2.320x240x16.bmp
+backdrop.128x128x16: backdrops/cabbiev2.128x128x16.bmp
+backdrop.132x80x16: backdrops/cabbiev2.132x80x16.bmp 
+backdrop.138x110x2: backdrops/cabbiev2.138x110x2.bmp
+backdrop.160x128x16: backdrops/cabbiev2.160x128x16.bmp
+backdrop.160x128x2: backdrops/cabbiev2.160x128x2.bmp
+backdrop.176x132x16: backdrops/cabbiev2.176x132x16.bmp
+backdrop.176x220x16: backdrops/cabbiev2.176x220x16.bmp
+backdrop.220x176x16: backdrops/cabbiev2.220x176x16.bmp
+backdrop.240x320x16: backdrops/cabbiev2.240x320x16.bmp
 
 #selection bar settings for color targets
 selector type.320x240x16: bar (gradient)

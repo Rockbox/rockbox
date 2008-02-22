@@ -27,7 +27,7 @@ my $firmdir="$ROOT/firmware";
 my $wpslist=$ARGV[0];
 
 my $target = $ARGV[1];
-my $cppdef = $target;
+my $cppdef = $target; 
 my @depthlist = ( 16, 8, 4, 2, 1 );
 
 if(!$wpslist) {
@@ -108,9 +108,10 @@ sub mkdirs {
 
 sub copybackdrop {
 	#copy the backdrop file into the build dir
-
-	$backdrop =~ /\/(.*backdrops\/(.*))/i;
-	`cp $ROOT/backdrops/$2 $1`;
+	$dst = $backdrop;
+	$dst =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
+	$cmd = "cp $ROOT/$backdrop .rockbox/$dst"; 
+	`$cmd`;	
 }
 
 sub copythemefont {
@@ -203,22 +204,24 @@ MOO
     if($font) {
         push @out, "font: /.rockbox/fonts/$font\n";
     }
-    if($fgcolor) {
+    if($fgcolor && $main_depth > 2) {
         push @out, "foreground color: $fgcolor\n";
     }
-    if($bgcolor) {
+    if($bgcolor && $main_depth > 2) {
         push @out, "background color: $bgcolor\n";
     }
     if($statusbar) {
         push @out, "statusbar: $statusbar\n";
     }
     if($backdrop) {
-        push @out, "backdrop: $backdrop\n";
+    	#clip resolution from filename
+    	$backdrop =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
+        push @out, "backdrop: /.rockbox/$backdrop\n";
     }    
-    if($lineselectstart) {
+    if($lineselectstart && $main_depth > 2) {
         push @out, "line selector start color: $lineselectstart\n";
     }
-    if($lineselectend) {
+    if($lineselectend && $main_depth > 2) {
         push @out, "line selector end color: $lineselectend\n";
     }
     if($selecttype) {
@@ -230,10 +233,10 @@ MOO
     if($viewericon) {
         push @out, "viewers iconset: $viewericon\n";
     }
-    if($lineselecttextcolor) {
+    if($lineselecttextcolor && $main_depth > 2 ) {
         push @out, "line selector text color: $lineselecttextcolor\n";
     }
-    if($filetylecolor) {
+    if($filetylecolor && $main_depth > 2) {
         push @out, "filetype colours: $filetylecolor\n";
     }
     if($rwps && $has_remote ) {
