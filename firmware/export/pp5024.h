@@ -19,8 +19,8 @@
  *
  ****************************************************************************/
 
-/* We believe is this quite similar to the 5020 and for how we just use that
-   completely and redifine any minor differences */
+/* We believe this is quite similar to the 5020 and for now we just use that
+   completely and redefine any minor differences */
 #include "pp5020.h"
 
 #endif
