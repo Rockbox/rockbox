@@ -802,9 +802,6 @@ int ata_write_sectors(IF_MV2(int drive,)
     int drive = current_card;
 #endif
 
-    if (start == 0)
-        panicf("Writing on sector 0\n");
-
     c_addr = start * SECTOR_SIZE;
     c_end_addr = c_addr + count * SECTOR_SIZE;
 

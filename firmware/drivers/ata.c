@@ -482,9 +482,6 @@ int ata_write_sectors(IF_MV2(int drive,)
     int ret = 0;
     long spinup_start;
 
-    if (start == 0)
-        panicf("Writing on sector 0\n");
-
 #ifndef MAX_PHYS_SECTOR_SIZE
 #ifdef HAVE_MULTIVOLUME
     (void)drive; /* unused for now */
