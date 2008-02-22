@@ -48,6 +48,10 @@
 #include "as3514.h"
 #endif
 
+#if !defined(HAVE_AS3514) && !defined(IPOD_ARCH)
+#include "ata.h"
+#endif
+
 
 /*-------------------------------------------------------------------------*/
 /* USB protocol descriptors: */
@@ -233,10 +237,11 @@ static struct usb_string_descriptor usb_string_iProduct =
 
 static struct usb_string_descriptor usb_string_iSerial =
 {
-    66,
+    82,
     USB_DT_STRING,
     {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0',
-     '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'}
+     '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0',
+     '0','0','0','0','0','0','0','0'}
 };
 
 /* Generic for all targets */
@@ -316,8 +321,7 @@ static void set_serial_descriptor(void)
 
     /* We need to convert from a little-endian 64-bit int
        into a utf-16 string of hex characters */
-    /* Align at the right side of the 32-digit serial number */
-    short* p = &usb_string_iSerial.wString[31];
+    short* p = &usb_string_iSerial.wString[15];
     uint32_t x;
     int i,j;
 
@@ -330,6 +334,7 @@ static void set_serial_descriptor(void)
           x >>= 4;
        }
     }
+    usb_string_iSerial.bLength=34;
 }
 #elif defined(HAVE_AS3514)
 static void set_serial_descriptor(void)
@@ -338,6 +343,7 @@ static void set_serial_descriptor(void)
                             '8','9','A','B','C','D','E','F'};
 
     unsigned char serial[16];
+    /* Align 32 digits right in the 40-digit serial number */
     short* p = usb_string_iSerial.wString;
     int i;
 
@@ -347,6 +353,30 @@ static void set_serial_descriptor(void)
         *p++ = hex[(serial[i] >> 4) & 0xF];
         *p++ = hex[(serial[i] >> 0) & 0xF];
     }
+    usb_string_iSerial.bLength=66;
+}
+#else 
+/* If we don't know the device serial number, use the one
+ * from the disk */
+static void set_serial_descriptor(void)
+{
+    static short hex[16] = {'0','1','2','3','4','5','6','7',
+                            '8','9','A','B','C','D','E','F'};
+
+    short* p = usb_string_iSerial.wString;
+    unsigned short* identify = ata_get_identify();
+    unsigned short x;
+    int i;
+
+    for (i = 10; i < 20; i++)
+    {
+       x = betoh16(identify[i]);
+       *p++ = hex[(x >> 4) & 0xF];
+       *p++ = hex[(x >> 0) & 0xF];
+       *p++ = hex[(x >> 12) & 0xF];
+       *p++ = hex[(x >> 8) & 0xF];
+    }
+    usb_string_iSerial.bLength=82;
 }
 #endif
 
@@ -406,9 +436,7 @@ bool usb_core_data_connection(void)
 #ifdef USB_THREAD
 void usb_core_thread(void)
 {
-#if defined(IPOD_ARCH) || defined(HAVE_AS3514)
     set_serial_descriptor();
-#endif
 
     while (1) {
         struct queue_event ev;
