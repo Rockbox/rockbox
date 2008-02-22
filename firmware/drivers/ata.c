@@ -93,6 +93,53 @@ static int multisectors; /* number of supported multisectors */
 static unsigned short identify_info[SECTOR_SIZE/2];
 
 #ifdef MAX_PHYS_SECTOR_SIZE
+
+/** This is temporary **/
+/* Define the mutex functions to use the special hack object */
+#define mutex_init ata_spin_init
+#define mutex_lock ata_spin_lock
+#define mutex_unlock ata_spin_unlock
+
+void ata_spin_init(struct mutex *m)
+{
+    m->thread = NULL;
+    m->locked = 0;
+    m->count = 0;
+#if CONFIG_CORELOCK == SW_CORELOCK
+    corelock_init(&m->cl);
+#endif
+}
+
+void ata_spin_lock(struct mutex *m)
+{
+    struct thread_entry *current = thread_get_current();
+
+    if (current == m->thread)
+    {
+        m->count++;
+        return;
+    }
+
+    while (test_and_set(&m->locked, 1, &m->cl))
+        yield();
+
+    m->thread = current;
+}
+
+void ata_spin_unlock(struct mutex *m)
+{
+    if (m->count > 0)
+    {
+        m->count--;
+        return;
+    }
+
+    m->thread = NULL;
+    test_and_set(&m->locked, 0, &m->cl);
+}
+
+/****/
+
 struct sector_cache_entry {
     bool inuse;
     unsigned long sectornum;  /* logical sector */
