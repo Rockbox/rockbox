@@ -188,7 +188,9 @@ int usb_detect(void)
     } else {
         /* if USB is detected, re-enable the USB-devices, otherwise make sure it's disabled */
         DEV_EN |= DEV_USB0;
+        DEV_RS &=~DEV_USB0;
         DEV_EN |= DEV_USB1;
+        DEV_RS &=~DEV_USB1;
 #if CONFIG_CPU == PP5020
         DEV_INIT2 |= INIT_USB;
 #endif

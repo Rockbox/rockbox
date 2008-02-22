@@ -361,10 +361,6 @@ void usb_drv_init(void)
 
     REG_USBMODE = USBMODE_CTRL_MODE_DEVICE;
 
-    /* Force device to full speed */
-    /* See 32.9.5.9.2 */
-    REG_PORTSC1 |= PORTSCX_PORT_FORCE_FULL_SPEED;
-
     td_array = (struct transfer_descriptor*)UNCACHED_ADDR(&_td_array);
     qh_array = (struct queue_head*)UNCACHED_ADDR(&_qh_array);
     init_control_queue_heads();
