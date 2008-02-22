@@ -651,7 +651,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                     logf("STRING %d",index);
                     if ((unsigned)index < (sizeof(usb_strings)/sizeof(struct usb_string_descriptor*))) {
                         size = usb_strings[index]->bLength;
-                        memcpy(&response_data[0],&usb_strings[index],size);
+                        memcpy(&response_data[0],usb_strings[index],size);
                         ptr = response_data;
                     }
                     else {
