@@ -253,8 +253,8 @@ MOO
 }
 
 # Get the LCD sizes first
-my ($main_height, $main_width, $main_depth) = getlcdsizes();
-my ($remote_height, $remote_width, $remote_depth) = getlcdsizes(1);
+($main_height, $main_width, $main_depth) = getlcdsizes();
+($remote_height, $remote_width, $remote_depth) = getlcdsizes(1);
 
 #print "LCD: ${main_height}x${main_width}x${main_depth}\n";
 $has_remote = 1 if ($remote_height && $remote_width && remote_depth);
