@@ -1659,6 +1659,8 @@ static bool audio_load_track(int offset, bool start_play)
     }
 
     last_peek_offset++;
+    tracks[track_widx].taginfo_ready = false;
+
     peek_again:
     logf("Buffering track:%d/%d", track_widx, track_ridx);
     /* Get track name from current playlist read position. */
@@ -1708,7 +1710,6 @@ static bool audio_load_track(int offset, bool start_play)
             
             tracks[track_widx].id3_hid =
                 bufalloc(&id3, sizeof(struct mp3entry), TYPE_ID3);
-            tracks[track_widx].taginfo_ready = (tracks[track_widx].id3_hid >= 0);
 
             if (tracks[track_widx].id3_hid < 0)
             {
@@ -1733,7 +1734,6 @@ static bool audio_load_track(int offset, bool start_play)
 
             /* Skip invalid entry from playlist. */
             playlist_skip_entry(NULL, last_peek_offset);
-            tracks[track_widx].taginfo_ready = false;
             close(fd);
             goto peek_again;
         }
@@ -1791,7 +1791,6 @@ static bool audio_load_track(int offset, bool start_play)
         gui_syncsplash(HZ*2, msgbuf);
         /* Skip invalid entry from playlist. */
         playlist_skip_entry(NULL, last_peek_offset);
-        tracks[track_widx].taginfo_ready = false;
         goto peek_again;
     }
 
@@ -1851,6 +1850,9 @@ static bool audio_load_track(int offset, bool start_play)
 
     if (tracks[track_widx].audio_hid < 0)
         return false;
+
+    /* All required data is now available for the codec. */
+    tracks[track_widx].taginfo_ready = true;
 
     if (start_play)
     {
