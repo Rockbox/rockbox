@@ -417,7 +417,9 @@ struct user_settings
 #if CONFIG_TUNER
     unsigned char fmr_file[MAX_FILENAME+1]; /* last fmr preset */
 #endif
+#ifdef HAVE_LCD_BITMAP
     unsigned char font_file[MAX_FILENAME+1]; /* last font */
+#endif
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
     unsigned char lang_file[MAX_FILENAME+1]; /* last language */
 

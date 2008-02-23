@@ -1083,8 +1083,10 @@ const struct settings_list settings[] = {
     FILENAME_SETTING(0, fmr_file, "fmr",
         "", FMPRESET_PATH "/", ".fmr", MAX_FILENAME+1),
 #endif
+#ifdef HAVE_LCD_BITMAP
     FILENAME_SETTING(F_THEMESETTING, font_file, "font",
         "", FONT_DIR "/", ".fnt", MAX_FILENAME+1),
+#endif
     FILENAME_SETTING(F_THEMESETTING,wps_file, "wps",
         "", WPS_DIR "/", ".wps", MAX_FILENAME+1),
     FILENAME_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng",MAX_FILENAME+1),
