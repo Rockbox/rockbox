@@ -155,6 +155,9 @@ Font.320x240x16: nimbus-19.fnt
 Foreground Color: 000000
 Background Color: FFFFFF
 Statusbar: on
+backdrop:
+iconset:
+viewers iconset:
 </wps>
 
 <rwps>

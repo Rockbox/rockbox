@@ -111,10 +111,12 @@ sub mkdirs
 sub copybackdrop
 {
     #copy the backdrop file into the build dir
-    $dst = $backdrop;
-    $dst =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
-    $cmd = "cp $ROOT/$backdrop .rockbox/$dst";
-    `$cmd`;
+    if ($backdrop ne '') {
+        $dst = $backdrop;
+        $dst =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
+        $cmd = "cp $ROOT/$backdrop .rockbox/$dst";
+        `$cmd`;
+    }
 }
 
 sub copythemefont
@@ -132,16 +134,20 @@ sub copythemeicon
 {
     #copy the icon specified by the theme
 
-    $iconset =~ /\/(.*icons\/(.*))/i;
-    `cp $ROOT/icons/$2 $1`;
+    if ($iconset ne '') {
+        $iconset =~ /\/(.*icons\/(.*))/i;
+        `cp $ROOT/icons/$2 $1`;
+    }
 }
 
 sub copythemeviewericon
 {
     #copy the viewer icon specified by the theme
 
-    $viewericon =~ /\/(.*icons\/(.*))/i;
-    `cp $ROOT/icons/$2 $1`;
+    if ($viewericon ne '') {
+        $viewericon =~ /\/(.*icons\/(.*))/i;
+        `cp $ROOT/icons/$2 $1`;
+    }
 }
 
 sub copywps
@@ -219,10 +225,14 @@ MOO
     if($statusbar) {
         push @out, "statusbar: $statusbar\n";
     }
-    if($backdrop) {
-        # clip resolution from filename
-        $backdrop =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
-        push @out, "backdrop: /.rockbox/$backdrop\n";
+    if(defined($backdrop)) {
+        if ($backdrop eq '') {
+            push @out, "backdrop:\n";
+        } else {
+            # clip resolution from filename
+            $backdrop =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
+            push @out, "backdrop: /.rockbox/$backdrop\n";
+        }
     }
     if($lineselectstart && $main_depth > 2) {
         push @out, "line selector start color: $lineselectstart\n";
@@ -233,10 +243,10 @@ MOO
     if($selecttype) {
         push @out, "selector type: $selecttype\n";
     }
-    if($iconset) {
+    if(defined($iconset)) {
         push @out, "iconset: $iconset\n";
     }
-    if($viewericon) {
+    if(defined($viewericon)) {
         push @out, "viewers iconset: $viewericon\n";
     }
     if($lineselecttextcolor && $main_depth > 2 ) {
@@ -362,93 +372,93 @@ while(<WPS>) {
             }
             $within = 0;
         }
-        elsif($l =~ /^Name: (.*)/i) {
+        elsif($l =~ /^Name: *(.*)/i) {
             # Note that in the case this is within <rwps>, $wps will contain the
             # name of the rwps. Use $isrwps to figure out what type it is.
             $wps = $wps_prefix = $1;
             $wps_prefix =~ s/\.(r|)wps//;
             # print $wps_prefix . "\n";
         }
-        elsif($l =~ /^RWPS: (.*)/i) {
+        elsif($l =~ /^RWPS: *(.*)/i) {
             $rwps = $1;
         }
-        elsif($l =~ /^RWPS\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+        elsif($l =~ /^RWPS\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $rwps = $1;
         }
-        elsif($l =~ /^Author: (.*)/i) {
+        elsif($l =~ /^Author: *(.*)/i) {
             $author = $1;
         }
-        elsif($l =~ /^Width: (.*)/i) {
+        elsif($l =~ /^Width: *(.*)/i) {
             $width = $1;
         }
-        elsif($l =~ /^Width\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+        elsif($l =~ /^Width\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $width = $1;
         }
-        elsif($l =~ /^Height: (.*)/i) {
+        elsif($l =~ /^Height: *(.*)/i) {
             $height = $1;
         }
-        elsif($l =~ /^Height\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+        elsif($l =~ /^Height\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $height = $1;
         }
-        elsif($l =~ /^Font: (.*)/i) {
+        elsif($l =~ /^Font: *(.*)/i) {
             $font = $1;
         }
-        elsif($l =~ /^Foreground Color: (.*)/i) {
+        elsif($l =~ /^Foreground Color: *(.*)/i) {
             $fgcolor = $1;
         }
-        elsif($l =~ /^Background Color: (.*)/i) {
+        elsif($l =~ /^Background Color: *(.*)/i) {
             $bgcolor = $1;
         }
-        elsif($l =~ /^Font\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+        elsif($l =~ /^Font\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $font = $1;
             copythemefont();
         }
-        elsif($l =~ /^Statusbar: (.*)/i) {
+        elsif($l =~ /^Statusbar: *(.*)/i) {
             $statusbar = $1;
         }
-        elsif($l =~ /^Statusbar\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+        elsif($l =~ /^Statusbar\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $statusbar = $1;
         }
-        elsif($l =~ /^Backdrop: (.*)/i) {
+        elsif($l =~ /^Backdrop: *(.*)/i) {
             $backdrop = $1;
             copybackdrop();
         }
-        elsif($l =~ /^Backdrop\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+        elsif($l =~ /^Backdrop\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $backdrop = $1;
             copybackdrop();
         }
-        elsif($l =~ /^line selector start color: (.*)/i) {
+        elsif($l =~ /^line selector start color: *(.*)/i) {
             $lineselectstart = $1;
         }
-        elsif($l =~ /^line selector end color: (.*)/i) {
+        elsif($l =~ /^line selector end color: *(.*)/i) {
             $lineselectend = $1;
         }
-        elsif($l =~ /^selector type: (.*)/i) {
+        elsif($l =~ /^selector type: *(.*)/i) {
             $selecttype = $1;
         }
-        elsif($l =~ /^selector type\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+        elsif($l =~ /^selector type\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $selecttype = $1;
         }
-        elsif($l =~ /^iconset: (.*)/i) {
+        elsif($l =~ /^iconset: *(.*)/i) {
             $iconset = $1;
             copythemeicon();
         }
-        elsif($l =~ /^iconset\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+        elsif($l =~ /^iconset\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $iconset = $1;
             copythemeicon();
         }
-        elsif($l =~ /^viewers iconset: (.*)/i) {
+        elsif($l =~ /^viewers iconset: *(.*)/i) {
             $viewericon = $1;
             copythemeviewericon();
         }
-        elsif($l =~ /^viewers iconset\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+        elsif($l =~ /^viewers iconset\.${main_width}x${main_height}x$main_depth: *(.*)/i) {
             $viewericon = $1;
             copythemeviewericon();
         }
-        elsif($l =~ /^line selector text color: (.*)/i) {
+        elsif($l =~ /^line selector text color: *(.*)/i) {
             $lineselecttextcolor = $1;
         }
-        elsif($l =~ /^filetype colours: (.*)/i) {
+        elsif($l =~ /^filetype colours: *(.*)/i) {
             $filetylecolor = $1;
         }
         else{
