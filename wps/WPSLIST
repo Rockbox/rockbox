@@ -254,6 +254,8 @@ selector type.160x128x16: bar (gradient)
 selector type.240x320x16: bar (gradient)
 selector type.176x132x16: bar (gradient)
 selector type.176x220x16: bar (gradient)
+selector type.160x128x2: bar (inverse)
+selector type.138x110x2: bar (inverse)
 
 #icons
 iconset.320x240x16: /.rockbox/icons/tango_small.bmp 
