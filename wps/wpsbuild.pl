@@ -13,7 +13,7 @@ $ROOT="..";
 if($ARGV[0] eq "-r") {
     $ROOT=$ARGV[1];
     shift @ARGV;
-    shift @ARGV;    
+    shift @ARGV;
 }
 
 my $verbose;
@@ -27,7 +27,7 @@ my $firmdir="$ROOT/firmware";
 my $wpslist=$ARGV[0];
 
 my $target = $ARGV[1];
-my $cppdef = $target; 
+my $cppdef = $target;
 my @depthlist = ( 16, 8, 4, 2, 1 );
 
 if(!$wpslist) {
@@ -37,7 +37,8 @@ if(!$wpslist) {
     exit;
 }
 
-sub getlcdsizes {
+sub getlcdsizes
+{
     my ($remote) = @_;
 
     open(GCC, ">gcctemp");
@@ -65,7 +66,7 @@ STOP
     close(GCC);
 
     my $c="cat gcctemp | gcc $cppdef -I. -I$firmdir/export -E -P -";
-    
+
     #print "CMD $c\n";
 
     open(GETSIZE, "$c|");
@@ -91,7 +92,8 @@ STOP
     return ($height, $width, $depth);
 }
 
-sub mkdirs {
+sub mkdirs
+{
     my $wpsdir = $wps;
     $wpsdir =~ s/\.(r|)wps//;
     mkdir ".rockbox/wps", 0777;
@@ -106,40 +108,44 @@ sub mkdirs {
     }
 }
 
-sub copybackdrop {
-	#copy the backdrop file into the build dir
-	$dst = $backdrop;
-	$dst =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
-	$cmd = "cp $ROOT/$backdrop .rockbox/$dst"; 
-	`$cmd`;	
+sub copybackdrop
+{
+    #copy the backdrop file into the build dir
+    $dst = $backdrop;
+    $dst =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
+    $cmd = "cp $ROOT/$backdrop .rockbox/$dst";
+    `$cmd`;
 }
 
-sub copythemefont {
-	#copy the font specified by the theme
-	
-	$o=$font; 
-	$o =~ s/\.fnt/\.bdf/;
-	`mkdir .rockbox/fonts/ >/dev/null 2>&1`;
-	$cmd ="$ROOT/tools/convbdf -f -o \".rockbox/fonts/$font\" \"$ROOT/fonts/$o\" ";
-	`$cmd`;
+sub copythemefont
+{
+    #copy the font specified by the theme
+
+    $o=$font;
+    $o =~ s/\.fnt/\.bdf/;
+    `mkdir .rockbox/fonts/ >/dev/null 2>&1`;
+    $cmd ="$ROOT/tools/convbdf -f -o \".rockbox/fonts/$font\" \"$ROOT/fonts/$o\" ";
+    `$cmd`;
 }
 
-sub copythemeicon {
-	#copy the icon specified by the theme
-	
-	$iconset =~ /\/(.*icons\/(.*))/i;
-	`cp $ROOT/icons/$2 $1`;
+sub copythemeicon
+{
+    #copy the icon specified by the theme
+
+    $iconset =~ /\/(.*icons\/(.*))/i;
+    `cp $ROOT/icons/$2 $1`;
 }
 
-sub copythemeviewericon {
-	#copy the viewer icon specified by the theme
-	
-	$viewericon =~ /\/(.*icons\/(.*))/i;
-	`cp $ROOT/icons/$2 $1`;
+sub copythemeviewericon
+{
+    #copy the viewer icon specified by the theme
+
+    $viewericon =~ /\/(.*icons\/(.*))/i;
+    `cp $ROOT/icons/$2 $1`;
 }
 
-
-sub copywps {
+sub copywps
+{
     # we assume that we copy the WPS files from the same dir the WPSLIST
     # file is located in
     my $dir;
@@ -214,10 +220,10 @@ MOO
         push @out, "statusbar: $statusbar\n";
     }
     if($backdrop) {
-    	#clip resolution from filename
-    	$backdrop =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
+        # clip resolution from filename
+        $backdrop =~ s/(\.[0-9]*x[0-9]*x[0-9]*)//;
         push @out, "backdrop: /.rockbox/$backdrop\n";
-    }    
+    }
     if($lineselectstart && $main_depth > 2) {
         push @out, "line selector start color: $lineselectstart\n";
     }
@@ -273,7 +279,7 @@ while(<WPS>) {
         undef $wps;
         undef $wps_prefix;
         undef $rwps;
-        undef $width; 
+        undef $width;
         undef $height;
         undef $font;
         undef $fgcolor;
@@ -290,7 +296,7 @@ while(<WPS>) {
         undef $viewericon;
         undef $lineselecttextcolor;
         undef $filetylecolor;
-        
+
         next;
     }
     if($within) {
@@ -298,11 +304,11 @@ while(<WPS>) {
             # Get the required width and height
             my ($rheight, $rwidth, $rdepth);
             if($isrwps) {
-                ($rheight, $rwidth, $rdepth) = 
+                ($rheight, $rwidth, $rdepth) =
                          ($remote_height, $remote_width, $remote_depth);
             }
             else {
-                ($rheight, $rwidth, $rdepth) = 
+                ($rheight, $rwidth, $rdepth) =
                          ($main_height, $main_width, $main_depth);
             }
 
@@ -317,7 +323,7 @@ while(<WPS>) {
         # If this WPS installable on this platform, one of the following
         # two files will be present
         foreach $d (@depthlist) {
-                next if ($d > $rdepth); 
+                next if ($d > $rdepth);
 
                 $req_g = $rwidth . "x" . $rheight . "x" . $d;
 
@@ -328,16 +334,16 @@ while(<WPS>) {
                     $req_g = $req_g . "." . $main_width . "x" . $main_height . "x" . "$main_depth";
 
                     $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
-                    last if (-e "$wpsdir/$req_g_wps"); 
+                    last if (-e "$wpsdir/$req_g_wps");
                 }
-            } 
+            }
             $req_t_wps = $wps_prefix . ".txt" . ".wps";
 
             #print "LCD: $wps wants $height x $width\n";
             #print "LCD: is $rheight x $rwidth\n";
 
             #print "gwps: $wpsdir/$req_g_wps" . "\n";
-            if (-e "$wpsdir/$req_g_wps" || -e "$wpsdir/$req_t_wps" ) { 
+            if (-e "$wpsdir/$req_g_wps" || -e "$wpsdir/$req_t_wps" ) {
                 #
                 # The target model has an LCD that is suitable for this
                 # WPS
@@ -351,7 +357,7 @@ while(<WPS>) {
                 copywps();
             }
             else {
-                #print "(${wps_prefix}-${rwidth}x${rheight}x$rdepth) "; 
+                #print "(${wps_prefix}-${rwidth}x${rheight}x$rdepth) ";
                 #print "Skip $wps due to size restraints\n";
             }
             $within = 0;
@@ -377,13 +383,13 @@ while(<WPS>) {
         }
         elsif($l =~ /^Width\.${main_width}x${main_height}x$main_depth: (.*)/i) {
             $width = $1;
-        }          
+        }
         elsif($l =~ /^Height: (.*)/i) {
             $height = $1;
         }
         elsif($l =~ /^Height\.${main_width}x${main_height}x$main_depth: (.*)/i) {
             $height = $1;
-        }        
+        }
         elsif($l =~ /^Font: (.*)/i) {
             $font = $1;
         }
@@ -402,55 +408,52 @@ while(<WPS>) {
         }
         elsif($l =~ /^Statusbar\.${main_width}x${main_height}x$main_depth: (.*)/i) {
             $statusbar = $1;
-        }        
-	elsif($l =~ /^Backdrop: (.*)/i) {
-	    $backdrop = $1;
-	    copybackdrop();
-	}
-	elsif($l =~ /^Backdrop\.${main_width}x${main_height}x$main_depth: (.*)/i) {
-	    $backdrop = $1;
-	    copybackdrop();
-	}	
-	elsif($l =~ /^line selector start color: (.*)/i) {
-	    $lineselectstart = $1;
-	}
-	elsif($l =~ /^line selector end color: (.*)/i) {
-	    $lineselectend = $1;
-	}
-	elsif($l =~ /^selector type: (.*)/i) {
-	    $selecttype = $1;
-	}
-	elsif($l =~ /^selector type\.${main_width}x${main_height}x$main_depth: (.*)/i) {
-	    $selecttype = $1;
-	}	
-	elsif($l =~ /^iconset: (.*)/i) {
-	    $iconset = $1;
-	    copythemeicon();
-	}
-	elsif($l =~ /^iconset\.${main_width}x${main_height}x$main_depth: (.*)/i) {
-	    $iconset = $1;
-	    copythemeicon();
-	}
-	elsif($l =~ /^viewers iconset: (.*)/i) {
-	    $viewericon = $1;
-	    copythemeviewericon();
-	}		
-	elsif($l =~ /^viewers iconset\.${main_width}x${main_height}x$main_depth: (.*)/i) {
-	    $viewericon = $1;
-	    copythemeviewericon();
-	}
-	elsif($l =~ /^line selector text color: (.*)/i) {
-	    $lineselecttextcolor = $1;
-	}	
-	elsif($l =~ /^filetype colours: (.*)/i) {
-	    $filetylecolor = $1;
-	}
-	else{
-		#print "Unknown line:  $l!\n";
-	}
-	
-	
-	
+        }
+        elsif($l =~ /^Backdrop: (.*)/i) {
+            $backdrop = $1;
+            copybackdrop();
+        }
+        elsif($l =~ /^Backdrop\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+            $backdrop = $1;
+            copybackdrop();
+        }
+        elsif($l =~ /^line selector start color: (.*)/i) {
+            $lineselectstart = $1;
+        }
+        elsif($l =~ /^line selector end color: (.*)/i) {
+            $lineselectend = $1;
+        }
+        elsif($l =~ /^selector type: (.*)/i) {
+            $selecttype = $1;
+        }
+        elsif($l =~ /^selector type\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+            $selecttype = $1;
+        }
+        elsif($l =~ /^iconset: (.*)/i) {
+            $iconset = $1;
+            copythemeicon();
+        }
+        elsif($l =~ /^iconset\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+            $iconset = $1;
+            copythemeicon();
+        }
+        elsif($l =~ /^viewers iconset: (.*)/i) {
+            $viewericon = $1;
+            copythemeviewericon();
+        }
+        elsif($l =~ /^viewers iconset\.${main_width}x${main_height}x$main_depth: (.*)/i) {
+            $viewericon = $1;
+            copythemeviewericon();
+        }
+        elsif($l =~ /^line selector text color: (.*)/i) {
+            $lineselecttextcolor = $1;
+        }
+        elsif($l =~ /^filetype colours: (.*)/i) {
+            $filetylecolor = $1;
+        }
+        else{
+            #print "Unknown line:  $l!\n";
+        }
     }
 }
 
