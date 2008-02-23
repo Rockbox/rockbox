@@ -185,7 +185,6 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 #else
   #define DEFAULT_FONTNAME ""
-  #define DEFAULT_WPSNAME ""
 #endif
 
 #ifdef HAVE_LCD_COLOR
