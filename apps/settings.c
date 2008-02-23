@@ -471,25 +471,33 @@ static bool settings_write_config(char* filename, int options)
             continue;
         value[0] = '\0';
         
-        if ((options == SETTINGS_SAVE_CHANGED) &&
-            !is_changed(i))
-            continue;
-        else if ((options == SETTINGS_SAVE_SOUND) &&
-                 ((settings[i].flags&F_SOUNDSETTING) == 0))
-            continue;
-        else if ((options == SETTINGS_SAVE_THEME) &&
-                 ((settings[i].flags&F_THEMESETTING) == 0))
-            continue;
+        switch (options)
+        {
+            case SETTINGS_SAVE_CHANGED:
+                if (!is_changed(i))
+                    continue;
+                break;
+            case SETTINGS_SAVE_SOUND:
+                if ((settings[i].flags&F_SOUNDSETTING) == 0)
+                    continue;
+                break;
+            case SETTINGS_SAVE_THEME:
+                if ((settings[i].flags&F_THEMESETTING) == 0)
+                    continue;
+                break;
 #ifdef HAVE_RECORDING
-        else if ((options == SETTINGS_SAVE_RECPRESETS) &&
-                 ((settings[i].flags&F_RECSETTING) == 0))
-            continue;
+            case SETTINGS_SAVE_RECPRESETS:
+                if ((settings[i].flags&F_RECSETTING) == 0)
+                    continue;
+                break;
 #endif
 #if CONFIG_CODEC == SWCODEC
-        else if ((options == SETTINGS_SAVE_EQPRESET) &&
-                 ((settings[i].flags&F_EQSETTING) == 0))
-            continue;
+            case SETTINGS_SAVE_EQPRESET:
+                if ((settings[i].flags&F_EQSETTING) == 0)
+                    continue;
+                break;
 #endif
+        }
         switch (settings[i].flags&F_T_MASK)
         {
             case F_T_INT:
