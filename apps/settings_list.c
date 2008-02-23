@@ -440,14 +440,14 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,flip_display, LANG_FLIP_DISPLAY, false,"flip display", NULL),
 #endif
     /* display */
-     CHOICE_SETTING(F_TEMPVAR|F_THEMESETTING, cursor_style, LANG_INVERT_CURSOR, 3,
+     CHOICE_SETTING(F_TEMPVAR|F_THEMESETTING, cursor_style, LANG_INVERT_CURSOR,
  #ifdef HAVE_LCD_COLOR
-         "selector type", "pointer,bar (inverse),bar (color),bar (gradient)",
+         3, "selector type", "pointer,bar (inverse),bar (color),bar (gradient)",
          NULL, 4,
          ID2P(LANG_INVERT_CURSOR_POINTER), ID2P(LANG_INVERT_CURSOR_BAR),
          ID2P(LANG_INVERT_CURSOR_COLOR), ID2P(LANG_INVERT_CURSOR_GRADIENT)),
  #else
-         "selector type", "pointer,bar (inverse)", NULL, 2,
+         1, "selector type", "pointer,bar (inverse)", NULL, 2,
          ID2P(LANG_INVERT_CURSOR_POINTER), ID2P(LANG_INVERT_CURSOR_BAR)),
  #endif
     OFFON_SETTING(F_THEMESETTING|F_TEMPVAR, statusbar,
