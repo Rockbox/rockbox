@@ -38,9 +38,8 @@ enum old_values{
     old_Icon_Config,
 };
 
-static const long icon_unknown = old_Icon_Unknown;
-static const long icons[Icon_Last_Themeable] = {
-    [0 ... Icon_Last_Themeable-1] = 0,
+static const unsigned short icons[Icon_Last_Themeable] = {
+    [0 ... Icon_Last_Themeable-1] = ' ',
     
     [Icon_Audio] = old_Icon_Audio,
     [Icon_Folder] = old_Icon_Folder,
@@ -52,8 +51,8 @@ static const long icons[Icon_Last_Themeable] = {
     [Icon_Config] = old_Icon_Config,
     [Icon_Plugin] = old_Icon_Plugin,
     [Icon_Bookmark] = old_Icon_Bookmark,
-    [Icon_Queued] = 'Q',
-    [Icon_Moving] = 'M',
+    [Icon_Queued] = old_Icon_Queued,
+    [Icon_Moving] = old_Icon_Moving,
     
     /*
     [Icon_Keyboard] = ,
@@ -83,10 +82,10 @@ static const long icons[Icon_Last_Themeable] = {
 extern void screen_put_iconxy(struct screen * screen,
                             int x, int y, enum themable_icons icon)
 {
-    if (icon == -1)
-        screen->putc(x, y, icon_unknown);
-    else if ((icon==Icon_NOICON) && (icons[icon]!=0))
+    if (icon == Icon_NOICON)
         screen->putc(x, y, ' ');
+    else if (icon >= Icon_Last_Themeable)
+        screen->putc(x, y, old_Icon_Unknown);
     else
         screen->putc(x, y, icons[icon]);
 }

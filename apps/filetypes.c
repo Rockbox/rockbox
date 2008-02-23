@@ -325,7 +325,6 @@ static void read_config(char* config_file)
         filetypes[filetype_count].icon = Icon_Questionmark;
         heighest_attr++;
         /* get the icon */
-#ifdef  HAVE_LCD_BITMAP
         s = e+1;
         if (*s == '*')
             filetypes[filetype_count].icon = atoi(s+1);
@@ -333,9 +332,6 @@ static void read_config(char* config_file)
             filetypes[filetype_count].icon = Icon_NOICON;
         else if (*s >= '0' && *s <= '9')
             filetypes[filetype_count].icon = Icon_Last_Themeable + atoi(s);
-#else
-        filetypes[filetype_count].icon = Icon_NOICON;
-#endif
         filetype_count++;
     }
 }
