@@ -26,10 +26,19 @@ Name: ipodVOL.wps
 RWPS: rockbox_default.rwps
 # Name of the creator of the WPS
 Author: xameius
-# prefered font:
+# preferred font
 Font: nimbus-12.fnt
 # Weather the WPS is designed to have the statusbar present or not
 Statusbar: on
+# wheather a menu backdrop should be set
+# needs to be declared as empty if there should be none (the default sets one)
+backdrop:
+# reference to the built-in icon set
+iconset:
+# reference to the built-in viewers icon set which is loaded from disk
+viewers iconset: /.rockbox/icons/viewers.bmp
+# preferred selector type
+selector type: bar (inverse)
 </wps>
 
 <wps>
@@ -38,6 +47,12 @@ RWPS: rockbox_default.rwps
 Author: Rockbox team
 Font: rockbox_default.fnt
 Statusbar: on
+Foreground Color: 000000
+Background Color: B6C6E5
+backdrop:
+iconset:
+viewers iconset: /.rockbox/icons/viewers.bmp
+selector type: bar (inverse)
 </wps>
 
 <wps>
@@ -46,6 +61,13 @@ rwps: boxes.rwps
 Author: Christi Scarborough (after Magnus Westerlund)
 Font: rockbox_default.fnt
 Statusbar: on
+# themes with colour screen versions need to set the colours too
+Foreground Color: 000000
+Background Color: B6C6E5
+backdrop:
+iconset:
+viewers iconset: /.rockbox/icons/viewers.bmp
+selector type: bar (inverse)
 </wps>
 
 <wps>
@@ -54,6 +76,10 @@ RWPS: engineeer2.rwps
 Author: Magnus Westerlund
 Font: nedore-8.fnt
 Statusbar: on
+backdrop:
+iconset:
+viewers iconset: /.rockbox/icons/viewers.bmp
+selector type: bar (inverse)
 </wps>
 
 <wps>
@@ -61,6 +87,10 @@ Name: iAmp.wps
 RWPS: iAmp.rwps
 Author: Raymond Hoh
 Font: nimbus-12.fnt
+backdrop:
+iconset:
+viewers iconset: /.rockbox/icons/viewers.bmp
+selector type: bar (inverse)
 Statusbar: on
 </wps>
 
@@ -70,6 +100,10 @@ RWPS: zezayer.rwps
 Author: Jake Owen
 Font: nedore-8.fnt
 Statusbar: on
+backdrop:
+iconset:
+viewers iconset: /.rockbox/icons/viewers.bmp
+selector type: bar (inverse)
 </wps>
 
 <rwps>
@@ -113,6 +147,10 @@ RWPS: marquee.rwps
 Author: Mike Sobel
 Font: nimbus-13.fnt
 Statusbar: on
+backdrop:
+iconset:
+viewers iconset: /.rockbox/icons/viewers.bmp
+selector type: bar (inverse)
 </wps>
 
 <rwps>
@@ -127,6 +165,12 @@ Name: DancePuffDuo.wps
 RWPS: DancePuffDuo.rwps
 Author: Chris Oxtoby
 Font: nimbus-13.fnt
+Foreground Color: 000000
+Background Color: B6C6E5
+Statusbar: on
+backdrop:
+iconset:
+viewers iconset: /.rockbox/icons/viewers.bmp
 Statusbar: on
 </wps>
 
@@ -158,6 +202,7 @@ Statusbar: on
 backdrop:
 iconset:
 viewers iconset: /.rockbox/icons/viewers.bmp
+selector type: bar (inverse)
 </wps>
 
 <rwps>
@@ -176,6 +221,10 @@ Font: unifont.fnt
 Foreground Color: 000000
 Background Color: FFFFFF
 Statusbar: on
+backdrop:
+iconset:
+viewers iconset: /.rockbox/icons/viewers.bmp
+selector type: bar (inverse)
 </wps>
 
 <rwps>
@@ -187,6 +236,7 @@ Statusbar: on
 
 <wps>
 Name: Rockboxed.wps
+RWPS: rockbox_default.rwps
 Author: Roan Horning
 Font.112x64x1: rockbox_default.fnt
 Font.128x128x16: nimbus-12.fnt
@@ -202,6 +252,10 @@ Font.320x240x16: nimbus-19.fnt
 Foreground Color: 000000
 Background Color: FFC000
 Statusbar: on
+backdrop:
+iconset:
+viewers iconset: /.rockbox/icons/viewers.bmp
+selector type: bar (inverse)
 </wps>
 
 <wps>
