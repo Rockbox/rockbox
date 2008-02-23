@@ -370,11 +370,11 @@ static void set_serial_descriptor(void)
 
     for (i = 10; i < 20; i++)
     {
-       x = betoh16(identify[i]);
-       *p++ = hex[(x >> 4) & 0xF];
-       *p++ = hex[(x >> 0) & 0xF];
+       x = identify[i];
        *p++ = hex[(x >> 12) & 0xF];
        *p++ = hex[(x >> 8) & 0xF];
+       *p++ = hex[(x >> 4) & 0xF];
+       *p++ = hex[(x >> 0) & 0xF];
     }
     usb_string_iSerial.bLength=82;
 }
