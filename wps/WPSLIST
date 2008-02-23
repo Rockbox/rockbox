@@ -165,13 +165,13 @@ Name: DancePuffDuo.wps
 RWPS: DancePuffDuo.rwps
 Author: Chris Oxtoby
 Font: nimbus-13.fnt
+Statusbar: on
 Foreground Color: 000000
 Background Color: B6C6E5
-Statusbar: on
 backdrop:
 iconset:
 viewers iconset: /.rockbox/icons/viewers.bmp
-Statusbar: on
+selector type: bar (inverse)
 </wps>
 
 <rwps>
