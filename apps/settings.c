@@ -524,9 +524,8 @@ static bool settings_write_config(char* filename, int options)
                 break;
             case F_T_CHARPTR:
             case F_T_UCHARPTR:
-                if (((char*)settings[i].setting)[0] == '\0')
-                    break;
-                if (settings[i].filename_setting->prefix)
+                if (((char*)settings[i].setting)[0]
+                    && settings[i].filename_setting->prefix)
                 {
                     snprintf(value,MAX_PATH,"%s%s%s",
                         settings[i].filename_setting->prefix,
@@ -537,8 +536,7 @@ static bool settings_write_config(char* filename, int options)
                                 settings[i].filename_setting->max_len);
                 break;
         } /* switch () */
-        if (value[0])
-            fdprintf(fd,"%s: %s\r\n",settings[i].cfg_name,value);
+        fdprintf(fd,"%s: %s\r\n",settings[i].cfg_name,value);
     } /* for(...) */
     close(fd);
 #if CONFIG_TUNER
