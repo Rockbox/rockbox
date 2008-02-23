@@ -57,7 +57,7 @@ QUrl systemProxy(void)
 {
 #if defined(Q_OS_LINUX)
     return QUrl(getenv("http_proxy"));
-#elseif defined(Q_OS_WIN32)
+#elif defined(Q_OS_WIN32)
     HKEY hk;
     wchar_t proxyval[80];
     DWORD buflen = 80;
