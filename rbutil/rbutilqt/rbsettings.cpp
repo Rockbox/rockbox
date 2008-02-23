@@ -160,7 +160,7 @@ bool RbSettings::cacheDisabled()
 
 QString RbSettings::proxyType()
 {
-    return userSettings->value("proxytype", "system").toString();
+    return userSettings->value("proxytype", "none").toString();
 }
 
 QString RbSettings::proxy()
