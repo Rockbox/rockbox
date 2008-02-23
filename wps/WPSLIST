@@ -28,9 +28,9 @@ RWPS: rockbox_default.rwps
 Author: xameius
 # preferred font
 Font: nimbus-12.fnt
-# Weather the WPS is designed to have the statusbar present or not
+# whether the WPS is designed to have the statusbar present or not
 Statusbar: on
-# wheather a menu backdrop should be set
+# whether a menu backdrop should be set
 # needs to be declared as empty if there should be none (the default sets one)
 backdrop:
 # reference to the built-in icon set
