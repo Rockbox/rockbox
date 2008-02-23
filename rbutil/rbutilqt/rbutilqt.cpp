@@ -926,7 +926,7 @@ QUrl RbUtilQt::proxy()
         return QUrl(settings->proxy());
     else if(settings->proxy() == "system")
     {    
-        systemProxy();
+        return systemProxy();
     }
     return QUrl("");
 }
