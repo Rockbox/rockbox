@@ -164,6 +164,42 @@ static const char off_number_spell[] = "off,number,spell";
 static const char graphic_numeric[] = "graphic,numeric";
 #endif
 
+/* Default theme settings */
+#ifdef HAVE_LCD_BITMAP
+
+#if LCD_HEIGHT <= 64
+  #define DEFAULT_FONTNAME "rockfont-8"
+#elif LCD_HEIGHT <= 80
+  #define DEFAULT_FONTNAME "Sazanami-Mincho-Regular-11"
+#elif LCD_HEIGHT <= 220
+  #define DEFAULT_FONTNAME "helvR10"
+#elif LCD_HEIGHT <= 240
+  #define DEFAULT_FONTNAME "helvR12"
+#elif LCD_HEIGHT <= 320
+  #define DEFAULT_FONTNAME "helvR14"
+#endif
+  #define DEFAULT_WPSNAME  "cabbiev2"
+#else
+  #define DEFAULT_FONTNAME ""
+  #define DEFAULT_WPSNAME ""
+#endif
+
+#ifdef HAVE_LCD_COLOR
+  #define DEFAULT_ICONSET "tango_small"
+  #define DEFAULT_VIEWERS_ICONSET "tango_small_viewers"
+#else
+  #define DEFAULT_ICONSET "tango_small_mono"
+  #define DEFAULT_VIEWERS_ICONSET "tango_small_viewers_mono"
+#endif
+
+#define DEFAULT_THEME_FOREGROUND LCD_RGBPACK(0xce, 0xcf, 0xce)
+#define DEFAULT_THEME_BACKGROUND LCD_RGBPACK(0x00, 0x00, 0x00)
+#define DEFAULT_THEME_SELECTOR_START LCD_RGBPACK(0xff, 0xeb, 0x9c)
+#define DEFAULT_THEME_SELECTOR_END LCD_RGBPACK(0xb5, 0x8e, 0x00)
+#define DEFAULT_THEME_SELECTOR_TEXT LCD_RGBPACK(0x00, 0x00, 0x00)
+
+#define DEFAULT_BACKDROP    "cabbiev2"
+
 #ifdef HAVE_RECORDING
 /* keep synchronous to trig_durations and
    trigger_times in settings_apply_trigger */
@@ -401,7 +437,7 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,flip_display, LANG_FLIP_DISPLAY, false,"flip display", NULL),
 #endif
     /* display */
-     CHOICE_SETTING(F_TEMPVAR|F_THEMESETTING, cursor_style, LANG_INVERT_CURSOR, 1,
+     CHOICE_SETTING(F_TEMPVAR|F_THEMESETTING, cursor_style, LANG_INVERT_CURSOR, 3,
  #ifdef HAVE_LCD_COLOR
          "selector type", "pointer,bar (inverse),bar (color),bar (gradient)",
          NULL, 4,
@@ -575,16 +611,18 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,scroll_paginated,LANG_SCROLL_PAGINATED,
         false,"scroll paginated",NULL),
 #ifdef HAVE_LCD_COLOR
-    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.fg_color,-1,INT(LCD_DEFAULT_FG),
+
+    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.fg_color,-1,INT(DEFAULT_THEME_FOREGROUND),
         "foreground color",NULL,UNUSED},
-    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.bg_color,-1,INT(LCD_DEFAULT_BG),
+    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.bg_color,-1,INT(DEFAULT_THEME_BACKGROUND),
         "background color",NULL,UNUSED},
-    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.lss_color,-1,INT(LCD_DEFAULT_LS),
+    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.lss_color,-1,INT(DEFAULT_THEME_SELECTOR_START),
         "line selector start color",NULL,UNUSED},
-    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.lse_color,-1,INT(LCD_DEFAULT_BG),
+    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.lse_color,-1,INT(DEFAULT_THEME_SELECTOR_END),
         "line selector end color",NULL,UNUSED},
-    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.lst_color,-1,INT(LCD_DEFAULT_FG),
+    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.lst_color,-1,INT(DEFAULT_THEME_SELECTOR_TEXT),
         "line selector text color",NULL,UNUSED},
+
 #endif
     /* more playback */
     OFFON_SETTING(0,play_selected,LANG_PLAY_SELECTED,true,"play selected",NULL),
@@ -1078,25 +1116,25 @@ const struct settings_list settings[] = {
         INT(0),"trigger type","stop,pause,nf stp",UNUSED},
 #endif
 
-    /** settings not in the old config blocks **/
+    /** settings not in the old config blocks **/ 
 #if CONFIG_TUNER
     FILENAME_SETTING(0, fmr_file, "fmr",
         "", FMPRESET_PATH "/", ".fmr", MAX_FILENAME+1),
 #endif
 #ifdef HAVE_LCD_BITMAP
     FILENAME_SETTING(F_THEMESETTING, font_file, "font",
-        "", FONT_DIR "/", ".fnt", MAX_FILENAME+1),
+        DEFAULT_FONTNAME, FONT_DIR "/", ".fnt", MAX_FILENAME+1),
 #endif
     FILENAME_SETTING(F_THEMESETTING,wps_file, "wps",
-        "", WPS_DIR "/", ".wps", MAX_FILENAME+1),
+        DEFAULT_WPSNAME, WPS_DIR "/", ".wps", MAX_FILENAME+1),
     FILENAME_SETTING(0,lang_file,"lang","",LANG_DIR "/",".lng",MAX_FILENAME+1),
 #ifdef HAVE_REMOTE_LCD
     FILENAME_SETTING(F_THEMESETTING,rwps_file,"rwps",
-        "", WPS_DIR "/", ".rwps", MAX_FILENAME+1),
+        DEFAULT_WPSNAME, WPS_DIR "/", ".rwps", MAX_FILENAME+1),
 #endif
 #if LCD_DEPTH > 1
     FILENAME_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
-        "", BACKDROP_DIR "/", ".bmp", MAX_FILENAME+1),
+        DEFAULT_BACKDROP, BACKDROP_DIR "/", ".bmp", MAX_FILENAME+1),
 #endif
 #ifdef HAVE_LCD_BITMAP
     FILENAME_SETTING(0,kbd_file,"kbd","",ROCKBOX_DIR "/",".kbd",MAX_FILENAME+1),
@@ -1140,12 +1178,12 @@ const struct settings_list settings[] = {
     {F_T_INT, &global_settings.alarm_wake_up_screen, LANG_ALARM_WAKEUP_SCREEN,
         INT(ALARM_START_WPS), "alarm wakeup screen", ALARM_SETTING_TEXT, UNUSED},
 #endif /* HAVE_RTC_ALARM */
-            
+
     /* Customizable icons */
 #ifdef HAVE_LCD_BITMAP
-    FILENAME_SETTING(F_THEMESETTING, icon_file, "iconset", "",
+    FILENAME_SETTING(F_THEMESETTING, icon_file, "iconset", DEFAULT_ICONSET,
                      ICON_DIR "/", ".bmp", MAX_FILENAME+1),
-    FILENAME_SETTING(F_THEMESETTING, viewers_icon_file, "viewers iconset", "",
+    FILENAME_SETTING(F_THEMESETTING, viewers_icon_file, "viewers iconset", DEFAULT_VIEWERS_ICONSET,
                      ICON_DIR "/", ".bmp", MAX_FILENAME+1),
 #endif
 #ifdef HAVE_REMOTE_LCD
@@ -1156,7 +1194,7 @@ const struct settings_list settings[] = {
                      ICON_DIR "/", ".bmp", MAX_FILENAME+1),
 #endif /* HAVE_REMOTE_LCD */
 #ifdef HAVE_LCD_COLOR
-    FILENAME_SETTING(F_THEMESETTING, colors_file, "filetype colours", "",
+    FILENAME_SETTING(F_THEMESETTING, colors_file, "filetype colours", "-",
                      THEME_DIR "/", ".colours", MAX_FILENAME+1),
 #endif
 #ifdef HAVE_BUTTON_LIGHT
