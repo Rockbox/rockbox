@@ -51,7 +51,7 @@ Foreground Color: 000000
 Background Color: B6C6E5
 backdrop:
 iconset:
-viewers iconset: /.rockbox/icons/viewers.bmp
+viewers iconset:
 selector type: bar (inverse)
 </wps>
 
@@ -66,7 +66,7 @@ Foreground Color: 000000
 Background Color: B6C6E5
 backdrop:
 iconset:
-viewers iconset: /.rockbox/icons/viewers.bmp
+viewers iconset:
 selector type: bar (inverse)
 </wps>
 
@@ -78,7 +78,7 @@ Font: nedore-8.fnt
 Statusbar: on
 backdrop:
 iconset:
-viewers iconset: /.rockbox/icons/viewers.bmp
+viewers iconset:
 selector type: bar (inverse)
 </wps>
 
@@ -89,7 +89,7 @@ Author: Raymond Hoh
 Font: nimbus-12.fnt
 backdrop:
 iconset:
-viewers iconset: /.rockbox/icons/viewers.bmp
+viewers iconset:
 selector type: bar (inverse)
 Statusbar: on
 </wps>
@@ -102,7 +102,7 @@ Font: nedore-8.fnt
 Statusbar: on
 backdrop:
 iconset:
-viewers iconset: /.rockbox/icons/viewers.bmp
+viewers iconset:
 selector type: bar (inverse)
 </wps>
 
@@ -149,7 +149,7 @@ Font: nimbus-13.fnt
 Statusbar: on
 backdrop:
 iconset:
-viewers iconset: /.rockbox/icons/viewers.bmp
+viewers iconset:
 selector type: bar (inverse)
 </wps>
 
@@ -170,7 +170,7 @@ Foreground Color: 000000
 Background Color: B6C6E5
 backdrop:
 iconset:
-viewers iconset: /.rockbox/icons/viewers.bmp
+viewers iconset:
 selector type: bar (inverse)
 </wps>
 
@@ -201,7 +201,7 @@ Background Color: FFFFFF
 Statusbar: on
 backdrop:
 iconset:
-viewers iconset: /.rockbox/icons/viewers.bmp
+viewers iconset:
 selector type: bar (inverse)
 </wps>
 
@@ -223,7 +223,7 @@ Background Color: FFFFFF
 Statusbar: on
 backdrop:
 iconset:
-viewers iconset: /.rockbox/icons/viewers.bmp
+viewers iconset:
 selector type: bar (inverse)
 </wps>
 
@@ -254,7 +254,7 @@ Background Color: FFC000
 Statusbar: on
 backdrop:
 iconset:
-viewers iconset: /.rockbox/icons/viewers.bmp
+viewers iconset:
 selector type: bar (inverse)
 </wps>
 

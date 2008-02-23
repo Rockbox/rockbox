@@ -144,8 +144,10 @@ sub copythemeviewericon
 {
     #copy the viewer icon specified by the theme
 
-    $viewericon =~ /\/(.*icons\/(.*))/i;
-    `cp $ROOT/icons/$2 $1`;
+    if ($viewericon ne '') {
+        $viewericon =~ /\/(.*icons\/(.*))/i;
+        `cp $ROOT/icons/$2 $1`;
+    }
 }
 
 sub copywps
@@ -244,7 +246,7 @@ MOO
     if(defined($iconset)) {
         push @out, "iconset: $iconset\n";
     }
-    if($viewericon) {
+    if(defined($viewericon)) {
         push @out, "viewers iconset: $viewericon\n";
     }
     if($lineselecttextcolor && $main_depth > 2 ) {
