@@ -157,7 +157,7 @@ Background Color: FFFFFF
 Statusbar: on
 backdrop:
 iconset:
-viewers iconset:
+viewers iconset: /.rockbox/icons/viewers.bmp
 </wps>
 
 <rwps>
