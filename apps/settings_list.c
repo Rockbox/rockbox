@@ -165,6 +165,8 @@ static const char graphic_numeric[] = "graphic,numeric";
 #endif
 
 /* Default theme settings */
+#define DEFAULT_WPSNAME  "cabbiev2"
+
 #ifdef HAVE_LCD_BITMAP
 
 #if LCD_HEIGHT <= 64
@@ -177,8 +179,10 @@ static const char graphic_numeric[] = "graphic,numeric";
   #define DEFAULT_FONTNAME "helvR12"
 #elif LCD_HEIGHT <= 320
   #define DEFAULT_FONTNAME "helvR14"
+#else
+  #define DEFAULT_FONTNAME "helvR10"    
 #endif
-  #define DEFAULT_WPSNAME  "cabbiev2"
+
 #else
   #define DEFAULT_FONTNAME ""
   #define DEFAULT_WPSNAME ""
