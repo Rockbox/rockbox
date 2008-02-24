@@ -25,10 +25,12 @@
 
 void _backlight_on(void)
 {
+    GPO32_ENABLE |= 0x1000000;
 }
 
 void _backlight_off(void)
 {
+    GPO32_ENABLE &= ~0x1000000;
 }
 
 void _buttonlight_on(void)
