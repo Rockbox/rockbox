@@ -35,8 +35,8 @@ Statusbar: on
 backdrop:
 # reference to the built-in icon set
 iconset:
-# reference to the built-in viewers icon set which is loaded from disk
-viewers iconset: /.rockbox/icons/viewers.bmp
+# reference to the default viewers icon set
+viewers iconset:
 # preferred selector type
 selector type: bar (inverse)
 </wps>
