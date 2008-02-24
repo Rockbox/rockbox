@@ -23,7 +23,7 @@
 #include "string.h"
 #include "usb_ch9.h"
 #include "usb_core.h"
-#define LOGF_ENABLE
+//#define LOGF_ENABLE
 #include "logf.h"
 
 /* USB device mode registers (Little Endian) */
