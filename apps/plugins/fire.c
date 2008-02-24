@@ -32,8 +32,8 @@
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 /* Archos has not enough plugin RAM for full-width fire :( */
-#define FIRE_WIDTH 108
-#define FIRE_XPOS 2
+#define FIRE_WIDTH 106
+#define FIRE_XPOS 3
 #else
 #define FIRE_WIDTH LCD_WIDTH
 #define FIRE_XPOS 0
