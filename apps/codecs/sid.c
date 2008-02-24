@@ -1221,8 +1221,8 @@ next_track:
         return CODEC_ERROR;
     }
 
-    while (!*ci->taginfo_ready)
-        ci->yield();
+    while (!*ci->taginfo_ready && !ci->stop_codec)
+        ci->sleep(1);
 
     codec_set_replaygain(ci->id3);
     

@@ -164,6 +164,9 @@ enum codec_status codec_main(void)
         goto exit;
     }
 
+    while (!*ci->taginfo_ready && !ci->stop_codec)
+        ci->sleep(1);
+
     inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
 
     /* Read the file headers to populate the ape_ctx struct */
@@ -198,9 +201,6 @@ enum codec_status codec_main(void)
                        (ape_ctx.seektablefilepos +
                         ape_ctx.numseekpoints * sizeof(uint32_t)));
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
-    
     ci->configure(DSP_SWITCH_FREQUENCY, ape_ctx.samplerate);
     ci->configure(DSP_SET_STEREO_MODE, ape_ctx.channels == 1 ?
                   STEREO_MONO : STEREO_NONINTERLEAVED);

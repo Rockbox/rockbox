@@ -98,6 +98,9 @@ next_track:
         goto exit;
     }
 
+    while (!*ci->taginfo_ready && !ci->stop_codec)
+        ci->sleep(1);
+
     samplesdone = ci->id3->offset;
 
     /* read file's streaminfo data */
