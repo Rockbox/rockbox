@@ -1,0 +1,80 @@
+# SVN user name (lower case, without space) SPACE full name
+# this file is used by automated scripts or humans that wants to know the full
+# name of individual committers in the svn commit log
+adam Adam Boot
+agashlin Adam Gashlin
+aliask Will Robertson
+amiconn Jens Arnold
+andy Andy
+bagder Daniel Stenberg
+barrywardell Barry Wardell
+benbasha Ben Basha
+bger Hristo Kovachev
+bluebrother Dominik Riebeling
+breaker Uwe Freese
+bryant Dave Bryant
+christi Christi Scarborough
+christian Christian Gmeiner
+dan Dan Everton
+dan_a Daniel Ankers
+dave Dave Chapman
+dionoea Antoine Cellerier
+domonoky Dominik Wenger
+eigma Catalin Patulea
+gevaerts Frank Gevaerts
+gotthardt Steve Gotthardt
+gwhite Greg White
+hardeeps Hardeep Sidhu
+hbacke Henrik Backe
+hcl Michiel Van Der Kolk
+hohensoh Jörg Hohensohn
+james83 James Espinoza
+jdgordon Jonathan Gordon
+jethead71 Mike Sevakis
+jyp Jean-Philippe Bernardy
+kevin Kevin Ferrare
+kjer Kjell Ericson
+kkurbjun Karl Kurbjun
+lamed Shachar Liberman
+learman Magnus Holmgren
+len0x Anton Oleynikov
+lenzone10 Alessio Lenzi
+linus Linus Nielsen Feltzing
+llorean Paul Louden
+lostlogic Brandon Low
+lowlight Mark Arigo
+markun Marcoen Hirschberg
+matsl Mats Lidell
+medifebbo Michael DiFebbo
+midgey34 Tom Ross
+midkay Zakk Roberts
+miipekk Miika Pekkarinen
+mmmm Martin Scarratt
+moos Mustapha Senhaji
+nicolasp Nicolas Pennequin
+niobos Niels Laukens
+nls Nils Wallménius
+pbv Pedro Vasconcelos
+peter "Peter D\Hoye"
+phaedrus961 Frank Dischner
+pixelma Marianne Arnold
+pondlife Steve Bavin
+preglow Thom Johansen
+quelsaruk Jose Maria Garcia-Valdecasas Bernal
+raenye Rani Hod
+rasher Jonas Häggqvist
+rdjackso Ryan Jackson
+rob Rob Purchase
+robert Robert Keevil
+roolku Robert Kukla
+saratoga Michael Giacomelli
+scorche Austin Appel
+sdoyon Stephane Doyon
+stevenm Stepan Moskovchenko
+theli Anton Romanov
+tomal Tomasz Malesinski
+tomas Tomas Salfischberger
+toni Antonius Hellmann
+tpdiffenbach TP Diffenbach
+tucoz Martin Arver
+zagor Björn Stenberg
