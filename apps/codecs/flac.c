@@ -436,15 +436,15 @@ enum codec_status codec_main(void)
         goto exit;
     }
 
+    while (!*ci->taginfo_ready && !ci->stop_codec)
+        ci->sleep(1);
+    
     if (!flac_init(&fc,ci->id3->first_frame_offset)) {
         LOGF("FLAC: Error initialising codec\n");
         retval = CODEC_ERROR;
         goto done;
     }
 
-    while (!*ci->taginfo_ready && !ci->stop_codec)
-        ci->sleep(1);
-    
     ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
     ci->configure(DSP_SET_STEREO_MODE, fc.channels == 1 ?
                   STEREO_MONO : STEREO_NONINTERLEAVED);
