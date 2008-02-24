@@ -23,7 +23,7 @@
 #include "string.h"
 #include "usb_ch9.h"
 #include "usb_core.h"
-//#define LOGF_ENABLE
+#define LOGF_ENABLE
 #include "logf.h"
 
 /* USB device mode registers (Little Endian) */
@@ -642,7 +642,6 @@ static void prepare_td(struct transfer_descriptor* td,
 static void control_received(void)
 {
     int i;
-    logf("control stuff");
     /* copy setup data from packet */
     static unsigned int tmp[2];
     tmp[0] = qh_array[0].setup_buffer[0];
@@ -651,7 +650,7 @@ static void control_received(void)
     /* acknowledge packet recieved */
     REG_ENDPTSETUPSTAT |= EPSETUP_STATUS_EP0;
 
-    /* Stop pending interrupt transfers */
+    /* Stop pending control transfers */
     for(i=0;i<2;i++) {
         if(qh_array[i].wait) {
             qh_array[i].wait=0;
