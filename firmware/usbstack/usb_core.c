@@ -62,7 +62,11 @@
 static const struct usb_device_descriptor device_descriptor= {
     .bLength            = sizeof(struct usb_device_descriptor),
     .bDescriptorType    = USB_DT_DEVICE,
+#ifdef USE_HIGH_SPEED
     .bcdUSB             = 0x0200,
+#else
+    .bcdUSB             = 0x0110,
+#endif
     .bDeviceClass       = USB_CLASS_PER_INTERFACE,
     .bDeviceSubClass    = 0,
     .bDeviceProtocol    = 0,
