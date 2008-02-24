@@ -73,7 +73,8 @@ const struct button_mapping generic_directions[] =
     || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)  \
     || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
     || (CONFIG_KEYPAD == SANSA_C200_PAD) \
-    || (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+    || (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
+    || (CONFIG_KEYPAD == MROBE100_PAD)
     { PLA_UP,                BUTTON_UP,                  BUTTON_NONE},
     { PLA_DOWN,              BUTTON_DOWN,                BUTTON_NONE},
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
@@ -112,8 +113,7 @@ const struct button_mapping generic_directions[] =
     {PLA_DOWN_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE},
     {PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
     {PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD) \
-   || (CONFIG_KEYPAD == MROBE100_PAD)
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
     { PLA_UP,                BUTTON_SCROLL_UP,           BUTTON_NONE},
     { PLA_DOWN,              BUTTON_SCROLL_DOWN,         BUTTON_NONE},
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
@@ -150,10 +150,11 @@ const struct button_mapping generic_left_right_fire[] =
 {
 #if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
-    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)     \
+    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)   \
     || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
     || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
-    || (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+    || (CONFIG_KEYPAD == GIGABEAT_S_PAD)    \
+    || (CONFIG_KEYPAD == MROBE100_PAD)
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
@@ -205,8 +206,7 @@ const struct button_mapping generic_left_right_fire[] =
     { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
     { PLA_FIRE,              BUTTON_SELECT,              BUTTON_NONE},
     { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD) \
-   || (CONFIG_KEYPAD == MROBE100_PAD)
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
     { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
@@ -312,8 +312,7 @@ const struct button_mapping generic_actions[] =
     {PLA_MENU,          BUTTON_DOWN,        BUTTON_NONE},
     {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD \
-   || (CONFIG_KEYPAD == MROBE100_PAD)
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
     {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
     {PLA_START,         BUTTON_PLAY,        BUTTON_NONE},
     {PLA_MENU,          BUTTON_FF,          BUTTON_NONE},
@@ -331,6 +330,12 @@ const struct button_mapping generic_actions[] =
     {PLA_MENU,          BUTTON_RC_MODE,                     BUTTON_NONE},
     {PLA_FIRE,          BUTTON_RC_HEART,                    BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_RC_HEART|BUTTON_REPEAT,      BUTTON_NONE},
+#elif CONFIG_KEYPAD == MROBE100_PAD
+    {PLA_QUIT,          BUTTON_DISPLAY,                 BUTTON_NONE},
+    {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
+    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_SELECT,                  BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
     {PLA_QUIT,          BUTTON_POWER,                       BUTTON_NONE},
     {PLA_START,         BUTTON_UP,                          BUTTON_NONE},
@@ -347,14 +352,15 @@ const struct button_mapping generic_increase_decrease[] =
 {
 #if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
-    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)     \
+    || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)   \
     || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
     || (CONFIG_KEYPAD == RECORDER_PAD)      \
     || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)  \
     || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
-    || (CONFIG_KEYPAD == ONDIO_PAD) \
-    || (CONFIG_KEYPAD == COWOND2_PAD) \
-    || (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+    || (CONFIG_KEYPAD == ONDIO_PAD)         \
+    || (CONFIG_KEYPAD == COWOND2_PAD)       \
+    || (CONFIG_KEYPAD == GIGABEAT_S_PAD)    \
+    || (CONFIG_KEYPAD == MROBE100_PAD)
     {PLA_INC,              BUTTON_UP,                  BUTTON_NONE},
     {PLA_DEC,              BUTTON_DOWN,                BUTTON_NONE},
     {PLA_INC_REPEAT,       BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},
@@ -375,8 +381,7 @@ const struct button_mapping generic_increase_decrease[] =
 #elif CONFIG_KEYPAD == PLAYER_PAD
     {PLA_INC,              BUTTON_STOP,  BUTTON_NONE},
     {PLA_DEC,              BUTTON_PLAY,  BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD) \
-    || (CONFIG_KEYPAD == MROBE100_PAD)
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
     {PLA_INC,              BUTTON_SCROLL_UP,           BUTTON_NONE},
     {PLA_DEC,              BUTTON_SCROLL_DOWN,         BUTTON_NONE},
     {PLA_INC_REPEAT,       BUTTON_SCROLL_UP|BUTTON_REPEAT,    BUTTON_NONE},

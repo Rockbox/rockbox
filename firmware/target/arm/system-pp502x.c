@@ -35,6 +35,9 @@ extern void microsd_int(void);          /* Sansa E200 and C200 */
 extern void button_int(void);
 extern void clickwheel_int(void);
 #endif
+#ifdef MROBE_100
+extern void button_int(void);
+#endif
 
 void irq(void)
 {
@@ -66,6 +69,11 @@ void irq(void)
             if (GPIOL_INT_STAT & 0x08)
                 microsd_int();
         }
+#elif defined(MROBE_100)
+        else if (CPU_HI_INT_STAT & GPIO0_MASK) {
+            if (GPIOD_INT_STAT & 0x2)
+                button_int();
+        }        
 #endif
 #ifdef HAVE_USBSTACK
         else if (CPU_INT_STAT & USB_MASK) {

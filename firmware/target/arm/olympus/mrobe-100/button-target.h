@@ -28,6 +28,7 @@
 bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
+void button_int(void);
 
 #define POWEROFF_BUTTON     BUTTON_POWER
 #define POWEROFF_COUNT      10
@@ -36,25 +37,33 @@ int button_read_device(void);
    for the H10 keypad & remote. THESE ARE NOT CORRECT! */
 
 /* Main unit's buttons */
-#define BUTTON_POWER        0x00000001
-#define BUTTON_LEFT         0x00000002
-#define BUTTON_RIGHT        0x00000004
-#define BUTTON_REW          0x00000008
-#define BUTTON_PLAY         0x00000010
-#define BUTTON_FF           0x00000020
-#define BUTTON_SCROLL_UP    0x00000040
-#define BUTTON_SCROLL_DOWN  0x00000080
-#define BUTTON_MAIN         (BUTTON_POWER|BUTTON_O|BUTTON_BACK|BUTTON_REW\
-                            |BUTTON_PLAY|BUTTON_FF)
+#define BUTTON_PLAY         0x00000001
+#define BUTTON_MENU         0x00000002
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_DISPLAY      0x00000008
+#define BUTTON_RIGHT        0x00000010
+#define BUTTON_SELECT       0x00000020
+#define BUTTON_UP           0x00000040
+#define BUTTON_SLIDE_UP     0x00000080
+#define BUTTON_DOWN         0x00000100
+#define BUTTON_SLIDE_DOWN   0x00000200
+#define BUTTON_POWER        0x00000400
+#define BUTTON_MAIN         (BUTTON_PLAY|BUTTON_MENU|BUTTON_LEFT|BUTTON_DISPLAY\
+                            |BUTTON_RIGHT|BUTTON_SELECT|BUTTON_UP|BUTTON_SLIDE_UP\
+                            |BUTTON_DOWN|BUTTON_SLIDE_DOWN|BUTTON_POWER)
 
 /* Remote control's buttons */
-#define BUTTON_RC_REW       0x00080000
-#define BUTTON_RC_PLAY      0x00100000
-#define BUTTON_RC_FF        0x00200000
+#define BUTTON_RC_PLAY      0x00010000
+#define BUTTON_RC_REW       0x00020000
+#define BUTTON_RC_FF        0x00040000
+#define BUTTON_RC_DISPLAY   0x00080000
+#define BUTTON_RC_FAV       0x00100000
+#define BUTTON_RC_MODE      0x00200000
 #define BUTTON_RC_VOL_UP    0x00400000
 #define BUTTON_RC_VOL_DOWN  0x00800000
-#define BUTTON_REMOTE (BUTTON_RC_PLAY|BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN\
-                |BUTTON_RC_REW|BUTTON_RC_FF)
+#define BUTTON_REMOTE       (BUTTON_RC_PLAY|BUTTON_RC_REW|BUTTON_RC_FF|\
+                            |BUTTON_RC_DISPLAY|BUTTON_RC_FAV|BUTTON_RC_MODE\
+                            |BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN)
 #define RC_POWEROFF_BUTTON  BUTTON_RC_PLAY
 
 #endif /* _BUTTON_TARGET_H_ */
