@@ -250,7 +250,7 @@ next_track:
 
         coef1 = (c*8192) >> 28;
         coef2 = (c*c/big28*-4096) >> 28;
-        DEBUGF("ADX: samprate=%lld ",frequency);
+        DEBUGF("ADX: samprate=%ld ",(long)frequency);
         DEBUGF("coef1 %04x ",(unsigned int)(coef1*4));
         DEBUGF("coef2 %04x\n",(unsigned int)(coef2*-4));
     }
