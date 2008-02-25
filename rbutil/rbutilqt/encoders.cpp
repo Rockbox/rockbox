@@ -186,11 +186,11 @@ bool EncRbSpeex::encode(QString input,QString output)
     char errstr[512];
     
     FILE *fin,*fout;
-    if ((fin = fopen(input.toUtf8(), "rb")) == NULL) {
+    if ((fin = fopen(input.toLocal8Bit(), "rb")) == NULL) {
         qDebug() << "Error: could not open input file\n";
         return false;
     }
-    if ((fout = fopen(output.toUtf8(), "wb")) == NULL) {
+    if ((fout = fopen(output.toLocal8Bit(), "wb")) == NULL) {
         qDebug() << "Error: could not open output file\n";
         return false;
     }
