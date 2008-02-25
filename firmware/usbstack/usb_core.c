@@ -23,6 +23,7 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
+#include "usb.h"
 #include "usb_ch9.h"
 #include "usb_drv.h"
 #include "usb_core.h"
@@ -299,6 +300,18 @@ static long usbcore_stack[DEFAULT_STACK_SIZE];
 static void usb_core_thread(void);
 #endif
 
+#ifdef USE_ROCKBOX_USB
+static bool usb_core_charging_enabled = false;
+static bool usb_core_storage_enabled = true;
+static bool usb_core_serial_enabled = true;
+#if defined(USB_BENCHMARK)
+static bool usb_core_benchmark_enabled = false;
+#endif
+#else
+static bool usb_core_charging_enabled = true;
+#endif
+
+
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
 static int ack_control(struct usb_ctrlrequest* req);
 
@@ -490,11 +503,9 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
     /* note: interrupt context */
     data_connection = true;
 
-#if defined(IPOD_ARCH) || defined(HAVE_AS3514)
     if(usb_state == DEFAULT) {
         set_serial_descriptor();
     }
-#endif
 
 #ifdef USB_BENCHMARK
     if ((req->bRequestType & 0x60) == USB_TYPE_VENDOR) {
@@ -510,11 +521,13 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
             if (req->wValue){
                 usb_state = CONFIGURED;
 #ifdef USB_STORAGE
-                usb_storage_control_request(req);
+                if(usb_core_storage_enabled)
+                    usb_storage_control_request(req);
 #endif
 
 #ifdef USB_SERIAL
-                usb_serial_control_request(req);
+                if(usb_core_serial_enabled)
+                    usb_serial_control_request(req);
 #endif
             }
             else {
@@ -631,48 +644,56 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                     size = sizeof(config_descriptor);
 
 #ifdef USB_CHARGING_ONLY
-                    charging_interface_descriptor.bInterfaceNumber=interface_number;
-                    interface_number++;
-                    memcpy(&response_data[size],&charging_interface_descriptor,sizeof(struct usb_interface_descriptor));
-                    size += sizeof(struct usb_interface_descriptor);
+                    if(usb_core_charging_enabled){
+                        charging_interface_descriptor.bInterfaceNumber=interface_number;
+                        interface_number++;
+                        memcpy(&response_data[size],&charging_interface_descriptor,sizeof(struct usb_interface_descriptor));
+                        size += sizeof(struct usb_interface_descriptor);
+                    }
 #endif
 #ifdef USB_STORAGE
-                    mass_storage_ep_in_descriptor.wMaxPacketSize=max_packet_size;
-                    mass_storage_ep_out_descriptor.wMaxPacketSize=max_packet_size;
-                    mass_storage_interface_descriptor.bInterfaceNumber=interface_number;
-                    interface_number++;
+                    if(usb_core_storage_enabled){
+                        mass_storage_ep_in_descriptor.wMaxPacketSize=max_packet_size;
+                        mass_storage_ep_out_descriptor.wMaxPacketSize=max_packet_size;
+                        mass_storage_interface_descriptor.bInterfaceNumber=interface_number;
+                        interface_number++;
 
-                    memcpy(&response_data[size],&mass_storage_interface_descriptor,sizeof(struct usb_interface_descriptor));
-                    size += sizeof(struct usb_interface_descriptor);
-                    memcpy(&response_data[size],&mass_storage_ep_in_descriptor,sizeof(struct usb_endpoint_descriptor));
-                    size += sizeof(struct usb_endpoint_descriptor);
-                    memcpy(&response_data[size],&mass_storage_ep_out_descriptor,sizeof(struct usb_endpoint_descriptor));
-                    size += sizeof(struct usb_endpoint_descriptor);
+                        memcpy(&response_data[size],&mass_storage_interface_descriptor,sizeof(struct usb_interface_descriptor));
+                        size += sizeof(struct usb_interface_descriptor);
+                        memcpy(&response_data[size],&mass_storage_ep_in_descriptor,sizeof(struct usb_endpoint_descriptor));
+                        size += sizeof(struct usb_endpoint_descriptor);
+                        memcpy(&response_data[size],&mass_storage_ep_out_descriptor,sizeof(struct usb_endpoint_descriptor));
+                        size += sizeof(struct usb_endpoint_descriptor);
+                    }
 #endif
 #ifdef USB_SERIAL
-                    serial_ep_in_descriptor.wMaxPacketSize=max_packet_size;
-                    serial_ep_out_descriptor.wMaxPacketSize=max_packet_size;
-                    serial_interface_descriptor.bInterfaceNumber=interface_number;
-                    interface_number++;
+                    if(usb_core_serial_enabled){
+                        serial_ep_in_descriptor.wMaxPacketSize=max_packet_size;
+                        serial_ep_out_descriptor.wMaxPacketSize=max_packet_size;
+                        serial_interface_descriptor.bInterfaceNumber=interface_number;
+                        interface_number++;
 
-                    memcpy(&response_data[size],&serial_interface_descriptor,sizeof(struct usb_interface_descriptor));
-                    size += sizeof(struct usb_interface_descriptor);
-                    memcpy(&response_data[size],&serial_ep_in_descriptor,sizeof(struct usb_endpoint_descriptor));
-                    size += sizeof(struct usb_endpoint_descriptor);
-                    memcpy(&response_data[size],&serial_ep_out_descriptor,sizeof(struct usb_endpoint_descriptor));
-                    size += sizeof(struct usb_endpoint_descriptor);
+                        memcpy(&response_data[size],&serial_interface_descriptor,sizeof(struct usb_interface_descriptor));
+                        size += sizeof(struct usb_interface_descriptor);
+                        memcpy(&response_data[size],&serial_ep_in_descriptor,sizeof(struct usb_endpoint_descriptor));
+                        size += sizeof(struct usb_endpoint_descriptor);
+                        memcpy(&response_data[size],&serial_ep_out_descriptor,sizeof(struct usb_endpoint_descriptor));
+                        size += sizeof(struct usb_endpoint_descriptor);
+                    }
 #endif
 #ifdef USB_BENCHMARK
-                    benchmark_ep_in_descriptor.wMaxPacketSize=max_packet_size;
-                    benchmark_ep_out_descriptor.wMaxPacketSize=max_packet_size;
-                    config_descriptor.bNumInterfaces=interface_number;
+                    if(usb_core_benchmark_enabled){
+                        benchmark_ep_in_descriptor.wMaxPacketSize=max_packet_size;
+                        benchmark_ep_out_descriptor.wMaxPacketSize=max_packet_size;
+                        config_descriptor.bNumInterfaces=interface_number;
 
-                    memcpy(&response_data[size],&benchmark_interface_descriptor,sizeof(struct usb_interface_descriptor));
-                    size += sizeof(struct usb_interface_descriptor);
-                    memcpy(&response_data[size],&benchmark_ep_in_descriptor,sizeof(struct usb_endpoint_descriptor));
-                    size += sizeof(struct usb_endpoint_descriptor);
-                    memcpy(&response_data[size],&benchmark_ep_out_descriptor,sizeof(struct usb_endpoint_descriptor));
-                    size += sizeof(struct usb_endpoint_descriptor);
+                        memcpy(&response_data[size],&benchmark_interface_descriptor,sizeof(struct usb_interface_descriptor));
+                        size += sizeof(struct usb_interface_descriptor);
+                        memcpy(&response_data[size],&benchmark_ep_in_descriptor,sizeof(struct usb_endpoint_descriptor));
+                        size += sizeof(struct usb_endpoint_descriptor);
+                        memcpy(&response_data[size],&benchmark_ep_out_descriptor,sizeof(struct usb_endpoint_descriptor));
+                        size += sizeof(struct usb_endpoint_descriptor);
+                    }
 #endif
                     config_descriptor.wTotalLength = size;
                     memcpy(&response_data[0],&config_descriptor,sizeof(struct usb_config_descriptor));

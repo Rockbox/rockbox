@@ -61,6 +61,17 @@
 #endif
 #endif /* HAVE_USB_POWER */
 
+#ifdef HAVE_USBSTACK
+/* USB class drivers */
+enum {
+    USB_DRIVER_MASS_STORAGE,
+    USB_DRIVER_SERIAL,
+    USB_DRIVER_CHARGING_ONLY,
+    USB_DRIVER_COUNT
+};
+#endif
+
+
 void usb_init(void);
 void usb_enable(bool on);
 void usb_start_monitoring(void);
