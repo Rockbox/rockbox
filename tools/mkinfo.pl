@@ -71,7 +71,7 @@ open(O, ">$output") || die "couldn't open $output for writing";
 
 # Variables identifying the target, that should remain the same as long
 # as the hardware is unmodified
-printf O ("Target: %s\n", $ENV{'ARCHOS'});
+printf O ("Target: %s\n", $ENV{'MODELNAME'});
 printf O ("Target id: %d\n", $ENV{'TARGET_ID'});
 printf O ("Target define: %s\n", $ENV{'TARGET'});
 printf O ("Memory: %d\n", $ENV{'MEMORYSIZE'});
