@@ -444,8 +444,6 @@ bool usb_core_data_connection(void)
 #ifdef USB_THREAD
 void usb_core_thread(void)
 {
-    set_serial_descriptor();
-
     while (1) {
         struct queue_event ev;
 
