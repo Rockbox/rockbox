@@ -1184,8 +1184,7 @@ bool simplelist_show_list(struct simplelist_info *info)
         }
         if (action == ACTION_STD_CANCEL)
             break;
-        else if ((action == ACTION_NONE) ||
-                 (action == ACTION_REDRAW) || 
+        else if ((action == ACTION_REDRAW) ||
                  (old_line_count != simplelist_line_count))
         {
             if (info->get_name == NULL)
