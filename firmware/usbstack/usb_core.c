@@ -76,7 +76,11 @@ static const struct usb_device_descriptor device_descriptor= {
     .bcdDevice          = 0x0100,
     .iManufacturer      = 1,
     .iProduct           = 2,
+#ifdef USE_ROCKBOX_USB
     .iSerialNumber      = 3,
+#else
+    .iSerialNumber      = 0,
+#endif
     .bNumConfigurations = 1
 };
 
