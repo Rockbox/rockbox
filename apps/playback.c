@@ -553,7 +553,8 @@ struct mp3entry* audio_current_track(void)
 
 struct mp3entry* audio_next_track(void)
 {
-    int next_idx = track_ridx;
+    int next_idx;
+    int offset = ci.new_track + wps_offset;
 
     if (!audio_have_tracks())
         return NULL;
@@ -565,7 +566,7 @@ struct mp3entry* audio_next_track(void)
         return &curtrack_id3;
     }
 
-    next_idx = (next_idx + 1) & MAX_TRACK_MASK;
+    next_idx = (track_ridx + offset + 1) & MAX_TRACK_MASK;
 
     if (next_idx == track_widx)
     {
