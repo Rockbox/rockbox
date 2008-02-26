@@ -1992,7 +1992,7 @@ static int audio_check_new_track(void)
     auto_dir_skip = end_of_playlist && global_settings.next_folder;
 
     /* If the playlist isn't that big */
-    if (!playlist_check(ci.new_track))
+    if (automatic_skip && !playlist_check(ci.new_track))
     {
         if (ci.new_track >= 0)
         {
