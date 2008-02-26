@@ -232,7 +232,7 @@ static bool file_speed(int chunksize, bool align)
     time = *rb->current_tick - time;
     rb->close(fd);
     rb->snprintf(text_buf, sizeof text_buf, "Create (%d,%c): %ld KB/s",
-                 chunksize, align ? 'A' : 'U', (25 * filesize / time) >> 8);
+                 chunksize, align ? 'A' : 'U', (25 * (filesize>>8) / time) );
     log_text(text_buf, true);
 
     /* Existing file write speed */
@@ -255,7 +255,7 @@ static bool file_speed(int chunksize, bool align)
     time = *rb->current_tick - time;
     rb->close(fd);
     rb->snprintf(text_buf, sizeof text_buf, "Write  (%d,%c): %ld KB/s",
-                 chunksize, align ? 'A' : 'U', (25 * filesize / time) >> 8);
+                 chunksize, align ? 'A' : 'U', (25 * (filesize>>8) / time) );
     log_text(text_buf, true);
     
     /* File read speed */
@@ -278,7 +278,7 @@ static bool file_speed(int chunksize, bool align)
     time = *rb->current_tick - time;
     rb->close(fd);
     rb->snprintf(text_buf, sizeof text_buf, "Read   (%d,%c): %ld KB/s",
-                 chunksize, align ? 'A' : 'U', (25 * filesize / time) >> 8);
+                 chunksize, align ? 'A' : 'U', (25 * (filesize>>8) / time) );
     log_text(text_buf, true);
     rb->remove(TEST_FILE);
     return true;
