@@ -222,6 +222,10 @@ static int track_widx = 0;           /* Track being buffered (A) */
 static struct track_info *prev_ti = NULL;  /* Pointer to the previously played
                                               track */
 
+/* Set by buffering_audio_callback when the low buffer event is received, to
+   avoid flodding the audio queue with fill_file_buffer messages. */
+static bool lowbuffer_event_sent = false;
+
 /* Set by the audio thread when the current track information has updated
  * and the WPS may need to update its cached information */
 static bool track_changed = false;
@@ -641,6 +645,9 @@ static void audio_skip(int direction)
         queue_post(&audio_queue, Q_AUDIO_SKIP, direction);
         /* Update wps while our message travels inside deep playback queues. */
         wps_offset += direction;
+        /* Immediately update the playlist index */
+        playlist_next(direction);
+        last_peek_offset -= direction;
         track_changed = true;
     }
     else
@@ -1456,8 +1463,11 @@ static void buffering_audio_callback(enum callback_event ev, int value)
     switch (ev)
     {
         case EVENT_BUFFER_LOW:
-            LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
-            queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+            if (!lowbuffer_event_sent) {
+                LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
+                queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+                lowbuffer_event_sent = true;
+            }
             break;
 
         case EVENT_HANDLE_REBUFFER:
@@ -1466,6 +1476,7 @@ static void buffering_audio_callback(enum callback_event ev, int value)
             break;
 
         case EVENT_HANDLE_FINISHED:
+            logf("handle %d finished buffering", value);
             strip_tags(value);
             break;
 
@@ -1885,6 +1896,10 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
     bool had_next_track = audio_next_track() != NULL;
     bool continue_buffering;
 
+    /* No need to rebuffer if there are track skips pending. */
+    if (ci.new_track != 0)
+        return;
+
     /* Must reset the buffer before use if trashed or voice only - voice
        file size shouldn't have changed so we can go straight from
        BUFFER_STATE_VOICED_ONLY to BUFFER_STATE_INITIALIZED */
@@ -1920,6 +1935,7 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
         track_changed = true;
 
     audio_generate_postbuffer_events();
+    lowbuffer_event_sent = false;
 }
 
 static void audio_rebuffer(void)
@@ -1991,12 +2007,13 @@ static int audio_check_new_track(void)
                 return Q_CODEC_REQUEST_FAILED;
             }
     }
-    /* Update the playlist */
-    last_peek_offset -= ci.new_track;
 
-    if (auto_dir_skip || !automatic_skip)
+    if (auto_dir_skip)
     {
-        /* If the track change was manual or the result of an auto dir skip,
+        /* Update the playlist */
+        last_peek_offset -= ci.new_track;
+
+        /* If the track change was the result of an auto dir skip,
            we need to update the playlist now */
         next_playlist_index = playlist_next(ci.new_track);
 
@@ -2051,9 +2068,8 @@ static int audio_check_new_track(void)
     {
         playlist_end = false;
         wps_offset = -ci.new_track;
+        track_changed = true;
     }
-
-    track_changed = true;
 
     /* If it is not safe to even skip this many track entries */
     if (ci.new_track >= track_count || ci.new_track <= track_count - MAX_TRACK)
@@ -2286,8 +2302,11 @@ static void audio_new_playlist(void)
     audio_fill_file_buffer(false, 0);
 }
 
+/* Called on manual track skip */
 static void audio_initiate_track_change(long direction)
 {
+    logf("audio_initiate_track_change(%ld)", direction);
+
     playlist_end = false;
     ci.new_track += direction;
     wps_offset -= direction;
@@ -2295,6 +2314,7 @@ static void audio_initiate_track_change(long direction)
         skipped_during_pause = true;
 }
 
+/* Called on manual dir skip */
 static void audio_initiate_dir_change(long direction)
 {
     playlist_end = false;
