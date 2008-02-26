@@ -1053,8 +1053,12 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         )
     {
         show_search_progress(true, 0);
+#if !defined(HAVE_FLASH_STORAGE)
+        /* Non-flash devices might have a pause while the disk spins up so give
+           some feedback so the user knows that something is happening */
         gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG),
                        0, csi->name);
+#endif
     }
     
     if (c->currtable == allsubentries)
