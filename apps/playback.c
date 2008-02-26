@@ -630,17 +630,17 @@ void audio_resume(void)
     queue_send(&audio_queue, Q_AUDIO_PAUSE, false);
 }
 
-void audio_next(void)
+static void audio_skip(int direction)
 {
-    if (playlist_check(ci.new_track + wps_offset + 1))
+    if (playlist_check(ci.new_track + wps_offset + direction))
     {
         if (global_settings.beep)
             pcmbuf_beep(5000, 100, 2500*global_settings.beep);
 
-        LOGFQUEUE("audio > audio Q_AUDIO_SKIP 1");
-        queue_post(&audio_queue, Q_AUDIO_SKIP, 1);
+        LOGFQUEUE("audio > audio Q_AUDIO_SKIP %d", direction);
+        queue_post(&audio_queue, Q_AUDIO_SKIP, direction);
         /* Update wps while our message travels inside deep playback queues. */
-        wps_offset++;
+        wps_offset += direction;
         track_changed = true;
     }
     else
@@ -651,25 +651,14 @@ void audio_next(void)
     }
 }
 
+void audio_next(void)
+{
+    audio_skip(1);
+}
+
 void audio_prev(void)
 {
-    if (playlist_check(ci.new_track + wps_offset - 1))
-    {
-        if (global_settings.beep)
-            pcmbuf_beep(5000, 100, 2500*global_settings.beep);
-
-        LOGFQUEUE("audio > audio Q_AUDIO_SKIP -1");
-        queue_post(&audio_queue, Q_AUDIO_SKIP, -1);
-        /* Update wps while our message travels inside deep playback queues. */
-        wps_offset--;
-        track_changed = true;
-    }
-    else
-    {
-        /* No more tracks. */
-        if (global_settings.beep)
-            pcmbuf_beep(1000, 100, 1000*global_settings.beep);
-    }
+    audio_skip(-1);
 }
 
 void audio_next_dir(void)
