@@ -175,7 +175,7 @@
 #define PORTSCX_PTC_DISABLE                    (0x00000000)
 #define PORTSCX_PTC_JSTATE                     (0x00010000)
 #define PORTSCX_PTC_KSTATE                     (0x00020000)
-#define PORTSCX_PTC_SEQNAK                     (0x00030000)
+#define PORTSCX_PTC_SE0NAK                     (0x00030000)
 #define PORTSCX_PTC_PACKET                     (0x00040000)
 #define PORTSCX_PTC_FORCE_EN                   (0x00050000)
 #define PORTSCX_PTC_BIT_POS                    (16)
@@ -530,6 +530,29 @@ void usb_drv_reset_endpoint(int endpoint, bool send)
     while (REG_ENDPTFLUSH & mask);
 }
 
+void usb_drv_set_test_mode(int mode)
+{
+    switch(mode){
+        case 0:
+            REG_PORTSC1 &= ~PORTSCX_PORT_TEST_CTRL;
+            break;
+        case 1:
+            REG_PORTSC1 |= PORTSCX_PTC_JSTATE;
+            break;
+        case 2:
+            REG_PORTSC1 |= PORTSCX_PTC_KSTATE;
+            break;
+        case 3:
+            REG_PORTSC1 |= PORTSCX_PTC_SE0NAK;
+            break;
+        case 4:
+            REG_PORTSC1 |= PORTSCX_PTC_PACKET;
+            break;
+        case 5:
+            REG_PORTSC1 |= PORTSCX_PTC_FORCE_EN;
+            break;
+    }
+}
 
 /*-------------------------------------------------------------------------*/
 

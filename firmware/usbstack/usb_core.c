@@ -571,11 +571,24 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
 
         case USB_REQ_SET_FEATURE:
             logf("usb_core: SET_FEATURE");
-            if (req->wValue)
-                usb_drv_stall(req->wIndex & 0xf, true,(req->wIndex & 0x80) !=0);
-            else
-                usb_drv_stall(req->wIndex & 0xf, false,(req->wIndex & 0x80) !=0);
-            ack_control(req);
+            switch(req->bRequestType & 0x0f){
+                case 0: /* Device */
+                    if(req->wValue == 2) { /* TEST_MODE */
+                        int mode=req->wIndex>>8;
+                        ack_control(req);
+                        usb_drv_set_test_mode(mode);
+                    }
+                    break;
+                case 2: /* Endpoint */
+                    if (req->wValue)
+                        usb_drv_stall(req->wIndex & 0xf, true,(req->wIndex & 0x80) !=0);
+                    else
+                        usb_drv_stall(req->wIndex & 0xf, false,(req->wIndex & 0x80) !=0);
+                    ack_control(req);
+                    break;
+                default:
+                    break;
+            }
             break;
 
         case USB_REQ_SET_ADDRESS: {
