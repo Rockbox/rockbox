@@ -75,11 +75,7 @@ static const struct usb_device_descriptor device_descriptor= {
     .bcdDevice          = 0x0100,
     .iManufacturer      = 1,
     .iProduct           = 2,
-#ifdef USE_ROCKBOX_USB
     .iSerialNumber      = 3,
-#else
-    .iSerialNumber      = 0,
-#endif
     .bNumConfigurations = 1
 };
 
@@ -317,7 +313,7 @@ static void set_serial_descriptor(void)
 
     /* We need to convert from a little-endian 64-bit int
        into a utf-16 string of hex characters */
-    short* p = &usb_string_iSerial.wString[15];
+    short* p = &usb_string_iSerial.wString[23];
     uint32_t x;
     int i,j;
 
@@ -330,7 +326,7 @@ static void set_serial_descriptor(void)
           x >>= 4;
        }
     }
-    usb_string_iSerial.bLength=34;
+    usb_string_iSerial.bLength=50;
 }
 #elif defined(HAVE_AS3514)
 static void set_serial_descriptor(void)
