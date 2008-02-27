@@ -1057,7 +1057,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         /* Show search progress straight away if the disk needs to spin up,
            otherwise show it after the normal 1/2 second delay */
         show_search_progress(
-#if !defined(HAVE_FLASH_STORAGE)
+#if !defined(HAVE_FLASH_STORAGE) && !defined(SIMULATOR)
             ata_disk_is_active()
 #else
             true
