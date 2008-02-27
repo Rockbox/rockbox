@@ -932,13 +932,15 @@ static bool show_search_progress(bool init, int count)
 {
     static int last_tick = 0;
     
+    /* Don't show splashes for 1/2 second after starting search */
     if (init)
     {
-        last_tick = current_tick;
+        last_tick = current_tick + HZ/2;
         return true;
     }
     
-    if (current_tick - last_tick > HZ/4)
+    /* Update progress every 1/10 of a second */
+    if (current_tick - last_tick > HZ/10)
     {
         gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG), count,
                           str(LANG_OFF_ABORT));
@@ -1052,13 +1054,15 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
 #endif
         )
     {
-        show_search_progress(true, 0);
+        /* Show search progress straight away if the disk needs to spin up,
+           otherwise show it after the normal 1/2 second delay */
+        show_search_progress(
 #if !defined(HAVE_FLASH_STORAGE)
-        /* Non-flash devices might have a pause while the disk spins up so give
-           some feedback so the user knows that something is happening */
-        gui_syncsplash(0, str(LANG_PLAYLIST_SEARCH_MSG),
-                       0, csi->name);
+            ata_disk_is_active()
+#else
+            true
 #endif
+            , 0);
     }
     
     if (c->currtable == allsubentries)
@@ -1232,7 +1236,7 @@ static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         
         if (init && !tcs->ramsearch)
         {
-            if (!show_search_progress(false, i))
+            if (!show_search_progress(false, total_count))
             {
                 tagcache_search_finish(tcs);
                 return current_entry_count;
