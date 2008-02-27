@@ -143,13 +143,13 @@ start:
     */
 #if MEM < 32
     move.l  #0x31002324,%d0 /* DACR0 - Base 0x31000000, Banks on 21 and up,
-                               CAS latency 1, Page mode, No refresh yet */
+                               CAS latency 2, Page mode, No refresh yet */
     move.l  %d0,(0x108,%a0)
     move.l  #0x00fc0001,%d0 /* Size: 16M */
     move.l  %d0,(0x10c,%a0) /* DMR0 - 32Mb */
 #else
     move.l  #0x31002524,%d0 /* DACR0 - Base 0x31000000, Banks on 23 and up,
-                               CAS latency 1, Page mode, No refresh yet */
+                               CAS latency 2, Page mode, No refresh yet */
     move.l  %d0,(0x108,%a0)
     move.l  #0x03fc0001,%d0 /* Size: 64M because of workaround above */
     move.l  %d0,(0x10c,%a0) /* DMR0 - 32Mb */
@@ -177,7 +177,7 @@ start:
     or.l    %d0,(0x108,%a0)
 
     move.l  #0xabcd1234,%d0
-    move.l  %d0,0x31000800  /* A12=1 means CASL=1 (a0 is not connected) */
+    move.l  %d0,0x31000800  /* A11=1 means CASL=2 (connected to SDRAM A5). */
 
     /* DACR0[IMRS] gets deactivated by the SDRAM controller */
     
