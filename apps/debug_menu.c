@@ -1874,6 +1874,17 @@ static int disk_callback(int btn, struct gui_synclist *lists)
              "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
     return btn;
 }
+
+static bool dbg_identify_info(void)
+{
+    int fd = creat("/identify_info.bin");
+    if(fd >= 0)
+    {
+        write(fd, ata_get_identify(), SECTOR_SIZE);
+        close(fd);
+    }
+    return false;
+}
 #endif /* !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP) */
 static bool dbg_disk_info(void)
 {
@@ -2386,6 +2397,9 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #ifndef SIMULATOR
         { "View disk info", dbg_disk_info },
+#if !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP)
+        { "Dump ATA identify info", dbg_identify_info},
+#endif
 #endif
 #ifdef HAVE_DIRCACHE
         { "View dircache info", dbg_dircache_info },
