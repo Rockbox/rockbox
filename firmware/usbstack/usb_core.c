@@ -28,8 +28,6 @@
 #include "usb_drv.h"
 #include "usb_core.h"
 
-#define USB_THREAD
-
 #if defined(USB_STORAGE)
 #include "usb_storage.h"
 #endif
@@ -289,28 +287,14 @@ static struct usb_string_descriptor* usb_strings[] =
 
 static int usb_address = 0;
 static bool initialized = false;
-static bool data_connection = false;
-static struct event_queue usbcore_queue;
 static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
-#ifdef USB_THREAD
-static const char usbcore_thread_name[] = "usb_core";
-static struct thread_entry* usbcore_thread;
-static long usbcore_stack[DEFAULT_STACK_SIZE];
-static void usb_core_thread(void);
-#endif
-
-#ifdef USE_ROCKBOX_USB
+static bool usb_core_storage_enabled = false;
+static bool usb_core_serial_enabled = false;
 static bool usb_core_charging_enabled = false;
-static bool usb_core_storage_enabled = true;
-static bool usb_core_serial_enabled = true;
 #if defined(USB_BENCHMARK)
 static bool usb_core_benchmark_enabled = false;
 #endif
-#else
-static bool usb_core_charging_enabled = true;
-#endif
-
 
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
 static int ack_control(struct usb_ctrlrequest* req);
@@ -318,16 +302,7 @@ static int ack_control(struct usb_ctrlrequest* req);
 static unsigned char *response_data;
 static unsigned char __response_data[CACHEALIGN_UP(256)] CACHEALIGN_ATTR;
 
-struct usb_core_event 
-{
-    unsigned char endpoint;
-    bool in;
-    int status;
-    int length;
-    void* data;
-};
-
-static struct usb_core_event events[NUM_ENDPOINTS];
+static struct usb_transfer_completion_event_data events[NUM_ENDPOINTS];
 
 #ifdef IPOD_ARCH
 static void set_serial_descriptor(void)
@@ -408,22 +383,17 @@ void usb_core_init(void)
 
     response_data = (void*)UNCACHED_ADDR(&__response_data);
 
-    queue_init(&usbcore_queue, false);
     usb_drv_init();
+
+    /* class driver init functions should be safe to call even if the driver
+     * won't be used. This simplifies other logic (i.e. we don't need to know
+     * yet which drivers will be enabled */
 #ifdef USB_STORAGE
     usb_storage_init();
 #endif
 
 #ifdef USB_SERIAL
     usb_serial_init();
-#endif
-
-#ifdef USB_THREAD
-    usbcore_thread =
-        create_thread(usb_core_thread, usbcore_stack, sizeof(usbcore_stack), 0,
-                      usbcore_thread_name
-                      IF_PRIO(, PRIORITY_SYSTEM)
-                      IF_COP(, CPU));
 #endif
 
 #ifdef USB_BENCHMARK
@@ -438,71 +408,57 @@ void usb_core_exit(void)
 {
     if (initialized) {
         usb_drv_exit();
-#ifdef USB_THREAD
-        queue_post(&usbcore_queue, USB_CORE_QUIT, 0);
-        thread_wait(usbcore_thread);
-#endif
-        queue_delete(&usbcore_queue);
     }
-    data_connection = false;
     initialized = false;
     logf("usb_core_exit() finished");
 }
 
-bool usb_core_data_connection(void)
+void usb_core_handle_transfer_completion(struct usb_transfer_completion_event_data* event)
 {
-    return data_connection;
-}
-
-#ifdef USB_THREAD
-void usb_core_thread(void)
-{
-    while (1) {
-        struct queue_event ev;
-
-        queue_wait(&usbcore_queue, &ev);
-        if (ev.id == USB_CORE_QUIT) {
-            cancel_cpu_boost();
-            return;
-        }
-
-        if (ev.id == USB_CORE_TRANSFER_COMPLETION) {
-            struct usb_core_event* event = (struct usb_core_event*)ev.data;
-            switch(event->endpoint) {
-                case EP_CONTROL:
-                    logf("ctrl handled %ld",current_tick);
-                    usb_core_control_request_handler((struct usb_ctrlrequest*)event->data);
-                    break;
+    switch(event->endpoint) {
+        case EP_CONTROL:
+            logf("ctrl handled %ld",current_tick);
+            usb_core_control_request_handler((struct usb_ctrlrequest*)event->data);
+            break;
 #ifdef USB_STORAGE
-                case EP_MASS_STORAGE:
-                    usb_storage_transfer_complete(event->in,event->status,event->length);
-                    break;
+        case EP_MASS_STORAGE:
+            usb_storage_transfer_complete(event->in,event->status,event->length);
+            break;
 #endif
 #ifdef USB_SERIAL
-                case EP_SERIAL:
-                    usb_serial_transfer_complete(event->in,event->status,event->length);
-                    break;
+        case EP_SERIAL:
+            usb_serial_transfer_complete(event->in,event->status,event->length);
+            break;
 #endif
 #ifdef USB_BENCHMARK
-                case EP_BENCHMARK:
-                    usb_benchmark_transfer_complete(event->in);
-                    break;
+        case EP_BENCHMARK:
+            usb_benchmark_transfer_complete(event->in);
+            break;
 #endif
 #ifdef USB_CHARGING_ONLY
-                case EP_CHARGING_ONLY:
-                    break;
+        case EP_CHARGING_ONLY:
+            break;
 #endif
-            }
-        }
     }
 }
-#endif
+
+void usb_core_enable_protocol(int driver,bool enabled)
+{
+    switch(driver) {
+	case USB_DRIVER_MASS_STORAGE:
+            usb_core_storage_enabled = enabled;
+            break;
+	case USB_DRIVER_SERIAL:
+            usb_core_serial_enabled = enabled;
+            break;
+	case USB_DRIVER_CHARGING_ONLY:
+            usb_core_charging_enabled = enabled;
+            break;
+    }
+}
 
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
 {
-    /* note: interrupt context */
-    data_connection = true;
-
     if(usb_state == DEFAULT) {
         set_serial_descriptor();
     }
@@ -766,13 +722,13 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
             }
             break;
     }
+    logf("control handled");
 }
 
 /* called by usb_drv_int() */
 void usb_core_bus_reset(void)
 {
     usb_address = 0;
-    data_connection = false;
     usb_state = DEFAULT;
 }
 
@@ -795,7 +751,7 @@ void usb_core_transfer_complete(int endpoint, bool in, int status,int length)
             events[endpoint].status=status;
             events[endpoint].length=length;
             /* All other endoints. Let the thread deal with it */
-            queue_post(&usbcore_queue, USB_CORE_TRANSFER_COMPLETION, (intptr_t)&events[endpoint]);
+            usb_signal_transfer_completion(&events[endpoint]);
             break;
     }
 }
@@ -809,7 +765,7 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
     events[0].status=0;
     events[0].length=0;
     logf("ctrl received %ld",current_tick);
-    queue_post(&usbcore_queue, USB_CORE_TRANSFER_COMPLETION,(intptr_t)&events[0]);
+    usb_signal_transfer_completion(&events[0]);
 }
 
 static int ack_control(struct usb_ctrlrequest* req)

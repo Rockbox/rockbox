@@ -70,33 +70,25 @@ void usb_init_device(void)
 void usb_enable(bool on)
 {
     if (on) {
-        usb_core_init();
-#if !defined(USE_ROCKBOX_USB)
-        /* until we have native mass-storage mode, we want to reboot on
-           usb host connect */
-#if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
-        if (button_status()==BUTTON_RIGHT)
-#endif /* defined(IRIVER_H10) || defined (IRIVER_H10_5GB) */
-        {
-#ifndef HAVE_FLASH_STORAGE
-            ata_sleepnow(); /* Immediately spindown the disk. */
-            sleep(HZ*2);
-#endif
-
-#ifdef IPOD_ARCH  /* The following code is based on ipodlinux */
+        /* if USB is detected, re-enable the USB-devices, otherwise make sure it's disabled */
+        DEV_EN |= DEV_USB0;
+        DEV_RS &=~DEV_USB0;
+        DEV_EN |= DEV_USB1;
+        DEV_RS &=~DEV_USB1;
 #if CONFIG_CPU == PP5020
-            memcpy((void *)0x40017f00, "diskmode\0\0hotstuff\0\0\1", 21);
-#elif CONFIG_CPU == PP5022
-            memcpy((void *)0x4001ff00, "diskmode\0\0hotstuff\0\0\1", 21);
-#endif /* CONFIG_CPU */
-#endif /* IPOD_ARCH */
-
-            system_reboot(); /* Reboot */
-        }
-#endif  /* USE_ROCKBOX_USB */
+        DEV_INIT2 |= INIT_USB;
+#endif
+        usb_core_init();
     }
-    else
+    else {
         usb_core_exit();
+        /* Disable USB devices */
+        DEV_EN &=~ DEV_USB0;
+        DEV_EN &=~ DEV_USB1;
+#if CONFIG_CPU == PP5020
+        DEV_INIT2 &=~ INIT_USB;
+#endif
+    }
 }
 
 static bool usb_pin_detect(void)
@@ -136,80 +128,23 @@ static bool usb_pin_detect(void)
 /* detect host or charger (INSERTED or POWERED) */
 int usb_detect(void)
 {
-    static int countdown = 0;
-    static int status = USB_EXTRACTED;
-    static bool prev_usbstatus1 = false;
-    bool usbstatus1, usbstatus2;
+    if(usb_pin_detect()) {
+        return USB_INSERTED;
+    }
+    else {
+        return USB_EXTRACTED;
+    }
+}
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
  || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
+bool firewire_detect(void)
+{
     /* GPIO C bit 1 is firewire detect */
     if (!(GPIOC_INPUT_VAL & 0x02))
         /* no charger detection needed for firewire */
-        return USB_INSERTED;
-#endif
-
-    if (countdown > 0)
-    {
-        countdown--;
-
-        usbstatus2 = usb_core_data_connection();
-        if ((countdown == 0) || usbstatus2)
-        {
-            /* We now know that we have been connected to either a charger
-               or a computer */
-            countdown = 0;
-            status = usbstatus2 ? USB_INSERTED : USB_POWERED;
-        }
-        return status;
-    }
-
-    usbstatus1 = usb_pin_detect();
-
-    if (usbstatus1 == prev_usbstatus1)
-    {
-        /* Nothing has changed, so just return previous status */
-        return status;
-    }
-    prev_usbstatus1 = usbstatus1;
-
-    if (!usbstatus1)
-    {   /* We have just been disconnected */
-        status = USB_EXTRACTED;
-
-        /* Disable USB devices */
-        DEV_EN &=~ DEV_USB0;
-        DEV_EN &=~ DEV_USB1;
-#if CONFIG_CPU == PP5020
-        DEV_INIT2 &=~ INIT_USB;
-#endif
-
-        return status;
-    } else {
-        /* if USB is detected, re-enable the USB-devices, otherwise make sure it's disabled */
-        DEV_EN |= DEV_USB0;
-        DEV_RS &=~DEV_USB0;
-        DEV_EN |= DEV_USB1;
-        DEV_RS &=~DEV_USB1;
-#if CONFIG_CPU == PP5020
-        DEV_INIT2 |= INIT_USB;
-#endif
-    }
-
-    /* Run the USB stack to request full bus power */
-    usb_core_init();
-
-    if((button_status() & ~USBPOWER_BTN_IGNORE) == USBPOWER_BUTTON)
-    {   
-        /* The user wants to charge, so it doesn't matter what we are
-           connected to. */
-        status = USB_POWERED;
-        return status;
-    }
-
-    /* Wait up to 100 ticks (1s) before deciding there is no computer
-       attached. */
-    countdown = 100;
-
-    return status;
+        return true;
+    else
+        return false;
 }
+#endif

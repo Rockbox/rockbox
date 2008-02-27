@@ -457,7 +457,9 @@ static void init(void)
 #endif
             {
                 usb_screen();
+#ifndef HAVE_USBSTACK
                 mounted = true; /* mounting done @ end of USB mode */
+#endif
             }
 #ifdef HAVE_USB_POWER
         if (usb_powered())      /* avoid deadlock */

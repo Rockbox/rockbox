@@ -20,33 +20,22 @@
 #define USB_CORE_H
 
 #ifndef BOOTLOADER
-#define USB_THREAD
 
-#ifdef USE_ROCKBOX_USB
 //#define USB_SERIAL
 //#define USB_BENCHMARK
 #define USB_STORAGE
-
-#else
 #define USB_CHARGING_ONLY
-
-#endif /* USE_ROCKBOX_USB */
-#else
+#else /* BOOTLOADER */
 #define USB_CHARGING_ONLY
 #endif /* BOOTLOADER */
 
 #include "usb_ch9.h"
+#include "usb.h"
 
 #if defined(CPU_PP)
 #define USB_IRAM_ORIGIN   ((unsigned char *)0x4000c000)
 #define USB_IRAM_SIZE     ((size_t)0xc000)
 #endif
-
-
-enum {
-	USB_CORE_QUIT,
-	USB_CORE_TRANSFER_COMPLETION
-};
 
 /* endpoints */
 enum {
@@ -66,16 +55,6 @@ enum {
 	NUM_ENDPOINTS
 };
 
-
-/* queue events */
-#define USB_TRANSFER_COMPLETE 1
-
-struct queue_msg {
-    int endpoint;
-    int length;
-    void* data;
-};
-
 extern int usb_max_pkt_size;
 
 void usb_core_init(void);
@@ -83,7 +62,8 @@ void usb_core_exit(void);
 void usb_core_control_request(struct usb_ctrlrequest* req);
 void usb_core_transfer_complete(int endpoint, bool in, int status, int length);
 void usb_core_bus_reset(void);
-bool usb_core_data_connection(void);
-
+bool usb_core_exclusive_connection(void);
+void usb_core_enable_protocol(int driver,bool enabled);
+void usb_core_handle_transfer_completion(struct usb_transfer_completion_event_data* event);
 #endif
 

@@ -23,15 +23,17 @@
 #include "button.h"
 
 /* Messages from usb_tick and thread states */
-#define USB_INSERTED    1
-#define USB_EXTRACTED   2 
-#ifdef HAVE_MMC
-#define USB_REENABLE    3
-#endif
+enum {
+	USB_INSERTED,
+	USB_EXTRACTED,
+	USB_REENABLE,
+	USB_POWERED,
+	USB_TRANSFER_COMPLETION,
+	USB_REQUEST_REBOOT
+};
+
 
 #ifdef HAVE_USB_POWER
-#define USB_POWERED     4
-
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define USBPOWER_BUTTON BUTTON_F1
 #define USBPOWER_BTN_IGNORE BUTTON_ON
@@ -70,6 +72,16 @@ enum {
     USB_DRIVER_COUNT
 };
 #endif
+#ifdef HAVE_USBSTACK
+struct usb_transfer_completion_event_data
+{
+    unsigned char endpoint;
+    bool in;
+    int status;
+    int length;
+    void* data;
+};
+#endif
 
 
 void usb_init(void);
@@ -86,6 +98,15 @@ bool usb_powered(void);
 bool usb_charging_enable(bool on);
 bool usb_charging_enabled(void);
 #endif
+#endif
+#ifdef HAVE_USBSTACK
+void usb_signal_transfer_completion(struct usb_transfer_completion_event_data* event_data);
+bool usb_driver_enabled(int driver);
+#endif
+
+#if defined(IPOD_COLOR) || defined(IPOD_4G) \
+ || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
+bool firewire_detect(void);
 #endif
 
 #endif

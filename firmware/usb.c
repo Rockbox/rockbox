@@ -37,6 +37,9 @@
 #include "sprintf.h"
 #include "string.h"
 #include "usb-target.h"
+#ifdef HAVE_USBSTACK
+#include "usb_core.h"
+#endif
 #ifdef IRIVER_H300_SERIES
 #include "pcf50606.h"        /* for pcf50606_usb_charging_... */
 #endif
@@ -65,13 +68,23 @@ static int usb_mmc_countdown = 0;
 #ifndef BOOTLOADER
 static long usb_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
+static struct thread_entry *usb_thread_entry;
 #endif
 static struct event_queue usb_queue;
 static int last_usb_status;
 static bool usb_monitor_enabled;
 
 
+#if defined(IPOD_COLOR) || defined(IPOD_4G) \
+ || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
+static int firewire_countdown;
+static bool last_firewire_status;
+#endif
+
+
+
 #ifndef BOOTLOADER
+#ifndef HAVE_USBSTACK
 static void usb_slave_mode(bool on)
 {
     int rc;
@@ -88,10 +101,8 @@ static void usb_slave_mode(bool on)
     {
         DEBUGF("Leaving USB slave mode\n");
 
-#ifndef HAVE_USBSTACK
         /* Let the ISDx00 settle */
         sleep(HZ*1);
-#endif
         
         usb_enable(false);
 
@@ -116,6 +127,30 @@ static void usb_slave_mode(bool on)
 
     }
 }
+#endif
+
+static void try_reboot(void)
+{
+#if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
+    if (button_status()==BUTTON_RIGHT)
+#endif /* defined(IRIVER_H10) || defined (IRIVER_H10_5GB) */
+    {
+#ifndef HAVE_FLASH_STORAGE
+        ata_sleepnow(); /* Immediately spindown the disk. */
+        sleep(HZ*2);
+#endif
+
+#ifdef IPOD_ARCH  /* The following code is based on ipodlinux */
+#if CONFIG_CPU == PP5020
+        memcpy((void *)0x40017f00, "diskmode\0\0hotstuff\0\0\1", 21);
+#elif CONFIG_CPU == PP5022
+        memcpy((void *)0x4001ff00, "diskmode\0\0hotstuff\0\0\1", 21);
+#endif /* CONFIG_CPU */
+#endif /* IPOD_ARCH */
+
+        system_reboot(); /* Reboot */
+    }
+}
 
 static void usb_thread(void)
 {
@@ -130,6 +165,11 @@ static void usb_thread(void)
         queue_wait(&usb_queue, &ev);
         switch(ev.id)
         {
+#ifdef HAVE_USBSTACK
+            case USB_TRANSFER_COMPLETION:
+                usb_core_handle_transfer_completion((struct usb_transfer_completion_event_data*)ev.data);
+                break;
+#endif
 #ifdef HAVE_USB_POWER
             case USB_POWERED:
                 usb_state = USB_POWERED;
@@ -147,6 +187,12 @@ static void usb_thread(void)
                 if((button_status() & ~USBPOWER_BTN_IGNORE) == USBPOWER_BUTTON)
                 {
                     usb_state = USB_POWERED;
+#ifdef HAVE_USBSTACK
+                    usb_core_enable_protocol(USB_DRIVER_MASS_STORAGE,false);
+                    usb_core_enable_protocol(USB_DRIVER_SERIAL,false);/* TODO: add debug setting */
+                    usb_core_enable_protocol(USB_DRIVER_CHARGING_ONLY,true);
+                    usb_enable(true);
+#endif
                 }
                 else
 #endif
@@ -168,9 +214,26 @@ static void usb_thread(void)
                     if(num_acks_to_expect == 0)
                     {
                         DEBUGF("All threads have acknowledged the connect.\n");
+#ifdef HAVE_USBSTACK
+#ifdef HAVE_PRIORITY_SCHEDULING
+                        thread_set_priority(usb_thread_entry,PRIORITY_REALTIME);
+#endif
+#ifdef USE_ROCKBOX_USB
+                        usb_core_enable_protocol(USB_DRIVER_MASS_STORAGE,true);
+                        usb_core_enable_protocol(USB_DRIVER_SERIAL,false);/* TODO: add debug setting */
+                        usb_core_enable_protocol(USB_DRIVER_CHARGING_ONLY,false);
+                        usb_enable(true);
+#else /* USE_ROCKBOX_USB */
+                        /* until we have native mass-storage mode, we want to reboot on
+                           usb host connect */
+                        try_reboot();
+#endif  /* USE_ROCKBOX_USB */
+
+#else
                         usb_slave_mode(true);
-                        usb_state = USB_INSERTED;
                         cpu_idle_mode(true);
+#endif
+                        usb_state = USB_INSERTED;
                     }
                     else
                     {
@@ -181,6 +244,12 @@ static void usb_thread(void)
                 break;
 
             case USB_EXTRACTED:
+#ifdef HAVE_USBSTACK
+                usb_enable(false);
+#ifdef HAVE_PRIORITY_SCHEDULING
+                thread_set_priority(usb_thread_entry,PRIORITY_SYSTEM);
+#endif
+#endif
 #ifdef HAVE_LCD_BITMAP
                 if(do_screendump_instead_of_usb)
                     break;
@@ -192,6 +261,7 @@ static void usb_thread(void)
                     break;
                 }
 #endif
+#ifndef HAVE_USBSTACK
                 if(usb_state == USB_INSERTED)
                 {
                     /* Only disable the USB mode if we really have enabled it
@@ -200,6 +270,7 @@ static void usb_thread(void)
                     usb_slave_mode(false);
                     cpu_idle_mode(false);
                 }
+#endif
 
                 usb_state = USB_EXTRACTED;
 
@@ -243,11 +314,21 @@ static void usb_thread(void)
                     usb_enable(true);  /* reenable only if still inserted */
                 break;
 #endif
+            case USB_REQUEST_REBOOT:
+                if((button_status() & ~USBPOWER_BTN_IGNORE) != USBPOWER_BUTTON)
+                    try_reboot();
+                break;
         }
     }
 }
 #endif
 
+#ifdef HAVE_USBSTACK
+void usb_signal_transfer_completion(struct usb_transfer_completion_event_data* event_data)
+{
+    queue_post(&usb_queue, USB_TRANSFER_COMPLETION, (intptr_t)event_data);
+}
+#endif
 
 #ifndef BOOTLOADER
 static void usb_tick(void)
@@ -256,6 +337,29 @@ static void usb_tick(void)
 
     if(usb_monitor_enabled)
     {
+#if defined(IPOD_COLOR) || defined(IPOD_4G) \
+ || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
+        int current_firewire_status = firewire_detect();
+        if(current_firewire_status != last_firewire_status)
+        {
+            last_firewire_status = current_firewire_status;
+            firewire_countdown = NUM_POLL_READINGS;
+        }
+        else
+        {
+            /* Count down until it gets negative */
+            if(firewire_countdown >= 0)
+                firewire_countdown--;
+
+            /* Report to the thread if we have had 3 identical status
+               readings in a row */
+            if(firewire_countdown == 0)
+            {
+                queue_post(&usb_queue, USB_REQUEST_REBOOT, 0);
+            }
+        }
+#endif
+
         current_status = usb_detect();
     
         /* Only report when the status has changed */
@@ -300,18 +404,24 @@ void usb_init(void)
     usb_monitor_enabled = false;
     countdown = -1;
 
+#if defined(IPOD_COLOR) || defined(IPOD_4G) \
+ || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
+    firewire_countdown = -1;
+    last_firewire_status = false;
+#endif
+
     usb_init_device();
     usb_enable(false);
 
     /* We assume that the USB cable is extracted */
-    last_usb_status = false;
+    last_usb_status = USB_EXTRACTED;
 
 #ifndef BOOTLOADER
     queue_init(&usb_queue, true);
     
-    create_thread(usb_thread, usb_stack, sizeof(usb_stack), 0, 
-                  usb_thread_name IF_PRIO(, PRIORITY_SYSTEM)
-		          IF_COP(, CPU));
+    usb_thread_entry = create_thread(usb_thread, usb_stack,
+                       sizeof(usb_stack), 0, usb_thread_name
+                       IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU));
 
     tick_add_task(usb_tick);
 #endif
