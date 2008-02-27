@@ -25,6 +25,8 @@
 #include "ata.h"
 #include "hotswap.h"
 #include "disk.h"
+/* Needed to get at the audio buffer */
+#include "audio.h"
 
 #ifdef USB_STORAGE
 
@@ -162,35 +164,17 @@ struct format_capacity {
     unsigned int block_size;
 } __attribute__ ((packed));
 
-static unsigned char _transfer_buffer[2*BUFFER_SIZE] __attribute((aligned (4096)));
 static unsigned char* transfer_buffer;
 
 static struct inquiry_data* inquiry;
-static unsigned char __inquiry[CACHEALIGN_UP(sizeof(struct inquiry_data))] CACHEALIGN_ATTR;
-
 static struct capacity* capacity_data;
-static unsigned char __capacity_data[CACHEALIGN_UP(sizeof(struct capacity))] CACHEALIGN_ATTR;
-
 static struct format_capacity* format_capacity_data;
-static unsigned char __format_capacity_data[CACHEALIGN_UP(sizeof(struct format_capacity))] CACHEALIGN_ATTR;
-
 static struct sense_data *sense_data;
-static unsigned char __sense_data[CACHEALIGN_UP(sizeof(struct sense_data))] CACHEALIGN_ATTR;
-
 static struct mode_sense_header_6 *mode_sense_data_6;
-static unsigned char __mode_sense_data_6[CACHEALIGN_UP(sizeof(struct mode_sense_header_6))] CACHEALIGN_ATTR;
-
 static struct mode_sense_header_10 *mode_sense_data_10;
-static unsigned char __mode_sense_data_10[CACHEALIGN_UP(sizeof(struct mode_sense_header_10))] CACHEALIGN_ATTR;
-
 static struct report_lun_data *lun_data;
-static unsigned char __lun_data[CACHEALIGN_UP(sizeof(struct report_lun_data))] CACHEALIGN_ATTR;
-
 static struct command_status_wrapper* csw;
-static unsigned char __csw[CACHEALIGN_UP(sizeof(struct command_status_wrapper))] CACHEALIGN_ATTR;
-
 static char *max_lun;
-static unsigned char __max_lun[CACHEALIGN_UP(1)] CACHEALIGN_ATTR;
 
 static struct {
     unsigned int sector;
@@ -227,16 +211,19 @@ static enum {
 /* called by usb_code_init() */
 void usb_storage_init(void)
 {
-    transfer_buffer = (void*)UNCACHED_ADDR(&_transfer_buffer);
-    inquiry = (void*)UNCACHED_ADDR(&__inquiry);
-    capacity_data = (void*)UNCACHED_ADDR(&__capacity_data);
-    format_capacity_data = (void*)UNCACHED_ADDR(&__format_capacity_data);
-    sense_data = (void*)UNCACHED_ADDR(&__sense_data);
-    mode_sense_data_6 = (void*)UNCACHED_ADDR(&__mode_sense_data_6);
-    mode_sense_data_10 = (void*)UNCACHED_ADDR(&__mode_sense_data_10);
-    lun_data = (void*)UNCACHED_ADDR(&__lun_data);
-    max_lun = (void*)UNCACHED_ADDR(&__max_lun);
-    csw = (void*)UNCACHED_ADDR(&__csw);
+    size_t bufsize;
+    unsigned char * audio_buffer = audio_get_buffer(false,&bufsize);
+    /* TODO : check if bufsize is at least 32K ? */
+    transfer_buffer = (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 32) & 0xffffffe0);
+    inquiry = (void*)transfer_buffer;
+    capacity_data = (void*)transfer_buffer;
+    format_capacity_data = (void*)transfer_buffer;
+    sense_data = (void*)transfer_buffer;
+    mode_sense_data_6 = (void*)transfer_buffer;
+    mode_sense_data_10 = (void*)transfer_buffer;
+    lun_data = (void*)transfer_buffer;
+    max_lun = (void*)transfer_buffer;
+    csw = (void*)transfer_buffer;
     logf("usb_storage_init done");
 }
 
