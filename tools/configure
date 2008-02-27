@@ -174,11 +174,18 @@ EOF
  fi
 }
 
+#
+# functions for setting up cross-compiler names and options
+# also set endianess and what the exact recommended gcc version is
+# the gcc version should most likely match what versions we build with
+# rockboxdev.sh
+#
 shcc () {
  prefixtools sh-elf-
  GCCOPTS="$CCOPTS -m1"
  GCCOPTIMIZE="-fomit-frame-pointer -fschedule-insns"
  endian="big"
+ gccchoice="4.0.3"
 }
 
 calmrisccc () {
@@ -193,6 +200,7 @@ coldfirecc () {
  GCCOPTS="$CCOPTS -m5206e -Wa\,-m5249 -malign-int -mstrict-align"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="big"
+ gccchoice="3.4.6"
 }
 
 arm7tdmicc () {
@@ -203,6 +211,7 @@ arm7tdmicc () {
  fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
+ gccchoice="4.0.3"
 }
 
 arm9tdmicc () {
@@ -210,6 +219,7 @@ arm9tdmicc () {
  GCCOPTS="$CCOPTS -mcpu=arm9tdmi -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
+ gccchoice="4.0.3"
 }
 
 arm946cc () {
@@ -217,13 +227,7 @@ arm946cc () {
  GCCOPTS="$CCOPTS -mcpu=arm9e -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
-}
-
-arm9cc () {
- prefixtools arm-elf-
- GCCOPTS="$CCOPTS -mcpu=arm9 -mlong-calls"
- GCCOPTIMIZE="-fomit-frame-pointer"
- endian="little"
+ gccchoice="4.0.3"
 }
 
 arm926ejscc () {
@@ -231,6 +235,7 @@ arm926ejscc () {
  GCCOPTS="$CCOPTS -mcpu=arm926ej-s -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
+ gccchoice="4.0.3"
 }
 
 arm1136jfscc () {
@@ -238,6 +243,7 @@ arm1136jfscc () {
  GCCOPTS="$CCOPTS -mcpu=arm1136jf-s -mlong-calls"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
+ gccchoice="4.0.3"
 }
 
 whichadvanced () {
@@ -1720,7 +1726,28 @@ else
    GCCOPTS="$GCCOPTS -Wno-override-init"
  fi
 
+ case $prefix in
+   "")
+     # simulator
+   ;;
+   i586-mingw32msvc-)
+     # cross-compile for win32
+   ;;
+   *)
+   # Verify that the cross-compiler is of a recommended version!
+   if test "$gccver" != "$gccchoice"; then
+     echo "WARNING: Your cross-compiler $CC $gccver is not of the recommended"
+     echo "WARNING: version $gccchoice!"
+     echo "WARNING: This may cause your build to fail since it may be a version"
+     echo "WARNING: that isn't functional or known to not be the best choice."
+     echo "WARNING: If you suffer from build problems, you know that this is"
+     echo "WARNING: a likely source for them..."
+   fi
+   ;;
+ esac
+
 fi
+
 
 echo "Using $LD $ldver"
 
