@@ -190,9 +190,12 @@ static const char graphic_numeric[] = "graphic,numeric";
 #ifdef HAVE_LCD_COLOR
   #define DEFAULT_ICONSET "tango_small"
   #define DEFAULT_VIEWERS_ICONSET "tango_small_viewers"
-#else
+#elif LCD_DEPTH >= 2
   #define DEFAULT_ICONSET "tango_small_mono"
   #define DEFAULT_VIEWERS_ICONSET "tango_small_viewers_mono"
+#else /* monochrome */
+  #define DEFAULT_ICONSET ""
+  #define DEFAULT_VIEWERS_ICONSET ""
 #endif
 
 #define DEFAULT_THEME_FOREGROUND LCD_RGBPACK(0xce, 0xcf, 0xce)
