@@ -315,7 +315,7 @@ static void usb_thread(void)
                 break;
 #endif
             case USB_REQUEST_REBOOT:
-#ifdef HAVE_POWER
+#ifdef HAVE_USB_POWER
                 if((button_status() & ~USBPOWER_BTN_IGNORE) != USBPOWER_BUTTON)
 #endif
                     try_reboot();
