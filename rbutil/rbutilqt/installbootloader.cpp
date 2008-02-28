@@ -378,10 +378,15 @@ void BootloaderInstaller::gigabeatFinish()
     firmwareOrig.append(".ORIG");
     QFileInfo firmwareOrigFI(firmwareOrig);
 
-    // rename the firmware, if there is no original firmware there
+    // rename and backup the firmware, if there is no original firmware there
     if(!firmwareOrigFI.exists())
     {
         QFile firmwareFile(firmware);
+        //backup
+        QDir::home().mkdir("Gigabeat Original Firmware Backup");
+        firmwareFile.copy(QDir::toNativeSeparators(QDir::homePath()) + QDir::toNativeSeparators("/Gigabeat Original Firmware Backup/") + m_bootloadername);
+        
+        //rename
         if(!firmwareFile.rename(firmwareOrig))
         {
             m_dp->addItem(tr("Could not rename: %1 to %2")
@@ -589,9 +594,15 @@ void BootloaderInstaller::h10Finish()
 
     QFileInfo firmwareOrigFI(firmwareOrig);
 
-    if(!firmwareOrigFI.exists())  //there is already a original firmware
+    if(!firmwareOrigFI.exists())  
     {
         QFile firmwareFile(firmware);
+        
+        //backup
+        QDir::home().mkdir("Iriver H10 Original Firmware Backup");
+        firmwareFile.copy(QDir::toNativeSeparators(QDir::homePath()) + QDir::toNativeSeparators("/Iriver H10 Original Firmware Backup/") + m_bootloadername);
+        
+        //rename         
         if(!firmwareFile.rename(firmwareOrig)) //rename Firmware to Original
         {
             m_dp->addItem(tr("Could not rename: %1 to %2")
@@ -600,7 +611,7 @@ void BootloaderInstaller::h10Finish()
             return;
         }
     }
-    else
+    else  //there is already a original firmware
     {
         QFile firmwareFile(firmware);
         firmwareFile.remove();
