@@ -280,6 +280,46 @@ IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
 struct thread_entry *codec_thread_p; /* For modifying thread priority later. */
 
+/* PCM buffer messaging */
+static struct event_queue pcmbuf_queue NOCACHEBSS_ATTR;
+
+/* Function to be called by pcm buffer callbacks.
+ * Permissible Context(s): Audio interrupt
+ */
+static void pcmbuf_callback_queue_post(long id, intptr_t data)
+{
+    /* No lock since we're already in audio interrupt context */
+    queue_post(&pcmbuf_queue, id, data);
+}
+
+/* Scan the pcmbuf queue and return true if a message pulled.
+ * Permissible Context(s): Thread
+ */
+static bool pcmbuf_queue_scan(struct queue_event *ev)
+{
+    if (!queue_empty(&pcmbuf_queue))
+    {
+        /* Transfer message to audio queue */
+        pcm_play_lock();
+        /* Pull message - never, ever any blocking call! */
+        queue_wait_w_tmo(&pcmbuf_queue, ev, 0);
+        pcm_play_unlock();
+        return true;
+    }
+
+    return false;
+}
+
+/* Clear the pcmbuf queue of messages
+ * Permissible Context(s): Thread
+ */
+static void pcmbuf_queue_clear(void)
+{
+    pcm_play_lock();
+    queue_clear(&pcmbuf_queue);
+    pcm_play_unlock();
+}
+
 /* --- Helper functions --- */
 
 static struct mp3entry *bufgetid3(int handle_id)
@@ -1126,7 +1166,7 @@ static void codec_track_changed(void)
 static void codec_pcmbuf_track_changed_callback(void)
 {
     pcmbuf_set_position_callback(NULL);
-    codec_track_changed();
+    pcmbuf_callback_queue_post(Q_AUDIO_TRACK_CHANGED, 0);
 }
 
 static void codec_discard_codec_callback(void)
@@ -2160,7 +2200,10 @@ static void audio_stop_codec_flush(void)
      * playing, it is now and _only_ now safe to call this function from the
      * audio thread */
     if (pcm_is_playing())
+    {
         pcmbuf_play_stop();
+        pcmbuf_queue_clear();
+    }
     pcmbuf_pause(paused);
 }
 
@@ -2428,7 +2471,8 @@ static void audio_thread(void)
     while (1)
     {
         cancel_cpu_boost();
-        queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
+        if (!pcmbuf_queue_scan(&ev))
+            queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
 
         switch (ev.id) {
             case Q_AUDIO_FILL_BUFFER:
@@ -2578,6 +2622,7 @@ void audio_init(void)
     queue_enable_queue_send(&audio_queue, &audio_queue_sender_list);
     queue_init(&codec_queue, false);
     queue_enable_queue_send(&codec_queue, &codec_queue_sender_list);
+    queue_init(&pcmbuf_queue, false);
 
     pcm_init();
 
