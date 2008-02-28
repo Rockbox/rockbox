@@ -1097,7 +1097,9 @@ static void sd_thread(void)
         case SYS_USB_CONNECTED:
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
             /* Wait until the USB cable is extracted again */
+#ifndef HAVE_USBSTACK
             usb_wait_for_disconnect(&sd_queue);
+#endif
             break;
         }
     }
