@@ -325,7 +325,7 @@ void RbUtilQt::completeInstall()
 
     if(smallInstallInner())
         return;
-
+    logger->undoAbort();
     // Fonts
     m_error = false;
     m_installed = false;
