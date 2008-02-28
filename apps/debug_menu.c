@@ -182,6 +182,8 @@ static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
         return ACTION_REDRAW;
     }
 #endif /* ROCKBOX_HAS_LOGF */
+    if (action == ACTION_NONE)
+        action = ACTION_REDRAW;
     return action;
 }
 /* Test code!!! */
