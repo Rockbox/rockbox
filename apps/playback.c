@@ -1221,11 +1221,15 @@ static bool codec_load_next_track(void)
             LOGFQUEUE("codec |< Q_CODEC_REQUEST_FAILED");
             ci.new_track = 0;
             ci.stop_codec = true;
+            LOGFQUEUE("codec > audio Q_AUDIO_STOP");
+            queue_post(&audio_queue, Q_AUDIO_STOP, 0);
             return false;
 
         default:
             LOGFQUEUE("codec |< default");
             ci.stop_codec = true;
+            LOGFQUEUE("codec > audio Q_AUDIO_STOP");
+            queue_post(&audio_queue, Q_AUDIO_STOP, 0);
             return false;
     }
 }
@@ -1337,9 +1341,6 @@ static void codec_thread(void)
 
                         if (!codec_load_next_track())
                         {
-                            LOGFQUEUE("codec > audio Q_AUDIO_STOP");
-                            /* End of playlist */
-                            queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                             break;
                         }
                     }
@@ -1356,9 +1357,6 @@ static void codec_thread(void)
                                     curtrack_id3.length - pcmbuf_get_latency();
                                 sleep(1);
                             }
-                            LOGFQUEUE("codec > audio Q_AUDIO_STOP");
-                            /* End of playlist */
-                            queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                             break;
                         }
                     }
@@ -2183,6 +2181,8 @@ static void audio_stop_playback(void)
 
         /* Save the current playing spot, or NULL if the playlist has ended */
         playlist_update_resume_info(id3);
+
+        /* TODO: Create auto bookmark too? */
 
         prev_track_elapsed = curtrack_id3.elapsed;
 
