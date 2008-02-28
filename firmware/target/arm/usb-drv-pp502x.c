@@ -353,6 +353,7 @@ bool usb_drv_powered(void)
 /* manual: 32.14.1 Device Controller Initialization */
 void usb_drv_init(void)
 {
+    trigger_cpu_boost();
     REG_USBCMD &= ~USBCMD_RUN;
     udelay(50000);
     REG_USBCMD |= USBCMD_CTRL_RESET;
@@ -405,6 +406,13 @@ void usb_drv_exit(void)
 
     /* stop usb controller */
     REG_USBCMD &= ~USBCMD_RUN;
+
+    /* TODO : is one of these needed to save power ?
+    REG_PORTSC1 |= PORTSCX_PHY_LOW_POWER_SPD;
+    REG_USBCMD |= USBCMD_CTRL_RESET;
+    */
+
+    cancel_cpu_boost();
 }
 
 void usb_drv_int(void)
