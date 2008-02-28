@@ -1590,14 +1590,10 @@ void switch_thread(struct thread_entry *old)
 {
     const unsigned int core = CURRENT_CORE;
     struct thread_entry *thread = cores[core].running;
+    struct thread_entry *block = old;
 
-    if (old == NULL)
-    {
-        /* Move to next thread */
+    if (block == NULL)
         old = thread;
-        cores[core].running = old->l.next;
-    }
-    /* else running list is already at next thread */
 
 #ifdef RB_PROFILE
     profile_thread_stopped(old - threads);
@@ -1625,6 +1621,9 @@ void switch_thread(struct thread_entry *old)
 #ifdef HAVE_PRIORITY_SCHEDULING
     /* Select the new task based on priorities and the last time a process
      * got CPU time. */
+    if (block == NULL)
+        thread = thread->l.next;
+
     for (;;)
     {
         int priority = thread->priority;
@@ -1645,6 +1644,12 @@ void switch_thread(struct thread_entry *old)
     
     /* Reset the value of thread's last running time to the current time. */
     thread->last_run = current_tick;
+#else
+    if (block == NULL)
+    {
+        thread = thread->l.next;
+        cores[core].running = thread;
+    }
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
     /* And finally give control to the next thread. */
