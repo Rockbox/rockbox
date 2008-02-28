@@ -67,9 +67,8 @@
 #define SCSI_START_STOP_UNIT      0x1b
 #define SCSI_REPORT_LUNS          0xa0
 
-#define SCSI_STATUS_GOOD            0x00
-#define SCSI_STATUS_FAIL            0x01
-#define SCSI_STATUS_CHECK_CONDITION 0x02
+#define UMS_STATUS_GOOD            0x00
+#define UMS_STATUS_FAIL            0x01
 
 #define SENSE_NOT_READY             0x02
 #define SENSE_MEDIUM_ERROR          0x03
@@ -214,7 +213,7 @@ void usb_storage_init(void)
     size_t bufsize;
     unsigned char * audio_buffer = audio_get_buffer(false,&bufsize);
     /* TODO : check if bufsize is at least 32K ? */
-    transfer_buffer = (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 32) & 0xffffffe0);
+    transfer_buffer = (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
     inquiry = (void*)transfer_buffer;
     capacity_data = (void*)transfer_buffer;
     format_capacity_data = (void*)transfer_buffer;
@@ -259,14 +258,14 @@ void usb_storage_transfer_complete(bool in,int status,int length)
                                                current_cmd.sector, MIN(BUFFER_SIZE/SECTOR_SIZE,current_cmd.count),
                                                current_cmd.data[current_cmd.data_select]);
                 if(result != 0) {
-                    send_csw(SCSI_STATUS_CHECK_CONDITION);
+                    send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
                     cur_sense_data.asc=ASC_WRITE_ERROR;
                     break;
                 }
 
                 if(next_count==0) {
-                    send_csw(SCSI_STATUS_GOOD);
+                    send_csw(UMS_STATUS_GOOD);
                 }
 
                 /* Switch buffers for the next one */
@@ -278,7 +277,7 @@ void usb_storage_transfer_complete(bool in,int status,int length)
             }
             else {
                 logf("Transfer failed %X",status);
-                send_csw(SCSI_STATUS_CHECK_CONDITION);
+                send_csw(UMS_STATUS_FAIL);
                 /* TODO fill in cur_sense_data */
                 cur_sense_data.sense_key=0;
                 cur_sense_data.information=0;
@@ -290,7 +289,13 @@ void usb_storage_transfer_complete(bool in,int status,int length)
                 logf("IN received in WAITING_FOR_COMMAND");
             }
             //logf("command received");
-            handle_scsi(cbw);
+            if(letoh32(cbw->signature) == CBW_SIGNATURE){
+                handle_scsi(cbw);
+            }
+            else {
+                usb_drv_stall(EP_MASS_STORAGE, true,true);
+                usb_drv_stall(EP_MASS_STORAGE, true,false);
+            }
             break;
         case SENDING_CSW:
             if(in==false) {
@@ -306,11 +311,11 @@ void usb_storage_transfer_complete(bool in,int status,int length)
             }
             if(status==0) {
                 //logf("data sent, now send csw");
-                send_csw(SCSI_STATUS_GOOD);
+                send_csw(UMS_STATUS_GOOD);
             }
             else {
                 logf("Transfer failed %X",status);
-                send_csw(SCSI_STATUS_CHECK_CONDITION);
+                send_csw(UMS_STATUS_FAIL);
                 /* TODO fill in cur_sense_data */
                 cur_sense_data.sense_key=0;
                 cur_sense_data.information=0;
@@ -324,7 +329,7 @@ void usb_storage_transfer_complete(bool in,int status,int length)
             if(status==0) {
                 if(current_cmd.count==0) {
                     //logf("data sent, now send csw");
-                    send_csw(SCSI_STATUS_GOOD);
+                    send_csw(UMS_STATUS_GOOD);
                 }
                 else {
                     send_and_read_next();
@@ -332,7 +337,7 @@ void usb_storage_transfer_complete(bool in,int status,int length)
             }
             else {
                 logf("Transfer failed %X",status);
-                send_csw(SCSI_STATUS_CHECK_CONDITION);
+                send_csw(UMS_STATUS_FAIL);
                 /* TODO fill in cur_sense_data */
                 cur_sense_data.sense_key=0;
                 cur_sense_data.information=0;
@@ -354,13 +359,6 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req)
 #else
             *max_lun = NUM_VOLUMES - 1;
 #endif
-#ifdef HAVE_HOTSWAP
-            /* Workaround until we find out how to do removable devices properly */
-            tCardInfo* cinfo = card_get_info(1);
-            if(cinfo->initialized==0) {
-                *max_lun=0;
-            }
-#endif
             logf("ums: getmaxlun");
             usb_drv_send(EP_CONTROL, UNCACHED_ADDR(max_lun), 1);
             usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
@@ -370,8 +368,15 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req)
 
         case USB_BULK_RESET_REQUEST:
             logf("ums: bulk reset");
+            state = WAITING_FOR_COMMAND;
+            /* UMS BOT 3.1 says The device shall preserve the value of its bulk
+             * data toggle bits and endpoint STALL conditions despite the Bulk-Only
+             * Mass Storage Reset. */
+#if 0
             usb_drv_reset_endpoint(EP_MASS_STORAGE, false);
             usb_drv_reset_endpoint(EP_MASS_STORAGE, true);
+#endif
+            
             usb_drv_send(EP_CONTROL, NULL, 0);  /* ack */
             handled = true;
             break;
@@ -392,7 +397,7 @@ static void send_and_read_next(void)
 {
     if(current_cmd.last_result!=0) {
         /* The last read failed. */
-        send_csw(SCSI_STATUS_CHECK_CONDITION);
+        send_csw(UMS_STATUS_FAIL);
         cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
         cur_sense_data.asc=ASC_READ_ERROR;
         return;
@@ -433,7 +438,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     unsigned int block_size_mult = 1;
 #ifdef HAVE_HOTSWAP
     tCardInfo* cinfo = card_get_info(lun);
-    if(cinfo->initialized==1) {
+    if(cinfo->initialized==1 && cinfo->numblocks > 0) {
         block_size = cinfo->blocksize;
         block_count = cinfo->numblocks;
     }
@@ -458,17 +463,14 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     switch (cbw->command_block[0]) {
         case SCSI_TEST_UNIT_READY:
             logf("scsi test_unit_ready %d",lun);
-#ifdef HAVE_HOTSWAP
-            if(cinfo->initialized==1)
-                send_csw(SCSI_STATUS_GOOD);
+            if(lun_present) {
+                send_csw(UMS_STATUS_GOOD);
+            }
             else {
-                send_csw(SCSI_STATUS_FAIL);
+                send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
             }
-#else
-            send_csw(SCSI_STATUS_GOOD);
-#endif
             break;
 
         case SCSI_REPORT_LUNS: {
@@ -515,12 +517,18 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         }
 
         case SCSI_MODE_SENSE_10: {
+            if(! lun_present) {
+                usb_drv_stall(EP_MASS_STORAGE, true,true);
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_NOT_READY;
+                cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                break;
+            }
             /*unsigned char pc = (cbw->command_block[2] & 0xc0) >>6;*/
             unsigned char page_code = cbw->command_block[2] & 0x3f;
             logf("scsi mode_sense_10 %d %X",lun,page_code);
             switch(page_code) {
                 case 0x3f:
-                default:
                     mode_sense_data_10->mode_data_length=0;
                     mode_sense_data_10->medium_type=0;
                     mode_sense_data_10->device_specific=0;
@@ -528,23 +536,28 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     send_command_result(mode_sense_data_10,
                               MIN(sizeof(struct mode_sense_header_10), length));
                     break;
-#if 0
                 default:
-                    send_csw(SCSI_STATUS_CHECK_CONDITION);
+                    usb_drv_stall(EP_MASS_STORAGE, true,true);
+                    send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                     cur_sense_data.asc=ASC_INVALID_FIELD_IN_CBD;
                     break;
-#endif
                 }
             break;
         }
         case SCSI_MODE_SENSE_6: {
+            if(! lun_present) {
+                usb_drv_stall(EP_MASS_STORAGE, true,true);
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_NOT_READY;
+                cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                break;
+            }
             /*unsigned char pc = (cbw->command_block[2] & 0xc0) >>6;*/
             unsigned char page_code = cbw->command_block[2] & 0x3f;
             logf("scsi mode_sense_6 %d %X",lun,page_code);
             switch(page_code) {
                 case 0x3f:
-                default:
                     /* All supported pages Since we support only one this is easy*/
                     mode_sense_data_6->mode_data_length=0;
                     mode_sense_data_6->medium_type=0;
@@ -553,61 +566,77 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     send_command_result(mode_sense_data_6,
                               MIN(sizeof(struct mode_sense_header_6), length));
                     break;
-#if 0
+                    /* TODO : windows does 1A, Power Condition. Do we need that ? */
                 default:
-                    send_csw(SCSI_STATUS_CHECK_CONDITION);
+                    usb_drv_stall(EP_MASS_STORAGE, true,true);
+                    send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                     cur_sense_data.asc=ASC_INVALID_FIELD_IN_CBD;
                     break;
-#endif
             }
             break;
         }
 
         case SCSI_START_STOP_UNIT:
             logf("scsi start_stop unit %d",lun);
-            send_csw(SCSI_STATUS_GOOD);
+            send_csw(UMS_STATUS_GOOD);
             break;
 
         case SCSI_ALLOW_MEDIUM_REMOVAL:
             logf("scsi allow_medium_removal %d",lun);
             /* TODO: use this to show the connect screen ? */
-            send_csw(SCSI_STATUS_GOOD);
+            send_csw(UMS_STATUS_GOOD);
             break;
-
         case SCSI_READ_FORMAT_CAPACITY: {
             logf("scsi read_format_capacity %d",lun);
-            format_capacity_data->following_length=htobe32(8);
-            /* Careful: "block count" actually means "number of last block" */
-            format_capacity_data->block_count = htobe32(block_count/block_size_mult - 1);
-            format_capacity_data->block_size = htobe32(block_size*block_size_mult);
-            format_capacity_data->block_size |= SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA;
+            if(lun_present) {
+                format_capacity_data->following_length=htobe32(8);
+                /* Careful: "block count" actually means "number of last block" */
+                format_capacity_data->block_count = htobe32(block_count/block_size_mult - 1);
+                format_capacity_data->block_size = htobe32(block_size*block_size_mult);
+                format_capacity_data->block_size |= SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA;
 
-            send_command_result(format_capacity_data,
-                      MIN(sizeof(struct format_capacity), length));
-
+                send_command_result(format_capacity_data,
+                          MIN(sizeof(struct format_capacity), length));
+            }
+            else
+            {
+                usb_drv_stall(EP_MASS_STORAGE, true,true);
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_NOT_READY;
+                cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+            }
             break;
         }
-
         case SCSI_READ_CAPACITY: {
             logf("scsi read_capacity %d",lun);
-            /* Careful: "block count" actually means "number of last block" */
-            capacity_data->block_count = htobe32(block_count/block_size_mult - 1);
-            capacity_data->block_size = htobe32(block_size*block_size_mult);
 
-            send_command_result(capacity_data, MIN(sizeof(struct capacity), length));
+            if(lun_present) {
+                /* Careful: "block count" actually means "number of last block" */
+                capacity_data->block_count = htobe32(block_count/block_size_mult - 1);
+                capacity_data->block_size = htobe32(block_size*block_size_mult);
+
+                send_command_result(capacity_data, MIN(sizeof(struct capacity), length));
+            }
+            else
+            {
+                usb_drv_stall(EP_MASS_STORAGE, true,true);
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_NOT_READY;
+                cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+            }
             break;
         }
 
         case SCSI_READ_10:
             logf("scsi read10 %d",lun);
             if(! lun_present) {
-                send_csw(SCSI_STATUS_CHECK_CONDITION);
+                usb_drv_stall(EP_MASS_STORAGE, true,true);
+                send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
                 break;
             }
-            trigger_cpu_boost();
             current_cmd.data[0] = transfer_buffer;
             current_cmd.data[1] = &transfer_buffer[BUFFER_SIZE];
             current_cmd.data_select=0;
@@ -620,15 +649,15 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                (cbw->command_block[7] << 16 |
                 cbw->command_block[8]);
 
-            logf("scsi read %d %d", current_cmd.sector, current_cmd.count);
+            //logf("scsi read %d %d", current_cmd.sector, current_cmd.count);
 
             if((current_cmd.sector + current_cmd.count) > block_count) {
-                send_csw(SCSI_STATUS_CHECK_CONDITION);
+                usb_drv_stall(EP_MASS_STORAGE, true,true);
+                send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
             }
             else {
-                /* TODO: any way to do this nonblocking ? */
                 current_cmd.last_result = ata_read_sectors(IF_MV2(current_cmd.lun,) current_cmd.sector,
                                               MIN(BUFFER_SIZE/SECTOR_SIZE,current_cmd.count),
                                               current_cmd.data[current_cmd.data_select]);
@@ -639,12 +668,12 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         case SCSI_WRITE_10:
             logf("scsi write10 %d",lun);
             if(! lun_present) {
-                send_csw(SCSI_STATUS_CHECK_CONDITION);
+                usb_drv_stall(EP_MASS_STORAGE, true,true);
+                send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
                 break;
             }
-            trigger_cpu_boost();
             current_cmd.data[0] = transfer_buffer;
             current_cmd.data[1] = &transfer_buffer[BUFFER_SIZE];
             current_cmd.data_select=0;
@@ -658,7 +687,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cbw->command_block[8]);
             /* expect data */
             if((current_cmd.sector + current_cmd.count) > block_count) {
-                send_csw(SCSI_STATUS_CHECK_CONDITION);
+                usb_drv_stall(EP_MASS_STORAGE, true,true);
+                send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
             }
@@ -672,7 +702,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         default:
             logf("scsi unknown cmd %x",cbw->command_block[0x0]);
             usb_drv_stall(EP_MASS_STORAGE, true,true);
-            send_csw(SCSI_STATUS_GOOD);
+            send_csw(UMS_STATUS_FAIL);
             break;
     }
 }
@@ -697,17 +727,16 @@ static void receive_block_data(void *data,int size)
 
 static void send_csw(int status)
 {
-    cancel_cpu_boost();
-    csw->signature = CSW_SIGNATURE;
+    csw->signature = htole32(CSW_SIGNATURE);
     csw->tag = current_cmd.tag;
     csw->data_residue = 0;
     csw->status = status;
 
     usb_drv_send_nonblocking(EP_MASS_STORAGE, csw, sizeof(struct command_status_wrapper));
     state = SENDING_CSW;
-    logf("CSW: %X",status);
+    //logf("CSW: %X",status);
 
-    if(status == SCSI_STATUS_GOOD) {
+    if(status == UMS_STATUS_GOOD) {
         cur_sense_data.sense_key=0;
         cur_sense_data.information=0;
         cur_sense_data.asc=0;
@@ -759,7 +788,8 @@ static void identify2inquiry(int lun)
     inquiry->Format   = 2; /* SPC-2/3 inquiry format */
 
 #ifdef HAVE_HOTSWAP
-    inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
+    if(lun>0)
+        inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
 #endif
 
 }
