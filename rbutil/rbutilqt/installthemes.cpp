@@ -230,11 +230,11 @@ void ThemesInstallWindow::resizeEvent(QResizeEvent* e)
 
 void ThemesInstallWindow::show()
 {
-    downloadInfo();
     QDialog::show();
     logger = new ProgressLoggerGui(this);
     logger->show();
     logger->addItem(tr("getting themes information ..."), LOGINFO);
+    downloadInfo();
     connect(logger, SIGNAL(aborted()), getter, SLOT(abort()));
     connect(logger, SIGNAL(aborted()), this, SLOT(close()));
 }
