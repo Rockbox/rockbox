@@ -58,7 +58,7 @@
 #define USB_SC_SCSI      0x06            /* Transparent */
 #define USB_PROT_BULK    0x50            /* bulk only */
 
-static const struct usb_device_descriptor device_descriptor= {
+static const struct usb_device_descriptor __attribute__((aligned(2))) device_descriptor= {
     .bLength            = sizeof(struct usb_device_descriptor),
     .bDescriptorType    = USB_DT_DEVICE,
 #ifdef USE_HIGH_SPEED
@@ -77,9 +77,9 @@ static const struct usb_device_descriptor device_descriptor= {
     .iProduct           = 2,
     .iSerialNumber      = 3,
     .bNumConfigurations = 1
-};
+} ;
 
-struct usb_config_descriptor config_descriptor = 
+struct usb_config_descriptor __attribute__((aligned(2))) config_descriptor = 
 {
     .bLength             = sizeof(struct usb_config_descriptor),
     .bDescriptorType     = USB_DT_CONFIG,
@@ -93,7 +93,7 @@ struct usb_config_descriptor config_descriptor =
 
 #ifdef USB_CHARGING_ONLY
 /* dummy interface for charging-only */
-struct usb_interface_descriptor charging_interface_descriptor =
+struct usb_interface_descriptor __attribute__((aligned(2))) charging_interface_descriptor =
 {
     .bLength            = sizeof(struct usb_interface_descriptor),
     .bDescriptorType    = USB_DT_INTERFACE,
@@ -109,7 +109,7 @@ struct usb_interface_descriptor charging_interface_descriptor =
 
 #ifdef USB_STORAGE
 /* storage interface */
-struct usb_interface_descriptor mass_storage_interface_descriptor = 
+struct usb_interface_descriptor __attribute__((aligned(2))) mass_storage_interface_descriptor = 
 {
     .bLength            = sizeof(struct usb_interface_descriptor),
     .bDescriptorType    = USB_DT_INTERFACE,
@@ -122,7 +122,7 @@ struct usb_interface_descriptor mass_storage_interface_descriptor =
     .iInterface         = 0
 };
 
-struct usb_endpoint_descriptor mass_storage_ep_in_descriptor =
+struct usb_endpoint_descriptor __attribute__((aligned(2))) mass_storage_ep_in_descriptor =
 {
     .bLength          = sizeof(struct usb_endpoint_descriptor),
     .bDescriptorType  = USB_DT_ENDPOINT,
@@ -131,7 +131,7 @@ struct usb_endpoint_descriptor mass_storage_ep_in_descriptor =
     .wMaxPacketSize   = 16,
     .bInterval        = 0
 };
-struct usb_endpoint_descriptor mass_storage_ep_out_descriptor =
+struct usb_endpoint_descriptor __attribute__((aligned(2))) mass_storage_ep_out_descriptor =
 {
     .bLength          = sizeof(struct usb_endpoint_descriptor),
     .bDescriptorType  = USB_DT_ENDPOINT,
@@ -144,7 +144,7 @@ struct usb_endpoint_descriptor mass_storage_ep_out_descriptor =
 
 #ifdef USB_SERIAL
 /* serial interface */
-struct usb_interface_descriptor serial_interface_descriptor =
+struct usb_interface_descriptor __attribute__((aligned(2))) serial_interface_descriptor =
 {
     .bLength            = sizeof(struct usb_interface_descriptor),
     .bDescriptorType    = USB_DT_INTERFACE,
@@ -157,7 +157,7 @@ struct usb_interface_descriptor serial_interface_descriptor =
     .iInterface         = 0
 };
 
-struct usb_endpoint_descriptor serial_ep_in_descriptor =
+struct usb_endpoint_descriptor __attribute__((aligned(2))) serial_ep_in_descriptor =
 {
     .bLength          = sizeof(struct usb_endpoint_descriptor),
     .bDescriptorType  = USB_DT_ENDPOINT,
@@ -166,7 +166,7 @@ struct usb_endpoint_descriptor serial_ep_in_descriptor =
     .wMaxPacketSize   = 16,
     .bInterval        = 0
 };
-struct usb_endpoint_descriptor serial_ep_out_descriptor =
+struct usb_endpoint_descriptor __attribute__((aligned(2))) serial_ep_out_descriptor =
 {
     .bLength          = sizeof(struct usb_endpoint_descriptor),
     .bDescriptorType  = USB_DT_ENDPOINT,
@@ -179,7 +179,7 @@ struct usb_endpoint_descriptor serial_ep_out_descriptor =
 
 #ifdef USB_BENCHMARK
 /* bulk test interface */
-struct usb_interface_descriptor benchmark_interface_descriptor =
+struct usb_interface_descriptor __attribute__((aligned(2))) benchmark_interface_descriptor =
 {
     .bLength            = sizeof(struct usb_interface_descriptor),
     .bDescriptorType    = USB_DT_INTERFACE,
@@ -192,7 +192,7 @@ struct usb_interface_descriptor benchmark_interface_descriptor =
     .iInterface         = 4
 };
 
-struct usb_endpoint_descriptor benchmark_ep_in_descriptor =
+struct usb_endpoint_descriptor __attribute__((aligned(2))) benchmark_ep_in_descriptor =
 {
     .bLength          = sizeof(struct usb_endpoint_descriptor),
     .bDescriptorType  = USB_DT_ENDPOINT,
@@ -212,7 +212,7 @@ struct usb_endpoint_descriptor benchmark_ep_out_descriptor =
 };
 #endif
 
-static const struct usb_qualifier_descriptor qualifier_descriptor =
+static const struct usb_qualifier_descriptor __attribute__((aligned(2))) qualifier_descriptor =
 {
     .bLength            = sizeof(struct usb_qualifier_descriptor),
     .bDescriptorType    = USB_DT_DEVICE_QUALIFIER,
@@ -224,21 +224,21 @@ static const struct usb_qualifier_descriptor qualifier_descriptor =
     .bNumConfigurations = 1
 };
 
-static struct usb_string_descriptor usb_string_iManufacturer =
+static struct usb_string_descriptor __attribute__((aligned(2))) usb_string_iManufacturer =
 {
     24,
     USB_DT_STRING,
     {'R','o','c','k','b','o','x','.','o','r','g'}
 };
 
-static struct usb_string_descriptor usb_string_iProduct =
+static struct usb_string_descriptor __attribute__((aligned(2))) usb_string_iProduct =
 {
     42,
     USB_DT_STRING,
     {'R','o','c','k','b','o','x',' ','m','e','d','i','a',' ','p','l','a','y','e','r'}
 };
 
-static struct usb_string_descriptor usb_string_iSerial =
+static struct usb_string_descriptor __attribute__((aligned(2))) usb_string_iSerial =
 {
     82,
     USB_DT_STRING,
@@ -250,21 +250,21 @@ static struct usb_string_descriptor usb_string_iSerial =
 /* Generic for all targets */
 
 /* this is stringid #0: languages supported */
-static struct usb_string_descriptor lang_descriptor =
+static struct usb_string_descriptor __attribute__((aligned(2))) lang_descriptor =
 {
     4,
     USB_DT_STRING,
     {0x0409} /* LANGID US English */
 };
 
-static struct usb_string_descriptor usb_string_usb_benchmark =
+static struct usb_string_descriptor __attribute__((aligned(2))) usb_string_usb_benchmark =
 {
     40,
     USB_DT_STRING,
     {'B','u','l','k',' ','t','e','s','t',' ','i','n','t','e','r','f','a','c','e'}
 };
 
-static struct usb_string_descriptor usb_string_charging_only =
+static struct usb_string_descriptor __attribute__((aligned(2))) usb_string_charging_only =
 {
     28,
     USB_DT_STRING,
@@ -580,7 +580,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
             switch (req->wValue >> 8) { /* type */
                 case USB_DT_DEVICE:
                     ptr = &device_descriptor;
-                    size = sizeof device_descriptor;
+                    size = sizeof(struct usb_device_descriptor);
                     break;
 
                 case USB_DT_OTHER_SPEED_CONFIG:
@@ -606,7 +606,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                         }
                         config_descriptor.bDescriptorType=USB_DT_OTHER_SPEED_CONFIG;
                     }
-                    size = sizeof(config_descriptor);
+                    size = sizeof(struct usb_config_descriptor);
 
 #ifdef USB_CHARGING_ONLY
                     if(usb_core_charging_enabled){
@@ -682,7 +682,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
 
                 case USB_DT_DEVICE_QUALIFIER:
                     ptr = &qualifier_descriptor;
-                    size = sizeof qualifier_descriptor;
+                    size = sizeof (struct usb_qualifier_descriptor);
                     break;
 
                 default:

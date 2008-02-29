@@ -227,7 +227,7 @@ struct usb_config_descriptor {
     uint8_t  iConfiguration;
     uint8_t  bmAttributes;
     uint8_t  bMaxPower;
-} __attribute__ ((packed,aligned(2)));
+} __attribute__ ((packed));
 
 #define USB_DT_CONFIG_SIZE    9
 
@@ -245,7 +245,7 @@ struct usb_string_descriptor {
     uint8_t  bDescriptorType;
 
     uint16_t wString[]; /* UTF-16LE encoded */
-} __attribute__ ((packed,aligned(2)));
+} __attribute__ ((packed));
 
 /* note that "string" zero is special, it holds language codes that
  * the device supports, not Unicode characters.
@@ -285,7 +285,7 @@ struct usb_endpoint_descriptor {
 	/* use USB_DT_ENDPOINT*_SIZE in bLength, not sizeof. */
     //uint8_t  bRefresh;
     //uint8_t  bSynchAddress;
-} __attribute__ ((packed,aligned(2)));
+} __attribute__ ((packed));
 
 #define USB_DT_ENDPOINT_SIZE        7
 #define USB_DT_ENDPOINT_AUDIO_SIZE  9	/* Audio extension */
@@ -304,7 +304,7 @@ struct usb_qualifier_descriptor {
     uint8_t  bMaxPacketSize0;
     uint8_t  bNumConfigurations;
     uint8_t  bRESERVED;
-} __attribute__ ((packed,aligned(2)));
+} __attribute__ ((packed));
 
 /*-------------------------------------------------------------------------*/
 
