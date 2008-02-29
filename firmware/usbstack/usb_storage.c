@@ -120,19 +120,35 @@ struct sense_data {
     unsigned short SenseKeySpecific;
 } __attribute__ ((packed));
 
-struct mode_sense_header_10 {
+struct mode_sense_block_descriptor_longlba {
+    unsigned char number_of_blocks[8];
+    unsigned char reserved[4];
+    unsigned char block_size[4];
+} __attribute__ ((packed));
+
+struct mode_sense_block_descriptor_shortlba {
+    unsigned char density_code;
+    unsigned char number_of_blocks[3];
+    unsigned char reserved;
+    unsigned char block_size[3];
+} __attribute__ ((packed));
+
+struct mode_sense_data_10 {
     unsigned short mode_data_length;
     unsigned char medium_type;
     unsigned char device_specific;
-    unsigned char reserved1[2];
+    unsigned char longlba;
+    unsigned char reserved;
     unsigned short block_descriptor_length;
+    struct mode_sense_block_descriptor_longlba block_descriptor;
 } __attribute__ ((packed));
 
-struct mode_sense_header_6 {
+struct mode_sense_data_6 {
     unsigned char mode_data_length;
     unsigned char medium_type;
     unsigned char device_specific;
     unsigned char block_descriptor_length;
+    struct mode_sense_block_descriptor_shortlba block_descriptor;
 } __attribute__ ((packed));
 
 struct command_block_wrapper {
@@ -169,8 +185,8 @@ static struct inquiry_data* inquiry;
 static struct capacity* capacity_data;
 static struct format_capacity* format_capacity_data;
 static struct sense_data *sense_data;
-static struct mode_sense_header_6 *mode_sense_data_6;
-static struct mode_sense_header_10 *mode_sense_data_10;
+static struct mode_sense_data_6 *mode_sense_data_6;
+static struct mode_sense_data_10 *mode_sense_data_10;
 static struct report_lun_data *lun_data;
 static struct command_status_wrapper* csw;
 static char *max_lun;
@@ -529,12 +545,25 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             logf("scsi mode_sense_10 %d %X",lun,page_code);
             switch(page_code) {
                 case 0x3f:
-                    mode_sense_data_10->mode_data_length=0;
+                    mode_sense_data_10->mode_data_length=sizeof(struct mode_sense_data_10);
                     mode_sense_data_10->medium_type=0;
                     mode_sense_data_10->device_specific=0;
-                    mode_sense_data_10->block_descriptor_length=0;
+                    mode_sense_data_10->reserved=0;
+                    mode_sense_data_10->longlba=1;
+                    mode_sense_data_10->block_descriptor_length=sizeof(struct mode_sense_block_descriptor_longlba);
+                    memset(mode_sense_data_10->block_descriptor.reserved,0,4);
+                    memset(mode_sense_data_10->block_descriptor.number_of_blocks,0,8);
+                    mode_sense_data_10->block_descriptor.number_of_blocks[4]=((block_count/block_size_mult) & 0xff000000)>>24;
+                    mode_sense_data_10->block_descriptor.number_of_blocks[5]=((block_count/block_size_mult) & 0x00ff0000)>>16;
+                    mode_sense_data_10->block_descriptor.number_of_blocks[6]=((block_count/block_size_mult) & 0x0000ff00)>>8;
+                    mode_sense_data_10->block_descriptor.number_of_blocks[7]=((block_count/block_size_mult) & 0x000000ff);
+
+                    mode_sense_data_10->block_descriptor.block_size[0]=((block_size*block_size_mult) & 0xff000000)>>24;
+                    mode_sense_data_10->block_descriptor.block_size[1]=((block_size*block_size_mult) & 0x00ff0000)>>16;
+                    mode_sense_data_10->block_descriptor.block_size[2]=((block_size*block_size_mult) & 0x0000ff00)>>8;
+                    mode_sense_data_10->block_descriptor.block_size[3]=((block_size*block_size_mult) & 0x000000ff);
                     send_command_result(mode_sense_data_10,
-                              MIN(sizeof(struct mode_sense_header_10), length));
+                              MIN(sizeof(struct mode_sense_data_10), length));
                     break;
                 default:
                     usb_drv_stall(EP_MASS_STORAGE, true,true);
@@ -559,14 +588,28 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             switch(page_code) {
                 case 0x3f:
                     /* All supported pages Since we support only one this is easy*/
-                    mode_sense_data_6->mode_data_length=0;
+                    mode_sense_data_6->mode_data_length=sizeof(struct mode_sense_data_6);
                     mode_sense_data_6->medium_type=0;
                     mode_sense_data_6->device_specific=0;
-                    mode_sense_data_6->block_descriptor_length=0;
+                    mode_sense_data_6->block_descriptor_length=sizeof(struct mode_sense_block_descriptor_shortlba);
+                    mode_sense_data_6->block_descriptor.density_code=0;
+                    mode_sense_data_6->block_descriptor.reserved=0;
+                    if(block_count/block_size_mult > 0xffffff){
+                        mode_sense_data_6->block_descriptor.number_of_blocks[0]=0xff;
+                        mode_sense_data_6->block_descriptor.number_of_blocks[1]=0xff;
+                        mode_sense_data_6->block_descriptor.number_of_blocks[2]=0xff;
+                    }
+                    else {
+                        mode_sense_data_6->block_descriptor.number_of_blocks[0]=((block_count/block_size_mult) & 0xff0000)>>16;
+                        mode_sense_data_6->block_descriptor.number_of_blocks[1]=((block_count/block_size_mult) & 0x00ff00)>>8;
+                        mode_sense_data_6->block_descriptor.number_of_blocks[2]=((block_count/block_size_mult) & 0x0000ff);
+                    }
+                    mode_sense_data_6->block_descriptor.block_size[0]=((block_size*block_size_mult) & 0xff0000)>>16;
+                    mode_sense_data_6->block_descriptor.block_size[1]=((block_size*block_size_mult) & 0x00ff00)>>8;
+                    mode_sense_data_6->block_descriptor.block_size[2]=((block_size*block_size_mult) & 0x0000ff);
                     send_command_result(mode_sense_data_6,
-                              MIN(sizeof(struct mode_sense_header_6), length));
+                              MIN(sizeof(struct mode_sense_data_6), length));
                     break;
-                    /* TODO : windows does 1A, Power Condition. Do we need that ? */
                 default:
                     usb_drv_stall(EP_MASS_STORAGE, true,true);
                     send_csw(UMS_STATUS_FAIL);
