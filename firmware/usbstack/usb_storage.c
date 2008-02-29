@@ -179,17 +179,19 @@ struct format_capacity {
     unsigned int block_size;
 } __attribute__ ((packed));
 
-static unsigned char* transfer_buffer;
 
-static struct inquiry_data* inquiry;
-static struct capacity* capacity_data;
-static struct format_capacity* format_capacity_data;
-static struct sense_data *sense_data;
-static struct mode_sense_data_6 *mode_sense_data_6;
-static struct mode_sense_data_10 *mode_sense_data_10;
-static struct report_lun_data *lun_data;
-static struct command_status_wrapper* csw;
-static char *max_lun;
+static union {
+    unsigned char* transfer_buffer;
+    struct inquiry_data* inquiry;
+    struct capacity* capacity_data;
+    struct format_capacity* format_capacity_data;
+    struct sense_data *sense_data;
+    struct mode_sense_data_6 *mode_sense_data_6;
+    struct mode_sense_data_10 *mode_sense_data_10;
+    struct report_lun_data *lun_data;
+    struct command_status_wrapper* csw;
+    char *max_lun;
+} tb;
 
 static struct {
     unsigned int sector;
@@ -229,23 +231,14 @@ void usb_storage_init(void)
     size_t bufsize;
     unsigned char * audio_buffer = audio_get_buffer(false,&bufsize);
     /* TODO : check if bufsize is at least 32K ? */
-    transfer_buffer = (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
-    inquiry = (void*)transfer_buffer;
-    capacity_data = (void*)transfer_buffer;
-    format_capacity_data = (void*)transfer_buffer;
-    sense_data = (void*)transfer_buffer;
-    mode_sense_data_6 = (void*)transfer_buffer;
-    mode_sense_data_10 = (void*)transfer_buffer;
-    lun_data = (void*)transfer_buffer;
-    max_lun = (void*)transfer_buffer;
-    csw = (void*)transfer_buffer;
+    tb.transfer_buffer = (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
     logf("usb_storage_init done");
 }
 
 /* called by usb_core_transfer_complete() */
 void usb_storage_transfer_complete(bool in,int status,int length)
 {
-    struct command_block_wrapper* cbw = (void*)transfer_buffer;
+    struct command_block_wrapper* cbw = (void*)tb.transfer_buffer;
 
     //logf("transfer result %X %d", status, length);
     switch(state) {
@@ -319,7 +312,7 @@ void usb_storage_transfer_complete(bool in,int status,int length)
             }
             //logf("csw sent, now go back to idle");
             state = WAITING_FOR_COMMAND;
-            usb_drv_recv(EP_MASS_STORAGE, transfer_buffer, 1024);
+            usb_drv_recv(EP_MASS_STORAGE, tb.transfer_buffer, 1024);
             break;
         case SENDING_RESULT:
             if(in==false) {
@@ -371,12 +364,12 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req)
     switch (req->bRequest) {
         case USB_BULK_GET_MAX_LUN: {
 #ifdef ONLY_EXPOSE_CARD_SLOT
-            *max_lun = 0;
+            *tb.max_lun = 0;
 #else
-            *max_lun = NUM_VOLUMES - 1;
+            *tb.max_lun = NUM_VOLUMES - 1;
 #endif
             logf("ums: getmaxlun");
-            usb_drv_send(EP_CONTROL, UNCACHED_ADDR(max_lun), 1);
+            usb_drv_send(EP_CONTROL, UNCACHED_ADDR(tb.max_lun), 1);
             usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
             handled = true;
             break;
@@ -401,7 +394,7 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req)
             logf("ums: set config");
             /* prime rx endpoint. We only need room for commands */
             state = WAITING_FOR_COMMAND;
-            usb_drv_recv(EP_MASS_STORAGE, transfer_buffer, 1024);
+            usb_drv_recv(EP_MASS_STORAGE, tb.transfer_buffer, 1024);
             handled = true;
             break;
     }
@@ -496,16 +489,16 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             allocation_length|=(cbw->command_block[7]<<16);
             allocation_length|=(cbw->command_block[8]<<8);
             allocation_length|=(cbw->command_block[9]);
-            memset(lun_data,0,sizeof(struct report_lun_data));
+            memset(tb.lun_data,0,sizeof(struct report_lun_data));
 #ifdef HAVE_HOTSWAP
-            lun_data->lun_list_length=htobe32(16);
-            lun_data->lun1[1]=1;
+            tb.lun_data->lun_list_length=htobe32(16);
+            tb.lun_data->lun1[1]=1;
 #else
-            lun_data->lun_list_length=htobe32(8);
+            tb.lun_data->lun_list_length=htobe32(8);
 #endif
-            lun_data->lun0[1]=0;
+            tb.lun_data->lun0[1]=0;
             
-            send_command_result(lun_data, MIN(sizeof(struct report_lun_data), length));
+            send_command_result(tb.lun_data, MIN(sizeof(struct report_lun_data), length));
             break;
         }
 
@@ -513,22 +506,22 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             logf("scsi inquiry %d",lun);
             identify2inquiry(lun);
             length = MIN(length, cbw->command_block[4]);
-            send_command_result(inquiry, MIN(sizeof(struct inquiry_data), length));
+            send_command_result(tb.inquiry, MIN(sizeof(struct inquiry_data), length));
             break;
 
         case SCSI_REQUEST_SENSE: {
-            sense_data->ResponseCode=0x70;/*current error*/
-            sense_data->filemark_eom_ili_sensekey=cur_sense_data.sense_key&0x0f;
-            sense_data->Information=cur_sense_data.information;
-            sense_data->AdditionalSenseLength=10;
-            sense_data->CommandSpecificInformation=0;
-            sense_data->AdditionalSenseCode=cur_sense_data.asc;
-            sense_data->AdditionalSenseCodeQualifier=0;
-            sense_data->FieldReplaceableUnitCode=0;
-            sense_data->SKSV=0;
-            sense_data->SenseKeySpecific=0;
+            tb.sense_data->ResponseCode=0x70;/*current error*/
+            tb.sense_data->filemark_eom_ili_sensekey=cur_sense_data.sense_key&0x0f;
+            tb.sense_data->Information=cur_sense_data.information;
+            tb.sense_data->AdditionalSenseLength=10;
+            tb.sense_data->CommandSpecificInformation=0;
+            tb.sense_data->AdditionalSenseCode=cur_sense_data.asc;
+            tb.sense_data->AdditionalSenseCodeQualifier=0;
+            tb.sense_data->FieldReplaceableUnitCode=0;
+            tb.sense_data->SKSV=0;
+            tb.sense_data->SenseKeySpecific=0;
             logf("scsi request_sense %d",lun);
-            send_command_result(sense_data, sizeof(struct sense_data));
+            send_command_result(tb.sense_data, sizeof(struct sense_data));
             break;
         }
 
@@ -545,24 +538,24 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             logf("scsi mode_sense_10 %d %X",lun,page_code);
             switch(page_code) {
                 case 0x3f:
-                    mode_sense_data_10->mode_data_length=sizeof(struct mode_sense_data_10);
-                    mode_sense_data_10->medium_type=0;
-                    mode_sense_data_10->device_specific=0;
-                    mode_sense_data_10->reserved=0;
-                    mode_sense_data_10->longlba=1;
-                    mode_sense_data_10->block_descriptor_length=sizeof(struct mode_sense_block_descriptor_longlba);
-                    memset(mode_sense_data_10->block_descriptor.reserved,0,4);
-                    memset(mode_sense_data_10->block_descriptor.number_of_blocks,0,8);
-                    mode_sense_data_10->block_descriptor.number_of_blocks[4]=((block_count/block_size_mult) & 0xff000000)>>24;
-                    mode_sense_data_10->block_descriptor.number_of_blocks[5]=((block_count/block_size_mult) & 0x00ff0000)>>16;
-                    mode_sense_data_10->block_descriptor.number_of_blocks[6]=((block_count/block_size_mult) & 0x0000ff00)>>8;
-                    mode_sense_data_10->block_descriptor.number_of_blocks[7]=((block_count/block_size_mult) & 0x000000ff);
+                    tb.mode_sense_data_10->mode_data_length=sizeof(struct mode_sense_data_10);
+                    tb.mode_sense_data_10->medium_type=0;
+                    tb.mode_sense_data_10->device_specific=0;
+                    tb.mode_sense_data_10->reserved=0;
+                    tb.mode_sense_data_10->longlba=1;
+                    tb.mode_sense_data_10->block_descriptor_length=sizeof(struct mode_sense_block_descriptor_longlba);
+                    memset(tb.mode_sense_data_10->block_descriptor.reserved,0,4);
+                    memset(tb.mode_sense_data_10->block_descriptor.number_of_blocks,0,8);
+                    tb.mode_sense_data_10->block_descriptor.number_of_blocks[4]=((block_count/block_size_mult) & 0xff000000)>>24;
+                    tb.mode_sense_data_10->block_descriptor.number_of_blocks[5]=((block_count/block_size_mult) & 0x00ff0000)>>16;
+                    tb.mode_sense_data_10->block_descriptor.number_of_blocks[6]=((block_count/block_size_mult) & 0x0000ff00)>>8;
+                    tb.mode_sense_data_10->block_descriptor.number_of_blocks[7]=((block_count/block_size_mult) & 0x000000ff);
 
-                    mode_sense_data_10->block_descriptor.block_size[0]=((block_size*block_size_mult) & 0xff000000)>>24;
-                    mode_sense_data_10->block_descriptor.block_size[1]=((block_size*block_size_mult) & 0x00ff0000)>>16;
-                    mode_sense_data_10->block_descriptor.block_size[2]=((block_size*block_size_mult) & 0x0000ff00)>>8;
-                    mode_sense_data_10->block_descriptor.block_size[3]=((block_size*block_size_mult) & 0x000000ff);
-                    send_command_result(mode_sense_data_10,
+                    tb.mode_sense_data_10->block_descriptor.block_size[0]=((block_size*block_size_mult) & 0xff000000)>>24;
+                    tb.mode_sense_data_10->block_descriptor.block_size[1]=((block_size*block_size_mult) & 0x00ff0000)>>16;
+                    tb.mode_sense_data_10->block_descriptor.block_size[2]=((block_size*block_size_mult) & 0x0000ff00)>>8;
+                    tb.mode_sense_data_10->block_descriptor.block_size[3]=((block_size*block_size_mult) & 0x000000ff);
+                    send_command_result(tb.mode_sense_data_10,
                               MIN(sizeof(struct mode_sense_data_10), length));
                     break;
                 default:
@@ -588,26 +581,26 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             switch(page_code) {
                 case 0x3f:
                     /* All supported pages Since we support only one this is easy*/
-                    mode_sense_data_6->mode_data_length=sizeof(struct mode_sense_data_6);
-                    mode_sense_data_6->medium_type=0;
-                    mode_sense_data_6->device_specific=0;
-                    mode_sense_data_6->block_descriptor_length=sizeof(struct mode_sense_block_descriptor_shortlba);
-                    mode_sense_data_6->block_descriptor.density_code=0;
-                    mode_sense_data_6->block_descriptor.reserved=0;
+                    tb.mode_sense_data_6->mode_data_length=sizeof(struct mode_sense_data_6);
+                    tb.mode_sense_data_6->medium_type=0;
+                    tb.mode_sense_data_6->device_specific=0;
+                    tb.mode_sense_data_6->block_descriptor_length=sizeof(struct mode_sense_block_descriptor_shortlba);
+                    tb.mode_sense_data_6->block_descriptor.density_code=0;
+                    tb.mode_sense_data_6->block_descriptor.reserved=0;
                     if(block_count/block_size_mult > 0xffffff){
-                        mode_sense_data_6->block_descriptor.number_of_blocks[0]=0xff;
-                        mode_sense_data_6->block_descriptor.number_of_blocks[1]=0xff;
-                        mode_sense_data_6->block_descriptor.number_of_blocks[2]=0xff;
+                        tb.mode_sense_data_6->block_descriptor.number_of_blocks[0]=0xff;
+                        tb.mode_sense_data_6->block_descriptor.number_of_blocks[1]=0xff;
+                        tb.mode_sense_data_6->block_descriptor.number_of_blocks[2]=0xff;
                     }
                     else {
-                        mode_sense_data_6->block_descriptor.number_of_blocks[0]=((block_count/block_size_mult) & 0xff0000)>>16;
-                        mode_sense_data_6->block_descriptor.number_of_blocks[1]=((block_count/block_size_mult) & 0x00ff00)>>8;
-                        mode_sense_data_6->block_descriptor.number_of_blocks[2]=((block_count/block_size_mult) & 0x0000ff);
+                        tb.mode_sense_data_6->block_descriptor.number_of_blocks[0]=((block_count/block_size_mult) & 0xff0000)>>16;
+                        tb.mode_sense_data_6->block_descriptor.number_of_blocks[1]=((block_count/block_size_mult) & 0x00ff00)>>8;
+                        tb.mode_sense_data_6->block_descriptor.number_of_blocks[2]=((block_count/block_size_mult) & 0x0000ff);
                     }
-                    mode_sense_data_6->block_descriptor.block_size[0]=((block_size*block_size_mult) & 0xff0000)>>16;
-                    mode_sense_data_6->block_descriptor.block_size[1]=((block_size*block_size_mult) & 0x00ff00)>>8;
-                    mode_sense_data_6->block_descriptor.block_size[2]=((block_size*block_size_mult) & 0x0000ff);
-                    send_command_result(mode_sense_data_6,
+                    tb.mode_sense_data_6->block_descriptor.block_size[0]=((block_size*block_size_mult) & 0xff0000)>>16;
+                    tb.mode_sense_data_6->block_descriptor.block_size[1]=((block_size*block_size_mult) & 0x00ff00)>>8;
+                    tb.mode_sense_data_6->block_descriptor.block_size[2]=((block_size*block_size_mult) & 0x0000ff);
+                    send_command_result(tb.mode_sense_data_6,
                               MIN(sizeof(struct mode_sense_data_6), length));
                     break;
                 default:
@@ -633,13 +626,13 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         case SCSI_READ_FORMAT_CAPACITY: {
             logf("scsi read_format_capacity %d",lun);
             if(lun_present) {
-                format_capacity_data->following_length=htobe32(8);
+                tb.format_capacity_data->following_length=htobe32(8);
                 /* Careful: "block count" actually means "number of last block" */
-                format_capacity_data->block_count = htobe32(block_count/block_size_mult - 1);
-                format_capacity_data->block_size = htobe32(block_size*block_size_mult);
-                format_capacity_data->block_size |= SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA;
+                tb.format_capacity_data->block_count = htobe32(block_count/block_size_mult - 1);
+                tb.format_capacity_data->block_size = htobe32(block_size*block_size_mult);
+                tb.format_capacity_data->block_size |= SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA;
 
-                send_command_result(format_capacity_data,
+                send_command_result(tb.format_capacity_data,
                           MIN(sizeof(struct format_capacity), length));
             }
             else
@@ -656,10 +649,10 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
             if(lun_present) {
                 /* Careful: "block count" actually means "number of last block" */
-                capacity_data->block_count = htobe32(block_count/block_size_mult - 1);
-                capacity_data->block_size = htobe32(block_size*block_size_mult);
+                tb.capacity_data->block_count = htobe32(block_count/block_size_mult - 1);
+                tb.capacity_data->block_size = htobe32(block_size*block_size_mult);
 
-                send_command_result(capacity_data, MIN(sizeof(struct capacity), length));
+                send_command_result(tb.capacity_data, MIN(sizeof(struct capacity), length));
             }
             else
             {
@@ -680,8 +673,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
                 break;
             }
-            current_cmd.data[0] = transfer_buffer;
-            current_cmd.data[1] = &transfer_buffer[BUFFER_SIZE];
+            current_cmd.data[0] = tb.transfer_buffer;
+            current_cmd.data[1] = &tb.transfer_buffer[BUFFER_SIZE];
             current_cmd.data_select=0;
             current_cmd.sector = block_size_mult *
                (cbw->command_block[2] << 24 |
@@ -717,8 +710,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
                 break;
             }
-            current_cmd.data[0] = transfer_buffer;
-            current_cmd.data[1] = &transfer_buffer[BUFFER_SIZE];
+            current_cmd.data[0] = tb.transfer_buffer;
+            current_cmd.data[1] = &tb.transfer_buffer[BUFFER_SIZE];
             current_cmd.data_select=0;
             current_cmd.sector = block_size_mult *
                (cbw->command_block[2] << 24 |
@@ -770,12 +763,12 @@ static void receive_block_data(void *data,int size)
 
 static void send_csw(int status)
 {
-    csw->signature = htole32(CSW_SIGNATURE);
-    csw->tag = current_cmd.tag;
-    csw->data_residue = 0;
-    csw->status = status;
+    tb.csw->signature = htole32(CSW_SIGNATURE);
+    tb.csw->tag = current_cmd.tag;
+    tb.csw->data_residue = 0;
+    tb.csw->status = status;
 
-    usb_drv_send_nonblocking(EP_MASS_STORAGE, csw, sizeof(struct command_status_wrapper));
+    usb_drv_send_nonblocking(EP_MASS_STORAGE, tb.csw, sizeof(struct command_status_wrapper));
     state = SENDING_CSW;
     //logf("CSW: %X",status);
 
@@ -791,14 +784,14 @@ static void identify2inquiry(int lun)
 {
 #ifdef HAVE_FLASH_STORAGE
     if(lun==0) {
-        memcpy(&inquiry->VendorId,"Rockbox ",8);
-        memcpy(&inquiry->ProductId,"Internal Storage",16);
-        memcpy(&inquiry->ProductRevisionLevel,"0.00",4);
+        memcpy(&tb.inquiry->VendorId,"Rockbox ",8);
+        memcpy(&tb.inquiry->ProductId,"Internal Storage",16);
+        memcpy(&tb.inquiry->ProductRevisionLevel,"0.00",4);
     }
     else {
-        memcpy(&inquiry->VendorId,"Rockbox ",8);
-        memcpy(&inquiry->ProductId,"SD Card Slot    ",16);
-        memcpy(&inquiry->ProductRevisionLevel,"0.00",4);
+        memcpy(&tb.inquiry->VendorId,"Rockbox ",8);
+        memcpy(&tb.inquiry->ProductId,"SD Card Slot    ",16);
+        memcpy(&tb.inquiry->ProductRevisionLevel,"0.00",4);
     }
 #else
     unsigned int i;
@@ -806,33 +799,33 @@ static void identify2inquiry(int lun)
     unsigned short* src;
     unsigned short* identify = ata_get_identify();
     (void)lun;
-    memset(inquiry, 0, sizeof(struct inquiry_data));
+    memset(tb.inquiry, 0, sizeof(struct inquiry_data));
     
     if (identify[82] & 4)
-        inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
+        tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
 
     /* ATA only has a 'model' field, so we copy the 
        first 8 bytes to 'vendor' and the rest to 'product' (they are
        consecutive in the inquiry struct) */
     src = (unsigned short*)&identify[27];
-    dest = (unsigned short*)&inquiry->VendorId;
+    dest = (unsigned short*)&tb.inquiry->VendorId;
     for (i=0;i<12;i++)
         dest[i] = htobe16(src[i]);
     
     src = (unsigned short*)&identify[23];
-    dest = (unsigned short*)&inquiry->ProductRevisionLevel;
+    dest = (unsigned short*)&tb.inquiry->ProductRevisionLevel;
     for (i=0;i<2;i++)
         dest[i] = htobe16(src[i]);
 #endif
 
-    inquiry->DeviceType = DIRECT_ACCESS_DEVICE;
-    inquiry->AdditionalLength = 0x1f;
-    inquiry->Versions = 4; /* SPC-2 */
-    inquiry->Format   = 2; /* SPC-2/3 inquiry format */
+    tb.inquiry->DeviceType = DIRECT_ACCESS_DEVICE;
+    tb.inquiry->AdditionalLength = 0x1f;
+    tb.inquiry->Versions = 4; /* SPC-2 */
+    tb.inquiry->Format   = 2; /* SPC-2/3 inquiry format */
 
 #ifdef HAVE_HOTSWAP
     if(lun>0)
-        inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
+        tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
 #endif
 
 }
