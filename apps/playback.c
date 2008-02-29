@@ -687,7 +687,6 @@ static void audio_skip(int direction)
         wps_offset += direction;
         /* Immediately update the playlist index */
         playlist_next(direction);
-        last_peek_offset -= direction;
         track_changed = true;
     }
     else
@@ -2046,11 +2045,11 @@ static int audio_check_new_track(void)
             }
     }
 
+    /* Update the playlist */
+    last_peek_offset -= ci.new_track;
+
     if (auto_dir_skip)
     {
-        /* Update the playlist */
-        last_peek_offset -= ci.new_track;
-
         /* If the track change was the result of an auto dir skip,
            we need to update the playlist now */
         next_playlist_index = playlist_next(ci.new_track);
