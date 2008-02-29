@@ -560,6 +560,11 @@ void usb_drv_set_test_mode(int mode)
             REG_PORTSC1 |= PORTSCX_PTC_FORCE_EN;
             break;
     }
+    REG_USBCMD &= ~USBCMD_RUN;
+    udelay(50000);
+    REG_USBCMD |= USBCMD_CTRL_RESET;
+    while (REG_USBCMD & USBCMD_CTRL_RESET);
+    REG_USBCMD |= USBCMD_RUN;
 }
 
 /*-------------------------------------------------------------------------*/
