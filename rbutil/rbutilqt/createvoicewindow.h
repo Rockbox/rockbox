@@ -33,6 +33,7 @@ class CreateVoiceWindow : public QDialog
     public:
         CreateVoiceWindow(QWidget *parent = 0);
         void setSettings(RbSettings* sett);
+        void setProxy(QUrl proxy){m_proxy = proxy;}
 
     public slots:
         void accept(void);
@@ -44,6 +45,7 @@ class CreateVoiceWindow : public QDialog
         Ui::CreateVoiceFrm ui;
         ProgressLoggerGui* logger;
         RbSettings* settings;
+        QUrl m_proxy;
 };
 
 #endif
