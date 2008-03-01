@@ -32,6 +32,10 @@ HttpGet::HttpGet(QObject *parent)
     outputToBuffer = true;
     cached = false;
     getRequest = -1;
+    // if a request is cancelled before a reponse is available return some
+    // hint about this in the http response instead of nonsense.
+    response = -1;
+
     connect(&http, SIGNAL(done(bool)), this, SLOT(httpDone(bool)));
     connect(&http, SIGNAL(dataReadProgress(int, int)), this, SLOT(httpProgress(int, int)));
     connect(&http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpFinished(int, bool)));
