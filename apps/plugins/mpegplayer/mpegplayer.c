@@ -193,8 +193,17 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_RW         BUTTON_RC_REW
 #define MPEG_FF         BUTTON_RC_FF
 
+#elif CONFIG_KEYPAD == MROBE100_PAD
+#define MPEG_MENU       BUTTON_MENU
+#define MPEG_STOP       BUTTON_POWER
+#define MPEG_PAUSE      BUTTON_PLAY
+#define MPEG_VOLDOWN    BUTTON_DOWN
+#define MPEG_VOLUP      BUTTON_UP
+#define MPEG_RW         BUTTON_LEFT
+#define MPEG_FF         BUTTON_RIGHT
+
 #else
-#error MPEGPLAYER: Unsupported keypad
+#error No keymap defined!
 #endif
 
 struct plugin_api* rb;

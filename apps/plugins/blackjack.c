@@ -218,8 +218,24 @@ PLUGIN_HEADER
 #define BJACK_RIGHT      BUTTON_RIGHT
 #define BJACK_LEFT       BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == MROBE100_PAD
+
+#define BJACK_START      BUTTON_SELECT
+#define BJACK_QUIT       BUTTON_POWER
+#define BJACK_MAX        BUTTON_MENU
+#define BJACK_MIN        BUTTON_DISPLAY
+#define BJACK_HIT        BUTTON_MENU
+#define BJACK_STAY       BUTTON_DISPLAY
+#define BJACK_DOUBLEDOWN BUTTON_SELECT
+#define BJACK_SCORES     BUTTON_RIGHT
+#define BJACK_RESUME     BUTTON_PLAY
+#define BJACK_UP         BUTTON_UP
+#define BJACK_DOWN       BUTTON_DOWN
+#define BJACK_RIGHT      BUTTON_RIGHT
+#define BJACK_LEFT       BUTTON_LEFT
+
 #else
-    #error BLACKJACK: Unsupported keypad
+#error No keymap defined!
 #endif
 
 #ifdef HAVE_LCD_COLOR

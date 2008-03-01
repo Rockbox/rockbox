@@ -189,6 +189,21 @@ PLUGIN_HEADER
 #define PLAYERS_TEXT "Up/Down"
 #define WORMS_TEXT "Left/Right"
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+
+#define BTN_DIR_UP BUTTON_UP
+#define BTN_DIR_DOWN BUTTON_DOWN
+#define BTN_DIR_LEFT BUTTON_LEFT
+#define BTN_DIR_RIGHT BUTTON_RIGHT
+#define BTN_STARTPAUSE BUTTON_SELECT
+#define BTN_QUIT BUTTON_POWER
+#define BTN_STOPRESET BUTTON_DISPLAY
+
+#define PLAYERS_TEXT "Up/Down"
+#define WORMS_TEXT "Left/Right"
+
+#else
+#error No keymap defined!
 #endif
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)

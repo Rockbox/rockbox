@@ -120,8 +120,16 @@ PLUGIN_HEADER
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_BACK
 
+#elif CONFIG_KEYPAD == MROBE100_PAD
+#define JEWELS_UP     BUTTON_UP
+#define JEWELS_DOWN   BUTTON_DOWN
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_SELECT BUTTON_SELECT
+#define JEWELS_CANCEL BUTTON_POWER
+
 #else
-    #error JEWELS: Unsupported keypad
+#error No keymap defined!
 #endif
 
 /* use 30x30 tiles (iPod Video, Gigabeat) */
@@ -1486,7 +1494,8 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 9, "SELECT to select");
                 rb->lcd_puts(0, 10, "Long SELECT to show menu");
                 rb->lcd_puts(0, 11, "PLAY to cancel");
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#elif CONFIG_KEYPAD == GIGABEAT_PAD \
+   || CONFIG_KEYPAD == MROBE100_PAD
                 rb->lcd_puts(0, 2, "Swap pairs of jewels to");
                 rb->lcd_puts(0, 3, "form connected segments");
                 rb->lcd_puts(0, 4, "of three or more of the");

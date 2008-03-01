@@ -144,8 +144,17 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+
+#define QUIT BUTTON_POWER
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define SELECT BUTTON_SELECT
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+
 #else
-#error Unsupported keypad
+#error No keymap defined!
 #endif
 
 #ifndef SCROLL_FWD /* targets without scroll wheel*/
@@ -836,7 +845,7 @@ int game_menu(int when)
     int button,cur=0;
     char str[10];
     rb->lcd_clear_display();
-#if (LCD_WIDTH != 112) && (LCD_HEIGHT != 64)
+#if LCD_DEPTH > 1 /* currently no background bmp for mono screens */
     rb->lcd_bitmap(brickmania_menu_bg, 0, 0, MENU_BGWIDTH, MENU_BGHEIGHT);
 #endif
     while (true) {

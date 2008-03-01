@@ -128,6 +128,15 @@ PLUGIN_HEADER
 #define BATTERY_ON_TXT  "PLAY - start"
 #define BATTERY_OFF_TXT "POWER  - quit"
 
+#elif CONFIG_KEYPAD == MROBE100_PAD
+
+#define BATTERY_ON  BUTTON_SELECT
+#define BATTERY_OFF BUTTON_POWER
+#define BATTERY_ON_TXT  "SELECT - start"
+#define BATTERY_OFF_TXT "POWER  - quit"
+
+#else
+#error No keymap defined!
 #endif
 
 

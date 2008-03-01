@@ -99,6 +99,15 @@ PLUGIN_HEADER
 #define BOUNCE_DOWN BUTTON_DOWN
 #define BOUNCE_QUIT BUTTON_BACK
 #define BOUNCE_MODE BUTTON_MENU
+
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+#define BOUNCE_UP   BUTTON_UP
+#define BOUNCE_DOWN BUTTON_DOWN
+#define BOUNCE_QUIT BUTTON_POWER
+#define BOUNCE_MODE BUTTON_DISPLAY
+
+#else
+#error No keymap defined!
 #endif
 
 static struct plugin_api* rb;

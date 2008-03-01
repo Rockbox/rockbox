@@ -1,4 +1,4 @@
-#if !defined(OLYMPUS_MROBE_100) && !defined(COWON_D2)
+#if !defined(COWON_D2)
 
 /* plugins common to all models */
 battery_bench.c
@@ -63,7 +63,7 @@ blackjack.c
 bounce.c
 bubbles.c
 
-#if (LCD_WIDTH >= 160)
+#if (LCD_DEPTH > 1)
 invadrox.c
 #endif
 
@@ -148,9 +148,9 @@ iriver_flash.c
 #endif
 
 #endif /* iFP7xx */
-#if (LCD_WIDTH > 138)
-/* Built for bitmap targets except H10 5/6gb, Archoses, iPod mini and ifp */
+#if (LCD_WIDTH > 138) && (LCD_DEPTH > 1)
+/* Built for bitmap targets except H10 5/6gb, Archoses, iPod mini, mrobe100 and ifp*/
 superdom.c
 #endif
 #endif /* m:robe 500 */
-#endif /* m:robe 100 */
+#endif /* COWON_D2 */

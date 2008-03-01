@@ -139,6 +139,18 @@ PLUGIN_HEADER
 #define FLIPIT_STEP_BY_STEP BUTTON_VOL_DOWN
 #define FLIPIT_TOGGLE       BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == MROBE100_PAD
+
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         BUTTON_POWER
+#define FLIPIT_SHUFFLE      BUTTON_MENU
+#define FLIPIT_SOLVE        BUTTON_PLAY
+#define FLIPIT_STEP_BY_STEP BUTTON_DISPLAY
+#define FLIPIT_TOGGLE       BUTTON_SELECT
+
+#else
+#error No keymap defined!
 #endif
 
 static struct plugin_api* rb;

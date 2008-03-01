@@ -2322,6 +2322,13 @@ void get_mp3_filename(char *wav_name)
 #define MP3ENC_NEXT BUTTON_DOWN
 #define MP3ENC_DONE BUTTON_BACK
 #define MP3ENC_SELECT BUTTON_SELECT
+#elif CONFIG_KEYPAD == MROBE100_PAD
+#define MP3ENC_PREV BUTTON_UP
+#define MP3ENC_NEXT BUTTON_DOWN
+#define MP3ENC_DONE BUTTON_POWER
+#define MP3ENC_SELECT BUTTON_SELECT
+#else
+#error No keymap defined!
 #endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)

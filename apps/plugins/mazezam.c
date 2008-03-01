@@ -153,6 +153,20 @@ MEM_FUNCTION_WRAPPERS(rb);
 #define MAZEZAM_QUIT                BUTTON_BACK
 #define MAZEZAM_QUIT_KEYNAME        "[BACK]"
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+#define MAZEZAM_UP                  BUTTON_UP
+#define MAZEZAM_DOWN                BUTTON_DOWN
+#define MAZEZAM_LEFT                BUTTON_LEFT
+#define MAZEZAM_RIGHT               BUTTON_RIGHT
+#define MAZEZAM_SELECT              BUTTON_SELECT
+
+#define MAZEZAM_RETRY               BUTTON_DISPLAY
+#define MAZEZAM_RETRY_KEYNAME       "[DISPLAY]"
+#define MAZEZAM_QUIT                BUTTON_POWER
+#define MAZEZAM_QUIT_KEYNAME        "[POWER]"
+
+#else
+#error No keymap defined!
 #endif
 
 /* The gap for the border around the heading in text pages. In fact, 2 is

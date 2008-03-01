@@ -92,8 +92,13 @@ Still To do:
 #define ACTION2 BUTTON_MENU
 #define ACTIONTEXT "SELECT"
 
+#elif CONFIG_KEYPAD == MROBE100_PAD
+#define QUIT BUTTON_POWER
+#define ACTION BUTTON_SELECT
+#define ACTIONTEXT "SELECT"
+
 #else
-#error Unsupported keypad
+#error No keymap defined!
 #endif
 
 static struct plugin_api* rb;

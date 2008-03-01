@@ -112,6 +112,13 @@ PLUGIN_HEADER
 #define MOSAIQUE_SPEED BUTTON_SELECT
 #define MOSAIQUE_RESTART BUTTON_MENU
 
+#elif CONFIG_KEYPAD == MROBE100_PAD
+#define MOSAIQUE_QUIT BUTTON_POWER
+#define MOSAIQUE_SPEED BUTTON_DISPLAY
+#define MOSAIQUE_RESTART BUTTON_SELECT
+
+#else
+#error No keymap defined!
 #endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)

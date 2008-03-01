@@ -174,6 +174,21 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define AST_FIRE BUTTON_SELECT
 #define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+#define AST_PAUSE BUTTON_DISPLAY
+#define AST_QUIT BUTTON_POWER
+#define AST_THRUST_REP BUTTON_UP | BUTTON_REPEAT
+#define AST_THRUST BUTTON_UP
+#define AST_HYPERSPACE BUTTON_DOWN
+#define AST_LEFT BUTTON_LEFT 
+#define AST_LEFT_REP BUTTON_LEFT | BUTTON_REPEAT
+#define AST_RIGHT BUTTON_RIGHT
+#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_REPEAT)
+#define AST_FIRE BUTTON_SELECT
+#define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
+
+#else
+#error No keymap defined!
 #endif
 
 #define ABS(x) ((x)>0?(x):-(x))

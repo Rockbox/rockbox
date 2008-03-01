@@ -65,6 +65,12 @@ static bool abort;
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 #define STATS_STOP BUTTON_BACK
+
+#elif CONFIG_KEYPAD == MROBE100_PAD
+#define STATS_STOP BUTTON_POWER
+
+#else
+#error No keymap defined!
 #endif
 
 /* TODO: Better get the exts from the filetypes var in tree.c */

@@ -102,8 +102,14 @@ PLUGIN_HEADER
 #define SNAKE_DOWN BUTTON_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_SELECT
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+#define SNAKE_QUIT BUTTON_POWER
+#define SNAKE_UP   BUTTON_UP
+#define SNAKE_DOWN BUTTON_DOWN
+#define SNAKE_PLAYPAUSE BUTTON_SELECT
+
 #else
-#error "lacks keymapping"
+#error No keymap defined!
 #endif
 
 #define BOARD_WIDTH (LCD_WIDTH/4)

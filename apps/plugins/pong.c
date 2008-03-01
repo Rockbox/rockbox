@@ -130,6 +130,16 @@ PLUGIN_HEADER
 #define PONG_RIGHT_UP BUTTON_VOL_UP
 #define PONG_RIGHT_DOWN BUTTON_VOL_DOWN
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+#define PONG_QUIT BUTTON_POWER
+#define PONG_PAUSE BUTTON_SELECT
+#define PONG_LEFT_UP BUTTON_MENU
+#define PONG_LEFT_DOWN BUTTON_LEFT
+#define PONG_RIGHT_UP BUTTON_PLAY
+#define PONG_RIGHT_DOWN BUTTON_RIGHT
+
+#else
+#error No keymap defined!
 #endif
 
 static struct plugin_api* rb;

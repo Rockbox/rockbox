@@ -179,6 +179,19 @@ PLUGIN_HEADER
 #define STAR_LEVEL_REPEAT   BUTTON_MENU
 #define STAR_MENU_RUN       BUTTON_SELECT
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_SELECT
+#define STAR_LEVEL_UP       BUTTON_PLAY
+#define STAR_LEVEL_DOWN     BUTTON_MENU
+#define STAR_LEVEL_REPEAT   BUTTON_DISPLAY
+#define STAR_MENU_RUN       BUTTON_SELECT
+
+#else
+#error No keymap defined!
 #endif
 
 /* function returns because of USB? */

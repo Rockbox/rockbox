@@ -141,8 +141,16 @@ enum minesweeper_status {
 #   define MINESWP_DISCOVER BUTTON_SELECT
 #   define MINESWP_INFO     BUTTON_MENU
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+#   define MINESWP_UP       BUTTON_UP
+#   define MINESWP_DOWN     BUTTON_DOWN
+#   define MINESWP_QUIT     BUTTON_POWER
+#   define MINESWP_TOGGLE   BUTTON_DISPLAY
+#   define MINESWP_DISCOVER BUTTON_SELECT
+#   define MINESWP_INFO     BUTTON_MENU
+
 #else
-#   warning Missing key definitions for this keypad
+#error No keymap defined!
 #endif
 
 /* here is a global api struct pointer. while not strictly necessary,

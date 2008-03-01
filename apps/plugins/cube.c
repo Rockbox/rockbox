@@ -217,6 +217,20 @@ PLUGIN_HEADER
 #define CUBE_PAUSE         (BUTTON_PLAY | BUTTON_REL)
 #define CUBE_HIGHSPEED     (BUTTON_NEXT | BUTTON_REL)
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+#define CUBE_QUIT          BUTTON_POWER
+#define CUBE_X_INC         BUTTON_LEFT
+#define CUBE_X_DEC         BUTTON_RIGHT
+#define CUBE_Y_INC         BUTTON_UP
+#define CUBE_Y_DEC         BUTTON_DOWN
+#define CUBE_Z_INC         (BUTTON_DISPLAY | BUTTON_UP)
+#define CUBE_Z_DEC         (BUTTON_DISPLAY | BUTTON_DOWN)
+#define CUBE_MODE          BUTTON_MENU
+#define CUBE_PAUSE         BUTTON_PLAY
+#define CUBE_HIGHSPEED     BUTTON_SELECT
+
+#else
+#error No keymap defined!
 #endif
 
 #ifdef HAVE_LCD_BITMAP

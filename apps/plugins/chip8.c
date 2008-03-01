@@ -1056,6 +1056,19 @@ STATIC void chip8 (void)
 #define CHIP8_KEY8 BUTTON_DOWN
 #define CHIP8_KEY9 BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+#define CHIP8_OFF  BUTTON_POWER
+#define CHIP8_KEY1 BUTTON_MENU
+#define CHIP8_KEY2 BUTTON_UP
+#define CHIP8_KEY3 BUTTON_PLAY
+#define CHIP8_KEY4 BUTTON_LEFT
+#define CHIP8_KEY5 BUTTON_SELECT
+#define CHIP8_KEY6 BUTTON_RIGHT
+#define CHIP8_KEY7 BUTTON_DISPLAY
+#define CHIP8_KEY8 BUTTON_DOWN
+
+#else
+#error No keymap defined!
 #endif
 
 static byte chip8_virtual_keys[16];

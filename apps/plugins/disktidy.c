@@ -76,8 +76,11 @@ enum tidy_system
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 #define TIDY_STOP BUTTON_BACK
 
+#elif CONFIG_KEYPAD == MROBE100_PAD
+#define TIDY_STOP BUTTON_POWER
+
 #else
-  #error DISKTIDY: Unsupported keypad
+#error No keymap defined!
 #endif
 
 

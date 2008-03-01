@@ -25,6 +25,8 @@ bubbles_bubble.320x240x1.bmp
 rockblox_background.112x64x1.bmp
 #elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 64)
 rockblox_background.128x64x1.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
+rockblox_background.160x128x1.bmp
 #endif
 
 /* Flip it */

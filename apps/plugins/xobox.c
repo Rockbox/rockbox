@@ -121,8 +121,17 @@ PLUGIN_HEADER
 #define DOWN BUTTON_DOWN
 #define PAUSE BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+
+#define QUIT BUTTON_POWER
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+#define PAUSE BUTTON_DISPLAY
+
 #else
-#error Unsupported keypad
+#error No keymap defined!
 #endif
 
 #define MOVE_NO 0               /* player movement */

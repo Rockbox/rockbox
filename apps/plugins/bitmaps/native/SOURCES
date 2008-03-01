@@ -485,6 +485,10 @@ sudoku_inverse.160x128x16.bmp
 sudoku_start.160x128x2.bmp
 sudoku_normal.160x128x2.bmp
 sudoku_inverse.160x128x2.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 1)
+sudoku_start.160x128x1.bmp
+sudoku_normal.160x128x1.bmp
+sudoku_inverse.160x128x1.bmp
 #elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176) && (LCD_DEPTH == 16)
 sudoku_start.220x176x16.bmp
 sudoku_normal.220x176x16.bmp

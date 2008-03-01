@@ -117,6 +117,17 @@ PLUGIN_IRAM_DECLARE
 #define BTN_PLAY         BUTTON_RC_HEART
 
 
+#elif (CONFIG_KEYPAD == MROBE100_PAD)
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+#define BTN_PLAY         BUTTON_DISPLAY
+
+
+#else
+#error No keymap defined!
 #endif
 
 #undef SYNC
