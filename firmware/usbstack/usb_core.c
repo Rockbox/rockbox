@@ -385,15 +385,18 @@ void usb_core_init(void)
      * won't be used. This simplifies other logic (i.e. we don't need to know
      * yet which drivers will be enabled */
 #ifdef USB_STORAGE
-    usb_storage_init();
+    if(usb_core_storage_enabled)
+        usb_storage_init();
 #endif
 
 #ifdef USB_SERIAL
-    usb_serial_init();
+    if(usb_core_serial_enabled)
+        usb_serial_init();
 #endif
 
 #ifdef USB_BENCHMARK
-    usb_benchmark_init();
+    if(usb_core_benchmark_enabled)
+        usb_benchmark_init();
 #endif
     initialized = true;
     usb_state = DEFAULT;
