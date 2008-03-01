@@ -26,6 +26,7 @@
 #include "debug_menu.h"
 #include "kernel.h"
 #include "sprintf.h"
+#include "structec.h"
 #include "action.h"
 #include "debug.h"
 #include "thread.h"
@@ -1882,7 +1883,11 @@ static bool dbg_identify_info(void)
     int fd = creat("/identify_info.bin");
     if(fd >= 0)
     {
+#ifdef ROCKBOX_LITTLE_ENDIAN
+        ecwrite(fd, ata_get_identify(), SECTOR_SIZE/2, "s", true);
+#else
         write(fd, ata_get_identify(), SECTOR_SIZE);
+#endif
         close(fd);
     }
     return false;
