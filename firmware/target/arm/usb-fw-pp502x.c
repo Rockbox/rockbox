@@ -48,7 +48,7 @@ void usb_init_device(void)
 
     while ((inl(0x70000028) & 0x80) == 0);
     outl(inl(0x70000028) | 0x2, 0x70000028);
-    udelay(0x186A0);
+    udelay(100000);
     
     /* disable USB-devices until USB is detected via GPIO */
     DEV_EN &= ~DEV_USB0;
@@ -68,9 +68,7 @@ void usb_enable(bool on)
     if (on) {
         /* if USB is detected, re-enable the USB-devices, otherwise make sure it's disabled */
         DEV_EN |= DEV_USB0;
-        DEV_RS &=~DEV_USB0;
         DEV_EN |= DEV_USB1;
-        DEV_RS &=~DEV_USB1;
         DEV_INIT2 |= INIT_USB;
         usb_core_init();
     }
