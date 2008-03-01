@@ -44,9 +44,7 @@ void usb_init_device(void)
     DEV_RS |= DEV_USB1;
     DEV_RS &=~DEV_USB1;
 
-#if CONFIG_CPU == PP5020
     DEV_INIT2 |= INIT_USB;
-#endif
 
     while ((inl(0x70000028) & 0x80) == 0);
     outl(inl(0x70000028) | 0x2, 0x70000028);
@@ -55,9 +53,7 @@ void usb_init_device(void)
     /* disable USB-devices until USB is detected via GPIO */
     DEV_EN &= ~DEV_USB0;
     DEV_EN &= ~DEV_USB1;
-#if CONFIG_CPU == PP5020
     DEV_INIT2 &= ~INIT_USB;
-#endif
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
  || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
@@ -75,9 +71,7 @@ void usb_enable(bool on)
         DEV_RS &=~DEV_USB0;
         DEV_EN |= DEV_USB1;
         DEV_RS &=~DEV_USB1;
-#if CONFIG_CPU == PP5020
         DEV_INIT2 |= INIT_USB;
-#endif
         usb_core_init();
     }
     else {
@@ -85,9 +79,7 @@ void usb_enable(bool on)
         /* Disable USB devices */
         DEV_EN &=~ DEV_USB0;
         DEV_EN &=~ DEV_USB1;
-#if CONFIG_CPU == PP5020
         DEV_INIT2 &=~ INIT_USB;
-#endif
     }
 }
 
