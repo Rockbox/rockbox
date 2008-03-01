@@ -62,11 +62,6 @@ plasma.c
 blackjack.c
 bounce.c
 bubbles.c
-
-#if (LCD_DEPTH > 1)
-invadrox.c
-#endif
-
 calculator.c
 chip8.c
 chopper.c
@@ -150,6 +145,7 @@ iriver_flash.c
 #endif /* iFP7xx */
 #if (LCD_WIDTH > 138) && (LCD_DEPTH > 1)
 /* Built for bitmap targets except H10 5/6gb, Archoses, iPod mini, mrobe100 and ifp*/
+invadrox.c
 superdom.c
 #endif
 #endif /* m:robe 500 */
