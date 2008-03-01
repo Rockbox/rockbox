@@ -68,7 +68,7 @@ void InstallTalkWindow::change()
     Config *cw = new Config(this,4);
     cw->setSettings(settings);
     cw->show();
-    connect(cw, SIGNAL(settingsUpdated()), this, SIGNAL(settingsUpdated()));
+    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(settingsUpdated()));
 }
 
 void InstallTalkWindow::accept()
@@ -109,7 +109,12 @@ void InstallTalkWindow::accept()
 void InstallTalkWindow::setSettings(RbSettings* sett)
 {
     settings = sett;
-    
+    settingsUpdated();
+}
+
+
+void InstallTalkWindow::settingsUpdated(void)
+{
     QString ttsName = settings->curTTS();
     TTSBase* tts = TTSBase::getTTS(ttsName);
     tts->setCfg(settings);
@@ -131,6 +136,5 @@ void InstallTalkWindow::setSettings(RbSettings* sett)
         ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
 
     setTalkFolder(settings->lastTalkedFolder());
-
 }
 

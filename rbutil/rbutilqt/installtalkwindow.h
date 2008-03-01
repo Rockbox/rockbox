@@ -34,9 +34,6 @@ class InstallTalkWindow : public QDialog
         InstallTalkWindow(QWidget *parent = 0);
         void setSettings(RbSettings* sett);
 
-    signals:
-        void settingsUpdated(void);
-        
     public slots:
         void accept(void);
         void change(void);
@@ -44,6 +41,7 @@ class InstallTalkWindow : public QDialog
     private slots:
         void browseFolder(void);
         void setTalkFolder(QString folder);
+        void settingsUpdated(void);
 
     private:
         TalkFileCreator* talkcreator;

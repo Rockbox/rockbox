@@ -36,7 +36,7 @@ void CreateVoiceWindow::change()
     Config *cw = new Config(this,4);
     cw->setSettings(settings);
     cw->show();
-    connect(cw, SIGNAL(settingsUpdated()), this, SIGNAL(settingsUpdated()));
+    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(settingsUpdated()));
 }
 
 void CreateVoiceWindow::accept()
@@ -58,7 +58,6 @@ void CreateVoiceWindow::accept()
     voicecreator->setMountPoint(settings->mountpoint());
     voicecreator->setTargetId(settings->curTargetId());
     voicecreator->setLang(lang);
-    voicecreator->setProxy(m_proxy);
     voicecreator->setWavtrimThreshold(wvThreshold);
        
     //start creating
@@ -66,11 +65,19 @@ void CreateVoiceWindow::accept()
 }
 
 
-
+/** @brief set settings object
+ */
 void CreateVoiceWindow::setSettings(RbSettings* sett)
 {
     settings = sett;
+    settingsUpdated();
+}
 
+
+/** @brief update displayed settings
+ */
+void CreateVoiceWindow::settingsUpdated(void)
+{
     // fill in language combobox
     QStringList languages = settings->allLanguages();
     languages.sort();
