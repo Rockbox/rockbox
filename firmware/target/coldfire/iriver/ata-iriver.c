@@ -36,10 +36,10 @@ void ata_reset(void)
 void ata_enable(bool on)
 {
     if(on)
-        and_l(~0x0040000, &GPIO_OUT);
+        and_l(~0x00040000, &GPIO_OUT);
     else
-        or_l(0x0040000, &GPIO_OUT);
-    
+        or_l(0x00040000, &GPIO_OUT);
+
     or_l(0x00040000, &GPIO_ENABLE);
     or_l(0x00040000, &GPIO_FUNCTION);
 }
@@ -53,11 +53,11 @@ void ata_device_init(void)
 {
 #ifdef HAVE_ATA_LED_CTRL
     /* Enable disk LED & ISD chip power control */
-    and_l(~0x0000240, &GPIO_OUT);
-    or_l(0x00000240, &GPIO_ENABLE);
-    or_l(0x00000200, &GPIO_FUNCTION);
+    and_l(~0x00000240, &GPIO_OUT);
+    or_l(  0x00000240, &GPIO_ENABLE);
+    or_l(  0x00000200, &GPIO_FUNCTION);
 #endif
-    
+
     /* ATA reset */
     or_l(0x00080000, &GPIO_OUT);
     or_l(0x00080000, &GPIO_ENABLE);
