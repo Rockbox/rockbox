@@ -5,7 +5,7 @@
 *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 *                     \/            \/     \/    \/            \/
-* $Id: grey_draw.c 16080 2008-01-13 18:39:09Z amiconn $
+* $Id$
 *
 * New greyscale framework
 * Coldfire assembler routines
