@@ -657,7 +657,6 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                     if(usb_core_benchmark_enabled){
                         benchmark_ep_in_descriptor.wMaxPacketSize=max_packet_size;
                         benchmark_ep_out_descriptor.wMaxPacketSize=max_packet_size;
-                        config_descriptor.bNumInterfaces=interface_number;
 
                         memcpy(&response_data[size],&benchmark_interface_descriptor,sizeof(struct usb_interface_descriptor));
                         size += sizeof(struct usb_interface_descriptor);
@@ -667,6 +666,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                         size += sizeof(struct usb_endpoint_descriptor);
                     }
 #endif
+                    config_descriptor.bNumInterfaces=interface_number;
                     config_descriptor.wTotalLength = size;
                     memcpy(&response_data[0],&config_descriptor,sizeof(struct usb_config_descriptor));
 
