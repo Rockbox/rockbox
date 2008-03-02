@@ -80,6 +80,8 @@
 #define ASC_LBA_OUT_OF_RANGE        0x21
 #define ASC_WRITE_ERROR             0x0C
 #define ASC_READ_ERROR              0x11
+#define ASC_NOT_READY               0x04
+#define ASCQ_BECOMING_READY         0x01
 
 #define SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA 0x02000000
 
@@ -207,6 +209,7 @@ static struct {
     unsigned char sense_key;
     unsigned char information;
     unsigned char asc;
+    unsigned char ascq;
 } cur_sense_data;
 
 static void handle_scsi(struct command_block_wrapper* cbw);
@@ -228,10 +231,6 @@ static enum {
 /* called by usb_code_init() */
 void usb_storage_init(void)
 {
-    size_t bufsize;
-    unsigned char * audio_buffer = audio_get_buffer(false,&bufsize);
-    /* TODO : check if bufsize is at least 32K ? */
-    tb.transfer_buffer = (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
     logf("usb_storage_init done");
 }
 
@@ -270,6 +269,7 @@ void usb_storage_transfer_complete(bool in,int status,int length)
                     send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
                     cur_sense_data.asc=ASC_WRITE_ERROR;
+                    cur_sense_data.ascq=0;
                     break;
                 }
 
@@ -291,6 +291,7 @@ void usb_storage_transfer_complete(bool in,int status,int length)
                 cur_sense_data.sense_key=0;
                 cur_sense_data.information=0;
                 cur_sense_data.asc=0;
+                cur_sense_data.ascq=0;
             }
             break;
         case WAITING_FOR_COMMAND:
@@ -329,6 +330,7 @@ void usb_storage_transfer_complete(bool in,int status,int length)
                 cur_sense_data.sense_key=0;
                 cur_sense_data.information=0;
                 cur_sense_data.asc=0;
+                cur_sense_data.ascq=0;
             }
             break;
         case SENDING_BLOCKS:
@@ -351,6 +353,7 @@ void usb_storage_transfer_complete(bool in,int status,int length)
                 cur_sense_data.sense_key=0;
                 cur_sense_data.information=0;
                 cur_sense_data.asc=0;
+                cur_sense_data.ascq=0;
             }
             break;
     }
@@ -390,13 +393,20 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req)
             handled = true;
             break;
 
-        case USB_REQ_SET_CONFIGURATION:
+        case USB_REQ_SET_CONFIGURATION: {
+            size_t bufsize;
+            unsigned char * audio_buffer;
             logf("ums: set config");
             /* prime rx endpoint. We only need room for commands */
             state = WAITING_FOR_COMMAND;
+
+            /* TODO : check if bufsize is at least 32K ? */
+            audio_buffer = audio_get_buffer(false,&bufsize);
+            tb.transfer_buffer = (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
             usb_drv_recv(EP_MASS_STORAGE, tb.transfer_buffer, 1024);
             handled = true;
             break;
+        }
     }
 
     return handled;
@@ -409,6 +419,7 @@ static void send_and_read_next(void)
         send_csw(UMS_STATUS_FAIL);
         cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
         cur_sense_data.asc=ASC_READ_ERROR;
+        cur_sense_data.ascq=0;
         return;
     }
     send_block_data(current_cmd.data[current_cmd.data_select],
@@ -472,6 +483,13 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     switch (cbw->command_block[0]) {
         case SCSI_TEST_UNIT_READY:
             logf("scsi test_unit_ready %d",lun);
+            if(!usb_exclusive_ata()) {
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_NOT_READY;
+                cur_sense_data.asc=ASC_NOT_READY;
+                cur_sense_data.ascq=ASCQ_BECOMING_READY;
+                break;
+            }
             if(lun_present) {
                 send_csw(UMS_STATUS_GOOD);
             }
@@ -479,6 +497,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
             }
             break;
 
@@ -516,7 +535,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             tb.sense_data->AdditionalSenseLength=10;
             tb.sense_data->CommandSpecificInformation=0;
             tb.sense_data->AdditionalSenseCode=cur_sense_data.asc;
-            tb.sense_data->AdditionalSenseCodeQualifier=0;
+            tb.sense_data->AdditionalSenseCodeQualifier=cur_sense_data.ascq;
             tb.sense_data->FieldReplaceableUnitCode=0;
             tb.sense_data->SKSV=0;
             tb.sense_data->SenseKeySpecific=0;
@@ -531,6 +550,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
                 break;
             }
             /*unsigned char pc = (cbw->command_block[2] & 0xc0) >>6;*/
@@ -563,6 +583,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                     cur_sense_data.asc=ASC_INVALID_FIELD_IN_CBD;
+                    cur_sense_data.ascq=0;
                     break;
                 }
             break;
@@ -573,6 +594,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
                 break;
             }
             /*unsigned char pc = (cbw->command_block[2] & 0xc0) >>6;*/
@@ -608,6 +630,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                     cur_sense_data.asc=ASC_INVALID_FIELD_IN_CBD;
+                    cur_sense_data.ascq=0;
                     break;
             }
             break;
@@ -641,6 +664,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
             }
             break;
         }
@@ -660,6 +684,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
             }
             break;
         }
@@ -671,6 +696,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
                 break;
             }
             current_cmd.data[0] = tb.transfer_buffer;
@@ -692,6 +718,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
+                cur_sense_data.ascq=0;
             }
             else {
                 current_cmd.last_result = ata_read_sectors(IF_MV2(current_cmd.lun,) current_cmd.sector,
@@ -708,6 +735,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
                 break;
             }
             current_cmd.data[0] = tb.transfer_buffer;
@@ -727,6 +755,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
+                cur_sense_data.ascq=0;
             }
             else {
                 receive_block_data(current_cmd.data[0],
@@ -776,6 +805,7 @@ static void send_csw(int status)
         cur_sense_data.sense_key=0;
         cur_sense_data.information=0;
         cur_sense_data.asc=0;
+        cur_sense_data.ascq=0;
     }
 }
 

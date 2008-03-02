@@ -29,6 +29,7 @@ enum {
 	USB_REENABLE,
 	USB_POWERED,
 	USB_TRANSFER_COMPLETION,
+	USB_REQUEST_DISK,
 	USB_REQUEST_REBOOT
 };
 
@@ -102,6 +103,8 @@ bool usb_charging_enabled(void);
 #ifdef HAVE_USBSTACK
 void usb_signal_transfer_completion(struct usb_transfer_completion_event_data* event_data);
 bool usb_driver_enabled(int driver);
+bool usb_exclusive_ata(void); /* ata is available for usb */
+void usb_request_exclusive_ata(void);
 #endif
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \

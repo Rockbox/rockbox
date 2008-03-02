@@ -460,6 +460,10 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
 {
     if(usb_state == DEFAULT) {
         set_serial_descriptor();
+#ifdef USB_STORAGE
+        if(usb_core_storage_enabled)
+            usb_request_exclusive_ata();
+#endif
     }
 
 #ifdef USB_BENCHMARK

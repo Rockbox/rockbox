@@ -73,6 +73,7 @@ static struct thread_entry *usb_thread_entry;
 static struct event_queue usb_queue;
 static int last_usb_status;
 static bool usb_monitor_enabled;
+static bool exclusive_disk;
 
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
@@ -197,6 +198,30 @@ static void usb_thread(void)
                 else
 #endif
                 {
+#ifdef HAVE_USBSTACK
+#ifdef USE_ROCKBOX_USB 
+                    usb_core_enable_protocol(USB_DRIVER_MASS_STORAGE,true);
+                    usb_core_enable_protocol(USB_DRIVER_SERIAL,false);/* TODO: add debug setting */
+                    usb_core_enable_protocol(USB_DRIVER_CHARGING_ONLY,false);
+                    usb_enable(true);
+#else
+                    usb_request_exclusive_ata();
+#endif  /* USE_ROCKBOX_USB */
+#else
+                    /* Tell all threads that they have to back off the ATA.
+                       We subtract one for our own thread. */
+                    num_acks_to_expect =
+                        queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
+                    waiting_for_ack = true;
+                    DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
+                           num_acks_to_expect);
+#endif
+                }
+                break;
+#ifdef HAVE_USBSTACK
+            case USB_REQUEST_DISK:
+                if(!waiting_for_ack)
+                {
                     /* Tell all threads that they have to back off the ATA.
                        We subtract one for our own thread. */
                     num_acks_to_expect =
@@ -206,7 +231,7 @@ static void usb_thread(void)
                            num_acks_to_expect);
                 }
                 break;
-
+#endif
             case SYS_USB_CONNECTED_ACK:
                 if(waiting_for_ack)
                 {
@@ -215,25 +240,22 @@ static void usb_thread(void)
                     {
                         DEBUGF("All threads have acknowledged the connect.\n");
 #ifdef HAVE_USBSTACK
-#ifdef HAVE_PRIORITY_SCHEDULING
-                        thread_set_priority(usb_thread_entry,PRIORITY_REALTIME);
-#endif
-#ifdef USE_ROCKBOX_USB
-                        usb_core_enable_protocol(USB_DRIVER_MASS_STORAGE,true);
-                        usb_core_enable_protocol(USB_DRIVER_SERIAL,false);/* TODO: add debug setting */
-                        usb_core_enable_protocol(USB_DRIVER_CHARGING_ONLY,false);
-                        usb_enable(true);
-#else /* USE_ROCKBOX_USB */
+#ifndef USE_ROCKBOX_USB
                         /* until we have native mass-storage mode, we want to reboot on
                            usb host connect */
                         try_reboot();
 #endif  /* USE_ROCKBOX_USB */
+#ifdef HAVE_PRIORITY_SCHEDULING
+                        thread_set_priority(usb_thread_entry,PRIORITY_REALTIME);
+                        exclusive_disk = true;
+#endif
 
 #else
                         usb_slave_mode(true);
                         cpu_idle_mode(true);
 #endif
                         usb_state = USB_INSERTED;
+                        waiting_for_ack = false;
                     }
                     else
                     {
@@ -246,6 +268,7 @@ static void usb_thread(void)
             case USB_EXTRACTED:
 #ifdef HAVE_USBSTACK
                 usb_enable(false);
+                exclusive_disk = false;
 #ifdef HAVE_PRIORITY_SCHEDULING
                 thread_set_priority(usb_thread_entry,PRIORITY_SYSTEM);
 #endif
@@ -290,6 +313,7 @@ static void usb_thread(void)
                     {
                         DEBUGF("All threads have acknowledged. "
                                "We're in business.\n");
+                        waiting_for_ack = false;
                     }
                     else
                     {
@@ -403,6 +427,7 @@ void usb_acknowledge(long id)
 void usb_init(void)
 {
     usb_state = USB_EXTRACTED;
+    exclusive_disk = false;
     usb_monitor_enabled = false;
     countdown = -1;
 
@@ -480,6 +505,20 @@ bool usb_inserted(void)
     return usb_state == USB_INSERTED;
 #endif
 }
+
+#ifdef HAVE_USBSTACK
+void usb_request_exclusive_ata(void)
+{
+    if(!exclusive_disk) {
+        queue_post(&usb_queue, USB_REQUEST_DISK, 0);
+    }
+}
+
+bool usb_exclusive_ata(void)
+{
+    return exclusive_disk;
+}
+#endif
 
 #ifdef HAVE_USB_POWER
 bool usb_powered(void)
