@@ -77,6 +77,8 @@ void usb_serial_send(unsigned char *data,int length)
 {
     if(!active)
         return;
+    if(length<=0)
+        return;
     mutex_lock(&sendlock);
     if(buffer_start+buffer_length > BUFFER_SIZE)
     { 
@@ -132,7 +134,7 @@ void usb_serial_transfer_complete(bool in, int status, int length)
             }
             busy_sending = false;
 
-            if(buffer_length!=0)
+            if(buffer_length>0)
             {
                 sendout();
             }
@@ -153,8 +155,13 @@ bool usb_serial_control_request(struct usb_ctrlrequest* req)
             handled = true;
 
             /* we come here too after a bus reset, so reset some data */
+            mutex_lock(&sendlock);
             busy_sending = false;
-            sendout();
+            if(buffer_length>0)
+            {
+                sendout();
+            }
+            mutex_unlock(&sendlock);
             break;
 
         default:
