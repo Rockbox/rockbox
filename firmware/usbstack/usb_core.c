@@ -285,10 +285,14 @@ static int usb_address = 0;
 static bool initialized = false;
 static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
+#ifdef USB_STORAGE
 static bool usb_core_storage_enabled = false;
+#endif
 /* Next one is non-static, to enable setting it from the debug menu */
 bool usb_core_serial_enabled = false;
+#ifdef USB_CHARGING_ONLY
 static bool usb_core_charging_enabled = false;
+#endif
 #if defined(USB_BENCHMARK)
 static bool usb_core_benchmark_enabled = false;
 #endif
