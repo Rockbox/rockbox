@@ -134,10 +134,9 @@
 #define HAVE_USB_POWER
 
 /* enable these for the experimental usb stack */
-/* TODO: get correct ID's */
 #define HAVE_USBSTACK
-#define USB_VENDOR_ID 0x0B70
-#define USB_PRODUCT_ID 0x00BA
+#define USB_VENDOR_ID 0x07B4
+#define USB_PRODUCT_ID 0x0280
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
