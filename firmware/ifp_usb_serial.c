@@ -25,7 +25,7 @@
 /* #include "config.h" */
 #include <stdlib.h>
 #include "pnx0101.h"
-#include "usb_serial.h"
+#include "ifp_usb_serial.h"
 
 #ifdef BUTTONS
 #include "kernel.h"

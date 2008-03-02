@@ -494,7 +494,7 @@ target/coldfire/iaudio/m5/audio-m5.c
 
 #ifdef IRIVER_IFP7XX_SERIES
 #ifdef STUB
-usb_serial.c
+ifp_usb_serial.c
 common/sscanf.c
 #endif /* STUB */
 #endif /* IRIVER_IFP7XX_SERIES */
