@@ -235,6 +235,8 @@ flipit_tokens.28x56x2.bmp
 flipit_tokens.25x50x2.bmp
 #endif
 #else /* monochrome */
+#if LCD_WIDTH >= 140 && LCD_HEIGHT >= 122
+flipit_tokens.28x56x1.bmp
 #if LCD_WIDTH >= 80 && LCD_HEIGHT >= 62
 flipit_tokens.16x26x1.bmp
 #endif
