@@ -73,7 +73,9 @@ static struct thread_entry *usb_thread_entry;
 static struct event_queue usb_queue;
 static int last_usb_status;
 static bool usb_monitor_enabled;
-static bool exclusive_disk;
+#ifdef HAVE_USBSTACK
+static bool exclusive_ata_access;
+#endif
 
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
@@ -243,7 +245,7 @@ static void usb_thread(void)
 #endif  /* USE_ROCKBOX_USB */
 #ifdef HAVE_PRIORITY_SCHEDULING
                         thread_set_priority(usb_thread_entry,PRIORITY_REALTIME);
-                        exclusive_disk = true;
+                        exclusive_ata_access = true;
 #endif
 
 #else
@@ -264,7 +266,7 @@ static void usb_thread(void)
             case USB_EXTRACTED:
 #ifdef HAVE_USBSTACK
                 usb_enable(false);
-                exclusive_disk = false;
+                exclusive_ata_access = false;
 #ifdef HAVE_PRIORITY_SCHEDULING
                 thread_set_priority(usb_thread_entry,PRIORITY_SYSTEM);
 #endif
@@ -423,7 +425,7 @@ void usb_acknowledge(long id)
 void usb_init(void)
 {
     usb_state = USB_EXTRACTED;
-    exclusive_disk = false;
+    exclusive_ata_access = false;
     usb_monitor_enabled = false;
     countdown = -1;
 
@@ -505,14 +507,14 @@ bool usb_inserted(void)
 #ifdef HAVE_USBSTACK
 void usb_request_exclusive_ata(void)
 {
-    if(!exclusive_disk) {
+    if(!exclusive_ata_access) {
         queue_post(&usb_queue, USB_REQUEST_DISK, 0);
     }
 }
 
 bool usb_exclusive_ata(void)
 {
-    return exclusive_disk;
+    return exclusive_ata_access;
 }
 #endif
 
