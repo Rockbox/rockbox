@@ -221,6 +221,8 @@
 #define UI_LCD_POSY                 74 /* y position of lcd (74 for real aspect) */
 #define UI_LCD_BGCOLOR              100, 135, 100 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         223, 216, 255 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
 #define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
 #define UI_REMOTE_BGCOLOR           90, 145, 90 /* bkgnd of remote lcd (no bklight) */
