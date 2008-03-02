@@ -199,14 +199,10 @@ static void usb_thread(void)
 #endif
                 {
 #ifdef HAVE_USBSTACK
-#ifdef USE_ROCKBOX_USB 
                     usb_core_enable_protocol(USB_DRIVER_MASS_STORAGE,true);
                     usb_core_enable_protocol(USB_DRIVER_SERIAL,false);/* TODO: add debug setting */
                     usb_core_enable_protocol(USB_DRIVER_CHARGING_ONLY,false);
                     usb_enable(true);
-#else
-                    usb_request_exclusive_ata();
-#endif  /* USE_ROCKBOX_USB */
 #else
                     /* Tell all threads that they have to back off the ATA.
                        We subtract one for our own thread. */
