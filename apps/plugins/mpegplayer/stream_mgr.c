@@ -1006,8 +1006,8 @@ int stream_init(void)
     graymem = mem;
 #endif
 
-    success = grey_init(rb, graymem, memsize, true, LCD_WIDTH,
-                        LCD_HEIGHT, &graysize);
+    success = grey_init(rb, graymem, memsize, GREY_BUFFERED,
+                        LCD_WIDTH, LCD_HEIGHT, &graysize);
 
     /* This can run on another processor - align size */
     graysize = CACHEALIGN_UP(graysize);

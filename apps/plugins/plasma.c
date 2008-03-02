@@ -214,7 +214,7 @@ int main(void)
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    grey_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT, NULL);
+    grey_init(rb, gbuf, gbuf_size, 0, LCD_WIDTH, LCD_HEIGHT, NULL);
     /* switch on greyscale overlay */
     grey_show(true);
 #endif

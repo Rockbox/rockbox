@@ -555,7 +555,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     xlcd_init(rb);
 #elif defined(USE_GSLIB)
     gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);
-    if (!grey_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, LCD_HEIGHT, NULL))
+    if (!grey_init(rb, gbuf, gbuf_size, GREY_BUFFERED, 
+                   LCD_WIDTH, LCD_HEIGHT, NULL))
     {
         rb->splash(HZ, "Couldn't init greyscale display");
         return PLUGIN_ERROR;

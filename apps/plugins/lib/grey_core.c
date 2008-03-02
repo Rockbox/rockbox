@@ -312,10 +312,12 @@ static int log_s16p16(int x)
    newrb     = pointer to plugin api
    gbuf      = pointer to the memory area to use (e.g. plugin buffer)
    gbuf_size = max usable size of the buffer
-   buffered  = use chunky pixel buffering?
+   features  = flags for requesting features
+               GREY_BUFFERED: use chunky pixel buffering
                This allows to use all drawing functions, but needs more
                memory. Unbuffered operation provides only a subset of
                drawing functions. (only grey_bitmap drawing and scrolling)
+               GREY_RAWMAPPED: no LCD linearisation and gamma correction
    width     = width in pixels  (1..LCD_WIDTH)
    height    = height in pixels (1..LCD_HEIGHT)
                Note that depending on the target LCD, either height or
@@ -335,7 +337,7 @@ static int log_s16p16(int x)
    The function is authentic regarding memory usage on the simulator, even
    if it doesn't use all of the allocated memory. */
 bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
-               bool buffered, int width, int height, long *buf_taken)
+               unsigned features, int width, int height, long *buf_taken)
 {
     int bdim, i;
     long plane_size, buftaken;
@@ -372,7 +374,7 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
 #endif
     gbuf += buftaken;
 
-    if (buffered) /* chunky buffer */
+    if (features & GREY_BUFFERED) /* chunky buffer */
     {
         _grey_info.buffer = gbuf;
         gbuf     += plane_size;
@@ -418,14 +420,21 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
 
     /* precalculate the value -> pattern index conversion table, taking
        linearisation and gamma correction into account */
-    for (i = 0; i < 256; i++)
-    {
-        data = exp_s16p16(((2<<8) * log_s16p16(i * 257 + 1)) >> 8) + 128;
-        data = (data - (data >> 8)) >> 8; /* approx. data /= 257 */
-        data = (lcdlinear[data] << 7) + 127;
-        _grey_info.gvalue[i] = (data + (data >> 8)) >> 8;
+    if (features & GREY_RAWMAPPED)
+        for (i = 0; i < 256; i++)
+        {
+            data = i << 7;
+            _grey_info.gvalue[i] = (data + (data >> 8)) >> 8;
+        }
+    else
+        for (i = 0; i < 256; i++)
+        {
+            data = exp_s16p16(((2<<8) * log_s16p16(i * 257 + 1)) >> 8) + 128;
+            data = (data - (data >> 8)) >> 8; /* approx. data /= 257 */
+            data = (lcdlinear[data] << 7) + 127;
+            _grey_info.gvalue[i] = (data + (data >> 8)) >> 8;
                                           /* approx. data / 255 */
-    }
+        }
 
     if (buf_taken)  /* caller requested info about space taken */
         *buf_taken = buftaken;
@@ -469,7 +478,7 @@ void grey_show(bool enable)
         _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / 70, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_IPOD2BPP
 #ifdef IPOD_1G2G
-        _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / 95, 1, _timer_isr); /* verified */
+        _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / 96, 1, _timer_isr); /* verified */
 #elif defined IPOD_3G
         _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / 87, 1, _timer_isr); /* verified */
 #else

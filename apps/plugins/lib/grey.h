@@ -29,8 +29,10 @@
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 
+/* The greyscale lib uses 8 bit brightness values natively on input. */
 #define GREY_BRIGHTNESS(y) (y)
 
+/* Some predefined levels for convenience: */
 #define GREY_BLACK     GREY_BRIGHTNESS(0)
 #define GREY_DARKGRAY  GREY_BRIGHTNESS(85)
 #define GREY_LIGHTGRAY GREY_BRIGHTNESS(170)
@@ -42,9 +44,13 @@
 #define GREY_INFO_STRUCT struct _grey_info _grey_info;
 #define GREY_INFO_STRUCT_IRAM struct _grey_info _grey_info IBSS_ATTR;
 
+/* Features you can request on library init (ORed together): */
+#define GREY_BUFFERED  0x0001
+#define GREY_RAWMAPPED 0x0002
+
 /* Library initialisation and release */
 bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
-               bool buffered, int width, int height, long *buf_taken);
+               unsigned features, int width, int height, long *buf_taken);
 void grey_release(void);
 
 /* Special functions */

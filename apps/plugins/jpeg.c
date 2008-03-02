@@ -3310,7 +3310,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
 #ifdef USEGSLIB
-    if (!grey_init(rb, buf, buf_size, false, LCD_WIDTH, LCD_HEIGHT, &greysize))
+    if (!grey_init(rb, buf, buf_size, 0, LCD_WIDTH, LCD_HEIGHT, &greysize))
     {
         rb->splash(HZ, "grey buf error");
         return PLUGIN_ERROR;

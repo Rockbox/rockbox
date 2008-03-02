@@ -620,7 +620,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
     /* initialize the greyscale buffer.*/
-    if (!grey_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT, NULL))
+    if (!grey_init(rb, gbuf, gbuf_size, 0, LCD_WIDTH, LCD_HEIGHT, NULL))
     {
         rb->splash(HZ, "Couldn't init greyscale display");
         return 0;

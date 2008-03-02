@@ -74,9 +74,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 #ifdef USE_BUFFERED_GREY
-    grey_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, LCD_HEIGHT, NULL);
+    grey_init(rb, gbuf, gbuf_size, GREY_BUFFERED, LCD_WIDTH, LCD_HEIGHT, NULL);
 #else
-    grey_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT, NULL);
+    grey_init(rb, gbuf, gbuf_size, 0, LCD_WIDTH, LCD_HEIGHT, NULL);
 #endif /* USE_BUFFERED_GREY */
     /* switch on greyscale overlay */
     grey_show(true);
