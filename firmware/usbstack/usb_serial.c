@@ -27,7 +27,7 @@
 
 #ifdef USB_SERIAL
 
-#define BUFFER_SIZE 16384 /* No larger, because of controller limitations */
+#define BUFFER_SIZE 512 /* Max 16k because of controller limitations */
 static unsigned char _send_buffer[BUFFER_SIZE] __attribute__((aligned(32)));
 static unsigned char* send_buffer;
 
@@ -83,7 +83,7 @@ void usb_serial_send(unsigned char *data,int length)
         /* current buffer wraps, so new data can't */
         int available_space = BUFFER_SIZE - buffer_length;
         length=MIN(length,available_space);
-        memcpy(&send_buffer[(buffer_start+buffer_length)%BUFFER_SIZE],data,MIN(length,available_space));
+        memcpy(&send_buffer[(buffer_start+buffer_length)%BUFFER_SIZE],data,length);
         buffer_length+=length;
     }
     else
