@@ -22,6 +22,8 @@
 
 #ifdef HAVE_LCD_BITMAP
 
+PLUGIN_IRAM_DECLARE
+
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #define FPS_QUIT BUTTON_MENU
@@ -258,7 +260,7 @@ static void time_remote_update(void)
 
 #if LCD_DEPTH < 4
 
-GREY_INFO_STRUCT
+GREY_INFO_STRUCT_IRAM
 static unsigned char greydata[LCD_HEIGHT][LCD_WIDTH];
 
 static void make_grey_rect(int width, int height)
@@ -337,6 +339,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     /* standard stuff */
+    PLUGIN_IRAM_INIT(api)
     (void)parameter;
     rb = api;
     
