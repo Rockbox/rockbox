@@ -702,6 +702,7 @@ void button_event(int key, bool pressed)
     case SDLK_SPACE:
         new_btn = BUTTON_SELECT;
         break;
+    case SDLK_KP_MULTIPLY:
     case SDLK_F8:
     case SDLK_ESCAPE:
         new_btn = BUTTON_POWER;

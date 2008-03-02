@@ -31,7 +31,8 @@
 #define UI_HEIGHT                   406 /* height of GUI window */
 #define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         126, 229, 126 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 80 /* x position of lcd */
 #define UI_LCD_POSY                 104 /* y position of lcd (96 for real aspect) */
 #define UI_LCD_WIDTH                112
@@ -43,7 +44,8 @@
 #define UI_HEIGHT                   420 /* height of GUI window */
 #define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         126, 229, 126 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 75 /* x position of lcd */
 #define UI_LCD_POSY                 116 /* y position of lcd */
 #define UI_LCD_WIDTH                132
@@ -55,7 +57,8 @@
 #define UI_HEIGHT                   414 /* height of GUI window */
 #define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         126, 229, 126 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 87 /* x position of lcd */
 #define UI_LCD_POSY                 77 /* y position of lcd (69 for real aspect) */
 #define UI_LCD_WIDTH                112
@@ -67,7 +70,8 @@
 #define UI_HEIGHT                   334 /* height of GUI window */
 #define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         130, 180, 250 /* bkgnd color of LCD (backlight mod) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 21 /* x position of lcd */
 #define UI_LCD_POSY                 82 /* y position of lcd (74 for real aspect) */
 #define UI_LCD_WIDTH                112
@@ -79,13 +83,16 @@
 #define UI_HEIGHT                   508 /* height of GUI window */
 #define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         173, 216, 230 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 109 /* x position of lcd */
 #define UI_LCD_POSY                 23 /* y position of lcd */
 #define UI_LCD_WIDTH                160
 #define UI_LCD_HEIGHT               128
 #define UI_REMOTE_BGCOLOR           90, 145, 90 /* bkgnd of remote lcd (no bklight) */
 #define UI_REMOTE_BGCOLORLIGHT      130, 180, 250 /* bkgnd of remote lcd (bklight) */
+#define UI_REMOTE_FGCOLOR           0, 0, 0 /* foreground color of remote LCD (no backlight) */
+#define UI_REMOTE_FGCOLORLIGHT      0, 0, 0 /* foreground color of remote LCD (backlight) */
 #define UI_REMOTE_POSX              50  /* x position of remote lcd */
 #define UI_REMOTE_POSY              403 /* y position of remote lcd */
 #define UI_REMOTE_WIDTH             128
@@ -113,7 +120,8 @@
 #define UI_HEIGHT                   382 /* height of GUI window */
 #define UI_LCD_BGCOLOR              100, 135, 100 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         223, 216, 255 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 32 /* x position of lcd */
 #define UI_LCD_POSY                 12 /* y position of lcd */
 #define UI_LCD_WIDTH                160
@@ -125,7 +133,8 @@
 #define UI_HEIGHT                   389 /* height of GUI window */
 #define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         173, 216, 230 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 29 /* x position of lcd */
 #define UI_LCD_POSY                 16 /* y position of lcd */
 #define UI_LCD_WIDTH                160
@@ -137,7 +146,8 @@
 #define UI_HEIGHT                   370 /* height of GUI window */
 #define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         173, 216, 230 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 19 /* x position of lcd */
 #define UI_LCD_POSY                 14 /* y position of lcd */
 #define UI_LCD_WIDTH                160
@@ -149,7 +159,8 @@
 #define UI_HEIGHT                   365 /* height of GUI window */
 #define UI_LCD_BGCOLOR              100, 135, 100 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         223, 216, 255 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 24 /* x position of lcd */
 #define UI_LCD_POSY                 17 /* y position of lcd */
 #define UI_LCD_WIDTH                138
@@ -301,7 +312,8 @@
 #define UI_HEIGHT                   183 /* height of GUI window */
 #define UI_LCD_BGCOLOR              94, 104, 84 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         60, 160, 230 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 115 /* x position of lcd */
 #define UI_LCD_POSY                 54 /* y position of lcd */
 #define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
@@ -318,15 +330,17 @@
 #define UI_LCD_HEIGHT               240
 #define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         173, 216, 230 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 
 #elif defined(MROBE_100)
 #define UI_TITLE                    "Olympus M:Robe 100"
 #define UI_WIDTH                    247 /* width of GUI window */
 #define UI_HEIGHT                   416 /* height of GUI window */
-#define UI_LCD_BGCOLOR              94, 2, 2 /* bkgnd color of LCD (no backlight) */
-#define UI_LCD_BGCOLORLIGHT         241, 6, 3 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_BGCOLOR              0, 0, 0 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         94, 2, 2 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_FGCOLOR              50, 50, 50 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         241, 6, 3 /* foreground color of LCD (backlight) */
 #define UI_LCD_POSX                 43 /* x position of lcd */
 #define UI_LCD_POSY                 25 /* y position of lcd */
 #define UI_LCD_WIDTH                160
@@ -342,7 +356,8 @@
 #define UI_LCD_HEIGHT               240
 #define UI_LCD_BGCOLOR              32, 32, 32 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         192, 192, 192 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 
 #endif
 extern SDL_Surface *gui_surface;

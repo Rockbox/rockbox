@@ -393,8 +393,13 @@ static const unsigned char bmpheader[] =
     LE32_CONST(BMP_NUMCOLORS),  /* Number of important colours */
 
 #if LCD_DEPTH == 1
+#ifdef MROBE_100
+    2, 2, 94,  0x00,            /* Colour #0 */
+    3, 6, 241, 0x00             /* Colour #1 */
+#elif
     0x90, 0xee, 0x90, 0x00,     /* Colour #0 */
     0x00, 0x00, 0x00, 0x00      /* Colour #1 */
+#endif
 #elif LCD_DEPTH == 2
     0xe6, 0xd8, 0xad, 0x00,     /* Colour #0 */
     0x99, 0x90, 0x73, 0x00,     /* Colour #1 */

@@ -35,7 +35,8 @@ extern int sim_creat(const char *name);
 SDL_Surface* lcd_surface;
 SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
 SDL_Color lcd_backlight_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
-SDL_Color lcd_color_max  = {0, 0, 0, 0};
+SDL_Color lcd_color_max  = {UI_LCD_FGCOLOR, 0};
+SDL_Color lcd_backlight_color_max = {UI_LCD_FGCOLORLIGHT, 0};
 
 
 static unsigned long get_lcd_pixel(int x, int y)
@@ -75,7 +76,8 @@ void lcd_update(void)
 void sim_backlight(int value)
 {
     if (value > 0) {
-        sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max,
+        sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, 
+                                      &lcd_backlight_color_max,
                          0, (1<<LCD_DEPTH));
     } else {
         sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max,
