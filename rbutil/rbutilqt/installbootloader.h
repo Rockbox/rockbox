@@ -102,6 +102,10 @@ private slots:
     //iriver specific routines
     void iriverPrepare();
     void iriverFinish();
+    
+    //mrobe100 specific routines
+    void mrobe100Prepare();
+    void mrobe100Finish();
 
 private:
 

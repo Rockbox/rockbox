@@ -68,6 +68,12 @@ void BootloaderInstaller::install(ProgressloggerInterface* dp)
         connect(this,SIGNAL(prepare()),this,SLOT(iriverPrepare()));
         connect(this,SIGNAL(finish()),this,SLOT(iriverFinish()));
     }
+    else if(m_bootloadermethod == "mrobe100")
+    {
+        // connect internal signal
+        connect(this,SIGNAL(prepare()),this,SLOT(mrobe100Prepare()));
+        connect(this,SIGNAL(finish()),this,SLOT(mrobe100Finish()));
+    }
     else
     {
         m_dp->addItem(tr("unsupported install Method"),LOGERROR);
@@ -110,6 +116,16 @@ void BootloaderInstaller::uninstall(ProgressloggerInterface* dp)
     {
         // connect internal signal
         connect(this,SIGNAL(prepare()),this,SLOT(sansaPrepare()));
+    }
+    else if(m_bootloadermethod == "h10")
+    {
+        // connect internal signal
+        connect(this,SIGNAL(prepare()),this,SLOT(h10Prepare()));
+    }
+    else if(m_bootloadermethod == "mrobe100")
+    {
+        // connect internal signal
+        connect(this,SIGNAL(prepare()),this,SLOT(mrobe100Prepare()));
     }
     else if(m_bootloadermethod == "fwpatcher")
     {
@@ -635,6 +651,149 @@ void BootloaderInstaller::h10Finish()
     emit done(false);  // success
 
 }
+
+
+
+/**************************************************
+*** mrobe100 secific code
+***************************************************/
+void BootloaderInstaller::mrobe100Prepare()
+{
+    if(m_install)         // Installation
+    {
+        QString url = m_bootloaderUrlBase + "/olympus/mrobe100/" + m_bootloadername;
+
+        m_dp->addItem(tr("Downloading file %1.%2")
+          .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()),LOGINFO);
+
+        // temporary file needs to be opened to get the filename
+        downloadFile.open();
+        m_tempfilename = downloadFile.fileName();
+        downloadFile.close();
+        // get the real file.
+        getter = new HttpGet(this);
+        getter->setProxy(m_proxy);
+        getter->setFile(&downloadFile);
+        getter->getFile(QUrl(url));
+        // connect signals from HttpGet
+        connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
+        connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+        connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
+    }
+    else             // Uninstallation
+    {
+
+        QString firmwarename = m_bootloadername;
+
+        QString firmware = m_mountpoint + "/SYSTEM/" + firmwarename;
+        QString firmwareOrig = m_mountpoint + "/SYSTEM/OF.mi4";
+
+        QFileInfo firmwareFI(firmware);
+        if(!firmwareFI.exists())  //Firmware dosent exists on player
+        {
+            m_dp->addItem(tr("Firmware does not exist: %1")
+                                .arg(firmware),LOGERROR);
+            emit done(true);
+            return;
+        }
+
+        QFileInfo firmwareOrigFI(firmwareOrig);
+        if(!firmwareOrigFI.exists())  //Original Firmware dosent exists on player
+        {
+            m_dp->addItem(tr("Original Firmware does not exist: %1")
+                                .arg(firmwareOrig),LOGERROR);
+            emit done(true);
+            return;
+        }
+
+        QFile firmwareFile(firmware);
+        QFile firmwareOrigFile(firmwareOrig);
+
+        //remove modified firmware
+        if(!firmwareFile.remove())
+        {
+             m_dp->addItem(tr("Could not remove the Firmware at: %1")
+                    .arg(firmware),LOGERROR);
+            emit done(true);
+            return;
+        }
+
+        //copy  original firmware
+        if(!firmwareOrigFile.copy(firmware))
+        {
+             m_dp->addItem(tr("Could not copy the Firmware from: %1 to %2")
+                    .arg(firmwareOrig,firmware),LOGERROR);
+            emit done(true);
+            return;
+        }
+
+        removeInstallLog();
+
+        emit done(false);  //success
+
+    }
+}
+
+void BootloaderInstaller::mrobe100Finish()
+{
+    QString firmwarename = m_bootloadername;
+
+    QString firmware = m_mountpoint + "/SYSTEM/" + firmwarename;
+    QString firmwareOrig = m_mountpoint + "/SYSTEM/OF.mi4";
+
+    QFileInfo firmwareFI(firmware);
+
+    if(!firmwareFI.exists())  //Firmware dosent exists on player
+    {
+        m_dp->addItem(tr("Firmware does not exist: %1")
+                                .arg(firmware),LOGERROR);
+        emit done(true);
+        return;
+    }
+
+    QFileInfo firmwareOrigFI(firmwareOrig);
+
+    if(!firmwareOrigFI.exists())  
+    {
+        QFile firmwareFile(firmware);
+        
+        //backup
+        QDir::home().mkdir("Olympus mrobe100 Original Firmware Backup");
+        firmwareFile.copy(QDir::toNativeSeparators(QDir::homePath()) + QDir::toNativeSeparators("/Olympus mrobe100 Original Firmware Backup/") + m_bootloadername);
+        
+        //rename         
+        if(!firmwareFile.rename(firmwareOrig)) //rename Firmware to Original
+        {
+            m_dp->addItem(tr("Could not rename: %1 to %2")
+                                .arg(firmware,firmwareOrig),LOGERROR);
+            emit done(true);
+            return;
+        }
+    }
+    else  //there is already a original firmware
+    {
+        QFile firmwareFile(firmware);
+        firmwareFile.remove();
+    }
+        //copy the firmware
+    if(!downloadFile.copy(firmware))
+    {
+        m_dp->addItem(tr("Could not copy: %1 to %2")
+                                .arg(m_tempfilename,firmware),LOGERROR);
+        emit done(true);
+        return;
+    }
+
+    downloadFile.remove();
+
+    createInstallLog();
+
+    m_dp->addItem(tr("Bootloader install finished successfully."),LOGOK);
+    m_dp->abort();
+
+    emit done(false);  // success
+}
+
 
 /**************************************************
 *** ipod secific code
