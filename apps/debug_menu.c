@@ -2357,6 +2357,18 @@ static bool dbg_scrollwheel(void)
 }
 #endif
 
+#if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF)
+extern bool usb_core_serial_enabled;
+
+static bool logf_usb_serial(void)
+{
+    usb_core_serial_enabled = !usb_core_serial_enabled;
+    gui_syncsplash(HZ, "USB logf %s",
+                 usb_core_serial_enabled?"enabled":"disabled");
+    return false;
+}
+#endif
+
 
 /****** The menu *********/
 struct the_menu_item {
@@ -2435,6 +2447,9 @@ static const struct the_menu_item menuitems[] = {
 #ifdef ROCKBOX_HAS_LOGF
         {"logf", logfdisplay },
         {"logfdump", logfdump },
+#endif
+#if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF)
+        {"logf over usb",logf_usb_serial },
 #endif
 #ifdef CPU_BOOST_LOGGING
         {"cpu_boost log",cpu_boost_log},

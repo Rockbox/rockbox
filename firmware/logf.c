@@ -32,6 +32,11 @@
 #include "logf.h"
 #include "serial.h"
 
+#ifdef HAVE_USBSTACK
+#include "usb_core.h"
+#include "usbstack/usb_serial.h"
+#endif
+
 /* Only provide all this if asked to */
 #ifdef ROCKBOX_HAS_LOGF
 
@@ -107,6 +112,11 @@ void _logf(const char *format, ...)
     serial_tx(ptr);
     serial_tx("\r\n");
 #endif
+#ifdef USB_SERIAL
+    usb_serial_send(ptr,len);
+    usb_serial_send("\r\n",2);
+#endif
+
     va_end(ap);
     if(len < MAX_LOGF_ENTRY)
         /* pad with spaces up to the MAX_LOGF_ENTRY byte border */

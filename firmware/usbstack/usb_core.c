@@ -286,7 +286,8 @@ static bool initialized = false;
 static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
 static bool usb_core_storage_enabled = false;
-static bool usb_core_serial_enabled = false;
+/* Next one is non-static, to enable setting it from the debug menu */
+bool usb_core_serial_enabled = false;
 static bool usb_core_charging_enabled = false;
 #if defined(USB_BENCHMARK)
 static bool usb_core_benchmark_enabled = false;
@@ -405,6 +406,11 @@ void usb_core_init(void)
 
 void usb_core_exit(void)
 {
+#ifdef USB_SERIAL
+    if(usb_core_serial_enabled)
+        usb_serial_exit();
+#endif
+
     if (initialized) {
         usb_drv_exit();
     }
@@ -444,15 +450,21 @@ void usb_core_handle_transfer_completion(struct usb_transfer_completion_event_da
 void usb_core_enable_protocol(int driver,bool enabled)
 {
     switch(driver) {
+#ifdef USB_STORAGE
 	case USB_DRIVER_MASS_STORAGE:
             usb_core_storage_enabled = enabled;
             break;
+#endif
+#ifdef USB_SERIAL
 	case USB_DRIVER_SERIAL:
             usb_core_serial_enabled = enabled;
             break;
+#endif
+#ifdef USB_CHARGING_ONLY
 	case USB_DRIVER_CHARGING_ONLY:
             usb_core_charging_enabled = enabled;
             break;
+#endif
     }
 }
 

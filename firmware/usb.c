@@ -192,7 +192,6 @@ static void usb_thread(void)
                     usb_state = USB_POWERED;
 #ifdef HAVE_USBSTACK
                     usb_core_enable_protocol(USB_DRIVER_MASS_STORAGE,false);
-                    usb_core_enable_protocol(USB_DRIVER_SERIAL,false);/* TODO: add debug setting */
                     usb_core_enable_protocol(USB_DRIVER_CHARGING_ONLY,true);
                     usb_enable(true);
 #endif
@@ -202,7 +201,6 @@ static void usb_thread(void)
                 {
 #ifdef HAVE_USBSTACK
                     usb_core_enable_protocol(USB_DRIVER_MASS_STORAGE,true);
-                    usb_core_enable_protocol(USB_DRIVER_SERIAL,false);/* TODO: add debug setting */
                     usb_core_enable_protocol(USB_DRIVER_CHARGING_ONLY,false);
                     usb_enable(true);
 #else
