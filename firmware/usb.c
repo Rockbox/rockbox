@@ -425,7 +425,9 @@ void usb_acknowledge(long id)
 void usb_init(void)
 {
     usb_state = USB_EXTRACTED;
+#ifdef HAVE_USBSTACK
     exclusive_ata_access = false;
+#endif
     usb_monitor_enabled = false;
     countdown = -1;
 
