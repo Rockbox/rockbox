@@ -106,7 +106,7 @@ static bool usb_pin_detect(void)
     if (GPIOB_INPUT_VAL & 0x10)
         retval = true;
 
-#elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+#elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(MROBE_100)
     /* GPIO L bit 2 is usb detect */
     if (GPIOL_INPUT_VAL & 0x4)
         retval = true;
