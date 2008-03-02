@@ -586,11 +586,17 @@ void grey_ub_clear_display(void)
 #endif
 }
 
+/* Assembler optimised helper function for copying a single line to the 
+ * greyvalue buffer. */
+void _grey_line1(int width, unsigned char *dst, const unsigned char *src,
+                 const unsigned char *lut);
+
 /* Draw a partial greyscale bitmap, canonical format */
 void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                               int stride, int x, int y, int width, int height)
 {
     int yc, ye;
+    unsigned char *dst;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= _grey_info.width)
@@ -618,16 +624,22 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     src += _GREY_MULUQ(stride, src_y) + src_x; /* move starting point */ 
     yc = y;
     ye = y + height;
+    dst = _grey_info.values + (x << _GREY_BSHIFT);
 
     do
     {
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        int idx = _GREY_MULUQ(_grey_info.width, yc) + x;
+        int idx = _GREY_MULUQ(_grey_info.width, yc);
 #else
         int idx = _GREY_MULUQ(_grey_info.width, yc & ~_GREY_BMASK)
-                + (x << _GREY_BSHIFT) + (~yc & _GREY_BMASK);
+                + (~yc & _GREY_BMASK);
 #endif /* LCD_PIXELFORMAT */
-        unsigned char *dst_row = _grey_info.values + idx;
+
+#if (LCD_PIXELFORMAT == VERTICAL_PACKING) && (LCD_DEPTH == 2) \
+ && defined(CPU_COLDFIRE)
+        _grey_line1(width, dst + idx, src, _grey_info.gvalue);
+#else
+        unsigned char *dst_row = dst + idx;
         const unsigned char *src_row = src;
         const unsigned char *src_end = src + width;
 
@@ -637,6 +649,7 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
             dst_row += _GREY_BSIZE;
         }
         while (src_row < src_end);
+#endif
         
         src += stride;
     }

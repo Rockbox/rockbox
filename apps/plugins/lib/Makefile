@@ -29,7 +29,8 @@ endif
 include $(TOOLSDIR)/makesrc.inc
 
 SOURCES = $(SRC)
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS2 := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DEPFILE = $(OBJDIR)/dep-pluginlib
 DIRS = .
 

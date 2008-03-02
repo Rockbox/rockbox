@@ -8,6 +8,9 @@ grey_core.c
 grey_draw.c
 grey_parm.c
 grey_scroll.c
+#ifdef CPU_COLDFIRE
+grey_coldfire.S
+#endif
 #endif
 highscore.c
 #ifndef SIMULATOR
