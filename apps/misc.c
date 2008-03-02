@@ -396,7 +396,7 @@ static const unsigned char bmpheader[] =
 #ifdef MROBE_100
     2, 2, 94,  0x00,            /* Colour #0 */
     3, 6, 241, 0x00             /* Colour #1 */
-#elif
+#else
     0x90, 0xee, 0x90, 0x00,     /* Colour #0 */
     0x00, 0x00, 0x00, 0x00      /* Colour #1 */
 #endif
