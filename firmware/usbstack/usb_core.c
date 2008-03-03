@@ -631,14 +631,6 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                     }
                     size = sizeof(struct usb_config_descriptor);
 
-#ifdef USB_CHARGING_ONLY
-                    if(usb_core_charging_enabled){
-                        charging_interface_descriptor.bInterfaceNumber=interface_number;
-                        interface_number++;
-                        memcpy(&response_data[size],&charging_interface_descriptor,sizeof(struct usb_interface_descriptor));
-                        size += sizeof(struct usb_interface_descriptor);
-                    }
-#endif
 #ifdef USB_STORAGE
                     if(usb_core_storage_enabled){
                         mass_storage_ep_in_descriptor.wMaxPacketSize=max_packet_size;
@@ -680,6 +672,14 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                         size += sizeof(struct usb_endpoint_descriptor);
                         memcpy(&response_data[size],&benchmark_ep_out_descriptor,sizeof(struct usb_endpoint_descriptor));
                         size += sizeof(struct usb_endpoint_descriptor);
+                    }
+#endif
+#ifdef USB_CHARGING_ONLY
+                    if(usb_core_charging_enabled && interface_number == 0){
+                        charging_interface_descriptor.bInterfaceNumber=interface_number;
+                        interface_number++;
+                        memcpy(&response_data[size],&charging_interface_descriptor,sizeof(struct usb_interface_descriptor));
+                        size += sizeof(struct usb_interface_descriptor);
                     }
 #endif
                     config_descriptor.bNumInterfaces=interface_number;
