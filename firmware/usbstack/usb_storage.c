@@ -546,7 +546,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_MODE_SENSE_10: {
             if(! lun_present) {
-                usb_drv_stall(EP_MASS_STORAGE, true,true);
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -579,7 +578,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                               MIN(sizeof(struct mode_sense_data_10), length));
                     break;
                 default:
-                    usb_drv_stall(EP_MASS_STORAGE, true,true);
                     send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                     cur_sense_data.asc=ASC_INVALID_FIELD_IN_CBD;
@@ -590,7 +588,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         }
         case SCSI_MODE_SENSE_6: {
             if(! lun_present) {
-                usb_drv_stall(EP_MASS_STORAGE, true,true);
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -626,7 +623,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                               MIN(sizeof(struct mode_sense_data_6), length));
                     break;
                 default:
-                    usb_drv_stall(EP_MASS_STORAGE, true,true);
                     send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                     cur_sense_data.asc=ASC_INVALID_FIELD_IN_CBD;
@@ -660,7 +656,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             }
             else
             {
-                usb_drv_stall(EP_MASS_STORAGE, true,true);
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -680,7 +675,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             }
             else
             {
-                usb_drv_stall(EP_MASS_STORAGE, true,true);
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -692,7 +686,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         case SCSI_READ_10:
             logf("scsi read10 %d",lun);
             if(! lun_present) {
-                usb_drv_stall(EP_MASS_STORAGE, true,true);
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -714,7 +707,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             //logf("scsi read %d %d", current_cmd.sector, current_cmd.count);
 
             if((current_cmd.sector + current_cmd.count) > block_count) {
-                usb_drv_stall(EP_MASS_STORAGE, true,true);
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
@@ -731,7 +723,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         case SCSI_WRITE_10:
             logf("scsi write10 %d",lun);
             if(! lun_present) {
-                usb_drv_stall(EP_MASS_STORAGE, true,true);
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
@@ -751,7 +742,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cbw->command_block[8]);
             /* expect data */
             if((current_cmd.sector + current_cmd.count) > block_count) {
-                usb_drv_stall(EP_MASS_STORAGE, true,true);
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
