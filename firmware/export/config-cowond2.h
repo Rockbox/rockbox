@@ -4,7 +4,7 @@
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 34
+#define MODEL_NUMBER 24
 
 /* define this if you have recording possibility */
 //#define HAVE_RECORDING
@@ -115,18 +115,11 @@
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 
-/* Offset ( in the firmware file's header ) to the file length */
-#define FIRMWARE_OFFSET_FILE_LENGTH 0
-
 /* Offset ( in the firmware file's header ) to the file CRC */
-#define FIRMWARE_OFFSET_FILE_CRC 4
+#define FIRMWARE_OFFSET_FILE_CRC 0
 
 /* Offset ( in the firmware file's header ) to the real data */
-#define FIRMWARE_OFFSET_FILE_DATA 6
-
-/* The start address index for ROM builds */
-/* #define ROM_START 0x11010 for behind original Archos */
-#define ROM_START 0x7010 /* for behind BootBox */
+#define FIRMWARE_OFFSET_FILE_DATA 8
 
 /* Software controlled LED */
 #define CONFIG_LED LED_VIRTUAL
