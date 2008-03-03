@@ -119,17 +119,19 @@ bubbles_emblem.112x64x1.bmp
 #endif
 
 /* ChessBox */
-#if (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 240) & (LCD_DEPTH >= 16)
+#if (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 240) && (LCD_DEPTH >= 16)
 chessbox_pieces.240x240x16.bmp
-#elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 176) & (LCD_DEPTH >= 16)
+#elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 176) && (LCD_DEPTH >= 16)
 chessbox_pieces.176x176x16.bmp
-#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128) & (LCD_DEPTH > 1)
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128) && (LCD_DEPTH > 1)
 chessbox_pieces.128x128x2.bmp
-#elif (LCD_WIDTH >= 104) && (LCD_HEIGHT >= 104) & (LCD_DEPTH > 1)
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128) && (LCD_DEPTH == 1)
+chessbox_pieces.128x128x1.bmp
+#elif (LCD_WIDTH >= 104) && (LCD_HEIGHT >= 104) && (LCD_DEPTH > 1)
 chessbox_pieces.104x104x2.bmp
-#elif (LCD_WIDTH >= 80) && (LCD_HEIGHT >= 80) & (LCD_DEPTH > 1)
+#elif (LCD_WIDTH >= 80) && (LCD_HEIGHT >= 80) && (LCD_DEPTH > 1)
 chessbox_pieces.80x80x16.bmp
-#elif (LCD_WIDTH == 112) && (LCD_HEIGHT == 64) & (LCD_DEPTH == 1)
+#elif (LCD_WIDTH == 112) && (LCD_HEIGHT == 64) && (LCD_DEPTH == 1)
 chessbox_pieces.80x64x1.bmp
 #elif (LCD_WIDTH >= 64) && (LCD_HEIGHT >= 64)
 chessbox_pieces.64x64x1.bmp
