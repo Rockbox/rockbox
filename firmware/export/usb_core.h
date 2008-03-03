@@ -22,7 +22,6 @@
 #ifndef BOOTLOADER
 
 //#define USB_SERIAL
-//#define USB_BENCHMARK
 #define USB_STORAGE
 #define USB_CHARGING_ONLY
 #else /* BOOTLOADER */
@@ -31,11 +30,6 @@
 
 #include "usb_ch9.h"
 #include "usb.h"
-
-#if defined(CPU_PP)
-#define USB_IRAM_ORIGIN   ((unsigned char *)0x4000c000)
-#define USB_IRAM_SIZE     ((size_t)0xc000)
-#endif
 
 /* endpoints */
 enum {
@@ -48,9 +42,6 @@ enum {
 #endif
 #ifdef USB_CHARGING_ONLY
 	EP_CHARGING_ONLY,
-#endif
-#ifdef USB_BENCHMARK
-	EP_BENCHMARK,
 #endif
 	NUM_ENDPOINTS
 };

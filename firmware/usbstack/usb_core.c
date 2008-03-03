@@ -36,10 +36,6 @@
 #include "usb_serial.h"
 #endif
 
-#if defined(USB_BENCHMARK)
-#include "usb_benchmark.h"
-#endif
-
 /* TODO: Move this target-specific stuff somewhere else (serial number reading) */
 
 #ifdef HAVE_AS3514
@@ -103,7 +99,7 @@ struct usb_interface_descriptor __attribute__((aligned(2))) charging_interface_d
     .bInterfaceClass    = USB_CLASS_VENDOR_SPEC,
     .bInterfaceSubClass = 0,
     .bInterfaceProtocol = 0,
-    .iInterface         = 5
+    .iInterface         = 4
 };
 #endif
 
@@ -177,41 +173,6 @@ struct usb_endpoint_descriptor __attribute__((aligned(2))) serial_ep_out_descrip
 };
 #endif
 
-#ifdef USB_BENCHMARK
-/* bulk test interface */
-struct usb_interface_descriptor __attribute__((aligned(2))) benchmark_interface_descriptor =
-{
-    .bLength            = sizeof(struct usb_interface_descriptor),
-    .bDescriptorType    = USB_DT_INTERFACE,
-    .bInterfaceNumber   = 0,
-    .bAlternateSetting  = 0,
-    .bNumEndpoints      = 2,
-    .bInterfaceClass    = USB_CLASS_VENDOR_SPEC,
-    .bInterfaceSubClass = 255,
-    .bInterfaceProtocol = 255,
-    .iInterface         = 4
-};
-
-struct usb_endpoint_descriptor __attribute__((aligned(2))) benchmark_ep_in_descriptor =
-{
-    .bLength          = sizeof(struct usb_endpoint_descriptor),
-    .bDescriptorType  = USB_DT_ENDPOINT,
-    .bEndpointAddress = EP_BENCHMARK | USB_DIR_OUT,
-    .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize   = 16,
-    .bInterval        = 0
-};
-struct usb_endpoint_descriptor benchmark_ep_out_descriptor =
-{
-    .bLength          = sizeof(struct usb_endpoint_descriptor),
-    .bDescriptorType  = USB_DT_ENDPOINT,
-    .bEndpointAddress = EP_BENCHMARK | USB_DIR_IN,
-    .bmAttributes     = USB_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize   = 16,
-    .bInterval        = 0
-};
-#endif
-
 static const struct usb_qualifier_descriptor __attribute__((aligned(2))) qualifier_descriptor =
 {
     .bLength            = sizeof(struct usb_qualifier_descriptor),
@@ -257,13 +218,6 @@ static struct usb_string_descriptor __attribute__((aligned(2))) lang_descriptor 
     {0x0409} /* LANGID US English */
 };
 
-static struct usb_string_descriptor __attribute__((aligned(2))) usb_string_usb_benchmark =
-{
-    40,
-    USB_DT_STRING,
-    {'B','u','l','k',' ','t','e','s','t',' ','i','n','t','e','r','f','a','c','e'}
-};
-
 static struct usb_string_descriptor __attribute__((aligned(2))) usb_string_charging_only =
 {
     28,
@@ -277,7 +231,6 @@ static struct usb_string_descriptor* usb_strings[] =
    &usb_string_iManufacturer,
    &usb_string_iProduct,
    &usb_string_iSerial,
-   &usb_string_usb_benchmark,
    &usb_string_charging_only
 };
 
@@ -292,9 +245,6 @@ static bool usb_core_storage_enabled = false;
 bool usb_core_serial_enabled = false;
 #ifdef USB_CHARGING_ONLY
 static bool usb_core_charging_enabled = false;
-#endif
-#if defined(USB_BENCHMARK)
-static bool usb_core_benchmark_enabled = false;
 #endif
 
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
@@ -399,10 +349,6 @@ void usb_core_init(void)
         usb_serial_init();
 #endif
 
-#ifdef USB_BENCHMARK
-    if(usb_core_benchmark_enabled)
-        usb_benchmark_init();
-#endif
     initialized = true;
     usb_state = DEFAULT;
     logf("usb_core_init() finished");
@@ -437,11 +383,6 @@ void usb_core_handle_transfer_completion(struct usb_transfer_completion_event_da
 #ifdef USB_SERIAL
         case EP_SERIAL:
             usb_serial_transfer_complete(event->in,event->status,event->length);
-            break;
-#endif
-#ifdef USB_BENCHMARK
-        case EP_BENCHMARK:
-            usb_benchmark_transfer_complete(event->in);
             break;
 #endif
 #ifdef USB_CHARGING_ONLY
@@ -481,13 +422,6 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
             usb_request_exclusive_ata();
 #endif
     }
-
-#ifdef USB_BENCHMARK
-    if ((req->bRequestType & 0x60) == USB_TYPE_VENDOR) {
-        usb_benchmark_control_request(req);
-        return;
-    }
-#endif
 
     switch (req->bRequest) {
         case USB_REQ_SET_CONFIGURATION:
@@ -658,19 +592,6 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                         memcpy(&response_data[size],&serial_ep_in_descriptor,sizeof(struct usb_endpoint_descriptor));
                         size += sizeof(struct usb_endpoint_descriptor);
                         memcpy(&response_data[size],&serial_ep_out_descriptor,sizeof(struct usb_endpoint_descriptor));
-                        size += sizeof(struct usb_endpoint_descriptor);
-                    }
-#endif
-#ifdef USB_BENCHMARK
-                    if(usb_core_benchmark_enabled){
-                        benchmark_ep_in_descriptor.wMaxPacketSize=max_packet_size;
-                        benchmark_ep_out_descriptor.wMaxPacketSize=max_packet_size;
-
-                        memcpy(&response_data[size],&benchmark_interface_descriptor,sizeof(struct usb_interface_descriptor));
-                        size += sizeof(struct usb_interface_descriptor);
-                        memcpy(&response_data[size],&benchmark_ep_in_descriptor,sizeof(struct usb_endpoint_descriptor));
-                        size += sizeof(struct usb_endpoint_descriptor);
-                        memcpy(&response_data[size],&benchmark_ep_out_descriptor,sizeof(struct usb_endpoint_descriptor));
                         size += sizeof(struct usb_endpoint_descriptor);
                     }
 #endif
