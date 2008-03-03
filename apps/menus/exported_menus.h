@@ -38,11 +38,6 @@ extern const struct menu_item_ex
         info_menu,                  /* info_menu.c      */
         theme_menu;                 /* theme_menu.c     */
 
-#ifdef HAVE_WM8758
-extern const struct menu_item_ex hw_eq_menu; /* eq_menu.c        */
-#endif
-
-
 struct browse_folder_info {
     const char* dir;
     int show_options;
@@ -51,3 +46,4 @@ int browse_folder(void *param); /* in theme_menu.c as it is mostly used there */
 
 #endif /* ! PLUGIN */
 #endif /*_EXPORTED_MENUS_H */
+
