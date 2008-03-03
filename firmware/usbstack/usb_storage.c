@@ -821,8 +821,10 @@ static void identify2inquiry(int lun)
     (void)lun;
     memset(tb.inquiry, 0, sizeof(struct inquiry_data));
     
+#if 0
     if (identify[82] & 4)
         tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
+#endif
 
     /* ATA only has a 'model' field, so we copy the 
        first 8 bytes to 'vendor' and the rest to 'product' (they are
@@ -843,11 +845,14 @@ static void identify2inquiry(int lun)
     tb.inquiry->Versions = 4; /* SPC-2 */
     tb.inquiry->Format   = 2; /* SPC-2/3 inquiry format */
 
+#if 0
 #ifdef HAVE_HOTSWAP
     if(lun>0)
         tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
 #endif
-
+#endif
+    /* Mac OSX 10.5 doesn't like this driver if DEVICE_REMOVABLE is not set */
+    tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
 }
 
 #endif /* USB_STORAGE */
