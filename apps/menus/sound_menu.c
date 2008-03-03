@@ -32,60 +32,64 @@
 #include "pcmbuf.h"
 #endif
 #include "exported_menus.h"
+#include "menu_common.h"
 
 /***********************************/
 /*    SOUND MENU                   */
-#if CONFIG_CODEC == SWCODEC
-/* This callback is also used in the eq menu to toggle low latency mode.
-   So, remember this if the callback is used for anything other than the togging */
-int soundmenu_callback(int action, const struct menu_item_ex *this_item)
-{
-    (void)this_item;
-    switch (action)
-    {
-        case ACTION_ENTER_MENUITEM: /* on entering an item */
-            pcmbuf_set_low_latency(true);
-            break;
-        case ACTION_EXIT_MENUITEM: /* on exit */
-            pcmbuf_set_low_latency(false);
-            break;
-    }
-    return action;
-}
+MENUITEM_SETTING(volume, &global_settings.volume, NULL);
+MENUITEM_SETTING(bass, &global_settings.bass,
+#ifdef HAVE_SW_TONE_CONTROLS
+    lowlatency_callback
 #else
-#define soundmenu_callback NULL
+    NULL
 #endif
-
-MENUITEM_SETTING(volume, &global_settings.volume, soundmenu_callback);
-MENUITEM_SETTING(bass, &global_settings.bass, soundmenu_callback);
+);
 #ifdef HAVE_WM8758
-MENUITEM_SETTING(bass_cutoff, &global_settings.bass_cutoff, soundmenu_callback);
+MENUITEM_SETTING(bass_cutoff, &global_settings.bass_cutoff, NULL);
 #endif
-MENUITEM_SETTING(treble, &global_settings.treble, soundmenu_callback);
+MENUITEM_SETTING(treble, &global_settings.treble,
+#ifdef HAVE_SW_TONE_CONTROLS
+    lowlatency_callback
+#else
+    NULL
+#endif
+);
 #ifdef HAVE_WM8758
-MENUITEM_SETTING(treble_cutoff, &global_settings.treble_cutoff, soundmenu_callback);
+MENUITEM_SETTING(treble_cutoff, &global_settings.treble_cutoff, NULL);
 #endif
-MENUITEM_SETTING(balance, &global_settings.balance, soundmenu_callback);
-MENUITEM_SETTING(channel_config, &global_settings.channel_config, soundmenu_callback);
-MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, soundmenu_callback);
+MENUITEM_SETTING(balance, &global_settings.balance, NULL);
+MENUITEM_SETTING(channel_config, &global_settings.channel_config, 
+#if CONFIG_CODEC == SWCODEC
+    lowlatency_callback
+#else
+    NULL
+#endif
+);
+MENUITEM_SETTING(stereo_width, &global_settings.stereo_width, 
+#if CONFIG_CODEC == SWCODEC
+    lowlatency_callback
+#else
+    NULL
+#endif
+);
 
 #if CONFIG_CODEC == SWCODEC
     /* Crossfeed Submenu */
-    MENUITEM_SETTING(crossfeed, &global_settings.crossfeed, soundmenu_callback);
+    MENUITEM_SETTING(crossfeed, &global_settings.crossfeed, lowlatency_callback);
     MENUITEM_SETTING(crossfeed_direct_gain,
-                     &global_settings.crossfeed_direct_gain, soundmenu_callback);
+                     &global_settings.crossfeed_direct_gain, lowlatency_callback);
     MENUITEM_SETTING(crossfeed_cross_gain,
-                     &global_settings.crossfeed_cross_gain, soundmenu_callback);
+                     &global_settings.crossfeed_cross_gain, lowlatency_callback);
     MENUITEM_SETTING(crossfeed_hf_attenuation,
-                     &global_settings.crossfeed_hf_attenuation, soundmenu_callback);
+                     &global_settings.crossfeed_hf_attenuation, lowlatency_callback);
     MENUITEM_SETTING(crossfeed_hf_cutoff,
-                     &global_settings.crossfeed_hf_cutoff, soundmenu_callback);
+                     &global_settings.crossfeed_hf_cutoff, lowlatency_callback);
     MAKE_MENU(crossfeed_menu,ID2P(LANG_CROSSFEED), NULL, Icon_NOICON,
               &crossfeed, &crossfeed_direct_gain, &crossfeed_cross_gain,
               &crossfeed_hf_attenuation, &crossfeed_hf_cutoff);
               
     MENUITEM_SETTING(dithering_enabled,
-                     &global_settings.dithering_enabled, soundmenu_callback);
+                     &global_settings.dithering_enabled, lowlatency_callback);
 #endif
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)

@@ -10,6 +10,7 @@ filetypes.c
 language.c
 main.c
 menu.c
+menus/menu_common.c
 menus/display_menu.c
 menus/theme_menu.c
 #if CONFIG_CODEC == SWCODEC
