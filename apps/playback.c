@@ -222,10 +222,6 @@ static int track_widx = 0;           /* Track being buffered (A) */
 static struct track_info *prev_ti = NULL;  /* Pointer to the previously played
                                               track */
 
-/* Set by buffering_audio_callback when the low buffer event is received, to
-   avoid flodding the audio queue with fill_file_buffer messages. */
-static bool lowbuffer_event_sent = false;
-
 /* Set by the audio thread when the current track information has updated
  * and the WPS may need to update its cached information */
 static bool track_changed = false;
@@ -1500,11 +1496,9 @@ static void buffering_audio_callback(enum callback_event ev, int value)
     switch (ev)
     {
         case EVENT_BUFFER_LOW:
-            if (!lowbuffer_event_sent) {
-                LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
-                queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
-                lowbuffer_event_sent = true;
-            }
+            LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
+            queue_remove_from_head(&audio_queue, Q_AUDIO_FILL_BUFFER);
+            queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
             break;
 
         case EVENT_HANDLE_REBUFFER:
@@ -1972,7 +1966,6 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
         track_changed = true;
 
     audio_generate_postbuffer_events();
-    lowbuffer_event_sent = false;
 }
 
 static void audio_rebuffer(void)
