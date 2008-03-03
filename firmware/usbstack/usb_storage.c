@@ -701,7 +701,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cbw->command_block[4] << 8  |
                 cbw->command_block[5] );
             current_cmd.count = block_size_mult *
-               (cbw->command_block[7] << 16 |
+               (cbw->command_block[7] << 8 |
                 cbw->command_block[8]);
 
             //logf("scsi read %d %d", current_cmd.sector, current_cmd.count);
@@ -738,7 +738,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cbw->command_block[4] << 8  |
                 cbw->command_block[5] );
             current_cmd.count = block_size_mult *
-               (cbw->command_block[7] << 16 |
+               (cbw->command_block[7] << 8 |
                 cbw->command_block[8]);
             /* expect data */
             if((current_cmd.sector + current_cmd.count) > block_count) {
