@@ -219,6 +219,7 @@ static void send_block_data(void *data,int size);
 static void receive_block_data(void *data,int size);
 static void identify2inquiry(int lun);
 static void send_and_read_next(void);
+static bool ejected[NUM_VOLUMES];
 
 static enum {
     WAITING_FOR_COMMAND,
@@ -231,6 +232,9 @@ static enum {
 /* called by usb_code_init() */
 void usb_storage_init(void)
 {
+    int i;
+    for(i=0;i<NUM_VOLUMES;i++)
+        ejected[i]=false;
     logf("usb_storage_init done");
 }
 
@@ -473,6 +477,9 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     block_count = (identify[61] << 16 | identify[60]);
 #endif
 
+    if(ejected[lun])
+        lun_present = false;
+
 #ifdef MAX_LOG_SECTOR_SIZE
     block_size_mult = disk_sector_multiplier;
 #endif
@@ -634,6 +641,14 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_START_STOP_UNIT:
             logf("scsi start_stop unit %d",lun);
+            if((cbw->command_block[4] & 0xf0) == 0) /* Process start and eject bits */
+            {
+                if((cbw->command_block[4] & 0x01) == 0 && 
+                   (cbw->command_block[4] & 0x02) != 0) /* Stop and eject */
+                {
+                    ejected[lun]=true;
+                }
+            }
             send_csw(UMS_STATUS_GOOD);
             break;
 
