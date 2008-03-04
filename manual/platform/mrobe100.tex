@@ -1,0 +1,106 @@
+% $Id: mrobe100.tex 15972 2007-12-25 19:55:22Z pixelma $ %
+\def\UseOption{mrobe100}
+\edef\UseOption{\UseOption,HAVE_RB_BL_ON_DISK}
+\edef\UseOption{\UseOption,HAVE_LCD_BITMAP}
+\edef\UseOption{\UseOption,SWCODEC}
+\edef\UseOption{\UseOption,CONFIG_RTC}
+\edef\UseOption{\UseOption,MROBE100_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_DIRCACHE}
+\edef\UseOption{\UseOption,HAVE_DISK_STORAGE}
+\edef\UseOption{\UseOption,HAVE_BUTTON_LIGHTS}
+\edef\UseOption{\UseOption,olympus}
+
+\newcommand{\playerman}{Olympus}
+\newcommand{\playertype}{m:robe 100}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\genericimg}{160x128x1}
+\newcommand{\specimg}{mrobe100}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.mi4}}
+\newcommand{\screenshotsize}{4cm}
+\newcommand{\disk}{hard disk}
+
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonMenu}{\btnfnt{Menu}}
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonUp}{\btnfnt{Up}}
+\newcommand{\ButtonDown}{\btnfnt{Down}}
+\newcommand{\ButtonVolUp}{\btnfnt{Volume up}}
+\newcommand{\ButtonVolDown}{\btnfnt{Volume down}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+\newcommand{\ButtonDisplay}{\btnfnt{Display}}
+\newcommand{\ButtonHold}{\btnfnt{Hold}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonUp}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonUp}
+\newcommand{\ActionStdNext}{\ButtonDown}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonDown}
+\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonPower}
+\newcommand{\ActionStdContext}{Long \ButtonSelect}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonMenu}
+\newcommand{\ActionStdMenu}{\ButtonMenu}
+\newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonDisplay}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonDisplay{} + \ButtonRight}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonDisplay{} + \ButtonLeft}
+\newcommand{\ActionWpsStop}{\ButtonPower}
+\newcommand{\ActionWpsVolDown}{\ButtonDown}
+\newcommand{\ActionWpsVolUp}{\ButtonUp}
+\newcommand{\ActionWpsPitchScreen}{\ButtonDisplay{} + \ButtonUp/\ButtonDown}
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonMenu}
+\newcommand{\ActionWpsMenu}{\ButtonMenu}
+\newcommand{\ActionWpsContext}{Long \ButtonSelect}
+\newcommand{\ActionWpsBrowse}{\ButtonSelect}
+\newcommand{\ActionWpsAbReset}{\ButtonDisplay{} + \ButtonSelect}
+\newcommand{\ActionWpsIdThreeScreen}{\ButtonDisplay{} + \ButtonMenu}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonDisplay}
+\newcommand{\ActionTreeStop}{\ButtonPower}
+\newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonSelect}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonUp}
+\newcommand{\ActionSettingDec}{\ButtonDown}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdCursorLeft}{\ButtonDisplay{} + \ButtonLeft}
+\newcommand{\ActionKbdCursorRight}{\ButtonDisplay{} + \ButtonRight}
+\newcommand{\ActionKbdPageFlip}{\ButtonDisplay{} + \ButtonMenu}
+\newcommand{\ActionKbdDone}{\ButtonDisplay}
+\newcommand{\ActionKbdAbort}{\ButtonPower}
+\newcommand{\ActionKbdBackSpace}{\ButtonMenu}
+\newcommand{\ActionKbdMorseInput}{\ButtonDisplay{} + \ButtonPower}
+\newcommand{\ActionKbdMorseSelect}{\ButtonSelect}
+\newcommand{\ActionKbdUp}{\ButtonUp}
+\newcommand{\ActionKbdDown}{\ButtonDown}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonMenu}
+\newcommand{\ActionPsIncSmall}{\ButtonUp}
+\newcommand{\ActionPsIncBig}{Long \ButtonUp}
+\newcommand{\ActionPsDecSmall}{\ButtonDown}
+\newcommand{\ActionPsDecBig}{Long \ButtonDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonDisplay}
+\newcommand{\ActionPsExit}{\ButtonPower}
