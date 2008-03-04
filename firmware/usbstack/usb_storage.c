@@ -564,7 +564,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             logf("scsi mode_sense_10 %d %X",lun,page_code);
             switch(page_code) {
                 case 0x3f:
-                    tb.mode_sense_data_10->mode_data_length=htobe16(sizeof(struct mode_sense_data_10));
+                    tb.mode_sense_data_10->mode_data_length=htobe16(sizeof(struct mode_sense_data_10)-2);
                     tb.mode_sense_data_10->medium_type=0;
                     tb.mode_sense_data_10->device_specific=0;
                     tb.mode_sense_data_10->reserved=0;
@@ -607,7 +607,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             switch(page_code) {
                 case 0x3f:
                     /* All supported pages Since we support only one this is easy*/
-                    tb.mode_sense_data_6->mode_data_length=sizeof(struct mode_sense_data_6);
+                    tb.mode_sense_data_6->mode_data_length=sizeof(struct mode_sense_data_6)-1;
                     tb.mode_sense_data_6->medium_type=0;
                     tb.mode_sense_data_6->device_specific=0;
                     tb.mode_sense_data_6->block_descriptor_length=sizeof(struct mode_sense_block_descriptor_shortlba);
