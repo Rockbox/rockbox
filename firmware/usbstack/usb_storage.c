@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id:  $
  *
- * Copyright (C) 2007 by Bjï¿½rn Stenberg
+ * Copyright (C) 2007 by Björn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -20,7 +20,7 @@
 #include "system.h"
 #include "usb_core.h"
 #include "usb_drv.h"
-#define LOGF_ENABLE
+//#define LOGF_ENABLE
 #include "logf.h"
 #include "ata.h"
 #include "hotswap.h"
