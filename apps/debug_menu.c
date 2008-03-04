@@ -97,6 +97,9 @@
 #include "debug-target.h"
 #endif
 
+#include "i2c-pp.h"
+#include "as3514.h"
+
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -1179,8 +1182,7 @@ bool dbg_ports(void)
         snprintf(buf, sizeof(buf), "REM:  %03x PAD: %03x",
                                  adc_read(ADC_REMOTE), adc_read(ADC_SCROLLPAD));
         lcd_puts(0, line++, buf);
-#elif defined(SANSA_E200)
-        line++;
+#elif defined(SANSA_E200)       
         snprintf(buf, sizeof(buf), "ADC_BVDD:     %4d", adc_read(ADC_BVDD));
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_RTCSUP:   %4d", adc_read(ADC_RTCSUP));
@@ -1206,6 +1208,8 @@ bool dbg_ports(void)
         snprintf(buf, sizeof(buf), "ADC_I_MICSUP2:%4d", adc_read(ADC_I_MICSUP2));
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_VBAT:     %4d", adc_read(ADC_VBAT));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "CHARGER: %02X/%02X", i2c_readbyte(AS3514_I2C_ADDR, CHRGR), i2c_readbyte(AS3514_I2C_ADDR, IRQ_ENRD0));
         lcd_puts(0, line++, buf);
 #endif
         lcd_update();

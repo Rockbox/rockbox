@@ -53,6 +53,7 @@ extern void audiohw_set_sample_rate(int sampling_control);
 #define PLLMODE    0x1d
 
 #define SYSTEM     0x20
+#define CHRGR      0x22
 #define DCDC15     0x23
 #define SUPERVISOR 0x24
 
