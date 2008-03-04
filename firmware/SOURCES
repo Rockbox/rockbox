@@ -255,16 +255,16 @@ drivers/tsc2100.c
 #if defined(CPU_SH)
 
 #ifndef SIMULATOR
-bitswap.S
-descramble.S
 drivers/i2c.c
 target/sh/adc-sh.c
+target/sh/bitswap.S
 target/sh/crt0.S
 target/sh/memcpy-sh.S
 target/sh/memmove-sh.S
 target/sh/memset-sh.S
 target/sh/strlen-sh.S
 target/sh/system-sh.c
+target/sh/archos/descramble.S
 #endif /* SIMULATOR */
 
 #elif defined(CPU_COLDFIRE)
