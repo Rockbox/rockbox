@@ -564,12 +564,12 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             logf("scsi mode_sense_10 %d %X",lun,page_code);
             switch(page_code) {
                 case 0x3f:
-                    tb.mode_sense_data_10->mode_data_length=sizeof(struct mode_sense_data_10);
+                    tb.mode_sense_data_10->mode_data_length=htobe16(sizeof(struct mode_sense_data_10));
                     tb.mode_sense_data_10->medium_type=0;
                     tb.mode_sense_data_10->device_specific=0;
                     tb.mode_sense_data_10->reserved=0;
                     tb.mode_sense_data_10->longlba=1;
-                    tb.mode_sense_data_10->block_descriptor_length=sizeof(struct mode_sense_block_descriptor_longlba);
+                    tb.mode_sense_data_10->block_descriptor_length=htobe16(sizeof(struct mode_sense_block_descriptor_longlba));
                     memset(tb.mode_sense_data_10->block_descriptor.reserved,0,4);
                     memset(tb.mode_sense_data_10->block_descriptor.number_of_blocks,0,8);
                     tb.mode_sense_data_10->block_descriptor.number_of_blocks[4]=((block_count/block_size_mult) & 0xff000000)>>24;
