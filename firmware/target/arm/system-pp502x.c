@@ -427,8 +427,6 @@ void system_reboot(void)
 #if defined(SANSA_E200) || defined(SANSA_C200)
     CACHE_CTL &= ~CACHE_CTL_VECT_REMAP;
 
-    pp_i2c_send(AS3514_I2C_ADDR, DCDC15, 0x0); /* backlight off */
-
     /* Magic used by the c200 OF: 0x23066000
        Magic used by the c200 BL: 0x23066b7b
        In both cases, the OF executes these 2 commands from iram. */
@@ -437,6 +435,8 @@ void system_reboot(void)
 #else
     DEV_RS |= DEV_SYSTEM;
 #endif
+    /* wait until reboot kicks in */
+    while (1);
 }
 
 int system_memory_guard(int newmode)
