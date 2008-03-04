@@ -201,11 +201,11 @@ static struct usb_string_descriptor __attribute__((aligned(2))) usb_string_iProd
 
 static struct usb_string_descriptor __attribute__((aligned(2))) usb_string_iSerial =
 {
-    82,
+    84,
     USB_DT_STRING,
     {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0',
      '0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0',
-     '0','0','0','0','0','0','0','0'}
+     '0','0','0','0','0','0','0','0','0'}
 };
 
 /* Generic for all targets */
@@ -255,11 +255,11 @@ static unsigned char __response_data[CACHEALIGN_UP(256)] CACHEALIGN_ATTR;
 
 static struct usb_transfer_completion_event_data events[NUM_ENDPOINTS];
 
+static short hex[16] = {'0','1','2','3','4','5','6','7',
+                        '8','9','A','B','C','D','E','F'};
 #ifdef IPOD_ARCH
 static void set_serial_descriptor(void)
 {
-    static short hex[16] = {'0','1','2','3','4','5','6','7',
-                            '8','9','A','B','C','D','E','F'};
 #ifdef IPOD_VIDEO
     uint32_t* serial = (uint32_t*)(0x20004034);
 #else
@@ -268,7 +268,7 @@ static void set_serial_descriptor(void)
 
     /* We need to convert from a little-endian 64-bit int
        into a utf-16 string of hex characters */
-    short* p = &usb_string_iSerial.wString[23];
+    short* p = &usb_string_iSerial.wString[24];
     uint32_t x;
     int i,j;
 
@@ -281,17 +281,14 @@ static void set_serial_descriptor(void)
           x >>= 4;
        }
     }
-    usb_string_iSerial.bLength=50;
+    usb_string_iSerial.bLength=52;
 }
 #elif defined(HAVE_AS3514)
 static void set_serial_descriptor(void)
 {
-    static short hex[16] = {'0','1','2','3','4','5','6','7',
-                            '8','9','A','B','C','D','E','F'};
-
     unsigned char serial[16];
     /* Align 32 digits right in the 40-digit serial number */
-    short* p = usb_string_iSerial.wString;
+    short* p = &usb_string_iSerial.wString[1];
     int i;
 
     i2c_readbytes(AS3514_I2C_ADDR, 0x30, 0x10, serial);
@@ -300,17 +297,14 @@ static void set_serial_descriptor(void)
         *p++ = hex[(serial[i] >> 4) & 0xF];
         *p++ = hex[(serial[i] >> 0) & 0xF];
     }
-    usb_string_iSerial.bLength=66;
+    usb_string_iSerial.bLength=68;
 }
 #else 
 /* If we don't know the device serial number, use the one
  * from the disk */
 static void set_serial_descriptor(void)
 {
-    static short hex[16] = {'0','1','2','3','4','5','6','7',
-                            '8','9','A','B','C','D','E','F'};
-
-    short* p = usb_string_iSerial.wString;
+    short* p = &usb_string_iSerial.wString[1];
     unsigned short* identify = ata_get_identify();
     unsigned short x;
     int i;
@@ -323,7 +317,7 @@ static void set_serial_descriptor(void)
        *p++ = hex[(x >> 4) & 0xF];
        *p++ = hex[(x >> 0) & 0xF];
     }
-    usb_string_iSerial.bLength=82;
+    usb_string_iSerial.bLength=84;
 }
 #endif
 
@@ -417,10 +411,19 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
 {
     if(usb_state == DEFAULT) {
         set_serial_descriptor();
+        
+        int serial_function_id = 0;
 #ifdef USB_STORAGE
-        if(usb_core_storage_enabled)
+        if(usb_core_storage_enabled) {
             usb_request_exclusive_ata();
+            serial_function_id |= 1;
+        }
 #endif
+#ifdef USB_SERIAL
+        if(usb_core_serial_enabled)
+            serial_function_id |= 2;
+#endif
+        usb_string_iSerial.wString[0] = hex[serial_function_id];
     }
 
     switch (req->bRequest) {
