@@ -647,16 +647,28 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
             break;
         } /* USB_REQ_GET_DESCRIPTOR */
 
-        default:
+        default: {
+            bool handled=false;
+            if((req->bRequestType & 0x1f) == 1) /* Interface */
+            {
 #ifdef USB_STORAGE
-            /* does usb_storage know this request? */
-            if (!usb_storage_control_request(req))
+                /* does usb_storage know this request? */
+                if(req->wIndex == mass_storage_interface_descriptor.bInterfaceNumber)
+                {
+                    handled = usb_storage_control_request(req);
+                }
 #endif
 
 #ifdef USB_SERIAL
-            /* does usb_serial know this request? */
-            if (!usb_serial_control_request(req))
+                /* does usb_serial know this request? */
+                if(req->wIndex == serial_interface_descriptor.bInterfaceNumber)
+                {
+                    handled = usb_serial_control_request(req);
+                }
+                    
 #endif
+            }
+            if(!handled)
             {
                 /* nope. flag error */
                 logf("usb bad req %d", req->bRequest);
@@ -664,6 +676,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                 ack_control(req);
             }
             break;
+        }
     }
     logf("control handled");
 }
