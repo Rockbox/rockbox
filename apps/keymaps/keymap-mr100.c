@@ -68,6 +68,7 @@ static const struct button_mapping button_context_standard[]  = {
 
 static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,          BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY },
+    { ACTION_WPS_STOP,          BUTTON_POWER|BUTTON_REL,        BUTTON_POWER },
     { ACTION_WPS_STOP,          BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_PLAY },
 
     { ACTION_WPS_SKIPNEXT,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
@@ -231,9 +232,9 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,        BUTTON_NONE },
-    { ACTION_PS_TOGGLE_MODE,    BUTTON_SELECT,                  BUTTON_NONE },
+    { ACTION_PS_TOGGLE_MODE,    BUTTON_MENU,                    BUTTON_NONE },
     { ACTION_PS_RESET,          BUTTON_DISPLAY,                 BUTTON_NONE },
-    { ACTION_PS_EXIT,           BUTTON_MENU,                    BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_PLAY,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */

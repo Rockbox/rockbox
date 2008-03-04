@@ -25,6 +25,7 @@
 \newcommand{\disk}{hard disk}
 
 \newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonPlay}{\btnfnt{Play}}
 \newcommand{\ButtonMenu}{\btnfnt{Menu}}
 \newcommand{\ButtonLeft}{\btnfnt{Left}}
 \newcommand{\ButtonRight}{\btnfnt{Right}}
@@ -41,21 +42,21 @@
 \newcommand{\ActionStdPrevRepeat}{Long \ButtonUp}
 \newcommand{\ActionStdNext}{\ButtonDown}
 \newcommand{\ActionStdNextRepeat}{Long \ButtonDown}
-\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonPower}
+\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonDisplay{} or \ButtonPower}
 \newcommand{\ActionStdContext}{Long \ButtonSelect}
 \newcommand{\ActionStdQuickScreen}{Long \ButtonMenu}
 \newcommand{\ActionStdMenu}{\ButtonMenu}
 \newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
 
 %Button actions, wps context
-\newcommand{\ActionWpsPlay}{\ButtonDisplay}
+\newcommand{\ActionWpsPlay}{\ButtonPlay}
 \newcommand{\ActionWpsSkipNext}{\ButtonRight}
 \newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
 \newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
 \newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
 \newcommand{\ActionWpsAbSetBNextDir}{\ButtonDisplay{} + \ButtonRight}
 \newcommand{\ActionWpsAbSetAPrevDir}{\ButtonDisplay{} + \ButtonLeft}
-\newcommand{\ActionWpsStop}{\ButtonPower}
+\newcommand{\ActionWpsStop}{\ButtonPower{} or Long \ButtonPlay}
 \newcommand{\ActionWpsVolDown}{\ButtonDown}
 \newcommand{\ActionWpsVolUp}{\ButtonUp}
 \newcommand{\ActionWpsPitchScreen}{\ButtonDisplay{} + \ButtonUp/\ButtonDown}
@@ -68,7 +69,7 @@
 
 %Button actions, tree context
 \newcommand{\ActionTreeWps}{\ButtonDisplay}
-\newcommand{\ActionTreeStop}{\ButtonPower}
+\newcommand{\ActionTreeStop}{\ButtonPower{} or Long \ButtonPlay}
 \newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
 \newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
 
@@ -103,4 +104,4 @@
 \newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
 \newcommand{\ActionPsNudgeRight}{\ButtonRight}
 \newcommand{\ActionPsReset}{\ButtonDisplay}
-\newcommand{\ActionPsExit}{\ButtonPower}
+\newcommand{\ActionPsExit}{\ButtonPlay}
