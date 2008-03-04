@@ -97,8 +97,10 @@
 #include "debug-target.h"
 #endif
 
+#if defined(SANSA_E200)
 #include "i2c-pp.h"
 #include "as3514.h"
+#endif
 
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */

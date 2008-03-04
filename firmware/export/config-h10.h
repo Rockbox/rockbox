@@ -156,6 +156,8 @@
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x0B70
 #define USB_PRODUCT_ID 0x00BA
+#define USE_ROCKBOX_USB
+#define USE_HIGH_SPEED
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
