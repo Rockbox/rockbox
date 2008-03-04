@@ -310,6 +310,7 @@ structure that Rockbox needs.
   \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
   \opt{gigabeat}{\input{getting_started/gigabeat_install.tex}}
   \opt{sansa}{\input{getting_started/sansa_install.tex}}
+  \opt{mrobe100}{\input{getting_started/mrobe100_install.tex}}
 }
 
 \subsection{Enabling Speech Support (optional)}\label{sec:enabling_speech_support}
@@ -373,7 +374,7 @@ completely follow the manual uninstallation instructions below.}}
   connect the \dap{} to your computer, and delete the
   \fname{\firmwarefilename} file.
 }
-\nopt{gigabeat,m5,x5,archos}
+\nopt{gigabeat,m5,x5,archos,mrobe100}
   {
   \note{The Rockbox bootloader can start the original firmware on your \dap.
   (See \reference{ref:Dualboot} for more information.)}}
@@ -385,6 +386,14 @@ completely follow the manual uninstallation instructions below.}}
   \fname{OF.mi4} to \opt{h10}{\fname{H10\_20GC.mi4}}\opt{h10_5gb}{\fname{H10.mi4}}
   in the \fname{System} directory on your \playertype{}. As in the installation,
   it may be necessary to first put your device into UMS mode.
+}
+
+\opt{mrobe100}{
+  If you would like to go back to using the original \playerman{} software,
+  connect the \dap{} to your computer, and delete the
+  \fname{pp5020.mi4} file and rename
+  \fname{OF.mi4} to \fname{pp5020.mi4}
+  in the \fname{System} directory on your \playertype{}.
 }
 
 \opt{e200}{
