@@ -242,6 +242,11 @@ static bool new_playlist = false;   /* Are we starting a new playlist? (A) */
 static int wps_offset = 0;          /* Pending track change offset, to keep WPS responsive (A) */
 static bool skipped_during_pause = false; /* Do we need to clear the PCM buffer when playback resumes (A) */
 
+/* Set to true if the codec thread should send an audio stop request
+ * (typically because the end of the playlist has been reached).
+ */
+static bool codec_requested_stop = false;
+
 /* Callbacks which applications or plugins may set */
 /* When the playing track has changed from the user's perspective */
 void (*track_changed_callback)(struct mp3entry *id3) = NULL;
@@ -1256,15 +1261,13 @@ static bool codec_load_next_track(void)
             LOGFQUEUE("codec |< Q_CODEC_REQUEST_FAILED");
             ci.new_track = 0;
             ci.stop_codec = true;
-            LOGFQUEUE("codec > audio Q_AUDIO_STOP");
-            queue_post(&audio_queue, Q_AUDIO_STOP, 0);
+            codec_requested_stop = true;
             return false;
 
         default:
             LOGFQUEUE("codec |< default");
             ci.stop_codec = true;
-            LOGFQUEUE("codec > audio Q_AUDIO_STOP");
-            queue_post(&audio_queue, Q_AUDIO_STOP, 0);
+            codec_requested_stop = true;
             return false;
     }
 }
@@ -1304,6 +1307,7 @@ static void codec_thread(void)
         status = 0;
         cancel_cpu_boost();
         queue_wait(&codec_queue, &ev);
+        codec_requested_stop = false;
 
         switch (ev.id) {
             case Q_CODEC_LOAD_DISK:
@@ -1376,6 +1380,9 @@ static void codec_thread(void)
 
                         if (!codec_load_next_track())
                         {
+                            LOGFQUEUE("codec > audio Q_AUDIO_STOP");
+                            /* End of playlist */
+                            queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                             break;
                         }
                     }
@@ -1391,6 +1398,12 @@ static void codec_thread(void)
                                 curtrack_id3.elapsed =
                                     curtrack_id3.length - pcmbuf_get_latency();
                                 sleep(1);
+                            }
+
+                            if (codec_requested_stop)
+                            {
+                                LOGFQUEUE("codec > audio Q_AUDIO_STOP");
+                                queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                             }
                             break;
                         }
