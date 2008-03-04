@@ -2595,15 +2595,6 @@ static void audio_thread(void)
     } /* end while */
 }
 
-#ifdef ROCKBOX_HAS_LOGF
-static void audio_test_track_changed_event(struct mp3entry *id3)
-{
-    (void)id3;
-
-    logf("tce:%s", id3->path);
-}
-#endif
-
 /* Initialize the audio system - called from init() in main.c.
  * Last function because of all the references to internal symbols
  */
@@ -2630,10 +2621,6 @@ void audio_init(void)
     queue_init(&pcmbuf_queue, false);
 
     pcm_init();
-
-#ifdef ROCKBOX_HAS_LOGF
-    audio_set_track_changed_event(audio_test_track_changed_event);
-#endif
 
      /* Initialize codec api. */
     ci.read_filebuf        = codec_filebuf_callback;
