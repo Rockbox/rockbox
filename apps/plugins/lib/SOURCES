@@ -10,6 +10,8 @@ grey_parm.c
 grey_scroll.c
 #ifdef CPU_COLDFIRE
 grey_coldfire.S
+#elif CONFIG_CPU == SH7034
+grey_sh.S
 #endif
 #endif
 highscore.c
