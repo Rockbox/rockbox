@@ -274,3 +274,88 @@ void list_draw(struct screen *display, struct viewport *parent,
 }
 
 
+#if defined(HAVE_TOUCHPAD)
+/* this needs to be fixed if we ever get more than 1 touchscreen on a target */
+/* this also assumes the whole screen is used, which is a bad asusmption but
+   fine untill customizable lists comes in... */
+unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewport *parent)
+{
+    short x,y;
+    unsigned button = action_get_touchpad_press(&x, &y);
+    int line;
+    struct screen *display = &screens[SCREEN_MAIN];
+    if (button == BUTTON_NONE)
+        return ACTION_NONE;
+    if (x<list_text[SCREEN_MAIN].x)
+    {
+        /* top left corner is hopefully GO_TO_ROOT */
+        if (y<list_text[SCREEN_MAIN].y)
+        {
+            if (button == BUTTON_REL)
+                return ACTION_STD_MENU;
+            else if (button == BUTTON_REPEAT)
+                return ACTION_STD_CONTEXT;
+            else
+                return ACTION_NONE;
+        }
+        /* scroll bar */
+        else
+        {
+            int new_selection, nb_lines;
+            int height, size;
+            nb_lines = viewport_get_nb_lines(&list_text[SCREEN_MAIN]);
+            if (nb_lines <  gui_list->nb_items)
+            {
+                height = nb_lines * display->char_height;
+                size = height*nb_lines / gui_list->nb_items;
+                new_selection = ((y-list_text[SCREEN_MAIN].y)*(gui_list->nb_items-nb_lines))/(height-size);
+                gui_synclist_select_item(gui_list, new_selection);
+                nb_lines /= 2;
+                if (new_selection - gui_list->start_item[SCREEN_MAIN] > nb_lines)
+                {
+                    new_selection = gui_list->start_item[SCREEN_MAIN]+nb_lines;
+                }
+                gui_list->start_item[SCREEN_MAIN] = new_selection;
+                return ACTION_REDRAW;
+            }
+        }
+    }
+    else
+    {
+        /*  pressing an item will select it.
+            pressing the selected item will "enter" it */
+        if (y > list_text[SCREEN_MAIN].y)
+        {
+            line = (y-list_text[SCREEN_MAIN].y) / display->char_height;
+            if (button != BUTTON_REL && button != BUTTON_REPEAT)
+            {
+                if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN])
+                    gui_synclist_select_item(gui_list, gui_list->start_item[SCREEN_MAIN]+line);
+                return ACTION_REDRAW;
+            }
+            if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN])
+            {
+                if (gui_list->start_item[SCREEN_MAIN]+line > gui_list->nb_items)
+                    return ACTION_NONE;
+                gui_synclist_select_item(gui_list, gui_list->start_item[SCREEN_MAIN]+line);
+            }
+        
+            if (button == BUTTON_REPEAT)
+                return ACTION_STD_CONTEXT;
+            else
+                return ACTION_STD_OK;
+        }
+        /* title goes up one level */
+        else if (y > title_text[SCREEN_MAIN].y && draw_title(display, parent, gui_list))
+        {
+            return ACTION_STD_CANCEL;
+        }
+        /* title or statusbar is cancel */
+        else if (global_settings.statusbar)
+        {
+            return ACTION_STD_CANCEL;
+        }
+    }
+    return ACTION_NONE;
+}
+#endif
