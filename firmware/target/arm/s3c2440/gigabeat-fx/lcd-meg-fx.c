@@ -287,22 +287,22 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
     int w, px;
     fb_data *dst;
 
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x; /* Clip right */
+    if (x + width > current_vp->width)
+        width = current_vp->width - x; /* Clip right */
     if (x < 0)
         width += x, x = 0; /* Clip left */
     if (width <= 0)
         return; /* nothing left to do */
 
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y; /* Clip bottom */
+    if (y + height > current_vp->height)
+        height = current_vp->height - y; /* Clip bottom */
     if (y < 0)
         height += y, y = 0; /* Clip top */
     if (height <= 0)
         return; /* nothing left to do */
 
     src += stride * src_y + src_x; /* move starting point */
-    dst = &lcd_framebuffer[y][x];
+    dst = &lcd_framebuffer[current_vp->y+y][current_vp->x+x];
 
     asm volatile (
     ".rowstart:                             \r\n"
