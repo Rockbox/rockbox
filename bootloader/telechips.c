@@ -62,8 +62,8 @@ void* main(void)
 #endif
 
     power_init();
-    lcd_init();
     system_init();
+    lcd_init();
     
 #if defined(COWON_D2)
     kernel_init();
@@ -74,12 +74,7 @@ void* main(void)
     backlight_init();
 
     font_init();
-
     lcd_setfont(FONT_SYSFIXED);
-
-#if defined(COWON_D2)
-    lcd_enable(true);
-#endif
 
     _backlight_on();
 

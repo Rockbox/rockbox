@@ -222,12 +222,14 @@ void lcd_enable(bool on)
 
     if (on)
     {
-        lcd_display_on();  /* Turn on display */
-        lcd_update();      /* Resync display */
+        LCDC_CTRL |= 1;     /* controller enable */
+        GPIOA_SET = (1<<6); /* backlight enable - not visible otherwise */
+        lcd_update();       /* Resync display */
     }
     else
     {
-        lcd_display_off();  /* Turn off display */
+        LCDC_CTRL &= ~1;      /* controller disable */
+        GPIOA_CLEAR = (1<<6); /* backlight off */
     }
 }
 
@@ -236,6 +238,7 @@ bool lcd_enabled(void)
     return display_on;
 }
 
+/* TODO: implement lcd_sleep() and separate out the power on/off functions */
 
 void lcd_init_device(void)
 {
@@ -264,22 +267,28 @@ void lcd_init_device(void)
 
     LCDC_I1BASE  = (unsigned int)lcd_framebuffer; /* dirty, dirty hack */
     LCDC_I1SIZE  = (LCD_HEIGHT<<16) | LCD_WIDTH;  /* image 1 size */
-    //LCDC_I1POS   = (0<<16) | 0;                   /* position */
-    //LCDC_I1OFF   = 0;                             /* address offset */
-    //LCDC_I1SCALE = 0;                             /* scaling */
+    LCDC_I1POS   = (0<<16) | 0;                   /* position */
+    LCDC_I1OFF   = 0;                             /* address offset */
+    LCDC_I1SCALE = 0;                             /* scaling */
     LCDC_I1CTRL  = 5;                             /* 565bpp (7 = 888bpp) */
-    //LCDC_CTRL &= ~(1<<28);
+    LCDC_CTRL &= ~(1<<28);
 
     LCDC_CLKDIV = (LCDC_CLKDIV &~ 0xFF00FF) | (1<<16) | 2; /* and this means? */
     
     /* set and clear various flags - not investigated yet */
-    //LCDC_CTRL &~ 0x090006AA;  /* clear bits 1,3,5,7,9,10,24,27 */
+    LCDC_CTRL &~ 0x090006AA;  /* clear bits 1,3,5,7,9,10,24,27 */
     LCDC_CTRL |= 0x02800144;  /*   set bits 2,6,8,25,23 */
     LCDC_CTRL = (LCDC_CTRL &~ 0xF0000) | 0x20000;
-    //LCDC_CTRL = (LCDC_CTRL &~ 0x700000) | 0x700000;
+    LCDC_CTRL = (LCDC_CTRL &~ 0x700000) | 0x700000;
 
     /* enable LCD controller */
     LCDC_CTRL |= 1;
+    
+    /* enable LTV250QV panel */
+    lcd_display_on();
+    
+    /* turn on the backlight, without it the LCD is not visible at all */
+    GPIOA_SET = (1<<6);
 }
 
 
