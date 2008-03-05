@@ -30,6 +30,9 @@
 #define LOGF_ENABLE
 #include "logf.h"
 
+static int int_btn = BUTTON_NONE;
+
+#ifndef BOOTLOADER
 /* Driver for the Synaptics Touchpad based on the "Synaptics Modular Embedded
    Protocol: 3-Wire Interface Specification" documentation */
 
@@ -59,7 +62,6 @@
 #define ABSOLUTE_HEADER 0x0b
 
 static int syn_status = 0;
-static int int_btn = BUTTON_NONE;
 
 static int syn_wait_clk_change(unsigned int val)
 {
@@ -584,6 +586,9 @@ void button_int(void)
         GPIOD_INT_EN  |=  0x2;
     }
 }
+#else
+void button_init_device(void){}
+#endif /* bootloader */
 
 /*
  * Get button pressed from hardware
@@ -592,6 +597,9 @@ int button_read_device(void)
 {
     int btn = int_btn;
 
+    if(button_hold())
+        return BUTTON_NONE;
+    
     if (~GPIOA_INPUT_VAL & 0x40)
         btn |= BUTTON_POWER;
 
