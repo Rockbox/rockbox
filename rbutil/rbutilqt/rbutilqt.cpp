@@ -56,8 +56,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     settings->open();
     
     // manual tab
-    updateManual();
-    updateDevice();
+    updateSettings();
     ui.radioPdf->setChecked(true);
 
     // info tab
@@ -132,9 +131,10 @@ void RbUtilQt::downloadInfo()
     connect(daily, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(daily, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
     connect(qApp, SIGNAL(lastWindowClosed()), daily, SLOT(abort()));
-    daily->setProxy(proxy());
     if(settings->cacheOffline())
-        daily->setCache(settings->cachePath());
+        daily->setCache(true);
+    else
+        daily->setCache(false);
     qDebug() << "downloading build info";
     daily->setFile(&buildInfo);
     daily->getFile(QUrl(settings->serverConfUrl()));
@@ -159,9 +159,8 @@ void RbUtilQt::downloadDone(bool error)
     connect(bleeding, SIGNAL(done(bool)), this, SLOT(downloadBleedingDone(bool)));
     connect(bleeding, SIGNAL(requestFinished(int, bool)), this, SLOT(downloadDone(int, bool)));
     connect(qApp, SIGNAL(lastWindowClosed()), daily, SLOT(abort()));
-    bleeding->setProxy(proxy());
     if(settings->cacheOffline())
-        bleeding->setCache(settings->cachePath());
+        bleeding->setCache(true);
     bleeding->setFile(&bleedingInfo);
     bleeding->getFile(QUrl(settings->bleedingInfo()));
 
@@ -252,6 +251,13 @@ void RbUtilQt::updateSettings()
     qDebug() << "updateSettings()";
     updateDevice();
     updateManual();
+    if(settings->proxyType() == "system") {
+        HttpGet::setGlobalProxy(systemProxy());
+    }
+    else if(settings->proxyType() == "manual") {
+        HttpGet::setGlobalProxy(settings->proxy());
+    }
+    HttpGet::setGlobalCache(settings->cachePath());
 }
 
 
@@ -452,11 +458,10 @@ bool RbUtilQt::installAuto()
 
     ZipInstaller* installer = new ZipInstaller(this);
     installer->setUrl(file);
-    installer->setProxy(proxy());
     installer->setLogSection("Rockbox (Base)");
     installer->setLogVersion(myversion);
     if(!settings->cacheDisabled())
-        installer->setCache(settings->cachePath());
+        installer->setCache(true);
     installer->setMountPoint(settings->mountpoint());
     installer->install(logger);
 
@@ -469,7 +474,6 @@ void RbUtilQt::install()
 {
     Install *installWindow = new Install(this);
     installWindow->setSettings(settings);
-    installWindow->setProxy(proxy());
 
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);
@@ -516,7 +520,6 @@ void RbUtilQt::installBootloader()
 
     blinstaller->setMountPoint(settings->mountpoint());
 
-    blinstaller->setProxy(proxy());
     blinstaller->setDevice(platform);
     blinstaller->setBootloaderMethod(settings->curBootloaderMethod());
     blinstaller->setBootloaderName(settings->curBootloaderName());
@@ -606,12 +609,11 @@ void RbUtilQt::installFonts()
     installer = new ZipInstaller(this);
 
     installer->setUrl(settings->fontUrl());
-    installer->setProxy(proxy());
     installer->setLogSection("Fonts");
     installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(settings->mountpoint());
     if(!settings->cacheDisabled())
-        installer->setCache(settings->cachePath());
+        installer->setCache(true);
     installer->install(logger);
 }
 
@@ -636,14 +638,13 @@ void RbUtilQt::installVoice()
         versmap.value("arch_date") + "-english.voice"; 
     qDebug() << voiceurl;
 
-    installer->setProxy(proxy());
     installer->setUrl(voiceurl);
     installer->setLogSection("Voice");
     installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(settings->mountpoint());
     installer->setTarget("/.rockbox/langs/english.voice");
     if(!settings->cacheDisabled())
-        installer->setCache(settings->cachePath());
+        installer->setCache(true);
     installer->install(logger);
 
 }
@@ -684,12 +685,11 @@ void RbUtilQt::installDoom()
     installer = new ZipInstaller(this);
 
     installer->setUrl(settings->doomUrl());
-    installer->setProxy(proxy());
     installer->setLogSection("Game Addons");
     installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(settings->mountpoint());
     if(!settings->cacheDisabled())
-        installer->setCache(settings->cachePath());
+        installer->setCache(true);
     installer->install(logger);
 
 }
@@ -699,7 +699,6 @@ void RbUtilQt::installThemes()
     if(chkConfig(true)) return;
     ThemesInstallWindow* tw = new ThemesInstallWindow(this);
     tw->setSettings(settings);
-    tw->setProxy(proxy());
     tw->setModal(true);
     tw->show();
 }
@@ -720,8 +719,7 @@ void RbUtilQt::createVoiceFile(void)
     if(chkConfig(true)) return;
     CreateVoiceWindow *installWindow = new CreateVoiceWindow(this);
     installWindow->setSettings(settings);
-    installWindow->setProxy(proxy());
-    
+
     installWindow->show();
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
@@ -747,7 +745,6 @@ void RbUtilQt::uninstallBootloader(void)
     logger->show();
 
     BootloaderInstaller blinstaller(this);
-    blinstaller.setProxy(proxy());
     blinstaller.setMountPoint(settings->mountpoint());
     blinstaller.setDevice(settings->curPlatform());
     blinstaller.setBootloaderMethod(settings->curBootloaderMethod());
@@ -802,8 +799,7 @@ void RbUtilQt::downloadManual(void)
     installer = new ZipInstaller(this);
     installer->setMountPoint(settings->mountpoint());
     if(!settings->cacheDisabled())
-        installer->setCache(settings->cachePath());
-    installer->setProxy(proxy());
+        installer->setCache(true);
     installer->setLogSection(section);
     installer->setLogVersion(date);
     installer->setUrl(manualurl);

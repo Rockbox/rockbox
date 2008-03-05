@@ -25,7 +25,7 @@
 ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 {
     m_unzip = true;
-    m_cache = "";
+    m_usecache = false;
 }
 
 
@@ -86,10 +86,8 @@ void ZipInstaller::installStart()
     downloadFile->close();
     // get the real file.
     getter = new HttpGet(this);
-    getter->setProxy(m_proxy);
-    if(m_cache.exists()) {
-        getter->setCache(m_cache);
-
+    if(m_usecache) {
+        getter->setCache(true);
     }
     getter->setFile(downloadFile);
     getter->getFile(QUrl(m_url));

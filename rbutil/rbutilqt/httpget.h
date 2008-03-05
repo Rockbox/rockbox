@@ -35,6 +35,7 @@ class HttpGet : public QObject
 
         bool getFile(const QUrl &url);
         void setProxy(const QUrl &url);
+        void setProxy(bool);
         QHttp::Error error(void);
         QString errorString(void);
         void setFile(QFile*);
@@ -43,6 +44,10 @@ class HttpGet : public QObject
         int httpResponse(void);
         QByteArray readAll(void);
         bool isCached() { return cached; }
+        static void setGlobalCache(const QDir d) //< set global cache path
+            { m_globalCache = d; }
+        static void setGlobalProxy(const QUrl p) //< set global proxy value
+            { m_globalProxy = p; }
 
     public slots:
         void abort(void);
@@ -61,9 +66,9 @@ class HttpGet : public QObject
         void httpStarted(int);
 
     private:
-        QHttp http;
+        QHttp http; //< download object
         QFile *outputFile;
-        int response;
+        int response; //< http response
         int getRequest;
         QByteArray dataBuffer;
         bool outputToBuffer;
@@ -72,6 +77,9 @@ class HttpGet : public QObject
         QDir m_cachedir;
         QString cachefile;
         bool cached;
+        QUrl m_proxy;
+        static QDir m_globalCache; //< global cache path value
+        static QUrl m_globalProxy; //< global proxy value
 };
 
 #endif

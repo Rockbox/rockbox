@@ -51,7 +51,6 @@ public:
     void uninstall(ProgressloggerInterface* dp);
 
     void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
-    void setProxy(QUrl proxy) {m_proxy= proxy;}
     void setDevice(QString device) {m_device= device;}  //!< the current plattform
     void setBootloaderMethod(QString method) {m_bootloadermethod= method;}
     void setBootloaderName(QString name){m_bootloadername= name;}
@@ -116,7 +115,6 @@ private:
 
     QString m_mountpoint, m_device,m_bootloadermethod,m_bootloadername;
     QString m_bootloaderUrlBase,m_tempfilename,m_origfirmware;
-    QUrl m_proxy;
     QString m_bootloaderinfoUrl;
     bool m_install;
 

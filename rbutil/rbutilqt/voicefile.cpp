@@ -90,7 +90,6 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
     downloadFile->close();
     // get the real file.
     getter = new HttpGet(this);
-    getter->setProxy(m_proxy);
     getter->setFile(downloadFile);
     getter->getFile(genlangUrl);
 

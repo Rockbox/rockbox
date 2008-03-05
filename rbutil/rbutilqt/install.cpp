@@ -37,13 +37,6 @@ void Install::setCached(bool cache)
 }
 
 
-void Install::setProxy(QUrl proxy_url)
-{
-    proxy = proxy_url;
-    qDebug() << "Install::setProxy" << proxy;
-}
-
-
 void Install::accept()
 {
     logger = new ProgressLoggerGui(this);
@@ -92,7 +85,6 @@ void Install::accept()
 
     installer = new ZipInstaller(this);
     installer->setUrl(file);
-    installer->setProxy(proxy);
     installer->setLogSection("Rockbox (Base)");
     if(!settings->cacheDisabled()
         && !ui.radioCurrent->isChecked()

@@ -203,8 +203,6 @@ bool BootloaderInstaller::downloadInfo()
    connect(infodownloader, SIGNAL(done(bool)), this, SLOT(infoDownloadDone(bool)));
    connect(infodownloader, SIGNAL(requestFinished(int, bool)), this, SLOT(infoRequestFinished(int, bool)));
 
-   infodownloader->setProxy(m_proxy);
-
    qDebug() << "downloading bootloader info";
    infodownloader->setFile(&bootloaderInfo);
    infodownloader->getFile(QUrl(m_bootloaderinfoUrl));
@@ -319,7 +317,6 @@ void BootloaderInstaller::gigabeatPrepare()
         downloadFile.close();
         // get the real file.
         getter = new HttpGet(this);
-        getter->setProxy(m_proxy);
         getter->setFile(&downloadFile);
         getter->getFile(QUrl(url));
         // connect signals from HttpGet
@@ -462,7 +459,6 @@ void BootloaderInstaller::iaudioPrepare()
     downloadFile.close();
     // get the real file.
     getter = new HttpGet(this);
-    getter->setProxy(m_proxy);
     getter->setFile(&downloadFile);
     getter->getFile(QUrl(url));
     // connect signals from HttpGet
@@ -519,7 +515,6 @@ void BootloaderInstaller::h10Prepare()
         downloadFile.close();
         // get the real file.
         getter = new HttpGet(this);
-        getter->setProxy(m_proxy);
         getter->setFile(&downloadFile);
         getter->getFile(QUrl(url));
         // connect signals from HttpGet
@@ -672,7 +667,6 @@ void BootloaderInstaller::mrobe100Prepare()
         downloadFile.close();
         // get the real file.
         getter = new HttpGet(this);
-        getter->setProxy(m_proxy);
         getter->setFile(&downloadFile);
         getter->getFile(QUrl(url));
         // connect signals from HttpGet
@@ -838,7 +832,6 @@ void BootloaderInstaller::ipodPrepare()
         downloadFile.close();
         // get the real file.
         getter = new HttpGet(this);
-        getter->setProxy(m_proxy);
         getter->setFile(&downloadFile);
         getter->getFile(QUrl(url));
         // connect signals from HttpGet
@@ -1081,7 +1074,6 @@ void BootloaderInstaller::sansaPrepare()
         downloadFile.close();
         // get the real file.
         getter = new HttpGet(this);
-        getter->setProxy(m_proxy);
         getter->setFile(&downloadFile);
         getter->getFile(QUrl(url));
         // connect signals from HttpGet
@@ -1270,7 +1262,6 @@ void BootloaderInstaller::iriverPrepare()
     downloadFile.close();
     // get the real file.
     getter = new HttpGet(this);
-    getter->setProxy(m_proxy);
     getter->setFile(&downloadFile);
     getter->getFile(QUrl(url));
     // connect signals from HttpGet

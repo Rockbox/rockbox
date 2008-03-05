@@ -32,7 +32,6 @@ class Install : public QDialog
     Q_OBJECT
     public:
         Install(QWidget *parent = 0);
-        void setProxy(QUrl);
         void setSettings(RbSettings* sett);
         void setVersionStrings(QMap<QString, QString>);
 
@@ -42,7 +41,6 @@ class Install : public QDialog
     private:
         Ui::InstallFrm ui;
         ProgressLoggerGui* logger;
-        QUrl proxy;
         RbSettings* settings;
         QHttp *download;
         QFile *target;

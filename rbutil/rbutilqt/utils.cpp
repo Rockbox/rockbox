@@ -52,7 +52,7 @@ bool recRmdir( const QString &dirName )
 }
 
 
-//Function to get the system proxy
+//! @brief get system proxy value.
 QUrl systemProxy(void)
 {
 #if defined(Q_OS_LINUX)

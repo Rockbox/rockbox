@@ -51,7 +51,6 @@ public:
     void setTargetId(int id){m_targetid = id;}
     void setLang(QString name){m_lang =name;}
     void setWavtrimThreshold(int th){m_wavtrimThreshold = th;}
-    void setProxy(QUrl proxy){m_proxy = proxy;}
     
 signals:
     void done(bool error);
@@ -69,7 +68,6 @@ private:
     RbSettings* settings;
     HttpGet *getter;
    
-    QUrl m_proxy;  //proxy
     QString filename;  //the temporary file
    
     QString m_mountpoint;  //mountpoint of the device

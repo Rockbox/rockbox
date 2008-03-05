@@ -39,7 +39,6 @@ public:
     void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
     void setUrl(QString url){m_urllist = QStringList(url);}
     void setUrl(QStringList url) { m_urllist = url; }
-    void setProxy(QUrl proxy) {m_proxy= proxy;}
     void setLogSection(QString name) {m_loglist = QStringList(name);}
     void setLogSection(QStringList name) { m_loglist = name; }
     void setLogVersion(QString v) { m_verlist = QStringList(v); qDebug() << m_verlist;}
@@ -47,6 +46,7 @@ public:
     void setUnzip(bool i) { m_unzip = i; }
     void setTarget(QString t) { m_target = t; }
     void setCache(QDir c) { m_cache = c; };
+    void setCache(bool c) { m_usecache = c; };
     void setCache(QString c) { m_cache = QDir(c);}
 
 signals:
@@ -63,11 +63,11 @@ private:
     void installSingle(ProgressloggerInterface *dp);
     QString m_url, m_file, m_mountpoint, m_logsection, m_logver;
     QStringList m_urllist, m_loglist, m_verlist;
-    QUrl m_proxy;
     bool m_unzip;
     QString m_target;
     int runner;
     QDir m_cache;
+    bool m_usecache;
 
     HttpGet *getter;
     QTemporaryFile *downloadFile;

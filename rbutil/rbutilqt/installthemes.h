@@ -37,7 +37,6 @@ class ThemesInstallWindow : public QDialog
         ThemesInstallWindow(QWidget* parent = 0);
         ~ThemesInstallWindow();
         void setSettings(RbSettings* sett){settings=sett;}
-        void setProxy(QUrl);
         void downloadInfo(void);
         void show(void);
 
@@ -52,7 +51,6 @@ class ThemesInstallWindow : public QDialog
         HttpGet igetter;
         QTemporaryFile themesInfo;
         QString resolution(void);
-        QUrl proxy;
         int currentItem;
         void resizeEvent(QResizeEvent*);
         QByteArray imgData;

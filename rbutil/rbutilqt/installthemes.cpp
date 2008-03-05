@@ -65,9 +65,8 @@ void ThemesInstallWindow::downloadInfo()
     url = QUrl(settings->themeUrl() + "/rbutilqt.php?res=" + resolution());
     qDebug() << "downloadInfo()" << url;
     qDebug() << url.queryItems();
-    getter->setProxy(proxy);
     if(settings->cacheOffline())
-        getter->setCache(settings->cachePath());
+        getter->setCache(true);
     getter->setFile(&themesInfo);
     getter->getFile(url);
 }
@@ -172,9 +171,8 @@ void ThemesInstallWindow::updateDetails(int row)
     iniDetails.endGroup();
 
     igetter.abort();
-    igetter.setProxy(proxy);
     if(!settings->cacheDisabled())
-        igetter.setCache(settings->cachePath());
+        igetter.setCache(true);
     else
     {
         if(infocachedir=="")
@@ -248,13 +246,6 @@ void ThemesInstallWindow::abort()
 }
 
 
-void ThemesInstallWindow::setProxy(QUrl p)
-{
-    proxy = p;
-    qDebug() << "setProxy()" << proxy;
-}
-
-
 void ThemesInstallWindow::acceptAll()
 {
     ui.listThemes->selectAll();
@@ -299,12 +290,11 @@ void ThemesInstallWindow::accept()
 
     installer = new ZipInstaller(this);
     installer->setUrl(themes);
-    installer->setProxy(proxy);
     installer->setLogSection(names);
     installer->setLogVersion(version);
     installer->setMountPoint(mountPoint);
     if(!settings->cacheDisabled())
-        installer->setCache(settings->cachePath());
+        installer->setCache(true);
     installer->install(logger);
     connect(logger, SIGNAL(closed()), this, SLOT(close()));
 }

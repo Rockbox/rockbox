@@ -23,6 +23,8 @@
 
 #include "httpget.h"
 
+QDir HttpGet::m_globalCache;
+QUrl HttpGet::m_globalProxy;
 
 HttpGet::HttpGet(QObject *parent)
     : QObject(parent)
@@ -36,6 +38,14 @@ HttpGet::HttpGet(QObject *parent)
     // hint about this in the http response instead of nonsense.
     response = -1;
 
+    // default to global proxy / cache if not empty.
+    // proxy is automatically enabled, disable it by setting an empty proxy
+    // cache is enabled to be in line, can get disabled with setCache(bool)
+    qDebug() << "setting global proxy / cache";
+    if(!m_globalProxy.isEmpty())
+        setProxy(m_globalProxy);
+    m_usecache = false;
+    m_cachedir = m_globalCache;
     connect(&http, SIGNAL(done(bool)), this, SLOT(httpDone(bool)));
     connect(&http, SIGNAL(dataReadProgress(int, int)), this, SLOT(httpProgress(int, int)));
     connect(&http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpFinished(int, bool)));
@@ -60,13 +70,14 @@ void HttpGet::setCache(QDir d)
             result = m_cachedir.mkdir("rbutil-cache");
     }
     else result = false;
-    qDebug() << "HttpGet::setCache(QDir)" << result;
+    qDebug() << "HttpGet::setCache(QDir)" << d << result;
     m_usecache = result;
 }
 
 
 void HttpGet::setCache(bool c)
 {
+    qDebug() << "setCache(bool)" << c;
     m_usecache = c;
 }
 
@@ -91,8 +102,19 @@ void HttpGet::httpProgress(int read, int total)
 
 void HttpGet::setProxy(const QUrl &proxy)
 {
-    qDebug() << "HttpGet::setProxy" << proxy.toString();
-    http.setProxy(proxy.host(), proxy.port(), proxy.userName(), proxy.password());
+    qDebug() << "HttpGet::setProxy(QUrl)" << proxy.toString();
+    m_proxy = proxy;
+    http.setProxy(m_proxy.host(), m_proxy.port(), m_proxy.userName(), m_proxy.password());
+}
+
+
+void HttpGet::setProxy(bool enable)
+{
+    qDebug() << "HttpGet::setProxy(bool)" << enable;
+    if(enable)
+        http.setProxy(m_proxy.host(), m_proxy.port(), m_proxy.userName(), m_proxy.password());
+    else
+        http.setProxy("", 0);
 }
 
 
@@ -171,6 +193,7 @@ bool HttpGet::getFile(const QUrl &url)
     else {
         qDebug() << "[HTTP] cache DISABLED";
     }
+
     http.setHost(url.host(), url.port(80));
     // construct query (if any)
     QList<QPair<QString, QString> > qitems = url.queryItems();
