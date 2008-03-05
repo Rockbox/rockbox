@@ -951,7 +951,7 @@ void settings_apply(void)
     if (global_settings.colors_file[0])
         read_color_theme_file();
 #endif
-
+    list_init_viewports();
 }
 
 

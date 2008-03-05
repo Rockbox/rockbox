@@ -125,7 +125,13 @@ void app_main(void)
 static void app_main(void)
 #endif
 {
+    int i;
     init();
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].clear_display();
+        screens[i].update();
+    }
     tree_gui_init();
     root_menu();
 }

@@ -54,6 +54,11 @@ gui/gwps-common.c
 gui/icon.c
 #endif
 gui/list.c
+#ifdef HAVE_LCD_BITMAP
+gui/bitmap/list.c
+#else
+gui/charcell/list.c
+#endif
 gui/option_select.c
 gui/quickscreen.c
 gui/scrollbar.c
@@ -63,6 +68,7 @@ gui/textarea.c
 gui/yesno.c
 gui/wps_debug.c
 gui/wps_parser.c
+gui/viewport.c
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 gui/backdrop.c

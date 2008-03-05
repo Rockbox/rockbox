@@ -297,8 +297,20 @@ MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
 /***********************************/
 /*    BARS MENU                    */
 #ifdef HAVE_LCD_BITMAP
+int statusbar_callback(int action,const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+    switch (action)
+    {
+        case ACTION_EXIT_MENUITEM:
+            /* this should be changed so only the viewports are reloaded */
+            settings_apply();
+            break;
+    }
+    return action;
+}
 MENUITEM_SETTING(scrollbar_item, &global_settings.scrollbar, NULL);
-MENUITEM_SETTING(statusbar, &global_settings.statusbar, NULL);
+MENUITEM_SETTING(statusbar, &global_settings.statusbar, statusbar_callback);
 #if CONFIG_KEYPAD == RECORDER_PAD
 MENUITEM_SETTING(buttonbar, &global_settings.buttonbar, NULL);
 #endif

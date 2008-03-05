@@ -40,6 +40,8 @@ codecs/spc/SOURCES
 codecs/Tremor/*
 eqs/*.cfg
 gui/*.[ch]
+gui/charcell/*.[ch]
+gui/bitmap/*.[ch]
 keymaps/*.[ch]
 lang/SOURCES
 lang/*.lang

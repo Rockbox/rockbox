@@ -37,6 +37,7 @@
 #include "sound.h"
 #include "misc.h"
 #include "talk.h"
+#include "viewport.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 #define SCROLL_LIMIT 1
@@ -56,11 +57,46 @@ static bool offset_out_of_view = false;
 #endif
 static struct gui_synclist* last_list_displayed;
 
-#define SHOW_LIST_TITLE ((gui_list->title != NULL) && \
-                         (display->nb_lines > 2))
-
 static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                                       int offset);
+void list_draw(struct screen *display, struct viewport *parent, struct gui_synclist *list);
+
+#ifdef HAVE_LCD_BITMAP
+static struct viewport parent[NB_SCREENS];
+void list_init_viewports(void)
+{
+    int i;
+    struct viewport *vp;
+    FOR_NB_SCREENS(i)
+    {
+        vp = &parent[i];
+        viewport_set_defaults(vp, i);
+    }
+}
+#else
+static struct viewport parent[NB_SCREENS] =
+{
+    [SCREEN_MAIN] = 
+    {
+        .x        = 0,
+        .y        = 0,
+        .width    = LCD_WIDTH,
+        .height   = LCD_HEIGHT
+    },
+};
+void list_init_viewports(void)
+{
+}
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+bool list_display_title(struct gui_synclist *list, struct viewport *vp)
+{
+    return list->title != NULL && viewport_get_nb_lines(vp)>2;
+}
+#else
+#define list_display_title(l,v) false
+#endif
 
 /*
  * Initializes a scrolling list
@@ -82,7 +118,7 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->callback_get_item_icon = NULL;
     gui_list->callback_get_item_name = callback_get_item_name;
     gui_list->callback_speak_item = NULL;
-    gui_list_set_nb_items(gui_list, 0);
+    gui_list->nb_items = 0;
     gui_list->selected_item = 0;
     FOR_NB_SCREENS(i)
     {
@@ -91,6 +127,7 @@ void gui_synclist_init(struct gui_synclist * gui_list,
 #ifdef HAVE_LCD_BITMAP
         gui_list->offset_position[i] = 0;
 #endif
+        gui_list->parent[i] = &parent[i];
     }
     gui_list->limit_scroll = false;
     gui_list->data=data;
@@ -118,8 +155,10 @@ void gui_synclist_hide_selection_marker(struct gui_synclist * lists, bool hide)
 
 
 #ifdef HAVE_LCD_BITMAP
-static int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_width,
-                             int text_pos, struct screen * display)
+int list_title_height(struct gui_synclist *list, struct viewport *vp);
+
+int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_width,
+                             int text_pos, struct screen * display, struct viewport *vp)
 {
     int item_offset;
 
@@ -130,7 +169,7 @@ static int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_wid
     else
     {
         /* if text is smaller then view */
-        if (item_width <= display->width - text_pos)
+        if (item_width <= vp->width - text_pos)
         {
             item_offset = 0;
         }
@@ -138,8 +177,8 @@ static int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_wid
         {
             /* if text got out of view  */
             if (gui_list->offset_position[display->screen_type] >
-                    item_width - (display->width - text_pos))
-                item_offset = item_width - (display->width - text_pos);
+                    item_width - (vp->width - text_pos))
+                item_offset = item_width - (vp->width - text_pos);
             else
                 item_offset = gui_list->offset_position[display->screen_type];
         }
@@ -148,341 +187,32 @@ static int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_wid
     return item_offset;
 }
 #endif
-
-/*
- * Draws the list on the attached screen
- * - gui_list : the list structure
- */
-static void gui_list_draw_smart(struct gui_synclist *gui_list, struct screen * display)
-{
-    int text_pos;
-    bool draw_icons = (gui_list->callback_get_item_icon != NULL && global_settings.show_icons);
-    bool draw_cursor;
-    int i;
-    int lines;
-    static int last_lines[NB_SCREENS] = {0};
-#ifdef HAVE_LCD_BITMAP
-    int item_offset;
-    int old_margin = display->getxmargin();
-#endif
-    int start, end;
-    bool partial_draw = false;
-
-#ifdef HAVE_LCD_BITMAP
-    display->setfont(FONT_UI);
-    gui_textarea_update_nblines(display);
-#endif
-    /* Speed up UI by drawing the changed contents only. */
-    if (gui_list == last_list_displayed
-        && gui_list->last_displayed_start_item[display->screen_type] == gui_list->start_item[display->screen_type]
-        && gui_list->selected_size == 1)
-    {
-        partial_draw = true;
-    }
-
-    lines = display->nb_lines - SHOW_LIST_TITLE;
-    if (last_lines[display->screen_type] != lines)
-    {
-        gui_list_select_at_offset(gui_list, 0);
-        last_lines[display->screen_type] = lines;
-    }
-
-    if (partial_draw)
-    {
-        end = gui_list->last_displayed_selected_item - gui_list->start_item[display->screen_type];
-        i = gui_list->selected_item - gui_list->start_item[display->screen_type];
-        if (i < end )
-        {
-            start = i;
-            end++;
-        }
-        else
-        {
-            start = end;
-            end = i + 1;
-        }
-    }
-    else
-    {
-        gui_textarea_clear(display);
-        start = 0;
-        end = display->nb_lines;
-        gui_list->last_displayed_start_item[display->screen_type] = gui_list->start_item[display->screen_type];
-        last_list_displayed = gui_list;
-    }
-
-    gui_list->last_displayed_selected_item = gui_list->selected_item;
-
-    /* position and draw the list title & icon */
-    if (SHOW_LIST_TITLE && !partial_draw)
-    {
-        if (gui_list->title_icon != NOICON && draw_icons)
-        {
-            screen_put_icon(display, 0, 0, gui_list->title_icon);
-#ifdef HAVE_LCD_BITMAP
-            text_pos = get_icon_width(display->screen_type)+2; /* pixels */
-#else
-            text_pos = 1; /* chars */
-#endif
-        }
-        else
-        {
-            text_pos = 0;
-        }
-
-#ifdef HAVE_LCD_BITMAP
-        int title_style = STYLE_DEFAULT;
-#ifdef HAVE_LCD_COLOR
-        if (gui_list->title_color >= 0)
-        {
-            title_style |= STYLE_COLORED;
-            title_style |= gui_list->title_color;
-        }
-#endif
-        screen_set_xmargin(display, text_pos); /* margin for title */
-        item_offset = gui_list_get_item_offset(gui_list, gui_list->title_width,
-                                               text_pos, display);
-        if (item_offset > gui_list->title_width - (display->width - text_pos))
-            display->puts_style_offset(0, 0, gui_list->title,
-                                       title_style, item_offset);
-        else
-            display->puts_scroll_style_offset(0, 0, gui_list->title,
-                                              title_style, item_offset);
-#else
-        display->puts_scroll(text_pos, 0, gui_list->title);
-#endif
-    }
-
-    /* Adjust the position of icon, cursor, text for the list */
-#ifdef HAVE_LCD_BITMAP
-    gui_textarea_update_nblines(display);
-    bool draw_scrollbar;
-
-    draw_scrollbar = (global_settings.scrollbar &&
-                lines < gui_list->nb_items);
-
-    draw_cursor = !global_settings.cursor_style &&
-                    gui_list->show_selection_marker;
-    text_pos = 0; /* here it's in pixels */
-    if(draw_scrollbar || SHOW_LIST_TITLE) /* indent if there's
-                                             a title */
-    {
-        text_pos += SCROLLBAR_WIDTH;
-    }
-    if(draw_cursor)
-        text_pos += get_icon_width(display->screen_type) + 2;
-
-    if(draw_icons)
-        text_pos += get_icon_width(display->screen_type) + 2;
-#else
-    draw_cursor = true;
-    if(draw_icons)
-        text_pos = 2; /* here it's in chars */
-    else
-        text_pos = 1;
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-    screen_set_xmargin(display, text_pos); /* margin for list */
-#endif
-
-    if (SHOW_LIST_TITLE)
-    {
-        start++;
-        if (end < display->nb_lines)
-            end++;
-    }
-
-#ifdef HAVE_LCD_COLOR
-    unsigned char cur_line = 0;
-#endif
-    for (i = start; i < end; i++)
-    {
-        unsigned char *s;
-        char entry_buffer[MAX_PATH];
-        unsigned char *entry_name;
-        int current_item = gui_list->start_item[display->screen_type] +
-                           (SHOW_LIST_TITLE ? i-1 : i);
-
-        /* When there are less items to display than the
-         * current available space on the screen, we stop*/
-        if(current_item >= gui_list->nb_items)
-            break;
-        s = gui_list->callback_get_item_name(current_item,
-                                             gui_list->data,
-                                             entry_buffer);
-        entry_name = P2STR(s);
-
-#ifdef HAVE_LCD_BITMAP
-        int style = STYLE_DEFAULT;
-        /* position the string at the correct offset place */
-        int item_width,h;
-        display->getstringsize(entry_name, &item_width, &h);
-        item_offset = gui_list_get_item_offset(gui_list, item_width,
-                                               text_pos, display);
-#endif
-
-#ifdef HAVE_LCD_COLOR
-        /* if the list has a color callback */
-        if (gui_list->callback_get_item_color)
-        {
-            int color = gui_list->callback_get_item_color(current_item,
-                                                          gui_list->data);
-            /* if color selected */
-            if (color >= 0)
-            {
-                style |= STYLE_COLORED;
-                style |= color;
-            }
-        }
-#endif
-
-        if(gui_list->show_selection_marker &&
-           current_item >= gui_list->selected_item &&
-           current_item <  gui_list->selected_item + gui_list->selected_size)
-        {/* The selected item must be displayed scrolling */
-#ifdef HAVE_LCD_BITMAP
-            if (global_settings.cursor_style == 1
-#ifdef HAVE_REMOTE_LCD
-                || display->screen_type == SCREEN_REMOTE
-#endif
-               )
-            {
-                /* Display inverted-line-style */
-                style |= STYLE_INVERT;
-            }
-#ifdef HAVE_LCD_COLOR
-            else if (global_settings.cursor_style == 2)
-            {
-                /* Display colour line selector */
-                style |= STYLE_COLORBAR;
-            }
-            else if (global_settings.cursor_style == 3)
-            {
-                /* Display gradient line selector */
-                style = STYLE_GRADIENT;
-
-                /* Make the lcd driver know how many lines the gradient should
-                   cover and current line number */
-                /* number of selected lines */
-                style |= NUMLN_PACK(gui_list->selected_size);
-                /* current line number, zero based */
-                style |= CURLN_PACK(cur_line);
-                cur_line++;
-            }
-#endif
-            else  /*  if (!global_settings.cursor_style) */
-            {
-                if (current_item % gui_list->selected_size != 0)
-                    draw_cursor = false;
-            }
-            /* if the text is smaller than the viewport size */
-            if (item_offset > item_width - (display->width - text_pos))
-            {
-                /* don't scroll */
-                display->puts_style_offset(0, i, entry_name,
-                                           style, item_offset);
-            }
-            else
-            {
-                display->puts_scroll_style_offset(0, i, entry_name,
-                                                  style, item_offset);
-            }
-#else
-            display->puts_scroll(text_pos, i, entry_name);
-#endif
-
-            if (draw_cursor)
-            {
-                screen_put_icon_with_offset(display, 0, i,
-                                           (draw_scrollbar || SHOW_LIST_TITLE)?
-                                                   SCROLLBAR_WIDTH: 0,
-                                           0, Icon_Cursor);
-            }
-        }
-        else
-        {/* normal item */
-            if(gui_list->scroll_all)
-            {
-#ifdef HAVE_LCD_BITMAP
-                display->puts_scroll_style_offset(0, i, entry_name,
-                                                  style, item_offset);
-#else
-                display->puts_scroll(text_pos, i, entry_name);
-#endif
-            }
-            else
-            {
-#ifdef HAVE_LCD_BITMAP
-                display->puts_style_offset(0, i, entry_name,
-                                           style, item_offset);
-#else
-                display->puts(text_pos, i, entry_name);
-#endif
-            }
-        }
-        /* Icons display */
-        if(draw_icons)
-        {
-            enum themable_icons icon;
-            icon = gui_list->callback_get_item_icon(current_item, gui_list->data);
-            if(icon > Icon_NOICON)
-            {
-#ifdef HAVE_LCD_BITMAP
-                int x = draw_cursor?1:0;
-                int x_off = (draw_scrollbar || SHOW_LIST_TITLE) ? SCROLLBAR_WIDTH: 0;
-                screen_put_icon_with_offset(display, x, i,
-                                           x_off, 0, icon);
-#else
-                screen_put_icon(display, 1, i, icon);
-#endif
-            }
-        }
-    }
-
-#ifdef HAVE_LCD_BITMAP
-    /* Draw the scrollbar if needed*/
-    if(draw_scrollbar)
-    {
-        int y_start = gui_textarea_get_ystart(display);
-        if (SHOW_LIST_TITLE)
-            y_start += display->char_height;
-        int scrollbar_y_end = display->char_height *
-                              lines + y_start;
-        gui_scrollbar_draw(display, 0, y_start, SCROLLBAR_WIDTH-1,
-                           scrollbar_y_end - y_start, gui_list->nb_items,
-                           gui_list->start_item[display->screen_type],
-                           gui_list->start_item[display->screen_type] + lines, VERTICAL);
-    }
-
-    screen_set_xmargin(display, old_margin);
-#endif
-
-    gui_textarea_update(display);
-}
-
 /*
  * Force a full screen update.
  */
+ 
 void gui_synclist_draw(struct gui_synclist *gui_list)
 {
     int i;
     FOR_NB_SCREENS(i)
     {
         last_list_displayed = NULL;
-        gui_list_draw_smart(gui_list, &screens[i]);
+        list_draw(&screens[i], gui_list->parent[i], gui_list);
     }
 }
-
-
 
 /* sets up the list so the selection is shown correctly on the screen */
 static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
                                              enum screen_type screen)
 {
-    struct screen *display = &screens[screen];
-    int nb_lines = display->nb_lines - SHOW_LIST_TITLE;
+    int nb_lines;
     int difference = gui_list->selected_item - gui_list->start_item[screen];
+    struct viewport vp = *gui_list->parent[screen];
+#ifdef HAVE_LCD_BITMAP
+    if (list_display_title(gui_list, gui_list->parent[screen]))
+        vp.height -= list_title_height(gui_list,gui_list->parent[screen]);
+#endif
+    nb_lines = viewport_get_nb_lines(&vp);
     
     /* edge case,, selected last item */
     if (gui_list->selected_item == gui_list->nb_items -1)
@@ -576,8 +306,12 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
         int i, nb_lines, screen_top;
         FOR_NB_SCREENS(i)
         {
-            struct screen *display = &screens[i];
-            nb_lines = display->nb_lines - SHOW_LIST_TITLE;
+            struct viewport vp = *gui_list->parent[i];
+#ifdef HAVE_LCD_BITMAP
+            if (list_display_title(gui_list, gui_list->parent[i]))
+                vp.height -= list_title_height(gui_list,gui_list->parent[i]);
+#endif
+            nb_lines = viewport_get_nb_lines(&vp);
             if (offset > 0)
             {
                 screen_top = gui_list->nb_items-nb_lines;
@@ -616,23 +350,12 @@ void gui_synclist_add_item(struct gui_synclist * gui_list)
  */
 void gui_synclist_del_item(struct gui_synclist * gui_list)
 {
-    int i;
     if(gui_list->nb_items > 0)
     {
         if (gui_list->selected_item == gui_list->nb_items-1)
             gui_list->selected_item--;
-        FOR_NB_SCREENS(i)
-        {
-            gui_textarea_update_nblines(&screens[i]);
-            int nb_lines = screens[i].nb_lines;
-            int dist_start_from_end = gui_list->nb_items
-                - gui_list->start_item[i] - 1;
-
-            /* scroll the list if needed */
-            if( (dist_start_from_end < nb_lines) && (gui_list->start_item[i] != 0) )
-                gui_list->start_item[i]--;
-        }
         gui_list->nb_items--;
+        gui_synclist_select_item(gui_list, gui_list->selected_item);
     }
 }
 
@@ -706,6 +429,14 @@ void gui_synclist_set_voice_callback(struct gui_synclist * lists,
 {
     lists->callback_speak_item = voice_callback;
 }
+
+#ifdef HAVE_LCD_COLOR
+void gui_synclist_set_color_callback(struct gui_synclist * lists,
+                                    list_get_color color_callback)
+{
+    lists->callback_get_item_color = color_callback;
+}
+#endif
 
 static void gui_synclist_select_next_page(struct gui_synclist * lists,
                                    enum screen_type screen)

@@ -311,8 +311,7 @@ void tree_gui_init(void)
     gui_synclist_set_voice_callback(&tree_lists, tree_voice_cb);
     gui_synclist_set_icon_callback(&tree_lists, &tree_get_fileicon);
 #ifdef HAVE_LCD_COLOR
-    gui_list_set_color_callback(&tree_lists,
-                                &tree_get_filecolor);
+    gui_synclist_set_color_callback(&tree_lists, &tree_get_filecolor);
 #endif
 }
 

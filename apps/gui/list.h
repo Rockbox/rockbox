@@ -123,57 +123,8 @@ struct gui_synclist
     int title_color;
     list_get_color *callback_get_item_color;
 #endif
+    struct viewport *parent[NB_SCREENS];
 };
-
-/*
- * Sets the numbers of items the list can currently display
- * note that the list's context like the currently pointed item is resetted
- *  - gui_list : the list structure
- *  - nb_items : the numbers of items you want
- */
-#define gui_list_set_nb_items(gui_list, nb) \
-    (gui_list)->nb_items = nb
-
-/*
- * Returns the numbers of items currently in the list
- *  - gui_list : the list structure
- */
-#define gui_list_get_nb_items(gui_list) \
-    (gui_list)->nb_items
-
-/*
- * Sets the icon callback function
- *  - gui_list : the list structure
- *  - _callback : the callback function
- */
-#define gui_list_set_icon_callback(gui_list, _callback) \
-    (gui_list)->callback_get_item_icon=_callback
-
-/*
- * Sets the voice callback function
- *  - gui_list : the list structure
- *  - _callback : the callback function
- */
-#define gui_list_set_voice_callback(gui_list, _callback) \
-    (gui_list)->callback_speak_item=_callback
-
-#ifdef HAVE_LCD_COLOR
-/*
- * Sets the color callback function
- *  - gui_list : the list structure
- *  - _callback : the callback function
- */
-#define gui_list_set_color_callback(gui_list, _callback) \
-    (gui_list)->callback_get_item_color=_callback
-#endif
-
-/*
- * Gives the position of the selected item
- *  - gui_list : the list structure
- * Returns the position
- */
-#define gui_list_get_sel_pos(gui_list) \
-    (gui_list)->selected_item
 
 
 #ifdef HAVE_LCD_BITMAP
@@ -183,17 +134,8 @@ extern void gui_list_screen_scroll_step(int ofs);
 /* parse global setting to static bool */
 extern void gui_list_screen_scroll_out_of_view(bool enable);
 #endif /* HAVE_LCD_BITMAP */
-/*
- * Tells the list wether it should stop when reaching the top/bottom
- * or should continue (by going to bottom/top)
- * - gui_list : the list structure
- * - scroll :
- *    - true : stops when reaching top/bottom
- *    - false : continues to go to bottom/top when reaching top/bottom
- */
-#define gui_list_limit_scroll(gui_list, scroll) \
-    (gui_list)->limit_scroll=scroll
 
+void list_init_viewports(void);
 
 extern void gui_synclist_init(
     struct gui_synclist * lists,
@@ -205,6 +147,9 @@ extern void gui_synclist_init(
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
 extern void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback);
 extern void gui_synclist_set_voice_callback(struct gui_synclist * lists, list_speak_item voice_callback);
+#ifdef HAVE_LCD_COLOR
+extern void gui_synclist_set_color_callback(struct gui_synclist * lists, list_get_color color_callback);
+#endif
 extern void gui_synclist_speak_item(struct gui_synclist * lists);
 extern int gui_synclist_get_nb_items(struct gui_synclist * lists);
 
