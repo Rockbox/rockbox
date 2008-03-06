@@ -293,7 +293,7 @@ static void init(void)
     settings_reset();
     settings_load(SETTINGS_ALL);
     gui_sync_wps_init();
-    settings_apply();
+    settings_apply(true);
     init_dircache(true);
     init_dircache(false);
 #ifdef HAVE_TAGCACHE
@@ -519,7 +519,7 @@ static void init(void)
     }
     
     gui_sync_wps_init();
-    settings_apply();
+    settings_apply(true);
     init_dircache(false);
 #ifdef HAVE_TAGCACHE
     init_tagcache();

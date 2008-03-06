@@ -304,7 +304,7 @@ int statusbar_callback(int action,const struct menu_item_ex *this_item)
     {
         case ACTION_EXIT_MENUITEM:
             /* this should be changed so only the viewports are reloaded */
-            settings_apply();
+            settings_apply(false);
             break;
     }
     return action;

@@ -86,7 +86,7 @@ static int set_color_func(void* color)
     res = (int)set_color(&screens[SCREEN_MAIN],str(colors[c].lang_id),
                          colors[c].setting,*colors[c].setting);
     settings_save();
-    settings_apply();
+    settings_apply(false);
     return res;
 }
 
@@ -99,7 +99,7 @@ static int reset_color(void)
     global_settings.lst_color = LCD_DEFAULT_FG;
     
     settings_save();
-    settings_apply();
+    settings_apply(false);
     return 0;
 }
 MENUITEM_FUNCTION(set_bg_col, MENU_FUNC_USEPARAM, ID2P(LANG_BACKGROUND_COLOR),

@@ -355,7 +355,7 @@ bool settings_load_config(const char* file, bool apply)
     close(fd);
     settings_save();
     if (apply)
-        settings_apply();
+        settings_apply(true);
     return true;
 }
 
@@ -732,7 +732,7 @@ void sound_settings_apply(void)
 #endif
 }
 
-void settings_apply(void)
+void settings_apply(bool read_disk)
 {
     char buf[64];
 #if CONFIG_CODEC == SWCODEC
@@ -812,40 +812,87 @@ void settings_apply(void)
         global_settings.peak_meter_clip_hold);
 #endif
 
+    if (read_disk)
+    {
 #if LCD_DEPTH > 1
-    unload_wps_backdrop();
+        unload_wps_backdrop();
 #endif
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    unload_remote_wps_backdrop();
+        unload_remote_wps_backdrop();
 #endif
-    if ( global_settings.wps_file[0] &&
-         global_settings.wps_file[0] != 0xff ) {
-        snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
-                 global_settings.wps_file);
-        wps_data_load(gui_wps[0].data, buf, true);
-    }
-    else
-    {
-        wps_data_init(gui_wps[0].data);
+        if ( global_settings.wps_file[0] &&
+            global_settings.wps_file[0] != 0xff ) {
+            snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
+                    global_settings.wps_file);
+            wps_data_load(gui_wps[0].data, buf, true);
+        }
+        else
+        {
+            wps_data_init(gui_wps[0].data);
 #ifdef HAVE_REMOTE_LCD
-        gui_wps[0].data->remote_wps = false;
+            gui_wps[0].data->remote_wps = false;
 #endif
-    }
+        }
 
 #if LCD_DEPTH > 1
-    if ( global_settings.backdrop_file[0] &&
-         global_settings.backdrop_file[0] != 0xff ) {
-        snprintf(buf, sizeof buf, BACKDROP_DIR "/%s.bmp",
-                 global_settings.backdrop_file);
-        load_main_backdrop(buf);
-    } else {
-        unload_main_backdrop();
-    }
-    show_main_backdrop();
+        if ( global_settings.backdrop_file[0] &&
+            global_settings.backdrop_file[0] != 0xff ) {
+            snprintf(buf, sizeof buf, BACKDROP_DIR "/%s.bmp",
+                    global_settings.backdrop_file);
+            load_main_backdrop(buf);
+        } else {
+            unload_main_backdrop();
+        }
+        show_main_backdrop();
 #endif
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-    show_remote_main_backdrop();
+        show_remote_main_backdrop();
 #endif
+
+#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
+        if ( global_settings.rwps_file[0]) {
+            snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
+                    global_settings.rwps_file);
+            wps_data_load(gui_wps[1].data, buf, true);
+        }
+        else
+        {
+            wps_data_init(gui_wps[1].data);
+            gui_wps[1].data->remote_wps = true;
+        }
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+        if ( global_settings.font_file[0]) {
+            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
+                    global_settings.font_file);
+            font_load(buf);
+        }
+        else
+            font_reset();
+    
+        if ( global_settings.kbd_file[0]) {
+            snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
+                    global_settings.kbd_file);
+            load_kbd(buf);
+        }
+        else
+            load_kbd(NULL);
+        
+        if ( global_settings.lang_file[0]) {
+            snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
+                     global_settings.lang_file);
+            lang_load(buf);
+            talk_init(); /* use voice of same language */
+        }
+        /* load the icon set */
+        icons_init();
+
+#ifdef HAVE_LCD_COLOR
+        if (global_settings.colors_file[0])
+            read_color_theme_file();
+#endif
+    }
 
 #ifdef HAVE_LCD_COLOR
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
@@ -854,36 +901,6 @@ void settings_apply(void)
     screens[SCREEN_MAIN].set_selector_end(global_settings.lse_color);
     screens[SCREEN_MAIN].set_selector_text(global_settings.lst_color);
 #endif
-
-#if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-    if ( global_settings.rwps_file[0]) {
-        snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
-                 global_settings.rwps_file);
-        wps_data_load(gui_wps[1].data, buf, true);
-    }
-    else
-    {
-        wps_data_init(gui_wps[1].data);
-        gui_wps[1].data->remote_wps = true;
-    }
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-    if ( global_settings.font_file[0]) {
-        snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
-                 global_settings.font_file);
-        font_load(buf);
-    }
-    else
-        font_reset();
-
-    if ( global_settings.kbd_file[0]) {
-        snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
-                 global_settings.kbd_file);
-        load_kbd(buf);
-    }
-    else
-        load_kbd(NULL);
 
     lcd_scroll_step(global_settings.scroll_step);
     gui_list_screen_scroll_step(global_settings.screen_scroll_step);
@@ -895,12 +912,6 @@ void settings_apply(void)
     lcd_bidir_scroll(global_settings.bidir_limit);
     lcd_scroll_delay(global_settings.scroll_delay);
 
-    if ( global_settings.lang_file[0]) {
-        snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
-                 global_settings.lang_file);
-        lang_load(buf);
-        talk_init(); /* use voice of same language */
-    }
 
     set_codepage(global_settings.default_codepage);
 
@@ -943,13 +954,6 @@ void settings_apply(void)
     /* This should stay last */
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_apply();
-#endif
-    /* load the icon set */
-    icons_init();
-
-#ifdef HAVE_LCD_COLOR
-    if (global_settings.colors_file[0])
-        read_color_theme_file();
 #endif
     list_init_viewports();
 }
