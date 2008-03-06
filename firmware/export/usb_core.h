@@ -21,7 +21,7 @@
 
 #ifndef BOOTLOADER
 
-#define USB_SERIAL
+//#define USB_SERIAL
 #define USB_STORAGE
 #define USB_CHARGING_ONLY
 #else /* BOOTLOADER */
