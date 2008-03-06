@@ -3,7 +3,7 @@
 # (C) Keith Perri (kperri) ported to (Gigabeat)
 #derived from "cabbie" (C) Yohann Misquitta
 %wd
-%ac%ca, %cb %cd, %?cf<%cH:%cM:%cS|%cl:%cM:%cS %cP>
+
 %X|wpsbackdrop-240x320x16.bmp|0|0|
 %P|pb-240x320x16.bmp|
 %xl|A|lockclosed-240x320x16.bmp|11|292|
@@ -38,24 +38,25 @@
 %xl|X|pause-240x320x16.bmp|206|292|
 %xl|Y|ff-240x320x16.bmp|206|292|
 %xl|Z|rew-240x320x16.bmp|206|292|
-%Cl|50|35|sc140|sc140|
-%pb|13|22|221|241|
-%?C<|>
+%Cl|55|30|sc130|sc130|
+%pb|13|22|221|254|
 %?C<|>
 %?C<|%s%ac%?it<%it|%fn>>
 %?C<|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
 %?C<|%s%ac%?id<%id|%?d1<%d1|(root)>>>
 %?C<|%ac%?iy<%iy|>>
 %?C<|>
-%?C<|%ac%?fv<(vbr) |>%fb kB/s %fc>
+%?C<|%ac%?ig<%ig|>>
+%?C<|%ac%?fv<(vbr) |>%fb kbit/s %fc>
 %?C<|>
-%?C<%s%ac%?it<%it|%fn>|%acNext Track:>
-%?C<%s%ac%?ia<%ia|%?d2<%d2|(root)>>|%ac%s%It>
-%?C<%s%ac%?id<%id|%?d1<%d1|(root)>>|%s%ac%?It<%Ia|%Fn>>
-%?C<|>
+%?C<%s%ac%?it<%it|%fn>|>
+%?C<%s%ac%?ia<%ia|%?d2<%d2|(root)>>|%acNext Track:>
+%?C<%s%ac%?id<%id|%?d1<%d1|(root)>>|%ac%s%It>
+%?C<|%s%ac%?It<%Ia|%Fn>>
+%?C<%s%ac%?Ia<Next: %Ia - |%?Fn<Next: %Fn|>>%It|>
+
 
      %pc%ac%pp of %pe%ar%pr     
-%?C<%s%ac%?Ia<Next: %Ia - |%?Fn<Next: %Fn|>>%It|>
 
 %?mh<%xdA|%xdB>
 %?bp<%?bc<%xdD|%xdC>|%?bl<|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK|%xdL>>

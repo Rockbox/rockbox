@@ -271,7 +271,7 @@ Author: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange
 
 # Preferred font (including .fnt extension - leave blank for player):
 Font.320x240x16: helvR12.fnt
-Font.240x320x16: helvR14.fnt
+Font.240x320x16: helvR12.fnt
 Font.220x176x16: helvR10.fnt
 Font.176x220x16: helvR10.fnt
 Font.176x132x16: helvR10.fnt
