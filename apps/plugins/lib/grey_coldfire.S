@@ -97,10 +97,11 @@ _grey_line1:
     subq.l  #4, %d2
     bhs.s   .p4_loop
     
+    /* No need to correct the count, we're only testing bits from now on. */
+
 .p4_end:
-    addq.l  #4, %d2
-    cmp.l   #2, %d2
-    blo.s   .p2_t_end
+    btst.l  #1, %d2
+    beq.s   .p2_t_end
     
     move.w  (%a1)+, %d1
     move.w  %d1, %d0
@@ -110,10 +111,9 @@ _grey_line1:
     move.b  %d1, %d0
     move.b  (%d0.l, %a2), (%a0)
     addq.l  #4, %a0
-    subq.l  #2, %d2
 .p2_t_end:
 
-    tst.l   %d2
+    btst.l  #0, %d2
     beq.s   .p1_t_end
 
     move.b  (%a1)+, %d0

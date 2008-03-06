@@ -99,8 +99,8 @@ __grey_line1:
     add     #16, r5
     bt      .p4_loop
     
-    sub     r6, r4
-
+    /* No need to correct the count, we're only testing bits from now on. */
+    
 .p4_end:
     mov     #2, r0
     tst     r0, r4
