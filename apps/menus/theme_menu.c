@@ -40,7 +40,6 @@
 #endif
 #include "exported_menus.h"
 
-
 #if LCD_DEPTH > 1
 /**
 * Menu to clear the backdrop image
@@ -57,66 +56,35 @@ MENUITEM_FUNCTION(clear_main_bd, 0, ID2P(LANG_CLEAR_BACKDROP),
                     clear_main_backdrop, NULL, NULL, Icon_NOICON);
 #endif
 #ifdef HAVE_LCD_COLOR
+
+enum Colors {
+    COLOR_FG = 0,
+    COLOR_BG,
+    COLOR_LSS,
+    COLOR_LSE,
+    COLOR_LST,
+    COLOR_COUNT
+};
+static struct colour_info
+{
+    int *setting;
+    int lang_id;
+} colors[COLOR_COUNT] = {
+    [COLOR_FG] = {&global_settings.fg_color, LANG_FOREGROUND_COLOR},
+    [COLOR_BG] = {&global_settings.bg_color, LANG_BACKGROUND_COLOR},
+    [COLOR_LSS] = {&global_settings.lss_color, LANG_SELECTOR_START_COLOR},
+    [COLOR_LSE] = {&global_settings.lse_color, LANG_SELECTOR_END_COLOR},
+    [COLOR_LST] = {&global_settings.lst_color, LANG_SELECTOR_TEXT_COLOR},
+};
+
 /**
- * Menu for fore/back colors
+ * Menu for fore/back/selection colors
  */
-static int set_fg_color(void)
+static int set_color_func(void* color)
 {
-    int res;
-    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_FOREGROUND_COLOR),
-                     &global_settings.fg_color,global_settings.bg_color);
-
-    screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
-    settings_save();
-    settings_apply();
-    return res;
-}
-
-static int set_bg_color(void)
-{
-    int res;
-    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_BACKGROUND_COLOR),
-                     &global_settings.bg_color,global_settings.fg_color);
-
-    screens[SCREEN_MAIN].set_background(global_settings.bg_color);
-    settings_save();
-    settings_apply();
-    return res;
-}
-
-/* Line selector colour */
-static int set_lss_color(void)
-{
-    int res;
-    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_SELECTOR_START_COLOR),
-                         &global_settings.lss_color,-1);
-
-    screens[SCREEN_MAIN].set_selector_start(global_settings.lss_color);
-    settings_save();
-    settings_apply();
-    return res;
-}
-
-static int set_lse_color(void)
-{
-    int res;
-    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_SELECTOR_END_COLOR),
-                         &global_settings.lse_color,-1);
-
-    screens[SCREEN_MAIN].set_selector_end(global_settings.lse_color);
-    settings_save();
-    settings_apply();
-    return res;
-}
-
-/* Line selector text colour */
-static int set_lst_color(void)
-{
-    int res;
-    res = (int)set_color(&screens[SCREEN_MAIN],str(LANG_SELECTOR_TEXT_COLOR),
-                         &global_settings.lst_color,global_settings.lss_color);
-
-    screens[SCREEN_MAIN].set_selector_text(global_settings.lst_color);
+    int res, c = (intptr_t)color;
+    res = (int)set_color(&screens[SCREEN_MAIN],str(colors[c].lang_id),
+                         colors[c].setting,*colors[c].setting);
     settings_save();
     settings_apply();
     return res;
@@ -129,26 +97,21 @@ static int reset_color(void)
     global_settings.lss_color = LCD_DEFAULT_LS;
     global_settings.lse_color = LCD_DEFAULT_BG;
     global_settings.lst_color = LCD_DEFAULT_FG;
-
-    screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
-    screens[SCREEN_MAIN].set_background(global_settings.bg_color);
-    screens[SCREEN_MAIN].set_selector_start(global_settings.lss_color);
-    screens[SCREEN_MAIN].set_selector_end(global_settings.lse_color);
-    screens[SCREEN_MAIN].set_selector_text(global_settings.lst_color);
+    
     settings_save();
     settings_apply();
     return 0;
 }
-MENUITEM_FUNCTION(set_bg_col, 0, ID2P(LANG_BACKGROUND_COLOR),
-                    set_bg_color, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_fg_col, 0, ID2P(LANG_FOREGROUND_COLOR),
-                    set_fg_color, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_lss_col, 0, ID2P(LANG_SELECTOR_START_COLOR),
-                    set_lss_color, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_lse_col, 0, ID2P(LANG_SELECTOR_END_COLOR),
-                    set_lse_color, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(set_lst_col, 0, ID2P(LANG_SELECTOR_TEXT_COLOR),
-                    set_lst_color, NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(set_bg_col, MENU_FUNC_USEPARAM, ID2P(LANG_BACKGROUND_COLOR),
+                  set_color_func, (void*)COLOR_BG, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(set_fg_col, MENU_FUNC_USEPARAM, ID2P(LANG_FOREGROUND_COLOR),
+                  set_color_func, (void*)COLOR_FG, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(set_lss_col, MENU_FUNC_USEPARAM, ID2P(LANG_SELECTOR_START_COLOR),
+                  set_color_func, (void*)COLOR_LSS, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(set_lse_col, MENU_FUNC_USEPARAM, ID2P(LANG_SELECTOR_END_COLOR),
+                  set_color_func, (void*)COLOR_LSE, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(set_lst_col, MENU_FUNC_USEPARAM, ID2P(LANG_SELECTOR_TEXT_COLOR),
+                  set_color_func, (void*)COLOR_LST, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(reset_colors, 0, ID2P(LANG_RESET_COLORS),
                     reset_color, NULL, NULL, Icon_NOICON);
 
