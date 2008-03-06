@@ -878,7 +878,7 @@ void settings_apply(bool read_disk)
         }
         else
             load_kbd(NULL);
-        
+#endif
         if ( global_settings.lang_file[0]) {
             snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
                      global_settings.lang_file);
@@ -902,6 +902,7 @@ void settings_apply(bool read_disk)
     screens[SCREEN_MAIN].set_selector_text(global_settings.lst_color);
 #endif
 
+#ifdef HAVE_LCD_BITMAP
     lcd_scroll_step(global_settings.scroll_step);
     gui_list_screen_scroll_step(global_settings.screen_scroll_step);
     gui_list_screen_scroll_out_of_view(global_settings.offset_out_of_view);
