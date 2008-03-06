@@ -191,8 +191,8 @@ static void usb_thread(void)
                 {
                     usb_state = USB_POWERED;
 #ifdef HAVE_USBSTACK
-                    usb_core_enable_protocol(USB_DRIVER_MASS_STORAGE,false);
-                    usb_core_enable_protocol(USB_DRIVER_CHARGING_ONLY,true);
+                    usb_core_enable_driver(USB_DRIVER_MASS_STORAGE,false);
+                    usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY,true);
                     usb_enable(true);
 #endif
                 }
@@ -200,8 +200,8 @@ static void usb_thread(void)
 #endif
                 {
 #ifdef HAVE_USBSTACK
-                    usb_core_enable_protocol(USB_DRIVER_MASS_STORAGE,true);
-                    usb_core_enable_protocol(USB_DRIVER_CHARGING_ONLY,false);
+                    usb_core_enable_driver(USB_DRIVER_MASS_STORAGE,true);
+                    usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY,false);
                     usb_enable(true);
 #else
                     /* Tell all threads that they have to back off the ATA.

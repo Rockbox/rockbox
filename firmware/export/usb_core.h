@@ -21,7 +21,7 @@
 
 #ifndef BOOTLOADER
 
-//#define USB_SERIAL
+#define USB_SERIAL
 #define USB_STORAGE
 #define USB_CHARGING_ONLY
 #else /* BOOTLOADER */
@@ -32,19 +32,8 @@
 #include "usb.h"
 
 /* endpoints */
-enum {
-	EP_CONTROL = 0,
-#ifdef USB_STORAGE
-	EP_MASS_STORAGE,
-#endif
-#ifdef USB_SERIAL
-	EP_SERIAL,
-#endif
-#ifdef USB_CHARGING_ONLY
-	EP_CHARGING_ONLY,
-#endif
-	NUM_ENDPOINTS
-};
+#define EP_CONTROL 0
+#define NUM_ENDPOINTS 3
 
 extern int usb_max_pkt_size;
 
@@ -54,7 +43,9 @@ void usb_core_control_request(struct usb_ctrlrequest* req);
 void usb_core_transfer_complete(int endpoint, bool in, int status, int length);
 void usb_core_bus_reset(void);
 bool usb_core_exclusive_connection(void);
-void usb_core_enable_protocol(int driver,bool enabled);
-void usb_core_handle_transfer_completion(struct usb_transfer_completion_event_data* event);
+void usb_core_enable_driver(int driver,bool enabled);
+bool usb_core_driver_enabled (int driver);
+void usb_core_handle_transfer_completion(
+                             struct usb_transfer_completion_event_data* event);
 #endif
 

@@ -102,6 +102,10 @@
 #include "as3514.h"
 #endif
 
+#if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF)
+#include "usb_core.h"
+#endif
+
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -2364,13 +2368,12 @@ static bool dbg_scrollwheel(void)
 #endif
 
 #if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF)
-extern bool usb_core_serial_enabled;
-
 static bool logf_usb_serial(void)
 {
-    usb_core_serial_enabled = !usb_core_serial_enabled;
+    bool serial_enabled = !usb_core_driver_enabled(USB_DRIVER_SERIAL);
+    usb_core_enable_driver(USB_DRIVER_SERIAL,serial_enabled);
     gui_syncsplash(HZ, "USB logf %s",
-                 usb_core_serial_enabled?"enabled":"disabled");
+                 serial_enabled?"enabled":"disabled");
     return false;
 }
 #endif

@@ -21,8 +21,11 @@
 
 #include "usb_ch9.h"
 
+int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size,
+                                     int interface_number, int endpoint);
+void usb_serial_init_connection(int interface,int endpoint);
 void usb_serial_init(void);
-void usb_serial_exit(void);
+void usb_serial_disconnect(void);
 void usb_serial_transfer_complete(bool in, int status, int length);
 bool usb_serial_control_request(struct usb_ctrlrequest* req);
 

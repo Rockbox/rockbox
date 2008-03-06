@@ -21,6 +21,9 @@
 
 #include "usb_ch9.h"
 
+int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size,
+                                      int interface_number,int endpoint);
+void usb_storage_init_connection(int interface,int endpoint);
 void usb_storage_init(void);
 void usb_storage_transfer_complete(bool in,int state,int length);
 bool usb_storage_control_request(struct usb_ctrlrequest* req);
