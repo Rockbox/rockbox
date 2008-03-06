@@ -175,10 +175,8 @@ static const char graphic_numeric[] = "graphic,numeric";
   #define DEFAULT_FONTNAME "Sazanami-Mincho-Regular-11"
 #elif LCD_HEIGHT <= 220
   #define DEFAULT_FONTNAME "helvR10"
-#elif LCD_HEIGHT <= 240
-  #define DEFAULT_FONTNAME "helvR12"
 #elif LCD_HEIGHT <= 320
-  #define DEFAULT_FONTNAME "helvR14"
+  #define DEFAULT_FONTNAME "helvR12"
 #else
   #define DEFAULT_FONTNAME "helvR10"    
 #endif
