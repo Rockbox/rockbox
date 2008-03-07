@@ -466,11 +466,19 @@ static inline void core_sleep(unsigned int core)
         "strb   r0, [%[sem], #2]           \n"
         "ldrb   r0, [%[sem], #1]           \n" /* && stay_awake == 0? */
         "cmp    r0, #0                     \n"
-        "moveq  r0, #0xca                  \n" /* Then sleep */
-        "streqb r0, [%[ctl], %[c], lsl #2] \n"
+        "bne    2f                         \n"
+        /* Sleep: PP5002 crashes if the instruction that puts it to sleep is
+         * located at 0xNNNNNNN0. 4/8/C works. This sequence makes sure
+         * that the correct alternative is executed. Don't change the order
+         * of the next 4 instructions! */
+        "tst    pc, #0x0c                  \n"
+        "mov    r0, #0xca                  \n"
+        "strne  r0, [%[ctl], %[c], lsl #2] \n"
+        "streq  r0, [%[ctl], %[c], lsl #2] \n"
         "nop                               \n" /* nop's needed because of pipeline */
         "nop                               \n"
         "nop                               \n"
+    "2:                                    \n"
         "mov    r0, #0                     \n" /* Clear stay_awake and sleep intent */
         "strb   r0, [%[sem], #1]           \n"
         "strb   r0, [%[sem], #2]           \n"
@@ -593,7 +601,7 @@ void core_wake(unsigned int othercore)
         "tst    r1, r2, lsr %[oc]       \n"
         "ldrne  r2, =0xcf004054         \n" /* If sleeping, wake it */
         "movne  r1, #0xce               \n"
-        "strneb r1, [r2, %[oc], lsl #2] \n"
+        "strne  r1, [r2, %[oc], lsl #2] \n"
         "mov    r1, #0                  \n" /* Done with wake procedure */
         "strb   r1, [%[sem], #0]        \n"
         "msr    cpsr_c, r3              \n" /* Restore int status */
