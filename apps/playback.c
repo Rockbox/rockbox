@@ -210,8 +210,6 @@ struct track_info {
     size_t filesize;           /* File total length */
 
     bool taginfo_ready;        /* Is metadata read */
-
-    bool event_sent;           /* Was this track's buffered event sent */
 };
 
 static struct track_info tracks[MAX_TRACK];
@@ -247,13 +245,12 @@ static bool skipped_during_pause = false; /* Do we need to clear the PCM buffer 
  */
 static bool codec_requested_stop = false;
 
-/* Callbacks which applications or plugins may set */
-/* When the playing track has changed from the user's perspective */
-void (*track_changed_callback)(struct mp3entry *id3) = NULL;
-/* When a track has been buffered */
-void (*track_buffer_callback)(struct mp3entry *id3) = NULL;
-/* When a track's buffer has been overwritten or cleared */
-void (*track_unbuffer_callback)(struct mp3entry *id3) = NULL;
+struct playback_event {
+    enum PLAYBACK_EVENT_TYPE type;
+    void (*callback)(void *data);
+};
+
+struct playback_event events[PLAYBACK_MAX_EVENTS];
 
 static size_t buffer_margin  = 0; /* Buffer margin aka anti-skip buffer (A/C-) */
 
@@ -352,11 +349,6 @@ static bool clear_track_info(struct track_info *track)
     }
 
     if (track->id3_hid >= 0) {
-        if (track->event_sent && track_unbuffer_callback) {
-            /* If there is an unbuffer callback, call it */
-            track_unbuffer_callback(bufgetid3(track->id3_hid));
-        }
-
         if (bufclose(track->id3_hid))
             track->id3_hid = -1;
         else
@@ -381,7 +373,6 @@ static bool clear_track_info(struct track_info *track)
 
     track->filesize = 0;
     track->taginfo_ready = false;
-    track->event_sent = false;
 
     return true;
 }
@@ -1456,6 +1447,51 @@ static void codec_thread(void)
 
 /* --- Audio thread --- */
 
+void playback_add_event(enum PLAYBACK_EVENT_TYPE type, void (*handler))
+{
+    int i;
+    
+    /* Try to find a free slot. */
+    for (i = 0; i < PLAYBACK_MAX_EVENTS; i++)
+    {
+        if (events[i].callback == NULL)
+        {
+            events[i].type = type;
+            events[i].callback = handler;
+            return;
+        }
+    }
+    
+    panicf("playback event line full");
+}
+
+void playback_remove_event(enum PLAYBACK_EVENT_TYPE type, void (*handler))
+{
+    int i;
+    
+    for (i = 0; i < PLAYBACK_MAX_EVENTS; i++)
+    {
+        if (events[i].type == type && events[i].callback == handler)
+        {
+            events[i].callback = NULL;
+            return;
+        }
+    }
+    
+    panicf("playback event not found");
+}
+
+static void send_event(enum PLAYBACK_EVENT_TYPE type, void *data)
+{
+    int i;
+    
+    for (i = 0; i < PLAYBACK_MAX_EVENTS; i++)
+    {
+        if (events[i].type == type && events[i].callback != NULL)
+            events[i].callback(data);
+    }
+}
+
 static bool audio_have_tracks(void)
 {
     return (audio_track_count() != 0);
@@ -1546,7 +1582,7 @@ static void audio_clear_track_entries(bool clear_unbuffered)
 
         /* If the track is buffered, conditionally clear/notify,
          * otherwise clear the track if that option is selected */
-        if (tracks[cur_idx].event_sent || clear_unbuffered)
+        if (clear_unbuffered)
             clear_track_info(&tracks[cur_idx]);
     }
 }
@@ -1750,8 +1786,7 @@ static bool audio_load_track(int offset, bool start_play)
     {
         if (get_metadata(&id3, fd, trackname))
         {
-            if (track_buffer_callback)
-                track_buffer_callback(&id3);
+            send_event(PLAYBACK_EVENT_TRACK_BUFFER, &id3);
             
             tracks[track_widx].id3_hid =
                 bufalloc(&id3, sizeof(struct mp3entry), TYPE_ID3);
@@ -1910,30 +1945,6 @@ static bool audio_load_track(int offset, bool start_play)
     return true;
 }
 
-/* Send callback events to notify about new tracks. */
-static void audio_generate_postbuffer_events(void)
-{
-    int cur_idx;
-
-    logf("Postbuffer:%d/%d",track_ridx,track_widx);
-
-    if (audio_have_tracks())
-    {
-        cur_idx = track_ridx;
-
-        while (1) {
-            if (!tracks[cur_idx].event_sent)
-            {
-                /* Mark the event 'sent' even if we don't really send one */
-                tracks[cur_idx].event_sent = true;
-            }
-            if (cur_idx == track_widx)
-                break;
-            cur_idx = (cur_idx + 1) & MAX_TRACK_MASK;
-        }
-    }
-}
-
 static void audio_fill_file_buffer(bool start_play, size_t offset)
 {
     struct queue_event ev;
@@ -1978,7 +1989,6 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
     if (!had_next_track && audio_next_track())
         track_changed = true;
 
-    audio_generate_postbuffer_events();
 }
 
 static void audio_rebuffer(void)
@@ -2012,6 +2022,9 @@ static int audio_check_new_track(void)
     bool forward;
     bool end_of_playlist;  /* Temporary flag, not the same as playlist_end */
 
+    /* Now it's good time to send track unbuffer events. */
+    send_event(PLAYBACK_EVENT_TRACK_FINISH, &curtrack_id3);
+    
     if (dir_skip)
     {
         dir_skip = false;
@@ -2171,21 +2184,6 @@ skip_done:
     audio_update_trackinfo();
     LOGFQUEUE("audio >|= codec Q_CODEC_REQUEST_COMPLETE");
     return Q_CODEC_REQUEST_COMPLETE;
-}
-
-void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3))
-{
-    track_buffer_callback = handler;
-}
-
-void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3))
-{
-    track_unbuffer_callback = handler;
-}
-
-void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3))
-{
-    track_changed_callback = handler;
 }
 
 unsigned long audio_prev_elapsed(void)
@@ -2404,8 +2402,7 @@ static void audio_finalise_track_change(void)
         bufgetid3(prev_ti->id3_hid)->elapsed = 0;
     }
 
-    if (track_changed_callback)
-        track_changed_callback(&curtrack_id3);
+    send_event(PLAYBACK_EVENT_TRACK_CHANGE, &curtrack_id3);
 
     track_changed = true;
     playlist_update_resume_info(audio_current_track());

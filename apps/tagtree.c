@@ -660,7 +660,7 @@ static void tagtree_buffer_event(struct mp3entry *id3)
     tagcache_search_finish(&tcs);
 }
 
-static void tagtree_unbuffer_event(struct mp3entry *id3)
+static void tagtree_track_finish_event(struct mp3entry *id3)
 {
     long playcount;
     long playtime;
@@ -924,8 +924,8 @@ void tagtree_init(void)
         root_menu = 0;
     
     uniqbuf = buffer_alloc(UNIQBUF_SIZE);
-    audio_set_track_buffer_event(tagtree_buffer_event);
-    audio_set_track_unbuffer_event(tagtree_unbuffer_event);
+    playback_add_event(PLAYBACK_EVENT_TRACK_BUFFER, tagtree_buffer_event);
+    playback_add_event(PLAYBACK_EVENT_TRACK_FINISH, tagtree_track_finish_event);
 }
 
 static bool show_search_progress(bool init, int count)

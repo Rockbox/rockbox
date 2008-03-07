@@ -39,11 +39,17 @@
 
 #define MAX_TRACK_MASK  (MAX_TRACK-1)
 
+#define PLAYBACK_MAX_EVENTS  4
+enum PLAYBACK_EVENT_TYPE {
+    PLAYBACK_EVENT_TRACK_BUFFER,
+    PLAYBACK_EVENT_TRACK_FINISH,
+    PLAYBACK_EVENT_TRACK_CHANGE,
+};
+
 /* Functions */
 const char * get_codec_filename(int cod_spec);
-void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3));
-void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3));
-void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3));
+void playback_add_event(enum PLAYBACK_EVENT_TYPE type, void (*handler));
+void playback_remove_event(enum PLAYBACK_EVENT_TYPE type, void (*handler));
 void voice_wait(void);
 
 #if CONFIG_CODEC == SWCODEC /* This #ifdef is better here than gui/gwps.c */
