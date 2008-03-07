@@ -33,6 +33,10 @@ bool charger_enabled;
 
 void power_init(void)
 {
+    /* Enable power-off bit */
+    GPIOB_ENABLE     |=  0x80;
+    GPIOB_OUTPUT_VAL &= ~0x80;
+    GPIOB_OUTPUT_EN  |=  0x80;
 }
 
 bool charger_inserted(void)
