@@ -600,7 +600,7 @@ void backlight_init(void)
 
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), 0, backlight_thread_name
-                  IF_PRIO(, PRIORITY_SYSTEM)
+                  IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
     tick_add_task(backlight_tick);
 }
