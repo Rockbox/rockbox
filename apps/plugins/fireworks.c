@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:
+ * $Id$
  *
  * Copyright (C) 2007 Zakk Roberts
  *
@@ -542,7 +542,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    rb->cpu_boost(false);
 #endif
 
     return PLUGIN_OK;
