@@ -67,6 +67,11 @@ Playlist/Song Info Tags:
   %pt : Total Track Time
   %pv : Current volume
 
+Database tags:
+  %rp : Playcount
+  %rr : Rating
+  %ra : Auto score
+
 Repeat mode tags:
   %mf : repeat off, returns f
   %ma : repeat all, returns a
