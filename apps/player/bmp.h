@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 Dave Chapman
+ * Copyright (C) 2002 by Daniel Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,18 +16,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "id3.h"
+#ifndef _BMP_H_
+#define _BMP_H_
 
-bool get_adx_metadata(int fd, struct mp3entry* id3);
-bool get_aiff_metadata(int fd, struct mp3entry* id3);
-bool get_flac_metadata(int fd, struct mp3entry* id3);
-bool get_mp4_metadata(int fd, struct mp3entry* id3);
-bool get_monkeys_metadata(int fd, struct mp3entry* id3);
-bool get_musepack_metadata(int fd, struct mp3entry *id3);
-bool get_sid_metadata(int fd, struct mp3entry* id3);
-bool get_spc_metadata(int fd, struct mp3entry* id3);
-bool get_ogg_metadata(int fd, struct mp3entry* id3);
-bool get_wave_metadata(int fd, struct mp3entry* id3);
-bool get_wavpack_metadata(int fd, struct mp3entry* id3);
-bool get_a52_metadata(int fd, struct mp3entry* id3);
-bool get_asf_metadata(int fd, struct mp3entry* id3);
+/*********************************************************************
+ * read_bmp_file(), minimalistic version for charcell displays
+ *
+ * Reads a 1 bit BMP file and puts the data in a horizontal packed
+ * 1 bit-per-pixel char array. Width must be <= 8 pixels.
+ * Returns < 0 for error, or number of bytes used from the bitmap
+ * buffer, which equals bitmap height.
+ *
+ **********************************************/
+int read_bmp_file(const char* filename,
+                  unsigned char *bitmap,
+                  int maxsize);
+
+#endif

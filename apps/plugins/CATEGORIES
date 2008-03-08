@@ -80,7 +80,6 @@ stopwatch,apps
 test_codec,viewers
 test_disk,apps
 test_fps,apps
-test_grey,apps
 test_sampr,apps
 test_scanrate,apps
 test_viewports,apps

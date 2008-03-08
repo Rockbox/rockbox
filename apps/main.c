@@ -144,10 +144,10 @@ static int init_dircache(bool preinit)
     
     if (preinit)
         dircache_init();
-
+    
     if (!global_settings.dircache)
         return 0;
-
+    
 # ifdef HAVE_EEPROM_SETTINGS
     if (firmware_settings.initialized && firmware_settings.disk_clean 
         && preinit)

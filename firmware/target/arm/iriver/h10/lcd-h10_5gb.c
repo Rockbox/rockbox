@@ -108,7 +108,6 @@ void lcd_init_device(void)
 {  
     CLCD_CLOCK_SRC |= 0xc0000000; /* Set LCD interface clock to PLL */
     /* H10 LCD is initialised by the bootloader */
-    lcd_write_reg(R_ENTRY_MODE, 0x1030); /* BGR =1, ID1 = 1, ID0 = 1 */
 }
 
 /*** update functions ***/
@@ -290,51 +289,88 @@ void lcd_yuv_blit(unsigned char * const src[3],
 
 
 /* Update a fraction of the display. */
-void lcd_update_rect(int x, int y, int width, int height)
+void lcd_update_rect(int x0, int y0, int width, int height)
 {
-    const fb_data *addr;
-    int bytes_to_write;
-    
-    if (x + width >= LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height >= LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
-        
-    if ((width <= 0) || (height <= 0))
-        return; /* Nothing left to do. 0 would hang the transfer. */
-        
-    /* Ensure x and width are both even, so we can read
-     * 32-bit aligned data from the framebuffer */
-    width = (width + (x & 1) + 1) & ~1;
-    x &= ~1;
+    int x1, y1;
+    int newx,newwidth;
+    unsigned long *addr;
 
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, (LCD_HEIGHT-1) << 8);
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
-    lcd_write_reg(R_RAM_ADDR_SET, (y << 8) | x);
+    /* Ensure x and width are both even - so we can read 32-bit aligned 
+       data from lcd_framebuffer */
+    newx=x0&~1;
+    newwidth=width&~1;
+    if (newx+newwidth < x0+width) { newwidth+=2; }
+    x0=newx; width=newwidth;
 
+    /* calculate the drawing region */
+    y1 = (y0 + height) - 1;           /* max vert */
+    x1 = (x0 + width) - 1;          /* max horiz */
+
+
+    /* swap max horiz < start horiz */
+    if (y1 < y0) {
+        int t;
+        t = y0;
+        y0 = y1;
+        y1 = t;
+    }
+
+    /* swap max vert < start vert */
+    if (x1 < x0) {
+        int t;
+        t = x0;
+        x0 = x1;
+        x1 = t;
+    }
+
+    /* max horiz << 8 | start horiz */
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (x1 << 8) | x0);
+
+    /* max vert << 8 | start vert */
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, (y1 << 8) | y0);
+
+    /* start vert << 8 | start horiz */
+    lcd_write_reg(R_RAM_ADDR_SET, (y0 << 8) | x0);
+
+    /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);
 
-    addr = &lcd_framebuffer[y][x];
-    bytes_to_write = width * height * sizeof(fb_data);  
-    /* must be <= 0x10000, but that's guaranteed on H10. */
+    addr = (unsigned long*)&lcd_framebuffer[y0][x0];
 
-    LCD2_BLOCK_CTRL   = 0x10000080;
-    LCD2_BLOCK_CONFIG = 0xc0010000 | (bytes_to_write - 1);
-    LCD2_BLOCK_CTRL   = 0x34000000;
-    
-    do
-    {
-        int w = width >> 1;
-        do
-        {
-            while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
-            LCD2_BLOCK_DATA = *(unsigned long*)addr;  /* output 2 pixels */
-            addr += 2;
+    while (height > 0) {
+        int c, r;
+        int h, pixels_to_write;
+
+        pixels_to_write = (width * height) * 2;
+        h = height;
+
+        /* calculate how much we can do in one go */
+        if (pixels_to_write > 0x10000) {
+            h = (0x10000/2) / width;
+            pixels_to_write = (width * h) * 2;
         }
-        while (--w > 0);
-        addr += LCD_WIDTH - width;
+
+        LCD2_BLOCK_CTRL = 0x10000080;
+        LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
+        LCD2_BLOCK_CTRL = 0x34000000;
+
+        /* for each row */
+        for (r = 0; r < h; r++) {
+            /* for each column */
+            for (c = 0; c < width; c += 2) {
+                while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_TXOK));
+
+                /* output 2 pixels */
+                LCD2_BLOCK_DATA = *addr++;
+            }
+            addr += (LCD_WIDTH - width)/2;
+        }
+
+        while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
+        LCD2_BLOCK_CONFIG = 0;
+
+        height -= h;
     }
-    while (--height > 0);
 }
 
 /* Update the display.

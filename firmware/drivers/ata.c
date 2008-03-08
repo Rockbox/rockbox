@@ -89,7 +89,6 @@ static bool initialized = false;
 static long last_user_activity = -1;
 long last_disk_activity = -1;
 
-static unsigned long total_sectors;
 static int multisectors; /* number of supported multisectors */
 static unsigned short identify_info[SECTOR_SIZE/2];
 
@@ -285,11 +284,6 @@ int ata_read_sectors(IF_MV2(int drive,)
     mutex_lock(&ata_mtx);
 #endif
 
-    if (start + incount > total_sectors) {
-        ret = -1;
-        goto error;
-    }
-
     last_disk_activity = current_tick;
     spinup_start = current_tick;
 
@@ -299,14 +293,16 @@ int ata_read_sectors(IF_MV2(int drive,)
         spinup = true;
         if (poweroff) {
             if (ata_power_on()) {
-                ret = -2;
-                goto error;
+                mutex_unlock(&ata_mtx);
+                ata_led(false);
+                return -1;
             }
         }
         else {
             if (perform_soft_reset()) {
-                ret = -2;
-                goto error;
+                mutex_unlock(&ata_mtx);
+                ata_led(false);
+                return -1;
             }
         }
     }
@@ -316,8 +312,9 @@ int ata_read_sectors(IF_MV2(int drive,)
     SET_REG(ATA_SELECT, ata_device);
     if (!wait_for_rdy())
     {
-        ret = -3;
-        goto error;
+        mutex_unlock(&ata_mtx);
+        ata_led(false);
+        return -2;
     }
 
  retry:
@@ -374,7 +371,7 @@ int ata_read_sectors(IF_MV2(int drive,)
                    We choose alternative 2.
                 */
                 perform_soft_reset();
-                ret = -5;
+                ret = -4;
                 goto retry;
             }
 
@@ -406,7 +403,7 @@ int ata_read_sectors(IF_MV2(int drive,)
             */
             if ( status & (STATUS_BSY | STATUS_ERR | STATUS_DF) ) {
                 perform_soft_reset();
-                ret = -6;
+                ret = -5;
                 goto retry;
             }
 
@@ -418,14 +415,13 @@ int ata_read_sectors(IF_MV2(int drive,)
 
         if(!ret && !wait_for_end_of_transfer()) {
             perform_soft_reset();
-            ret = -4;
+            ret = -3;
             goto retry;
         }
         break;
     }
-
-  error:
     ata_led(false);
+
 #ifndef MAX_PHYS_SECTOR_SIZE
     mutex_unlock(&ata_mtx);
 #endif
@@ -493,9 +489,6 @@ int ata_write_sectors(IF_MV2(int drive,)
     mutex_lock(&ata_mtx);
 #endif
     
-    if (start + count > total_sectors)
-        panicf("Writing past end of disk");
-
     last_disk_activity = current_tick;
     spinup_start = current_tick;
 
@@ -505,14 +498,16 @@ int ata_write_sectors(IF_MV2(int drive,)
         spinup = true;
         if (poweroff) {
             if (ata_power_on()) {
-                ret = -1;
-                goto error;
+                mutex_unlock(&ata_mtx);
+                ata_led(false);
+                return -1;
             }
         }
         else {
             if (perform_soft_reset()) {
-                ret = -1;
-                goto error;
+                mutex_unlock(&ata_mtx);
+                ata_led(false);
+                return -1;
             }
         }
     }
@@ -520,8 +515,9 @@ int ata_write_sectors(IF_MV2(int drive,)
     SET_REG(ATA_SELECT, ata_device);
     if (!wait_for_rdy())
     {
-        ret = -2;
-        goto error;
+        mutex_unlock(&ata_mtx);
+        ata_led(false);
+        return -2;
     }
 
 #ifdef HAVE_LBA48
@@ -579,8 +575,8 @@ int ata_write_sectors(IF_MV2(int drive,)
         ret = -4;
     }
 
-  error:
     ata_led(false);
+
 #ifndef MAX_PHYS_SECTOR_SIZE
     mutex_unlock(&ata_mtx);
 #endif
@@ -1244,16 +1240,11 @@ int ata_init(void)
                    phys_sector_mult * SECTOR_SIZE);
 #endif
 
-        total_sectors = identify_info[60] | (identify_info[60] << 16);
-
 #ifdef HAVE_LBA48
-        if (identify_info[83] & 0x0400       /* 48 bit address support */
-            && total_sectors == 0x0FFFFFFF)  /* and disk size >= 128 GiB */
-        {                                    /* (needs BigLBA addressing) */
-            if (identify_info[102] || identify_info[103])
-                panicf("Unsupported disk size, >= 2^32 sectors");
-                
-            total_sectors = identify_info[100] | (identify_info[101] << 16);
+        if (identify_info[83] & 0x0400 /* 48 bit address support */
+            && identify_info[60] == 0xFFFF  /* and disk size >= 128 GiB */
+            && identify_info[61] == 0x0FFF) /* (needs BigLBA addressing) */
+        {
             lba48 = true; /* use BigLBA */
         }
 #endif

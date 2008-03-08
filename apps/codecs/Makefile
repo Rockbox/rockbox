@@ -47,7 +47,6 @@ all: $(LINKCODEC) $(ROCKS)
 ifndef SIMVER
 $(BUILDDIR)/%.a : % $(CODECDEPS)
 
-$(OBJDIR)/mod.elf : $(OBJDIR)/mod.o $(OBJDIR)/codec_crt0.o
 $(OBJDIR)/wav.elf : $(OBJDIR)/wav.o $(OBJDIR)/codec_crt0.o
 $(OBJDIR)/sid.elf : $(OBJDIR)/sid.o $(OBJDIR)/codec_crt0.o
 $(OBJDIR)/adx.elf : $(OBJDIR)/adx.o $(OBJDIR)/codec_crt0.o

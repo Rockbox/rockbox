@@ -814,7 +814,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     }
 
     if (c_end_addr  > card->size)
-        panicf("Writing past end of card");
+        panicf("Writing past end of card\n");
 
     blocksize = card->blocksize;
     offset = c_addr & (blocksize - 1);

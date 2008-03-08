@@ -13,7 +13,6 @@ wma.c
 aac.c
 #endif
 ape.c
-mod.c
 shorten.c
 aiff.c
 speex.c
