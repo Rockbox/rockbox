@@ -869,13 +869,9 @@ void peak_meter_get_peakhold(int *peak_left, int *peak_right)
  */
 void peak_meter_set_clip_hold(int time) 
 {
-    pm_clip_eternal = false;
-
-    if (time <= 0) {
-        pm_clip_left = false;
-        pm_clip_right = false;
-        pm_clip_eternal = true;
-    }
+    pm_clip_left = false;
+    pm_clip_right = false;
+    pm_clip_eternal = (time > 0) ? false : true;
 }
 
 /**

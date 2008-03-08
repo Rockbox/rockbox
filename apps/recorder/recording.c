@@ -281,9 +281,7 @@ static void set_gain(void)
                                  global_settings.rec_right_gain,
                                  AUDIO_GAIN_LINEIN);
     }
-    /* reset the clipping indicators:
-       use -1 to clear them, then call again with settings value */
-    peak_meter_set_clip_hold(-1);
+    /* reset the clipping indicators */
     peak_meter_set_clip_hold(global_settings.peak_meter_clip_hold);
 }
 
