@@ -38,8 +38,8 @@
  *  %d0 - destination address (like ANSI version)
  *
  * register usage:
- *  %a0 - current source address
- *  %a1 - current dest address
+ *  %a1 - current source address
+ *  %a0 - current dest address
  *  %a2 - source end address (in line-copy loops)
  *  %d0 - data / scratch
  *  %d1 - source end address (byte and longword copy) / data / scratch
@@ -52,11 +52,439 @@
  * if FULLSPEED is undefined.
  */
 memcpy:
-    move.l  (4,%sp),%a1     /* Destination */
-    move.l  (8,%sp),%a0     /* Source */
-    move.l  (12,%sp),%d1    /* Length */
+    move.l  (4, %sp), %a1       /* Destination */
+    move.l  (8, %sp), %a0       /* Source */
+    move.l  (12, %sp), %d1      /* Length */
 
 __memcpy_fwd_entry:
+
+#if 1 /* CODE TEST */
+
+    cmp.l   #5, %d1
+    bhs.b   .min5
+
+    move.l  %a1, %d0
+    jmp.l   (2, %pc, %d1.l*4)
+.bytes_grid:
+    rts                         /* 0 */
+    nop
+.bytes_1:
+    move.b  (%a0)+, (%a1)+      /* 1 */
+    rts
+    move.w  (%a0)+, (%a1)+      /* 2 */
+    rts
+    move.w  (%a0)+, (%a1)+      /* 3 */
+    bra.s   .bytes_1
+    move.l  (%a0)+, (%a1)+      /* 4 */
+    rts
+
+.min5:
+    move.l  %a0, %d0
+    and.l   #3, %d0
+    jmp.l   (2, %pc, %d0.l*2)
+    bra.s   .byte1_off0
+    bra.s   .byte1_off1
+    bra.s   .byte1_off2
+    /* last table entry coincides with target */
+
+.byte1_off3:
+    move.b  (%a0)+, (%a1)+
+    subq.l  #1, %d1
+    bra.s   .byte1_off0
+
+.byte1_off1:
+    move.b  (%a0)+, (%a1)+
+    subq.l  #1, %d1
+.byte1_off2:
+    move.w  (%a0)+, (%a1)+
+    subq.l  #2, %d1
+.byte1_off0:
+
+    move.l  %d1, %d0
+    cmp.l   #16, %d0
+    bhs.b   .min16
+
+.longs:
+    lsr.l   #2, %d0             /* in longwords */
+    neg.l   %d0
+    jmp.l   (8, %pc, %d0.l*2)
+
+    move.l  (%a0)+, (%a1)+
+    move.l  (%a0)+, (%a1)+
+    move.l  (%a0)+, (%a1)+
+    move.l  (4, %sp), %d0
+    and.l   #3, %d1
+    jmp.l   (.bytes_grid - 2 - ., %pc, %d1.l*4)
+
+.min16:
+#if 0
+    lea.l   (-44, %sp), %sp
+    movem.l %d2-%d7/%a2-%a6, (%sp)
+
+
+.main_do12_start:
+    lea.l   (main_do12_loop - ., %pc), %a5
+    movem.l (%a0), %d6-%d7/%a2-%a3
+    bra.b   .main_do12_headstore
+
+.main_do8_start:
+    lea.l   (main_do8_loop - ., %pc), %a5
+    movem.l (%a0), %d5-%d7/%a2
+    bra.b   .main_do8_headstore
+
+.main_do4_start:
+    lea.l   (main_do4_loop - ., %pc), %a5
+    movem.l (%a0), %d4-%d7
+/* .main_do4_headstore: */
+    move.l  %d4, (%a1)+
+.main_do8_headstore:
+    move.l  %d5, (%a1)+
+.main_do12_headstore:
+    move.l  %d6, (%a1)+
+    bra.b   .main_bo0_check
+
+.main_do12_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    move.l  %a3, %d5
+    movem.l (%a0), %d6-%d7/%a2-%a3
+    bra.b   .main_bo0_store
+.main_do8_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    movem.l (%a0), %d5-%d7/%a2
+    bra.b   .main_bo0_store
+.main_do4_loop:
+    move.l  %d7, %d3
+    movem.l (%a0), %d4-%d7
+    bra.b   .main_bo0_store
+.main_do0_loop:
+    movem.l (%a0), %d3-%d6
+.main_bo0_store:
+    lea.l   (16, %a0), %a1
+    movem.l %d3-%d6, (%a1)
+    lea.l   (16, %a1), %a1
+.main_do0_start:
+.main_bo0_check:
+    sub.l   #16, %d1
+    blo.b   .main_bo0_tail
+    jmp     (%a5)
+    
+.main_bo0_tail:
+    
+
+
+.main_do13_start:
+    lea.l   (main_do13_loop - ., %pc), %a5
+    movem.l (%a0), %d7/%a2-%a4
+    move.l  %d7, %d0
+    lsr.l   #8, %d0
+    swap    %d0
+    move.b  %d0, (%a1)+
+    swap    %d0
+    move.w  %d0, (%a1)+
+    bra.b   .main_bo1_check
+
+.main_do9_start:
+    lea.l   (main_do9_loop - ., %pc), %a5
+    movem.l (%a0), %d6-%d7/%a2-%a3
+    move.l  %d6, %d0
+    lsr.l   #8, %d0
+    swap    %d0
+    move.b  %d0, (%a1)+
+    swap    %d0
+    move.w  %d0, (%a1)+
+    bra.b   .main_do9_headstore
+
+.main_do5_start:
+    lea.l   (main_do5_loop - ., %pc), %a5
+    movem.l (%a0), %d5-%d7/%a2
+    move.l  %d5, %d0
+    lsr.l   #8, %d0
+    swap    %d0
+    move.b  %d0, (%a1)+
+    swap    %d0
+    move.w  %d0, (%a1)+
+    bra.b   .main_do5_headstore
+
+.main_do1_start:
+    lea.l   (main_do1_loop - ., %pc), %a5
+    movem.l (%a0), %d4-%d7
+    move.l  %d4, %d0
+    lsr.l   #8, %d0
+    swap    %d0
+    move.b  %d0, (%a1)+
+    swap    %d0
+    move.w  %d0, (%a1)+
+/* .main_do1_headstore: */
+    lsl.l   %d2, %d4
+    move.l  %d5, %d0
+    lsr.l   #8, %d0
+    or.l    %d0, %d4
+    move.l  %d4, (%a1)+
+.main_do5_headstore:
+    lsl.l   %d2, %d5
+    move.l  %d6, %d0
+    lsr.l   #8, %d0
+    or.l    %d0, %d5
+    move.l  %d5, (%a1)+
+.main_do9_headstore:
+    lsl.l   %d2, %d6
+    move.l  %d7, %d0
+    lsr.l   #8, %d0
+    or.l    %d0, %d6
+    move.l  %d6, (%a1)+
+    bra.b   .main_bo1_check
+
+.main_do13_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    move.l  %a3, %d5
+    move.l  %a4, %d6
+    movem.l (%a0), %d7/%a2-%a4
+    bra.b   .main_bo1_store
+.main_do9_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    move.l  %a3, %d5
+    movem.l (%a0), %d6-%d7/%a2-%a3
+    bra.b   .main_bo1_store
+.main_do5_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    movem.l (%a0), %d5-%d7/%a2
+    bra.b   .main_bo1_store
+.main_do1_loop:
+    move.l  %d7, %d3
+    movem.l (%a0), %d4-%d7
+.main_bo1_store:
+    lea.l   (16, %a0), %a1
+    lsl.l   %d2, %d3
+    move.l  %d4, %d0
+    lsr.l   #8, %d0
+    or.l    %d0, %d3
+    lsl.l   %d2, %d4
+    move.l  %d5, %d0
+    lsr.l   #8, %d0
+    or.l    %d0, %d4
+    lsl.l   %d2, %d5
+    move.l  %d6, %d0
+    lsr.l   #8, %d0
+    or.l    %d0, %d5
+    lsl.l   %d2, %d6
+    move.l  %d7, %d0
+    lsr.l   #8, %d0
+    or.l    %d0, %d6
+    movem.l %d3-%d6,(%a1)
+    lea.l   (16, %a1), %a1
+.main_bo1_check:
+    sub.l   #16, %d1
+    blo.b   .main_bo1_tail
+    jmp     (%a5)
+
+
+.main_do14_start:
+    lea.l   (main_do14_loop - ., %pc), %a5
+    movem.l (%a0), %d7/%a2-%a4
+    swap    %d7
+    move.w  %d7, (%a1)+
+    bra.b   .main_bo2_check
+
+.main_do10_start:
+    lea.l   (main_do10_loop - ., %pc), %a5
+    movem.l (%a0), %d6-%d7/%a2-%a3
+    swap    %d6
+    move.w  %d6, (%a1)+
+    bra.b   .main_do10_headstore
+
+.main_do6_start:
+    lea.l   (main_do6_loop - ., %pc), %a5
+    movem.l (%a0), %d5-%d7/%a2
+    swap    %d5
+    move.w  %d5, (%a1)+
+    bra.b   .main_do6_headstore
+
+.main_do2_start:
+    lea.l   (main_do2_loop - ., %pc), %a5
+    movem.l (%a0), %d4-%d7
+    swap    %d4
+    move.w  %d4, (%a1)+
+/* .main_do2_headstore: */
+    swap    %d5
+    move.w  %d5, %d4
+    move.l  %d4, (%a1)+
+.main_do6_headstore:
+    swap    %d6
+    move.w  %d6, %d5
+    move.l  %d5, (%a1)+
+.main_do10_headstore:
+    swap    %d7
+    move.w  %d7, %d6
+    move.l  %d6, (%a1)+
+    bra.b   .main_bo2_check
+
+.main_do14_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    move.l  %a3, %d5
+    move.l  %a4, %d6
+    movem.l (%a0), %d7/%a2-%a4
+    bra.b   .main_bo1_store
+.main_do10_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    move.l  %a3, %d5
+    movem.l (%a0), %d6-%d7/%a2-%a3
+    bra.b   .main_bo1_store
+.main_do6_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    movem.l (%a0), %d5-%d7/%a2
+    bra.b   .main_bo1_store
+.main_do2_loop:
+    move.l  %d7, %d3
+    movem.l (%a0), %d4-%d7
+.main_bo2_store:
+    lea.l   (16, %a0), %a1
+    swap    %d4
+    move.w  %d4,%d3
+    swap    %d5
+    move.w  %d5,%d4
+    swap    %d6
+    move.w  %d6,%d5
+    swap    %d7
+    move.w  %d7,%d6
+    movem.l %d3-%d6,(%a1)
+    lea.l   (16, %a1), %a1
+.main_bo2_check
+    sub.l   #16, %d1
+    blo.b   .main_bo2_tail
+    jmp     (%a5)
+
+
+.main_do15_start:
+    lea.l   (main_do15_loop - ., %pc), %a5
+    movem.l (%a0), %d7/%a2-%a4
+    move.l  %d7, %d0
+    lsr.l   %d2, %d0
+    move.b  %d0, (%a1)+
+    bra.b   .main_bo3_check
+
+.main_do11_start:
+    lea.l   (main_do11_loop - ., %pc), %a5
+    movem.l (%a0), %d6-%d7/%a2-%a3
+    move.l  %d6, %d0
+    lsr.l   %d2, %d0
+    move.b  %d0, (%a1)+
+    bra.b   .main_do11_headstore
+
+.main_do7_start:
+    lea.l   (main_do7_loop - ., %pc), %a5
+    movem.l (%a0), %d5-%d7/%a2
+    move.l  %d5, %d0
+    lsr.l   %d2, %d0
+    move.b  %d0, (%a1)+
+    bra.b   .main_do7_headstore
+
+.main_do3_start:
+    lea.l   (main_do3_loop - ., %pc), %a5
+    movem.l (%a0), %d4-%d7
+    move.l  %d4, %d0
+    lsr.l   %d2, %d0
+    move.b  %d0, (%a1)+
+/* .main_do3_headstore: */
+    lsl.l   #8, %d4
+    move.l  %d5, %d0
+    lsr.l   %d2, %d0
+    or.l    %d0, %d4
+    move.l  %d4, (%a1)+
+.main_do7_headstore:
+    lsl.l   #8, %d5
+    move.l  %d6, %d0
+    lsr.l   %d2, %d0
+    or.l    %d0, %d5
+    move.l  %d5, (%a1)+
+.main_do11_headstore:
+    lsl.l   #8, %d6
+    move.l  %d7, %d0
+    lsr.l   %d2, %d0
+    or.l    %d0, %d6
+    move.l  %d6, (%a1)+
+    bra.b   .main_bo3_check
+
+.main_do15_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    move.l  %a3, %d5
+    move.l  %a4, %d6
+    movem.l (%a0), %d7/%a2-%a4
+    bra.b   .main_bo1_store
+.main_do11_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    move.l  %a3, %d5
+    movem.l (%a0), %d6-%d7/%a2-%a3
+    bra.b   .main_bo1_store
+.main_do7_loop:
+    move.l  %d7, %d3
+    move.l  %a2, %d4
+    movem.l (%a0), %d5-%d7/%a2
+    bra.b   .main_bo1_store
+.main_do3_loop:
+    move.l  %d7, %d3
+    movem.l (%a0), %d4-%d7
+.main_bo3_store:
+    lea.l   (16, %a0), %a1
+    lsl.l   #8, %d3
+    move.l  %d4, %d0
+    lsr.l   %d2, %d0
+    or.l    %d0, %d3
+    lsl.l   #8, %d4
+    move.l  %d5, %d0
+    lsr.l   %d2, %d0
+    or.l    %d0, %d4
+    lsl.l   #8, %d5
+    move.l  %d6, %d0
+    lsr.l   %d2, %d0
+    or.l    %d0, %d5
+    lsl.l   #8, %d6
+    move.l  %d7, %d0
+    lsr.l   %d2, %d0
+    or.l    %d0, %d6
+    movem.l %d3-%d6,(%a1)
+    lea.l   (16, %a1), %a1
+.main_bo3_check:
+    sub.l   #16, %d1
+    blo.b   .main_bo3_tail
+    jmp     (%a5)
+
+
+
+    movem.l (%sp), %d2-%d7/%a2-%a6
+    lea.l   (44, %sp), %sp
+#else
+    lea.l   (-16, %sp), %sp
+    movem.l %d2-%d5, (%sp)
+    sub.l   #16, %d1
+
+.main_loop:
+    movem.l (%a0), %d2-%d5
+    lea.l   (16, %a0), %a0
+    movem.l  %d2-%d5, (%a1)
+    lea.l   (16, %a1), %a1
+    sub.l   #16, %d1
+    bhs.b   .main_loop
+    
+    add.l   #16, %d1
+    movem.l (%sp), %d2-%d5
+    lea.l   (16, %sp), %sp
+#endif
+
+    move.l  %d1, %d0
+    bra.s   .longs
+
+#else /* CODE TEST */
+
     add.l   %a0,%d1         /* %d1 = source end */
 
     move.l  %a0,%d0
@@ -675,6 +1103,8 @@ __memcpy_fwd_entry:
 .bytes2_end:
     move.l  (4,%sp),%d0     /* return destination */
     rts
+    
+#endif /* CODE TEST */
 
 .end:
     .size   memcpy,.end-memcpy

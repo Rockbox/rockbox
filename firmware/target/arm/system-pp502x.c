@@ -365,7 +365,7 @@ void system_init(void)
 #elif defined (IPOD_MINI)
         /* to be done */
 #elif defined (IPOD_MINI2G)
-        /* to be done */
+        /* to be done */    
 #elif defined (MROBE_100)
         /* to be done */
 #elif defined (ELIO_TPJ1022)
