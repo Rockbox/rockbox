@@ -120,6 +120,9 @@ static const MPC_SAMPLE_FORMAT  Di_opt [32] [16] ICONST_ATTR = {
 
 #undef  _
 
+// needed to prevent from internal overflow in calculate_V
+#define OVERFLOW_FIX 1
+
 // V-coefficients were expanded (<<) by V_COEFFICIENT_EXPAND
 #define V_COEFFICIENT_EXPAND 27
 
@@ -129,6 +132,11 @@ static const MPC_SAMPLE_FORMAT  Di_opt [32] [16] ICONST_ATTR = {
       // samples are rounded to +/- 2^19 as pre-shift before 32=32x32-multiply
       #define MPC_MULTIPLY_V(sample, vcoef) ( MPC_SHR_RND(sample, 12) * vcoef )
       
+      // pre- and postscale are used to avoid internal overflow in synthesis calculation
+      #define MPC_MULTIPLY_V_PRESCALE(sample, vcoef)  ( MPC_SHR_RND(sample, (12+OVERFLOW_FIX)) * vcoef )
+      #define MPC_MULTIPLY_V_POSTSCALE(sample, vcoef) ( MPC_SHR_RND(sample, (12-OVERFLOW_FIX)) * vcoef )
+      #define MPC_V_POSTSCALE(sample) (sample<<OVERFLOW_FIX)
+      
       // round to +/- 2^16 as pre-shift before 32=32x32-multiply
       #define MPC_MAKE_INVCOS(value) (MPC_SHR_RND(value, 15))
    #else
@@ -137,12 +145,20 @@ static const MPC_SAMPLE_FORMAT  Di_opt [32] [16] ICONST_ATTR = {
       // Will loose 5bit accuracy on result in fract part without effect on final audio result
       #define MPC_MULTIPLY_V(sample, vcoef) ( (MPC_MULTIPLY_FRACT(sample, vcoef)) << (32-V_COEFFICIENT_EXPAND) )
       
+      // pre- and postscale are used to avoid internal overflow in synthesis calculation
+      #define MPC_MULTIPLY_V_PRESCALE(sample, vcoef)  ( (MPC_MULTIPLY_FRACT(sample, vcoef)) << (32-V_COEFFICIENT_EXPAND-OVERFLOW_FIX) )
+      #define MPC_MULTIPLY_V_POSTSCALE(sample, vcoef) ( (MPC_MULTIPLY_FRACT(sample, vcoef)) << (32-V_COEFFICIENT_EXPAND+OVERFLOW_FIX) )
+      #define MPC_V_POSTSCALE(sample) (sample<<OVERFLOW_FIX)
+      
       // directly use accurate 32bit-coefficients
       #define MPC_MAKE_INVCOS(value) (value)
    #endif
 #else
    // for floating point use the standard multiplication macro
-   #define MPC_MULTIPLY_V(sample, vcoef) ( MPC_MULTIPLY(sample, vcoef) )
+   #define MPC_MULTIPLY_V          (sample, vcoef) ( MPC_MULTIPLY(sample, vcoef) )
+   #define MPC_MULTIPLY_V_PRESCALE (sample, vcoef) ( MPC_MULTIPLY(sample, vcoef) )
+   #define MPC_MULTIPLY_V_POSTSCALE(sample, vcoef) ( MPC_MULTIPLY(sample, vcoef) )
+   #define MPC_V_POSTSCALE(sample) (sample)
    
    // downscale the accurate 32bit-coefficients and convert to float
    #define MPC_MAKE_INVCOS(value) MAKE_MPC_SAMPLE((double)value/(double)(1<<V_COEFFICIENT_EXPAND))
@@ -294,22 +310,22 @@ mpc_calculate_new_V ( const MPC_SAMPLE_FORMAT * Sample, MPC_SAMPLE_FORMAT * V )
     V[42] = tmp - A[10] - A[11];
     // 9 adds, 9 subs
 
-    A[ 0] = MPC_MULTIPLY_V((Sample[ 0] - Sample[31]), INVCOS01);
-    A[ 1] = MPC_MULTIPLY_V((Sample[ 1] - Sample[30]), INVCOS03);
-    A[ 2] = MPC_MULTIPLY_V((Sample[ 2] - Sample[29]), INVCOS05);
-    A[ 3] = MPC_MULTIPLY_V((Sample[ 3] - Sample[28]), INVCOS07);
-    A[ 4] = MPC_MULTIPLY_V((Sample[ 4] - Sample[27]), INVCOS09);
-    A[ 5] = MPC_MULTIPLY_V((Sample[ 5] - Sample[26]), INVCOS11);
-    A[ 6] = MPC_MULTIPLY_V((Sample[ 6] - Sample[25]), INVCOS13);
-    A[ 7] = MPC_MULTIPLY_V((Sample[ 7] - Sample[24]), INVCOS15);
-    A[ 8] = MPC_MULTIPLY_V((Sample[ 8] - Sample[23]), INVCOS17);
-    A[ 9] = MPC_MULTIPLY_V((Sample[ 9] - Sample[22]), INVCOS19);
-    A[10] = MPC_MULTIPLY_V((Sample[10] - Sample[21]), INVCOS21);
-    A[11] = MPC_MULTIPLY_V((Sample[11] - Sample[20]), INVCOS23);
-    A[12] = MPC_MULTIPLY_V((Sample[12] - Sample[19]), INVCOS25);
-    A[13] = MPC_MULTIPLY_V((Sample[13] - Sample[18]), INVCOS27);
-    A[14] = MPC_MULTIPLY_V((Sample[14] - Sample[17]), INVCOS29);
-    A[15] = MPC_MULTIPLY_V((Sample[15] - Sample[16]), INVCOS31);
+    A[ 0] = MPC_MULTIPLY_V_PRESCALE((Sample[ 0] - Sample[31]), INVCOS01);
+    A[ 1] = MPC_MULTIPLY_V_PRESCALE((Sample[ 1] - Sample[30]), INVCOS03);
+    A[ 2] = MPC_MULTIPLY_V_PRESCALE((Sample[ 2] - Sample[29]), INVCOS05);
+    A[ 3] = MPC_MULTIPLY_V_PRESCALE((Sample[ 3] - Sample[28]), INVCOS07);
+    A[ 4] = MPC_MULTIPLY_V_PRESCALE((Sample[ 4] - Sample[27]), INVCOS09);
+    A[ 5] = MPC_MULTIPLY_V_PRESCALE((Sample[ 5] - Sample[26]), INVCOS11);
+    A[ 6] = MPC_MULTIPLY_V_PRESCALE((Sample[ 6] - Sample[25]), INVCOS13);
+    A[ 7] = MPC_MULTIPLY_V_PRESCALE((Sample[ 7] - Sample[24]), INVCOS15);
+    A[ 8] = MPC_MULTIPLY_V_PRESCALE((Sample[ 8] - Sample[23]), INVCOS17);
+    A[ 9] = MPC_MULTIPLY_V_PRESCALE((Sample[ 9] - Sample[22]), INVCOS19);
+    A[10] = MPC_MULTIPLY_V_PRESCALE((Sample[10] - Sample[21]), INVCOS21);
+    A[11] = MPC_MULTIPLY_V_PRESCALE((Sample[11] - Sample[20]), INVCOS23);
+    A[12] = MPC_MULTIPLY_V_PRESCALE((Sample[12] - Sample[19]), INVCOS25);
+    A[13] = MPC_MULTIPLY_V_PRESCALE((Sample[13] - Sample[18]), INVCOS27);
+    A[14] = MPC_MULTIPLY_V_PRESCALE((Sample[14] - Sample[17]), INVCOS29);
+    A[15] = MPC_MULTIPLY_V_PRESCALE((Sample[15] - Sample[16]), INVCOS31);
     // 16 subs, 16 muls, 16 shifts
 
     B[ 0] = A[ 0] + A[15];
@@ -366,22 +382,22 @@ mpc_calculate_new_V ( const MPC_SAMPLE_FORMAT * Sample, MPC_SAMPLE_FORMAT * V )
     B[15] = MPC_MULTIPLY_V((A[13] - A[14]), INVCOS24);
     // 8 adds, 8 subs, 8 muls, 8 shift
 
-    A[ 0] = B[ 0] + B[ 1];
-    A[ 1] = MPC_MULTIPLY_V((B[ 0] - B[ 1]), INVCOS16);
-    A[ 2] = B[ 2] + B[ 3];
-    A[ 3] = MPC_MULTIPLY_V((B[ 2] - B[ 3]), INVCOS16);
-    A[ 4] = B[ 4] + B[ 5];
-    A[ 5] = MPC_MULTIPLY_V((B[ 4] - B[ 5]), INVCOS16);
-    A[ 6] = B[ 6] + B[ 7];
-    A[ 7] = MPC_MULTIPLY_V((B[ 6] - B[ 7]), INVCOS16);
-    A[ 8] = B[ 8] + B[ 9];
-    A[ 9] = MPC_MULTIPLY_V((B[ 8] - B[ 9]), INVCOS16);
-    A[10] = B[10] + B[11];
-    A[11] = MPC_MULTIPLY_V((B[10] - B[11]), INVCOS16);
-    A[12] = B[12] + B[13];
-    A[13] = MPC_MULTIPLY_V((B[12] - B[13]), INVCOS16);
-    A[14] = B[14] + B[15];
-    A[15] = MPC_MULTIPLY_V((B[14] - B[15]), INVCOS16);
+    A[ 0] = MPC_V_POSTSCALE((B[ 0] + B[ 1]));
+    A[ 1] = MPC_MULTIPLY_V_POSTSCALE((B[ 0] - B[ 1]), INVCOS16);
+    A[ 2] = MPC_V_POSTSCALE((B[ 2] + B[ 3]));
+    A[ 3] = MPC_MULTIPLY_V_POSTSCALE((B[ 2] - B[ 3]), INVCOS16);
+    A[ 4] = MPC_V_POSTSCALE((B[ 4] + B[ 5]));
+    A[ 5] = MPC_MULTIPLY_V_POSTSCALE((B[ 4] - B[ 5]), INVCOS16);
+    A[ 6] = MPC_V_POSTSCALE((B[ 6] + B[ 7]));
+    A[ 7] = MPC_MULTIPLY_V_POSTSCALE((B[ 6] - B[ 7]), INVCOS16);
+    A[ 8] = MPC_V_POSTSCALE((B[ 8] + B[ 9]));
+    A[ 9] = MPC_MULTIPLY_V_POSTSCALE((B[ 8] - B[ 9]), INVCOS16);
+    A[10] = MPC_V_POSTSCALE((B[10] + B[11]));
+    A[11] = MPC_MULTIPLY_V_POSTSCALE((B[10] - B[11]), INVCOS16);
+    A[12] = MPC_V_POSTSCALE((B[12] + B[13]));
+    A[13] = MPC_MULTIPLY_V_POSTSCALE((B[12] - B[13]), INVCOS16);
+    A[14] = MPC_V_POSTSCALE((B[14] + B[15]));
+    A[15] = MPC_MULTIPLY_V_POSTSCALE((B[14] - B[15]), INVCOS16);
     // 8 adds, 8 subs, 8 muls, 8 shift
 
     // multiple used expressions: A[ 4]+A[ 6]+A[ 7], A[ 9]+A[13]+A[15]
