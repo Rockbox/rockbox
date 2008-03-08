@@ -1625,23 +1625,19 @@ int solitaire( int skipmenu )
                 else
                 {
                     /* try moving cards */
-                    /* the code in the else seems to not like moveing kings
-                       so if the selected card is a king do it the simple way */
-                    if (deck[sel_card].num == CARDS_PER_SUIT - 1)
+                    /* The flexible move must not be used from the remains stack. */
+                    if (find_card_col(sel_card) == REM_COL)
                     {
                         if (move_card( cur_col, sel_card ) == MOVE_NOT_OK)
                             sel_card = NOT_A_CARD;
                     }
                     else
                     {
-                        int retval;
                         do {
-                            retval = move_card( cur_col, sel_card );
-                            if (retval == MOVE_NOT_OK)
-                            {
-                                sel_card = find_prev_card(sel_card);
-                            }
-                        } while ((retval == MOVE_NOT_OK) && (sel_card != NOT_A_CARD));
+                            if (move_card( cur_col, sel_card) == MOVE_OK)
+                                break;
+                            sel_card = find_prev_card(sel_card);
+                        } while (sel_card != NOT_A_CARD);
                     }
                 }
                 break;
