@@ -1566,11 +1566,11 @@ static void buffering_audio_callback(enum callback_event ev, int value)
 }
 
 /* Clear tracks between write and read, non inclusive */
-static void audio_clear_track_entries(bool clear_unbuffered)
+static void audio_clear_track_entries(void)
 {
     int cur_idx = track_widx;
 
-    logf("Clearing tracks:%d/%d, %d", track_ridx, track_widx, clear_unbuffered);
+    logf("Clearing tracks:%d/%d", track_ridx, track_widx);
 
     /* Loop over all tracks from write-to-read */
     while (1)
@@ -1580,10 +1580,7 @@ static void audio_clear_track_entries(bool clear_unbuffered)
         if (cur_idx == track_ridx)
             break;
 
-        /* If the track is buffered, conditionally clear/notify,
-         * otherwise clear the track if that option is selected */
-        if (clear_unbuffered)
-            clear_track_info(&tracks[cur_idx]);
+        clear_track_info(&tracks[cur_idx]);
     }
 }
 
@@ -1964,7 +1961,7 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
     logf("Starting buffer fill");
 
     if (!start_play)
-        audio_clear_track_entries(false);
+        audio_clear_track_entries();
 
     /* Save the current resume position once. */
     playlist_update_resume_info(audio_current_track());
@@ -1999,7 +1996,7 @@ static void audio_rebuffer(void)
 
     /* Reset track pointers */
     track_widx = track_ridx;
-    audio_clear_track_entries(true);
+    audio_clear_track_entries();
 
     /* Fill the buffer */
     last_peek_offset = -1;
@@ -2231,14 +2228,6 @@ static void audio_stop_playback(void)
         /* TODO: Create auto bookmark too? */
 
         prev_track_elapsed = curtrack_id3.elapsed;
-
-        /* At end of playlist save current id3 (id3.elapsed!) to buffer and
-         * Increment index so runtime info is saved in audio_clear_track_entries().
-         */
-        if ((playlist_end) && (tracks[track_ridx].id3_hid >= 0)) {
-            copy_mp3entry(bufgetid3(tracks[track_ridx].id3_hid), &curtrack_id3);
-            track_ridx = (track_ridx + 1) & MAX_TRACK_MASK;
-        }
     }
 
     paused = false;
@@ -2246,7 +2235,7 @@ static void audio_stop_playback(void)
     playing = false;
 
     /* Mark all entries null. */
-    audio_clear_track_entries(false);
+    audio_clear_track_entries();
 
     /* Close all tracks */
     audio_release_tracks();
@@ -2312,7 +2301,7 @@ static void audio_invalidate_tracks(void)
         track_widx = track_ridx;
 
         /* Mark all other entries null (also buffered wrong metadata). */
-        audio_clear_track_entries(true);
+        audio_clear_track_entries();
 
         track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
@@ -2330,7 +2319,7 @@ static void audio_new_playlist(void)
             skipped_during_pause = true;
         playlist_end = false;
         track_widx = track_ridx;
-        audio_clear_track_entries(true);
+        audio_clear_track_entries();
 
         track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
@@ -2574,7 +2563,7 @@ static void audio_thread(void)
                 usb_wait_for_disconnect(&audio_queue);
 
                 /* Mark all entries null. */
-                audio_clear_track_entries(false);
+                audio_clear_track_entries();
 
                 /* release tracks to make sure all handles are closed */
                 audio_release_tracks();
