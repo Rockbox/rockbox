@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 
 #include "lcd.h"
@@ -31,16 +32,27 @@
 #include "bidi.h"
 #include "scroll_engine.h"
 
+#ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */
+#define LCDFN(fn) lcd_ ## fn
+#define FBFN(fn)  fb_ ## fn
+#define LCDM(ma) LCD_ ## ma
+#define MAIN_LCD
+#endif
+
 /*** globals ***/
 
-unsigned char lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
+FBFN(data) LCDFN(framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)]
+#if CONFIG_CPU != SH7034
+           IBSS_ATTR
+#endif
+           ;
 
 static struct viewport default_vp =
 {
     .x        = 0,
     .y        = 0,
-    .width    = LCD_WIDTH,
-    .height   = LCD_HEIGHT,
+    .width    = LCDM(WIDTH),
+    .height   = LCDM(HEIGHT),
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
     .xmargin  = 0,
@@ -51,7 +63,7 @@ static struct viewport* current_vp = &default_vp;
 
 /*** Viewports ***/
 
-void lcd_set_viewport(struct viewport* vp)
+void LCDFN(set_viewport)(struct viewport* vp)
 {
     if (vp == NULL)
         current_vp = &default_vp;
@@ -59,75 +71,78 @@ void lcd_set_viewport(struct viewport* vp)
         current_vp = vp;
 }
 
-void lcd_update_viewport(void)
+void LCDFN(update_viewport)(void)
 {
-    lcd_update_rect(current_vp->x, current_vp->y,
-                    current_vp->width, current_vp->height);
+    LCDFN(update_rect)(current_vp->x, current_vp->y,
+                       current_vp->width, current_vp->height);
 }
 
-void lcd_update_viewport_rect(int x, int y, int width, int height)
+void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
 {
-    lcd_update_rect(current_vp->x + x, current_vp->y + y, width, height);
+    LCDFN(update_rect)(current_vp->x + x, current_vp->y + y, width, height);
 }
 
 /* LCD init */
-void lcd_init(void)
+void LCDFN(init)(void)
 {
-    lcd_clear_display();
-    /* Call device specific init */
-    lcd_init_device();
+    LCDFN(clear_display)();
+#ifndef SIMULATOR
+    LCDFN(init_device)();
+#endif
+#ifdef MAIN_LCD
     scroll_init();
+#endif
 }
 
 /*** parameter handling ***/
 
-void lcd_set_drawmode(int mode)
+void LCDFN(set_drawmode)(int mode)
 {
     current_vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
 }
 
-int lcd_get_drawmode(void)
+int LCDFN(get_drawmode)(void)
 {
     return current_vp->drawmode;
 }
 
-void lcd_setmargins(int x, int y)
+void LCDFN(setmargins)(int x, int y)
 {
     current_vp->xmargin = x;
     current_vp->ymargin = y;
 }
 
-int lcd_getxmargin(void)
+int LCDFN(getxmargin)(void)
 {
     return current_vp->xmargin;
 }
 
-int lcd_getymargin(void)
+int LCDFN(getymargin)(void)
 {
     return current_vp->ymargin;
 }
 
-int lcd_getwidth(void)
+int LCDFN(getwidth)(void)
 {
     return current_vp->width;
 }
 
-int lcd_getheight(void)
+int LCDFN(getheight)(void)
 {
     return current_vp->height;
 }
 
-void lcd_setfont(int newfont)
+void LCDFN(setfont)(int newfont)
 {
     current_vp->font = newfont;
 }
 
-int lcd_getfont(void)
+int LCDFN(getfont)(void)
 {
     return current_vp->font;
 }
 
-int lcd_getstringsize(const unsigned char *str, int *w, int *h)
+int LCDFN(getstringsize)(const unsigned char *str, int *w, int *h)
 {
     return font_getstringsize(str, w, h, current_vp->font);
 }
@@ -136,17 +151,17 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 static void setpixel(int x, int y)
 {
-    lcd_framebuffer[y>>3][x] |= 1 << (y & 7);
+    LCDFN(framebuffer)[y>>3][x] |= 1 << (y & 7);
 }
 
 static void clearpixel(int x, int y)
 {
-    lcd_framebuffer[y>>3][x] &= ~(1 << (y & 7));
+    LCDFN(framebuffer)[y>>3][x] &= ~(1 << (y & 7));
 }
 
 static void flippixel(int x, int y)
 {
-    lcd_framebuffer[y>>3][x] ^= 1 << (y & 7);
+    LCDFN(framebuffer)[y>>3][x] ^= 1 << (y & 7);
 }
 
 static void nopixel(int x, int y)
@@ -155,35 +170,31 @@ static void nopixel(int x, int y)
     (void)y;
 }
 
-lcd_pixelfunc_type* const lcd_pixelfuncs[8] = {
+LCDFN(pixelfunc_type)* const LCDFN(pixelfuncs)[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearpixel, nopixel, clearpixel
 };
                                
-static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
-                      ICODE_ATTR;
-static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR flipblock(FBFN(data) *address, unsigned mask,
+                                 unsigned bits)
 {
     *address ^= bits & mask;
 }
 
-static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
-                    ICODE_ATTR;
-static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR bgblock(FBFN(data) *address, unsigned mask,
+                               unsigned bits)
 {
     *address &= bits | ~mask;
 }
 
-static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
-                    ICODE_ATTR;
-static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR fgblock(FBFN(data) *address, unsigned mask,
+                               unsigned bits)
 {
     *address |= bits & mask;
 }
 
-static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
-                       ICODE_ATTR;
-static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR solidblock(FBFN(data) *address, unsigned mask,
+                                  unsigned bits)
 {
     unsigned data = *(char*)address;
 
@@ -191,30 +202,26 @@ static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
     *address = data ^ (bits & mask);
 }
 
-static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
-                         ICODE_ATTR;
-static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR flipinvblock(FBFN(data) *address, unsigned mask,
+                                    unsigned bits)
 {
     *address ^= ~bits & mask;
 }
 
-static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
-                       ICODE_ATTR;
-static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR bginvblock(FBFN(data) *address, unsigned mask,
+                                  unsigned bits)
 {
     *address &= ~(bits & mask);
 }
 
-static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
-                       ICODE_ATTR;
-static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR fginvblock(FBFN(data) *address, unsigned mask,
+                                  unsigned bits)
 {
     *address |= ~bits & mask;
 }
 
-static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
-                          ICODE_ATTR;
-static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR solidinvblock(FBFN(data) *address, unsigned mask,
+                                     unsigned bits)
 {
     unsigned data = *(char *)address;
     
@@ -222,7 +229,7 @@ static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
     *address = data ^ (bits & mask);
 }
 
-lcd_blockfunc_type* const lcd_blockfuncs[8] = {
+LCDFN(blockfunc_type)* const LCDFN(blockfuncs)[8] = {
     flipblock, bgblock, fgblock, solidblock,
     flipinvblock, bginvblock, fginvblock, solidinvblock
 };
@@ -230,21 +237,22 @@ lcd_blockfunc_type* const lcd_blockfuncs[8] = {
 /*** drawing functions ***/
 
 /* Clear the whole display */
-void lcd_clear_display(void)
+void LCDFN(clear_display)(void)
 {
     unsigned bits = (current_vp->drawmode & DRMODE_INVERSEVID) ? 0xFFu : 0;
 
-    memset(lcd_framebuffer, bits, sizeof lcd_framebuffer);
-    lcd_scroll_info.lines = 0;
+    memset(LCDFN(framebuffer), bits, sizeof LCDFN(framebuffer));
+    LCDFN(scroll_info).lines = 0;
 }
 
-void lcd_clear_viewport(void)
+/* Clear the current viewport */
+void LCDFN(clear_viewport)(void)
 {
     int oldmode;
 
     if (current_vp == &default_vp)
     {
-        lcd_clear_display();
+        LCDFN(clear_display)();
     }
     else
     {
@@ -254,24 +262,24 @@ void lcd_clear_viewport(void)
         current_vp->drawmode = (~current_vp->drawmode & DRMODE_INVERSEVID) | 
                                DRMODE_SOLID;
 
-        lcd_fillrect(0, 0, current_vp->width, current_vp->height);
+        LCDFN(fillrect)(0, 0, current_vp->width, current_vp->height);
 
         current_vp->drawmode = oldmode;
 
-        lcd_scroll_stop(current_vp);
+        LCDFN(scroll_stop)(current_vp);
     }
 }
 
 /* Set a single pixel */
-void lcd_drawpixel(int x, int y)
+void LCDFN(drawpixel)(int x, int y)
 {
     if (((unsigned)x < (unsigned)current_vp->width) &&
         ((unsigned)y < (unsigned)current_vp->height))
-        lcd_pixelfuncs[current_vp->drawmode](current_vp->x + x, current_vp->y + y);
+        LCDFN(pixelfuncs)[current_vp->drawmode](current_vp->x + x, current_vp->y + y);
 }
 
 /* Draw a line */
-void lcd_drawline(int x1, int y1, int x2, int y2)
+void LCDFN(drawline)(int x1, int y1, int x2, int y2)
 {
     int numpixels;
     int i;
@@ -279,7 +287,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
-    lcd_pixelfunc_type *pfunc = lcd_pixelfuncs[current_vp->drawmode];
+    LCDFN(pixelfunc_type) *pfunc = LCDFN(pixelfuncs)[current_vp->drawmode];
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
@@ -323,8 +331,8 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 
     for (i = 0; i < numpixels; i++)
     {
-        if (((unsigned)x < (unsigned)current_vp->width) &&
-            ((unsigned)y < (unsigned)current_vp->height))
+        if (((unsigned)x < (unsigned)current_vp->width)
+            && ((unsigned)y < (unsigned)current_vp->height))
             pfunc(current_vp->x + x, current_vp->y + y);
 
         if (d < 0)
@@ -343,12 +351,12 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 }
 
 /* Draw a horizontal line (optimised) */
-void lcd_hline(int x1, int x2, int y)
+void LCDFN(hline)(int x1, int x2, int y)
 {
-    int x;
+    int x, width;
     unsigned char *dst, *dst_end;
     unsigned mask;
-    lcd_blockfunc_type *bfunc;
+    LCDFN(blockfunc_type) *bfunc;
 
     /* direction flip */
     if (x2 < x1)
@@ -369,28 +377,29 @@ void lcd_hline(int x1, int x2, int y)
     if (x2 >= current_vp->width)
         x2 = current_vp->width-1;
         
-    /* adjust for viewport */
-    y += current_vp->y;
-    x1 += current_vp->x;
-    x2 += current_vp->x;
+    width = x2 - x1 + 1;
 
-    bfunc = lcd_blockfuncs[current_vp->drawmode];
-    dst   = &lcd_framebuffer[y>>3][x1];
+    /* adjust to viewport */
+    x1 += current_vp->x;
+    y += current_vp->y;
+
+    bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
+    dst   = &LCDFN(framebuffer)[y>>3][x1];
     mask  = 1 << (y & 7);
 
-    dst_end = dst + x2 - x1;
+    dst_end = dst + width;
     do
         bfunc(dst++, mask, 0xFFu);
-    while (dst <= dst_end);
+    while (dst < dst_end);
 }
 
 /* Draw a vertical line (optimised) */
-void lcd_vline(int x, int y1, int y2)
+void LCDFN(vline)(int x, int y1, int y2)
 {
     int ny;
-    unsigned char *dst;
+    FBFN(data) *dst;
     unsigned mask, mask_bottom;
-    lcd_blockfunc_type *bfunc;
+    LCDFN(blockfunc_type) *bfunc;
 
     /* direction flip */
     if (y2 < y1)
@@ -416,8 +425,8 @@ void lcd_vline(int x, int y1, int y2)
     y2 += current_vp->y;
     x += current_vp->x;
 
-    bfunc = lcd_blockfuncs[current_vp->drawmode];
-    dst   = &lcd_framebuffer[y1>>3][x];
+    bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
+    dst   = &LCDFN(framebuffer)[y1>>3][x];
     ny    = y2 - (y1 & ~7);
     mask  = 0xFFu << (y1 & 7);
     mask_bottom = 0xFFu >> (~ny & 7);
@@ -425,7 +434,7 @@ void lcd_vline(int x, int y1, int y2)
     for (; ny >= 8; ny -= 8)
     {
         bfunc(dst, mask, 0xFFu);
-        dst += LCD_WIDTH;
+        dst += LCDM(WIDTH);
         mask = 0xFFu;
     }
     mask &= mask_bottom;
@@ -433,7 +442,7 @@ void lcd_vline(int x, int y1, int y2)
 }
 
 /* Draw a rectangular box */
-void lcd_drawrect(int x, int y, int width, int height)
+void LCDFN(drawrect)(int x, int y, int width, int height)
 {
     if ((width <= 0) || (height <= 0))
         return;
@@ -441,20 +450,20 @@ void lcd_drawrect(int x, int y, int width, int height)
     int x2 = x + width - 1;
     int y2 = y + height - 1;
 
-    lcd_vline(x, y, y2);
-    lcd_vline(x2, y, y2);
-    lcd_hline(x, x2, y);
-    lcd_hline(x, x2, y2);
+    LCDFN(vline)(x, y, y2);
+    LCDFN(vline)(x2, y, y2);
+    LCDFN(hline)(x, x2, y);
+    LCDFN(hline)(x, x2, y2);
 }
 
 /* Fill a rectangular area */
-void lcd_fillrect(int x, int y, int width, int height)
+void LCDFN(fillrect)(int x, int y, int width, int height)
 {
     int ny;
-    unsigned char *dst, *dst_end;
+    FBFN(data) *dst, *dst_end;
     unsigned mask, mask_bottom;
     unsigned bits = 0;
-    lcd_blockfunc_type *bfunc;
+    LCDFN(blockfunc_type) *bfunc;
     bool fillopt = false;
 
     /* nothing to draw? */
@@ -497,8 +506,8 @@ void lcd_fillrect(int x, int y, int width, int height)
             bits = 0xFFu;
         }
     }
-    bfunc = lcd_blockfuncs[current_vp->drawmode];
-    dst   = &lcd_framebuffer[y>>3][x];
+    bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
+    dst   = &LCDFN(framebuffer)[y>>3][x];
     ny    = height - 1 + (y & 7);
     mask  = 0xFFu << (y & 7);
     mask_bottom = 0xFFu >> (~ny & 7);
@@ -509,7 +518,7 @@ void lcd_fillrect(int x, int y, int width, int height)
             memset(dst, bits, width);
         else
         {
-            unsigned char *dst_row = dst;
+            FBFN(data) *dst_row = dst;
 
             dst_end = dst_row + width;
             do
@@ -517,7 +526,7 @@ void lcd_fillrect(int x, int y, int width, int height)
             while (dst_row < dst_end);
         }
 
-        dst += LCD_WIDTH;
+        dst += LCDM(WIDTH);
         mask = 0xFFu;
     }
     mask &= mask_bottom;
@@ -545,16 +554,14 @@ void lcd_fillrect(int x, int y, int width, int height)
  * This is the same as the internal lcd hw format. */
 
 /* Draw a partial bitmap */
-void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
-                     int stride, int x, int y, int width, int height)
-                     ICODE_ATTR;
-void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
-                     int stride, int x, int y, int width, int height)
+void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
+                                   int src_y, int stride, int x, int y,
+                                   int width, int height)
 {
     int shift, ny;
-    unsigned char *dst, *dst_end;
+    FBFN(data) *dst, *dst_end;
     unsigned mask, mask_bottom;
-    lcd_blockfunc_type *bfunc;
+    LCDFN(blockfunc_type) *bfunc;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= current_vp->width)
@@ -586,11 +593,11 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
     src    += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     y      -= src_y;
-    dst    = &lcd_framebuffer[y>>3][x];
+    dst    = &LCDFN(framebuffer)[y>>3][x];
     shift  = y & 7;
     ny     = height - 1 + shift + src_y;
 
-    bfunc  = lcd_blockfuncs[current_vp->drawmode];
+    bfunc  = LCDFN(blockfuncs)[current_vp->drawmode];
     mask   = 0xFFu << (shift + src_y);
     mask_bottom = 0xFFu >> (~ny & 7);
     
@@ -605,7 +612,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
             else
             {
                 const unsigned char *src_row = src;
-                unsigned char *dst_row = dst;
+                FBFN(data) *dst_row = dst;
                 
                 dst_end = dst_row + width;
                 do 
@@ -614,7 +621,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
             }
 
             src += stride;
-            dst += LCD_WIDTH;
+            dst += LCDM(WIDTH);
             mask = 0xFFu;
         }
         mask &= mask_bottom;
@@ -635,7 +642,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
         do
         {
             const unsigned char *src_col = src++;
-            unsigned char *dst_col = dst++;
+            FBFN(data) *dst_col = dst++;
             unsigned mask_col = mask;
             unsigned data = 0;
             
@@ -652,7 +659,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
                     mask_col >>= 8;
 
                 src_col += stride;
-                dst_col += LCD_WIDTH;
+                dst_col += LCDM(WIDTH);
                 data >>= 8;
             }
             data |= *src_col << shift;
@@ -663,13 +670,14 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
 }
 
 /* Draw a full bitmap */
-void lcd_bitmap(const unsigned char *src, int x, int y, int width, int height)
+void LCDFN(bitmap)(const unsigned char *src, int x, int y, int width,
+                   int height)
 {
-    lcd_bitmap_part(src, 0, 0, width, x, y, width, height);
+    LCDFN(bitmap_part)(src, 0, 0, width, x, y, width, height);
 }
 
 /* put a string at a given pixel position, skipping first ofs pixel columns */
-static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
+static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
     unsigned short ch;
     unsigned short *ucs;
@@ -683,7 +691,7 @@ static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
         const unsigned char *bits;
 
         /* get proportional width and glyph bits */
-        width = font_get_width(pf,ch);
+        width = font_get_width(pf, ch);
 
         if (ofs > width)
         {
@@ -693,82 +701,84 @@ static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 
         bits = font_get_bits(pf, ch);
 
-        lcd_mono_bitmap_part(bits, ofs, 0, width, x, y, width - ofs,
-                             pf->height);
+        LCDFN(mono_bitmap_part)(bits, ofs, 0, width, x, y, width - ofs,
+                                pf->height);
         
         x += width - ofs;
         ofs = 0;
     }
 }
 /* put a string at a given pixel position */
-void lcd_putsxy(int x, int y, const unsigned char *str)
+void LCDFN(putsxy)(int x, int y, const unsigned char *str)
 {
-    lcd_putsxyofs(x, y, 0, str);
+    LCDFN(putsxyofs)(x, y, 0, str);
 }
 
 /*** Line oriented text output ***/
 
 /* put a string at a given char position */
-void lcd_puts(int x, int y, const unsigned char *str)
+void LCDFN(puts)(int x, int y, const unsigned char *str)
 {
-    lcd_puts_style_offset(x, y, str, STYLE_DEFAULT, 0);
+    LCDFN(puts_style_offset)(x, y, str, STYLE_DEFAULT, 0);
 }
 
-void lcd_puts_style(int x, int y, const unsigned char *str, int style)
+void LCDFN(puts_style)(int x, int y, const unsigned char *str, int style)
 {
-    lcd_puts_style_offset(x, y, str, style, 0);
+    LCDFN(puts_style_offset)(x, y, str, style, 0);
 }
 
-void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)
+void LCDFN(puts_offset)(int x, int y, const unsigned char *str, int offset)
 {
-    lcd_puts_style_offset(x, y, str, STYLE_DEFAULT, offset);
+    LCDFN(puts_style_offset)(x, y, str, STYLE_DEFAULT, offset);
 }
 
 /* put a string at a given char position, style, and pixel position,
  * skipping first offset pixel columns */
-void lcd_puts_style_offset(int x, int y, const unsigned char *str,
-                           int style, int offset)
+void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
+                              int style, int offset)
 {
     int xpos,ypos,w,h,xrect;
     int lastmode = current_vp->drawmode;
 
     /* make sure scrolling is turned off on the line we are updating */
-    lcd_scroll_stop_line(current_vp, y);
+    LCDFN(scroll_stop_line)(current_vp, y);
 
     if(!str || !str[0])
         return;
 
-    lcd_getstringsize(str, &w, &h);
+    LCDFN(getstringsize)(str, &w, &h);
     xpos = current_vp->xmargin + x*w / utf8length(str);
     ypos = current_vp->ymargin + y*h;
     current_vp->drawmode = (style & STYLE_INVERT) ?
                            (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
-    lcd_putsxyofs(xpos, ypos, offset, str);
+    LCDFN(putsxyofs)(xpos, ypos, offset, str);
     current_vp->drawmode ^= DRMODE_INVERSEVID;
     xrect = xpos + MAX(w - offset, 0);
-    lcd_fillrect(xrect, ypos, current_vp->width - xrect, h);
+    LCDFN(fillrect)(xrect, ypos, current_vp->width - xrect, h);
     current_vp->drawmode = lastmode;
 }
 
 /*** scrolling ***/
-void lcd_puts_scroll(int x, int y, const unsigned char *string)
+
+void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
 {
-    lcd_puts_scroll_style(x, y, string, STYLE_DEFAULT);
+    LCDFN(puts_scroll_style)(x, y, string, STYLE_DEFAULT);
 }
 
-void lcd_puts_scroll_style(int x, int y, const unsigned char *string, int style)
+void LCDFN(puts_scroll_style)(int x, int y, const unsigned char *string,
+                              int style)
 {
-     lcd_puts_scroll_style_offset(x, y, string, style, 0);
+     LCDFN(puts_scroll_style_offset)(x, y, string, style, 0);
 }
 
-void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
-                            int offset)
+void LCDFN(puts_scroll_offset)(int x, int y, const unsigned char *string,
+                               int offset)
 {
-     lcd_puts_scroll_style_offset(x, y, string, STYLE_DEFAULT, offset);
-}          
+     LCDFN(puts_scroll_style_offset)(x, y, string, STYLE_DEFAULT, offset);
+}
    
-void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
-                                  int style, int offset)
+void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
+                                     int style, int offset)
 {
     struct scrollinfo* s;
     int w, h;
@@ -777,21 +787,21 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         return;
 
     /* remove any previously scrolling line at the same location */
-    lcd_scroll_stop_line(current_vp, y);
+    LCDFN(scroll_stop_line)(current_vp, y);
 
-    if (lcd_scroll_info.lines >= LCD_SCROLLABLE_LINES) return;
+    if (LCDFN(scroll_info.lines) >= LCDM(SCROLLABLE_LINES)) return;
 
-    s = &lcd_scroll_info.scroll[lcd_scroll_info.lines];
+    s = &LCDFN(scroll_info).scroll[LCDFN(scroll_info).lines];
 
-    s->start_tick = current_tick + lcd_scroll_info.delay;
+    s->start_tick = current_tick + LCDFN(scroll_info).delay;
     s->style = style;
     if (style & STYLE_INVERT) {
-        lcd_puts_style_offset(x,y,string,STYLE_INVERT,offset);
+        LCDFN(puts_style_offset)(x,y,string,STYLE_INVERT,offset);
     }
     else
-        lcd_puts_offset(x,y,string,offset);
+        LCDFN(puts_offset)(x,y,string,offset);
 
-    lcd_getstringsize(string, &w, &h);
+    LCDFN(getstringsize)(string, &w, &h);
 
     if (current_vp->width - x * 8 - current_vp->xmargin < w) {
         /* prepare scroll line */
@@ -801,13 +811,13 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         strcpy(s->line, string);
 
         /* get width */
-        s->width = lcd_getstringsize(s->line, &w, &h);
+        s->width = LCDFN(getstringsize)(s->line, &w, &h);
 
         /* scroll bidirectional or forward only depending on the string
            width */
-        if ( lcd_scroll_info.bidir_limit ) {
+        if ( LCDFN(scroll_info).bidir_limit ) {
             s->bidir = s->width < (current_vp->width - current_vp->xmargin) *
-                (100 + lcd_scroll_info.bidir_limit) / 100;
+                (100 + LCDFN(scroll_info).bidir_limit) / 100;
         }
         else
             s->bidir = false;
@@ -815,7 +825,7 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         if (!s->bidir) { /* add spaces if scrolling in the round */
             strcat(s->line, "   ");
             /* get new width incl. spaces */
-            s->width = lcd_getstringsize(s->line, &w, &h);
+            s->width = LCDFN(getstringsize)(s->line, &w, &h);
         }
 
         end = strchr(s->line, '\0');
@@ -827,11 +837,12 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         s->offset = offset;
         s->startx = current_vp->xmargin + x * s->width / s->len;;
         s->backward = false;
-        lcd_scroll_info.lines++;
+
+        LCDFN(scroll_info).lines++;
     }
 }
 
-void lcd_scroll_fn(void)
+void LCDFN(scroll_fn)(void)
 {
     struct font* pf;
     struct scrollinfo* s;
@@ -840,19 +851,19 @@ void lcd_scroll_fn(void)
     int lastmode;
     struct viewport* old_vp = current_vp;
 
-    for ( index = 0; index < lcd_scroll_info.lines; index++ ) {
-        s = &lcd_scroll_info.scroll[index];
+    for ( index = 0; index < LCDFN(scroll_info).lines; index++ ) {
+        s = &LCDFN(scroll_info).scroll[index];
 
         /* check pause */
         if (TIME_BEFORE(current_tick, s->start_tick))
             continue;
 
-        lcd_set_viewport(s->vp);
+        LCDFN(set_viewport)(s->vp);
 
         if (s->backward)
-            s->offset -= lcd_scroll_info.step;
+            s->offset -= LCDFN(scroll_info).step;
         else
-            s->offset += lcd_scroll_info.step;
+            s->offset += LCDFN(scroll_info).step;
 
         pf = font_get(current_vp->font);
         xpos = s->startx;
@@ -863,13 +874,13 @@ void lcd_scroll_fn(void)
                 /* at beginning of line */
                 s->offset = 0;
                 s->backward = false;
-                s->start_tick = current_tick + lcd_scroll_info.delay * 2;
+                s->start_tick = current_tick + LCDFN(scroll_info).delay * 2;
             }
             if (s->offset >= s->width - (current_vp->width - xpos)) {
                 /* at end of line */
                 s->offset = s->width - (current_vp->width - xpos);
                 s->backward = true;
-                s->start_tick = current_tick + lcd_scroll_info.delay * 2;
+                s->start_tick = current_tick + LCDFN(scroll_info).delay * 2;
             }
         }
         else {
@@ -881,10 +892,10 @@ void lcd_scroll_fn(void)
         lastmode = current_vp->drawmode;
         current_vp->drawmode = (s->style&STYLE_INVERT) ?
                                (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
-        lcd_putsxyofs(xpos, ypos, s->offset, s->line);
+        LCDFN(putsxyofs)(xpos, ypos, s->offset, s->line);
         current_vp->drawmode = lastmode;
-        lcd_update_viewport_rect(xpos, ypos, current_vp->width - xpos, pf->height);
+        LCDFN(update_viewport_rect)(xpos, ypos, current_vp->width - xpos, pf->height);
     }
 
-    lcd_set_viewport(old_vp);
+    LCDFN(set_viewport)(old_vp);
 }
