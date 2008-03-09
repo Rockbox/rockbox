@@ -531,11 +531,11 @@ static void sd_card_mux(int card_no)
     {
         GPO32_VAL |= 0x4;
 
-        GPIOA_ENABLE     &= ~0x7a;
-        GPIOA_OUTPUT_EN  &= ~0x7a;
-        GPIOD_ENABLE     |=  0x1f;
-        GPIOD_OUTPUT_VAL |=  0x1f;
-        GPIOD_OUTPUT_EN  |=  0x1f;
+        GPIO_CLEAR_BITWISE(GPIOA_ENABLE, 0x7a);
+        GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_EN, 0x7a);
+        GPIO_SET_BITWISE(GPIOD_ENABLE,  0x1f);
+        GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x1f);
+        GPIO_SET_BITWISE(GPIOD_OUTPUT_EN,  0x1f);
 
         outl((inl(0x70000014) & ~(0x3ffff)) | 0x255aa, 0x70000014);
     }
@@ -543,11 +543,11 @@ static void sd_card_mux(int card_no)
     {
         GPO32_VAL &= ~0x4;
 
-        GPIOD_ENABLE     &= ~0x1f;
-        GPIOD_OUTPUT_EN  &= ~0x1f;
-        GPIOA_ENABLE     |=  0x7a;
-        GPIOA_OUTPUT_VAL |=  0x7a;
-        GPIOA_OUTPUT_EN  |=  0x7a;
+        GPIO_CLEAR_BITWISE(GPIOD_ENABLE, 0x1f);
+        GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_EN, 0x1f);
+        GPIO_SET_BITWISE(GPIOA_ENABLE, 0x7a);
+        GPIO_SET_BITWISE(GPIOA_OUTPUT_VAL, 0x7a);
+        GPIO_SET_BITWISE( GPIOA_OUTPUT_EN, 0x7a);
 
         outl(inl(0x70000014) & ~(0x3ffff), 0x70000014);
     }
@@ -556,11 +556,11 @@ static void sd_card_mux(int card_no)
     {
         GPO32_VAL |= 0x4;
 
-        GPIOD_ENABLE     &= ~0x1f;
-        GPIOD_OUTPUT_EN  &= ~0x1f;
-        GPIOA_ENABLE     |=  0x7a;
-        GPIOA_OUTPUT_VAL |=  0x7a;
-        GPIOA_OUTPUT_EN  |=  0x7a;
+        GPIO_CLEAR_BITWISE(GPIOD_ENABLE, 0x1f);
+        GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_EN, 0x1f);
+        GPIO_SET_BITWISE(GPIOA_ENABLE, 0x7a);
+        GPIO_SET_BITWISE(GPIOA_OUTPUT_VAL, 0x7a);
+        GPIO_SET_BITWISE( GPIOA_OUTPUT_EN, 0x7a);
 
         outl(inl(0x70000014) & ~(0x3ffff), 0x70000014);
     }
@@ -568,11 +568,11 @@ static void sd_card_mux(int card_no)
     {
         GPO32_VAL &= ~0x4;
 
-        GPIOA_ENABLE     &= ~0x7a;
-        GPIOA_OUTPUT_EN  &= ~0x7a;
-        GPIOD_ENABLE     |=  0x1f;
-        GPIOD_OUTPUT_VAL |=  0x1f;
-        GPIOD_OUTPUT_EN  |=  0x1f;
+        GPIO_CLEAR_BITWISE(GPIOA_ENABLE, 0x7a);
+        GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_EN, 0x7a);
+        GPIO_SET_BITWISE(GPIOD_ENABLE,  0x1f);
+        GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x1f);
+        GPIO_SET_BITWISE(GPIOD_OUTPUT_EN,  0x1f);
 
         outl((inl(0x70000014) & ~(0x3ffff)) | 0x255aa, 0x70000014);
     }
@@ -1044,39 +1044,16 @@ static void sd_thread(void)
         switch ( ev.id ) 
         {
 #ifdef HAVE_HOTSWAP
-        case SD_HOTSWAP:
-        {
-            int action = SDA_NONE;
-
-            /* Lock to keep us from messing with this variable while an init
-               may be in progress */
-            mutex_lock(&sd_mtx);
-            card_info[1].initialized = 0;
-            sd_status[1].retry = 0;
-
-            /* Either unmount because the card was pulled or unmount and
-               remount if already mounted since multiple messages may be
-               generated for the same event - like someone inserting a new
-               card before anything detects the old one pulled :) */
-            if (disk_unmount(1) != 0)  /* release "by force" */
-                action |= SDA_UNMOUNTED;
-
-            if (ev.data != 0 && disk_mount(1) != 0) /* mount SD-CARD */
-                action |= SDA_MOUNTED;
-
-            if (action & SDA_UNMOUNTED)
-                queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
-
-            if (action & SDA_MOUNTED)
-                queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
-
-            if (action != SDA_NONE)
-                queue_broadcast(SYS_FS_CHANGED, 0);
-
-            mutex_unlock(&sd_mtx);
+        case SYS_HOTSWAP_INSERTED:
+            disk_mount(1); /* mount microSD card */
+            queue_broadcast(SYS_FS_CHANGED, 0);
             break;
-            } /* SD_HOTSWAP */
-#endif /* HAVE_HOTSWAP */
+       
+        case SYS_HOTSWAP_EXTRACTED:
+            disk_unmount(1); /* release "by force" */
+            queue_broadcast(SYS_FS_CHANGED, 0);
+            break;
+#endif
         case SYS_TIMEOUT:
             if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
             {
@@ -1097,9 +1074,8 @@ static void sd_thread(void)
         case SYS_USB_CONNECTED:
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
             /* Wait until the USB cable is extracted again */
-#ifndef HAVE_USBSTACK
             usb_wait_for_disconnect(&sd_queue);
-#endif
+
             break;
         case SYS_USB_DISCONNECTED:
             usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
@@ -1170,22 +1146,22 @@ int ata_init(void)
         outl(inl(0x7000008c) & ~(0x4), 0x7000008c);
         GPO32_ENABLE |= 0x4;
 
-        GPIOG_ENABLE     |= (0x3 << 5);
-        GPIOG_OUTPUT_EN  |= (0x3 << 5);
-        GPIOG_OUTPUT_VAL |= (0x3 << 5);
+        GPIO_SET_BITWISE(GPIOG_ENABLE, (0x3 << 5));
+        GPIO_SET_BITWISE(GPIOG_OUTPUT_EN, (0x3 << 5));
+        GPIO_SET_BITWISE(GPIOG_OUTPUT_VAL, (0x3 << 5));
 
 #ifdef HAVE_HOTSWAP
         /* enable card detection port - mask interrupt first */
 #ifdef SANSA_E200
-        GPIOA_INT_EN     &= ~0x80;
+        GPIO_CLEAR_BITWISE(GPIOA_INT_EN, 0x80);
 
-        GPIOA_OUTPUT_EN  &= ~0x80;
-        GPIOA_ENABLE     |=  0x80;
+        GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_EN, 0x80);
+        GPIO_SET_BITWISE(GPIOA_ENABLE, 0x80);
 #elif defined SANSA_C200
-        GPIOL_INT_EN     &= ~0x08;
+        GPIO_CLEAR_BITWISE(GPIOL_INT_EN, 0x08);
 
-        GPIOL_OUTPUT_EN  &= ~0x08;
-        GPIOL_ENABLE     |=  0x08;
+        GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_EN, 0x08);
+        GPIO_SET_BITWISE(GPIOL_ENABLE, 0x08);
 #endif
 #endif
         sd_select_device(0);
@@ -1205,18 +1181,18 @@ int ata_init(void)
         CPU_INT_EN = HI_MASK;
         CPU_HI_INT_EN = GPIO0_MASK;
 
-        GPIOA_INT_LEV = (GPIOA_INT_LEV & ~0x80) | (~GPIOA_INPUT_VAL & 0x80);
+        GPIOA_INT_LEV = (0x80 << 8) | (~GPIOA_INPUT_VAL & 0x80);
 
         GPIOA_INT_CLR = 0x80;
-        GPIOA_INT_EN |= 0x80;
+        GPIO_SET_BITWISE(GPIOA_INT_EN, 0x80);
 #elif defined SANSA_C200
         CPU_INT_EN = HI_MASK;
         CPU_HI_INT_EN = GPIO2_MASK;
 
-        GPIOL_INT_LEV = (GPIOL_INT_LEV & ~0x08) | (~GPIOL_INPUT_VAL & 0x08);
+        GPIOL_INT_LEV = (0x08 << 8) | (~GPIOL_INPUT_VAL & 0x08);
 
         GPIOL_INT_CLR = 0x08;
-        GPIOL_INT_EN |= 0x08;
+        GPIO_SET_BITWISE(GPIOL_INT_EN, 0x08);
 #endif
 #endif
     }
@@ -1272,9 +1248,15 @@ bool card_detect_target(void)
 
 static bool sd1_oneshot_callback(struct timeout *tmo)
 {
-    /* Take final state only - insert/remove is bouncy */
-    queue_remove_from_head(&sd_queue, SD_HOTSWAP);
-    queue_post(&sd_queue, SD_HOTSWAP, tmo->data);
+    (void)tmo;
+
+    /* This is called only if the state was stable for 300ms - check state
+     * and post appropriate event. */
+    if (card_detect_target())
+        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
+    else
+        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+
     return false;
 }
 
@@ -1284,22 +1266,18 @@ void microsd_int(void)
     static struct timeout sd1_oneshot;
 
 #ifdef SANSA_E200
-    int detect = GPIOA_INPUT_VAL & 0x80;
-
-    GPIOA_INT_LEV = (GPIOA_INT_LEV & ~0x80) | (detect ^ 0x80);
+    GPIO_CLEAR_BITWISE(GPIOA_INT_EN, 0x80);
+    GPIOA_INT_LEV = (0x80 << 8) | (~GPIOA_INPUT_VAL & 0x80);
     GPIOA_INT_CLR = 0x80;
+    GPIO_SET_BITWISE(GPIOA_INT_EN, 0x80);
 
-    timeout_register(&sd1_oneshot, sd1_oneshot_callback,
-                     detect ? 1 : HZ/2, detect == 0);
 #elif defined SANSA_C200
-    int detect = GPIOL_INPUT_VAL & 0x08;
-
-    GPIOL_INT_LEV = (GPIOL_INT_LEV & ~0x08) | (detect ^ 0x08);
+    GPIO_CLEAR_BITWISE(GPIOL_INT_EN, 0x08);
+    GPIOL_INT_LEV = (0x08 << 8) | (~GPIOL_INPUT_VAL & 0x08);
     GPIOL_INT_CLR = 0x08;
-
-    timeout_register(&sd1_oneshot, sd1_oneshot_callback,
-                     detect ? HZ/2 : 1, detect != 0);
+    GPIO_SET_BITWISE(GPIOL_INT_EN, 0x08);
 #endif
+    timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
 
 }
 #endif /* HAVE_HOTSWAP */
