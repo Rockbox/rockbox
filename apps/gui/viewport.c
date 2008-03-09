@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include "lcd.h"
+#include "lcd-remote.h"
 #include "font.h"
 #include "sprintf.h"
 #include "string.h"
@@ -57,7 +58,11 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
     vp->drawmode = DRMODE_SOLID;
     vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */
 #endif
-    if (screens[screen].depth > 1)
+
+#ifdef HAVE_REMOTE_LCD
+    /* We only need this test if there is a remote LCD */
+    if (screen == SCREEN_MAIN)
+#endif
     {
 #ifdef HAVE_LCD_COLOR
         vp->fg_pattern = global_settings.fg_color;
@@ -70,4 +75,12 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
         vp->bg_pattern = LCD_DEFAULT_BG;
 #endif
     }
+
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+    if (screen == SCREEN_REMOTE)
+    {
+        vp->fg_pattern = LCD_REMOTE_DEFAULT_FG;
+        vp->bg_pattern = LCD_REMOTE_DEFAULT_BG;
+    }
+#endif
 }
