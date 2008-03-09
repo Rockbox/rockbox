@@ -347,6 +347,8 @@ Function LangIDs(ByRef sLanguage)
             LangIDs = Array(&h408)
         Case "hebrew"
             LangIDs = Array(&h40d)
+        Case "hindi"
+            LangIDs = Array(&h439)
         Case "islenska"
             LangIDs = Array(&h40f)
         Case "italiano"
@@ -375,8 +377,14 @@ Function LangIDs(ByRef sLanguage)
             LangIDs = Array(&h419)
         Case "slovenscina"
             LangIDs = Array(&h424)
+        Case "srpski"
+            LangIDs = Array(&hc1a) ' Cyrillic
         Case "svenska"
             LangIDs = Array(&h41d, &h81d) ' Standard, Finland
+        Case "tagalog"
+            LangIDs = Array(&h464) ' Filipino, might not be 100% correct
+        Case "thai"
+            LangIDs = Array(&h41e)
         Case "turkce"
             LangIDs = Array(&h41f)
         Case "wallisertitsch"
