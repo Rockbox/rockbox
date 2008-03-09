@@ -197,6 +197,13 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
     FOR_NB_SCREENS(i)
     {
         last_list_displayed = NULL;
+        /* quick hack to fix the recorder overwriting the button bar..
+           TODO: fix properly */
+        gui_list->parent[i]->height = screens[i].height - gui_list->parent[i]->y
+#ifdef HAS_BUTTONBAR
+                - (screens[i].has_buttonbar?BUTTONBAR_HEIGHT:0)
+#endif
+                ;
         list_draw(&screens[i], gui_list->parent[i], gui_list);
     }
 }

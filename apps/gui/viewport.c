@@ -50,7 +50,7 @@ void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
     vp->y = global_settings.statusbar?STATUSBAR_HEIGHT:0;
     vp->height = screens[screen].height - vp->y
 #ifdef HAS_BUTTONBAR
-                - screens[screen].has_buttonbar?BUTTONBAR_HEIGHT:0
+                - (screens[screen].has_buttonbar?BUTTONBAR_HEIGHT:0)
 #endif
                 ;
 #ifdef HAVE_LCD_BITMAP
