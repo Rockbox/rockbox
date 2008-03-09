@@ -687,7 +687,7 @@ restart:
                 nOctaves = REAL_CONST(log((float)limTable[k]/(float)limTable[k-1])/log(2.0));
 #else
 #ifdef FIXED_POINT
-                nOctaves = DIV_R((limTable[k]<<REAL_BITS),REAL_CONST(limTable[k-1]));
+                nOctaves = DIV_R((limTable[k]<<REAL_BITS),limTable[k-1]);
 #else
                 nOctaves = (real_t)limTable[k]/(real_t)limTable[k-1];
 #endif
