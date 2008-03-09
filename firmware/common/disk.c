@@ -148,10 +148,6 @@ int disk_mount(int drive)
     {
         return 0;
     }
-#if !defined(ELIO_TPJ1022) && !defined(MROBE_100)
-    /* The Elio's hard drive has no partition table and probing for partitions causes
-       Rockbox to crash - so we temporarily disable the probing until we fix the
-       real problem. */
 #ifdef TOSHIBA_GIGABEAT_S
     int i = 1;  /* For the Gigabeat S, we mount the second partition */
 #else
@@ -185,7 +181,6 @@ int disk_mount(int drive)
         }
 #endif
     }
-#endif
 
     if (mounted == 0 && volume != -1) /* none of the 4 entries worked? */
     {   /* try "superfloppy" mode */
