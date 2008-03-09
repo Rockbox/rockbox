@@ -570,7 +570,7 @@ struct mp3entry* audio_current_track(void)
     if (!filename)
         filename = "No file!";
 
-#ifdef HAVE_TC_RAMCACHE
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     if (tagcache_fill_tags(&temp_id3, filename))
         return &temp_id3;
 #endif

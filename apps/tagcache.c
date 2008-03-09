@@ -3794,9 +3794,9 @@ static bool load_tagcache(void)
 # ifdef HAVE_DIRCACHE
     while (dircache_is_initializing())
         sleep(1);
+
+    dircache_set_appflag(DIRCACHE_APPFLAG_TAGCACHE);    
 # endif
-    
-    dircache_set_appflag(DIRCACHE_APPFLAG_TAGCACHE);
     
     logf("loading tagcache to ram...");
     
