@@ -241,8 +241,8 @@ void RbUtilQt::configDialog()
     Config *cw = new Config(this);
     cw->setSettings(settings);
     cw->show();
-    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
+    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
 }
 
 
@@ -256,6 +256,9 @@ void RbUtilQt::updateSettings()
     }
     else if(settings->proxyType() == "manual") {
         HttpGet::setGlobalProxy(settings->proxy());
+    }
+    else {
+        HttpGet::setGlobalProxy(QUrl(""));
     }
     HttpGet::setGlobalCache(settings->cachePath());
 }
