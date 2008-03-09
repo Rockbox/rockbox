@@ -55,7 +55,7 @@ static int offset_step = 16; /* pixels per screen scroll step */
 /* should lines scroll out of the screen */
 static bool offset_out_of_view = false;
 #endif
-static struct gui_synclist* last_list_displayed;
+static int force_list_reinit = false;
 
 static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                                       int offset);
@@ -72,6 +72,7 @@ void list_init_viewports(void)
         vp = &parent[i];
         viewport_set_defaults(vp, i);
     }
+    force_list_reinit = false;
 }
 #else
 static struct viewport parent[NB_SCREENS] =
@@ -145,6 +146,7 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->title_color = -1;
     gui_list->callback_get_item_color = NULL;
 #endif
+    force_list_reinit = true;
 }
 
 /* this toggles the selection bar or cursor */
@@ -194,16 +196,29 @@ int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_width,
 void gui_synclist_draw(struct gui_synclist *gui_list)
 {
     int i;
+    static struct gui_synclist *last_list = NULL;
+    static int last_count = -1;
+#ifdef HAS_BUTTONBAR
+    static bool last_buttonbar = false;
+#endif
+    
+    if (force_list_reinit ||
+#ifdef HAS_BUTTONBAR
+        last_buttonbar != screens[SCREEN_MAIN].has_buttonbar ||
+#endif
+        last_list != gui_list ||
+        gui_list->nb_items != last_count)
+    {
+        list_init_viewports();
+        force_list_reinit = false;
+    }
+#ifdef HAS_BUTTONBAR
+    last_buttonbar = screens[SCREEN_MAIN].has_buttonbar;
+#endif
+    last_count = gui_list->nb_items;
+    last_list = gui_list;
     FOR_NB_SCREENS(i)
     {
-        last_list_displayed = NULL;
-        /* quick hack to fix the recorder overwriting the button bar..
-           TODO: fix properly */
-        gui_list->parent[i]->height = screens[i].height - gui_list->parent[i]->y
-#ifdef HAS_BUTTONBAR
-                - (screens[i].has_buttonbar?BUTTONBAR_HEIGHT:0)
-#endif
-                ;
         list_draw(&screens[i], gui_list->parent[i], gui_list);
     }
 }
@@ -401,6 +416,7 @@ void gui_synclist_set_title(struct gui_synclist * gui_list,
     } else {
         gui_list->title_width = 0;
     }
+    force_list_reinit = true;
 }
 
 
