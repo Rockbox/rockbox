@@ -193,6 +193,7 @@ void metronome_draw(struct screen* display)
         display->puts(0,2,METRONOME_MSG_START);
     else
         display->puts(0,2,METRONOME_MSG_STOP);
+    display->setfont(FONT_UI);
 #endif /* HAVE_LCD_BITMAP */
     display->update();
 }
