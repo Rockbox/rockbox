@@ -813,8 +813,6 @@ bool ata_disk_is_active(void)
 
 static int ata_perform_sleep(void)
 {
-    int ret = 0;
-
     mutex_lock(&ata_mtx);
 
     SET_REG(ATA_SELECT, ata_device);
@@ -830,12 +828,13 @@ static int ata_perform_sleep(void)
     if (!wait_for_rdy())
     {
         DEBUGF("ata_perform_sleep() - CMD failed\n");
-        ret = -2;
+        mutex_unlock(&ata_mtx);
+        return -2;
     }
 
     sleeping = true;
     mutex_unlock(&ata_mtx);
-    return ret;
+    return 0; 
 }
 
 void ata_sleep(void)
@@ -954,10 +953,9 @@ static int perform_soft_reset(void)
  * ATA -> Flash interface automatically sleeps almost immediately after the
  * last command.
  */
-#ifndef IPOD_NANO
     int ret;
     int retry_count;
-    
+
     SET_REG(ATA_SELECT, SELECT_LBA | ata_device );
     SET_REG(ATA_CONTROL, CONTROL_nIEN|CONTROL_SRST );
     sleep(1); /* >= 5us */
@@ -972,13 +970,19 @@ static int perform_soft_reset(void)
         ret = wait_for_rdy();
     } while(!ret && retry_count--);
 
-    /* Massage the return code so it is 0 on success and -1 on failure */
-    ret = ret?0:-1;
+    if (!ret)
+        return -1;
 
-    return ret;
-#else
-    return 0; /* Always report success */
-#endif
+    if (set_features())
+        return -2;
+
+    if (set_multiple_mode(multisectors))
+        return -3;
+
+    if (freeze_lock())
+        return -4;
+
+    return 0;
 }
 
 int ata_soft_reset(void)
@@ -1096,10 +1100,10 @@ static int set_features(void)
         unsigned char subcommand;
         unsigned char parameter;
     } features[] = {
-        { 83, 3, 0x05, 0x80 }, /* power management: lowest power without standby */
+        { 83, 14, 0x03, 0 },   /* force PIO mode */
+        { 83, 3, 0x05, 0x80 }, /* adv. power management: lowest w/o standby */
         { 83, 9, 0x42, 0x80 }, /* acoustic management: lowest noise */
         { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
-        { 83, 14, 0x03, 0 },   /* force PIO mode */
     };
     int i;
     int pio_mode = 2;
@@ -1111,9 +1115,9 @@ static int set_features(void)
         if(identify_info[64] & 1)
             pio_mode = 3;
 
-    /* Update the table */
-    features[3].parameter = 8 + pio_mode;
-    
+    /* Update the table: set highest supported pio mode that we also support */
+    features[0].parameter = 8 + pio_mode;
+
     SET_REG(ATA_SELECT, ata_device);
 
     if (!wait_for_rdy()) {
@@ -1132,7 +1136,9 @@ static int set_features(void)
                 return -10 - i;
             }
 
-            if(ATA_ALT_STATUS & STATUS_ERR) {
+            if((ATA_ALT_STATUS & STATUS_ERR) && (i != 1)) {
+                /* some CF cards don't like advanced powermanagement
+                   even if they mark it as supported - go figure... */
                 if(ATA_ERROR & ERROR_ABRT) {
                     return -20 - i;
                 }
