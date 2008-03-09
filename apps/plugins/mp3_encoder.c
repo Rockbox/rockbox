@@ -2369,7 +2369,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         switch(butt)
         {
             case MP3ENC_DONE:   cont = 0;               break;
+            case MP3ENC_PREV|BUTTON_REPEAT:
             case MP3ENC_PREV:   if(srat >  0  ) srat--; break;
+            case MP3ENC_NEXT|BUTTON_REPEAT:
             case MP3ENC_NEXT:   if(srat < nrat) srat++; break;
         }
 
