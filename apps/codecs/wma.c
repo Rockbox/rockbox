@@ -389,6 +389,10 @@ static int get_timestamp(int *duration)
     datap += 4;
     *duration = get_short_le(datap);
 
+    /*the get_timestamp function advances us 12-13 bytes past the packet start, 
+      need to undo this here so that we stay synced with the packet*/
+    ci->seek_buffer(ci->curpos-bytesread);
+
     return send_time;
 }
 
@@ -430,8 +434,6 @@ static int seek(int ms, asf_waveformatex_t* wfx)
         }
 
         if ((time+duration>=ms && time<=ms) || count > 10) {
-            /*the get_timestamp function advances us 12 bytes past the packet start*/
-            ci->seek_buffer(ci->curpos-12);
             DEBUGF("Found our packet! Now at %d packet\n", packet_num);
             return time;
         } else {
