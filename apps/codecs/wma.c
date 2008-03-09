@@ -403,7 +403,7 @@ static int seek(int ms, asf_waveformatex_t* wfx)
 
     /*estimate packet number from bitrate*/
     int initial_packet = ci->curpos/wfx->packet_size;
-    int packet_num = (ms*(wfx->bitrate>>3))/wfx->packet_size/1000;
+    int packet_num = (((int64_t)ms)*(wfx->bitrate>>3))/wfx->packet_size/1000;
     int last_packet = ci->id3->filesize / wfx->packet_size;
 
     if (packet_num > last_packet) {
