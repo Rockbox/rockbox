@@ -303,16 +303,20 @@ static void usb_thread(void)
 #endif
 
                 usb_state = USB_EXTRACTED;
+#ifdef HAVE_USBSTACK
                 if(exclusive_ata_access)
                 {
                     exclusive_ata_access = false;
+#endif
                     /* Tell all threads that we are back in business */
                     num_acks_to_expect =
                         queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
                     waiting_for_ack = true;
                     DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
                            num_acks_to_expect);
+#ifdef HAVE_USBSTACK
                 }
+#endif
                 break;
 
             case SYS_USB_DISCONNECTED_ACK:

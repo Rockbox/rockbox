@@ -262,7 +262,7 @@ static enum {
     SENDING_CSW
 } state = WAITING_FOR_COMMAND;
 
-static bool check_disk_present(int volume)
+static bool check_disk_present(IF_MV(int volume))
 {
     unsigned char sector[512];
     return ata_read_sectors(IF_MV2(volume,)0,1,sector) == 0;
@@ -290,7 +290,7 @@ static void try_release_ata(void)
 void usb_storage_notify_hotswap(int volume,bool inserted)
 {
     logf("notify %d",inserted);
-    if(inserted  && check_disk_present(volume)) {
+    if(inserted  && check_disk_present(IF_MV(volume))) {
         ejected[volume] = false;
     }
     else {
@@ -305,7 +305,7 @@ void usb_storage_reconnect(void)
 {
     int i;
     for(i=0;i<NUM_VOLUMES;i++)
-        ejected[i] = !check_disk_present(i);
+        ejected[i] = !check_disk_present(IF_MV(i));
 
     usb_request_exclusive_ata();
 }
@@ -315,7 +315,7 @@ void usb_storage_init(void)
 {
     int i;
     for(i=0;i<NUM_VOLUMES;i++) {
-        ejected[i] = !check_disk_present(i);
+        ejected[i] = !check_disk_present(IF_MV(i));
     }
     logf("usb_storage_init done");
 }
