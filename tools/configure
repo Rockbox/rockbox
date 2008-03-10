@@ -621,6 +621,7 @@ cat <<EOF
  31) M5/M5L            41) Gigabeat S         51) Sansa e200R
  32) 7                                        52) Sansa c200
  33) Cowon D2
+ 34) M3/M3L
 
  ==Tatung==            ==Olympus==            ==Logik==
  60) Elio TPJ-1022     70) M:Robe 500         80) DAX 1GB MP3/DAB
@@ -818,7 +819,7 @@ EOF
     ;;
 
    6|av300)
-    target_id=26
+    target_id=38
     modelname="av300"
     target="-DARCHOS_AV300"
     memory=16 # always
@@ -1210,6 +1211,75 @@ EOF
     t_model="m5"
     ;;
 
+   32|iaudio7)
+    target_id=32
+    modelname="iaudio7"
+    target="-DIAUDIO_7"
+    memory=16 # always
+    arm946cc
+    tool="$rootdir/tools/scramble -add i7"
+    boottool="$rootdir/tools/scramble -tcc=crc"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    output="rockbox.iaudio"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    bootoutput="I7_FW.BIN"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$tccbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tcc77x"
+    t_model="iaudio7"
+    ;;
+
+    33|cowond2)
+    target_id=34
+    modelname="cowond2"
+    target="-DCOWON_D2"
+    memory=32
+    arm926ejscc
+    tool="$rootdir/tools/scramble -add=d2"
+    boottool="$rootdir/tools/scramble -tcc=crc"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
+    output="rockbox.iaudio"
+    appextra="recorder:gui"
+    plugins="no"
+    swcodec="yes"
+    toolset="$tccbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tcc780x"
+    t_model="cowond2"
+    ;;
+    
+   34|m3)
+    target_id=37
+    modelname="m3"
+    target="-DIAUDIO_M3"
+    memory=16 # always
+    coldfirecc
+    tool="$rootdir/tools/scramble -add=iam3"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 7"
+    output="rockbox.iaudio"
+    appextra="recorder:gui"
+    plugins="no"
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$iaudiobitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="coldfire"
+    t_manufacturer="iaudio"
+    t_model="m3"
+    ;;
+
    40|gigabeatf)
     target_id=20
     modelname="gigabeatf"
@@ -1255,7 +1325,7 @@ EOF
     ;;
 
     70|mrobe500)
-    target_id=20
+    target_id=36
     modelname="mrobe500"
     target="-DMROBE_500"
     memory=64 # always
@@ -1451,53 +1521,6 @@ EOF
     t_model="tpj1022"
     ;;
 
-   32|iaudio7)
-    target_id=32
-    modelname="iaudio7"
-    target="-DIAUDIO_7"
-    memory=16 # always
-    arm946cc
-    tool="$rootdir/tools/scramble -add i7"
-    boottool="$rootdir/tools/scramble -tcc=crc"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
-    output="rockbox.iaudio"
-    appextra="recorder:gui"
-    plugins="yes"
-    swcodec="yes"
-    bootoutput="I7_FW.BIN"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset="$tccbitmaptools"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tcc77x"
-    t_model="iaudio7"
-    ;;
-
-    33|cowond2)
-    target_id=34
-    modelname="cowond2"
-    target="-DCOWON_D2"
-    memory=32
-    arm926ejscc
-    tool="$rootdir/tools/scramble -add=d2"
-    boottool="$rootdir/tools/scramble -tcc=crc"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
-    output="rockbox.iaudio"
-    appextra="recorder:gui"
-    plugins="no"
-    swcodec="yes"
-    toolset="$tccbitmaptools"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tcc780x"
-    t_model="cowond2"
-    ;;
-    
    *)
     echo "Please select a supported target platform!"
     exit
