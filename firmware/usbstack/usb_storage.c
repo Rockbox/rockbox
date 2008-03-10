@@ -262,7 +262,7 @@ static enum {
     SENDING_CSW
 } state = WAITING_FOR_COMMAND;
 
-static bool check_disk_present(IF_MV(int volume))
+static bool check_disk_present(IF_MV_NONVOID(int volume))
 {
     unsigned char sector[512];
     return ata_read_sectors(IF_MV2(volume,)0,1,sector) == 0;
