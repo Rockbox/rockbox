@@ -102,8 +102,11 @@
 #include "as3514.h"
 #endif
 
-#if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF)
+#if defined(HAVE_USBSTACK)
 #include "usb_core.h"
+#endif
+#ifdef USB_STORAGE
+#include "../firmware/usbstack/usb_storage.h"
 #endif
 
 /*---------------------------------------------------*/
@@ -2378,6 +2381,15 @@ static bool logf_usb_serial(void)
 }
 #endif
 
+#if defined(HAVE_USBSTACK) && defined(USB_STORAGE)
+static bool usb_reconnect(void)
+{
+    gui_syncsplash(HZ, "Reconnect mass storage");
+    usb_storage_reconnect();
+    return false;
+}
+#endif
+
 
 /****** The menu *********/
 struct the_menu_item {
@@ -2459,6 +2471,9 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
         {"logf over usb",logf_usb_serial },
+#endif
+#if defined(HAVE_USBSTACK) && defined(USB_STORAGE)
+        {"reconnect usb storage",usb_reconnect},
 #endif
 #ifdef CPU_BOOST_LOGGING
         {"cpu_boost log",cpu_boost_log},
