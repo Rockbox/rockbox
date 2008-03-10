@@ -450,6 +450,7 @@ static void init(void)
 #endif
     
     usb_start_monitoring();
+#ifndef HAVE_USBSTACK
     while (usb_detect() == USB_INSERTED)
     {   
 #ifdef HAVE_EEPROM_SETTINGS
@@ -463,15 +464,14 @@ static void init(void)
 #endif
             {
                 usb_screen();
-#ifndef HAVE_USBSTACK
                 mounted = true; /* mounting done @ end of USB mode */
-#endif
             }
 #ifdef HAVE_USB_POWER
         if (usb_powered())      /* avoid deadlock */
             break;
 #endif
     }
+#endif
 
     if (!mounted)
     {
