@@ -1288,7 +1288,7 @@
   user:
   <source>
     *: none
-    masf: "Време опадања за AV"
+    masf: "AV Decay Time"
   </source>
   <dest>
     *: none
