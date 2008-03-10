@@ -78,6 +78,7 @@
 #define LOGIK_DAX_PAD      20
 #define IAUDIO67_PAD       21
 #define COWOND2_PAD        22
+#define IAUDIO_M3_PAD      23
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -115,6 +116,7 @@
 #define LCD_IAUDIO67 21 /* as used by iAudio 6/7 - unknown */
 #define LCD_COWOND2  21 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
 #define LCD_CREATIVEZVM 22 /* as used by Creative Zen Vision:M */
+#define LCD_TL0350A  23 /* as used by the iAudio M3 remote, treated as main LCD */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -198,6 +200,8 @@
 #include "config-iaudiox5.h"
 #elif defined(IAUDIO_M5)
 #include "config-iaudiom5.h"
+#elif defined(IAUDIO_M3)
+#include "config-iaudiom3.h"
 #elif defined(IPOD_COLOR)
 #include "config-ipodcolor.h"
 #elif defined(IPOD_NANO)
