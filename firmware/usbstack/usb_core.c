@@ -199,7 +199,10 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .init = usb_storage_init,
         .disconnect = NULL,
         .transfer_complete = usb_storage_transfer_complete,
-        .control_request = usb_storage_control_request
+        .control_request = usb_storage_control_request,
+#ifdef HAVE_HOTSWAP
+        .notify_hotswap = usb_storage_notify_hotswap,
+#endif
     },
 #endif
 #ifdef USB_SERIAL
@@ -213,7 +216,10 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .init = usb_serial_init,
         .disconnect = usb_serial_disconnect,
         .transfer_complete = usb_serial_transfer_complete,
-        .control_request = usb_serial_control_request
+        .control_request = usb_serial_control_request,
+#ifdef HAVE_HOTSWAP
+        .notify_hotswap = NULL,
+#endif
     },
 #endif
 #ifdef USB_CHARGING_ONLY
@@ -227,7 +233,10 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .init = NULL,
         .disconnect = NULL,
         .transfer_complete = NULL,
-        .control_request = NULL 
+        .control_request = NULL,
+#ifdef HAVE_HOTSWAP
+        .notify_hotswap = NULL,
+#endif
     },
 #endif
 };
@@ -385,6 +394,20 @@ bool usb_core_driver_enabled(int driver)
 {
     return drivers[driver].enabled;
 }
+
+#ifdef HAVE_HOTSWAP
+void usb_core_hotswap_event(int volume,bool inserted)
+{
+    int i;
+    for(i=0;i<USB_NUM_DRIVERS;i++) {
+        if(drivers[i].enabled &&
+           drivers[i].notify_hotswap!=NULL)
+        {
+            drivers[i].notify_hotswap(volume,inserted);
+        }
+    }
+}
+#endif
 
 static void usb_core_set_serial_function_id(void)
 {

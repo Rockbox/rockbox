@@ -21,7 +21,7 @@
 
 #ifndef BOOTLOADER
 
-//#define USB_SERIAL
+#define USB_SERIAL
 #define USB_STORAGE
 #define USB_CHARGING_ONLY
 #else /* BOOTLOADER */
@@ -47,5 +47,8 @@ void usb_core_enable_driver(int driver,bool enabled);
 bool usb_core_driver_enabled (int driver);
 void usb_core_handle_transfer_completion(
                              struct usb_transfer_completion_event_data* event);
+#ifdef HAVE_HOTSWAP
+void usb_core_hotswap_event(int volume,bool inserted);
+#endif
 #endif
 

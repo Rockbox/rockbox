@@ -227,6 +227,18 @@ static void usb_thread(void)
                            num_acks_to_expect);
                 }
                 break;
+            case USB_RELEASE_DISK:
+                if(!waiting_for_ack)
+                {
+                    /* Tell all threads that they have to back off the ATA.
+                       We subtract one for our own thread. */
+                    num_acks_to_expect =
+                        queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
+                    waiting_for_ack = true;
+                    DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
+                           num_acks_to_expect);
+                }
+                break;
 #endif
             case SYS_USB_CONNECTED_ACK:
                 if(waiting_for_ack)
@@ -264,7 +276,6 @@ static void usb_thread(void)
             case USB_EXTRACTED:
 #ifdef HAVE_USBSTACK
                 usb_enable(false);
-                exclusive_ata_access = false;
 #ifdef HAVE_PRIORITY_SCHEDULING
                 thread_set_priority(usb_thread_entry,PRIORITY_SYSTEM);
 #endif
@@ -292,13 +303,16 @@ static void usb_thread(void)
 #endif
 
                 usb_state = USB_EXTRACTED;
-
-                /* Tell all threads that we are back in business */
-                num_acks_to_expect =
-                    queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
-                waiting_for_ack = true;
-                DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
-                       num_acks_to_expect);
+                if(exclusive_ata_access)
+                {
+                    exclusive_ata_access = false;
+                    /* Tell all threads that we are back in business */
+                    num_acks_to_expect =
+                        queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
+                    waiting_for_ack = true;
+                    DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
+                           num_acks_to_expect);
+                }
                 break;
 
             case SYS_USB_DISCONNECTED_ACK:
@@ -319,15 +333,19 @@ static void usb_thread(void)
                 }
                 break;
 
-#ifdef HAVE_MMC
+#ifdef HAVE_HOTSWAP
             case SYS_HOTSWAP_INSERTED:
             case SYS_HOTSWAP_EXTRACTED:
+#ifdef HAVE_USBSTACK
+                usb_core_hotswap_event(1,ev.id == SYS_HOTSWAP_INSERTED);
+#else
                 if(usb_state == USB_INSERTED)
                 {
                     usb_enable(false);
                     usb_mmc_countdown = HZ/2; /* re-enable after 0.5 sec */
                 }
                 break;
+#endif
 
             case USB_REENABLE:
                 if(usb_state == USB_INSERTED)
@@ -509,6 +527,14 @@ void usb_request_exclusive_ata(void)
 {
     if(!exclusive_ata_access) {
         queue_post(&usb_queue, USB_REQUEST_DISK, 0);
+    }
+}
+
+void usb_release_exclusive_ata(void)
+{
+    if(exclusive_ata_access) {
+        queue_post(&usb_queue, USB_RELEASE_DISK, 0);
+        exclusive_ata_access = false;
     }
 }
 

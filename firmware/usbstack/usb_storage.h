@@ -27,6 +27,11 @@ void usb_storage_init_connection(int interface,int endpoint);
 void usb_storage_init(void);
 void usb_storage_transfer_complete(bool in,int state,int length);
 bool usb_storage_control_request(struct usb_ctrlrequest* req);
+#ifdef HAVE_HOTSWAP
+void usb_storage_notify_hotswap(int volume,bool inserted);
+#endif
+
+void usb_storage_reconnect(void);
 
 #endif
 

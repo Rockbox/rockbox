@@ -262,14 +262,64 @@ static enum {
     SENDING_CSW
 } state = WAITING_FOR_COMMAND;
 
+static bool check_disk_present(int volume)
+{
+    unsigned char sector[512];
+    return ata_read_sectors(IF_MV2(volume,)0,1,sector) == 0;
+}
+
+static void try_release_ata(void)
+{
+    /* Check if there is a connected drive left. If not, 
+       release excusive access */
+    bool canrelease=true;
+    int i;
+    for(i=0;i<NUM_VOLUMES;i++) {
+        if(ejected[i]==false){
+            canrelease=false;
+            break;
+        }
+    }
+    if(canrelease) {
+        logf("scsi release ata");
+        usb_release_exclusive_ata();
+    }
+}
+
+#ifdef HAVE_HOTSWAP
+void usb_storage_notify_hotswap(int volume,bool inserted)
+{
+    logf("notify %d",inserted);
+    if(inserted  && check_disk_present(volume)) {
+        ejected[volume] = false;
+    }
+    else {
+        ejected[volume] = true;
+        try_release_ata();
+    }
+
+}
+#endif
+
+void usb_storage_reconnect(void)
+{
+    int i;
+    for(i=0;i<NUM_VOLUMES;i++)
+        ejected[i] = !check_disk_present(i);
+
+    usb_request_exclusive_ata();
+}
+
 /* called by usb_code_init() */
 void usb_storage_init(void)
 {
     int i;
-    for(i=0;i<NUM_VOLUMES;i++)
-        ejected[i]=false;
+    for(i=0;i<NUM_VOLUMES;i++) {
+        ejected[i] = !check_disk_present(i);
+    }
     logf("usb_storage_init done");
 }
+
 
 int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size,
                                       int interface_number,int endpoint)
@@ -348,7 +398,7 @@ void usb_storage_transfer_complete(bool in,int status,int length)
                 int result = ata_write_sectors(IF_MV2(cur_cmd.lun,)
                                          cur_cmd.sector,
                                          MIN(BUFFER_SIZE/SECTOR_SIZE,
-                                         cur_cmd.count),
+                                             cur_cmd.count),
                                          cur_cmd.data[cur_cmd.data_select]);
                 if(result != 0) {
                     send_csw(UMS_STATUS_FAIL);
@@ -508,7 +558,7 @@ static void send_and_read_next(void)
         cur_cmd.last_result = ata_read_sectors(IF_MV2(cur_cmd.lun,)
                                            cur_cmd.sector,
                                            MIN(BUFFER_SIZE/SECTOR_SIZE,
-                                           cur_cmd.count),
+                                               cur_cmd.count),
                                            cur_cmd.data[cur_cmd.data_select]);
     }
 }
@@ -520,8 +570,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
        TODO: support 48-bit LBA */
 
     unsigned int length = cbw->data_transfer_length;
-    unsigned int block_size;
-    unsigned int block_count;
+    unsigned int block_size = 0;
+    unsigned int block_count = 0;
     bool lun_present=true;
 #ifdef ONLY_EXPOSE_CARD_SLOT
     unsigned char lun = cbw->lun+1;
@@ -536,9 +586,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         block_count = cinfo->numblocks;
     }
     else {
-        lun_present=false;
-        block_size = 0;
-        block_count = 0;
+        ejected[lun] = true;
+        try_release_ata();
     }
 #else
     unsigned short* identify = ata_get_identify();
@@ -562,8 +611,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             if(!usb_exclusive_ata()) {
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
-                cur_sense_data.asc=ASC_NOT_READY;
-                cur_sense_data.ascq=ASCQ_BECOMING_READY;
+                cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
                 break;
             }
             if(lun_present) {
@@ -732,12 +781,17 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_START_STOP_UNIT:
             logf("scsi start_stop unit %d",lun);
-            if((cbw->command_block[4] & 0xf0) == 0)
+            if((cbw->command_block[4] & 0xf0) == 0) /*load/eject bit is valid*/
             { /* Process start and eject bits */
-                if((cbw->command_block[4] & 0x01) == 0 && 
-                   (cbw->command_block[4] & 0x02) != 0) /* Stop and eject */
+                logf("scsi load/eject");
+                if((cbw->command_block[4] & 0x01) == 0) /* Don't start */
                 {
-                    ejected[lun]=true;
+                    if((cbw->command_block[4] & 0x02) != 0) /* eject */
+                    {
+                        logf("scsi eject");
+                        ejected[lun]=true;
+                        try_release_ata();
+                    }
                 }
             }
             send_csw(UMS_STATUS_GOOD);
@@ -828,7 +882,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cur_cmd.last_result = ata_read_sectors(IF_MV2(cur_cmd.lun,)
                                              cur_cmd.sector,
                                              MIN(BUFFER_SIZE/SECTOR_SIZE,
-                                             cur_cmd.count),
+                                                 cur_cmd.count),
                                              cur_cmd.data[cur_cmd.data_select]);
                 send_and_read_next();
             }

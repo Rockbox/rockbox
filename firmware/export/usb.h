@@ -30,6 +30,7 @@ enum {
     USB_POWERED,
     USB_TRANSFER_COMPLETION,
     USB_REQUEST_DISK,
+    USB_RELEASE_DISK,
     USB_REQUEST_REBOOT
 };
 
@@ -105,6 +106,7 @@ void usb_signal_transfer_completion(struct usb_transfer_completion_event_data* e
 bool usb_driver_enabled(int driver);
 bool usb_exclusive_ata(void); /* ata is available for usb */
 void usb_request_exclusive_ata(void);
+void usb_release_exclusive_ata(void);
 #endif
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \

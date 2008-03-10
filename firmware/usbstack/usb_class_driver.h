@@ -54,6 +54,12 @@ struct usb_class_driver {
        able to handle it, it should ack the request, and return true. Otherwise
        it should return false. */
     bool (*control_request)(struct usb_ctrlrequest* req);
+
+#ifdef HAVE_HOTSWAP
+    /* Tells the driver that a hotswappable disk/card was inserted or
+       extracted */
+    void (*notify_hotswap)(int volume, bool inserted);
+#endif
 };
 
 #endif
