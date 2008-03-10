@@ -278,6 +278,8 @@ $has_remote = 1 if ($remote_height && $remote_width && remote_depth);
 open(WPS, "<$wpslist");
 while(<WPS>) {
     my $l = $_;
+    # remove CR
+    $l =~ s/\r//g;
     if($l =~ /^ *\#/) {
         # skip comment
         next;
