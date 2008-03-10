@@ -133,6 +133,16 @@ copied_start:
     ldrhi  r5, [r4], #4
     strhi  r5, [r2], #4
     bhi    1b
+
+    /* Copy the IRAM (SRAM) */
+    ldr    r2, =_iramcopy
+    ldr    r3, =_iramstart
+    ldr    r4, =_iramend
+1:
+    cmp    r4, r3
+    ldrhi  r5, [r2], #4
+    strhi  r5, [r3], #4
+    bhi    1b
     
     /* Zero out IBSS */
     ldr    r2, =_iedata

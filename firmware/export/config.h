@@ -114,9 +114,9 @@
 #define LCD_MROBE100 19 /* as used by Olympus M:Robe 100 */
 #define LCD_LOGIKDAX 20 /* as used by Logik DAX - SSD1815 */
 #define LCD_IAUDIO67 21 /* as used by iAudio 6/7 - unknown */
-#define LCD_COWOND2  21 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
 #define LCD_CREATIVEZVM 22 /* as used by Creative Zen Vision:M */
 #define LCD_TL0350A  23 /* as used by the iAudio M3 remote, treated as main LCD */
+#define LCD_COWOND2  24 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -402,7 +402,7 @@
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
     defined(CPU_TCC77X) ||  /* Telechips: core, plugins, codecs */ \
-    defined(CPU_TCC780X) || /* Telechips: core, plugins, codecs */ \
+    /*defined(CPU_TCC780X) || /. Telechips: core, plugins, codecs */ \
     (CONFIG_CPU == PNX0101))
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))

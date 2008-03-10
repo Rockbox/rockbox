@@ -261,7 +261,6 @@ SECTIONS
     .itcm :
     {
         _itcmstart = .;
-        *(.icode)
         _itcmend = .;
     } > ITCM AT> DRAM
 
@@ -270,13 +269,23 @@ SECTIONS
     .dtcm :
     {
         _dtcmstart = .;
-        *(.irodata)
-        *(.idata)
         _dtcmend = .;
     } > DTCM AT> DRAM
 
     _dtcmcopy = LOADADDR(.dtcm);
 
+    .iram :
+    {
+        _iramstart = .;
+        *(.irodata)
+        *(.idata)
+        *(.icode)
+        . = ALIGN(0x4);
+        _iramend = .;
+    } > SRAM AT> DRAM
+
+    _iramcopy = LOADADDR(.iram);
+    
     .ibss (NOLOAD) :
     {
         _iedata = .;
