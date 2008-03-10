@@ -34,10 +34,13 @@
 #define HAVE_PITCHSCREEN
 
 /* define this if you would like tagcache to build on this target */
-#define HAVE_TAGCACHE
+//#define HAVE_TAGCACHE
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
+
+/* Some (2Gb?) D2s seem to be FAT16 formatted */
+#define HAVE_FAT16SUPPORT
 
 /* LCD dimensions */
 #define LCD_WIDTH  320
