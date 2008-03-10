@@ -183,10 +183,10 @@ static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
 static int usb_core_num_interfaces;
 
-int usb_charging_get_config_descriptor(unsigned char *dest,int max_packet_size,
-                                            int interface_number,int endpoint);
+static int usb_charging_get_config_descriptor(unsigned char *dest,int max_packet_size,
+                                              int interface_number,int endpoint);
 
-struct usb_class_driver drivers[] =
+static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 {
 #ifdef USB_STORAGE
     [USB_DRIVER_MASS_STORAGE] = {
@@ -325,7 +325,7 @@ void usb_core_init(void)
     logf("usb_core_init() finished");
 }
 
-int usb_charging_get_config_descriptor(unsigned char *dest,int max_packet_size,
+static int usb_charging_get_config_descriptor(unsigned char *dest,int max_packet_size,
                                             int interface_number,int endpoint)
 {
     (void) max_packet_size;

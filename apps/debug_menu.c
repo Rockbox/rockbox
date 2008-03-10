@@ -2367,7 +2367,7 @@ static bool dbg_scrollwheel(void)
 }
 #endif
 
-#if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF)
+#if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
 static bool logf_usb_serial(void)
 {
     bool serial_enabled = !usb_core_driver_enabled(USB_DRIVER_SERIAL);
@@ -2457,7 +2457,7 @@ static const struct the_menu_item menuitems[] = {
         {"logf", logfdisplay },
         {"logfdump", logfdump },
 #endif
-#if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF)
+#if defined(HAVE_USBSTACK) && defined(ROCKBOX_HAS_LOGF) && defined(USB_SERIAL)
         {"logf over usb",logf_usb_serial },
 #endif
 #ifdef CPU_BOOST_LOGGING
