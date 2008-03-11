@@ -75,6 +75,10 @@ typedef struct {
 char *get_volume_name(int volume);
 #endif
 
+#ifdef HAVE_MULTIVOLUME
+    int strip_volume(const char*, char*);
+#endif
+
 #ifndef DIRFUNCTIONS_DEFINED
 
 extern DIR_UNCACHED* opendir_uncached(const char* name);

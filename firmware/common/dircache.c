@@ -37,6 +37,7 @@
 #include "usb.h"
 #include "file.h"
 #include "buffer.h"
+#include "dir.h"
 #if CONFIG_RTC
 #include "time.h"
 #include "timefuncs.h"
@@ -51,6 +52,9 @@ DIR_CACHED opendirs[MAX_OPEN_DIRS];
 
 static struct dircache_entry *fd_bindings[MAX_OPEN_FILES];
 static struct dircache_entry *dircache_root;
+#ifdef HAVE_MULTIVOLUME
+static struct dircache_entry *append_position;
+#endif
 
 static bool dircache_initialized = false;
 static bool dircache_initializing = false;
@@ -155,6 +159,9 @@ static bool check_event_queue(void)
     {
         case DIRCACHE_STOP:
         case SYS_USB_CONNECTED:
+#ifdef HAVE_HOTSWAP
+        case SYS_FS_CHANGED:
+#endif
             /* Put the event back into the queue. */
             queue_post(&dircache_queue, ev.id, ev.data);
             return true;
@@ -166,7 +173,7 @@ static bool check_event_queue(void)
 /**
  * Internal function to iterate a path.
  */
-static int dircache_scan(struct travel_data *td)
+static int dircache_scan(IF_MV2(int volume,) struct travel_data *td)
 {
 #ifdef SIMULATOR
     while ( ( td->entry = readdir_uncached(td->dir) ) )
@@ -273,22 +280,37 @@ static int dircache_scan(struct travel_data *td)
  * Recursively scan the hard disk and build the cache.
  */
 #ifdef SIMULATOR
-static int dircache_travel(DIR_UNCACHED *dir, struct dircache_entry *ce)
+static int dircache_travel(IF_MV2(int volume,) DIR_UNCACHED *dir, struct dircache_entry *ce)
 #else
-static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
+static int dircache_travel(IF_MV2(int volume,) struct fat_dir *dir, struct dircache_entry *ce)
 #endif
 {
     int depth = 0;
     int result;
 
     memset(ce, 0, sizeof(struct dircache_entry));
+
+#if defined(HAVE_MULTIVOLUME) && !defined(SIMULATOR)
+    if (volume > 0)
+    {
+        ce->d_name = ((char *)dircache_root+dircache_size);
+        snprintf(ce->d_name, VOL_ENUM_POS + 3, VOL_NAMES, volume);
+        ce->name_len = VOL_ENUM_POS + 3;
+        dircache_size += ce->name_len;
+        ce->attribute = FAT_ATTR_DIRECTORY | FAT_ATTR_VOLUME;
+        ce->size = 0;
+        append_position = dircache_gen_next(ce);
+        ce = dircache_gen_down(ce);
+    }
+#endif
+
     dir_recursion[0].dir = dir;
     dir_recursion[0].ce = ce;
     dir_recursion[0].first = ce;
     
     do {
         //logf("=> %s", dircache_cur_path);
-        result = dircache_scan(&dir_recursion[depth]);
+        result = dircache_scan(IF_MV2(volume,) &dir_recursion[depth]);
         switch (result) {
             case 0: /* Leaving the current directory. */
                 /* Add the standard . and .. entries. */
@@ -536,37 +558,57 @@ static int dircache_do_rebuild(void)
     start_tick = current_tick;
     dircache_initializing = true;
     appflags = 0;
+    entry_count = 0;
     
-#ifdef SIMULATOR
-    pdir = opendir_uncached("/");
-    if (pdir == NULL)
-    {
-        logf("Failed to open rootdir");
-        dircache_initializing = false;
-        return -3;
-    }
-#else
-    if ( fat_opendir(IF_MV2(volume,) &dir, 0, NULL) < 0 ) {
-        logf("Failed opening root dir");
-        dircache_initializing = false;
-        return -3;
-    }
-    pdir = &dir;
-#endif
-
     memset(dircache_cur_path, 0, sizeof(dircache_cur_path));
     dircache_size = sizeof(struct dircache_entry);
 
-    cpu_boost(true);
-    if (dircache_travel(pdir, dircache_root) < 0)
+#ifdef HAVE_MULTIVOLUME
+    append_position = dircache_root;
+
+    for (i = NUM_VOLUMES; i >= 0; i--)
     {
-        logf("dircache_travel failed");
-        cpu_boost(false);
-        dircache_size = 0;
-        dircache_initializing = false;
-        return -2;
+        if (fat_ismounted(i))
+        {
+#endif
+#ifdef SIMULATOR
+            pdir = opendir_uncached("/");
+            if (pdir == NULL)
+            {
+                logf("Failed to open rootdir");
+                dircache_initializing = false;
+                return -3;
+            }
+#else
+#ifdef HAVE_MULTIVOLUME
+            if ( fat_opendir(IF_MV2(i,) &dir, 0, NULL) < 0 ) {
+#else
+            if ( fat_opendir(IF_MV2(0,) &dir, 0, NULL) < 0 ) {
+#endif /* HAVE_MULTIVOLUME */
+                logf("Failed opening root dir");
+                dircache_initializing = false;
+                return -3;
+            }
+            pdir = &dir;
+#endif
+            cpu_boost(true);
+#ifdef HAVE_MULTIVOLUME
+            if (dircache_travel(IF_MV2(i,) pdir, append_position) < 0)
+#else
+            if (dircache_travel(IF_MV2(0,) pdir, dircache_root) < 0)
+#endif /* HAVE_MULTIVOLUME */
+            {
+                logf("dircache_travel failed");
+                cpu_boost(false);
+                dircache_size = 0;
+                dircache_initializing = false;
+                return -2;
+            }
+            cpu_boost(false);
+#ifdef HAVE_MULTIVOLUME
+        }
     }
-    cpu_boost(false);
+#endif
 
     logf("Done, %ld KiB used", dircache_size / 1024);
     
@@ -610,6 +652,12 @@ static void dircache_thread(void)
 
         switch (ev.id)
         {
+#ifdef HAVE_HOTSWAP
+            case SYS_FS_CHANGED:
+                if (!dircache_initialized)
+                    break;
+                dircache_initialized = false;
+#endif
             case DIRCACHE_BUILD:
                 thread_enabled = true;
                 dircache_do_rebuild();

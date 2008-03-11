@@ -22,6 +22,23 @@
 
 #include "config.h"
 
+#ifdef HAVE_MULTIVOLUME
+
+/* how to name volumes, first char must be outside of legal file names,
+   a number gets appended to enumerate, if applicable */
+#ifdef HAVE_MMC
+#define VOL_NAMES "<MMC%d>"
+#define VOL_ENUM_POS 4 /* position of %d, to avoid runtime calculation */
+#elif defined(HAVE_HOTSWAP)
+#define VOL_NAMES "<microSD%d>"
+#define VOL_ENUM_POS 8 /* position of %d, to avoid runtime calculation */
+#else
+#define VOL_NAMES "<HD%d>"
+#define VOL_ENUM_POS 3
+#endif
+
+#endif
+
 #ifdef HAVE_DIRCACHE
 # include "dircache.h"
 # define DIR DIR_CACHED

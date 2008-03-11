@@ -313,9 +313,7 @@
  * plenty of RAM. Both features can be enabled independently. */
 #if ((defined(MEMORYSIZE) && (MEMORYSIZE > 8)) || MEM > 8) && \
  !defined(BOOTLOADER)
-#if !defined(SANSA_E200) && !defined(SANSA_C200)
 #define HAVE_DIRCACHE
-#endif
 #ifdef HAVE_TAGCACHE
 #define HAVE_TC_RAMCACHE
 #endif

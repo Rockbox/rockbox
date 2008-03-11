@@ -24,7 +24,6 @@
 #include "dir.h"
 #include "debug.h"
 #include "atoi.h"
-//#include "dircache.h"
 
 #define MAX_OPEN_DIRS 8
 
@@ -32,22 +31,9 @@ static DIR_UNCACHED opendirs[MAX_OPEN_DIRS];
 
 #ifdef HAVE_MULTIVOLUME
 
-/* how to name volumes, first char must be outside of legal file names,
-   a number gets appended to enumerate, if applicable */
-#ifdef HAVE_MMC
-static const char* vol_names = "<MMC%d>";
-#define VOL_ENUM_POS 4 /* position of %d, to avoid runtime calculation */
-#elif defined(HAVE_HOTSWAP)
-static const char* vol_names = "<microSD%d>";
-#define VOL_ENUM_POS 8 /* position of %d, to avoid runtime calculation */
-#else
-static const char* vol_names = "<HD%d>";
-#define VOL_ENUM_POS 3
-#endif
-
 /* returns on which volume this is, and copies the reduced name
    (sortof a preprocessor for volume-decorated pathnames) */
-static int strip_volume(const char* name, char* namecopy)
+int strip_volume(const char* name, char* namecopy)
 {
     int volume = 0;
     const char *temp = name;
@@ -55,7 +41,7 @@ static int strip_volume(const char* name, char* namecopy)
     while (*temp == '/')          /* skip all leading slashes */
         ++temp;
         
-    if (*temp && !strncmp(temp, vol_names, VOL_ENUM_POS))
+    if (*temp && !strncmp(temp, VOL_NAMES, VOL_ENUM_POS))
     {
         temp += VOL_ENUM_POS;     /* behind special name */
         volume = atoi(temp);      /* number is following */
@@ -199,7 +185,7 @@ struct dirent_uncached* readdir_uncached(DIR_UNCACHED* dir)
                 memset(theent, 0, sizeof(*theent));
                 theent->attribute = FAT_ATTR_DIRECTORY | FAT_ATTR_VOLUME;
                 snprintf(theent->d_name, sizeof(theent->d_name), 
-                         vol_names, dir->volumecounter);
+                         VOL_NAMES, dir->volumecounter);
                 return theent;
             }
         }
