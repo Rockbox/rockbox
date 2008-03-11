@@ -105,6 +105,9 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
     if (dircache_is_enabled() && !file->write && use_cache)
     {
         const struct dircache_entry *ce;
+# ifdef HAVE_MULTIVOLUME
+        int volume = strip_volume(pathname, pathnamecopy);
+# endif
 
         ce = dircache_get_entry_ptr(pathname);
         if (!ce)
@@ -114,7 +117,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
             return -7;
         }
 
-        fat_open(IF_MV2(unsupported at the moment,)
+        fat_open(IF_MV2(volume,)
                  ce->startcluster,
                  &(file->fatfile),
                  NULL);
