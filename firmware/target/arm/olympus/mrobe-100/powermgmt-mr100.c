@@ -22,9 +22,6 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-/* FIXME: All voltages copied from H10/Tatung Elio. This will need changing
-   proper power management. */
-
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     3450 
@@ -61,7 +58,5 @@ const unsigned short percent_to_volt_charge[11] =
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    /* work around the inital (false) high readout */
-    int readout=adc_read(ADC_UNREG_POWER);
-    return (readout>700) ? 3480 : (readout * BATTERY_SCALE_FACTOR) >> 10;
+    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
 }

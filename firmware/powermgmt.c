@@ -798,6 +798,9 @@ static void power_thread(void)
 #endif
 
     /* Delay reading the first battery level */
+#ifdef MROBE_100
+    while(battery_adc_voltage()>4200)  /* gives false readings initially */
+#endif
     sleep(HZ/100);
 
     /* initialize the voltages for the exponential filter */
