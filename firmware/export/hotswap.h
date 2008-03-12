@@ -40,7 +40,9 @@ typedef struct
 } tCardInfo;
 
 #ifdef TARGET_TREE
+#ifdef HAVE_HOTSWAP
 #include "hotswap-target.h"
+#endif
 #define card_detect            card_detect_target
 #define card_get_info          card_get_info_target
 #define card_enable_monitoring card_enable_monitoring_target
