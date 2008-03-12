@@ -172,6 +172,7 @@ struct bpb
 };
 
 static struct bpb fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
+static bool initialized = false;
 
 static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb));
 static int flush_fat(IF_MV_NONVOID(struct bpb* fat_bpb));
@@ -201,6 +202,18 @@ struct fat_cache_entry
 static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE];
 static struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 static struct mutex cache_mutex NOCACHEBSS_ATTR;
+
+#ifdef HAVE_HOTSWAP
+void fat_lock(void)
+{
+    mutex_lock(&cache_mutex);
+}
+
+void fat_unlock(void)
+{
+    mutex_unlock(&cache_mutex);
+}
+#endif
 
 static long cluster2sec(IF_MV2(struct bpb* fat_bpb,) long cluster)
 {
@@ -240,7 +253,11 @@ void fat_init(void)
 {
     unsigned int i;
 
-    mutex_init(&cache_mutex);
+    if (!initialized)
+    {
+        initialized = true;
+        mutex_init(&cache_mutex);
+    }
 
     /* mark the FAT cache as unused */
     for(i = 0;i < FAT_CACHE_SIZE;i++)

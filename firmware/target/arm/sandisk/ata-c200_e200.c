@@ -16,7 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "ata.h"
+#include "fat.h"
 #include "hotswap-target.h"
 #include "ata-target.h"
 #include "ata_idle_notify.h"
@@ -29,8 +29,8 @@
 #include "panic.h"
 #include "usb.h"
 
-#define BLOCK_SIZE      (512)
-#define SECTOR_SIZE     (512)
+#define BLOCK_SIZE      512
+#define SECTOR_SIZE     512
 #define BLOCKS_PER_BANK 0x7a7800
 
 #define STATUS_REG      (*(volatile unsigned int *)(0x70008204))
@@ -1045,22 +1045,33 @@ static void sd_thread(void)
         {
 #ifdef HAVE_HOTSWAP
         case SYS_HOTSWAP_INSERTED:
-            mutex_lock(&sd_mtx); /* Lock-out card activity */
-            card_info[1].initialized = 0;   
-            sd_status[1].retry = 0; 
-            disk_unmount(1); /* Force remount */
-            disk_mount(1); /* mount microSD card */
-            queue_broadcast(SYS_FS_CHANGED, 0);
-            mutex_unlock(&sd_mtx);
-            break;
-       
         case SYS_HOTSWAP_EXTRACTED:
-            mutex_lock(&sd_mtx); /* Lock-out card activity */
-            card_info[1].initialized = 0;   
+            fat_lock();          /* lock-out FAT activity first -
+                                    prevent deadlocking via disk_mount that
+                                    would cause a reverse-order attempt with
+                                    another thread */
+            mutex_lock(&sd_mtx); /* lock-out card activity - direct calls
+                                    into driver that bypass the fat cache */
+
+            /* We now have exclusive control of fat cache and ata */
+
+            disk_unmount(1);     /* release "by force", ensure file
+                                    descriptors aren't leaked and any busy
+                                    ones are invalid if mounting */
+
+            /* Force card init for new card, re-init for re-inserted one or
+             * clear if the last attempt to init failed with an error. */
+            card_info[1].initialized = 0;
             sd_status[1].retry = 0; 
-            disk_unmount(1); /* release "by force" */
+
+            if (ev.id == SYS_HOTSWAP_INSERTED)
+                disk_mount(1);
+
             queue_broadcast(SYS_FS_CHANGED, 0);
+
+            /* Access is now safe */
             mutex_unlock(&sd_mtx);
+            fat_unlock();
             break;
 #endif
         case SYS_TIMEOUT:
@@ -1135,6 +1146,28 @@ void ata_enable(bool on)
     }
 }
 
+#ifdef HAVE_HOTSWAP
+void card_enable_monitoring(bool on)
+{
+    if (on)
+    {
+#ifdef SANSA_E200
+        GPIO_SET_BITWISE(GPIOA_INT_EN, 0x80);
+#elif defined(SANSA_C200)
+        GPIO_SET_BITWISE(GPIOL_INT_EN, 0x08);
+#endif
+    }
+    else
+    {
+#ifdef SANSA_E200
+        GPIO_CLEAR_BITWISE(GPIOA_INT_EN, 0x80);
+#elif defined(SANSA_C200)
+        GPIO_CLEAR_BITWISE(GPIOL_INT_EN, 0x08);
+#endif
+    }
+}
+#endif
+
 int ata_init(void)
 {
     int ret = 0;
@@ -1193,7 +1226,6 @@ int ata_init(void)
         GPIOA_INT_LEV = (0x80 << 8) | (~GPIOA_INPUT_VAL & 0x80);
 
         GPIOA_INT_CLR = 0x80;
-        GPIO_SET_BITWISE(GPIOA_INT_EN, 0x80);
 #elif defined SANSA_C200
         CPU_INT_EN = HI_MASK;
         CPU_HI_INT_EN = GPIO2_MASK;
@@ -1201,7 +1233,6 @@ int ata_init(void)
         GPIOL_INT_LEV = (0x08 << 8) | (~GPIOL_INPUT_VAL & 0x08);
 
         GPIOL_INT_CLR = 0x08;
-        GPIO_SET_BITWISE(GPIOL_INT_EN, 0x08);
 #endif
 #endif
     }

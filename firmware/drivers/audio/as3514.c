@@ -132,9 +132,6 @@ void audiohw_init(void)
 {
     unsigned int i;
 
-    /* reset I2C */
-    i2c_init();
-
     /* normal outputs for CDI and I2S pin groups */
     DEV_INIT2 &= ~0x300;
 

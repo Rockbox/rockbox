@@ -104,7 +104,7 @@ int disk_mount_all(void)
     int mounted;
     int i;
     
-#ifdef HAVE_MMC
+#if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
     card_enable_monitoring(false);
 #endif
 
@@ -118,9 +118,8 @@ int disk_mount_all(void)
     {
         mounted += disk_mount(1); /* try 2nd "drive", too */
     }
-#ifdef HAVE_MMC
+
     card_enable_monitoring(true);
-#endif
 #endif
 
     return mounted;

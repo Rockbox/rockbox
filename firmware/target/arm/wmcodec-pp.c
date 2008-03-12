@@ -41,9 +41,6 @@
  * Initialise the PP I2C and I2S.
  */
 void audiohw_init(void) {
-    /* reset I2C */
-    i2c_init();
-
 #ifdef CPU_PP502x
     /* normal outputs for CDI and I2S pin groups */
     DEV_INIT2 &= ~0x300;

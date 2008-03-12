@@ -187,6 +187,7 @@ int pp_i2c_send(unsigned int addr, int data0, int data1)
 void i2c_init(void)
 {
     /* From ipodlinux */
+    mutex_init(&i2c_mtx);
 
 #ifdef IPOD_MINI
     /* GPIO port C disable port 0x10 */
@@ -230,8 +231,6 @@ void i2c_init(void)
     pp_i2c_send(AS3514_I2C_ADDR, SUPERVISOR, 5);
 #endif
 #endif
-
-    mutex_init(&i2c_mtx);
 
     i2c_readbyte(0x8, 0);
 }

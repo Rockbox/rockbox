@@ -82,6 +82,10 @@ struct fat_dir
     unsigned char sectorcache[3][SECTOR_SIZE];
 };
 
+#ifdef HAVE_HOTSWAP
+extern void fat_lock(void);
+extern void fat_unlock(void);
+#endif
 
 extern void fat_init(void);
 extern int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector);
