@@ -70,6 +70,7 @@ struct viewport {
 #include "file.h"  /* for MAX_PATH; FIXME: Why does this not work for sims? */
 #endif /* SIMULATOR */
 
+#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH <=8
 #if (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED) \
  || (LCD_PIXELFORMAT == HORIZONTAL_INTERLEAVED)
@@ -82,6 +83,10 @@ typedef unsigned short fb_data;
 #else /* LCD_DEPTH > 16 */
 typedef unsigned long fb_data;
 #endif /* LCD_DEPTH */
+
+#else /* LCD_CHARCELLS */
+typedef unsigned char fb_data;
+#endif
 
 /* common functions */
 extern void lcd_write_command(int byte);
