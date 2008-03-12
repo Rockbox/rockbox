@@ -496,7 +496,7 @@ target/coldfire/iaudio/m5/audio-m5.c
 #ifdef IAUDIO_M3
 #ifndef SIMULATOR
 target/coldfire/ata-as-coldfire.S
-target/coldfire/iaudio/ata-iaudio.c
+target/coldfire/iaudio/m3/ata-m3.c
 target/coldfire/iaudio/m3/backlight-m3.c
 target/coldfire/iaudio/m3/button-m3.c
 target/coldfire/iaudio/m3/lcd-m3.c
