@@ -22,9 +22,6 @@
 #define REMOTE_INIT_LCD   1
 #define REMOTE_DEINIT_LCD 2
 
-void lcd_remote_write_command(int cmd);
-void lcd_remote_write_command_ex(int cmd, int data);
-void lcd_remote_write_data(const unsigned char* p_bytes, int count);
 #ifdef HAVE_REMOTE_LCD_TICKING
 void lcd_remote_emireduce(bool state);
 #endif

@@ -60,7 +60,6 @@ static int cached_contrast = DEFAULT_CONTRAST_SETTING;
 
 bool initialized = false;
 
-static void lcd_tick(void);
 
 /* Standard low-level byte writer. Requires CLK high on entry */
 static inline void _write_byte(unsigned data)
@@ -295,7 +294,7 @@ int lcd_default_contrast(void)
     return DEFAULT_CONTRAST_SETTING;
 }
 
-void lcdset_contrast(int val)
+void lcd_set_contrast(int val)
 {
     if (val < 0)
         val = 0;
@@ -312,29 +311,11 @@ bool remote_detect(void)
     return (GPIO_READ & 0x40000000) == 0;
 }
 
-void lcd_init_device(void)
-{
-    or_l(0x24000000, &GPIO_OUT);
-    or_l(0x24000000, &GPIO_ENABLE);
-    or_l(0x24000000, &GPIO_FUNCTION);
-    
-    or_l(0x00011000, &GPIO1_OUT);
-    or_l(0x00011000, &GPIO1_ENABLE);
-    or_l(0x00011000, &GPIO1_FUNCTION);
-
-    and_l(~0x40000000, &GPIO_OUT);
-    and_l(~0x40000000, &GPIO_ENABLE);
-    or_l(0x40000000, &GPIO_FUNCTION);
-
-    lcd_clear_display();
-    tick_add_task(lcd_tick);
-}
-
 void lcd_on(void)
 {
     CS_HI;
     CLK_HI;
-    sleep(10);
+    sleep(HZ/100);
     
     lcd_write_command(LCD_SET_DUTY_RATIO);
     lcd_write_command(0x70);  /* 1/128 */
@@ -349,7 +330,7 @@ void lcd_on(void)
     
     lcd_write_command(LCD_CONTROL_POWER | 7); /* All circuits ON */
     
-    sleep(30);
+    sleep(3*HZ/100);
     
     lcd_write_command_e(LCD_SET_GRAY | 0, 0x00);
     lcd_write_command_e(LCD_SET_GRAY | 1, 0x00);
@@ -385,6 +366,7 @@ void lcd_poweroff(void)
         lcd_write_command(LCD_SET_POWER_SAVE | 1);
 }
 
+#ifndef BOOTLOADER
 /* Monitor remote hotswap */
 static void lcd_tick(void)
 {
@@ -421,6 +403,29 @@ static void lcd_tick(void)
             }
         }
     }
+}
+#endif
+
+void lcd_init_device(void)
+{
+    or_l(0x24000000, &GPIO_OUT);
+    or_l(0x24000000, &GPIO_ENABLE);
+    or_l(0x24000000, &GPIO_FUNCTION);
+    
+    or_l(0x00011000, &GPIO1_OUT);
+    or_l(0x00011000, &GPIO1_ENABLE);
+    or_l(0x00011000, &GPIO1_FUNCTION);
+
+    and_l(~0x40000000, &GPIO_OUT);
+    and_l(~0x40000000, &GPIO_ENABLE);
+    or_l(0x40000000, &GPIO_FUNCTION);
+
+    lcd_clear_display();
+#ifdef BOOTLOADER
+    lcd_on();
+#else
+    tick_add_task(lcd_tick);
+#endif
 }
 
 /* Update the display.

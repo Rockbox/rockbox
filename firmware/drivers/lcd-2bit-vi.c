@@ -65,7 +65,7 @@ static struct viewport default_vp =
     .bg_pattern = LCDM(DEFAULT_BG)
 };
 
-static struct viewport IDATA_ATTR *current_vp = &default_vp;
+static struct viewport *current_vp IBSS_ATTR;
 
 static unsigned fg_pattern IBSS_ATTR;
 static unsigned bg_pattern IBSS_ATTR;
@@ -97,6 +97,7 @@ void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
 /* LCD init */
 void LCDFN(init)(void)
 {
+    LCDFN(set_viewport)(NULL);
     LCDFN(clear_display)();
 #ifndef SIMULATOR
     LCDFN(init_device)();

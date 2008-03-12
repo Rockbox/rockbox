@@ -59,7 +59,6 @@ static int cached_contrast = DEFAULT_REMOTE_CONTRAST_SETTING;
 
 bool remote_initialized = false;
 
-static void remote_tick(void);
 
 /* Standard low-level byte writer. Requires CLK high on entry */
 static inline void _write_byte(unsigned data)
@@ -269,9 +268,10 @@ void lcd_remote_write_command_ex(int cmd, int data)
     CS_HI;
 }
 
-void lcd_remote_write_data(const unsigned char* p_bytes, int count)
+void lcd_remote_write_data(const fb_remote_data *p_words, int count)
 {
-    const unsigned char *p_end = p_bytes + count;
+    const unsigned char *p_bytes = (const unsigned char *)p_words;
+    const unsigned char *p_end = (const unsigned char *)(p_words + count);
 
     RS_HI;
     CS_LO;
@@ -320,24 +320,6 @@ bool remote_detect(void)
     return (GPIO_READ & 0x01000000)?false:true;
 }
 
-void lcd_remote_init_device(void)
-{
-    or_l(0x0000e000, &GPIO_OUT);
-    or_l(0x0000e000, &GPIO_ENABLE);
-    or_l(0x0000e000, &GPIO_FUNCTION);
-    
-    or_l(0x00000020, &GPIO1_OUT);
-    or_l(0x00000020, &GPIO1_ENABLE);
-    or_l(0x00000020, &GPIO1_FUNCTION);
-    
-    and_l(~0x01000000, &GPIO_OUT);
-    and_l(~0x01000000, &GPIO_ENABLE);
-    or_l(0x01000000, &GPIO_FUNCTION);
-
-    lcd_remote_clear_display();
-    tick_add_task(remote_tick);
-}
-
 void lcd_remote_on(void)
 {
     CS_HI;
@@ -356,7 +338,7 @@ void lcd_remote_on(void)
     lcd_remote_write_command(LCD_SET_BIAS | 6); /* 1/11 */
     
     lcd_remote_write_command(LCD_CONTROL_POWER | 7); /* All circuits ON */
-    
+
     sleep(30);
     
     lcd_remote_write_command_ex(LCD_SET_GRAY | 0, 0x00);
@@ -393,6 +375,7 @@ void lcd_remote_poweroff(void)
         lcd_remote_write_command(LCD_SET_POWER_SAVE | 1);
 }
 
+#ifndef BOOTLOADER
 /* Monitor remote hotswap */
 static void remote_tick(void)
 {
@@ -430,6 +413,29 @@ static void remote_tick(void)
         }
     }
 }
+#endif
+
+void lcd_remote_init_device(void)
+{
+    or_l(0x0000e000, &GPIO_OUT);
+    or_l(0x0000e000, &GPIO_ENABLE);
+    or_l(0x0000e000, &GPIO_FUNCTION);
+    
+    or_l(0x00000020, &GPIO1_OUT);
+    or_l(0x00000020, &GPIO1_ENABLE);
+    or_l(0x00000020, &GPIO1_FUNCTION);
+    
+    and_l(~0x01000000, &GPIO_OUT);
+    and_l(~0x01000000, &GPIO_ENABLE);
+    or_l(0x01000000, &GPIO_FUNCTION);
+
+    lcd_remote_clear_display();
+#ifdef BOOTLOADER
+    lcd_remote_on();
+#else
+    tick_add_task(remote_tick);
+#endif
+}
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
@@ -445,8 +451,7 @@ void lcd_remote_update(void)
                have to update one page at a time. */
             lcd_remote_write_command(LCD_SET_PAGE | (y>5?y+2:y));
             lcd_remote_write_command_ex(LCD_SET_COLUMN | 0, 0);
-            lcd_remote_write_data((unsigned char *)lcd_remote_framebuffer[y],
-                                  LCD_REMOTE_WIDTH*2);
+            lcd_remote_write_data(lcd_remote_framebuffer[y], LCD_REMOTE_WIDTH);
         }
     }
 }
@@ -478,9 +483,8 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
             lcd_remote_write_command_ex(LCD_SET_COLUMN | ((x >> 4) & 0xf),
                                         x & 0xf);
 
-            lcd_remote_write_data (
-                (unsigned char *)&lcd_remote_framebuffer[y][x], width*2);
-        } 
+            lcd_remote_write_data(&lcd_remote_framebuffer[y][x], width);
+        }
     }
 }
 

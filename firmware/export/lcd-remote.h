@@ -56,9 +56,11 @@ typedef unsigned short fb_remote_data;
 typedef unsigned long fb_remote_data;
 #endif
 
-#ifndef LCD_REMOTE_FBWIDTH
-#define LCD_REMOTE_FBWIDTH LCD_REMOTE_WIDTH
-#endif
+/* common functions */
+void lcd_remote_init(void);
+void lcd_remote_write_command(int cmd);
+void lcd_remote_write_command_ex(int cmd, int data);
+void lcd_remote_write_data(const fb_remote_data *data, int count);
 
 /* Low-level drawing function types */
 typedef void lcd_remote_pixelfunc_type(int x, int y);

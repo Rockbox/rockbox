@@ -53,6 +53,10 @@ const unsigned short percent_to_volt_charge[11] =
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
+#ifdef IAUDIO_M3
+    return 4000; /* FIXME: fake value - no ADC yet */
+#else
     return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
+#endif
 }
 

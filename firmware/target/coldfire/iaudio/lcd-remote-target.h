@@ -23,9 +23,6 @@
 #define REMOTE_DEINIT_LCD 2
 
 void lcd_remote_init_device(void);
-void lcd_remote_write_command(int cmd);
-void lcd_remote_write_command_ex(int cmd, int data);
-void lcd_remote_write_data(const unsigned char* p_bytes, int count);
 bool remote_detect(void);
 void lcd_remote_powersave(bool on);
 void lcd_remote_set_contrast(int val);
