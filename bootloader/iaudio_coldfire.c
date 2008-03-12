@@ -113,7 +113,7 @@ void check_battery(void)
 
     printf("Batt: %d.%02dV", batt_int, batt_frac);
 
-    if (battery_voltage <= 350) 
+    if (battery_voltage <= 3500) 
     {
         printf("WARNING! BATTERY LOW!!");
         sleep(HZ*2);
@@ -135,6 +135,7 @@ void main(void)
     (void)rec_button;
     (void)hold_status;
     (void)data;
+    
     power_init();
 
     system_init();
@@ -157,7 +158,7 @@ void main(void)
     printf("Version %s", version);
     
     check_battery();
-
+    
     rc = ata_init();
     if(rc)
     {

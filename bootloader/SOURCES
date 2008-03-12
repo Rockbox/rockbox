@@ -18,13 +18,13 @@ main-pp.c
 #elif defined(ELIO_TPJ1022)
 tpj1022.c
 #elif defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(IAUDIO_M3)
-iaudio_x5.c
+iaudio_coldfire.c
+#elif defined(IRIVER_H100_SERIES)
+iriver_h1x0.c
 #elif defined(IRIVER_H300_SERIES)
 iriver_h300.c
 #elif defined(MROBE_500)
 mrobe500.c
 #elif defined(CPU_TCC77X) || defined(CPU_TCC780X)
 telechips.c
-#else
-main.c
 #endif
