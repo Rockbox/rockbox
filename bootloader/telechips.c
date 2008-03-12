@@ -43,11 +43,14 @@
 
 #if defined(COWON_D2)
 #include "i2c.h"
+#define LOAD_ADDRESS 0x20000000 /* DRAM_START */
 #endif
 
 char version[] = APPSVERSION;
 
 extern int line;
+
+#define MAX_LOAD_SIZE (8*1024*1024) /* Arbitrary, but plenty. */
 
 void* main(void)
 {
@@ -56,9 +59,9 @@ void* main(void)
     int count = 0;
     bool do_power_off = false;
     
-#if defined(COWON_D2)
-    int i,rc,fd,len;
-    int* buf = (int*)0x21000000; /* Unused DRAM */
+#if defined(COWON_D2) && defined(TCCBOOT)
+    int rc;
+    unsigned char* loadbuffer = (unsigned char*)LOAD_ADDRESS;
 #endif
 
     power_init();
@@ -78,7 +81,12 @@ void* main(void)
 
     _backlight_on();
 
-#if defined(COWON_D2)
+/* Only load the firmware if TCCBOOT is defined - this ensures SDRAM_START is
+   available for loading the firmware. Otherwise display the debug screen. */
+#if defined(COWON_D2) && defined(TCCBOOT)
+    printf("Rockbox boot loader");
+    printf("Version %s", version);
+
     printf("ATA");
     rc = ata_init();
     if(rc)
@@ -94,36 +102,20 @@ void* main(void)
         error(EDISK,rc);
     }
 
-#if 0
-    printf("opening test file...");
+    rc = load_firmware(loadbuffer, BOOTFILE, MAX_LOAD_SIZE);
 
-    fd = open("/test.bin", O_RDONLY);
-    if (fd < 0) panicf("could not open test file");
-    
-    len = filesize(fd);
-    printf("Length: %x", len);
-
-    lseek(fd, 0, SEEK_SET);
-    read(fd, buf, len);
-    close(fd);
-    
-    printf("testing contents...");
-    
-    i = 0;
-    while (buf[i] == i && i<(len/4)) { i++; }
-
-    if (i < len/4)
+    if (rc < 0)
     {
-        printf("mismatch at %x [0x%x]", i, buf[i]);
+        error(EBOOTFILE,rc);
     }
-    else
+    else if (rc == EOK)
     {
-        printf("passed!");
+        int(*kernel_entry)(void);
+
+        kernel_entry = (void*) loadbuffer;
+        rc = kernel_entry();
     }
-    while (!button_read_device()) {};
-    while (button_read_device()) {};
-#endif
-#endif
+#else
 
     while(!do_power_off) {
         line = 0;
@@ -145,6 +137,8 @@ void* main(void)
         printf("Btn: 0x%08x",button);
 
 #if defined(COWON_D2)
+        int i;
+
         printf("GPIOA: 0x%08x",GPIOA);
         printf("GPIOB: 0x%08x",GPIOB);
         printf("GPIOC: 0x%08x",GPIOC);
@@ -194,6 +188,9 @@ void* main(void)
 
     /* Power-off */
     power_off();
+
+    printf("(NOT) POWERED OFF");
+#endif
 
     return 0;
 }

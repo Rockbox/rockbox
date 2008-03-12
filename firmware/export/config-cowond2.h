@@ -6,6 +6,9 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 24
 
+/* Produce a dual-boot bootloader.bin for mktccboot */
+#define TCCBOOT
+
 /* define this if you have recording possibility */
 //#define HAVE_RECORDING
 
@@ -62,6 +65,9 @@
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
+
+/* Reduce Tremor's ICODE usage */
+#define ICODE_ATTR_TREMOR_NOT_MDCT
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x80000
