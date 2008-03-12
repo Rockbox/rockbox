@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 #include "fat.h"
-#include "hotswap-target.h"
+#include "hotswap.h"
 #include "ata-target.h"
 #include "ata_idle_notify.h"
 #include "system.h"
@@ -1147,7 +1147,7 @@ void ata_enable(bool on)
 }
 
 #ifdef HAVE_HOTSWAP
-void card_enable_monitoring(bool on)
+void card_enable_monitoring_target(bool on)
 {
     if (on)
     {

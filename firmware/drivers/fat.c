@@ -203,7 +203,7 @@ static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE];
 static struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 static struct mutex cache_mutex NOCACHEBSS_ATTR;
 
-#ifdef HAVE_HOTSWAP
+#if defined(HAVE_HOTSWAP) && !defined(HAVE_MMC) /* A better condition ?? */
 void fat_lock(void)
 {
     mutex_lock(&cache_mutex);

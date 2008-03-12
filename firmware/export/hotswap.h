@@ -40,8 +40,10 @@ typedef struct
 } tCardInfo;
 
 #ifdef TARGET_TREE
-bool       card_detect(void);
-tCardInfo *card_get_info(int card_no);
+#include "hotswap-target.h"
+#define card_detect            card_detect_target
+#define card_get_info          card_get_info_target
+#define card_enable_monitoring card_enable_monitoring_target
 #else /* HAVE_MMC */
 #include "ata_mmc.h"
 #define card_detect            mmc_detect

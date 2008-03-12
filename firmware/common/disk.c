@@ -104,7 +104,7 @@ int disk_mount_all(void)
     int mounted;
     int i;
     
-#if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
+#ifdef HAVE_HOTSWAP
     card_enable_monitoring(false);
 #endif
 

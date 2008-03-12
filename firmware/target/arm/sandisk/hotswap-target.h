@@ -20,7 +20,6 @@
 #define HOTSWAP_TARGET_H
 
 #include "inttypes.h"
-#include "hotswap.h"
 
 typedef struct
 {
@@ -41,5 +40,6 @@ typedef struct
 
 tCardInfo *card_get_info_target(int card_no);
 bool       card_detect_target(void);
+void       card_enable_monitoring_target(bool on);
 
 #endif

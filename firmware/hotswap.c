@@ -18,10 +18,10 @@
  ****************************************************************************/
 #include <stdbool.h>
 #include "config.h"
-#ifdef TARGET_TREE
-#include "hotswap-target.h"
-#else
+#ifdef HAVE_MMC
 #include "ata_mmc.h"
+#else
+#include "hotswap.h"
 #endif
 
 /* helper function to extract n (<=32) bits from an arbitrary position.
@@ -44,15 +44,3 @@ unsigned long card_extract_bits(
 
     return result;
 }
-
-#ifdef TARGET_TREE
-bool card_detect(void)
-{
-    return card_detect_target();
-}
-
-tCardInfo *card_get_info(int card_no)
-{
-    return card_get_info_target(card_no);
-}
-#endif
