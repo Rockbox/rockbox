@@ -1045,13 +1045,22 @@ static void sd_thread(void)
         {
 #ifdef HAVE_HOTSWAP
         case SYS_HOTSWAP_INSERTED:
+            mutex_lock(&sd_mtx); /* Lock-out card activity */
+            card_info[1].initialized = 0;   
+            sd_status[1].retry = 0; 
+            disk_unmount(1); /* Force remount */
             disk_mount(1); /* mount microSD card */
             queue_broadcast(SYS_FS_CHANGED, 0);
+            mutex_unlock(&sd_mtx);
             break;
        
         case SYS_HOTSWAP_EXTRACTED:
+            mutex_lock(&sd_mtx); /* Lock-out card activity */
+            card_info[1].initialized = 0;   
+            sd_status[1].retry = 0; 
             disk_unmount(1); /* release "by force" */
             queue_broadcast(SYS_FS_CHANGED, 0);
+            mutex_unlock(&sd_mtx);
             break;
 #endif
         case SYS_TIMEOUT:
