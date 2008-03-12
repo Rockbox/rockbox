@@ -71,7 +71,12 @@ struct viewport {
 #endif /* SIMULATOR */
 
 #if LCD_DEPTH <=8
+#if (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED) \
+ || (LCD_PIXELFORMAT == HORIZONTAL_INTERLEAVED)
+typedef unsigned short fb_data;
+#else
 typedef unsigned char fb_data;
+#endif
 #elif LCD_DEPTH <= 16
 typedef unsigned short fb_data;
 #else /* LCD_DEPTH > 16 */
@@ -303,8 +308,10 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 #define LCD_FBWIDTH ((LCD_WIDTH+3)/4)
-#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
 #define LCD_FBHEIGHT ((LCD_HEIGHT+3)/4)
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+#define LCD_FBHEIGHT ((LCD_HEIGHT+7)/8)
 #endif /* LCD_PIXELFORMAT */
 #endif /* LCD_DEPTH */
 /* Set defaults if not defined different yet. The defaults apply to both

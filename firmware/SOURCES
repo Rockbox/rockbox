@@ -80,6 +80,8 @@ drivers/lcd-1bit-vert.c
 drivers/lcd-2bit-horz.c
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
 drivers/lcd-2bit-vert.c
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+drivers/lcd-2bit-vi.c
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
 drivers/lcd-16bit.c
@@ -275,7 +277,7 @@ target/coldfire/memcpy-coldfire.S
 target/coldfire/memmove-coldfire.S
 target/coldfire/memset-coldfire.S
 target/coldfire/strlen-coldfire.S
-#if defined(HAVE_LCD_COLOR) \
+#if defined(HAVE_LCD_COLOR) || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED) \
  || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
 target/coldfire/memset16-coldfire.S
 #endif
@@ -490,6 +492,19 @@ target/coldfire/iaudio/m5/audio-m5.c
 #endif
 #endif /* SIMULATOR */
 #endif /* IAUDIO_M5 */
+
+#ifdef IAUDIO_M3
+#ifndef SIMULATOR
+target/coldfire/ata-as-coldfire.S
+target/coldfire/iaudio/ata-iaudio.c
+target/coldfire/iaudio/m3/backlight-m3.c
+target/coldfire/iaudio/m3/button-m3.c
+target/coldfire/iaudio/m3/lcd-m3.c
+target/coldfire/iaudio/m3/power-m3.c
+target/coldfire/iaudio/m3/system-m3.c
+target/coldfire/iaudio/powermgmt-iaudio.c
+#endif /* SIMULATOR */
+#endif /* IAUDIO_M3 */
 
 #ifdef IRIVER_IFP7XX_SERIES
 #ifdef STUB

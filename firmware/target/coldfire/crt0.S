@@ -61,6 +61,7 @@ start:
     move.l  #0x00000180,%d0 /* CSCR0 - no wait states, 16 bits, no bursts */
     move.l  %d0,(0x088,%a0)
         
+#ifndef IAUDIO_M3
     /* Chip select 1 - LCD controller */
     move.l  #0xf0000000,%d0 /* CSAR1 - Base = 0xf0000000 */
     move.l  %d0,(0x08c,%a0)
@@ -68,6 +69,7 @@ start:
     move.l  %d0,(0x090,%a0)
     move.l  #0x00000180,%d0 /* CSCR1 - no wait states, 16 bits, no bursts */
     move.l  %d0,(0x094,%a0)
+#endif
         
     /* Chip select 2 - ATA controller */
     move.l  #0x20000000,%d0 /* CSAR2 - Base = 0x20000000 */

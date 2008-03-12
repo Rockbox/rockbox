@@ -91,6 +91,7 @@ void usage(void)
            "\t-iaudiox5 iAudio X5 format\n"
            "\t-iaudiox5v iAudio X5V format\n"
            "\t-iaudiom5 iAudio M5 format\n"
+           "\t-iaudiom3 iAudio M3 format\n"
            "\t-ipod3g ipod firmware partition format (3rd Gen)\n"
            "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
            "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
@@ -107,8 +108,8 @@ void usage(void)
            "\t-tcc=X  Telechips generic firmware format (X values: sum, crc)\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
-           "\t                   ip3g, ip4g, mini, iax5, h10, h10_5gb, tpj2,\n"
-           "\t                   c200, e200, giga, gigs, m100, m500, d2)\n"
+           "\t                   ip3g, ip4g, mini, iax5, iam5, iam3, h10, h10_5gb,\n"
+           "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2)\n"
            "\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -258,6 +259,8 @@ int main (int argc, char** argv)
             modelnum = 23;
         else if(!strcmp(&argv[1][5], "d2"))
             modelnum = 24;
+        else if(!strcmp(&argv[1][5], "iam3"))
+            modelnum = 25;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;
@@ -301,6 +304,11 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         return iaudio_encode(iname, oname, "COWON_M5_FW");
+    }
+    else if(!strcmp(argv[1], "-iaudiom3")) {
+        iname = argv[2];
+        oname = argv[3];
+        return iaudio_encode(iname, oname, "COWON_M3_FW");
     }
     else if(!strcmp(argv[1], "-ipod3g")) {
         iname = argv[2];
