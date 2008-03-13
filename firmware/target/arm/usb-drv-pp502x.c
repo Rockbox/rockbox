@@ -353,7 +353,6 @@ bool usb_drv_powered(void)
 /* manual: 32.14.1 Device Controller Initialization */
 void usb_drv_init(void)
 {
-    trigger_cpu_boost();
     REG_USBCMD &= ~USBCMD_RUN;
     udelay(50000);
     REG_USBCMD |= USBCMD_CTRL_RESET;
