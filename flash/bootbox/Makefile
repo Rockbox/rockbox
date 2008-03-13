@@ -11,7 +11,7 @@ INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)
  -I$(BUILDDIR)
 
 DEPFILE = $(OBJDIR)/dep-bootbox
-LDS := $(FIRMDIR)/app.lds
+LDS := $(FIRMDIR)/target/$(CPU)/$(MANUFACTURER)/app.lds
 
 ifdef DEBUG
     DEFINES := -DDEBUG
