@@ -11,7 +11,9 @@ INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDI
  -I$(BUILDDIR)/bitmaps -I$(OBJDIR)
 
 DEPFILE = $(OBJDIR)/dep-apps
-LDS := $(FIRMDIR)/app.lds
+
+LDS := $(FIRMDIR)/target/$(CPU)/$(MANUFACTURER)/app.lds
+
 ROMLDS := $(FIRMDIR)/rom.lds
 
 ifdef ENABLEDPLUGINS
