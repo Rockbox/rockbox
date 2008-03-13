@@ -613,5 +613,5 @@ bool button_hold(void)
 
 bool headphones_inserted(void)
 {
-    return (GPIOD_INPUT_VAL & 0x80) ? true : false;
+    return (GPIOD_INPUT_VAL & 0x80) ? false : true;
 }
