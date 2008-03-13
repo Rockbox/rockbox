@@ -72,7 +72,6 @@ static bool cached_invert = false;
 static bool cached_flip = false;
 static int cached_contrast = DEFAULT_REMOTE_CONTRAST_SETTING;
 
-static void remote_tick(void);
 
 #ifdef HAVE_REMOTE_LCD_TICKING
 static inline void _byte_delay(int delay)
@@ -414,31 +413,6 @@ int remote_type(void)
     return _remote_type;
 }
 
-void lcd_remote_init_device(void)
-{
-#ifdef IRIVER_H300_SERIES
-    or_l(0x10010000, &GPIO_FUNCTION); /* GPIO16: RS
-                                         GPIO28: CLK */
-
-    or_l(0x00040006, &GPIO1_FUNCTION); /* GPO33:  Backlight
-                                          GPIO34: CS
-                                          GPIO50: Data */
-    or_l(0x10010000, &GPIO_ENABLE);
-    or_l(0x00040006, &GPIO1_ENABLE);
-#else
-    or_l(0x10010800, &GPIO_FUNCTION); /* GPIO11: Backlight
-                                         GPIO16: RS
-                                         GPIO28: CLK */
-
-    or_l(0x00040004, &GPIO1_FUNCTION); /* GPIO34: CS
-                                          GPIO50: Data */
-    or_l(0x10010800, &GPIO_ENABLE);
-    or_l(0x00040004, &GPIO1_ENABLE);
-#endif
-    lcd_remote_clear_display();
-    tick_add_task(remote_tick);
-}
-
 void lcd_remote_on(void)
 {
     CS_HI;
@@ -475,6 +449,7 @@ void lcd_remote_off(void)
     CS_HI;
 }
 
+#ifndef BOOTLOADER
 /* Monitor remote hotswap */
 static void remote_tick(void)
 {
@@ -548,6 +523,37 @@ static void remote_tick(void)
         cs_countdown--;
     if (cs_countdown == 0)
         CS_HI;
+}
+#endif
+
+void lcd_remote_init_device(void)
+{
+#ifdef IRIVER_H300_SERIES
+    or_l(0x10010000, &GPIO_FUNCTION); /* GPIO16: RS
+                                         GPIO28: CLK */
+
+    or_l(0x00040006, &GPIO1_FUNCTION); /* GPO33:  Backlight
+                                          GPIO34: CS
+                                          GPIO50: Data */
+    or_l(0x10010000, &GPIO_ENABLE);
+    or_l(0x00040006, &GPIO1_ENABLE);
+#else
+    or_l(0x10010800, &GPIO_FUNCTION); /* GPIO11: Backlight
+                                         GPIO16: RS
+                                         GPIO28: CLK */
+
+    or_l(0x00040004, &GPIO1_FUNCTION); /* GPIO34: CS
+                                          GPIO50: Data */
+    or_l(0x10010800, &GPIO_ENABLE);
+    or_l(0x00040004, &GPIO1_ENABLE);
+#endif
+
+    lcd_remote_clear_display();
+    if (remote_detect())
+        lcd_remote_on();
+#ifndef BOOTLOADER
+    tick_add_task(remote_tick);
+#endif
 }
 
 /* Update the display.

@@ -324,7 +324,7 @@ void lcd_remote_on(void)
 {
     CS_HI;
     CLK_HI;
-    sleep(10);
+    sleep(HZ/100);
     
     lcd_remote_write_command(LCD_SET_DUTY_RATIO);
     lcd_remote_write_command(0x70);  /* 1/128 */
@@ -339,7 +339,7 @@ void lcd_remote_on(void)
     
     lcd_remote_write_command(LCD_CONTROL_POWER | 7); /* All circuits ON */
 
-    sleep(30);
+    sleep(3*HZ/100);
     
     lcd_remote_write_command_ex(LCD_SET_GRAY | 0, 0x00);
     lcd_remote_write_command_ex(LCD_SET_GRAY | 1, 0x00);
@@ -371,7 +371,7 @@ void lcd_remote_off(void)
 void lcd_remote_poweroff(void)
 {
     /* Set power save -> Power OFF (VDD - VSS) .. that's it */
-    if (remote_initialized && remote_detect())
+    if (remote_initialized)
         lcd_remote_write_command(LCD_SET_POWER_SAVE | 1);
 }
 
@@ -430,9 +430,9 @@ void lcd_remote_init_device(void)
     or_l(0x01000000, &GPIO_FUNCTION);
 
     lcd_remote_clear_display();
-#ifdef BOOTLOADER
-    lcd_remote_on();
-#else
+    if (remote_detect())
+        lcd_remote_on();
+#ifndef BOOTLOADER
     tick_add_task(remote_tick);
 #endif
 }

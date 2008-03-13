@@ -362,7 +362,7 @@ void lcd_off(void)
 void lcd_poweroff(void)
 {
     /* Set power save -> Power OFF (VDD - VSS) .. that's it */
-    if (initialized && remote_detect())
+    if (initialized)
         lcd_write_command(LCD_SET_POWER_SAVE | 1);
 }
 
@@ -421,9 +421,9 @@ void lcd_init_device(void)
     or_l(0x40000000, &GPIO_FUNCTION);
 
     lcd_clear_display();
-#ifdef BOOTLOADER
-    lcd_on();
-#else
+    if (remote_detect())
+        lcd_on();
+#ifndef BOOTLOADER
     tick_add_task(lcd_tick);
 #endif
 }
