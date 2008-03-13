@@ -77,7 +77,7 @@
 /* Define this if you can detect headphones */
 #define HAVE_HEADPHONE_DETECTION
 
-#define BATTERY_CAPACITY_DEFAULT 630 /* default battery capacity */
+#define BATTERY_CAPACITY_DEFAULT 1200 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1200  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 1900 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
@@ -85,6 +85,9 @@
 
 /* Hardware controlled charging? FIXME */
 //#define CONFIG_CHARGING CHARGING_SIMPLE
+
+/* FIXME: Don't shutdown on low battery until we have proper suspend. */
+#define NO_LOW_BATTERY_SHUTDOWN
 
 #ifndef SIMULATOR
 
