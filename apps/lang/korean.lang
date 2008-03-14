@@ -795,7 +795,7 @@
   desc: in setting_menu()
   user:
   <source>
-    *: "Browse .cfg files"
+    *: "Browse .cfg Files"
   </source>
   <dest>
     *: "설정 파일 보기"
@@ -933,7 +933,7 @@
   desc: in system_settings_menu()
   user:
   <source>
-    *: "Write .cfg file"
+    *: "Save .cfg File"
   </source>
   <dest>
     *: "설정 파일 만들기"
@@ -1731,7 +1731,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Initialize now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "지금 초기화하기"
@@ -3960,7 +3960,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max Files in Dir Browser"
+    *: "Max Entries in File Browser"
   </source>
   <dest>
     *: "폴더 내 최대 파일 수"
@@ -4282,7 +4282,7 @@
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert next"
+    *: "Insert Next"
   </source>
   <dest>
     *: "다음곡으로 삽입"
@@ -4296,7 +4296,7 @@
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert last"
+    *: "Insert Last"
   </source>
   <dest>
     *: "마지막곡에 삽입"
@@ -4310,7 +4310,7 @@
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </source>
   <dest>
     *: "임의순서로 삽입"
@@ -4338,7 +4338,7 @@
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Queue next"
+    *: "Queue Next"
   </source>
   <dest>
     *: "다음곡으로 예약"
@@ -4352,7 +4352,7 @@
   desc: in onplay menu.  queue a track/playlist at end of playlist.
   user:
   <source>
-    *: "Queue last"
+    *: "Queue Last"
   </source>
   <dest>
     *: "마지막곡에 예약"
@@ -4366,7 +4366,7 @@
   desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </source>
   <dest>
     *: "임의순서로 예약"

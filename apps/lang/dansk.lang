@@ -742,7 +742,7 @@
   desc: in setting_menu()
   user:
   <source>
-    *: "Browse .cfg files"
+    *: "Browse .cfg Files"
   </source>
   <dest>
     *: "Vis indstillings filer"
@@ -784,7 +784,7 @@
   desc: in system_settings_menu()
   user:
   <source>
-    *: "Write .cfg file"
+    *: "Save .cfg File"
   </source>
   <dest>
     *: "Skriv indstillings fil"
@@ -3259,7 +3259,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max Files in Dir Browser"
+    *: "Max Entries in File Browser"
   </source>
   <dest>
     *: "Maks filer i fil-browser"
@@ -3483,7 +3483,7 @@
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert next"
+    *: "Insert Next"
   </source>
   <dest>
     *: "Indsæt som næste"
@@ -3497,7 +3497,7 @@
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert last"
+    *: "Insert Last"
   </source>
   <dest>
     *: "Indsæt til sidst"
@@ -3511,7 +3511,7 @@
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </source>
   <dest>
     *: "Indsæt blandet"
@@ -3539,7 +3539,7 @@
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Queue next"
+    *: "Queue Next"
   </source>
   <dest>
     *: "Sæt i kø som næste"
@@ -3553,7 +3553,7 @@
   desc: in onplay menu.  queue a track/playlist at end of playlist.
   user:
   <source>
-    *: "Queue last"
+    *: "Queue Last"
   </source>
   <dest>
     *: "Sæt i køen sidst"
@@ -3873,6 +3873,7 @@
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
   </source>
   <dest>
     *: "SLUK: Fortryd"
@@ -3882,6 +3883,7 @@
     x5,m5: "OPTAG = Fortryd"
     h10,h10_5gb: "FORRIGE = Fortryd"
     gigabeatf: "TÆND/SLUK = Fortryd"
+    mrobe100: "VIS = Fortryd"
   </dest>
   <voice>
     *: none
@@ -6949,7 +6951,7 @@
   desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </source>
   <dest>
     *: "Sæt i kø blandet"
@@ -7245,7 +7247,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Initialize now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "Genopbyg database"
@@ -9298,14 +9300,14 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
+    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Bygger database... %d fundet (SLUK for at stoppe)"
     h100,h120,h300: "Bygger database... %d fundet (STOP for at stoppe)"
     ipod*: "Bygger database... %d fundet (SPIL/PAUSE for at stoppe)"
-    x5,m5: "Bygger database... %d fundet (VENSTRE for at stoppe)"
+    x5,m5,gigabeatf,mrobe100: "Bygger database... %d fundet (VENSTRE for at stoppe)"
     h10,h10_5gb,e200,c200: "Bygger database... %d fundet (FORRIGE for at stoppe)"
   </dest>
   <voice>
@@ -10536,13 +10538,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPIL = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "VÆLG = Ja"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "VÆLG = Ja"
     player: "(SPIL/STOP)"
   </dest>
   <voice>
@@ -10560,13 +10562,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "Tænd = Indstil"
     h100,h120,h300: "NAVI = Indstil"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "VÆLG = Indstil"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "VÆLG = Indstil"
   </dest>
   <voice>
     *: none
@@ -10625,7 +10627,7 @@
   desc: 
   user:
   <source>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </source>
   <dest>
     *: "Tilføj til genveje"
@@ -11248,7 +11250,7 @@
   desc: voice settings menu
   user:
   <source>
-    *: "Say file type"
+    *: "Say File Type"
   </source>
   <dest>
     *: "Sig filtype"

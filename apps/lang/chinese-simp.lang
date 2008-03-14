@@ -750,7 +750,7 @@
   desc: in setting_menu()
   user: 
   <source>
-    *: "Browse .cfg files"
+    *: "Browse .cfg Files"
   </source>
   <dest>
     *: "浏览.cfg文件"
@@ -792,7 +792,7 @@
   desc: in system_settings_menu()
   user: 
   <source>
-    *: "Write .cfg file"
+    *: "Save .cfg File"
   </source>
   <dest>
     *: "保存.cfg文件"
@@ -1508,7 +1508,7 @@
   desc: in tag cache settings
   user: 
   <source>
-    *: "Initialize now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "立即初始化"
@@ -3832,7 +3832,7 @@
   desc: in settings_menu
   user: 
   <source>
-    *: "Max Files in Dir Browser"
+    *: "Max Entries in File Browser"
   </source>
   <dest>
     *: "目录浏览器最大文件数"
@@ -4146,7 +4146,7 @@
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
   user: 
   <source>
-    *: "Insert next"
+    *: "Insert Next"
   </source>
   <dest>
     *: "插入下一个"
@@ -4160,7 +4160,7 @@
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user: 
   <source>
-    *: "Insert last"
+    *: "Insert Last"
   </source>
   <dest>
     *: "插入到最后"
@@ -4174,7 +4174,7 @@
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
   user: 
   <source>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </source>
   <dest>
     *: "乱序插入"
@@ -4202,7 +4202,7 @@
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
   user: 
   <source>
-    *: "Queue next"
+    *: "Queue Next"
   </source>
   <dest>
     *: "队列中下一个"
@@ -4216,7 +4216,7 @@
   desc: in onplay menu.  queue a track/playlist at end of playlist.
   user: 
   <source>
-    *: "Queue last"
+    *: "Queue Last"
   </source>
   <dest>
     *: "队列最后"
@@ -4230,7 +4230,7 @@
   desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
   user: 
   <source>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </source>
   <dest>
     *: "随机队列"
@@ -9520,7 +9520,7 @@
   desc: 
   user: 
   <source>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </source>
   <dest>
     *: "添加到快捷"
@@ -11231,7 +11231,7 @@
   desc: voice settings menu
   user: 
   <source>
-    *: "Say file type"
+    *: "Say File Type"
   </source>
   <dest>
     *: "读出文件格式"

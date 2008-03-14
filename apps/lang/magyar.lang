@@ -2401,13 +2401,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Initialize now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "Indítás most"
   </dest>
   <voice>
-    *: "Initialize now"
+    *: "Initialize Now"
   </voice>
 </phrase>
 <phrase>
@@ -4519,7 +4519,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max Files in Dir Browser"
+    *: "Max Entries in File Browser"
   </source>
   <dest>
     *: "Könyvtárban mutatott fájlok max. száma"
@@ -4968,7 +4968,7 @@
   desc: in setting_menu()
   user:
   <source>
-    *: "Browse .cfg files"
+    *: "Browse .cfg Files"
   </source>
   <dest>
     *: "Konfig fájl választás"
@@ -5024,7 +5024,7 @@
   desc: in system_settings_menu()
   user:
   <source>
-    *: "Write .cfg file"
+    *: "Save .cfg File"
   </source>
   <dest>
     *: "Konfigurációs fájl írása"
@@ -7011,13 +7011,13 @@
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert next"
+    *: "Insert Next"
   </source>
   <dest>
     *: "Beillesztés következőnek"
   </dest>
   <voice>
-    *: "Insert next"
+    *: "Insert Next"
   </voice>
 </phrase>
 <phrase>
@@ -7025,13 +7025,13 @@
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert last"
+    *: "Insert Last"
   </source>
   <dest>
     *: "Beillesztés utolsóként"
   </dest>
   <voice>
-    *: "Insert last"
+    *: "Insert Last"
   </voice>
 </phrase>
 <phrase>
@@ -7039,13 +7039,13 @@
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </source>
   <dest>
     *: "Beillesztés véletlen sorrendben"
   </dest>
   <voice>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </voice>
 </phrase>
 <phrase>
@@ -7067,13 +7067,13 @@
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Queue next"
+    *: "Queue Next"
   </source>
   <dest>
     *: "Ez lesz a következő"
   </dest>
   <voice>
-    *: "Queue next"
+    *: "Queue Next"
   </voice>
 </phrase>
 <phrase>
@@ -7081,13 +7081,13 @@
   desc: in onplay menu.  queue a track/playlist at end of playlist.
   user:
   <source>
-    *: "Queue last"
+    *: "Queue Last"
   </source>
   <dest>
     *: "Ez lesz az utolsó"
   </dest>
   <voice>
-    *: "Queue last"
+    *: "Queue Last"
   </voice>
 </phrase>
 <phrase>
@@ -7095,13 +7095,13 @@
   desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </source>
   <dest>
     *: "Felveszem véletlen helyre"
   </dest>
   <voice>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </voice>
 </phrase>
 <phrase>
@@ -7888,13 +7888,13 @@
   desc:
   user:
   <source>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </dest>
   <voice>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </voice>
 </phrase>
 <phrase>

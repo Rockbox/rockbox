@@ -2403,7 +2403,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Initialize now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "Иницијализуј одмах"
@@ -4522,7 +4522,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max Files in Dir Browser"
+    *: "Max Entries in File Browser"
   </source>
   <dest>
     *: "Макс датотека у претраживачу дир"
@@ -4973,7 +4973,7 @@
   desc: in setting_menu()
   user:
   <source>
-    *: "Browse .cfg files"
+    *: "Browse .cfg Files"
   </source>
   <dest>
     *: "Прегледај .cfg датотеке"
@@ -5029,7 +5029,7 @@
   desc: in system_settings_menu()
   user:
   <source>
-    *: "Write .cfg file"
+    *: "Save .cfg File"
   </source>
   <dest>
     *: "Запиши .cfg датотеку"
@@ -7017,7 +7017,7 @@
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert next"
+    *: "Insert Next"
   </source>
   <dest>
     *: "Уметни наредну"
@@ -7031,7 +7031,7 @@
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert last"
+    *: "Insert Last"
   </source>
   <dest>
     *: "Уметни последњу"
@@ -7045,7 +7045,7 @@
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </source>
   <dest>
     *: "Уметни промешано"
@@ -7073,7 +7073,7 @@
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Queue next"
+    *: "Queue Next"
   </source>
   <dest>
     *: "Стави следећу у ред"
@@ -7087,7 +7087,7 @@
   desc: in onplay menu.  queue a track/playlist at end of playlist.
   user:
   <source>
-    *: "Queue last"
+    *: "Queue Last"
   </source>
   <dest>
     *: "Стави последњу у ред"
@@ -7101,7 +7101,7 @@
   desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </source>
   <dest>
     *: "Стави у ред промешано"
@@ -7894,7 +7894,7 @@
   desc:
   user:
   <source>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </source>
   <dest>
     *: "Додај у пречице"
@@ -11401,7 +11401,7 @@
   desc: voice settings menu
   user:
   <source>
-    *: "Say file type"
+    *: "Say File Type"
   </source>
   <dest>
     *: "Реци тип датотеке"

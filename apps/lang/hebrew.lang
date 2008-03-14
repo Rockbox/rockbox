@@ -678,7 +678,7 @@
   desc: in setting_menu()
   user:
   <source>
-    *: "Browse .cfg files"
+    *: "Browse .cfg Files"
   </source>
   <dest>
     *: ".cfg הצג קבצי"
@@ -720,7 +720,7 @@
   desc: in system_settings_menu()
   user:
   <source>
-    *: "Write .cfg file"
+    *: "Save .cfg File"
   </source>
   <dest>
     *: ".cfg יצירת קובץ"
@@ -2794,7 +2794,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max Files in Dir Browser"
+    *: "Max Entries in File Browser"
   </source>
   <dest>
     *: "מספר קבצים מקסימלי בספריה"
@@ -3018,13 +3018,13 @@
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert next"
+    *: "Insert Next"
   </source>
   <dest>
     *: "הכנס הבא בתור"
   </dest>
   <voice>
-    *: "Insert next"
+    *: "Insert Next"
   </voice>
 </phrase>
 <phrase>
@@ -3032,13 +3032,13 @@
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert last"
+    *: "Insert Last"
   </source>
   <dest>
     *: "הכנס אחרון"
   </dest>
   <voice>
-    *: "Insert last"
+    *: "Insert Last"
   </voice>
 </phrase>
 <phrase>
@@ -3046,13 +3046,13 @@
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </source>
   <dest>
     *: "הכנס במעורבב"
   </dest>
   <voice>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </voice>
 </phrase>
 <phrase>
@@ -3074,13 +3074,13 @@
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Queue next"
+    *: "Queue Next"
   </source>
   <dest>
     *: "העמד הבא בתור"
   </dest>
   <voice>
-    *: "Queue next"
+    *: "Queue Next"
   </voice>
 </phrase>
 <phrase>
@@ -3088,13 +3088,13 @@
   desc: in onplay menu.  queue a track/playlist at end of playlist.
   user:
   <source>
-    *: "Queue last"
+    *: "Queue Last"
   </source>
   <dest>
     *: "העמד אחרון בתור"
   </dest>
   <voice>
-    *: "Queue last"
+    *: "Queue Last"
   </voice>
 </phrase>
 <phrase>
@@ -6425,13 +6425,13 @@
   desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </source>
   <dest>
     *: "העמד בתור במעורבב"
   </dest>
   <voice>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </voice>
 </phrase>
 <phrase>
@@ -7029,7 +7029,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Initialize now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "אתחל עכשיו"
@@ -10721,13 +10721,13 @@
   desc: 
   user: 
   <source>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </source>
   <dest>
     *: "הוסף לקיצורים"
   </dest>
   <voice>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </voice>
 </phrase>
 <phrase>

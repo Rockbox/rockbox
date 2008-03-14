@@ -740,7 +740,7 @@
   desc: in setting_menu()
   user: 
   <source>
-    *: "Browse .cfg files"
+    *: "Browse .cfg Files"
   </source>
   <dest>
     *: "Przeglądaj pliki .cfg"
@@ -782,7 +782,7 @@
   desc: in system_settings_menu()
   user: 
   <source>
-    *: "Write .cfg file"
+    *: "Save .cfg File"
   </source>
   <dest>
     *: "Zapisz plik .cfg"
@@ -1498,7 +1498,7 @@
   desc: in tag cache settings
   user: 
   <source>
-    *: "Initialize now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "Zainicjuj teraz"
@@ -3822,7 +3822,7 @@
   desc: in settings_menu
   user: 
   <source>
-    *: "Max Files in Dir Browser"
+    *: "Max Entries in File Browser"
   </source>
   <dest>
     *: "Maks. plików w przeglądarce katalogów"
@@ -4136,7 +4136,7 @@
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
   user: 
   <source>
-    *: "Insert next"
+    *: "Insert Next"
   </source>
   <dest>
     *: "Wstaw za bieżącą"
@@ -4150,7 +4150,7 @@
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user: 
   <source>
-    *: "Insert last"
+    *: "Insert Last"
   </source>
   <dest>
     *: "Wstaw na koniec"
@@ -4164,7 +4164,7 @@
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
   user: 
   <source>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </source>
   <dest>
     *: "Wstaw losowo"
@@ -4192,7 +4192,7 @@
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
   user: 
   <source>
-    *: "Queue next"
+    *: "Queue Next"
   </source>
   <dest>
     *: "Na początek kolejki"
@@ -4206,7 +4206,7 @@
   desc: in onplay menu.  queue a track/playlist at end of playlist.
   user: 
   <source>
-    *: "Queue last"
+    *: "Queue Last"
   </source>
   <dest>
     *: "Na koniec kolejki"
@@ -4220,7 +4220,7 @@
   desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
   user: 
   <source>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </source>
   <dest>
     *: "Losowo do kolejki"
@@ -10234,7 +10234,7 @@
   desc: 
   user: 
   <source>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </source>
   <dest>
     *: "Dodaj do skrótów"
@@ -11058,7 +11058,7 @@
   desc: voice settings menu
   user: 
   <source>
-    *: "Say file type"
+    *: "Say File Type"
   </source>
   <dest>
     *: "Wymawiaj rozszerzenia plików"

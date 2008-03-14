@@ -750,7 +750,7 @@
   desc: in setting_menu()
   user:
   <source>
-    *: "Browse .cfg files"
+    *: "Browse .cfg Files"
   </source>
   <dest>
     *: "瀏覽.cfg檔案"
@@ -792,7 +792,7 @@
   desc: in system_settings_menu()
   user:
   <source>
-    *: "Write .cfg file"
+    *: "Save .cfg File"
   </source>
   <dest>
     *: "寫出.cfg檔案"
@@ -1508,13 +1508,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Initialize now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "即刻初始化"
   </dest>
   <voice>
-    *: "Initialize now"
+    *: "Initialize Now"
   </voice>
 </phrase>
 <phrase>
@@ -3832,7 +3832,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max Files in Dir Browser"
+    *: "Max Entries in File Browser"
   </source>
   <dest>
     *: "目錄瀏覽器最大檔案數"
@@ -4146,13 +4146,13 @@
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert next"
+    *: "Insert Next"
   </source>
   <dest>
     *: "插入下一個"
   </dest>
   <voice>
-    *: "Insert next"
+    *: "Insert Next"
   </voice>
 </phrase>
 <phrase>
@@ -4160,13 +4160,13 @@
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert last"
+    *: "Insert Last"
   </source>
   <dest>
     *: "插入到最後"
   </dest>
   <voice>
-    *: "Insert last"
+    *: "Insert Last"
   </voice>
 </phrase>
 <phrase>
@@ -4174,13 +4174,13 @@
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </source>
   <dest>
     *: "亂序插入"
   </dest>
   <voice>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </voice>
 </phrase>
 <phrase>
@@ -4202,13 +4202,13 @@
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Queue next"
+    *: "Queue Next"
   </source>
   <dest>
     *: "隊列中下一個"
   </dest>
   <voice>
-    *: "Queue next"
+    *: "Queue Next"
   </voice>
 </phrase>
 <phrase>
@@ -4216,13 +4216,13 @@
   desc: in onplay menu.  queue a track/playlist at end of playlist.
   user:
   <source>
-    *: "Queue last"
+    *: "Queue Last"
   </source>
   <dest>
     *: "隊列最后"
   </dest>
   <voice>
-    *: "Queue last"
+    *: "Queue Last"
   </voice>
 </phrase>
 <phrase>
@@ -4230,13 +4230,13 @@
   desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </source>
   <dest>
     *: "隨機隊列"
   </dest>
   <voice>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </voice>
 </phrase>
 <phrase>
@@ -9530,13 +9530,13 @@
   desc: 
   user:
   <source>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </source>
   <dest>
     *: "添加到快捷"
   </dest>
   <voice>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </voice>
 </phrase>
 <phrase>
@@ -11241,13 +11241,13 @@
   desc: voice settings menu
   user: 
   <source>
-    *: "Say file type"
+    *: "Say File Type"
   </source>
   <dest>
     *: "讀出文件格式"
   </dest>
   <voice>
-    *: "Say file type"
+    *: "Say File Type"
   </voice>
 </phrase>
 <phrase>

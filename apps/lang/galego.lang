@@ -703,7 +703,7 @@
   desc: in setting_menu()
   user:
   <source>
-    *: "Browse .cfg files"
+    *: "Browse .cfg Files"
   </source>
   <dest>
     *: "Visualizar arquivos de configuración"
@@ -830,7 +830,7 @@
   desc: in system_settings_menu()
   user:
   <source>
-    *: "Write .cfg file"
+    *: "Save .cfg File"
   </source>
   <dest>
     *: "Escribir archivo .cfg"
@@ -3014,13 +3014,13 @@
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert next"
+    *: "Insert Next"
   </source>
   <dest>
     *: "Insertar como próximo"
   </dest>
   <voice>
-    *: "Insert next"
+    *: "Insert Next"
   </voice>
 </phrase>
 <phrase>
@@ -3028,13 +3028,13 @@
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert last"
+    *: "Insert Last"
   </source>
   <dest>
     *: "Insertar de último"
   </dest>
   <voice>
-    *: "Insert last"
+    *: "Insert Last"
   </voice>
 </phrase>
 <phrase>
@@ -3042,13 +3042,13 @@
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </source>
   <dest>
     *: "Insertar desordenado"
   </dest>
   <voice>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </voice>
 </phrase>
 <phrase>
@@ -3070,13 +3070,13 @@
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Queue next"
+    *: "Queue Next"
   </source>
   <dest>
     *: "Poñer seguinte na cola"
   </dest>
   <voice>
-    *: "Queue next"
+    *: "Queue Next"
   </voice>
 </phrase>
 <phrase>
@@ -3084,13 +3084,13 @@
   desc: in onplay menu.  queue a track/playlist at end of playlist.
   user:
   <source>
-    *: "Queue last"
+    *: "Queue Last"
   </source>
   <dest>
     *: "Poñer último na cola"
   </dest>
   <voice>
-    *: "Queue last"
+    *: "Queue Last"
   </voice>
 </phrase>
 <phrase>

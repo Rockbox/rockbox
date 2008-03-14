@@ -2400,7 +2400,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Initialize now"
+    *: "Initialize Now"
   </source>
   <dest>
     *: "Neu generieren"
@@ -4522,7 +4522,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max Files in Dir Browser"
+    *: "Max Entries in File Browser"
   </source>
   <dest>
     *: "Max Anzahl Dateien in Verzeichnisanzeige"
@@ -4973,7 +4973,7 @@
   desc: in setting_menu()
   user:
   <source>
-    *: "Browse .cfg files"
+    *: "Browse .cfg Files"
   </source>
   <dest>
     *: "Zeige .cfg-Dateien"
@@ -5029,7 +5029,7 @@
   desc: in system_settings_menu()
   user:
   <source>
-    *: "Write .cfg file"
+    *: "Save .cfg File"
   </source>
   <dest>
     *: "Schreibe .cfg-Datei"
@@ -7036,7 +7036,7 @@
   desc: in onplay menu.  insert a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert next"
+    *: "Insert Next"
   </source>
   <dest>
     *: "Einfügen als Nächsten"
@@ -7050,7 +7050,7 @@
   desc: in onplay menu.  append a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Insert last"
+    *: "Insert Last"
   </source>
   <dest>
     *: "Einfügen als Letzten"
@@ -7064,7 +7064,7 @@
   desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Insert shuffled"
+    *: "Insert Shuffled"
   </source>
   <dest>
     *: "Zufällig einfügen"
@@ -7092,7 +7092,7 @@
   desc: in onplay menu.  queue a track/playlist into dynamic playlist.
   user:
   <source>
-    *: "Queue next"
+    *: "Queue Next"
   </source>
   <dest>
     *: "Warteschlange als Nächsten"
@@ -7106,7 +7106,7 @@
   desc: in onplay menu.  queue a track/playlist at end of playlist.
   user:
   <source>
-    *: "Queue last"
+    *: "Queue Last"
   </source>
   <dest>
     *: "Warteschlange als Letzten"
@@ -7120,7 +7120,7 @@
   desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
   user:
   <source>
-    *: "Queue shuffled"
+    *: "Queue Shuffled"
   </source>
   <dest>
     *: "Zufällig in Warteschlange"
@@ -7913,7 +7913,7 @@
   desc:
   user:
   <source>
-    *: "Add to shortcuts"
+    *: "Add to Shortcuts"
   </source>
   <dest>
     *: "Zu Verknüpfungen hinzufügen"
@@ -11396,7 +11396,7 @@
   desc: voice settings menu
   user:
   <source>
-    *: "Say file type"
+    *: "Say File Type"
   </source>
   <dest>
     *: "Dateityp ansagen"
