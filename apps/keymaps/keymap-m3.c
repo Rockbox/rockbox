@@ -292,7 +292,7 @@ static const struct button_mapping button_context_tree[]  = {
 static const struct button_mapping remote_button_context_tree[]  = {
     { ACTION_NONE,            BUTTON_RC_PLAY,                BUTTON_NONE },
     { ACTION_TREE_WPS,        BUTTON_RC_PLAY|BUTTON_REL,     BUTTON_RC_PLAY },
-    { ACTION_TREE_WPS,        BUTTON_RC_PLAY|BUTTON_REPEAT,  BUTTON_RC_PLAY },
+    { ACTION_TREE_STOP,       BUTTON_RC_PLAY|BUTTON_REPEAT,  BUTTON_RC_PLAY },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* remote_button_context_tree */
