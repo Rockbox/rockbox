@@ -424,8 +424,10 @@ void screen_dump(void)
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     static unsigned char line_block[BMP_LINESIZE];
-#else
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
     static unsigned char line_block[4][BMP_LINESIZE];
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+    static unsigned char line_block[8][BMP_LINESIZE];
 #endif
 #elif LCD_DEPTH == 16
     static unsigned short line_block[BMP_LINESIZE/2];
@@ -501,7 +503,7 @@ void screen_dump(void)
 
             write(fh, line_block, sizeof(line_block));
         }
-#else /* VERTICAL_PACKING */
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
         for (by = LCD_FBHEIGHT - 1; by >= 0; by--)
         {
             unsigned char *src = &lcd_framebuffer[by][0];
@@ -511,15 +513,41 @@ void screen_dump(void)
             for (bx = LCD_WIDTH/2; bx > 0; bx--)
             {
                 unsigned char *dst_blk = dst++;
-                unsigned src_byte0 = *src++;
+                unsigned src_byte0 = *src++ << 4;
                 unsigned src_byte1 = *src++;
                 int iy;
 
                 for (iy = 4; iy > 0; iy--)
                 {
-                    *dst_blk = ((src_byte0 & 3) << 4) | (src_byte1 & 3);
+                    *dst_blk = (src_byte0 & 0x30) | (src_byte1 & 0x03);
                     src_byte0 >>= 2;
                     src_byte1 >>= 2;
+                    dst_blk -= BMP_LINESIZE;
+                }
+            }
+
+            write(fh, line_block, sizeof(line_block));
+        }
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+        for (by = LCD_FBHEIGHT - 1; by >= 0; by--)
+        {
+            const fb_data *src = &lcd_framebuffer[by][0];
+            unsigned char *dst = &line_block[7][0];
+
+            memset(line_block, 0, sizeof(line_block));
+            for (bx = LCD_WIDTH/2; bx > 0; bx--)
+            {
+                unsigned char *dst_blk = dst++;
+                unsigned src_data0 = *src++ << 4;
+                unsigned src_data1 = *src++;
+                int iy;
+
+                for (iy = 8; iy > 0; iy--)
+                {
+                    *dst_blk = (src_data0 & 0x10) | (src_data1 & 0x01)
+                             | ((src_data0 & 0x1000) | (src_data1 & 0x0100)) >> 7;
+                    src_data0 >>= 1;
+                    src_data1 >>= 1;
                     dst_blk -= BMP_LINESIZE;
                 }
             }
