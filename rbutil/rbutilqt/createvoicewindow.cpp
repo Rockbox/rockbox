@@ -36,7 +36,7 @@ void CreateVoiceWindow::change()
     Config *cw = new Config(this,4);
     cw->setSettings(settings);
     cw->show();
-    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(settingsUpdated()));
+    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
 }
 
 void CreateVoiceWindow::accept()
@@ -70,13 +70,13 @@ void CreateVoiceWindow::accept()
 void CreateVoiceWindow::setSettings(RbSettings* sett)
 {
     settings = sett;
-    settingsUpdated();
+    updateSettings();
 }
 
 
 /** @brief update displayed settings
  */
-void CreateVoiceWindow::settingsUpdated(void)
+void CreateVoiceWindow::updateSettings(void)
 {
     // fill in language combobox
     QStringList languages = settings->allLanguages();
@@ -118,7 +118,7 @@ void CreateVoiceWindow::settingsUpdated(void)
     else
         ui.labelEncProfile->setText(tr("Selected Encoder: <b>%1</b>").arg("Invalid encoder configuration!"));
     ui.wavtrimthreshold->setValue(settings->wavtrimTh());
-
+    emit settingsUpdated();
 }
 
 

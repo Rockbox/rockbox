@@ -38,6 +38,9 @@ class CreateVoiceWindow : public QDialog
     public slots:
         void accept(void);
         void change(void);
+        void updateSettings(void);
+
+    signals:
         void settingsUpdated(void);
 
     private:
