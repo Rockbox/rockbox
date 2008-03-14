@@ -1249,7 +1249,7 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iaudio"
     appextra="recorder:gui"
-    plugins="no"
+    plugins=""
     swcodec="yes"
     toolset="$tccbitmaptools"
     # architecture, manufacturer and model for the target-tree build
@@ -1269,7 +1269,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 7"
     output="rockbox.iaudio"
     appextra="recorder:gui"
-    plugins="no"
+    plugins=""
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1388,7 +1388,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.logik"
     appextra="recorder:gui"
-    plugins="no"
+    plugins=""
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
