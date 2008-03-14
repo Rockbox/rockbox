@@ -54,12 +54,6 @@ int button_read_device(void)
     hold_button_old = hold_button;
     hold_button = button_hold();
 
-#ifndef BOOTLOADER
-    /* give BL notice if HB state chaged */
-    if (hold_button != hold_button_old)
-        backlight_hold_changed(hold_button);
-#endif
-
     if (!hold_button)
     {
 #if 0 /* TODO: implement ADC */
@@ -83,7 +77,7 @@ int button_read_device(void)
 
 #ifndef BOOTLOADER
     if (remote_hold_button != remote_hold_button_old)
-        remote_backlight_hold_changed(remote_hold_button);
+        backlight_hold_changed(remote_hold_button);
 #endif
 
     if (!remote_hold_button)

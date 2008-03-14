@@ -496,13 +496,19 @@ target/coldfire/iaudio/m5/audio-m5.c
 #ifdef IAUDIO_M3
 #ifndef SIMULATOR
 target/coldfire/ata-as-coldfire.S
+target/coldfire/iaudio/m3/adc-m3.c
 target/coldfire/iaudio/m3/ata-m3.c
 target/coldfire/iaudio/m3/backlight-m3.c
 target/coldfire/iaudio/m3/button-m3.c
+target/coldfire/iaudio/m3/fmradio_i2c-m3.c
 target/coldfire/iaudio/m3/lcd-m3.c
 target/coldfire/iaudio/m3/power-m3.c
 target/coldfire/iaudio/m3/system-m3.c
+target/coldfire/iaudio/m3/usb-m3.c
 target/coldfire/iaudio/powermgmt-iaudio.c
+#ifndef BOOTLOADER
+target/coldfire/iaudio/m3/audio-m3.c
+#endif
 #endif /* SIMULATOR */
 #endif /* IAUDIO_M3 */
 

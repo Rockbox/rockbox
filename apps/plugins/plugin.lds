@@ -34,7 +34,7 @@ OUTPUT_FORMAT(elf32-sh)
 #define ARCH_IRIVER
 #endif
 
-#ifdef ARCH_IRIVER
+#if defined(ARCH_IRIVER) || defined(IAUDIO_M3)
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x1000c000
 #define IRAMSIZE 0xc000

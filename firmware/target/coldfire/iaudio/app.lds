@@ -18,7 +18,11 @@ INPUT(target/coldfire/crt0.o)
 
 #define DRAMORIG 0x31000000 + STUBOFFSET
 #define IRAMORIG 0x10000000
+#ifdef IAUDIO_M3
+#define IRAMSIZE 0xc000
+#else
 #define IRAMSIZE 0x10000
+#endif
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)

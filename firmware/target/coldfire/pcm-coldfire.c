@@ -78,7 +78,7 @@ static const unsigned char pcm_freq_parms[HW_NUM_FREQ][3] =
 };
 #endif
 
-#if CONFIG_CPU == MCF5250 && defined(HAVE_TLV320)
+#if (CONFIG_CPU == MCF5250 || CONFIG_CPU == MCF5249) && defined(HAVE_TLV320)
 static const unsigned char pcm_freq_parms[HW_NUM_FREQ][3] =
 {
     [HW_FREQ_88] = { 0x0c, 0x01, 0x02 },

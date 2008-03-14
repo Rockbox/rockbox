@@ -19,59 +19,14 @@
 
 #include "config.h"
 #include "cpu.h"
-#include <stdbool.h>
-#include "kernel.h"
 #include "system.h"
-#include "power.h"
+#include "kernel.h"
+#include "thread.h"
+#include "adc.h"
 
-#ifndef SIMULATOR
-
-void power_init(void)
-{   
-    /* Set KEEPACT */
-    or_l(0x00040000, &GPIO_OUT); 
-    or_l(0x00040000, &GPIO_ENABLE);
-    or_l(0x00040000, &GPIO_FUNCTION);
-
-    /* Charger detect */
-    and_l(~0x00000020, &GPIO1_ENABLE);
-    or_l(0x00000020, &GPIO1_FUNCTION);
-}
-
-bool charger_inserted(void)
-{     
-    return (GPIO1_READ & 0x00000020) == 0;
-}
-
-void ide_power_enable(bool on)
+unsigned short adc_scan(int channel)
 {
-    if (on)
-    {
-        or_l(0x00800000, &GPIO_OUT);
-    }
-    else
-    {
-        and_l(~0x00800000, &GPIO_OUT);
-    }
-}
-
-bool ide_powered(void)
-{
-    return false;
-}
-
-void power_off(void)
-{
-    lcd_poweroff();
-    set_irq_level(DISABLE_INTERRUPTS);
-    and_l(~0x00040000, &GPIO_OUT); /* Set KEEPACT low */
-    asm("halt");
-}
-
-#endif /* SIMULATOR */
-
-bool tuner_power(bool status)
-{
-    (void)status;
-    return true;
+    /* TODO */
+    (void)channel;
+    return 0xff;
 }

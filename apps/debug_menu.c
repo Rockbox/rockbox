@@ -1002,6 +1002,9 @@ static bool dbg_spdif(void)
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #   define DEBUG_CANCEL  BUTTON_REC
 
+#elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
+#   define DEBUG_CANCEL  BUTTON_RC_REC
+
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #   define DEBUG_CANCEL  BUTTON_REW
 
@@ -2050,7 +2053,7 @@ static bool dbg_save_roms(void)
     fd = creat("/internal_rom_000000-1FFFFF.bin");
 #elif defined(IRIVER_H300_SERIES)
     fd = creat("/internal_rom_000000-3FFFFF.bin");
-#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
+#elif defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(IAUDIO_M3)
     fd = creat("/internal_rom_000000-3FFFFF.bin");
 #endif
     if(fd >= 0)
