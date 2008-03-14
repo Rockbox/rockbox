@@ -45,8 +45,11 @@ static unsigned long get_lcd_pixel(int x, int y)
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     return ((lcd_framebuffer[y][x/4] >> (2 * (~x & 3))) & 3);
-#else
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
     return ((lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3);
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+    unsigned bits = (lcd_framebuffer[y/8][x] >> (y & 7)) & 0x0101;
+    return (bits | (bits >> 7)) & 3;
 #endif
 #elif LCD_DEPTH == 16
 #if LCD_PIXELFORMAT == RGB565SWAPPED

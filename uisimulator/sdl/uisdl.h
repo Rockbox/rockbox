@@ -232,6 +232,19 @@
 #define UI_REMOTE_WIDTH             128
 #define UI_REMOTE_HEIGHT            96
 
+#elif defined(IAUDIO_M3)
+#define UI_TITLE                    "iAudio M3"
+#define UI_WIDTH                    397 /* width of GUI window */
+#define UI_HEIGHT                   501 /* height of GUI window */
+#define UI_LCD_POSX                 92  /* x position of lcd */
+#define UI_LCD_POSY                 348 /* y position of lcd */
+#define UI_LCD_BGCOLOR              90, 145, 90   /* bkgnd color of LCD (no bklight) */
+#define UI_LCD_BGCOLORLIGHT         130, 180, 250 /* bkgnd color of LCD (bklight) */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
+#define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
+#define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
+
 #elif defined(GIGABEAT_F)
 #define UI_TITLE                    "Toshiba Gigabeat"
 #define UI_WIDTH                    401 /* width of GUI window */
