@@ -153,6 +153,8 @@ keymaps/keymap-ondio.c
 keymaps/keymap-player.c
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 keymaps/keymap-x5.c
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+keymaps/keymap-m3.c
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 keymaps/keymap-gigabeat.c
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
