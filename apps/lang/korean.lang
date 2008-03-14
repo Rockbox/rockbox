@@ -7670,7 +7670,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Force mono"
+    *: "Force Mono"
   </source>
   <dest>
     *: "모노로 듣기"

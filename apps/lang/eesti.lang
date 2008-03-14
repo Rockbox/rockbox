@@ -7605,10 +7605,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Force mono"
+    *: "Force Mono"
   </source>
   <dest>
-    *: "Force mono"
+    *: "Force Mono"
   </dest>
   <voice>
     *: ""

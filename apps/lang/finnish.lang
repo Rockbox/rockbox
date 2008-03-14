@@ -7162,7 +7162,7 @@
   user:
   <source>
     *: none
-    radio: "Force mono"
+    radio: "Force Mono"
   </source>
   <dest>
     *: none

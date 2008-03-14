@@ -5341,7 +5341,7 @@
   user:
   <source>
     *: none
-    radio: "Force mono"
+    radio: "Force Mono"
   </source>
   <dest>
     *: none
@@ -5349,7 +5349,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Force mono"
+    radio: "Force Mono"
   </voice>
 </phrase>
 <phrase>

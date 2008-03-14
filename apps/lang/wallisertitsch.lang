@@ -5508,7 +5508,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Force mono"
+    *: "Force Mono"
   </source>
   <dest>
     *: "Mono erzwingu"
