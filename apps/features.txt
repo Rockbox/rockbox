@@ -1,8 +1,8 @@
 /* This file controls which strings are included when rockbox is built and
    when the .lng and .voice files are built. That means that a change in this
-   file will break compatiblity with older .lng and .voice files and that those
+   file will break compatibility with older .lng and .voice files and that those
    version numbers should be updated. It also means that changing defines in
-   the various config*.h files could also break back compatiblity */  
+   the various config*.h files could also break back compatibility */  
 
 #if defined(HAVE_AGC)
 agc
