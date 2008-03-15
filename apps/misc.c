@@ -1083,7 +1083,7 @@ void setvol(void)
 
 static int hex2dec(int c)
 {
-   return  (((c) >= '0' && ((c) <= '9')) ? (toupper(c)) - '0' :
+   return  (((c) >= '0' && ((c) <= '9')) ? (c) - '0' :
                                            (toupper(c)) - 'A' + 10);
 }
 
