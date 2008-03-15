@@ -1082,22 +1082,22 @@ bool dbg_ports(void)
         gpio_enable = GPIO_ENABLE;
         gpio1_enable = GPIO1_ENABLE;
 
-        snprintf(buf, sizeof(buf), "GPIO_READ:     %08x", gpio_read);
+        snprintf(buf, sizeof(buf), "GPIO_READ: %08x", gpio_read);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_OUT:      %08x", gpio_out);
+        snprintf(buf, sizeof(buf), "GPIO_OUT:  %08x", gpio_out);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_FUNCTION: %08x", gpio_function);
+        snprintf(buf, sizeof(buf), "GPIO_FUNC: %08x", gpio_function);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_ENABLE:   %08x", gpio_enable);
+        snprintf(buf, sizeof(buf), "GPIO_ENA:  %08x", gpio_enable);
         lcd_puts(0, line++, buf);
 
-        snprintf(buf, sizeof(buf), "GPIO1_READ:     %08x", gpio1_read);
+        snprintf(buf, sizeof(buf), "GPIO1_READ: %08x", gpio1_read);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO1_OUT:      %08x", gpio1_out);
+        snprintf(buf, sizeof(buf), "GPIO1_OUT:  %08x", gpio1_out);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO1_FUNCTION: %08x", gpio1_function);
+        snprintf(buf, sizeof(buf), "GPIO1_FUNC: %08x", gpio1_function);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO1_ENABLE:   %08x", gpio1_enable);
+        snprintf(buf, sizeof(buf), "GPIO1_ENA:  %08x", gpio1_enable);
         lcd_puts(0, line++, buf);
 
         adc_buttons = adc_read(ADC_BUTTONS);
