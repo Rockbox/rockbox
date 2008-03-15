@@ -55,17 +55,17 @@ static const struct button_mapping button_context_standard[]  = {
 }; /* button_context_standard */
 
 static const struct button_mapping remote_button_context_standard[]  = {
-    { ACTION_STD_PREV,        BUTTON_VOL_UP,                 BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,  BUTTON_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_STD_NEXT,        BUTTON_VOL_DOWN,               BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,  BUTTON_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_STD_PREV,        BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,  BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_STD_NEXT,        BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,  BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
 
-    { ACTION_STD_CONTEXT,     BUTTON_RC_MODE|BUTTON_REPEAT,  BUTTON_RC_MODE },
-    { ACTION_STD_CANCEL,      BUTTON_RC_REW,                 BUTTON_NONE },
-    { ACTION_STD_OK,          BUTTON_RC_FF,                  BUTTON_NONE },
-    { ACTION_STD_OK,          BUTTON_RC_PLAY,                BUTTON_NONE },
-    { ACTION_STD_MENU,        BUTTON_RC_MENU|BUTTON_REL,     BUTTON_RC_MENU },
-    { ACTION_STD_QUICKSCREEN, BUTTON_RC_MENU|BUTTON_REPEAT,  BUTTON_RC_MENU },
+    { ACTION_STD_CONTEXT,     BUTTON_RC_MODE|BUTTON_REPEAT,     BUTTON_RC_MODE },
+    { ACTION_STD_CANCEL,      BUTTON_RC_REW,                    BUTTON_NONE },
+    { ACTION_STD_OK,          BUTTON_RC_FF,                     BUTTON_NONE },
+    { ACTION_STD_OK,          BUTTON_RC_PLAY,                   BUTTON_NONE },
+    { ACTION_STD_MENU,        BUTTON_RC_MENU|BUTTON_REL,        BUTTON_RC_MENU },
+    { ACTION_STD_QUICKSCREEN, BUTTON_RC_MENU|BUTTON_REPEAT,     BUTTON_RC_MENU },
 
     LAST_ITEM_IN_LIST
 }; /* remote_button_context_standard */

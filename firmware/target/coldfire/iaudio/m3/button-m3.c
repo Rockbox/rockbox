@@ -48,7 +48,7 @@ int button_read_device(void)
     int  btn = BUTTON_NONE;
     bool hold_button_old;
     bool remote_hold_button_old;
-    int  data = 0xff; /* FIXME */
+    int  data;
 
     /* normal buttons */
     hold_button_old = hold_button;
@@ -56,24 +56,36 @@ int button_read_device(void)
 
     if (!hold_button)
     {
-#if 0 /* TODO: implement ADC */
         data = adc_scan(ADC_BUTTONS);
 
-        if (data < 0xf0)
+        if (data < 0xc0)
         {
+            if (data < 0x67)
+                if (data < 0x37)
+                    btn = BUTTON_VOL_DOWN;
+                else
+                    if (data < 0x51)
+                        btn = BUTTON_MODE;
+                    else
+                        btn = BUTTON_VOL_UP;
+            else
+                if (data < 0x7f)
+                    btn = BUTTON_REC;
+                else
+                    if (data < 0x98)
+                        btn = BUTTON_LEFT;
+                    else
+                        btn = BUTTON_RIGHT;
         }
-#endif
         if (!(GPIO1_READ & 0x00000002))
             btn |= BUTTON_PLAY;
     }
 
     /* remote buttons */
-#if 0 /* TODO: implement ADC */
     data = remote_detect() ? adc_scan(ADC_REMOTE) : 0xff;
-#endif
 
     remote_hold_button_old = remote_hold_button;
-    remote_hold_button = data < 0x17;
+    remote_hold_button = data < 0x14;
 
 #ifndef BOOTLOADER
     if (remote_hold_button != remote_hold_button_old)
@@ -82,11 +94,28 @@ int button_read_device(void)
 
     if (!remote_hold_button)
     {
-#if 0 /* TODO: implement ADC */
-        if (data < 0xee)
+        if (data < 0xd0)
         {
+            if (data < 0x67)
+                if (data < 0x37)
+                    btn |= BUTTON_RC_FF;
+                else
+                    if (data < 0x51)
+                        btn |= BUTTON_RC_REW;
+                    else
+                        btn |= BUTTON_RC_MODE;
+            else
+                if (data < 0x98)
+                    if (data < 0x7f)
+                        btn |= BUTTON_RC_REC;
+                    else
+                        btn |= BUTTON_RC_MENU;
+                else
+                    if (data < 0xb0)
+                        btn |= BUTTON_RC_VOL_UP;
+                    else
+                        btn |= BUTTON_RC_VOL_DOWN;
         }
-#endif
         if ((GPIO_READ & 0x80000000) == 0)
             btn |= BUTTON_RC_PLAY;
     }
