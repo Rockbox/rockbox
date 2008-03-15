@@ -32,7 +32,7 @@
 #define IIS_FIFO_RESET      (1 << 11)
 #define PDIR2_FIFO_RESET    (1 << 9)
 
-#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
+#if defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(IAUDIO_M3)
 #define SET_IIS_PLAY(x) IIS1CONFIG = (x)
 #define IIS_PLAY        IIS1CONFIG
 #else
