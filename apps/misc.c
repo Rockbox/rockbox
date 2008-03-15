@@ -1081,8 +1081,11 @@ void setvol(void)
  * Helper function to convert a string of 6 hex digits to a native colour
  */
 
-#define hex2dec(c) (((c) >= '0' && ((c) <= '9')) ? (toupper(c)) - '0' : \
-                                                   (toupper(c)) - 'A' + 10)
+static int hex2dec(int c)
+{
+   return  (((c) >= '0' && ((c) <= '9')) ? (toupper(c)) - '0' :
+                                           (toupper(c)) - 'A' + 10);
+}
 
 int hex_to_rgb(const char* hex)
 {   int ok = 1;
