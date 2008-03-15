@@ -70,7 +70,7 @@ void HttpGet::setCache(QDir d)
             result = m_cachedir.mkdir("rbutil-cache");
     }
     else result = false;
-    qDebug() << "HttpGet::setCache(QDir)" << d << result;
+    qDebug() << "HttpGet::setCache(QDir)" << d.absolutePath() << result;
     m_usecache = result;
 }
 
