@@ -46,7 +46,7 @@ static const char* const irqname[] = {
     "","","","","","","","SOFTINT0",
     "SOFTINT1","SOFTINT2","SOFTINT3","",
     "","CDROMCRCERR","CDROMNOSYNC","CDROMILSYNC",
-    "CDROMNEWBLK","","","","","","","",
+    "CDROMNEWBLK","","","","","","IIC2","ADC",
     "","","","","","","","",
     "","","","","","","","",
     "","","","","","","","",
@@ -136,6 +136,9 @@ default_interrupt (CDROMNOSYNC); /* CD-ROM No sync */
 default_interrupt (CDROMILSYNC); /* CD-ROM Illegal sync */
 default_interrupt (CDROMNEWBLK); /* CD-ROM New block */
 
+default_interrupt (IIC2); /* I2C 2 */
+default_interrupt (ADC);  /* A/D converter */
+
 #if defined(IAUDIO_X5) || defined(IAUDIO_M5)
 #define EXCP_BUTTON_GPIO_READ   GPIO_READ
 #define EXCP_BUTTON_MASK        0x0c000000
@@ -219,7 +222,7 @@ void (* const vbr[]) (void) __attribute__ ((section (".vectors"))) =
     UIE,UIE,UIE,UIE,UIE,UIE,UIE,SOFTINT0,
     SOFTINT1,SOFTINT2,SOFTINT3,UIE,
     UIE,CDROMCRCERR,CDROMNOSYNC,CDROMILSYNC,
-    CDROMNEWBLK,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
+    CDROMNEWBLK,UIE,UIE,UIE,UIE,UIE,IIC2,ADC,
 
     UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
     UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
