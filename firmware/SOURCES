@@ -1,4 +1,5 @@
 ata_idle_notify.c
+events.c
 backlight.c
 buffer.c
 id3.c

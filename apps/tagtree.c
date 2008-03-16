@@ -924,14 +924,9 @@ void tagtree_init(void)
         root_menu = 0;
     
     uniqbuf = buffer_alloc(UNIQBUF_SIZE);
-#if CONFIG_CODEC == SWCODEC
-    playback_add_event(PLAYBACK_EVENT_TRACK_BUFFER, tagtree_buffer_event);
-    playback_add_event(PLAYBACK_EVENT_TRACK_FINISH, tagtree_track_finish_event);
-#else
-    audio_set_track_buffer_event(tagtree_buffer_event);
-    audio_set_track_unbuffer_event(tagtree_track_finish_event);
-#endif
-    
+
+    add_event(PLAYBACK_EVENT_TRACK_BUFFER, tagtree_buffer_event);
+    add_event(PLAYBACK_EVENT_TRACK_FINISH, tagtree_track_finish_event);
 }
 
 static bool show_search_progress(bool init, int count)

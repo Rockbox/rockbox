@@ -21,6 +21,7 @@
 
 #include <stdbool.h>
 #include "id3.h"
+#include "events.h"
 
 #define MPEG_SWAP_CHUNKSIZE  0x2000
 #define MPEG_HIGH_WATER  2 /* We leave 2 bytes empty because otherwise we

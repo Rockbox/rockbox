@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 Miika Pekkarinen
+ * Copyright (C) 2008 by Miika Pekkarinen
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,41 +17,35 @@
  *
  ****************************************************************************/
 
-#ifndef _PLAYBACK_H
-#define _PLAYBACK_H
+#ifndef _EVENTS_H
+#define _EVENTS_H
 
 #include <stdbool.h>
 
-#include "id3.h"
-#include "mp3data.h"
-#include "events.h"
+#define MAX_SYS_EVENTS 10
 
-#define CODEC_IDX_AUDIO     0
-#define CODEC_IDX_VOICE     1
+/**
+ * High nibble = Event class definition
+ * Low nibble  = Event ID
+ */
 
-/* Not yet implemented. */
-#define CODEC_SET_AUDIOBUF_WATERMARK    4
+#define EVENT_CLASS_DISK       0x0100
+#define EVENT_CLASS_PLAYBACK   0x0200
 
-#if MEM > 1
-#define MAX_TRACK       128
-#else
-#define MAX_TRACK       32
-#endif
+/**
+ * Because same playback events are used in mpeg.c and playback.c, define
+ * them here to prevent cluttering and ifdefs.
+ */
+enum {
+    PLAYBACK_EVENT_TRACK_BUFFER = (EVENT_CLASS_PLAYBACK|1),
+    PLAYBACK_EVENT_TRACK_FINISH,
+    PLAYBACK_EVENT_TRACK_CHANGE,
+};
 
-#define MAX_TRACK_MASK  (MAX_TRACK-1)
 
-/* Functions */
-const char * get_codec_filename(int cod_spec);
-void voice_wait(void);
-
-#if CONFIG_CODEC == SWCODEC /* This #ifdef is better here than gui/gwps.c */
-extern void audio_next_dir(void);
-extern void audio_prev_dir(void);
-#else
-# define audio_next_dir() 
-#define audio_prev_dir()
-#endif
+bool add_event(unsigned short id, void (*handler));
+void remove_event(unsigned short id, void (*handler));
+void send_event(unsigned short id, bool oneshot, void *data);
 
 #endif
-
 

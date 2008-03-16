@@ -601,25 +601,7 @@ int settings_save( void )
        target doesnt have rtc ram */
     write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
 #endif
-    if(!register_ata_idle_func(flush_config_block_callback))
-    {
-        int i;
-        FOR_NB_SCREENS(i)
-        {
-            screens[i].clear_display();
-#ifdef HAVE_LCD_CHARCELLS
-            screens[i].puts(0, 0, str(LANG_SETTINGS_SAVE_FAILED));
-            screens[i].puts(0, 1, str(LANG_SETTINGS_PARTITION));
-#else
-            screens[i].puts(4, 2, str(LANG_SETTINGS_SAVE_FAILED));
-            screens[i].puts(2, 4, str(LANG_SETTINGS_PARTITION));
-            screens[i].update();
-#endif
-        }
-        cond_talk_ids_fq(LANG_SETTINGS_SAVE_FAILED);
-        sleep(HZ*2);
-        return -1;
-    }
+    register_ata_idle_func(flush_config_block_callback);
     return 0;
 }
 bool settings_save_config(int options)

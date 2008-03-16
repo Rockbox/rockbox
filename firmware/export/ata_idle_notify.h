@@ -19,7 +19,9 @@
 #ifndef __ATACALLBACK_H__
 #define __ATACALLBACK_H__
 
+
 #include <stdbool.h>
+#include "events.h"
 
 #if 0
                 NOTE: ata_idle_nofity usage notes..
@@ -34,15 +36,17 @@
         5) Dont Panic!
 #endif
 
+enum {
+    DISK_EVENT_SPINUP = (EVENT_CLASS_DISK|1),
+};
+
 #define USING_ATA_CALLBACK  !defined(SIMULATOR)             \
                             && !defined(HAVE_FLASH_DISK)
 
-#define MAX_ATA_CALLBACKS 5
 typedef bool (*ata_idle_notify)(void);
 
-extern bool register_ata_idle_func(ata_idle_notify function);
+extern void register_ata_idle_func(ata_idle_notify function);
 #if USING_ATA_CALLBACK
-extern void ata_idle_notify_init(void);
 extern void unregister_ata_idle_func(ata_idle_notify function, bool run);
 extern bool call_ata_idle_notifys(bool force);
 #else

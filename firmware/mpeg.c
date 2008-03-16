@@ -100,7 +100,6 @@ struct trackdata
     struct mp3entry id3;
     int mempos;
     int load_ahead_index;
-    bool event_sent;
 };
 
 static struct trackdata trackdata[MAX_TRACK_ENTRIES];
@@ -115,11 +114,6 @@ unsigned long prev_track_elapsed;
 static int track_read_idx = 0;
 static int track_write_idx = 0;
 #endif /* !SIMULATOR */
-
-/* Callback function to call when current track has really changed. */
-void (*track_changed_callback)(struct mp3entry *id3) = NULL;
-void (*track_buffer_callback)(struct mp3entry *id3) = NULL;
-void (*track_unbuffer_callback)(struct mp3entry *id3) = NULL;
 
 /* Cuesheet callback */
 static bool (*cuesheet_callback)(const char *filename) = NULL;
@@ -475,21 +469,6 @@ unsigned long mpeg_get_last_header(void)
 #endif /* !SIMULATOR */
 }
 
-void audio_set_track_buffer_event(void (*handler)(struct mp3entry *id3))
-{
-    track_buffer_callback = handler;
-}
-
-void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3))
-{
-    track_unbuffer_callback = handler;
-}
-
-void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3))
-{
-    track_changed_callback = handler;
-}
-
 void audio_set_cuesheet_callback(bool (*handler)(const char *filename))
 {
     cuesheet_callback = handler;
@@ -506,12 +485,7 @@ static void generate_unbuffer_events(void)
     for (i = 0; i < numentries; i++)
     {
         /* Send an event to notify that track has finished. */
-        if (trackdata[cur_idx].event_sent)
-        {
-            if (track_unbuffer_callback)
-                track_unbuffer_callback(&trackdata[cur_idx].id3);
-            trackdata[cur_idx].event_sent = false;
-        }
+        send_event(PLAYBACK_EVENT_TRACK_FINISH, false, &trackdata[cur_idx].id3);
         cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
     }
 }
@@ -525,12 +499,7 @@ static void generate_postbuffer_events(void)
 
     for (i = 0; i < numentries; i++)
     {
-        if (!trackdata[cur_idx].event_sent)
-        {
-            if (track_buffer_callback)
-                track_buffer_callback(&trackdata[cur_idx].id3);
-            trackdata[cur_idx].event_sent = true;
-        }
+        send_event(PLAYBACK_EVENT_TRACK_BUFFER, false, &trackdata[cur_idx].id3);
         cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
     }
 }
@@ -1080,8 +1049,7 @@ static void track_change(void)
     if (num_tracks_in_memory() > 0)
     {
         remove_current_tag();
-        if (track_changed_callback)
-            track_changed_callback(audio_current_track());
+        send_event(PLAYBACK_EVENT_TRACK_CHANGE, false, audio_current_track());
         update_playlist();
     }
 
@@ -1134,8 +1102,7 @@ static void start_playback_if_ready(void)
                 if (play_pending_track_change)
                 {
                     play_pending_track_change = false;
-                    if(track_changed_callback)
-                        track_changed_callback(audio_current_track());
+                    send_event(PLAYBACK_EVENT_TRACK_CHANGE, false, audio_current_track());
                 }
                 play_pending = false;
             }

@@ -245,13 +245,6 @@ static bool skipped_during_pause = false; /* Do we need to clear the PCM buffer 
  */
 static bool codec_requested_stop = false;
 
-struct playback_event {
-    enum PLAYBACK_EVENT_TYPE type;
-    void (*callback)(void *data);
-};
-
-struct playback_event events[PLAYBACK_MAX_EVENTS];
-
 static size_t buffer_margin  = 0; /* Buffer margin aka anti-skip buffer (A/C-) */
 
 /* Multiple threads */
@@ -1447,51 +1440,6 @@ static void codec_thread(void)
 
 /* --- Audio thread --- */
 
-void playback_add_event(enum PLAYBACK_EVENT_TYPE type, void (*handler))
-{
-    int i;
-    
-    /* Try to find a free slot. */
-    for (i = 0; i < PLAYBACK_MAX_EVENTS; i++)
-    {
-        if (events[i].callback == NULL)
-        {
-            events[i].type = type;
-            events[i].callback = handler;
-            return;
-        }
-    }
-    
-    panicf("playback event line full");
-}
-
-void playback_remove_event(enum PLAYBACK_EVENT_TYPE type, void (*handler))
-{
-    int i;
-    
-    for (i = 0; i < PLAYBACK_MAX_EVENTS; i++)
-    {
-        if (events[i].type == type && events[i].callback == handler)
-        {
-            events[i].callback = NULL;
-            return;
-        }
-    }
-    
-    panicf("playback event not found");
-}
-
-static void send_event(enum PLAYBACK_EVENT_TYPE type, void *data)
-{
-    int i;
-    
-    for (i = 0; i < PLAYBACK_MAX_EVENTS; i++)
-    {
-        if (events[i].type == type && events[i].callback != NULL)
-            events[i].callback(data);
-    }
-}
-
 static bool audio_have_tracks(void)
 {
     return (audio_track_count() != 0);
@@ -1783,7 +1731,7 @@ static bool audio_load_track(int offset, bool start_play)
     {
         if (get_metadata(&id3, fd, trackname))
         {
-            send_event(PLAYBACK_EVENT_TRACK_BUFFER, &id3);
+            send_event(PLAYBACK_EVENT_TRACK_BUFFER, false, &id3);
             
             tracks[track_widx].id3_hid =
                 bufalloc(&id3, sizeof(struct mp3entry), TYPE_ID3);
@@ -2020,7 +1968,7 @@ static int audio_check_new_track(void)
     bool end_of_playlist;  /* Temporary flag, not the same as playlist_end */
 
     /* Now it's good time to send track unbuffer events. */
-    send_event(PLAYBACK_EVENT_TRACK_FINISH, &curtrack_id3);
+    send_event(PLAYBACK_EVENT_TRACK_FINISH, false, &curtrack_id3);
     
     if (dir_skip)
     {
@@ -2391,7 +2339,7 @@ static void audio_finalise_track_change(void)
         bufgetid3(prev_ti->id3_hid)->elapsed = 0;
     }
 
-    send_event(PLAYBACK_EVENT_TRACK_CHANGE, &curtrack_id3);
+    send_event(PLAYBACK_EVENT_TRACK_CHANGE, false, &curtrack_id3);
 
     track_changed = true;
     playlist_update_resume_info(audio_current_track());

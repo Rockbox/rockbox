@@ -19,7 +19,6 @@
 #include "config.h"
 
 #include "ata.h"
-#include "ata_idle_notify.h"
 #include "disk.h"
 #include "fat.h"
 #include "lcd.h"
@@ -428,7 +427,6 @@ static void init(void)
     }
 #endif
 
-    ata_idle_notify_init();
     rc = ata_init();
     if(rc)
     {

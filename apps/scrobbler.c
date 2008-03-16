@@ -183,7 +183,10 @@ static void add_to_cache(unsigned long play_length)
     } else {
         cache_pos++;
         if (!scrobbler_ata_callback)
-            scrobbler_ata_callback = register_ata_idle_func(scrobbler_flush_callback);
+        {
+            register_ata_idle_func(scrobbler_flush_callback);
+            scrobbler_ata_callback = true;
+        }
     }
 
 }
@@ -224,11 +227,7 @@ int scrobbler_init(void)
 
     scrobbler_cache = buffer_alloc(SCROBBLER_MAX_CACHE*SCROBBLER_CACHE_LEN);
 
-#if CONFIG_CODEC == SWCODEC
-    playback_add_event(PLAYBACK_EVENT_TRACK_CHANGE, scrobbler_change_event);
-#else
-    audio_set_track_changed_event(&scrobbler_change_event);
-#endif
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, scrobbler_change_event);
     cache_pos = 0;
     pending = false;
     scrobbler_initialised = true;
@@ -263,11 +262,7 @@ void scrobbler_shutdown(void)
 
     if (scrobbler_initialised)
     {
-#if CONFIG_CODEC == SWCODEC
-        playback_remove_event(PLAYBACK_EVENT_TRACK_CHANGE, scrobbler_change_event);
-#else
-        audio_set_track_changed_event(NULL);
-#endif
+        remove_event(PLAYBACK_EVENT_TRACK_CHANGE, scrobbler_change_event);
         scrobbler_initialised = false;
     }
 }
