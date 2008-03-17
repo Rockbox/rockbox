@@ -269,6 +269,7 @@ int rolo_load(const char* filename)
     lcd_remote_puts(0, 1, "Executing");
     lcd_remote_update();
 #endif
+    adc_close();
 
     set_irq_level(HIGHEST_IRQ_LEVEL);
 #elif CONFIG_CPU == SH7034

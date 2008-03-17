@@ -67,6 +67,7 @@ inline void __reset_cookie(void)
 
 void start_firmware(void)
 {
+    adc_close();
     asm(" move.w #0x2700,%sr");
     __reset_cookie();
     asm(" move.l %0,%%d0" :: "i"(DRAM_START));
@@ -126,16 +127,35 @@ void main(void)
     int rc;
     bool rc_on_button = false;
     bool on_button = false;
-    bool rec_button = false;
-    bool hold_status = false;
+
+    /* We want to read the buttons as early as possible, before the user
+       releases the ON button */
+
+#ifdef IAUDIO_M3
+    or_l(0x80000000, &GPIO_FUNCTION);  /* remote Play button */
+    and_l(~0x80000000, &GPIO_ENABLE);
+    or_l(0x00000202, &GPIO1_FUNCTION); /* main Hold & Play */
+    
+    if ((GPIO1_READ & 0x000000002) == 0)
+        on_button = true;
+        
+    if ((GPIO_READ & 0x80000000) == 0)
+        rc_on_button = true;
+#elif defined(IAUDIO_M5) || defined(IAUDIO_X5)
     int data;
 
-    (void)rc_on_button;
-    (void)on_button;
-    (void)rec_button;
-    (void)hold_status;
-    (void)data;
+    or_l(0x0e000000, &GPIO_FUNCTION); /* main Hold & Power, remote Play */
+    and_l(~0x0e000000, &GPIO_ENABLE);
     
+    data = GPIO_READ;
+    
+    if ((data & 0x04000000) == 0)
+        on_button = true;
+        
+    if ((data & 0x02000000) == 0)
+        rc_on_button = true;
+#endif
+
     power_init();
 
     system_init();
@@ -153,6 +173,16 @@ void main(void)
     font_init();
     adc_init();
     button_init();
+    
+    if ((!on_button || button_hold())
+        && (!rc_on_button || remote_button_hold())
+        && !charger_inserted())
+    {
+        /* No need to check for USB connection here, as USB is handled
+         * in the cowon loader. */
+        printf("Hold switch on");
+        shutdown();
+    }
 
     printf("Rockbox boot loader");
     printf("Version %s", version);

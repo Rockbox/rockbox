@@ -38,23 +38,23 @@ void power_init(void)
 
 bool charger_inserted(void)
 {     
-    return (GPIO1_READ & 0x01000000)?true:false;
+    return (GPIO1_READ & 0x01000000) != 0;
 }
 
 void ide_power_enable(bool on)
 {
     /* GPOOD3 */
     int level = set_irq_level(HIGHEST_IRQ_LEVEL);
-    if(on)
-        pcf50606_write(0x3c, 0x07);
-    else
-        pcf50606_write(0x3c, 0x00);
+    pcf50606_write(0x3c, on ? 0x07 : 0x00);
     set_irq_level(level);
 }
 
 bool ide_powered(void)
 {
-    return false;
+    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int value = pcf50606_read(0x3c);
+    set_irq_level(level);
+    return (value & 0x07) != 0;
 }
 
 void power_off(void)

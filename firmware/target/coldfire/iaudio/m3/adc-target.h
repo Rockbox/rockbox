@@ -26,4 +26,7 @@
 #define ADC_BATTERY 1
 #define ADC_REMOTE  2
 
+#define NEED_ADC_CLOSE
+void adc_close(void);
+
 #endif /* _ADC_TARGET_H_ */

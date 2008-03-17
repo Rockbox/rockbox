@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include <stdio.h>
 #include "config.h"
+#include "adc.h"
 #include "system.h"
 #include "lcd.h"
 #include "font.h"
@@ -254,6 +255,16 @@ void system_init(void)
        what'll be the most useful for most things which the main thread
        will do. */
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+    
+    IMR = 0x3ffff;
+    INTPRI1 = 0;
+    INTPRI2 = 0;
+    INTPRI3 = 0;
+    INTPRI4 = 0;
+    INTPRI5 = 0;
+    INTPRI6 = 0;
+    INTPRI7 = 0;
+    INTPRI8 = 0;
 
     /* Set INTBASE and SPURVEC */
     INTBASE = 64;
@@ -268,6 +279,7 @@ void system_init(void)
 
 void system_reboot (void)
 {
+    adc_close();
     set_cpu_frequency(0);
 
     asm(" move.w #0x2700,%sr");

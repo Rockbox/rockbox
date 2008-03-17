@@ -36,7 +36,7 @@ void power_init(void)
     /* Charger detect */
     and_l(~0x00000020, &GPIO1_ENABLE);
     or_l(0x00000020, &GPIO1_FUNCTION);
-                                                        
+
     /* FIXME: Just disable the multi-colour LED for now. */
     and_l(~0x00000210, &GPIO1_OUT);
     and_l(~0x00008000, &GPIO_OUT);
@@ -61,7 +61,7 @@ void ide_power_enable(bool on)
 
 bool ide_powered(void)
 {
-    return false;
+    return (GPIO_OUT & 0x00800000) != 0;
 }
 
 void power_off(void)

@@ -25,4 +25,8 @@
 unsigned short adc_read(int channel);
 void adc_init(void);
 
+#ifndef NEED_ADC_CLOSE
+#define adc_close()
+#endif
+
 #endif /* _ADC_H_ */
