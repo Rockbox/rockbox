@@ -6,10 +6,10 @@
     *: "Yes"
   </source>
   <dest>
-    *: "Si"
+    *: "Sì"
   </dest>
   <voice>
-    *: "Si"
+    *: "Sì"
   </voice>
 </phrase>
 <phrase>
@@ -8532,11 +8532,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Si"
+    lcd_bitmap: "Sì"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Si"
+    lcd_bitmap: "Sì"
   </voice>
 </phrase>
 <phrase>
@@ -10400,15 +10400,13 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Nessuna partizione?"
-    player: "Partizione?"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -10433,16 +10431,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Salvataggio fallito"
+    *: ""
   </dest>
   <voice>
-    *: "Salvataggio fallito"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10517,9 +10515,9 @@
     player: "(PLAY/STOP)"
   </source>
   <dest>
-    *: "PLAY = Si"
-    h100,h120,h300: "NAVI = Si"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Si"
+    *: "PLAY = Sì"
+    h100,h120,h300: "NAVI = Sì"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Sì"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
