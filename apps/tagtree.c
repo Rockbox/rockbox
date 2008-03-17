@@ -925,8 +925,8 @@ void tagtree_init(void)
     
     uniqbuf = buffer_alloc(UNIQBUF_SIZE);
 
-    add_event(PLAYBACK_EVENT_TRACK_BUFFER, tagtree_buffer_event);
-    add_event(PLAYBACK_EVENT_TRACK_FINISH, tagtree_track_finish_event);
+    add_event(PLAYBACK_EVENT_TRACK_BUFFER, false, tagtree_buffer_event);
+    add_event(PLAYBACK_EVENT_TRACK_FINISH, false, tagtree_track_finish_event);
 }
 
 static bool show_search_progress(bool init, int count)

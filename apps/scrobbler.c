@@ -227,7 +227,7 @@ int scrobbler_init(void)
 
     scrobbler_cache = buffer_alloc(SCROBBLER_MAX_CACHE*SCROBBLER_CACHE_LEN);
 
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, scrobbler_change_event);
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, scrobbler_change_event);
     cache_pos = 0;
     pending = false;
     scrobbler_initialised = true;

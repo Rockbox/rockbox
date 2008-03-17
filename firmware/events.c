@@ -23,12 +23,13 @@
 
 struct sysevent {
     unsigned short id;
+    bool oneshot;
     void (*callback)(void *data);
 };
 
 struct sysevent events[MAX_SYS_EVENTS];
 
-bool add_event(unsigned short id, void (*handler))
+bool add_event(unsigned short id, bool oneshot, void (*handler))
 {
     int i;
     
@@ -45,6 +46,7 @@ bool add_event(unsigned short id, void (*handler))
         if (events[i].callback == NULL)
         {
             events[i].id = id;
+            events[i].oneshot = oneshot;
             events[i].callback = handler;
             return true;
         }
@@ -70,7 +72,7 @@ void remove_event(unsigned short id, void (*handler))
     panicf("event not found");
 }
 
-void send_event(unsigned short id, bool oneshot, void *data)
+void send_event(unsigned short id, void *data)
 {
     int i;
     
@@ -80,7 +82,7 @@ void send_event(unsigned short id, bool oneshot, void *data)
         {
             events[i].callback(data);
             
-            if (oneshot)
+            if (events[i].oneshot)
                 events[i].callback = NULL;
         }
     }

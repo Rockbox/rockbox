@@ -1731,7 +1731,7 @@ static bool audio_load_track(int offset, bool start_play)
     {
         if (get_metadata(&id3, fd, trackname))
         {
-            send_event(PLAYBACK_EVENT_TRACK_BUFFER, false, &id3);
+            send_event(PLAYBACK_EVENT_TRACK_BUFFER, &id3);
             
             tracks[track_widx].id3_hid =
                 bufalloc(&id3, sizeof(struct mp3entry), TYPE_ID3);
@@ -1968,7 +1968,7 @@ static int audio_check_new_track(void)
     bool end_of_playlist;  /* Temporary flag, not the same as playlist_end */
 
     /* Now it's good time to send track unbuffer events. */
-    send_event(PLAYBACK_EVENT_TRACK_FINISH, false, &curtrack_id3);
+    send_event(PLAYBACK_EVENT_TRACK_FINISH, &curtrack_id3);
     
     if (dir_skip)
     {
@@ -2339,7 +2339,7 @@ static void audio_finalise_track_change(void)
         bufgetid3(prev_ti->id3_hid)->elapsed = 0;
     }
 
-    send_event(PLAYBACK_EVENT_TRACK_CHANGE, false, &curtrack_id3);
+    send_event(PLAYBACK_EVENT_TRACK_CHANGE, &curtrack_id3);
 
     track_changed = true;
     playlist_update_resume_info(audio_current_track());

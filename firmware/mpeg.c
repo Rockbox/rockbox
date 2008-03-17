@@ -485,7 +485,7 @@ static void generate_unbuffer_events(void)
     for (i = 0; i < numentries; i++)
     {
         /* Send an event to notify that track has finished. */
-        send_event(PLAYBACK_EVENT_TRACK_FINISH, false, &trackdata[cur_idx].id3);
+        send_event(PLAYBACK_EVENT_TRACK_FINISH, &trackdata[cur_idx].id3);
         cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
     }
 }
@@ -499,7 +499,7 @@ static void generate_postbuffer_events(void)
 
     for (i = 0; i < numentries; i++)
     {
-        send_event(PLAYBACK_EVENT_TRACK_BUFFER, false, &trackdata[cur_idx].id3);
+        send_event(PLAYBACK_EVENT_TRACK_BUFFER, &trackdata[cur_idx].id3);
         cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
     }
 }
@@ -1049,7 +1049,7 @@ static void track_change(void)
     if (num_tracks_in_memory() > 0)
     {
         remove_current_tag();
-        send_event(PLAYBACK_EVENT_TRACK_CHANGE, false, audio_current_track());
+        send_event(PLAYBACK_EVENT_TRACK_CHANGE, audio_current_track());
         update_playlist();
     }
 
@@ -1102,7 +1102,7 @@ static void start_playback_if_ready(void)
                 if (play_pending_track_change)
                 {
                     play_pending_track_change = false;
-                    send_event(PLAYBACK_EVENT_TRACK_CHANGE, false, audio_current_track());
+                    send_event(PLAYBACK_EVENT_TRACK_CHANGE, audio_current_track());
                 }
                 play_pending = false;
             }

@@ -26,7 +26,7 @@
 void register_ata_idle_func(ata_idle_notify function)
 {
 #if USING_ATA_CALLBACK
-    add_event(DISK_EVENT_SPINUP, function);
+    add_event(DISK_EVENT_SPINUP, true, function);
 #else
     function(); /* just call the function now */
 /* this _may_ cause problems later if the calling function
@@ -55,7 +55,7 @@ bool call_ata_idle_notifys(bool force)
     }
     lock_until = current_tick + 30*HZ;
 
-    send_event(DISK_EVENT_SPINUP, true, NULL);
+    send_event(DISK_EVENT_SPINUP, NULL);
     
     return true;
 }

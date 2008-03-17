@@ -43,9 +43,9 @@ enum {
 };
 
 
-bool add_event(unsigned short id, void (*handler));
+bool add_event(unsigned short id, bool oneshot, void (*handler));
 void remove_event(unsigned short id, void (*handler));
-void send_event(unsigned short id, bool oneshot, void *data);
+void send_event(unsigned short id, void *data);
 
 #endif
 
