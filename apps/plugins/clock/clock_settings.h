@@ -78,7 +78,7 @@ struct clock_settings{
 extern struct clock_settings clock_settings;
 
 /* settings are saved to this location */
-#define settings_filename PLUGIN_GAMES_DIR "/.clock_settings"
+#define settings_filename PLUGIN_APPS_DIR "/.clock_settings"
 
 void clock_settings_skin_next(struct clock_settings* settings);
 void clock_settings_skin_previous(struct clock_settings* settings);
