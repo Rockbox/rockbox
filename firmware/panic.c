@@ -108,10 +108,12 @@ void panicf( const char *fmt, ...)
         #define system_reboot() nop
 #elif defined (TOSHIBA_GIGABEAT_F)
         if ((GPGDAT & (1 << 0)) != 0)
-#elif defined (IRIVER_H100_SERIES)
+#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
         if ((GPIO1_READ & 0x22) == 0) /* check for ON button and !hold */
-#elif defined(IRIVER_H300_SERIES)
-        if ((GPIO1_READ & 0x22) == 0) /* check for ON button and !hold */
+#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
+        if ((GPIO_READ & 0x0c000000) == 0x08000000) /* check for ON button and !hold */
+#elif defined(IAUDIO_M3)
+        if ((GPIO1_READ & 0x202) == 0x200) /* check for ON button and !hold */
 #elif CONFIG_CPU == SH7034
 #if CONFIG_KEYPAD == PLAYER_PAD
         if (!(PADRL & 0x20))

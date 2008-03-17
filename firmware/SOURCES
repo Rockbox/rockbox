@@ -504,9 +504,9 @@ target/coldfire/iaudio/m3/button-m3.c
 target/coldfire/iaudio/m3/fmradio_i2c-m3.c
 target/coldfire/iaudio/m3/lcd-m3.c
 target/coldfire/iaudio/m3/power-m3.c
+target/coldfire/iaudio/m3/powermgmt-m3.c
 target/coldfire/iaudio/m3/system-m3.c
 target/coldfire/iaudio/m3/usb-m3.c
-target/coldfire/iaudio/powermgmt-iaudio.c
 #ifndef BOOTLOADER
 target/coldfire/iaudio/m3/audio-m3.c
 #endif

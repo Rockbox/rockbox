@@ -56,7 +56,7 @@ int button_read_device(void)
 
     if (!hold_button)
     {
-        data = adc_scan(ADC_BUTTONS);
+        data = adc_read(ADC_BUTTONS);
 
         if (data < 0xc0)
         {
@@ -82,7 +82,7 @@ int button_read_device(void)
     }
 
     /* remote buttons */
-    data = remote_detect() ? adc_scan(ADC_REMOTE) : 0xff;
+    data = remote_detect() ? adc_read(ADC_REMOTE) : 0xff;
 
     remote_hold_button_old = remote_hold_button;
     remote_hold_button = data < 0x14;

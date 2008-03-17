@@ -56,15 +56,16 @@ void i2c_init(void)
     
     /* I2C Clock divisor = 160 => 124.1556 MHz / 2 / 160 = 388.08 kHz */
     MFDR  = 0x0d;
+
+#if defined(IAUDIO_M3)
+    MBCR  = IEN;  /* Enable interface 1 */
+    /* secondary channel is handled in the interrupt driven ADC driver */
+#elif defined(IAUDIO_X5) || defined(IAUDIO_M5)
+    MBCR  = IEN;  /* Enable interface 1 */
+
     MFDR2 = 0x0d;
-
-#if defined(IAUDIO_X5) || defined(IAUDIO_M5)
-    MBCR  = IEN;  /* Enable interface */
-    MBCR2 = IEN; 
-#endif
-
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    /* Audio Codec */
+    MBCR2 = IEN;  /* Enable interface 2 */
+#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     MBDR = 0;    /* iRiver firmware does this */
     MBCR = IEN;  /* Enable interface */
 #endif
@@ -156,7 +157,7 @@ int i2c_read(volatile unsigned char *iface, unsigned char addr,
             iface[O_MBCR] |= TXAK;
         else if (i == 1)
             /* Generate STOP before reading last byte received */
-            i2c_stop(iface); 
+            i2c_stop(iface);
 
         *buf++ = iface[O_MBDR];
     }

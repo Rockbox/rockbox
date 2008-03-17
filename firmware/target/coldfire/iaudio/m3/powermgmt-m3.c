@@ -7,8 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Heikki Hannikainen, Uwe Freese
- * Revisions copyright (C) 2005 by Gerald Van Baren
+ * Copyright (C) 2008 Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -47,12 +46,12 @@ const unsigned short percent_to_volt_charge[11] =
     3500, 3650, 3720, 3740, 3760, 3790, 3840, 3900, 3950, 4040, 4120
 };
 
-#define BATTERY_SCALE_FACTOR  6000
-/* full-scale ADC readout (2^10) in millivolt */
+#define BATTERY_SCALE_FACTOR  5720
+/* full-scale ADC readout (2^8) in millivolt */
 
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
+    return (adc_read(ADC_BATTERY) * BATTERY_SCALE_FACTOR) >> 8;
 }
 

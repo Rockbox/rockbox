@@ -144,6 +144,11 @@ default_interrupt (ADC);  /* A/D converter */
 #define EXCP_BUTTON_MASK        0x0c000000
 #define EXCP_BUTTON_VALUE       0x08000000 /* On button and !hold */
 #define EXCP_PLLCR              0x10400000
+#elif defined(IAUDIO_M3)
+#define EXCP_BUTTON_GPIO_READ   GPIO1_READ
+#define EXCP_BUTTON_MASK        0x00000202
+#define EXCP_BUTTON_VALUE       0x00000200 /* On button and !hold */
+#define EXCP_PLLCR              0x10800000
 #else
 #define EXCP_BUTTON_GPIO_READ   GPIO1_READ
 #define EXCP_BUTTON_MASK        0x00000022
