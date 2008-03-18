@@ -2,7 +2,8 @@
 \section{\label{ref:Bookmarkconfigactual}Bookmarking}
   Bookmarks allow you to save your current position within a track so that 
   you can return to it at a later time. Bookmarks are saved on a per directory
-  basis, they are stored in the same directory as the files they reference.
+  basis (for dynamic playlists) or for individual (saved) playlists. They are 
+  stored next to the directory/playlist they reference.
   You can store multiple bookmarks for the same track.
   \begin{description}
   \item [Bookmark on Stop. ]This option controls whether Rockbox writes a
@@ -54,9 +55,7 @@
   \setting{Recent Bookmarks} option of the \setting{Bookmarks} sub menu of the 
   Main Menu. When set to \setting{Yes} each new bookmark will be added to the
   MRB list. Setting this to \setting{No} disables the addition of bookmarks to
-  the MRB list. \setting{Unique Only} will remove an old bookmark for the current
-  track from the MRB list and replace it with the new one if a bookmark in the
-  MRB list already existed. Otherwise this will behave like the 
-  \setting{Yes} setting.
-  \fixme{The above information was obtained by reading the source code, but my C is rather rusty...}
+  the MRB list. \setting{Unique Only} behaves like the \setting{Yes} setting 
+  but in addition all older entries for the current (dynamic) playlist will 
+  be removed from the MRB whenever a new entry is added.
   \end{description}
