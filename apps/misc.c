@@ -862,24 +862,35 @@ void car_adapter_mode_init(void)
 #ifdef HAVE_HEADPHONE_DETECTION
 static void unplug_change(bool inserted)
 {
+    static bool headphone_caused_pause = false;
+
     if (global_settings.unplug_mode)
     {
+        int audio_stat = audio_status();
         if (inserted)
         {
-            if ( global_settings.unplug_mode > 1 )
+            if ((audio_stat & AUDIO_STATUS_PLAY) &&
+                    headphone_caused_pause &&
+                    global_settings.unplug_mode > 1 )
                 audio_resume();
             backlight_on();
+            headphone_caused_pause = false;
         } else {
-            audio_pause();
-
-            if (global_settings.unplug_rw)
+            if ((audio_stat & AUDIO_STATUS_PLAY) &&
+                    !(audio_stat & AUDIO_STATUS_PAUSE))
             {
-                if ( audio_current_track()->elapsed >
-                (unsigned long)(global_settings.unplug_rw*1000))
-                    audio_ff_rewind(audio_current_track()->elapsed -
-                    (global_settings.unplug_rw*1000));
-                else
-                    audio_ff_rewind(0);
+                headphone_caused_pause = true;
+                audio_pause();
+
+                if (global_settings.unplug_rw)
+                {
+                    if (audio_current_track()->elapsed >
+                            (unsigned long)(global_settings.unplug_rw*1000))
+                        audio_ff_rewind(audio_current_track()->elapsed -
+                                (global_settings.unplug_rw*1000));
+                    else
+                        audio_ff_rewind(0);
+                }
             }
         }
     }
