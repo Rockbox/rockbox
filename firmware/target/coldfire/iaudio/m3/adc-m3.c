@@ -49,7 +49,7 @@ void IIC2(void)
 {
     static int bytenum = 0;
     
-    MBSR2 &= ~IFF;            /* Clear interrupt flag */
+    MBSR2 &= ~IIF;            /* Clear interrupt flag */
 
     if (MBSR2 & IAL)          /* Arbitration lost - shouldn't never happen */
     {

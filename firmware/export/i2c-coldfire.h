@@ -57,7 +57,7 @@ void i2c_adjust_prescale(int multiplier);
 #define IBB     (1 << 5)        /* Bus Busy		        */
 #define IAL     (1 << 4)        /* Arbitration Lost	    */
 #define SRW     (1 << 2)        /* Slave R/W		    */
-#define IFF     (1 << 1)        /* I2C Interrupt	    */
+#define IIF     (1 << 1)        /* I2C Interrupt	    */
 #define RXAK    (1 << 0)        /* No Ack bit		    */
 
 /* MBCR - Control register */

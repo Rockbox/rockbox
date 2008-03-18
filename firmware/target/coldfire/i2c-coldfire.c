@@ -195,17 +195,17 @@ int i2c_start(volatile unsigned char *iface)
 int i2c_wait_for_slave(volatile unsigned char *iface)
 {
     int j = MAX_LOOP;
-    while (--j && ! (iface[O_MBSR] & IFF))
+    while (--j && ! (iface[O_MBSR] & IIF))
         ;
     if (!j)
     {
-        logf("i2c: IFF not set (iface=%08lX)", (uintptr_t)iface);
+        logf("i2c: IIF not set (iface=%08lX)", (uintptr_t)iface);
         i2c_stop(iface); 
         return -2;
     }
   
     /* Clear interrupt flag */
-    iface[O_MBSR] &= ~IFF;
+    iface[O_MBSR] &= ~IIF;
     
     return 0;
 }
