@@ -37,9 +37,11 @@ void power_init(void)
     and_l(~0x00000020, &GPIO1_ENABLE);
     or_l(0x00000020, &GPIO1_FUNCTION);
 
+#ifndef BOOTLOADER
     /* FIXME: Just disable the multi-colour LED for now. */
     and_l(~0x00000210, &GPIO1_OUT);
     and_l(~0x00008000, &GPIO_OUT);
+#endif
 }
 
 bool charger_inserted(void)

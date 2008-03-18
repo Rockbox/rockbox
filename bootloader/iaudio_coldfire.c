@@ -180,7 +180,8 @@ void main(void)
     {
         /* No need to check for USB connection here, as USB is handled
          * in the cowon loader. */
-        printf("Hold switch on");
+        if (on_button || rc_on_button)
+            printf("Hold switch on");
         shutdown();
     }
 
