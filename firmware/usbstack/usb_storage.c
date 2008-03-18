@@ -812,7 +812,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 tb.format_capacity_data->block_size =
                      htobe32(block_size*block_size_mult);
                 tb.format_capacity_data->block_size |=
-                     SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA;
+                     htobe32(SCSI_FORMAT_CAPACITY_FORMATTED_MEDIA);
 
                 send_command_result(tb.format_capacity_data,
                           MIN(sizeof(struct format_capacity), length));
