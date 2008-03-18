@@ -26,6 +26,7 @@
 #include "gigabeats.h"
 #include "mi4.h"
 #include "telechips.h"
+#include "iaudio_bl_flash.h"
 
 int iaudio_encode(char *iname, char *oname, char *idstring);
 int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc);
@@ -75,6 +76,12 @@ void int2be(unsigned int val, unsigned char* addr)
     addr[1] = (val >> 16) & 0xff;
     addr[2] = (val >> 8) & 0xff;
     addr[3] = val & 0xFF;
+}
+
+void short2be(unsigned short val, unsigned char* addr)
+{
+    addr[0] = (val >> 8) & 0xff;
+    addr[1] = val & 0xFF;
 }
 
 void usage(void)
@@ -586,6 +593,11 @@ int iaudio_encode(char *iname, char *oname, char *idstring)
     
     memset(outbuf, 0, 0x1030);
     strcpy((char *)outbuf, idstring);
+    memcpy(outbuf+0x20, iaudio_bl_flash, 
+           BMPWIDTH_iaudio_bl_flash * (BMPHEIGHT_iaudio_bl_flash/8) * 2);
+    short2be(BMPWIDTH_iaudio_bl_flash, &outbuf[0x10]);
+    short2be((BMPHEIGHT_iaudio_bl_flash/8), &outbuf[0x12]);
+    outbuf[0x19] = 2;
 
     for(i = 0; i < length;i++)
         sum += outbuf[0x1030 + i];
