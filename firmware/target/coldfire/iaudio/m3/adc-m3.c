@@ -51,8 +51,8 @@ void IIC2(void)
     
     MBSR2 &= ~IFF;            /* Clear interrupt flag */
 
-    if (MBSR2 & IAL)          /* Arbitration lost - shouldn't happen */
-    {                         /* normally, but CPU freq change might induce it */
+    if (MBSR2 & IAL)          /* Arbitration lost - shouldn't never happen */
+    {
         MBSR2 &= ~IAL;        /* Clear flag */
         MBCR2 &= ~MSTA;       /* STOP */
     }
@@ -97,11 +97,22 @@ void adc_init(void)
     MBSR2 = 0;                /* Clear flags */
     MBCR2 = (IEN|IIEN);       /* Enable interrupts */
 
-    and_l(~0x0f000000, &INTPRI8);
     or_l(  0x04000000, &INTPRI8); /* INT62 - Priority 4 */
 
     tick_add_task(adc_tick);
     
     while (!data_ready)
         sleep(1);             /* Ensure valid readings when adc_init returns */
+}
+
+/* The ADC (most probably the PIC12F675) obviously has a slow and buggy I²C
+ * implementation. If a transfer is stopped prematurely, it often locks up
+ * and doesn't react anymore until the unit is power cycled. */
+
+void adc_close(void)
+{
+    tick_remove_task(adc_tick);
+
+    while (MBSR2 & IBB)       /* Wait for an ongoing transfer to finish */
+        sleep(1);
 }
