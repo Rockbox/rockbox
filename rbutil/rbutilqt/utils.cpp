@@ -19,6 +19,8 @@
 
 #include "utils.h"
 
+//#include <cstdlib>
+
 #include <QDir>
 
 #if defined(Q_OS_WIN32)
