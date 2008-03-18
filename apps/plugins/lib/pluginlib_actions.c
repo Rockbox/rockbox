@@ -265,8 +265,8 @@ const struct button_mapping generic_actions[] =
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_RC_MODE|BUTTON_REPEAT,   BUTTON_NONE},
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-    {PLA_QUIT,          BUTTON_A,           BUTTON_NONE},
-    {PLA_START,         BUTTON_POWER,       BUTTON_NONE},
+    {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
+    {PLA_START,         BUTTON_A,           BUTTON_NONE},
     {PLA_MENU,          BUTTON_MENU,        BUTTON_NONE},
     {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
@@ -331,7 +331,7 @@ const struct button_mapping generic_actions[] =
     {PLA_FIRE,          BUTTON_RC_HEART,                    BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_RC_HEART|BUTTON_REPEAT,      BUTTON_NONE},
 #elif CONFIG_KEYPAD == MROBE100_PAD
-    {PLA_QUIT,          BUTTON_DISPLAY,                 BUTTON_NONE},
+    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
     {PLA_START,         BUTTON_PLAY,                    BUTTON_NONE},
     {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
     {PLA_FIRE,          BUTTON_SELECT,                  BUTTON_NONE},
