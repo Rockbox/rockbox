@@ -1112,6 +1112,7 @@ int dsp_callback(int msg, intptr_t param)
 int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 {
     int32_t *tmp[2];
+    long last_yield = current_tick;
     int written = 0;
     int samples;
 
@@ -1159,7 +1160,13 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 
         written += samples;
         dst += samples * sizeof (int16_t) * 2;
-        yield();
+        
+        /* yield at least once each tick */
+        if (current_tick > last_yield)
+        {
+            yield();
+            last_yield = current_tick;
+        }
     }
 
 #if defined(CPU_COLDFIRE)

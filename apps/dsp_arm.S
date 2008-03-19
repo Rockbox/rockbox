@@ -18,6 +18,183 @@
  ****************************************************************************/
 
 /****************************************************************************
+ *  void channels_process_sound_chan_mono(int count, int32_t *buf[])
+ *
+ *  NOTE: The following code processes two samples at once. When count is odd,
+ *        there is an additional obsolete sample processed, which will not be
+ *        used by the calling functions.
+ */
+    .section .icode, "ax", %progbits
+    .align  2
+    .global channels_process_sound_chan_mono
+    .type   channels_process_sound_chan_mono, %function
+channels_process_sound_chan_mono:
+    @ input: r0 = count, r1 = buf
+    stmfd   sp!, {r4-r6, lr}
+    ldmia   r1, {r2-r3}                @ r4 = buf[0], r5 = buf[1]
+
+.monoloop:
+    ldmia   r2, {r4-r5}
+    ldmia   r3, {r6,lr}
+    mov     r4, r4, asr #1             @ r4 = r4/2
+    add     r4, r4, r6, asr #1         @ r4 = r4 + r6/2 = (buf[0]+buf[1])/2
+    mov     r5, r5, asr #1             @ r5 = r5/2
+    add     r5, r5, lr, asr #1         @ r5 = r5 + lr/2 = (buf[0]+buf[1])/2
+    stmia   r2!, {r4-r5}
+    stmia   r3!, {r4-r5}
+    subs    r0, r0, #2
+    bgt     .monoloop
+    
+    ldmfd   sp!, {r4-r6, pc}
+.monoend:
+    .size   channels_process_sound_chan_mono,.monoend-channels_process_sound_chan_mono 
+ 
+/****************************************************************************
+ *  void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
+ *  NOTE: The following code processes two samples at once. When count is odd,
+ *        there is an additional obsolete sample processed, which will not be
+ *        used by the calling functions.
+ */
+    .section .icode, "ax", %progbits
+    .align  2
+    .global channels_process_sound_chan_karaoke
+    .type   channels_process_sound_chan_karaoke, %function
+channels_process_sound_chan_karaoke:
+    @ input: r0 = count, r1 = buf
+    stmfd   sp!, {r4-r6, lr}
+    ldmia   r1, {r2-r3}                @ r4 = buf[0], r5 = buf[1]
+
+.karaokeloop:
+    ldmia   r2, {r4-r5}
+    ldmia   r3, {r6,lr} 
+    mov     r6, r6, asr #1             @ r6 = r6/2
+    rsb     r4, r6, r4, asr #1         @ r4 = -r6 + r4/2 = (buf[0]-buf[1])/2
+    rsb     r6, r4, #0                 @ r6 = -r4
+    mov     lr, lr, asr #1             @ lr = lr/2
+    rsb     r5, lr, r5, asr #1         @ r5 = -lr + r5/2 = (buf[0]-buf[1])/2
+    rsb     lr, r5, #0                 @ lr = -r5  
+    stmia   r2!, {r4-r5}
+    stmia   r3!, {r6,lr}
+    subs    r0, r0, #2
+    bgt     .karaokeloop
+
+    ldmfd   sp!, {r4-r6, pc}
+.karaokeend:
+    .size   channels_process_sound_chan_karaoke,.karaokeend-channels_process_sound_chan_karaoke
+    
+/****************************************************************************
+ *  void sample_output_mono(int count, struct dsp_data *data,
+                               int32_t *src[], int16_t *dst)
+ *  NOTE: The following code processes two samples at once. When count is odd,
+ *        there is an additional obsolete sample processed, which will not be
+ *        used by the calling functions.
+ */
+    .section .icode, "ax", %progbits
+    .align  2
+    .global sample_output_mono
+    .type   sample_output_mono, %function
+sample_output_mono:
+    @ input: r0 = count, r1 = data, r2 = src, r3 = dst
+    stmfd   sp!, {r4-r9, lr}
+
+    ldr     r4, [r2]                   @ r4 = src[0]
+    ldr     r5, [r1]                   @ lr = data->output_scale
+    sub     r1, r5, #1                 @ r1 = r5-1
+    mov     r2, #1
+    mov     r2, r2, asl r1             @ r2 = 1<<r1 = 1 << (scale-1)
+    mvn     r1, #0x8000                @ r1 needed for clipping
+    mov     r8, #0xff00
+    orr     r8, r8, #0xff              @ r8 needed for masking
+
+.somloop:
+    ldmia   r4!, {r6-r7}
+    add     r6, r6, r2
+    mov     r6, r6, asr r5             @ r6 = (r6 + 1<<(scale-1)) >> scale
+    mov     lr, r6, asr #15
+    teq     lr, lr, asr #31
+    eorne   r6, r1, lr, asr #31        @ Clip (-32768...+32767)
+    add     r7, r7, r2
+    mov     r7, r7, asr r5             @ r7 = (r7 + 1<<(scale-1)) >> scale
+    mov     lr, r7, asr #15
+    teq     lr, lr, asr #31
+    eorne   r7, r1, lr, asr #31        @ Clip (-32768...+32767)
+    
+    and     r6, r6, r8
+    orr     r6, r6, r6, asl #16        @ pack first 2 halfwords into 1 word
+    and     r7, r7, r8
+    orr     r7, r7, r7, asl #16        @ pack last 2 halfwords into 1 word
+    stmia   r3!, {r6-r7}
+    
+    subs    r0, r0, #2
+    bgt     .somloop     
+       
+    ldmfd   sp!, {r4-r9, pc}
+.somend:
+    .size   sample_output_mono,.somend-sample_output_mono
+    
+/****************************************************************************
+ * void sample_output_stereo(int count, struct dsp_data *data,
+                                 int32_t *src[], int16_t *dst)
+ *  NOTE: The following code processes two samples at once. When count is odd,
+ *        there is an additional obsolete sample processed, which will not be
+ *        used by the calling functions.
+ */
+    .section .icode, "ax", %progbits
+    .align  2
+    .global sample_output_stereo
+    .type   sample_output_stereo, %function
+sample_output_stereo:
+    @ input: r0 = count, r1 = data, r2 = src, r3 = dst
+    stmfd   sp!, {r4-r11, lr}
+
+    ldmia   r2, {r4-r5}                @ r4 = src[0], r5 = src[1]
+    ldr     r6, [r1]                   @ r6 = data->output_scale
+    sub     r1, r6, #1                 @ r1 = r6-1
+    mov     r2, #1
+    mov     r2, r2, asl r1             @ r2 = 1<<r1 = 1 << (scale-1)
+    mvn     r1, #0x8000                @ r1 needed for clipping
+    mov     r11, #0xff00
+    orr     r11, r11, #0xff            @ r11 needed for masking
+
+.sosloop:
+    ldmia   r4!, {r7-r8}
+    add     r7, r7, r2
+    mov     r7, r7, asr r6             @ r7 = (r7 + 1<<(scale-1)) >> scale
+    mov     lr, r7, asr #15
+    teq     lr, lr, asr #31
+    eorne   r7, r1, lr, asr #31        @ Clip (-32768...+32767)
+    add     r8, r8, r2
+    mov     r8, r8, asr r6             @ r8 = (r8 + 1<<(scale-1)) >> scale
+    mov     lr, r8, asr #15
+    teq     lr, lr, asr #31
+    eorne   r8, r1, lr, asr #31        @ Clip (-32768...+32767)
+    
+    ldmia   r5!, {r9-r10}
+    add     r9, r9, r2
+    mov     r9, r9, asr r6             @ r9 = (r9 + 1<<(scale-1)) >> scale
+    mov     lr, r9, asr #15
+    teq     lr, lr, asr #31
+    eorne   r9, r1, lr, asr #31        @ Clip (-32768...+32767)
+    add     r10, r10, r2
+    mov     r10, r10, asr r6           @ r10 = (r10 + 1<<(scale-1)) >> scale
+    mov     lr, r10, asr #15
+    teq     lr, lr, asr #31
+    eorne   r10, r1, lr, asr #31       @ Clip (-32768...+32767)
+    
+    and     r7, r7, r11
+    orr     r9, r7, r9, asl #16        @ pack first 2 halfwords into 1 word
+    and     r8, r8, r11
+    orr     r10, r8, r10, asl #16      @ pack last 2 halfwords into 1 word
+    stmia   r3!, {r9-r10}
+
+    subs    r0, r0, #2
+    bgt     .sosloop
+
+    ldmfd   sp!, {r4-r11, pc}
+.sosend:
+    .size   sample_output_stereo,.sosend-sample_output_stereo
+
+/****************************************************************************
  * void apply_crossfeed(int count, int32_t* src[])
  */
     .section .text
