@@ -47,6 +47,9 @@
 
 #define LCD_PIXELFORMAT VERTICAL_INTERLEAVED
 
+/* define this if only the remote has an LCD */
+#define HAVE_REMOTE_LCD_AS_MAIN
+
 #define CONFIG_KEYPAD IAUDIO_M3_PAD
 
 #define AB_REPEAT_ENABLE 1

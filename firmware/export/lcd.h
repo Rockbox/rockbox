@@ -331,6 +331,12 @@ static inline unsigned lcd_color_to_native(unsigned color)
 extern fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
 
 /** Port-specific functions. Enable in port config file. **/
+#ifdef HAVE_REMOTE_LCD_AS_MAIN
+void lcd_on(void);
+void lcd_off(void);
+void lcd_poweroff(void);
+#endif
+
 #ifdef HAVE_LCD_ENABLE
 /* Enable/disable the main display. */
 extern void lcd_enable(bool on);

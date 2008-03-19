@@ -21,8 +21,9 @@
 #include "cpu.h"
 #include <stdbool.h>
 #include "kernel.h"
-#include "system.h"
+#include "lcd.h"
 #include "power.h"
+#include "system.h"
 
 #ifndef SIMULATOR
 

@@ -30,10 +30,8 @@
 #include "button.h"
 #include "timer.h"
 #include "backlight.h"
+#include "lcd.h"
 
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-#include "lcd.h" /* for lcd_enable() and lcd_sleep() */
-#endif
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
@@ -367,7 +365,13 @@ void backlight_set_fade_out(int value)
 static void backlight_update_state(void)
 {
 #ifdef HAS_BUTTON_HOLD
-    if (button_hold() && (backlight_on_button_hold != 0))
+    if ((backlight_on_button_hold != 0)
+#ifdef HAVE_REMOTE_LCD_AS_MAIN
+        && remote_button_hold()
+#else
+        && button_hold()
+#endif
+        )
         backlight_timeout = (backlight_on_button_hold == 2) ? 0 : -1;
         /* always on or always off */
     else
@@ -375,9 +379,9 @@ static void backlight_update_state(void)
 #if CONFIG_CHARGING
         if (charger_inserted()
 #ifdef HAVE_USB_POWER
-                || usb_powered()
+            || usb_powered()
 #endif
-                )
+            )
             backlight_timeout = backlight_timeout_plugged;
         else
 #endif
@@ -452,8 +456,9 @@ void backlight_thread(void)
                 break;
 #endif
 
-#if defined(HAVE_REMOTE_LCD) && !defined(SIMULATOR)
+#ifndef SIMULATOR
             /* Here for now or else the aggressive init messes up scrolling */
+#ifdef HAVE_REMOTE_LCD
             case SYS_REMOTE_PLUGGED:
                 lcd_remote_on();
                 lcd_remote_update();
@@ -462,7 +467,17 @@ void backlight_thread(void)
             case SYS_REMOTE_UNPLUGGED:
                 lcd_remote_off();
                 break;
-#endif /* defined(HAVE_REMOTE_LCD) && !defined(SIMULATOR) */
+#elif defined HAVE_REMOTE_LCD_AS_MAIN
+            case SYS_REMOTE_PLUGGED:
+                lcd_on();
+                lcd_update();
+                break;
+
+            case SYS_REMOTE_UNPLUGGED:
+                lcd_off();
+                break;
+#endif /* HAVE_REMOTE_LCD/ HAVE_REMOTE_LCD_AS_MAIN */
+#endif /* !SIMULATOR */
 #ifdef SIMULATOR
             /* This one here too for lack of a better place */
             case SYS_SCREENDUMP:
