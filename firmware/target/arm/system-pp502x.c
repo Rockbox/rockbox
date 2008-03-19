@@ -259,7 +259,7 @@ static void pp_set_cpu_frequency(long frequency)
         while (!(PLL_STATUS & 0x80000000)); /* wait for relock */
 #endif
         scale_suspend_core(true);
-        DEV_TIMING1   = 0x00000808;
+        DEV_TIMING1   = 0x00000303;
         CLOCK_SOURCE  = 0x20007777; /* source #1, #2, #3, #4: PLL (#2 active) */
         scale_suspend_core(false);
         break;
