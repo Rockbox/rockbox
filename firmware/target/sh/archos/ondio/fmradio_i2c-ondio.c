@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
+ * $Id$
  * Physical interface of the Philips TEA5767 in Archos Ondio
  *
  * Copyright (C) 2002 by Linus Nielsen Feltzing
@@ -77,7 +77,7 @@ static void fmradio_i2c_ack(bool nack)
     
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the slave to release it */
-        sleep_thread(0);
+        sleep(0);
 
     DELAY;
     SCL_OUTPUT;
@@ -96,7 +96,7 @@ static int fmradio_i2c_getack(void)
     SDA_INPUT;   /* And set to input */
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the slave to release it */
-        sleep_thread(0);
+        sleep(0);
     
     if (SDA)
         /* ack failed */

@@ -2077,7 +2077,7 @@ void audio_init_playback(void)
     queue_post(&mpeg_queue, MPEG_INIT_PLAYBACK, 0);
 
     while(!init_playback_done)
-        sleep_thread(1);
+        sleep(1);
 }
 
 
@@ -2091,7 +2091,7 @@ void audio_init_recording(unsigned int buffer_offset)
     queue_post(&mpeg_queue, MPEG_INIT_RECORDING, 0);
 
     while(!init_recording_done)
-        sleep_thread(1);
+        sleep(1);
 }
 
 static void init_recording(void)
