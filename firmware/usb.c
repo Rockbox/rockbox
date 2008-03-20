@@ -529,6 +529,10 @@ bool usb_inserted(void)
 #ifdef HAVE_USBSTACK
 void usb_request_exclusive_ata(void)
 {
+    /* This is not really a clean place to start boosting the cpu. but it's 
+     * currently the best one. We want to get rid of having to boost the cpu
+     * for usb anyway */
+    trigger_cpu_boost();
     if(!exclusive_ata_access) {
         queue_post(&usb_queue, USB_REQUEST_DISK, 0);
     }
@@ -536,6 +540,7 @@ void usb_request_exclusive_ata(void)
 
 void usb_release_exclusive_ata(void)
 {
+    cancel_cpu_boost();
     if(exclusive_ata_access) {
         queue_post(&usb_queue, USB_RELEASE_DISK, 0);
         exclusive_ata_access = false;

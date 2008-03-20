@@ -879,7 +879,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cur_sense_data.ascq=0;
             }
             else {
-                trigger_cpu_boost();
                 cur_cmd.last_result = ata_read_sectors(IF_MV2(cur_cmd.lun,)
                                              cur_cmd.sector,
                                              MIN(BUFFER_SIZE/SECTOR_SIZE,
@@ -917,7 +916,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cur_sense_data.ascq=0;
             }
             else {
-                trigger_cpu_boost();
                 receive_block_data(cur_cmd.data[0],
                                    MIN(BUFFER_SIZE,
                                    cur_cmd.count*SECTOR_SIZE));
@@ -953,7 +951,6 @@ static void receive_block_data(void *data,int size)
 
 static void send_csw(int status)
 {
-    cancel_cpu_boost();
     tb.csw->signature = htole32(CSW_SIGNATURE);
     tb.csw->tag = cur_cmd.tag;
     tb.csw->data_residue = 0;
