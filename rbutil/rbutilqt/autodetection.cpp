@@ -135,6 +135,15 @@ bool Autodetection::detect()
                 m_mountpoint = mountpoints.at(i);
                 return true;
             }
+#if defined(Q_OS_WIN32)
+            // on windows, try to detect the drive letter of an Ipod
+            if(rootfolders.contains("iPod_Control"), Qt::CaseInsensitive)
+            {
+                // iPod_Control folder -> Ipod found
+                // detecting of the Ipod type is done below using ipodpatcher
+                m_mountpoint = mountpoints.at(i);
+            }
+#endif
         }
 
     }
@@ -146,7 +155,9 @@ bool Autodetection::detect()
     if(n == 1) {
         qDebug() << "Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
         m_device = ipod.targetname;
+#if !defined(Q_OS_WIN32)
         m_mountpoint = resolveMountPoint(ipod.diskname);
+#endif
         return true;
     }
 
