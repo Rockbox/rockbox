@@ -1112,7 +1112,8 @@ int dsp_callback(int msg, intptr_t param)
 int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 {
     int32_t *tmp[2];
-    long last_yield = current_tick;
+    static long last_yield;
+    long tick;
     int written = 0;
     int samples;
 
@@ -1125,6 +1126,10 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
 
     if (new_gain)
         dsp_set_replaygain(); /* Gain has changed */
+
+    /* Perform at least one yield before starting */
+    last_yield = current_tick;
+    yield();
 
     /* Testing function pointers for NULL is preferred since the pointer
        will be preloaded to be used for the call if not. */
@@ -1162,10 +1167,11 @@ int dsp_process(struct dsp_config *dsp, char *dst, const char *src[], int count)
         dst += samples * sizeof (int16_t) * 2;
         
         /* yield at least once each tick */
-        if (current_tick > last_yield)
+        tick = current_tick;
+        if (TIME_AFTER(tick, last_yield))
         {
+            last_yield = tick;
             yield();
-            last_yield = current_tick;
         }
     }
 
