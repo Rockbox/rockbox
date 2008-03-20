@@ -353,6 +353,7 @@ bool usb_drv_powered(void)
 /* manual: 32.14.1 Device Controller Initialization */
 void usb_drv_init(void)
 {
+    trigger_cpu_boost();
     REG_USBCMD &= ~USBCMD_RUN;
     udelay(50000);
     REG_USBCMD |= USBCMD_CTRL_RESET;
@@ -520,6 +521,11 @@ void usb_drv_wait(int endpoint, bool send)
 int usb_drv_port_speed(void)
 {
     return (REG_PORTSC1 & 0x08000000) ? 1 : 0;
+}
+
+bool usb_drv_connected(void)
+{
+    return ((REG_PORTSC1 & PORTSCX_CURRENT_CONNECT_STATUS) !=0);
 }
 
 void usb_drv_set_address(int address)

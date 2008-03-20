@@ -119,7 +119,12 @@ static bool usb_pin_detect(void)
 int usb_detect(void)
 {
     if(usb_pin_detect()) {
-        return USB_INSERTED;
+        if(usb_drv_connected()) {
+            return USB_INSERTED;
+        }
+        else {
+            return USB_POWERED;
+        }
     }
     else {
         return USB_EXTRACTED;
