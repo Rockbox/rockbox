@@ -110,9 +110,10 @@ static const unsigned char dither_matrix[16][16] = {
 };
 #endif
 
-#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH == 2) \
-    && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
-static const fb_remote_data remote_pattern[4] = {
+#if ((LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)) \
+ || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH == 2) \
+     && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED))
+static const unsigned short vi_pattern[4] = {
     0x0101, 0x0100, 0x0001, 0x0000
 };
 #endif
@@ -271,12 +272,15 @@ int read_bmp_fd(int fd,
 #endif /* defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1 */
         {
 #if LCD_DEPTH == 2
-#if LCD_PIXELFORMAT == VERTICAL_PACKING
-            dst_width  = width;
-            dst_height = (height + 3) >> 2;
-#else /* LCD_PIXELFORMAT == HORIZONTAL_PACKING */
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
             dst_width  = (width + 3) >> 2;
             dst_height = height;
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
+            dst_width  = width;
+            dst_height = (height + 3) >> 2;
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+            dst_width  = width;
+            dst_height = (height + 7) >> 3;
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
             dst_width  = width;
@@ -475,6 +479,7 @@ int read_bmp_fd(int fd,
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
             if (remote) {
 #if (LCD_REMOTE_DEPTH == 2) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
+                /* iAudio X5/M5 remote */
                 fb_remote_data *dest = (fb_remote_data *)bitmap
                                      + dst_width * (row >> 3);
                 int shift = row & 7;
@@ -486,28 +491,14 @@ int read_bmp_fd(int fd,
                         delta = dither_matrix[row & 0xf][col & 0xf];
                     bright = brightness(*qp++);
                     bright = (3 * bright + (bright >> 6) + delta) >> 8;
-                    *dest++ |= remote_pattern[bright] << shift;
+                    *dest++ |= vi_pattern[bright] << shift;
                 }
 #endif /* LCD_REMOTE_DEPTH / LCD_REMOTE_PIXELFORMAT */
             } else
 #endif /* defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1 */
             {
 #if LCD_DEPTH == 2
-#if LCD_PIXELFORMAT == VERTICAL_PACKING
-                /* iriver H1x0 */
-                fb_data *dest = (fb_data *)bitmap + dst_width * (row >> 2);
-                int shift = 2 * (row & 3);
-                int delta = 127;
-                unsigned bright;
-
-                for (col = 0; col < width; col++) {
-                    if (dither)
-                        delta = dither_matrix[row & 0xf][col & 0xf];
-                    bright = brightness(*qp++);
-                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
-                    *dest++ |= (~bright & 3) << shift;
-                }
-#else /* LCD_PIXELFORMAT == HORIZONTAL_PACKING */
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
                 /* greyscale iPods */
                 fb_data *dest = (fb_data *)bitmap + dst_width * row;
                 int shift = 6;
@@ -530,6 +521,34 @@ int read_bmp_fd(int fd,
                 }
                 if (shift < 6)
                     *dest++ = data;
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
+                /* iriver H1x0 */
+                fb_data *dest = (fb_data *)bitmap + dst_width * (row >> 2);
+                int shift = 2 * (row & 3);
+                int delta = 127;
+                unsigned bright;
+
+                for (col = 0; col < width; col++) {
+                    if (dither)
+                        delta = dither_matrix[row & 0xf][col & 0xf];
+                    bright = brightness(*qp++);
+                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
+                    *dest++ |= (~bright & 3) << shift;
+                }
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+                /* iAudio M3 */
+                fb_data *dest = (fb_data *)bitmap + dst_width * (row >> 3);
+                int shift = row & 7;
+                int delta = 127;
+                unsigned bright;
+                
+                for (col = 0; col < width; col++) {
+                    if (dither)
+                        delta = dither_matrix[row & 0xf][col & 0xf];
+                    bright = brightness(*qp++);
+                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
+                    *dest++ |= vi_pattern[bright] << shift;
+                }
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
                 /* iriver h300, colour iPods, X5 */
