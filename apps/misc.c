@@ -1099,28 +1099,23 @@ static int hex2dec(int c)
 }
 
 int hex_to_rgb(const char* hex, int* color)
-{   int ok = 1;
-    int i;
+{
     int red, green, blue;
+    int i = 0;
 
-    if (strlen(hex) == 6) {
-        for (i=0; i < 6; i++ ) {
-           if (!isxdigit(hex[i])) {
-              ok=0;
-              break;
-           }
-        }
+    while ((i < 6) && (isxdigit(hex[i])))
+        i++;
 
-        if (ok) {
-            red = (hex2dec(hex[0]) << 4) | hex2dec(hex[1]);
-            green = (hex2dec(hex[2]) << 4) | hex2dec(hex[3]);
-            blue = (hex2dec(hex[4]) << 4) | hex2dec(hex[5]);
-            *color = LCD_RGBPACK(red,green,blue);
-            return 0;
-        }
-    }
+    if (i < 6)
+        return -1;
 
-    return -1;
+    red = (hex2dec(hex[0]) << 4) | hex2dec(hex[1]);
+    green = (hex2dec(hex[2]) << 4) | hex2dec(hex[3]);
+    blue = (hex2dec(hex[4]) << 4) | hex2dec(hex[5]);
+
+    *color = LCD_RGBPACK(red,green,blue);
+
+    return 0;
 }
 #endif /* HAVE_LCD_COLOR */
 
