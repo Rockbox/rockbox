@@ -999,7 +999,7 @@ void ICODE_ATTR LCDFN(bitmap_part)(const FBFN(data) *src, int src_x,
                 }
                 else
                 {
-                    mask_col  = (mask << 8) & 0xFFu;
+                    mask_col  = (mask >> 8) & 0xFFu;
                     mask_col |= mask_col << 8;
                 }
                 src_col += stride;
