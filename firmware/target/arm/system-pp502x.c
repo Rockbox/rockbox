@@ -144,22 +144,19 @@ void scale_suspend_core(bool suspend) ICODE_ATTR;
 void scale_suspend_core(bool suspend)
 {
     unsigned int core = CURRENT_CORE;
-    unsigned int othercore = 1 - core;
-    static unsigned long proc_bits IBSS_ATTR;
+    IF_COP( unsigned int othercore = 1 - core; )
     static int oldstatus IBSS_ATTR;
 
     if (suspend)
     {
         oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
-        proc_bits = PROC_CTL(othercore) & 0xc0000000;
-        PROC_CTL(othercore) = 0x40000000; nop;
+        IF_COP( PROC_CTL(othercore) = 0x40000000; nop; )
         PROC_CTL(core) = 0x48000003; nop;
     }
     else
     {
         PROC_CTL(core) = 0x4800001f; nop;
-        if (proc_bits == 0)
-            PROC_CTL(othercore) = 0;
+        IF_COP( PROC_CTL(othercore) = 0x00000000; nop; )
         set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
     }
 }
