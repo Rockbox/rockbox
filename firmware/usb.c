@@ -134,25 +134,20 @@ static void usb_slave_mode(bool on)
 
 static void try_reboot(void)
 {
-#if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
-    if (button_status()==BUTTON_RIGHT)
-#endif /* defined(IRIVER_H10) || defined (IRIVER_H10_5GB) */
-    {
 #ifndef HAVE_FLASH_STORAGE
-        ata_sleepnow(); /* Immediately spindown the disk. */
-        sleep(HZ*2);
+    ata_sleepnow(); /* Immediately spindown the disk. */
+    sleep(HZ*2);
 #endif
 
 #ifdef IPOD_ARCH  /* The following code is based on ipodlinux */
 #if CONFIG_CPU == PP5020
-        memcpy((void *)0x40017f00, "diskmode\0\0hotstuff\0\0\1", 21);
+    memcpy((void *)0x40017f00, "diskmode\0\0hotstuff\0\0\1", 21);
 #elif CONFIG_CPU == PP5022
-        memcpy((void *)0x4001ff00, "diskmode\0\0hotstuff\0\0\1", 21);
+    memcpy((void *)0x4001ff00, "diskmode\0\0hotstuff\0\0\1", 21);
 #endif /* CONFIG_CPU */
 #endif /* IPOD_ARCH */
 
-        system_reboot(); /* Reboot */
-    }
+    system_reboot(); /* Reboot */
 }
 
 static void usb_thread(void)
@@ -187,7 +182,11 @@ static void usb_thread(void)
                 else
 #endif
 #ifdef HAVE_USB_POWER
+#if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
+                if((button_status() & ~USBPOWER_BTN_IGNORE) != USBPOWER_BUTTON)
+#else
                 if((button_status() & ~USBPOWER_BTN_IGNORE) == USBPOWER_BUTTON)
+#endif
                 {
                     usb_state = USB_POWERED;
 #ifdef HAVE_USBSTACK
