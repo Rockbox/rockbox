@@ -273,7 +273,7 @@ int do_item_menu(int cur_sel, char* copy_buffer)
                     || (c>='0' && c<= '9'))
 #define hex2dec(c) (((c) >= '0' && ((c) <= '9')) ? (toupper(c)) - '0' : \
                                                    (toupper(c)) - 'A' + 10)
-int hex_to_rgb(const char* hex)
+int hex_to_rgb(const char* hex, int* color)
 {   int ok = 1;
     int i;
     int red, green, blue;
@@ -290,11 +290,12 @@ int hex_to_rgb(const char* hex)
             red = (hex2dec(hex[0]) << 4) | hex2dec(hex[1]);
             green = (hex2dec(hex[2]) << 4) | hex2dec(hex[3]);
             blue = (hex2dec(hex[4]) << 4) | hex2dec(hex[5]);
-            return LCD_RGBPACK(red,green,blue);
+            *color = LCD_RGBPACK(red,green,blue);
+            return 0;
         }
     }
 
-    return 0;
+    return -1;
 }
 #endif /* HAVE_LCD_COLOR */
 
@@ -407,7 +408,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                             case 1:
                                 edit_text = false;
                                 if (value)
-                                    color = hex_to_rgb(value);
+                                    hex_to_rgb(value, &color);
                                 else color = 0;
                                 rb->strcpy(extension, name);
                                 rb->set_color(rb->screens[SCREEN_MAIN], name, &color, -1);

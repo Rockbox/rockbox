@@ -447,21 +447,27 @@ static int parse_image_load(const char *wps_bufptr,
 {
     int n;
     const char *ptr = wps_bufptr;
-    const char *pos = NULL;
-    const char *newline;
-
+    const char* filename;
+    const char* id;
+    int x,y;
+    
     /* format: %x|n|filename.bmp|x|y|
        or %xl|n|filename.bmp|x|y|  */
 
-    ptr = strchr(ptr, '|') + 1;
-    pos = strchr(ptr, '|');
-    newline = strchr(ptr, '\n');
+    if (*ptr != '|')
+        return WPS_ERROR_INVALID_PARAM;
 
-    if (!pos || pos > newline)
-        return 0;
+    ptr++;
+
+    if (!(ptr = parse_list("ssdd", '|', ptr, &id, &filename, &x, &y)))
+        return WPS_ERROR_INVALID_PARAM;
+
+    /* Check there is a terminating | */
+    if (*ptr != '|')
+        return WPS_ERROR_INVALID_PARAM;
 
     /* get the image ID */
-    n = get_image_id(*ptr);
+    n = get_image_id(*id);
 
     /* check the image number and load state */
     if(n < 0 || n >= MAX_IMAGES || wps_data->img[n].loaded)
@@ -470,34 +476,11 @@ static int parse_image_load(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     }
 
-    ptr = pos + 1;
+    /* save a pointer to the filename */
+    bmp_names[n] = filename;
 
-    /* get image name */
-    bmp_names[n] = ptr;
-
-    pos = strchr(ptr, '|');
-    ptr = pos + 1;
-
-    /* get x-position */
-    pos = strchr(ptr, '|');
-    if (pos && pos < newline)
-        wps_data->img[n].x = atoi(ptr);
-    else
-    {
-        /* weird syntax, bail out */
-        return WPS_ERROR_INVALID_PARAM;
-    }
-
-    /* get y-position */
-    ptr = pos + 1;
-    pos = strchr(ptr, '|');
-    if (pos && pos < newline)
-        wps_data->img[n].y = atoi(ptr);
-    else
-    {
-        /* weird syntax, bail out */
-        return WPS_ERROR_INVALID_PARAM;
-    }
+    wps_data->img[n].x = x;
+    wps_data->img[n].y = y;
 
     if (token->type == WPS_TOKEN_IMAGE_DISPLAY)
         wps_data->img[n].always_display = true;

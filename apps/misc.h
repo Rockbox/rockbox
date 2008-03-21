@@ -110,7 +110,7 @@ void check_bootfile(bool do_rolo);
 void setvol(void);
 
 #ifdef HAVE_LCD_COLOR
-int hex_to_rgb(const char* hex);
+int hex_to_rgb(const char* hex, int* color);
 #endif
 
 char* strrsplt(char* str, int c);
@@ -123,5 +123,8 @@ bool dir_exists(const char *path);
  * puts the result in buffer
  */
 char *strip_extension(char* buffer, int buffer_size, const char *filename);
+
+/* A simplified scanf */
+const char* parse_list(const char *fmt, const char sep, const char* str, ...);
 
 #endif /* MISC_H */

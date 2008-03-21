@@ -290,7 +290,7 @@ bool settings_load_config(const char* file, bool apply)
                     case F_T_UINT:
 #ifdef HAVE_LCD_COLOR
                         if (settings[i].flags&F_RGB)
-                            *(int*)settings[i].setting = hex_to_rgb(value);
+                            hex_to_rgb(value, (int*)settings[i].setting);
                         else 
 #endif 
                             if (settings[i].cfg_vals == NULL)

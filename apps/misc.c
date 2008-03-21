@@ -1098,7 +1098,7 @@ static int hex2dec(int c)
                                            (toupper(c)) - 'A' + 10);
 }
 
-int hex_to_rgb(const char* hex)
+int hex_to_rgb(const char* hex, int* color)
 {   int ok = 1;
     int i;
     int red, green, blue;
@@ -1115,11 +1115,12 @@ int hex_to_rgb(const char* hex)
             red = (hex2dec(hex[0]) << 4) | hex2dec(hex[1]);
             green = (hex2dec(hex[2]) << 4) | hex2dec(hex[3]);
             blue = (hex2dec(hex[4]) << 4) | hex2dec(hex[5]);
-            return LCD_RGBPACK(red,green,blue);
+            *color = LCD_RGBPACK(red,green,blue);
+            return 0;
         }
     }
 
-    return 0;
+    return -1;
 }
 #endif /* HAVE_LCD_COLOR */
 
@@ -1200,3 +1201,104 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
 
     return buffer;
 }
+
+#ifdef HAVE_LCD_BITMAP
+/* A simplified scanf - used (at time of writing) by wps parsing functions.
+
+   fmt - char array specifying the format of each list option.  Valid values
+         are:  d - int
+               s - string (sets pointer to string, without copying)
+               c - hex colour (RGB888 - e.g. ff00ff)
+               g - greyscale "colour" (0-3)
+
+   sep - list separator (e.g. ',' or '|')
+   str  - string to parse, must be terminated by 0 or sep
+   ... - pointers to store the parsed values
+
+   return value - pointer to char after parsed data, 0 if there was an error.
+
+*/
+
+/* '0'-'3' are ASCII 0x30 to 0x33 */
+#define is0123(x) (((x) & 0xfc) == 0x30)
+
+const char* parse_list(const char *fmt, const char sep, const char* str, ...)
+{
+    va_list ap;
+    const char* p = str;
+    const char** s;
+    int* d;
+
+    va_start(ap, str);
+
+    while (*fmt)
+    {
+        /* Check for separator, if we're not at the start */
+        if (p != str)
+        {
+            if (*p != sep)
+                goto err;
+            p++;
+        }
+
+        switch (*fmt++) 
+        {
+            case 's': /* string - return a pointer to it (not a copy) */
+                s = va_arg(ap, const char **);
+
+                *s = p;
+                while (*p && *p != sep)
+                   p++;
+
+                break;
+
+            case 'd': /* int */
+                d = va_arg(ap, int*);
+                if (!isdigit(*p))
+                   goto err;
+
+                *d = *p++ - '0';
+
+                while (isdigit(*p))
+                   *d = (*d * 10) + (*p++ - '0');
+
+                break;
+
+#ifdef HAVE_LCD_COLOR
+            case 'c': /* colour (rrggbb - e.g. f3c1a8) */
+                d = va_arg(ap, int*);
+
+                if (hex_to_rgb(p, d) < 0)
+                    goto err;
+
+                p += 6;
+
+                break;
+#endif
+
+#if LCD_DEPTH == 2 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 2)
+            case 'g': /* greyscale colour (0-3) */
+                d = va_arg(ap, int*);
+
+                if (is0123(*p))
+                    *d = *p++ - '0';
+                else
+                    goto err;
+
+                break;
+#endif
+
+            default:  /* Unknown format type */
+                goto err;
+                break;
+        }
+    }
+
+    va_end(ap);
+    return p;
+
+err:
+    va_end(ap);
+    return 0;
+}
+#endif

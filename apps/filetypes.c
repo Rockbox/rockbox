@@ -164,12 +164,12 @@ void read_color_theme_file(void) {
             continue;
         if (!strcasecmp(ext, "folder"))
         {
-            custom_colors[0] = hex_to_rgb(color);
+            hex_to_rgb(color, &custom_colors[0]);
             continue;
         }
         if (!strcasecmp(ext, "???"))
         {
-            custom_colors[MAX_FILETYPES] = hex_to_rgb(color);
+            hex_to_rgb(color, &custom_colors[MAX_FILETYPES]);
             continue;
         }
         for (i=1; i<filetype_count; i++)
@@ -177,7 +177,7 @@ void read_color_theme_file(void) {
             if (filetypes[i].extension &&
                 !strcasecmp(ext, filetypes[i].extension))
             {
-                custom_colors[i] = hex_to_rgb(color);
+                hex_to_rgb(color, &custom_colors[i]);
                 break;
             }
         }
