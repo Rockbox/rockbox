@@ -806,7 +806,7 @@ void settings_apply(bool read_disk)
             global_settings.wps_file[0] != 0xff ) {
             snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
                     global_settings.wps_file);
-            wps_data_load(gui_wps[0].data, buf, true);
+            wps_data_load(gui_wps[0].data, &screens[0], buf, true);
         }
         else
         {
@@ -835,7 +835,7 @@ void settings_apply(bool read_disk)
         if ( global_settings.rwps_file[0]) {
             snprintf(buf, sizeof buf, WPS_DIR "/%s.rwps",
                     global_settings.rwps_file);
-            wps_data_load(gui_wps[1].data, buf, true);
+            wps_data_load(gui_wps[1].data, &screens[1], buf, true);
         }
         else
         {

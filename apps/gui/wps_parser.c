@@ -69,13 +69,13 @@ static int line;
 #ifdef HAVE_LCD_BITMAP
 
 #if LCD_DEPTH > 1
-#define MAX_BITMAPS MAX_IMAGES+2 /* WPS images + pbar bitmap + backdrop */
+#define MAX_BITMAPS (MAX_IMAGES+2) /* WPS images + pbar bitmap + backdrop */
 #else
-#define MAX_BITMAPS MAX_IMAGES+1 /* WPS images + pbar bitmap */
+#define MAX_BITMAPS (MAX_IMAGES+1) /* WPS images + pbar bitmap */
 #endif
 
 #define PROGRESSBAR_BMP MAX_IMAGES
-#define BACKDROP_BMP    MAX_IMAGES+1
+#define BACKDROP_BMP    (MAX_IMAGES+1)
 
 /* pointers to the bitmap filenames in the WPS source */
 static const char *bmp_names[MAX_BITMAPS];
@@ -118,6 +118,8 @@ static int parse_dir_level(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 
 #ifdef HAVE_LCD_BITMAP
+static int parse_viewport(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
 static int parse_leftmargin(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_image_special(const char *wps_bufptr,
@@ -131,7 +133,6 @@ static int parse_image_display(const char *wps_bufptr,
 static int parse_image_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 #endif /*HAVE_LCD_BITMAP */
-
 #ifdef HAVE_ALBUMART
 static int parse_albumart_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
@@ -311,6 +312,9 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_ALBUMART_DISPLAY,         "C",   WPS_REFRESH_STATIC,
                                                 parse_albumart_conditional },
 #endif
+
+    { WPS_NO_TOKEN,                       "V",   0,    parse_viewport      },
+
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
     { WPS_TOKEN_IMAGE_BACKDROP,           "X",   0,    parse_image_special },
 #endif
@@ -334,9 +338,11 @@ static int skip_end_of_line(const char *wps_bufptr)
 /* Starts a new subline in the current line during parsing */
 static void wps_start_new_subline(struct wps_data *data)
 {
+    struct wps_viewport* vp = &data->viewports[data->num_viewports];
+
     data->num_sublines++;
     data->sublines[data->num_sublines].first_token_idx = data->num_tokens;
-    data->lines[data->num_lines].num_sublines++;
+    vp->lines[vp->num_lines].num_sublines++;
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -482,12 +488,119 @@ static int parse_image_load(const char *wps_bufptr,
     wps_data->img[n].x = x;
     wps_data->img[n].y = y;
 
+    /* save current viewport */
+    wps_data->img[n].vp = &wps_data->viewports[wps_data->num_viewports].vp;
+
     if (token->type == WPS_TOKEN_IMAGE_DISPLAY)
         wps_data->img[n].always_display = true;
 
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
 }
+
+static int parse_viewport(const char *wps_bufptr,
+                          struct wps_token *token,
+                          struct wps_data *wps_data)
+{
+    const char *ptr = wps_bufptr;
+    struct viewport* vp;
+    int depth;
+
+    (void)token; /* Kill warnings */
+
+    if (*wps_bufptr != '|')
+        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
+
+    ptr = wps_bufptr + 1;
+    /* format: %V|x|y|width|height|fg_pattern|bg_pattern| */
+
+    if (wps_data->num_viewports >= WPS_MAX_VIEWPORTS)
+        return WPS_ERROR_INVALID_PARAM;
+
+    wps_data->num_viewports++;
+    vp = &wps_data->viewports[wps_data->num_viewports].vp;
+
+    /* Set the defaults for fields not user-specified */
+    vp->drawmode = DRMODE_SOLID;
+    vp->xmargin  = 0;
+    vp->ymargin  = 0;
+
+    /* Work out the depth of this display */
+#ifdef HAVE_REMOTE_LCD
+    depth = (wps_data->remote_wps ? LCD_REMOTE_DEPTH : LCD_DEPTH);
+#else
+    depth = LCD_DEPTH;
+#endif
+
+#ifdef HAVE_LCD_COLOR
+    if (depth == 16)
+    {
+        parse_list("dddddcc", '|', ptr, &vp->x, &vp->y, &vp->width,
+                   &vp->height, &vp->font, &vp->fg_pattern,&vp->bg_pattern);
+    }
+    else 
+#endif
+#if (LCD_DEPTH == 2) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 2)
+    if (depth == 2) {
+        parse_list("dddddgg", '|', ptr, &vp->x, &vp->y, &vp->width,
+                   &vp->height, &vp->font, &vp->fg_pattern, &vp->bg_pattern);
+    }
+    else 
+#endif
+#if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
+    if (depth == 1)
+    {
+        parse_list("ddddd", '|', ptr, &vp->x, &vp->y, &vp->width, &vp->height, 
+                                      &vp->font);
+    }
+      else
+#endif
+    {}
+
+    /* Default to using the user font if the font was an invalid number */
+    if ((vp->font != FONT_SYSFIXED) && (vp->font != FONT_UI))
+        vp->font = FONT_UI;
+
+    /* Validate the viewport dimensions - we know that the numbers are
+       non-negative integers */
+#ifdef HAVE_REMOTE_LCD
+    if (wps_data->remote_wps)
+    {
+        if ((vp->x >= LCD_REMOTE_WIDTH) || 
+            ((vp->x + vp->width) >= LCD_REMOTE_WIDTH) ||
+            (vp->y >= LCD_REMOTE_HEIGHT) || 
+            ((vp->y + vp->height) >= LCD_REMOTE_HEIGHT))
+        {
+            return WPS_ERROR_INVALID_PARAM;
+        }
+    }
+    else
+#else
+    {
+        if ((vp->x >= LCD_WIDTH) || 
+            (vp->y >= LCD_HEIGHT) || 
+            ((vp->y + vp->height) >= LCD_HEIGHT))
+        {
+            return WPS_ERROR_INVALID_PARAM;
+        }
+    }
+#endif
+  
+    wps_data->viewports[wps_data->num_viewports].num_lines = 0;
+  
+    if (wps_data->num_sublines < WPS_MAX_SUBLINES)
+    {
+        wps_data->viewports[wps_data->num_viewports].lines[0].first_subline_idx =
+            wps_data->num_sublines;
+
+        wps_data->sublines[wps_data->num_sublines].first_token_idx =
+            wps_data->num_tokens;
+    }
+
+    /* Skip the rest of the line */
+    return skip_end_of_line(wps_bufptr);
+  }
+
 
 static int parse_image_special(const char *wps_bufptr,
                                struct wps_token *token,
@@ -958,7 +1071,8 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     level = -1;
 
     while(*wps_bufptr && !fail && data->num_tokens < WPS_MAX_TOKENS - 1
-          && data->num_lines < WPS_MAX_LINES)
+          && data->num_viewports < WPS_MAX_VIEWPORTS 
+          && data->viewports[data->num_viewports].num_lines < WPS_MAX_LINES)
     {
         switch(*wps_bufptr++)
         {
@@ -1066,12 +1180,12 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 
                 line++;
                 wps_start_new_subline(data);
-                data->num_lines++; /* Start a new line */
+                data->viewports[data->num_viewports].num_lines++; /* Start a new line */
 
-                if ((data->num_lines < WPS_MAX_LINES) &&
+                if ((data->viewports[data->num_viewports].num_lines < WPS_MAX_LINES) &&
                     (data->num_sublines < WPS_MAX_SUBLINES))
                 {
-                    data->lines[data->num_lines].first_subline_idx =
+                    data->viewports[data->num_viewports].lines[data->viewports[data->num_viewports].num_lines].first_subline_idx =
                         data->num_sublines;
 
                     data->sublines[data->num_sublines].first_token_idx =
@@ -1148,6 +1262,9 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     if (!fail && level >= 0) /* there are unclosed conditionals */
         fail = PARSE_FAIL_UNCLOSED_COND;
 
+    /* We have finished with the last viewport, so increment count */
+    data->num_viewports++;
+
 #ifdef DEBUG
     print_debug_info(data, fail, line);
 #endif
@@ -1211,16 +1328,6 @@ static void wps_reset(struct wps_data *data)
 }
 
 #ifdef HAVE_LCD_BITMAP
-
-
-static void clear_bmp_names(void)
-{
-    int n;
-    for (n = 0; n < MAX_BITMAPS; n++)
-    {
-        bmp_names[n] = NULL;
-    }
-}
 
 static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
 {
@@ -1291,6 +1398,7 @@ static char *skip_utf8_bom(char *buf)
 /* to setup up the wps-data from a format-buffer (isfile = false)
    from a (wps-)file (isfile = true)*/
 bool wps_data_load(struct wps_data *wps_data,
+                   struct screen *display,
                    const char *buf,
                    bool isfile)
 {
@@ -1299,6 +1407,24 @@ bool wps_data_load(struct wps_data *wps_data,
 
     wps_reset(wps_data);
 
+    /* Initialise the first (default) viewport */
+    wps_data->viewports[0].vp.x          = 0;
+    wps_data->viewports[0].vp.y          = 0;
+    wps_data->viewports[0].vp.width      = display->width;
+    wps_data->viewports[0].vp.height     = display->height;
+#ifdef HAVE_LCD_BITMAP
+    wps_data->viewports[0].vp.font       = FONT_UI;
+    wps_data->viewports[0].vp.drawmode   = DRMODE_SOLID;
+#endif
+    wps_data->viewports[0].vp.xmargin    = display->getxmargin();
+    wps_data->viewports[0].vp.ymargin    = display->getymargin();
+#if LCD_DEPTH > 1
+    if (display->depth > 1)
+    {
+        wps_data->viewports[0].vp.fg_pattern = display->get_foreground();
+        wps_data->viewports[0].vp.bg_pattern = display->get_background();
+    }
+#endif
     if (!isfile)
     {
         return wps_parse(wps_data, buf);
@@ -1357,7 +1483,8 @@ bool wps_data_load(struct wps_data *wps_data,
             return false;
 
 #ifdef HAVE_LCD_BITMAP
-        clear_bmp_names();
+        /* Set all filename pointers to NULL */
+        memset(bmp_names, sizeof(bmp_names), 0);
 #endif
 
         /* Skip leading UTF-8 BOM, if present. */
@@ -1385,20 +1512,20 @@ bool wps_data_load(struct wps_data *wps_data,
     }
 }
 
-int wps_subline_index(struct wps_data *data, int line, int subline)
+int wps_subline_index(struct wps_data *data, int v, int line, int subline)
 {
-    return data->lines[line].first_subline_idx + subline;
+    return data->viewports[v].lines[line].first_subline_idx + subline;
 }
 
-int wps_first_token_index(struct wps_data *data, int line, int subline)
+int wps_first_token_index(struct wps_data *data, int v, int line, int subline)
 {
-    int first_subline_idx = data->lines[line].first_subline_idx;
+    int first_subline_idx = data->viewports[v].lines[line].first_subline_idx;
     return data->sublines[first_subline_idx + subline].first_token_idx;
 }
 
-int wps_last_token_index(struct wps_data *data, int line, int subline)
+int wps_last_token_index(struct wps_data *data, int v, int line, int subline)
 {
-    int first_subline_idx = data->lines[line].first_subline_idx;
+    int first_subline_idx = data->viewports[v].lines[line].first_subline_idx;
     int idx = first_subline_idx + subline;
     if (idx < data->num_sublines - 1)
     {

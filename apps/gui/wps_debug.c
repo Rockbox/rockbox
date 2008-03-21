@@ -493,40 +493,51 @@ static void dump_wps_tokens(struct wps_data *data)
 
 static void print_line_info(struct wps_data *data)
 {
-    int i, j;
+    int i, j, v;
     struct wps_line *line;
     struct wps_subline *subline;
 
     if (wps_verbose_level > 0)
     {
-        DEBUGF("Number of lines   : %d\n", data->num_lines);
-        DEBUGF("Number of sublines: %d\n", data->num_sublines);
-        DEBUGF("Number of tokens  : %d\n", data->num_tokens);
+        DEBUGF("Number of viewports : %d\n", data->num_viewports);
+        for (v = 0; v < data->num_viewports; v++)
+        {
+            DEBUGF("vp %d: Number of lines: %d\n", v, data->viewports[v].num_lines);
+        }
+        DEBUGF("Number of sublines  : %d\n", data->num_sublines);
+        DEBUGF("Number of tokens    : %d\n", data->num_tokens);
         DEBUGF("\n");
     }
 
     if (wps_verbose_level > 1)
     {
-        for (i = 0, line = data->lines; i < data->num_lines; i++,line++)
+        for (v = 0; v < data->num_viewports; v++)
         {
-            DEBUGF("Line %2d (num_sublines=%d, first_subline=%d)\n",
-                   i, line->num_sublines, line->first_subline_idx);
-
-            for (j = 0, subline = data->sublines + line->first_subline_idx;
-                 j < line->num_sublines; j++, subline++)
+            DEBUGF("Viewport %d - +%d+%d (%dx%d)\n",v,data->viewports[v].vp.x, 
+                                                      data->viewports[v].vp.y,
+                                                      data->viewports[v].vp.width,
+                                                      data->viewports[v].vp.height);
+            for (i = 0, line = data->viewports[v].lines; i < data->viewports[v].num_lines; i++,line++)
             {
-                DEBUGF("    Subline %d: first_token=%3d, last_token=%3d",
-                       j, subline->first_token_idx,
-                       wps_last_token_index(data, i, j));
+                DEBUGF("Line %2d (num_sublines=%d, first_subline=%d)\n",
+                       i, line->num_sublines, line->first_subline_idx);
 
-                if (subline->line_type & WPS_REFRESH_SCROLL)
-                    DEBUGF(", scrolled");
-                else if (subline->line_type & WPS_REFRESH_PLAYER_PROGRESS)
-                    DEBUGF(", progressbar");
-                else if (subline->line_type & WPS_REFRESH_PEAK_METER)
-                    DEBUGF(", peakmeter");
+                for (j = 0, subline = data->sublines + line->first_subline_idx;
+                     j < line->num_sublines; j++, subline++)
+                {
+                    DEBUGF("    Subline %d: first_token=%3d, last_token=%3d",
+                           j, subline->first_token_idx,
+                           wps_last_token_index(data, v, i, j));
 
-                DEBUGF("\n");
+                    if (subline->line_type & WPS_REFRESH_SCROLL)
+                        DEBUGF(", scrolled");
+                    else if (subline->line_type & WPS_REFRESH_PLAYER_PROGRESS)
+                        DEBUGF(", progressbar");
+                    else if (subline->line_type & WPS_REFRESH_PEAK_METER)
+                        DEBUGF(", peakmeter");
+
+                    DEBUGF("\n");
+                }
             }
         }
 

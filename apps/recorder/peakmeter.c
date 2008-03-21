@@ -915,14 +915,14 @@ unsigned short peak_meter_scale_value(unsigned short val, int meterwidth)
 void peak_meter_screen(struct screen *display, int x, int y, int height)
 {
     peak_meter_draw(display, &scales[display->screen_type], x, y,
-                        display->width - x, height);
+                        display->getwidth() - x, height);
 }           
 /**
  * Draws a peak meter in the specified size at the specified position.
  * @param int x - The x coordinate. 
- *                Make sure that 0 <= x and x + width < display->width
+ *                Make sure that 0 <= x and x + width < display->getwidth()
  * @param int y - The y coordinate. 
- *                Make sure that 0 <= y and y + height < display->height
+ *                Make sure that 0 <= y and y + height < display->getheight()
  * @param int width - The width of the peak meter. Note that for display
  *                    of clips a 3 pixel wide area is used ->
  *                    width > 3
@@ -1111,7 +1111,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         start_trigx = x+peak_meter_scale_value(trig_strt_threshold,meterwidth);
         display->vline(start_trigx, ycenter - 2, ycenter);
         start_trigx ++;
-        if (start_trigx < display->width ) display->drawpixel(start_trigx, ycenter - 1);
+        if (start_trigx < display->getwidth() ) display->drawpixel(start_trigx, ycenter - 1);
 
         stop_trigx = x + peak_meter_scale_value(trig_stp_threshold,meterwidth);
         display->vline(stop_trigx, ycenter - 2, ycenter);

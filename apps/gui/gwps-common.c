@@ -295,6 +295,19 @@ bool gui_wps_display(void)
     {
         FOR_NB_SCREENS(i)
         {
+            /* Update the values in the first (default) viewport - in case the user
+               has modified the statusbar or colour settings */
+#ifdef HAVE_LCD_BITMAP
+            gui_wps[i].data->viewports[0].vp.ymargin = gui_wps[i].display->getymargin();
+#if LCD_DEPTH > 1
+            if (gui_wps[i].display->depth > 1)
+            {
+                gui_wps[i].data->viewports[0].vp.fg_pattern = gui_wps[i].display->get_foreground();
+                gui_wps[i].data->viewports[0].vp.bg_pattern = gui_wps[i].display->get_background();
+            }
+#endif
+#endif
+
             gui_wps[i].display->clear_display();
             if (!gui_wps[i].data->wps_loaded) {
                 if ( !gui_wps[i].data->num_tokens ) {
@@ -306,6 +319,7 @@ bool gui_wps_display(void)
                         unload_wps_backdrop();
 #endif
                         wps_data_load(gui_wps[i].data,
+                                      gui_wps[i].display,
                                       "%s%?it<%?in<%in. |>%it|%fn>\n"
                                       "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
                                       "%s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>\n"
@@ -316,6 +330,7 @@ bool gui_wps_display(void)
                                       "%pm\n", false);
 #else
                         wps_data_load(gui_wps[i].data,
+                                      gui_wps[i].display,
                                       "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>\n"
                                       "%pc%?ps<*|/>%pt\n", false);
 #endif
@@ -328,6 +343,7 @@ bool gui_wps_display(void)
                          unload_remote_wps_backdrop();
 #endif
                          wps_data_load(gui_wps[i].data,
+                                       gui_wps[i].display,
                                        "%s%?ia<%ia|%?d2<%d2|(root)>>\n"
                                        "%s%?it<%?in<%in. |>%it|%fn>\n"
                                        "%al%pc/%pt%ar[%pp:%pe]\n"
@@ -448,7 +464,7 @@ static void draw_progressbar(struct gui_wps *gwps, int line)
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
     struct wps_state *state = gwps->state;
-    int h = font_get(FONT_UI)->height;
+    int h = font_get(display->getfont())->height;
 
     int sb_y;
     if (data->progress_top < 0)
@@ -459,7 +475,7 @@ static void draw_progressbar(struct gui_wps *gwps, int line)
         sb_y = data->progress_top;
 
     if (!data->progress_end)
-        data->progress_end=display->width;
+        data->progress_end=display->getwidth();
 
     if (gwps->data->progressbar.have_bitmap_pb)
         gui_bitmap_scrollbar_draw(display, data->progressbar.bm,
@@ -529,7 +545,7 @@ static void wps_draw_image(struct gui_wps *gwps, int n)
 #endif
 }
 
-static void wps_display_images(struct gui_wps *gwps)
+static void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
 {
     if(!gwps || !gwps->data || !gwps->display)
         return;
@@ -541,7 +557,8 @@ static void wps_display_images(struct gui_wps *gwps)
     for (n = 0; n < MAX_IMAGES; n++)
     {
         if (data->img[n].loaded &&
-            (data->img[n].display || data->img[n].always_display))
+            (data->img[n].display || 
+             (data->img[n].always_display && data->img[n].vp == vp)))
         {
             wps_draw_image(gwps, n);
         }
@@ -1449,7 +1466,7 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
    The return value indicates whether the line needs to be updated.
 */
 static bool get_line(struct gui_wps *gwps,
-                     int line, int subline,
+                     int v, int line, int subline,
                      struct align_pos *align,
                      char *linebuf,
                      int linebuf_size)
@@ -1477,8 +1494,8 @@ static bool get_line(struct gui_wps *gwps,
 #endif
 
     /* Process all tokens of the desired subline */
-    last_token_idx = wps_last_token_index(data, line, subline);
-    for (i = wps_first_token_index(data, line, subline);
+    last_token_idx = wps_last_token_index(data, v, line, subline);
+    for (i = wps_first_token_index(data, v, line, subline);
          i <= last_token_idx; i++)
     {
         switch(data->tokens[i].type)
@@ -1577,16 +1594,16 @@ static bool get_line(struct gui_wps *gwps,
     return update;
 }
 
-static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
+static void get_subline_timeout(struct gui_wps *gwps, int v, int line, int subline)
 {
     struct wps_data *data = gwps->data;
     int i;
-    int subline_idx = wps_subline_index(data, line, subline);
-    int last_token_idx = wps_last_token_index(data, line, subline);
+    int subline_idx = wps_subline_index(data, v, line, subline);
+    int last_token_idx = wps_last_token_index(data, v, line, subline);
 
     data->sublines[subline_idx].time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
 
-    for (i = wps_first_token_index(data, line, subline);
+    for (i = wps_first_token_index(data, v, line, subline);
          i <= last_token_idx; i++)
     {
         switch(data->tokens[i].type)
@@ -1614,7 +1631,7 @@ static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
 
 /* Calculates which subline should be displayed for the specified line
    Returns true iff the subline must be refreshed */
-static bool update_curr_subline(struct gui_wps *gwps, int line)
+static bool update_curr_subline(struct gui_wps *gwps, int v, int line)
 {
     struct wps_data *data = gwps->data;
 
@@ -1623,13 +1640,13 @@ static bool update_curr_subline(struct gui_wps *gwps, int line)
     bool new_subline_refresh;
     bool only_one_subline;
 
-    num_sublines = data->lines[line].num_sublines;
-    reset_subline = (data->lines[line].curr_subline == SUBLINE_RESET);
+    num_sublines = data->viewports[v].lines[line].num_sublines;
+    reset_subline = (data->viewports[v].lines[line].curr_subline == SUBLINE_RESET);
     new_subline_refresh = false;
     only_one_subline = false;
 
     /* if time to advance to next sub-line  */
-    if (TIME_AFTER(current_tick, data->lines[line].subline_expire_time - 1) ||
+    if (TIME_AFTER(current_tick, data->viewports[v].lines[line].subline_expire_time - 1) ||
         reset_subline)
     {
         /* search all sublines until the next subline with time > 0
@@ -1637,46 +1654,46 @@ static bool update_curr_subline(struct gui_wps *gwps, int line)
         if (reset_subline)
             search_start = 0;
         else
-            search_start = data->lines[line].curr_subline;
+            search_start = data->viewports[v].lines[line].curr_subline;
 
         for (search = 0; search < num_sublines; search++)
         {
-            data->lines[line].curr_subline++;
+            data->viewports[v].lines[line].curr_subline++;
 
             /* wrap around if beyond last defined subline or WPS_MAX_SUBLINES */
-            if (data->lines[line].curr_subline == num_sublines)
+            if (data->viewports[v].lines[line].curr_subline == num_sublines)
             {
-                if (data->lines[line].curr_subline == 1)
+                if (data->viewports[v].lines[line].curr_subline == 1)
                     only_one_subline = true;
-                data->lines[line].curr_subline = 0;
+                data->viewports[v].lines[line].curr_subline = 0;
             }
 
             /* if back where we started after search or
                 only one subline is defined on the line */
             if (((search > 0) &&
-                 (data->lines[line].curr_subline == search_start)) ||
+                 (data->viewports[v].lines[line].curr_subline == search_start)) ||
                 only_one_subline)
             {
                 /* no other subline with a time > 0 exists */
-                data->lines[line].subline_expire_time = (reset_subline ?
+                data->viewports[v].lines[line].subline_expire_time = (reset_subline ?
                     current_tick :
-                    data->lines[line].subline_expire_time) + 100 * HZ;
+                    data->viewports[v].lines[line].subline_expire_time) + 100 * HZ;
                 break;
             }
             else
             {
                 /* get initial time multiplier for this subline */
-                get_subline_timeout(gwps, line, data->lines[line].curr_subline);
+                get_subline_timeout(gwps, v, line, data->viewports[v].lines[line].curr_subline);
 
-                int subline_idx = wps_subline_index(data, line,
-                                               data->lines[line].curr_subline);
+                int subline_idx = wps_subline_index(data, v, line,
+                                               data->viewports[v].lines[line].curr_subline);
 
                 /* only use this subline if subline time > 0 */
                 if (data->sublines[subline_idx].time_mult > 0)
                 {
                     new_subline_refresh = true;
-                    data->lines[line].subline_expire_time = (reset_subline ?
-                        current_tick : data->lines[line].subline_expire_time) +
+                    data->viewports[v].lines[line].subline_expire_time = (reset_subline ?
+                        current_tick : data->viewports[v].lines[line].subline_expire_time) +
                         BASE_SUBLINE_TIME*data->sublines[subline_idx].time_mult;
                     break;
                 }
@@ -1724,10 +1741,10 @@ static void write_line(struct screen *display,
     }
 
     left_xpos = display->getxmargin();
-    right_xpos = (display->width - right_width);
-    center_xpos = (display->width + left_xpos - center_width) / 2;
+    right_xpos = (display->getwidth() - right_width);
+    center_xpos = (display->getwidth() + left_xpos - center_width) / 2;
 
-    scroll_width = display->width - left_xpos;
+    scroll_width = display->getwidth() - left_xpos;
 
     /* Checks for overlapping strings.
         If needed the overlapping strings will be merged, separated by a
@@ -1767,7 +1784,7 @@ static void write_line(struct screen *display,
         format_align->right = format_align->center;
         /* calculate the new width and position of the merged string */
         right_width = center_width + space_width + right_width;
-        right_xpos = (display->width - right_width);
+        right_xpos = (display->getwidth() - right_width);
         /* there is no centered string anymore */
         center_width = 0;
     }
@@ -1778,7 +1795,7 @@ static void write_line(struct screen *display,
         format_align->right = format_align->center;
         /* calculate the new width and position of the string */
         right_width = center_width;
-        right_xpos = (display->width - right_width);
+        right_xpos = (display->getwidth() - right_width);
         /* there is no centered string anymore */
         center_width = 0;
     }
@@ -1823,7 +1840,7 @@ static void write_line(struct screen *display,
 #ifdef HAVE_LCD_BITMAP
         /* clear the line first */
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        display->fillrect(left_xpos, ypos, display->width, string_height);
+        display->fillrect(left_xpos, ypos, display->getwidth(), string_height);
         display->set_drawmode(DRMODE_SOLID);
 #endif
 
@@ -1862,7 +1879,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     if(!gwps || !data || !state || !display)
         return false;
 
-    int line, i, subline_idx;
+    int v, line, i, subline_idx;
     unsigned char flags;
     char linebuf[MAX_PATH];
 
@@ -1885,19 +1902,19 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     */
     bool enable_pm = false;
 
-    /* Set images to not to be displayed */
-    for (i = 0; i < MAX_IMAGES; i++)
-    {
-        data->img[i].display = false;
-    }
 #endif
 
     /* reset to first subline if refresh all flag is set */
     if (refresh_mode == WPS_REFRESH_ALL)
     {
-        for (i = 0; i < data->num_lines; i++)
+        display->clear_display();
+
+        for (v = 0; v < data->num_viewports; v++)
         {
-            data->lines[i].curr_subline = SUBLINE_RESET;
+            for (i = 0; i < data->viewports[v].num_lines; i++)
+            {
+                data->viewports[v].lines[i].curr_subline = SUBLINE_RESET;
+            }
         }
     }
 
@@ -1917,87 +1934,113 @@ bool gui_wps_refresh(struct gui_wps *gwps,
 
     state->ff_rewind_count = ffwd_offset;
 
-    for (line = 0; line < data->num_lines; line++)
+    for (v = 0; v < data->num_viewports; v++)
     {
-        memset(linebuf, 0, sizeof(linebuf));
-        update_line = false;
+        display->set_viewport(&data->viewports[v].vp);
 
-        /* get current subline for the line */
-        new_subline_refresh = update_curr_subline(gwps, line);
-
-        subline_idx = wps_subline_index(data, line,
-                                        data->lines[line].curr_subline);
-        flags = data->sublines[subline_idx].line_type;
-
-        if (refresh_mode == WPS_REFRESH_ALL || (flags & refresh_mode)
-            || new_subline_refresh)
+        if (refresh_mode == WPS_REFRESH_ALL)
         {
-            /* get_line tells us if we need to update the line */
-            update_line = get_line(gwps, line, data->lines[line].curr_subline,
-                                   &align, linebuf, sizeof(linebuf));
+            display->clear_viewport();
         }
 
 #ifdef HAVE_LCD_BITMAP
-        /* progressbar */
-        if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
+        /* Set images to not to be displayed */
+        for (i = 0; i < MAX_IMAGES; i++)
         {
-            /* the progressbar should be alone on its line */
-            update_line = false;
-            draw_progressbar(gwps, line);
-        }
-
-        /* peakmeter */
-        if (flags & refresh_mode & WPS_REFRESH_PEAK_METER)
-        {
-            /* the peakmeter should be alone on its line */
-            update_line = false;
-
-            int h = font_get(FONT_UI)->height;
-            int peak_meter_y = display->getymargin() + line * h;
-
-            /* The user might decide to have the peak meter in the last
-                line so that it is only displayed if no status bar is
-                visible. If so we neither want do draw nor enable the
-                peak meter. */
-            if (peak_meter_y + h <= display->height) {
-                /* found a line with a peak meter -> remember that we must
-                    enable it later */
-                enable_pm = true;
-                peak_meter_screen(gwps->display, 0, peak_meter_y,
-                                  MIN(h, display->height - peak_meter_y));
-            }
-        }
-
-#else /* HAVE_LCD_CHARCELL */
-
-        /* progressbar */
-        if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
-        {
-            if (data->full_line_progressbar)
-                draw_player_fullbar(gwps, linebuf, sizeof(linebuf));
-            else
-                draw_player_progress(gwps);
+            data->img[i].display = false;
         }
 #endif
 
-        if (update_line)
+        for (line = 0; line < data->viewports[v].num_lines; line++)
         {
-            if (flags & WPS_REFRESH_SCROLL)
+            memset(linebuf, 0, sizeof(linebuf));
+            update_line = false;
+
+            /* get current subline for the line */
+            new_subline_refresh = update_curr_subline(gwps, v, line);
+
+            subline_idx = wps_subline_index(data, v, line,
+                                            data->viewports[v].lines[line].curr_subline);
+            flags = data->sublines[subline_idx].line_type;
+
+            if (refresh_mode == WPS_REFRESH_ALL || (flags & refresh_mode)
+                || new_subline_refresh)
             {
-                /* if the line is a scrolling one we don't want to update
-                   too often, so that it has the time to scroll */
-                if ((refresh_mode & WPS_REFRESH_SCROLL) || new_subline_refresh)
-                    write_line(display, &align, line, true);
+                /* get_line tells us if we need to update the line */
+                update_line = get_line(gwps, v, line, data->viewports[v].lines[line].curr_subline,
+                                       &align, linebuf, sizeof(linebuf));
             }
-            else
-                write_line(display, &align, line, false);
+
+#ifdef HAVE_LCD_BITMAP
+            /* progressbar */
+            if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
+            {
+                /* the progressbar should be alone on its line */
+                update_line = false;
+                draw_progressbar(gwps, line);
+            }
+
+            /* peakmeter */
+            if (flags & refresh_mode & WPS_REFRESH_PEAK_METER)
+            {
+                /* the peakmeter should be alone on its line */
+                update_line = false;
+
+                int h = font_get(display->getfont())->height;
+                int peak_meter_y = display->getymargin() + line * h;
+
+                /* The user might decide to have the peak meter in the last
+                    line so that it is only displayed if no status bar is
+                    visible. If so we neither want do draw nor enable the
+                    peak meter. */
+                if (peak_meter_y + h <= display->getheight()) {
+                    /* found a line with a peak meter -> remember that we must
+                        enable it later */
+                    enable_pm = true;
+                    peak_meter_screen(gwps->display, 0, peak_meter_y,
+                                      MIN(h, display->getheight() - peak_meter_y));
+                }
+            }
+
+#else /* HAVE_LCD_CHARCELL */
+
+            /* progressbar */
+            if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
+            {
+                if (data->full_line_progressbar)
+                    draw_player_fullbar(gwps, linebuf, sizeof(linebuf));
+                else
+                    draw_player_progress(gwps);
+            }
+#endif
+
+            if (update_line)
+            {
+                if (flags & WPS_REFRESH_SCROLL)
+                {
+                    /* if the line is a scrolling one we don't want to update
+                       too often, so that it has the time to scroll */
+                    if ((refresh_mode & WPS_REFRESH_SCROLL) || new_subline_refresh)
+                        write_line(display, &align, line, true);
+                }
+                else
+                    write_line(display, &align, line, false);
+            }
+
         }
+
+#ifdef HAVE_LCD_BITMAP
+        /* Now display any images in this viewport */
+        wps_display_images(gwps, &data->viewports[v].vp);
+#endif
     }
 
 #ifdef HAVE_LCD_BITMAP
     data->peak_meter_enabled = enable_pm;
-    wps_display_images(gwps);
 #endif
+
+    /* Restore the default viewport */
+    display->set_viewport(NULL);
 
     display->update();
 
