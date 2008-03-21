@@ -255,8 +255,8 @@ static void usb_thread(void)
 #endif  /* USE_ROCKBOX_USB */
 #ifdef HAVE_PRIORITY_SCHEDULING
                         thread_set_priority(usb_thread_entry,PRIORITY_REALTIME);
-                        exclusive_ata_access = true;
 #endif
+                        exclusive_ata_access = true;
 
 #else
                         usb_slave_mode(true);
