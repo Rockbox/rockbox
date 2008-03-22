@@ -95,14 +95,21 @@ PLUGIN_HEADER
 
 #endif
 
+/* external bitmaps */
+#ifdef HAVE_LCD_COLOR 
+#include "bubbles_background.h"
+#endif
+#include "bubbles_bubble.h"
+#include "bubbles_emblem.h"
+
+#define BUBBLE_WIDTH  BMPWIDTH_bubbles_bubble
+#define BUBBLE_HEIGHT BMPHEIGHT_bubbles_bubble
+#define EMBLEM_WIDTH  BMPWIDTH_bubbles_emblem
+#define EMBLEM_HEIGHT (BMPHEIGHT_bubbles_emblem/8)
 
 /* bubbles will consume height of ROW_HEIGHT*(BB_HEIGHT-1)+BUBBLE_HEIGHT*3/2 */
 /* 22x22 bubbles (iPod Video) */
 #if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320)
-#define BUBBLE_WIDTH  22
-#define BUBBLE_HEIGHT 22
-#define EMBLEM_WIDTH  16
-#define EMBLEM_HEIGHT 16
 #define XOFS          72
 #define ROW_HEIGHT    18
 #define ROW_INDENT    11
@@ -110,10 +117,6 @@ PLUGIN_HEADER
 
 /* 22x22 bubbles (Gigabeat) */
 #elif (LCD_HEIGHT == 320) && (LCD_WIDTH == 240)
-#define BUBBLE_WIDTH  22
-#define BUBBLE_HEIGHT 22
-#define EMBLEM_WIDTH  16
-#define EMBLEM_HEIGHT 16
 #define XOFS          64
 #define ROW_HEIGHT    18
 #define ROW_INDENT    11
@@ -121,10 +124,6 @@ PLUGIN_HEADER
 
 /* 16x16 bubbles (H300, iPod Color) */
 #elif (LCD_HEIGHT == 176) && (LCD_WIDTH == 220)
-#define BUBBLE_WIDTH  16
-#define BUBBLE_HEIGHT 16
-#define EMBLEM_WIDTH  12
-#define EMBLEM_HEIGHT 12
 #define XOFS          46
 #define ROW_HEIGHT    14
 #define ROW_INDENT     8
@@ -132,10 +131,6 @@ PLUGIN_HEADER
 
 /* 16x16 bubbles (Sansa E200) */
 #elif (LCD_HEIGHT == 220) && (LCD_WIDTH == 176)
-#define BUBBLE_WIDTH  16
-#define BUBBLE_HEIGHT 16
-#define EMBLEM_WIDTH  12
-#define EMBLEM_HEIGHT 12
 #define XOFS          48
 #define ROW_HEIGHT    14
 #define ROW_INDENT     8
@@ -143,10 +138,6 @@ PLUGIN_HEADER
 
 /* 12x12 bubbles (iPod Nano) */
 #elif (LCD_HEIGHT == 132) && (LCD_WIDTH == 176)
-#define BUBBLE_WIDTH  12
-#define BUBBLE_HEIGHT 12
-#define EMBLEM_WIDTH   8
-#define EMBLEM_HEIGHT  8
 #define XOFS          40
 #define ROW_HEIGHT    10
 #define ROW_INDENT     6
@@ -154,10 +145,6 @@ PLUGIN_HEADER
 
 /* 12x12 bubbles (H100, H10, iAudio X5, iPod 3G, iPod 4G grayscale) */
 #elif (LCD_HEIGHT == 128) && ((LCD_WIDTH == 160) || (LCD_WIDTH == 128))
-#define BUBBLE_WIDTH  12
-#define BUBBLE_HEIGHT 12
-#define EMBLEM_WIDTH   8
-#define EMBLEM_HEIGHT  8
 #define XOFS          33
 #define ROW_HEIGHT    10
 #define ROW_INDENT     6
@@ -165,21 +152,20 @@ PLUGIN_HEADER
 
 /* 10x10 bubbles (iPod Mini) */
 #elif (LCD_HEIGHT == 110) && (LCD_WIDTH == 138)
-#define BUBBLE_WIDTH  10
-#define BUBBLE_HEIGHT 10
-#define EMBLEM_WIDTH   6
-#define EMBLEM_HEIGHT  6
 #define XOFS          33
 #define ROW_HEIGHT     8
 #define ROW_INDENT     5
 #define MAX_FPS       30
 
+/* 9x9 bubbles (iAudio M3) */
+#elif (LCD_HEIGHT == 96) && (LCD_WIDTH == 128)
+#define XOFS          45
+#define ROW_HEIGHT     7
+#define ROW_INDENT     4
+#define MAX_FPS       30
+
 /* 8x8 bubbles (Sansa C200) */
 #elif (LCD_HEIGHT == 80) && (LCD_WIDTH == 132)
-#define BUBBLE_WIDTH  8
-#define BUBBLE_HEIGHT 8
-#define EMBLEM_WIDTH   6
-#define EMBLEM_HEIGHT  6
 #define XOFS          45
 #define ROW_HEIGHT     6
 #define ROW_INDENT     4
@@ -187,10 +173,6 @@ PLUGIN_HEADER
 
 /* 8x7 bubbles (Archos recorder, Ondio) */
 #elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 112)
-#define BUBBLE_WIDTH   8
-#define BUBBLE_HEIGHT  7
-#define EMBLEM_WIDTH   7
-#define EMBLEM_HEIGHT  5
 #define XOFS          33
 #define ROW_HEIGHT     5
 #define ROW_INDENT     4
@@ -208,13 +190,6 @@ PLUGIN_HEADER
 
 /* collision distance squared */
 #define MIN_DISTANCE ((BUBBLE_WIDTH*8)/10)*((BUBBLE_HEIGHT*8)/10)
-
-/* external bitmaps */
-extern const fb_data bubbles_bubble[];
-extern const fb_data bubbles_emblem[];
-#ifdef HAVE_LCD_COLOR 
-extern const fb_data bubbles_background[];
-#endif
 
 /* global rockbox api */
 static struct plugin_api* rb;
@@ -2473,6 +2448,14 @@ static int bubbles(struct game_context* bb) {
             rb->lcd_puts(0, 4, "POWER to exit");
             rb->lcd_puts_scroll(0, 5, "SELECT to fire and show high scores, "
                                 "LEFT/RIGHT to aim and change level");
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+            rb->lcd_puts(0, 2, "PLAY to start/pause");
+            rb->lcd_puts(0, 3, "MENU to save/resume");
+            rb->lcd_puts(0, 4, "REC to exit");
+            rb->lcd_puts(0, 5, "MODE to fire");
+            rb->lcd_puts(0, 6, " and show high scores");
+            rb->lcd_puts(0, 7, "REW/FF to aim");
+            rb->lcd_puts(0, 8, "VOL UP/DN to change level");
 #endif
 #if LCD_WIDTH >= 138
             rb->snprintf(str, 28, "Start on level %d of %d", startlevel+1,

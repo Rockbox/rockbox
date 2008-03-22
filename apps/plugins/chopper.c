@@ -97,6 +97,12 @@ Still To do:
 #define ACTION BUTTON_SELECT
 #define ACTIONTEXT "SELECT"
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define QUIT BUTTON_RC_REC
+#define ACTION BUTTON_RC_PLAY
+#define ACTION2 BUTTON_RC_MODE
+#define ACTIONTEXT "PLAY"
+
 #else
 #error No keymap defined!
 #endif

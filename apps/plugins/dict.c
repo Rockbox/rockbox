@@ -125,6 +125,8 @@ long reverse (long N) {
 #define LP_QUIT BUTTON_POWER
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 #define LP_QUIT BUTTON_BACK
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define LP_QUIT BUTTON_RC_REC
 #else
 #define LP_QUIT BUTTON_OFF
 #endif

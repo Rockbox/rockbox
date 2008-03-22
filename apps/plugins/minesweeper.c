@@ -33,6 +33,8 @@ enum minesweeper_status {
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_OFF
@@ -43,6 +45,8 @@ enum minesweeper_status {
 #   define MINESWP_INFO     BUTTON_F3
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_OFF
@@ -53,6 +57,8 @@ enum minesweeper_status {
 #   define MINESWP_INFO     BUTTON_F3
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_OFF
@@ -63,6 +69,8 @@ enum minesweeper_status {
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_OFF
@@ -77,6 +85,8 @@ enum minesweeper_status {
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 #   define MINESWP_SCROLLWHEEL
+#   define MINESWP_LEFT       BUTTON_LEFT
+#   define MINESWP_RIGHT      BUTTON_RIGHT
 #   define MINESWP_UP         BUTTON_MENU
 #   define MINESWP_DOWN       BUTTON_PLAY
 #   define MINESWP_NEXT       BUTTON_SCROLL_FWD
@@ -88,14 +98,18 @@ enum minesweeper_status {
 #   define MINESWP_INFO       (BUTTON_SELECT | BUTTON_PLAY)
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#   define MINESWP_UP         BUTTON_UP
-#   define MINESWP_DOWN       BUTTON_DOWN
-#   define MINESWP_QUIT       BUTTON_POWER
-#   define MINESWP_TOGGLE     BUTTON_PLAY
-#   define MINESWP_DISCOVER   BUTTON_SELECT
-#   define MINESWP_INFO       BUTTON_REC
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
+#   define MINESWP_UP       BUTTON_UP
+#   define MINESWP_DOWN     BUTTON_DOWN
+#   define MINESWP_QUIT     BUTTON_POWER
+#   define MINESWP_TOGGLE   BUTTON_PLAY
+#   define MINESWP_DISCOVER BUTTON_SELECT
+#   define MINESWP_INFO     BUTTON_REC
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_POWER
@@ -105,6 +119,8 @@ enum minesweeper_status {
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
 #   define MINESWP_SCROLLWHEEL
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_POWER
@@ -115,6 +131,8 @@ enum minesweeper_status {
 #   define MINESWP_INFO     (BUTTON_REC|BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD)
+#   define MINESWP_LEFT       BUTTON_LEFT
+#   define MINESWP_RIGHT      BUTTON_RIGHT
 #   define MINESWP_UP         BUTTON_UP
 #   define MINESWP_DOWN       BUTTON_DOWN
 #   define MINESWP_QUIT       BUTTON_POWER
@@ -126,6 +144,8 @@ enum minesweeper_status {
 #   define MINESWP_INFO       BUTTON_REC
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
 #   define MINESWP_UP       BUTTON_SCROLL_UP
 #   define MINESWP_DOWN     BUTTON_SCROLL_DOWN
 #   define MINESWP_QUIT     BUTTON_POWER
@@ -134,6 +154,8 @@ enum minesweeper_status {
 #   define MINESWP_INFO     (BUTTON_REW | BUTTON_PLAY)
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_BACK
@@ -142,12 +164,24 @@ enum minesweeper_status {
 #   define MINESWP_INFO     BUTTON_MENU
 
 #elif (CONFIG_KEYPAD == MROBE100_PAD)
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_POWER
 #   define MINESWP_TOGGLE   BUTTON_DISPLAY
 #   define MINESWP_DISCOVER BUTTON_SELECT
 #   define MINESWP_INFO     BUTTON_MENU
+
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#   define MINESWP_LEFT     BUTTON_RC_REW
+#   define MINESWP_RIGHT    BUTTON_RC_FF
+#   define MINESWP_UP       BUTTON_RC_VOL_UP
+#   define MINESWP_DOWN     BUTTON_RC_VOL_DOWN
+#   define MINESWP_QUIT     BUTTON_RC_REC
+#   define MINESWP_TOGGLE   BUTTON_RC_MODE
+#   define MINESWP_DISCOVER BUTTON_RC_PLAY
+#   define MINESWP_INFO     BUTTON_RC_MENU
 
 #else
 #error No keymap defined!
@@ -560,14 +594,14 @@ enum minesweeper_status minesweeper( void )
                 return MINESWEEPER_QUIT;
 
             /* move cursor left */
-            case BUTTON_LEFT:
-            case BUTTON_LEFT|BUTTON_REPEAT:
+            case MINESWP_LEFT:
+            case MINESWP_LEFT|BUTTON_REPEAT:
                 x = ( x + width - 1 )%width;
                 break;
 
             /* move cursor right */
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT|BUTTON_REPEAT:
+            case MINESWP_RIGHT:
+            case MINESWP_RIGHT|BUTTON_REPEAT:
                 x = ( x + 1 )%width;
                 break;
 

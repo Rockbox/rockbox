@@ -20,10 +20,12 @@
 
 PLUGIN_HEADER
 
-/* All swcodec targets have BUTTON_SELECT apart from the H10 */
+/* All swcodec targets have BUTTON_SELECT apart from the H10 and M3 */
 
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
 #define TESTCODEC_EXITBUTTON BUTTON_RIGHT
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define TESTCODEC_EXITBUTTON BUTTON_RC_PLAY
 #else
 #define TESTCODEC_EXITBUTTON BUTTON_SELECT
 #endif

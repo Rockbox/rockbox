@@ -200,6 +200,17 @@ PLUGIN_HEADER
 #define ROCKBLOX_DROP          BUTTON_SELECT
 #define ROCKBLOX_RESTART       BUTTON_DISPLAY
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+
+#define ROCKBLOX_OFF           BUTTON_RC_REC
+#define ROCKBLOX_ROTATE_RIGHT  BUTTON_RC_VOL_DOWN
+#define ROCKBLOX_ROTATE_LEFT   BUTTON_RC_VOL_UP
+#define ROCKBLOX_DOWN          BUTTON_RC_MENU
+#define ROCKBLOX_LEFT          BUTTON_RC_REW
+#define ROCKBLOX_RIGHT         BUTTON_RC_FF
+#define ROCKBLOX_DROP          BUTTON_RC_PLAY
+#define ROCKBLOX_RESTART       BUTTON_RC_MODE
+
 #else
 #error No keymap defined!
 #endif
@@ -325,18 +336,18 @@ PLUGIN_HEADER
 #define LEVEL_Y 49
 #define LINES_Y 82
 
-#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128)
+#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
 
-#define BLOCK_WIDTH 6
-#define BLOCK_HEIGHT 6
-#define BOARD_X 4
-#define BOARD_Y 3
-#define PREVIEW_X 84
-#define PREVIEW_Y 100
-#define LABEL_X 71
-#define SCORE_Y 17
-#define LEVEL_Y 49
-#define LINES_Y 82
+#define BLOCK_WIDTH 5
+#define BLOCK_HEIGHT 5
+#define BOARD_X 14
+#define BOARD_Y 0
+#define PREVIEW_X 98
+#define PREVIEW_Y 88
+#define LABEL_X 80
+#define SCORE_Y 15
+#define LEVEL_Y 45
+#define LINES_Y 74
 
 #elif (LCD_WIDTH == 132) && (LCD_HEIGHT == 80)
 
@@ -350,6 +361,32 @@ PLUGIN_HEADER
 #define SCORE_Y 10
 #define LEVEL_Y 30
 #define LINES_Y 50
+
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128)
+
+#define BLOCK_WIDTH 6
+#define BLOCK_HEIGHT 6
+#define BOARD_X 4
+#define BOARD_Y 3
+#define PREVIEW_X 84
+#define PREVIEW_Y 100
+#define LABEL_X 71
+#define SCORE_Y 17
+#define LEVEL_Y 49
+#define LINES_Y 82
+
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96)
+
+#define BLOCK_WIDTH 4
+#define BLOCK_HEIGHT 4
+#define BOARD_X 14
+#define BOARD_Y 2
+#define PREVIEW_X 89
+#define PREVIEW_Y 76
+#define LABEL_X 70
+#define SCORE_Y 14
+#define LEVEL_Y 39
+#define LINES_Y 64
 
 #elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 64)
 
@@ -377,19 +414,6 @@ PLUGIN_HEADER
 #define LEVEL_Y 13
 #define LEVEL_X 78
 #define LINES_Y 51
-
-#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
-
-#define BLOCK_WIDTH 5
-#define BLOCK_HEIGHT 5
-#define BOARD_X 14
-#define BOARD_Y 0
-#define PREVIEW_X 98
-#define PREVIEW_Y 88
-#define LABEL_X 80
-#define SCORE_Y 15
-#define LEVEL_Y 45
-#define LINES_Y 74
 
 #endif
 

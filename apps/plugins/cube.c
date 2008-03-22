@@ -229,6 +229,18 @@ PLUGIN_HEADER
 #define CUBE_PAUSE         BUTTON_PLAY
 #define CUBE_HIGHSPEED     BUTTON_SELECT
 
+#elif (CONFIG_KEYPAD == IAUDIO_M3_PAD)
+#define CUBE_QUIT          BUTTON_RC_REC
+#define CUBE_X_INC         BUTTON_RC_FF
+#define CUBE_X_DEC         BUTTON_RC_REW
+#define CUBE_Y_INC         BUTTON_RC_VOL_UP
+#define CUBE_Y_DEC         BUTTON_RC_VOL_DOWN
+#define CUBE_Z_INC         BUTTON_VOL_UP      /* FIXME: quick hack */
+#define CUBE_Z_DEC         BUTTON_VOL_DOWN
+#define CUBE_MODE          BUTTON_RC_MODE
+#define CUBE_PAUSE         BUTTON_RC_PLAY
+#define CUBE_HIGHSPEED     BUTTON_RC_MENU
+
 #else
 #error No keymap defined!
 #endif

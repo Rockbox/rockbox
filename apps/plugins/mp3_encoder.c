@@ -2327,6 +2327,11 @@ void get_mp3_filename(char *wav_name)
 #define MP3ENC_NEXT BUTTON_DOWN
 #define MP3ENC_DONE BUTTON_POWER
 #define MP3ENC_SELECT BUTTON_SELECT
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define MP3ENC_PREV BUTTON_RC_VOL_UP
+#define MP3ENC_NEXT BUTTON_RC_VOL_DOWN
+#define MP3ENC_DONE BUTTON_RC_REC
+#define MP3ENC_SELECT BUTTON_RC_FF
 #else
 #error No keymap defined!
 #endif

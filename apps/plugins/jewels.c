@@ -128,6 +128,16 @@ PLUGIN_HEADER
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define JEWELS_UP     BUTTON_RC_VOL_UP
+#define JEWELS_DOWN   BUTTON_RC_VOL_DOWN
+#define JEWELS_LEFT   BUTTON_RC_REW
+#define JEWELS_RIGHT  BUTTON_RC_FF
+#define JEWELS_SELECT BUTTON_RC_PLAY
+#define JEWELS_CANCEL BUTTON_RC_REC
+
+#define JEWELS_RC_CANCEL BUTTON_REC
+
 #else
 #error No keymap defined!
 #endif
@@ -175,6 +185,13 @@ PLUGIN_HEADER
 #define TILE_HEIGHT 13
 #define YOFS 6
 #define NUM_SCORES 10
+
+/* use 12x12 tiles (iAudio M3) */
+#elif (LCD_HEIGHT == 96) && (LCD_WIDTH == 128)
+#define TILE_WIDTH  12
+#define TILE_HEIGHT 12
+#define YOFS 0
+#define NUM_SCORES 9
 
 /* use 10x10 tiles (Sansa c200) */
 #elif (LCD_HEIGHT == 80) && (LCD_WIDTH == 132)
@@ -1527,6 +1544,17 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 10, "PLAY to select");
                 rb->lcd_puts(0, 11, "Long PLAY for menu");
                 rb->lcd_puts(0, 12, "POWER to cancel");
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+                rb->lcd_puts(0, 2, "Swap pairs of jewels");
+                rb->lcd_puts(0, 3, "to form connected");
+                rb->lcd_puts(0, 4, "segments of three or ");
+                rb->lcd_puts(0, 5, "more of the");
+                rb->lcd_puts(0, 6, "same type.");
+                rb->lcd_puts(0, 8, "Controls:");
+                rb->lcd_puts(0, 9, "Directions or scroll to move");
+                rb->lcd_puts(0, 10, "PLAY to select");
+                rb->lcd_puts(0, 11, "Long PLAY for menu");
+                rb->lcd_puts(0, 12, "REC to cancel");
 #else
     #warning: missing help text.
 #endif

@@ -202,6 +202,19 @@ PLUGIN_HEADER
 #define PLAYERS_TEXT "Up/Down"
 #define WORMS_TEXT "Left/Right"
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+
+#define BTN_DIR_UP BUTTON_RC_VOL_UP
+#define BTN_DIR_DOWN BUTTON_RC_VOL_DOWN
+#define BTN_DIR_LEFT BUTTON_RC_REW
+#define BTN_DIR_RIGHT BUTTON_RC_FF
+#define BTN_STARTPAUSE BUTTON_RC_PLAY
+#define BTN_QUIT BUTTON_RC_REC
+#define BTN_STOPRESET BUTTON_RC_MODE
+
+#define PLAYERS_TEXT "VOL UP/DN"
+#define WORMS_TEXT "REW/FF"
+
 #else
 #error No keymap defined!
 #endif
@@ -215,6 +228,11 @@ PLUGIN_HEADER
 #define FOOD_SIZE 3
 #define ARGH_SIZE 4
 #define SPEED 14
+#define MAX_WORM_SEGMENTS 128
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96)
+#define FOOD_SIZE 3
+#define ARGH_SIZE 4
+#define SPEED 12
 #define MAX_WORM_SEGMENTS 128
 #elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
 #define FOOD_SIZE 4

@@ -135,6 +135,15 @@ PLUGIN_HEADER
 #define BATTERY_ON_TXT  "SELECT - start"
 #define BATTERY_OFF_TXT "POWER  - quit"
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+
+#define BATTERY_ON  BUTTON_PLAY
+#define BATTERY_OFF BUTTON_REC
+#define BATTERY_RC_ON  BUTTON_RC_PLAY
+#define BATTERY_RC_OFF BUTTON_RC_REC
+#define BATTERY_ON_TXT  "PLAY - start"
+#define BATTERY_OFF_TXT "REC  - quit"
+
 #else
 #error No keymap defined!
 #endif
@@ -231,7 +240,7 @@ void thread(void)
     int fd, buffelements, tick = 1, i = 0, skipped = 0, exit = 0;
     int fst = 0, lst = 0; /* first and last skipped tick */
     unsigned int last_voltage = 0;
-#if  CONFIG_CHARGING || defined(HAVE_USB_POWER) 
+#if  CONFIG_CHARGING || defined(HAVE_USB_POWER)
     unsigned int last_state = 0;
 #endif    
     long sleep_time = 5 * HZ;

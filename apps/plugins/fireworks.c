@@ -66,6 +66,12 @@ static struct plugin_api* rb;
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #define BTN_MENU BUTTON_POWER
 #define BTN_FIRE BUTTON_PLAY
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define BTN_MENU BUTTON_RC_REC
+#define BTN_FIRE BUTTON_RC_PLAY
+
+#else
+#error No keymap defined!
 #endif
 
 /* The lowdown on source terminology:

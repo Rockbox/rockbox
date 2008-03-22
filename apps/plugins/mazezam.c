@@ -165,6 +165,18 @@ MEM_FUNCTION_WRAPPERS(rb);
 #define MAZEZAM_QUIT                BUTTON_POWER
 #define MAZEZAM_QUIT_KEYNAME        "[POWER]"
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define MAZEZAM_UP                  BUTTON_RC_VOL_UP
+#define MAZEZAM_DOWN                BUTTON_RC_VOL_DOWN
+#define MAZEZAM_LEFT                BUTTON_RC_REW
+#define MAZEZAM_RIGHT               BUTTON_RC_FF
+#define MAZEZAM_SELECT              BUTTON_RC_PLAY
+
+#define MAZEZAM_RETRY               BUTTON_RC_MODE
+#define MAZEZAM_RETRY_KEYNAME       "[MODE]"
+#define MAZEZAM_QUIT                BUTTON_RC_REC
+#define MAZEZAM_QUIT_KEYNAME        "[REC]"
+
 #else
 #error No keymap defined!
 #endif

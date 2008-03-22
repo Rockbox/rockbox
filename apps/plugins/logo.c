@@ -62,6 +62,7 @@ const unsigned char rockbox16x7[] = {
 #define LP_INC_X BUTTON_RIGHT
 #define LP_DEC_Y (BUTTON_ON | BUTTON_LEFT)
 #define LP_INC_Y (BUTTON_ON | BUTTON_RIGHT)
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -70,18 +71,21 @@ const unsigned char rockbox16x7[] = {
 #define LP_INC_X BUTTON_RIGHT
 #define LP_DEC_Y BUTTON_SCROLL_BACK
 #define LP_INC_Y BUTTON_SCROLL_FWD
+
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define LP_QUIT BUTTON_PLAY
 #define LP_DEC_X BUTTON_LEFT
 #define LP_INC_X BUTTON_RIGHT
 #define LP_DEC_Y BUTTON_DOWN
 #define LP_INC_Y BUTTON_UP
+
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define LP_QUIT BUTTON_POWER
 #define LP_DEC_X BUTTON_LEFT
 #define LP_INC_X BUTTON_RIGHT
 #define LP_DEC_Y BUTTON_DOWN
 #define LP_INC_Y BUTTON_UP
+
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 #define LP_QUIT BUTTON_POWER
 #define LP_DEC_X BUTTON_LEFT
@@ -124,6 +128,13 @@ const unsigned char rockbox16x7[] = {
 #define LP_INC_X BUTTON_RIGHT
 #define LP_DEC_Y BUTTON_DOWN
 #define LP_INC_Y BUTTON_UP
+
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define LP_QUIT BUTTON_RC_REC
+#define LP_DEC_X BUTTON_RC_REW
+#define LP_INC_X BUTTON_RC_FF
+#define LP_DEC_Y BUTTON_RC_VOL_DOWN
+#define LP_INC_Y BUTTON_RC_VOL_UP
 
 #else
 #define LP_QUIT BUTTON_OFF

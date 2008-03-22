@@ -69,6 +69,10 @@ static bool abort;
 #elif CONFIG_KEYPAD == MROBE100_PAD
 #define STATS_STOP BUTTON_POWER
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define STATS_STOP BUTTON_REC
+#define STATS_STOP_REMOTE BUTTON_RC_REC
+
 #else
 #error No keymap defined!
 #endif

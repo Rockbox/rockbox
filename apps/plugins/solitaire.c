@@ -275,11 +275,36 @@ static struct plugin_api* rb;
 #   define HK_CUR2STACK    "SELECT.."
 #   define HK_REM2STACK    "DISPLAY+RIGHT"
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#   define SOL_QUIT         BUTTON_RC_REC
+#   define SOL_UP           BUTTON_RC_VOL_UP
+#   define SOL_DOWN         BUTTON_RC_VOL_DOWN
+#   define SOL_LEFT         BUTTON_RC_REW
+#   define SOL_RIGHT        BUTTON_RC_FF
+#   define SOL_MOVE         BUTTON_RC_PLAY
+#   define SOL_DRAW_PRE     BUTTON_RC_MENU
+#   define SOL_DRAW         (BUTTON_RC_MENU | BUTTON_REL)
+#   define SOL_REM2CUR_PRE  BUTTON_RC_MENU
+#   define SOL_REM2CUR      (BUTTON_RC_MENU | BUTTON_REPEAT)
+#   define SOL_CUR2STACK_PRE BUTTON_RC_MODE
+#   define SOL_CUR2STACK    (BUTTON_RC_MODE | BUTTON_REL)
+#   define SOL_REM2STACK_PRE BUTTON_RC_MODE
+#   define SOL_REM2STACK    (BUTTON_RC_MODE | BUTTON_REPEAT)
+#   define HK_LR           "REW/FF"
+#   define HK_UD           "VOL UP/DOWN"
+#   define HK_MOVE         "PLAY"
+#   define HK_DRAW         "MENU"
+#   define HK_REM2CUR      "MENU.."
+#   define HK_CUR2STACK    "MODE"
+#   define HK_REM2STACK    "MODE.."
+
 #else
 #error No keymap defined!
 #endif
 
-#define HK_LR "LEFT/RIGHT"
+#ifndef HK_LR
+#   define HK_LR "LEFT/RIGHT"
+#endif
 #ifndef HK_UD
 #   define HK_UD "UP/DOWN"
 #endif

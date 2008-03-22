@@ -5,6 +5,8 @@
 bubbles_bubble.112x64x1.bmp
 #elif (LCD_WIDTH == 132) && (LCD_HEIGHT == 80)
 bubbles_bubble.132x80x16.bmp
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96)
+bubbles_bubble.128x96x1.bmp
 #elif ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128)) || \
       ((LCD_WIDTH == 128) && (LCD_HEIGHT == 128))
 bubbles_bubble.160x128x1.bmp
@@ -35,6 +37,8 @@ rockblox_background.160x128x1.bmp
 flipit_cursor.28x28x1.bmp
 #elif LCD_WIDTH >= 125 && LCD_HEIGHT >= 110
 flipit_cursor.25x25x1.bmp
+#elif LCD_WIDTH >= 105 && LCD_HEIGHT >= 96
+flipit_cursor.21x21x1.bmp
 #elif LCD_WIDTH >= 80 && LCD_HEIGHT >= 62
 flipit_cursor.16x13x1.bmp
 #endif

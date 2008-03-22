@@ -105,6 +105,8 @@ extern const fb_data sokoban_tiles[];
 /* variable button definitions */
 #if (CONFIG_KEYPAD == RECORDER_PAD) || \
     (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_MENU BUTTON_OFF
@@ -118,6 +120,8 @@ extern const fb_data sokoban_tiles[];
 #define BUTTON_SAVE_NAME "ON"
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_MENU BUTTON_OFF
@@ -133,6 +137,8 @@ extern const fb_data sokoban_tiles[];
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_MENU BUTTON_OFF
@@ -150,6 +156,8 @@ extern const fb_data sokoban_tiles[];
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_MENU
 #define SOKOBAN_DOWN BUTTON_PLAY
 #define SOKOBAN_MENU (BUTTON_SELECT | BUTTON_MENU)
@@ -165,6 +173,8 @@ extern const fb_data sokoban_tiles[];
 /* FIXME: if/when simultaneous button presses work for X5/M5,
  * add level up/down */
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_MENU BUTTON_POWER
@@ -177,6 +187,8 @@ extern const fb_data sokoban_tiles[];
 #define BUTTON_SAVE_NAME "SELECT"
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_SCROLL_UP
 #define SOKOBAN_DOWN BUTTON_SCROLL_DOWN
 #define SOKOBAN_MENU BUTTON_POWER
@@ -191,6 +203,8 @@ extern const fb_data sokoban_tiles[];
 #define BUTTON_SAVE_NAME "PLAY"
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_MENU BUTTON_POWER
@@ -204,6 +218,8 @@ extern const fb_data sokoban_tiles[];
 #define BUTTON_SAVE_NAME "SELECT"
 
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_MENU BUTTON_POWER
@@ -218,6 +234,8 @@ extern const fb_data sokoban_tiles[];
 #define BUTTON_SAVE_NAME "SELECT"
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_MENU BUTTON_MENU
@@ -231,6 +249,8 @@ extern const fb_data sokoban_tiles[];
 #define BUTTON_SAVE_NAME "SELECT"
 
 #elif CONFIG_KEYPAD == MROBE100_PAD
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_UP
 #define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_MENU BUTTON_POWER
@@ -242,6 +262,20 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_PAUSE BUTTON_SELECT
 #define BUTTON_SAVE BUTTON_SELECT
 #define BUTTON_SAVE_NAME "SELECT"
+
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define SOKOBAN_LEFT BUTTON_RC_REW
+#define SOKOBAN_RIGHT BUTTON_RC_FF
+#define SOKOBAN_UP BUTTON_RC_VOL_UP
+#define SOKOBAN_DOWN BUTTON_RC_VOL_DOWN
+#define SOKOBAN_MENU BUTTON_RC_REC
+#define SOKOBAN_UNDO BUTTON_RC_MODE
+#define SOKOBAN_REDO BUTTON_RC_MENU
+#define SOKOBAN_PAUSE BUTTON_RC_PLAY
+#define BUTTON_SAVE BUTTON_RC_PLAY
+#define BUTTON_SAVE_NAME "PLAY"
+
+#define SOKOBAN_RC_MENU BUTTON_REC
 
 #else
 #error No keymap defined!
@@ -1043,8 +1077,8 @@ static bool load(char *filename, bool silent)
                             paused = !paused;
                             break;
 
-                        case BUTTON_LEFT:
-                        case BUTTON_LEFT | BUTTON_REPEAT:
+                        case SOKOBAN_LEFT:
+                        case SOKOBAN_LEFT | BUTTON_REPEAT:
                             /* Go back one move */
                             if (paused) {
                                 if (undo())
@@ -1054,8 +1088,8 @@ static bool load(char *filename, bool silent)
                             }
                             break;
 
-                        case BUTTON_RIGHT:
-                        case BUTTON_RIGHT | BUTTON_REPEAT:
+                        case SOKOBAN_RIGHT:
+                        case SOKOBAN_RIGHT | BUTTON_REPEAT:
                             /* Go forward one move */
                             if (paused) {
                                 if (redo())
@@ -1336,13 +1370,13 @@ static bool sokoban_loop(void)
                 break;
 #endif
 
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
+            case SOKOBAN_LEFT:
+            case SOKOBAN_LEFT | BUTTON_REPEAT:
                 moved = move(SOKOBAN_MOVE_LEFT, false);
                 break;
 
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
+            case SOKOBAN_RIGHT:
+            case SOKOBAN_RIGHT | BUTTON_REPEAT:
                 moved = move(SOKOBAN_MOVE_RIGHT, false);
                 break;
 

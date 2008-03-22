@@ -153,6 +153,17 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+
+#define QUIT BUTTON_RC_REC
+#define LEFT BUTTON_RC_REW
+#define RIGHT BUTTON_RC_FF
+#define SELECT BUTTON_RC_PLAY
+#define UP BUTTON_RC_VOL_UP
+#define DOWN BUTTON_RC_VOL_DOWN
+
+#define RC_QUIT BUTTON_REC
+
 #else
 #error No keymap defined!
 #endif
@@ -176,26 +187,6 @@ enum menu_items {
     BM_QUIT,
     BM_SEL_QUIT,
 };
-
-/* External bitmaps */
-#if (LCD_WIDTH != 112) && (LCD_HEIGHT != 64)
-extern const fb_data brickmania_menu_bg[];
-extern const fb_data brickmania_gameover[];
-#endif
-extern const fb_data brickmania_menu_items[];
-extern const fb_data brickmania_ball[];
-#ifdef HAVE_LCD_COLOR
-extern const fb_data brickmania_break[];
-#endif
-
-/* normal, glue, fire */
-extern const fb_data brickmania_pads[];
-
-/* +life, -life, glue, fire, normal */
-extern const fb_data brickmania_powerups[];
-
-/* purple, red, blue, pink, green, yellow orange */
-extern const fb_data brickmania_bricks[];
 
 #include "brickmania_pads.h"
 #include "brickmania_bricks.h"
@@ -225,6 +216,9 @@ extern const fb_data brickmania_bricks[];
 #define MENU_BGWIDTH   BMPWIDTH_brickmania_menu_bg
 #endif
 
+#ifdef HAVE_LCD_COLOR /* currently no transparency for non-colour */
+#include "brickmania_break.h"
+#endif
 
 #if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 
@@ -350,7 +344,26 @@ extern const fb_data brickmania_bricks[];
 #define STRINGPOS_NAVI 44
 #define STRINGPOS_FLIP 44
 
+/* iAudio M3 */
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96)
+/* The time (in ms) for one iteration through the game loop - decrease this
+   to speed up the game - note that current_tick is (currently) only accurate
+   to 10ms.
+*/
+#define CYCLETIME 50
 
+#define TOPMARGIN 10
+
+#define BMPYOFS_start 42
+#define HIGHSCORE_XPOS 65
+#define HIGHSCORE_YPOS 25
+
+#define STRINGPOS_FINISH 54
+#define STRINGPOS_CONGRATS 44
+#define STRINGPOS_NAVI 44
+#define STRINGPOS_FLIP 44
+
+/* Archos */
 #elif (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 /* The time (in ms) for one iteration through the game loop - decrease this
    to speed up the game - note that current_tick is (currently) only accurate
@@ -1072,7 +1085,7 @@ int help(int when)
 #if CONFIG_KEYPAD == ONDIO_PAD
         rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
                        "MENU  Releases the ball/Fire!");
-#elif CONFIG_KEYPAD == RECORDER_PAD
+#elif (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IAUDIO_M3_PAD)
         rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
                        "PLAY  Releases the ball/Fire!");
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
@@ -1082,7 +1095,11 @@ int help(int when)
         rb->lcd_putsxy(1+xoffset, 7*(h+2)+yoffset,
                        "SELECT  Releases the ball/Fire!");
 #endif
+#if CONFIG_KEYPAD == IAUDIO_M3_PAD
+        rb->lcd_putsxy(1+xoffset, 8*(h+2)+yoffset, "REC  Opens menu/Quit");
+#else
         rb->lcd_putsxy(1+xoffset, 8*(h+2)+yoffset, "STOP  Opens menu/Quit");
+#endif
 #ifdef HAVE_LCD_COLOR
         rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
         rb->lcd_putsxy(1+xoffset, 10*(h+2)+yoffset, "Specials");
@@ -1291,6 +1308,8 @@ int game_loop(void)
                 rb->snprintf(s, sizeof(s), "MENU To Continue");
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
                 rb->snprintf(s, sizeof(s), "Press NAVI To Continue");
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+                rb->snprintf(s, sizeof(s), "PLAY To Continue");
 #else
                 rb->snprintf(s, sizeof(s), "Press SELECT To Continue");
 #endif
@@ -1794,7 +1813,8 @@ int game_loop(void)
             int button_right,button_left;
             button=rb->button_get(false);
 
-#ifdef HAS_BUTTON_HOLD
+#if defined(HAS_BUTTON_HOLD) && !defined(HAVE_REMOTE_LCD_AS_MAIN)
+            /* FIXME: Should probably check remote hold here */
             if (rb->button_hold())
             button = QUIT;
 #endif

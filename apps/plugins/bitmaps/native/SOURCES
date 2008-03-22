@@ -59,15 +59,19 @@ brickmania_break.132x80x16.bmp
 #elif LCD_DEPTH > 1
 brickmania_gameover.86x43x2.bmp
 brickmania_menu_items.160x128x2.bmp
-brickmania_ball.5x5x2.bmp
 brickmania_menu_bg.160x128x2.bmp
 brickmania_pads.160x128x2.bmp
 brickmania_powerups.160x128x2.bmp
-brickmania_break.160x128x2.bmp
+//brickmania_break.160x128x2.bmp
 #if (LCD_WIDTH >= 160)
+brickmania_ball.5x5x2.bmp
 brickmania_bricks.160x128x2.bmp
-#else /* Mini currently */
+#elif LCD_WIDTH >= 138
+brickmania_ball.5x5x2.bmp
 brickmania_bricks.138x110x2.bmp
+#else /* M3 currently */
+brickmania_ball.4x4x2.bmp
+brickmania_bricks.128x96x2.bmp
 #endif
 #else /* mono */
 brickmania_gameover.59x30x1.bmp
@@ -113,6 +117,8 @@ bubbles_background.132x80x16.bmp
 bubbles_emblem.160x128x2.bmp
 #elif (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
 bubbles_emblem.138x110x2.bmp
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96)
+bubbles_emblem.128x96x2.bmp
 #elif (LCD_WIDTH >= 112) && (LCD_HEIGHT >= 64)
 bubbles_emblem.112x64x1.bmp
 #endif
@@ -235,6 +241,8 @@ flipit_tokens.17x34x16.bmp
 flipit_tokens.28x56x2.bmp
 #elif LCD_WIDTH >= 125 && LCD_HEIGHT >= 110
 flipit_tokens.25x50x2.bmp
+#elif LCD_WIDTH >= 105 && LCD_HEIGHT >= 96
+flipit_tokens.21x42x2.bmp
 #endif
 #else /* monochrome */
 #if LCD_WIDTH >= 140 && LCD_HEIGHT >= 122
@@ -279,6 +287,8 @@ jewels.112x64x1.bmp
 jewels.128x128x16.bmp
 #elif (LCD_WIDTH == 132) && (LCD_HEIGHT == 80)
 jewels.132x80x16.bmp
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96)
+jewels.128x96x2.bmp
 #elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
 jewels.138x110x2.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && !defined(HAVE_LCD_COLOR)
@@ -333,6 +343,8 @@ rockblox_background.132x80x16.bmp
 rockblox_background.160x128x2.bmp
 #elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110) && (LCD_DEPTH == 2)
 rockblox_background.138x110x2.bmp
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96) && (LCD_DEPTH == 2)
+rockblox_background.128x96x2.bmp
 #endif
 
 /* Rockpaint */

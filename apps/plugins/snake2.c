@@ -35,6 +35,17 @@ PLUGIN_HEADER
 #define WIDTH  28
 #define HEIGHT 16
 
+#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >= 1)
+#include "snake2_header1.h"
+#include "snake2_header2.h"
+#include "snake2_left.h"
+#include "snake2_right.h"
+#include "snake2_bottom.h"
+#define BMPHEIGHT_snake2_header BMPHEIGHT_snake2_header1
+#define BMPWIDTH_snake2_header  BMPWIDTH_snake2_header1
+#endif
+
+
 #if (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
     #define MULTIPLIER 10 /*Modifier for porting on other screens*/
     #define MODIFIER_1 10
@@ -47,14 +58,6 @@ PLUGIN_HEADER
     #define TOP_X4 274 /* x-coord of the lowerright item (hi-score) */
     #define TOP_Y1 4   /* y-coord of the top row of items */
     #define TOP_Y2 25  /* y-coord of the bottom row of items */
-    #define BMPHEIGHT_snake2_header 38
-    #define BMPWIDTH_snake2_header 320
-    #define BMPHEIGHT_snake2_right 192
-    #define BMPWIDTH_snake2_right 10
-    #define BMPHEIGHT_snake2_left 192
-    #define BMPWIDTH_snake2_left 10
-    #define BMPHEIGHT_snake2_bottom 10
-    #define BMPWIDTH_snake2_bottom 320
 #elif (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 168)
     #define MULTIPLIER 8
     #define MODIFIER_1 8
@@ -67,14 +70,6 @@ PLUGIN_HEADER
     #define TOP_X4 194
     #define TOP_Y1 4
     #define TOP_Y2 25
-    #define BMPHEIGHT_snake2_header 38
-    #define BMPWIDTH_snake2_header 240
-    #define BMPHEIGHT_snake2_right 120
-    #define BMPWIDTH_snake2_right 10
-    #define BMPHEIGHT_snake2_left 120
-    #define BMPWIDTH_snake2_left 10
-    #define BMPHEIGHT_snake2_bottom 10
-    #define BMPWIDTH_snake2_bottom 240
 #elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
     #define MULTIPLIER 7
     #define MODIFIER_1 7
@@ -87,14 +82,6 @@ PLUGIN_HEADER
     #define TOP_X4 174
     #define TOP_Y1 4
     #define TOP_Y2 25
-    #define BMPHEIGHT_snake2_header 38
-    #define BMPWIDTH_snake2_header 220
-    #define BMPHEIGHT_snake2_right 128
-    #define BMPWIDTH_snake2_right 10
-    #define BMPHEIGHT_snake2_left 128
-    #define BMPWIDTH_snake2_left 10
-    #define BMPHEIGHT_snake2_bottom 10
-    #define BMPWIDTH_snake2_bottom 220
 #elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 132)
     #define MULTIPLIER 5
     #define MODIFIER_1 5
@@ -107,14 +94,6 @@ PLUGIN_HEADER
     #define TOP_X4 130
     #define TOP_Y1 4
     #define TOP_Y2 25
-    #define BMPHEIGHT_snake2_header 38
-    #define BMPWIDTH_snake2_header 176
-    #define BMPHEIGHT_snake2_right 84
-    #define BMPWIDTH_snake2_right 10
-    #define BMPHEIGHT_snake2_left 84
-    #define BMPWIDTH_snake2_left 10
-    #define BMPHEIGHT_snake2_bottom 10
-    #define BMPWIDTH_snake2_bottom 176
 #elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
     #define MULTIPLIER 5
     #define MODIFIER_1 5
@@ -127,14 +106,6 @@ PLUGIN_HEADER
     #define TOP_X4 114
     #define TOP_Y1 4
     #define TOP_Y2 25
-    #define BMPHEIGHT_snake2_header 38
-    #define BMPWIDTH_snake2_header 160
-    #define BMPHEIGHT_snake2_right 80
-    #define BMPWIDTH_snake2_right 10
-    #define BMPHEIGHT_snake2_left 80
-    #define BMPWIDTH_snake2_left 10
-    #define BMPHEIGHT_snake2_bottom 10
-    #define BMPWIDTH_snake2_bottom 160
 #else
     #define MULTIPLIER 4
     #define MODIFIER_1 4
@@ -146,6 +117,8 @@ PLUGIN_HEADER
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
@@ -158,6 +131,8 @@ PLUGIN_HEADER
 #define SNAKE2_PLAYPAUSE_TEXT "Play"
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
@@ -170,6 +145,8 @@ PLUGIN_HEADER
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
@@ -182,6 +159,8 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_OFF
@@ -197,6 +176,8 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_MENU
 #define SNAKE2_DOWN BUTTON_PLAY
 #define SNAKE2_QUIT (BUTTON_SELECT | BUTTON_MENU)
@@ -209,6 +190,8 @@ PLUGIN_HEADER
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
@@ -221,6 +204,8 @@ PLUGIN_HEADER
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
@@ -234,6 +219,8 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
 (CONFIG_KEYPAD == SANSA_C200_PAD)
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
@@ -246,6 +233,8 @@ PLUGIN_HEADER
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_SCROLL_UP
 #define SNAKE2_DOWN BUTTON_SCROLL_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
@@ -258,6 +247,8 @@ PLUGIN_HEADER
 #define SNAKE2_PLAYPAUSE_TEXT "FF"
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_BACK
@@ -270,6 +261,8 @@ PLUGIN_HEADER
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
 #elif (CONFIG_KEYPAD == MROBE100_PAD)
+#define SNAKE2_LEFT BUTTON_LEFT
+#define SNAKE2_RIGHT BUTTON_RIGHT
 #define SNAKE2_UP   BUTTON_UP
 #define SNAKE2_DOWN BUTTON_DOWN
 #define SNAKE2_QUIT BUTTON_POWER
@@ -280,6 +273,20 @@ PLUGIN_HEADER
 #define SNAKE2_SELECT_TYPE BUTTON_MENU
 #define SNAKE2_PLAYPAUSE BUTTON_SELECT
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
+
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define SNAKE2_LEFT BUTTON_RC_REW
+#define SNAKE2_RIGHT BUTTON_RC_FF
+#define SNAKE2_UP   BUTTON_RC_VOL_UP
+#define SNAKE2_DOWN BUTTON_RC_VOL_DOWN
+#define SNAKE2_QUIT BUTTON_RC_REC
+#define SNAKE2_LEVEL_UP BUTTON_RC_VOL_UP
+#define SNAKE2_LEVEL_DOWN BUTTON_RC_VOL_DOWN
+#define SNAKE2_MAZE_NEXT BUTTON_RC_FF
+#define SNAKE2_MAZE_LAST BUTTON_RC_REW
+#define SNAKE2_SELECT_TYPE BUTTON_RC_MODE
+#define SNAKE2_PLAYPAUSE BUTTON_RC_PLAY
+#define SNAKE2_PLAYPAUSE_TEXT "Play"
 
 #else
 #error No keymap defined!
@@ -313,22 +320,6 @@ static int num_apples_to_got=0;
 static int game_b_level=0;
 static int applecount=0;
 static char phscore[30];
-
-#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
-#ifdef HAVE_LCD_COLOR
-extern const unsigned short snake2_header1[];
-extern const unsigned short snake2_header2[];
-extern const unsigned short snake2_left[];
-extern const unsigned short snake2_right[];
-extern const unsigned short snake2_bottom[];
-#else
-extern const unsigned char snake2_header1[];
-extern const unsigned char snake2_header2[];
-extern const unsigned char snake2_left[];
-extern const unsigned char snake2_right[];
-extern const unsigned char snake2_bottom[];
-#endif
-#endif
 
 #define NORTH       1
 #define EAST        2
@@ -1196,8 +1187,8 @@ void game (void)
                  if (dir != SOUTH) set_direction(NORTH);
                  break;
 
-             case BUTTON_RIGHT:
-             case BUTTON_RIGHT | BUTTON_REPEAT:
+             case SNAKE2_RIGHT:
+             case SNAKE2_RIGHT | BUTTON_REPEAT:
                  if (dir != WEST) set_direction(EAST);
                  break;
 
@@ -1206,8 +1197,8 @@ void game (void)
                  if (dir != NORTH) set_direction(SOUTH);
                  break;
 
-             case BUTTON_LEFT:
-             case BUTTON_LEFT | BUTTON_REPEAT:
+             case SNAKE2_LEFT:
+             case SNAKE2_LEFT | BUTTON_REPEAT:
                  if (dir != EAST) set_direction(WEST);
                  break;
 

@@ -3,7 +3,8 @@ configfile.c
 fixedpoint.c
 playback_control.c
 rgb_hsv.c
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) \
+ && !defined(IAUDIO_M3) /* TODO: Test whether it can be implemented */
 grey_core.c
 grey_draw.c
 grey_parm.c

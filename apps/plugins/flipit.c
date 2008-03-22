@@ -22,6 +22,8 @@ PLUGIN_HEADER
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_OFF
@@ -31,6 +33,8 @@ PLUGIN_HEADER
 #define FLIPIT_TOGGLE       BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_OFF
@@ -40,6 +44,8 @@ PLUGIN_HEADER
 #define FLIPIT_TOGGLE       BUTTON_SELECT
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP_PRE       BUTTON_ON
 #define FLIPIT_UP           (BUTTON_ON | BUTTON_REL)
 #define FLIPIT_DOWN         BUTTON_MENU
@@ -50,6 +56,8 @@ PLUGIN_HEADER
 #define FLIPIT_TOGGLE       BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_OFF
@@ -61,6 +69,8 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_OFF
@@ -76,6 +86,8 @@ PLUGIN_HEADER
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_MENU
 #define FLIPIT_DOWN         BUTTON_PLAY
 #define FLIPIT_QUIT         (BUTTON_SELECT | BUTTON_MENU)
@@ -87,6 +99,8 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_POWER
@@ -99,6 +113,8 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_POWER
@@ -110,6 +126,8 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
       (CONFIG_KEYPAD == SANSA_C200_PAD)
 
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_POWER
@@ -120,6 +138,8 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_SCROLL_UP
 #define FLIPIT_DOWN         BUTTON_SCROLL_DOWN
 #define FLIPIT_QUIT         BUTTON_POWER
@@ -131,6 +151,8 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_BACK
@@ -141,6 +163,8 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == MROBE100_PAD
 
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_POWER
@@ -148,6 +172,22 @@ PLUGIN_HEADER
 #define FLIPIT_SOLVE        BUTTON_PLAY
 #define FLIPIT_STEP_BY_STEP BUTTON_DISPLAY
 #define FLIPIT_TOGGLE       BUTTON_SELECT
+
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+
+#define FLIPIT_LEFT         BUTTON_RC_REW
+#define FLIPIT_RIGHT        BUTTON_RC_FF
+#define FLIPIT_UP           BUTTON_RC_VOL_UP
+#define FLIPIT_DOWN         BUTTON_RC_VOL_DOWN
+#define FLIPIT_QUIT         BUTTON_RC_REC
+#define FLIPIT_SHUFFLE      BUTTON_RC_MODE
+#define FLIPIT_SOLVE_PRE    BUTTON_RC_MENU
+#define FLIPIT_SOLVE        (BUTTON_RC_MENU|BUTTON_REPEAT)
+#define FLIPIT_STEP_PRE     BUTTON_RC_MENU
+#define FLIPIT_STEP_BY_STEP (BUTTON_RC_MENU|BUTTON_REL)
+#define FLIPIT_TOGGLE       BUTTON_RC_PLAY
+
+#define FLIPIT_RC_QUIT      BUTTON_REC
 
 #else
 #error No keymap defined!
@@ -174,7 +214,7 @@ static int cursor_pos, moves;
 #define GRID_TOP    MAX(0, ((LCD_HEIGHT - PANEL_HEIGHT - GRID_HEIGHT)/2))
 
 /* draw a spot at the coordinates (x,y), range of p is 0-19 */
-static void draw_spot(int p) 
+static void draw_spot(int p)
 {
     rb->lcd_bitmap_part( flipit_tokens, 0, spots[p] * TK_HEIGHT, TK_WIDTH,
                          GRID_LEFT + (p%5) * (TK_WIDTH+TK_SPACE),
@@ -448,11 +488,11 @@ static bool flipit_loop(void)
                 }
                 break;
 
-            case BUTTON_LEFT:
+            case FLIPIT_LEFT:
                 move_cursor(-1, 0);
                 break;
 
-            case BUTTON_RIGHT:
+            case FLIPIT_RIGHT:
                 move_cursor(1, 0);
                 break;
 
@@ -553,6 +593,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 28, "[REC-LEFT] shuffle");
     rb->lcd_putsxy(2, 38, "[REC-RIGHT] solution");
     rb->lcd_putsxy(2, 48, "[REC-SEL] step by step");
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+    rb->lcd_putsxy(2, 8, "[REC] to stop");
+    rb->lcd_putsxy(2, 18, "[PLAY] toggle");
+    rb->lcd_putsxy(2, 28, "[MODE] shuffle");
+    rb->lcd_putsxy(2, 38, "[MENU..] solution");
+    rb->lcd_putsxy(2, 48, "[MENU] step by step");
 #endif
     rb->lcd_update();
 #else /* HAVE_LCD_CHARCELLS */

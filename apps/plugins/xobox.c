@@ -130,6 +130,15 @@ PLUGIN_HEADER
 #define DOWN BUTTON_DOWN
 #define PAUSE BUTTON_DISPLAY
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+
+#define QUIT BUTTON_RC_REC
+#define LEFT BUTTON_RC_REW
+#define RIGHT BUTTON_RC_FF
+#define UP BUTTON_RC_VOL_UP
+#define DOWN BUTTON_RC_VOL_DOWN
+#define PAUSE BUTTON_RC_PLAY
+
 #else
 #error No keymap defined!
 #endif

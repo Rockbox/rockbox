@@ -55,6 +55,8 @@ PLUGIN_HEADER
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define STAR_QUIT           BUTTON_OFF
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_UP
 #define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_ON
@@ -68,6 +70,8 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 #define STAR_QUIT           BUTTON_OFF
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_UP
 #define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_ON
@@ -81,6 +85,8 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define STAR_QUIT           BUTTON_OFF
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_UP
 #define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL_PRE BUTTON_MENU
@@ -93,6 +99,8 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define STAR_QUIT           BUTTON_OFF
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_UP
 #define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_MODE
@@ -109,6 +117,8 @@ PLUGIN_HEADER
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
 #define STAR_QUIT           (BUTTON_SELECT | BUTTON_MENU)
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_MENU
 #define STAR_DOWN           BUTTON_PLAY
 #define STAR_TOGGLE_CONTROL_PRE BUTTON_SELECT
@@ -122,6 +132,8 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 
 #define STAR_QUIT           BUTTON_POWER
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_UP
 #define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_SELECT
@@ -136,6 +148,8 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 
 #define STAR_QUIT           BUTTON_POWER
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_UP
 #define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_SELECT
@@ -148,6 +162,8 @@ PLUGIN_HEADER
 (CONFIG_KEYPAD == SANSA_C200_PAD)
 
 #define STAR_QUIT BUTTON_POWER
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP   BUTTON_UP
 #define STAR_DOWN BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_SELECT
@@ -160,6 +176,8 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 
 #define STAR_QUIT           BUTTON_POWER
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_SCROLL_UP
 #define STAR_DOWN           BUTTON_SCROLL_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_REW
@@ -171,6 +189,8 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 
 #define STAR_QUIT           BUTTON_BACK
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_UP
 #define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_SELECT
@@ -182,6 +202,8 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == MROBE100_PAD)
 
 #define STAR_QUIT           BUTTON_POWER
+#define STAR_LEFT           BUTTON_LEFT
+#define STAR_RIGHT          BUTTON_RIGHT
 #define STAR_UP             BUTTON_UP
 #define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_SELECT
@@ -189,6 +211,19 @@ PLUGIN_HEADER
 #define STAR_LEVEL_DOWN     BUTTON_MENU
 #define STAR_LEVEL_REPEAT   BUTTON_DISPLAY
 #define STAR_MENU_RUN       BUTTON_SELECT
+
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+
+#define STAR_QUIT           BUTTON_RC_REC
+#define STAR_LEFT           BUTTON_RC_REW
+#define STAR_RIGHT          BUTTON_RC_FF
+#define STAR_UP             BUTTON_RC_VOL_UP
+#define STAR_DOWN           BUTTON_RC_VOL_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_RC_MODE
+#define STAR_LEVEL_UP       (BUTTON_RC_PLAY|BUTTON_RC_VOL_UP)
+#define STAR_LEVEL_DOWN     (BUTTON_RC_PLAY|BUTTON_RC_VOL_DOWN)
+#define STAR_LEVEL_REPEAT   (BUTTON_RC_PLAY|BUTTON_RC_MENU)
+#define STAR_MENU_RUN       BUTTON_RC_FF
 
 #else
 #error No keymap defined!
@@ -514,7 +549,7 @@ void star_display_text(char *str, bool waitkey)
                 switch (key)
                 {
                     case STAR_QUIT:
-                    case BUTTON_LEFT:
+                    case STAR_LEFT:
                     case STAR_DOWN:
                         go_on = true;
                         break;
@@ -769,11 +804,11 @@ static int star_run_game(int current_level)
                 case STAR_QUIT:
                     return -1;
 
-                case BUTTON_LEFT:
+                case STAR_LEFT:
                     move_x = -1;
                     break;
 
-                case BUTTON_RIGHT:
+                case STAR_RIGHT:
                     move_x = 1;
                     break;
 
