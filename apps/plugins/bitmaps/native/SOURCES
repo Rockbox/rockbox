@@ -475,10 +475,14 @@ star_tiles.6x7.mono.bmp
 
 /* Sudoku */
 #if LCD_WIDTH >= LCD_HEIGHT
-#if (LCD_WIDTH == 112) && (LCD_HEIGHT==64) && (LCD_DEPTH == 1)
+#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64) && (LCD_DEPTH == 1)
 sudoku_start.112x64x1.bmp
 sudoku_normal.112x64x1.bmp
 sudoku_inverse.112x64x1.bmp
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96) && (LCD_DEPTH >= 2)
+sudoku_start.128x96x2.bmp
+sudoku_normal.128x96x2.bmp
+sudoku_inverse.128x96x2.bmp
 #elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110) && (LCD_DEPTH >= 2)
 sudoku_start.138x110x2.bmp
 sudoku_normal.138x110x2.bmp

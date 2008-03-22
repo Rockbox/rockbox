@@ -75,22 +75,19 @@ static struct plugin_api* rb;
 #define CELL_HEIGHT 8
 #define SMALL_BOARD
 
-#elif (LCD_HEIGHT==110) && (LCD_WIDTH==138)
+#elif (LCD_HEIGHT==96) && (LCD_WIDTH==128) \
+   || (LCD_HEIGHT==110) && (LCD_WIDTH==138) \
+   || (LCD_HEIGHT==128) && (LCD_WIDTH==128)
+/* iAudio M3 - 138x110, 8 cells @ 10x10 with 9 border lines */
 /* iPod Mini - 138x110, 8 cells @ 10x10 with 9 border lines */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH  10
-#define CELL_HEIGHT 10
-
-#elif (LCD_HEIGHT==128) && (LCD_WIDTH==128)
 /* iriver H10 5-6GB - 128x128, 8 cells @ 10x10 with 9 border lines */
 
 /* Internal dimensions of a cell */
 #define CELL_WIDTH  10
 #define CELL_HEIGHT 10
 
-#elif ((LCD_HEIGHT==128) && (LCD_WIDTH==160)) || \
-      ((LCD_HEIGHT==132) && (LCD_WIDTH==176))
+#elif ((LCD_HEIGHT==128) && (LCD_WIDTH==160)) \
+   || ((LCD_HEIGHT==132) && (LCD_WIDTH==176))
 /* iAudio X5, Iriver H1x0, iPod G3, G4 - 160x128; */
 /* iPod Nano - 176x132, 8 cells @ 12x12 with 9 border lines */
 

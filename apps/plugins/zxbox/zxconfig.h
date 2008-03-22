@@ -18,7 +18,8 @@ extern int intkeys[5];
 #define SETTINGS_VERSION 2
 
 /* undef not to use greyscale lib */
-#if !defined HAVE_LCD_COLOR
+#if !defined HAVE_LCD_COLOR && !defined(IAUDIO_M3) 
+                   /* FIXME: change after implementing greyscale lib for M3 */
 #define USE_GREY
 #define USE_BUFFERED_GREY
 #endif

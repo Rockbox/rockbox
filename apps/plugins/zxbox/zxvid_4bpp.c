@@ -5,12 +5,19 @@
 
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING 
 #define FB_WIDTH ((LCD_WIDTH+3)/4)
-unsigned char pixmask[4] ICONST_ATTR = {
-        0xC0, 0x30, 0x0C, 0x03
-    };
+fb_data pixmask[4] ICONST_ATTR = {
+    0xC0, 0x30, 0x0C, 0x03
+};
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
-unsigned char pixmask[4] ICONST_ATTR = {
+fb_data pixmask[4] ICONST_ATTR = {
     0x03, 0x0C, 0x30, 0xC0
+};
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+fb_data pixmask[8] ICONST_ATTR = {
+    0x0101, 0x0202, 0x0404, 0x0808, 0x1010, 0x2020, 0x4040, 0x8080
+};
+fb_data pixval[4] ICONST_ATTR = {
+    0x0000, 0x0001, 0x0100, 0x0101
 };
 #endif
 
@@ -63,8 +70,8 @@ void update_screen(void)
         srcx = 0;           /* reset our x counter before each row... */
         for(x = 0; x < LCD_WIDTH; x++)
         {
-            mask = pixmask[x & 3];
-            frameb[x >> 2] = (frameb[x >> 2] & ~mask) |  ((image[(srcx>>16)]&0x3) << ((3-(x & 3 )) * 2 ));
+            mask = ~pixmask[x & 3];
+            frameb[x >> 2] = (frameb[x >> 2] & mask) |  ((image[(srcx>>16)]&0x3) << ((3-(x & 3 )) * 2 ));
             srcx += X_STEP;    /* move through source image */
         }
         srcy += Y_STEP;      /* move through the source image... */
@@ -78,17 +85,34 @@ void update_screen(void)
         frameb = rb->lcd_framebuffer + (y/4) * LCD_WIDTH;
         srcx = 0;           /* reset our x counter before each row... */
 		shift = ((y & 3 ) * 2 );
-		mask = pixmask[y & 3];
+		mask = ~pixmask[y & 3];
         for(x = 0; x < LCD_WIDTH; x++)
         {
-            frameb[x] = (frameb[x] & ~mask) |  ((image[(srcx>>16)]&0x3) << shift );
+            frameb[x] = (frameb[x] & mask) |  ((image[(srcx>>16)]&0x3) << shift );
             srcx += X_STEP;    /* move through source image */
         }
         srcy += Y_STEP;      /* move through the source image... */
         image += (srcy>>16)*WIDTH;   /* and possibly to the next row. */
         srcy &= 0xffff;     /* set up the y-coordinate between 0 and 1 */
     }
-#endif 
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+	int shift;
+    for(y = 0; y < LCD_HEIGHT; y++)
+    {
+        frameb = rb->lcd_framebuffer + (y/8) * LCD_WIDTH;
+        srcx = 0;           /* reset our x counter before each row... */
+		shift = (y & 7);
+		mask = ~pixmask[y & 7];
+        for(x = 0; x < LCD_WIDTH; x++)
+        {
+            frameb[x] = (frameb[x] & mask) |  (pixval[image[(srcx>>16)]&0x3] << shift );
+            srcx += X_STEP;    /* move through source image */
+        }
+        srcy += Y_STEP;      /* move through the source image... */
+        image += (srcy>>16)*WIDTH;   /* and possibly to the next row. */
+        srcy &= 0xffff;     /* set up the y-coordinate between 0 and 1 */
+    }
+#endif
 
     if ( settings.showfps ) {
         int percent=0;

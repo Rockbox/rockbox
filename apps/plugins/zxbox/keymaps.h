@@ -94,6 +94,14 @@
 #define ZX_SELECT    BUTTON_RC_MODE
 #define ZX_MENU         (BUTTON_POWER | BUTTON_REL)
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define ZX_UP           BUTTON_RC_VOL_UP
+#define ZX_DOWN         BUTTON_RC_VOL_DOWN
+#define ZX_LEFT         BUTTON_RC_REW
+#define ZX_RIGHT        BUTTON_RC_FF
+#define ZX_SELECT       BUTTON_RC_PLAY
+#define ZX_MENU         BUTTON_RC_REC
+
 #else
 #error Keymap not defined!
 

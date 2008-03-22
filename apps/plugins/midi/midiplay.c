@@ -126,6 +126,15 @@ PLUGIN_IRAM_DECLARE
 #define BTN_PLAY         BUTTON_DISPLAY
 
 
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define BTN_QUIT         BUTTON_RC_REC
+#define BTN_RIGHT        BUTTON_RC_FF
+#define BTN_LEFT         BUTTON_RC_REW
+#define BTN_UP           BUTTON_RC_VOL_UP
+#define BTN_DOWN         BUTTON_RC_VOL_DOWN
+#define BTN_PLAY         BUTTON_RC_PLAY
+
+
 #else
 #error No keymap defined!
 #endif
