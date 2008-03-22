@@ -6,7 +6,7 @@
     This option controls the voicing of menus/settings as they are selected
     by the cursor. In order for this to work, a voice file must be present 
     in the \fname{/.rockbox/langs/} directory on the \dap.  Voice files are large
-    and are not  shipped with Rockbox by default.
+    and are not shipped with Rockbox by default.
     The voice file is the name of the language for which it is made, followed
     by the extension \fname{.voice}.  So for English, the file name would be 
     \fname{english.voice}.
@@ -74,6 +74,16 @@
     Use of a .talk clip takes precedence over other filename voicing. Otherwise 
     (e.g. if  a .talk clip is not available), voicing uses the method set under
      \setting{Voice Filenames} above.
+
+  \item[Say File Type.]
+    This option turns on voicing of file types when \setting{Voice Filenames}
+    is set to \setting{Spell} or \setting{Numbers}.
+    When \setting{Voice Directories} is set to \setting{Spell}, ``Directory''
+    will be voiced after each spelled out directory.
+
+  \item[Announce Battery Level.]
+    When this option is enabled the battery level is announced when it falls
+    under 50\%, 30\% and 15\%.
 
   \end{description}
 
