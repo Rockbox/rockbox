@@ -1077,6 +1077,14 @@ STATIC void chip8 (void)
 #define CHIP8_KEY6 BUTTON_RC_FF
 #define CHIP8_KEY8 BUTTON_RC_VOL_DOWN
 
+#elif (CONFIG_KEYPAD == COWOND2_PAD)
+#define CHIP8_OFF  BUTTON_POWER
+#define CHIP8_KEY2 BUTTON_DOWN
+#define CHIP8_KEY4 BUTTON_LEFT
+#define CHIP8_KEY5 BUTTON_SELECT
+#define CHIP8_KEY6 BUTTON_RIGHT
+#define CHIP8_KEY8 BUTTON_UP
+
 #else
 #error No keymap defined!
 #endif

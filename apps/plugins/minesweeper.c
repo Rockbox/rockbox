@@ -183,6 +183,16 @@ enum minesweeper_status {
 #   define MINESWP_DISCOVER BUTTON_RC_PLAY
 #   define MINESWP_INFO     BUTTON_RC_MENU
 
+#elif (CONFIG_KEYPAD == COWOND2_PAD)
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
+#   define MINESWP_UP       BUTTON_UP
+#   define MINESWP_DOWN     BUTTON_DOWN
+#   define MINESWP_QUIT     BUTTON_POWER
+#   define MINESWP_TOGGLE   BUTTON_SELECT
+#   define MINESWP_DISCOVER BUTTON_MENU
+#   define MINESWP_INFO     (BUTTON_MENU | BUTTON_SELECT)
+
 #else
 #error No keymap defined!
 #endif

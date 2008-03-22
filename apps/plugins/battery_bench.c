@@ -144,6 +144,13 @@ PLUGIN_HEADER
 #define BATTERY_ON_TXT  "PLAY - start"
 #define BATTERY_OFF_TXT "REC  - quit"
 
+#elif CONFIG_KEYPAD == COWOND2_PAD
+
+#define BATTERY_ON  BUTTON_MENU
+#define BATTERY_OFF BUTTON_POWER
+#define BATTERY_ON_TXT  "MENU - start"
+#define BATTERY_OFF_TXT "POWER  - quit"
+
 #else
 #error No keymap defined!
 #endif

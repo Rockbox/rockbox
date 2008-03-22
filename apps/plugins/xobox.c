@@ -139,6 +139,15 @@ PLUGIN_HEADER
 #define DOWN BUTTON_RC_VOL_DOWN
 #define PAUSE BUTTON_RC_PLAY
 
+#elif CONFIG_KEYPAD == COWOND2_PAD
+
+#define QUIT BUTTON_POWER
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define UP BUTTON_UP
+#define DOWN BUTTON_DOWN
+#define PAUSE BUTTON_SELECT
+
 #else
 #error No keymap defined!
 #endif

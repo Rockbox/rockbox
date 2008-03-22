@@ -61,6 +61,24 @@ static const struct button_mapping button_context_standard[]  = {
 
 
 static const struct button_mapping button_context_wps[]  = {
+    { ACTION_WPS_PLAY,      BUTTON_SELECT|BUTTON_REL,         BUTTON_SELECT },
+    { ACTION_WPS_STOP,      BUTTON_SELECT|BUTTON_REPEAT,      BUTTON_SELECT },
+    { ACTION_WPS_SKIPPREV,  BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
+    { ACTION_WPS_SEEKBACK,  BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_WPS_STOPSEEK,  BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT|BUTTON_REPEAT },
+    { ACTION_WPS_SKIPNEXT,  BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
+    { ACTION_WPS_SEEKFWD,   BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_WPS_STOPSEEK,  BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT|BUTTON_REPEAT },
+
+    { ACTION_WPS_VOLDOWN,       BUTTON_MINUS,                    BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,       BUTTON_MINUS|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_WPS_VOLUP,         BUTTON_PLUS,                      BUTTON_NONE },
+    { ACTION_WPS_VOLUP,         BUTTON_PLUS|BUTTON_REPEAT,        BUTTON_NONE },
+
+    { ACTION_WPS_BROWSE,        BUTTON_UP|BUTTON_REL,       BUTTON_UP },
+    { ACTION_WPS_CONTEXT,       BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP },
+    { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,          BUTTON_MENU },
+    { ACTION_WPS_QUICKSCREEN,   BUTTON_DOWN|BUTTON_REPEAT,       BUTTON_DOWN },
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
@@ -132,8 +150,8 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 }; /* button_context_pitchcreen */
 
 static const struct button_mapping button_context_keyboard[]  = {
-
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    //LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
 extern int current_tick;

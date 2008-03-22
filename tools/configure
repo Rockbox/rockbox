@@ -1249,7 +1249,7 @@ EOF
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iaudio"
     appextra="recorder:gui"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     toolset="$tccbitmaptools"
     # architecture, manufacturer and model for the target-tree build

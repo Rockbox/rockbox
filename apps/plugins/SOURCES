@@ -1,5 +1,3 @@
-#if !defined(COWON_D2)
-
 /* plugins common to all models */
 battery_bench.c
 chessclock.c
@@ -149,4 +147,3 @@ invadrox.c
 superdom.c
 #endif
 #endif /* m:robe 500 */
-#endif /* COWON_D2 */

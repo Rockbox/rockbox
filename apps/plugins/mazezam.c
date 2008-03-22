@@ -177,6 +177,18 @@ MEM_FUNCTION_WRAPPERS(rb);
 #define MAZEZAM_QUIT                BUTTON_RC_REC
 #define MAZEZAM_QUIT_KEYNAME        "[REC]"
 
+#elif (CONFIG_KEYPAD == COWOND2_PAD)
+#define MAZEZAM_UP                  BUTTON_UP
+#define MAZEZAM_DOWN                BUTTON_DOWN
+#define MAZEZAM_LEFT                BUTTON_LEFT
+#define MAZEZAM_RIGHT               BUTTON_RIGHT
+#define MAZEZAM_SELECT              BUTTON_SELECT
+
+#define MAZEZAM_RETRY               BUTTON_SELECT
+#define MAZEZAM_RETRY_KEYNAME       "[PLAY]"
+#define MAZEZAM_QUIT                BUTTON_POWER
+#define MAZEZAM_QUIT_KEYNAME        "[POWER]"
+
 #else
 #error No keymap defined!
 #endif

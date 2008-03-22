@@ -241,6 +241,19 @@ PLUGIN_HEADER
 #define CUBE_PAUSE         BUTTON_RC_PLAY
 #define CUBE_HIGHSPEED     BUTTON_RC_MENU
 
+#elif CONFIG_KEYPAD == COWOND2_PAD
+#define CUBE_QUIT          BUTTON_POWER
+#define CUBE_X_INC         BUTTON_RIGHT
+#define CUBE_X_DEC         BUTTON_LEFT
+#define CUBE_Y_INC         BUTTON_UP
+#define CUBE_Y_DEC         BUTTON_DOWN
+#define CUBE_Z_INC         BUTTON_PLUS
+#define CUBE_Z_DEC         BUTTON_MINUS
+#define CUBE_MODE          BUTTON_MENU
+#define CUBE_PAUSE_PRE     BUTTON_SELECT
+#define CUBE_PAUSE         (BUTTON_MINUS | BUTTON_REL)
+#define CUBE_HIGHSPEED     (BUTTON_PLUS | BUTTON_REL)
+
 #else
 #error No keymap defined!
 #endif

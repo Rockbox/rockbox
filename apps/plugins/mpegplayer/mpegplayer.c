@@ -202,6 +202,15 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_RW         BUTTON_LEFT
 #define MPEG_FF         BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == COWOND2_PAD
+#define MPEG_MENU       BUTTON_MENU
+#define MPEG_STOP       BUTTON_POWER
+#define MPEG_PAUSE      BUTTON_SELECT
+#define MPEG_VOLDOWN    BUTTON_MINUS
+#define MPEG_VOLUP      BUTTON_PLUS
+#define MPEG_RW         BUTTON_LEFT
+#define MPEG_FF         BUTTON_RIGHT
+
 #else
 #error No keymap defined!
 #endif

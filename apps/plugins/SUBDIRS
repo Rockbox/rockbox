@@ -1,4 +1,4 @@
-#if !defined(IRIVER_IFP7XX_SERIES) && !defined(COWON_D2) && !defined(GIGABEAT_S)
+#if !defined(IRIVER_IFP7XX_SERIES) && !defined(GIGABEAT_S)
 
 /* For all targets */
 shortcuts

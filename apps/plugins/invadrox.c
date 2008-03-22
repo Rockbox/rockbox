@@ -114,6 +114,13 @@ PLUGIN_HEADER
 #define RIGHT BUTTON_RIGHT
 #define FIRE BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == COWOND2_PAD
+
+#define QUIT BUTTON_POWER
+#define LEFT BUTTON_MINUS
+#define RIGHT BUTTON_PLUS
+#define FIRE BUTTON_MENU
+
 #else
     #error INVADROX: Unsupported keypad
 #endif

@@ -82,6 +82,9 @@ enum tidy_system
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
 #define TIDY_STOP BUTTON_RC_REC
 
+#elif CONFIG_KEYPAD == COWOND2_PAD
+#define TIDY_STOP BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

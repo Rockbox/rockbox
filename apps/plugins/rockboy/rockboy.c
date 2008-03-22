@@ -197,6 +197,15 @@ static void setoptions (void)
         options.START=BUTTON_RC_HEART;
         options.SELECT=BUTTON_RC_MODE;
         options.MENU=BUTTON_POWER;
+#elif CONFIG_KEYPAD == COWOND2_PAD
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_LEFT;
+        options.B=BUTTON_RIGHT;
+        options.START=BUTTON_PLUS;
+        options.SELECT=BUTTON_SELECT;
+        options.MENU=BUTTON_MENU;
 #else
 #error No Keymap Defined!
 #endif
