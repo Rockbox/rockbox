@@ -62,7 +62,6 @@ brickmania_menu_items.160x128x2.bmp
 brickmania_menu_bg.160x128x2.bmp
 brickmania_pads.160x128x2.bmp
 brickmania_powerups.160x128x2.bmp
-//brickmania_break.160x128x2.bmp
 #if (LCD_WIDTH >= 160)
 brickmania_ball.5x5x2.bmp
 brickmania_bricks.160x128x2.bmp
