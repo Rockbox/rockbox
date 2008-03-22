@@ -1975,7 +1975,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
             {
                 /* the progressbar should be alone on its line */
                 update_line = false;
-                draw_progressbar(gwps, line);
+                draw_progressbar(gwps, line - data->viewports[v].first_line);
             }
 
             /* peakmeter */
@@ -1985,7 +1985,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
                 update_line = false;
 
                 int h = font_get(display->getfont())->height;
-                int peak_meter_y = display->getymargin() + line * h;
+                int peak_meter_y = display->getymargin() + (line - data->viewports[v].first_line)* h;
 
                 /* The user might decide to have the peak meter in the last
                     line so that it is only displayed if no status bar is
