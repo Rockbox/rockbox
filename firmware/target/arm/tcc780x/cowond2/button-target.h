@@ -23,15 +23,17 @@
 #include <stdbool.h>
 #include "config.h"
 
+#define HAS_BUTTON_HOLD
+
+bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
 
 /* Main unit's buttons */
 #define BUTTON_POWER      0x00000001
-#define BUTTON_HOLD       0x00000002
-#define BUTTON_PLUS       0x00000004
-#define BUTTON_MINUS      0x00000008
-#define BUTTON_MENU       0x00000010
+#define BUTTON_PLUS       0x00000002
+#define BUTTON_MINUS      0x00000004
+#define BUTTON_MENU       0x00000008
 
 /* Faked buttons based on touchscreen quadrants (not yet read) */
 #define BUTTON_UP     0x00000020

@@ -27,6 +27,11 @@ void button_init_device(void)
     /* Nothing to do */
 }
 
+bool button_hold(void)
+{
+    return (GPIOA & 0x8) ? false : true;
+}
+
 int button_read_device(void)
 {
     int btn = BUTTON_NONE;
@@ -56,9 +61,6 @@ int button_read_device(void)
 
     /* TODO: Read 'fake' buttons based on touchscreen quadrants. 
        Question: How can I read from the PCF chip (I2C) in a tick task? */
-
-    if (!(GPIOA & 0x8))
-        btn |= BUTTON_HOLD;
 
     if (!(GPIOA & 0x4))
         btn |= BUTTON_POWER;
