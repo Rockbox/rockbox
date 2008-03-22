@@ -107,15 +107,22 @@
 #define CREQ    (*(volatile unsigned long *)0xF3001004)
 #define IRQSEL  (*(volatile unsigned long *)0xF300100C)
 #define MREQ    (*(volatile unsigned long *)0xF3001014)
+#define POL     (*(volatile unsigned long *)0xF300101C)
 #define MIRQ    (*(volatile unsigned long *)0xF3001028)
 #define MFIQ    (*(volatile unsigned long *)0xF300102C)
+#define MODE    (*(volatile unsigned long *)0xF3001030)
 #define ALLMASK (*(volatile unsigned long *)0xF3001044)
 #define VAIRQ   (*(volatile unsigned long *)0xF3001080)
 #define VAFIQ   (*(volatile unsigned long *)0xF3001084)
 #define VNIRQ   (*(volatile unsigned long *)0xF3001088)
 #define VNFIQ   (*(volatile unsigned long *)0xF300108C)
+#define VCTRL   (*(volatile unsigned long *)0xF3001090)
 
-#define TIMER_IRQ_MASK (1<<6)
+#define IRQ_PRIORITY_TABLE ((volatile unsigned int *)0xF30010A0)
+
+#define TIMER0_IRQ_MASK (1<<6)
+#define DAI_RX_IRQ_MASK (1<<14)
+#define DAI_TX_IRQ_MASK (1<<15)
 
 /* Timer / Counters */
 

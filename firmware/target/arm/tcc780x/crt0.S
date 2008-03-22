@@ -121,6 +121,52 @@ copied_start:
     msr    cpsr, r0
     ldr    sp, =stackend
 
+    /* Enable MMU & caches. At present this is just doing what the OF does.
+       Ensure TCMs are enabled before copying the exception vectors to 0x0. */
+
+    mov     r1, #0xf7000000  /* Virtual MMU Table base */
+
+    ldr     r0, =0x1fe0c     /* Region 0: 0x00000000-0xffffffff (4Gb) */
+    str     r0, [r1]         /* AP: 3 EN: 1 DO: 0 CACHE_ALL */
+
+    ldr     r0, =0x2801ae24  /* Region 1: 0x28000000-0x2fffffff (128Mb) */
+    str     r0, [r1,#4]      /* AP: 3 EN: 1 DO: 1 BUFFERED */
+
+    ldr     r0, =0x13e44     /* Region 2: 0x00000000-0x000fffff (1Mb) */
+    str     r0, [r1,#8]      /* AP: 3 EN: 1 DO: 2 BUFFERED */
+
+    ldr     r0, =0x4001ce60  /* Region 3: 0x40000000-0x5fffffff (512Mb) */
+    str     r0, [r1,#0xc]    /* AP: 3 EN: 1 DO: 3 CACHE_NONE */
+
+    ldr     r0, =0x6001be80  /* Region 4: 0x60000000-0x6fffffff (256Mb) */
+    str     r0, [r1,#0x10]   /* AP: 3 EN: 1 DO: 4 CACHE_NONE */
+
+    ldr     r0, =0x3801aea4  /* Region 5: 0x38000000-0x3fffffff (128Mb) */
+    str     r0, [r1,#0x14]   /* AP: 3 EN: 1 DO: 5 BUFFERED */
+
+    ldr     r0, =0x8001eec0  /* Region 6: 0x80000000-0xffffffff (2Gb) */
+    str     r0, [r1,#0x18]   /* AP: 3 EN: 1 DO: 6 CACHE_NONE */
+
+    ldr     r0, =0x1001aee0  /* Region 7: 0x10000000-0x17ffffff (128Mb) */
+    str     r0, [r1,#0x1c]   /* AP: 3 EN: 1 DO: 7 CACHE_NONE */
+
+    add     r1, r1, #0x8000
+    mcr     p15, 0, r1, c2, c0, 0  /* Set TTBR = TABBASE (Virtual TLB) */
+
+    ldr     r0, =0x55555555
+    mcr     p15, 0, r0, c3, c0, 0  /* Domain access d0-d15 = 'client' */
+    
+    ldr     r0, =0xa0000011
+    mcr     p15, 0, r0, c9, c1, 0  /* Data TCM: 0xA0000000-0xA00001fff (8Kb) */
+    mov     r0, #0xd
+    mcr     p15, 0, r0, c9, c1, 1  /* Instr. TCM: 0x00000000-0x00000fff (4Kb) */
+
+    mov     r0, #0
+    mcr     p15, 0, r0, c7, c5, 0  /* Invalidate Icache */
+    ldr     r2, =0x5507d
+    mcr     p15, 0, r2, c1, c0, 0  /* Enable MMU, I & D caches */
+    mcr     p15, 0, r0, c7, c6, 0  /* Invalidate Dcache */
+    mcr     p15, 0, r1, c8, c7, 0  /* Invalidate TLB */
 
 #if !defined(BOOTLOADER) && !defined(STUB)
 
@@ -193,43 +239,6 @@ copied_start:
     strhi  r4, [r2], #4
     bhi    1b
 
-    /*
-       Enable cache & TCM regions
-       TODO: This is just doing what the OF does at present. It needs to be
-       better understood and moved out to a separate MMU functions package.
-    */
-    ldr     r1, =0x1fe0c
-    mov     r0, #0xf7000000
-    str     r1, [r0]
-    ldr     r1, =0x2801ae24
-    str     r1, [r0,#4]
-    ldr     r1, =0x13e44
-    str     r1, [r0,#8]
-    ldr     r1, =0x4001ce60
-    str     r1, [r0,#0xc]
-    ldr     r1, =0x6001be80
-    str     r1, [r0,#0x10]
-    ldr     r1, =0x3801aea4
-    str     r1, [r0,#0x14]
-    ldr     r1, =0x8001eec0
-    str     r1, [r0,#0x18]
-    ldr     r1, =0x1001aee0
-    str     r1, [r0,#0x1c]
-    add     r1, r0, #0x8000  /* r1 now = 0xf7008000 */
-    ldr     r0, =0xa0000011
-    ldr     r2, =0x5507d
-    mcr     p15, 0, r0,c9,c1 /* data tcm region (enabled; 8kb; 0xa0000000) */
-    mov     r0, #0xd
-    mcr     p15, 0, r0,c9,c1, 1 /* inst tcm region (enabled, 4kb, 0x00000000) */
-    ldr     r0, =0x55555555
-    mcr     p15, 0, r1,c2,c0 /* translation table base register = 0xf7008000 */
-    mcr     p15, 0, r0,c3,c0 /* domain access d0-d15 = 'client' */
-    mov     r0, #0
-    mcr     p15, 0, r0,c7,c5 /* invalidate icache */
-    mcr     p15, 0, r2,c1,c0 /* enable mmu, i & d caches */
-    mcr     p15, 0, r0,c7,c6 /* invalidate dcache */
-    mcr     p15, 0, r1,c8,c7 /* invalidate tlb */
-    
     bl     main
     /* main() should never return */
 

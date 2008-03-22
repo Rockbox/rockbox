@@ -36,8 +36,8 @@ void tick_start(unsigned int interval_in_ms)
     TCFG0 = (1<<8) | (0<<4) | (1<<3) | 1;
 
     /* Unmask timer IRQ */
-    MIRQ &= ~TIMER_IRQ_MASK;
+    IEN |= TIMER0_IRQ_MASK;
 }
 
-/* NB: Since the 7801 has a single timer IRQ, the tick tasks are dispatched
-   as part of the central timer IRQ processing in timer-tcc780x.c */
+/* NB: Since we are using a single timer IRQ, tick tasks are dispatched as
+       part of the central timer IRQ processing in timer-tcc780x.c */

@@ -52,7 +52,7 @@ void __timer_unregister(void)
 
 extern void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 
-void TIMER(void)
+void TIMER0(void)
 {
     if (TIREQ & TF0)    /* Timer0 reached ref value */
     {
@@ -77,6 +77,4 @@ void TIMER(void)
     {
         /* dispatch timer */
     }
-
-    CREQ |= TIMER_IRQ_MASK;    /* clear IRQ */
 }

@@ -33,49 +33,86 @@ default_interrupt(EXT0);
 default_interrupt(EXT1);
 default_interrupt(EXT2);
 default_interrupt(EXT3);
-default_interrupt(IRQ4);
-default_interrupt(IRQ5);
-default_interrupt(TIMER);
-default_interrupt(IRQ7);
-default_interrupt(IRQ8);
-default_interrupt(IRQ9);
-default_interrupt(IRQ10);
-default_interrupt(IRQ11);
-default_interrupt(IRQ12);
-default_interrupt(IRQ13);
+default_interrupt(RTC);
+default_interrupt(GPSB0);
+default_interrupt(TIMER0);
+default_interrupt(TIMER1);
+default_interrupt(SCORE);
+default_interrupt(SPDTX);
+default_interrupt(VIDEO);
+default_interrupt(GSIO);
+default_interrupt(SCALER);
+default_interrupt(I2C);
 default_interrupt(DAI_RX);
 default_interrupt(DAI_TX);
-default_interrupt(IRQ16);
-default_interrupt(IRQ17);
-default_interrupt(IRQ18);
-default_interrupt(IRQ19);
-default_interrupt(IRQ20);
-default_interrupt(IRQ21);
-default_interrupt(IRQ22);
-default_interrupt(IRQ23);
-default_interrupt(IRQ24);
-default_interrupt(IRQ25);
-default_interrupt(IRQ26);
-default_interrupt(IRQ27);
-default_interrupt(IRQ28);
-default_interrupt(IRQ29);
-default_interrupt(IRQ30);
-default_interrupt(IRQ31);
+default_interrupt(CDRX);
+default_interrupt(HPI);
+default_interrupt(UART0);
+default_interrupt(UART1);
+default_interrupt(G2D);
+default_interrupt(USB_DEVICE);
+default_interrupt(USB_HOST);
+default_interrupt(DMA);
+default_interrupt(HDD);
+default_interrupt(MSTICK);
+default_interrupt(NFC);
+default_interrupt(SDMMC);
+default_interrupt(CAM);
+default_interrupt(LCD);
+default_interrupt(ADC);
+default_interrupt(GPSB1);
+
+/* TODO: Establish IRQ priorities (0 = highest priority) */
+static const char irqpriority[] =
+{
+    0,  /* EXT0 */
+    1,  /* EXT1 */
+    2,  /* EXT2 */
+    3,  /* EXT3 */
+    4,  /* RTC */
+    5,  /* GPSB0 */
+    6,  /* TIMER0 */
+    7,  /* TIMER1 */
+    8,  /* SCORE */
+    9,  /* SPDTX */
+    10, /* VIDEO */
+    11, /* GSIO */
+    12, /* SCALER */
+    13, /* I2C */
+    14, /* DAI_RX */
+    15, /* DAI_TX */
+    16, /* CDRX */
+    17, /* HPI */
+    18, /* UART0 */
+    19, /* UART1 */
+    20, /* G2D */
+    21, /* USB_DEVICE */
+    22, /* USB_HOST */
+    23, /* DMA */
+    24, /* HDD */
+    25, /* MSTICK */
+    26, /* NFC */
+    27, /* SDMMC */
+    28, /* CAM */
+    29, /* LCD */
+    30, /* ADC */
+    31, /* GPSB */
+};
 
 static void (* const irqvector[])(void) =
 {
-    EXT0,EXT1,EXT2,EXT3,IRQ4,IRQ5,TIMER,IRQ7,
-    IRQ8,IRQ9,IRQ10,IRQ11,IRQ12,IRQ13,DAI_RX,DAI_TX,
-    IRQ16,IRQ17,IRQ18,IRQ19,IRQ20,IRQ21,IRQ22,IRQ23,
-    IRQ24,IRQ25,IRQ26,IRQ27,IRQ28,IRQ29,IRQ30,IRQ31
+    EXT0,EXT1,EXT2,EXT3,RTC,GPSB0,TIMER0,TIMER1,
+    SCORE,SPDTX,VIDEO,GSIO,SCALER,I2C,DAI_RX,DAI_TX,
+    CDRX,HPI,UART0,UART1,G2D,USB_DEVICE,USB_HOST,DMA,
+    HDD,MSTICK,NFC,SDMMC,CAM,LCD,ADC,GPSB1
 };
 
 static const char * const irqname[] =
 {
-    "EXT0","EXT1","EXT2","EXT3","IRQ4","IRQ5","TIMER","IRQ7",
-    "IRQ8","IRQ9","IRQ10","IRQ11","IRQ12","IRQ13","DAI_RX","DAI_TX",
-    "IRQ16","IRQ17","IRQ18","IRQ19","IRQ20","IRQ21","IRQ22","IRQ23",
-    "IRQ24","IRQ25","IRQ26","IRQ27","IRQ28","IRQ29","IRQ30","IRQ31"
+    "EXT0","EXT1","EXT2","EXT3","RTC","GPSB0","TIMER0","TIMER1",
+    "SCORE","SPDTX","VIDEO","GSIO","SCALER","I2C","DAI_RX","DAI_TX",
+    "CDRX","HPI","UART0","UART1","G2D","USB_DEVICE","USB_HOST","DMA",
+    "HDD","MSTICK","NFC","SDMMC","CAM","LCD","ADC","GPSB1"
 };
 
 static void UIRQ(void)
@@ -92,17 +129,23 @@ void irq_handler(void)
 
     asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
-    irqvector[VNIRQ]();
+
+    int irq_no = VNIRQ;   /* Read clears the corresponding IRQ status */
+    
+    if ((irq_no & (1<<31)) == 0)  /* Ensure invalid flag is not set */
+    {
+        irqvector[irq_no]();
+    }
+    
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
-                    "subs  pc, lr, #4           \n"); /* Return from FIQ */
+                    "subs  pc, lr, #4           \n"); /* Return from IRQ */
 }
 
 void fiq_handler(void)
 {
     asm volatile (
-        "sub    lr, lr, #4   \r\n"
-        "movs   lr,pc        \r\n"
+        "subs   pc, lr, #4   \r\n"
     );
 }
 #endif /* !defined(BOOTLOADER) */
@@ -231,15 +274,36 @@ static void clock_init(void)
 #ifdef COWON_D2
 void system_init(void)
 {
+    int i;
+
     MBCFG = 0x19;
 
     if (TCC780_VER == 0)
       ECFG0 = 0x309;
     else
       ECFG0 = 0x30d;
-      
+
     /* mask all interrupts */
-    MIRQ = -1;
+    IEN = 0;
+
+#if !defined(BOOTLOADER)
+
+    IRQSEL = -1;        /* set all interrupts to be IRQs not FIQs */
+
+    POL = 0x200108;     /* IRQs 3,8,21 active low (as OF) */
+    MODE = 0x20ce07c0;  /* IRQs 6-10,17-19,22-23,29 level-triggered (as OF) */
+
+    VCTRL |= (1<<31);   /* Reading from VNIRQ clears that interrupt */
+
+    /* Write IRQ priority registers using ints - a freeze occurs otherwise */
+    for (i = 0; i < 7; i++)
+    {
+        IRQ_PRIORITY_TABLE[i] = ((int*)irqpriority)[i];
+    }
+
+    ALLMASK = 3;        /* Global FIQ/IRQ unmask */
+    
+#endif /* !defined(BOOTLOADER) */
 
     gpio_init();
     clock_init();

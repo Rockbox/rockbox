@@ -67,10 +67,6 @@ void* main(void)
     power_init();
     system_init();
     lcd_init();
-    
-#if defined(COWON_D2)
-    kernel_init();
-#endif
 
     adc_init();
     button_init();
