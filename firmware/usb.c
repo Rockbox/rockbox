@@ -199,6 +199,9 @@ static void usb_thread(void)
 #endif
                 {
 #ifdef HAVE_USBSTACK
+                    /* Set the state to USB_POWERED for now. if a real
+                       connection is detected it will switch to USB_INSERTED */
+                    usb_state = USB_POWERED;
                     usb_core_enable_driver(USB_DRIVER_MASS_STORAGE,true);
                     usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY,false);
                     usb_enable(true);
