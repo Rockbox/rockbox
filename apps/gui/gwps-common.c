@@ -1466,7 +1466,7 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
    The return value indicates whether the line needs to be updated.
 */
 static bool get_line(struct gui_wps *gwps,
-                     int v, int line, int subline,
+                     int line, int subline,
                      struct align_pos *align,
                      char *linebuf,
                      int linebuf_size)
@@ -1494,8 +1494,8 @@ static bool get_line(struct gui_wps *gwps,
 #endif
 
     /* Process all tokens of the desired subline */
-    last_token_idx = wps_last_token_index(data, v, line, subline);
-    for (i = wps_first_token_index(data, v, line, subline);
+    last_token_idx = wps_last_token_index(data, line, subline);
+    for (i = wps_first_token_index(data, line, subline);
          i <= last_token_idx; i++)
     {
         switch(data->tokens[i].type)
@@ -1594,16 +1594,16 @@ static bool get_line(struct gui_wps *gwps,
     return update;
 }
 
-static void get_subline_timeout(struct gui_wps *gwps, int v, int line, int subline)
+static void get_subline_timeout(struct gui_wps *gwps, int line, int subline)
 {
     struct wps_data *data = gwps->data;
     int i;
-    int subline_idx = wps_subline_index(data, v, line, subline);
-    int last_token_idx = wps_last_token_index(data, v, line, subline);
+    int subline_idx = wps_subline_index(data, line, subline);
+    int last_token_idx = wps_last_token_index(data, line, subline);
 
     data->sublines[subline_idx].time_mult = DEFAULT_SUBLINE_TIME_MULTIPLIER;
 
-    for (i = wps_first_token_index(data, v, line, subline);
+    for (i = wps_first_token_index(data, line, subline);
          i <= last_token_idx; i++)
     {
         switch(data->tokens[i].type)
@@ -1631,7 +1631,7 @@ static void get_subline_timeout(struct gui_wps *gwps, int v, int line, int subli
 
 /* Calculates which subline should be displayed for the specified line
    Returns true iff the subline must be refreshed */
-static bool update_curr_subline(struct gui_wps *gwps, int v, int line)
+static bool update_curr_subline(struct gui_wps *gwps, int line)
 {
     struct wps_data *data = gwps->data;
 
@@ -1640,13 +1640,13 @@ static bool update_curr_subline(struct gui_wps *gwps, int v, int line)
     bool new_subline_refresh;
     bool only_one_subline;
 
-    num_sublines = data->viewports[v].lines[line].num_sublines;
-    reset_subline = (data->viewports[v].lines[line].curr_subline == SUBLINE_RESET);
+    num_sublines = data->lines[line].num_sublines;
+    reset_subline = (data->lines[line].curr_subline == SUBLINE_RESET);
     new_subline_refresh = false;
     only_one_subline = false;
 
     /* if time to advance to next sub-line  */
-    if (TIME_AFTER(current_tick, data->viewports[v].lines[line].subline_expire_time - 1) ||
+    if (TIME_AFTER(current_tick, data->lines[line].subline_expire_time - 1) ||
         reset_subline)
     {
         /* search all sublines until the next subline with time > 0
@@ -1654,46 +1654,46 @@ static bool update_curr_subline(struct gui_wps *gwps, int v, int line)
         if (reset_subline)
             search_start = 0;
         else
-            search_start = data->viewports[v].lines[line].curr_subline;
+            search_start = data->lines[line].curr_subline;
 
         for (search = 0; search < num_sublines; search++)
         {
-            data->viewports[v].lines[line].curr_subline++;
+            data->lines[line].curr_subline++;
 
             /* wrap around if beyond last defined subline or WPS_MAX_SUBLINES */
-            if (data->viewports[v].lines[line].curr_subline == num_sublines)
+            if (data->lines[line].curr_subline == num_sublines)
             {
-                if (data->viewports[v].lines[line].curr_subline == 1)
+                if (data->lines[line].curr_subline == 1)
                     only_one_subline = true;
-                data->viewports[v].lines[line].curr_subline = 0;
+                data->lines[line].curr_subline = 0;
             }
 
             /* if back where we started after search or
                 only one subline is defined on the line */
             if (((search > 0) &&
-                 (data->viewports[v].lines[line].curr_subline == search_start)) ||
+                 (data->lines[line].curr_subline == search_start)) ||
                 only_one_subline)
             {
                 /* no other subline with a time > 0 exists */
-                data->viewports[v].lines[line].subline_expire_time = (reset_subline ?
+                data->lines[line].subline_expire_time = (reset_subline ?
                     current_tick :
-                    data->viewports[v].lines[line].subline_expire_time) + 100 * HZ;
+                    data->lines[line].subline_expire_time) + 100 * HZ;
                 break;
             }
             else
             {
                 /* get initial time multiplier for this subline */
-                get_subline_timeout(gwps, v, line, data->viewports[v].lines[line].curr_subline);
+                get_subline_timeout(gwps, line, data->lines[line].curr_subline);
 
-                int subline_idx = wps_subline_index(data, v, line,
-                                               data->viewports[v].lines[line].curr_subline);
+                int subline_idx = wps_subline_index(data, line,
+                                               data->lines[line].curr_subline);
 
                 /* only use this subline if subline time > 0 */
                 if (data->sublines[subline_idx].time_mult > 0)
                 {
                     new_subline_refresh = true;
-                    data->viewports[v].lines[line].subline_expire_time = (reset_subline ?
-                        current_tick : data->viewports[v].lines[line].subline_expire_time) +
+                    data->lines[line].subline_expire_time = (reset_subline ?
+                        current_tick : data->lines[line].subline_expire_time) +
                         BASE_SUBLINE_TIME*data->sublines[subline_idx].time_mult;
                     break;
                 }
@@ -1909,12 +1909,9 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     {
         display->clear_display();
 
-        for (v = 0; v < data->num_viewports; v++)
+        for (i = 0; i <= data->num_lines; i++)
         {
-            for (i = 0; i < data->viewports[v].num_lines; i++)
-            {
-                data->viewports[v].lines[i].curr_subline = SUBLINE_RESET;
-            }
+            data->lines[i].curr_subline = SUBLINE_RESET;
         }
     }
 
@@ -1951,23 +1948,24 @@ bool gui_wps_refresh(struct gui_wps *gwps,
         }
 #endif
 
-        for (line = 0; line < data->viewports[v].num_lines; line++)
+        for (line = data->viewports[v].first_line; 
+             line <= data->viewports[v].last_line; line++)
         {
             memset(linebuf, 0, sizeof(linebuf));
             update_line = false;
 
             /* get current subline for the line */
-            new_subline_refresh = update_curr_subline(gwps, v, line);
+            new_subline_refresh = update_curr_subline(gwps, line);
 
-            subline_idx = wps_subline_index(data, v, line,
-                                            data->viewports[v].lines[line].curr_subline);
+            subline_idx = wps_subline_index(data, line,
+                                            data->lines[line].curr_subline);
             flags = data->sublines[subline_idx].line_type;
 
             if (refresh_mode == WPS_REFRESH_ALL || (flags & refresh_mode)
                 || new_subline_refresh)
             {
                 /* get_line tells us if we need to update the line */
-                update_line = get_line(gwps, v, line, data->viewports[v].lines[line].curr_subline,
+                update_line = get_line(gwps, line, data->lines[line].curr_subline,
                                        &align, linebuf, sizeof(linebuf));
             }
 
@@ -2021,10 +2019,10 @@ bool gui_wps_refresh(struct gui_wps *gwps,
                     /* if the line is a scrolling one we don't want to update
                        too often, so that it has the time to scroll */
                     if ((refresh_mode & WPS_REFRESH_SCROLL) || new_subline_refresh)
-                        write_line(display, &align, line, true);
+                        write_line(display, &align, line - data->viewports[v].first_line, true);
                 }
                 else
-                    write_line(display, &align, line, false);
+                    write_line(display, &align, line - data->viewports[v].first_line, false);
             }
 
         }

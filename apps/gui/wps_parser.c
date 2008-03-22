@@ -338,11 +338,9 @@ static int skip_end_of_line(const char *wps_bufptr)
 /* Starts a new subline in the current line during parsing */
 static void wps_start_new_subline(struct wps_data *data)
 {
-    struct wps_viewport* vp = &data->viewports[data->num_viewports];
-
     data->num_sublines++;
     data->sublines[data->num_sublines].first_token_idx = data->num_tokens;
-    vp->lines[vp->num_lines].num_sublines++;
+    data->lines[data->num_lines].num_sublines++;
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -585,12 +583,14 @@ static int parse_viewport(const char *wps_bufptr,
         }
     }
 #endif
-  
-    wps_data->viewports[wps_data->num_viewports].num_lines = 0;
+
+    wps_data->viewports[wps_data->num_viewports-1].last_line = wps_data->num_lines - 1;
+
+    wps_data->viewports[wps_data->num_viewports].first_line = wps_data->num_lines;
   
     if (wps_data->num_sublines < WPS_MAX_SUBLINES)
     {
-        wps_data->viewports[wps_data->num_viewports].lines[0].first_subline_idx =
+        wps_data->lines[wps_data->num_lines].first_subline_idx =
             wps_data->num_sublines;
 
         wps_data->sublines[wps_data->num_sublines].first_token_idx =
@@ -599,7 +599,7 @@ static int parse_viewport(const char *wps_bufptr,
 
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
-  }
+}
 
 
 static int parse_image_special(const char *wps_bufptr,
@@ -1072,7 +1072,7 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 
     while(*wps_bufptr && !fail && data->num_tokens < WPS_MAX_TOKENS - 1
           && data->num_viewports < WPS_MAX_VIEWPORTS 
-          && data->viewports[data->num_viewports].num_lines < WPS_MAX_LINES)
+          && data->num_lines < WPS_MAX_LINES)
     {
         switch(*wps_bufptr++)
         {
@@ -1180,12 +1180,12 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 
                 line++;
                 wps_start_new_subline(data);
-                data->viewports[data->num_viewports].num_lines++; /* Start a new line */
+                data->num_lines++; /* Start a new line */
 
-                if ((data->viewports[data->num_viewports].num_lines < WPS_MAX_LINES) &&
+                if ((data->num_lines < WPS_MAX_LINES) &&
                     (data->num_sublines < WPS_MAX_SUBLINES))
                 {
-                    data->viewports[data->num_viewports].lines[data->viewports[data->num_viewports].num_lines].first_subline_idx =
+                    data->lines[data->num_lines].first_subline_idx =
                         data->num_sublines;
 
                     data->sublines[data->num_sublines].first_token_idx =
@@ -1261,6 +1261,8 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
 
     if (!fail && level >= 0) /* there are unclosed conditionals */
         fail = PARSE_FAIL_UNCLOSED_COND;
+
+    data->viewports[data->num_viewports].last_line = data->num_lines - 1;
 
     /* We have finished with the last viewport, so increment count */
     data->num_viewports++;
@@ -1512,20 +1514,20 @@ bool wps_data_load(struct wps_data *wps_data,
     }
 }
 
-int wps_subline_index(struct wps_data *data, int v, int line, int subline)
+int wps_subline_index(struct wps_data *data, int line, int subline)
 {
-    return data->viewports[v].lines[line].first_subline_idx + subline;
+    return data->lines[line].first_subline_idx + subline;
 }
 
-int wps_first_token_index(struct wps_data *data, int v, int line, int subline)
+int wps_first_token_index(struct wps_data *data, int line, int subline)
 {
-    int first_subline_idx = data->viewports[v].lines[line].first_subline_idx;
+    int first_subline_idx = data->lines[line].first_subline_idx;
     return data->sublines[first_subline_idx + subline].first_token_idx;
 }
 
-int wps_last_token_index(struct wps_data *data, int v, int line, int subline)
+int wps_last_token_index(struct wps_data *data, int line, int subline)
 {
-    int first_subline_idx = data->viewports[v].lines[line].first_subline_idx;
+    int first_subline_idx = data->lines[line].first_subline_idx;
     int idx = first_subline_idx + subline;
     if (idx < data->num_sublines - 1)
     {

@@ -88,7 +88,7 @@ struct align_pos {
                    + (2*LCD_HEIGHT*LCD_WIDTH/8))
 
 #define WPS_MAX_VIEWPORTS   16
-#define WPS_MAX_LINES       (LCD_HEIGHT/5+1)
+#define WPS_MAX_LINES       ((LCD_HEIGHT/5+1) * 2)
 #define WPS_MAX_SUBLINES    (WPS_MAX_LINES*3)
 #define WPS_MAX_TOKENS      1024
 #define WPS_MAX_STRINGS     128
@@ -321,10 +321,9 @@ struct wps_line {
 struct wps_viewport {
     struct viewport vp;   /* The LCD viewport struct */
 
-    /* Number of lines in this viewport. During WPS parsing, this is
-       the index of the line being parsed. */
-    int num_lines;
-    struct wps_line lines[WPS_MAX_LINES];
+    /* Indexes of the first and last lines belonging to this viewport in the 
+       lines[] array */
+    int first_line, last_line;
 };
 
 /* wps_data
@@ -371,9 +370,15 @@ struct wps_data
     bool remote_wps;
 #endif
 
+    /* Number of lines in the WPS. During WPS parsing, this is
+       the index of the line being parsed. */
+    int num_lines;
+
     /* Number of viewports in the WPS */
     int num_viewports;
     struct wps_viewport viewports[WPS_MAX_VIEWPORTS];
+
+    struct wps_line lines[WPS_MAX_LINES];
 
     /* Total number of sublines in the WPS. During WPS parsing, this is
        the index of the subline where the parsed tokens are added to. */
@@ -403,25 +408,22 @@ bool wps_data_load(struct wps_data *wps_data,
                    bool isfile);
 
 /* Returns the index of the subline in the subline array
-   v - 0-based viewport number
    line - 0-based line number
    subline - 0-based subline number within the line
  */
-int wps_subline_index(struct wps_data *wps_data, int v, int line, int subline);
+int wps_subline_index(struct wps_data *wps_data, int line, int subline);
 
 /* Returns the index of the first subline's token in the token array
-   v - 0-based viewport number
    line - 0-based line number
    subline - 0-based subline number within the line
  */
-int wps_first_token_index(struct wps_data *data, int v, int line, int subline);
+int wps_first_token_index(struct wps_data *data, int line, int subline);
 
 /* Returns the index of the last subline's token in the token array.
-   v - 0-based viewport number
    line - 0-based line number
    subline - 0-based subline number within the line
  */
-int wps_last_token_index(struct wps_data *data, int v, int line, int subline);
+int wps_last_token_index(struct wps_data *data, int line, int subline);
 
 /* wps_data end */
 
