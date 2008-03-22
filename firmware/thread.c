@@ -758,6 +758,19 @@ static inline void core_sleep(void)
 {
     #warning TODO: Implement core_sleep
 }
+#elif defined(CPU_TCC780X)
+static inline void core_sleep(void)
+{
+    /* Single core only for now. Use the generic ARMv5 wait for IRQ */
+    asm volatile (
+        "mov r0, #0                \n"
+        "mcr p15, 0, r0, c7, c0, 4 \n" /* Wait for interrupt */
+        "mrs r0, cpsr              \n" /* Unmask IRQ/FIQ at core level */
+        "bic r0, r0, #0xc0         \n"
+        "msr cpsr_c, r0            \n"
+        : : : "r0"
+    );
+}
 #elif CONFIG_CPU == IMX31L
 static inline void core_sleep(void)
 {
