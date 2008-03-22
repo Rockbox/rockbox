@@ -4,7 +4,7 @@
 #derived from "cabbie" (C) Yohann Misquitta
 %wd
 
-%X|wpsbackdrop-240x320x16.bmp|0|0|
+%X|wpsbackdrop-240x320x16.bmp|
 %P|pb-240x320x16.bmp|
 %xl|A|lockclosed-240x320x16.bmp|11|292|
 %xl|B|lockopen-240x320x16.bmp|11|292|

@@ -2,8 +2,7 @@
 # derived from cabbie 2.0 default rwps (C) 2007, Marc Guay
 %wd
 %P|pbar-128x64x1.bmp|
-%x|A|ebar-128x64x1.bmp|4|38|
-%xl|B|npbar-128x64x1.bmp|4|2|
+%x|A|wpsbackdrop-128x64x1.bmp|0|0|
 %pb|8|4|123|38|
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>

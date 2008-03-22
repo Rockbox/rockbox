@@ -2,7 +2,7 @@
 # (C) 2007, Johannes Voggenthaler (Zinc Alloy)
 #derived from "cabbie" (C) Yohann Misquitta
 %wd
-%X|wpsbackdrop-128x128x16.bmp|0|0|
+%X|wpsbackdrop-128x128x16.bmp|
 %P|pb-128x128x16.bmp|
 %xl|A|lockclosed-128x128x16.bmp|3|110|
 %xl|B|lockopen-128x128x16.bmp|3|110|

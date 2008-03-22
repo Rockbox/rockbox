@@ -1,7 +1,7 @@
 # cabbie 2.0 default for the Sansa c200 Series by Marc Guay
 # derived from cabbie 2.0 default (C) 2007, Johannes Voggenthaler (Zinc Alloy)
 %wd
-%X|wpsbackdrop-132x80x16.bmp|0|0|
+%X|wpsbackdrop-132x80x16.bmp|
 %P|pb-132x80x16.bmp|
 %xl|A|lockclosed-132x80x16.bmp|36|69|
 %xl|B|lockopen-132x80x16.bmp|36|69|

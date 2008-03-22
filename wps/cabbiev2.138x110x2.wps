@@ -3,7 +3,7 @@
 # (C) 2007, Johannes Voggenthaler (Zinc Alloy)
 # derived from "cabbie" (C) Yohann Misquitta
 %wd
-%X|wpsbackdrop-138x110x2.bmp|0|0|
+%X|wpsbackdrop-138x110x2.bmp|
 %P|pb-138x110x2.bmp|
 %xl|A|lockclosed-160x128x2.bmp|2|96|
 %xl|B|lockopen-160x128x2.bmp|2|96|
@@ -17,15 +17,16 @@
 %xl|J|batt05-160x128x2.bmp|26|98|
 %xl|K|batt06-160x128x2.bmp|26|98|
 %xl|L|batt07-160x128x2.bmp|26|98|
-%xl|M|vol00-160x128x2.bmp|54|98|
-%xl|N|vol01-160x128x2.bmp|54|98|
-%xl|O|vol02-160x128x2.bmp|54|98|
-%xl|P|vol03-160x128x2.bmp|54|98|
-%xl|p|vol04-160x128x2.bmp|54|98|
-%xl|q|vol05-160x128x2.bmp|54|98|
-%xl|r|vol06-160x128x2.bmp|54|98|
-%xl|s|vol07-160x128x2.bmp|54|98|
-%xl|t|vol08-160x128x2.bmp|54|98|
+%xl|M|vol0-160x128x2.bmp|54|98|
+%xl|N|vol1-160x128x2.bmp|54|98|
+%xl|O|vol2-160x128x2.bmp|54|98|
+%xl|P|vol3-160x128x2.bmp|54|98|
+%xl|p|vol4-160x128x2.bmp|54|98|
+%xl|q|vol5-160x128x2.bmp|54|98|
+%xl|r|vol6-160x128x2.bmp|54|98|
+%xl|s|vol7-160x128x2.bmp|54|98|
+%xl|t|vol8-160x128x2.bmp|54|98|
+%xl|u|vol9-160x128x2.bmp|54|98|
 %xl|Q|shuffle-160x128x2.bmp|86|97|
 %xl|R|repeatall-160x128x2.bmp|107|95|
 %xl|S|repeatone-160x128x2.bmp|107|95|
@@ -47,7 +48,7 @@
 %al %pc%ac%pp of %pe%ar%pr 
 %?mh<%xdA|%xdB>
 %?bp<%?bc<%xdD|%xdC>|%?bl<|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK|%xdL>>
-%?pv<%xdM|%xdN|%xdO|%xdP|%xdp|%xdq|%xdr|%xds|%xdt>
+%?pv<%xdM|%xdN|%xdO|%xdP|%xdp|%xdq|%xdr|%xds|%xdt|%xdu>
 %?ps<%xdQ>
 %?mm<|%xdR|%xdS|%xdT|%xdU>
 %?mp<%xdV|%xdW|%xdX|%xdY|%xdZ>
