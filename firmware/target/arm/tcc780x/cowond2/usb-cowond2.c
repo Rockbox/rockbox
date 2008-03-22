@@ -23,10 +23,10 @@
 #include "kernel.h"
 #include "ata.h"
 
-/* USB detect is GPIOC 26 active low */
+/* USB detect is GPIOC 26 */
 inline bool usb_detect(void)
 {
-    return (GPIOC & 1<<26)?false:true;
+    return (GPIOC & 1<<26);
 }
 
 void usb_init_device(void)
