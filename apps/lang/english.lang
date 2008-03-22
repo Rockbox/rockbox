@@ -4600,7 +4600,7 @@
     *: "Max Entries in File Browser"
   </dest>
   <voice>
-    *: "Maximum files in directory browser"
+    *: "Maximum entries in file browser"
   </voice>
 </phrase>
 <phrase>
@@ -5107,7 +5107,7 @@
     *: "Save .cfg File"
   </dest>
   <voice>
-    *: "Write configuration file"
+    *: "Save configuration file"
   </voice>
 </phrase>
 <phrase>
