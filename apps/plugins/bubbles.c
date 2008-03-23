@@ -2284,7 +2284,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     if (timeout < 0)
         timeout = 0;
     button = pluginlib_getaction(rb,timeout,plugin_contexts,2);
-#ifdef HAS_BUTTON_HOLD  && !defined(HAVE_REMOTE_LCD_AS_MAIN)
+#if defined(HAS_BUTTON_HOLD) && !defined(HAVE_REMOTE_LCD_AS_MAIN)
     /* FIXME: Should probably check remote hold here */
     if (rb->button_hold())
         button = BUBBLES_START;
