@@ -591,7 +591,9 @@ matrix_normal.bmp
     sliding_puzzle.240x240x16.bmp
 #endif
 #elif (LCD_DEPTH > 1)
-#if SMALLER_DIMENSION <= 110
+#if SMALLER_DIMENSION <= 96
+    sliding_puzzle.96x96x2.bmp
+#elif SMALLER_DIMENSION <= 110
     sliding_puzzle.108x108x2.bmp
 #elif SMALLER_DIMENSION <= 128
     sliding_puzzle.128x128x2.bmp
