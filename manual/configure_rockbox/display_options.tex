@@ -28,7 +28,7 @@
       beginning so that the display can be read to see song information. The
       amount of time is determined by the value of the backlight timeout
       setting, but is no less than 5 seconds.
-      \opt{HAVE_BACKLIGHT_PWM_FADING}{
+      \opt{backlight_fade}{
         \item[Backlight fade in:]
         The amount of time that the backlight will take to fade from off to on
         after a button is pressed. If set to \setting{Off} the backlight will
@@ -46,7 +46,7 @@
       off will only turn the backlight on without having any other effect. When
       disabled the first keypress will \emph{also} perform its appropriate action.
       
-      \opt{HAVE_LCD_SLEEP}{
+      \opt{lcd_sleep}{
         \item[Sleep (After Backlight Off):]
         This setting controls how long rockbox will wait before turning off the
         display after the backlight is turned off. Turning off the display
@@ -54,7 +54,7 @@
         noticeably longer than just turning on the backlight.
       }
       
-      \opt{HAVE_BACKLIGHT_BRIGHTNESS}{
+      \opt{backlight_brightness}{
         \item[Brightness:]
         Changes the brightness of your LCD display.
       }
@@ -67,12 +67,12 @@
         find this menu option again!}
     } % \opt{archos,h1xx,ipodmini,ipod4g,x5}
 
-    \opt{HAVE_LCD_INVERT}{
+    \opt{lcd_invert}{
       \item[LCD Mode:]
       This setting lets you invert the colours of the display.
     }
 
-    \opt{HAVE_LCD_FLIP}{
+    \opt{lcd_flip}{
       \item[Upside Down:]
       Displays the screen so that the top of the display is nearest the buttons.
       This is sometimes useful when carrying the \dap{} in a pocket for easy
@@ -131,7 +131,7 @@
     \item[Scroll Start Delay:]
       Controls how many milliseconds Rockbox should wait before a new
       text begins scrolling.
-    \opt{HAVE_LCD_BITMAP}{
+    \opt{lcd_bitmap}{
       \item[Scroll Step Size:]
         Controls how many pixels the text scroll should move for each step.
     }
@@ -148,7 +148,7 @@
       it should use depending of how much it has to scroll left. This setting
       lets you tell Rockbox where that limit is, expressed in percentage of
       line length.
-    \opt{HAVE_LCD_BITMAP}{
+    \opt{lcd_bitmap}{
       \item[Screen Scrolls Out of View:]
         On lists with long entries that do not fit on the screen using 
         \opt{recorder,recorderv2fm,h1xx,h300}{\ButtonOn+\ButtonRight/
@@ -175,7 +175,7 @@
       can be useful on slow displays.
     \end{description}
 %
-  \opt{HAVE_LCD_BITMAP}{
+  \opt{lcd_bitmap}{
     \item[Status/Scrollbar:]
       Settings related to on screen status display and the scrollbar.
       \begin{description}
@@ -194,7 +194,7 @@
       \end{description}
     }
 %
-  \opt{HAVE_LCD_BITMAP}{
+  \opt{lcd_bitmap}{
     \item[Peak Meter:]
       The peak meter can be configured with a number of parameters. 
       \begin{description}
@@ -212,7 +212,7 @@
       \item[Clip Hold Time:]
         The number of seconds that the clipping indicator will be visible
         after clipping is detected.
-      \opt{HAVE_RECORDING}{  
+      \opt{recording}{  
         \item[Clip Counter:]
           Show the number of times the clip indicator went active during
           recording in front of the peakmeters.

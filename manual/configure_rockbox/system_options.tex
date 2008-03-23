@@ -42,7 +42,7 @@
         is currently used in the \dap{}. The two supported battery types are
         ``Alkaline'' or ``NiMH''.}
 
-      \opt{HAVE_USB_CHARGING}{
+      \opt{usb_charging}{
 %TODO: check where it is working correctly (except H300) and append the option to the respective platform file
       \item [Charge During USB Connection: ]This option lets you control whether
         the \dap{} should charge during the USB connection and hence draw the
@@ -52,7 +52,7 @@
 
      \end{description}
 }
-\opt{HAVE_DIRCACHE,HAVE_DISK_STORAGE}{
+\opt{dircache,HAVE_DISK_STORAGE}{
 \subsection{Disk}
     Options relating to the hard disk.
 
@@ -67,7 +67,7 @@
       afterwards.
     }
 
-    \opt{HAVE_DIRCACHE}{
+    \opt{dircache}{
     \item [Directory Cache: ]Rockbox has the ability to cache the contents of
       your drive in RAM. The \setting{Directory Cache} takes a small amount of
       memory away from Rockbox that would otherwise be used to buffer music,
@@ -82,9 +82,9 @@
       background.}
     }
   \end{description}
-} % \opt{HAVE_DIRCACHE,HAVE_DISK_STORAGE}
+} % \opt{dircache,HAVE_DISK_STORAGE}
 
-\opt{CONFIG_RTC}{
+\opt{rtc}{
   \subsection{Time and Date}
   Time related menu options.
     \begin{description}
@@ -101,7 +101,7 @@ recording. Settings are either \setting{Off} or \setting{1} to \setting{10}
 minutes in 1 minute steps. Then \setting{15,30,45} and \setting{60} minutes are
 available.
 
-\opt{HAVE_RTC_ALARM}{
+\opt{alarm}{
 \subsection{Wake-Up Alarm}
 % TODO this isn't quite right for all targets, I think
     This option turns the \dap{} off and then starts it up again at the
@@ -113,7 +113,7 @@ available.
     again before the alarm occurs, the alarm will be cancelled. Using this
     option disables the \setting{Sleep Timer}.
 
-  \opt{HAVE_RECORDING,CONFIG_TUNER}{
+  \opt{recording,radio}{
     \subsection{Alarm Wake up Screen}
     This option controls what the \dap{} does when it is woken up by the alarm.
   }

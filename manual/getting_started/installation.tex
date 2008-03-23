@@ -25,7 +25,7 @@ installation options.
 
 \opt{MASCODEC}{Rockbox itself comes as a single package. There is no need
   to install additional software for running Rockbox.}
-\opt{SWCODEC} {
+\opt{swcodec} {
   \opt{HAVE_RB_BL_ON_DISK}{There are three separate components,
     two of which need to be installed in order to run Rockbox.}
   \opt{HAVE_RB_BL_IN_FLASH}{There are two separate components of Rockbox
@@ -198,7 +198,7 @@ you want to install and get the version for your \dap{}.
       of known critical bugs. The current stable release of Rockbox, version
       2.5, is available at \url{http://www.rockbox.org/download/}.
   }
-  \opt{SWCODEC}{
+  \opt{swcodec}{
       There has not yet been a stable release for the \playername{}. Until
       there is a stable release for \playername{}, use a current build.
   }
@@ -275,7 +275,7 @@ structure that Rockbox needs.
 
 % This has nothing to do with swcodec, just that these players need our own
 % bootloader so we can decide where we want the main binary.
-\opt{SWCODEC}{
+\opt{swcodec}{
   \note{
     If the contents of the \fname{.zip} file are extracted correctly, you will
     have a directory called \fname{/.rockbox}, which contains all the files needed
@@ -312,7 +312,7 @@ structure that Rockbox needs.
   }
 }
 
-\opt{SWCODEC}{
+\opt{swcodec}{
   \subsubsection{Installing the bootloader}
   \opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
   \opt{ipod}{\input{getting_started/ipod_install.tex}}

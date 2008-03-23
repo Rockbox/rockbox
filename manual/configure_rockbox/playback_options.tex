@@ -121,7 +121,7 @@ related to audio playback.
       The anti-skip buffer can safely be kept at zero. It will eventually be 
       eliminated.
     }%
-    \opt{SWCODEC}{The anti-skip buffer can be set to various values between
+    \opt{swcodec}{The anti-skip buffer can be set to various values between
       5 seconds and 10 minutes.}%
     
     \note{Having a large anti-skip buffer tends to use more power, and may
@@ -138,7 +138,7 @@ related to audio playback.
     instead of being played immediately. Pausing and stopping playback is
     disabled as well as skipping songs and launching plugins.
 
-    \opt{SWCODEC}{
+    \opt{swcodec}{
     \item[Crossfade. ]
       This setting enables a cross-fader. At the end of a song, the song will 
       fade out as the next song fades in, creating a smooth transition between 
@@ -178,7 +178,7 @@ related to audio playback.
         set on shuffle.}
     }%
     
-    \opt{SWCODEC}{
+    \opt{swcodec}{
     \item[Replaygain. ]This allows you to control the replaygain function.
       The purpose of replaygain is to adjust the volume of the music played
       so that all songs (or albums, depending on your settings) have the
@@ -220,7 +220,7 @@ related to audio playback.
         decibel (dB) value between -12dB and +12dB, in increments of 0.1{}dB.
       \end{description}
     }
-    \opt{SWCODEC}{
+    \opt{swcodec}{
       \item[Beep Volume. ]Controls the volume of the beep that is heard when
         skipping forward or backward between tracks. The beep is disabled when
         set to \setting{Off}.
@@ -267,8 +267,8 @@ related to audio playback.
   \url{http://www.last.fm}. This service was formely known as 
   \emph{Audioscrobbler}. When you enable this option, you'll have to reboot to
   start the logging. The log-file is called 
-  \opt{CONFIG_RTC}{\fname{.scrobbler.log},}%
-  \nopt{CONFIG_RTC}{\fname{.scrobbler-timeless.log},}%
+  \opt{rtc}{\fname{.scrobbler.log},}%
+  \nopt{rtc}{\fname{.scrobbler-timeless.log},}%
   and is to be found in the root directory of your \dap{}.
   \note{See \wikilink{LastFMLog} for a further description, and for tools you 
     can use to submit your Last.fm log.}

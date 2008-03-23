@@ -3,7 +3,7 @@
 The While Playing Screen (WPS) displays various pieces of information about the
 currently playing audio file.
 %
-\opt{HAVE_LCD_BITMAP}{%
+\opt{lcd_bitmap}{%
   The appearance of the WPS can be configured using WPS configuration files.
   The items shown depend on your configuration -- all item can be turned on
   or off independently. Refer to \reference{ref:wps_tags} for details on how
@@ -11,7 +11,7 @@ currently playing audio file.
   \begin{itemize}
     \nopt{ondio}{
     \item Status bar: The Status bar shows Battery level, charger status, 
-      volume, play mode, repeat mode, shuffle mode\opt{CONFIG_RTC}{ and clock}.
+      volume, play mode, repeat mode, shuffle mode\opt{rtc}{ and clock}.
       In contrast to all other items, the status bar is always at the top of
       the screen.
     }
@@ -115,11 +115,11 @@ your WPS (While Playing Screen).
 \end{table}
 
 
-\opt{HAVE_LCD_BITMAP}{
+\opt{lcd_bitmap}{
   \subsection{\label{ref:peak_meter}Peak Meter}
   The peak meter can be displayed on the While Playing Screen and consists of
   several indicators. 
-  \opt{HAVE_RECORDING}{
+  \opt{recording}{
     For a picture of the peak meter, please see the While
     Recording Screen in \reference{ref:while_recording_screen}.
   }
@@ -242,7 +242,7 @@ function in the file browser's \setting{Context Menu}.
   }
 }
 
-\opt{SWCODEC}{
+\opt{swcodec}{
   \subsubsection{Graphical EQ}
   This is a shortcut to the \setting{Equalizer}. See \reference{ref:EQ}.
   

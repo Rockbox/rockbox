@@ -3,11 +3,11 @@
 
 \section{\label{ref:CustomisingUI}Customising the userinterface}
 \subsection{\label{ref:GettingExtras}Getting Extras}
-\opt{HAVE_LCD_BITMAP}{
+\opt{lcd_bitmap}{
 Rockbox supports custom fonts. A collection of fonts is available for download
 in the font package at \url{http://www.rockbox.org/daily.shtml}}.
 
-\opt{HAVE_LCD_BITMAP}{
+\opt{lcd_bitmap}{
   \subsection{\label{ref:Loadingfonts}Loading Fonts}\index{Fonts}
   Rockbox can load fonts dynamically. Simply copy the \fname{.fnt} file to the
   \dap{} and ``play'' it in the \setting{File Browser}. If you want a font to
@@ -37,7 +37,7 @@ If your language is not yet supported and you want to write your own language
 file find the instructions on the Rockbox website:
 \wikilink{LangFiles}
 
-\opt{HAVE_LCD_COLOR}{
+\opt{lcd_color}{
   \subsection{Changing Colours}
   The colours used in the Rockbox interface can be changed to any combination
   of background and foreground colour you like. To do this go to the
@@ -101,7 +101,7 @@ all the tags that are available.
 \item All characters not preceded by \% are displayed as typed.
 \item Lines beginning with \# are comments and will be ignored.
 \item Maximum file size used is 
-  \opt{HAVE_LCD_BITMAP}{1600}
+  \opt{lcd_bitmap}{1600}
   \opt{player}{400} bytes.
   If you have a bigger WPS file, only the first part of it will be 
   loaded and used.
@@ -225,7 +225,7 @@ displaying images:
     }%
 \end{enumerate}
 
-\optv{SWCODEC}{% This doesn't depend on SWCODEC but we don't have a \noptv
+\optv{swcodec}{% This doesn't depend on swcodec but we don't have a \noptv
                % command.
   Example on background image use:
   \begin{example}
@@ -255,7 +255,7 @@ That is, ``tracknum -- title [artist, album]'', where most fields are only
 displayed if available. Could also be rendered as ``filename'' or ``tracknum --
 title [artist]''.
 
-%\opt{HAVE_LCD_BITMAP}{
+%\opt{lcd_bitmap}{
 %  \begin{verbatim}
 %    %s%?it<%?in<%in. |>%it|%fn>
 %    %s%?ia<%ia|%?d2<%d2|(root)>>

@@ -90,7 +90,7 @@
     cuesheet support
                     & on, off           & N/A\\
 %
-    \opt{SWCODEC}{
+    \opt{swcodec}{
       replaygain    & on, off           & N/A\\
       replaygain type
                     & track, album, track shuffle
@@ -159,7 +159,7 @@
       mdb shape     & 50 to 300         & Hz\\
     }%
 
-    \opt{HAVE_LCD_BITMAP}{
+    \opt{lcd_bitmap}{
       peak meter release
                     & 1 to 126          & ?\\
       peak meter hold
@@ -185,12 +185,12 @@
       invert        & on, off           & N/A\\
     }%
 
-    \opt{SWCODEC}{% This doesn't depend on SWCODEC but using a \nopt here
+    \opt{swcodec}{% This doesn't depend on swcodec but using a \nopt here
                   % causes ondiosp not to build for mysterious reasons.
       backdrop      & /path/filename.bmp    & N/A\\
     }%
 
-    \opt{HAVE_LCD_COLOR}{
+    \opt{lcd_color}{
       foreground color & 000000 to FFFFFF   & RRGGBB\\
       background color & 000000 to FFFFFF   & RRGGBB\\
     }
@@ -226,10 +226,10 @@
                 & on, off               & N/A\\
       }%
     }
-    \opt{CONFIG_RTC}{
+    \opt{rtc}{
       time format & 12hour, 24hour      & N/A\\
     }%
-    \opt{HAVE_RECORDING}{
+    \opt{recording}{
      rec quality & 0 to 7               & 0: small size, 7: high quality\\
      rec frequency
                 & 48, 44, 32, 24, 22, 16 & kHz\\
@@ -249,7 +249,7 @@
      rec directory
                 & /recordings,current   & N/A\\
     }%
-    \opt{CONFIG_TUNER}{
+    \opt{radio}{
       force fm mono
                 & off, on               & N/A\\
     }%

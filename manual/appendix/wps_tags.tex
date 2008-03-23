@@ -81,7 +81,7 @@ Example for the \config{\%dN} commands: If the path is
     \opt{player}{
           & This will display a 1 character ``cup'' %
             that empties as the time progresses.}
-    \opt{HAVE_LCD_BITMAP}{
+    \opt{lcd_bitmap}{
          & This will replace the entire line with a progress bar. \\
          & You can set the height, position and width of the progressbar %
            (in pixels): \config{\%pb{\textbar}height{\textbar}leftpos%
@@ -118,12 +118,12 @@ Example for the \config{\%dN} commands: If the path is
   \end{tagmap}
 \end{table}
 
-\opt{SWCODEC}{
+\opt{swcodec}{
 \section{Sound (DSP) settings}
 \begin{table}
   \begin{tagmap}{}{}
     \config{\%sp} & Display current playback pitch \\
-  \opt{SWCODEC}{
+  \opt{swcodec}{
     \config{\%xf} & Crossfade setting, in the order: Off, Shuffle, Skip, Always\\
     \config{\%rg} & ReplayGain value in use (x.y dB). If used as a conditional,
            Replaygain type in use: \config{\%?rg{\textless}Off{\textbar}Track%
@@ -234,7 +234,7 @@ order left -- center -- right. If the aligned texts overlap, they are merged.
 \end{tagmap}
 \end{table}
 
-\opt{CONFIG_RTC}{
+\opt{rtc}{
   \section{Real Time Clock}
   \begin{table}
     \begin{tagmap}{}{}
