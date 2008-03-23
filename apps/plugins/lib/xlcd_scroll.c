@@ -25,6 +25,10 @@
 #ifdef HAVE_LCD_BITMAP
 #include "xlcd.h"
 
+#if (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
+static const unsigned short patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};
+#endif
+
 #if (LCD_PIXELFORMAT == HORIZONTAL_PACKING) && (LCD_DEPTH < 8)
 
 /* Scroll left */
@@ -149,11 +153,7 @@ void xlcd_scroll_left(int count)
         return;
 
     data = _xlcd_rb->lcd_framebuffer;
-#if LCD_DEPTH >= 8
-    data_end = data + LCD_WIDTH*LCD_HEIGHT;
-#else
-    data_end = data + LCD_WIDTH*((LCD_HEIGHT*LCD_DEPTH+7)/8);
-#endif
+    data_end = data + LCD_WIDTH*LCD_FBHEIGHT;
     length = LCD_WIDTH - count;
 
     do
@@ -179,11 +179,7 @@ void xlcd_scroll_right(int count)
         return;
 
     data = _xlcd_rb->lcd_framebuffer;
-#if LCD_DEPTH >= 8
-    data_end = data + LCD_WIDTH*LCD_HEIGHT;
-#else
-    data_end = data + LCD_WIDTH*((LCD_HEIGHT*LCD_DEPTH+7)/8);
-#endif
+    data_end = data + LCD_WIDTH*LCD_FBHEIGHT;
     length = LCD_WIDTH - count;
 
     do
@@ -243,7 +239,8 @@ void xlcd_scroll_down(int count)
     _xlcd_rb->lcd_set_drawmode(oldmode);
 }
 
-#else /* LCD_PIXELFORMAT vertical packed */
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING, 
+         LCD_PIXELFORMAT == VERTICAL_INTERLEAVED */
 
 /* Scroll up */
 void xlcd_scroll_up(int count)
@@ -254,24 +251,26 @@ void xlcd_scroll_up(int count)
     if ((unsigned) count >= LCD_HEIGHT)
         return;
         
-#if LCD_DEPTH == 1
+#if (LCD_DEPTH == 1) \
+ || (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
     blockcount = count >> 3;
-    blocklen = ((LCD_HEIGHT+7)/8) - blockcount;
     bitcount = count & 7;
-#elif LCD_DEPTH == 2
+#elif (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_PACKING)
     blockcount = count >> 2;
-    blocklen = ((LCD_HEIGHT+3)/4) - blockcount;
     bitcount = 2 * (count & 3);
 #endif
+    blocklen = LCD_FBHEIGHT - blockcount;
 
     if (blockcount)
     {
         _xlcd_rb->memmove(_xlcd_rb->lcd_framebuffer,
                           _xlcd_rb->lcd_framebuffer + blockcount * LCD_FBWIDTH,
-                          blocklen * LCD_FBWIDTH);
+                          blocklen * LCD_FBWIDTH * sizeof(fb_data));
     }
     if (bitcount)
     {
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
+
 #if (CONFIG_CPU == SH7034) && (LCD_DEPTH == 1)
         asm (
             "mov     #0,r4       \n"  /* x = 0 */
@@ -384,17 +383,15 @@ void xlcd_scroll_up(int count)
         unsigned char *addr = _xlcd_rb->lcd_framebuffer + blocklen * LCD_FBWIDTH;
 #if LCD_DEPTH == 2
         unsigned fill = 0x55 * (~_xlcd_rb->lcd_get_background() & 3);
+#else
+        const unsigned fill = 0;
 #endif
 
         for (x = 0; x < LCD_WIDTH; x++)
         {
             unsigned char *col_addr = addr++;
-#if LCD_DEPTH == 1
-            unsigned data = 0;
-#else
             unsigned data = fill;
-#endif
-            
+
             for (by = 0; by < blocklen; by++)
             {
                 col_addr -= LCD_FBWIDTH;
@@ -403,6 +400,35 @@ void xlcd_scroll_up(int count)
             }
         }
 #endif /* CPU, LCD_DEPTH */
+
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+
+#if LCD_DEPTH == 2
+        int x, by;
+        fb_data *addr = _xlcd_rb->lcd_framebuffer + blocklen * LCD_FBWIDTH;
+        unsigned fill, mask;
+
+        fill = patterns[_xlcd_rb->lcd_get_background() & 3] << 8;
+        mask = (0xFFu >> bitcount) << bitcount;
+        mask |= mask << 8;
+
+        for (x = 0; x < LCD_WIDTH; x++)
+        {
+            fb_data *col_addr = addr++;
+            unsigned olddata = fill;
+            unsigned data;
+
+            for (by = 0; by < blocklen; by++)
+            {
+                col_addr -= LCD_FBWIDTH;
+                data = *col_addr;
+                *col_addr = (olddata ^ ((data ^ olddata) & mask)) >> bitcount;
+                olddata = data << 8;
+            }
+        }
+#endif /* LCD_DEPTH == 2 */
+
+#endif /* LCD_PIXELFORMAT */
     }
     oldmode = _xlcd_rb->lcd_get_drawmode();
     _xlcd_rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -419,24 +445,26 @@ void xlcd_scroll_down(int count)
     if ((unsigned) count >= LCD_HEIGHT)
         return;
         
-#if LCD_DEPTH == 1
+#if (LCD_DEPTH == 1) \
+ || (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
     blockcount = count >> 3;
-    blocklen = ((LCD_HEIGHT+7)/8) - blockcount;
     bitcount = count & 7;
-#elif LCD_DEPTH == 2
+#elif (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_PACKING)
     blockcount = count >> 2;
-    blocklen = ((LCD_HEIGHT+3)/4) - blockcount;
     bitcount = 2 * (count & 3);
 #endif
+    blocklen = LCD_FBHEIGHT - blockcount;
 
     if (blockcount)
     {
         _xlcd_rb->memmove(_xlcd_rb->lcd_framebuffer + blockcount * LCD_FBWIDTH,
                           _xlcd_rb->lcd_framebuffer,
-                          blocklen * LCD_FBWIDTH);
+                          blocklen * LCD_FBWIDTH * sizeof(fb_data));
     }
     if (bitcount)
     {
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
+
 #if (CONFIG_CPU == SH7034) && (LCD_DEPTH == 1)
         asm (
             "mov     #0,r4       \n"  /* x = 0 */
@@ -545,17 +573,15 @@ void xlcd_scroll_down(int count)
         unsigned char *addr = _xlcd_rb->lcd_framebuffer + blockcount * LCD_FBWIDTH;
 #if LCD_DEPTH == 2
         unsigned fill = (0x55 * (~_xlcd_rb->lcd_get_background() & 3)) << bitcount;
+#else
+        const unsigned fill = 0;
 #endif
 
         for (x = 0; x < LCD_WIDTH; x++)
         {
             unsigned char *col_addr = addr++;
-#if LCD_DEPTH == 1
-            unsigned data = 0;
-#else
             unsigned data = fill;
-#endif
-            
+
             for (by = 0; by < blocklen; by++)
             {
                 data = (data >> 8) | (*col_addr << bitcount);
@@ -564,6 +590,35 @@ void xlcd_scroll_down(int count)
             }
         }
 #endif /* CPU, LCD_DEPTH */
+
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+
+#if LCD_DEPTH == 2
+        int x, by;
+        fb_data *addr = _xlcd_rb->lcd_framebuffer + blockcount * LCD_FBWIDTH;
+        unsigned fill, mask;
+        
+        fill = patterns[_xlcd_rb->lcd_get_background() & 3] >> (8 - bitcount);
+        mask = (0xFFu >> bitcount) << bitcount;
+        mask |= mask << 8;
+
+        for (x = 0; x < LCD_WIDTH; x++)
+        {
+            fb_data *col_addr = addr++;
+            unsigned olddata = fill;
+            unsigned data;
+
+            for (by = 0; by < blocklen; by++)
+            {
+                data = *col_addr << bitcount;
+                *col_addr = olddata ^ ((data ^ olddata) & mask);
+                olddata = data >> 8;
+                col_addr += LCD_FBWIDTH;
+            }
+        }
+#endif /* LCD_DEPTH == 2 */
+
+#endif /* LCD_PIXELFORMAT */
     }
     oldmode = _xlcd_rb->lcd_get_drawmode();
     _xlcd_rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
