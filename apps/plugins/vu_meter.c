@@ -31,6 +31,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_OFF
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP "ON"
+#define LABEL_QUIT "OFF"
+#define LABEL_MENU "F1"
+#define LABEL_VOLUME "UP/DOWN"
 
 #elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
 #define VUMETER_QUIT BUTTON_OFF
@@ -40,6 +44,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_OFF
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP "ON"
+#define LABEL_QUIT "OFF"
+#define LABEL_MENU "F1"
+#define LABEL_VOLUME "UP/DOWN"
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define VUMETER_QUIT BUTTON_OFF
@@ -51,6 +59,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_OFF
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP "MODE"
+#define LABEL_QUIT "OFF"
+#define LABEL_MENU "MODE.."
+#define LABEL_VOLUME "UP/DOWN"
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -62,6 +74,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_OFF
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP "PLAY"
+#define LABEL_QUIT "STOP"
+#define LABEL_MENU "SELECT,MODE"
+#define LABEL_VOLUME "UP/DOWN"
 
 #define VUMETER_RC_QUIT BUTTON_RC_STOP
 
@@ -75,6 +91,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_MENU
 #define VUMETER_UP BUTTON_SCROLL_FWD
 #define VUMETER_DOWN BUTTON_SCROLL_BACK
+#define LABEL_HELP "PLAY"
+#define LABEL_QUIT "MENU"
+#define LABEL_MENU "SELECT"
+#define LABEL_VOLUME "Wheel"
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define VUMETER_QUIT BUTTON_POWER
@@ -84,6 +104,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP "A"
+#define LABEL_QUIT "POWER"
+#define LABEL_MENU "MENU"
+#define LABEL_VOLUME "UP/DOWN"
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
 #define VUMETER_QUIT BUTTON_POWER
@@ -93,6 +117,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
 #define VUMETER_UP BUTTON_SCROLL_FWD
 #define VUMETER_DOWN BUTTON_SCROLL_BACK
+#define LABEL_HELP "REC"
+#define LABEL_QUIT "POWER"
+#define LABEL_MENU "SELECT"
+#define LABEL_VOLUME "Wheel"
 
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD)
 #define VUMETER_QUIT BUTTON_POWER
@@ -102,6 +130,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
 #define VUMETER_UP BUTTON_VOL_UP
 #define VUMETER_DOWN BUTTON_VOL_DOWN
+#define LABEL_HELP "REC"
+#define LABEL_QUIT "POWER"
+#define LABEL_MENU "SELECT"
+#define LABEL_VOLUME "VOL UP/DN"
 
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define VUMETER_QUIT BUTTON_POWER
@@ -111,6 +143,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP "PLAY"
+#define LABEL_QUIT "POWER"
+#define LABEL_MENU "SELECT"
+#define LABEL_VOLUME "UP/DOWN"
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define VUMETER_QUIT BUTTON_POWER
@@ -120,6 +156,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
 #define VUMETER_UP BUTTON_SCROLL_UP
 #define VUMETER_DOWN BUTTON_SCROLL_DOWN
+#define LABEL_HELP "PLAY"
+#define LABEL_QUIT "POWER"
+#define LABEL_MENU "REW"
+#define LABEL_VOLUME "Scroller"
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 #define VUMETER_QUIT BUTTON_BACK
@@ -129,6 +169,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_PLAY
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP "NEXT"
+#define LABEL_QUIT "BACK"
+#define LABEL_MENU "MENU"
+#define LABEL_VOLUME "UP/DOWN"
 
 #elif (CONFIG_KEYPAD == MROBE100_PAD)
 #define VUMETER_QUIT BUTTON_POWER
@@ -138,6 +182,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP "DISPLAY"
+#define LABEL_QUIT "POWER"
+#define LABEL_MENU "MENU"
+#define LABEL_VOLUME "UP/DOWN"
 
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
 #define VUMETER_QUIT BUTTON_RC_REC
@@ -147,6 +195,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_RC_REC
 #define VUMETER_UP BUTTON_RC_VOL_UP
 #define VUMETER_DOWN BUTTON_RC_VOL_DOWN
+#define LABEL_HELP "MODE"
+#define LABEL_QUIT "REC"
+#define LABEL_MENU "MENU"
+#define LABEL_VOLUME "VOL UP/DN"
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define VUMETER_QUIT BUTTON_POWER
@@ -156,6 +208,10 @@ PLUGIN_HEADER
 #define VUMETER_MENU_EXIT2 BUTTON_POWER
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP "SELECT"
+#define LABEL_QUIT "POWER"
+#define LABEL_MENU "MENU"
+#define LABEL_VOLUME "UP/DOWN"
 
 #else
 #error No keymap defined!
@@ -290,11 +346,7 @@ void load_settings(void) {
     }
     else {
         reset_settings();
-#if CONFIG_KEYPAD == RECORDER_PAD
-        rb->splash(HZ, "Press ON for help");
-#elif CONFIG_KEYPAD == ONDIO_PAD
-        rb->splash(HZ, "Press MODE for help");
-#endif
+        rb->splash(HZ, "Press " LABEL_HELP " for help");
     }
 }
 
@@ -617,13 +669,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                     break;
 #endif
                 rb->lcd_clear_display();
-                rb->lcd_puts(0, 0, "OFF: Exit");
-#if CONFIG_KEYPAD == RECORDER_PAD
-                rb->lcd_puts(0, 1, "F1: Settings");
-#elif CONFIG_KEYPAD == ONDIO_PAD
-                rb->lcd_puts(0, 1, "MODE..: Settings");
-#endif
-                rb->lcd_puts(0, 2, "UP/DOWN: Volume");
+                rb->lcd_puts(0, 0, LABEL_QUIT ": Exit");
+                rb->lcd_puts(0, 1, LABEL_MENU ": Settings");
+                rb->lcd_puts(0, 2, LABEL_VOLUME ": Volume");
                 rb->lcd_update();
                 rb->sleep(HZ*3);
                 break;

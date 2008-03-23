@@ -2284,8 +2284,9 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     if (timeout < 0)
         timeout = 0;
     button = pluginlib_getaction(rb,timeout,plugin_contexts,2);
-#ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold())
+#ifdef HAS_BUTTON_HOLD  && !defined(HAVE_REMOTE_LCD_AS_MAIN)
+    /* FIXME: Should probably check remote hold here */
+    if (rb->button_hold())
         button = BUBBLES_START;
 #endif
 
@@ -2455,7 +2456,7 @@ static int bubbles(struct game_context* bb) {
             rb->lcd_puts(0, 5, "MODE to fire");
             rb->lcd_puts(0, 6, " and show high scores");
             rb->lcd_puts(0, 7, "REW/FF to aim");
-            rb->lcd_puts(0, 8, "VOL UP/DN to change level");
+            rb->lcd_puts(0, 8, "VOL UP/DN to chg. lvl");
 #endif
 #if LCD_WIDTH >= 138
             rb->snprintf(str, 28, "Start on level %d of %d", startlevel+1,

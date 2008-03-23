@@ -1184,6 +1184,16 @@ static unsigned int blackjack_menu(struct game_context* bj) {
             rb->lcd_puts(0, 7, "REC to view scores");
             rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
             rb->lcd_puts(0, 9, str);
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+            rb->lcd_puts(0, 2, "PLAY to start & to");
+            rb->lcd_puts(0, 3, "  hit");
+            rb->lcd_puts(0, 4, "REC to exit");
+            rb->lcd_puts(0, 5, "FF to stay");
+            rb->lcd_puts(0, 6, "REW to double down");
+            rb->lcd_puts(0, 7, "MODE to save/resume");
+            rb->lcd_puts(0, 8, "MENU to view scores");
+            rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
+            rb->lcd_puts(0, 10, str);
 #endif
         } else {
             rb->snprintf(str, 12, "%s", "High Scores");
