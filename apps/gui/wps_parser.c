@@ -1483,7 +1483,7 @@ bool wps_data_load(struct wps_data *wps_data,
 
 #ifdef HAVE_LCD_BITMAP
         /* Set all filename pointers to NULL */
-        memset(bmp_names, sizeof(bmp_names), 0);
+        memset(bmp_names, 0, sizeof(bmp_names));
 #endif
 
         /* Skip leading UTF-8 BOM, if present. */
