@@ -516,11 +516,11 @@ static void clear_image_pos(struct gui_wps *gwps, int n)
     struct wps_data *data = gwps->data;
     gwps->display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     gwps->display->fillrect(data->img[n].x, data->img[n].y,
-                            data->img[n].bm.width, data->img[n].bm.height);
+                            data->img[n].bm.width, data->img[n].subimage_height);
     gwps->display->set_drawmode(DRMODE_SOLID);
 }
 
-static void wps_draw_image(struct gui_wps *gwps, int n)
+static void wps_draw_image(struct gui_wps *gwps, int n, int subimage)
 {
     struct screen *display = gwps->display;
     struct wps_data *data = gwps->data;
@@ -532,15 +532,18 @@ static void wps_draw_image(struct gui_wps *gwps, int n)
 #if LCD_DEPTH > 1
     if(data->img[n].bm.format == FORMAT_MONO) {
 #endif
-        display->mono_bitmap(data->img[n].bm.data, data->img[n].x,
-                             data->img[n].y, data->img[n].bm.width,
-                             data->img[n].bm.height);
+        display->mono_bitmap_part(data->img[n].bm.data, 
+                                  0, data->img[n].subimage_height * subimage,
+                                  data->img[n].bm.width, data->img[n].x,
+                                  data->img[n].y, data->img[n].bm.width,
+                                  data->img[n].subimage_height);
 #if LCD_DEPTH > 1
     } else {
-        display->transparent_bitmap((fb_data *)data->img[n].bm.data,
-                                    data->img[n].x,
-                                    data->img[n].y, data->img[n].bm.width,
-                                    data->img[n].bm.height);
+        display->transparent_bitmap_part((fb_data *)data->img[n].bm.data,
+                                         0, data->img[n].subimage_height * subimage,
+                                         data->img[n].bm.width, data->img[n].x,
+                                         data->img[n].y, data->img[n].bm.width,
+                                         data->img[n].subimage_height);
     }
 #endif
 }
@@ -556,11 +559,15 @@ static void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
 
     for (n = 0; n < MAX_IMAGES; n++)
     {
-        if (data->img[n].loaded &&
-            (data->img[n].display || 
-             (data->img[n].always_display && data->img[n].vp == vp)))
+        if (data->img[n].loaded)
         {
-            wps_draw_image(gwps, n);
+            if (data->img[n].display >= 0)
+            {
+                wps_draw_image(gwps, n, data->img[n].display);
+            } else if (data->img[n].always_display && data->img[n].vp == vp)
+            {
+                wps_draw_image(gwps, n, 0);
+            }
         }
     }
     display->set_drawmode(DRMODE_SOLID);
@@ -1449,7 +1456,7 @@ static bool evaluate_conditional(struct gui_wps *gwps, int *token_index)
 #ifdef HAVE_LCD_BITMAP
         /* clear all pictures in the conditional and nested ones */
         if (data->tokens[i].type == WPS_TOKEN_IMAGE_PRELOAD_DISPLAY)
-            clear_image_pos(gwps, data->tokens[i].value.i);
+            clear_image_pos(gwps, data->tokens[i].value.i & 0xFF);
 #endif
 #ifdef HAVE_ALBUMART
         if (data->tokens[i].type == WPS_TOKEN_ALBUMART_DISPLAY)
@@ -1515,9 +1522,11 @@ static bool get_line(struct gui_wps *gwps,
             case WPS_TOKEN_IMAGE_PRELOAD_DISPLAY:
             {
                 struct gui_img *img = data->img;
-                int n = data->tokens[i].value.i;
+                int n = data->tokens[i].value.i & 0xFF;
+                int subimage = data->tokens[i].value.i >> 8;
+
                 if (n >= 0 && n < MAX_IMAGES && img[n].loaded)
-                    img[n].display = true;
+                    img[n].display = subimage;
                 break;
             }
 #endif
@@ -1944,7 +1953,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
         /* Set images to not to be displayed */
         for (i = 0; i < MAX_IMAGES; i++)
         {
-            data->img[i].display = false;
+            data->img[i].display = -1;
         }
 #endif
 

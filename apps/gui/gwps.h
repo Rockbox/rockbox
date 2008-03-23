@@ -64,8 +64,10 @@ struct gui_img{
     struct viewport* vp;    /* The viewport to display this image in */
     int x;                  /* x-pos */
     int y;                  /* y-pos */
+    int num_subimages;      /* number of sub-images */
+    int subimage_height;    /* height of each sub-image */
+    int display;            /* -1 for no display, 0..n to display a subimage */
     bool loaded;            /* load state */
-    bool display;           /* is to be displayed */
     bool always_display;    /* not using the preload/display mechanism */
 };
 

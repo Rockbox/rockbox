@@ -432,7 +432,8 @@ static int parse_image_display(const char *wps_bufptr,
                                struct wps_data *wps_data)
 {
     (void)wps_data;
-    int n = get_image_id(*wps_bufptr);
+    int n = get_image_id(wps_bufptr[0]);
+    int subimage;
 
     if (n == -1)
     {
@@ -440,9 +441,15 @@ static int parse_image_display(const char *wps_bufptr,
         return WPS_ERROR_INVALID_PARAM;
     }
 
-    token->value.i = n;
-
-    return 1;
+    if ((subimage = get_image_id(wps_bufptr[1])) != -1)
+    {
+        /* Store sub-image number to display in high bits */
+        token->value.i = n | (subimage << 8);
+        return 2; /* We have consumed 2 bytes */
+    } else {
+        token->value.i = n;
+        return 1; /* We have consumed 1 byte */
+    }
 }
 
 static int parse_image_load(const char *wps_bufptr,
@@ -451,12 +458,16 @@ static int parse_image_load(const char *wps_bufptr,
 {
     int n;
     const char *ptr = wps_bufptr;
+    const char *pos;
     const char* filename;
     const char* id;
+    const char *newline;
     int x,y;
     
     /* format: %x|n|filename.bmp|x|y|
-       or %xl|n|filename.bmp|x|y|  */
+       or %xl|n|filename.bmp|x|y| 
+       or %xl|n|filename.bmp|x|y|num_subimages|
+    */
 
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
@@ -490,7 +501,18 @@ static int parse_image_load(const char *wps_bufptr,
     wps_data->img[n].vp = &wps_data->viewports[wps_data->num_viewports].vp;
 
     if (token->type == WPS_TOKEN_IMAGE_DISPLAY)
+    {
         wps_data->img[n].always_display = true;
+    }
+    else
+    {
+        /* Parse the (optional) number of sub-images */
+        ptr++;
+        newline = strchr(ptr, '\n');
+        pos = strchr(ptr, '|');
+        if (pos && pos < newline)
+            wps_data->img[n].num_subimages = atoi(ptr);
+    }
 
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
@@ -1283,8 +1305,9 @@ static void wps_images_clear(struct wps_data *data)
     for (i = 0; i < MAX_IMAGES; i++)
     {
        data->img[i].loaded = false;
-       data->img[i].display = false;
+       data->img[i].display = -1;
        data->img[i].always_display = false;
+       data->img[i].num_subimages = 1;
     }
     data->progressbar.have_bitmap_pb = false;
 }
@@ -1357,6 +1380,11 @@ static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
             if (load_bitmap(wps_data, img_path, bitmap))
             {
                 *loaded = true;
+
+                /* Calculate and store height if this image has sub-images */
+		if (n < MAX_IMAGES)
+                    wps_data->img[n].subimage_height = wps_data->img[n].bm.height /
+                                                       wps_data->img[n].num_subimages;
             }
         }
     }
