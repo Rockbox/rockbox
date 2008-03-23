@@ -893,10 +893,9 @@ target/arm/tcc77x/iaudio7/power-iaudio7.c
 
 #ifdef COWON_D2
 #ifndef SIMULATOR
+target/arm/lcd-as-memframe.S
 target/arm/tcc780x/adc-tcc780x.c
 target/arm/tcc780x/ata-nand-tcc780x.c
-target/arm/tcc780x/kernel-tcc780x.c
-target/arm/tcc780x/timer-tcc780x.c
 target/arm/tcc780x/system-tcc780x.c
 target/arm/tcc780x/cowond2/button-cowond2.c
 target/arm/tcc780x/cowond2/lcd-cowond2.c
@@ -904,6 +903,8 @@ target/arm/tcc780x/cowond2/power-cowond2.c
 target/arm/tcc780x/cowond2/powermgmt-cowond2.c
 target/arm/tcc780x/cowond2/usb-cowond2.c
 #ifndef BOOTLOADER
+target/arm/tcc780x/kernel-tcc780x.c
+target/arm/tcc780x/timer-tcc780x.c
 target/arm/wmcodec-telechips.c
 target/arm/tcc780x/debug-tcc780x.c
 target/arm/tcc780x/cowond2/pcm-cowond2.c
