@@ -6,38 +6,12 @@
 
 %X|wpsbackdrop-240x320x16.bmp|
 %P|pb-240x320x16.bmp|
-%xl|A|lockclosed-240x320x16.bmp|11|292|
-%xl|B|lockopen-240x320x16.bmp|11|292|
-%xl|C|battpl-240x320x16.bmp|46|292|
-%xl|D|battch-240x320x16.bmp|46|292|
-%xl|E|batt00-240x320x16.bmp|46|292|
-%xl|F|batt01-240x320x16.bmp|46|292|
-%xl|G|batt02-240x320x16.bmp|46|292|
-%xl|H|batt03-240x320x16.bmp|46|292|
-%xl|I|batt04-240x320x16.bmp|46|292|
-%xl|J|batt05-240x320x16.bmp|46|292|
-%xl|K|batt06-240x320x16.bmp|46|292|
-%xl|L|batt07-240x320x16.bmp|46|292|
-%xl|M|vol0-240x320x16.bmp|98|292|
-%xl|N|vol1-240x320x16.bmp|98|292|
-%xl|O|vol2-240x320x16.bmp|98|292|
-%xl|o|vol3-240x320x16.bmp|98|292|
-%xl|P|vol4-240x320x16.bmp|98|292|
-%xl|a|vol5-240x320x16.bmp|98|292|
-%xl|b|vol6-240x320x16.bmp|98|292|
-%xl|c|vol7-240x320x16.bmp|98|292|
-%xl|d|vol8-240x320x16.bmp|98|292|
-%xl|e|vol9-240x320x16.bmp|98|292|
-%xl|Q|shuffle-240x320x16.bmp|139|292|
-%xl|R|repeatall-240x320x16.bmp|182|292|
-%xl|S|repeatone-240x320x16.bmp|182|292|
-%xl|T|repeatshuffle-240x320x16.bmp|182|292|
-%xl|U|repeatab-240x320x16.bmp|182|292|
-%xl|V|stop-240x320x16.bmp|206|292|
-%xl|W|play-240x320x16.bmp|206|292|
-%xl|X|pause-240x320x16.bmp|206|292|
-%xl|Y|ff-240x320x16.bmp|206|292|
-%xl|Z|rew-240x320x16.bmp|206|292|
+%xl|A|lock-240x320x16.bmp|11|292|2|
+%xl|B|battery-240x320x16.bmp|46|292|10|
+%xl|C|volume-240x320x16.bmp|98|292|10|
+%xl|D|shuffle-240x320x16.bmp|139|292|
+%xl|E|repeat-240x320x16.bmp|182|292|4|
+%xl|F|playmode-240x320x16.bmp|206|292|5|
 %Cl|55|30|sc130|sc130|
 %pb|13|22|221|254|
 %?C<|>
@@ -58,11 +32,11 @@
 
      %pc%ac%pp of %pe%ar%pr     
 
-%?mh<%xdA|%xdB>
-%?bp<%?bc<%xdD|%xdC>|%?bl<|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK|%xdL>>
-%?pv<%xdM|%xdN|%xdO|%xdo|%xdP|%xda|%xdb|%xdc|%xdd|%xde>
-%?ps<%xdQ>
-%?mm<|%xdR|%xdS|%xdT|%xdU>
-%?mp<%xdV|%xdW|%xdX|%xdY|%xdZ>
+%?mh<%xdAa|%xdAb>
+%?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
+%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
+%?ps<%xdD>
+%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
+%?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
 %?C<%C>
 
