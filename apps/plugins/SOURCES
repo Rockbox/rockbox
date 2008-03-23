@@ -52,10 +52,12 @@ wavview.c
 robotfindskitten.c
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
+#ifndef IAUDIO_M3 /* FIXME: no greyscale library yet */
 fire.c
 jpeg.c
 mandelbrot.c
 plasma.c
+#endif
 
 blackjack.c
 bounce.c

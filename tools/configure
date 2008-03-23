@@ -1269,7 +1269,7 @@ EOF
     bmp2rb_native="$rootdir/tools/bmp2rb -f 7"
     output="rockbox.iaudio"
     appextra="recorder:gui"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
