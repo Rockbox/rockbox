@@ -74,7 +74,6 @@ static const struct plugin_api rockbox_api = {
     /* lcd */
     lcd_set_contrast,
     lcd_update,
-    lcd_update_rect,
     lcd_clear_display,
     lcd_setmargins,
     lcd_getstringsize,
@@ -93,6 +92,7 @@ static const struct plugin_api rockbox_api = {
     lcd_double_height,
 #else
     &lcd_framebuffer[0][0],
+    lcd_update_rect,
     lcd_set_drawmode,
     lcd_get_drawmode,
     lcd_setfont,

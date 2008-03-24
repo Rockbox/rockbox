@@ -144,7 +144,6 @@ struct plugin_api {
     /* lcd */
     void (*lcd_set_contrast)(int x);
     void (*lcd_update)(void);
-    void (*lcd_update_rect)(int x, int y, int width, int height);
     void (*lcd_clear_display)(void);
     void (*lcd_setmargins)(int x, int y);
     int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
@@ -163,6 +162,7 @@ struct plugin_api {
     void (*lcd_double_height)(bool on);
 #else /* HAVE_LCD_BITMAP */
     fb_data* lcd_framebuffer;
+    void (*lcd_update_rect)(int x, int y, int width, int height);
     void (*lcd_set_drawmode)(int mode);
     int  (*lcd_get_drawmode)(void);
     void (*lcd_setfont)(int font);

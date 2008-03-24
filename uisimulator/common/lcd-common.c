@@ -27,7 +27,7 @@
 void lcd_blit_mono(const unsigned char *data, int x, int y, int width, int height,
                    int stride)
 {
-    (void)p_data;
+    (void)data;
     (void)x;
     (void)y;
     (void)width;
