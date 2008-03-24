@@ -593,8 +593,10 @@ static int parse_viewport(const char *wps_bufptr,
 #ifdef HAVE_REMOTE_LCD
     if (wps_data->remote_wps)
     {
-        if (((vp->x + vp->width) >= LCD_REMOTE_WIDTH) ||
-            ((vp->y + vp->height) >= LCD_REMOTE_HEIGHT))
+        if ((vp->x >= LCD_REMOTE_WIDTH) ||
+            ((vp->x + vp->width) > LCD_REMOTE_WIDTH) ||
+            (vp->y >= LCD_REMOTE_HEIGHT) ||
+            ((vp->y + vp->height) > LCD_REMOTE_HEIGHT))
         {
             return WPS_ERROR_INVALID_PARAM;
         }
@@ -602,8 +604,10 @@ static int parse_viewport(const char *wps_bufptr,
     else
 #else
     {
-        if (((vp->x + vp->width) >= LCD_WIDTH) ||
-            ((vp->y + vp->height) >= LCD_HEIGHT))
+        if ((vp->x >= LCD_WIDTH) ||
+            ((vp->x + vp->width) > LCD_WIDTH) ||
+            (vp->y >= LCD_HEIGHT) ||
+            ((vp->y + vp->height) > LCD_HEIGHT))
         {
             return WPS_ERROR_INVALID_PARAM;
         }
