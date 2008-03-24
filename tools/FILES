@@ -31,3 +31,4 @@ rbspeex/rbspeexdec.c
 rbspeex/rbspeex.h
 *.vbs
 VOICE_PAUSE.wav
+iaudio_bl_flash.bmp
