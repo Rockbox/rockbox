@@ -109,20 +109,6 @@ void lcd_init_device(void)
 
 /*** update functions ***/
 
-/* Performance function that works with an external buffer
-   note that by and bheight are in 4-pixel units! */
-void lcd_blit(const fb_data* data, int x, int by, int width,
-              int bheight, int stride)
-{
-    /* TODO: Implement lcd_blit() */
-    (void)data;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
-}
-
 #define CSUB_X 2
 #define CSUB_Y 2
 
@@ -155,7 +141,7 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
 #define MAX_6BIT 0x3f
 
 /* Performance function to blit a YUV bitmap directly to the LCD */
-void lcd_yuv_blit(unsigned char * const src[3],
+void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {

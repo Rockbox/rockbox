@@ -119,12 +119,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 99
+#define PLUGIN_API_VERSION 100
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 98
+#define PLUGIN_MIN_API_VERSION 100
 
 /* plugin return codes */
 enum plugin_status {
@@ -144,6 +144,7 @@ struct plugin_api {
     /* lcd */
     void (*lcd_set_contrast)(int x);
     void (*lcd_update)(void);
+    void (*lcd_update_rect)(int x, int y, int width, int height);
     void (*lcd_clear_display)(void);
     void (*lcd_setmargins)(int x, int y);
     int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
@@ -160,7 +161,8 @@ struct plugin_api {
     void (*lcd_remove_cursor)(void);
     void (*lcd_icon)(int icon, bool enable);
     void (*lcd_double_height)(bool on);
-#else
+#else /* HAVE_LCD_BITMAP */
+    fb_data* lcd_framebuffer;
     void (*lcd_set_drawmode)(int mode);
     int  (*lcd_get_drawmode)(void);
     void (*lcd_setfont)(int font);
@@ -192,28 +194,40 @@ struct plugin_api {
             int x, int y, int width, int height);
     void (*lcd_bitmap_transparent)(const fb_data *src, int x, int y,
             int width, int height);
+    void (*lcd_blit_yuv)(unsigned char * const src[3],
+                         int src_x, int src_y, int stride,
+                         int x, int y, int width, int height);
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
+    || defined (IRIVER_H10)
+    void (*lcd_yuv_set_options)(unsigned options);
 #endif
-    unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
-    const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
-    struct font* (*font_load)(const char *path);
+#elif (LCD_DEPTH < 4) || !defined(SIMULATOR)
+    void (*lcd_blit_mono)(const unsigned char *data, int x, int by, int width,
+                          int bheight, int stride);
+    void (*lcd_blit_grey_phase)(unsigned char *values, unsigned char *phases,
+                                int bx, int by, int bwidth, int bheight,
+                                int stride);
+#endif /* LCD_DEPTH */
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
                                   int style);
-    fb_data* lcd_framebuffer;
-    void (*lcd_blit) (const fb_data* data, int x, int by, int width,
-                      int bheight, int stride);
-    void (*lcd_update_rect)(int x, int y, int width, int height);
-    void (*gui_scrollbar_draw)(struct screen * screen, int x, int y,
-                               int width, int height, int items,
-                               int min_shown, int max_shown,
-                               unsigned flags);
+
+    unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
+    const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
+    struct font* (*font_load)(const char *path);
     struct font* (*font_get)(int font);
     int  (*font_getstringsize)(const unsigned char *str, int *w, int *h,
                                int fontnumber);
     int (*font_get_width)(struct font* pf, unsigned short char_code);
     void (*screen_clear_area)(struct screen * display, int xstart, int ystart,
                               int width, int height);
-#endif
+    void (*gui_scrollbar_draw)(struct screen * screen, int x, int y,
+                               int width, int height, int items,
+                               int min_shown, int max_shown,
+                               unsigned flags);
+#endif  /* HAVE_LCD_BITMAP */
+
+    /* backlight */
     void (*backlight_on)(void);
     void (*backlight_off)(void);
     void (*backlight_set_timeout)(int index);
@@ -255,7 +269,11 @@ struct plugin_api {
 
     void (*remote_backlight_on)(void);
     void (*remote_backlight_off)(void);
+    void (*remote_backlight_set_timeout)(int index);
+#if CONFIG_CHARGING
+    void (*remote_backlight_set_timeout_plugged)(int index);
 #endif
+#endif /* HAVE_REMOTE_LCD */
     struct screen* screens[NB_SCREENS];
 #if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     void     (*lcd_remote_set_foreground)(unsigned foreground);
@@ -267,22 +285,6 @@ struct plugin_api {
     void (*lcd_remote_bitmap)(const fb_remote_data *src, int x, int y, int width,
                               int height);
 #endif
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR)
-    void (*lcd_grey_phase_blit)(unsigned char *values, unsigned char *phases,
-                                int bx, int by, int bwidth, int bheight,
-                                int stride);
-#endif
-#if defined(HAVE_LCD_COLOR)
-    void (*lcd_yuv_blit)(unsigned char * const src[3],
-                         int src_x, int src_y, int stride,
-                         int x, int y, int width, int height);
-#endif
-
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
-    || defined (IRIVER_H10)
-    void (*lcd_yuv_set_options)(unsigned options);
-#endif
-
     /* list */
     void (*gui_synclist_init)(struct gui_synclist * lists,
             list_get_name callback_get_item_name,void * data,
@@ -329,11 +331,14 @@ struct plugin_api {
     void (*ata_sleep)(void);
     bool (*ata_disk_is_active)(void);
 #endif
+    void (*ata_spin)(void);
     void (*ata_spindown)(int seconds);
     void (*reload_directory)(void);
     char *(*create_numbered_filename)(char *buffer, const char *path,
                                       const char *prefix, const char *suffix,
                                       int numberlen IF_CNFN_NUM_(, int *num));
+    bool (*file_exists)(const char *file);
+
 
     /* dir */
     DIR* (*opendir)(const char* name);
@@ -341,6 +346,7 @@ struct plugin_api {
     struct dirent* (*readdir)(DIR* dir);
     int (*mkdir)(const char *name);
     int (*rmdir)(const char *name);
+    bool (*dir_exists)(const char *path);
 
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);
@@ -358,6 +364,14 @@ struct plugin_api {
                                           IF_PRIO(, int priority)
 					                      IF_COP(, unsigned int core));
     void (*remove_thread)(struct thread_entry *thread);
+    void (*thread_wait)(struct thread_entry *thread);
+#if CONFIG_CODEC == SWCODEC
+    void (*mutex_init)(struct mutex *m);
+    void (*mutex_lock)(struct mutex *m);
+    void (*mutex_unlock)(struct mutex *m);
+    size_t (*align_buffer)(void **start, size_t size, size_t align);
+#endif
+
     void (*reset_poweroff_timer)(void);
 #ifndef SIMULATOR
     int (*system_memory_guard)(int newmode);
@@ -368,7 +382,15 @@ struct plugin_api {
 #else
     void (*cpu_boost)(bool on_off);
 #endif
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
+#endif /* !SIMULATOR */
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    void (*trigger_cpu_boost)(void);
+    void (*cancel_cpu_boost)(void);
 #endif
+#ifdef CACHE_FUNCTIONS_AS_CALL
+    void (*flush_icache)(void);
+    void (*invalidate_icache)(void);
 #endif
     bool (*timer_register)(int reg_prio, void (*unregister_callback)(void),
                            long cycles, int int_prio,
@@ -381,6 +403,16 @@ struct plugin_api {
     void (*queue_post)(struct event_queue *q, long id, intptr_t data);
     void (*queue_wait_w_tmo)(struct event_queue *q, struct queue_event *ev,
             int ticks);
+#if CONFIG_CODEC == SWCODEC
+    void (*queue_enable_queue_send)(struct event_queue *q,
+                                    struct queue_sender_list *send);
+    bool (*queue_empty)(const struct event_queue *q);
+    void (*queue_wait)(struct event_queue *q, struct queue_event *ev);
+    intptr_t (*queue_send)(struct event_queue *q, long id,
+                           intptr_t data);
+    void (*queue_reply)(struct event_queue *q, intptr_t retval);
+#endif /* CONFIG_CODEC == SWCODEC */
+
     void (*usb_acknowledge)(long id);
 #ifdef RB_PROFILE
     void (*profile_thread)(void);
@@ -430,12 +462,12 @@ struct plugin_api {
     int (*utf8seek)(const unsigned char* utf8, int offset);
 
     /* sound */
-#if CONFIG_CODEC == SWCODEC
-    int (*sound_default)(int setting);
-#endif
     void (*sound_set)(int setting, int value);
+    int (*sound_default)(int setting);
     int (*sound_min)(int setting);
     int (*sound_max)(int setting);
+    const char * (*sound_unit)(int setting);
+    int (*sound_val2phys)(int setting, int value);
 #ifndef SIMULATOR
     void (*mp3_play_data)(const unsigned char* start, int size, void (*get_more)(unsigned char** start, size_t* size));
     void (*mp3_play_pause)(bool play);
@@ -458,6 +490,8 @@ struct plugin_api {
     void (*pcm_play_pause)(bool play);
     size_t (*pcm_get_bytes_waiting)(void);
     void (*pcm_calculate_peaks)(int *left, int *right);
+    void (*pcm_play_lock)(void);
+    void (*pcm_play_unlock)(void);
 #ifdef HAVE_RECORDING
     const unsigned long *rec_freq_sampr;
     void (*pcm_init_recording)(void);
@@ -473,6 +507,13 @@ struct plugin_api {
     void (*audio_set_output_source)(int monitor);
     void (*audio_set_input_source)(int source, unsigned flags);
 #endif
+    void (*dsp_set_crossfeed)(bool enable);
+    void (*dsp_set_eq)(bool enable);
+    void (*dsp_dither_enable)(bool enable);
+    intptr_t (*dsp_configure)(struct dsp_config *dsp, int setting,
+                              intptr_t value);
+    int (*dsp_process)(struct dsp_config *dsp, char *dest,
+                       const char *src[], int count);
 #endif /* CONFIG_CODEC == SWCODC */
 
     /* playback control */
@@ -638,37 +679,8 @@ struct plugin_api {
 
     void (*led)(bool on);
 
-#ifdef CACHE_FUNCTIONS_AS_CALL
-    void (*flush_icache)(void);
-    void (*invalidate_icache)(void);
-#endif
-
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
-
 #if (CONFIG_CODEC == SWCODEC)
-    void (*mutex_init)(struct mutex *m);
-    void (*mutex_lock)(struct mutex *m);
-    void (*mutex_unlock)(struct mutex *m);
-#endif
-
-    void (*thread_wait)(struct thread_entry *thread);
-
-#if (CONFIG_CODEC == SWCODEC)
-    size_t (*align_buffer)(void **start, size_t size, size_t align);
-#endif
-
-    bool (*file_exists)(const char *file);
-    bool (*dir_exists)(const char *path);
-    
-#ifdef HAVE_REMOTE_LCD
-    void (*remote_backlight_set_timeout)(int index);
-#if CONFIG_CHARGING
-    void (*remote_backlight_set_timeout_plugged)(int index);
-#endif
-#endif /* HAVE_REMOTE_LCD */
-
-#if (CONFIG_CODEC == SWCODEC)
+    /* buffering API */
     int (*bufopen)(const char *file, size_t offset, enum data_type type);
     int (*bufalloc)(const void *src, size_t size, enum data_type type);
     bool (*bufclose)(int handle_id);
@@ -704,33 +716,9 @@ struct plugin_api {
                                   char *buf, int buflen);
 #endif
 
-#if CONFIG_CODEC == SWCODEC
-    void (*pcm_play_lock)(void);
-    void (*pcm_play_unlock)(void);
-    void (*queue_enable_queue_send)(struct event_queue *q,
-                                    struct queue_sender_list *send);
-    bool (*queue_empty)(const struct event_queue *q);
-    void (*queue_wait)(struct event_queue *q, struct queue_event *ev);
-    intptr_t (*queue_send)(struct event_queue *q, long id,
-                           intptr_t data);
-    void (*queue_reply)(struct event_queue *q, intptr_t retval);
-#ifndef HAVE_FLASH_STORAGE
-    void (*ata_spin)(void);
-#endif
-#ifdef HAVE_SCHEDULER_BOOSTCTRL
-    void (*trigger_cpu_boost)(void);
-    void (*cancel_cpu_boost)(void);
-#endif
-    const char * (*sound_unit)(int setting);
-    int (*sound_val2phys)(int setting, int value);
-    void (*dsp_set_crossfeed)(bool enable);
-    void (*dsp_set_eq)(bool enable);
-    void (*dsp_dither_enable)(bool enable);
-    intptr_t (*dsp_configure)(struct dsp_config *dsp, int setting,
-                              intptr_t value);
-    int (*dsp_process)(struct dsp_config *dsp, char *dest,
-                       const char *src[], int count);
-#endif /* CONFIG_CODEC == SWCODEC */
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
+
 };
 
 /* plugin header */

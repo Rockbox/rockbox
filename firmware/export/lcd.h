@@ -134,21 +134,21 @@ extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
 
 #ifdef HAVE_LCD_BITMAP
 
+/* performance function */
 #if defined(HAVE_LCD_COLOR)
 #define LCD_YUV_DITHER 0x1
 extern void lcd_yuv_set_options(unsigned options);
-extern void lcd_yuv_blit(unsigned char * const src[3],
+extern void lcd_blit_yuv(unsigned char * const src[3],
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);
 #else
-extern void lcd_grey_phase_blit(unsigned char *values, unsigned char *phases,
+extern void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
+                          int bheight, int stride);
+extern void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                                 int bx, int by, int bwidth, int bheight,
                                 int stride);
 #endif
 
-/* performance function */
-extern void lcd_blit(const fb_data* data, int x, int by, int width,
-                     int bheight, int stride);
 
 /* update a fraction of the screen */
 extern void lcd_update_rect(int x, int y, int width, int height);

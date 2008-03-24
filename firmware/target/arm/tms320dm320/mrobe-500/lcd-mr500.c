@@ -163,7 +163,7 @@ extern void lcd_write_yuv420_lines(fb_data *dst,
 /* Performance function to blit a YUV bitmap directly to the LCD */
 /* For the Gigabeat - show it rotated */
 /* So the LCD_WIDTH is now the height */
-void lcd_yuv_blit(unsigned char * const src[3],
+void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
@@ -208,18 +208,6 @@ void lcd_set_contrast(int val) {
 void lcd_set_invert_display(bool yesno) {
   (void) yesno;
   // TODO:
-}
-
-void lcd_blit(const fb_data* data, int bx, int y, int bwidth,
-              int height, int stride)
-{
-  (void) data;
-  (void) bx;
-  (void) y;
-  (void) bwidth;
-  (void) height;
-  (void) stride;
-  //TODO:
 }
 
 void lcd_set_flip(bool yesno) {

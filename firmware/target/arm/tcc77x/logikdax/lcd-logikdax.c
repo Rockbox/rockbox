@@ -190,8 +190,8 @@ void lcd_init_device(void)
 
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
-void lcd_blit(const unsigned char* data, int x, int by, int width,
-              int bheight, int stride)
+void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
+                   int bheight, int stride)
 {
     /* Copy display bitmap to hardware */
     while (bheight--)
@@ -205,6 +205,20 @@ void lcd_blit(const unsigned char* data, int x, int by, int width,
     }
 }
 
+
+/* Performance function that works with an external buffer
+   note that by and bheight are in 8-pixel units! */
+void lcd_blit_grey_phase_blit(unsigned char *values, unsigned char *phases,
+                         int x, int by, int width, int bheight, int stride)
+{
+    (void)values;
+    (void)phases;
+    (void)x;
+    (void)by;
+    (void)width;
+    (void)bheight;
+    (void)stride;
+}
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */

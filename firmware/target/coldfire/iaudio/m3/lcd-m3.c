@@ -289,6 +289,35 @@ void lcd_write_data(const fb_data *p_words, int count)
     CS_HI;
 }
 
+static void lcd_mono_data(const unsigned char *p_words, int count)
+{
+    unsigned data;
+    const unsigned char *p_bytes = p_words;
+    const unsigned char *p_end = p_words + count;
+
+    RS_HI;
+    CS_LO;
+    if (cpu_frequency < 50000000)
+    {
+        while (p_bytes < p_end)
+        {
+            data = *p_bytes++;
+            _write_fast(data);
+            _write_fast(data);
+        }
+    }
+    else
+    {
+        while (p_bytes < p_end)
+        {
+            data = *p_bytes++;
+            _write_byte(data);
+            _write_byte(data);
+        }
+    }
+    CS_HI;
+}
+
 int lcd_default_contrast(void)
 {
     return DEFAULT_CONTRAST_SETTING;
@@ -341,7 +370,7 @@ void lcd_on(void)
     lcd_write_command_e(LCD_SET_GRAY | 6, 0xcc);
     lcd_write_command_e(LCD_SET_GRAY | 7, 0x0c);
     
-    lcd_write_command(LCD_SET_PWM_FRC | 6); /* 4FRC + 12PWM */
+    lcd_write_command(LCD_SET_PWM_FRC | 6); /* 3FRC + 12PWM */
     
     lcd_write_command(LCD_DISPLAY_ON | 1); /* display on */
 
@@ -428,24 +457,31 @@ void lcd_init_device(void)
 #endif
 }
 
-/* TODO: implement blit functions */
-
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
-void lcd_blit(const fb_data *data, int x, int by, int width,
-              int bheight, int stride)
+void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
+                   int bheight, int stride)
 {
-    (void)data;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
+    if (initialized)
+    {
+        /* COM48-COM63 are not connected, so we need to skip those */
+        while (bheight--)
+        {
+            lcd_write_command(LCD_SET_PAGE | ((by > 5 ? by + 2 : by) & 0xf));
+            lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
+
+            lcd_mono_data(data, width);
+            data += stride;
+            by++;
+        }
+    }
 }
 
+/* TODO: implement grey blit function */
+
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
-void lcd_grey_phase_blit(unsigned char *values, unsigned char *phases,
+void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
     (void)values;
@@ -463,7 +499,8 @@ void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
     int y;
-    if(initialized) {
+    if (initialized)
+    {
         for(y = 0;y < LCD_FBHEIGHT;y++) {
             /* Copy display bitmap to hardware.
                The COM48-COM63 lines are not connected so we have to skip
@@ -480,7 +517,8 @@ void lcd_update(void)
 void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    if(initialized) {
+    if (initialized)
+    {
         int ymax;
 
         /* The Y coordinates have to work on even 8 pixel rows */

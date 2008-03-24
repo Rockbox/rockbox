@@ -24,8 +24,8 @@
 #include "lcd.h"
 #include "lcd-sdl.h"
 
-void lcd_blit(const fb_data* p_data, int x, int y, int width, int height,
-              int stride)
+void lcd_blit_mono(const unsigned char *data, int x, int y, int width, int height,
+                   int stride)
 {
     (void)p_data;
     (void)x;

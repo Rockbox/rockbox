@@ -193,9 +193,9 @@ void lcd_yuv_set_options(unsigned options)
     (void)options;
 }
 
-/* Draw a partial YUV colour bitmap - similiar behavior to lcd_yuv_blit
+/* Draw a partial YUV colour bitmap - similiar behavior to lcd_blit_yuv
    in the core */
-void lcd_yuv_blit(unsigned char * const src[3],
+void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {

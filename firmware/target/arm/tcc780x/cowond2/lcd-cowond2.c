@@ -370,18 +370,6 @@ void lcd_set_invert_display(bool yesno)
     (void)yesno;
 }
 
-void lcd_blit(const fb_data* data, int bx, int y, int bwidth,
-              int height, int stride)
-{
-    // TODO
-    (void)data;
-    (void)bx;
-    (void)y;
-    (void)bwidth;
-    (void)height;
-    (void)stride;
-}
-
 void lcd_yuv_set_options(unsigned options)
 {
     lcd_yuv_options = options;
@@ -400,7 +388,7 @@ extern void lcd_write_yuv420_lines_odither(fb_data *dst,
                                            int y_screen);
 
 /* Performance function to blit a YUV bitmap directly to the LCD */
-void lcd_yuv_blit(unsigned char * const src[3],
+void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {

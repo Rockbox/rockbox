@@ -140,8 +140,8 @@ void lcd_init_device(void)
 
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
-void lcd_blit(const unsigned char* data, int x, int by, int width,
-              int bheight, int stride)
+void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
+                   int bheight, int stride)
 {
     /* Copy display bitmap to hardware */
     while (bheight--)
@@ -160,7 +160,7 @@ void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
-void lcd_grey_phase_blit(unsigned char *values, unsigned char *phases,
+void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
     stride <<= 3; /* 8 pixels per block */

@@ -361,13 +361,13 @@ void timer4_isr(void)
         height = MIN(LCD_HEIGHT/8-1, height); /* reserve bottom line */
         if (gPlay.bDirtyOSD)
         {   /* OSD to bottom line */
-            rb->lcd_blit(gBuf.pOSD, 0, LCD_HEIGHT/8-1, 
+            rb->lcd_blit_mono(gBuf.pOSD, 0, LCD_HEIGHT/8-1,
                 LCD_WIDTH, 1, LCD_WIDTH);
             gPlay.bDirtyOSD = false;
         }
     }
 
-    rb->lcd_blit(gBuf.pReadVideo, 0, 0, 
+    rb->lcd_blit_mono(gBuf.pReadVideo, 0, 0,
         gFileHdr.video_width, height, gFileHdr.video_width);
 
     available = Available(gBuf.pReadVideo);

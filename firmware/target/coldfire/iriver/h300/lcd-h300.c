@@ -294,21 +294,6 @@ bool lcd_enabled(void)
 
 /*** update functions ***/
 
-/* Performance function that works with an external buffer
-   note that by and bheight are in 8-pixel units! */
-void lcd_blit(const fb_data* data, int x, int by, int width,
-              int bheight, int stride)
-{
-    /* TODO: Implement lcd_blit() */
-    (void)data;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
-    /*if(display_on)*/
-}
-
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420.
  * y should have two lines of Y back to back, 2nd line first.
  * c should contain the Cb and Cr data for the two lines of Y back to back.
@@ -321,7 +306,7 @@ extern void lcd_write_yuv420_lines(const unsigned char *y,
  * src_x, src_y, width and height should be even
  * x, y, width and height have to be within LCD bounds
  */
-void lcd_yuv_blit(unsigned char * const src[3],
+void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {

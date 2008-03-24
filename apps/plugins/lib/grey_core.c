@@ -239,12 +239,12 @@ static unsigned long _grey_get_pixel(int x, int y)
 static void _timer_isr(void)
 {
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    _grey_info.rb->lcd_grey_phase_blit(_grey_info.values, _grey_info.phases,
+    _grey_info.rb->lcd_blit_grey_phase(_grey_info.values, _grey_info.phases,
                                        _grey_info.bx, _grey_info.y,
                                        _grey_info.bwidth, _grey_info.height,
                                        _grey_info.width);
 #else
-    _grey_info.rb->lcd_grey_phase_blit(_grey_info.values, _grey_info.phases,
+    _grey_info.rb->lcd_blit_grey_phase(_grey_info.values, _grey_info.phases,
                                        _grey_info.x, _grey_info.by,
                                        _grey_info.width, _grey_info.bheight,
                                        _grey_info.width);
@@ -457,7 +457,7 @@ void grey_release(void)
    grey_deferred_update() instead.
 
  Other functions to avoid are:
-   lcd_blit() (obviously), lcd_update_rect(), lcd_set_contrast(),
+   lcd_blit_mono(), lcd_update_rect(), lcd_set_contrast(),
    lcd_set_invert_display(), lcd_set_flip() */
 void grey_show(bool enable)
 {

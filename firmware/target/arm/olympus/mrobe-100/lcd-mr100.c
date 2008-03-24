@@ -118,8 +118,8 @@ void lcd_set_flip(bool yesno)
 
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
-void lcd_blit(const unsigned char* data, int x, int by, int width,
-              int bheight, int stride)
+void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
+                   int bheight, int stride)
 {
     /* TODO: Implement lcd_blit() */
     (void)data;
@@ -132,7 +132,7 @@ void lcd_blit(const unsigned char* data, int x, int by, int width,
 
 /* Performance function that works with an external buffer
    note that by and bheight are in 4-pixel units! */
-void lcd_grey_phase_blit(unsigned char *values, unsigned char *phases,
+void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
     /* TODO: Implement lcd_grey_phase_blit() */

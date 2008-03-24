@@ -277,8 +277,8 @@ void lcd_mono_data(const unsigned char *data, int count);
 
 /* Performance function that works with an external buffer
    note that x, bwidtht and stride are in 8-pixel units! */
-void lcd_blit(const unsigned char* data, int bx, int y, int bwidth,
-              int height, int stride)
+void lcd_blit_mono(const unsigned char *data, int bx, int y, int bwidth,
+                   int height, int stride)
 {
     while (height--)
     {
@@ -295,7 +295,7 @@ void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 
 /* Performance function that works with an external buffer
    note that bx and bwidth are in 8-pixel units! */
-void lcd_grey_phase_blit(unsigned char *values, unsigned char *phases,
+void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int bx, int y, int bwidth, int height, int stride)
 {
     while (height--) 

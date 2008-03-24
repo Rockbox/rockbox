@@ -74,6 +74,7 @@ static const struct plugin_api rockbox_api = {
     /* lcd */
     lcd_set_contrast,
     lcd_update,
+    lcd_update_rect,
     lcd_clear_display,
     lcd_setmargins,
     lcd_getstringsize,
@@ -91,6 +92,7 @@ static const struct plugin_api rockbox_api = {
     lcd_icon,
     lcd_double_height,
 #else
+    &lcd_framebuffer[0][0],
     lcd_set_drawmode,
     lcd_get_drawmode,
     lcd_setfont,
@@ -115,21 +117,27 @@ static const struct plugin_api rockbox_api = {
 #if LCD_DEPTH == 16
     lcd_bitmap_transparent_part,
     lcd_bitmap_transparent,
+    lcd_blit_yuv,
+#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
+    || defined (IRIVER_H10)
+    lcd_yuv_set_options,
 #endif
+#elif (LCD_DEPTH < 4) || !defined(SIMULATOR)
+    lcd_blit_mono,
+    lcd_blit_grey_phase,
+#endif /* LCD_DEPTH */
+    lcd_puts_style,
+    lcd_puts_scroll_style,
     bidi_l2v,
     font_get_bits,
     font_load,
-    lcd_puts_style,
-    lcd_puts_scroll_style,
-    &lcd_framebuffer[0][0],
-    lcd_blit,
-    lcd_update_rect,
-    gui_scrollbar_draw,
     font_get,
     font_getstringsize,
     font_get_width,
     screen_clear_area,
+    gui_scrollbar_draw,
 #endif
+
     backlight_on,
     backlight_off,
     backlight_set_timeout,
@@ -137,6 +145,7 @@ static const struct plugin_api rockbox_api = {
     backlight_set_timeout_plugged,
 #endif
     gui_syncsplash,
+
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
     lcd_remote_set_contrast,
@@ -166,7 +175,11 @@ static const struct plugin_api rockbox_api = {
 
     remote_backlight_on,
     remote_backlight_off,
+    remote_backlight_set_timeout,
+#if CONFIG_CHARGING
+    remote_backlight_set_timeout_plugged,
 #endif
+#endif /* HAVE_REMOTE_LCD */
 #if NB_SCREENS == 2
     {&screens[SCREEN_MAIN], &screens[SCREEN_REMOTE]},
 #else
@@ -181,16 +194,6 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_bitmap,
 #endif
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && !defined(SIMULATOR)
-    lcd_grey_phase_blit,
-#endif
-#if defined(HAVE_LCD_COLOR)
-    lcd_yuv_blit,
-#endif
-#if defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200) \
-    || defined (IRIVER_H10)
-    lcd_yuv_set_options,
-#endif
     /* list */
     gui_synclist_init,
     gui_synclist_set_nb_items,
@@ -233,9 +236,11 @@ static const struct plugin_api rockbox_api = {
     ata_sleep,
     ata_disk_is_active,
 #endif
+    ata_spin,
     ata_spindown,
     reload_directory,
     create_numbered_filename,
+    file_exists,
 
     /* dir */
     opendir,
@@ -243,6 +248,7 @@ static const struct plugin_api rockbox_api = {
     readdir,
     mkdir,
     rmdir,
+    dir_exists,
 
     /* kernel/ system */
     PREFIX(sleep),
@@ -256,6 +262,14 @@ static const struct plugin_api rockbox_api = {
     threads,
     create_thread,
     remove_thread,
+    thread_wait,
+#if (CONFIG_CODEC == SWCODEC)
+    mutex_init,
+    mutex_lock,
+    mutex_unlock,
+    align_buffer,
+#endif
+
     reset_poweroff_timer,
 #ifndef SIMULATOR
     system_memory_guard,
@@ -267,7 +281,15 @@ static const struct plugin_api rockbox_api = {
 #else
     cpu_boost,
 #endif
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
+#endif /* !SIMULATOR */
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    trigger_cpu_boost,
+    cancel_cpu_boost,
 #endif
+#ifdef CACHE_FUNCTIONS_AS_CALL
+    flush_icache,
+    invalidate_icache,
 #endif
     timer_register,
     timer_unregister,
@@ -277,6 +299,13 @@ static const struct plugin_api rockbox_api = {
     queue_delete,
     queue_post,
     queue_wait_w_tmo,
+#if CONFIG_CODEC == SWCODEC
+    queue_enable_queue_send,
+    queue_empty,
+    queue_wait,
+    queue_send,
+    queue_reply,
+#endif
     usb_acknowledge,
 #ifdef RB_PROFILE
     profile_thread,
@@ -325,13 +354,12 @@ static const struct plugin_api rockbox_api = {
     utf8seek,
 
     /* sound */
-#if CONFIG_CODEC == SWCODEC
-    sound_default,
-#endif
     sound_set,
-
+    sound_default,
     sound_min,
     sound_max,
+    sound_unit,
+    sound_val2phys,
 #ifndef SIMULATOR
     mp3_play_data,
     mp3_play_pause,
@@ -353,6 +381,8 @@ static const struct plugin_api rockbox_api = {
     pcm_play_pause,
     pcm_get_bytes_waiting,
     pcm_calculate_peaks,
+    pcm_play_lock,
+    pcm_play_unlock,
 #ifdef HAVE_RECORDING
     &rec_freq_sampr[0],
     pcm_init_recording,
@@ -367,6 +397,11 @@ static const struct plugin_api rockbox_api = {
     audio_set_output_source,
     audio_set_input_source,
 #endif
+    dsp_set_crossfeed,
+    dsp_set_eq,
+    dsp_dither_enable,
+    dsp_configure,
+    dsp_process,
 #endif /* CONFIG_CODEC == SWCODEC */
 
     /* playback control */
@@ -508,35 +543,6 @@ static const struct plugin_api rockbox_api = {
     detect_flashed_romimage,
 #endif
     led,
-#ifdef CACHE_FUNCTIONS_AS_CALL
-    flush_icache,
-    invalidate_icache,
-#endif
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
-
-#if (CONFIG_CODEC == SWCODEC)
-    mutex_init,
-    mutex_lock,
-    mutex_unlock,
-#endif
-
-    thread_wait,
-
-#if (CONFIG_CODEC == SWCODEC)
-    align_buffer,
-#endif
-
-    file_exists,
-    dir_exists,
-
-#ifdef HAVE_REMOTE_LCD
-    remote_backlight_set_timeout,
-#if CONFIG_CHARGING
-    remote_backlight_set_timeout_plugged,
-#endif
-#endif /* HAVE_REMOTE_LCD */
-
 #if (CONFIG_CODEC == SWCODEC)
     bufopen,
     bufalloc,
@@ -569,29 +575,9 @@ static const struct plugin_api rockbox_api = {
     search_albumart_files,
 #endif
 
-#if CONFIG_CODEC == SWCODEC
-    pcm_play_lock,
-    pcm_play_unlock,
-    queue_enable_queue_send,
-    queue_empty,
-    queue_wait,
-    queue_send,
-    queue_reply,
-#ifndef HAVE_FLASH_STORAGE
-    ata_spin,
-#endif
-#ifdef HAVE_SCHEDULER_BOOSTCTRL
-    trigger_cpu_boost,
-    cancel_cpu_boost,
-#endif
-    sound_unit,
-    sound_val2phys,
-    dsp_set_crossfeed,
-    dsp_set_eq,
-    dsp_dither_enable,
-    dsp_configure,
-    dsp_process,
-#endif /* CONFIG_CODEC == SWCODEC */
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
+
 };
 
 int plugin_load(const char* plugin, void* parameter)
