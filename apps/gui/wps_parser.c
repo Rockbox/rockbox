@@ -516,6 +516,9 @@ static int parse_image_load(const char *wps_bufptr,
         pos = strchr(ptr, '|');
         if (pos && pos < newline)
             wps_data->img[n].num_subimages = atoi(ptr);
+
+        if (wps_data->img[n].num_subimages <= 0)
+            return WPS_ERROR_INVALID_PARAM;
     }
 
     /* Skip the rest of the line */
