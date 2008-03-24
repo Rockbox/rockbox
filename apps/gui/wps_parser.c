@@ -26,6 +26,7 @@
 #include "gwps.h"
 #ifndef __PCTOOL__
 #include "settings.h"
+#include "misc.h"
 #include "debug.h"
 #include "plugin.h"
 
@@ -562,27 +563,34 @@ static int parse_viewport(const char *wps_bufptr,
 #ifdef HAVE_LCD_COLOR
     if (depth == 16)
     {
-        parse_list("dddddcc", '|', ptr, &vp->x, &vp->y, &vp->width,
-                   &vp->height, &vp->font, &vp->fg_pattern,&vp->bg_pattern);
+        if (!(ptr = parse_list("dddddcc", '|', ptr, &vp->x, &vp->y, &vp->width,
+                    &vp->height, &vp->font, &vp->fg_pattern,&vp->bg_pattern)))
+            return WPS_ERROR_INVALID_PARAM;
     }
     else 
 #endif
 #if (LCD_DEPTH == 2) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 2)
     if (depth == 2) {
-        parse_list("dddddgg", '|', ptr, &vp->x, &vp->y, &vp->width,
-                   &vp->height, &vp->font, &vp->fg_pattern, &vp->bg_pattern);
+        if (!(ptr = parse_list("dddddgg", '|', ptr, &vp->x, &vp->y, &vp->width,
+                    &vp->height, &vp->font, &vp->fg_pattern, &vp->bg_pattern)))
+            return WPS_ERROR_INVALID_PARAM;
     }
     else 
 #endif
 #if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
     if (depth == 1)
     {
-        parse_list("ddddd", '|', ptr, &vp->x, &vp->y, &vp->width, &vp->height, 
-                                      &vp->font);
+        if (!(ptr = parse_list("ddddd", '|', ptr, &vp->x, &vp->y, &vp->width,
+                                                  &vp->height, &vp->font)))
+            return WPS_ERROR_INVALID_PARAM;
     }
       else
 #endif
     {}
+
+    /* Check for trailing | */
+    if (*ptr != '|')
+        return WPS_ERROR_INVALID_PARAM;
 
     /* Default to using the user font if the font was an invalid number */
     if ((vp->font != FONT_SYSFIXED) && (vp->font != FONT_UI))
