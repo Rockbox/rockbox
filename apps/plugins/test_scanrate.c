@@ -55,16 +55,6 @@ PLUGIN_HEADER
 
 #endif
 
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-#define BUF_WIDTH  ((LCD_WIDTH+7)/8/4)
-#define BUF_HEIGHT LCD_HEIGHT
-#define TEXT_X (BUF_WIDTH*8)
-#else
-#define BUF_WIDTH  (LCD_WIDTH/4)
-#define BUF_HEIGHT (LCD_HEIGHT/8)
-#define TEXT_X BUF_WIDTH
-#endif
-
 /* Default refresh rates in 1/10 Hz */
 #if CONFIG_LCD == LCD_SSD1815
 #define DEFAULT_SCAN_RATE 670
@@ -74,10 +64,38 @@ PLUGIN_HEADER
 #define DEFAULT_SCAN_RATE 800
 #elif CONFIG_LCD == LCD_IPODMINI
 #define DEFAULT_SCAN_RATE 880
+#elif CONFIG_LCD == LCD_TL0350A
+#define DEFAULT_SCAN_RATE 1480
+#define HORIZ_SCAN /* LCD controller updates the panel sideways */
+#define NEED_BOOST
 #else
 #define DEFAULT_SCAN_RATE 700
 #warning Generic default scanrate
 #endif
+
+#ifdef HORIZ_SCAN 
+#define TEXT_X 0
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+#define BUF_WIDTH  ((LCD_WIDTH+7)/8)
+#define BUF_HEIGHT (LCD_HEIGHT/4)
+#define TEXT_Y BUF_HEIGHT
+#else
+#define BUF_WIDTH  (LCD_WIDTH)
+#define BUF_HEIGHT (LCD_HEIGHT/8/4)
+#define TEXT_Y (BUF_HEIGHT*8)
+#endif
+#else /* !HORIZ_SCAN */
+#define TEXT_Y 0
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+#define BUF_WIDTH  ((LCD_WIDTH+7)/8/4)
+#define BUF_HEIGHT LCD_HEIGHT
+#define TEXT_X (BUF_WIDTH*8)
+#else
+#define BUF_WIDTH  (LCD_WIDTH/4)
+#define BUF_HEIGHT (LCD_HEIGHT/8)
+#define TEXT_X BUF_WIDTH
+#endif
+#endif /* !HORIZ_SCAN */
 
 #if defined(CPU_PP) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
 #define NEED_BOOST
@@ -91,11 +109,11 @@ static bool need_refresh = false;
 
 static void timer_isr(void)
 {
-    rb->lcd_blit(bitbuffer[curbuf][0], 0, 0, BUF_WIDTH, BUF_HEIGHT, BUF_WIDTH);
+    rb->lcd_blit_mono(bitbuffer[curbuf][0], 0, 0, BUF_WIDTH, BUF_HEIGHT, BUF_WIDTH);
     curbuf = (curbuf + 1) & 1;
     if (need_refresh)
     {
-        rb->lcd_update_rect(TEXT_X, 0, LCD_WIDTH-TEXT_X, 8);
+        rb->lcd_update_rect(TEXT_X, TEXT_Y, LCD_WIDTH-TEXT_X, 8);
         need_refresh = false;
     }
 }
@@ -109,17 +127,16 @@ int plugin_main(void)
     
     rb->lcd_setfont(FONT_SYSFIXED);
 
-    rb->lcd_putsxy(TEXT_X, 12, "Adjust Frequ.");
-    rb->lcd_putsxy(TEXT_X, 20, "so the block");
-    rb->lcd_putsxy(TEXT_X, 28, "stops moving.");
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD) \
- || (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-    rb->lcd_putsxy(TEXT_X, 40, "U/D: Coarse");
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
-   || (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-    rb->lcd_putsxy(TEXT_X, 40, "Scroll: Coarse");
+    rb->lcd_putsxy(TEXT_X, TEXT_Y+12, "Adjust Frequ.");
+    rb->lcd_putsxy(TEXT_X, TEXT_Y+20, "so the block");
+    rb->lcd_putsxy(TEXT_X, TEXT_Y+28, "stops moving.");
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+ || (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+    rb->lcd_putsxy(TEXT_X, TEXT_Y+40, "Scroll: Coarse");
+#else
+    rb->lcd_putsxy(TEXT_X, TEXT_Y+40, "U/D: Coarse");
 #endif
-    rb->lcd_putsxy(TEXT_X, 48, "L/R: Fine");
+    rb->lcd_putsxy(TEXT_X, TEXT_Y+48, "L/R: Fine");
     rb->lcd_update();
 
     rb->memset(bitbuffer[0], 0, sizeof(bitbuffer[0]));
@@ -138,7 +155,7 @@ int plugin_main(void)
             rb->timer_set_period(TIMER_FREQ * 5 / scan_rate);
             rb->snprintf(buf, sizeof(buf), "f: %d.%d Hz", scan_rate / 10,
                          scan_rate % 10);
-            rb->lcd_putsxy(TEXT_X, 0, buf);
+            rb->lcd_putsxy(TEXT_X, TEXT_Y, buf);
             need_refresh = true;
             change = false;
         }
