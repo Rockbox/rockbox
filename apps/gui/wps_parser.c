@@ -443,6 +443,10 @@ static int parse_image_display(const char *wps_bufptr,
 
     if ((subimage = get_image_id(wps_bufptr[1])) != -1)
     {
+        /* Sanity check */
+        if (subimage >= wps_data->img[n].num_subimages)
+            return WPS_ERROR_INVALID_PARAM;
+
         /* Store sub-image number to display in high bits */
         token->value.i = n | (subimage << 8);
         return 2; /* We have consumed 2 bytes */
@@ -1382,7 +1386,7 @@ static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
                 *loaded = true;
 
                 /* Calculate and store height if this image has sub-images */
-		if (n < MAX_IMAGES)
+                if (n < MAX_IMAGES)
                     wps_data->img[n].subimage_height = wps_data->img[n].bm.height /
                                                        wps_data->img[n].num_subimages;
             }
