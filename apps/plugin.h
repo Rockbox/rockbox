@@ -201,7 +201,7 @@ struct plugin_api {
     || defined (IRIVER_H10)
     void (*lcd_yuv_set_options)(unsigned options);
 #endif
-#elif (LCD_DEPTH < 4) || !defined(SIMULATOR)
+#elif (LCD_DEPTH < 4) && !defined(SIMULATOR)
     void (*lcd_blit_mono)(const unsigned char *data, int x, int by, int width,
                           int bheight, int stride);
     void (*lcd_blit_grey_phase)(unsigned char *values, unsigned char *phases,

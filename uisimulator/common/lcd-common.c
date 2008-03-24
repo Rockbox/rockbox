@@ -24,17 +24,6 @@
 #include "lcd.h"
 #include "lcd-sdl.h"
 
-void lcd_blit_mono(const unsigned char *data, int x, int y, int width, int height,
-                   int stride)
-{
-    (void)data;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-    (void)stride;
-}
-    
 void lcd_set_flip(bool yesno)
 {
     (void)yesno;

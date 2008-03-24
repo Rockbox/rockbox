@@ -122,7 +122,7 @@ static const struct plugin_api rockbox_api = {
     || defined (IRIVER_H10)
     lcd_yuv_set_options,
 #endif
-#elif (LCD_DEPTH < 4) || !defined(SIMULATOR)
+#elif (LCD_DEPTH < 4) && !defined(SIMULATOR)
     lcd_blit_mono,
     lcd_blit_grey_phase,
 #endif /* LCD_DEPTH */
