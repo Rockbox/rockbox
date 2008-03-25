@@ -34,7 +34,7 @@ pacbox
 
 /* For all the color targets */
 #if defined(HAVE_LCD_COLOR) || \
-    (LCD_DEPTH == 2) && !defined(ARCHOS_AV300) && !defined(IAUDIO_M3)
+    (LCD_DEPTH == 2) && !defined(ARCHOS_AV300)
 doom
 #endif
 
@@ -42,9 +42,7 @@ doom
 #if CONFIG_CODEC == SWCODEC
 midi
 /* beatbox */
-#ifndef IAUDIO_M3 /* TODO: no greyscale lib yet */
 mpegplayer
-#endif
 #endif
 
 #endif /* IRIVER_IFP7XX_SERIES */

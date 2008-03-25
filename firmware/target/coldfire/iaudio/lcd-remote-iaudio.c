@@ -64,83 +64,106 @@ bool remote_initialized = false;
 static inline void _write_byte(unsigned data)
 {
     asm volatile (
-        "move.l  (%[gpo0]), %%d0     \n"  /* Get current state of data line */
-        "and.l   %[dbit], %%d0       \n"
+        "move.w  %%sr,%%d2           \n"  /* Get current interrupt level */
+        "move.w  #0x2700,%%sr        \n"  /* Disable interrupts */
+
+        "move.l  (%[gpo0]), %%d0     \n"  /* Get current state of data port */
+        "move.l  %%d0, %%d1          \n"
+        "and.l   %[dbit], %%d1       \n"  /* Check current state of data line */
         "beq.s   1f                  \n"  /*   and set it as previous-state bit */
-        "bset    #8, %[data]         \n"  
+        "bset    #8, %[data]         \n"
     "1:                              \n"
-        "move.l  %[data], %%d0       \n"  /* Compute the 'bit derivative', i.e. a value */
-        "lsr.l   #1, %%d0            \n"  /*   with 1's where the data changes from the */
-        "eor.l   %%d0, %[data]       \n"  /*   previous state, and 0's where it doesn't */
+        "move.l  %[data], %%d1       \n"  /* Compute the 'bit derivative', i.e. a value */
+        "lsr.l   #1, %%d1            \n"  /*   with 1's where the data changes from the */
+        "eor.l   %%d1, %[data]       \n"  /*   previous state, and 0's where it doesn't */
         "swap    %[data]             \n"  /* Shift data to upper byte */
         "lsl.l   #8, %[data]         \n"
         
-        "move.l  %[cbit], %%d1       \n"  /* Prepare mask for flipping CLK */
-        "or.l    %[dbit], %%d1       \n"  /*   and DATA at once */
-
+        "eor.l   %[cbit], %%d0       \n"  /* precalculate opposite state of clock line */
+        
         "lsl.l   #1,%[data]          \n"  /* Shift out MSB */
         "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"  /* 1: Flip both CLK and DATA */
-        ".word   0x51fa              \n"  /* (trapf.w - shadow next insn) */
+        "eor.l   %[dbit], %%d0       \n"  /* 1: Flip data bit */
     "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"  /*   else flip CLK only */
-        "eor.l   %[cbit], (%[gpo0])  \n"  /* Flip CLK again */
+        "move.l  %%d0, %%d1          \n"
+        "move.l  %%d0, (%[gpo0])     \n"  /* Output new state and set CLK = 0*/
+        "eor.l   %[cbit], %%d1       \n"
+        "nop                         \n"
 
         "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
         "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
+        "eor.l   %[dbit], %%d0       \n"
     "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
+        "move.l  %%d1, (%[gpo0])     \n"  /* set CLK = 1 (delayed) */
+        "move.l  %%d0, %%d1          \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d1       \n"
+        "nop                         \n"
 
-        "lsl.l   #1,%[data]          \n"
+        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
         "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
+        "eor.l   %[dbit], %%d0       \n"
     "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
+        "move.l  %%d1, (%[gpo0])     \n"
+        "move.l  %%d0, %%d1          \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d1       \n"
+        "nop                         \n"
 
-        "lsl.l   #1,%[data]          \n"
+        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
         "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
+        "eor.l   %[dbit], %%d0       \n"
     "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
+        "move.l  %%d1, (%[gpo0])     \n"
+        "move.l  %%d0, %%d1          \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d1       \n"
+        "nop                         \n"
 
-        "lsl.l   #1,%[data]          \n"
+        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
         "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
+        "eor.l   %[dbit], %%d0       \n"
     "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
+        "move.l  %%d1, (%[gpo0])     \n"
+        "move.l  %%d0, %%d1          \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d1       \n"
+        "nop                         \n"
 
-        "lsl.l   #1,%[data]          \n"
+        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
         "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
+        "eor.l   %[dbit], %%d0       \n"
     "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
+        "move.l  %%d1, (%[gpo0])     \n"
+        "move.l  %%d0, %%d1          \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d1       \n"
+        "nop                         \n"
 
-        "lsl.l   #1,%[data]          \n"
+        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
         "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
+        "eor.l   %[dbit], %%d0       \n"
     "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
+        "move.l  %%d1, (%[gpo0])     \n"
+        "move.l  %%d0, %%d1          \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d1       \n"
+        "nop                         \n"
 
-        "lsl.l   #1,%[data]          \n"
+        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
         "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
+        "eor.l   %[dbit], %%d0       \n"
     "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
+        "move.l  %%d1, (%[gpo0])     \n"
+        "move.l  %%d0, %%d1          \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d1       \n"
+        "nop                         \n"
+
+        "nop                         \n"
+        "move.l  %%d1, (%[gpo0])     \n" /* set CLK = 1 (delayed) */
+
+        "move.w  %%d2, %%sr          \n" /* Restore interrupt level */
         : /* outputs */
         [data]"+d"(data)
         : /* inputs */
@@ -148,7 +171,7 @@ static inline void _write_byte(unsigned data)
         [cbit]"d"(0x00004000),
         [dbit]"d"(0x00002000)
         : /* clobbers */
-        "d0", "d1"
+        "d0", "d1", "d2"
     );
 }
 
@@ -157,7 +180,7 @@ static inline void _write_byte(unsigned data)
 static inline void _write_fast(unsigned data)
 {
     asm volatile (
-        "move.w  %%sr,%%d3           \n"  /* Get current interrupt level */
+        "move.w  %%sr,%%d2           \n"  /* Get current interrupt level */
         "move.w  #0x2700,%%sr        \n"  /* Disable interrupts */
 
         "move.l  (%[gpo0]), %%d0     \n"  /* Get current state of data port */
@@ -239,7 +262,7 @@ static inline void _write_fast(unsigned data)
         "move.l  %%d1, (%[gpo0])     \n"
         "move.l  %%d0, (%[gpo0])     \n"
 
-        "move.w  %%d3, %%sr          \n" /* Restore interrupt level */
+        "move.w  %%d2, %%sr          \n" /* Restore interrupt level */
         : /* outputs */
         [data]"+d"(data)
         : /* inputs */
@@ -247,7 +270,7 @@ static inline void _write_fast(unsigned data)
         [cbit]"d"(0x00004000),
         [dbit]"d"(0x00002000)
         : /* clobbers */
-        "d0", "d1", "d2", "d3"
+        "d0", "d1", "d2"
     );
 }
 

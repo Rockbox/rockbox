@@ -116,7 +116,7 @@ int button_read_device(void)
                     else
                         btn |= BUTTON_RC_VOL_DOWN;
         }
-        if ((GPIO_READ & 0x80000000) == 0)
+        if ((GPIO_READ & 0x80000000) == 0)    
             btn |= BUTTON_RC_PLAY;
     }
 

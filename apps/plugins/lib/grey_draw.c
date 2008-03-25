@@ -630,7 +630,7 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     {
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
         int idx = _GREY_MULUQ(_grey_info.width, yc);
-#else
+#else /* vertical packing or vertical interleaved */
         int idx = _GREY_MULUQ(_grey_info.width, yc & ~_GREY_BMASK)
                 + (~yc & _GREY_BMASK);
 #endif /* LCD_PIXELFORMAT */

@@ -134,8 +134,8 @@ void grey_ub_scroll_down(int count);
 
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 #define _GREY_BSHIFT 0
-#else
-#if LCD_DEPTH == 1
+#else /* vertical packing or vertical interleaved */
+#if (LCD_DEPTH == 1) || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
 #define _GREY_BSHIFT 3
 #elif LCD_DEPTH == 2
 #define _GREY_BSHIFT 2
@@ -155,7 +155,7 @@ struct _grey_info
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     int bx;         /* 8-pixel units */
     int bwidth;     /* 8-pixel units */
-#else /* vertical packing */
+#else /* vertical packing or vertical interleaved */
     int by;         /* 4-pixel or 8-pixel units */
     int bheight;    /* 4-pixel or 8-pixel units */
 #endif

@@ -61,263 +61,6 @@ static int cached_contrast = DEFAULT_CONTRAST_SETTING;
 bool initialized = false;
 
 
-/* Standard low-level byte writer. Requires CLK high on entry */
-static inline void _write_byte(unsigned data)
-{
-    asm volatile (
-        "move.l  (%[gpo0]), %%d0     \n"  /* Get current state of data line */
-        "and.l   %[dbit], %%d0       \n"
-        "beq.s   1f                  \n"  /*   and set it as previous-state bit */
-        "bset    #8, %[data]         \n"  
-    "1:                              \n"
-        "move.l  %[data], %%d0       \n"  /* Compute the 'bit derivative', i.e. a value */
-        "lsr.l   #1, %%d0            \n"  /*   with 1's where the data changes from the */
-        "eor.l   %%d0, %[data]       \n"  /*   previous state, and 0's where it doesn't */
-        "swap    %[data]             \n"  /* Shift data to upper byte */
-        "lsl.l   #8, %[data]         \n"
-        
-        "move.l  %[cbit], %%d1       \n"  /* Prepare mask for flipping CLK */
-        "or.l    %[dbit], %%d1       \n"  /*   and DATA at once */
-
-        "lsl.l   #1,%[data]          \n"  /* Shift out MSB */
-        "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"  /* 1: Flip both CLK and DATA */
-        ".word   0x51fa              \n"  /* (trapf.w - shadow next insn) */
-    "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"  /*   else flip CLK only */
-        "eor.l   %[cbit], (%[gpo0])  \n"  /* Flip CLK again */
-
-        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
-        "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
-    "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
-    "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
-    "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
-    "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
-    "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
-    "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %%d1, (%[gpo0])     \n"
-        ".word   0x51fa              \n"
-    "1:                              \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        "eor.l   %[cbit], (%[gpo0])  \n"
-        : /* outputs */
-        [data]"+d"(data)
-        : /* inputs */
-        [gpo0]"a"(&GPIO_OUT),
-        [cbit]"d"(0x20000000),
-        [dbit]"d"(0x04000000)
-        : /* clobbers */
-        "d0", "d1"
-    );
-}
-
-/* Fast low-level byte writer. Don't use with high CPU clock.
- * Requires CLK high on entry */
-static inline void _write_fast(unsigned data)
-{
-    asm volatile (
-        "move.w  %%sr,%%d3           \n"  /* Get current interrupt level */
-        "move.w  #0x2700,%%sr        \n"  /* Disable interrupts */
-
-        "move.l  (%[gpo0]), %%d0     \n"  /* Get current state of data port */
-        "move.l  %%d0, %%d1          \n"
-        "and.l   %[dbit], %%d1       \n"  /* Check current state of data line */
-        "beq.s   1f                  \n"  /*   and set it as previous-state bit */
-        "bset    #8, %[data]         \n"
-    "1:                              \n"
-        "move.l  %[data], %%d1       \n"  /* Compute the 'bit derivative', i.e. a value */
-        "lsr.l   #1, %%d1            \n"  /*   with 1's where the data changes from the */
-        "eor.l   %%d1, %[data]       \n"  /*   previous state, and 0's where it doesn't */
-        "swap    %[data]             \n"  /* Shift data to upper byte */
-        "lsl.l   #8, %[data]         \n"
-        
-        "move.l  %%d0, %%d1          \n"  /* precalculate opposite state of clock line */
-        "eor.l   %[cbit], %%d1       \n"
-        
-        "lsl.l   #1,%[data]          \n"  /* Shift out MSB */
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"  /* 1: Flip data bit */
-        "eor.l   %[dbit], %%d1       \n"  /*   for both clock states */
-    "1:                              \n"
-        "move.l  %%d1, (%[gpo0])     \n"  /* Output new state and set CLK */
-        "move.l  %%d0, (%[gpo0])     \n"  /* reset CLK */
-
-        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "eor.l   %[dbit], %%d1       \n"
-    "1:                              \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "eor.l   %[dbit], %%d1       \n"
-    "1:                              \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "eor.l   %[dbit], %%d1       \n"
-    "1:                              \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "eor.l   %[dbit], %%d1       \n"
-    "1:                              \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "eor.l   %[dbit], %%d1       \n"
-    "1:                              \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "eor.l   %[dbit], %%d1       \n"
-    "1:                              \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-
-        "lsl.l   #1,%[data]          \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "eor.l   %[dbit], %%d1       \n"
-    "1:                              \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo0])     \n"
-
-        "move.w  %%d3, %%sr          \n" /* Restore interrupt level */
-        : /* outputs */
-        [data]"+d"(data)
-        : /* inputs */
-        [gpo0]"a"(&GPIO_OUT),
-        [cbit]"d"(0x20000000),
-        [dbit]"d"(0x04000000)
-        : /* clobbers */
-        "d0", "d1", "d2", "d3"
-    );
-}
-
-void lcd_write_command(int cmd)
-{
-    RS_LO;
-    CS_LO;
-    _write_byte(cmd);
-    CS_HI;
-}
-
-void lcd_write_command_e(int cmd, int data)
-{
-    RS_LO;
-    CS_LO;
-    _write_byte(cmd);
-    _write_byte(data);
-    CS_HI;
-}
-
-void lcd_write_data(const fb_data *p_words, int count)
-{
-    const unsigned char *p_bytes = (const unsigned char *)p_words;
-    const unsigned char *p_end = (const unsigned char *)(p_words + count);
-
-    RS_HI;
-    CS_LO;
-    if (cpu_frequency < 50000000)
-    {
-        while (p_bytes < p_end)
-            _write_fast(*p_bytes++);
-    }
-    else
-    {
-        while (p_bytes < p_end)
-            _write_byte(*p_bytes++);
-    }
-    CS_HI;
-}
-
-static void lcd_mono_data(const unsigned char *p_words, int count)
-{
-    unsigned data;
-    const unsigned char *p_bytes = p_words;
-    const unsigned char *p_end = p_words + count;
-
-    RS_HI;
-    CS_LO;
-    if (cpu_frequency < 50000000)
-    {
-        while (p_bytes < p_end)
-        {
-            data = *p_bytes++;
-            _write_fast(data);
-            _write_fast(data);
-        }
-    }
-    else
-    {
-        while (p_bytes < p_end)
-        {
-            data = *p_bytes++;
-            _write_byte(data);
-            _write_byte(data);
-        }
-    }
-    CS_HI;
-}
-
 int lcd_default_contrast(void)
 {
     return DEFAULT_CONTRAST_SETTING;
@@ -457,6 +200,9 @@ void lcd_init_device(void)
 #endif
 }
 
+/* Helper function. */
+void lcd_mono_data(const unsigned char *data, int count);
+
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
 void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
@@ -477,20 +223,28 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
     }
 }
 
-/* TODO: implement grey blit function */
+/* Helper function for lcd_grey_phase_blit(). */
+void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
 void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
-    (void)values;
-    (void)phases;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
+    if (initialized)
+    {
+        stride <<= 3; /* 8 pixels per block */
+        while (bheight--)
+        {
+            lcd_write_command(LCD_SET_PAGE | ((by > 5 ? by + 2 : by) & 0xf));
+            lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
+
+            lcd_grey_data(values, phases, width);
+            values += stride;
+            phases += stride;
+            by++;
+        }
+    }
 }
 
 /* Update the display.
@@ -501,12 +255,13 @@ void lcd_update(void)
     int y;
     if (initialized)
     {
-        for(y = 0;y < LCD_FBHEIGHT;y++) {
+        for(y = 0;y < LCD_FBHEIGHT;y++) 
+        {
             /* Copy display bitmap to hardware.
                The COM48-COM63 lines are not connected so we have to skip
                them. Further, the column address doesn't wrap, so we
                have to update one page at a time. */
-            lcd_write_command(LCD_SET_PAGE | (y>5?y+2:y));
+            lcd_write_command(LCD_SET_PAGE | (y > 5 ? y + 2 : y));
             lcd_write_command_e(LCD_SET_COLUMN | 0, 0);
             lcd_write_data(lcd_framebuffer[y], LCD_WIDTH);
         }
@@ -536,7 +291,7 @@ void lcd_update_rect(int x, int y, int width, int height)
            COM48-COM63 are not connected, so we need to skip those */
         for (; y <= ymax; y++) 
         {
-            lcd_write_command(LCD_SET_PAGE | ((y > 5?y + 2:y) & 0xf));
+            lcd_write_command(LCD_SET_PAGE | ((y > 5 ? y + 2 : y) & 0xf));
             lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
 
             lcd_write_data(&lcd_framebuffer[y][x], width);
@@ -547,19 +302,23 @@ void lcd_update_rect(int x, int y, int width, int height)
 void lcd_set_invert_display(bool yesno)
 {
     cached_invert = yesno;
-    if(initialized)
+    if (initialized)
         lcd_write_command(LCD_REVERSE | yesno);
 }
 
 void lcd_set_flip(bool yesno)
 {
     cached_flip = yesno;
-    if(initialized) {
-        if(yesno) {
+    if (initialized)
+    {
+        if(yesno) 
+        {
             lcd_write_command(LCD_SELECT_ADC | 0);
             lcd_write_command(LCD_SELECT_SHL | 0);
             lcd_write_command_e(LCD_SET_COM0, 16);
-        } else {
+        }
+        else 
+        {
             lcd_write_command(LCD_SELECT_ADC | 1);
             lcd_write_command(LCD_SELECT_SHL | 8);
             lcd_write_command_e(LCD_SET_COM0, 0);

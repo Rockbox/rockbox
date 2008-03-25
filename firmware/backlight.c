@@ -468,7 +468,7 @@ void backlight_thread(void)
                 lcd_remote_off();
                 break;
 #elif defined HAVE_REMOTE_LCD_AS_MAIN
-            case SYS_REMOTE_PLUGGED:
+            case SYS_REMOTE_PLUGGED:        
                 lcd_on();
                 lcd_update();
                 break;
