@@ -29,4 +29,6 @@ void sim_exit_irq_handler(void);
 bool sim_kernel_init(void);
 void sim_kernel_shutdown(void);
 
+extern long start_tick;
+
 #endif /* _SYSTEM_SDL_H_ */

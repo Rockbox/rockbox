@@ -253,15 +253,12 @@ static const struct plugin_api rockbox_api = {
     /* kernel/ system */
     PREFIX(sleep),
     yield,
-#ifdef HAVE_PRIORITY_SCHEDULING
-    priority_yield,
-#endif
     &current_tick,
     default_event_handler,
     default_event_handler_ex,
     threads,
     create_thread,
-    remove_thread,
+    thread_exit,
     thread_wait,
 #if (CONFIG_CODEC == SWCODEC)
     mutex_init,

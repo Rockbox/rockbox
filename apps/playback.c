@@ -2549,9 +2549,7 @@ void audio_init(void)
        to send messages. Thread creation will be delayed however so nothing
        starts running until ready if something yields such as talk_init. */
     queue_init(&audio_queue, true);
-    queue_enable_queue_send(&audio_queue, &audio_queue_sender_list);
     queue_init(&codec_queue, false);
-    queue_enable_queue_send(&codec_queue, &codec_queue_sender_list);
     queue_init(&pcmbuf_queue, false);
 
     pcm_init();
@@ -2587,10 +2585,16 @@ void audio_init(void)
             codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK)
             IF_COP(, CPU));
 
+    queue_enable_queue_send(&codec_queue, &codec_queue_sender_list,
+                            codec_thread_p);
+
     audio_thread_p = create_thread(audio_thread, audio_stack,
                   sizeof(audio_stack), CREATE_THREAD_FROZEN,
-                  audio_thread_name IF_PRIO(, PRIORITY_SYSTEM)
+                  audio_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
+
+    queue_enable_queue_send(&audio_queue, &audio_queue_sender_list,
+                            audio_thread_p);
 
 #ifdef PLAYBACK_VOICE
     voice_thread_init();

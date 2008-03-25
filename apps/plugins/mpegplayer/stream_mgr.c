@@ -987,7 +987,6 @@ int stream_init(void)
 
     stream_mgr.q = &stream_mgr_queue;
     rb->queue_init(stream_mgr.q, false);
-    rb->queue_enable_queue_send(stream_mgr.q, &stream_mgr_queue_send);
 
     /* sets audiosize and returns buffer pointer */
     mem = rb->plugin_get_audio_buffer(&memsize);
@@ -1027,6 +1026,9 @@ int stream_init(void)
     stream_mgr.thread = rb->create_thread(stream_mgr_thread,
         stream_mgr_thread_stack, sizeof(stream_mgr_thread_stack),
         0, "mpgstream_mgr" IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU));
+
+    rb->queue_enable_queue_send(stream_mgr.q, &stream_mgr_queue_send,
+                                stream_mgr.thread);
 
     if (stream_mgr.thread == NULL)
     {

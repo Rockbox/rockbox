@@ -40,18 +40,12 @@
 #include "SDL_thread.h"
 
 /* extern functions */
-extern void                 app_main (void *); /* mod entry point */
-extern void                 new_key(int key);
-extern void                 sim_tick_tasks(void);
-extern bool                 sim_io_init(void);
-extern void                 sim_io_shutdown(void);
+extern void new_key(int key);
 
 void button_event(int key, bool pressed);
 
 SDL_Surface *gui_surface;
 bool background = false;        /* Don't use backgrounds by default */
-
-SDL_TimerID tick_timer_id;
 
 bool lcd_display_redraw = true;         /* Used for player simulator */
 char having_new_lcd = true;               /* Used for player simulator */
@@ -62,31 +56,6 @@ bool debug_audio = false;
 
 bool debug_wps = false;
 int wps_verbose_level = 3;
-
-long start_tick;
-
-Uint32 tick_timer(Uint32 interval, void *param)
-{
-    long new_tick;
-
-    (void) interval;
-    (void) param;
-    
-    new_tick = (SDL_GetTicks() - start_tick) / (1000/HZ);
-        
-    if (new_tick != current_tick) {
-        long i;
-        for (i = new_tick - current_tick; i > 0; i--)
-        {
-            sim_enter_irq_handler();
-            sim_tick_tasks();
-            sim_exit_irq_handler();
-        }
-        current_tick = new_tick;
-    }
-    
-    return 1;
-}
 
 void gui_message_loop(void)
 {
@@ -181,8 +150,6 @@ bool gui_startup(void)
         SDL_UpdateRect(gui_surface, 0, 0, 0, 0);
     }
     
-    start_tick = SDL_GetTicks();
-
     return true;
 }
 
@@ -191,7 +158,6 @@ bool gui_shutdown(void)
     /* Order here is relevent to prevent deadlocks and use of destroyed
        sync primitives by kernel threads */
     thread_sdl_shutdown();
-    SDL_RemoveTimer(tick_timer_id);
     sim_kernel_shutdown();
     return true;
 }
@@ -286,8 +252,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "thread_sdl_init failed\n");
         return -1;
     }
-
-    tick_timer_id = SDL_AddTimer(10, tick_timer, NULL);
 
     gui_message_loop();
 

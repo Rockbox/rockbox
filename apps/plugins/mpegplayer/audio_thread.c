@@ -714,12 +714,14 @@ bool audio_thread_init(void)
     /* Start the audio thread */
     audio_str.hdr.q = &audio_str_queue;
     rb->queue_init(audio_str.hdr.q, false);
-    rb->queue_enable_queue_send(audio_str.hdr.q, &audio_str_queue_send);
 
     /* One-up on the priority since the core DSP over-yields internally */
     audio_str.thread = rb->create_thread(
         audio_thread, audio_stack, audio_stack_size, 0,
-        "mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK-1) IF_COP(, CPU));
+        "mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK-4) IF_COP(, CPU));
+
+    rb->queue_enable_queue_send(audio_str.hdr.q, &audio_str_queue_send,
+                                audio_str.thread);
 
     if (audio_str.thread == NULL)
         return false;

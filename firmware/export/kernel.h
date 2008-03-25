@@ -76,6 +76,8 @@
 #define SYS_SCREENDUMP            MAKE_SYS_EVENT(SYS_EVENT_CLS_MISC, 0)
 #define SYS_CAR_ADAPTER_RESUME    MAKE_SYS_EVENT(SYS_EVENT_CLS_MISC, 1)
 
+#define IS_SYSEVENT(ev)           ((ev & SYS_EVENT) == SYS_EVENT)
+
 struct queue_event
 {
     long     id;
@@ -87,68 +89,92 @@ struct queue_sender_list
 {
     /* If non-NULL, there is a thread waiting for the corresponding event */
     /* Must be statically allocated to put in non-cached ram. */
-    struct thread_entry *senders[QUEUE_LENGTH];
+    struct thread_entry *senders[QUEUE_LENGTH]; /* message->thread map */
+    struct thread_entry *list;                  /* list of senders in map */
     /* Send info for last message dequeued or NULL if replied or not sent */
     struct thread_entry *curr_sender;
+#ifdef HAVE_PRIORITY_SCHEDULING
+    struct blocker blocker;
+#endif
 };
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
+#ifdef HAVE_PRIORITY_SCHEDULING
+#define QUEUE_GET_THREAD(q) \
+    (((q)->send == NULL) ? NULL : (q)->send->blocker.thread)
+#else
+/* Queue without priority enabled have no owner provision _at this time_ */
+#define QUEUE_GET_THREAD(q) \
+    (NULL)
+#endif
+
 struct event_queue
 {
-    struct thread_queue queue;         /* Waiter list */
+    struct thread_entry *queue;         /* waiter list */
     struct queue_event events[QUEUE_LENGTH]; /* list of events */
-    unsigned int read;                 /* head of queue */
-    unsigned int write;                /* tail of queue */
+    unsigned int read;                  /* head of queue */
+    unsigned int write;                 /* tail of queue */
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-    struct queue_sender_list *send;    /* list of threads waiting for
-                                          reply to an event */
+    struct queue_sender_list *send;     /* list of threads waiting for
+                                           reply to an event */
+#ifdef HAVE_PRIORITY_SCHEDULING
+    struct blocker *blocker_p;          /* priority inheritance info
+                                           for sync message senders */
 #endif
-#if NUM_CORES > 1
-    struct corelock cl;                /* inter-core sync */
 #endif
+    IF_COP( struct corelock cl; )       /* multiprocessor sync */
 };
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+#define MUTEX_SET_THREAD(m, t) ((m)->blocker.thread = (t))
+#define MUTEX_GET_THREAD(m)    ((m)->blocker.thread)
+#else
+#define MUTEX_SET_THREAD(m, t) ((m)->thread = (t))
+#define MUTEX_GET_THREAD(m)    ((m)->thread)
+#endif
 
 struct mutex
 {
-    struct thread_entry *queue;  /* Waiter list */
-#if CONFIG_CORELOCK == SW_CORELOCK
-    struct corelock cl;          /* inter-core sync */
+    struct thread_entry *queue;         /* waiter list */
+    int count;                          /* lock owner recursion count */
+#ifdef HAVE_PRIORITY_SCHEDULING
+    struct blocker blocker;             /* priority inheritance info
+                                           for waiters */
+    bool no_preempt;                    /* don't allow higher-priority thread
+                                           to be scheduled even if woken */
+#else
+    struct thread_entry *thread;
 #endif
-    struct thread_entry *thread; /* thread that owns lock */
-    int count;                   /* lock owner recursion count */
-    unsigned char locked;        /* locked semaphore */
+    IF_COP( struct corelock cl; )       /* multiprocessor sync */
+    unsigned char locked;               /* locked semaphore */
 };
 
 #if NUM_CORES > 1
 struct spinlock
 {
-    struct corelock cl;          /* inter-core sync */
-    struct thread_entry *thread; /* lock owner */
-    int count;                   /* lock owner recursion count */
+    struct thread_entry *thread;        /* lock owner */
+    int count;                          /* lock owner recursion count */
+    struct corelock cl;                 /* multiprocessor sync */
 };
 #endif
 
 #ifdef HAVE_SEMAPHORE_OBJECTS
 struct semaphore
 {
-    struct thread_entry *queue;  /* Waiter list */
-#if CONFIG_CORELOCK == SW_CORELOCK
-    struct corelock cl;          /* inter-core sync */
-#endif
-    int count;                   /* # of waits remaining before unsignaled */
-    int max;                     /* maximum # of waits to remain signaled */
+    struct thread_entry *queue;         /* Waiter list */
+    int count;                          /* # of waits remaining before unsignaled */
+    int max;                            /* maximum # of waits to remain signaled */
+    IF_COP( struct corelock cl; )       /* multiprocessor sync */
 };
 #endif
 
 #ifdef HAVE_EVENT_OBJECTS
 struct event
 {
-    struct thread_entry *queues[2]; /* waiters for each state */
-#if CONFIG_CORELOCK == SW_CORELOCK
-    struct corelock cl;             /* inter-core sync */
-#endif
-    unsigned char automatic;        /* event performs auto-reset */
-    unsigned char state;            /* state: 1 = signaled */
+    struct thread_entry *queues[2];     /* waiters for each state */
+    unsigned char automatic;            /* event performs auto-reset */
+    unsigned char state;                /* state: 1 = signaled */
+    IF_COP( struct corelock cl; )       /* multiprocessor sync */
 };
 #endif
 
@@ -208,7 +234,9 @@ extern void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev,
                              int ticks);
 extern void queue_post(struct event_queue *q, long id, intptr_t data);
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-extern void queue_enable_queue_send(struct event_queue *q, struct queue_sender_list *send);
+extern void queue_enable_queue_send(struct event_queue *q,
+                                    struct queue_sender_list *send,
+                                    struct thread_entry *owner);
 extern intptr_t queue_send(struct event_queue *q, long id, intptr_t data);
 extern void queue_reply(struct event_queue *q, intptr_t retval);
 extern bool queue_in_queue_send(struct event_queue *q);
@@ -223,6 +251,11 @@ extern int queue_broadcast(long id, intptr_t data);
 extern void mutex_init(struct mutex *m);
 extern void mutex_lock(struct mutex *m);
 extern void mutex_unlock(struct mutex *m);
+#ifdef HAVE_PRIORITY_SCHEDULING
+/* Temporary function to disable mutex preempting a thread on unlock */
+static inline void mutex_set_preempt(struct mutex *m, bool preempt)
+    { m->no_preempt = !preempt; }
+#endif
 #if NUM_CORES > 1
 extern void spinlock_init(struct spinlock *l);
 extern void spinlock_lock(struct spinlock *l);
@@ -240,6 +273,5 @@ extern void event_init(struct event *e, unsigned int flags);
 extern void event_wait(struct event *e, unsigned int for_state);
 extern void event_set_state(struct event *e, unsigned int state);
 #endif /* HAVE_EVENT_OBJECTS */
-#define IS_SYSEVENT(ev) ((ev & SYS_EVENT) == SYS_EVENT)
 
 #endif /* _KERNEL_H_ */

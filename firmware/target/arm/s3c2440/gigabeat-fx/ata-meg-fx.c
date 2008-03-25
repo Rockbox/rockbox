@@ -128,7 +128,7 @@ void copy_read_sectors(unsigned char* buf, int wordcount)
 
     /* Wait for transfer to complete */
     while((DSTAT0 & 0x000fffff))
-        priority_yield();
+        yield();
     /* Dump cache for the buffer  */
 }
 #endif

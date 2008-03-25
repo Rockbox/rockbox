@@ -198,7 +198,7 @@ static bool sd_poll_status(unsigned int trigger, long timeout)
         if (TIME_AFTER(time, next_yield))
         {
             long ty = USEC_TIMER;
-            priority_yield();
+            yield();
             timeout += USEC_TIMER - ty;
             next_yield = ty + MIN_YIELD_PERIOD;
         }
@@ -317,7 +317,7 @@ static int sd_wait_for_state(unsigned int state, int id)
         us = USEC_TIMER;
         if (TIME_AFTER(us, next_yield))
         {
-            priority_yield();
+            yield();
             timeout += USEC_TIMER - us;
             next_yield = us + MIN_YIELD_PERIOD;
         }

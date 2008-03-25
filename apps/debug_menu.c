@@ -127,11 +127,6 @@ static char thread_status_char(unsigned status)
         [STATE_KILLED]            = 'K',
     };
 
-#if NUM_CORES > 1
-    if (status == STATE_BUSY) /* Not a state index */
-        return '.';
-#endif
-
     if (status > THREAD_NUM_STATES)
         status = THREAD_NUM_STATES;
 
@@ -166,15 +161,15 @@ static char* threads_getname(int selected_item, void * data, char *buffer)
     thread_get_name(name, 32, thread);
 
     snprintf(buffer, MAX_PATH,
-             "%2d: " IF_COP("(%d) ") "%c%c " IF_PRIO("%d ") "%2d%% %s",
+             "%2d: " IF_COP("(%d) ") "%c%c " IF_PRIO("%d %d ") "%2d%% %s",
              selected_item,
              IF_COP(thread->core,)
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
-             (thread->boosted) ? '+' :
+             (thread->cpu_boost) ? '+' :
 #endif
                  ((thread->state == STATE_RUNNING) ? '*' : ' '),
              thread_status_char(thread->state),
-             IF_PRIO(thread->priority,)
+             IF_PRIO(thread->base_priority, thread->priority, )
              thread_stack_usage(thread), name);
 
     return buffer;

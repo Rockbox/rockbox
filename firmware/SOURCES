@@ -9,11 +9,11 @@ usb.c
 #ifdef ROCKBOX_HAS_LOGF
 logf.c
 #endif /* ROCKBOX_HAS_LOGF */
+kernel.c
 #ifndef SIMULATOR
 #ifdef RB_PROFILE
 profile.c
 #endif /* RB_PROFILE */
-kernel.c
 rolo.c
 thread.c
 timer.c
@@ -274,6 +274,10 @@ target/sh/archos/descramble.S
 
 #ifndef SIMULATOR
 target/coldfire/crt0.S
+#ifdef HAVE_PRIORITY_SCHEDULING
+common/ffs.c
+target/coldfire/ffs-coldfire.S
+#endif
 target/coldfire/memcpy-coldfire.S
 target/coldfire/memmove-coldfire.S
 target/coldfire/memset-coldfire.S
@@ -299,6 +303,9 @@ common/strlen.c
 #ifndef SIMULATOR
 target/arm/memset-arm.S
 target/arm/memset16-arm.S
+#ifdef HAVE_PRIORITY_SCHEDULING
+target/arm/ffs-arm.S
+#endif
 #if CONFIG_I2C == I2C_PP5024 || CONFIG_I2C == I2C_PP5020 || CONFIG_I2C == I2C_PP5002
 target/arm/i2c-pp.c
 #elif CONFIG_I2C == I2C_PNX0101
@@ -345,6 +352,9 @@ target/arm/crt0.S
 
 #else
 
+#ifdef HAVE_PRIORITY_SCHEDULING
+common/ffs.c
+#endif
 common/memcpy.c
 common/memmove.c
 common/memset.c

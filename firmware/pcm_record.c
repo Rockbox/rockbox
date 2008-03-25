@@ -361,11 +361,12 @@ unsigned long pcm_rec_sample_rate(void)
 void pcm_rec_init(void)
 {
     queue_init(&pcmrec_queue, true);
-    queue_enable_queue_send(&pcmrec_queue, &pcmrec_queue_send);
     pcmrec_thread_p =
         create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
                       0, pcmrec_thread_name IF_PRIO(, PRIORITY_RECORDING)
 		              IF_COP(, CPU));
+    queue_enable_queue_send(&pcmrec_queue, &pcmrec_queue_send,
+                            pcmrec_thread_p);
 } /* pcm_rec_init */
 
 /** audio_* group **/
@@ -874,9 +875,9 @@ static void pcmrec_flush(unsigned flush_num)
             logf("pcmrec: boost (%s)",
                  num >= flood_watermark ? "num" : "time");
             prio_pcmrec = thread_set_priority(NULL,
-                                thread_get_priority(NULL) - 1);
+                                thread_get_priority(NULL) - 4);
             prio_codec  = thread_set_priority(codec_thread_p,
-                                thread_get_priority(codec_thread_p) - 1);
+                                thread_get_priority(codec_thread_p) - 4);
         }
 #endif
 

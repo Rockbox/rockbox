@@ -371,10 +371,20 @@
 #endif
 
 /* define for all cpus from ARM family */
-#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-  || (CONFIG_CPU == DSC25) || (CONFIG_CPU == IMX31L) || (CONFIG_CPU == DM320) \
-  || defined(CPU_TCC77X) || defined(CPU_TCC780X)
+#if (CONFIG_CPU == IMX31L)
 #define CPU_ARM
+#define ARM_ARCH 6 /* ARMv6 */
+#endif
+
+#if defined(CPU_TCC77X) || defined(CPU_TCC780X)
+#define CPU_ARM
+#define ARM_ARCH 5 /* ARMv5 */
+#endif
+
+#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
+  || (CONFIG_CPU == DSC25) || (CONFIG_CPU == DM320)
+#define CPU_ARM
+#define ARM_ARCH 4 /* ARMv4 */
 #endif
 
 /* Determine if accesses should be strictly long aligned. */

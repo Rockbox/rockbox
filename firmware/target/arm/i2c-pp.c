@@ -45,7 +45,7 @@ static int pp_i2c_wait_not_busy(void)
          if (!(I2C_STATUS & I2C_BUSY)) {
             return 0;
          }
-         priority_yield();
+         yield();
     }
 
     return -1;

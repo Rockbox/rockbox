@@ -1446,16 +1446,21 @@ void buffering_thread(void)
 
 void buffering_init(void) {
     mutex_init(&llist_mutex);
+#ifdef HAVE_PRIORITY_SCHEDULING
+    /* This behavior not safe atm */
+    mutex_set_preempt(&llist_mutex, false);
+#endif
 
     conf_watermark = BUFFERING_DEFAULT_WATERMARK;
 
     queue_init(&buffering_queue, true);
-    queue_enable_queue_send(&buffering_queue, &buffering_queue_sender_list);
-
     buffering_thread_p = create_thread( buffering_thread, buffering_stack,
             sizeof(buffering_stack), CREATE_THREAD_FROZEN,
             buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING)
             IF_COP(, CPU));
+
+    queue_enable_queue_send(&buffering_queue, &buffering_queue_sender_list,
+                            buffering_thread_p);
 }
 
 /* Initialise the buffering subsystem */

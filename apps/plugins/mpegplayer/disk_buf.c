@@ -837,7 +837,6 @@ bool disk_buf_init(void)
 
     disk_buf.q = &disk_buf_queue;
     rb->queue_init(disk_buf.q, false);
-    rb->queue_enable_queue_send(disk_buf.q, &disk_buf_queue_send);
 
     disk_buf.state  = TSTATE_EOS;
     disk_buf.status = STREAM_STOPPED;
@@ -885,6 +884,9 @@ bool disk_buf_init(void)
     disk_buf.thread = rb->create_thread(
         disk_buf_thread, disk_buf_stack, sizeof(disk_buf_stack), 0,
         "mpgbuffer" IF_PRIO(, PRIORITY_BUFFERING) IF_COP(, CPU));
+
+    rb->queue_enable_queue_send(disk_buf.q, &disk_buf_queue_send,
+                                disk_buf.thread);
 
     if (disk_buf.thread == NULL)
         return false;

@@ -159,6 +159,20 @@ int get_cpu_boost_counter(void);
 #define H_TO_BE32(x) (x)
 #endif
 
+/* Get the byte offset of a type's member */
+#define OFFSETOF(type, membername) ((off_t)&((type *)0)->membername)
+
+/* Get the type pointer from one of its members */
+#define TYPE_FROM_MEMBER(type, memberptr, membername) \
+    ((type *)((intptr_t)(memberptr) - OFFSETOF(type, membername)))
+
+/* returns index of first set bit + 1 or 0 if no bits are set */
+int find_first_set_bit(uint32_t val);
+
+static inline __attribute__((always_inline))
+uint32_t isolate_first_bit(uint32_t val)
+    { return val & -val; }
+
 /* gcc 3.4 changed the format of the constraints */
 #if (__GNUC__ >= 3) && (__GNUC_MINOR__ > 3) || (__GNUC__ >= 4)
 #define I_CONSTRAINT "I08"

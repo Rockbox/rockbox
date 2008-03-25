@@ -270,7 +270,7 @@ static void init_tagcache(void)
 
 static void init(void)
 {
-    init_threads();
+    kernel_init();
     buffer_init();
     set_irq_level(0);
     lcd_init();

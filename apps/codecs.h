@@ -80,12 +80,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 22
+#define CODEC_API_VERSION 23
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 22
+#define CODEC_MIN_API_VERSION 23
 
 /* codec return codes */
 enum codec_status {
@@ -118,6 +118,9 @@ struct codec_api {
     /* If seek_time != 0, codec should seek to that song position (in ms)
        if codec supports seeking. */
     long seek_time;
+
+    /* The dsp instance to be used for audio output */
+    struct dsp_config *dsp;
     
     /* Returns buffer to malloc array. Only codeclib should need this. */
     void* (*get_codec_memory)(size_t *size);
@@ -159,6 +162,28 @@ struct codec_api {
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);
     void (*yield)(void);
+
+#if NUM_CORES > 1
+    struct thread_entry *
+        (*create_thread)(void (*function)(void), void* stack,
+                         size_t stack_size, unsigned flags, const char *name
+                         IF_PRIO(, int priority)
+                         IF_COP(, unsigned int core));
+
+    void (*thread_thaw)(struct thread_entry *thread);
+    void (*thread_wait)(struct thread_entry *thread);
+    void (*semaphore_init)(struct semaphore *s, int max, int start);
+    void (*semaphore_wait)(struct semaphore *s);
+    void (*semaphore_release)(struct semaphore *s);
+    void (*event_init)(struct event *e, unsigned int flags);
+    void (*event_wait)(struct event *e, unsigned int for_state);
+    void (*event_set_state)(struct event *e, unsigned int state);
+#endif /* NUM_CORES */
+
+#ifdef CACHE_FUNCTIONS_AS_CALL
+    void (*flush_icache)(void);
+    void (*invalidate_icache)(void);
+#endif
 
     /* strings and memory */
     char* (*strcpy)(char *dst, const char *src);
@@ -218,29 +243,6 @@ struct codec_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
 
-#ifdef CACHE_FUNCTIONS_AS_CALL
-    void (*flush_icache)(void);
-    void (*invalidate_icache)(void);
-#endif
-
-    struct dsp_config *dsp;
-
-#if NUM_CORES > 1
-    struct thread_entry *
-        (*create_thread)(void (*function)(void), void* stack,
-                         int stack_size, unsigned flags, const char *name
-                         IF_PRIO(, int priority)
-                         IF_COP(, unsigned int core));
-
-    void (*thread_thaw)(struct thread_entry *thread);
-    void (*thread_wait)(struct thread_entry *thread);
-    void (*semaphore_init)(struct semaphore *s, int max, int start);
-    void (*semaphore_wait)(struct semaphore *s);
-    void (*semaphore_release)(struct semaphore *s);
-    void (*event_init)(struct event *e, unsigned int flags);
-    void (*event_wait)(struct event *e, unsigned int for_state);
-    void (*event_set_state)(struct event *e, unsigned int state);
-#endif /* NUM_CORES */
 };
 
 /* codec header */

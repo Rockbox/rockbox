@@ -76,6 +76,7 @@ struct codec_api ci = {
     false, /* stop_codec */
     0, /* new_track */
     0, /* seek_time */
+    NULL, /* struct dsp_config *dsp */
     NULL, /* get_codec_memory */
     NULL, /* pcmbuf_insert */
     NULL, /* set_elapsed */
@@ -94,6 +95,23 @@ struct codec_api ci = {
     /* kernel/ system */
     PREFIX(sleep),
     yield,
+
+#if NUM_CORES > 1
+    create_thread,
+    thread_thaw,
+    thread_wait,
+    semaphore_init,
+    semaphore_wait,
+    semaphore_release,
+    event_init,
+    event_wait,
+    event_set_state,
+#endif
+
+#ifdef CACHE_FUNCTIONS_AS_CALL
+    flush_icache,
+    invalidate_icache,
+#endif
 
     /* strings and memory */
     strcpy,
@@ -147,24 +165,6 @@ struct codec_api ci = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#ifdef CACHE_FUNCTIONS_AS_CALL
-    flush_icache,
-    invalidate_icache,
-#endif
-
-    NULL, /* struct dsp_config *dsp */
-
-#if NUM_CORES > 1
-    create_thread,
-    thread_thaw,
-    thread_wait,
-    semaphore_init,
-    semaphore_wait,
-    semaphore_release,
-    event_init,
-    event_wait,
-    event_set_state,
-#endif
 };
 
 void codec_get_full_path(char *path, const char *codec_root_fn)

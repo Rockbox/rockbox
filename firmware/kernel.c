@@ -20,21 +20,30 @@
 #include <string.h>
 #include "config.h"
 #include "kernel.h"
+#ifdef SIMULATOR
+#include "system-sdl.h"
+#include "debug.h"
+#endif
 #include "thread.h"
 #include "cpu.h"
 #include "system.h"
 #include "panic.h"
 
 /* Make this nonzero to enable more elaborate checks on objects */
-#ifdef DEBUG
-#define KERNEL_OBJECT_CHECKS 1 /* Always 1 for DEBUG */
+#if defined(DEBUG) || defined(SIMULATOR)
+#define KERNEL_OBJECT_CHECKS 1 /* Always 1 for DEBUG and sim*/
 #else
 #define KERNEL_OBJECT_CHECKS 0
 #endif
 
 #if KERNEL_OBJECT_CHECKS
+#ifdef SIMULATOR
+#define KERNEL_ASSERT(exp, msg...) \
+    ({ if (!({ exp; })) { DEBUGF(msg); exit(-1); } })
+#else
 #define KERNEL_ASSERT(exp, msg...) \
     ({ if (!({ exp; })) panicf(msg); })
+#endif
 #else
 #define KERNEL_ASSERT(exp, msg...) ({})
 #endif
@@ -52,9 +61,7 @@ static struct
 {
     int count;
     struct event_queue *queues[MAX_NUM_QUEUES];
-#if NUM_CORES > 1
-    struct corelock cl;
-#endif
+    IF_COP( struct corelock cl; )
 } all_queues NOCACHEBSS_ATTR;
 
 /****************************************************************************
@@ -75,564 +82,6 @@ void kernel_init(void)
         corelock_init(&all_queues.cl);
         tick_start(1000/HZ);
     }
-}
-
-void sleep(int ticks)
-{
-#if CONFIG_CPU == S3C2440 && defined(BOOTLOADER)
-    volatile int counter;
-    TCON &= ~(1 << 20); // stop timer 4
-    // TODO: this constant depends on dividers settings inherited from
-    // firmware. Set them explicitly somwhere.
-    TCNTB4 = 12193 * ticks / HZ;
-    TCON |= 1 << 21; // set manual bit
-    TCON &= ~(1 << 21); // reset manual bit
-    TCON &= ~(1 << 22); //autoreload Off
-    TCON |= (1 << 20); // start timer 4
-    do {
-       counter = TCNTO4;
-    } while(counter > 0);
-
-#elif defined(CPU_PP) && defined(BOOTLOADER)
-    unsigned stop = USEC_TIMER + ticks * (1000000/HZ);
-    while (TIME_BEFORE(USEC_TIMER, stop))
-        switch_thread(NULL);
-#else
-    sleep_thread(ticks);
-#endif
-}
-
-void yield(void)
-{
-#if ((CONFIG_CPU == S3C2440 || defined(ELIO_TPJ1022)) && defined(BOOTLOADER))
-    /* Some targets don't like yielding in the bootloader */
-#else
-    switch_thread(NULL);
-#endif
-}
-
-/****************************************************************************
- * Queue handling stuff
- ****************************************************************************/
-
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-/* Moves waiting thread's descriptor to the current sender when a
-   message is dequeued */
-static void queue_fetch_sender(struct queue_sender_list *send,
-                               unsigned int i)
-{
-    struct thread_entry **spp = &send->senders[i];
-
-    if(*spp)
-    {
-        send->curr_sender = *spp;
-        *spp = NULL;
-    }
-}
-
-/* Puts the specified return value in the waiting thread's return value
- * and wakes the thread.
- * 1) A sender should be confirmed to exist before calling which makes it
- *    more efficent to reject the majority of cases that don't need this
-      called.
- * 2) Requires interrupts disabled since queue overflows can cause posts
- *    from interrupt handlers to wake threads. Not doing so could cause
- *    an attempt at multiple wakes or other problems.
- */
-static void queue_release_sender(struct thread_entry **sender,
-                                 intptr_t retval)
-{
-    (*sender)->retval = retval;
-    wakeup_thread_no_listlock(sender);
-    /* This should _never_ happen - there must never be multiple
-       threads in this list and it is a corrupt state */
-    KERNEL_ASSERT(*sender == NULL, "queue->send slot ovf: %08X", (int)*sender);
-}
-
-/* Releases any waiting threads that are queued with queue_send -
- * reply with 0.
- * Disable IRQs and lock before calling since it uses
- * queue_release_sender.
- */
-static void queue_release_all_senders(struct event_queue *q)
-{
-    if(q->send)
-    {
-        unsigned int i;
-        for(i = q->read; i != q->write; i++)
-        {
-            struct thread_entry **spp =
-                &q->send->senders[i & QUEUE_LENGTH_MASK];
-
-            if(*spp)
-            {
-                queue_release_sender(spp, 0);
-            }
-        }
-    }
-}
-
-/* Enables queue_send on the specified queue - caller allocates the extra
-   data structure. Only queues which are taken to be owned by a thread should
-   enable this. Public waiting is not permitted. */
-void queue_enable_queue_send(struct event_queue *q,
-                             struct queue_sender_list *send)
-{
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&q->cl);
-
-    q->send = NULL;
-    if(send != NULL)
-    {
-        memset(send, 0, sizeof(*send));
-        q->send = send;
-    }
-
-    corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
-}
-#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
-
-/* Queue must not be available for use during this call */
-void queue_init(struct event_queue *q, bool register_queue)
-{
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-
-    if(register_queue)
-    {
-        corelock_lock(&all_queues.cl);
-    }
-
-    corelock_init(&q->cl);
-    thread_queue_init(&q->queue);
-    q->read   = 0;
-    q->write  = 0;
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-    q->send   = NULL; /* No message sending by default */
-#endif
-
-    if(register_queue)
-    {
-        if(all_queues.count >= MAX_NUM_QUEUES)
-        {
-            panicf("queue_init->out of queues");
-        }
-        /* Add it to the all_queues array */
-        all_queues.queues[all_queues.count++] = q;
-        corelock_unlock(&all_queues.cl);
-    }
-
-    set_irq_level(oldlevel);
-}
-
-/* Queue must not be available for use during this call */
-void queue_delete(struct event_queue *q)
-{
-    int oldlevel;
-    int i;
-
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&all_queues.cl);
-    corelock_lock(&q->cl);
-
-    /* Find the queue to be deleted */
-    for(i = 0;i < all_queues.count;i++)
-    {
-        if(all_queues.queues[i] == q)
-        {
-            /* Move the following queues up in the list */
-            all_queues.count--;
-
-            for(;i < all_queues.count;i++)
-            {
-                all_queues.queues[i] = all_queues.queues[i+1];
-            }
-
-            break;
-        }
-    }
-
-    corelock_unlock(&all_queues.cl);
-
-    /* Release threads waiting on queue head */
-    thread_queue_wake(&q->queue);
-
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-    /* Release waiting threads for reply and reply to any dequeued
-       message waiting for one. */
-    queue_release_all_senders(q);
-    queue_reply(q, 0);
-#endif
-
-    q->read = 0;
-    q->write = 0;
-
-    corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
-}
-
-/* NOTE: multiple threads waiting on a queue head cannot have a well-
-   defined release order if timeouts are used. If multiple threads must
-   access the queue head, use a dispatcher or queue_wait only. */
-void queue_wait(struct event_queue *q, struct queue_event *ev)
-{
-    int oldlevel;
-    unsigned int rd;
-
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&q->cl);
-
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-    if(q->send && q->send->curr_sender)
-    {
-        /* auto-reply */
-        queue_release_sender(&q->send->curr_sender, 0);
-    }
-#endif
-    
-    if (q->read == q->write)
-    {
-        do
-        {
-#if CONFIG_CORELOCK == CORELOCK_NONE
-#elif CONFIG_CORELOCK == SW_CORELOCK
-            const unsigned int core = CURRENT_CORE;
-            cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK;
-            cores[core].blk_ops.cl_p = &q->cl;
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-            const unsigned int core = CURRENT_CORE;
-            cores[core].blk_ops.flags = TBOP_SET_VARu8;
-            cores[core].blk_ops.var_u8p = &q->cl.locked;
-            cores[core].blk_ops.var_u8v = 0;
-#endif /* CONFIG_CORELOCK */
-            block_thread(&q->queue);
-            oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-            corelock_lock(&q->cl);
-        }
-        /* A message that woke us could now be gone */
-        while (q->read == q->write);
-    } 
-
-    rd = q->read++ & QUEUE_LENGTH_MASK;
-    *ev = q->events[rd];
-
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-    if(q->send && q->send->senders[rd])
-    {
-        /* Get data for a waiting thread if one */
-        queue_fetch_sender(q->send, rd);
-    }
-#endif
-
-    corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
-}
-
-void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
-{
-    int oldlevel;
-
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&q->cl);
-
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-    if (q->send && q->send->curr_sender)
-    {
-        /* auto-reply */
-        queue_release_sender(&q->send->curr_sender, 0);
-    }
-#endif
-
-    if (q->read == q->write && ticks > 0)
-    {
-#if CONFIG_CORELOCK == CORELOCK_NONE
-#elif CONFIG_CORELOCK == SW_CORELOCK
-        const unsigned int core = CURRENT_CORE;
-        cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK;
-        cores[core].blk_ops.cl_p  = &q->cl;
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-        const unsigned int core = CURRENT_CORE;
-        cores[core].blk_ops.flags = TBOP_SET_VARu8;
-        cores[core].blk_ops.var_u8p = &q->cl.locked;
-        cores[core].blk_ops.var_u8v = 0;
-#endif
-        block_thread_w_tmo(&q->queue, ticks);
-        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-        corelock_lock(&q->cl);
-    }
-
-    /* no worry about a removed message here - status is checked inside
-       locks - perhaps verify if timeout or false alarm */
-    if (q->read != q->write)
-    {
-        unsigned int rd = q->read++ & QUEUE_LENGTH_MASK;
-        *ev = q->events[rd];
-
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-        if(q->send && q->send->senders[rd])
-        {
-            /* Get data for a waiting thread if one */
-            queue_fetch_sender(q->send, rd);
-        }
-#endif
-    }
-    else
-    {
-        ev->id = SYS_TIMEOUT;
-    }
-
-    corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
-}
-
-void queue_post(struct event_queue *q, long id, intptr_t data)
-{
-    int oldlevel;
-    unsigned int wr;
-
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&q->cl);
-
-    wr = q->write++ & QUEUE_LENGTH_MASK;
-
-    q->events[wr].id   = id;
-    q->events[wr].data = data;
-
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-    if(q->send)
-    {
-        struct thread_entry **spp = &q->send->senders[wr];
-
-        if (*spp)
-        {
-            /* overflow protect - unblock any thread waiting at this index */
-            queue_release_sender(spp, 0);
-        }
-    }
-#endif
-
-    /* Wakeup a waiting thread if any */
-    wakeup_thread(&q->queue);
-
-    corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
-}
-
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-/* IRQ handlers are not allowed use of this function - we only aim to
-   protect the queue integrity by turning them off. */
-intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
-{
-    int oldlevel;
-    unsigned int wr;
-
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&q->cl);
-
-    wr = q->write++ & QUEUE_LENGTH_MASK;
-
-    q->events[wr].id   = id;
-    q->events[wr].data = data;
-    
-    if(q->send)
-    {
-        const unsigned int core = CURRENT_CORE;
-        struct thread_entry **spp = &q->send->senders[wr];
-
-        if(*spp)
-        {
-            /* overflow protect - unblock any thread waiting at this index */
-            queue_release_sender(spp, 0);
-        }
-
-        /* Wakeup a waiting thread if any */
-        wakeup_thread(&q->queue);
-
-#if CONFIG_CORELOCK == CORELOCK_NONE
-#elif CONFIG_CORELOCK == SW_CORELOCK
-        cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK;
-        cores[core].blk_ops.cl_p  = &q->cl; 
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-        cores[core].blk_ops.flags = TBOP_SET_VARu8;
-        cores[core].blk_ops.var_u8p = &q->cl.locked;
-        cores[core].blk_ops.var_u8v = 0;
-#endif
-        block_thread_no_listlock(spp);
-        return cores[core].running->retval;
-    }
-
-    /* Function as queue_post if sending is not enabled */
-    wakeup_thread(&q->queue);
-
-    corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
-    
-    return 0;
-}
-
-#if 0 /* not used now but probably will be later */
-/* Query if the last message dequeued was added by queue_send or not */
-bool queue_in_queue_send(struct event_queue *q)
-{
-    bool in_send;
-
-#if NUM_CORES > 1
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&q->cl);
-#endif
-
-    in_send = q->send && q->send->curr_sender;
-
-#if NUM_CORES > 1
-    corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
-#endif
-
-    return in_send;
-}
-#endif
-
-/* Replies with retval to the last dequeued message sent with queue_send */
-void queue_reply(struct event_queue *q, intptr_t retval)
-{
-    if(q->send && q->send->curr_sender)
-    {
-#if NUM_CORES > 1
-        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-        corelock_lock(&q->cl);
-        /* Double-check locking */
-        if(q->send && q->send->curr_sender)
-        {
-#endif
-
-            queue_release_sender(&q->send->curr_sender, retval);
-
-#if NUM_CORES > 1
-        }
-        corelock_unlock(&q->cl);
-        set_irq_level(oldlevel);
-#endif
-    }
-}
-#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
-
-/* Poll queue to see if a message exists - careful in using the result if
- * queue_remove_from_head is called when messages are posted - possibly use
- * queue_wait_w_tmo(&q, 0) in that case or else a removed message that
- * unsignals the queue may cause an unwanted block */
-bool queue_empty(const struct event_queue* q)
-{
-    return ( q->read == q->write );
-}
-
-bool queue_peek(struct event_queue *q, struct queue_event *ev)
-{
-    if (q->read == q->write)
-         return false;
-
-    bool have_msg = false;
-
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&q->cl);
-
-    if (q->read != q->write)
-    {
-        *ev = q->events[q->read & QUEUE_LENGTH_MASK];
-        have_msg = true;
-    }
-
-    corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
-
-    return have_msg;
-}
-
-void queue_clear(struct event_queue* q)
-{
-    int oldlevel;
-
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&q->cl);
-
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-    /* Release all threads waiting in the queue for a reply -
-       dequeued sent message will be handled by owning thread */
-    queue_release_all_senders(q);
-#endif
-
-    q->read = 0;
-    q->write = 0;
-
-    corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
-}
-
-void queue_remove_from_head(struct event_queue *q, long id)
-{
-    int oldlevel;
-
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&q->cl);
-
-    while(q->read != q->write)
-    {
-        unsigned int rd = q->read & QUEUE_LENGTH_MASK;
-
-        if(q->events[rd].id != id)
-        {
-            break;
-        }
-
-#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-        if(q->send)
-        {
-            struct thread_entry **spp = &q->send->senders[rd];
-
-            if (*spp)
-            {
-                /* Release any thread waiting on this message */
-                queue_release_sender(spp, 0);
-            }
-        }
-#endif
-        q->read++;
-    }
-
-    corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
-}
-
-/**
- * The number of events waiting in the queue.
- * 
- * @param struct of event_queue
- * @return number of events in the queue
- */
-int queue_count(const struct event_queue *q)
-{
-    return q->write - q->read;
-}
-
-int queue_broadcast(long id, intptr_t data)
-{
-    int i;
-
-#if NUM_CORES > 1
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    corelock_lock(&all_queues.cl);
-#endif
-    
-    for(i = 0;i < all_queues.count;i++)
-    {
-        queue_post(all_queues.queues[i], id, data);
-    }
-
-#if NUM_CORES > 1
-    corelock_unlock(&all_queues.cl);
-    set_irq_level(oldlevel);
-#endif
-   
-    return i;
 }
 
 /****************************************************************************
@@ -961,72 +410,692 @@ void timeout_register(struct timeout *tmo, timeout_cb_type callback,
 #endif /* INCLUDE_TIMEOUT_API */
 
 /****************************************************************************
- * Simple mutex functions ;)
+ * Thread stuff
  ****************************************************************************/
-void mutex_init(struct mutex *m)
+void sleep(int ticks)
 {
-    m->queue = NULL;
-    m->thread = NULL;
-    m->count = 0;
-    m->locked = 0;
-#if CONFIG_CORELOCK == SW_CORELOCK
-    corelock_init(&m->cl);
+#if CONFIG_CPU == S3C2440 && defined(BOOTLOADER)
+    volatile int counter;
+    TCON &= ~(1 << 20); // stop timer 4
+    // TODO: this constant depends on dividers settings inherited from
+    // firmware. Set them explicitly somwhere.
+    TCNTB4 = 12193 * ticks / HZ;
+    TCON |= 1 << 21; // set manual bit
+    TCON &= ~(1 << 21); // reset manual bit
+    TCON &= ~(1 << 22); //autoreload Off
+    TCON |= (1 << 20); // start timer 4
+    do {
+       counter = TCNTO4;
+    } while(counter > 0);
+
+#elif defined(CPU_PP) && defined(BOOTLOADER)
+    unsigned stop = USEC_TIMER + ticks * (1000000/HZ);
+    while (TIME_BEFORE(USEC_TIMER, stop))
+        switch_thread();
+#else
+    set_irq_level(HIGHEST_IRQ_LEVEL);
+    sleep_thread(ticks);
+    switch_thread();
 #endif
 }
 
+void yield(void)
+{
+#if ((CONFIG_CPU == S3C2440 || defined(ELIO_TPJ1022)) && defined(BOOTLOADER))
+    /* Some targets don't like yielding in the bootloader */
+#else
+    switch_thread();
+#endif
+}
+
+/****************************************************************************
+ * Queue handling stuff
+ ****************************************************************************/
+
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+/****************************************************************************
+ * Sender thread queue structure that aids implementation of priority
+ * inheritance on queues because the send list structure is the same as
+ * for all other kernel objects:
+ *
+ * Example state:
+ * E0 added with queue_send and removed by thread via queue_wait(_w_tmo)
+ * E3 was posted with queue_post
+ * 4 events remain enqueued (E1-E4)
+ *
+ *                                 rd                          wr
+ * q->events[]:          |  XX  |  E1  |  E2  |  E3  |  E4  |  XX  |
+ * q->send->senders[]:   | NULL |  T1  |  T2  | NULL |  T3  | NULL |
+ *                                 \/     \/            \/
+ * q->send->list:       >->|T0|<->|T1|<->|T2|<-------->|T3|<-<
+ * q->send->curr_sender:    /\
+ *
+ * Thread has E0 in its own struct queue_event.
+ *
+ ****************************************************************************/
+
+/* Puts the specified return value in the waiting thread's return value
+ * and wakes the thread.
+ *
+ * A sender should be confirmed to exist before calling which makes it
+ * more efficent to reject the majority of cases that don't need this
+ * called.
+ */
+static void queue_release_sender(struct thread_entry **sender,
+                                 intptr_t retval)
+{
+    struct thread_entry *thread = *sender;
+
+    *sender = NULL;               /* Clear slot. */
+    thread->wakeup_ext_cb = NULL; /* Clear callback. */
+    thread->retval = retval;      /* Assign thread-local return value. */
+    *thread->bqp = thread;        /* Move blocking queue head to thread since
+                                     wakeup_thread wakes the first thread in
+                                     the list. */
+    wakeup_thread(thread->bqp);
+}
+
+/* Releases any waiting threads that are queued with queue_send -
+ * reply with 0.
+ */
+static void queue_release_all_senders(struct event_queue *q)
+{
+    if(q->send)
+    {
+        unsigned int i;
+        for(i = q->read; i != q->write; i++)
+        {
+            struct thread_entry **spp =
+                &q->send->senders[i & QUEUE_LENGTH_MASK];
+
+            if(*spp)
+            {
+                queue_release_sender(spp, 0);
+            }
+        }
+    }
+}
+
+/* Callback to do extra forced removal steps from sender list in addition
+ * to the normal blocking queue removal and priority dis-inherit */
+static void queue_remove_sender_thread_cb(struct thread_entry *thread)
+{
+    *((struct thread_entry **)thread->retval) = NULL;
+    thread->wakeup_ext_cb = NULL;
+    thread->retval = 0;
+}
+
+/* Enables queue_send on the specified queue - caller allocates the extra
+ * data structure. Only queues which are taken to be owned by a thread should
+ * enable this however an official owner is not compulsory but must be
+ * specified for priority inheritance to operate.
+ *
+ * Use of queue_wait(_w_tmo) by multiple threads on a queue using synchronous
+ * messages results in an undefined order of message replies.
+ */
+void queue_enable_queue_send(struct event_queue *q,
+                             struct queue_sender_list *send,
+                             struct thread_entry *owner)
+{
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&q->cl);
+
+    if(send != NULL && q->send == NULL)
+    {
+        memset(send, 0, sizeof(*send));
+#ifdef HAVE_PRIORITY_SCHEDULING
+        send->blocker.wakeup_protocol = wakeup_priority_protocol_release;
+        send->blocker.priority = PRIORITY_IDLE;
+        send->blocker.thread = owner;
+        if(owner != NULL)
+            q->blocker_p = &send->blocker;
+#endif
+        q->send = send;
+    }
+
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+
+    (void)owner;
+}
+
+/* Unblock a blocked thread at a given event index */
+static inline void queue_do_unblock_sender(struct queue_sender_list *send,
+                                           unsigned int i)
+{
+    if(send)
+    {
+        struct thread_entry **spp = &send->senders[i];
+
+        if(*spp)
+        {
+            queue_release_sender(spp, 0);
+        }
+    }
+}
+
+/* Perform the auto-reply sequence */
+static inline void queue_do_auto_reply(struct queue_sender_list *send)
+{
+    if(send && send->curr_sender)
+    {
+        /* auto-reply */
+        queue_release_sender(&send->curr_sender, 0);
+    }
+}
+
+/* Moves waiting thread's refrence from the senders array to the
+ * current_sender which represents the thread waiting for a reponse to the
+ * last message removed from the queue. This also protects the thread from
+ * being bumped due to overflow which would not be a valid action since its
+ * message _is_ being processed at this point. */
+static inline void queue_do_fetch_sender(struct queue_sender_list *send,
+                                         unsigned int rd)
+{
+    if(send)
+    {
+        struct thread_entry **spp = &send->senders[rd];
+
+        if(*spp)
+        {
+            /* Move thread reference from array to the next thread
+               that queue_reply will release */
+            send->curr_sender = *spp;
+            (*spp)->retval = (intptr_t)spp;
+            *spp = NULL;
+        }
+        /* else message was posted asynchronously with queue_post */
+    }
+}
+#else
+/* Empty macros for when synchoronous sending is not made */
+#define queue_release_all_senders(q)
+#define queue_do_unblock_sender(send, i)
+#define queue_do_auto_reply(send)
+#define queue_do_fetch_sender(send, rd)
+#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
+
+/* Queue must not be available for use during this call */
+void queue_init(struct event_queue *q, bool register_queue)
+{
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    if(register_queue)
+    {
+        corelock_lock(&all_queues.cl);
+    }
+
+    corelock_init(&q->cl);
+    q->queue = NULL;
+    q->read = 0;
+    q->write = 0;
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    q->send = NULL; /* No message sending by default */
+    IF_PRIO( q->blocker_p = NULL; )
+#endif
+
+    if(register_queue)
+    {
+        if(all_queues.count >= MAX_NUM_QUEUES)
+        {
+            panicf("queue_init->out of queues");
+        }
+        /* Add it to the all_queues array */
+        all_queues.queues[all_queues.count++] = q;
+        corelock_unlock(&all_queues.cl);
+    }
+
+    set_irq_level(oldlevel);
+}
+
+/* Queue must not be available for use during this call */
+void queue_delete(struct event_queue *q)
+{
+    int oldlevel;
+    int i;
+
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&all_queues.cl);
+    corelock_lock(&q->cl);
+
+    /* Find the queue to be deleted */
+    for(i = 0;i < all_queues.count;i++)
+    {
+        if(all_queues.queues[i] == q)
+        {
+            /* Move the following queues up in the list */
+            all_queues.count--;
+
+            for(;i < all_queues.count;i++)
+            {
+                all_queues.queues[i] = all_queues.queues[i+1];
+            }
+
+            break;
+        }
+    }
+
+    corelock_unlock(&all_queues.cl);
+
+    /* Release thread(s) waiting on queue head */
+    thread_queue_wake(&q->queue);
+
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    if(q->send)
+    {
+        /* Release threads waiting for replies */
+        queue_release_all_senders(q);
+
+        /* Reply to any dequeued message waiting for one */
+        queue_do_auto_reply(q->send);
+
+        q->send = NULL;
+    }
+#endif
+
+    q->read = 0;
+    q->write = 0;
+
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+}
+
+/* NOTE: multiple threads waiting on a queue head cannot have a well-
+   defined release order if timeouts are used. If multiple threads must
+   access the queue head, use a dispatcher or queue_wait only. */
+void queue_wait(struct event_queue *q, struct queue_event *ev)
+{
+    int oldlevel;
+    unsigned int rd;
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+    KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
+                  QUEUE_GET_THREAD(q) == thread_get_current(),
+                  "queue_wait->wrong thread\n");
+#endif
+
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&q->cl);
+
+    /* auto-reply */
+    queue_do_auto_reply(q->send);
+    
+    if (q->read == q->write)
+    {
+        struct thread_entry *current = cores[CURRENT_CORE].running;
+
+        do
+        {
+            IF_COP( current->obj_cl = &q->cl; )
+            current->bqp = &q->queue;
+
+            block_thread(current);
+
+            corelock_unlock(&q->cl);
+            switch_thread();
+
+            oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+            corelock_lock(&q->cl);
+        }
+        /* A message that woke us could now be gone */
+        while (q->read == q->write);
+    } 
+
+    rd = q->read++ & QUEUE_LENGTH_MASK;
+    *ev = q->events[rd];
+
+    /* Get data for a waiting thread if one */
+    queue_do_fetch_sender(q->send, rd);
+
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+}
+
+void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
+{
+    int oldlevel;
+
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+    KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
+                  QUEUE_GET_THREAD(q) == thread_get_current(),
+                  "queue_wait_w_tmo->wrong thread\n");
+#endif
+
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&q->cl);
+
+    /* Auto-reply */
+    queue_do_auto_reply(q->send);
+
+    if (q->read == q->write && ticks > 0)
+    {
+        struct thread_entry *current = cores[CURRENT_CORE].running;
+
+        IF_COP( current->obj_cl = &q->cl; )
+        current->bqp = &q->queue;
+
+        block_thread_w_tmo(current, ticks);
+        corelock_unlock(&q->cl);    
+
+        switch_thread();
+
+        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        corelock_lock(&q->cl);
+    }
+
+    /* no worry about a removed message here - status is checked inside
+       locks - perhaps verify if timeout or false alarm */
+    if (q->read != q->write)
+    {
+        unsigned int rd = q->read++ & QUEUE_LENGTH_MASK;
+        *ev = q->events[rd];
+        /* Get data for a waiting thread if one */
+        queue_do_fetch_sender(q->send, rd);
+    }
+    else
+    {
+        ev->id = SYS_TIMEOUT;
+    }
+
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+}
+
+void queue_post(struct event_queue *q, long id, intptr_t data)
+{
+    int oldlevel;
+    unsigned int wr;
+
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&q->cl);
+
+    wr = q->write++ & QUEUE_LENGTH_MASK;
+
+    q->events[wr].id   = id;
+    q->events[wr].data = data;
+
+    /* overflow protect - unblock any thread waiting at this index */
+    queue_do_unblock_sender(q->send, wr);
+
+    /* Wakeup a waiting thread if any */
+    wakeup_thread(&q->queue);
+
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+}
+
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+/* IRQ handlers are not allowed use of this function - we only aim to
+   protect the queue integrity by turning them off. */
+intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
+{
+    int oldlevel;
+    unsigned int wr;
+
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&q->cl);
+
+    wr = q->write++ & QUEUE_LENGTH_MASK;
+
+    q->events[wr].id   = id;
+    q->events[wr].data = data;
+    
+    if(q->send)
+    {
+        struct queue_sender_list *send = q->send;
+        struct thread_entry **spp = &send->senders[wr];
+        struct thread_entry *current = cores[CURRENT_CORE].running;
+
+        if(*spp)
+        {
+            /* overflow protect - unblock any thread waiting at this index */
+            queue_release_sender(spp, 0);
+        }
+
+        /* Wakeup a waiting thread if any */
+        wakeup_thread(&q->queue);
+
+        /* Save thread in slot, add to list and wait for reply */
+        *spp = current;
+        IF_COP( current->obj_cl = &q->cl; )
+        IF_PRIO( current->blocker = q->blocker_p; )
+        current->wakeup_ext_cb = queue_remove_sender_thread_cb;
+        current->retval = (intptr_t)spp;
+        current->bqp = &send->list;
+
+        block_thread(current);
+
+        corelock_unlock(&q->cl);
+        switch_thread();
+
+        return current->retval;
+    }
+
+    /* Function as queue_post if sending is not enabled */
+    wakeup_thread(&q->queue);
+
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+    
+    return 0;
+}
+
+#if 0 /* not used now but probably will be later */
+/* Query if the last message dequeued was added by queue_send or not */
+bool queue_in_queue_send(struct event_queue *q)
+{
+    bool in_send;
+
+#if NUM_CORES > 1
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&q->cl);
+#endif
+
+    in_send = q->send && q->send->curr_sender;
+
+#if NUM_CORES > 1
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+#endif
+
+    return in_send;
+}
+#endif
+
+/* Replies with retval to the last dequeued message sent with queue_send */
+void queue_reply(struct event_queue *q, intptr_t retval)
+{
+    if(q->send && q->send->curr_sender)
+    {
+        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        corelock_lock(&q->cl);
+        /* Double-check locking */
+        IF_COP( if(q->send && q->send->curr_sender) )
+        {
+            queue_release_sender(&q->send->curr_sender, retval);
+        }
+
+        corelock_unlock(&q->cl);
+        set_irq_level(oldlevel);
+    }
+}
+
+bool queue_peek(struct event_queue *q, struct queue_event *ev)
+{
+    if(q->read == q->write)
+         return false;
+
+    bool have_msg = false;
+
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&q->cl);
+
+    if(q->read != q->write)
+    {
+        *ev = q->events[q->read & QUEUE_LENGTH_MASK];
+        have_msg = true;
+    }
+
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+
+    return have_msg;
+}
+#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
+
+/* Poll queue to see if a message exists - careful in using the result if
+ * queue_remove_from_head is called when messages are posted - possibly use
+ * queue_wait_w_tmo(&q, 0) in that case or else a removed message that
+ * unsignals the queue may cause an unwanted block */
+bool queue_empty(const struct event_queue* q)
+{
+    return ( q->read == q->write );
+}
+
+void queue_clear(struct event_queue* q)
+{
+    int oldlevel;
+
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&q->cl);
+
+    /* Release all threads waiting in the queue for a reply -
+       dequeued sent message will be handled by owning thread */
+    queue_release_all_senders(q);
+
+    q->read = 0;
+    q->write = 0;
+
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+}
+
+void queue_remove_from_head(struct event_queue *q, long id)
+{
+    int oldlevel;
+
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&q->cl);
+
+    while(q->read != q->write)
+    {
+        unsigned int rd = q->read & QUEUE_LENGTH_MASK;
+
+        if(q->events[rd].id != id)
+        {
+            break;
+        }
+
+        /* Release any thread waiting on this message */
+        queue_do_unblock_sender(q->send, rd);
+
+        q->read++;
+    }
+
+    corelock_unlock(&q->cl);
+    set_irq_level(oldlevel);
+}
+
+/**
+ * The number of events waiting in the queue.
+ * 
+ * @param struct of event_queue
+ * @return number of events in the queue
+ */
+int queue_count(const struct event_queue *q)
+{
+    return q->write - q->read;
+}
+
+int queue_broadcast(long id, intptr_t data)
+{
+    int i;
+
+#if NUM_CORES > 1
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    corelock_lock(&all_queues.cl);
+#endif
+    
+    for(i = 0;i < all_queues.count;i++)
+    {
+        queue_post(all_queues.queues[i], id, data);
+    }
+
+#if NUM_CORES > 1
+    corelock_unlock(&all_queues.cl);
+    set_irq_level(oldlevel);
+#endif
+   
+    return i;
+}
+
+/****************************************************************************
+ * Simple mutex functions ;)
+ ****************************************************************************/
+
+/* Initialize a mutex object - call before any use and do not call again once
+ * the object is available to other threads */
+void mutex_init(struct mutex *m)
+{
+    corelock_init(&m->cl);
+    m->queue = NULL;
+    m->count = 0;
+    m->locked = 0;
+    MUTEX_SET_THREAD(m, NULL);
+#ifdef HAVE_PRIORITY_SCHEDULING
+    m->blocker.priority = PRIORITY_IDLE;
+    m->blocker.wakeup_protocol = wakeup_priority_protocol_transfer;
+    m->no_preempt = false;
+#endif
+}
+
+/* Gain ownership of a mutex object or block until it becomes free */
 void mutex_lock(struct mutex *m)
 {
     const unsigned int core = CURRENT_CORE;
-    struct thread_entry *const thread = cores[core].running;
+    struct thread_entry *current = cores[core].running;
 
-    if(thread == m->thread)
+    if(current == MUTEX_GET_THREAD(m))
     {
+        /* current thread already owns this mutex */
         m->count++;
         return;
     }
 
-    /* Repeat some stuff here or else all the variation is too difficult to
-       read */
-#if CONFIG_CORELOCK == CORELOCK_SWAP
-    /* peek at lock until it's no longer busy */
-    unsigned int locked;
-    while ((locked = xchg8(&m->locked, STATE_BUSYu8)) == STATE_BUSYu8);
-    if(locked == 0)
-    {
-        m->thread = thread;
-        m->locked = 1;
-        return;
-    }
-
-    /* Block until the lock is open... */
-    cores[core].blk_ops.flags = TBOP_SET_VARu8;
-    cores[core].blk_ops.var_u8p = &m->locked;
-    cores[core].blk_ops.var_u8v = 1;
-#else
+    /* lock out other cores */
     corelock_lock(&m->cl);
-    if (m->locked == 0)
+
+    if(m->locked == 0)
     {
+        /* lock is open */
+        MUTEX_SET_THREAD(m, current);
         m->locked = 1;
-        m->thread = thread;
         corelock_unlock(&m->cl);
         return;
     }
 
-    /* Block until the lock is open... */
-#if CONFIG_CORELOCK == SW_CORELOCK
-    cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK;
-    cores[core].blk_ops.cl_p = &m->cl;
-#endif
-#endif /* CONFIG_CORELOCK */
+    /* block until the lock is open... */
+    IF_COP( current->obj_cl = &m->cl; )
+    IF_PRIO( current->blocker = &m->blocker; )
+    current->bqp = &m->queue;
 
-    block_thread_no_listlock(&m->queue);
+    set_irq_level(HIGHEST_IRQ_LEVEL);
+    block_thread(current);
+
+    corelock_unlock(&m->cl);
+
+    /* ...and turn control over to next thread */
+    switch_thread();
 }
 
+/* Release ownership of a mutex object - only owning thread must call this */
 void mutex_unlock(struct mutex *m)
 {
     /* unlocker not being the owner is an unlocking violation */
-    KERNEL_ASSERT(m->thread == cores[CURRENT_CORE].running,
-                  "mutex_unlock->wrong thread (recurse)");
+    KERNEL_ASSERT(MUTEX_GET_THREAD(m) == thread_get_current(),
+                  "mutex_unlock->wrong thread (%s != %s)\n",
+                  MUTEX_GET_THREAD(m)->name,
+                  thread_get_current()->name);
 
     if(m->count > 0)
     {
@@ -1035,37 +1104,33 @@ void mutex_unlock(struct mutex *m)
         return;
     }
 
-#if CONFIG_CORELOCK == SW_CORELOCK
     /* lock out other cores */
     corelock_lock(&m->cl);
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-    /* wait for peeker to move on */
-    while (xchg8(&m->locked, STATE_BUSYu8) == STATE_BUSYu8);
-#endif
 
     /* transfer to next queued thread if any */
-
-    /* This can become busy using SWP but is safe since only one thread
-       will be changing things at a time. Allowing timeout waits will
-       change that however but not now. There is also a hazard the thread
-       could be killed before performing the wakeup but that's just
-       irresponsible. :-) */
-    m->thread = m->queue;
-
-    if(m->thread == NULL)
+    if(m->queue == NULL)
     {
-        m->locked = 0; /* release lock */
-#if CONFIG_CORELOCK == SW_CORELOCK
+        /* no threads waiting - open the lock */
+        MUTEX_SET_THREAD(m, NULL);
+        m->locked = 0;
         corelock_unlock(&m->cl);
-#endif
+        return;
     }
-    else /* another thread is waiting - remain locked */
+    else
     {
-        wakeup_thread_no_listlock(&m->queue);
-#if CONFIG_CORELOCK == SW_CORELOCK
+        const int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        /* Tranfer of owning thread is handled in the wakeup protocol
+         * if priorities are enabled otherwise just set it from the
+         * queue head. */
+        IFN_PRIO( MUTEX_SET_THREAD(m, m->queue); )
+        IF_PRIO( unsigned int result = ) wakeup_thread(&m->queue);
+        set_irq_level(oldlevel);
+
         corelock_unlock(&m->cl);
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-        m->locked = 1;
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+        if((result & THREAD_SWITCH) && !m->no_preempt)
+            switch_thread();
 #endif
     }
 }
@@ -1083,28 +1148,32 @@ void spinlock_init(struct spinlock *l)
 
 void spinlock_lock(struct spinlock *l)
 {
-    struct thread_entry *const thread = cores[CURRENT_CORE].running;
+    const unsigned int core = CURRENT_CORE;
+    struct thread_entry *current = cores[core].running;
 
-    if (l->thread == thread)
+    if(l->thread == current)
     {
+        /* current core already owns it */
         l->count++;
         return;
     }
 
+    /* lock against other processor cores */
     corelock_lock(&l->cl);
 
-    l->thread = thread;
+    /* take ownership */
+    l->thread = current;
 }
 
 void spinlock_unlock(struct spinlock *l)
 {
     /* unlocker not being the owner is an unlocking violation */
-    KERNEL_ASSERT(l->thread == cores[CURRENT_CORE].running,
-                  "spinlock_unlock->wrong thread");
+    KERNEL_ASSERT(l->thread == thread_get_current(),
+                  "spinlock_unlock->wrong thread\n");
 
-    if (l->count > 0)
+    if(l->count > 0)
     {
-        /* this thread still owns lock */
+        /* this core still owns lock */
         l->count--;
         return;
     }
@@ -1124,76 +1193,62 @@ void spinlock_unlock(struct spinlock *l)
 void semaphore_init(struct semaphore *s, int max, int start)
 {
     KERNEL_ASSERT(max > 0 && start >= 0 && start <= max,
-                  "semaphore_init->inv arg");
+                  "semaphore_init->inv arg\n");
     s->queue = NULL;
     s->max = max;
     s->count = start;
-#if CONFIG_CORELOCK == SW_CORELOCK
     corelock_init(&s->cl);
-#endif
 }
 
 void semaphore_wait(struct semaphore *s)
 {
-#if CONFIG_CORELOCK == CORELOCK_NONE || CONFIG_CORELOCK == SW_CORELOCK
+    struct thread_entry *current;
+
     corelock_lock(&s->cl);
+
     if(--s->count >= 0)
     {
+        /* wait satisfied */
         corelock_unlock(&s->cl);
         return;
     }
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-    int count;
-    while ((count = xchg32(&s->count, STATE_BUSYi)) == STATE_BUSYi);
-    if(--count >= 0)
-    {
-        s->count = count;
-        return;
-    }
-#endif
 
-    /* too many waits - block until dequeued */
-#if CONFIG_CORELOCK == SW_CORELOCK
-    const unsigned int core = CURRENT_CORE;
-    cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK;
-    cores[core].blk_ops.cl_p = &s->cl;
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-    const unsigned int core = CURRENT_CORE;
-    cores[core].blk_ops.flags = TBOP_SET_VARi;
-    cores[core].blk_ops.var_ip = &s->count;
-    cores[core].blk_ops.var_iv = count;
-#endif
-    block_thread_no_listlock(&s->queue);
+    /* too many waits - block until dequeued... */
+    current = cores[CURRENT_CORE].running;
+
+    IF_COP( current->obj_cl = &s->cl; )
+    current->bqp = &s->queue;
+
+    set_irq_level(HIGHEST_IRQ_LEVEL);
+    block_thread(current);
+
+    corelock_unlock(&s->cl);
+
+    /* ...and turn control over to next thread */
+    switch_thread();
 }
 
 void semaphore_release(struct semaphore *s)
 {
-#if CONFIG_CORELOCK == CORELOCK_NONE || CONFIG_CORELOCK == SW_CORELOCK
-    corelock_lock(&s->cl);
-    if (s->count < s->max)
-    {
-        if (++s->count <= 0)
-        {
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-    int count;
-    while ((count = xchg32(&s->count, STATE_BUSYi)) == STATE_BUSYi);
-    if(count < s->max)
-    {
-        if(++count <= 0)
-        {
-#endif /* CONFIG_CORELOCK */
+    IF_PRIO( unsigned int result = THREAD_NONE; )
 
-            /* there should be threads in this queue */
-            KERNEL_ASSERT(s->queue != NULL, "semaphore->wakeup");
-            /* a thread was queued - wake it up */
-            wakeup_thread_no_listlock(&s->queue);
-        }
+    corelock_lock(&s->cl);
+
+    if(s->count < s->max && ++s->count <= 0)
+    {
+        /* there should be threads in this queue */
+        KERNEL_ASSERT(s->queue != NULL, "semaphore->wakeup\n");
+        /* a thread was queued - wake it up */
+        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        IF_PRIO( result = ) wakeup_thread(&s->queue);
+        set_irq_level(oldlevel);
     }
 
-#if CONFIG_CORELOCK == SW_CORELOCK
     corelock_unlock(&s->cl);
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-    s->count = count;
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+    if(result & THREAD_SWITCH)
+        switch_thread();
 #endif
 }
 #endif /* HAVE_SEMAPHORE_OBJECTS */
@@ -1208,117 +1263,107 @@ void event_init(struct event *e, unsigned int flags)
     e->queues[STATE_SIGNALED] = NULL;
     e->state = flags & STATE_SIGNALED;
     e->automatic = (flags & EVENT_AUTOMATIC) ? 1 : 0;
-#if CONFIG_CORELOCK == SW_CORELOCK
     corelock_init(&e->cl);
-#endif
 }
 
 void event_wait(struct event *e, unsigned int for_state)
 {
-   unsigned int last_state;
-#if CONFIG_CORELOCK == CORELOCK_NONE || CONFIG_CORELOCK == SW_CORELOCK
+    struct thread_entry *current;
+
     corelock_lock(&e->cl);
-    last_state = e->state;
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-    while ((last_state = xchg8(&e->state, STATE_BUSYu8)) == STATE_BUSYu8);
-#endif
 
     if(e->automatic != 0)
     {
         /* wait for false always satisfied by definition
            or if it just changed to false */
-        if(last_state == STATE_SIGNALED || for_state == STATE_NONSIGNALED)
+        if(e->state == STATE_SIGNALED || for_state == STATE_NONSIGNALED)
         {
             /* automatic - unsignal */
             e->state = STATE_NONSIGNALED;
-#if CONFIG_CORELOCK == SW_CORELOCK
             corelock_unlock(&e->cl);
-#endif
             return;
         }
         /* block until state matches */
     }
-    else if(for_state == last_state)
+    else if(for_state == e->state)
     {
         /* the state being waited for is the current state */
-#if CONFIG_CORELOCK == SW_CORELOCK
         corelock_unlock(&e->cl);
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-        e->state = last_state;
-#endif
         return;
     }
 
-    {
-        /* current state does not match wait-for state */
-#if CONFIG_CORELOCK == SW_CORELOCK
-        const unsigned int core = CURRENT_CORE;
-        cores[core].blk_ops.flags = TBOP_UNLOCK_CORELOCK;
-        cores[core].blk_ops.cl_p = &e->cl;
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-        const unsigned int core = CURRENT_CORE;
-        cores[core].blk_ops.flags = TBOP_SET_VARu8;
-        cores[core].blk_ops.var_u8p = &e->state;
-        cores[core].blk_ops.var_u8v = last_state;
-#endif
-        block_thread_no_listlock(&e->queues[for_state]);
-    }
+    /* block until state matches what callers requests */
+    current = cores[CURRENT_CORE].running;
+
+    IF_COP( current->obj_cl = &e->cl; )
+    current->bqp = &e->queues[for_state];
+
+    set_irq_level(HIGHEST_IRQ_LEVEL);
+    block_thread(current);
+
+    corelock_unlock(&e->cl);
+
+    /* turn control over to next thread */
+    switch_thread();
 }
 
 void event_set_state(struct event *e, unsigned int state)
 {
-    unsigned int last_state;
-#if CONFIG_CORELOCK == CORELOCK_NONE || CONFIG_CORELOCK == SW_CORELOCK
-    corelock_lock(&e->cl);
-    last_state = e->state;
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-    while ((last_state = xchg8(&e->state, STATE_BUSYu8)) == STATE_BUSYu8);
-#endif
+    unsigned int result;
+    int oldlevel;
 
-    if(last_state == state)
+    corelock_lock(&e->cl);
+
+    if(e->state == state)
     {
         /* no change */
-#if CONFIG_CORELOCK == SW_CORELOCK
         corelock_unlock(&e->cl);
-#elif CONFIG_CORELOCK == CORELOCK_SWAP
-        e->state = last_state;
-#endif
         return;
     }
+
+    IF_PRIO( result = THREAD_OK; )
+
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
 
     if(state == STATE_SIGNALED)
     {
         if(e->automatic != 0)
         {
-            struct thread_entry *thread;
-            /* no thread should have ever blocked for unsignaled */
+            /* no thread should have ever blocked for nonsignaled */
             KERNEL_ASSERT(e->queues[STATE_NONSIGNALED] == NULL,
-                          "set_event_state->queue[NS]:S");
+                          "set_event_state->queue[NS]:S\n");
             /* pass to next thread and keep unsignaled - "pulse" */
-            thread = wakeup_thread_no_listlock(&e->queues[STATE_SIGNALED]);
-            e->state = thread != NULL ? STATE_NONSIGNALED : STATE_SIGNALED;
+            result = wakeup_thread(&e->queues[STATE_SIGNALED]);
+            e->state = (result & THREAD_OK) ? STATE_NONSIGNALED : STATE_SIGNALED;
         }
         else
         {
             /* release all threads waiting for signaled */
-            thread_queue_wake_no_listlock(&e->queues[STATE_SIGNALED]);
             e->state = STATE_SIGNALED;
+            IF_PRIO( result = )
+                thread_queue_wake(&e->queues[STATE_SIGNALED]);
         }
     }
     else
     {
-        /* release all threads waiting for unsignaled */
+        /* release all threads waiting for nonsignaled */
 
         /* no thread should have ever blocked if automatic */
         KERNEL_ASSERT(e->queues[STATE_NONSIGNALED] == NULL ||
-                      e->automatic == 0, "set_event_state->queue[NS]:NS");
+                      e->automatic == 0, "set_event_state->queue[NS]:NS\n");
 
-        thread_queue_wake_no_listlock(&e->queues[STATE_NONSIGNALED]);
         e->state = STATE_NONSIGNALED;
+        IF_PRIO( result = )
+            thread_queue_wake(&e->queues[STATE_NONSIGNALED]);
     }
 
-#if CONFIG_CORELOCK == SW_CORELOCK
+    set_irq_level(oldlevel);
+
     corelock_unlock(&e->cl);
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+    if(result & THREAD_SWITCH)
+        switch_thread();
 #endif
 }
 #endif /* HAVE_EVENT_OBJECTS */

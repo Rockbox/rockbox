@@ -424,12 +424,14 @@ void voice_thread_init(void)
 {
     logf("Starting voice thread");
     queue_init(&voice_queue, false);
-    queue_enable_queue_send(&voice_queue, &voice_queue_sender_list);
     mutex_init(&voice_mutex);
     event_init(&voice_event, STATE_SIGNALED | EVENT_MANUAL);
     voice_thread_p = create_thread(voice_thread, voice_stack,
             sizeof(voice_stack), CREATE_THREAD_FROZEN,
             voice_thread_name IF_PRIO(, PRIORITY_PLAYBACK) IF_COP(, CPU));
+
+    queue_enable_queue_send(&voice_queue, &voice_queue_sender_list,
+                            voice_thread_p);
 } /* voice_thread_init */
 
 /* Unfreeze the voice thread */

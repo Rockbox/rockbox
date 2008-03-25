@@ -116,7 +116,7 @@ static bool low_latency_mode = false;
 static bool pcmbuf_flush;
 
 #ifdef HAVE_PRIORITY_SCHEDULING
-static int codec_thread_priority = 0;
+static int codec_thread_priority = PRIORITY_PLAYBACK;
 #endif
 
 extern struct thread_entry *codec_thread_p;
@@ -256,18 +256,21 @@ static void boost_codec_thread(bool boost)
      * will starve if the codec thread's priority is boosted. */
     if (boost)
     {
-        if (codec_thread_priority == 0)
+        int priority = (PRIORITY_PLAYBACK - PRIORITY_PLAYBACK_MAX)*pcmbuf_unplayed_bytes
+                          / (2*NATIVE_FREQUENCY) + PRIORITY_PLAYBACK_MAX;
+
+        if (priority != codec_thread_priority)
         {
-            codec_thread_priority = thread_set_priority(
-                codec_thread_p, PRIORITY_REALTIME);
-            voice_thread_set_priority(PRIORITY_REALTIME);
+            codec_thread_priority = priority;
+            thread_set_priority(codec_thread_p, priority);
+            voice_thread_set_priority(priority);
         }
     }
-    else if (codec_thread_priority != 0)
+    else if (codec_thread_priority != PRIORITY_PLAYBACK)
     {
-        thread_set_priority(codec_thread_p, codec_thread_priority);
-        voice_thread_set_priority(codec_thread_priority);
-        codec_thread_priority = 0;
+        thread_set_priority(codec_thread_p, PRIORITY_PLAYBACK);
+        voice_thread_set_priority(PRIORITY_PLAYBACK);
+        codec_thread_priority = PRIORITY_PLAYBACK;
     }
 }
 #endif /* HAVE_PRIORITY_SCHEDULING */
@@ -818,7 +821,7 @@ static bool prepare_insert(size_t length)
     if (low_latency_mode)
     {
         /* 1/4s latency. */
-        if (pcmbuf_unplayed_bytes > NATIVE_FREQUENCY * 4 / 4
+        if (pcmbuf_unplayed_bytes > NATIVE_FREQUENCY * 4 / 2
             && pcm_is_playing())
             return false;
     }

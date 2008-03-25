@@ -259,6 +259,12 @@ void fat_init(void)
         mutex_init(&cache_mutex);
     }
 
+#ifdef HAVE_PRIORITY_SCHEDULING
+    /* Disable this because it is dangerous due to the assumption that
+     * mutex_unlock won't yield */
+    mutex_set_preempt(&cache_mutex, false);
+#endif
+
     /* mark the FAT cache as unused */
     for(i = 0;i < FAT_CACHE_SIZE;i++)
     {
