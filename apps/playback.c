@@ -163,7 +163,7 @@ enum {
 #define CODEC_IRAM_SIZE     ((size_t)0xc000)
 #endif
 
-static bool audio_is_initialized = false;
+bool audio_is_initialized = false;
 static bool audio_thread_ready NOCACHEBSS_ATTR = false;
 
 /* Variables are commented with the threads that use them: *
