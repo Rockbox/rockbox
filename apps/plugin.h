@@ -119,12 +119,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 101
+#define PLUGIN_API_VERSION 102
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 101
+#define PLUGIN_MIN_API_VERSION 102
 
 /* plugin return codes */
 enum plugin_status {
@@ -562,20 +562,21 @@ struct plugin_api {
     void (*gui_syncstatusbar_draw)(struct gui_syncstatusbar * bars, bool force_redraw);
     
     /* options */
-    const struct settings_list* (*find_setting)(void* variable, int *id);
+    const struct settings_list* (*find_setting)(const void* variable, int *id);
     bool (*option_screen)(struct settings_list *setting,
                           bool use_temp_var, unsigned char* option_title);
-    bool (*set_option)(const char* string, void* variable,
-                       enum optiontype type, const struct opt_items* options,
-                       int numoptions, void (*function)(int));
-    bool (*set_bool_options)(const char* string, bool* variable,
-                             const char* yes_str, int yes_voice,
-                             const char* no_str, int no_voice,
+    bool (*set_option)(const char* string, const void* variable,
+                       const enum optiontype type, const struct opt_items* options,
+                       const int numoptions, void (*function)(int));
+    bool (*set_bool_options)(const char* string, const bool* variable,
+                             const char* yes_str, const int yes_voice,
+                             const char* no_str, const int no_voice,
                              void (*function)(bool));
-    bool (*set_int)(const unsigned char* string, const char* unit, int voice_unit,
-                    int* variable, void (*function)(int), int step, int min,
-                    int max, void (*formatter)(char*, size_t, int, const char*) );
-    bool (*set_bool)(const char* string, bool* variable );
+    bool (*set_int)(const unsigned char* string, const char* unit, const int voice_unit,
+                    const int* variable, void (*function)(int), const int step, 
+                    const int min, const int max, 
+                    void (*formatter)(char*, size_t, int, const char*) );
+    bool (*set_bool)(const char* string, const bool* variable );
 
 #ifdef HAVE_LCD_COLOR
     bool (*set_color)(struct screen *display, char *title, unsigned *color,

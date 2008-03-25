@@ -29,6 +29,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "settings.h"
+#include "settings_list.h"
 #include "mp3_playback.h"
 #include "audio.h"
 #include "lang.h"
@@ -875,6 +876,19 @@ void talk_disable(bool disable)
     else 
         talk_temp_disable_count--;
 }
+
+void talk_setting(const void *global_settings_variable)
+{
+    const struct settings_list *setting;
+    if (!global_settings.talk_menu)
+        return;
+    setting = find_setting(global_settings_variable, NULL);
+    if (setting == NULL)
+        return;
+    if (setting->lang_id)
+        talk_id(setting->lang_id,false);
+}
+
 
 #if CONFIG_RTC
 void talk_date(struct tm *tm, bool enqueue)

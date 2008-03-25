@@ -41,6 +41,9 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
+#if CONFIG_RTC
+#include "screens.h"
+#endif
 
 /***********************************/
 /*    TAGCACHE MENU                */

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by wavey@wavey.org
+ * Copyright (C) 2002 by Stuart Martin
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -195,10 +195,10 @@ extern unsigned char vp_dummy[VIRT_SIZE];
 #define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */
 #define SETTINGS_HD  2 /* only the settings from the disk sector */
 #define SETTINGS_ALL 3 /* both */
-void settings_load(int which);
-bool settings_load_config(const char* file, bool apply);
+void settings_load(const int which);
+bool settings_load_config(const char* file, const bool apply);
 
-void status_save( void );
+void status_save(void);
 int settings_save(void);
 /* defines for the options paramater */
 enum {
@@ -213,44 +213,41 @@ enum {
     SETTINGS_SAVE_EQPRESET,
 #endif
 };
-bool settings_save_config(int options);
+bool settings_save_config(const int options);
 
 void settings_reset(void);
 void sound_settings_apply(void);
-void settings_apply(bool read_disk);
+void settings_apply(const bool read_disk);
 void settings_apply_pm_range(void);
 void settings_display(void);
 
 enum optiontype { INT, BOOL };
 
-const struct settings_list* find_setting(void* variable, int *id);
-bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len);
-void talk_setting(void *global_settings_variable);
-bool set_sound(const unsigned char * string,
-               int* variable, int setting);
-bool set_bool_options(const char* string, bool* variable,
-                      const char* yes_str, int yes_voice,
-                      const char* no_str, int no_voice,
+const struct settings_list* find_setting(const void* variable, int *id);
+bool cfg_int_to_string(const int setting_id, const int val, char* buf, const int buf_len);
+bool set_bool_options(const char* string, const bool* variable,
+                      const char* yes_str, const int yes_voice,
+                      const char* no_str, const int no_voice,
                       void (*function)(bool));
 
-bool set_bool(const char* string, bool* variable );
-bool set_option(const char* string, void* variable, enum optiontype type,
-                const struct opt_items* options, int numoptions, void (*function)(int));
-bool set_int(const unsigned char* string, const char* unit, int voice_unit,
-             int* variable,
-             void (*function)(int), int step, int min, int max,
+bool set_bool(const char* string, const bool* variable);
+bool set_int(const unsigned char* string, const char* unit, const int voice_unit,
+             const int* variable,
+             void (*function)(int), const int step, const int min, const int max,
              void (*formatter)(char*, size_t, int, const char*) );
+
 /* use this one if you need to create a lang from the value (i.e with TALK_ID()) */
-bool set_int_ex(const unsigned char* string, const char* unit, int voice_unit,
-             int* variable,
-             void (*function)(int), int step, int min, int max,
+bool set_int_ex(const unsigned char* string, const char* unit, const int voice_unit,
+             const int* variable,
+             void (*function)(int), const int step, const int min, const int max,
              void (*formatter)(char*, size_t, int, const char*),
              int32_t (*get_talk_id)(int, int));
 
-/* the following are either not in setting.c or shouldnt be */
-bool set_time_screen(const char* string, struct tm *tm);
-int read_line(int fd, char* buffer, int buffer_size);
-void set_file(char* filename, char* setting, int maxlen);
+void set_file(const char* filename, char* setting, const int maxlen);
+
+bool set_option(const char* string, const void* variable, const enum optiontype type,
+                const struct opt_items* options, const int numoptions, void (*function)(int));
+
 
 
 /** global_settings and global_status struct definitions **/

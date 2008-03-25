@@ -275,7 +275,7 @@ static int talk_menu_item(int selected_item, void *data)
         }
         return 0;
 }
-#define MAX_OPTIONS 32
+
 bool do_setting_from_menu(const struct menu_item_ex *temp)
 {
     int setting_id;

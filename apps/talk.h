@@ -78,6 +78,7 @@ int talk_file(const char* filename, bool enqueue); /* play a thumbnail from file
 int talk_number(long n, bool enqueue); /* say a number */
 int talk_value(long n, int unit, bool enqueue); /* say a numeric value */
 int talk_spell(const char* spell, bool enqueue); /* spell a string */
+void talk_setting(const void *global_settings_variable); /* read a setting */
 void talk_disable(bool disable); /* temporarily disable (or re-enable) talking (temporarily, not persisted) */
 void talk_force_shutup(void); /* kill voice unconditionally */
 void talk_shutup(void); /* Interrupt voice, as when enqueue is false */
