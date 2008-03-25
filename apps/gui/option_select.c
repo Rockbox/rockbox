@@ -530,77 +530,6 @@ bool option_screen(struct settings_list *setting,
     return false;
 }
 
-/******************************************************
-    Compatability functions 
-*******************************************************/
-#define MAX_OPTIONS 32
-const struct opt_items *set_option_options;
-void set_option_formatter(char* buf, size_t size, int item, const char* unit)
-{
-    (void)unit;
-    const unsigned char *text = set_option_options[item].string;
-    snprintf(buf, size, "%s", P2STR(text));
-}
-int32_t set_option_get_talk_id(int value, int unit)
-{
-    (void)unit;
-    return set_option_options[value].voice_id;
-}
-bool set_option(const char* string, void* variable, enum optiontype type,
-                const struct opt_items* options, 
-                int numoptions, void (*function)(int))
-{
-    int temp;
-    struct settings_list item;
-    struct int_setting data = {
-        function, UNIT_INT, 0, numoptions-1, 1,
-        set_option_formatter, set_option_get_talk_id
-    };
-    set_option_options = options;
-    item.int_setting = &data;
-    item.flags = F_INT_SETTING|F_T_INT;
-    item.lang_id = -1;
-    item.cfg_vals = (char*)string;
-    item.setting = &temp;
-    if (type == BOOL)
-        temp = *(bool*)variable? 1: 0;
-    else 
-        temp = *(int*)variable;
-    if (!option_screen(&item, false, NULL))
-    {
-        if (type == BOOL)
-            *(bool*)variable = (temp == 1? true: false);
-        else
-            *(int*)variable = temp;
-        return false;
-    }
-    return true;
-}
-
-bool set_int_ex(const unsigned char* string,
-                const char* unit,
-                int voice_unit,
-                int* variable,
-                void (*function)(int),
-                int step,
-                int min,
-                int max,
-                void (*formatter)(char*, size_t, int, const char*),
-                int32_t (*get_talk_id)(int, int))
-{
-    (void)unit;
-    struct settings_list item;
-    struct int_setting data = {
-        function, voice_unit, min, max, step, 
-        formatter, get_talk_id
-    };
-    item.int_setting = &data;
-    item.flags = F_INT_SETTING|F_T_INT;
-    item.lang_id = -1;
-    item.cfg_vals = (char*)string;
-    item.setting = variable;
-    return option_screen(&item, false, NULL);
-}
 
 /* to be replaced */
 void option_select_init_items(struct option_select * opt,
@@ -649,5 +578,5 @@ void option_select_prev(struct option_select * opt)
 
 const char * option_select_get_text(struct option_select * opt)
 {
-        return(P2STR(opt->items[opt->option].string));
+    return(P2STR(opt->items[opt->option].string));
 }
