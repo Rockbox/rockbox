@@ -262,7 +262,6 @@ static bool cfg_string_to_int(int setting_id, int* out, char* str)
     }
     return false;
 }
-static bool settings_write_config(char* filename, int options);
 
 bool settings_load_config(const char* file, bool apply)
 {
@@ -274,8 +273,7 @@ bool settings_load_config(const char* file, bool apply)
     fd = open(file, O_RDONLY);
     if (fd < 0)
         return false;
-    settings_write_config(ROCKBOX_DIR "oldcfg.cfg", SETTINGS_SAVE_CHANGED);
-    
+
     while (read_line(fd, line, sizeof line) > 0)
     {
         if (!settings_parseline(line, &name, &value))
@@ -452,7 +450,7 @@ static bool is_changed(int setting_id)
     return true;
 }
 
-static bool settings_write_config(char* filename, int options)
+bool settings_write_config(char* filename, int options)
 {
     int i;
     int fd;
@@ -951,7 +949,7 @@ void settings_reset(void) {
 
     int i;
     DEBUGF( "settings_reset()\n" );
-    settings_write_config(ROCKBOX_DIR "oldcfg.cfg", SETTINGS_SAVE_CHANGED);
+
     for(i=0; i<nb_settings; i++)
     {
         switch (settings[i].flags&F_T_MASK)
