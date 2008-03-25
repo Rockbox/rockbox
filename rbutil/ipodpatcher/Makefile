@@ -47,11 +47,11 @@ ipodpatcher-mac: ipodpatcher-i386 ipodpatcher-ppc
 	lipo -create ipodpatcher-ppc ipodpatcher-i386 -output ipodpatcher-mac
 
 ipodpatcher-i386: $(SRC) ipodio-posix.c $(BOOTSRC)
-	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o bin/i386/program -arch i386 $(CFLAGS) -o ipodpatcher-i386 $(SRC) ipodio-posix.c $(BOOTSRC)
+	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 $(CFLAGS) -o ipodpatcher-i386 $(SRC) ipodio-posix.c $(BOOTSRC)
 	strip ipodpatcher-i386
 
 ipodpatcher-ppc: $(SRC) ipodio-posix.c $(BOOTSRC)
-	gcc -arch ppc $(CFLAGS) -o ipodpatcher-ppc $(SRC) ipodio-posix.c $(BOOTSRC)
+	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch ppc $(CFLAGS) -o ipodpatcher-ppc $(SRC) ipodio-posix.c $(BOOTSRC)
 	strip ipodpatcher-ppc
 
 ipod2c: ipod2c.c

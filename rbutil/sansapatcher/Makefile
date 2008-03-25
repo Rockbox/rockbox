@@ -35,11 +35,11 @@ sansapatcher-mac: sansapatcher-i386 sansapatcher-ppc
 	lipo -create sansapatcher-ppc sansapatcher-i386 -output sansapatcher-mac
 
 sansapatcher-i386: main.c sansapatcher.c sansaio-posix.c parttypes.h bootimg_c200.c bootimg_e200.c
-	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -o bin/i386/program -arch i386 $(CFLAGS) -o sansapatcher-i386 main.c sansapatcher.c sansaio-posix.c bootimg_c200.c bootimg_e200.c
+	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 $(CFLAGS) -o sansapatcher-i386 main.c sansapatcher.c sansaio-posix.c bootimg_c200.c bootimg_e200.c
 	strip sansapatcher-i386
 
 sansapatcher-ppc: main.c sansapatcher.c sansaio-posix.c parttypes.h bootimg_c200.c bootimg_e200.c
-	gcc -arch ppc $(CFLAGS) -o sansapatcher-ppc main.c sansapatcher.c sansaio-posix.c bootimg_c200.c bootimg_e200.c
+	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch ppc $(CFLAGS) -o sansapatcher-ppc main.c sansapatcher.c sansaio-posix.c bootimg_c200.c bootimg_e200.c
 	strip sansapatcher-ppc
 
 bin2c: bin2c.c
