@@ -31,7 +31,14 @@
     .global     _grey_line1
     .type       _grey_line1, @function
     
-#if (LCD_PIXELFORMAT == VERTICAL_PACKING) && (LCD_DEPTH == 2)
+#if (LCD_PIXELFORMAT == VERTICAL_PACKING) \
+ || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
+ 
+#if (LCD_DEPTH == 1) || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
+#define GREY_BSIZE 8
+#elif LCD_DEPTH == 2
+#define GREY_BSIZE 4
+#endif
     
 /****************************************************************************
  * void _grey_line1(int width,
@@ -52,7 +59,7 @@ _grey_line1:
 
     move.b  (%a1)+, %d0
     move.b  (%d0.l, %a2), (%a0)
-    addq.l  #4, %a0
+    addq.l  #GREY_BSIZE, %a0
     subq.l  #1, %d2
 .p1_h_end:
 
@@ -66,10 +73,10 @@ _grey_line1:
     move.w  %d1, %d0
     lsr.l   #8, %d0
     move.b  (%d0.l, %a2), (%a0)
-    addq.l  #4, %a0
+    addq.l  #GREY_BSIZE, %a0
     move.b  %d1, %d0
     move.b  (%d0.l, %a2), (%a0)
-    addq.l  #4, %a0
+    addq.l  #GREY_BSIZE, %a0
     subq.l  #2, %d2
 .p2_h_end:
 
@@ -82,18 +89,18 @@ _grey_line1:
     move.w  %d1, %d0
     lsr.l   #8, %d0
     move.b  (%d0.l, %a2), (%a0)
-    addq.l  #4, %a0
+    addq.l  #GREY_BSIZE, %a0
     move.b  %d1, %d0
     move.b  (%d0.l, %a2), (%a0)
-    addq.l  #4, %a0
+    addq.l  #GREY_BSIZE, %a0
     swap    %d1
     move.w  %d1, %d0
     lsr.l   #8, %d0
     move.b  (%d0.l, %a2), (%a0)
-    addq.l  #4, %a0
+    addq.l  #GREY_BSIZE, %a0
     move.b  %d1, %d0
     move.b  (%d0.l, %a2), (%a0)
-    addq.l  #4, %a0
+    addq.l  #GREY_BSIZE, %a0
     subq.l  #4, %d2
     bhs.s   .p4_loop
     
@@ -107,10 +114,10 @@ _grey_line1:
     move.w  %d1, %d0
     lsr.l   #8, %d0
     move.b  (%d0.l, %a2), (%a0)
-    addq.l  #4, %a0
+    addq.l  #GREY_BSIZE, %a0
     move.b  %d1, %d0
     move.b  (%d0.l, %a2), (%a0)
-    addq.l  #4, %a0
+    addq.l  #GREY_BSIZE, %a0
 .p2_t_end:
 
     btst.l  #0, %d2

@@ -26,7 +26,8 @@
 #include "plugin.h"
 #include "grey.h"
 
-#if defined(CPU_PP) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && \
+    (defined(CPU_PP) || (CONFIG_LCD == LCD_TL0350A))
 #define NEED_BOOST
 #endif
 
@@ -143,6 +144,42 @@ static const unsigned char lcdlinear[256] = {
     203, 206, 209, 212, 215, 219, 222, 226,
     229, 233, 236, 240, 244, 248, 251, 255
 };
+#elif CONFIG_LCD == LCD_TL0350A
+/* measured and interpolated curve for iaudio remote */
+static const unsigned char lcdlinear[256] = {
+      5,   9,  13,  17,  21,  25,  29,  33,
+     36,  39,  42,  45,  48,  51,  54,  57,
+     60,  62,  65,  67,  70,  72,  75,  77,
+     80,  82,  84,  86,  87,  89,  91,  93,
+     94,  95,  96,  97,  97,  98,  99,  99,
+    100, 100, 101, 102, 103, 103, 104, 105,
+    106, 106, 107, 108, 108, 109, 110, 111,
+    112, 112, 113, 113, 114, 114, 115, 115,
+    116, 116, 117, 117, 118, 118, 119, 119,
+    120, 120, 121, 121, 122, 122, 123, 123,
+    124, 124, 124, 125, 125, 126, 126, 126,
+    127, 127, 127, 128, 128, 129, 129, 129,
+    130, 130, 131, 131, 132, 132, 133, 133,
+    134, 134, 135, 135, 136, 136, 137, 137,
+    138, 138, 139, 139, 140, 140, 141, 141,
+    142, 142, 143, 143, 144, 144, 145, 145,
+    146, 146, 147, 147, 148, 149, 149, 150,
+    151, 151, 152, 152, 153, 154, 154, 155,
+    156, 156, 157, 157, 158, 159, 159, 160,
+    161, 161, 162, 163, 164, 164, 165, 166,
+    167, 167, 168, 169, 170, 170, 171, 172,
+    173, 173, 174, 175, 176, 176, 177, 178,
+    179, 179, 180, 181, 182, 182, 183, 184,
+    185, 186, 187, 188, 188, 189, 191, 191,
+    192, 193, 194, 195, 195, 196, 197, 198,
+    199, 200, 201, 202, 203, 204, 205, 206,
+    207, 208, 209, 210, 211, 212, 213, 214,
+    215, 216, 217, 218, 219, 220, 222, 223,
+    224, 225, 226, 227, 228, 229, 230, 231,
+    232, 233, 234, 235, 236, 237, 238, 239,
+    240, 240, 241, 242, 243, 243, 244, 245,
+    246, 246, 247, 248, 249, 250, 251, 252
+};
 #endif
 #else /* SIMULATOR */
 /* undo a (generic) PC display gamma of 2.0 to simulate target behaviour */
@@ -225,7 +262,7 @@ static unsigned long _grey_get_pixel(int x, int y)
     int yg = y - _grey_info.y;
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     int idx = _grey_info.width * yg + xg;
-#else
+#else /* vertical packing or vertical interleaved */
     int idx = _grey_info.width * (yg & ~_GREY_BMASK) 
             + (xg << _GREY_BSHIFT) + (~yg & _GREY_BMASK);
 #endif
@@ -243,7 +280,7 @@ static void _timer_isr(void)
                                        _grey_info.bx, _grey_info.y,
                                        _grey_info.bwidth, _grey_info.height,
                                        _grey_info.width);
-#else
+#else /* vertical packing or vertical interleaved */
     _grey_info.rb->lcd_blit_grey_phase(_grey_info.values, _grey_info.phases,
                                        _grey_info.x, _grey_info.by,
                                        _grey_info.width, _grey_info.bheight,
@@ -355,8 +392,8 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     bdim = (width + 7) >> 3;
     width = bdim << 3;
-#else /* vertical packing */
-#if LCD_DEPTH == 1
+#else /* vertical packing or vertical interleaved */
+#if (LCD_DEPTH == 1) || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
     bdim = (height + 7) >> 3;
     height = bdim << 3;
 #elif LCD_DEPTH == 2
@@ -408,7 +445,7 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     _grey_info.bx = 0;
     _grey_info.bwidth = bdim;
-#else
+#else /* vertical packing or vertical interleaved */
     _grey_info.by = 0;
     _grey_info.bheight = bdim;
 #endif
@@ -491,6 +528,9 @@ void grey_show(bool enable)
         _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / 83, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_MROBE100
         _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / 83, 1, _timer_isr); /* not calibrated/tested */
+#elif CONFIG_LCD == LCD_TL0350A
+        _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / 75, 1, _timer_isr); /* verified */
+        /* This is half of the actual frame frequency, but 150Hz is too much */
 #endif /* CONFIG_LCD */
 #endif /* !SIMULATOR */
         _grey_info.rb->screen_dump_set_hook(grey_screendump_hook);
@@ -607,8 +647,11 @@ static void grey_screendump_hook(int fd)
 #elif LCD_DEPTH == 2
     int shift;
 #endif
-#endif /* LCD_PIXELFORMAT == VERTICAL_PACKING */
-    unsigned char *lcdptr;
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+    unsigned data;
+    int shift;
+#endif /* LCD_PIXELFORMAT */
+    fb_data *lcdptr;
     unsigned char *clut_entry;
     unsigned char linebuf[MAX(4*BMP_VARCOLORS,BMP_LINESIZE)];
 
@@ -660,7 +703,7 @@ static void grey_screendump_hook(int fd)
             lcdptr++;
         }
 #endif /* LCD_DEPTH */
-#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
 #if LCD_DEPTH == 1
         mask = 1 << (y & 7);
         lcdptr = _grey_info.rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
@@ -704,6 +747,32 @@ static void grey_screendump_hook(int fd)
             else
             {
                 linebuf[x] = (*lcdptr >> shift) & 3;
+            }
+            lcdptr++;
+        }
+#endif /* LCD_DEPTH */
+#elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
+#if LCD_DEPTH == 2
+        shift = y & 7;
+        lcdptr = _grey_info.rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
+
+        for (x = 0; x < LCD_WIDTH; x++)
+        {
+            gx = x - _grey_info.x;
+
+            if (((unsigned)gy < (unsigned)_grey_info.height)
+                && ((unsigned)gx < (unsigned)_grey_info.width))
+            {
+                linebuf[x] = BMP_FIXEDCOLORS
+                           + _grey_info.values[_GREY_MULUQ(_grey_info.width,
+                                                           gy & ~_GREY_BMASK)
+                                               + (gx << _GREY_BSHIFT)
+                                               + (~gy & _GREY_BMASK)];
+            }
+            else
+            {
+                data = (*lcdptr >> shift) & 0x0101;
+                linebuf[x] = ((data >> 7) | data) & 3;
             }
             lcdptr++;
         }

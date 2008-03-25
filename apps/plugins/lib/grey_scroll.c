@@ -191,7 +191,8 @@ void grey_ub_scroll_up(int count)
                               _grey_info.fg_brightness :
                               _grey_info.bg_brightness];
 
-#if LCD_PIXELFORMAT == VERTICAL_PACKING
+#if (LCD_PIXELFORMAT == VERTICAL_PACKING) \
+ || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
     if (count & _GREY_BMASK)
     {
         /* Scrolling by fractional blocks - move pixel wise. */
@@ -262,7 +263,8 @@ void grey_ub_scroll_down(int count)
                               _grey_info.fg_brightness :
                               _grey_info.bg_brightness];
 
-#if LCD_PIXELFORMAT == VERTICAL_PACKING
+#if (LCD_PIXELFORMAT == VERTICAL_PACKING) \
+ || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
     if (count & _GREY_BMASK)
     {
         /* Scrolling by fractional blocks - move pixel wise. */
@@ -302,6 +304,9 @@ void grey_ub_scroll_down(int count)
             }
             while (dst < line_end);
         }
+        /* Top pixel in a block has the highest address, but dst must point
+         * to the lowest address in that block for the subsequent fill. */
+        dst -= _GREY_BMASK;
     }
     else
 #endif
@@ -311,7 +316,7 @@ void grey_ub_scroll_down(int count)
         dst -= blen;
         _grey_info.rb->memmove(dst, start, blen);
     }
-    _grey_info.rb->memset(start, blank, dst - start); 
+    _grey_info.rb->memset(start, blank, dst - start);
     /* Fill remainder at once. */
 #ifdef SIMULATOR
     _grey_info.rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
