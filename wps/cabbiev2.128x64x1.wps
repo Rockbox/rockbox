@@ -1,13 +1,10 @@
 # cabbie 2.0 default rwps for Iriver Players by Johannes Voggenthaler (Zinc Alloy)
 # derived from cabbie 2.0 default rwps (C) 2007, Marc Guay
 %wd
-%P|pbar-128x64x1.bmp|
+%P|pb-128x64x1.bmp|
 %x|A|wpsbackdrop-128x64x1.bmp|0|0|
-%pb|8|4|123|38|
+%pb|8|1|126|38|
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 
 %al   %pc%ar%pr   
-
-%xdB  
-
