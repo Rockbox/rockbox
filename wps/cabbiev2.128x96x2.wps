@@ -1,13 +1,24 @@
-# cabbie 2.0 default for the iAudio X5 Series by Marc Guay
-# derived from cabbie 2.0 default (C) 2007, Johannes Voggenthaler (Zinc Alloy)
 %wd
 %X|wpsbackdrop-128x96x2.bmp|
 %P|pb-128x96x2.bmp|
-%pb|8|4|122|76|
+%xl|A|lock-160x128x2.bmp|3|1|2|
+%xl|B|battery-160x128x2.bmp|26|2|10|
+%xl|C|volume-160x128x2.bmp|49|1|10|
+%xl|D|shuffle-160x128x2.bmp|72|2|
+%xl|E|repeat-160x128x2.bmp|93|0|4|
+%xl|F|playmode-160x128x2.bmp|112|1|5|
+%pb|7|1|126|61|
+%V|0|83|128|13|1|0|3|
+%?mh<%xdAa|%xdAb>
+%?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
+%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
+%?ps<%xdD>
+%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
+%?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
+%V|0|10|128|72|1|0|3|
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>
-
 %sNext: %ac%It
 
-%al   %pc%ar%pr   
+%al %pc%ac%pp of %pe%ar%pr 
