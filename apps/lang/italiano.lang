@@ -785,10 +785,10 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "Scrivi file .cfg"
+    *: "Salva file .cfg"
   </dest>
   <voice>
-    *: "Scrivi File di Configurazione"
+    *: "Salva File di Configurazione"
   </voice>
 </phrase>
 <phrase>
@@ -3545,10 +3545,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Massimo numero di files nelle cartelle"
+    *: "Numero massimo di elementi nelle cartelle"
   </dest>
   <voice>
-    *: "Massimo numero di file nelle cartelle"
+    *: "Numero massimo di elementi nelle cartelle"
   </voice>
 </phrase>
 <phrase>
