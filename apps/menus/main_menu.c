@@ -68,6 +68,7 @@ static int reset_settings(void)
     switch(gui_syncyesno_run(&message, &yes_message, &no_message))
     {
         case YESNO_YES:
+            settings_write_config(CONFIGFILE ".bak", SETTINGS_SAVE_CHANGED);
             settings_reset();
             settings_apply(true);
             settings_save();

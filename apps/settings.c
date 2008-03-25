@@ -450,7 +450,7 @@ static bool is_changed(int setting_id)
     return true;
 }
 
-static bool settings_write_config(char* filename, int options)
+bool settings_write_config(char* filename, int options)
 {
     int i;
     int fd;
