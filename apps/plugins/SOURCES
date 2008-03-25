@@ -19,7 +19,6 @@ stats.c
 stopwatch.c
 vbrfix.c
 viewer.c
-test_disk.c           
 
 #ifdef OLYMPUS_MROBE_500
 /* remove these once the plugins before it are compileable */
@@ -47,22 +46,17 @@ flipit.c
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
 brickmania.c
 maze.c
-mazezam.c      
-greyscale.c
-test_fps.c
-test_scanrate.c
+mazezam.c
 text_editor.c
 wavview.c
 robotfindskitten.c
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
+#ifndef IAUDIO_M3 /* FIXME: no greyscale library yet */
 fire.c
 jpeg.c
 mandelbrot.c
 plasma.c
-
-#if LCD_DEPTH < 4
-test_grey.c
 #endif
 
 blackjack.c
@@ -124,7 +118,6 @@ nim.c
 
 #if CONFIG_CODEC == SWCODEC        /* software codec platforms */
 mp3_encoder.c
-test_codec.c
 wav2wv.c
 #else                              /* hardware codec platforms */
 #ifndef HAVE_MMC                   /* not for Ondio, has no remote control pin */

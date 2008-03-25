@@ -90,9 +90,6 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     [AFMT_AAC] =
         AFMT_ENTRY("AAC",  "aac",     NULL,          "mp4\0"      ),
     /* Shorten */
-    [AFMT_MOD] =
-        AFMT_ENTRY("MOD",  "mod",     NULL,          "mod\0"      ),
-    /* Shorten */
     [AFMT_SHN] =
         AFMT_ENTRY("SHN",  "shorten", NULL,          "shn\0"      ),
     /* SID File Format */

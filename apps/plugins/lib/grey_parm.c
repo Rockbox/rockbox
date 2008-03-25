@@ -34,8 +34,8 @@ void grey_set_position(int x, int y)
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     _grey_info.bx = (x + 4) >> 3;
     x = 8 * _grey_info.bx;
-#else /* vertical packing or vertical interleaved */
-#if (LCD_DEPTH == 1) || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
+#else
+#if LCD_DEPTH == 1
     _grey_info.by = (y + 4) >> 3;
     y = 8 * _grey_info.by;
 #elif LCD_DEPTH == 2

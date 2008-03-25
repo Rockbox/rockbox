@@ -513,7 +513,6 @@ target/coldfire/iaudio/m3/backlight-m3.c
 target/coldfire/iaudio/m3/button-m3.c
 target/coldfire/iaudio/m3/fmradio_i2c-m3.c
 target/coldfire/iaudio/m3/lcd-m3.c
-target/coldfire/iaudio/m3/lcd-as-m3.S
 target/coldfire/iaudio/m3/power-m3.c
 target/coldfire/iaudio/m3/powermgmt-m3.c
 target/coldfire/iaudio/m3/system-m3.c

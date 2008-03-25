@@ -191,8 +191,7 @@ void grey_ub_scroll_up(int count)
                               _grey_info.fg_brightness :
                               _grey_info.bg_brightness];
 
-#if (LCD_PIXELFORMAT == VERTICAL_PACKING) \
- || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
     if (count & _GREY_BMASK)
     {
         /* Scrolling by fractional blocks - move pixel wise. */
@@ -263,8 +262,7 @@ void grey_ub_scroll_down(int count)
                               _grey_info.fg_brightness :
                               _grey_info.bg_brightness];
 
-#if (LCD_PIXELFORMAT == VERTICAL_PACKING) \
- || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
     if (count & _GREY_BMASK)
     {
         /* Scrolling by fractional blocks - move pixel wise. */

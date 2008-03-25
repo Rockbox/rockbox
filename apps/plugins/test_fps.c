@@ -260,7 +260,7 @@ static void time_remote_update(void)
 }
 #endif
 
-#if LCD_DEPTH < 4
+#if (LCD_DEPTH < 4) && !defined(IAUDIO_M3)
 
 GREY_INFO_STRUCT_IRAM
 static unsigned char greydata[LCD_HEIGHT][LCD_WIDTH];
@@ -357,7 +357,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     log_text("Main LCD YUV");
     time_main_yuv();
 #endif
-#if LCD_DEPTH < 4
+#if (LCD_DEPTH < 4) && !defined(IAUDIO_M3)
     log_text("Greyscale library");
     time_greyscale();
 #endif
