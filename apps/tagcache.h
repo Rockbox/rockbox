@@ -60,7 +60,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 /* How many entries to fetch to the seek table at once while searching. */
 #define SEEK_LIST_SIZE 32
 
-/* Always strict align entries for best performance and binary compatability. */
+/* Always strict align entries for best performance and binary compatibility. */
 #define TAGCACHE_STRICT_ALIGN 1
 
 /* Max events in the internal tagcache command queue. */
