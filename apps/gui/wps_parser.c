@@ -610,7 +610,7 @@ static int parse_viewport(const char *wps_bufptr,
         }
     }
     else
-#else
+#endif
     {
         if ((vp->x >= LCD_WIDTH) ||
             ((vp->x + vp->width) > LCD_WIDTH) ||
@@ -620,7 +620,6 @@ static int parse_viewport(const char *wps_bufptr,
             return WPS_ERROR_INVALID_PARAM;
         }
     }
-#endif
 
     wps_data->viewports[wps_data->num_viewports-1].last_line = wps_data->num_lines - 1;
 
