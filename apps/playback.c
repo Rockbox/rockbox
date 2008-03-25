@@ -163,7 +163,7 @@ enum {
 #define CODEC_IRAM_SIZE     ((size_t)0xc000)
 #endif
 
-bool audio_is_initialized = false;
+static bool audio_is_initialized = false;
 static bool audio_thread_ready NOCACHEBSS_ATTR = false;
 
 /* Variables are commented with the threads that use them: *
@@ -1669,7 +1669,7 @@ static void audio_set_elapsed(struct mp3entry* id3)
    everything required was loaded correctly, false if not. */
 static bool audio_load_track(int offset, bool start_play)
 {
-    char *trackname;
+    const char *trackname;
     char msgbuf[80];
     int fd = -1;
     int file_offset = 0;
@@ -2386,7 +2386,7 @@ static void audio_reset_buffer(void)
        the location of others. */
     {
         size_t pcmbufsize;
-        unsigned char * pcmbuf = pcmbuf_get_meminfo(&pcmbufsize);
+        const unsigned char *pcmbuf = pcmbuf_get_meminfo(&pcmbufsize);
         logf("mabuf:  %08X", (unsigned)malloc_buf);
         logf("mabufe: %08X", (unsigned)(malloc_buf + MALLOC_BUFSIZE));
         logf("fbuf:   %08X", (unsigned)filebuf);
