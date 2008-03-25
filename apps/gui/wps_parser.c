@@ -24,6 +24,7 @@
 #include <string.h>
 #include "atoi.h"
 #include "gwps.h"
+#include "font.h"
 #ifndef __PCTOOL__
 #include "settings.h"
 #include "misc.h"

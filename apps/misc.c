@@ -18,6 +18,8 @@
  ****************************************************************************/
 #include <stdlib.h>
 #include <ctype.h>
+#include "sprintf.h"
+#ifndef __PCTOOL__
 #include "lang.h"
 #include "string.h"
 #include "config.h"
@@ -25,7 +27,6 @@
 #include "dir.h"
 #include "lcd.h"
 #include "lcd-remote.h"
-#include "sprintf.h"
 #include "errno.h"
 #include "system.h"
 #include "timefuncs.h"
@@ -48,15 +49,17 @@
 #include "tagcache.h"
 #include "scrobbler.h"
 #include "sound.h"
+#endif
+
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
 #include "tree.h"
 #include "eeprom_settings.h"
-#ifdef HAVE_RECORDING
+#if defined(HAVE_RECORDING) && !defined(__PCTOOL__)
 #include "recording.h"
 #endif
-#ifdef HAVE_LCD_BITMAP
+#if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
 #include "bmp.h"
 #include "icons.h"
 #endif /* End HAVE_LCD_BITMAP */
@@ -74,6 +77,7 @@
 #endif
 #endif
 
+#ifndef __PCTOOL__
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
@@ -1087,38 +1091,6 @@ void setvol(void)
     settings_save();
 }
 
-#ifdef HAVE_LCD_COLOR
-/*
- * Helper function to convert a string of 6 hex digits to a native colour
- */
-
-static int hex2dec(int c)
-{
-   return  (((c) >= '0' && ((c) <= '9')) ? (c) - '0' :
-                                           (toupper(c)) - 'A' + 10);
-}
-
-int hex_to_rgb(const char* hex, int* color)
-{
-    int red, green, blue;
-    int i = 0;
-
-    while ((i < 6) && (isxdigit(hex[i])))
-        i++;
-
-    if (i < 6)
-        return -1;
-
-    red = (hex2dec(hex[0]) << 4) | hex2dec(hex[1]);
-    green = (hex2dec(hex[2]) << 4) | hex2dec(hex[3]);
-    blue = (hex2dec(hex[4]) << 4) | hex2dec(hex[5]);
-
-    *color = LCD_RGBPACK(red,green,blue);
-
-    return 0;
-}
-#endif /* HAVE_LCD_COLOR */
-
 char* strrsplt(char* str, int c)
 {
     char* s = strrchr(str, c);
@@ -1196,6 +1168,39 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
 
     return buffer;
 }
+#endif /* !defined(__PCTOOL__) */
+
+#ifdef HAVE_LCD_COLOR
+/*
+ * Helper function to convert a string of 6 hex digits to a native colour
+ */
+
+static int hex2dec(int c)
+{
+   return  (((c) >= '0' && ((c) <= '9')) ? (c) - '0' :
+                                           (toupper(c)) - 'A' + 10);
+}
+
+int hex_to_rgb(const char* hex, int* color)
+{
+    int red, green, blue;
+    int i = 0;
+
+    while ((i < 6) && (isxdigit(hex[i])))
+        i++;
+
+    if (i < 6)
+        return -1;
+
+    red = (hex2dec(hex[0]) << 4) | hex2dec(hex[1]);
+    green = (hex2dec(hex[2]) << 4) | hex2dec(hex[3]);
+    blue = (hex2dec(hex[4]) << 4) | hex2dec(hex[5]);
+
+    *color = LCD_RGBPACK(red,green,blue);
+
+    return 0;
+}
+#endif /* HAVE_LCD_COLOR */
 
 #ifdef HAVE_LCD_BITMAP
 /* A simplified scanf - used (at time of writing) by wps parsing functions.

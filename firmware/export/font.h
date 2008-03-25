@@ -27,7 +27,9 @@
 #include "config.h"
 
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
+#ifndef __PCTOOL__
 #include "sysfont.h"
+#endif
 
 /* max static loadable font buffer size */
 #ifndef MAX_FONT_SIZE
