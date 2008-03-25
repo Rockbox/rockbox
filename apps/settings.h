@@ -200,7 +200,6 @@ bool settings_load_config(const char* file, bool apply);
 
 void status_save( void );
 int settings_save(void);
-
 /* defines for the options paramater */
 enum {
     SETTINGS_SAVE_CHANGED = 0,
@@ -215,7 +214,6 @@ enum {
 #endif
 };
 bool settings_save_config(int options);
-bool settings_write_config(char* filename, int options);
 
 void settings_reset(void);
 void sound_settings_apply(void);
