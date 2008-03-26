@@ -120,12 +120,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 103
+#define PLUGIN_API_VERSION 104
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 103
+#define PLUGIN_MIN_API_VERSION 104
 
 /* plugin return codes */
 enum plugin_status {
@@ -684,20 +684,20 @@ struct plugin_api {
 
 #if (CONFIG_CODEC == SWCODEC)
     /* buffering API */
-    int (*bufopen)(const char *file, size_t offset, enum data_type type);
-    int (*bufalloc)(const void *src, size_t size, enum data_type type);
-    bool (*bufclose)(int handle_id);
-    int (*bufseek)(int handle_id, size_t newpos);
-    int (*bufadvance)(int handle_id, off_t offset);
-    ssize_t (*bufread)(int handle_id, size_t size, void *dest);
-    ssize_t (*bufgetdata)(int handle_id, size_t size, void **data);
-    ssize_t (*bufgettail)(int handle_id, size_t size, void **data);
-    ssize_t (*bufcuttail)(int handle_id, size_t size);
+    int (*bufopen)(const char *file, size_t offset, const enum data_type type);
+    int (*bufalloc)(const void *src, const size_t size, const enum data_type type);
+    bool (*bufclose)(const int handle_id);
+    int (*bufseek)(const int handle_id, const size_t newpos);
+    int (*bufadvance)(const int handle_id, const off_t offset);
+    ssize_t (*bufread)(const int handle_id, size_t size, void *dest);
+    ssize_t (*bufgetdata)(const int handle_id, size_t size, void **data);
+    ssize_t (*bufgettail)(const int handle_id, const size_t size, void **data);
+    ssize_t (*bufcuttail)(const int handle_id, size_t size);
 
-    ssize_t (*buf_get_offset)(int handle_id, void *ptr);
-    ssize_t (*buf_handle_offset)(int handle_id);
-    void (*buf_request_buffer_handle)(int handle_id);
-    void (*buf_set_base_handle)(int handle_id);
+    ssize_t (*buf_get_offset)(const int handle_id, void *ptr);
+    ssize_t (*buf_handle_offset)(const int handle_id);
+    void (*buf_request_buffer_handle)(const int handle_id);
+    void (*buf_set_base_handle)(const int handle_id);
     size_t (*buf_used)(void);
 #endif
 

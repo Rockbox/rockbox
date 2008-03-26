@@ -56,7 +56,7 @@ enum callback_event {
 void buffering_init(void);
 
 /* Reset the buffering system */
-bool buffering_reset(char *buf, size_t buflen);
+bool buffering_reset(char *buf, const size_t buflen);
 
 
 /***************************************************************************
@@ -80,15 +80,15 @@ bool buffering_reset(char *buf, size_t buflen);
 
 #define BUF_MAX_HANDLES         256
 
-int bufopen(const char *file, size_t offset, enum data_type type);
-int bufalloc(const void *src, size_t size, enum data_type type);
-bool bufclose(int handle_id);
-int bufseek(int handle_id, size_t newpos);
-int bufadvance(int handle_id, off_t offset);
-ssize_t bufread(int handle_id, size_t size, void *dest);
-ssize_t bufgetdata(int handle_id, size_t size, void **data);
-ssize_t bufgettail(int handle_id, size_t size, void **data);
-ssize_t bufcuttail(int handle_id, size_t size);
+int bufopen(const char *file, size_t offset, const enum data_type type);
+int bufalloc(const void *src, const size_t size, const enum data_type type);
+bool bufclose(const int handle_id);
+int bufseek(const int handle_id, const size_t newpos);
+int bufadvance(const int handle_id, const off_t offset);
+ssize_t bufread(const int handle_id, size_t size, void *dest);
+ssize_t bufgetdata(const int handle_id, size_t size, void **data);
+ssize_t bufgettail(const int handle_id, const size_t size, void **data);
+ssize_t bufcuttail(const int handle_id, size_t size);
 
 
 /***************************************************************************
@@ -102,10 +102,10 @@ ssize_t bufcuttail(int handle_id, size_t size);
  * buf_used: Total amount of buffer space used (including allocated space)
  ****************************************************************************/
 
-ssize_t buf_get_offset(int handle_id, void *ptr);
-ssize_t buf_handle_offset(int handle_id);
-void buf_request_buffer_handle(int handle_id);
-void buf_set_base_handle(int handle_id);
+ssize_t buf_get_offset(const int handle_id, void *ptr);
+ssize_t buf_handle_offset(const int handle_id);
+void buf_request_buffer_handle(const int handle_id);
+void buf_set_base_handle(const int handle_id);
 size_t buf_used(void);
 
 
@@ -123,9 +123,9 @@ size_t buf_used(void);
  ****************************************************************************/
 
 #define MAX_BUF_CALLBACKS 4
-typedef void (*buffering_callback)(enum callback_event ev, int value);
-bool register_buffering_callback(buffering_callback func);
-void unregister_buffering_callback(buffering_callback func);
+typedef void (*buffering_callback)(const enum callback_event ev, const int value);
+bool register_buffering_callback(const buffering_callback func);
+void unregister_buffering_callback(const buffering_callback func);
 
 /* Settings */
 enum {

@@ -1231,7 +1231,7 @@ bool mp3info(struct mp3entry *entry, const char *filename)
     return result;
 }
 
-void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
+void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig)
 {
     long offset;
     if (orig > dest)
@@ -1270,7 +1270,7 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
 #endif
 }
 
-void copy_mp3entry(struct mp3entry *dest, struct mp3entry *orig)
+void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig)
 {
     memcpy(dest, orig, sizeof(struct mp3entry));
     adjust_mp3entry(dest, dest, orig);
