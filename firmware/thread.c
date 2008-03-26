@@ -399,7 +399,7 @@ static inline void core_sleep(void)
 {
     PROC_CTL(CURRENT_CORE) = PROC_SLEEP;
     nop; nop; nop;
-    set_irq_level(IRQ_ENABLED);
+    enable_irq();
 }
 #else
 static inline void core_sleep(unsigned int core)
@@ -421,9 +421,6 @@ static inline void core_sleep(unsigned int core)
         "ldr    r1, [%[mbx], #0]           \n"
         "tst    r1, r0, lsr #2             \n"
         "bne    1b                         \n"
-        "mrs    r1, cpsr                   \n" /* Enable IRQ */
-        "bic    r1, r1, #0x80              \n"
-        "msr    cpsr_c, r1                 \n"
         :
         :  [ctl]"r"(&PROC_CTL(CPU)), [mbx]"r"(MBX_BASE), [c]"r"(core)
         : "r0", "r1");
@@ -443,10 +440,8 @@ static inline void core_sleep(unsigned int core)
 
     /* Wait for other processor to finish wake procedure */
     while (MBX_MSG_STAT & (0x1 << core));
-
-    /* Enable IRQ */
-    set_irq_level(IRQ_ENABLED);
 #endif /* ASM/C selection */
+    enable_irq();
 }
 #endif /* NUM_CORES */
 #elif CONFIG_CPU == PP5002
@@ -465,13 +460,11 @@ static inline void core_sleep(void)
         "nop                  \n" /* nop's needed because of pipeline */
         "nop                  \n"
         "nop                  \n"
-        "mrs    r0, cpsr      \n" /* Enable IRQ */
-        "bic    r0, r0, #0x80 \n"
-        "msr    cpsr_c, r0    \n"
         :
         : [ctl]"r"(&PROC_CTL(CURRENT_CORE))
         : "r0"
     );
+    enable_irq();
 }
 #else
 /* PP5002 has no mailboxes - emulate using bytes */
@@ -503,9 +496,6 @@ static inline void core_sleep(unsigned int core)
         "ldrb   r0, [%[sem], #0]           \n"
         "cmp    r0, #0                     \n"
         "bne    1b                         \n"
-        "mrs    r0, cpsr                   \n" /* Enable IRQ */
-        "bic    r0, r0, #0x80              \n"
-        "msr    cpsr_c, r0                 \n"
         :
         : [sem]"r"(&core_semaphores[core]), [c]"r"(core),
           [ctl]"r"(&PROC_CTL(CPU))
@@ -530,8 +520,8 @@ static inline void core_sleep(unsigned int core)
     while (core_semaphores[core].intend_wake != 0);
 
     /* Enable IRQ */
-    set_irq_level(IRQ_ENABLED);
 #endif /* ASM/C selection */
+    enable_irq();
 }
 #endif /* NUM_CORES */
 #endif /* PP CPU type */
@@ -578,7 +568,7 @@ void core_wake(unsigned int othercore)
         : "r1", "r2", "r3");
 #else /* C version for reference */
     /* Disable interrupts - avoid reentrancy from the tick */
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
     /* Signal intent to wake other processor - set stay awake */
     MBX_MSG_SET = 0x11 << othercore;
@@ -593,7 +583,7 @@ void core_wake(unsigned int othercore)
 
     /* Done with wake procedure */
     MBX_MSG_CLR = 0x1 << othercore;
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 #endif /* ASM/C selection */
 }
 #elif CONFIG_CPU == PP5002
@@ -631,7 +621,7 @@ void core_wake(unsigned int othercore)
     );
 #else /* C version for reference */
     /* Disable interrupts - avoid reentrancy from the tick */
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
     /* Signal intent to wake other processor - set stay awake */
     core_semaphores[othercore].intend_wake = 1;
@@ -647,7 +637,7 @@ void core_wake(unsigned int othercore)
 
     /* Done with wake procedure */
     core_semaphores[othercore].intend_wake = 0;
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 #endif  /* ASM/C selection */
 }
 #endif /* CPU type */
@@ -775,7 +765,7 @@ static inline void core_sleep(void)
 static inline void core_sleep(void)
 {
     #warning TODO: Implement core_sleep
-    set_irq_level(IRQ_ENABLED);
+    enable_irq();
 }
 #elif defined(CPU_TCC780X)
 static inline void core_sleep(void)
@@ -784,11 +774,9 @@ static inline void core_sleep(void)
     asm volatile (
         "mov r0, #0                \n"
         "mcr p15, 0, r0, c7, c0, 4 \n" /* Wait for interrupt */
-        "mrs r0, cpsr              \n" /* Unmask IRQ at core level */
-        "bic r0, r0, #0x80         \n"
-        "msr cpsr_c, r0            \n"
         : : : "r0"
     );
+    enable_irq();
 }
 #elif CONFIG_CPU == IMX31L
 static inline void core_sleep(void)
@@ -796,17 +784,15 @@ static inline void core_sleep(void)
     asm volatile (
         "mov r0, #0                \n"
         "mcr p15, 0, r0, c7, c0, 4 \n" /* Wait for interrupt */
-        "mrs r0, cpsr              \n" /* Unmask IRQ at core level */
-        "bic r0, r0, #0x80         \n"
-        "msr cpsr_c, r0            \n"
         : : : "r0"
     );
+    enable_irq();
 }
 #else
 static inline void core_sleep(void)
 {
     #warning core_sleep not implemented, battery life will be decreased
-    set_irq_level(0);
+    enable_irq();
 }
 #endif /* CONFIG_CPU == */
 
@@ -1706,14 +1692,14 @@ void check_tmo_threads(void)
     while (next != NULL)
     {
         /* Check sleeping threads. Allow interrupts between checks. */
-        set_irq_level(0);
+        enable_irq();
 
         struct thread_entry *curr = next;
 
         next = curr->tmo.next;
 
         /* Lock thread slot against explicit wakeup */
-        set_irq_level(HIGHEST_IRQ_LEVEL);
+        disable_irq();
         LOCK_THREAD(curr);
 
         unsigned state = curr->state;
@@ -1956,7 +1942,7 @@ void switch_thread(void)
             check_tmo_threads();
         }
 
-        set_irq_level(HIGHEST_IRQ_LEVEL);
+        disable_irq();
         RTR_LOCK(core);
 
         thread = cores[core].running;
@@ -2018,7 +2004,7 @@ void switch_thread(void)
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
             RTR_UNLOCK(core);
-            set_irq_level(0);
+            enable_irq();
             break;
         }
     }
@@ -2212,7 +2198,7 @@ unsigned int thread_queue_wake(struct thread_entry **list)
 static struct thread_entry * find_empty_thread_slot(void)
 {
     /* Any slot could be on an interrupt-accessible list */
-    IF_COP( int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL); )
+    IF_COP( int oldlevel = disable_irq_save(); )
     struct thread_entry *thread = NULL;
     int n;
 
@@ -2233,7 +2219,7 @@ static struct thread_entry * find_empty_thread_slot(void)
         UNLOCK_THREAD(t);
     }
 
-    IF_COP( set_irq_level(oldlevel); ) /* Reenable interrups - this slot is
+    IF_COP( restore_irq(oldlevel); ) /* Reenable interrups - this slot is
                                           not accesible to them yet */
     return thread;
 }
@@ -2247,7 +2233,7 @@ static struct thread_entry * find_empty_thread_slot(void)
 void core_idle(void)
 {
     IF_COP( const unsigned int core = CURRENT_CORE; )
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+    disable_irq();
     core_sleep(IF_COP(core));
 }
 
@@ -2277,7 +2263,7 @@ struct thread_entry*
         return NULL;
     }
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
 
     /* Munge the stack to make it easy to spot stack overflows */
     stackptr = ALIGN_UP((uintptr_t)stack, sizeof (uintptr_t));
@@ -2338,7 +2324,7 @@ struct thread_entry*
 
     UNLOCK_THREAD(thread);
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 
     return thread;
 }
@@ -2394,7 +2380,7 @@ void thread_wait(struct thread_entry *thread)
         IF_COP( current->obj_cl = &thread->waiter_cl; )
         current->bqp = &thread->queue;
 
-        set_irq_level(HIGHEST_IRQ_LEVEL);
+        disable_irq();
         block_thread(current);
 
         corelock_unlock(&thread->waiter_cl);
@@ -2418,7 +2404,7 @@ void thread_exit(void)
     /* Cancel CPU boost if any */
     cancel_cpu_boost();
 
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+    disable_irq();
 
     corelock_lock(&current->waiter_cl);
     LOCK_THREAD(current);
@@ -2503,7 +2489,7 @@ void remove_thread(struct thread_entry *thread)
     if (thread == current)
         thread_exit(); /* Current thread - do normal exit */
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
 
     corelock_lock(&thread->waiter_cl);
     LOCK_THREAD(thread);
@@ -2521,7 +2507,7 @@ void remove_thread(struct thread_entry *thread)
         /* Thread being killed - become a waiter */
         UNLOCK_THREAD(thread);
         corelock_unlock(&thread->waiter_cl);
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
         thread_wait(thread);
         return;
     }
@@ -2543,11 +2529,11 @@ void remove_thread(struct thread_entry *thread)
         corelock_unlock(&thread->waiter_cl);
 
         UNLOCK_THREAD(thread);
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
 
         old_core = switch_core(new_core);
 
-        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        oldlevel = disable_irq_save();
 
         corelock_lock(&thread->waiter_cl);
         LOCK_THREAD(thread);
@@ -2643,7 +2629,7 @@ thread_killed: /* Thread was already killed */
     /* Removal complete - safe to unlock and reenable interrupts */
     corelock_unlock(&thread->waiter_cl);
     UNLOCK_THREAD(thread);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 
 #if NUM_CORES > 1
     if (old_core < NUM_CORES)
@@ -2675,7 +2661,7 @@ int thread_set_priority(struct thread_entry *thread, int priority)
 
     /* Thread could be on any list and therefore on an interrupt accessible
        one - disable interrupts */
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
     LOCK_THREAD(thread);
 
@@ -2788,7 +2774,7 @@ int thread_set_priority(struct thread_entry *thread, int priority)
 
     UNLOCK_THREAD(thread);
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 
     return old_base_priority;
 }
@@ -2815,14 +2801,14 @@ int thread_get_priority(struct thread_entry *thread)
  */
 void thread_thaw(struct thread_entry *thread)
 {
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
     LOCK_THREAD(thread);
 
     if (thread->state == STATE_FROZEN)
         core_schedule_wakeup(thread);
 
     UNLOCK_THREAD(thread);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 /*---------------------------------------------------------------------------
@@ -2850,14 +2836,14 @@ unsigned int switch_core(unsigned int new_core)
         return core;
     }
 
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
     LOCK_THREAD(current);
 
     if (current->name == THREAD_DESTRUCT)
     {
         /* Thread being killed - deactivate and let process complete */
         UNLOCK_THREAD(current);
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
         thread_wait(current);
         /* Should never be reached */
         THREAD_PANICF("switch_core->D:*R", current);

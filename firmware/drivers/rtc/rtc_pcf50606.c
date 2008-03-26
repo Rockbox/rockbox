@@ -30,21 +30,21 @@ void rtc_init(void)
 
 int rtc_read_datetime(unsigned char* buf) {
     int rc;
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
     
     rc = pcf50606_read_multiple(0x0a, buf, 7);
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
     return rc;
 }
 
 int rtc_write_datetime(unsigned char* buf) {
     int rc;
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
     
     rc = pcf50606_write_multiple(0x0a, buf, 7);
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 
     return rc;
 }

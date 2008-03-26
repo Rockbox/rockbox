@@ -110,7 +110,7 @@ static void bcm_setup_rect(unsigned x, unsigned y,
 #ifndef BOOTLOADER
 static void lcd_tick(void)
 {
-    /* No set_irq_level - already in interrupt context */
+    /* No core level interrupt mask - already in interrupt context */
 #if NUM_CORES > 1
     corelock_lock(&lcd_state.cl);
 #endif
@@ -143,7 +143,7 @@ static void lcd_tick(void)
 
 static inline void lcd_block_tick(void)
 {
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
 #if NUM_CORES > 1
     corelock_lock(&lcd_state.cl);
@@ -152,14 +152,14 @@ static inline void lcd_block_tick(void)
 #else
     lcd_state.blocked = true;
 #endif
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 static void lcd_unblock_and_update(void)
 {
     unsigned data;
     bool bcm_is_busy;
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
 #if NUM_CORES > 1
     corelock_lock(&lcd_state.cl);
@@ -184,7 +184,7 @@ static void lcd_unblock_and_update(void)
 #if NUM_CORES > 1
     corelock_unlock(&lcd_state.cl);
 #endif
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 #else /* BOOTLOADER */

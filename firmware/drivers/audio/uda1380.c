@@ -203,10 +203,10 @@ void audiohw_enable_output(bool enable)
 static void reset(void)
 {
 #ifdef IRIVER_H300_SERIES
-    int mask = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int mask = disable_irq_save();
     pcf50606_write(0x3b, 0x00);  /* GPOOD2 high Z */
     pcf50606_write(0x3b, 0x07);  /* GPOOD2 low */
-    set_irq_level(mask);
+    restore_irq(mask);
 #else
     /* RESET signal */
     or_l(1<<29, &GPIO_OUT);

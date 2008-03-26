@@ -52,10 +52,28 @@ static inline int set_irq_level(int level)
 {
     int i;
     /* Read the old level and set the new one */
-    asm volatile ("stc sr, %0" : "=r" (i));
+
+    /* Not volatile - will be optimized away if the return value isn't used */
+    asm ("stc sr, %0" : "=r" (i));
     asm volatile ("ldc %0, sr" : : "r" (level));
     return i;
 }
+
+static inline void enable_irq(void)
+{
+    int i;
+    asm volatile ("mov %1, %0 \n" /* Save a constant load from RAM */
+                  "ldc %0, sr \n" : "=&r"(i) : "i"(0));
+}
+
+#define disable_irq() \
+    ((void)set_irq_level(HIGHEST_IRQ_LEVEL))
+
+#define disable_irq_save() \
+    set_irq_level(HIGHEST_IRQ_LEVEL)
+
+#define restore_irq(i) \
+    ((void)set_irq_level(i))
 
 static inline uint16_t swap16(uint16_t value)
   /*

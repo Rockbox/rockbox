@@ -134,7 +134,7 @@ static unsigned char ds2411_read_byte(void)
  */
 int ds2411_read_id(struct ds2411_id *id)
 {
-    int level = set_irq_level(DISABLE_INTERRUPTS); /* Timing sensitive */
+    int level = disable_irq_save(); /* Timing sensitive */
     int i;
     unsigned char crc;
 
@@ -208,7 +208,7 @@ int ds2411_read_id(struct ds2411_id *id)
         i = DS2411_NO_PRESENCE;
     }
 
-    set_irq_level(level);
+    restore_irq(level);
 
     return i;
 } /* ds2411_read_id */

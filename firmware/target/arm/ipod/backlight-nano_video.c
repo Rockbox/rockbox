@@ -43,11 +43,11 @@ void _backlight_set_brightness(int val)
     {
         do
         {
-            oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+            oldlevel = disable_irq_save();
             GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
             udelay(10);
             GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
-            set_irq_level(oldlevel);
+            restore_irq(oldlevel);
             udelay(10);
         }
         while (++current_dim < val);
@@ -56,11 +56,11 @@ void _backlight_set_brightness(int val)
     {
         do
         {
-            oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+            oldlevel = disable_irq_save();
             GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
             udelay(200);
             GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
-            set_irq_level(oldlevel);
+            restore_irq(oldlevel);
             udelay(10);
         }
         while (--current_dim > val);

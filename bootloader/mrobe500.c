@@ -174,8 +174,8 @@ void main(void)
     system_init();
     kernel_init();
     
-    set_irq_level(0);
-    set_fiq_status(FIQ_ENABLED);
+    enable_irq();
+    enable_fiq();
 
     adc_init();
     button_init();

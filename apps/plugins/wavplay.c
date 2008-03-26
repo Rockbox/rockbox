@@ -3345,7 +3345,7 @@ void dma_end_isr(void)
 
 void demand_irq_enable(bool on)
 {
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
     
     if(on)
     {
@@ -3357,7 +3357,7 @@ void demand_irq_enable(bool on)
         IPRA &= 0xfff0;
     }
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 static inline int available(void)

@@ -81,11 +81,52 @@ static inline int set_irq_level(int level)
 {
     int oldlevel;
     /* Read the old level and set the new one */
-    asm volatile ("move.w %%sr, %0 \n"
-                  "bset.l #13, %1  \n" /* Keep supervisor state set */
-                  "move.w %1, %%sr \n"
-                  : "=d"(oldlevel), "+d"(level));
+
+    /* Not volatile - can be removed if oldlevel isn't used */
+    asm          ("move.w %%sr, %0" : "=d"(oldlevel));
+    /* Keep supervisor state set */
+    asm volatile ("move.w %0, %%sr \n" : : "d"(level | 0x2000));
     return oldlevel;
+}
+
+/* Enable all interrupts */
+static inline void enable_irq(void)
+{
+    int tmp;
+    /* Using move.w over the compiler's move.l saves 2 bytes per instance */
+    asm volatile ("move.w %1, %0   \n"
+                  "move.w %0, %%sr \n"
+                  : "=&d"(tmp) : "i"(0x2000));
+}
+
+/* Disable interrupts up to HIGHEST_IRQ_LEVEL */
+static inline void disable_irq(void)
+{
+    int tmp;
+    /* Using move.w over the compiler's move.l saves 2 bytes per instance */
+    asm volatile ("move.w %1, %0   \n"
+                  "move.w %0, %%sr \n"
+                  : "=&d"(tmp)
+                  : "i"(0x2000 | HIGHEST_IRQ_LEVEL));
+}
+
+static inline int disable_irq_save(void)
+{
+    int oldlevel, tmp;
+    /* Using move.w over the compiler's move.l saves 2 bytes per instance */
+    asm volatile ("move.w %%sr, %1 \n"
+                  "move.w %2, %0   \n"
+                  "move.w %0, %%sr \n"
+                  : "=&d"(tmp), "=d"(oldlevel)
+                  : "i"(0x2000 | HIGHEST_IRQ_LEVEL));
+    return oldlevel;
+}
+
+static inline void restore_irq(int oldlevel)
+{
+    /* Restore the sr value returned by disable_irq_save or
+     * set_irq_level */
+    asm volatile ("move.w %0, %%sr" : : "d"(oldlevel));
 }
 
 static inline uint16_t swap16(uint16_t value)

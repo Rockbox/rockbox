@@ -33,18 +33,18 @@ bool _backlight_init(void)
 
 void _backlight_on(void)
 {
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level = disable_irq_save();
 
     pcf50606_write(0x39, 0x07);
-    set_irq_level(level);
+    restore_irq(level);
 }
 
 void _backlight_off(void)
 {
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level = disable_irq_save();
 
     pcf50606_write(0x39, 0x00);
-    set_irq_level(level);
+    restore_irq(level);
 }
 
 void _remote_backlight_on(void)

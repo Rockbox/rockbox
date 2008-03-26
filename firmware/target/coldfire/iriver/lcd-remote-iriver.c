@@ -478,9 +478,9 @@ static void remote_tick(void)
             if (!(countdown % 8))
             {
                 /* Determine which type of remote it is */
-                level = set_irq_level(HIGHEST_IRQ_LEVEL);
+                level = disable_irq_save();
                 val = adc_scan(ADC_REMOTEDETECT);
-                set_irq_level(level);
+                restore_irq(level);
 
                 if (val < ADCVAL_H100_LCD_REMOTE_HOLD)
                 {

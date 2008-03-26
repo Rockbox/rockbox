@@ -39,16 +39,16 @@ void _backlight_on(void)
 #ifndef BOOTLOADER
     _lcd_sleep_timer = 0; /* LCD should be awake already */
 #endif
-    level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    level = disable_irq_save();
     pcf50606_write(0x38, 0xb0); /* Backlight ON, GPO1INV=1, GPO1ACT=011 */
-    set_irq_level(level);
+    restore_irq(level);
 }
 
 void _backlight_off(void)
 {
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level = disable_irq_save();
     pcf50606_write(0x38, 0x80); /* Backlight OFF, GPO1INV=1, GPO1ACT=000 */
-    set_irq_level(level);
+    restore_irq(level);
     lcd_enable(false);
 #ifndef BOOTLOADER
     /* Start LCD sleep countdown */
@@ -66,10 +66,10 @@ void _backlight_off(void)
 void _backlight_set_brightness(int val)
 {
     /* disable IRQs while bitbanging */
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int old_irq_level = disable_irq_save();
     pcf50606_write(0x35, (val << 1) | 0x01); /* 512Hz, Enable PWM */
     /* enable IRQs again */
-    set_irq_level(old_irq_level);
+    restore_irq(old_irq_level);
 }
 
 void _remote_backlight_on(void)

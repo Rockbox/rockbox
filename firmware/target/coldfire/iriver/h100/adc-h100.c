@@ -47,7 +47,7 @@
 
 unsigned short adc_scan(int channel)
 {
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level = disable_irq_save();
     unsigned char data = 0;
     int i;
     
@@ -97,7 +97,7 @@ unsigned short adc_scan(int channel)
 
     CS_HI;
 
-    set_irq_level(level);
+    restore_irq(level);
     return data;
 }
 

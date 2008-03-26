@@ -542,7 +542,7 @@ int main(void)
 
 
 
-    set_irq_level(0);
+    enable_irq();
 
 
 

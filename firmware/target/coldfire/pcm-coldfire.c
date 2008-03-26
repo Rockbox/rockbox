@@ -158,7 +158,7 @@ void _pcm_apply_settings_irq_lock(bool clear_reset)
 {
     int level = set_irq_level(DMA_IRQ_LEVEL);
     _pcm_apply_settings(clear_reset);
-    set_irq_level(level);
+    restore_irq(level);
 }
 
 /* This clears the reset bit to enable monitoring immediately if monitoring
@@ -175,7 +175,7 @@ void pcm_apply_settings(void)
     if (_pcm_apply_settings(!pbm || kick) && kick)
         PDOR3 = 0; /* Kick FIFO out of reset by writing to it */
 
-    set_irq_level(level);
+    restore_irq(level);
 } /* pcm_apply_settings */
 
 void pcm_play_dma_init(void)

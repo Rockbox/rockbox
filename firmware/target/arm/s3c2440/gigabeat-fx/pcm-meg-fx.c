@@ -66,27 +66,27 @@ static void _pcm_apply_settings(void)
 
 void pcm_apply_settings(void)
 {
-    int oldstatus = set_fiq_status(FIQ_DISABLED);
+    int status = disable_fiq_save();
     _pcm_apply_settings();
-    set_fiq_status(oldstatus);
+    restore_fiq(status);
 }
 
 /* For the locks, DMA interrupt must be disabled because the handler
    manipulates INTMSK and the operation is not atomic */
 void pcm_play_lock(void)
 {
-    int status = set_fiq_status(FIQ_DISABLED);
+    int status = disable_fiq_save();
     if (++dma_play_lock.locked == 1)
         INTMSK |= (1<<19); /* Mask the DMA interrupt */
-    set_fiq_status(status);
+    restore_fiq(status);
 }
 
 void pcm_play_unlock(void)
 {
-    int status = set_fiq_status(FIQ_DISABLED);
+    int status = disable_fiq_save();
     if (--dma_play_lock.locked == 0)
         INTMSK &= ~dma_play_lock.state; /* Unmask the DMA interrupt if enabled */
-    set_fiq_status(status);
+    restore_fiq(status);
 }
 
 void pcm_play_dma_init(void)

@@ -246,7 +246,7 @@ void switch_thread(void)
 {
     struct thread_entry *current = cores[CURRENT_CORE].running;
 
-    set_irq_level(0);
+    enable_irq();
 
     switch (current->state)
     {
@@ -266,9 +266,9 @@ void switch_thread(void)
         SDL_SemWait(current->context.s);
         SDL_LockMutex(m);
 
-        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        oldlevel = disable_irq_save();
         current->state = STATE_RUNNING;
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
         break;
         } /* STATE_BLOCKED: */
 
@@ -280,7 +280,7 @@ void switch_thread(void)
         result = SDL_SemWaitTimeout(current->context.s, current->tmo_tick);
         SDL_LockMutex(m);
 
-        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        oldlevel = disable_irq_save();
 
         if (current->state == STATE_BLOCKED_W_TMO)
         {
@@ -303,7 +303,7 @@ void switch_thread(void)
                 SDL_SemTryWait(current->context.s);
         }
 
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
         break;
         } /* STATE_BLOCKED_W_TMO: */
 
@@ -505,7 +505,7 @@ void remove_thread(struct thread_entry *thread)
     SDL_Thread *t;
     SDL_sem *s;
 
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
     if (thread == NULL)
     {
@@ -547,12 +547,12 @@ void remove_thread(struct thread_entry *thread)
     {
         /* Do a graceful exit - perform the longjmp back into the thread
            function to return */
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
         longjmp(thread_jmpbufs[current - threads], 1);
     }
 
     SDL_KillThread(t);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 void thread_exit(void)

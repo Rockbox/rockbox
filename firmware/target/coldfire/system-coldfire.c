@@ -351,5 +351,5 @@ void coldfire_set_dataincontrol(unsigned long value)
     /* Have to be atomic against recording stop initiated by DMA1 */
     int level = set_irq_level(DMA_IRQ_LEVEL);
     DATAINCONTROL = (DATAINCONTROL & (1 << 9)) | value;
-    set_irq_level(level);
+    restore_irq(level);
 }

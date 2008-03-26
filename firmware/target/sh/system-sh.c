@@ -360,7 +360,7 @@ void system_init(void)
 
 void system_reboot (void)
 {
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+    disable_irq();
 
     asm volatile ("ldc\t%0,vbr" : : "r"(0));
 

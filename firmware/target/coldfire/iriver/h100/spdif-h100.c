@@ -99,7 +99,7 @@ void spdif_set_output_source(int source, bool src_on)
         PDOR3 = 0; /* A write to the FIFO kick-starts playback */
     }
 
-    set_irq_level(level);
+    restore_irq(level);
 } /* spdif_set_output_source */
 
 /* Return the last set S/PDIF audio source */

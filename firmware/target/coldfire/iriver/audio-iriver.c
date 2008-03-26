@@ -41,7 +41,7 @@ void audio_set_output_source(int source)
 
     IIS2CONFIG = (IIS2CONFIG & ~(7 << 8)) | (txsrc_select[source+1] << 8);
 
-    set_irq_level(level);
+    restore_irq(level);
 } /* audio_set_output_source */
 
 void audio_input_mux(int source, unsigned flags)

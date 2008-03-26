@@ -85,7 +85,7 @@ void dsp_wake(void)
 {
     /* If this is called concurrently, we may overlap setting and resetting the
        bit, which causes lost interrupts to the DSP. */
-    int old_level = set_irq_level(IRQ_DISABLED);
+    int old_level = disable_irq_save();
     
     /* The first time you INT0 the DSP, the ROM loader will branch to your RST
        handler. Subsequent times, your INT0 handler will get executed. */
@@ -93,7 +93,7 @@ void dsp_wake(void)
     nop; nop;
     IO_DSPC_HPIB_CONTROL |= 1 << 7;
     
-    set_irq_level(old_level);
+    restore_irq(old_level);
 }
 
 static void dsp_load(const struct dsp_section *im)

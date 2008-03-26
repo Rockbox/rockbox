@@ -271,7 +271,11 @@ int rolo_load(const char* filename)
 #endif
     adc_close();
 
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+#ifdef CPU_ARM
+    disable_fiq();
+#endif
+    set_irq_level(DISABLE_INTERRUPTS);
+
 #elif CONFIG_CPU == SH7034
     /* Read file length from header and compare to real file length */
     lseek(fd, FIRMWARE_OFFSET_FILE_LENGTH, SEEK_SET);

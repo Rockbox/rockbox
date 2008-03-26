@@ -79,9 +79,8 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+    disable_irq();
     and_b(~0x08, &PADRH);
     or_b(0x08, &PAIORH);
-    while(1)
-        yield();
+    while(1);
 }

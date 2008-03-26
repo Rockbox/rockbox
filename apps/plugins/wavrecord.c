@@ -3415,7 +3415,7 @@ void rec_tick(void)
 
 void rec_tick_enable(bool on)
 {
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
     if(on)
     {
@@ -3431,7 +3431,7 @@ void rec_tick_enable(bool on)
         IPRB = (IPRB & 0xff0f) | 0x0080;  /* Reenable IRQ6 */
     }
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 void hijack_interrupts(bool on)

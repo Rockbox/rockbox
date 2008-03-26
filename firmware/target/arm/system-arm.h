@@ -74,27 +74,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
     return value;
 }
 
-static inline void enable_fiq(void)
-{
-    /* Clear FIQ disable bit */
-    asm volatile (
-        "mrs     r0, cpsr         \n"\
-        "bic     r0, r0, #0x40    \n"\
-        "msr     cpsr_c, r0         "
-        : : : "r0"
-    );
-}
-
-static inline void disable_fiq(void)
-{
-    /* Set FIQ disable bit */
-    asm volatile (
-        "mrs     r0, cpsr         \n"\
-        "orr     r0, r0, #0x40    \n"\
-        "msr     cpsr_c, r0         "
-        : : : "r0"
-    );
-}
+/* Core-level interrupt masking */
 
 /* This one returns the old status */
 #define IRQ_ENABLED      0x00
@@ -108,8 +88,10 @@ static inline void disable_fiq(void)
 #define IRQ_FIQ_STATUS   0xc0
 #define HIGHEST_IRQ_LEVEL IRQ_DISABLED
 
-#define set_irq_level(status)  set_interrupt_status((status), IRQ_STATUS)
-#define set_fiq_status(status) set_interrupt_status((status), FIQ_STATUS)
+#define set_irq_level(status) \
+    set_interrupt_status((status), IRQ_STATUS)
+#define set_fiq_status(status) \
+    set_interrupt_status((status), FIQ_STATUS)
 
 static inline int set_interrupt_status(int status, int mask)
 {
@@ -122,10 +104,75 @@ static inline int set_interrupt_status(int status, int mask)
         "orr    %0, %0, %2      \n"
         "msr    cpsr_c, %0      \n"
         : "=&r,r"(cpsr), "=&r,r"(oldstatus)
-        : "r,i"(status & mask), [mask]"i,i"(mask)
-    );
+        : "r,i"(status & mask), [mask]"i,i"(mask));
 
     return oldstatus;
 }
+
+static inline void enable_interrupt(int mask)
+{
+    /* Clear I and/or F disable bit */
+    int tmp;
+    asm volatile (
+        "mrs     %0, cpsr   \n"
+        "bic     %0, %0, %1 \n"
+        "msr     cpsr_c, %0 \n"
+        : "=&r"(tmp) : "i"(mask));
+}
+
+static inline void disable_interrupt(int mask)
+{
+    /* Set I and/or F disable bit */
+    int tmp;
+    asm volatile (
+        "mrs     %0, cpsr   \n"
+        "orr     %0, %0, %1 \n"
+        "msr     cpsr_c, %0 \n"
+        : "=&r"(tmp) : "i"(mask));
+}
+
+#define disable_irq(void) \
+    disable_interrupt(IRQ_STATUS)
+
+#define enable_irq(void) \
+    enable_interrupt(IRQ_STATUS)
+
+#define disable_fiq(void) \
+    disable_interrupt(FIQ_STATUS)
+
+#define enable_fiq(void) \
+    enable_interrupt(FIQ_STATUS)
+
+static inline int disable_interrupt_save(int mask)
+{
+    /* Set I and/or F disable bit and return old cpsr value */
+    int cpsr, tmp;
+    asm volatile (
+        "mrs     %1, cpsr   \n"
+        "orr     %0, %1, %2 \n"
+        "msr     cpsr_c, %0 \n"
+        : "=&r"(tmp), "=&r"(cpsr)
+        : "i"(mask));
+    return cpsr;
+}
+
+#define disable_irq_save() \
+    disable_interrupt_save(IRQ_STATUS)
+
+#define disable_fiq_save() \
+    disable_interrupt_save(FIQ_STATUS)
+
+static inline void restore_interrupt(int cpsr)
+{
+    /* Set cpsr_c from value returned by disable_interrupt_save
+     * or set_interrupt_status */
+    asm volatile ("msr cpsr_c, %0" : : "r"(cpsr));
+}
+
+#define restore_irq(cpsr) \
+    restore_interrupt(cpsr)
+
+#define restore_fiq(cpsr) \
+    restore_interrupt(cpsr)
 
 #endif /* SYSTEM_ARM_H */

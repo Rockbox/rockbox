@@ -34,7 +34,7 @@ static int adcc2_parms[] =
 
 unsigned short adc_scan(int channel)
 {
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level = disable_irq_save();
     unsigned data;
 
     pcf50606_write(0x2f, adcc2_parms[channel]);
@@ -43,6 +43,6 @@ unsigned short adc_scan(int channel)
     if (channel == ADC_BATTERY)
         data = (data << 2) | (pcf50606_read(0x31) & 0x03);
 
-    set_irq_level(level);
+    restore_irq(level);
     return data;
 }

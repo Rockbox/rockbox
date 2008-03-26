@@ -55,11 +55,10 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+    disable_interrupt(IRQ_FIQ_STATUS);
     GPIO1_CLR = 1 << 16;
     GPIO2_SET = 1;
-    while(1)
-        yield();
+    while(1);
 }
 
 #else

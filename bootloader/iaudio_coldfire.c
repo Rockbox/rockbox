@@ -164,7 +164,7 @@ void main(void)
     set_cpu_frequency(CPUFREQ_NORMAL);
     coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
 
-    set_irq_level(0);
+    enable_irq();
     lcd_init();
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();

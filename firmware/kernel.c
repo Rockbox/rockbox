@@ -270,7 +270,7 @@ void tick_start(unsigned int interval_in_ms)
 int tick_add_task(void (*f)(void))
 {
     int i;
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
     /* Add a task if there is room */
     for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
@@ -278,11 +278,11 @@ int tick_add_task(void (*f)(void))
         if(tick_funcs[i] == NULL)
         {
             tick_funcs[i] = f;
-            set_irq_level(oldlevel);
+            restore_irq(oldlevel);
             return 0;
         }
     }
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
     panicf("Error! tick_add_task(): out of tasks");
     return -1;
 }
@@ -290,7 +290,7 @@ int tick_add_task(void (*f)(void))
 int tick_remove_task(void (*f)(void))
 {
     int i;
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
     /* Remove a task if it is there */
     for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
@@ -298,12 +298,12 @@ int tick_remove_task(void (*f)(void))
         if(tick_funcs[i] == f)
         {
             tick_funcs[i] = NULL;
-            set_irq_level(oldlevel);
+            restore_irq(oldlevel);
             return 0;
         }
     }
     
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
     return -1;
 }
 
@@ -341,7 +341,7 @@ static void timeout_tick(void)
 /* Cancels a timeout callback - can be called from the ISR */
 void timeout_cancel(struct timeout *tmo)
 {
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
     if (tmo_list != NULL)
     {
@@ -368,7 +368,7 @@ void timeout_cancel(struct timeout *tmo)
         /* not in list or tmo == NULL */
     }
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 /* Adds a timeout callback - calling with an active timeout resets the
@@ -382,7 +382,7 @@ void timeout_register(struct timeout *tmo, timeout_cb_type callback,
     if (tmo == NULL)
         return;
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
 
     /* see if this one is already registered */
     curr = tmo_list;
@@ -404,7 +404,7 @@ void timeout_register(struct timeout *tmo, timeout_cb_type callback,
     tmo->data = data;
     *(long *)&tmo->expires = current_tick + ticks;
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 #endif /* INCLUDE_TIMEOUT_API */
@@ -433,7 +433,7 @@ void sleep(int ticks)
     while (TIME_BEFORE(USEC_TIMER, stop))
         switch_thread();
 #else
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+    disable_irq();
     sleep_thread(ticks);
     switch_thread();
 #endif
@@ -537,7 +537,7 @@ void queue_enable_queue_send(struct event_queue *q,
                              struct queue_sender_list *send,
                              struct thread_entry *owner)
 {
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
     if(send != NULL && q->send == NULL)
@@ -554,7 +554,7 @@ void queue_enable_queue_send(struct event_queue *q,
     }
 
     corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 
     (void)owner;
 }
@@ -618,7 +618,7 @@ static inline void queue_do_fetch_sender(struct queue_sender_list *send,
 /* Queue must not be available for use during this call */
 void queue_init(struct event_queue *q, bool register_queue)
 {
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
 
     if(register_queue)
     {
@@ -645,7 +645,7 @@ void queue_init(struct event_queue *q, bool register_queue)
         corelock_unlock(&all_queues.cl);
     }
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 /* Queue must not be available for use during this call */
@@ -654,7 +654,7 @@ void queue_delete(struct event_queue *q)
     int oldlevel;
     int i;
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
     corelock_lock(&all_queues.cl);
     corelock_lock(&q->cl);
 
@@ -697,7 +697,7 @@ void queue_delete(struct event_queue *q)
     q->write = 0;
 
     corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 /* NOTE: multiple threads waiting on a queue head cannot have a well-
@@ -714,7 +714,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
                   "queue_wait->wrong thread\n");
 #endif
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
     /* auto-reply */
@@ -734,7 +734,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
             corelock_unlock(&q->cl);
             switch_thread();
 
-            oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+            oldlevel = disable_irq_save();
             corelock_lock(&q->cl);
         }
         /* A message that woke us could now be gone */
@@ -748,7 +748,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
     queue_do_fetch_sender(q->send, rd);
 
     corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
@@ -761,7 +761,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
                   "queue_wait_w_tmo->wrong thread\n");
 #endif
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
     /* Auto-reply */
@@ -779,7 +779,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
         switch_thread();
 
-        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        oldlevel = disable_irq_save();
         corelock_lock(&q->cl);
     }
 
@@ -798,7 +798,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
     }
 
     corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 void queue_post(struct event_queue *q, long id, intptr_t data)
@@ -806,7 +806,7 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
     int oldlevel;
     unsigned int wr;
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
     wr = q->write++ & QUEUE_LENGTH_MASK;
@@ -821,7 +821,7 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
     wakeup_thread(&q->queue);
 
     corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
@@ -832,7 +832,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     int oldlevel;
     unsigned int wr;
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
     wr = q->write++ & QUEUE_LENGTH_MASK;
@@ -875,7 +875,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     wakeup_thread(&q->queue);
 
     corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
     
     return 0;
 }
@@ -887,7 +887,7 @@ bool queue_in_queue_send(struct event_queue *q)
     bool in_send;
 
 #if NUM_CORES > 1
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 #endif
 
@@ -895,7 +895,7 @@ bool queue_in_queue_send(struct event_queue *q)
 
 #if NUM_CORES > 1
     corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 #endif
 
     return in_send;
@@ -907,7 +907,7 @@ void queue_reply(struct event_queue *q, intptr_t retval)
 {
     if(q->send && q->send->curr_sender)
     {
-        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        int oldlevel = disable_irq_save();
         corelock_lock(&q->cl);
         /* Double-check locking */
         IF_COP( if(q->send && q->send->curr_sender) )
@@ -916,7 +916,7 @@ void queue_reply(struct event_queue *q, intptr_t retval)
         }
 
         corelock_unlock(&q->cl);
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
     }
 }
 
@@ -927,7 +927,7 @@ bool queue_peek(struct event_queue *q, struct queue_event *ev)
 
     bool have_msg = false;
 
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
     if(q->read != q->write)
@@ -937,7 +937,7 @@ bool queue_peek(struct event_queue *q, struct queue_event *ev)
     }
 
     corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 
     return have_msg;
 }
@@ -956,7 +956,7 @@ void queue_clear(struct event_queue* q)
 {
     int oldlevel;
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
     /* Release all threads waiting in the queue for a reply -
@@ -967,14 +967,14 @@ void queue_clear(struct event_queue* q)
     q->write = 0;
 
     corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 void queue_remove_from_head(struct event_queue *q, long id)
 {
     int oldlevel;
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
     corelock_lock(&q->cl);
 
     while(q->read != q->write)
@@ -993,7 +993,7 @@ void queue_remove_from_head(struct event_queue *q, long id)
     }
 
     corelock_unlock(&q->cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 
 /**
@@ -1012,7 +1012,7 @@ int queue_broadcast(long id, intptr_t data)
     int i;
 
 #if NUM_CORES > 1
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
     corelock_lock(&all_queues.cl);
 #endif
     
@@ -1023,7 +1023,7 @@ int queue_broadcast(long id, intptr_t data)
 
 #if NUM_CORES > 1
     corelock_unlock(&all_queues.cl);
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 #endif
    
     return i;
@@ -1079,7 +1079,7 @@ void mutex_lock(struct mutex *m)
     IF_PRIO( current->blocker = &m->blocker; )
     current->bqp = &m->queue;
 
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+    disable_irq();
     block_thread(current);
 
     corelock_unlock(&m->cl);
@@ -1118,13 +1118,13 @@ void mutex_unlock(struct mutex *m)
     }
     else
     {
-        const int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        const int oldlevel = disable_irq_save();
         /* Tranfer of owning thread is handled in the wakeup protocol
          * if priorities are enabled otherwise just set it from the
          * queue head. */
         IFN_PRIO( MUTEX_SET_THREAD(m, m->queue); )
         IF_PRIO( unsigned int result = ) wakeup_thread(&m->queue);
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
 
         corelock_unlock(&m->cl);
 
@@ -1219,7 +1219,7 @@ void semaphore_wait(struct semaphore *s)
     IF_COP( current->obj_cl = &s->cl; )
     current->bqp = &s->queue;
 
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+    disable_irq();
     block_thread(current);
 
     corelock_unlock(&s->cl);
@@ -1239,9 +1239,9 @@ void semaphore_release(struct semaphore *s)
         /* there should be threads in this queue */
         KERNEL_ASSERT(s->queue != NULL, "semaphore->wakeup\n");
         /* a thread was queued - wake it up */
-        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        int oldlevel = disable_irq_save();
         IF_PRIO( result = ) wakeup_thread(&s->queue);
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
     }
 
     corelock_unlock(&s->cl);
@@ -1298,7 +1298,7 @@ void event_wait(struct event *e, unsigned int for_state)
     IF_COP( current->obj_cl = &e->cl; )
     current->bqp = &e->queues[for_state];
 
-    set_irq_level(HIGHEST_IRQ_LEVEL);
+    disable_irq();
     block_thread(current);
 
     corelock_unlock(&e->cl);
@@ -1323,7 +1323,7 @@ void event_set_state(struct event *e, unsigned int state)
 
     IF_PRIO( result = THREAD_OK; )
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
 
     if(state == STATE_SIGNALED)
     {
@@ -1357,7 +1357,7 @@ void event_set_state(struct event *e, unsigned int state)
             thread_queue_wake(&e->queues[STATE_NONSIGNALED]);
     }
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 
     corelock_unlock(&e->cl);
 

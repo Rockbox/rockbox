@@ -48,7 +48,7 @@ bool __timer_set(long cycles, bool start)
         pfn_unregister = NULL;
     }
 
-    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    oldlevel = disable_irq_save();
 
     /* Increase prescale values starting from 0 to make the cycle count fit */
     while(divider>65535 && prescaler<1024)
@@ -60,7 +60,7 @@ bool __timer_set(long cycles, bool start)
     IO_TIMER0_TMPRSCL = prescaler;
     IO_TIMER0_TMDIV = divider;
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 
     return true;
 }

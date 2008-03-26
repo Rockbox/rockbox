@@ -134,7 +134,7 @@ static void postpone_dma_tick(void)
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 void demand_irq_enable(bool on)
 {
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int oldlevel = disable_irq_save();
     
     if(on)
     {
@@ -144,7 +144,7 @@ void demand_irq_enable(bool on)
     else
         IPRA &= 0xfff0;
 
-    set_irq_level(oldlevel);
+    restore_irq(oldlevel);
 }
 #endif /* #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 

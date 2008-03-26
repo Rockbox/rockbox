@@ -115,8 +115,7 @@ void power_off(void)
     set_irq_level(DISABLE_INTERRUPTS);
     and_l(~0x00080000, &GPIO1_OUT);
     asm("halt");
-    while(1)
-        yield();
+    while(1);
 }
 
 #endif /* SIMULATOR */

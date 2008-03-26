@@ -435,7 +435,7 @@ void main(void)
     coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
 #endif
 #endif
-    set_irq_level(0);
+    enable_irq();
 
 #ifdef HAVE_EEPROM_SETTINGS
     initialize_eeprom();

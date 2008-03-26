@@ -44,16 +44,16 @@ bool charger_inserted(void)
 void ide_power_enable(bool on)
 {
     /* GPOOD3 */
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level = disable_irq_save();
     pcf50606_write(0x3c, on ? 0x07 : 0x00);
-    set_irq_level(level);
+    restore_irq(level);
 }
 
 bool ide_powered(void)
 {
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level = disable_irq_save();
     int value = pcf50606_read(0x3c);
-    set_irq_level(level);
+    restore_irq(level);
     return (value & 0x07) != 0;
 }
 

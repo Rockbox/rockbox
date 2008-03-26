@@ -417,7 +417,7 @@ static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
     not_id   = flash[1]; /* should be 'A' (0x41) and 'R' (0x52) from the "ARCH" marker */
 
     /* disable interrupts, prevent any stray flash access */
-    old_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    old_level = disable_irq_save();
 
     flash[addr1] = 0xAA; /* enter command mode */
     flash[addr2] = 0x55;
@@ -432,7 +432,7 @@ static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
     /* Atmel wants 20ms pause here */
     /* sleep(HZ/50); no sleeping possible while interrupts are disabled */
 
-    set_irq_level(old_level); /* enable interrupts again */
+    restore_irq(old_level); /* enable interrupts again */
 
     /* I assume success if the obtained values are different from
         the normal flash content. This is not perfectly bulletproof, they
@@ -2066,17 +2066,18 @@ static bool dbg_save_roms(void)
         char buf[EEPROM_SIZE];
         int err;
 
-        old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+        old_irq_level = disable_irq_save();
 
         err = eeprom_24cxx_read(0, buf, sizeof buf);
+
+        restore_irq(old_irq_level);
+
         if (err)
             gui_syncsplash(HZ*3, "Eeprom read failure (%d)",err);
         else
         {
             write(fd, buf, sizeof buf);
         }
-
-        set_irq_level(old_irq_level);
 
         close(fd);
     }
@@ -2248,7 +2249,7 @@ static bool dbg_write_eeprom(void)
 
         if(rc == EEPROM_SIZE)
         {
-            old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+            old_irq_level = disable_irq_save();
 
             err = eeprom_24cxx_write(0, buf, sizeof buf);
             if (err)
@@ -2256,7 +2257,7 @@ static bool dbg_write_eeprom(void)
             else
                 gui_syncsplash(HZ*3, "Eeprom written successfully");
 
-            set_irq_level(old_irq_level);
+            restore_irq(old_irq_level);
         }
         else
         {

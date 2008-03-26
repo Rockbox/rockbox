@@ -568,10 +568,10 @@ bool usb_charging_enable(bool on)
 #ifdef IRIVER_H300_SERIES
     int irqlevel;
     logf("usb_charging_enable(%s)\n", on ? "on" : "off" );
-    irqlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    irqlevel = disable_irq_save();
     pcf50606_set_usb_charging(on);
     rc = on;
-    (void)set_irq_level(irqlevel);
+    restore_irq(irqlevel);
 #else
     /* TODO: implement it for other targets... */
     (void)on;

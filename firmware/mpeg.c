@@ -1767,9 +1767,9 @@ static void mpeg_thread(void)
                         DEBUGF("New audiobuf_read address: %x (%x)\n",
                                audiobuf+audiobuf_read, audiobuf_read);
 
-                        level = set_irq_level(HIGHEST_IRQ_LEVEL);
+                        level = disable_irq_save();
                         num_rec_bytes = get_unsaved_space();
-                        set_irq_level(level);
+                        restore_irq(level);
                     }
                     else
                     {
@@ -1860,11 +1860,11 @@ static void mpeg_thread(void)
                         pause_start_time = record_start_time;
 
                     /* capture all values at one point */
-                    level = set_irq_level(HIGHEST_IRQ_LEVEL);
+                    level = disable_irq_save();
                     save_endpos = audiobuf_write;
                     last_rec_bytes = num_rec_bytes;
                     num_rec_bytes = 0;
-                    set_irq_level(level);
+                    restore_irq(level);
 
                     if (amount_to_save >= 1800)
                     {
@@ -1883,9 +1883,9 @@ static void mpeg_thread(void)
                             save_endpos -= audiobuflen;
 
                         last_rec_bytes += offset - 1800;
-                        level = set_irq_level(HIGHEST_IRQ_LEVEL);
+                        level = disable_irq_save();
                         num_rec_bytes += 1800 - offset;
-                        set_irq_level(level);
+                        restore_irq(level);
                     }
 
                     saving_status = NEW_FILE;

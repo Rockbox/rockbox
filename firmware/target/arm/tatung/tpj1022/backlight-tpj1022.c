@@ -28,17 +28,17 @@
 void _backlight_on(void)
 {
 #if 0
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level = disable_irq_save();
     pcf50606_write(0x38, 0xb0); /* Backlight ON, GPO1INV=1, GPO1ACT=011 */
-    set_irq_level(level);
+    restore_irq(level);
 #endif
 }
 
 void _backlight_off(void)
 {
 #if 0
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level = disable_irq_save();
     pcf50606_write(0x38, 0x80); /* Backlight OFF, GPO1INV=1, GPO1ACT=000 */
-    set_irq_level(level);
+    restore_irq(level);
 #endif
 }

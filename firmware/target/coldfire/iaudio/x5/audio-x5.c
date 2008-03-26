@@ -32,7 +32,7 @@ void audio_set_output_source(int source)
         txsrc = (4 << 8); /* recording, iis1RcvData */
 
     IIS1CONFIG = (IIS1CONFIG & ~(7 << 8)) | txsrc;
-    set_irq_level(level);
+    restore_irq(level);
 } /* audio_set_output_source */
 
 void audio_input_mux(int source, unsigned flags)

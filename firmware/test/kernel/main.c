@@ -59,7 +59,7 @@ int main(void)
 
     kernel_init();
 
-    set_irq_level(0);
+    enable_irq();
 
     tick_add_task(testfunc);
     

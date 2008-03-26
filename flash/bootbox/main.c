@@ -156,7 +156,7 @@ void main(void)
     buffer_init();
     lcd_init();
     show_logo();
-    set_irq_level(0);
+    enable_irq();
     adc_init();
     usb_init();
     button_init();

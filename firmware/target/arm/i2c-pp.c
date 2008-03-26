@@ -60,7 +60,7 @@ static int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
 
     {
         unsigned int byte;
-        int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+        int old_irq_level = disable_irq_save();
 
         /* clear top 15 bits, left shift 1, or in 0x1 for a read */
         I2C_ADDR = ((addr << 17) >> 16) | 0x1 ;
@@ -69,19 +69,19 @@ static int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
 
         I2C_CTRL |= I2C_SEND;
 
-        set_irq_level(old_irq_level);
+        restore_irq(old_irq_level);
         if (pp_i2c_wait_not_busy() < 0)
         {
             return -1;
         }
-        old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+        old_irq_level = disable_irq_save();
 
         byte = I2C_DATA(0);
 
         if (data)
             *data = byte;
 
-        set_irq_level(old_irq_level);
+        restore_irq(old_irq_level);
     }
 
     return 0;
@@ -102,7 +102,7 @@ static int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char 
     }
 
     {
-        int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+        int old_irq_level = disable_irq_save();
 
         /* clear top 15 bits, left shift 1 */
         I2C_ADDR = (addr << 17) >> 16;
@@ -118,7 +118,7 @@ static int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char 
 
         I2C_CTRL |= I2C_SEND;
 
-        set_irq_level(old_irq_level);
+        restore_irq(old_irq_level);
     }
 
     return 0x0;

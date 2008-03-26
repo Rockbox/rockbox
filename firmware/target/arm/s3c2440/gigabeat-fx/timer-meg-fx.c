@@ -66,7 +66,7 @@ bool __timer_set(long cycles, bool start)
             pfn_unregister = NULL;
         }
 
-        oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        oldlevel = disable_irq_save();
 
         TCMPB0 = 0;
         TCNTB0 = (unsigned int)cycles / prescaler;
@@ -77,7 +77,7 @@ bool __timer_set(long cycles, bool start)
         TCFG0 = (TCFG0 & ~0xff) | (prescaler - 1);
         TCFG1 = (TCFG1 & ~0xf) | divider;
 
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
 
         retval = true;
     }

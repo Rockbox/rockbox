@@ -223,24 +223,24 @@ void fiq_playback(void)
    will require other measures */
 void pcm_play_lock(void)
 {
-    int status = set_fiq_status(FIQ_DISABLED);
+    int status = disable_fiq_save();
 
     if (++dma_play_data.locked == 1) {
         IIS_IRQTX_REG &= ~IIS_IRQTX;
     }
 
-    set_fiq_status(status);
+    restore_fiq(status);
 }
 
 void pcm_play_unlock(void)
 {
-   int status = set_fiq_status(FIQ_DISABLED);
+   int status = disable_fiq_save();
 
     if (--dma_play_data.locked == 0 && dma_play_data.state != 0) {
         IIS_IRQTX_REG |= IIS_IRQTX;
     }
 
-   set_fiq_status(status);
+   restore_fiq(status);
 }
 
 static void play_start_pcm(void)
@@ -373,22 +373,22 @@ static struct dma_data dma_rec_data NOCACHEBSS_ATTR =
    will require other measures */
 void pcm_rec_lock(void)
 {
-    int status = set_fiq_status(FIQ_DISABLED);
+    int status = disable_fiq_save();
 
     if (++dma_rec_data.locked == 1)
         IIS_IRQRX_REG &= ~IIS_IRQRX;
 
-    set_fiq_status(status);
+    restore_fiq(status);
 }
 
 void pcm_rec_unlock(void)
 {
-    int status = set_fiq_status(FIQ_DISABLED);
+    int status = disable_fiq_save();
 
     if (--dma_rec_data.locked == 0 && dma_rec_data.state != 0)
         IIS_IRQRX_REG |= IIS_IRQRX;
 
-    set_fiq_status(status);
+    restore_fiq(status);
 }
 
 /* NOTE: direct stack use forbidden by GCC stack handling bug for FIQ */

@@ -24,6 +24,19 @@
 #define HIGHEST_IRQ_LEVEL 1
 
 int set_irq_level(int level);
+
+#define disable_irq() \
+    ((void)set_irq_level(HIGHEST_IRQ_LEVEL))
+
+#define enable_irq()  \
+    ((void)set_irq_level(0))
+
+#define disable_irq_save() \
+    set_irq_level(HIGHEST_IRQ_LEVEL)
+
+#define restore_irq(level) \
+    ((void)set_irq_level(level))
+
 void sim_enter_irq_handler(void);
 void sim_exit_irq_handler(void);
 bool sim_kernel_init(void);

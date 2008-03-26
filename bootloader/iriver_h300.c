@@ -175,10 +175,10 @@ void main(void)
     }
 
     /* get rid of a nasty humming sound during boot */
-    mask = set_irq_level(HIGHEST_IRQ_LEVEL);
+    mask = disable_irq_save();
     pcf50606_write(0x3b, 0x00);  /* GPOOD2 high Z */
     pcf50606_write(0x3b, 0x07);  /* GPOOD2 low */
-    set_irq_level(mask);
+    restore_irq(mask);
 
     /* Start with the main backlight OFF. */
     _backlight_init();
@@ -192,7 +192,7 @@ void main(void)
     /* Set up waitstates for the peripherals */
     set_cpu_frequency(0); /* PLL off */
     coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
-    set_irq_level(0);
+    enable_irq();
 
     isp1362_init();
 

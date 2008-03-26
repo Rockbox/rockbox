@@ -113,7 +113,7 @@ static inline void *noncached(void *p)
 static void do_set_mem_timings(void) ICODE_ATTR;
 static void do_set_mem_timings(void)
 {
-    int old_irq = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int old_irq = disable_irq_save();
     while ((EMC.status & 3) != 0);
     EMC.control = 5;
     EMCSTATIC0.waitrd = 6;
@@ -130,7 +130,7 @@ static void do_set_mem_timings(void)
     EMCSTATIC1.config = 0x80081;
 #endif
     EMC.control = 1;
-    set_irq_level(old_irq);
+    restore_irq(old_irq);
 }
 
 static void emc_set_mem_timings(void)

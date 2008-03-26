@@ -272,7 +272,7 @@ static void init(void)
 {
     kernel_init();
     buffer_init();
-    set_irq_level(0);
+    enable_irq();
     lcd_init();
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();
@@ -360,9 +360,9 @@ static void init(void)
     
     power_init();
 
-    set_irq_level(0);
+    enable_irq();
 #ifdef CPU_ARM
-    set_fiq_status(FIQ_ENABLED);
+    enable_fiq();
 #endif
     lcd_init();
 #ifdef HAVE_REMOTE_LCD

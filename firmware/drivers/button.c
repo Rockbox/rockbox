@@ -465,10 +465,10 @@ void button_set_flip(bool flip)
     if (flip != flipped) /* not the current setting */
     {
         /* avoid race condition with the button_tick() */
-        int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+        int oldlevel = disable_irq_save();
         lastbtn = button_flip(lastbtn);
         flipped = flip;
-        set_irq_level(oldlevel);
+        restore_irq(oldlevel);
     }
 }
 #endif /* HAVE_LCD_BITMAP */
