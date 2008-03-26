@@ -1429,17 +1429,24 @@ static bool load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
     {
         get_image_filename(bmp_names[BACKDROP_BMP], bmpdir,
                             img_path, sizeof(img_path));
-#ifdef HAVE_REMOTE_LCD
-        if (wps_data->remote_wps)
-#if LCD_REMOTE_DEPTH > 1
-            if (!load_remote_wps_backdrop(img_path))
-                return false
+
+#if defined(HAVE_REMOTE_LCD)
+        /* We only need to check LCD type if there is a remote LCD */
+        if (!wps_data->remote_wps)
 #endif
-            ;
-        else
-#endif /* HAVE_REMOTE_LCD */
+        {
+            /* Load backdrop for the main LCD */
             if (!load_wps_backdrop(img_path))
                 return false;
+        }
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+        else 
+        {      
+            /* Load backdrop for the remote LCD */
+            if (!load_remote_wps_backdrop(img_path))
+                return false;
+        }
+#endif
     }
 #endif /* has backdrop support */
 
