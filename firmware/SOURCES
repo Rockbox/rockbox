@@ -463,6 +463,7 @@ target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iaudio/adc-iaudio.c
 target/coldfire/iaudio/ata-iaudio.c
+target/coldfire/iaudio/lcd-remote-as-iaudio.S
 target/coldfire/iaudio/lcd-remote-iaudio.c
 target/coldfire/iaudio/pcf50606-iaudio.c
 target/coldfire/iaudio/powermgmt-iaudio.c
@@ -488,6 +489,7 @@ target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iaudio/adc-iaudio.c
 target/coldfire/iaudio/ata-iaudio.c
+target/coldfire/iaudio/lcd-remote-as-iaudio.S
 target/coldfire/iaudio/lcd-remote-iaudio.c
 target/coldfire/iaudio/m5/backlight-m5.c
 target/coldfire/iaudio/m5/button-m5.c
