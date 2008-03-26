@@ -51,7 +51,10 @@ void usb_init_device(void)
     udelay(100000);
     
     /* disable USB-devices until USB is detected via GPIO */
+#ifndef BOOTLOADER
+    /* Disabling USB0 in the bootloader makes the OF not load */
     DEV_EN &= ~DEV_USB0;
+#endif
     DEV_EN &= ~DEV_USB1;
     DEV_INIT2 &= ~INIT_USB;
 
@@ -75,7 +78,10 @@ void usb_enable(bool on)
     else {
         usb_core_exit();
         /* Disable USB devices */
+#ifndef BOOTLOADER
+        /* Disabling USB0 in the bootloader makes the OF not load */
         DEV_EN &=~ DEV_USB0;
+#endif
         DEV_EN &=~ DEV_USB1;
         DEV_INIT2 &=~ INIT_USB;
     }
