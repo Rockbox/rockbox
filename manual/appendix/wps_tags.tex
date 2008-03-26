@@ -175,7 +175,7 @@ Ffwd{\textbar}Rew{\textgreater}}
   \begin{tagmap}{}{}
     \nopt{archos}{%
     \config{\%X{\textbar}filename.bmp{\textbar}}
-        & Load and set a backdrop image for the WPS. %
+        & Load and set a backdrop image for the WPS.
           This image must be exactly the same size as your LCD.\\
     }%
     \config{\%P{\textbar}filename.bmp{\textbar}}
@@ -183,23 +183,33 @@ Ffwd{\textbar}Rew{\textgreater}}
           progress bar\\
     \config{\%x{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar}}
         & Load and display an image\\
-        & \config{n}: image ID (a-z and A-Z)\\
+        & \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\\
         & \config{filename}: filename relative to \fname{/.rockbox/} and including .bmp\\
         & \config{x}: x coordinate\\
         & \config{y}: y coordinate.\\
-    \config{\%xl{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar}}
-        & Preload an image for later display\\
-        & \config{n}: image ID (a-z and A-Z)\\
+    \config{\%xl{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar}[nimages{\textbar}]}
+        & Preload an image for later display (useful for when your images are displayed conditionally)\\
+        & \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\\
         & \config{filename}: filename relative to \fname{/.rockbox/} and including .bmp\\
         & \config{x}: x coordinate\\
         & \config{y}: y coordinate.\\
-    \config{\%xdn} & Display a preloaded image\\
-        & \config{n}: image ID (a-z and A-Z)\\
+        & \config{nimages}: (optional) number of sub-images (tiled vertically, of the same height)
+          contained in the bitmap. Default is 1.\\
+    \config{\%xdn[i]} & Display a preloaded image\\
+        & \config{n}: image ID (a-z and A-Z) as it was specified in \config{\%x} or \config{\%xl}\\
+        & \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52).
+          By default the first (i.e. top most) sub-image will be used.\\
   \end{tagmap}
 \end{table}
 
-Example: image \fname{/.rockbox/bg.bmp} with ID ``a'' at 37, 109 would be:\\
+Example 1: image \fname{/.rockbox/bg.bmp} with ID ``a'' at 37, 109 would be:\\
 \config{\%x{\textbar}a{\textbar}bg.bmp{\textbar}37{\textbar}109{\textbar}}
+
+Example 2: loads a bitmap strip containing 10 volume icon images (all the same size),
+and then references the individual sub-images in a conditional:\\
+\config{\%xl{\textbar}M{\textbar}volume.bmp{\textbar}134{\textbar}153{\textbar}10{\textbar}}\\
+\config{\?pv<\%xdMa{\textbar}\%xdMb{\textbar}\%xdMc{\textbar}\%xdMd{\textbar}\%xdMe{\textbar}\%xdMf{\textbar}\%xdMg{\textbar}\%xdMh{\textbar}\%xdMi{\textbar}\%xdMj>}
+
 
 \note{
   \begin{itemize}
