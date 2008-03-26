@@ -221,7 +221,7 @@ static int browser(void* param)
 static int menu(void* param)
 {
     (void)param;
-    return do_menu(NULL, 0);
+    return do_menu(NULL, 0, NULL, false);
     
 }
 #ifdef HAVE_RECORDING
@@ -292,7 +292,7 @@ static int plugins_menu(void* param)
     int selection = 0, current = 0;
     while (retval == GO_TO_PREVIOUS)
     {
-        selection = do_menu(&plugins_menu_items, &current);
+        selection = do_menu(&plugins_menu_items, &current, NULL, false);
         switch (selection)
         {
             case 0:
@@ -483,7 +483,7 @@ static int load_context_screen(int selection)
     }
     
     if (context_menu)
-        return do_menu(context_menu, NULL);
+        return do_menu(context_menu, NULL, NULL, false);
     else
         return GO_TO_PREVIOUS;
 }
@@ -540,7 +540,7 @@ void root_menu(void)
             case GO_TO_ROOT:
                 if (last_screen != GO_TO_ROOT)
                     selected = get_selection(last_screen);
-                next_screen = do_menu(&root_menu_, &selected);
+                next_screen = do_menu(&root_menu_, &selected, NULL, false);
                 if (next_screen != GO_TO_PREVIOUS)
                     last_screen = GO_TO_ROOT;
                 break;

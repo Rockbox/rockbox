@@ -199,7 +199,7 @@ int do_center_band_menu(void* param)
     menu.flags = MT_MENU|(3<<MENU_COUNT_SHIFT)|MENU_HAS_DESC;
     menu.submenus = band_items[band-1];
     menu.callback_and_desc = &cb_and_desc;
-    do_menu(&menu, NULL);
+    do_menu(&menu, NULL, NULL, false);
     return 0;
 }
 MAKE_MENU(band_0_menu, ID2P(LANG_EQUALIZER_BAND_LOW_SHELF), NULL, 

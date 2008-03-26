@@ -951,16 +951,28 @@ static int star_menu(void)
 {
     int selection, level=1;
     bool menu_quit = false;
-
+    struct viewport vp[NB_SCREENS];
     /* get the size of char */
     rb->lcd_getstringsize("a", &char_width, &char_height);
 
     MENUITEM_STRINGLIST(menu,"Star Menu",NULL,"Play","Choose Level",
                         "Information","Keys","Quit");
-
+    FOR_NB_SCREENS(selection)
+    {
+        rb->viewport_set_defaults(&vp[selection], selection);
+        /* we are hiding the statusbar so fix the height also */
+        vp->y = 0; vp->height = rb->screens[selection]->height;
+#if LCD_DEPTH > 1
+        if (rb->screens[selection]->depth > 1)
+        {
+            vp->bg_pattern = LCD_BLACK;
+            vp->fg_pattern = LCD_WHITE;
+        }
+#endif
+    }
     while(!menu_quit)
     {
-        switch(rb->do_menu(&menu, &selection))
+        switch(rb->do_menu(&menu, &selection, vp, true))
         {
             case 0:
                 menu_quit = true;

@@ -80,6 +80,7 @@
 #include "color_picker.h"
 #include "buffering.h"
 #include "tagcache.h"
+#include "viewport.h"
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
@@ -119,12 +120,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 102
+#define PLUGIN_API_VERSION 103
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 102
+#define PLUGIN_MIN_API_VERSION 103
 
 /* plugin return codes */
 enum plugin_status {
@@ -285,10 +286,12 @@ struct plugin_api {
     void (*lcd_remote_bitmap)(const fb_remote_data *src, int x, int y, int width,
                               int height);
 #endif
+    void (*viewport_set_defaults)(struct viewport *vp, enum screen_type screen);
     /* list */
     void (*gui_synclist_init)(struct gui_synclist * lists,
             list_get_name callback_get_item_name,void * data,
-            bool scroll_all,int selected_size);
+            bool scroll_all,int selected_size,
+            struct viewport parent[NB_SCREENS]);
     void (*gui_synclist_set_nb_items)(struct gui_synclist * lists, int nb_items);
     void (*gui_synclist_set_icon_callback)(struct gui_synclist * lists, list_get_icon icon_callback);
     int (*gui_synclist_get_nb_items)(struct gui_synclist * lists);
@@ -555,7 +558,8 @@ struct plugin_api {
 #endif
 
     /* menu */
-    int (*do_menu)(const struct menu_item_ex *menu, int *start_selected);
+    int (*do_menu)(const struct menu_item_ex *menu, int *start_selected,
+                   struct viewport parent[NB_SCREENS], bool hide_bars);
 
     /* scroll bar */
     struct gui_syncstatusbar *statusbars;

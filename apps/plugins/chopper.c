@@ -684,7 +684,7 @@ static int chopMenu(int menunum)
     rb->lcd_clear_display();
 
     while (!menu_quit) {
-        switch(rb->do_menu(&menu, &result))
+        switch(rb->do_menu(&menu, &result, NULL, false))
         {
             case 0:     /* Start New Game */
                 menu_quit=true;

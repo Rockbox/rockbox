@@ -628,7 +628,7 @@ struct pgn_game_node* pgn_show_game_list(struct plugin_api* api,
     }
 
 
-    rb->gui_synclist_init(&games_list, &get_game_text, first_game, false, 1);
+    rb->gui_synclist_init(&games_list, &get_game_text, first_game, false, 1, NULL);
     rb->gui_synclist_set_title(&games_list, "Games", NOICON);
     rb->gui_synclist_set_icon_callback(&games_list, NULL);
     rb->gui_synclist_set_nb_items(&games_list, i);

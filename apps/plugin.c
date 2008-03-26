@@ -193,7 +193,8 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_bitmap_part,
     lcd_remote_bitmap,
 #endif
-
+    viewport_set_defaults,
+    
     /* list */
     gui_synclist_init,
     gui_synclist_set_nb_items,

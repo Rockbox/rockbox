@@ -234,7 +234,7 @@ static int display_playlists(char* playlist, bool view)
         playlist = temp_buf;
 
     gui_synclist_init(&playlist_lists, playlist_callback_name, playlists,
-        false, 1);
+                       false, 1, NULL);
     gui_synclist_set_nb_items(&playlist_lists, num_playlists);
     gui_synclist_draw(&playlist_lists);
 

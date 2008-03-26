@@ -438,7 +438,7 @@ static int onplay_menu(int index)
                         ID2P(LANG_CATALOG_ADD_TO), ID2P(LANG_CATALOG_ADD_TO_NEW));
     bool current = (current_track->index == viewer.current_playing_track);
 
-    result = do_menu(&menu_items, NULL);
+    result = do_menu(&menu_items, NULL, NULL, false);
     if (result == MENU_ATTACHED_USB)
     {
         ret = -1;
@@ -505,7 +505,7 @@ MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS),
           &show_icons, &show_indices, &track_display, &save_playlist_item);
 static bool viewer_menu(void)
 {
-    return do_menu(&viewer_settings_menu, NULL) == MENU_ATTACHED_USB;
+    return do_menu(&viewer_settings_menu, NULL, NULL, false) == MENU_ATTACHED_USB;
 }
 
 /* Save playlist to disk */
@@ -589,7 +589,8 @@ bool playlist_viewer_ex(char* filename)
     if (!playlist_viewer_init(&viewer, filename, false))
         goto exit;
 
-    gui_synclist_init(&playlist_lists, playlist_callback_name, &viewer, false, 1);
+    gui_synclist_init(&playlist_lists, playlist_callback_name,
+                      &viewer, false, 1, NULL);
     gui_synclist_set_icon_callback(&playlist_lists,
                   global_settings.playlist_viewer_icons?
                   &playlist_callback_icons:NULL);
@@ -798,7 +799,7 @@ bool search_playlist(void)
     }
     backlight_on();
     gui_synclist_init(&playlist_lists, playlist_search_callback_name,
-                                found_indicies, false, 1);
+                      found_indicies, false, 1, NULL);
     gui_synclist_set_icon_callback(&playlist_lists, NULL);
     gui_synclist_set_nb_items(&playlist_lists, found_indicies_count);
     gui_synclist_select_item(&playlist_lists, 0);

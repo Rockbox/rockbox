@@ -396,7 +396,7 @@ bool enc_config_menu(struct encoder_config *cfg)
     {
         menu_callback_data.cfg = &cfg;
         menu_callback_data.global = false;
-        return do_menu(enc_data[cfg->rec_format].menu, NULL)
+        return do_menu(enc_data[cfg->rec_format].menu, NULL, NULL, false)
                 == MENU_ATTACHED_USB;
     }
     else
@@ -454,7 +454,7 @@ bool enc_global_config_menu(void)
     {
         menu_callback_data.cfg = &cfg;
         menu_callback_data.global = true;
-        return do_menu(enc_data[cfg.rec_format].menu, NULL)
+        return do_menu(enc_data[cfg.rec_format].menu, NULL, NULL, false)
                 == MENU_ATTACHED_USB;
     }
     else

@@ -278,7 +278,7 @@ void edit_list(void)
     list = (struct file_format *)buffer;
     dirs_count = list->count;
     
-    rb->gui_synclist_init(&lists,list_get_name_cb,0, false, 1);
+    rb->gui_synclist_init(&lists,list_get_name_cb,0, false, 1, NULL);
     rb->gui_synclist_set_icon_callback(&lists,NULL);
     rb->gui_synclist_set_nb_items(&lists,list->count);
     rb->gui_synclist_limit_scroll(&lists,true);

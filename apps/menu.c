@@ -50,6 +50,7 @@
 #include "bookmark.h"
 #include "gwps-common.h" /* for fade() */
 #include "audio.h"
+#include "viewport.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -164,7 +165,8 @@ static int menu_get_icon(int selected_item, void * data)
 #endif
 
 static void init_menu_lists(const struct menu_item_ex *menu,
-                     struct gui_synclist *lists, int selected, bool callback)
+                     struct gui_synclist *lists, int selected, bool callback,
+                     struct viewport parent[NB_SCREENS])
 {
     int i, count = MENU_GET_COUNT(menu->flags);
     int type = (menu->flags&MENU_TYPE_MASK);
@@ -197,7 +199,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     }
     current_submenus_menu = (struct menu_item_ex *)menu;
 
-    gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1);
+    gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1, parent);
 #ifdef HAVE_LCD_BITMAP
     if (menu->callback_and_desc->icon_id == Icon_NOICON)
         icon = Icon_Submenu_Entered;
@@ -275,6 +277,29 @@ static int talk_menu_item(int selected_item, void *data)
         }
         return 0;
 }
+/* this is used to reload the default menu viewports when the
+   theme changes. nothing happens if the menu is using a supplied parent vp */
+void init_default_menu_viewports(struct viewport parent[NB_SCREENS], bool hide_bars)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        viewport_set_defaults(&parent[i], i);
+        /* viewport_set_defaults() fixes the vp for the bars, so resize */
+        if (hide_bars)
+        {
+            if (global_settings.statusbar)
+            {
+                parent[i].y -= STATUSBAR_HEIGHT;
+                parent[i].height += STATUSBAR_HEIGHT;
+            }
+        }
+    }
+#ifdef HAS_BUTTONBAR
+    if (!hide_bars)
+        parent[0].height -= BUTTONBAR_HEIGHT;
+#endif
+}
 
 bool do_setting_from_menu(const struct menu_item_ex *temp)
 {
@@ -318,42 +343,71 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
 }
 
 /* display a menu */
-int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
+int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
+            struct viewport parent[NB_SCREENS], bool hide_bars)
 {
     int selected = start_selected? *start_selected : 0;
     int action;
     struct gui_synclist lists;
     const struct menu_item_ex *temp, *menu;
-    int ret = 0;
+    int ret = 0, i;
     bool redraw_lists;
-#ifdef HAS_BUTTONBAR
-    struct gui_buttonbar buttonbar;
-#endif
-
+    
     const struct menu_item_ex *menu_stack[MAX_MENUS];
     int menu_stack_selected_item[MAX_MENUS];
     int stack_top = 0;
     bool in_stringlist, done = false;
+    
+    struct viewport *vps, menu_vp[NB_SCREENS]; /* menu_vp will hopefully be phased out */
+#ifdef HAS_BUTTONBAR
+    struct gui_buttonbar buttonbar;
+    gui_buttonbar_init(&buttonbar);
+    gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
+    gui_buttonbar_set(&buttonbar, "<<<", "", "");
+#endif
+
     menu_callback_type menu_callback = NULL;
     if (start_menu == NULL)
         menu = &main_menu_;
     else menu = start_menu;
-#ifdef HAS_BUTTONBAR
-    gui_buttonbar_init(&buttonbar);
-    gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
-    gui_buttonbar_set(&buttonbar, "<<<", "", "");
-    gui_buttonbar_draw(&buttonbar);
-#endif
-    init_menu_lists(menu,&lists,selected,true);
+    
+    if (parent)
+    {
+        vps = parent;
+        /* if hide_bars == true we assume the viewport is correctly sized */
+    }
+    else
+    {
+        vps = menu_vp;
+        init_default_menu_viewports(vps, hide_bars);
+    }
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].set_viewport(&vps[i]);
+        screens[i].clear_viewport();
+        screens[i].set_viewport(NULL);
+    }
+    init_menu_lists(menu, &lists, selected, true, vps);
     in_stringlist = ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID);
     
     /* load the callback, and only reload it if menu changes */
     get_menu_callback(menu, &menu_callback);
     
+
+#ifdef HAS_BUTTONBAR
+    if (!hide_bars)
+    {
+        gui_buttonbar_set(&buttonbar, "<<<", "", "");
+        gui_buttonbar_draw(&buttonbar);
+    }
+#endif
     while (!done)
     {
         redraw_lists = false;
-        gui_syncstatusbar_draw(&statusbars, true);
+        if (!hide_bars)
+        {
+            gui_syncstatusbar_draw(&statusbars, true);
+        }
         action = get_action(CONTEXT_MAINMENU,
                             list_do_action_timeout(&lists, HZ));
         /* HZ so the status bar redraws corectly */
@@ -430,7 +484,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                     done = true;
                 else
                     init_menu_lists(menu, &lists, 
-                                 menu_stack_selected_item[stack_top], false);
+                                    menu_stack_selected_item[stack_top], false, vps);
                 /* new menu, so reload the callback */
                 get_menu_callback(menu, &menu_callback);
             }
@@ -444,8 +498,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         {
             int type;
 #ifdef HAS_BUTTONBAR
-            gui_buttonbar_unset(&buttonbar);
-            gui_buttonbar_draw(&buttonbar);
+            if (!hide_bars)
+            {
+                gui_buttonbar_unset(&buttonbar);
+                gui_buttonbar_draw(&buttonbar);
+            }
 #endif
             selected = get_menu_selection(gui_synclist_get_sel_pos(&lists), menu);
             temp = menu->submenus[selected];
@@ -471,7 +528,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                         menu_stack[stack_top] = menu;
                         menu_stack_selected_item[stack_top] = selected;
                         stack_top++;
-                        init_menu_lists(temp, &lists, 0, true);
+                        init_menu_lists(temp, &lists, 0, true, vps);
                         redraw_lists = false; /* above does the redraw */
                         menu = temp;
                     }
@@ -491,8 +548,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                     if (temp->flags&MENU_HAS_DESC &&
                         temp->callback_and_desc->desc == ID2P(LANG_LANGUAGE))
                     {
-                        init_menu_lists(menu, &lists, selected, true);
+                        init_menu_lists(menu, &lists, selected, true, vps);
                     }
+                    init_default_menu_viewports(menu_vp, hide_bars);
                     
                     if (temp->flags&MENU_FUNC_CHECK_RETVAL)
                     {
@@ -509,7 +567,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 {
                     if (do_setting_from_menu(temp))
                     {
-                        init_menu_lists(menu, &lists, selected, true);
+                        init_default_menu_viewports(menu_vp, hide_bars);
+                        init_menu_lists(menu, &lists, selected, true,vps);
                         redraw_lists = false; /* above does the redraw */
                     }
                     break;
@@ -526,7 +585,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                         menu_stack_selected_item[stack_top] = selected;
                         stack_top++;
                         menu = temp;
-                        init_menu_lists(menu,&lists,0,false);
+                        init_menu_lists(menu,&lists,0,false, vps);
                         redraw_lists = false; /* above does the redraw */
                         in_stringlist = true;
                     }
@@ -542,7 +601,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                     menu_callback(ACTION_EXIT_MENUITEM,temp);
             }
             if (current_submenus_menu != menu)
-                init_menu_lists(menu,&lists,selected,true);
+                init_menu_lists(menu,&lists,selected,true,vps);
             /* callback was changed, so reload the menu's callback */
             get_menu_callback(menu, &menu_callback);
             if ((menu->flags&MENU_EXITAFTERTHISMENU) && 
@@ -552,8 +611,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
                 break;
             }
 #ifdef HAS_BUTTONBAR
-            gui_buttonbar_set(&buttonbar, "<<<", "", "");
-            gui_buttonbar_draw(&buttonbar);
+            if (!hide_bars)
+            {
+                gui_buttonbar_set(&buttonbar, "<<<", "", "");
+                gui_buttonbar_draw(&buttonbar);
+            }
 #endif
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
@@ -575,7 +637,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected)
         if (stack_top > 0)
         {
             menu = menu_stack[0];
-            init_menu_lists(menu,&lists,menu_stack_selected_item[0],true);
+            init_menu_lists(menu,&lists,menu_stack_selected_item[0],true, vps);
         }
         *start_selected = get_menu_selection(
                             gui_synclist_get_sel_pos(&lists), menu);

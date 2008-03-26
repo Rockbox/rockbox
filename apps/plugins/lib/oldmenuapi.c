@@ -74,7 +74,7 @@ int menu_init(struct plugin_api *api, const struct menu_item* mitems,
         return -1;
     menus[menu].items = (struct menu_item*)mitems; /* de-const */
     rb->gui_synclist_init(&(menus[menu].synclist),
-                      &menu_get_itemname, &menus[menu], false, 1);
+                          &menu_get_itemname, &menus[menu], false, 1, NULL);
     rb->gui_synclist_set_icon_callback(&(menus[menu].synclist), NULL);
     rb->gui_synclist_set_nb_items(&(menus[menu].synclist), count);
     menus[menu].callback = callback;

@@ -901,7 +901,7 @@ bool recording_menu(bool no_source)
 {
     bool retval;
     no_source_in_menu = no_source;
-    retval = do_menu(&recording_settings_menu, NULL) == MENU_ATTACHED_USB;
+    retval = do_menu(&recording_settings_menu, NULL, NULL, false) == MENU_ATTACHED_USB;
     no_source_in_menu = false; /* always fall back to the default */
     return retval;
 };

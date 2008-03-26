@@ -3716,7 +3716,7 @@ static int recording_menu(void)
 
     while (!done)
     {
-        switch (rb->do_menu(&menu, &menupos))
+        switch (rb->do_menu(&menu, &menupos, NULL, false))
         {
             case 0: /* Set sample rate */
                 rb->set_option("Sample rate", &reccfg.samplerate, INT, freqs, 9, NULL);

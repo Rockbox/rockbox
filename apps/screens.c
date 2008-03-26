@@ -1223,7 +1223,7 @@ bool browse_id3(void)
     struct mp3entry* id3 = audio_current_track();
     int key;
 
-    gui_synclist_init(&id3_lists, &id3_get_info, id3, true, 2);
+    gui_synclist_init(&id3_lists, &id3_get_info, id3, true, 2, NULL);
     gui_synclist_set_nb_items(&id3_lists, 
         sizeof(id3_headers)/sizeof(id3_headers[0])*2);
     gui_synclist_draw(&id3_lists);
@@ -1275,7 +1275,7 @@ bool view_runtime(void)
 
     struct gui_synclist lists;
     int action;
-    gui_synclist_init(&lists, runtime_get_data, NULL, false, 2);
+    gui_synclist_init(&lists, runtime_get_data, NULL, false, 2, NULL);
 #if !defined(HAVE_LCD_CHARCELLS)
     gui_synclist_set_title(&lists, str(LANG_RUNNING_TIME), NOICON);
 #else

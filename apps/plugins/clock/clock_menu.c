@@ -57,7 +57,7 @@ static const struct opt_items hour_format_text[] = {
 bool menu_mode_selector(void){
     MENUITEM_STRINGLIST(menu,"Mode Selector",NULL, "Analog",
                         "Digital", "Binary");
-    if(rb->do_menu(&menu, &clock_settings.mode) >=0)
+    if(rb->do_menu(&menu, &clock_settings.mode, NULL, false) >=0)
         return(true);
     return(false);
 }
@@ -73,7 +73,7 @@ void menu_analog_settings(void)
                         "Show Second Hand","Show Border");
 
     while(result>=0){
-        result=rb->do_menu(&menu, &selection);
+        result=rb->do_menu(&menu, &selection, NULL, false);
         switch(result){
             case 0:
                 rb->set_option("Show Date", &clock_settings.analog.show_date,
@@ -103,7 +103,7 @@ void menu_digital_settings(void){
                         "Blinking Colon");
 
     while(result>=0){
-        result=rb->do_menu(&menu, &selection);
+        result=rb->do_menu(&menu, &selection, NULL, false);
         switch(result){
             case 0:
                 rb->set_option("Show Seconds",
@@ -148,7 +148,7 @@ void menu_general_settings(void){
                         "Idle Poweroff (temporary)");
 
     while(result>=0){
-        result=rb->do_menu(&menu, &selection);
+        result=rb->do_menu(&menu, &selection, NULL, false);
         switch(result){
             case 0:
                 rb->set_option("Hour format",
@@ -211,7 +211,7 @@ bool main_menu(void){
                         "Mode Settings","General Settings","Quit");
 
     while(!done){
-        switch(rb->do_menu(&menu, &selection)){
+        switch(rb->do_menu(&menu, &selection, NULL, false)){
             case 0:
                 done = true;
                 break;

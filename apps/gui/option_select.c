@@ -373,7 +373,7 @@ bool option_screen(struct settings_list *setting,
     }
     else return false; /* only int/bools can go here */
     gui_synclist_init(&lists, value_setting_get_name_cb,
-                      (void*)setting, false, 1);
+                      (void*)setting, false, 1, NULL);
     if (setting->lang_id == -1)
         title = (char*)setting->cfg_vals;
     else
@@ -460,6 +460,7 @@ bool option_screen(struct settings_list *setting,
     gui_synclist_draw(&lists);
     /* talk the item */
     gui_synclist_speak_item(&lists);
+    gui_syncstatusbar_draw(&statusbars, false);
     while (!done)
     {
         if (list_do_action(CONTEXT_LIST, TIMEOUT_BLOCK,

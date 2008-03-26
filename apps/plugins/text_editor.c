@@ -202,7 +202,7 @@ void save_changes(int overwrite)
 
 void setup_lists(struct gui_synclist *lists, int sel)
 {
-    rb->gui_synclist_init(lists,list_get_name_cb,0, false, 1);
+    rb->gui_synclist_init(lists,list_get_name_cb,0, false, 1, NULL);
     rb->gui_synclist_set_icon_callback(lists,NULL);
     rb->gui_synclist_set_nb_items(lists,line_count);
     rb->gui_synclist_limit_scroll(lists,true);
@@ -222,7 +222,7 @@ int do_item_menu(int cur_sel, char* copy_buffer)
                         "Insert Above", "Insert Below",
                         "Concat To Above", "Save");
 
-    switch (rb->do_menu(&menu, NULL))
+    switch (rb->do_menu(&menu, NULL, NULL, false))
     {
         case 0: /* cut */
             rb->strcpy(copy_buffer,&buffer[do_action(ACTION_GET,0,cur_sel)]);
@@ -400,7 +400,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     {
                         MENUITEM_STRINGLIST(menu, "Edit What?", NULL, 
                                             "Extension", "Color",);
-                        switch (rb->do_menu(&menu, NULL))
+                        switch (rb->do_menu(&menu, NULL, NULL, false))
                         {
                             case 0:
                                 edit_text = true;
@@ -468,7 +468,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                                         "Show Playback Menu", "Save Changes",
                                         "Save As...", "Save and Exit",
                                         "Ignore Changes and Exit");
-                    switch (rb->do_menu(&menu, NULL))
+                    switch (rb->do_menu(&menu, NULL, NULL, false))
                     {
                         case 0:
                         break;

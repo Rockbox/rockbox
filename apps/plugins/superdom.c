@@ -493,7 +493,7 @@ int settings_menu_function(void) {
                     "Human starting farms","Human starting factories",
                     "Starting cash","Starting food","Moves per turn");
 settings_menu:
-    selection=rb->do_menu(&settings_menu,&selection);
+    selection=rb->do_menu(&settings_menu,&selection, NULL, false);
     switch(selection) {
         case 0:
             rb->set_int("Computer starting farms", "", UNIT_INT, 
@@ -557,7 +557,7 @@ int do_help(void) {
                     "Each tile has a strength, calculated by the ownership",
                     "of adjacent tiles, and the type and number of troops",
                     "on them.");
-    rb->do_menu(&help_menu,&selection);
+    rb->do_menu(&help_menu,&selection, NULL, false);
     switch(selection) {
         case MENU_ATTACHED_USB:
             return PLUGIN_USB_CONNECTED;
@@ -573,7 +573,7 @@ int menu(void) {
                     "Play Super Domination","Settings","Help","Quit");
 
     while(1) {
-        selection=rb->do_menu(&main_menu,&selection);
+        selection=rb->do_menu(&main_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
                 return 0; /* start playing */
@@ -651,7 +651,7 @@ int ingame_menu(void) {
     MENUITEM_STRINGLIST(ingame_menu,"Super Domination Menu",NULL,
                     "Return to game","Save Game", "Quit");
 
-    selection=rb->do_menu(&ingame_menu,&selection);
+    selection=rb->do_menu(&ingame_menu,&selection, NULL, false);
     switch(selection) {
         case 0:
             return 0;
@@ -864,7 +864,7 @@ int buy_resources_menu(void) {
                     "Finish buying", "Game menu");
 
 resources_menu:
-    selection=rb->do_menu(&res_menu,&selection);
+    selection=rb->do_menu(&res_menu,&selection, NULL, false);
     switch(selection) {
         case 0:
             nummen = 0;
@@ -1059,7 +1059,7 @@ int move_unit(void) {
 
     MENUITEM_STRINGLIST(move_unit_menu, "Move unit", NULL, "Move men", 
                     "Move tank", "Move plane");
-    selection=rb->do_menu(&move_unit_menu,&selection);
+    selection=rb->do_menu(&move_unit_menu,&selection, NULL, false);
     switch(selection) {
         case 0:
             rb->splash(HZ, "Select where to move troops from");
@@ -1173,7 +1173,7 @@ int movement_menu(void) {
                     "Check map", "Finish moving", "Game menu");
 
     while(!menu_quit) {
-        selection=rb->do_menu(&move_menu,&selection);
+        selection=rb->do_menu(&move_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
                 if(humanres.moves) {
@@ -1281,7 +1281,7 @@ int production_menu(void) {
                     "Withdraw money", "Finish turn", "Game menu");
 
     while(1) {
-        selection=rb->do_menu(&prod_menu,&selection);
+        selection=rb->do_menu(&prod_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
                 tempmenu = buy_resources_menu();
@@ -1523,7 +1523,7 @@ int war_menu(void) {
 
     humanres.moves = superdom_settings.movesperturn;
     while(humanres.moves) {
-        selection=rb->do_menu(&wartime_menu,&selection);
+        selection=rb->do_menu(&wartime_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
                 if(select_square() == PLUGIN_USB_CONNECTED)

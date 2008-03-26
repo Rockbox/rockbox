@@ -851,7 +851,7 @@ static int game_menu (void)
     rb->lcd_set_background(LCD_WHITE);
 #endif
     for (;;) {
-        rb->do_menu(&menu,&selection);
+        rb->do_menu(&menu,&selection, NULL, false);
         if (selection==1)
             rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 10, NULL);
         else if (selection==2)

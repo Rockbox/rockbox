@@ -664,7 +664,7 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
     bookmarks->start = 0;
     bookmarks->show_playlist_name
         = strcmp(bookmark_file_name, RECENT_BOOKMARK_FILE) == 0;
-    gui_synclist_init(&list, &get_bookmark_info, (void*) bookmarks, false, 2);
+    gui_synclist_init(&list, &get_bookmark_info, (void*) bookmarks, false, 2, NULL);
     gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK), 
         Icon_Bookmark);
     gui_syncstatusbar_draw(&statusbars, true);
@@ -738,7 +738,7 @@ static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resu
             {
                 ACTION_STD_OK, ACTION_BMS_DELETE
             };
-            int selection = do_menu(&menu_items, NULL);
+            int selection = do_menu(&menu_items, NULL, NULL, false);
             
             refresh = true;
 

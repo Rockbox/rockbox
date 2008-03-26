@@ -45,15 +45,13 @@ int viewport_get_nb_lines(struct viewport *vp)
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 {
+    vp->xmargin = 0;
+    vp->ymargin = 0;
     vp->x = 0;
     vp->width = screens[screen].width;
     
     vp->y = global_settings.statusbar?STATUSBAR_HEIGHT:0;
-    vp->height = screens[screen].height - vp->y
-#ifdef HAS_BUTTONBAR
-                - (screens[screen].has_buttonbar?BUTTONBAR_HEIGHT:0)
-#endif
-                ;
+    vp->height = screens[screen].height - vp->y;
 #ifdef HAVE_LCD_BITMAP
     vp->drawmode = DRMODE_SOLID;
     vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */

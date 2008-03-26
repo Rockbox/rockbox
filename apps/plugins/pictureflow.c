@@ -1541,7 +1541,7 @@ int settings_menu(void) {
                         "Rebuild cache");
 
     do {
-        selection=rb->do_menu(&settings_menu,&selection);
+        selection=rb->do_menu(&settings_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
                 rb->set_bool("Show FPS", &show_fps);
@@ -1604,7 +1604,7 @@ int main_menu(void)
                         "Settings", "Return", "Quit");
 
     while (1)  {
-        switch (rb->do_menu(&main_menu,&selection)) {
+        switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
             case 0:
                 result = settings_menu();
                 if ( result != 0 ) return result;

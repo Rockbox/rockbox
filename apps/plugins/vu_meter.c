@@ -401,7 +401,7 @@ static bool vu_meter_menu(void)
     };
 
     while (!menu_quit) {
-        switch(rb->do_menu(&menu, &selection))
+        switch(rb->do_menu(&menu, &selection, NULL, false))
         {
             case 0:
                 rb->set_option("Meter Type", &vumeter_settings.meter_type, INT,

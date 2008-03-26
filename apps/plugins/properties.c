@@ -305,7 +305,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     prev_show_statusbar = rb->global_settings->statusbar;
     rb->global_settings->statusbar = false;
 
-    rb->gui_synclist_init(&properties_lists, &get_props, file, false, 1);
+    rb->gui_synclist_init(&properties_lists, &get_props, file, false, 1, NULL);
     rb->gui_synclist_set_title(&properties_lists, its_a_dir ?
                                                   "Directory properties" :
                                                   "File properties", NOICON);

@@ -107,12 +107,14 @@ bool list_display_title(struct gui_synclist *list, struct viewport *vp)
  *  - data : extra data passed to the list callback
  *  - scroll_all : 
  *  - selected_size : 
+ *  - parent : the parent viewports to use. NULL means the full screen minus
+ *             statusbar if enabled. NOTE: new screens should NOT set this to NULL.
  */
 void gui_synclist_init(struct gui_synclist * gui_list,
     list_get_name callback_get_item_name,
     void * data,
     bool scroll_all,
-    int selected_size
+    int selected_size, struct viewport list_parent[NB_SCREENS]
     )
 {
     int i;
@@ -128,7 +130,18 @@ void gui_synclist_init(struct gui_synclist * gui_list,
 #ifdef HAVE_LCD_BITMAP
         gui_list->offset_position[i] = 0;
 #endif
-        gui_list->parent[i] = &parent[i];
+        if (list_parent)
+            gui_list->parent[i] = &list_parent[i];
+        else
+        {
+            gui_list->parent[i] = &parent[i];
+            gui_list->parent[i]->y = global_settings.statusbar?STATUSBAR_HEIGHT:0;
+            gui_list->parent[i]->height = screens[i].height - gui_list->parent[i]->y;
+#ifdef HAS_BUTTONBAR
+            if (screens[i].has_buttonbar)
+                gui_list->parent[i]->height -= BUTTONBAR_HEIGHT;
+#endif
+        }
     }
     gui_list->limit_scroll = false;
     gui_list->data=data;
@@ -811,7 +824,7 @@ bool simplelist_show_list(struct simplelist_info *info)
     else
         getname = simplelist_static_getname;
     gui_synclist_init(&lists, getname,  info->callback_data, 
-                      info->scroll_all, info->selection_size);
+                      info->scroll_all, info->selection_size, NULL);
     if (info->title)
         gui_synclist_set_title(&lists, info->title, NOICON);
     if (info->get_icon)

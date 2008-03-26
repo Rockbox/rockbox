@@ -117,7 +117,7 @@ bool list_sc(bool is_editable)
 
     /* Setup the GUI list object, draw it to the screen,
      * and then handle the user input to it */
-    rb->gui_synclist_init(&gui_sc, &build_sc_list, &sc_file, false, 1);
+    rb->gui_synclist_init(&gui_sc, &build_sc_list, &sc_file, false, 1, NULL);
     rb->gui_synclist_set_title(&gui_sc,
         (is_editable?"Shortcuts (editable)":"Shortcuts (sealed)"), NOICON);
     rb->gui_synclist_set_nb_items(&gui_sc, sc_file.entry_cnt);

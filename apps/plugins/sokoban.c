@@ -1173,7 +1173,7 @@ static int sokoban_menu(void)
 
     do {
         menu_quit = true;
-        selection = rb->do_menu(&menu, &start_selected);
+        selection = rb->do_menu(&menu, &start_selected, NULL, false);
 
         switch (selection) {
             case 0: /* Resume */

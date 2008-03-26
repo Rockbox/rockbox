@@ -142,7 +142,8 @@ extern void gui_synclist_init(
     list_get_name callback_get_item_name,
     void * data,
     bool scroll_all,
-    int selected_size
+    int selected_size,
+    struct viewport parent[NB_SCREENS] /* NOTE: new screens should NOT set this to NULL */
     );
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
 extern void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback);

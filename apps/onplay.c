@@ -1197,7 +1197,7 @@ int onplay(char* file, int attr, int from)
         menu = &wps_onplay_menu;
     else
         menu = &tree_onplay_menu;
-    switch (do_menu(menu, NULL))
+    switch (do_menu(menu, NULL, NULL, false))
     {
         case GO_TO_WPS:
             return ONPLAY_START_PLAY;

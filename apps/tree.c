@@ -307,7 +307,7 @@ void tree_gui_init(void)
     /* since archos only have one screen, no need to create more than that */
     gui_buttonbar_set_display(&tree_buttonbar, &(screens[SCREEN_MAIN]) );
 #endif
-    gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1);
+    gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1, NULL);
     gui_synclist_set_voice_callback(&tree_lists, tree_voice_cb);
     gui_synclist_set_icon_callback(&tree_lists, &tree_get_fileicon);
 #ifdef HAVE_LCD_COLOR

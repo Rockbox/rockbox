@@ -1331,7 +1331,7 @@ static int handle_radio_presets(void)
                                  str(LANG_FM_BUTTONBAR_ACTION));
     gui_buttonbar_draw(&buttonbar);
 #endif
-    gui_synclist_init(&lists, presets_get_name, NULL, false, 1);
+    gui_synclist_init(&lists, presets_get_name, NULL, false, 1, NULL);
     gui_synclist_set_title(&lists, str(LANG_PRESET), NOICON);
     gui_synclist_set_icon_callback(&lists, NULL);
     if(global_settings.talk_file)
@@ -1364,7 +1364,7 @@ static int handle_radio_presets(void)
             case ACTION_F3:
             case ACTION_STD_CONTEXT:
                 selected_preset = gui_synclist_get_sel_pos(&lists);
-                do_menu(&handle_radio_preset_menu, NULL);
+                do_menu(&handle_radio_preset_menu, NULL, NULL, false);
                 gui_synclist_speak_item(&lists);
                 break;
             default:
@@ -1583,7 +1583,7 @@ MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL,
 /* main menu of the radio screen */
 static bool radio_menu(void)
 {
-    return do_menu(&radio_settings_menu, NULL) == MENU_ATTACHED_USB;
+    return do_menu(&radio_settings_menu, NULL, NULL, false) == MENU_ATTACHED_USB;
 }
 
 #endif
