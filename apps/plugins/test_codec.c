@@ -509,7 +509,7 @@ static void codec_thread(void)
     codec_playing = false;
 }
 
-static unsigned char* codec_stack;
+static uintptr_t* codec_stack;
 static size_t codec_stack_size;
 
 static enum plugin_status test_track(char* filename)
@@ -585,8 +585,8 @@ static enum plugin_status test_track(char* filename)
     codec_playing = true;
 
     if ((codecthread_id = rb->create_thread(codec_thread,
-        (uint8_t*)codec_stack, codec_stack_size, 0, "testcodec"
-        IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, CPU))) == NULL)
+            codec_stack, codec_stack_size, 0, "testcodec"
+            IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, CPU))) == NULL)
     {
         log_text("Cannot create codec thread!",true);
         goto exit;
@@ -642,7 +642,7 @@ exit:
 /* plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    unsigned char* codec_stack_copy;
+    uintptr_t* codec_stack_copy;
     int result, selection = 0;
     enum plugin_status res = PLUGIN_OK;
     int scandir;
@@ -692,7 +692,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     codec_stack_copy = codec_mallocbuf + 512*1024;
-    audiobuf = codec_stack_copy + codec_stack_size;
+    audiobuf = SKIPBYTES(codec_stack_copy, codec_stack_size);
     audiosize -= 512*1024 + codec_stack_size;
 
 #ifndef SIMULATOR
