@@ -296,19 +296,30 @@ void init_default_menu_viewports(struct viewport parent[NB_SCREENS], bool hide_b
         }
     }
 #ifdef HAS_BUTTONBAR
-    if (!hide_bars)
+    if (!hide_bars && global_settings.buttonbar)
         parent[0].height -= BUTTONBAR_HEIGHT;
 #endif
 }
 
 bool do_setting_from_menu(const struct menu_item_ex *temp)
 {
-    int setting_id;
+    int setting_id, oldval;
     const struct settings_list *setting = find_setting(
                                                temp->variable,
                                                &setting_id);
     char *title;
     char padded_title[MAX_PATH];
+    int var_type = setting->flags&F_T_MASK;
+    if (var_type == F_T_INT || var_type == F_T_UINT)
+    {
+        oldval = *(int*)setting->setting;
+    }
+    else if (var_type == F_T_BOOL)
+    {
+        oldval = *(bool*)setting->setting;
+    }
+    else
+        oldval = 0;
     if ((temp->flags&MENU_TYPE_MASK) == MT_SETTING_W_TEXT)
         title = temp->callback_and_desc->desc;
     else
@@ -339,6 +350,14 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
     
     option_screen((struct settings_list *)setting, 
                   setting->flags&F_TEMPVAR, title);
+    if (var_type == F_T_INT || var_type == F_T_UINT)
+    {
+        return oldval != *(int*)setting->setting;
+    }
+    else if (var_type == F_T_BOOL)
+    {
+        return oldval != *(bool*)setting->setting;
+    }
     return false;
 }
 
@@ -548,9 +567,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                     if (temp->flags&MENU_HAS_DESC &&
                         temp->callback_and_desc->desc == ID2P(LANG_LANGUAGE))
                     {
+                        init_default_menu_viewports(menu_vp, hide_bars);
                         init_menu_lists(menu, &lists, selected, true, vps);
                     }
-                    init_default_menu_viewports(menu_vp, hide_bars);
                     
                     if (temp->flags&MENU_FUNC_CHECK_RETVAL)
                     {

@@ -63,15 +63,26 @@ void list_draw(struct screen *display, struct viewport *parent, struct gui_syncl
 
 #ifdef HAVE_LCD_BITMAP
 static struct viewport parent[NB_SCREENS];
-void list_init_viewports(void)
+void list_init_viewports(struct gui_synclist *list)
 {
     int i;
     struct viewport *vp;
     FOR_NB_SCREENS(i)
     {
         vp = &parent[i];
-        viewport_set_defaults(vp, i);
+        if (!list)
+            viewport_set_defaults(vp, i);
+        else if (list->parent[i] == vp)
+        {
+            viewport_set_defaults(vp, i);
+            list->parent[i]->y = global_settings.statusbar?STATUSBAR_HEIGHT:0;
+            list->parent[i]->height = screens[i].height - list->parent[i]->y;
+        }
     }
+#ifdef HAS_BUTTONBAR
+    if (list && (list->parent[0] == &parent[0]) && global_settings.buttonbar)
+        list->parent[0]->height -= BUTTONBAR_HEIGHT;
+#endif
     force_list_reinit = false;
 }
 #else
@@ -85,8 +96,9 @@ static struct viewport parent[NB_SCREENS] =
         .height   = LCD_HEIGHT
     },
 };
-void list_init_viewports(void)
+void list_init_viewports(struct gui_synclist *list)
 {
+    (void)list;
 }
 #endif
 
@@ -135,14 +147,9 @@ void gui_synclist_init(struct gui_synclist * gui_list,
         else
         {
             gui_list->parent[i] = &parent[i];
-            gui_list->parent[i]->y = global_settings.statusbar?STATUSBAR_HEIGHT:0;
-            gui_list->parent[i]->height = screens[i].height - gui_list->parent[i]->y;
-#ifdef HAS_BUTTONBAR
-            if (screens[i].has_buttonbar)
-                gui_list->parent[i]->height -= BUTTONBAR_HEIGHT;
-#endif
         }
     }
+    list_init_viewports(gui_list);
     gui_list->limit_scroll = false;
     gui_list->data=data;
     gui_list->scroll_all=scroll_all;
@@ -214,7 +221,6 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
 #ifdef HAS_BUTTONBAR
     static bool last_buttonbar = false;
 #endif
-    
     if (force_list_reinit ||
 #ifdef HAS_BUTTONBAR
         last_buttonbar != screens[SCREEN_MAIN].has_buttonbar ||
@@ -222,7 +228,7 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
         last_list != gui_list ||
         gui_list->nb_items != last_count)
     {
-        list_init_viewports();
+        list_init_viewports(gui_list);
         force_list_reinit = false;
     }
 #ifdef HAS_BUTTONBAR
@@ -817,14 +823,20 @@ static char* simplelist_static_getname(int item, void * data, char *buffer)
 bool simplelist_show_list(struct simplelist_info *info)
 {
     struct gui_synclist lists;
-    int action, old_line_count = simplelist_line_count;
+    struct viewport vp[NB_SCREENS];
+    int action, old_line_count = simplelist_line_count,i;
     char* (*getname)(int item, void * data, char *buffer);
     if (info->get_name)
         getname = info->get_name;
     else
         getname = simplelist_static_getname;
+    FOR_NB_SCREENS(i)
+    {
+        viewport_set_defaults(&vp[i], i);
+    }
     gui_synclist_init(&lists, getname,  info->callback_data, 
-                      info->scroll_all, info->selection_size, NULL);
+                      info->scroll_all, info->selection_size, vp);
+    
     if (info->title)
         gui_synclist_set_title(&lists, info->title, NOICON);
     if (info->get_icon)

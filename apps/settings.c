@@ -942,7 +942,7 @@ void settings_apply(const bool read_disk)
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_apply();
 #endif
-    list_init_viewports();
+    list_init_viewports(NULL);
 }
 
 
