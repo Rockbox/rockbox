@@ -32,6 +32,7 @@
     /* Output 8 bits to the LCD. Instruction order is devised to maximize the
      * delay between changing the data line and the CLK L->H transition, which
      * makes the LCD controller sample DATA.
+     * Requires CLK = 1 on entry.
      *
      * Custom calling convention:
      *   %a0 - GPIO_OUT_ADDR
@@ -63,8 +64,8 @@
     bcc.s   1f
     eor.l   %d6, %d0            /* 1: Flip data bit */
 1:
-    move.l  %d0, %d1
     move.l  %d0, (%a0)          /* Output new state and set CLK = 0*/
+    move.l  %d0, %d1
     eor.l   %d7, %d1
     bra.w   .wr_bit7
 
@@ -72,6 +73,7 @@
     /* Output 16 bits to the LCD. Instruction order is devised to maximize the
      * delay between changing the data line and the CLK L->H transition, which
      * makes the LCD controller sample DATA.
+     * Requires CLK = 1 on entry.
      *
      * Custom calling convention:
      *   %a0 - GPIO_OUT_ADDR
@@ -102,8 +104,8 @@
     bcc.s   1f
     eor.l   %d6, %d0            /* 1: Flip data bit */
 1:
-    move.l  %d0, %d1
     move.l  %d0, (%a0)          /* Output new state and set CLK = 0*/
+    move.l  %d0, %d1
     eor.l   %d7, %d1
     nop
 
@@ -113,8 +115,8 @@
     eor.l   %d6, %d0
 1:
     move.l  %d1, (%a0)          /* Set CLK = 1 (delayed) */
-    move.l  %d0, %d1
     move.l  %d0, (%a0)
+    move.l  %d0, %d1
     eor.l   %d7, %d1
 .endm
     bit_out
@@ -310,7 +312,7 @@ lcd_write_data:
     movem.l (%sp), %d2-%d4/%d6-%d7/%a2-%a3
     lea.l   (7*4, %sp), %sp
     rts
-    
+
     
 /*** The following functions are only needed for main LCDs ***/
 
