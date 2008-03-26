@@ -64,7 +64,7 @@ database: database.c ../apps/tagcache.c ../apps/metadata.c \
 -D__PCTOOL__ -DHAVE_TAGCACHE -DROCKBOX_HAS_LOGF -DSIMULATOR \
 -DCONFIG_CODEC=1 -ldl -I../apps $+ -o $@
 
-checkwps: checkwps.c ../apps/gui/wps_parser.c ../apps/gui/wps_debug.c ../firmware/common/ctype.c ../apps/misc.c
+checkwps: checkwps.c ../apps/gui/wps_parser.c ../apps/gui/wps_debug.c ../firmware/common/ctype.c ../apps/misc.c ../apps/recorder/bmp.c
 	$(SILENT)$(CC) -g -I ../apps/gui -I../firmware/export \
 -D__PCTOOL__ -DDEBUG -DROCKBOX_HAS_LOGF -DIPOD_COLOR -D ROCKBOX_DIR_LEN -D WPS_DIR=\".\" \
 -I../apps -I../firmware/target/arm/ipod -I../firmware/include $+ -o $@

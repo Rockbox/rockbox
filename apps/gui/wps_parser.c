@@ -17,18 +17,29 @@
  *
  ****************************************************************************/
 
+#include <stdio.h>
+#include <string.h>
+#include "gwps.h"
+#ifdef __PCTOOL__
+#define DEBUGF printf
+#define FONT_SYSFIXED 0
+#define FONT_UI 1
+#else
+#include "debug.h"
+#endif
+
+#ifndef __PCTOOL__
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "font.h"
+
 #include "atoi.h"
 #include "gwps.h"
-#include "font.h"
-#ifndef __PCTOOL__
 #include "settings.h"
 #include "misc.h"
-#include "debug.h"
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
@@ -382,7 +393,7 @@ static bool load_bitmap(struct wps_data *wps_data,
     int ret = read_bmp_file(filename, bm,
                             wps_data->img_buf_free,
                             format);
-
+    DEBUGF("Read %s, ret=%d\n",filename,ret);
     if (ret > 0)
     {
 #if LCD_DEPTH == 16
@@ -1370,12 +1381,11 @@ static void wps_reset(struct wps_data *data)
 
 #ifdef HAVE_LCD_BITMAP
 
-static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
+static bool load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
 {
     char img_path[MAX_PATH];
     struct bitmap *bitmap;
     bool *loaded;
-
     int n;
     for (n = 0; n < BACKDROP_BMP; n++)
     {
@@ -1405,6 +1415,12 @@ static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
                     wps_data->img[n].subimage_height = wps_data->img[n].bm.height /
                                                        wps_data->img[n].num_subimages;
             }
+            else
+            {
+                /* Abort if we can't load an image */
+                DEBUGF("ERR: Failed to load image %d - %s\n",n,img_path);
+                return false;
+            }
         }
     }
 
@@ -1416,14 +1432,19 @@ static void load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
 #ifdef HAVE_REMOTE_LCD
         if (wps_data->remote_wps)
 #if LCD_REMOTE_DEPTH > 1
-            load_remote_wps_backdrop(img_path)
+            if (!load_remote_wps_backdrop(img_path))
+                return false
 #endif
             ;
         else
 #endif /* HAVE_REMOTE_LCD */
-            load_wps_backdrop(img_path);
+            if (!load_wps_backdrop(img_path))
+                return false;
     }
 #endif /* has backdrop support */
+
+    /* If we got here, everything was OK */
+    return true;
 }
 
 #endif /* HAVE_LCD_BITMAP */
@@ -1552,7 +1573,8 @@ bool wps_data_load(struct wps_data *wps_data,
         bmpdir[bmpdirlen] = 0;
 
         /* load the bitmaps that were found by the parsing */
-        load_wps_bitmaps(wps_data, bmpdir);
+        if (!load_wps_bitmaps(wps_data, bmpdir))
+            return false;
 #endif
         return true;
     }

@@ -38,11 +38,16 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
+#ifndef __PCTOOL__
 #include "file.h"
 #include "config.h"
 #include "system.h"
 #include "bmp.h"
-#include "lcd.h"
+#include "debug.h"
+#else
+#undef DEBUGF
+#define DEBUGF(...)
+#endif
 
 #ifdef __GNUC__
 #define STRUCT_PACKED __attribute__((packed))

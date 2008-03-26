@@ -7,15 +7,43 @@
 bool debug_wps = true;
 int wps_verbose_level = 0;
 
-int read_bmp_file(char* filename,
-                  struct bitmap *bm,
-                  int maxsize,
-                  int format)
+int errno;
+
+/* static endianness conversion */
+#define SWAP_16(x) ((typeof(x))(unsigned short)(((unsigned short)(x) >> 8) | \
+                                                ((unsigned short)(x) << 8)))
+
+#define SWAP_32(x) ((typeof(x))(unsigned long)( ((unsigned long)(x) >> 24) | \
+                                               (((unsigned long)(x) & 0xff0000ul) >> 8) | \
+                                               (((unsigned long)(x) & 0xff00ul) << 8) | \
+                                                ((unsigned long)(x) << 24)))
+unsigned short letoh16(unsigned short x)
 {
-    return 0;
+    unsigned short n = 0x1234;
+    unsigned char* ch = &n;
+
+    if (*ch == 0x34)
+    {
+        /* Little-endian */
+        return x;
+    } else {
+        return SWAP_16(x);
+    }
 }
 
-int errno;
+unsigned int htole32(unsigned int x)
+{
+    unsigned short n = 0x1234;
+    unsigned char* ch = &n;
+
+    if (*ch == 0x34)
+    {
+        /* Little-endian */
+        return x;
+    } else {
+        return SWAP_32(x);
+    }
+}
 
 int read_line(int fd, char* buffer, int buffer_size)
 {
