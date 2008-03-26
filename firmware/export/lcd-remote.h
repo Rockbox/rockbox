@@ -23,12 +23,11 @@
 #include <stdbool.h>
 #include "cpu.h"
 #include "config.h"
-#include "adc.h"
 #include "lcd.h"
 
 #ifdef HAVE_REMOTE_LCD
 
-#if defined(TARGET_TREE)
+#if defined(TARGET_TREE) && !defined(__PCTOOL__)
 #include "lcd-remote-target.h"
 #endif
 

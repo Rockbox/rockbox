@@ -28,6 +28,7 @@
 #include "audio.h"
 #include "system.h"
 #include "i2c.h"
+#include "adc.h"
 #include "string.h"
 #include "buffer.h"
 

@@ -53,6 +53,7 @@
 #include "dsp.h"
 #include "action.h"
 #include "cuesheet.h"
+#include "playlist.h"
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"

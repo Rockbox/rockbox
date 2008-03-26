@@ -1,0 +1,23 @@
+This directory contains the checkwps tool which can be used to
+validate wps files outside of Rockbox.
+
+checkwps uses the Rockbox WPS parser and is therefore built in
+target-specific versions (to avoid making lots of changes to the core
+code).
+
+To compile
+----------
+
+Just run the ./buildall.sh script
+
+
+To remove all compiled files
+----------------------------
+
+./cleanall.sh
+
+
+To add a new target
+-------------------
+
+Add $target and $modelname from tools/configure to targets.txt

@@ -18,14 +18,16 @@
  ****************************************************************************/
 #include <stdlib.h>
 #include <ctype.h>
+#include "config.h"
+#include "lcd.h"
+#include "file.h"
+#ifdef __PCTOOL__
+#include <stdarg.h>
+#else
 #include "sprintf.h"
-#ifndef __PCTOOL__
 #include "lang.h"
 #include "string.h"
-#include "config.h"
-#include "file.h"
 #include "dir.h"
-#include "lcd.h"
 #include "lcd-remote.h"
 #include "errno.h"
 #include "system.h"
@@ -49,7 +51,6 @@
 #include "tagcache.h"
 #include "scrobbler.h"
 #include "sound.h"
-#endif
 
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
@@ -77,7 +78,6 @@
 #endif
 #endif
 
-#ifndef __PCTOOL__
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is

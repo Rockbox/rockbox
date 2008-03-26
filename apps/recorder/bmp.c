@@ -35,11 +35,11 @@
 #include "inttypes.h"
 #include "debug.h"
 #include "lcd.h"
+#include "file.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
 #ifndef __PCTOOL__
-#include "file.h"
 #include "config.h"
 #include "system.h"
 #include "bmp.h"

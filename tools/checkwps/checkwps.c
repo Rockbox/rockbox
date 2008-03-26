@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
+#include "config.h"
 #include "gwps.h"
 
 #define MIN(x,y) ((x) > (y) ? (y) : (x))
@@ -20,7 +22,7 @@ int errno;
 unsigned short letoh16(unsigned short x)
 {
     unsigned short n = 0x1234;
-    unsigned char* ch = &n;
+    unsigned char* ch = (unsigned char*)&n;
 
     if (*ch == 0x34)
     {
@@ -34,7 +36,7 @@ unsigned short letoh16(unsigned short x)
 unsigned int htole32(unsigned int x)
 {
     unsigned short n = 0x1234;
-    unsigned char* ch = &n;
+    unsigned char* ch = (unsigned char*)&n;
 
     if (*ch == 0x34)
     {
@@ -80,6 +82,11 @@ bool load_wps_backdrop(char* filename)
     return true;
 }
 
+bool load_remote_wps_backdrop(char* filename)
+{
+    return true;
+}
+
 static char pluginbuf[PLUGIN_BUFFER_SIZE];
 
 static int dummy_func1(void)
@@ -105,12 +112,17 @@ struct screen screens[NB_SCREENS] =
         .width=LCD_WIDTH,
         .height=LCD_HEIGHT,
         .depth=LCD_DEPTH,
+#ifdef HAVE_LCD_COLOR
         .is_color=true,
-        .has_disk_led=false,
+#else
+        .is_color=false,
+#endif
         .getxmargin=dummy_func1,
         .getymargin=dummy_func1,
+#if LCD_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
+#endif
     },
 #ifdef HAVE_REMOTE_LCD
     {
@@ -119,10 +131,12 @@ struct screen screens[NB_SCREENS] =
         .height=LCD_REMOTE_HEIGHT,
         .depth=LCD_REMOTE_DEPTH,
         .is_color=false,/* No color remotes yet */
-        .getxmargin=dummy_func,
-        .getymargin=dummy_func,
-        .get_foreground=dummy_func,
-        .get_background=dummy_func,
+        .getxmargin=dummy_func1,
+        .getymargin=dummy_func1,
+#if LCD_REMOTE_DEPTH > 1
+        .get_foreground=dummy_func2,
+        .get_background=dummy_func2,
+#endif
     }
 #endif
 };

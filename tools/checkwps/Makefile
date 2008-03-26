@@ -7,12 +7,25 @@
 # $Id$
 #
 
-all: checkwps
+ROOT=../..
 
-checkwps: checkwps.c ../../apps/gui/wps_parser.c ../../apps/gui/wps_debug.c ../../firmware/common/ctype.c ../../apps/misc.c ../../apps/recorder/bmp.c
-	$(SILENT)$(CC) -g -I ../../apps/gui -I../../firmware/export \
--D__PCTOOL__ -DDEBUG -DROCKBOX_HAS_LOGF -DIPOD_COLOR -D ROCKBOX_DIR_LEN -D WPS_DIR=\".\" \
--I../../apps -I../../firmware/target/arm/ipod -I../../firmware/include $+ -o $@
+COMMON=$(ROOT)/apps/gui/wps_parser.c \
+       $(ROOT)/apps/gui/wps_debug.c \
+       $(ROOT)/apps/misc.c \
+       $(ROOT)/apps/recorder/bmp.c
+
+INCLUDE=-I $(ROOT)/apps/gui \
+        -I $(ROOT)/firmware/export \
+        -I $(ROOT)/apps \
+        -I .
+
+CFLAGS = -g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\" 
+
+all: checkwps.$(MODEL)
+
+checkwps.$(MODEL): checkwps.c  $(COMMON)
+	@echo CC [$(TARGET)]
+	@$(CC) $(INCLUDE) $(CFLAGS) $(COMMON) -D$(TARGET) checkwps.c -o $@
 
 clean:
-	rm -f cleanwps
+	rm -f checkwps.$(MODEL)

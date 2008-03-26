@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "gwps.h"
+#include "file.h"
+#include "misc.h"
 #ifdef __PCTOOL__
 #define DEBUGF printf
 #define FONT_SYSFIXED 0
@@ -39,7 +41,6 @@
 #include "atoi.h"
 #include "gwps.h"
 #include "settings.h"
-#include "misc.h"
 #include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP

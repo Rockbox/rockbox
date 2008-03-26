@@ -59,6 +59,7 @@
 #endif
 #include "gwps-common.h"
 #include "bookmark.h"
+#include "playlist.h"
 #include "tagtree.h"
 #include "menus/exported_menus.h"
 #ifdef HAVE_RTC_ALARM

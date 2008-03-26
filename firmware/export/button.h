@@ -22,7 +22,9 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include "config.h"
+#ifndef __PCTOOL__
 #include "button-target.h"
+#endif
 
 extern struct event_queue button_queue;
 
