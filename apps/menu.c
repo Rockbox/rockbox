@@ -560,16 +560,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                                     temp->function->param);
                     else 
                         return_value = temp->function->function();
-                        
-                    /* check if a new lang was loaded. IF this isnt done then
-                       the title for "General Settings" will be fudged untill
-                       the settings menu is exited and reentered */
-                    if (temp->flags&MENU_HAS_DESC &&
-                        temp->callback_and_desc->desc == ID2P(LANG_LANGUAGE))
-                    {
-                        init_default_menu_viewports(menu_vp, hide_bars);
-                        init_menu_lists(menu, &lists, selected, true, vps);
-                    }
+                    
+                    init_default_menu_viewports(menu_vp, hide_bars);
+                    init_menu_lists(menu, &lists, selected, true, vps);
                     
                     if (temp->flags&MENU_FUNC_CHECK_RETVAL)
                     {
