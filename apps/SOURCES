@@ -175,6 +175,4 @@ keymaps/keymap-mr500.c
 keymaps/keymap-mr100.c
 #elif CONFIG_KEYPAD == COWOND2_PAD
 keymaps/keymap-cowond2.c
-#elif CONFIG_KEYPAD == MEIZU_M6SL_PAD
-keymaps/keymap-meizu-m6sl.c
 #endif

@@ -920,10 +920,3 @@ target/arm/tcc780x/cowond2/pcm-cowond2.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* COWON_D2 */
-
-#ifdef MEIZU_M6SL
-#ifndef SIMULATOR
-#ifndef BOOTLOADER
-#endif /* BOOTLOADER */
-#endif /* SIMULATOR */
-#endif /* MEIZU_M6SL */

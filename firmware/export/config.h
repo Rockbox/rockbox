@@ -31,8 +31,6 @@
 #define TEA5767    0x02 /* Philips */
 #define LV24020LP  0x04 /* Sanyo */
 #define SI4700     0x08 /* Silicon Labs */
-#define TEA5760    0x10 /* Philips */
-#define LV240000   0x20 /* Sanyo */
 
 /* CONFIG_CODEC */
 #define MAS3587F 3587
@@ -56,7 +54,6 @@
 #define TCC771L       771
 #define TCC773L       773
 #define TCC7801      7801
-#define S5L8700      8700
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -82,7 +79,6 @@
 #define IAUDIO67_PAD       21
 #define COWOND2_PAD        22
 #define IAUDIO_M3_PAD      23
-#define MEIZU_M6SL_PAD     24
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -121,7 +117,6 @@
 #define LCD_CREATIVEZVM 22 /* as used by Creative Zen Vision:M */
 #define LCD_TL0350A  23 /* as used by the iAudio M3 remote, treated as main LCD */
 #define LCD_COWOND2  24 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
-#define LCD_S6D0129  25 /* as used by the Meizu M6SP and M6SL - S6D0129 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -148,7 +143,6 @@
 #define I2C_IMX31L   9
 #define I2C_TCC77X  10
 #define I2C_TCC780X 11
-#define I2C_S5L8700 12
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -171,8 +165,6 @@
 #define RTC_TCC77X   10
 #define RTC_TCC780X  11
 #define RTC_MR100  12
-#define RTC_S5L8700  13
-#define RTC_S35390A  14
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */
@@ -254,8 +246,6 @@
 #include "config-cowond2.h"
 #elif defined(CREATIVE_ZVM)
 #include "config-creativezvm.h"
-#elif defined(MEIZU_M6SL)
-#include "config-meizu-m6sl.h"
 #else
 /* no known platform */
 #endif
@@ -392,7 +382,7 @@
 #endif
 
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-  || (CONFIG_CPU == DSC25) || (CONFIG_CPU == DM320) || (CONFIG_CPU == S5L8700)
+  || (CONFIG_CPU == DSC25) || (CONFIG_CPU == DM320)
 #define CPU_ARM
 #define ARM_ARCH 4 /* ARMv4 */
 #endif
@@ -421,8 +411,7 @@
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
     defined(CPU_TCC77X) ||  /* Telechips: core, plugins, codecs */ \
     defined(CPU_TCC780X) || /* Telechips: core, plugins, codecs */ \
-    (CONFIG_CPU == PNX0101) || \
-    (CONFIG_CPU == S5L8700))
+    (CONFIG_CPU == PNX0101))
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
