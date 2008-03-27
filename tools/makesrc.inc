@@ -11,4 +11,5 @@
 
 SRC := $(shell cat SOURCES | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
 $(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -include "config.h" - 2>/dev/null \
-| grep -v "^\#")
+| grep -v "^\#" | xargs ls)
+#| grep -v "^\#")

@@ -374,6 +374,19 @@
 #define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
 #define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 
+#elif defined(MEIZU_M6SL)
+#define UI_TITLE                    "Meizu M6"
+#define UI_WIDTH                    512 /* width of GUI window */
+#define UI_HEIGHT                   322 /* height of GUI window */
+#define UI_LCD_POSX                 39 /* x position of lcd */
+#define UI_LCD_POSY                 38 /* y position of lcd */
+#define UI_LCD_WIDTH                320
+#define UI_LCD_HEIGHT               240
+#define UI_LCD_BGCOLOR              32, 32, 32 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         192, 192, 192 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
+
 #endif
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */
