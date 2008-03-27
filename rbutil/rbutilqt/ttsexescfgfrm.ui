@@ -97,7 +97,7 @@
            <string>&amp;Ok</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>
           </property>
          </widget>
         </item>
@@ -107,7 +107,7 @@
            <string>&amp;Cancel</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/process-stop.png</iconset>
           </property>
          </widget>
         </item>

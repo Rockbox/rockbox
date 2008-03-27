@@ -42,16 +42,16 @@ void ProgressLoggerGui::addItem(const QString &text, int flag)
         case LOGNOICON:
             break;
         case LOGOK:
-            item->setIcon(QIcon(":/icons/icons/go-next.png"));
+            item->setIcon(QIcon(":/icons/go-next.png"));
             break;
         case LOGINFO:
-            item->setIcon(QIcon(":/icons/icons/dialog-information.png"));
+            item->setIcon(QIcon(":/icons/dialog-information.png"));
             break;
         case LOGWARNING:
-            item->setIcon(QIcon(":/icons/icons/dialog-warning.png"));
+            item->setIcon(QIcon(":/icons/dialog-warning.png"));
             break;
         case LOGERROR:
-            item->setIcon(QIcon(":/icons/icons/dialog-error.png"));
+            item->setIcon(QIcon(":/icons/dialog-error.png"));
             break;
     }
 
@@ -77,7 +77,7 @@ int ProgressLoggerGui::getProgressMax()
 void ProgressLoggerGui::abort()
 {
     dp.buttonAbort->setText(tr("&Ok"));
-    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/icons/go-next.png")));
+    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/go-next.png")));
     disconnect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
     connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(closed()));
@@ -87,7 +87,7 @@ void ProgressLoggerGui::abort()
 void ProgressLoggerGui::undoAbort()
 {
     dp.buttonAbort->setText(tr("&Abort"));
-    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/icons/process-stop.png")));
+    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/process-stop.png")));
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SLOT(abort()));
 }
 

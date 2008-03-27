@@ -13,7 +13,7 @@
    <string>About Rockbox Utility</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="rbutilqt.qrc" >:/icons/icons/rockbox-1.png</iconset>
+   <iconset resource="rbutilqt.qrc" >:/icons/rockbox-1.png</iconset>
   </property>
   <layout class="QGridLayout" >
    <item row="0" column="0" colspan="3" >
@@ -24,7 +24,7 @@
         <string/>
        </property>
        <property name="pixmap" >
-        <pixmap resource="rbutilqt.qrc" >:/icons/icons/rockbox-5.png</pixmap>
+        <pixmap resource="rbutilqt.qrc" >:/icons/rockbox-5.png</pixmap>
        </property>
       </widget>
      </item>

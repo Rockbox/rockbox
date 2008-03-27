@@ -30,7 +30,7 @@
        <string>&amp;Device</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/icons/rbutil.png</iconset>
+       <iconset resource="rbutilqt.qrc" >:/icons/rbutil.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
@@ -54,7 +54,7 @@
             <string>&amp;Browse</string>
            </property>
            <property name="icon" >
-            <iconset resource="rbutilqt.qrc" >:/icons/icons/system-search.png</iconset>
+            <iconset resource="rbutilqt.qrc" >:/icons/system-search.png</iconset>
            </property>
           </widget>
          </item>
@@ -98,7 +98,7 @@
           <string>&amp;Autodetect</string>
          </property>
          <property name="icon" >
-          <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
+          <iconset resource="rbutilqt.qrc" >:/icons/edit-find.png</iconset>
          </property>
         </widget>
        </item>
@@ -109,7 +109,7 @@
        <string>&amp;Proxy</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/icons/network-idle.png</iconset>
+       <iconset resource="rbutilqt.qrc" >:/icons/network-idle.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
@@ -225,7 +225,7 @@
        <string>&amp;Language</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/icons/preferences-desktop-locale.png</iconset>
+       <iconset resource="rbutilqt.qrc" >:/icons/preferences-desktop-locale.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
@@ -238,7 +238,7 @@
        <string>Cac&amp;he</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/icons/package-x-generic.png</iconset>
+       <iconset resource="rbutilqt.qrc" >:/icons/package-x-generic.png</iconset>
       </attribute>
       <attribute name="toolTip" >
        <string>Download cache settings</string>
@@ -286,7 +286,7 @@
             <string>&amp;Browse</string>
            </property>
            <property name="icon" >
-            <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
+            <iconset resource="rbutilqt.qrc" >:/icons/edit-find.png</iconset>
            </property>
           </widget>
          </item>
@@ -345,7 +345,7 @@
           <string>Clean cache &amp;now</string>
          </property>
          <property name="icon" >
-          <iconset resource="rbutilqt.qrc" >:/icons/icons/user-trash-full.png</iconset>
+          <iconset resource="rbutilqt.qrc" >:/icons/user-trash-full.png</iconset>
          </property>
         </widget>
        </item>
@@ -356,7 +356,7 @@
        <string>&amp;TTS &amp;&amp; Encoder</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/icons/audio-input-microphone.png</iconset>
+       <iconset resource="rbutilqt.qrc" >:/icons/audio-input-microphone.png</iconset>
       </attribute>
       <layout class="QVBoxLayout" >
        <item>
@@ -398,7 +398,7 @@
              <string/>
             </property>
             <property name="pixmap" >
-             <pixmap resource="rbutilqt.qrc" >:/icons/icons/dialog-error.png</pixmap>
+             <pixmap resource="rbutilqt.qrc" >:/icons/dialog-error.png</pixmap>
             </property>
            </widget>
           </item>
@@ -408,7 +408,7 @@
              <string>Configure &amp;TTS</string>
             </property>
             <property name="icon" >
-             <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
+             <iconset resource="rbutilqt.qrc" >:/icons/edit-find.png</iconset>
             </property>
            </widget>
           </item>
@@ -454,7 +454,7 @@
              <string/>
             </property>
             <property name="pixmap" >
-             <pixmap resource="rbutilqt.qrc" >:/icons/icons/dialog-error.png</pixmap>
+             <pixmap resource="rbutilqt.qrc" >:/icons/dialog-error.png</pixmap>
             </property>
            </widget>
           </item>
@@ -464,7 +464,7 @@
              <string> Configure &amp;Enc</string>
             </property>
             <property name="icon" >
-             <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
+             <iconset resource="rbutilqt.qrc" >:/icons/edit-find.png</iconset>
             </property>
            </widget>
           </item>
@@ -507,7 +507,7 @@
       <string>&amp;Ok</string>
      </property>
      <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+      <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>
      </property>
     </widget>
    </item>
@@ -517,7 +517,7 @@
       <string>&amp;Cancel</string>
      </property>
      <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+      <iconset resource="rbutilqt.qrc" >:/icons/process-stop.png</iconset>
      </property>
     </widget>
    </item>

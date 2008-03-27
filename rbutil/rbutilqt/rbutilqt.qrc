@@ -6,7 +6,7 @@
      <qresource>
         <file alias="builtin/VOICE_PAUSE.wav">../../tools/VOICE_PAUSE.wav</file>
     </qresource>
-    <qresource prefix="/icons" >
+    <qresource prefix="/" >
         <file>icons/audio-input-microphone.png</file>
         <file>icons/bootloader_btn.png</file>
         <file>icons/dialog-error.png</file>

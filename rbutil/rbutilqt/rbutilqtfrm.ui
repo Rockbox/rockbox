@@ -13,7 +13,7 @@
    <string>Rockbox Utility</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="rbutilqt.qrc" >:/icons/icons/rockbox-1.png</iconset>
+   <iconset resource="rbutilqt.qrc" >:/icons/rockbox-1.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QGridLayout" >
@@ -53,7 +53,7 @@
          <string comment="Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox." />
         </property>
         <property name="pixmap" >
-         <pixmap resource="rbutilqt.qrc" >:/icons/icons/rblogo.png</pixmap>
+         <pixmap resource="rbutilqt.qrc" >:/icons/rblogo.png</pixmap>
         </property>
        </widget>
       </item>
@@ -120,7 +120,7 @@ p, li { white-space: pre-wrap; }
           <string>&amp;Change</string>
          </property>
          <property name="icon" >
-          <iconset resource="rbutilqt.qrc" >:/icons/icons/edit-find.png</iconset>
+          <iconset resource="rbutilqt.qrc" >:/icons/edit-find.png</iconset>
          </property>
         </widget>
        </item>
@@ -146,7 +146,7 @@ p, li { white-space: pre-wrap; }
            <string>Complete Installation</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/bootloader_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/bootloader_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -176,7 +176,7 @@ p, li { white-space: pre-wrap; }
            <string>Small Installation</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/rbinstall_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/rbinstall_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -245,7 +245,7 @@ p, li { white-space: pre-wrap; }
            <string>Install Bootloader</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/bootloader_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/bootloader_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -278,7 +278,7 @@ p, li { white-space: pre-wrap; }
            <string>Install Rockbox</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/rbinstall_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/rbinstall_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -349,7 +349,7 @@ p, li { white-space: pre-wrap; }
            <string>Install Fonts package</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/font_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/font_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -379,7 +379,7 @@ p, li { white-space: pre-wrap; }
            <string>Install themes</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/themes_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/themes_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -409,7 +409,7 @@ p, li { white-space: pre-wrap; }
            <string>Install game files</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/doom_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/doom_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -475,7 +475,7 @@ p, li { white-space: pre-wrap; }
            <string>Install Voice files</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/talkfile_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -505,7 +505,7 @@ p, li { white-space: pre-wrap; }
            <string>Install Talk files</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/talkfile_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -558,7 +558,7 @@ p, li { white-space: pre-wrap; }
            <string>Create Voice files</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/talkfile_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -596,7 +596,7 @@ p, li { white-space: pre-wrap; }
            <string>Uninstall Bootloader</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/rembootloader_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/rembootloader_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -626,7 +626,7 @@ p, li { white-space: pre-wrap; }
            <string>Uninstall Rockbox</string>
           </property>
           <property name="icon" >
-           <iconset resource="rbutilqt.qrc" >:/icons/icons/remrb_btn.png</iconset>
+           <iconset resource="rbutilqt.qrc" >:/icons/remrb_btn.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -947,7 +947,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionComplete_Installation" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/bootloader_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/bootloader_btn.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Complete Installation</string>
@@ -955,7 +955,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSmall_Installation" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/rbinstall_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/rbinstall_btn.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Small Installation</string>
@@ -963,7 +963,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionInstall_Bootloader" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/bootloader_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/bootloader_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Install &amp;Bootloader</string>
@@ -971,7 +971,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionInstall_Rockbox" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/rbinstall_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/rbinstall_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Install &amp;Rockbox</string>
@@ -979,7 +979,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionFonts_Package" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/font_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/font_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Install &amp;Fonts Package</string>
@@ -987,7 +987,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionInstall_Themes" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/themes_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/themes_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Install &amp;Themes</string>
@@ -995,7 +995,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionInstall_Game_Files" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/doom_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/doom_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Install &amp;Game Files</string>
@@ -1003,7 +1003,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionInstall_Voice_File" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/talkfile_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Install Voice File</string>
@@ -1011,7 +1011,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionCreate_Talk_Files" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/talkfile_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Create &amp;Talk Files</string>
@@ -1019,7 +1019,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionRemove_bootloader" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/rembootloader_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/rembootloader_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Remove &amp;bootloader</string>
@@ -1027,7 +1027,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionUninstall_Rockbox" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/remrb_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/remrb_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Uninstall &amp;Rockbox</string>
@@ -1055,7 +1055,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionCreate_Voice_File" >
    <property name="icon" >
-    <iconset resource="rbutilqt.qrc" >:/icons/icons/talkfile_btn.png</iconset>
+    <iconset resource="rbutilqt.qrc" >:/icons/talkfile_btn.png</iconset>
    </property>
    <property name="text" >
     <string>Create &amp;Voice File</string>

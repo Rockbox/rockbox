@@ -19,7 +19,7 @@
       <string/>
      </property>
      <property name="pixmap" >
-      <pixmap resource="rbutilqt.qrc" >:/icons/icons/wizard.xpm</pixmap>
+      <pixmap resource="rbutilqt.qrc" >:/icons/wizard.xpm</pixmap>
      </property>
      <property name="alignment" >
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -108,7 +108,7 @@
         <string>&amp;Install</string>
        </property>
        <property name="icon" >
-        <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+        <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>
        </property>
       </widget>
      </item>
@@ -118,7 +118,7 @@
         <string>Install &amp;All</string>
        </property>
        <property name="icon" >
-        <iconset resource="rbutilqt.qrc" >:/icons/icons/go-next.png</iconset>
+        <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>
        </property>
       </widget>
      </item>
@@ -128,7 +128,7 @@
         <string>&amp;Cancel</string>
        </property>
        <property name="icon" >
-        <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+        <iconset resource="rbutilqt.qrc" >:/icons/process-stop.png</iconset>
        </property>
       </widget>
      </item>

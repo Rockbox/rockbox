@@ -56,7 +56,7 @@
       <string>&amp;Abort</string>
      </property>
      <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >:/icons/icons/process-stop.png</iconset>
+      <iconset resource="rbutilqt.qrc" >:/icons/process-stop.png</iconset>
      </property>
     </widget>
    </item>
