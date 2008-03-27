@@ -10391,15 +10391,13 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Partitie?"
-    player: "Partitie?"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -10424,13 +10422,13 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Opslaan mislukt"
+    *: ""
   </dest>
   <voice>
     *: ""
