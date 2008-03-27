@@ -1,3 +1,6 @@
+/* define this if you use an ATA controller */
+#define HAVE_ATA
+
 /* define this if you have a charcell LCD display */
 #define HAVE_LCD_CHARCELLS
 

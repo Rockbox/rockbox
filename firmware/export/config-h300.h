@@ -7,6 +7,9 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 2
 
+/* define this if you use an ATA controller */
+#define HAVE_ATA
+
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
 

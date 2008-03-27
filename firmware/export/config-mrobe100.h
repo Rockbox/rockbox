@@ -10,6 +10,9 @@
 #define MODEL_NUMBER 23
 #define MODEL_NAME   "Olympus m:robe MR-100"
 
+/* define this if you use an ATA controller */
+#define HAVE_ATA
+
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
 

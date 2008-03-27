@@ -114,7 +114,7 @@ drivers/ata_mmc.c
 #ifdef HAVE_FLASH_DISK
 drivers/ata_flash.c
 #else  /* !HAVE_FLASH_DISK */
-#if !defined(SANSA_E200) && !defined(SANSA_C200) && !defined(LOGIK_DAX) && !defined(IAUDIO_7) && !defined(COWON_D2)
+#ifdef HAVE_ATA
 drivers/ata.c
 #endif /* SANSA_E200 */
 #endif /* HAVE_FLASH_DISK */

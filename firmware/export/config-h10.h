@@ -8,6 +8,9 @@
 #define MODEL_NUMBER 13
 #define MODEL_NAME   "iriver H10 20GB"
 
+/* define this if you use an ATA controller */
+#define HAVE_ATA
+
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 /* Define bitmask of input sources - recordable bitmask can be defined

@@ -8,6 +8,9 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 8
 
+/* define this if you use an ATA controller */
+#define HAVE_ATA
+
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
