@@ -110,14 +110,10 @@ drivers/serial.c
 #ifndef SIMULATOR
 #ifdef HAVE_MMC
 drivers/ata_mmc.c
-#else  /* !HAVE_MMC */
-#ifdef HAVE_FLASH_DISK
+#elif defined(HAVE_FLASH_DISK)
 drivers/ata_flash.c
-#else  /* !HAVE_FLASH_DISK */
-#ifdef HAVE_ATA
+#elif defined(HAVE_ATA)
 drivers/ata.c
-#endif /* SANSA_E200 */
-#endif /* HAVE_FLASH_DISK */
 #endif /* HAVE_MMC */
 drivers/fat.c
 #ifdef HAVE_HOTSWAP
