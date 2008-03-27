@@ -464,6 +464,11 @@ void* main(void)
     }
         
     btn = button_read_device();
+
+    /* Enable bootloader messages if any button is pressed */
+    if (btn)
+        verbose = true;
+
 #if defined(SANSA_E200) || defined(SANSA_C200)
 #if !defined(USE_ROCKBOX_USB)
     usb_init();
@@ -477,9 +482,6 @@ void* main(void)
         btn |= BOOTLOADER_BOOT_OF;
 #endif /* USE_ROCKBOX_USB */
 #endif
-    /* Enable bootloader messages if any button is pressed */
-    if (btn)
-        verbose = true;
 
     lcd_setfont(FONT_SYSFIXED);
 
