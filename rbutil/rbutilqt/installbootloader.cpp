@@ -285,6 +285,8 @@ bool BootloaderInstaller::uptodate()
     installedMd5 = installlog.value("md5sum").toString();
     installlog.endGroup();
 
+    if(installedMd5.isEmpty())
+        return false;
     bootloaderInfo.open();
     QSettings info(bootloaderInfo.fileName(), QSettings::IniFormat, this);
     bootloaderInfo.close();
