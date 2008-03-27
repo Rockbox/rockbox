@@ -4,7 +4,7 @@
 %wd
 %X|wpsbackdrop-128x128x16.bmp|
 %P|pb-128x128x16.bmp|
-%xl|A|lockclosed-128x128x16.bmp|3|110|2|
+%xl|A|lock-128x128x16.bmp|3|110|2|
 %xl|B|battery-128x128x16.bmp|23|110|10|
 %xl|C|volume-128x128x16.bmp|51|110|10|
 %xl|D|shuffle-128x128x16.bmp|74|110|
