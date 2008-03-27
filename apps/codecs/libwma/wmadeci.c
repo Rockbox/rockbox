@@ -906,7 +906,7 @@ static int wma_decode_block(WMADecodeContext *s)
     int nb_coefs[MAX_CHANNELS];
     fixed32 mdct_norm;
 
-    DEBUGF("***decode_block: %d  (%d samples of %d in frame)\n",  s->block_num, s->frame_len, s->block_len);
+    DEBUGF("***decode_block: %d  (%d samples of %d in frame)\n",  s->block_num, s->block_len, s->frame_len);
 
    /* compute current block length */
     if (s->use_variable_block_len)
