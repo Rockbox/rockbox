@@ -21,6 +21,7 @@
 #include "system.h"
 #include "file.h"
 #include "lcd-remote.h"
+#include "adc.h"
 #include "scroll_engine.h"
 
 /*** definitions ***/
