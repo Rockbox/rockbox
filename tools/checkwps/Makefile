@@ -21,7 +21,8 @@ INCLUDE=-I $(ROOT)/apps/gui \
 
 CFLAGS = -g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\" 
 
-all: checkwps.$(MODEL)
+all:
+	@echo To build, run the buildall.sh script
 
 checkwps.$(MODEL): checkwps.c  $(COMMON)
 	@echo CC [$(TARGET)]
