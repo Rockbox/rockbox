@@ -30,31 +30,30 @@
     .type   lcd_write_data, %function
                                       /* r0 = addr, must be aligned */
 lcd_write_data:                       /* r1 = pixel count, must be even */
-    stmfd   sp!, {r4-r6}
-    mov     r2, #0x30000000           /* LCD data port */
+    stmfd   sp!, {r4-r5, lr}
+    mov     lr, #0x30000000           /* LCD data port */
 
     subs    r1, r1, #16
 .loop16:
-    ldmgeia r0!, {r3-r6}
-    stmgeia r2, {r3-r6}
-    ldmgeia r0!, {r3-r6}
-    stmgeia r2, {r3-r6}
+    ldmgeia r0!, {r2-r5}
+    stmgeia lr, {r2-r5}
+    ldmgeia r0!, {r2-r5}
+    stmgeia lr, {r2-r5}
     subges  r1, r1, #16
     bge     .loop16
 
     /* no need to correct the count, we're just checking bits from now */
     tst     r1, #8
-    ldmneia r0!, {r3-r6}
-    stmneia r2, {r3-r6}
+    ldmneia r0!, {r2-r5}
+    stmneia lr, {r2-r5}
     tst     r1, #4
-    ldmneia r0!, {r3-r4}
-    stmneia r2, {r3-r4}
+    ldmneia r0!, {r2-r3}
+    stmneia lr, {r2-r3}
     tst     r1, #2
     ldrne   r3, [r0], #4
-    strne   r3, [r2]
+    strne   r3, [lr]
 
-    ldmfd   sp!, {r4-r6}
-    bx      lr
+    ldmfd   sp!, {r4-r5, pc}
 
 /****************************************************************************
  * extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
@@ -86,11 +85,11 @@ lcd_write_yuv420_lines:
                                       /* r1 = dst = bcmaddr */
                                       /* r2 = width */
                                       /* r3 = stride */                
-    stmfd       sp!, { r4-r12 }       /* save non-scratch */
-    ldmia       r0, { r10-r12 }       /* r10 = yuv_src[0] = Y'_p */
-                                      /* r11 = yuv_src[1] = Cb_p */
-                                      /* r12 = yuv_src[2] = Cr_p */
-    add         r3, r10, r3           /* r3 = &ysrc[stride] */
+    stmfd       sp!, { r4-r11, lr }   /* save non-scratch */
+    ldmia       r0, { r9-r11 }        /* r9 = yuv_src[0] = Y'_p */
+                                      /* r10 = yuv_src[1] = Cb_p */
+                                      /* r11 = yuv_src[2] = Cr_p */
+    add         r3, r9, r3            /* r3 = &ysrc[stride] */
     add         r4, r2, r2, asr #1    /* chroma buffer lenght = width/2 *3 */
     mov         r4, r4, asl #2        /*   use words for str/ldm possibility */
     add         r4, r4, #19           /*   plus room for 4 additional words, */
@@ -100,11 +99,11 @@ lcd_write_yuv420_lines:
 
     mov         r7, r2                /* r7 = loop count */
     add         r8, sp, #16           /* chroma buffer */
-    mov         r9, #0x30000000       /* LCD data port */
+    mov         lr, #0x30000000       /* LCD data port */
     
     /* The following writes dest address to BCM and waits for write ready */
-    orr         r2, r9, #0x00010000   /* r2 = BCM_WR_ADDR32 */
-    orr         r6, r9, #0x00030000   /* r6 = BCM_CONTROL */
+    orr         r2, lr, #0x00010000   /* r2 = BCM_WR_ADDR32 */
+    orr         r6, lr, #0x00030000   /* r6 = BCM_CONTROL */
     str         r1, [r2]              /* BCM_WR_ADDR32 = bcmaddr */
 .busy_1:
     ldrh        r1, [r6]              /* while (!(BCM_CONTROL & 0x2)) */
@@ -114,8 +113,8 @@ lcd_write_yuv420_lines:
     /* 1st loop start */
 10:                                   /* loop start */
 
-    ldrb        r0, [r11], #1         /* r0 = *usrc++ = *Cb_p++ */
-    ldrb        r1, [r12], #1         /* r1 = *vsrc++ = *Cr_p++ */
+    ldrb        r0, [r10], #1         /* r0 = *usrc++ = *Cb_p++ */
+    ldrb        r1, [r11], #1         /* r1 = *vsrc++ = *Cr_p++ */
 
     sub         r0, r0, #128          /* r0 = Cb-128 */
     sub         r1, r1, #128          /* r1 = Cr-128 */
@@ -138,7 +137,7 @@ lcd_write_yuv420_lines:
     stmia       r8!, {r0-r2}          /* store r0, r1 and r2 to chroma buffer */
     
     /* 1st loop, first pixel */
-    ldrb        r5, [r10], #1         /* r5 = *ysrc++ = *Y'_p++ */
+    ldrb        r5, [r9], #1          /* r5 = *ysrc++ = *Y'_p++ */
     sub         r5, r5, #16           /* r5 = (Y'-16) * 74 */
     add         r3, r5, r5, asl #2
     add         r5, r3, r5, asl #5
@@ -167,7 +166,7 @@ lcd_write_yuv420_lines:
     orr         r5, r4, r6, lsl #11   /* r5 = pixel_1 */
 
     /* 1st loop, second pixel */
-    ldrb        r4, [r10], #1         /* r4 = *ysrc++ = *Y'_p++ */
+    ldrb        r4, [r9], #1          /* r4 = *ysrc++ = *Y'_p++ */
     sub         r4, r4, #16           /* r4 = (Y'-16) * 74 */
     add         r3, r4, r4, asl #2
     add         r4, r3, r4, asl #5
@@ -195,7 +194,7 @@ lcd_write_yuv420_lines:
     orr         r4, r4, r3, lsl #5    /* pixel_2 = r<<11 | g<<5 | b */
     orr         r4, r4, r6, lsl #11   /* r4 = pixel_2 */
     orr         r4, r5, r4, lsl #16   /* r4 = pixel_2<<16 | pixel_1 */
-    str         r4, [r9]              /* write packed pixels */
+    str         r4, [lr]              /* write packed pixels */
   
     subs        r7, r7, #2            /* check for loop end */
     bgt         10b                   /* back to beginning  */
@@ -203,13 +202,13 @@ lcd_write_yuv420_lines:
     
     /* Reload several registers for pointer rewinding for next loop */
     add         r8, sp, #16           /* chroma buffer */
-    ldmia       sp, { r1, r7, r10}    /* r1  = bcmaddr */
+    ldmia       sp, { r1, r7, r9}     /* r1  = bcmaddr */
                                       /* r7  = loop count */
-                                      /* r10 = &ysrc[stride] */
+                                      /* r9 = &ysrc[stride] */
     
     /* The following writes dest address to BCM and waits for write ready */
-    orr         r2, r9, #0x00010000   /* r2 = BCM_WR_ADDR32 */
-    orr         r6, r9, #0x00030000   /* r6 = BCM_CONTROL */
+    orr         r2, lr, #0x00010000   /* r2 = BCM_WR_ADDR32 */
+    orr         r6, lr, #0x00030000   /* r6 = BCM_CONTROL */
     add         r1, r1, #640          /* dst += (LCD_WIDTH*2) */
     str         r1, [r2]              /* BCM_WR_ADDR32 = dst */
 .busy_2:
@@ -224,7 +223,7 @@ lcd_write_yuv420_lines:
     ldmia       r8!, {r0-r2}
   
     /* 2nd loop, first pixel */
-    ldrb        r5, [r10], #1         /* r5 = *ysrc++ = *Y'_p++ */
+    ldrb        r5, [r9], #1          /* r5 = *ysrc++ = *Y'_p++ */
     sub         r5, r5, #16           /* r5 = (Y'-16) * 74 */
     add         r3, r5, r5, asl #2
     add         r5, r3, r5, asl #5
@@ -252,7 +251,7 @@ lcd_write_yuv420_lines:
     orr         r5, r4, r6, lsl #11   /* r5 = pixel_1 */
     
     /* 2nd loop, second pixel */
-    ldrb        r4, [r10], #1         /* r4 = *ysrc++ = *Y'_p++ */
+    ldrb        r4, [r9], #1          /* r4 = *ysrc++ = *Y'_p++ */
     sub         r4, r4, #16           /* r4 = (Y'-16) * 74 */
     add         r3, r4, r4, asl #2
     add         r4, r3, r4, asl #5
@@ -280,7 +279,7 @@ lcd_write_yuv420_lines:
     orr         r4, r4, r3, lsl #5    /* pixel_2 = r<<11 | g<<5 | b */
     orr         r4, r4, r6, lsl #11   /* r4 = pixel_2 */
     orr         r4, r5, r4, lsl #16   /* r4 = pixel_2<<16 | pixel_1 */
-    str         r4, [r9]              /* write packed pixels */
+    str         r4, [lr]              /* write packed pixels */
     
     subs        r7, r7, #2            /* check for loop end */
     bgt         20b                   /* back to beginning  */
@@ -288,8 +287,7 @@ lcd_write_yuv420_lines:
 
     ldr         r3, [sp, #12]
     add         sp, sp, r3            /* deallocate buffer */
-    ldmfd       sp!, { r4-r12 }       /* restore registers */
-    bx          lr
+    ldmfd       sp!, { r4-r11, pc }   /* restore registers */
 
     .ltorg
     .size   lcd_write_yuv420_lines, .-lcd_write_yuv420_lines
