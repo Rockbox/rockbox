@@ -208,7 +208,9 @@ Example 1: image \fname{/.rockbox/bg.bmp} with ID ``a'' at 37, 109 would be:\\
 Example 2: loads a bitmap strip containing 10 volume icon images (all the same size),
 and then references the individual sub-images in a conditional:\\
 \config{\%xl{\textbar}M{\textbar}volume.bmp{\textbar}134{\textbar}153{\textbar}10{\textbar}}\\
-\config{\?pv<\%xdMa{\textbar}\%xdMb{\textbar}\%xdMc{\textbar}\%xdMd{\textbar}\%xdMe{\textbar}\%xdMf{\textbar}\%xdMg{\textbar}\%xdMh{\textbar}\%xdMi{\textbar}\%xdMj>}
+\config{\%?pv<\%xdMa{\textbar}\%xdMb{\textbar}\%xdMc{\textbar}\%xdMd{\textbar}%
+\%xdMe{\textbar}\%xdMf{\textbar}\%xdMg{\textbar}\%xdMh{\textbar}%
+\%xdMi{\textbar}\%xdMj>}
 
 
 \note{
