@@ -202,15 +202,16 @@ Ffwd{\textbar}Rew{\textgreater}}
   \end{tagmap}
 \end{table}
 
-Example 1: image \fname{/.rockbox/bg.bmp} with ID ``a'' at 37, 109 would be:\\
+Examples:
+\begin{enumerate}
+\item Load and display the image \fname{/.rockbox/bg.bmp} with ID ``a'' at 37, 109:\\
 \config{\%x{\textbar}a{\textbar}bg.bmp{\textbar}37{\textbar}109{\textbar}}
-
-Example 2: loads a bitmap strip containing 10 volume icon images (all the same size),
-and then references the individual sub-images in a conditional:\\
-\config{\%xl{\textbar}M{\textbar}volume.bmp{\textbar}134{\textbar}153{\textbar}10{\textbar}}\\
+\item Load a bitmap strip containing 5 volume icon images (all the same size)
+with image ID ``M'', and then reference the individual sub-images in a conditional:\\
+\config{\%xl{\textbar}M{\textbar}volume.bmp{\textbar}134{\textbar}153{\textbar}5{\textbar}}\\
 \config{\%?pv<\%xdMa{\textbar}\%xdMb{\textbar}\%xdMc{\textbar}\%xdMd{\textbar}%
-\%xdMe{\textbar}\%xdMf{\textbar}\%xdMg{\textbar}\%xdMh{\textbar}%
-\%xdMi{\textbar}\%xdMj>}
+\%xdMe>}
+\end{enumerate}
 
 
 \note{
