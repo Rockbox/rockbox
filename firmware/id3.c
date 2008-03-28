@@ -185,7 +185,7 @@ static const char* const genres[] = {
     "Synthpop"
 };
 
-char* id3_get_num_genre(const unsigned int genre_num)
+char* id3_get_num_genre(unsigned int genre_num)
 {
     if (genre_num < sizeof(genres)/sizeof(char*))
         return (char*)genres[genre_num];

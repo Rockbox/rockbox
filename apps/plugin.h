@@ -521,13 +521,13 @@ struct plugin_api {
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
     int (*playlist_start)(int start_index, int offset);
-    void (*PREFIX(audio_play))(const long offset);
+    void (*PREFIX(audio_play))(long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);
     void (*audio_resume)(void);
     void (*audio_next)(void);
     void (*audio_prev)(void);
-    void (*audio_ff_rewind)(const long newtime);
+    void (*audio_ff_rewind)(long newtime);
     struct mp3entry* (*audio_next_track)(void);
     int (*audio_status)(void);
     bool (*audio_has_changed_track)(void);
@@ -570,15 +570,15 @@ struct plugin_api {
     bool (*option_screen)(struct settings_list *setting,
                           bool use_temp_var, unsigned char* option_title);
     bool (*set_option)(const char* string, const void* variable,
-                       const enum optiontype type, const struct opt_items* options,
-                       const int numoptions, void (*function)(int));
+                       enum optiontype type, const struct opt_items* options,
+                       int numoptions, void (*function)(int));
     bool (*set_bool_options)(const char* string, const bool* variable,
-                             const char* yes_str, const int yes_voice,
-                             const char* no_str, const int no_voice,
+                             const char* yes_str, int yes_voice,
+                             const char* no_str, int no_voice,
                              void (*function)(bool));
-    bool (*set_int)(const unsigned char* string, const char* unit, const int voice_unit,
-                    const int* variable, void (*function)(int), const int step, 
-                    const int min, const int max, 
+    bool (*set_int)(const unsigned char* string, const char* unit, int voice_unit,
+                    const int* variable, void (*function)(int), int step, 
+                    int min, int max, 
                     void (*formatter)(char*, size_t, int, const char*) );
     bool (*set_bool)(const char* string, const bool* variable );
 
@@ -684,20 +684,20 @@ struct plugin_api {
 
 #if (CONFIG_CODEC == SWCODEC)
     /* buffering API */
-    int (*bufopen)(const char *file, size_t offset, const enum data_type type);
-    int (*bufalloc)(const void *src, const size_t size, const enum data_type type);
-    bool (*bufclose)(const int handle_id);
-    int (*bufseek)(const int handle_id, const size_t newpos);
-    int (*bufadvance)(const int handle_id, const off_t offset);
-    ssize_t (*bufread)(const int handle_id, size_t size, void *dest);
-    ssize_t (*bufgetdata)(const int handle_id, size_t size, void **data);
-    ssize_t (*bufgettail)(const int handle_id, const size_t size, void **data);
-    ssize_t (*bufcuttail)(const int handle_id, size_t size);
+    int (*bufopen)(const char *file, size_t offset, enum data_type type);
+    int (*bufalloc)(const void *src, size_t size, enum data_type type);
+    bool (*bufclose)(int handle_id);
+    int (*bufseek)(int handle_id, size_t newpos);
+    int (*bufadvance)(int handle_id, off_t offset);
+    ssize_t (*bufread)(int handle_id, size_t size, void *dest);
+    ssize_t (*bufgetdata)(int handle_id, size_t size, void **data);
+    ssize_t (*bufgettail)(int handle_id, size_t size, void **data);
+    ssize_t (*bufcuttail)(int handle_id, size_t size);
 
-    ssize_t (*buf_get_offset)(const int handle_id, void *ptr);
-    ssize_t (*buf_handle_offset)(const int handle_id);
-    void (*buf_request_buffer_handle)(const int handle_id);
-    void (*buf_set_base_handle)(const int handle_id);
+    ssize_t (*buf_get_offset)(int handle_id, void *ptr);
+    ssize_t (*buf_handle_offset)(int handle_id);
+    void (*buf_request_buffer_handle)(int handle_id);
+    void (*buf_set_base_handle)(int handle_id);
     size_t (*buf_used)(void);
 #endif
 

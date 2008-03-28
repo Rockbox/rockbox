@@ -114,7 +114,7 @@ long lasttime = 0;
 #define NVRAM_FILE ROCKBOX_DIR "/nvram.bin"
 static char nvram_buffer[NVRAM_BLOCK_SIZE];
 
-static bool read_nvram_data(char* buf, const int max_len)
+static bool read_nvram_data(char* buf, int max_len)
 {
     unsigned crc32 = 0xffffffff;
     int var_count = 0, i = 0, buf_pos = 0;
@@ -164,7 +164,7 @@ static bool read_nvram_data(char* buf, const int max_len)
     }
     return true;
 }
-static bool write_nvram_data(char* buf, const int max_len)
+static bool write_nvram_data(char* buf, int max_len)
 {
     unsigned crc32 = 0xffffffff;
     int i = 0, buf_pos = 0;
@@ -222,7 +222,7 @@ static bool write_nvram_data(char* buf, const int max_len)
 /*
  * load settings from disk or RTC RAM
  */
-void settings_load(const int which)
+void settings_load(int which)
 {
     DEBUGF( "reload_all_settings()\n" );
     if (which&SETTINGS_RTC)
@@ -234,7 +234,7 @@ void settings_load(const int which)
     }
 }
 
-static bool cfg_string_to_int(const int setting_id, int* out, const char* str)
+static bool cfg_string_to_int(int setting_id, int* out, const char* str)
 {
     const char* start = settings[setting_id].cfg_vals;
     char* end = NULL;
@@ -265,7 +265,7 @@ static bool cfg_string_to_int(const int setting_id, int* out, const char* str)
     return false;
 }
 
-bool settings_load_config(const char* file, const bool apply)
+bool settings_load_config(const char* file, bool apply)
 {
     int fd;
     char line[128];
@@ -363,7 +363,7 @@ bool settings_load_config(const char* file, const bool apply)
 
 /** Writing to a config file and saving settings **/
 
-bool cfg_int_to_string(const int setting_id, const int val, char* buf, const int buf_len)
+bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
 {
     int flags = settings[setting_id].flags;
     const char* start = settings[setting_id].cfg_vals;
@@ -420,7 +420,7 @@ bool cfg_int_to_string(const int setting_id, const int val, char* buf, const int
 }
 
 
-static bool is_changed(const int setting_id)
+static bool is_changed(int setting_id)
 {
     const struct settings_list *setting = &settings[setting_id];
     switch (setting->flags&F_T_MASK)
@@ -454,7 +454,7 @@ static bool is_changed(const int setting_id)
     return true;
 }
 
-static bool settings_write_config(const char* filename, const int options)
+static bool settings_write_config(const char* filename, int options)
 {
     int i;
     int fd;
@@ -609,7 +609,7 @@ int settings_save(void)
     return 0;
 }
 
-bool settings_save_config(const int options)
+bool settings_save_config(int options)
 {
     char filename[MAX_PATH];
     char *folder;
@@ -719,7 +719,7 @@ void sound_settings_apply(void)
 #endif
 }
 
-void settings_apply(const bool read_disk)
+void settings_apply(bool read_disk)
 {
     char buf[64];
 #if CONFIG_CODEC == SWCODEC
@@ -1009,8 +1009,8 @@ bool set_bool(const char* string, const bool* variable )
 
 
 bool set_bool_options(const char* string, const bool* variable,
-                      const char* yes_str, const int yes_voice,
-                      const char* no_str, const int no_voice,
+                      const char* yes_str, int yes_voice,
+                      const char* no_str, int no_voice,
                       void (*function)(bool))
 {
     struct opt_items names[] = {
@@ -1026,12 +1026,12 @@ bool set_bool_options(const char* string, const bool* variable,
 
 bool set_int(const unsigned char* string,
              const char* unit,
-             const int voice_unit,
+             int voice_unit,
              const int* variable,
              void (*function)(int),
-             const int step,
-             const int min,
-             const int max,
+             int step,
+             int min,
+             int max,
              void (*formatter)(char*, size_t, int, const char*) )
 {
     return set_int_ex(string, unit, voice_unit, variable, function,
@@ -1040,12 +1040,12 @@ bool set_int(const unsigned char* string,
 
 bool set_int_ex(const unsigned char* string,
                 const char* unit,
-                const int voice_unit,
+                int voice_unit,
                 const int* variable,
                 void (*function)(int),
-                const int step,
-                const int min,
-                const int max,
+                int step,
+                int min,
+                int max,
                 void (*formatter)(char*, size_t, int, const char*),
                 int32_t (*get_talk_id)(int, int))
 {
@@ -1076,9 +1076,9 @@ static int32_t set_option_get_talk_id(int value, int unit)
     (void)unit;
     return set_option_options[value].voice_id;
 }
-bool set_option(const char* string, const void* variable, const enum optiontype type,
+bool set_option(const char* string, const void* variable, enum optiontype type,
                 const struct opt_items* options, 
-                const int numoptions, void (*function)(int))
+                int numoptions, void (*function)(int))
 {
     int temp;
     struct settings_list item;
@@ -1108,7 +1108,7 @@ bool set_option(const char* string, const void* variable, const enum optiontype 
 }
 
 
-void set_file(const char* filename, char* setting, const int maxlen)
+void set_file(const char* filename, char* setting, int maxlen)
 {
     char* fptr = strrchr(filename,'/');
     int len;

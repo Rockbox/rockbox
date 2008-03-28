@@ -210,7 +210,7 @@ unsigned shadow_codec_reg0;
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
 #ifdef HAVE_RECORDING
-const unsigned char empty_id3_header[] =
+static const unsigned char empty_id3_header[] =
 {
     'I', 'D', '3', 0x03, 0x00, 0x00,
     0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
@@ -533,7 +533,7 @@ static void recalculate_watermark(int bitrate)
 }
 
 #ifndef HAVE_FLASH_STORAGE
-void audio_set_buffer_margin(const int seconds)
+void audio_set_buffer_margin(int seconds)
 {
     low_watermark_margin = seconds;
 }
@@ -2627,7 +2627,7 @@ void audio_set_recording_options(struct audio_recording_options *options)
 #endif /* SIMULATOR */
 #endif /* CONFIG_CODEC == MAS3587F */
 
-void audio_play(const long offset)
+void audio_play(long offset)
 {
 #ifdef SIMULATOR
     char* trackname;
@@ -2768,7 +2768,7 @@ void audio_prev(void)
 #endif /* SIMULATOR */
 }
 
-void audio_ff_rewind(const long newtime)
+void audio_ff_rewind(long newtime)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_FF_REWIND, newtime);

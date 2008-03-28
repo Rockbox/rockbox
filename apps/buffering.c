@@ -190,7 +190,7 @@ static struct event_queue buffering_queue;
 static struct queue_sender_list buffering_queue_sender_list;
 
 
-static void call_buffering_callbacks(const enum callback_event ev, const int value);
+static void call_buffering_callbacks(enum callback_event ev, int value);
 
 
 /*
@@ -225,8 +225,8 @@ buf_ridx == buf_widx means the buffer is empty.
            only potential side effect is to allocate space for the cur_handle
            if it returns NULL.
    */
-static struct memory_handle *add_handle(const size_t data_size, const bool can_wrap,
-                                        const bool alloc_all)
+static struct memory_handle *add_handle(size_t data_size, bool can_wrap,
+                                        bool alloc_all)
 {
     /* gives each handle a unique id */
     static int cur_handle_id = 0;
@@ -363,7 +363,7 @@ static bool rm_handle(const struct memory_handle *h)
 
 /* Return a pointer to the memory handle of given ID.
    NULL if the handle wasn't found */
-static struct memory_handle *find_handle(const int handle_id)
+static struct memory_handle *find_handle(int handle_id)
 {
     if (handle_id < 0)
         return NULL;
@@ -407,7 +407,7 @@ static struct memory_handle *find_handle(const int handle_id)
            found in the linked list for adjustment.  This function has no side
            effects if NULL is returned. */
 static bool move_handle(struct memory_handle **h, size_t *delta,
-                        const size_t data_size, const bool can_wrap)
+                        size_t data_size, bool can_wrap)
 {
     struct memory_handle *dest;
     const struct memory_handle *src;
@@ -559,7 +559,7 @@ static inline bool buffer_is_low(void)
 
 /* Buffer data for the given handle.
    Return whether or not the buffering should continue explicitly.  */
-static bool buffer_handle(const int handle_id)
+static bool buffer_handle(int handle_id)
 {
     logf("buffer_handle(%d)", handle_id);
     struct memory_handle *h = find_handle(handle_id);
@@ -667,7 +667,7 @@ static bool buffer_handle(const int handle_id)
 
 /* Reset writing position and data buffer of a handle to its current offset.
    Use this after having set the new offset to use. */
-static void reset_handle(const int handle_id)
+static void reset_handle(int handle_id)
 {
     logf("reset_handle(%d)", handle_id);
 
@@ -687,7 +687,7 @@ static void reset_handle(const int handle_id)
 }
 
 /* Seek to a nonbuffered part of a handle by rebuffering the data. */
-static void rebuffer_handle(const int handle_id, const size_t newpos)
+static void rebuffer_handle(int handle_id, size_t newpos)
 {
     struct memory_handle *h = find_handle(handle_id);
     if (!h)
@@ -725,7 +725,7 @@ static void rebuffer_handle(const int handle_id, const size_t newpos)
     h->ridx = h->data;
 }
 
-static bool close_handle(const int handle_id)
+static bool close_handle(int handle_id)
 {
     struct memory_handle *h = find_handle(handle_id);
 
@@ -830,7 +830,7 @@ static bool fill_buffer(void)
 /* Given a file descriptor to a bitmap file, write the bitmap data to the
    buffer, with a struct bitmap and the actual data immediately following.
    Return value is the total size (struct + data). */
-static int load_bitmap(const int fd)
+static int load_bitmap(int fd)
 {
     int rc;
     struct bitmap *bmp = (struct bitmap *)&buffer[buf_widx];
@@ -873,7 +873,7 @@ management functions for all the actual handle management work.
    return value: <0 if the file cannot be opened, or one file already
    queued to be opened, otherwise the handle for the file in the buffer
 */
-int bufopen(const char *file, const size_t offset, const enum data_type type)
+int bufopen(const char *file, size_t offset, enum data_type type)
 {
     size_t adjusted_offset = offset;
 
@@ -957,7 +957,7 @@ int bufopen(const char *file, const size_t offset, const enum data_type type)
    requested amount of data can entirely fit in the buffer without wrapping.
    Return value is the handle id for success or <0 for failure.
 */
-int bufalloc(const void *src, const size_t size, const enum data_type type)
+int bufalloc(const void *src, size_t size, enum data_type type)
 {
     struct memory_handle *h = add_handle(size, false, true);
 
@@ -992,7 +992,7 @@ int bufalloc(const void *src, const size_t size, const enum data_type type)
 }
 
 /* Close the handle. Return true for success and false for failure */
-bool bufclose(const int handle_id)
+bool bufclose(int handle_id)
 {
     logf("bufclose(%d)", handle_id);
 
@@ -1006,7 +1006,7 @@ bool bufclose(const int handle_id)
      -1 if the handle wasn't found
      -2 if the new requested position was beyond the end of the file
 */
-int bufseek(const int handle_id, const size_t newpos)
+int bufseek(int handle_id, size_t newpos)
 {
     struct memory_handle *h = find_handle(handle_id);
     if (!h)
@@ -1028,7 +1028,7 @@ int bufseek(const int handle_id, const size_t newpos)
 
 /* Advance the reading index in a handle (relatively to its current position).
    Return 0 for success and < 0 for failure */
-int bufadvance(const int handle_id, const off_t offset)
+int bufadvance(int handle_id, off_t offset)
 {
     const struct memory_handle *h = find_handle(handle_id);
     if (!h)
@@ -1042,8 +1042,8 @@ int bufadvance(const int handle_id, const off_t offset)
  * actual amount of data available for reading.  This function explicitly
  * does not check the validity of the input handle.  It does do range checks
  * on size and returns a valid (and explicit) amount of data for reading */
-static struct memory_handle *prep_bufdata(const int handle_id, size_t *size,
-                                          const bool guardbuf_limit)
+static struct memory_handle *prep_bufdata(int handle_id, size_t *size,
+                                          bool guardbuf_limit)
 {
     struct memory_handle *h = find_handle(handle_id);
     if (!h)
@@ -1096,7 +1096,7 @@ static struct memory_handle *prep_bufdata(const int handle_id, size_t *size,
    Return the number of bytes copied or < 0 for failure (handle not found).
    The caller is blocked until the requested amount of data is available.
 */
-ssize_t bufread(const int handle_id, const size_t size, void *dest)
+ssize_t bufread(int handle_id, size_t size, void *dest)
 {
     const struct memory_handle *h;
     size_t adjusted_size = size;
@@ -1129,7 +1129,7 @@ ssize_t bufread(const int handle_id, const size_t size, void *dest)
    The guard buffer may be used to provide the requested size. This means it's
    unsafe to request more than the size of the guard buffer.
 */
-ssize_t bufgetdata(const int handle_id, const size_t size, void **data)
+ssize_t bufgetdata(int handle_id, size_t size, void **data)
 {
     const struct memory_handle *h;
     size_t adjusted_size = size;
@@ -1154,7 +1154,7 @@ ssize_t bufgetdata(const int handle_id, const size_t size, void **data)
     return adjusted_size;
 }
 
-ssize_t bufgettail(const int handle_id, const size_t size, void **data)
+ssize_t bufgettail(int handle_id, size_t size, void **data)
 {
     size_t tidx;
 
@@ -1184,7 +1184,7 @@ ssize_t bufgettail(const int handle_id, const size_t size, void **data)
     return size;
 }
 
-ssize_t bufcuttail(const int handle_id, const size_t size)
+ssize_t bufcuttail(int handle_id, size_t size)
 {
     struct memory_handle *h;
     size_t adjusted_size = size;
@@ -1228,7 +1228,7 @@ management functions for all the actual handle management work.
 */
 
 /* Get a handle offset from a pointer */
-ssize_t buf_get_offset(const int handle_id, void *ptr)
+ssize_t buf_get_offset(int handle_id, void *ptr)
 {
     const struct memory_handle *h = find_handle(handle_id);
     if (!h)
@@ -1237,7 +1237,7 @@ ssize_t buf_get_offset(const int handle_id, void *ptr)
     return (size_t)ptr - (size_t)&buffer[h->ridx];
 }
 
-ssize_t buf_handle_offset(const int handle_id)
+ssize_t buf_handle_offset(int handle_id)
 {
     const struct memory_handle *h = find_handle(handle_id);
     if (!h)
@@ -1245,13 +1245,13 @@ ssize_t buf_handle_offset(const int handle_id)
     return h->offset;
 }
 
-void buf_request_buffer_handle(const int handle_id)
+void buf_request_buffer_handle(int handle_id)
 {
     LOGFQUEUE("buffering >| Q_START_FILL %d",handle_id);
     queue_send(&buffering_queue, Q_START_FILL, handle_id);
 }
 
-void buf_set_base_handle(const int handle_id)
+void buf_set_base_handle(int handle_id)
 {
     LOGFQUEUE("buffering > Q_BASE_HANDLE %d", handle_id);
     queue_post(&buffering_queue, Q_BASE_HANDLE, handle_id);
@@ -1263,13 +1263,13 @@ size_t buf_used(void)
     return BUF_USED;
 }
 
-void buf_set_watermark(const size_t bytes)
+void buf_set_watermark(size_t bytes)
 {
     LOGFQUEUE("buffering > Q_SET_WATERMARK %ld", (long)bytes);
     queue_post(&buffering_queue, Q_SET_WATERMARK, bytes);
 }
 
-bool register_buffering_callback(const buffering_callback func)
+bool register_buffering_callback(buffering_callback func)
 {
     int i;
     if (buffer_callback_count >= MAX_BUF_CALLBACKS)
@@ -1288,7 +1288,7 @@ bool register_buffering_callback(const buffering_callback func)
     return false;
 }
 
-void unregister_buffering_callback(const buffering_callback func)
+void unregister_buffering_callback(buffering_callback func)
 {
     int i;
     for (i = 0; i < MAX_BUF_CALLBACKS; i++)
@@ -1302,7 +1302,7 @@ void unregister_buffering_callback(const buffering_callback func)
     return;
 }
 
-static void call_buffering_callbacks(const enum callback_event ev, const int value)
+static void call_buffering_callbacks(enum callback_event ev, int value)
 {
     logf("call_buffering_callbacks()");
     int i;
@@ -1471,7 +1471,7 @@ void buffering_init(void)
 }
 
 /* Initialise the buffering subsystem */
-bool buffering_reset(char *buf, const size_t buflen)
+bool buffering_reset(char *buf, size_t buflen)
 {
     if (!buf || !buflen)
         return false;

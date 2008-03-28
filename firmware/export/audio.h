@@ -77,21 +77,21 @@ struct audio_debug
 };
 
 void audio_init(void);
-void audio_play(const long offset);
+void audio_play(long offset);
 void audio_stop(void);
 void audio_pause(void);
 void audio_resume(void);
 void audio_next(void);
 void audio_prev(void);
 int audio_status(void);
-void audio_ff_rewind(const long newtime);
+void audio_ff_rewind(long newtime);
 void audio_flush_and_reload_tracks(void);
 struct mp3entry* audio_current_track(void);
 struct mp3entry* audio_next_track(void);
 bool audio_has_changed_track(void);
 void audio_get_debugdata(struct audio_debug *dbgdata);
 #ifndef HAVE_FLASH_STORAGE
-void audio_set_buffer_margin(const int seconds);
+void audio_set_buffer_margin(int seconds);
 #endif
 unsigned int audio_error(void);
 void audio_error_clear(void);
@@ -100,7 +100,7 @@ void audio_beep(int duration);
 void audio_init_playback(void);
 
 /* Required call when audio buffer is required for some other purpose */
-unsigned char *audio_get_buffer(const bool talk_buf, size_t *buffer_size); 
+unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size); 
 /* only implemented in playback.c, but called from firmware */
 
 /* channel modes */
@@ -196,7 +196,7 @@ unsigned long audio_recorded_time(void);
 unsigned long audio_num_recorded_bytes(void);
 
 #if CONFIG_CODEC == SWCODEC
-/* SWCODEC recoring functions */
+/* SWCODEC recording functions */
 /* playback.c */
 bool audio_load_encoder(int afmt);
 void audio_remove_encoder(void);

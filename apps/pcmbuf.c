@@ -82,7 +82,7 @@ static char *fadebuf IDATA_ATTR;
 static char *voicebuf IDATA_ATTR;
 
 static void (*pcmbuf_event_handler)(void) IDATA_ATTR;
-static void (*position_callback)(const size_t size) IDATA_ATTR;
+static void (*position_callback)(size_t size) IDATA_ATTR;
 
 /* Crossfade related state */
 static bool crossfade_enabled;
@@ -188,7 +188,7 @@ static void pcmbuf_callback(unsigned char** start, size_t* size)
     }
 }
 
-void pcmbuf_set_position_callback(void (*callback)(const size_t size))
+void pcmbuf_set_position_callback(void (*callback)(size_t size))
 {
     position_callback = callback;
 }
@@ -938,7 +938,7 @@ void pcmbuf_write_complete(int count)
 }
 
 #if 0
-bool pcmbuf_insert_buffer(char *buf, const int count)
+bool pcmbuf_insert_buffer(char *buf, int count)
 {
     size_t length = (size_t)(unsigned int)count << 2;
 

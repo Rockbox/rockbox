@@ -38,13 +38,13 @@
 #define MAX_TRACK_MASK  (MAX_TRACK-1)
 
 /* Functions */
-const char *get_codec_filename(const int cod_spec);
+const char *get_codec_filename(int cod_spec);
 void voice_wait(void);
 void audio_wait_for_init(void);
 int audio_track_count(void);
 long audio_filebufused(void);
 void audio_pre_ff_rewind(void);
-void audio_set_crossfade(const int type);
+void audio_set_crossfade(int type);
 
 void audio_hard_stop(void); /* Stops audio from serving playback */
 
@@ -53,7 +53,7 @@ enum
     AUDIO_WANT_PLAYBACK = 0,
     AUDIO_WANT_VOICE,
 };
-bool audio_restore_playback(const int type); /* Restores the audio buffer to handle the requested playback */
+bool audio_restore_playback(int type); /* Restores the audio buffer to handle the requested playback */
 
 #ifdef HAVE_ALBUMART
 int audio_current_aa_hid(void);

@@ -63,7 +63,7 @@ bool pcmbuf_is_lowdata(void);
 void pcmbuf_play_start(void);
 bool pcmbuf_crossfade_init(bool manual_skip);
 void pcmbuf_set_event_handler(void (*callback)(void));
-void pcmbuf_set_position_callback(void (*callback)(const size_t size));
+void pcmbuf_set_position_callback(void (*callback)(size_t size));
 size_t pcmbuf_free(void);
 unsigned int pcmbuf_get_latency(void);
 void pcmbuf_set_low_latency(bool state);
