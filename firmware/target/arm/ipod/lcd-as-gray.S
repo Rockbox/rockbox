@@ -32,40 +32,40 @@
     .type       lcd_write_data,%function
 
 lcd_write_data:
-    stmfd   sp!, {r4, lr}
-    ldr     r2, =LCD1_BASE
+    str     lr, [sp, #-4]!
+    ldr     lr, =LCD1_BASE
 
 .loop:
-    ldrb    r3, [r0], #1
+    ldrb    r2, [r0], #1
 
 #ifdef IPOD_MINI2G
-    ldrb    r4, [r0], #1
-    orr     r3, r4, r3, lsl #8
-    orr     r3, r3, #0x760000
+    ldrb    r3, [r0], #1
+    orr     r2, r3, r2, lsl #8
+    orr     r2, r2, #0x760000
 1:
-    ldr     r4, [r2]
-    tst     r4, #LCD1_BUSY_MASK
+    ldr     r3, [lr]
+    tst     r3, #LCD1_BUSY_MASK
     bne     1b
-    str     r3, [r2, #0x08]
+    str     r2, [lr, #0x08]
 #else
 1:
-    ldr     r4, [r2]
-    tst     r4, #LCD1_BUSY_MASK
+    ldr     r3, [lr]
+    tst     r3, #LCD1_BUSY_MASK
     bne     1b
-    str     r3, [r2, #0x10]
+    str     r2, [lr, #0x10]
 
-    ldrb    r3, [r0], #1
+    ldrb    r2, [r0], #1
 1:
-    ldr     r4, [r2]
-    tst     r4, #LCD1_BUSY_MASK
+    ldr     r3, [lr]
+    tst     r3, #LCD1_BUSY_MASK
     bne     1b
-    str     r3, [r2, #0x10]
+    str     r2, [lr, #0x10]
 #endif
 
     subs    r1, r1, #1
     bne     .loop
 
-    ldmfd   sp!, {r4, pc}
+    ldr     pc, [sp], #4
     .size   lcd_write_data,.-lcd_write_data
     
 
@@ -75,28 +75,28 @@ lcd_write_data:
     .type       lcd_write_data_shifted,%function
     
 lcd_write_data_shifted:
-    stmfd   sp!, {r4-r6, lr}
-    ldr     r2, =LCD1_BASE
-    mov     r6, #0x760000
-    ldrb    r3, [r0], #1
+    stmfd   sp!, {r4, r5, lr}
+    ldr     lr, =LCD1_BASE
+    mov     r5, #0x760000
+    ldrb    r2, [r0], #1
 
 .sloop:
-    ldrb    r4, [r0], #1
-    orr     r3, r4, r3, lsl #8
-    ldrb    r4, [r0], #1
-    orr     r3, r4, r3, lsl #8
-    mov     r5, r3, lsl #12
-    orr     r5, r6, r5, lsr #16
+    ldrb    r3, [r0], #1
+    orr     r2, r3, r2, lsl #8
+    ldrb    r3, [r0], #1
+    orr     r2, r3, r2, lsl #8
+    mov     r4, r2, lsl #12
+    orr     r4, r5, r4, lsr #16
 1:
-    ldr     r4, [r2]
-    tst     r4, #LCD1_BUSY_MASK
+    ldr     r3, [lr]
+    tst     r3, #LCD1_BUSY_MASK
     bne     1b
-    str     r5, [r2, #0x08]
+    str     r4, [lr, #0x08]
 
     subs    r1, r1, #1
     bne     .sloop
 
-    ldmfd   sp!, {r4-r6, pc}
+    ldmfd   sp!, {r4, r5, pc}
     .size   lcd_write_data_shifted,.-lcd_write_data_shifted
     
 #elif defined IPOD_MINI
@@ -105,33 +105,33 @@ lcd_write_data_shifted:
     .type       lcd_write_data_shifted,%function
     
 lcd_write_data_shifted:
-    stmfd   sp!, {r4, r5, lr}
-    ldr     r2, =LCD1_BASE
-    ldrb    r3, [r0], #1
+    stmfd   sp!, {r4, lr}
+    ldr     lr, =LCD1_BASE
+    ldrb    r2, [r0], #1
 
 .sloop:
-    ldrb    r4, [r0], #1
-    orr     r3, r4, r3, lsl #8
-    mov     r5, r3, lsr #4
+    ldrb    r3, [r0], #1
+    orr     r2, r3, r2, lsl #8
+    mov     r4, r2, lsr #4
 1:
-    ldr     r4, [r2]
-    tst     r4, #LCD1_BUSY_MASK
+    ldr     r3, [lr]
+    tst     r3, #LCD1_BUSY_MASK
     bne     1b
-    str     r5, [r2, #0x10]
+    str     r4, [lr, #0x10]
 
-    ldrb    r4, [r0], #1
-    orr     r3, r4, r3, lsl #8
-    mov     r5, r3, lsr #4
+    ldrb    r3, [r0], #1
+    orr     r2, r3, r2, lsl #8
+    mov     r4, r2, lsr #4
 1:
-    ldr     r4, [r2]
-    tst     r4, #LCD1_BUSY_MASK
+    ldr     r3, [lr]
+    tst     r3, #LCD1_BUSY_MASK
     bne     1b
-    str     r5, [r2, #0x10]
+    str     r4, [lr, #0x10]
 
     subs    r1, r1, #1
     bne     .sloop
 
-    ldmfd   sp!, {r4, r5, pc}
+    ldmfd   sp!, {r4, pc}
     .size   lcd_write_data_shifted,.-lcd_write_data_shifted
 
 #endif
@@ -140,45 +140,45 @@ lcd_write_data_shifted:
     .type       lcd_mono_data,%function
     
 lcd_mono_data:
-    stmfd   sp!, {r4-r6, lr}
-    ldr     r2, =LCD1_BASE
-    adr     r6, .dibits
+    stmfd   sp!, {r4, r5, lr}
+    ldr     lr, =LCD1_BASE
+    adr     r5, .dibits
 
 .mloop:
-    ldrb    r3, [r0], #1
-    mov     r4, r3, lsr #4
-    ldrb    r5, [r6, r4]
+    ldrb    r2, [r0], #1
+    mov     r3, r2, lsr #4
+    ldrb    r4, [r5, r3]
 
 #ifdef IPOD_MINI2G
-    and     r4, r3, #0x0f
-    ldrb    r4, [r6, r4]
-    orr     r5, r4, r5, lsl #8
-    orr     r5, r5, #0x760000
+    and     r3, r2, #0x0f
+    ldrb    r3, [r5, r3]
+    orr     r4, r3, r4, lsl #8
+    orr     r4, r4, #0x760000
 1:
-    ldr     r4, [r2]
-    tst     r4, #LCD1_BUSY_MASK
+    ldr     r3, [lr]
+    tst     r3, #LCD1_BUSY_MASK
     bne     1b
-    str     r5, [r2, #0x08]
+    str     r4, [lr, #0x08]
 #else
 1:
-    ldr     r4, [r2]
-    tst     r4, #LCD1_BUSY_MASK
+    ldr     r3, [lr]
+    tst     r3, #LCD1_BUSY_MASK
     bne     1b
-    str     r5, [r2, #0x10]
+    str     r4, [lr, #0x10]
 
-    and     r4, r3, #0x0f
-    ldrb    r5, [r6, r4]
+    and     r3, r2, #0x0f
+    ldrb    r4, [r5, r3]
 1:
-    ldr     r4, [r2]
-    tst     r4, #LCD1_BUSY_MASK
+    ldr     r3, [lr]
+    tst     r3, #LCD1_BUSY_MASK
     bne     1b
-    str     r5, [r2, #0x10]
+    str     r4, [lr, #0x10]
 #endif
 
     subs    r1, r1, #1
     bne     .mloop
 
-    ldmfd   sp!, {r4-r6, pc}
+    ldmfd   sp!, {r4, r5, pc}
 
 .dibits:
     .byte   0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F
@@ -203,15 +203,15 @@ lcd_mono_data:
  *   r5/r6 - current block of values
  *   r7 - lcd data accumulator
  *   r8 - phase signs mask
- *   r9 - lcd bridge address
+ *   lr - lcd bridge address
  */
  
 lcd_grey_data:
-    stmfd   sp!, {r4-r9, lr}
+    stmfd   sp!, {r4-r8, lr}
     mov     r8, #0x80
     orr     r8, r8, r8, lsl #8
     orr     r8, r8, r8, lsl #16
-    ldr     r9, =LCD1_BASE
+    ldr     lr, =LCD1_BASE
 
 .greyloop:
     ldmia   r1, {r3-r4}         /* Fetch 8 pixel phases */
@@ -243,11 +243,11 @@ lcd_grey_data:
     add     r3, r3, r5
 
 1:
-    ldr     r5, [r9]
+    ldr     r5, [lr]
     tst     r5, #LCD1_BUSY_MASK
     bne     1b
 
-    str     r7, [r9, #0x10]
+    str     r7, [lr, #0x10]
     mov     r7, #0
 #endif
 
@@ -265,18 +265,18 @@ lcd_grey_data:
     stmia   r1!, {r3-r4}
 
 1:
-    ldr     r5, [r9]
+    ldr     r5, [lr]
     tst     r5, #LCD1_BUSY_MASK
     bne     1b
 #ifdef IPOD_MINI2G
-    str     r7, [r9, #0x08]
+    str     r7, [lr, #0x08]
 #else
-    str     r7, [r9, #0x10]
+    str     r7, [lr, #0x10]
 #endif
 
     subs    r2, r2, #1
     bne     .greyloop
 
-    ldmfd   sp!, {r4-r9, pc}
+    ldmfd   sp!, {r4-r8, pc}
     .size   lcd_grey_data,.-lcd_grey_data
 
