@@ -1,0 +1,833 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: CorelDRAW -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xml:space="preserve"
+   width="425.9126"
+   height="602.36218"
+   shape-rendering="geometricPrecision"
+   text-rendering="geometricPrecision"
+   image-rendering="optimizeQuality"
+   fill-rule="evenodd"
+   viewBox="0 0 12020.2 17000"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   sodipodi:docname="mrobe100-front.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   sodipodi:docbase="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images"
+   version="1.0"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><metadata
+   id="metadata136"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs134"><linearGradient
+   id="linearGradient2324"><stop
+     style="stop-color:#060606;stop-opacity:1;"
+     offset="0"
+     id="stop2326" /><stop
+     id="stop2332"
+     offset="0.33027524"
+     style="stop-color:#1d1d1d;stop-opacity:1;" /><stop
+     style="stop-color:#040404;stop-opacity:1;"
+     offset="1"
+     id="stop2328" /></linearGradient>
+
+
+
+
+
+
+
+
+
+
+  <defs
+   id="defs5">
+   <linearGradient
+   y2="8017.3501"
+   x2="4574.3901"
+   y1="8136.27"
+   x1="4574.3901"
+   gradientUnits="userSpaceOnUse"
+   id="id0"
+   gradientTransform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)">
+    <stop
+   id="stop8"
+   stop-color="#828282"
+   offset="0" />
+    <stop
+   id="stop10"
+   stop-color="#FFFFFF"
+   offset="0.501961" />
+    <stop
+   id="stop12"
+   stop-color="#828282"
+   offset="1" />
+   </linearGradient>
+   <linearGradient
+   y2="7754.6699"
+   x2="4581.3398"
+   y1="8424.7695"
+   x1="4581.3398"
+   gradientUnits="userSpaceOnUse"
+   id="id1"
+   gradientTransform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)">
+    <stop
+   id="stop15"
+   stop-color="#828282"
+   offset="0" />
+    <stop
+   id="stop17"
+   stop-color="#FFFFFF"
+   offset="0.0784314" />
+    <stop
+   id="stop19"
+   stop-color="#F0F0F0"
+   offset="0.101961" />
+    <stop
+   id="stop21"
+   stop-color="#F0F0F0"
+   offset="0.901961" />
+    <stop
+   id="stop23"
+   stop-color="#FFFFFF"
+   offset="0.921569" />
+    <stop
+   id="stop25"
+   stop-color="#828282"
+   offset="1" />
+   </linearGradient>
+  </defs>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+ <linearGradient
+   inkscape:collect="always"
+   xlink:href="#linearGradient2324"
+   id="linearGradient2330"
+   x1="2136.3252"
+   y1="578.99249"
+   x2="5707.4956"
+   y2="17605.824"
+   gradientUnits="userSpaceOnUse" />
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+
+   
+   
+   
+   
+  
+   
+   
+   
+   
+   
+   
+  </defs><sodipodi:namedview
+   inkscape:window-height="968"
+   inkscape:window-width="1280"
+   inkscape:pageshadow="2"
+   inkscape:pageopacity="0.0"
+   guidetolerance="10.0"
+   gridtolerance="10.0"
+   objecttolerance="10.0"
+   borderopacity="1.0"
+   bordercolor="#666666"
+   pagecolor="#ffffff"
+   id="base"
+   width="120.202mm"
+   height="170mm"
+   units="mm"
+   inkscape:zoom="0.44255643"
+   inkscape:cx="416.44028"
+   inkscape:cy="516.7249"
+   inkscape:window-x="-4"
+   inkscape:window-y="-4"
+   inkscape:current-layer="layer1"
+   showguides="true"
+   inkscape:guide-bbox="true" />
+ <path
+   style="fill:url(#id0);stroke:#6e6e6e;stroke-width:29.16940308;stroke-linejoin:bevel"
+   id="path27"
+   d="M 872.43082,7176.7605 L 872.43082,6883.4612 C 872.43082,6871.4854 880.193,6861.7785 889.77052,6861.7785 L 911.79352,6861.7785 L 911.79352,7198.4426 L 889.77052,7198.4426 C 880.193,7198.4426 872.43082,7188.7357 872.43082,7176.7599"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   style="fill:url(#id1);stroke:#6e6e6e;stroke-width:29.16940308;stroke-linejoin:bevel"
+   id="path29"
+   d="M 911.78389,8015.264 L 911.78389,6118.1289 L 950.31989,6118.1289 L 950.31989,8015.264 L 911.78389,8015.264"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   style="fill:#8c8a8a;stroke:#000000;stroke-width:12.34842682"
+   id="path31"
+   d="M 10145.43,35.061007 L 7970.5834,35.061007 C 7967.0346,0.5761103 7943.718,6.2543318 7916.3311,6.1733608 L 1431.6246,6.1733608 L 1431.3814,6.1733608 C 1299.276,6.2381943 1179.1141,60.282699 1091.9938,147.30508 C 1004.7608,234.47326 950.55431,354.7 950.52175,486.82298 L 950.52175,486.93651 L 950.52175,16513.064 L 950.52175,16513.307 C 950.58658,16645.347 1004.7285,16765.462 1091.9289,16852.613 C 1179.0646,16939.716 1299.2916,16993.791 1431.5091,16993.825 L 1431.6227,16993.825 L 10332.155,16993.825 L 10332.398,16993.825 C 10464.519,16993.76 10584.665,16939.699 10671.768,16852.692 C 10759.034,16765.524 10813.224,16645.299 10813.257,16513.174 L 10813.257,16513.061 L 10813.257,486.93481 L 10813.257,486.69161 C 10813.192,354.65102 10759.034,234.52139 10671.849,147.38605 C 10584.714,60.282699 10464.455,6.205636 10332.269,6.1733608 L 10332.156,6.1733608 L 10194.071,6.1733608 C 10168.625,6.0507279 10152.547,14.1198 10145.43,35.061007 z "
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"
+   sodipodi:nodetypes="cccccsccccsccccsccccscccc" /><path
+   style="fill:#d6d6d6;stroke:#fafafa;stroke-width:80.00000296;stroke-miterlimit:4;stroke-dasharray:none"
+   id="path33"
+   d="M 10332.144,87.205861 L 1431.6125,87.205861 L 1431.3693,87.205861 C 1321.4326,87.254557 1221.43,132.24021 1148.96,204.61306 C 1076.5549,276.95334 1031.5528,376.89117 1031.5367,486.82779 L 1031.5367,486.94132 L 1031.5367,16513.07 L 1031.5367,16513.31 C 1031.5854,16623.168 1076.5226,16722.991 1148.8952,16795.316 C 1221.3977,16867.785 1321.4488,16912.786 1431.4989,16912.803 L 1431.6125,16912.803 L 10332.144,16912.803 L 10332.388,16912.803 C 10442.34,16912.755 10542.327,16867.768 10614.781,16795.395 C 10687.218,16723.039 10732.204,16623.119 10732.22,16513.183 L 10732.22,16513.07 L 10732.22,486.94132 L 10732.22,486.69812 C 10732.171,376.84247 10687.202,277.01817 10614.862,204.69403 C 10542.359,132.22407 10442.292,87.221999 10332.258,87.205861 L 10332.144,87.205861 L 10332.144,87.205861 z "
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   style="fill:#383635;stroke:#383635;stroke-width:68.01555805;stroke-miterlimit:4;stroke-dasharray:none"
+   id="path35"
+   d="M 1431.6125,192.55318 L 10332.144,192.55318 L 10332.258,192.55318 C 10390.662,192.56932 10445.322,209.76321 10491.313,239.28906 C 10500.144,244.94457 10508.782,251.18387 10517.079,257.86031 C 10525.262,264.43963 10533.138,271.5212 10540.641,279.00819 L 10540.771,279.00819 L 10540.933,279.17014 C 10570.443,308.67984 10593.779,344.60693 10608.623,384.6341 L 10608.623,384.74763 C 10611.329,392.07239 10613.889,400.01294 10616.223,408.48829 C 10623.126,433.54175 10626.854,459.74552 10626.886,486.46795 L 10626.886,486.71115 L 10626.886,486.95406 L 10626.886,16513.081 L 10626.886,16513.194 C 10626.87,16571.454 10609.805,16625.934 10580.474,16671.665 C 10574.851,16680.45 10568.66,16689.023 10562.032,16697.27 C 10555.161,16705.826 10548.112,16713.702 10541.03,16720.783 L 10540.868,16720.947 L 10540.739,16720.947 C 10511.067,16750.57 10474.994,16774.02 10434.772,16788.96 C 10426.734,16791.941 10418.713,16794.566 10410.821,16796.737 C 10385.703,16803.691 10359.434,16807.45 10332.631,16807.482 L 10332.388,16807.482 L 10332.145,16807.482 L 1431.6127,16807.482 L 1431.4992,16807.482 C 1373.0953,16807.467 1318.435,16790.274 1272.4446,16760.748 C 1263.6128,16755.091 1254.9752,16748.851 1246.6782,16742.175 C 1238.4945,16735.596 1230.6188,16728.515 1223.1157,16721.027 L 1222.986,16721.027 L 1222.824,16720.865 C 1193.3143,16691.356 1169.9785,16655.429 1155.1345,16615.402 L 1155.1345,16615.288 C 1152.4282,16607.964 1149.8677,16600.023 1147.5343,16591.546 C 1140.6308,16566.494 1136.9036,16540.291 1136.871,16513.568 L 1136.871,16513.324 L 1136.871,16513.081 L 1136.871,486.95434 L 1136.871,486.84081 C 1136.8874,428.58298 1153.9514,374.10078 1183.283,328.3694 C 1188.9062,319.5863 1195.0968,311.01356 1201.7246,302.76499 C 1208.5958,294.20867 1215.6451,286.33296 1222.7267,279.25139 L 1222.8889,279.08916 L 1223.0185,279.08916 C 1252.6905,249.46593 1288.7634,226.01688 1328.9848,211.07574 C 1337.0224,208.09396 1345.0439,205.46863 1352.9361,203.29713 C 1378.0541,196.34523 1404.3229,192.58545 1431.1264,192.55318 L 1431.3693,192.55318 L 1431.6125,192.55318 L 1431.6125,192.55318 z "
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   style="fill:url(#linearGradient2330);stroke:#666666;stroke-width:15.00000047;fill-opacity:1.0;stroke-miterlimit:4;stroke-dasharray:none"
+   id="path37"
+   d="M 10332.144,224.94161 L 1431.6125,224.94161 L 1431.3693,224.94161 C 1359.0613,224.97388 1293.349,254.48387 1245.8028,301.98133 C 1198.6131,349.12234 1169.2976,414.57556 1169.2815,486.81873 L 1169.2815,486.93226 L 1169.2815,16513.058 L 1169.2815,16513.302 C 1169.3141,16585.465 1198.5967,16650.82 1245.738,16697.93 C 1293.3167,16745.491 1359.11,16775.034 1431.4989,16775.051 L 1431.6125,16775.051 L 10332.144,16775.051 L 10332.388,16775.051 C 10404.696,16775.017 10470.408,16745.508 10517.954,16698.009 C 10565.144,16650.87 10594.459,16585.417 10594.475,16513.174 L 10594.475,16513.058 L 10594.475,486.93254 L 10594.475,486.68935 C 10594.443,414.52714 10565.16,349.17132 10518.019,302.06258 C 10470.44,254.50001 10404.647,224.95803 10332.258,224.94161 L 10332.144,224.94161 L 10332.144,224.94161 z "
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><rect
+   style="fill:#5e0202;stroke:#666666;stroke-width:12.34842682;fill-opacity:1"
+   id="rect39"
+   height="5160.3765"
+   width="6390.3154"
+   y="833.97992"
+   x="2745.4102"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><rect
+   style="fill:none;stroke:#fb0216;stroke-width:30.00000121;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   id="rect41"
+   height="511.11426"
+   width="645.61682"
+   y="15047.373"
+   x="2767.0684"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="5486.0801"
+   cy="10200.7"
+   r="39.8727"
+   id="circle45"
+   sodipodi:cx="5486.0801"
+   sodipodi:cy="10200.7"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="7220.3599"
+   cy="10200.7"
+   r="39.8727"
+   id="circle47"
+   sodipodi:cx="7220.3599"
+   sodipodi:cy="10200.7"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="5486.0801"
+   cy="9764.1201"
+   r="39.8727"
+   id="circle49"
+   sodipodi:cx="5486.0801"
+   sodipodi:cy="9764.1201"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;fill-opacity:1;stroke-opacity:1;opacity:1;color:#000000;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="7220.3599"
+   cy="9764.1201"
+   r="39.8727"
+   id="circle51"
+   sodipodi:cx="7220.3599"
+   sodipodi:cy="9764.1201"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="5201.6001"
+   cy="9982.4297"
+   r="39.8727"
+   id="circle53"
+   sodipodi:cx="5201.6001"
+   sodipodi:cy="9982.4297"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="6330.0098"
+   cy="9982.4404"
+   r="39.8727"
+   id="circle55"
+   sodipodi:cx="6330.0098"
+   sodipodi:cy="9982.4404"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="6330.0098"
+   cy="10264.8"
+   r="39.8727"
+   id="circle57"
+   sodipodi:cx="6330.0098"
+   sodipodi:cy="10264.8"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="6330.0098"
+   cy="10547.2"
+   r="39.8727"
+   id="circle59"
+   sodipodi:cx="6330.0098"
+   sodipodi:cy="10547.2"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="6330.0098"
+   cy="10829.5"
+   r="39.8727"
+   id="circle61"
+   sodipodi:cx="6330.0098"
+   sodipodi:cy="10829.5"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="6330.0098"
+   cy="9700.0801"
+   r="39.8727"
+   id="circle63"
+   sodipodi:cx="6330.0098"
+   sodipodi:cy="9700.0801"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="6330.0098"
+   cy="9417.7197"
+   r="39.8727"
+   id="circle65"
+   sodipodi:cx="6330.0098"
+   sodipodi:cy="9417.7197"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="6330.0098"
+   cy="9135.3604"
+   r="39.8727"
+   id="circle67"
+   sodipodi:cx="6330.0098"
+   sodipodi:cy="9135.3604"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="7504.8398"
+   cy="9982.4297"
+   r="39.8727"
+   id="circle69"
+   sodipodi:cx="7504.8398"
+   sodipodi:cy="9982.4297"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="5343.8398"
+   cy="9873.2803"
+   r="39.8727"
+   id="circle71"
+   sodipodi:cx="5343.8398"
+   sodipodi:cy="9873.2803"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="7362.6001"
+   cy="9873.2803"
+   r="39.8727"
+   id="circle73"
+   sodipodi:cx="7362.6001"
+   sodipodi:cy="9873.2803"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="5343.8398"
+   cy="10091.6"
+   r="39.8727"
+   id="circle75"
+   sodipodi:cx="5343.8398"
+   sodipodi:cy="10091.6"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><circle
+   cx="7362.6001"
+   cy="10091.6"
+   r="39.8727"
+   id="circle77"
+   sodipodi:cx="7362.6001"
+   sodipodi:cy="10091.6"
+   sodipodi:rx="39.8727"
+   sodipodi:ry="39.8727"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:10.59637835;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 2583.072,9640.3193 L 2583.072,9373.1431 L 2636.4359,9373.1431 L 2699.5067,9562.4693 L 2712.2763,9601.832 L 2726.5694,9559.0501 L 2790.4992,9373.1433 L 2837.9482,9373.1433 L 2837.9482,9640.3195 L 2803.8362,9640.3195 L 2803.8362,9416.6868 L 2726.2778,9640.3195 L 2694.4505,9640.3195 L 2617.0866,9412.7812 L 2617.0866,9640.3195 L 2583.0717,9640.3195 L 2583.072,9640.3193 z "
+   id="path79"
+   style="fill:#fb0216"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 2896.0846,9640.3193 L 2896.0846,9373.1431 L 3089.219,9373.1431 L 3089.219,9404.6946 L 2931.2337,9404.6946 L 2931.2337,9486.5312 L 3079.1066,9486.5312 L 3079.1066,9517.7911 L 2931.2337,9517.7911 L 2931.2337,9608.7836 L 3095.3119,9608.7836 L 3095.3119,9640.319 L 2896.0843,9640.319 L 2896.0846,9640.3193 z "
+   id="path81"
+   style="fill:#fb0216"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 3143.8957,9640.3193 L 3143.8957,9373.1431 L 3180.1953,9373.1431 L 3320.2574,9582.7743 L 3320.2574,9373.1431 L 3354.3695,9373.1431 L 3354.3695,9640.3193 L 3318.0698,9640.3193 L 3177.6187,9430.4123 L 3177.6187,9640.3193 L 3143.8957,9640.3193 z "
+   id="path83"
+   style="fill:#fb0216"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 3588.8685,9373.1431 L 3624.3095,9373.1431 L 3624.3095,9527.4983 C 3624.3095,9553.4268 3621.8463,9573.1484 3616.8876,9586.6799 C 3611.9285,9600.3085 3605.1711,9611.2634 3596.5013,9619.6414 C 3587.8314,9628.0357 3577.152,9634.3234 3564.2853,9638.5042 C 3551.4344,9642.7014 3536.6552,9644.7919 3519.8828,9644.7919 C 3485.1063,9644.7919 3458.7242,9636.414 3440.8984,9619.6414 C 3422.9916,9602.869 3414.1273,9572.1923 3414.1273,9527.4983 L 3414.1273,9373.1431 L 3449.5682,9373.1431 L 3449.5682,9527.2228 C 3449.5682,9548.4681 3451.0914,9563.8144 3454.138,9573.1484 C 3457.201,9582.5798 3461.5763,9590.0991 3467.1024,9595.8197 C 3472.7257,9601.443 3479.6776,9605.7373 3487.9746,9608.5894 C 3496.1583,9611.5386 3505.8816,9612.9811 3516.8362,9612.9811 C 3532.4583,9612.9811 3545.5195,9610.6799 3555.907,9606.3043 C 3566.2948,9601.8317 3574.3973,9594.0047 3580.1989,9582.7743 C 3585.9193,9571.6252 3588.8688,9553.1349 3588.8688,9527.2228 L 3588.8688,9373.1431 L 3588.8685,9373.1431 z "
+   id="path85"
+   style="fill:#fb0216"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><text
+   x="2555.4395"
+   y="9640.3184"
+   font-weight="normal"
+   font-size="201.928"
+   id="text87"
+   style="font-size:571.68969727px;font-weight:normal;fill:#fb0216;stroke:#fb0216;stroke-width:24.29933423;stroke-linejoin:round;font-family:Browallia New;fill-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72">MENU</text>
+<path
+   d="M 8678.6926,9506.6321 L 8545.0802,9573.4301 L 8411.5164,9640.212 L 8411.5164,9506.6318 L 8411.5164,9373.0355 L 8545.0802,9439.8174 L 8678.6926,9506.6318 L 8678.6926,9506.6321 z "
+   id="path89"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:30.00000121;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><rect
+   x="8931.9678"
+   y="9373.1143"
+   width="97.231522"
+   height="267.22488"
+   id="rect91"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:30.00000121;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><rect
+   x="9101.8936"
+   y="9373.1143"
+   width="97.231522"
+   height="267.22488"
+   id="rect93"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:30.00000121;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 3089.8772,15423.635 L 3020.0649,15302.711 L 2950.2364,15181.786 L 3089.8772,15181.786 L 3229.518,15181.786 L 3159.6896,15302.711 L 3089.8772,15423.635 z "
+   id="path95"
+   style="fill:#fb0216;stroke:#fb0216;stroke-width:30.00000121;stroke-linejoin:round;opacity:1;color:#000000;fill-opacity:1;fill-rule:nonzero;stroke-linecap:butt;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 4896.9192,2208.2231 C 4795.9441,1768.8814 4534.4237,1749.7768 4473.0046,1749.7768 L 4473.0046,1723.9943 C 4609.3072,1723.9943 4829.7472,1821.3881 4909.784,2155.1199 C 5012.3472,1821.9382 5187.4938,1732.5501 5310.3954,1730.8995 C 5427.5271,1729.2303 5499.8351,1756.6333 5610.8887,1814.4863 L 5610.8887,1762.3214 L 5931.4123,1762.3214 L 5931.4123,1718.3079 L 5957.049,1718.3079 L 5957.049,1762.3214 L 6011.4502,1762.3214 L 6011.4502,1788.0068 L 5957.049,1788.0068 L 5957.049,2416.1865 L 6187.6662,1833.4128 L 6408.5117,1833.4128 L 6427.7313,1788.0056 L 6152.5497,1788.0056 L 6152.5497,1762.3202 L 6438.604,1762.3202 L 6468.8431,1690.9035 L 6492.5027,1700.902 L 6466.5255,1762.32 L 6527.3925,1762.32 L 6527.3925,1788.0053 L 6455.6031,1788.0053 L 6276.0003,2211.9851 L 6513.9909,2211.9851 L 6513.9909,2529.7371 C 6736.5541,2420.1895 7003.0027,2500.5513 7137.2306,2715.1416 C 7270.454,2509.8369 7530.6931,2428.0652 7757.4067,2520.1599 L 7748.3639,2505.5752 L 8131.6685,2505.5752 L 8208.0925,2629.3185 L 8282.8474,2508.4273 C 8284.0306,2506.5961 8285.9589,2505.5752 8288.0817,2505.5752 L 8288.0817,2505.5752 C 8290.2532,2505.5752 8292.3437,2506.758 8293.3972,2508.735 C 8294.4342,2510.6636 8294.4342,2512.9486 8293.2349,2514.8444 L 8215.2066,2640.8566 L 8225.2863,2657.0295 L 8317.1217,2508.4273 C 8318.3045,2506.5961 8320.1522,2505.5752 8322.2911,2505.5752 L 8322.2911,2505.5752 C 8324.4952,2505.5752 8326.4722,2506.758 8327.655,2508.7353 C 8328.6598,2510.6636 8328.6114,2512.9486 8327.4931,2514.8446 L 8232.4005,2668.6002 L 8242.318,2684.7568 L 8353.0972,2505.5752 L 8736.2857,2505.5752 L 8433.9607,2994.5215 L 8443.8946,3010.5809 L 8763.0254,2494.7358 L 8365.0243,2494.7358 C 8362.8041,2494.7358 8360.6813,2493.5852 8359.6117,2491.6082 C 8358.6395,2489.6635 8358.6395,2487.4272 8359.6765,2485.5311 L 8359.6765,2485.5311 C 8360.9081,2483.6838 8362.8689,2482.5655 8365.0243,2482.5655 L 8784.8394,2482.5655 L 8468.1888,2994.5235 L 8764.39,3473.3088 C 8765.5567,3475.2048 8765.5893,3477.5059 8764.4548,3479.5478 C 8763.4178,3481.3793 8761.4244,3482.6108 8759.2367,3482.6108 C 8757.1785,3482.6108 8755.1044,3481.5412 8753.9538,3479.6939 L 8461.0764,3006.0301 L 8451.094,3022.1705 L 8735.8686,3482.61 L 8352.6632,3482.61 L 8279.4316,3364.2467 L 8208.0961,3479.693 C 8206.9617,3481.5403 8205.0008,3482.61 8202.8455,3482.61 L 8202.8455,3482.61 C 8201.8571,3482.61 8200.9656,3482.3668 8200.0743,3481.8484 C 8199.1508,3482.3668 8198.1947,3482.61 8197.1574,3482.61 C 8195.0185,3482.61 8192.8954,3481.3784 8191.9232,3479.5472 C 8190.8213,3477.5051 8190.8535,3475.2039 8192.0367,3473.3082 L 8269.5141,3348.0901 L 8259.5314,3331.9981 L 8168.1012,3479.693 C 8166.9994,3481.5403 8165.1195,3482.61 8162.867,3482.61 C 8160.7442,3482.61 8158.7346,3481.3784 8157.6489,3479.5472 C 8156.5631,3477.5054 8156.5631,3475.2042 8157.7624,3473.3082 L 8252.3041,3320.4113 L 8242.3217,3304.368 L 8132.0448,3482.6097 L 7748.9186,3482.6097 L 7760.0999,3464.3626 C 7533.1774,3558.1588 7271.7368,3477.1161 7137.7354,3271.293 C 7003.7178,3486.4343 6736.8663,3565.0311 6513.9949,3455.3202 L 6513.9949,3482.61 L 6188.2845,3482.61 L 6188.2845,3480.163 L 6134.4994,3480.163 L 6158.0297,3546.4265 L 6133.7865,3554.9989 L 6107.3395,3480.163 L 6004.1119,3480.163 L 6004.1119,3454.5102 L 6098.2484,3454.5102 L 5906.443,2913.0912 L 5895.1478,2940.7049 L 5895.1478,3482.608 L 5682.6967,3482.608 L 5682.6967,1833.4142 L 5895.1478,1833.4142 L 5895.1478,2572.731 L 5931.4152,2481.074 L 5931.4152,1788.007 L 5636.5757,1788.007 L 5636.5757,1863.0213 C 5508.6027,1777.0524 5422.8444,1756.6339 5310.3954,1756.6339 C 5221.3312,1756.6339 5025.9124,1821.471 4922.6035,2208.2259 L 4896.9181,2208.2259 L 4896.9192,2208.2231 z M 5356.8745,3517.2676 L 4952.0192,3517.2837 L 4952.0192,3491.5499 L 5228.4974,3491.5499 C 5017.7317,3398.0292 4926.0252,3059.4192 4926.0252,2657.9981 C 4926.0252,2184.7222 5053.5122,1798.779 5353.3089,1798.779 C 5491.0537,1798.779 5569.3089,1869.4339 5636.5774,1933.9633 L 5636.5774,1975.9511 C 5636.5774,1976.0482 5636.5774,1976.0482 5636.5774,1976.0482 L 5636.5774,2332.4341 L 5613.728,2332.4341 C 5564.0913,2241.9925 5472.8231,2115.0081 5378.4762,2115.0081 C 5221.4147,2115.0081 5143.6296,2358.314 5145.6227,2657.9984 C 5143.6296,2957.6508 5221.4147,3200.9886 5378.4762,3200.9886 C 5472.8234,3200.9886 5564.0913,3074.0042 5613.728,2983.433 L 5636.5774,2983.433 L 5636.5774,3339.867 C 5636.5774,3339.867 5636.5774,3339.867 5636.5774,3339.948 L 5636.5774,3381.9683 C 5569.7146,3445.9629 5492.2694,3515.9049 5356.8745,3517.2661 L 5356.8745,3517.2676 z M 4469.9922,1798.7785 C 4767.0031,1798.7785 4893.468,2203.8461 4893.468,2657.9975 C 4893.468,3112.1178 4767.002,3517.2817 4469.9922,3517.2817 C 4172.851,3517.2817 4046.3861,3131.3697 4046.3861,2657.9975 C 4046.3861,2184.7216 4172.8522,1798.7785 4469.9922,1798.7785 z M 3730.2876,1833.4092 L 3343.4837,1833.4092 L 3343.4837,2791.076 C 3345.9632,2797.8498 3348.3776,2804.4453 3350.8733,2811.2517 C 3368.1481,2806.4549 3386.2981,2804.4779 3404.221,2805.5797 C 3439.4188,2807.3461 3471.1487,2827.4405 3488.0671,2858.3117 C 3503.284,2886.1525 3510.5114,2917.8498 3509.1502,2949.5636 C 3508.4535,2962.9654 3504.9207,2975.8647 3498.795,2987.7431 C 3483.8051,3016.7829 3460.6315,3040.7828 3432.0618,3056.7613 C 3441.7687,3089.5121 3450.9085,3122.2468 3459.7403,3155.2408 C 3476.5129,3218.3603 3484.4048,3283.4732 3483.1248,3348.7481 C 3482.7519,3365.5691 3479.1705,3382.1308 3472.4777,3397.5422 C 3465.4771,3413.3746 3453.2422,3426.3713 3437.9118,3434.2147 C 3426.8762,3440.0486 3413.7986,3440.8912 3402.0657,3436.8237 C 3390.1225,3432.74 3380.4155,3424.0379 3375.1652,3412.7265 C 3369.0394,3399.5192 3366.0576,3385.048 3366.3979,3370.5766 C 3366.6086,3362.2793 3370.6761,3354.6629 3377.0935,3349.688 C 3385.3905,3343.5461 3395.6647,3340.3698 3405.939,3340.8398 C 3412.8102,3341.2614 3418.8547,3345.1992 3421.9336,3351.2599 C 3424.9802,3357.2883 3424.3644,3364.5805 3420.6695,3370.2363 C 3415.9701,3377.1072 3408.9856,3382.3579 3401.0125,3384.821 L 3403.7836,3390.8332 C 3405.1448,3394.1714 3407.8673,3396.829 3411.3677,3397.5422 C 3414.933,3398.4009 3418.7086,3397.5422 3421.3501,3395.1923 C 3434.6384,3383.8162 3443.0654,3367.6109 3444.4753,3350.1416 C 3446.4684,3320.0161 3445.8201,3289.8416 3442.5305,3259.8781 C 3433.1962,3195.77 3419.2273,3132.4398 3400.8019,3070.2764 C 3396.1186,3071.816 3391.3056,3073.0637 3386.4439,3074.2143 C 3372.2318,3077.3096 3357.8903,3079.8214 3343.4837,3081.5716 L 3343.4837,3482.602 L 3602.3629,3482.602 L 3602.3629,3536.1604 L 3627.9834,3536.1604 L 3627.9834,3482.602 L 3683.1785,3482.602 L 3683.1785,3456.9815 L 3627.9834,3456.9815 L 3627.9834,2878.6159 L 3652.7937,2878.6159 L 3878.8411,3482.6034 L 4126.9113,3482.6034 L 4149.3394,3539.8242 L 4173.2259,3530.4251 L 4150.9274,3473.512 L 4228.3723,3473.512 L 4228.3723,3447.8267 L 4140.8638,3447.8267 L 3873.7199,2765.8917 C 3971.9723,2664.3982 4028.4479,2511.7445 4028.4479,2317.816 C 4028.4479,2057.9159 3958.1008,1833.408 3730.2876,1833.408 L 3730.2876,1833.4092 z M 3389.4418,3034.1223 C 3374.7113,3040.1993 3359.2838,3044.2991 3343.4837,3046.26 L 3343.4837,2900.056 C 3359.3648,2944.4097 3374.6465,2988.8609 3389.3283,3033.6523 C 3389.4418,3033.8142 3389.4418,3034.0087 3389.4418,3034.1223 C 3389.4418,3034.1223 3389.4418,3034.1223 3389.4418,3034.1223 C 3389.4418,3034.1223 3389.4418,3034.1223 3389.4418,3034.1223 C 3389.4418,3034.1223 3389.4418,3034.1223 3389.4418,3034.1223 M 3365.3122,2850.9864 C 3370.2871,2849.6413 3375.4404,2848.4907 3380.5936,2847.486 C 3396.5234,2844.4558 3413.2957,2848.4907 3426.4221,2858.3112 C 3438.4463,2867.3213 3447.0513,2879.9452 3450.9082,2894.3354 C 3459.6106,2926.4865 3457.763,2960.6311 3445.512,2991.6156 C 3442.9515,2998.1626 3438.7544,3003.8668 3433.2931,3008.1773 C 3429.2255,3011.5967 3424.8664,3014.7243 3420.3289,3017.7061 C 3403.2485,2961.7169 3384.8718,2906.1976 3365.3119,2850.9864 M 3343.4834,3046.26 C 3339.3675,3046.6813 3335.3161,3047.119 3331.2324,3047.2971 C 3286.83,3049.7604 3245.3284,3024.5286 3227.1945,2983.8373 C 3194.9785,2911.6751 3190.1817,2830.1788 3213.9872,2754.7596 C 3222.2519,2728.3127 3230.8892,2701.8493 3239.9155,2675.5807 C 3242.2976,2668.3208 3244.8094,2660.996 3247.2567,2653.7522 C 3271.2728,2710.5191 3294.1222,2767.659 3315.8374,2825.2526 C 3284.8853,2841.782 3259.8321,2867.6293 3244.2913,2899.2944 C 3241.7469,2904.4802 3242.8004,2910.768 3246.7705,2914.9326 C 3250.8219,2919.0972 3257.0932,2920.2642 3262.3277,2917.7524 C 3266.8814,2914.4787 3271.2731,2910.7193 3275.0974,2906.6192 C 3290.7194,2889.2959 3309.6146,2874.9541 3330.5357,2864.4205 C 3334.7651,2876.2828 3339.173,2888.1615 3343.4837,2900.056 L 3343.4837,2791.0754 C 3322.9193,2735.9126 3301.026,2681.2685 3277.9334,2627.305 C 3274.1413,2618.2464 3270.3006,2609.2849 3266.3627,2600.4529 C 3271.0786,2587.2781 3275.9725,2574.1681 3280.899,2560.9931 C 3287.9322,2542.2921 3293.4419,2523.0728 3297.0881,2503.2862 C 3301.1879,2481.1822 3299.3567,2458.2193 3291.5781,2436.9256 C 3274.1413,2388.4556 3240.5964,2347.4724 3196.4207,2320.9444 C 3176.8772,2309.2283 3154.5301,2303.4266 3131.9561,2304.3018 C 3113.0446,2305.0633 3097.617,2320.0857 3096.5151,2339.0134 C 3095.5268,2356.1909 3099.5779,2373.3525 3108.0048,2388.3585 C 3115.848,2402.1655 3124.3233,2415.7615 3133.4309,2428.8392 C 3161.3364,2469.4009 3185.5309,2512.3937 3205.6254,2557.3632 C 3209.4822,2566.195 3213.4524,2575.0107 3217.3254,2583.9721 C 3211.1838,2600.6799 3205.1715,2617.679 3199.3538,2634.5488 C 3172.2262,2713.1119 3154.5301,2794.5759 3147.0756,2877.3037 C 3143.4781,2916.4557 3147.0595,2955.721 3157.3338,2993.609 C 3171.5295,3045.4497 3217.6173,3082.2194 3271.3863,3084.3909 C 3295.4511,3085.3956 3319.4837,3084.4721 3343.4837,3081.5713 L 3343.4837,3046.26 M 3695.252,1764.7485 L 3295.3059,1764.7485 L 3295.3059,1702.3906 L 3269.5557,1702.3906 L 3269.5557,1764.7485 L 3209.7744,1764.7485 L 3209.7744,1790.3691 L 3269.5557,1790.3691 L 3269.5557,2076.5537 L 3295.3059,2076.5537 L 3295.3059,1790.3691 L 3695.252,1790.3691 L 3695.252,1764.7485 z "
+   id="path99"
+   style="fill:#f10603;fill-opacity:1"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 8668.8968,2543.2621 L 8374.0574,2543.2621 L 8242.3084,2756.2318 L 8110.4949,2543.2621 L 7815.8819,2543.2621 L 7871.1096,2632.634 C 7758.6289,2537.104 7608.0009,2499.6374 7463.8563,2531.3186 C 7319.7589,2562.9188 7198.7542,2660.1181 7136.6567,2794.006 C 7080.943,2669.436 6976.0948,2576.2397 6849.5152,2538.4975 C 6722.7901,2500.8041 6586.6981,2522.2761 6476.2584,2597.355 L 6476.2584,2243.7719 L 6225.8384,2243.7719 L 6225.8384,3439.12 L 6476.2584,3439.12 L 6476.2584,3390.9417 C 6586.827,3466.1502 6723.2915,3487.5735 6850.1466,3449.5237 C 6977.0339,3411.6196 7081.655,3317.9208 7137.2229,3193.0753 C 7199.8725,3327.3522 7322.1575,3424.4218 7467.2933,3455.2279 C 7612.3954,3486.0178 7763.5087,3446.8173 7875.4073,3349.4723 L 7816.3553,3444.9862 L 8111.1466,3444.9862 L 8242.3121,3232.8267 L 8373.6395,3444.9862 L 8668.3317,3444.9862 L 8389.6984,2994.5436 L 8668.8991,2543.2601 L 8668.8968,2543.2621 z "
+   id="path101"
+   style="fill:#5e0202;fill-opacity:1"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 6921.3091,2992.8497 C 6921.3091,2869.9812 6821.6954,2770.254 6698.7782,2770.254 C 6575.8613,2770.254 6476.2474,2869.9812 6476.2474,2992.8497 C 6476.2474,3115.7504 6575.861,3215.3157 6698.7782,3215.3157 C 6821.6951,3215.3157 6921.3091,3115.7504 6921.3091,2992.8497 z M 8024.2086,2880.0287 C 8042.8608,2955.9991 8042.3747,3035.4858 8022.8961,3111.132 L 8094.9122,2994.5189 L 8024.2086,2880.0287 M 7787.8062,2992.8497 C 7787.8062,2869.9812 7688.1761,2770.254 7565.2269,2770.254 C 7442.4558,2770.254 7342.7448,2869.9812 7342.7448,2992.8497 C 7342.7448,3115.7504 7442.4558,3215.3157 7565.2269,3215.3157 C 7688.1764,3215.3157 7787.8062,3115.7504 7787.8062,2992.8497 z "
+   id="path103"
+   style="fill:#f10603;fill-opacity:1"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 3555.7439,3456.9894 L 3602.334,3456.9894 L 3602.334,2878.6239 L 3555.7439,2878.6239 L 3555.7439,3456.9894 M 3651.8897,2514.1663 C 3730.3881,2514.1663 3742.6716,2414.6011 3742.5584,2346.3608 C 3742.4448,2278.0881 3732.5111,2203.9489 3664.0439,2203.9489 L 3555.7439,2203.9489 L 3555.7439,2581.2401 L 3602.334,2581.2401 L 3602.334,2514.1666 L 3651.8897,2514.1666 L 3651.8897,2514.1663 z M 3651.8897,2539.803 L 3627.9546,2539.803 L 3627.9546,2581.2398 L 3629.64,2581.2398 C 3804.5595,2581.2398 3804.5595,2424.7618 3804.5595,2370.2309 L 3804.5595,2335.1302 C 3804.5595,2282.3821 3804.1544,2136.7939 3656.8808,2136.7939 L 3555.7437,2136.7939 L 3555.7437,2178.2955 L 3651.8894,2178.2955 C 3701.8342,2178.2955 3768.9076,2185.4258 3768.9076,2352.9722 C 3768.9076,2520.5834 3701.4774,2538.3766 3651.8894,2539.8027 L 3651.8897,2539.803 z M 3235.4295,2535.1684 C 3215.2702,2495.028 3193.5066,2455.6978 3170.0898,2417.3074 C 3162.6354,2405.1696 3155.9587,2392.5781 3149.9954,2379.5813 C 3145.9927,2371.0573 3143.7564,2361.9336 3143.1242,2352.5996 C 3143.0271,2350.6874 3143.7564,2348.7588 3145.1824,2347.3489 C 3146.5272,2345.8745 3148.472,2345.0478 3150.4328,2345.0965 C 3160.1723,2345.5177 3169.5227,2348.2566 3177.8684,2353.1828 C 3213.4226,2374.509 3238.7841,2409.3665 3248.1507,2449.8959 C 3250.7922,2461.6124 3250.938,2473.9446 3248.3775,2485.7743 C 3244.78,2502.4496 3240.4047,2518.9303 3235.4295,2535.1681 L 3235.4295,2535.1681 M 7559.1145,3177.6905 L 7571.3657,3177.6905 C 7672.1625,3174.3036 7751.7789,3090.7978 7750.1909,2989.8552 C 7748.4245,2888.9126 7666.1828,2807.9347 7565.2077,2807.9347 C 7464.346,2807.9347 7382.0557,2888.9126 7380.4028,2989.8552 C 7378.7497,3090.7978 7458.3015,3174.3036 7559.1145,3177.6905 L 7559.1145,3177.6905 z M 6692.5854,3177.6905 L 6704.8366,3177.6905 C 6805.6821,3174.3036 6885.331,3090.7978 6883.5969,2989.8552 C 6881.9603,2888.9126 6799.605,2807.9347 6698.7595,2807.9347 C 6597.8169,2807.9347 6515.5265,2888.9126 6513.9547,2989.8552 C 6512.2532,3090.7978 6591.6427,3174.3036 6692.5854,3177.6905 L 6692.5854,3177.6905 z M 6112.9713,2596.4088 L 6188.2446,2790.8558 L 6188.2446,2418.7994 L 6112.9713,2596.4091 M 6125.4009,3454.5099 L 5921.0523,2877.5061 L 5944.9387,2819.1348 L 6181.1469,3454.5113 L 6125.4009,3454.5113 M 4469.9503,2109.3441 C 4612.8971,2109.3441 4673.7802,2368.1262 4673.7802,2658.0052 C 4673.7802,2947.8193 4612.8971,3206.587 4469.9503,3206.587 C 4326.809,3206.587 4265.9423,2960.1696 4265.9423,2658.0052 C 4265.9423,2355.8246 4326.8093,2109.3441 4469.9503,2109.3441 z "
+   id="path105"
+   style="fill:#5e0202;fill-opacity:1"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 7559.1402,3177.6959 C 7563.2726,3177.8904 7567.2914,3177.8904 7571.3915,3177.6959 L 7571.3915,3160.6642 C 7662.8217,3157.3583 7734.9352,3081.3069 7733.2334,2989.7634 C 7731.548,2898.22 7656.7282,2824.8911 7565.1848,2824.9559 C 7562.9646,2824.8911 7561.1172,2826.0091 7560.0799,2827.9215 C 7558.9132,2829.9147 7558.9132,2832.1997 7560.0799,2834.0793 C 7561.1172,2836.024 7563.0455,2837.1585 7565.1848,2837.0611 C 7621.5143,2837.0611 7673.5979,2867.4459 7701.1306,2916.6938 C 7728.7605,2965.8444 7727.5128,3026.1118 7698.1324,3074.2253 C 7668.7198,3122.2579 7615.5505,3150.698 7559.1399,3148.4942 L 7559.1399,3177.6961 L 7559.1402,3177.6959 z M 6698.7859,3131.608 C 6695.399,3131.608 6692.6117,3128.853 6692.6117,3125.5635 C 6692.6117,3122.1118 6695.399,3119.4703 6698.7859,3119.4703 C 6768.744,3119.4703 6825.4139,3062.7843 6825.4139,2992.8585 C 6825.4139,2922.949 6768.744,2866.1495 6698.7859,2866.1495 C 6695.399,2866.1495 6692.6117,2863.4755 6692.6117,2860.1211 C 6692.6117,2856.8316 6695.399,2854.1089 6698.7859,2854.1089 C 6775.453,2854.1089 6837.5516,2916.2236 6837.5516,2992.8585 C 6837.5516,3069.5743 6775.453,3131.608 6698.7859,3131.608 L 6698.7859,3131.608 z M 7565.2329,3131.608 C 7561.9269,3131.608 7559.1397,3128.853 7559.1397,3125.5635 C 7559.1397,3122.1118 7561.9269,3119.4703 7565.2329,3119.4703 C 7635.2072,3119.4703 7691.9418,3062.7843 7691.9418,2992.8585 C 7691.9418,2922.949 7635.2072,2866.1495 7565.2329,2866.1495 C 7561.9269,2866.1495 7559.1397,2863.4755 7559.1397,2860.1211 C 7559.1397,2856.8316 7561.9269,2854.1089 7565.2329,2854.1089 C 7641.9487,2854.1089 7704.1444,2916.2236 7704.1444,2992.8585 C 7704.1444,3069.5743 7641.9484,3131.608 7565.2329,3131.608 L 7565.2329,3131.608 z M 6692.6111,3177.6959 C 6696.6786,3177.8094 6700.7623,3177.8094 6704.8624,3177.6959 L 6704.8624,3160.6642 C 6796.3736,3157.3583 6868.3087,3081.3069 6866.5749,2989.7634 C 6864.8734,2898.22 6790.2806,2824.8911 6698.7046,2824.9559 C 6696.4357,2824.8911 6694.6532,2826.0091 6693.4865,2827.9215 C 6692.4169,2829.9147 6692.4169,2832.1997 6693.4865,2834.0793 C 6694.6532,2836.024 6696.4357,2837.1585 6698.7046,2837.0611 C 6755.0016,2837.0611 6807.0855,2867.4459 6834.5534,2916.6938 C 6862.2319,2965.8444 6861.0652,3026.1118 6831.5878,3074.2253 C 6802.159,3122.2579 6748.9732,3150.698 6692.6114,3148.4942 L 6692.6114,3177.6961 L 6692.6111,3177.6959 z M 4469.978,3129.4204 L 4469.978,3065.9767 L 4444.163,3065.9767 L 4444.163,3133.5528 L 4444.163,3159.1246 C 4583.0584,3159.1246 4623.8307,2923.4512 4624.7871,2670.9087 L 5209.2453,2670.9087 C 5210.5742,2848.6159 5249.5641,3120.6379 5365.61,3139.5642 L 5365.61,3206.5892 L 5391.328,3206.5892 L 5391.328,2670.909 L 5493.6479,2670.909 L 5493.6479,2645.1752 L 5391.328,2645.1752 L 5391.328,2552.4973 L 5365.61,2552.4973 L 5365.61,2645.1752 L 5234.9468,2645.1752 C 5237.7505,2468.9915 5286.8846,2211.377 5378.4606,2207.1784 L 5378.4606,2181.4766 C 5258.5091,2186.0789 5211.6922,2461.1147 5209.3263,2645.1746 L 4624.7859,2645.1746 C 4623.0521,2393.7986 4582.5063,2159.957 4444.1619,2159.957 L 4444.1619,2184.573 L 4444.1619,2645.1766 L 4365.7122,2645.1766 L 4365.7122,2670.9104 L 4444.1619,2670.9104 L 4444.1619,2760.5579 L 4469.9769,2760.5579 L 4469.9769,2670.9104 L 4599.0196,2670.9104 C 4597.7719,2832.4284 4577.4504,3093.6587 4469.9769,3129.4218 L 4469.978,3129.4204 z "
+   id="path107"
+   style="fill:#f10603;fill-opacity:1"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   d="M 5234.846,2670.9189 C 5236.5153,2839.1621 5279.1349,3090.4396 5365.6064,3113.2106 L 5365.6064,2670.9189 L 5234.846,2670.9189 z M 4599.0958,2645.1848 L 4469.9721,2645.1848 L 4469.9721,2188.811 C 4576.846,2224.2842 4598.3342,2483.2286 4599.0958,2645.1848 z "
+   id="path109"
+   style="fill:#5e0202;fill-opacity:1"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><g
+   id="g111"
+   transform="matrix(2.8311561,0,0,2.8311561,-12039.368,-15836.575)"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72">
+   <path
+   style="fill:#ffffff"
+   id="path113"
+   d="M 6369.42,8277.34 L 6369.4601,8277.34 C 6391.6059,8277.3514 6411.7483,8286.4238 6426.3557,8301.0427 C 6440.9059,8315.6043 6449.9496,8335.6952 6449.9725,8357.8124 L 6449.9725,8357.8983 L 6449.9725,8357.9383 C 6449.961,8380.0784 6440.8886,8400.2265 6426.2755,8414.8339 C 6411.7139,8429.3841 6391.6173,8438.4278 6369.5058,8438.4507 L 6369.4199,8438.4507 L 6369.3798,8438.4507 C 6347.234,8438.4393 6327.0859,8429.3669 6312.4785,8414.748 C 6297.9283,8400.1864 6288.8846,8380.0955 6288.8617,8357.984 L 6288.8617,8357.8982 L 6288.8617,8357.8581 C 6288.8732,8335.7123 6297.9456,8315.5642 6312.5644,8300.9568 C 6327.126,8286.4066 6347.2226,8277.3629 6369.3341,8277.34 L 6369.42,8277.34 L 6369.42,8277.34 z " />
+   <path
+   style="fill:#ffffff"
+   id="path115"
+   d="M 6213.34,8433.22 L 6213.34,8328.593 L 6213.34,8328.5529 C 6213.3514,8314.4721 6219.1326,8301.6505 6228.4397,8292.3606 C 6237.6895,8283.1165 6250.4538,8277.3754 6264.506,8277.3468 L 6264.5919,8277.3468 L 6264.5919,8305.9663 L 6264.506,8305.9663 C 6258.3013,8305.9778 6252.6518,8308.5192 6248.5649,8312.6003 C 6244.4952,8316.6643 6241.9652,8322.3195 6241.9595,8328.5528 L 6241.9595,8328.5929 L 6241.9595,8433.2199 L 6213.34,8433.2199 L 6213.34,8433.22 z " />
+   <path
+   style="fill:#ffffff"
+   id="path117"
+   d="M 6628.69,8357.89 C 6628.7014,8335.7442 6637.7738,8315.5961 6652.3927,8300.9887 C 6666.9543,8286.4385 6687.0509,8277.3948 6709.1624,8277.3719 C 6731.3082,8277.3833 6751.5765,8286.4557 6766.1839,8301.0746 C 6780.7341,8315.6362 6789.7778,8335.8531 6789.8007,8357.9702 C 6789.8007,8358.9204 6789.7664,8359.8476 6789.732,8360.7921 L 6657.378,8360.7921 C 6658.0935,8373.9628 6663.7716,8385.88 6672.5464,8394.6547 C 6681.9164,8404.0362 6695.0299,8409.8574 6709.3339,8409.8631 C 6723.6093,8409.8459 6736.5854,8404.0133 6745.9783,8394.6261 C 6749.2238,8391.3864 6752.017,8387.7002 6754.318,8383.6877 L 6785.5362,8383.6877 C 6781.5066,8395.5419 6774.7867,8406.1826 6766.1035,8414.8658 C 6751.5419,8429.416 6731.3193,8438.4597 6709.2079,8438.4826 C 6687.0621,8438.4711 6666.914,8429.3988 6652.3066,8414.7799 C 6637.7564,8400.2183 6628.7127,8380.0014 6628.6898,8357.89 L 6628.69,8357.89 z " />
+   <path
+   style="fill:#ffffff"
+   id="path119"
+   d="M 5930.38,8277.35 C 5946.0234,8277.3786 5960.2359,8283.7722 5970.5332,8294.0638 C 5970.8366,8294.3614 5971.117,8294.6648 5971.4032,8294.9682 C 5971.6837,8294.6763 5971.947,8294.35 5972.2332,8294.0638 C 5982.5191,8283.7722 5996.9547,8277.3786 6012.6383,8277.35 C 6028.3218,8277.3786 6042.5629,8283.7722 6052.8545,8294.0638 L 6052.8259,8294.0981 C 6063.169,8304.4355 6069.5912,8318.7395 6069.6027,8334.4001 L 6069.6027,8433.2233 L 6037.7377,8433.2233 L 6037.7377,8334.36 C 6037.732,8327.4169 6034.8643,8321.1206 6030.3252,8316.5987 C 6025.7804,8312.0597 6019.3239,8309.2264 6012.4494,8309.2149 C 6005.5865,8309.2264 5999.2443,8312.0482 5994.6996,8316.5987 C 5990.172,8321.1206 5987.3559,8327.4569 5987.3501,8334.4 L 5987.3501,8433.2232 L 5955.4794,8433.2232 L 5955.4794,8333.633 C 5955.2848,8326.9819 5952.503,8320.966 5948.1299,8316.5987 C 5943.5794,8312.0597 5937.0999,8309.2264 5930.1912,8309.2149 C 5923.3226,8309.2264 5916.9976,8312.0482 5912.4471,8316.5987 C 5907.9253,8321.2523 5905.0919,8327.9607 5905.0919,8334.4 L 5905.0919,8433.2232 L 5873.2269,8433.2232 L 5873.2269,8334.3599 C 5873.2384,8318.6993 5879.632,8304.401 5889.975,8294.0636 C 5900.2666,8283.772 5914.6965,8277.3784 5930.3801,8277.3498 L 5930.38,8277.35 z " />
+   <circle
+   style="fill:#ffffff"
+   sodipodi:ry="18.602699"
+   sodipodi:rx="18.602699"
+   sodipodi:cy="8323.9902"
+   sodipodi:cx="6141.46"
+   id="circle121"
+   r="18.602699"
+   cy="8323.9902"
+   cx="6141.46" />
+   <circle
+   style="fill:#ffffff"
+   sodipodi:ry="18.602699"
+   sodipodi:rx="18.602699"
+   sodipodi:cy="8395.2002"
+   sodipodi:cx="6141.46"
+   id="circle123"
+   r="18.602699"
+   cy="8395.2002"
+   cx="6141.46" />
+   <path
+   style="fill:#000000"
+   id="path125"
+   d="M 6369.46,8305.96 L 6369.4199,8305.96 L 6369.3341,8305.96 C 6355.0587,8305.9772 6342.0826,8311.8098 6332.6897,8321.197 C 6323.3082,8330.567 6317.487,8343.5546 6317.4813,8357.8586 L 6317.4813,8357.8987 L 6317.4813,8357.9845 C 6317.4984,8372.2599 6323.3311,8385.236 6332.7183,8394.6232 C 6342.0883,8404.0047 6355.0759,8409.8259 6369.3799,8409.8316 L 6369.4199,8409.8316 L 6369.5058,8409.8316 C 6383.7812,8409.8145 6396.7573,8403.9818 6406.1502,8394.5946 C 6415.526,8385.2246 6421.3472,8372.2427 6421.3529,8357.9387 L 6421.3529,8357.8987 L 6421.3529,8357.8128 C 6421.3357,8343.5317 6415.5031,8330.5556 6406.1159,8321.1684 C 6396.7459,8311.7869 6383.764,8305.9657 6369.46,8305.96 z " />
+   <path
+   style="fill:#ffffff"
+   id="path127"
+   d="M 6539.34,8277.36 L 6539.3801,8277.36 C 6561.5259,8277.3714 6581.6683,8286.4438 6596.2757,8301.0627 C 6610.8259,8315.6243 6619.8696,8335.8011 6619.8925,8357.9183 L 6619.8925,8357.9584 C 6619.881,8380.0985 6610.8086,8400.2466 6596.1955,8414.854 C 6581.6339,8429.4042 6561.4514,8438.4479 6539.3399,8438.4708 L 6539.2998,8438.4708 C 6517.154,8438.4593 6497.0059,8429.3869 6482.3985,8414.7681 C 6467.8483,8400.2065 6458.8046,8379.9896 6458.7817,8357.8782 L 6458.7817,8246.3932 L 6487.4012,8246.3932 L 6487.4012,8296.4488 C 6501.419,8284.566 6519.6153,8277.3825 6539.3399,8277.3596 L 6539.34,8277.36 z " />
+   <path
+   style="fill:#000000"
+   id="path129"
+   d="M 6539.38,8305.98 L 6539.3399,8305.98 L 6539.2541,8305.98 C 6524.9787,8305.9972 6512.0026,8311.8298 6502.6097,8321.217 C 6493.2282,8330.587 6487.407,8343.5746 6487.4013,8357.8786 L 6487.4013,8357.9187 L 6487.4013,8358.0045 C 6487.4184,8372.2799 6493.2511,8385.256 6502.6383,8394.6432 C 6512.0083,8404.0247 6524.9959,8409.8459 6539.2999,8409.8516 L 6539.3399,8409.8516 L 6539.4258,8409.8516 C 6553.7012,8409.8345 6566.6773,8404.0018 6576.0702,8394.6146 C 6585.446,8385.2446 6591.2672,8372.2627 6591.2729,8357.9587 L 6591.2729,8357.9187 L 6591.2729,8357.8328 C 6591.2557,8343.5517 6585.4231,8330.5756 6576.0359,8321.1884 C 6566.6659,8311.8069 6553.684,8305.9857 6539.38,8305.98 z " />
+   <path
+   style="fill:#000000"
+   id="path131"
+   d="M 6709.17,8305.99 C 6694.8946,8306.0072 6681.9185,8311.8398 6672.5256,8321.227 C 6669.2801,8324.4724 6666.4411,8328.1529 6664.1401,8332.1711 L 6754.3317,8332.1711 C 6752.025,8328.1415 6749.2088,8324.4553 6745.9519,8321.1984 C 6736.5819,8311.8169 6723.4741,8305.9957 6709.1701,8305.99 L 6709.17,8305.99 z " />
+  </g>
+<g
+   inkscape:groupmode="layer"
+   id="layer1"
+   inkscape:label="text"
+   style="display:inline"><text
+   xml:space="preserve"
+   style="font-size:846.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="7921.3022"
+   y="-183.49445"
+   id="text2289"
+   sodipodi:linespacing="125%"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><tspan
+     sodipodi:role="line"
+     id="tspan2291"
+     x="7921.3022"
+     y="-183.49445">Power</tspan></text>
+
+<text
+   sodipodi:linespacing="125%"
+   id="text3263"
+   y="7219.6333"
+   x="-2222.5493"
+   style="font-size:846.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   xml:space="preserve"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><tspan
+     y="7219.6333"
+     x="-2222.5493"
+     id="tspan3265"
+     sodipodi:role="line">Hold</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:846.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="-2217.1748"
+   y="9789.9248"
+   id="text3267"
+   sodipodi:linespacing="125%"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><tspan
+     sodipodi:role="line"
+     id="tspan3269"
+     x="-2217.1748"
+     y="9789.9248">Menu</tspan></text>
+
+<text
+   sodipodi:linespacing="125%"
+   id="text3271"
+   y="12668.409"
+   x="-2216.7615"
+   style="font-size:846.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   xml:space="preserve"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><tspan
+     y="12668.409"
+     x="-2216.7615"
+     id="tspan3273"
+     sodipodi:role="line">Left</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:846.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="-2213.8677"
+   y="15516.716"
+   id="text3275"
+   sodipodi:linespacing="125%"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><tspan
+     sodipodi:role="line"
+     id="tspan3277"
+     x="-2213.8677"
+     y="15516.716">Display</tspan></text>
+
+<text
+   sodipodi:linespacing="125%"
+   id="text3279"
+   y="15099.665"
+   x="11473.794"
+   style="font-size:846.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   xml:space="preserve"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><tspan
+     y="15099.665"
+     x="11473.794"
+     id="tspan3281"
+     sodipodi:role="line">Down</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:846.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="11465.112"
+   y="9790.0713"
+   id="text3283"
+   sodipodi:linespacing="125%"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><tspan
+     sodipodi:role="line"
+     id="tspan3285"
+     x="11465.112"
+     y="9790.0713">Play</tspan></text>
+
+<text
+   sodipodi:linespacing="125%"
+   id="text3287"
+   y="12662.764"
+   x="11468.833"
+   style="font-size:846.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   xml:space="preserve"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><tspan
+     y="12662.764"
+     x="11468.833"
+     id="tspan3289"
+     sodipodi:role="line">Right</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:846.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="11482.82"
+   y="11226.417"
+   id="text3291"
+   sodipodi:linespacing="125%"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><tspan
+     sodipodi:role="line"
+     id="tspan3293"
+     x="11482.82"
+     y="11226.417">Select</tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-size:846.66668701px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Palatino Linotype"
+   x="11473.794"
+   y="8325.6123"
+   id="text3295"
+   sodipodi:linespacing="125%"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"><tspan
+     sodipodi:role="line"
+     id="tspan3297"
+     x="11473.794"
+     y="8325.6123">Up</tspan></text>
+
+<path
+   id="path2308"
+   d="M 2565.6108,9553.0213 L 217.71849,9553.0213"
+   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#7a7a7a;stroke-width:28.22222328;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   sodipodi:nodetypes="cc"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   sodipodi:nodetypes="cc"
+   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#7a7a7a;stroke-width:28.22222328;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="M 2613.4389,12438.655 L -419.99055,12438.655"
+   id="path4520"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   id="path4522"
+   d="M 3027.9498,15260.517 L 791.65661,15260.517"
+   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#7a7a7a;stroke-width:28.22222328;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   sodipodi:nodetypes="cc"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   id="path4528"
+   d="M 11174.683,12438.655 L 9177.5304,12438.655"
+   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#7a7a7a;stroke-width:28.22222328;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   sodipodi:nodetypes="cc"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   sodipodi:nodetypes="cc"
+   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#7a7a7a;stroke-width:27.10848618;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="M 11175.24,9553.0213 L 8874.0625,9553.0213"
+   id="path4530"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   id="path4536"
+   d="M 11174.683,8166.0042 L 5845.5004,10031.303"
+   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#7a7a7a;stroke-width:28.22222328;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   sodipodi:nodetypes="cc"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   sodipodi:nodetypes="cc"
+   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#7a7a7a;stroke-width:28.22222328;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="M 11174.683,14830.064 L 5829.558,14830.064"
+   id="path4538"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /><path
+   sodipodi:nodetypes="cc"
+   style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#7a7a7a;stroke-width:28.22222328;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   d="M 11174.683,10844.383 L 5845.5004,12390.826"
+   id="path4540"
+   inkscape:export-filename="C:\cygwin\home\Marianne\rockbox-patched\trunk\manual\rockbox_interface\images\mrobe100-front.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72" /></g></svg>
