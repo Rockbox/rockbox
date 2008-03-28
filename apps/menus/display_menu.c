@@ -67,6 +67,7 @@ int flipdisplay_callback(int action,const struct menu_item_ex *this_item)
         case ACTION_EXIT_MENUITEM:
             button_set_flip(global_settings.flip_display);
             lcd_set_flip(global_settings.flip_display);
+            lcd_update();
 #ifdef HAVE_REMOTE_LCD
             lcd_remote_set_flip(global_settings.remote_flip_display);
             lcd_remote_update();
