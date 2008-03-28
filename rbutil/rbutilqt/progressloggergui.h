@@ -22,7 +22,7 @@
 #include <QtGui>
 
 #include "progressloggerinterface.h"
-#include "ui_installprogressfrm.h"
+#include "ui_progressloggerfrm.h"
 
 class ProgressLoggerGui :public ProgressloggerInterface
 {
@@ -49,7 +49,7 @@ public slots:
     virtual void show();
 
 private:
-    Ui::InstallProgressFrm dp;
+    Ui::ProgressLoggerFrm dp;
     QDialog *downloadProgress;
 
 };

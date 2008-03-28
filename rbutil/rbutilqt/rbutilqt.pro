@@ -124,7 +124,7 @@ TARGET = rbutilqt
 FORMS += rbutilqtfrm.ui \
  aboutbox.ui \
  installfrm.ui \
- installprogressfrm.ui \
+ progressloggerfrm.ui \
  configurefrm.ui \
  browsedirtreefrm.ui \
  installtalkfrm.ui \
