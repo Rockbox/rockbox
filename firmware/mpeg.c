@@ -533,7 +533,7 @@ static void recalculate_watermark(int bitrate)
 }
 
 #ifndef HAVE_FLASH_STORAGE
-void audio_set_buffer_margin(int seconds)
+void audio_set_buffer_margin(const int seconds)
 {
     low_watermark_margin = seconds;
 }
@@ -2627,7 +2627,7 @@ void audio_set_recording_options(struct audio_recording_options *options)
 #endif /* SIMULATOR */
 #endif /* CONFIG_CODEC == MAS3587F */
 
-void audio_play(long offset)
+void audio_play(const long offset)
 {
 #ifdef SIMULATOR
     char* trackname;
@@ -2768,7 +2768,7 @@ void audio_prev(void)
 #endif /* SIMULATOR */
 }
 
-void audio_ff_rewind(long newtime)
+void audio_ff_rewind(const long newtime)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_FF_REWIND, newtime);

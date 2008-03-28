@@ -34,6 +34,10 @@
 #include "scrobbler.h"
 #include "audio.h"
 #include "cuesheet.h"
+#if CONFIG_CODEC == SWCODEC
+#include "playback.h"
+#endif
+
 
 #if CONFIG_CODEC == SWCODEC
 int setcrossfadeonexit_callback(int action,const struct menu_item_ex *this_item)

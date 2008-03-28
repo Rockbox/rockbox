@@ -33,7 +33,7 @@
 extern char having_new_lcd;
 
 #if CONFIG_CODEC != SWCODEC
-void audio_set_buffer_margin(int seconds)
+void audio_set_buffer_margin(const int seconds)
 {
      (void)seconds;
 }

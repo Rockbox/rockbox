@@ -23,6 +23,7 @@
 #include "talk.h"
 #include "dsp.h"
 #include "audio.h"
+#include "playback.h"
 #include "pcmbuf.h"
 #include "codecs/libspeex/speex/speex.h"
 

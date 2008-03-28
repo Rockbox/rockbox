@@ -54,6 +54,9 @@
 #include "action.h"
 #include "cuesheet.h"
 #include "playlist.h"
+#if CONFIG_CODEC == SWCODEC
+#include "playback.h"
+#endif
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"

@@ -197,7 +197,7 @@ static void* get_codec_memory(size_t *size)
 }
 
 /* Null output */
-static bool pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
+static bool pcmbuf_insert_null(const void *ch1, const void *ch2, const int count)
 {
     /* Always successful - just discard data */
     (void)ch1;
@@ -310,7 +310,7 @@ static bool pcmbuf_insert_wav(const void *ch1, const void *ch2, int count)
 
 
 /* Set song position in WPS (value in ms). */
-static void set_elapsed(unsigned int value)
+static void set_elapsed(const unsigned int value)
 {
     elapsed = value;
 }
@@ -318,7 +318,7 @@ static void set_elapsed(unsigned int value)
 
 /* Read next <size> amount bytes from file buffer to <ptr>.
    Will return number of bytes read or 0 if end of file. */
-static size_t read_filebuf(void *ptr, size_t size)
+static size_t read_filebuf(void *ptr, const size_t size)
 {
    if (ci.curpos > (off_t)track.filesize)
    {
@@ -336,7 +336,7 @@ static size_t read_filebuf(void *ptr, size_t size)
    <realsize> amount of data. <reqsize> tells the buffer system
    how much data it should try to allocate. If <realsize> is 0,
    end of file is reached. */
-static void* request_buffer(size_t *realsize, size_t reqsize)
+static void* request_buffer(size_t *realsize, const size_t reqsize)
 {
     *realsize = MIN(track.filesize-ci.curpos,reqsize);
 
@@ -345,7 +345,7 @@ static void* request_buffer(size_t *realsize, size_t reqsize)
 
 
 /* Advance file buffer position by <amount> amount of bytes. */
-static void advance_buffer(size_t amount)
+static void advance_buffer(const size_t amount)
 {
     ci.curpos += amount;
 }
@@ -359,7 +359,7 @@ static void advance_buffer_loc(void *ptr)
 
 
 /* Seek file buffer to position <newpos> beginning of file. */
-static bool seek_buffer(size_t newpos)
+static bool seek_buffer(const size_t newpos)
 {
     ci.curpos = newpos;
     return true;
@@ -374,7 +374,7 @@ static void seek_complete(void)
 
 
 /* Calculate mp3 seek position from given time data in ms. */
-static off_t mp3_get_filepos(int newtime)
+static off_t mp3_get_filepos(const int newtime)
 {
     /* We don't ask the codec to seek, so no need to implement this. */
     (void)newtime;
@@ -399,7 +399,7 @@ static void discard_codec(void)
 }
 
 
-static void set_offset(size_t value)
+static void set_offset(const size_t value)
 {
     /* ??? */
     (void)value;

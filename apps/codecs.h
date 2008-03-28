@@ -126,28 +126,28 @@ struct codec_api {
     void* (*get_codec_memory)(size_t *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
        automatically. */
-    bool (*pcmbuf_insert)(const void *ch1, const void *ch2, int count);
+    bool (*pcmbuf_insert)(const void *ch1, const void *ch2, const int count);
     /* Set song position in WPS (value in ms). */
-    void (*set_elapsed)(unsigned int value);
+    void (*set_elapsed)(const unsigned int value);
     
     /* Read next <size> amount bytes from file buffer to <ptr>.
        Will return number of bytes read or 0 if end of file. */
-    size_t (*read_filebuf)(void *ptr, size_t size);
+    size_t (*read_filebuf)(void *ptr, const size_t size);
     /* Request pointer to file buffer which can be used to read
        <realsize> amount of data. <reqsize> tells the buffer system
        how much data it should try to allocate. If <realsize> is 0,
        end of file is reached. */
-    void* (*request_buffer)(size_t *realsize, size_t reqsize);
+    void* (*request_buffer)(size_t *realsize, const size_t reqsize);
     /* Advance file buffer position by <amount> amount of bytes. */
-    void (*advance_buffer)(size_t amount);
+    void (*advance_buffer)(const size_t amount);
     /* Advance file buffer to a pointer location inside file buffer. */
     void (*advance_buffer_loc)(void *ptr);
     /* Seek file buffer to position <newpos> beginning of file. */
-    bool (*seek_buffer)(size_t newpos);
+    bool (*seek_buffer)(const size_t newpos);
     /* Codec should call this function when it has done the seeking. */
     void (*seek_complete)(void);
     /* Calculate mp3 seek position from given time data in ms. */
-    off_t (*mp3_get_filepos)(int newtime);
+    off_t (*mp3_get_filepos)(const int newtime);
     /* Request file change from file buffer. Returns true is next
        track is available and changed. If return value is false,
        codec should exit immediately with PLUGIN_OK status. */
@@ -155,12 +155,12 @@ struct codec_api {
     /* Free the buffer area of the current codec after its loaded */
     void (*discard_codec)(void);
     
-    void (*set_offset)(size_t value);
+    void (*set_offset)(const size_t value);
     /* Configure different codec buffer parameters. */
-    void (*configure)(int setting, intptr_t value);
+    void (*configure)(const int setting, const intptr_t value);
 
     /* kernel/ system */
-    void (*PREFIX(sleep))(int ticks);
+    void (*PREFIX(sleep))(const int ticks);
     void (*yield)(void);
 
 #if NUM_CORES > 1

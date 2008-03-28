@@ -521,13 +521,13 @@ struct plugin_api {
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
     int (*playlist_start)(int start_index, int offset);
-    void (*PREFIX(audio_play))(long offset);
+    void (*PREFIX(audio_play))(const long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);
     void (*audio_resume)(void);
     void (*audio_next)(void);
     void (*audio_prev)(void);
-    void (*audio_ff_rewind)(long newtime);
+    void (*audio_ff_rewind)(const long newtime);
     struct mp3entry* (*audio_next_track)(void);
     int (*audio_status)(void);
     bool (*audio_has_changed_track)(void);

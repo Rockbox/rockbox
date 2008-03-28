@@ -225,7 +225,7 @@ buf_ridx == buf_widx means the buffer is empty.
            only potential side effect is to allocate space for the cur_handle
            if it returns NULL.
    */
-static struct memory_handle *add_handle(size_t data_size, const bool can_wrap,
+static struct memory_handle *add_handle(const size_t data_size, const bool can_wrap,
                                         const bool alloc_all)
 {
     /* gives each handle a unique id */
@@ -873,8 +873,10 @@ management functions for all the actual handle management work.
    return value: <0 if the file cannot be opened, or one file already
    queued to be opened, otherwise the handle for the file in the buffer
 */
-int bufopen(const char *file, size_t offset, const enum data_type type)
+int bufopen(const char *file, const size_t offset, const enum data_type type)
 {
+    size_t adjusted_offset = offset;
+
     int fd = open(file, O_RDONLY);
     if (fd < 0)
         return ERR_FILE_ERROR;
@@ -882,10 +884,10 @@ int bufopen(const char *file, size_t offset, const enum data_type type)
     size_t size = filesize(fd);
     bool can_wrap = type==TYPE_PACKET_AUDIO || type==TYPE_CODEC;
 
-    if (offset > size)
-        offset = 0;
+    if (adjusted_offset > size)
+        adjusted_offset = 0;
 
-    struct memory_handle *h = add_handle(size-offset, can_wrap, false);
+    struct memory_handle *h = add_handle(size-adjusted_offset, can_wrap, false);
     if (!h)
     {
         DEBUGF("bufopen: failed to add handle\n");
@@ -894,7 +896,7 @@ int bufopen(const char *file, size_t offset, const enum data_type type)
     }
 
     strncpy(h->path, file, MAX_PATH);
-    h->offset = offset;
+    h->offset = adjusted_offset;
     h->ridx = buf_widx;
     h->data = buf_widx;
     h->type = type;
@@ -923,7 +925,7 @@ int bufopen(const char *file, size_t offset, const enum data_type type)
     else
 #endif
     {
-        h->filerem = size - offset;
+        h->filerem = size - adjusted_offset;
         h->filesize = size;
         h->available = 0;
         h->widx = buf_widx;
@@ -1094,27 +1096,28 @@ static struct memory_handle *prep_bufdata(const int handle_id, size_t *size,
    Return the number of bytes copied or < 0 for failure (handle not found).
    The caller is blocked until the requested amount of data is available.
 */
-ssize_t bufread(const int handle_id, size_t size, void *dest)
+ssize_t bufread(const int handle_id, const size_t size, void *dest)
 {
     const struct memory_handle *h;
+    size_t adjusted_size = size;
 
-    h = prep_bufdata(handle_id, &size, false);
+    h = prep_bufdata(handle_id, &adjusted_size, false);
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
 
-    if (h->ridx + size > buffer_len)
+    if (h->ridx + adjusted_size > buffer_len)
     {
         /* the data wraps around the end of the buffer */
         size_t read = buffer_len - h->ridx;
         memcpy(dest, &buffer[h->ridx], read);
-        memcpy(dest+read, buffer, size - read);
+        memcpy(dest+read, buffer, adjusted_size - read);
     }
     else
     {
-        memcpy(dest, &buffer[h->ridx], size);
+        memcpy(dest, &buffer[h->ridx], adjusted_size);
     }
 
-    return size;
+    return adjusted_size;
 }
 
 /* Update the "data" pointer to make the handle's data available to the caller.
@@ -1126,20 +1129,21 @@ ssize_t bufread(const int handle_id, size_t size, void *dest)
    The guard buffer may be used to provide the requested size. This means it's
    unsafe to request more than the size of the guard buffer.
 */
-ssize_t bufgetdata(const int handle_id, size_t size, void **data)
+ssize_t bufgetdata(const int handle_id, const size_t size, void **data)
 {
     const struct memory_handle *h;
+    size_t adjusted_size = size;
 
-    h = prep_bufdata(handle_id, &size, true);
+    h = prep_bufdata(handle_id, &adjusted_size, true);
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
 
-    if (h->ridx + size > buffer_len)
+    if (h->ridx + adjusted_size > buffer_len)
     {
         /* the data wraps around the end of the buffer :
            use the guard buffer to provide the requested amount of data. */
-        size_t copy_n = h->ridx + size - buffer_len;
-        /* prep_bufdata ensures size <= buffer_len - h->ridx + GUARD_BUFSIZE,
+        size_t copy_n = h->ridx + adjusted_size - buffer_len;
+        /* prep_bufdata ensures adjusted_size <= buffer_len - h->ridx + GUARD_BUFSIZE,
            so copy_n <= GUARD_BUFSIZE */
         memcpy(guard_buffer, (const unsigned char *)buffer, copy_n);
     }
@@ -1147,7 +1151,7 @@ ssize_t bufgetdata(const int handle_id, size_t size, void **data)
     if (data)
         *data = &buffer[h->ridx];
 
-    return size;
+    return adjusted_size;
 }
 
 ssize_t bufgettail(const int handle_id, const size_t size, void **data)
@@ -1180,9 +1184,10 @@ ssize_t bufgettail(const int handle_id, const size_t size, void **data)
     return size;
 }
 
-ssize_t bufcuttail(const int handle_id, size_t size)
+ssize_t bufcuttail(const int handle_id, const size_t size)
 {
     struct memory_handle *h;
+    size_t adjusted_size = size;
 
     h = find_handle(handle_id);
 
@@ -1192,16 +1197,16 @@ ssize_t bufcuttail(const int handle_id, size_t size)
     if (h->filerem)
         return ERR_HANDLE_NOT_DONE;
 
-    if (h->available < size)
-        size = h->available;
+    if (h->available < adjusted_size)
+        adjusted_size = h->available;
 
-    h->available -= size;
-    h->filesize -= size;
-    h->widx = RINGBUF_SUB(h->widx, size);
+    h->available -= adjusted_size;
+    h->filesize -= adjusted_size;
+    h->widx = RINGBUF_SUB(h->widx, adjusted_size);
     if (h == cur_handle)
         buf_widx = h->widx;
 
-    return size;
+    return adjusted_size;
 }
 
 
