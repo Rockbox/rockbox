@@ -142,6 +142,13 @@ enum {
 #endif
 };
 
+enum filling_state {
+    STATE_IDLE,     /* audio is stopped: nothing to do */
+    STATE_FILLING,  /* adding tracks to the buffer */
+    STATE_FULL,     /* can't add any more tracks */
+    STATE_FINISHED, /* all remaining tracks have been added */
+};
+
 /* As defined in plugins/lib/xxx2wav.h */
 #if MEM > 1
 #define MALLOC_BUFSIZE (512*1024)
@@ -230,6 +237,8 @@ static int last_peek_offset = 0;
 
 /* Scrobbler support */
 static unsigned long prev_track_elapsed = 0; /* Previous track elapsed time (C/A-)*/
+
+static enum filling_state filling;
 
 /* Track change controls */
 static bool automatic_skip = false; /* Who initiated in-progress skip? (C/A-) */
@@ -1493,9 +1502,11 @@ static void buffering_audio_callback(enum callback_event ev, int value)
     switch (ev)
     {
         case EVENT_BUFFER_LOW:
-            LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
-            queue_remove_from_head(&audio_queue, Q_AUDIO_FILL_BUFFER);
-            queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+            if (filling == STATE_FULL) {
+                /* force a refill */
+                LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
+                queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+            }
             break;
 
         case EVENT_HANDLE_REBUFFER:
@@ -1709,6 +1720,7 @@ static bool audio_load_track(int offset, bool start_play)
         logf("End-of-playlist");
         playlist_end = true;
         memset(&lasttrack_id3, 0, sizeof(struct mp3entry));
+        filling = STATE_FINISHED;
         return false;
     }
 
@@ -1741,7 +1753,7 @@ static bool audio_load_track(int offset, bool start_play)
                 last_peek_offset--;
                 close(fd);
                 copy_mp3entry(&lasttrack_id3, &id3);
-                return false;
+                goto buffer_full;
             }
 
             if (track_widx == track_ridx)
@@ -1806,7 +1818,7 @@ static bool audio_load_track(int offset, bool start_play)
         if (tracks[track_widx].codec_hid == ERR_BUFFER_FULL)
         {
             /* No space for codec on buffer, not an error */
-            return false;
+            goto buffer_full;
         }
 
         /* This is an error condition, either no codec was found, or reading
@@ -1874,7 +1886,7 @@ static bool audio_load_track(int offset, bool start_play)
     tracks[track_widx].audio_hid = bufopen(trackname, file_offset, type);
 
     if (tracks[track_widx].audio_hid < 0)
-        return false;
+        goto buffer_full;
 
     /* All required data is now available for the codec. */
     tracks[track_widx].taginfo_ready = true;
@@ -1888,6 +1900,11 @@ static bool audio_load_track(int offset, bool start_play)
     track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
     return true;
+
+buffer_full:
+    logf("buffer is full for now");
+    filling = STATE_FULL;
+    return false;
 }
 
 static void audio_fill_file_buffer(bool start_play, size_t offset)
@@ -1895,6 +1912,8 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
     struct queue_event ev;
     bool had_next_track = audio_next_track() != NULL;
     bool continue_buffering;
+
+    filling = STATE_FILLING;
 
     /* No need to rebuffer if there are track skips pending. */
     if (ci.new_track != 0)
@@ -1917,16 +1936,9 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
     continue_buffering = audio_load_track(offset, start_play);
     do {
         sleep(1);
-        if (queue_peek(&audio_queue, &ev)) {
-            if (ev.id != Q_AUDIO_FILL_BUFFER)
-            {
-                /* There's a message in the queue. break the loop to treat it,
-                and go back to filling after that. */
-                LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
-                queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
-            }
+        if (queue_peek(&audio_queue, &ev))
+            /* There's a message in the queue. break the loop to treat it */
             break;
-        }
         continue_buffering = audio_load_track(0, false);
     } while (continue_buffering);
 
@@ -2181,6 +2193,8 @@ static void audio_stop_playback(void)
     audio_stop_codec_flush();
     playing = false;
 
+    filling = STATE_IDLE;
+
     /* Mark all entries null. */
     audio_clear_track_entries();
 
@@ -2230,6 +2244,7 @@ static void audio_play_start(size_t offset)
 #ifndef HAVE_FLASH_STORAGE
     set_filebuf_watermark(buffer_margin, 0);
 #endif
+
     audio_fill_file_buffer(true, offset);
     register_buffering_callback(buffering_audio_callback);
 
@@ -2413,10 +2428,9 @@ static void audio_thread(void)
             queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
 
         switch (ev.id) {
+
             case Q_AUDIO_FILL_BUFFER:
                 LOGFQUEUE("audio < Q_AUDIO_FILL_BUFFER");
-                if (!playing || playlist_end || ci.stop_codec)
-                    break;
                 audio_fill_file_buffer(false, 0);
                 break;
 
@@ -2519,6 +2533,8 @@ static void audio_thread(void)
 
             case SYS_TIMEOUT:
                 LOGFQUEUE_SYS_TIMEOUT("audio < SYS_TIMEOUT");
+                if (filling == STATE_FILLING)
+                    audio_fill_file_buffer(false, 0);
                 break;
 
             default:
