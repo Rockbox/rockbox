@@ -161,6 +161,13 @@ void switch_thread(void)
  * Processor-specific section
  */
 
+#ifdef MAX_PHYS_SECTOR_SIZE
+/* Support a special workaround object for large-sector disks */
+#define IF_NO_SKIP_YIELD(...) __VA_ARGS__
+#else
+#define IF_NO_SKIP_YIELD(...)
+#endif
+
 #if defined(CPU_ARM)
 /*---------------------------------------------------------------------------
  * Start the thread running and terminate it if it returns
@@ -1928,8 +1935,9 @@ void switch_thread(void)
 #endif
 
 #ifdef HAVE_PRIORITY_SCHEDULING
+    IF_NO_SKIP_YIELD( if (thread->skip_count != -1) )
     /* Reset the value of thread's skip count */
-    thread->skip_count = 0;
+        thread->skip_count = 0;
 #endif
 
     for (;;)
@@ -1985,6 +1993,7 @@ void switch_thread(void)
                  * priority threads are runnable. The highest priority runnable
                  * thread(s) are never skipped. */
                 if (priority <= max ||
+                    IF_NO_SKIP_YIELD( thread->skip_count == -1 || )
                     (diff = priority - max, ++thread->skip_count > diff*diff))
                 {
                     cores[core].running = thread;
@@ -2129,7 +2138,8 @@ unsigned int wakeup_thread(struct thread_entry **list)
         if (bl == NULL)
         {
             /* No inheritance - just boost the thread by aging */
-            thread->skip_count = thread->priority;
+            IF_NO_SKIP_YIELD( if (thread->skip_count != -1) )
+                thread->skip_count = thread->priority;
             current = cores[CURRENT_CORE].running;
         }
         else
