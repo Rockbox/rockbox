@@ -838,10 +838,11 @@ const char *get_codec_filename(const int cod_spec)
         afmt, fname ? fname : "<unknown>");
 #else /* !HAVE_RECORDING */
     /* Always decoder */
-    if ((unsigned)cod_spec >= AFMT_NUM_CODECS)
-        cod_spec = AFMT_UNKNOWN;
-    fname = audio_formats[cod_spec].codec_root_fn;
-    logf("Codec: %d - %s",  cod_spec, fname ? fname : "<unknown>");
+    int afmt = cod_spec;
+    if ((unsigned)afmt >= AFMT_NUM_CODECS)
+        afmt = AFMT_UNKNOWN;
+    fname = audio_formats[afmt].codec_root_fn;
+    logf("Codec: %d - %s",  afmt, fname ? fname : "<unknown>");
 #endif /* HAVE_RECORDING */
 
     return fname;
