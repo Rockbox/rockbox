@@ -690,6 +690,7 @@ void queue_delete(struct event_queue *q)
         queue_do_auto_reply(q->send);
 
         q->send = NULL;
+        IF_PRIO( q->blocker_p = NULL; )
     }
 #endif
 
