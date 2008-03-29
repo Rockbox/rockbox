@@ -2358,8 +2358,9 @@ static void audio_thread(void)
 
     while (1)
     {
-        if (filling != STATE_FILLING)
+        if (filling != STATE_FILLING) {
             cancel_cpu_boost();
+        }
 
         if (!pcmbuf_queue_scan(&ev))
             queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
