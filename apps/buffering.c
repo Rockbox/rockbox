@@ -88,7 +88,7 @@
 /* default point to start buffer refill */
 #define BUFFERING_DEFAULT_WATERMARK      (1024*512)
 /* amount of data to read in one read() call */
-#define BUFFERING_DEFAULT_FILECHUNK      (1024*16)
+#define BUFFERING_DEFAULT_FILECHUNK      (1024*32)
 /* point at which the file buffer will fight for CPU time */
 #define BUFFERING_CRITICAL_LEVEL         (1024*128)
 
@@ -1466,7 +1466,7 @@ void buffering_init(void)
     queue_init(&buffering_queue, true);
     buffering_thread_p = create_thread( buffering_thread, buffering_stack,
             sizeof(buffering_stack), CREATE_THREAD_FROZEN,
-            buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING)
+            buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING-1)
             IF_COP(, CPU));
 
     queue_enable_queue_send(&buffering_queue, &buffering_queue_sender_list,
