@@ -21,8 +21,8 @@
 
 #include "system-arm.h"
 
-#define CPUFREQ_DEFAULT 98784000
-#define CPUFREQ_NORMAL  98784000
+#define CPUFREQ_DEFAULT 32000000
+#define CPUFREQ_NORMAL  48000000
 #define CPUFREQ_MAX    192000000
 
 #define inl(a) (*(volatile unsigned long *) (a))

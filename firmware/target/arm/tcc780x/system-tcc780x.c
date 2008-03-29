@@ -151,59 +151,6 @@ void fiq_handler(void)
 #endif /* !defined(BOOTLOADER) */
 
 
-/* TODO:
-  a) this is not the place for this function
-  b) it currently ignores the supplied frequency and uses default values
-  c) if the PLL being set drives any PCKs, an appropriate new clock divider
-     will have to be re-calculated for those PCKs (the OF maintains a list of
-     PCK frequencies for this purpose).
-*/
-void set_pll_frequency(unsigned int pll_number, unsigned int frequency)
-{
-    int i = 0;
-
-    if (pll_number > 1) return;
-
-    /* The frequency parameter is currently ignored and temporary values are
-       used (PLL0=192Mhz, PLL1=216Mhz). The D2 firmware uses a lookup table
-       to derive the values of PLLxCFG from a the supplied frequency.
-       Presumably we will need to do something similar. */
-    if (pll_number == 0)
-    {
-        /* drive CPU off Xin while switching */
-        CLKCTRL = 0xB00FF014;   /* Xin enable, Fsys driven by Xin, Fbus = Fsys,
-                                   MCPU=Fbus, SCPU=Fbus */
-
-        asm volatile (
-            "nop      \n\t"
-            "nop      \n\t"
-        );
-    
-        PLL0CFG |= (1<<31);                /* power down */
-        CLKDIVC = CLKDIVC &~ (0xff << 24); /* disable PLL0 divider */
-        PLL0CFG = 0x80019808;              /* set for 192Mhz (with power down) */
-        PLL0CFG = PLL0CFG &~ (1<<31);      /* power up */
-
-        CLKCTRL = (CLKCTRL & ~0x1f) | 0x800FF010;
-        
-        asm volatile (
-            "nop      \n\t"
-            "nop      \n\t"
-        );
-    }
-    else if (pll_number == 1)
-    {
-        PLL1CFG |= (1<<31);                /* power down */
-        CLKDIVC = CLKDIVC &~ (0xff << 16); /* disable PLL1 divider */
-        PLL1CFG = 0x80002503;              /* set for 216Mhz (with power down)*/
-        PLL1CFG = PLL1CFG &~ (1<<31);      /* power up */
-    }
-
-    i = 0x1000;
-    while (--i) {};
-}
-
-
 /* TODO - these should live in the target-specific directories and
    once we understand what all the GPIO pins do, move the init to the
    specific driver for that hardware.   For now, we just perform the 
@@ -242,7 +189,14 @@ static void clock_init(void)
     int i;
     
     CSCFG3  = (CSCFG3 &~ 0x3fff) | 0x841;
-    CLKCTRL = (CLKCTRL & ~0xff) | 0x14;
+
+    /* Enable Xin (12Mhz), Fsys = Xin, Fbus = Fsys/2, MCPU=Fsys, SCPU=Fsys */
+    CLKCTRL = 0x800FF014;
+
+    asm volatile (
+        "nop      \n\t"
+        "nop      \n\t"
+    );
     
     PCLK_RFREQ = 0x1401002d; /* RAM refresh source = Xin (4) / 0x2d = 266kHz */
     
@@ -252,13 +206,27 @@ static void clock_init(void)
     MCFG1 |= 1;
     SDCFG1 = (SDCFG &~ 0x7000) | 0x2000;
 
-    PLL0CFG |= 0x80000000;  /* power down */
-    PLL0CFG  = 0x14010000;  /* power up, source = Xin (4) undivided = 12Mhz */
+    /* Configure PLL0 to 192Mhz, for CPU scaling */
+    PLL0CFG |= (1<<31);                /* power down */
+    CLKDIVC = CLKDIVC &~ (0xff << 24); /* disable PLL0 divider */
+    PLL0CFG = 0x80019808;              /* set for 192Mhz (with power down) */
+    PLL0CFG = PLL0CFG &~ (1<<31);      /* power up */
+
+    /* Configure PLL1 to 216Mz, for LCD clock (when divided by 2) */
+    PLL1CFG |= (1<<31);                /* power down */
+    CLKDIVC = CLKDIVC &~ (0xff << 16); /* disable PLL1 divider */
+    PLL1CFG = 0x80002503;              /* set for 216Mhz (with power down)*/
+    PLL1CFG = PLL1CFG &~ (1<<31);      /* power up */
 
     i = 0x8000;
     while (--i) {};
-    
-    CLKCTRL = (CLKCTRL &~ 0x1f) | 0x800FF010; /* CPU and COP driven by PLL0 */
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    set_cpu_frequency(CPUFREQ_NORMAL);
+#else
+    /* 48Mhz: Fsys = PLL0 (192Mhz) Fbus = Fsys/4 CPU = Fbus, COP = Fbus */
+    CLKCTRL = (1<<31) | (3<<28) | (3<<4);
+#endif
 
     asm volatile (
         "nop      \n\t"
@@ -274,8 +242,6 @@ static void clock_init(void)
 #ifdef COWON_D2
 void system_init(void)
 {
-    int i;
-
     MBCFG = 0x19;
 
     if (TCC780_VER == 0)
@@ -296,6 +262,7 @@ void system_init(void)
     VCTRL |= (1<<31);   /* Reading from VNIRQ clears that interrupt */
 
     /* Write IRQ priority registers using ints - a freeze occurs otherwise */
+    int i;
     for (i = 0; i < 7; i++)
     {
         IRQ_PRIORITY_TABLE[i] = ((int*)irqpriority)[i];
@@ -307,33 +274,62 @@ void system_init(void)
 
     gpio_init();
     clock_init();
-
-    /* TODO: these almost certainly shouldn't be here */
-    set_pll_frequency(0, 192000000);    /* drives CPU */
-    set_pll_frequency(1, 216000000);    /* drives LCD PXCLK - divided by 2 */
 }
 #endif
 
 
 void system_reboot(void)
 {
-    #warning function not implemented
+    SWRESET = -1;
 }
 
 int system_memory_guard(int newmode)
 {
-    #warning function not implemented
-    
     (void)newmode;
     return 0;
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 
+/* Note: This is not currently enabled because switching seems to 
+   cause an occasional freeze. To be investigated. */
+
 void set_cpu_frequency(long frequency)
 {
-    #warning function not implemented
-    (void)frequency;
+    /* CPU/COP frequencies can be scaled between Fbus (min) and Fsys (max).
+       Fbus should not be set below ~32Mhz with LCD enabled or the display
+       will be garbled. */
+    if (frequency == CPUFREQ_MAX)
+    {
+        /* 192Mhz:
+           Fsys = PLL0 (192Mhz)
+           Fbus = Fsys/2
+           CPU = Fsys, COP = Fsys */
+        CLKCTRL = (1<<31) | (0xFF<<12) | (1<<4);
+    }
+    else if (frequency == CPUFREQ_NORMAL)
+    {
+        /* 48Mhz:
+           Fsys = PLL0 (192Mhz)
+           Fbus = Fsys/4
+           CPU = Fbus, COP = Fbus */
+        CLKCTRL = (1<<31) | (3<<28) | (3<<4);
+    }
+    else
+    {
+        /* 32Mhz:
+           Fsys = PLL0 (192Mhz)
+           Fbus = Fsys/6
+           CPU = Fbus, COP = Fbus */
+        CLKCTRL = (1<<31) | (3<<28) | (5<<4);
+    }
+
+    asm volatile (
+        "nop      \n\t"
+        "nop      \n\t"
+    );
+
+    cpu_frequency = frequency;
 }
 
 #endif

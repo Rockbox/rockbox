@@ -119,10 +119,10 @@
 #define HAVE_ATA_POWER_OFF
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ      192000000
+#define CPU_FREQ 48000000
 
 /* Define this if you have adjustable CPU frequency */
-#define HAVE_ADJUSTABLE_CPU_FREQ
+/* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
