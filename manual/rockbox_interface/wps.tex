@@ -133,9 +133,11 @@ your WPS (While Playing Screen).
   \item [The clip indicator:]
     This is a little black block that is displayed at the very right of the
     scale when an overflow occurs. It usually does not show up during normal
-    playback unless you play an audio file that is distorted heavily. If you
-    encounter clipping while recording, your recording will sound distorted. You
-    should lower the gain. 
+    playback unless you play an audio file that is distorted heavily.
+    \opt{recording}{
+      If you encounter clipping while recording, your recording will sound distorted.
+      You should lower the gain.
+    }
     \note{Note that the clip detection is not very precise.
      Clipping might occur without being indicated.}
   \item [The scale:]
