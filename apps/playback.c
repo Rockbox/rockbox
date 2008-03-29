@@ -1844,7 +1844,6 @@ buffer_full:
 
 static void audio_fill_file_buffer(bool start_play, size_t offset)
 {
-    struct queue_event ev;
     bool had_next_track = audio_next_track() != NULL;
     bool continue_buffering;
 
@@ -1871,7 +1870,7 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
     continue_buffering = audio_load_track(offset, start_play);
     do {
         sleep(1);
-        if (queue_peek(&audio_queue, &ev))
+        if (!queue_empty(&audio_queue))
             /* There's a message in the queue. break the loop to treat it */
             break;
         continue_buffering = audio_load_track(0, false);
