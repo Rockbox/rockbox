@@ -64,10 +64,7 @@
 #include "tagtree.h"
 #endif
 #include "cuesheet.h"
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
-#endif
 
 static int context;
 static char* selected_file = NULL;

@@ -51,10 +51,7 @@
 #include "yesno.h"
 #include "list.h"
 #include "plugin.h"
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
-#endif
 
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350

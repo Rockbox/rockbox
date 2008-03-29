@@ -56,6 +56,7 @@
 #include "pcmbuf.h"
 #include "list.h"
 #include "yesno.h"
+#include "backdrop.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include <bitmaps/usblogo.h>
@@ -70,10 +71,6 @@
 #endif
 #if CONFIG_CODEC == SWCODEC
 #include "dsp.h"
-#endif
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
-#include "backdrop.h"
 #endif
 
 #ifdef HAVE_LCD_BITMAP

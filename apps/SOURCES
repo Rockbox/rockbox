@@ -70,7 +70,7 @@ gui/wps_debug.c
 gui/wps_parser.c
 gui/viewport.c
 
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 gui/backdrop.c
 #endif
 

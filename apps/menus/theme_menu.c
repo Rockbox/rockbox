@@ -34,10 +34,7 @@
 #include "color_picker.h"
 #include "lcd.h"
 #include "lcd-remote.h"
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
-#endif
 #include "exported_menus.h"
 
 #if LCD_DEPTH > 1

@@ -47,9 +47,7 @@
 #include "bmp.h"
 #endif
 
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
-#endif
 
 #endif
 
@@ -329,7 +327,7 @@ static const struct wps_tag all_tags[] = {
 
     { WPS_NO_TOKEN,                       "V",   0,    parse_viewport      },
 
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     { WPS_TOKEN_IMAGE_BACKDROP,           "X",   0,    parse_image_special },
 #endif
 #endif
@@ -1425,7 +1423,7 @@ static bool load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
         }
     }
 
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     if (bmp_names[BACKDROP_BMP])
     {
         get_image_filename(bmp_names[BACKDROP_BMP], bmpdir,

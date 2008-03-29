@@ -49,9 +49,7 @@
 #include "radio.h"
 #endif
 
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
-#endif
 
 int ft_build_playlist(struct tree_context* c, int start_index)
 {

@@ -34,11 +34,7 @@
 #include "color_picker.h"
 #include "lcd.h"
 #include "lcd-remote.h"
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
-#endif
-
 
 #ifdef HAVE_BACKLIGHT
 int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)

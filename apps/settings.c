@@ -63,10 +63,7 @@
 #include "settings_list.h"
 #include "filetypes.h"
 #include "option_select.h"
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
-#endif
 
 #if CONFIG_TUNER
 #include "radio.h"

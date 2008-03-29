@@ -56,10 +56,7 @@
 #include "cuesheet.h"
 #include "ata_idle_notify.h"
 #include "root_menu.h"
-
-#if (LCD_DEPTH > 1) || (defined(HAVE_LCD_REMOTE) && (LCD_REMOTE_DEPTH > 1))
 #include "backdrop.h"
-#endif
 
 /* currently only on wps_state is needed */
 struct wps_state wps_state;
