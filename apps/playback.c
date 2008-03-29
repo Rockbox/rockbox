@@ -1848,6 +1848,7 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
     bool continue_buffering;
 
     filling = STATE_FILLING;
+    trigger_cpu_boost();
 
     /* No need to rebuffer if there are track skips pending. */
     if (ci.new_track != 0)
@@ -2357,7 +2358,9 @@ static void audio_thread(void)
 
     while (1)
     {
-        cancel_cpu_boost();
+        if (filling != STATE_FILLING)
+            cancel_cpu_boost();
+
         if (!pcmbuf_queue_scan(&ev))
             queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
 

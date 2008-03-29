@@ -1338,8 +1338,10 @@ void buffering_thread(void)
 
     while (true)
     {
-        cancel_cpu_boost();
-        queue_wait_w_tmo(&buffering_queue, &ev, filling?5:HZ/2);
+        if (!filling)
+            cancel_cpu_boost();
+
+        queue_wait_w_tmo(&buffering_queue, &ev, filling ? 5 : HZ/2);
 
         switch (ev.id)
         {
