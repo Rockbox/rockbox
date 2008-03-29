@@ -1466,7 +1466,7 @@ void buffering_init(void)
     queue_init(&buffering_queue, true);
     buffering_thread_p = create_thread( buffering_thread, buffering_stack,
             sizeof(buffering_stack), CREATE_THREAD_FROZEN,
-            buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING-1)
+            buffering_thread_name IF_PRIO(, PRIORITY_BUFFERING)
             IF_COP(, CPU));
 
     queue_enable_queue_send(&buffering_queue, &buffering_queue_sender_list,

@@ -46,11 +46,11 @@
 #define PRIORITY_REALTIME_3      3
 #define PRIORITY_REALTIME_4      4
 #define PRIORITY_REALTIME        4   /* Lowest realtime range */
+#define PRIORITY_BUFFERING       15  /* Codec buffering thread */
 #define PRIORITY_USER_INTERFACE  16  /* The main thread */
 #define PRIORITY_RECORDING       16  /* Recording thread */
 #define PRIORITY_PLAYBACK        16  /* Variable between this and MAX */
 #define PRIORITY_PLAYBACK_MAX    5   /* Maximum allowable playback priority */
-#define PRIORITY_BUFFERING       16  /* Codec buffering thread */
 #define PRIORITY_SYSTEM          18  /* All other firmware threads */
 #define PRIORITY_BACKGROUND      20  /* Normal application threads */
 #define NUM_PRIORITIES           32
