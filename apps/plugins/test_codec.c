@@ -372,16 +372,6 @@ static void seek_complete(void)
     /* Do nothing */
 }
 
-
-/* Calculate mp3 seek position from given time data in ms. */
-static off_t mp3_get_filepos(int newtime)
-{
-    /* We don't ask the codec to seek, so no need to implement this. */
-    (void)newtime;
-    return 0;
-}
-
-
 /* Request file change from file buffer. Returns true is next
    track is available and changed. If return value is false,
    codec should exit immediately with PLUGIN_OK status. */
@@ -448,7 +438,6 @@ static void init_ci(void)
     ci.advance_buffer_loc = advance_buffer_loc;
     ci.seek_buffer = seek_buffer;
     ci.seek_complete = seek_complete;
-    ci.mp3_get_filepos = mp3_get_filepos;
     ci.request_next_track = request_next_track;
     ci.discard_codec = discard_codec;
     ci.set_offset = set_offset;
