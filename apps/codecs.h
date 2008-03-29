@@ -80,12 +80,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 23
+#define CODEC_API_VERSION 24
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 23
+#define CODEC_MIN_API_VERSION 24
 
 /* codec return codes */
 enum codec_status {
@@ -146,8 +146,6 @@ struct codec_api {
     bool (*seek_buffer)(size_t newpos);
     /* Codec should call this function when it has done the seeking. */
     void (*seek_complete)(void);
-    /* Calculate mp3 seek position from given time data in ms. */
-    off_t (*mp3_get_filepos)(int newtime);
     /* Request file change from file buffer. Returns true is next
        track is available and changed. If return value is false,
        codec should exit immediately with PLUGIN_OK status. */

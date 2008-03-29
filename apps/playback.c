@@ -1042,71 +1042,6 @@ static void codec_advance_buffer_loc_callback(void *ptr)
     codec_advance_buffer_callback(amount);
 }
 
-/* Copied from mpeg.c. Should be moved somewhere else. */
-static int codec_get_file_pos(void)
-{
-    int pos = -1;
-    struct mp3entry *id3 = audio_current_track();
-
-    if (id3->vbr)
-    {
-        if (id3->has_toc)
-        {
-            /* Use the TOC to find the new position */
-            unsigned int percent, remainder;
-            int curtoc, nexttoc, plen;
-
-            percent = (id3->elapsed*100)/id3->length;
-            if (percent > 99)
-                percent = 99;
-
-            curtoc = id3->toc[percent];
-
-            if (percent < 99)
-                nexttoc = id3->toc[percent+1];
-            else
-                nexttoc = 256;
-
-            pos = (id3->filesize/256)*curtoc;
-
-            /* Use the remainder to get a more accurate position */
-            remainder   = (id3->elapsed*100)%id3->length;
-            remainder   = (remainder*100)/id3->length;
-            plen        = (nexttoc - curtoc)*(id3->filesize/256);
-            pos        += (plen/100)*remainder;
-        }
-        else
-        {
-            /* No TOC exists, estimate the new position */
-            pos = (id3->filesize / (id3->length / 1000)) *
-                (id3->elapsed / 1000);
-        }
-    }
-    else if (id3->bitrate)
-        pos = id3->elapsed * (id3->bitrate / 8);
-    else
-        return -1;
-
-    pos += id3->first_frame_offset;
-
-    /* Don't seek right to the end of the file so that we can
-       transition properly to the next song */
-    if (pos >= (int)(id3->filesize - id3->id3v1len))
-        pos = id3->filesize - id3->id3v1len - 1;
-
-    return pos;
-}
-
-static off_t codec_mp3_get_filepos_callback(int newtime)
-{
-    off_t newpos;
-
-    curtrack_id3.elapsed = newtime;
-    newpos = codec_get_file_pos();
-
-    return newpos;
-}
-
 static void codec_seek_complete_callback(void)
 {
     logf("seek_complete");
@@ -2577,7 +2512,6 @@ void audio_init(void)
     ci.advance_buffer      = codec_advance_buffer_callback;
     ci.advance_buffer_loc  = codec_advance_buffer_loc_callback;
     ci.request_next_track  = codec_request_next_track_callback;
-    ci.mp3_get_filepos     = codec_mp3_get_filepos_callback;
     ci.seek_buffer         = codec_seek_buffer_callback;
     ci.seek_complete       = codec_seek_complete_callback;
     ci.set_elapsed         = codec_set_elapsed_callback;

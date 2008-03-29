@@ -86,7 +86,6 @@ struct codec_api ci = {
     NULL, /* advance_buffer_loc */
     NULL, /* seek_buffer */
     NULL, /* seek_complete */
-    NULL, /* mp3_get_filepos */
     NULL, /* request_next_track */
     NULL, /* discard_codec */
     NULL, /* set_offset */

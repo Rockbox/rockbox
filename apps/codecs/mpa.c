@@ -58,6 +58,57 @@ void init_mad(void)
     stream.main_data = &mad_main_data;
 }
 
+int get_file_pos(int newtime)
+{
+    int pos = -1;
+    struct mp3entry *id3 = ci->id3;
+
+    if (id3->vbr) {
+        if (id3->has_toc) {
+            /* Use the TOC to find the new position */
+            unsigned int percent, remainder;
+            int curtoc, nexttoc, plen;
+
+            percent = (newtime*100) / id3->length;
+            if (percent > 99)
+                percent = 99;
+
+            curtoc = id3->toc[percent];
+
+            if (percent < 99) {
+                nexttoc = id3->toc[percent+1];
+            } else {
+                nexttoc = 256;
+            }
+
+            pos = (id3->filesize/256)*curtoc;
+
+            /* Use the remainder to get a more accurate position */
+            remainder   = (newtime*100) % id3->length;
+            remainder   = (remainder*100) / id3->length;
+            plen        = (nexttoc - curtoc)*(id3->filesize/256);
+            pos        += (plen/100)*remainder;
+        } else {
+            /* No TOC exists, estimate the new position */
+            pos = (id3->filesize / (id3->length / 1000)) *
+                (newtime / 1000);
+        }
+    } else if (id3->bitrate) {
+        pos = newtime * (id3->bitrate / 8);
+    } else {
+        return -1;
+    }
+
+    pos += id3->first_frame_offset;
+
+    /* Don't seek right to the end of the file so that we can
+       transition properly to the next song */
+    if (pos >= (int)(id3->filesize - id3->id3v1len))
+        pos = id3->filesize - id3->id3v1len - 1;
+
+    return pos;
+}
+
 /* this is the codec entry point */
 enum codec_status codec_main(void)
 {
@@ -146,7 +197,7 @@ next_track:
                 newpos = ci->id3->first_frame_offset;
                 samples_to_skip = start_skip;
             } else {
-                newpos = ci->mp3_get_filepos(ci->seek_time-1);
+                newpos = get_file_pos(ci->seek_time-1);
                 samples_to_skip = 0;
             }
 
