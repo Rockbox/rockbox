@@ -66,7 +66,7 @@ void eq_precut_format(char* buffer, size_t buffer_size, int value, const char* u
 /*
  * Settings functions
  */
-void eq_apply(void)
+static void eq_apply(void)
 {
     int i;
     dsp_set_eq(global_settings.eq_enabled); 
@@ -76,37 +76,52 @@ void eq_apply(void)
         dsp_set_eq_coefs(i);
     }
 }
-int enable_callback(int action, const struct menu_item_ex *this_item)
-{
-    (void)this_item;
-    if (action == ACTION_EXIT_MENUITEM)
-        eq_apply();
-    return action;
-}
-MENUITEM_SETTING(eq_enable, &global_settings.eq_enabled, enable_callback);
-MENUITEM_SETTING(eq_precut, &global_settings.eq_precut, enable_callback);
 
-int dsp_set_coefs_callback(int action, const struct menu_item_ex *this_item)
+static int eq_setting_callback(int action, const struct menu_item_ex *this_item)
 {
-    (void)this_item;
-    if (action == ACTION_EXIT_MENUITEM)
+    switch (action)
     {
-        /* for now, set every band... figure out a better way later */
-        int i=0;
-        for (i=0; i<5; i++)
-            dsp_set_eq_coefs(i);
+        case ACTION_ENTER_MENUITEM:
+            action = lowlatency_callback(action, this_item);
+            break;
+        case ACTION_EXIT_MENUITEM:
+            eq_apply();
+            action = lowlatency_callback(action, this_item);
+            break;
     }
+
     return action;
 }
+MENUITEM_SETTING(eq_enable, &global_settings.eq_enabled, eq_setting_callback);
+MENUITEM_SETTING(eq_precut, &global_settings.eq_precut, eq_setting_callback);
 
-char* gainitem_get_name(int selected_item, void * data, char *buffer)
+MENUITEM_SETTING(cutoff_0, &global_settings.eq_band0_cutoff, eq_setting_callback);
+MENUITEM_SETTING(cutoff_1, &global_settings.eq_band1_cutoff, eq_setting_callback);
+MENUITEM_SETTING(cutoff_2, &global_settings.eq_band2_cutoff, eq_setting_callback);
+MENUITEM_SETTING(cutoff_3, &global_settings.eq_band3_cutoff, eq_setting_callback);
+MENUITEM_SETTING(cutoff_4, &global_settings.eq_band4_cutoff, eq_setting_callback);
+
+MENUITEM_SETTING(q_0, &global_settings.eq_band0_q, eq_setting_callback);
+MENUITEM_SETTING(q_1, &global_settings.eq_band1_q, eq_setting_callback);
+MENUITEM_SETTING(q_2, &global_settings.eq_band2_q, eq_setting_callback);
+MENUITEM_SETTING(q_3, &global_settings.eq_band3_q, eq_setting_callback);
+MENUITEM_SETTING(q_4, &global_settings.eq_band4_q, eq_setting_callback);
+
+MENUITEM_SETTING(gain_0, &global_settings.eq_band0_gain, eq_setting_callback);
+MENUITEM_SETTING(gain_1, &global_settings.eq_band1_gain, eq_setting_callback);
+MENUITEM_SETTING(gain_2, &global_settings.eq_band2_gain, eq_setting_callback);
+MENUITEM_SETTING(gain_3, &global_settings.eq_band3_gain, eq_setting_callback);
+MENUITEM_SETTING(gain_4, &global_settings.eq_band4_gain, eq_setting_callback);
+
+static char* gainitem_get_name(int selected_item, void * data, char *buffer)
 {
     (void)selected_item;
     int *setting = (int*)data;
     snprintf(buffer, MAX_PATH, str(LANG_EQUALIZER_GAIN_ITEM), *setting);
     return buffer;
 }
-int gainitem_speak_item(int selected_item, void * data)
+
+static int gainitem_speak_item(int selected_item, void * data)
 {
     (void)selected_item;
     int *setting = (int*)data;
@@ -115,31 +130,15 @@ int gainitem_speak_item(int selected_item, void * data)
     return 0;
 }
 
-int do_option(void* param)
+static int do_option(void * param)
 {
     const struct menu_item_ex *setting = (const struct menu_item_ex*)param;
+    lowlatency_callback(ACTION_ENTER_MENUITEM, setting);
     do_setting_from_menu(setting);
     eq_apply();
+    lowlatency_callback(ACTION_EXIT_MENUITEM, setting);
     return 0;
 }
-
-MENUITEM_SETTING(cutoff_0, &global_settings.eq_band0_cutoff, dsp_set_coefs_callback);
-MENUITEM_SETTING(cutoff_1, &global_settings.eq_band1_cutoff, dsp_set_coefs_callback);
-MENUITEM_SETTING(cutoff_2, &global_settings.eq_band2_cutoff, dsp_set_coefs_callback);
-MENUITEM_SETTING(cutoff_3, &global_settings.eq_band3_cutoff, dsp_set_coefs_callback);
-MENUITEM_SETTING(cutoff_4, &global_settings.eq_band4_cutoff, dsp_set_coefs_callback);
-
-MENUITEM_SETTING(q_0, &global_settings.eq_band0_q, dsp_set_coefs_callback);
-MENUITEM_SETTING(q_1, &global_settings.eq_band1_q, dsp_set_coefs_callback);
-MENUITEM_SETTING(q_2, &global_settings.eq_band2_q, dsp_set_coefs_callback);
-MENUITEM_SETTING(q_3, &global_settings.eq_band3_q, dsp_set_coefs_callback);
-MENUITEM_SETTING(q_4, &global_settings.eq_band4_q, dsp_set_coefs_callback);
-
-MENUITEM_SETTING(gain_0, &global_settings.eq_band0_gain, dsp_set_coefs_callback);
-MENUITEM_SETTING(gain_1, &global_settings.eq_band1_gain, dsp_set_coefs_callback);
-MENUITEM_SETTING(gain_2, &global_settings.eq_band2_gain, dsp_set_coefs_callback);
-MENUITEM_SETTING(gain_3, &global_settings.eq_band3_gain, dsp_set_coefs_callback);
-MENUITEM_SETTING(gain_4, &global_settings.eq_band4_gain, dsp_set_coefs_callback);
 
 MENUITEM_FUNCTION_DYNTEXT(gain_item_0, MENU_FUNC_USEPARAM,
                           do_option, (void*)&gain_0, 
@@ -170,14 +169,16 @@ static const struct menu_item_ex *band_items[3][3] = {
     { &cutoff_2, &q_2, &gain_2 },
     { &cutoff_3, &q_3, &gain_3 }
 };
-char* centerband_get_name(int selected_item, void * data, char *buffer)
+
+static char* centerband_get_name(int selected_item, void * data, char *buffer)
 {
     (void)selected_item;
     int band = (intptr_t)data;
     snprintf(buffer, MAX_PATH, str(LANG_EQUALIZER_BAND_PEAK), band);
     return buffer;
 }
-int centerband_speak_item(int selected_item, void * data)
+
+static int centerband_speak_item(int selected_item, void * data)
 {
     (void)selected_item;
     int band = (intptr_t)data;
@@ -185,7 +186,8 @@ int centerband_speak_item(int selected_item, void * data)
     talk_number(band, true);
     return 0;
 }
-int do_center_band_menu(void* param)
+
+static int do_center_band_menu(void* param)
 {
     int band = (intptr_t)param;
     struct menu_item_ex menu;
@@ -202,6 +204,7 @@ int do_center_band_menu(void* param)
     do_menu(&menu, NULL, NULL, false);
     return 0;
 }
+
 MAKE_MENU(band_0_menu, ID2P(LANG_EQUALIZER_BAND_LOW_SHELF), NULL, 
             Icon_EQ, &cutoff_0, &q_0, &gain_0);
 MENUITEM_FUNCTION_DYNTEXT(band_1_menu, MENU_FUNC_USEPARAM,
@@ -586,6 +589,7 @@ bool eq_menu_graphical(void)
         screens[i].setfont(FONT_UI);
         screens[i].clear_display();
     }
+
     return result;
 }
 
@@ -609,14 +613,15 @@ bool eq_browse_presets(void)
 }
 
 MENUITEM_FUNCTION(eq_graphical, 0, ID2P(LANG_EQUALIZER_GRAPHICAL),
-                    (int(*)(void))eq_menu_graphical, NULL, NULL, 
+                    (int(*)(void))eq_menu_graphical, NULL, lowlatency_callback, 
                     Icon_EQ);
 MENUITEM_FUNCTION(eq_save, 0, ID2P(LANG_EQUALIZER_SAVE),
                     (int(*)(void))eq_save_preset, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(eq_browse, 0, ID2P(LANG_EQUALIZER_BROWSE),
-                    (int(*)(void))eq_browse_presets, NULL, NULL, Icon_NOICON);
+                    (int(*)(void))eq_browse_presets, NULL, lowlatency_callback,
+                    Icon_NOICON);
 
-MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), lowlatency_callback, Icon_EQ,
+MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), NULL, Icon_EQ,
         &eq_enable, &eq_graphical, &eq_precut, &gain_menu, 
         &advanced_eq_menu_, &eq_save, &eq_browse);
 
