@@ -620,19 +620,18 @@ target/arm/s3c2440/gigabeat-fx/adc-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/ata-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/backlight-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/button-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/i2c-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/kernel-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/lcd-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/power-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/powermgmt-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/sc606-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/usb-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
-target/arm/s3c2440/gigabeat-fx/dma_start.c
 target/arm/s3c2440/gigabeat-fx/system-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/usb-meg-fx.c
 #ifndef BOOTLOADER
+target/arm/s3c2440/gigabeat-fx/i2c-meg-fx.c
 target/arm/s3c2440/gigabeat-fx/pcm-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/powermgmt-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
+target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
 #endif
 #endif /* SIMULATOR */
 #endif /* GIGABEAT_F */
