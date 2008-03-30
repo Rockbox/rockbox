@@ -31,6 +31,9 @@
 #define ID_LARGE                0x80
 #define ID_SAMPLE_RATE          0x27
 
+#define MONO_FLAG       4
+#define HYBRID_FLAG     8
+
 static const long wavpack_sample_rates [] = 
 {
      6000,  8000,  9600, 11025, 12000, 16000,  22050, 24000, 
@@ -48,7 +51,7 @@ bool get_wavpack_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;
-    uint32_t totalsamples, blocksamples;
+    uint32_t totalsamples, blocksamples, flags;
     int i;
 
     for (i = 0; i < 256; ++i) {
@@ -74,8 +77,9 @@ bool get_wavpack_metadata(int fd, struct mp3entry* id3)
     id3->filesize = filesize (fd);
     totalsamples = get_long_le(&buf[12]);
     blocksamples = get_long_le(&buf[20]);
+    flags = get_long_le(&buf[24]);
 
-    if (blocksamples && totalsamples != (uint32_t) -1) {
+    if (blocksamples) {
         int srindx = ((buf [26] >> 7) & 1) + ((buf [27] << 1) & 14);
 
         if (srindx == 15) {
@@ -114,9 +118,23 @@ bool get_wavpack_metadata(int fd, struct mp3entry* id3)
         else
             id3->frequency = wavpack_sample_rates[srindx];
 
+        /* if the total number of samples is unknown, make a guess on the high side (for now) */
+
+        if (totalsamples == (uint32_t) -1) {
+            totalsamples = filesize (fd) * 3;
+
+            if (!(flags & HYBRID_FLAG))
+                totalsamples /= 2;
+
+            if (!(flags & MONO_FLAG))
+                totalsamples /= 2;
+        }
+
         id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
         id3->bitrate = filesize (fd) / (id3->length / 8);
+
+        return true;
     }
 
-    return true;
+    return false;
 }
