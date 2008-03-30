@@ -19,79 +19,55 @@
 #include "system.h"
 #include "i2c-meg-fx.h"
 
-/* Only implements sending bytes for now. Adding receiving bytes should be
-   straightforward if needed. No yielding is present since the calls only
-   involve setting audio codec registers - a very rare event. */
-
-/* Wait for a condition on the bus, optionally returning it */
-#define COND_RET    _c;
-#define COND_VOID
-#define WAIT_COND(cond, ret)                        \
-    ({                                              \
-        int _t = current_tick + 2;                  \
-        bool _c;                                    \
-        while (1) {                                 \
-            _c = !!(cond);                          \
-            if (_c || TIME_AFTER(current_tick, _t)) \
-                break;                              \
-        }                                           \
-        ret                                         \
-    })
-
-static int i2c_getack(void)
-{
-    /* Wait for ACK: 0 = ack received, 1 = ack not received */
-    WAIT_COND(IICCON & I2C_TXRX_INTPND, COND_VOID);
-    return IICSTAT & I2C_ACK_L;
-}
-
-static int i2c_start(void)
-{
-    /* Generate START */
-    IICSTAT = I2C_MODE_MASTER | I2C_MODE_TX | I2C_START | I2C_RXTX_ENB;
-    return i2c_getack();
-}
+static struct wakeup i2c_wake; /* Transfer completion signal */
+static struct mutex i2c_mtx;   /* Mutual exclusion */
+static unsigned char *buf_ptr; /* Next byte to transfer */
+static int buf_count;          /* Number of bytes remaining to transfer */
 
 static void i2c_stop(void)
 {
     /* Generate STOP */
     IICSTAT = I2C_MODE_MASTER | I2C_MODE_TX | I2C_RXTX_ENB;
-    /* Clear pending interrupt to continue */
-    IICCON &= ~I2C_TXRX_INTPND;
-}
 
-static int i2c_outb(unsigned char byte)
-{
-    /* Write byte to shift register */
-    IICDS = byte;
-    /* Clear pending interrupt to continue */
-    IICCON &= ~I2C_TXRX_INTPND;
-    return i2c_getack();
+    /* No more interrupts, clear pending interrupt to continue */
+    IICCON &= ~(I2C_TXRX_INTPND | I2C_TXRX_INTENB);
 }
 
 void i2c_write(int addr, const unsigned char *buf, int count)
 {
+    if (count <= 0)
+        return;
+
+    mutex_lock(&i2c_mtx);
+
     /* Turn on I2C clock */
     CLKCON |= (1 << 16);
 
     /* Set mode to master transmitter and enable lines */
     IICSTAT = I2C_MODE_MASTER | I2C_MODE_TX | I2C_RXTX_ENB;
 
-    /* Wait for bus to be available */
-    if (WAIT_COND(!(IICSTAT & I2C_BUSY), COND_RET))
+    /* Set buffer start and count */
+    buf_ptr = (unsigned char *)buf;
+    buf_count = count;
+
+    /* Send slave address and then data */
+    SRCPND = IIC_MASK;
+    INTPND = IIC_MASK;
+
+    IICCON |= I2C_TXRX_INTENB;
+
+    /* Load slave address into shift register */
+    IICDS = addr & 0xfe;
+
+    /* Generate START */
+    IICSTAT = I2C_MODE_MASTER | I2C_MODE_TX | I2C_START | I2C_RXTX_ENB;
+
+    if (wakeup_wait(&i2c_wake, HZ) != WAIT_SUCCEEDED)
     {
-        /* Send slave address and then data */
-        IICCON &= ~I2C_TXRX_INTPND;
-        IICCON |= I2C_TXRX_INTENB;
-
-        IICDS = addr & 0xfe;
-
-        if (i2c_start() == 0)
-            while (count-- > 0 && i2c_outb(*buf++) == 0);
-
+        /* Something went wrong - stop transmission */
+        int oldlevel = disable_irq_save();
         i2c_stop();
-
-        IICCON &= ~I2C_TXRX_INTENB;
+        restore_irq(oldlevel);
     }
 
     /* Go back to slave receive mode and disable lines */
@@ -99,12 +75,23 @@ void i2c_write(int addr, const unsigned char *buf, int count)
 
     /* Turn off I2C clock */
     CLKCON &= ~(1 << 16);
+
+    mutex_unlock(&i2c_mtx);
 }
 
 void i2c_init(void)
 {
-    /* We poll I2C interrupts */
-    INTMSK |= (1 << 27);
+    /* Init kernel objects */
+    wakeup_init(&i2c_wake);
+    mutex_init(&i2c_mtx);
+
+    /* Clear pending source */
+    SRCPND = IIC_MASK;
+    INTPND = IIC_MASK;
+
+    /* Enable i2c interrupt in controller */
+    INTMOD &= ~IIC_MASK;
+    INTMSK &= ~IIC_MASK;
 
     /* Turn on I2C clock */
     CLKCON |= (1 << 16);
@@ -122,4 +109,34 @@ void i2c_init(void)
 
     /* Turn off I2C clock */
     CLKCON &= ~(1 << 16);
+}
+
+void IIC(void)
+{
+    for (;;)
+    {
+        /* If ack was received from last byte and bytes are remaining */
+        if (--buf_count >= 0 && (IICSTAT & I2C_ACK_L) == 0)
+        {
+            /* Write next byte to shift register */
+            IICDS = *buf_ptr++;
+
+            /* Clear pending interrupt to continue */
+            IICCON &= ~I2C_TXRX_INTPND;
+            break;
+        }
+
+        /* Finished */
+
+        /* Generate STOP */
+        i2c_stop();
+
+        /* Signal thread */
+        wakeup_signal(&i2c_wake);
+        break;
+    }
+
+    /* Ack */
+    SRCPND = IIC_MASK;
+    INTPND = IIC_MASK;
 }
