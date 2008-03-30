@@ -1233,7 +1233,11 @@ static void codec_thread(void)
 
     while (1) {
         status = 0;
-        cancel_cpu_boost();
+        
+        if (!pcmbuf_is_crossfade_active()) {
+            cancel_cpu_boost();
+        }
+            
         queue_wait(&codec_queue, &ev);
         codec_requested_stop = false;
 
