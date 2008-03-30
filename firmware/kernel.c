@@ -1368,3 +1368,81 @@ void event_set_state(struct event *e, unsigned int state)
 #endif
 }
 #endif /* HAVE_EVENT_OBJECTS */
+
+
+#ifdef HAVE_WAKEUP_OBJECTS
+/****************************************************************************
+ * Lightweight IRQ-compatible wakeup object
+ */
+
+/* Initialize the wakeup object */
+void wakeup_init(struct wakeup *w)
+{
+    w->queue = NULL;
+    w->signalled = 0;
+    IF_COP( corelock_init(&w->cl); )
+}
+
+/* Wait for a signal blocking indefinitely or for a specified period */
+int wakeup_wait(struct wakeup *w, int timeout)
+{
+    int ret = WAIT_SUCCEEDED; /* Presume success */
+    int oldlevel = disable_irq_save();
+
+    corelock_lock(&w->cl);
+
+    if(w->signalled == 0 && timeout != TIMEOUT_NOBLOCK)
+    {
+        struct thread_entry * current = cores[CURRENT_CORE].running;
+
+        IF_COP( current->obj_cl = &w->cl; )
+        current->bqp = &w->queue;
+        
+        if (timeout != TIMEOUT_BLOCK)
+            block_thread_w_tmo(current, timeout);
+        else
+            block_thread(current);
+
+        corelock_unlock(&w->cl);
+        switch_thread();
+
+        oldlevel = disable_irq_save();
+        corelock_lock(&w->cl);
+    }
+
+    if(w->signalled == 0)
+    {
+        /* Timed-out or failed */
+        ret = (timeout != TIMEOUT_BLOCK) ? WAIT_TIMEDOUT : WAIT_FAILED;
+    }
+
+    w->signalled = 0;  /* Reset */
+
+    corelock_unlock(&w->cl);
+    restore_irq(oldlevel);
+
+    return ret;
+}
+
+/* Signal the thread waiting or leave the signal if the thread hasn't 
+ * waited yet.
+ *
+ * returns THREAD_NONE or THREAD_OK
+ */
+int wakeup_signal(struct wakeup *w)
+{
+    int oldlevel = disable_irq_save();
+    int ret;
+
+    corelock_lock(&w->cl);
+
+    w->signalled = 1;
+    ret = wakeup_thread(&w->queue);
+
+    corelock_unlock(&w->cl);
+    restore_irq(oldlevel);
+
+    return ret;
+}
+#endif /* HAVE_WAKEUP_OBJECTS */
+

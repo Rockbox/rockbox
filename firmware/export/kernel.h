@@ -78,6 +78,11 @@
 
 #define IS_SYSEVENT(ev)           ((ev & SYS_EVENT) == SYS_EVENT)
 
+#ifndef TIMEOUT_BLOCK
+#define TIMEOUT_BLOCK   -1
+#define TIMEOUT_NOBLOCK  0
+#endif
+
 struct queue_event
 {
     long     id;
@@ -178,6 +183,17 @@ struct event
 };
 #endif
 
+
+#ifdef HAVE_WAKEUP_OBJECTS
+struct wakeup
+{
+    struct thread_entry *queue;         /* waiter list */
+    unsigned char signalled;            /* signalled status */
+    IF_COP( struct corelock cl; )       /* multiprocessor sync */
+};
+#endif
+
+
 /* global tick variable */
 #if defined(CPU_PP) && defined(BOOTLOADER)
 /* We don't enable interrupts in the iPod bootloader, so we need to fake
@@ -225,6 +241,7 @@ void timeout_cancel(struct timeout *tmo);
 #define STATE_SIGNALED    1
 
 #define WAIT_TIMEDOUT     (-1)
+#define WAIT_FAILED       0
 #define WAIT_SUCCEEDED    1
 
 extern void queue_init(struct event_queue *q, bool register_queue);
@@ -273,5 +290,11 @@ extern void event_init(struct event *e, unsigned int flags);
 extern void event_wait(struct event *e, unsigned int for_state);
 extern void event_set_state(struct event *e, unsigned int state);
 #endif /* HAVE_EVENT_OBJECTS */
+
+#ifdef HAVE_WAKEUP_OBJECTS
+extern void wakeup_init(struct wakeup *w);
+extern int wakeup_wait(struct wakeup *w, int timeout);
+extern int wakeup_signal(struct wakeup *w);
+#endif /* HAVE_WAKEUP_OBJECTS */
 
 #endif /* _KERNEL_H_ */

@@ -335,6 +335,10 @@
 #endif /* SIMULATOR */
 #define HAVE_SEMAPHORE_OBJECTS
 #define HAVE_EVENT_OBJECTS
+
+#if defined (TOSHIBA_GIGABEAT_F) || defined (TOSHIBA_GIGABEAT_S)
+#define HAVE_WAKEUP_OBJECTS
+#endif
 #endif
 
 /* define for all cpus from SH family */
