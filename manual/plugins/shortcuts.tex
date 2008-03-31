@@ -1,0 +1,52 @@
+\subsection{Shortcuts}
+
+The Shortcuts Plugin allows you to jump to places within the file browser
+without having to navigate there manually. The plugin works with
+\fname{.link} files. A \fname{.link} file is just a text file with every
+line containing the name of the file or the directory you want to quickly
+jump to. All names should be full absolute names, i.e. they should start
+with a \fname{/}. Directory names should also end with a \fname{/}.
+
+\subsubsection{How to create \fname{.link} files}
+
+You can use your favourite text editor to create a \fname{.link} file on the
+PC an then copy the file to the \dap{}. Or you can use the context menu on
+either a file or a directory in the file browser tree, and use the "Add to
+shortcuts" menu option. This will append a line with the full name of the
+file or the directory to the \fname{shortcuts.link} file in the root
+directory of the \dap{}. (The file will be created if it does not exist
+yet.) You can later rename the automatically created \fname{shortcuts.link}
+file or move it to another directory if you wish. Subsequent calls of the
+context menu will create it again.
+
+
+\subsubsection{How to use \fname{.link} files, i.e. jump to desired places}
+
+To use a \fname{.link} file just ``play'' it from the file browser. This will
+show you a list with the entries in the file. Selecting one of them will
+then exit the plugin and leave you within the directory selected, or with
+the file selected in the file browser. You can then play the file or do
+with it whatever you want. The file will not be ``played'' automatically.
+
+If the \fname{.link} file contains only one entry no list will be shown, you
+will directly jump to that location. The file \fname{shortcuts.link} in the
+root directory is an exception. After ``playing'' it, the list will be shown
+even if the file contains just one entry.
+
+If the list you are seeing is from \fname{shortcuts.link} in the root
+directory, you can delete the selected entry by pressing \ActionStdMenu.
+Deleting entries from other \fname{.link} files is not possible.
+
+
+\subsubsection{Advanced Usage}
+
+Placing the line ``\#Display last path segments=n'' (where n is a number) in
+the beginning of a \fname{.link} file will leave just the last n segments of
+the entries when they are shown. For example, if n is chosen to be 1, then
+the entry \fname{/MyMusic/collection/song.mp3} will be shown as
+\fname{song.mp3}. This allows you to hide common path prefixes.
+
+You can also provide a custom display name for each entry individually. To
+do so, append a tabulator character after the entry's path followed by your
+custom name. That name will then be used for showing the entry. For example,
+\fname{/MyMusic/collection/song.mp3<TAB>My favourite song!}
