@@ -60,7 +60,7 @@ bool ide_powered(void)
 void power_off(void)
 {
     /* Disable interrupts on this core */
-    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+    disable_interrupt(IRQ_FIQ_STATUS);
 
     /* Mask them on both cores */
     CPU_INT_CLR = -1;

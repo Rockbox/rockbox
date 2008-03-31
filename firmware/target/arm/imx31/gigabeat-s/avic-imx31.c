@@ -125,8 +125,7 @@ void avic_set_int_priority(enum IMX31_INT_LIST ints,
 void avic_enable_int(enum IMX31_INT_LIST ints, enum INT_TYPE intstype,
                      unsigned long ni_priority, void (*handler)(void))
 {
-    int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED,
-                                         IRQ_FIQ_STATUS);
+    int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
 
     if (ints != ALL) /* No mass-enable allowed */
     {
@@ -136,7 +135,7 @@ void avic_enable_int(enum IMX31_INT_LIST ints, enum INT_TYPE intstype,
         avic_set_int_priority(ints, ni_priority);
     }
 
-    set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
+    restore_interrupt(oldstatus);
 }
 
 void avic_disable_int(enum IMX31_INT_LIST ints)
@@ -184,8 +183,7 @@ static void set_int_type(int i, enum INT_TYPE intstype)
 
 void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype)
 {
-    int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED,
-                                         IRQ_FIQ_STATUS);
+    int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
 
     if (ints == ALL)
     {
@@ -198,5 +196,5 @@ void avic_set_int_type(enum IMX31_INT_LIST ints, enum INT_TYPE intstype)
         set_int_type(ints, intstype);
     }
 
-    set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
+    restore_interrupt(oldstatus);
 }

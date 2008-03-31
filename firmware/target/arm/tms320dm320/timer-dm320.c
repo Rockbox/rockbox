@@ -76,7 +76,7 @@ static void stop_timer(void)
 
 bool __timer_register(void)
 {
-    int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+    int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
 
     stop_timer();
 
@@ -85,14 +85,14 @@ bool __timer_register(void)
 
     IO_INTC_EINT0 |= 1<<IRQ_TIMER0;
 
-    set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
+    restore_interrupt(oldstatus);
 
     return true;
 }
 
 void __timer_unregister(void)
 {
-    int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+    int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     stop_timer();
-    set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
+    restore_interrupt(oldstatus);
 }

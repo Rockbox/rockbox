@@ -28,7 +28,7 @@ void system_init(void)
 #ifdef BOOTLOADER
 void system_prepare_fw_start(void)
 {
-    set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+    disable_interrupt(IRQ_FIQ_STATUS);
     avic_disable_int(ALL);
     tick_stop();
 }

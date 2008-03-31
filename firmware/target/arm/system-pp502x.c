@@ -149,7 +149,7 @@ void scale_suspend_core(bool suspend)
 
     if (suspend)
     {
-        oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+        oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
         IF_COP( PROC_CTL(othercore) = 0x40000000; nop; )
         PROC_CTL(core) = 0x48000003; nop;
     }
@@ -157,7 +157,7 @@ void scale_suspend_core(bool suspend)
     {
         PROC_CTL(core) = 0x4800001f; nop;
         IF_COP( PROC_CTL(othercore) = 0x00000000; nop; )
-        set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
+        restore_interrupt(oldstatus);
     }
 }
 
