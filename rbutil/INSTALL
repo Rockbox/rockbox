@@ -19,13 +19,30 @@ This is Rockbox Utility, the graphical installer and housekeeping utility
 for Rockbox.
 
 Requirements:
+=============
 - Qt 4.3.0 or greater
+- at least the following folders from Rockbox svn:
+  o apps/
+  o rbutil/
+  o tools/
+- libusb (Linux, Mac)
 
 Building:
+=========
 - run qmake
 - run make
 The resulting binary will be located in the rbutilqt subfolder. If you have
 multiple versions of Qt installed make sure to pick the correct one.
+
+Installation / Deployment:
+==========================
+Rockbox Utility is build as all-in-one binary. This means for distribution
+you need:
+- rbutilqt (main binary)
+- rbutil_*.qm (translation files, optional)
+You don't need any other files like configuration files, especially 
+rbutil.ini which will get included into the binary.
+
 
 The website for Rockbox Utility is 
 http://www.rockbox.org/wiki/RockboxUtility
