@@ -291,11 +291,11 @@ int system_memory_guard(int newmode)
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 
-/* Note: This is not currently enabled because switching seems to 
-   cause an occasional freeze. To be investigated. */
-
 void set_cpu_frequency(long frequency)
 {
+    if (cpu_frequency == frequency)
+        return;
+    
     /* CPU/COP frequencies can be scaled between Fbus (min) and Fsys (max).
        Fbus should not be set below ~32Mhz with LCD enabled or the display
        will be garbled. */
@@ -325,6 +325,7 @@ void set_cpu_frequency(long frequency)
     }
 
     asm volatile (
+        "nop      \n\t"
         "nop      \n\t"
         "nop      \n\t"
     );

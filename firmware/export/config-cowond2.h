@@ -84,8 +84,7 @@
 #define HAVE_WM8985
 
 /* There is no hardware tone control */
-/* TODO: probably need to use this */
-//#define HAVE_SW_TONE_CONTROLS
+#define HAVE_SW_TONE_CONTROLS
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
@@ -122,7 +121,7 @@
 #define CPU_FREQ 48000000
 
 /* Define this if you have adjustable CPU frequency */
-/* #define HAVE_ADJUSTABLE_CPU_FREQ */
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
