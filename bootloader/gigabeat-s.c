@@ -150,7 +150,7 @@ void main(void)
     printf("kernel init done");
     int rc;
 
-    disable_interrupt(IRQ_FIQ_STATUS);
+    enable_interrupt(IRQ_FIQ_STATUS);
 
     rc = ata_init();
     if(rc)
