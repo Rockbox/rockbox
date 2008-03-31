@@ -183,10 +183,12 @@ static char* info_getname(int selected_item, void *data, char *buffer)
         case INFO_TIME:
             tm = get_time();
             snprintf(buffer, MAX_PATH, "%02d:%02d:%02d %s", 
-                global_settings.timeformat == 0 ? tm->tm_hour : tm->tm_hour-12,
-                tm->tm_min, 
-                tm->tm_sec, 
-                global_settings.timeformat == 0 ? "" : tm->tm_hour>11 ? "P" : "A");
+                global_settings.timeformat == 0 ? tm->tm_hour :
+                     ((tm->tm_hour + 11) % 12) + 1,
+                     tm->tm_min, 
+                     tm->tm_sec, 
+                     global_settings.timeformat == 0 ? "" :
+                     tm->tm_hour>11 ? "P" : "A");
             break;
         case INFO_DATE:
             tm = get_time();
