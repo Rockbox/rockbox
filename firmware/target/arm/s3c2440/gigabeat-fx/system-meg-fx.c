@@ -104,6 +104,24 @@ void memory_init(void) {
     enable_mmu();
 }
 
+void s3c_regmod(volatile int *reg, unsigned int set, unsigned int clr)
+{
+    int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
+    unsigned int val = *reg;
+    *reg = (val | set) & ~clr;
+    restore_interrupt(oldstatus);
+}
+
+void s3c_regset(volatile int *reg, unsigned int mask)
+{
+    s3c_regmod(reg, mask, 0);
+}
+
+void s3c_regclr(volatile int *reg, unsigned int mask)
+{
+    s3c_regmod(reg, 0, mask);
+}
+
 void system_init(void)
 {
     /* Disable interrupts and set all to IRQ mode */
@@ -146,7 +164,7 @@ void system_init(void)
 
         /* Turn off NAND flash controller */
         | (1 << 4)
-    
+
         );
     
     /* Turn off the USB PLL */

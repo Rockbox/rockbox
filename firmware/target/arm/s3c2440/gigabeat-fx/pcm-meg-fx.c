@@ -38,7 +38,7 @@ static struct
 } dma_play_lock =
 {
     .locked = 0,
-    .state  = (0<<19)
+    .state  = 0,
 };
 
 /* Last samplerate set by pcm_set_frequency */
@@ -71,22 +71,18 @@ void pcm_apply_settings(void)
     restore_fiq(status);
 }
 
-/* For the locks, DMA interrupt must be disabled because the handler
-   manipulates INTMSK and the operation is not atomic */
+/* Mask the DMA interrupt */
 void pcm_play_lock(void)
 {
-    int status = disable_fiq_save();
     if (++dma_play_lock.locked == 1)
-        INTMSK |= (1<<19); /* Mask the DMA interrupt */
-    restore_fiq(status);
+        s3c_regset(&INTMSK, DMA2_MASK);
 }
 
+/* Unmask the DMA interrupt if enabled */
 void pcm_play_unlock(void)
 {
-    int status = disable_fiq_save();
     if (--dma_play_lock.locked == 0)
-        INTMSK &= ~dma_play_lock.state; /* Unmask the DMA interrupt if enabled */
-    restore_fiq(status);
+        s3c_regclr(&INTMSK, dma_play_lock.state);
 }
 
 void pcm_play_dma_init(void)
@@ -110,11 +106,11 @@ void pcm_play_dma_init(void)
     /* Do not service DMA requests, yet */
 
     /* clear any pending int and mask it */
-    INTMSK |= (1<<19);
-    SRCPND = (1<<19);
+    s3c_regset(&INTMSK, DMA2_MASK);
+    SRCPND = DMA2_MASK;
 
     /* connect to FIQ */
-    INTMOD |= (1<<19);
+    s3c_regset(&INTMOD, DMA2_MASK);
 }
 
 void pcm_postinit(void)
@@ -127,7 +123,7 @@ void pcm_postinit(void)
 static void play_start_pcm(void)
 {
     /* clear pending DMA interrupt */
-    SRCPND = (1<<19);
+    SRCPND = DMA2_MASK;
 
     _pcm_apply_settings();
 
@@ -135,7 +131,7 @@ static void play_start_pcm(void)
     clean_dcache_range((void*)DISRC2, (DCON2 & 0xFFFFF) * 2);
 
     /* unmask DMA interrupt when unlocking */
-    dma_play_lock.state = (1<<19);
+    dma_play_lock.state = DMA2_MASK;
 
     /* turn on the request */
     IISCON |= (1<<5);
@@ -154,7 +150,7 @@ static void play_start_pcm(void)
 static void play_stop_pcm(void)
 {
     /* Mask DMA interrupt */
-    INTMSK |= (1<<19);
+    s3c_regset(&INTMSK, DMA2_MASK);
 
     /* De-Activate the DMA channel */
     DMASKTRIG2 = 0x4;
@@ -182,7 +178,7 @@ static void play_stop_pcm(void)
 void pcm_play_dma_start(const void *addr, size_t size)
 {
     /* Enable the IIS clock */
-    CLKCON |= (1<<17);
+    s3c_regset(&CLKCON, 1<<17);
 
     /* stop any DMA in progress - idle IIS */
     play_stop_pcm();
@@ -217,7 +213,7 @@ void pcm_play_dma_stop(void)
     play_stop_pcm();
 
     /* Disconnect the IIS clock */
-    CLKCON &= ~(1<<17);
+    s3c_regclr(&CLKCON, 1<<17);
 }
 
 void pcm_play_dma_pause(bool pause)
@@ -245,7 +241,7 @@ void fiq_handler(void)
     register pcm_more_callback_type get_more;   /* No stack for this */
 
     /* clear any pending interrupt */
-    SRCPND = (1<<19);
+    SRCPND = DMA2_MASK;
 
     /* Buffer empty.  Try to get more. */
     get_more = pcm_callback_for_more;

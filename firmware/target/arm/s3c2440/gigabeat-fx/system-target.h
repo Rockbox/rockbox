@@ -26,6 +26,15 @@
 #define CPUFREQ_NORMAL  98784000
 #define CPUFREQ_MAX    296352000
 
+/* Functions to set and clear regiser bits atomically */
+
+/* Set and clear register bits */
+void s3c_regmod(volatile int *reg, unsigned int set, unsigned int clr);
+/* Set register bits */
+void s3c_regset(volatile int *reg, unsigned int mask);
+/* Clear register bits */
+void s3c_regclr(volatile int *reg, unsigned int mask);
+
 #define HAVE_INVALIDATE_ICACHE
 static inline void invalidate_icache(void)
 {

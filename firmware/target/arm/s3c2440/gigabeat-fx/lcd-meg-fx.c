@@ -1,4 +1,5 @@
 #include "config.h"
+#include "system.h"
 #include "cpu.h"
 #include "string.h"
 #include "lcd.h"
@@ -81,7 +82,7 @@ void SPI_Send_Bytes(const unsigned char *array, int count)
 
 void Setup_LCD_SPI(void)
 {
-    CLKCON|=0x40000;
+    s3c_regset(&CLKCON, 0x40000);
     SPI_LCD_CS(false);
     SPCON0=0x3E;
     SPPRE0=24;
@@ -146,8 +147,8 @@ void lcd_init_device(void)
 #if !defined(BOOTLOADER)
     lcd_poweroff = false;
 #endif
-    
-    CLKCON  |= 0x20;       /* enable LCD clock */
+
+    s3c_regset(&CLKCON, 0x20);       /* enable LCD clock */
 
     Setup_LCD_SPI();
 
@@ -204,7 +205,7 @@ void lcd_init_device(void)
     SPI_Send_Bytes(initbuf, sizeof(initbuf));
     SPI_LCD_CS(false);
 
-    CLKCON  &= ~0x40000;    /* disable SPI clock */  
+    s3c_regclr(&CLKCON, 0x40000);    /* disable SPI clock */  
 }
 
 /* Update a fraction of the display. */

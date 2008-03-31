@@ -89,7 +89,7 @@ bool __timer_register(void)
 {
     bool retval = true;
 
-    int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+    int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
 
     stop_timer();
 
@@ -115,14 +115,14 @@ bool __timer_register(void)
         retval = false;
     }
 
-    set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
+    restore_interrupt(oldstatus);
 
     return retval;
 }
 
 void __timer_unregister(void)
 {
-    int oldstatus = set_interrupt_status(IRQ_FIQ_DISABLED, IRQ_FIQ_STATUS);
+    int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     stop_timer();
-    set_interrupt_status(oldstatus, IRQ_FIQ_STATUS);
+    restore_interrupt(oldstatus);
 }
