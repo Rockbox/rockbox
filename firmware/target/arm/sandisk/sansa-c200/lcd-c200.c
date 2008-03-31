@@ -27,6 +27,7 @@ static unsigned lcd_yuv_options NOCACHEBSS_ATTR = 0;
 
 /* LCD command set for Samsung S6B33B2 */
 
+#define R_NOP                  0x00
 #define R_OSCILLATION_MODE     0x02
 #define R_DRIVER_OUTPUT_MODE   0x10
 #define R_DCDC_SET             0x20
@@ -243,6 +244,11 @@ void lcd_blit_yuv(unsigned char * const src[3],
             lcd_send_command(y);
             lcd_send_command(y + 1);
 
+            /* NOP needed because on some c200s, the previous lcd_send_command
+               is interpreted as a separate command instead of part of
+               R_Y_ADDR_AREA. */
+            lcd_send_command(R_NOP);
+
             lcd_write_yuv420_lines_odither(yuv_src, width, stride, x, y);
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
             yuv_src[1] += stride >> 1; /* Skip down one chroma line */
@@ -258,6 +264,8 @@ void lcd_blit_yuv(unsigned char * const src[3],
             lcd_send_command(R_Y_ADDR_AREA);
             lcd_send_command(y);
             lcd_send_command(y + 1);
+
+            lcd_send_command(R_NOP);
 
             lcd_write_yuv420_lines(yuv_src, width, stride);
             yuv_src[0] += stride << 1; /* Skip down two luma lines */
@@ -304,9 +312,14 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_send_command(x);
         lcd_send_command(x + width - 1);
     }
+
     lcd_send_command(R_Y_ADDR_AREA);
     lcd_send_command(y + 0x1a);
     lcd_send_command(y + height - 1 + 0x1a);
+
+    /* NOP needed because on some c200s, the previous lcd_send_command is
+       interpreted as a separate command instead of part of R_Y_ADDR_AREA. */
+    lcd_send_command(R_NOP);
 
     do {
         int w = width;
