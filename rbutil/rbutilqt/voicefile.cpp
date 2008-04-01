@@ -91,11 +91,12 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
     // get the real file.
     getter = new HttpGet(this);
     getter->setFile(downloadFile);
-    getter->getFile(genlangUrl);
-
+    
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
     connect(m_logger, SIGNAL(aborted()), getter, SLOT(abort()));
+    
+    getter->getFile(genlangUrl);
     return true;
  }
 

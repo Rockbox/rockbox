@@ -55,6 +55,8 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     settings = new RbSettings();
     settings->open();
     
+    m_gotInfo = false;
+    
     // manual tab
     updateSettings();
     ui.radioPdf->setChecked(true);
@@ -186,6 +188,8 @@ void RbUtilQt::downloadBleedingDone(bool error)
     versmap.insert("bleed_rev", info.value("bleeding/rev").toString());
     versmap.insert("bleed_date", info.value("bleeding/timestamp").toString());
     qDebug() << "versmap =" << versmap;
+    
+    m_gotInfo = true;
 }
 
 
@@ -624,6 +628,14 @@ void RbUtilQt::installFonts()
 void RbUtilQt::installVoice()
 {
     if(chkConfig(true)) return;
+    
+    if(m_gotInfo == false)
+    {
+       QMessageBox::warning(this, tr("Warning"),
+       tr("The Application is still downloading Information about new Builds. Please try again shortly."));
+        return;    
+    }
+    
     if(QMessageBox::question(this, tr("Confirm Installation"),
        tr("Do you really want to install the voice file?"),
        QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
@@ -633,19 +645,17 @@ void RbUtilQt::installVoice()
 
     // create zip installer
     installer = new ZipInstaller(this);
-    installer->setUnzip(false);
-
-    QString voiceurl = settings->voiceUrl()  + "/" ;
+    
+    QString voiceurl = settings->voiceUrl();
     
     voiceurl += settings->curVoiceName() + "-" +
-        versmap.value("arch_date") + "-english.voice"; 
+        versmap.value("arch_date") + "-english.zip"; 
     qDebug() << voiceurl;
 
     installer->setUrl(voiceurl);
     installer->setLogSection("Voice");
     installer->setLogVersion(versmap.value("arch_date"));
     installer->setMountPoint(settings->mountpoint());
-    installer->setTarget("/.rockbox/langs/english.voice");
     if(!settings->cacheDisabled())
         installer->setCache(true);
     installer->install(logger);

@@ -90,11 +90,12 @@ void ZipInstaller::installStart()
         getter->setCache(true);
     }
     getter->setFile(downloadFile);
-    getter->getFile(QUrl(m_url));
-
+    
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
     connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
+    
+    getter->getFile(QUrl(m_url));
 }
 
 

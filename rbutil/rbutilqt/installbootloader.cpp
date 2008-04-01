@@ -320,11 +320,12 @@ void BootloaderInstaller::gigabeatPrepare()
         // get the real file.
         getter = new HttpGet(this);
         getter->setFile(&downloadFile);
-        getter->getFile(QUrl(url));
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
         connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
+        
+        getter->getFile(QUrl(url));
    }
    else                 //UnInstallation
    {
@@ -518,11 +519,12 @@ void BootloaderInstaller::h10Prepare()
         // get the real file.
         getter = new HttpGet(this);
         getter->setFile(&downloadFile);
-        getter->getFile(QUrl(url));
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
         connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
+        
+        getter->getFile(QUrl(url));
     }
     else             // Uninstallation
     {
@@ -670,11 +672,13 @@ void BootloaderInstaller::mrobe100Prepare()
         // get the real file.
         getter = new HttpGet(this);
         getter->setFile(&downloadFile);
-        getter->getFile(QUrl(url));
+        
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
         connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
+        
+        getter->getFile(QUrl(url));
     }
     else             // Uninstallation
     {
@@ -835,11 +839,13 @@ void BootloaderInstaller::ipodPrepare()
         // get the real file.
         getter = new HttpGet(this);
         getter->setFile(&downloadFile);
-        getter->getFile(QUrl(url));
+        
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
         connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
+        
+        getter->getFile(QUrl(url));
     }
     else                 // Uninstallation
     {
@@ -1077,11 +1083,13 @@ void BootloaderInstaller::sansaPrepare()
         // get the real file.
         getter = new HttpGet(this);
         getter->setFile(&downloadFile);
-        getter->getFile(QUrl(url));
+        
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
         connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
+        
+        getter->getFile(QUrl(url));
     }
     else                 // Uninstallation
     {
@@ -1265,11 +1273,13 @@ void BootloaderInstaller::iriverPrepare()
     // get the real file.
     getter = new HttpGet(this);
     getter->setFile(&downloadFile);
-    getter->getFile(QUrl(url));
+    
     // connect signals from HttpGet
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
     connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
     connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
+    
+    getter->getFile(QUrl(url));
 }
 
 void BootloaderInstaller::iriverFinish()

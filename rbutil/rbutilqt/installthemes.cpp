@@ -183,8 +183,8 @@ void ThemesInstallWindow::updateDetails(int row)
         }
         igetter.setCache(infocachedir);
     }
-    igetter.getFile(img);
     connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
+    igetter.getFile(img);
 }
 
 

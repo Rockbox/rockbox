@@ -61,6 +61,7 @@ class RbUtilQt : public QMainWindow
 
         volatile bool m_installed;
         volatile bool m_error;
+        bool m_gotInfo;
 
     private slots:
         void about(void);
