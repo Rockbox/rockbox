@@ -21,10 +21,11 @@
 #include "system.h"
 #include "kernel.h"
 #include "ata.h"
+#include "usb.h"
 
 inline int usb_detect(void)
 {
-    return 0;
+    return USB_EXTRACTED;
 }
 
 void usb_init_device(void)
