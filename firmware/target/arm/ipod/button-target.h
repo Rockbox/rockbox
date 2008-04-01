@@ -28,7 +28,6 @@ bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
 
-void handle_scroll_wheel(int new_scroll, int was_hold, int reverse);
 void ipod_mini_button_int(void);
 void ipod_4g_button_int(void);
 

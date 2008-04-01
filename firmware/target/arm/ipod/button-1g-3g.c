@@ -47,11 +47,9 @@ static int int_btn = BUTTON_NONE;
  * we only enable it for a very short time to check for changes every
  * tick, and only keep it enabled if there is activity. */
 #define WHEEL_TIMEOUT (HZ/4)
-static int wheel_timeout = 0;
 #endif
 
-/* iPod 3G and mini 1G, mini 2G uses iPod 4G code */
-void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
+static void handle_scroll_wheel(int new_scroll, int was_hold)
 {
     int wheel_keycode = BUTTON_NONE;
     static int prev_scroll = -1;
@@ -64,10 +62,6 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
         {0, -1, 1, 0}
     };
     
-#ifdef IPOD_1G2G
-    wheel_timeout = WHEEL_TIMEOUT;
-#endif
-
     if ( prev_scroll == -1 ) {
         prev_scroll = new_scroll;
     }
@@ -80,26 +74,14 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
         reset_poweroff_timer();
         if (++count == 6) { /* reduce sensitivity */
             count = 0;
+            /* 1st..3rd Gen wheel has inverse direction mapping
+             * compared to Mini 1st Gen wheel. */
             switch (direction) {
                 case 1:
-                    if (reverse) {
-                        /* 'r' keypress */
-                        wheel_keycode = BUTTON_SCROLL_FWD;
-                    }
-                    else {
-                        /* 'l' keypress */
-                        wheel_keycode = BUTTON_SCROLL_BACK;
-                    }
+                    wheel_keycode = BUTTON_SCROLL_BACK;
                     break;
                 case -1:
-                    if (reverse) {
-                        /* 'l' keypress */
-                        wheel_keycode = BUTTON_SCROLL_BACK;
-                    }
-                    else {
-                        /* 'r' keypress */
-                        wheel_keycode = BUTTON_SCROLL_FWD;
-                    }
+                    wheel_keycode = BUTTON_SCROLL_FWD;
                     break;
                 default:
                     /* only happens if we get out of sync */
@@ -174,7 +156,7 @@ static int ipod_3g_button_read(void)
     }
 
     if (source & 0xc0) {
-        handle_scroll_wheel((state & 0xc0) >> 6, was_hold, 0);
+        handle_scroll_wheel((state & 0xc0) >> 6, was_hold);
     }
 
     /* ack any active interrupts */
@@ -219,6 +201,7 @@ int button_read_device(void)
     static bool hold_button = false;
     bool hold_button_old;
 #ifdef IPOD_1G2G
+    static int wheel_timeout = 0;
     static unsigned char last_wheel_value = 0;
     unsigned char wheel_value;
 
@@ -228,17 +211,21 @@ int button_read_device(void)
         {
             GPIOB_OUTPUT_VAL |= 0x01; /* enable wheel */
             udelay(50);               /* let the voltage settle */
-            wheel_value = GPIOA_INPUT_VAL >> 6;
-            if (wheel_value != last_wheel_value)
-            {   
-                last_wheel_value = wheel_value; 
-                wheel_timeout = WHEEL_TIMEOUT; /* keep wheel enabled */
-            }
-        }                
+            GPIOA_INT_EN = 0xff;      /* enable wheel interrupts */
+        }
+        wheel_value = GPIOA_INPUT_VAL >> 6;
+        if (wheel_value != last_wheel_value)
+        {
+            last_wheel_value = wheel_value;
+            wheel_timeout = WHEEL_TIMEOUT; /* keep wheel enabled */
+        }
         if (wheel_timeout)
             wheel_timeout--;
         else
+        {
+            GPIOA_INT_EN = 0x3f;       /* disable wheel interrupts */
             GPIOB_OUTPUT_VAL &= ~0x01; /* disable wheel */
+        }
     }
 #endif
 

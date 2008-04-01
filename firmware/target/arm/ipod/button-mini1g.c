@@ -47,8 +47,7 @@ int int_btn = BUTTON_NONE;
     static bool send_events = true;
 #endif
 
-/* iPod 3G and mini 1G, mini 2G uses iPod 4G code */
-void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
+static void handle_scroll_wheel(int new_scroll, int was_hold)
 {
     int wheel_keycode = BUTTON_NONE;
     static int prev_scroll = -1;
@@ -73,26 +72,14 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
         reset_poweroff_timer();
         if (++count == 6) { /* reduce sensitivity */
             count = 0;
+            /* Mini 1st Gen wheel has inverse direction mapping
+             * compared to 1st..3rd Gen wheel. */
             switch (direction) {
                 case 1:
-                    if (reverse) {
-                        /* 'r' keypress */
-                        wheel_keycode = BUTTON_SCROLL_FWD;
-                    }
-                    else {
-                        /* 'l' keypress */
-                        wheel_keycode = BUTTON_SCROLL_BACK;
-                    }
+                    wheel_keycode = BUTTON_SCROLL_FWD;
                     break;
                 case -1:
-                    if (reverse) {
-                        /* 'l' keypress */
-                        wheel_keycode = BUTTON_SCROLL_BACK;
-                    }
-                    else {
-                        /* 'r' keypress */
-                        wheel_keycode = BUTTON_SCROLL_FWD;
-                    }
+                    wheel_keycode = BUTTON_SCROLL_BACK;
                     break;
                 default:
                     /* only happens if we get out of sync */
@@ -147,7 +134,7 @@ static int ipod_mini_button_read(void)
             btn |= BUTTON_LEFT;
 
         if (wheel_source & 0x30) {
-            handle_scroll_wheel((wheel_state & 0x30) >> 4, was_hold, 1);
+            handle_scroll_wheel((wheel_state & 0x30) >> 4, was_hold);
         }
     }
 
