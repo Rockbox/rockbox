@@ -62,7 +62,7 @@ void ZipInstaller::installContinue()
         m_dp->addItem(tr("Installation finished successfully."),LOGOK);
         m_dp->abort();
 
-        emit done(true);
+        emit done(false);
         return;
     }
 
@@ -114,14 +114,14 @@ void ZipInstaller::downloadDone(bool error)
     if(getter->httpResponse() != 200 && !getter->isCached()) {
         m_dp->addItem(tr("Download error: received HTTP error %1.").arg(getter->httpResponse()),LOGERROR);
         m_dp->abort();
-        emit done(false);
+        emit done(true);
         return;
     }
     if(getter->isCached()) m_dp->addItem(tr("Cached file used."), LOGINFO);
     if(error) {
         m_dp->addItem(tr("Download error: %1").arg(getter->errorString()),LOGERROR);
         m_dp->abort();
-        emit done(false);
+        emit done(true);
         return;
     }
     else m_dp->addItem(tr("Download finished."),LOGOK);
@@ -141,7 +141,7 @@ void ZipInstaller::downloadDone(bool error)
             m_dp->addItem(tr("Opening archive failed: %1.")
                 .arg(uz.formatError(ec)),LOGERROR);
             m_dp->abort();
-            emit done(false);
+            emit done(true);
             return;
         }
 
@@ -150,7 +150,7 @@ void ZipInstaller::downloadDone(bool error)
             m_dp->addItem(tr("Extracting failed: %1.")
                 .arg(uz.formatError(ec)),LOGERROR);
             m_dp->abort();
-            emit done(false);
+            emit done(true);
             return;
         }
         // prepare file list for log
@@ -171,7 +171,7 @@ void ZipInstaller::downloadDone(bool error)
         if(!downloadFile->copy(m_mountpoint + m_target)) {
             m_dp->addItem(tr("Installing file failed."), LOGERROR);
             m_dp->abort();
-            emit done(false);
+            emit done(true);
             return;
         }
 
