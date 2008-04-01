@@ -4,44 +4,15 @@
 %s%ac%?ia<%ia|%?d2<%d2|Unknown Artist>>
 %s%ac%?in<%in|%pp> - %?it<%it|%fn>
 
-%xl|A|bat0-s.bmp|109|2|
-%xl|B|bat1-s.bmp|109|2|
-%xl|C|bat2-s.bmp|109|2|
-%xl|D|bat3-s.bmp|109|2|
-%xl|E|bat4-s.bmp|109|2|
-%t0.5 %?bp<%?bc<%xdA|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdB|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdC|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdD|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdE|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>
-%xl|G|holdmain-s.bmp|86|1|
-%xl|H|holdremote-s.bmp|86|1|
-%xl|I|holdboth-s.bmp|86|1|
-%xl|K|repeatall-s.bmp|66|1|
-%xl|L|repeatone-s.bmp|66|1|
-%xl|M|repeatshuffle-s.bmp|66|1|
-%xl|N|repeata-b-s.bmp|66|1|
-%xl|O|shuffle0-s.bmp|46|3|
-%xl|P|shuffle1-s.bmp|46|3|
-%xl|R|pb-play-s.bmp|3|2|
-%xl|S|pb-pause-s.bmp|3|2|
-%xl|T|pb-fforward-s.bmp|3|2|
-%xl|U|pb-rewind-s.bmp|3|2|
-%?mh<%?mr<%xdI|%xdG>|%?mr<%xdH|>>%?mm<|%xdK|%xdL|%xdM|%xdN>%?ps<%xdP|%xdO>%?mp<|%xdR|%xdS|%xdT|%xdU>
-%xl|a|vol0-s.bmp|16|0|
-%xl|b|vol1-s.bmp|16|0|
-%xl|c|vol2-s.bmp|16|0|
-%xl|d|vol3-s.bmp|16|0|
-%xl|e|vol4-s.bmp|16|0|
-%xl|f|vol5-s.bmp|16|0|
-%xl|g|vol6-s.bmp|16|0|
-%xl|h|vol7-s.bmp|16|0|
-%xl|i|vol8-s.bmp|16|0|
-%xl|j|ani1-s.bmp|16|0|
-%xl|k|ani2-s.bmp|16|0|
-%xl|l|ani3-s.bmp|16|0|
-%xl|m|ani4-s.bmp|16|0|
-%xl|n|ani5-s.bmp|16|0|
-%xl|o|ani6-s.bmp|16|0|
-%xl|p|ani7-s.bmp|16|0|
-%xl|q|ani8-s.bmp|16|0|
-%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdj|%xdj|%xdj>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdk|%xdk|%xdk>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdl|%xdl|%xdl>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdm|%xdm|%xdm>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdn|%xdn|%xdn>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdo|%xdo|%xdo>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdp|%xdp|%xdp>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdq|%xdq|%xdq>
-%xl|X|line2-128.bmp|0|12|
-%xl|Y|line1-128.bmp|0|57|
-%xdX%xdY
+%xl|A|battery-s.bmp|109|2|5|
+%t0.5 %?bp<%?bc<%xdAa|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAb|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAc|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAd|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAe|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>
+%xl|B|hold-s.bmp|86|1|3|
+%xl|C|repeat-s.bmp|66|1|4|
+%xl|D|shuffle-s.bmp|46|3|2|
+%xl|E|playmode-s.bmp|3|2|4|
+%?mh<%?mr<%xdBa|%xdBb>|%?mr<%xdBc|>>%?mm<|%xdCa|%xdCb|%xdCc|%xdCd>%?ps<%xdDa|%xdDb>%?mp<|%xdEa|%xdEb|%xdEc|%xdEd>
+%xl|F|volume-s.bmp|16|0|9|
+%xl|G|animation-s.bmp|16|0|8|
+%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGa|%xdGa|%xdGa>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGb|%xdGb|%xdGb>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGc|%xdGc|%xdGc>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGd|%xdGd|%xdGd>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGe|%xdGe|%xdGe>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGf|%xdGf|%xdGf>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGg|%xdGg|%xdGg>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGh|%xdGh|%xdGh>
+%x|X|line2-128.bmp|0|12|
+%x|Y|line1-128.bmp|0|57|
