@@ -378,6 +378,8 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
 
         if (currpts != INVALID_TIMESTAMP)
         {
+            ssize_t pos_adj; /* Adjustment to over or under-estimate */
+
             /* Found a valid timestamp - see were it lies in relation to
              * target */
             if (currpts < time)
@@ -401,10 +403,14 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
 
                 pos_new = muldiv_uint32(time - time_left,
                                         pos_right - pos_left,
-                                        time_right - time_left) + pos_left;
+                                        time_right - time_left);
                 /* Point is ahead of us - fudge estimate a bit high */
-                pos_new = muldiv_uint32(11, pos_new - pos_left, 10)
-                                + pos_left;
+                pos_adj = pos_new / 10;
+
+                if (pos_adj > 512*1024)
+                    pos_adj = 512*1024;
+
+                pos_new += pos_left + pos_adj;
 
                 if (pos_new >= pos_right)
                 {
@@ -431,9 +437,14 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
 
                 pos_new = muldiv_uint32(time - time_left,
                                         pos_right - pos_left,
-                                        time_right - time_left) + pos_left;
+                                        time_right - time_left);
                 /* Overshot the seek point - fudge estimate a bit low */
-                pos_new = muldiv_uint32(9, pos_new - pos_left, 10) + pos_left;
+                pos_adj = pos_new / 10;
+
+                if (pos_adj > 512*1024)
+                    pos_adj = 512*1024;
+
+                pos_new += pos_left - pos_adj;
 
                 state = state3; /* Last scan was late */
                 sk.dir = SSCAN_REVERSE;
