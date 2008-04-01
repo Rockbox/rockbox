@@ -245,6 +245,7 @@ static struct {
 static void handle_scsi(struct command_block_wrapper* cbw);
 static void send_csw(int status);
 static void send_command_result(void *data,int size);
+static void send_command_failed_result(void);
 static void send_block_data(void *data,int size);
 static void receive_block_data(void *data,int size);
 static void identify2inquiry(int lun);
@@ -258,6 +259,7 @@ static enum {
     WAITING_FOR_COMMAND,
     SENDING_BLOCKS,
     SENDING_RESULT,
+    SENDING_FAILED_RESULT,
     RECEIVING_BLOCKS,
     SENDING_CSW
 } state = WAITING_FOR_COMMAND;
@@ -468,6 +470,12 @@ void usb_storage_transfer_complete(bool in,int status,int length)
                 cur_sense_data.ascq=0;
             }
             break;
+        case SENDING_FAILED_RESULT:
+            if(in==false) {
+                logf("OUT received in SENDING");
+            }
+            send_csw(UMS_STATUS_FAIL);
+            break;
         case SENDING_BLOCKS:
             if(in==false) {
                 logf("OUT received in SENDING");
@@ -657,6 +665,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_REQUEST_SENSE: {
             tb.sense_data->ResponseCode=0x70;/*current error*/
+            tb.sense_data->Obsolete=0;
             tb.sense_data->fei_sensekey=cur_sense_data.sense_key&0x0f;
             tb.sense_data->Information=cur_sense_data.information;
             tb.sense_data->AdditionalSenseLength=10;
@@ -673,9 +682,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_MODE_SENSE_10: {
             if(! lun_present) {
-                /* Windows expects an empty command result before the csw */
-                usb_drv_send(usb_endpoint, 0, 0);
-                send_csw(UMS_STATUS_FAIL);
+                send_command_failed_result();
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
                 cur_sense_data.ascq=0;
@@ -719,9 +726,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                               MIN(sizeof(struct mode_sense_data_10), length));
                     break;
                 default:
-                    /* Windows expects an empty command result before the csw */
-                    usb_drv_send(usb_endpoint, 0, 0);
-                    send_csw(UMS_STATUS_FAIL);
+                    send_command_failed_result();
                     cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                     cur_sense_data.asc=ASC_INVALID_FIELD_IN_CBD;
                     cur_sense_data.ascq=0;
@@ -731,9 +736,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         }
         case SCSI_MODE_SENSE_6: {
             if(! lun_present) {
-                /* Windows expects an empty command result before the csw */
-                usb_drv_send(usb_endpoint, 0, 0);
-                send_csw(UMS_STATUS_FAIL);
+                send_command_failed_result();
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
                 cur_sense_data.ascq=0;
@@ -776,9 +779,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                               MIN(sizeof(struct mode_sense_data_6), length));
                     break;
                 default:
-                    /* Windows expects an empty command result before the csw */
-                    usb_drv_send(usb_endpoint, 0, 0);
-                    send_csw(UMS_STATUS_FAIL);
+                    send_command_failed_result();
                     cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                     cur_sense_data.asc=ASC_INVALID_FIELD_IN_CBD;
                     cur_sense_data.ascq=0;
@@ -827,9 +828,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             }
             else
             {
-                /* Windows expects an empty command result before the csw */
-                usb_drv_send(usb_endpoint, 0, 0);
-                send_csw(UMS_STATUS_FAIL);
+                send_command_failed_result();
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
                 cur_sense_data.ascq=0;
@@ -851,9 +850,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
             }
             else
             {
-                /* Windows expects an empty command result before the csw */
-                usb_drv_send(usb_endpoint, 0, 0);
-                send_csw(UMS_STATUS_FAIL);
+                send_command_failed_result();
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
                 cur_sense_data.ascq=0;
@@ -864,9 +861,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
         case SCSI_READ_10:
             logf("scsi read10 %d",lun);
             if(! lun_present) {
-                /* Windows expects an empty command result before the csw */
-                usb_drv_send(usb_endpoint, 0, 0);
-                send_csw(UMS_STATUS_FAIL);
+                send_command_failed_result();
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
                 cur_sense_data.ascq=0;
@@ -957,6 +952,12 @@ static void send_command_result(void *data,int size)
     state = SENDING_RESULT;
 }
 
+static void send_command_failed_result(void)
+{
+    usb_drv_send_nonblocking(usb_endpoint, NULL, 0);
+    state = SENDING_FAILED_RESULT;
+}
+
 static void receive_block_data(void *data,int size)
 {
     usb_drv_recv(usb_endpoint, data, size);
@@ -1026,6 +1027,7 @@ static void identify2inquiry(int lun)
 
     tb.inquiry->DeviceType = DIRECT_ACCESS_DEVICE;
     tb.inquiry->AdditionalLength = 0x1f;
+    memset(tb.inquiry->Reserved, 0, 3);
     tb.inquiry->Versions = 4; /* SPC-2 */
     tb.inquiry->Format   = 2; /* SPC-2/3 inquiry format */
 
