@@ -1319,9 +1319,6 @@ static bool wps_parse(struct wps_data *data, const char *wps_bufptr)
     print_debug_info(data, fail, line);
 #endif
 
-    if (fail)
-        wps_reset(data);
-
     return (fail == 0);
 }
 
@@ -1564,8 +1561,10 @@ bool wps_data_load(struct wps_data *wps_data,
         wps_buffer = skip_utf8_bom(wps_buffer);
 
         /* parse the WPS source */
-        if (!wps_parse(wps_data, wps_buffer))
+        if (!wps_parse(wps_data, wps_buffer)) {
+            wps_reset(wps_data);
             return false;
+        }
 
         wps_data->wps_loaded = true;
 
@@ -1579,8 +1578,10 @@ bool wps_data_load(struct wps_data *wps_data,
         bmpdir[bmpdirlen] = 0;
 
         /* load the bitmaps that were found by the parsing */
-        if (!load_wps_bitmaps(wps_data, bmpdir))
+        if (!load_wps_bitmaps(wps_data, bmpdir)) {
+            wps_reset(wps_data);
             return false;
+        }
 #endif
         return true;
     }
