@@ -25,6 +25,7 @@
 #include <QUrl>
 
 bool recRmdir( const QString &dirName );
+QString resolvePathCase(QString path);
 
 QUrl systemProxy(void);
 

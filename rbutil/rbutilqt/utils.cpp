@@ -30,6 +30,7 @@
 #include <windows.h>
 #include <tchar.h>
 #endif
+#include <QDebug>
 
 // recursive function to delete a dir with files
 bool recRmdir( const QString &dirName )
@@ -51,6 +52,38 @@ bool recRmdir( const QString &dirName )
     }
     dir.cdUp();
     return dir.rmdir(dirN); // delete empty dir and return if (now empty) dir-removing was successfull
+}
+
+
+//! @brief resolves the given path, ignoring case.
+//! @param path absolute path to resolve.
+//! @return returns exact casing of path, empty string if path not found.
+QString resolvePathCase(QString path)
+{
+    QStringList elems;
+    QString realpath = "/";
+    elems = path.split("/", QString::SkipEmptyParts);
+
+    for(int i = 0; i < elems.size(); i++) {
+        QStringList direlems = QDir(realpath).entryList(QDir::AllEntries);
+        if(direlems.contains(elems.at(i), Qt::CaseInsensitive)) {
+            // need to filter using QRegExp as QStringList::filter(QString)
+            // matches any substring
+            QString expr = QString("^" + elems.at(i) + "$");
+            QRegExp rx = QRegExp(expr, Qt::CaseInsensitive);
+            QStringList a = direlems.filter(rx);
+
+            if(a.size() != 1)
+                return QString("");
+            if(!realpath.endsWith("/"))
+                realpath += "/";
+            realpath += a.at(0);
+        }
+        else
+            return QString("");
+    }
+    qDebug() << __func__ << path << "->" << realpath;
+    return realpath;
 }
 
 
