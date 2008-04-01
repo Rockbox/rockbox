@@ -1386,7 +1386,7 @@ void wakeup_init(struct wakeup *w)
 /* Wait for a signal blocking indefinitely or for a specified period */
 int wakeup_wait(struct wakeup *w, int timeout)
 {
-    int ret = WAIT_SUCCEEDED; /* Presume success */
+    int ret = OBJ_WAIT_SUCCEEDED; /* Presume success */
     int oldlevel = disable_irq_save();
 
     corelock_lock(&w->cl);
@@ -1413,7 +1413,8 @@ int wakeup_wait(struct wakeup *w, int timeout)
     if(w->signalled == 0)
     {
         /* Timed-out or failed */
-        ret = (timeout != TIMEOUT_BLOCK) ? WAIT_TIMEDOUT : WAIT_FAILED;
+        ret = (timeout != TIMEOUT_BLOCK) ?
+            OBJ_WAIT_TIMEDOUT : OBJ_WAIT_FAILED;
     }
 
     w->signalled = 0;  /* Reset */

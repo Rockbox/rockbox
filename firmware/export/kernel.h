@@ -240,9 +240,9 @@ void timeout_cancel(struct timeout *tmo);
 #define STATE_NONSIGNALED 0
 #define STATE_SIGNALED    1
 
-#define WAIT_TIMEDOUT     (-1)
-#define WAIT_FAILED       0
-#define WAIT_SUCCEEDED    1
+#define OBJ_WAIT_TIMEDOUT     (-1)
+#define OBJ_WAIT_FAILED       0
+#define OBJ_WAIT_SUCCEEDED    1
 
 extern void queue_init(struct event_queue *q, bool register_queue);
 extern void queue_delete(struct event_queue *q);

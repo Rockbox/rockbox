@@ -62,7 +62,7 @@ void i2c_write(int addr, const unsigned char *buf, int count)
     /* Generate START */
     IICSTAT = I2C_MODE_MASTER | I2C_MODE_TX | I2C_START | I2C_RXTX_ENB;
 
-    if (wakeup_wait(&i2c_wake, HZ) != WAIT_SUCCEEDED)
+    if (wakeup_wait(&i2c_wake, HZ) != OBJ_WAIT_SUCCEEDED)
     {
         /* Something went wrong - stop transmission */
         int oldlevel = disable_irq_save();
