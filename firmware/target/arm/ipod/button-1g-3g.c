@@ -211,13 +211,13 @@ int button_read_device(void)
         {
             GPIOB_OUTPUT_VAL |= 0x01; /* enable wheel */
             udelay(50);               /* let the voltage settle */
-            GPIOA_INT_EN = 0xff;      /* enable wheel interrupts */
         }
         wheel_value = GPIOA_INPUT_VAL >> 6;
         if (wheel_value != last_wheel_value)
         {
             last_wheel_value = wheel_value;
             wheel_timeout = WHEEL_TIMEOUT; /* keep wheel enabled */
+            GPIOA_INT_EN = 0xff;      /* enable wheel interrupts */
         }
         if (wheel_timeout)
             wheel_timeout--;
