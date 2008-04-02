@@ -1910,16 +1910,13 @@ static void audio_rebuffer(void)
    of the track transition. */
 static int audio_check_new_track(void)
 {
-    int track_count = audio_track_count();
     int old_track_ridx = track_ridx;
     int i, idx;
-    int next_playlist_index;
     bool forward;
     bool end_of_playlist;  /* Temporary flag, not the same as playlist_end */
 
-    /* Now it's good time to send track unbuffer events. */
+    /* Now it's good time to send track finish events. */
     send_event(PLAYBACK_EVENT_TRACK_FINISH, &curtrack_id3);
-    
     if (dir_skip)
     {
         dir_skip = false;
@@ -1939,24 +1936,21 @@ static int audio_check_new_track(void)
     if (new_playlist)
         ci.new_track = 0;
 
-    end_of_playlist = playlist_peek(automatic_skip ? ci.new_track : 0) == NULL;
+    end_of_playlist = !playlist_checkend(automatic_skip ? ci.new_track : 0);
     auto_dir_skip = end_of_playlist && global_settings.next_folder;
 
     /* If the playlist isn't that big */
-    if (automatic_skip && !playlist_check(ci.new_track))
+    if (automatic_skip)
     {
-        if (ci.new_track >= 0)
+        while (!playlist_check(ci.new_track))
         {
-            LOGFQUEUE("audio >|= codec Q_CODEC_REQUEST_FAILED");
-            return Q_CODEC_REQUEST_FAILED;
-        }
-        /* Find the beginning backward if the user over-skips it */
-        while (!playlist_check(++ci.new_track))
             if (ci.new_track >= 0)
             {
                 LOGFQUEUE("audio >|= codec Q_CODEC_REQUEST_FAILED");
                 return Q_CODEC_REQUEST_FAILED;
             }
+            ci.new_track++;
+        }
     }
 
     /* Update the playlist */
@@ -1966,9 +1960,7 @@ static int audio_check_new_track(void)
     {
         /* If the track change was the result of an auto dir skip,
            we need to update the playlist now */
-        next_playlist_index = playlist_next(ci.new_track);
-
-        if (next_playlist_index < 0)
+        if (playlist_next(ci.new_track) < 0)
         {
             LOGFQUEUE("audio >|= codec Q_CODEC_REQUEST_FAILED");
             return Q_CODEC_REQUEST_FAILED;
@@ -2023,6 +2015,7 @@ static int audio_check_new_track(void)
     }
 
     /* If it is not safe to even skip this many track entries */
+    int track_count = audio_track_count();
     if (ci.new_track >= track_count || ci.new_track <= track_count - MAX_TRACK)
     {
         ci.new_track = 0;
@@ -2041,7 +2034,7 @@ static int audio_check_new_track(void)
     }
 
     /* When skipping backwards, it is possible that we've found a track that's
-     * buffered, but which is around the track-wrap and therefor not the track
+     * buffered, but which is around the track-wrap and therefore not the track
      * we are looking for */
     if (!forward)
     {
