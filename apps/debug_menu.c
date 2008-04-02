@@ -1144,7 +1144,7 @@ bool dbg_ports(void)
 
     while(1)
     {
-        line = 0;             
+        line = 0;
         lcd_puts(0, line++, "GPIO STATES:");
         snprintf(buf, sizeof(buf), "A: %02x  E: %02x  I: %02x",
                                    (unsigned int)GPIOA_INPUT_VAL,

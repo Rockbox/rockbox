@@ -49,7 +49,7 @@
 
 /* Uncomment this if you want to enable ATA power-off control.
  * Attention, some players crash when ATA power-off is enabled! */
-#define HAVE_ATA_POWER_OFF
+//#define HAVE_ATA_POWER_OFF
 
 /* Define this if you control ata power player style
    (with PB4, new player only) */

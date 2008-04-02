@@ -56,29 +56,24 @@ PLUGIN_HEADER
 #endif
 
 /* Default refresh rates in 1/10 Hz */
-#if defined ARCHOS_RECORDER   || defined ARCHOS_FMRECORDER  \
- || defined ARCHOS_RECORDERV2 || defined ARCHOS_ONDIOFM     \
- || defined ARCHOS_ONDIOSP
+#if CONFIG_LCD == LCD_SSD1815
 #define DEFAULT_SCAN_RATE 670
-#elif defined IAUDIO_M3
-#define DEFAULT_SCAN_RATE 1500
+#elif CONFIG_LCD == LCD_S1D15E06
+#define DEFAULT_SCAN_RATE 700
+#elif CONFIG_LCD == LCD_IPOD2BPP
+#define DEFAULT_SCAN_RATE 800
+#elif CONFIG_LCD == LCD_IPODMINI
+#define DEFAULT_SCAN_RATE 880
+#elif CONFIG_LCD == LCD_TL0350A
+#define DEFAULT_SCAN_RATE 1480
 #define HORIZ_SCAN /* LCD controller updates the panel sideways */
 #define NEED_BOOST
-#elif defined IAUDIO_M5
-#define DEFAULT_SCAN_RATE 730
-#elif defined IPOD_1G2G
-#define DEFAULT_SCAN_RATE 960
-#elif defined IPOD_MINI2G  || defined IPOD_MINI  \
-   || defined IPOD_3G      || defined IPOD_4G
-#define DEFAULT_SCAN_RATE 870
-#elif defined IRIVER_H100_SERIES
-#define DEFAULT_SCAN_RATE 700
 #else
 #define DEFAULT_SCAN_RATE 700
 #warning Generic default scanrate
 #endif
 
-#ifdef HORIZ_SCAN
+#ifdef HORIZ_SCAN 
 #define TEXT_X 0
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 #define BUF_WIDTH  ((LCD_WIDTH+7)/8)

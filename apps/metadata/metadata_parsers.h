@@ -25,7 +25,6 @@ bool get_mp4_metadata(int fd, struct mp3entry* id3);
 bool get_monkeys_metadata(int fd, struct mp3entry* id3);
 bool get_musepack_metadata(int fd, struct mp3entry *id3);
 bool get_sid_metadata(int fd, struct mp3entry* id3);
-bool get_mod_metadata(int fd, struct mp3entry* id3);
 bool get_spc_metadata(int fd, struct mp3entry* id3);
 bool get_ogg_metadata(int fd, struct mp3entry* id3);
 bool get_wave_metadata(int fd, struct mp3entry* id3);
