@@ -802,12 +802,22 @@ void backlight_on(void) {}
 void backlight_off(void) {}
 void buttonlight_on(void) {}
 void backlight_set_timeout(int value) {(void)value;}
-bool is_backlight_on(void) {return true;}
+
+bool is_backlight_on(bool ignore_always_off)
+{
+    (void)ignore_always_off;
+    return true;
+}
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_on(void) {}
 void remote_backlight_off(void) {}
 void remote_backlight_set_timeout(int value) {(void)value;}
-bool is_remote_backlight_on(void) {return true;}
+
+bool is_remote_backlight_on(bool ignore_always_off) 
+{
+    (void)ignore_always_off;
+    return true;
+}
 #endif /* HAVE_REMOTE_LCD */
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void backlight_set_brightness(int val) { (void)val; }
