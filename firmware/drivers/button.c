@@ -247,9 +247,10 @@ static void button_tick(void)
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                     if (btn & BUTTON_REMOTE) {
-                        if (!remote_filter_first_keypress || is_remote_backlight_on()
+                        if (!remote_filter_first_keypress 
+                            || is_remote_backlight_on(false)
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-                           || (remote_type()==REMOTETYPE_H300_NONLCD)
+                            || (remote_type()==REMOTETYPE_H300_NONLCD)
 #endif
                             )
                             queue_post(&button_queue, btn, data);
@@ -258,9 +259,9 @@ static void button_tick(void)
                     }
                     else
 #endif
-                        if (!filter_first_keypress || is_backlight_on()
+                        if (!filter_first_keypress || is_backlight_on(false)
 #if BUTTON_REMOTE
-                                || (btn&BUTTON_REMOTE)
+                                || (btn & BUTTON_REMOTE)
 #endif
                            )
                             queue_post(&button_queue, btn, data);

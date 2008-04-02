@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-bool is_backlight_on(void);
+bool is_backlight_on(bool ignore_always_off);
 void backlight_on(void);
 void backlight_off(void);
 void backlight_set_timeout(int value);
@@ -57,7 +57,7 @@ void remote_backlight_on(void);
 void remote_backlight_off(void);
 void remote_backlight_set_timeout(int value);
 void remote_backlight_set_timeout_plugged(int value);
-bool is_remote_backlight_on(void);
+bool is_remote_backlight_on(bool ignore_always_off);
 
 #ifdef HAS_REMOTE_BUTTON_HOLD
 void remote_backlight_hold_changed(bool rc_hold_button);

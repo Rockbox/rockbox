@@ -120,7 +120,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 105
+#define PLUGIN_API_VERSION 106
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -721,7 +721,8 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
+       
+    bool (*is_backlight_on)(bool ignore_always_off);
 };
 
 /* plugin header */

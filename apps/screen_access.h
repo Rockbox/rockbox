@@ -151,7 +151,7 @@ struct screen
     void (*update_viewport)(void);
     void (*backlight_on)(void);
     void (*backlight_off)(void);
-    bool (*is_backlight_on)(void);
+    bool (*is_backlight_on)(bool ignore_always_off);
     void (*backlight_set_timeout)(int index);
 };
 

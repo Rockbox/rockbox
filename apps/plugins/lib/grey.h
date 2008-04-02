@@ -120,9 +120,16 @@ void grey_ub_scroll_down(int count);
 
 /*** Internal stuff ***/
 
+/* standard gamma (s23p8) */
+#ifdef SIMULATOR                /* Standard PC gamma */
+#define _GREY_GAMMA ((200<<8)/100)
+#else   /* Target LCDs have a smaller contrast range */
+#define _GREY_GAMMA ((180<<8)/100)  
+#endif
+
 /* flag definitions */
-#define _GREY_RUNNING          0x0001  /* greyscale overlay is running */
-#define _GREY_DEFERRED_UPDATE  0x0002  /* lcd_update() requested */
+#define _GREY_RUNNING          0x8000  /* greyscale overlay is running */
+#define _GREY_DEFERRED_UPDATE  0x4000  /* lcd_update() requested */
 
 /* fast unsigned multiplication (16x16bit->32bit or 32x32bit->32bit,
  * whichever is faster for the architecture) */

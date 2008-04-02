@@ -631,13 +631,13 @@ void backlight_off(void)
     queue_post(&backlight_queue, BACKLIGHT_OFF, 0);
 }
 
-/* returns true when the backlight is on OR when it's set to always off */
-bool is_backlight_on(void)
+/* returns true when the backlight is on,
+ * and optionally when it's set to always off. */
+bool is_backlight_on(bool ignore_always_off)
 {
-    if (backlight_timer || backlight_timeout <= 0)
-        return true;
-    else
-        return false;
+    return (backlight_timer > 0)   /* countdown */
+        || (backlight_timeout == 0) /* always on */
+        || ((backlight_timeout < 0) && !ignore_always_off);
 }
 
 /* return value in ticks; 0 means always on, <0 means always off */
@@ -752,13 +752,13 @@ int remote_backlight_get_current_timeout(void)
     return remote_backlight_timeout;
 }
 
-/* returns true when the backlight is on OR when it's set to always off */
-bool is_remote_backlight_on(void)
+/* returns true when the backlight is on, and
+ * optionally  when it's set to always off */
+bool is_remote_backlight_on(bool ignore_always_off)
 {
-    if (remote_backlight_timer != 0 || remote_backlight_timeout <= 0)
-        return true;
-    else
-        return false;
+    return (remote_backlight_timer > 0)   /* countdown */
+        || (remote_backlight_timeout == 0) /* always on */
+        || ((remote_backlight_timeout < 0) && !ignore_always_off);
 }
 
 #endif /* HAVE_REMOTE_LCD */

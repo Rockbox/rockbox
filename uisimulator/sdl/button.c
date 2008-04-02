@@ -883,14 +883,16 @@ void button_event(int key, bool pressed)
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                         if (btn & BUTTON_REMOTE) {
-                            if (!remote_filter_first_keypress || is_remote_backlight_on())
+                            if (!remote_filter_first_keypress 
+                                || is_remote_backlight_on(false))
                                 queue_post(&button_queue, btn, data);
                             else
                                 skip_remote_release = true;
                         }
                         else
 #endif                                    
-                            if (!filter_first_keypress || is_backlight_on())
+                            if (!filter_first_keypress 
+                                || is_backlight_on(false))
                                 queue_post(&button_queue, btn, data);
                             else
                                 skip_release = true;
