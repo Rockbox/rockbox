@@ -14,61 +14,18 @@
 %pb|4|10|166|
 %s%acNext: %?It<%It|%?Fn<%Fn|?>>
 
-%xl|A|bat0.bmp|151|8|
-%xl|B|bat1.bmp|151|8|
-%xl|C|bat2.bmp|151|8|
-%xl|D|bat3.bmp|151|8|
-%xl|E|bat4.bmp|151|8|
-%t0.5 %?bp<%?bc<%xdA|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdB|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdC|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdD|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdE|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>
-%xl|F|hold0.bmp|122|5|
-%xl|G|holdmain.bmp|122|5|
-%xl|H|holdremote.bmp|122|5|
-%xl|I|holdboth.bmp|122|5|
-%?mh<%?mr<%xdI|%xdG>|%?mr<%xdH|%xdF>>
-%xl|J|repeat0.bmp|91|6|
-%xl|K|repeatall.bmp|91|6|
-%xl|L|repeatone.bmp|91|6|
-%xl|M|repeatshuffle.bmp|91|6|
-%xl|N|repeata-b.bmp|91|6|
-%?mm<%xdJ|%xdK|%xdL|%xdM|%xdN>
-%xl|O|shuffle0.bmp|66|7|
-%xl|P|shuffle1.bmp|66|7|
-%?ps<%xdP|%xdO>
-%xl|R|pb-play.bmp|6|7|
-%xl|S|pb-pause.bmp|6|7|
-%xl|T|pb-fforward.bmp|6|7|
-%xl|U|pb-rewind.bmp|6|7|
-%?mp<|%xdR|%xdS|%xdT|%xdU>
-%xl|a|vol0.bmp|24|3|
-%xl|b|vol1.bmp|24|3|
-%xl|c|vol2.bmp|24|3|
-%xl|d|vol3.bmp|24|3|
-%xl|e|vol4.bmp|24|3|
-%xl|f|vol5.bmp|24|3|
-%xl|g|vol6.bmp|24|3|
-%xl|h|vol7.bmp|24|3|
-%xl|i|vol8.bmp|24|3|
-%xl|j|ani1.bmp|24|3|
-%xl|k|ani2.bmp|24|3|
-%xl|l|ani3.bmp|24|3|
-%xl|m|ani4.bmp|24|3|
-%xl|n|ani5.bmp|24|3|
-%xl|o|ani6.bmp|24|3|
-%xl|p|ani7.bmp|24|3|
-%xl|q|ani8.bmp|24|3|
-%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdj|%xdj|%xdj>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdk|%xdk|%xdk>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdl|%xdl|%xdl>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdm|%xdm|%xdm>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdn|%xdn|%xdn>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdo|%xdo|%xdo>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdp|%xdp|%xdp>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdq|%xdq|%xdq>
-%xl|r|codec-mp1.bmp|131|164|
-%xl|s|codec-mp2.bmp|131|164|
-%xl|t|codec-mp3.bmp|131|164|
-%xl|u|codec-aiff.bmp|131|164|
-%xl|v|codec-wav.bmp|131|164|
-%xl|w|codec-ogg.bmp|131|164|
-%xl|x|codec-flac.bmp|131|164|
-%xl|y|codec-mpc.bmp|131|164|
-%xl|z|codec-ac3.bmp|131|164|
-%xl|V|codec-wavpack.bmp|131|164|
-%xl|W|codec-alac.bmp|131|164|
-%xl|X|codec-aac.bmp|131|164|
-%xl|Y|codec-shorten.bmp|131|164|
-%xl|Z|codec-unknown.bmp|131|164|
-%?fc<%xdr|%xds|%xdt|%xdu|%xdv|%xdw|%xdx|%xdy|%xdz|%xdV|%xdW|%xdX|%xdY|%xdZ>
+%xl|A|battery.bmp|151|8|5|
+%t0.5 %?bp<%?bc<%xdAa|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAb|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAc|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAd|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAe|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>
+%xl|B|hold.bmp|122|5|4|
+%?mh<%?mr<%xdBa|%xdBb>|%?mr<%xdBc|%xdBd>>
+%xl|C|repeat.bmp|91|6|5|
+%?mm<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe>
+%xl|D|shuffle.bmp|66|7|2|
+%?ps<%xdDa|%xdDb>
+%xl|E|playmode.bmp|6|7|4|
+%?mp<|%xdEa|%xdEb|%xdEc|%xdEd>
+%xl|F|volume.bmp|24|3|9|
+%xl|G|animation.bmp|24|3|8|
+%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGa|%xdGa|%xdGa>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGb|%xdGb|%xdGb>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGc|%xdGc|%xdGc>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGd|%xdGd|%xdGd>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGe|%xdGe|%xdGe>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGf|%xdGf|%xdGf>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGg|%xdGg|%xdGg>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGh|%xdGh|%xdGh>
+%xl|H|codec.bmp|131|164|21|
+%?fc<%xdHa|%xdHb|%xdHc|%xdHd|%xdHe|%xdHf|%xdHg|%xdHh|%xdHi|%xdHj|%xdHk|%xdHl|%xdHm|%xdHn|%xdHo|%xdHp|%xdHq|%xdHr|%xdHs|%xdHt|%xdHu>

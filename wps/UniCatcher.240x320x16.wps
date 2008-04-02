@@ -20,61 +20,18 @@
 
 %s%acNext: %?It<%It|%?Fn<%Fn|?>>
 
-%xl|A|bat0-b.bmp|204|12|
-%xl|B|bat1-b.bmp|204|12|
-%xl|C|bat2-b.bmp|204|12|
-%xl|D|bat3-b.bmp|204|12|
-%xl|E|bat4-b.bmp|204|12|
-%t0.5 %?bp<%?bc<%xdA|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdB|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdC|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdD|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdE|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>
-%xl|F|hold0-b.bmp|164|8|
-%xl|G|holdmain-b.bmp|164|8|
-%xl|H|holdremote-b.bmp|164|8|
-%xl|I|holdboth-b.bmp|164|8|
-%?mh<%?mr<%xdI|%xdG>|%?mr<%xdH|%xdF>>
-%xl|J|repeat0-b.bmp|126|9|
-%xl|K|repeatall-b.bmp|126|9|
-%xl|L|repeatone-b.bmp|126|9|
-%xl|M|repeatshuffle-b.bmp|126|9|
-%xl|N|repeata-b-b.bmp|126|9|
-%?mm<%xdJ|%xdK|%xdL|%xdM|%xdN>
-%xl|O|shuffle0-b.bmp|91|11|
-%xl|P|shuffle1-b.bmp|91|11|
-%?ps<%xdP|%xdO>
-%xl|R|pb-play-b.bmp|11|10|
-%xl|S|pb-pause-b.bmp|11|10|
-%xl|T|pb-fforward-b.bmp|11|10|
-%xl|U|pb-rewind-b.bmp|11|10|
-%?mp<|%xdR|%xdS|%xdT|%xdU>
-%xl|a|vol0-b.bmp|34|5|
-%xl|b|vol1-b.bmp|34|5|
-%xl|c|vol2-b.bmp|34|5|
-%xl|d|vol3-b.bmp|34|5|
-%xl|e|vol4-b.bmp|34|5|
-%xl|f|vol5-b.bmp|34|5|
-%xl|g|vol6-b.bmp|34|5|
-%xl|h|vol7-b.bmp|34|5|
-%xl|i|vol8-b.bmp|34|5|
-%xl|j|ani1-b.bmp|34|5|
-%xl|k|ani2-b.bmp|34|5|
-%xl|l|ani3-b.bmp|34|5|
-%xl|m|ani4-b.bmp|34|5|
-%xl|n|ani5-b.bmp|34|5|
-%xl|o|ani6-b.bmp|34|5|
-%xl|p|ani7-b.bmp|34|5|
-%xl|q|ani8-b.bmp|34|5|
-%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdj|%xdj|%xdj>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdk|%xdk|%xdk>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdl|%xdl|%xdl>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdm|%xdm|%xdm>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdn|%xdn|%xdn>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdo|%xdo|%xdo>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdp|%xdp|%xdp>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdq|%xdq|%xdq>
-%xl|r|codec-mp1-b.bmp|168|236|
-%xl|s|codec-mp2-b.bmp|168|236|
-%xl|t|codec-mp3-b.bmp|168|236|
-%xl|u|codec-aiff-b.bmp|168|236|
-%xl|v|codec-wav-b.bmp|168|236|
-%xl|w|codec-ogg-b.bmp|168|236|
-%xl|x|codec-flac-b.bmp|168|236|
-%xl|y|codec-mpc-b.bmp|168|236|
-%xl|z|codec-ac3-b.bmp|168|236|
-%xl|V|codec-wavpack-b.bmp|168|236|
-%xl|W|codec-alac-b.bmp|168|236|
-%xl|X|codec-aac-b.bmp|168|236|
-%xl|Y|codec-shorten-b.bmp|168|236|
-%xl|Z|codec-unknown-b.bmp|168|236|
-%?fc<%xdr|%xds|%xdt|%xdu|%xdv|%xdw|%xdx|%xdy|%xdz|%xdV|%xdW|%xdX|%xdY|%xdZ>
+%xl|A|battery-b.bmp|204|12|5|
+%t0.5 %?bp<%?bc<%xdAa|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAb|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAc|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAd|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>;%t0.5 %?bp<%?bc<%xdAe|%xdAe>|%?bl<%xdAa|%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAe>>
+%xl|B|hold-b.bmp|164|8|4|
+%?mh<%?mr<%xdBa|%xdBb>|%?mr<%xdBc|%xdBd>>
+%xl|C|repeat-b.bmp|126|9|5|
+%?mm<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe>
+%xl|D|shuffle-b.bmp|91|11|2|
+%?ps<%xdDa|%xdDb>
+%xl|E|playmode-b.bmp|11|10|4|
+%?mp<|%xdEa|%xdEb|%xdEc|%xdEd>
+%xl|F|volume-b.bmp|34|5|9|
+%xl|G|animation-b.bmp|34|5|8|
+%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGa|%xdGa|%xdGa>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGb|%xdGb|%xdGb>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGc|%xdGc|%xdGc>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGd|%xdGd|%xdGd>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGe|%xdGe|%xdGe>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGf|%xdGf|%xdGf>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGg|%xdGg|%xdGg>;%t0.1 %?mp<%xdFa|%?pv<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe|%xdFf|%xdFg|%xdFh|%xdFi>|%xdGh|%xdGh|%xdGh>
+%xl|H|codec-b.bmp|168|236|21|
+%?fc<%xdHa|%xdHb|%xdHc|%xdHd|%xdHe|%xdHf|%xdHg|%xdHh|%xdHi|%xdHj|%xdHk|%xdHl|%xdHm|%xdHn|%xdHo|%xdHp|%xdHq|%xdHr|%xdHs|%xdHt|%xdHu>
