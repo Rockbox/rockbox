@@ -111,6 +111,16 @@ software.
     \note{\index{Firewire}Firewire detection is not supported in Rockbox at 
     the moment. Please use USB only.} 
   }
+
+  \opt{sansa}{\warn{The following steps require you to change the setting in
+    \setting{Settings $\rightarrow$ USB Mode} to \setting{MSC} from within the
+    original firmware. Never extract files to your \dap{} while it is in
+    recovery mode.}}
+  \opt{h10,h10_5gb}{\warn{The following steps require you to use UMS mode and so
+    may require use of the UMS trick as described in the bootloader installation
+    section.}}
+  \opt{gigabeat}{\warn{During installation, do not connect your \dap{}
+    using the cradle but plug the USB cable directly to the \dap{}.}}  
 \end{description}
 For manual installation and customization additional software is required.
 \begin{description}
@@ -145,6 +155,11 @@ For manual installation and customization additional software is required.
 }
 
 \section{Installing Rockbox}\label{sec:installing_rockbox}\index{Installation}
+
+\opt{ipodvideo}{\warn{There are separate versions of Rockbox for the 30GB and 
+  60GB/80GB models.  You must ensure you download the correct version for your 
+  \dap{}.}}
+
 \subsection{Automated Installation}
 
 \opt{mrobe100}{\fixme{NOTE: The m:robe 100 is only supported in rbutil version 
@@ -227,19 +242,6 @@ bugs. Just be aware that these are development builds that are highly
 functional, but not perfect!
 
 \subsubsection{Installing the firmware}\label{sec:installing_firmware}
-
-\opt{sansa}{\warn{The following steps require you to change the setting in
-  \setting{Settings $\rightarrow$ USB Mode} to \setting{MSC} from within the
-  original firmware. Never extract files to your \dap{} while it is in
-  recovery mode.}}
-\opt{h10,h10_5gb}{\warn{The following steps require you to use UMS mode and so
-  may require use of the UMS trick as described in the bootloader installation
-  section.}}
-\opt{gigabeat}{\warn{During installation, do not connect your \dap{}
-  using the cradle but plug the USB cable directly to the \dap{}.}}
-\opt{ipodvideo}{\warn{There are separate versions of Rockbox for the 30GB and 
-  60GB/80GB models.  You must ensure you download the correct version for your 
-  \dap{}.}}
 
 \begin{enumerate}
 
@@ -327,10 +329,11 @@ structure that Rockbox needs.
 \index{Speech}\index{Installation!Optional Steps}
 If you wish to use speech support you will also need a voice file, english ones
 are available from \url{http://www.rockbox.org/daily.shtml}. Download the
-``voice'' for your player, rename it to \fname{english.voice}, copy it
-into the \fname{langs} directory which is inside the \fname{/.rockbox} directory on
-your \dap{} and reboot. Voice menus are turned on by default. See
-\reference{ref:Voiceconfiguration} for details on voice settings.
+``voice'' package for your player and unzip it directly to the root of your \dap.
+You should now find an \fname{english.voice} in the \fname{/.rockbox/langs}
+directory on your \dap{}. Voice menus are enabled by default and will come
+into effect after a reboot. See \reference{ref:Voiceconfiguration} for details
+on voice settings.
 
 \section{Running Rockbox}
 Remove your \dap{} from the computer's USB port. %
