@@ -16,6 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __IMX31L_H__
+#define __IMX31L_H__
 
 /* Most(if not all) of these defines are copied from Nand-Boot v4 provided w/ the Imx31 Linux Bsp*/
 
@@ -26,7 +28,6 @@
 /* Place in the section with the framebuffer */
 #define TTB_BASE_ADDR           (0x80100000 + 0x00100000 - TTB_SIZE)
  
-/*Frame Buffer and TTB defines from gigabeat f/x build*/
 #define FRAME ((short *)0x80100000) /* Framebuffer */
 #define LCD_BUFFER_SIZE ((320*240*2))
 #define TTB_SIZE (0x4000)
@@ -82,6 +83,7 @@
 #define AIPS2_BASE_ADDR         0x53F00000
 #define AIPS2_CTRL_BASE_ADDR    AIPS2_BASE_ADDR
 #define CCM_BASE_ADDR           0x53F80000
+#define CSPI3_BASE_ADDR         0x53F84000
 #define FIRI_BASE_ADDR          0x53F8C000
 #define GPT1_BASE_ADDR          0x53F90000
 #define EPIT1_BASE_ADDR         0x53F94000
@@ -108,10 +110,10 @@
 /* IOMUXC */
 #define IOMUXC_(o)              (*(REG32_PTR_T)(IOMUXC_BASE_ADDR+(o)))
 
-    /* GPR */
+/* GPR */
 #define IOMUXC_GPR              IOMUXC_(0x008)
 
-    /* SW_MUX_CTL */
+/* SW_MUX_CTL */
 #define SW_MUX_CTL_CSPI3_MISO_CSPI3_SCLK_CSPI3_SPI_RDY_TTM_PAD          IOMUXC_(0x00C)
 #define SW_MUX_CTL_ATA_RESET_B_CE_CONTROL_CLKSS_CSPI3_MOSI              IOMUXC_(0x010)
 #define SW_MUX_CTL_ATA_CS1_ATA_DIOR_ATA_DIOW_ATA_DMACK                  IOMUXC_(0x014)
@@ -216,7 +218,7 @@
 #define SW_MUX_CTL_FLD_2(x)     ((x) << 16)
 #define SW_MUX_CTL_FLD_3(x)     ((x) << 24)
 
-    /* SW_PAD_CTL */
+/* SW_PAD_CTL */
 #define SW_PAD_CTL_TTM_PAD__X__X                            IOMUXC_(0x154)
 #define SW_PAD_CTL_CSPI3_MISO_CSPI3_SCLK_CSPI3_SPI_RDY      IOMUXC_(0x158)
 #define SW_PAD_CTL_CE_CONTROL_CLKSS_CSPI3_MOSI              IOMUXC_(0x15C)
@@ -453,17 +455,40 @@
 #define ATA_CONTROLLER_IDLE     (1 << 4)
 #define ATA_INTRQ2              (1 << 3)
 
-/* Timers */
+/* EPIT */
 #define EPITCR1                 (*(REG32_PTR_T)(EPIT1_BASE_ADDR+0x00))
 #define EPITSR1                 (*(REG32_PTR_T)(EPIT1_BASE_ADDR+0x04))
 #define EPITLR1                 (*(REG32_PTR_T)(EPIT1_BASE_ADDR+0x08))
 #define EPITCMPR1               (*(REG32_PTR_T)(EPIT1_BASE_ADDR+0x0C))
 #define EPITCNT1                (*(REG32_PTR_T)(EPIT1_BASE_ADDR+0x10))
+
 #define EPITCR2                 (*(REG32_PTR_T)(EPIT2_BASE_ADDR+0x00))
 #define EPITSR2                 (*(REG32_PTR_T)(EPIT2_BASE_ADDR+0x04))
 #define EPITLR2                 (*(REG32_PTR_T)(EPIT2_BASE_ADDR+0x08))
 #define EPITCMPR2               (*(REG32_PTR_T)(EPIT2_BASE_ADDR+0x0C))
 #define EPITCNT2                (*(REG32_PTR_T)(EPIT2_BASE_ADDR+0x10))
+
+#define EPITCR_CLKSRC_OFF               (0 << 24)
+#define EPITCR_CLKSRC_IPG_CLK           (1 << 24)
+#define EPITCR_CLKSRC_IPG_CLK_HIGHFREQ  (2 << 24)
+#define EPITCR_CLKSRC_IPG_CLK_32K       (3 << 24)
+#define EPITCR_OM_DISCONNECTED          (0 << 22)
+#define EPITCR_OM_TOGGLE                (1 << 22)
+#define EPITCR_OM_CLEAR                 (2 << 22)
+#define EPITCR_OM_SET                   (3 << 22)
+#define EPITCR_STOPEN                   (1 << 21)
+#define EPITCR_DOZEN                    (1 << 20)
+#define EPITCR_WAITEN                   (1 << 19)
+#define EPITCR_DBGEN                    (1 << 18)
+#define EPITCR_IOVW                     (1 << 17)
+#define EPITCR_SWR                      (1 << 16)
+#define EPITCR_PRESCALER(n)             ((n) << 4) /* Divide by n+1 */
+#define EPITCR_RLD                      (1 << 3)
+#define EPITCR_OCIEN                    (1 << 2)
+#define EPITCR_ENMOD                    (1 << 1)
+#define EPITCR_EN                       (1 << 0)
+
+#define EPITSR_OCIF                     (1 << 0)
 
 /* GPIO */
 #define GPIO1_DR                (*(REG32_PTR_T)(GPIO1_BASE_ADDR+0x00))
@@ -490,7 +515,7 @@
 #define GPIO3_IMR               (*(REG32_PTR_T)(GPIO3_BASE_ADDR+0x14))
 #define GPIO3_ISR               (*(REG32_PTR_T)(GPIO3_BASE_ADDR+0x18))
 
-/* SPI */
+/* CSPI */
 #define CSPI_RXDATA1            (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x00))
 #define CSPI_TXDATA1            (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x04))
 #define CSPI_CONREG1            (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x08))
@@ -508,6 +533,79 @@
 #define CSPI_STATREG2           (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x14))
 #define CSPI_PERIODREG2         (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x18))
 #define CSPI_TESTREG2           (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x1C0))
+
+#define CSPI_RXDATA3            (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x00))
+#define CSPI_TXDATA3            (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x04))
+#define CSPI_CONREG3            (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x08))
+#define CSPI_INTREG3            (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x0C))
+#define CSPI_DMAREG3            (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x10))
+#define CSPI_STATREG3           (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x14))
+#define CSPI_PERIODREG3         (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x18))
+#define CSPI_TESTREG3           (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x1C0))
+
+/* CSPI CONREG flags/fields */
+#define CSPI_CONREG_CHIP_SELECT_SS0     (0 << 24)
+#define CSPI_CONREG_CHIP_SELECT_SS1     (1 << 24)
+#define CSPI_CONREG_CHIP_SELECT_SS2     (2 << 24)
+#define CSPI_CONREG_CHIP_SELECT_SS3     (3 << 24)
+#define CSPI_CONREG_CHIP_SELECT_MASK    (3 << 24)
+#define CSPI_CONREG_DRCTL_DONT_CARE     (0 << 20)
+#define CSPI_CONREG_DRCTL_TRIG_FALLING  (1 << 20)
+#define CSPI_CONREG_DRCTL_TRIG_LOW      (2 << 20)
+#define CSPI_CONREG_DRCTL_TRIG_RSV      (3 << 20)
+#define CSPI_CONREG_DRCTL_MASK          (3 << 20)
+#define CSPI_CONREG_DATA_RATE_DIV_4     (0 << 16)
+#define CSPI_CONREG_DATA_RATE_DIV_8     (1 << 16)
+#define CSPI_CONREG_DATA_RATE_DIV_16    (2 << 16)
+#define CSPI_CONREG_DATA_RATE_DIV_32    (3 << 16)
+#define CSPI_CONREG_DATA_RATE_DIV_64    (4 << 16)
+#define CSPI_CONREG_DATA_RATE_DIV_128   (5 << 16)
+#define CSPI_CONREG_DATA_RATE_DIV_256   (6 << 16)
+#define CSPI_CONREG_DATA_RATE_DIV_512   (7 << 16)
+#define CSPI_CONREG_DATA_RATE_DIV_MASK  (7 << 16)
+#define CSPI_CONREG_SSPOL               (1 << 7)
+#define CSPI_CONREG_SSCTL               (1 << 6)
+#define CSPI_CONREG_PHA                 (1 << 6)
+#define CSPI_CONREG_POL                 (1 << 4)
+#define CSPI_CONREG_SMC                 (1 << 3)
+#define CSPI_CONREG_XCH                 (1 << 2)
+#define CSPI_CONREG_MODE                (1 << 1)
+#define CSPI_CONREG_EN                  (1 << 0)
+
+/* CSPI INTREG flags */
+#define CSPI_INTREG_TCEN                (1 << 8)
+#define CSPI_INTREG_BOEN                (1 << 7)
+#define CSPI_INTREG_ROEN                (1 << 6)
+#define CSPI_INTREG_RFEN                (1 << 5)
+#define CSPI_INTREG_RHEN                (1 << 4)
+#define CSPI_INTREG_RREN                (1 << 3)
+#define CSPI_INTREG_TFEN                (1 << 2)
+#define CSPI_INTREG_THEN                (1 << 1)
+#define CSPI_INTREF_TEEN                (1 << 0)
+
+/* CSPI DMAREG flags */
+#define CSPI_DMAREG_RFDEN               (1 << 5)
+#define CSPI_DMAREG_RHDEN               (1 << 4)
+#define CSPI_DMAREG_THDEN               (1 << 1)
+#define CSPI_DMAREG_TEDEN               (1 << 0)
+
+/* CSPI STATREG flags */
+#define CSPI_STATREG_TC                 (1 << 8) /* w1c */
+#define CSPI_STATREG_BO                 (1 << 7) /* w1c */
+#define CSPI_STATREG_RO                 (1 << 6)
+#define CSPI_STATREG_RF                 (1 << 5)
+#define CSPI_STATREG_RH                 (1 << 4)
+#define CSPI_STATREG_RR                 (1 << 3)
+#define CSPI_STATREG_TF                 (1 << 2)
+#define CSPI_STATREG_TH                 (1 << 1)
+#define CSPI_STATREG_TE                 (1 << 0)
+
+/* CSPI PERIODREG flags */
+#define CSPI_PERIODREG_CSRC             (1 << 15)
+
+/* CSPI TESTREG flags */
+#define CSPI_TESTREG_SWAP               (1 << 15)
+#define CSPI_TESTREG_LBC                (1 << 14)
 
 /* RTC */
 #define RTC_HOURMIN             (*(REG32_PTR_T)(RTC_BASE_ADDR+0x00))
@@ -642,7 +740,6 @@
 #define CLKCTL_CCMR                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x00))
 #define CLKCTL_PDR0                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x04))
 #define CLKCTL_PDR1                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x08))
-#define CLKCTL_PDR2                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x64))
 #define CLKCTL_RCSR                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x0C))
 #define CLKCTL_MPCTL                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x10))
 #define CLKCTL_UPCTL                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x14))
@@ -652,8 +749,68 @@
 #define CLKCTL_CGR1                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x24))
 #define CLKCTL_CGR2                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x28))
 #define CLKCTL_WIMR0                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x2C))
+#define CLKCTL_LDC                      (*(REG32_PTR_T)(CCM_BASE_ADDR+0x30))
+#define CLKCTL_DCVR0                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x34))
+#define CLKCTL_DCVR1                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x38))
+#define CLKCTL_DCVR2                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x3C))
+#define CLKCTL_DCVR3                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x40))
+#define CLKCTL_LTR0                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x44))
+#define CLKCTL_LTR1                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x48))
+#define CLKCTL_LTR2                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x4C))
+#define CLKCTL_LTR3                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x50))
+#define CLKCTL_LTBR0                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x54))
+#define CLKCTL_LTBR1                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x58))
 #define CLKCTL_PMCR0                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x5C))
-#define PLL_REF_CLK                     26000000
+#define CLKCTL_PMCR1                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x60))
+#define CLKCTL_PDR2                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x64))
+
+#define CG_OFF                          0x0 /* Always off */
+#define CG_ON_RUN                       0x1 /* On in run mode, off in wait and doze */
+#define CG_ON_RUN_WAIT                  0x2 /* On in run and wait modes, off in doze */
+#define CG_ON_ALL                       0x3 /* Always on */
+#define CG_MASK                         0x3 /* bitmask */
+
+#define CGR0_SD_MMC1(cg)                ((cg) << 0*2)
+#define CGR0_SD_MMC2(cg)                ((cg) << 1*2)
+#define CGR0_GPT(cg)                    ((cg) << 2*2)
+#define CGR0_EPIT1(cg)                  ((cg) << 3*2)
+#define CGR0_EPIT2(cg)                  ((cg) << 4*2)
+#define CGR0_IIM(cg)                    ((cg) << 5*2)
+#define CGR0_ATA(cg)                    ((cg) << 6*2)
+#define CGR0_SDMA(cg)                   ((cg) << 7*2)
+#define CGR0_CSPI3(cg)                  ((cg) << 8*2)
+#define CGR0_RNG(cg)                    ((cg) << 9*2)
+#define CGR0_UART1(cg)                  ((cg) << 10*2)
+#define CGR0_UART2(cg)                  ((cg) << 11*2)
+#define CGR0_SSI1(cg)                   ((cg) << 12*2)
+#define CGR0_I2C1(cg)                   ((cg) << 13*2)
+#define CGR0_I2C2(cg)                   ((cg) << 14*2)
+#define CGR0_I2C3(cg)                   ((cg) << 15*2)
+
+#define CGR1_HANTRO(cg)                 ((cg) << 0*2)
+#define CGR1_MEMSTICK1(cg)              ((cg) << 1*2)
+#define CGR1_MEMSTICK2(cg)              ((cg) << 2*2)
+#define CGR1_CSI(cg)                    ((cg) << 3*2)
+#define CGR1_RTC(cg)                    ((cg) << 4*2)
+#define CGR1_WDOG(cg)                   ((cg) << 5*2)
+#define CGR1_PWM(cg)                    ((cg) << 6*2)
+#define CGR1_SIM(cg)                    ((cg) << 7*2)
+#define CGR1_ECT(cg)                    ((cg) << 8*2)
+#define CGR1_USBOTG(cg)                 ((cg) << 9*2)
+#define CGR1_KPP(cg)                    ((cg) << 10*2)
+#define CGR1_IPU(cg)                    ((cg) << 11*2)
+#define CGR1_UART3(cg)                  ((cg) << 12*2)
+#define CGR1_UART4(cg)                  ((cg) << 13*2)
+#define CGR1_UART5(cg)                  ((cg) << 14*2)
+#define CGR1_1_WIRE(cg)                 ((cg) << 15*2)
+
+#define CGR2_SSI2(cg)                   ((cg) << 0*2)
+#define CGR2_CSPI1(cg)                  ((cg) << 1*2)
+#define CGR2_CSPI2(cg)                  ((cg) << 2*2)
+#define CGR2_GACC(cg)                   ((cg) << 3*2)
+#define CGR2_EMI(cg)                    ((cg) << 4*2)
+#define CGR2_RTIC(cg)                   ((cg) << 5*2)
+#define CGR2_FIR(cg)                    ((cg) << 6*2)
 
 /* WEIM - CS0 */
 #define CSCRU                           0x00
@@ -829,3 +986,5 @@
 #define readl(a)                (*(REG32_PTR_T)(a))
 #define writew(v,a)             (*(REG16_PTR_T)(a) = (v))
 #define readw(a)                (*(REG16_PTR_T)(a))
+
+#endif /* __IMX31L_H__ */
