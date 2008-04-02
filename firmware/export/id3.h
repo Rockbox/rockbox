@@ -49,6 +49,7 @@ enum
     AFMT_WAVPACK,      /* WavPack */
     AFMT_ALAC,         /* Apple Lossless Audio Codec */
     AFMT_AAC,          /* Advanced Audio Coding (AAC) in M4A container */
+    AFMT_MOD,          /* MOD File Format */
     AFMT_SHN,          /* Shorten */
     AFMT_SID,          /* SID File Format */
     AFMT_ADX,          /* ADX File Format */

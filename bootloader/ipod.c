@@ -56,6 +56,49 @@ unsigned char *loadbuffer = (unsigned char *)DRAM_START;
 /* Bootloader version */
 char version[] = APPSVERSION;
 
+struct sysinfo 
+{
+    unsigned IsyS;  /* == "IsyS" */
+    unsigned len;
+    char BoardHwName[16];
+    char pszSerialNumber[32];
+    char pu8FirewireGuid[16];
+    unsigned boardHwRev;
+    unsigned bootLoaderImageRev;
+    unsigned diskModeImageRev;
+    unsigned diagImageRev;
+    unsigned osImageRev;
+    unsigned iram_perhaps;
+    unsigned Flsh;
+    unsigned flash_zero;
+    unsigned flash_base;
+    unsigned flash_size;
+    unsigned flash_zero2;
+    unsigned Sdrm;
+    unsigned sdram_zero;
+    unsigned sdram_base;
+    unsigned sdram_size;
+    unsigned sdram_zero2;
+    unsigned Frwr;
+    unsigned frwr_zero;
+    unsigned frwr_base;
+    unsigned frwr_size;
+    unsigned frwr_zero2;
+    unsigned Iram;
+    unsigned iram_zero;
+    unsigned iram_base;
+    unsigned iram_size;
+    unsigned iram_zero2;
+    char pad7[120];
+    unsigned boardHwSwInterfaceRev;
+
+    /* added in V3 */
+    char HddFirmwareRev[10];
+    unsigned short RegionCode;
+    unsigned PolicyFlags;
+    char ModelNumStr[16];
+};
+
 #define BUTTON_LEFT  1
 #define BUTTON_MENU  2
 #define BUTTON_RIGHT 3
@@ -220,6 +263,24 @@ void fatal_error(void)
 
 }
 
+static struct sysinfo ** const sysinfo_ptr =
+#if CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020
+                      0x40017f1c;
+#elif CONFIG_CPU == PP5022 || CONFIG_CPU == PP5024
+                      0x4001ff1c;
+#endif
+
+static unsigned ipod_get_hwrev_sysinfo(void)
+{
+    if ( (*sysinfo_ptr)->IsyS == *(unsigned *)"IsyS" )
+    {
+        if ((*sysinfo_ptr)->len == 0xf8)
+            return (*sysinfo_ptr)->sdram_zero2;
+        else
+            return (*sysinfo_ptr)->boardHwSwInterfaceRev;
+    }
+    return 0xffffffff; /* unknown */
+}
 
 void* main(void)
 {
@@ -270,6 +331,9 @@ void* main(void)
     printf("Rockbox boot loader");
     printf("Version: %s", version);
     printf("IPOD version: 0x%08x", IPOD_HW_REVISION);
+    
+    printf("SysI ptr: %08x", *sysinfo_ptr);
+    printf("SysI HWR: %08x", ipod_get_hwrev_sysinfo());
 
     i=ata_init();
     if (i==0) {
