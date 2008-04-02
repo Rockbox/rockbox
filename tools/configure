@@ -66,6 +66,32 @@ findtool(){
   done
 }
 
+# parse the argument list, returns the value after the = in case of a
+# option=value type option, returns 0 in case of --ccache or --no-ccache,
+# returns 1 if the searched argument type wasn't fount in the argument list
+# Usage [var = ]`parse_args <argumenttype>`, i.e. `parse_args target`
+
+# var definitons below are needed so that parse_args can see the arguments
+arg1=$1 arg2=$2 arg3=$3 arg4=$4 arg5=$5 arg6=$6 arg7=$7 arg8=$8 arg9=$9
+
+parse_args() {
+  ret="1"
+  for i in $arg1 $arg2 $arg3 $arg4 $arg5 $arg6 $arg7 $arg8 $arg9
+  do
+    if [ "$1" = "--ccache" ]; then
+      if [ "$i" = "--ccache" ]; then
+        ret="0"
+      fi
+    elif [ "$1" = "--no-ccache" ]; then
+      if [ "$i" = "--no-ccache" ]; then
+        ret="0"
+      fi
+    elif [ "$1" = `echo $i|cut -d'=' -f1` ]; then
+      ret=`echo $i|cut -d'=' -f2`
+    fi
+  done
+  echo "$ret"
+}
 
 simcc () {
 
@@ -544,7 +570,28 @@ if test "$opt" = "--help"; then
   echo "Invoke this in a directory to generate a Makefile to build Rockbox"
   echo "Do *NOT* run this within the tools directory!"
   echo ""
-  echo "Usage: configure [--ccache][--no-ccache]"
+cat <<EOF
+  Usage: configure [OPTION]...
+  Options:
+    --target=TARGET   Sets the target, TARGET can be either the target ID or
+                      corresponding string. Run without this option to see the
+                      available targets.
+
+    --ram=RAM         Sets the RAM for certain targets. Even though any number
+                      is accepted, not every number is correct. The default
+                      value will be applied, if you entered a wrong number
+                      (which depends on the target). Watch the output.  Run
+                      without this option if you are not sure which the right
+                      number is.
+
+    --type=TYPE       Sets the build type. The shortcut is valied.
+                      Run without this option to see available types.
+    --ccache          Enable ccache use (done by default these days)
+    --no-ccache       Disable ccache use
+    --help            Shows this message (must not be used with other options)
+
+EOF
+
   exit
 fi
 
@@ -604,6 +651,9 @@ toolsdir='\$(ROOTDIR)/tools'
 # Figure out target platform
 #
 
+if [ "1" != `parse_args --target` ]; then
+  buildfor=`parse_args --target`;
+else
   echo "Enter target platform:"
 cat <<EOF
  ==Archos==            ==iriver==             ==Apple iPod==
@@ -628,10 +678,12 @@ cat <<EOF
                        71) M:Robe 100
  ==Creative==
  90) Zen Vision:M
+
 EOF
 
   buildfor=`input`;
 
+fi
   # Set of tools built for all target platforms:
   toolset="rdf2binary convbdf codepages"
 
@@ -1538,36 +1590,42 @@ EOF
 #
 
 if [ -z "$memory" ]; then
-
-  	case $target_id in
-	15)
-  	   	echo "Enter size of your RAM (in MB): (Defaults to 32)"
-    		size=`input`;
-     		case $size in
-     		60|64)
-	   	  	memory="64"
-  	 	  	;;
-	  	  *)
-                        memory="32"
-	  	   	;;
-                esac
-                ;;	
-				
-   	*)
-                echo "Enter size of your RAM (in MB): (defaults to 2)"
-                size=`input`;
-    		case $size in
-		8)
-  		memory="8"
-    		;;
-   		*)
-    		memory="2"
-    		;;
-		esac
-                ;;
-   	esac
-
-	echo "Memory size selected: $memory MB"
+  case $target_id in
+  15)
+    echo "Enter size of your RAM (in MB): (Defaults to 32)"
+    if [ "1" != `parse_args --ram` ]; then
+      size=`parse_args --ram`;
+    else
+      size=`input`;
+    fi
+    case $size in
+    60|64)
+      memory="64"
+      ;;
+    *)
+      memory="32"
+      ;;
+    esac
+    ;;
+  *)
+    echo "Enter size of your RAM (in MB): (Defaults to 2)"
+      if [ "1" != `parse_args --ram` ]; then
+        size=`parse_args --ram`;
+      else
+        size=`input`;
+      fi
+      case $size in
+      8)
+        memory="8"
+        ;;
+      *)
+        memory="2"
+        ;;
+      esac
+    ;;
+  esac
+  echo "Memory size selected: $memory MB"
+  echo ""
 fi
 #remove end
 
@@ -1577,21 +1635,22 @@ fi
 
   # the ifp7x0 is the only platform that supports building a gdb stub like
   # this
-  case $modelname in
-    ifp7xx)
-       gdbstub="(G)DB stub, "
-       ;;
-    e200r|e200)
-       gdbstub="(I)installer, "
-       ;;
-    *)
-       ;;
-  esac
-
-  echo ""
-  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, $gdbstub(M)anual (N)"
-
+case $modelname in
+  ifp7xx)
+     gdbstub="(G)DB stub, "
+     ;;
+  e200r|e200)
+     gdbstub="(I)installer, "
+     ;;
+  *)
+     ;;
+esac
+if [ "1" != `parse_args --type` ]; then
+  option=`parse_args --type`;
+else
+  echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, $gdbstub(M)anual: (Defaults to N)"
   option=`input`;
+fi
 
   case $option in
     [Ii])
@@ -1798,12 +1857,20 @@ if test "$CC" = "m68k-elf-gcc"; then
   # convert -O to -Os to get smaller binaries!
   GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
 fi
+  for path in $PATH
+  do
+    # echo "checks for $file in $path" >&2
+    if test -f "$path/$file"; then
+      echo "$path/$file"
+      return
+    fi
+  done
 
-if test "$1" = "--ccache"; then
+if [ "1" != `parse_args --ccache` ]; then
   echo "Enable ccache for building"
   ccache="ccache"
 else
-  if test "$1" != "--no-ccache"; then
+  if [ "1" = `parse_args --no-ccache` ]; then
     ccache=`findtool ccache`
     if test -n "$ccache"; then
       echo "Found and uses ccache ($ccache)"
