@@ -57,18 +57,12 @@ static void invert_display(void);
 #endif
 
 #if defined(IPOD_1G2G) || defined(IPOD_3G)
-static unsigned short power_reg_h;
-#define POWER_REG_H power_reg_h
+#define POWER_REG_H 0x1120   /* 1/7 Bias, 5x step-up @ clk/8 */
 #else
-#define POWER_REG_H 0x1200
+#define POWER_REG_H 0x1200   /* 1/7 Bias, 6x step-up @ clk/32 */
 #endif
 
-#ifdef IPOD_1G2G
-static unsigned short contrast_reg_h;
-#define CONTRAST_REG_H contrast_reg_h
-#else
 #define CONTRAST_REG_H 0x400
-#endif
 
 /* needed for flip */
 static int addr_offset;
@@ -118,43 +112,19 @@ static void lcd_cmd_and_data(unsigned cmd, unsigned data)
 /* LCD init */
 void lcd_init_device(void)
 {
-#ifdef IPOD_1G2G
-    if ((IPOD_HW_REVISION >> 16) == 1)
-    {
-        power_reg_h = 0x1500;
-        contrast_reg_h = 0x700;
-    }
-    else /* 2nd gen */
-    {
-        if (inl(0xcf00404c) & 0x01) /* check bit 0 */
-        {
-            power_reg_h = 0x1520;   /* Set step-up frequency to f/8 instead of
-                                     * f/32, for better blacklevel stability */
-            contrast_reg_h = 0x400;
-        }
-        else
-        {
-            power_reg_h = 0x1100;
-            contrast_reg_h = 0x300;
-        }
-    }
-#elif defined IPOD_3G
-    if (inl(0xcf00404c) & 0x01) /* check bit 0 */
-        power_reg_h = 0x1520;   /* Set step-up frequency to f/8 instead of
-                                 * f/32, for better blacklevel stability */
-    else
-        power_reg_h = 0x1100;
-#endif
 
 #ifdef IPOD_MINI2G /* serial LCD hookup */
     lcd_wait_write();
     LCD1_CONTROL = 0x01730084; /* fastest setting */
 #elif defined(IPOD_1G2G) || defined(IPOD_3G)
-    LCD1_CONTROL = (LCD1_CONTROL & 0x0002) | 0x0084; /* fastest setting, keep backlight bit */
+    LCD1_CONTROL = (LCD1_CONTROL & 0x0002) | 0x0084; 
+                   /* fastest setting, keep backlight bit */
 #else
     LCD1_CONTROL = 0x0084; /* fastest setting */
 #endif
 
+    lcd_cmd_and_data(R_DRV_WAVEFORM_CONTROL, 0x48);
+                     /* C waveform, no EOR, 9 lines inversion */
     lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0xc);
 #ifdef HAVE_BACKLIGHT_INVERSION
     invert_display();
@@ -169,9 +139,11 @@ void lcd_init_device(void)
 
 int lcd_default_contrast(void)
 {
-#ifdef IPOD_1G2G
-    return 28;
-#elif defined(IPOD_MINI) || defined(IPOD_MINI2G) || defined(IPOD_3G)
+#if defined(IPOD_1G2G)
+    return 45;
+#elif defined(IPOD_3G)
+    return 55;
+#elif defined(IPOD_MINI) || defined(IPOD_MINI2G)
     return 42;
 #elif defined(IPOD_4G)
     return 35;
@@ -354,7 +326,7 @@ void lcd_update(void)
 /* LCD powerdown */
 void lcd_shutdown(void)
 {
-    lcd_cmd_and_data(R_POWER_CONTROL, 0x1500); /* Turn off op amp power */
-    lcd_cmd_and_data(R_POWER_CONTROL, 0x1502); /* Put LCD driver in standby */
+    lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0x00); /* Turn off op amp power */
+    lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0x02); /* Put LCD driver in standby */
 }
 #endif
