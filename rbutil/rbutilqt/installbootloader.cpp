@@ -19,6 +19,7 @@
 
 #include "installbootloader.h"
 #include "irivertools/checksums.h"
+#include "utils.h"
 
 BootloaderInstaller::BootloaderInstaller(QObject* parent): QObject(parent)
 {
@@ -329,8 +330,9 @@ void BootloaderInstaller::gigabeatPrepare()
    }
    else                 //UnInstallation
    {
-        QString firmware = m_mountpoint + "/GBSYSTEM/FWIMG/FWIMG01.DAT";
-        QString firmwareOrig = firmware.append(".ORIG");
+        QString firmware;
+        firmware = resolvePathCase(m_mountpoint + "/GBSYSTEM/FWIMG/FWIMG01.DAT");
+        QString firmwareOrig = resolvePathCase(firmware.append(".ORIG"));
 
         QFileInfo firmwareOrigFI(firmwareOrig);
 
@@ -355,8 +357,8 @@ void BootloaderInstaller::gigabeatPrepare()
             return;
         }
 
-        //copy  original firmware
-        if(!firmwareOrigFile.copy(firmware))
+        // rename original firmware back
+        if(!firmwareOrigFile.rename(firmware))
         {
              m_dp->addItem(tr("Could not copy the Firmware from: %1 to %2")
                     .arg(firmwareOrig,firmware),LOGERROR);
@@ -377,7 +379,8 @@ void BootloaderInstaller::gigabeatFinish()
 
     m_dp->addItem(tr("Finishing bootloader install"),LOGINFO);
 
-    QString firmware = m_mountpoint + "/GBSYSTEM/FWIMG/" + m_bootloadername;
+    QString firmware;
+    firmware = resolvePathCase(m_mountpoint + "/GBSYSTEM/FWIMG/" + m_bootloadername);
 
     QFileInfo firmwareFI(firmware);
 
@@ -401,7 +404,7 @@ void BootloaderInstaller::gigabeatFinish()
         //backup
         QDir::home().mkdir("Gigabeat Original Firmware Backup");
         firmwareFile.copy(QDir::toNativeSeparators(QDir::homePath()) + QDir::toNativeSeparators("/Gigabeat Original Firmware Backup/") + m_bootloadername);
-        
+        firmwareFile.unsetError(); 
         //rename
         if(!firmwareFile.rename(firmwareOrig))
         {
@@ -472,7 +475,8 @@ void BootloaderInstaller::iaudioPrepare()
 
 void BootloaderInstaller::iaudioFinish()
 {
-    QString firmware = m_mountpoint + "/FIRMWARE/" + m_bootloadername;
+    QString firmware;
+    firmware = resolvePathCase(m_mountpoint + "/FIRMWARE/") + "/" + m_bootloadername;
 
     //copy the firmware
     if(!downloadFile.copy(firmware))
@@ -531,13 +535,15 @@ void BootloaderInstaller::h10Prepare()
 
         QString firmwarename = m_bootloadername.section('/', -1);
 
-        QString firmware = m_mountpoint + "/SYSTEM/" + firmwarename;
-        QString firmwareOrig = m_mountpoint + "/SYSTEM/OF.mi4";
+        QString firmware;
+        firmware = resolvePathCase(m_mountpoint + "/SYSTEM/" + firmwarename);
+        QString firmwareOrig = resolvePathCase(m_mountpoint + "/SYSTEM/OF.mi4");
 
         QFileInfo firmwareFI(firmware);
         if(!firmwareFI.exists())  //Firmware dosent exists on player
         {
-            firmware = m_mountpoint + "/SYSTEM/H10EMP.mi4";   //attempt other firmwarename
+            firmware = resolvePathCase(m_mountpoint + "/SYSTEM/H10EMP.mi4");
+            //attempt other firmwarename
             firmwareFI.setFile(firmware);
             if(!firmwareFI.exists())  //Firmware dosent exists on player
             {
@@ -569,8 +575,8 @@ void BootloaderInstaller::h10Prepare()
             return;
         }
 
-        //copy  original firmware
-        if(!firmwareOrigFile.copy(firmware))
+        // rename original firmware back
+        if(!firmwareOrigFile.rename(firmware))
         {
              m_dp->addItem(tr("Could not copy the Firmware from: %1 to %2")
                     .arg(firmwareOrig,firmware),LOGERROR);
@@ -589,14 +595,16 @@ void BootloaderInstaller::h10Finish()
 {
     QString firmwarename = m_bootloadername.section('/', -1);
 
-    QString firmware = m_mountpoint + "/SYSTEM/" + firmwarename;
-    QString firmwareOrig = m_mountpoint + "/SYSTEM/OF.mi4";
+    QString firmware;
+    firmware = resolvePathCase(m_mountpoint + "/SYSTEM/" + firmwarename);
+    QString firmwareOrig = resolvePathCase(m_mountpoint + "/SYSTEM") + "/OF.mi4";
 
     QFileInfo firmwareFI(firmware);
 
     if(!firmwareFI.exists())  //Firmware dosent exists on player
     {
-        firmware = m_mountpoint + "/SYSTEM/H10EMP.mi4";   //attempt other firmwarename
+        firmware = resolvePathCase(m_mountpoint + "/SYSTEM") +"/H10EMP.mi4";
+        //attempt other firmwarename
         firmwareFI.setFile(firmware);
         if(!firmwareFI.exists())  //Firmware dosent exists on player
         {
@@ -616,6 +624,7 @@ void BootloaderInstaller::h10Finish()
         //backup
         QDir::home().mkdir("Iriver H10 Original Firmware Backup");
         firmwareFile.copy(QDir::toNativeSeparators(QDir::homePath()) + QDir::toNativeSeparators("/Iriver H10 Original Firmware Backup/") + m_bootloadername);
+        firmwareFile.unsetError();
         
         //rename         
         if(!firmwareFile.rename(firmwareOrig)) //rename Firmware to Original
@@ -685,8 +694,9 @@ void BootloaderInstaller::mrobe100Prepare()
 
         QString firmwarename = m_bootloadername;
 
-        QString firmware = m_mountpoint + "/SYSTEM/" + firmwarename;
-        QString firmwareOrig = m_mountpoint + "/SYSTEM/OF.mi4";
+        QString firmware;
+        firmware = resolvePathCase(m_mountpoint + "/SYSTEM/" + firmwarename);
+        QString firmwareOrig = resolvePathCase(m_mountpoint + "/SYSTEM/OF.mi4");
 
         QFileInfo firmwareFI(firmware);
         if(!firmwareFI.exists())  //Firmware dosent exists on player
@@ -718,8 +728,8 @@ void BootloaderInstaller::mrobe100Prepare()
             return;
         }
 
-        //copy  original firmware
-        if(!firmwareOrigFile.copy(firmware))
+        // move original firmware back
+        if(!firmwareOrigFile.rename(firmware))
         {
              m_dp->addItem(tr("Could not copy the Firmware from: %1 to %2")
                     .arg(firmwareOrig,firmware),LOGERROR);
@@ -738,8 +748,10 @@ void BootloaderInstaller::mrobe100Finish()
 {
     QString firmwarename = m_bootloadername;
 
-    QString firmware = m_mountpoint + "/SYSTEM/" + firmwarename;
-    QString firmwareOrig = m_mountpoint + "/SYSTEM/OF.mi4";
+    QString firmware;
+    firmware = resolvePathCase(m_mountpoint + "/SYSTEM/" + firmwarename);
+    // NOTE: the filename for the OF may not exist yet, so resolve path only!
+    QString firmwareOrig = resolvePathCase(m_mountpoint + "/SYSTEM") + "/OF.mi4";
 
     QFileInfo firmwareFI(firmware);
 
@@ -760,8 +772,8 @@ void BootloaderInstaller::mrobe100Finish()
         //backup
         QDir::home().mkdir("Olympus mrobe100 Original Firmware Backup");
         firmwareFile.copy(QDir::toNativeSeparators(QDir::homePath()) + QDir::toNativeSeparators("/Olympus mrobe100 Original Firmware Backup/") + m_bootloadername);
-        
-        //rename         
+        firmwareFile.unsetError();        
+        //rename
         if(!firmwareFile.rename(firmwareOrig)) //rename Firmware to Original
         {
             m_dp->addItem(tr("Could not rename: %1 to %2")
@@ -1118,11 +1130,11 @@ void BootloaderInstaller::sansaPrepare()
         if (sansa.hasoldbootloader)
         {
             m_dp->addItem(tr("********************************************\n"
-                                       "OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
-                                       "You must reinstall the original Sansa firmware before running\n"
-                                       "sansapatcher for the first time.\n"
-                                       "See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install\n"
-                                       "*********************************************\n"),LOGERROR);
+               "OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
+               "You must reinstall the original Sansa firmware before running\n"
+               "sansapatcher for the first time.\n"
+               "See http://www.rockbox.org/wiki/SansaE200Install\n"
+               "*********************************************\n"),LOGERROR);
             emit done(true);
             return;
         }
@@ -1184,11 +1196,11 @@ void BootloaderInstaller::sansaFinish()
     if (sansa.hasoldbootloader)
     {
         m_dp->addItem(tr("********************************************\n"
-                                       "OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
-                                       "You must reinstall the original Sansa firmware before running\n"
-                                       "sansapatcher for the first time.\n"
-                                       "See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install\n"
-                                       "*********************************************\n"),LOGERROR);
+               "OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
+               "You must reinstall the original Sansa firmware before running\n"
+               "sansapatcher for the first time.\n"
+               "See http://www.rockbox.org/wiki/SansaE200Install\n"
+               "*********************************************\n"),LOGERROR);
         emit done(true);
         return;
     }
@@ -1398,6 +1410,5 @@ void BootloaderInstaller::iriverFinish()
     m_dp->abort();
 
     emit done(false);  // success
-
-
 }
+
