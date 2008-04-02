@@ -1450,7 +1450,7 @@ static void buffering_audio_callback(enum callback_event ev, int value)
 
         case EVENT_HANDLE_REBUFFER:
             LOGFQUEUE("audio >| audio Q_AUDIO_FLUSH");
-            queue_send(&audio_queue, Q_AUDIO_FLUSH, 0);
+            queue_post(&audio_queue, Q_AUDIO_FLUSH, 0);
             break;
 
         case EVENT_HANDLE_FINISHED:
