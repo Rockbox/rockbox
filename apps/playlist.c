@@ -538,12 +538,6 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     if(playlist->fd < 0)
         return -1; /* failure */
     
-#ifdef HAVE_LCD_BITMAP
-    if(global_settings.statusbar)
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
-    else
-        lcd_setmargins(0, 0);
-#endif
     gui_syncsplash(0, ID2P(LANG_WAIT));
 
     if (!buffer)
