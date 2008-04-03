@@ -739,7 +739,7 @@ static int dirbrowse()
                 /* don't enter f3 from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    if (quick_screen_f3(BUTTON_F3))
+                    if (quick_screen_f3(ACTION_F3))
                         reload_dir = true;
                     restore = true;
                 }
