@@ -425,11 +425,13 @@ QMap<int, QString> RbSettings::usbIdMap()
         QString target = devices->value(platforms.at(i)).toString();
         devices->endGroup();
         devices->beginGroup(target);
-        if(!devices->value("usbid").toString().isEmpty())
-            map.insert(devices->value("usbid").toString().toInt(0, 16), target);
+        QStringList ids = devices->value("usbid").toStringList();
+        int j = ids.size();
+        while(j--)
+            map.insert(ids.at(j).toInt(0, 16), target);
+
         devices->endGroup();
     }
-    
     return map;
 }
 
@@ -449,11 +451,12 @@ QMap<int, QString> RbSettings::usbIdErrorMap()
         QString target = devices->value(platforms.at(i)).toString();
         devices->endGroup();
         devices->beginGroup(target);
-         if(!devices->value("usberror").toString().isEmpty())
-            map.insert(devices->value("usberror").toString().toInt(0, 16), target);
+        QStringList ids = devices->value("usberror").toStringList();
+        int j = ids.size();
+        while(j--)
+            map.insert(ids.at(j).toInt(0, 16), target);
         devices->endGroup();
     }
-    
     return map;
 }
 
