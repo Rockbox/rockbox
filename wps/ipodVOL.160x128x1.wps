@@ -1,23 +1,10 @@
-%xl|y|play.bmp|0|2|
-%xl|p|pause.bmp|0|2|
-%xl|f|ffwd.bmp|0|2|
-%xl|v|rev.bmp|0|2|
-%xl|h|hold.bmp|20|2|
-%xl|b|blank.bmp|20|2|
-%xl|r|rep.bmp|141|18|
-%xl|s|reps.bmp|141|18|
-%xl|t|rep1.bmp|141|18|
-%xl|x|repb.bmp|141|18|
-%xl|A|be.bmp|136|2|
-%xl|B|bqe.bmp|136|2|
-%xl|C|bh.bmp|136|2|
-%xl|D|bqf.bmp|136|2|
-%xl|E|bf.bmp|136|2|
-%xl|F|bfp.bmp|136|2|
-%x|V|vol.bmp|60|109|
-%x|g|bg.bmp|0|0|
+%xl|A|playmode.bmp|0|2|4|
+%xl|B|hold.bmp|20|2|
+%xl|C|repeat.bmp|141|18|4|
+%xl|D|battery.bmp|136|2|6|
+%x|a|bg.bmp|0|0|
 %wd
-%ac%?mp<Now Stopped|Now Playing %?ps<(S)|>|Now Paused %?ps<(S)|>|Now Playing %?ps<(S)|>|Now Playing %?ps<(S)|>>
+%ac%?mp<Now Stopped|Now Playing|Now Paused|Now Playing|Now Playing>%?mp<|%?ps< (S)|>>
 
 %al%pp of %pe 
 
@@ -27,7 +14,7 @@
 
 %pb
 %al%pc %ac      %pv %ar-%pr
-%?mp<|%xdy|%xdp|%xdf|%xdv>
-%?mh<%xdh|%xdb>
-%?bp<%xdF|%?bl<%xdA|%xdB|%xdC|%xdD|%xdE>>
-%?mm<%xdx|%xdr|%xdt|%xds>
+%?mp<|%xdAa|%xdAb|%xdAc|%xdAd>
+%?mh<%xdB|>
+%?bp<%xdDa|%?bl<%xdDb|%xdDc|%xdDd|%xdDe|%xdDf>>
+%?mm<|%xdCa|%xdCb|%xdCc|%xdCd>
