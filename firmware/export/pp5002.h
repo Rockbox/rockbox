@@ -93,12 +93,22 @@
 #define GPIOC_INT_CLR    (*(volatile unsigned char *)(0xcf000078))
 #define GPIOD_INT_CLR    (*(volatile unsigned char *)(0xcf00007c))
 
-#define INT_FORCED_CLR   (*(volatile unsigned long *)(0xcf00101c))
 #define CPU_INT_STAT     (*(volatile unsigned long *)(0xcf001000))
+#define COP_INT_STAT     (*(volatile unsigned long *)(0xcf001004))
+#define CPU_FIQ_STAT     (*(volatile unsigned long *)(0xcf001008))
+#define COP_FIQ_STAT     (*(volatile unsigned long *)(0xcf00100c))
+
+#define INT_STAT         (*(volatile unsigned long *)(0xcf001010))
+#define INT_FORCED_STAT  (*(volatile unsigned long *)(0xcf001014))
+#define INT_FORCED_SET   (*(volatile unsigned long *)(0xcf001018))
+#define INT_FORCED_CLR   (*(volatile unsigned long *)(0xcf00101c))
+
+#define CPU_INT_EN_STAT  (*(volatile unsigned long *)(0xcf001020))
 #define CPU_INT_EN       (*(volatile unsigned long *)(0xcf001024))
 #define CPU_INT_CLR      (*(volatile unsigned long *)(0xcf001028))
 #define CPU_INT_PRIORITY (*(volatile unsigned long *)(0xcf00102c))
-#define COP_INT_STAT     (*(volatile unsigned long *)(0xcf001010))
+
+#define COP_INT_EN_STAT  (*(volatile unsigned long *)(0xcf001030))
 #define COP_INT_EN       (*(volatile unsigned long *)(0xcf001034))
 #define COP_INT_CLR      (*(volatile unsigned long *)(0xcf001038))
 #define COP_INT_PRIORITY (*(volatile unsigned long *)(0xcf00103c))
