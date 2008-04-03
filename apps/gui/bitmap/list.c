@@ -201,12 +201,16 @@ void list_draw(struct screen *display, struct viewport *parent,
             }
         }
 #endif
-
-        if(list->show_selection_marker && global_settings.cursor_style &&
-           i >= list->selected_item &&
+        if(i >= list->selected_item &&
            i <  list->selected_item + list->selected_size)
         {/* The selected item must be displayed scrolling */
-            if (global_settings.cursor_style == 1 || display->depth < 16)
+            if (global_settings.cursor_style == 1
+#ifdef HAVE_REMOTE_LCD
+                    /* the global_settings.cursor_style check is here to make sure
+                       if they want the cursor instead of bar it will work */
+                    || (display->depth < 16 && global_settings.cursor_style)
+#endif
+            )
             {
                 /* Display inverted-line-style */
                 list_text[display->screen_type].drawmode |= STYLE_INVERT;
