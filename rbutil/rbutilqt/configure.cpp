@@ -489,6 +489,7 @@ void Config::setCache(QString c)
 void Config::autodetect()
 {
     Autodetection detector(this);
+    detector.setSettings(settings);
 
     if(detector.detect())  //let it detect
     {

@@ -410,6 +410,55 @@ QString RbSettings::brand(QString plattform)
     return brand;
 }
 
+QMap<int, QString> RbSettings::usbIdMap()
+{
+    QMap<int, QString> map;
+     // get a list of ID -> target name
+    QStringList platforms;
+    devices->beginGroup("platforms");
+    platforms = devices->childKeys();
+    devices->endGroup();
+    
+    for(int i = 0; i < platforms.size(); i++)
+    {
+        devices->beginGroup("platforms");
+        QString target = devices->value(platforms.at(i)).toString();
+        devices->endGroup();
+        devices->beginGroup(target);
+        if(!devices->value("usbid").toString().isEmpty())
+            map.insert(devices->value("usbid").toString().toInt(0, 16), target);
+        devices->endGroup();
+    }
+    
+    return map;
+}
+
+QMap<int, QString> RbSettings::usbIdErrorMap()
+{
+
+    QMap<int, QString> map;
+     // get a list of ID -> target name
+    QStringList platforms;
+    devices->beginGroup("platforms");
+    platforms = devices->childKeys();
+    devices->endGroup();
+    
+    for(int i = 0; i < platforms.size(); i++)
+    {
+        devices->beginGroup("platforms");
+        QString target = devices->value(platforms.at(i)).toString();
+        devices->endGroup();
+        devices->beginGroup(target);
+         if(!devices->value("usberror").toString().isEmpty())
+            map.insert(devices->value("usberror").toString().toInt(0, 16), target);
+        devices->endGroup();
+    }
+    
+    return map;
+}
+
+
+
 QString RbSettings::curResolution()
 {
     QString platform = userSettings->value("platform").toString();

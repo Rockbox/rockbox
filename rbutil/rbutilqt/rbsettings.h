@@ -81,7 +81,10 @@ class RbSettings : public QObject
         QString name(QString plattform);
         QString brand(QString plattform);
         QStringList allLanguages();
-
+        QMap<int, QString> usbIdMap();
+        QMap<int, QString> usbIdErrorMap();
+        
+        
         bool curNeedsBootloader();
         QString curBrand();
         QString curName();

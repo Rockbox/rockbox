@@ -22,6 +22,7 @@
 #define AUTODETECTION_H_
 
 #include <QtCore>
+#include "rbsettings.h"
 
 extern "C" {
     // Ipodpatcher
@@ -35,7 +36,9 @@ class Autodetection :public QObject
 
 public:
     Autodetection(QObject* parent=0);
-
+    
+    void setSettings(RbSettings* sett) {settings = sett;}
+        
     bool detect();
 
     QString getDevice() {return m_device;}
@@ -52,6 +55,7 @@ private:
     QString m_mountpoint;
     QString m_errdev;
     QList<int> m_usbconid;
+    RbSettings* settings;
 };
 
 

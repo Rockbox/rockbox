@@ -256,32 +256,11 @@ QString Autodetection::resolveMountPoint(QString device)
  */
 bool Autodetection::detectUsb()
 {
-    // autodetection uses the buildin device settings only
-    QSettings dev(":/ini/rbutil.ini", QSettings::IniFormat, this);
-
-    // get a list of ID -> target name
-    QStringList platforms;
-    dev.beginGroup("platforms");
-    platforms = dev.childKeys();
-    dev.endGroup();
-
     // usbids holds the mapping in the form
     // ((VID<<16)|(PID)), targetname
     // the ini file needs to hold the IDs as hex values.
-    QMap<int, QString> usbids;
-    QMap<int, QString> usberror;
-
-    for(int i = 0; i < platforms.size(); i++) {
-        dev.beginGroup("platforms");
-        QString target = dev.value(platforms.at(i)).toString();
-        dev.endGroup();
-        dev.beginGroup(target);
-        if(!dev.value("usbid").toString().isEmpty())
-            usbids.insert(dev.value("usbid").toString().toInt(0, 16), target);
-        if(!dev.value("usberror").toString().isEmpty())
-            usberror.insert(dev.value("usberror").toString().toInt(0, 16), target);
-        dev.endGroup();
-    }
+    QMap<int, QString> usbids = settings->usbIdMap();
+    QMap<int, QString> usberror = settings->usbIdErrorMap();
 
     // usb pid detection
 #if defined(Q_OS_LINUX) | defined(Q_OS_MACX)
