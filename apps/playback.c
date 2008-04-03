@@ -1559,62 +1559,6 @@ static bool audio_loadcodec(bool start_play)
     return true;
 }
 
-/* TODO: Copied from mpeg.c. Should be moved somewhere else. */
-static void audio_set_elapsed(struct mp3entry* id3)
-{
-    unsigned long offset = id3->offset > id3->first_frame_offset ?
-        id3->offset - id3->first_frame_offset : 0;
-
-    if ( id3->vbr ) {
-        if ( id3->has_toc ) {
-            /* calculate elapsed time using TOC */
-            int i;
-            unsigned int remainder, plen, relpos, nextpos;
-
-            /* find wich percent we're at */
-            for (i=0; i<100; i++ )
-                if ( offset < id3->toc[i] * (id3->filesize / 256) )
-                    break;
-
-            i--;
-            if (i < 0)
-                i = 0;
-
-            relpos = id3->toc[i];
-
-            if (i < 99)
-                nextpos = id3->toc[i+1];
-            else
-                nextpos = 256;
-
-            remainder = offset - (relpos * (id3->filesize / 256));
-
-            /* set time for this percent (divide before multiply to prevent
-               overflow on long files. loss of precision is negligible on
-               short files) */
-            id3->elapsed = i * (id3->length / 100);
-
-            /* calculate remainder time */
-            plen = (nextpos - relpos) * (id3->filesize / 256);
-            id3->elapsed += (((remainder * 100) / plen) *
-                             (id3->length / 10000));
-        }
-        else {
-            /* no TOC exists. set a rough estimate using average bitrate */
-            int tpk = id3->length /
-                ((id3->filesize - id3->first_frame_offset - id3->id3v1len) /
-                1024);
-            id3->elapsed = offset / 1024 * tpk;
-        }
-    }
-    else
-    {
-        /* constant bitrate, use exact calculation */
-        if (id3->bitrate != 0)
-            id3->elapsed = offset / (id3->bitrate / 8);
-    }
-}
-
 /* Load one track by making the appropriate bufopen calls. Return true if
    everything required was loaded correctly, false if not. */
 static bool audio_load_track(int offset, bool start_play)
@@ -1781,7 +1725,6 @@ static bool audio_load_track(int offset, bool start_play)
         if (offset > 0) {
             file_offset = offset;
             track_id3->offset = offset;
-            audio_set_elapsed(track_id3);
         }
         break;
 
