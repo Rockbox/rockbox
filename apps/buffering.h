@@ -22,6 +22,7 @@
 
 #include <sys/types.h>
 #include <stdbool.h>
+#include "events.h"
 
 
 enum data_type {
@@ -36,8 +37,7 @@ enum data_type {
 };
 
 enum callback_event {
-    EVENT_DEFAULT,
-    EVENT_BUFFER_LOW,
+    EVENT_BUFFER_LOW = (EVENT_CLASS_BUFFERING|1),
     EVENT_HANDLE_REBUFFER,
     EVENT_HANDLE_CLOSED,
     EVENT_HANDLE_MOVED,
@@ -109,23 +109,6 @@ void buf_set_base_handle(int handle_id);
 size_t buf_used(void);
 
 
-/***************************************************************************
- * CALLBACK UTILITIES
- * ==================
- *
- * register_buffering_callback, unregister_buffering_callback:
- *
- * Register/Unregister callback functions that will get executed when the buffer
- * goes below the low watermark. They are executed once, then forgotten.
- *
- * NOTE: The callbacks are called from the buffering thread, so don't make them
- * do too much. Ideally they should just post an event to a queue and return.
- ****************************************************************************/
-
-#define MAX_BUF_CALLBACKS 4
-typedef void (*buffering_callback)(enum callback_event ev, int value);
-bool register_buffering_callback(buffering_callback func);
-void unregister_buffering_callback(buffering_callback func);
 
 /* Settings */
 enum {

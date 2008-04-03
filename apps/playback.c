@@ -41,6 +41,7 @@
 #include "codecs.h"
 #include "audio.h"
 #include "buffering.h"
+#include "events.h"
 #include "voice_thread.h"
 #include "mp3_playback.h"
 #include "usb.h"
@@ -1386,6 +1387,34 @@ static void codec_thread(void)
 }
 
 
+/* --- Buffering callbacks --- */
+
+static void buffering_low_buffer_callback(void *data)
+{
+    (void)data;
+    logf("low buffer callback");
+
+    if (filling == STATE_FULL) {
+        /* force a refill */
+        LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
+        queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+    }
+}
+
+static void buffering_handle_rebuffer_callback(void *data)
+{
+    (void)data;
+    LOGFQUEUE("audio >| audio Q_AUDIO_FLUSH");
+    queue_post(&audio_queue, Q_AUDIO_FLUSH, 0);
+}
+
+static void buffering_handle_finished_callback(int *data)
+{
+    logf("handle %d finished buffering", *data);
+    strip_tags(*data);
+}
+
+
 /* --- Audio thread --- */
 
 static bool audio_have_tracks(void)
@@ -1431,36 +1460,6 @@ static void audio_update_trackinfo(void)
     ci.id3 = &curtrack_id3;
     ci.curpos = 0;
     ci.taginfo_ready = &CUR_TI->taginfo_ready;
-}
-
-static void buffering_audio_callback(enum callback_event ev, int value)
-{
-    (void)value;
-    logf("buffering_audio_callback");
-
-    switch (ev)
-    {
-        case EVENT_BUFFER_LOW:
-            if (filling == STATE_FULL) {
-                /* force a refill */
-                LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
-                queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
-            }
-            break;
-
-        case EVENT_HANDLE_REBUFFER:
-            LOGFQUEUE("audio >| audio Q_AUDIO_FLUSH");
-            queue_post(&audio_queue, Q_AUDIO_FLUSH, 0);
-            break;
-
-        case EVENT_HANDLE_FINISHED:
-            logf("handle %d finished buffering", value);
-            strip_tags(value);
-            break;
-
-        default:
-            break;
-    }
 }
 
 /* Clear tracks between write and read, non inclusive */
@@ -2062,6 +2061,8 @@ static void audio_stop_playback(void)
         /* TODO: Create auto bookmark too? */
 
         prev_track_elapsed = curtrack_id3.elapsed;
+
+        remove_event(EVENT_BUFFER_LOW, buffering_low_buffer_callback);
     }
 
     paused = false;
@@ -2075,8 +2076,6 @@ static void audio_stop_playback(void)
 
     /* Close all tracks */
     audio_release_tracks();
-
-    unregister_buffering_callback(buffering_audio_callback);
 
     memset(&curtrack_id3, 0, sizeof(struct mp3entry));
 }
@@ -2121,7 +2120,8 @@ static void audio_play_start(size_t offset)
 #endif
 
     audio_fill_file_buffer(true, offset);
-    register_buffering_callback(buffering_audio_callback);
+
+    add_event(EVENT_BUFFER_LOW, false, buffering_low_buffer_callback);
 
     LOGFQUEUE("audio > audio Q_AUDIO_TRACK_CHANGED");
     queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
@@ -2511,6 +2511,9 @@ void audio_init(void)
         tracks[i].aa_hid = -1;
 #endif
     }
+
+    add_event(EVENT_HANDLE_REBUFFER, false, buffering_handle_rebuffer_callback);
+    add_event(EVENT_HANDLE_FINISHED, false, buffering_handle_finished_callback);
 
     /* Probably safe to say */
     audio_is_initialized = true;

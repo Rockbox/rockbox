@@ -49,6 +49,7 @@
 #include "pcmbuf.h"
 #include "buffer.h"
 #include "bmp.h"
+#include "events.h"
 
 #ifdef SIMULATOR
 #define ata_disk_is_active() 1
@@ -153,9 +154,6 @@ static struct mutex llist_mutex;
    This is global so that move_handle and rm_handle can invalidate it. */
 static struct memory_handle *cached_handle = NULL;
 
-static buffering_callback buffering_callback_funcs[MAX_BUF_CALLBACKS];
-static int buffer_callback_count = 0;
-
 static struct {
     size_t remaining;   /* Amount of data needing to be buffered */
     size_t wasted;      /* Amount of space available for freeing */
@@ -189,8 +187,6 @@ static struct thread_entry *buffering_thread_p;
 static struct event_queue buffering_queue;
 static struct queue_sender_list buffering_queue_sender_list;
 
-
-static void call_buffering_callbacks(enum callback_event ev, int value);
 
 
 /*
@@ -659,7 +655,7 @@ static bool buffer_handle(int handle_id)
         /* finished buffering the file */
         close(h->fd);
         h->fd = -1;
-        call_buffering_callbacks(EVENT_HANDLE_FINISHED, h->id);
+        send_event(EVENT_HANDLE_FINISHED, &h->id);
     }
 
     return true;
@@ -715,7 +711,7 @@ static void rebuffer_handle(int handle_id, size_t newpos)
         /* There isn't enough space to rebuffer all of the track from its new
            offset, so we ask the user to free some */
         DEBUGF("rebuffer_handle: space is needed\n");
-        call_buffering_callbacks(EVENT_HANDLE_REBUFFER, handle_id);
+        send_event(EVENT_HANDLE_REBUFFER, &handle_id);
     }
 
     /* Now we ask for a rebuffer */
@@ -1269,52 +1265,6 @@ void buf_set_watermark(size_t bytes)
     queue_post(&buffering_queue, Q_SET_WATERMARK, bytes);
 }
 
-bool register_buffering_callback(buffering_callback func)
-{
-    int i;
-    if (buffer_callback_count >= MAX_BUF_CALLBACKS)
-        return false;
-    for (i = 0; i < MAX_BUF_CALLBACKS; i++)
-    {
-        if (buffering_callback_funcs[i] == NULL)
-        {
-            buffering_callback_funcs[i] = func;
-            buffer_callback_count++;
-            return true;
-        }
-        else if (buffering_callback_funcs[i] == func)
-            return true;
-    }
-    return false;
-}
-
-void unregister_buffering_callback(buffering_callback func)
-{
-    int i;
-    for (i = 0; i < MAX_BUF_CALLBACKS; i++)
-    {
-        if (buffering_callback_funcs[i] == func)
-        {
-            buffering_callback_funcs[i] = NULL;
-            buffer_callback_count--;
-        }
-    }
-    return;
-}
-
-static void call_buffering_callbacks(enum callback_event ev, int value)
-{
-    logf("call_buffering_callbacks()");
-    int i;
-    for (i = 0; i < MAX_BUF_CALLBACKS; i++)
-    {
-        if (buffering_callback_funcs[i])
-        {
-            buffering_callback_funcs[i](ev, value);
-        }
-    }
-}
-
 static void shrink_buffer_inner(struct memory_handle *h)
 {
     if (h == NULL)
@@ -1350,7 +1300,7 @@ void buffering_thread(void)
                 LOGFQUEUE("buffering < Q_START_FILL");
                 /* Call buffer callbacks here because this is one of two ways
                  * to begin a full buffer fill */
-                call_buffering_callbacks(EVENT_BUFFER_LOW, 0);
+                send_event(EVENT_BUFFER_LOW, 0);
                 shrink_buffer();
                 queue_reply(&buffering_queue, 1);
                 filling |= buffer_handle((int)ev.data);
@@ -1412,7 +1362,7 @@ void buffering_thread(void)
 
         /* If the buffer is low, call the callbacks to get new data */
         if (num_handles > 0 && data_counters.useful <= conf_watermark)
-            call_buffering_callbacks(EVENT_BUFFER_LOW, 0);
+            send_event(EVENT_BUFFER_LOW, 0);
 
 #if 0
         /* TODO: This needs to be fixed to use the idle callback, disable it
@@ -1422,7 +1372,7 @@ void buffering_thread(void)
         else if (ata_disk_is_active() && queue_empty(&buffering_queue))
         {
             if (num_handles > 0 && data_counters.useful <= high_watermark)
-                call_buffering_callbacks(EVENT_BUFFER_LOW, 0);
+                send_event(EVENT_BUFFER_LOW, 0);
 
             if (data_counters.remaining > 0 && BUF_USED <= high_watermark)
             {
@@ -1491,9 +1441,6 @@ bool buffering_reset(char *buf, size_t buflen)
     cached_handle = NULL;
     num_handles = 0;
     base_handle_id = -1;
-
-    buffer_callback_count = 0;
-    memset(buffering_callback_funcs, 0, sizeof(buffering_callback_funcs));
 
     /* Set the high watermark as 75% full...or 25% empty :) */
 #if MEM > 8
