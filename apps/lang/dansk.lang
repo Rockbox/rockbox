@@ -10424,15 +10424,13 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Ingen partition?"
-    player: "Partition?"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -10458,16 +10456,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Indstillinger ikke gemt"
+    *: ""
   </dest>
   <voice>
-    *: "Indstillinger ikke gemt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
