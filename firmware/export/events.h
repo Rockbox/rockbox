@@ -31,6 +31,7 @@
 
 #define EVENT_CLASS_DISK       0x0100
 #define EVENT_CLASS_PLAYBACK   0x0200
+#define EVENT_CLASS_BUFFERING  0x0400
 
 /**
  * Because same playback events are used in mpeg.c and playback.c, define
