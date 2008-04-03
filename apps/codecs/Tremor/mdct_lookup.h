@@ -17,9 +17,6 @@
   
 #include "os_types.h"
 
-/* we keep the most used sin cosine table in fast IRAM;
-   unfortunately, we don't have the space for both tables */
-
 /* {sin(2*i*PI/4096), cos(2*i*PI/4096)}, with i = 0 to 512 */
 static LOOKUP_T sincos_lookup0[1026] ICONST_ATTR = {
   X(0x00000000), X(0x7fffffff), X(0x003243f5), X(0x7ffff621),
