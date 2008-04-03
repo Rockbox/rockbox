@@ -67,6 +67,7 @@ demystify.c
 jewels.c
 minesweeper.c
 oscilloscope.c
+pegbox.c
 pong.c
 sliding_puzzle.c
 snake.c
