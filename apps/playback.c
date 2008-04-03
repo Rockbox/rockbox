@@ -244,7 +244,6 @@ static enum filling_state filling;
 /* Track change controls */
 static bool automatic_skip = false; /* Who initiated in-progress skip? (C/A-) */
 static bool playlist_end = false;   /* Has the current playlist ended? (A) */
-static bool auto_dir_skip = false;  /* Have we changed dirs automatically? */
 static bool dir_skip = false;       /* Is a directory skip pending? (A) */
 static bool new_playlist = false;   /* Are we starting a new playlist? (A) */
 static int wps_offset = 0;          /* Pending track change offset, to keep WPS responsive (A) */
@@ -680,8 +679,6 @@ static void audio_skip(int direction)
         queue_post(&audio_queue, Q_AUDIO_SKIP, direction);
         /* Update wps while our message travels inside deep playback queues. */
         wps_offset += direction;
-        /* Immediately update the playlist index */
-        playlist_next(direction);
         track_changed = true;
     }
     else
@@ -1856,7 +1853,6 @@ static int audio_check_new_track(void)
     int old_track_ridx = track_ridx;
     int i, idx;
     bool forward;
-    bool end_of_playlist;  /* Temporary flag, not the same as playlist_end */
 
     /* Now it's good time to send track finish events. */
     send_event(PLAYBACK_EVENT_TRACK_FINISH, &curtrack_id3);
@@ -1879,9 +1875,6 @@ static int audio_check_new_track(void)
     if (new_playlist)
         ci.new_track = 0;
 
-    end_of_playlist = !playlist_checkend(automatic_skip ? ci.new_track : 0);
-    auto_dir_skip = end_of_playlist && global_settings.next_folder;
-
     /* If the playlist isn't that big */
     if (automatic_skip)
     {
@@ -1899,15 +1892,10 @@ static int audio_check_new_track(void)
     /* Update the playlist */
     last_peek_offset -= ci.new_track;
 
-    if (auto_dir_skip)
+    if (playlist_next(ci.new_track) < 0)
     {
-        /* If the track change was the result of an auto dir skip,
-           we need to update the playlist now */
-        if (playlist_next(ci.new_track) < 0)
-        {
-            LOGFQUEUE("audio >|= codec Q_CODEC_REQUEST_FAILED");
-            return Q_CODEC_REQUEST_FAILED;
-        }
+        LOGFQUEUE("audio >|= codec Q_CODEC_REQUEST_FAILED");
+        return Q_CODEC_REQUEST_FAILED;
     }
 
     if (new_playlist)
@@ -2203,14 +2191,9 @@ static void audio_finalise_track_change(void)
 
     if (automatic_skip)
     {
-        if (!auto_dir_skip)
-            playlist_next(-wps_offset);
-
         wps_offset = 0;
         automatic_skip = false;
     }
-
-    auto_dir_skip = false;
 
     /* Invalidate prevtrack_id3 */
     prevtrack_id3.path[0] = 0;
