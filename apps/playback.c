@@ -1853,6 +1853,7 @@ static void audio_rebuffer(void)
    of the track transition. */
 static int audio_check_new_track(void)
 {
+    int track_count = audio_track_count();
     int old_track_ridx = track_ridx;
     int i, idx;
     bool forward;
@@ -1958,7 +1959,6 @@ static int audio_check_new_track(void)
     }
 
     /* If it is not safe to even skip this many track entries */
-    int track_count = audio_track_count();
     if (ci.new_track >= track_count || ci.new_track <= track_count - MAX_TRACK)
     {
         ci.new_track = 0;
