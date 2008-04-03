@@ -351,7 +351,7 @@ bool pcmbuf_crossfade_init(bool manual_skip)
     }
 
     trigger_cpu_boost();
-    
+
     /* Not enough data, or crossfade disabled, flush the old data instead */
     if (LOW_DATA(2) || !pcmbuf_is_crossfade_enabled() || low_latency_mode)
     {
@@ -365,7 +365,7 @@ bool pcmbuf_crossfade_init(bool manual_skip)
         crossfade_mixmode = false;
     else
         crossfade_mixmode = global_settings.crossfade_fade_out_mixmode;
-    
+
     crossfade_init = true;
 
     return true;
@@ -569,7 +569,7 @@ static void crossfade_process_buffer(size_t fade_in_delay,
         }
         /* The start sample within the chunk */
         fade_out_sample = fade_out_delay / 2;
-        
+
         while (fade_out_rem > 0)
         {
             /* Each 1/10 second of audio will have the same fade applied */
@@ -695,11 +695,11 @@ static size_t crossfade_fade_mix(int factor, const char *buf, size_t fade_rem)
         sample = *input_buf++;
         sample = ((sample * factor) >> 8) + *output_buf;
         *output_buf++ = clip_sample_16(sample);
-        
+
         sample = *input_buf++;
         sample = ((sample * factor) >> 8) + *output_buf;
         *output_buf++ = clip_sample_16(sample);
-        
+
         fade_rem -= 4; /* 2 samples, each 16 bit -> 4 bytes */
 
         if (output_buf >= chunk_end)
@@ -729,10 +729,10 @@ static size_t crossfade_mix(const char *buf, size_t length)
         /* fade left and right channel at once to keep buffer alignment */
         sample = *input_buf++ + *output_buf;
         *output_buf++ = clip_sample_16(sample);
-        
+
         sample = *input_buf++ + *output_buf;
         *output_buf++ = clip_sample_16(sample);
-        
+
         length -= 4; /* 2 samples, each 16 bit -> 4 bytes */
 
         if (output_buf >= chunk_end)
@@ -846,7 +846,7 @@ static bool prepare_insert(size_t length)
     if (!pcm_is_playing())
     {
         trigger_cpu_boost();
-        
+
         /* Pre-buffer 1s. */
 #if MEM <= 1
         if (!LOW_DATA(1))
@@ -858,7 +858,7 @@ static bool prepare_insert(size_t length)
             if (!(audio_status() & AUDIO_STATUS_PAUSE))
                 pcmbuf_play_start();
         }
-    } 
+    }
     else if (pcmbuf_unplayed_bytes <= pcmbuf_watermark)
         pcmbuf_under_watermark();
 
@@ -975,69 +975,58 @@ bool pcmbuf_insert_buffer(char *buf, int count)
    in Hertz for a duration in milliseconds. */
 void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
 {
-    unsigned int count = 0, i = 0;
+    unsigned int count = 0;
+    unsigned int i;
     unsigned int interval = NATIVE_FREQUENCY / frequency;
+    unsigned int samples = NATIVE_FREQUENCY / 1000 * duration;
     int32_t sample;
-    int16_t *buf;
+    int16_t *bufstart;
+    int16_t *bufptr;
     int16_t *pcmbuf_end = (int16_t *)fadebuf;
-    size_t samples = NATIVE_FREQUENCY / 1000 * duration;
+    bool mix = pcmbuf_read != NULL && pcmbuf_read->link != NULL;
 
-    if (pcm_is_playing() && pcmbuf_read != NULL)
+    /* Find the insertion point and set bufstart to the start of it */
+    if (mix)
     {
-        if (pcmbuf_read->link)
-        {
-            /* Get the next chunk */
-            char *pcmbuf_mix_buf = pcmbuf_read->link->addr;
-            /* Give at least 1/8s clearance. */
-            buf = (int16_t *)&pcmbuf_mix_buf[NATIVE_FREQUENCY * 4 / 8];
-        }
-        else
-        {
-            logf("No place to beep");
-            return;
-        }
-
-        while (i++ < samples)
-        {
-            sample = *buf;
-            *buf++ = clip_sample_16(sample + amplitude);
-            if (buf > pcmbuf_end)
-                buf = (int16_t *)audiobuffer;
-            sample = *buf;
-            *buf++ = clip_sample_16(sample + amplitude);
-
-            /* Toggle square wav side */
-            if (++count >= interval)
-            {
-                count = 0;
-                amplitude = -amplitude;
-            }
-            if (buf > pcmbuf_end)
-                buf = (int16_t *)audiobuffer;
-        }
+        /* Get the next chunk */
+        char *pcmbuf_mix_buf = pcmbuf_read->link->addr;
+        /* Give 1/8s clearance. */
+        bufstart = (int16_t *)&pcmbuf_mix_buf[NATIVE_FREQUENCY * 4 / 8];
     }
     else
     {
-        buf = (int16_t *)audiobuffer;
-        while (i++ < samples)
-        {
-            *buf++ = amplitude;
-            if (buf > pcmbuf_end)
-                buf = (int16_t *)audiobuffer;
-            *buf++ = amplitude;
+        /* Use audiobuffer */
+        bufstart = (int16_t *)audiobuffer;
+    }
 
-            /* Toggle square wav side */
-            if (++count >= interval)
-            {
-                count = 0;
-                amplitude = -amplitude;
-            }
-            if (buf > pcmbuf_end)
-                buf = (int16_t *)audiobuffer;
+    /* Mix square wave into buffer */
+    bufptr = bufstart;
+    for (i = 0; i < samples; ++i)
+    {
+        sample = mix ? *bufptr : 0;
+        *bufptr++ = clip_sample_16(sample + amplitude);
+        if (bufptr > pcmbuf_end)
+            bufptr = (int16_t *)audiobuffer;
+        sample = mix ? *bufptr : 0;
+        *bufptr++ = clip_sample_16(sample + amplitude);
+        if (bufptr > pcmbuf_end)
+            bufptr = (int16_t *)audiobuffer;
+
+        /* Toggle square wave edge */
+        if (++count >= interval)
+        {
+            count = 0;
+            amplitude = -amplitude;
         }
-        pcm_play_data(NULL, (unsigned char *)audiobuffer, samples * 4);
+    }
+
+    /* Kick off playback if required */
+    if (!pcm_is_playing())
+    {
+        pcm_play_data(NULL, (unsigned char *)bufstart, samples * 4);
     }
 }
+
 
 /* Returns pcm buffer usage in percents (0 to 100). */
 int pcmbuf_usage(void)
