@@ -123,6 +123,7 @@
 #define TIMER0_IRQ_MASK (1<<6)
 #define DAI_RX_IRQ_MASK (1<<14)
 #define DAI_TX_IRQ_MASK (1<<15)
+#define ADC_IRQ_MASK    (1<<30)
 
 /* Timer / Counters */
 

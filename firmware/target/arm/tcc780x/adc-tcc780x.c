@@ -24,20 +24,46 @@
 #include "string.h"
 #include "adc.h"
 
-/* 
-  TODO: We probably want to do this on the timer interrupt once we get
-        interrupts going - see the sh-adc.c implementation for an example which
-        looks like it should work well with the TCC77x.
-
-  Also, this code is practically identical between 77x & 780x targets. 
-  Should probably find a common location to avoid the duplication.
-*/
-
 static unsigned short adcdata[8];
 
-static void adc_do_read(void)
+#ifndef BOOTLOADER
+
+/* Tick task */
+static void adc_tick(void)
 {
     int i;
+    
+    PCLK_ADC |= PCK_EN;   /* Enable ADC clock */
+    
+    /* Start converting the first 4 channels */
+    for (i = 0; i < 4; i++)
+        ADCCON = i;
+
+}
+
+/* IRQ handler */
+void ADC(void)
+{
+    int num;
+    uint32_t adc_status;
+
+    do
+    {
+        adc_status = ADCSTATUS;
+        num = (adc_status>>24) & 7;
+        if (num) adcdata[(adc_status >> 16) & 0x7] = adc_status & 0x3ff;
+    } while (num);
+
+    PCLK_ADC &= ~PCK_EN;   /* Disable ADC clock */
+}
+#endif /* BOOTLOADER */
+
+
+unsigned short adc_read(int channel)
+{
+#ifdef BOOTLOADER
+    /* IRQs aren't enabled in the bootloader - just do the read directly */
+    int i,num;
     uint32_t adc_status;
 
     PCLK_ADC |= PCK_EN;   /* Enable ADC clock */
@@ -49,20 +75,15 @@ static void adc_do_read(void)
     /* Wait for data to become stable */
     while ((ADCDATA & 0x1) == 0);
 
-    /* Now read the values back */
-    for (i=0;i < 4; i++) {
+    do
+    {
         adc_status = ADCSTATUS;
-        adcdata[(adc_status >> 16) & 0x7] = adc_status & 0x3ff;
-    }
+        num = (adc_status>>24) & 7;
+        if (num) adcdata[(adc_status >> 16) & 0x7] = adc_status & 0x3ff;
+    } while (num);
 
     PCLK_ADC &= ~PCK_EN;   /* Disable ADC clock */
-}
-
-unsigned short adc_read(int channel)
-{
-    /* Either move this to an interrupt routine, or only perform the read if
-       the last call was X length of time ago. */
-    adc_do_read();
+#endif
 
     return adcdata[channel];
 }
@@ -71,6 +92,14 @@ void adc_init(void)
 {
     /* consider configuring PCK_ADC source here */
     
-    ADCCON = (1<<4);         /* Leave standby mode */
-    ADCCFG |= 0x00000003;    /* Single-mode, auto power-down */
+    ADCCON = (1<<4);         /* Enter standby mode */
+    ADCCFG |= 0x0000000B;    /* Single-mode, auto power-down, IRQ enable */
+
+#ifndef BOOTLOADER
+    IEN |= ADC_IRQ_MASK;     /* Enable ADC IRQs */
+    
+    tick_add_task(adc_tick);
+    
+    sleep(2);    /* Ensure valid readings when adc_init returns */
+#endif
 }
