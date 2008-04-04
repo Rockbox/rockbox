@@ -1153,7 +1153,6 @@ static int pegbox(struct game_context* pb) {
 
 #ifdef PEGBOX_LVL_UP
             case PEGBOX_LVL_UP:
-            case (PEGBOX_LVL_UP|BUTTON_REPEAT):
                 if(pb->level < pb->highlevel) {
                     pb->level++;
                     load_level(pb);
@@ -1164,7 +1163,6 @@ static int pegbox(struct game_context* pb) {
 
 #ifdef PEGBOX_LVL_DOWN
             case PEGBOX_LVL_DOWN:
-            case (PEGBOX_LVL_DOWN|BUTTON_REPEAT):
                 if(pb->level > 1) {
                     pb->level--;
                     load_level(pb);
