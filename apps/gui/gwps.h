@@ -85,6 +85,10 @@ struct align_pos {
 #ifdef HAVE_LCD_BITMAP
 
 #define MAX_IMAGES (26*2) /* a-z and A-Z */
+
+/* The image buffer is big enough to store one full-screen native bitmap,
+   plus two full-screen mono bitmaps. */
+
 #define IMG_BUFSIZE ((LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
                    + (2*LCD_HEIGHT*LCD_WIDTH/8))
 
