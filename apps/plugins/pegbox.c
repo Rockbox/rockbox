@@ -18,7 +18,7 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 110)
+#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
 #include "pegbox_menu_top.h"
 #include "pegbox_menu_items.h"
 #include "pegbox_header.h"
@@ -128,19 +128,17 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 #define PEGBOX_SELECT   BUTTON_SELECT
 #define PEGBOX_QUIT     BUTTON_POWER
-#define PEGBOX_SAVE     (BUTTON_PLAY | BUTTON_RIGHT)
-#define PEGBOX_RESTART  (BUTTON_PLAY | BUTTON_LEFT)
-#define PEGBOX_LVL_UP   (BUTTON_PLAY | BUTTON_UP)
-#define PEGBOX_LVL_DOWN (BUTTON_PLAY | BUTTON_DOWN)
+#define PEGBOX_SAVE     BUTTON_PLAY
+#define PEGBOX_RESTART  BUTTON_REC
 #define PEGBOX_UP       BUTTON_UP
 #define PEGBOX_DOWN     BUTTON_DOWN
 #define PEGBOX_RIGHT    BUTTON_RIGHT
 #define PEGBOX_LEFT     BUTTON_LEFT
 
-#define RESTART_TEXT "PLAY+LEFT"
-#define LVL_UP_TEXT "PLAY+UP"
-#define LVL_DOWN_TEXT "PLAY+DOWN"
-#define SAVE_TEXT "PLAY+RIGHT"
+#define RESTART_TEXT "REC"
+#define LVL_UP_TEXT "-"
+#define LVL_DOWN_TEXT "-"
+#define SAVE_TEXT "PLAY"
 #define QUIT_TEXT "OFF"
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
@@ -184,8 +182,8 @@ PLUGIN_HEADER
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_SAVE     BUTTON_REC
 #define PEGBOX_RESTART  BUTTON_SELECT
-#define PEGBOX_LVL_UP   BUTTON_SCROLL_UP
-#define PEGBOX_LVL_DOWN BUTTON_SCROLL_DOWN
+#define PEGBOX_LVL_UP   BUTTON_SCROLL_BACK
+#define PEGBOX_LVL_DOWN BUTTON_SCROLL_FWD
 #define PEGBOX_UP       BUTTON_UP
 #define PEGBOX_DOWN     BUTTON_DOWN
 #define PEGBOX_RIGHT    BUTTON_RIGHT
@@ -249,6 +247,41 @@ PLUGIN_HEADER
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 #define SAVE_TEXT "REC+SELECT"
+#define QUIT_TEXT "POWER"
+
+#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
+#define PEGBOX_SELECT   BUTTON_RC_PLAY
+#define PEGBOX_QUIT     BUTTON_RC_REC
+#define PEGBOX_SAVE     BUTTON_RC_MENU
+#define PEGBOX_RESTART  BUTTON_RC_MODE
+#define PEGBOX_LVL_UP   BUTTON_VOL_UP
+#define PEGBOX_LVL_DOWN BUTTON_VOL_DOWN
+#define PEGBOX_UP       BUTTON_RC_VOL_UP
+#define PEGBOX_DOWN     BUTTON_RC_VOL_DOWN
+#define PEGBOX_RIGHT    BUTTON_RC_FF
+#define PEGBOX_LEFT     BUTTON_RC_REW
+
+#define RESTART_TEXT "REM. MODE"
+#define LVL_UP_TEXT "VOL+"
+#define LVL_DOWN_TEXT "VOL-"
+#define SAVE_TEXT "REM. PLAY"
+#define QUIT_TEXT "REM. REC"
+
+#elif CONFIG_KEYPAD == COWOND2_PAD
+#define PEGBOX_SELECT   BUTTON_SELECT
+#define PEGBOX_QUIT     BUTTON_POWER
+#define PEGBOX_SAVE     BUTTON_MENU
+#define PEGBOX_RESTART  BUTTON_MINUS
+#define PEGBOX_LVL_UP   BUTTON_PLUS
+#define PEGBOX_UP       BUTTON_UP
+#define PEGBOX_DOWN     BUTTON_DOWN
+#define PEGBOX_RIGHT    BUTTON_RIGHT
+#define PEGBOX_LEFT     BUTTON_LEFT
+
+#define RESTART_TEXT "MINUS"
+#define LVL_UP_TEXT "PLUS"
+#define LVL_DOWN_TEXT "-"
+#define SAVE_TEXT "MENU"
 #define QUIT_TEXT "POWER"
 #endif
 
@@ -844,7 +877,7 @@ static unsigned int pegbox_menu(struct game_context* pb) {
         can_resume = true;
         
     while(!breakout){
-#if (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 110)
+#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
         rb->lcd_clear_display();
         rb->lcd_bitmap(pegbox_menu_top,0,0,LCD_WIDTH, BMPHEIGHT_pegbox_menu_top);
 
@@ -959,7 +992,7 @@ static unsigned int pegbox_menu(struct game_context* pb) {
 #endif
         rb->snprintf(str, 28, "Start on level %d of %d", startlevel, 
                      pb->highlevel);
-#if LCD_HEIGHT > 110
+#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
         rb->lcd_putsxy(0, BMPHEIGHT_pegbox_menu_top+4*
                          (BMPHEIGHT_pegbox_menu_items/9)+8, str);
 #elif LCD_WIDTH > 112
@@ -1118,21 +1151,28 @@ static int pegbox(struct game_context* pb) {
                 draw_board(pb);
                 break;
 
+#ifdef PEGBOX_LVL_UP
             case PEGBOX_LVL_UP:
+            case (PEGBOX_LVL_UP|BUTTON_REPEAT):
                 if(pb->level < pb->highlevel) {
                     pb->level++;
                     load_level(pb);
                     draw_board(pb);
                 }
                 break;
+#endif
 
+#ifdef PEGBOX_LVL_DOWN
             case PEGBOX_LVL_DOWN:
+            case (PEGBOX_LVL_DOWN|BUTTON_REPEAT):
                 if(pb->level > 1) {
                     pb->level--;
                     load_level(pb);
                     draw_board(pb);
                 }
                 break;
+#endif
+
         }
 
         if(pb->num_left == 0) {
@@ -1169,6 +1209,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     rb = api;
 
     rb->lcd_setfont(FONT_SYSFIXED);
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
+#endif 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(BG_COLOR);
