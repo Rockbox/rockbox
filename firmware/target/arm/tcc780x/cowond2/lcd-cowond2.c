@@ -23,7 +23,6 @@
 #include "lcd.h"
 #include "system.h"
 #include "cpu.h"
-#include "i2c.h"
 
 /* GPIO A pins for LCD panel SDI interface */
 
@@ -97,16 +96,6 @@ static void lcd_write_reg(unsigned char reg, unsigned short val)
 {
     ltv250qv_write(0x740000 | reg);
     ltv250qv_write(0x760000 | val);
-}
-
-
-/* TODO: The existing pcf50606 drivers are target-specific, so the following 
-   lonely function exists until a D2 driver exists. */
-
-void pcf50606_write_reg(unsigned char reg, unsigned char val)
-{
-    unsigned char data[] = { reg, val };
-    i2c_write(0x10, data, 2);
 }
 
 
@@ -190,9 +179,6 @@ static void lcd_display_on(void)
     lcd_write_reg(10, 0x111F);
     sleep_ms(10);
 
-    pcf50606_write_reg(0x35, 0xe9); /* PWMC1 - backlight power (intensity) */
-    pcf50606_write_reg(0x38, 0x3);  /* GPOC1 - ? */
-
     /* tell that we're on now */
     display_on = true;
 }
@@ -213,9 +199,6 @@ static void lcd_display_off(void)
     
     /* kill power to LCD panel (unconfirmed) */
     GPIOA_CLEAR = (1<<16);
-    
-    /* also kill the backlight, otherwise LCD fade is visible on screen */
-    GPIOA_CLEAR = (1<<6);
 }
 
 
@@ -226,14 +209,14 @@ void lcd_enable(bool on)
 
     if (on)
     {
+        lcd_display_on();
         LCDC_CTRL |= 1;     /* controller enable */
-        GPIOA_SET = (1<<6); /* backlight enable - not visible otherwise */
         lcd_update();       /* Resync display */
     }
     else
     {
-        LCDC_CTRL &= ~1;      /* controller disable */
-        GPIOA_CLEAR = (1<<6); /* backlight off */
+        LCDC_CTRL &= ~1;    /* controller disable */
+        lcd_display_off();
     }
 }
 
@@ -290,9 +273,6 @@ void lcd_init_device(void)
     
     /* enable LTV250QV panel */
     lcd_display_on();
-    
-    /* turn on the backlight, without it the LCD is not visible at all */
-    GPIOA_SET = (1<<6);
 }
 
 

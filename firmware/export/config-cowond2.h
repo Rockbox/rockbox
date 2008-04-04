@@ -89,13 +89,13 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
-/* TODO: Enable LCD brightness control */
-//#define HAVE_BACKLIGHT_BRIGHTNESS
+/* Enable LCD brightness control */
+#define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults */
-//#define MIN_BRIGHTNESS_SETTING      1
-//#define MAX_BRIGHTNESS_SETTING      10
-//#define DEFAULT_BRIGHTNESS_SETTING  8
+#define MIN_BRIGHTNESS_SETTING      1
+#define MAX_BRIGHTNESS_SETTING      14
+#define DEFAULT_BRIGHTNESS_SETTING  8
 
 #define CONFIG_I2C I2C_TCC780X
 

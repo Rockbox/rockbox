@@ -911,6 +911,7 @@ target/arm/tcc780x/cowond2/lcd-cowond2.c
 target/arm/tcc780x/cowond2/power-cowond2.c
 target/arm/tcc780x/cowond2/powermgmt-cowond2.c
 target/arm/tcc780x/cowond2/usb-cowond2.c
+target/arm/tcc780x/cowond2/backlight-cowond2.c
 #ifndef BOOTLOADER
 target/arm/tcc780x/kernel-tcc780x.c
 target/arm/tcc780x/timer-tcc780x.c
