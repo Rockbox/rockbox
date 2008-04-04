@@ -1,48 +1,17 @@
 %X|backdrop-220x176.bmp|
 %P|pb-220.bmp|
-%x|a|frame-220x176.bmp|0|0|
-%xl|b|cdc-mp1.bmp|46|102|
-%xl|c|cdc-mp2.bmp|46|102|
-%xl|d|cdc-mp3.bmp|46|102|
-%xl|e|cdc-aiff.bmp|46|102|
-%xl|f|cdc-wav.bmp|46|102|
-%xl|g|cdc-ogg.bmp|46|102|
-%xl|h|cdc-flac.bmp|46|102|
-%xl|i|cdc-mpc.bmp|46|102|
-%xl|j|cdc-a52.bmp|46|102|
-%xl|J|cdc-unk.bmp|46|102|
-%xl|k|enc-vbr.bmp|46|108|
-%xl|l|enc-cbr.bmp|46|108|
-%xl|m|rpt-all.bmp|130|10|
-%xl|n|rpt-one.bmp|130|10|
-%xl|o|rpt-shf.bmp|130|10|
-%xl|p|nav-stop.bmp|89|11|
-%xl|q|nav-play-colour.bmp|89|11|
-%xl|r|nav-pause-colour.bmp|89|11|
-%xl|s|nav-ffwd-colour.bmp|89|11|
-%xl|t|nav-rwnd-colour.bmp|89|11|
-%xl|u|shf.bmp|130|24|
-%xl|v|lock-m.bmp|110|10|
-%xl|x|lock-r.bmp|110|23|
-%xl|B|vol-0-colour.bmp|18|3|
-%xl|C|vol-1-colour.bmp|18|3|
-%xl|D|vol-2-colour.bmp|18|3|
-%xl|E|vol-3-colour.bmp|18|3|
-%xl|F|vol-4-colour.bmp|18|3|
-%xl|G|vol-5-colour.bmp|18|3|
-%xl|H|vol-6-colour.bmp|18|3|
-%xl|I|vol-7-colour.bmp|18|3|
-%xl|K|vol-8-colour.bmp|18|3|
-%xl|L|vol-9-colour.bmp|18|3|
-%xl|z|vol-10-colour.bmp|18|3|
-%xl|O|bat-0-colour.bmp|204|10|
-%xl|P|bat-1-colour.bmp|204|10|
-%xl|Q|bat-2-colour.bmp|204|10|
-%xl|R|bat-3-colour.bmp|204|10|
-%xl|S|bat-4-colour.bmp|204|10|
-%xl|T|pwr-colour.bmp|210|10|
-%xl|y|led-colour.bmp|192|12|
+%xl|A|codec.bmp|40|102|21|
+%xl|B|encoding.bmp|40|108|2|
+%xl|C|repeat.bmp|124|10|4|
+%xl|D|navi-colour.bmp|83|11|5|
+%xl|E|shf.bmp|124|24|
+%xl|F|lock-m.bmp|104|10|
+%xl|G|lock-r.bmp|104|21|
+%xl|H|volume-colour.bmp|12|3|11|
+%xl|I|battery-colour.bmp|198|10|6|
+%xl|J|led-colour.bmp|186|12|
 %wd
+%V|6|0|208|176|1|000000|B6C6E5|
 %ar%ca, %cb %cd %cH:%cM
 
 
@@ -56,22 +25,22 @@
 
 
 
-   %fbk
+  %fbk
 
-%pb|8|4|215|
+%pb|8|0|208|
 
 
 %ac%t5%s%?It<%It|%Fn>;%ac%t5%s%?Ia<%Ia|%D2>
 
 
 %pm
-%?pv<%xdB|%xdC|%xdD|%xdE|%xdF|%xdG|%xdH|%xdI|%xdK|%xdL|%xdz>
-%?bp<%xdT|%?bl<%xdO|%xdP|%xdQ|%xdR|%xdS>>
-%?fc<%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi|%xdj|%xdJ>
-%?fv<%xdk|%xdl>
-%?mm<|%xdm|%xdn|%xdo>
-%?mp<%xdp|%xdq|%xdr|%xds|%xdt>
-%?ps<%xdu|>
-%?mh<%xdv|>
-%?mr<%xdx|>
-%?lh<%xdy|>
+%?pv<%xdHa|%xdHb|%xdHc|%xdHd|%xdHe|%xdHf|%xdHg|%xdHh|%xdHi|%xdHj|%xdHk>
+%?bp<%xdIa|%?bl<%xdIb|%xdIc|%xdId|%xdIe|%xdIf>>
+%?fc<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAf|%xdAg|%xdAh|%xdAi|%xdAj|%xdAk|%xdAl|%xdAm|%xdAn|%xdAo|%xdAp|%xdAq|%xdAr|%xdAs|%xdAt|%xdAu>
+%?fv<%xdBa|%xdBb>
+%?mm<|%xdCa|%xdCb|%xdCc|%xdCd>
+%?mp<%xdDa|%xdDb|%xdDc|%xdDd|%xdDe>
+%?ps<%xdE|>
+%?mh<%xdF|>
+%?mr<%xdG|>
+%?lh<%xdJ|>
