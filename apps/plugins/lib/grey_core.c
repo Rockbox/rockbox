@@ -242,10 +242,8 @@ static unsigned long _grey_get_pixel(int x, int y);
 static void _timer_isr(void);
 #endif
 
+
 #if defined(HAVE_BACKLIGHT_INVERSION) && !defined(SIMULATOR)
-static bool backlight_state;
-
-
 static void invert_gvalues(void)
 {
     unsigned char *val, *end;
@@ -339,11 +337,12 @@ static unsigned long _grey_get_pixel(int x, int y)
 static void _timer_isr(void)
 {
 #if defined(HAVE_BACKLIGHT_INVERSION) && !defined(SIMULATOR)
-    bool bls = _grey_info.rb->is_backlight_on(true);
+    unsigned long check = _grey_info.rb->is_backlight_on(true) 
+                        ? 0 : _GREY_BACKLIGHT_ON;
     
-    if ((backlight_state != bls) && !(_grey_info.flags & GREY_RAWMAPPED))
+    if ((_grey_info.flags & (_GREY_BACKLIGHT_ON|GREY_RAWMAPPED)) == check)
     {
-        backlight_state = bls;
+        _grey_info.flags ^= _GREY_BACKLIGHT_ON;
         invert_gvalues();
         return; /* don't overload this timer slot */
     }
@@ -422,7 +421,7 @@ static void fill_gvalues(void)
     unsigned data;
 
 #if defined(HAVE_BACKLIGHT_INVERSION) && !defined(SIMULATOR)
-    unsigned imask = backlight_state ? 0xff : 0;
+    unsigned imask = (_grey_info.flags & _GREY_BACKLIGHT_ON) ? 0xff : 0;
 #else
     const unsigned imask = 0;
 #endif
@@ -561,7 +560,8 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     else
     {
 #if defined(HAVE_BACKLIGHT_INVERSION) && !defined(SIMULATOR)
-        backlight_state = _grey_info.rb->is_backlight_on(true);
+        if (_grey_info.rb->is_backlight_on(true))
+            _grey_info.flags |= _GREY_BACKLIGHT_ON;
 #endif
         fill_gvalues();
     }

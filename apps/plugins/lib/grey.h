@@ -130,6 +130,7 @@ void grey_ub_scroll_down(int count);
 /* flag definitions */
 #define _GREY_RUNNING          0x8000  /* greyscale overlay is running */
 #define _GREY_DEFERRED_UPDATE  0x4000  /* lcd_update() requested */
+#define _GREY_BACKLIGHT_ON     0x2000  /* backlight is active - only used on 1st+2nd Gen */
 
 /* fast unsigned multiplication (16x16bit->32bit or 32x32bit->32bit,
  * whichever is faster for the architecture) */
