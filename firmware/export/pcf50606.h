@@ -19,6 +19,12 @@
 #ifndef PCF50606_H
 #define PCF50606_H
 
+#include "pcf5060x.h"
+#include "system.h"
+
+/* The following functions may either be implemented by an optimised driver
+   in the target tree, or by the generic drivers/pcf50606.c */
+
 void pcf50606_init(void);
 int pcf50606_write_multiple(int address, const unsigned char* buf, int count);
 int pcf50606_write(int address, unsigned char val);

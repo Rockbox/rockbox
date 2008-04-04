@@ -901,6 +901,7 @@ target/arm/tcc77x/iaudio7/power-iaudio7.c
 
 #ifdef COWON_D2
 #ifndef SIMULATOR
+drivers/pcf50606.c
 target/arm/lcd-as-memframe.S
 target/arm/tcc780x/adc-tcc780x.c
 target/arm/tcc780x/ata-nand-tcc780x.c
