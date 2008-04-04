@@ -126,10 +126,9 @@ void lcd_init_device(void)
     lcd_cmd_and_data(R_DRV_WAVEFORM_CONTROL, 0x48);
                      /* C waveform, no EOR, 9 lines inversion */
     lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0xc);
+    lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
 #ifdef HAVE_BACKLIGHT_INVERSION
     invert_display();
-#else
-    lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
 #endif
     lcd_set_flip(false);
     lcd_cmd_and_data(R_ENTRY_MODE, 0x0000);
@@ -162,10 +161,16 @@ void lcd_set_contrast(int val)
 #ifdef HAVE_BACKLIGHT_INVERSION
 static void invert_display(void)
 {
-    if (lcd_inverted ^ lcd_backlit)
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0017);
-    else
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
+    static bool last_invert = false;
+    bool new_invert = lcd_inverted ^ lcd_backlit;
+
+    if (new_invert != last_invert)
+    {
+        int oldlevel = disable_irq_save();
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, new_invert? 0x0017 : 0x0015);
+        restore_irq(oldlevel);
+        last_invert = new_invert;
+    }
 }
 
 void lcd_set_invert_display(bool yesno)
@@ -182,10 +187,7 @@ void lcd_set_backlight_inversion(bool yesno)
 #else
 void lcd_set_invert_display(bool yesno)
 {
-    if (yesno)
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0017);
-    else
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
+    lcd_cmd_and_data(R_DISPLAY_CONTROL, yesno ? 0x0017 : 0x0015);
 }
 #endif
 

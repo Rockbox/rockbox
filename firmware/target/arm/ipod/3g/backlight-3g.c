@@ -22,10 +22,10 @@
 
 void _backlight_on(void)
 {
-    outl(inl(0xc0001000) | 0x02, 0xc0001000);
+    LCD1_CONTROL |= 0x02;
 }
 
 void _backlight_off(void)
 {
-    outl(inl(0xc0001000) & ~0x02, 0xc0001000);
+    LCD1_CONTROL &= ~0x02;
 }
