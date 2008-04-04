@@ -45,8 +45,10 @@
 #define GREY_INFO_STRUCT_IRAM struct _grey_info _grey_info IBSS_ATTR;
 
 /* Features you can request on library init (ORed together): */
-#define GREY_BUFFERED  0x0001
-#define GREY_RAWMAPPED 0x0002
+#define GREY_BUFFERED  0x0001  /* Use a chunky buffer */
+#define GREY_RAWMAPPED 0x0002  /* No gamma & LCD linearisation */
+#define GREY_ON_COP    0x0004  /* Run ISR on COP (PP targets) */
+        /* TODO: only usable in conjunction with GREY_INFO_STRUCT_IRAM atm */
 
 /* Library initialisation and release */
 bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,

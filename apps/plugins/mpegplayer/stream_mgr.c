@@ -1005,7 +1005,7 @@ int stream_init(void)
     graymem = mem;
 #endif
 
-    success = grey_init(rb, graymem, memsize, GREY_BUFFERED,
+    success = grey_init(rb, graymem, memsize, GREY_BUFFERED|GREY_ON_COP,
                         LCD_WIDTH, LCD_HEIGHT, &graysize);
 
     /* This can run on another processor - align size */

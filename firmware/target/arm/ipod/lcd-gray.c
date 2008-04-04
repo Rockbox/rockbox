@@ -53,6 +53,10 @@
 /* The backlight makes the LCD appear negative on the 1st/2nd gen */
 static bool lcd_inverted = false;
 static bool lcd_backlit = false;
+#if NUM_CORES > 1
+/* invert_display() and the lcd_blit_* functions need to be corelocked */
+static struct corelock cl IBSS_ATTR;
+#endif
 static void invert_display(void);
 #endif
 
@@ -112,7 +116,9 @@ static void lcd_cmd_and_data(unsigned cmd, unsigned data)
 /* LCD init */
 void lcd_init_device(void)
 {
-
+#if (NUM_CORES > 1) && defined(HAVE_BACKLIGHT_INVERSION)
+    corelock_init(&cl);
+#endif
 #ifdef IPOD_MINI2G /* serial LCD hookup */
     lcd_wait_write();
     LCD1_CONTROL = 0x01730084; /* fastest setting */
@@ -167,7 +173,13 @@ static void invert_display(void)
     if (new_invert != last_invert)
     {
         int oldlevel = disable_irq_save();
+#if NUM_CORES > 1
+        corelock_lock(&cl);
         lcd_cmd_and_data(R_DISPLAY_CONTROL, new_invert? 0x0017 : 0x0015);
+        corelock_unlock(&cl);
+#else
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, new_invert? 0x0017 : 0x0015);
+#endif
         restore_irq(oldlevel);
         last_invert = new_invert;
     }
@@ -254,14 +266,19 @@ void lcd_mono_data(const unsigned char *data, int count);
 void lcd_blit_mono(const unsigned char *data, int bx, int y, int bwidth,
                    int height, int stride)
 {
+#if (NUM_CORES > 1) && defined(HAVE_BACKLIGHT_INVERSION)
+    corelock_lock(&cl);
+#endif
     while (height--)
     {
         lcd_cmd_and_data(R_RAM_ADDR_SET, (y++ << 5) + addr_offset - bx);
         lcd_prepare_cmd(R_RAM_DATA);
-
         lcd_mono_data(data, bwidth);
         data += stride;
     }
+#if (NUM_CORES > 1) && defined(HAVE_BACKLIGHT_INVERSION)
+    corelock_unlock(&cl);
+#endif
 }
 
 /* Helper function for lcd_grey_phase_blit(). */
@@ -272,15 +289,20 @@ void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int bx, int y, int bwidth, int height, int stride)
 {
-    while (height--) 
+#if (NUM_CORES > 1) && defined(HAVE_BACKLIGHT_INVERSION)
+    corelock_lock(&cl);
+#endif
+    while (height--)
     {
         lcd_cmd_and_data(R_RAM_ADDR_SET, (y++ << 5) + addr_offset - bx);
         lcd_prepare_cmd(R_RAM_DATA);
-
         lcd_grey_data(values, phases, bwidth);
         values += stride;
         phases += stride;
     }
+#if (NUM_CORES > 1) && defined(HAVE_BACKLIGHT_INVERSION)
+    corelock_unlock(&cl);
+#endif
 }
 
 void lcd_update_rect(int x, int y, int width, int height)

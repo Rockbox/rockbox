@@ -286,7 +286,7 @@ static void time_greyscale(void)
     int fps, load;
 
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
-    if (!grey_init(rb, gbuf, gbuf_size, 0, LCD_WIDTH, LCD_HEIGHT, NULL))
+    if (!grey_init(rb, gbuf, gbuf_size, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL))
     {
         log_text("greylib: out of memory.");
         return;

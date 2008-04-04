@@ -495,11 +495,12 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
 #endif
 
     plane_size = _GREY_MULUQ(width, height);
-#ifdef CPU_COLDFIRE
-    plane_size += (-plane_size) & 0xf; /* All buffers should be line aligned */
+#if defined(CPU_COLDFIRE)              /* Buffers should be line aligned */  \
+ || defined(CPU_PP) && (NUM_CORES > 1) /* Buffers must be cache line aligned */
+    plane_size += (-plane_size) & 0xf;
     buftaken    = (-(long)gbuf) & 0xf;
-#else
-    buftaken    = (-(long)gbuf) & 3;   /* All buffers must be long aligned. */
+#else                                  /* Buffers must be 32 bit aligned. */
+    buftaken    = (-(long)gbuf) & 3;   
 #endif
     gbuf += buftaken;
 
@@ -509,6 +510,10 @@ bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
         gbuf     += plane_size;
         buftaken += plane_size;
     }
+#if NUM_CORES > 1  /* Values and phases must be uncached when running on COP */
+    if (features & GREY_ON_COP)
+        gbuf = UNCACHED_ADDR(gbuf);
+#endif
     _grey_info.values = gbuf;
     gbuf += plane_size;
     _grey_info.phases = gbuf;
@@ -602,8 +607,14 @@ void grey_show(bool enable)
 #ifdef NEED_BOOST
         _grey_info.rb->cpu_boost(true);
 #endif
+#if NUM_CORES > 1
+        _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / LCD_SCANRATE,
+                                      1, _timer_isr,
+                                      (_grey_info.flags & GREY_ON_COP) ? COP : CPU);
+#else
         _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / LCD_SCANRATE, 1,
-                                      _timer_isr IF_COP(, CPU));
+                                      _timer_isr);
+#endif
 #endif /* !SIMULATOR */
         _grey_info.rb->screen_dump_set_hook(grey_screendump_hook);
     }

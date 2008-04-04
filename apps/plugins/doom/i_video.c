@@ -696,7 +696,7 @@ void I_InitGraphics(void)
 
 #ifndef HAVE_LCD_COLOR
    gbuf=malloc(GREYBUFSIZE);
-   grey_init(rb, gbuf, GREYBUFSIZE, 0, LCD_WIDTH, LCD_HEIGHT, NULL);
+   grey_init(rb, gbuf, GREYBUFSIZE, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL);
    /* switch on greyscale overlay */
    grey_show(true);
 #endif
