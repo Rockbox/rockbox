@@ -109,7 +109,7 @@ int  I_GetTime (void)
 void I_Init (void)
 {
 #if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
-   rb->timer_register(1, NULL, TIMER_FREQ/TICRATE, 1, doomtime);
+   rb->timer_register(1, NULL, TIMER_FREQ/TICRATE, 1, doomtime IF_COP(, CPU));
 #endif
    I_InitSound();
 }

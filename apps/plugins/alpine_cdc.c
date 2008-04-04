@@ -231,11 +231,11 @@ void timer_set_mode(int mode)
 
     if (mode == TM_RX_TIMEOUT)
     {
-        rb->timer_register(1, NULL, gTimer.timeout, 11, timer4_isr);
+        rb->timer_register(1, NULL, gTimer.timeout, 11, timer4_isr IF_COP(, CPU));
     }
     else if (mode == TM_TRANSMIT)
     {
-        rb->timer_register(1, NULL, gTimer.transmit, 14, timer4_isr);
+        rb->timer_register(1, NULL, gTimer.transmit, 14, timer4_isr IF_COP(, CPU));
     }
     else
     {

@@ -144,6 +144,7 @@ static const struct plugin_api rockbox_api = {
 #if CONFIG_CHARGING
     backlight_set_timeout_plugged,
 #endif
+    is_backlight_on,
     gui_syncsplash,
 
 #ifdef HAVE_REMOTE_LCD
@@ -477,7 +478,7 @@ static const struct plugin_api rockbox_api = {
 # endif
 #endif
 #ifdef HAVE_USB_POWER
-        usb_powered,
+    usb_powered,
 #endif
 
     /* misc */
@@ -576,7 +577,6 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-    is_backlight_on,
 };
 
 int plugin_load(const char* plugin, void* parameter)

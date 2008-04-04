@@ -25,12 +25,12 @@
 #include "logf.h"
 
 static int timer_prio = -1;
-void (*pfn_timer)(void) = NULL;      /* timer callback */
-void (*pfn_unregister)(void) = NULL; /* unregister callback */
+void NOCACHEBSS_ATTR (*pfn_timer)(void) = NULL;      /* timer callback */
+void NOCACHEBSS_ATTR (*pfn_unregister)(void) = NULL; /* unregister callback */
 #ifdef CPU_COLDFIRE
 static int base_prescale;
 #elif defined CPU_PP || CONFIG_CPU == PNX0101
-static long cycles_new = 0;
+static long NOCACHEBSS_ATTR cycles_new = 0;
 #endif
 
 /* interrupt handler */
@@ -201,6 +201,8 @@ static bool timer_set(long cycles, bool start)
             pfn_unregister();
             pfn_unregister = NULL;
         }
+        CPU_INT_CLR = TIMER2_MASK;
+        COP_INT_CLR = TIMER2_MASK;
     }
     if (start || (cycles_new == -1))  /* within isr, cycles_new is "locked" */
         TIMER2_CFG = 0xc0000000 | (cycles - 1);    /* enable timer */
@@ -236,7 +238,8 @@ void timers_adjust_prescale(int multiplier, bool enable_irq)
 
 /* Register a user timer, called every <cycles> TIMER_FREQ cycles */
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
-                    long cycles, int int_prio, void (*timer_callback)(void))
+                    long cycles, int int_prio, void (*timer_callback)(void)
+                    IF_COP(, int core))
 {
     if (reg_prio <= timer_prio || cycles == 0)
         return false;
@@ -264,7 +267,12 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     return true;
 #elif defined(CPU_PP)
     /* unmask interrupt source */
-    CPU_INT_EN = TIMER2_MASK;
+#if NUM_CORES > 1
+    if (core == COP)
+        COP_INT_EN = TIMER2_MASK;
+    else
+#endif
+        CPU_INT_EN = TIMER2_MASK;
     return true;
 #elif CONFIG_CPU == PNX0101
     irq_set_int_handler(IRQ_TIMER1, TIMER1_ISR);
@@ -301,6 +309,7 @@ void timer_unregister(void)
 #elif defined(CPU_PP)
     TIMER2_CFG = 0;         /* stop timer 2 */
     CPU_INT_CLR = TIMER2_MASK;
+    COP_INT_CLR = TIMER2_MASK;
 #elif CONFIG_CPU == PNX0101
     TIMER1.ctrl &= ~0x80;  /* disable timer 1 */
     irq_disable_int(IRQ_TIMER1);

@@ -603,7 +603,7 @@ void grey_show(bool enable)
         _grey_info.rb->cpu_boost(true);
 #endif
         _grey_info.rb->timer_register(1, NULL, TIMER_FREQ / LCD_SCANRATE, 1,
-                                      _timer_isr);
+                                      _timer_isr IF_COP(, CPU));
 #endif /* !SIMULATOR */
         _grey_info.rb->screen_dump_set_hook(grey_screendump_hook);
     }

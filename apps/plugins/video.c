@@ -540,9 +540,11 @@ int SeekTo(int fd, int nPos)
         gPlay.bVideoUnderrun = false;
         /* start display interrupt */
 #if FREQ == 12000000 /* Ondio speed kludge */
-        rb->timer_register(1, NULL, gPlay.nFrameTimeAdjusted, 1, timer4_isr);
+        rb->timer_register(1, NULL, gPlay.nFrameTimeAdjusted, 1,
+                           timer4_isr IF_COP(, CPU));
 #else
-        rb->timer_register(1, NULL, gFileHdr.video_frametime, 1, timer4_isr);
+        rb->timer_register(1, NULL, gFileHdr.video_frametime, 1,
+                           timer4_isr IF_COP(, CPU));
 #endif
     }
 
