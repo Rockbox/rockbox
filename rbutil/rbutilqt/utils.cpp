@@ -61,10 +61,21 @@ bool recRmdir( const QString &dirName )
 QString resolvePathCase(QString path)
 {
     QStringList elems;
-    QString realpath = "/";
-    elems = path.split("/", QString::SkipEmptyParts);
+    QString realpath;
 
-    for(int i = 0; i < elems.size(); i++) {
+    elems = path.split("/", QString::SkipEmptyParts);
+    int start;
+#if defined(Q_OS_WIN32)
+    // on windows we must make sure to start with the first entry (i.e. the
+    // drive letter) instead of a single / to make resolving work.
+    start = 1;
+    realpath = elems.at(0) + "/";
+#else
+    start = 0;
+    realpath = "/";
+#endif
+
+    for(int i = start; i < elems.size(); i++) {
         QStringList direlems = QDir(realpath).entryList(QDir::AllEntries);
         if(direlems.contains(elems.at(i), Qt::CaseInsensitive)) {
             // need to filter using QRegExp as QStringList::filter(QString)
