@@ -253,41 +253,33 @@ static void invert_gvalues(void)
     unsigned x = 0;
     unsigned last_x;
     
-    if (_grey_info.flags & GREY_BUFFERED)
+    /* Step 1: Calculate a transposed table for undoing the old mapping */
+    for (i = 0; i < 256; i++)
     {
-        fill_gvalues();
-        grey_update();
-    }
-    else /* Unbuffered - need crude reconstruction */
-    {
-        /* Step 1: Calculate a transposed table for undoing the old mapping */
-        for (i = 0; i < 256; i++)
+        last_x = x;
+        x = _grey_info.gvalue[i];
+        if (x > last_x)
         {
-            last_x = x;
-            x = _grey_info.gvalue[i];
-            if (x > last_x)
-            {
-                rev_tab[last_x++] = (last_i + i) / 2;
-                while (x > last_x)
-                    rev_tab[last_x++] = i;
-                last_i = i;
-            }
+            rev_tab[last_x++] = (last_i + i) / 2;
+            while (x > last_x)
+                rev_tab[last_x++] = i;
+            last_i = i;
         }
-        rev_tab[last_x++] = (last_i + 255) / 2;
-        while (256 > last_x)
-            rev_tab[last_x++] = 255;
-
-        /* Step 2: Calculate new mapping */
-        fill_gvalues();
-
-        /* Step 3: Transpose all pixel values */
-        val = _grey_info.values;
-        end = val + _GREY_MULUQ(_grey_info.width, _grey_info.height);
-
-        do
-            *val = _grey_info.gvalue[rev_tab[*val]];
-        while (++val < end);
     }
+    rev_tab[last_x++] = (last_i + 255) / 2;
+    while (256 > last_x)
+        rev_tab[last_x++] = 255;
+
+    /* Step 2: Calculate new mapping */
+    fill_gvalues();
+
+    /* Step 3: Transpose all pixel values */
+    val = _grey_info.values;
+    end = val + _GREY_MULUQ(_grey_info.width, _grey_info.height);
+
+    do
+        *val = _grey_info.gvalue[rev_tab[*val]];
+    while (++val < end);
 }
 #endif
 
