@@ -614,12 +614,15 @@ void grey_show(bool enable)
     {
 #ifdef SIMULATOR
         _grey_info.rb->sim_lcd_ex_init(0, NULL);
-#else
+#else /* !SIMULATOR */
         _grey_info.rb->timer_unregister();
+#if NUM_CORES > 1  /* Make sure the ISR has finished before calling lcd_update() */
+        _grey_info.rb->sleep(HZ/100);
+#endif
 #ifdef NEED_BOOST
         _grey_info.rb->cpu_boost(false);
 #endif
-#endif
+#endif /* !SIMULATOR */
         _grey_info.flags &= ~_GREY_RUNNING;
         _grey_info.rb->screen_dump_set_hook(NULL);
         _grey_info.rb->lcd_update(); /* restore whatever there was before */
