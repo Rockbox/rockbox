@@ -534,6 +534,18 @@ void Config::autodetect()
             QMessageBox::critical(this, tr("Fatal error"), text, QMessageBox::Ok);
             return;
         }
+        if(!detector.incompatdev().isEmpty()) {
+            QString text;
+            // we need to set the platform here to get the brand from the
+            // settings object
+            settings->setCurPlatform(detector.incompatdev());
+            text = tr("Detected an unsupported %1 player variant. Sorry, "
+                      "Rockbox doesn't run on your player.").arg(settings->curBrand());
+
+            QMessageBox::critical(this, tr("Fatal error: incompatible player found"),
+                                  text, QMessageBox::Ok);
+                return;
+            }
 
         if(detector.getMountPoint() != "" )
         {

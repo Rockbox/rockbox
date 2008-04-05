@@ -461,6 +461,31 @@ QMap<int, QString> RbSettings::usbIdErrorMap()
 }
 
 
+QMap<int, QString> RbSettings::usbIdIncompatMap()
+{
+
+    QMap<int, QString> map;
+     // get a list of ID -> target name
+    QStringList platforms;
+    devices->beginGroup("platforms");
+    platforms = devices->childKeys();
+    devices->endGroup();
+    
+    for(int i = 0; i < platforms.size(); i++)
+    {
+        devices->beginGroup("platforms");
+        QString target = devices->value(platforms.at(i)).toString();
+        devices->endGroup();
+        devices->beginGroup(target);
+        QStringList ids = devices->value("usbincompat").toStringList();
+        int j = ids.size();
+        while(j--)
+            map.insert(ids.at(j).toInt(0, 16), target);
+        devices->endGroup();
+    }
+    return map;
+}
+
 
 QString RbSettings::curResolution()
 {

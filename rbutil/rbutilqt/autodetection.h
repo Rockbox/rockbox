@@ -44,6 +44,7 @@ public:
     QString getDevice() {return m_device;}
     QString getMountPoint() {return m_mountpoint;}
     QString errdev(void) { return m_errdev; }
+    QString incompatdev(void) { return m_incompat; }
 
 private:
     QStringList getMountpoints(void);
@@ -54,6 +55,7 @@ private:
     QString m_device;
     QString m_mountpoint;
     QString m_errdev;
+    QString m_incompat;
     QList<int> m_usbconid;
     RbSettings* settings;
 };

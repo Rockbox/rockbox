@@ -83,7 +83,7 @@ class RbSettings : public QObject
         QStringList allLanguages();
         QMap<int, QString> usbIdMap();
         QMap<int, QString> usbIdErrorMap();
-        
+        QMap<int, QString> usbIdIncompatMap();
         
         bool curNeedsBootloader();
         QString curBrand();

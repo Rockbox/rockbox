@@ -172,7 +172,7 @@ bool Autodetection::detect()
         return true;
     }
 
-    if(m_mountpoint.isEmpty() && m_device.isEmpty() && m_errdev.isEmpty())
+    if(m_mountpoint.isEmpty() && m_device.isEmpty() && m_errdev.isEmpty() && m_incompat.isEmpty())
         return false;
     return true;
 }
@@ -262,6 +262,7 @@ bool Autodetection::detectUsb()
     // the ini file needs to hold the IDs as hex values.
     QMap<int, QString> usbids = settings->usbIdMap();
     QMap<int, QString> usberror = settings->usbIdErrorMap();
+    QMap<int, QString> usbincompat = settings->usbIdIncompatMap();
 
     // usb pid detection
 #if defined(Q_OS_LINUX) | defined(Q_OS_MACX)
@@ -291,6 +292,11 @@ bool Autodetection::detectUsb()
                     m_errdev = usberror.value(id);
                     // we detected something, so return true
                     qDebug() << "detected device with problems via usb!";
+                    return true;
+                }
+                if(usbincompat.contains(id)) {
+                    m_incompat = usbincompat.value(id);
+                    qDebug() << "detected incompatible player variant";
                     return true;
                 }
                 u = u->next;
@@ -369,6 +375,14 @@ bool Autodetection::detectUsb()
                     SetupDiDestroyDeviceInfoList(deviceInfo);
                     qDebug() << "detectUsb: Got" << m_device;
                     qDebug() << "detected device with problems via usb!";
+                    return true;
+                }
+                if(usbincompat.contains(id)) {
+                    m_incompat = usbincompat.value(id);
+                    // we detected an incompatible player variant
+                    if(buffer) free(buffer);
+                    SetupDiDestroyDeviceInfoList(deviceInfo);
+                    qDebug() << "detectUsb: detected incompatible variant";
                     return true;
                 }
         }
