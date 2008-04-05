@@ -127,8 +127,9 @@ bool Autodetection::detect()
                 }
             }
             // detection based on player specific folders
-            QStringList rootfolders = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-            if(rootfolders.contains("GBSYSTEM"), Qt::CaseInsensitive)
+            QStringList rootfolders = root.entryList(QDir::Dirs
+                    | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
+            if(rootfolders.contains("GBSYSTEM", Qt::CaseInsensitive))
             {
                 // GBSYSTEM folder -> Gigabeat
                 m_device = "gigabeatf";
@@ -137,7 +138,7 @@ bool Autodetection::detect()
             }
 #if defined(Q_OS_WIN32)
             // on windows, try to detect the drive letter of an Ipod
-            if(rootfolders.contains("iPod_Control"), Qt::CaseInsensitive)
+            if(rootfolders.contains("iPod_Control", Qt::CaseInsensitive))
             {
                 // iPod_Control folder -> Ipod found
                 // detecting of the Ipod type is done below using ipodpatcher
