@@ -56,13 +56,13 @@
 static int xoffset; /* needed for flip */
 
 /* timeout counter for deasserting /CS after access, <0 means not counting */
-static int cs_countdown IDATA_ATTR = 0;
+int remote_cs_countdown IDATA_ATTR = 0;
 #define CS_TIMEOUT (HZ/10)
 
 #ifdef HAVE_REMOTE_LCD_TICKING
 /* If set to true, will prevent "ticking" to headphones. */
 static bool emireduce = false;
-static int byte_delay = 0;
+int remote_byte_delay = 0; /* used in lcd-remote-as-iriver.S */
 #endif
 
 bool remote_initialized = false;
@@ -73,203 +73,6 @@ static bool cached_invert = false;
 static bool cached_flip = false;
 static int cached_contrast = DEFAULT_REMOTE_CONTRAST_SETTING;
 
-
-#ifdef HAVE_REMOTE_LCD_TICKING
-static inline void _byte_delay(int delay)
-{
-    asm (
-        "move.l  %[dly], %%d0    \n"
-        "ble.s   2f              \n"
-    "1:                          \n"
-        "subq.l  #1, %%d0        \n"
-        "bne.s   1b              \n"
-    "2:                          \n"
-        : /* outputs */
-        : /* inputs */
-        [dly]"d"(delay)
-        : /* clobbers */
-        "d0"
-    );
-}
-#endif /* HAVE_REMOTE_LCD_TICKING */
-
-/* Low-level byte writer. Instruction order is devised to maximize the delay
- * between changing the data line and the CLK L->H transition, which makes
- * the LCD controller sample DATA, so it's fast yet usable even when boosted.
- * Requires CLK low on entry */
-static inline void _write_byte(unsigned data)
-{
-    asm volatile (
-        "move.w  %%sr, %%d3          \n"  /* Get current interrupt level */
-        "move.w  #0x2700, %%sr       \n"  /* Disable interrupts */
-
-        "move.l  (%[gpo1]), %%d0     \n"  /* Get current state of data port */
-        "move.l  %%d0, %%d1          \n"
-        "and.l   %[dbit], %%d1       \n"  /* Check current state of data line */
-        "beq.s   1f                  \n"  /*   and set it as previous-state bit */
-        "bset    #8, %[data]         \n"
-    "1:                              \n"
-        "move.l  %[data], %%d1       \n"  /* Compute the 'bit derivative', i.e. a value */
-        "lsr.l   #1, %%d1            \n"  /*   with 1's where the data changes from the */
-        "eor.l   %%d1, %[data]       \n"  /*   previous state, and 0's where it doesn't */
-        "swap    %[data]             \n"  /* Shift data to upper byte */
-        "lsl.l   #8, %[data]         \n"
-
-        "move.l  (%[gpo0]),%%d1      \n"  /* Get current state of clock port */
-        "move.l  %%d1, %%d2          \n"  /* Precalculate opposite state of clock line */
-        "eor.l   %[cbit], %%d2       \n"
-        
-        "lsl.l   #1, %[data]         \n"  /* Invert data line for bit7 ? */
-        "bcc.s   1f                  \n"  /*   no: skip */
-        "eor.l   %[dbit], %%d0       \n"  /* invert data bit */
-        "move.l  %%d0, (%[gpo1])     \n"  /*   output data bit7 */
-    "1:                              \n"
-
-        "lsl.l   #1, %[data]         \n"  /* Invert data line for bit6 ? */
-        "bcc.s   1f                  \n"  /*   no: skip */
-        "eor.l   %[dbit], %%d0       \n"  /* Invert data bit */
-        "move.l  %%d2, (%[gpo0])     \n"  /* Bit7: set CLK = 1 */
-        "move.l  %%d1, (%[gpo0])     \n"  /*       set CLK = 0 */
-        "move.l  %%d0, (%[gpo1])     \n"  /* Output data bit6 */
-        ".word   0x51fb              \n"  /* trapf.l - skip next 2 insns */
-    "1:                              \n"  /*   else */
-        "move.l  %%d2, (%[gpo0])     \n"  /* Bit7: set CLK = 1 */
-        "move.l  %%d1, (%[gpo0])     \n"  /*       set CLK = 0 */
-
-        "lsl.l   #1, %[data]         \n"  /* Unrolled */
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo1])     \n"
-        ".word   0x51fb              \n"
-    "1:                              \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-
-        "lsl.l   #1, %[data]         \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo1])     \n"
-        ".word   0x51fb              \n"
-    "1:                              \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-
-        "lsl.l   #1, %[data]         \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo1])     \n"
-        ".word   0x51fb              \n"
-    "1:                              \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-
-        "lsl.l   #1, %[data]         \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo1])     \n"
-        ".word   0x51fb              \n"
-    "1:                              \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-
-        "lsl.l   #1, %[data]         \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo1])     \n"
-        ".word   0x51fb              \n"
-    "1:                              \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-
-        "lsl.l   #1, %[data]         \n"
-        "bcc.s   1f                  \n"
-        "eor.l   %[dbit], %%d0       \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-        "move.l  %%d0, (%[gpo1])     \n"
-        ".word   0x51fb              \n"
-    "1:                              \n"
-        "move.l  %%d2, (%[gpo0])     \n"
-        "move.l  %%d1, (%[gpo0])     \n"
-
-        "nop                         \n"  /* Let data line settle */
-        "move.l  %%d2, (%[gpo0])     \n"  /* Bit0: Set CLK = 1 */
-        "move.l  %%d1, (%[gpo0])     \n"  /*       Set CLK = 0 */
-
-        "move.w  %%d3, %%sr          \n"  /* Restore interrupt level */
-        : /* outputs */
-        [data]"+d"(data)
-        : /* inputs */
-        [gpo0]"a"(&GPIO_OUT),
-        [cbit]"i"(0x10000000),
-        [gpo1]"a"(&GPIO1_OUT),
-        [dbit]"d"(0x00040000)
-        : /* clobbers */
-        "d0", "d1", "d2", "d3"
-    );
-}
-
-void lcd_remote_write_command(int cmd)
-{
-    cs_countdown = 0;
-    RS_LO;
-    CS_LO;
-
-    _write_byte(cmd);
-#ifdef HAVE_REMOTE_LCD_TICKING
-     _byte_delay(byte_delay);
-#endif
-
-    cs_countdown = CS_TIMEOUT;
-}
-
-void lcd_remote_write_command_ex(int cmd, int data)
-{
-    cs_countdown = 0;
-    RS_LO;
-    CS_LO;
-
-    _write_byte(cmd);
-#ifdef HAVE_REMOTE_LCD_TICKING
-    _byte_delay(byte_delay);
-#endif
-    _write_byte(data);
-#ifdef HAVE_REMOTE_LCD_TICKING
-    _byte_delay(byte_delay);
-#endif
-
-    cs_countdown = CS_TIMEOUT;
-}
-
-void lcd_remote_write_data(const unsigned char* p_bytes, int count) ICODE_ATTR;
-void lcd_remote_write_data(const unsigned char* p_bytes, int count)
-{
-    const unsigned char *p_end = p_bytes + count;
-
-    cs_countdown = 0;
-    RS_HI;
-    CS_LO;
-
-    while (p_bytes < p_end)
-    {
-        _write_byte(*p_bytes++);
-#ifdef HAVE_REMOTE_LCD_TICKING
-        _byte_delay(byte_delay);
-#endif
-    }
-
-    cs_countdown = CS_TIMEOUT;
-}
 
 /*** hardware configuration ***/
 
@@ -448,9 +251,9 @@ static void remote_tick(void)
     }
 
     /* handle chip select timeout */
-    if (cs_countdown >= 0)
-        cs_countdown--;
-    if (cs_countdown == 0)
+    if (remote_cs_countdown >= 0)
+        remote_cs_countdown--;
+    if (remote_cs_countdown == 0)
         CS_HI;
 }
 #endif
@@ -496,7 +299,7 @@ void lcd_remote_update(void)
 
 #ifdef HAVE_REMOTE_LCD_TICKING
     /* Adjust byte delay for emi reduction. */
-    byte_delay = emireduce ? cpu_frequency / 192800 - 90: 0;
+    remote_byte_delay = emireduce ? cpu_frequency / 192800 - 100: 0;
 #endif
 
     /* Copy display bitmap to hardware */
@@ -530,7 +333,7 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
 
 #ifdef HAVE_REMOTE_LCD_TICKING
     /* Adjust byte delay for emi reduction */
-    byte_delay = emireduce ? cpu_frequency / 192800 - 90: 0;
+    remote_byte_delay = emireduce ? cpu_frequency / 192800 - 100: 0;
 #endif
 
     /* Copy specified rectange bitmap to hardware */

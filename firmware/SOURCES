@@ -535,6 +535,7 @@ target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
+target/coldfire/iriver/lcd-remote-as-iriver.S
 target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/fmradio_i2c-iriver.c
 target/coldfire/iriver/h300/sw_i2c-h300.c
@@ -559,6 +560,7 @@ drivers/sw_i2c.c
 target/coldfire/ata-as-coldfire.S
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/lcd-remote-iriver.c
+target/coldfire/iriver/lcd-remote-as-iriver.S
 target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/fmradio_i2c-iriver.c
 target/coldfire/iriver/h100/adc-h100.c
