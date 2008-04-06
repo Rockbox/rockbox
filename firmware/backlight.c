@@ -111,8 +111,8 @@ static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
 
-static int backlight_timer;
-static int backlight_timeout;
+static int backlight_timer SHAREDBSS_ATTR;
+static int backlight_timeout SHAREDBSS_ATTR;
 static int backlight_timeout_normal = 5*HZ;
 #if CONFIG_CHARGING
 static int backlight_timeout_plugged = 5*HZ;
