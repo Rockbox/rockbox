@@ -35,15 +35,15 @@ void CreateVoiceWindow::change()
 {
     Config *cw = new Config(this,4);
     cw->setSettings(settings);
-    cw->show();
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
+    cw->show();    
 }
 
 void CreateVoiceWindow::accept()
 {
     logger = new ProgressLoggerGui(this);
-    logger->show();
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
+    logger->show();    
     
     QString lang = ui.comboLanguage->currentText();
     int wvThreshold = ui.wavtrimthreshold->value();

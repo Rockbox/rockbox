@@ -67,15 +67,19 @@ void InstallTalkWindow::change()
 {
     Config *cw = new Config(this,4);
     cw->setSettings(settings);
-    cw->show();
+    
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
+    
+    cw->show();
 }
 
 void InstallTalkWindow::accept()
 {
     logger = new ProgressLoggerGui(this);
-    logger->show();
+    
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
+    logger->show();
+    
 
     QString folderToTalk = ui.lineTalkFolder->text();
      

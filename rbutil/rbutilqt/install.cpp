@@ -93,9 +93,10 @@ void Install::accept()
 
     installer->setLogVersion(myversion);
     installer->setMountPoint(mountPoint);
-    installer->install(logger);
-
+    
     connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
+    
+    installer->install(logger);
 
 }
 

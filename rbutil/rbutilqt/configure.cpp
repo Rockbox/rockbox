@@ -469,8 +469,9 @@ void Config::browseCache()
     cbrowser->setFilter(QDir::Drives);
 #endif
     cbrowser->setDir(ui.cachePath->text());
-    cbrowser->show();
     connect(cbrowser, SIGNAL(itemChanged(QString)), this, SLOT(setCache(QString)));
+    cbrowser->show();
+    
 }
 
 void Config::setMountpoint(QString m)

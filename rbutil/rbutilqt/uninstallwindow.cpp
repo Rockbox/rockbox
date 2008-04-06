@@ -34,7 +34,8 @@ void UninstallWindow::accept()
 {
     logger = new ProgressLoggerGui(this);
     logger->show();
-
+    
+    connect(logger,SIGNAL(closed()),this,SLOT(close()));
     if(ui.CompleteRadioBtn->isChecked())
     {
         uninstaller->deleteAll(logger);
@@ -43,7 +44,7 @@ void UninstallWindow::accept()
     {
         uninstaller->uninstall(logger);
     }
-    connect(logger,SIGNAL(closed()),this,SLOT(close()));
+    
 }
 
 

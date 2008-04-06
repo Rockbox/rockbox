@@ -244,9 +244,9 @@ void RbUtilQt::configDialog()
 {
     Config *cw = new Config(this);
     cw->setSettings(settings);
-    cw->show();
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
     connect(cw, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
+    cw->show();
 }
 
 
@@ -500,8 +500,7 @@ void RbUtilQt::install()
 bool RbUtilQt::installBootloaderAuto()
 {
     installBootloader();
-    connect(blinstaller,SIGNAL(done(bool)),this,SLOT(installdone(bool)));
-    return !m_error;
+  return !m_error;
 }
 
 void RbUtilQt::installBootloaderBtn()
@@ -514,7 +513,8 @@ void RbUtilQt::installBootloaderBtn()
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
-
+    connect(blinstaller,SIGNAL(done(bool)),this,SLOT(installdone(bool)));
+  
     installBootloader();
 }
 
@@ -723,9 +723,10 @@ void RbUtilQt::createTalkFiles(void)
     if(chkConfig(true)) return;
     InstallTalkWindow *installWindow = new InstallTalkWindow(this);
     installWindow->setSettings(settings);
-    installWindow->show();
+    
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
+    installWindow->show();
 
 }
 
@@ -734,10 +735,10 @@ void RbUtilQt::createVoiceFile(void)
     if(chkConfig(true)) return;
     CreateVoiceWindow *installWindow = new CreateVoiceWindow(this);
     installWindow->setSettings(settings);
-
-    installWindow->show();
+    
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(downloadInfo()));
     connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
+    installWindow->show();
 }
 
 void RbUtilQt::uninstall(void)

@@ -232,9 +232,11 @@ void ThemesInstallWindow::show()
     logger = new ProgressLoggerGui(this);
     logger->show();
     logger->addItem(tr("getting themes information ..."), LOGINFO);
-    downloadInfo();
     connect(logger, SIGNAL(aborted()), getter, SLOT(abort()));
-    connect(logger, SIGNAL(aborted()), this, SLOT(close()));
+    connect(logger, SIGNAL(aborted()), this, SLOT(close()));  
+
+    downloadInfo();
+
 }
 
 
@@ -295,7 +297,9 @@ void ThemesInstallWindow::accept()
     installer->setMountPoint(mountPoint);
     if(!settings->cacheDisabled())
         installer->setCache(true);
+        
+    connect(logger, SIGNAL(closed()), this, SLOT(close()));    
     installer->install(logger);
-    connect(logger, SIGNAL(closed()), this, SLOT(close()));
+    
 }
 
