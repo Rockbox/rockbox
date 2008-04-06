@@ -66,6 +66,7 @@ class HttpGet : public QObject
         void httpStarted(int);
 
     private:
+        bool initializeCache(const QDir&);
         QHttp http; //< download object
         QFile *outputFile;
         int response; //< http response

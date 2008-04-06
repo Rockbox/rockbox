@@ -61,15 +61,8 @@ HttpGet::HttpGet(QObject *parent)
 void HttpGet::setCache(QDir d)
 {
     m_cachedir = d;
-    bool result = true;
-
-    QString p = m_cachedir.absolutePath() + "/rbutil-cache";
-    if(QFileInfo(m_cachedir.absolutePath()).isDir())
-    {
-        if(!QFileInfo(p).isDir())
-            result = m_cachedir.mkdir("rbutil-cache");
-    }
-    else result = false;
+    bool result;
+    result = initializeCache(d);
     qDebug() << "HttpGet::setCache(QDir)" << d.absolutePath() << result;
     m_usecache = result;
 }
@@ -79,6 +72,26 @@ void HttpGet::setCache(bool c)
 {
     qDebug() << "setCache(bool)" << c;
     m_usecache = c;
+    // make sure cache is initialized
+    if(c)
+        m_usecache = initializeCache(m_cachedir);
+}
+
+
+bool HttpGet::initializeCache(const QDir& d)
+{
+    bool result;
+    QString p = d.absolutePath() + "/rbutil-cache";
+    if(QFileInfo(d.absolutePath()).isDir())
+    {
+        if(!QFileInfo(p).isDir())
+            result = d.mkdir("rbutil-cache");
+    }
+    else
+        result = false;
+
+    return result;
+
 }
 
 
