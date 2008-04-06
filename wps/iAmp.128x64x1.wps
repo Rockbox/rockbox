@@ -1,51 +1,20 @@
+%x|a|iAmp.bmp|100|0|
+%x|b|line.bmp|0|11|
+%x|c|pb.bmp|96|40|
 %wd
 
 %s%?ia<%ia|%d1>
 %s%?it<%?in<%in. >%it|%fn>
 %pb
-%xl|H|a5.bmp|102|48|
-%xl|o|m1.bmp|102|48|
-%xl|p|m2.bmp|102|48|
-%xl|q|m3.bmp|102|48|
-%xl|r|ai.bmp|102|48|
-%xl|s|w.bmp|102|48|
-%xl|t|o.bmp|102|48|
-%xl|u|f.bmp|102|48|
-%xl|w|mc.bmp|102|48|
-%pc/%pt %ar%pp of %pe%t5;%pc/%pt%?fc<%xdo|%xdp|%xdq|%xdr|%xds|%xdt|%xdu|%xdH|%xdw|>%t3;%pc/%pt %ar%?fv<[VBR]|%fbkbps>%t3
-%x|a|i.bmp|100|0|
-%xl|c|b1.bmp|0|0|
-%xl|d|b2.bmp|0|0|
-%xl|e|b3.bmp|0|0|
-%xl|f|b4.bmp|0|0|
-%xl|g|b5.bmp|0|0|
-%xl|h|b.bmp|0|0|
-%?bp<%xdh|%?bl<%xdc|%xdd|%xde|%xdf|%xdg>>
-%xl|i|v1.bmp|24|0|
-%xl|j|v2.bmp|24|0|
-%xl|k|v3.bmp|24|0|
-%xl|l|v4.bmp|24|0|
-%xl|m|v5.bmp|24|0|
-%xl|D|v6.bmp|24|0|
-%xl|E|v7.bmp|24|0|
-%xl|F|v8.bmp|24|0|
-%xl|G|v9.bmp|24|0|
-%?pv<%xdi|%xdi|%xdj|%xdk|%xdl|%xdm|%xdD|%xdE|%xdF|%xdG>
-%xl|n|s.bmp|54|1|
-%xl|K|k.bmp|54|1|
-%xl|I|g.bmp|54|1|
-%xl|L|a.bmp|54|1|
-%xl|J|j.bmp|54|1|
-%?mm<%?ps<%xdn>|%?ps<%xdJ|%xdI>|%xdL|%?ps<%xdK|%xdI>|>
-%xl|x|d.bmp|79|0|
-%xl|y|e.bmp|79|0|
-%xl|b|c.bmp|79|0|
-%?mh<%?mr<%xdb|%xdx>>
-%?mr<%?mh<%xdb|%xdy>>
-%x|z|l.bmp|0|11|
-%xl|A|x.bmp|74|48|
-%xl|B|y.bmp|74|48|
-%xl|C|z.bmp|74|48|
-%?mp<||%xdA|%xdB|%xdC>
-%x|v|pb.bmp|96|40|
-# letters to use: b, M-Z
+%xl|A|codec.bmp|102|48|21|
+%pc/%pt %ar%pp of %pe%t5;%pc/%pt%?fc<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAf|%xdAg|%xdAh|%xdAi|%xdAj|%xdAk|%xdAl|%xdAm|%xdAn|%xdAo|%xdAp|%xdAq|%xdAr|%xdAs|%xdAt|%xdAu>%t3;%pc/%pt %ar%?fv<[VBR]|%fbkbps>%t3
+%xl|B|battery-small.bmp|0|0|6|
+%?bp<%xdBa|%?bl<%xdBb|%xdBc|%xdBd|%xdBe|%xdBf>>
+%xl|C|volume.bmp|24|0|9|
+%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi>
+%xl|D|repeatshuffle-small.bmp|54|1|6|
+%?mm<%?ps<%xdDa>|%?ps<%xdDb|%xdDc>|%xdDd|%?ps<%xdDe|%xdDc>|%xdDf>
+%xl|E|lock-small.bmp|79|0|3|
+%?mh<%?mr<%xdEa|%xdx>|%?mr<%xdy|>>
+%xl|F|playmode-small.bmp|74|48|3|
+%?mp<||%xdFa|%xdFb|%xdFc>

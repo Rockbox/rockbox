@@ -1,3 +1,7 @@
+%x|a|pb.bmp|128|100|
+%x|b|vl.bmp|27|1|
+%x|c|iAmp.bmp|129|3|
+%x|d|line.bmp|0|14|
 %wd
             %pv
 
@@ -9,47 +13,15 @@
 
 %pb
 %pc/%pt %ar%pp of %pe
-%xl|a|hm.bmp|114|1|
-%xl|z|hr.bmp|114|1|
-%xl|w|h.bmp|114|1|
-%?mh<%?mr<%xdw|%xda>>
-%?mr<%?mh<%xdw|%xdz>>
-%x|L|pb.bmp|128|100|
-%xl|x|w.bmp|68|87|
-%xl|y|ai.bmp|68|87|
-%xl|f|f.bmp|68|87|
-%xl|h|m1.bmp|68|87|
-%xl|i|m2.bmp|68|87|
-%xl|j|m3.bmp|68|87|
-%xl|k|mc.bmp|68|87|
-%xl|l|o.bmp|68|87|
-%xl|H|a5.bmp|68|87|
-%?fc<%xdh|%xdi|%xdj|%xdy|%xdx|%xdl|%xdf|%xdk|%xdH|>
-%xl|e|ff.bmp|76|1|
-%xl|m|pa.bmp|76|1|
-%xl|n|pl.bmp|76|1|
-%xl|t|rw.bmp|76|1|
-%xl|v|st.bmp|76|1|
-%xl|I|ff2.bmp|0|120|
-%xl|J|pa2.bmp|0|120|
-%xl|K|rw2.bmp|0|120|
-%?mp<|%xdn|%xdm|%xde|%xdt>
-%?mp<|%xdn|%xdJ|%xdI|%xdK>
-%xl|u|sh.bmp|90|1|
-%xl|o|re+sh.bmp|90|1|
-%xl|p|re.bmp|90|1|
-%xl|r|re1.bmp|90|1|
-%xl|s|resh.bmp|90|1|
-%xl|c|ab.bmp|90|1|
-%?mm<%?ps<%xdu>|%?ps<%xds|%xdp>|%xdr|%?ps<%xdo|%xdp>|%xdc>
-%x|d|vl.bmp|27|1|
-%x|g|i.bmp|129|3|
-%xl|A|bt1.bmp|1|1|
-%xl|B|bt2.bmp|1|1|
-%xl|C|bt3.bmp|1|1|
-%xl|D|bt4.bmp|1|1|
-%xl|E|bt5.bmp|1|1|
-%x|F|l.bmp|0|14|
-%xl|G|bp.bmp|1|1|
-%?bp<%xdG|%?bl<%xdA|%xdB|%xdC|%xdD|%xdE>>
-# letters to use: b, q, M-Z
+%xl|A|codec.bmp|68|87|21|
+%?fc<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAf|%xdAg|%xdAh|%xdAi|%xdAj|%xdAk|%xdAl|%xdAm|%xdAn|%xdAo|%xdAp|%xdAq|%xdAr|%xdAs|%xdAt|%xdAu>
+%xl|B|battery.bmp|1|1|6|
+%?bp<%xdBa|%?bl<%xdBb|%xdBc|%xdBd|%xdBe|%xdBf>>
+%xl|C|lock.bmp|114|1|3|
+%?mh<%?mr<%xdCa|%xdCb>|%?mr<%xdCc|>>
+%xl|D|repeatshuffle.bmp|90|1|6|
+%?mm<%?ps<%xdDa>|%?ps<%xdDb|%xdDc>|%xdDd|%?ps<%xdDe|%xdDc>|%xdDf>
+%xl|E|playmode-bar.bmp|0|120|3|
+%xl|F|playmode.bmp|76|1|5|
+%?mp<||%xdEa|%xdEb|%xdEc>
+%?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
