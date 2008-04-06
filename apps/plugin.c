@@ -585,10 +585,13 @@ int plugin_load(const char* plugin, void* parameter)
     struct plugin_header *hdr;
 #ifdef SIMULATOR
     void *pd;
-#else
+#else /* !SIMULATOR */
     int fd;
     ssize_t readsize;
+#if NUM_CORES > 1
+    unsigned my_core;
 #endif
+#endif /* !SIMULATOR */
     int xm, ym;
 #ifdef HAVE_REMOTE_LCD
     int rxm, rym;
@@ -637,6 +640,12 @@ int plugin_load(const char* plugin, void* parameter)
         gui_syncsplash(HZ*2, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return fd;
     }
+#if NUM_CORES > 1
+    /* Make sure COP cache is flushed and invalidated before loading */
+    my_core = switch_core(CURRENT_CORE ^ 1);
+    invalidate_icache();
+    switch_core(my_core);
+#endif
 
     readsize = read(fd, pluginbuf, PLUGIN_BUFFER_SIZE);
     close(fd);
