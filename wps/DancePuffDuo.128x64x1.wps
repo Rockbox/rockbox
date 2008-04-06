@@ -1,40 +1,14 @@
 %x|a|bg.bmp|0|0|
-%xl|b|Stp.bmp|59|0|
-%xl|c|Ply.bmp|59|0|
-%xl|d|Pse.bmp|59|0|
-%xl|e|FF.bmp|59|0|
-%xl|f|RW.bmp|59|0|
-%xl|g|RptA.bmp|114|0|
-%xl|h|Rpt1.bmp|114|0|
-%xl|i|RptS.bmp|114|0|
-%xl|j|Shf.bmp|101|0|
-%xl|k|Pow.bmp|5|53|
-%xl|l|Bat0.bmp|0|53|
-%xl|m|Bat1.bmp|0|53|
-%xl|n|Bat2.bmp|0|53|
-%xl|o|Bat3.bmp|0|53|
-%xl|p|Bat4.bmp|0|53|
-%xl|y|HoldM.bmp|36|0|
-%xl|z|HoldR.bmp|47|0|
-%xl|L|mp1.bmp|70|66|
-%xl|M|mp2.bmp|70|66|
-%xl|N|mp3.bmp|70|66|
-%xl|O|wav.bmp|70|66|
-%xl|P|ogg.bmp|70|66|
-%xl|Q|flac.bmp|70|66|
-%xl|R|mpc.bmp|70|66|
-%xl|S|ac3.bmp|70|66|
-%xl|T|wv.bmp|70|66|
-%xl|U|alac.bmp|70|66|
-%xl|V|aac.bmp|70|66|
-%xl|W|shn.bmp|70|66|
-%xl|X|aiff.bmp|70|66|
-%xl|Y|Unk.bmp|70|66|
-%xl|Z|A-B.bmp|145|0|
+%xl|A|playmode.bmp|59|0|5|
+%xl|B|repeat.bmp|114|0|4|
+%xl|C|Shf.bmp|101|0|
+%xl|D|Pow.bmp|5|53|
+%xl|E|battery.bmp|0|53|5|
+%xl|F|HoldM.bmp|36|0|
+%xl|G|HoldR.bmp|47|0|
 %wd
-%al   %pv%?mh<%xdy|>%?mr<%xdz|>%ac%?mp<%xdb|%xdc|%xdd|%xde|%xdf>%?mm<|%xdg|%xdh|%xdi|%xdZ>%?ps<%xdj|>
+%al   %pv%?mh<%xdF|>%?mr<%xdG|>%ac%?mp<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe>%?mm<|%xdBa|%xdBb|%xdBc|%xdBd>%?ps<%xdC|>
 %ac%s%?in<%in. |>%?it<%it|%fn>
 %t3%ac%s%?ia<%ia|%d2>;%t3%ac%s%?id<%id|%d1>
 %pb
-%?bp<%xdk|%?bl<%xdl|%xdm|%xdn|%xdo|%xdp>>     %bl%%%ar%pc/%pt
-
+%?bp<%xdD|%?bl<%xdEa|%xdEb|%xdEc|%xdEd|%xdEe>>     %bl%%%ar%pc/%pt

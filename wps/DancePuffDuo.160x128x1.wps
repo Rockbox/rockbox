@@ -1,64 +1,27 @@
 %x|a|bg.bmp|0|0|
-%xl|b|Stp.bmp|72|0|
-%xl|c|Ply.bmp|72|0|
-%xl|d|Pse.bmp|72|0|
-%xl|e|FF.bmp|72|0|
-%xl|f|RW.bmp|72|0|
-%xl|g|RptA.bmp|145|0|
-%xl|h|Rpt1.bmp|145|0|
-%xl|i|RptS.bmp|145|0|
-%xl|j|Shf.bmp|132|0|
-%xl|k|Pow.bmp|5|118|
-%xl|l|Bat0.bmp|0|118|
-%xl|m|Bat1.bmp|0|118|
-%xl|n|Bat2.bmp|0|118|
-%xl|o|Bat3.bmp|0|118|
-%xl|p|Bat4.bmp|0|118|
-%xl|q|DP1.bmp|129|65|
-%xl|r|DP2.bmp|129|65|
-%xl|s|DP3.bmp|129|65|
-%xl|t|DP4.bmp|129|65|
-%xl|u|DP1.bmp|5|65|
-%xl|v|DP2.bmp|5|65|
-%xl|w|DP3.bmp|5|65|
-%xl|x|DP4.bmp|5|65|
-%xl|y|HoldM.bmp|45|0|
-%xl|z|HoldR.bmp|56|0|
-%xl|A|Rat0.bmp|34|66|
-%xl|B|Rat1.bmp|34|66|
-%xl|C|Rat2.bmp|34|66|
-%xl|D|Rat3.bmp|34|66|
-%xl|E|Rat4.bmp|34|66|
-%xl|F|Rat5.bmp|34|66|
-%xl|G|Rat6.bmp|34|66|
-%xl|H|Rat7.bmp|34|66|
-%xl|I|Rat8.bmp|34|66|
-%xl|J|Rat9.bmp|34|66|
-%xl|K|Rat10.bmp|34|66|
-%xl|L|mp1.bmp|70|66|
-%xl|M|mp2.bmp|70|66|
-%xl|N|mp3.bmp|70|66|
-%xl|O|aiff.bmp|70|66|
-%xl|P|wav.bmp|70|66|
-%xl|Q|ogg.bmp|70|66|
-%xl|R|flac.bmp|70|66|
-%xl|S|mpc.bmp|70|66|
-%xl|T|ac3.bmp|70|66|
-%xl|U|wv.bmp|70|66|
-%xl|V|alac.bmp|70|66|
-%xl|W|aac.bmp|70|66|
-%xl|X|shn.bmp|70|66|
-%xl|Y|Unk.bmp|70|66|
-%xl|Z|A-B.bmp|145|0|
+%xl|A|playmode.bmp|72|0|5|
+%xl|B|repeat.bmp|145|0|4|
+%xl|C|Shf.bmp|132|0|
+%xl|D|Pow.bmp|5|118|
+%xl|E|battery.bmp|0|118|5|
+%xl|F|DancePuff.bmp|129|65|4|
+%xl|G|DancePuff.bmp|5|65|4|
+%xl|H|HoldM.bmp|45|0|
+%xl|I|HoldR.bmp|56|0|
+%xl|J|rating.bmp|34|66|11|
+%xl|K|codec.bmp|70|66|21|
 %wd
-%al   %pv%?mh<%xdy|>%?mr<%xdz|>%ac%?mp<%xdb|%xdc|%xdd|%xde|%xdf>%?mm<|%xdg|%xdh|%xdi|%xdZ>%?ps<%xdj|>
+%al   %pv
 %ac%s%?in<%in. |>%?it<%it|%fn>
 %ac%s%?ia<%ia|%d2>
 %ac%s%?id<%id|%d1>
 %ac%s%t2%?ig<%ig|> %?iy<(%iy)|>
-%?rr<%xdA|%xdB|%xdC|%xdD|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK>%?fc<%xdL|%xdM|%xdN|%xdO|%xdP|%xdQ|%xdR|%xdS|%xdT|%xdU|%xdV|%xdW|%xdX|%xdY>
-%t0.2%xdw%xdq%ac%pc/%pt;%t0.2%xdx%xdr%ac%pc/%pt;%t0.2%xdw%xdq%ac%pc/%pt;%t0.2%xdx%xdr%ac%pc/%pt;%t0.2%xdu%xds%ac%pc/%pt;%t0.2%xdv%xdt%ac%pc/%pt;%t0.2%xdu%xds%ac%pc/%pt;%t0.2%xdv%xdt%ac%pc/%pt
+
+%t0.2%xdGc%xdFa%ac%pc/%pt;%t0.2%xdGd%xdFb%ac%pc/%pt;%t0.2%xdGc%xdFa%ac%pc/%pt;%t0.2%xdGd%xdFb%ac%pc/%pt;%t0.2%xdGa%xdFc%ac%pc/%pt;%t0.2%xdGb%xdFd%ac%pc/%pt;%t0.2%xdGa%xdFc%ac%pc/%pt;%t0.2%xdGb%xdFd%ac%pc/%pt
 %pb
 %ac%s%?In<%In. |>%?It<%It - |%Fn >%?Id<%Id |%D1 >
-%?bp<%xdk|%?bl<%xdl|%xdm|%xdn|%xdo|%xdp>>%?bt<     %bt>%ar%?pp<[%pp/%pe]>
-
+%?bt<     %bt>%ar%?pp<[%pp/%pe]>
+%?mh<%xdH|>%?mr<%xdI|>%?mp<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe>%?mm<|%xdBa|%xdBb|%xdBc|%xdBd>%?ps<%xdC|>
+%?bp<%xdD|%?bl<%xdEa|%xdEb|%xdEc|%xdEd|%xdEe>>
+%?rr<%xdJa|%xdJb|%xdJc|%xdJd|%xdJe|%xdJf|%xdJg|%xdJh|%xdJi|%xdJj|%xdJk>#escape line ending to not break drawing but break long line
+%?fc<%xdKa|%xdKb|%xdKc|%xdKd|%xdKe|%xdKf|%xdKg|%xdKh|%xdKi|%xdKj|%xdKk|%xdKl|%xdKm|%xdKn|%xdKo|%xdKp|%xdKq|%xdKr|%xdKs|%xdKt|%xdKu>
