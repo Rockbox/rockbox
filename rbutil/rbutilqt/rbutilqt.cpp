@@ -470,10 +470,10 @@ bool RbUtilQt::installAuto()
     if(!settings->cacheDisabled())
         installer->setCache(true);
     installer->setMountPoint(settings->mountpoint());
-    installer->install(logger);
 
     connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
 
+    installer->install(logger);
     return true;
 }
 
@@ -606,7 +606,7 @@ void RbUtilQt::installFontsBtn()
 bool RbUtilQt::installFontsAuto()
 {
     installFonts();
-    connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
+
     return !m_error;
 }
 
@@ -621,6 +621,8 @@ void RbUtilQt::installFonts()
     installer->setMountPoint(settings->mountpoint());
     if(!settings->cacheDisabled())
         installer->setCache(true);
+
+    connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
     installer->install(logger);
 }
 
@@ -682,7 +684,6 @@ void RbUtilQt::installDoomBtn()
 bool RbUtilQt::installDoomAuto()
 {
     installDoom();
-    connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
     return !m_error;
 }
 
@@ -703,6 +704,7 @@ void RbUtilQt::installDoom()
     installer->setMountPoint(settings->mountpoint());
     if(!settings->cacheDisabled())
         installer->setCache(true);
+    connect(installer, SIGNAL(done(bool)), this, SLOT(installdone(bool)));
     installer->install(logger);
 
 }
