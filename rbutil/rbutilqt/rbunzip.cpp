@@ -31,7 +31,7 @@ UnZip::ErrorCode RbUnZip::extractArchive(const QString& dest)
     for(int i = 0; i < total; i++) {
         qDebug() << __func__ << files.at(i);
         error = this->extractFile(files.at(i), dest, UnZip::ExtractPaths);
-        emit unzipProgress(i, total);
+        emit unzipProgress(i + 1, total);
         QCoreApplication::processEvents(); // update UI
         if(m_abortunzip)
             error = SkipAll;
