@@ -32,6 +32,8 @@ xlcd_draw.c
 xlcd_scroll.c
 #if LCD_DEPTH>1
 bmp.c
+#endif
+#ifdef HAVE_LCD_COLOR
 bmp_smooth_scale.c
 #endif
 #endif
