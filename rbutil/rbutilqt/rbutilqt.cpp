@@ -500,7 +500,7 @@ void RbUtilQt::install()
 bool RbUtilQt::installBootloaderAuto()
 {
     installBootloader();
-  return !m_error;
+    return !m_error;
 }
 
 void RbUtilQt::installBootloaderBtn()
@@ -513,7 +513,6 @@ void RbUtilQt::installBootloaderBtn()
     // create logger
     logger = new ProgressLoggerGui(this);
     logger->show();
-    connect(blinstaller,SIGNAL(done(bool)),this,SLOT(installdone(bool)));
   
     installBootloader();
 }
@@ -587,7 +586,7 @@ void RbUtilQt::installBootloader()
         }
     }
     blinstaller->setOrigFirmwarePath(offirmware);
-
+    connect(blinstaller,SIGNAL(done(bool)),this,SLOT(installdone(bool)));
     blinstaller->install(logger);
 }
 
