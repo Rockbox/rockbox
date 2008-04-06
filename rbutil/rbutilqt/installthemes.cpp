@@ -54,8 +54,7 @@ void ThemesInstallWindow::downloadInfo()
 {
     // try to get the current build information
     getter = new HttpGet(this);
-    connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-
+    
     qDebug() << "downloading themes info";
     themesInfo.open();
     qDebug() << "file:" << themesInfo.fileName();
@@ -68,6 +67,9 @@ void ThemesInstallWindow::downloadInfo()
     if(settings->cacheOffline())
         getter->setCache(true);
     getter->setFile(&themesInfo);
+    
+    connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
+    connect(logger, SIGNAL(aborted()), getter, SLOT(abort()));
     getter->getFile(url);
 }
 
@@ -232,7 +234,7 @@ void ThemesInstallWindow::show()
     logger = new ProgressLoggerGui(this);
     logger->show();
     logger->addItem(tr("getting themes information ..."), LOGINFO);
-    connect(logger, SIGNAL(aborted()), getter, SLOT(abort()));
+    
     connect(logger, SIGNAL(aborted()), this, SLOT(close()));  
 
     downloadInfo();
