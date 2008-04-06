@@ -44,8 +44,8 @@ static size_t audio_stack_size; /* Keep gcc happy and init */
 #ifndef SIMULATOR
 static uint32_t codec_stack_copy[AUDIO_STACKSIZE / sizeof(uint32_t)];
 #endif
-static struct event_queue audio_str_queue NOCACHEBSS_ATTR;
-static struct queue_sender_list audio_str_queue_send NOCACHEBSS_ATTR;
+static struct event_queue audio_str_queue SHAREDBSS_ATTR;
+static struct queue_sender_list audio_str_queue_send SHAREDBSS_ATTR;
 struct stream audio_str IBSS_ATTR;
 
 /* libmad related definitions */

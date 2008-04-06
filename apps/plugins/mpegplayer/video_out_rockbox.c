@@ -52,7 +52,7 @@ static struct vo_data vo;
 #endif
 
 #if NUM_CORES > 1
-static struct mutex vo_mtx NOCACHEBSS_ATTR;
+static struct mutex vo_mtx SHAREDBSS_ATTR;
 #endif
 
 static inline void video_lock_init(void)

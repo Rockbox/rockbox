@@ -231,7 +231,7 @@ static struct
     struct event emu_evt_reply;
     intptr_t retval;
     struct sample_queue_chunk wav_chunk[WAV_NUM_CHUNKS];
-} sample_queue NOCACHEBSS_ATTR;
+} sample_queue SHAREDBSS_ATTR;
 
 static inline void samples_release_wrbuf(void)
 {

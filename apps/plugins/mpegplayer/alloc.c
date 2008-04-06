@@ -30,10 +30,10 @@ static size_t bufsize;
 static unsigned char* mallocbuf;
 
 /* libmpeg2 allocator */
-static off_t mpeg2_mem_ptr NOCACHEBSS_ATTR;
-static size_t mpeg2_bufsize NOCACHEBSS_ATTR;
-static unsigned char *mpeg2_mallocbuf NOCACHEBSS_ATTR;
-static unsigned char *mpeg2_bufallocbuf NOCACHEBSS_ATTR;
+static off_t mpeg2_mem_ptr SHAREDBSS_ATTR;
+static size_t mpeg2_bufsize SHAREDBSS_ATTR;
+static unsigned char *mpeg2_mallocbuf SHAREDBSS_ATTR;
+static unsigned char *mpeg2_bufallocbuf SHAREDBSS_ATTR;
 
 #if defined(DEBUG) || defined(SIMULATOR)
 const char * mpeg_get_reason_str(int reason)

@@ -212,8 +212,8 @@ enum
 
 /***************************************************************************/
 
-static struct event_queue       pcmrec_queue NOCACHEBSS_ATTR;
-static struct queue_sender_list pcmrec_queue_send NOCACHEBSS_ATTR;
+static struct event_queue       pcmrec_queue SHAREDBSS_ATTR;
+static struct queue_sender_list pcmrec_queue_send SHAREDBSS_ATTR;
 static long                pcmrec_stack[3*DEFAULT_STACK_SIZE/sizeof(long)];
 static const char          pcmrec_thread_name[] = "pcmrec";
 static struct thread_entry *pcmrec_thread_p;

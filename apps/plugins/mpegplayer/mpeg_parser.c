@@ -21,7 +21,7 @@
 #include "plugin.h"
 #include "mpegplayer.h"
 
-struct stream_parser str_parser NOCACHEBSS_ATTR;
+struct stream_parser str_parser SHAREDBSS_ATTR;
 
 static void parser_init_state(void)
 {

@@ -25,12 +25,12 @@
 #include "logf.h"
 
 static int timer_prio = -1;
-void NOCACHEBSS_ATTR (*pfn_timer)(void) = NULL;      /* timer callback */
-void NOCACHEBSS_ATTR (*pfn_unregister)(void) = NULL; /* unregister callback */
+void SHAREDBSS_ATTR (*pfn_timer)(void) = NULL;      /* timer callback */
+void SHAREDBSS_ATTR (*pfn_unregister)(void) = NULL; /* unregister callback */
 #ifdef CPU_COLDFIRE
 static int base_prescale;
 #elif defined CPU_PP || CONFIG_CPU == PNX0101
-static long NOCACHEBSS_ATTR cycles_new = 0;
+static long SHAREDBSS_ATTR cycles_new = 0;
 #endif
 
 /* interrupt handler */

@@ -457,25 +457,30 @@
                              and not a special semaphore instruction */
 #define CORELOCK_SWAP   2 /* A swap (exchange) instruction */
 
-/* Dual core support - not yet working on the 1G/2G and 3G iPod */
 #if defined(CPU_PP)
 #define IDLE_STACK_SIZE  0x80
 #define IDLE_STACK_WORDS 0x20
+
+/* Attributes to place data in uncached DRAM */
+/* These are useful beyond dual-core and ultimately beyond PP since they may
+ * be used for DMA buffers and such without cache maintenence calls. */
+#define NOCACHEBSS_ATTR     __attribute__((section(".ncbss"),nocommon))
+#define NOCACHEDATA_ATTR    __attribute__((section(".ncdata"),nocommon))
 
 #if !defined(FORCE_SINGLE_CORE)
 
 #define NUM_CORES 2
 #define CURRENT_CORE current_core()
-/* Use IRAM for variables shared across cores - large memory buffers should
- * use UNCACHED_ADDR(a) and be appropriately aligned and padded */
-#define NOCACHEBSS_ATTR IBSS_ATTR
-#define NOCACHEDATA_ATTR IDATA_ATTR
+/* Attributes for core-shared data in DRAM where IRAM is better used for other
+ * purposes. */
+#define SHAREDBSS_ATTR     NOCACHEBSS_ATTR
+#define SHAREDDATA_ATTR    NOCACHEDATA_ATTR
 
 #define IF_COP(...)         __VA_ARGS__
 #define IF_COP_VOID(...)    __VA_ARGS__
 #define IF_COP_CORE(core)   core
 
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+#ifdef CPU_PP
 #define CONFIG_CORELOCK SW_CORELOCK /* SWP(B) is broken */
 #else
 #define CONFIG_CORELOCK CORELOCK_SWAP
@@ -500,9 +505,10 @@
 #ifndef NUM_CORES
 /* Default to single core */
 #define NUM_CORES 1
-#define CURRENT_CORE CPU
-#define NOCACHEBSS_ATTR
-#define NOCACHEDATA_ATTR
+#define CURRENT_CORE    CPU
+/* Attributes for core-shared data in DRAM - no caching considerations */
+#define SHAREDBSS_ATTR
+#define SHAREDDATA_ATTR
 #define CONFIG_CORELOCK CORELOCK_NONE
 
 #define IF_COP(...)

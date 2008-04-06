@@ -27,6 +27,7 @@ SECTIONS
     *(.irodata)
     *(.idata)
     *(.data*)
+    *(.ncdata*)
     _dataend = . ;
    }
 
@@ -48,6 +49,7 @@ SECTIONS
      _edata = .;
      *(.bss*);
      *(.ibss);
+     *(.ncbss*);
      _end = .;
    }
 }

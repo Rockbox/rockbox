@@ -42,7 +42,7 @@ static bool initialized = false;
 static long next_yield = 0;
 #define MIN_YIELD_PERIOD 2000
 
-static struct mutex ata_mtx NOCACHEBSS_ATTR;
+static struct mutex ata_mtx SHAREDBSS_ATTR;
 
 #define SECTOR_SIZE 512
 

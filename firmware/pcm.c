@@ -67,13 +67,13 @@
 
 /* the registered callback function to ask for more mp3 data */
 volatile pcm_more_callback_type pcm_callback_for_more
-    NOCACHEBSS_ATTR = NULL;
+    SHAREDBSS_ATTR = NULL;
 /* PCM playback state */
-volatile bool pcm_playing NOCACHEBSS_ATTR = false;
+volatile bool pcm_playing SHAREDBSS_ATTR = false;
 /* PCM paused state. paused implies playing */
-volatile bool pcm_paused NOCACHEBSS_ATTR = false;
+volatile bool pcm_paused SHAREDBSS_ATTR = false;
 /* samplerate of currently playing audio - undefined if stopped */
-unsigned long pcm_curr_sampr NOCACHEBSS_ATTR = 0;
+unsigned long pcm_curr_sampr SHAREDBSS_ATTR = 0;
 
 /**
  * Do peak calculation using distance squared from axis and save a lot
@@ -312,12 +312,12 @@ void pcm_mute(bool mute)
 /** Low level pcm recording apis **/
 
 /* Next start for recording peaks */
-const volatile void *pcm_rec_peak_addr NOCACHEBSS_ATTR = NULL;
+const volatile void *pcm_rec_peak_addr SHAREDBSS_ATTR = NULL;
 /* the registered callback function for when more data is available */
 volatile pcm_more_callback_type2
-    pcm_callback_more_ready NOCACHEBSS_ATTR = NULL;
+    pcm_callback_more_ready SHAREDBSS_ATTR = NULL;
 /* DMA transfer in is currently active */
-volatile bool pcm_recording NOCACHEBSS_ATTR = false;
+volatile bool pcm_recording SHAREDBSS_ATTR = false;
 
 /**
  * Return recording peaks - From the end of the last peak up to

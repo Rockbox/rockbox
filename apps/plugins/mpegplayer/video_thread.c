@@ -54,8 +54,8 @@ struct video_thread_data
    so maybe we can reduce it. */
 #define VIDEO_STACKSIZE (4*1024)
 static uint32_t video_stack[VIDEO_STACKSIZE / sizeof(uint32_t)] IBSS_ATTR;
-static struct event_queue video_str_queue NOCACHEBSS_ATTR;
-static struct queue_sender_list video_str_queue_send NOCACHEBSS_ATTR;
+static struct event_queue video_str_queue SHAREDBSS_ATTR;
+static struct queue_sender_list video_str_queue_send SHAREDBSS_ATTR;
 struct stream video_str IBSS_ATTR;
 
 static void draw_fps(struct video_thread_data *td)

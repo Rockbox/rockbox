@@ -172,7 +172,7 @@ enum filling_state {
 #endif
 
 bool audio_is_initialized = false;
-static bool audio_thread_ready NOCACHEBSS_ATTR = false;
+static bool audio_thread_ready SHAREDBSS_ATTR = false;
 
 /* Variables are commented with the threads that use them: *
  * A=audio, C=codec, V=voice. A suffix of - indicates that *
@@ -180,9 +180,9 @@ static bool audio_thread_ready NOCACHEBSS_ATTR = false;
 /* TBD: Split out "audio" and "playback" (ie. calling) threads */
 
 /* Main state control */
-static volatile bool audio_codec_loaded NOCACHEBSS_ATTR = false; /* Codec loaded? (C/A-) */
-static volatile bool playing NOCACHEBSS_ATTR = false; /* Is audio playing? (A) */
-static volatile bool paused NOCACHEBSS_ATTR = false; /* Is audio paused? (A/C-) */
+static volatile bool audio_codec_loaded SHAREDBSS_ATTR = false; /* Codec loaded? (C/A-) */
+static volatile bool playing SHAREDBSS_ATTR = false; /* Is audio playing? (A) */
+static volatile bool paused SHAREDBSS_ATTR = false; /* Is audio paused? (A/C-) */
 
 /* Ring buffer where compressed audio and codecs are loaded */
 static unsigned char *filebuf = NULL;       /* Start of buffer (A/C-) */
@@ -261,8 +261,8 @@ static size_t buffer_margin  = 0; /* Buffer margin aka anti-skip buffer (A/C-) *
 static void set_filebuf_watermark(int seconds, size_t max);
 
 /* Audio thread */
-static struct event_queue       audio_queue NOCACHEBSS_ATTR;
-static struct queue_sender_list audio_queue_sender_list NOCACHEBSS_ATTR;
+static struct event_queue       audio_queue SHAREDBSS_ATTR;
+static struct queue_sender_list audio_queue_sender_list SHAREDBSS_ATTR;
 static long audio_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
 static const char audio_thread_name[] = "audio";
 
@@ -273,7 +273,7 @@ static void audio_reset_buffer(void);
 
 /* Codec thread */
 extern struct codec_api ci;
-static struct event_queue codec_queue NOCACHEBSS_ATTR;
+static struct event_queue codec_queue SHAREDBSS_ATTR;
 static struct queue_sender_list codec_queue_sender_list;
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
@@ -281,7 +281,7 @@ static const char codec_thread_name[] = "codec";
 struct thread_entry *codec_thread_p; /* For modifying thread priority later. */
 
 /* PCM buffer messaging */
-static struct event_queue pcmbuf_queue NOCACHEBSS_ATTR;
+static struct event_queue pcmbuf_queue SHAREDBSS_ATTR;
 
 /* Function to be called by pcm buffer callbacks.
  * Permissible Context(s): Audio interrupt

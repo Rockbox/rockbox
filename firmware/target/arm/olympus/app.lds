@@ -21,6 +21,14 @@ INPUT(target/arm/crt0-pp.o)
 #define IRAMORIG 0x40000000
 #define IRAMSIZE 0xc000
 
+#ifdef CPU_PP502x
+#define NOCACHE_BASE 	0x10000000
+#else
+#define NOCACHE_BASE 	0x28000000
+#endif
+
+#define CACHEALIGN_SIZE 16
+
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
 
@@ -70,6 +78,18 @@ SECTIONS
         _dataend  = .;
     } > DRAM
 
+#if NOCACHE_BASE != 0
+    /* .ncdata section is placed at uncached physical alias address and is
+     * loaded at the proper cached virtual address - no copying is
+     * performed in the init code */
+    .ncdata . + NOCACHE_BASE :
+    {
+        . = ALIGN(CACHEALIGN_SIZE);
+        *(.ncdata*)
+        . = ALIGN(CACHEALIGN_SIZE);
+    } AT> DRAM
+#endif
+    
     /DISCARD/ :
     {
         *(.eh_frame)
@@ -103,7 +123,7 @@ SECTIONS
         _iend = .;
     } > IRAM
 
-    .idle_stacks :
+    .idle_stacks (NOLOAD) :
     {
        *(.idle_stacks)
 #if NUM_CORES > 1
@@ -116,7 +136,7 @@ SECTIONS
        cop_idlestackend = .;
     } > IRAM
 
-    .stack :
+    .stack (NOLOAD) :
     {
        *(.stack)
        stackbegin = .;
@@ -124,37 +144,53 @@ SECTIONS
        stackend = .;
     } > IRAM
 
-    .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram) + SIZEOF(.vectors):
+    /* .bss and .ncbss are treated as a single section to use one init loop to
+     * zero it - note "_edata" and "_end" */
+    .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.ncdata) +\
+         SIZEOF(.iram) + SIZEOF(.vectors) (NOLOAD) :
     {
        _edata = .;
         *(.bss*)
         *(COMMON)
         . = ALIGN(0x4);
-       _end = .;
     } > DRAM
 
-    .audiobuf ALIGN(4) :
+#if NOCACHE_BASE != 0
+    .ncbss . + NOCACHE_BASE (NOLOAD):
+    {
+    	. = ALIGN(CACHEALIGN_SIZE);
+        *(.ncbss*)
+    	. = ALIGN(CACHEALIGN_SIZE);
+    } AT> DRAM
+#endif
+
+    /* This will be aligned by preceding alignments */
+    .endaddr . - NOCACHE_BASE (NOLOAD) :
+    {
+        _end = .;
+    } > DRAM
+
+    .audiobuf (NOLOAD) :
     {
         _audiobuffer = .;
         audiobuffer = .;
     } > DRAM
-
-    .audiobufend ENDAUDIOADDR:
+    
+    .audiobufend ENDAUDIOADDR (NOLOAD) :
     {
         audiobufend = .;
         _audiobufend = .;
     } > DRAM
 
-    .codec ENDAUDIOADDR:
+    .codec ENDAUDIOADDR (NOLOAD) :
     {
         codecbuf = .;
         _codecbuf = .;
     }
 
-    .plugin ENDADDR:
+    .plugin ENDADDR (NOLOAD) :
     {
         _pluginbuf = .;
         pluginbuf = .;
     }
 }
-

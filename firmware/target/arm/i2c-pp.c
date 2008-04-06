@@ -33,7 +33,7 @@
 #include "as3514.h"
 
 /* Local functions definitions */
-static struct mutex i2c_mtx NOCACHEBSS_ATTR;
+static struct mutex i2c_mtx SHAREDBSS_ATTR;
 
 #define POLL_TIMEOUT (HZ)
 

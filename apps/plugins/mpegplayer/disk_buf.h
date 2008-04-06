@@ -84,7 +84,7 @@ struct disk_buf
     bool need_seek;   /* Need to seek because a read was not contiguous */
 };
 
-extern struct disk_buf disk_buf NOCACHEBSS_ATTR;
+extern struct disk_buf disk_buf SHAREDBSS_ATTR;
 
 static inline bool disk_buf_is_data_ready(struct stream_hdr *sh,
                                           ssize_t margin)

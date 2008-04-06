@@ -16,6 +16,20 @@ OUTPUT_FORMAT(elf32-sh)
 #define STUBOFFSET 0
 #endif
 
+#if defined(CPU_PP)
+#ifdef CPU_PP502x
+#define NOCACHE_BASE 	0x10000000
+#else
+#define NOCACHE_BASE 	0x28000000
+#endif /* CPU_* */
+#define CACHEALIGN_SIZE 16
+#endif /* CPU_PP */
+
+#ifndef NOCACHE_BASE
+/* Default to no offset if target doesn't define this */
+#define NOCACHE_BASE 0x00000000
+#endif
+
 #if CONFIG_CPU==S3C2440
 #include "s3c2440.h"
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - 0x100 - PLUGIN_BUFFER_SIZE - STUBOFFSET - CODEC_SIZE - LCD_BUFFER_SIZE - TTB_SIZE
@@ -119,10 +133,20 @@ SECTIONS
     .data :
     {
         *(.data*)
-#if defined(IRAMSIZE)
-        iramcopy = .;
-#endif
     } > PLUGIN_RAM
+
+#if NOCACHE_BASE != 0
+    .ncdata . + NOCACHE_BASE :
+    {
+        . = ALIGN(CACHEALIGN_SIZE);
+        *(.ncdata*)
+        . = ALIGN(CACHEALIGN_SIZE);
+    } AT> PLUGIN_RAM
+#endif
+
+#if defined(IRAMSIZE)
+    iramcopy = . - NOCACHE_BASE;
+#endif
 
     /DISCARD/ :
     {
@@ -139,6 +163,7 @@ SECTIONS
         iramend = .;
     } > PLUGIN_IRAM
 
+
     .ibss (NOLOAD) :
     {
         iedata = .;
@@ -150,13 +175,27 @@ SECTIONS
 
     .bss (NOLOAD) :
     {
-    plugin_bss_start = .;
+    	plugin_bss_start = .;
         *(.bss*)
         *(COMMON)
         . = ALIGN(0x4);
+    } > PLUGIN_RAM
+    
+#if NOCACHE_BASE != 0
+    .ncbss . + NOCACHE_BASE (NOLOAD) :
+    {
+    	. = ALIGN(CACHEALIGN_SIZE);
+    	*(.ncbss*)
+        . = ALIGN(CACHEALIGN_SIZE);
+    } AT> PLUGIN_RAM
+#endif
+
+    /* Restore . */
+    .pluginend . - NOCACHE_BASE :
+    {
         _plugin_end_addr = .;
         plugin_end_addr = .;
-    } > PLUGIN_RAM
+    }
 
     /* Special trick to avoid a linker error when no other sections are
        left after garbage collection (plugin not for this platform) */

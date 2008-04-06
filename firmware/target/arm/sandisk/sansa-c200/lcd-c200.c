@@ -23,7 +23,7 @@
 #include "system.h"
 
 /* Display status */
-static unsigned lcd_yuv_options NOCACHEBSS_ATTR = 0;
+static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 
 /* LCD command set for Samsung S6B33B2 */
 

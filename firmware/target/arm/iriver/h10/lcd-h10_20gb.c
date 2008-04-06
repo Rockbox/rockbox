@@ -34,7 +34,7 @@ static unsigned short disp_control_rev;
 /* Contrast setting << 8 */
 static int lcd_contrast;
 
-static unsigned lcd_yuv_options NOCACHEBSS_ATTR = 0;
+static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 
 /* Forward declarations */
 static void lcd_display_off(void);

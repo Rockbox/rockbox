@@ -27,11 +27,11 @@
 GREY_INFO_STRUCT_IRAM
 #endif
 
-static struct event_queue stream_mgr_queue NOCACHEBSS_ATTR;
-static struct queue_sender_list stream_mgr_queue_send NOCACHEBSS_ATTR;
+static struct event_queue stream_mgr_queue SHAREDBSS_ATTR;
+static struct queue_sender_list stream_mgr_queue_send SHAREDBSS_ATTR;
 static uint32_t stream_mgr_thread_stack[DEFAULT_STACK_SIZE*2/sizeof(uint32_t)];
 
-struct stream_mgr stream_mgr NOCACHEBSS_ATTR;
+struct stream_mgr stream_mgr SHAREDBSS_ATTR;
 
 /* Forward decs */
 static int stream_on_close(void);

@@ -49,7 +49,7 @@
 #endif
 
 #if !defined(CPU_PP) || !defined(BOOTLOADER) 
-volatile long current_tick NOCACHEDATA_ATTR = 0;
+volatile long current_tick SHAREDDATA_ATTR = 0;
 #endif
 
 void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
@@ -62,7 +62,7 @@ static struct
     int count;
     struct event_queue *queues[MAX_NUM_QUEUES];
     IF_COP( struct corelock cl; )
-} all_queues NOCACHEBSS_ATTR;
+} all_queues SHAREDBSS_ATTR;
 
 /****************************************************************************
  * Standard kernel stuff

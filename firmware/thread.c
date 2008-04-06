@@ -235,7 +235,7 @@ extern uintptr_t cpu_idlestackbegin[];
 extern uintptr_t cpu_idlestackend[];
 extern uintptr_t cop_idlestackbegin[];
 extern uintptr_t cop_idlestackend[];
-static uintptr_t * const idle_stacks[NUM_CORES] NOCACHEDATA_ATTR =
+static uintptr_t * const idle_stacks[NUM_CORES] =
 {
     [CPU] = cpu_idlestackbegin,
     [COP] = cop_idlestackbegin
@@ -251,7 +251,7 @@ struct core_semaphores
     volatile uint8_t unused;       /* 03h */
 };
 
-static struct core_semaphores core_semaphores[NUM_CORES] NOCACHEBSS_ATTR;
+static struct core_semaphores core_semaphores[NUM_CORES] IBSS_ATTR;
 #endif /* CONFIG_CPU == PP5002 */
 
 #endif /* NUM_CORES */

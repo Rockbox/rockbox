@@ -108,7 +108,7 @@ static inline unsigned int processor_id(void)
 /* Certain data needs to be out of the way of cache line interference
  * such as data for COP use or for use with UNCACHED_ADDR */
 #define PROC_NEEDS_CACHEALIGN
-#define CACHEALIGN_BITS (5) /* 2^5 = 32 bytes */
+#define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
 
 /** cache functions **/
 #ifndef BOOTLOADER

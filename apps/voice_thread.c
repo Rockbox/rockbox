@@ -57,10 +57,10 @@ static long voice_stack[0x7c0/sizeof(long)] IBSS_ATTR_VOICE_STACK;
 static const char voice_thread_name[] = "voice";
 
 /* Voice thread synchronization objects */
-static struct event_queue voice_queue NOCACHEBSS_ATTR;
-static struct mutex voice_mutex NOCACHEBSS_ATTR;
-static struct event voice_event NOCACHEBSS_ATTR;
-static struct queue_sender_list voice_queue_sender_list NOCACHEBSS_ATTR;
+static struct event_queue voice_queue SHAREDBSS_ATTR;
+static struct mutex voice_mutex SHAREDBSS_ATTR;
+static struct event voice_event SHAREDBSS_ATTR;
+static struct queue_sender_list voice_queue_sender_list SHAREDBSS_ATTR;
 
 /* Buffer for decoded samples */
 static spx_int16_t voice_output_buf[VOICE_FRAME_SIZE] CACHEALIGN_ATTR;
@@ -115,7 +115,7 @@ void mp3_play_data(const unsigned char* start, int size,
 {
     /* Shared struct to get data to the thread - once it replies, it has
      * safely cached it in its own private data */
-    static struct voice_info voice_clip NOCACHEBSS_ATTR;
+    static struct voice_info voice_clip SHAREDBSS_ATTR;
 
     if (get_more != NULL && start != NULL && (ssize_t)size > 0)
     {

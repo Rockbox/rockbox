@@ -165,7 +165,7 @@ static struct sd_card_status sd_status[NUM_VOLUMES] =
 /* Shoot for around 75% usage */
 static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
 static const char         sd_thread_name[] = "ata/sd";
-static struct mutex       sd_mtx NOCACHEBSS_ATTR;
+static struct mutex       sd_mtx SHAREDBSS_ATTR;
 static struct event_queue sd_queue;
 
 /* Posted when card plugged status has changed */

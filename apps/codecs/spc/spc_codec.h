@@ -97,10 +97,10 @@
 #endif
 
 #if SPC_DUAL_CORE
-    #undef NOCACHEBSS_ATTR
-    #define NOCACHEBSS_ATTR __attribute__ ((section(".ibss")))
-    #undef NOCACHEDATA_ATTR
-    #define NOCACHEDATA_ATTR __attribute__((section(".idata")))
+    #undef SHAREDBSS_ATTR
+    #define SHAREDBSS_ATTR __attribute__ ((section(".ibss")))
+    #undef SHAREDDATA_ATTR
+    #define SHAREDDATA_ATTR __attribute__((section(".idata")))
 #endif
 #endif
 

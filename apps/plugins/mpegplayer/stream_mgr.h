@@ -44,7 +44,7 @@ struct stream_mgr
     } parms;
 };
 
-extern struct stream_mgr stream_mgr NOCACHEBSS_ATTR;
+extern struct stream_mgr stream_mgr SHAREDBSS_ATTR;
 
 struct stream_window
 {

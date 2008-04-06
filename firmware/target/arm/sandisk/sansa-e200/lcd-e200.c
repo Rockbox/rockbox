@@ -28,8 +28,8 @@
 
 /* Power and display status */
 static bool power_on   = false; /* Is the power turned on?   */
-static bool display_on NOCACHEBSS_ATTR = false; /* Is the display turned on? */
-static unsigned lcd_yuv_options NOCACHEBSS_ATTR = 0;
+static bool display_on SHAREDBSS_ATTR = false; /* Is the display turned on? */
+static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 
 /* Reverse Flag */
 #define R_DISP_CONTROL_NORMAL 0x0004

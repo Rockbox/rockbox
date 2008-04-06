@@ -29,14 +29,14 @@
 #include "string.h"
 
 #ifndef SIMULATOR
-long cpu_frequency NOCACHEBSS_ATTR = CPU_FREQ;
+long cpu_frequency SHAREDBSS_ATTR = CPU_FREQ;
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-static int boost_counter NOCACHEBSS_ATTR = 0;
-static bool cpu_idle NOCACHEBSS_ATTR = false;
+static int boost_counter SHAREDBSS_ATTR = 0;
+static bool cpu_idle SHAREDBSS_ATTR = false;
 #if NUM_CORES > 1
-struct spinlock boostctrl_spin NOCACHEBSS_ATTR;
+struct spinlock boostctrl_spin SHAREDBSS_ATTR;
 void cpu_boost_init(void)
 {
     spinlock_init(&boostctrl_spin);

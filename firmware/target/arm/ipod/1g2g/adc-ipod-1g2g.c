@@ -22,7 +22,7 @@
 #include "hwcompat.h"
 #include "kernel.h"
 
-static struct mutex adc_mtx NOCACHEBSS_ATTR;
+static struct mutex adc_mtx SHAREDBSS_ATTR;
 
 /* used in the 2nd gen ADC interrupt */
 static unsigned int_data;

@@ -72,7 +72,7 @@ void fiq_handler(void)
 /****************************************************************************
  ** Playback DMA transfer
  **/
-struct dma_data dma_play_data NOCACHEBSS_ATTR =
+struct dma_data dma_play_data SHAREDBSS_ATTR =
 {
     /* Initialize to a locked, stopped state */
     .p = NULL,
@@ -84,7 +84,7 @@ struct dma_data dma_play_data NOCACHEBSS_ATTR =
     .state = 0
 };
 
-static unsigned long pcm_freq NOCACHEDATA_ATTR = HW_SAMPR_DEFAULT; /* 44.1 is default */
+static unsigned long pcm_freq SHAREDDATA_ATTR = HW_SAMPR_DEFAULT; /* 44.1 is default */
 #ifdef HAVE_WM8751
 /* Samplerate control for audio codec */
 static int sr_ctrl = MROBE100_44100HZ;
@@ -356,7 +356,7 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
  **/
 #ifdef HAVE_RECORDING
 /* PCM recording interrupt routine lockout */
-static struct dma_data dma_rec_data NOCACHEBSS_ATTR =
+static struct dma_data dma_rec_data SHAREDBSS_ATTR =
 {
     /* Initialize to a locked, stopped state */
     .p = NULL,

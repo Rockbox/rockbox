@@ -21,12 +21,12 @@
 #include "plugin.h"
 #include "mpegplayer.h"
 
-static struct mutex disk_buf_mtx NOCACHEBSS_ATTR;
-static struct event_queue disk_buf_queue NOCACHEBSS_ATTR;
-static struct queue_sender_list disk_buf_queue_send NOCACHEBSS_ATTR;
+static struct mutex disk_buf_mtx SHAREDBSS_ATTR;
+static struct event_queue disk_buf_queue SHAREDBSS_ATTR;
+static struct queue_sender_list disk_buf_queue_send SHAREDBSS_ATTR;
 static uint32_t disk_buf_stack[DEFAULT_STACK_SIZE*2/sizeof(uint32_t)];
 
-struct disk_buf disk_buf NOCACHEBSS_ATTR;
+struct disk_buf disk_buf SHAREDBSS_ATTR;
 static struct list_item nf_list;
 
 static inline void disk_buf_lock(void)
@@ -566,7 +566,7 @@ static int disk_buf_probe(off_t start, size_t length,
     {
         if (disk_buf.cache[page] != tag)
         {
-            static struct dbuf_range rng NOCACHEBSS_ATTR;
+            static struct dbuf_range rng IBSS_ATTR;
             DEBUGF("disk_buf: cache miss\n");
             rng.tag_start = tag;
             rng.tag_end = tag_end;
