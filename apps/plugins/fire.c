@@ -278,7 +278,8 @@ int init_grey(void)
     /* get the remainder of the plugin buffer */
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
-    if (!grey_init(rb, gbuf, gbuf_size, 0, FIRE_WIDTH, LCD_HEIGHT, NULL)){
+    if (!grey_init(rb, gbuf, gbuf_size, GREY_ON_COP,
+                   FIRE_WIDTH, LCD_HEIGHT, NULL)){
         rb->splash(HZ, "not enough memory");
         return PLUGIN_ERROR;
     }

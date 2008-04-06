@@ -210,7 +210,7 @@ int main(void)
     /* initialize the greyscale buffer:
        Archos: 112 pixels wide, 7 rows (56 pixels) high.
        H1x0: 160 pixels wide, 30 rows (120 pixels) high. */
-    if (!grey_init(rb, gbuf, gbuf_size, GREY_BUFFERED, 
+    if (!grey_init(rb, gbuf, gbuf_size, GREY_BUFFERED|GREY_ON_COP,
                    LCD_WIDTH, GFX_HEIGHT, NULL))
     {
         rb->splash(HZ, "Not enough memory.");

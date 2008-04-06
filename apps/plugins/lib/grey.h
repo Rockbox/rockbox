@@ -41,7 +41,7 @@
 /* Greyscale library management structure declaration. You need one of these
  * in every plugin using the library, depending on whether the structure should
  * use IRAM or not. */
-#define GREY_INFO_STRUCT struct _grey_info _grey_info;
+#define GREY_INFO_STRUCT struct _grey_info _grey_info SHAREDBSS_ATTR;
 #define GREY_INFO_STRUCT_IRAM struct _grey_info _grey_info IBSS_ATTR;
 
 /* Features you can request on library init (ORed together): */
