@@ -76,7 +76,8 @@ QString resolvePathCase(QString path)
 #endif
 
     for(int i = start; i < elems.size(); i++) {
-        QStringList direlems = QDir(realpath).entryList(QDir::AllEntries);
+        QStringList direlems
+	    = QDir(realpath).entryList(QDir::AllEntries|QDir::Hidden|QDir::System);
         if(direlems.contains(elems.at(i), Qt::CaseInsensitive)) {
             // need to filter using QRegExp as QStringList::filter(QString)
             // matches any substring
