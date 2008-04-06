@@ -55,7 +55,8 @@ SOURCES += rbutilqt.cpp \
  ../../tools/voicefont.c \
  voicefile.cpp \
  createvoicewindow.cpp \
- rbsettings.cpp
+ rbsettings.cpp \
+ rbunzip.cpp
  
 HEADERS += rbutilqt.h \
  install.h \
@@ -100,7 +101,8 @@ HEADERS += rbutilqt.h \
  ../../tools/voicefont.h \
  voicefile.h \
  createvoicewindow.h \
- rbsettings.h
+ rbsettings.h \
+ rbunzip.h
  
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex ../../tools

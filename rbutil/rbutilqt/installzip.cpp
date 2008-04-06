@@ -18,9 +18,8 @@
  ****************************************************************************/
 
 #include "installzip.h"
+#include "rbunzip.h"
 
-#include "zip/zip.h"
-#include "zip/unzip.h"
 
 ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 {
@@ -135,21 +134,29 @@ void ZipInstaller::downloadDone(bool error)
 
         qDebug() << "file to unzip: " << m_file;
         UnZip::ErrorCode ec;
-        UnZip uz;
+        RbUnZip uz;
+        connect(&uz, SIGNAL(unzipProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+        connect(m_dp, SIGNAL(aborted()), &uz, SLOT(abortUnzip()));
         ec = uz.openArchive(m_file);
         if(ec != UnZip::Ok) {
             m_dp->addItem(tr("Opening archive failed: %1.")
                 .arg(uz.formatError(ec)),LOGERROR);
+            m_dp->setProgressMax(1);
+            m_dp->setProgressValue(1);
             m_dp->abort();
             emit done(true);
             return;
         }
 
-        ec = uz.extractAll(m_mountpoint);
+        ec = uz.extractArchive(m_mountpoint);
+        // TODO: better handling of aborted unzip operation.
         if(ec != UnZip::Ok) {
             m_dp->addItem(tr("Extracting failed: %1.")
                 .arg(uz.formatError(ec)),LOGERROR);
             m_dp->abort();
+            m_dp->setProgressMax(1);
+            m_dp->setProgressValue(1);
+
             emit done(true);
             return;
         }
