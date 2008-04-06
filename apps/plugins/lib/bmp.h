@@ -35,4 +35,10 @@ int save_bmp_file( char* filename, struct bitmap *bm, struct plugin_api* rb  );
 */
 void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst);
 
+/**
+   Advanced image scale from src to dst (bilinear) based on imlib2.
+   Source and destination dimensions are read from the struct bitmap.
+ */
+void smooth_resize_bitmap(struct bitmap *src,  struct bitmap *dst);
+
 #endif

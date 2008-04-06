@@ -295,7 +295,7 @@ static bool load_resize_bitmap(void)
                                 FORMAT_NATIVE );
         if( rc > 0 )
         {
-            simple_resize_bitmap( &temp_bitmap, &main_bitmap );
+            smooth_resize_bitmap( &temp_bitmap, &main_bitmap );
             puzzle_bmp_ptr = (const fb_data *)img_buf;
             rb->strcpy( img_buf_path, filename );
             return true;

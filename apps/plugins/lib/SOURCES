@@ -32,6 +32,7 @@ xlcd_draw.c
 xlcd_scroll.c
 #if LCD_DEPTH>1
 bmp.c
+bmp_smooth_scale.c
 #endif
 #endif
 pluginlib_actions.c
