@@ -733,6 +733,31 @@ static void __attribute__((naked))
     );
     (void)core; (void)thread;
 }
+
+/*---------------------------------------------------------------------------
+ * Do any device-specific inits for the threads and synchronize the kernel
+ * initializations.
+ *---------------------------------------------------------------------------
+ */
+static void core_thread_init(unsigned int core)
+{
+    if (core == CPU)
+    {
+        /* Wake up coprocessor and let it initialize kernel and threads */
+#ifdef CPU_PP502x
+        MBX_MSG_CLR = 0x3f;
+#endif
+        COP_CTL = PROC_WAKE;
+        /* Sleep until COP has finished */
+        CPU_CTL = PROC_SLEEP;
+        nop; nop; nop;
+    }
+    else
+    {
+        /* Wake the CPU and return */
+        CPU_CTL = PROC_WAKE;
+    }
+}
 #endif /* NUM_CORES */
 
 #elif CONFIG_CPU == S3C2440
@@ -2955,24 +2980,22 @@ void init_threads(void)
         thread->stack = stackbegin;
         thread->stack_size = (uintptr_t)stackend - (uintptr_t)stackbegin;
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
-        /* TODO: HAL interface for this */
-        /* Wake up coprocessor and let it initialize kernel and threads */
-#ifdef CPU_PP502x
-        MBX_MSG_CLR = 0x3f;
-#endif
-        COP_CTL = PROC_WAKE;
-        /* Sleep until finished */
-        CPU_CTL = PROC_SLEEP;
-        nop; nop; nop; nop;
+        /* Wait for other processors to finish their inits since create_thread
+         * isn't safe to call until the kernel inits are done. The first
+         * threads created in the system must of course be created by CPU. */
+        core_thread_init(CPU);
     } 
     else
     {
-        /* Initial stack is the COP idle stack */
-        thread->stack = cop_idlestackbegin;
+        /* Initial stack is the idle stack */
+        thread->stack = idle_stacks[core];
         thread->stack_size = IDLE_STACK_SIZE;
-        /* Get COP safely primed inside switch_thread where it will remain
-         * until a thread actually exists on it */
-        CPU_CTL = PROC_WAKE;
+        /* After last processor completes, it should signal all others to
+         * proceed or may signal the next and call thread_exit(). The last one
+         * to finish will signal CPU. */
+        core_thread_init(core);
+        /* Other cores do not have a main thread - go idle inside switch_thread
+         * until a thread can run on the core. */
         thread_exit();
 #endif /* NUM_CORES */
     }
