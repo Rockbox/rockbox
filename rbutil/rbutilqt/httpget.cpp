@@ -86,6 +86,8 @@ bool HttpGet::initializeCache(const QDir& d)
     {
         if(!QFileInfo(p).isDir())
             result = d.mkdir("rbutil-cache");
+        else
+            result = true;
     }
     else
         result = false;
