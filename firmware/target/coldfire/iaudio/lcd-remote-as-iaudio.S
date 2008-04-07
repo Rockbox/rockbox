@@ -22,7 +22,7 @@
 #define RS_MASK        0x00008000
 #define GPIO_OUT_ADDR  0x80000004
 
-#define CS_MASK        0x00000020
+#define CS_MASK        0x00000020 /* used in moveq.l */
 #define GPIO1_OUT_ADDR 0x800000b4
 
     .extern cpu_frequency       /* Global variable from system.c */
@@ -232,12 +232,12 @@ lcd_remote_write_command:
 
     move.l  #~RS_MASK, %d0
     and.l   %d0, (%a0)
-    move.l  #~CS_MASK, %d0
+    moveq.l #~CS_MASK, %d0
     and.l   %d0, (%a1)
 
     bsr.w   .write_byte
 
-    move.l  #CS_MASK, %d0
+    moveq.l #CS_MASK, %d0
     or.l    %d0, (%a1)
     
     movem.l (%sp), %d2-%d3/%d6-%d7
@@ -261,14 +261,14 @@ lcd_remote_write_command_ex:
 
     move.l  #~RS_MASK, %d0
     and.l   %d0, (%a0)
-    move.l  #~CS_MASK, %d0
+    moveq.l #~CS_MASK, %d0
     and.l   %d0, (%a1)
 
     lsl.l   #8, %d2
     or.l    %d2, %d3
     bsr.w   .write_word
 
-    move.l  #CS_MASK, %d0
+    moveq.l #CS_MASK, %d0
     or.l    %d0, (%a1)
     
     movem.l (%sp), %d2-%d3/%d6-%d7
@@ -300,7 +300,7 @@ lcd_remote_write_data:
 
     move.l  #RS_MASK, %d0
     or.l    %d0, (%a0)
-    move.l  #~CS_MASK, %d0
+    moveq.l #~CS_MASK, %d0
     and.l   %d0, (%a1)
 
 .wd_loop:                
@@ -310,7 +310,7 @@ lcd_remote_write_data:
     subq.l  #1, %d4
     bne.s   .wd_loop
 
-    move.l  #CS_MASK, %d0
+    moveq.l #CS_MASK, %d0
     or.l    %d0, (%a1)
     
     movem.l (%sp), %d2-%d4/%d6-%d7/%a2-%a3
