@@ -24,7 +24,7 @@ manual-prep: rockbox.tex
 	@find * -type d \! -regex '.*\.svn.*' -exec mkdir -p $(OBJDIR)/{} \;
 	@find * -type f \! -regex '.*\.svn.*' -exec cp -u {} $(OBJDIR)/{} \;
 	@printf "%s%%" $(VERSION) > $(OBJDIR)/version.tex
-	@perl credits.pl < $(ROOTDIR)/docs/CREDITS  > $(OBJDIR)/CREDITS.tex
+	@perl credits.pl < $(DOCSDIR)/CREDITS  > $(OBJDIR)/CREDITS.tex
 	@printf "\\\\newcommand{\\\\platform}{${MANUALDEV}}\n" > $(OBJDIR)/$(MANFILE).tex
 	@printf "\\\\newcommand{\\\\buildversion}{$(VERSION)}\n" >> $(OBJDIR)/$(MANFILE).tex
 	@printf "\\\\input{rockbox.tex}\n" >> $(OBJDIR)/$(MANFILE).tex
@@ -35,8 +35,8 @@ $(OBJDIR)/features: $(ROOTDIR)/apps/features.txt
 	$(SILENT)cat $< | $(HOSTCC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) \
 	$(TARGET) $(DEFINES) $(EXTRA_DEFINES) -E -P -imacros "config.h" -imacros "button.h" - | \
 	grep -v "^\#" | grep -v "^$$" > $@; \
-	for f in `cat $(OBJDIR)/features`; do feat="$$feat\n\\\edef\\UseOption{\\UseOption,$$f}" ; done ; \
-	echo -e "$$feat" >$(OBJDIR)/features.tex
+	for f in `cat $(OBJDIR)/features`; do feat="$$feat\\n\\\\edef\\\\UseOption{\\\\UseOption,$$f}" ; done ; \
+	printf "$$feat" >$(OBJDIR)/features.tex
 
 manual-pdf: features manual-prep rockbox.tex
 	$(MAKE) -C $(OBJDIR) buildmanual
