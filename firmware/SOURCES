@@ -704,6 +704,7 @@ target/arm/adc-pp5020.c
 target/arm/olympus/mrobe-100/backlight-mr100.c
 target/arm/olympus/mrobe-100/button-mr100.c
 target/arm/olympus/mrobe-100/lcd-mr100.c
+target/arm/olympus/mrobe-100/lcd-as-mr100.S
 target/arm/olympus/mrobe-100/power-mr100.c
 target/arm/olympus/mrobe-100/powermgmt-mr100.c
 target/arm/usb-fw-pp502x.c

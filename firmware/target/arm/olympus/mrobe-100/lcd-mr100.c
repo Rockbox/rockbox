@@ -76,17 +76,6 @@ void lcd_write_command(int byte)
     LCD1_CMD = byte;
 }
 
-/* send LCD data */
-
-void lcd_write_data(const fb_data* p_bytes, int count)
-{
-    while (count--)
-    {
-        while (LCD1_CONTROL & LCD1_BUSY_MASK); /* wait for LCD */
-        LCD1_DATA = *(p_bytes++);
-    }    
-}
-
 static int xoffset; /* needed for flip */
 
 /*** hardware configuration ***/
@@ -146,8 +135,7 @@ void lcd_init_device(void)
     LCD1_CONTROL |= 0x4;
     udelay(10);
 
-    LCD1_CONTROL = 0x690;
-    LCD1_CONTROL = 0x694;
+    LCD1_CONTROL = 0x0094;
 
     /* OF just reads these */
     LCD1_CONTROL;
@@ -206,18 +194,30 @@ void lcd_blit_mono(const unsigned char* data, int x, int by, int width,
     }
 }
 
+/* Helper function for lcd_grey_phase_blit(). */
+void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
+
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
 void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
-    (void)values;
-    (void)phases;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
+    int cmd1, cmd2;
+
+    stride <<= 3;  /* 8 pixels per block */
+    cmd1 = LCD_CNTL_HIGHCOL | (((x + xoffset) >> 4) & 0xf);
+    cmd2 = LCD_CNTL_LOWCOL | ((x + xoffset) & 0xf);
+
+    while (bheight--)
+    {
+        lcd_write_command(LCD_CNTL_PAGE | (by++ & 0xff));
+        lcd_write_command(cmd1);
+        lcd_write_command(cmd2);
+
+        lcd_grey_data(values, phases, width);
+        values += stride;
+        phases += stride;
+    }
 }
  
 /* Update the display.
