@@ -52,11 +52,13 @@ void usb_init_device(void)
     
     /* disable USB-devices until USB is detected via GPIO */
 #ifndef BOOTLOADER
-    /* Disabling USB0 in the bootloader makes the OF not load */
+    /* Disabling USB0 in the bootloader makes the OF not load,
+       Also something here breaks usb pin detect in bootloader.
+       leave it all enabled untill rockbox main loads */
     DEV_EN &= ~DEV_USB0;
-#endif
     DEV_EN &= ~DEV_USB1;
     DEV_INIT2 &= ~INIT_USB;
+#endif
 
 #if defined(IPOD_COLOR) || defined(IPOD_4G) \
  || defined(IPOD_MINI)  || defined(IPOD_MINI2G)
@@ -78,10 +80,7 @@ void usb_enable(bool on)
     else {
         usb_core_exit();
         /* Disable USB devices */
-#ifndef BOOTLOADER
-        /* Disabling USB0 in the bootloader makes the OF not load */
         DEV_EN &=~ DEV_USB0;
-#endif
         DEV_EN &=~ DEV_USB1;
         DEV_INIT2 &=~ INIT_USB;
     }

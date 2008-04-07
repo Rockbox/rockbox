@@ -253,6 +253,7 @@ static void usb_thread(void)
 #ifndef USE_ROCKBOX_USB
                         /* until we have native mass-storage mode, we want to reboot on
                            usb host connect */
+                        usb_enable(true);
                         try_reboot();
 #endif  /* USE_ROCKBOX_USB */
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -460,7 +461,9 @@ void usb_init(void)
 #endif
 
     usb_init_device();
+#ifndef BOOTLOADER
     usb_enable(false);
+#endif
 
     /* We assume that the USB cable is extracted */
     last_usb_status = USB_EXTRACTED;
