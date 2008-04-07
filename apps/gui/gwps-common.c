@@ -824,8 +824,7 @@ static char *get_token_value(struct gui_wps *gwps,
             return playlist_name(NULL, buf, buf_size);
 
         case WPS_TOKEN_PLAYLIST_POSITION:
-            snprintf(buf, buf_size, "%d",
-                        playlist_get_display_index());
+            snprintf(buf, buf_size, "%d", id3->index + 1);
             return buf;
 
         case WPS_TOKEN_PLAYLIST_SHUFFLE:
