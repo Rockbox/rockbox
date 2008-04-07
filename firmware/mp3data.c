@@ -402,7 +402,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
     {
         int i = 8; /* Where to start parsing info */
 
-        DEBUGF("Xing/Info header\n");
+        /* DEBUGF("Xing/Info header\n"); */
 
         /* Remember where in the file the Xing header is */
         info->vbr_header_pos = lseek(fd, 0, SEEK_CUR) - info->frame_size;

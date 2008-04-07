@@ -75,7 +75,7 @@ bool cuesheet_is_enabled(void)
 
 bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path)
 {
-    DEBUGF("look for cue file\n");
+    /* DEBUGF("look for cue file\n"); */
 
     char cuepath[MAX_PATH];
     char *dot, *slash;
