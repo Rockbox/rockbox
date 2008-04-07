@@ -60,11 +60,17 @@ uint16_t *runtabarray[2], *levtabarray[2];                                      
 
 uint16_t runtab0[1336], runtab1[1336], levtab0[1336], levtab1[1336];                //these could be made smaller since only one can be 1336
 
+#define VLCBUF1SIZE 4598
+#define VLCBUF2SIZE 3574
+#define VLCBUF3SIZE 360
+#define VLCBUF4SIZE 540
+
 /*putting these in IRAM actually makes PP slower*/
-VLC_TYPE vlcbuf1[2550][2];
-VLC_TYPE vlcbuf2[2550][2];
-VLC_TYPE vlcbuf3[360][2];
-VLC_TYPE vlcbuf4[540][2];
+
+VLC_TYPE vlcbuf1[VLCBUF1SIZE][2];
+VLC_TYPE vlcbuf2[VLCBUF2SIZE][2];
+VLC_TYPE vlcbuf3[VLCBUF3SIZE][2];
+VLC_TYPE vlcbuf4[VLCBUF4SIZE][2];
 
 
 
@@ -690,9 +696,9 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     levtabarray[0] = levtab0; levtabarray[1] = levtab1;
 
     s->coef_vlc[0].table = vlcbuf1;
-    s->coef_vlc[0].table_allocated = 24576/4;
+    s->coef_vlc[0].table_allocated = VLCBUF1SIZE;
     s->coef_vlc[1].table = vlcbuf2;
-    s->coef_vlc[1].table_allocated = 14336/4;
+    s->coef_vlc[1].table_allocated = VLCBUF2SIZE;
 
 
     init_coef_vlc(&s->coef_vlc[0], &s->run_table[0], &s->level_table[0],
