@@ -10798,7 +10798,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and  file vew setting
+  desc: in the main menu and file view setting
   user:
   <source>
     *: "Playlists"
