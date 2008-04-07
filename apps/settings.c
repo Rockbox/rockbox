@@ -205,11 +205,8 @@ static bool write_nvram_data(char* buf, int max_len)
        supports that, but this will have to do for now 8-) */
     for (i=0; i < NVRAM_BLOCK_SIZE; i++ ) {
         int r = rtc_write(0x14+i, buf[i]);
-        if (r) {
-            DEBUGF( "save_config_buffer: rtc_write failed at addr 0x%02x: %d\n",
-                    14+i, r );
+        if (r) 
             return false;
-        }
     }
 #endif
     return true;
@@ -221,7 +218,6 @@ static bool write_nvram_data(char* buf, int max_len)
  */
 void settings_load(int which)
 {
-    DEBUGF( "reload_all_settings()\n" );
     if (which&SETTINGS_RTC)
         read_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
     if (which&SETTINGS_HD)
@@ -723,7 +719,6 @@ void settings_apply(bool read_disk)
     int i;
 #endif
 
-    DEBUGF( "settings_apply()\n" );
     sound_settings_apply();
 
 #ifndef HAVE_FLASH_STORAGE
@@ -950,7 +945,6 @@ void settings_apply(bool read_disk)
 void settings_reset(void) 
 {
     int i;
-    DEBUGF( "settings_reset()\n" );
 
     for(i=0; i<nb_settings; i++)
     {

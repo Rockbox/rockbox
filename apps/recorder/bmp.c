@@ -584,6 +584,5 @@ int read_bmp_fd(int fd,
         }
     }
 
-    DEBUGF("totalsize: %d\n", totalsize);
     return totalsize; /* return the used buffer size. */
 }

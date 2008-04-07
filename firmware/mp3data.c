@@ -38,7 +38,7 @@
 #include "file.h"
 #include "buffer.h"
 
-#define DEBUG_VERBOSE
+// #define DEBUG_VERBOSE
 
 #define SYNC_MASK (0x7ffL << 21)
 #define VERSION_MASK (3L << 19)
@@ -230,7 +230,7 @@ static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
 
     *offset = pos - 4;
 
-#if defined(DEBUG) || defined(SIMULATOR)
+#if defined(DEBUG)
     if(*offset)
         DEBUGF("Warning: skipping %ld bytes of garbage\n", *offset);
 #endif
@@ -374,7 +374,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
     /* OK, we have found a frame. Let's see if it has a Xing header */
     if (info->frame_size-4 >= (int)sizeof(frame))
     {
-#if defined(DEBUG) || defined(SIMULATOR)
+#if defined(DEBUG)
         DEBUGF("Error: Invalid id3 header, frame_size: %d\n", info->frame_size);
 #endif
         return -8;

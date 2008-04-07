@@ -62,7 +62,6 @@ int ft_build_playlist(struct tree_context* c, int start_index)
     {
         if((dircache[i].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
         {
-            DEBUGF("Adding %s\n", dircache[i].name);
             if (playlist_add(dircache[i].name) < 0)
                 break;
         }
