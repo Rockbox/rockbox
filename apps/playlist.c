@@ -2516,7 +2516,6 @@ char* playlist_peek(int steps)
 {
     struct playlist_info* playlist = &current_playlist;
     int seek;
-    int fd;
     char *temp_ptr;
     int index;
     bool control_file;
@@ -2540,26 +2539,12 @@ char* playlist_peek(int steps)
            (workaround for buggy playlist creation tools) */
         while (temp_ptr)
         {
-#ifdef HAVE_DIRCACHE
-            if (dircache_is_enabled())
-            {
-                if (dircache_get_entry_ptr(temp_ptr))
-                    break;
-            }
-            else
-#endif
-            {
-                fd = open(temp_ptr, O_RDONLY);
-                if (fd >= 0)
-                {
-                    close(fd);
-                    break;
-                }
-            }
-            
+            if (file_exists(temp_ptr))
+                break;
+
             temp_ptr = strchr(temp_ptr+1, '/');
         }
-        
+
         if (!temp_ptr)
         {
             /* Even though this is an invalid file, we still need to pass a
