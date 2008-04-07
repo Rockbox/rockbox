@@ -207,7 +207,7 @@ sub correct_string {
             $string =~ s/Ã¨/è/ig;
             $string =~ s/\b(s*)Ã¬\b/$1ì/ig;
             $string =~ s/\b(s*)Ã¹\b/$1ù/ig;
-            $string =~ s/\b(s*)Ã*\b/$1à/ig;
+            $string =~ s/\b(s*)Ã \b/$1à/ig;
             switch($$tts_object{"name"}) {
                  case "sapi" {   # just for SAPI
                     switch($$tts_object{"vendor"}) {
