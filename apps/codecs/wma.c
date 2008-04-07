@@ -93,14 +93,13 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
     uint8_t* buf;
     size_t bufsize;
     int i;
-    DEBUGF("Reading new packet at %d bytes ", (int)ci->curpos);
+    /*DEBUGF("Reading new packet at %d bytes ", (int)ci->curpos);*/
 
     if (ci->read_filebuf(&tmp8, 1) == 0) {
         return ASF_ERROR_EOF;
     }
     bytesread++;
 
-    //DEBUGF("tmp8=0x%02x\n",tmp8);
     /* TODO: We need a better way to detect endofstream */
     if (tmp8 != 0x82) {
     DEBUGF("Read failed:  packet did not sync\n");
@@ -158,7 +157,7 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
     datap += 4;
     duration = get_short_le(datap);
     datap += 2;
-    DEBUGF("and duration %d ms\n", duration);
+    /*DEBUGF("and duration %d ms\n", duration);*/
 
     /* this is really idiotic, packet length can (and often will) be
      * undefined and we just have to use the header packet size as the size
@@ -312,7 +311,6 @@ static int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlen
 static int get_timestamp(int *duration)
 {
     uint8_t tmp8, packet_flags, packet_property;
-    //int stream_id;
     int ec_length, opaque_data, ec_length_type;
     int datalen;
     uint8_t data[18];
@@ -321,7 +319,6 @@ static int get_timestamp(int *duration)
     uint32_t padding_length;
     uint32_t send_time;
 
-    //uint16_t payload_count;
     uint32_t bytesread = 0;
     packet_count++;
     if (ci->read_filebuf(&tmp8, 1) == 0) {
@@ -535,7 +532,7 @@ next_track:
                 ci->seek_complete();
                 goto next_track;
             }
-            DEBUGF("Seek returned %d\n", (int)elapsedtime);
+            /*DEBUGF("Seek returned %d\n", (int)elapsedtime);*/
             ci->set_elapsed(elapsedtime);
 
             /*flush the wma decoder state*/
@@ -595,7 +592,7 @@ new_packet:
     retval = CODEC_OK;
 
 done:
-    LOGF("WMA: Decoded %ld samples\n",elapsedtime*wfx.rate/1000);
+    /*LOGF("WMA: Decoded %ld samples\n",elapsedtime*wfx.rate/1000);*/
 
     if (ci->request_next_track())
         goto next_track;

@@ -625,9 +625,8 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
             window[j] = fsincos(fixmul32(j2,alpha)<<16, 0);        //alpha between 0 and pi/2
 
         }
-        //printf("created window\n");
         s->windows[i] = window;
-        //printf("assigned window\n");
+
     }
 
     s->reset_block_lengths = 1;
@@ -914,7 +913,7 @@ static int wma_decode_block(WMADecodeContext *s)
     int nb_coefs[MAX_CHANNELS];
     fixed32 mdct_norm;
 
-    DEBUGF("***decode_block: %d  (%d samples of %d in frame)\n",  s->block_num, s->block_len, s->frame_len);
+    /*DEBUGF("***decode_block: %d  (%d samples of %d in frame)\n",  s->block_num, s->block_len, s->frame_len);*/
 
    /* compute current block length */
     if (s->use_variable_block_len)
