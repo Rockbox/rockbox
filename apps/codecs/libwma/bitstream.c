@@ -28,6 +28,7 @@
  */
 
 #include "bitstream.h"
+#include <codecs/lib/codeclib.h>
 
 /**
  * Same as av_mallocz_static(), but does a realloc.
