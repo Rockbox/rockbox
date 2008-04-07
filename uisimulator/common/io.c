@@ -342,7 +342,7 @@ int sim_open(const char *name, int o)
     {
         snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
 
-        //debugf("We open the real file '%s'\n", buffer);
+        /* debugf("We open the real file '%s'\n", buffer); */
         if (num_openfiles < MAX_OPEN_FILES)
         {
             ret = OPEN(buffer, opts, 0666);
@@ -380,7 +380,7 @@ int sim_creat(const char *name)
     {
         snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
 
-        //debugf("We create the real file '%s'\n", buffer);
+        /* debugf("We create the real file '%s'\n", buffer); */
         return OPEN(buffer, O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, 0666);
     }
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n", name);
@@ -434,7 +434,7 @@ int sim_mkdir(const char *name)
 
     snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
 
-    //debugf("We create the real directory '%s'\n", buffer);
+    /* debugf("We create the real directory '%s'\n", buffer); */
     return MKDIR(buffer, 0777);
 #endif
 }
@@ -449,7 +449,7 @@ int sim_rmdir(const char *name)
     {
         snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
 
-        //debugf("We remove the real directory '%s'\n", buffer);
+        /* debugf("We remove the real directory '%s'\n", buffer); */
         return RMDIR(buffer);
     }
     return RMDIR(name);
@@ -470,7 +470,7 @@ int sim_remove(const char *name)
     if(name[0] == '/') {
         snprintf(buffer, sizeof(buffer), "%s%s", get_sim_rootdir(), name);
 
-        //debugf("We remove the real file '%s'\n", buffer);
+        /* debugf("We remove the real file '%s'\n", buffer); */
         return REMOVE(buffer);
     }
     return REMOVE(name);
@@ -495,7 +495,7 @@ int sim_rename(const char *oldpath, const char* newpath)
         snprintf(buffer2, sizeof(buffer2), "%s%s", get_sim_rootdir(),
                                                    newpath);
 
-        //debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2);
+        /* debugf("We rename the real file '%s' to '%s'\n", buffer1, buffer2); */
         return RENAME(buffer1, buffer2);
     }
     return -1;
@@ -526,7 +526,7 @@ void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free)
 {
 #ifdef HAVE_MULTIVOLUME
     if (volume != 0) {
-        //debugf("io.c: fat_size(volume=%d); simulator only supports volume 0\n",volume);
+        /* debugf("io.c: fat_size(volume=%d); simulator only supports volume 0\n",volume); */
 
         if (size) *size = 0;
         if (free) *free = 0;
