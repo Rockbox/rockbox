@@ -367,8 +367,13 @@ static const unsigned face_colors[6] =
     LCD_RGBPACK(255, 0, 0), LCD_RGBPACK(255, 0, 0), LCD_RGBPACK(0, 255, 0),
     LCD_RGBPACK(0, 255, 0), LCD_RGBPACK(0, 0, 255), LCD_RGBPACK(0, 0, 255)
 #elif defined(USE_GSLIB)
+#ifdef MROBE_100
+    GREY_LIGHTGRAY, GREY_LIGHTGRAY, GREY_DARKGRAY,
+    GREY_DARKGRAY,  GREY_WHITE,     GREY_WHITE
+#else
     GREY_LIGHTGRAY, GREY_LIGHTGRAY, GREY_DARKGRAY,
     GREY_DARKGRAY,  GREY_BLACK,     GREY_BLACK
+#endif
 #else
     LCD_LIGHTGRAY, LCD_LIGHTGRAY, LCD_DARKGRAY,
     LCD_DARKGRAY,  LCD_BLACK,     LCD_BLACK
@@ -591,6 +596,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     lcdfuncs.clear_display = rb->lcd_clear_display;
     lcdfuncs.drawline =      rb->lcd_drawline;
     lcdfuncs.putsxy =        rb->lcd_putsxy;
+
+#ifdef MROBE_100
+    grey_set_background(GREY_BLACK);
+#endif
 
     grey_setfont(FONT_SYSFIXED);
 #endif
