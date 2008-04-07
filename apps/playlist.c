@@ -2480,19 +2480,6 @@ int playlist_start(int start_index, int offset)
     return 0;
 }
 
-/* Returns false if 'steps' would pass end of playlist */
-bool playlist_checkend(int steps)
-{
-    struct playlist_info* playlist = &current_playlist;
-
-    int index = get_next_index(playlist, steps, -1);
-
-    if (index < 0 && steps >= 0 && global_settings.repeat_mode == REPEAT_SHUFFLE)
-        index = get_next_index(playlist, steps, REPEAT_ALL);
-
-    return (index >= 0);
-}
-
 /* Returns false if 'steps' is out of bounds, else true */
 bool playlist_check(int steps)
 {
