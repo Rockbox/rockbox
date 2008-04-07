@@ -38,7 +38,7 @@ void power_off(void)
     pp_i2c_send(AS3514_I2C_ADDR, SYSTEM, byte);
 
     /* Stop interrupts on both cores */
-    disable_irq(IRQ_FIQ_STATUS);
+    disable_interrupt(IRQ_FIQ_STATUS);
     COP_INT_CLR = -1;
     CPU_INT_CLR = -1;
 

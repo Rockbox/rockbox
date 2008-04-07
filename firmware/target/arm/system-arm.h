@@ -131,16 +131,16 @@ static inline void disable_interrupt(int mask)
         : "=&r"(tmp) : "i"(mask));
 }
 
-#define disable_irq(void) \
+#define disable_irq() \
     disable_interrupt(IRQ_STATUS)
 
-#define enable_irq(void) \
+#define enable_irq() \
     enable_interrupt(IRQ_STATUS)
 
-#define disable_fiq(void) \
+#define disable_fiq() \
     disable_interrupt(FIQ_STATUS)
 
-#define enable_fiq(void) \
+#define enable_fiq() \
     enable_interrupt(FIQ_STATUS)
 
 static inline int disable_interrupt_save(int mask)
