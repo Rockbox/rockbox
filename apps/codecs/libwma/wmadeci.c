@@ -663,6 +663,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
 #endif
 
          s->hgain_vlc.table = vlcbuf4;
+         s->hgain_vlc.table_allocated = VLCBUF4SIZE;
          init_vlc(&s->hgain_vlc, HGAINVLCBITS, sizeof(hgain_huffbits),
                   hgain_huffbits, 1, 1,
                   hgain_huffcodes, 2, 2, 0);
@@ -672,6 +673,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     {
 
         s->exp_vlc.table = vlcbuf3;
+        s->exp_vlc.table_allocated = VLCBUF3SIZE;
 
          init_vlc(&s->exp_vlc, EXPVLCBITS, sizeof(scale_huffbits),
                   scale_huffbits, 1, 1,
