@@ -63,7 +63,7 @@ unsigned short adc_read(int channel)
 {
 #ifdef BOOTLOADER
     /* IRQs aren't enabled in the bootloader - just do the read directly */
-    int i,num;
+    int i;
     uint32_t adc_status;
 
     PCLK_ADC |= PCK_EN;   /* Enable ADC clock */
@@ -72,15 +72,15 @@ unsigned short adc_read(int channel)
     for (i = 0; i < 4; i++)
         ADCCON = i;
 
-    /* Wait for data to become stable */
-    while ((ADCDATA & 0x1) == 0);
-
-    do
+    /* Now read the values back */
+    for (i=0; i < 4; i++)
     {
+        /* Wait for data to become stable */
+        while ((ADCDATA & 0x1) == 0);
+        
         adc_status = ADCSTATUS;
-        num = (adc_status>>24) & 7;
-        if (num) adcdata[(adc_status >> 16) & 0x7] = adc_status & 0x3ff;
-    } while (num);
+        adcdata[(adc_status >> 16) & 0x7] = adc_status & 0x3ff;
+    }
 
     PCLK_ADC &= ~PCK_EN;   /* Disable ADC clock */
 #endif
@@ -93,10 +93,11 @@ void adc_init(void)
     /* consider configuring PCK_ADC source here */
     
     ADCCON = (1<<4);         /* Enter standby mode */
-    ADCCFG |= 0x0000000B;    /* Single-mode, auto power-down, IRQ enable */
+    ADCCFG |= 0x00000003;    /* Single-mode, auto power-down */
 
 #ifndef BOOTLOADER
-    IEN |= ADC_IRQ_MASK;     /* Enable ADC IRQs */
+    ADCCFG |= (1<<3);        /* Request IRQ on ADC completion */
+    IEN |= ADC_IRQ_MASK;     /* Unmask ADC IRQs */
     
     tick_add_task(adc_tick);
     
