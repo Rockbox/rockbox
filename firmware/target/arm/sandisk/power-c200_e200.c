@@ -32,23 +32,21 @@ void power_off(void)
 {
     char byte;
 
-    /* Disable interrupts on this core */
-    disable_interrupt(IRQ_FIQ_STATUS);
-
-    /* Mask them on both cores */
-    CPU_INT_CLR = -1;
-    COP_INT_CLR = -1;
-
     /* Send shutdown command to PMU */
     byte = i2c_readbyte(AS3514_I2C_ADDR, SYSTEM);
     byte &= ~0x1;   
     pp_i2c_send(AS3514_I2C_ADDR, SYSTEM, byte);
 
+    /* Stop interrupts on both cores */
+    disable_irq(IRQ_FIQ_STATUS);
+    COP_INT_CLR = -1;
+    CPU_INT_CLR = -1;
+
     /* Halt everything and wait for device to power off */
     while (1)
     {
-        CPU_CTL = PROC_SLEEP;
-        COP_CTL = PROC_SLEEP;
+        COP_CTL = 0x40000000;
+        CPU_CTL = 0x40000000;
     }
 }
 
