@@ -91,6 +91,7 @@ SECTIONS
         *(.icode)
         *(.irodata)
         *(.idata)
+        . = ALIGN(0x4);
         _iramend = .;
     } > DRAM
 
