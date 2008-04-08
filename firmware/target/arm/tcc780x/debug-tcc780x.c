@@ -27,19 +27,20 @@
 #include "sprintf.h"
 #include "font.h"
 #include "debug-target.h"
+#include "adc.h"
+
+/* IRQ status registers of debug interest only */
+#define STS    (*(volatile unsigned long *)0xF3001008)
+#define SRC    (*(volatile unsigned long *)0xF3001010)
 
 bool __dbg_ports(void)
 {
     return false;
 }
 
-//extern char r_buffer[5];
-//extern int r_button;
-
 bool __dbg_hw_info(void)
 {
-    int line = 0, button, oldline;
-    int *address=0x0;
+    int line = 0, i, button, oldline;
     bool done=false;
     char buf[100];
 
@@ -50,8 +51,6 @@ bool __dbg_hw_info(void)
     /* Put all the static text before the while loop */
     lcd_puts(0, line++, "[Hardware info]");
 
-    /* TODO: ... */
-
     line++;
     oldline=line;
     while(!done)
@@ -61,26 +60,28 @@ bool __dbg_hw_info(void)
         
         button &= ~BUTTON_REPEAT;
         
-        if (button == BUTTON_MENU)
+        if (button == BUTTON_POWER)
             done=true;
-        if(button==BUTTON_DOWN)
-            address+=0x01;
-        else if (button==BUTTON_UP)
-            address-=0x01;
 
-        /*snprintf(buf, sizeof(buf), "Buffer: 0x%02x%02x%02x%02x%02x",
-            r_buffer[0], r_buffer[1], r_buffer[2], r_buffer[3],r_buffer[4] );    lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Button: 0x%08x, HWread: 0x%08x",
-            (unsigned int)button, r_button);  lcd_puts(0, line++, buf);*/
         snprintf(buf, sizeof(buf), "current tick: %08x Seconds running: %08d",
             (unsigned int)current_tick, (unsigned int)current_tick/100);  lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x", 
-            (unsigned int)address, *address);           lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x",
-            (unsigned int)(address+1), *(address+1));   lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x",
-            (unsigned int)(address+2), *(address+2));   lcd_puts(0, line++, buf);
+            
+        snprintf(buf, sizeof(buf), "GPIOA: 0x%08x  GPIOB: 0x%08x",
+            (unsigned int)GPIOA, (unsigned int)GPIOB);  lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIOC: 0x%08x  GPIOD: 0x%08x",
+            (unsigned int)GPIOC, (unsigned int)GPIOD);  lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIOE: 0x%08x",
+            (unsigned int)GPIOE);  lcd_puts(0, line++, buf);
 
+        for (i = 0; i<4; i++)
+        {
+            snprintf(buf, sizeof(buf), "ADC%d: 0x%04x", i, adc_read(i));
+                lcd_puts(0, line++, buf);
+        }
+        
+        snprintf(buf, sizeof(buf), "STS: 0x%08x  SRC: 0x%08x",
+            (unsigned int)STS, (unsigned int)SRC);  lcd_puts(0, line++, buf);
+        
         lcd_update();
     }
     return false;

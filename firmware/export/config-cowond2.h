@@ -136,6 +136,6 @@
 
 #define BOOTFILE_EXT "iaudio"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/"
+#define BOOTDIR "/.rockbox"
 
 #endif /* SIMULATOR */
