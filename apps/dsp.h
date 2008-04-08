@@ -121,22 +121,6 @@ enum {
                   : [b] "r" (y)); \
 }
 
-#define ACC(acc, x, y) \
-    (void)acc; \
-    asm ("mac.l %[a], %[b], %%acc0" \
-         : : [a] "i,r" (x), [b] "i,r" (y));
-
-#define GET_ACC(acc) \
-({ \
-    long t; \
-    (void)acc; \
-    asm ("movclr.l %%acc0, %[t]" \
-         : [t] "=r" (t)); \
-    t; \
-})
-
-#define ACC_INIT(acc, x, y) ACC(acc, x, y)
-
 #elif defined(CPU_ARM)
 
 /* Multiply two S.31 fractional integers and return the sign bit and the
@@ -168,10 +152,6 @@ enum {
     t; \
 })
 
-#define ACC_INIT(acc, x, y) acc = FRACMUL(x, y)
-#define ACC(acc, x, y) acc += FRACMUL(x, y)
-#define GET_ACC(acc) acc
-
 /* Multiply one S.31-bit and one S8.23 fractional integer and store the
  * sign bit and the 31 most significant bits of the result to d (and
  * increase d). Load next value to multiply with into x from s (and
@@ -190,9 +170,6 @@ enum {
 
 #else
 
-#define ACC_INIT(acc, x, y) acc = FRACMUL(x, y)
-#define ACC(acc, x, y) acc += FRACMUL(x, y)
-#define GET_ACC(acc) acc
 #define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 31))
 #define FRACMUL_SHL(x, y, z) \
 ((long)(((((long long) (x)) * ((long long) (y))) >> (31 - (z)))))

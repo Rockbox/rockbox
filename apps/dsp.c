@@ -714,19 +714,19 @@ static void apply_crossfeed(int count, int32_t *buf[])
         right = buf[1][i];
 
         /* Filter delayed sample from left speaker */
-        ACC_INIT(acc, *di, coefs[0]);
-        ACC(acc, hist_l[0], coefs[1]);
-        ACC(acc, hist_l[1], coefs[2]);
+        acc = FRACMUL(*di, coefs[0]);
+        acc += FRACMUL(hist_l[0], coefs[1]);
+        acc += FRACMUL(hist_l[1], coefs[2]);
         /* Save filter history for left speaker */
-        hist_l[1] = GET_ACC(acc);
+        hist_l[1] = acc;
         hist_l[0] = *di;
         *di++ = left;
         /* Filter delayed sample from right speaker */
-        ACC_INIT(acc, *di, coefs[0]);
-        ACC(acc, hist_r[0], coefs[1]);
-        ACC(acc, hist_r[1], coefs[2]);
+        acc = FRACMUL(*di, coefs[0]);
+        acc += FRACMUL(hist_r[0], coefs[1]);
+        acc += FRACMUL(hist_r[1], coefs[2]);
         /* Save filter history for right speaker */
-        hist_r[1] = GET_ACC(acc);
+        hist_r[1] = acc;
         hist_r[0] = *di;
         *di++ = right;
         /* Now add the attenuated direct sound and write to outputs */
