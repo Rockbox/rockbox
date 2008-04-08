@@ -83,7 +83,7 @@ enum {
 
 /* Multiply two S.31 fractional integers, and return the 32 most significant
  * bits after a shift left by the constant z. NOTE: Only works for shifts of
- * up to 8 on Coldfire!
+ * 1 to 8 on Coldfire!
  */
 #define FRACMUL_SHL(x, y, z) \
 ({ \
@@ -101,25 +101,6 @@ enum {
            [c] "i" ((z)), [d] "i" (8 - (z))); \
     t; \
 })
-
-/* Multiply one S.31-bit and one S8.23 fractional integer and return the
- * sign bit and the 31 most significant bits of the result. Load next value
- * to multiply with into x from s (and increase s); x must contain the
- * initial value.
- */
-#define FRACMUL_8_LOOP(x, y, s, d) \
-{ \
-    long t, t2; \
-    asm volatile ("mac.l    %[a], %[b], (%[src])+, %[a], %%acc0\n\t" \
-                  "move.l   %%accext01, %[t2]\n\t" \
-                  "movclr.l %%acc0, %[t]\n\t" \
-                  "asl.l    #8, %[t]\n\t" \
-                  "move.b   %[t2], %[t]\n\t" \
-                  "move.l   %[t], (%[dst])+\n\t" \
-                  : [a] "+r" (x), [src] "+a" (s), [dst] "+a" (d), \
-                    [t] "=r" (t), [t2] "=r" (t2) \
-                  : [b] "r" (y)); \
-}
 
 #elif defined(CPU_ARM)
 
@@ -152,33 +133,11 @@ enum {
     t; \
 })
 
-/* Multiply one S.31-bit and one S8.23 fractional integer and store the
- * sign bit and the 31 most significant bits of the result to d (and
- * increase d). Load next value to multiply with into x from s (and
- * increase s); x must contain the initial value.
- */
-#define FRACMUL_8_LOOP(x, y, s, d) \
-({ \
-    long t, t2; \
-    asm volatile ("smull    %[t], %[t2], %[a], %[b]\n\t" \
-                  "mov      %[t2], %[t2], asl #9\n\t" \
-                  "orr      %[d], %[t2], %[t], lsr #23\n\t" \
-                  : [d] "=&r" (*(d)++), [t] "=&r" (t), [t2] "=&r" (t2) \
-                  : [a] "r" (x), [b] "r" (y)); \
-    x = *(s)++; \
-})
-
 #else
 
 #define FRACMUL(x, y) (long) (((((long long) (x)) * ((long long) (y))) >> 31))
 #define FRACMUL_SHL(x, y, z) \
 ((long)(((((long long) (x)) * ((long long) (y))) >> (31 - (z)))))
-#define FRACMUL_8_LOOP(x, y, s, d) \
-({ \
-    long t = x; \
-    x = *(s)++; \
-    *(d)++ = (long) (((((long long) (t)) * ((long long) (y))) >> 23)); \
-})
 
 #endif
 

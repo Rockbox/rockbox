@@ -794,22 +794,16 @@ void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
 static void dsp_apply_gain(int count, struct dsp_data *data, int32_t *buf[])
 {
     const int32_t gain = data->gain;
-    int ch = data->num_channels - 1;
+    int ch;
 
-    do
+    for (ch = 0; ch < data->num_channels; ch++)
     {
-        int32_t *s = buf[ch];
         int32_t *d = buf[ch];
-        int32_t  samp = *s++;
-        int i = 0;
+        int i;
 
-        do
-        {
-            FRACMUL_8_LOOP(samp, gain, s, d);
-        }
-        while (++i < count);
+        for (i = 0; i < count; i++)
+            d[i] = FRACMUL_SHL(d[i], gain, 8);
     }
-    while (--ch >= 0);
 }
 #endif /* DSP_HAVE_ASM_APPLY_GAIN */
 
