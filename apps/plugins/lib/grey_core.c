@@ -732,7 +732,7 @@ static const unsigned char bmpheader[] =
 #define BMP_RED_BASE   94
 #define BMP_GREEN_BASE 2
 #define BMP_BLUE_BASE  2
-#elif
+#else
 #define BMP_RED   0x90
 #define BMP_GREEN 0xee
 #define BMP_BLUE  0x90
