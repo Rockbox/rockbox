@@ -43,7 +43,7 @@
 #include "common.h"
 
 #if defined(COWON_D2)
-#include "i2c.h"
+#include "pcf50606.h"
 #define LOAD_ADDRESS 0x20000000 /* DRAM_START */
 #endif
 
@@ -97,11 +97,11 @@ void show_debug_screen(void)
            how such a beast is going to work. Since it needs I2C read/write,
            it can't easily go on an interrupt-based tick task. */
         {
-            unsigned char buf[] = { 0x2f, (0xE<<1) | 1, /* ADC start for X+Y */
-                                    0, 0, 0 };
             int x,y;
-            i2c_write(0x10, buf, 2);
-            i2c_readmem(0x10, 0x2e, buf, 5);
+            unsigned char buf[5];
+            
+            pcf50606_write(PCF5060X_ADCC2, (0xE<<1) | 1); /* ADC start X+Y */
+            pcf50606_read_multiple(PCF5060X_ADCC1, buf, 5);
             x = (buf[2] << 2) | (buf[3] & 3);
             y = (buf[4] << 2) | ((buf[3] & 0xC) >> 2);
             printf("X: 0x%03x Y: 0x%03x",x,y);
@@ -111,10 +111,8 @@ void show_debug_screen(void)
             lcd_hline(x-5, x+5, y);
             lcd_vline(x, y-5, y+5);
 
-            buf[0] = 0x2f;
-            buf[1] = (0xF<<1) | 1;   /* ADC start for P1+P2 */
-            i2c_write(0x10, buf, 2);
-            i2c_readmem(0x10, 0x2e, buf, 5);
+            pcf50606_write(PCF5060X_ADCC2, (0xF<<1) | 1); /* ADC start P1+P2 */
+            pcf50606_read_multiple(PCF5060X_ADCC1, buf, 5);
             x = (buf[2] << 2) | (buf[3] & 3);
             y = (buf[4] << 2) | ((buf[3] & 0xC) >> 2);
             printf("P1: 0x%03x P2: 0x%03x",x,y);
@@ -188,13 +186,13 @@ void* main(void)
     {
         int(*kernel_entry)(void);
 
-        /* wait for button release to allow debug statememts to be read */
-        while (button_read_device()) {};
+        /* wait for hold release to allow debug statements to be read */
+        while (button_hold()) {};
     
         kernel_entry = (void*) loadbuffer;
         
-        /* allow entry to the debug screen if hold is on */
-        if (!button_hold()) rc = kernel_entry();
+        /* allow entry to the debug screen if still holding power */
+        if (!(button_read_device() & POWEROFF_BUTTON)) rc = kernel_entry();
     }
 #endif
     show_debug_screen();

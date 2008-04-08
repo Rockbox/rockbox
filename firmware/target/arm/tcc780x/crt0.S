@@ -72,9 +72,9 @@ start_loc:
 #ifdef TCCBOOT
 #ifdef COWON_D2
     ldr    r0, =0xf005a000
-    ldr    r0, [r0, #0x40] /* Read GPIO B */
-    tst    r0, #0x4
-    ldreq  pc, [pc, #-28]  /* Jump to original firmware if keypad not pressed */
+    ldr    r0, [r0, #0x20] /* Read GPIO A */
+    tst    r0, #0x8
+    ldrne  pc, [pc, #-28]  /* Jump to original firmware if HOLD not pressed */
 #else
     #error No bootup key detection implemented for this target
 #endif
