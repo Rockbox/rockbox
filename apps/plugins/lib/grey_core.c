@@ -725,9 +725,18 @@ static const unsigned char bmpheader[] =
 };
 
 #if LCD_DEPTH == 1
+#ifdef MROBE_100
+#define BMP_RED   241
+#define BMP_GREEN 6
+#define BMP_BLUE  3
+#define BMP_RED_BASE   94
+#define BMP_GREEN_BASE 2
+#define BMP_BLUE_BASE  2
+#elif
 #define BMP_RED   0x90
 #define BMP_GREEN 0xee
 #define BMP_BLUE  0x90
+#endif
 #elif LCD_DEPTH == 2
 #define BMP_RED   0xad
 #define BMP_GREEN 0xd8
@@ -762,9 +771,18 @@ static void grey_screendump_hook(int fd)
 
     for (i = 0; i <= 128; i++)
     {
+#ifdef MROBE_100        
+        *clut_entry++ = (_GREY_MULUQ(BMP_BLUE-BMP_BLUE_BASE,   i) >> 7) + 
+                         BMP_BLUE_BASE;
+        *clut_entry++ = (_GREY_MULUQ(BMP_GREEN-BMP_GREEN_BASE, i) >> 7) + 
+                         BMP_GREEN_BASE;
+        *clut_entry++ = (_GREY_MULUQ(BMP_RED-BMP_RED_BASE,     i) >> 7) + 
+                         BMP_RED_BASE;
+#else        
         *clut_entry++ = _GREY_MULUQ(BMP_BLUE,  i) >> 7;
         *clut_entry++ = _GREY_MULUQ(BMP_GREEN, i) >> 7;
         *clut_entry++ = _GREY_MULUQ(BMP_RED,   i) >> 7;
+#endif
         clut_entry++;
     }
     _grey_info.rb->write(fd, linebuf, 4*BMP_VARCOLORS);
