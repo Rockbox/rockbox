@@ -93,7 +93,7 @@ int gigabeat_s_code(char *infile, char *outfile)
     fclose(in);
 
     /* Step 2: Create the file header */
-    sprintf(buf, "B000FF\n");
+    sprintf((char *)buf, "B000FF\n");
     put_uint32le(0x88200000, buf+7);
     /* If the value below is too small, the update will attempt to flash.
      * Be careful when changing this (leaving it as is won't cause issues) */

@@ -20,6 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+extern void int2le(unsigned int val, unsigned char* addr);
+extern unsigned int le2int(unsigned char* buf);
+
 static FILE * openinfile( const char * filename )
 {
     FILE * F = fopen( filename, "rb" );

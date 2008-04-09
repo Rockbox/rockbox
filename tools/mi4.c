@@ -138,7 +138,7 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
     memset(outbuf, 0, mi4length);
 
     len = fread(outbuf+0x200, 1, length, file);
-    if(len < length) {
+    if(len < (size_t)length) {
         perror(iname);
         return -2;
     }
@@ -179,7 +179,7 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
     }
     
     len = fwrite(outbuf, 1, mi4length, file);
-    if(len < length) {
+    if(len < (size_t)length) {
         perror(oname);
         return -4;
     }
