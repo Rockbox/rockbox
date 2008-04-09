@@ -17,40 +17,65 @@
  *
  ****************************************************************************/
 
-#include "creative.h"
-#include "hmac-sha1.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "creative.h"
+#include "hmac-sha1.h"
+
+static const char null_key_v1[]  = "CTL:N0MAD|PDE0.SIGN.";
+static const char null_key_v2[]  = "CTL:N0MAD|PDE0.DPMP.";
+static const char null_key_v3[]  = "CTL:Z3N07|PDE0.DPMP.";
+static const char null_key_v4[]  = "CTL:N0MAD|PDE0.DPFP.";
+
+static const struct device_info devices[] =
+{
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M",
+     42, null_key_v2},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M\0 \0G\0o\0!",
+     50, null_key_v2},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0 \0©\0T\0L",
+     48, null_key_v2},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N\0 \0V", 42, null_key_v4}
+};
+
+
 /*
 Create a Zen Vision:M FRESCUE structure file
 */
+extern void int2le(unsigned int val, unsigned char* addr);
+extern unsigned int le2int(unsigned char* buf);
 
 
-static int make_ciff_file(char *inbuf, int length, char *outbuf, int device)
+static int make_ciff_file(unsigned char *inbuf, int length,
+                          unsigned char *outbuf, int device)
 {
+    char key[20];
     memcpy(outbuf, "FFIC", 4);
     int2le(length+90, &outbuf[4]);
     memcpy(&outbuf[8], "FNIC", 4);
     int2le(96, &outbuf[0xC]);
     memcpy(&outbuf[0x10], devices[device].cinf, devices[device].cinf_size);
-    memset(&outbuf[0x10+devices[device].cinf_size], 0, 96 - devices[device].cinf_size);
+    memset(&outbuf[0x10+devices[device].cinf_size], 0,
+           96 - devices[device].cinf_size);
     memcpy(&outbuf[0x70], "ATAD", 4);
     int2le(length+32, &outbuf[0x74]);
-    memcpy(&outbuf[0x78], "H\0j\0u\0k\0e\0b\0o\0x\0\x32\0.\0j\0r\0m", 32); /*Unicode encoded*/
+    memcpy(&outbuf[0x78], "H\0j\0u\0k\0e\0b\0o\0x\0\x32\0.\0j\0r\0m",
+           32); /*Unicode encoded*/
     memcpy(&outbuf[0x98], inbuf, length);
     memcpy(&outbuf[0x98+length], "LLUN", 4);
     int2le(20, &outbuf[0x98+length+4]);
     /* Do checksum */
-    char key[20];
-    hmac_sha((char*)devices[device].null, strlen(devices[device].null), outbuf, 0x98+length, key, 20);
+    hmac_sha((char *)devices[device].null, strlen(devices[device].null),
+             (char *)outbuf, 0x98+length, key, 20);
     memcpy(&outbuf[0x98+length+8], key, 20);
     return length+0x90+0x1C+8;
 }
 
-static int make_jrm_file(char *inbuf, int length, char *outbuf)
+static int make_jrm_file(unsigned char *inbuf, int length,
+                         unsigned char *outbuf)
 {
     int i;
     unsigned int sum = 0;
@@ -101,7 +126,6 @@ int zvm_encode(char *iname, char *oname, int device)
     FILE *file;
     unsigned char *outbuf;
     unsigned char *buf;
-    int i;
 
     file = fopen(iname, "rb");
     if (!file) {
@@ -120,7 +144,7 @@ int zvm_encode(char *iname, char *oname, int device)
     }
 
     len = fread(buf, 1, length, file);
-    if(len < length) {
+    if(len < (size_t)length) {
         perror(iname);
         return -2;
     }
@@ -147,7 +171,7 @@ int zvm_encode(char *iname, char *oname, int device)
     }
 
     len = fwrite(buf, 1, length, file);
-    if(len < length) {
+    if(len < (size_t)length) {
         free(buf);
         perror(oname);
         return -4;

@@ -273,8 +273,6 @@ int iriver_encode(char *infile_name, char *outfile_name, BOOL modify )
     unsigned char * pChecksums, * ppChecksums;
     unsigned char ck;
 
-    enum striptype stripmode = STRIP_NONE;
-
     infile = openinfile(infile_name);
     outfile = openoutfile(outfile_name);
 

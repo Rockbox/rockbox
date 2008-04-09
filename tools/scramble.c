@@ -41,7 +41,7 @@ enum
     ARCHOS_ONDIO_FM
 };
 
-int size_limit[] =
+static unsigned int size_limit[] =
 {
     0x32000, /* ARCHOS_PLAYER */
     0x64000, /* ARCHOS_V2RECORDER */
@@ -132,10 +132,10 @@ int main (int argc, char** argv)
     unsigned char header[24];
     char *iname = argv[1];
     char *oname = argv[2];
-    char *xorstring;
+    char *xorstring=NULL;
     int headerlen = 6;
     FILE* file;
-    int version;
+    int version=0;
     unsigned long modelnum;
     char modelname[5];
     int model_id;
@@ -351,7 +351,6 @@ int main (int argc, char** argv)
     }
     else if(!strncmp(argv[1], "-mi4", 4)) {
         int mi4magic;
-        int version;
         char model[4] = "";
         char type[4] = "";
         
@@ -402,7 +401,7 @@ int main (int argc, char** argv)
     
     if ((method == scramble) &&
         ((length + headerlen) >= size_limit[model_id])) {
-        printf("error: firmware image is %d bytes while max size is %d!\n",
+        printf("error: firmware image is %ld bytes while max size is %u!\n",
                length + headerlen,
                size_limit[model_id]);
         fclose(file);
@@ -461,6 +460,10 @@ int main (int argc, char** argv)
                     outbuf[slen++] = 0xff; /* all data is uncompressed */
                 outbuf[slen++] = inbuf[i];
             }
+            break;
+        case none:
+        default:
+            /* dummy case just to silence picky compilers */
             break;
     }
 
@@ -598,7 +601,7 @@ int iaudio_encode(char *iname, char *oname, char *idstring)
     }
 
     len = fread(outbuf+0x1030, 1, length, file);
-    if(len < length) {
+    if(len < (size_t) length) {
         perror(iname);
         return -2;
     }
@@ -626,12 +629,13 @@ int iaudio_encode(char *iname, char *oname, char *idstring)
     }
     
     len = fwrite(outbuf, 1, length+0x1030, file);
-    if(len < length) {
+    if(len < (size_t)length) {
         perror(oname);
         return -4;
     }
 
     fclose(file);
+    return 0;
 }
 
 
@@ -697,7 +701,7 @@ int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
     }
 
     len = fread(outbuf+0x4600, 1, length, file);
-    if(len < length) {
+    if(len < (size_t)length) {
         perror(iname);
         return -2;
     }
@@ -754,7 +758,7 @@ int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
     }
     
     len = fwrite(outbuf, 1, length+0x4600, file);
-    if(len < length) {
+    if(len < (size_t)length) {
         perror(oname);
         return -4;
     }
