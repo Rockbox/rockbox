@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2007 by Karl Kurbjun
+ * Copyright (C) 2008 by Maurus Cuelenaere
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -24,13 +25,13 @@
 #ifndef __DM320_H__
 #define __DM320_H__
 
-#define LCD_BUFFER_SIZE (640*480*2)
-#define TTB_SIZE (0x4000)
+#define LCD_BUFFER_SIZE (LCD_WIDTH*LCD_HEIGHT*2)
+#define TTB_SIZE        (0x4000)
 /* must be 16Kb (0x4000) aligned */
-#define TTB_BASE   ((unsigned int *)(0x04900000 - TTB_SIZE)) /* End of memory */
-#define FRAME   ((short *) ((char*)TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
+#define TTB_BASE        ((unsigned int *)(0x04900000 - TTB_SIZE)) /* End of memory */
+#define FRAME           ((short *) ((char*)TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
 
-#define PHY_IO_BASE 0x00030000
+#define PHY_IO_BASE      0x00030000
 #define DM320_REG(addr) (*(volatile unsigned short *)(PHY_IO_BASE + (addr)))
 
 /* Timer 0-3 */
@@ -96,11 +97,11 @@
 #define IO_UART1_SR               DM320_REG(0x038C)
 
 /* Watchdog Timer */
-#define IO_WATCHDOG_MODE          0x0400
-#define IO_WATCHDOG_RESET         0x0402
-#define IO_WATCHDOG_PRESCALAR     0x0404
-#define IO_WATCHDOG_DIVISOR       0x0406
-#define IO_WATCHDOG_EXT_RESET     0x0408
+#define IO_WATCHDOG_MODE          DM320_REG(0x0400)
+#define IO_WATCHDOG_RESET         DM320_REG(0x0402)
+#define IO_WATCHDOG_PRESCALAR     DM320_REG(0x0404)
+#define IO_WATCHDOG_DIVISOR       DM320_REG(0x0406)
+#define IO_WATCHDOG_EXT_RESET     DM320_REG(0x0408)
 
 /* MMC/SD Controller */
 #define IO_MMC_CONTROL            0x0480
@@ -342,49 +343,49 @@
 #define IO_CCD_FMTPTNB            0x0758
 
 /* NTSC/PAL Encoder */
-#define IO_VID_ENC_VMOD           0x0800
-#define IO_VID_ENC_VDCTL          0x0802
-#define IO_VID_ENC_VDPRO          0x0804
-#define IO_VID_ENC_SYNCCTL        0x0806
-#define IO_VID_ENC_HSPLS          0x0808
-#define IO_VID_ENC_VSPLS          0x080A
-#define IO_VID_ENC_HINT           0x080C
-#define IO_VID_ENC_HSTART         0x080E
-#define IO_VID_ENC_HVALID         0x0810
-#define IO_VID_ENC_VINT           0x0812
-#define IO_VID_ENC_VSTART         0x0814
-#define IO_VID_ENC_VVALID         0x0816
-#define IO_VID_ENC_HSDLY          0x0818
-#define IO_VID_ENC_VSDLY          0x081A
-#define IO_VID_ENC_YCCTL          0x081C
-#define IO_VID_ENC_RGBCTL         0x081E
-#define IO_VID_ENC_RGBCLP         0x0820
-#define IO_VID_ENC_LNECTL         0x0822
-#define IO_VID_ENC_CULLLNE        0x0824
-#define IO_VID_ENC_LCDOUT         0x0826
-#define IO_VID_ENC_BRTS           0x0828
-#define IO_VID_ENC_BRTW           0x082A
-#define IO_VID_ENC_ACCTL          0x082C
-#define IO_VID_ENC_PWMP           0x082E
-#define IO_VID_ENC_PWMW           0x0830
-#define IO_VID_ENC_DCLKCTL        0x0832
-#define IO_VID_ENC_DCLKPTN0       0x0834
-#define IO_VID_ENC_DCLKPTN1       0x0836
-#define IO_VID_ENC_DCLKPTN2       0x0838
-#define IO_VID_ENC_DCLKPTN3       0x083A
-#define IO_VID_ENC_DCLKPTN0A      0x083C
-#define IO_VID_ENC_DCLKPTN1A      0x083E
-#define IO_VID_ENC_DCLKPTN2A      0x0840
-#define IO_VID_ENC_DCLKPTN3A      0x0842
-#define IO_VID_ENC_DCLKHS         0x0844
-#define IO_VID_ENC_DCLKHSA        0x0846
-#define IO_VID_ENC_DCLKHR         0x0848
-#define IO_VID_ENC_DCLKVS         0x084A
-#define IO_VID_ENC_DCLKVR         0x084C
-#define IO_VID_ENC_CAPCTL         0x084E
-#define IO_VID_ENC_CAPDO          0x0850
-#define IO_VID_ENC_CAPDE          0x0852
-#define IO_VID_ENC_ATR0           0x0854
+#define IO_VID_ENC_VMOD           DM320_REG(0x0800)
+#define IO_VID_ENC_VDCTL          DM320_REG(0x0802)
+#define IO_VID_ENC_VDPRO          DM320_REG(0x0804)
+#define IO_VID_ENC_SYNCCTL        DM320_REG(0x0806)
+#define IO_VID_ENC_HSPLS          DM320_REG(0x0808)
+#define IO_VID_ENC_VSPLS          DM320_REG(0x080A)
+#define IO_VID_ENC_HINT           DM320_REG(0x080C)
+#define IO_VID_ENC_HSTART         DM320_REG(0x080E)
+#define IO_VID_ENC_HVALID         DM320_REG(0x0810)
+#define IO_VID_ENC_VINT           DM320_REG(0x0812)
+#define IO_VID_ENC_VSTART         DM320_REG(0x0814)
+#define IO_VID_ENC_VVALID         DM320_REG(0x0816)
+#define IO_VID_ENC_HSDLY          DM320_REG(0x0818)
+#define IO_VID_ENC_VSDLY          DM320_REG(0x081A)
+#define IO_VID_ENC_YCCTL          DM320_REG(0x081C)
+#define IO_VID_ENC_RGBCTL         DM320_REG(0x081E)
+#define IO_VID_ENC_RGBCLP         DM320_REG(0x0820)
+#define IO_VID_ENC_LNECTL         DM320_REG(0x0822)
+#define IO_VID_ENC_CULLLNE        DM320_REG(0x0824)
+#define IO_VID_ENC_LCDOUT         DM320_REG(0x0826)
+#define IO_VID_ENC_BRTS           DM320_REG(0x0828)
+#define IO_VID_ENC_BRTW           DM320_REG(0x082A)
+#define IO_VID_ENC_ACCTL          DM320_REG(0x082C)
+#define IO_VID_ENC_PWMP           DM320_REG(0x082E)
+#define IO_VID_ENC_PWMW           DM320_REG(0x0830)
+#define IO_VID_ENC_DCLKCTL        DM320_REG(0x0832)
+#define IO_VID_ENC_DCLKPTN0       DM320_REG(0x0834)
+#define IO_VID_ENC_DCLKPTN1       DM320_REG(0x0836)
+#define IO_VID_ENC_DCLKPTN2       DM320_REG(0x0838)
+#define IO_VID_ENC_DCLKPTN3       DM320_REG(0x083A)
+#define IO_VID_ENC_DCLKPTN0A      DM320_REG(0x083C)
+#define IO_VID_ENC_DCLKPTN1A      DM320_REG(0x083E)
+#define IO_VID_ENC_DCLKPTN2A      DM320_REG(0x0840)
+#define IO_VID_ENC_DCLKPTN3A      DM320_REG(0x0842)
+#define IO_VID_ENC_DCLKHS         DM320_REG(0x0844)
+#define IO_VID_ENC_DCLKHSA        DM320_REG(0x0846)
+#define IO_VID_ENC_DCLKHR         DM320_REG(0x0848)
+#define IO_VID_ENC_DCLKVS         DM320_REG(0x084A)
+#define IO_VID_ENC_DCLKVR         DM320_REG(0x084C)
+#define IO_VID_ENC_CAPCTL         DM320_REG(0x084E)
+#define IO_VID_ENC_CAPDO          DM320_REG(0x0850)
+#define IO_VID_ENC_CAPDE          DM320_REG(0x0852)
+#define IO_VID_ENC_ATR0           DM320_REG(0x0854)
 
 /* Clock Controller */
 #define IO_CLK_PLLA               DM320_REG(0x0880)
@@ -414,102 +415,102 @@
 #define IO_CLK_PWM1H              DM320_REG(0x08B0)
 
 /* Bus Controller */
-#define IO_BUSC_ECR               0x0900
-#define IO_BUSC_EBYTER            0x0902
-#define IO_BUSC_EBITR             0x0904
-#define IO_BUSC_REVR              0x0906
+#define IO_BUSC_ECR               DM320_REG(0x0900)
+#define IO_BUSC_EBYTER            DM320_REG(0x0902)
+#define IO_BUSC_EBITR             DM320_REG(0x0904)
+#define IO_BUSC_REVR              DM320_REG(0x0906)
 
 /* SDRAM Controller */
-#define IO_SDRAM_SDBUFD0L         0x0980
-#define IO_SDRAM_SDBUFD0H         0x0982
-#define IO_SDRAM_SDBUFD1L         0x0984
-#define IO_SDRAM_SDBUFD1H         0x0986
-#define IO_SDRAM_SDBUFD2L         0x0988
-#define IO_SDRAM_SDBUFD2H         0x098A
-#define IO_SDRAM_SDBUFD3L         0x098C
-#define IO_SDRAM_SDBUFD3H         0x098E
-#define IO_SDRAM_SDBUFD4L         0x0990
-#define IO_SDRAM_SDBUFD4H         0x0992
-#define IO_SDRAM_SDBUFD5L         0x0994
-#define IO_SDRAM_SDBUFD5H         0x0996
-#define IO_SDRAM_SDBUFD6L         0x0998
-#define IO_SDRAM_SDBUFD6H         0x099A
-#define IO_SDRAM_SDBUFD7L         0x099C
-#define IO_SDRAM_SDBUFD7H         0x099E
-#define IO_SDRAM_SDBUFAD1         0x09A0
-#define IO_SDRAM_SDBUFAD2         0x09A2
-#define IO_SDRAM_SDBUFCTL         0x09A4
-#define IO_SDRAM_SDMODE           0x09A6
-#define IO_SDRAM_REFCTL           0x09A8
-#define IO_SDRAM_SDPRTY1          0x09AA
-#define IO_SDRAM_SDPRTY2          0x09AC
-#define IO_SDRAM_SDPRTY3          0x09AE
-#define IO_SDRAM_SDPRTY4          0x09B0
-#define IO_SDRAM_SDPRTY5          0x09B2
-#define IO_SDRAM_SDPRTY6          0x09B4
-#define IO_SDRAM_SDPRTY7          0x09B6
-#define IO_SDRAM_SDPRTY8          0x09B8
-#define IO_SDRAM_SDPRTY9          0x09BA
-#define IO_SDRAM_SDPRTY10         0x09BC
-#define IO_SDRAM_SDPRTY11         0x09BE
-#define IO_SDRAM_SDPRTY12         0x09C0
-#define IO_SDRAM_RSV              0x09C2
-#define IO_SDRAM_SDPRTYON         0x09C4
-#define IO_SDRAM_SDDMASEL         0x09C6
+#define IO_SDRAM_SDBUFD0L         DM320_REG(0x0980)
+#define IO_SDRAM_SDBUFD0H         DM320_REG(0x0982)
+#define IO_SDRAM_SDBUFD1L         DM320_REG(0x0984)
+#define IO_SDRAM_SDBUFD1H         DM320_REG(0x0986)
+#define IO_SDRAM_SDBUFD2L         DM320_REG(0x0988)
+#define IO_SDRAM_SDBUFD2H         DM320_REG(0x098A)
+#define IO_SDRAM_SDBUFD3L         DM320_REG(0x098C)
+#define IO_SDRAM_SDBUFD3H         DM320_REG(0x098E)
+#define IO_SDRAM_SDBUFD4L         DM320_REG(0x0990)
+#define IO_SDRAM_SDBUFD4H         DM320_REG(0x0992)
+#define IO_SDRAM_SDBUFD5L         DM320_REG(0x0994)
+#define IO_SDRAM_SDBUFD5H         DM320_REG(0x0996)
+#define IO_SDRAM_SDBUFD6L         DM320_REG(0x0998)
+#define IO_SDRAM_SDBUFD6H         DM320_REG(0x099A)
+#define IO_SDRAM_SDBUFD7L         DM320_REG(0x099C)
+#define IO_SDRAM_SDBUFD7H         DM320_REG(0x099E)
+#define IO_SDRAM_SDBUFAD1         DM320_REG(0x09A0)
+#define IO_SDRAM_SDBUFAD2         DM320_REG(0x09A2)
+#define IO_SDRAM_SDBUFCTL         DM320_REG(0x09A4)
+#define IO_SDRAM_SDMODE           DM320_REG(0x09A6)
+#define IO_SDRAM_REFCTL           DM320_REG(0x09A8)
+#define IO_SDRAM_SDPRTY1          DM320_REG(0x09AA)
+#define IO_SDRAM_SDPRTY2          DM320_REG(0x09AC)
+#define IO_SDRAM_SDPRTY3          DM320_REG(0x09AE)
+#define IO_SDRAM_SDPRTY4          DM320_REG(0x09B0)
+#define IO_SDRAM_SDPRTY5          DM320_REG(0x09B2)
+#define IO_SDRAM_SDPRTY6          DM320_REG(0x09B4)
+#define IO_SDRAM_SDPRTY7          DM320_REG(0x09B6)
+#define IO_SDRAM_SDPRTY8          DM320_REG(0x09B8)
+#define IO_SDRAM_SDPRTY9          DM320_REG(0x09BA)
+#define IO_SDRAM_SDPRTY10         DM320_REG(0x09BC)
+#define IO_SDRAM_SDPRTY11         DM320_REG(0x09BE)
+#define IO_SDRAM_SDPRTY12         DM320_REG(0x09C0)
+#define IO_SDRAM_RSV              DM320_REG(0x09C2)
+#define IO_SDRAM_SDPRTYON         DM320_REG(0x09C4)
+#define IO_SDRAM_SDDMASEL         DM320_REG(0x09C6)
 
 /* EMIF Controller */
-#define IO_EMIF_CS0CTRL1          0x0A00
-#define IO_EMIF_CS0CTRL2          0x0A02
-#define IO_EMIF_CS0CTRL3          0x0A04
-#define IO_EMIF_CS1CTRL1A         0x0A06
-#define IO_EMIF_CS1CTRL1B         0x0A08
-#define IO_EMIF_CS1CTRL2          0x0A0A
-#define IO_EMIF_CS2CTRL1          0x0A0C
-#define IO_EMIF_CS2CTRL2          0x0A0E
-#define IO_EMIF_CS3CTRL1          0x0A10
-#define IO_EMIF_CS3CTRL2          0x0A12
-#define IO_EMIF_CS4CTRL1          0x0A14
-#define IO_EMIF_CS4CTRL2          0x0A16
-#define IO_EMIF_BUSCTRL           0x0A18
-#define IO_EMIF_BUSRLS            0x0A1A
-#define IO_EMIF_CFCTRL1           0x0A1C
-#define IO_EMIF_CFCTRL2           0x0A1E
-#define IO_EMIF_SMCTRL            0x0A20
-#define IO_EMIF_BUSINTEN          0x0A22
-#define IO_EMIF_BUSSTS            0x0A24
-#define IO_EMIF_BUSWAITMD         0x0A26
-#define IO_EMIF_ECC1CP            0x0A28
-#define IO_EMIF_ECC1LP            0x0A2A
-#define IO_EMIF_ECC2CP            0x0A2C
-#define IO_EMIF_ECC2LP            0x0A2E
-#define IO_EMIF_ECC3CP            0x0A30
-#define IO_EMIF_ECC3LP            0x0A32
-#define IO_EMIF_ECC4CP            0x0A34
-#define IO_EMIF_ECC4LP            0x0A36
-#define IO_EMIF_ECC5CP            0x0A38
-#define IO_EMIF_ECC5LP            0x0A3A
-#define IO_EMIF_ECC6CP            0x0A3C
-#define IO_EMIF_ECC6LP            0x0A3E 
-#define IO_EMIF_ECC7CP            0x0A40
-#define IO_EMIF_ECC7LP            0x0A42
-#define IO_EMIF_ECC8CP            0x0A44
-#define IO_EMIF_ECC8LP            0x0A46
-#define IO_EMIF_ECCCLR            0x0A48
-#define IO_EMIF_PAGESZ            0x0A4A
-#define IO_EMIF_PRIORCTL          0x0A4C
-#define IO_EMIF_MGDSPDEST         0x0A4E
-#define IO_EMIF_MGDSPADDH         0x0A50
-#define IO_EMIF_MGDSPADDL         0x0A52
-#define IO_EMIF_AHBADDH           0x0A54
-#define IO_EMIF_AHBADDL           0x0A56
-#define IO_EMIF_MTCADDH           0x0A58
-#define IO_EMIF_MTCADDL           0x0A5A
-#define IO_EMIF_DMASIZE           0x0A5C
-#define IO_EMIF_DMAMTCSEL         0x0A5E
-#define IO_EMIF_DMACTL            0x0A60
+#define IO_EMIF_CS0CTRL1          DM320_REG(0x0A00)
+#define IO_EMIF_CS0CTRL2          DM320_REG(0x0A02)
+#define IO_EMIF_CS0CTRL3          DM320_REG(0x0A04)
+#define IO_EMIF_CS1CTRL1A         DM320_REG(0x0A06)
+#define IO_EMIF_CS1CTRL1B         DM320_REG(0x0A08)
+#define IO_EMIF_CS1CTRL2          DM320_REG(0x0A0A)
+#define IO_EMIF_CS2CTRL1          DM320_REG(0x0A0C)
+#define IO_EMIF_CS2CTRL2          DM320_REG(0x0A0E)
+#define IO_EMIF_CS3CTRL1          DM320_REG(0x0A10)
+#define IO_EMIF_CS3CTRL2          DM320_REG(0x0A12)
+#define IO_EMIF_CS4CTRL1          DM320_REG(0x0A14)
+#define IO_EMIF_CS4CTRL2          DM320_REG(0x0A16)
+#define IO_EMIF_BUSCTRL           DM320_REG(0x0A18)
+#define IO_EMIF_BUSRLS            DM320_REG(0x0A1A)
+#define IO_EMIF_CFCTRL1           DM320_REG(0x0A1C)
+#define IO_EMIF_CFCTRL2           DM320_REG(0x0A1E)
+#define IO_EMIF_SMCTRL            DM320_REG(0x0A20)
+#define IO_EMIF_BUSINTEN          DM320_REG(0x0A22)
+#define IO_EMIF_BUSSTS            DM320_REG(0x0A24)
+#define IO_EMIF_BUSWAITMD         DM320_REG(0x0A26)
+#define IO_EMIF_ECC1CP            DM320_REG(0x0A28)
+#define IO_EMIF_ECC1LP            DM320_REG(0x0A2A)
+#define IO_EMIF_ECC2CP            DM320_REG(0x0A2C)
+#define IO_EMIF_ECC2LP            DM320_REG(0x0A2E)
+#define IO_EMIF_ECC3CP            DM320_REG(0x0A30)
+#define IO_EMIF_ECC3LP            DM320_REG(0x0A32)
+#define IO_EMIF_ECC4CP            DM320_REG(0x0A34)
+#define IO_EMIF_ECC4LP            DM320_REG(0x0A36)
+#define IO_EMIF_ECC5CP            DM320_REG(0x0A38)
+#define IO_EMIF_ECC5LP            DM320_REG(0x0A3A)
+#define IO_EMIF_ECC6CP            DM320_REG(0x0A3C)
+#define IO_EMIF_ECC6LP            DM320_REG(0x0A3E)
+#define IO_EMIF_ECC7CP            DM320_REG(0x0A40)
+#define IO_EMIF_ECC7LP            DM320_REG(0x0A42)
+#define IO_EMIF_ECC8CP            DM320_REG(0x0A44)
+#define IO_EMIF_ECC8LP            DM320_REG(0x0A46)
+#define IO_EMIF_ECCCLR            DM320_REG(0x0A48)
+#define IO_EMIF_PAGESZ            DM320_REG(0x0A4A)
+#define IO_EMIF_PRIORCTL          DM320_REG(0x0A4C)
+#define IO_EMIF_MGDSPDEST         DM320_REG(0x0A4E)
+#define IO_EMIF_MGDSPADDH         DM320_REG(0x0A50)
+#define IO_EMIF_MGDSPADDL         DM320_REG(0x0A52)
+#define IO_EMIF_AHBADDH           DM320_REG(0x0A54)
+#define IO_EMIF_AHBADDL           DM320_REG(0x0A56)
+#define IO_EMIF_MTCADDH           DM320_REG(0x0A58)
+#define IO_EMIF_MTCADDL           DM320_REG(0x0A5A)
+#define IO_EMIF_DMASIZE           DM320_REG(0x0A5C)
+#define IO_EMIF_DMAMTCSEL         DM320_REG(0x0A5E)
+#define IO_EMIF_DMACTL            DM320_REG(0x0A60)
 
 /* Preivew Engine */
-#define IO_PREV_ENG_PVEN          0x0A80
+#define IO_PREV_ENG_PVEN          DM320_REG(0x0A80)
 #define IO_PREV_ENG_PVSET1        0x0A82
 #define IO_PREV_ENG_RADRH         0x0A84
 #define IO_PREV_ENG_RADRL         0x0A86
@@ -623,26 +624,74 @@
 /* Reserved 0x0C00 - 0x0CCFF */
 
 /* Memory Stick Controller : */
-#define IO_MEM_STICK_MODE       0x0C80
-#define IO_MEM_STICK_CMD        0x0C82
-#define IO_MEM_STICK_DATA       0x0C84
-#define IO_MEM_STICK_STATUS     0x0C86
-#define IO_MEM_STICK_SYS        0x0C88
-#define IO_MEM_STICK_ENDIAN     0x0C8A
-#define IO_MEM_STICK_INT_STATUS 0x0C8C
-#define IO_MEM_STICK_DMA_TRG    0x0C8E
-#define IO_MEM_STICK_DMA_MODE   0x0C90
-#define IO_MEM_STICK_SDRAM_ADDL 0x0C92
-#define IO_MEM_STICK_SDRAM_ADDH 0x0C94
-#define IO_MEM_STICK_DMA_STATUS 0x0C96
+#define IO_MEM_STICK_MODE         0x0C80
+#define IO_MEM_STICK_CMD          0x0C82
+#define IO_MEM_STICK_DATA         0x0C84
+#define IO_MEM_STICK_STATUS       0x0C86
+#define IO_MEM_STICK_SYS          0x0C88
+#define IO_MEM_STICK_ENDIAN       0x0C8A
+#define IO_MEM_STICK_INT_STATUS   0x0C8C
+#define IO_MEM_STICK_DMA_TRG      0x0C8E
+#define IO_MEM_STICK_DMA_MODE     0x0C90
+#define IO_MEM_STICK_SDRAM_ADDL   0x0C92
+#define IO_MEM_STICK_SDRAM_ADDH   0x0C94
+#define IO_MEM_STICK_DMA_STATUS   0x0C96
 
 /* ATM : WBB Need to find these Register values */
 #define IO_ATM_                   0x0D00
 
 /* I2C */
-#define IO_I2C_TXDATA             0x0D80
-#define IO_I2C_RXDATA             0x0D82
-#define IO_I2C_SCS                0x0D84
+#define IO_I2C_TXDATA             DM320_REG(0x0D80)
+#define IO_I2C_RXDATA             DM320_REG(0x0D82)
+#define IO_I2C_SCS                DM320_REG(0x0D84)
+
+/* VLYNQ */
+#define VL_ID                     DM320_REG(0x30300)
+#define VL_CTRL                   DM320_REG(0x30304)
+#define VL_STAT                   DM320_REG(0x30308)
+#define VL_INTPRI                 DM320_REG(0x3030c)
+#define VL_INTST                  DM320_REG(0x30310)
+#define VL_INTPND                 DM320_REG(0x30314)
+#define VL_INTPTR                 DM320_REG(0x30318)
+#define VL_TXMAP                  DM320_REG(0x3031c)
+#define VL_RXMAPSZ1               DM320_REG(0x30320)
+#define VL_RXMAPOF1               DM320_REG(0x30324)
+#define VL_RXMAPSZ2               DM320_REG(0x30328)
+#define VL_RXMAPOF2               DM320_REG(0x3032c)
+#define VL_RXMAPSZ3               DM320_REG(0x30330)
+#define VL_RXMAPOF3               DM320_REG(0x30334)
+#define VL_RXMAPSZ4               DM320_REG(0x30338)
+#define VL_RXMAPOF4               DM320_REG(0x3033c)
+#define VL_CHIPVER                DM320_REG(0x30340)
+#define VL_AUTONEG                DM320_REG(0x30344)
+#define VL_MANNEG                 DM320_REG(0x30348)
+#define VL_NEGSTAT                DM320_REG(0x3034c)
+#define VL_ENDIAN                 DM320_REG(0x3035c)
+#define VL_INTVEC30               DM320_REG(0x30360)
+#define VL_INTVEC74               DM320_REG(0x30364)
+#define VL_ID_R                   DM320_REG(0x30380)
+#define VL_CTRL_R                 DM320_REG(0x30384)
+#define VL_STAT_R                 DM320_REG(0x30388)
+#define VL_INTPRI_R               DM320_REG(0x3038c)
+#define VL_INTST_R                DM320_REG(0x30390)
+#define VL_INTPND_R               DM320_REG(0x30394)
+#define VL_INTPTR_R               DM320_REG(0x30398)
+#define VL_TXMAP_R                DM320_REG(0x3039c)
+#define VL_RXMAPSZ1_R             DM320_REG(0x303a0)
+#define VL_RXMAPOF1_R             DM320_REG(0x303a4)
+#define VL_RXMAPSZ2_R             DM320_REG(0x303a8)
+#define VL_RXMAPOF2_R             DM320_REG(0x303ac)
+#define VL_RXMAPSZ3_R             DM320_REG(0x303b0)
+#define VL_RXMAPOF3_R             DM320_REG(0x303b4)
+#define VL_RXMAPSZ4_R             DM320_REG(0x303b8)
+#define VL_RXMAPOF4_R             DM320_REG(0x303bc)
+#define VL_CHIPVER_R              DM320_REG(0x303c0)
+#define VL_AUTONEG_R              DM320_REG(0x303c4)
+#define VL_MANNEG_R               DM320_REG(0x303c8)
+#define VL_NEGSTAT_R              DM320_REG(0x303cc)
+#define VL_ENDIAN_R               DM320_REG(0x303dc)
+#define VL_INTVEC30_R             DM320_REG(0x303e0)
+#define VL_INTVEC74_R             DM320_REG(0x303e4)
 
 /* Taken from linux/include/asm-arm/arch-itdm320/irqs.h
  *
@@ -738,5 +787,117 @@
 #define CONFIG_TIMER3_TMMD_TRG_READY   0x1000
 #define CONFIG_TIMER3_TMMD_SIGNAL      0x2000
 
+/*
+ *  IO_MODx bits
+ */
+#define CLK_MOD0_HPIB                  (1 << 11)
+#define CLK_MOD0_DSP                   (1 << 10)
+#define CLK_MOD0_EXTHOST               (1 << 9)
+#define CLK_MOD0_SDRAMC                (1 << 8)
+#define CLK_MOD0_EMIF                  (1 << 7)
+#define CLK_MOD0_INTC                  (1 << 6)
+#define CLK_MOD0_AIM                   (1 << 5)
+#define CLK_MOD0_E2ICE                 (1 << 4)
+#define CLK_MOD0_ETM                   (1 << 3)
+#define CLK_MOD0_AHB                   (1 << 2)
+#define CLK_MOD0_BUSC                  (1 << 1)
+#define CLK_MOD0_ARM                   (1 << 0)
+
+#define CLK_MOD1_CPBUS                 (1 << 11)
+#define CLK_MOD1_SEQ                   (1 << 10)
+#define CLK_MOD1_DCT                   (1 << 9)
+#define CLK_MOD1_IMGBUF                (1 << 8)
+#define CLK_MOD1_IMX                   (1 << 7)
+#define CLK_MOD1_VLCD                  (1 << 6)
+#define CLK_MOD1_DAC                   (1 << 5)
+#define CLK_MOD1_VENC                  (1 << 4)
+#define CLK_MOD1_OSD                   (1 << 3)
+#define CLK_MOD1_PRV                   (1 << 2)
+#define CLK_MOD1_H3A                   (1 << 1)
+#define CLK_MOD1_CCDC                  (1 << 0)
+
+#define CLK_MOD2_TEST                  (1 << 15)
+#define CLK_MOD2_MS                    (1 << 14)
+#define CLK_MOD2_VLYNQ                 (1 << 13)
+#define CLK_MOD2_I2C                   (1 << 12)
+#define CLK_MOD2_MMC                   (1 << 11)
+#define CLK_MOD2_SIF1                  (1 << 10)
+#define CLK_MOD2_SIF0                  (1 << 9)
+#define CLK_MOD2_UART1                 (1 << 8)
+#define CLK_MOD2_UART0                 (1 << 7)
+#define CLK_MOD2_USB                   (1 << 6)
+#define CLK_MOD2_GIO                   (1 << 5)
+#define CLK_MOD2_CCDTMR1               (1 << 4)
+#define CLK_MOD2_CCDTMR0               (1 << 3)
+#define CLK_MOD2_TMR1                  (1 << 2)
+#define CLK_MOD2_TMR0                  (1 << 1)
+#define CLK_MOD2_WDT                   (1 << 0)
+
+/*
+ *  IO_EINTx bits
+ */
+#define INTR_EINT0_USB1                (1 << 15)
+#define INTR_EINT0_USB0                (1 << 14)
+#define INTR_EINT0_UART1               (1 << 13)
+#define INTR_EINT0_UART0               (1 << 12)
+#define INTR_EINT0_IMGBUF              (1 << 11)
+#define INTR_EINT0_EXTHOST             (1 << 10)
+#define INTR_EINT0_SP1                 (1 << 9)
+#define INTR_EINT0_SP0                 (1 << 8)
+#define INTR_EINT0_VENC                (1 << 7)
+#define INTR_EINT0_CCDWEN              (1 << 6)
+#define INTR_EINT0_CCDVD1              (1 << 5)
+#define INTR_EINT0_CCDVD0              (1 << 4)
+#define INTR_EINT0_TMR3                (1 << 3)
+#define INTR_EINT0_TMR2                (1 << 2)
+#define INTR_EINT0_TMR1                (1 << 1)
+#define INTR_EINT0_TMR0                (1 << 0)
+
+#define INTR_EINT1_EXT10               (1 << 15)
+#define INTR_EINT1_EXT9                (1 << 14)
+#define INTR_EINT1_EXT8                (1 << 13)
+#define INTR_EINT1_EXT7                (1 << 12)
+#define INTR_EINT1_EXT6                (1 << 11)
+#define INTR_EINT1_EXT5                (1 << 10)
+#define INTR_EINT1_EXT4                (1 << 9)
+#define INTR_EINT1_EXT3                (1 << 8)
+#define INTR_EINT1_EXT2                (1 << 7)
+#define INTR_EINT1_EXT1                (1 << 6)
+#define INTR_EINT1_EXT0                (1 << 5)
+#define INTR_EINT1_MMCSDMS1            (1 << 4)
+#define INTR_EINT1_MMCSDMS0            (1 << 3)
+#define INTR_EINT1_MTC1                (1 << 2)
+#define INTR_EINT1_MTC0                (1 << 1)
+#define INTR_EINT1_VLYNQ               (1 << 0)
+
+#define INTR_EINT2_RSVINT              (1 << 13)
+#define INTR_EINT2_ARMCOMTX            (1 << 12)
+#define INTR_EINT2_ARMCOMRX            (1 << 11)
+#define INTR_EINT2_E2ICE               (1 << 10)
+#define INTR_EINT2_INTRC               (1 << 9)
+#define INTR_EINT2_I2C                 (1 << 8)
+#define INTR_EINT2_WDT                 (1 << 7)
+#define INTR_EINT2_PREV1               (1 << 6)
+#define INTR_EINT2_PREV0               (1 << 5)
+#define INTR_EINT2_EXT15               (1 << 4)
+#define INTR_EINT2_EXT14               (1 << 3)
+#define INTR_EINT2_EXT13               (1 << 2)
+#define INTR_EINT2_EXT12               (1 << 1)
+#define INTR_EINT2_EXT11               (1 << 0)
+
+/*
+* IO_IRQx bits
+*/
+#define INTR_IRQ0_TMR0        INTR_EINT0_TMR0
+#define INTR_IRQ0_TMR1        INTR_EINT0_TMR1
+#define INTR_IRQ0_TMR2        INTR_EINT0_TMR2
+#define INTR_IRQ0_TMR3        INTR_EINT0_TMR3
+#define INTR_IRQ0_UART1       INTR_EINT0_UART1
+#define INTR_IRQ0_CCDVD1      INTR_EINT0_CCDVD1
+#define INTR_IRQ0_IMGBUF      INTR_EINT0_IMGBUF
+
+#define INTR_IRQ1_EXT0        INTR_EINT1_EXT0
+#define INTR_IRQ1_EXT2        INTR_EINT1_EXT2
+#define INTR_IRQ1_EXT7        INTR_EINT1_EXT7
 
 #endif
