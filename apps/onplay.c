@@ -1077,16 +1077,20 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
                 return (clipboard_selection[0] != 0) ?
                                     action : ACTION_EXIT_MENUITEM;
             }
-            else if ((this_item == &create_dir_item) ||
-                     (this_item == &properties_item) || 
+            else if (this_item == &create_dir_item) 
+            {
+                /* always visible */
+                return action;
+            }
+            else if ((this_item == &properties_item) || 
                      (this_item == &rename_file_item) ||
                      (this_item == &clipboard_cut_item) ||
                      (this_item == &clipboard_copy_item) ||
                      (this_item == &add_to_faves_item)
                     )
             {
-                /* always visible */
-                return action;
+                /* requires an actual file */                
+                return (selected_file) ?  action : ACTION_EXIT_MENUITEM;
             }
 #if LCD_DEPTH > 1
             else if (this_item == &set_backdrop_item)
