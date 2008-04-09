@@ -1,77 +1,123 @@
-/*
- *  sha1.h
- *
- *  Description:
- *      This is the header file for code which implements the Secure
- *      Hashing Algorithm 1 as defined in FIPS PUB 180-1 published
- *      April 17, 1995.
- *
- *      Many of the variable names in this code, especially the
- *      single character names, were used because those were the names
- *      used in the publication.
- *
- *      Please read the file sha1.c for more information.
- *
- */
+/* Taken from gnulib (http://savannah.gnu.org/projects/gnulib/) */
+/* Declarations of functions and data types used for SHA1 sum
+   library functions.
+   Copyright (C) 2000, 2001, 2003, 2005, 2006 Free Software Foundation, Inc.
 
-#ifndef _SHA1_H_
-#define _SHA1_H_
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
 
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+
+#ifndef SHA1_H
+#define SHA1_H 1
+
+#include <stdio.h>
 #include <stdint.h>
-/*
- * If you do not have the ISO standard stdint.h header file, then you
- * must typdef the following:
- *    name              meaning
- *  uint32_t         unsigned 32 bit integer
- *  uint8_t          unsigned 8 bit integer (i.e., unsigned char)
- *  int_least16_t    integer of >= 16 bits
- *
- */
 
-#ifndef _SHA_enum_
-#define _SHA_enum_
-enum
+/* Structure to save state of computation between the single steps.  */
+struct sha1_ctx
 {
-    shaSuccess = 0,
-    shaNull,            /* Null pointer parameter */
-    shaInputTooLong,    /* input data too long */
-    shaStateError       /* called Input after Result */
+  uint32_t A;
+  uint32_t B;
+  uint32_t C;
+  uint32_t D;
+  uint32_t E;
+
+  uint32_t total[2];
+  uint32_t buflen;
+  uint32_t buffer[32];
 };
+
+
+/* Initialize structure containing state of computation. */
+extern void sha1_init_ctx (struct sha1_ctx *ctx);
+
+/* Starting with the result of former calls of this function (or the
+   initialization function update the context for the next LEN bytes
+   starting at BUFFER.
+   It is necessary that LEN is a multiple of 64!!! */
+extern void sha1_process_block (const void *buffer, size_t len,
+				struct sha1_ctx *ctx);
+
+/* Starting with the result of former calls of this function (or the
+   initialization function update the context for the next LEN bytes
+   starting at BUFFER.
+   It is NOT required that LEN is a multiple of 64.  */
+extern void sha1_process_bytes (const void *buffer, size_t len,
+				struct sha1_ctx *ctx);
+
+/* Process the remaining bytes in the buffer and put result from CTX
+   in first 20 bytes following RESBUF.  The result is always in little
+   endian byte order, so that a byte-wise output yields to the wanted
+   ASCII representation of the message digest.
+
+   IMPORTANT: On some systems it is required that RESBUF be correctly
+   aligned for a 32 bits value.  */
+extern void *sha1_finish_ctx (struct sha1_ctx *ctx, void *resbuf);
+
+
+/* Put result from CTX in first 20 bytes following RESBUF.  The result is
+   always in little endian byte order, so that a byte-wise output yields
+   to the wanted ASCII representation of the message digest.
+
+   IMPORTANT: On some systems it is required that RESBUF is correctly
+   aligned for a 32 bits value.  */
+extern void *sha1_read_ctx (const struct sha1_ctx *ctx, void *resbuf);
+
+
+/* Compute SHA1 message digest for bytes read from STREAM.  The
+   resulting message digest number will be written into the 20 bytes
+   beginning at RESBLOCK.  */
+extern int sha1_stream (FILE *stream, void *resblock);
+
+/* Compute SHA1 message digest for LEN bytes beginning at BUFFER.  The
+   result is always in little endian byte order, so that a byte-wise
+   output yields to the wanted ASCII representation of the message
+   digest.  */
+extern void *sha1_buffer (const char *buffer, size_t len, void *resblock);
+
 #endif
-#define SHA1HashSize 20
 
-/*
- *  This structure will hold context information for the SHA-1
- *  hashing operation
- */
-typedef struct SHA1Context
-{
-    uint32_t Intermediate_Hash[SHA1HashSize/4]; /* Message Digest  */
 
-    uint32_t Length_Low;            /* Message length in bits      */
-    uint32_t Length_High;           /* Message length in bits      */
+/* hmac.h -- hashed message authentication codes
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
-    /* Index into message block array   */
-    int_least16_t Message_Block_Index;
-    uint8_t Message_Block[64];      /* 512-bit message blocks      */
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
 
-    int Computed;               /* Is the digest computed?         */
-    int Corrupted;             /* Is the message digest corrupted? */
-} SHA1Context;
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-/*
- *  Function Prototypes
- */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-int SHA1Reset(  SHA1Context *);
-int SHA1Input(  SHA1Context *,
-        const uint8_t *,
-        unsigned int);
-int SHA1Result( SHA1Context *,
-        uint8_t Message_Digest[SHA1HashSize]);
+/* Written by Simon Josefsson.  */
 
-void hmac_sha(unsigned char* k, int lk,
-              unsigned char* d, int ld,
-              unsigned char* out, int t);
+#ifndef HMAC_H
+#define HMAC_H 1
 
-#endif
+#include <stddef.h>
+
+/* Compute Hashed Message Authentication Code with SHA-1, over BUFFER
+   data of BUFLEN bytes using the KEY of KEYLEN bytes, writing the
+   output to pre-allocated 20 byte minimum RESBUF buffer.  Return 0 on
+   success.  */
+int
+hmac_sha1 (const void *key, size_t keylen,
+	   const void *in, size_t inlen, void *resbuf);
+
+#endif /* HMAC_H */

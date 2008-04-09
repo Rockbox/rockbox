@@ -68,8 +68,8 @@ static int make_ciff_file(unsigned char *inbuf, int length,
     memcpy(&outbuf[0x98+length], "LLUN", 4);
     int2le(20, &outbuf[0x98+length+4]);
     /* Do checksum */
-    hmac_sha((unsigned char *)devices[device].null, strlen(devices[device].null),
-             outbuf, 0x98+length, key, 20);
+    hmac_sha1((unsigned char *)devices[device].null, strlen(devices[device].null),
+             outbuf, 0x98+length, key);
     memcpy(&outbuf[0x98+length+8], key, 20);
     return length+0x90+0x1C+8;
 }
