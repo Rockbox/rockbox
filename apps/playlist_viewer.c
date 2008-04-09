@@ -223,7 +223,7 @@ static int playlist_entry_load(struct playlist_entry *entry, int index,
     return -1;
 }
 
-static int playlist_buffer_get_index(struct playlist_buffer *pb, int index )
+static int playlist_buffer_get_index(struct playlist_buffer *pb, int index)
 {
     int buffer_index;
     if(pb->direction==FORWARD)
@@ -246,7 +246,8 @@ static int playlist_buffer_get_index(struct playlist_buffer *pb, int index )
 
 #define distance(a, b) \
     a>b? (a) - (b) : (b) - (a)
-static bool playlist_buffer_needs_reload(struct playlist_buffer* pb, int track_index)
+static bool playlist_buffer_needs_reload(struct playlist_buffer* pb,
+                                         int track_index)
 {
     if(pb->num_loaded==viewer.num_tracks)
         return(false);
@@ -550,8 +551,13 @@ static char *playlist_callback_name(int selected_item,
                                     size_t buffer_len)
 {
     struct playlist_viewer * local_viewer = (struct playlist_viewer *)data;
-    struct playlist_entry *track = playlist_buffer_get_track(&(local_viewer->buffer), get_track_num(local_viewer,selected_item));
+
+    int track_num = get_track_num(local_viewer, selected_item);
+    struct playlist_entry *track =
+       playlist_buffer_get_track(&(local_viewer->buffer), track_num);
+
     format_line(track, buffer, buffer_len);
+
     return(buffer);
 }
 
@@ -559,9 +565,11 @@ static char *playlist_callback_name(int selected_item,
 static int playlist_callback_icons(int selected_item, void *data)
 {
     struct playlist_viewer * local_viewer=(struct playlist_viewer *)data;
+
+    int track_num = get_track_num(local_viewer, selected_item);
     struct playlist_entry *track=
-        playlist_buffer_get_track(&(local_viewer->buffer),
-                                  get_track_num(local_viewer, selected_item));
+        playlist_buffer_get_track(&(local_viewer->buffer), track_num);
+
     if (track->index == local_viewer->current_playing_track)
     {
         /* Current playing track */
