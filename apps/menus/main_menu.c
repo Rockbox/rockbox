@@ -145,6 +145,12 @@ enum infoscreenorder
     INFO_COUNT
 };
 
+static const unsigned char *kbyte_units[] =
+{
+    ID2P(LANG_KILOBYTE),
+    ID2P(LANG_MEGABYTE),
+    ID2P(LANG_GIGABYTE)
+};
 
 static char* info_getname(int selected_item, void *data,
                           char *buffer, size_t buffer_len)
@@ -153,12 +159,6 @@ static char* info_getname(int selected_item, void *data,
 #if CONFIG_RTC
     struct tm *tm;
 #endif
-    const unsigned char *kbyte_units[] =
-    {
-        ID2P(LANG_KILOBYTE),
-        ID2P(LANG_MEGABYTE),
-        ID2P(LANG_GIGABYTE)
-    };
     char s1[32];
 #ifdef HAVE_MULTIVOLUME
     char s2[32];
@@ -211,26 +211,26 @@ static char* info_getname(int selected_item, void *data,
         case INFO_BATTERY: /* battery */
 #if CONFIG_CHARGING == CHARGING_SIMPLE
             if (charger_input_state == CHARGER)
-                snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_CHARGE));
+                return (char *)str(LANG_BATTERY_CHARGE);
             else
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
             if (charge_state == CHARGING)
-                snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_CHARGE));
+                return (char *)str(LANG_BATTERY_CHARGE);
             else
 #if CONFIG_CHARGING == CHARGING_CONTROL
             if (charge_state == TOPOFF)
-                snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_TOPOFF_CHARGE));
+                return (char *)str(LANG_BATTERY_TOPOFF_CHARGE);
             else
 #endif
             if (charge_state == TRICKLE)
-                snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_TRICKLE_CHARGE));
+                return (char *)str(LANG_BATTERY_TRICKLE_CHARGE);
             else
 #endif
             if (battery_level() >= 0)
                 snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_TIME),
                          battery_level(), battery_time() / 60, battery_time() % 60);
             else
-                strcpy(buffer, "(n/a)");
+                return "(n/a)";
             break;
         case INFO_DISK1: /* disk usage 1 */
 #ifdef HAVE_MULTIVOLUME
@@ -269,11 +269,7 @@ static char* info_getname(int selected_item, void *data,
 static int info_speak_item(int selected_item, void * data)
 {
     struct info_data *info = (struct info_data*)data;
-    const unsigned char *kbyte_units[] = {
-        ID2P(LANG_KILOBYTE),
-        ID2P(LANG_MEGABYTE),
-        ID2P(LANG_GIGABYTE)
-    };
+
     switch (selected_item)
     {
         case INFO_VERSION: /* version */
