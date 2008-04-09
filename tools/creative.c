@@ -21,6 +21,7 @@
 #include "hmac-sha1.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 /*
 Create a Zen Vision:M FRESCUE structure file
