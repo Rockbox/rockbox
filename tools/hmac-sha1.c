@@ -29,6 +29,8 @@
  *
  */
 
+#include <string.h>
+
 #include "hmac-sha1.h"
 
 /*
@@ -386,35 +388,20 @@ void SHA1PadMessage(SHA1Context *context)
 
 #define SHA_BLOCKSIZE   64
 
-static void truncate
-(
-        char*   d1,   /* data to be truncated */
-        char*   d2,   /* truncated data */
-        int     len   /* length in bytes to keep */
-)
-{
-    int     i ;
-    for (i = 0 ; i < len ; i++) d2[i] = d1[i];
-}
-
-
 /* Function to compute the digest */
 void
-hmac_sha
-(
-        char*    k,     /* secret key */
-        int      lk,    /* length of the key in bytes */
-        char*    d,     /* data */
-        int      ld,    /* length of data in bytes */
-        char*    out,   /* output buffer, at least "t" bytes */
-        int      t
-)
+hmac_sha(unsigned char* k,   /* secret key */
+         int      lk,        /* length of the key in bytes */
+         unsigned char* d,   /* data */
+         int      ld,        /* length of data in bytes */
+         unsigned char* out, /* output buffer, at least "t" bytes */
+         int      t)
 {
     SHA1Context ictx, octx ;
-    char    isha[SHA_DIGESTSIZE], osha[SHA_DIGESTSIZE] ;
-    char    key[SHA_DIGESTSIZE] ;
-    char    buf[SHA_BLOCKSIZE] ;
-    int     i ;
+    unsigned char isha[SHA_DIGESTSIZE], osha[SHA_DIGESTSIZE] ;
+    unsigned char key[SHA_DIGESTSIZE] ;
+    unsigned char buf[SHA_BLOCKSIZE] ;
+    int i ;
 
     if (lk > SHA_BLOCKSIZE) {
 
@@ -433,8 +420,11 @@ hmac_sha
     SHA1Reset(&ictx) ;
 
     /* Pad the key for inner digest */
-    for (i = 0 ; i < lk ; ++i) buf[i] = k[i] ^ 0x36 ;
-    for (i = lk ; i < SHA_BLOCKSIZE ; ++i) buf[i] = 0x36 ;
+    for (i = 0 ; i < lk ; ++i)
+        buf[i] = k[i] ^ 0x36 ;
+
+    for (i = lk ; i < SHA_BLOCKSIZE ; ++i)
+        buf[i] = 0x36 ;
 
     SHA1Input(&ictx, buf, SHA_BLOCKSIZE) ;
     SHA1Input(&ictx, d, ld) ;
@@ -456,8 +446,8 @@ hmac_sha
 
     SHA1Result(&octx, osha) ;
 
-    /* truncate and print the results */
+    /* truncate the results */
     t = t > SHA_DIGESTSIZE ? SHA_DIGESTSIZE : t ;
-    truncate(osha, out, t) ;
+    memcpy(out, osha, t);
 
 }

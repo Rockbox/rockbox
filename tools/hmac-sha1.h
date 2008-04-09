@@ -70,15 +70,8 @@ int SHA1Input(  SHA1Context *,
 int SHA1Result( SHA1Context *,
         uint8_t Message_Digest[SHA1HashSize]);
 
-void
-hmac_sha
-(
-        char*    k,
-        int      lk,
-        char*    d,
-        int      ld,
-        char*    out,
-        int      t
-);
+void hmac_sha(unsigned char* k, int lk,
+              unsigned char* d, int ld,
+              unsigned char* out, int t);
 
 #endif

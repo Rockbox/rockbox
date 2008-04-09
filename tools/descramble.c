@@ -157,13 +157,13 @@ int main (int argc, char** argv)
         length |= header[10] << 16 | header[11] << 24;
 
         /* calculate the xor string used */
-        for (i=0; i<stringlen; i++) {
+        for (i=0; i<(unsigned long)stringlen; i++) {
             int top=0, topchar=0, c;
             int bytecount[256];
             memset(bytecount, 0, sizeof(bytecount));
 
             /* gather byte frequency statistics */
-            for (c=i; c<length; c+=stringlen)
+            for (c=i; c<(int)length; c+=stringlen)
                 bytecount[inbuf[c]]++;
 
             /* find the most frequent byte */
@@ -202,7 +202,7 @@ int main (int argc, char** argv)
                     int count = (byte2 & 0x0f) + 3;
                     int src =
                         (j & 0xfffff000) + (byte1 | ((byte2 & 0xf0)<<4)) + 18;
-                    if (src > j)
+                    if (src > (int)j)
                         src -= 0x1000;
 
                     for (x=0; x<count; x++)
@@ -259,7 +259,7 @@ int iaudio_decode(char *iname, char *oname)
     }
 
     len = fread(outbuf, 1, length, file);
-    if(len < length) {
+    if(len < (size_t)length) {
         perror(iname);
         return -2;
     }
@@ -283,7 +283,7 @@ int iaudio_decode(char *iname, char *oname)
     }
     
     len = fwrite(outbuf+0x1030, 1, length-0x1030, file);
-    if(len < length-0x1030) {
+    if(len < (size_t)length-0x1030) {
         perror(oname);
         return -4;
     }
