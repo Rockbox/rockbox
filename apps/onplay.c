@@ -83,7 +83,11 @@ static bool clipboard_is_copy = false;
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { (void*)name##_},{.callback_and_desc = & name##__}};
             
-
+#ifdef HAVE_LCD_BITMAP            
+static void draw_slider(void);
+#else
+#define draw_slider()
+#endif
 /* ----------------------------------------------------------------------- */
 /* Displays the bookmark menu options for the user to decide.  This is an  */
 /* interface function.                                                     */
@@ -465,8 +469,10 @@ static int remove_dir(char* dirname, int len)
             break;
 
         dirname[dirlen] ='\0';
-        FOR_NB_SCREENS(i)
+        FOR_NB_SCREENS(i){
             screens[i].puts(0,1,dirname);
+            screens[i].update();        
+        }
         
         /* append name to current directory */
         snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
@@ -484,19 +490,9 @@ static int remove_dir(char* dirname, int len)
         }
         else
         {   /* remove a file */
-#ifdef HAVE_LCD_BITMAP
-            FOR_NB_SCREENS(i)
-            {
-                show_busy_slider(&screens[i], 2, 3*screens[i].char_height,
-                                 LCD_WIDTH-4, screens[i].char_height);
-            }
-#endif
+            draw_slider();        
             result = remove(dirname);
         }
-#ifdef HAVE_LCD_BITMAP
-        FOR_NB_SCREENS(i)
-            screens[i].update();
-#endif
         if(ACTION_STD_CANCEL == get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
         {
             gui_syncsplash(HZ, ID2P(LANG_CANCEL));
@@ -666,18 +662,16 @@ static bool clipboard_copy(void)
 }
 
 #ifdef HAVE_LCD_BITMAP
-static inline void draw_slider(void)
+static void draw_slider(void)
 {
     int i;
     FOR_NB_SCREENS(i)
     {
-        show_busy_slider(&screens[i], 2, LCD_HEIGHT/4,
-                         LCD_WIDTH-4, screens[i].char_height);
+        show_busy_slider(&screens[i], 1, LCD_HEIGHT-2*screens[i].char_height,
+                         LCD_WIDTH-2, 2*screens[i].char_height-1);
         screens[i].update();
     }
 }
-#else
-#define draw_slider()
 #endif
 
 /* Paste a file to a new directory. Will overwrite always. */
