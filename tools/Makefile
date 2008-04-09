@@ -13,16 +13,18 @@ LDFLAGS := -g
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
  generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database \
- lngdump telechips gigabeats mktccboot mknkboot rbspeexenc
+ lngdump telechips gigabeats creative hmac-sha1 mktccboot mknkboot rbspeexenc
 
 all:
 	@echo "Run make in your build directory!"
 
-scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o iaudio_bl_flash.o
+scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o iaudio_bl_flash.o creative.o hmac-sha1.o
 descramble: descramble.o iriver.o gigabeat.o
+scramble.o: scramble.c iriver.h mi4.h gigabeat.h telechips.h iaudio_bl_flash.h creative.h
 
-scramble.o: scramble.c iriver.h mi4.h gigabeat.h telechips.h iaudio_bl_flash.h
 descramble.o: descramble.c iriver.h gigabeat.h
+creative.o: creative.c creative.h
+hmac-sha1.o: hmac-sha1.c hmac-sha1.h
 iriver.o: iriver.c iriver.h
 gigabeat.o: gigabeat.c gigabeat.h
 gigabeats.o: gigabeats.c gigabeats.h

@@ -26,6 +26,7 @@
 #include "gigabeats.h"
 #include "mi4.h"
 #include "telechips.h"
+#include "creative.h"
 #include "iaudio_bl_flash.h"
 
 int iaudio_encode(char *iname, char *oname, char *idstring);
@@ -102,7 +103,7 @@ void usage(void)
            "\t-ipod3g ipod firmware partition format (3rd Gen)\n"
            "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
            "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
-           "\t-zvm Zen Vision:M FRESCUE structure format\n"
+           "\t-creative=X Creative firmware structure format\n"
            "\t-gigabeat Toshiba Gigabeat F/X format\n"
            "\t-gigabeats Toshiba Gigabeat S format\n"
            "\t-mi4v2  PortalPlayer .mi4 format (revision 010201)\n"
@@ -332,10 +333,21 @@ int main (int argc, char** argv)
         oname = argv[3];
         return ipod_encode(iname, oname, 3, true);  /* Firmware image v3 */
     }
-    else if(!strcmp(argv[1], "-zvm")) {
+    else if(!strncmp(argv[1], "-creative=", 10)) {
         iname = argv[2];
         oname = argv[3];
-        return zvm_encode(iname, oname);
+        if(!strcmp(&argv[1][10], "zvm"))
+            return zvm_encode(iname, oname, ZENVISIONM);
+        else if(!strcmp(&argv[1][10], "zvm60"))
+            return zvm_encode(iname, oname, ZENVISIONM60);
+        else if(!strcmp(&argv[1][10], "zenvision"))
+            return zvm_encode(iname, oname, ZENVISION);
+        else if(!strcmp(&argv[1][10], "zenv"))
+            return zvm_encode(iname, oname, ZENV);
+        else {
+            fprintf(stderr, "unsupported Creative device: %s\n", &argv[1][10]);
+            return 2;
+        }
     }
     else if(!strncmp(argv[1], "-mi4", 4)) {
         int mi4magic;
@@ -746,99 +758,6 @@ int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
         perror(oname);
         return -4;
     }
-
-    fclose(file);
-
-    return 0;
-}
-
-
-/* Create an Zen Vision:M FRESCUE structure file
-*/
-
-int zvm_encode(char *iname, char *oname)
-{
-    size_t len;
-    int length;
-    FILE *file;
-    unsigned int sum = 0;
-    unsigned char *outbuf;
-    int i;
-
-    file = fopen(iname, "rb");
-    if (!file) {
-       perror(iname);
-       return -1;
-    }
-    fseek(file,0,SEEK_END);
-    length = ftell(file);
-    
-    fseek(file,0,SEEK_SET);
-
-    outbuf = malloc(length+0x18+0x10);
-
-    if ( !outbuf ) {
-       printf("out of memory!\n");
-       return -1;
-    }
-
-    len = fread(outbuf+0x18, 1, length, file);
-    if(len < length) {
-        perror(iname);
-        return -2;
-    }
-    fclose(file);
-
-    /* Calculate checksum for later use in header */
-	for(i=0; i<length; i+= 4)
-		sum += le2int(&outbuf[0x18+i]) + (le2int(&outbuf[0x18+i])>>16);
-
-    /* Clear the header area to zero */
-    memset(outbuf, 0, 0x18);
-
-    /* Header (EDOC) */
-    memcpy((char*)outbuf, "EDOC", 4);
-	/* Total Size */
-	int2le(length+0x20, &outbuf[0x4]);
-	/* 4 bytes of zero */
-	
-	/* Address = 0x900000 */
-	int2le(0x900000, &outbuf[0xC]);
-	/* Size */
-	int2le(length, &outbuf[0x10]);
-	/* Checksum */
-	int2le(sum, &outbuf[0x14]);
-	outbuf[0x16] = 0;
-	outbuf[0x17] = 0;
-	/* Data starts here... */
-	
-	/* Second block starts here ... */
-	/* Address = 0x0 */
-	/* Size */
-	int2le(0x4, &outbuf[0x18+length+0x4]);
-	/* Checksum */
-	outbuf[0x18+length+0x8] = 0xB7;
-	outbuf[0x18+length+0x9] = 0xD5;
-	/* Data: LDR PC, =0x900000 */
-	outbuf[0x18+length+0xC] = 0x18;
-	outbuf[0x18+length+0xD] = 0xF0;
-	outbuf[0x18+length+0xE] = 0x9F;
-	outbuf[0x18+length+0xF] = 0xE5;
-
-
-    file = fopen(oname, "wb");
-    if (!file) {
-       perror(oname);
-       return -3;
-    }
-    
-    len = fwrite(outbuf, 1, length+0x28, file);
-    if(len < length+0x18) {
-        perror(oname);
-        return -4;
-    }
-	
-	free(outbuf);
 
     fclose(file);
 
