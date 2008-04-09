@@ -331,10 +331,12 @@ static int selection_to_val(struct settings_list *setting, int selection)
     return max- (selection * step);
 }
 static char * value_setting_get_name_cb(int selected_item, 
-                                        void * data, char *buffer)
+                                        void * data,
+                                        char *buffer,
+                                        size_t buffer_len)
 {
     selected_item = selection_to_val(data, selected_item);
-    return option_get_valuestring(data, buffer, MAX_PATH, selected_item);
+    return option_get_valuestring(data, buffer, buffer_len, selected_item);
 }
 
 /* wrapper to convert from int param to bool param in option_screen */

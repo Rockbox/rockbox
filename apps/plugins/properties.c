@@ -214,38 +214,39 @@ static bool dir_properties(char* selected_file)
     return true;
 }
 
-char * get_props(int selected_item, void* data, char *buffer)
+char * get_props(int selected_item, void* data, char *buffer, size_t buffer_len)
 {
     (void)data;
 
     switch(selected_item)
     {
         case 0:
-            rb->strcpy(buffer, str_dirname);
+            rb->strncpy(buffer, str_dirname, buffer_len);
             break;
         case 1:
-            rb->strcpy(buffer, its_a_dir ? str_dircount : str_filename);
+            rb->strncpy(buffer, its_a_dir ? str_dircount : str_filename,
+                        buffer_len);
             break;
         case 2:
-            rb->strcpy(buffer, its_a_dir ? str_filecount : str_size);
+            rb->strncpy(buffer, its_a_dir ? str_filecount : str_size, buffer_len);
             break;
         case 3:
-            rb->strcpy(buffer, its_a_dir ? str_size : str_date);
+            rb->strncpy(buffer, its_a_dir ? str_size : str_date, buffer_len);
             break;
         case 4:
-            rb->strcpy(buffer, its_a_dir ? "" : str_time);
+            rb->strncpy(buffer, its_a_dir ? "" : str_time, buffer_len);
             break;
         case 5:
-            rb->strcpy(buffer, its_a_dir ? "" : str_artist);
+            rb->strncpy(buffer, its_a_dir ? "" : str_artist, buffer_len);
             break;
         case 6:
-            rb->strcpy(buffer, its_a_dir ? "" : str_title);
+            rb->strncpy(buffer, its_a_dir ? "" : str_title, buffer_len);
             break;
         case 7:
-            rb->strcpy(buffer, its_a_dir ? "" : str_album);
+            rb->strncpy(buffer, its_a_dir ? "" : str_album, buffer_len);
             break;
         default:
-            rb->strcpy(buffer, "ERROR");
+            rb->strncpy(buffer, "ERROR", buffer_len);
             break;
     }
     return buffer;

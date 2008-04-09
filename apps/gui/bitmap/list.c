@@ -178,7 +178,8 @@ void list_draw(struct screen *display, struct viewport *parent,
         char entry_buffer[MAX_PATH];
         unsigned char *entry_name;
         int text_pos = 0;
-        s = list->callback_get_item_name(i, list->data, entry_buffer);
+        s = list->callback_get_item_name(i, list->data, entry_buffer,
+                                         sizeof(entry_buffer));
         entry_name = P2STR(s);
         display->set_viewport(&list_text[display->screen_type]);
         list_text[display->screen_type].drawmode = STYLE_DEFAULT;

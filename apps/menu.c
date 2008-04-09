@@ -93,13 +93,16 @@ static int find_menu_selection(int selected)
             return i;
     return 0;
 }
-static char * get_menu_item_name(int selected_item,void * data, char *buffer)
+static char * get_menu_item_name(int selected_item,
+                                 void * data,
+                                 char *buffer,
+                                 size_t buffer_len)
 {
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
     int type = (menu->flags&MENU_TYPE_MASK);
     selected_item = get_menu_selection(selected_item, menu);
     
-    (void)buffer;
+    (void)buffer_len;
     /* only MT_MENU or MT_RETURN_ID is allowed in here */
     if (type == MT_RETURN_ID)
     {

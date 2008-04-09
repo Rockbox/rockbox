@@ -1290,7 +1290,8 @@ MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_PRESET),
             radio_preset_callback, Icon_NOICON, &radio_edit_preset_item, 
             &radio_delete_preset_item);
 /* present a list of preset stations */
-char * presets_get_name(int selected_item, void * data, char *buffer)
+static char * presets_get_name(int selected_item, void *data,
+                               char *buffer, size_t buffer_len)
 {
     (void)data;
     struct fmstation *p = &presets[selected_item];
@@ -1299,7 +1300,7 @@ char * presets_get_name(int selected_item, void * data, char *buffer)
     int freq = p->frequency / 10000;
     int frac = freq % 100;
     freq /= 100;
-    snprintf(buffer, MAX_PATH,
+    snprintf(buffer, buffer_len,
              str(LANG_FM_DEFAULT_PRESET_NAME), freq, frac);
     return buffer;
 }

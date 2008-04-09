@@ -59,9 +59,11 @@ typedef enum themable_icons list_get_icon(int selected_item, void * data);
  *             (The content of the buffer may not be used by the list, we use
  *             the return value of the function in all cases to avoid filling
  *             a buffer when it's not necessary)
+ *  - buffer_len : length of the buffer
  * Returns a pointer to a string that contains the text to display
  */
-typedef char * list_get_name(int selected_item, void * data, char * buffer);
+typedef char * list_get_name(int selected_item, void * data,
+                             char * buffer, size_t buffer_len);
 /*
  * Voice callback
  *  - selected_item : an integer that tells the number of the item to speak

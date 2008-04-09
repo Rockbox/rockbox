@@ -527,7 +527,8 @@ void coords_to_pgn(struct pgn_ply_node* ply){
     }
 }
 
-char * get_game_text(int selected_item, void *data, char *buffer){
+char * get_game_text(int selected_item, void *data,
+                     char *buffer, size_t buffer_len){
     int i;
     struct pgn_game_node *temp_node = (struct pgn_game_node *)data;
     char text_buffer[50];
@@ -541,7 +542,7 @@ char * get_game_text(int selected_item, void *data, char *buffer){
     rb->snprintf(text_buffer, 50,"%s vs. %s (%s)", temp_node->white_player,
                          temp_node->black_player, temp_node->game_date);
 
-    rb->strcpy(buffer, text_buffer);
+    rb->strncpy(buffer, text_buffer, buffer_len);
     return buffer;
 }
 

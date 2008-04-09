@@ -146,7 +146,8 @@ enum infoscreenorder
 };
 
 
-static char* info_getname(int selected_item, void *data, char *buffer)
+static char* info_getname(int selected_item, void *data,
+                          char *buffer, size_t buffer_len)
 {
     struct info_data *info = (struct info_data*)data;
 #if CONFIG_RTC
@@ -176,13 +177,13 @@ static char* info_getname(int selected_item, void *data, char *buffer)
     switch (selected_item)
     {
         case INFO_VERSION:
-            snprintf(buffer, MAX_PATH, "%s: %s", 
+            snprintf(buffer, buffer_len, "%s: %s", 
                      str(LANG_VERSION), appsversion);
             break;
 #if CONFIG_RTC
         case INFO_TIME:
             tm = get_time();
-            snprintf(buffer, MAX_PATH, "%02d:%02d:%02d %s", 
+            snprintf(buffer, buffer_len, "%02d:%02d:%02d %s", 
                 global_settings.timeformat == 0 ? tm->tm_hour :
                      ((tm->tm_hour + 11) % 12) + 1,
                      tm->tm_min, 
@@ -192,7 +193,7 @@ static char* info_getname(int selected_item, void *data, char *buffer)
             break;
         case INFO_DATE:
             tm = get_time();
-            snprintf(buffer, MAX_PATH, "%s %d %d", 
+            snprintf(buffer, buffer_len, "%s %d %d", 
                 str(LANG_MONTH_JANUARY + tm->tm_mon),
                 tm->tm_mday,
                 tm->tm_year+1900);
@@ -203,31 +204,31 @@ static char* info_getname(int selected_item, void *data, char *buffer)
             long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
             int integer = buflen / 1000;
             int decimal = buflen % 1000;
-            snprintf(buffer, MAX_PATH, (char *)str(LANG_BUFFER_STAT),
+            snprintf(buffer, buffer_len, (char *)str(LANG_BUFFER_STAT),
                      integer, decimal);
         }
         break;
         case INFO_BATTERY: /* battery */
 #if CONFIG_CHARGING == CHARGING_SIMPLE
             if (charger_input_state == CHARGER)
-                snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_CHARGE));
+                snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_CHARGE));
             else
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
             if (charge_state == CHARGING)
-                snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_CHARGE));
+                snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_CHARGE));
             else
 #if CONFIG_CHARGING == CHARGING_CONTROL
             if (charge_state == TOPOFF)
-                snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_TOPOFF_CHARGE));
+                snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_TOPOFF_CHARGE));
             else
 #endif
             if (charge_state == TRICKLE)
-                snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_TRICKLE_CHARGE));
+                snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_TRICKLE_CHARGE));
             else
 #endif
             if (battery_level() >= 0)
-                snprintf(buffer, MAX_PATH, (char *)str(LANG_BATTERY_TIME), battery_level(),
-                         battery_time() / 60, battery_time() % 60);
+                snprintf(buffer, buffer_len, (char *)str(LANG_BATTERY_TIME),
+                         battery_level(), battery_time() / 60, battery_time() % 60);
             else
                 strcpy(buffer, "(n/a)");
             break;
@@ -235,11 +236,11 @@ static char* info_getname(int selected_item, void *data, char *buffer)
 #ifdef HAVE_MULTIVOLUME
             output_dyn_value(s1, sizeof s1, info->free, kbyte_units, true);
             output_dyn_value(s2, sizeof s2, info->size, kbyte_units, true);
-            snprintf(buffer, MAX_PATH, "%s %s/%s", str(LANG_DISK_NAME_INTERNAL),
+            snprintf(buffer, buffer_len, "%s %s/%s", str(LANG_DISK_NAME_INTERNAL),
                      s1, s2);
 #else
             output_dyn_value(s1, sizeof s1, info->free, kbyte_units, true);
-            snprintf(buffer, MAX_PATH, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
+            snprintf(buffer, buffer_len, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
 #endif
             break;
         case INFO_DISK2: /* disk usage 2 */
@@ -248,17 +249,17 @@ static char* info_getname(int selected_item, void *data, char *buffer)
             {
                 output_dyn_value(s1, sizeof s1, info->free2, kbyte_units, true);
                 output_dyn_value(s2, sizeof s2, info->size2, kbyte_units, true);
-                snprintf(buffer, MAX_PATH, "%s %s/%s", str(LANG_DISK_NAME_MMC),
+                snprintf(buffer, buffer_len, "%s %s/%s", str(LANG_DISK_NAME_MMC),
                          s1, s2);
             }
             else 
             {
-                snprintf(buffer, MAX_PATH, "%s %s", str(LANG_DISK_NAME_MMC),
+                snprintf(buffer, buffer_len, "%s %s", str(LANG_DISK_NAME_MMC),
                          str(LANG_NOT_PRESENT));
             }
 #else
             output_dyn_value(s1, sizeof s1, info->size, kbyte_units, true);
-            snprintf(buffer, MAX_PATH, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
+            snprintf(buffer, buffer_len, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
             break;
     }

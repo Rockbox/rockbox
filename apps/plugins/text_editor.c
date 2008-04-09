@@ -115,18 +115,19 @@ int _do_action(int action, char* str, int line)
     last_char_index = c;
     return 1;
 }
-char *list_get_name_cb(int selected_item,void* data,char* buf)
+char *list_get_name_cb(int selected_item, void* data,
+                       char* buf, size_t buf_len)
 {
     char *b = &buffer[do_action(ACTION_GET,0,selected_item)];
     (void)data;
-    if (rb->strlen(b) >= MAX_PATH)
+    if (rb->strlen(b) >= buf_len)
     {
-        char t = b[MAX_PATH-10];
-        b[MAX_PATH-10] = '\0';
-        rb->snprintf(buf,MAX_PATH,"%s ...",b);
-        b[MAX_PATH-10] = t;
+        char t = b[buf_len-10];
+        b[buf_len-10] = '\0';
+        rb->snprintf(buf , buf_len, "%s ...", b);
+        b[buf_len-10] = t;
     }
-    else rb->strcpy(buf,b);
+    else rb->strncpy(buf, b, buf_len);
     return buf;
 }
 char filename[MAX_PATH];

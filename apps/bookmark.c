@@ -96,7 +96,10 @@ static bool  parse_bookmark(const char *bookmark,
                             bool *shuffle,
                             char* file_name);
 static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line);
-static char* get_bookmark_info(int list_index, void* data, char *buffer);
+static char* get_bookmark_info(int list_index,
+                               void* data,
+                               char *buffer,
+                               size_t buffer_len);
 static char* select_bookmark(const char* bookmark_file_name, bool show_dont_resume);
 static bool  system_check(void);
 static bool  write_bookmark(bool create_bookmark_file);
@@ -523,7 +526,10 @@ static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
     return bookmarks->start + bookmarks->count;
 }
 
-static char* get_bookmark_info(int list_index, void* data, char *buffer)
+static char* get_bookmark_info(int list_index,
+                               void* data,
+                               char *buffer,
+                               size_t buffer_len)
 {
     struct bookmark_list* bookmarks = (struct bookmark_list*) data;
     int     index = list_index / 2;
@@ -625,7 +631,7 @@ static char* get_bookmark_info(int list_index, void* data, char *buffer)
         }
         
         strrsplt(global_filename, '.');
-        snprintf(buffer, MAX_PATH, format, name, global_filename);
+        snprintf(buffer, buffer_len, format, name, global_filename);
         return buffer;
     }
     else
@@ -633,7 +639,7 @@ static char* get_bookmark_info(int list_index, void* data, char *buffer)
         char time_buf[32];
 
         format_time(time_buf, sizeof(time_buf), resume_time);
-        snprintf(buffer, MAX_PATH, "%s, %d%s", time_buf, resume_index + 1,
+        snprintf(buffer, buffer_len, "%s, %d%s", time_buf, resume_index + 1,
             shuffle ? (char*) str(LANG_BOOKMARK_SHUFFLE) : "");
         return buffer;
     }

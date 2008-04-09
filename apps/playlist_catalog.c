@@ -188,11 +188,11 @@ exit:
 
 /* Callback for gui_synclist */
 static char* playlist_callback_name(int selected_item, void* data,
-                                    char* buffer)
+                                    char* buffer, size_t buffer_len)
 {
     char** playlists = (char**) data;
 
-    strncpy(buffer, playlists[selected_item], MAX_PATH);
+    strncpy(buffer, playlists[selected_item], buffer_len);
 
     if (buffer[0] != '.' && !(global_settings.show_filename_ext == 1
         || (global_settings.show_filename_ext == 3

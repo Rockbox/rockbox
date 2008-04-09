@@ -82,7 +82,8 @@ void list_draw(struct screen *display, struct viewport *parent,
             break;
         s = gui_list->callback_get_item_name(current_item,
                                              gui_list->data,
-                                             entry_buffer);
+                                             entry_buffer,
+                                             sizeof(entry_buffer));
         entry_name = P2STR(s);
 
 

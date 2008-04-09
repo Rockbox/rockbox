@@ -134,7 +134,8 @@ static char thread_status_char(unsigned status)
     return thread_status_chars[status];
 }
 
-static char* threads_getname(int selected_item, void * data, char *buffer)
+static char* threads_getname(int selected_item, void *data,
+                             char *buffer, size_t buffer_len)
 {
     (void)data;
     struct thread_entry *thread;
@@ -143,7 +144,7 @@ static char* threads_getname(int selected_item, void * data, char *buffer)
 #if NUM_CORES > 1
     if (selected_item < (int)NUM_CORES)
     {
-        snprintf(buffer, MAX_PATH, "Idle (%d): %2d%%", selected_item,
+        snprintf(buffer, buffer_len, "Idle (%d): %2d%%", selected_item,
                  idle_stack_usage(selected_item));
         return buffer;
     }
@@ -155,13 +156,13 @@ static char* threads_getname(int selected_item, void * data, char *buffer)
 
     if (thread->state == STATE_KILLED)
     {
-        snprintf(buffer, MAX_PATH, "%2d: ---", selected_item);
+        snprintf(buffer, buffer_len, "%2d: ---", selected_item);
         return buffer;
     }
 
     thread_get_name(name, 32, thread);
 
-    snprintf(buffer, MAX_PATH,
+    snprintf(buffer, buffer_len,
              "%2d: " IF_COP("(%d) ") "%c%c " IF_PRIO("%d %d ") "%2d%% %s",
              selected_item,
              IF_COP(thread->core,)
@@ -771,18 +772,19 @@ static bool dbg_hw_info(void)
 #endif /* !SIMULATOR */
 
 #ifndef SIMULATOR
-static char* dbg_partitions_getname(int selected_item, void * data, char *buffer)
+static char* dbg_partitions_getname(int selected_item, void *data,
+                                    char *buffer, size_t buffer_len)
 {
     (void)data;
     int partition = selected_item/2;
     struct partinfo* p = disk_partinfo(partition);
     if (selected_item%2)
     {
-        snprintf(buffer, MAX_PATH, "   T:%x %ld MB", p->type, p->size / 2048);
+        snprintf(buffer, buffer_len, "   T:%x %ld MB", p->type, p->size / 2048);
     }
     else
     {
-        snprintf(buffer, MAX_PATH, "P%d: S:%lx", partition, p->start);
+        snprintf(buffer, buffer_len, "P%d: S:%lx", partition, p->start);
     }
     return buffer;
 }
@@ -1468,7 +1470,8 @@ char *itob(int n, int len)
     binary[j] = '\0';
     return binary;
 }
-static char* tsc2100_debug_getname(int selected_item, void * data, char *buffer)
+static char* tsc2100_debug_getname(int selected_item, void * data,
+                                   char *buffer, size_t buffer_len)
 {
     int *page = (int*)data;
     bool reserved = false;
@@ -1491,9 +1494,9 @@ static char* tsc2100_debug_getname(int selected_item, void * data, char *buffer)
             break;
     }
     if (reserved)
-        snprintf(buffer, MAX_PATH, "%02x: RESERVED", selected_item);
+        snprintf(buffer, buffer_len, "%02x: RESERVED", selected_item);
     else
-        snprintf(buffer, MAX_PATH, "%02x: %s", selected_item,
+        snprintf(buffer, buffer_len, "%02x: %s", selected_item,
                     itob(tsc2100_readreg(*page, selected_item)&0xffff,16));
     return buffer;
 }
@@ -2491,9 +2494,10 @@ static int menu_action_callback(int btn, struct gui_synclist *lists)
     }
     return btn;
 }
-static char* dbg_menu_getname(int item, void * data, char *buffer)
+static char* dbg_menu_getname(int item, void * data,
+                              char *buffer, size_t buffer_len)
 {
-    (void)data; (void)buffer;
+    (void)data; (void)buffer; (void)buffer_len;
     return menuitems[item].desc;
 }
 bool debug_menu(void)

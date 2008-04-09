@@ -1116,7 +1116,8 @@ static const int id3_headers[]=
     LANG_ID3_PATH,
 };
 
-static char * id3_get_info(int selected_item, void* data, char *buffer)
+static char * id3_get_info(int selected_item, void* data,
+                           char *buffer, size_t buffer_len)
 {
     struct mp3entry* id3 =(struct mp3entry*)data;
     int info_no=selected_item/2;
@@ -1150,7 +1151,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                     info = id3->disc_string;
                 else if (id3->discnum)
                 {
-                    snprintf(buffer, MAX_PATH, "%d", id3->discnum);
+                    snprintf(buffer, buffer_len, "%d", id3->discnum);
                     info = buffer;
                 }
                 break;
@@ -1159,7 +1160,7 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                     info = id3->track_string;
                 else if (id3->tracknum)
                 {
-                    snprintf(buffer, MAX_PATH, "%d", id3->tracknum);
+                    snprintf(buffer, buffer_len, "%d", id3->tracknum);
                     info = buffer;
                 }
                 break;
@@ -1174,26 +1175,26 @@ static char * id3_get_info(int selected_item, void* data, char *buffer)
                     info = id3->year_string;
                 else if (id3->year)
                 {
-                    snprintf(buffer, MAX_PATH, "%d", id3->year);
+                    snprintf(buffer, buffer_len, "%d", id3->year);
                     info = buffer;
                 }
                 break;
             case 10:/*LANG_ID3_LENGTH*/
-                format_time(buffer, MAX_PATH, id3->length);
+                format_time(buffer, buffer_len, id3->length);
                 info=buffer;
                 break;
             case 11:/*LANG_ID3_PLAYLIST*/
-                snprintf(buffer, MAX_PATH, "%d/%d", playlist_get_display_index(),
+                snprintf(buffer, buffer_len, "%d/%d", playlist_get_display_index(),
             playlist_amount());
                 info=buffer;
                 break;
             case 12:/*LANG_ID3_BITRATE*/
-                snprintf(buffer, MAX_PATH, "%d kbps%s", id3->bitrate,
+                snprintf(buffer, buffer_len, "%d kbps%s", id3->bitrate,
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
                 info=buffer;
                 break;
             case 13:/*LANG_ID3_FREQUENCY*/
-                snprintf(buffer, MAX_PATH, "%ld Hz", id3->frequency);
+                snprintf(buffer, buffer_len, "%ld Hz", id3->frequency);
                 info=buffer;
                 break;
 #if CONFIG_CODEC == SWCODEC
@@ -1236,21 +1237,23 @@ bool browse_id3(void)
     }
 }
 
-static char* runtime_get_data(int selected_item, void* data, char* buffer)
+static char* runtime_get_data(int selected_item, void* data,
+                              char* buffer, size_t buffer_len)
 {
-    (void) data;
+    (void)data;
     unsigned char *headers[] = {str(LANG_RUNNING_TIME), str(LANG_TOP_TIME) };
     int t;
     if(!(selected_item%2))
         return headers[selected_item/2];
 
-    if(selected_item/2) t = global_status.topruntime;
+    if(selected_item/2)
+        t = global_status.topruntime;
+
     else t = global_status.runtime;
 
-    snprintf(buffer, 16, "%dh %dm %ds",
+    snprintf(buffer, buffer_len, "%dh %dm %ds",
         t / 3600, (t % 3600) / 60, t % 60);
     return buffer;
-
 }
 
 static int runtime_speak_data(int selected_item, void* data)

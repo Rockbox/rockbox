@@ -39,7 +39,8 @@ static bool usb_connected = false;
 enum sc_list_action_type draw_sc_list(struct gui_synclist gui_sc);
 
 /* Will be passed sc_file* as data */
-char* build_sc_list(int selected_item, void *data, char *buffer);
+char* build_sc_list(int selected_item, void *data,
+                    char *buffer, size_t buffer_len);
 
 /* Returns true iff we should leave the main loop */
 bool list_sc(bool is_editable);
@@ -91,17 +92,16 @@ enum sc_list_action_type draw_sc_list(struct gui_synclist gui_sc)
 }
 
 
-char* build_sc_list(int selected_item, void *data, char *buffer)
+char* build_sc_list(int selected_item, void *data,
+                    char *buffer, size_t buffer_len)
 {
-    char text_buffer[MAX_PATH];
     sc_file_t *file = (sc_file_t*)data;
     
     if (!is_valid_index(file, selected_item)) {
         return NULL;
     }
     sc_entry_t *entry = file->entries + selected_item;
-    rb->snprintf(text_buffer, sizeof(text_buffer), "%s", entry->disp);
-    rb->strcpy(buffer, text_buffer);
+    rb->snprintf(buffer, buffer_len, "%s", entry->disp);
     return buffer;
 }
 

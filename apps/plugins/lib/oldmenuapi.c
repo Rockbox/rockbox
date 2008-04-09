@@ -40,10 +40,11 @@ struct menu {
 static struct menu menus[MAX_MENUS];
 static bool inuse[MAX_MENUS] = { false };
 
-static char * menu_get_itemname(int selected_item, void * data, char *buffer)
+static char * menu_get_itemname(int selected_item, void * data,
+                                char *buffer, size_t buffer_len)
 {
+    (void)buffer; (void)buffer_len;
     struct menu *local_menus=(struct menu *)data;
-    (void)buffer;
     return(local_menus->items[selected_item].desc);
 }
 

@@ -254,10 +254,10 @@ void generate(void)
     rb->write(fd,&dirs_count,sizeof(int));
     rb->close(fd);
 }
-char *list_get_name_cb(int selected_item,void* data,char* buf)
+char *list_get_name_cb(int selected_item, void* data, char* buf, size_t buf_len)
 {
     (void)data;
-    rb->strcpy(buf,list->folder[selected_item]);
+    rb->strncpy(buf, list->folder[selected_item], buf_len);
     return buf;
 }
 

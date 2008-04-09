@@ -421,15 +421,18 @@ struct cb_data {
     int *items;
     char *current_file;
 };
-enum themable_icons openwith_get_icon(int selected_item, void * data)
+
+static enum themable_icons openwith_get_icon(int selected_item, void * data)
 {
     struct cb_data *info = (struct cb_data *)data;
     int *items = info->items;
     return filetypes[items[selected_item]].icon;
 }
-char * openwith_get_name(int selected_item, void * data, char * buffer)
+
+static char * openwith_get_name(int selected_item, void * data,
+                                char * buffer, size_t buffer_len)
 {
-    (void)buffer;
+    (void)buffer; (void)buffer_len;
     struct cb_data *info = (struct cb_data *)data;
     int *items = info->items;
     char *s = strrchr(filetypes[items[selected_item]].plugin, '/');
@@ -437,7 +440,8 @@ char * openwith_get_name(int selected_item, void * data, char * buffer)
         return s+1;
     else return filetypes[items[selected_item]].plugin;
 }
-int openwith_action_callback(int action, struct gui_synclist *lists)
+
+static int openwith_action_callback(int action, struct gui_synclist *lists)
 {
     struct cb_data *info = (struct cb_data *)lists->data;
     int *items = info->items;
@@ -453,6 +457,7 @@ int openwith_action_callback(int action, struct gui_synclist *lists)
     }
     return action;
 }
+
 int filetype_list_viewers(const char* current_file)
 {
     int i, count = 0;
