@@ -244,7 +244,7 @@ static void set_prescaled_volume(void)
  * the prescaler stay at 0 for these unless SW tone controls are in use */
 #if defined(HAVE_SW_TONE_CONTROLS) || !(defined(HAVE_WM8975) \
     || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751) \
-    || defined(HAVE_WM8758))
+    || defined(HAVE_WM8758) || defined(HAVE_WM8985))
 
     prescale = MAX(current_bass, current_treble);
     if (prescale < 0)
@@ -453,7 +453,7 @@ void sound_set_bass(int value)
     audiohw_set_bass(value);
     set_prescaled_volume();
 #elif defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_UDA1380) \
-    || defined HAVE_WM8731 || defined(HAVE_WM8721)
+    || defined HAVE_WM8731 || defined(HAVE_WM8721) || defined(HAVE_WM8985)
     current_bass = value * 10;
     audiohw_set_bass(value);
     set_prescaled_volume();
@@ -483,7 +483,7 @@ void sound_set_treble(int value)
     current_treble = value;
     set_prescaled_volume();
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_UDA1380) \
-   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8985)
     audiohw_set_treble(value);
     current_treble = value * 10;
     set_prescaled_volume();
@@ -518,7 +518,7 @@ void sound_set_stereo_width(int value)
 #endif
 }
 
-#ifdef HAVE_WM8758
+#if defined(HAVE_WM8758) || defined(HAVE_WM8985)
 void sound_set_bass_cutoff(int value)
 {
     if(!audio_is_initialized)
@@ -697,7 +697,7 @@ void sound_set_superbass(int value)
 }
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
-#ifdef HAVE_WM8758
+#if defined(HAVE_WM8758) || defined(HAVE_WM8985)
 void sound_set_bass_cutoff(int value)
 {
     (void) value;

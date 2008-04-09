@@ -69,7 +69,7 @@ enum {
     SOUND_RIGHT_GAIN,
     SOUND_MIC_GAIN,
 #endif
-#ifdef HAVE_WM8758
+#if defined(HAVE_WM8758) || defined(HAVE_WM8985)
     SOUND_BASS_CUTOFF,
     SOUND_TREBLE_CUTOFF,
 #endif

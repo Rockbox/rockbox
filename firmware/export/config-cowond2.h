@@ -83,8 +83,8 @@
 /* The D2 uses a WM8985 codec */
 #define HAVE_WM8985
 
-/* There is no hardware tone control */
-#define HAVE_SW_TONE_CONTROLS
+/* Use WM8985 EQ1 & EQ5 as hardware tone controls */
+/* #define HAVE_SW_TONE_CONTROLS */
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
