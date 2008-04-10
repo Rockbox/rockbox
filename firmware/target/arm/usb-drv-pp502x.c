@@ -428,7 +428,7 @@ void usb_drv_int(void)
 
     /* usb transaction interrupt */
     if (status & USBSTS_INT) {
-        REG_USBSTS |= USBSTS_INT;
+        REG_USBSTS = USBSTS_INT;
 
         /* a control packet? */
         if (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0) {
@@ -441,20 +441,20 @@ void usb_drv_int(void)
 
     /* error interrupt */
     if (status & USBSTS_ERR) {
-        REG_USBSTS |= USBSTS_ERR;
+        REG_USBSTS = USBSTS_ERR;
         logf("usb error int");
     }
 
     /* reset interrupt */
     if (status & USBSTS_RESET) {
-        REG_USBSTS |= USBSTS_RESET;
+        REG_USBSTS = USBSTS_RESET;
         bus_reset();
         usb_core_bus_reset(); /* tell mom */
     }
 
     /* port change */
     if (status & USBSTS_PORT_CHANGE) {
-        REG_USBSTS |= USBSTS_PORT_CHANGE;
+        REG_USBSTS = USBSTS_PORT_CHANGE;
     }
 }
 
@@ -688,7 +688,7 @@ static void control_received(void)
     tmp[1] = qh_array[0].setup_buffer[1];
 
     /* acknowledge packet recieved */
-    REG_ENDPTSETUPSTAT |= EPSETUP_STATUS_EP0;
+    REG_ENDPTSETUPSTAT = EPSETUP_STATUS_EP0;
 
     /* Stop pending control transfers */
     for(i=0;i<2;i++) {
@@ -706,7 +706,7 @@ static void transfer_completed(void)
 {
     int ep;
     unsigned int mask = REG_ENDPTCOMPLETE;
-    REG_ENDPTCOMPLETE |= mask;
+    REG_ENDPTCOMPLETE = mask;
 
     for (ep=0; ep<NUM_ENDPOINTS; ep++) {
         int dir;
