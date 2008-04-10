@@ -1026,7 +1026,7 @@ int gen_h_header(struct font* pf, char *path)
     strcpy(buf, ctime(&t));
     buf[strlen(buf)-1] = 0;
 
-    fprintf(ofp, hdr1, buf, 
+    fprintf(ofp, hdr1, buf,
             pf->name,
             pf->facename? pf->facename: "",
             pf->maxwidth,
@@ -1034,7 +1034,7 @@ int gen_h_header(struct font* pf, char *path)
             pf->size,
             pf->ascent);
 
-    fprintf(ofp, hdr2, buf,            
+    fprintf(ofp, hdr2, 
             pf->descent,
             pf->firstchar,
             pf->firstchar+pf->size-1,
