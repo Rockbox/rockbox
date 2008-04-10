@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * ### line of auto-generated stuff I don't understand ###
  *
- * Copyright (C) 2006 Malcolm Tyrrell
+ * Copyright (C) 2006, 2008 Malcolm Tyrrell
  *
  * MazezaM - a Rockbox version of my ZX Spectrum game from 2002
  *
@@ -21,193 +20,60 @@
 #include "plugin.h"
 #include "configfile.h"
 #include "helper.h"
+#include "pluginlib_actions.h"
+#include "playback_control.h"
 
 /* Include standard plugin macro */
 PLUGIN_HEADER
 
 static struct plugin_api* rb;
 
+/* The plugin actions of interest. */
+const struct button_mapping *plugin_contexts[]
+= {generic_directions, generic_actions};
+
 MEM_FUNCTION_WRAPPERS(rb);
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define MAZEZAM_UP                  BUTTON_UP
-#define MAZEZAM_DOWN                BUTTON_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_PLAY
+/* Use the standard plugin buttons rather than a hard-to-maintain list of
+ * MazezaM specific buttons. */
+#define MAZEZAM_UP                  PLA_UP
+#define MAZEZAM_UP_REPEAT           PLA_UP_REPEAT
+#define MAZEZAM_DOWN                PLA_DOWN
+#define MAZEZAM_DOWN_REPEAT         PLA_DOWN_REPEAT
+#define MAZEZAM_LEFT                PLA_LEFT
+#define MAZEZAM_LEFT_REPEAT         PLA_LEFT_REPEAT
+#define MAZEZAM_RIGHT               PLA_RIGHT
+#define MAZEZAM_RIGHT_REPEAT        PLA_RIGHT_REPEAT
+#define MAZEZAM_MENU                PLA_QUIT
 
-#define MAZEZAM_RETRY               BUTTON_F1
-#define MAZEZAM_RETRY_KEYNAME       "[F1]"
-#define MAZEZAM_QUIT                BUTTON_OFF
-#define MAZEZAM_QUIT_KEYNAME        "[OFF]"
+/* All the text is here */
+#define MAZEZAM_TEXT_GAME_OVER       "Game Over"
+#define MAZEZAM_TEXT_LIVES           "Level %d, Lives %d"
+#define MAZEZAM_TEXT_CHECKPOINT      "Checkpoint reached"
+#define MAZEZAM_TEXT_WELLDONE_TITLE  "You have escaped!"
+#define MAZEZAM_TEXT_WELLDONE_OPTION "Goodbye"
+#define MAZEZAM_TEXT_MAZEZAM_MENU    "MazezaM Menu"
+#define MAZEZAM_TEXT_RETRY_LEVEL     "Retry level"
+#define MAZEZAM_TEXT_AUDIO_PLAYBACK  "Audio playback"
+#define MAZEZAM_TEXT_QUIT            "Quit"
+#define MAZEZAM_TEXT_BACK            "Return"
+#define MAZEZAM_TEXT_MAIN_MENU       "MazezaM"
+#define MAZEZAM_TEXT_CONTINUE        "Play from checkpoint"
+#define MAZEZAM_TEXT_PLAY_GAME       "Play game"
+#define MAZEZAM_TEXT_PLAY_NEW_GAME   "Play new game"
 
-#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
-#define MAZEZAM_UP                  BUTTON_UP
-#define MAZEZAM_DOWN                BUTTON_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_SELECT
-
-#define MAZEZAM_RETRY               BUTTON_F1
-#define MAZEZAM_RETRY_KEYNAME       "[F1]"
-#define MAZEZAM_QUIT                BUTTON_OFF
-#define MAZEZAM_QUIT_KEYNAME        "[OFF]"
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define MAZEZAM_UP                  BUTTON_UP
-#define MAZEZAM_DOWN                BUTTON_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_RIGHT
-
-#define MAZEZAM_RETRY               BUTTON_MENU
-#define MAZEZAM_RETRY_KEYNAME       "[MENU]"
-#define MAZEZAM_QUIT                BUTTON_OFF
-#define MAZEZAM_QUIT_KEYNAME        "[OFF]"
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#define MAZEZAM_UP                  BUTTON_UP
-#define MAZEZAM_DOWN                BUTTON_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_SELECT
-
-#define MAZEZAM_RETRY               BUTTON_REC
-#define MAZEZAM_RETRY_KEYNAME       "[REC]"
-#define MAZEZAM_QUIT                BUTTON_POWER
-#define MAZEZAM_QUIT_KEYNAME        "[POWER]"
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define MAZEZAM_UP                  BUTTON_MENU
-#define MAZEZAM_DOWN                BUTTON_PLAY
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_SELECT
-
-#define MAZEZAM_RETRY               BUTTON_SELECT
-#define MAZEZAM_RETRY_KEYNAME       "[SELECT]"
-#define MAZEZAM_QUIT                (BUTTON_SELECT | BUTTON_REPEAT)
-#define MAZEZAM_QUIT_KEYNAME        "[SELECT] (held)"
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define MAZEZAM_UP                  BUTTON_UP
-#define MAZEZAM_DOWN                BUTTON_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_SELECT
-
-#define MAZEZAM_RETRY               BUTTON_ON
-#define MAZEZAM_RETRY_KEYNAME       "[ON]"
-#define MAZEZAM_QUIT                BUTTON_OFF
-#define MAZEZAM_QUIT_KEYNAME        "[OFF]"
-
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define MAZEZAM_UP                  BUTTON_UP
-#define MAZEZAM_DOWN                BUTTON_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_SELECT
-
-#define MAZEZAM_RETRY               BUTTON_A
-#define MAZEZAM_RETRY_KEYNAME       "[A]"
-#define MAZEZAM_QUIT                BUTTON_POWER
-#define MAZEZAM_QUIT_KEYNAME        "[POWER]"
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-(CONFIG_KEYPAD == SANSA_C200_PAD)
-#define MAZEZAM_UP                  BUTTON_UP
-#define MAZEZAM_DOWN                BUTTON_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_SELECT
-
-#define MAZEZAM_RETRY               BUTTON_REC
-#define MAZEZAM_RETRY_KEYNAME       "[REC]"
-#define MAZEZAM_QUIT                BUTTON_POWER
-#define MAZEZAM_QUIT_KEYNAME        "[POWER]"
-
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#define MAZEZAM_UP                  BUTTON_SCROLL_UP
-#define MAZEZAM_DOWN                BUTTON_SCROLL_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_PLAY
-
-#define MAZEZAM_RETRY               BUTTON_PLAY
-#define MAZEZAM_RETRY_KEYNAME       "[PLAY]"
-#define MAZEZAM_QUIT                BUTTON_POWER
-#define MAZEZAM_QUIT_KEYNAME        "[POWER]"
-
-#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
-#define MAZEZAM_UP                  BUTTON_UP
-#define MAZEZAM_DOWN                BUTTON_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_SELECT
-
-#define MAZEZAM_RETRY               BUTTON_PLAY
-#define MAZEZAM_RETRY_KEYNAME       "[PLAY]"
-#define MAZEZAM_QUIT                BUTTON_BACK
-#define MAZEZAM_QUIT_KEYNAME        "[BACK]"
-
-#elif (CONFIG_KEYPAD == MROBE100_PAD)
-#define MAZEZAM_UP                  BUTTON_UP
-#define MAZEZAM_DOWN                BUTTON_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_SELECT
-
-#define MAZEZAM_RETRY               BUTTON_DISPLAY
-#define MAZEZAM_RETRY_KEYNAME       "[DISPLAY]"
-#define MAZEZAM_QUIT                BUTTON_POWER
-#define MAZEZAM_QUIT_KEYNAME        "[POWER]"
-
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define MAZEZAM_UP                  BUTTON_RC_VOL_UP
-#define MAZEZAM_DOWN                BUTTON_RC_VOL_DOWN
-#define MAZEZAM_LEFT                BUTTON_RC_REW
-#define MAZEZAM_RIGHT               BUTTON_RC_FF
-#define MAZEZAM_SELECT              BUTTON_RC_PLAY
-
-#define MAZEZAM_RETRY               BUTTON_RC_MODE
-#define MAZEZAM_RETRY_KEYNAME       "[MODE]"
-#define MAZEZAM_QUIT                BUTTON_RC_REC
-#define MAZEZAM_QUIT_KEYNAME        "[REC]"
-
-#elif (CONFIG_KEYPAD == COWOND2_PAD)
-#define MAZEZAM_UP                  BUTTON_UP
-#define MAZEZAM_DOWN                BUTTON_DOWN
-#define MAZEZAM_LEFT                BUTTON_LEFT
-#define MAZEZAM_RIGHT               BUTTON_RIGHT
-#define MAZEZAM_SELECT              BUTTON_SELECT
-
-#define MAZEZAM_RETRY               BUTTON_SELECT
-#define MAZEZAM_RETRY_KEYNAME       "[PLAY]"
-#define MAZEZAM_QUIT                BUTTON_POWER
-#define MAZEZAM_QUIT_KEYNAME        "[POWER]"
-
-#else
-#error No keymap defined!
-#endif
-
-/* The gap for the border around the heading in text pages. In fact, 2 is
- * really the only acceptable value.
- */
-#define MAZEZAM_MENU_BORDER        2
-#define MAZEZAM_EXTRA_LIFE         2 /* get an extra life every _ levels */
-#define MAZEZAM_START_LIVES        3 /* how many lives at game start */
+#define MAZEZAM_START_LIVES         3 /* how many lives at game start */
+#define MAZEZAM_FIRST_CHECKPOINT    3 /* The level at the first checkpoint */
+#define MAZEZAM_CHECKPOINT_INTERVAL 4 /* A checkpoint every _ levels */
 
 #ifdef HAVE_LCD_COLOR
-#define MAZEZAM_HEADING_COLOR      LCD_RGBPACK(255,255,  0) /* Yellow      */
-#define MAZEZAM_BORDER_COLOR       LCD_RGBPACK(  0,  0,255) /* Blue        */
-#define MAZEZAM_TEXT_COLOR         LCD_RGBPACK(255,255,255) /* White       */
-#define MAZEZAM_BG_COLOR           LCD_RGBPACK(  0,  0,  0) /* Black       */
-#define MAZEZAM_WALL_COLOR         LCD_RGBPACK(100,100,100) /* Dark gray   */
-#define MAZEZAM_PLAYER_COLOR       LCD_RGBPACK(255,255,255) /* White       */
-#define MAZEZAM_GATE_COLOR         LCD_RGBPACK(100,100,100) /* Dark gray   */
+#define MAZEZAM_HEADING_COLOR      LCD_RGBPACK(255,255,  0) /* Yellow    */
+#define MAZEZAM_BORDER_COLOR       LCD_RGBPACK(  0,  0,255) /* Blue      */
+#define MAZEZAM_COLOR              LCD_RGBPACK(255,255,255) /* White     */
+#define MAZEZAM_BG_COLOR           LCD_RGBPACK(  0,  0,  0) /* Black     */
+#define MAZEZAM_WALL_COLOR         LCD_RGBPACK(100,100,100) /* Dark gray */
+#define MAZEZAM_PLAYER_COLOR       LCD_RGBPACK(255,255,255) /* White     */
+#define MAZEZAM_GATE_COLOR         LCD_RGBPACK(100,100,100) /* Dark gray */
 
 /* the rows are coloured sequentially */
 #define MAZEZAM_NUM_CHUNK_COLORS   8
@@ -226,7 +92,7 @@ static const unsigned chunk_colors[MAZEZAM_NUM_CHUNK_COLORS] = {
 
 #define MAZEZAM_HEADING_GRAY       LCD_BLACK
 #define MAZEZAM_BORDER_GRAY        LCD_DARKGRAY
-#define MAZEZAM_TEXT_GRAY          LCD_BLACK
+#define MAZEZAM_GRAY               LCD_BLACK
 #define MAZEZAM_BG_GRAY            LCD_WHITE
 #define MAZEZAM_WALL_GRAY          LCD_DARKGRAY
 #define MAZEZAM_PLAYER_GRAY        LCD_BLACK
@@ -245,69 +111,16 @@ static const unsigned chunk_gray_shade[MAZEZAM_NUM_CHUNK_GRAYS] = {
 };
 #endif
 
-#define MAZEZAM_GAMEOVER_TEXT      "Game Over"
-#define MAZEZAM_GAMEOVER_DELAY     (3 * HZ) / 2
-#define MAZEZAM_LEVEL_LIVES_TEXT   "Level %d, Lives %d"
-#define MAZEZAM_LEVEL_LIVES_DELAY  HZ
-#define MAZEZAM_WELLDONE_DELAY     4 * HZ
-
-/* The maximum number of lines that a text page can display.
- * This must be 4 or less if the Archos recorder is to be
- * supported.
- */
-#define MAZEZAM_TEXT_MAXLINES      4
-
-/* A structure for holding text pages */
-struct textpage {
-    /* Ensure 1 < num_lines <= MAZEZAM_TEXT_MAXLINES */
-    short num_lines;
-    char *line[MAZEZAM_TEXT_MAXLINES]; /* text of lines */
-};
-
-/* The text page for the welcome screen */
-static const struct textpage title_page = {
-    4,
-    {"MazezaM", "play game", "instructions", "quit"}
-};
-
-/* The number of help screens */
-#define MAZEZAM_NUM_HELP_PAGES   4
-
-/* The instruction screens */
-static const struct textpage help_page[] = {
-    {4,{"Instructions","10 mazezams","bar your way","to freedom"}},
-    {4,{"Instructions","Push the rows","left and right","to escape"}},
-    {4,{"Instructions","Press " MAZEZAM_RETRY_KEYNAME " to","retry a level",
-                                                              "(lose 1 life)"}},
-    {4,{"Instructions","Press " MAZEZAM_QUIT_KEYNAME,"to quit","the game"}}
-};
-
-/* the text of the screen that asks for a quit confirmation */
-static const struct textpage confirm_page = {
-    4,
-    {"Quit","Are you sure?","yes","no"}
-};
-
-/* the text of the screen at the end of the game */
-static const struct textpage welldone_page = {
-    3,
-    {"Well Done","You have","escaped",""}
-};
-
-/* the text of the screen asking if the user wants to
- * resume or start a new game.
- */
-static const struct textpage resume_page = {
-    3,
-    {"Checkpoint", "continue", "new game"}
-};
+#define MAZEZAM_DELAY_CHECKPOINT   HZ
+#define MAZEZAM_DELAY_LIVES        HZ
+#define MAZEZAM_DELAY_GAME_OVER     (3 * HZ) / 2
 
 /* maximum height of a level */
 #define MAZEZAM_MAX_LINES         11
 /* maximum number of chunks on a line */
 #define MAZEZAM_MAX_CHUNKS        5
 
-/* A structure for holding levels */
+/* A structure for storing level data in unparsed form */
 struct mazezam_level {
     short height;                  /* the number of lines */
     short width;                   /* the width */
@@ -316,9 +129,7 @@ struct mazezam_level {
     char *line[MAZEZAM_MAX_LINES]; /* the chunk data in string form */
 };
 
-/* The number of levels. Note that the instruction screens reference this
- * number
- */
+/* The number of levels. */
 #define MAZEZAM_NUM_LEVELS        10
 
 /* The levels. In theory, they could be stored in a file so this data
@@ -331,33 +142,29 @@ struct mazezam_level {
  * http://webpages.dcu.ie/~tyrrelma/MazezaM.
  */
 static const struct mazezam_level level_data[MAZEZAM_NUM_LEVELS] = {
-    {2,7,0,0,{" $  $"," $  $$",NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
-                  NULL}},
-    {3,8,2,1,{"  $  $$$","  $ $ $"," $ $ $",NULL,NULL,NULL,NULL,NULL,NULL,
-                 NULL,NULL}},
+    {2,7,0,0,{" $  $"," $  $$"}},
+    {3,8,2,1,{"  $  $$$","  $ $ $"," $ $ $"}},
     {4,14,1,3,{" $$$$$ $$ $$","   $$  $$  $$","$$  $ $$ $$$",
-                 "   $$$$$$$$  $",NULL,NULL,NULL,NULL,NULL,NULL,NULL}},
-    {6,7,4,2,{"   $"," $$$$"," $$$ $$"," $ $ $"," $ $$","$ $$",
-                 NULL,NULL,NULL,NULL,NULL}},
+                 "   $$$$$$$$  $"}},
+    {6,7,4,2,{"   $"," $$$$"," $$$ $$"," $ $ $"," $ $$","$ $$"}},
     {6,13,0,0,{"   $$$$$","$ $$$$$  $$$"," $ $$$ $$$$",
-                 "$ $  $$$$$$$"," $$$ $   $$","$ $ $ $$  $",NULL,NULL,
-                 NULL,NULL,NULL}},
+                 "$ $  $$$$$$$"," $$$ $   $$","$ $ $ $$  $"}},
     {11,5,10,0,{"  $"," $ $$"," $$","$ $"," $ $"," $$$","$ $",
                  " $ $"," $ $","$ $$"," $"}},
     {7,16,0,6,{"      $$$$$$$","  $$$$ $$$$ $ $","$$ $$ $$$$$$ $ $",
                  "$      $ $"," $$$$$$$$$$$$$$"," $ $$    $ $$$",
-                 "  $   $$$     $$",NULL,NULL,NULL,NULL}},
+                 "  $   $$$     $$"}},
     {4,15,2,0,{" $$$$  $$$$  $$"," $ $$ $$ $ $$"," $ $$ $$$$ $$",
-                 " $ $$  $$$$  $",NULL,NULL,NULL,NULL,NULL,NULL,NULL}},
+                 " $ $$  $$$$  $"}},
     {7,9,6,2,{" $  $$$$"," $  $ $$"," $ $$$$ $","$ $$  $","  $   $$$",
-         " $$$$$$","  $",NULL,NULL,NULL,NULL}},
+         " $$$$$$","  $"}},
     {10,14,8,0,{"            $"," $$$$$$$$$$  $"," $$$       $$",
                  " $ $$$$$$$$ $"," $$$ $$$  $$$"," $$$   $  $$$",
                  " $ $$$$$$$ $$"," $ $ $    $$$"," $$$$$$$$$$$$",
-                 "",NULL}}
+                 ""}}
 };
 
-/* This is the data structure the game uses for managing levels */
+/* This data structure which holds information about the rows */
 struct chunk_data {
     /* the number of chunks on a line */
     short l_num[MAZEZAM_MAX_LINES];
@@ -367,39 +174,38 @@ struct chunk_data {
     short c_inset[MAZEZAM_MAX_LINES][MAZEZAM_MAX_CHUNKS];
 };
 
-/* The state and exit code of the level loop */
-enum level_state {
-    LEVEL_STATE_LOOPING,
-    LEVEL_STATE_COMPLETED,
-    LEVEL_STATE_FAILED,
-    LEVEL_STATE_QUIT,
-    LEVEL_STATE_PARSE_ERROR,
-    LEVEL_STATE_USB_CONNECTED,
+/* Parsed level data */
+struct level_info {
+  short width;
+  short height;
+  short entrance;
+  short exit;
+  struct chunk_data cd;
 };
 
-/* The state and exit code of the text screens. I use the
- * same enum for all of them, even though there are some
- * differences.
- */
-enum text_state {
-    TEXT_STATE_LOOPING,
-    TEXT_STATE_QUIT,
-    TEXT_STATE_OKAY,
-    TEXT_STATE_USB_CONNECTED,
-    TEXT_STATE_PARSE_ERROR,
-    TEXT_STATE_BACK,
-};
+/* The state variable used to hold the state of the plugin */
+static enum {
+    STATE_QUIT,          /* The player wants to quit */
+    STATE_USB_CONNECTED, /* A USB cable has been inserted */
+    STATE_PARSE_ERROR,   /* There's a parse error in the levels */
+    STATE_WELLDONE,      /* The player has finished the game */
 
-/* The state and exit code of the game loop */
-enum game_state {
-    GAME_STATE_LOOPING,
-    GAME_STATE_QUIT,
-    GAME_STATE_OKAY,
-    GAME_STATE_USB_CONNECTED,
-    GAME_STATE_OVER,
-    GAME_STATE_COMPLETED,
-    GAME_STATE_PARSE_ERROR,
-};
+    STATE_IN_APPLICATION,
+
+    STATE_MAIN_MENU      /* The player is at the main menu */
+      = STATE_IN_APPLICATION,
+    STATE_GAME_OVER,      /* The player is out of lives */
+
+    STATE_IN_GAME,
+
+    STATE_COMPLETED      /* A level has been completed */
+      = STATE_IN_GAME,
+      
+    STATE_FAILED,        /* The player wants to retry the level */
+    STATE_GAME_MENU,     /* The player wan't to access the in-game menu */
+ 
+    STATE_IN_LEVEL,
+} state;
 
 /* The various constants needed for configuration files.
  * See apps/plugins/lib/configfile.*
@@ -417,87 +223,73 @@ struct resume_data {
   int level; /* level at which to restart the game */
 };
 
-/* Display a screen of text. line[0] is the heading.
- * line[highlight] will be highlighted, unless highlight == 0
- */
-static void display_text_page(struct textpage text, int highlight)
+#if LCD_DEPTH > 1
+/* Store the display settings so they are reintroduced during menus */
+static struct {
+  fb_data* backdrop;
+  unsigned foreground;
+  unsigned background;
+} lcd_settings;
+#endif
+
+/*****************************************************************************
+* Store the LCD settings
+******************************************************************************/
+static void store_lcd_settings(void) 
 {
-    int w[text.num_lines], h[text.num_lines];
-    int hsum,i,vgap,vnext;
-
-    rb->lcd_clear_display();
-
-    /* find out how big the text is so we can determine the positioning */
-    hsum = 0;
-    for(i = 0; i < text.num_lines; i++) {
-        rb->lcd_getstringsize(text.line[i], w+i, h+i);
-        hsum += h[i];
-    }
-
-    vgap = (LCD_HEIGHT-hsum)/(text.num_lines+1);
-
-    /* The Heading */
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(MAZEZAM_BORDER_COLOR);
-#elif LCD_DEPTH > 1
-    rb->lcd_set_foreground(MAZEZAM_BORDER_GRAY);
+    /* Store the old settings */
+#if LCD_DEPTH > 1
+    lcd_settings.backdrop = rb->lcd_get_backdrop();
+    lcd_settings.foreground = rb->lcd_get_foreground();
+    lcd_settings.background = rb->lcd_get_background();
 #endif
-    rb->lcd_drawrect((LCD_WIDTH-w[0])/2-MAZEZAM_MENU_BORDER,
-                     vgap-MAZEZAM_MENU_BORDER, w[0] + 2*MAZEZAM_MENU_BORDER,
-                     h[0] + 2*MAZEZAM_MENU_BORDER);
-    rb->lcd_drawrect((LCD_WIDTH-w[0])/2-MAZEZAM_MENU_BORDER*2,
-                     vgap-MAZEZAM_MENU_BORDER*2, w[0] + 4*MAZEZAM_MENU_BORDER,
-                     h[0] + 4*MAZEZAM_MENU_BORDER);
-    rb->lcd_drawline(0,vgap + h[0]/2,(LCD_WIDTH-w[0])/2-MAZEZAM_MENU_BORDER*2,
-                     vgap + h[0]/2);
-    rb->lcd_drawline((LCD_WIDTH-w[0])/2+w[0]+MAZEZAM_MENU_BORDER*2,
-                     vgap + h[0]/2,LCD_WIDTH-1,vgap + h[0]/2);
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(MAZEZAM_HEADING_COLOR);
-#elif LCD_DEPTH > 1
-    rb->lcd_set_foreground(MAZEZAM_HEADING_GRAY);
-#endif
-    rb->lcd_putsxy((LCD_WIDTH-w[0])/2,vgap,text.line[0]);
-
-    vnext = vgap*2 + h[0];
-
-    /* The other lines */
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(MAZEZAM_TEXT_COLOR);
-#elif LCD_DEPTH > 1
-    rb->lcd_set_foreground(MAZEZAM_TEXT_GRAY);
-#endif
-    for (i = 1; i<text.num_lines; i++) {
-        rb->lcd_putsxy((LCD_WIDTH-w[i])/2,vnext,text.line[i]);
-
-        /* add underlining if i is the highlighted line */
-        if (i == highlight) {
-            rb->lcd_drawline((LCD_WIDTH-w[i])/2, vnext + h[i] + 1,
-                    (LCD_WIDTH-w[i])/2 + w[i], vnext + h[i] + 1);
-        }
-
-        vnext += vgap + h[i];
-    }
-
-    rb->lcd_update();
 }
 
+/*****************************************************************************
+* Restore the LCD settings to their defaults
+******************************************************************************/
+static void restore_lcd_settings(void) {
+    /* Turn on backlight timeout (revert to settings) */
+    backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
-/* Parse the level data from the level_data structure. This could be
- * replaced by a file read. Returns true if the level parsed correctly.
- */
-static bool parse_level(short level, struct chunk_data *cd,
-        short *width, short *height, short *entrance, short *exit)
+    /* Restore the old settings */
+#if LCD_DEPTH > 1
+    rb->lcd_set_foreground(lcd_settings.foreground);
+    rb->lcd_set_background(lcd_settings.background);
+    rb->lcd_set_backdrop(lcd_settings.backdrop);
+#endif
+}
+
+/*****************************************************************************
+* Adjust the LCD settings to suit MazezaM levels
+******************************************************************************/
+static void plugin_lcd_settings(void) {
+    /* Turn off backlight timeout */
+    backlight_force_on(rb); /* backlight control in lib/helper.c */
+
+    /* Set the new settings */
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(MAZEZAM_BG_COLOR);
+    rb->lcd_set_backdrop(NULL);
+#elif LCD_DEPTH > 1
+    rb->lcd_set_background(MAZEZAM_BG_GRAY);
+    rb->lcd_set_backdrop(NULL);
+#endif
+}
+
+/*****************************************************************************
+* Parse the level data from the level_data structure. This could be
+* replaced by a file read. Returns true if the level parsed correctly.
+******************************************************************************/
+static bool parse_level(short level, struct level_info* li)
 {
     int i,j;
     char c,clast;
 
-    *width    = level_data[level].width;
-    *height   = level_data[level].height;
-    *entrance = level_data[level].entrance;
-    *exit     = level_data[level].exit;
+    li->width    = level_data[level].width;
+    li->height   = level_data[level].height;
+    li->entrance = level_data[level].entrance;
+    li->exit     = level_data[level].exit;
 
     /* for each line in the level */
     for (i = 0; i<level_data[level].height; i++) {
@@ -505,19 +297,19 @@ static bool parse_level(short level, struct chunk_data *cd,
             return false;
         else {
             j = 0;
-            cd->l_num[i] = 0;
+            li->cd.l_num[i] = 0;
             clast = ' '; /* the character we last considered */
             while ((c = level_data[level].line[i][j]) != '\0') {
                 if (c != ' ') {
                     if (clast == ' ') {
-                        cd->l_num[i] += 1;
-                        if (cd->l_num[i] > MAZEZAM_MAX_CHUNKS)
+                        li->cd.l_num[i] += 1;
+                        if (li->cd.l_num[i] > MAZEZAM_MAX_CHUNKS)
                             return false;
-                        cd->c_inset[i][cd->l_num[i] - 1] = j;
-                        cd->c_width[i][cd->l_num[i] - 1] = 1;
+                        li->cd.c_inset[i][li->cd.l_num[i] - 1] = j;
+                        li->cd.c_width[i][li->cd.l_num[i] - 1] = 1;
                     }
                     else
-                        cd->c_width[i][cd->l_num[i] - 1] += 1;
+                        li->cd.c_width[i][li->cd.l_num[i] - 1] += 1;
                 }
                 clast = c;
                 j++;
@@ -527,42 +319,18 @@ static bool parse_level(short level, struct chunk_data *cd,
     return true;
 }
 
-/* Draw the level */
-static void draw_level(
-        struct chunk_data *cd, /* the data about the chunks */
-        short *shift, /* an array of the horizontal offset of the lines */
+/*****************************************************************************
+* Draw the walls of a level
+******************************************************************************/
+static void draw_walls(
+        short size,
+        short xOff,
+        short yOff,
         short width,
         short height,
         short entrance,
-        short exit,
-        short x, /* player's x and y coords */
-        short y)
+        short exit)
 {
-    /* The number of pixels the side of a square should be */
-    short size = (LCD_WIDTH/(width+2)) < (LCD_HEIGHT/height) ?
-                 (LCD_WIDTH/(width+2)) : (LCD_HEIGHT/height);
-    /* The x and y position (in pixels) of the top left corner of the
-     * level
-     */
-    short xOff = (LCD_WIDTH - (size*width))/2;
-    short yOff = (LCD_HEIGHT - (size*height))/2;
-    /* For drawing the player, taken from the sokoban plugin */
-    short max = size - 1;
-    short middle = max / 2;
-    short ldelta = (middle + 1) / 2;
-    short i,j;
-    short third = size / 3;
-    short twothirds = (2 * size) / 3;
-#ifndef HAVE_LCD_COLOR
-    /* We #def these out to supress a compiler warning */
-    short k;
-#if LCD_DEPTH <= 1
-    short l;
-#endif
-#endif
-
-    rb->lcd_clear_display();
-
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(MAZEZAM_WALL_COLOR);
 #elif LCD_DEPTH > 1
@@ -585,59 +353,96 @@ static void draw_level(
     rb->lcd_fillrect(xOff+(size*width),yOff+(size*exit)+size-1,
                      LCD_WIDTH-xOff+(size*width),
                      LCD_HEIGHT-yOff-(size*exit)-size+1);
+}
 
-    /* draw the chunks */
-    for (i = 0; i<height; i++) {
-#ifdef HAVE_LCD_COLOR
-        /* adding width to i should have a fixed, but randomising effect on
-         * the choice of the colours of the top line of chunks
-         */
-        rb->lcd_set_foreground(chunk_colors[(i+width) % 
-                               MAZEZAM_NUM_CHUNK_COLORS]);
+/*****************************************************************************
+* Draw chunk row i
+******************************************************************************/
+static void draw_row(
+        short size,
+        short xOff,
+        short yOff,
+        short width,
+        short i, /* the row number */
+        struct chunk_data *cd, /* the data about the chunks */
+        short *shift /* an array of the horizontal offset of the lines */
+)
+{
+    /* The assignment below is just a hack to make supress a warning on
+     * non color targets */
+    short j = width;
+#ifndef HAVE_LCD_COLOR
+    /* We #def these out to supress a compiler warning */
+    short k;
+#if LCD_DEPTH <= 1
+    short l;
 #endif
-        for (j = 0; j<cd->l_num[i]; j++) {
+#endif
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_fillrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
-                             yOff+size*i, cd->c_width[i][j]*size,size);
+    /* adding width to i should have a fixed, but randomising effect on
+     * the choice of the colours of the top line of chunks
+     */
+    rb->lcd_set_foreground(chunk_colors[(i+width) % 
+                           MAZEZAM_NUM_CHUNK_COLORS]);
+#endif
+    for (j = 0; j<cd->l_num[i]; j++) {
+#ifdef HAVE_LCD_COLOR
+        rb->lcd_fillrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
+                         yOff+size*i, cd->c_width[i][j]*size,size);
 #elif LCD_DEPTH > 1
-            rb->lcd_set_foreground(MAZEZAM_CHUNK_EDGE_GRAY);
-            rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
-                             yOff+size*i, cd->c_width[i][j]*size,size);
+        rb->lcd_set_foreground(MAZEZAM_CHUNK_EDGE_GRAY);
+        rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
+                         yOff+size*i, cd->c_width[i][j]*size,size);
 
-            /* draw shade */
-            rb->lcd_set_foreground(chunk_gray_shade[(i+width) %
-                                   MAZEZAM_NUM_CHUNK_GRAYS]);
-            rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+1,
-                             yOff+size*i+size-2,
-                             xOff+size*shift[i]+size*cd->c_inset[i][j]+
-                                                       cd->c_width[i][j]*size-3,
-                             yOff+size*i+size-2);
-            rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+
-                                                       cd->c_width[i][j]*size-2,
-                             yOff+size*i,
-                             xOff+size*shift[i]+size*cd->c_inset[i][j]+
-                                                       cd->c_width[i][j]*size-2,
-                             yOff+size*i+size-2);
+        /* draw shade */
+        rb->lcd_set_foreground(chunk_gray_shade[(i+width) %
+                               MAZEZAM_NUM_CHUNK_GRAYS]);
+        rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+1,
+                         yOff+size*i+size-2,
+                         xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                                                   cd->c_width[i][j]*size-3,
+                         yOff+size*i+size-2);
+        rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                                                   cd->c_width[i][j]*size-2,
+                         yOff+size*i,
+                         xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                                                   cd->c_width[i][j]*size-2,
+                         yOff+size*i+size-2);
 
-            /* draw fill */
-            rb->lcd_set_foreground(chunk_gray[(i+width) %
-                                   MAZEZAM_NUM_CHUNK_GRAYS]);
-            for (k = yOff+size*i+2; k <  yOff+size*i+size-2; k += 2)
-                rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+2,k,
-                                 xOff+size*shift[i]+size*cd->c_inset[i][j]+
-                                                    cd->c_width[i][j]*size-3,k);
+        /* draw fill */
+        rb->lcd_set_foreground(chunk_gray[(i+width) %
+                               MAZEZAM_NUM_CHUNK_GRAYS]);
+        for (k = yOff+size*i+2; k <  yOff+size*i+size-2; k += 2)
+            rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+2,k,
+                             xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                                                cd->c_width[i][j]*size-3,k);
 #else
-            rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
-                             yOff+size*i, cd->c_width[i][j]*size,size);
-            for (k = xOff+size*shift[i]+size*cd->c_inset[i][j]+2;
-                 k < xOff+size*shift[i]+size*cd->c_inset[i][j]+
-                                                         cd->c_width[i][j]*size;
-                 k += 2 + (i & 1))
-                for (l = yOff+size*i+2; l <  yOff+size*i+size; l += 2 + (i & 1))
-                     rb->lcd_drawpixel(k, l);
+        rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
+                         yOff+size*i, cd->c_width[i][j]*size,size);
+        for (k = xOff+size*shift[i]+size*cd->c_inset[i][j]+2;
+             k < xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                                                     cd->c_width[i][j]*size;
+             k += 2 + (i & 1))
+            for (l = yOff+size*i+2; l <  yOff+size*i+size; l += 2 + (i & 1))
+                 rb->lcd_drawpixel(k, l);
 #endif
-        }
     }
+}
+
+/*****************************************************************************
+* Draw the player
+******************************************************************************/
+static void draw_player(
+        short size,
+        short xOff,
+        short yOff,
+        short x,
+        short y)
+{
+    /* For drawing the player, taken from the sokoban plugin */
+    short max = size - 1;
+    short middle = max / 2;
+    short ldelta = (middle + 1) / 2;
 
     /* draw the player (mostly copied from the sokoban plugin) */
 #ifdef HAVE_LCD_COLOR
@@ -653,132 +458,261 @@ static void draw_level(
                      xOff+size*x+middle-ldelta, yOff+size*y+max);
     rb->lcd_drawline(xOff+size*x+middle, yOff+size*y+max-ldelta,
                      xOff+size*x+middle+ldelta, yOff+size*y+max);
+}
 
-    /* draw the gate, if the player has moved into the level */
-    if (x >= 0) {
+/*****************************************************************************
+* Draw the gate
+******************************************************************************/
+static void draw_gate(
+        short size,
+        short xOff,
+        short yOff,
+        short entrance)
+{
+    short third = size / 3;
+    short twothirds = (2 * size) / 3;
 #ifdef HAVE_LCD_COLOR
-        rb->lcd_set_foreground(MAZEZAM_GATE_COLOR);
+    rb->lcd_set_foreground(MAZEZAM_GATE_COLOR);
 #elif LCD_DEPTH > 1
-        rb->lcd_set_foreground(MAZEZAM_GATE_GRAY);
+    rb->lcd_set_foreground(MAZEZAM_GATE_GRAY);
 #endif
-        rb->lcd_drawline(xOff-size,yOff+entrance*size+third,
-                         xOff-1,yOff+entrance*size+third);
-        rb->lcd_drawline(xOff-size,yOff+entrance*size+twothirds,
-                         xOff-1,yOff+entrance*size+twothirds);
-        rb->lcd_drawline(xOff-size+third,yOff+entrance*size,
-                         xOff-size+third,yOff+entrance*size+size-1);
-        rb->lcd_drawline(xOff-size+twothirds,yOff+entrance*size,
-                         xOff-size+twothirds,yOff+entrance*size+size-1);
-    }
+    rb->lcd_drawline(xOff-size,yOff+entrance*size+third,
+                     xOff-1,yOff+entrance*size+third);
+    rb->lcd_drawline(xOff-size,yOff+entrance*size+twothirds,
+                     xOff-1,yOff+entrance*size+twothirds);
+    rb->lcd_drawline(xOff-size+third,yOff+entrance*size,
+                     xOff-size+third,yOff+entrance*size+size-1);
+    rb->lcd_drawline(xOff-size+twothirds,yOff+entrance*size,
+                     xOff-size+twothirds,yOff+entrance*size+size-1);
 }
 
-/* Manage the congratulations screen */
-static enum text_state welldone_screen(void)
+/*****************************************************************************
+* Draw the level
+******************************************************************************/
+static void draw_level(
+        struct level_info* li,
+        short *shift, /* an array of the horizontal offset of the lines */
+        short x, /* player's x and y coords */
+        short y)
 {
-    int button = BUTTON_NONE;
-    enum text_state state = TEXT_STATE_LOOPING;
-
-    display_text_page(welldone_page, 0);
-
-    while (state == TEXT_STATE_LOOPING) {
-        button = rb->button_get(true);
-
-        switch (button) {
-            case MAZEZAM_QUIT:
-                state = TEXT_STATE_QUIT;
-                break;
-
-            case MAZEZAM_SELECT:
-#if CONFIG_KEYPAD != ONDIO_PAD
-            case MAZEZAM_RIGHT:
-#endif
-                state = TEXT_STATE_OKAY;
-                break;
-
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    state = TEXT_STATE_USB_CONNECTED;
-                break;
-        }
-    }
-
-    return state;
-}
-
-/* Manage the quit confimation screen */
-static enum text_state quitconfirm_loop(void)
-{
-    int button = BUTTON_NONE;
-    enum text_state state = TEXT_STATE_LOOPING;
-    short select = 2;
-
-    display_text_page(confirm_page, select + 1);
-
-    /* Wait for a button release. This is useful when a repeated button
-     * press is used for quit.
+    /* First we calculate the draw info */
+    /* The number of pixels the side of a square should be */
+    short size = (LCD_WIDTH/(li->width+2)) < (LCD_HEIGHT/li->height) ?
+                 (LCD_WIDTH/(li->width+2)) : (LCD_HEIGHT/li->height);
+    /* The x and y position (in pixels) of the top left corner of the
+     * level
      */
-    while ((rb->button_get(true) & BUTTON_REL) != BUTTON_REL);
+    short xOff = (LCD_WIDTH - (size*li->width))/2;
+    short yOff = (LCD_HEIGHT - (size*li->height))/2;
+    short i;
+    
+    rb->lcd_clear_display();
 
-    while (state == TEXT_STATE_LOOPING) {
-        display_text_page(confirm_page, select + 1);
+    draw_walls(size,xOff,yOff,li->width, li->height, li->entrance, li->exit);
 
-        button = rb->button_get(true);
-
-        switch (button) {
-            case MAZEZAM_QUIT:
-                state = TEXT_STATE_QUIT;
-                break;
-
-            case MAZEZAM_UP:
-            case MAZEZAM_DOWN:
-                select = (2 - select) + 1;
-                break;
-
-            case MAZEZAM_SELECT:
-#if CONFIG_KEYPAD != ONDIO_PAD
-            case MAZEZAM_RIGHT:
-#endif
-                if (select == 1)
-                    state = TEXT_STATE_QUIT;
-                else
-                    state = TEXT_STATE_OKAY;
-                break;
-
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    state = TEXT_STATE_USB_CONNECTED;
-                break;
-        }
+    /* draw the chunks */
+    for (i = 0; i<li->height; i++) {
+        draw_row(size,xOff,yOff,li->width,i,&(li->cd),shift);
     }
 
-    return state;
+    draw_player(size,xOff,yOff,x,y);
+
+    /* if the player has moved into the level, draw the gate */
+    if (x >= 0)
+        draw_gate(size,xOff,yOff,li->entrance);
 }
 
-/* Manage the playing of a level */
-static enum level_state level_loop(short level, short lives)
+/*****************************************************************************
+* Manage the congratulations screen
+******************************************************************************/
+static void welldone_screen(void)
 {
-    struct chunk_data cd;
-    short shift[MAZEZAM_MAX_LINES]; /* amount each line has been shifted */
-    short width;
-    short height;
-    short entrance;
-    short exit;
-    short i;
-    short x,y;
+    int start_selection = 0;
+
+    MENUITEM_STRINGLIST(menu,MAZEZAM_TEXT_WELLDONE_TITLE,NULL,
+                          MAZEZAM_TEXT_WELLDONE_OPTION);
+
+    switch(rb->do_menu(&menu, &start_selection, NULL, true)){
+        case MENU_ATTACHED_USB:
+            state = STATE_USB_CONNECTED;
+            break;
+    }
+}
+
+/*****************************************************************************
+* Manage the playing of a level
+******************************************************************************/
+static void level_loop(struct level_info* li, short* shift, short *x, short *y)
+{
+    int i;
     int button;
-    enum level_state state = LEVEL_STATE_LOOPING;
     bool blocked; /* is there a chunk in the way of the player? */
 
-    if (!(parse_level(level,&cd,&width,&height,&entrance,&exit)))
-        return LEVEL_STATE_PARSE_ERROR;
+    while (state >= STATE_IN_LEVEL) {
+        draw_level(li, shift, *x, *y);
+        rb->lcd_update();
+        button = pluginlib_getaction(rb, TIMEOUT_BLOCK, plugin_contexts, 2);
+        blocked = false;
 
-    for (i = 0; i < height; i++)
+        switch (button) {
+            case MAZEZAM_UP:
+            case MAZEZAM_UP_REPEAT:
+                if ((*y > 0) && (*x >= 0) && (*x < li->width)) {
+                    for (i = 0; i < li->cd.l_num[*y-1]; i++)
+                        blocked = blocked ||
+                                  ((*x>=shift[*y-1]+li->cd.c_inset[*y-1][i]) &&
+                                   (*x<shift[*y-1]+li->cd.c_inset[*y-1][i]+
+                                                   li->cd.c_width[*y-1][i]));
+                    if (!blocked) *y -= 1;
+                }
+                break;
+
+
+
+            case MAZEZAM_DOWN:
+            case MAZEZAM_DOWN_REPEAT:
+                if ((*y < li->height-1) && (*x >= 0) && (*x < li->width)) {
+                    for (i = 0; i < li->cd.l_num[*y+1]; i++)
+                        blocked = blocked ||
+                                  ((*x>=shift[*y+1]+li->cd.c_inset[*y+1][i]) &&
+                                   (*x<shift[*y+1]+li->cd.c_inset[*y+1][i]+
+                                                   li->cd.c_width[*y+1][i]));
+                    if (!blocked) *y += 1;
+                }
+                break;
+
+            case MAZEZAM_LEFT:
+            case MAZEZAM_LEFT_REPEAT:
+                if (*x > 0) {
+                    for (i = 0; i < li->cd.l_num[*y]; i++)
+                        blocked = blocked ||
+                                  (*x == shift[*y]+li->cd.c_inset[*y][i]+
+                                                   li->cd.c_width[*y][i]);
+                    if (!blocked) *x -= 1;
+                    else if (shift[*y] + li->cd.c_inset[*y][0] > 0) {
+                        *x -= 1;
+                        shift[*y] -= 1;
+                    }
+                }
+                break;
+
+            case MAZEZAM_RIGHT:
+            case MAZEZAM_RIGHT_REPEAT:
+                if (*x < li->width-1) {
+                    for (i = 0; i < li->cd.l_num[*y]; i++)
+                        blocked = blocked ||
+                                    (*x+1 == shift[*y]+li->cd.c_inset[*y][i]);
+                    if (!blocked) *x += 1;
+                    else if (shift[*y] 
+                              + li->cd.c_inset[*y][li->cd.l_num[*y]-1]
+                              + li->cd.c_width[*y][li->cd.l_num[*y]-1]
+                                 < li->width) {
+                        *x += 1;
+                        shift[*y] += 1;
+                    }
+                }
+                else if (*x == li->width) state = STATE_COMPLETED;
+                else if (*y == li->exit) *x += 1;
+                break;
+
+            case MAZEZAM_MENU:
+                state = STATE_GAME_MENU;
+                break;
+
+            default:
+                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    state = STATE_USB_CONNECTED;
+                break;
+        }
+    }
+}
+
+/*****************************************************************************
+* Manage the in game menu
+******************************************************************************/
+static void in_game_menu(void)
+{
+    /* The initial option is retry level */
+    int start_selection = 1;
+
+    MENUITEM_STRINGLIST(menu,MAZEZAM_TEXT_MAZEZAM_MENU, NULL,
+                         MAZEZAM_TEXT_BACK,
+                         MAZEZAM_TEXT_RETRY_LEVEL,
+                         MAZEZAM_TEXT_AUDIO_PLAYBACK,
+                         MAZEZAM_TEXT_QUIT);
+    
+    /* Don't show the status bar */
+    switch(rb->do_menu(&menu, &start_selection, NULL, false)){
+        case 1: /* retry */
+            state = STATE_FAILED;
+            break;
+
+        case 2: /* Audio playback */
+            playback_control(rb);
+            state = STATE_IN_LEVEL;
+            break;
+
+        case 3: /* quit */
+            state = STATE_QUIT;
+            break;
+
+        case MENU_ATTACHED_USB:
+            state = STATE_USB_CONNECTED;
+            break;
+
+        default: /* Back */
+            state = STATE_IN_LEVEL;
+            break;
+    }
+}
+
+/*****************************************************************************
+* Is the level a checkpoint
+******************************************************************************/
+static bool at_checkpoint(int level) 
+{
+    if (level <= MAZEZAM_FIRST_CHECKPOINT) 
+        return level == MAZEZAM_FIRST_CHECKPOINT;
+    else {
+        level = level - MAZEZAM_FIRST_CHECKPOINT;
+        return level % MAZEZAM_CHECKPOINT_INTERVAL == 0;
+    }
+}
+
+/*****************************************************************************
+* Set up and play a level
+* new_level should be true if this is the first time we've encountered
+* this level
+******************************************************************************/
+static void play_level(short level, short lives, bool new_level)
+{
+    struct level_info li;
+    short shift[MAZEZAM_MAX_LINES]; /* amount each line has been shifted */
+    short x,y;
+    int i;
+
+    state = STATE_IN_LEVEL;
+
+    if (!(parse_level(level,&li)))
+        state =  STATE_PARSE_ERROR;
+
+    for (i = 0; i < li.height; i++)
         shift[i] = 0;
 
     x = -1;
-    y = entrance;
+    y = li.entrance;
 
-    draw_level(&cd, shift, width, height, entrance, exit, x, y);
+    plugin_lcd_settings();
+    rb->lcd_clear_display();
+
+    draw_level(&li, shift, x, y);
+
+    /* If we've just reached a checkpoint, then alert the player */
+    if (new_level && at_checkpoint(level)) {
+        rb->splash(MAZEZAM_DELAY_CHECKPOINT, MAZEZAM_TEXT_CHECKPOINT);
+        /* Clear the splash */
+        draw_level(&li, shift, x, y);
+    }
 
 #ifdef HAVE_REMOTE_LCD
     /* Splash text seems to use the remote display by
@@ -786,288 +720,97 @@ static enum level_state level_loop(short level, short lives)
      */
     rb->lcd_remote_clear_display();
 #endif
-    rb->splash(MAZEZAM_LEVEL_LIVES_DELAY, MAZEZAM_LEVEL_LIVES_TEXT,
+    rb->splash(MAZEZAM_DELAY_LIVES, MAZEZAM_TEXT_LIVES,
                level+1, lives);
 
     /* ensure keys pressed during the splash screen are ignored */
     rb->button_clear_queue();
 
-    while (state == LEVEL_STATE_LOOPING) {
-        draw_level(&cd, shift, width, height, entrance, exit, x, y);
-        rb->lcd_update();
-        button = rb->button_get(true);
-        blocked = false;
+    /* this little loop just ensures we return to the game if the player
+     * doesn't perform an interesting action during the in game menu */
+    while (state >= STATE_IN_LEVEL) {
+        level_loop(&li, shift, &x, &y);
 
-        switch (button) {
-            case MAZEZAM_UP:
-            case MAZEZAM_UP | BUTTON_REPEAT:
-                if ((y > 0) && (x >= 0) && (x < width)) {
-                    for (i = 0; i < cd.l_num[y-1]; i++)
-                        blocked = blocked ||
-                                  ((x>=shift[y-1]+cd.c_inset[y-1][i]) &&
-                                   (x<shift[y-1]+cd.c_inset[y-1][i]+
-                                                           cd.c_width[y-1][i]));
-                    if (!blocked) y -= 1;
-                }
-                break;
-
-            case MAZEZAM_DOWN:
-            case MAZEZAM_DOWN | BUTTON_REPEAT:
-                if ((y < height-1) && (x >= 0) && (x < width)) {
-                    for (i = 0; i < cd.l_num[y+1]; i++)
-                        blocked = blocked ||
-                                  ((x>=shift[y+1]+cd.c_inset[y+1][i]) &&
-                                   (x<shift[y+1]+cd.c_inset[y+1][i]+
-                                                           cd.c_width[y+1][i]));
-                    if (!blocked) y += 1;
-                }
-                break;
-
-            case MAZEZAM_LEFT:
-            case MAZEZAM_LEFT | BUTTON_REPEAT:
-                if (x > 0) {
-                    for (i = 0; i < cd.l_num[y]; i++)
-                        blocked = blocked ||
-                                  (x == shift[y]+cd.c_inset[y][i]+
-                                                              cd.c_width[y][i]);
-                    if (!blocked) x -= 1;
-                    else if (shift[y] + cd.c_inset[y][0] > 0) {
-                        x -= 1;
-                        shift[y] -= 1;
-                    }
-                }
-                break;
-
-            case MAZEZAM_RIGHT:
-            case MAZEZAM_RIGHT | BUTTON_REPEAT:
-                if (x < width-1) {
-                    for (i = 0; i < cd.l_num[y]; i++)
-                        blocked = blocked || (x+1 == shift[y]+cd.c_inset[y][i]);
-                    if (!blocked) x += 1;
-                    else if (shift[y] + cd.c_inset[y][cd.l_num[y]-1] +
-                                         cd.c_width[y][cd.l_num[y]-1] < width) {
-                        x += 1;
-                        shift[y] += 1;
-                    }
-                }
-                else if (x == width) state = LEVEL_STATE_COMPLETED;
-                else if (y == exit) x += 1;
-                break;
-
-            case MAZEZAM_RETRY:
-                state = LEVEL_STATE_FAILED;
-                break;
-
-            case MAZEZAM_QUIT:
-                switch (quitconfirm_loop()) {
-                    case TEXT_STATE_QUIT:
-                        state = LEVEL_STATE_QUIT;
-                        break;
-
-                    case TEXT_STATE_USB_CONNECTED:
-                        state = LEVEL_STATE_USB_CONNECTED;
-                        break;
-
-                    default:
-                        break;
-                }
-                break;
-
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    state = LEVEL_STATE_USB_CONNECTED;
-                break;
+        if (state == STATE_GAME_MENU) {
+            restore_lcd_settings();
+            in_game_menu();
+            plugin_lcd_settings();
         }
     }
-
-    return state;
+    restore_lcd_settings();
 }
 
-/* The loop which manages a full game of MazezaM */
-static enum game_state game_loop(struct resume_data *r)
+/*****************************************************************************
+* Update the resume data based on the level reached
+******************************************************************************/
+static void update_resume_data(struct resume_data *r, int level)
 {
-    enum game_state state = GAME_STATE_LOOPING;
+    if (at_checkpoint(level))
+        r->level = level;
+}
+
+/*****************************************************************************
+* The loop which manages a full game of MazezaM.
+******************************************************************************/
+static void game_loop(struct resume_data *r)
+{
     int level = r->level;
     int lives = MAZEZAM_START_LIVES;
+    /* We want to know when a player reaches a level for the first time,
+     * so we keep a second copy of the level. */
+    int old_level = level;
 
-    rb->lcd_clear_display();
+    state = STATE_IN_GAME;
 
-    while (state == GAME_STATE_LOOPING)
+    while (state >= STATE_IN_GAME)
     {
-        switch (level_loop(level,lives)) {
-            case LEVEL_STATE_COMPLETED:
+        play_level(level, lives, old_level < level);
+        old_level = level;
+
+        switch (state) {
+            case STATE_COMPLETED:
                 level += 1;
-                if (!((level - r->level) % MAZEZAM_EXTRA_LIFE))
-                    lives += 1;
+                if (level == MAZEZAM_NUM_LEVELS)
+                    state = STATE_WELLDONE;
                 break;
 
-            case LEVEL_STATE_QUIT:
-                state = GAME_STATE_QUIT;
-                break;
-
-            case LEVEL_STATE_FAILED:
+            case STATE_FAILED:
                 lives -= 1;
-                break;
-
-            case LEVEL_STATE_PARSE_ERROR:
-                state = GAME_STATE_PARSE_ERROR;
-                break;
-
-            case LEVEL_STATE_USB_CONNECTED:
-                state = GAME_STATE_USB_CONNECTED;
+                if (lives == 0)
+                    state = STATE_GAME_OVER;
                 break;
 
             default:
                 break;
         }
-        if (lives == 0)
-            state = GAME_STATE_OVER;
-        else if (level == MAZEZAM_NUM_LEVELS)
-            state = GAME_STATE_COMPLETED;
+
+        update_resume_data(r,level);
     }
 
     switch (state) {
-        case GAME_STATE_OVER:
+        case STATE_GAME_OVER:
 #ifdef HAVE_REMOTE_LCD
             /* Splash text seems to use the remote display by
              * default. I suppose I better keep it tidy!
              */
             rb->lcd_remote_clear_display();
 #endif
-            rb->splash(MAZEZAM_GAMEOVER_DELAY, MAZEZAM_GAMEOVER_TEXT);
+            rb->splash(MAZEZAM_DELAY_GAME_OVER, MAZEZAM_TEXT_GAME_OVER);
             break;
 
-        case GAME_STATE_COMPLETED:
-            switch (welldone_screen()) {
-                case TEXT_STATE_QUIT:
-                    state = GAME_STATE_QUIT;
-                    break;
-
-                case TEXT_STATE_USB_CONNECTED:
-                    state = GAME_STATE_USB_CONNECTED;
-                    break;
-
-                default:
-                    state = GAME_STATE_OKAY;
-                    break;
-            }
+        case STATE_WELLDONE:
+            welldone_screen();
             break;
 
         default:
             break;
     }
-
-    /* This particular resume game logic is designed to make
-     * players prove they can solve a level more than once
-     */
-    if (level > r->level + 1)
-        r->level += 1;
-
-    return state;
 }
 
-/* Manage the instruction screen */
-static enum text_state instruction_loop(void)
-{
-    int button;
-    enum text_state state = TEXT_STATE_LOOPING;
-    int page = 0;
-
-    while (state == TEXT_STATE_LOOPING) {
-        display_text_page(help_page[page], 0);
-        button = rb->button_get(true);
-
-        switch (button) {
-            case MAZEZAM_LEFT:
-                page -= 1;
-                break;
-
-            case MAZEZAM_SELECT:
-#if CONFIG_KEYPAD != ONDIO_PAD
-            case MAZEZAM_RIGHT:
-#endif
-                page += 1;
-                break;
-
-            case MAZEZAM_QUIT:
-                state = TEXT_STATE_QUIT;
-                break;
-
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    state = TEXT_STATE_USB_CONNECTED;
-                break;
-
-        }
-
-        if ((page < 0) || (page >= MAZEZAM_NUM_HELP_PAGES))
-            state = TEXT_STATE_OKAY;
-    }
-
-    return state;
-}
-
-/* Manage the text screen that offers the user the option of
- * resuming or starting a new game
- */
-static enum text_state resume_game_loop (struct resume_data *r)
-{
-    int button = BUTTON_NONE;
-    enum text_state state = TEXT_STATE_LOOPING;
-    short select = 0;
-
-    /* if the resume level is 0, don't bother asking */
-    if (r->level == 0) return TEXT_STATE_OKAY;
-
-    display_text_page(resume_page, select + 1);
-
-    while (state == TEXT_STATE_LOOPING) {
-        display_text_page(resume_page, select + 1);
-
-        button = rb->button_get(true);
-
-        switch (button) {
-            case MAZEZAM_QUIT:
-                state = TEXT_STATE_QUIT;
-                break;
-
-            case MAZEZAM_LEFT:
-                state = TEXT_STATE_BACK;
-                break;
-
-            case MAZEZAM_UP:
-            case MAZEZAM_DOWN:
-                select = 1 - select;
-                break;
-
-            case MAZEZAM_SELECT:
-#if CONFIG_KEYPAD != ONDIO_PAD
-            case MAZEZAM_RIGHT:
-#endif
-                if (select == 1) {
-                    /* The player wants to play a new game. I could ask
-                     * for confirmation here, but the only penalty is
-                     * playing through some already completed levels,
-                     * so I don't think it's necessary
-                     */
-                    r->level = 0;
-                }
-                state = TEXT_STATE_OKAY;
-                break;
-
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    state = TEXT_STATE_USB_CONNECTED;
-                break;
-        }
-    }
-
-    return state;
-}
-
-/* Load the resume data from the config file. The data is
- * stored in both r and old.
- */
+/*****************************************************************************
+* Load the resume data from the config file. The data is
+* stored in both r and old.
+******************************************************************************/
 static void resume_load_data (struct resume_data *r, struct resume_data *old)
 {
     struct configdata config[] = {
@@ -1075,8 +818,8 @@ static void resume_load_data (struct resume_data *r, struct resume_data *old)
          MAZEZAM_CONFIG_LEVELS_NAME,NULL,NULL}
     };
 
-    if (configfile_load(MAZEZAM_CONFIG_FILENAME,config,MAZEZAM_CONFIG_NUM_ITEMS,
-                        MAZEZAM_CONFIG_VERSION) < 0)
+    if (configfile_load(MAZEZAM_CONFIG_FILENAME,config,
+                         MAZEZAM_CONFIG_NUM_ITEMS, MAZEZAM_CONFIG_VERSION) < 0)
         r->level = 0;
     /* an extra precaution */
     else if ((r->level < 0) || (MAZEZAM_NUM_LEVELS <= r->level))
@@ -1085,7 +828,9 @@ static void resume_load_data (struct resume_data *r, struct resume_data *old)
     old->level = r->level;
 }
 
-/* Save the resume data in the config file, but only if necessary */
+/*****************************************************************************
+* Save the resume data in the config file, but only if necessary
+******************************************************************************/
 static void resume_save_data (struct resume_data *r, struct resume_data *old)
 {
     struct configdata config[] = {
@@ -1097,99 +842,74 @@ static void resume_save_data (struct resume_data *r, struct resume_data *old)
      * changed.
      */
     if (old->level != r->level)
-        configfile_save(MAZEZAM_CONFIG_FILENAME,config,MAZEZAM_CONFIG_NUM_ITEMS,
-                        MAZEZAM_CONFIG_MINVERSION);
+        configfile_save(MAZEZAM_CONFIG_FILENAME,config,
+                          MAZEZAM_CONFIG_NUM_ITEMS, MAZEZAM_CONFIG_MINVERSION);
 }
 
-/* The loop which manages the welcome screen and menu */
-static enum text_state welcome_loop(void)
+/*****************************************************************************
+* Offer a main menu with no continue option 
+******************************************************************************/
+static int main_menu_without_continue(int* start_selection) 
 {
-    int button;
-    short select = 0;
-    enum text_state state = TEXT_STATE_LOOPING;
+    MENUITEM_STRINGLIST(menu,MAZEZAM_TEXT_MAIN_MENU,NULL,
+                          MAZEZAM_TEXT_PLAY_GAME,
+                          MAZEZAM_TEXT_QUIT);
+    return rb->do_menu(&menu, start_selection, NULL, false);
+}
+
+/*****************************************************************************
+* Offer a main menu with a continue option
+******************************************************************************/
+static int main_menu_with_continue(int* start_selection)
+{
+    MENUITEM_STRINGLIST(menu,MAZEZAM_TEXT_MAIN_MENU,NULL,
+                          MAZEZAM_TEXT_CONTINUE,
+                          MAZEZAM_TEXT_PLAY_NEW_GAME,
+                          MAZEZAM_TEXT_QUIT);
+    return rb->do_menu(&menu, start_selection, NULL, false);
+}
+
+/*****************************************************************************
+* Manages the main menu 
+******************************************************************************/
+static void main_menu(void)
+{
+    /* The initial option is "play game" */
+    int start_selection = 0;
+    int choice = 0;
     struct resume_data r_data, old_data;
 
     /* Load data */
     resume_load_data(&r_data, &old_data);
 
-    while (state == TEXT_STATE_LOOPING) {
-        display_text_page(title_page, select + 1);
-        button = rb->button_get(true);
+    while (state >= STATE_IN_APPLICATION) {
+        if (r_data.level == 0)
+            choice = main_menu_without_continue(&start_selection);
+        else
+            choice = main_menu_with_continue(&start_selection);
 
-        switch (button) {
-            case MAZEZAM_QUIT:
-                state = TEXT_STATE_QUIT;
+        switch(choice) {
+            case 0: /* Continue */
+                state = STATE_IN_GAME;
+                game_loop(&r_data);
                 break;
 
-            case MAZEZAM_UP:
-                select = (select + (title_page.num_lines - 2)) %
-                         (title_page.num_lines - 1);
-                break;
-
-            case MAZEZAM_DOWN:
-                select = (select + 1) % (title_page.num_lines - 1);
-                break;
-
-            case MAZEZAM_SELECT:
-#if CONFIG_KEYPAD != ONDIO_PAD
-            case MAZEZAM_RIGHT:
-#endif
-                if (select == 0) { /* play game */
-                    switch (resume_game_loop(&r_data)) {
-                        case TEXT_STATE_QUIT:
-                            state = TEXT_STATE_QUIT;
-                            break;
-
-                        case TEXT_STATE_USB_CONNECTED:
-                            state = TEXT_STATE_USB_CONNECTED;
-                            break;
-
-                        case TEXT_STATE_BACK:
-                            break;
-
-                        default: { /* Ouch! This nesting is too deep! */
-                            switch (game_loop(&r_data)) {
-                                case GAME_STATE_QUIT:
-                                    state = TEXT_STATE_QUIT;
-                                    break;
-
-                                case GAME_STATE_USB_CONNECTED:
-                                    state = TEXT_STATE_USB_CONNECTED;
-                                    break;
-
-                                case GAME_STATE_PARSE_ERROR:
-                                    state = TEXT_STATE_PARSE_ERROR;
-                                    break;
-
-                                default:
-                                    break;
-                            }
-                            break;
-                        }
-                    }
+            case 1: /* Quit or Play new game */
+                if (r_data.level == 0)
+                    state = STATE_QUIT;
+                else { /* Play new game */
+                    r_data.level = 0;
+                    state = STATE_IN_GAME;
+                    game_loop(&r_data);
                 }
-                else if (select == 1) { /* Instructions */
-                    switch (instruction_loop()) {
-                        case TEXT_STATE_QUIT:
-                            state = TEXT_STATE_QUIT;
-                            break;
-
-                        case TEXT_STATE_USB_CONNECTED:
-                            state = TEXT_STATE_USB_CONNECTED;
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                else /* Quit */
-                    state = TEXT_STATE_QUIT;
-
                 break;
 
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    state = TEXT_STATE_USB_CONNECTED;
+            case MENU_ATTACHED_USB:
+                state = STATE_USB_CONNECTED;
+                break;
+
+            default: /* Quit */
+                state = STATE_QUIT;
                 break;
         }
     }
@@ -1198,49 +918,41 @@ static enum text_state welcome_loop(void)
      * Currently, I do so.
      */
     resume_save_data(&r_data, &old_data);
-
-    return state;
 }
 
-/* Plugin entry point */
+/*****************************************************************************
+* Plugin entry point 
+******************************************************************************/
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    enum plugin_status state;
+    enum plugin_status plugin_state;
 
     /* Usual plugin stuff */
     (void)parameter;
     rb = api;
 
-    /* Turn off backlight timeout */
-    backlight_force_on(rb); /* backlight control in lib/helper.c */
-
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(MAZEZAM_BG_COLOR);
-    rb->lcd_set_backdrop(NULL);
-#elif LCD_DEPTH > 1
-    rb->lcd_set_background(MAZEZAM_BG_GRAY);
-#endif
-    rb->lcd_setfont(FONT_SYSFIXED);
 
     /* initialise the config file module */
     configfile_init(rb);
 
-    switch (welcome_loop()) {
-        case TEXT_STATE_USB_CONNECTED:
-            state = PLUGIN_USB_CONNECTED;
+    store_lcd_settings();
+
+    state = STATE_MAIN_MENU;
+    main_menu();   
+
+    switch (state) {
+        case STATE_USB_CONNECTED:
+            plugin_state = PLUGIN_USB_CONNECTED;
             break;
 
-        case TEXT_STATE_PARSE_ERROR:
-            state = PLUGIN_ERROR;
+        case STATE_PARSE_ERROR:
+            plugin_state = PLUGIN_ERROR;
             break;
 
         default:
-            state = PLUGIN_OK;
+            plugin_state = PLUGIN_OK;
             break;
     }
 
-    /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb); /* backlight control in lib/helper.c */
-
-    return state;
+    return plugin_state;
 }
