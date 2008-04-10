@@ -36,7 +36,7 @@ static FILE * openinfile( const char * filename )
         exit( -1 );
     };
     return F;
-};
+}
 
 static FILE * openoutfile( const char * filename )
 {
@@ -48,7 +48,7 @@ static FILE * openoutfile( const char * filename )
         exit( -1 );
     };
     return F;
-};
+}
 
 static uint32_t calc_csum(const unsigned char* pb, int cb)
 {

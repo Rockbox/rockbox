@@ -33,7 +33,7 @@ static FILE * openinfile( const char * filename )
         exit( -1 );
     };
     return F;
-};
+}
 
 static FILE * openoutfile( const char * filename )
 {
@@ -45,7 +45,7 @@ static FILE * openoutfile( const char * filename )
         exit( -1 );
     };
     return F;
-};
+}
 
 int gigabeat_code(char *infile, char *outfile)
 {

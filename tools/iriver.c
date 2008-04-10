@@ -49,16 +49,16 @@ static int testheader( const unsigned char * const data )
 {
     const unsigned char * const d = data+16;
     const char * const * m = models;
-    int index = 0;
+    int ind = 0;
     while( *m )
     {
-        if( memcmp( header[ index ], d, 16 ) == 0 )
-            return index;
-        index++;
+        if( memcmp( header[ ind ], d, 16 ) == 0 )
+            return ind;
+        ind++;
         m++;
     };
     return -1;
-};
+}
 
 static void modifyheader( unsigned char * data )
 {
@@ -70,7 +70,7 @@ static void modifyheader( unsigned char * data )
             h = header_modify;
         *data++ ^= *h++;
     };
-};
+}
 
 static FILE * openinfile( const char * filename )
 {
@@ -82,7 +82,7 @@ static FILE * openinfile( const char * filename )
         exit( -1 );
     };
     return F;
-};
+}
 
 static FILE * openoutfile( const char * filename )
 {
@@ -94,7 +94,7 @@ static FILE * openoutfile( const char * filename )
         exit( -1 );
     };
     return F;
-};
+}
 
 int iriver_decode(char *infile_name, char *outfile_name, BOOL modify,
                   enum striptype stripmode )
@@ -256,7 +256,7 @@ int iriver_decode(char *infile_name, char *outfile_name, BOOL modify,
     };
 
     return 0;
-};
+}
 
 int iriver_encode(char *infile_name, char *outfile_name, BOOL modify )
 {
@@ -376,4 +376,4 @@ int iriver_encode(char *infile_name, char *outfile_name, BOOL modify )
     fprintf( stderr, "File encoded successfully and checksum table built!\n" );
 
     return 0;
-};
+}

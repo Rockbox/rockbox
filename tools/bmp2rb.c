@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -140,7 +141,7 @@ int read_bmp_file(char* filename,
 
     if (compression != 0)
     {
-        debugf("error - Unsupported compression %ld\n", compression);
+        debugf("error - Unsupported compression %d\n", compression);
         close(fd);
         return 3;
     }
@@ -154,7 +155,7 @@ int read_bmp_file(char* filename,
             numcolors = 1 << depth;
 
         if (read(fd, &palette[0], numcolors * sizeof(struct RGBQUAD))
-           != numcolors * sizeof(struct RGBQUAD))
+            != (int)(numcolors * sizeof(struct RGBQUAD)))
         {
             debugf("error - Can't read bitmap's color palette\n");
             close(fd);
@@ -459,8 +460,8 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
             return;
         }
         fprintf(fh,
-                "#define BMPHEIGHT_%s %ld\n"
-                "#define BMPWIDTH_%s %ld\n",
+                "#define BMPHEIGHT_%s %d\n"
+                "#define BMPWIDTH_%s %d\n",
                 id, height, id, width);
         if (t_depth <= 8)
             fprintf(fh, "extern const unsigned char %s[];\n", id);
@@ -470,8 +471,8 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
         fclose(fh);
     } else {
         fprintf(f,
-                "#define BMPHEIGHT_%s %ld\n"
-                "#define BMPWIDTH_%s %ld\n",
+                "#define BMPHEIGHT_%s %d\n"
+                "#define BMPWIDTH_%s %d\n",
                 id, height, id, width);
     }
 
@@ -497,7 +498,7 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
     fprintf(f, "\n};\n");
 }
 
-void generate_raw_file(char *id, const unsigned short *t_bitmap, 
+void generate_raw_file(const unsigned short *t_bitmap, 
                        int t_width, int t_height, int t_depth)
 {
     FILE *f;
@@ -559,14 +560,14 @@ void print_usage(void)
            "\t-r       Generate RAW file (little-endian)\n"
            "\t-f <n>   Generate destination format n, default = 0\n"
            "\t         0  Archos recorder, Ondio, Iriver H1x0 mono\n"
-           "\t         1  Archos player graphics library\n"
+           , APPLICATION_NAME);
+    printf("\t         1  Archos player graphics library\n"
            "\t         2  Iriver H1x0 4-grey\n"
            "\t         3  Canonical 8-bit greyscale\n"
            "\t         4  16-bit packed 5-6-5 RGB (iriver H300)\n"
            "\t         5  16-bit packed and byte-swapped 5-6-5 RGB (iPod)\n"
            "\t         6  Greyscale iPod 4-grey\n"
-           "\t         7  Greyscale X5 remote 4-grey\n"
-           , APPLICATION_NAME);
+           "\t         7  Greyscale X5 remote 4-grey\n");
     printf("build date: " __DATE__ "\n\n");
 }
 
@@ -703,7 +704,7 @@ int main(int argc, char **argv)
                              &t_width, &t_height, &t_depth))
             exit(1);
         if(raw)
-            generate_raw_file(id, t_bitmap, t_width, t_height, t_depth);
+            generate_raw_file(t_bitmap, t_width, t_height, t_depth);
         else
             generate_c_source(id, header_dir, width, height, t_bitmap, 
                               t_width, t_height, t_depth);

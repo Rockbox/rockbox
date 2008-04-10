@@ -99,8 +99,8 @@ void usage(void)
            "\t-iaudiox5 iAudio X5 format\n"
            "\t-iaudiox5v iAudio X5V format\n"
            "\t-iaudiom5 iAudio M5 format\n"
-           "\t-iaudiom3 iAudio M3 format\n"
-           "\t-ipod3g ipod firmware partition format (3rd Gen)\n"
+           "\t-iaudiom3 iAudio M3 format\n");
+    printf("\t-ipod3g ipod firmware partition format (3rd Gen)\n"
            "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
            "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
            "\t-creative=X Creative firmware structure format\n"
@@ -109,16 +109,16 @@ void usage(void)
            "\t-mi4v2  PortalPlayer .mi4 format (revision 010201)\n"
            "\t-mi4v3  PortalPlayer .mi4 format (revision 010301)\n"
            "\t-mi4r   Sandisk Rhapsody .mi4 format\n"
-           "\t        All mi4 options take two optional arguments:\n"
-           "\t        -model=XXXX   where XXXX is the model id string\n"
+           "\t        All mi4 options take two optional arguments:\n");
+    printf("\t        -model=XXXX   where XXXX is the model id string\n"
            "\t        -type=XXXX    where XXXX is a string indicating the \n"
            "\t                      type of binary, eg. RBOS, RBBL\n"
            "\t-tcc=X  Telechips generic firmware format (X values: sum, crc)\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
            "\t                   ip3g, ip4g, mini, iax5, iam5, iam3, h10, h10_5gb,\n"
-           "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2)\n"
-           "\nNo option results in Archos standard player/recorder format.\n");
+           "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2)\n");
+    printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
 }
