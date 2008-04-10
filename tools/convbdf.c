@@ -738,7 +738,7 @@ int rotleft(unsigned char *dst, /* output buffer */
 
     if(((height + 7) / 8) * width > dstlen) {
         fprintf(stderr, "%s:%d %d x %d overflows %d bytes buffer, needs %d\n",
-                __FILE__, __LINE__, width, height, dstlen,
+                __FILE__, __LINE__, width, height, (int)dstlen,
                 ((height + 7) / 8) * width );
         return 0;
     }
