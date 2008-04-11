@@ -642,6 +642,7 @@ target/arm/s3c2440/gigabeat-fx/wmcodec-meg-fx.c
 #ifndef SIMULATOR
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.c
+target/arm/imx31/debug-imx31.c
 target/arm/imx31/gigabeat-s/adc-imx31.c
 target/arm/imx31/gigabeat-s/ata-imx31.c
 target/arm/imx31/gigabeat-s/avic-imx31.c

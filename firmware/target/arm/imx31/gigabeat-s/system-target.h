@@ -30,9 +30,6 @@ static inline void udelay(unsigned int usecs)
     while ((signed int)EPITCNT1 > stop);
 }
 
-#define __dbg_hw_info(...) 0
-#define __dbg_ports(...) 0
-
 void system_prepare_fw_start(void);
 void tick_stop(void);
 void kernel_device_init(void);
