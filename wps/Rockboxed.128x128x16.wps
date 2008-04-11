@@ -6,7 +6,7 @@
 %xl|A|mode-color-small.bmp|62|109|4|
 %xl|B|shuffle-color-small.bmp|34|109|
 %xl|C|volume-color-small.bmp|15|111|9|
-%xl|D|battery-color-small.bmp|101|113|11|
+%xl|D|battery-color-small.bmp|101|113|12|
 %xl|E|repeat-color-small.bmp|47|109|4|
 %xl|F|lock-color.bmp|78|109|
 
@@ -22,4 +22,4 @@
 %?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
 %?mh<%xdF>
 %?pv<|%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi>
-%?bl<|%xdDa|%xdDb|%xdDc|%xdDd|%xdDe|%xdDf|%xdDg|%xdDh|%xdDi|%xdDj|%xdDk>
+%?bl<%xdDa|%xdDb|%xdDc|%xdDd|%xdDe|%xdDf|%xdDg|%xdDh|%xdDi|%xdDj|%xdDk|%xdDl>
