@@ -35,6 +35,9 @@ static inline void udelay(unsigned int usecs)
 
 void system_prepare_fw_start(void);
 void tick_stop(void);
+void kernel_device_init(void);
+
+#define KDEV_INIT
 
 #define HAVE_INVALIDATE_ICACHE
 static inline void invalidate_icache(void)

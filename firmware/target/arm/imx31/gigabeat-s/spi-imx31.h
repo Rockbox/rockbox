@@ -16,8 +16,58 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#define DATAMASK 0xFF000000
+#ifndef _SPI_IMX31_H_
+#define _SPI_IMX31_H_
 
+#define USE_CSPI1_MODULE (1 << 0)
+#define USE_CSPI2_MODULE (1 << 1)
+#define USE_CSPI3_MODULE (1 << 2)
+
+/* SPI_MODULE_MASK is set in target's config */
+enum spi_module_number
+{
+#if (SPI_MODULE_MASK & USE_CSPI1_MODULE)
+    CSPI1_NUM = 0,
+#endif
+#if (SPI_MODULE_MASK & USE_CSPI2_MODULE)
+    CSPI2_NUM,
+#endif
+#if (SPI_MODULE_MASK & USE_CSPI3_MODULE)
+    CSPI3_NUM,
+#endif
+    SPI_NUM_CSPI,
+};
+
+struct spi_node
+{
+    enum spi_module_number num; /* Module number (CSPIx_NUM) */
+    unsigned long conreg;       /* CSPI conreg setup */
+    unsigned long periodreg;    /* CSPI periodreg setup */
+};
+
+struct spi_transfer
+{
+    const void *txbuf;
+    void       *rxbuf;
+    int         count;
+};
+
+/* One-time init of SPI driver */
 void spi_init(void);
-void spi_send(int address, unsigned long data);
-void spi_read(int address, unsigned long* buffer);
+
+/* Enable the specified module for the node */
+void spi_enable_module(struct spi_node *node);
+
+/* Disabled the specified module for the node */
+void spi_disable_module(struct spi_node *node);
+
+/* Lock module mutex */
+void spi_lock(struct spi_node *node);
+
+/* Unlock module mutex */
+void spi_unlock(struct spi_node *node);
+
+/* Send and/or receive data on the specified node */
+int spi_transfer(struct spi_node *node, struct spi_transfer *trans);
+
+#endif /* _SPI_IMX31_H_ */

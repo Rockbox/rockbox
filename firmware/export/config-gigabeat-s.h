@@ -83,6 +83,9 @@
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_IMX31L
 
+/* Define the bitmask of serial interface modules (CSPI) used */
+#define SPI_MODULE_MASK (USE_CSPI2_MODULE)
+
 /* Type of mobile power - check this out */
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1500        /* min. capacity selectable */

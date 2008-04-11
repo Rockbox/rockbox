@@ -516,32 +516,41 @@
 #define GPIO3_ISR               (*(REG32_PTR_T)(GPIO3_BASE_ADDR+0x18))
 
 /* CSPI */
-#define CSPI_RXDATA1            (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x00))
-#define CSPI_TXDATA1            (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x04))
-#define CSPI_CONREG1            (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x08))
-#define CSPI_INTREG1            (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x0C))
-#define CSPI_DMAREG1            (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x10))
-#define CSPI_STATREG1           (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x14))
-#define CSPI_PERIODREG1         (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x18))
-#define CSPI_TESTREG1           (*(REG32_PTR_T)(CSPI1_BASE_ADDR+0x1C0))
+#define CSPI_RXDATA_I           0x00 /* Offset - 0x00  */
+#define CSPI_TXDATA_I           0x01 /* Offset - 0x04  */
+#define CSPI_CONREG_I           0x02 /* Offset - 0x08  */
+#define CSPI_INTREG_I           0x03 /* Offset - 0x0C  */
+#define CSPI_DMAREG_I           0x04 /* Offset - 0x10  */
+#define CSPI_STATREG_I          0x05 /* Offset - 0x14  */
+#define CSPI_PERIODREG_I        0x06 /* Offset - 0x18  */
+#define CSPI_TESTREG_I          0x70 /* Offset - 0x1C0 */
 
-#define CSPI_RXDATA2            (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x00))
-#define CSPI_TXDATA2            (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x04))
-#define CSPI_CONREG2            (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x08))
-#define CSPI_INTREG2            (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x0C))
-#define CSPI_DMAREG2            (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x10))
-#define CSPI_STATREG2           (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x14))
-#define CSPI_PERIODREG2         (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x18))
-#define CSPI_TESTREG2           (*(REG32_PTR_T)(CSPI2_BASE_ADDR+0x1C0))
+#define CSPI_RXDATA1            (((REG32_PTR_T)CSPI1_BASE_ADDR)[CSPI_RXDATA_I])
+#define CSPI_TXDATA1            (((REG32_PTR_T)CSPI1_BASE_ADDR)[CSPI_TXDATA_I])
+#define CSPI_CONREG1            (((REG32_PTR_T)CSPI1_BASE_ADDR)[CSPI_CONREG_I])
+#define CSPI_INTREG1            (((REG32_PTR_T)CSPI1_BASE_ADDR)[CSPI_INTREG_I])
+#define CSPI_DMAREG1            (((REG32_PTR_T)CSPI1_BASE_ADDR)[CSPI_DMAREG_I])
+#define CSPI_STATREG1           (((REG32_PTR_T)CSPI1_BASE_ADDR)[CSPI_STATREG_I])
+#define CSPI_PERIODREG1         (((REG32_PTR_T)CSPI1_BASE_ADDR)[CSPI_PERIODREG_I])
+#define CSPI_TESTREG1           (((REG32_PTR_T)CSPI1_BASE_ADDR)[CSPI_TESTREG_I])
 
-#define CSPI_RXDATA3            (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x00))
-#define CSPI_TXDATA3            (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x04))
-#define CSPI_CONREG3            (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x08))
-#define CSPI_INTREG3            (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x0C))
-#define CSPI_DMAREG3            (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x10))
-#define CSPI_STATREG3           (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x14))
-#define CSPI_PERIODREG3         (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x18))
-#define CSPI_TESTREG3           (*(REG32_PTR_T)(CSPI3_BASE_ADDR+0x1C0))
+#define CSPI_RXDATA2            (((REG32_PTR_T)CSPI2_BASE_ADDR)[CSPI_RXDATA_I])
+#define CSPI_TXDATA2            (((REG32_PTR_T)CSPI2_BASE_ADDR)[CSPI_TXDATA_I])
+#define CSPI_CONREG2            (((REG32_PTR_T)CSPI2_BASE_ADDR)[CSPI_CONREG_I])
+#define CSPI_INTREG2            (((REG32_PTR_T)CSPI2_BASE_ADDR)[CSPI_INTREG_I])
+#define CSPI_DMAREG2            (((REG32_PTR_T)CSPI2_BASE_ADDR)[CSPI_DMAREG_I])
+#define CSPI_STATREG2           (((REG32_PTR_T)CSPI2_BASE_ADDR)[CSPI_STATREG_I])
+#define CSPI_PERIODREG2         (((REG32_PTR_T)CSPI2_BASE_ADDR)[CSPI_PERIODREG_I])
+#define CSPI_TESTREG2           (((REG32_PTR_T)CSPI2_BASE_ADDR)[CSPI_TESTREG_I])
+
+#define CSPI_RXDATA3            (((REG32_PTR_T)CSPI3_BASE_ADDR)[CSPI_RXDATA_I])
+#define CSPI_TXDATA3            (((REG32_PTR_T)CSPI3_BASE_ADDR)[CSPI_TXDATA_I])
+#define CSPI_CONREG3            (((REG32_PTR_T)CSPI3_BASE_ADDR)[CSPI_CONREG_I])
+#define CSPI_INTREG3            (((REG32_PTR_T)CSPI3_BASE_ADDR)[CSPI_INTREG_I])
+#define CSPI_DMAREG3            (((REG32_PTR_T)CSPI3_BASE_ADDR)[CSPI_DMAREG_I])
+#define CSPI_STATREG3           (((REG32_PTR_T)CSPI3_BASE_ADDR)[CSPI_STATREG_I])
+#define CSPI_PERIODREG3         (((REG32_PTR_T)CSPI3_BASE_ADDR)[CSPI_PERIODREG_I])
+#define CSPI_TESTREG3           (((REG32_PTR_T)CSPI3_BASE_ADDR)[CSPI_TESTREG_I])
 
 /* CSPI CONREG flags/fields */
 #define CSPI_CONREG_CHIP_SELECT_SS0     (0 << 24)
@@ -563,6 +572,7 @@
 #define CSPI_CONREG_DATA_RATE_DIV_256   (6 << 16)
 #define CSPI_CONREG_DATA_RATE_DIV_512   (7 << 16)
 #define CSPI_CONREG_DATA_RATE_DIV_MASK  (7 << 16)
+#define CSPI_BITCOUNT(n)                ((n) << 8)
 #define CSPI_CONREG_SSPOL               (1 << 7)
 #define CSPI_CONREG_SSCTL               (1 << 6)
 #define CSPI_CONREG_PHA                 (1 << 6)
@@ -581,7 +591,7 @@
 #define CSPI_INTREG_RREN                (1 << 3)
 #define CSPI_INTREG_TFEN                (1 << 2)
 #define CSPI_INTREG_THEN                (1 << 1)
-#define CSPI_INTREF_TEEN                (1 << 0)
+#define CSPI_INTREG_TEEN                (1 << 0)
 
 /* CSPI DMAREG flags */
 #define CSPI_DMAREG_RFDEN               (1 << 5)
@@ -764,12 +774,6 @@
 #define CLKCTL_PMCR1                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x60))
 #define CLKCTL_PDR2                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x64))
 
-#define CG_OFF                          0x0 /* Always off */
-#define CG_ON_RUN                       0x1 /* On in run mode, off in wait and doze */
-#define CG_ON_RUN_WAIT                  0x2 /* On in run and wait modes, off in doze */
-#define CG_ON_ALL                       0x3 /* Always on */
-#define CG_MASK                         0x3 /* bitmask */
-
 #define CGR0_SD_MMC1(cg)                ((cg) << 0*2)
 #define CGR0_SD_MMC2(cg)                ((cg) << 1*2)
 #define CGR0_GPT(cg)                    ((cg) << 2*2)
@@ -811,6 +815,39 @@
 #define CGR2_EMI(cg)                    ((cg) << 4*2)
 #define CGR2_RTIC(cg)                   ((cg) << 5*2)
 #define CGR2_FIR(cg)                    ((cg) << 6*2)
+
+#define WIM_GPIO3                       (1 << 0)
+#define WIM_GPIO2                       (1 << 1)
+#define WIM_GPIO1                       (1 << 2)
+#define WIM_PCMCIA                      (1 << 3)
+#define WIM_WDT                         (1 << 4)
+#define WIM_USB_OTG                     (1 << 5)
+#define WIM_IPI_INT_UH2                 (1 << 6)
+#define WIM_IPI_INT_UH1                 (1 << 7)
+#define WIM_IPI_INT_UART5_ANDED         (1 << 8)
+#define WIM_IPI_INT_UART4_ANDED         (1 << 9)
+#define WIM_IPI_INT_UART3_ANDED         (1 << 10)
+#define WIM_IPI_INT_UART2_ANDED         (1 << 11)
+#define WIM_IPI_INT_UART1_ANDED         (1 << 12)
+#define WIM_IPI_INT_SIM_DATA_IRQ        (1 << 13)
+#define WIM_IPI_INT_SDHC2               (1 << 14)
+#define WIM_IPI_INT_SDHC1               (1 << 15)
+#define WIM_IPI_INT_RTC                 (1 << 16)
+#define WIM_IPI_INT_PWM                 (1 << 17)
+#define WIM_IPI_INT_KPP                 (1 << 18)
+#define WIM_IPI_INT_IIM                 (1 << 19)
+#define WIM_IPI_INT_GPT                 (1 << 20)
+#define WIM_IPI_INT_FIR                 (1 << 21)
+#define WIM_IPI_INT_EPIT2               (1 << 22)
+#define WIM_IPI_INT_EPIT1               (1 << 23)
+#define WIM_IPI_INT_CSPI2               (1 << 24)
+#define WIM_IPI_INT_CSPI1               (1 << 25)
+#define WIM_IPI_INT_POWER_FAIL          (1 << 26)
+#define WIM_IPI_INT_CSPI3               (1 << 27)
+#define WIM_RESERVED28                  (1 << 28)
+#define WIM_RESERVED29                  (1 << 29)
+#define WIM_RESERVED30                  (1 << 30)
+#define WIM_RESERVED31                  (1 << 31)
 
 /* WEIM - CS0 */
 #define CSCRU                           0x00

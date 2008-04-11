@@ -81,6 +81,9 @@ void kernel_init(void)
         memset(&all_queues, 0, sizeof(all_queues));
         corelock_init(&all_queues.cl);
         tick_start(1000/HZ);
+#ifdef KDEV_INIT
+        kernel_device_init();
+#endif
     }
 }
 

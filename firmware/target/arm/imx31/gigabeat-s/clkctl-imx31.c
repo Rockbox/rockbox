@@ -7,7 +7,9 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Linus Nielsen Feltzing
+ * Copyright (c) 2008 Michael Sevakis
+ *
+ * Clock control functions for IMX31 processor
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,36 +18,28 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
-#include "cpu.h"
 #include "system.h"
-#include "backlight-target.h"
-#include "backlight.h"
-#include "lcd.h"
-#include "power.h"
-#include "mc13783.h"
-#include "debug.h"
+#include "cpu.h"
+#include "clkctl-imx31.h"
 
-bool _backlight_init(void)
+void imx31_clkctl_module_clock_gating(enum IMX31_CG_LIST cg,
+                                      enum IMX31_CG_MODES mode)
 {
-    return true;
-}
+    volatile unsigned long *reg;
+    unsigned long mask;
+    int shift;
+    int oldlevel;
 
-void _backlight_on(void)
-{
-    /* LEDEN=1 */
-    mc13783_set(MC13783_LED_CONTROL0, (1 << 0));
-}
+    if (cg >= CG_NUM_CLOCKS)
+        return;
 
-void _backlight_off(void)
-{
-    /* LEDEN=0 */
-    mc13783_clear(MC13783_LED_CONTROL0, (1 << 0));
-}
+    reg = &CLKCTL_CGR0 + cg / 16;   /* Select CGR0, CGR1, CGR2 */
+    shift = 2*(cg % 16);            /* Get field shift */
+    mask = CG_MASK << shift;        /* Select field */
 
-/* Assumes that the backlight has been initialized */
-void _backlight_set_brightness(int brightness)
-{
-    (void)brightness;
-}
+    oldlevel = disable_interrupt_save(IRQ_FIQ_STATUS);
 
+    *reg = (*reg & ~mask) | ((mode << shift) & mask);
+
+    restore_interrupt(oldlevel);
+}

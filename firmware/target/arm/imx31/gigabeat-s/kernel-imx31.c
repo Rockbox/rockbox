@@ -19,6 +19,9 @@
 #include "config.h"
 #include "system.h"
 #include "avic-imx31.h"
+#include "spi-imx31.h"
+#include "mc13783.h"
+#include "clkctl-imx31.h"
 #include "kernel.h"
 #include "thread.h"
 
@@ -42,10 +45,11 @@ static __attribute__((interrupt("IRQ"))) void EPIT1_HANDLER(void)
 
 void tick_start(unsigned int interval_in_ms)
 {
-    CLKCTL_CGR0 |= CGR0_EPIT1(CG_ON_ALL);   /* EPIT1 module clock ON -
-                                               before writing regs! */
+    imx31_clkctl_module_clock_gating(CG_EPIT1, CGM_ON_ALL); /* EPIT1 module
+                                               clock ON - before writing
+                                               regs! */
     EPITCR1 &= ~(EPITCR_OCIEN | EPITCR_EN); /* Disable the counter */
-    CLKCTL_WIMR0 &= ~(1 << 23);             /* Clear wakeup mask */
+    CLKCTL_WIMR0 &= ~WIM_IPI_INT_EPIT1;     /* Clear wakeup mask */
 
     /* mcu_main_clk = 528MHz = 27MHz * 2 * ((9 + 7/9) / 1)
      * CLKSRC = ipg_clk = 528MHz / 4 / 2 = 66MHz,
@@ -66,11 +70,18 @@ void tick_start(unsigned int interval_in_ms)
     EPITCR1 |= EPITCR_EN;        /* Enable the counter */
 }
 
+void kernel_device_init(void)
+{
+    spi_init();
+    mc13783_init();
+}
+
 #ifdef BOOTLOADER
 void tick_stop(void)
 {
     avic_disable_int(EPIT1);                /* Disable insterrupt */
     EPITCR1 &= ~(EPITCR_OCIEN | EPITCR_EN); /* Disable counter */
-    CLKCTL_CGR0 &= ~CGR0_EPIT1(CG_MASK);    /* EPIT1 module clock OFF */
+    EPITSR1 = EPITSR_OCIF;                  /* Clear pending */
+    imx31_clkctl_module_clock_gating(CG_EPIT1, CGM_OFF); /* Turn off module clock */
 }
 #endif
