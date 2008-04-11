@@ -1,44 +1,14 @@
 # (C) 2007, Roan Horning <roan@horning.us>
 # License: GNU GPL v2 or later.
 %wd
-%X|bg-220x176x16.bmp|0|0|
+%X|bg-220x176x16.bmp|
 %P|pg-200.bmp|
-%x|o|pgln-200.bmp|10|116|
-%xl|p|ply-color-big.bmp|102|156|
-%xl|q|ps-color-big.bmp|102|156|
-%xl|f|ff-color-big.bmp|102|156|
-%xl|r|rw-color-big.bmp|102|156|
-%xl|b|sl-color-big.bmp|57|156|
-%x|s|spk-color.bmp|3|156|
-%xl|A|v01-color.bmp|15|156|
-%xl|B|v02-color.bmp|17|156|
-%xl|C|v03-color.bmp|19|156|
-%xl|D|v04-color.bmp|21|156|
-%xl|E|v05-color.bmp|23|156|
-%xl|F|v06-color.bmp|25|156|
-%xl|G|v07-color.bmp|27|156|
-%xl|H|v08-color.bmp|29|156|
-%xl|I|v09-color-big.bmp|31|156|
-%xl|J|v10-color.bmp|33|156|
-%xl|K|v11-color.bmp|35|156|
-%xl|Z|n-color-big.bmp|210|160|
-%xl|Y|n-color-big.bmp|207|160|
-%xl|X|n-color-big.bmp|204|160|
-%xl|W|n-color-big.bmp|201|160|
-%xl|V|n-color-big.bmp|198|160|
-%xl|U|n-color-big.bmp|195|160|
-%xl|T|n-color-big.bmp|192|160|
-%xl|S|n-color-big.bmp|189|160|
-%xl|R|n-color-big.bmp|186|160|
-%xl|Q|n-color-big.bmp|183|160|
-%xl|P|l-color-big.bmp|186|160|
-%xl|O|l-color-big.bmp|183|160|
-%x|N|bt-color-big.bmp|181|158|
-%xl|z|ra-color-big.bmp|77|156|
-%xl|y|ro-color-big.bmp|77|156|
-%xl|x|rs-color-big.bmp|77|156|
-%xl|w|rab-color-big.bmp|77|156|
-%xl|h|hd-color.bmp|142|156|
+%xl|A|mode-color-big.bmp|102|156|4|
+%xl|B|shuffle-color-big.bmp|57|156|
+%xl|C|volume-color-big.bmp|15|158|11|
+%xl|D|battery-color-big.bmp|183|160|12|
+%xl|E|repeat-color-big.bmp|77|156|4|
+%xl|F|lock-color.bmp|142|156|
 
 
 
@@ -48,10 +18,10 @@
 
 %ac%t3%ig;%ac%iy 
 %pb|5|10|210|116|
-%al  %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|unknown>%ar%pt  
-%?ps<%xdb>
-%?mp<%xdq|%xdp|%xdq|%xdf|%xdr>
-%?mm<|%xdz|%xdy|%xdx|%xdw>
-%?mh<%xdh>
-%?pv<|%xdA|%xdA%xdB|%xdA%xdB%xdC|%xdA%xdB%xdC%xdD|%xdA%xdB%xdC%xdD%xdE|%xdA%xdB%xdC%xdD%xdE%xdF|%xdA%xdB%xdC%xdD%xdE%xdF%xdG|%xdA%xdB%xdC%xdD%xdE%xdF%xdG%xdH|%xdA%xdB%xdC%xdD%xdE%xdF%xdG%xdH%xdI|%xdA%xdB%xdC%xdD%xdE%xdF%xdG%xdH%xdI%xdJ|%xdA%xdB%xdC%xdD%xdE%xdF%xdG%xdH%xdI%xdJ%xdK>
-%?bl<|%xdO|%xdO%xdP|%xdQ%xdR|%xdQ%xdR%xdS|%xdQ%xdR%xdS%xdT|%xdQ%xdR%xdS%xdT%xdU|%xdQ%xdR%xdS%xdT%xdU%xdV|%xdQ%xdR%xdS%xdT%xdU%xdV%xdW|%xdQ%xdR%xdS%xdT%xdU%xdV%xdW%xdX|%xdQ%xdR%xdS%xdT%xdU%xdV%xdW%xdX%xdY|%xdQ%xdR%xdS%xdT%xdU%xdV%xdW%xdX%xdY%xdZ>
+%al  %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|nsf|speex|spc|ape|wma|unknown>%ar%pt  
+%?ps<%xdB>
+%?mp<%xdAb|%xdAa|%xdAb|%xdAc|%xdAd>
+%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
+%?mh<%xdF>
+%?pv<|%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj|%xdCk>
+%?bl<%xdDa|%xdDb|%xdDc|%xdDd|%xdDe|%xdDf|%xdDg|%xdDh|%xdDi|%xdDj|%xdDk|%xdDl>
