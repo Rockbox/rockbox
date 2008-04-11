@@ -140,6 +140,7 @@ struct tea_key tea_keytable[] = {
   { "c200",              { 0xbf2d06fa, 0xf0e23d59, 0x29738132, 0xe2d04ca7 } },
   { "c200_103",          { 0x2a7968de, 0x15127979, 0x142e60a7, 0xe49c1893 } },
   { "c200_106",          { 0xa913d139, 0xf842f398, 0x3e03f1a6, 0x060ee012 } },
+  { "sa9200",            { 0x33ea0236, 0x9247bdc5, 0xdfaedf9f, 0xd67c9d30 } },
 };
 
 /*
