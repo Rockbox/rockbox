@@ -66,7 +66,7 @@
 #define ATA_POWER_OFF_TIMEOUT 2*HZ
 #endif
 
-#ifdef MAX_PHYS_SECTOR_SIZE
+#if defined(MAX_PHYS_SECTOR_SIZE) && MEM == 64
 /* Hack - what's the deal with 5g? */
 struct ata_lock
 {
