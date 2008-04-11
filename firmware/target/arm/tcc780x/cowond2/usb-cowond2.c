@@ -23,21 +23,18 @@
 #include "kernel.h"
 #include "ata.h"
 
-/* USB detect is GPIOC 26 */
+/* USB detect is currently unknown */
 inline bool usb_detect(void)
 {
-    return (GPIOC & 1<<26);
+    return true;
 }
 
 void usb_init_device(void)
 {
-    #warning function not implemented
 }
 
 void usb_enable(bool on)
 {
-    #warning function not implemented
-
     if (on)
     {
     
