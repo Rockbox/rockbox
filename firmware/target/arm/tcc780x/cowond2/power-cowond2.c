@@ -27,6 +27,11 @@
 
 void power_init(void)
 {
+    unsigned char data[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
+
+    /* Clear pending interrupts from pcf50606 */
+    pcf50606_read_multiple(0x02, data, 3);
+    
     /* Set outputs as per OF - further investigation required. */
     pcf50606_write(PCF5060X_DCDEC1,  0xe4);
     pcf50606_write(PCF5060X_IOREGC,  0xf5);
@@ -36,6 +41,10 @@ void power_init(void)
     pcf50606_write(PCF5060X_DCUDC1,  0xe7);
     pcf50606_write(PCF5060X_LPREGC1, 0x0);
     pcf50606_write(PCF5060X_LPREGC2, 0x2);
+
+#ifndef BOOTLOADER
+    IEN |= EXT3_IRQ_MASK;   /* Unmask EXT3 */
+#endif
 }
 
 void ide_power_enable(bool on)
@@ -53,6 +62,37 @@ void power_off(void)
     /* Forcibly cut power to SoC & peripherals by putting the PCF to sleep */
     pcf50606_write(PCF5060X_OOCC1, GOSTDBY | CHGWAK | EXTONWAK);
 }
+
+#ifndef BOOTLOADER
+void EXT3(void)
+{
+    unsigned char data[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
+
+    /* Clear pending interrupts from pcf50606 */
+    int fiq_status = disable_fiq_save();
+    pcf50606_read_multiple(0x02, data, 3);
+
+    if (data[0] & 0x04)
+    {
+        /* ONKEY1S: reset timeout as we're using SW poweroff */
+        pcf50606_write(0x08, pcf50606_read(0x08) | 0x02); /* OOCC1: TOTRST=1 */
+    }
+
+    if (data[2] & 0x08)
+    {
+        /* TODO: Touchscreen pen down event, do something about it */
+    }
+
+    restore_fiq(fiq_status);
+}
+#endif
+
+#if CONFIG_CHARGING
+bool charger_inserted(void)
+{
+    return (GPIOC & (1<<26)) ? false:true;
+}
+#endif
 
 #else /* SIMULATOR */
 

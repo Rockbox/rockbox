@@ -120,6 +120,7 @@
 
 #define IRQ_PRIORITY_TABLE ((volatile unsigned int *)0xF30010A0)
 
+#define EXT3_IRQ_MASK   (1<<3)
 #define TIMER0_IRQ_MASK (1<<6)
 #define DAI_RX_IRQ_MASK (1<<14)
 #define DAI_TX_IRQ_MASK (1<<15)
