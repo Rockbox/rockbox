@@ -698,6 +698,15 @@ static void draw_player_fullbar(struct gui_wps *gwps, char* buf, int buf_size)
 
 #endif /* HAVE_LCD_CHARCELL */
 
+static char* get_codectype(const struct mp3entry* id3)
+{
+    if (id3->codectype < AFMT_NUM_CODECS) {
+        return (char*)audio_formats[id3->codectype].label;
+    } else {
+        return NULL;
+    }
+}
+
 /* Extract a part from a path.
  *
  * buf      - buffer extract part to.
@@ -983,7 +992,7 @@ static char *get_token_value(struct gui_wps *gwps,
                 else
                     *intval = id3->codectype;
             }
-            return id3_get_codec(id3);
+            return get_codectype(id3);
 
         case WPS_TOKEN_FILE_FREQUENCY:
             snprintf(buf, buf_size, "%ld", id3->frequency);

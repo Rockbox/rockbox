@@ -232,7 +232,6 @@ enum {
 bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename);
 bool mp3info(struct mp3entry *entry, const char *filename);
 char* id3_get_num_genre(unsigned int genre_num);
-char* id3_get_codec(const struct mp3entry* id3);
 int getid3v2len(int fd);
 void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig);
 void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig);

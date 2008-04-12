@@ -143,10 +143,10 @@ const int afmt_rec_format[AFMT_NUM_CODECS] =
 #endif /* CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING) */
 /****/
 
-unsigned long unsync(unsigned long b0,
-                     unsigned long b1,
-                     unsigned long b2,
-                     unsigned long b3)
+static unsigned long unsync(unsigned long b0,
+                            unsigned long b1,
+                            unsigned long b2,
+                            unsigned long b3)
 {
    return (((long)(b0 & 0x7F) << (3*7)) |
            ((long)(b1 & 0x7F) << (2*7)) |
@@ -197,15 +197,6 @@ static bool id3_is_genre_string(const char *string)
 {
     return ( string >= genres[0] &&
              string <= genres[sizeof(genres)/sizeof(char*) - 1] );
-}
-
-char* id3_get_codec(const struct mp3entry* id3)
-{
-    if (id3->codectype < AFMT_NUM_CODECS) {
-        return (char*)audio_formats[id3->codectype].label;
-    } else {
-        return NULL;
-    }
 }
 
 /*
