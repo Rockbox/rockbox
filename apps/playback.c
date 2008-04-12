@@ -1743,6 +1743,7 @@ static bool audio_load_track(int offset, bool start_play)
     case AFMT_AAC:
     case AFMT_MPC:
     case AFMT_APE:
+    case AFMT_WMA:
         if (offset > 0)
             track_id3->offset = offset;
         break;

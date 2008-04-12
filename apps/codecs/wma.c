@@ -453,7 +453,6 @@ enum codec_status codec_main(void)
     uint32_t elapsedtime;
     int retval;
     asf_waveformatex_t wfx;
-    uint32_t currentframe;
     size_t resume_offset;
     int i;
     int wmares, res;
@@ -495,8 +494,25 @@ next_track:
         goto exit;
     }
 
-    /* Now advance the file position to the first frame */
-    ci->seek_buffer(ci->id3->first_frame_offset);
+    DEBUGF("**************** IN WMA.C ******************\n");
+
+    wma_decode_init(&wmadec,&wfx);
+
+    if (resume_offset > ci->id3->first_frame_offset)
+    {
+        /* Get start of current packet */
+        int packet_offset = (resume_offset - ci->id3->first_frame_offset) 
+            % wfx.packet_size;
+        ci->seek_buffer(resume_offset - packet_offset);
+        elapsedtime = get_timestamp(&i);
+        ci->set_elapsed(elapsedtime);
+    }
+    else
+    {
+        /* Now advance the file position to the first frame */
+        ci->seek_buffer(ci->id3->first_frame_offset);
+        elapsedtime = 0;
+    }
 
     ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
     ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
@@ -504,12 +520,6 @@ next_track:
     codec_set_replaygain(ci->id3);
 
     /* The main decoding loop */
-
-    currentframe = 0;
-    elapsedtime = 0;
-
-    DEBUGF("**************** IN WMA.C ******************\n");
-    wma_decode_init(&wmadec,&wfx);
 
     res = 1;
     while (res >= 0)
