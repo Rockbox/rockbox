@@ -760,10 +760,10 @@ bool is_point_within_rectangle(struct Point* rect, struct Point* p, int size)
     int aTLy = rect->y - size;
     int aBRx = rect->x + size;
     int aBRy = rect->y + size;
-    rb->lcd_drawline( aTLx/SCALE, aTLy/SCALE, aBRx/SCALE, aTLy/SCALE);
-    rb->lcd_drawline( aTLx/SCALE, aTLy/SCALE, aTLx/SCALE, aBRy/SCALE);
-    rb->lcd_drawline( aTLx/SCALE, aBRy/SCALE, aBRx/SCALE, aBRy/SCALE);
-    rb->lcd_drawline( aBRx/SCALE, aBRy/SCALE, aBRx/SCALE, aTLy/SCALE);
+    rb->lcd_hline( aTLx/SCALE, aBRx/SCALE, aTLy/SCALE);
+    rb->lcd_vline( aTLx/SCALE, aTLy/SCALE, aBRy/SCALE);
+    rb->lcd_hline( aTLx/SCALE, aBRx/SCALE, aBRy/SCALE);
+    rb->lcd_vline( aBRx/SCALE, aBRy/SCALE, aTLy/SCALE);
     return (p->x > aTLx && p->x < aBRx && p->y > aTLy && p->y < aBRy);
 #else
     return (p->x > rect->x - size && p->x < rect->x + size &&

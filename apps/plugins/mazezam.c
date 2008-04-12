@@ -397,24 +397,21 @@ static void draw_row(
         /* draw shade */
         rb->lcd_set_foreground(chunk_gray_shade[(i+width) %
                                MAZEZAM_NUM_CHUNK_GRAYS]);
-        rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+1,
-                         yOff+size*i+size-2,
-                         xOff+size*shift[i]+size*cd->c_inset[i][j]+
+        rb->lcd_hline(xOff+size*shift[i]+size*cd->c_inset[i][j]+1,
+                      xOff+size*shift[i]+size*cd->c_inset[i][j]+
                                                    cd->c_width[i][j]*size-3,
-                         yOff+size*i+size-2);
-        rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+
+                      yOff+size*i+size-2);
+        rb->lcd_vline(xOff+size*shift[i]+size*cd->c_inset[i][j]+
                                                    cd->c_width[i][j]*size-2,
-                         yOff+size*i,
-                         xOff+size*shift[i]+size*cd->c_inset[i][j]+
-                                                   cd->c_width[i][j]*size-2,
-                         yOff+size*i+size-2);
+                      yOff+size*i,
+                      yOff+size*i+size-2);
 
         /* draw fill */
         rb->lcd_set_foreground(chunk_gray[(i+width) %
                                MAZEZAM_NUM_CHUNK_GRAYS]);
         for (k = yOff+size*i+2; k <  yOff+size*i+size-2; k += 2)
-            rb->lcd_drawline(xOff+size*shift[i]+size*cd->c_inset[i][j]+2,k,
-                             xOff+size*shift[i]+size*cd->c_inset[i][j]+
+            rb->lcd_hline(xOff+size*shift[i]+size*cd->c_inset[i][j]+2,
+                          xOff+size*shift[i]+size*cd->c_inset[i][j]+
                                                 cd->c_width[i][j]*size-3,k);
 #else
         rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
@@ -450,10 +447,8 @@ static void draw_player(
 #elif LCD_DEPTH > 1
     rb->lcd_set_foreground(MAZEZAM_PLAYER_GRAY);
 #endif
-    rb->lcd_drawline(xOff+size*x, yOff+size*y+middle,
-                     xOff+size*x+max, yOff+size*y+middle);
-    rb->lcd_drawline(xOff+size*x+middle, yOff+size*y,
-                     xOff+size*x+middle, yOff+size*y+max-ldelta);
+    rb->lcd_hline(xOff+size*x, xOff+size*x+max, yOff+size*y+middle);
+    rb->lcd_vline(xOff+size*x+middle, yOff+size*y, yOff+size*y+max-ldelta);
     rb->lcd_drawline(xOff+size*x+middle, yOff+size*y+max-ldelta,
                      xOff+size*x+middle-ldelta, yOff+size*y+max);
     rb->lcd_drawline(xOff+size*x+middle, yOff+size*y+max-ldelta,
@@ -476,14 +471,12 @@ static void draw_gate(
 #elif LCD_DEPTH > 1
     rb->lcd_set_foreground(MAZEZAM_GATE_GRAY);
 #endif
-    rb->lcd_drawline(xOff-size,yOff+entrance*size+third,
-                     xOff-1,yOff+entrance*size+third);
-    rb->lcd_drawline(xOff-size,yOff+entrance*size+twothirds,
-                     xOff-1,yOff+entrance*size+twothirds);
-    rb->lcd_drawline(xOff-size+third,yOff+entrance*size,
-                     xOff-size+third,yOff+entrance*size+size-1);
-    rb->lcd_drawline(xOff-size+twothirds,yOff+entrance*size,
-                     xOff-size+twothirds,yOff+entrance*size+size-1);
+    rb->lcd_hline(xOff-size,xOff-1,yOff+entrance*size+third);
+    rb->lcd_hline(xOff-size,xOff-1,yOff+entrance*size+twothirds);
+    rb->lcd_vline(xOff-size+third,yOff+entrance*size,
+                  yOff+entrance*size+size-1);
+    rb->lcd_vline(xOff-size+twothirds,yOff+entrance*size,
+                  yOff+entrance*size+size-1);
 }
 
 /*****************************************************************************

@@ -202,22 +202,22 @@ void maze_draw(struct maze* maze, struct screen* display)
 
             /* draw walls */
             if(cell & WALL_N)
-                display->drawline(x*wx, y*wy, x*wx+wx, y*wy);
+                display->hline(x*wx, x*wx+wx, y*wy);
             if(cell & WALL_E)
-                display->drawline(x*wx+wx, y*wy, x*wx+wx, y*wy+wy);
+                display->vline(x*wx+wx, y*wy, y*wy+wy);
             if(cell & WALL_S)
-                display->drawline(x*wx, y*wy+wy, x*wx+wx, y*wy+wy);
+                display->hline(x*wx, x*wx+wx, y*wy+wy);
             if(cell & WALL_W)
-                display->drawline(x*wx, y*wy, x*wx, y*wy+wy);
+                display->vline(x*wx, y*wy, y*wy+wy);
 
             if(cell & BORDER_N)
-                display->drawline(x*wx, y*wy, x*wx+wx, y*wy);
+                display->hline(x*wx, x*wx+wx, y*wy);
             if(cell & BORDER_E)
-                display->drawline(x*wx+wx, y*wy, x*wx+wx, y*wy+wy);
+                display->vline(x*wx+wx, y*wy, y*wy+wy);
             if(cell & BORDER_S)
-                display->drawline(x*wx, y*wy+wy, x*wx+wx, y*wy+wy);
+                display->hline(x*wx, x*wx+wx, y*wy+wy);
             if(cell & BORDER_W)
-                display->drawline(x*wx, y*wy, x*wx, y*wy+wy);
+                display->vline(x*wx, y*wy, y*wy+wy);
         }
     }
     if(maze->solved){
