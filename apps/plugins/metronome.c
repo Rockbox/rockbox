@@ -188,7 +188,7 @@ void metronome_draw(struct screen* display)
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_BITMAP
-    display->drawline(0, 12, 111, 12);
+    display->hline(0, 111, 12);
     if(sound_paused)
         display->puts(0,2,METRONOME_MSG_START);
     else

@@ -1000,7 +1000,7 @@ static unsigned int pegbox_menu(struct game_context* pb) {
         rb->lcd_putsxy((LCD_WIDTH)/4, 40, "Quit");
         
         if(!can_resume)
-            rb->lcd_drawline((LCD_WIDTH)/4, 28, (LCD_WIDTH)/4+30, 28);
+            rb->lcd_hline((LCD_WIDTH)/4, (LCD_WIDTH)/4+30, 28);
         
         rb->lcd_putsxy((LCD_WIDTH)/4-8, loc*8+16, "*");
         

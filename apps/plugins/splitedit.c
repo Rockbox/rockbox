@@ -338,10 +338,10 @@ static void redraw_osci(void)
     {
         if (osci_buffer[x] > 0)
         {
-            rb->lcd_drawline
+            rb->lcd_vline
             (
                 OSCI_X + x, OSCI_Y + OSCI_HEIGHT - 1,
-                OSCI_X + x, OSCI_Y + OSCI_HEIGHT - osci_buffer[x] - 1
+                OSCI_Y + OSCI_HEIGHT - osci_buffer[x] - 1
             );
         }
     }
@@ -977,10 +977,10 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                     int i;
                     for (i = lastx +1; i <= x; i++)
                     {
-                        rb->lcd_drawline
+                        rb->lcd_vline
                             (
                             i, OSCI_Y + OSCI_HEIGHT - 1,
-                            i, OSCI_Y + OSCI_HEIGHT - osci_buffer[i - OSCI_X]-1
+                            OSCI_Y + OSCI_HEIGHT - osci_buffer[i - OSCI_X]-1
                             );
                     }
                 }
@@ -1007,8 +1007,8 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                         );
                         rb->lcd_set_drawmode(DRMODE_SOLID);
                     }
-                    rb->lcd_drawline(split_x -2, OSCI_Y, split_x + 2, OSCI_Y);
-                    rb->lcd_drawline(split_x-1, OSCI_Y+1, split_x +1,OSCI_Y+1);
+                    rb->lcd_hline(split_x -2, split_x + 2, OSCI_Y);
+                    rb->lcd_hline(split_x-1, split_x +1,OSCI_Y+1);
                 }
 
                 /* make visible */

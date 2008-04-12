@@ -220,20 +220,15 @@ void draw_hour(struct screen* display, struct time* time,
 
 void draw_center_cover(struct screen* display)
 {
-    display->drawline((display->width/2)-1, (display->height/2)+3,
-                      (display->width/2)+1, (display->height/2)+3);
-    display->drawline((display->width/2)-3, (display->height/2)+2,
-                      (display->width/2)+3, (display->height/2)+2);
-    display->drawline((display->width/2)-4, (display->height/2)+1,
-                      (display->width/2)+4, (display->height/2)+1);
-    display->drawline((display->width/2)-4, display->height/2,
-                      (display->width/2)+4, display->height/2);
-    display->drawline((display->width/2)-4, (display->height/2)-1,
-                      (display->width/2)+4, (display->height/2)-1);
-    display->drawline((display->width/2)-3, (display->height/2)-2,
-                      (display->width/2)+3, (display->height/2)-2);
-    display->drawline((display->width/2)-1, (display->height/2)-3,
-                      (display->width/2)+1, (display->height/2)-3);
+    display->hline((display->width/2)-1,
+                   (display->width/2)+1, (display->height/2)+3);
+    display->hline((display->width/2)-3,
+                   (display->width/2)+3, (display->height/2)+2);
+    display->fillrect((display->width/2)-4, (display->height/2)-1, 9, 3);
+    display->hline((display->width/2)-3,
+                   (display->width/2)+3, (display->height/2)-2);
+    display->hline((display->width/2)-1,
+                   (display->width/2)+1, (display->height/2)-3);
 }
 
 void analog_clock_draw(struct screen* display, struct time* time,

@@ -114,7 +114,7 @@ static void draw_headers(void)
         rb->lcd_putsxy(ws, 0 , Dayname[i++]);
         ws += space;
     }
-    rb->lcd_drawline(0 ,h ,LCD_WIDTH-1 ,h);
+    rb->lcd_hline(0, LCD_WIDTH-1 ,h);
 }
 
 static bool day_has_memo[31];
@@ -170,8 +170,8 @@ static void draw_calendar(struct shown *shown)
             ws = 2;
         }
     }
-    rb->lcd_drawline(60,LCD_HEIGHT-h-3,60,LCD_HEIGHT-1);
-    rb->lcd_drawline(60,LCD_HEIGHT-h-3,LCD_WIDTH-1,LCD_HEIGHT-h-3);
+    rb->lcd_vline(60,LCD_HEIGHT-h-3,LCD_HEIGHT-1);
+    rb->lcd_hline(60,LCD_WIDTH-1,LCD_HEIGHT-h-3);
     rb->snprintf(buffer,9,"%s %04d",Monthname[shown->mon-1],shown->year);
     rb->lcd_putsxy(62,(LCD_HEIGHT-h-1),buffer);
     shown->lastday = pos;

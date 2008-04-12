@@ -561,8 +561,8 @@ void analog_meter(void) {
     rb->lcd_putsxy(half_width+quarter_width-12, 12, "Right");
 
     /* Line above/below  the Left/Right text */
-    rb->lcd_drawline(0,9,LCD_WIDTH-1,9);
-    rb->lcd_drawline(0,21,LCD_WIDTH-1,21);
+    rb->lcd_hline(0,LCD_WIDTH-1,9);
+    rb->lcd_hline(0,LCD_WIDTH-1,21);
 
     for(i=0; i<half_width; i++) {
         rb->lcd_drawpixel(i, (y_values[i])-2);
@@ -613,18 +613,18 @@ void digital_meter(void) {
         draw_digital_minimeters();
 
     /* Lines above/below where the LEDS are */
-    rb->lcd_drawline(0,12,LCD_WIDTH-1,12);
-    rb->lcd_drawline(0,half_height-12,LCD_WIDTH-1,half_height-12);
+    rb->lcd_hline(0,LCD_WIDTH-1,12);
+    rb->lcd_hline(0,LCD_WIDTH-1,half_height-12);
 
-    rb->lcd_drawline(0,half_height+18,LCD_WIDTH-1,half_height+18);
-    rb->lcd_drawline(0,LCD_HEIGHT-6,LCD_WIDTH-1,LCD_HEIGHT-6);
+    rb->lcd_hline(0,LCD_WIDTH-1,half_height+18);
+    rb->lcd_hline(0,LCD_WIDTH-1,LCD_HEIGHT-6);
 
     /* Show Left/Right */
     rb->lcd_putsxy(2, half_height-8, "Left");
     rb->lcd_putsxy(2, half_height+8, "Right");
 
     /* Line in the middle */
-    rb->lcd_drawline(0,half_height+3,LCD_WIDTH-1,half_height+3);
+    rb->lcd_hline(0,LCD_WIDTH-1,half_height+3);
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {

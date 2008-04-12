@@ -502,13 +502,11 @@ void cal_initial (void)
 
     /* draw lines */
     rb->lcd_drawrect(X_0_POS, Y_0_POS, LCD_WIDTH-1, LCD_HEIGHT);
-    rb->lcd_drawline(X_0_POS, Y_1_POS-1, X_5_POS, Y_1_POS-1);
+    rb->lcd_hline(X_0_POS, X_5_POS, Y_1_POS-1);
     for (i = 0; i < 5 ; i++)
-        rb->lcd_drawline(X_0_POS, Y_1_POS+i*REC_HEIGHT,
-                         X_5_POS, Y_1_POS+i*REC_HEIGHT);
+        rb->lcd_hline(X_0_POS, X_5_POS, Y_1_POS+i*REC_HEIGHT);
     for (i = 0; i < 4 ; i++)
-        rb->lcd_drawline(X_1_POS+i*REC_WIDTH, Y_1_POS,
-                         X_1_POS+i*REC_WIDTH, Y_6_POS);
+        rb->lcd_vline(X_1_POS+i*REC_WIDTH, Y_1_POS, Y_6_POS);
 
 #ifdef CALCULATOR_OPERATORS
     /* basic operators are available through separate button */

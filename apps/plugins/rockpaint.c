@@ -2461,10 +2461,10 @@ static void inv_cursor(bool update)
     rb->lcd_set_foreground(COLOR_BLACK);
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
     /* cross painting */
-    rb->lcd_drawline(x-4,y,x-1,y);
-    rb->lcd_drawline(x+1,y,x+4,y);
-    rb->lcd_drawline(x,y-4,x,y-1);
-    rb->lcd_drawline(x,y+1,x,y+4);
+    rb->lcd_hline(x-4,x-1,y);
+    rb->lcd_hline(x+1,x+4,y);
+    rb->lcd_vline(x,y-4,y-1);
+    rb->lcd_vline(x,y+1,y+4);
     rb->lcd_set_foreground(rp_colors[drawcolor]);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 

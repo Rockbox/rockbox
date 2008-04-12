@@ -355,12 +355,10 @@ void draw_board(void) {
     }
     rb->lcd_set_foreground(LCD_BLACK);
     for(i=0;i<=10;i++) { /* Draw Horizontal lines */
-        rb->lcd_drawline(MARGIN, MARGIN+(BOX_HEIGHT*i), MARGIN+(BOX_WIDTH*10), 
-                        MARGIN+(BOX_HEIGHT*i));
+        rb->lcd_hline(MARGIN, MARGIN+(BOX_WIDTH*10), MARGIN+(BOX_HEIGHT*i));
     }
     for(i=0;i<=10;i++) { /* Draw Vertical lines */
-        rb->lcd_drawline(MARGIN+(BOX_WIDTH*i),MARGIN, MARGIN+(BOX_WIDTH*i), 
-                        MARGIN+(BOX_HEIGHT*10));
+        rb->lcd_vline(MARGIN+(BOX_WIDTH*i), MARGIN, MARGIN+(BOX_HEIGHT*10));
     }
     rb->lcd_update();
 }
@@ -688,14 +686,12 @@ int get_number(char* param, int* value) {
     /* Draw a 3x4 grid */
     int i,j,x=0,y=0;
     for(i=0;i<=3;i++) {  /* Vertical lines */
-        rb->lcd_drawline(NUM_MARGIN_X+(NUM_BOX_WIDTH*i), NUM_MARGIN_Y, 
-                        NUM_MARGIN_X+(NUM_BOX_WIDTH*i), 
-                        NUM_MARGIN_Y+(4*NUM_BOX_HEIGHT));
+        rb->lcd_vline(NUM_MARGIN_X+(NUM_BOX_WIDTH*i), NUM_MARGIN_Y,
+                      NUM_MARGIN_Y+(4*NUM_BOX_HEIGHT));
     }
     for(i=0;i<=4;i++) {  /* Horizontal lines */
-        rb->lcd_drawline(NUM_MARGIN_X, NUM_MARGIN_Y+(i*NUM_BOX_HEIGHT), 
-                        NUM_MARGIN_X+(3*NUM_BOX_WIDTH), 
-                        NUM_MARGIN_Y+(NUM_BOX_HEIGHT*i));
+        rb->lcd_hline(NUM_MARGIN_X, NUM_MARGIN_X+(3*NUM_BOX_WIDTH),
+                      NUM_MARGIN_Y+(NUM_BOX_HEIGHT*i));
     }
     int temp = 1;
     for(i=0;i<3;i++) {

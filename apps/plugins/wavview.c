@@ -289,26 +289,22 @@ int displaypeaks(void)
 
     rb->lcd_clear_display();
 
-    rb->lcd_drawline(0, LEFTZERO - (0x8000 / YSCALE), LCD_WIDTH-1,
-                     LEFTZERO - (0x8000 / YSCALE));
-    rb->lcd_drawline(0, LEFTZERO, LCD_WIDTH-1, LEFTZERO);
-    rb->lcd_drawline(0, LEFTZERO + (0x8000 / YSCALE), LCD_WIDTH-1,
-                     LEFTZERO + (0x8000 / YSCALE));
-    rb->lcd_drawline(0, RIGHTZERO - (0x8000 / YSCALE), LCD_WIDTH-1,
-                     RIGHTZERO - (0x8000 / YSCALE));
-    rb->lcd_drawline(0, RIGHTZERO, LCD_WIDTH-1, RIGHTZERO);
-    rb->lcd_drawline(0, RIGHTZERO + (0x8000 / YSCALE), LCD_WIDTH-1,
-                     RIGHTZERO + (0x8000 / YSCALE));
+    rb->lcd_hline(0, LCD_WIDTH-1, LEFTZERO - (0x8000 / YSCALE));
+    rb->lcd_hline(0, LCD_WIDTH-1, LEFTZERO);
+    rb->lcd_hline(0, LCD_WIDTH-1, LEFTZERO + (0x8000 / YSCALE));
+    rb->lcd_hline(0, LCD_WIDTH-1, RIGHTZERO - (0x8000 / YSCALE));
+    rb->lcd_hline(0, LCD_WIDTH-1, RIGHTZERO);
+    rb->lcd_hline(0, LCD_WIDTH-1, RIGHTZERO + (0x8000 / YSCALE));
 
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
 
     /* draw zoombar */
-    rb->lcd_drawline(leftmargin / (mempeakcount / LCD_WIDTH), LCD_HEIGHT / 2,
-                     (leftmargin / (mempeakcount / LCD_WIDTH)) +
+    rb->lcd_hline(leftmargin / (mempeakcount / LCD_WIDTH),
+                  (leftmargin / (mempeakcount / LCD_WIDTH)) +
                         (LCD_WIDTH / zoomlevel),
-                     LCD_HEIGHT / 2);
+                  LCD_HEIGHT / 2);
 
     while((x < LCD_WIDTH) && (peakcount < mempeakcount))
     {
@@ -324,10 +320,10 @@ int displaypeaks(void)
         if(0 == (peakcount % ppp))
         {
             /* drawing time */
-            rb->lcd_drawline(x, LEFTZERO - (lymax / YSCALE), x,
-                             LEFTZERO - (lymin / YSCALE));
-            rb->lcd_drawline(x, RIGHTZERO - (rymax / YSCALE), x,
-                             RIGHTZERO - (rymin / YSCALE));
+            rb->lcd_vline(x, LEFTZERO - (lymax / YSCALE),
+                          LEFTZERO - (lymin / YSCALE));
+            rb->lcd_vline(x, RIGHTZERO - (rymax / YSCALE),
+                          RIGHTZERO - (rymin / YSCALE));
             lymin = INT_MAX;
             lymax = INT_MIN;
             rymin = INT_MAX;
