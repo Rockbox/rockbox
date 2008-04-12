@@ -36,6 +36,7 @@
 #define LCDFN(fn) lcd_ ## fn
 #define FBFN(fn)  fb_ ## fn
 #define LCDM(ma) LCD_ ## ma
+#define LCDNAME "lcd_"
 #define MAIN_LCD
 #endif
 
@@ -290,7 +291,19 @@ void LCDFN(drawline)(int x1, int y1, int x2, int y2)
     LCDFN(pixelfunc_type) *pfunc = LCDFN(pixelfuncs)[current_vp->drawmode];
 
     deltax = abs(x2 - x1);
+    if (deltax == 0)
+    {
+        DEBUGF(LCDNAME "drawline() called for vertical line - optimisation.\n");
+        LCDFN(vline)(x1, y1, y2);
+        return;
+    }
     deltay = abs(y2 - y1);
+    if (deltay == 0)
+    {
+        DEBUGF(LCDNAME "drawline() called for horizontal line - optimisation.\n");
+        LCDFN(hline)(x1, x2, y1);
+        return;
+    }
     xinc2 = 1;
     yinc2 = 1;
 

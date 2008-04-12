@@ -204,32 +204,27 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
-static void setpixel(fb_data *address) ICODE_ATTR;
-static void setpixel(fb_data *address)
+static void ICODE_ATTR setpixel(fb_data *address)
 {
     *address = current_vp->fg_pattern;
 }
 
-static void clearpixel(fb_data *address) ICODE_ATTR;
-static void clearpixel(fb_data *address)
+static void ICODE_ATTR clearpixel(fb_data *address)
 {
     *address = current_vp->bg_pattern;
 }
 
-static void clearimgpixel(fb_data *address) ICODE_ATTR;
-static void clearimgpixel(fb_data *address)
+static void ICODE_ATTR clearimgpixel(fb_data *address)
 {
     *address = *(fb_data *)((long)address + lcd_backdrop_offset);
 }
 
-static void flippixel(fb_data *address) ICODE_ATTR;
-static void flippixel(fb_data *address)
+static void ICODE_ATTR flippixel(fb_data *address)
 {
     *address = ~(*address);
 }
 
-static void nopixel(fb_data *address) ICODE_ATTR;
-static void nopixel(fb_data *address)
+static void ICODE_ATTR nopixel(fb_data *address)
 {
     (void)address;
 }
@@ -349,8 +344,20 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     int y, yinc1, yinc2;
     lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[current_vp->drawmode];
 
-    deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
+    if (deltay == 0)
+    {
+        DEBUGF("lcd_drawline() called for horizontal line - optimisation.\n");
+        lcd_hline(x1, x2, y1);
+        return;
+    }
+    deltax = abs(x2 - x1);
+    if (deltax == 0)
+    {
+        DEBUGF("lcd_drawline() called for vertical line - optimisation.\n");
+        lcd_vline(x1, y1, y2);
+        return;
+    }
     xinc2 = 1;
     yinc2 = 1;
 
@@ -699,11 +706,9 @@ static void lcd_gradient_rect_scroll(int x1, int x2, int y, int h,
 
 /* Draw a partial monochrome bitmap */
 
-void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
-                          int stride, int x, int y, int width, int height)
-                          ICODE_ATTR;
-void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
-                          int stride, int x, int y, int width, int height)
+void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
+                                     int src_y, int stride, int x, int y,
+                                     int width, int height)
 {
     const unsigned char *src_end;
     bool has_backdrop;
@@ -798,11 +803,9 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
 }
 
 /* Draw a partial native bitmap */
-void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
-                     int stride, int x, int y, int width, int height)
-                     ICODE_ATTR;
-void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
-                     int stride, int x, int y, int width, int height)
+void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
+                                int stride, int x, int y, int width,
+                                int height)
 {
     fb_data *dst, *dst_end;
 
@@ -851,12 +854,9 @@ void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
 #if !defined(TOSHIBA_GIGABEAT_F) && !defined(TOSHIBA_GIGABEAT_S) \
     || defined(SIMULATOR)
 /* Draw a partial native bitmap */
-void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
-                                 int stride, int x, int y, int width,
-                                 int height) ICODE_ATTR;
-void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
-                                 int stride, int x, int y, int width,
-                                 int height)
+void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
+                                            int src_y, int stride, int x,
+                                            int y, int width, int height)
 {
     fb_data *dst, *dst_end;
 

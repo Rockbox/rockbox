@@ -23,5 +23,6 @@
 #define LCDFN(fn) lcd_remote_ ## fn
 #define FBFN(fn)  fb_remote_ ## fn
 #define LCDM(ma) LCD_REMOTE_ ## ma
+#define LCDNAME "lcd_remote_"
 
 #include "lcd-1bit-vert.c"

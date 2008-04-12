@@ -242,43 +242,38 @@ lcd_pixelfunc_type* const lcd_pixelfuncs_backdrop[8] = {
 lcd_pixelfunc_type* const * lcd_pixelfuncs = lcd_pixelfuncs_bgcolor;
 
 /* 'mask' and 'bits' contain 2 bits per pixel */
-static void flipblock(fb_data *address, unsigned mask, unsigned bits)
-                      ICODE_ATTR;
-static void flipblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR flipblock(fb_data *address, unsigned mask,
+                                 unsigned bits)
 {
     *address ^= bits & mask;
 }
 
-static void bgblock(fb_data *address, unsigned mask, unsigned bits)
-                    ICODE_ATTR;
-static void bgblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR bgblock(fb_data *address, unsigned mask,
+                               unsigned bits)
 {
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask & ~bits);
 }
 
-static void bgimgblock(fb_data *address, unsigned mask, unsigned bits)
-                       ICODE_ATTR;
-static void bgimgblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR bgimgblock(fb_data *address, unsigned mask,
+                                  unsigned bits)
 {
     unsigned data = *address;
 
     *address = data ^ ((data ^ *(address + lcd_backdrop_offset)) & mask & ~bits);
 }
 
-static void fgblock(fb_data *address, unsigned mask, unsigned bits)
-                    ICODE_ATTR;
-static void fgblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR fgblock(fb_data *address, unsigned mask,
+                               unsigned bits)
 {
     unsigned data = *address;
 
     *address = data ^ ((data ^ fg_pattern) & mask & bits);
 }
 
-static void solidblock(fb_data *address, unsigned mask, unsigned bits)
-                       ICODE_ATTR;
-static void solidblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR solidblock(fb_data *address, unsigned mask,
+                                  unsigned bits)
 {
     unsigned data = *address;
     unsigned bgp  = bg_pattern;
@@ -287,9 +282,8 @@ static void solidblock(fb_data *address, unsigned mask, unsigned bits)
     *address = data ^ ((data ^ bits) & mask);
 }
 
-static void solidimgblock(fb_data *address, unsigned mask, unsigned bits)
-                          ICODE_ATTR;
-static void solidimgblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR solidimgblock(fb_data *address, unsigned mask,
+                                     unsigned bits)
 {
     unsigned data = *address;
     unsigned bgp  = *(address + lcd_backdrop_offset);
@@ -298,43 +292,38 @@ static void solidimgblock(fb_data *address, unsigned mask, unsigned bits)
     *address = data ^ ((data ^ bits) & mask);
 }
 
-static void flipinvblock(fb_data *address, unsigned mask, unsigned bits)
-                         ICODE_ATTR;
-static void flipinvblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR flipinvblock(fb_data *address, unsigned mask,
+                                    unsigned bits)
 {
     *address ^= ~bits & mask;
 }
 
-static void bginvblock(fb_data *address, unsigned mask, unsigned bits)
-                       ICODE_ATTR;
-static void bginvblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR bginvblock(fb_data *address, unsigned mask,
+                                  unsigned bits)
 {
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask & bits);
 }
 
-static void bgimginvblock(fb_data *address, unsigned mask, unsigned bits)
-                          ICODE_ATTR;
-static void bgimginvblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR bgimginvblock(fb_data *address, unsigned mask,
+                                     unsigned bits)
 {
     unsigned data = *address;
 
     *address = data ^ ((data ^ *(address + lcd_backdrop_offset)) & mask & bits);
 }
 
-static void fginvblock(fb_data *address, unsigned mask, unsigned bits)
-                       ICODE_ATTR;
-static void fginvblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR fginvblock(fb_data *address, unsigned mask,
+                                  unsigned bits)
 {
     unsigned data = *address;
 
     *address = data ^ ((data ^ fg_pattern) & mask & ~bits);
 }
 
-static void solidinvblock(fb_data *address, unsigned mask, unsigned bits)
-                          ICODE_ATTR;
-static void solidinvblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR solidinvblock(fb_data *address, unsigned mask,
+                                     unsigned bits)
 {
     unsigned data = *address;
     unsigned fgp  = fg_pattern;
@@ -343,9 +332,8 @@ static void solidinvblock(fb_data *address, unsigned mask, unsigned bits)
     *address = data ^ ((data ^ bits) & mask);
 }
 
-static void solidimginvblock(fb_data *address, unsigned mask, unsigned bits)
-                             ICODE_ATTR;
-static void solidimginvblock(fb_data *address, unsigned mask, unsigned bits)
+static void ICODE_ATTR solidimginvblock(fb_data *address, unsigned mask,
+                                        unsigned bits)
 {
     unsigned data = *address;
     unsigned fgp  = fg_pattern;
@@ -463,7 +451,19 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     lcd_pixelfunc_type *pfunc = lcd_pixelfuncs[current_vp->drawmode];
 
     deltax = abs(x2 - x1);
+    if (deltax == 0)
+    {
+        DEBUGF("lcd_drawline() called for vertical line - optimisation.\n");
+        lcd_vline(x1, y1, y2);
+        return;
+    }
     deltay = abs(y2 - y1);
+    if (deltay == 0)
+    {
+        DEBUGF("lcd_drawline() called for horizontal line - optimisation.\n");
+        lcd_hline(x1, x2, y1);
+        return;
+    }
     xinc2 = 1;
     yinc2 = 1;
 
@@ -729,11 +729,9 @@ void lcd_fillrect(int x, int y, int width, int height)
  * This is similar to the internal lcd hw format. */
 
 /* Draw a partial monochrome bitmap */
-void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
-                          int stride, int x, int y, int width, int height)
-                          ICODE_ATTR;
-void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
-                          int stride, int x, int y, int width, int height)
+void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
+                                     int src_y, int stride, int x, int y,
+                                     int width, int height)
 {
     int shift, ny;
     fb_data *dst, *dst_end;
@@ -901,11 +899,9 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
  * This is the same as the internal lcd hw format. */
 
 /* Draw a partial native bitmap */
-void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
-                     int stride, int x, int y, int width, int height)
-                     ICODE_ATTR;
-void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
-                     int stride, int x, int y, int width, int height)
+void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
+                                int stride, int x, int y, int width,
+                                int height)
 {
     int shift, ny;
     fb_data *dst, *dst_end;
