@@ -23,7 +23,7 @@
 /*******************************************************************************
  * font_cache_lru_init
  ******************************************************************************/
-void font_cache_lru_init(void* data)
+static void font_cache_lru_init(void* data)
 {
     struct font_cache_entry* p = data;
     p->_char_code = 0xffff;   /* assume invalid char */
@@ -69,9 +69,9 @@ void font_cache_create(
 /*******************************************************************************
  * font_cache_index_of
  ******************************************************************************/
-int font_cache_index_of(
-    struct font_cache* fcache,
-    unsigned short char_code)
+static int font_cache_index_of(
+           struct font_cache* fcache,
+           unsigned short char_code)
 {
     struct font_cache_entry* p;
     int left, right, mid, c;
@@ -101,9 +101,9 @@ int font_cache_index_of(
 /*******************************************************************************
  * font_cache_insertion_point
  ******************************************************************************/
-int font_cache_insertion_point(
-    struct font_cache* fcache,
-    unsigned short char_code)
+static int font_cache_insertion_point(
+       struct font_cache* fcache,
+       unsigned short char_code)
 {
     struct font_cache_entry* p;
     short *index = fcache->_index;
