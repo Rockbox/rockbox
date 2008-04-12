@@ -29,7 +29,8 @@
 /* Most code in here is taken from the Linux BSP provided by Freescale
  * Copyright 2004-2006 Freescale Semiconductor, Inc. All Rights Reserved. */
 
-static uint32_t int_btn = BUTTON_NONE;
+static bool headphones_detect = false;
+static uint32_t int_btn     = BUTTON_NONE;
 static bool hold_button     = false;
 static bool hold_button_old = false;
 #define _button_hold() (GPIO3_DR & 0x10)
@@ -48,7 +49,8 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
     unsigned short reg_val;
     int col, row;
     int i;
-    int button = BUTTON_NONE;
+    /* Power button is handled separately on PMIC */
+    int button = int_btn & BUTTON_POWER;
 
     /* 1. Disable both (depress and release) keypad interrupts. */
     KPP_KPSR &= ~(KPP_KPSR_KRIE | KPP_KPSR_KDIE);
@@ -160,4 +162,36 @@ int button_read_device(void)
 
     /* If hold, ignore any pressed button */
     return hold_button ? BUTTON_NONE : int_btn;
+}
+
+/* This is called from the mc13783 interrupt thread */
+void button_power_set_state(bool pressed)
+{
+    /* Prevent KPP_HANDLER from changing things */
+    int oldlevel = disable_irq_save();
+
+    if (pressed)
+    {
+        int_btn |= BUTTON_POWER;
+    }
+    else
+    {
+        int_btn &= ~BUTTON_POWER;
+    }
+
+    restore_irq(oldlevel);
+}
+
+/* This is called from the mc13783 interrupt thread */
+void set_headphones_inserted(bool inserted)
+{
+    headphones_detect = inserted;
+}
+
+/* This is called from the mc13783 interrupt thread */
+/* TODO: Just do a post to the button queue directly - implement the
+ * appropriate variant in the driver. */
+bool headphones_inserted(void)
+{
+    return headphones_detect;
 }

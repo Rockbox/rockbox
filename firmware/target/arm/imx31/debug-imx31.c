@@ -24,6 +24,7 @@
 #include "sprintf.h"
 #include "font.h"
 #include "debug-target.h"
+#include "mc13783.h"
 
 bool __dbg_hw_info(void)
 {
@@ -34,6 +35,43 @@ bool __dbg_ports(void)
 {
     char buf[50];
     int line;
+    int i;
+
+    static const char pmic_regset[] =
+    {
+        MC13783_INTERRUPT_STATUS0,
+        MC13783_INTERRUPT_SENSE0,
+        MC13783_INTERRUPT_STATUS1,
+        MC13783_INTERRUPT_SENSE1,
+        MC13783_RTC_TIME,
+        MC13783_RTC_ALARM,
+        MC13783_RTC_DAY,
+        MC13783_RTC_DAY_ALARM,
+        MC13783_ADC0,
+        MC13783_ADC1,
+        MC13783_ADC2,
+        MC13783_ADC3,
+        MC13783_ADC4,
+    };
+
+    static const char *pmic_regnames[ARRAYLEN(pmic_regset)] =
+    {
+        "Int Stat0 ",
+        "Int Sense0",
+        "Int Stat1 ",
+        "Int Sense1",
+        "RTC Time  ",
+        "RTC Alarm ",
+        "RTC Day   ",
+        "RTC Day Al",
+        "ADC0      ",
+        "ADC1      ",
+        "ADC2      ",
+        "ADC3      ",
+        "ADC4      ",
+    };
+
+    uint32_t pmic_regs[ARRAYLEN(pmic_regset)];
 
     lcd_setmargins(0, 0);
     lcd_clear_display();
@@ -83,6 +121,16 @@ bool __dbg_ports(void)
 
         snprintf(buf, sizeof(buf), "       ISR:  %08lx",             GPIO3_ISR);
         lcd_puts(0, line++, buf); line++;
+
+        lcd_puts(0, line++, "PMIC Registers"); line++;
+
+        mc13783_read_regset(pmic_regset, pmic_regs, ARRAYLEN(pmic_regs));
+
+        for (i = 0; i < (int)ARRAYLEN(pmic_regs); i++)
+        {
+            snprintf(buf, sizeof(buf), "%s: %08lx", pmic_regnames[i], pmic_regs[i]);
+            lcd_puts(0, line++, buf);
+        }
 
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))

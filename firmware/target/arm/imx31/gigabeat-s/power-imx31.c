@@ -17,14 +17,12 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "cpu.h"
-#include <stdbool.h>
-#include "kernel.h"
 #include "system.h"
 #include "power.h"
-#include "pcf50606.h"
 #include "backlight.h"
 #include "backlight-target.h"
+#include "avic-imx31.h"
+#include "mc13783.h"
 
 #ifndef SIMULATOR
 
@@ -54,6 +52,10 @@ bool ide_powered(void)
 
 void power_off(void)
 {
+    mc13783_set(MC13783_POWER_CONTROL0, MC13783_USEROFFSPI);
+
+    disable_interrupt(IRQ_FIQ_STATUS);
+    while (1);
 }
 
 #else /* SIMULATOR */

@@ -43,7 +43,7 @@ static const char * avic_int_names[64] =
     "EXT_SENS1", "EXT_SENS2",     "EXT_WDOG",  "EXT_TV"
 };
 
-static void UIE_VECTOR(void)
+void UIE_VECTOR(void)
 {
     int mode;
     long offset;

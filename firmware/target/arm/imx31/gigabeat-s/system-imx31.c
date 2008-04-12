@@ -2,6 +2,7 @@
 #include "system.h"
 #include "panic.h"
 #include "avic-imx31.h"
+#include "gpio-imx31.h"
 #include "mmu-imx31.h"
 #include "system-target.h"
 #include "lcd.h"
@@ -23,6 +24,7 @@ void system_init(void)
     /* MCR WFI enables wait mode */
     CLKCTL_CCMR &= ~(3 << 14);
     avic_init();
+    gpio_init();
 }
 
 #ifdef BOOTLOADER

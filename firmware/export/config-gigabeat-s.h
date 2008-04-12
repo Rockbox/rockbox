@@ -73,6 +73,8 @@
 #define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
                        SAMPR_CAP_11)
 
+#define HAVE_HEADPHONE_DETECTION
+
 #ifndef SIMULATOR
 
 /* The LCD on a Gigabeat is 240x320 - it is portrait */
@@ -85,6 +87,9 @@
 
 /* Define the bitmask of serial interface modules (CSPI) used */
 #define SPI_MODULE_MASK (USE_CSPI2_MODULE)
+
+/* Define this if target has an additional number of threads specific to it */
+#define TARGET_EXTRA_THREADS 1
 
 /* Type of mobile power - check this out */
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */

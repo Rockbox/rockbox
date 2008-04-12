@@ -491,29 +491,37 @@
 #define EPITSR_OCIF                     (1 << 0)
 
 /* GPIO */
-#define GPIO1_DR                (*(REG32_PTR_T)(GPIO1_BASE_ADDR+0x00))
-#define GPIO1_GDIR              (*(REG32_PTR_T)(GPIO1_BASE_ADDR+0x04))
-#define GPIO1_PSR               (*(REG32_PTR_T)(GPIO1_BASE_ADDR+0x08))
-#define GPIO1_ICR1              (*(REG32_PTR_T)(GPIO1_BASE_ADDR+0x0C))
-#define GPIO1_ICR2              (*(REG32_PTR_T)(GPIO1_BASE_ADDR+0x10))
-#define GPIO1_IMR               (*(REG32_PTR_T)(GPIO1_BASE_ADDR+0x14))
-#define GPIO1_ISR               (*(REG32_PTR_T)(GPIO1_BASE_ADDR+0x18))
+#define GPIO_DR_I               0x00 /* Offset - 0x00 */
+#define GPIO_GDIR_I             0x01 /* Offset - 0x04 */
+#define GPIO_PSR_I              0x02 /* Offset - 0x08 */
+#define GPIO_ICR1_I             0x03 /* Offset - 0x0C */
+#define GPIO_ICR2_I             0x04 /* Offset - 0x10 */
+#define GPIO_IMR_I              0x05 /* Offset - 0x14 */
+#define GPIO_ISR_I              0x06 /* Offset - 0x18 */
 
-#define GPIO2_DR                (*(REG32_PTR_T)(GPIO2_BASE_ADDR+0x00))
-#define GPIO2_GDIR              (*(REG32_PTR_T)(GPIO2_BASE_ADDR+0x04))
-#define GPIO2_PSR               (*(REG32_PTR_T)(GPIO2_BASE_ADDR+0x08))
-#define GPIO2_ICR1              (*(REG32_PTR_T)(GPIO2_BASE_ADDR+0x0C))
-#define GPIO2_ICR2              (*(REG32_PTR_T)(GPIO2_BASE_ADDR+0x10))
-#define GPIO2_IMR               (*(REG32_PTR_T)(GPIO2_BASE_ADDR+0x14))
-#define GPIO2_ISR               (*(REG32_PTR_T)(GPIO2_BASE_ADDR+0x18))
+#define GPIO1_DR                (((REG32_PTR_T)GPIO1_BASE_ADDR)[GPIO_DR_I])
+#define GPIO1_GDIR              (((REG32_PTR_T)GPIO1_BASE_ADDR)[GPIO_GDIR_I])
+#define GPIO1_PSR               (((REG32_PTR_T)GPIO1_BASE_ADDR)[GPIO_PSR_I])
+#define GPIO1_ICR1              (((REG32_PTR_T)GPIO1_BASE_ADDR)[GPIO_ICR1_I])
+#define GPIO1_ICR2              (((REG32_PTR_T)GPIO1_BASE_ADDR)[GPIO_ICR2_I])
+#define GPIO1_IMR               (((REG32_PTR_T)GPIO1_BASE_ADDR)[GPIO_IMR_I])
+#define GPIO1_ISR               (((REG32_PTR_T)GPIO1_BASE_ADDR)[GPIO_ISR_I])
 
-#define GPIO3_DR                (*(REG32_PTR_T)(GPIO3_BASE_ADDR+0x00))
-#define GPIO3_GDIR              (*(REG32_PTR_T)(GPIO3_BASE_ADDR+0x04))
-#define GPIO3_PSR               (*(REG32_PTR_T)(GPIO3_BASE_ADDR+0x08))
-#define GPIO3_ICR1              (*(REG32_PTR_T)(GPIO3_BASE_ADDR+0x0C))
-#define GPIO3_ICR2              (*(REG32_PTR_T)(GPIO3_BASE_ADDR+0x10))
-#define GPIO3_IMR               (*(REG32_PTR_T)(GPIO3_BASE_ADDR+0x14))
-#define GPIO3_ISR               (*(REG32_PTR_T)(GPIO3_BASE_ADDR+0x18))
+#define GPIO2_DR                (((REG32_PTR_T)GPIO2_BASE_ADDR)[GPIO_DR_I])
+#define GPIO2_GDIR              (((REG32_PTR_T)GPIO2_BASE_ADDR)[GPIO_GDIR_I])
+#define GPIO2_PSR               (((REG32_PTR_T)GPIO2_BASE_ADDR)[GPIO_PSR_I])
+#define GPIO2_ICR1              (((REG32_PTR_T)GPIO2_BASE_ADDR)[GPIO_ICR1_I])
+#define GPIO2_ICR2              (((REG32_PTR_T)GPIO2_BASE_ADDR)[GPIO_ICR2_I])
+#define GPIO2_IMR               (((REG32_PTR_T)GPIO2_BASE_ADDR)[GPIO_IMR_I])
+#define GPIO2_ISR               (((REG32_PTR_T)GPIO2_BASE_ADDR)[GPIO_ISR_I])
+
+#define GPIO3_DR                (((REG32_PTR_T)GPIO3_BASE_ADDR)[GPIO_DR_I])
+#define GPIO3_GDIR              (((REG32_PTR_T)GPIO3_BASE_ADDR)[GPIO_GDIR_I])
+#define GPIO3_PSR               (((REG32_PTR_T)GPIO3_BASE_ADDR)[GPIO_PSR_I])
+#define GPIO3_ICR1              (((REG32_PTR_T)GPIO3_BASE_ADDR)[GPIO_ICR1_I])
+#define GPIO3_ICR2              (((REG32_PTR_T)GPIO3_BASE_ADDR)[GPIO_ICR2_I])
+#define GPIO3_IMR               (((REG32_PTR_T)GPIO3_BASE_ADDR)[GPIO_IMR_I])
+#define GPIO3_ISR               (((REG32_PTR_T)GPIO3_BASE_ADDR)[GPIO_ISR_I])
 
 /* CSPI */
 #define CSPI_RXDATA_I           0x00 /* Offset - 0x00  */

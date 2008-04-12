@@ -19,9 +19,12 @@
 #include "system.h"
 #include "cpu.h"
 #include "spi-imx31.h"
+#include "gpio-imx31.h"
 #include "mc13783.h"
 #include "debug.h"
 #include "kernel.h"
+
+#include "button-target.h"
 
 /* This is all based on communicating with the MC13783 PMU which is on 
  * CSPI2 with the chip select at 0. The LCD controller resides on
@@ -43,17 +46,68 @@ static int mc13783_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)];
 static const char *mc13783_thread_name = "pmic";
 static struct wakeup mc13783_wake;
 
+/* The next two functions are rather target-specific but they'll just be left
+ * here for the moment */
 static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
 {
+    const unsigned char status_regs[2] =
+    {
+        MC13783_INTERRUPT_STATUS0,
+        MC13783_INTERRUPT_STATUS1,
+    };
+    uint32_t pending[2];
+    uint32_t value;
+
+    mc13783_read_regset(status_regs, pending, 2);
+    mc13783_write_regset(status_regs, pending, 2);
+
+    gpio_enable_event(MC13783_GPIO_NUM, MC13783_EVENT_ID);
+
+    /* Check initial states */
+    value = mc13783_read(MC13783_INTERRUPT_SENSE1);
+    button_power_set_state((value & MC13783_ON1B) == 0);
+    set_headphones_inserted((value & MC13783_ON2B) == 0);
+
+    /* Enable desired PMIC interrupts */
+    mc13783_clear(MC13783_INTERRUPT_MASK1, MC13783_ON1B | MC13783_ON2B);
+    
     while (1)
     {
         wakeup_wait(&mc13783_wake, TIMEOUT_BLOCK);
+
+        mc13783_read_regset(status_regs, pending, 2);
+        mc13783_write_regset(status_regs, pending, 2);
+
+#if 0
+        if (pending[0])
+        {
+            /* Handle ...PENDING0 */
+        }
+#endif
+
+        if (pending[1])
+        {
+            /* Handle ...PENDING1 */
+            if (pending[1] & (MC13783_ON1B | MC13783_ON2B))
+            {
+                value = mc13783_read(MC13783_INTERRUPT_SENSE1);
+
+                if (pending[1] & MC13783_ON1B)
+                    button_power_set_state((value & MC13783_ON1B) == 0);
+
+                if (pending[1] & MC13783_ON2B)
+                    set_headphones_inserted((value & MC13783_ON2B) == 0);
+            }
+        }
     }
 }
 
-static __attribute__((interrupt("IRQ"))) void mc13783_interrupt(void)
+/* GPIO interrupt handler for mc13783 */
+int mc13783_event(void)
 {
+    MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
     wakeup_signal(&mc13783_wake);
+    return 1; /* Yes, it's handled */
 }
 
 void mc13783_init(void)
@@ -64,25 +118,44 @@ void mc13783_init(void)
     /* Enable the PMIC SPI module */
     spi_enable_module(&mc13783_spi);
 
+    /* Mask any PMIC interrupts for now - poll initial status in thread
+     * and enable them there */
+    mc13783_write(MC13783_INTERRUPT_MASK0, 0xffffff);
+    mc13783_write(MC13783_INTERRUPT_MASK1, 0xffffff);
+
+    MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
+
     create_thread(mc13783_interrupt_thread, mc13783_thread_stack,
                   sizeof(mc13783_thread_stack), 0, mc13783_thread_name
                   IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
 }
 
-void mc13783_set(unsigned address, uint32_t bits)
+uint32_t mc13783_set(unsigned address, uint32_t bits)
 {
     spi_lock(&mc13783_spi);
+
     uint32_t data = mc13783_read(address);
-    mc13783_write(address, data | bits);
+
+    if (data != (uint32_t)-1)
+        mc13783_write(address, data | bits);
+
     spi_unlock(&mc13783_spi);
+
+    return data;
 }
 
-void mc13783_clear(unsigned address, uint32_t bits)
+uint32_t mc13783_clear(unsigned address, uint32_t bits)
 {
     spi_lock(&mc13783_spi);
+
     uint32_t data = mc13783_read(address);
-    mc13783_write(address, data & ~bits);
+
+    if (data != (uint32_t)-1)
+        mc13783_write(address, data & ~bits);
+
     spi_unlock(&mc13783_spi);
+
+    return data;
 }
 
 int mc13783_write(unsigned address, uint32_t data)
@@ -108,7 +181,7 @@ int mc13783_write_multiple(unsigned start, const uint32_t *data, int count)
 {
     int i;
     struct spi_transfer xfer;
-    uint32_t packets[64];
+    uint32_t packets[MC13783_NUM_REGS];
 
     if (start + count > MC13783_NUM_REGS)
         return -1;
@@ -123,6 +196,36 @@ int mc13783_write_multiple(unsigned start, const uint32_t *data, int count)
     xfer.rxbuf = packets;
     xfer.count = count;
     
+    if (!spi_transfer(&mc13783_spi, &xfer))
+        return -1;
+
+    return count - xfer.count;
+}
+
+int mc13783_write_regset(const unsigned char *regs, const uint32_t *data,
+                         int count)
+{
+    int i;
+    struct spi_transfer xfer;
+    uint32_t packets[MC13783_NUM_REGS];
+
+    if (count > MC13783_NUM_REGS)
+        return -1;
+
+    for (i = 0; i < count; i++)
+    {
+        uint32_t reg = regs[i];
+
+        if (reg >= MC13783_NUM_REGS)
+            return -1;
+
+        packets[i] = (1 << 31) | (reg << 25) | (data[i] & 0xffffff);
+    }
+
+    xfer.txbuf = packets;
+    xfer.rxbuf = packets;
+    xfer.count = count;
+
     if (!spi_transfer(&mc13783_spi, &xfer))
         return -1;
 
@@ -146,25 +249,53 @@ uint32_t mc13783_read(unsigned address)
     if (!spi_transfer(&mc13783_spi, &xfer))
         return (uint32_t)-1;
 
-    return packet & 0xffffff;
+    return packet;
 }
 
 int mc13783_read_multiple(unsigned start, uint32_t *buffer, int count)
 {
     int i;
-    uint32_t packets[64];
     struct spi_transfer xfer;
 
     if (start + count > MC13783_NUM_REGS)
         return -1;
 
-    xfer.txbuf = packets;
+    xfer.txbuf = buffer;
     xfer.rxbuf = buffer;
     xfer.count = count;
 
     /* Prepare TX payload */
     for (i = 0; i < count; i++, start++)
-        packets[i] = start << 25;
+        buffer[i] = start << 25;
+
+    if (!spi_transfer(&mc13783_spi, &xfer))
+        return -1;
+
+    return count - xfer.count;
+}
+
+int mc13783_read_regset(const unsigned char *regs, uint32_t *buffer,
+                        int count)
+{
+    int i;
+    struct spi_transfer xfer;
+
+    if (count > MC13783_NUM_REGS)
+        return -1;
+
+    for (i = 0; i < count; i++)
+    {
+        unsigned reg = regs[i];
+
+        if (reg >= MC13783_NUM_REGS)
+            return -1;
+
+        buffer[i] = reg << 25;
+    }
+
+    xfer.txbuf = buffer;
+    xfer.rxbuf = buffer;
+    xfer.count = count;
 
     if (!spi_transfer(&mc13783_spi, &xfer))
         return -1;

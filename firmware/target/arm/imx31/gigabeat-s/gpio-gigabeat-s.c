@@ -7,7 +7,9 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Linus Nielsen Feltzing
+ * Copyright (c) 2008 by Michael Sevakis
+ *
+ * Gigabeat S GPIO interrupt event descriptions
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,35 +19,21 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "cpu.h"
 #include "system.h"
-#include "backlight-target.h"
-#include "backlight.h"
-#include "lcd.h"
-#include "power.h"
-#include "mc13783.h"
-#include "debug.h"
+#include "gpio-imx31.h"
 
-bool _backlight_init(void)
+extern int mc13783_event(void);
+
+static const struct gpio_event gpio1_events =
 {
-    return true;
-}
+    .line     = MC13783_GPIO_LINE,
+    .sense    = GPIO_SENSE_RISING,
+    .callback = mc13783_event,
+};
 
-void _backlight_on(void)
+const struct gpio_event_list gpio1_event_list =
 {
-    /* LEDEN=1 */
-    mc13783_set(MC13783_LED_CONTROL0, MC13783_LEDEN);
-}
-
-void _backlight_off(void)
-{
-    /* LEDEN=0 */
-    mc13783_clear(MC13783_LED_CONTROL0, MC13783_LEDEN);
-}
-
-/* Assumes that the backlight has been initialized */
-void _backlight_set_brightness(int brightness)
-{
-    (void)brightness;
-}
-
+    .priority = 7,
+    .count    = 1,
+    .events   = &gpio1_events,
+};

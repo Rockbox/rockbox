@@ -62,14 +62,20 @@
 #if CONFIG_CODEC == SWCODEC
 
 #ifdef HAVE_RECORDING
-#define MAXTHREADS  18
+#define BASETHREADS  18
 #else
-#define MAXTHREADS  17
+#define BASETHREADS  17
 #endif
 
 #else
-#define MAXTHREADS  11
+#define BASETHREADS  11
 #endif /* CONFIG_CODE == * */
+
+#ifndef TARGET_EXTRA_THREADS
+#define TARGET_EXTRA_THREADS 0
+#endif
+
+#define MAXTHREADS (BASETHREADS+TARGET_EXTRA_THREADS)
 
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
 
