@@ -26,8 +26,9 @@
 /* SPI_MODULE_MASK is set in target's config */
 enum spi_module_number
 {
+    __CSPI_NUM_START = -1, /* The first will be 0 */
 #if (SPI_MODULE_MASK & USE_CSPI1_MODULE)
-    CSPI1_NUM = 0,
+    CSPI1_NUM,
 #endif
 #if (SPI_MODULE_MASK & USE_CSPI2_MODULE)
     CSPI2_NUM,
