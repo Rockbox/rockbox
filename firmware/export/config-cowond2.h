@@ -105,10 +105,6 @@
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
-/* define this if the unit should not shut down on low battery. */
-/* TODO: this is temporary until battery monitoring implemented */
-#define NO_LOW_BATTERY_SHUTDOWN
-
 #ifndef SIMULATOR
 
 /* Define this if you have a TCC7801 */

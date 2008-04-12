@@ -21,39 +21,62 @@
 #include "adc.h"
 #include "powermgmt.h"
 #include "kernel.h"
+#include "pcf50606.h"
 
 unsigned short current_voltage = 3910;
+
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    0
+    /* FIXME: calibrate value */
+    3380
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    0
+    /* FIXME: calibrate value */
+    3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 100, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1320 },
+    /* FIXME: calibrate values. Table is "inherited" from iPod-PCF / H100 */
+    { 3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4080, 4160 }
 };
 
+#if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    100, 300, 400, 500, 600, 700, 800, 900, 1000, 1200, 1320,
+    /* FIXME: calibrate values. Table is "inherited" from iPod-PCF / H100 */
+    { 3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4080, 4160 }
 };
+#endif /* CONFIG_CHARGING */
 
-void read_battery_inputs(void)
-{
-    #warning function not implemented
-}
-    
+#define BATTERY_SCALE_FACTOR 6000
+/* full-scale ADC readout (2^10) in millivolt */
+
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    #warning function not implemented
-    return 0;
+    static unsigned last_tick = 0;
+
+    if (TIME_BEFORE(last_tick+HZ, current_tick))
+    {
+        int adc_val, irq_status;
+        unsigned char buf[2];
+
+        irq_status = disable_interrupt_save(IRQ_FIQ_DISABLED);
+        pcf50606_write(PCF5060X_ADCC2, 0x1);
+        pcf50606_read_multiple(PCF5060X_ADCS1, buf, 2);
+        restore_interrupt(irq_status);
+
+        adc_val = (buf[0]<<2) | (buf[1] & 3); //ADCDAT1H+ADCDAT1L
+        current_voltage = (adc_val * BATTERY_SCALE_FACTOR) >> 10;
+
+        last_tick = current_tick;
+    }
+
+    return current_voltage;
 }
 

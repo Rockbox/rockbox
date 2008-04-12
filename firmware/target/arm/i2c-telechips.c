@@ -23,7 +23,7 @@
 #include "i2c-target.h"
 
 /* arbitrary delay loop */
-#define DELAY  do { int _x; for(_x=0;_x<20;_x++);} while (0)
+#define DELAY  do { int _x; for(_x=0;_x<40;_x++);} while (0)
 
 static struct mutex i2c_mtx;
 
