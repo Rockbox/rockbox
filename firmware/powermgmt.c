@@ -478,6 +478,10 @@ static void battery_status_update(void)
         if ((battery_millivolts + 20) > percent_to_volt_discharge[0][0])
             powermgmt_est_runningtime_min = (level + battery_percent) * 60 *
                                          battery_capacity / 200 / runcurrent();
+
+        else if (battery_millivolts <= battery_level_shutoff[0])
+            powermgmt_est_runningtime_min = 0;
+
         else
             powermgmt_est_runningtime_min = (battery_millivolts -
                                              battery_level_shutoff[0]) / 2;
