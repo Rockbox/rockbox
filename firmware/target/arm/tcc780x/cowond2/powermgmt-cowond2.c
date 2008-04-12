@@ -49,7 +49,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 const unsigned short percent_to_volt_charge[11] =
 {
     /* FIXME: calibrate values. Table is "inherited" from iPod-PCF / H100 */
-    { 3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4080, 4160 }
+    3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4080, 4160
 };
 #endif /* CONFIG_CHARGING */
 
