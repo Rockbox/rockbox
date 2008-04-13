@@ -26,13 +26,21 @@
 
 #ifndef SIMULATOR
 
+static bool charger_detect = false;
+
 void power_init(void)
 {
 }
 
+/* This is called from the mc13783 interrupt thread */
+void set_charger_inserted(bool inserted)
+{
+    charger_detect = inserted;
+}
+
 bool charger_inserted(void)
 {
-    return false;
+    return charger_detect;
 }
 
 /* Returns true if the unit is charging the batteries. */

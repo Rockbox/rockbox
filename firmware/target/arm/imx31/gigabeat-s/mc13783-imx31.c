@@ -24,6 +24,7 @@
 #include "debug.h"
 #include "kernel.h"
 
+#include "power-imx31.h"
 #include "button-target.h"
 
 /* This is all based on communicating with the MC13783 PMU which is on 
@@ -64,11 +65,15 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
     gpio_enable_event(MC13783_GPIO_NUM, MC13783_EVENT_ID);
 
     /* Check initial states */
+    value = mc13783_read(MC13783_INTERRUPT_SENSE0);
+    set_charger_inserted(value & MC13783_CHGDET);
+
     value = mc13783_read(MC13783_INTERRUPT_SENSE1);
     button_power_set_state((value & MC13783_ON1B) == 0);
     set_headphones_inserted((value & MC13783_ON2B) == 0);
 
     /* Enable desired PMIC interrupts */
+    mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_CHGDET);
     mc13783_clear(MC13783_INTERRUPT_MASK1, MC13783_ON1B | MC13783_ON2B);
     
     while (1)
@@ -78,12 +83,19 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
         mc13783_read_regset(status_regs, pending, 2);
         mc13783_write_regset(status_regs, pending, 2);
 
-#if 0
+
         if (pending[0])
         {
             /* Handle ...PENDING0 */
+            if (pending[0] & MC13783_CHGDET)
+            {
+                value = mc13783_read(MC13783_INTERRUPT_SENSE0);
+
+                if (pending[0] & MC13783_CHGDET)
+                    set_charger_inserted(value & MC13783_CHGDET);
+            }
         }
-#endif
+
 
         if (pending[1])
         {
