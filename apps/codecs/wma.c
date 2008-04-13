@@ -496,8 +496,6 @@ next_track:
 
     DEBUGF("**************** IN WMA.C ******************\n");
 
-    wma_decode_init(&wmadec,&wfx);
-
     if (resume_offset > ci->id3->first_frame_offset)
     {
         /* Get start of current packet */
