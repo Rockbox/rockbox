@@ -25,6 +25,7 @@
 #include "font.h"
 #include "debug-target.h"
 #include "mc13783.h"
+#include "adc.h"
 
 bool __dbg_hw_info(void)
 {
@@ -47,11 +48,6 @@ bool __dbg_ports(void)
         MC13783_RTC_ALARM,
         MC13783_RTC_DAY,
         MC13783_RTC_DAY_ALARM,
-        MC13783_ADC0,
-        MC13783_ADC1,
-        MC13783_ADC2,
-        MC13783_ADC3,
-        MC13783_ADC4,
     };
 
     static const char *pmic_regnames[ARRAYLEN(pmic_regset)] =
@@ -64,11 +60,6 @@ bool __dbg_ports(void)
         "RTC Alarm ",
         "RTC Day   ",
         "RTC Day Al",
-        "ADC0      ",
-        "ADC1      ",
-        "ADC2      ",
-        "ADC3      ",
-        "ADC4      ",
     };
 
     uint32_t pmic_regs[ARRAYLEN(pmic_regset)];
@@ -129,6 +120,21 @@ bool __dbg_ports(void)
         for (i = 0; i < (int)ARRAYLEN(pmic_regs); i++)
         {
             snprintf(buf, sizeof(buf), "%s: %08lx", pmic_regnames[i], pmic_regs[i]);
+            lcd_puts(0, line++, buf);
+        }
+
+        line++;
+
+        lcd_puts(0, line++, "ADC"); line++;
+
+        for (i = 0; i < NUM_ADC_CHANNELS; i += 4)
+        {
+            snprintf(buf, sizeof(buf),
+                     "CH%02d:%04u CH%02d:%04u CH%02d:%04u CH%02d:%04u",
+                     i+0, adc_read(i+0),
+                     i+1, adc_read(i+1),
+                     i+2, adc_read(i+2),
+                     i+3, adc_read(i+3));
             lcd_puts(0, line++, buf);
         }
 

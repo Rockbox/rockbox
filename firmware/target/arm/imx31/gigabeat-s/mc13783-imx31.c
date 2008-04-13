@@ -26,6 +26,7 @@
 
 #include "power-imx31.h"
 #include "button-target.h"
+#include "adc-target.h"
 
 /* This is all based on communicating with the MC13783 PMU which is on 
  * CSPI2 with the chip select at 0. The LCD controller resides on
@@ -64,17 +65,21 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
 
     gpio_enable_event(MC13783_GPIO_NUM, MC13783_EVENT_ID);
 
-    /* Check initial states */
+    /* Check initial states for events with a sense bit */
     value = mc13783_read(MC13783_INTERRUPT_SENSE0);
     set_charger_inserted(value & MC13783_CHGDET);
 
     value = mc13783_read(MC13783_INTERRUPT_SENSE1);
-    button_power_set_state((value & MC13783_ON1B) == 0);
-    set_headphones_inserted((value & MC13783_ON2B) == 0);
+    button_power_set_state((value & MC13783_ONOFD1) == 0);
+    set_headphones_inserted((value & MC13783_ONOFD2) == 0);
 
-    /* Enable desired PMIC interrupts */
+    pending[0] = pending[1] = 0xffffff;
+    mc13783_write_regset(status_regs, pending, 2);
+
+    /* Enable desired PMIC interrupts - some are unmasked in the drivers that
+     * handle a specific task */
     mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_CHGDET);
-    mc13783_clear(MC13783_INTERRUPT_MASK1, MC13783_ON1B | MC13783_ON2B);
+    mc13783_clear(MC13783_INTERRUPT_MASK1, MC13783_ONOFD1 | MC13783_ONOFD2);
     
     while (1)
     {
@@ -83,10 +88,16 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
         mc13783_read_regset(status_regs, pending, 2);
         mc13783_write_regset(status_regs, pending, 2);
 
-
         if (pending[0])
         {
             /* Handle ...PENDING0 */
+
+            /* Handle interrupts without a sense bit */
+            if (pending[0] & MC13783_ADCDONE)
+                adc_done();
+
+            /* Handle interrupts that have a sense bit that needs to
+             * be checked */
             if (pending[0] & MC13783_CHGDET)
             {
                 value = mc13783_read(MC13783_INTERRUPT_SENSE0);
@@ -96,19 +107,24 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
             }
         }
 
-
         if (pending[1])
         {
             /* Handle ...PENDING1 */
-            if (pending[1] & (MC13783_ON1B | MC13783_ON2B))
+
+            /* Handle interrupts without a sense bit */
+            /* ... */
+
+            /* Handle interrupts that have a sense bit that needs to
+             * be checked */
+            if (pending[1] & (MC13783_ONOFD1 | MC13783_ONOFD2))
             {
                 value = mc13783_read(MC13783_INTERRUPT_SENSE1);
 
-                if (pending[1] & MC13783_ON1B)
-                    button_power_set_state((value & MC13783_ON1B) == 0);
+                if (pending[1] & MC13783_ONOFD1)
+                    button_power_set_state((value & MC13783_ONOFD1) == 0);
 
-                if (pending[1] & MC13783_ON2B)
-                    set_headphones_inserted((value & MC13783_ON2B) == 0);
+                if (pending[1] & MC13783_ONOFD2)
+                    set_headphones_inserted((value & MC13783_ONOFD2) == 0);
             }
         }
     }
