@@ -813,11 +813,9 @@ static bool fill_buffer(void)
     }
     else
     {
-#ifndef SIMULATOR
         /* only spin the disk down if the filling wasn't interrupted by an
            event arriving in the queue. */
         ata_sleep();
-#endif
         return false;
     }
 }

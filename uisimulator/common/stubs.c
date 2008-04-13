@@ -108,6 +108,11 @@ void ata_spin(void)
 {
 }
 
+void ata_sleep(void)
+{
+    DEBUGF("ata_sleep()\n");
+}
+
 void ata_spindown(int s)
 {
     (void)s;

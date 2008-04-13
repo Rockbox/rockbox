@@ -169,6 +169,7 @@ static inline void disk_buf_buffer(void)
         if (!stream_get_window(&sw))
         {
             disk_buf.state = TSTATE_DATA;
+            rb->ata_sleep();
             break;
         }
 
@@ -183,6 +184,7 @@ static inline void disk_buf_buffer(void)
             /* Free space is less than one page */
             disk_buf.state = TSTATE_DATA;
             disk_buf.low_wm = DISK_BUF_LOW_WATERMARK;
+            rb->ata_sleep();
             break;
         }
 
@@ -204,6 +206,7 @@ static inline void disk_buf_buffer(void)
             {
                 /* Error or end of stream */
                 disk_buf.state = TSTATE_EOS;
+                rb->ata_sleep();
                 break;
             }
 

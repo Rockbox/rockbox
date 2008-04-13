@@ -234,8 +234,8 @@ static const struct plugin_api rockbox_api = {
     fdprintf,
     read_line,
     settings_parseline,
-#ifndef SIMULATOR
     ata_sleep,
+#ifndef SIMULATOR
     ata_disk_is_active,
 #endif
     ata_spin,

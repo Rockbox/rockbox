@@ -171,9 +171,7 @@ void load_settings(void){
             draw_message(display, MESSAGE_ERRLOAD, 1);
         display->update();
     }
-#ifndef SIMULATOR
     rb->ata_sleep();
-#endif
     rb->sleep(HZ);
 }
 
