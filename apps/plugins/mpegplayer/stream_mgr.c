@@ -993,32 +993,18 @@ int stream_init(void)
 
     /* Initialize non-allocator blocks first */
 #ifndef HAVE_LCD_COLOR
-    bool success;
-    long graysize;
-    void *graymem;
+    long greysize;
 
-#ifdef PROC_NEEDS_CACHEALIGN
-    /* This can run on another processor - align data */
-    memsize = CACHEALIGN_BUFFER(&mem, memsize);
-    graymem = UNCACHED_ADDR(mem); 
-#else
-    graymem = mem;
-#endif
-
-    success = grey_init(rb, graymem, memsize, GREY_BUFFERED|GREY_ON_COP,
-                        LCD_WIDTH, LCD_HEIGHT, &graysize);
-
-    /* This can run on another processor - align size */
-    graysize = CACHEALIGN_UP(graysize);
-
-    mem += graysize;
-    memsize -= graysize;
-
-    if (!success || (ssize_t)memsize <= 0)
+    /* Greylib init handles all necessary cache alignment */
+    if (!grey_init(rb, mem, memsize, GREY_BUFFERED|GREY_ON_COP,
+                   LCD_WIDTH, LCD_HEIGHT, &greysize))
     {
         rb->splash(HZ, "greylib init failed!");
         return STREAM_ERROR;
     }
+
+    mem += greysize;
+    memsize -= greysize;
 
     grey_clear_display();
 #endif /* !HAVE_LCD_COLOR */
