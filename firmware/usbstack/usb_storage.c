@@ -306,10 +306,13 @@ void usb_storage_notify_hotswap(int volume,bool inserted)
 void usb_storage_reconnect(void)
 {
     int i;
-    for(i=0;i<NUM_VOLUMES;i++)
-        ejected[i] = !check_disk_present(IF_MV(i));
+    if(usb_core_driver_enabled(USB_DRIVER_MASS_STORAGE)
+       && usb_inserted()) {
+        for(i=0;i<NUM_VOLUMES;i++)
+            ejected[i] = !check_disk_present(IF_MV(i));
 
-    usb_request_exclusive_ata();
+        usb_request_exclusive_ata();
+    }
 }
 
 /* called by usb_code_init() */
