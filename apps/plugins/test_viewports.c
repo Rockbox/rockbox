@@ -29,7 +29,7 @@ static struct plugin_api* rb;
 #define BGCOLOR_1 LCD_RGBPACK(255,255,0)
 #define BGCOLOR_2 LCD_RGBPACK(0,255,0)
 #define FGCOLOR_1 LCD_RGBPACK(0,0,255)
-#else if LCD_DEPTH > 1
+#elif LCD_DEPTH > 1
 #define BGCOLOR_1 LCD_DARKGRAY
 #define BGCOLOR_2 LCD_LIGHTGRAY
 #define FGCOLOR_1 LCD_WHITE
