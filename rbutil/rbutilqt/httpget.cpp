@@ -23,14 +23,13 @@
 
 #include "httpget.h"
 
-QDir HttpGet::m_globalCache;
-QUrl HttpGet::m_globalProxy;
+QDir HttpGet::m_globalCache; //< global cach path value for new objects
+QUrl HttpGet::m_globalProxy; //< global proxy value for new objects
 
 HttpGet::HttpGet(QObject *parent)
     : QObject(parent)
 {
     m_usecache = false;
-    qDebug() << "--> HttpGet::HttpGet()";
     outputToBuffer = true;
     cached = false;
     getRequest = -1;
@@ -41,7 +40,6 @@ HttpGet::HttpGet(QObject *parent)
     // default to global proxy / cache if not empty.
     // proxy is automatically enabled, disable it by setting an empty proxy
     // cache is enabled to be in line, can get disabled with setCache(bool)
-    qDebug() << "setting global proxy / cache";
     if(!m_globalProxy.isEmpty())
         setProxy(m_globalProxy);
     m_usecache = false;
@@ -58,6 +56,8 @@ HttpGet::HttpGet(QObject *parent)
 }
 
 
+//! @brief set cache path
+//  @param d new directory to use as cache path
 void HttpGet::setCache(QDir d)
 {
     m_cachedir = d;
@@ -68,6 +68,9 @@ void HttpGet::setCache(QDir d)
 }
 
 
+/** @brief enable / disable cache useage
+ *  @param c set cache usage
+ */
 void HttpGet::setCache(bool c)
 {
     qDebug() << "setCache(bool)" << c;
@@ -103,6 +106,9 @@ QByteArray HttpGet::readAll()
 }
 
 
+/** @brief get http error
+ *  @return http error
+ */
 QHttp::Error HttpGet::error()
 {
     return http.error();
@@ -219,13 +225,15 @@ bool HttpGet::getFile(const QUrl &url)
         qDebug() << query;
     }
 
+    QString path;
+    path = QString(QUrl::toPercentEncoding(url.path(), "/"));
     if(outputToBuffer) {
         qDebug() << "[HTTP] downloading to buffer:" << url.toString();
-        getRequest = http.get(url.path() + query);
+        getRequest = http.get(path + query);
     }
     else {
         qDebug() << "[HTTP] downloading to file:" << url.toString() << qPrintable(outputFile->fileName());
-        getRequest = http.get(url.path() + query, outputFile);
+        getRequest = http.get(path + query, outputFile);
     }
     qDebug() << "[HTTP] request scheduled: GET" << getRequest;
 
