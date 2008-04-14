@@ -48,13 +48,10 @@ const unsigned short percent_to_volt_charge[11] =
     3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990
 };
 
-/* ADC[0] is (530) at discharge and 625 at full charge */
-#define BATTERY_SCALE_FACTOR 6605
-/* full-scale ADC readout (2^10) in millivolt */
-
 /* Returns battery voltage from ADC [millivolts] */
 unsigned int battery_adc_voltage(void)
 {
-    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
+    /* ADC reading 0-1023 = 2400mV-4700mV */
+    return ((adc_read(ADC_BATTERY) * 2303) >> 10) + 2400;
 }
 

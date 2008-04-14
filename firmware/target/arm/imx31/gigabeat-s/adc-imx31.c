@@ -50,7 +50,7 @@ unsigned short adc_read(int channel)
     mutex_lock(&adc_mtx);
 
     /* Limit the traffic through here */
-    if (TIME_AFTER(current_tick, last_adc_read[input_select]))
+    if (current_tick != last_adc_read[input_select])
     {
         /* Keep enable, start conversion, increment from channel 0,
          * increment from channel 4 */
