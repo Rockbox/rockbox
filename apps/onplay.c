@@ -261,6 +261,13 @@ MAKE_MENU( cat_playlist_menu, ID2P(LANG_CATALOG), cat_playlist_callback,
 static int cat_playlist_callback(int action,
                                  const struct menu_item_ex *this_item)
 {
+    if (((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO) &&
+          ((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) &&
+          ((selected_file_attr & ATTR_DIRECTORY) == 0))
+    {
+        return ACTION_EXIT_MENUITEM;
+    }
+    
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
