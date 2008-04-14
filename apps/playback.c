@@ -1211,6 +1211,11 @@ static bool codec_request_next_track_callback(void)
     if (!codec_load_next_track())
         return false;
 
+    /* Seek to the beginning of the new track because if the struct
+       mp3entry was buffered, "elapsed" might not be zero (if the track has
+       been played already but not unbuffered) */
+    codec_seek_buffer_callback(curtrack_id3.first_frame_offset);
+
     /* Check if the next codec is the same file. */
     if (prev_codectype == get_codec_base_type(curtrack_id3.codectype))
     {
