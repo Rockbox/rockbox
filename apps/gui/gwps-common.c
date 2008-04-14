@@ -833,15 +833,7 @@ static char *get_token_value(struct gui_wps *gwps,
             return playlist_name(NULL, buf, buf_size);
 
         case WPS_TOKEN_PLAYLIST_POSITION:
-#if CONFIG_CODEC == SWCODEC
-            snprintf(buf, buf_size, "%d", id3->index + 1);
-#else
-            /* On HWCODEC, using id3->index doesn't work when shuffle is
-             * enabled, so we get the playlist index directly. To use
-             * id3->index, something like what was added in r3726 would be
-             * required. */
             snprintf(buf, buf_size, "%d", playlist_get_display_index());
-#endif
             return buf;
 
         case WPS_TOKEN_PLAYLIST_SHUFFLE:

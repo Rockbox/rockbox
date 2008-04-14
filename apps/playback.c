@@ -585,7 +585,6 @@ struct mp3entry* audio_current_track(void)
 
     strncpy(temp_id3.path, p, sizeof(temp_id3.path)-1);
     temp_id3.title = &temp_id3.path[0];
-    temp_id3.index = playlist_get_display_index() - 1 + wps_offset;
 
     return &temp_id3;
 }
@@ -1628,8 +1627,6 @@ static bool audio_load_track(int offset, bool start_play)
     {
         if (get_metadata(&id3, fd, trackname))
         {
-            id3.index = playlist_get_display_index() + last_peek_offset - 1;
-
             send_event(PLAYBACK_EVENT_TRACK_BUFFER, &id3);
 
             tracks[track_widx].id3_hid =
