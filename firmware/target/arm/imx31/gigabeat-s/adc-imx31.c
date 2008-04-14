@@ -23,19 +23,15 @@
 #include "kernel.h"
 
 /* Do this so we may read all channels in a single SPI message */
-static const unsigned char reg_array[NUM_ADC_CHANNELS/2] =
+static const unsigned char reg_array[4] =
 {
-    MC13783_ADC2,
-    MC13783_ADC2,
-    MC13783_ADC2,
-    MC13783_ADC2,
     MC13783_ADC2,
     MC13783_ADC2,
     MC13783_ADC2,
     MC13783_ADC2,
 };
 
-static uint32_t channels[2][NUM_ADC_CHANNELS/2];
+static uint32_t channels[2][4];
 static struct wakeup adc_wake;
 static struct mutex adc_mtx;
 static long last_adc_read[2]; /* One for each input group */
@@ -49,9 +45,9 @@ unsigned short adc_read(int channel)
     if ((unsigned)channel >= NUM_ADC_CHANNELS)
         return ADC_READ_ERROR;
 
-    mutex_lock(&adc_mtx);
-
     input_select = channel >> 3;
+
+    mutex_lock(&adc_mtx);
 
     /* Limit the traffic through here */
     if (TIME_AFTER(current_tick, last_adc_read[input_select]))
@@ -72,13 +68,12 @@ unsigned short adc_read(int channel)
 
         /* Read all 8 channels that are converted - two channels in each
          * word. */
-        mc13783_read_regset(reg_array, channels[input_select],
-                            NUM_ADC_CHANNELS/2);
+        mc13783_read_regset(reg_array, channels[input_select], 4);
 
         last_adc_read[input_select] = current_tick;
     }
 
-    data = channels[input_select][channel & 7];
+    data = channels[input_select][(channel >> 1) & 3];
 
     mutex_unlock(&adc_mtx);
 
