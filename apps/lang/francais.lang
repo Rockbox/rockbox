@@ -16,7 +16,7 @@
 #    
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
 #    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006, Mar 2007, Sep 2007,
-#    Oct 2007, Nov 2007, Dec 2007, Jan 2008
+#    Oct 2007, Nov 2007, Dec 2007, Jan 2008, Avril 2008
 #
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -263,13 +263,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Oui"
     h100,h120,h300: "NAVI = Oui"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Oui"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Oui"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2368,14 +2368,14 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
+    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Création base de données... %d trouvés (OFF = retour)"
     h100,h120,h300: "Création base de données... %d trouvés (STOP = retour)"
     ipod*: "Création base de données... %d trouvés (PREV = retour)"
-    x5,m5: "Création base de données... %d trouvés (LEFT = retour)"
+    x5,m5,gigabeatf,mrobe100: "Création base de données... %d trouvés (LEFT = retour)"
     h10,h10_5gb,e200,c200: "Création base de données... %d trouvés (PREV = retour)"
   </dest>
   <voice>
@@ -4128,17 +4128,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Valider"
     h100,h120,h300: "NAVI = Valider"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Valider"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Valider"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -4153,6 +4153,7 @@
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
   </source>
   <dest>
     *: none
@@ -4162,10 +4163,11 @@
     x5,m5: "RECORD = Annuler"
     h10,h10_5gb: "PREV = Annuler"
     gigabeatf: "A = Annuler"
+    mrobe100: "DISPLAY = Annuler"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -8152,29 +8154,27 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Erreur enreg."
+    *: ""
   </dest>
   <voice>
-    *: "Erreur d'enregistrement"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Pas de partition?"
-    player: "Partition?"
+    *: ""
   </dest>
   <voice>
     *: ""
