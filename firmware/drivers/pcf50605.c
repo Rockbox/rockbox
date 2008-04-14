@@ -99,7 +99,7 @@ void pcf50605_init(void)
     /* keep initialization from svn for other iPods */
     pcf50605_write(PCF5060X_D1REGC1, 0xf5); /* 3.0V ON */
     pcf50605_write(PCF5060X_D3REGC1, 0xf5); /* 3.0V ON */
+#endif
     /* Dock Connector pin 17 (default: OFF) */
     pcf50605_write(PCF5060X_D2REGC1, 0xf8); /* 3.3V ON */
-#endif
 }
