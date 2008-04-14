@@ -50,6 +50,7 @@
 #include "buffer.h"
 #include "bmp.h"
 #include "events.h"
+#include "metadata.h"
 
 #ifdef SIMULATOR
 #define ata_disk_is_active() 1
@@ -586,6 +587,18 @@ static bool buffer_handle(int handle_id)
 
     trigger_cpu_boost();
 
+    if (h->type == TYPE_ID3)
+    {
+        get_metadata((struct mp3entry *)(buffer + h->data), h->fd, h->path);
+        close(h->fd);
+        h->fd = -1;
+        h->filerem = 0;
+        h->available = sizeof(struct mp3entry);
+        h->widx += sizeof(struct mp3entry);
+        send_event(EVENT_HANDLE_FINISHED, &h->id);
+        return true;
+    }
+
     while (h->filerem > 0)
     {
         /* max amount to copy */
@@ -869,7 +882,31 @@ management functions for all the actual handle management work.
 */
 int bufopen(const char *file, size_t offset, enum data_type type)
 {
-    size_t adjusted_offset = offset;
+    if (type == TYPE_ID3)
+    {
+        /* ID3 case: allocate space, init the handle and return. */
+
+        struct memory_handle *h = add_handle(sizeof(struct mp3entry), false, true);
+        if (!h)
+            return ERR_BUFFER_FULL;
+
+        h->fd = -1;
+        h->filesize = sizeof(struct mp3entry);
+        h->filerem = sizeof(struct mp3entry);
+        h->offset = 0;
+        h->data = buf_widx;
+        h->ridx = buf_widx;
+        h->widx = buf_widx;
+        h->available = 0;
+        h->type = type;
+        strncpy(h->path, file, MAX_PATH);
+
+        buf_widx += sizeof(struct mp3entry);  /* safe because the handle
+                                                 can't wrap */
+        return h->id;
+    }
+
+    /* Other cases: there is a little more work. */
 
     int fd = open(file, O_RDONLY);
     if (fd < 0)
@@ -878,6 +915,7 @@ int bufopen(const char *file, size_t offset, enum data_type type)
     size_t size = filesize(fd);
     bool can_wrap = type==TYPE_PACKET_AUDIO || type==TYPE_CODEC;
 
+    size_t adjusted_offset = offset;
     if (adjusted_offset > size)
         adjusted_offset = 0;
 

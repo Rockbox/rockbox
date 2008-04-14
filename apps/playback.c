@@ -131,6 +131,7 @@ enum {
     Q_AUDIO_DIR_SKIP,
     Q_AUDIO_POSTINIT,
     Q_AUDIO_FILL_BUFFER,
+    Q_AUDIO_FINISH_LOAD,
     Q_CODEC_REQUEST_COMPLETE,
     Q_CODEC_REQUEST_FAILED,
 
@@ -248,6 +249,9 @@ static bool dir_skip = false;       /* Is a directory skip pending? (A) */
 static bool new_playlist = false;   /* Are we starting a new playlist? (A) */
 static int wps_offset = 0;          /* Pending track change offset, to keep WPS responsive (A) */
 static bool skipped_during_pause = false; /* Do we need to clear the PCM buffer when playback resumes (A) */
+
+static bool start_play_g = false; /* Used by audio_load_track to notify
+                                     audio_finish_load_track about start_play */
 
 /* Set to true if the codec thread should send an audio stop request
  * (typically because the end of the playlist has been reached).
@@ -606,6 +610,9 @@ struct mp3entry* audio_next_track(void)
 
     next_idx = (track_ridx + offset + 1) & MAX_TRACK_MASK;
 
+    if (tracks[next_idx].id3_hid >= 0)
+        return bufgetid3(tracks[next_idx].id3_hid);
+
     if (next_idx == track_widx)
     {
         /* The next track hasn't been buffered yet, so we return the static
@@ -613,10 +620,7 @@ struct mp3entry* audio_next_track(void)
         return &lasttrack_id3;
     }
 
-    if (tracks[next_idx].id3_hid < 0)
-        return NULL;
-    else
-        return bufgetid3(tracks[next_idx].id3_hid);
+    return NULL;
 }
 
 bool audio_has_changed_track(void)
@@ -1413,7 +1417,20 @@ static void buffering_handle_rebuffer_callback(void *data)
 static void buffering_handle_finished_callback(int *data)
 {
     logf("handle %d finished buffering", *data);
-    strip_tags(*data);
+
+    if (*data == tracks[track_widx].id3_hid)
+    {
+        /* The metadata handle for the last loaded track has been buffered.
+           We can ask the audio thread to load the rest of the track's data. */
+        LOGFQUEUE("audio >| audio Q_AUDIO_FINISH_LOAD");
+        queue_post(&audio_queue, Q_AUDIO_FINISH_LOAD, 0);
+    }
+    else
+    {
+        /* This is most likely an audio handle, so we strip the useless
+           trailing tags that are left. */
+        strip_tags(*data);
+    }
 }
 
 
@@ -1446,12 +1463,8 @@ long audio_filebufused(void)
 static void audio_update_trackinfo(void)
 {
     /* Load the curent track's metadata into curtrack_id3 */
-    CUR_TI->taginfo_ready = (CUR_TI->id3_hid >= 0);
     if (CUR_TI->id3_hid >= 0)
         copy_mp3entry(&curtrack_id3, bufgetid3(CUR_TI->id3_hid));
-
-    int next_idx = (track_ridx + 1) & MAX_TRACK_MASK;
-    tracks[next_idx].taginfo_ready = (tracks[next_idx].id3_hid >= 0);
 
     /* Reset current position */
     curtrack_id3.elapsed = 0;
@@ -1560,15 +1573,15 @@ static bool audio_loadcodec(bool start_play)
     return true;
 }
 
-/* Load one track by making the appropriate bufopen calls. Return true if
-   everything required was loaded correctly, false if not. */
-static bool audio_load_track(int offset, bool start_play)
+/* Load metadata for the next track (with bufopen). The rest of the track
+   loading will be handled by audio_finish_load_track once the metadata has been
+   actually loaded by the buffering thread. */
+static bool audio_load_track(size_t offset, bool start_play)
 {
     const char *trackname;
-    char msgbuf[80];
     int fd = -1;
-    int file_offset = 0;
-    struct mp3entry id3;
+
+    start_play_g = start_play;  /* will be read by audio_finish_load_track */
 
     /* Stop buffer filling if there is no free track entries.
        Don't fill up the last track entry (we wan't to store next track
@@ -1582,7 +1595,6 @@ static bool audio_load_track(int offset, bool start_play)
     last_peek_offset++;
     tracks[track_widx].taginfo_ready = false;
 
-    peek_again:
     logf("Buffering track:%d/%d", track_widx, track_ridx);
     /* Get track name from current playlist read position. */
     while ((trackname = playlist_peek(last_peek_offset)) != NULL)
@@ -1610,7 +1622,7 @@ static bool audio_load_track(int offset, bool start_play)
 
     tracks[track_widx].filesize = filesize(fd);
 
-    if ((unsigned)offset > tracks[track_widx].filesize)
+    if (offset > tracks[track_widx].filesize)
         offset = 0;
 
     /* Set default values */
@@ -1625,43 +1637,48 @@ static bool audio_load_track(int offset, bool start_play)
     /* Get track metadata if we don't already have it. */
     if (tracks[track_widx].id3_hid < 0)
     {
-        if (get_metadata(&id3, fd, trackname))
+        tracks[track_widx].id3_hid = bufopen(trackname, 0, TYPE_ID3);
+
+        if (tracks[track_widx].id3_hid < 0)
         {
-            send_event(PLAYBACK_EVENT_TRACK_BUFFER, &id3);
-
-            tracks[track_widx].id3_hid =
-                bufalloc(&id3, sizeof(struct mp3entry), TYPE_ID3);
-
-            if (tracks[track_widx].id3_hid < 0)
-            {
-                last_peek_offset--;
-                close(fd);
-                copy_mp3entry(&lasttrack_id3, &id3);
-                goto buffer_full;
-            }
-
-            if (track_widx == track_ridx)
-                copy_mp3entry(&curtrack_id3, &id3);
-
-            if (start_play)
-            {
-                track_changed = true;
-                playlist_update_resume_info(audio_current_track());
-            }
-        }
-        else
-        {
-            logf("mde:%s!",trackname);
-
-            /* Skip invalid entry from playlist. */
-            playlist_skip_entry(NULL, last_peek_offset);
+            /* Buffer is full. */
+            get_metadata(&lasttrack_id3, fd, trackname);
+            last_peek_offset--;
             close(fd);
-            goto peek_again;
+            logf("buffer is full for now");
+            filling = STATE_FULL;
+            return false;
         }
 
+        close(fd);
+
+        if (track_widx == track_ridx)
+        {
+            buf_request_buffer_handle(tracks[track_widx].id3_hid);
+            copy_mp3entry(&curtrack_id3, bufgetid3(tracks[track_widx].id3_hid));
+            curtrack_id3.offset = offset;
+        }
+
+        if (start_play)
+        {
+            track_changed = true;
+            playlist_update_resume_info(audio_current_track());
+        }
     }
 
-    close(fd);
+    return true;
+}
+
+/* Second part of the track loading: We now have the metadata available, so we
+   can load the codec, the album art and finally the audio data.
+   This is called on the audio thread after the buffering thread calls the
+   buffering_handle_finished_callback callback. */
+static void audio_finish_load_track(void)
+{
+    char msgbuf[80];
+    size_t file_offset = 0;
+    size_t offset = 0;
+    bool start_play = start_play_g;
 
 #if 0
     if (cuesheet_is_enabled() && tracks[track_widx].id3.cuesheet_type == 1)
@@ -1680,12 +1697,35 @@ static bool audio_load_track(int offset, bool start_play)
     }
 #endif
 
+    if (tracks[track_widx].id3_hid < 0) {
+        logf("no metatdata");
+        return;
+    }
+
     struct mp3entry *track_id3;
 
     if (track_widx == track_ridx)
         track_id3 = &curtrack_id3;
     else
         track_id3 = bufgetid3(tracks[track_widx].id3_hid);
+
+    if (track_id3->length == 0 || track_id3->filesize == 0)
+    {
+        logf("audio_finish_load_track: invalid metadata");
+
+        /* Invalid metadata */
+        bufclose(tracks[track_widx].id3_hid);
+        tracks[track_widx].id3_hid = -1;
+
+        /* Skip invalid entry from playlist. */
+        playlist_skip_entry(NULL, last_peek_offset--);
+
+        /* load next track */
+        LOGFQUEUE("audio > audio Q_AUDIO_FILL_BUFFER %d", (int)start_play);
+        queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, start_play);
+
+        return;
+    }
 
 #ifdef HAVE_ALBUMART
     if (tracks[track_widx].aa_hid < 0 && gui_sync_wps_uses_albumart())
@@ -1702,20 +1742,21 @@ static bool audio_load_track(int offset, bool start_play)
         if (tracks[track_widx].codec_hid == ERR_BUFFER_FULL)
         {
             /* No space for codec on buffer, not an error */
-            goto buffer_full;
+            return;
         }
 
         /* This is an error condition, either no codec was found, or reading
          * the codec file failed part way through, either way, skip the track */
-        snprintf(msgbuf, sizeof(msgbuf)-1, "No codec for: %s", trackname);
+        snprintf(msgbuf, sizeof(msgbuf)-1, "No codec for: %s", track_id3->path);
         /* We should not use gui_syncplash from audio thread! */
         gui_syncsplash(HZ*2, msgbuf);
         /* Skip invalid entry from playlist. */
         playlist_skip_entry(NULL, last_peek_offset);
-        goto peek_again;
+        return;
     }
 
     track_id3->elapsed = 0;
+    offset = track_id3->offset;
 
     enum data_type type = TYPE_PACKET_AUDIO;
 
@@ -1758,7 +1799,7 @@ static bool audio_load_track(int offset, bool start_play)
         break;
     }
 
-    logf("alt:%s", trackname);
+    logf("alt:%s", track_id3->path);
 
     if (file_offset > AUDIO_REBUFFER_GUESS_SIZE)
         file_offset -= AUDIO_REBUFFER_GUESS_SIZE;
@@ -1767,10 +1808,10 @@ static bool audio_load_track(int offset, bool start_play)
     else
         file_offset = 0;
 
-    tracks[track_widx].audio_hid = bufopen(trackname, file_offset, type);
+    tracks[track_widx].audio_hid = bufopen(track_id3->path, file_offset, type);
 
     if (tracks[track_widx].audio_hid < 0)
-        goto buffer_full;
+        return;
 
     /* All required data is now available for the codec. */
     tracks[track_widx].taginfo_ready = true;
@@ -1783,18 +1824,18 @@ static bool audio_load_track(int offset, bool start_play)
 
     track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
-    return true;
+    send_event(PLAYBACK_EVENT_TRACK_BUFFER, track_id3);
 
-buffer_full:
-    logf("buffer is full for now");
-    filling = STATE_FULL;
-    return false;
+    /* load next track */
+    LOGFQUEUE("audio > audio Q_AUDIO_FILL_BUFFER");
+    queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+
+    return;
 }
 
 static void audio_fill_file_buffer(bool start_play, size_t offset)
 {
     bool had_next_track = audio_next_track() != NULL;
-    bool continue_buffering;
 
     filling = STATE_FILLING;
     trigger_cpu_boost();
@@ -1817,18 +1858,10 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
     /* Save the current resume position once. */
     playlist_update_resume_info(audio_current_track());
 
-    continue_buffering = audio_load_track(offset, start_play);
-    do {
-        sleep(1);
-        if (!queue_empty(&audio_queue))
-            /* There's a message in the queue. break the loop to treat it */
-            break;
-        continue_buffering = audio_load_track(0, false);
-    } while (continue_buffering);
+    audio_load_track(offset, start_play);
 
     if (!had_next_track && audio_next_track())
         track_changed = true;
-
 }
 
 static void audio_rebuffer(void)
@@ -2199,22 +2232,22 @@ static void audio_finalise_track_change(void)
     {
         wps_offset = 0;
         automatic_skip = false;
-    }
 
-    /* Invalidate prevtrack_id3 */
-    prevtrack_id3.path[0] = 0;
+        /* Invalidate prevtrack_id3 */
+        prevtrack_id3.path[0] = 0;
 
-    if (prev_ti && prev_ti->audio_hid < 0)
-    {
-        /* No audio left so we clear all the track info. */
-        clear_track_info(prev_ti);
-    }
+        if (prev_ti && prev_ti->audio_hid < 0)
+        {
+            /* No audio left so we clear all the track info. */
+            clear_track_info(prev_ti);
+        }
 
-    if (prev_ti && prev_ti->id3_hid >= 0)
-    {
-        /* Reset the elapsed time to force the progressbar to be empty if
-           the user skips back to this track */
-        bufgetid3(prev_ti->id3_hid)->elapsed = 0;
+        if (prev_ti && prev_ti->id3_hid >= 0)
+        {
+            /* Reset the elapsed time to force the progressbar to be empty if
+            the user skips back to this track */
+            bufgetid3(prev_ti->id3_hid)->elapsed = 0;
+        }
     }
 
     send_event(PLAYBACK_EVENT_TRACK_CHANGE, &curtrack_id3);
@@ -2297,8 +2330,13 @@ static void audio_thread(void)
         switch (ev.id) {
 
             case Q_AUDIO_FILL_BUFFER:
-                LOGFQUEUE("audio < Q_AUDIO_FILL_BUFFER");
-                audio_fill_file_buffer(false, 0);
+                LOGFQUEUE("audio < Q_AUDIO_FILL_BUFFER %d", (int)ev.data);
+                audio_fill_file_buffer((bool)ev.data, 0);
+                break;
+
+            case Q_AUDIO_FINISH_LOAD:
+                LOGFQUEUE("audio < Q_AUDIO_FINISH_LOAD");
+                audio_finish_load_track();
                 break;
 
             case Q_AUDIO_PLAY:
@@ -2400,8 +2438,6 @@ static void audio_thread(void)
 
             case SYS_TIMEOUT:
                 LOGFQUEUE_SYS_TIMEOUT("audio < SYS_TIMEOUT");
-                if (filling == STATE_FILLING)
-                    audio_fill_file_buffer(false, 0);
                 break;
 
             default:
