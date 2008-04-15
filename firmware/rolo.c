@@ -340,7 +340,7 @@ int rolo_load(const char* filename)
     rolo_restart(audiobuf, ramstart, length);
 
     return 0; /* this is never reached */
-    (void)i; (void)checksum; (void)file_checksum;
+    (void)checksum; (void)file_checksum;
 }
 #else  /* !defined(IRIVER_IFP7XX_SERIES) */
 int rolo_load(const char* filename)
