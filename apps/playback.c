@@ -244,7 +244,6 @@ static enum filling_state filling;
 
 /* Track change controls */
 static bool automatic_skip = false; /* Who initiated in-progress skip? (C/A-) */
-static bool playlist_end = false;   /* Has the current playlist ended? (A) */
 static bool dir_skip = false;       /* Is a directory skip pending? (A) */
 static bool new_playlist = false;   /* Are we starting a new playlist? (A) */
 static int wps_offset = 0;          /* Pending track change offset, to keep WPS responsive (A) */
@@ -1614,7 +1613,6 @@ static bool audio_load_track(size_t offset, bool start_play)
     if (!trackname)
     {
         logf("End-of-playlist");
-        playlist_end = true;
         memset(&lasttrack_id3, 0, sizeof(struct mp3entry));
         filling = STATE_FINISHED;
         return false;
@@ -1979,7 +1977,6 @@ static int audio_check_new_track(void)
 
     if (automatic_skip)
     {
-        playlist_end = false;
         wps_offset = -ci.new_track;
         track_changed = true;
     }
@@ -2074,7 +2071,7 @@ static void audio_stop_playback(void)
     {
         struct mp3entry *id3 = NULL;
 
-        if (!playlist_end || !ci.stop_codec)
+        if (!ci.stop_codec)
         {
             /* Set this early, the outside code yields and may allow the codec
                to try to wait for a reply on a buffer wait */
@@ -2121,7 +2118,6 @@ static void audio_play_start(size_t offset)
     audio_stop_codec_flush();
 
     track_changed = true;
-    playlist_end = false;
 
     playing = true;
 
@@ -2161,7 +2157,6 @@ static void audio_invalidate_tracks(void)
     if (audio_have_tracks())
     {
         last_peek_offset = 0;
-        playlist_end = false;
         track_widx = track_ridx;
 
         /* Mark all other entries null (also buffered wrong metadata). */
@@ -2181,7 +2176,6 @@ static void audio_new_playlist(void)
     {
         if (paused)
             skipped_during_pause = true;
-        playlist_end = false;
         track_widx = track_ridx;
         audio_clear_track_entries();
 
@@ -2206,7 +2200,6 @@ static void audio_initiate_track_change(long direction)
 {
     logf("audio_initiate_track_change(%ld)", direction);
 
-    playlist_end = false;
     ci.new_track += direction;
     wps_offset -= direction;
     if (paused)
@@ -2216,7 +2209,6 @@ static void audio_initiate_track_change(long direction)
 /* Called on manual dir skip */
 static void audio_initiate_dir_change(long direction)
 {
-    playlist_end = false;
     dir_skip = true;
     ci.new_track = direction;
     if (paused)
@@ -2402,7 +2394,6 @@ static void audio_thread(void)
 
             case Q_AUDIO_DIR_SKIP:
                 LOGFQUEUE("audio < Q_AUDIO_DIR_SKIP");
-                playlist_end = false;
                 audio_initiate_dir_change(ev.data);
                 break;
 
