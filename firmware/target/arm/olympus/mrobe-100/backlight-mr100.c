@@ -19,9 +19,10 @@
 
 #include "backlight-target.h"
 #include "system.h"
-#include "lcd.h"
-#include "backlight.h"
-#include "i2c-pp.h"
+
+#define MIN_BRIGHTNESS 0x80ff08ff
+
+static const int log_brightness[12] = {0,4,8,12,20,28,40,60,88,124,176,255};
 
 void _backlight_on(void)
 {
@@ -33,23 +34,18 @@ void _backlight_off(void)
     GPO32_ENABLE &= ~0x1000000;
 }
 
+void _buttonlight_set_brightness(int brightness)
+{
+    /* clamp the brightness value */
+    brightness = MAX(0, MIN(15, brightness));
+
+    outl(MIN_BRIGHTNESS-(log_brightness[brightness - 1] << 16), 0x7000a010);
+}
+
 void _buttonlight_on(void)
 {
     /* turn on all touchpad leds */
     GPIOA_OUTPUT_VAL |= BUTTONLIGHT_ALL;
-
-#if 0
-    /* Writing to 0x7000a010 controls the brightness of the leds.
-       This routine fades the leds from dim to bright, like when
-       you first turn the unit on. */
-    unsigned long val = 0x80ff08ff;
-    int i = 0;
-    for (i = 0; i < 16; i++)
-        outl(val, 0x7000a010);
-        udelay(100000);
-        val -= 0x110000;
-    }
-#endif
 }
 
 void _buttonlight_off(void)

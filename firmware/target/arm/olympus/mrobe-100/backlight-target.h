@@ -35,6 +35,7 @@ void _backlight_off(void);
                               BUTTONLIGHT_DISPLAY | BUTTONLIGHT_LEFT  | \
                               BUTTONLIGHT_RIGHT   | BUTTONLIGHT_SCROLL)
 
+void _buttonlight_set_brightness(int brightness);
 void _buttonlight_on(void);
 void _buttonlight_off(void);
 

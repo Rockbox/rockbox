@@ -75,6 +75,8 @@
 /* define this if you have a light associated with the buttons */
 #define HAVE_BUTTON_LIGHT
 
+#define HAVE_BUTTONLIGHT_BRIGHTNESS
+
 #define BATTERY_CAPACITY_DEFAULT 720 /* default battery capacity */
 
 #ifndef SIMULATOR

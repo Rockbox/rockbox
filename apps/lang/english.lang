@@ -3909,15 +3909,15 @@
   user:
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </voice>
 </phrase>
 <phrase>
