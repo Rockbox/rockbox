@@ -212,6 +212,8 @@ static bool timer_set(long cycles, bool start)
     return true;
 #elif (CONFIG_CPU == IMX31L)
     /* TODO */
+    (void)cycles; (void)start;
+    return false;
 #else
     return __TIMER_SET(cycles, start);
 #endif /* CONFIG_CPU */
@@ -280,6 +282,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     return true;
 #elif CONFIG_CPU == IMX31L
     /* TODO */
+    return false;
 #else
     return __TIMER_REGISTER(reg_prio, unregister_callback, cycles,
                             int_prio, timer_callback);

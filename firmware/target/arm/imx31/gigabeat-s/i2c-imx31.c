@@ -19,6 +19,7 @@
 #include "system.h"
 #include "i2c-imx31.h"
 
+#if 0
 static int i2c_getack(void)
 {
     return 0;
@@ -38,11 +39,12 @@ static int i2c_outb(unsigned char byte)
     (void)byte;
     return 0;
 }
+#endif
 
 void i2c_write(int addr, const unsigned char *buf, int count)
 {
     (void)addr;
-    (void)*buf;
+    (void)buf;
     (void)count;
 }
 

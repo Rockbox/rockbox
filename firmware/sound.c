@@ -412,6 +412,7 @@ void sound_set_volume(int value)
     int tmp = (60 - value * 4) & 0xff;
     CODECVOL = tmp | (tmp << 8);
 #endif
+    (void)value;
 }
 
 void sound_set_balance(int value)
@@ -429,8 +430,8 @@ void sound_set_balance(int value)
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101
     /* TODO: implement for iFP */
-    (void)value;
 #endif
+    (void)value;
 }
 
 void sound_set_bass(int value)
@@ -459,8 +460,8 @@ void sound_set_bass(int value)
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101
     /* TODO: implement for iFP */
-    (void)value;
 #endif               
+    (void)value;
 }
 
 void sound_set_treble(int value)
@@ -489,8 +490,8 @@ void sound_set_treble(int value)
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101 
     /* TODO: implement for iFP */
+#endif
     (void)value;
-#endif    
 }
 
 void sound_set_channels(int value)

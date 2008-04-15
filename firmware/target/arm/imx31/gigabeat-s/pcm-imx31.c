@@ -25,7 +25,9 @@
 #include "file.h"
 #include "mmu-imx31.h"
 
+#if 0
 static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
+#endif
 
 void pcm_play_lock(void)
 {
@@ -35,9 +37,11 @@ void pcm_play_unlock(void)
 {
 }
 
+#if 0
 static void _pcm_apply_settings(void)
 {
 }
+#endif
 
 void pcm_apply_settings(void)
 {
@@ -51,6 +55,7 @@ void pcm_postinit(void)
 {
 }
 
+#if 0
 /* Connect the DMA and start filling the FIFO */
 static void play_start_pcm(void)
 {
@@ -60,6 +65,7 @@ static void play_start_pcm(void)
 static void play_stop_pcm(void)
 {
 }
+#endif
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
@@ -73,6 +79,7 @@ void pcm_play_dma_stop(void)
 
 void pcm_play_dma_pause(bool pause)
 {
+    (void)pause;
 }
 
 /* Set the pcm frequency hardware will use when play is next started or
@@ -80,17 +87,20 @@ void pcm_play_dma_pause(bool pause)
    hardware here but simply cache it. */
 void pcm_set_frequency(unsigned int frequency)
 {
+    (void)frequency;
 }
 
 /* Return the number of bytes waiting - full L-R sample pairs only */
 size_t pcm_get_bytes_waiting(void)
 {
+    return 0;
 }
 
 /* Return a pointer to the samples and the number of them in *count */
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     (void)count;
+    return NULL;
 }
 
 /* Any recording functionality should be implemented similarly */
