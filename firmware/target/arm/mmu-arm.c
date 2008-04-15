@@ -86,6 +86,17 @@ void enable_mmu(void) {
     asm volatile("nop \n nop \n nop \n nop");
 }
 
+#if CONFIG_CPU == IMX31L
+void __attribute__((naked)) invalidate_dcache_range(const void *base, unsigned int size)
+{
+    asm volatile(
+        "add    r1, r1, r0          \n"
+        "mcrr   p15, 0, r1, r0, c14 \n"
+        "bx     lr                  \n"
+    );
+    (void)base; (void)size;
+}
+#else
 /* Invalidate DCache for this range  */
 /* Will do write back */
 void invalidate_dcache_range(const void *base, unsigned int size) {
@@ -122,7 +133,20 @@ void invalidate_dcache_range(const void *base, unsigned int size) {
     "mcr p15,0,%0,c7,c10,4\n"    /* Drain write buffer */
         : : "r" (addr), "r" (end));
 }
+#endif
 
+
+#if CONFIG_CPU == IMX31L
+void __attribute__((naked)) clean_dcache_range(const void *base, unsigned int size)
+{
+    asm volatile(
+        "add    r1, r1, r0          \n"
+        "mcrr   p15, 0, r1, r0, c12 \n"
+        "bx     lr                  \n"
+    );
+    (void)base; (void)size;
+}
+#else
 /* clean DCache for this range  */
 /* forces DCache writeback for the specified range */
 void clean_dcache_range(const void *base, unsigned int size) {
@@ -160,7 +184,19 @@ void clean_dcache_range(const void *base, unsigned int size) {
     "mcr p15,0,%0,c7,c10,4 \n"    /* Drain write buffer */
         : : "r" (addr), "r" (end));
 }
+#endif
 
+#if CONFIG_CPU == IMX31L
+void __attribute__((naked)) dump_dcache_range(const void *base, unsigned int size)
+{
+    asm volatile(
+        "add    r1, r1, r0         \n"
+        "mcrr   p15, 0, r1, r0, c6 \n"
+        "bx     lr                 \n"
+    );
+    (void)base; (void)size;
+}
+#else
 /* Dump DCache for this range  */
 /* Will *NOT* do write back */
 void dump_dcache_range(const void *base, unsigned int size) {
@@ -183,6 +219,19 @@ void dump_dcache_range(const void *base, unsigned int size) {
     "mcr p15,0,%0,c7,c10,4 \n"    /* Drain write buffer */
         : : "r" (addr), "r" (end));
 }
+#endif
+
+#if CONFIG_CPU == IMX31L
+void __attribute__((naked)) clean_dcache(void)
+{
+    asm volatile (
+        /* Clean entire data cache */
+        "mov    r0, #0                 \n"
+        "mcr    p15, 0, r0, c7, c10, 0 \n"
+        "bx     lr                     \n"
+    );
+}
+#else
 /* Cleans entire DCache */
 void clean_dcache(void)
 {
@@ -223,4 +272,5 @@ void clean_dcache(void)
             : : "r" (addr));
     }
 }
+#endif
 
