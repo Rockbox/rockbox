@@ -31,12 +31,12 @@ unsigned short adc_read(int channel)
         i2c_lock();
 
         /* Select channel */
-        if (pp_i2c_send( AS3514_I2C_ADDR, ADC_0, (channel << 4)) >= 0)
+        if (pp_i2c_send( AS3514_I2C_ADDR, AS3514_ADC_0, (channel << 4)) >= 0)
         {
             unsigned char buf[2];
 
             /* Read data */
-            if (i2c_readbytes( AS3514_I2C_ADDR, ADC_0, 2, buf) >= 0)
+            if (i2c_readbytes( AS3514_I2C_ADDR, AS3514_ADC_0, 2, buf) >= 0)
             {
                 data = (((buf[0] & 0x3) << 8) | buf[1]);
             }

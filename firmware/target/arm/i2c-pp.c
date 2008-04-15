@@ -228,7 +228,7 @@ void i2c_init(void)
     outl(0, 0x600060a4);
     outl(0x1e, 0x600060a4);
 
-    pp_i2c_send(AS3514_I2C_ADDR, SUPERVISOR, 5);
+    pp_i2c_send(AS3514_I2C_ADDR, AS3514_SUPERVISOR, 5);
 #endif
 #endif
 

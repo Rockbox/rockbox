@@ -161,33 +161,33 @@ void audiohw_init(void)
     /* Set ADC off, mixer on, DAC on, line out off, line in off, mic off */
 
     /* Turn on SUM, DAC */
-    as3514_write(AUDIOSET1, (1 << 6) | (1 << 5));
+    as3514_write(AS3514_AUDIOSET1, (1 << 6) | (1 << 5));
 
     /* Set BIAS on, DITH on, AGC on, IBR_DAC max, LSP_LP on, IBR_LSP min */
-    as3514_write(AUDIOSET2, (1 << 2) | (3 << 0));
+    as3514_write(AS3514_AUDIOSET2, (1 << 2) | (3 << 0));
 
     /* Set HPCM off, ZCU off*/
-    as3514_write(AUDIOSET3, (1 << 2) | (1 << 0));
+    as3514_write(AS3514_AUDIOSET3, (1 << 2) | (1 << 0));
 
     /* Mute and disable speaker */
-    as3514_write(LSP_OUT_R, 0);
-    as3514_write(LSP_OUT_L, (1 << 7));
+    as3514_write(AS3514_LSP_OUT_R, 0);
+    as3514_write(AS3514_LSP_OUT_L, (1 << 7));
 
     /* set vol and set headphone over-current to 0 */
-    as3514_write(HPH_OUT_R, (0x3 << 6) | 0x16);
+    as3514_write(AS3514_HPH_OUT_R, (0x3 << 6) | 0x16);
     /* set default vol for headphone */
-    as3514_write(HPH_OUT_L, 0x16);
+    as3514_write(AS3514_HPH_OUT_L, 0x16);
 
     /* LRCK 24-48kHz */
-    as3514_write(PLLMODE, 0x00);
+    as3514_write(AS3514_PLLMODE, 0x00);
 
     /* DAC_Mute_off */
-    as3514_write_or(DAC_L, (1 << 6));
+    as3514_write_or(AS3514_DAC_L, (1 << 6));
 
     /* M1_Sup_off */
-    as3514_write_or(MIC1_L, (1 << 7));
+    as3514_write_or(AS3514_MIC1_L, (1 << 7));
     /* M2_Sup_off */
-    as3514_write_or(MIC2_L, (1 << 7));
+    as3514_write_or(AS3514_MIC2_L, (1 << 7));
 
     /* read all reg values */
     for (i = 0; i < ARRAYLEN(as3514.regs); i++)
@@ -207,18 +207,18 @@ void audiohw_enable_output(bool enable)
         /* reset the I2S controller into known state */
         i2s_reset();
 
-        as3514_write_or(HPH_OUT_L, (1 << 6)); /* power on */
+        as3514_write_or(AS3514_HPH_OUT_L, (1 << 6)); /* power on */
         audiohw_mute(0);
     } else {
         audiohw_mute(1);
-        as3514_write_and(HPH_OUT_L, ~(1 << 6)); /* power off */
+        as3514_write_and(AS3514_HPH_OUT_L, ~(1 << 6)); /* power off */
     }
 }
 
 void audiohw_set_master_vol(int vol_l, int vol_r)
 {
-    unsigned int hph_r = as3514.regs[HPH_OUT_R] & ~0x1f;
-    unsigned int hph_l = as3514.regs[HPH_OUT_L] & ~0x1f;
+    unsigned int hph_r = as3514.regs[AS3514_HPH_OUT_R] & ~0x1f;
+    unsigned int hph_l = as3514.regs[AS3514_HPH_OUT_L] & ~0x1f;
     unsigned int mix_l, mix_r;
     unsigned int mix_reg_r, mix_reg_l;
 
@@ -227,11 +227,11 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
     as3514.vol_r = vol_r;
 
     if (source == SOURCE_LINE_IN1_ANALOG) {
-        mix_reg_r = LINE_IN1_R;
-        mix_reg_l = LINE_IN1_L;
+        mix_reg_r = AS3514_LINE_IN1_R;
+        mix_reg_l = AS3514_LINE_IN1_L;
     } else {
-        mix_reg_r = DAC_R;
-        mix_reg_l = DAC_L;
+        mix_reg_r = AS3514_DAC_R;
+        mix_reg_l = AS3514_DAC_L;
     }
 
     mix_r = as3514.regs[mix_reg_r] & ~0x1f;    
@@ -257,22 +257,22 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 
     as3514_write(mix_reg_r, mix_r);
     as3514_write(mix_reg_l, mix_l);
-    as3514_write(HPH_OUT_R, hph_r);
-    as3514_write(HPH_OUT_L, hph_l);
+    as3514_write(AS3514_HPH_OUT_R, hph_r);
+    as3514_write(AS3514_HPH_OUT_L, hph_l);
 }
 
 void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
-    as3514_write(LINE_OUT_R, vol_r);
-    as3514_write(LINE_OUT_L, (1 << 6) | vol_l);
+    as3514_write(AS3514_LINE_OUT_R, vol_r);
+    as3514_write(AS3514_LINE_OUT_L, (1 << 6) | vol_l);
 }
 
 void audiohw_mute(bool mute)
 {
     if (mute) {
-        as3514_write_or(HPH_OUT_L, (1 << 7));
+        as3514_write_or(AS3514_HPH_OUT_L, (1 << 7));
     } else {
-        as3514_write_and(HPH_OUT_L, ~(1 << 7));
+        as3514_write_and(AS3514_HPH_OUT_L, ~(1 << 7));
     }
 }
 
@@ -283,7 +283,7 @@ void audiohw_close(void)
     audiohw_mute(true);
 
     /* turn off everything */
-    as3514_write(AUDIOSET1, 0x0);
+    as3514_write(AS3514_AUDIOSET1, 0x0);
 }
 
 void audiohw_set_sample_rate(int sampling_control)
@@ -300,29 +300,29 @@ void audiohw_enable_recording(bool source_mic)
         audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);
 
         /* ADCmux = Stereo Microphone */
-        as3514_write_and(ADC_R, ~(0x3 << 6));
+        as3514_write_and(AS3514_ADC_R, ~(0x3 << 6));
         /* MIC1_on, LIN1_off */
-        as3514_write(AUDIOSET1,
-            (as3514.regs[AUDIOSET1] & ~(1 << 2)) | (1 << 0));
+        as3514_write(AS3514_AUDIOSET1,
+            (as3514.regs[AS3514_AUDIOSET1] & ~(1 << 2)) | (1 << 0));
         /* M1_AGC_off */
-        as3514_write_and(MIC1_R, ~(1 << 7));
+        as3514_write_and(AS3514_MIC1_R, ~(1 << 7));
     } else {
         source = SOURCE_LINE_IN1;
 
         audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);
 
         /* ADCmux = Line_IN1 */
-        as3514_write(ADC_R,
-            (as3514.regs[ADC_R] & ~(0x3 << 6)) | (0x1 << 6));
+        as3514_write(AS3514_ADC_R,
+            (as3514.regs[AS3514_ADC_R] & ~(0x3 << 6)) | (0x1 << 6));
         /* MIC1_off, LIN1_on */
-        as3514_write(AUDIOSET1,
-            (as3514.regs[AUDIOSET1] & ~(1 << 0)) | (1 << 2));
+        as3514_write(AS3514_AUDIOSET1,
+            (as3514.regs[AS3514_AUDIOSET1] & ~(1 << 0)) | (1 << 2));
     }
 
     /* ADC_Mute_off */
-    as3514_write_or(ADC_L, (1 << 6));
+    as3514_write_or(AS3514_ADC_L, (1 << 6));
     /* ADC_on */
-    as3514_write_or(AUDIOSET1, (1 << 7));
+    as3514_write_or(AS3514_AUDIOSET1, (1 << 7));
 }
 
 void audiohw_disable_recording(void)
@@ -330,10 +330,10 @@ void audiohw_disable_recording(void)
     source = SOURCE_DAC;
 
     /* ADC_Mute_on */
-    as3514_write_and(ADC_L, ~(1 << 6));
+    as3514_write_and(AS3514_ADC_L, ~(1 << 6));
 
     /* ADC_off, LIN1_off, MIC_off */
-    as3514_write_and(AUDIOSET1, ~((1 << 7) | (1 << 2) | (1 << 0)));
+    as3514_write_and(AS3514_AUDIOSET1, ~((1 << 7) | (1 << 2) | (1 << 0)));
 
     audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);
 }
@@ -354,7 +354,7 @@ void audiohw_set_recvol(int left, int right, int type)
     case AUDIO_GAIN_MIC:
     {
         /* Combine MIC gains seamlessly with ADC levels */
-        unsigned int mic1_r = as3514.regs[MIC1_R] & ~(0x3 << 5);
+        unsigned int mic1_r = as3514.regs[AS3514_MIC1_R] & ~(0x3 << 5);
 
         if (left >= 36) {
             /* M1_Gain = +40db, ADR_Vol = +7.5dB .. +12.0 dB =>
@@ -372,7 +372,7 @@ void audiohw_set_recvol(int left, int right, int type)
 
         right = left;
 
-        as3514_write(MIC1_R, mic1_r);
+        as3514_write(AS3514_MIC1_R, mic1_r);
         break;
         }
     case AUDIO_GAIN_LINEIN:
@@ -381,8 +381,8 @@ void audiohw_set_recvol(int left, int right, int type)
         return;
     }
 
-    as3514_write(ADC_R, (as3514.regs[ADC_R] & ~0x1f) | right);
-    as3514_write(ADC_L, (as3514.regs[ADC_L] & ~0x1f) | left);
+    as3514_write(AS3514_ADC_R, (as3514.regs[AS3514_ADC_R] & ~0x1f) | right);
+    as3514_write(AS3514_ADC_L, (as3514.regs[AS3514_ADC_L] & ~0x1f) | left);
 }
 
 /**
@@ -392,11 +392,11 @@ void audiohw_set_recvol(int left, int right, int type)
 void audiohw_set_monitor(bool enable)
 {
     /* LI1R_Mute_on - default */
-    unsigned int line_in1_r = as3514.regs[LINE_IN1_R] & ~(1 << 5);
+    unsigned int line_in1_r = as3514.regs[AS3514_LINE_IN1_R] & ~(1 << 5);
     /* LI1L_Mute_on - default */
-    unsigned int line_in1_l = as3514.regs[LINE_IN1_L] & ~(1 << 5);
+    unsigned int line_in1_l = as3514.regs[AS3514_LINE_IN1_L] & ~(1 << 5);
     /* LIN1_off - default */
-    unsigned int audioset1 = as3514.regs[AUDIOSET1] & ~(1 << 2);
+    unsigned int audioset1 = as3514.regs[AS3514_AUDIOSET1] & ~(1 << 2);
 
     if (enable) {
         source = SOURCE_LINE_IN1_ANALOG;
@@ -409,9 +409,9 @@ void audiohw_set_monitor(bool enable)
         audioset1 |= (1 << 2);
     }
 
-    as3514_write(AUDIOSET1, audioset1);
-    as3514_write(LINE_IN1_R, line_in1_r);
-    as3514_write(LINE_IN1_L, line_in1_l);
+    as3514_write(AS3514_AUDIOSET1, audioset1);
+    as3514_write(AS3514_LINE_IN1_R, line_in1_r);
+    as3514_write(AS3514_LINE_IN1_L, line_in1_l);
 
     /* Sync mixer volume */
     audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);

@@ -29,44 +29,49 @@ extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 extern void audiohw_set_sample_rate(int sampling_control);
 
 /* Register Descriptions */
-#define LINE_OUT_R 0x00
-#define LINE_OUT_L 0x01
-#define HPH_OUT_R  0x02
-#define HPH_OUT_L  0x03
-#define LSP_OUT_R  0x04
-#define LSP_OUT_L  0x05
-#define MIC1_R     0x06
-#define MIC1_L     0x07
-#define MIC2_R     0x08
-#define MIC2_L     0x09
-#define LINE_IN1_R 0x0a
-#define LINE_IN1_L 0x0b
-#define LINE_IN2_R 0x0c
-#define LINE_IN2_L 0x0d
-#define DAC_R      0x0e
-#define DAC_L      0x0f
-#define ADC_R      0x10
-#define ADC_L      0x11
-#define AUDIOSET1  0x14
-#define AUDIOSET2  0x15
-#define AUDIOSET3  0x16
-#define PLLMODE    0x1d
+#define AS3514_LINE_OUT_R 0x00
+#define AS3514_LINE_OUT_L 0x01
+#define AS3514_HPH_OUT_R  0x02
+#define AS3514_HPH_OUT_L  0x03
+#define AS3514_LSP_OUT_R  0x04
+#define AS3514_LSP_OUT_L  0x05
+#define AS3514_MIC1_R     0x06
+#define AS3514_MIC1_L     0x07
+#define AS3514_MIC2_R     0x08
+#define AS3514_MIC2_L     0x09
+#define AS3514_LINE_IN1_R 0x0a
+#define AS3514_LINE_IN1_L 0x0b
+#define AS3514_LINE_IN2_R 0x0c
+#define AS3514_LINE_IN2_L 0x0d
+#define AS3514_DAC_R      0x0e
+#define AS3514_DAC_L      0x0f
+#define AS3514_ADC_R      0x10
+#define AS3514_ADC_L      0x11
+#define AS3514_AUDIOSET1  0x14
+#define AS3514_AUDIOSET2  0x15
+#define AS3514_AUDIOSET3  0x16
+#define AS3514_PLLMODE    0x1d
 
-#define SYSTEM     0x20
-#define CHRGR      0x22
-#define DCDC15     0x23
-#define SUPERVISOR 0x24
+#define AS3514_SYSTEM     0x20
+#define AS3514_CVDD_DCDC3 0x21
+#define AS3514_CHARGER    0x22
+#define AS3514_DCDC15     0x23
+#define AS3514_SUPERVISOR 0x24
 
-#define IRQ_ENRD0  0x25
-#define IRQ_ENRD1  0x26
-#define IRQ_ENRD2  0x27
+#define AS3514_IRQ_ENRD0  0x25
+#define AS3514_IRQ_ENRD1  0x26
+#define AS3514_IRQ_ENRD2  0x27
 
-#define RTC_0      0x2a
-#define RTC_1      0x2b
-#define RTC_2      0x2c
-#define RTC_3      0x2d
-#define ADC_0      0x2e
-#define ADC_1      0x2f
+#define AS3514_RTCV       0x28
+#define AS3514_RTCT       0x29
+#define AS3514_RTC_0      0x2a
+#define AS3514_RTC_1      0x2b
+#define AS3514_RTC_2      0x2c
+#define AS3514_RTC_3      0x2d
+#define AS3514_ADC_0      0x2e
+#define AS3514_ADC_1      0x2f
+
+#define AS3514_UID_0      0x30
 
 /* Headphone volume goes from -73.5 ... +6dB */
 #define VOLUME_MIN -735

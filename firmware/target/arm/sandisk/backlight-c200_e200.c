@@ -44,12 +44,12 @@ void _backlight_on(void)
 #if defined(HAVE_LCD_SLEEP) && !defined(BOOTLOADER)
     _lcd_sleep_timer = 0; /* LCD should be awake already */
 #endif
-    pp_i2c_send(AS3514_I2C_ADDR, DCDC15, backlight_brightness);
+    pp_i2c_send(AS3514_I2C_ADDR, AS3514_DCDC15, backlight_brightness);
 }
 
 void _backlight_off(void)
 {
-    pp_i2c_send(AS3514_I2C_ADDR, DCDC15, 0x0);
+    pp_i2c_send(AS3514_I2C_ADDR, AS3514_DCDC15, 0x0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off lcd */
 #endif

@@ -1220,7 +1220,7 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_VBAT:     %4d", adc_read(ADC_VBAT));
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "CHARGER: %02X/%02X", i2c_readbyte(AS3514_I2C_ADDR, CHRGR), i2c_readbyte(AS3514_I2C_ADDR, IRQ_ENRD0));
+        snprintf(buf, sizeof(buf), "CHARGER: %02X/%02X", i2c_readbyte(AS3514_I2C_ADDR, AS3514_CHARGER), i2c_readbyte(AS3514_I2C_ADDR, AS3514_IRQ_ENRD0));
         lcd_puts(0, line++, buf);
 #endif
         lcd_update();
