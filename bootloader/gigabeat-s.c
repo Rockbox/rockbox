@@ -141,10 +141,11 @@ void main(void)
 {
     char buf[MAX_PATH];
     char tarstring[6];
+    char model[5];
 
     lcd_clear_display();
     printf("Hello world!");
-    printf("Gigabeat S Rockbox Bootloader v.00000004");
+    printf("Gigabeat S Rockbox Bootloader v.00000005");
     system_init();
     kernel_init();
     printf("kernel init done");
@@ -182,6 +183,25 @@ void main(void)
             fd = open(buf, O_RDONLY);
             if (fd >= 0)
             {
+                /* Check whether the file is a rockbox binary. */
+                lseek(fd, 4, SEEK_SET);
+                rc = read(fd, model, 4);
+                if (rc == 4)
+                {
+                    model[4] = 0;
+                    if (strcmp(model, "gigs") == 0)
+                    {
+                        printf("Found rockbox binary. Moving...");
+                        close(fd);
+                        remove("/.rockbox/rockbox.gigabeat");
+                        int ret = rename(buf, "/.rockbox/rockbox.gigabeat");
+                        printf("returned %d", ret);
+                        sleep(100);
+                        break;
+                    }
+                }
+
+                /* Check whether the file is a tar file. */
                 lseek(fd, 257, SEEK_SET);
                 rc = read(fd, tarstring, 5);
                 if (rc == 5)
