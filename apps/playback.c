@@ -552,7 +552,7 @@ struct mp3entry* audio_current_track(void)
         /* The usual case */
         return &curtrack_id3;
     }
-    else if (offset == -1 && *prevtrack_id3.path)
+    else if (automatic_skip && offset == -1 && *prevtrack_id3.path)
     {
         /* We're in a track transition. The codec has moved on to the nex track,
            but the audio being played is still the same (now previous) track.
@@ -563,7 +563,8 @@ struct mp3entry* audio_current_track(void)
     else if (tracks[cur_idx].id3_hid >= 0)
     {
         /* Get the ID3 metadata from the main buffer */
-        return bufgetid3(tracks[cur_idx].id3_hid);
+        struct mp3entry *ret = bufgetid3(tracks[cur_idx].id3_hid);
+        if (ret) return ret;
     }
 
     /* We didn't find the ID3 metadata, so we fill temp_id3 with the little info
@@ -1648,8 +1649,6 @@ static bool audio_load_track(size_t offset, bool start_play)
             return false;
         }
 
-        close(fd);
-
         if (track_widx == track_ridx)
         {
             buf_request_buffer_handle(tracks[track_widx].id3_hid);
@@ -1664,6 +1663,7 @@ static bool audio_load_track(size_t offset, bool start_play)
         }
     }
 
+    close(fd);
     return true;
 }
 
