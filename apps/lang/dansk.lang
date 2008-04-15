@@ -10172,15 +10172,15 @@
   user:
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
-    *: ""
-    gigabeatf: "Knap-lys styrke"
+    *: none
+    gigabeatf,mrobe100: "Knap-lys styrke"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Knap-lys styrke"
+    gigabeatf,mrobe100: "Knap-lys styrke"
   </voice>
 </phrase>
 <phrase>
