@@ -24,7 +24,7 @@
 UnZip::ErrorCode RbUnZip::extractArchive(const QString& dest)
 {
     QStringList files = this->fileList();
-    UnZip::ErrorCode error;
+    UnZip::ErrorCode error = Ok;
     m_abortunzip = false;
 
     int total = files.size();
