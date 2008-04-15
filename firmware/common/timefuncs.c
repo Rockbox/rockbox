@@ -116,7 +116,7 @@ int set_time(const struct tm *tm)
 
         rc = rtc_write_datetime(rtcbuf);
 
-        if(rc)
+        if (rc < 0)
             return -1;
         else
             return 0;
