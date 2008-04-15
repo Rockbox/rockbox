@@ -53,14 +53,30 @@ void use_calibration(bool enable);
 
 #define BUTTON_TOUCH        0x00000200
 
-/* compatibility hacks */
+/* Touchpad Screen Area Buttons */
+#define BUTTON_TOPLEFT      0x00004000
+#define BUTTON_TOPMIDDLE    0x00008000
+#define BUTTON_TOPRIGHT     0x00010000
+#define BUTTON_MIDLEFT      0x00020000
+#define BUTTON_CENTER       0x00040000
+#define BUTTON_MIDRIGHT     0x00080000
+#define BUTTON_BOTTOMLEFT   0x00100000
+#define BUTTON_BOTTOMMIDDLE 0x00200000
+#define BUTTON_BOTTOMRIGHT  0x00400000
+
+/* compatibility hacks
+   not mapped to the touchpad button areas because
+   the touchpad is not always in that mode */
 #define BUTTON_LEFT     BUTTON_RC_REW
 #define BUTTON_RIGHT    BUTTON_RC_FF
 
 #define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT  10
 
-#define BUTTON_MAIN BUTTON_POWER
+#define BUTTON_MAIN (BUTTON_POWER| \
+                     BUTTON_TOPLEFT|BUTTON_TOPMIDDLE|BUTTON_TOPRIGHT \
+                     BUTTON_MIDLEFT|BUTTON_CENTER|BUTTON_MIDRIGHT \
+                     BUTTON_BOTTOMLEFT|BUTTON_BOTTOMMIDDLE|BUTTON_BOTTOMRIGHT)
 
 #define BUTTON_REMOTE (BUTTON_RC_HEART|BUTTON_RC_MODE|      \
                        BUTTON_RC_VOL_DOWN|BUTTON_RC_VOL_UP| \

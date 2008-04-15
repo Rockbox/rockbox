@@ -138,6 +138,9 @@ metadata/a52.c
 #ifdef HAVE_TAGCACHE
 tagcache.c
 #endif
+#ifdef HAVE_TOUCHPAD
+keymaps/keymap-touchpad.c
+#endif
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 keymaps/keymap-h1x0_h3x0.c

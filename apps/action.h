@@ -25,14 +25,15 @@
 #define TIMEOUT_NOBLOCK  0
 
 #define CONTEXT_STOPSEARCHING 0xFFFFFFFF
-#define CONTEXT_REMOTE 0x80000000 /* | this against another context to get remote buttons for that context */
-#define CONTEXT_CUSTOM 0x40000000 /* | this against anything to get your context number */
+#define CONTEXT_REMOTE  0x80000000 /* | this against another context to get remote buttons for that context */
+#define CONTEXT_CUSTOM  0x40000000 /* | this against anything to get your context number */
+#define CONTEXT_CUSTOM2 0x20000000 /* as above */
 
 #define LAST_ITEM_IN_LIST { CONTEXT_STOPSEARCHING, BUTTON_NONE, BUTTON_NONE }
 #define LAST_ITEM_IN_LIST__NEXTLIST(a) { a, BUTTON_NONE, BUTTON_NONE }
 
 #ifndef HAS_BUTTON_HOLD
-#define ALLOW_SOFTLOCK 0x20000000 /* will be stripped.. never needed except in calls to get_action() */
+#define ALLOW_SOFTLOCK 0x10000000 /* will be stripped.. never needed except in calls to get_action() */
 #else
 #define ALLOW_SOFTLOCK 0
 #endif
@@ -79,6 +80,7 @@ enum {
     ACTION_UNKNOWN,
     ACTION_REDRAW, /* returned if keys are locked and we splash()'ed */
     ACTION_TOUCHPAD,
+    ACTION_TOUCHPAD_MODE, /* toggle the touchpad mode */
     
     /* standard actions, use these first */
     ACTION_STD_PREV, 

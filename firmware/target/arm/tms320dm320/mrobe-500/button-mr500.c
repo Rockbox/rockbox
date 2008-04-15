@@ -40,6 +40,22 @@
 static short last_x, last_y, last_z1, last_z2; /* for the touch screen */
 static bool touch_available = false;
 
+static enum touchpad_mode current_mode = TOUCHPAD_POINT;
+static int touchpad_buttons[3][3] = {
+    {BUTTON_TOPLEFT, BUTTON_TOPMIDDLE, BUTTON_TOPRIGHT},
+    {BUTTON_MIDLEFT, BUTTON_CENTER, BUTTON_MIDRIGHT},
+    {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT},
+};
+
+void touchpad_set_mode(enum touchpad_mode mode)
+{
+    current_mode = mode;
+}
+enum touchpad_mode touchpad_get_mode(void)
+{
+    return current_mode;
+}
+
 static struct touch_calibration_point topleft, bottomright;
 
 /* Jd's tests.. These will hopefully work for everyone so we dont have to
@@ -165,7 +181,19 @@ int button_read_device(int *data)
             last_x = x;
             last_y = y;
             *data = touch_to_pixels(x, y);
-            r_button |= BUTTON_TOUCHPAD;
+            switch (current_mode)
+            {
+                case TOUCHPAD_POINT:
+                    r_button |= BUTTON_TOUCHPAD;
+                    break;
+                case TOUCHPAD_BUTTON:
+                {
+                    int px_x = ((*data&0xffff0000)>>16), px_y = ((*data&0x0000ffff));
+                    r_button |= touchpad_buttons[px_y/(LCD_HEIGHT/3)][px_x/(LCD_WIDTH/3)];
+                    oldbutton = r_button;
+                    break;
+                }
+            }
         }
         last_touch = current_tick;
         touch_available = false;
@@ -219,6 +247,6 @@ void GIO14(void)
             read_battery_inputs();
             break;
     }
-    touch_available = true;
+    //touch_available = true;
     IO_INTC_IRQ2 = (1<<3); /* IRQ_GIO14 == 35 */
 }

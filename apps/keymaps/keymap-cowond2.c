@@ -37,48 +37,27 @@
  */
 
 static const struct button_mapping button_context_standard[]  = {
-    { ACTION_STD_PREV,        BUTTON_UP,                  BUTTON_NONE },
     { ACTION_STD_PREV,        BUTTON_MINUS,               BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,  BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,  BUTTON_MINUS|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_STD_NEXT,        BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_STD_NEXT,        BUTTON_PLUS,                BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,  BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,  BUTTON_PLUS|BUTTON_REPEAT,  BUTTON_NONE },
 
     { ACTION_STD_OK,          BUTTON_MENU|BUTTON_REL,     BUTTON_NONE },
-    { ACTION_STD_OK,          BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
-
     { ACTION_STD_MENU,        BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
    // { ACTION_STD_QUICKSCREEN, BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_STD_CONTEXT,     BUTTON_PLUS|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_STD_CONTEXT,     BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_STD_CANCEL,      BUTTON_POWER,               BUTTON_NONE },
-    { ACTION_STD_CANCEL,      BUTTON_LEFT,                BUTTON_NONE },
-    { ACTION_STD_CANCEL,      BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
 
 static const struct button_mapping button_context_wps[]  = {
-    { ACTION_WPS_PLAY,      BUTTON_SELECT|BUTTON_REL,         BUTTON_SELECT },
-    { ACTION_WPS_STOP,      BUTTON_SELECT|BUTTON_REPEAT,      BUTTON_SELECT },
-    { ACTION_WPS_SKIPPREV,  BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
-    { ACTION_WPS_SEEKBACK,  BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_WPS_STOPSEEK,  BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT|BUTTON_REPEAT },
-    { ACTION_WPS_SKIPNEXT,  BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
-    { ACTION_WPS_SEEKFWD,   BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_WPS_STOPSEEK,  BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT|BUTTON_REPEAT },
 
     { ACTION_WPS_VOLDOWN,       BUTTON_MINUS,                    BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,       BUTTON_MINUS|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_VOLUP,         BUTTON_PLUS,                      BUTTON_NONE },
     { ACTION_WPS_VOLUP,         BUTTON_PLUS|BUTTON_REPEAT,        BUTTON_NONE },
-
-    { ACTION_WPS_BROWSE,        BUTTON_UP|BUTTON_REL,       BUTTON_UP },
-    { ACTION_WPS_CONTEXT,       BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP },
     { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,          BUTTON_MENU },
-    { ACTION_WPS_QUICKSCREEN,   BUTTON_DOWN|BUTTON_REPEAT,       BUTTON_DOWN },
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
@@ -99,13 +78,9 @@ static const struct button_mapping button_context_listtree_scroll_without_combo[
 };
 
 static const struct button_mapping button_context_settings[]  = {
-    { ACTION_SETTINGS_INC,          BUTTON_UP,                    BUTTON_NONE },
     { ACTION_SETTINGS_INC,          BUTTON_PLUS,                  BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,    BUTTON_UP|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_PLUS|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,          BUTTON_DOWN,                  BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_MINUS,                 BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_MINUS|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_STD_OK,                BUTTON_MENU,                  BUTTON_NONE },
     { ACTION_STD_CANCEL,            BUTTON_POWER,                 BUTTON_NONE },
@@ -154,10 +129,9 @@ static const struct button_mapping button_context_keyboard[]  = {
     //LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
-extern int current_tick;
-const struct button_mapping* get_context_mapping(int context)
+const struct button_mapping* target_get_context_mapping(int context)
 {
-    switch (context&(~CONTEXT_REMOTE))
+    switch (context)
     {
         case CONTEXT_STD:
             return button_context_standard;

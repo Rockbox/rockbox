@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 
-/* Button Code Definitions for the toshiba gigabeat target */
+/* Button Code Definitions for the Olympus M:robe 500 target */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -137,8 +137,7 @@ static const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
-extern int current_tick;
-const struct button_mapping* get_context_mapping(int context)
+const struct button_mapping* target_get_context_mapping(int context)
 {
     switch (context&(~CONTEXT_REMOTE))
     {

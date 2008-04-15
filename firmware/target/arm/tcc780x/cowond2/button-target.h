@@ -35,14 +35,25 @@ int button_read_device(void);
 #define BUTTON_MINUS      0x00000004
 #define BUTTON_MENU       0x00000008
 
-/* Faked buttons based on touchscreen quadrants (not yet read) */
-#define BUTTON_UP     0x00000020
-#define BUTTON_DOWN   0x00000040
-#define BUTTON_LEFT   0x00000080
-#define BUTTON_RIGHT  0x00000100
-#define BUTTON_SELECT 0x00000200
+/* compatibility hacks
+   not mapped to the touchpad button areas because
+   the touchpad is not always in that mode */
+#define BUTTON_LEFT  BUTTON_MINUS
+#define BUTTON_RIGHT BUTTON_PLUS
 
-#define BUTTON_MAIN 0x3FF
+/* Faked buttons based on touchscreen quadrants (not yet read) */
+/* Touchpad Screen Area Buttons */
+#define BUTTON_TOPLEFT      0x00000010
+#define BUTTON_TOPMIDDLE    0x00000020
+#define BUTTON_TOPRIGHT     0x00000040
+#define BUTTON_MIDLEFT      0x00000080
+#define BUTTON_CENTER       0x00000100
+#define BUTTON_MIDRIGHT     0x00000200
+#define BUTTON_BOTTOMLEFT   0x00000400
+#define BUTTON_BOTTOMMIDDLE 0x00000800
+#define BUTTON_BOTTOMRIGHT  0x00001000
+
+#define BUTTON_MAIN 0x1FFF
 
 /* No remote */
 #define BUTTON_REMOTE 0

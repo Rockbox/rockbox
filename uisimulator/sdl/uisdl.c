@@ -83,6 +83,12 @@ void gui_message_loop(void)
                     printf("Mouse at: (%d, %d)\n", event.button.x, event.button.y);
                 }
                 break;
+#else 
+            case SDL_MOUSEBUTTONUP:
+                sim_enter_irq_handler();
+                button_event(BUTTON_TOUCHPAD, false);
+                sim_exit_irq_handler();
+                break;
 #endif
             case SDL_QUIT:
                 done = true;

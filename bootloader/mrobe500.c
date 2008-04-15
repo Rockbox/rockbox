@@ -117,7 +117,7 @@ void mrdebug(void)
         printf("%d:%d:%d %d %d %d", t->tm_hour, t->tm_min, t->tm_sec, t->tm_mday, t->tm_mon, t->tm_year);
         printf("time: %d", mktime(t));
 #endif
-        button = button_get(false);
+       button = button_get(false);
         if (button == BUTTON_POWER)
         {
             printf("reset");
@@ -143,8 +143,18 @@ void mrdebug(void)
 // //            tsc2100_keyclick(); /* doesnt work :( */
 //             line -= 6;
 //         }
+        else if (button == BUTTON_RC_HEART)
+        {
+            printf("POINT");
+            touchpad_set_mode(TOUCHPAD_POINT);
+        }
+        else if (button == BUTTON_RC_MODE)
+        {
+            printf("BUTTON");
+            touchpad_set_mode(TOUCHPAD_BUTTON);
+        }
 #if 1
-        if (button&BUTTON_TOUCHPAD)
+        else if (button&BUTTON_TOUCHPAD)
         {
             if (button&BUTTON_REL)
                 continue;
@@ -152,11 +162,24 @@ void mrdebug(void)
             int x = (data&0xffff0000)>>16, y = data&0x0000ffff;
             reset_screen();
             line = 9;
-            printf("%x %d %d\n", button, x,y);
+            printf("BB: %x %d %d", button, x,y);
             lcd_hline(x-5, x+5, y);
             lcd_vline(x, y-5, y+5);
             lcd_update();
         }
+        else if (button == BUTTON_RC_PLAY)
+        {
+            reset_screen();
+        }
+            
+        else if (button)
+        {
+          //  if (button&BUTTON_REL)
+            {
+                printf("%08x %s\n", button, (button&BUTTON_REL)?"yes":"no");
+            }
+        }
+            
 #endif
     }
 }

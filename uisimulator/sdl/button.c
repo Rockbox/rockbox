@@ -32,6 +32,15 @@ static intptr_t button_data; /* data value from last message dequeued */
 
 #ifdef HAVE_TOUCHPAD
 static int mouse_coords = 0;
+static enum touchpad_mode touchpad_mode = TOUCHPAD_POINT;
+void touchpad_set_mode(enum touchpad_mode mode)
+{
+    touchpad_mode = mode;
+}
+enum touchpad_mode touchpad_get_mode(void)
+{
+    return touchpad_mode;
+}
 #endif
 /* how long until repeat kicks in */
 #define REPEAT_START      6
@@ -111,9 +120,53 @@ void button_event(int key, bool pressed)
 
 #ifdef HAVE_TOUCHPAD
     case BUTTON_TOUCHPAD:
-        new_btn = BUTTON_TOUCHPAD;
         data = mouse_coords;
+        switch (touchpad_mode)
+        {
+            case TOUCHPAD_POINT:
+                new_btn = BUTTON_TOUCHPAD;
+                break;
+            case TOUCHPAD_BUTTON:
+            {
+                static int touchpad_buttons[3][3] = {
+                    {BUTTON_TOPLEFT, BUTTON_TOPMIDDLE, BUTTON_TOPRIGHT},
+                    {BUTTON_MIDLEFT, BUTTON_CENTER, BUTTON_MIDRIGHT},
+                    {BUTTON_BOTTOMLEFT, BUTTON_BOTTOMMIDDLE, BUTTON_BOTTOMRIGHT},
+                };
+                int px_x = ((data&0xffff0000)>>16), px_y = ((data&0x0000ffff));
+                new_btn = touchpad_buttons[px_y/(LCD_HEIGHT/3)][px_x/(LCD_WIDTH/3)];
+                break;
+            }
+        }
         break;
+    case SDLK_KP7:
+        new_btn = BUTTON_TOPLEFT;
+        break;
+    case SDLK_KP8:
+        new_btn = BUTTON_TOPMIDDLE;
+        break;
+    case SDLK_KP9:
+        new_btn = BUTTON_TOPRIGHT;
+        break;
+    case SDLK_KP4:
+        new_btn = BUTTON_MIDLEFT;
+        break;
+    case SDLK_KP5:
+        new_btn = BUTTON_CENTER;
+        break;
+    case SDLK_KP6:
+        new_btn = BUTTON_MIDRIGHT;
+        break;
+    case SDLK_KP1:
+        new_btn = BUTTON_BOTTOMLEFT;
+        break;
+    case SDLK_KP2:
+        new_btn = BUTTON_BOTTOMMIDDLE;
+        break;
+    case SDLK_KP3:
+        new_btn = BUTTON_BOTTOMRIGHT;
+        break;
+            
 #endif
     case SDLK_u:
         if (!pressed)
@@ -665,43 +718,34 @@ void button_event(int key, bool pressed)
         break;
         
 #elif CONFIG_KEYPAD == MROBE500_PAD
-    case SDLK_KP4:
+    case SDLK_F9:
+        new_btn = BUTTON_RC_HEART;
+        break;
+    case SDLK_F10:
+        new_btn = BUTTON_RC_MODE;
+        break;
+    case SDLK_F11:
+        new_btn = BUTTON_RC_VOL_DOWN;
+        break;
+    case SDLK_F12:
+        new_btn = BUTTON_RC_VOL_UP;
+        break;
     case SDLK_LEFT:
         new_btn = BUTTON_LEFT;
         break;
-    case SDLK_KP6:
     case SDLK_RIGHT:
         new_btn = BUTTON_RIGHT;
         break;
-    case SDLK_KP8:
     case SDLK_UP:
         new_btn = BUTTON_RC_PLAY;
         break;
-    case SDLK_KP2:
     case SDLK_DOWN:
         new_btn = BUTTON_RC_DOWN;
         break;
-    case SDLK_KP_PLUS:
     case SDLK_F8:
-        new_btn = BUTTON_POWER;
-        break;
     case SDLK_ESCAPE:
         new_btn = BUTTON_POWER;
         break;
-    case SDLK_KP_ENTER:
-    case SDLK_RETURN:
-    case SDLK_a:
-        new_btn = BUTTON_RC_VOL_UP;
-        break;
-    case SDLK_KP5:
-    case SDLK_SPACE:
-        new_btn = BUTTON_RC_HEART;
-        break;
-    case SDLK_KP_PERIOD:
-    case SDLK_INSERT:
-        new_btn = BUTTON_RC_MODE;
-        break;
-
 #elif CONFIG_KEYPAD == MROBE100_PAD
     case SDLK_KP1:
         new_btn = BUTTON_DISPLAY;
@@ -739,29 +783,8 @@ void button_event(int key, bool pressed)
         break;
     
 #elif CONFIG_KEYPAD == COWOND2_PAD
-    case SDLK_KP4:
-    case SDLK_LEFT:
-        new_btn = BUTTON_LEFT;
-        break;
-    case SDLK_KP6:
-    case SDLK_RIGHT:
-        new_btn = BUTTON_RIGHT;
-        break;
-    case SDLK_KP8:
-    case SDLK_UP:
-        new_btn = BUTTON_UP;
-        break;
-    case SDLK_KP2:
-    case SDLK_DOWN:
-        new_btn = BUTTON_DOWN;
-        break;
-    case SDLK_KP3:
+    case SDLK_ESCAPE:
         new_btn = BUTTON_POWER;
-        break;
-    case SDLK_KP5:
-    case SDLK_KP_ENTER:
-    case SDLK_RETURN:
-        new_btn = BUTTON_SELECT;
         break;
     case SDLK_KP_PLUS:
         new_btn = BUTTON_PLUS;
@@ -769,7 +792,7 @@ void button_event(int key, bool pressed)
     case SDLK_KP_MINUS:
         new_btn = BUTTON_MINUS;
         break;
-    case SDLK_KP9:
+    case SDLK_KP_ENTER:
         new_btn = BUTTON_MENU;
         break;
 #else
@@ -976,11 +999,6 @@ void mouse_tick_task(void)
         button_event(BUTTON_TOUCHPAD, true);
         if (debug_wps)
             printf("Mouse at: (%d, %d)\n", x, y);
-    }
-    else if (lastbtn == BUTTON_TOUCHPAD)
-    {
-        button_event(BUTTON_TOUCHPAD, false);
-        mouse_coords = 0;
     }
 }
 #endif

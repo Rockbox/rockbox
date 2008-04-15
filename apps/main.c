@@ -132,6 +132,9 @@ static void app_main(void)
         screens[i].update();
     }
     tree_gui_init();
+#ifdef HAVE_TOUCHPAD
+    touchpad_set_mode(TOUCHPAD_BUTTON);
+#endif
     root_menu();
 }
 

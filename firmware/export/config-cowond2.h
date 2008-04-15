@@ -56,6 +56,7 @@
 
 /* define this to indicate your device's keypad */
 #define CONFIG_KEYPAD COWOND2_PAD
+#define HAVE_TOUCHPAD
 
 /* define this if you have a real-time clock */
 //#define CONFIG_RTC RTC_TCC780X
