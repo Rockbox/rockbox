@@ -68,7 +68,7 @@ static struct viewport default_vp =
 
 /* The Gigabeat target build requires access to the current fg_pattern
    in lcd-meg-fx.c */
-#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
+#if (!defined(TOSHIBA_GIGABEAT_F)&& !defined(TOSHIBA_GIGABEAT_S)) || defined(SIMULATOR)
 static struct viewport* current_vp IDATA_ATTR = &default_vp;
 #else
 struct viewport* current_vp IDATA_ATTR = &default_vp;

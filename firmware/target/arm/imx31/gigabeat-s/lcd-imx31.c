@@ -11,12 +11,15 @@ static volatile bool lcd_on = true;
 volatile bool lcd_poweroff = false;
 static unsigned lcd_yuv_options = 0;
 /*
-** These are imported from lcd-16bit.c
+** This is imported from lcd-16bit.c
 */
-extern unsigned fg_pattern;
-extern unsigned bg_pattern;
-
 extern struct viewport* current_vp;
+
+/* Copies a rectangle from one framebuffer to another. Can be used in
+   single transfer mode with width = num pixels, and height = 1 which
+   allows a full-width rectangle to be copied more efficiently. */
+extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
+                                 int width, int height);
 
 #if 0
 bool lcd_enabled()
@@ -106,26 +109,25 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
                                  int stride, int x, int y, int width,
                                  int height)
 {
-#if 0
     int w, px;
     fb_data *dst;
 
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x; /* Clip right */
+    if (x + width > current_vp->width)
+        width = current_vp->width - x; /* Clip right */
     if (x < 0)
         width += x, x = 0; /* Clip left */
     if (width <= 0)
         return; /* nothing left to do */
 
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y; /* Clip bottom */
+    if (y + height > current_vp->height)
+        height = current_vp->height - y; /* Clip bottom */
     if (y < 0)
         height += y, y = 0; /* Clip top */
     if (height <= 0)
         return; /* nothing left to do */
 
     src += stride * src_y + src_x; /* move starting point */
-    dst = &lcd_framebuffer[y][x];
+    dst = &lcd_framebuffer[current_vp->y+y][current_vp->x+x];
 
     asm volatile (
     ".rowstart:                             \r\n"
@@ -152,7 +154,6 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
           [fgcolor]"r"(REPLACEWITHFG_COLOR),
           [fgpat]"r"(current_vp->fg_pattern)
     );
-#endif
 }
 
 void lcd_yuv_set_options(unsigned options)
