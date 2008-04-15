@@ -125,7 +125,7 @@ void usage(void)
 
 int main (int argc, char** argv)
 {
-    unsigned long length,i,slen;
+    unsigned long length,i,slen=0;
     unsigned char *inbuf,*outbuf;
     unsigned short crc=0;
     unsigned long chksum=0; /* 32 bit checksum */
