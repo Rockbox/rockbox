@@ -35,11 +35,12 @@ int button_read_device(void);
 #define BUTTON_MINUS      0x00000004
 #define BUTTON_MENU       0x00000008
 
-/* compatibility hacks
-   not mapped to the touchpad button areas because
-   the touchpad is not always in that mode */
-#define BUTTON_LEFT  BUTTON_MINUS
-#define BUTTON_RIGHT BUTTON_PLUS
+/* compatibility hacks These definatly need fixing */
+#define BUTTON_LEFT  BUTTON_MIDLEFT
+#define BUTTON_RIGHT BUTTON_MIDRIGHT
+#define BUTTON_SELECT BUTTON_CENTER
+#define BUTTON_UP    BUTTON_TOPMIDDLE
+#define BUTTON_DOWN  BUTTON_BOTTOMMIDDLE
 
 /* Faked buttons based on touchscreen quadrants (not yet read) */
 /* Touchpad Screen Area Buttons */

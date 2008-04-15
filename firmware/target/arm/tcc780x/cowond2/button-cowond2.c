@@ -22,6 +22,16 @@
 #include "button.h"
 #include "adc.h"
 
+static enum touchpad_mode current_mode = TOUCHPAD_POINT;
+void touchpad_set_mode(enum touchpad_mode mode)
+{
+    current_mode = mode;
+}
+enum touchpad_mode touchpad_get_mode(void)
+{
+    return current_mode;
+}
+
 void button_init_device(void)
 {
     /* Nothing to do */

@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: keymap-mr500.c 16056 2008-01-11 21:48:01Z roolku $
+ * $Id$
  *
  * Copyright (C) 2006 Jonathan Gordon
  *
