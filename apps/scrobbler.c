@@ -31,6 +31,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #include "buffer.h"
 #include "settings.h"
 #include "ata_idle_notify.h"
+#include "misc.h"
 
 #if CONFIG_RTC
 #include "time.h"
@@ -56,7 +57,6 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 
 static char* scrobbler_cache;
 
-static int scrobbler_fd = -1;
 static int cache_pos;
 static struct mp3entry scrobbler_entry;
 static bool pending = false;
@@ -79,48 +79,45 @@ unsigned long audio_prev_elapsed(void)
 static void write_cache(void)
 {
     int i;
+    int fd;
 
     scrobbler_ata_callback = false;
 
     /* If the file doesn't exist, create it.
     Check at each write since file may be deleted at any time */
-    scrobbler_fd = open(SCROBBLER_FILE, O_RDONLY);
-    if(scrobbler_fd < 0)
+    if(!file_exists(SCROBBLER_FILE))
     {
-        scrobbler_fd = open(SCROBBLER_FILE, O_RDWR | O_CREAT);
-        if(scrobbler_fd >= 0)
+        fd = open(SCROBBLER_FILE, O_RDWR | O_CREAT);
+        if(fd >= 0)
         {
-            fdprintf(scrobbler_fd, "#AUDIOSCROBBLER/%s\n", SCROBBLER_VERSION);
-            fdprintf(scrobbler_fd, "#TZ/UNKNOWN\n");
+            fdprintf(fd, "#AUDIOSCROBBLER/" SCROBBLER_VERSION "\n"
+                         "#TZ/UNKNOWN\n"
 #if CONFIG_RTC
-            fdprintf(scrobbler_fd,
-                     "#CLIENT/Rockbox " TARGET_NAME SCROBBLER_REVISION "\n");
+                         "#CLIENT/Rockbox " TARGET_NAME SCROBBLER_REVISION "\n");
 #else
-            fdprintf(scrobbler_fd,
-                     "#CLIENT/Rockbox " TARGET_NAME SCROBBLER_REVISION " Timeless\n");
+                         "#CLIENT/Rockbox " TARGET_NAME SCROBBLER_REVISION " Timeless\n");
 #endif
-            close(scrobbler_fd);
+
+            close(fd);
         }
         else
         {
             logf("SCROBBLER: cannot create log file");
         }
     }
-    close(scrobbler_fd);
-    scrobbler_fd = -1;
 
     /* write the cache entries */
-    scrobbler_fd = open(SCROBBLER_FILE, O_WRONLY | O_APPEND);
-    if(scrobbler_fd >= 0)
+    fd = open(SCROBBLER_FILE, O_WRONLY | O_APPEND);
+    if(fd >= 0)
     {
         logf("SCROBBLER: writing %d entries", cache_pos); 
 
         for ( i=0; i < cache_pos; i++ )
         {
             logf("SCROBBLER: write %d", i);
-            fdprintf(scrobbler_fd, "%s", scrobbler_cache+(SCROBBLER_CACHE_LEN*i));
+            fdprintf(fd, "%s", scrobbler_cache+(SCROBBLER_CACHE_LEN*i));
         }
-        close(scrobbler_fd);
+        close(fd);
     }
     else
     {
@@ -129,7 +126,6 @@ static void write_cache(void)
 
     /* clear even if unsuccessful - don't want to overflow the buffer */
     cache_pos = 0;
-    scrobbler_fd = -1;
 }
 
 static bool scrobbler_flush_callback(void)
