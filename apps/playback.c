@@ -542,6 +542,7 @@ struct mp3entry* audio_current_track(void)
     const char *filename;
     const char *p;
     static struct mp3entry temp_id3;
+    struct playlist_track_info trackinfo;
     int cur_idx;
     int offset = ci.new_track + wps_offset;
 
@@ -572,7 +573,8 @@ struct mp3entry* audio_current_track(void)
 
     memset(&temp_id3, 0, sizeof(struct mp3entry));
 
-    filename = playlist_peek(0);
+    playlist_get_track_info(NULL, playlist_next(0)+wps_offset, &trackinfo);
+    filename = trackinfo.filename;
     if (!filename)
         filename = "No file!";
 
