@@ -132,17 +132,14 @@ const struct button_mapping generic_directions[] =
     { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,       BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
-#warning pluginlib_action needs working keymaps for the d2
-    /* Needs Fxing
-    { PLA_UP,                BUTTON_UP,                         BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_DOWN,                       BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_UP,                         BUTTON_MENU},
-    { PLA_RIGHT,             BUTTON_DOWN,                       BUTTON_MENU},
-    { PLA_UP_REPEAT,         BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_UP|BUTTON_REPEAT,           BUTTON_MENU},
-    { PLA_RIGHT_REPEAT,      BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_MENU},
-    */
+    { PLA_UP,                BUTTON_TOPMIDDLE,                  BUTTON_NONE},
+    { PLA_DOWN,              BUTTON_BOTTOMMIDDLE,               BUTTON_NONE},
+    { PLA_LEFT,              BUTTON_MIDLEFT,                    BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_MIDRIGHT,                   BUTTON_NONE},
+    { PLA_UP_REPEAT,         BUTTON_TOPMIDDLE|BUTTON_REPEAT,    BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_MIDLEFT|BUTTON_REPEAT,      BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_MIDRIGHT|BUTTON_REPEAT,     BUTTON_NONE},
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     { PLA_UP,                BUTTON_RC_VOL_UP,                  BUTTON_NONE},
     { PLA_DOWN,              BUTTON_RC_VOL_DOWN,                BUTTON_NONE},
@@ -233,14 +230,18 @@ const struct button_mapping generic_left_right_fire[] =
     { PLA_FIRE,              BUTTON_RC_HEART,                   BUTTON_NONE},
     { PLA_FIRE_REPEAT,       BUTTON_RC_HEART|BUTTON_REPEAT,     BUTTON_NONE},
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
-    /* Needs fixing 
-    { PLA_LEFT,              BUTTON_UP,                         BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_DOWN,                       BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_MENU,                       BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_MENU|BUTTON_REPEAT,         BUTTON_NONE},
-    */
+    { PLA_LEFT,              BUTTON_MINUS,                  BUTTON_NONE},
+    { PLA_LEFT,              BUTTON_MIDLEFT,                BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_MINUS|BUTTON_REPEAT,    BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_MIDLEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_PLUS,                   BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_MIDRIGHT,               BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_PLUS|BUTTON_REPEAT,     BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_MIDRIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_MENU,                   BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_CENTER,                 BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_MENU|BUTTON_REPEAT,     BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_CENTER|BUTTON_REPEAT,   BUTTON_NONE},
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     { PLA_LEFT,              BUTTON_RC_REW,                BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_RC_FF,                 BUTTON_NONE},
@@ -358,11 +359,11 @@ const struct button_mapping generic_actions[] =
     {PLA_FIRE,          BUTTON_SELECT,                  BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
-    {PLA_QUIT,          BUTTON_POWER,                       BUTTON_NONE},
-    {PLA_START,         BUTTON_MINUS,                       BUTTON_NONE},
-    {PLA_MENU,          BUTTON_PLUS,                        BUTTON_NONE},
-    {PLA_FIRE,          BUTTON_MENU,                        BUTTON_NONE},
-    {PLA_FIRE_REPEAT,   BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
+    {PLA_QUIT,          BUTTON_POWER,                   BUTTON_NONE},
+    {PLA_START,         BUTTON_MINUS,                   BUTTON_NONE},
+    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_CENTER,                  BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_CENTER|BUTTON_REPEAT,    BUTTON_NONE},
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     {PLA_QUIT,          BUTTON_RC_REC,                  BUTTON_NONE},
     {PLA_START,         BUTTON_RC_PLAY,                 BUTTON_NONE},
@@ -423,10 +424,14 @@ const struct button_mapping generic_increase_decrease[] =
     {PLA_INC_REPEAT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
     {PLA_DEC_REPEAT,      BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
 #elif CONFIG_KEYPAD == COWOND2_PAD
-    {PLA_INC,             BUTTON_PLUS,                  BUTTON_NONE},
-    {PLA_DEC,             BUTTON_MINUS,                 BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_PLUS|BUTTON_REPEAT,    BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_MINUS|BUTTON_REPEAT,  BUTTON_NONE},
+    {PLA_INC,             BUTTON_PLUS,                       BUTTON_NONE},
+    {PLA_INC,             BUTTON_TOPMIDDLE,                  BUTTON_NONE},
+    {PLA_DEC,             BUTTON_MINUS,                      BUTTON_NONE},
+    {PLA_DEC,             BUTTON_BOTTOMMIDDLE,               BUTTON_NONE},
+    {PLA_INC_REPEAT,      BUTTON_PLUS|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_INC_REPEAT,      BUTTON_TOPMIDDLE|BUTTON_REPEAT,    BUTTON_NONE},
+    {PLA_DEC_REPEAT,      BUTTON_MINUS|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_DEC_REPEAT,      BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT, BUTTON_NONE},
 #else
 #error pluginlib_actions: Unsupported keypad
 #endif
