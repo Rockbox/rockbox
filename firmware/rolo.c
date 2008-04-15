@@ -167,6 +167,15 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         "mov   r0, #0x10000000   \n"
         "mov   pc, r0            \n"
     );
+
+#elif defined(CPU_TCC780X)
+    /* Flush cache */
+    flush_icache();
+
+    asm volatile(
+        "mov   pc, %0            \n"
+        : : "r"(dest)
+    );
 #endif
 }
 #endif
@@ -216,7 +225,8 @@ int rolo_load(const char* filename)
 
     length = filesize(fd) - FIRMWARE_OFFSET_FILE_DATA;
 
-#if defined(CPU_COLDFIRE) || defined(CPU_PP) || (CONFIG_CPU==DM320)
+#if defined(CPU_COLDFIRE) || defined(CPU_PP) || (CONFIG_CPU==DM320) \
+     || defined(CPU_TCC780X)
     /* Read and save checksum */
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
     if (read(fd, &file_checksum, 4) != 4) {

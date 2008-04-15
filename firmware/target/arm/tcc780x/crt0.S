@@ -35,18 +35,16 @@
 
 start:
 #ifdef TCCBOOT
+#ifdef BOOTLOADER
     /* Add -DTCCBOOT to EXTRA_DEFINES in the bootloader Makefile to
        enable building the bootloader to be appended to the end of the
        original firmware, dual-booting based on a key-press.
-
-       NB: On the D2 TCCBOOT currently only works in USB boot mode (via tcctool)
-       When flashed to the device, the OF will boot as normal - but holding a
-       key to boot Rockbox results in a blank screen and crashed player.
 
        The following two values are filled in by mktccboot.
      */
     .word  0              /* Saved entrypoint of original firmware*/
     .word  0              /* Location in RAM of the start of our bootloader */
+#endif
 #else
     ldr    pc, =start_loc    /* jump to the main entry point  */
 
@@ -79,7 +77,7 @@ start_loc:
     #error No bootup key detection implemented for this target
 #endif
 
-    /* Copy bootloader to safe area - 0x21000000 (DRAM) */
+    /* Copy bootloader to safe area - 0x21F00000 (end of DRAM) */
     /* TODO: Adjust this for other targets - DRAM + DRAMSIZE - 0x100000 */
     ldr    r0, [pc, #-28]
     mov    r1, #0x22000000

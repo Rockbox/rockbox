@@ -39,9 +39,6 @@ long last_disk_activity = -1;
 /** static, private data **/
 static bool initialized = false;
 
-static long next_yield = 0;
-#define MIN_YIELD_PERIOD 2000
-
 static struct mutex ata_mtx SHAREDBSS_ATTR;
 
 #define SECTOR_SIZE 512
@@ -740,7 +737,11 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
 int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
-    #warning function not implemented
+#ifdef HAVE_MULTIVOLUME
+    (void)drive; /* unused for now */
+#endif
+
+    /* TODO: Learn more about TNFTL and implement this one day... */
     (void)start;
     (void)count;
     (void)outbuf;
