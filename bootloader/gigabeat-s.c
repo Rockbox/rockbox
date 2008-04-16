@@ -53,6 +53,7 @@
 char version[] = APPSVERSION;
 char basedir[] = "/Content/0b00/00/"; /* Where files sent via MTP are stored */
 int (*kernel_entry)(void);
+char *tarbuf = (char *)0x00000040;
 extern void reference_system_c(void);
 
 /* Dummy stub that creates C references for C functions only used by
@@ -65,13 +66,21 @@ void reference_files(void)
 void untar(int tar_fd)
 {
     char header[TAR_HEADER_SIZE];
-    char copybuf[TAR_CHUNK];
+    char *ptr;
     char path[102];
-    int fd, i, size = 0, pos = 0;
+    int fd, i, size = 0;
+    int ret;
+
+    ret = read(tar_fd, tarbuf, filesize(tar_fd));
+    if (ret < 0) {
+        printf("couldn't read tar file (%d)", ret);
+        return;
+    }
+    ptr = tarbuf;
 
     while (1)
     {
-        read(tar_fd, header, TAR_HEADER_SIZE);
+        memcpy(header, ptr, TAR_HEADER_SIZE);
 
         if (*header == '\0')  /* Check for EOF */
             break;
@@ -83,7 +92,7 @@ void untar(int tar_fd)
         }
 
         /* Skip rest of header */
-        pos = lseek(tar_fd, TAR_CHUNK - TAR_HEADER_SIZE, SEEK_CUR);
+        ptr += TAR_CHUNK;
 
         /* Make the path absolute */
         strcpy(path, "/");
@@ -91,33 +100,24 @@ void untar(int tar_fd)
 
         if (header[156] == '0')  /* file */
         {
-            int rc, wc, total = 0;
+            int wc;
 
             fd = creat(path);
             if (fd < 0)
             {
                 printf("failed to create file (%d)", fd);
-                /* Skip the file */
-                lseek(tar_fd, (size + 511) & (~511), SEEK_CUR);
             }
             else
             {
-                /* Copy the file over 512 bytes at a time */
-                while (total < size)
+                wc = write(fd, ptr, size);
+                if (wc < 0)
                 {
-                    rc = read(tar_fd, copybuf, TAR_CHUNK);
-                    pos += rc;
-
-                    wc = write(fd, copybuf, MIN(rc, size - total));
-                    if (wc < 0)
-                    {
-                        printf("write failed (%d)", wc);
-                        break;
-                    }
-                    total += wc;
+                    printf("write failed (%d)", wc);
+                    break;
                 }
                 close(fd);
             }
+            ptr += (size + TAR_CHUNK-1) & (~(TAR_CHUNK-1));
         }
         else if (header[156] == '5')  /* directory */
         {
@@ -145,7 +145,7 @@ void main(void)
 
     lcd_clear_display();
     printf("Hello world!");
-    printf("Gigabeat S Rockbox Bootloader v.00000005");
+    printf("Gigabeat S Rockbox Bootloader v.00000006");
     system_init();
     kernel_init();
     printf("kernel init done");
@@ -196,7 +196,7 @@ void main(void)
                         remove("/.rockbox/rockbox.gigabeat");
                         int ret = rename(buf, "/.rockbox/rockbox.gigabeat");
                         printf("returned %d", ret);
-                        sleep(100);
+                        sleep(HZ);
                         break;
                     }
                 }
