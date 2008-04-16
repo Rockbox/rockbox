@@ -7,7 +7,11 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 Dave Chapman
+ * Copyright (C) 2007 Dave Chapman
+ *
+ * ASF parsing code based on libasf by Juho Vähä-Herttua
+ * http://code.google.com/p/libasf/  libasf itself was based on the ASF
+ * parser in VLC - http://www.videolan.org/
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
