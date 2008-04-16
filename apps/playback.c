@@ -1519,13 +1519,17 @@ static bool audio_loadcodec(bool start_play)
 {
     int prev_track;
     char codec_path[MAX_PATH]; /* Full path to codec */
+    const struct mp3entry *id3, *prev_id3;
 
     if (tracks[track_widx].id3_hid < 0) {
         return false;
     }
 
-    const char * codec_fn =
-        get_codec_filename(bufgetid3(tracks[track_widx].id3_hid)->codectype);
+    id3 = bufgetid3(tracks[track_widx].id3_hid);
+    if (!id3)
+        return false;
+
+    const char *codec_fn = get_codec_filename(id3->codectype);
     if (codec_fn == NULL)
         return false;
 
@@ -1550,12 +1554,14 @@ static bool audio_loadcodec(bool start_play)
         {
             prev_track = (track_widx - 1) & MAX_TRACK_MASK;
 
+            id3 = bufgetid3(tracks[track_widx].id3_hid);
+            prev_id3 = bufgetid3(tracks[prev_track].id3_hid);
+
             /* If the previous codec is the same as this one, there is no need
              * to put another copy of it on the file buffer */
-            if (get_codec_base_type(
-                        bufgetid3(tracks[track_widx].id3_hid)->codectype) ==
-                get_codec_base_type(
-                        bufgetid3(tracks[prev_track].id3_hid)->codectype)
+            if (id3 && prev_id3 &&
+                get_codec_base_type(id3->codectype) ==
+                get_codec_base_type(prev_id3->codectype)
                 && audio_codec_loaded)
             {
                 logf("Reusing prev. codec");
