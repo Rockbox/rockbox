@@ -33,7 +33,14 @@ static inline uint16_t swap16(uint16_t value)
       result[ 7..0] = value[15..8];
     */
 {
+#if ARM_ARCH >= 6
+    uint32_t retval;
+    asm volatile ("revsh %0, %1"                /* xxAB */
+        : "=r"(retval) : "r"((uint32_t)value)); /* xxBA */
+    return retval;
+#else
     return (value >> 8) | (value << 8);
+#endif
 }
 
 static inline uint32_t swap32(uint32_t value)
@@ -44,6 +51,12 @@ static inline uint32_t swap32(uint32_t value)
       result[ 7.. 0] = value[31..24];
     */
 {
+#if ARM_ARCH >= 6
+    uint32_t retval;
+    asm volatile ("rev %0, %1"        /* ABCD */
+        : "=r"(retval) : "r"(value)); /* DCBA */
+    return retval;
+#else
     uint32_t tmp;
 
     asm volatile (
@@ -54,6 +67,7 @@ static inline uint32_t swap32(uint32_t value)
         : "+r" (value), "=r" (tmp)
     );
     return value;
+#endif
 }
 
 static inline uint32_t swap_odd_even32(uint32_t value)
@@ -62,6 +76,12 @@ static inline uint32_t swap_odd_even32(uint32_t value)
       result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
       result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
     */
+#if ARM_ARCH >= 6
+    uint32_t retval;
+    asm volatile ("rev16 %0, %1"      /* ABCD */
+        : "=r"(retval) : "r"(value)); /* BADC */
+    return retval;
+#else
     uint32_t tmp;
 
     asm volatile (                    /* ABCD      */
@@ -72,6 +92,7 @@ static inline uint32_t swap_odd_even32(uint32_t value)
         : "+r" (value), "=r" (tmp)    /* BADC      */
     );
     return value;
+#endif
 }
 
 /* Core-level interrupt masking */
