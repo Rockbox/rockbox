@@ -1709,7 +1709,7 @@ static void audio_finish_load_track(void)
     else
         track_id3 = bufgetid3(tracks[track_widx].id3_hid);
 
-    if (track_id3->length == 0 || track_id3->filesize == 0)
+    if (track_id3->length == 0 && track_id3->filesize == 0)
     {
         logf("audio_finish_load_track: invalid metadata");
 

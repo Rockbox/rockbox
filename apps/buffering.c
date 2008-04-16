@@ -589,7 +589,11 @@ static bool buffer_handle(int handle_id)
 
     if (h->type == TYPE_ID3)
     {
-        get_metadata((struct mp3entry *)(buffer + h->data), h->fd, h->path);
+        if (!get_metadata((struct mp3entry *)(buffer + h->data), h->fd, h->path))
+        {
+            /* metadata parsing failed: clear the buffer. */
+            memset(buffer + h->data, 0, sizeof(struct mp3entry));
+        }
         close(h->fd);
         h->fd = -1;
         h->filerem = 0;
