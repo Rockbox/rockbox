@@ -302,8 +302,8 @@ struct transfer_descriptor {
     unsigned int reserved;
 } __attribute__ ((packed));
 
-static struct transfer_descriptor _td_array[NUM_ENDPOINTS*2] __attribute((aligned (32)));
-static struct transfer_descriptor* td_array;
+static struct transfer_descriptor td_array[NUM_ENDPOINTS*2]
+    NOCACHEBSS_ATTR;
 
 /* manual: 32.13.1 Endpoint Queue Head (dQH) */
 struct queue_head {
@@ -318,8 +318,9 @@ struct queue_head {
     unsigned int wait;              /* for softwate use, indicates if the transfer is blocking */
 } __attribute__((packed));
 
-static struct queue_head _qh_array[NUM_ENDPOINTS*2] __attribute((aligned (2048)));
-static struct queue_head* qh_array;
+static struct queue_head qh_array[NUM_ENDPOINTS*2]
+    NOCACHEBSS_ATTR __attribute((aligned (2048)));
+
 static struct event_queue transfer_completion_queue[NUM_ENDPOINTS*2];
 
 
@@ -367,10 +368,8 @@ void usb_drv_init(void)
     REG_PORTSC1 |= PORTSCX_PORT_FORCE_FULL_SPEED;
 #endif
 
-    td_array = (struct transfer_descriptor*)UNCACHED_ADDR(&_td_array);
-    qh_array = (struct queue_head*)UNCACHED_ADDR(&_qh_array);
     init_control_queue_heads();
-    memset(td_array, 0, sizeof _td_array);
+    memset(td_array, 0, sizeof td_array);
 
     REG_ENDPOINTLISTADDR = (unsigned int)qh_array;
     REG_DEVICEADDR = 0;
@@ -646,7 +645,7 @@ void usb_drv_cancel_all_transfers(void)
     REG_ENDPTFLUSH = ~0;
     while (REG_ENDPTFLUSH);
 
-    memset(td_array, 0, sizeof _td_array);
+    memset(td_array, 0, sizeof td_array);
     for(i=0;i<NUM_ENDPOINTS*2;i++) {
         if(qh_array[i].wait) {
             qh_array[i].wait=0;
@@ -776,7 +775,7 @@ static void bus_reset(void)
 static void init_control_queue_heads(void)
 {
     int i;
-    memset(qh_array, 0, sizeof _qh_array);
+    memset(qh_array, 0, sizeof qh_array);
 
     /*** control ***/
     qh_array[EP_CONTROL].max_pkt_length = 64 << QH_MAX_PKT_LEN_POS | QH_IOS;

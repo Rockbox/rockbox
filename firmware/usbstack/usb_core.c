@@ -121,7 +121,7 @@ static const struct usb_qualifier_descriptor __attribute__((aligned(2)))
     .bNumConfigurations = 1
 };
 
-static struct usb_string_descriptor __attribute__((aligned(2)))
+static const struct usb_string_descriptor __attribute__((aligned(2)))
                                     usb_string_iManufacturer =
 {
     24,
@@ -129,7 +129,7 @@ static struct usb_string_descriptor __attribute__((aligned(2)))
     {'R','o','c','k','b','o','x','.','o','r','g'}
 };
 
-static struct usb_string_descriptor __attribute__((aligned(2)))
+static const struct usb_string_descriptor __attribute__((aligned(2)))
                                     usb_string_iProduct =
 {
     42,
@@ -152,7 +152,7 @@ static struct usb_string_descriptor __attribute__((aligned(2)))
 /* Generic for all targets */
 
 /* this is stringid #0: languages supported */
-static struct usb_string_descriptor __attribute__((aligned(2)))
+static const struct usb_string_descriptor __attribute__((aligned(2)))
                                     lang_descriptor =
 {
     4,
@@ -160,7 +160,7 @@ static struct usb_string_descriptor __attribute__((aligned(2)))
     {0x0409} /* LANGID US English */
 };
 
-static struct usb_string_descriptor __attribute__((aligned(2)))
+static const struct usb_string_descriptor __attribute__((aligned(2)))
                                     usb_string_charging_only =
 {
     28,
@@ -168,7 +168,7 @@ static struct usb_string_descriptor __attribute__((aligned(2)))
     {'C','h','a','r','g','i','n','g',' ','o','n','l','y'}
 };
 
-static struct usb_string_descriptor* usb_strings[] =
+static struct usb_string_descriptor* const usb_strings[] =
 {
    &lang_descriptor,
    &usb_string_iManufacturer,
@@ -244,8 +244,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
 static int ack_control(struct usb_ctrlrequest* req);
 
-static unsigned char *response_data;
-static unsigned char __response_data[CACHEALIGN_UP(256)] CACHEALIGN_ATTR;
+static unsigned char response_data[256] NOCACHEBSS_ATTR;
 
 static struct usb_transfer_completion_event_data events[NUM_ENDPOINTS];
 
@@ -316,8 +315,6 @@ void usb_core_init(void)
     int i;
     if (initialized)
         return;
-
-    response_data = (void*)UNCACHED_ADDR(&__response_data);
 
     usb_drv_init();
 
