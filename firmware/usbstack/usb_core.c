@@ -168,7 +168,7 @@ static const struct usb_string_descriptor __attribute__((aligned(2)))
     {'C','h','a','r','g','i','n','g',' ','o','n','l','y'}
 };
 
-static struct usb_string_descriptor* const usb_strings[] =
+static const struct usb_string_descriptor* const usb_strings[] =
 {
    &lang_descriptor,
    &usb_string_iManufacturer,
