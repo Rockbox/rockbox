@@ -518,6 +518,8 @@
 /* Attributes for core-shared data in DRAM - no caching considerations */
 #define SHAREDBSS_ATTR
 #define SHAREDDATA_ATTR
+#define NOCACHEBSS_ATTR
+#define NOCACHEDATA_ATTR
 #define CONFIG_CORELOCK CORELOCK_NONE
 
 #define IF_COP(...)
