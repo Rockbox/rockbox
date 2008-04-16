@@ -133,6 +133,7 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
 #define HAVE_SERIAL
+#define HAVE_VOLUME_IN_LIST
 
 /*Remove Comments from UART_INT to enable the UART interrupts,*/
 /*otherwise iterrupts will be disabled. For now we will test */

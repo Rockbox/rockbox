@@ -219,13 +219,13 @@ int main(int argc, char *argv[])
     boot2 = boot + bootlength + 12;
 
     /* Copy dual-boot code in an endian-safe way */
-    for (i = 0; i < sizeof(dualboot) / 4; i++) {
+    for (i = 0; i < (signed int)sizeof(dualboot) / 4; i++) {
         put_uint32le(dualboot[i], boot2 + 12 + i*4);
     }
 
     /* Calculate checksum */
     sum = 0;
-    for (i = 0; i < sizeof(dualboot); i++) {
+    for (i = 0; i < (signed int)sizeof(dualboot); i++) {
         sum += boot2[i+12];
     }
     
