@@ -159,7 +159,7 @@ const struct button_mapping generic_directions[] =
 
 const struct button_mapping generic_left_right_fire[] =
 {
-#ifdef HAVE_TOUCPAD
+#ifdef HAVE_TOUCHPAD
     { PLA_LEFT,              BUTTON_MIDLEFT,                BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_MIDLEFT|BUTTON_REPEAT,  BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_MIDRIGHT,               BUTTON_NONE},
