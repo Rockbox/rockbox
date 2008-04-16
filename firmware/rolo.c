@@ -169,8 +169,8 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     );
 
 #elif defined(CPU_TCC780X) || (CONFIG_CPU==IMX31L)
-    /* Flush cache */
-    flush_icache();
+    /* Flush and invalidate caches */
+    invalidate_icache();
 
     asm volatile(
         "mov   pc, %0            \n"
