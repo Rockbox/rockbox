@@ -46,7 +46,7 @@ int lang_load(const char *filename)
     int fd = open(filename, O_RDONLY);
     int retcode=0;
     unsigned char lang_header[3];
-    if(fd == -1)
+    if(fd < 0)
         return 1;
     fsize = filesize(fd) - 2;
     if(fsize <= MAX_LANGUAGE_SIZE) {

@@ -380,8 +380,6 @@ static bool check_bookmark(const char* bookmark)
 /* ------------------------------------------------------------------------*/
 bool bookmark_autoload(const char* file)
 {
-    int  fd;
-
     if(global_settings.autoloadbookmark == BOOKMARK_NO)
         return false;
 
@@ -390,10 +388,10 @@ bool bookmark_autoload(const char* file)
     {
         return false;
     }
-    fd = open(global_bookmark_file_name, O_RDONLY);
-    if(fd<0)
+
+    if(!file_exists(global_bookmark_file_name))
         return false;
-    close(fd);
+
     if(global_settings.autoloadbookmark == BOOKMARK_YES)
     {
         return bookmark_load(global_bookmark_file_name, true);
@@ -1040,12 +1038,7 @@ bool bookmark_exist(void)
                                        sizeof(global_temp_buffer));
         if (generate_bookmark_file_name(name))
         {
-            int fd=open(global_bookmark_file_name, O_RDONLY);
-            if (fd >=0)
-            {
-                close(fd);
-                exist=true;
-            }
+            exist = file_exists(global_bookmark_file_name);
         }
     }
 

@@ -91,22 +91,20 @@ bool look_for_cuesheet_file(const char *trackpath, char *found_cue_path)
     dot = strrchr(cuepath, '.');
     strcpy(dot, ".cue");
 
-    int fd = open(cuepath,O_RDONLY);
-    if (fd < 0)
+    if (!file_exists(cuepath))
     {
         strcpy(cuepath, CUE_DIR);
         strcat(cuepath, slash);
         char *dot = strrchr(cuepath, '.');
         strcpy(dot, ".cue");
-        fd = open(cuepath,O_RDONLY);
-        if (fd < 0)
+        if (!file_exists(cuepath))
         {
             if (found_cue_path)
                 found_cue_path = NULL;
             return false;
         }
     }
-    close(fd);
+
     if (found_cue_path)
         strncpy(found_cue_path, cuepath, MAX_PATH);
     return true;

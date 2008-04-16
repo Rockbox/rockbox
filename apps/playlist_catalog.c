@@ -64,10 +64,8 @@ static int initialize_catalog(void)
 
     if (!initialized)
     {
-        DIR* dir;
         bool default_dir = true;
 
-        
         /* directory config is of the format: "dir: /path/to/dir" */
         if (global_settings.playlist_catalog_dir[0])
         {
@@ -82,11 +80,9 @@ static int initialize_catalog(void)
 
         playlist_dir_length = strlen(playlist_dir);
 
-        dir = opendir(playlist_dir);
-        if (dir)
+        if (dir_exists(playlist_dir))
         {
             playlist_dir_exists = true;
-            closedir(dir);
             memset(most_recent_playlist, 0, sizeof(most_recent_playlist));
             initialized = true;
         }

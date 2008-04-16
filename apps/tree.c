@@ -269,8 +269,7 @@ static int tree_voice_cb(int selected_item, void * data)
 
 bool check_rockboxdir(void)
 {
-    DIR *dir = opendir(ROCKBOX_DIR);
-    if(!dir)
+    if(!dir_exists(ROCKBOX_DIR))
     {   /* No need to localise this message.
            If .rockbox is missing, it wouldn't work anyway */
         int i;
@@ -282,7 +281,6 @@ bool check_rockboxdir(void)
         gui_syncsplash(HZ*2, "Installation incomplete");
         return false;
     }
-    closedir(dir);
     return true;
 }
 
@@ -1086,10 +1084,8 @@ bool bookmark_play(char *resume_file, int index, int offset, int seed,
         /* Playlist playback */
         char* slash;
         /* check that the file exists */
-        int fd = open(resume_file, O_RDONLY);
-        if(fd<0)
+        if(!file_exists(resume_file))
             return false;
-        close(fd);
 
         slash = strrchr(resume_file,'/');
         if (slash)
@@ -1171,7 +1167,6 @@ static void say_filetype(int attr)
 
 static int ft_play_dirname(char* name)
 {
-    int fd;
     char dirname_mp3_filename[MAX_PATH+1];
 
 #if CONFIG_CODEC != SWCODEC
@@ -1185,14 +1180,11 @@ static int ft_play_dirname(char* name)
 
     DEBUGF("Checking for %s\n", dirname_mp3_filename);
 
-    fd = open(dirname_mp3_filename, O_RDONLY);
-    if (fd < 0)
+    if (!file_exists(dirname_mp3_filename))
     {
         DEBUGF("Failed to find: %s\n", dirname_mp3_filename);
         return -1;
     }
-
-    close(fd);
 
     DEBUGF("Found: %s\n", dirname_mp3_filename);
 

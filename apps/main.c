@@ -574,13 +574,10 @@ static void init(void)
 
 #ifdef AUTOROCK
     {
-        int fd;
         static const char filename[] = PLUGIN_APPS_DIR "/autostart.rock"; 
 
-        fd = open(filename, O_RDONLY);
-        if(fd >= 0) /* no complaint if it doesn't exist */
+        if(file_exists(filename)) /* no complaint if it doesn't exist */
         {
-            close(fd);
             plugin_load((char*)filename, NULL); /* start if it does */
         }
     }

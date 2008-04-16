@@ -783,14 +783,9 @@ static bool clipboard_pastedirectory(char *src, int srclen, char *target,
     DIR *srcdir;
     int srcdirlen = strlen(src);
     int targetdirlen = strlen(target);
-    int fd;
     bool result = true;
 
-    /* Check if the target exists */
-    fd = open(target, O_RDONLY);
-    close(fd);
-
-    if (fd < 0) {
+    if (!file_exists(target)) {
         if (!copy) {
             /* Just move the directory */
             result = rename(src, target) == 0;
@@ -871,7 +866,6 @@ static bool clipboard_paste(void)
     char target[MAX_PATH];
     char *cwd, *nameptr;
     bool success;
-    int target_fd;
 
     unsigned char *lines[]={ID2P(LANG_REALLY_OVERWRITE)};
     struct text_message message={(char **)lines, 1};
@@ -885,12 +879,8 @@ static bool clipboard_paste(void)
     /* Final target is current directory plus name of selection  */
     snprintf(target, sizeof(target), "%s%s", cwd[1] ? cwd : "", nameptr);
 
-    /* Check if we're going to overwrite */
-    target_fd = open(target, O_RDONLY);
-    close(target_fd);
-
     /* If the target existed but they choose not to overwite, exit */
-    if (target_fd >= 0 &&
+    if (file_exists(target) &&
         (gui_syncyesno_run(&message, NULL, NULL) == YESNO_NO)) {
         return false;
     }

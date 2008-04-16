@@ -1211,9 +1211,9 @@ static int save_preset_list(void)
     { 
         bool bad_file_name = true;
 
-        if(!opendir(FMPRESET_PATH)) /* Check if there is preset folder */
-            mkdir(FMPRESET_PATH); 
-    
+        if(!dir_exists(FMPRESET_PATH)) /* Check if there is preset folder */
+            mkdir(FMPRESET_PATH);
+
         create_numbered_filename(filepreset, FMPRESET_PATH, "preset",
                                  ".fmr", 2 IF_CNFN_NUM_(, NULL));
 
