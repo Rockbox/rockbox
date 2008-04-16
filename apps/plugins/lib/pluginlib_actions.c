@@ -65,6 +65,16 @@ const struct button_mapping remote_directions[] =
 
 const struct button_mapping generic_directions[] =
 {
+#ifdef HAVE_TOUCHPAD
+    { PLA_UP,                BUTTON_TOPMIDDLE,                  BUTTON_NONE},
+    { PLA_DOWN,              BUTTON_BOTTOMMIDDLE,               BUTTON_NONE},
+    { PLA_LEFT,              BUTTON_MIDLEFT,                    BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_MIDRIGHT,                   BUTTON_NONE},
+    { PLA_UP_REPEAT,         BUTTON_TOPMIDDLE|BUTTON_REPEAT,    BUTTON_NONE},
+    { PLA_DOWN_REPEAT,       BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_MIDLEFT|BUTTON_REPEAT,      BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_MIDRIGHT|BUTTON_REPEAT,     BUTTON_NONE},
+#endif
 #if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
     || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)     \
@@ -132,14 +142,6 @@ const struct button_mapping generic_directions[] =
     { PLA_LEFT_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,       BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
-    { PLA_UP,                BUTTON_TOPMIDDLE,                  BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_BOTTOMMIDDLE,               BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_MIDLEFT,                    BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_MIDRIGHT,                   BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_TOPMIDDLE|BUTTON_REPEAT,    BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_MIDLEFT|BUTTON_REPEAT,      BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_MIDRIGHT|BUTTON_REPEAT,     BUTTON_NONE},
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     { PLA_UP,                BUTTON_RC_VOL_UP,                  BUTTON_NONE},
     { PLA_DOWN,              BUTTON_RC_VOL_DOWN,                BUTTON_NONE},
@@ -157,6 +159,14 @@ const struct button_mapping generic_directions[] =
 
 const struct button_mapping generic_left_right_fire[] =
 {
+#ifdef HAVE_TOUCPAD
+    { PLA_LEFT,              BUTTON_MIDLEFT,                BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_MIDLEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_MIDRIGHT,               BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_MIDRIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_CENTER,                 BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_CENTER|BUTTON_REPEAT,   BUTTON_NONE},
+#endif
 #if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
     || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)   \
@@ -231,17 +241,11 @@ const struct button_mapping generic_left_right_fire[] =
     { PLA_FIRE_REPEAT,       BUTTON_RC_HEART|BUTTON_REPEAT,     BUTTON_NONE},
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
     { PLA_LEFT,              BUTTON_MINUS,                  BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_MIDLEFT,                BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_MINUS|BUTTON_REPEAT,    BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_MIDLEFT|BUTTON_REPEAT,  BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_PLUS,                   BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_MIDRIGHT,               BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_PLUS|BUTTON_REPEAT,     BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_MIDRIGHT|BUTTON_REPEAT, BUTTON_NONE},
     { PLA_FIRE,              BUTTON_MENU,                   BUTTON_NONE},
-    { PLA_FIRE,              BUTTON_CENTER,                 BUTTON_NONE},
     { PLA_FIRE_REPEAT,       BUTTON_MENU|BUTTON_REPEAT,     BUTTON_NONE},
-    { PLA_FIRE_REPEAT,       BUTTON_CENTER|BUTTON_REPEAT,   BUTTON_NONE},
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     { PLA_LEFT,              BUTTON_RC_REW,                BUTTON_NONE},
     { PLA_RIGHT,             BUTTON_RC_FF,                 BUTTON_NONE},
@@ -258,6 +262,13 @@ const struct button_mapping generic_left_right_fire[] =
 /* these were taken from the bubbles plugin, so may need tweaking */
 const struct button_mapping generic_actions[] = 
 {
+#ifdef HAVE_TOUCHPAD
+    {PLA_QUIT,          BUTTON_BOTTOMRIGHT,                 BUTTON_NONE},
+    {PLA_START,         BUTTON_CENTER,                      BUTTON_NONE},
+    {PLA_MENU,          BUTTON_TOPLEFT,                     BUTTON_NONE},
+    {PLA_FIRE,          BUTTON_BOTTOMMIDDLE,                BUTTON_NONE},
+    {PLA_FIRE_REPEAT,   BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT,  BUTTON_NONE},
+#endif
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     {PLA_QUIT,          BUTTON_OFF,                   BUTTON_NONE},
     {PLA_QUIT,          BUTTON_RC_STOP,               BUTTON_NONE},
@@ -378,6 +389,12 @@ const struct button_mapping generic_actions[] =
 
 const struct button_mapping generic_increase_decrease[] =
 {
+#ifdef HAVE_TOUCHPAD
+    {PLA_INC,             BUTTON_TOPMIDDLE,                  BUTTON_NONE},
+    {PLA_DEC,             BUTTON_BOTTOMMIDDLE,               BUTTON_NONE},
+    {PLA_INC_REPEAT,      BUTTON_TOPMIDDLE|BUTTON_REPEAT,    BUTTON_NONE},
+    {PLA_DEC_REPEAT,      BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT, BUTTON_NONE},
+#endif
 #if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
     || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)   \
@@ -425,13 +442,9 @@ const struct button_mapping generic_increase_decrease[] =
     {PLA_DEC_REPEAT,      BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
 #elif CONFIG_KEYPAD == COWOND2_PAD
     {PLA_INC,             BUTTON_PLUS,                       BUTTON_NONE},
-    {PLA_INC,             BUTTON_TOPMIDDLE,                  BUTTON_NONE},
     {PLA_DEC,             BUTTON_MINUS,                      BUTTON_NONE},
-    {PLA_DEC,             BUTTON_BOTTOMMIDDLE,               BUTTON_NONE},
     {PLA_INC_REPEAT,      BUTTON_PLUS|BUTTON_REPEAT,         BUTTON_NONE},
-    {PLA_INC_REPEAT,      BUTTON_TOPMIDDLE|BUTTON_REPEAT,    BUTTON_NONE},
     {PLA_DEC_REPEAT,      BUTTON_MINUS|BUTTON_REPEAT,        BUTTON_NONE},
-    {PLA_DEC_REPEAT,      BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT, BUTTON_NONE},
 #else
 #error pluginlib_actions: Unsupported keypad
 #endif
