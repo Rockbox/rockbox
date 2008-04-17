@@ -7936,11 +7936,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "x4"
+    lcd_bitmap: "sh4"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "x4"
+    lcd_bitmap: "xsh"
   </voice>
 </phrase>
 <phrase>
@@ -7957,7 +7957,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "bu"
+    lcd_bitmap: "bu2"
   </voice>
 </phrase>
 <phrase>
@@ -9343,19 +9343,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = 是"
     h100,h120,h300: "NAVI = 是"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "select=是"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "select=是"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: ""
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: ""
     player: ""
   </voice>
 </phrase>
@@ -10275,15 +10275,15 @@
   user: 
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "按钮光度"
+    gigabeatf,mrobe100: "按钮光度"
   </dest>
   <voice>
     *: none
-    gigabeatf: "按钮光度"
+    gigabeatf,mrobe100: "按钮光度"
   </voice>
 </phrase>
 <phrase>

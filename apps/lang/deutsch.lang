@@ -245,13 +245,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Ja"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Ja"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -2350,14 +2350,14 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
+    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Erstelle Datenbank... %d gefunden (OFF zum Abbrechen)"
     h100,h120,h300: "Erstelle Datenbank... %d gefunden (STOP zum Abbrechen)"
     ipod*: "Erstelle Datenbank... %d gefunden (PLAY/PAUSE zum Abbrechen)"
-    x5,m5: "Erstelle Datenbank... %d gefunden (LINKS zum Abbrechen)"
+    x5,m5,gigabeatf,mrobe100: "Erstelle Datenbank... %d gefunden (LINKS zum Abbrechen)"
     h10,h10_5gb,e200,c200: "Erstelle Datenbank... %d gefunden (PREV zum Abbrechen)"
   </dest>
   <voice>
@@ -3837,15 +3837,15 @@
   user:
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "Tastenbeleuchtung: Helligkeit"
+    gigabeatf,mrobe100: "Tastenbeleuchtung: Helligkeit"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Tastenbeleuchtung: Helligkeit"
+    gigabeatf,mrobe100: "Tastenbeleuchtung: Helligkeit"
   </voice>
 </phrase>
 <phrase>
@@ -4112,17 +4112,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Speichern"
     h100,h120,h300: "NAVI = Speichern"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Speichern"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Speichern"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -4137,6 +4137,7 @@
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
   </source>
   <dest>
     *: none
@@ -4146,10 +4147,11 @@
     x5,m5: "RECORD = Abbrechen"
     h10,h10_5gb: "PREV = Abbrechen"
     gigabeatf: "A = Abbrechen"
+    mrobe100: "display=abbrechen"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -8137,29 +8139,28 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Speichern fehlgeschlagen"
+    *: ""
   </dest>
   <voice>
-    *: "Speichern fehlgeschlagen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Keine Partition?"
-    player: "Partition?"
+    *: ""
+    player: ""
   </dest>
   <voice>
     *: ""

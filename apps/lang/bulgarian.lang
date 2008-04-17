@@ -1334,6 +1334,7 @@
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
   </source>
   <dest>
     *: none
@@ -1343,6 +1344,7 @@
     x5,m5: "RECORD за отказ"
     h10,h10_5gb: "PREV за отказ"
     gigabeatf: "A за отказ"
+    mrobe100: "displayза отказ"
   </dest>
   <voice>
     *: none
@@ -1352,6 +1354,7 @@
     x5,m5: ""
     h10,h10_5gb: ""
     gigabeatf: ""
+    mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -2901,14 +2904,14 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
+    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Изграждане на базата данни...  намерени %d (OFF за връщане)"
     h100,h120,h300: "Изграждане на базата данни...  намерени %d (STOP за връщане)"
     ipod*: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
-    x5,m5: "Изграждане на базата данни...  намерени %d (LEFT за връщане)"
+    x5,m5,gigabeatf,mrobe100: "Изграждане на базата данни...  намерени %d (LEFT за връщане)"
     h10,h10_5gb,e200,c200: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
   </dest>
   <voice>
@@ -3952,20 +3955,17 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user: 
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Няма дял на диска?"
-    player: "Дял?"
-  </dest>
+    *: ""
+    </dest>
   <voice>
     *: ""
-    player: ""
-  </voice>
+    </voice>
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
@@ -4538,13 +4538,13 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user: 
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Запазването е неуспешно"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -4989,13 +4989,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Да"
     h100,h120,h300: "NAVI = Да"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Да"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Да"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -5027,19 +5027,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Запази"
     h100,h120,h300: "NAVI = Запази"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Запази"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Запази"
   </dest>
   <voice>
     *: ""
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -8880,15 +8880,15 @@
   user: 
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "Яркост на осветяването на бутоните"
+    gigabeatf,mrobe100: "Яркост на осветяването на бутоните"
   </dest>
   <voice>
     *: ""
-    gigabeatf: ""
+    gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>

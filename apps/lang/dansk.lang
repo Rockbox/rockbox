@@ -1,22 +1,3 @@
-# Rockbox danish language file
-# Translated by:
-# - Rune Wiinberg
-# - Jakob Givoni
-# - Jonas Häggqvist
-#
-# Try to follow the guidelines from http://www.sslug.dk/locale/ Specifically
-# try to avoid english words at (almost) all costs.
-#
-# Local conventions:
-# "Settings" is removed from translations used in the menu since it's all
-# settings there ("Sound Settings > Lyd"). "Recording Settings" is an exception
-# since it's used alongside "Recording" in some menus.
-# No excessive capitals ("Håndter opsætning" - not "Håndter Opsætning")
-#
-# Strings that need attention:
-# - LANG_EQUALIZER_BAND_LOW_SHELF
-# - LANG_EQUALIZER_BAND_HIGH_SHELF
-# - All strings with "Equalizer" in them.
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -10536,19 +10517,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPIL = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "VÆLG = Ja"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "VÆLG = Ja"
     player: "(SPIL/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: ""
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: ""
     player: ""
   </voice>
 </phrase>
