@@ -10119,15 +10119,15 @@
   user:
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "Helderheid Licht Knoppen"
+    gigabeatf,mrobe100: "Helderheid Licht Knoppen"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Helderheid Licht Knoppen"
+    gigabeatf,mrobe100: "Helderheid Licht Knoppen"
   </voice>
 </phrase>
 <phrase>
@@ -10502,13 +10502,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Ja"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Ja"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
