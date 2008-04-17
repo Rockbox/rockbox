@@ -35,8 +35,9 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* Sansa Li Ion 750mAH FIXME this is a first linear approach */
-    { 3300, 3390, 3480, 3570, 3660, 3750, 3840, 3930, 4020, 4110, 4200 },
+ 
+    { 3286, 3679, 3734, 3764, 3788, 3824, 3886, 3950, 4014, 4098, 4237 },
+    
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
