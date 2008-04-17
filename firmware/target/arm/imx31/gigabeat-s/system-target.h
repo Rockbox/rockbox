@@ -42,8 +42,13 @@ static inline void invalidate_icache(void)
     asm volatile(
         /* Clean and invalidate entire data cache */
         "mcr p15, 0, %0, c7, c14, 0 \n"
-        /* Invalidate entire instruction cache */
+        /* Invalidate entire intruction cache
+         * Also flushes the branch target cache */
         "mcr p15, 0, %0, c7, c5, 0  \n"
+        /* Data synchronization barrier */
+        "mcr p15, 0, %0, c7, c10, 4 \n"
+        /* Flush prefetch buffer */
+        "mcr p15, 0, %0, c7, c5, 4  \n"
         : : "r"(0)
     );
 }
@@ -54,6 +59,8 @@ static inline void flush_icache(void)
     asm volatile (
         /* Clean entire data cache */
         "mcr p15, 0, %0, c7, c10, 0 \n"
+        /* Data synchronization barrier */
+        "mcr p15, 0, r2, c7, c10, 4 \n"
         : : "r"(0)
     );
 }

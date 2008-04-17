@@ -90,9 +90,11 @@ void enable_mmu(void) {
 void __attribute__((naked)) invalidate_dcache_range(const void *base, unsigned int size)
 {
     asm volatile(
-        "add    r1, r1, r0          \n"
-        "mcrr   p15, 0, r1, r0, c14 \n"
-        "bx     lr                  \n"
+        "add    r1, r1, r0             \n"
+        "mov    r2, #0                 \n"
+        "mcrr   p15, 0, r1, r0, c14    \n" /* Clean and invalidate dcache range */
+        "mcr    p15, 0, r2, c7, c10, 4 \n" /* Data synchronization barrier */
+        "bx     lr                     \n"
     );
     (void)base; (void)size;
 }
@@ -140,9 +142,11 @@ void invalidate_dcache_range(const void *base, unsigned int size) {
 void __attribute__((naked)) clean_dcache_range(const void *base, unsigned int size)
 {
     asm volatile(
-        "add    r1, r1, r0          \n"
-        "mcrr   p15, 0, r1, r0, c12 \n"
-        "bx     lr                  \n"
+        "add    r1, r1, r0             \n"
+        "mov    r2, #0                 \n"
+        "mcrr   p15, 0, r1, r0, c12    \n" /* Clean dcache range */
+        "mcr    p15, 0, r2, c7, c10, 4 \n" /* Data synchronization barrier */
+        "bx     lr                     \n"
     );
     (void)base; (void)size;
 }
