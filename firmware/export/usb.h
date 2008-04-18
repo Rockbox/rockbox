@@ -89,6 +89,7 @@ struct usb_transfer_completion_event_data
 void usb_init(void);
 void usb_enable(bool on);
 void usb_start_monitoring(void);
+void usb_stop_monitoring(void);
 void usb_acknowledge(long id);
 void usb_wait_for_disconnect(struct event_queue *q);
 int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks);

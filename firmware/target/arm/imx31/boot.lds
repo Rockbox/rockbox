@@ -17,6 +17,7 @@ INPUT(target/arm/imx31/crt0.o)
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+   DEVBSS : ORIGIN = 0x80100000 + FRAME_SIZE, LENGTH = 0x100000 - FRAME_SIZE - TTB_SIZE
 }
 
 SECTIONS
@@ -81,4 +82,11 @@ SECTIONS
         _vectorsend = .;
     } AT > DRAM
     _vectorscopy = LOADADDR(.vectors);
+    
+    .devbss (NOLOAD) :
+    {
+        _devbssdata = .;
+        *(.devbss*)
+        _devbssend = .;
+    } > DEVBSS
 }

@@ -27,6 +27,7 @@
 #include "power-imx31.h"
 #include "button-target.h"
 #include "adc-target.h"
+#include "usb-target.h"
 
 /* This is all based on communicating with the MC13783 PMU which is on 
  * CSPI2 with the chip select at 0. The LCD controller resides on
@@ -67,6 +68,7 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
 
     /* Check initial states for events with a sense bit */
     value = mc13783_read(MC13783_INTERRUPT_SENSE0);
+    usb_set_status(value & MC13783_USB4V4);
     set_charger_inserted(value & MC13783_CHGDET);
 
     value = mc13783_read(MC13783_INTERRUPT_SENSE1);
@@ -98,12 +100,15 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
 
             /* Handle interrupts that have a sense bit that needs to
              * be checked */
-            if (pending[0] & MC13783_CHGDET)
+            if (pending[0] & (MC13783_CHGDET | MC13783_USB4V4))
             {
                 value = mc13783_read(MC13783_INTERRUPT_SENSE0);
 
                 if (pending[0] & MC13783_CHGDET)
                     set_charger_inserted(value & MC13783_CHGDET);
+
+                if (pending[0] & MC13783_USB4V4)
+                    usb_set_status(value & MC13783_USB4V4);
             }
         }
 

@@ -46,6 +46,7 @@
 #include "lcd-target.h"
 #include "avic-imx31.h"
 #include <stdarg.h>
+#include "usb-target.h"
 
 #define TAR_CHUNK 512
 #define TAR_HEADER_SIZE 157
@@ -55,12 +56,22 @@ char basedir[] = "/Content/0b00/00/"; /* Where files sent via MTP are stored */
 int (*kernel_entry)(void);
 char *tarbuf = (char *)0x00000040;
 extern void reference_system_c(void);
+static struct event_queue usb_wait_queue;
 
 /* Dummy stub that creates C references for C functions only used by
    assembly - never called */
 void reference_files(void)
 {
     reference_system_c();
+}
+
+void show_splash(int timeout, const char *msg)
+{
+    lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
+                (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
+    lcd_update();
+
+    sleep(timeout);
 }
 
 void untar(int tar_fd)
@@ -145,7 +156,7 @@ void main(void)
 
     lcd_clear_display();
     printf("Hello world!");
-    printf("Gigabeat S Rockbox Bootloader v.00000006");
+    printf("Gigabeat S Rockbox Bootloader v.00000007");
     system_init();
     kernel_init();
     printf("kernel init done");
@@ -223,6 +234,47 @@ void main(void)
         }
     }
 
+    if (usb_plugged())
+    {
+        /* Enter USB mode  */
+        struct queue_event ev;
+        queue_init(&usb_wait_queue, true);
+
+        /* Start the USB driver */
+        usb_init();
+        usb_start_monitoring();
+
+        /* Wait for threads to connect or cable is pulled */
+        reset_screen();
+        show_splash(0, "Waiting for USB");
+
+        while (1)
+        {
+            queue_wait_w_tmo(&usb_wait_queue, &ev, HZ/2);
+
+            if (ev.id == SYS_USB_CONNECTED)
+                break; /* Hit */
+
+            if (!usb_plugged())
+                break; /* Cable pulled */
+        }
+
+        if (ev.id == SYS_USB_CONNECTED)
+        {
+            /* Got the message - wait for disconnect */
+            reset_screen();
+            show_splash(0, "Bootloader USB mode");
+
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            usb_wait_for_disconnect(&usb_wait_queue);
+        }
+
+        /* No more monitoring */
+        usb_stop_monitoring();
+
+        reset_screen();
+    }
+
     unsigned char *loadbuffer = (unsigned char *)0x0;
     int buffer_size = 31*1024*1024;
 
@@ -239,6 +291,8 @@ void main(void)
         rc = kernel_entry();
     }
 
-    while (1);
+    /* Halt */
+    while (1)
+        core_idle();
 }
 

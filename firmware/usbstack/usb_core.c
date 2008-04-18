@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:  $
+ * $Id$
  *
  * Copyright (C) 2007 by Bj�rn Stenberg
  *
@@ -244,7 +244,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
 static int ack_control(struct usb_ctrlrequest* req);
 
-static unsigned char response_data[256] NOCACHEBSS_ATTR;
+static unsigned char response_data[256] USBDEVBSS_ATTR;
 
 static struct usb_transfer_completion_event_data events[NUM_ENDPOINTS];
 
@@ -558,9 +558,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                                          sizeof(struct usb_string_descriptor*)))
                             {
                                 size = usb_strings[index]->bLength;
-                                memcpy(&response_data[0],usb_strings[index],
-                                       size);
-                                ptr = response_data;
+                                ptr = usb_strings[index];
                             }
                             else {
                                 logf("bad string id %d", index);
@@ -580,9 +578,13 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
                     }
 
                     if (ptr) {
-                        unsigned char *uncached = (void*)UNCACHED_ADDR(ptr);
                         length = MIN(size, length);
-                        if(usb_drv_send(EP_CONTROL, uncached, length)!=0)
+
+                        if (ptr != response_data) {
+                            memcpy(response_data, ptr, length);
+                        }
+
+                        if(usb_drv_send(EP_CONTROL, response_data, length)!=0)
                             break;
                     }
                     ack_control(req);

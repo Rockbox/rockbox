@@ -23,7 +23,7 @@ INPUT(target/arm/imx31/crt0.o)
 /* #define IRAMORIG 0x1FFFC000 */
 #define IRAMORIG DRAMORIG
 #define IRAM     DRAM
-#define IRAMSIZE 0x4000
+#define IRAMSIZE IRAM_SIZE
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
@@ -34,6 +34,7 @@ INPUT(target/arm/imx31/crt0.o)
 MEMORY
 {
     DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+    DEVBSS : ORIGIN = 0x80100000 + FRAME_SIZE, LENGTH = 0x100000 - FRAME_SIZE - TTB_SIZE
 }
 
 SECTIONS
@@ -147,5 +148,12 @@ SECTIONS
         _pluginbuf = .;
         pluginbuf = .;
     }
+    
+    .devbss (NOLOAD) :
+    {
+    	_devbssdata = .;
+    	*(.devbss*)
+    	_devbssend = .;
+    } > DEVBSS
 }
 

@@ -112,7 +112,18 @@
 #define CPU_FREQ 16934400
 
 /* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
+//#define HAVE_USB_POWER /* Disable for now */
+
+/* USB On-the-go */
+#define CONFIG_USBOTG USBOTG_ARC
+
+/* enable these for the experimental usb stack */
+#define USE_HIGH_SPEED
+#define USE_ROCKBOX_USB
+#define HAVE_USBSTACK
+#define USB_STORAGE
+#define USB_VENDOR_ID 0x0930
+#define USB_PRODUCT_ID 0x0010
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF

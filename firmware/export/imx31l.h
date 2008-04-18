@@ -26,12 +26,14 @@
 #define REG32_PTR_T volatile unsigned long *
 
 /* Place in the section with the framebuffer */
-#define TTB_BASE_ADDR           (0x80100000 + 0x00100000 - TTB_SIZE)
- 
-#define FRAME ((short *)0x80100000) /* Framebuffer */
-#define LCD_BUFFER_SIZE ((320*240*2))
-#define TTB_SIZE (0x4000)
-#define TTB_BASE ((unsigned int *)TTB_BASE_ADDR)
+#define TTB_BASE_ADDR (0x80100000 + 0x00100000 - TTB_SIZE)
+#define TTB_SIZE      (0x4000)
+#define IRAM_SIZE     (0x4000)
+#define TTB_BASE      ((unsigned int *)TTB_BASE_ADDR)
+#define FRAME         ((void*)0x80100000)
+#define FRAME_SIZE    (240*320*2)
+
+#define DEVBSS_ATTR   __attribute__((section(".devbss"),nocommon))
 
 /*
  * AIPS 1
@@ -1031,5 +1033,7 @@
 #define readl(a)                (*(REG32_PTR_T)(a))
 #define writew(v,a)             (*(REG16_PTR_T)(a) = (v))
 #define readw(a)                (*(REG16_PTR_T)(a))
+
+#define USB_BASE                OTG_BASE_ADDR
 
 #endif /* __IMX31L_H__ */

@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:  $
+ * $Id$
  *
  * Driver for ARC USBOTG Device Controller
  *
@@ -20,11 +20,19 @@
  ****************************************************************************/
 
 #include "system.h"
+#include "config.h"
 #include "string.h"
 #include "usb_ch9.h"
 #include "usb_core.h"
+#include "kernel.h"
+#include "panic.h"
 //#define LOGF_ENABLE
 #include "logf.h"
+
+#if CONFIG_CPU == IMX31L
+#include "avic-imx31.h"
+static void __attribute__((interrupt("IRQ"))) USB_OTG_HANDLER(void);
+#endif
 
 /* USB device mode registers (Little Endian) */
 
@@ -44,6 +52,7 @@
 #define REG_DEVICEADDR       (*(volatile unsigned int *)(USB_BASE+0x154))
 #define REG_ENDPOINTLISTADDR (*(volatile unsigned int *)(USB_BASE+0x158))
 #define REG_BURSTSIZE        (*(volatile unsigned int *)(USB_BASE+0x160))
+#define REG_ULPI             (*(volatile unsigned int *)(USB_BASE+0x170))
 #define REG_CONFIGFLAG       (*(volatile unsigned int *)(USB_BASE+0x180))
 #define REG_PORTSC1          (*(volatile unsigned int *)(USB_BASE+0x184))
 #define REG_OTGSC            (*(volatile unsigned int *)(USB_BASE+0x1a4))
@@ -127,6 +136,16 @@
 #define USBINTR_SOF_EN                        (0x00000080)
 #define USBINTR_DEVICE_SUSPEND                (0x00000100)
 
+/* ULPI Register Bit Masks */
+#define ULPI_ULPIWU                           (0x80000000)
+#define ULPI_ULPIRUN                          (0x40000000)
+#define ULPI_ULPIRW                           (0x20000000)
+#define ULPI_ULPISS                           (0x08000000)
+#define ULPI_ULPIPORT                         (0x07000000)
+#define ULPI_ULPIADDR                         (0x00FF0000)
+#define ULPI_ULPIDATRD                        (0x0000FF00)
+#define ULPI_ULPIDATWR                        (0x000000FF)
+
 /* Device Address bit masks */
 #define USBDEVICEADDRESS_MASK                 (0xFE000000)
 #define USBDEVICEADDRESS_BIT_POS              (25)
@@ -194,6 +213,7 @@
 
 /* bit 31-30 are port transceiver select */
 #define PORTSCX_PTS_UTMI                       (0x00000000)
+#define PORTSCX_PTS_CLASSIC                    (0x40000000)
 #define PORTSCX_PTS_ULPI                       (0x80000000)
 #define PORTSCX_PTS_FSLS                       (0xC0000000)
 #define PORTSCX_PTS_BIT_POS                    (30)
@@ -303,7 +323,7 @@ struct transfer_descriptor {
 } __attribute__ ((packed));
 
 static struct transfer_descriptor td_array[NUM_ENDPOINTS*2]
-    NOCACHEBSS_ATTR;
+    USBDEVBSS_ATTR __attribute__((aligned(32)));
 
 /* manual: 32.13.1 Endpoint Queue Head (dQH) */
 struct queue_head {
@@ -319,10 +339,10 @@ struct queue_head {
 } __attribute__((packed));
 
 static struct queue_head qh_array[NUM_ENDPOINTS*2]
-    NOCACHEBSS_ATTR __attribute((aligned (2048)));
+    USBDEVBSS_ATTR __attribute__((aligned (2048)));
 
-static struct event_queue transfer_completion_queue[NUM_ENDPOINTS*2];
-
+static struct wakeup transfer_completion_signal[NUM_ENDPOINTS*2]
+    SHAREDBSS_ATTR;
 
 static const unsigned int pipe2mask[] = {
     0x01, 0x010000,
@@ -331,6 +351,8 @@ static const unsigned int pipe2mask[] = {
     0x08, 0x080000,
     0x10, 0x100000,
 };
+
+static bool first_init = true;
 
 /*-------------------------------------------------------------------------*/
 static void transfer_completed(void);
@@ -355,12 +377,29 @@ bool usb_drv_powered(void)
 void usb_drv_init(void)
 {
     REG_USBCMD &= ~USBCMD_RUN;
-    udelay(50000);
+
+    if (first_init)
+    {
+        /* Initialize all the signal objects once */
+        int i;
+        for(i=0;i<NUM_ENDPOINTS*2;i++) {
+            wakeup_init(&transfer_completion_signal[i]);
+        }
+
+        first_init = false;
+    }
+
+    sleep(HZ/20);
     REG_USBCMD |= USBCMD_CTRL_RESET;
     while (REG_USBCMD & USBCMD_CTRL_RESET);
 
 
     REG_USBMODE = USBMODE_CTRL_MODE_DEVICE;
+
+#if CONFIG_CPU == IMX31L
+    /* Set to ULPI */
+    REG_PORTSC1 = (REG_PORTSC1 & ~PORTSCX_PHY_TYPE_SEL) | PORTSCX_PTS_ULPI;
+#endif
 
 #ifndef USE_HIGH_SPEED
     /* Force device to full speed */
@@ -382,8 +421,12 @@ void usb_drv_init(void)
         USBINTR_RESET_EN |
         USBINTR_SYS_ERR_EN;
 
+#if CONFIG_CPU == IMX31L
+    avic_enable_int(USB_OTG, IRQ, 7, USB_OTG_HANDLER);
+#else
     /* enable USB IRQ in CPU */
-    CPU_INT_EN |= USB_MASK;
+    CPU_INT_EN = USB_MASK;
+#endif
 
     /* go go go */
     REG_USBCMD |= USBCMD_RUN;
@@ -410,10 +453,20 @@ void usb_drv_exit(void)
     REG_USBCMD |= USBCMD_CTRL_RESET;
     */
 
+#if CONFIG_CPU == IMX31L
+    avic_disable_int(USB_OTG);
+#else
+    CPU_INT_CLR = USB_MASK;
+#endif
+
     cancel_cpu_boost();
 }
 
+#if CONFIG_CPU == IMX31L
+static void __attribute__((interrupt("IRQ"))) USB_OTG_HANDLER(void)
+#else
 void usb_drv_int(void)
+#endif
 {
     unsigned int status = REG_USBSTS;
 
@@ -564,7 +617,7 @@ void usb_drv_set_test_mode(int mode)
             break;
     }
     REG_USBCMD &= ~USBCMD_RUN;
-    udelay(50000);
+    sleep(HZ/20);
     REG_USBCMD |= USBCMD_CTRL_RESET;
     while (REG_USBCMD & USBCMD_CTRL_RESET);
     REG_USBCMD |= USBCMD_RUN;
@@ -575,6 +628,7 @@ void usb_drv_set_test_mode(int mode)
 /* manual: 32.14.5.2 */
 static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait)
 {
+    int rc = 0;
     int pipe = endpoint * 2 + (send ? 1 : 0);
     unsigned int mask = pipe2mask[pipe];
     struct queue_head* qh = &qh_array[pipe];
@@ -590,7 +644,6 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait
     qh->length = 0;
     qh->wait   = wait;
 
-
     new_td=&td_array[pipe];
     prepare_td(new_td, 0, ptr, len,pipe);
     //logf("starting ep %d %s",endpoint,send?"send":"receive");
@@ -603,40 +656,58 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait
     if(endpoint == EP_CONTROL && (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0)) {
         /* 32.14.3.2.2 */
         logf("new setup arrived");
-        return -4;
+        rc = -4;
+        goto pt_error;
     }
 
     last_tick = current_tick;
     while ((REG_ENDPTPRIME & mask)) {
-        if (REG_USBSTS & USBSTS_RESET)
-            return -1;
+        if (REG_USBSTS & USBSTS_RESET) {
+            rc = -1;
+            goto pt_error;
+        }
 
         if (TIME_AFTER(current_tick, last_tick + HZ/4)) {
             logf("prime timeout");
-            return -2;
+            rc = -2;
+            goto pt_error;
         }
     }
 
     if (!(REG_ENDPTSTATUS & mask)) {
         logf("no prime! %d %d %x", endpoint, pipe, qh->dtd.size_ioc_sts & 0xff );
-        return -3;
+        rc = -3;
+        goto pt_error;
     }
     if(endpoint == EP_CONTROL && (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0)) {
         /* 32.14.3.2.2 */
         logf("new setup arrived");
-        return -4;
+        rc = -4;
+        goto pt_error;
     }
 
     if (wait) {
         /* wait for transfer to finish */
-        struct queue_event ev;
-        queue_wait(&transfer_completion_queue[pipe], &ev);
+        wakeup_wait(&transfer_completion_signal[pipe], TIMEOUT_BLOCK);
         if(qh->status!=0) {
-            return -5;
+            /* No need to cancel wait here since it was done and the signal
+             * came. */
+            return 5;
         }
         //logf("all tds done");
     }
-    return 0;
+
+pt_error:
+    /* Error status must make sure an abandoned wakeup signal isn't left */
+    if (rc < 0 && wait) {
+        /* Cancel wait */
+        qh->wait = 0;
+        /* Make sure to remove any signal if interrupt fired before we zeroed
+         * qh->wait. Could happen during a bus reset for example. */
+        wakeup_wait(&transfer_completion_signal[pipe], TIMEOUT_NOBLOCK);
+    }
+
+    return rc;
 }
 
 void usb_drv_cancel_all_transfers(void)
@@ -650,7 +721,7 @@ void usb_drv_cancel_all_transfers(void)
         if(qh_array[i].wait) {
             qh_array[i].wait=0;
             qh_array[i].status=DTD_STATUS_HALTED;
-            queue_post(&transfer_completion_queue[i],0, 0);
+            wakeup_signal(&transfer_completion_signal[i]);
         }
     }
 }
@@ -694,7 +765,7 @@ static void control_received(void)
         if(qh_array[i].wait) {
             qh_array[i].wait=0;
             qh_array[i].status=DTD_STATUS_HALTED;
-            queue_post(&transfer_completion_queue[i],0, 0);
+            wakeup_signal(&transfer_completion_signal[i]);
         }
     }
 
@@ -731,7 +802,7 @@ static void transfer_completed(void)
                 }
                 if(qh->wait) {
                     qh->wait=0;
-                    queue_post(&transfer_completion_queue[pipe],0, 0);
+                    wakeup_signal(&transfer_completion_signal[pipe]);
                 }
                 usb_core_transfer_complete(ep, dir, qh->status, qh->length);
             }
@@ -757,8 +828,13 @@ static void bus_reset(void)
             logf("usb: double reset");
             return;
         }
-
+#if CONFIG_CPU == IMX31L
+        int x;
+        for (x = 0; x < 30000; x++)
+            asm volatile ("");
+#else
         udelay(100);
+#endif
     }
     if (REG_ENDPTPRIME) {
         logf("usb: short reset timeout");
@@ -774,7 +850,6 @@ static void bus_reset(void)
 /* manual: 32.14.4.1 Queue Head Initialization */
 static void init_control_queue_heads(void)
 {
-    int i;
     memset(qh_array, 0, sizeof qh_array);
 
     /*** control ***/
@@ -782,10 +857,6 @@ static void init_control_queue_heads(void)
     qh_array[EP_CONTROL].dtd.next_td_ptr = QH_NEXT_TERMINATE;
     qh_array[EP_CONTROL+1].max_pkt_length = 64 << QH_MAX_PKT_LEN_POS;
     qh_array[EP_CONTROL+1].dtd.next_td_ptr = QH_NEXT_TERMINATE;
-
-    for(i=0;i<2;i++) {
-        queue_init(&transfer_completion_queue[i], false);
-    }
 }
 /* manual: 32.14.4.1 Queue Head Initialization */
 static void init_bulk_queue_heads(void)
@@ -809,9 +880,6 @@ static void init_bulk_queue_heads(void)
         qh_array[i*2].dtd.next_td_ptr = QH_NEXT_TERMINATE;
         qh_array[i*2+1].max_pkt_length = tx_packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
         qh_array[i*2+1].dtd.next_td_ptr = QH_NEXT_TERMINATE;
-    }
-    for(i=2;i<NUM_ENDPOINTS*2;i++) {
-        queue_init(&transfer_completion_queue[i], false);
     }
 }
 

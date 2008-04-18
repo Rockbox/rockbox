@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:  $
+ * $Id$
  *
  * Copyright (C) 2007 by Björn Stenberg
  *
@@ -352,9 +352,6 @@ int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size,
 
 void usb_storage_init_connection(int interface,int endpoint)
 {
-    size_t bufsize;
-    unsigned char * audio_buffer;
-
     usb_interface = interface;
     usb_endpoint = endpoint;
 
@@ -362,10 +359,20 @@ void usb_storage_init_connection(int interface,int endpoint)
     /* prime rx endpoint. We only need room for commands */
     state = WAITING_FOR_COMMAND;
 
+#if CONFIG_CPU == IMX31L
+    static unsigned char _transfer_buffer[BUFFER_SIZE*2]
+        USBDEVBSS_ATTR __attribute__((aligned(32)));
+    tb.transfer_buffer = (void *)_transfer_buffer;
+#else
     /* TODO : check if bufsize is at least 32K ? */
+    size_t bufsize;
+    unsigned char * audio_buffer;
+
     audio_buffer = audio_get_buffer(false,&bufsize);
     tb.transfer_buffer =
         (void *)UNCACHED_ADDR((unsigned int)(audio_buffer + 31) & 0xffffffe0);
+    invalidate_icache();
+#endif
     usb_drv_recv(usb_endpoint, tb.transfer_buffer, 1024);
 }
 
@@ -519,7 +526,7 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req)
             *tb.max_lun = NUM_VOLUMES - 1;
 #endif
             logf("ums: getmaxlun");
-            usb_drv_send(EP_CONTROL, UNCACHED_ADDR(tb.max_lun), 1);
+            usb_drv_send(EP_CONTROL, tb.max_lun, 1);
             usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
             handled = true;
             break;
@@ -1042,7 +1049,11 @@ static void identify2inquiry(int lun)
 #endif
     /* Mac OSX 10.5 doesn't like this driver if DEVICE_REMOVABLE is not set.
        TODO : this can probably be solved by providing caching mode page */
+#ifdef TOSHIBA_GIGABEAT_S
+    tb.inquiry->DeviceTypeModifier = 0;
+#else
     tb.inquiry->DeviceTypeModifier = DEVICE_REMOVABLE;
+#endif
 }
 
 #endif /* USB_STORAGE */

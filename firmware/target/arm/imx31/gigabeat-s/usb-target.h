@@ -19,8 +19,11 @@
 #ifndef USB_TARGET_H
 #define USB_TARGET_H
 
+void usb_set_status(bool plugged);
 bool usb_init_device(void);
 int usb_detect(void);
+/* Read the immediate state of the cable from the PMIC */
+bool usb_plugged(void);
 void usb_enable(bool on);
 
 #endif

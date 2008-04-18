@@ -324,12 +324,10 @@
 #define HAVE_MAS35XX
 #endif
 
-#if CONFIG_CODEC == SWCODEC && !defined(BOOTLOADER)
-#define HAVE_EXTENDED_MESSAGING_AND_NAME
-#endif
-
 #if (CONFIG_CODEC == SWCODEC)
 #ifndef BOOTLOADER
+
+#define HAVE_EXTENDED_MESSAGING_AND_NAME
 
 #ifndef SIMULATOR
 #define HAVE_PRIORITY_SCHEDULING
@@ -345,10 +343,11 @@
 
 #endif /* BOOTLOADER */
 
-#ifdef TOSHIBA_GIGABEAT_S
+#ifdef HAVE_USBSTACK
 #define HAVE_WAKEUP_OBJECTS
 #endif
-#endif
+
+#endif /*  (CONFIG_CODEC == SWCODEC) */
 
 /* define for all cpus from SH family */
 #if (CONFIG_CPU == SH7034)

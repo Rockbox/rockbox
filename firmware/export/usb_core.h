@@ -33,7 +33,13 @@
 
 /* endpoints */
 #define EP_CONTROL 0
+#if CONFIG_CPU == IMX31L
+#define NUM_ENDPOINTS 8
+#define USBDEVBSS_ATTR  DEVBSS_ATTR
+#else
+#define USBDEVBSS_ATTR  NOCACHEBSS_ATTR
 #define NUM_ENDPOINTS 3
+#endif
 
 extern int usb_max_pkt_size;
 

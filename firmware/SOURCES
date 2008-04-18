@@ -233,8 +233,8 @@ drivers/audio/mas35xx.c
 usbstack/usb_core.c
 usbstack/usb_storage.c
 usbstack/usb_serial.c
-#ifdef CPU_PP502x
-target/arm/usb-drv-pp502x.c
+#if CONFIG_USBOTG == USBOTG_ARC
+target/arm/usb-drv-arc.c
 #endif
 #else /* !defined(HAVE_USBSTACK) */
 #if CONFIG_USBOTG == USBOTG_ISP1362	 

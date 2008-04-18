@@ -45,11 +45,21 @@
 #endif
 #include "logf.h"
 
+/* Conditions under which we want the entire driver */
+#if !defined(BOOTLOADER) || \
+     (defined(TOSHIBA_GIGABEAT_S) && defined(USE_ROCKBOX_USB) && defined(USB_STORAGE))
+#define USB_FULL_INIT
+#endif
+
 extern void dbg_ports(void); /* NASTY! defined in apps/ */
 
 #ifdef HAVE_LCD_BITMAP
 bool do_screendump_instead_of_usb = false;
+#if defined(USB_FULL_INIT) && defined(BOOTLOADER)
+static void screen_dump(void) {}
+#else
 void screen_dump(void);   /* Nasty again. Defined in apps/ too */
+#endif
 #endif
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
@@ -59,13 +69,13 @@ static int countdown;
 
 static int usb_state;
 
-#if defined(HAVE_MMC) && !defined(BOOTLOADER)
+#if defined(HAVE_MMC) && defined(USB_FULL_INIT)
 static int usb_mmc_countdown = 0;
 #endif
 
 /* FIXME: The extra 0x800 is consumed by fat_mount() when the fsinfo
    needs updating */
-#ifndef BOOTLOADER
+#ifdef USB_FULL_INIT
 static long usb_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
 static struct thread_entry *usb_thread_entry;
@@ -84,9 +94,7 @@ static int firewire_countdown;
 static bool last_firewire_status;
 #endif
 
-
-
-#ifndef BOOTLOADER
+#ifdef USB_FULL_INIT
 #ifndef HAVE_USBSTACK
 static void usb_slave_mode(bool on)
 {
@@ -377,7 +385,7 @@ void usb_signal_transfer_completion(struct usb_transfer_completion_event_data* e
 }
 #endif
 
-#ifndef BOOTLOADER
+#ifdef USB_FULL_INIT
 static void usb_tick(void)
 {
     int current_status;
@@ -461,14 +469,14 @@ void usb_init(void)
 #endif
 
     usb_init_device();
-#ifndef BOOTLOADER
+#ifdef USB_FULL_INIT
     usb_enable(false);
 #endif
 
     /* We assume that the USB cable is extracted */
     last_usb_status = USB_EXTRACTED;
 
-#ifndef BOOTLOADER
+#ifdef USB_FULL_INIT
     queue_init(&usb_queue, true);
     
     usb_thread_entry = create_thread(usb_thread, usb_stack,
@@ -521,6 +529,14 @@ void usb_start_monitoring(void)
 {
     usb_monitor_enabled = true;
 }
+
+#ifdef TOSHIBA_GIGABEAT_S
+void usb_stop_monitoring(void)
+{
+    tick_remove_task(usb_tick);
+    usb_monitor_enabled = false;
+}
+#endif
 
 bool usb_inserted(void)
 {

@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:  $
+ * $Id$
  *
  * Copyright (C) 2007 by Christian Gmeiner
  *
@@ -53,11 +53,10 @@ struct usb_endpoint_descriptor __attribute__((aligned(2))) endpoint_descriptor =
 };
 
 #define BUFFER_SIZE 512 /* Max 16k because of controller limitations */
-static unsigned char _send_buffer[BUFFER_SIZE] __attribute__((aligned(32)));
-static unsigned char* send_buffer;
-
-static unsigned char _receive_buffer[512] __attribute__((aligned(32)));
-static unsigned char* receive_buffer;
+static unsigned char send_buffer[BUFFER_SIZE]
+    USBDEVBSS_ATTR __attribute__((aligned(32)));
+static unsigned char receive_buffer[512]
+    USBDEVBSS_ATTR __attribute__((aligned(32)));
 static bool busy_sending = false;
 static int buffer_start;
 static int buffer_length;
@@ -66,7 +65,7 @@ static bool active = false;
 static int usb_endpoint;
 static int usb_interface;
 
-static struct mutex sendlock;
+static struct mutex sendlock SHAREDBSS_ATTR;
 
 static void sendout(void)
 {
@@ -111,7 +110,7 @@ void usb_serial_init_connection(int interface,int endpoint)
     usb_endpoint = endpoint;
 
     /* prime rx endpoint */
-    usb_drv_recv(usb_endpoint, receive_buffer, sizeof _receive_buffer);
+    usb_drv_recv(usb_endpoint, receive_buffer, sizeof receive_buffer);
 
     /* we come here too after a bus reset, so reset some data */
     mutex_lock(&sendlock);
@@ -127,8 +126,6 @@ void usb_serial_init_connection(int interface,int endpoint)
 void usb_serial_init(void)
 {
     logf("serial: init");
-    send_buffer = (void*)UNCACHED_ADDR(&_send_buffer);
-    receive_buffer = (void*)UNCACHED_ADDR(&_receive_buffer);
     busy_sending = false;
     buffer_start = 0;
     buffer_length = 0;
@@ -190,7 +187,7 @@ void usb_serial_transfer_complete(bool in, int status, int length)
         case false:
             logf("serial: %s", receive_buffer);
             /* Data received. TODO : Do something with it ? */
-            usb_drv_recv(usb_endpoint, receive_buffer, sizeof _receive_buffer);
+            usb_drv_recv(usb_endpoint, receive_buffer, sizeof receive_buffer);
             break;
 
         case true:

@@ -259,6 +259,15 @@ remap_end:
     strhi   r4, [r2], #4
     bhi     1b
     
+    /* Initialise the device bss section to zero */
+    ldr     r2, =_devbssdata
+    ldr     r3, =_devbssend
+    mov     r4, #0
+1:
+    cmp     r3, r2
+    strhi   r4, [r2], #4
+    bhi     1b
+
     /* Set up some stack and munge it with 0xdeadbeef */
     ldr     sp, =stackend
     ldr     r2, =stackbegin
