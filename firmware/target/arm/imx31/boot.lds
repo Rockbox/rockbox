@@ -1,4 +1,5 @@
 #include "config.h"
+#include "imx31l.h"
 
 ENTRY(start)
 OUTPUT_FORMAT(elf32-littlearm)
@@ -8,9 +9,10 @@ INPUT(target/arm/imx31/crt0.o)
 #define DRAMSIZE (1 << 20) /* Limit 1 MB for bootloader */
 
 #define DRAMORIG (0x02000000-0x00100000)
-#define IRAM DRAM
-#define IRAMORIG 0x1FFFC000
-#define IRAMSIZE 16K
+/* #define IRAMORIG 0x1FFFC000 */
+#define IRAM      DRAM
+#define IRAMSIZE  IRAM_SIZE
+#define IRAMORIG  DRAMORIG
 #define FLASHORIG 0x0000000
 #define FLASHSIZE 1M
 
