@@ -107,17 +107,18 @@ void pcm_apply_settings(void)
     pcm_curr_sampr = pcm_freq;
 }
 
-/* ASM optimised FIQ handler. Checks for the minimum allowed loop cycles by evalutation of
- * free IISFIFO-slots against available source buffer words. Through this it is possible to 
- * move the check for IIS_TX_FREE_COUNT outside the loop and do some further optimization.
- * Right after the loops (source buffer -> IISFIFO) are done we need to check whether we
- * have to exit FIQ handler (this must be done, if all free FIFO slots were filled) or
- * we will have to get some new source data.
- * Important information kept from former ASM implementation (not used anymore): GCC fails 
- * to make use of the fact that FIQ mode has registers r8-r14 banked, and so does not need 
- * to be saved. This routine uses only these registers, and so will never touch the stack 
- * unless it actually needs to do so when calling pcm_callback_for_more. C version is still 
- * included below for reference and testing.
+/* ASM optimised FIQ handler. Checks for the minimum allowed loop cycles by
+ * evalutation of free IISFIFO-slots against available source buffer words.
+ * Through this it is possible to move the check for IIS_TX_FREE_COUNT outside
+ * the loop and do some further optimization. Right after the loops (source
+ * buffer -> IISFIFO) are done we need to check whether we have to exit FIQ
+ * handler (this must be done, if all free FIFO slots were filled) or we will
+ * have to get some new source data. Important information kept from former
+ * ASM implementation (not used anymore): GCC fails to make use of the fact
+ * that FIQ mode has registers r8-r14 banked, and so does not need to be saved.
+ * This routine uses only these registers, and so will never touch the stack
+ * unless it actually needs to do so when calling pcm_callback_for_more.
+ * C version is still included below for reference and testing.
  */
 #if 1
 void fiq_playback(void) ICODE_ATTR __attribute__((naked));
@@ -169,8 +170,9 @@ void fiq_playback(void)
     ".check_fifo:                    \n"   
         "ldr     r0, [r10, %[cfg]]   \n" /* read IISFIFO_CFG to check FIFO status */
         "and     r0, r0, %[mask]     \n" /* r0 = IIS_TX_FREE_COUNT << 23 (PP5002) */
-        
-        "mov     r1, r0, lsr #24     \n" /* number of free pairs of FIFO slots */     
+
+        "movs    r1, r0, lsr #24     \n" /* number of free pairs of FIFO slots */
+        "beq     .exit               \n" /* no complete pair? -> exit */
         "cmp     r1, r9, lsr #2      \n" /* number of words from source */
         "movgt   r1, r9, lsr #2      \n" /* r1 = amount of allowed loops */
         "sub     r9, r9, r1, lsl #2  \n" /* r1 words will be written in following loop */
