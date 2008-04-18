@@ -358,6 +358,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                             lseek(fd,current.size - 24 - 72 - 6,SEEK_CUR);
                             wfx->audiostream = flags&0x7f;
                         } else {
+                            DEBUGF("Unsupported WMA codec (Pro, Lossless, Voice, etc)\n", wfx->audiostream );
                             lseek(fd,current.size - 24 - 72,SEEK_CUR);
                         }
 
