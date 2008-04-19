@@ -577,7 +577,7 @@ int talk_id(int32_t id, bool enqueue)
         return -1;
 
     decimals = (((uint32_t)id) >> DECIMAL_SHIFT) & 0x7;
-    DEBUGF("decimals %d\n", decimals);
+
     /* check if this is a special ID, with a value */
     unit = ((uint32_t)id) >> UNIT_SHIFT;
     if (unit || decimals)
