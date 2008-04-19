@@ -140,6 +140,8 @@ static void init_cache(void)
 }
 #endif /* !BOOTLOADER */
 
+/* We need this for Sansas since we boost the cpu in their bootloader */
+#if !defined(BOOTLOADER) || defined(SANSA_E200) || defined(SANSA_C200)
 void scale_suspend_core(bool suspend) ICODE_ATTR;
 void scale_suspend_core(bool suspend)
 {
@@ -283,6 +285,7 @@ static void pp_set_cpu_frequency(long frequency)
     spinlock_unlock(&boostctrl_spin);
 #endif
 }
+#endif /* !BOOTLOADER || SANSA_E200 || SANSA_C200 */
 
 void system_init(void)
 {
