@@ -55,9 +55,17 @@ enum {
 
 #define UNIT_SHIFT (32-5) /* this many bits left from UNIT_xx enum */
 
+#define DECIMAL_SHIFT (32 - 8)
+
 /* make a "talkable" ID from number + unit
    unit is upper 4 bits, number the remaining (in regular 2's complement) */
 #define TALK_ID(n,u) (((long)(u))<<UNIT_SHIFT | ((n) & ~(-1L<<UNIT_SHIFT)))
+
+/* make a "talkable" ID from a decimal number + unit, the decimal number
+   is represented like x*10*d where d is the number of decimal digits */
+#define TALK_ID_DECIMAL(n,d,u) (((long)(u))<<UNIT_SHIFT |\
+                             ((long)(d))<<DECIMAL_SHIFT |\
+                             ((n) & ~(-1L<<DECIMAL_SHIFT)))
 
 /* convenience macro to have both virtual pointer and ID as arguments */
 #define STR(id) ID2P(id), id
@@ -77,6 +85,7 @@ int talk_id(int32_t id, bool enqueue); /* play a voice ID from voicefont */
 int talk_file(const char* filename, bool enqueue); /* play a thumbnail from file */
 int talk_number(long n, bool enqueue); /* say a number */
 int talk_value(long n, int unit, bool enqueue); /* say a numeric value */
+int talk_value_decimal(long n, int unit, int decimals, bool enqueue);
 int talk_spell(const char* spell, bool enqueue); /* spell a string */
 void talk_setting(const void *global_settings_variable); /* read a setting */
 void talk_disable(bool disable); /* temporarily disable (or re-enable) talking (temporarily, not persisted) */

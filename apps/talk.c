@@ -558,6 +558,7 @@ int talk_id(int32_t id, bool enqueue)
     long clipsize;
     unsigned char* clipbuf;
     int32_t unit;
+    int decimals;
 
     if (talk_temp_disable_count > 0)
         return -1;  /* talking has been disabled */
@@ -575,13 +576,16 @@ int talk_id(int32_t id, bool enqueue)
     if (id == -1) /* -1 is an indication for silence */
         return -1;
 
+    decimals = (((uint32_t)id) >> DECIMAL_SHIFT) & 0x7;
+    DEBUGF("decimals %d\n", decimals);
     /* check if this is a special ID, with a value */
     unit = ((uint32_t)id) >> UNIT_SHIFT;
-    if (unit)
+    if (unit || decimals)
     {   /* sign-extend the value */
-        id = (uint32_t)id << (32-UNIT_SHIFT);
-        id >>= (32-UNIT_SHIFT);
-        talk_value(id, unit, enqueue); /* speak it */
+        id = (uint32_t)id << (32-DECIMAL_SHIFT);
+        id >>= (32-DECIMAL_SHIFT);
+
+        talk_value_decimal(id, unit, decimals, enqueue); /* speak it */
         return 0; /* and stop, end of special case */
     }
 
@@ -593,7 +597,6 @@ int talk_id(int32_t id, bool enqueue)
 
     return 0;
 }
-
 /* Speaks zero or more IDs (from an array). */
 int talk_idarray(long *ids, bool enqueue)
 {
@@ -760,8 +763,13 @@ static int talk_time_unit(long secs, bool exact, bool enqueue)
     return 0;
 }
 
-/* singular/plural aware saying of a value */
 int talk_value(long n, int unit, bool enqueue)
+{
+    return talk_value_decimal(n, unit, 0, enqueue);
+}
+
+/* singular/plural aware saying of a value */
+int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
 {
     int unit_id;
     static const int unit_voiced[] = 
@@ -823,6 +831,22 @@ int talk_value(long n, int unit, bool enqueue)
     if (n > 0 && (unit == UNIT_SIGNED || unit == UNIT_DB))
     {
         talk_id(VOICE_PLUS, enqueue);
+        enqueue = true;
+    }
+
+    if (decimals)
+    {
+        /* needed for the "-0.5" corner case */
+        if (n < 0)
+        {
+            talk_id(VOICE_MINUS, enqueue);
+            n = -n;
+            enqueue = true;
+        }
+
+        talk_number(n / (10*decimals), enqueue);
+        talk_id(LANG_POINT, true);
+        n %= (10*decimals);
         enqueue = true;
     }
 
