@@ -138,8 +138,8 @@ static void init_cache(void)
     CACHE_CTL |= CACHE_CTL_INIT | CACHE_CTL_ENABLE | CACHE_CTL_RUN;
     nop; nop; nop; nop;
 }
+#endif /* !BOOTLOADER */
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void scale_suspend_core(bool suspend) ICODE_ATTR;
 void scale_suspend_core(bool suspend)
 {
@@ -161,6 +161,7 @@ void scale_suspend_core(bool suspend)
     }
 }
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency) ICODE_ATTR;
 void set_cpu_frequency(long frequency)
 #else
@@ -282,7 +283,6 @@ static void pp_set_cpu_frequency(long frequency)
     spinlock_unlock(&boostctrl_spin);
 #endif
 }
-#endif /* !BOOTLOADER */
 
 void system_init(void)
 {
@@ -415,6 +415,13 @@ void system_init(void)
     }
 
     init_cache();
+#else /* BOOTLOADER */
+    if (CURRENT_CORE == CPU)
+    {
+#if defined(SANSA_C200) || defined (SANSA_E200)
+        pp_set_cpu_frequency(CPUFREQ_MAX);
+#endif
+    }
 #endif /* BOOTLOADER */
 }
 
