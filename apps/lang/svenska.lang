@@ -253,13 +253,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPELA = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "VÄLJ = Ja"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "VÄLJ = Ja"
     player: "SPELA/STOPP"
   </dest>
   <voice>
@@ -2354,14 +2354,14 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
+    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Skapar databas... %d hittade (AV = Återgå)"
     h100,h120,h300: "Skapar databas... %d hittade (STOPP = Återgå)"
     ipod*: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
-    x5,m5: "Skapar databas... %d hittade (VÄNSTER = Återgå)"
+    x5,m5,gigabeatf,mrobe100: "Skapar databas... %d hittade (VÄNSTER = Återgå)"
     h10,h10_5gb,e200,c200: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
   </dest>
   <voice>
@@ -3840,15 +3840,15 @@
   user:
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "Knappljusstyrka"
+    gigabeatf,mrobe100: "Knappljusstyrka"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Knappljusstyrka"
+    gigabeatf,mrobe100: "Knappljusstyrka"
   </voice>
 </phrase>
 <phrase>
@@ -4113,17 +4113,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "PÅ = Ställ"
     h100,h120,h300: "NAVI = Ställ"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "VÄLJ = Ställ"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "VÄLJ = Ställ"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -4138,6 +4138,7 @@
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
   </source>
   <dest>
     *: none
@@ -4147,10 +4148,11 @@
     x5,m5: "SPELA IN = Avbryt"
     h10,h10_5gb: "FÖREGÅENDE = Avbryt"
     gigabeatf: "A = Avbryt"
+    mrobe100: "VISA = Avbryt"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -8120,29 +8122,27 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Spara misslyckades"
+    *: ""
   </dest>
   <voice>
-    *: "Spara misslyckades"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Ingen partition?"
-    player: "Partition?"
+    *: ""
   </dest>
   <voice>
     *: ""
