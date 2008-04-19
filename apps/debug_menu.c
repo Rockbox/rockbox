@@ -1691,14 +1691,14 @@ static bool view_battery(void)
 
         lcd_update();
 
-        switch(get_action(CONTEXT_SETTINGS,HZ/2))
+        switch(get_action(CONTEXT_STD,HZ/2))
         {
-            case ACTION_SETTINGS_DEC:
+            case ACTION_STD_PREV:
                 if (view)
                     view--;
                 break;
 
-            case ACTION_SETTINGS_INC:
+            case ACTION_STD_NEXT:
                 if (view < 3)
                     view++;
                 break;
