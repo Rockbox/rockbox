@@ -1493,9 +1493,6 @@ void update_scroll_animation(void)
 void cleanup(void *parameter)
 {
     (void) parameter;
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
-#endif
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings(rb); /* backlight control in lib/helper.c */
 
@@ -1947,9 +1944,6 @@ int main(void)
     char fpstxt[10];
     int button;
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
-#endif
     int frames = 0;
     long last_update = *rb->current_tick;
     long current_update;
@@ -2097,11 +2091,17 @@ enum plugin_status plugin_start(struct plugin_api *api, void *parameter)
 #endif
     /* Turn off backlight timeout */
     backlight_force_on(rb);     /* backlight control in lib/helper.c */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true);
+#endif
     ret = main();
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
     if ( ret == PLUGIN_OK ) {
         if (!write_pfconfig()) {
             rb->splash(HZ, "Error writing config.");
-            return PLUGIN_ERROR;
+            ret = PLUGIN_ERROR;
         }
     }
 
