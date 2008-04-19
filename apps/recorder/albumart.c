@@ -108,6 +108,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     char dir[MAX_PATH + 1];
     bool found = false;
     const char *trackname;
+    const char *artist;
     int dirlen;
     int albumlen;
 
@@ -146,12 +147,14 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
         found = file_exists(path);
     }
 
-    if (!found && id3->artist && id3->album)
+    artist = id3->albumartist != NULL ? id3->albumartist : id3->artist;
+
+    if (!found && artist && id3->album)
     {
         /* look in the albumart subdir of .rockbox */
         snprintf(path, sizeof(path),
                 ROCKBOX_DIR "/albumart/%s-%s%s.bmp",
-                id3->artist,
+                artist,
                 id3->album,
                 size_string);
         fix_path_part(path, strlen(ROCKBOX_DIR "/albumart/"), MAX_PATH);
