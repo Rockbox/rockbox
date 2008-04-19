@@ -40,7 +40,7 @@
 
 
 #if CONFIG_CODEC == SWCODEC
-int setcrossfadeonexit_callback(int action,const struct menu_item_ex *this_item)
+static int setcrossfadeonexit_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
@@ -56,7 +56,7 @@ int setcrossfadeonexit_callback(int action,const struct menu_item_ex *this_item)
 
 /***********************************/
 /*    PLAYBACK MENU                */
-int playback_callback(int action,const struct menu_item_ex *this_item);
+static int playback_callback(int action,const struct menu_item_ex *this_item);
     
 MENUITEM_SETTING(shuffle_item, &global_settings.playlist_shuffle, playback_callback);
 MENUITEM_SETTING(repeat_mode, &global_settings.repeat_mode, playback_callback);
@@ -68,7 +68,7 @@ MAKE_MENU(ff_rewind_settings_menu, ID2P(LANG_WIND_MENU), 0, Icon_NOICON,
           &ff_rewind_min_step, &ff_rewind_accel);
 #ifndef HAVE_FLASH_STORAGE
 #if CONFIG_CODEC == SWCODEC
-int buffermargin_callback(int action,const struct menu_item_ex *this_item)
+static int buffermargin_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
@@ -108,7 +108,7 @@ MAKE_MENU(crossfade_settings_menu,ID2P(LANG_CROSSFADE),0, Icon_NOICON,
 
 /* replay gain submenu */
 
-int replaygain_callback(int action,const struct menu_item_ex *this_item)
+static int replaygain_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
@@ -134,7 +134,7 @@ MENUITEM_SETTING(beep, &global_settings.beep ,NULL);
 MENUITEM_SETTING(spdif_enable, &global_settings.spdif_enable, NULL);
 #endif
 MENUITEM_SETTING(next_folder, &global_settings.next_folder, NULL);
-int audioscrobbler_callback(int action,const struct menu_item_ex *this_item)
+static int audioscrobbler_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
@@ -152,7 +152,7 @@ int audioscrobbler_callback(int action,const struct menu_item_ex *this_item)
 MENUITEM_SETTING(audioscrobbler, &global_settings.audioscrobbler, audioscrobbler_callback);
 
 
-int cuesheet_callback(int action,const struct menu_item_ex *this_item)
+static int cuesheet_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
@@ -196,7 +196,7 @@ MAKE_MENU(playback_menu_item,ID2P(LANG_PLAYBACK),0,
 #endif
          );
          
-int playback_callback(int action,const struct menu_item_ex *this_item)
+static int playback_callback(int action,const struct menu_item_ex *this_item)
 {
     static bool old_shuffle = false;
     static int old_repeat_mode = 0;
