@@ -270,7 +270,7 @@ static bool dbg_audio_thread(void)
 extern size_t filebuflen;
 /* This is a size_t, but call it a long so it puts a - when it's bad. */
 
-static unsigned int ticks, boost_ticks;
+static unsigned int ticks, boost_ticks, freq_sum;
 
 static void dbg_audio_task(void)
 {
@@ -278,7 +278,7 @@ static void dbg_audio_task(void)
     if(FREQ > CPUFREQ_NORMAL)
         boost_ticks++;
 #endif
-
+    freq_sum += FREQ/1000000; /* in MHz */
     ticks++;
 }
 
@@ -293,7 +293,7 @@ static bool dbg_buffering_thread(void)
     int pcmbufdescs = pcmbuf_descs();
     struct buffering_debug d;
 
-    ticks = boost_ticks = 0;
+    ticks = boost_ticks = freq_sum = 0;
 
     tick_add_task(dbg_audio_task);
 
@@ -374,8 +374,10 @@ static bool dbg_buffering_thread(void)
 
         if (ticks > 0)
         {
-            snprintf(buf, sizeof(buf), "boost ratio: %3d%%",
-                     boost_ticks * 100 / ticks);
+            int boostquota = boost_ticks * 1000 / ticks; /* in °/oo */
+            int avgclock   = freq_sum * 10 / ticks;      /* in 100 kHz */
+            snprintf(buf, sizeof(buf), "boost ratio: %3d.%d%% (%2d.%dMHz)",
+                     boostquota/10, boostquota%10, avgclock/10, avgclock%10);
             lcd_puts(0, line++, buf);
         }
 
