@@ -3028,7 +3028,7 @@ static bool command_queue_is_full(void)
     
     return (next == command_queue_ridx);
 }
-bool command_queue_sync_callback(void)
+static bool command_queue_sync_callback(void)
 {
     
     struct master_header myhdr;
@@ -3074,7 +3074,7 @@ bool command_queue_sync_callback(void)
     return true;
 }
 
-void run_command_queue(bool force)
+static void run_command_queue(bool force)
 {
     if (COMMAND_QUEUE_IS_EMPTY)
         return;
