@@ -3157,17 +3157,13 @@ static bool write_tag(int fd, const char *tagstr, const char *datastr)
     int i;
     
     snprintf(buf, sizeof buf, "%s=\"", tagstr);
-    for (i = strlen(buf); i < (long)sizeof(buf)-3; i++)
+    for (i = strlen(buf); i < (long)sizeof(buf)-4; i++)
     {
         if (*datastr == '\0')
             break;
         
-        if (*datastr == '"')
-        {
-            buf[i] = '\\';
-            datastr++;
-            continue;
-        }
+        if (*datastr == '"' || *datastr == '\\')
+            buf[i++] = '\\';
         
         buf[i] = *(datastr++);
     }
@@ -3222,9 +3218,9 @@ static bool read_tag(char *dest, long size,
             if (*src == '\0')
                 break;
             
-            if (*src == '\\' && *(src+1) == '"')
+            if (*src == '\\')
             {
-                dest[pos] = '"';
+                dest[pos] = *(src+1);
                 src += 2;
                 continue;
             }
