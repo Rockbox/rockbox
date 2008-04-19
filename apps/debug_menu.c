@@ -277,8 +277,8 @@ static void dbg_audio_task(void)
 #ifndef SIMULATOR
     if(FREQ > CPUFREQ_NORMAL)
         boost_ticks++;
-#endif
     freq_sum += FREQ/1000000; /* in MHz */
+#endif
     ticks++;
 }
 
