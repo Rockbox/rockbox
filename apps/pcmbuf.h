@@ -45,7 +45,6 @@ size_t pcmbuf_get_bufsize(void);
 /* just used for logging for now */
 unsigned char * pcmbuf_get_meminfo(size_t *length);
 #endif
-size_t get_pcmbuf_descsize(void);
 
 void pcmbuf_pause(bool pause);
 void pcmbuf_play_stop(void);

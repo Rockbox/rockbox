@@ -99,7 +99,6 @@ static size_t crossfade_sample IDATA_ATTR;
 static size_t crossfade_fade_in_total IDATA_ATTR;
 static size_t crossfade_fade_in_rem IDATA_ATTR;
 
-static size_t pcmbuf_descsize;
 static struct pcmbufdesc *pcmbuf_read IDATA_ATTR;
 static struct pcmbufdesc *pcmbuf_read_end IDATA_ATTR;
 static struct pcmbufdesc *pcmbuf_write IDATA_ATTR;
@@ -409,10 +408,6 @@ int pcmbuf_descs(void) {
     return PCMBUF_DESCS(pcmbuf_size);
 }
 
-size_t get_pcmbuf_descsize(void) {
-    return pcmbuf_descsize;
-}
-
 static void pcmbuf_init_pcmbuffers(void) {
     struct pcmbufdesc *next = pcmbuf_write;
     next++;
@@ -468,7 +463,6 @@ size_t pcmbuf_init(unsigned char *bufend)
     voicebuf = &fadebuf[PCMBUF_MIX_CHUNK];
     pcmbuf_write = (struct pcmbufdesc *)&voicebuf[PCMBUF_MIX_CHUNK];
 
-    pcmbuf_descsize = PCMBUF_DESCS_SIZE(pcmbuf_size);
     pcmbuf_init_pcmbuffers();
 
     position_callback = NULL;
