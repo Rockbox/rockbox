@@ -53,10 +53,16 @@ struct usb_endpoint_descriptor __attribute__((aligned(2))) endpoint_descriptor =
 };
 
 #define BUFFER_SIZE 512 /* Max 16k because of controller limitations */
+#if CONFIG_CPU == IMX31L
 static unsigned char send_buffer[BUFFER_SIZE]
     USBDEVBSS_ATTR __attribute__((aligned(32)));
-static unsigned char receive_buffer[512]
+static unsigned char receive_buffer[32]
     USBDEVBSS_ATTR __attribute__((aligned(32)));
+#else
+static unsigned char send_buffer[BUFFER_SIZE] __attribute__((aligned(32)));
+static unsigned char receive_buffer[32] __attribute__((aligned(32)));
+#endif
+
 static bool busy_sending = false;
 static int buffer_start;
 static int buffer_length;
