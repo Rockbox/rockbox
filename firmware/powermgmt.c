@@ -195,6 +195,13 @@ void reset_poweroff_timer(void)
 {
 }
 
+#ifdef HAVE_ACCESSORY_SUPPLY
+void accessory_supply_set(bool enable)
+{
+    (void)enable;
+}
+#endif
+
 #else /* not SIMULATOR ******************************************************/
 
 #if CONFIG_CHARGING == CHARGING_CONTROL
@@ -1143,7 +1150,7 @@ void powermgmt_init(void)
     memset(power_history, 0x00, sizeof(power_history));
     create_thread(power_thread, power_stack, sizeof(power_stack), 0,
                   power_thread_name IF_PRIO(, PRIORITY_SYSTEM)
-		          IF_COP(, CPU));
+                  IF_COP(, CPU));
 }
 
 #endif /* SIMULATOR */
