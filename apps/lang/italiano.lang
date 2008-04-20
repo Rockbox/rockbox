@@ -11529,3 +11529,31 @@
     swcodec: "Click Tasti Ripetuto"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in keyclick settings menu
+  user:
+  <source>
+    *: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: "Alimentazione Accessoria"
+  </dest>
+  <voice>
+    *: "Alimentazione Accessoria"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user:
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "Sconosciuto"
+  </dest>
+  <voice>
+    *: "Sconosciuto"
+  </voice>
+</phrase>
