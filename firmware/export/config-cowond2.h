@@ -59,7 +59,7 @@
 #define HAVE_TOUCHPAD
 
 /* define this if you have a real-time clock */
-//#define CONFIG_RTC RTC_TCC780X
+#define CONFIG_RTC RTC_PCF50606
 
 /* define this if you have RTC RAM available for settings */
 //#define HAVE_RTC_RAM

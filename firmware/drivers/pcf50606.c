@@ -27,6 +27,16 @@ int pcf50606_write(int address, unsigned char val)
     return i2c_write(PCF50606_ADDR, data, 2);
 }
 
+int pcf50606_write_multiple(int address, const unsigned char* buf, int count)
+{
+    int i;
+
+    for (i = 0; i < count; i++)
+        pcf50606_write(address + i, buf[i]);
+
+    return 0;
+}
+
 int pcf50606_read(int address)
 {
     unsigned char val = -1;
