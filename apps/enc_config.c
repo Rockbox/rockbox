@@ -46,7 +46,7 @@ static int enc_menuitem_enteritem(int action,
 static void enc_rec_settings_changed(struct encoder_config *cfg);
 /* this is used by all encoder menu items,
    MUST be initialised before the call to do_menu() */
-struct menucallback_data {
+static struct menucallback_data {
     struct encoder_config *cfg;
     bool global;
 } menu_callback_data;

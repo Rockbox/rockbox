@@ -61,8 +61,8 @@ static unsigned char *eofptr;
 /* Font cache structures */
 static struct font_cache font_cache_ui;
 static int fnt_file = -1;           /* >=0 if font is cached   */
-uint32_t file_width_offset;    /* offset to file width data    */
-uint32_t file_offset_offset;   /* offset to file offset data   */
+static uint32_t file_width_offset;    /* offset to file width data    */
+static uint32_t file_offset_offset;   /* offset to file offset data   */
 static void cache_create(int maxwidth, int height);
 static int long_offset = 0;
 static int glyph_file;

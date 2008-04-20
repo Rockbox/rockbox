@@ -246,7 +246,7 @@ static const int sw_cap_high = 191;
 static int coef_00, coef_01, coef_10, coef_11;
 
 /* DAC control register set values */
-int if_set, sd_set;
+static int if_set, sd_set;
 
 static inline bool tuner_awake(void)
 {

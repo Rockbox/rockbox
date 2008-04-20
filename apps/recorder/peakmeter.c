@@ -82,8 +82,8 @@ bool peak_meter_enabled = true;
 
 /** Parameters **/
 /* Range */
-unsigned short peak_meter_range_min;  /* minimum of range in samples */
-unsigned short peak_meter_range_max;  /* maximum of range in samples */
+static unsigned short peak_meter_range_min;  /* minimum of range in samples */
+static unsigned short peak_meter_range_max;  /* maximum of range in samples */
 static unsigned short pm_range;       /* range width in samples */
 static bool pm_use_dbfs = true;       /* true if peakmeter displays dBfs */
 static bool level_check;              /* true if peeked at peakmeter before drawing */

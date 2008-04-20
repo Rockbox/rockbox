@@ -42,7 +42,7 @@ const struct sound_settings_info audiohw_settings[] = {
 };
 
 /* Shadow registers */
-struct as3514_info
+static struct as3514_info
 {
     int          vol_r;       /* Cached volume level (R) */
     int          vol_l;       /* Cached volume level (L) */

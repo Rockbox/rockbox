@@ -76,9 +76,6 @@ extern void peak_meter_set_trigger_listener(void (*listener)(int status));
 extern void peak_meter_draw_trig(int x[], int y[], int trig_width[], 
                                       int nb_screens);
 
-extern unsigned short peak_meter_range_min;
-extern unsigned short peak_meter_range_max;
-
 #define DB_SCALE_SRC_VALUES_SIZE 12
 struct meter_scales{
     /* buffered peak values */

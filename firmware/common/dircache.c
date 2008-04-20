@@ -48,7 +48,7 @@
 #define DIRCACHE_STOP  2
 
 #define MAX_OPEN_DIRS 8
-DIR_CACHED opendirs[MAX_OPEN_DIRS];
+static DIR_CACHED opendirs[MAX_OPEN_DIRS];
 
 static struct dircache_entry *fd_bindings[MAX_OPEN_FILES];
 static struct dircache_entry *dircache_root;

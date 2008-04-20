@@ -44,9 +44,8 @@
 #define SCROLLBAR_WIDTH 6
 #define ICON_PADDING 1
 
-/* globals */
-struct viewport title_text[NB_SCREENS], title_icons[NB_SCREENS],
-                list_text[NB_SCREENS], list_icons[NB_SCREENS];
+static struct viewport title_text[NB_SCREENS], title_icons[NB_SCREENS],
+                       list_text[NB_SCREENS], list_icons[NB_SCREENS];
 
 /* should probably be moved somewhere else */
 int list_title_height(struct gui_synclist *list, struct viewport *vp)

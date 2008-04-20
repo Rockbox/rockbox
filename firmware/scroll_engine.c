@@ -42,7 +42,7 @@ static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE*3];
 static const char scroll_name[] = "scroll";
 
-struct scrollinfo lcd_scroll[LCD_SCROLLABLE_LINES];
+static struct scrollinfo lcd_scroll[LCD_SCROLLABLE_LINES];
 
 #ifdef HAVE_REMOTE_LCD
 struct scrollinfo lcd_remote_scroll[LCD_REMOTE_SCROLLABLE_LINES];
