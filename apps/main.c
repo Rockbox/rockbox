@@ -73,9 +73,6 @@
 
 #if (CONFIG_CODEC == SWCODEC)
 #include "playback.h"
-#include "pcmbuf.h"
-#else
-#define pcmbuf_init()
 #endif
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && !defined(SIMULATOR)
 #include "pcm_record.h"

@@ -28,9 +28,6 @@
 #include "menu.h"
 #include "sound_menu.h"
 #include "eq_menu.h"
-#if CONFIG_CODEC == SWCODEC
-#include "pcmbuf.h"
-#endif
 #include "exported_menus.h"
 #include "menu_common.h"
 

@@ -55,7 +55,6 @@
 #if CONFIG_CODEC == SWCODEC
 #include "dsp.h"
 #include "menus/eq_menu.h"
-#include "pcmbuf.h"
 #ifdef HAVE_RECORDING
 #include "enc_config.h"
 #endif

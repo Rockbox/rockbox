@@ -76,7 +76,6 @@ struct user_settings global_settings;
 struct system_status global_status;
 
 #if CONFIG_CODEC == SWCODEC
-#include "pcmbuf.h"
 #include "dsp.h"
 #include "playback.h"
 #ifdef HAVE_RECORDING
