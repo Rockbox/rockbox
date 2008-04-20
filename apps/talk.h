@@ -62,7 +62,7 @@ enum {
 #define TALK_ID(n,u) (((long)(u))<<UNIT_SHIFT | ((n) & ~(-1L<<UNIT_SHIFT)))
 
 /* make a "talkable" ID from a decimal number + unit, the decimal number
-   is represented like x*10*d where d is the number of decimal digits */
+   is represented like x*10^d where d is the number of decimal digits */
 #define TALK_ID_DECIMAL(n,d,u) (((long)(u))<<UNIT_SHIFT |\
                              ((long)(d))<<DECIMAL_SHIFT |\
                              ((n) & ~(-1L<<DECIMAL_SHIFT)))
@@ -91,6 +91,9 @@ void talk_setting(const void *global_settings_variable); /* read a setting */
 void talk_disable(bool disable); /* temporarily disable (or re-enable) talking (temporarily, not persisted) */
 void talk_force_shutup(void); /* kill voice unconditionally */
 void talk_shutup(void); /* Interrupt voice, as when enqueue is false */
+
+/* helper function for speaking fractional numbers */
+void talk_fractional(char *tbuf, int value, int unit);
 
 #if CONFIG_RTC
 void talk_time(struct tm *tm, bool enqueue);

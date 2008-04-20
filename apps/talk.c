@@ -763,6 +763,22 @@ static int talk_time_unit(long secs, bool exact, bool enqueue)
     return 0;
 }
 
+void talk_fractional(char *tbuf, int value, int unit)
+{
+    int i;
+    /* strip trailing zeros from the fraction */
+    for (i = strlen(tbuf) - 1; (i >= 0) && (tbuf[i] == '0'); i--)
+        tbuf[i] = '\0';
+
+    talk_number(value, true);
+    if (tbuf[0] != 0)
+    {
+        talk_id(LANG_POINT, true);
+        talk_spell(tbuf, true);
+    }
+    talk_id(unit, true);
+}
+
 int talk_value(long n, int unit, bool enqueue)
 {
     return talk_value_decimal(n, unit, 0, enqueue);
@@ -805,6 +821,12 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
             = VOICE_PM_UNITS_PER_TICK,
     };
 
+    static const int pow10[] = { /* 10^0 - 10^7 */
+        1, 10, 100, 1000, 10000, 100000, 1000000, 10000000
+    };
+
+    char tbuf[8];
+
     if (talk_temp_disable_count > 0)
         return -1;  /* talking has been disabled */
 #if CONFIG_CODEC != SWCODEC
@@ -841,18 +863,17 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
         {
             talk_id(VOICE_MINUS, enqueue);
             n = -n;
-            enqueue = true;
         }
 
-        talk_number(n / (10*decimals), enqueue);
-        talk_id(LANG_POINT, true);
-        n %= (10*decimals);
-        enqueue = true;
+        snprintf(tbuf, sizeof(tbuf), "%0*d", decimals, n % pow10[decimals]);
+        talk_fractional(tbuf, n / pow10[decimals], unit_id);
+
+        return 0;
     }
 
     talk_number(n, enqueue); /* say the number */
     talk_id(unit_id, true); /* say the unit, if any */
-        
+
     return 0;
 }
 

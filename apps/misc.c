@@ -89,7 +89,6 @@ char *output_dyn_value(char *buf, int buf_size, int value,
     int scale = bin_scale ? 1024 : 1000;
     int fraction = 0;
     int unit_no = 0;
-    int i;
     char tbuf[5];
 
     while (value >= scale)
@@ -118,17 +117,7 @@ char *output_dyn_value(char *buf, int buf_size, int value,
     }
     else
     {
-        /* strip trailing zeros from the fraction */
-        for (i = strlen(tbuf) - 1; (i >= 0) && (tbuf[i] == '0'); i--)
-            tbuf[i] = '\0';
-
-        talk_number(value, true);
-        if (tbuf[0] != 0)
-        {
-            talk_id(LANG_POINT, true);
-            talk_spell(tbuf, true);
-        }
-        talk_id(P2ID(units[unit_no]), true);
+        talk_fractional(tbuf, value, P2ID(units[unit_no]));
     }
     return buf;
 }
