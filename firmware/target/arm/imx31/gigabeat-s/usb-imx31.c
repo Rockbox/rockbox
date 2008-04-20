@@ -23,6 +23,7 @@
 #include "ata.h"
 #include "usb.h"
 #include "usb_core.h"
+#include "usb_drv.h"
 #include "clkctl-imx31.h"
 #include "mc13783.h"
 
@@ -60,8 +61,6 @@ bool usb_plugged(void)
 {
     return mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_USB4V4;
 }
-
-extern void usb_drv_startup(void);
 
 void usb_init_device(void)
 {
