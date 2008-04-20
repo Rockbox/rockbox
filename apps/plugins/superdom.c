@@ -543,24 +543,65 @@ settings_menu:
     return 0;
 }
 
-int do_help(void) {
-    int selection = 0;
+static int do_help(void) {
+    int button;
+    int y = MARGIN, space_w, width, height;
+    unsigned short x = MARGIN, i = 0;
+#define WORDS (sizeof instructions / sizeof (char*))
+    static char* instructions[] = {
+        "Super", "domination", "is", "a", "turn", "based", "strategy", "game,", 
+        "where", "the", "aim", "is", "to", "overpower", "the", "computer",
+        "player", "by", "taking", "their", "territory.", "",
+        "Each", "year", "you", "are", "allocated", "an", "amount", "of", "cash",
+        "and", "food,", "depending", "on", "how", "many", "farms", "and",
+        "factories", "you", "control.", "",
+        "Use", "this", "cash", "and", "food", "to", "buy", "and", "feed", "your",
+        "army.", "Each", "tile", "has", "a", "strength,", "calculated", "by",
+        "the", "ownership", "of", "adjacent", "tiles,", "and", "the", "type",
+        "and", "number", "of", "troops", "on", "them.",
+    };
+    rb->lcd_clear_display();
+    rb->lcd_getstringsize(" ", &space_w, &height);
+    for (i = 0; i < WORDS; i++) {
+        rb->lcd_getstringsize(instructions[i], &width, NULL);
+        /* Skip to next line if the current one can't fit the word */
+        if (x + width > LCD_WIDTH - MARGIN) {
+            x = MARGIN;
+            y += height;
+        }
+        /* .. or if the word is the empty string */
+        if (rb->strcmp(instructions[i], "") == 0) {
+            x = MARGIN;
+            y += height;
+            continue;
+        }
+        /* We filled the screen */
+        if (y + height > LCD_HEIGHT - MARGIN) {
+            y = MARGIN;
+            rb->lcd_update();
+            do {
+                button = rb->button_get(true);
+                if (button == SYS_USB_CONNECTED) {
+                    return PLUGIN_USB_CONNECTED;
+                }
+            } while( ( button == BUTTON_NONE )
+                    || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
 
-    MENUITEM_STRINGLIST(help_menu,"Help",NULL,"Super domination is a turn",
-                    "based strategy game, where the aim is to overpower the",
-                    "computer player by taking their territory.",
-                    "Each year you are allocated an amount of cash and food,",
-                    "depending on how many farms and factories you control."
-                    "Use this cash and food to buy and feed your army.",
-                    "Each tile has a strength, calculated by the ownership",
-                    "of adjacent tiles, and the type and number of troops",
-                    "on them.");
-    rb->do_menu(&help_menu,&selection, NULL, false);
-    switch(selection) {
-        case MENU_ATTACHED_USB:
-            return PLUGIN_USB_CONNECTED;
-            break;
+
+            rb->lcd_clear_display();
+        }
+        rb->lcd_putsxy(x, y, instructions[i]);
+        x += width + space_w;
     }
+    rb->lcd_update();
+    do {
+        button = rb->button_get(true);
+        if (button == SYS_USB_CONNECTED) {
+            return PLUGIN_USB_CONNECTED;
+        }
+    } while( ( button == BUTTON_NONE )
+            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
+
     return 0;
 }
 
