@@ -1103,11 +1103,9 @@ static char *get_token_value(struct gui_wps *gwps,
         {
             int status = audio_status();
             int mode = 1;
-            if (status == AUDIO_STATUS_PLAY && \
-                !(status & AUDIO_STATUS_PAUSE))
+            if (status == AUDIO_STATUS_PLAY)
                 mode = 2;
-            if (audio_status() & AUDIO_STATUS_PAUSE && \
-                (! status_get_ffmode()))
+            if (status & AUDIO_STATUS_PAUSE && !status_get_ffmode())
                 mode = 3;
             if (status_get_ffmode() == STATUS_FASTFORWARD)
                 mode = 4;
@@ -1118,7 +1116,7 @@ static char *get_token_value(struct gui_wps *gwps,
                 *intval = mode;
             }
 
-            snprintf(buf, buf_size, "%d", mode);
+            snprintf(buf, buf_size, "%d", mode-1);
             return buf;
         }
 
