@@ -661,7 +661,7 @@ static int create_and_play_dir(int direction, bool play_last)
  * Removes all tracks, from the playlist, leaving the presently playing
  * track queued.
  */
-int remove_all_tracks(struct playlist_info *playlist)
+int playlist_remove_all_tracks(struct playlist_info *playlist)
 {
     int result;
 
@@ -775,7 +775,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
             break;
         }
         case PLAYLIST_REPLACE:
-            if (remove_all_tracks(playlist) < 0)
+            if (playlist_remove_all_tracks(playlist) < 0)
                 return -1;
     
             position = insert_position = playlist->index + 1;
@@ -2905,7 +2905,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
 
     if (position == PLAYLIST_REPLACE)
     {
-        if (remove_all_tracks(playlist) == 0)
+        if (playlist_remove_all_tracks(playlist) == 0)
             position = PLAYLIST_INSERT_LAST;
         else
             return -1;
@@ -2995,7 +2995,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
 
     if (position == PLAYLIST_REPLACE)
     {
-        if (remove_all_tracks(playlist) == 0)
+        if (playlist_remove_all_tracks(playlist) == 0)
             position = PLAYLIST_INSERT_LAST;
         else return -1;
     }

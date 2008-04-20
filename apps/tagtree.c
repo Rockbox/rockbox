@@ -1585,7 +1585,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     
     if (position == PLAYLIST_REPLACE)
     {
-        if (remove_all_tracks(NULL) == 0)
+        if (playlist_remove_all_tracks(NULL) == 0)
             position = PLAYLIST_INSERT_LAST;
         else return -1;    }
 

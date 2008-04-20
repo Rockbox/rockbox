@@ -164,6 +164,6 @@ int playlist_save(struct playlist_info* playlist, char *filename);
 int playlist_directory_tracksearch(const char* dirname, bool recurse,
                                    int (*callback)(char*, void*),
                                    void* context);
-int remove_all_tracks(struct playlist_info *playlist);
+int playlist_remove_all_tracks(struct playlist_info *playlist);
 
 #endif /* __PLAYLIST_H__ */
