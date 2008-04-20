@@ -101,10 +101,7 @@ void panicf( const char *fmt, ...)
         /* try to restart firmware if ON is pressed */
 #if defined (CPU_PP)
         /* For now, just sleep the core */
-        if (CURRENT_CORE == CPU)
-            CPU_CTL = PROC_SLEEP;
-        else
-            COP_CTL = PROC_SLEEP;
+        sleep_core(CURRENT_CORE);
         #define system_reboot() nop
 #elif defined (TOSHIBA_GIGABEAT_F)
         if ((GPGDAT & (1 << 0)) != 0)

@@ -88,6 +88,60 @@ static inline unsigned int processor_id(void)
     return id;
 }
 
+#if CONFIG_CPU == PP5002
+static inline void sleep_core(int core)
+{
+    asm volatile (
+        /* Sleep: PP5002 crashes if the instruction that puts it to sleep is
+         * located at 0xNNNNNNN0. 4/8/C works. This sequence makes sure
+         * that the correct alternative is executed. Don't change the order
+         * of the next 4 instructions! */
+        "tst    pc, #0x0c       \n"
+        "mov    r0, #0xca       \n"
+        "strne  r0, [%[ctl]]    \n"
+        "streq  r0, [%[ctl]]    \n"
+        "nop                    \n" /* nop's needed because of pipeline */
+        "nop                    \n"
+        "nop                    \n"
+        :
+        : [ctl]"r"(&PROC_CTL(core))
+        : "r0"
+    );
+}
+static inline void wake_core(int core)
+{
+    asm volatile (
+        "mov    r0, #0xce       \n"
+        "str    r0, [%[ctl]]    \n"
+        :
+        : [ctl]"r"(&PROC_CTL(core))
+        : "r0"
+    );
+}
+#else /* PP502x */
+static inline void sleep_core(int core)
+{
+    asm volatile (
+        "mov    r0, #0x80000000  \n"
+        "str    r0, [%[ctl]]     \n"
+        "nop                     \n"
+        :
+        : [ctl]"r"(&PROC_CTL(core))
+        : "r0"
+    );
+}
+static inline void wake_core(int core)
+{
+    asm volatile (
+        "mov    r0, #0           \n"
+        "str    r0, [%[ctl]]     \n"
+        :
+        : [ctl]"r"(&PROC_CTL(core))
+        : "r0"
+    );
+}
+#endif
+
 #ifdef BOOTLOADER
 /* All addresses within rockbox are in IRAM in the bootloader so
    are therefore uncached */

@@ -604,7 +604,7 @@ void cop_main(void)
     /* This should never be reached */
 #endif
     while(1) {
-        COP_CTL = PROC_SLEEP;
+        sleep_core(COP);
     }
 }
 #endif /* CPU_PP */

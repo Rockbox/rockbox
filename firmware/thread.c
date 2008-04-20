@@ -404,8 +404,7 @@ void corelock_unlock(struct corelock *cl)
 #if NUM_CORES == 1
 static inline void core_sleep(void)
 {
-    PROC_CTL(CURRENT_CORE) = PROC_SLEEP;
-    nop; nop; nop;
+    sleep_core(CURRENT_CORE);
     enable_irq();
 }
 #else
@@ -429,7 +428,7 @@ static inline void core_sleep(unsigned int core)
         "tst    r1, r0, lsr #2             \n"
         "bne    1b                         \n"
         :
-        :  [ctl]"r"(&PROC_CTL(CPU)), [mbx]"r"(MBX_BASE), [c]"r"(core)
+        :  [ctl]"r"(&CPU_CTL), [mbx]"r"(MBX_BASE), [c]"r"(core)
         : "r0", "r1");
 #else /* C version for reference */
     /* Signal intent to sleep */
@@ -438,8 +437,8 @@ static inline void core_sleep(unsigned int core)
     /* Something waking or other processor intends to wake us? */
     if ((MBX_MSG_STAT & (0x10 << core)) == 0)
     {
-        PROC_CTL(core) = PROC_SLEEP; nop; /* Snooze */
-        PROC_CTL(core) = 0;               /* Clear control reg */
+        sleep_core(core);
+        wake_core(core);
     }
 
     /* Signal wake - clear wake flag */
@@ -455,22 +454,7 @@ static inline void core_sleep(unsigned int core)
 #if NUM_CORES == 1
 static inline void core_sleep(void)
 {
-    asm volatile (
-        /* Sleep: PP5002 crashes if the instruction that puts it to sleep is
-         * located at 0xNNNNNNN0. 4/8/C works. This sequence makes sure
-         * that the correct alternative is executed. Don't change the order
-         * of the next 4 instructions! */
-        "tst    pc, #0x0c     \n"
-        "mov    r0, #0xca     \n"
-        "strne  r0, [%[ctl]]  \n"
-        "streq  r0, [%[ctl]]  \n"
-        "nop                  \n" /* nop's needed because of pipeline */
-        "nop                  \n"
-        "nop                  \n"
-        :
-        : [ctl]"r"(&PROC_CTL(CURRENT_CORE))
-        : "r0"
-    );
+    sleep_core(CURRENT_CORE);
     enable_irq();
 }
 #else
@@ -505,7 +489,7 @@ static inline void core_sleep(unsigned int core)
         "bne    1b                         \n"
         :
         : [sem]"r"(&core_semaphores[core]), [c]"r"(core),
-          [ctl]"r"(&PROC_CTL(CPU))
+          [ctl]"r"(&CPU_CTL)
         : "r0"
         );
 #else /* C version for reference */
@@ -515,8 +499,7 @@ static inline void core_sleep(unsigned int core)
     /* Something waking or other processor intends to wake us? */
     if (core_semaphores[core].stay_awake == 0)
     {
-        PROC_CTL(core) = PROC_SLEEP; /* Snooze */
-        nop; nop; nop;
+        sleep_core(core);
     }
 
     /* Signal wake - clear wake flag */
@@ -640,7 +623,7 @@ void core_wake(unsigned int othercore)
 
     /* If sleeping, wake it up */
     if (PROC_STAT & PROC_SLEEPING(othercore))
-        PROC_CTL(othercore) = PROC_WAKE;
+        wake_core(othercore);
 
     /* Done with wake procedure */
     core_semaphores[othercore].intend_wake = 0;
@@ -747,15 +730,14 @@ static void core_thread_init(unsigned int core)
 #ifdef CPU_PP502x
         MBX_MSG_CLR = 0x3f;
 #endif
-        COP_CTL = PROC_WAKE;
+        wake_core(COP);
         /* Sleep until COP has finished */
-        CPU_CTL = PROC_SLEEP;
-        nop; nop; nop;
+        sleep_core(CPU);
     }
     else
     {
         /* Wake the CPU and return */
-        CPU_CTL = PROC_WAKE;
+        wake_core(CPU);
     }
 }
 #endif /* NUM_CORES */
