@@ -378,7 +378,7 @@ static void val_to_selection(struct settings_list *setting, int oldvalue,
                     table_setting_oldval = oldvalue;
                     table_setting_array_position = i;
                     *selected = i;
-                    *nb_items++;
+                    (*nb_items)++;
                 }
                 else if (oldvalue == info->values[i])
                     *selected = i;
