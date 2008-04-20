@@ -104,7 +104,16 @@ SECTIONS
 
     _vectorscopy = LOADADDR(.vectors);
 
-    .iram IRAMORIG :
+    .ibss IRAMORIG (NOLOAD) :
+    {
+        _iedata = .;
+        *(.qharray)
+        *(.ibss)
+        . = ALIGN(0x4);
+        _iend = .;
+    } > IRAM
+
+    .iram _iend :
     {
         _iramstart = .;
         *(.icode)
@@ -115,14 +124,6 @@ SECTIONS
     } > IRAM AT> DRAM
 
     _iramcopy = LOADADDR(.iram);
-
-    .ibss (NOLOAD) :
-    {
-        _iedata = .;
-        *(.ibss)
-        . = ALIGN(0x4);
-        _iend = .;
-    } > IRAM
 
     .idle_stacks (NOLOAD) :
     {

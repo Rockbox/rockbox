@@ -338,8 +338,15 @@ struct queue_head {
     unsigned int wait;              /* for softwate use, indicates if the transfer is blocking */
 } __attribute__((packed));
 
+#if CONFIG_CPU == IMX31L
 static struct queue_head qh_array[NUM_ENDPOINTS*2]
-    USBDEVBSS_ATTR __attribute__((aligned (2048)));
+    QHARRAY_ATTR __attribute__((aligned (2048)));
+#else
+/* This still needs to be 2048 byte aligned, but QHARRAY_ATTR should take
+   care of that */
+static struct queue_head qh_array[NUM_ENDPOINTS*2]
+    QHARRAY_ATTR __attribute__((aligned (4)));
+#endif
 
 static struct wakeup transfer_completion_signal[NUM_ENDPOINTS*2]
     SHAREDBSS_ATTR;

@@ -34,6 +34,7 @@
 #define FRAME_SIZE    (240*320*2)
 
 #define DEVBSS_ATTR   __attribute__((section(".devbss"),nocommon))
+#define QHARRAY_ATTR  __attribute__((section(".qharray"),nocommon))
 
 /*
  * AIPS 1

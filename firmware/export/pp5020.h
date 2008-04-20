@@ -21,6 +21,8 @@
 
 /* All info gleaned and/or copied from the iPodLinux project. */
 
+#define QHARRAY_ATTR   __attribute__((section(".qharray"),nocommon))
+
 /* DRAM starts at 0x10000000, but in Rockbox we remap it to 0x00000000 */
 #define DRAM_START       0x10000000
 
