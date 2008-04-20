@@ -156,7 +156,7 @@ void main(void)
 
     lcd_clear_display();
     printf("Hello world!");
-    printf("Gigabeat S Rockbox Bootloader v.00000007");
+    printf("Gigabeat S Rockbox Bootloader v.00000008");
     system_init();
     kernel_init();
     printf("kernel init done");
@@ -273,6 +273,11 @@ void main(void)
         usb_stop_monitoring();
 
         reset_screen();
+    }
+    else
+    {
+        /* Bang on the controller */
+        usb_init_device();
     }
 
     unsigned char *loadbuffer = (unsigned char *)0x0;

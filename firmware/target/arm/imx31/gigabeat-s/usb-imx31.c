@@ -28,6 +28,23 @@
 
 static int usb_status = USB_EXTRACTED;
 
+static void enable_transceiver(bool enable)
+{
+    if (enable)
+    {
+        if (GPIO1_DR & (1 << 30))
+        {
+            GPIO3_DR &= ~(1 << 16); /* Reset ISP1504 */
+            GPIO3_DR |= (1 << 16);
+            GPIO1_DR &= ~(1 << 30); /* Select ISP1504 */
+        }
+    }
+    else
+    {
+        GPIO1_DR |= (1 << 30); /* Deselect ISP1504 */
+    }
+}
+
 void usb_set_status(bool plugged)
 {
     usb_status = plugged ? USB_INSERTED : USB_EXTRACTED;
@@ -44,8 +61,17 @@ bool usb_plugged(void)
     return mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_USB4V4;
 }
 
+extern void usb_drv_startup(void);
+
 void usb_init_device(void)
 {
+    imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_ON_ALL);
+
+    enable_transceiver(true);
+
+    /* Module will be turned off later after firmware init */
+    usb_drv_startup();
+
     mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_USB4V4);
 }
 
@@ -54,18 +80,16 @@ void usb_enable(bool on)
     if (on)
     {
         imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_ON_ALL);
-        GPIO3_DR &= ~(1 << 16); /* Reset ISP1504 */
-        GPIO3_DR |= (1 << 16);
-        GPIO1_DR &= ~(1 << 30); /* Select ISP1504 */
+        enable_transceiver(true);
         usb_core_init();
     }
     else
     {
         /* Module clock should be on since this could be called first */
         imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_ON_ALL);
-        GPIO1_DR &= ~(1 << 30); /* Select ISP1504 */
+        enable_transceiver(true);
         usb_core_exit();
-        GPIO1_DR |= (1 << 30); /* Deselect ISP1504 */
+        enable_transceiver(false);
         imx31_clkctl_module_clock_gating(CG_USBOTG, CGM_OFF);
     }
 }

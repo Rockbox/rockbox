@@ -352,8 +352,6 @@ static const unsigned int pipe2mask[] = {
     0x10, 0x100000,
 };
 
-static bool first_init = true;
-
 /*-------------------------------------------------------------------------*/
 static void transfer_completed(void);
 static void control_received(void);
@@ -373,22 +371,34 @@ bool usb_drv_powered(void)
     return (REG_OTGSC & OTGSC_B_SESSION_VALID) ? true : false;
 }
 
+/* One-time driver startup init */
+void usb_drv_startup(void)
+{
+#if CONFIG_CPU == IMX31L && defined(BOOTLOADER)
+    /* This is the bootloader - activate the OTG controller or cold
+     * connect later could/will fail */
+    REG_USBCMD &= ~USBCMD_RUN;
+
+    sleep(HZ/20);
+    REG_USBCMD |= USBCMD_CTRL_RESET;
+    while (REG_USBCMD & USBCMD_CTRL_RESET);
+
+    /* Set to ULPI */
+    REG_PORTSC1 = (REG_PORTSC1 & ~PORTSCX_PHY_TYPE_SEL) | PORTSCX_PTS_ULPI;
+    sleep(HZ/10);
+#endif
+
+    /* Initialize all the signal objects once */
+    int i;
+    for(i=0;i<NUM_ENDPOINTS*2;i++) {
+        wakeup_init(&transfer_completion_signal[i]);
+    }
+}
+
 /* manual: 32.14.1 Device Controller Initialization */
 void usb_drv_init(void)
 {
     REG_USBCMD &= ~USBCMD_RUN;
-
-    if (first_init)
-    {
-        /* Initialize all the signal objects once */
-        int i;
-        for(i=0;i<NUM_ENDPOINTS*2;i++) {
-            wakeup_init(&transfer_completion_signal[i]);
-        }
-
-        first_init = false;
-    }
-
     sleep(HZ/20);
     REG_USBCMD |= USBCMD_CTRL_RESET;
     while (REG_USBCMD & USBCMD_CTRL_RESET);

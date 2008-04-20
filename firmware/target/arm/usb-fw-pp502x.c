@@ -66,6 +66,11 @@ void usb_init_device(void)
     GPIOC_ENABLE    |=  0x02;
     GPIOC_OUTPUT_EN &= ~0x02;
 #endif
+
+#ifdef HAVE_USBSTACK
+    /* Do one-time inits */
+    usb_drv_startup();
+#endif
 }
 
 void usb_enable(bool on)

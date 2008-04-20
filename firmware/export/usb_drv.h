@@ -21,6 +21,7 @@
 #include "usb_ch9.h"
 #include "kernel.h"
 
+void usb_drv_startup(void);
 void usb_drv_init(void);
 void usb_drv_exit(void);
 void usb_drv_int(void);
