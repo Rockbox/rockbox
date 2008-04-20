@@ -88,6 +88,7 @@ SECTIONS
     .devbss (NOLOAD) :
     {
         _devbssdata = .;
+    	*(.qharray)
         *(.devbss*)
         _devbssend = .;
     } > DEVBSS
