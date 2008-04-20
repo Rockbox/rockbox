@@ -19,8 +19,6 @@
 #ifndef _STATUS_H
 #define _STATUS_H
 
-extern enum playmode ff_mode;
-
 #if defined(HAVE_LCD_CHARCELLS)
 extern bool record;
 extern bool audio;

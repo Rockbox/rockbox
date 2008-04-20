@@ -50,7 +50,7 @@
 #include "pcm_record.h"
 #endif
 
-enum playmode ff_mode;
+static enum playmode ff_mode;
 
 void status_init(void)
 {
