@@ -11533,3 +11533,17 @@
     swcodec: "Tastentöne Wiederholung"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in keyclick settings menu
+  user:
+  <source>
+    *: "Zubehör Spannungsversorgung"
+  </source>
+  <dest>
+    *: "Zubehör Spannungsversorgung"
+  </dest>
+  <voice>
+    *: "Zubehör Spannungsversorgung"
+  </voice>
+</phrase>

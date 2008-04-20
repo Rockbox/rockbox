@@ -21,6 +21,8 @@
 #include "config.h"
 #include "adc.h"
 #include "powermgmt.h"
+#include "pcf5060x.h"
+#include "pcf50605.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -88,3 +90,20 @@ unsigned int battery_adc_voltage(void)
 {
     return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
 }
+
+#ifdef HAVE_ACCESSORY_SUPPLY
+void accessory_supply_set(bool enable)
+{
+    if (enable)
+    {
+        /* Accessory voltage supply */
+        pcf50605_write(PCF5060X_D2REGC1, 0xf8); /* 3.3V ON */
+    }
+    else
+    {
+        /* Accessory voltage supply */
+        pcf50605_write(PCF5060X_D2REGC1, 0x18); /* OFF */
+    }
+    
+}
+#endif

@@ -11576,3 +11576,17 @@
     swcodec: "Keyclick Repeats"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in keyclick settings menu
+  user:
+  <source>
+    *: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: "Accessory Power Supply"
+  </dest>
+  <voice>
+    *: "Accessory Power Supply"
+  </voice>
+</phrase>

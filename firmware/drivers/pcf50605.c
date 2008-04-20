@@ -79,27 +79,25 @@ void pcf50605_init(void)
 #if defined (IPOD_VIDEO)    
     /* I/O and GPO voltage supply (default: 0xf8 = 3.3V ON) */
     /* ECO not allowed regarding data sheet */
-    pcf50605_write(PCF5060X_IOREGC,  0xf8);  /* 3.3V ON */
+    pcf50605_write(PCF5060X_IOREGC,  0xf8); /* 3.3V ON */
     
     /* core voltage supply (default DCDC1/DCDC2: 0xec = 1.2V ON) */
     /* ECO not stable, assumed due to less precision of voltage in ECO mode */
-    pcf50605_write(PCF5060X_DCDC1,   0xec);  /* 1.2V ON */
-    pcf50605_write(PCF5060X_DCDC2,   0x0c);  /* OFF */
+    pcf50605_write(PCF5060X_DCDC1,   0xec); /* 1.2V ON */
+    pcf50605_write(PCF5060X_DCDC2,   0x0c); /* OFF */
     
     /* unknown (default: 0xe3 = 1.8V ON) */
-    pcf50605_write(PCF5060X_DCUDC1,  0xe3);  /* 1.8V ON */
+    pcf50605_write(PCF5060X_DCUDC1,  0xe3); /* 1.8V ON */
     
     /* WM8758 voltage supply (default: 0xf5 = 3.0V ON) */
     /* ECO not allowed as max. current of 5mA is not sufficient */
-    pcf50605_write(PCF5060X_D1REGC1, 0xf0);  /* 2.5V ON */
+    pcf50605_write(PCF5060X_D1REGC1, 0xf0); /* 2.5V ON */
     
     /* LCD voltage supply (default: 0xf5 = 3.0V ON) */
-    pcf50605_write(PCF5060X_D3REGC1, 0xf1);  /* 2.6V ON */
+    pcf50605_write(PCF5060X_D3REGC1, 0xf1); /* 2.6V ON */
 #else
     /* keep initialization from svn for other iPods */
     pcf50605_write(PCF5060X_D1REGC1, 0xf5); /* 3.0V ON */
     pcf50605_write(PCF5060X_D3REGC1, 0xf5); /* 3.0V ON */
 #endif
-    /* Dock Connector pin 17 (default: OFF) */
-    pcf50605_write(PCF5060X_D2REGC1, 0xf8); /* 3.3V ON */
 }

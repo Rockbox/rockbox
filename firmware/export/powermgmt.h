@@ -182,5 +182,7 @@ void reset_poweroff_timer(void);
 void cancel_shutdown(void);
 void shutdown_hw(void);
 void sys_poweroff(void);
-
+#ifdef HAVE_ACCESSORY_SUPPLY
+void accessory_supply_set(bool);
+#endif
 #endif

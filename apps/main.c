@@ -583,6 +583,9 @@ static void init(void)
 #if CONFIG_CHARGING
     car_adapter_mode_init();
 #endif
+#ifdef HAVE_ACCESSORY_SUPPLY
+    accessory_supply_set(global_settings.accessory_supply);
+#endif
 }
 
 #ifdef CPU_PP

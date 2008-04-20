@@ -71,6 +71,9 @@
 /* Define if the device can wake from an RTC alarm */
 #define HAVE_RTC_ALARM
 
+/* Define this if you can switch on/off the accessory power supply */
+#define HAVE_ACCESSORY_SUPPLY
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 

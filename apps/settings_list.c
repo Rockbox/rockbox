@@ -512,6 +512,10 @@ const struct settings_list settings[] = {
     OFFON_SETTING(NVRAM(1), car_adapter_mode,
         LANG_CAR_ADAPTER_MODE, false, "car adapter mode", NULL),
 #endif
+#ifdef HAVE_ACCESSORY_SUPPLY
+    OFFON_SETTING(0, accessory_supply, LANG_ACCESSORY_SUPPLY, 
+        false, "accessory power supply", accessory_supply_set),
+#endif
     /* tuner */
 #if CONFIG_TUNER
     OFFON_SETTING(0,fm_force_mono, LANG_FM_MONO_MODE,

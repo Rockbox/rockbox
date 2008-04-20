@@ -453,6 +453,9 @@ struct user_settings
     bool peak_meter_clipcounter;    /* clipping count indicator */
 #endif
     bool car_adapter_mode; /* 0=off 1=on */
+#ifdef HAVE_ACCESSORY_SUPPLY
+    bool accessory_supply; /* 0=off 1=on, accessory power supply for iPod */
+#endif
 
     /* show status bar */
     bool statusbar;    /* 0=hide, 1=show */
