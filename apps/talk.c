@@ -826,6 +826,7 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
     };
 
     char tbuf[8];
+    char fmt[] = "%0nd";
 
     if (talk_temp_disable_count > 0)
         return -1;  /* talking has been disabled */
@@ -865,7 +866,9 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
             n = -n;
         }
 
-        snprintf(tbuf, sizeof(tbuf), "%0*d", decimals, n % pow10[decimals]);
+        fmt[2] = '0' + decimals;
+
+        snprintf(tbuf, sizeof(tbuf), fmt, n % pow10[decimals]);
         talk_fractional(tbuf, n / pow10[decimals], unit_id);
 
         return 0;
