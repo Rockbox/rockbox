@@ -215,6 +215,8 @@ enum {
 };
 bool settings_save_config(int options);
 
+struct settings_list;
+void reset_setting(const struct settings_list *setting, void *var);
 void settings_reset(void);
 void sound_settings_apply(void);
 void settings_apply(bool read_disk);

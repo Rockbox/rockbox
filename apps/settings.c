@@ -941,33 +941,35 @@ void settings_apply(bool read_disk)
 /*
  * reset all settings to their default value
  */
-void settings_reset(void) 
+void reset_setting(const struct settings_list *setting, void *var)
+{
+    switch (setting->flags&F_T_MASK)
+    {
+    case F_T_INT:
+    case F_T_UINT:
+        if (setting->flags&F_DEF_ISFUNC)
+            *(int*)var = setting->default_val.func();
+        else if (setting->flags&F_T_SOUND)
+            *(int*)var = sound_default(setting->sound_setting->setting);
+        else *(int*)var = setting->default_val.int_;
+        break;
+    case F_T_BOOL:
+        *(bool*)var = setting->default_val.bool_;
+        break;
+    case F_T_CHARPTR:
+    case F_T_UCHARPTR:
+        strncpy((char*)var, setting->default_val.charptr,
+                setting->filename_setting->max_len);
+        break;
+    }
+}
+
+void settings_reset(void)
 {
     int i;
 
     for(i=0; i<nb_settings; i++)
-    {
-        switch (settings[i].flags&F_T_MASK)
-        {
-            case F_T_INT:
-            case F_T_UINT:
-                if (settings[i].flags&F_DEF_ISFUNC)
-                    *(int*)settings[i].setting = settings[i].default_val.func();
-                else if (settings[i].flags&F_T_SOUND)
-                    *(int*)settings[i].setting = 
-                            sound_default(settings[i].sound_setting->setting);
-                else *(int*)settings[i].setting = settings[i].default_val.int_;
-                break;
-            case F_T_BOOL:
-                *(bool*)settings[i].setting = settings[i].default_val.bool_;
-                break;
-            case F_T_CHARPTR:
-            case F_T_UCHARPTR:
-                strncpy((char*)settings[i].setting,
-                        settings[i].default_val.charptr,MAX_FILENAME);
-                break;
-        }
-    } /* for(...) */
+        reset_setting(&settings[i], settings[i].setting);
 #if defined (HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_reset();
 #endif

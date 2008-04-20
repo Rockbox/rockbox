@@ -349,6 +349,82 @@ static void bool_funcwrapper(int value)
         boolfunction(false);
 }
 
+static void val_to_selection(struct settings_list *setting, int oldvalue,
+                             int *nb_items, int *selected,
+                             void (**function)(int))
+{
+    int var_type = setting->flags&F_T_MASK;
+    /* set the number of items and current selection */
+    if (var_type == F_T_INT || var_type == F_T_UINT)
+    {
+        if (setting->flags&F_CHOICE_SETTING)
+        {
+            *nb_items = setting->choice_setting->count;
+            *selected = oldvalue;
+            *function = setting->choice_setting->option_callback;
+        }
+        else if (setting->flags&F_TABLE_SETTING)
+        {
+            const struct table_setting *info = setting->table_setting;
+            int i;
+            *nb_items = info->count;
+            *selected = -1;
+            table_setting_array_position = -1;
+            for (i=0;*selected==-1 && i<*nb_items;i++)
+            {
+                if (setting->flags&F_ALLOW_ARBITRARY_VALS &&
+                    (oldvalue < info->values[i]))
+                {
+                    table_setting_oldval = oldvalue;
+                    table_setting_array_position = i;
+                    *selected = i;
+                    *nb_items++;
+                }
+                else if (oldvalue == info->values[i])
+                    *selected = i;
+            }
+            *function = info->option_callback;
+        }
+        else if (setting->flags&F_T_SOUND)
+        {
+            int setting_id = setting->sound_setting->setting;
+            int steps = sound_steps(setting_id);
+            int min = sound_min(setting_id);
+            int max = sound_max(setting_id);
+            *nb_items = (max-min)/steps + 1;
+#ifndef ASCENDING_INT_SETTINGS
+            *selected = (max - oldvalue) / steps;
+#else
+            *selected = (oldvalue - min) / steps;
+#endif
+            *function = sound_get_fn(setting_id);
+        }
+        else
+        {
+            const struct int_setting *info = setting->int_setting;
+            int min, max, step;
+            max = info->max;
+            min = info->min;
+            step = info->step;
+            *nb_items = (max-min)/step + 1;
+#ifndef ASCENDING_INT_SETTINGS
+            *selected = (max - oldvalue) / step;
+#else
+            *selected = (oldvalue - min) / step;
+#endif
+            *function = info->option_callback;
+        }
+    }
+    else if (var_type == F_T_BOOL)
+    {
+        *selected = oldvalue;
+        *nb_items = 2;
+        boolfunction = setting->bool_setting->option_callback;
+        if (boolfunction)
+            *function = bool_funcwrapper;
+    }
+}
+
 bool option_screen(struct settings_list *setting,
                    bool use_temp_var, unsigned char* option_title)
 {
@@ -386,75 +462,7 @@ bool option_screen(struct settings_list *setting,
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&lists, option_talk);
     
-    /* set the number of items and current selection */
-    if (var_type == F_T_INT || var_type == F_T_UINT)
-    {
-        if (setting->flags&F_CHOICE_SETTING)
-        {
-            nb_items = setting->choice_setting->count;
-            selected = oldvalue;
-            function = setting->choice_setting->option_callback;
-        }
-        else if (setting->flags&F_TABLE_SETTING)
-        {
-            const struct table_setting *info = setting->table_setting;
-            int i;
-            nb_items = info->count;
-            selected = -1;
-            table_setting_array_position = -1;
-            for (i=0;selected==-1 && i<nb_items;i++)
-            {
-                if (setting->flags&F_ALLOW_ARBITRARY_VALS &&
-                    (oldvalue < info->values[i]))
-                {
-                    table_setting_oldval = oldvalue;
-                    table_setting_array_position = i;
-                    selected = i;
-                    nb_items++;
-                }
-                else if (oldvalue == info->values[i])
-                    selected = i;
-            }
-            function = info->option_callback;
-        }
-        else if (setting->flags&F_T_SOUND)
-        {
-            int setting_id = setting->sound_setting->setting;
-            int steps = sound_steps(setting_id);
-            int min = sound_min(setting_id);
-            int max = sound_max(setting_id);
-            nb_items = (max-min)/steps + 1;
-#ifndef ASCENDING_INT_SETTINGS
-            selected = (max - oldvalue) / steps;
-#else
-            selected = (oldvalue - min) / steps;
-#endif
-            function = sound_get_fn(setting_id);
-        }
-        else
-        {
-            const struct int_setting *info = setting->int_setting;
-            int min, max, step;
-            max = info->max;
-            min = info->min;
-            step = info->step;
-            nb_items = (max-min)/step + 1;
-#ifndef ASCENDING_INT_SETTINGS
-            selected = (max - oldvalue) / step;
-#else
-            selected = (oldvalue - min) / step;
-#endif
-            function = info->option_callback;
-        }
-    }
-    else if (var_type == F_T_BOOL)
-    {
-        selected = oldvalue;
-        nb_items = 2;
-        boolfunction = setting->bool_setting->option_callback;
-        if (boolfunction)
-            function = bool_funcwrapper;
-    }
+    val_to_selection(setting, oldvalue, &nb_items, &selected, &function);
     gui_synclist_set_nb_items(&lists, nb_items);
     gui_synclist_select_item(&lists, selected);
     
@@ -505,6 +513,17 @@ bool option_screen(struct settings_list *setting,
             if (show_cancel)
                 gui_syncsplash(HZ/2, ID2P(LANG_CANCEL));
             done = true;
+        }
+        else if (action == ACTION_STD_CONTEXT)
+        {
+            reset_setting(setting, variable);
+            if (var_type == F_T_BOOL && !use_temp_var)
+                *(bool*)setting->setting = temp_var==1?true:false;
+            val_to_selection(setting, *variable, &nb_items,
+                             &selected, &function);
+            gui_synclist_select_item(&lists, selected);
+            gui_synclist_draw(&lists);
+            gui_synclist_speak_item(&lists);
         }
         else if (action == ACTION_STD_OK)
         {
