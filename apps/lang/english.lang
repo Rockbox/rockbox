@@ -11590,3 +11590,17 @@
     *: "Accessory Power Supply"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user:
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "Unknown"
+  </dest>
+  <voice>
+    *: "Unknown"
+  </voice>
+</phrase>

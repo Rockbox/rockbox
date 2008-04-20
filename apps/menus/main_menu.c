@@ -183,20 +183,34 @@ static char* info_getname(int selected_item, void *data,
 #if CONFIG_RTC
         case INFO_TIME:
             tm = get_time();
-            snprintf(buffer, buffer_len, "%02d:%02d:%02d %s", 
-                global_settings.timeformat == 0 ? tm->tm_hour :
-                     ((tm->tm_hour + 11) % 12) + 1,
-                     tm->tm_min, 
-                     tm->tm_sec, 
-                     global_settings.timeformat == 0 ? "" :
-                     tm->tm_hour>11 ? "P" : "A");
+            if (valid_time(tm))
+            {
+                snprintf(buffer, buffer_len, "%02d:%02d:%02d %s", 
+                    global_settings.timeformat == 0 ? tm->tm_hour :
+                         ((tm->tm_hour + 11) % 12) + 1,
+                         tm->tm_min, 
+                         tm->tm_sec, 
+                         global_settings.timeformat == 0 ? "" :
+                         tm->tm_hour>11 ? "P" : "A");
+            }
+            else
+            {
+                snprintf(buffer, buffer_len, "%s", "--:--:--");
+            }
             break;
         case INFO_DATE:
             tm = get_time();
-            snprintf(buffer, buffer_len, "%s %d %d", 
-                str(LANG_MONTH_JANUARY + tm->tm_mon),
-                tm->tm_mday,
-                tm->tm_year+1900);
+            if (valid_time(tm))
+            {
+                snprintf(buffer, buffer_len, "%s %d %d", 
+                    str(LANG_MONTH_JANUARY + tm->tm_mon),
+                    tm->tm_mday,
+                    tm->tm_year+1900);
+            }
+            else
+            {
+                snprintf(buffer, buffer_len, "%s", str(LANG_UNKNOWN));
+            }
             break;
 #endif
         case INFO_BUFFER: /* buffer */
@@ -270,6 +284,10 @@ static int info_speak_item(int selected_item, void * data)
 {
     struct info_data *info = (struct info_data*)data;
 
+#if CONFIG_RTC
+    struct tm *tm;
+#endif
+
     switch (selected_item)
     {
         case INFO_VERSION: /* version */
@@ -277,12 +295,28 @@ static int info_speak_item(int selected_item, void * data)
             talk_spell(appsversion, true);
             break;
 #if CONFIG_RTC
-        case INFO_TIME: 
+        case INFO_TIME:
+            tm = get_time();
             talk_id(VOICE_CURRENT_TIME, false);
-            talk_time(get_time(), true);
+            if (valid_time(tm))
+            {
+                talk_time(tm, true);
+            }
+            else
+            {
+                talk_id(LANG_UNKNOWN, true);
+            }
             break;
         case INFO_DATE:
-            talk_date(get_time(), true);
+            tm = get_time();
+            if (valid_time(tm))
+            {
+                talk_date(get_time(), true);
+            }
+            else
+            {
+                talk_id(LANG_UNKNOWN, true);
+            }
             break;
 #endif
         case INFO_BUFFER: /* buffer */
