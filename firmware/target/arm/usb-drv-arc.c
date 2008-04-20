@@ -645,6 +645,7 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait
     static long last_tick;
     struct transfer_descriptor* new_td;
 
+    int oldlevel = disable_irq_save();
 /*
     if (send && endpoint > EP_CONTROL) {
         logf("usb: sent %d bytes", len);
@@ -696,6 +697,8 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait
         goto pt_error;
     }
 
+    restore_irq(oldlevel);
+
     if (wait) {
         /* wait for transfer to finish */
         wakeup_wait(&transfer_completion_signal[pipe], TIMEOUT_BLOCK);
@@ -708,6 +711,9 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait
     }
 
 pt_error:
+    if(rc<0)
+        restore_irq(oldlevel);
+
     /* Error status must make sure an abandoned wakeup signal isn't left */
     if (rc < 0 && wait) {
         /* Cancel wait */
