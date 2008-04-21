@@ -35,7 +35,8 @@ enum tidy_system
 {
     TIDY_MAC = 0,
     TIDY_WIN = 1,
-    TIDY_BOTH = 2,
+    TIDY_NIX = 2,
+    TIDY_ALL = 3,
 };
 
 /* variable button definitions */
@@ -145,9 +146,9 @@ enum tidy_return tidy_removedir(const char *name, int *removed)
                 return TIDY_RETURN_ABORT;
             }
             if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-		        {
-		            rb->closedir(dir);
-    			      return TIDY_RETURN_USB;
+            {
+                rb->closedir(dir);
+                return TIDY_RETURN_USB;
             }
             
             rb->yield();
@@ -213,9 +214,9 @@ enum tidy_return tidy_clean(const char *name, int *removed, \
                 return TIDY_RETURN_ABORT;
             }
             if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-		        {
-		            rb->closedir(dir);
-    			      return TIDY_RETURN_USB;
+            {
+                rb->closedir(dir);
+                return TIDY_RETURN_USB;
             }
             
             rb->yield();
@@ -234,7 +235,7 @@ enum tidy_return tidy_clean(const char *name, int *removed, \
                     /* check if we are in root directory "/" */
                     if (rb->strcmp(name, "/") == 0)
                     {
-                        if ((system == TIDY_MAC) || (system == TIDY_BOTH))
+                        if ((system == TIDY_MAC) || (system == TIDY_ALL))
                         {
                             /* mac directories */
                             if (rb->strcmp(entry->d_name, ".Trashes") == 0)
@@ -247,7 +248,7 @@ enum tidy_return tidy_clean(const char *name, int *removed, \
                         
                         if (del == 0)
                         {
-                            if ((system == TIDY_WIN) || (system == TIDY_BOTH))
+                            if ((system == TIDY_WIN) || (system == TIDY_ALL))
                             {
                                 /* windows directories */
                                 if (rb->strcmp(entry->d_name, "Recycled") == 0 \
@@ -273,7 +274,7 @@ enum tidy_return tidy_clean(const char *name, int *removed, \
                 /* file */
                 del = 0;
                 
-                if ((system == TIDY_MAC) || (system == TIDY_BOTH))
+                if ((system == TIDY_MAC) || (system == TIDY_ALL))
                 {
                     /* remove mac files */
                     if ((rb->strcmp(entry->d_name, ".DS_Store") == 0) || \
@@ -293,7 +294,7 @@ enum tidy_return tidy_clean(const char *name, int *removed, \
                 
                 if (del == 0)
                 {
-                    if ((system == TIDY_WIN) || (system == TIDY_BOTH))
+                    if ((system == TIDY_WIN) || (system == TIDY_ALL))
                     {
                         /* remove windows files*/
                         if ((rb->strcmp(entry->d_name, "Thumbs.db") == 0))
@@ -308,9 +309,29 @@ enum tidy_return tidy_clean(const char *name, int *removed, \
                             rb->remove(fullname);
                             del = 1;
                         }
-                    }                    
+                    }
+                 }
+                 if (del == 0)
+                 {
+                    if ((system ==TIDY_NIX) || (system == TIDY_ALL))
+                    {
+                        /* remove linux files*/
+                        if ((rb->strcmp(entry->d_name, ".dolphinview") == 0) || \
+                            (rb->strncmp(entry->d_name, ".d3lphinview", 2) == 0))
+                        {
+                            *removed += 1; /* increment removed files counter */
+                            
+                            /* get absolute path */
+                            char fullname[MAX_PATH];
+                            tidy_get_absolute_path(entry, fullname, name);
+                            
+                            /* delete file */
+                            rb->remove(fullname);
+                            del = 1;
+                        }
+                   }
                 }
-            }  
+            }
         }
         rb->closedir(dir);
         return status;
@@ -354,17 +375,18 @@ enum plugin_status tidy_do(enum tidy_system system)
 
 int tidy_lcd_menu(void)
 {
-    int selection, ret = 2;
+    int selection, ret = 3;
     bool menu_quit = false;
     
     MENUITEM_STRINGLIST(menu,"Disktidy Menu",NULL,"Start Cleaning",
                         "Files to Clean","Quit");
     
-    static const struct opt_items system_option[3] = 
+    static const struct opt_items system_option[] = 
     {
         { "Mac", -1 },
         { "Windows", -1 },
-        { "Both", -1 }
+        { "Linux", -1 },
+        { "All", -1 }
     };
                       
     while (!menu_quit)
@@ -377,7 +399,7 @@ int tidy_lcd_menu(void)
                 break;
                 
             case 1:
-                rb->set_option("Files to Clean", &ret, INT, system_option, 3, NULL);
+                rb->set_option("Files to Clean", &ret, INT, system_option, 4, NULL);
                 break;
         
             default:
@@ -392,7 +414,7 @@ int tidy_lcd_menu(void)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    enum tidy_system system = TIDY_BOTH;
+    enum tidy_system system = TIDY_ALL;
     enum tidy_return status;
 
     (void)parameter;
@@ -408,12 +430,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             system = TIDY_WIN;
             break;
         case 2:
-            system = TIDY_BOTH;
+            system = TIDY_NIX;
+            break;
+        case 3:
+            system = TIDY_ALL;
             break;
         case 99:
             return PLUGIN_OK;
         default:
-            system = TIDY_BOTH;
+            system = TIDY_ALL;
     }
 
     while (true)
