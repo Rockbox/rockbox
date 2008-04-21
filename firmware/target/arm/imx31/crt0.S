@@ -198,10 +198,10 @@ remap_start:
                       (1 << 22))  /* Unaligned access support disabled */
     bic     r0, r0, #((1 << 21) | /* All performance features enabled */ \
                       (1 << 15))  /* Loads to PC set T bit */
-    bic     r0, r0, #((1 << 13) | /* Low vectors */ \
-                      (1 << 11))  /* Program flow prediction disabled (for now) */
+    bic     r0, r0, #((1 << 13))  /* Low vectors */
     orr     r0, r0, #((1 << 14) | /* Round-robin replacement for I/D caches */ \
                       (1 << 12) | /* L1 I-cache enabled */ \
+                      (1 << 11) | /* Program flow prediction enabled */ \
                       (1 <<  9) | /* ROM protection enabled */ \
                       (1 <<  8))  /* MMU protection enabled */
     orr     r0, r0, #((1 <<  2) | /* L1 D-cache enabled */ \
