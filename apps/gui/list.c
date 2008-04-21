@@ -787,10 +787,11 @@ static char simplelist_text[SIMPLELIST_MAX_LINES][SIMPLELIST_MAX_LINELENGTH];
 void simplelist_set_line_count(int lines)
 {
     if (lines < 0)
-        lines = 0;
-    else if (lines > SIMPLELIST_MAX_LINES)
-        lines = SIMPLELIST_MAX_LINES;
-    simplelist_line_count = 0;
+        simplelist_line_count = 0;
+    else if (lines >= SIMPLELIST_MAX_LINES)
+        simplelist_line_count = SIMPLELIST_MAX_LINES;
+    else
+        simplelist_line_count = lines;
 }
 /* get the current amount of lines shown */
 int simplelist_get_line_count(void)
