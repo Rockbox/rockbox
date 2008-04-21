@@ -1061,6 +1061,13 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
+#ifdef HAVE_MULTIVOLUME
+            if ((selected_file_attr & FAT_ATTR_VOLUME) &&
+                (this_item == &rename_file_item ||
+                 this_item == &delete_dir_item ||
+                 this_item == &clipboard_cut_item) )
+                return ACTION_EXIT_MENUITEM;
+#endif
             if (context == CONTEXT_ID3DB)
                 return ACTION_EXIT_MENUITEM;
             if (this_item == &clipboard_paste_item)
