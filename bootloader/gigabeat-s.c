@@ -156,7 +156,7 @@ void main(void)
 
     lcd_clear_display();
     printf("Hello world!");
-    printf("Gigabeat S Rockbox Bootloader v.00000008");
+    printf("Gigabeat S Rockbox Bootloader v.00000009");
     system_init();
     kernel_init();
     printf("kernel init done");

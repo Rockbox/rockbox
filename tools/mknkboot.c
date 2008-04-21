@@ -81,7 +81,7 @@ static uint32_t dualboot[] =
     0xe59f900c,      /* ldr     r9, [pc, #12] -> 0x53fa4000 */
     0xe5999000,      /* ldr     r9, [r9] */
     0xe3190010,      /* tst     r9, #16 ; 0x10 */
-#if 1
+#if 0
     /* Branch to Rockbox if hold is on */
     0x159ff004,      /* ldrne   pc, [pc, #4]  -> 0x89000000 */
 #else
