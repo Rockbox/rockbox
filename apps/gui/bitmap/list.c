@@ -202,7 +202,7 @@ void list_draw(struct screen *display, struct viewport *parent,
         }
 #endif
         if(i >= list->selected_item &&
-           i <  list->selected_item + list->selected_size)
+           i <  list->selected_item + list->selected_size && list->show_selection_marker)
         {/* The selected item must be displayed scrolling */
             if (global_settings.cursor_style == 1
 #ifdef HAVE_REMOTE_LCD
