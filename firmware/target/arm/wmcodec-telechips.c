@@ -38,7 +38,6 @@
 
 void audiohw_init(void)
 {
-    #warning function not implemented
 }
 
 void wmcodec_write(int reg, int data)

@@ -73,7 +73,7 @@
 #define PCLKCFG10  (*(volatile unsigned long *)0xF3000048)
 #define PCLKCFG11  (*(volatile unsigned long *)0xF300004C)
 #define PCLK_ADC   (*(volatile unsigned long *)0xF3000050)
-#define PCLKCFG13  (*(volatile unsigned long *)0xF3000054)
+#define PCLK_DAI   (*(volatile unsigned long *)0xF3000054)
 #define PCLKCFG14  (*(volatile unsigned long *)0xF3000058)
 #define PCLK_RFREQ (*(volatile unsigned long *)0xF300005C)
 #define PCLKCFG16  (*(volatile unsigned long *)0xF3000060)
@@ -170,6 +170,21 @@
 
 #define SDCFG1     (*(volatile unsigned long *)0xF1001000)
 #define MCFG1      (*(volatile unsigned long *)0xF1001008)
+
+/* DAI */
+
+#define DADO_L0     (*(volatile unsigned long *)0xF0059020)
+#define DADO_R0     (*(volatile unsigned long *)0xF0059024)
+#define DADO_L1     (*(volatile unsigned long *)0xF0059028)
+#define DADO_R1     (*(volatile unsigned long *)0xF005902c)
+#define DADO_L2     (*(volatile unsigned long *)0xF0059030)
+#define DADO_R2     (*(volatile unsigned long *)0xF0059034)
+#define DADO_L3     (*(volatile unsigned long *)0xF0059038)
+#define DADO_R3     (*(volatile unsigned long *)0xF005903c)
+#define DADO_L(_x_) (*(volatile unsigned int *)(0xF0059020+8*(_x_)))
+#define DADO_R(_x_) (*(volatile unsigned int *)(0xF0059024+8*(_x_)))
+#define DAMR        (*(volatile unsigned long *)0xF0059040)
+#define DAVC        (*(volatile unsigned long *)0xF0059044)
 
 /* Misc */
 

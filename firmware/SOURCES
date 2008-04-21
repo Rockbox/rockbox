@@ -925,7 +925,7 @@ target/arm/tcc780x/kernel-tcc780x.c
 target/arm/tcc780x/timer-tcc780x.c
 target/arm/wmcodec-telechips.c
 target/arm/tcc780x/debug-tcc780x.c
-target/arm/tcc780x/cowond2/pcm-cowond2.c
+target/arm/tcc780x/pcm-tcc780x.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* COWON_D2 */

@@ -142,12 +142,6 @@ void irq_handler(void)
                     "subs  pc, lr, #4           \n"); /* Return from IRQ */
 }
 
-void fiq_handler(void)
-{
-    asm volatile (
-        "subs   pc, lr, #4   \r\n"
-    );
-}
 #endif /* !defined(BOOTLOADER) */
 
 
@@ -254,7 +248,8 @@ void system_init(void)
 
 #if !defined(BOOTLOADER)
 
-    IRQSEL = -1;        /* set all interrupts to be IRQs not FIQs */
+    /* Set DAI interrupts as FIQ, all others are IRQ. */
+    IRQSEL = ~(DAI_RX_IRQ_MASK | DAI_TX_IRQ_MASK);
 
     POL = 0x200108;     /* IRQs 3,8,21 active low (as OF) */
     MODE = 0x20ce07c0;  /* IRQs 6-10,17-19,22-23,29 level-triggered (as OF) */
