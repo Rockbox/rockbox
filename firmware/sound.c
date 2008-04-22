@@ -300,93 +300,8 @@ static void set_prescaled_volume(void)
 #endif /* (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 */
 #endif /* !SIMULATOR */
 
-#if CONFIG_CODEC != SWCODEC
-int channel_configuration = SOUND_CHAN_STEREO;
-int stereo_width = 100;
-#endif
 
 #ifndef SIMULATOR
-
-#if CONFIG_CODEC != SWCODEC
-static void set_channel_config(void)
-{
-    /* default values: stereo */
-    unsigned long val_ll = 0x80000;
-    unsigned long val_lr = 0;
-    unsigned long val_rl = 0;
-    unsigned long val_rr = 0x80000;
-    
-    switch(channel_configuration)
-    {
-        /* case SOUND_CHAN_STEREO unnecessary */
-
-        case SOUND_CHAN_MONO:
-            val_ll = 0xc0000;
-            val_lr = 0xc0000;
-            val_rl = 0xc0000;
-            val_rr = 0xc0000;
-            break;
-
-        case SOUND_CHAN_CUSTOM:
-            {
-                /* fixed point variables (matching MAS internal format)
-                   integer part: upper 13 bits (inlcuding sign)
-                   fractional part: lower 19 bits */
-                long fp_width, fp_straight, fp_cross;
-                
-                fp_width = (stereo_width << 19) / 100;
-                if (stereo_width <= 100)
-                {
-                    fp_straight = - ((1<<19) + fp_width) / 2;
-                    fp_cross = fp_straight + fp_width;
-                }
-                else
-                {
-                    /* straight = - (1 + width) / (2 * width) */
-                    fp_straight = - ((((1<<19) + fp_width) / (fp_width >> 9)) << 9);
-                    fp_cross = (1<<19) + fp_straight;
-                }
-                val_ll = val_rr = fp_straight & 0xfffff;
-                val_lr = val_rl = fp_cross & 0xfffff;
-            }
-            break;
-
-        case SOUND_CHAN_MONO_LEFT:
-            val_ll = 0x80000;
-            val_lr = 0x80000;
-            val_rl = 0;
-            val_rr = 0;
-            break;
-
-        case SOUND_CHAN_MONO_RIGHT:
-            val_ll = 0;
-            val_lr = 0;
-            val_rl = 0x80000;
-            val_rr = 0x80000;
-            break;
-
-        case SOUND_CHAN_KARAOKE:
-            val_ll = 0xc0000;
-            val_lr = 0x40000;
-            val_rl = 0x40000;
-            val_rr = 0xc0000;
-            break;
-    }
-
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LL, &val_ll, 1); /* LL */
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_LR, &val_lr, 1); /* LR */
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RL, &val_rl, 1); /* RL */
-    mas_writemem(MAS_BANK_D0, MAS_D0_OUT_RR, &val_rr, 1); /* RR */
-#elif CONFIG_CODEC == MAS3507D
-    mas_writemem(MAS_BANK_D1, 0x7f8, &val_ll, 1); /* LL */
-    mas_writemem(MAS_BANK_D1, 0x7f9, &val_lr, 1); /* LR */
-    mas_writemem(MAS_BANK_D1, 0x7fa, &val_rl, 1); /* RL */
-    mas_writemem(MAS_BANK_D1, 0x7fb, &val_rr, 1); /* RR */
-#endif
-}
-
-#endif /* CONFIG_CODEC != SWCODEC */
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 unsigned long mdb_shape_shadow = 0;
@@ -494,26 +409,25 @@ void sound_set_treble(int value)
 
 void sound_set_channels(int value)
 {
+    if(!audio_is_initialized)
+        return;
+
 #if CONFIG_CODEC == SWCODEC
     dsp_callback(DSP_CALLBACK_SET_CHANNEL_CONFIG, value);
 #else
-    if(!audio_is_initialized)
-        return;
-    channel_configuration = value;
-    set_channel_config();
+    audiohw_set_channel(value);
 #endif
 }
 
 void sound_set_stereo_width(int value)
 {
+    if(!audio_is_initialized)
+        return;
+
 #if CONFIG_CODEC == SWCODEC
     dsp_callback(DSP_CALLBACK_SET_STEREO_WIDTH, value);
 #else
-    if(!audio_is_initialized)
-        return;
-    stereo_width = value;
-    if (channel_configuration == SOUND_CHAN_CUSTOM)
-        set_channel_config();
+    audiohw_set_stereo_width(value);
 #endif
 }
 

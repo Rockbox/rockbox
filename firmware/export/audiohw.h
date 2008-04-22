@@ -160,4 +160,24 @@ void audiohw_set_monitor(bool enable);
 
 #endif /*HAVE_RECORDING*/
 
+
+#if CONFIG_CODEC != SWCODEC
+
+/* functions which are only used by mas35xx codecs, but are also
+   aviable on SWCODECS through dsp */
+
+/**
+ * Set channel configuration.
+ * @param val new channel value (see enum Channel).
+ */
+void audiohw_set_channel(int val);
+
+/**
+ * Set stereo width.
+ * @param val new stereo width value.
+ */
+void audiohw_set_stereo_width(int val);
+
+#endif /* CONFIG_CODEC != SWCODEC */
+
 #endif /* _AUDIOHW_H_ */
