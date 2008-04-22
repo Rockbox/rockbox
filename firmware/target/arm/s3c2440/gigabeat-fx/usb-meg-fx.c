@@ -26,8 +26,8 @@
 #define USB_RST_ASSERT   GPBDAT &= ~(1 << 4)
 #define USB_RST_DEASSERT GPBDAT |=  (1 << 4)
 
-#define USB_VPLUS_PWR_ASSERT    GPBDAT |=  (1 << 6)
-#define USB_VPLUS_PWR_DEASSERT  GPBDAT &= ~(1 << 6)
+#define USB_VBUS_PWR_ASSERT    GPBDAT |=  (1 << 6)
+#define USB_VBUS_PWR_DEASSERT  GPBDAT &= ~(1 << 6)
 
 #define USB_UNIT_IS_PRESENT  !(GPFDAT & 0x01)
 #define USB_CRADLE_IS_PRESENT  ((GPFDAT &0x02)&&((GPGDAT&(3<<13))==(1<<13)))
@@ -46,16 +46,21 @@ int usb_detect(void)
 
 void usb_init_device(void)
 {
-    /* Input is the default configuration, only pullups need to be disabled */
-/*    GPFUP|=0x02;  */
+    /* Setup USB Cradle Power control (output, disabled, no pullup) */
+    GPHCON=( GPHCON&~(1<<17) ) | (1<<16);
+    GPHUP|=1<<8;
+    USB_CRADLE_BUS_DISABLE;
 
+    /* Setup VBUS PWR (output, asserted, no pullup) */
     GPBCON=( GPBCON&~(1<<13) ) | (1 << 12);
-    USB_VPLUS_PWR_ASSERT;
+    GPBUP|=1<<6;
+    USB_VBUS_PWR_ASSERT;
 
     sleep(HZ/20);
 
-    /* Reset the usb port */
+    /* Setup USB reset (output, asserted, no pullup) */
     GPBCON = (GPBCON & ~0x200) | 0x100; /* Make sure reset line is an output */
+    GPBUP|=1<<4;
     USB_RST_ASSERT;
 
     sleep(HZ/25);
@@ -71,25 +76,22 @@ void usb_init_device(void)
     sleep(HZ/25);
 
     /* leave chip in low power mode */
-    USB_VPLUS_PWR_DEASSERT;
+    USB_VBUS_PWR_DEASSERT;
 
     sleep(HZ/25);
 }
 
 void usb_enable(bool on)
-{
-    GPHCON=( GPHCON&~(1<<17) ) | (1<<16); /* Make the pin an output */
-    GPHUP|=1<<8;  /* Disable pullup in SOC as we are now driving */
-    
+{    
     if (on)
     {
-        USB_VPLUS_PWR_ASSERT;
+        USB_VBUS_PWR_ASSERT;
         if(USB_CRADLE_IS_PRESENT) USB_CRADLE_BUS_ENABLE;
     }
     else
     {
         if(USB_CRADLE_IS_PRESENT) USB_CRADLE_BUS_DISABLE;
-        USB_VPLUS_PWR_DEASSERT;
+        USB_VBUS_PWR_DEASSERT;
     }
 
     sleep(HZ/20); // > 50ms for detecting the enable state change
