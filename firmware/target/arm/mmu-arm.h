@@ -17,13 +17,16 @@
  *
  ****************************************************************************/
 
-#define CACHE_ALL (1 << 3 | 1 << 2 )
-#define CACHE_NONE 0
-#define BUFFERED (1 << 2)
+#define CACHE_ALL   0x0C
+#define CACHE_NONE  0
+#define BUFFERED    0x04
 
 void ttb_init(void);
 void enable_mmu(void);
-void map_section(unsigned int pa, unsigned int va, int mb, int cache_flags);
+void map_section(unsigned int pa, unsigned int va, int mb, int flags);
+
+/* Cleans entire DCache */
+void clean_dcache(void);
 
 /* Invalidate DCache for this range  */
 /* Will do write back */
@@ -36,8 +39,5 @@ void clean_dcache_range(const void *base, unsigned int size);
 /* Dump DCache for this range  */
 /* Will *NOT* do write back */
 void dump_dcache_range(const void *base, unsigned int size);
-
-/* Cleans entire DCache */
-void clean_dcache(void);
 
 void memory_init(void);

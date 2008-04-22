@@ -20,70 +20,111 @@
 #include "mmu-arm.h"
 #include "panic.h"
 
-#define SECTION_ADDRESS_MASK (-1 << 20)
-#define MB (1 << 20)
-
-void ttb_init(void) {
-    unsigned int* ttbPtr;
-
-    /* must be 16Kb (0x4000) aligned - clear out the TTB */
-    for (ttbPtr=TTB_BASE; ttbPtr<(TTB_SIZE+TTB_BASE); ttbPtr++)
-    {
-        *ttbPtr = 0;
-    }
-
-    /* Set the TTB base address */
-    asm volatile("mcr p15, 0, %0, c2, c0, 0" : : "r" (TTB_BASE));
-
-    /* Set all domains to manager status */
-    asm volatile("mcr p15, 0, %0, c3, c0, 0" : : "r" (0xFFFFFFFF));
+void __attribute__((naked)) ttb_init(void) {
+    asm volatile
+    (
+        "mcr p15, 0, %[ttbB], c2, c0, 0 \n" /* Set the TTB base address */
+        "mcr p15, 0, %[ffff], c3, c0, 0 \n" /* Set all domains to manager status */
+        "bx  lr                         \n"
+        : 
+        :   [ttbB] "r" (TTB_BASE), 
+            [ffff] "r" (0xFFFFFFFF)
+    );
 }
 
-void map_section(unsigned int pa, unsigned int va, int mb, int cache_flags) {
-    unsigned int* ttbPtr;
-    int i;
-    int section_no;
+void __attribute__((naked)) map_section(unsigned int pa, unsigned int va, int mb, int flags) {
+#if 0 /* This code needs to be fixed and the C needs to be replaced to ensure that stack is not used */
+    asm volatile
+    (
+        /* pa &= (-1 << 20);   // align to 1MB */
+        "mov  r0, r0, lsr #20   \n"
+        "mov  r0, r0, lsl #20   \n"
 
-    section_no = va >> 20; /* sections are 1Mb size */
-    ttbPtr = TTB_BASE + section_no;
-    pa &= SECTION_ADDRESS_MASK; /* align to 1Mb */
-    for(i=0; i<mb; i++, pa += MB) {
-        *(ttbPtr + i) =
-            pa |
-            1 << 10 |    /* superuser - r/w, user - no access */
-            0 << 5 |    /* domain 0th */
-            1 << 4 |    /* should be "1" */
-            cache_flags |
-            1 << 1;    /* Section signature */
-    }
-}
+        /* pa |= (flags | 0x412);
+         * bit breakdown:
+         *  10:     superuser - r/w, user - no access
+         *  4:      should be "1"
+         *  3,2:    Cache flags (flags (r3))
+         *  1:      Section signature 
+         */
 
-void enable_mmu(void) {
-    int regread;
-
-    asm volatile(
-        "MRC p15, 0, %r0, c1, c0, 0\n"  /* Read reg1, control register */
-    : /* outputs */
-        "=r"(regread)
-    : /* inputs */
-    : /* clobbers */
-        "r0"
+        "orr  r0, r0, r3        \n"
+        "orr  r0, r0, #0x410    \n"
+        "orr  r0, r0, #0x2      \n"
+        :
+        :
     );
 
-    if ( !(regread & 0x04) || !(regread & 0x00001000) ) /* Was the ICache or DCache Enabled? */
-        clean_dcache(); /* If so we need to clean the DCache before invalidating below */
+    register int *ttb_base asm ("r3") = TTB_BASE;   /* force in r3 */
 
-    asm volatile("mov r0, #0\n"
-        "mcr p15, 0, r0, c8, c7, 0\n" /* invalidate TLB */
+    asm volatile
+    (
+        /* unsigned int* ttbPtr = TTB_BASE + (va >> 20);
+         * sections are 1MB size 
+         */
 
-        "mcr p15, 0, r0, c7, c7,0\n" /* invalidate both icache and dcache */
+        "mov  r1, r1, lsr #20           \n"
+        "add  r1, %[ttbB], r1, lsl #0x2 \n" 
 
-        "mrc p15, 0, r0, c1, c0, 0\n"
-        "orr r0, r0, #1<<0\n" /* enable mmu bit, icache and dcache */
-        "orr r0, r0, #1<<2\n" /* enable dcache */
-        "orr r0, r0, #1<<12\n" /* enable icache */
-        "mcr p15, 0, r0, c1, c0, 0" : : : "r0");
-    asm volatile("nop \n nop \n nop \n nop");
+        /* Add MB to pa, flags are already present in pa, but addition 
+         *  should not effect them
+         *
+         * #define MB (1 << 20)
+         * for( ; mb>0; mb--, pa += MB)
+         * {
+         *     *(ttbPtr++) = pa;
+         * }
+         * #undef MB
+         */
+
+        "cmp  r2, #0                    \n"
+        "bxle lr                        \n"
+        "loop:                          \n"
+        "str  r0, [r1], #4              \n"
+        "add  r0, r0, #0x100000         \n"
+        "sub  r2, r2, #0x01             \n"
+        "bne  loop                      \n"
+        "bx   lr                        \n"
+        : 
+        :   [ttbB] "r" (ttb_base)   /* This /HAS/ to be in r3 */
+    );
+    (void) pa;
+    (void) va;
+    (void) mb;
+    (void) flags;
+#else
+    pa &= (-1 << 20);
+    pa |= (flags | 0x412);
+    unsigned int* ttbPtr = TTB_BASE + (va >> 20);
+
+#define MB (1 << 20)
+    for( ; mb>0; mb--, pa += MB)
+    {
+        *(ttbPtr++) = pa;
+    }
+#undef MB
+#endif
+}
+
+void __attribute__((naked)) enable_mmu(void) {
+    asm volatile(
+        "mov r0, #0                 \n"
+        "mcr p15, 0, r0, c8, c7, 0  \n" /* invalidate TLB */
+        "mcr p15, 0, r0, c7, c7,0   \n" /* invalidate both icache and dcache */
+        "mrc p15, 0, r0, c1, c0, 0  \n"
+        "orr r0, r0, #1             \n" /* enable mmu bit, icache and dcache */
+        "orr r0, r0, #1<<2          \n" /* enable dcache */
+        "orr r0, r0, #1<<12         \n" /* enable icache */
+        "mcr p15, 0, r0, c1, c0, 0  \n"
+        "nop                        \n" 
+        "nop                        \n"
+        "nop                        \n"
+        "nop                        \n"
+        "bx  lr                     \n"
+        : 
+        : 
+        : "r0"
+    );
 }
 
 #if CONFIG_CPU == IMX31L
@@ -105,35 +146,36 @@ void invalidate_dcache_range(const void *base, unsigned int size) {
     unsigned int addr = (((int) base) & ~31);    /* Align start to cache line*/
     unsigned int end = ((addr+size) & ~31)+64;  /* Align end to cache line, pad */
     asm volatile(
-"inv_start: \n"
-    "mcr p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
-    "add %0, %0, #32 \n"
-    "cmp %0, %1 \n"
-    "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
-    "addne %0, %0, #32 \n"
-    "cmpne %0, %1 \n"
-    "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
-    "addne %0, %0, #32 \n"
-    "cmpne %0, %1 \n"
-    "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
-    "addne %0, %0, #32 \n"
-    "cmpne %0, %1 \n"
-    "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
-    "addne %0, %0, #32 \n"
-    "cmpne %0, %1 \n"
-    "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
-    "addne %0, %0, #32 \n"
-    "cmpne %0, %1 \n"
-    "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
-    "addne %0, %0, #32 \n"
-    "cmpne %0, %1 \n"
-    "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
-    "addne %0, %0, #32 \n"
-    "cmpne %0, %1 \n"
-    "bne inv_start \n"
-    "mov %0, #0\n"
-    "mcr p15,0,%0,c7,c10,4\n"    /* Drain write buffer */
-        : : "r" (addr), "r" (end));
+        "inv_start: \n"
+        "mcr p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
+        "add %0, %0, #32 \n"
+        "cmp %0, %1 \n"
+        "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
+        "addne %0, %0, #32 \n"
+        "cmpne %0, %1 \n"
+        "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
+        "addne %0, %0, #32 \n"
+        "cmpne %0, %1 \n"
+        "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
+        "addne %0, %0, #32 \n"
+        "cmpne %0, %1 \n"
+        "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
+        "addne %0, %0, #32 \n"
+        "cmpne %0, %1 \n"
+        "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
+        "addne %0, %0, #32 \n"
+        "cmpne %0, %1 \n"
+        "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
+        "addne %0, %0, #32 \n"
+        "cmpne %0, %1 \n"
+        "mcrne p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
+        "addne %0, %0, #32 \n"
+        "cmpne %0, %1 \n"
+        "bne inv_start \n"
+        "mov %0, #0\n"
+        "mcr p15,0,%0,c7,c10,4\n"    /* Drain write buffer */
+        : : "r" (addr), "r" (end)
+    );
 }
 #endif
 
@@ -239,41 +281,20 @@ void __attribute__((naked)) clean_dcache(void)
 /* Cleans entire DCache */
 void clean_dcache(void)
 {
-    unsigned int index, addr;
+    unsigned int index, addr, low;
 
-    for(index = 0; index <= 63; index++) {
-        addr = (0 << 5) | (index << 26);
-        asm volatile(
-            "mcr p15, 0, %0, c7, c10, 2 \n" /* Clean this entry by index */
-            : : "r" (addr));
-        addr = (1 << 5) | (index << 26);
-        asm volatile(
-            "mcr p15, 0, %0, c7, c10, 2 \n" /* Clean this entry by index */
-            : : "r" (addr));
-        addr = (2 << 5) | (index << 26);
-        asm volatile(
-            "mcr p15, 0, %0, c7, c10, 2 \n" /* Clean this entry by index */
-            : : "r" (addr));
-        addr = (3 << 5) | (index << 26);
-        asm volatile(
-            "mcr p15, 0, %0, c7, c10, 2 \n" /* Clean this entry by index */
-            : : "r" (addr));
-        addr = (4 << 5) | (index << 26);
-        asm volatile(
-            "mcr p15, 0, %0, c7, c10, 2 \n" /* Clean this entry by index */
-            : : "r" (addr));
-        addr = (5 << 5) | (index << 26);
-        asm volatile(
-            "mcr p15, 0, %0, c7, c10, 2 \n" /* Clean this entry by index */
-            : : "r" (addr));
-        addr = (6 << 5) | (index << 26);
-        asm volatile(
-            "mcr p15, 0, %0, c7, c10, 2 \n" /* Clean this entry by index */
-            : : "r" (addr));
-        addr = (7 << 5) | (index << 26);
-        asm volatile(
-            "mcr p15, 0, %0, c7, c10, 2 \n" /* Clean this entry by index */
-            : : "r" (addr));
+    for(index = 0; index <= 63; index++) 
+    {
+        for(low = 0;low <= 7; low++)
+        {
+            addr = (index << 26) | (low << 5);
+            asm volatile
+            (
+                "mcr p15, 0, %[addr], c7, c10, 2 \n" /* Clean this entry by index */
+                : 
+                : [addr] "r" (addr)
+            );
+        }
     }
 }
 #endif

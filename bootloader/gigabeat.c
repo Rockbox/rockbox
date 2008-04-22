@@ -54,7 +54,6 @@ void main(void)
     int rc;
     int(*kernel_entry)(void);
 
-    memory_init();
     power_init();
     system_init();
     lcd_init();
@@ -98,6 +97,8 @@ void main(void)
     printf("Rockbox boot loader");
     printf("Version %s", version);
 
+    sleep(50); /* ATA seems to error without this pause */
+
     rc = ata_init();
     if(rc)
     {
@@ -115,8 +116,8 @@ void main(void)
 
     printf("Loading firmware");
 
-    loadbuffer = (unsigned char*) 0x100;
-    buffer_size = (unsigned char*)0x400000 - loadbuffer;
+    loadbuffer = (unsigned char*) 0x31000000;
+    buffer_size = (unsigned char*)0x31400000 - loadbuffer;
 
     rc = load_firmware(loadbuffer, BOOTFILE, buffer_size);
     if(rc < 0)

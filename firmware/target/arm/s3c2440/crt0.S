@@ -7,7 +7,11 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Copyright (C) 2008 by Karl Kurbjun
+ *
+ * Arm bootloader and startup code based on startup.s from the iPodLinux loader
+ *  Copyright (c) 2003, Daniel Palffy (dpalffy (at) rainstorm.org)
+ *  Copyright (c) 2005, Bernard Leach <leachbj@bouncycastle.org>
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -19,73 +23,183 @@
 #include "config.h"
 #include "cpu.h"
 
-    .section .init.text,"ax",%progbits
+/* Exception Handlers */
+.section .vectors,"ax",%progbits
+.code 32
 
-    .global    start
-start:
+.global vectors
+vectors:
+    b   start
+    b   undef_instr_handler
+    b   software_int_handler
+    b   prefetch_abort_handler
+    b   data_abort_handler
+    b   reserved_handler
+    b   irq_handler
+    b   fiq_handler
 
-/* Arm bootloader and startup code based on startup.s from the iPodLinux loader
- *
- * Copyright (c) 2003, Daniel Palffy (dpalffy (at) rainstorm.org)
- * Copyright (c) 2005, Bernard Leach <leachbj@bouncycastle.org>
- *
+/*
+ * Function: code_copy
+ *  Variables:
+ *      r0 = from
+ *      r1 = to
+ *      r2 = length
  */
-    msr    cpsr, #0xd3 /* enter supervisor mode, disable IRQ */
 
-#if !defined(BOOTLOADER)
-    /* Copy exception handler code to address 0 */
-    ldr    r2, =_vectorsstart
-    ldr    r3, =_vectorsend
-    ldr    r4, =_vectorscopy
-1:
-    cmp    r3, r2
-    ldrhi  r5, [r4], #4
-    strhi  r5, [r2], #4
-    bhi    1b
+.section    .init.text, "ax", %progbits
+.align      0x04
+.global     word_copy
+.type       word_copy, %function
+word_copy: 
+    sub     r2, r2, #0x04
+    cmp     r2, #0
+    ldrge   r3, [r0], #4
+    strge   r3, [r1], #4
+    bgt     word_copy
+    bx lr
+.ltorg  
+.size       word_copy, .-word_copy
+
+/*
+ * Entry: start
+ *  Variables:
+ *      none
+ */
+
+.section    .init.text,"ax",%progbits
+.code       32
+.align      0x04 /* Align */
+.global     start
+start:
+    msr     cpsr, #0xd3 /* enter supervisor mode, disable IRQ */
+
+    /* Disable the watchdog */
+    ldr     r2, =0x00000000
+    mov     r1, #0x53000000
+    str     r2, [r1]
+
+    /* Mask all Interupts to be safe */
+    ldr     r2, =0xFFFFFFFF
+    mov     r1, #0x4A000000
+    str     r2, [r1]
+
+    /* Submask too */
+    ldr     r2, =0x00003FFF
+    str     r2, [r1, #0x1C]
+
+    /* Check if loaded by the old bootloader or by the OF
+     * Be careful with code size above this as well.
+     */
+
+    /* Get the execute address (cannot be past 0x100 for this to work */
+    ldr     r0, =0xffffff00
+    and     r0, pc, r0
+
+    /* Calculate the length of the code needed to run/copy */
+    ldr     r1, = _vectorstart
+    ldr     r2, = _iramend
+    sub     r2, r2, r1
+
+    add     r3, r2, #0x30000000
+
+    /* Is there enough space to copy without overwriting? */
+    cmp     r0, r3
+
+    /* There's enough space, skip copying */
+    bgt     skipreset
+
+    /* Is this code running from 0x0?  If so skip copy. */
+    cmplt   r0, #0
+    beq     skipreset
+    
+    /* There's not enough space to copy without overwriting, copy to safe spot
+     * and reset
+     */
+    mov     r1, #0x31000000     /* copy location */
+    bl      word_copy
+
+    mov     pc, #0x31000000
+
+    skipreset:  
+
+    /* Initial Clock Setup */
+    mov     r2, #0x7
+    mov     r1, #0x4C000000
+    str     r2, [r1, #0x14]
+
+    mov     r2, #0x0
+    str     r2, [r1, #0x18]
+
+    ldr     r2, =0xFFFFFFFF
+    str     r2, [r1]
+
+    ldr     r2, =0x0003C042
+    str     r2, [r1, #0x08]
+
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+
+    ldr     r2, =0x000C9042
+    str     r2, [r1, #0x04]
+
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+
+    /* If we want to disable extraneous clocks, uncomment, but it can 
+     *  freeze the device 
+     */
+#if 0
+    ldr     r2, =0x6030
+    mov     r1, #0x4C000000
+    str     r2, [r1, #0x0C]
 #endif
 
-#if !defined(BOOTLOADER) && !defined(STUB)
-    /* Zero out IBSS */
-    ldr    r2, =_iedata
-    ldr    r3, =_iend
-    mov    r4, #0
-1:
-    cmp    r3, r2
-    strhi  r4, [r2], #4
-    bhi    1b
+    /* set Bus to Asynchronous mode (full speed) */    
+    mov     r0, #0
+    mrc     p15, 0, r0, c1, c0, 0
+    ldr     r1,  =0xC0000000
+    orr     r0, r0, r1 
+    mcr     p15, 0, r0, c1, c0, 0
 
-    /* Copy the IRAM */
-    ldr    r2, =_iramcopy
-    ldr    r3, =_iramstart
-    ldr    r4, =_iramend
-1:
-    cmp    r4, r3
-    ldrhi  r5, [r2], #4
-    strhi  r5, [r3], #4
-    bhi    1b
-#endif /* !BOOTLOADER, !STUB */
+    /* Setup MISCCR */
+    ldr     r2, =0x00613020
+    mov     r1, #0x56000000
+    str     r2, [r1, #0x80]
 
-    /* Initialise bss section to zero */
-    ldr    r2, =_edata
-    ldr    r3, =_end
-    mov    r4, #0
-1:
-    cmp    r3, r2
-    strhi  r4, [r2], #4
-    bhi    1b
-    
-    /* Set up some stack and munge it with 0xdeadbeef */
-    ldr    sp, =stackend
-    mov    r3, sp
-    ldr    r2, =stackbegin
-    ldr    r4, =0xdeadbeef
-1:
-    cmp    r3, r2
-    strhi  r4, [r2], #4
-    bhi    1b
-    
-#ifdef BOOTLOADER
-    /* Proper initialization pulled from 0x5070 */
+    /* Setup some unknown outputs in GPB and GPH */
+    ldr     r2, [r1, #0x10] 
+    mov     r3, #0x05
+    orr     r2, r3, r2
+    str     r2, [r1, #0x10]
+
+    ldr     r2, [r1, #0x14]
+    mov     r3, #0x03
+    orr     r2, r3, r2
+    str     r2, [r1, #0x14]
+
+    ldr     r2, [r1, #0x70] 
+    mov     r3, #0x05
+    orr     r2, r3, r2
+    str     r2, [r1, #0x70]
+
+    ldr     r2, [r1, #0x74]
+    mov     r3, #0x03
+    orr     r2, r3, r2
+    str     r2, [r1, #0x74]
+
+    /* Memory setup (taken from 0x5070) */
 
     /* BWSCON
      *      Reserved 0
@@ -120,7 +234,7 @@ start:
      *      Disable wait 0
      *      Not using UB/LB 0
      */
-    ldr     r2,=0x01055102
+    ldr     r2, =0x01055102
     mov     r1, #0x48000000
     str     r2, [r1]
 
@@ -133,8 +247,8 @@ start:
      *      Chip select setup time: 1 clock 01
      *      Address setup time: 0 clock 00
      */
-    ldr     r2,=0x00000D60
-    str     r2, [r1, #4]
+    ldr     r2, =0x00000D60
+    str     r2, [r1, #0x04]
 
 
     /* BANKCON1 
@@ -146,8 +260,8 @@ start:
      *      Chip select setup time: 0 clocks 00
      *      Address setup time: 0 clocks 00
      */
-    ldr     r2,=0x00000000
-    str     r2, [r1, #8]
+    ldr     r2, =0x00000000
+    str     r2, [r1, #0x08]
 
     /* BANKCON2 
      *      Pagemode: normal (1 data) 00
@@ -158,17 +272,17 @@ start:
      *      Chip select setup time: 4 clocks 11
      *      Address setup time: 0 clocks 00
      */
-    ldr     r2,=0x00001FA0
+    ldr     r2, =0x00001FA0
     str     r2, [r1, #0xC]
 
     /* BANKCON3 */
-    ldr     r2,=0x00001D80
+    ldr     r2, =0x00001D80
     str     r2, [r1, #0x10]
     /* BANKCON4 */
     str     r2, [r1, #0x14]
 
     /* BANKCON5 */
-    ldr     r2,=0x00000000
+    ldr     r2, =0x00000000
     str     r2, [r1, #0x18]
 
     /* BANKCON6/7
@@ -181,13 +295,13 @@ start:
      *      Tacs:   0 clock     00
      *      MT:     Sync DRAM   11
      */
-    ldr     r2,=0x00018005
+    ldr     r2, =0x00018005
     str     r2, [r1, #0x1C]
     /* BANKCON7 */
     str     r2, [r1, #0x20]
 
     /* REFRESH */
-    ldr     r2,=0x00980501
+    ldr     r2, =0x00980501
     str     r2, [r1, #0x24]
 
     /* BANKSIZE
@@ -198,117 +312,158 @@ start:
      *      Reserved: 0         0
      *      BURST_EN: enabled   1
      */
-    ldr     r2,=0x00000090
+    ldr     r2, =0x00000090
     str     r2, [r1, #0x28]
 
     /* MRSRB6 */
-    ldr     r2,=0x00000030
+    ldr     r2, =0x00000030
     str     r2, [r1, #0x2C]
     /* MRSRB7 */
     str     r2, [r1, #0x30]
     
 #if 0
-    /* This next part I am not sure of the purpose */
-    
     /* GPACON */
-    mov    r2,#0x01FFFCFF
-    str    r2,=0x56000000
+    mov     r1, #0x56000000
+    ldr     r2, =0x01FFFCFF /* 0x01FFFCFF */
+    str     r2, [r1]
     
     /* GPADAT */
-    mov    r2,#0x01FFFEFF
-    str    r2,=0x56000004
+    ldr     r2, =0x01FFFEFF
+    str     r2, [r1, #0x04]
 
     /* MRSRB6 */
-    mov    r2,#0x00000000
-    str    r2,=0x4800002C
+    mov     r1, #0x48000000
+    mov     r2, #0x00000000
+    str     r2, [r1, #0x2C]
 
     /* GPADAT */
-    ldr     r2,=0x01FFFFFF
+    mov     r1, #0x56000000
+    ldr     r2, =0x01FFFFFF     
+    str     r2, [r1, #0x04]
+
+    /* MRSRB6 */
+    mov     r1, #0x48000000
+    mov     r2, #0x00000030
+    str     r2, [r1, #0x2C]
+
+    /* GPACON */
     mov     r1, #0x56000000 
-    str     r2, [r1, #4]
-
-    /* MRSRB6 */
-    mov    r2,#0x00000030
-    str    r2,=0x4800002C
-
-    /* GPACON */
-    mov    r2,#0x01FFFFFF
-    str    r2,=0x56000000
+    mov     r2, #0x01FFFFFF
+    str     r2, [r1]
 
     /* End of the unknown */
 #endif
 
-    /* get the high part of our execute address */
-    ldr    r2, =0xffffff00
-    and    r4, pc, r2
+    /* The builds have two potential load addresses, one being from flash, 
+     * and the other from some "unknown" location right now the assumption
+     * is that the code is not at 0x3000000.
+     */   
+    /* get the high part of our execute address (where am I) */
+    ldr     r0, =0xfffff000
+    and     r0, pc, r0
 
-    /* Copy bootloader to safe area - 0x31000000 */
-    mov    r5, #0x30000000
-    add    r5, r5, #0x1000000
-    ldr    r6, = _dataend
-    sub    r0, r6, r5       /* length of loader */
-    add    r0, r4, r0     /* r0 points to start of loader */
-1:
-    cmp    r5, r6
-    ldrcc  r2, [r4], #4
-    strcc  r2, [r5], #4
-    bcc    1b
+    /* Copy code to 0x30000000 */
+    ldr     r2, = _vectorstart
+    ldr     r3, = _iramend
 
-    ldr    pc, =start_loc    /* jump to the relocated start_loc:  */
+    sub     r2, r3, r2           /* length of loader */
     
-start_loc:
-     bl main
+    ldr     r1, =0x30000000     /* copy location */   
+    
+    bl      word_copy
 
-#else /* BOOTLOADER */
+    ldr     r1, =donecopy
+    ldr     r2, =0x30000000
+    add     r1, r1, r2
+    mov     pc, r1           /* The code is located where we want it-jump*/
+
+donecopy: 
+
+    /* Setup the MMU, start by disabling */
+
+    mrc     p15, 0, r0, c1, c0, 0  
+    bic     r0, r0, #0x41      /* disable mmu and dcache */
+    bic     r0, r0, #0x1000   /* disable icache */
+    mcr     p15, 0, r0, c1, c0, 0
+
+    bl      ttb_init
+    
+    ldr     r0, =0x0
+    ldr     r1, =0x0
+    ldr     r2, =0x1000
+    mov     r3, #0
+    bl      map_section
+
+    ldr     r0, =0x30000000
+    ldr     r1, =0x0
+    mov     r2, #32
+    mov     r3, #12
+    bl      map_section
+
+    ldr     r0, =0x31FD6800     /* FRAME */
+    mov     r1, r0
+    mov     r2, #1
+    mov     r3, #4
+    bl      map_section        
+    
+    bl      enable_mmu   
+
+    /* Zero out IBSS */
+    ldr     r2, =_iedata
+    ldr     r3, =_iend
+    mov     r4, #0
+ibsszero:
+    cmp     r3, r2
+    strhi   r4, [r2], #4
+    bhi     ibsszero
+
+    /* Copy the IRAM */
+    ldr     r0, =_iramcopy
+    ldr     r1, =_iramstart
+    ldr     r2, =_iramend
+    sub     r2, r2, r1
+    bl      word_copy
+
+    /* Initialise bss section to zero */
+    ldr     r2, =_edata
+    ldr     r3, =_end
+    mov     r4, #0
+bsszero:
+    cmp     r3, r2
+    strhi   r4, [r2], #4
+    bhi     bsszero
+    
+    /* Set up some stack and munge it with 0xdeadbeef */
+    ldr     sp, =stackend
+    mov     r3, sp
+    ldr     r2, =stackbegin
+    ldr     r4, =0xdeadbeef
+stackmunge:
+    cmp     r3, r2
+    strhi   r4, [r2], #4
+    bhi     stackmunge
 
      /* Set up stack for IRQ mode */
-    msr    cpsr_c, #0xd2
-    ldr    sp, =irq_stack
+    msr     cpsr_c, #0xd2
+    ldr     sp, =irq_stack
     /* Set up stack for FIQ mode */ 
-    msr    cpsr_c, #0xd1
-    ldr    sp, =fiq_stack
+    msr     cpsr_c, #0xd1
+    ldr     sp, =fiq_stack
 
     /* Let abort and undefined modes use IRQ stack */
-    msr    cpsr_c, #0xd7
-    ldr    sp, =irq_stack
-    msr    cpsr_c, #0xdb
-    ldr    sp, =irq_stack
+    msr     cpsr_c, #0xd7
+    ldr     sp, =irq_stack
+    msr     cpsr_c, #0xdb
+    ldr     sp, =irq_stack
     /* Switch to supervisor mode */
-    msr    cpsr_c, #0xd3
-    ldr    sp, =stackend
-    bl     main
-    /* main() should never return */
+    msr     cpsr_c, #0xd3
+    ldr     sp, =stackend
 
-/* Exception handlers. Will be copied to address 0 after memory remapping */
-    .section .vectors,"aw"
-    ldr    pc, [pc, #24]
-    ldr    pc, [pc, #24]
-    ldr    pc, [pc, #24]
-    ldr    pc, [pc, #24]
-    ldr    pc, [pc, #24]
-    ldr    pc, [pc, #24]
-    ldr    pc, [pc, #24]
-    ldr    pc, [pc, #24]
+    /* Start the main function */
+    ldr     pc, =main
 
-    /* Exception vectors */
-    .global vectors
-vectors:
-    .word  start 
-    .word  undef_instr_handler
-    .word  software_int_handler
-    .word  prefetch_abort_handler
-    .word  data_abort_handler
-    .word  reserved_handler
-    .word  irq_handler
-    .word  fiq_handler
-
-    .text
-
-#ifndef STUB
-    .global irq
-    .global fiq
-    .global UIE
-#endif
+    /* Should never get here, but let's restart in case */
+//    b       vectors
 
 /* All illegal exceptions call into UIE with exception address as first
    parameter. This is calculated differently depending on which exception
@@ -337,11 +492,15 @@ data_abort_handler:
     mov    r1, #2
     b      UIE
 
-#ifdef STUB
-UIE:
+#if defined(BOOTLOADER)
+fiq_handler:
     b UIE
 #endif
 
+UIE:
+    b UIE
+
+.section .text
 /* 256 words of IRQ stack */
     .space 256*4
 irq_stack:
@@ -350,4 +509,3 @@ irq_stack:
     .space 256*4
 fiq_stack:
 
-#endif /* BOOTLOADER */

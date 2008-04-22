@@ -19,6 +19,12 @@
 #ifndef __S3C2440_H__
 #define __S3C2440_H__
 
+#define LCD_BUFFER_SIZE (320*240*2)
+#define TTB_SIZE (0x4000)
+/* must be 16Kb (0x4000) aligned */
+#define TTB_BASE   ((unsigned int *)(0x30000000 + (32*1024*1024) - TTB_SIZE)) /* End of memory */
+#define FRAME   ((short *) ((char *)TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
+
 /* Memory Controllers */
 
 #define BWSCON (*(volatile int *)0x48000000) /* Bus width & wait status control */
@@ -225,12 +231,6 @@
 #define LCDINTMSK (*(volatile int *)0x4D00005C) /* LCD interrupt mask */
 #define TCONSEL (*(volatile int *)0x4D000060) /* TCON(LPC3600/LCC3600) control */
 
-#define LCD_BUFFER_SIZE ((320*240*2))
-#define TTB_SIZE (0x4000)
-/*#define FRAME   ( (short *) 0x31E00000  ) */ /* LCD Frame buffer - Firmware Address */
-/* must be 16Kb (0x4000) aligned */
-#define TTB_BASE   ((unsigned int *)(0x30000000 + (32*1024*1024) - TTB_SIZE)) /* End of memory */
-#define FRAME   ((short *) ((char *)TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
 /* NAND Flash */
 
 #define NFCONF (*(volatile int *)0x4E000000) /* NAND flash configuration */

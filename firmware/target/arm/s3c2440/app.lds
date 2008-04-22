@@ -16,12 +16,9 @@ INPUT(target/arm/s3c2440/crt0.o)
 #endif
 
 #include "cpu.h"
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - 0x100 - STUBOFFSET - PLUGINSIZE - CODECSIZE - LCD_BUFFER_SIZE - TTB_SIZE
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGINSIZE - CODECSIZE - LCD_BUFFER_SIZE - TTB_SIZE
 
-#define DRAMORIG 0x00000100 + STUBOFFSET
-#define IRAMORIG DRAMORIG
-#define IRAM DRAM
-#define IRAMSIZE 0x1000
+#define DRAMORIG 0x00000000 + STUBOFFSET
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
@@ -36,17 +33,25 @@ MEMORY
 
 SECTIONS
 {
+    .vectors DRAMORIG :
+    {
+        _vectorstart = .;
+        *(.vectors*);
+        *(.init.text)
+        . = ALIGN(0x4);
+    } > DRAM
+
     .text :
     {
-        loadaddress = .;
-        _loadaddress = .;
-        . = ALIGN(0x200);
-        *(.init.text)
+        _textstart = .;
+        *(.text)
         *(.text*)
         *(.glue_7)
         *(.glue_7t)
         . = ALIGN(0x4);
     } > DRAM
+
+    _textcopy = LOADADDR(.text);
 
     .rodata :
     {
@@ -55,35 +60,18 @@ SECTIONS
         *(.rodata.str1.1)
         *(.rodata.str1.4)
         . = ALIGN(0x4);
-
-        /* Pseudo-allocate the copies of the data sections */
-        _datacopy = .;
     } > DRAM
 
-    /* TRICK ALERT! For RAM execution, we put the .data section at the
-       same load address as the copy. Thus, we don't waste extra RAM
-       when we don't actually need the copy.  */
-    .data : AT ( _datacopy )
+    .data :
     {
-        _datastart = .;
         *(.data*)
         . = ALIGN(0x4);
-        _dataend  = .;
     } > DRAM
 
     /DISCARD/ :
     {
         *(.eh_frame)
-    }
-
-    .vectors 0x0 :
-    {
-        _vectorsstart = .;
-        *(.vectors);
-        _vectorsend = .;
-    } AT> DRAM
-
-    _vectorscopy = LOADADDR(.vectors);
+    } 
 
     .iram :
     {
@@ -97,7 +85,7 @@ SECTIONS
 
     _iramcopy = LOADADDR(.iram);
 
-    .ibss (NOLOAD) :
+    .ibss :
     {
         _iedata = .;
         *(.ibss)
