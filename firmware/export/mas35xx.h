@@ -24,7 +24,16 @@
 
 #include "config.h"
 
-#if CONFIG_CODEC == MAS3507D
+#if CONFIG_CODEC != MAS3507D
+
+#define VOLUME_MIN -400
+#define VOLUME_MAX  600
+
+#else /* CONFIG_CODEC == MAS3507D */
+
+#define VOLUME_MIN -780
+#define VOLUME_MAX  180
+
 static const unsigned int bass_table[] =
 {
     0x9e400, /* -15dB */

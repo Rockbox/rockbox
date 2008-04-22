@@ -35,12 +35,8 @@
 #endif
 #endif
 
-#if CONFIG_CODEC == MAS3507D /* volume/balance/treble/bass interdependency */
-#define VOLUME_MIN -780
-#define VOLUME_MAX  180
-#elif !defined(VOLUME_MIN) && !defined(VOLUME_MAX)
-#define VOLUME_MIN -400
-#define VOLUME_MAX  600
+#if !defined(VOLUME_MIN) && !defined(VOLUME_MAX)
+#error define for VOLUME_MIN and VOLUME_MAX is missing
 #endif
 
 /* volume/balance/treble/bass interdependency main part */
