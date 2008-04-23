@@ -45,7 +45,9 @@ static int const remote_buttons[] =
 
 void button_init_device(void)
 {
-    /* Power, Remote Play & Hold switch */
+    /* Some button inputs need the internal pullups disabled to function */
+    GPGUP|=0x031F;
+    GPJUP|=0x1FFF;
 }
 
 inline bool button_hold(void)
