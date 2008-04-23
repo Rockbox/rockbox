@@ -19,6 +19,9 @@ stats.c
 stopwatch.c
 vbrfix.c
 viewer.c
+#ifdef HAVE_BACKLIGHT
+flashlight.c
+#endif /* HAVE_BACKLIGHT */
 
 #ifdef OLYMPUS_MROBE_500
 /* remove these once the plugins before it are compileable */

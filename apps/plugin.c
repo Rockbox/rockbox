@@ -141,6 +141,7 @@ static const struct plugin_api rockbox_api = {
     backlight_on,
     backlight_off,
     backlight_set_timeout,
+
 #if CONFIG_CHARGING
     backlight_set_timeout_plugged,
 #endif
@@ -576,6 +577,10 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    backlight_set_brightness,
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
 };
 
