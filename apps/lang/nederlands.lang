@@ -11533,3 +11533,31 @@
     swcodec: "Toetsklik herhaling"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in keyclick settings menu
+  user:
+  <source>
+    *: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: "Stroomvoorziening voor accessiores"
+  </dest>
+  <voice>
+    *: "Stroomvoorziening voor accessiores"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user:
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "Onbekend"
+  </dest>
+  <voice>
+    *: "Onbekend"
+  </voice>
+</phrase>
