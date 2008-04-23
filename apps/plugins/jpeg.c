@@ -2580,7 +2580,7 @@ int show_menu(void) /* return 1 to quit */
 
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
         case MIID_SHOW_PLAYBACK_MENU:
-            playback_control(rb);
+            playback_control(rb, NULL);
             break;
 #endif
 #ifdef HAVE_LCD_COLOR

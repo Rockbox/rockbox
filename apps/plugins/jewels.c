@@ -1698,7 +1698,7 @@ static int jewels_main(struct game_context* bj) {
                     continue;
 
                 case MRES_PLAYBACK:
-                    playback_control(rb);
+                    playback_control(rb, NULL);
                     rb->lcd_setfont(FONT_SYSFIXED);
                     inmenu = false;
                     selected = false;

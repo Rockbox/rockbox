@@ -25,6 +25,7 @@ extern const struct menu_item_ex playback_control_menu;
 void playback_control_init(struct plugin_api* newapi);
 
 /* Use this if your menu still uses the old menu api */
-bool playback_control(struct plugin_api* api);
+bool playback_control(struct plugin_api* api,
+                      struct viewport parent[NB_SCREENS]);
 
 #endif /* __PLAYBACK_CONTROL_H__ */

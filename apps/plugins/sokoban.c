@@ -1193,7 +1193,7 @@ static int sokoban_menu(void)
                 break;
 
             case 2: /* Audio playback control */
-                playback_control(rb);
+                playback_control(rb, NULL);
                 menu_quit = false;
                 break;
 

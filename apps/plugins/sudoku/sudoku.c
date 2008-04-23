@@ -1078,7 +1078,7 @@ bool sudoku_menu(struct sudoku_state_t* state)
 
     switch (result) {
         case SM_AUDIO_PLAYBACK:
-            playback_control(rb);
+            playback_control(rb, NULL);
             break;
 
 #ifdef HAVE_LCD_COLOR

@@ -747,7 +747,7 @@ int solitaire_menu(bool in_game)
                 break;
 
             case 4:
-                 playback_control(rb);
+                 playback_control(rb, NULL);
                  break;
 
             case 5:

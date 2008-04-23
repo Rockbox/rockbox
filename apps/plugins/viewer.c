@@ -1426,7 +1426,7 @@ static void viewer_menu(void)
             done = viewer_options_menu();
             break;
         case 2: /* playback control */
-            playback_control(rb);
+            playback_control(rb, NULL);
             break;
         case 3: /* return */
             break;

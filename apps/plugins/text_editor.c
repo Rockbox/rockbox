@@ -221,7 +221,8 @@ int do_item_menu(int cur_sel, char* copy_buffer)
     MENUITEM_STRINGLIST(menu, "Line Options", NULL, 
                         "Cut/Delete", "Copy",
                         "Insert Above", "Insert Below",
-                        "Concat To Above", "Save");
+                        "Concat To Above", "Save",
+                        "Show Playback Menu",);
 
     switch (rb->do_menu(&menu, NULL, NULL, false))
     {
@@ -259,6 +260,10 @@ int do_item_menu(int cur_sel, char* copy_buffer)
         break;
         case 5: /* save */
             ret = MENU_RET_SAVE;
+        break;
+        case 6: /* playback menu */
+            playback_control(rb, NULL);
+            ret = MENU_RET_UPDATE;
         break;
         default:
             ret = MENU_RET_NO_UPDATE;
@@ -474,7 +479,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                         case 0:
                         break;
                         case 1:
-                            playback_control(rb);
+                            playback_control(rb, NULL);
                         break;
                         case 2: //save to disk
                             save_changes(1);

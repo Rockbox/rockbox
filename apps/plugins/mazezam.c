@@ -641,7 +641,7 @@ static void in_game_menu(void)
             break;
 
         case 2: /* Audio playback */
-            playback_control(rb);
+            playback_control(rb, NULL);
             state = STATE_IN_LEVEL;
             break;
 
