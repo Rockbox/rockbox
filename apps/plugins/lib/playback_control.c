@@ -20,6 +20,7 @@
 #include "plugin.h"
 
 struct plugin_api* api = 0;
+struct viewport *parentvp = NULL;
 
 bool prevtrack(void)
 {
@@ -61,14 +62,14 @@ static bool volume(void)
 {
     const struct settings_list* vol = 
         api->find_setting(&api->global_settings->volume, NULL);
-    return api->option_screen((struct settings_list*)vol, false, "Volume");
+    return api->option_screen((struct settings_list*)vol, parentvp, false, "Volume");
 }
 
 static bool shuffle(void)
 {
     const struct settings_list* shuffle = 
         api->find_setting(&api->global_settings->playlist_shuffle, NULL);
-    return api->option_screen((struct settings_list*)shuffle, false, "Shuffle");
+    return api->option_screen((struct settings_list*)shuffle, parentvp, false, "Shuffle");
 }
 
 static bool repeat_mode(void)
@@ -77,7 +78,7 @@ static bool repeat_mode(void)
         api->find_setting(&api->global_settings->repeat_mode, NULL);
     int old_repeat = api->global_settings->repeat_mode;
   
-    api->option_screen((struct settings_list*)repeat, false, "Repeat");
+    api->option_screen((struct settings_list*)repeat, parentvp, false, "Repeat");
   
     if (old_repeat != api->global_settings->repeat_mode &&
         (api->audio_status() & AUDIO_STATUS_PLAY))
@@ -103,14 +104,17 @@ MAKE_MENU(playback_control_menu, "Playback Control", NULL, Icon_NOICON,
             &prevtrack_item, &playpause_item, &stop_item, &nexttrack_item,
             &volume_item, &shuffle_item, &repeat_mode_item);
 
-void playback_control_init(struct plugin_api* newapi)
+void playback_control_init(struct plugin_api* newapi,
+                           struct viewport parent[NB_SCREENS])
 {
     api = newapi;
+    parentvp = parent;
 }
 
 bool playback_control(struct plugin_api* newapi,
                       struct viewport parent[NB_SCREENS])
 {
     api = newapi;
+    parentvp = parent;
     return api->do_menu(&playback_control_menu, NULL, parent, false) == MENU_ATTACHED_USB;
 }

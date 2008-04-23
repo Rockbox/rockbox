@@ -304,7 +304,8 @@ void init_default_menu_viewports(struct viewport parent[NB_SCREENS], bool hide_b
 #endif
 }
 
-bool do_setting_from_menu(const struct menu_item_ex *temp)
+bool do_setting_from_menu(const struct menu_item_ex *temp,
+                          struct viewport parent[NB_SCREENS])
 {
     int setting_id, oldval;
     const struct settings_list *setting = find_setting(
@@ -351,7 +352,7 @@ bool do_setting_from_menu(const struct menu_item_ex *temp)
         title = padded_title;
     }
     
-    option_screen((struct settings_list *)setting, 
+    option_screen((struct settings_list *)setting, parent,
                   setting->flags&F_TEMPVAR, title);
     if (var_type == F_T_INT || var_type == F_T_UINT)
     {
@@ -585,7 +586,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 case MT_SETTING:
                 case MT_SETTING_W_TEXT:
                 {
-                    if (do_setting_from_menu(temp))
+                    if (do_setting_from_menu(temp, menu_vp))
                     {
                         init_default_menu_viewports(menu_vp, hide_bars);
                         init_menu_lists(menu, &lists, selected, true,vps);

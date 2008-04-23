@@ -99,7 +99,8 @@ struct menu_item_ex {
 
 typedef int (*menu_callback_type)(int action,
                                   const struct menu_item_ex *this_item);
-bool do_setting_from_menu(const struct menu_item_ex *temp);
+bool do_setting_from_menu(const struct menu_item_ex *temp,
+                          struct viewport parent[NB_SCREENS]);
 
 /* 
    int do_menu(const struct menu_item_ex *menu, int *start_selected)

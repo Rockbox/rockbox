@@ -19,9 +19,12 @@
 
 #ifndef _GUI_OPTION_SELECT_H_
 #define _GUI_OPTION_SELECT_H_
+#include "config.h"
+#include "screen_access.h"
 #include "settings.h"
 
 bool option_screen(struct settings_list *setting,
+                   struct viewport parent[NB_SCREENS],
                    bool use_temp_var, unsigned char* option_title);
 
 struct option_select

@@ -426,6 +426,7 @@ static void val_to_selection(struct settings_list *setting, int oldvalue,
 }
 
 bool option_screen(struct settings_list *setting,
+                   struct viewport parent[NB_SCREENS],
                    bool use_temp_var, unsigned char* option_title)
 {
     int action;
@@ -451,7 +452,7 @@ bool option_screen(struct settings_list *setting,
     }
     else return false; /* only int/bools can go here */
     gui_synclist_init(&lists, value_setting_get_name_cb,
-                      (void*)setting, false, 1, NULL);
+                      (void*)setting, false, 1, parent);
     if (setting->lang_id == -1)
         title = (char*)setting->cfg_vals;
     else

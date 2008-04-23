@@ -134,7 +134,7 @@ static int do_option(void * param)
 {
     const struct menu_item_ex *setting = (const struct menu_item_ex*)param;
     lowlatency_callback(ACTION_ENTER_MENUITEM, setting);
-    do_setting_from_menu(setting);
+    do_setting_from_menu(setting, NULL);
     eq_apply();
     lowlatency_callback(ACTION_EXIT_MENUITEM, setting);
     return 0;

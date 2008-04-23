@@ -569,6 +569,7 @@ struct plugin_api {
     /* options */
     const struct settings_list* (*find_setting)(const void* variable, int *id);
     bool (*option_screen)(struct settings_list *setting,
+                          struct viewport parent[NB_SCREENS],
                           bool use_temp_var, unsigned char* option_title);
     bool (*set_option)(const char* string, const void* variable,
                        enum optiontype type, const struct opt_items* options,
