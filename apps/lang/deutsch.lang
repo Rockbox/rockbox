@@ -11535,7 +11535,7 @@
 </phrase>
 <phrase>
   id: LANG_ACCESSORY_SUPPLY
-  desc: in keyclick settings menu
+  desc: in system settings menu
   user:
   <source>
     *: "Zubehör Spannungsversorgung"
