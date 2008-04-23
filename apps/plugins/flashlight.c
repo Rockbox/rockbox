@@ -65,6 +65,14 @@ PLUGIN_HEADER
 #   define FLASHLIGHT_NEXT       BUTTON_SCROLL_UP
 #   define FLASHLIGHT_PREV       BUTTON_SCROLL_DOWN
 
+#elif CONFIG_KEYPAD == MROBE500_PAD
+#   define FLASHLIGHT_LEFT       BUTTON_LEFT
+#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
+
+#elif CONFIG_KEYPAD == COWOND2_PAD
+#   define FLASHLIGHT_LEFT       BUTTON_LEFT
+#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
+
 #else
 #   error Missing key definitions for this keypad
 #endif
