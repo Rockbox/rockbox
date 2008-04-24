@@ -159,7 +159,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case (FLASHLIGHT_NEXT|BUTTON_REL):
 #endif /* FLASHLIGHT_NEXT */
 #ifdef FLASHLIGHT_PREV
-            case FLASHLIGHT_PREV:
             case (FLASHLIGHT_PREV|BUTTON_REPEAT):
             case (FLASHLIGHT_PREV|BUTTON_REL):
 #endif /* FLASHLIGHT_PREV */
