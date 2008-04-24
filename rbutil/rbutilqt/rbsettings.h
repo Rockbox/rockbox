@@ -141,8 +141,10 @@ class RbSettings : public QObject
         
         
         //! private copy constructors to prvent copying
-        RbSettings&  operator= (const RbSettings& other) {return *this; }
-        RbSettings(const RbSettings& other) {}
+        RbSettings&  operator= (const RbSettings& other)
+            { (void)other; return *this; }
+        RbSettings(const RbSettings& other)
+            { (void)other; }
     
         //! pointers to our setting objects
         QSettings *devices;
