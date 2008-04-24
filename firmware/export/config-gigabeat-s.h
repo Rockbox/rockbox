@@ -43,7 +43,7 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-//#define CONFIG_RTC RTC_IMX31L
+#define CONFIG_RTC RTC_MC13783
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT

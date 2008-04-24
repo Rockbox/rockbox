@@ -165,6 +165,7 @@
 #define RTC_TCC77X   10
 #define RTC_TCC780X  11
 #define RTC_MR100  12
+#define RTC_MC13783  13 /* Freescale MC13783 PMIC */
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */

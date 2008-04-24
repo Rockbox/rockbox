@@ -149,6 +149,8 @@ drivers/rtc/rtc_as3514.c
 drivers/rtc/rtc_rx5x348ab.c
 #elif (CONFIG_RTC == RTC_MR100)
 drivers/rtc/rtc_mr100.c
+#elif (CONFIG_RTC == RTC_MC13783)
+drivers/rtc/rtc_mc13783.c
 #endif /* (CONFIG_RTC == RTC_) */
 #endif /* SIMULATOR */
 
