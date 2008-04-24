@@ -28,6 +28,7 @@ static int dirs_count;
 static int lasttick;
 #define RFA_FILE ROCKBOX_DIR "/folder_advance_list.dat"
 #define RFADIR_FILE ROCKBOX_DIR "/folder_advance_dir.txt"
+#define RFA_FILE_TEXT ROCKBOX_DIR "/folder_advance_list.txt"
 #define MAX_REMOVED_DIRS 10
 
 char *buffer = NULL;
@@ -39,29 +40,6 @@ struct file_format {
     char folder[][MAX_PATH];
 };
 struct file_format *list = NULL;
-#if CONFIG_KEYPAD == PLAYER_PAD 
-
-#elif (CONFIG_KEYPAD == RECORDER_PAD) \
-   || (CONFIG_KEYPAD == ONDIO_PAD)
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) \
-   || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-
-#endif
 
 void update_screen(bool clear)
 {
@@ -253,6 +231,7 @@ void generate(void)
     rb->lseek(fd,0,SEEK_SET);
     rb->write(fd,&dirs_count,sizeof(int));
     rb->close(fd);
+    rb->splash(HZ, "Done");
 }
 char *list_get_name_cb(int selected_item, void* data, char* buf, size_t buf_len)
 {
@@ -261,21 +240,63 @@ char *list_get_name_cb(int selected_item, void* data, char* buf, size_t buf_len)
     return buf;
 }
 
+int load_list(void)
+{
+    int myfd = rb->open(RFA_FILE,O_RDONLY);
+    if (myfd < 0)
+        return -1;
+    buffer = rb->plugin_get_audio_buffer((size_t *)&buffer_size);
+    if (!buffer)
+    {
+        return -2;
+    }
+    
+    rb->read(myfd,buffer,buffer_size);
+    rb->close(myfd);
+    list = (struct file_format *)buffer;
+    
+    return 0;
+}
+
+int save_list(void)
+{
+    int myfd = rb->creat(RFA_FILE);
+    if (myfd < 0)
+    {
+        rb->splash(HZ, "Could Not Open " RFA_FILE);
+        return -1;
+    }
+    int dirs_count = 0, i = 0;
+    rb->write(myfd,&dirs_count,sizeof(int));
+    for ( ;i<list->count;i++)
+    {
+        if (list->folder[i][0] != ' ')
+        {
+            dirs_count++;
+            rb->write(myfd,list->folder[i],MAX_PATH);
+        }
+    }
+    rb->lseek(myfd,0,SEEK_SET);
+    rb->write(myfd,&dirs_count,sizeof(int));
+    rb->close(myfd);
+    
+    return 1;
+}
+
 void edit_list(void)
 {
     struct gui_synclist lists;
     bool exit = false;
     int button,i;
     int selection;
-    fd = rb->open(RFA_FILE,O_RDONLY);
-    if (fd < 0)
+    
+    /* load the dat file if not already done */
+    if ((list == NULL || list->count == 0) && (i = load_list()) != 0)
+    {
+        rb->splash(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
         return;
-    buffer = rb->plugin_get_audio_buffer((size_t *)&buffer_size);
-    if (!buffer)
-        return;
-    rb->read(fd,buffer,buffer_size);
-    rb->close(fd);
-    list = (struct file_format *)buffer;
+    }
+    
     dirs_count = list->count;
     
     rb->gui_synclist_init(&lists,list_get_name_cb,0, false, 1, NULL);
@@ -345,27 +366,7 @@ void edit_list(void)
                 switch (menu_show(m))
                 {
                     case 0:
-                        exit = true;
-                        rb->splash(HZ*2, "Saving " RFA_FILE);
-                        fd = rb->open(RFA_FILE, O_CREAT|O_WRONLY);
-                        if (fd < 0)
-                        {
-                            rb->splash(HZ, "Could Not Open " RFA_FILE);
-                            break;
-                        }
-                        dirs_count = 0;
-                        rb->write(fd,&dirs_count,sizeof(int));
-                        for (i=0;i<list->count;i++)
-                        {
-                            if (list->folder[i][0] != ' ')
-                            {
-                                dirs_count++;
-                                rb->write(fd,list->folder[i],MAX_PATH);
-                            }
-                        }
-                        rb->lseek(fd,0,SEEK_SET);
-                        rb->write(fd,&dirs_count,sizeof(int));
-                        rb->close(fd);
+                        save_list();
                     case 1:
                         exit = true;
                 }
@@ -375,12 +376,107 @@ void edit_list(void)
         }
     }
 }
+
+int export_list_to_file_text(void)
+{
+    int i = 0;
+    /* load the dat file if not already done */
+    if ((list == NULL || list->count == 0) && (i = load_list()) != 0)
+    {
+        rb->splash(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
+        return 0;
+    }
+        
+    if (list->count <= 0)
+    {
+        rb->splash(HZ*2, "no dirs in list file: %s", RFA_FILE);
+        return 0;
+    }
+        
+    /* create and open the file */
+    int myfd = rb->creat(RFA_FILE_TEXT);
+    if (myfd < 0)
+    {
+        rb->splash(HZ*4, "failed to open: fd = %d, file = %s", 
+            myfd, RFA_FILE_TEXT);
+        return -1;
+    }
+    
+    /* write each directory to file */
+    for (i = 0; i < list->count; i++)
+    {
+        if (list->folder[i][0] != ' ')
+        {
+            rb->fdprintf(myfd, "%s\n", list->folder[i]);
+        }
+    }
+    
+    rb->close(myfd);
+    rb->splash(HZ, "Done");
+    return 1;
+}
+
+int import_list_from_file_text(void)
+{
+    char line[MAX_PATH];
+    
+    buffer = rb->plugin_get_audio_buffer((size_t *)&buffer_size);
+    if (buffer == NULL)
+    {
+        rb->splash(HZ*2, "failed to get audio buffer");
+        return -1;
+    }
+
+    int myfd = rb->open(RFA_FILE_TEXT, O_RDONLY);
+    if (myfd < 0)
+    {
+        rb->splash(HZ*2, "failed to open: %s", RFA_FILE_TEXT);
+        return -1;
+    }
+    
+    /* set the list structure, and initialize count */
+    list = (struct file_format *)buffer;
+    list->count = 0;
+        
+    while ((rb->read_line(myfd, line, MAX_PATH - 1)) > 0)
+    {
+        /* copy the dir name, and skip the newline */
+        int len = rb->strlen(line);
+        /* remove CRs */
+        if (len > 0)
+        {
+            if (line[len-1] == 0x0A || line[len-1] == 0x0D)
+                line[len-1] = 0x00;
+            if (len > 1 && 
+                (line[len-2] == 0x0A || line[len-2] == 0x0D))
+                line[len-2] = 0x00;
+        }
+        
+        rb->strcpy(list->folder[list->count++], line);
+    }
+    
+    rb->close(myfd);
+    
+    if (list->count == 0)
+    {
+        load_list();
+    }
+    else
+    {
+        save_list();
+    }
+    rb->splash(HZ, "Done");
+    return list->count;
+}
+
 int main_menu(void)
 {
     int m;
     static const struct menu_item items[] = {
         { "Generate Folder List", NULL },
         { "Edit Folder List", NULL },
+        { "Export List To Textfile", NULL },
+        { "Import List From Textfile", NULL },
         { "Quit", NULL },
     };
     m = menu_init(rb, items, sizeof(items) / sizeof(*items),
@@ -414,7 +510,33 @@ int main_menu(void)
 #endif
             rb->backlight_on();
             break;
-        case 2:
+        case 2: /* export to textfile */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(true);
+#endif
+            export_list_to_file_text();
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(false);
+#endif
+#ifdef HAVE_REMOTE_LCD
+            rb->remote_backlight_on();
+#endif
+            rb->backlight_on();
+            break;
+        case 3: /* import from textfile */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(true);
+#endif
+            import_list_from_file_text();
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(false);
+#endif
+#ifdef HAVE_REMOTE_LCD
+            rb->remote_backlight_on();
+#endif
+            rb->backlight_on();
+            break;
+        case 4:
             menu_exit(m);
             return 1;
     }
