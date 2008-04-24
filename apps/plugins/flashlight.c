@@ -115,9 +115,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef HAVE_LCD_INVERT
 #ifdef OLYMPUS_MROBE_100
     /* mrobe-100 has inverted display so invert it for max brightness */
-    lcd_set_invert_display(true);
+    rb->lcd_set_invert_display(true);
 #else
-    lcd_set_invert_display(false);
+    rb->lcd_set_invert_display(false);
 #endif /* OLYMPUS_MROBE_100 */
 #endif /* HAVE_LCD_INVERT */
 
@@ -185,7 +185,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     backlight_use_settings(rb);
 
 #ifdef HAVE_LCD_INVERT
-    lcd_set_invert_display(rb->global_settings->invert);
+    rb->lcd_set_invert_display(rb->global_settings->invert);
 #endif /* HAVE_LCD_INVERT */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
