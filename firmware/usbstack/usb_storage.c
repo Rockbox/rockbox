@@ -359,7 +359,7 @@ void usb_storage_init_connection(int interface,int endpoint)
     /* prime rx endpoint. We only need room for commands */
     state = WAITING_FOR_COMMAND;
 
-#if CONFIG_CPU == IMX31L
+#if CONFIG_CPU == IMX31L || CONFIG_USBOTG == USBOTG_ISP1583
     static unsigned char _transfer_buffer[BUFFER_SIZE*2]
         USBDEVBSS_ATTR __attribute__((aligned(32)));
     tb.transfer_buffer = (void *)_transfer_buffer;

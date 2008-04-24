@@ -117,7 +117,7 @@ void usage(void)
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
            "\t                   ip3g, ip4g, mini, iax5, iam5, iam3, h10, h10_5gb,\n"
-           "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2)\n");
+           "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2, zvm)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -269,6 +269,8 @@ int main (int argc, char** argv)
             modelnum = 24;
         else if(!strcmp(&argv[1][5], "iam3"))
             modelnum = 25;
+        else if(!strcmp(&argv[1][5], "zvm"))
+            modelnum = 26;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;
@@ -344,6 +346,8 @@ int main (int argc, char** argv)
             return zvm_encode(iname, oname, ZENVISION);
         else if(!strcmp(&argv[1][10], "zenv"))
             return zvm_encode(iname, oname, ZENV);
+        else if(!strcmp(&argv[1][10], "zen"))
+            return zvm_encode(iname, oname, ZEN);
         else {
             fprintf(stderr, "unsupported Creative device: %s\n", &argv[1][10]);
             return 2;

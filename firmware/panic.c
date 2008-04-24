@@ -123,6 +123,8 @@ void panicf( const char *fmt, ...)
 #elif CONFIG_KEYPAD == ONDIO_PAD
         if (!(PCDR & 0x0008))
 #endif /* CONFIG_KEYPAD */
+#elif defined(CREATIVE_ZVM)
+        if(false)
 #endif /* CPU */
             system_reboot();
 #endif /* !SIMULATOR */

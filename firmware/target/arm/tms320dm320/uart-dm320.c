@@ -50,7 +50,7 @@ void uart_init(void)
     uart1_recieve_write=0;
 
     /* Enable the interrupt */
-    IO_INTC_EINT0 |= (1<<IRQ_UART1);
+    IO_INTC_EINT0 |= INTR_EINT0_UART1;
 }
 
 void uart1_putc(char ch)
@@ -75,7 +75,7 @@ void uart1_puts(const char *str, int size)
 /* This function returns the number of bytes left in the queue after a read is done (negative if fail)*/
 int uart1_gets_queue(char *str, unsigned int size)
 {
-    IO_INTC_EINT0 &= ~(1<<IRQ_UART1);
+    IO_INTC_EINT0 &= ~INTR_EINT0_UART1;
     int retval;
     
     if(uart1_recieve_count<size)
@@ -106,7 +106,7 @@ int uart1_gets_queue(char *str, unsigned int size)
     }
 
     /* Enable the interrupt */
-    IO_INTC_EINT0 |= (1<<IRQ_UART1);
+    IO_INTC_EINT0 |= INTR_EINT0_UART1;
 
     return retval;
 }
@@ -129,5 +129,5 @@ void UART1(void)
         }
     }
 
-    IO_INTC_IRQ0 = (1<<IRQ_UART1);
+    IO_INTC_IRQ0 = INTR_IRQ0_UART1;
 }

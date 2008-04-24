@@ -435,6 +435,11 @@ void sleep(int ticks)
     unsigned stop = USEC_TIMER + ticks * (1000000/HZ);
     while (TIME_BEFORE(USEC_TIMER, stop))
         switch_thread();
+#elif defined(CREATIVE_ZVM) && defined(BOOTLOADER)
+    // hacky..
+	long sleep_ticks = current_tick + ticks + 1;
+    while (sleep_ticks > current_tick)
+        switch_thread();
 #else
     disable_irq();
     sleep_thread(ticks);

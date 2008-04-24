@@ -27,7 +27,7 @@
 #define CREATIVE_ZVM 1
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 35
+#define MODEL_NUMBER 26
 
 /* define this if you use an ATA controller */
 #define HAVE_ATA
@@ -65,15 +65,12 @@
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
 
-#define LCD_REMOTE_PIXELFORMAT VERTICAL_PACKING
-
-#define MIN_REMOTE_CONTRAST_SETTING     0
-#define MAX_REMOTE_CONTRAST_SETTING     15
-#define DEFAULT_REMOTE_CONTRAST_SETTING 7
-
-#define CONFIG_KEYPAD MROBE500_PAD
+#define CONFIG_KEYPAD CREATIVEZVM_PAD
+#define HAS_BUTTON_HOLD
+#define HAVE_HEADPHONE_DETECTION
 //#define HAVE_TOUCHPAD
-#define HAVE_BUTTON_DATA
+
+#define CONFIG_I2C  I2C_DM320
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
@@ -84,16 +81,17 @@
 /* Define this for LCD backlight available */
 //#define HAVE_BACKLIGHT
 
-#define HAVE_BACKLIGHT_BRIGHTNESS
+//#define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING          0
-#define MAX_BRIGHTNESS_SETTING          127
-#define DEFAULT_BRIGHTNESS_SETTING      85 /* OF "full brightness" */
-#define DEFAULT_DIMNESS_SETTING         22 /* OF "most dim" */
+//#define MIN_BRIGHTNESS_SETTING          0
+//#define MAX_BRIGHTNESS_SETTING          127
+//#define DEFAULT_BRIGHTNESS_SETTING      85 /* OF "full brightness" */
+//#define DEFAULT_DIMNESS_SETTING         22 /* OF "most dim" */
 
 /* Define this if you have a software controlled poweroff */
-#define HAVE_SW_POWEROFF
+//#define HAVE_SW_POWEROFF
+//TODO: enable this back
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x80000
@@ -104,11 +102,11 @@
 /* Define this if you have the TLV320 audio codec */
 //#define HAVE_TLV320
 
-/* Define this if you want to use the adaptive bass capibility of the 8751 */
-/* #define USE_ADAPTIVE_BASS */
+/* TLV320 has no tone controls, so we use the software ones */
+//#define HAVE_SW_TONE_CONTROLS
 
-#define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
-                       SAMPR_CAP_11)
+/*#define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
+    SAMPR_CAP_11)*/
 
 #define BATTERY_CAPACITY_DEFAULT 1100 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 500        /* min. capacity selectable */
@@ -117,7 +115,7 @@
 #define BATTERY_TYPES_COUNT  1          /* only one type */
 
 /* Hardware controlled charging with monitoring */
-#define CONFIG_CHARGING CHARGING_MONITOR
+//#define CONFIG_CHARGING CHARGING_MONITOR
 
 #ifndef SIMULATOR
 
@@ -127,8 +125,7 @@
 /* Define this if you have a Texas Instruments TSC2100 touch screen */
 //#define HAVE_TSC2100
 
-/* Define this if you want to use coldfire's i2c interface */
-//#define CONFIG_I2C I2C_S3C2440
+#define CONFIG_USBOTG	USBOTG_ISP1583
 
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
@@ -161,4 +158,23 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
+#define HAVE_USBSTACK
+#define USB_VENDOR_ID 0x041e 
+#define USB_PRODUCT_ID 0x4133
+
+#define USB_SERIAL
+
+//DEBUGGING!
+#ifdef BOOTLOADER
+#define THREAD_EXTRA_CHECKS 1
+#define DEBUG 1
+#define debug(msg) printf(msg)
+#define BUTTON_DEBUG
+
+#define DO_THREAD_TEST
+#endif
+
+
+//Uncomment next line to make this build Zen Vision compatible
+//#define ZEN_VISION
 #endif

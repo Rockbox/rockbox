@@ -178,4 +178,6 @@ keymaps/keymap-mr500.c
 keymaps/keymap-mr100.c
 #elif CONFIG_KEYPAD == COWOND2_PAD
 keymaps/keymap-cowond2.c
+#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
+keymaps/keymap-creativezvm.c
 #endif

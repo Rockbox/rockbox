@@ -79,6 +79,7 @@
 #define IAUDIO67_PAD       21
 #define COWOND2_PAD        22
 #define IAUDIO_M3_PAD      23
+#define CREATIVEZVM_PAD    24
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -143,6 +144,7 @@
 #define I2C_IMX31L   9
 #define I2C_TCC77X  10
 #define I2C_TCC780X 11
+#define I2C_DM320   12 /* DM320 style */
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -169,6 +171,7 @@
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */
+#define USBOTG_ISP1583 1583 /* Creative Zen Vision:M */
 #define USBOTG_M5636   5636 /* iAudio X5 */
 #define USBOTG_ARC     5020 /* PortalPlayer 502x */
 
@@ -389,13 +392,13 @@
 #define ARM_ARCH 6 /* ARMv6 */
 #endif
 
-#if defined(CPU_TCC77X) || defined(CPU_TCC780X)
+#if defined(CPU_TCC77X) || defined(CPU_TCC780X) || (CONFIG_CPU == DM320)
 #define CPU_ARM
 #define ARM_ARCH 5 /* ARMv5 */
 #endif
 
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-  || (CONFIG_CPU == DSC25) || (CONFIG_CPU == DM320)
+  || (CONFIG_CPU == DSC25)
 #define CPU_ARM
 #define ARM_ARCH 4 /* ARMv4 */
 #endif

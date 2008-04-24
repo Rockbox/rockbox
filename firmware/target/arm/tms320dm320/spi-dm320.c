@@ -31,6 +31,7 @@
 #define GIO_TS_ENABLE  (1<<2)
 #define GIO_RTC_ENABLE (1<<12)
 #define GIO_BL_ENABLE  (1<<13)
+#define GIO_LCD_ENABLE (1<<5)
 
 struct mutex spi_mtx;
 
@@ -39,13 +40,20 @@ struct SPI_info {
     volatile unsigned short *clrreg;
     int bit;
 };
-#define reg(a) ((volatile unsigned short *)(PHY_IO_BASE+a))
+
 struct SPI_info spi_targets[] =
 {
+#ifndef CREATIVE_ZVM
     [SPI_target_TSC2100]   = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, GIO_TS_ENABLE },
-    [SPI_target_RX5X348AB] = { &IO_GIO_BITSET0, &IO_GIO_BITCLR0, GIO_RTC_ENABLE },
+    [SPI_target_RX5X348AB] = { &IO_GIO_BITSET0, &IO_GIO_BITCLR0, GIO_RTC_ENABLE},
     [SPI_target_BACKLIGHT] = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, GIO_BL_ENABLE },
+#else
+    [SPI_target_LTV250QV] =  { &IO_GIO_BITCLR2, &IO_GIO_BITSET2, GIO_LCD_ENABLE},
+#endif
 };
+
+#define IO_SERIAL0_XMIT         (0x100)
+#define IO_SERIAL0_MODE_SCLK    (1 << 10)
 
 static void spi_disable_all_targets(void)
 {
@@ -70,7 +78,7 @@ int spi_block_transfer(enum SPI_target target,
         IO_SERIAL0_TX_DATA = *tx_bytes++;
 
         /* Wait until transfer finished */
-        while (IO_SERIAL0_RX_DATA & 0x100);
+        while (IO_SERIAL0_RX_DATA & IO_SERIAL0_XMIT);
     }
 
     while (rx_size--)
@@ -80,7 +88,7 @@ int spi_block_transfer(enum SPI_target target,
 
         /* Wait until transfer finished */
         unsigned short data;
-        while ((data = IO_SERIAL0_RX_DATA) & 0x100);
+        while ((data = IO_SERIAL0_RX_DATA) & IO_SERIAL0_XMIT);
         
         *rx_bytes++ = data & 0xff;
     }
@@ -95,14 +103,15 @@ void spi_init(void)
 {
     mutex_init(&spi_mtx);
     /* Set SCLK idle level = 0 */
-    IO_SERIAL0_MODE |= 1<<10;
+    IO_SERIAL0_MODE |= IO_SERIAL0_MODE_SCLK;
     /* Enable TX */
     IO_SERIAL0_TX_ENABLE = 0x0001;
-
+#ifndef CREATIVE_ZVM
     /* Set GIO 18 to output for touch screen slave enable */
     IO_GIO_DIR1 &= ~GIO_TS_ENABLE;
     /* Set GIO 12 to output for rtc slave enable */
     IO_GIO_DIR0 &= ~GIO_RTC_ENABLE;
-    
+#endif  
     spi_disable_all_targets(); /* make sure only one is ever enabled at a time */
+
 }

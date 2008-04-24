@@ -28,7 +28,12 @@
 #define LCD_BUFFER_SIZE (LCD_WIDTH*LCD_HEIGHT*2)
 #define TTB_SIZE        (0x4000)
 /* must be 16Kb (0x4000) aligned */
+#if 0
+#define MEM_END         0x00900000 + (MEM*0x00100000)
+#define TTB_BASE        ((unsigned int *)(MEM_END - TTB_SIZE)) /* End of memory */
+#else
 #define TTB_BASE        ((unsigned int *)(0x04900000 - TTB_SIZE)) /* End of memory */
+#endif
 #define FRAME           ((short *) ((char*)TTB_BASE - LCD_BUFFER_SIZE))  /* Right before TTB */
 
 #define PHY_IO_BASE      0x00030000

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Catalin Patulea
+ * Copyright (C) 2008 by Maurus Cuelenaere
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,27 +16,50 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
-#ifndef SPI_TARGET_H
-#define SPI_TARGET_H
 
-#include <inttypes.h>
-#include <stdbool.h>
+#include "config.h"
+#include "system.h"
+#include "kernel.h"
+#include "usb.h"
+#include "usb-target.h"
+#include "usb_drv.h"
+#include "usb_core.h"
+#include "isp1583.h"
 
-enum SPI_target {
-#ifndef CREATIVE_ZVM
-    SPI_target_TSC2100 = 0,
-    SPI_target_RX5X348AB,
-    SPI_target_BACKLIGHT,
-#else
-    SPI_target_LTV250QV = 0,
+#define printf
+
+bool usb_drv_connected(void)
+{
+    return button_usb_connected();
+}
+
+int usb_detect(void)
+{
+    if(button_usb_connected())
+        return USB_INSERTED;
+    else
+        return USB_EXTRACTED;
+}
+
+void usb_init_device(void)
+{
+    return;
+}
+
+void usb_enable(bool on)
+{
+    if(on)
+        usb_core_init();
+    else
+         usb_core_exit();
+}
+
+void GIO7(void)
+{
+#ifdef DEBUG
+    //printf("GIO7 interrupt... [%d]", current_tick);
 #endif
-    SPI_MAX_TARGETS,
-};
-
-void spi_init(void);
-int spi_block_transfer(enum SPI_target target,
-                       const uint8_t *tx_bytes, unsigned int tx_size,
-                             uint8_t *rx_bytes, unsigned int rx_size);
-
-#endif
+	usb_drv_int();
+    
+	IO_INTC_IRQ1 = INTR_IRQ1_EXT7;
+}

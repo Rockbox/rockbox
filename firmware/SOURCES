@@ -237,10 +237,12 @@ usbstack/usb_storage.c
 usbstack/usb_serial.c
 #if CONFIG_USBOTG == USBOTG_ARC
 target/arm/usb-drv-arc.c
+#elif CONFIG_USBOTG == USBOTG_ISP1583
+drivers/isp1583.c
 #endif
 #else /* !defined(HAVE_USBSTACK) */
 #if CONFIG_USBOTG == USBOTG_ISP1362	 
-drivers/isp1362.c	 
+drivers/isp1362.c
 #elif CONFIG_USBOTG == USBOTG_M5636	 
 drivers/m5636.c
 #endif
@@ -672,6 +674,17 @@ target/arm/imx31/gigabeat-s/pcm-imx31.c
 #endif /* SIMULATOR */
 #endif /* GIGABEAT_S */
 
+#if CONFIG_CPU == DM320
+target/arm/tms320dm320/debug-dm320.c
+target/arm/tms320dm320/dsp-dm320.c
+target/arm/tms320dm320/i2c-dm320.c
+target/arm/tms320dm320/kernel-dm320.c
+target/arm/tms320dm320/spi-dm320.c
+target/arm/tms320dm320/system-dm320.c
+target/arm/tms320dm320/timer-dm320.c
+target/arm/tms320dm320/uart-dm320.c
+#endif /* CONFIG_CPU == DM320 */
+
 #ifdef MROBE_500
 #ifndef SIMULATOR
 target/arm/lcd-as-memframe.S
@@ -689,16 +702,24 @@ target/arm/tms320dm320/mrobe-500/pcm-mr500.c
 target/arm/tms320dm320/mrobe-500/powermgmt-mr500.c
 target/arm/tms320dm320/mrobe-500/power-mr500.c
 target/arm/tms320dm320/mrobe-500/usb-mr500.c
-target/arm/tms320dm320/debug-dm320.c
-target/arm/tms320dm320/i2c-dm320.c
-target/arm/tms320dm320/kernel-dm320.c
-target/arm/tms320dm320/spi-dm320.c
-target/arm/tms320dm320/system-dm320.c
-target/arm/tms320dm320/timer-dm320.c
-target/arm/tms320dm320/uart-dm320.c
-target/arm/tms320dm320/dsp-dm320.c
 #endif /* SIMULATOR */
 #endif /* MROBE_500 */
+
+#ifdef CREATIVE_ZVM
+#ifndef SIMULATOR
+target/arm/lcd-as-memframe.S
+target/arm/mmu-arm.c
+target/arm/tms320dm320/creative-zvm/adc-creativezvm.c
+target/arm/tms320dm320/creative-zvm/audio-creativezvm.c
+target/arm/tms320dm320/creative-zvm/lcd-creativezvm.c
+target/arm/tms320dm320/creative-zvm/ata-creativezvm.c
+target/arm/tms320dm320/creative-zvm/pcm-creativezvm.c
+target/arm/tms320dm320/creative-zvm/pic-creativezvm.c
+target/arm/tms320dm320/creative-zvm/power-creativezvm.c
+target/arm/tms320dm320/creative-zvm/powermgmt-creativezvm.c
+target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
+#endif /* SIMULATOR */
+#endif /* CREATIVE_ZVM */
 
 #ifdef MROBE_100
 #ifndef SIMULATOR

@@ -114,7 +114,12 @@ void irq_handler(void)
 
     asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
-    irqvector[(IO_INTC_IRQENTRY0>>2)-1]();
+    unsigned short addr = IO_INTC_IRQENTRY0>>2;
+    if(addr != 0)
+    {
+        addr--;
+        irqvector[addr]();
+    }
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from FIQ */
@@ -130,18 +135,34 @@ void fiq_handler(void)
         "sub    lr, lr, #4            \r\n"
         "stmfd  sp!, {r0-r3, ip, lr}  \r\n"
         "mov    r0, #0x00030000       \r\n"
-        "ldr    r0, [r0, #0x518]       \r\n"
+        "ldr    r0, [r0, #0x518]      \r\n"
+        "sub    r0, r0, #1             \r\n"
         "ldr    r1, =irqvector        \r\n"
         "ldr    r1, [r1, r0, lsl #2]  \r\n"
-        "mov    lr, pc                \r\n"
-        "bx     r1                    \r\n"
+        "blx    r1                    \r\n"
         "ldmfd  sp!, {r0-r3, ip, pc}^ \r\n"
     );
 }
 
 void system_reboot(void)
 {
-
+    /* Code taken from linux/include/asm-arm/arch-itdm320-20/system.h at NeuroSVN */
+    __asm__ __volatile__(                    
+        "mov     ip, #0                                             \n"
+        "mcr     p15, 0, ip, c7, c7, 0           @ invalidate cache \n"
+        "mcr	 p15, 0, ip, c7, c10,4		     @ drain WB         \n"
+        "mcr     p15, 0, ip, c8, c7, 0           @ flush TLB (v4)   \n"
+        "mrc     p15, 0, ip, c1, c0, 0           @ get ctrl register\n"
+        "bic     ip, ip, #0x000f                 @ ............wcam \n"
+        "bic     ip, ip, #0x2100                 @ ..v....s........ \n"
+        "mcr     p15, 0, ip, c1, c0, 0           @ ctrl register    \n"
+        "mov     ip, #0xFF000000                                    \n"
+        "orr     ip, ip, #0xFF0000               @ ip = 0xFFFF0000  \n"  
+        "mov     pc, ip                                             \n"
+        :
+        :
+        : "cc"
+    );
 }
 
 void system_init(void)
@@ -167,16 +188,28 @@ void system_init(void)
     IO_INTC_FISEL1 = 0;
     IO_INTC_FISEL2 = 0;
 
+    /* IRQENTRY only reflects enabled interrupts */
+    IO_INTC_RAW = 0;
+
     IO_INTC_ENTRY_TBA0 = 0;
     IO_INTC_ENTRY_TBA1 = 0;
     
-    /* Turn off other timers */
+    unsigned short i;
+    /* Reset interrupt priorities to default values */
+    for(i = 0; i < 23; i++)
+        DM320_REG(0x0540+i*2) = ( (i*2+1) << 8 ) | i*2 ;//IO_INTC_PRIORITYx
+    
+    /* Turn off all timers */
+    IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
+    IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_STOP;
     IO_TIMER2_TMMD = CONFIG_TIMER2_TMMD_STOP;
     IO_TIMER3_TMMD = CONFIG_TIMER3_TMMD_STOP;
 
+#ifndef CREATIVE_ZVM
     /* set GIO26 (reset pin) to output and low */
     IO_GIO_BITCLR1=(1<<10);
     IO_GIO_DIR1&=~(1<<10);
+#endif
 
     uart_init();
     spi_init();
@@ -186,9 +219,18 @@ void system_init(void)
     /* Make sure everything is mapped on itself */
     map_section(0, 0, 0x1000, CACHE_NONE);
     /* Enable caching for RAM */
-    map_section(0x00900000, 0x00900000, 64, CACHE_ALL);
+    map_section(CONFIG_SDRAM_START, CONFIG_SDRAM_START, MEM, CACHE_ALL);
     /* enable buffered writing for the framebuffer */
     map_section((int)FRAME, (int)FRAME, 1, BUFFERED);
+#ifdef CREATIVE_ZVM
+    //mimic OF
+    map_section(0x00100000, 0x00100000,  4, CACHE_NONE);
+    map_section(0x04700000, 0x04700000,  2,   BUFFERED);
+    map_section(0x40000000, 0x40000000, 16, CACHE_NONE);
+    map_section(0x50000000, 0x50000000, 16, CACHE_NONE);
+    map_section(0x60000000, 0x60000000, 16, CACHE_NONE);
+    map_section(0x80000000, 0x80000000,  1, CACHE_NONE); 
+#endif
     enable_mmu();
 }
 

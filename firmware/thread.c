@@ -802,6 +802,16 @@ static inline void core_sleep(void)
     );
     enable_irq();
 }
+#elif CONFIG_CPU == DM320
+static inline void core_sleep(void)
+{
+    asm volatile (
+        "mov r0, #0                \n"
+        "mcr p15, 0, r0, c7, c0, 4 \n" /* Wait for interrupt */
+        : : : "r0"
+    );
+    enable_irq();
+}
 #else
 static inline void core_sleep(void)
 {

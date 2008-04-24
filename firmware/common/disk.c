@@ -26,6 +26,7 @@
 #include "file.h" /* for release_files() */
 #endif
 #include "disk.h"
+#include <string.h>
 
 /* Partition table entry layout:
    -----------------------
@@ -66,8 +67,8 @@ struct partinfo* disk_init(IF_MV_NONVOID(int drive))
     struct partinfo* pinfo = part;
 #endif
 
-    ata_read_sectors(IF_MV2(drive,) 0,1,&sector);
-
+    ata_read_sectors(IF_MV2(drive,) 0,1, &sector);
+#ifndef CREATIVE_ZVM
     /* check that the boot sector is initialized */
     if ( (sector[510] != 0x55) ||
          (sector[511] != 0xaa)) {
@@ -90,7 +91,46 @@ struct partinfo* disk_init(IF_MV_NONVOID(int drive))
             /* not handled yet */
         }
     }
-
+#else
+    struct partition_struct
+    {
+        unsigned int end;
+        unsigned int start;
+        char name[8];
+    };
+    struct hdd_struct
+    {
+        unsigned char MBLK[4];
+        int sector_size;
+        long long total_disk_size;
+        struct partition_struct partitions[4];
+    };
+    struct hdd_struct* hdd_struct = (struct hdd_struct*)sector;
+    
+    if(hdd_struct->MBLK[0] != 0x4B ||
+       hdd_struct->MBLK[1] != 0x4C ||
+       hdd_struct->MBLK[2] != 0x42 ||
+       hdd_struct->MBLK[3] != 0x4D) /* 0x4B4C424D = KLBM */
+    {
+        DEBUGF("Bad boot sector signature\n");
+        return NULL;
+    }
+    else
+    {
+        /* parse partitions */
+        for ( i=0; i<4; i++ ) {
+            if(hdd_struct->partitions[i].name[0] != 0)
+            {
+                pinfo[i].type  = ( strcmp(hdd_struct->partitions[i].name, "cfs") == 0 ? PARTITION_TYPE_FAT32_LBA : 0);
+                pinfo[i].start = hdd_struct->partitions[i].start;
+                pinfo[i].size  = (hdd_struct->partitions[i].end - hdd_struct->partitions[i].start);
+                
+                DEBUGF("Part%d: Type %02x, start: %08lx size: %08lx\n",
+                       i,pinfo[i].type,pinfo[i].start,pinfo[i].size);
+            }
+        }
+    }
+#endif
     return pinfo;
 }
 
@@ -147,7 +187,7 @@ int disk_mount(int drive)
     {
         return 0;
     }
-#ifdef TOSHIBA_GIGABEAT_S
+#if defined(TOSHIBA_GIGABEAT_S) ||defined(CREATIVE_ZVM)
     int i = 1;  /* For the Gigabeat S, we mount the second partition */
 #else
     int i = 0;

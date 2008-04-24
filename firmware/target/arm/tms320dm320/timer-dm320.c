@@ -24,12 +24,12 @@
 #include "logf.h"
 
 /* GPB0/TOUT0 should already have been configured as output so that pin
-   should not be a functional pin and TIMER0 output unseen there */
+  should not be a functional pin and TIMER0 output unseen there */
 void TIMER0(void)
 {
     if (pfn_timer != NULL)
         pfn_timer();
-    IO_INTC_IRQ0 |= 1<<IRQ_TIMER0;
+    IO_INTC_IRQ0 = INTR_IRQ0_TMR0; //clear TIMER0 interrupt
 }
 
 bool __timer_set(long cycles, bool start)
@@ -39,6 +39,10 @@ bool __timer_set(long cycles, bool start)
 
     if(cycles<1)
         return false;
+
+    oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    
+    IO_CLK_MOD2 |= CLK_MOD2_TMR0; //enable TIMER0 clock!!!!!!!!!
 
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
 
@@ -67,23 +71,27 @@ bool __timer_set(long cycles, bool start)
 
 static void stop_timer(void)
 {
-    IO_INTC_EINT0 &= ~(1<<IRQ_TIMER0);
+    IO_INTC_EINT0 &= ~INTR_EINT0_TMR0; //disable TIMER0 interrupt
 
-    IO_INTC_IRQ0 |= 1<<IRQ_TIMER0;
+    IO_INTC_IRQ0 = INTR_IRQ0_TMR0; //clear TIMER0 interrupt
     
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
+    
+    IO_CLK_MOD2 &= ~CLK_MOD2_TMR0; //disable TIMER0 clock
 }
 
 bool __timer_register(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
-
+    
     stop_timer();
+    
+    IO_CLK_MOD2 |= CLK_MOD2_TMR0; //enable TIMER0 clock!!!!!!!!!
 
     /* Turn Timer0 to Free Run mode */
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_FREE_RUN;
 
-    IO_INTC_EINT0 |= 1<<IRQ_TIMER0;
+    IO_INTC_EINT0 |= INTR_EINT0_TMR0; //enable TIMER0 interrupt
 
     restore_interrupt(oldstatus);
 

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Catalin Patulea
+ * Copyright (C) 2008 by Maurus Cuelenaere
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,26 +17,21 @@
  *
  ****************************************************************************/
  
-#ifndef SPI_TARGET_H
-#define SPI_TARGET_H
-
-#include <inttypes.h>
-#include <stdbool.h>
-
-enum SPI_target {
-#ifndef CREATIVE_ZVM
-    SPI_target_TSC2100 = 0,
-    SPI_target_RX5X348AB,
-    SPI_target_BACKLIGHT,
-#else
-    SPI_target_LTV250QV = 0,
-#endif
-    SPI_MAX_TARGETS,
-};
-
-void spi_init(void);
-int spi_block_transfer(enum SPI_target target,
-                       const uint8_t *tx_bytes, unsigned int tx_size,
-                             uint8_t *rx_bytes, unsigned int rx_size);
-
-#endif
+ #include "i2c-dm320.h"
+ 
+ #define I2C_ADDRESS 0x51
+ 
+ unsigned char* rtc_send_command(short unk1, short unk2)
+ {
+    unsigned char ret[12];
+    i2c_write(I2C_ADDRESS, (unk2 & 0xFF) | (unk << 8), 1);
+    i2c_read(I2C_ADDRESS, ret, 12);
+    return ret;
+ }
+ 
+ unsigned char* rtc_read(void)
+ {
+    unsigned char ret[12];
+    i2c_read(I2C_ADDRESS, ret, 12);
+    return ret;
+ }

@@ -1461,12 +1461,12 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
-    tool="cp"
+    tool="$rootdir/tools/scramble -creative=zvm"
     output="rockbox.zvm"
     appextra="recorder:gui"
     plugins=""
     swcodec="yes"
-    toolset=$gigabeatbitmaptools
+    toolset=$ipodbitmaptools
     boottool="$rootdir/tools/scramble -creative=zvm"
     bootoutput="rockbox.zvmboot"
     # architecture, manufacturer and model for the target-tree build

@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id: adc-target.h 14817 2007-09-22 15:43:38Z kkurbjun $
  *
- * Copyright (C) 2007 by Catalin Patulea
+ * Copyright (C) 2007 by Karl Kurbjun
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,26 +17,22 @@
  *
  ****************************************************************************/
  
-#ifndef SPI_TARGET_H
-#define SPI_TARGET_H
+#ifndef _ADC_TARGET_H_
+#define _ADC_TARGET_H_
 
-#include <inttypes.h>
-#include <stdbool.h>
+/* only two channels used by the Gigabeat */
+#define NUM_ADC_CHANNELS 2
 
-enum SPI_target {
-#ifndef CREATIVE_ZVM
-    SPI_target_TSC2100 = 0,
-    SPI_target_RX5X348AB,
-    SPI_target_BACKLIGHT,
-#else
-    SPI_target_LTV250QV = 0,
-#endif
-    SPI_MAX_TARGETS,
-};
+#define ADC_BATTERY     0
+#define ADC_HPREMOTE    1
+#define ADC_UNKNOWN_3   2
+#define ADC_UNKNOWN_4   3
+#define ADC_UNKNOWN_5   4
+#define ADC_UNKNOWN_6   5
+#define ADC_UNKNOWN_7   6
+#define ADC_UNKNOWN_8   7
 
-void spi_init(void);
-int spi_block_transfer(enum SPI_target target,
-                       const uint8_t *tx_bytes, unsigned int tx_size,
-                             uint8_t *rx_bytes, unsigned int rx_size);
+#define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
+#define ADC_READ_ERROR 0xFFFF
 
 #endif
