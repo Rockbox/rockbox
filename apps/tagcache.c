@@ -145,10 +145,10 @@ enum tagcache_queue {
 };
 
 struct tagcache_command_entry {
-    long command;
-    long idx_id;
-    long tag;
-    long data;
+    int32_t command;
+    int32_t idx_id;
+    int32_t tag;
+    int32_t data;
 };
 
 static struct tagcache_command_entry command_queue[TAGCACHE_COMMAND_QUEUE_LENGTH];
@@ -167,22 +167,22 @@ struct tagfile_entry {
 
 /* Fixed-size tag entry in master db index. */
 struct index_entry {
-    long tag_seek[TAG_COUNT]; /* Location of tag data or numeric tag data */
-    long flag;                /* Status flags */
+    int32_t tag_seek[TAG_COUNT]; /* Location of tag data or numeric tag data */
+    int32_t flag;                /* Status flags */
 };
 
 /* Header is the same in every file. */
 struct tagcache_header {
-    long magic;       /* Header version number */
-    long datasize;    /* Data size in bytes */
-    long entry_count; /* Number of entries in this file */
+    int32_t magic;       /* Header version number */
+    int32_t datasize;    /* Data size in bytes */
+    int32_t entry_count; /* Number of entries in this file */
 };
 
 struct master_header {
     struct tagcache_header tch;
-    long serial; /* Increasing counting number */
-    long commitid; /* Number of commits so far */
-    long dirty;
+    int32_t serial; /* Increasing counting number */
+    int32_t commitid; /* Number of commits so far */
+    int32_t dirty;
 };
 
 /* For the endianess correction */
