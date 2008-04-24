@@ -25,9 +25,7 @@
 #include "usb_core.h"
 #include "isp1583.h"
 #include "thread.h"
-
-#define printf
-#define logf printf
+#include "logf.h"
 
 #define DIR_RX                      0
 #define DIR_TX                      1
