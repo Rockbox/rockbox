@@ -3544,7 +3544,7 @@ static bool delete_entry(long idx_id)
         if (tc_stat.ramcache && tag != tag_filename)
         {
             struct tagfile_entry *tfe;
-            long *seek = &hdr->indices[idx_id].tag_seek[tag];
+            int32_t *seek = &hdr->indices[idx_id].tag_seek[tag];
             
             tfe = (struct tagfile_entry *)&hdr->tags[tag][*seek];
             *seek = crc_32(tfe->tag_data, strlen(tfe->tag_data), 0xffffffff);
