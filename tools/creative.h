@@ -25,15 +25,19 @@ enum
     ZENVISIONM = 0,
     ZENVISIONM60 = 1,
     ZENVISION = 2,
-	ZENV = 3
+	ZENV = 3,
+    ZEN = 4
 };
 
 struct device_info
 {
     const char* cinf; /*Must be Unicode encoded*/
-    const int cinf_size;
+    const unsigned int cinf_size;
     const char* null;
-} device_info;
+    const unsigned char* bootloader;
+    const unsigned int bootloader_size;
+    const unsigned int memory_address;
+};
 
 int zvm_encode(char *iname, char *oname, int device);
 

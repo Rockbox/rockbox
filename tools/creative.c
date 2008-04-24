@@ -30,17 +30,31 @@ static const char null_key_v2[]  = "CTL:N0MAD|PDE0.DPMP.";
 static const char null_key_v3[]  = "CTL:Z3N07|PDE0.DPMP.";
 static const char null_key_v4[]  = "CTL:N0MAD|PDE0.DPFP.";
 
-static const struct device_info devices[] =
+static const unsigned char bootloader_v1[] =
 {
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M",
-     42, null_key_v2},
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M\0 \0G\0o\0!",
-     50, null_key_v2},
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0 \0©\0T\0L",
-     48, null_key_v2},
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N\0 \0V", 42, null_key_v4}
+    0xD3, 0xF0, 0x29, 0xE3, /* MSR     CPSR_cf, #0xD3     */
+    0x09, 0xF6, 0xA0, 0xE3  /* MOV     PC, #0x900000      */
 };
 
+static const unsigned char bootloader_v2[] =
+{
+    0xD3, 0xF0, 0x29, 0xE3, /* MSR     CPSR_cf, #0xD3     */
+    0x09, 0xF6, 0xA0, 0xE3  /* MOV     PC, #0x40000000      */
+};
+
+static const unsigned char bootloader_v3[] =
+{
+    0 /* Unknown */
+};
+
+static const struct device_info devices[] =
+{
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M",             42, null_key_v2, bootloader_v1, sizeof(bootloader_v1), 0x00900000},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M\0 \0G\0o\0!", 50, null_key_v2, bootloader_v1, sizeof(bootloader_v1), 0x00900000},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0 \0©\0T\0L",       48, null_key_v2, bootloader_v1, sizeof(bootloader_v1), 0x00900000},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N\0 \0V",                                  42, null_key_v4, bootloader_v3, sizeof(bootloader_v3), 0x00000000},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N",                                        48, null_key_v3, bootloader_v2, sizeof(bootloader_v2), 0x40000000}
+};
 
 /*
 Create a Zen Vision:M FRESCUE structure file
@@ -49,7 +63,7 @@ extern void int2le(unsigned int val, unsigned char* addr);
 extern unsigned int le2int(unsigned char* buf);
 
 
-static int make_ciff_file(unsigned char *inbuf, int length,
+static int make_ciff_file(unsigned char *inbuf, unsigned int length,
                           unsigned char *outbuf, int device)
 {
     unsigned char key[20];
@@ -74,14 +88,11 @@ static int make_ciff_file(unsigned char *inbuf, int length,
     return length+0x90+0x1C+8;
 }
 
-static int make_jrm_file(unsigned char *inbuf, int length,
-                         unsigned char *outbuf)
+static int make_jrm_file(unsigned char *inbuf, unsigned int length,
+                         unsigned char *outbuf, int device)
 {
-    int i;
+    unsigned int i;
     unsigned int sum = 0;
-    /* Calculate checksum for later use in header */
-    for(i=0; i<length; i+= 4)
-        sum += le2int(&inbuf[i]) + (le2int(&inbuf[i])>>16);
 
     /* Clear the header area to zero */
     memset(outbuf, 0, 0x18);
@@ -89,34 +100,42 @@ static int make_jrm_file(unsigned char *inbuf, int length,
     /* Header (EDOC) */
     memcpy(outbuf, "EDOC", 4);
     /* Total Size */
-    int2le(length+0x20, &outbuf[0x4]);
+    #define SIZEOF_BOOTLOADER_CODE  devices[device].bootloader_size
+    int2le(4+0xC+SIZEOF_BOOTLOADER_CODE+0xC+length, &outbuf[0x4]);
     /* 4 bytes of zero */
-
-    /* Address = 0x900000 */
-    int2le(0x900000, &outbuf[0xC]);
+    memset(&outbuf[0x8], 0, 0x4);
+    
+    /* First block starts here ... */
+    /* Address = 0x0 */
+    memset(&outbuf[0xC], 0, 0x4);
     /* Size */
-    int2le(length, &outbuf[0x10]);
+    int2le(SIZEOF_BOOTLOADER_CODE, &outbuf[0x10]);
     /* Checksum */
+    for(i=0; i<SIZEOF_BOOTLOADER_CODE; i+= 4)
+        sum += le2int((unsigned char*)&devices[device].bootloader[i]) + (le2int((unsigned char*)&devices[device].bootloader[i])>>16);
     int2le(sum, &outbuf[0x14]);
     outbuf[0x16] = 0;
     outbuf[0x17] = 0;
-    /* Data starts here... */
-    memcpy(&outbuf[0x18], inbuf, length);
-
+    /*Data */
+    memcpy(&outbuf[0x18], devices[device].bootloader, SIZEOF_BOOTLOADER_CODE);
+    
     /* Second block starts here ... */
-    /* Address = 0x0 */
+    /* Address = depends on target */
+    #define SB_START    (0x18+SIZEOF_BOOTLOADER_CODE)
+    int2le(devices[device].memory_address, &outbuf[SB_START]);
     /* Size */
-    int2le(0x4, &outbuf[0x18+length+0x4]);
+    int2le(length, &outbuf[SB_START+0x4]);
     /* Checksum */
-    outbuf[0x18+length+0x8] = 0xA9;
-    outbuf[0x18+length+0x9] = 0xD9;
-    /* Data: MOV PC, 0x900000 */
-    outbuf[0x18+length+0xC] = 0x09;
-    outbuf[0x18+length+0xD] = 0xF6;
-    outbuf[0x18+length+0xE] = 0xA0;
-    outbuf[0x18+length+0xF] = 0xE3;
-
-    return length+0x18+0x10;
+    sum = 0;
+    for(i=0; i<length; i+= 4)
+        sum += le2int(&inbuf[i]) + (le2int(&inbuf[i])>>16);
+    int2le(sum, &outbuf[SB_START+0x8]);
+    outbuf[SB_START+0xA] = 0;
+    outbuf[SB_START+0xB] = 0;
+    /* Data */
+    memcpy(&outbuf[SB_START+0xC], inbuf, length);
+    
+    return SB_START+0xC+length;
 }
 
 int zvm_encode(char *iname, char *oname, int device)
@@ -156,7 +175,7 @@ int zvm_encode(char *iname, char *oname, int device)
         printf("out of memory!\n");
         return -1;
     }
-    length = make_jrm_file(buf, len, outbuf);
+    length = make_jrm_file(buf, len, outbuf, device);
     free(buf);
     buf = (unsigned char*)malloc(length+0x200);
     memset(buf, 0, length+0x200);
