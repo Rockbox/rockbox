@@ -54,7 +54,6 @@ void usage(void)
 int sendfile_function(char *from_path)
 {
     printf("Sending %s\n", from_path);
-    char *filename;
     uint64_t filesize;
 #ifdef __USE_LARGEFILE64
     struct stat64 sb;
@@ -82,7 +81,6 @@ int sendfile_function(char *from_path)
 #else
     filesize = (uint64_t) sb.st_size;
 #endif
-    filename = basename(from_path);
 
     genfile = LIBMTP_new_file_t();
     genfile->filesize = filesize;
