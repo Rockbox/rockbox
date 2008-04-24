@@ -101,6 +101,7 @@ class RbSettings : public QObject
         QString curResolution();
         int curTargetId();
 
+        //! Set Fucntions
         void setOfPath(QString path);
         void setCachePath(QString path);
         void setBuild(QString build);
@@ -130,6 +131,20 @@ class RbSettings : public QObject
         void setEncoderNarrowband(QString enc,bool nb);
 
     private:
+        
+        //! helper function to get an entry in the current platform section
+        QVariant deviceSettingCurGet(QString entry,QString def="");
+        //! helper function to get an entry out of a group in the userSettings
+        QVariant userSettingsGroupGet(QString group,QString entry,QVariant def="");
+        //! helper function to set an entry in a group in the userSettings
+        void userSettingsGroupSet(QString group,QString entry,QVariant value);
+        
+        
+        //! private copy constructors to prvent copying
+        RbSettings&  operator= (const RbSettings& other) {return *this; }
+        RbSettings(const RbSettings& other) {}
+    
+        //! pointers to our setting objects
         QSettings *devices;
         QSettings *userSettings;
 

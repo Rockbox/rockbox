@@ -48,6 +48,30 @@ void RbSettings::sync()
     userSettings->sync();
 } 
 
+QVariant RbSettings::deviceSettingCurGet(QString entry,QString def)
+{
+    QString platform = userSettings->value("platform").toString();
+    devices->beginGroup(platform);
+    QVariant result = devices->value(entry,def);
+    devices->endGroup();
+    return result;
+}
+
+QVariant RbSettings::userSettingsGroupGet(QString group,QString entry,QVariant def)
+{
+    userSettings->beginGroup(group);
+    QVariant result = userSettings->value(entry,def);
+    userSettings->endGroup();
+    return result;
+}
+
+void RbSettings::userSettingsGroupSet(QString group,QString entry,QVariant value)
+{
+    userSettings->beginGroup(group);
+    userSettings->setValue(entry,value);
+    userSettings->endGroup();
+}
+
 QString RbSettings::userSettingFilename()
 {
     return userSettings->fileName();
@@ -60,10 +84,7 @@ bool RbSettings::cacheOffline()
 
 bool RbSettings::curNeedsBootloader()
 {
-    QString platform = userSettings->value("platform").toString();
-    devices->beginGroup(platform);
-    QString result = devices->value("needsbootloader", "").toString(); 
-    devices->endGroup();
+    QString result = deviceSettingCurGet("needsbootloader", "").toString(); 
     if( result == "no")
     {
         return false;
@@ -192,30 +213,18 @@ QString RbSettings::curPlatform()
 
 QString RbSettings::curPlatformName()
 {
-    QString platform = userSettings->value("platform").toString();
-    devices->beginGroup(platform);
-    QString name = devices->value("platform").toString();
-    devices->endGroup();
-    return name;
+    return deviceSettingCurGet("platform").toString();
 }
 
 QString RbSettings::curManual()
 {
-    QString platform = userSettings->value("platform").toString();
-    devices->beginGroup(platform);
-    QString name = devices->value("manualname","rockbox-" +
+    return deviceSettingCurGet("manualname","rockbox-" +
             devices->value("platform").toString()).toString();
-    devices->endGroup();
-    return name;
 }
 
 bool RbSettings::curReleased()
 {
-    QString platform = userSettings->value("platform").toString();
-    devices->beginGroup(platform);
-    QString released = devices->value("released").toString();
-    devices->endGroup();
-    
+    QString released = deviceSettingCurGet("released").toString();
     if(released == "yes")
         return true;
     else 
@@ -224,29 +233,17 @@ bool RbSettings::curReleased()
 
 QString RbSettings::curBootloaderMethod()
 {
-    QString platform = userSettings->value("platform").toString();
-    devices->beginGroup(platform);
-    QString method = devices->value("bootloadermethod").toString();
-    devices->endGroup();
-    return method;
+    return deviceSettingCurGet("bootloadermethod").toString();
 }
 
 QString RbSettings::curBootloaderName()
 {
-    QString platform = userSettings->value("platform").toString();
-    devices->beginGroup(platform);
-    QString name = devices->value("bootloadername").toString();
-    devices->endGroup();
-    return name;
+    return deviceSettingCurGet("bootloadername").toString();
 }
 
 QString RbSettings::curVoiceName()
 {
-    QString platform = userSettings->value("platform").toString();
-    devices->beginGroup(platform);
-    QString name = devices->value("voicename").toString();
-    devices->endGroup();
-    return name;
+    return deviceSettingCurGet("voicename").toString();
 }
 
 QString RbSettings::curLang()
@@ -281,91 +278,54 @@ int RbSettings::wavtrimTh()
 
 QString RbSettings::ttsPath(QString tts)
 {
-    userSettings->beginGroup(tts);
-    QString path = userSettings->value("ttspath").toString();
-    userSettings->endGroup();
-    return path;
-    
+    return userSettingsGroupGet(tts,"ttspath").toString();
 }
 QString RbSettings::ttsOptions(QString tts)
 {
-    userSettings->beginGroup(tts);
-    QString op = userSettings->value("ttsoptions").toString();
-    userSettings->endGroup();
-    return op;
+    return userSettingsGroupGet(tts,"ttsoptions").toString();
 }
 QString RbSettings::ttsVoice(QString tts)
 {
-    userSettings->beginGroup(tts);
-    QString op = userSettings->value("ttsvoice","Microsoft Sam").toString();
-    userSettings->endGroup();
-    return op;
+    return userSettingsGroupGet(tts,"ttsoptions","Microsoft Sam").toString();
 }
 int RbSettings::ttsSpeed(QString tts)
 {
-    userSettings->beginGroup(tts);
-    int sp = userSettings->value("ttsspeed",0).toInt();
-    userSettings->endGroup();
-    return sp;
+    return userSettingsGroupGet(tts,"ttsspeed",0).toInt();
 }
 QString RbSettings::ttsLang(QString tts)
 {
-    userSettings->beginGroup(tts);
-    QString op = userSettings->value("ttslanguage","english").toString();
-    userSettings->endGroup();
-    return op;
+    return userSettingsGroupGet(tts,"ttslanguage","english").toString();
 }
 
 bool RbSettings::ttsUseSapi4()
 {
-    userSettings->beginGroup("sapi");
-    bool op = userSettings->value("useSapi4",false).toBool();
-    userSettings->endGroup();
-    return op;
+    return userSettingsGroupGet("sapi","useSapi4",false).toBool();
 }
 
 QString RbSettings::encoderPath(QString enc)
 {
-    userSettings->beginGroup(enc);
-    QString path = userSettings->value("encoderpath").toString();
-    userSettings->endGroup();
-    return path;
+    return userSettingsGroupGet(enc,"encoderpath").toString();
 }
 QString RbSettings::encoderOptions(QString enc)
 {
-    userSettings->beginGroup(enc);
-    QString op = userSettings->value("encoderoptions").toString();
-    userSettings->endGroup();
-    return op;
+    return userSettingsGroupGet(enc,"encoderoptions").toString();
 }
 
 double RbSettings::encoderQuality(QString enc)
 {
-    userSettings->beginGroup(enc);
-    double q =userSettings->value("quality",8.f).toDouble();
-    userSettings->endGroup();
-    return q;
+    return userSettingsGroupGet(enc,"quality",8.f).toDouble();
 }
 int RbSettings::encoderComplexity(QString enc)
 {
-    userSettings->beginGroup(enc);
-    int c = userSettings->value("complexity",10).toInt();
-    userSettings->endGroup();
-    return c;
+    return userSettingsGroupGet(enc,"complexity",10).toInt();
 }
 double RbSettings::encoderVolume(QString enc)
 {
-    userSettings->beginGroup(enc);
-    double v = userSettings->value("volume",1.f).toDouble();
-    userSettings->endGroup();
-    return v;
+    return userSettingsGroupGet(enc,"volume",1.f).toDouble();
 }
 bool RbSettings::encoderNarrowband(QString enc)
 {
-    userSettings->beginGroup(enc);
-    bool nb = userSettings->value("narrowband",false).toBool();
-    userSettings->endGroup();
-    return nb;
+    return userSettingsGroupGet(enc,"narrowband",false).toBool();
 }
  
 QStringList RbSettings::allPlatforms()
@@ -489,20 +449,12 @@ QMap<int, QString> RbSettings::usbIdIncompatMap()
 
 QString RbSettings::curResolution()
 {
-    QString platform = userSettings->value("platform").toString();
-    devices->beginGroup(platform);
-    QString resolution = devices->value("resolution").toString();
-    devices->endGroup();
-    return resolution;
+    return deviceSettingCurGet("resolution").toString();
 }
 
 int RbSettings::curTargetId()
 {
-    QString platform = userSettings->value("platform").toString();
-    devices->beginGroup(platform);
-    int id = devices->value("targetid").toInt();
-    devices->endGroup();
-    return id;
+    return deviceSettingCurGet("targetid").toInt();
 }
 
 
@@ -584,82 +536,57 @@ void RbSettings::setCurEncoder(QString enc)
 
 void RbSettings::setTTSPath(QString tts, QString path)
 {
-    userSettings->beginGroup(tts);
-    userSettings->setValue("ttspath",path);
-    userSettings->endGroup();
+    userSettingsGroupSet(tts,"ttspath",path);
 }
 
 void RbSettings::setTTSOptions(QString tts, QString options)
 {
-    userSettings->beginGroup(tts);
-    userSettings->setValue("ttsoptions",options);
-    userSettings->endGroup();
+    userSettingsGroupSet(tts,"ttsoptions",options);
 }
 
 void RbSettings::setTTSVoice(QString tts, QString voice)
 {
-    userSettings->beginGroup(tts);
-    userSettings->setValue("ttsvoice",voice);
-    userSettings->endGroup();
+    userSettingsGroupSet(tts,"ttsvoice",voice);
 }
 
 void RbSettings::setTTSSpeed(QString tts, int speed)
 {
-    userSettings->beginGroup(tts);
-    userSettings->setValue("ttsspeed",speed);
-    userSettings->endGroup();
+    userSettingsGroupSet(tts,"ttsspeed",speed);
 }
 
 void RbSettings::setTTSLang(QString tts, QString lang)
 {
-    userSettings->beginGroup(tts);
-    userSettings->setValue("ttslanguage",lang);
-    userSettings->endGroup();
+    userSettingsGroupSet(tts,"ttslanguage",lang);
 }
 
 void RbSettings::setTTSUseSapi4(bool value)
 {
-    userSettings->beginGroup("sapi");
-    userSettings->setValue("useSapi4",value);
-    userSettings->endGroup();
+    userSettingsGroupSet("sapi","useSapi4",value);
 } 
-
 
 void RbSettings::setEncoderPath(QString enc, QString path)
 {
-    userSettings->beginGroup(enc);
-    userSettings->setValue("encoderpath",path);
-    userSettings->endGroup();
+    userSettingsGroupSet(enc,"encoderpath",path);
 }
 
 void RbSettings::setEncoderOptions(QString enc, QString options)
 {
-    userSettings->beginGroup(enc);
-    userSettings->setValue("encoderoptions",options);
-    userSettings->endGroup();
+    userSettingsGroupSet(enc,"encoderoptions",options);
 }
 
 void RbSettings::setEncoderQuality(QString enc, double q)
 {
-    userSettings->beginGroup(enc);
-    userSettings->setValue("quality",q);
-    userSettings->endGroup();
+    userSettingsGroupSet(enc,"quality",q);
 }
 void RbSettings::setEncoderComplexity(QString enc, int c)
 {
-    userSettings->beginGroup(enc);
-    userSettings->setValue("complexity",c);
-    userSettings->endGroup();
+    userSettingsGroupSet(enc,"complexity",c);
 }
 void RbSettings::setEncoderVolume(QString enc,double v)
 {
-     userSettings->beginGroup(enc);
-    userSettings->setValue("volume",v);
-    userSettings->endGroup();
+    userSettingsGroupSet(enc,"volume",v);
 }
 void RbSettings::setEncoderNarrowband(QString enc,bool nb)
 {
-     userSettings->beginGroup(enc);
-    userSettings->setValue("narrowband",nb);
-    userSettings->endGroup();
+    userSettingsGroupSet(enc,"narrowband",nb);
 }
