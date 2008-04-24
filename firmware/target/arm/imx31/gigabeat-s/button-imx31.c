@@ -52,6 +52,8 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
     /* Power button is handled separately on PMIC */
     int button = int_btn & BUTTON_POWER;
 
+    int oldlevel = disable_irq_save();
+
     /* 1. Disable both (depress and release) keypad interrupts. */
     KPP_KPSR &= ~(KPP_KPSR_KRIE | KPP_KPSR_KDIE);
 
@@ -65,7 +67,7 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
         KPP_KPCR &= ~(0x7 << 8);
 
         /* Give the columns time to discharge */
-        for (i = 0; i < 256; i++)
+        for (i = 0; i < 128; i++) /* TODO: find minimum safe delay */
             asm volatile ("");
 
         /* 4. Configure columns as open-drain */
@@ -81,7 +83,7 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
 
         /* Delay added to avoid propagating the 0 from column to row
          * when scanning. */
-        for (i = 0; i < 256; i++)
+        for (i = 0; i < 128; i++) /* TODO: find minimum safe delay */
             asm volatile ("");
 
         /* Read row input */
@@ -104,10 +106,12 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
     /* 10. Re-enable the appropriate keypad interrupt(s) so that the KDIE
      *     detects a key hold condition, or the KRIE detects a key-release
      *     event. */
-    if (button != BUTTON_NONE)
+    if ((button & ~BUTTON_POWER) != BUTTON_NONE)
         KPP_KPSR |= KPP_KPSR_KRIE;
     else
         KPP_KPSR |= KPP_KPSR_KDIE;
+
+    restore_irq(oldlevel);
 
     int_btn = button;
 }
@@ -159,6 +163,12 @@ int button_read_device(void)
         hold_button_old = hold_button;
         backlight_hold_changed(hold_button);
     }
+
+    /* Enable the keypad interrupt to cause it to fire if a key is down.
+     * KPP_HANDLER will clear and disable it after the scan. If no key
+     * is depressed then this bit will already be set in waiting for the
+     * first key down event. */
+    KPP_KPSR |= KPP_KPSR_KDIE;
 
     /* If hold, ignore any pressed button */
     return hold_button ? BUTTON_NONE : int_btn;
