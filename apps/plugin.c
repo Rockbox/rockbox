@@ -581,7 +581,9 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     backlight_set_brightness,
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
-
+#ifdef HAVE_LCD_INVERT
+    lcd_set_invert_display,
+#endif /* HAVE_LCD_INVERT */
 };
 
 int plugin_load(const char* plugin, void* parameter)

@@ -728,7 +728,9 @@ struct plugin_api {
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     void (*backlight_set_brightness)(int val);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
-
+#ifdef HAVE_LCD_INVERT
+    void (*lcd_set_invert_display)(bool yesno);
+#endif /* HAVE_LCD_INVERT */
 };
 
 /* plugin header */
