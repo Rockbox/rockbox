@@ -86,10 +86,13 @@ PLUGIN_HEADER
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
 
+#define FLIPIT_SCROLLWHEEL
 #define FLIPIT_LEFT         BUTTON_LEFT
 #define FLIPIT_RIGHT        BUTTON_RIGHT
 #define FLIPIT_UP           BUTTON_MENU
 #define FLIPIT_DOWN         BUTTON_PLAY
+#define FLIPIT_NEXT         BUTTON_SCROLL_FWD
+#define FLIPIT_PREV         BUTTON_SCROLL_BACK
 #define FLIPIT_QUIT         (BUTTON_SELECT | BUTTON_MENU)
 #define FLIPIT_SHUFFLE      (BUTTON_SELECT | BUTTON_LEFT)
 #define FLIPIT_SOLVE        (BUTTON_SELECT | BUTTON_PLAY)
@@ -123,8 +126,22 @@ PLUGIN_HEADER
 #define FLIPIT_STEP_BY_STEP BUTTON_VOL_DOWN
 #define FLIPIT_TOGGLE       BUTTON_SELECT
 
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_C200_PAD)
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+
+#define FLIPIT_SCROLLWHEEL
+#define FLIPIT_LEFT         BUTTON_LEFT
+#define FLIPIT_RIGHT        BUTTON_RIGHT
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_NEXT         BUTTON_SCROLL_FWD
+#define FLIPIT_PREV         BUTTON_SCROLL_BACK
+#define FLIPIT_QUIT         BUTTON_POWER
+#define FLIPIT_SHUFFLE      (BUTTON_REC | BUTTON_LEFT)
+#define FLIPIT_SOLVE        (BUTTON_REC | BUTTON_RIGHT)
+#define FLIPIT_STEP_BY_STEP (BUTTON_REC | BUTTON_SELECT)
+#define FLIPIT_TOGGLE       BUTTON_SELECT
+
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
 
 #define FLIPIT_LEFT         BUTTON_LEFT
 #define FLIPIT_RIGHT        BUTTON_RIGHT
@@ -508,7 +525,28 @@ static bool flipit_loop(void)
             case FLIPIT_RIGHT:
                 move_cursor(1, 0);
                 break;
+            /*move cursor though the entire field*/
+#ifdef FLIPIT_SCROLLWHEEL
+            case FLIPIT_PREV:
+            case FLIPIT_PREV|BUTTON_REPEAT:    
+                if ((cursor_pos)%5 == 0) {
+                    move_cursor(-1, -1);
+                }
+                else {
+                    move_cursor(-1, 0);
+                }
+                break;
 
+            case FLIPIT_NEXT:
+            case FLIPIT_NEXT|BUTTON_REPEAT:
+                if ((cursor_pos+1)%5 == 0) {
+                    move_cursor(1, 1);
+                }
+                else {
+                    move_cursor(1, 0);
+                }
+                break;
+#endif
             case FLIPIT_UP:
 #ifdef FLIPIT_UP_PRE
                 if (lastbutton != FLIPIT_UP_PRE)
