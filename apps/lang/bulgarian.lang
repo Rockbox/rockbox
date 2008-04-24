@@ -2394,10 +2394,12 @@
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    recording: "deprecated"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4169,7 +4171,7 @@
     ipodvideo: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     ipodvideo: ""
   </voice>
 </phrase>
@@ -6484,7 +6486,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: "deprecated"
   </dest>
   <voice>
     *: ""
@@ -9247,7 +9249,7 @@
     ipodvideo: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     ipodvideo: ""
   </voice>
 </phrase>
@@ -9650,7 +9652,7 @@
     ipodvideo: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     ipodvideo: ""
   </voice>
 </phrase>
@@ -10687,7 +10689,7 @@
     ipodvideo: ""
   </dest>
   <voice>
-    *: ""
+    *: none
     ipodvideo: ""
   </voice>
 </phrase>
@@ -11542,5 +11544,33 @@
   <voice>
     *: ""
     recording: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in system settings menu
+  user: 
+  <source>
+    *: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: "Захранване на аксесоарите"
+  </dest>
+  <voice>
+    *: "Захранване на аксесоарите"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user: 
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "Неустановен"
+  </dest>
+  <voice>
+    *: "Неустановено състояние"
   </voice>
 </phrase>
