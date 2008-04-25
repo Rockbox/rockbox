@@ -30,7 +30,14 @@
 
 /* Power and display status */
 static bool display_on  = true; /* Is the display turned on? */
-static bool direct_fb_access = false; /* Does the DM320 has direct access to the FB? */
+static bool direct_fb_access = false; /* Does the DM320 has direct access to
+                                         the FB? */
+
+/* Copies a rectangle from one framebuffer to another. Can be used in
+   single transfer mode with width = num pixels, and height = 1 which
+   allows a full-width rectangle to be copied more efficiently. */
+extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
+                                 int width, int height);
 
 int lcd_default_contrast(void)
 {
@@ -46,17 +53,17 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno) {
   (void) yesno;
-  // TODO:
+  /* TODO: */
 }
 
 void lcd_set_flip(bool yesno) {
   (void) yesno;
-  // TODO:
+  /* TODO: */
 }
 
 
 /* LTV250QV panel functions */
-
+#ifdef ENABLE_DISPLAY_FUNCS
 static void lcd_write_reg(unsigned char reg, unsigned short val)
 {
     unsigned char block[3];
@@ -88,7 +95,7 @@ static void lcd_display_on(void)
     IO_GIO_BITSET2 = (1 << 8);
     sleep_ms(1);
     
-    //Init SPI here...
+    /*Init SPI here... */
     sleep_ms(32);
     
     IO_GIO_BITSET2 = (1 << 0);
@@ -98,7 +105,7 @@ static void lcd_display_on(void)
     IO_GIO_BITSET2 = (1 << 4);
     sleep_ms(5);
     IO_GIO_BITCLR2 = (1 << 8);
-    //TODO: figure out what OF does after this...
+    /*TODO: figure out what OF does after this... */
     IO_GIO_BITSET2 = (1 << 8);
     sleep_ms(1);
     
@@ -155,7 +162,7 @@ static void lcd_display_on(void)
     lcd_write_reg(10, 0x111A);
     sleep_ms(10);
     
-    //TODO: other stuff!
+    /*TODO: other stuff! */
 
     /* tell that we're on now */
     display_on = true;
@@ -193,6 +200,7 @@ static void lcd_display_off(void)
     IO_GIO_BITCLR2 |= (1 << 3);
 }
 
+#endif /* ENABLE_DISPLAY_FUNCS */
 
 
 void lcd_enable(bool on)
@@ -202,13 +210,13 @@ void lcd_enable(bool on)
 
     if (on)
     {
-        display_on = true; //TODO: remove me!
+        display_on = true; /*TODO: remove me! */
         //lcd_display_on();  /* Turn on display */
         lcd_update();      /* Resync display */
     }
     else
     {
-        display_on = false; //TODO: remove me!
+        display_on = false; /*TODO: remove me! */
         //lcd_display_off();  /* Turn off display */
     }
 }
@@ -268,17 +276,23 @@ void lcd_init_device(void)
     IO_OSD_OSDWIN0XL = LCD_WIDTH;
     IO_OSD_OSDWIN0YL = LCD_HEIGHT;
 #if 0
-    //TODO: set LCD clock!
-    IO_CLK_MOD1 &= ~0x18; // disable OSD clock and VENC clock
+    /*TODO: set LCD clock! */
+    IO_CLK_MOD1 &= ~0x18; /* disable OSD clock and VENC clock */
     IO_CLK_02DIV = 3;
-    IO_CLK_OSEL = (IO_CLK_OSEL & ~0xF00) | 0x400; // reset 'General purpose clock output (GIO26, GIO34)' and set to 'PLLIN clock'
-    IO_CLK_SEL1 = (IO_CLK_SEL1 | 7) | 0x1000; // set to 'GP clock output 2 (GIO26, GIO34)' and turn on 'VENC clock'
-    IO_CLK_MOD1 |= 0x18; // enable OSD clock and VENC clock
+
+    /* reset 'General purpose clock output (GIO26, GIO34)' and set to 'PLLIN
+       clock' */
+    IO_CLK_OSEL = (IO_CLK_OSEL & ~0xF00) | 0x400;
+
+    /* set to 'GP clock output 2 (GIO26, GIO34)' and turn on 'VENC clock' */
+    IO_CLK_SEL1 = (IO_CLK_SEL1 | 7) | 0x1000;
+    IO_CLK_MOD1 |= 0x18; /* enable OSD clock and VENC clock */
     
     /* Set LCD values in OSD */
-    IO_VID_ENC_VMOD = ( ( (IO_VID_ENC_VMOD & 0xFFFF8C00) | 0x14) | 0x2400 ); // disable NTSC/PAL encoder & set mode to RGB666 parallel 18 bit
+    /* disable NTSC/PAL encoder & set mode to RGB666 parallel 18 bit */
+    IO_VID_ENC_VMOD = ( ( (IO_VID_ENC_VMOD & 0xFFFF8C00) | 0x14) | 0x2400 );
     IO_VID_ENC_VDCTL = ( ( (IO_VID_ENC_VDCTL & 0xFFFFCFE8) | 0x20) | 0x4000 );
-    //TODO: finish this...
+    /* TODO: finish this... */
 #endif
 }
 
@@ -293,21 +307,21 @@ void lcd_update_rect(int x, int y, int width, int height)
     register fb_data *dst, *src;
 
     if (!display_on || direct_fb_access)
-    return;
+        return;
 
     if (x + width > LCD_WIDTH)
-    width = LCD_WIDTH - x; /* Clip right */
+        width = LCD_WIDTH - x; /* Clip right */
     if (x < 0)
-    width += x, x = 0; /* Clip left */
+        width += x, x = 0; /* Clip left */
     if (width <= 0)
     return; /* nothing left to do */
 
     if (y + height > LCD_HEIGHT)
-    height = LCD_HEIGHT - y; /* Clip bottom */
+        height = LCD_HEIGHT - y; /* Clip bottom */
     if (y < 0)
-    height += y, y = 0; /* Clip top */
+        height += y, y = 0; /* Clip top */
     if (height <= 0)
-    return; /* nothing left to do */
+        return; /* nothing left to do */
 
 #if CONFIG_ORIENTATION == SCREEN_PORTAIT
     dst = (fb_data *)FRAME + LCD_WIDTH*y + x;
@@ -348,10 +362,10 @@ This must be called after all other LCD functions that change the display. */
 void lcd_update(void)
 {
     if (!display_on || direct_fb_access)
-    return;
+        return;
 #if CONFIG_ORIENTATION == SCREEN_PORTAIT
     lcd_copy_buffer_rect((fb_data *)FRAME, &lcd_framebuffer[0][0],
-    LCD_WIDTH*LCD_HEIGHT, 1);
+                         LCD_WIDTH*LCD_HEIGHT, 1);
 #else
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
@@ -367,17 +381,17 @@ int stride);
 /* For the Gigabeat - show it rotated */
 /* So the LCD_WIDTH is now the height */
 void lcd_blit_yuv(unsigned char * const src[3],
-int src_x, int src_y, int stride,
-int x, int y, int width, int height)
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
 {
     /* Caches for chroma data so it only need be recalculated every other
-    line */
+       line */
     unsigned char chroma_buf[LCD_HEIGHT/2*3]; /* 480 bytes */
     unsigned char const * yuv_src[3];
     off_t z;
 
     if (!display_on || direct_fb_access)
-    return;
+        return;
 
     /* Sorry, but width and height must be >= 2 or else */
     width &= ~1;

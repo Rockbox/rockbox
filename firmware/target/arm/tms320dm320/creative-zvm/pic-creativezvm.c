@@ -73,7 +73,10 @@
 #define BTN_HOLD                        0x9F06
 #define BTN_UNHOLD                      0xAF06
 /* TODO: other values
-First number is just pressing it, second is when you release it or keep it pressed a bit longer
+
+First number is just pressing it, second is when you release it or keep it
+pressed a bit longer
+
 On/Off    = 0F00 && 0F01
 Hold      = 9F06 && AF06
 Volume Up = 6F00 && 6F01
@@ -235,10 +238,14 @@ void GIO0(void)
 #ifdef BOOTLOADER
     lcd_set_foreground((sw ? LCD_RGBPACK(255,0,0) : LCD_RGBPACK(0,255,0) ));
 #endif
-    snprintf(weergvn, sizeof(char)*10, "%x", (unsigned int)((msg[3] << 24) | (msg[2] << 16) | (msg[1] << 8) | msg[0]));
-    lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*10, LCD_HEIGHT-SYSFONT_HEIGHT*10, weergvn);
+    snprintf(weergvn, sizeof(char)*10, "%x",
+             (unsigned int)((msg[3] << 24) |
+                            (msg[2] << 16) | (msg[1] << 8) | msg[0]));
+    lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*10, LCD_HEIGHT-SYSFONT_HEIGHT*10,
+               weergvn);
     snprintf(weergvn, sizeof(char)*10, "%x", btn);
-    lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*10, LCD_HEIGHT-SYSFONT_HEIGHT*7, weergvn);
+    lcd_putsxy(LCD_WIDTH-SYSFONT_WIDTH*10, LCD_HEIGHT-SYSFONT_HEIGHT*7,
+               weergvn);
 #ifdef BOOTLOADER
     lcd_set_foreground(LCD_BLACK);
 #endif
@@ -249,7 +256,8 @@ void GIO0(void)
     IO_INTC_IRQ1 = INTR_IRQ1_EXT0;
 }
 
-void send_command_to_pic(unsigned char in, unsigned char* out, unsigned int length)
+void send_command_to_pic(unsigned char in, unsigned char* out,
+                         unsigned int length)
 {
     /* Disable GIO0 interrupt */
     IO_INTC_EINT1 &= ~INTR_EINT1_EXT0;
@@ -280,13 +288,17 @@ bool headphones_inserted(void)
 
 void button_init_device(void)
 {
-    /* TODO: I suppose GIO0 has to be set to input and enable interrupts on it? */
+    /* TODO: I suppose GIO0 has to be set to input and enable interrupts on
+       it? */
     /* Enable GIO0 interrupt */
     IO_INTC_EINT1 |= INTR_EINT1_EXT0;
-    btn = nonbtn = pic_init_value = pic_init2_value = last_btn = hold_switch = 0;
+    btn = nonbtn = pic_init_value = pic_init2_value = last_btn = hold_switch =
+        0;
     /* Initialize PIC */
-    send_command_to_pic(1, &pic_init_value, sizeof(pic_init_value));
-    send_command_to_pic(2, &pic_init2_value, sizeof(pic_init2_value));
+    send_command_to_pic(1, (unsigned char *)&pic_init_value,
+                        sizeof(pic_init_value));
+    send_command_to_pic(2, (unsigned char *)&pic_init2_value,
+                        sizeof(pic_init2_value));
 }
 
 int get_debug_info(int choice)

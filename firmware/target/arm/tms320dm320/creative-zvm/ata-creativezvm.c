@@ -26,7 +26,8 @@
 #include "panic.h"
 #include "ata-target.h"
 
-void ide_power_enable(bool on){
+void ide_power_enable(bool on)
+{
 #if 0
     IO_INTC_EINT1 &= ~INTR_EINT1_EXT2;
     if(on)
@@ -37,13 +38,16 @@ void ide_power_enable(bool on){
     else
         IO_GIO_BITCLR0 = (1 << 14);
     IO_INTC_EINT1 |= INTR_EINT1_EXT2;
-	return;
+    return;
+#else
+    (void)on;
 #endif
 }
 
-inline bool ide_powered(){
+inline bool ide_powered()
+{
 #if 0
-	return (IO_GIO_BITSET0 & (1 << 14));
+    return (IO_GIO_BITSET0 & (1 << 14));
 #else
     return true;
 #endif
@@ -52,31 +56,31 @@ inline bool ide_powered(){
 void ata_reset(void)
 {
 /* Disabled until figured out what's wrong */
-	IO_INTC_EINT1 &= ~INTR_EINT1_EXT2; //disable GIO2 interrupt
-	if(!ide_powered())
-	{
+    IO_INTC_EINT1 &= ~INTR_EINT1_EXT2; /*disable GIO2 interrupt */
+    if(!ide_powered())
+    {
         ide_power_enable(true);
-		sleep(150);
-	}
-	else
-	{
-		IO_GIO_BITSET0 = (1 << 5);
-		IO_GIO_BITCLR0 = (1 << 3);
-		sleep(1);
-	}
-	IO_GIO_BITCLR0 = (1 << 5);
-	sleep(10);
-	IO_GIO_BITSET0 = (1 << 3);
-	while(!(ATA_COMMAND & STATUS_RDY))
-		sleep(10);
-	IO_INTC_EINT1 |= INTR_EINT1_EXT2; //enable GIO2 interrupt
-	return;
+        sleep(150);
+    }
+    else
+    {
+        IO_GIO_BITSET0 = (1 << 5);
+        IO_GIO_BITCLR0 = (1 << 3);
+        sleep(1);
+    }
+    IO_GIO_BITCLR0 = (1 << 5);
+    sleep(10);
+    IO_GIO_BITSET0 = (1 << 3);
+    while(!(ATA_COMMAND & STATUS_RDY))
+        sleep(10);
+    IO_INTC_EINT1 |= INTR_EINT1_EXT2; //enable GIO2 interrupt
+    return;
 }
 
 void ata_enable(bool on)
 {
-	(void)on;
-	return;
+    (void)on;
+    return;
 }
 
 bool ata_is_coldstart(void)
