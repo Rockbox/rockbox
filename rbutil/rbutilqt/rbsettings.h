@@ -143,7 +143,7 @@ class RbSettings : public QObject
         //! private copy constructors to prvent copying
         RbSettings&  operator= (const RbSettings& other)
             { (void)other; return *this; }
-        RbSettings(const RbSettings& other)
+        RbSettings(const RbSettings& other) :QObject()
             { (void)other; }
     
         //! pointers to our setting objects
