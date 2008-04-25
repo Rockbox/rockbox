@@ -17,19 +17,26 @@
  *
  ****************************************************************************/
 
-#include "backlight-target.h"
+#include "config.h"
 #include "system.h"
+#include "backlight-target.h"
 
 #define MIN_BRIGHTNESS 0x80ff08ff
 
 static const int log_brightness[12] = {0,4,8,12,20,28,40,60,88,124,176,255};
 
-void _backlight_on(void)
+/* Returns the current state of the backlight (true=ON, false=OFF). */
+bool _backlight_init(void)
+{
+    return (GPO32_ENABLE & 0x1000000) ? true : false;
+}
+
+void _backlight_hw_on(void)
 {
     GPO32_ENABLE |= 0x1000000;
 }
 
-void _backlight_off(void)
+void _backlight_hw_off(void)
 {
     GPO32_ENABLE &= ~0x1000000;
 }

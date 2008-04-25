@@ -4,8 +4,6 @@
  
 #define TARGET_TREE
 
-#define OLYMPUS_MROBE_100 1 
-
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 23
 #define MODEL_NAME   "Olympus m:robe MR-100"
@@ -65,7 +63,9 @@
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
-/* TODO #define HAVE_BACKLIGHT_BRIGHTNESS */
+
+/* We can fade the backlight by using PWM */
+#define HAVE_BACKLIGHT_PWM_FADING
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      1

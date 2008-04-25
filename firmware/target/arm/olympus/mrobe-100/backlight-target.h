@@ -20,9 +20,20 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-#define _backlight_init() true
-void _backlight_on(void);
-void _backlight_off(void);
+bool _backlight_init(void); /* Returns backlight current state (true=ON). */
+void _backlight_hw_on(void);
+void _backlight_hw_off(void);
+
+#ifdef BOOTLOADER
+#define _backlight_on() _backlight_hw_on()
+#define _backlight_off() _backlight_hw_off()
+#else
+#define _backlight_on_isr() _backlight_hw_on()
+#define _backlight_off_isr() _backlight_hw_off()
+#define _backlight_on_normal() _backlight_hw_on()
+#define _backlight_off_normal() _backlight_hw_off()
+#define _BACKLIGHT_FADE_BOOST
+#endif
 
 /* Button lights are controlled by GPIOA_OUTPUT_VAL */
 #define BUTTONLIGHT_PLAY     0x01
