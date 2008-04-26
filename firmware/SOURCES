@@ -235,6 +235,7 @@ drivers/audio/mas35xx.c
 usbstack/usb_core.c
 usbstack/usb_storage.c
 usbstack/usb_serial.c
+usbstack/usb_charging_only.c
 #if CONFIG_USBOTG == USBOTG_ARC
 target/arm/usb-drv-arc.c
 #elif CONFIG_USBOTG == USBOTG_ISP1583

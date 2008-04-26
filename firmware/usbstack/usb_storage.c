@@ -326,23 +326,32 @@ void usb_storage_init(void)
 }
 
 
-int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size,
-                                      int interface_number,int endpoint)
+int usb_storage_set_first_endpoint(int endpoint)
+{
+    usb_endpoint = endpoint;
+    return endpoint + 1;
+}
+int usb_storage_set_first_interface(int interface)
+{
+    usb_interface = interface;
+    return interface + 1;
+}
+
+int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size)
 {
     endpoint_descriptor.wMaxPacketSize=max_packet_size;
-    interface_descriptor.bInterfaceNumber=interface_number;
-
+    interface_descriptor.bInterfaceNumber=usb_interface;
 
     memcpy(dest,&interface_descriptor,
            sizeof(struct usb_interface_descriptor));
     dest+=sizeof(struct usb_interface_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = endpoint | USB_DIR_IN,
+    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_IN,
     memcpy(dest,&endpoint_descriptor,
            sizeof(struct usb_endpoint_descriptor));
     dest+=sizeof(struct usb_endpoint_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = endpoint | USB_DIR_OUT,
+    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_OUT,
     memcpy(dest,&endpoint_descriptor,
            sizeof(struct usb_endpoint_descriptor));
 
@@ -350,11 +359,8 @@ int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size,
            2*sizeof(struct usb_endpoint_descriptor);
 }
 
-void usb_storage_init_connection(int interface,int endpoint)
+void usb_storage_init_connection(void)
 {
-    usb_interface = interface;
-    usb_endpoint = endpoint;
-
     logf("ums: set config");
     /* prime rx endpoint. We only need room for commands */
     state = WAITING_FOR_COMMAND;
@@ -377,8 +383,9 @@ void usb_storage_init_connection(int interface,int endpoint)
 }
 
 /* called by usb_core_transfer_complete() */
-void usb_storage_transfer_complete(bool in,int status,int length)
+void usb_storage_transfer_complete(int ep,bool in,int status,int length)
 {
+    (void)ep;
     struct command_block_wrapper* cbw = (void*)tb.transfer_buffer;
 
     //logf("transfer result %X %d", status, length);

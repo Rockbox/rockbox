@@ -28,7 +28,7 @@
 #ifdef USB_SERIAL
 
 /* serial interface */
-struct usb_interface_descriptor __attribute__((aligned(2)))
+static struct usb_interface_descriptor __attribute__((aligned(2)))
                                 interface_descriptor =
 {
     .bLength            = sizeof(struct usb_interface_descriptor),
@@ -42,7 +42,8 @@ struct usb_interface_descriptor __attribute__((aligned(2)))
     .iInterface         = 0
 };
 
-struct usb_endpoint_descriptor __attribute__((aligned(2))) endpoint_descriptor =
+
+static struct usb_endpoint_descriptor __attribute__((aligned(2))) endpoint_descriptor =
 {
     .bLength          = sizeof(struct usb_endpoint_descriptor),
     .bDescriptorType  = USB_DT_ENDPOINT,
@@ -90,31 +91,42 @@ static void sendout(void)
     busy_sending=true;
 }
 
-int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size,
-                                     int interface_number,int endpoint)
+int usb_serial_set_first_endpoint(int endpoint)
 {
-    endpoint_descriptor.wMaxPacketSize=max_packet_size;
-    interface_descriptor.bInterfaceNumber=interface_number;
+    usb_endpoint = endpoint;
+    return endpoint + 1;
+}
 
+int usb_serial_set_first_interface(int interface)
+{
+    usb_interface = interface;
+    return interface + 1;
+}
+
+
+int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size)
+{
+    unsigned char *orig_dest = dest;
+
+    endpoint_descriptor.wMaxPacketSize=max_packet_size;
+    interface_descriptor.bInterfaceNumber=usb_interface;
 
     memcpy(dest,&interface_descriptor,sizeof(struct usb_interface_descriptor));
     dest+=sizeof(struct usb_interface_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = endpoint | USB_DIR_IN,
+    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_IN,
     memcpy(dest,&endpoint_descriptor,sizeof(struct usb_endpoint_descriptor));
     dest+=sizeof(struct usb_endpoint_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = endpoint | USB_DIR_OUT,
+    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_OUT,
     memcpy(dest,&endpoint_descriptor,sizeof(struct usb_endpoint_descriptor));
-    return sizeof(struct usb_interface_descriptor) +
-           2 * sizeof(struct usb_endpoint_descriptor);
+    dest+=sizeof(struct usb_endpoint_descriptor);
+
+    return (dest - orig_dest);
 }
 
-void usb_serial_init_connection(int interface,int endpoint)
+void usb_serial_init_connection(void)
 {
-    usb_interface = interface;
-    usb_endpoint = endpoint;
-
     /* prime rx endpoint */
     usb_drv_recv(usb_endpoint, receive_buffer, sizeof receive_buffer);
 
@@ -187,8 +199,9 @@ void usb_serial_send(unsigned char *data,int length)
 }
 
 /* called by usb_core_transfer_complete() */
-void usb_serial_transfer_complete(bool in, int status, int length)
+void usb_serial_transfer_complete(int ep,bool in, int status, int length)
 {
+    (void)ep;
     switch (in) {
         case false:
             logf("serial: %s", receive_buffer);

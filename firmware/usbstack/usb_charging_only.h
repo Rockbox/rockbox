@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:  $
  *
- * Copyright (C) 2007 by Christian Gmeiner
+ * Copyright (C) 2008 by Frank Gevaerts
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,21 +16,16 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef USB_SERIAL_H
-#define USB_SERIAL_H
+#ifndef USB_CHARGING_ONLY_H
+#define USB_CHARGING_ONLY_H
 
 #include "usb_ch9.h"
 
-int usb_serial_set_first_endpoint(int endpoint);
-int usb_serial_set_first_interface(int interface);
-int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size);
-void usb_serial_init_connection(void);
-void usb_serial_init(void);
-void usb_serial_disconnect(void);
-void usb_serial_transfer_complete(int ep,bool in, int status, int length);
-bool usb_serial_control_request(struct usb_ctrlrequest* req);
-
-void usb_serial_send(unsigned char *data,int length);
+void usb_charging_only_init(void);
+int usb_charging_only_set_first_endpoint(int endpoint);
+int usb_charging_only_set_first_interface(int interface);
+int usb_charging_only_get_config_descriptor(unsigned char *dest,int max_packet_size);
+bool usb_charging_only_control_request(struct usb_ctrlrequest* req);
 
 #endif
 
