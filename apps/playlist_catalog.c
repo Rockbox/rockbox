@@ -378,11 +378,9 @@ static int add_to_playlist(const char* playlist, char* sel, int sel_attr)
     {
         /* search directory for tracks and append to playlist */
         bool recurse = false;
-        char *lines[] = {
-            (char *)str(LANG_RECURSE_DIRECTORY_QUESTION),
-                sel
-        };
-        struct text_message message={lines, 2};
+        const char *lines[] = {
+            str(LANG_RECURSE_DIRECTORY_QUESTION), sel};
+        const struct text_message message={lines, 2};
         struct add_track_context context;
 
         if (global_settings.recursive_dir_insert != RECURSE_ASK)

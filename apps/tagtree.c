@@ -1501,8 +1501,8 @@ int tagtree_enter(struct tree_context* c)
                     !global_settings.party_mode &&
                     playlist_modified(NULL))
                 {
-                    char *lines[]={ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
-                    struct text_message message={lines, 1};
+                    static const char *lines[]={ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
+                    static const struct text_message message={lines, 1};
                     
                     if (gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
                         break;

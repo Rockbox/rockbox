@@ -25,7 +25,7 @@
 
 struct text_message
 {
-    char **message_lines;
+    const char **message_lines;
     int nb_lines;
 };
 
@@ -50,7 +50,7 @@ extern void gui_textarea_update(struct screen * display);
  * returns : the number of lines effectively displayed
  */
 extern int gui_textarea_put_message(struct screen * display,
-                                    struct text_message * message,
+                                    const struct text_message * message,
                                     int ystart);
 /*
  * Compute the number of text lines the display can draw with the current font
@@ -63,7 +63,7 @@ extern void gui_textarea_update_nblines(struct screen * display);
  * Speak a text_message. The message's lines may be virtual pointers
  * representing language / voicefont IDs (see settings.h).
  */
-extern void talk_text_message(struct text_message * message, bool enqueue);
+extern void talk_text_message(const struct text_message * message, bool enqueue);
 
 #ifdef HAVE_LCD_BITMAP
 /*

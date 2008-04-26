@@ -1270,8 +1270,8 @@ static int runtime_speak_data(int selected_item, void* data)
 
 bool view_runtime(void)
 {
-    unsigned char *lines[]={ID2P(LANG_CLEAR_TIME)};
-    struct text_message message={(char **)lines, 1};
+    static const char *lines[]={ID2P(LANG_CLEAR_TIME)};
+    static const struct text_message message={lines, 1};
 
     struct gui_synclist lists;
     int action;

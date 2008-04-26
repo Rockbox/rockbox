@@ -55,15 +55,18 @@ static const struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
 
 static int reset_settings(void)
 {
-    const unsigned char *lines[]={ID2P(LANG_RESET_ASK)};
-    const unsigned char *yes_lines[]={
-        str(LANG_SETTINGS),
+    static const char *lines[]={ID2P(LANG_RESET_ASK)};
+    static const char *yes_lines[]={
+        ID2P(LANG_SETTINGS),
         ID2P(LANG_RESET_DONE_CLEAR)
     };
-    const unsigned char *no_lines[]={yes_lines[0], ID2P(LANG_CANCEL)};
-    struct text_message message={(char **)lines, 1};
-    struct text_message yes_message={(char **)yes_lines, 2};
-    struct text_message no_message={(char **)no_lines, 2};
+    static const char *no_lines[]={
+        ID2P(LANG_SETTINGS),
+        ID2P(LANG_CANCEL)
+    };
+    static const struct text_message message={lines, 1};
+    static const struct text_message yes_message={yes_lines, 2};
+    static const struct text_message no_message={no_lines, 2};
 
     switch(gui_syncyesno_run(&message, &yes_message, &no_message))
     {

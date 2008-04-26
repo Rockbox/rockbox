@@ -187,12 +187,12 @@ bool bookmark_autobookmark(void)
             return write_bookmark(false);
     }
 #ifdef HAVE_LCD_BITMAP
-    unsigned char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY)};
-    struct text_message message={(char **)lines, 1};
+    const char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY)};
+    const struct text_message message={lines, 1};
 #else
-    unsigned char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY),
+    const char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY),
                             str(LANG_CONFIRM_WITH_BUTTON)};
-    struct text_message message={(char **)lines, 2};
+    const struct text_message message={lines, 2};
 #endif
 #if LCD_DEPTH > 1
     show_main_backdrop(); /* switch to main backdrop as we may come from wps */

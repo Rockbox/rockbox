@@ -32,8 +32,8 @@ enum yesno_res
 
 struct gui_yesno
 {
-    struct text_message * main_message;
-    struct text_message * result_message[2];
+    const struct text_message * main_message;
+    const struct text_message * result_message[2];
 
     struct screen * display;
 };
@@ -47,7 +47,7 @@ struct gui_yesno
  *  - no_message : message displayed if answer is 'no'
  */
 extern enum yesno_res gui_syncyesno_run(
-                           struct text_message * main_message,
-                           struct text_message * yes_message,
-                           struct text_message * no_message);
+                           const struct text_message * main_message,
+                           const struct text_message * yes_message,
+                           const struct text_message * no_message);
 #endif /* _GUI_YESNO_H_ */

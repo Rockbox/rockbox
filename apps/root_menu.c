@@ -143,8 +143,9 @@ static int browser(void* param)
                     {
                         /* Prompt the user */
                         reinit_attempted = true;
-                        char *lines[]={ID2P(LANG_TAGCACHE_BUSY), ID2P(LANG_TAGCACHE_FORCE_UPDATE)};
-                        struct text_message message={lines, 2};
+                        static const char *lines[]={
+                            ID2P(LANG_TAGCACHE_BUSY), ID2P(LANG_TAGCACHE_FORCE_UPDATE)};
+                        static const struct text_message message={lines, 2};
                         if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_NO)
                             break;
                         int i;

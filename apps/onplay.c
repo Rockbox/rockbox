@@ -160,11 +160,11 @@ static bool save_playlist(void)
 static bool add_to_playlist(int position, bool queue)
 {
     bool new_playlist = !(audio_status() & AUDIO_STATUS_PLAY);
-    char *lines[] = {
+    const char *lines[] = {
         ID2P(LANG_RECURSE_DIRECTORY_QUESTION),
         selected_file
     };
-    struct text_message message={lines, 2};
+    const struct text_message message={lines, 2};
 
     gui_syncsplash(0, ID2P(LANG_WAIT));
     
@@ -523,11 +523,11 @@ static int remove_dir(char* dirname, int len)
 /* share code for file and directory deletion, saves space */
 static bool delete_handler(bool is_dir)
 {
-    char *lines[]={
+    const char *lines[]={
         ID2P(LANG_REALLY_DELETE),
         selected_file
     };
-    char *yes_lines[]={
+    const char *yes_lines[]={
         ID2P(LANG_DELETED),
         selected_file
     };
@@ -867,8 +867,8 @@ static bool clipboard_paste(void)
     char *cwd, *nameptr;
     bool success;
 
-    unsigned char *lines[]={ID2P(LANG_REALLY_OVERWRITE)};
-    struct text_message message={(char **)lines, 1};
+    static const char *lines[]={ID2P(LANG_REALLY_OVERWRITE)};
+    static const struct text_message message={lines, 1};
 
     /* Get the name of the current directory */
     cwd = getcwd(NULL, 0);

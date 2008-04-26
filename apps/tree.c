@@ -645,8 +645,8 @@ static int dirbrowse()
             tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
 #ifdef BOOTFILE
         if (boot_changed) {
-            char *lines[]={ID2P(LANG_BOOT_CHANGED), ID2P(LANG_REBOOT_NOW)};
-            struct text_message message={lines, 2};
+            static const char *lines[]={ID2P(LANG_BOOT_CHANGED), ID2P(LANG_REBOOT_NOW)};
+            static const struct text_message message={lines, 2};
             if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
                 rolo_load("/" BOOTFILE);
             restore = true;

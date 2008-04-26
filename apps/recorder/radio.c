@@ -136,11 +136,11 @@ static int scan_presets(void);
 
 /* Function to manipulate all yesno dialogues.
    This function needs the output text as an argument. */
-static bool yesno_pop(char* text)
+static bool yesno_pop(const char* text)
 {
     int i;
-    char *lines[]={text};
-    struct text_message message={lines, 1};
+    const char *lines[]={text};
+    const struct text_message message={lines, 1};
     bool ret = (gui_syncyesno_run(&message,NULL,NULL)== YESNO_YES);
     FOR_NB_SCREENS(i)
         gui_textarea_clear(&screens[i]);

@@ -47,7 +47,7 @@ void gui_textarea_update(struct screen * display)
 }
 
 int gui_textarea_put_message(struct screen * display,
-                             struct text_message * message,
+                             const struct text_message * message,
                              int ystart)
 {
     int i;
@@ -78,7 +78,7 @@ void gui_textarea_update_nblines(struct screen * display)
     display->nb_lines = height / display->char_height;
 }
 
-void talk_text_message(struct text_message * message, bool enqueue)
+void talk_text_message(const struct text_message * message, bool enqueue)
 {
     int line;
     if(message)

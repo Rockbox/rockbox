@@ -1050,9 +1050,9 @@ void check_bootfile(bool do_rolo)
                 if((entry->wrtdate != wrtdate) ||
                    (entry->wrttime != wrttime))
                 {
-                    char *lines[] = { ID2P(LANG_BOOT_CHANGED),
-                                      ID2P(LANG_REBOOT_NOW) };
-                    struct text_message message={ lines, 2 };
+                    static const char *lines[] = { ID2P(LANG_BOOT_CHANGED),
+                                                   ID2P(LANG_REBOOT_NOW) };
+                    static const struct text_message message={ lines, 2 };
                     button_clear_queue(); /* Empty the keyboard buffer */
                     if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
                     rolo_load(BOOTDIR "/" BOOTFILE);

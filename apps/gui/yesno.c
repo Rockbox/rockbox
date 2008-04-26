@@ -33,9 +33,9 @@
  *  - no_message : message displayed if answer is 'no'
  */
 static void gui_yesno_init(struct gui_yesno * yn,
-                    struct text_message * main_message,
-                    struct text_message * yes_message,
-                    struct text_message * no_message)
+                    const struct text_message * main_message,
+                    const struct text_message * yes_message,
+                    const struct text_message * no_message)
 {
     yn->main_message=main_message;
     yn->result_message[YESNO_YES]=yes_message;
@@ -92,7 +92,7 @@ static void gui_yesno_draw(struct gui_yesno * yn)
  */
 static bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
 {
-    struct text_message * message=yn->result_message[result];
+    const struct text_message * message=yn->result_message[result];
     if(message==NULL)
         return false;
     gui_textarea_put_message(yn->display, message, 0);
@@ -101,9 +101,9 @@ static bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
 
 #include "debug.h"
 
-enum yesno_res gui_syncyesno_run(struct text_message * main_message,
-                                 struct text_message * yes_message,
-                                 struct text_message * no_message)
+enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
+                                 const struct text_message * yes_message,
+                                 const struct text_message * no_message)
 {
     int i;
     unsigned button;
