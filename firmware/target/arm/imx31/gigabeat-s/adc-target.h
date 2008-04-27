@@ -19,25 +19,26 @@
 #ifndef _ADC_TARGET_H_
 #define _ADC_TARGET_H_
 
-/* only two channels used by the Gigabeat */
+/* 16 channels in groups of 8 - each conversion converts 8 channels in
+ * a group of 8 inputs */
 #define NUM_ADC_CHANNELS 16
 
-#define ADC_BATTERY      0
-#define ADC_UNKNOWN_1    1
-#define ADC_UNKNOWN_2    2
-#define ADC_UNKNOWN_3    3
-#define ADC_UNKNOWN_4    4
-#define ADC_UNKNOWN_5    5
-#define ADC_UNKNOWN_6    6
-#define ADC_UNKNOWN_7    7
-#define ADC_HPREMOTE     8
-#define ADC_UNKNOWN_9    9
-#define ADC_UNKNOWN_10  10
-#define ADC_UNKNOWN_11  11
-#define ADC_UNKNOWN_12  12
-#define ADC_UNKNOWN_13  13
-#define ADC_UNKNOWN_14  14
-#define ADC_UNKNOWN_15  15
+#define ADC_BATTERY            0 /* Battery Voltage (BATT) */
+#define ADC_UNUSED1            1 /* Battery Current (BATT-BATTISNS) */
+#define ADC_APPLICATION_SUPPLY 2 /* Application Supply (BP) */
+#define ADC_CHARGER_VOLTAGE    3 /* Charger Voltage (CHRGRAW) */
+#define ADC_CHARGER_CURRENT    4 /* Charger Current (CHRGISNSP-CHRGISNSN) */
+#define ADC_BATTERY_TEMP       5 /* General Purpose ADIN5 / Battery Pack Thermistor */
+#define ADC_UNUSED6            6 /* General Purpose ADIN6 / Backup Voltage (LICELL) */
+#define ADC_UNUSED7            7 /* General Purpose ADIN7 / UID / Die Temperature */
+#define ADC_HPREMOTE           8 /* General-purpose ADIN8 (Remote control) */
+#define ADC_UNUSED9            9 /* General-purpose ADIN9 */
+#define ADC_UNUSED10          10 /* General-purpose ADIN10 */
+#define ADC_UNUSED11          11 /* General-purpose ADIN11 */
+#define ADC_UNUSED12          12 /* General-purpose TSX1/Touch screen X-plate 1 */
+#define ADC_UNUSED13          13 /* General-purpose TSX2/Touch screen X-plate 2 */
+#define ADC_UNUSED14          14 /* General-purpose TSY1/Touch screen Y-plate 1 */
+#define ADC_UNUSED15          15 /* General-purpose TSY2/Touch screen Y-plate 2 */
 
 
 #define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */

@@ -73,12 +73,12 @@ unsigned short adc_read(int channel)
         last_adc_read[input_select] = current_tick;
     }
 
-    data = channels[input_select][(channel >> 1) & 3];
+    data = channels[input_select][channel & 3];
 
     mutex_unlock(&adc_mtx);
 
-    /* Extract the bitfield depending on even or odd channel number */
-    return (channel & 1) ? MC13783_ADD2r(data) : MC13783_ADD1r(data);
+    /* Channels 0-3/8-11 in ADD1, 0-4/12-15 in ADD2 */
+    return (channel & 4) ? MC13783_ADD2r(data) : MC13783_ADD1r(data);
 }
 
 /* Called when conversion is complete */
@@ -95,9 +95,9 @@ void adc_init(void)
     /* Init so first reads get data */
     last_adc_read[0] = last_adc_read[1] = current_tick-1;
 
-    /* Enable increment-by-read, thermistor */
+    /* Enable increment-by-read, thermistor, charge current */
     mc13783_write(MC13783_ADC0, MC13783_ADINC2 | MC13783_ADINC1 |
-                  MC13783_RTHEN);
+                  MC13783_RTHEN | MC13783_CHRGICON);
     /* Enable ADC, set multi-channel mode */
     mc13783_write(MC13783_ADC1, MC13783_ADEN);
     /* Enable the ADCDONE interrupt - notifications are dispatched by
