@@ -24,7 +24,6 @@
 
 #include "id3.h"
 #include "mp3data.h"
-#include "events.h"
 
 /* Not yet implemented. */
 #define CODEC_SET_AUDIOBUF_WATERMARK    4
