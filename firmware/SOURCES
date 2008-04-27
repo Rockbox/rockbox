@@ -255,6 +255,7 @@ drivers/m5636.c
 /* Other Random Hardware */
 #ifdef HAVE_TSC2100
 drivers/tsc2100.c
+drivers/audio/tsc2100.c
 #endif
 
 /* CPU Specific - By class then particular chip if applicable */

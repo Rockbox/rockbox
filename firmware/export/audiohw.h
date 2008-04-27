@@ -45,6 +45,8 @@
 #include "as3514.h"
 #elif defined(HAVE_MAS35XX)
 #include "mas35xx.h"
+#elif defined(HAVE_TSC2100)
+#include "tsc2100.h"
 #endif
 
 enum {

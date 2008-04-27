@@ -71,12 +71,14 @@ void tsc2100_writereg(int page, int address, short value);
 #define TSRESET_VALUE   0xBB00
 
 /* ts codec dac gain control */
-#define TSDACGAIN_PAGE			2
-#define TSDACGAIN_ADDRESS		0x02
+#define TSDACGAIN_PAGE          2
+#define TSDACGAIN_ADDRESS       0x02
+#define VOLUME_MAX  0
+#define VOLUME_MIN  -630
 
 /* ts audio control 1*/
-#define TSAC1_PAGE			2
-#define TSAC1_ADDRESS		0x00
+#define TSAC1_PAGE          2
+#define TSAC1_ADDRESS       0x00
 
 /* ts audio control 2 */
 #define TSAC2_PAGE          2
@@ -95,19 +97,35 @@ void tsc2100_writereg(int page, int address, short value);
 #define TSAC2_ADGAF         (1<<0) /* r only */
 
 /* ts codec power control */
-#define TSCPC_PAGE			2
-#define TSCPC_ADDRESS		0x05
+#define TSCPC_PAGE          2
+#define TSCPC_ADDRESS       0x05
 
 /* ts audio control 3 */
-#define TSAC3_PAGE			2
-#define TSAC3_ADDRESS		0x06
+#define TSAC3_PAGE          2
+#define TSAC3_ADDRESS       0x06
 
 /* ts audio control 4 */
-#define TSAC4_PAGE			2
-#define TSAC4_ADDRESS		0x1d
+#define TSAC4_PAGE          2
+#define TSAC4_ADDRESS       0x1d
+#define TSAC4_ASTDP         (1<<15)
+#define TSAC4_DASTDP        (1<<14)
+#define TSAC4_ASSTDP        (1<<13)
+#define TSAC4_DSTDP         (1<<12)
+#define TSAC4_RESERVEDD11   (1<<11)
+#define TSAC4_AGC_HYST_MASK 0x0c00
+#define TSAC4_AGC_HYST_SHIFT 10
+#define TSAC4_SHCKT_DIS     (1<<8)
+#define TSAC4_SHCKT_PD      (1<<7)
+#define TSAC4_SHCKT_FLAG    (1<<6)
+#define TSAC4_DAC_POP_RED   (1<<5)
+#define TSAC4_DAC_POP_RED_SET1          (1<<4)
+#define TSAC4_DAC_POP_RED_SET2_MASK     0x000c
+#define TSAC4_DAC_POP_RED_SET2_SHIFT    3
+#define TSAC4_PGID_MASK     0x0003
+#define TSAC4_PGID_SHIFT    0
 
 /* ts audio control 5 */
-#define TSAC5_PAGE			2
-#define TSAC5_ADDRESS		0x1e
+#define TSAC5_PAGE          2
+#define TSAC5_ADDRESS       0x1e
 
 #endif
