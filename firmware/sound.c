@@ -225,7 +225,7 @@ static int tenthdb2reg(int db)
 #if (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
     || defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_WM8731) \
     || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
-    || defined(HAVE_AS3514) || defined(HAVE_WM8985)
+    || defined(HAVE_AS3514) || defined(HAVE_WM8985) || defined(HAVE_TSC2100)
 
 /* all values in tenth of dB    MAS3507D    UDA1380  */
 int current_volume = 0;    /* -780..+180  -840..   0 */
@@ -242,7 +242,7 @@ static void set_prescaled_volume(void)
  * the prescaler stay at 0 for these unless SW tone controls are in use */
 #if defined(HAVE_SW_TONE_CONTROLS) || !(defined(HAVE_WM8975) \
     || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751) \
-    || defined(HAVE_WM8758) || defined(HAVE_WM8985))
+    || defined(HAVE_WM8758) || defined(HAVE_WM8985)) || defined(HAVE_TSC2100)
 
     prescale = MAX(current_bass, current_treble);
     if (prescale < 0)
@@ -286,10 +286,11 @@ static void set_prescaled_volume(void)
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751) \
-   || defined(HAVE_AS3514)
+   || defined(HAVE_AS3514) || defined(HAVE_TSC2100)
     audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758) \
-   || (defined(HAVE_WM8751) && !defined(MROBE_100))
+   || (defined(HAVE_WM8751) && !defined(MROBE_100)) \
+   || defined(HAVE_TSC2100)
     audiohw_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
 #endif
 
@@ -318,7 +319,7 @@ void sound_set_volume(int value)
 #elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
    || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
-   || defined(HAVE_AS3514) || defined(HAVE_WM8985)
+    || defined(HAVE_AS3514) || defined(HAVE_WM8985)  || defined(HAVE_TSC2100)
     current_volume = value * 10;     /* tenth of dB */
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101
@@ -338,7 +339,7 @@ void sound_set_balance(int value)
 #elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380 \
    || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
-   || defined(HAVE_AS3514) || defined(HAVE_WM8985)
+   || defined(HAVE_AS3514) || defined(HAVE_WM8985)  || defined(HAVE_TSC2100)
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101
@@ -631,7 +632,8 @@ void sound_set(int setting, int value)
         sound_set_val(value);
 }
 
-#if (!defined(HAVE_AS3514) && !defined (HAVE_WM8731)) || defined(SIMULATOR)
+#if (!defined(HAVE_AS3514) && !defined (HAVE_WM8731) && !defined(HAVE_TSC2100)) \
+    || defined(SIMULATOR)
 int sound_val2phys(int setting, int value)
 {
 #if CONFIG_CODEC == MAS3587F
