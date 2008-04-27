@@ -62,6 +62,6 @@ void tsc2100_writereg(int page, int address, short value)
 void tsc2100_keyclick(void)
 {
     // 1100 0100 0001 0000
-    short val = 0xC410;
+    //short val = 0xC410;
     tsc2100_writereg(TSAC2_PAGE, TSAC2_ADDRESS, tsc2100_readreg(TSAC2_PAGE, TSAC2_ADDRESS)&0x8000);
 }
