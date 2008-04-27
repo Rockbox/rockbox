@@ -61,11 +61,11 @@
 struct gui_img{
     struct bitmap bm;
     struct viewport* vp;    /* The viewport to display this image in */
-    int x;                  /* x-pos */
-    int y;                  /* y-pos */
-    int num_subimages;      /* number of sub-images */
-    int subimage_height;    /* height of each sub-image */
-    int display;            /* -1 for no display, 0..n to display a subimage */
+    short int x;                  /* x-pos */
+    short int y;                  /* y-pos */
+    short int num_subimages;      /* number of sub-images */
+    short int subimage_height;    /* height of each sub-image */
+    short int display;            /* -1 for no display, 0..n to display a subimage */
     bool loaded;            /* load state */
     bool always_display;    /* not using the preload/display mechanism */
 };
@@ -276,7 +276,7 @@ enum wps_token_type {
 };
 
 struct wps_token {
-    enum wps_token_type type;
+    unsigned char type; /* enough to store the token type */
 
     /* Whether the tag (e.g. track name or the album) refers the
        current or the next song (false=current, true=next) */
