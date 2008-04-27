@@ -44,7 +44,7 @@ extern const struct gpio_event_list gpio3_event_list;
 
 static struct gpio_module_descriptor
 {
-    volatile unsigned long *base;       /* Module base address */
+    struct gpio_map * const base;       /* Module base address */
     enum IMX31_INT_LIST ints;           /* AVIC int number */
     void (*handler)(void);              /* Interrupt function */
     const struct gpio_event_list *list; /* Event handler list */
@@ -52,21 +52,21 @@ static struct gpio_module_descriptor
 {
 #if (GPIO_EVENT_MASK & USE_GPIO1_EVENTS)
     {
-        .base    = (unsigned long *)GPIO1_BASE_ADDR,
+        .base    = (struct gpio_map *)GPIO1_BASE_ADDR,
         .ints    = GPIO1,
         .handler = GPIO1_HANDLER,
     },
 #endif
 #if (GPIO_EVENT_MASK & USE_GPIO2_EVENTS)
     {
-        .base    = (unsigned long *)GPIO2_BASE_ADDR,
+        .base    = (struct gpio_map *)GPIO2_BASE_ADDR,
         .ints    = GPIO2,
         .handler = GPIO2_HANDLER,
     },
 #endif
 #if (GPIO_EVENT_MASK & USE_GPIO3_EVENTS)
     {
-        .base    = (unsigned long *)GPIO3_BASE_ADDR,
+        .base    = (struct gpio_map *)GPIO3_BASE_ADDR,
         .ints    = GPIO3,
         .handler = GPIO3_HANDLER,
     },
@@ -77,17 +77,17 @@ static void gpio_call_events(enum gpio_module_number gpio)
 {
     const struct gpio_module_descriptor * const desc = &gpio_descs[gpio];
     const struct gpio_event_list * const list = desc->list;
-    volatile unsigned long * const base = desc->base;
+    struct gpio_map * const base = desc->base;
     unsigned i;
 
     /* Intersect pending and unmasked bits */
-    unsigned long pending = base[GPIO_ISR_I] & base[GPIO_IMR_I];
+    uint32_t pending = base->isr & base->imr;
 
     /* Call each event handler in order */
     for (i = 0; i < list->count; i++)
     {
         const struct gpio_event * const event = &list->events[i];
-        unsigned long bit = 1ul << event->line;
+        uint32_t bit = 1ul << event->line;
 
         if ((pending & bit) && event->callback())
             pending &= ~bit;
@@ -144,10 +144,10 @@ bool gpio_enable_event(enum gpio_module_number gpio, unsigned id)
 {
     const struct gpio_module_descriptor * const desc = &gpio_descs[gpio];
     const struct gpio_event * const event = &desc->list->events[id];
-    volatile unsigned long * const base = desc->base;
-    volatile unsigned long * icr;
-    unsigned long mask;
-    unsigned long imr;
+    struct gpio_map * const base = desc->base;
+    volatile uint32_t *icr;
+    uint32_t mask;
+    uint32_t imr;
     int shift;
 
     if (id >= desc->list->count)
@@ -155,7 +155,7 @@ bool gpio_enable_event(enum gpio_module_number gpio, unsigned id)
 
     int oldlevel = disable_irq_save();
 
-    imr =  base[GPIO_IMR_I];
+    imr =  base->imr;
 
     if (imr == 0)
     {
@@ -165,14 +165,14 @@ bool gpio_enable_event(enum gpio_module_number gpio, unsigned id)
     }
 
     /* Set the line sense */
-    icr = &base[GPIO_ICR1_I] + event->line / 16;
-    shift = 2*(event->line % 16);
+    icr = &base->icr[event->line >> 4];
+    shift = (event->line & 15) << 1;
     mask = GPIO_SENSE_CONFIG_MASK << shift;
 
     *icr = (*icr & ~mask) | ((event->sense << shift) & mask);
 
     /* Unmask the line */
-    base[GPIO_IMR_I] = imr | (1ul << event->line);
+    base->imr = imr | (1ul << event->line);
 
     restore_irq(oldlevel);
 
@@ -183,8 +183,8 @@ void gpio_disable_event(enum gpio_module_number gpio, unsigned id)
 {
     const struct gpio_module_descriptor * const desc = &gpio_descs[gpio];
     const struct gpio_event * const event = &desc->list->events[id];
-    volatile unsigned long * const base = desc->base;
-    unsigned long imr;
+    struct gpio_map * const base = desc->base;
+    uint32_t imr;
 
     if (id >= desc->list->count)
         return;
@@ -192,10 +192,10 @@ void gpio_disable_event(enum gpio_module_number gpio, unsigned id)
     int oldlevel = disable_irq_save();
 
     /* Remove bit from mask */
-    imr = base[GPIO_IMR_I] & ~(1ul << event->line);
+    imr = base->imr & ~(1ul << event->line);
 
     /* Mask the line */
-    base[GPIO_IMR_I] = imr;
+    base->imr = imr;
 
     if (imr == 0)
     {

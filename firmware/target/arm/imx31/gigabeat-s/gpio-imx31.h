@@ -51,6 +51,17 @@ enum gpio_int_sense_enum
 
 #define GPIO_SENSE_CONFIG_MASK 0x3
 
+/* Register map for each module */
+struct gpio_map
+{
+    volatile uint32_t dr;        /* 00h */
+    volatile uint32_t gdir;      /* 04h */
+    volatile uint32_t psr;       /* 08h */
+    volatile uint32_t icr[2];    /* 0Ch */
+    volatile uint32_t imr;       /* 14h */
+    volatile uint32_t isr;       /* 18h */
+};
+
 /* Pending events will be called in array order */
 
 /* Describes a single event for a pin */

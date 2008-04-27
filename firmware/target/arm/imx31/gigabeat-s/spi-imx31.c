@@ -16,7 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "cpu.h"
+#include "config.h"
+#include "system.h"
 #include "spi-imx31.h"
 #include "avic-imx31.h"
 #include "clkctl-imx31.h"
@@ -37,7 +38,7 @@ static __attribute__((interrupt("IRQ"))) void CSPI3_HANDLER(void);
 /* State data associatated with each CSPI module */
 static struct spi_module_descriptor
 {
-    volatile unsigned long *base;
+    struct cspi_map * const base;
     int enab;
     struct spi_node *last;
     enum IMX31_CG_LIST cg;
@@ -53,7 +54,7 @@ static struct spi_module_descriptor
 {
 #if (SPI_MODULE_MASK & USE_CSPI1_MODULE)
     {
-        .base    = (unsigned long *)CSPI1_BASE_ADDR,
+        .base    = (struct cspi_map *)CSPI1_BASE_ADDR,
         .cg      = CG_CSPI1,
         .ints    = CSPI1,
         .handler = CSPI1_HANDLER,
@@ -61,7 +62,7 @@ static struct spi_module_descriptor
 #endif
 #if (SPI_MODULE_MASK & USE_CSPI2_MODULE)
     {
-        .base    = (unsigned long *)CSPI2_BASE_ADDR,
+        .base    = (struct cspi_map *)CSPI2_BASE_ADDR,
         .cg      = CG_CSPI2,
         .ints    = CSPI2,
         .handler = CSPI2_HANDLER,
@@ -69,7 +70,7 @@ static struct spi_module_descriptor
 #endif
 #if (SPI_MODULE_MASK & USE_CSPI3_MODULE)
     {
-        .base    = (unsigned long *)CSPI3_BASE_ADDR,
+        .base    = (struct cspi_map *)CSPI3_BASE_ADDR,
         .cg      = CG_CSPI3,
         .ints    = CSPI3,
         .handler = CSPI3_HANDLER,
@@ -81,16 +82,16 @@ static struct spi_module_descriptor
 static void spi_interrupt(enum spi_module_number spi)
 {
     struct spi_module_descriptor *desc = &spi_descs[spi];
-    volatile unsigned long * const base = desc->base;
+    struct cspi_map * const base = desc->base;
     struct spi_transfer *trans = desc->trans;
     int inc = desc->byte_size + 1;
 
     if (desc->rxcount > 0)
     {
         /* Data received - empty out RXFIFO */
-        while ((base[CSPI_STATREG_I] & CSPI_STATREG_RR) != 0)
+        while ((base->statreg & CSPI_STATREG_RR) != 0)
         {
-            uint32_t word = base[CSPI_RXDATA_I];
+            uint32_t word = base->rxdata;
 
             switch (desc->byte_size & 3)
             {
@@ -108,20 +109,20 @@ static void spi_interrupt(enum spi_module_number spi)
 
             if (--desc->rxcount < 4)
             {
-                unsigned long intreg = base[CSPI_INTREG_I];
+                unsigned long intreg = base->intreg;
 
                 if (desc->rxcount <= 0)
                 {
                     /* No more to receive - stop RX interrupts */
                     intreg &= ~(CSPI_INTREG_RHEN | CSPI_INTREG_RREN);
-                    base[CSPI_INTREG_I] = intreg;
+                    base->intreg = intreg;
                     break;
                 }
                 else if (!(intreg & CSPI_INTREG_RREN))
                 {
                     /* < 4 words expected - switch to RX ready */
                     intreg &= ~CSPI_INTREG_RHEN;
-                    base[CSPI_INTREG_I] = intreg | CSPI_INTREG_RREN;
+                    base->intreg = intreg | CSPI_INTREG_RREN;
                 }
             }
         }
@@ -130,7 +131,7 @@ static void spi_interrupt(enum spi_module_number spi)
     if (trans->count > 0)
     {
         /* Data to transmit - fill TXFIFO or write until exhausted */
-        while ((base[CSPI_STATREG_I] & CSPI_STATREG_TF) == 0)
+        while ((base->statreg & CSPI_STATREG_TF) == 0)
         {
             uint32_t word = 0;
 
@@ -148,21 +149,21 @@ static void spi_interrupt(enum spi_module_number spi)
 
             trans->txbuf += inc;
 
-            base[CSPI_TXDATA_I] = word;
+            base->txdata = word;
 
             if (--trans->count <= 0)
             {
                 /* Out of data - stop TX interrupts */
-                base[CSPI_INTREG_I] &= ~CSPI_INTREG_THEN;
+                base->intreg &= ~CSPI_INTREG_THEN;
                 break;
             }
         }
     }
 
     /* If all interrupts have been remasked - we're done */
-    if (base[CSPI_INTREG_I] == 0)
+    if (base->intreg == 0)
     {
-        base[CSPI_STATREG_I] = CSPI_STATREG_TC | CSPI_STATREG_BO;
+        base->statreg = CSPI_STATREG_TC | CSPI_STATREG_BO;
         wakeup_signal(&desc->w);
     }
 }
@@ -193,9 +194,9 @@ static __attribute__((interrupt("IRQ"))) void CSPI3_HANDLER(void)
 static bool spi_set_context(struct spi_node *node,
                             struct spi_module_descriptor *desc)
 {
-    volatile unsigned long * const base = desc->base;
+    struct cspi_map * const base = desc->base;
 
-    if ((base[CSPI_CONREG_I] & CSPI_CONREG_EN) == 0)
+    if ((base->conreg & CSPI_CONREG_EN) == 0)
         return false;
 
     if (node != desc->last)
@@ -205,13 +206,13 @@ static bool spi_set_context(struct spi_node *node,
         desc->byte_size = (((node->conreg >> 8) & 0x1f) + 1 + 7) / 8 - 1;
 
         /* Keep reserved and start bits cleared. Keep enabled bit. */
-        base[CSPI_CONREG_I] =
+        base->conreg =
             (node->conreg & ~(0xfcc8e000 | CSPI_CONREG_XCH | CSPI_CONREG_SMC))
             | CSPI_CONREG_EN;
         /* Set the wait-states */
-        base[CSPI_PERIODREG_I] = node->periodreg & 0xffff;
+        base->periodreg = node->periodreg & 0xffff;
         /* Clear out any spuriously-pending interrupts */
-        base[CSPI_STATREG_I] = CSPI_STATREG_TC | CSPI_STATREG_BO;
+        base->statreg = CSPI_STATREG_TC | CSPI_STATREG_BO;
     }
 
     return true;
@@ -252,16 +253,16 @@ void spi_enable_module(struct spi_node *node)
     if (++desc->enab == 1)
     {
         /* First enable for this module */
-        volatile unsigned long * const base = desc->base;
+        struct cspi_map * const base = desc->base;
 
         /* Enable clock-gating register */
         imx31_clkctl_module_clock_gating(desc->cg, CGM_ON_ALL);
         
         /* Reset */
-        base[CSPI_CONREG_I] &= ~CSPI_CONREG_EN;
-        base[CSPI_CONREG_I] |= CSPI_CONREG_EN;
-        base[CSPI_INTREG_I] = 0;
-        base[CSPI_STATREG_I] = CSPI_STATREG_TC | CSPI_STATREG_BO;
+        base->conreg &= ~CSPI_CONREG_EN;
+        base->conreg |= CSPI_CONREG_EN;
+        base->intreg = 0;
+        base->statreg = CSPI_STATREG_TC | CSPI_STATREG_BO;
 
         /* Enable interrupt at controller level */
         avic_enable_int(desc->ints, IRQ, 6, desc->handler);
@@ -280,13 +281,13 @@ void spi_disable_module(struct spi_node *node)
     if (desc->enab > 0 && --desc->enab == 0)
     {
         /* Last enable for this module */
-        volatile unsigned long * const base = desc->base;
+        struct cspi_map * const base = desc->base;
 
         /* Disable interrupt at controller level */
         avic_disable_int(desc->ints);
 
         /* Disable interface */
-        base[CSPI_CONREG_I] &= ~CSPI_CONREG_EN;
+        base->conreg &= ~CSPI_CONREG_EN;
 
         /* Disable interface clock */
         imx31_clkctl_module_clock_gating(desc->cg, CGM_OFF);
@@ -310,7 +311,7 @@ int spi_transfer(struct spi_node *node, struct spi_transfer *trans)
 
     if (retval)
     {
-        volatile unsigned long * const base = desc->base;
+        struct cspi_map * const base = desc->base;
         unsigned long intreg;
 
         desc->trans = trans;
@@ -323,15 +324,15 @@ int spi_transfer(struct spi_node *node, struct spi_transfer *trans)
             CSPI_INTREG_RREN : /* Must grab data on every word */
             CSPI_INTREG_RHEN;  /* Enough data to wait for half-full */
 
-        base[CSPI_INTREG_I] = intreg;
+        base->intreg = intreg;
 
         /* Start transfer */
-        base[CSPI_CONREG_I] |= CSPI_CONREG_XCH;
+        base->conreg |= CSPI_CONREG_XCH;
 
         if (wakeup_wait(&desc->w, HZ) != OBJ_WAIT_SUCCEEDED)
         {
-            base[CSPI_INTREG_I] = 0;
-            base[CSPI_CONREG_I] &= ~CSPI_CONREG_XCH;
+            base->intreg = 0;
+            base->conreg &= ~CSPI_CONREG_XCH;
             retval = false;
         }
     }

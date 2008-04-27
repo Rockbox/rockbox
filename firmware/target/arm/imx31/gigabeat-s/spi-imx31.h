@@ -39,6 +39,19 @@ enum spi_module_number
     SPI_NUM_CSPI,
 };
 
+struct cspi_map
+{
+    volatile uint32_t rxdata;       /* 00h */
+    volatile uint32_t txdata;       /* 04h */
+    volatile uint32_t conreg;       /* 08h */
+    volatile uint32_t intreg;       /* 0Ch */
+    volatile uint32_t dmareg;       /* 10h */
+    volatile uint32_t statreg;      /* 14h */
+    volatile uint32_t periodreg;    /* 18h */
+    volatile uint32_t skip1[0x69];  /* 1Ch */
+    volatile uint32_t testreg;      /* 1C0h */
+};
+
 struct spi_node
 {
     enum spi_module_number num; /* Module number (CSPIx_NUM) */

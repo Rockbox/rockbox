@@ -74,9 +74,9 @@ void __attribute__((naked)) irq_handler(void)
 void __attribute__((naked)) fiq_handler(void)
 {
     asm volatile (
-        "mov r10, #0x6c000000      \n" /* load AVIC base address */
+        "mov r10, #0x68000000      \n" /* load AVIC base address */
         "ldr r9, [r10, #0x44]      \n" /* read FIVECSR of AVIC */
-        "add r10, r10, #100        \n" /* move pointer to base of VECTOR table */
+        "add r10, r10, #0x100      \n" /* move pointer to base of VECTOR table */
         "ldr r8, [r10, r9, lsl #2] \n" /* read FIQ vector from VECTOR table */
         "bx  r8                    \n" /* jump to FIQ service routine */
     );
@@ -84,23 +84,24 @@ void __attribute__((naked)) fiq_handler(void)
 
 void avic_init(void)
 {
+    struct avic_map * const avic = (struct avic_map *)AVIC_BASE_ADDR;
     int i;
 
     /* Disable all interrupts and set to unhandled */
     avic_disable_int(ALL);
 
     /* Reset AVIC control */
-    INTCNTL = 0;
+    avic->intcntl = 0;
 
     /* Init all interrupts to type IRQ */
     avic_set_int_type(ALL, IRQ);
 
     /* Set all normal to lowest priority */
     for (i = 0; i < 8; i++)
-        NIPRIORITY(i) = 0;
+        avic->nipriority[i] = 0;
 
     /* Set NM bit to enable VIC */
-    INTCNTL |= INTCNTL_NM;
+    avic->intcntl |= INTCNTL_NM;
 
     /* Enable VE bit in CP15 Control reg to enable VIC */
     asm volatile (
@@ -110,28 +111,30 @@ void avic_init(void)
         : : : "r0");
 
     /* Enable normal interrupts at all priorities */
-    NIMASK = 0x1f;
+    avic->nimask = 0x1f;
 }
 
 void avic_set_int_priority(enum IMX31_INT_LIST ints,
                            unsigned long ni_priority)
 {
-    volatile unsigned long *reg = &NIPRIORITY((63 - ints) / 8);
-    unsigned int shift = 4*(ints % 8);
-    unsigned long mask = 0xful << shift;
+    struct avic_map * const avic = (struct avic_map *)AVIC_BASE_ADDR;
+    volatile uint32_t *reg = &avic->nipriority[7 - (ints >> 3)];
+    unsigned int shift = (ints & 0x7) << 2;
+    uint32_t mask = 0xful << shift;
     *reg = (*reg & ~mask) | ((ni_priority << shift) & mask);
 }
 
 void avic_enable_int(enum IMX31_INT_LIST ints, enum INT_TYPE intstype,
                      unsigned long ni_priority, void (*handler)(void))
 {
+    struct avic_map * const avic = (struct avic_map *)AVIC_BASE_ADDR;
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
 
     if (ints != ALL) /* No mass-enable allowed */
     {
         avic_set_int_type(ints, intstype);
-        VECTOR(ints) = (long)handler;
-        INTENNUM = ints;
+        avic->vector[ints] = (long)handler;
+        avic->intennum = ints;
         avic_set_int_priority(ints, ni_priority);
     }
 
@@ -140,38 +143,30 @@ void avic_enable_int(enum IMX31_INT_LIST ints, enum INT_TYPE intstype,
 
 void avic_disable_int(enum IMX31_INT_LIST ints)
 {
-    long i;
+    struct avic_map * const avic = (struct avic_map *)AVIC_BASE_ADDR;
+    uint32_t i;
 
     if (ints == ALL)
     {
         for (i = 0; i < 64; i++)
         {
-            INTDISNUM = i;
-            VECTOR(i) = (long)UIE_VECTOR;
+            avic->intdisnum = i;
+            avic->vector[i] = (long)UIE_VECTOR;
         }
     }
     else
     {
-        INTDISNUM = ints;
-        VECTOR(ints) = (long)UIE_VECTOR;
+        avic->intdisnum = ints;
+        avic->vector[ints] = (long)UIE_VECTOR;
     }
 }
 
 static void set_int_type(int i, enum INT_TYPE intstype)
 {
-    volatile unsigned long *reg;
-    long val;
-
-    if (i >= 32)
-    {
-        reg = &INTTYPEH;
-        val = 1L << (i - 32);
-    }
-    else
-    {
-        reg = &INTTYPEL;
-        val = 1L << i;
-    }
+    /* INTTYPEH: vectors 63-32, INTTYPEL: vectors 31-0 */
+    struct avic_map * const avic = (struct avic_map *)AVIC_BASE_ADDR;
+    volatile uint32_t *reg = &avic->inttype[1 - (i >> 5)];
+    uint32_t val = 1L << (i & 0x1f);
 
     if (intstype == IRQ)
         val = *reg & ~val;
