@@ -221,7 +221,8 @@ bool HttpGet::getFile(const QUrl &url)
     if(url.hasQuery()) {
         query = "?";
         for(int i = 0; i < qitems.size(); i++)
-            query += qitems.at(i).first + "=" + qitems.at(i).second + "&";
+            query += QUrl::toPercentEncoding(qitems.at(i).first, "/") + "=" 
+                  + QUrl::toPercentEncoding(qitems.at(i).second, "/") + "&";
         qDebug() << query;
     }
 
