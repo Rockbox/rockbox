@@ -25,8 +25,8 @@
 #define MAX_SYS_EVENTS 10
 
 /**
- * High nibble = Event class definition
- * Low nibble  = Event ID
+ * High byte = Event class definition
+ * Low byte  = Event ID
  */
 
 #define EVENT_CLASS_DISK       0x0100

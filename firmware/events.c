@@ -33,7 +33,7 @@ bool add_event(unsigned short id, bool oneshot, void (*handler))
 {
     int i;
     
-    /* Chcek if the event already exists. */
+    /* Check if the event already exists. */
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
         if (events[i].callback == handler && events[i].id == id)
@@ -69,7 +69,7 @@ void remove_event(unsigned short id, void (*handler))
         }
     }
     
-    panicf("event not found");
+    panicf("event %d not found", (int)id);
 }
 
 void send_event(unsigned short id, void *data)
