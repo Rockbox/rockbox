@@ -9045,11 +9045,9 @@
   </source>
   <dest>
     *: ""
-    player: ""
   </dest>
   <voice>
     *: ""
-    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -11555,5 +11553,33 @@
   <voice>
     *: none
     swcodec: "关键点击重"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in keyclick settings menu
+  user: 
+  <source>
+    *: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: "东西的电"
+  </dest>
+  <voice>
+    *: "东西的电"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user:
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "不知道"
+  </dest>
+  <voice>
+    *: "不知道"
   </voice>
 </phrase>

@@ -8160,7 +8160,6 @@
   </source>
   <dest>
     *: ""
-    player: ""
   </dest>
   <voice>
     *: ""
@@ -11538,7 +11537,7 @@
   desc: in system settings menu
   user:
   <source>
-    *: "Zubehör Spannungsversorgung"
+    *: "Accessory Power Supply"
   </source>
   <dest>
     *: "Zubehör Spannungsversorgung"
