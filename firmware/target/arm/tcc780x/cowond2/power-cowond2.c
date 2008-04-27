@@ -21,7 +21,7 @@
 #include "system.h"
 #include "power.h"
 #include "pcf50606.h"
-#include "cpu.h"
+#include "button-target.h"
 
 #ifndef SIMULATOR
 
@@ -74,15 +74,19 @@ void EXT3(void)
 
     if (data[0] & 0x04)
     {
+        /* ONKEY1S: don't reset the timeout, because we want a way to power off
+           the player in the event of a crashed plugin or UIE/panic, etc. */
+#if 0
         /* ONKEY1S: reset timeout as we're using SW poweroff */
         pcf50606_write(0x08, pcf50606_read(0x08) | 0x02); /* OOCC1: TOTRST=1 */
+#endif
     }
 
     if (data[2] & 0x08)
     {
-        /* TODO: Touchscreen pen down event, do something about it */
+        /* Touchscreen event, do something about it */
+        button_set_touch_available();
     }
-
     restore_fiq(fiq_status);
 }
 #endif

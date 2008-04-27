@@ -59,12 +59,19 @@ void show_debug_screen(void)
     int power_count = 0;
     int count = 0;
     bool do_power_off = false;
+#ifdef HAVE_BUTTON_DATA
+    unsigned int data;
+#endif
 
     while(!do_power_off) {
         line = 0;
         printf("Hello World!");
 
+#ifdef HAVE_BUTTON_DATA
+        button = button_read_device(&data);
+#else
         button = button_read_device();
+#endif
 
         /* Power-off if POWER button has been held for a long time
            This loop is currently running at about 100 iterations/second
@@ -78,46 +85,6 @@ void show_debug_screen(void)
         }
 
         printf("Btn: 0x%08x",button);
-
-#if defined(COWON_D2)
-        int i;
-
-        printf("GPIOA: 0x%08x",GPIOA);
-        printf("GPIOB: 0x%08x",GPIOB);
-        printf("GPIOC: 0x%08x",GPIOC);
-        printf("GPIOD: 0x%08x",GPIOD);
-        printf("GPIOE: 0x%08x",GPIOE);
-
-        for (i = 0; i<4; i++)
-        {
-            printf("ADC%d: 0x%04x",i,adc_read(i));
-        }
-
-        /* TODO: Move this stuff out to a touchscreen driver and establish
-           how such a beast is going to work. Since it needs I2C read/write,
-           it can't easily go on an interrupt-based tick task. */
-        {
-            int x,y;
-            unsigned char buf[5];
-            
-            pcf50606_write(PCF5060X_ADCC2, (0xE<<1) | 1); /* ADC start X+Y */
-            pcf50606_read_multiple(PCF5060X_ADCC1, buf, 5);
-            x = (buf[2] << 2) | (buf[3] & 3);
-            y = (buf[4] << 2) | ((buf[3] & 0xC) >> 2);
-            printf("X: 0x%03x Y: 0x%03x",x,y);
-
-            x = (x*LCD_WIDTH) / 1024;
-            y = (y*LCD_HEIGHT) / 1024;
-            lcd_hline(x-5, x+5, y);
-            lcd_vline(x, y-5, y+5);
-
-            pcf50606_write(PCF5060X_ADCC2, (0xF<<1) | 1); /* ADC start P1+P2 */
-            pcf50606_read_multiple(PCF5060X_ADCC1, buf, 5);
-            x = (buf[2] << 2) | (buf[3] & 3);
-            y = (buf[4] << 2) | ((buf[3] & 0xC) >> 2);
-            printf("P1: 0x%03x P2: 0x%03x",x,y);
-        }
-#endif
 
         count++;
         printf("Count: %d",count);
@@ -186,16 +153,12 @@ void* main(void)
     {
         int(*kernel_entry)(void);
 
-        /* wait for hold release to allow debug statements to be read */
-        while (button_hold()) {};
-    
         kernel_entry = (void*) loadbuffer;
-        
-        /* allow entry to the debug screen if still holding power */
-        if (!(button_read_device() & POWEROFF_BUTTON)) rc = kernel_entry();
+        rc = kernel_entry();
     }
-#endif
+#else
     show_debug_screen();
+#endif
 
     return 0;
 }

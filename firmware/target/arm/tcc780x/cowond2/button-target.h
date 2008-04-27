@@ -27,7 +27,8 @@
 
 bool button_hold(void);
 void button_init_device(void);
-int button_read_device(void);
+int button_read_device(int *data);
+void button_set_touch_available(void);
 
 /* Main unit's buttons */
 #define BUTTON_POWER      0x00000001
@@ -42,7 +43,6 @@ int button_read_device(void);
 #define BUTTON_UP    BUTTON_TOPMIDDLE
 #define BUTTON_DOWN  BUTTON_BOTTOMMIDDLE
 
-/* Faked buttons based on touchscreen quadrants (not yet read) */
 /* Touchpad Screen Area Buttons */
 #define BUTTON_TOPLEFT      0x00000010
 #define BUTTON_TOPMIDDLE    0x00000020
@@ -54,7 +54,9 @@ int button_read_device(void);
 #define BUTTON_BOTTOMMIDDLE 0x00000800
 #define BUTTON_BOTTOMRIGHT  0x00001000
 
-#define BUTTON_MAIN 0x1FFF
+#define BUTTON_TOUCH        0x00002000
+
+#define BUTTON_MAIN 0x3FFF
 
 /* No remote */
 #define BUTTON_REMOTE 0
