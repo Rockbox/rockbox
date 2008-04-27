@@ -70,10 +70,18 @@ static struct plugin_api* rb;
 #define BTN_MENU BUTTON_RC_REC
 #define BTN_FIRE BUTTON_RC_PLAY
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
-#define BTN_MENU BUTTON_MENU
-#define BTN_FIRE BUTTON_SELECT
+#define BTN_MENU (BUTTON_MENU|BUTTON_REL)
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef BTN_MENU
+#define BTN_MENU (BUTTON_TOPLEFT|BUTTON_REL)
+#endif
+#ifndef BTN_FIRE
+#define BTN_FIRE BUTTON_CENTER
+#endif
 #endif
 
 /* The lowdown on source terminology:

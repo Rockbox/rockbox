@@ -202,19 +202,40 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define VUMETER_QUIT BUTTON_POWER
-#define VUMETER_HELP BUTTON_SELECT
 #define VUMETER_MENU BUTTON_MENU
-#define VUMETER_MENU_EXIT BUTTON_LEFT
-#define VUMETER_MENU_EXIT2 BUTTON_POWER
-#define VUMETER_UP BUTTON_UP
-#define VUMETER_DOWN BUTTON_DOWN
-#define LABEL_HELP "SELECT"
+#define VUMETER_MENU_EXIT BUTTON_POWER
 #define LABEL_QUIT "POWER"
 #define LABEL_MENU "MENU"
-#define LABEL_VOLUME "UP/DOWN"
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef VUMETER_QUIT
+#define VUMETER_QUIT      BUTTON_TOPLEFT
+#define LABEL_QUIT        "TOPLEFT"
+#endif
+#ifndef VUMETER_HELP
+#define VUMETER_HELP      BUTTON_CENTER
+#define LABEL_HELP        "CENTRE"
+#endif
+#ifndef VUMETER_MENU
+#define VUMETER_MENU      BUTTON_TOPRIGHT
+#define LABEL_MENU        "TOPRIGHT"
+#endif
+#ifndef VUMETER_MENU_EXIT
+#define VUMETER_MENU_EXIT BUTTON_TOPLEFT
+#endif
+#ifndef VUMETER_UP
+#define VUMETER_UP        BUTTON_TOPMIDDLE
+#endif
+#ifndef VUMETER_DOWN
+#define VUMETER_DOWN      BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef LABEL_VOLUME
+#define LABEL_VOLUME      "UP/DOWN"
+#endif
 #endif
 
 const struct plugin_api* rb;

@@ -211,18 +211,39 @@ PLUGIN_HEADER
 #define JPEG_PREVIOUS    BUTTON_RC_MENU
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#define JPEG_ZOOM_IN    BUTTON_PLUS
-#define JPEG_ZOOM_OUT   BUTTON_MINUS
-#define JPEG_UP         BUTTON_UP
-#define JPEG_DOWN       BUTTON_DOWN
-#define JPEG_LEFT       BUTTON_LEFT
-#define JPEG_RIGHT      BUTTON_RIGHT
-#define JPEG_MENU       BUTTON_MENU
-#define JPEG_NEXT       (BUTTON_SELECT|BUTTON_PLUS)
-#define JPEG_PREVIOUS   (BUTTON_SELECT|BUTTON_MINUS)
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef JPEG_UP
+#define JPEG_UP         BUTTON_TOPMIDDLE
+#endif
+#ifndef JPEG_DOWN
+#define JPEG_DOWN       BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef JPEG_LEFT
+#define JPEG_LEFT       BUTTON_MIDLEFT
+#endif
+#ifndef JPEG_RIGHT
+#define JPEG_RIGHT      BUTTON_MIDRIGHT
+#endif
+#ifndef JPEG_ZOOM_IN
+#define JPEG_ZOOM_IN    BUTTON_TOPRIGHT
+#endif
+#ifndef JPEG_ZOOM_OUT
+#define JPEG_ZOOM_OUT   BUTTON_TOPLEFT
+#endif
+#ifndef JPEG_MENU
+#define JPEG_MENU       (BUTTON_CENTER|BUTTON_REL)
+#endif
+#ifndef JPEG_NEXT
+#define JPEG_NEXT       BUTTON_BOTTOMRIGHT
+#endif
+#ifndef JPEG_PREVIOUS
+#define JPEG_PREVIOUS   BUTTON_BOTTOMLEFT
+#endif
 #endif
 
 /* different graphics libraries */

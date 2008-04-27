@@ -273,23 +273,56 @@ PLUGIN_HEADER
 #define LVL_DOWN_TEXT "VOL-"
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#define PEGBOX_SAVE     BUTTON_SELECT
 #define PEGBOX_QUIT     BUTTON_POWER
-#define PEGBOX_RESTART  BUTTON_MENU
-#define PEGBOX_LVL_UP   BUTTON_PLUS
-#define PEGBOX_LVL_DOWN BUTTON_MINUS
-#define PEGBOX_UP       BUTTON_UP
-#define PEGBOX_DOWN     BUTTON_DOWN
-#define PEGBOX_RIGHT    BUTTON_RIGHT
-#define PEGBOX_LEFT     BUTTON_LEFT
 
-#define SAVE_TEXT "SELECT"
 #define QUIT_TEXT "POWER"
-#define RESTART_TEXT "MENU"
-#define LVL_UP_TEXT "PLUS"
-#define LVL_DOWN_TEXT "MINUS"
 #else
 #error Unsupported keymap!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef PEGBOX_QUIT
+#define PEGBOX_QUIT     BUTTON_TOPLEFT
+#endif
+#ifndef PEGBOX_SAVE
+#define PEGBOX_SAVE     BUTTON_CENTER
+#endif
+#ifndef PEGBOX_RESTART
+#define PEGBOX_RESTART  BUTTON_TOPRIGHT
+#endif
+#ifndef PEGBOX_LVL_UP
+#define PEGBOX_LVL_UP   BUTTON_BOTTOMLEFT
+#endif
+#ifndef PEGBOX_LVL_DOWN
+#define PEGBOX_LVL_DOWN BUTTON_BOTTOMRIGHT
+#endif
+#ifndef PEGBOX_UP
+#define PEGBOX_UP       BUTTON_TOPMIDDLE
+#endif
+#ifndef PEGBOX_DOWN
+#define PEGBOX_DOWN     BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef PEGBOX_RIGHT
+#define PEGBOX_RIGHT    BUTTON_MIDRIGHT
+#endif
+#ifndef PEGBOX_LEFT
+#define PEGBOX_LEFT     BUTTON_MIDLEFT
+#endif
+#ifndef SAVE_TEXT
+#define SAVE_TEXT "CENTER"
+#endif
+#ifndef QUIT_TEXT
+#define QUIT_TEXT "TOPLEFT"
+#endif
+#ifndef RESTART_TEXT
+#define RESTART_TEXT "TOPRIGHT"
+#endif
+#ifndef LVL_UP_TEXT
+#define LVL_UP_TEXT "BOTTOMLEFT"
+#endif
+#ifndef LVL_DOWN_TEXT
+#define LVL_DOWN_TEXT "BOTTOMRIGHT"
+#endif
 #endif
 
 #if (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)

@@ -228,18 +228,49 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 
 #define STAR_QUIT           BUTTON_POWER
-#define STAR_LEFT           BUTTON_LEFT
-#define STAR_RIGHT          BUTTON_RIGHT
-#define STAR_UP             BUTTON_UP
-#define STAR_DOWN           BUTTON_DOWN
-#define STAR_TOGGLE_CONTROL BUTTON_SELECT
-#define STAR_LEVEL_UP       BUTTON_PLUS
-#define STAR_LEVEL_DOWN     BUTTON_MINUS
-#define STAR_LEVEL_REPEAT   (BUTTON_SELECT | BUTTON_MENU)
+#define STAR_QUIT_NAME      "[POWER]"
 #define STAR_MENU_RUN       BUTTON_MENU
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+//#ifndef STAR_QUIT
+//#define STAR_QUIT           BUTTON_TOPLEFT
+//#define STAR_QUIT_NAME           "[TOPLEFT]"
+//#endif
+#ifndef STAR_MENU_RUN
+#define STAR_MENU_RUN       BUTTON_TOPRIGHT
+#endif
+#ifndef STAR_LEFT
+#define STAR_LEFT           BUTTON_MIDLEFT
+#endif
+#ifndef STAR_RIGHT
+#define STAR_RIGHT          BUTTON_MIDRIGHT
+#endif
+#ifndef STAR_UP
+#define STAR_UP             BUTTON_TOPMIDDLE
+#endif
+#ifndef STAR_DOWN
+#define STAR_DOWN           BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef STAR_TOGGLE_CONTROL
+#define STAR_TOGGLE_CONTROL BUTTON_CENTER
+#define STAR_TOGGLE_CONTROL_NAME "[CENTER]"
+#endif
+#ifndef STAR_LEVEL_UP
+#define STAR_LEVEL_UP       BUTTON_TOPLEFT
+#define STAR_LEVEL_UP_NAME  "[TOPLEFT]"
+#endif
+#ifndef STAR_LEVEL_DOWN
+#define STAR_LEVEL_DOWN     BUTTON_BOTTOMLEFT
+#define STAR_LEVEL_DOWN_NAME "[BOTTOMLEFT]"
+#endif
+#ifndef STAR_LEVEL_REPEAT
+#define STAR_LEVEL_REPEAT   BUTTON_BOTTOMRIGHT
+#define STAR_LEVEL_REPEAT_NAME "[BOTTOMRIGHT]"
+#endif
 #endif
 
 /* function returns because of USB? */
@@ -1040,6 +1071,14 @@ static int star_menu(void)
                                   "[PLAY+DOWN] Prev. level\n"
                                   "[PLAY+RIGHT] Reset level\n"
                                   "[PLAY+UP] Next level", true);
+#endif
+#ifdef HAVE_TOUCHPAD
+                star_display_text("KEYS\n\n"
+                                  STAR_TOGGLE_CONTROL_NAME " Toggle Control\n"
+                                  STAR_QUIT_NAME " Exit\n"
+                                  STAR_LEVEL_DOWN_NAME " Prev. level\n"
+                                  STAR_LEVEL_REPEAT_NAME " Reset level\n"
+                                  STAR_LEVEL_UP_NAME " Next level", true);
 #endif
                 break;
             default:

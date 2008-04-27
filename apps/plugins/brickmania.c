@@ -165,16 +165,28 @@ PLUGIN_HEADER
 #define RC_QUIT BUTTON_REC
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-
-#define QUIT BUTTON_POWER
-#define LEFT BUTTON_LEFT
-#define RIGHT BUTTON_RIGHT
-#define SELECT BUTTON_SELECT
-#define UP BUTTON_UP
-#define DOWN BUTTON_DOWN
+#define QUIT    BUTTON_POWER
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef LEFT
+#define LEFT    BUTTON_MIDLEFT
+#endif
+#ifndef RIGHT
+#define RIGHT   BUTTON_MIDRIGHT
+#endif
+#ifndef SELECT
+#define SELECT  BUTTON_CENTER
+#endif
+#ifndef UP
+#define UP      BUTTON_TOPMIDDLE
+#endif
+#ifndef DOWN
+#define DOWN    BUTTON_BOTTOMMIDDLE
+#endif
 #endif
 
 #ifndef SCROLL_FWD /* targets without scroll wheel*/

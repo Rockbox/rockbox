@@ -124,11 +124,21 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define MOSAIQUE_QUIT BUTTON_POWER
-#define MOSAIQUE_SPEED BUTTON_RIGHT
-#define MOSAIQUE_RESTART BUTTON_MENU
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef MOSAIQUE_QUIT
+#define MOSAIQUE_QUIT    BUTTON_TOPLEFT
+#endif
+#ifndef MOSAIQUE_SPEED
+#define MOSAIQUE_SPEED   BUTTON_MIDRIGHT
+#endif
+#ifndef MOSAIQUE_RESTART
+#define MOSAIQUE_RESTART BUTTON_CENTER
+#endif
 #endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -230,4 +240,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
     }
 }
+
 

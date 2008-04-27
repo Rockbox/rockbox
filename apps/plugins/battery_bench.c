@@ -146,15 +146,27 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 
-#define BATTERY_ON  BUTTON_MENU
 #define BATTERY_OFF BUTTON_POWER
-#define BATTERY_ON_TXT  "MENU - start"
 #define BATTERY_OFF_TXT "POWER  - quit"
 
 #else
 #error No keymap defined!
 #endif
 
+#ifdef HAVE_TOUCHPAD
+#ifndef BATTERY_ON
+#define BATTERY_ON       BUTTON_CENTER
+#endif
+#ifndef BATTERY_OFF
+#define BATTERY_OFF      BUTTON_TOPLEFT
+#endif
+#ifndef BATTERY_ON_TXT
+#define BATTERY_ON_TXT  "CENTRE - start"
+#endif
+#ifndef BATTERY_OFF_TXT
+#define BATTERY_OFF_TXT "TOPLEFT  - quit"
+#endif
+#endif
 
 /****************************** Plugin Entry Point ****************************/
 static struct plugin_api* rb;

@@ -70,12 +70,25 @@ PLUGIN_HEADER
 #   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#   define FLASHLIGHT_LEFT       BUTTON_LEFT
-#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
 
 #else
 #   error Missing key definitions for this keypad
 #endif
+#endif
+
+#ifdef HAVE_TOUCHPAD
+# ifndef FLASHLIGHT_LEFT
+#   define FLASHLIGHT_LEFT       BUTTON_MIDLEFT
+# endif
+# ifndef FLASHLIGHT_RIGHT
+#   define FLASHLIGHT_RIGHT      BUTTON_MIDRIGHT
+# endif
+# ifndef FLASHLIGHT_NEXT
+#   define FLASHLIGHT_NEXT       BUTTON_TOPMIDDLE
+# endif
+# ifndef FLASHLIGHT_PREV
+#   define FLASHLIGHT_PREV       BUTTON_BOTTOMMIDDLE
+# endif
 #endif
 
 static struct plugin_api* rb; /* global api struct pointer */

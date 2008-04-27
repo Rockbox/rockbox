@@ -184,17 +184,37 @@ enum minesweeper_status {
 #   define MINESWP_INFO     BUTTON_RC_MENU
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
-#   define MINESWP_LEFT     BUTTON_LEFT
-#   define MINESWP_RIGHT    BUTTON_RIGHT
-#   define MINESWP_UP       BUTTON_UP
-#   define MINESWP_DOWN     BUTTON_DOWN
 #   define MINESWP_QUIT     BUTTON_POWER
-#   define MINESWP_TOGGLE   BUTTON_SELECT
-#   define MINESWP_DISCOVER BUTTON_MENU
-#   define MINESWP_INFO     (BUTTON_MENU | BUTTON_SELECT)
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef MINESWP_QUIT
+#   define MINESWP_QUIT     BUTTON_TOPLEFT
+#endif
+#ifndef MINESWP_LEFT
+#   define MINESWP_LEFT     BUTTON_MIDLEFT
+#endif
+#ifndef MINESWP_RIGHT
+#   define MINESWP_RIGHT    BUTTON_MIDRIGHT
+#endif
+#ifndef MINESWP_UP
+#   define MINESWP_UP       BUTTON_TOPMIDDLE
+#endif
+#ifndef MINESWP_DOWN
+#   define MINESWP_DOWN     BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef MINESWP_TOGGLE
+#   define MINESWP_TOGGLE   BUTTON_CENTER
+#endif
+#ifndef MINESWP_DISCOVER
+#   define MINESWP_DISCOVER BUTTON_BOTTOMLEFT
+#endif
+#ifndef MINESWP_INFO
+#   define MINESWP_INFO     BUTTON_BOTTOMRIGHT
+#endif
 #endif
 
 /* here is a global api struct pointer. while not strictly necessary,

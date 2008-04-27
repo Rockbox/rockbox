@@ -278,23 +278,50 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_RC_MENU BUTTON_REC
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#define SOKOBAN_LEFT BUTTON_LEFT
-#define SOKOBAN_RIGHT BUTTON_RIGHT
-#define SOKOBAN_UP BUTTON_UP
-#define SOKOBAN_DOWN BUTTON_DOWN
 #define SOKOBAN_MENU BUTTON_MENU
-#define SOKOBAN_UNDO_PRE BUTTON_PLUS
-#define SOKOBAN_UNDO (BUTTON_LEFT|BUTTON_MENU)
-#define SOKOBAN_REDO (BUTTON_RIGHT | BUTTON_MENU)
-#define SOKOBAN_LEVEL_DOWN (BUTTON_MENU | BUTTON_DOWN)
-#define SOKOBAN_LEVEL_UP (BUTTON_MENU | BUTTON_UP)
-#define SOKOBAN_LEVEL_REPEAT (BUTTON_SELECT|BUTTON_MENU)
-#define SOKOBAN_PAUSE BUTTON_SELECT
-#define BUTTON_SAVE BUTTON_SELECT
-#define BUTTON_SAVE_NAME "SELECT"
+#define SOKOBAN_MENU_NAME "[MENU]"
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef SOKOBAN_LEFT
+#define SOKOBAN_LEFT          BUTTON_MIDLEFT
+#endif
+#ifndef SOKOBAN_RIGHT
+#define SOKOBAN_RIGHT         BUTTON_MIDRIGHT
+#endif
+#ifndef SOKOBAN_UP
+#define SOKOBAN_UP            BUTTON_TOPMIDDLE
+#endif
+#ifndef SOKOBAN_DOWN
+#define SOKOBAN_DOWN          BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef SOKOBAN_MENU
+#define SOKOBAN_MENU          BUTTON_TOPLEFT
+#define SOKOBAN_MENU_NAME     "[TOPLEFT]"
+#endif
+#ifndef SOKOBAN_UNDO
+#define SOKOBAN_UNDO          BUTTON_BOTTOMRIGHT
+#define SOKOBAN_UNDO_NAME     "[BOTTOMRIGHT]"
+#endif
+#ifndef SOKOBAN_REDO
+#define SOKOBAN_REDO          BUTTON_BOTTOMLEFT
+#define SOKOBAN_REDO_NAME     "[BOTTOMLEFT]"
+#endif
+#ifndef SOKOBAN_PAUSE
+#define SOKOBAN_PAUSE         BUTTON_CENTER
+#define SOKOBAN_PAUSE_NAME    "[CENTER]"
+#endif
+#ifndef SOKOBAN_LEVEL_REPEAT
+#define SOKOBAN_LEVEL_REPEAT  BUTTON_TOPRIGHT
+#define SOKOBAN_LEVEL_REPEAT_NAME "[TOPRIGHT]"
+#endif
+#ifndef BUTTON_SAVE
+#define BUTTON_SAVE           BUTTON_CENTER
+#define BUTTON_SAVE_NAME      "CENTER"
+#endif
 #endif
 
 #define SOKOBAN_FONT FONT_SYSFIXED
@@ -1259,6 +1286,14 @@ static int sokoban_menu(void)
                 rb->lcd_putsxy(3, 36, "[SELECT+DOWN] Previous Level");
                 rb->lcd_putsxy(3, 46, "[SELECT+RIGHT] Restart Level");
                 rb->lcd_putsxy(3, 56, "[SELECT+UP] Next Level");
+#endif
+
+#ifdef HAVE_TOUCHPAD
+                rb->lcd_putsxy(3,  6, SOKOBAN_MENU_NAME " Menu");
+                rb->lcd_putsxy(3, 16, SOKOBAN_UNDO_NAME " Undo");
+                rb->lcd_putsxy(3, 26, SOKOBAN_REDO_NAME " Redo");
+                rb->lcd_putsxy(3, 36, SOKOBAN_PAUSE_NAME " Pause");
+                rb->lcd_putsxy(3, 46, SOKOBAN_LEVEL_REPEAT_NAME " Restart Level");
 #endif
 
                 FOR_NB_SCREENS(i)

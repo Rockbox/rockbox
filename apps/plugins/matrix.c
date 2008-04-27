@@ -97,11 +97,23 @@ extern const fb_data matrix_normal[];
 #define MATRIX_PAUSE BUTTON_RC_PLAY
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #define MATRIX_EXIT BUTTON_POWER
-#define MATRIX_SLEEP_MORE BUTTON_PLUS
-#define MATRIX_SLEEP_LESS BUTTON_MINUS
-#define MATRIX_PAUSE BUTTON_MENU
 #else
 #error Unsupported keypad
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef MATRIX_EXIT
+#define MATRIX_EXIT       BUTTON_TOPLEFT
+#endif
+#ifndef MATRIX_SLEEP_MORE
+#define MATRIX_SLEEP_MORE BUTTON_MIDRIGHT
+#endif
+#ifndef MATRIX_SLEEP_LESS
+#define MATRIX_SLEEP_LESS BUTTON_MIDLEFT
+#endif
+#ifndef MATRIX_PAUSE
+#define MATRIX_PAUSE      BUTTON_CENTER
+#endif
 #endif
 
 #define SLEEP HZ/50

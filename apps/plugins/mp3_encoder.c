@@ -2333,12 +2333,24 @@ void get_mp3_filename(char *wav_name)
 #define MP3ENC_DONE BUTTON_RC_REC
 #define MP3ENC_SELECT BUTTON_RC_FF
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#define MP3ENC_PREV BUTTON_UP
-#define MP3ENC_NEXT BUTTON_DOWN
 #define MP3ENC_DONE BUTTON_POWER
-#define MP3ENC_SELECT BUTTON_SELECT
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef MP3ENC_PREV
+#define MP3ENC_PREV   BUTTON_MIDLEFT
+#endif
+#ifndef MP3ENC_NEXT
+#define MP3ENC_NEXT   BUTTON_MIDRIGHT
+#endif
+#ifndef MP3ENC_DONE
+#define MP3ENC_DONE   BUTTON_TOPLEFT
+#endif
+#ifndef MP3ENC_SELECT
+#define MP3ENC_SELECT BUTTON_CENTER
+#endif
 #endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)

@@ -148,13 +148,30 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #define PONG_QUIT BUTTON_POWER
-#define PONG_LEFT_UP BUTTON_UP
-#define PONG_LEFT_DOWN BUTTON_DOWN
-#define PONG_RIGHT_UP BUTTON_LEFT
-#define PONG_RIGHT_DOWN BUTTON_RIGHT
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef PONG_QUIT
+#define PONG_QUIT       BUTTON_TOPMIDDLE
+#endif
+#ifndef PONG_LEFT_UP
+#define PONG_LEFT_UP    BUTTON_TOPLEFT
+#endif
+#ifndef PONG_LEFT_DOWN
+#define PONG_LEFT_DOWN  BUTTON_BOTTOMLEFT
+#endif
+#ifndef PONG_RIGHT_UP
+#define PONG_RIGHT_UP   BUTTON_TOPRIGHT
+#endif
+#ifndef PONG_RIGHT_DOWN
+#define PONG_RIGHT_DOWN BUTTON_BOTTOMRIGHT
+#endif
+#ifndef PONG_PAUSE
+#define PONG_PAUSE      BUTTON_CENTER
+#endif
 #endif
 
 static struct plugin_api* rb;

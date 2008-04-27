@@ -201,20 +201,46 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define AST_FIRE_REP (BUTTON_RC_MODE | BUTTON_REPEAT)
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
-#define AST_PAUSE BUTTON_SELECT
 #define AST_QUIT BUTTON_POWER
-#define AST_THRUST_REP BUTTON_UP | BUTTON_MENU
-#define AST_THRUST BUTTON_UP
-#define AST_HYPERSPACE BUTTON_DOWN
-#define AST_LEFT BUTTON_LEFT 
-#define AST_LEFT_REP BUTTON_LEFT | BUTTON_MENU
-#define AST_RIGHT BUTTON_RIGHT
-#define AST_RIGHT_REP (BUTTON_RIGHT | BUTTON_MENU)
-#define AST_FIRE BUTTON_PLUS
-#define AST_FIRE_REP BUTTON_PLUS | BUTTON_MENU
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef AST_PAUSE
+#define AST_PAUSE       BUTTON_CENTER
+#endif
+#ifndef AST_QUIT
+#define AST_QUIT        BUTTON_TOPLEFT
+#endif
+#ifndef AST_THRUST_REP
+#define AST_THRUST_REP (BUTTON_TOPMIDDLE | BUTTON_REPEAT)
+#endif
+#ifndef AST_THRUST
+#define AST_THRUST      BUTTON_TOPMIDDLE
+#endif
+#ifndef AST_HYPERSPACE
+#define AST_HYPERSPACE  BUTTON_TOPRIGHT
+#endif
+#ifndef AST_LEFT
+#define AST_LEFT        BUTTON_MIDLEFT 
+#endif
+#ifndef AST_LEFT_REP
+#define AST_LEFT_REP   (BUTTON_MIDLEFT | BUTTON_REPEAT)
+#endif
+#ifndef AST_RIGHT
+#define AST_RIGHT       BUTTON_MIDRIGHT
+#endif
+#ifndef AST_RIGHT_REP
+#define AST_RIGHT_REP  (BUTTON_MIDRIGHT | BUTTON_REPEAT)
+#endif
+#ifndef AST_FIRE
+#define AST_FIRE        BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef AST_FIRE_REP
+#define AST_FIRE_REP   (BUTTON_BOTTOMMIDDLE | BUTTON_MENU)
+#endif
 #endif
 
 #define ABS(x) ((x)>0?(x):-(x))

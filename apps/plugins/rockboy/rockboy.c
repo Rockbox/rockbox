@@ -84,8 +84,13 @@ static void setoptions (void)
     fd = open(optionsave, O_RDONLY);
     if(fd < 0) /* no options to read, set defaults */
     {
+#ifdef HAVE_TOUCHPAD
+        options.LEFT=BUTTON_MIDLEFT;
+        options.RIGHT=BUTTON_MIDRIGHT;
+#else
         options.LEFT=BUTTON_LEFT;
         options.RIGHT=BUTTON_RIGHT;
+#endif
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
         options.UP=BUTTON_UP;
@@ -198,16 +203,20 @@ static void setoptions (void)
         options.SELECT=BUTTON_RC_MODE;
         options.MENU=BUTTON_POWER;
 #elif CONFIG_KEYPAD == COWOND2_PAD
-        options.UP=BUTTON_UP;
-        options.DOWN=BUTTON_DOWN;
 
-        options.A=BUTTON_LEFT;
-        options.B=BUTTON_RIGHT;
-        options.START=BUTTON_PLUS;
-        options.SELECT=BUTTON_SELECT;
-        options.MENU=BUTTON_MENU;
 #else
 #error No Keymap Defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+        options.UP=BUTTON_TOPMIDDLE;
+        options.DOWN=BUTTON_BOTTOMMIDDLE;
+
+        options.A=BUTTON_MIDLEFT;
+        options.B=BUTTON_MIDRIGHT;
+        options.START=BUTTON_TOPRIGHT;
+        options.SELECT=BUTTON_CENTER;
+        options.MENU=BUTTON_TOPLEFT;
 #endif
 
       options.maxskip=4;

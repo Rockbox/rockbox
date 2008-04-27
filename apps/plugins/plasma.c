@@ -99,13 +99,33 @@ static int plasma_frequency;
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #define PLASMA_QUIT BUTTON_POWER
-#define PLASMA_INCREASE_FREQUENCY BUTTON_UP
-#define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
 
-#else
-#define PLASMA_QUIT BUTTON_OFF
+// the new button definitions should be placed here
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef PLASMA_QUIT
+#define PLASMA_QUIT               BUTTON_TOPLEFT
+#endif
+#ifndef PLASMA_INCREASE_FREQUENCY
+#define PLASMA_INCREASE_FREQUENCY BUTTON_MIDRIGHT
+#endif
+#ifndef PLASMA_DECREASE_FREQUENCY
+#define PLASMA_DECREASE_FREQUENCY BUTTON_MIDLEFT
+#endif
+
+#endif
+
+// if no button definitions specified and no touchpad use default
+#ifndef PLASMA_QUIT
+#define PLASMA_QUIT               BUTTON_OFF
+#endif
+#ifndef PLASMA_INCREASE_FREQUENCY
 #define PLASMA_INCREASE_FREQUENCY BUTTON_UP
+#endif
+#ifndef PLASMA_DECREASE_FREQUENCY
 #define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
+#endif
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define PLASMA_RC_QUIT            BUTTON_RC_STOP
@@ -128,8 +148,10 @@ static int plasma_frequency;
 #define PLASMA_REGEN_COLORS BUTTON_SELECT
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 #define PLASMA_REGEN_COLORS BUTTON_SELECT
-#elif CONFIG_KEYPAD == COWOND2_PAD
-#define PLASMA_REGEN_COLORS BUTTON_SELECT
+#endif
+#ifdef HAVE_TOUCHPAD
+#ifndef PLASMA_REGEN_COLORS
+#define PLASMA_REGEN_COLORS BUTTON_CENTER
 #endif
 #endif
 

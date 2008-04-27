@@ -118,17 +118,40 @@ PLUGIN_HEADER
 
 #elif ( CONFIG_KEYPAD == COWOND2_PAD )
 #define ROCKPAINT_QUIT      BUTTON_POWER
-#define ROCKPAINT_DRAW      BUTTON_SELECT
 #define ROCKPAINT_MENU      BUTTON_MENU
-#define ROCKPAINT_TOOLBAR   BUTTON_PLUS
-#define ROCKPAINT_TOOLBAR2  BUTTON_MINUS
-#define ROCKPAINT_UP        BUTTON_UP
-#define ROCKPAINT_DOWN      BUTTON_DOWN
-#define ROCKPAINT_LEFT      BUTTON_LEFT
-#define ROCKPAINT_RIGHT     BUTTON_RIGHT
 
 #else
 #error "Please define keys for this keypad"
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef ROCKPAINT_QUIT
+#define ROCKPAINT_QUIT      BUTTON_TOPLEFT
+#endif
+#ifndef ROCKPAINT_DRAW
+#define ROCKPAINT_DRAW      BUTTON_CENTER
+#endif
+#ifndef ROCKPAINT_MENU
+#define ROCKPAINT_MENU      BUTTON_TOPRIGHT
+#endif
+#ifndef ROCKPAINT_TOOLBAR
+#define ROCKPAINT_TOOLBAR   BUTTON_BOTTOMLEFT
+#endif
+#ifndef ROCKPAINT_TOOLBAR2
+#define ROCKPAINT_TOOLBAR2  BUTTON_BOTTOMRIGHT
+#endif
+#ifndef ROCKPAINT_UP
+#define ROCKPAINT_UP        BUTTON_TOPMIDDLE
+#endif
+#ifndef ROCKPAINT_DOWN
+#define ROCKPAINT_DOWN      BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef ROCKPAINT_LEFT
+#define ROCKPAINT_LEFT      BUTTON_MIDLEFT
+#endif
+#ifndef ROCKPAINT_RIGHT
+#define ROCKPAINT_RIGHT     BUTTON_MIDRIGHT
+#endif
 #endif
 
 /***********************************************************************

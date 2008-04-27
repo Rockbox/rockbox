@@ -138,10 +138,6 @@ const unsigned char rockbox16x7[] = {
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define LP_QUIT BUTTON_POWER
-#define LP_DEC_X BUTTON_LEFT
-#define LP_INC_X BUTTON_RIGHT
-#define LP_DEC_Y BUTTON_DOWN
-#define LP_INC_Y BUTTON_UP
 
 #else
 #define LP_QUIT BUTTON_OFF
@@ -162,6 +158,23 @@ const unsigned char rockbox16x7[] = {
 #endif
 #endif /* CONFIG_REMOTE_KEYPAD */
 
+#ifdef HAVE_TOUCHPAD
+#ifndef LP_QUIT
+#define LP_QUIT  BUTTON_TOPLEFT
+#endif
+#ifndef LP_DEC_X
+#define LP_DEC_X BUTTON_MIDLEFT
+#endif
+#ifndef LP_INC_X
+#define LP_INC_X BUTTON_MIDRIGHT
+#endif
+#ifndef LP_DEC_Y
+#define LP_DEC_Y BUTTON_TOPMIDDLE
+#endif
+#ifndef LP_INC_Y
+#define LP_INC_Y BUTTON_BOTTOMMIDDLE
+#endif
+#endif
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     int button;
@@ -288,4 +301,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
         }
     }
 }
+
 

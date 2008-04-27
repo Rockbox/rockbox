@@ -36,10 +36,9 @@ void button_set_touch_available(void);
 #define BUTTON_MINUS      0x00000004
 #define BUTTON_MENU       0x00000008
 
-/* compatibility hacks These definatly need fixing */
+/* Compatibility hacks for flipping. Needs a somewhat better fix. */
 #define BUTTON_LEFT  BUTTON_MIDLEFT
 #define BUTTON_RIGHT BUTTON_MIDRIGHT
-#define BUTTON_SELECT BUTTON_CENTER
 #define BUTTON_UP    BUTTON_TOPMIDDLE
 #define BUTTON_DOWN  BUTTON_BOTTOMMIDDLE
 

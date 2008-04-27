@@ -105,12 +105,24 @@ Still To do:
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define QUIT BUTTON_POWER
-#define ACTION BUTTON_UP
-#define ACTION2 BUTTON_MENU
-#define ACTIONTEXT "UP"
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef QUIT
+#define QUIT        BUTTON_TOPLEFT
+#endif
+#ifndef ACTION
+#define ACTION      BUTTON_BOTTOMLEFT
+#endif
+#ifndef ACTION2
+#define ACTION2     BUTTON_BOTTOMRIGHT
+#endif
+#ifndef ACTIONTEXT
+#define ACTIONTEXT "BOTTOMRIGHT"
+#endif
 #endif
 
 static struct plugin_api* rb;

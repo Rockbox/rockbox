@@ -140,17 +140,44 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #define PUZZLE_QUIT BUTTON_POWER
-#define PUZZLE_LEFT BUTTON_LEFT
-#define PUZZLE_RIGHT BUTTON_RIGHT
-#define PUZZLE_UP BUTTON_UP
-#define PUZZLE_DOWN BUTTON_DOWN
-#define PUZZLE_SHUFFLE BUTTON_MENU
-#define PUZZLE_PICTURE BUTTON_SELECT
+#define PUZZLE_QUIT_TEXT "[POWER]"
 
 #else
 #error No keymap defined!
 #endif
 
+#ifdef HAVE_TOUCHPAD
+#ifndef PUZZLE_QUIT
+#define PUZZLE_QUIT    BUTTON_TOPLEFT
+#endif
+#ifndef PUZZLE_LEFT
+#define PUZZLE_LEFT    BUTTON_MIDLEFT
+#endif
+#ifndef PUZZLE_RIGHT
+#define PUZZLE_RIGHT   BUTTON_MIDRIGHT
+#endif
+#ifndef PUZZLE_UP
+#define PUZZLE_UP      BUTTON_TOPMIDDLE
+#endif
+#ifndef PUZZLE_DOWN
+#define PUZZLE_DOWN    BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef PUZZLE_SHUFFLE
+#define PUZZLE_SHUFFLE BUTTON_BOTTOMLEFT
+#endif
+#ifndef PUZZLE_PICTURE
+#define PUZZLE_PICTURE BUTTON_CENTER
+#endif
+#ifndef PUZZLE_QUIT_TEXT 
+#define PUZZLE_QUIT_TEXT "[TOPLEFT]"
+#endif
+#ifndef PUZZLE_SHUFFLE_TEXT 
+#define PUZZLE_SHUFFLE_TEXT "[BOTTOMLEFT]"
+#endif
+#ifndef PUZZLE_PICTURE_TEXT 
+#define PUZZLE_PICTURE_TEXT "[CENTER]"
+#endif
+#endif
 
 #include "sliding_puzzle.h"
 #define IMAGE_WIDTH BMPWIDTH_sliding_puzzle
@@ -646,6 +673,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->lcd_putsxy(0, 18, "[REC] to stop");
         rb->lcd_putsxy(0, 28, "[MODE] shuffle");
         rb->lcd_putsxy(0, 38, "[MENU] change pic");
+#endif
+#ifdef HAVE_TOUCHPAD
+        rb->lcd_putsxy(0, 18, PUZZLE_QUIT_TEXT " to stop");
+        rb->lcd_putsxy(0, 28, PUZZLE_SHUFFLE_TEXT " shuffle");
+        rb->lcd_putsxy(0, 38, PUZZLE_PICTURE_TEXT " change pic");
 #endif
 #ifdef HAVE_ALBUMART
         rb->lcd_putsxy(0,48,"    pic->albumart->num");

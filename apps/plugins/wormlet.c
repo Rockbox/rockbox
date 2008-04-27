@@ -217,20 +217,43 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 
-#define BTN_DIR_UP BUTTON_UP
-#define BTN_DIR_DOWN BUTTON_DOWN
-#define BTN_DIR_LEFT BUTTON_LEFT
-#define BTN_DIR_RIGHT BUTTON_RIGHT
-#define BTN_STARTPAUSE BUTTON_SELECT
 #define BTN_QUIT BUTTON_POWER
-#define BTN_STOPRESET BUTTON_PLUS
-
-#define PLAYERS_TEXT "Up/Down"
-#define WORMS_TEXT "Left/Right"
 
 #else
 #error No keymap defined!
 #endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef BTN_DIR_UP
+#define BTN_DIR_UP     BUTTON_TOPMIDDLE
+#endif
+#ifndef BTN_DIR_DOWN
+#define BTN_DIR_DOWN   BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef BTN_DIR_LEFT
+#define BTN_DIR_LEFT   BUTTON_MIDLEFT
+#endif
+#ifndef BTN_DIR_RIGHT
+#define BTN_DIR_RIGHT  BUTTON_MIDRIGHT
+#endif
+#ifndef BTN_STARTPAUSE
+#define BTN_STARTPAUSE BUTTON_CENTER
+#endif
+#ifndef BTN_QUIT
+#define BTN_QUIT       BUTTON_TOPLEFT
+#endif
+#ifndef BTN_STOPRESET
+#define BTN_STOPRESET  BUTTON_TOPRIGHT
+
+#endif
+#ifndef PLAYERS_TEXT
+#define PLAYERS_TEXT   "Up/Down"
+#endif
+#ifndef WORMS_TEXT
+#define WORMS_TEXT     "Left/Right"
+#endif
+#endif
+
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 #define FOOD_SIZE 3

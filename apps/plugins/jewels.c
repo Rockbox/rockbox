@@ -149,15 +149,31 @@ PLUGIN_HEADER
 #define JEWELS_RC_CANCEL BUTTON_REC
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#define JEWELS_UP     BUTTON_UP
-#define JEWELS_DOWN   BUTTON_DOWN
-#define JEWELS_LEFT   BUTTON_LEFT
-#define JEWELS_RIGHT  BUTTON_RIGHT
-#define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_POWER
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef JEWELS_UP
+#define JEWELS_UP     BUTTON_TOPMIDDLE
+#endif
+#ifndef JEWELS_DOWN
+#define JEWELS_DOWN   BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef JEWELS_LEFT
+#define JEWELS_LEFT   BUTTON_MIDLEFT
+#endif
+#ifndef JEWELS_RIGHT
+#define JEWELS_RIGHT  BUTTON_MIDRIGHT
+#endif
+#ifndef JEWELS_SELECT
+#define JEWELS_SELECT BUTTON_CENTER
+#endif
+#ifndef JEWELS_CANCEL
+#define JEWELS_CANCEL BUTTON_TOPLEFT
+#endif
 #endif
 
 /* use 30x30 tiles (iPod Video, Gigabeat) */
@@ -1574,14 +1590,6 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 11, "Long PLAY for menu");
                 rb->lcd_puts(0, 12, "REC to cancel");
 #elif CONFIG_KEYPAD == COWOND2_PAD
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
-                rb->lcd_puts(0, 3, "form connected segments");
-                rb->lcd_puts(0, 4, "of three or more of the");
-                rb->lcd_puts(0, 5, "same type.");
-                rb->lcd_puts(0, 7, "Controls:");
-                rb->lcd_puts(0, 8, "Directions to move");
-                rb->lcd_puts(0, 9, "SELECT to select");
-                rb->lcd_puts(0, 10, "Long SELECT to show menu");
                 rb->lcd_puts(0, 11, "POWER to cancel");
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
                 rb->lcd_puts(0, 2, "Swap pairs of jewels to");
@@ -1595,6 +1603,17 @@ static int jewels_main(struct game_context* bj) {
                 rb->lcd_puts(0, 11, "BACK to cancel");
 #else
     #warning: missing help text.
+#endif
+
+#ifdef HAVE_TOUCHPAD
+                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
+                rb->lcd_puts(0, 3, "form connected segments");
+                rb->lcd_puts(0, 4, "of three or more of the");
+                rb->lcd_puts(0, 5, "same type.");
+                rb->lcd_puts(0, 7, "Controls:");
+                rb->lcd_puts(0, 8, "Directions to move");
+                rb->lcd_puts(0, 9, "CENTER to select");
+                rb->lcd_puts(0, 10, "Long CENTER to show menu");
 #endif
                 rb->lcd_update();
                 while(true) {

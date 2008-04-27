@@ -300,27 +300,48 @@ static struct plugin_api* rb;
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #   define SOL_QUIT          BUTTON_POWER
-#   define SOL_UP            BUTTON_UP
-#   define SOL_DOWN          BUTTON_DOWN
-#   define SOL_LEFT_PRE      BUTTON_LEFT
-#   define SOL_LEFT          (BUTTON_LEFT | BUTTON_REL)
-#   define SOL_RIGHT_PRE     BUTTON_RIGHT
-#   define SOL_RIGHT         (BUTTON_RIGHT | BUTTON_REL)
-#   define SOL_MOVE          BUTTON_SELECT
-#   define SOL_DRAW_PRE      BUTTON_LEFT
-#   define SOL_DRAW          (BUTTON_LEFT | BUTTON_MENU)
-#   define SOL_REM2CUR       BUTTON_PLUS
-#   define SOL_CUR2STACK     BUTTON_MINUS
-#   define SOL_REM2STACK_PRE BUTTON_RIGHT
-#   define SOL_REM2STACK     (BUTTON_RIGHT | BUTTON_MENU)
-#   define HK_MOVE           "PLAY"
-#   define HK_DRAW           "LEFT.."
-#   define HK_REM2CUR        "FF"
-#   define HK_CUR2STACK      "REW"
-#   define HK_REM2STACK      "RIGHT.."
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+//#ifndef SOL_QUIT
+//#   define SOL_QUIT          BUTTON_TOPLEFT
+//endif
+#ifndef SOL_UP
+#   define SOL_UP            BUTTON_TOPMIDDLE
+#endif
+#ifndef SOL_DOWN
+#   define SOL_DOWN          BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef SOL_LEFT
+#   define SOL_LEFT          BUTTON_MIDLEFT
+#endif
+#ifndef SOL_RIGHT
+#   define SOL_RIGHT         BUTTON_MIDRIGHT
+#endif
+#ifndef SOL_MOVE
+#   define SOL_MOVE          BUTTON_CENTER
+#   define HK_MOVE           "CENTRE"
+#endif
+#ifndef SOL_DRAW
+#   define SOL_DRAW          BUTTON_TOPLEFT
+#   define HK_DRAW           "TOPLEFT"
+#endif
+#ifndef SOL_REM2CUR
+#   define SOL_REM2CUR       BUTTON_TOPRIGHT
+#   define HK_REM2CUR        "TOPRIGHT"
+#endif
+#ifndef SOL_CUR2STACK
+#   define SOL_CUR2STACK     BUTTON_BOTTOMLEFT
+#   define HK_CUR2STACK      "BOTTOMLEFT"
+#endif
+#ifndef SOL_REM2STACK
+#   define SOL_REM2STACK     BUTTON_BOTTOMRIGHT
+#   define HK_REM2STACK      "BOTTOMRIGHT"
+#endif
+
 #endif
 
 #ifndef HK_LR

@@ -208,19 +208,40 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 
-#define FLIPIT_LEFT         BUTTON_LEFT
-#define FLIPIT_RIGHT        BUTTON_RIGHT
-#define FLIPIT_UP           BUTTON_UP
-#define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_POWER
-#define FLIPIT_SHUFFLE      (BUTTON_LEFT|BUTTON_MENU)
-#define FLIPIT_SOLVE        (BUTTON_RIGHT|BUTTON_MENU)
-#define FLIPIT_STEP_BY_STEP BUTTON_MINUS
-#define FLIPIT_TOGGLE_PRE   BUTTON_PLUS
-#define FLIPIT_TOGGLE       BUTTON_SELECT
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef FLIPIT_LEFT
+#define FLIPIT_LEFT         BUTTON_MIDLEFT
+#endif
+#ifndef FLIPIT_RIGHT
+#define FLIPIT_RIGHT        BUTTON_MIDRIGHT
+#endif
+#ifndef FLIPIT_UP
+#define FLIPIT_UP           BUTTON_TOPMIDDLE
+#endif
+#ifndef FLIPIT_DOWN
+#define FLIPIT_DOWN         BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef FLIPIT_QUIT
+#define FLIPIT_QUIT         BUTTON_TOPLEFT
+#endif
+#ifndef FLIPIT_SHUFFLE
+#define FLIPIT_SHUFFLE      BUTTON_TOPRIGHT
+#endif
+#ifndef FLIPIT_SOLVE
+#define FLIPIT_SOLVE        BUTTON_BOTTOMLEFT
+#endif
+#ifndef FLIPIT_STEP_BY_STEP
+#define FLIPIT_STEP_BY_STEP BUTTON_BOTTOMRIGHT
+#endif
+#ifndef FLIPIT_TOGGLE
+#define FLIPIT_TOGGLE       BUTTON_CENTER
+#endif
 #endif
 
 static struct plugin_api* rb;
@@ -651,6 +672,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 38, "[MENU..] solution");
     rb->lcd_putsxy(2, 48, "[MENU] step by step");
 #endif
+
+#ifdef HAVE_TOUCHPAD
+    rb->lcd_putsxy(2, 8, "[BOTTOMLEFT]  to stop");
+    rb->lcd_putsxy(2, 18, "[CENTRE]      toggle");
+    rb->lcd_putsxy(2, 28, "[TOPRIGHT]    shuffle");
+    rb->lcd_putsxy(2, 38, "[BOTTOMLEFT]  solution");
+    rb->lcd_putsxy(2, 48, "[BOTTOMRIGHT] step by step");
+#endif
+
     rb->lcd_update();
 #else /* HAVE_LCD_CHARCELLS */
     if (!init_gfx())

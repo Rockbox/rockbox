@@ -248,23 +248,55 @@
 #define CB_RC_QUIT BUTTON_REC
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#define CB_SELECT  BUTTON_SELECT
-#define CB_UP      BUTTON_UP
-#define CB_DOWN    BUTTON_DOWN
-#define CB_LEFT    BUTTON_LEFT
-#define CB_RIGHT   BUTTON_RIGHT
-#define CB_PLAY    BUTTON_MENU
 #define CB_LEVEL   BUTTON_PLUS
-#define CB_RESTART (BUTTON_SELECT | BUTTON_MENU)
-#define CB_MENU    BUTTON_POWER
+#define CB_RESTART BUTTON_MINUS
+#define CB_MENU    (BUTTON_MENU|BUTTON_REL)
 
-#define CB_SCROLL_UP     (BUTTON_UP|BUTTON_MENU)
-#define CB_SCROLL_DOWN   (BUTTON_DOWN|BUTTON_MENU)
-#define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_MENU)
-#define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_MENU)
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef CB_LEVEL
+#define CB_LEVEL          BUTTON_TOPLEFT
+#endif
+#ifndef CB_RESTART
+#define CB_RESTART        BUTTON_TOPRIGHT
+#endif
+#ifndef CB_MENU
+#define CB_MENU           (BUTTON_BOTTOMLEFT|BUTTON_REL)
+#endif
+#ifndef CB_PLAY
+#define CB_PLAY          (BUTTON_CENTER|BUTTON_REPEAT)
+#endif
+#ifndef CB_SELECT
+#define CB_SELECT         BUTTON_CENTER
+#endif
+#ifndef CB_UP
+#define CB_UP             BUTTON_TOPMIDDLE
+#endif
+#ifndef CB_DOWN
+#define CB_DOWN           BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef CB_LEFT
+#define CB_LEFT           BUTTON_MIDLEFT
+#endif
+#ifndef CB_RIGHT
+#define CB_RIGHT          BUTTON_MIDRIGHT
+#endif
+#ifndef CB_SCROLL_UP
+#define CB_SCROLL_UP     (BUTTON_TOPMIDDLE|BUTTON_REPEAT)
+#endif
+#ifndef CB_SCROLL_DOWN
+#define CB_SCROLL_DOWN   (BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT)
+#endif
+#ifndef CB_SCROLL_LEFT
+#define CB_SCROLL_LEFT   (BUTTON_MIDLEFT|BUTTON_REPEAT)
+#endif
+#ifndef CB_SCROLL_RIGHT
+#define CB_SCROLL_RIGHT  (BUTTON_MIDRIGHT|BUTTON_REPEAT)
+#endif
 #endif
 
 /* structure to represent the plies */

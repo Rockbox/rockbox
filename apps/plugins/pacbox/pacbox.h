@@ -132,20 +132,39 @@
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 
-#define PACMAN_UP       BUTTON_UP
-#define PACMAN_DOWN     BUTTON_DOWN
-#define PACMAN_LEFT     BUTTON_LEFT
-#define PACMAN_RIGHT    BUTTON_RIGHT
-#define PACMAN_1UP      BUTTON_MINUS
-#define PACMAN_2UP      BUTTON_PLUS
-#define PACMAN_COIN_PRE BUTTON_SELECT
-#define PACMAN_COIN     (BUTTON_MENU | BUTTON_SELECT)
-#define PACMAN_MENU     BUTTON_MENU
+#define PACMAN_MENU     (BUTTON_MENU|BUTTON_REL)
 
 #else
 
 #error Keymap not defined!
 
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef PACMAN_UP
+#define PACMAN_UP       BUTTON_TOPMIDDLE
+#endif
+#ifndef PACMAN_DOWN
+#define PACMAN_DOWN     BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef PACMAN_LEFT
+#define PACMAN_LEFT     BUTTON_MIDLEFT
+#endif
+#ifndef PACMAN_RIGHT
+#define PACMAN_RIGHT    BUTTON_MIDRIGHT
+#endif
+#ifndef PACMAN_1UP
+#define PACMAN_1UP      BUTTON_BOTTOMLEFT
+#endif
+#ifndef PACMAN_2UP
+#define PACMAN_2UP      BUTTON_BOTTOMRIGHT
+#endif
+#ifndef PACMAN_COIN
+#define PACMAN_COIN    BUTTON_CENTER
+#endif
+#ifndef PACMAN_MENU
+#define PACMAN_MENU    (BUTTON_TOPLEFT|BUTTON_REL)
+#endif
 #endif
 
 #if (LCD_HEIGHT >= 288)

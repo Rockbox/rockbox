@@ -251,22 +251,46 @@ PLUGIN_HEADER
 #define BJACK_LEFT       BUTTON_RC_REW
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#define BJACK_START      BUTTON_SELECT
 #define BJACK_QUIT       BUTTON_POWER
-#define BJACK_MAX        BUTTON_PLUS
-#define BJACK_MIN        BUTTON_MINUS
-#define BJACK_HIT        BUTTON_SELECT
-#define BJACK_STAY       BUTTON_MENU
-#define BJACK_DOUBLEDOWN (BUTTON_DOWN|BUTTON_MENU)
-#define BJACK_SCORES     (BUTTON_SELECT|BUTTON_MENU)
-#define BJACK_RESUME     (BUTTON_SELECT|BUTTON_PLUS)
-#define BJACK_UP         BUTTON_UP
-#define BJACK_DOWN       BUTTON_DOWN
-#define BJACK_RIGHT      BUTTON_RIGHT
-#define BJACK_LEFT       BUTTON_LEFT
+#define BJACK_DOUBLEDOWN BUTTON_MINUS
+#define BJACK_SCORES     BUTTON_MENU
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef BJACK_START
+#define BJACK_START      BUTTON_CENTER
+#endif
+#ifndef BJACK_HIT
+#define BJACK_HIT        BUTTON_CENTER
+#endif
+#ifndef BJACK_MAX
+#define BJACK_MAX        BUTTON_TOPRIGHT
+#endif
+#ifndef BJACK_MIN
+#define BJACK_MIN        BUTTON_TOPLEFT
+#endif
+#ifndef BJACK_RESUME
+#define BJACK_RESUME     BUTTON_BOTTOMRIGHT
+#endif
+#ifndef BJACK_STAY
+#define BJACK_STAY       BUTTON_BOTTOMLEFT
+#endif
+#ifndef BJACK_UP
+#define BJACK_UP         BUTTON_TOPMIDDLE
+#endif
+#ifndef BJACK_DOWN
+#define BJACK_DOWN       BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef BJACK_RIGHT
+#define BJACK_RIGHT      BUTTON_MIDRIGHT
+#endif
+#ifndef BJACK_LEFT
+#define BJACK_LEFT       BUTTON_MIDLEFT
+#endif
+
 #endif
 
 #ifdef HAVE_LCD_COLOR
@@ -1194,6 +1218,18 @@ static unsigned int blackjack_menu(struct game_context* bj) {
             rb->lcd_puts(0, 8, "MENU to view scores");
             rb->snprintf(str, 21, "High Score: $%d", bj->highscores[0]);
             rb->lcd_puts(0, 10, str);
+#elif CONFIG_KEYPAD == COWOND2_PAD
+            rb->lcd_puts(0, 6, "POWER           to exit");
+            rb->lcd_puts(0, 7, "MINUS           to double down");
+            rb->lcd_puts(0, 8, "MENU            to view scores");
+            rb->snprintf(str, 21, "High Score:     $%d", bj->highscores[0]);
+            rb->lcd_puts(0, 10, str);
+#endif
+
+#ifdef HAVE_TOUCHPAD
+            rb->lcd_puts(0, 2, "LCD CENTRE      to start & to hit");
+            rb->lcd_puts(0, 3, "LCD BOTTOMLEFT  to stay");
+            rb->lcd_puts(0, 4, "LCD BOTTOMRIGHT to save/resume");
 #endif
         } else {
             rb->snprintf(str, 12, "%s", "High Scores");

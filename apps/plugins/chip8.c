@@ -1079,14 +1079,39 @@ STATIC void chip8 (void)
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #define CHIP8_OFF  BUTTON_POWER
-#define CHIP8_KEY2 BUTTON_DOWN
-#define CHIP8_KEY4 BUTTON_LEFT
-#define CHIP8_KEY5 BUTTON_SELECT
-#define CHIP8_KEY6 BUTTON_RIGHT
-#define CHIP8_KEY8 BUTTON_UP
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef CHIP8_OFF
+#define CHIP8_OFF  BUTTON_TOPLEFT
+#endif
+#ifndef CHIP8_KEY1
+#define CHIP8_KEY1 BUTTON_TOPRIGHT
+#endif
+#ifndef CHIP8_KEY2
+#define CHIP8_KEY2 BUTTON_TOPMIDDLE
+#endif
+#ifndef CHIP8_KEY3
+#define CHIP8_KEY3 BUTTON_BOTTOMLEFT
+#endif
+#ifndef CHIP8_KEY4
+#define CHIP8_KEY4 BUTTON_MIDLEFT
+#endif
+#ifndef CHIP8_KEY5
+#define CHIP8_KEY5 BUTTON_CENTER
+#endif
+#ifndef CHIP8_KEY6
+#define CHIP8_KEY6 BUTTON_MIDRIGHT
+#endif
+#ifndef CHIP8_KEY7
+#define CHIP8_KEY7 BUTTON_BOTTOMRIGHT
+#endif
+#ifndef CHIP8_KEY8
+#define CHIP8_KEY8 BUTTON_BOTTOMMIDDLE
+#endif
 #endif
 
 static byte chip8_virtual_keys[16];

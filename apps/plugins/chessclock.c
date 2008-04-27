@@ -181,19 +181,37 @@ PLUGIN_HEADER
 #define CHC_SETTINGS_CANCEL BUTTON_RC_REC
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#define CHC_QUIT BUTTON_POWER
-#define CHC_STARTSTOP BUTTON_SELECT
-#define CHC_RESET (BUTTON_SELECT|BUTTON_MENU)
-#define CHC_MENU BUTTON_MENU
-#define CHC_SETTINGS_INC BUTTON_UP
-#define CHC_SETTINGS_DEC BUTTON_DOWN
-#define CHC_SETTINGS_OK BUTTON_SELECT
+#define CHC_QUIT            BUTTON_POWER
+#define CHC_RESET          (BUTTON_CENTER|BUTTON_MENU)
+#define CHC_MENU            BUTTON_MENU
+#define CHC_SETTINGS_INC    BUTTON_PLUS
+#define CHC_SETTINGS_DEC    BUTTON_MINUS
 #define CHC_SETTINGS_CANCEL BUTTON_POWER
 
 #else
 #error No keymap defined!
 #endif
 
+#ifdef HAVE_TOUCHPAD
+#ifndef CHC_SETTINGS_OK
+#define CHC_SETTINGS_OK  BUTTON_CENTER
+#endif
+#ifndef CHC_STARTSTOP
+#define CHC_STARTSTOP    BUTTON_CENTER
+#endif
+#ifndef CHC_SETTINGS_INC
+#define CHC_SETTINGS_INC BUTTON_TOPMIDDLE
+#endif
+#ifndef CHC_SETTINGS_DEC
+#define CHC_SETTINGS_DEC BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef CHC_RESET
+#define CHC_RESET        BUTTON_TOPLEFT
+#endif
+#ifndef CHC_MENU
+#define CHC_MENU         BUTTON_TOPRIGHT
+#endif
+#endif
 
 
 /* leave first line blank on bitmap display, for pause icon */
@@ -649,4 +667,5 @@ static int simple_menu(int nr, unsigned char **strarr)
         }
     }
 }
+
 

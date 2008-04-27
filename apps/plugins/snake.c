@@ -142,14 +142,30 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #define SNAKE_QUIT BUTTON_POWER
-#define SNAKE_LEFT BUTTON_LEFT
-#define SNAKE_RIGHT BUTTON_RIGHT
-#define SNAKE_UP   BUTTON_UP
-#define SNAKE_DOWN BUTTON_DOWN
-#define SNAKE_PLAYPAUSE BUTTON_MENU
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef SNAKE_QUIT
+#define SNAKE_QUIT      BUTTON_TOPLEFT
+#endif
+#ifndef SNAKE_LEFT
+#define SNAKE_LEFT      BUTTON_MIDLEFT
+#endif
+#ifndef SNAKE_RIGHT
+#define SNAKE_RIGHT     BUTTON_MIDRIGHT
+#endif
+#ifndef SNAKE_UP
+#define SNAKE_UP        BUTTON_TOPMIDDLE
+#endif
+#ifndef SNAKE_DOWN
+#define SNAKE_DOWN      BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef SNAKE_PLAYPAUSE
+#define SNAKE_PLAYPAUSE BUTTON_CENTER
+#endif
 #endif
 
 #define BOARD_WIDTH (LCD_WIDTH/4)

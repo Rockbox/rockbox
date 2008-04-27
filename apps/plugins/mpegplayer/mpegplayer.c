@@ -212,16 +212,37 @@ PLUGIN_IRAM_DECLARE
 #define MPEG_FF         BUTTON_RC_FF
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
-#define MPEG_MENU       BUTTON_MENU
-#define MPEG_STOP       BUTTON_POWER
-#define MPEG_PAUSE      BUTTON_SELECT
+#define MPEG_MENU       (BUTTON_MENU|BUTTON_REL)
+//#define MPEG_STOP       BUTTON_POWER
 #define MPEG_VOLDOWN    BUTTON_MINUS
 #define MPEG_VOLUP      BUTTON_PLUS
-#define MPEG_RW         BUTTON_LEFT
-#define MPEG_FF         BUTTON_RIGHT
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef MPEG_MENU
+#define MPEG_MENU      (BUTTON_TOPRIGHT|BUTTON_REL)
+#endif
+#ifndef MPEG_STOP
+#define MPEG_STOP       BUTTON_TOPLEFT
+#endif
+#ifndef MPEG_PAUSE
+#define MPEG_PAUSE      BUTTON_CENTER
+#endif
+#ifndef MPEG_VOLDOWN
+#define MPEG_VOLDOWN    BUTTON_TOPMIDDLE
+#endif
+#ifndef MPEG_VOLUP
+#define MPEG_VOLUP      BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef MPEG_RW
+#define MPEG_RW         BUTTON_MIDLEFT
+#endif
+#ifndef MPEG_FF
+#define MPEG_FF         BUTTON_MIDRIGHT
+#endif
 #endif
 
 struct plugin_api* rb;

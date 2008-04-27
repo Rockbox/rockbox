@@ -243,20 +243,46 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define CUBE_QUIT          BUTTON_POWER
-#define CUBE_X_INC         BUTTON_RIGHT
-#define CUBE_X_DEC         BUTTON_LEFT
-#define CUBE_Y_INC         BUTTON_UP
-#define CUBE_Y_DEC         BUTTON_DOWN
-#define CUBE_Z_INC         BUTTON_PLUS
-#define CUBE_Z_DEC         BUTTON_MINUS
-#define CUBE_MODE          BUTTON_MENU
-#define CUBE_PAUSE_PRE     BUTTON_SELECT
-#define CUBE_PAUSE         (BUTTON_MINUS | BUTTON_REL)
-#define CUBE_HIGHSPEED     (BUTTON_PLUS | BUTTON_REL)
 
 #else
 #error No keymap defined!
 #endif
+
+#ifdef HAVE_TOUCHPAD
+// not enough touchfields, so CUBE_QUIT have to be 
+// mapped to a real button
+//ifndef CUBE_QUIT
+//#define CUBE_QUIT          BUTTON_TOPLEFT
+//#endif
+#ifndef CUBE_X_INC
+#define CUBE_X_INC         BUTTON_MIDRIGHT
+#endif
+#ifndef CUBE_X_DEC
+#define CUBE_X_DEC         BUTTON_MIDLEFT
+#endif
+#ifndef CUBE_Y_INC
+#define CUBE_Y_INC         BUTTON_TOPMIDDLE
+#endif
+#ifndef CUBE_Y_DEC
+#define CUBE_Y_DEC         BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef CUBE_Z_INC
+#define CUBE_Z_INC         BUTTON_BOTTOMRIGHT
+#endif
+#ifndef CUBE_Z_DEC
+#define CUBE_Z_DEC         BUTTON_BOTTOMLEFT
+#endif
+#ifndef CUBE_MODE
+#define CUBE_MODE          BUTTON_TOPRIGHT
+#endif
+#ifndef CUBE_PAUSE
+#define CUBE_PAUSE        (BUTTON_CENTER | BUTTON_REL)
+#endif
+#ifndef CUBE_HIGHSPEED
+#define CUBE_HIGHSPEED     BUTTON_TOPLEFT
+#endif
+#endif
+
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -853,4 +879,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
     return PLUGIN_OK;
 }
+
 

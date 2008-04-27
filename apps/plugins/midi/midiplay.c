@@ -137,15 +137,31 @@ PLUGIN_IRAM_DECLARE
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define BTN_QUIT         BUTTON_POWER
-#define BTN_RIGHT        BUTTON_RIGHT
-#define BTN_LEFT         BUTTON_LEFT
-#define BTN_UP           BUTTON_UP
-#define BTN_DOWN         BUTTON_DOWN
-#define BTN_PLAY         BUTTON_SELECT
 
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef BTN_QUIT
+#define BTN_QUIT         BUTTON_TOPLEFT
+#endif
+#ifndef BTN_RIGHT
+#define BTN_RIGHT        BUTTON_MIDRIGHT
+#endif
+#ifndef BTN_LEFT
+#define BTN_LEFT         BUTTON_MIDLEFT
+#endif
+#ifndef BTN_UP
+#define BTN_UP           BUTTON_TOPMIDDLE
+#endif
+#ifndef BTN_DOWN
+#define BTN_DOWN         BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef BTN_PLAY
+#define BTN_PLAY         BUTTON_CENTER
+#endif
 #endif
 
 #undef SYNC

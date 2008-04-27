@@ -246,15 +246,34 @@ PLUGIN_HEADER
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define VIEWER_QUIT BUTTON_POWER
-#define VIEWER_PAGE_UP BUTTON_UP
-#define VIEWER_PAGE_DOWN BUTTON_DOWN
-#define VIEWER_SCREEN_LEFT BUTTON_LEFT
-#define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
 #define VIEWER_MENU BUTTON_MENU
-#define VIEWER_AUTOSCROLL BUTTON_SELECT
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef VIEWER_QUIT
+#define VIEWER_QUIT         BUTTON_TOPLEFT
+#endif
+#ifndef VIEWER_PAGE_UP
+#define VIEWER_PAGE_UP      BUTTON_TOPMIDDLE
+#endif
+#ifndef VIEWER_PAGE_DOWN
+#define VIEWER_PAGE_DOWN    BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef VIEWER_SCREEN_LEFT
+#define VIEWER_SCREEN_LEFT  BUTTON_MIDLEFT
+#endif
+#ifndef VIEWER_SCREEN_RIGHT
+#define VIEWER_SCREEN_RIGHT BUTTON_MIDRIGHT
+#endif
+#ifndef VIEWER_MENU
+#define VIEWER_MENU         BUTTON_TOPRIGHT
+#endif
+#ifndef VIEWER_AUTOSCROLL
+#define VIEWER_AUTOSCROLL   BUTTON_CENTER
+#endif
 #endif
 
 /* stuff for the bookmarking */
@@ -1619,4 +1638,5 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     }
     return PLUGIN_OK;
 }
+
 

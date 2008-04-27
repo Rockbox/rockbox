@@ -139,15 +139,32 @@ PLUGIN_HEADER
 #define BOUNCE_MODE BUTTON_RC_MODE
 
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
-#define BOUNCE_LEFT BUTTON_LEFT
-#define BOUNCE_RIGHT BUTTON_RIGHT
-#define BOUNCE_UP   BUTTON_UP
-#define BOUNCE_DOWN BUTTON_DOWN
 #define BOUNCE_QUIT BUTTON_POWER
 #define BOUNCE_MODE BUTTON_MENU
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef BOUNCE_LEFT
+#define BOUNCE_LEFT BUTTON_MIDLEFT
+#endif
+#ifndef BOUNCE_RIGHT
+#define BOUNCE_RIGHT BUTTON_MIDRIGHT
+#endif
+#ifndef BOUNCE_UP
+#define BOUNCE_UP   BUTTON_TOPMIDDLE
+#endif
+#ifndef BOUNCE_DOWN
+#define BOUNCE_DOWN BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef BOUNCE_QUIT
+#define BOUNCE_QUIT BUTTON_TOPLEFT
+#endif
+#ifndef BOUNCE_MODE
+#define BOUNCE_MODE BUTTON_CENTER
+#endif
 #endif
 
 static struct plugin_api* rb;

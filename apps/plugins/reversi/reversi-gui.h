@@ -134,17 +134,35 @@
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 #define REVERSI_QUIT                BUTTON_POWER
-#define REVERSI_BUTTON_UP           BUTTON_UP
-#define REVERSI_BUTTON_DOWN         BUTTON_DOWN
-#define REVERSI_BUTTON_LEFT         BUTTON_LEFT
-#define REVERSI_BUTTON_RIGHT        BUTTON_RIGHT
-#define REVERSI_BUTTON_MAKE_MOVE    BUTTON_SELECT
 #define REVERSI_BUTTON_MENU         BUTTON_MENU
 
 #else
 #error No keymap defined!
 #endif
 
+#ifdef HAVE_TOUCHPAD
+#ifndef REVERSI_QUIT
+#define REVERSI_QUIT                BUTTON_TOPLEFT
+#endif
+#ifndef REVERSI_BUTTON_UP
+#define REVERSI_BUTTON_UP           BUTTON_TOPMIDDLE
+#endif
+#ifndef REVERSI_BUTTON_DOWN
+#define REVERSI_BUTTON_DOWN         BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef REVERSI_BUTTON_LEFT
+#define REVERSI_BUTTON_LEFT         BUTTON_MIDLEFT
+#endif
+#ifndef REVERSI_BUTTON_RIGHT
+#define REVERSI_BUTTON_RIGHT        BUTTON_MIDRIGHT
+#endif
+#ifndef REVERSI_BUTTON_MAKE_MOVE
+#define REVERSI_BUTTON_MAKE_MOVE    BUTTON_CENTER
+#endif
+#ifndef REVERSI_BUTTON_MENU
+#define REVERSI_BUTTON_MENU         BUTTON_TOPRIGHT
+#endif
+#endif
 
 /* Modes for the cursor behaviour at the board edges  */
 typedef enum _cursor_wrap_mode_t {

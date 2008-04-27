@@ -142,14 +142,30 @@ PLUGIN_HEADER
 #elif CONFIG_KEYPAD == COWOND2_PAD
 
 #define QUIT BUTTON_POWER
-#define LEFT BUTTON_LEFT
-#define RIGHT BUTTON_RIGHT
-#define UP BUTTON_UP
-#define DOWN BUTTON_DOWN
-#define PAUSE BUTTON_SELECT
 
 #else
 #error No keymap defined!
+#endif
+
+#ifdef HAVE_TOUCHPAD
+#ifndef QUIT
+#define QUIT  BUTTON_TOPLEFT
+#endif
+#ifndef LEFT
+#define LEFT  BUTTON_MIDLEFT
+#endif
+#ifndef RIGHT
+#define RIGHT BUTTON_MIDRIGHT
+#endif
+#ifndef UP
+#define UP    BUTTON_TOPMIDDLE
+#endif
+#ifndef DOWN
+#define DOWN  BUTTON_BOTTOMMIDDLE
+#endif
+#ifndef PAUSE
+#define PAUSE BUTTON_CENTER
+#endif
 #endif
 
 #define MOVE_NO 0               /* player movement */
