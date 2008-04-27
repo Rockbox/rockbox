@@ -46,7 +46,7 @@ static const char * avic_int_names[64] =
 void UIE_VECTOR(void)
 {
     int mode;
-    long offset;
+    int offset;
 
     asm volatile (
         "mrs    %0, cpsr      \n" /* Mask core IRQ/FIQ */
@@ -56,9 +56,10 @@ void UIE_VECTOR(void)
         : "=&r"(mode)
     );
 
-    offset = mode == 0x11 ? (long)FIVECSR : ((long)NIVECSR >> 16);
+    offset = mode == 0x11 ?
+        (int32_t)FIVECSR : ((int32_t)NIVECSR >> 16);
 
-    panicf("Unhandled %s %ld: %s",
+    panicf("Unhandled %s %d: %s",
            mode == 0x11 ? "FIQ" : "IRQ", offset,
            offset >= 0 ? avic_int_names[offset] : "<Unknown>");
 }
@@ -66,7 +67,10 @@ void UIE_VECTOR(void)
 /* We use the AVIC */
 void __attribute__((naked)) irq_handler(void)
 {
-    panicf("Unhandled IRQ in irq_handler");
+    const int offset = (int32_t)NIVECSR >> 16;
+    disable_interrupt(IRQ_FIQ_STATUS);
+    panicf("Unhandled IRQ %d in irq_handler: %s", offset,
+           offset >= 0 ? avic_int_names[offset] : "<Unknown>");
 }
 
 /* Accoring to section 9.3.5 of the UM, the AVIC doesn't accelerate
