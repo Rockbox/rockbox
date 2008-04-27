@@ -21,6 +21,9 @@
 #ifndef _WM8978_H
 #define _WM8978_H
 
+#define VOLUME_MIN -570
+#define VOLUME_MAX 60
+
 #define WM8978_I2C_ADDR 0x34
 
 /* Registers */
@@ -142,7 +145,7 @@
     #define WM8978_DAC_COMP_U_LAW           (2 << 3)
     #define WM8978_DAC_COMP_A_LAW           (3 << 3)
 #define WM8978_ADC_COMP                     (3 << 1)
-    #define WM8978_DAC_COMP_OFF             (0 << 1)
+    #define WM8978_ADC_COMP_OFF             (0 << 1)
     #define WM8978_ADC_COMP_U_LAW           (2 << 1)
     #define WM8978_ADC_COMP_A_LAW           (3 << 1)
 #define WM8978_LOOPBACK                     (1 << 0)
@@ -159,12 +162,12 @@
     #define WM8978_MCLKDIV_8                (6 << 5)
     #define WM8978_MCLKDIV_12               (7 << 5)
 #define WM8978_BCLKDIV                      (7 << 2)
-    #define WM8978_MCLKDIV_1                (0 << 2)
-    #define WM8978_MCLKDIV_2                (1 << 2)
-    #define WM8978_MCLKDIV_4                (2 << 2)
-    #define WM8978_MCLKDIV_8                (3 << 2)
-    #define WM8978_MCLKDIV_16               (4 << 2)
-    #define WM8978_MCLKDIV_32               (5 << 2)
+    #define WM8978_BCLKDIV_1                (0 << 2)
+    #define WM8978_BCLKDIV_2                (1 << 2)
+    #define WM8978_BCLKDIV_4                (2 << 2)
+    #define WM8978_BCLKDIV_8                (3 << 2)
+    #define WM8978_BCLKDIV_16               (4 << 2)
+    #define WM8978_BCLKDIV_32               (5 << 2)
 #define WM8978_MS                           (1 << 0)
 
 /* WM8978_ADDITIONAL_CTRL (0x07) */

@@ -49,7 +49,7 @@
 #define ETB_SLOT4_BASE_ADDR     0x43F10000
 #define ETB_SLOT5_BASE_ADDR     0x43F14000
 #define ECT_CTIO_BASE_ADDR      0x43F18000
-#define I2C_BASE_ADDR           0x43F80000
+#define I2C1_BASE_ADDR          0x43F80000
 #define I2C3_BASE_ADDR          0x43F84000
 #define OTG_BASE_ADDR           0x43F88000
 #define ATA_BASE_ADDR           0x43F8C000
@@ -627,6 +627,112 @@
 /* CSPI TESTREG flags */
 #define CSPI_TESTREG_SWAP               (1 << 15)
 #define CSPI_TESTREG_LBC                (1 << 14)
+
+/* I2C */
+#define I2C_IADR1               (*(REG16_PTR_T)(I2C1_BASE_ADDR+0x0))
+#define I2C_IFDR1               (*(REG16_PTR_T)(I2C1_BASE_ADDR+0x4))
+#define I2C_I2CR1               (*(REG16_PTR_T)(I2C1_BASE_ADDR+0x8))
+#define I2C_I2SR1               (*(REG16_PTR_T)(I2C1_BASE_ADDR+0xC))
+#define I2C_I2DR1               (*(REG16_PTR_T)(I2C1_BASE_ADDR+0x10))
+
+#define I2C_IADR2               (*(REG16_PTR_T)(I2C2_BASE_ADDR+0x0))
+#define I2C_IFDR2               (*(REG16_PTR_T)(I2C2_BASE_ADDR+0x4))
+#define I2C_I2CR2               (*(REG16_PTR_T)(I2C2_BASE_ADDR+0x8))
+#define I2C_I2SR2               (*(REG16_PTR_T)(I2C2_BASE_ADDR+0xC))
+#define I2C_I2DR2               (*(REG16_PTR_T)(I2C2_BASE_ADDR+0x10))
+
+#define I2C_IADR3               (*(REG16_PTR_T)(I2C3_BASE_ADDR+0x0))
+#define I2C_IFDR3               (*(REG16_PTR_T)(I2C3_BASE_ADDR+0x4))
+#define I2C_I2CR3               (*(REG16_PTR_T)(I2C3_BASE_ADDR+0x8))
+#define I2C_I2SR3               (*(REG16_PTR_T)(I2C3_BASE_ADDR+0xC))
+#define I2C_I2DR3               (*(REG16_PTR_T)(I2C3_BASE_ADDR+0x10))
+
+    /* IADR - [7:1] Address */
+
+    /* IFDR */
+#define I2C_IFDR_DIV30           0x00
+#define I2C_IFDR_DIV32           0x01
+#define I2C_IFDR_DIV36           0x02
+#define I2C_IFDR_DIV42           0x03
+#define I2C_IFDR_DIV48           0x04
+#define I2C_IFDR_DIV52           0x05
+#define I2C_IFDR_DIV60           0x06
+#define I2C_IFDR_DIV72           0x07
+#define I2C_IFDR_DIV80           0x08
+#define I2C_IFDR_DIV88           0x09
+#define I2C_IFDR_DIV104          0x0a
+#define I2C_IFDR_DIV128          0x0b
+#define I2C_IFDR_DIV144          0x0c
+#define I2C_IFDR_DIV160          0x0d
+#define I2C_IFDR_DIV192          0x0e
+#define I2C_IFDR_DIV240          0x0f
+#define I2C_IFDR_DIV288          0x10
+#define I2C_IFDR_DIV320          0x11
+#define I2C_IFDR_DIV384          0x12
+#define I2C_IFDR_DIV480          0x13
+#define I2C_IFDR_DIV576          0x14
+#define I2C_IFDR_DIV640          0x15
+#define I2C_IFDR_DIV768          0x16
+#define I2C_IFDR_DIV960          0x17
+#define I2C_IFDR_DIV1152         0x18
+#define I2C_IFDR_DIV1280         0x19
+#define I2C_IFDR_DIV1536         0x1a
+#define I2C_IFDR_DIV1920         0x1b
+#define I2C_IFDR_DIV2304         0x1c
+#define I2C_IFDR_DIV2560         0x1d
+#define I2C_IFDR_DIV3072         0x1e
+#define I2C_IFDR_DIV3840         0x1f
+#define I2C_IFDR_DIV22           0x20
+#define I2C_IFDR_DIV24           0x21
+#define I2C_IFDR_DIV26           0x22
+#define I2C_IFDR_DIV28           0x23
+#define I2C_IFDR_DIV32_2         0x24
+#define I2C_IFDR_DIV36_2         0x25
+#define I2C_IFDR_DIV40           0x26
+#define I2C_IFDR_DIV44           0x27
+#define I2C_IFDR_DIV48_2         0x28
+#define I2C_IFDR_DIV56           0x29
+#define I2C_IFDR_DIV64           0x2a
+#define I2C_IFDR_DIV72_2         0x2b
+#define I2C_IFDR_DIV80_2         0x2c
+#define I2C_IFDR_DIV96           0x2d
+#define I2C_IFDR_DIV112          0x2e
+#define I2C_IFDR_DIV128_2        0x2f
+#define I2C_IFDR_DIV160_2        0x30
+#define I2C_IFDR_DIV192_2        0x31
+#define I2C_IFDR_DIV224          0x32
+#define I2C_IFDR_DIV256          0x33
+#define I2C_IFDR_DIV320_2        0x34
+#define I2C_IFDR_DIV384_2        0x35
+#define I2C_IFDR_DIV448          0x36
+#define I2C_IFDR_DIV512          0x37
+#define I2C_IFDR_DIV640_2        0x38
+#define I2C_IFDR_DIV768_2        0x39
+#define I2C_IFDR_DIV896          0x3a
+#define I2C_IFDR_DIV1024         0x3b
+#define I2C_IFDR_DIV1280_2       0x3c
+#define I2C_IFDR_DIV1536_2       0x3d
+#define I2C_IFDR_DIV1792         0x3e
+#define I2C_IFDR_DIV2048         0x3f
+
+    /* I2CR */
+#define I2C_I2CR_IEN            (1 << 7)
+#define I2C_I2CR_IIEN           (1 << 6)
+#define I2C_I2CR_MSTA           (1 << 5)
+#define I2C_I2CR_MTX            (1 << 4)
+#define I2C_I2CR_TXAK           (1 << 3)
+#define I2C_I2CR_RSATA          (1 << 2)
+
+    /* I2SR */
+#define I2C_I2SR_ICF            (1 << 7)
+#define I2C_I2SR_IAAS           (1 << 6)
+#define I2C_I2SR_IBB            (1 << 5)
+#define I2C_I2SR_IAL            (1 << 4)
+#define I2C_I2SR_SRW            (1 << 2)
+#define I2C_I2SR_IIF            (1 << 1)
+#define I2C_I2SR_RXAK           (1 << 0)
+
+    /* I2DR - [7:0] Data */
 
 /* RTC */
 #define RTC_HOURMIN             (*(REG32_PTR_T)(RTC_BASE_ADDR+0x00))

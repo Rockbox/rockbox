@@ -49,10 +49,12 @@ void pcm_apply_settings(void)
 
 void pcm_play_dma_init(void)
 {
+    audiohw_init();
 }
 
 void pcm_postinit(void)
 {
+    audiohw_postinit();
 }
 
 #if 0

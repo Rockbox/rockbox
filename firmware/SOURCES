@@ -210,7 +210,9 @@ drivers/mas.c
 drivers/audio/uda1380.c
 #elif defined(HAVE_WM8751)
 drivers/audio/wm8751.c
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8978)
+#elif defined(HAVE_WM8978)
+drivers/audio/wm8978.c
+#elif defined(HAVE_WM8975)
 drivers/audio/wm8975.c
 #elif defined(HAVE_WM8985)
 drivers/audio/wm8985.c

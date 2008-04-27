@@ -66,9 +66,8 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
-/* Define this if you have the WM8975 audio codec */
+/* Define this if you have the WM8978 audio codec */
 #define HAVE_WM8978
-
 
 #define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
                        SAMPR_CAP_11)
@@ -85,8 +84,9 @@
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_IMX31L
 
-/* Define the bitmask of serial interface modules (CSPI) used */
+/* Define the bitmask of modules used */
 #define SPI_MODULE_MASK (USE_CSPI2_MODULE)
+#define I2C_MODULE_MASK (USE_I2C1_MODULE)
 
 /* Define this if target has an additional number of threads specific to it */
 #define TARGET_EXTRA_THREADS 1

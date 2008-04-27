@@ -27,7 +27,9 @@
 #include "uda1380.h"
 #elif defined(HAVE_WM8751)
 #include "wm8751.h"
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8978)
+#elif defined(HAVE_WM8978)
+#include "wm8978.h"
+#elif defined(HAVE_WM8975)
 #include "wm8975.h"
 #elif defined(HAVE_WM8985)
 #include "wm8985.h"
@@ -109,7 +111,14 @@ extern const struct sound_settings_info audiohw_settings[];
 void audiohw_init(void);
 
 /**
- * Do some stuff (codec related) after audiohw_init.
+ * Do initial audio codec setup.
+ */
+void audiohw_preinit(void);
+
+/**
+ * Do some stuff (codec related) after audiohw_init that needs to be
+ * delayed such as enabling outputs to prevent popping. This lets
+ * other inits in the system complete in the meantime.
  */
 void audiohw_postinit(void);
 
