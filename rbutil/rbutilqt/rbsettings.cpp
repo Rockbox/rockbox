@@ -286,7 +286,7 @@ QString RbSettings::ttsOptions(QString tts)
 }
 QString RbSettings::ttsVoice(QString tts)
 {
-    return userSettingsGroupGet(tts,"ttsoptions","Microsoft Sam").toString();
+    return userSettingsGroupGet(tts,"ttsvoice","Microsoft Sam").toString();
 }
 int RbSettings::ttsSpeed(QString tts)
 {
