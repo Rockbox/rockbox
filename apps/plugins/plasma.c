@@ -100,7 +100,6 @@ static int plasma_frequency;
 #elif (CONFIG_KEYPAD == COWOND2_PAD)
 #define PLASMA_QUIT BUTTON_POWER
 
-// the new button definitions should be placed here
 #endif
 
 #ifdef HAVE_TOUCHPAD
@@ -113,10 +112,8 @@ static int plasma_frequency;
 #ifndef PLASMA_DECREASE_FREQUENCY
 #define PLASMA_DECREASE_FREQUENCY BUTTON_MIDLEFT
 #endif
+#endif /* HAVE_TOUCHPAD */
 
-#endif
-
-// if no button definitions specified and no touchpad use default
 #ifndef PLASMA_QUIT
 #define PLASMA_QUIT               BUTTON_OFF
 #endif
@@ -129,7 +126,6 @@ static int plasma_frequency;
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define PLASMA_RC_QUIT            BUTTON_RC_STOP
-#endif
 #endif
 
 #ifdef HAVE_LCD_COLOR
@@ -153,7 +149,8 @@ static int plasma_frequency;
 #ifndef PLASMA_REGEN_COLORS
 #define PLASMA_REGEN_COLORS BUTTON_CENTER
 #endif
-#endif
+#endif /* HAVE_TOUCHPAD */
+#endif /* HAVE_LCD_COLOR */
 
 #define WAV_AMP 90
 
