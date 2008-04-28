@@ -164,7 +164,7 @@ case $1 in
     ;;
   [Aa])
     target="arm-elf"
-    gccpatch="rockbox-multilibs-arm-elf-gcc-4.0.3.diff"
+    gccpatch="rockbox-multilibs-arm-elf-gcc-4.0.3_2.diff"
     ;;
   *)
     echo "unsupported"
