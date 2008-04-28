@@ -131,13 +131,14 @@
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
 
+
+/* Define this if you have a Texas Instruments TSC2100 touch screen */
+#define HAVE_TSC2100
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU DM320
-
-/* Define this if you have a Texas Instruments TSC2100 touch screen */
-#define HAVE_TSC2100
 
 /* Define this if you want to use coldfire's i2c interface */
 //#define CONFIG_I2C I2C_S3C2440
