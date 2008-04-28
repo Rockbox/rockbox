@@ -34,8 +34,7 @@ QUICKREF
 
 #include "config.h"
 #include <_ansi.h>
-#include <stddef.h>
-#include <limits.h>
+#include <string.h>
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
 #define UNALIGNED(X, Y) \
@@ -47,7 +46,7 @@ QUICKREF
 /* How many bytes are copied each iteration of the word copy loop.  */
 #define LITTLEBLOCKSIZE (sizeof (long))
 
-/* Threshhold for punting to the byte copier.  */
+/* Threshold for punting to the byte copier.  */
 #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
 
 _PTR
