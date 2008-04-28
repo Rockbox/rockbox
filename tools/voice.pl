@@ -132,7 +132,10 @@ sub correct_string {
         case "english" {
             switch($$tts_object{"name"}) {
                 case ["sapi","festival"] {
-                    $string =~ s/plugin(s?)/plug-in$1/ig;
+                    $string =~ s/plugin(s?)/plug-in$1/ig; next
+                }
+                case "festival" {
+                    $string =~ s/\ba\b/ay/ig;
                 }
             }
         }
