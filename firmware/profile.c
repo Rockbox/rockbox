@@ -57,7 +57,40 @@
 #include <system.h>
 #include <string.h>
 #include <timer.h>
+#include <sys/types.h>
 #include "profile.h"
+
+
+/* PFD is Profiled Function Data */
+
+/* Indices are shorts which means that we use 4k of RAM */
+#define INDEX_BITS 11    /* What is a reasonable size for this? */
+#define INDEX_SIZE 2048  /* 2 ^ INDEX_BITS */
+#define INDEX_MASK 0x7FF /* lower INDEX_BITS 1 */
+
+/*
+ * In the current setup (pfd has 4 longs and 2 shorts) this uses 20k of RAM
+ * for profiling, and allows for profiling sections of code with up-to
+ * 1024 function caller->callee pairs
+ */
+#define NUMPFDS 1024
+
+struct pfd_struct {
+    void *self_pc;
+    unsigned long count;
+    unsigned long time;
+    unsigned short link;
+    struct pfd_struct *caller;
+};
+
+/* Possible states of profiling */
+#define PROF_ON 0x00
+#define PROF_BUSY 0x01
+#define PROF_ERROR 0x02
+#define PROF_OFF 0x03
+/* Masks for thread switches */
+#define PROF_OFF_THREAD 0x10
+#define PROF_ON_THREAD 0x0F
 
 static unsigned short profiling = PROF_OFF;
 static size_t recursion_level;
