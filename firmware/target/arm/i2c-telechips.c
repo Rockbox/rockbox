@@ -138,7 +138,7 @@ int i2c_getack(void)
 }
 
 /* device = 8 bit slave address */
-int i2c_write(int device, unsigned char* buf, int count )
+int i2c_write(int device, const unsigned char* buf, int count )
 {
     int i = 0;
     mutex_lock(&i2c_mtx);

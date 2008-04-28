@@ -555,7 +555,7 @@ struct plugin_api {
     int (*mas_codec_readreg)(int reg);
     void (*i2c_begin)(void);
     void (*i2c_end)(void);
-    int  (*i2c_write)(int address, unsigned char* buf, int count );
+    int  (*i2c_write)(int address, const unsigned char* buf, int count );
 #endif
 #endif
 
