@@ -79,7 +79,7 @@ static int tone_tenthdb2hw(int value)
     /* -6.0db..+0db..+9.0db step 1.5db - translate -60..+0..+90 step 15
         to 10..6..0 step -1.
     */
-    value = (10 - (value + 60) / 15) / 10;
+    value = 10 - (value + 60) / 15;
 
     if (value == 6)
         value = 0xf; /* 0db -> off */

@@ -35,6 +35,10 @@
 #endif
 #endif
 
+/* TODO
+ * find a nice way to handle 1.5db steps -> see wm8751 ifdef in sound_set_bass/treble
+*/
+
 #if !defined(VOLUME_MIN) && !defined(VOLUME_MAX)
 #warning define for VOLUME_MIN and VOLUME_MAX is missing
 #define VOLUME_MIN -400
@@ -370,7 +374,11 @@ void sound_set_bass(int value)
 #endif
 
 #if (CONFIG_CODEC != MAS3587F) && (CONFIG_CODEC != MAS3539F)
-    current_bass = value * 10;
+#if defined(HAVE_WM8751)
+    current_bass = value;
+#else
+     current_bass =  value * 10;
+#endif
     set_prescaled_volume();
 #endif
 }
@@ -387,7 +395,11 @@ void sound_set_treble(int value)
 #endif
 
 #if (CONFIG_CODEC != MAS3587F) && (CONFIG_CODEC != MAS3539F)
-    current_treble = value * 10;
+#if defined(HAVE_WM8751)
+    current_treble = value;
+#else
+     current_treble =  value * 10;
+#endif
     set_prescaled_volume();
 #endif
 }
