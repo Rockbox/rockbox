@@ -20,7 +20,9 @@
 #ifndef _METADATA_H
 #define _METADATA_H
 
-#include "playback.h"
+#include <stdbool.h>
+#include "config.h"
+#include "id3.h"
 
 unsigned int probe_file_format(const char *filename);
 bool get_metadata(struct mp3entry* id3, int fd, const char* trackname);

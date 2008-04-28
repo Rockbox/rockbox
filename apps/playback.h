@@ -21,20 +21,7 @@
 #define _PLAYBACK_H
 
 #include <stdbool.h>
-
-#include "id3.h"
-#include "mp3data.h"
-
-/* Not yet implemented. */
-#define CODEC_SET_AUDIOBUF_WATERMARK    4
-
-#if MEM > 1
-#define MAX_TRACK       128
-#else
-#define MAX_TRACK       32
-#endif
-
-#define MAX_TRACK_MASK  (MAX_TRACK-1)
+#include "config.h"
 
 /* Functions */
 const char *get_codec_filename(int cod_spec);

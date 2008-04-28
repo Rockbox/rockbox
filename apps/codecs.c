@@ -40,7 +40,6 @@
 #include "buffer.h"
 #include "buffering.h"
 #include "mp3_playback.h"
-#include "playback.h"
 #include "backlight.h"
 #include "ata.h"
 #include "talk.h"

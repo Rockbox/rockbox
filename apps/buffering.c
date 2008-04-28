@@ -45,7 +45,6 @@
 #include "status.h"
 #include "screens.h"
 #include "playlist.h"
-#include "playback.h"
 #include "pcmbuf.h"
 #include "buffer.h"
 #include "bmp.h"

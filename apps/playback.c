@@ -151,6 +151,14 @@ enum filling_state {
     STATE_FINISHED, /* all remaining tracks have been added */
 };
 
+#if MEM > 1
+#define MAX_TRACK       128
+#else
+#define MAX_TRACK       32
+#endif
+
+#define MAX_TRACK_MASK  (MAX_TRACK-1)
+
 /* As defined in plugins/lib/xxx2wav.h */
 #if MEM > 1
 #define MALLOC_BUFSIZE (512*1024)
