@@ -24,6 +24,8 @@
 
 #include "config.h"
 
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+
 #if CONFIG_CODEC == MAS3507D
 #define VOLUME_MIN -780
 #define VOLUME_MAX  180

@@ -23,6 +23,10 @@
 #include "config.h"
 #include <stdbool.h>
 
+/* define some audiohw caps */
+#define TREBLE_CAP      (1 << 0)
+#define BASS_CAP        (1 << 1)
+
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
 #elif defined(HAVE_WM8751)
@@ -48,6 +52,17 @@
 #elif defined(HAVE_TSC2100)
 #include "tsc2100.h"
 #endif
+
+/* convert caps into defines */
+#ifdef AUDIOHW_CAPS
+#if (AUDIOHW_CAPS & TREBLE_CAP)
+#define AUDIOHW_HAVE_TREBLE
+#endif
+
+#if (AUDIOHW_CAPS & BASS_CAP)
+#define AUDIOHW_HAVE_BASS
+#endif
+#endif /* AUDIOHW_CAPS */
 
 enum {
     SOUND_VOLUME = 0,
@@ -140,6 +155,26 @@ void audiohw_mute(bool mute);
  * @param enable true or false.
  */
 void audiohw_enable_output(bool enable);
+
+#ifdef AUDIOHW_HAVE_TREBLE
+/**
+ * Set new treble value.
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          TREBLE_CAP
+ */
+void audiohw_set_treble(int val);
+#endif
+
+#ifdef AUDIOHW_HAVE_BASS
+/**
+ * Set new bass value.
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          BASS_CAP
+ */
+void audiohw_set_bass(int val);
+#endif
 
 #ifdef HAVE_RECORDING
 

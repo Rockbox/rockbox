@@ -150,3 +150,23 @@ void audiohw_set_stereo_width(int val)
         set_channel_config();
     }
 }
+
+void audiohw_set_bass(int val)
+{
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    unsigned tmp = ((unsigned)(val * 8) & 0xff) << 8;
+    mas_codec_writereg(0x14, tmp);
+#elif CONFIG_CODEC == MAS3507D
+    mas_writereg(MAS_REG_KBASS, bass_table[val+15]);
+#endif
+}
+
+void audiohw_set_treble(int val)
+{
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    unsigned tmp = ((unsigned)(val * 8) & 0xff) << 8;
+    mas_codec_writereg(0x15, tmp);
+#elif CONFIG_CODEC == MAS3507D
+    mas_writereg(MAS_REG_KTREBLE, treble_table[val+15]);
+#endif
+}

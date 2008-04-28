@@ -222,10 +222,20 @@ static int tenthdb2reg(int db)
 }
 #endif
 
-#if (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
-    || defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_WM8731) \
-    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
-    || defined(HAVE_AS3514) || defined(HAVE_WM8985) || defined(HAVE_TSC2100)
+
+/* MAS3587F and MAS3539F handle clipping prevention internally so we do not need
+ * the prescaler.
+ */
+#if (CONFIG_CODEC != MAS3587F) && (CONFIG_CODEC != MAS3539F)
+
+/*
+ * The prescaler compensates for any kind of boosts, to prevent clipping.
+ *
+ * It's basically just a measure to make sure that audio does not clip during
+ * tone controls processing, like if i want to boost bass 12 dB, i can decrease
+ * the audio amplitude by -12 dB before processing, then increase master gain
+ * by 12 dB after processing.
+ */
 
 /* all values in tenth of dB    MAS3507D    UDA1380  */
 int current_volume = 0;    /* -780..+180  -840..   0 */
@@ -352,60 +362,34 @@ void sound_set_bass(int value)
 {
     if(!audio_is_initialized)
         return;
-#if defined(HAVE_SW_TONE_CONTROLS)
-    current_bass = value * 10;
+
+#if defined(AUDIOHW_HAVE_BASS)
+    audiohw_set_bass(value);
+#else
     dsp_callback(DSP_CALLBACK_SET_BASS, current_bass);
-    set_prescaled_volume();
-#elif (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    unsigned tmp = ((unsigned)(value * 8) & 0xff) << 8;
-    mas_codec_writereg(0x14, tmp);
-#elif CONFIG_CODEC == MAS3507D
-    mas_writereg(MAS_REG_KBASS, bass_table[value+15]);
+#endif
+
+#if (CONFIG_CODEC != MAS3587F) && (CONFIG_CODEC != MAS3539F)
     current_bass = value * 10;
     set_prescaled_volume();
-#elif defined(HAVE_WM8751)
-    current_bass = value;
-    audiohw_set_bass(value);
-    set_prescaled_volume();
-#elif defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_UDA1380) \
-    || defined HAVE_WM8731 || defined(HAVE_WM8721) || defined(HAVE_WM8985)
-    current_bass = value * 10;
-    audiohw_set_bass(value);
-    set_prescaled_volume();
-#elif CONFIG_CPU == PNX0101
-    /* TODO: implement for iFP */
-#endif               
-    (void)value;
+#endif
 }
 
 void sound_set_treble(int value)
 {
     if(!audio_is_initialized)
         return;
-#if defined(HAVE_SW_TONE_CONTROLS)
-    current_treble = value * 10;
+
+#if defined(AUDIOHW_HAVE_TREBLE)
+    audiohw_set_treble(value);
+#else
     dsp_callback(DSP_CALLBACK_SET_TREBLE, current_treble);
-    set_prescaled_volume();
-#elif (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    unsigned tmp = ((unsigned)(value * 8) & 0xff) << 8;
-    mas_codec_writereg(0x15, tmp);
-#elif CONFIG_CODEC == MAS3507D
-    mas_writereg(MAS_REG_KTREBLE, treble_table[value+15]);
-    current_treble = value * 10;
-    set_prescaled_volume();
-#elif defined(HAVE_WM8751)
-    audiohw_set_treble(value);
-    current_treble = value;
-    set_prescaled_volume();
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_UDA1380) \
-   || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8985)
-    audiohw_set_treble(value);
-    current_treble = value * 10;
-    set_prescaled_volume();
-#elif CONFIG_CPU == PNX0101 
-    /* TODO: implement for iFP */
 #endif
-    (void)value;
+
+#if (CONFIG_CODEC != MAS3587F) && (CONFIG_CODEC != MAS3539F)
+    current_treble = value * 10;
+    set_prescaled_volume();
+#endif
 }
 
 void sound_set_channels(int value)

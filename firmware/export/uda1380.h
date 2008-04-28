@@ -24,13 +24,13 @@
 #define VOLUME_MIN -840
 #define VOLUME_MAX  0
 
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+
 extern int tenthdb2master(int db);
 extern int tenthdb2mixer(int db);
 
 extern void audiohw_set_master_vol(int vol_l, int vol_r);
 extern void audiohw_set_mixer_vol(int channel1, int channel2);
-extern void audiohw_set_bass(int value);
-extern void audiohw_set_treble(int value);
 
 /**
  * Sets frequency settings for DAC and ADC relative to MCLK
