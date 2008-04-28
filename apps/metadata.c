@@ -27,6 +27,7 @@
 #include "debug.h"
 #include "logf.h"
 #include "cuesheet.h"
+#include "metadata.h"
 
 #if CONFIG_CODEC == SWCODEC
 

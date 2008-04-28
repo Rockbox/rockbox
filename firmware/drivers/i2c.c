@@ -22,6 +22,7 @@
 #include "thread.h"
 #include "debug.h"
 #include "system.h"
+#include "i2c.h"
 
 /* cute little functions, atomic read-modify-write */
 

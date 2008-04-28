@@ -30,6 +30,7 @@
 #include "menu.h"
 #include "logf.h"
 #include "settings.h"
+#include "logfdisp.h"
 
 #ifdef HAVE_LCD_BITMAP
 bool logfdisplay(void)

@@ -26,6 +26,7 @@
 
 #include "system.h"
 #include "cpu.h"
+#include "i2s.h"
 
 /* TODO: Add in PP5002 defs */
 #if CONFIG_CPU == PP5002

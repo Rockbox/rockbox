@@ -22,6 +22,7 @@
 #include "logf.h"
 #include "audio.h"
 #include "sound.h"
+#include "pcm.h"
 
 #ifdef HAVE_WM8751
 #define MROBE100_44100HZ     (0x40|(0x11 << 1)|1)

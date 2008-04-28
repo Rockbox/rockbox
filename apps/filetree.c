@@ -41,6 +41,7 @@
 #include "splash.h"
 #include "yesno.h"
 #include "cuesheet.h"
+#include "filetree.h"
 #ifdef HAVE_LCD_BITMAP
 #include "keyboard.h"
 #endif

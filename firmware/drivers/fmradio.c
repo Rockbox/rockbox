@@ -22,6 +22,7 @@
 #include "thread.h"
 #include "debug.h"
 #include "system.h"
+#include "fmradio.h"
 
 #if CONFIG_TUNER
 
