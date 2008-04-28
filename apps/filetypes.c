@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "string.h"
-#include "atoi.h"
 #include <ctype.h>
 
 #include "sprintf.h"

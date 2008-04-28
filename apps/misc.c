@@ -44,7 +44,6 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "backlight.h"
-#include "atoi.h"
 #include "version.h"
 #include "font.h"
 #include "splash.h"

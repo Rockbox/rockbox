@@ -29,7 +29,6 @@
 #include "logf.h"
 #include "debug.h"
 #include "replaygain.h"
-#include "atoi.h"
 
 #define MP4_ID(a, b, c, d)  (((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 

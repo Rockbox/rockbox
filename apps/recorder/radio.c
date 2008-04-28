@@ -33,7 +33,6 @@
 #include "ctype.h"
 #include "file.h"
 #include "errno.h"
-#include "atoi.h"
 #include "string.h"
 #include "system.h"
 #include "radio.h"

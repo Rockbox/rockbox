@@ -60,7 +60,6 @@
 #include "dir.h"
 #include "errno.h"
 #include "talk.h"
-#include "atoi.h"
 #include "sound.h"
 #include "ata.h"
 #include "splash.h"

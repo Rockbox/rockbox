@@ -25,7 +25,6 @@
 #include "system.h"
 #include "id3.h"
 #include "metadata_common.h"
-#include "atoi.h"
 #include "rbunicode.h"
 
 /* PSID metadata info is available here: 

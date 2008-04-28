@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "gwps.h"
 #include "file.h"
 #include "misc.h"
@@ -33,12 +34,9 @@
 #ifndef __PCTOOL__
 #include <ctype.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include "font.h"
 
-#include "atoi.h"
 #include "gwps.h"
 #include "settings.h"
 #include "plugin.h"

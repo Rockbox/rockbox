@@ -35,7 +35,6 @@
 #include "system.h"
 #include "errno.h"
 #include "icons.h"
-#include "atoi.h"
 #include "string.h"
 #include "menu.h"
 #include "lang.h"

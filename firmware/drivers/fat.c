@@ -30,7 +30,6 @@
 #include "kernel.h"
 #include "rbunicode.h"
 #include "logf.h"
-#include "atoi.h"
 
 #define BYTES2INT16(array,pos) \
           (array[pos] | (array[pos+1] << 8 ))

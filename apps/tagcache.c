@@ -74,7 +74,6 @@
 #include "dir.h"
 #include "structec.h"
 #ifndef __PCTOOL__
-#include "atoi.h"
 #include "splash.h"
 #include "lang.h"
 #include "eeprom_settings.h"

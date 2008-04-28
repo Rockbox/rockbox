@@ -26,7 +26,6 @@
 #include "id3.h"
 #include "metadata_common.h"
 #include "replaygain.h"
-#include "atoi.h"
 
 /* Skip an ID3v2 tag if it can be found. We assume the tag is located at the
  * start of the file, which should be true in all cases where we need to skip it.

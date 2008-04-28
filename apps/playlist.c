@@ -83,7 +83,6 @@
 #include "applimits.h"
 #include "screens.h"
 #include "buffer.h"
-#include "atoi.h"
 #include "misc.h"
 #include "button.h"
 #include "filetree.h"

@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
-#include <atoi.h>
+#include <stdlib.h>
 #include <timefuncs.h>
 #include <ctype.h>
 #include "debug.h"

@@ -21,7 +21,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <atoi.h>
 #include <inttypes.h>
 
 #include "id3.h"

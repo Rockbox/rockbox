@@ -40,7 +40,6 @@
 #include "keyboard.h"
 #include "gui/list.h"
 #include "buffer.h"
-#include "atoi.h"
 #include "playback.h"
 #include "yesno.h"
 #include "misc.h"

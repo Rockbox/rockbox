@@ -47,7 +47,6 @@
 #include "peakmeter.h"
 /* Image stuff */
 #include "bmp.h"
-#include "atoi.h"
 #include "albumart.h"
 #endif
 #include "dsp.h"

@@ -36,7 +36,6 @@
 #include "rtc.h"
 #include "power.h"
 #include "ata_idle_notify.h"
-#include "atoi.h"
 #include "screens.h"
 #include "ctype.h"
 #include "file.h"

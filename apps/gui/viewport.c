@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include <stdlib.h>
 #include "config.h"
 #include "lcd.h"
 #include "lcd-remote.h"
@@ -27,7 +28,6 @@
 #include "kernel.h"
 #include "system.h"
 #include "misc.h"
-#include "atoi.h"
 #include "viewport.h"
 #include "statusbar.h"
 #include "screen_access.h"

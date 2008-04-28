@@ -20,7 +20,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <sprintf.h>
-#include <atoi.h>
+#include <stdlib.h>
 #include "debug.h"
 #include "i2c.h"
 #include "lang.h"

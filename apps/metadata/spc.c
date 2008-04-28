@@ -26,7 +26,6 @@
 #include "id3.h"
 #include "metadata_common.h"
 #include "debug.h"
-#include "atoi.h"
 #include "rbunicode.h"
 
 bool get_spc_metadata(int fd, struct mp3entry* id3)

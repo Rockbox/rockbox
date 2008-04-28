@@ -27,8 +27,8 @@
 #include <errno.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "debug.h"
-#include "atoi.h"
 #include "system.h"
 #include "logf.h"
 #include "dircache.h"

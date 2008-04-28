@@ -36,7 +36,6 @@
 #include "config.h"
 #include "file.h"
 #include "logf.h"
-#include "atoi.h"
 
 #include "id3.h"
 #include "mp3data.h"

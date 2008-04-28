@@ -20,10 +20,10 @@
 #include <errno.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "fat.h"
 #include "dir.h"
 #include "debug.h"
-#include "atoi.h"
 
 #define MAX_OPEN_DIRS 8
 

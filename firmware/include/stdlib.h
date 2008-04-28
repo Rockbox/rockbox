@@ -41,6 +41,8 @@ int rand(void);
 #ifdef SIMULATOR
 void exit(int status);
 #endif
+
+int atoi (const char *str);
     
 #ifdef __cplusplus
 }
