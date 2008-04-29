@@ -340,11 +340,6 @@ vectors:
 
     .text
 
-#ifndef STUB
-    .global irq
-    .global UIE
-#endif
-
 /* All illegal exceptions call into UIE with exception address as first
    parameter. This is calculated differently depending on which exception
    we're in. Second parameter is exception number, used for a string lookup

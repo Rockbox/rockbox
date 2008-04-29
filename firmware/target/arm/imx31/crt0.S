@@ -317,7 +317,6 @@ remap_end:
 #endif /* BOOTLOADER */
 
     .text
-    .global UIE
 
 /* All illegal exceptions call into UIE with exception address as first
  * parameter. This is calculated differently depending on which exception
