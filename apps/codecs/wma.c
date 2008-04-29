@@ -481,7 +481,7 @@ next_track:
     /* Remember the resume position - when the codec is opened, the
        playback engine will reset it. */
     resume_offset = ci->id3->offset;
-
+restart_track:
     if (codec_init()) {
         LOGF("WMA: Error initialising codec\n");
         retval = CODEC_ERROR;
@@ -516,6 +516,7 @@ next_track:
         elapsedtime = 0;
     }
 
+    resume_offset = 0;
     ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
     ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
                   STEREO_MONO : STEREO_INTERLEAVED);
@@ -536,7 +537,7 @@ next_track:
 
             if (ci->seek_time == 1) {
                 ci->seek_complete();
-                goto next_track; /* Pretend you never saw this... */
+                goto restart_track; /* Pretend you never saw this... */
             }
 
             elapsedtime = seek(ci->seek_time, &wfx);
