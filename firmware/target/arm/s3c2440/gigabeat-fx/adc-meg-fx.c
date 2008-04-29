@@ -21,15 +21,11 @@
 #include "adc-target.h"
 #include "kernel.h"
 
-
-
 static unsigned short adc_readings[NUM_ADC_CHANNELS];
 
 /* prototypes */
 static unsigned short __adc_read(int channel);
 static void adc_tick(void);
-
-
 
 void adc_init(void) 
 {
@@ -59,19 +55,13 @@ void adc_init(void)
 
     /* attach the adc reading to the tick */
     tick_add_task(adc_tick);
-
-    
 }
-
-
 
 /* Called to get the recent ADC reading */
 inline unsigned short adc_read(int channel)
 {
     return adc_readings[channel];
 }
-
-
 
 /** 
   * Read the ADC by polling
@@ -80,46 +70,51 @@ inline unsigned short adc_read(int channel)
   */
 static unsigned short __adc_read(int channel) 
 {
-  int i;
+    int i;
 
-  /* Set the channel */
-  ADCCON = (ADCCON & ~(0x7<<3)) | (channel<<3);
+    /* Set the channel */
+    ADCCON = (ADCCON & ~(0x7<<3)) | (channel<<3);
 
-  /* Start the conversion process */
-  ADCCON |= 0x1;
+    /* Start the conversion process */
+    ADCCON |= 0x1;
 
-  /* Wait for a low Enable_start */
-  for (i = 20000;;) {
-    if(0 == (ADCCON & 0x1)) {
-      break;
+    /* Wait for a low Enable_start */
+    for (i = 20000;;) 
+    {
+        if(0 == (ADCCON & 0x1)) 
+        {
+            break;
+        }
+        else 
+        {
+            i--;
+            if (0 == i) 
+            {
+                /* Ran out of time */
+                return ADC_READ_ERROR;
+            }
+        }
     }
-    else {
-      i--;
-      if (0 == i) {
-        /* Ran out of time */
-        return ADC_READ_ERROR;
-      }
-    }
-  }
 
-  /* Wait for high End_of_Conversion */
-  for(i = 20000;;) {
-    if(ADCCON & (1<<15)) {
-      break;
+    /* Wait for high End_of_Conversion */
+    for(i = 20000;;) 
+    {
+        if(ADCCON & (1<<15)) 
+        {
+            break;
+        }
+        else 
+        {
+            i--;
+            if(0 == i) 
+            {
+                /* Ran out of time */
+                return ADC_READ_ERROR;
+            }
+        }
     }
-    else {
-      i--;
-      if(0 == i) {
-        /* Ran out of time */
-        return ADC_READ_ERROR;
-      }
-    }
-  }
-
-  return (ADCDAT0 & 0x3ff);
+    return (ADCDAT0 & 0x3ff);
 }
-
-
 
 /* add this to the tick so that the ADC converts are done in the background */
 static void adc_tick(void)
@@ -140,6 +135,3 @@ static void adc_tick(void)
     }
 }
 
-
-
-  
