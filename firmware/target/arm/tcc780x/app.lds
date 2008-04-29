@@ -4,7 +4,7 @@ ENTRY(start)
 
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
-INPUT(target/arm/tcc780x/crt0.o)
+STARTUP(target/arm/tcc780x/crt0.o)
 
 #define PLUGINSIZE PLUGIN_BUFFER_SIZE
 #define CODECSIZE CODEC_SIZE

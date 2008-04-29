@@ -58,13 +58,6 @@ char *tarbuf = (char *)0x00000040;
 extern void reference_system_c(void);
 static struct event_queue usb_wait_queue;
 
-/* Dummy stub that creates C references for C functions only used by
-   assembly - never called */
-void reference_files(void)
-{
-    reference_system_c();
-}
-
 void show_splash(int timeout, const char *msg)
 {
     lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,

@@ -4,19 +4,19 @@ ENTRY(start)
 
 #ifdef CPU_COLDFIRE
 OUTPUT_FORMAT(elf32-m68k)
-INPUT(target/coldfire/crt0.o)
+STARTUP(target/coldfire/crt0.o)
 #elif defined(CPU_PP)
 OUTPUT_FORMAT(elf32-littlearm)
-INPUT(target/arm/crt0-pp.o)
+STARTUP(target/arm/crt0-pp.o)
 #elif defined(CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
-INPUT(target/arm/crt0.o)
+STARTUP(target/arm/crt0.o)
 #elif CONFIG_CPU == SH7034
 OUTPUT_FORMAT(elf32-sh)
-INPUT(target/sh/crt0.o)
+STARTUP(target/sh/crt0.o)
 #else
 OUTPUT_FORMAT(elf32-sh)
-INPUT(crt0.o)
+STARTUP(crt0.o)
 #endif
 
 

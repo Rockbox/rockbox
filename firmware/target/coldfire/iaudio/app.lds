@@ -3,7 +3,7 @@
 ENTRY(start)
 
 OUTPUT_FORMAT(elf32-m68k)
-INPUT(target/coldfire/crt0.o)
+STARTUP(target/coldfire/crt0.o)
 
 #define PLUGINSIZE PLUGIN_BUFFER_SIZE
 #define CODECSIZE CODEC_SIZE

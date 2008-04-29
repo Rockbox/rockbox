@@ -3,7 +3,7 @@
 ENTRY(start)
 
 OUTPUT_FORMAT(elf32-sh)
-INPUT(target/sh/crt0.o)
+STARTUP(target/sh/crt0.o)
 
 #define PLUGINSIZE PLUGIN_BUFFER_SIZE
 #define CODECSIZE CODEC_SIZE

@@ -2,7 +2,7 @@
 
 ENTRY(start)
 OUTPUT_FORMAT(elf32-sh)
-INPUT(target/sh/crt0.o)
+STARTUP(target/sh/crt0.o)
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
 

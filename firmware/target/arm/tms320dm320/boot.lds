@@ -3,7 +3,7 @@
 ENTRY(start)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
-INPUT(target/arm/tms320dm320/crt0.o)
+STARTUP(target/arm/tms320dm320/crt0.o)
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
 

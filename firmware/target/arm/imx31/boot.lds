@@ -4,7 +4,7 @@
 ENTRY(start)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
-INPUT(target/arm/imx31/crt0.o)
+STARTUP(target/arm/imx31/crt0.o)
 
 #define DRAMSIZE (1 << 20) /* Limit 1 MB for bootloader */
 
