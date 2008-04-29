@@ -54,7 +54,7 @@
 #define CONFIG_LCD LCD_CREATIVEZVM
 
 /* choose the lcd orientation. both work */
-#define CONFIG_ORIENTATION SCREEN_PORTAIT
+#define CONFIG_ORIENTATION SCREEN_PORTRAIT
 
 #define LCD_WIDTH  320
 #define LCD_HEIGHT 240

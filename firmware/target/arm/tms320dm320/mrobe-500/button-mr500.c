@@ -72,7 +72,7 @@ static int touch_to_pixels(short val_x, short val_y)
 {
     short x,y;
 
-#if CONFIG_ORIENTATION == SCREEN_PORTAIT
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     x=val_x;
     y=val_y;
 #else
@@ -103,7 +103,7 @@ void button_init_device(void)
     /* GIO is the power button, set as input */
     IO_GIO_DIR0 |= 0x01;
 
-#if CONFIG_ORIENTATION == SCREEN_PORTAIT
+#if CONFIG_ORIENTATION == SCREEN_PORTRAIT
     topleft.val_x = 200;        
     topleft.val_y = 3900;
     
