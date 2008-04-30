@@ -40,6 +40,10 @@ extern void ata_enable(bool on);
 extern void ata_spindown(int seconds);
 extern void ata_sleep(void);
 extern void ata_sleepnow(void);
+/* NOTE: DO NOT use this to poll for disk activity.
+         If you are waiting for the disk to become active before
+         doing something use ata_idle_notify.h
+ */
 extern bool ata_disk_is_active(void);
 extern int ata_hard_reset(void);
 extern int ata_soft_reset(void);

@@ -70,6 +70,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "playlist.h"
+#include "ata_idle_notify.h"
 #include "file.h"
 #include "action.h"
 #include "dir.h"
@@ -1255,6 +1256,23 @@ static int compare(const void* p1, const void* p2)
  * without affecting playlist load up performance.  This thread also flushes
  * any pending control commands when the disk spins up.
  */
+static bool playlist_flush_callback(void)
+{
+    struct playlist_info *playlist;
+    playlist = &current_playlist;
+    if (playlist->control_fd >= 0)
+    {
+        if (playlist->num_cached > 0)
+        {
+            mutex_lock(&playlist->control_mutex);
+            flush_cached_control(playlist);
+            mutex_unlock(&playlist->control_mutex);
+        }
+        sync_control(playlist, true);
+    }
+    return true;
+}
+         
 static void playlist_thread(void)
 {
     struct queue_event ev;
@@ -1288,21 +1306,10 @@ static void playlist_thread(void)
                timeout or 5s, whichever is less */
             case SYS_TIMEOUT:
                 playlist = &current_playlist;
-
-                if (playlist->control_fd >= 0
-# ifndef SIMULATOR
-                    && ata_disk_is_active()
-# endif
-                    )
+                if (playlist->control_fd >= 0)
                 {
                     if (playlist->num_cached > 0)
-                    {
-                        mutex_lock(&playlist->control_mutex);
-                        flush_cached_control(playlist);
-                        mutex_unlock(&playlist->control_mutex);
-                    }
-                    
-                    sync_control(playlist, true);
+                        register_ata_idle_func(playlist_flush_callback);
                 }
 
                 if (!dirty_pointers)
