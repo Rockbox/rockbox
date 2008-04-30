@@ -51,10 +51,6 @@
 #include "events.h"
 #include "metadata.h"
 
-#ifdef SIMULATOR
-#define ata_disk_is_active() 1
-#endif
-
 #if MEM > 1
 #define GUARD_BUFSIZE   (32*1024)
 #else
