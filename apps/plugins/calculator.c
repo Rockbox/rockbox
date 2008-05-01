@@ -78,10 +78,10 @@ F3: equal to "="
 
 PLUGIN_HEADER
 
-#define REC_HEIGHT 10   /* blank height = 9 */
-#define REC_WIDTH 22    /* blank width = 21 */
+#define REC_HEIGHT (int)(LCD_HEIGHT / 6)
+#define REC_WIDTH (int)(LCD_WIDTH / 5)
 
-#define Y_6_POS (LCD_HEIGHT - 1)       /* y6 = 63 */
+#define Y_6_POS (LCD_HEIGHT)       /* Leave room for the border */
 #define Y_5_POS (Y_6_POS - REC_HEIGHT) /* y5 = 53 */
 #define Y_4_POS (Y_5_POS - REC_HEIGHT) /* y4 = 43 */
 #define Y_3_POS (Y_4_POS - REC_HEIGHT) /* y3 = 33 */
@@ -288,6 +288,7 @@ enum {
     basicButtons,
     sciButtons
 } buttonGroup;
+
 unsigned char* buttonChar[2][5][5] = {
     { { "MR" , "M+" , "2nd" , "CE"   , "C"   },
       { "7"  , "8"  , "9"   , "/"    , "sqr" },
@@ -301,12 +302,14 @@ unsigned char* buttonChar[2][5][5] = {
       { "1"  , "2"  , "3"   , "ln"   , "e^x" },
       { "0"  , "+/-", "."   , "log"  , "x^y" }  }
 };
+
 enum { btn_MR , btn_M    , btn_bas , btn_CE    , btn_C      ,
        btn_7  , btn_8    , btn_9   , btn_div   , btn_sqr    ,
        btn_4  , btn_5    , btn_6   , btn_time  , btn_square ,
        btn_1  , btn_2    , btn_3   , btn_minus , btn_rec    ,
        btn_0  , btn_sign , btn_dot , btn_add   , btn_equal
      };
+
 enum { sci_fac, sci_pi   , sci_sci , sci_sin   , sci_asin   ,
        sci_7  , sci_8    , sci_9   , sci_cos   , sci_acos    ,
        sci_4  , sci_5    , sci_6   , sci_tan   , sci_atan    ,
@@ -439,6 +442,9 @@ void printResult(void);
 void formatResult(void);
 void oneOperand(void);
 
+void drawLines(void);
+void drawButtons(int group);
+
 /* -----------------------------------------------------------------------
 Handy funtions
 ----------------------------------------------------------------------- */
@@ -469,6 +475,9 @@ void clearInput(void)
     calStatus = cal_normal;
     clearResult();
     cleartypingbuf();
+    rb->lcd_clear_display();
+    drawButtons(buttonGroup);
+    drawLines();
 }
 
 void clearOperand(void)
@@ -508,22 +517,53 @@ void switchOperands(void)
     power = tempp;
 }
 
+void drawLines(void)
+{
+    int i;
+    rb->lcd_hline(0, LCD_WIDTH, Y_1_POS-1);
+    for (i = 0; i < 5 ; i++)
+        rb->lcd_hline(0, LCD_WIDTH, Y_1_POS+i*REC_HEIGHT);
+    for (i = 0; i < 4 ; i++)
+        rb->lcd_vline(X_1_POS+i*REC_WIDTH, Y_1_POS, LCD_HEIGHT);
+}
+
+void drawButtons(int group)
+{
+    int i, j, w, h;
+    for (i = 0; i <= 4; i++){
+        for (j = 0; j <= 4; j++){
+            rb->lcd_getstringsize( buttonChar[group][i][j],&w,&h);
+            if (i == m && j == n) /* selected item */
+                rb->lcd_set_drawmode(DRMODE_SOLID);
+            else
+                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect( X_0_POS + j*REC_WIDTH,
+                              Y_1_POS + i*REC_HEIGHT,
+                              REC_WIDTH, REC_HEIGHT+1);
+            if (i == m && j == n) /* selected item */
+                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            else
+                rb->lcd_set_drawmode(DRMODE_SOLID);
+            rb->lcd_putsxy( X_0_POS + j*REC_WIDTH + (REC_WIDTH - w)/2,
+                            Y_1_POS + i*REC_HEIGHT + (REC_HEIGHT - h)/2 + 1,
+                            buttonChar[group][i][j] );
+        }
+    }
+    rb->lcd_set_drawmode(DRMODE_SOLID);
+}
+
 /* -----------------------------------------------------------------------
 Initiate calculator
 ----------------------------------------------------------------------- */
 void cal_initial (void)
 {
-    int i,j,w,h;
-    rb->lcd_setfont(FONT_SYSFIXED);
-    rb->lcd_clear_display();
+    int w,h;
 
-    /* draw lines */
-    rb->lcd_drawrect(X_0_POS, Y_0_POS, LCD_WIDTH-1, LCD_HEIGHT);
-    rb->lcd_hline(X_0_POS, X_5_POS, Y_1_POS-1);
-    for (i = 0; i < 5 ; i++)
-        rb->lcd_hline(X_0_POS, X_5_POS, Y_1_POS+i*REC_HEIGHT);
-    for (i = 0; i < 4 ; i++)
-        rb->lcd_vline(X_1_POS+i*REC_WIDTH, Y_1_POS, Y_6_POS);
+    rb->lcd_getstringsize("A",&w,&h);
+    if (h >= REC_HEIGHT)
+        rb->lcd_setfont(FONT_SYSFIXED);
+
+    rb->lcd_clear_display();
 
 #ifdef CALCULATOR_OPERATORS
     /* basic operators are available through separate button */
@@ -531,26 +571,14 @@ void cal_initial (void)
 #else
     buttonGroup = basicButtons;
 #endif
-    /* draw buttons */
-    for (i = 0; i < 5; i++){
-        for (j = 0; j < 5; j++){
-            rb->lcd_getstringsize( buttonChar[buttonGroup][i][j],&w,&h);
-            rb->lcd_putsxy( X_0_POS + j*REC_WIDTH + (REC_WIDTH - w)/2,
-                            TEXT_2_POS + i*REC_HEIGHT,
-                            buttonChar[buttonGroup][i][j] );
-        }
-    }
 
     /* initially, invert button "5" */
     m = 2;
     n = 1;
     prev_m = m;
     prev_n = n;
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect( X_0_POS + n*REC_WIDTH + 1,
-                      Y_1_POS + m*REC_HEIGHT + 1,
-                      REC_WIDTH - 1, REC_HEIGHT - 1);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    drawButtons(buttonGroup);
+    drawLines();
     rb->lcd_update();
 
     /* initial mem and output display*/
@@ -858,89 +886,49 @@ void moveButton(void){
             break;
     }
 
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect( X_0_POS + prev_n*REC_WIDTH + 1,
-                      Y_1_POS + prev_m*REC_HEIGHT + 1,
-                      REC_WIDTH - 1, REC_HEIGHT - 1);
+    drawButtons(buttonGroup);
+    drawLines();
 
-    rb->lcd_fillrect( X_0_POS + n*REC_WIDTH + 1,
-                      Y_1_POS + m*REC_HEIGHT + 1,
-                      REC_WIDTH - 1, REC_HEIGHT - 1);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-
-    rb->lcd_update_rect( X_0_POS + prev_n*REC_WIDTH + 1,
-                        Y_1_POS + prev_m*REC_HEIGHT + 1,
-                        REC_WIDTH - 1, REC_HEIGHT - 1);
-
-    rb->lcd_update_rect( X_0_POS + n*REC_WIDTH + 1,
-                        Y_1_POS + m*REC_HEIGHT + 1,
-                        REC_WIDTH - 1, REC_HEIGHT - 1);
+    rb->lcd_update();
 
     prev_m = m;
     prev_n = n;
 }
+
 /* -----------------------------------------------------------------------
 Print buttons when switching 1st and 2nd
 int group = {basicButtons, sciButtons}
 ----------------------------------------------------------------------- */
 void printButtonGroups(int group)
 {
-    int i,j,w,h;
-    for (i = 0; i < 5; i++){
-        for (j = 3; j <= 4; j++){
-            rb->lcd_getstringsize( buttonChar[group][i][j],&w,&h);
-            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            rb->lcd_fillrect( X_0_POS + j*REC_WIDTH + 1,
-                              Y_1_POS + i*REC_HEIGHT + 1,
-                              REC_WIDTH - 1, REC_HEIGHT - 1);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
-            rb->lcd_putsxy( X_0_POS + j*REC_WIDTH + (REC_WIDTH - w)/2,
-                            TEXT_2_POS + i*REC_HEIGHT,
-                            buttonChar[group][i][j] );
-        }
-    }
-    for (i = 0; i <= 0; i++){
-        for (j = 0; j <= 2; j++){
-            rb->lcd_getstringsize( buttonChar[group][i][j],&w,&h);
-            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            rb->lcd_fillrect( X_0_POS + j*REC_WIDTH + 1,
-                              Y_1_POS + i*REC_HEIGHT + 1,
-                              REC_WIDTH - 1, REC_HEIGHT - 1);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
-            rb->lcd_putsxy( X_0_POS + j*REC_WIDTH + (REC_WIDTH - w)/2,
-                            TEXT_2_POS + i*REC_HEIGHT,
-                            buttonChar[group][i][j] );
-        }
-    }
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect( X_0_POS + 2*REC_WIDTH + 1,
-                      Y_1_POS + 0*REC_HEIGHT + 1,
-                      REC_WIDTH - 1, REC_HEIGHT - 1);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_update_rect( X_0_POS, Y_1_POS,
-                         REC_WIDTH*5, REC_HEIGHT*5);
+    drawButtons(group);
+    drawLines();
+    rb->lcd_update();
 }
 /* -----------------------------------------------------------------------
-flash the button pressed
+flash the currently marked button
 ----------------------------------------------------------------------- */
-void flashButton(int b)
+void flashButton(void)
 {
-    int i = b/5; int j = b - i*5;
-    int k;
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    for (k=1*2;k>0;k--){
-        rb->lcd_fillrect( X_0_POS + j*REC_WIDTH + 1,
-                          Y_1_POS + i*REC_HEIGHT + 1,
+    int k, w, h;
+    for (k=2;k>0;k--)
+    {
+        rb->lcd_getstringsize( buttonChar[buttonGroup][m][n],&w,&h);
+        rb->lcd_set_drawmode(DRMODE_SOLID|(k==1) ? 0 : DRMODE_INVERSEVID);
+        rb->lcd_fillrect( X_0_POS + n*REC_WIDTH + 1,
+                          Y_1_POS + m*REC_HEIGHT + 1,
                           REC_WIDTH - 1, REC_HEIGHT - 1);
-        rb->lcd_update_rect( X_0_POS + j*REC_WIDTH + 1,
-                            Y_1_POS + i*REC_HEIGHT + 1,
+        rb->lcd_putsxy( X_0_POS + n*REC_WIDTH + (REC_WIDTH - w)/2,
+                        Y_1_POS + m*REC_HEIGHT + (REC_HEIGHT - h)/2 +1,
+                        buttonChar[buttonGroup][m][n] );
+        rb->lcd_update_rect( X_0_POS + n*REC_WIDTH + 1,
+                            Y_1_POS + m*REC_HEIGHT + 1,
                             REC_WIDTH - 1, REC_HEIGHT - 1);
 
         if (k!= 1)
             rb->sleep(HZ/22);
 
     }
-    rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /* -----------------------------------------------------------------------
@@ -1110,7 +1098,9 @@ printResult() generates LCD display.
 ----------------------------------------------------------------------- */
 void printResult(void)
 {
-    int k;
+    int k, w, h;
+
+    char operbuf[3] = {0, 0, 0};
 
     switch_Status:
     switch(calStatus){
@@ -1140,42 +1130,43 @@ void printResult(void)
             result2typingbuf();
             clearbuf();
 
-            buf[0] = oper;
-            buf[1] = ( ABS(memTemp) > MINIMUM )?'M':' ';
-            buf[2] = ' ';
+            operbuf[0] = oper;
+            operbuf[1] = ( ABS(memTemp) > MINIMUM )?'M':' ';
+            operbuf[2] = '\0';
 
             if(SCIENTIFIC_FORMAT){
                 /* output format: X.XXXX eXXX */
                 if(power > -98){ /* power-1 >= -99, eXXX or e-XX */
-                    rb->snprintf(buf+3, 12, "%11s",typingbuf);
-                    for(k=14;k<=17;k++) buf[k] = ' ';
+                    rb->snprintf(buf, 12, "%11s",typingbuf);
+                    for(k=11;k<=14;k++) buf[k] = ' ';
                     cleartypingbuf();
                     rb->snprintf(typingbuf, 5, "e%d",power-1);
-                    rb->snprintf(buf+14, 5, "%4s",typingbuf);
+                    rb->snprintf(buf+11, 5, "%4s",typingbuf);
                 }
                 else{  /* power-1 <= -100, e-XXX */
-                    rb->snprintf(buf+2, 12, "%11s",typingbuf);
-                    rb->snprintf(buf+13, 6, "e%d",power-1);
+                    rb->snprintf(buf, 12, "%11s",typingbuf);
+                    rb->snprintf(buf+11, 6, "e%d",power-1);
                 }
             }
             else{
-                rb->snprintf(buf+7, 12, "%11s",typingbuf);
+                rb->snprintf(buf, 12, "%11s",typingbuf);
             } /* if SCIENTIFIC_FORMAT */
             break;
         case cal_typing:
         case cal_dotted:
             clearbuf();
-            buf[0] = oper;
-            buf[1] = ( ABS(memTemp) > MINIMUM )?'M':' ';
-            for(k=2;k<=6;k++)
-                buf[k] = ' ';
-            rb->snprintf(buf+7, 12, "%11s",typingbuf);
+            operbuf[0] = oper;
+            operbuf[1] = ( ABS(memTemp) > MINIMUM )?'M':' ';
+            rb->snprintf(buf, 12, "%11s",typingbuf);
             break;
 
     }
 
-    rb->lcd_putsxy(1, TEXT_1_POS,buf);
-    rb->lcd_update_rect(1, TEXT_1_POS, 6*18, 8);
+    rb->lcd_getstringsize(buf, &w, &h);
+    rb->screen_clear_area(rb->screens[0], 0, 0, LCD_WIDTH, REC_HEIGHT-1);
+    rb->lcd_putsxy(4, Y_1_POS - h -1, operbuf);
+    rb->lcd_putsxy(LCD_WIDTH - w - 4, Y_1_POS - h -1, buf);
+    rb->lcd_update_rect(0, 1, LCD_WIDTH, Y_1_POS);
 }
 
 /* -----------------------------------------------------------------------
@@ -1302,7 +1293,7 @@ void basicButtonsProcess(void){
     switch (btn) {
         case CALCULATOR_INPUT:
             if (calStatus == cal_error && (CAL_BUTTON != btn_C) ) break;
-            flashButton(CAL_BUTTON);
+            flashButton();
             switch( CAL_BUTTON ){
                 case btn_MR:
                     operInputted = false;
@@ -1377,10 +1368,10 @@ void basicButtonsProcess(void){
             if (!operInputted) {twoOperands(); operInputted = true;}
             switch (oper){
                 case ' ':
-                case '/':  oper = '+';  flashButton(btn_add);    break;
-                case '+':  oper = '-';  flashButton(btn_minus);  break;
-                case '-':  oper = '*';  flashButton(btn_time);   break;
-                case '*':  oper = '/';  flashButton(btn_div);    break;
+                case '/':  oper = '+';  flashButton();    break;
+                case '+':  oper = '-';  flashButton();  break;
+                case '-':  oper = '*';  flashButton();   break;
+                case '*':  oper = '/';  flashButton();    break;
             }
             goto case_cycle_operators;
             break;
@@ -1388,7 +1379,7 @@ void basicButtonsProcess(void){
 
         case CALCULATOR_CALC:
             if (calStatus == cal_error) break;
-            flashButton(btn_equal);
+            flashButton();
             goto case_btn_equal;
             break;
         default: break;
@@ -1403,7 +1394,7 @@ void sciButtonsProcess(void){
     switch (btn) {
         case CALCULATOR_INPUT:
             if (calStatus == cal_error && (CAL_BUTTON != sci_sci) ) break;
-            flashButton(CAL_BUTTON);
+            flashButton();
             switch( CAL_BUTTON ){
 
                 case sci_pi:
