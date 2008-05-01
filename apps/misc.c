@@ -50,6 +50,8 @@
 #include "tagcache.h"
 #include "scrobbler.h"
 #include "sound.h"
+#include "playlist.h"
+#include "yesno.h"
 
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
@@ -243,6 +245,24 @@ char *create_datetime_filename(char *buffer, const char *path,
     return buffer;
 }
 #endif /* CONFIG_RTC */
+
+/* Ask the user if they really want to erase the current dynamic playlist
+ * returns true if the playlist should be replaced */
+bool warn_on_pl_erase(void)
+{
+    if (global_settings.warnon_erase_dynplaylist &&
+        !global_settings.party_mode &&
+        playlist_modified(NULL))
+    {
+        static const char *lines[] =
+            {ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
+        static const struct text_message message={lines, 1};
+
+        return (gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES);
+    }
+    else
+        return true;
+}
 
 /* Read (up to) a line of text from fd into buffer and return number of bytes
  * read (which may be larger than the number of bytes stored in buffer). If

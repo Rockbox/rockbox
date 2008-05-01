@@ -1497,16 +1497,8 @@ int tagtree_enter(struct tree_context* c)
                 c->dirlevel--;
                 /* about to create a new current playlist...
                  allow user to cancel the operation */
-                if (global_settings.warnon_erase_dynplaylist &&
-                    !global_settings.party_mode &&
-                    playlist_modified(NULL))
-                {
-                    static const char *lines[]={ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
-                    static const struct text_message message={lines, 1};
-                    
-                    if (gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
-                        break;
-                }
+                if (!warn_on_pl_erase())
+                    break;
 
                 if (tagtree_play_folder(c) >= 0)
                     rc = 2;

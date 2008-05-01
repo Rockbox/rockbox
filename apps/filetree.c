@@ -42,6 +42,7 @@
 #include "yesno.h"
 #include "cuesheet.h"
 #include "filetree.h"
+#include "misc.h"
 #ifdef HAVE_LCD_BITMAP
 #include "keyboard.h"
 #endif
@@ -102,15 +103,8 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
 
     /* about to create a new current playlist...
        allow user to cancel the operation */
-    if (global_settings.warnon_erase_dynplaylist &&
-        playlist_modified(NULL))
-    {
-        const char *lines[] = {ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
-        struct text_message message = {lines, 1};
-
-        if (gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
-            return false;
-    }
+    if (!warn_on_pl_erase())
+        return false;
 
     if (playlist_create(dirname, filename) != -1)
     {
@@ -405,16 +399,8 @@ int ft_enter(struct tree_context* c)
 
                 /* about to create a new current playlist...
                    allow user to cancel the operation */
-                if (global_settings.warnon_erase_dynplaylist &&
-                    !global_settings.party_mode &&
-                    playlist_modified(NULL))
-                {
-                    static const char *lines[]={ID2P(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
-                    static const struct text_message message={lines, 1};
-
-                    if(gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
-                        break;
-                }
+                if (!warn_on_pl_erase())
+                    break;
 
                 if (global_settings.party_mode) 
                 {
