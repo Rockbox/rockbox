@@ -514,7 +514,7 @@ const struct settings_list settings[] = {
 #endif
 #ifdef HAVE_ACCESSORY_SUPPLY
     OFFON_SETTING(0, accessory_supply, LANG_ACCESSORY_SUPPLY, 
-        false, "accessory power supply", accessory_supply_set),
+        true, "accessory power supply", accessory_supply_set),
 #endif
     /* tuner */
 #if CONFIG_TUNER
