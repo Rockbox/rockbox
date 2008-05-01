@@ -122,7 +122,7 @@ void irq_handler(void)
     }
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
-                    "subs  pc, lr, #4           \n"); /* Return from FIQ */
+                    "subs  pc, lr, #4           \n"); /* Return from IRQ */
 }
 
 void fiq_handler(void)
@@ -135,12 +135,12 @@ void fiq_handler(void)
         "sub    lr, lr, #4            \r\n"
         "stmfd  sp!, {r0-r3, ip, lr}  \r\n"
         "mov    r0, #0x00030000       \r\n"
-        "ldr    r0, [r0, #0x518]      \r\n"
-        "sub    r0, r0, #1             \r\n"
+        "ldr    r0, [r0, #0x510]      \r\n" /* Fetch value from IO_INTC_FIQENTRY0 */
+        "sub    r0, r0, #1            \r\n"
         "ldr    r1, =irqvector        \r\n"
-        "ldr    r1, [r1, r0, lsl #2]  \r\n"
-        "blx    r1                    \r\n"
-        "ldmfd  sp!, {r0-r3, ip, pc}^ \r\n"
+        "ldr    r1, [r1, r0, lsl #2]  \r\n" /* Divide value by 4 (TBA0/TBA1 is set to 0) and load appropriate pointer from the vector list */
+        "blx    r1                    \r\n" /* Jump to handler */
+        "ldmfd  sp!, {r0-r3, ip, pc}^ \r\n" /* Return from FIQ */
     );
 }
 
@@ -197,7 +197,7 @@ void system_init(void)
     unsigned short i;
     /* Reset interrupt priorities to default values */
     for(i = 0; i < 23; i++)
-        DM320_REG(0x0540+i*2) = ( (i*2+1) << 8 ) | i*2 ;//IO_INTC_PRIORITYx
+        DM320_REG(0x0540+i*2) = ( (i*2+1) << 8 ) | i*2 ;/* IO_INTC_PRIORITYx */
     
     /* Turn off all timers */
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
