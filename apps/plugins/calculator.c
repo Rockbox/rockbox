@@ -283,6 +283,7 @@ PLUGIN_HEADER
 #endif
 
 static struct plugin_api* rb;
+MEM_FUNCTION_WRAPPERS(rb);
 
 enum {
     basicButtons,
