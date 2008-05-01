@@ -13,6 +13,12 @@ STARTUP(target/arm/crt0-pp-bl.o)
 #define FLASHORIG 0x001f0000
 #define FLASHSIZE 2M
 
+MEMORY
+{
+    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+}
+
 SECTIONS
 {
   . = IRAMORIG;
@@ -20,26 +26,28 @@ SECTIONS
   .text : {
     *(.init.text)
     *(.text*)
-  }
+    *(.glue_7)
+    *(.glue_7t)
+  } > IRAM
 
   .data : {
     *(.icode)
     *(.irodata)
     *(.idata)
     *(.data*)
-    *(.ncdata*);
+    *(.ncdata*)
+    *(.rodata*)
     _dataend = . ;
-   }
+  } > IRAM
 
-  .stack :
-  {
+  .stack : {
      *(.stack)
      _stackbegin = .;
      stackbegin = .;
      . += 0x2000;
      _stackend = .;
      stackend = .;
-  }
+  } > IRAM
 
   /* The bss section is too large for IRAM - we just move it 16MB into the
      DRAM */
@@ -51,5 +59,5 @@ SECTIONS
      *(.ibss);
      *(.ncbss*);
      _end = .;
-   }
+  } > DRAM
 }
