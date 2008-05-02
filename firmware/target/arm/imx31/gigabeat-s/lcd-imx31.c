@@ -28,17 +28,6 @@ bool lcd_enabled()
 }
 #endif
 
-void printscreen(unsigned int colour)
-{
-    int i;
-    char * base = (char *)FRAME;
-    for(i = 0; i < (320*240*2); i++)
-    {
-        writel(colour, base);
-        base++;
-    }
-}
-
 /* LCD init */
 void lcd_init_device(void)
 {

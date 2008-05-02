@@ -1119,10 +1119,6 @@
 #define SDRAM_COMPARE_CONST2    0xAAAAAAAA
 #define UART_FIFO_CTRL          0x881
 #define TIMEOUT                 1000
-#define writel(v,a)             (*(REG32_PTR_T)(a) = (v))
-#define readl(a)                (*(REG32_PTR_T)(a))
-#define writew(v,a)             (*(REG16_PTR_T)(a) = (v))
-#define readw(a)                (*(REG16_PTR_T)(a))
 
 #define USB_BASE                OTG_BASE_ADDR
 
