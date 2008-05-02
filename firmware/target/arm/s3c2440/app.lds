@@ -33,6 +33,11 @@ MEMORY
 
 SECTIONS
 {
+    /* This nice little hack is to trick ROLO into loading in a certain place
+     * CRT0.s takes care of making sure the code is where it needs to be
+     */
+    loadaddress = 0x31000000; 
+
     .vectors DRAMORIG :
     {
         _vectorstart = .;
