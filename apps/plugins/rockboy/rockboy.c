@@ -204,6 +204,15 @@ static void setoptions (void)
         options.MENU=BUTTON_POWER;
 #elif CONFIG_KEYPAD == COWOND2_PAD
 
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
+        options.UP=BUTTON_UP;
+        options.DOWN=BUTTON_DOWN;
+
+        options.A=BUTTON_VOL_UP;
+        options.B=BUTTON_VOL_DOWN;
+        options.START=BUTTON_PLAY;
+        options.SELECT=BUTTON_SELECT;
+        options.MENU=BUTTON_MENU;
 #else
 #error No Keymap Defined!
 #endif
