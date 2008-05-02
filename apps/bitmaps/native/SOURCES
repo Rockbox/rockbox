@@ -4,6 +4,8 @@
 #if (LCD_DEPTH == 1)
 #if (LCD_WIDTH == 160)
 rockboxlogo.160x53x1.bmp
+#elif (LCD_WIDTH == 128)
+rockboxlogo.128x42x1.bmp
 #else
 rockboxlogo.112x30x1.bmp
 #endif
