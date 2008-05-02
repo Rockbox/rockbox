@@ -670,7 +670,7 @@ cat <<EOF
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200
  31) M5/M5L            41) Gigabeat S         51) Sansa e200R
  32) 7                                        52) Sansa c200
- 33) Cowon D2
+ 33) Cowon D2                                 53) Sansa m200
  34) M3/M3L
 
  ==Tatung==            ==Olympus==            ==Logik==
@@ -1550,6 +1550,30 @@ fi
     t_model="sansa-c200"
     ;;
 
+   53|m200)
+    target_id=31
+    modelname="m200"
+    target="-DSANSA_M200"
+    memory=2 # always
+    arm946cc
+    tool="$rootdir/tools/scramble -add=m200"
+    boottool="$rootdir/tools/scramble -tcc=crc"
+    bootoutput="player.rom"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
+    output="rockbox.m200"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$tccbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tcc77x"
+    t_model="m200"
+    ;;
+	
    60|tpj1022)
     target_id=25
     modelname="tpj1022"

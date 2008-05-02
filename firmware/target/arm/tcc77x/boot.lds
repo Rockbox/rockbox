@@ -10,16 +10,11 @@ STARTUP(target/arm/tcc77x/crt0.o)
 #define DRAMORIG 0x20000000
 #define IRAMORIG 0x00000000
 #define IRAMSIZE 64K
-#define FLASHORIG 0x0000000
-#define FLASHSIZE 1M
+
 
 MEMORY
 {
-#ifdef TCCBOOT
    DRAM : ORIGIN = DRAMORIG + DRAMSIZE - 0x100000, LENGTH = 0x100000
-#else
-   DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
-#endif
    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
 }
 
@@ -52,6 +47,7 @@ SECTIONS
          _stackend = .;
          stackend = .;
     } > DRAM
+
     .bss : {
          _edata = .;
          *(.bss*);

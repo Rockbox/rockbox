@@ -1,10 +1,10 @@
 /*
- * This config file is for the Logik DAX MP3/DAB
+ * This config file is for the Sansa M200 series
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 27
+#define MODEL_NUMBER 28
 
 /* define this if you have recording possibility */
 //#define HAVE_RECORDING
@@ -41,7 +41,7 @@
 #define LCD_PIXELFORMAT VERTICAL_PACKING
 
 /* define this to indicate your device's keypad */
-#define CONFIG_KEYPAD LOGIK_DAX_PAD
+#define CONFIG_KEYPAD SANSA_M200_PAD
 
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_TCC77X
@@ -59,6 +59,12 @@
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
+
+/* Define this if you have the TLV320 audio codec */
+#define HAVE_TLV320
+
+/* TLV320 has no tone controls, so we use the software ones */
+#define HAVE_SW_TONE_CONTROLS
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
@@ -103,7 +109,7 @@
 
 #define CONFIG_LCD LCD_SSD1815
 
-#define BOOTFILE_EXT "logik"
+#define BOOTFILE_EXT "m200"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/"
 

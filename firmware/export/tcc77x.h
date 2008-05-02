@@ -45,7 +45,7 @@
 
 #define CLKCTRL    (*(volatile unsigned long *)0x80000400)
 #define PLL0CFG    (*(volatile unsigned long *)0x80000404)
-#define CLKDIV0    (*(volatile unsigned long *)0x8000040c)
+#define CLKDIVC    (*(volatile unsigned long *)0x8000040c)
 #define MODECTR    (*(volatile unsigned long *)0x80000410)
 #define BCLKCTR    (*(volatile unsigned long *)0x80000414)
 #define SWRESET    (*(volatile unsigned long *)0x80000418)
@@ -77,5 +77,66 @@
 #define CSCFG3     (*(volatile unsigned long *)0xf000001c)
 #define CLKCFG     (*(volatile unsigned long *)0xf0000020)
 #define SDCMD      (*(volatile unsigned long *)0xf0000024)
+
+
+/* IRQ Controller */
+
+#define TIMER0_IRQ_MASK (1<<6)
+
+#define IEN      (*(volatile unsigned long *)0x80000100)
+#define CREQ     (*(volatile unsigned long *)0x80000104)
+#define IREQ     (*(volatile unsigned long *)0x80000108)
+#define IRQSEL   (*(volatile unsigned long *)0x8000010c)
+#define ICFG     (*(volatile unsigned long *)0x80000110)
+#define MREQ     (*(volatile unsigned long *)0x80000114)
+#define TSTREQ   (*(volatile unsigned long *)0x80000118)
+#define IRQ      (*(volatile unsigned long *)0x80000120)
+#define FIQ      (*(volatile unsigned long *)0x80000124)
+#define MIRQ     (*(volatile unsigned long *)0x80000128)
+#define MFIQ     (*(volatile unsigned long *)0x8000012c)
+#define TMODE    (*(volatile unsigned long *)0x80000130)
+#define SYNC     (*(volatile unsigned long *)0x80000134)
+#define WKUP     (*(volatile unsigned long *)0x80000138)
+
+/* Timer Controller */
+
+#define TCFG0    (*(volatile unsigned long *)0x80000200)
+#define TCNT0    (*(volatile unsigned long *)0x80000204)
+#define TREF0    (*(volatile unsigned long *)0x80000208)
+#define TMREF0   (*(volatile unsigned long *)0x8000020c)
+#define TCFG1    (*(volatile unsigned long *)0x80000210)
+#define TCNT1    (*(volatile unsigned long *)0x80000214)
+#define TREF1    (*(volatile unsigned long *)0x80000218)
+#define TMREF1   (*(volatile unsigned long *)0x8000021c)
+#define TCFG2    (*(volatile unsigned long *)0x80000220)
+#define TCNT2    (*(volatile unsigned long *)0x80000224)
+#define TREF2    (*(volatile unsigned long *)0x80000228)
+#define TMREF2   (*(volatile unsigned long *)0x8000022c)
+#define TCFG3    (*(volatile unsigned long *)0x80000230)
+#define TCNT3    (*(volatile unsigned long *)0x80000234)
+#define TREF3    (*(volatile unsigned long *)0x80000238)
+#define TMREF3   (*(volatile unsigned long *)0x8000023c)
+#define TCFG4    (*(volatile unsigned long *)0x80000240)
+#define TCNT4    (*(volatile unsigned long *)0x80000244)
+#define TREF4    (*(volatile unsigned long *)0x80000248)
+#define TCFG5    (*(volatile unsigned long *)0x80000250)
+#define TCNT5    (*(volatile unsigned long *)0x80000254)
+#define TREF5    (*(volatile unsigned long *)0x80000258)
+#define TIREQ    (*(volatile unsigned long *)0x80000260)
+#define TWDCFG   (*(volatile unsigned long *)0x80000270)
+#define TWDCLR   (*(volatile unsigned long *)0x80000274)
+#define TC32EN   (*(volatile unsigned long *)0x80000280)
+#define TC32LDV  (*(volatile unsigned long *)0x80000284)
+#define TC32CMP0 (*(volatile unsigned long *)0x80000288)
+#define TC32CMP1 (*(volatile unsigned long *)0x8000028c)
+#define TC32PCNT (*(volatile unsigned long *)0x80000290)
+#define TC32MCNT (*(volatile unsigned long *)0x80000294)
+#define TC32IRQ  (*(volatile unsigned long *)0x80000298)
+
+/* TIREQ flags */
+#define TF0 (1<<8) /* Timer 0 reference value reached */
+#define TF1 (1<<9) /* Timer 1 reference value reached */
+#define TI0 (1<<0) /* Timer 0 IRQ flag */
+#define TI1 (1<<1) /* Timer 1 IRQ flag */
 
 #endif

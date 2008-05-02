@@ -29,6 +29,11 @@
 
     .section .init.text,"ax",%progbits
 
+    .extern irq
+    .extern fiq
+    .extern UIE
+    .extern main
+
     .global    start
 
 /* Telechips firmware files start with a 32-byte header, as part of the code. */
@@ -44,7 +49,8 @@ start:
     .word  0              /* Saved entrypoint of original firmware*/
     .word  0              /* Location in RAM of the start of our bootloader */
 #else
-    ldr    pc, =start_loc    /* jump to the main entry point  */
+//    ldr    pc, =start_loc    /* jump to the main entry point  */
+    b       start_loc
 
     .word  0xffff0601        /* Unknown magic */
     .word  0x3a726556        /* "Ver:" */
@@ -65,21 +71,40 @@ start:
 start_loc:
 
 #ifdef BOOTLOADER
+
+/*
+  If we are appended to the OF (i.e. dual-booting), do a simple GPIO
+  button check, and branch to the OF's entry point (saved by mktccboot)
+  if not active 
+*/
+
 #ifdef TCCBOOT
-#ifdef LOGIK_DAX
     mov    r0, #0x80000000
-    ldr    r0, [r0, #0x300]     /* Read GPIO A */
+#ifdef LOGIK_DAX
+    ldr    r0, [r0, #0x300]     /* Hold button is GPIO A, pin 0x2 */
     tst    r0, #0x2
-    ldrne  pc, [pc, #-28]     /* Jump to original firmware if HOLD button not pressed */
+#elif defined(SANSA_M200)
+    ldr    r0, [r0, #0x310]     /* Hold button is GPIO B, pin 0x200 */
+    tst    r0, #0x200
 #else
     #error No bootup key detection implemented for this target
 #endif
 
-    /* Copy bootloader to safe area - 0x21000000 (DRAM) */
-    /* TODO: Adjust this for other targets - DRAM + DRAMSIZE - 0x100000 */
-    ldr    r0, [pc, #-28]
-    mov    r1, #0x20000000
-    add    r1, r1, #0x100000
+    ldrne  pc, [pc, #-28]     /* Jump to OF if HOLD button not pressed */
+#endif /* TCCBOOT */
+
+/* We are now definitely executing the bootloader, so we relocate to the
+   linked address (see boot.lds) - 1MB from the end of DRAM.
+*/
+
+#ifdef TCCBOOT
+    ldr    r0, [pc, #-28]     /* mktccboot fills in the load address */
+#else
+    mov    r0, #0x20000000    /* Otherwise, load address is the start of DRAM */
+#endif
+    mov    r1, #0x20000000    /* Destination: 1MB from end of DRAM */
+    add    r1, r1, #((MEM - 1) * 0x100000)
+
     ldr    r2, =_dataend
 1:
     cmp    r2, r1
@@ -88,16 +113,14 @@ start_loc:
     bhi    1b
 
     ldr    pc, =copied_start   /* jump to the relocated start_loc:  */
-
 copied_start:
-#endif
-#else
-    /* We don't use interrupts in the bootloader */
+#endif /* BOOTLOADER */
 
     /* Set up stack for IRQ mode */ 
     mov    r0,#0xd2
     msr    cpsr, r0
     ldr    sp, =irq_stack
+
     /* Set up stack for FIQ mode */ 
     mov    r0,#0xd1
     msr    cpsr, r0
@@ -110,13 +133,22 @@ copied_start:
     mov    r0,#0xdb
     msr    cpsr, r0
     ldr    sp, =irq_stack
-#endif
 
     /* Switch to supervisor mode */
     mov    r0,#0xd3
     msr    cpsr, r0
     ldr    sp, =stackend
     
+    /* Copy exception handler code to address 0 */
+    mov    r2, #0x0
+    ldr    r3, =vectors_start
+    ldr    r4, =vectors_end
+1:
+    cmp    r4, r3
+    ldrhi  r5, [r3], #4
+    strhi  r5, [r2], #4
+    bhi    1b
+
     /* Initialise bss section to zero */
     ldr    r2, =_edata
     ldr    r3, =_end
@@ -139,9 +171,68 @@ copied_start:
     bl     main
     /* main() should never return */
 
-#ifndef BOOTLOADER
-    /* We don't use interrupts in the bootloader */
+/* Exception handlers. Will be copied to address 0 after memory remapping */
+vectors_start:
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
+    ldr    pc, [pc, #24]
 
+    /* Exception vectors */
+    .global vectors
+vectors:
+    .word  start
+    .word  undef_instr_handler
+    .word  software_int_handler
+    .word  prefetch_abort_handler
+    .word  data_abort_handler
+    .word  reserved_handler
+    .word  irq_handler
+    .word  fiq_handler
+vectors_end:
+
+    .text
+
+/* All illegal exceptions call into UIE with exception address as first
+   parameter. This is calculated differently depending on which exception
+   we're in. Second parameter is exception number, used for a string lookup
+   in UIE.
+ */
+undef_instr_handler:
+    mov    r0, lr
+    mov    r1, #0
+    b      UIE
+
+/* We run supervisor mode most of the time, and should never see a software
+   exception being thrown. Perhaps make it illegal and call UIE?
+ */
+software_int_handler:
+reserved_handler:
+    movs   pc, lr
+
+prefetch_abort_handler:
+    sub    r0, lr, #4
+    mov    r1, #1
+    b      UIE
+
+data_abort_handler:
+    sub    r0, lr, #8
+    mov    r1, #2
+    b      UIE
+
+irq_handler:
+    stmfd  sp!, {r0-r3, r12, lr}
+    bl     irq
+    ldmfd  sp!, {r0-r3, r12, lr}
+    subs   pc, lr, #4
+
+/* Align stacks to cache line boundary */
+    .balign 16
+    
 /* 256 words of IRQ stack */
     .space 256*4
 irq_stack:
@@ -150,4 +241,3 @@ irq_stack:
     .space 256*4
 fiq_stack:
 
-#endif

@@ -21,7 +21,9 @@
 #include "string.h"
 #include "audio.h"
 
+#ifdef CPU_COLDFIRE
 #include "i2c-coldfire.h"
+#endif
 #include "audiohw.h"
 
 const struct sound_settings_info audiohw_settings[] = {
@@ -73,7 +75,11 @@ static void tlv320_write_reg(unsigned reg, unsigned value)
     data[0] = (reg << 1) | ((value >> 8) & 1);
     data[1] = value;
 
+#ifdef CPU_COLDFIRE
     if (i2c_write(I2C_IFACE_0, TLV320_ADDR, data, 2) != 2)
+#else
+    #warning Implement tlv320_write_reg()
+#endif
     {
         logf("tlv320 error reg=0x%x", reg);
         return;

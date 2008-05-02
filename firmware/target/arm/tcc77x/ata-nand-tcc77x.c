@@ -32,6 +32,9 @@ int ata_spinup_time = 0;
 
 long last_disk_activity = -1;
 
+/* Used to store (fake?) identify info */
+static unsigned short identify_info[256];
+
 /** static, private data **/ 
 static bool initialized = false;
 
@@ -91,4 +94,11 @@ void ata_enable(bool on)
 
 int ata_init(void)
 {
+     return 0;
+}
+
+/* TEMP: This will return junk, it's here for compilation only */
+unsigned short* ata_get_identify(void)
+{
+    return identify_info;
 }

@@ -151,6 +151,8 @@ drivers/rtc/rtc_rx5x348ab.c
 drivers/rtc/rtc_mr100.c
 #elif (CONFIG_RTC == RTC_MC13783)
 drivers/rtc/rtc_mc13783.c
+#elif (CONFIG_RTC == RTC_TCC77X)
+drivers/rtc/rtc_tcc77x.c
 #endif /* (CONFIG_RTC == RTC_) */
 #endif /* SIMULATOR */
 
@@ -316,7 +318,7 @@ target/arm/ffs-arm.S
 target/arm/i2c-pp.c
 #elif CONFIG_I2C == I2C_PNX0101
 target/arm/pnx0101/i2c-pnx0101.c
-#elif CONFIG_I2C == I2C_TCC780X
+#elif CONFIG_I2C == I2C_TCC780X || CONFIG_I2C == I2C_TCC77X 
 target/arm/i2c-telechips.c
 #elif CONFIG_I2C == I2C_S3C2440
 /* no i2c driver yet */
@@ -919,10 +921,37 @@ target/arm/pnx0101/pcm-pnx0101.c
 #ifndef SIMULATOR
 target/arm/tcc77x/adc-tcc77x.c
 target/arm/tcc77x/ata-nand-tcc77x.c
-target/arm/tcc77x/system-tcc77x.c
+target/arm/tcc77x/kernel-tcc77x.c
 target/arm/tcc77x/lcd-ssd1815.c
+target/arm/tcc77x/powermgmt-tcc77x.c
+target/arm/tcc77x/system-tcc77x.c
+target/arm/tcc77x/timer-tcc77x.c
+target/arm/tcc77x/usb-tcc77x.c
 target/arm/tcc77x/logikdax/button-logikdax.c
 target/arm/tcc77x/logikdax/power-logikdax.c
+#ifndef BOOTLOADER
+target/arm/tcc77x/debug-tcc77x.c
+target/arm/tcc77x/pcm-tcc77x.c
+#endif /* BOOTLOADER */
+#endif /* SIMULATOR */
+#endif /* LOGIK_DAX */
+
+#ifdef SANSA_M200
+#ifndef SIMULATOR
+target/arm/tcc77x/adc-tcc77x.c
+target/arm/tcc77x/ata-nand-tcc77x.c
+target/arm/tcc77x/kernel-tcc77x.c
+target/arm/tcc77x/lcd-ssd1815.c
+target/arm/tcc77x/powermgmt-tcc77x.c
+target/arm/tcc77x/system-tcc77x.c
+target/arm/tcc77x/timer-tcc77x.c
+target/arm/tcc77x/usb-tcc77x.c
+target/arm/tcc77x/m200/button-m200.c
+target/arm/tcc77x/m200/power-m200.c
+#ifndef BOOTLOADER
+target/arm/tcc77x/debug-tcc77x.c
+target/arm/tcc77x/pcm-tcc77x.c
+#endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* LOGIK_DAX */
 
