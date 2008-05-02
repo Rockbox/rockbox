@@ -60,7 +60,7 @@ static inline void flush_icache(void)
         /* Clean entire data cache */
         "mcr p15, 0, %0, c7, c10, 0 \n"
         /* Data synchronization barrier */
-        "mcr p15, 0, r2, c7, c10, 4 \n"
+        "mcr p15, 0, %0, c7, c10, 4 \n"
         : : "r"(0)
     );
 }
