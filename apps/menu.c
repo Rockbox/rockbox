@@ -51,6 +51,7 @@
 #include "gwps-common.h" /* for fade() */
 #include "audio.h"
 #include "viewport.h"
+#include "quickscreen.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Kevin Ferrare
+ * Copyright (C) 2008 by Jonathan Gordon
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,11 +17,9 @@
  *
  ****************************************************************************/
 
-#include "quickscreen.h"
-
-#ifdef HAVE_QUICKSCREEN
 
 #include <stdio.h>
+#include "config.h"
 #include "system.h"
 #include "icons.h"
 #include "textarea.h"
@@ -30,108 +28,198 @@
 #include "misc.h"
 #include "statusbar.h"
 #include "action.h"
+#include "settings_list.h"
+#include "lang.h"
+#include "playlist.h"
+#include "dsp.h"
+#include "viewport.h"
+#include "audio.h"
+#include "quickscreen.h"
 
-void gui_quickscreen_init(struct gui_quickscreen * qs,
-                          struct option_select *left_option,
-                          struct option_select *bottom_option,
-                          struct option_select *right_option,
-                          quickscreen_callback callback)
+static struct viewport vps[NB_SCREENS][QUICKSCREEN_ITEM_COUNT];
+static struct viewport vp_icons[NB_SCREENS];
+/* vp_icons will be used like this:
+   the side icons will be aligned to the top of this vp and to their sides
+   the bottom icon wil be aligned center and at the bottom of this vp */
+
+#define MIN_LINES 4
+#define MAX_NEEDED_LINES 8
+#define CENTER_MARGIN 10 /* pixels between the 2 center items minimum */
+#define CENTER_ICONAREA_WIDTH (CENTER_MARGIN+8*2)
+
+static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
+                                      struct screen *display,
+                                      struct viewport *parent)
 {
-    qs->left_option=left_option;
-    qs->bottom_option=bottom_option;
-    qs->right_option=right_option;
-    qs->callback=callback;
+    int char_height, i, screen = display->screen_type;
+    int left_width, right_width, bottom_lines = 3;
+    unsigned char *s;
+    int nb_lines = viewport_get_nb_lines(parent);
+    char_height = parent->height/nb_lines;
+    
+    vp_icons[screen] = *parent;
+    
+    vps[screen][QUICKSCREEN_BOTTOM] = *parent;
+    if (nb_lines <= MIN_LINES) /* make the bottom item use 1 line */
+        bottom_lines = 1;
+    else
+        bottom_lines = 2;
+    vps[screen][QUICKSCREEN_BOTTOM].height = bottom_lines*char_height;
+    vps[screen][QUICKSCREEN_BOTTOM].y = parent->y + parent->height - bottom_lines*char_height;
+    if (nb_lines >= MAX_NEEDED_LINES)
+    {
+        vps[screen][QUICKSCREEN_BOTTOM].y -= char_height;
+    }
+    
+    /* adjust the left/right items widths to fit the screen nicely */
+    s = P2STR(ID2P(qs->items[QUICKSCREEN_LEFT]->lang_id));
+    left_width = display->getstringsize(s, NULL, NULL);
+    s = P2STR(ID2P(qs->items[QUICKSCREEN_RIGHT]->lang_id));
+    right_width = display->getstringsize(s, NULL, NULL);
+    nb_lines -= bottom_lines;
+    
+    vps[screen][QUICKSCREEN_LEFT] = *parent;
+    vps[screen][QUICKSCREEN_RIGHT] = *parent;
+    vps[screen][QUICKSCREEN_LEFT].x = parent->x;
+    if (nb_lines <= MIN_LINES)
+        i = 0;
+    else
+        i = nb_lines/2;
+    vps[screen][QUICKSCREEN_LEFT].y = parent->y + (i*char_height);
+    vps[screen][QUICKSCREEN_RIGHT].y = parent->y + (i*char_height);
+    if (nb_lines >= 3)
+        i = 3*char_height;
+    else
+        i = nb_lines*char_height;
+    
+    vps[screen][QUICKSCREEN_LEFT].height = i;
+    vps[screen][QUICKSCREEN_RIGHT].height = i;
+    vp_icons[screen].y = vps[screen][QUICKSCREEN_LEFT].y + (char_height/2);
+    vp_icons[screen].height = vps[screen][QUICKSCREEN_BOTTOM].y - vp_icons[screen].y;
+    
+    if (left_width + right_width > display->width - CENTER_MARGIN) /* scrolling needed */
+    {
+        int width = (parent->width - CENTER_ICONAREA_WIDTH)/2;
+        vps[screen][QUICKSCREEN_LEFT].width = width;
+        vps[screen][QUICKSCREEN_RIGHT].width = width;
+        vps[screen][QUICKSCREEN_RIGHT].x = parent->x+parent->width - width;
+        vp_icons[screen].x = parent->x + width;
+        vp_icons[screen].width = CENTER_ICONAREA_WIDTH;
+    }
+    else
+    {
+        int width, pad = 0;
+        if (left_width > right_width)
+            width = left_width;
+        else
+            width = right_width;
+        width += CENTER_MARGIN;
+        if (width*2 < parent->width/2)
+        {
+            width += parent->width/6;
+            /* add some padding on the edges */
+            pad = CENTER_MARGIN;
+        }
+        vps[screen][QUICKSCREEN_LEFT].width = width;
+        vps[screen][QUICKSCREEN_RIGHT].width = width;
+        vps[screen][QUICKSCREEN_RIGHT].x = parent->x + parent->width - width;
+        vp_icons[screen].x = parent->x + width;
+        if (pad)
+        {
+            vp_icons[screen].x += pad;
+            vps[screen][QUICKSCREEN_LEFT].x += pad;
+            vps[screen][QUICKSCREEN_RIGHT].x -= pad;
+            /* need to add the pad to the bottom to make it all centered nicely */
+            vps[screen][QUICKSCREEN_BOTTOM].x += pad;
+            vps[screen][QUICKSCREEN_BOTTOM].width -= pad;
+        }
+        vp_icons[screen].width = vps[screen][QUICKSCREEN_RIGHT].x - width;
+        
+    }
 }
 
-/*
- * Draws the quickscreen on a given screen
- *  - qs : the quickscreen
- *  - display : the screen to draw on
- */
-static void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
+static void quickscreen_draw_text(char *s, int item, bool title,
+                                  struct screen *display, struct viewport *vp)
 {
-    const unsigned char *option;
-    const unsigned char *title;
-    int w, font_h;
-    bool statusbar = global_settings.statusbar;
-#ifdef HAS_BUTTONBAR
-    display->has_buttonbar=false;
-#endif
-    gui_textarea_clear(display);
-    if (display->height / display->char_height < 7) /* we need at leats 7 lines */
+    int nb_lines = viewport_get_nb_lines(vp);
+    int w, h, line = 0, x=0;
+    display->getstringsize(s, &w, &h);
+    
+    if (nb_lines > 1 && !title)
+        line = 1;
+    switch (item)
     {
-        display->setfont(FONT_SYSFIXED);
+        case QUICKSCREEN_BOTTOM:
+            x = (vp->width - w)/2;
+            break;
+        case QUICKSCREEN_LEFT:
+            x = 0;
+            break;
+        case QUICKSCREEN_RIGHT:
+            x = vp->width - w;
+            break;
     }
-    display->getstringsize("A", NULL, &font_h);
-
-    /* do these calculations once */
-    const unsigned int puts_center = display->height/2/font_h;
-    const unsigned int puts_bottom = display->height/font_h;
-    const unsigned int putsxy_center = display->height/2;
-    const unsigned int putsxy_bottom = display->height;
-
-    /* Displays the first line of text */
-    option=(unsigned char *)option_select_get_text(qs->left_option);
-    title=(unsigned char *)qs->left_option->title;
-    display->puts_scroll(2, puts_center-4+!statusbar, title);
-    display->puts_scroll(2, puts_center-3+!statusbar, option);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 1,
-                         putsxy_center-(font_h*3), 7, 8);
-
-    /* Displays the second line of text */
-    option=(unsigned char *)option_select_get_text(qs->right_option);
-    title=(unsigned char *)qs->right_option->title;
-    display->getstringsize(title, &w, NULL);
-    if(w > display->width - 8)
-    {
-        display->puts_scroll(2, puts_center-2+!statusbar, title);
-        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 1,
-                             putsxy_center-font_h, 7, 8);
-    }
+    if (w>vp->width)
+        display->puts_scroll(0,line,s);
     else
-    {
-        display->putsxy(display->width - w - 12, putsxy_center-font_h, title);
-        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                        display->width - 8, putsxy_center-font_h, 7, 8);
-    }
-    display->getstringsize(option, &w, NULL);
-    if(w > display->width)
-        display->puts_scroll(0, puts_center-1+!statusbar, option);
-    else
-        display->putsxy(display->width -w-12, putsxy_center, option);
-
-    /* Displays the third line of text */
-    option=(unsigned char *)option_select_get_text(qs->bottom_option);
-    title=(unsigned char *)qs->bottom_option->title;
-
-    display->getstringsize(title, &w, NULL);
-    if(w > display->width)
-        display->puts_scroll(0, puts_bottom-4+!statusbar, title);
-    else
-        display->putsxy(display->width/2-w/2, putsxy_bottom-(font_h*3), title);
-
-    display->getstringsize(option, &w, NULL);
-    if(w > display->width)
-        display->puts_scroll(0, puts_bottom-3+!statusbar, option);
-    else
-        display->putsxy(display->width/2-w/2, putsxy_bottom-(font_h*2), option);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow], display->width/2-4,
-                         putsxy_bottom-font_h, 7, 8);
-
-    gui_textarea_update(display);
-    display->setfont(FONT_UI);
+        display->putsxy(x, line*h, s);
 }
 
-/*
- * Draws the quickscreen on all available screens
- *  - qs : the quickscreen
- */
-static void gui_syncquickscreen_draw(struct gui_quickscreen * qs)
+static void gui_quickscreen_draw(struct gui_quickscreen *qs,
+                                 struct screen *display,
+                                 struct viewport *parent)
 {
     int i;
-    FOR_NB_SCREENS(i)
-        gui_quickscreen_draw(qs, &screens[i]);
+    char buf[MAX_PATH];
+    unsigned char *title, *value;
+    void *setting;
+    int temp;
+    display->set_viewport(parent);
+    display->clear_viewport();
+    for (i=0; i<QUICKSCREEN_ITEM_COUNT; i++)
+    {
+        
+        if (!qs->items[i])
+            continue;
+        display->set_viewport(&vps[display->screen_type][i]);
+        display->scroll_stop(&vps[display->screen_type][i]);
+        
+        title = P2STR(ID2P(qs->items[i]->lang_id));
+        setting = qs->items[i]->setting;
+        if ((qs->items[i]->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
+            temp = *(bool*)setting?1:0;
+        else
+            temp = *(int*)setting;
+        value = option_get_valuestring((struct settings_list*)qs->items[i], buf, MAX_PATH, temp);
+        
+        if (vps[display->screen_type][i].height < display->char_height*2)
+        {
+            char text[MAX_PATH];
+            snprintf(text, MAX_PATH, "%s: %s", title, value);
+            quickscreen_draw_text(text, i, true, display, &vps[display->screen_type][i]);
+        }
+        else
+        {
+            quickscreen_draw_text(title, i, true, display, &vps[display->screen_type][i]);
+            quickscreen_draw_text(value, i, false, display, &vps[display->screen_type][i]);
+        }
+        display->update_viewport();
+    }
+    /* draw the icons */
+    display->set_viewport(&vp_icons[display->screen_type]);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
+                         vp_icons[display->screen_type].width - 8, 0, 7, 8);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 0, 0, 7, 8);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+                         (vp_icons[display->screen_type].width/2) - 4, 
+                          vp_icons[display->screen_type].height - 7, 7, 8);
+    display->update_viewport();
+    
+    display->set_viewport(parent);
+    display->update_viewport();
+    display->set_viewport(NULL);
 }
+
 
 /*
  * Does the actions associated to the given button if any
@@ -141,48 +229,60 @@ static void gui_syncquickscreen_draw(struct gui_quickscreen * qs)
  */
 static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 {
-
+    int item;
     switch(button)
     {
         case ACTION_QS_LEFT:
-            option_select_next(qs->left_option);
-            return(true);
+            item = QUICKSCREEN_LEFT;
+            break;
 
         case ACTION_QS_DOWN:
-            option_select_next(qs->bottom_option);
-            return(true);
+        case ACTION_QS_DOWNINV:
+            item = QUICKSCREEN_BOTTOM;
+            break;
 
         case ACTION_QS_RIGHT:
-            option_select_next(qs->right_option);
-            return(true);
+            item = QUICKSCREEN_RIGHT;
+            break;
 
-        case ACTION_QS_DOWNINV:
-            option_select_prev(qs->bottom_option);
-            return(true);
+        default:
+            return false;
     }
-    return(false);
+    option_select_next_val((struct settings_list *)qs->items[item], false, true);
+    return true;
 }
 
 bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
 {
-    int button;
+    int button, i;
+    struct viewport vp[NB_SCREENS];
+    bool changed = false;
     /* To quit we need either :
      *  - a second press on the button that made us enter
      *  - an action taken while pressing the enter button,
      *    then release the enter button*/
     bool can_quit=false;
-    gui_syncquickscreen_draw(qs);
     gui_syncstatusbar_draw(&statusbars, true);
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].set_viewport(NULL);
+        screens[i].stop_scroll();
+        viewport_set_defaults(&vp[i], i);
+        quickscreen_fix_viewports(qs, &screens[i], &vp[i]);
+        gui_quickscreen_draw(qs, &screens[i], &vp[i]);
+    }
     while (true) {
         button = get_action(CONTEXT_QUICKSCREEN,TIMEOUT_BLOCK);
         if(default_event_handler(button) == SYS_USB_CONNECTED)
             return(true);
         if(gui_quickscreen_do_button(qs, button))
         {
+            changed = true;
             can_quit=true;
-            if(qs->callback)
+            FOR_NB_SCREENS(i)
+                gui_quickscreen_draw(qs, &screens[i], &vp[i]);
+            if (qs->callback)
                 qs->callback(qs);
-            gui_syncquickscreen_draw(qs);
         }
         else if(button==button_enter)
             can_quit=true;
@@ -195,8 +295,57 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
             
         gui_syncstatusbar_draw(&statusbars, false);
     }
-    return false;
+    return changed;
 }
 
-#endif /* HAVE_QUICKSCREEN */
+bool quick_screen_quick(int button_enter)
+{
+    struct gui_quickscreen qs;
+    bool oldshuffle = global_settings.playlist_shuffle;
+    int oldrepeat = global_settings.repeat_mode;
+    qs.items[QUICKSCREEN_LEFT] = find_setting(&global_settings.playlist_shuffle, NULL);
+    qs.items[QUICKSCREEN_RIGHT] = find_setting(&global_settings.repeat_mode, NULL);
+    qs.items[QUICKSCREEN_BOTTOM] = find_setting(&global_settings.dirfilter, NULL);
+    qs.callback = NULL;
+    if (gui_syncquickscreen_run(&qs, button_enter))
+    {
+        settings_save();
+        settings_apply(false);
+        /* make sure repeat/shuffle/any other nasty ones get updated */
+        if ( oldrepeat != global_settings.repeat_mode &&
+             (audio_status() & AUDIO_STATUS_PLAY) )
+        {
+            audio_flush_and_reload_tracks();
+        }
+        if (oldshuffle != global_settings.playlist_shuffle
+            && audio_status() & AUDIO_STATUS_PLAY)
+        {
+#if CONFIG_CODEC == SWCODEC
+            dsp_set_replaygain();
+#endif
+            if (global_settings.playlist_shuffle)
+                playlist_randomise(NULL, current_tick, true);
+            else
+                playlist_sort(NULL, true);
+        }
+    }
+    return(0);
+}
+
+#ifdef BUTTON_F3
+bool quick_screen_f3(int button_enter)
+{
+    struct gui_quickscreen qs;
+    qs.items[QUICKSCREEN_LEFT] = find_setting(&global_settings.scrollbar, NULL);
+    qs.items[QUICKSCREEN_RIGHT] = find_setting(&global_settings.statusbar, NULL);
+    qs.items[QUICKSCREEN_BOTTOM] = find_setting(&global_settings.flip_display, NULL);
+    qs.callback = NULL;
+    if (gui_syncquickscreen_run(&qs, button_enter))
+    {
+        settings_save();
+        settings_apply(false);
+    }
+    return(0);
+}
+#endif /* BUTTON_F3 */
 

@@ -69,4 +69,10 @@ extern void option_select_next(struct option_select * opt);
 extern void option_select_prev(struct option_select * opt);
 
 
+
+void option_select_next_val(struct settings_list *setting,
+                            bool previous, bool apply);
+char *option_get_valuestring(struct settings_list *setting, 
+                             char *buffer, int buf_len,
+                             intptr_t temp_var);
 #endif /* _GUI_OPTION_SELECT_H_ */

@@ -57,6 +57,7 @@
 #include "ata_idle_notify.h"
 #include "root_menu.h"
 #include "backdrop.h"
+#include "quickscreen.h"
 
 /* currently only on wps_state is needed */
 struct wps_state wps_state;
