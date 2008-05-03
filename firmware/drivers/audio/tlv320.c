@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "config.h"
+#define LOGF_ENABLE
 #include "logf.h"
 #include "system.h"
 #include "string.h"
@@ -111,8 +112,10 @@ void audiohw_init(void)
 
     /* All ON except OUT, ADC, MIC and LINE */
     tlv320_write_reg(REG_PC, PC_OUT | PC_ADC | PC_MIC | PC_LINE);
+#ifdef HAVE_RECORDING
     audiohw_set_recvol(0, 0, AUDIO_GAIN_MIC);
     audiohw_set_recvol(0, 0, AUDIO_GAIN_LINEIN);
+#endif
     audiohw_mute(true);
     tlv320_write_reg(REG_AAP, AAP_DAC | AAP_MICM);
     tlv320_write_reg(REG_DAP, 0x00);  /* No deemphasis */
@@ -210,6 +213,7 @@ void audiohw_set_headphone_vol(int vol_l, int vol_r)
  * Mic (left): 0 ..  1 => Volume  +0,     +20 dB
  *
  */
+#ifdef HAVE_RECORDING
 void audiohw_set_recvol(int left, int right, int type)
 {
     if (type == AUDIO_GAIN_MIC)
@@ -229,6 +233,7 @@ void audiohw_set_recvol(int left, int right, int type)
         tlv320_write_reg(REG_RLIV, RLIV_RIV(right));
     }
 }
+#endif
 
 void audiohw_mute(bool mute)
 {
@@ -264,6 +269,7 @@ void audiohw_close(void)
         PC_DAC | PC_ADC | PC_MIC | PC_LINE);  /* All OFF */
 }
 
+#ifdef HAVE_RECORDING
 void audiohw_enable_recording(bool source_mic)
 {
     unsigned value_aap, value_pc;
@@ -295,6 +301,7 @@ void audiohw_disable_recording(void)
     value_pc |= PC_ADC | PC_MIC | PC_LINE; /* ADC, MIC and LINE off */
     tlv320_write_reg(REG_PC, value_pc);
 }
+#endif
 
 void audiohw_set_monitor(bool enable)
 {
