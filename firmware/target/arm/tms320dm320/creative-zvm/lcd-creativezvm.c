@@ -29,9 +29,8 @@
 #include "lcd-target.h"
 
 /* Power and display status */
-static bool display_on  = true; /* Is the display turned on? */
-static bool direct_fb_access = false; /* Does the DM320 has direct access to
-                                         the FB? */
+static bool display_on = false; /* Is the display turned on? */
+static bool direct_fb_access = false; /* Does the DM320 has direct access to the FB? */
 
 /* Copies a rectangle from one framebuffer to another. Can be used in
    single transfer mode with width = num pixels, and height = 1 which
@@ -60,8 +59,30 @@ void lcd_set_flip(bool yesno) {
   /* TODO: */
 }
 
+static void enable_venc(bool enable)
+{
+    if(enable)
+    {
+        /* Set OSD clock */
+        IO_CLK_MOD1 &= ~(CLK_MOD1_VENC | CLK_MOD1_OSD); /* disable OSD clock and VENC clock */
+        IO_CLK_O2DIV = 3;
+
+        IO_CLK_OSEL &= ~CLK_OSEL_O2SEL(0xF); /* reset 'General purpose clock output (GIO26, GIO34)' and */
+        IO_CLK_OSEL |= CLK_OSEL_O2SEL(4);    /* set to 'PLLIN clock' */
+
+        IO_CLK_SEL1 |= (CLK_SEL1_OSD | CLK_SEL1_VENC(7)); /* set to 'GP clock output 2 (GIO26, GIO34)' and turn on 'VENC clock' */
+        IO_CLK_MOD1 |= (CLK_MOD1_VENC | CLK_MOD1_OSD);    /* enable OSD clock and VENC clock */
+    }
+    else
+    {
+        /* Disable video encoder */
+        IO_VID_ENC_VMOD &= ~VENC_VMOD_VENC;
+        /* Disable clock for power saving */
+        IO_CLK_MOD1 &= ~(CLK_MOD1_VENC | CLK_MOD1_OSD);
+    }
+}
+
 /* LTV250QV panel functions */
-#ifdef ENABLE_DISPLAY_FUNCS
 static void lcd_write_reg(unsigned char reg, unsigned short val)
 {
     unsigned char block[3];
@@ -80,8 +101,8 @@ static void sleep_ms(unsigned int ms)
     sleep(ms*HZ/1000);
 }
 
-static void lcd_display_on(void)
-{
+static void lcd_display_on(bool reset)
+{  
     /* Enable main power */
     IO_GIO_BITSET2 |= (1 << 3);
     
@@ -160,14 +181,18 @@ static void lcd_display_on(void)
     lcd_write_reg(10, 0x111A);
     sleep_ms(10);
 
+    if(!reset)
+    {
+        enable_venc(true);
+        /* Re-enable video encoder */
+        IO_VID_ENC_VMOD |= VENC_VMOD_VENC;
+    }
     /* tell that we're on now */
     display_on = true;
 }
 
-void lcd_display_off(void)
+static void lcd_display_off(void)
 {
-    display_on = false;
-
     /* LQV shutdown sequence */
     lcd_write_reg(9,  0x855);
     sleep_ms(20);
@@ -194,26 +219,28 @@ void lcd_display_off(void)
     
     /* Disable main power */
     IO_GIO_BITCLR2 |= (1 << 3);
+    
+    enable_venc(false);
+    
+    display_on = false;
 }
-
-#endif /* ENABLE_DISPLAY_FUNCS */
 
 
 void lcd_enable(bool on)
 {
+/* Disabled until properly working */
+return;
     if (on == display_on)
-    return;
+        return;
 
     if (on)
     {
-        display_on = true; /*TODO: remove me! */
-        //lcd_display_on();  /* Turn on display */
+        lcd_display_on(false);  /* Turn on display */
         lcd_update();      /* Resync display */
     }
     else
     {
-        display_on = false; /*TODO: remove me! */
-        //lcd_display_off();  /* Turn off display */
+        lcd_display_off();  /* Turn off display */
     }
 }
 
@@ -239,56 +266,64 @@ bool lcd_get_direct_fb(void)
     return direct_fb_access;
 }
 
-void lcd_init_device(void)
+static bool _lcd_enabled(void)
 {
-    /* Based on lcd-mr500.c from Catalin Patulea */
-    unsigned int addr;
+    /* Needed to detect if VENC/LCD already is initialized... */
+    if(IO_VID_ENC_VDCTL & VENC_VDCTL_VCLKE)
+        return true;
+    else if(!(IO_VID_ENC_VDCTL & VENC_VDCTL_YCDC))
+        return true;
+    else if(IO_CLK_MOD1 & CLK_MOD1_VENC)
+        return true;
+    else if(IO_CLK_MOD1 & CLK_MOD1_OSD)
+        return true;
+    else
+        return false;
+}
 
+void lcd_init_device(void)
+{    
+    if(!_lcd_enabled())
+    {
+        lcd_display_on(true);
+        
+        enable_venc(true);
+        
+        /* Set LCD values in Video Encoder */
+        IO_VID_ENC_VMOD &= 0x8800; /* Clear all values */
+        IO_VID_ENC_VMOD |= (VENC_VMOD_DACPD | VENC_VMOD_VMD | VENC_VMOD_ITLC | VENC_VMOD_VDMD(2)); /* set mode to RGB666 parallel 16 bit */
+        IO_VID_ENC_VDCTL &= 0x8FE8; /* Clear all values */
+        IO_VID_ENC_VDCTL |= (VENC_VDCTL_VCLKP | VENC_VDCTL_DOMD(2)),
+        IO_VID_ENC_VDPRO = VENC_VDPRO_PFLTR;
+        IO_VID_ENC_SYNCTL &= 0xE000; /* Clear all values */
+        IO_VID_ENC_SYNCTL |= (VENC_SYNCTL_VPL | VENC_SYNCTL_HPL);
+        IO_VID_ENC_HSDLY = 0;
+        IO_VID_ENC_HSPLS = 0x12;
+        IO_VID_ENC_HSTART = 0x1B;
+        IO_VID_ENC_HVALID = 0x140;
+        IO_VID_ENC_HINT = 0x168;
+        IO_VID_ENC_VSDLY = 0;
+        IO_VID_ENC_VSPLS = 3;
+        IO_VID_ENC_VSTART = 5;
+        IO_VID_ENC_VVALID = 0xF0;
+        IO_VID_ENC_VINT = 0x118;
+        IO_VID_ENC_RGBCTL &= 0x088; /* Clear all values */
+        IO_VID_ENC_RGBCTL |= VENC_RGBCTL_DFLTR;
+        IO_VID_ENC_RGBCLP = VENC_RGBCLP_UCLIP(0xFF);
+        IO_VID_ENC_LCDOUT &= 0xFE00; /* Clear all values */
+        IO_VID_ENC_LCDOUT |= (VENC_LCDOUT_OEE | VENC_LCDOUT_FIDS);
+        IO_VID_ENC_DCLKCTL &= 0xC0C0; /* Clear all values */
+        IO_VID_ENC_DCLKCTL |= VENC_DCLKCTL_DCKEC;
+        IO_VID_ENC_DCLKPTN0 = 1;
+        DM320_REG(0x0864) = 0; /* ???? */
+    }
+    else
+        display_on = true;
+
+    /* Based on lcd-mr500.c from Catalin Patulea */
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
     
-#ifdef ENABLE_DISPLAY_FUNCS
-    lcd_display_on();
-    
-    /* Set OSD clock */
-    IO_CLK_MOD1 &= ~(CLK_MOD1_VENC | CLK_MOD1_OSD); /* disable OSD clock and VENC clock */
-    IO_CLK_O2DIV = 3;
-
-    IO_CLK_OSEL &= ~CLK_OSEL_O2SEL(0xF); /* reset 'General purpose clock output (GIO26, GIO34)' and */
-    IO_CLK_OSEL |= CLK_OSEL_O2SEL(4);    /* set to 'PLLIN clock' */
-
-    IO_CLK_SEL1 |= (CLK_SEL1_OSD | CLK_SEL1_VENC(7)); /* set to 'GP clock output 2 (GIO26, GIO34)' and turn on 'VENC clock' */
-    IO_CLK_MOD1 |= (CLK_MOD1_VENC | CLK_MOD1_OSD);    /* enable OSD clock and VENC clock */
-    
-    /* Set LCD values in Video Encoder */
-    IO_VID_ENC_VMOD &= 0x8800; /* Clear all values */
-    IO_VID_ENC_VMOD |= (VENC_VMOD_DACPD | VENC_VMOD_VMD | VENC_VMOD_ITLC | VENC_VMOD_VDMD(2)); /* set mode to RGB666 parallel 16 bit */
-    IO_VID_ENC_VDTL &= 0x8FE8; /* Clear all values */
-    IO_VID_ENC_VDCTL |= (VENC_VDCTL_VCLKP | VENC_VDCTL_DOMD(2)),
-    IO_VID_ENC_VPRO = VENC_VDPRO_PFLTR;
-    IO_VID_ENC_SYNCCTL &= 0xE000; /* Clear all values */
-    IO_VID_ENC_SYNCCTL |= (VENC_SYNCCTL_VPL | VENC_SYNCCTL_HPL);
-    IO_VID_ENC_HSDLY = 0;
-    IO_VID_ENC_HSPLS = 0x12;
-    IO_VID_ENC_HSTART = 0x1B;
-    IO_VID_ENC_HVALID = 0x140;
-    IO_VID_ENC_HINT = 0x168;
-    IO_VID_ENC_VSDLY = 0;
-    IO_VID_ENC_VSPLS = 3;
-    IO_VID_ENC_VSTART = 5;
-    IO_VID_ENC_VVALID = 0xF0;
-    IO_VID_ENC_VINT = 0x118;
-    IO_VID_ENC_RGBCTL &= 0x088; /* Clear all values */
-    IO_VID_ENC_RGBCTL |= VENC_RGBCTL_DFLTR;
-    IO_VID_ENC_RGBCLP = VENC_RGBCLP_UCLIP(0xFF);
-    IO_VID_ENC_LCDOUT &= 0xFE00; /* Clear all values */
-    IO_VID_ENC_LCDOUT |= (VENC_LCDOUT_OEE | VENC_LCDOUT_FIDS);
-    IO_VID_ENC_DCLKCTL &= 0xC0C0; /* Clear all values */
-    IO_VID_ENC_DCLKCTL |= VENC_DCLKCTL_DCKEC;
-    IO_VID_ENC_DCLKPTN0 = 1;
-    DM320_REG(0x0864) = 0; /* ???? */  
-#endif
-
     IO_OSD_MODE = 0x00ff;
     IO_OSD_VIDWINMD = 0x0002;
     IO_OSD_OSDWINMD0 = 0x2001;
@@ -296,6 +331,7 @@ void lcd_init_device(void)
     IO_OSD_ATRMD = 0x0000;
     IO_OSD_RECTCUR = 0x0000;
 
+    unsigned int addr;
     IO_OSD_OSDWIN0OFST = (LCD_WIDTH*16) / 256;
     addr = ((unsigned int)FRAME-CONFIG_SDRAM_START) / 32;
     IO_OSD_OSDWINADH = addr >> 16;
@@ -314,18 +350,14 @@ void lcd_init_device(void)
     IO_OSD_OSDWIN0XL = LCD_WIDTH;
     IO_OSD_OSDWIN0YL = LCD_HEIGHT;
 
-#ifdef ENABLE_DISPLAY_FUNCS
     IO_VID_ENC_VDCTL |= VENC_VDCTL_VCLKE; /* Enable VCLK */
     IO_VID_ENC_VMOD |= VENC_VMOD_VENC; /* Enable video encoder */
-    IO_VID_ENC_SYNCCTL |= VENC_SYNCCTL_SYE; /* Enable sync output */
+    IO_VID_ENC_SYNCTL |= VENC_SYNCTL_SYE; /* Enable sync output */
     IO_VID_ENC_VDCTL &= ~VENC_VDCTL_DOMD(3); /* Normal digital data output */
-#endif
 }
 
 
 /*** Update functions ***/
-
-
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
