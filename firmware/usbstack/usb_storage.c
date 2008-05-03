@@ -27,6 +27,7 @@
 #include "disk.h"
 /* Needed to get at the audio buffer */
 #include "audio.h"
+#include "usb_storage.h"
 
 
 #ifdef USB_STORAGE

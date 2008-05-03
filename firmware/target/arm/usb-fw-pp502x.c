@@ -29,6 +29,7 @@
 #include "string.h"
 #include "usb_core.h"
 #include "usb_drv.h"
+#include "usb-target.h"
 
 void usb_init_device(void)
 {

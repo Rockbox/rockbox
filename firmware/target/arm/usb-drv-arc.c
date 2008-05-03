@@ -26,6 +26,8 @@
 #include "usb_core.h"
 #include "kernel.h"
 #include "panic.h"
+#include "usb_drv.h"
+
 //#define LOGF_ENABLE
 #include "logf.h"
 
