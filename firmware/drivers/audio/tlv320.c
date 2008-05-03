@@ -16,13 +16,16 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include "logf.h"
 #include "system.h"
 #include "string.h"
 #include "audio.h"
 
-#ifdef CPU_COLDFIRE
+#if CONFIG_I2C == I2C_COLDFIRE
 #include "i2c-coldfire.h"
+#elif CONFIG_I2C == I2C_DM320
+#include "i2c-dm320.h"
 #endif
 #include "audiohw.h"
 
@@ -45,7 +48,7 @@ int tenthdb2master(int db)
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
     /* 1111111 == +6dB  (0x7f) */
     /* 1111001 == 0dB   (0x79) */
-    /* 0110000 == -73dB (0x30 */
+    /* 0110000 == -73dB (0x30) */
     /* 0101111 == mute  (0x2f) */
 
     if (db < VOLUME_MIN) {
@@ -56,7 +59,11 @@ int tenthdb2master(int db)
 }
 
 /* local functions and definations */
+#ifndef CREATIVE_ZVM
 #define TLV320_ADDR 0x34
+#else
+#define TLV320_ADDR 0x1A
+#endif
 
 struct tlv320_info
 {
@@ -75,8 +82,10 @@ static void tlv320_write_reg(unsigned reg, unsigned value)
     data[0] = (reg << 1) | ((value >> 8) & 1);
     data[1] = value;
 
-#ifdef CPU_COLDFIRE
+#if CONFIG_I2C == I2C_COLDFIRE
     if (i2c_write(I2C_IFACE_0, TLV320_ADDR, data, 2) != 2)
+#elif CONFIG_I2C == I2C_DM320
+    if (i2c_write(TLV320_ADDR, data, 2) != 0)
 #else
     #warning Implement tlv320_write_reg()
 #endif
@@ -95,6 +104,7 @@ static void tlv320_write_reg(unsigned reg, unsigned value)
  */
 void audiohw_init(void)
 {
+    logf("TLV320 init");
     memset(tlv320_regs, 0, sizeof(tlv320_regs));
 
     /* Initialize all registers */
@@ -106,7 +116,11 @@ void audiohw_init(void)
     audiohw_mute(true);
     tlv320_write_reg(REG_AAP, AAP_DAC | AAP_MICM);
     tlv320_write_reg(REG_DAP, 0x00);  /* No deemphasis */
+#ifndef CREATIVE_ZVM
     tlv320_write_reg(REG_DAIF, DAIF_IWL_16 | DAIF_FOR_I2S);
+#else
+    tlv320_write_reg(REG_DAIF, DAIF_IWL_16 | DAIF_FOR_DSP);
+#endif
     tlv320_write_reg(REG_DIA, DIA_ACT);
     audiohw_set_frequency(-1); /* default */
 }

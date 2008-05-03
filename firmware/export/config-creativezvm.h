@@ -48,7 +48,7 @@
 #define HAVE_TAGCACHE
 
 /* define this if the target has volume keys which can be used in the lists */
-#define HAVE_VOLUME_IN_LIST
+//#define HAVE_VOLUME_IN_LIST
 
 /* LCD dimensions */
 #define CONFIG_LCD LCD_CREATIVEZVM
@@ -99,8 +99,10 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-/* Define this if you have the TLV320 audio codec */
-//#define HAVE_TLV320
+/* Define this if you have the TLV320 audio codec -> controlled by the DSP */
+#define HAVE_TLV320
+
+#define CONFIG_I2C I2C_DM320
 
 /* TLV320 has no tone controls, so we use the software ones */
 //#define HAVE_SW_TONE_CONTROLS
@@ -108,7 +110,7 @@
 /*#define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
     SAMPR_CAP_11)*/
 
-#define BATTERY_CAPACITY_DEFAULT 1100 /* default battery capacity */
+#define BATTERY_CAPACITY_DEFAULT 1250 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 500        /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 2500        /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 100         /* capacity increment */
@@ -121,11 +123,6 @@
 
 /* Define this if you have a TI TMS320DM320 */
 #define CONFIG_CPU DM320
-
-/* Define this if you have a Texas Instruments TSC2100 touch screen */
-//#define HAVE_TSC2100
-
-#define CONFIG_USBOTG	USBOTG_ISP1583
 
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
@@ -158,11 +155,10 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
+#define CONFIG_USBOTG	USBOTG_ISP1583
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x041e 
 #define USB_PRODUCT_ID 0x4133
-
-#define USB_SERIAL
 
 //DEBUGGING!
 #ifdef BOOTLOADER
