@@ -26,6 +26,7 @@
 #include "isp1583.h"
 #include "thread.h"
 #include "logf.h"
+#include <stdio.h>
 
 #define DIR_RX                      0
 #define DIR_TX                      1
@@ -149,7 +150,7 @@ static void usb_enable_endpoint(int idx)
     
     endpoints[epidx_n(idx)].enabled[epidx_dir(idx)] = 1;
 }
-
+/*
 static void usb_disable_endpoint(int idx, bool set_struct)
 {
     usb_select_endpoint(idx);
@@ -159,7 +160,7 @@ static void usb_disable_endpoint(int idx, bool set_struct)
     if(set_struct)
         endpoints[epidx_n(idx)].enabled[epidx_dir(idx)] = 0;
 }
-
+*/
 static int usb_get_packet(unsigned char *buf, int max_len)
 {
     int len, i;
@@ -389,7 +390,7 @@ void usb_helper(void)
     if(ISP1583_GEN_INT_READ & ISP1583_INIT_INTEN_READ)
     {
     #ifdef DEBUG
-        //logf("Helper detected interrupt... [%d]", current_tick);
+        logf("Helper detected interrupt... [%d]", current_tick);
     #endif
         usb_drv_int();
     }
@@ -710,6 +711,53 @@ void usb_drv_set_address(int address)
     ZVM_SPECIFIC;
     
     usb_status_ack(0, DIR_TX);
+}
+
+int dbg_usb_num_items(void)
+{
+    return 2+NUM_ENDPOINTS*2;
+}
+
+char* dbg_usb_item(int selected_item, void *data, char *buffer, size_t buffer_len)
+{
+    if(selected_item < 2)
+    {
+        switch(selected_item)
+        {
+            case 0:
+                snprintf(buffer, buffer_len, "USB connected: %s", (usb_drv_connected() ? "Yes" : "No"));
+                return buffer;
+            case 1:
+                snprintf(buffer, buffer_len, "HS mode: %s", (high_speed_mode ? "Yes" : "No"));
+                return buffer;
+        }
+    }
+    else
+    {
+        int n = ep_index((selected_item - 2) / 2, (selected_item - 2) % 2);
+        if(endpoints[n].enabled == false)
+            snprintf(buffer, buffer_len, "EP%d[%s]: DISABLED", epidx_n(n), (epidx_dir(n) ? "TX" : "RX"));
+        else
+        {
+            if(epidx_dir(n))
+            {
+                if(endpoints[n].out_in_progress)
+                    snprintf(buffer, buffer_len, "EP%d[TX]: TRANSFERRING DATA -> %d bytes/%d bytes", epidx_n(n), (endpoints[n].out_len - endpoints[n].out_ptr), endpoints[n].out_len);
+                else
+                    snprintf(buffer, buffer_len, "EP%d[TX]: STANDBY", epidx_n(n));
+            }
+            else
+            {
+                if(endpoints[n].in_buf && !endpoints[n].in_ack)
+                    snprintf(buffer, buffer_len, "EP%d[RX]: RECEIVING DATA -> %d bytes/%d bytes", epidx_n(n), endpoints[n].in_ptr, endpoints[n].in_max_len);
+                else
+                    snprintf(buffer, buffer_len, "EP%d[RX]: STANDBY", epidx_n(n));
+            }
+        }
+        return buffer;
+    }
+    return NULL;
+    (void)data;
 }
 
 void usb_drv_set_test_mode(int mode)

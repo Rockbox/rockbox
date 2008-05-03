@@ -2396,6 +2396,54 @@ static bool usb_reconnect(void)
 }
 #endif
 
+#if CONFIG_USBOTG == USBOTG_ISP1583
+extern int dbg_usb_num_items(void);
+extern char* dbg_usb_item(int selected_item, void *data, char *buffer, size_t buffer_len);
+
+static int isp1583_action_callback(int action, struct gui_synclist *lists)
+{
+    (void)lists;
+    if (action == ACTION_NONE)
+        action = ACTION_REDRAW;
+    return action;
+}
+
+static bool dbg_isp1583(void)
+{
+    struct simplelist_info isp1583;
+    simplelist_info_init(&isp1583, "ISP1583", dbg_usb_num_items(), NULL);
+    isp1583.timeout = HZ/100; 
+    isp1583.hide_selection = true;
+    isp1583.get_name = dbg_usb_item;
+    isp1583.action_callback = isp1583_action_callback;
+    return simplelist_show_list(&isp1583);
+}
+#endif
+
+#ifdef CREATIVE_ZVM
+extern int pic_dbg_num_items(void);
+extern char* pic_dbg_item(int selected_item, void *data, char *buffer, size_t buffer_len);
+
+static int pic_action_callback(int action, struct gui_synclist *lists)
+{
+    (void)lists;
+    if (action == ACTION_NONE)
+        action = ACTION_REDRAW;
+    return action;
+}
+
+static bool dbg_pic(void)
+{
+    struct simplelist_info pic;
+    simplelist_info_init(&pic, "PIC", pic_dbg_num_items(), NULL);
+    pic.timeout = HZ/100; 
+    pic.hide_selection = true;
+    pic.get_name = pic_dbg_item;
+    pic.action_callback = pic_action_callback;
+    return simplelist_show_list(&pic);
+}
+#endif
+
 
 /****** The menu *********/
 struct the_menu_item {
@@ -2471,6 +2519,12 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
         { "Write back EEPROM", dbg_write_eeprom },
+#endif
+#if CONFIG_USBOTG == USBOTG_ISP1583
+        { "View ISP1583 info", dbg_isp1583 },
+#endif
+#ifdef CREATIVE_ZVM
+        { "View PIC info", dbg_pic },
 #endif
 #ifdef ROCKBOX_HAS_LOGF
         {"logf", logfdisplay },

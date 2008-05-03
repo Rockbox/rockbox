@@ -25,7 +25,6 @@
 #include "button-target.h"
 #include "i2c-dm320.h"
 
-
 #include "lcd-target.h"
 #include "lcd.h"
 #include "sprintf.h"
@@ -46,8 +45,10 @@
 #define BTN_REL                         1
 
 #define BTN_TOUCHPAD_PRESS              0x1F00
+#define BTN_TOUCHPAD_SCROLL_DOWN        0x0F03
 #define BTN_TOUCHPAD_CORNER_DOWN        0xAF00
 #define BTN_TOUCHPAD_CORNER_UP          0x3F00
+#define BTN_TOUCHPAD_SCROLL_UP          0x0F04
 
 #define HEADPHONE_PLUGIN_A              0x5707
 #define HEADPHONE_PLUGIN_B              0x5F07
@@ -176,6 +177,9 @@ static bool sw = false;
 
 void GIO0(void)
 {
+    /* Mask GIO0 interrupt */
+    IO_INTC_IRQ1 = INTR_IRQ1_EXT0;
+    
     unsigned char msg[4];
     i2c_read(PIC_ADR, msg, sizeof(msg));
     tick_diff = current_tick - last_tick;
@@ -200,6 +204,12 @@ void GIO0(void)
         map_button(BTN_TOUCHPAD_PRESS,       BUTTON_SELECT);
         map_button(BTN_TOUCHPAD_CORNER_DOWN, BUTTON_DOWN);
         map_button(BTN_TOUCHPAD_CORNER_UP,   BUTTON_UP);
+    case BTN_TOUCHPAD_SCROLL_DOWN:
+        btn = BUTTON_DOWN;
+        break;
+    case BTN_TOUCHPAD_SCROLL_UP:
+        btn = BUTTON_UP;
+        break;
     case BTN_HOLD:
         hold_switch = true;
         break;
@@ -252,8 +262,6 @@ void GIO0(void)
     lcd_update();
     sw = !sw;
 #endif
-    /* Mask GIO0 interrupt */
-    IO_INTC_IRQ1 = INTR_IRQ1_EXT0;
 }
 
 void send_command_to_pic(unsigned char in, unsigned char* out,
@@ -292,8 +300,7 @@ void button_init_device(void)
        it? */
     /* Enable GIO0 interrupt */
     IO_INTC_EINT1 |= INTR_EINT1_EXT0;
-    btn = nonbtn = pic_init_value = pic_init2_value = last_btn = hold_switch =
-        0;
+    btn=nonbtn=pic_init_value=pic_init2_value=last_btn=hold_switch=0;
     /* Initialize PIC */
     send_command_to_pic(1, (unsigned char *)&pic_init_value,
                         sizeof(pic_init_value));
@@ -301,27 +308,12 @@ void button_init_device(void)
                         sizeof(pic_init2_value));
 }
 
-int get_debug_info(int choice)
-{
-    switch(choice)
-    {
-        case 1:
-            return pic_init_value;
-        case 2:
-            return pic_init2_value;
-        case 3:
-            return last_btn;
-        case 4:
-            return nonbtn;
-        case 5:
-            return tick_diff;
-    }
-    return -1;
-}
-
 int button_read_device(void)
 {
-    return btn;
+    if(hold_switch)
+        return 0;
+    else
+        return btn;
 }
 
 bool button_hold(void)
@@ -332,4 +324,45 @@ bool button_hold(void)
 bool button_usb_connected(void)
 {
     return (bool)(nonbtn & NONBUTTON_USB);
+}
+    
+int pic_dbg_num_items(void)
+{
+    return 13;
+}
+
+char* pic_dbg_item(int selected_item, void *data, char *buffer, size_t buffer_len)
+{
+    (void)data;
+    switch(selected_item)
+    {
+        case 0:
+            snprintf(buffer, buffer_len, "Init value 1: 0x%04x", pic_init_value);
+            return buffer;
+        case 1:
+            snprintf(buffer, buffer_len, "Init value 2: 0x%04x", pic_init2_value);
+            return buffer;
+        case 2:
+            snprintf(buffer, buffer_len, "Last button value: 0x%04x Raw value: 0x%04x", last_btn, btn);
+            return buffer;
+        case 3:
+            snprintf(buffer, buffer_len, "Last button differs in ticks: 0x%04x", tick_diff);
+            return buffer;
+        case 4:
+            snprintf(buffer, buffer_len, "Dock values: 0x%04x", nonbtn);
+            return buffer;
+        #define B(n,w,b)    case n: \
+                                    snprintf(buffer, buffer_len, "%s: 0x%04x", w, b); \
+                                    return buffer;
+        B(5,  "MASK_TV_OUT", MASK_TV_OUT(pic_init_value));
+        B(6,  "MASK_xx1",    MASK_xx1(pic_init_value));
+        B(7,  "MASK_xx2",    MASK_xx2(pic_init_value));
+        B(8,  "MASK_xx3",    MASK_xx3(pic_init_value));
+        B(9,  "MASK_xx4",    MASK_xx4(pic_init_value));
+        B(10, "MASK_xx5",    MASK_xx5(pic_init_value));
+        B(11, "MASK_xx6",    MASK_xx6(pic_init_value));
+        B(12, "MASK_xx7",    MASK_xx7(pic_init_value));
+        #undef B
+    }
+    return NULL;
 }

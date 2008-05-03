@@ -22,6 +22,7 @@
 
 #include "dm320.h"
 
+/* General purpose memory region #2 */
 #define ISP1583_IOBASE              0x60FFC000
 #define ISP1583_H_OVERRIDE
 

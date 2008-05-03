@@ -82,6 +82,13 @@ bool __dbg_hw_info(void)
     lcd_puts(0, line++, buf);
     snprintf(buf, sizeof(buf), " IO_CLK_MOD2: 0x%04x IO_CLK_LPCTL0: 0x%04x ", IO_CLK_MOD2, IO_CLK_LPCTL0);
     lcd_puts(0, line++, buf); 
+    lcd_puts(0, line++, "Interrupt info:");
+    snprintf(buf, sizeof(buf), " IO_INTC_EINT0: 0x%04x IO_INTC_EINT1: 0x%04x ", IO_INTC_EINT0, IO_INTC_EINT1);
+    lcd_puts(0, line++, buf); 
+    snprintf(buf, sizeof(buf), " IO_INTC_EINT2: 0x%04x IO_INTC_IRQ0: 0x%04x ", IO_INTC_EINT2, IO_INTC_IRQ0);
+    lcd_puts(0, line++, buf);
+    snprintf(buf, sizeof(buf), " IO_INTC_IRQ1: 0x%04x IO_INTC_IRQ2: 0x%04x ", IO_INTC_IRQ1, IO_INTC_IRQ2);
+    lcd_puts(0, line++, buf);
 #endif
 		
     lcd_puts(0, line++, "Board revision:");
@@ -130,17 +137,6 @@ bool __dbg_hw_info(void)
     else if(button & BUTTON_RIGHT)
         lcd_set_direct_fb(true);
     
-    lcd_puts(0, line++, "PIC info:");
-    snprintf(buf, sizeof(buf), " Init value 1: 0x%04x", get_debug_info(1));
-    lcd_puts(0, line++, buf);
-    snprintf(buf, sizeof(buf), " Init value 2: 0x%04x", get_debug_info(2));
-    lcd_puts(0, line++, buf);
-    snprintf(buf, sizeof(buf), " Last button value: 0x%04x Raw value: 0x%04x", get_debug_info(3), button_read_device());
-    lcd_puts(0, line++, buf);
-    snprintf(buf, sizeof(buf), " Last button at: 0x%04x", get_debug_info(5));
-    lcd_puts(0, line++, buf);
-    snprintf(buf, sizeof(buf), " Dock values: 0x%04x", get_debug_info(4));
-    lcd_puts(0, line++, buf);
     lcd_puts(0, line++, "LCD info:");
     snprintf(buf, sizeof(buf), " LCD direct FB access? %s", (lcd_get_direct_fb() ? "yes" : "no"));
     lcd_puts(0, line++, buf);
