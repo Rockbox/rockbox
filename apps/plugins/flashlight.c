@@ -139,7 +139,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef HAVE_LCD_COLOR
     do 
     {
-        if((cs < 0) || (cs >= NUM_COLORSETS))
+        if(cs < 0)
+            cs = NUM_COLORSETS-1;
+        if(cs >= NUM_COLORSETS)
             cs = 0;
         rb->lcd_set_background( LCD_RGBPACK( colorset[cs][0],
                                 colorset[cs][1],
