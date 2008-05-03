@@ -688,11 +688,12 @@ static void nand_test(void)
 
 
 /* API Functions */
-
+#if 0 /* currently unused */
 static void ata_led(bool onoff)
 {
     led(onoff);
 }
+#endif
 
 int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
