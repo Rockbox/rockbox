@@ -27,6 +27,7 @@
 #include "rbunicode.h"
 #include "arabjoin.h"
 #include "scroll_engine.h"
+#include "bidi.h"
 
 /* #define _HEB_BUFFER_LENGTH (MAX_PATH + LCD_WIDTH/2 + 3 + 2 + 2) * 2 */
 #define _HEB_BLOCK_TYPE_ENG 1
@@ -40,7 +41,7 @@
 #define _isnewline(c) ((c=='\n' || c=='\r') ? 1 : 0)
 #define XOR(a,b) ((a||b) && !(a&&b))
 
-const arab_t * arab_lookup(unsigned short uchar)
+static const arab_t * arab_lookup(unsigned short uchar)
 {
     if (uchar >= 0x621 && uchar <= 0x63a)
         return &(jointable[uchar - 0x621]);
@@ -53,8 +54,8 @@ const arab_t * arab_lookup(unsigned short uchar)
     return 0;
 }
 
-void arabjoin(unsigned short * stringprt, int length){
-
+static void arabjoin(unsigned short * stringprt, int length)
+{
     bool connected = false;
     unsigned short * writeprt = stringprt;
 

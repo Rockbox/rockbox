@@ -927,7 +927,7 @@ void dsp_set_eq(bool enable)
     set_gain(&audio_dsp);
 }
 
-void dsp_set_stereo_width(int value)
+static void dsp_set_stereo_width(int value)
 {
     long width, straight, cross;
     
@@ -1023,7 +1023,7 @@ static void channels_process_sound_chan_karaoke(int count, int32_t *buf[])
 }
 #endif /* DSP_HAVE_ASM_SOUND_CHAN_KARAOKE */
 
-void dsp_set_channel_config(int value)
+static void dsp_set_channel_config(int value)
 {
     static const channels_process_fn_type channels_process_functions[] =
     {

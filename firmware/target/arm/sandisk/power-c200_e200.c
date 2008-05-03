@@ -23,6 +23,7 @@
 #include "i2c-pp.h"
 #include "tuner.h"
 #include "as3514.h"
+#include "power.h"
 
 void power_init(void)
 {

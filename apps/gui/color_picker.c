@@ -32,6 +32,7 @@
 #include "splash.h"
 #include "action.h"
 #include "icon.h"
+#include "color_picker.h"
 
 /* structure for color info */
 struct rgb_pick

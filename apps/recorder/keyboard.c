@@ -34,6 +34,7 @@
 #include "icon.h"
 #include "pcmbuf.h"
 #include "lang.h"
+#include "keyboard.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0

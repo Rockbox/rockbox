@@ -1278,7 +1278,8 @@ MENUITEM_FUNCTION(radio_edit_preset_item, MENU_FUNC_CHECK_RETVAL,
 MENUITEM_FUNCTION(radio_delete_preset_item, MENU_FUNC_CHECK_RETVAL,
                     ID2P(LANG_FM_DELETE_PRESET), 
                     radio_delete_preset, NULL, NULL, Icon_NOICON);
-int radio_preset_callback(int action, const struct menu_item_ex *this_item)
+static int radio_preset_callback(int action,
+                                 const struct menu_item_ex *this_item)
 {
     if (action == ACTION_STD_OK)
         action = ACTION_EXIT_AFTER_THIS_MENUITEM;

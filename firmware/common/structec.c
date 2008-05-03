@@ -109,7 +109,7 @@ void structec_convert(void *structure, const char *ecinst,
  * @param ecinst endianess correction string.
  * @return length of the struct in bytes.
  */
-size_t structec_size(const char *ecinst)
+static size_t structec_size(const char *ecinst)
 {
     size_t size = 0;
     

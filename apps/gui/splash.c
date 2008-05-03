@@ -25,6 +25,7 @@
 #include "lang.h"
 #include "settings.h"
 #include "talk.h"
+#include "splash.h"
 
 #ifndef MAX
 #define MAX(a, b) (((a)>(b))?(a):(b))
@@ -185,7 +186,7 @@ static void splash(struct screen * screen, const char *fmt, va_list ap)
 }
 
 void gui_splash(struct screen * screen, int ticks, 
-                const unsigned char *fmt, ...)
+                const char *fmt, ...)
 {
     va_list ap;
     va_start( ap, fmt );
@@ -196,21 +197,21 @@ void gui_splash(struct screen * screen, int ticks,
         sleep(ticks);
 }
 
-void gui_syncsplash(int ticks, const unsigned char *fmt, ...)
+void gui_syncsplash(int ticks, const char *fmt, ...)
 {
     va_list ap;
     int i;
 #if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
     long id;
     /* fmt may be a so called virtual pointer. See settings.h. */
-    if((id = P2ID(fmt)) >= 0)
+    if((id = P2ID((unsigned char *)fmt)) >= 0)
         /* If fmt specifies a voicefont ID, and voice menus are
            enabled, then speak it. */
         cond_talk_ids_fq(id);
 #endif
     /* If fmt is a lang ID then get the corresponding string (which
        still might contain % place holders). */
-    fmt = P2STR(fmt);
+    fmt = P2STR((unsigned char *)fmt);
     va_start( ap, fmt );
     FOR_NB_SCREENS(i)
         splash(&(screens[i]), fmt, ap);

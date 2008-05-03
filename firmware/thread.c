@@ -1657,7 +1657,7 @@ struct thread_entry *
  * catch something.
  *---------------------------------------------------------------------------
  */
-void check_for_obj_waiters(const char *function, struct thread_entry *thread)
+static void check_for_obj_waiters(const char *function, struct thread_entry *thread)
 {
     /* Only one bit in the mask should be set with a frequency on 1 which
      * represents the thread's own base priority */

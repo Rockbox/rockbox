@@ -37,7 +37,7 @@
 #include "backdrop.h"
 
 #ifdef HAVE_BACKLIGHT
-int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
+static int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
@@ -55,7 +55,7 @@ int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item
 }
 #endif
 #ifdef HAVE_LCD_BITMAP
-int flipdisplay_callback(int action,const struct menu_item_ex *this_item)
+static int flipdisplay_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
@@ -251,7 +251,7 @@ MENUITEM_SETTING(list_accel_start_delay,
 MENUITEM_SETTING(list_accel_wait, &global_settings.list_accel_wait, NULL);
 #endif /* HAVE_SCROLLWHEEL */
 #ifdef HAVE_LCD_BITMAP
-int screenscroll_callback(int action,const struct menu_item_ex *this_item)
+static int screenscroll_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
@@ -294,7 +294,7 @@ MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
 /***********************************/
 /*    BARS MENU                    */
 #ifdef HAVE_LCD_BITMAP
-int statusbar_callback(int action,const struct menu_item_ex *this_item)
+static int statusbar_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)
@@ -328,7 +328,7 @@ MAKE_MENU(bars_menu, ID2P(LANG_BARS_MENU), 0, Icon_NOICON,
 /*    PEAK METER MENU              */
 
 #ifdef HAVE_LCD_BITMAP
-int peakmeter_callback(int action,const struct menu_item_ex *this_item)
+static int peakmeter_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
     switch (action)

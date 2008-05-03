@@ -354,7 +354,7 @@ MENUITEM_RETURNVALUE(db_browser, ID2P(LANG_TAGCACHE), GO_TO_DBBROWSER,
 #endif
 MENUITEM_RETURNVALUE(rocks_browser, ID2P(LANG_PLUGINS), GO_TO_BROWSEPLUGINS, 
                         NULL, Icon_Plugin);
-char *get_wps_item_name(int selected_item, void * data, char *buffer)
+static char *get_wps_item_name(int selected_item, void * data, char *buffer)
 {
     (void)selected_item; (void)data; (void)buffer;
     if (audio_status())

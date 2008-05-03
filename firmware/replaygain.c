@@ -27,6 +27,7 @@
 #include <system.h>
 #include "id3.h"
 #include "debug.h"
+#include "replaygain.h"
 
 /* The fixed point math routines (with the exception of fp_atof) are based
  * on oMathFP by Dan Carter (http://orbisstudios.com).

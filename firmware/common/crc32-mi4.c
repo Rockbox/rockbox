@@ -37,7 +37,7 @@
 
 /* based on implementation by Finn Yannick Jacobs */
 
-
+#include "crc32-mi4.h"
 
 /* crc_tab[] -- this crcTable is being build by chksum_crc32GenTab().
  *      so make sure, you call it before using the other

@@ -73,6 +73,8 @@
 #include "settings.h"
 #include "dir.h"
 #include "structec.h"
+#include "tagcache.h"
+
 #ifndef __PCTOOL__
 #include "splash.h"
 #include "lang.h"

@@ -36,6 +36,7 @@ static char debugbuf[400];
 #ifndef SIMULATOR /* allow non archos platforms to display output */
 #include "kernel.h"
 #include "system.h"
+#include "debug.h"
 
 #ifdef DEBUG
 #if CONFIG_CPU == SH7034 /* these are still very SH-oriented */

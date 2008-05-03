@@ -23,6 +23,7 @@
 #include "debug.h"
 #include "system.h"
 #include "audio.h"
+#include "sound.h"
 
 #include "audiohw.h"
 #include "i2s.h"

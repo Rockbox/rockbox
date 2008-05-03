@@ -38,6 +38,7 @@
 #include "misc.h"
 #include "talk.h"
 #include "viewport.h"
+#include "list.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 #define SCROLL_LIMIT 1

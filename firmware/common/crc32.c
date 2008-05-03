@@ -19,6 +19,8 @@
 
 /* Code copied from firmware_flash plugin. */
 
+#include "crc32.h"
+
 /* Tool function to calculate a CRC32 across some buffer */
 /* third argument is either 0xFFFFFFFF to start or value from last piece */
 unsigned crc_32(const void *src, unsigned len, unsigned crc32)

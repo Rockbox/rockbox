@@ -64,7 +64,7 @@
 
 /* draws the statusbar on the given wps-screen */
 #ifdef HAVE_LCD_BITMAP
-void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
+static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 {
     bool draw = global_settings.statusbar;
 

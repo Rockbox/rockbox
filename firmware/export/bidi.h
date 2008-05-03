@@ -17,5 +17,8 @@
  *
  ****************************************************************************/
 #ifndef BIDI_H
+#define BIDI_H
+
 extern unsigned short *bidi_l2v(const unsigned char *str, int orientation);
-#endif
+
+#endif /* BIDI_H */

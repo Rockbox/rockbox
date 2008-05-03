@@ -282,7 +282,7 @@ static int talk_menu_item(int selected_item, void *data)
 }
 /* this is used to reload the default menu viewports when the
    theme changes. nothing happens if the menu is using a supplied parent vp */
-void init_default_menu_viewports(struct viewport parent[NB_SCREENS], bool hide_bars)
+static void init_default_menu_viewports(struct viewport parent[NB_SCREENS], bool hide_bars)
 {
     int i;
     FOR_NB_SCREENS(i)

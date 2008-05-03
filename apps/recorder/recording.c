@@ -66,6 +66,8 @@
 #include "screen_access.h"
 #include "action.h"
 #include "radio.h"
+#include "sound_menu.h"
+
 #ifdef HAVE_RECORDING
 /* This array holds the record timer interval lengths, in seconds */
 static const unsigned long rec_timer_seconds[] =

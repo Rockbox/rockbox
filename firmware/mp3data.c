@@ -307,8 +307,8 @@ static void buf_init(void)
     fnf_read_index = 0;
 }
 
-unsigned long buf_find_next_frame(int fd, long *offset, long max_offset,
-                                  unsigned long last_header)
+static unsigned long buf_find_next_frame(int fd, long *offset, long max_offset,
+                                         unsigned long last_header)
 {
     return __find_next_frame(fd, offset, max_offset, last_header, buf_getbyte);
 }
