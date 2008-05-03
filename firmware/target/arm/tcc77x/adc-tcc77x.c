@@ -24,48 +24,93 @@
 #include "string.h"
 #include "adc.h"
 
-/* 
-  TODO: We probably want to do this on the timer interrupt once we get
-        interrupts going - see the sh-adc.c implementation for an example which
-        looks like it should work well with the TCC77x.
-*/
+/**************************************************************************
+ ** The A/D conversion is done every tick, in three steps:
+ **
+ ** 1) On the tick interrupt, the conversion of channels 0-3 is started, and
+ **    the A/D interrupt is enabled.
+ **
+ ** 2) After the conversion is done, an interrupt
+ **    is generated at level 1, which is the same level as the tick interrupt
+ **    itself. This interrupt will be pending until the tick interrupt is
+ **    finished.
+ **    When the A/D interrupt is finally served, it will read the results
+ **    from the first conversion and start the conversion of channels 4-7.
+ **
+ ** 3) When the conversion of channels 4-7 is finished, the interrupt is
+ **    triggered again, and the results are read. This time, no new
+ **    conversion is started, it will be done in the next tick interrupt.
+ **
+ ** Thus, each channel will be updated HZ times per second.
+ **
+ *************************************************************************/
 
+static int channel_group;
 static unsigned short adcdata[8];
 
-static void adc_do_read(void)
+/* Tick task */
+static void adc_tick(void)
 {
+    /* Start a conversion of channels 0-3. This will trigger an interrupt,
+       and the interrupt handler will take care of channels 4-7. */
+
     int i;
-    uint32_t adc_status;
 
     PCLKCFG6 |= (1<<15);   /* Enable ADC clock */
+
+    channel_group = 0;
 
     /* Start converting the first 4 channels */
     for (i = 0; i < 4; i++)
         ADCCON = i;
 
-    /* Wait for data to become stable */
-    while ((ADCDATA & 0x1) == 0);
+}
 
-    /* Now read the values back */
-    for (i=0;i < 4; i++) {
+/* IRQ handler */
+void ADC(void)
+{
+    int num;
+    int i;
+    uint32_t adc_status;
+
+    do
+    {
         adc_status = ADCSTATUS;
-        adcdata[(adc_status >> 16) & 0x7] = adc_status & 0x3ff;
-    }
+        num = (adc_status>>24) & 7;
+        if (num) adcdata[(adc_status >> 16) & 0x7] = adc_status & 0x3ff;
+    } while (num);
 
-    PCLKCFG6 &= ~(1<<15);   /* Disable ADC clock */
+
+    if (channel_group == 0)
+    {
+        /* Start conversion of channels 4-7 */
+        for (i = 4; i < 8; i++)
+            ADCCON = i;
+
+        channel_group = 1;
+    }
+    else
+    {
+        PCLKCFG6 &= ~(1<<15);   /* Disable ADC clock */
+    }
 }
 
 unsigned short adc_read(int channel)
 {
-    adc_do_read();
-
     return adcdata[channel];
 }
 
 void adc_init(void)
 {
-    int i;
-
     ADCCON = (1<<4);         /* Leave standby mode */
-    ADCCFG |= 0x00000003;    /* Single-mode, auto power-down */
+
+    /* IRQ enable, auto power-down, single-mode */
+    ADCCFG |= (1<<3) | (1<<1) | (1<<0);
+
+    /* Unmask ADC IRQ */
+    IEN |= ADC_IRQ_MASK;
+
+    tick_add_task(adc_tick);
+
+    sleep(2);   /* Ensure adc_data[] contains data before returning */
 }

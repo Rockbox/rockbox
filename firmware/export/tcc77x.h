@@ -82,6 +82,7 @@
 /* IRQ Controller */
 
 #define TIMER0_IRQ_MASK (1<<6)
+#define ADC_IRQ_MASK (1<<16)
 
 #define IEN      (*(volatile unsigned long *)0x80000100)
 #define CREQ     (*(volatile unsigned long *)0x80000104)

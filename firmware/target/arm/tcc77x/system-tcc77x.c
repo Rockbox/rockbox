@@ -21,7 +21,9 @@
 #include "system.h"
 #include "panic.h"
 
+/* Externally defined interrupt handlers */
 extern void TIMER(void);
+extern void ADC(void);
 
 void irq(void)
 {
@@ -29,13 +31,11 @@ void irq(void)
     CREQ = irq;     /* Clears the corresponding IRQ status */
 
     if (irq & TIMER0_IRQ_MASK)
-    {
         TIMER();
-    }
+    else if (irq & ADC_IRQ_MASK)
+        ADC();
     else
-    {
         panicf("Unhandled IRQ 0x%08X", irq);
-    }
 }
 
 void fiq_handler(void)
