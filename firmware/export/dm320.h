@@ -411,9 +411,9 @@
 #define IO_CLK_LPCTL0             DM320_REG(0x089E)
 #define IO_CLK_LPCTL1             DM320_REG(0x08A0)
 #define IO_CLK_OSEL               DM320_REG(0x08A2)
-#define IO_CLK_00DIV              DM320_REG(0x08A4)
+#define IO_CLK_O0DIV              DM320_REG(0x08A4)
 #define IO_CLK_O1DIV              DM320_REG(0x08A6)
-#define IO_CLK_02DIV              DM320_REG(0x08A8)
+#define IO_CLK_O2DIV              DM320_REG(0x08A8)
 #define IO_CLK_PWM0C              DM320_REG(0x08AA)
 #define IO_CLK_PWM0H              DM320_REG(0x08AC)
 #define IO_CLK_PWM1C              DM320_REG(0x08AE)
@@ -838,6 +838,15 @@
 #define CLK_MOD2_TMR0                  (1 << 1)
 #define CLK_MOD2_WDT                   (1 << 0)
 
+#define CLK_SEL1_OSD                   (1 << 12)
+#define CLK_SEL1_CCD                   (1 << 8)
+#define CLK_SEL1_VENCPLL               (1 << 4)
+#define CLK_SEL1_VENC(x)               (x << 0)
+
+#define CLK_OSEL_O2SEL(x)              (x << 8)
+#define CLK_OSEL_O1SEL(x)              (x << 4)
+#define CLK_OSEL_O0SEL(x)              (x << 0)
+
 /*
  *  IO_EINTx bits
  */
@@ -904,5 +913,91 @@
 #define INTR_IRQ1_EXT0        INTR_EINT1_EXT0
 #define INTR_IRQ1_EXT2        INTR_EINT1_EXT2
 #define INTR_IRQ1_EXT7        INTR_EINT1_EXT7
+
+/*
+* HPIBCTL bits
+*/
+#define HPIBCTL_DBIO          (1 << 10)
+#define HPIBCTL_DHOLD         (1 << 9)
+#define HPIBCTL_DRST          (1 << 8)
+#define HPIBCTL_DINT0         (1 << 7)
+#define HPIBCTL_EXCHG         (1 << 5)
+#define HPIBCTL_HPNMI         (1 << 3)
+#define HPIBCTL_HPIEN         (1 << 0)
+
+/*
+* Video Encoder bits
+*/
+#define VENC_VMOD_VDMD(x)     (x << 12)
+#define VENC_VMOD_ITLC        (1 << 10)
+#define VENC_VMOD_CBTYP       (1 << 9)
+#define VENC_VMOD_CBMD        (1 << 8)
+#define VENC_VMOD_NTPLS(x)    (x << 6)
+#define VENC_VMOD_SLAVE       (1 << 5)
+#define VENC_VMOD_VMD         (1 << 4)
+#define VENC_VMOD_BLNK        (1 << 3)
+#define VENC_VMOD_DACPD       (1 << 2)
+#define VENC_VMOD_VIE         (1 << 1)
+#define VENC_VMOD_VENC        (1 << 0)
+
+#define VENC_VDCTL_VCLKP      (1 << 14)
+#define VENC_VDCTL_VCLKE      (1 << 13)
+#define VENC_VDCTL_VCLKZ      (1 << 12)
+#define VENC_VDCTL_DOMD(x)    (x << 4)
+#define VENC_VDCTL_YCDC       (1 << 2)
+#define VENC_VDCTL_INPTRU     (1 << 1)
+#define VENC_VDCTL_YCDIR      (1 << 0)
+
+#define VENC_VDPRO_PFLTY(x)   (x << 12)
+#define VENC_VDPRO_PFLTR      (1 << 11)
+#define VENC_VDPRO_YCDLY(x)   (x << 8)
+#define VENC_VDPRO_RGBMAT     (1 << 7)
+#define VENC_VDPRO_ATRGB      (1 << 6)
+#define VENC_VDPRO_ATYCC      (1 << 5)
+#define VENC_VDPRO_ATCOM      (1 << 4)
+#define VENC_VDPRO_STUP       (1 << 3)
+#define VENC_VDPRO_CRCUT      (1 << 2)
+#define VENC_VDPRO_CUPS       (1 << 1)
+#define VENC_VDPRO_YUPS       (1 << 0)
+
+#define VENC_SYNCCTL_EXFEN    (1 << 12)
+#define VENC_SYNCCTL_EXFIV    (1 << 11)
+#define VENC_SYNCCTL_EXSYNC   (1 << 10)
+#define VENC_SYNCCTL_EXVIV    (1 << 9)
+#define VENC_SYNCCTL_EXHIV    (1 << 8)
+#define VENC_SYNCCTL_CSP      (1 << 7)
+#define VENC_SYNCCTL_CSE      (1 << 6)
+#define VENC_SYNCCTL_SYSW     (1 << 5)
+#define VENC_SYNCCTL_VSYNCS   (1 << 4)
+#define VENC_SYNCCTL_VPL      (1 << 3)
+#define VENC_SYNCCTL_HPL      (1 << 2)
+#define VENC_SYNCCTL_SYE      (1 << 1)
+#define VENC_SYNCCTL_SYDIR    (1 << 0)
+
+#define VENC_RGBCTL_IRONM     (1 << 11)
+#define VENC_RGBCTL_DFLTR     (1 << 10)
+#define VENC_RGBCTL_DFLTS(x)  (x << 8)
+#define VENC_RGBCTL_RGBEF(x)  (x << 4)
+#define VENC_RGBCTL_RGBOF(x)  (x << 0)
+
+#define VENC_RGBCLP_UCLIP(x)  (x << 8)
+#define VENC_RGBCLP_OFST(x)   (x << 0)
+
+#define VENC_LCDOUT_FIDS      (1 << 8)
+#define VENC_LCDOUT_FIDP      (1 << 7)
+#define VENC_LCDOUT_PWMP      (1 << 6)
+#define VENC_LCDOUT_PWME      (1 << 5)
+#define VENC_LCDOUT_ACE       (1 << 4)
+#define VENC_LCDOUT_BRP       (1 << 3)
+#define VENC_LCDOUT_BRE       (1 << 2)
+#define VENC_LCDOUT_OEP       (1 << 1)
+#define VENC_LCDOUT_OEE       (1 << 0)
+
+#define VENC_DCLKCTL_DOFST(x) (x << 12)
+#define VENC_DCLKCTL_DCKEC    (1 << 11)
+#define VENC_DCLKCTL_DCKME    (1 << 10)
+#define VENC_DCLKCTL_DCKOH    (1 << 9)
+#define VENC_DCLKCTL_DCKIH    (1 << 8)
+#define VENC_DCLKCTL_DCKPW(x) (x << 0)
 
 #endif

@@ -46,8 +46,7 @@ int lcd_default_contrast(void)
 
 void lcd_set_contrast(int val)
 {
-    /* iirc there is an ltv250qv command to do this */
-    #warning function not implemented
+    /* find S6F2002 controller datasheet first */
     (void)val;
 }
 
@@ -60,7 +59,6 @@ void lcd_set_flip(bool yesno) {
   (void) yesno;
   /* TODO: */
 }
-
 
 /* LTV250QV panel functions */
 #ifdef ENABLE_DISPLAY_FUNCS
@@ -161,14 +159,12 @@ static void lcd_display_on(void)
     lcd_write_reg(9,  0xA55);
     lcd_write_reg(10, 0x111A);
     sleep_ms(10);
-    
-    /*TODO: other stuff! */
 
     /* tell that we're on now */
     display_on = true;
 }
 
-static void lcd_display_off(void)
+void lcd_display_off(void)
 {
     display_on = false;
 
@@ -250,6 +246,48 @@ void lcd_init_device(void)
 
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
+    
+#ifdef ENABLE_DISPLAY_FUNCS
+    lcd_display_on();
+    
+    /* Set OSD clock */
+    IO_CLK_MOD1 &= ~(CLK_MOD1_VENC | CLK_MOD1_OSD); /* disable OSD clock and VENC clock */
+    IO_CLK_O2DIV = 3;
+
+    IO_CLK_OSEL &= ~CLK_OSEL_O2SEL(0xF); /* reset 'General purpose clock output (GIO26, GIO34)' and */
+    IO_CLK_OSEL |= CLK_OSEL_O2SEL(4);    /* set to 'PLLIN clock' */
+
+    IO_CLK_SEL1 |= (CLK_SEL1_OSD | CLK_SEL1_VENC(7)); /* set to 'GP clock output 2 (GIO26, GIO34)' and turn on 'VENC clock' */
+    IO_CLK_MOD1 |= (CLK_MOD1_VENC | CLK_MOD1_OSD);    /* enable OSD clock and VENC clock */
+    
+    /* Set LCD values in Video Encoder */
+    IO_VID_ENC_VMOD &= 0x8800; /* Clear all values */
+    IO_VID_ENC_VMOD |= (VENC_VMOD_DACPD | VENC_VMOD_VMD | VENC_VMOD_ITLC | VENC_VMOD_VDMD(2)); /* set mode to RGB666 parallel 16 bit */
+    IO_VID_ENC_VDTL &= 8FE8; /* Clear all values */
+    IO_VID_ENC_VDCTL |= (VENC_VDCTL_VCLKP | VENC_VDCTL_DOMD(2)),
+    IO_VID_ENC_VPRO = VENC_VDPRO_PFLTR;
+    IO_VID_ENC_SYNCCTL &= 0xE000; /* Clear all values */
+    IO_VID_ENC_SYNCCTL |= (VENC_SYNCCTL_VPL | VENC_SYNCCTL_HPL);
+    IO_VID_ENC_HSDLY = 0;
+    IO_VID_ENC_HSPLS = 0x12;
+    IO_VID_ENC_HSTART = 0x1B;
+    IO_VID_ENC_HVALID = 0x140;
+    IO_VID_ENC_HINT = 0x168;
+    IO_VID_ENC_VSDLY = 0;
+    IO_VID_ENC_VSPLS = 3;
+    IO_VID_ENC_VSTART = 5;
+    IO_VID_ENC_VVALID = 0xF0;
+    IO_VID_ENC_VINT = 0x118;
+    IO_VID_ENC_RGBCTL &= 0x088; /* Clear all values */
+    IO_VID_ENC_RGBCTL |= VENC_RGBCTL_DFLTR;
+    IO_VID_ENC_RGBCLP = VENC_RGBCLP_UCLIP(0xFF);
+    IO_VID_ENC_LCDOUT &= 0xFE00; /* Clear all values */
+    IO_VID_ENC_LCDOUT |= (VENC_LCDOUT_OEE | VENC_LCDOUT_FIDS);
+    IO_VID_ENC_DCLKCTL &= 0xC0C0; /* Clear all values */
+    IO_VID_ENC_DCLKCTL |= VENC_DCLKCTL_DCKEC;
+    IO_VID_ENC_DCLKPTN0 = 1;
+    DM320_REG(0x0864) = 0; /* ???? */  
+#endif
 
     IO_OSD_MODE = 0x00ff;
     IO_OSD_VIDWINMD = 0x0002;
@@ -264,35 +302,23 @@ void lcd_init_device(void)
     IO_OSD_OSDWIN0ADL = addr & 0xFFFF;
 
 #ifndef ZEN_VISION
-    IO_OSD_BASEPX=26;
-    IO_OSD_BASEPY=5;
+    IO_OSD_BASEPX = 26;
+    IO_OSD_BASEPY = 5;
 #else
-    IO_OSD_BASEPX=80;
-    IO_OSD_BASEPY=0;
+    IO_OSD_BASEPX = 80;
+    IO_OSD_BASEPY = 0;
 #endif
 
     IO_OSD_OSDWIN0XP = 0;
     IO_OSD_OSDWIN0YP = 0;
     IO_OSD_OSDWIN0XL = LCD_WIDTH;
     IO_OSD_OSDWIN0YL = LCD_HEIGHT;
-#if 0
-    /*TODO: set LCD clock! */
-    IO_CLK_MOD1 &= ~0x18; /* disable OSD clock and VENC clock */
-    IO_CLK_02DIV = 3;
 
-    /* reset 'General purpose clock output (GIO26, GIO34)' and set to 'PLLIN
-       clock' */
-    IO_CLK_OSEL = (IO_CLK_OSEL & ~0xF00) | 0x400;
-
-    /* set to 'GP clock output 2 (GIO26, GIO34)' and turn on 'VENC clock' */
-    IO_CLK_SEL1 = (IO_CLK_SEL1 | 7) | 0x1000;
-    IO_CLK_MOD1 |= 0x18; /* enable OSD clock and VENC clock */
-    
-    /* Set LCD values in OSD */
-    /* disable NTSC/PAL encoder & set mode to RGB666 parallel 18 bit */
-    IO_VID_ENC_VMOD = ( ( (IO_VID_ENC_VMOD & 0xFFFF8C00) | 0x14) | 0x2400 );
-    IO_VID_ENC_VDCTL = ( ( (IO_VID_ENC_VDCTL & 0xFFFFCFE8) | 0x20) | 0x4000 );
-    /* TODO: finish this... */
+#ifdef ENABLE_DISPLAY_FUNCS
+    IO_VID_ENC_VDCTL |= VENC_VDCTL_VCLKE; /* Enable VCLK */
+    IO_VID_ENC_VMOD |= VENC_VMOD_VENC; /* Enable video encoder */
+    IO_VID_ENC_SYNCCTL |= VENC_SYNCCTL_SYE; /* Enable sync output */
+    IO_VID_ENC_VDCTL &= ~VENC_VDCTL_DOMD(3); /* Normal digital data output */
 #endif
 }
 
