@@ -27,9 +27,128 @@
 #include "mc13783.h"
 #include "adc.h"
 
+#define CONFIG_CLK32_FREQ   32768
+#define CONFIG_HCLK_FREQ    27000000
+
+/* Return PLL frequency in HZ */
+static unsigned int decode_pll(unsigned int reg,
+                               unsigned int infreq)
+{
+    uint64_t mfi = (reg >> 10) & 0xf;
+    uint64_t mfn =  reg & 0x3ff;
+    uint64_t mfd = ((reg >> 16) & 0x3ff) + 1;
+    uint64_t pd =  ((reg >> 26) & 0xf) + 1;
+
+    mfi = mfi <= 5 ? 5 : mfi;
+
+    return 2*infreq*(mfi * mfd + mfn) / (mfd * pd);
+}
+
+/* Get the PLL reference clock frequency */
+static unsigned int get_pll_ref_clk_freq(void)
+{
+    if ((CLKCTL_CCMR & (3 << 1)) == (1 << 1))
+        return CONFIG_CLK32_FREQ * 1024;
+    else
+        return CONFIG_HCLK_FREQ;
+}
+
 bool __dbg_hw_info(void)
 {
-    return false;
+    char buf[50];
+    int line;
+    unsigned int pllref;
+    unsigned int mcu_pllfreq, ser_pllfreq, usb_pllfreq;
+    uint32_t mpctl, spctl, upctl;
+    unsigned int freq;
+    uint32_t regval;
+
+    lcd_setmargins(0, 0);
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+
+    while (1)
+    {
+        line = 0;
+        mpctl = CLKCTL_MPCTL;
+        spctl = CLKCTL_SPCTL;
+        upctl = CLKCTL_UPCTL;
+
+        pllref = get_pll_ref_clk_freq();
+
+        mcu_pllfreq = decode_pll(mpctl, pllref);
+        ser_pllfreq = decode_pll(spctl, pllref);
+        usb_pllfreq = decode_pll(upctl, pllref);
+
+        snprintf(buf, sizeof (buf), "pll_ref_clk: %u", pllref);
+        lcd_puts(0, line++, buf); line++;
+
+        /* MCU clock domain */
+        snprintf(buf, sizeof (buf), "MPCTL: %08lX", mpctl);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof (buf), " mpl_dpdgck_clk: %u", mcu_pllfreq);
+        lcd_puts(0, line++, buf); line++;
+
+        regval = CLKCTL_PDR0;
+        snprintf(buf, sizeof (buf), "  PDR0: %08lX", regval);
+        lcd_puts(0, line++, buf);
+
+        freq = mcu_pllfreq / (((regval & 0x7) + 1));
+        snprintf(buf, sizeof (buf), "   mcu_clk:      %u", freq);
+        lcd_puts(0, line++, buf);
+
+        freq = mcu_pllfreq / (((regval >> 11) & 0x7) + 1);
+        snprintf(buf, sizeof (buf), "   hsp_clk:      %u", freq);
+        lcd_puts(0, line++, buf);
+
+        freq = mcu_pllfreq / (((regval >> 3) & 0x7) + 1);
+        snprintf(buf, sizeof (buf), "   hclk_clk:     %u", freq);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof (buf), "   ipg_clk:      %u",
+            freq / (unsigned)(((regval >> 6) & 0x3) + 1));
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof (buf), "   nfc_clk:      %u",
+            freq / (unsigned)(((regval >> 8) & 0x7) + 1));
+        lcd_puts(0, line++, buf);
+
+        line++;
+
+        /* Serial clock domain */
+        snprintf(buf, sizeof (buf), "SPCTL: %08lX", spctl);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof (buf), " spl_dpdgck_clk: %u", ser_pllfreq);
+        lcd_puts(0, line++, buf);
+
+        line++;
+
+        /* USB clock domain */
+        snprintf(buf, sizeof (buf), "UPCTL: %08lX", upctl);
+        lcd_puts(0, line++, buf);
+
+        snprintf(buf, sizeof (buf), " upl_dpdgck_clk: %u", usb_pllfreq);
+        lcd_puts(0, line++, buf); line++;
+
+        regval = CLKCTL_PDR1;
+        snprintf(buf, sizeof (buf), "  PDR1: %08lX", regval);
+        lcd_puts(0, line++, buf);
+
+        freq = usb_pllfreq /
+            ((((regval >> 30) & 0x3) + 1) * (((regval >> 27) & 0x7) + 1));
+        snprintf(buf, sizeof (buf), "   usb_clk:       %u", freq);
+        lcd_puts(0, line++, buf);
+
+        freq = usb_pllfreq / (((CLKCTL_PDR0 >> 16) & 0x1f) + 1);
+        snprintf(buf, sizeof (buf), "   ipg_per_baud:  %u", freq);
+        lcd_puts(0, line++, buf);
+          
+        lcd_update();
+
+        if (button_get(true) == (DEBUG_CANCEL|BUTTON_REL))
+            return false;
+    }
 }
 
 bool __dbg_ports(void)

@@ -308,7 +308,7 @@ static void set_prescaled_volume(void)
     audiohw_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
 #endif
 
-#elif defined(HAVE_TLV320)
+#elif defined(HAVE_TLV320) || defined(HAVE_WM8978)
     audiohw_set_headphone_vol(tenthdb2master(l), tenthdb2master(r));
 #endif
 }
@@ -333,7 +333,8 @@ void sound_set_volume(int value)
 #elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
    || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
-    || defined(HAVE_AS3514) || defined(HAVE_WM8985)  || defined(HAVE_TSC2100)
+   || defined(HAVE_AS3514) || defined(HAVE_WM8985)  || defined(HAVE_TSC2100) \
+   || defined(HAVE_WM8978)
     current_volume = value * 10;     /* tenth of dB */
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101
@@ -353,7 +354,8 @@ void sound_set_balance(int value)
 #elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380 \
    || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
-   || defined(HAVE_AS3514) || defined(HAVE_WM8985)  || defined(HAVE_TSC2100)
+   || defined(HAVE_AS3514) || defined(HAVE_WM8985)  || defined(HAVE_TSC2100) \
+   || defined(HAVE_WM8978)
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101

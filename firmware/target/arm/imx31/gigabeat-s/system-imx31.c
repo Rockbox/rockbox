@@ -27,6 +27,16 @@ void system_init(void)
     gpio_init();
 }
 
+void imx31_regmod32(volatile uint32_t *reg_p, uint32_t mask, uint32_t value)
+{
+    value &= mask;
+    mask = ~mask;
+
+    int oldlevel = disable_interrupt_save(IRQ_FIQ_STATUS);
+    *reg_p = (*reg_p & mask) | value;
+    restore_interrupt(oldlevel);
+}
+
 #ifdef BOOTLOADER
 void system_prepare_fw_start(void)
 {

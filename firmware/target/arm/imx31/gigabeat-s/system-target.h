@@ -24,15 +24,20 @@
 
 #define CPUFREQ_NORMAL 532000000
 
+#if 0
 static inline void udelay(unsigned int usecs)
 {
     volatile signed int stop = EPITCNT1 - usecs;
     while ((signed int)EPITCNT1 > stop);
 }
+#endif
 
 void system_prepare_fw_start(void);
 void tick_stop(void);
 void kernel_device_init(void);
+
+void imx31_regmod32(volatile uint32_t *reg_p, uint32_t value,
+                    uint32_t mask);
 
 #define KDEV_INIT
 

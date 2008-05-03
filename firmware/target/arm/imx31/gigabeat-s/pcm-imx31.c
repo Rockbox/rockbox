@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Michael Sevakis
+ * Copyright (C) 2008 by Michael Sevakis
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -19,69 +19,256 @@
 #include <stdlib.h>
 #include "system.h"
 #include "kernel.h"
-#include "logf.h"
 #include "audio.h"
 #include "sound.h"
-#include "file.h"
-#include "mmu-imx31.h"
+#include "avic-imx31.h"
+#include "clkctl-imx31.h"
 
-#if 0
-static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
-#endif
+/* This isn't DMA-based at the moment and is handled like Portal Player but
+ * will suffice for starters. */
+
+struct dma_data
+{
+    uint16_t *p;
+    size_t size;
+    int locked;
+    int state;
+};
+
+static unsigned long pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
+
+static struct dma_data dma_play_data =
+{
+    /* Initialize to a locked, stopped state */
+    .p = NULL,
+    .size = 0,
+    .locked = 0,
+    .state = 0
+};
 
 void pcm_play_lock(void)
 {
+    if (++dma_play_data.locked == 1)
+    {
+        /* Atomically disable transmit interrupt */
+        imx31_regmod32(&SSI_SIER1, 0, SSI_SIER_TIE);
+    }
 }
 
 void pcm_play_unlock(void)
 {
+    if (--dma_play_data.locked == 0 && dma_play_data.state != 0)
+    {
+        /* Atomically enable transmit interrupt */
+        imx31_regmod32(&SSI_SIER1, SSI_SIER_TIE, SSI_SIER_TIE);
+    }
 }
 
-#if 0
 static void _pcm_apply_settings(void)
 {
+    if (pcm_freq != pcm_curr_sampr)
+    {
+        pcm_curr_sampr = pcm_freq;
+        // TODO: audiohw_set_frequency(sr_ctrl);
+    }
 }
-#endif
+
+static void __attribute__((interrupt("IRQ"))) SSI1_HANDLER(void)
+{
+    register pcm_more_callback_type get_more;
+
+    do
+    {
+        while (dma_play_data.size > 0)
+        {
+            if (SSI_SFCSR_TFCNT0r(SSI_SFCSR1) > 6)
+            {
+                return;
+            }
+            SSI_STX0_1 = *dma_play_data.p++;
+            SSI_STX0_1 = *dma_play_data.p++;
+            dma_play_data.size -= 4;
+        }
+
+        /* p is empty, get some more data */
+        get_more = pcm_callback_for_more;
+
+        if (get_more)
+        {
+            get_more((unsigned char **)&dma_play_data.p,
+                     &dma_play_data.size);
+        }
+    }
+    while (dma_play_data.size > 0);
+
+    /* No more data, so disable the FIFO/interrupt */
+    pcm_play_dma_stop();
+    pcm_play_dma_stopped_callback();
+}
 
 void pcm_apply_settings(void)
 {
+    int oldstatus = disable_fiq_save();
+
+    _pcm_apply_settings();
+
+    restore_fiq(oldstatus);
 }
 
 void pcm_play_dma_init(void)
 {
+    imx31_clkctl_module_clock_gating(CG_SSI1, CGM_ON_ALL);
+    imx31_clkctl_module_clock_gating(CG_SSI2, CGM_ON_ALL);
+
+    /* Reset & disable SSIs */
+    SSI_SCR2 &= ~SSI_SCR_SSIEN;
+    SSI_SCR1 &= ~SSI_SCR_SSIEN;
+
+    SSI_SIER1 = SSI_SIER_TFE0;
+    SSI_SIER2 = 0;
+
+    /* Set up audio mux */
+
+    /* Port 1 (internally connected to SSI1)
+     * All clocking is output sourced from port 4 */
+    AUDMUX_PTCR1 = AUDMUX_PTCR_TFS_DIR | AUDMUX_PTCR_TFSEL_PORT4 |
+                   AUDMUX_PTCR_TCLKDIR | AUDMUX_PTCR_TCSEL_PORT4 |
+                   AUDMUX_PTCR_RFSDIR  | AUDMUX_PTCR_RFSSEL_PORT4 |
+                   AUDMUX_PTCR_RCLKDIR | AUDMUX_PTCR_RCSEL_PORT4 |
+                   AUDMUX_PTCR_SYN;
+ 
+    /* Receive data from port 4 */
+    AUDMUX_PDCR1 = AUDMUX_PDCR_RXDSEL_PORT4;
+    /* All clock lines are inputs sourced from the master mode codec and
+     * sent back to SSI1 through port 1 */
+    AUDMUX_PTCR4 = AUDMUX_PTCR_SYN;
+
+    /* Receive data from port 1 */
+    AUDMUX_PDCR4 = AUDMUX_PDCR_RXDSEL_PORT1;
+
+    /* Port 2 (internally connected to SSI2) routes clocking to port 5 to
+     * provide MCLK to the codec */
+    /* All port 2 clocks are inputs taken from SSI2 */
+    AUDMUX_PTCR2 = 0;
+    AUDMUX_PDCR2 = 0;
+    /* Port 5 outputs TCLK sourced from port 2 */
+    AUDMUX_PTCR5 = AUDMUX_PTCR_TCLKDIR | AUDMUX_PTCR_TCSEL_PORT2;
+    AUDMUX_PDCR5 = 0;
+
+    /* Setup SSIs */
+
+    /* SSI1 - interface for all I2S data */
+    SSI_SCR1 = SSI_SCR_SYN | SSI_SCR_I2S_MODE_SLAVE;
+    SSI_STCR1 = SSI_STCR_TXBIT0 | SSI_STCR_TSCKP | SSI_STCR_TFSI |
+                SSI_STCR_TEFS | SSI_STCR_TFEN0;
+
+    /* 16 bits per word, 2 words per frame */
+    SSI_STCCR1 = SSI_STRCCR_WL16 | SSI_STRCCR_DCw(2-1) |
+                 SSI_STRCCR_PMw(4-1);
+
+    SSI_STMSK1 = 0;
+
+    /* Receive */
+    SSI_SRCR1 = SSI_SRCR_RXBIT0 | SSI_SRCR_RSCKP | SSI_SRCR_RFSI |
+                SSI_SRCR_REFS | SSI_SRCR_RFEN0;
+
+    /* 16 bits per word, 2 words per frame */
+    SSI_SRCCR1 = SSI_STRCCR_WL16 | SSI_STRCCR_DCw(2-1) |
+                 SSI_STRCCR_PMw(4-1);
+
+    /* Receive high watermark - 6 samples in FIFO
+     * Transmit low watermark - 2 samples in FIFO */
+    SSI_SFCSR1 = SSI_SFCSR_RFWM1w(8) | SSI_SFCSR_TFWM1w(1) |
+                 SSI_SFCSR_RFWM0w(6) | SSI_SFCSR_TFWM0w(2);
+
+    SSI_SRMSK1 = 0;
+
+    /* SSI2 - provides MCLK only */
+    SSI_SCR2 = 0;
+    SSI_SRCR2 = 0;
+    SSI_STCR2 = SSI_STCR_TXDIR;
+    SSI_STCCR2 = SSI_STRCCR_PMw(0);
+
+    /* Enable SSIs */
+    SSI_SCR2 |= SSI_SCR_SSIEN;
+
     audiohw_init();
 }
 
 void pcm_postinit(void)
 {
     audiohw_postinit();
+    avic_enable_int(SSI1, IRQ, 8, SSI1_HANDLER);
 }
 
-#if 0
-/* Connect the DMA and start filling the FIFO */
 static void play_start_pcm(void)
 {
+    /* Stop transmission (if in progress) */
+    SSI_SCR1 &= ~SSI_SCR_TE;
+
+    /* Apply new settings */
+    _pcm_apply_settings();
+
+    /* Enable interrupt on unlock */
+    dma_play_data.state = 1;
+
+    /* Fill the FIFO or start when data is used up */
+    while (1)
+    {
+        if (SSI_SFCSR_TFCNT0r(SSI_SFCSR1) > 6 || dma_play_data.size == 0)
+        {
+            SSI_SCR1 |= (SSI_SCR_TE | SSI_SCR_SSIEN); /* Start transmitting */
+            return;
+        }
+
+        SSI_STX0_1 = *dma_play_data.p++;
+        SSI_STX0_1 = *dma_play_data.p++;
+        dma_play_data.size -= 4;
+    }
 }
 
-/* Disconnect the DMA and wait for the FIFO to clear */
 static void play_stop_pcm(void)
 {
+    /* Disable interrupt */
+    SSI_SIER1 &= ~SSI_SIER_TIE;
+
+    /* Wait for FIFO to empty */
+    while (SSI_SFCSR_TFCNT0r(SSI_SFCSR1) > 0);
+
+    /* Disable transmission */
+    SSI_SCR1 &= ~(SSI_SCR_TE | SSI_SCR_SSIEN);
+
+    /* Do not enable interrupt on unlock */
+    dma_play_data.state = 0;
 }
-#endif
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    (void)addr;
-    (void)size;
+    dma_play_data.p    = (void *)(((uintptr_t)addr + 3) & ~3);
+    dma_play_data.size = (size & ~3);
+
+    play_start_pcm();
 }
 
 void pcm_play_dma_stop(void)
 {
+    play_stop_pcm();
+    dma_play_data.size = 0;
 }
 
 void pcm_play_dma_pause(bool pause)
 {
-    (void)pause;
+    if (pause)
+    {
+        play_stop_pcm();
+    }
+    else
+    {
+        uint32_t addr = (uint32_t)dma_play_data.p;
+        dma_play_data.p = (void *)((addr + 2) & ~3);
+        dma_play_data.size &= ~3;
+        play_start_pcm();
+    }
 }
 
 /* Set the pcm frequency hardware will use when play is next started or
@@ -89,20 +276,23 @@ void pcm_play_dma_pause(bool pause)
    hardware here but simply cache it. */
 void pcm_set_frequency(unsigned int frequency)
 {
+    /* TODO */
     (void)frequency;
 }
 
 /* Return the number of bytes waiting - full L-R sample pairs only */
 size_t pcm_get_bytes_waiting(void)
 {
-    return 0;
+    return dma_play_data.size & ~3;
 }
 
 /* Return a pointer to the samples and the number of them in *count */
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
-    (void)count;
-    return NULL;
+    uint32_t addr = (uint32_t)dma_play_data.p;
+    size_t cnt = dma_play_data.size;
+    *count = cnt >> 2;
+    return (void *)((addr + 2) & ~3);
 }
 
 /* Any recording functionality should be implemented similarly */

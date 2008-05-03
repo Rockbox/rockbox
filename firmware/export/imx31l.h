@@ -717,6 +717,296 @@
 
     /* I2DR - [7:0] Data */
 
+/* AUDMUX */
+#define AUDMUX_PTCR1            (*(REG32_PTR_T)(AUDMUX_BASE+0x00))
+#define AUDMUX_PDCR1            (*(REG32_PTR_T)(AUDMUX_BASE+0x04))
+#define AUDMUX_PTCR2            (*(REG32_PTR_T)(AUDMUX_BASE+0x08))
+#define AUDMUX_PDCR2            (*(REG32_PTR_T)(AUDMUX_BASE+0x0C))
+#define AUDMUX_PTCR3            (*(REG32_PTR_T)(AUDMUX_BASE+0x10))
+#define AUDMUX_PDCR3            (*(REG32_PTR_T)(AUDMUX_BASE+0x14))
+#define AUDMUX_PTCR4            (*(REG32_PTR_T)(AUDMUX_BASE+0x18))
+#define AUDMUX_PDCR4            (*(REG32_PTR_T)(AUDMUX_BASE+0x1C))
+#define AUDMUX_PTCR5            (*(REG32_PTR_T)(AUDMUX_BASE+0x20))
+#define AUDMUX_PDCR5            (*(REG32_PTR_T)(AUDMUX_BASE+0x24))
+#define AUDMUX_PTCR6            (*(REG32_PTR_T)(AUDMUX_BASE+0x28))
+#define AUDMUX_PDCR6            (*(REG32_PTR_T)(AUDMUX_BASE+0x2C))
+#define AUDMUX_PTCR7            (*(REG32_PTR_T)(AUDMUX_BASE+0x30))
+#define AUDMUX_PDCR7            (*(REG32_PTR_T)(AUDMUX_BASE+0x34))
+#define AUDMUX_CNMCR            (*(REG32_PTR_T)(AUDMUX_BASE+0x38))
+
+#define AUDMUX_PTCR_TFS_DIR         (1 << 31)
+
+#define AUDMUX_PTCR_TFSEL           (0xf << 27)
+#define AUDMUX_PTCR_TFSEL_TXFS      (0x0 << 27)
+#define AUDMUX_PTCR_TFSEL_RXFS      (0x8 << 27)
+#define AUDMUX_PTCR_TFSEL_PORT1     (0x0 << 27)
+#define AUDMUX_PTCR_TFSEL_PORT2     (0x1 << 27)
+#define AUDMUX_PTCR_TFSEL_PORT3     (0x2 << 27)
+#define AUDMUX_PTCR_TFSEL_PORT4     (0x3 << 27)
+#define AUDMUX_PTCR_TFSEL_PORT5     (0x4 << 27)
+#define AUDMUX_PTCR_TFSEL_PORT6     (0x5 << 27)
+#define AUDMUX_PTCR_TFSEL_PORT7     (0x6 << 27)
+
+#define AUDMUX_PTCR_TCLKDIR         (1 << 26)
+
+#define AUDMUX_PTCR_TCSEL           (0xf << 22)
+#define AUDMUX_PTCR_TCSEL_TXFS      (0x0 << 22)
+#define AUDMUX_PTCR_TCSEL_RXFS      (0x8 << 22)
+#define AUDMUX_PTCR_TCSEL_PORT1     (0x0 << 22)
+#define AUDMUX_PTCR_TCSEL_PORT2     (0x1 << 22)
+#define AUDMUX_PTCR_TCSEL_PORT3     (0x2 << 22)
+#define AUDMUX_PTCR_TCSEL_PORT4     (0x3 << 22)
+#define AUDMUX_PTCR_TCSEL_PORT5     (0x4 << 22)
+#define AUDMUX_PTCR_TCSEL_PORT6     (0x5 << 22)
+#define AUDMUX_PTCR_TCSEL_PORT7     (0x6 << 22)
+
+#define AUDMUX_PTCR_RFSDIR          (1 << 21)
+
+#define AUDMUX_PTCR_RFSSEL          (0xf << 17)
+#define AUDMUX_PTCR_RFSSEL_TXFS     (0x0 << 17)
+#define AUDMUX_PTCR_RFSSEL_RXFS     (0x8 << 17)
+#define AUDMUX_PTCR_RFSSEL_PORT1    (0x0 << 17)
+#define AUDMUX_PTCR_RFSSEL_PORT2    (0x1 << 17)
+#define AUDMUX_PTCR_RFSSEL_PORT3    (0x2 << 17)
+#define AUDMUX_PTCR_RFSSEL_PORT4    (0x3 << 17)
+#define AUDMUX_PTCR_RFSSEL_PORT5    (0x4 << 17)
+#define AUDMUX_PTCR_RFSSEL_PORT6    (0x5 << 17)
+#define AUDMUX_PTCR_RFSSEL_PORT7    (0x6 << 17)
+
+#define AUDMUX_PTCR_RCLKDIR         (1 << 16)
+
+#define AUDMUX_PTCR_RCSEL           (0xf << 12)
+#define AUDMUX_PTCR_RCSEL_TXFS      (0x0 << 12)
+#define AUDMUX_PTCR_RCSEL_RXFS      (0x8 << 12)
+#define AUDMUX_PTCR_RCSEL_PORT1     (0x0 << 12)
+#define AUDMUX_PTCR_RCSEL_PORT2     (0x1 << 12)
+#define AUDMUX_PTCR_RCSEL_PORT3     (0x2 << 12)
+#define AUDMUX_PTCR_RCSEL_PORT4     (0x3 << 12)
+#define AUDMUX_PTCR_RCSEL_PORT5     (0x4 << 12)
+#define AUDMUX_PTCR_RCSEL_PORT6     (0x5 << 12)
+#define AUDMUX_PTCR_RCSEL_PORT7     (0x6 << 12)
+#define AUDMUX_PTCR_SYN             (1 << 11)
+
+#define AUDMUX_PDCR_RXDSEL          (0x7 << 13)
+#define AUDMUX_PDCR_RXDSEL_PORT1    (0 << 13)
+#define AUDMUX_PDCR_RXDSEL_PORT2    (1 << 13)
+#define AUDMUX_PDCR_RXDSEL_PORT3    (2 << 13)
+#define AUDMUX_PDCR_RXDSEL_PORT4    (3 << 13)
+#define AUDMUX_PDCR_RXDSEL_PORT5    (4 << 13)
+#define AUDMUX_PDCR_RXDSEL_PORT6    (5 << 13)
+#define AUDMUX_PDCR_RXDSEL_PORT7    (6 << 13)
+#define AUDMUX_PDCR_TXRXEN          (1 << 12)
+
+#define AUDMUX_CNMCR_BEN            (1 << 18)
+#define AUDMUX_CNMCR_FSPOL          (1 << 17)
+#define AUDMUX_CNMCR_CLKPOL         (1 << 16)
+
+#define AUDMUX_CNMCR_CNTHI          (0xff << 8)
+#define AUDMUX_CNMCR_CNTHIw(x)      (((x) << 8) & AUDMUX_CNMCR_CNTHI)
+
+#define AUDMUX_CNMCR_CNTLOW         (0xff << 0)
+#define AUDMUX_CNMCR_CNTLOWw(x)     (((x) << 0) & AUDMUX_CNMCR_CNTLOW)
+
+/* SSI */
+#define SSI_STX0_1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x00))
+#define SSI_STX1_1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x04))
+#define SSI_SRX0_1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x08))
+#define SSI_SRX1_1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x0C))
+#define SSI_SCR1                (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x10))
+#define SSI_SISR1               (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x14))
+#define SSI_SIER1               (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x18))
+#define SSI_STCR1               (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x1C))
+#define SSI_SRCR1               (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x20))
+#define SSI_STCCR1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x24))
+#define SSI_SRCCR1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x28))
+#define SSI_SFCSR1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x2C))
+#define SSI_SACNT1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x38))
+#define SSI_SACADD1             (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x3C))
+#define SSI_SACDAT1             (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x40))
+#define SSI_SATAG1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x44))
+#define SSI_STMSK1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x48))
+#define SSI_SRMSK1              (*(REG32_PTR_T)(SSI1_BASE_ADDR+0x4C))
+
+#define SSI_STX0_2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x00))
+#define SSI_STX1_2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x04))
+#define SSI_SRX0_2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x08))
+#define SSI_SRX1_2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x0C))
+#define SSI_SCR2                (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x10))
+#define SSI_SISR2               (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x14))
+#define SSI_SIER2               (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x18))
+#define SSI_STCR2               (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x1C))
+#define SSI_SRCR2               (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x20))
+#define SSI_STCCR2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x24))
+#define SSI_SRCCR2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x28))
+#define SSI_SFCSR2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x2C))
+#define SSI_SACNT2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x38))
+#define SSI_SACADD2             (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x3C))
+#define SSI_SACDAT2             (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x40))
+#define SSI_SATAG2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x44))
+#define SSI_STMSK2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x48))
+#define SSI_SRMSK2              (*(REG32_PTR_T)(SSI2_BASE_ADDR+0x4C))
+
+/* SSI SCR */
+#define SSI_SCR_CLK_IST         (0x1 << 9)
+#define SSI_SCR_TCHN_EN         (0x1 << 8)
+#define SSI_SCR_SYS_CLK_EN      (0x1 << 7)
+
+#define SSI_SCR_I2S_MODE        (0x3 << 5)
+#define SSI_SCR_I2S_MODE_NORMAL (0x0 << 5)
+#define SSI_SCR_I2S_MODE_MASTER (0x1 << 5)
+#define SSI_SCR_I2S_MODE_SLAVE  (0x2 << 5)
+#define SSI_SCR_I2S_MODE_NOR2   (0x3 << 5)
+
+#define SSI_SCR_SYN             (0x1 << 4)
+#define SSI_SCR_NET             (0x1 << 3)
+#define SSI_SCR_RE              (0x1 << 2)
+#define SSI_SCR_TE              (0x1 << 1)
+#define SSI_SCR_SSIEN           (0x1 << 0)
+
+/* SSI SISR */
+#define SSI_SISR_CMDAU          (0x1 << 18)
+#define SSI_SISR_CMDDU          (0x1 << 17)
+#define SSI_SISR_RXT            (0x1 << 16)
+#define SSI_SISR_RDR1           (0x1 << 15)
+#define SSI_SISR_RDR0           (0x1 << 14)
+#define SSI_SISR_TDE1           (0x1 << 13)
+#define SSI_SISR_TDE0           (0x1 << 12)
+#define SSI_SISR_ROE1           (0x1 << 11)
+#define SSI_SISR_ROE0           (0x1 << 10)
+#define SSI_SISR_TUE1           (0x1 << 9)
+#define SSI_SISR_TUE0           (0x1 << 8)
+#define SSI_SISR_TFS            (0x1 << 7)
+#define SSI_SISR_RFS            (0x1 << 6)
+#define SSI_SISR_TLS            (0x1 << 5)
+#define SSI_SISR_RLS            (0x1 << 4)
+#define SSI_SISR_RFF1           (0x1 << 3)
+#define SSI_SISR_RFF2           (0x1 << 2)
+#define SSI_SISR_TFE1           (0x1 << 1)
+#define SSI_SISR_TFE0           (0x1 << 0)
+
+/* SSI SIER */
+#define SSI_SIER_RDMAE          (0x1 << 22)
+#define SSI_SIER_RIE            (0x1 << 21)
+#define SSI_SIER_TDMAE          (0x1 << 20)
+#define SSI_SIER_TIE            (0x1 << 19)
+#define SSI_SIER_CMDAU          (0x1 << 18)
+#define SSI_SIER_CMDDU          (0x1 << 17)
+#define SSI_SIER_RXT            (0x1 << 16)
+#define SSI_SIER_RDR1           (0x1 << 15)
+#define SSI_SIER_RDR0           (0x1 << 14)
+#define SSI_SIER_TDE1           (0x1 << 13)
+#define SSI_SIER_TDE0           (0x1 << 12)
+#define SSI_SIER_ROE1           (0x1 << 11)
+#define SSI_SIER_ROE0           (0x1 << 10)
+#define SSI_SIER_TUE1           (0x1 << 9)
+#define SSI_SIER_TUE0           (0x1 << 8)
+#define SSI_SIER_TFS            (0x1 << 7)
+#define SSI_SIER_RFS            (0x1 << 6)
+#define SSI_SIER_TLS            (0x1 << 5)
+#define SSI_SIER_RLS            (0x1 << 4)
+#define SSI_SIER_RFF1           (0x1 << 3)
+#define SSI_SIER_RFF2           (0x1 << 2)
+#define SSI_SIER_TFE1           (0x1 << 1)
+#define SSI_SIER_TFE0           (0x1 << 0)
+
+/* SSI STCR */
+#define SSI_STCR_TXBIT0         (0x1 << 9)
+#define SSI_STCR_TFEN1          (0x1 << 8)
+#define SSI_STCR_TFEN0          (0x1 << 7)
+#define SSI_STCR_TFDIR          (0x1 << 6)
+#define SSI_STCR_TXDIR          (0x1 << 5)
+#define SSI_STCR_TSHFD          (0x1 << 4)
+#define SSI_STCR_TSCKP          (0x1 << 3)
+#define SSI_STCR_TFSI           (0x1 << 2)
+#define SSI_STCR_TFSL           (0x1 << 1)
+#define SSI_STCR_TEFS           (0x1 << 0)
+
+/* SSI SRCR */
+#define SSI_SRCR_RXEXT          (0x1 << 10)
+#define SSI_SRCR_RXBIT0         (0x1 << 9)
+#define SSI_SRCR_RFEN1          (0x1 << 8)
+#define SSI_SRCR_RFEN0          (0x1 << 7)
+#define SSI_SRCR_RFDIR          (0x1 << 6)
+#define SSI_SRCR_RXDIR          (0x1 << 5)
+#define SSI_SRCR_RSHFD          (0x1 << 4)
+#define SSI_SRCR_RSCKP          (0x1 << 3)
+#define SSI_SRCR_RFSI           (0x1 << 2)
+#define SSI_SRCR_RFSL           (0x1 << 1)
+#define SSI_SRCR_REFS           (0x1 << 0)
+
+/* SSI STCCR/SRCCR */
+#define SSI_STRCCR_DIV2         (0x1 << 18)
+#define SSI_STRCCR_PSR          (0x1 << 17)
+
+#define SSI_STRCCR_WL           (0xf << 13)
+#define SSI_STRCCR_WL8          (0x3 << 13)
+#define SSI_STRCCR_WL10         (0x4 << 13)
+#define SSI_STRCCR_WL12         (0x5 << 13)
+#define SSI_STRCCR_WL16         (0x7 << 13)
+#define SSI_STRCCR_WL18         (0x8 << 13)
+#define SSI_STRCCR_WL20         (0x9 << 13)
+#define SSI_STRCCR_WL22         (0xa << 13)
+#define SSI_STRCCR_WL24         (0xb << 13)
+
+#define SSI_STRCCR_DC           (0x1f << 8)
+#define SSI_STRCCR_DCw(x)       (((x) << 8) & SSI_STRCCR_DC)
+#define SSI_STRCCR_DCr(x)       (((x) & SSI_SRCCR_DC) >> 8)
+
+#define SSI_STRCCR_PM           (0xf << 0)
+#define SSI_STRCCR_PMw(x)       (((x) << 0) & SSI_STRCCR_PM)
+#define SSI_STRCCR_PMr(x)       (((x) & SSI_SRCCR_PM) >> 0)
+
+/* SSI SFCSR */
+#define SSI_SFCSR_RFCNT1        (0xf << 28)
+#define SSI_SFCSR_RFCNT1w(x)    (((x) << 28) & SSI_SFCSR_RFCNT1)
+#define SSI_SFCSR_RFCNT1r(x)    (((x) & SSI_SFCSR_RFCNT1) >> 28)
+
+#define SSI_SFCSR_TFCNT1        (0xf << 24)
+#define SSI_SFCSR_TFCNT1w(x)    (((x) << 24) & SSI_SFCSR_TFCNT1)
+#define SSI_SFCSR_TFCNT1r(x)    (((x) & SSI_SFCSR_TFCNT1) >> 24)
+
+#define SSI_SFCSR_RFWM1         (0xf << 20)
+#define SSI_SFCSR_RFWM1w(x)     (((x) << 20) & SSI_SFCSR_RFWM1)
+#define SSI_SFCSR_RFWM1r(x)     (((x) & SSI_SFCSR_RFWM1) >> 20)
+#define SSI_SFCSR_RFWM1_1       (0x1 << 20)
+#define SSI_SFCSR_RFWM1_2       (0x2 << 20)
+#define SSI_SFCSR_RFWM1_3       (0x3 << 20)
+#define SSI_SFCSR_RFWM1_4       (0x4 << 20)
+#define SSI_SFCSR_RFWM1_5       (0x5 << 20)
+#define SSI_SFCSR_RFWM1_6       (0x6 << 20)
+#define SSI_SFCSR_RFWM1_7       (0x7 << 20)
+
+#define SSI_SFCSR_TFWM1         (0xf << 16)
+#define SSI_SFCSR_TFWM1w(x)     (((x) << 16) & SSI_SFCSR_TFWM1)
+#define SSI_SFCSR_TFWM1r(x)     (((x) & SSI_SFCSR_TFWM1) >> 16)
+
+#define SSI_SFCSR_RFCNT0        (0xf << 12)
+#define SSI_SFCSR_RFCNT0w(x)    (((x) << 12) & SSI_SFCSR_RFCNT0)
+#define SSI_SFCSR_RFCNT0r(x)    (((x) & SSI_SFCSR_RFCNT0) >> 12)
+
+#define SSI_SFCSR_TFCNT0        (0xf << 8)
+#define SSI_SFCSR_TFCNT0w(x)    (((x) << 8) & SSI_SFCSR_TFCNT0)
+#define SSI_SFCSR_TFCNT0r(x)    (((x) & SSI_SFCSR_TFCNT0) >> 8)
+
+#define SSI_SFCSR_RFWM0         (0xf << 4)
+#define SSI_SFCSR_RFWM0w(x)     (((x) << 4) & SSI_SFCSR_RFWM0)
+#define SSI_SFCSR_RFWM0r(x)     (((x) & SSI_SFCSR_RFWM0) >> 4)
+
+#define SSI_SFCSR_TFWM0         (0xf << 0)
+#define SSI_SFCSR_TFWM0w(x)     (((x) << 0) & SSI_SFCSR_TFWM0)
+#define SSI_SFCSR_TFWM0r(x)     (((x) & SSI_SFCSR_TFWM0) >> 0)
+
+/* SACNT */
+#define SSI_SACNT_FRDIV         (0x3f << 5)
+#define SSI_SACNT_FRDIVw(x)     (((x) << 5) & SSI_SACNT_FRDIV)
+#define SSI_SACNT_FRDIVr(x)     (((x) & SSI_SACNT_FRDIV) >> 5)
+
+#define SSI_SACNT_WR            (0x1 << 4)
+#define SSI_SACNT_RD            (0x1 << 3)
+#define SSI_SACNT_TIF           (0x1 << 2)
+#define SSI_SACNT_FV            (0x1 << 1)
+#define SSI_SACNT_AC97EN        (0x1 << 0)
+
 /* RTC */
 #define RTC_HOURMIN             (*(REG32_PTR_T)(RTC_BASE_ADDR+0x00))
 #define RTC_SECONDS             (*(REG32_PTR_T)(RTC_BASE_ADDR+0x04))
@@ -873,6 +1163,123 @@
 #define CLKCTL_PMCR0                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x5C))
 #define CLKCTL_PMCR1                    (*(REG32_PTR_T)(CCM_BASE_ADDR+0x60))
 #define CLKCTL_PDR2                     (*(REG32_PTR_T)(CCM_BASE_ADDR+0x64))
+
+/* CCMR */
+#define CCMR_L2PG                       (0x1 << 29)
+#define CCMR_VSTBY                      (0x1 << 28)
+#define CCMR_WBEN                       (0x1 << 27)
+#define CCMR_FPMF                       (0x1 << 26)
+#define CCMR_CSCS                       (0x1 << 25)
+#define CCMR_PERCS                      (0x1 << 24)
+
+#define CCMR_SSI2S                      (0x3 << 21)
+#define CCMR_SSI2S_MCU_CLK              (0x0 << 21)
+#define CCMR_SSI2S_USB_CLK              (0x1 << 21)
+#define CCMR_SSI2S_SERIAL_CLK           (0x2 << 21) /* default */
+
+#define CCMR_SSI1S                      (0x3 << 18)
+#define CCMR_SSI1S_MCU_CLK              (0x0 << 18)
+#define CCMR_SSI1S_USB_CLK              (0x1 << 18)
+#define CCMR_SSI1S_SERIAL_CLK           (0x2 << 18) /* default */
+
+#define CCMR_RAMW                       (0x3 << 16)
+#define CCMR_RAMW_0ARM_0ALTMS           (0x0 << 16)
+#define CCMR_RAMW_0ARM_1ALTMS           (0x1 << 16) /* Not recommended */
+#define CCMR_RAMW_1ARM_0ALTMS           (0x2 << 16) /* Not recommended */
+#define CCMR_RAMW_1ARM_1ALTMS           (0x3 << 16)
+
+#define CCMR_LPM                        (0x3 << 14)
+#define CCMR_LPM_WAIT_MODE              (0x0 << 14)
+#define CCMR_LPM_DOZE_MODE              (0x1 << 14)
+#define CCMR_LPM_SRM                    (0x2 << 14) /* State retention mode */
+#define CCMR_LPM_DSM                    (0x3 << 14) /* Deep sleep mode */
+
+#define CCMR_FIRS                       (0x3 << 11)
+#define CCMR_FIRS_MCU_CLK               (0x0 << 11)
+#define CCMR_FIRS_USB_CLK               (0x1 << 11)
+#define CCMR_FIRS_SERIAL_CLK            (0x2 << 11)
+
+#define CCMR_WAMO                       (0x1 << 10)
+#define CCMR_UPE                        (0x1 << 9)
+#define CCMR_SPE                        (0x1 << 8)
+#define CCMR_MDS                        (0x1 << 7)
+
+#define CCMR_ROMW                       (0x3 << 5)
+#define CCMR_ROMW_0ARM_0ALTMS           (0x0 << 5)
+#define CCMR_ROMW_0ARM_1ALTMS           (0x1 << 5) /* Not recommended */
+#define CCMR_ROMW_1ARM_0ALTMS           (0x2 << 5) /* Not recommended */
+#define CCMR_ROMW_1ARM_1ALTMS           (0x3 << 5)
+
+#define CCMR_SBYCS                      (0x1 << 4)
+#define CCMR_MPE                        (0x1 << 3)
+
+#define CCMR_PRCS                       (0x3 << 1)
+#define CCMR_PRCS_FPM                   (0x1 << 1)
+#define CCMR_PRCS_CKIH                  (0x2 << 1)
+
+#define CCMR_FPME                       (0x1 << 0)
+
+/* PDR0 */
+#define PDR0_CSI_PODF                   (0x1ff << 23)
+#define PDR0_CSI_PODFw(x)               (((x) << 23) & PDR0_CSI_PODF)
+#define PDR0_CSI_PODFr(x)               (((x) & PDR0_CSI_PODF) >> 23)
+
+#define PDR0_PER_PODF                   (0x1f << 16)
+#define PDR0_PER_PODFw(x)               (((x) << 16) & PDR0_PER_PODF)
+#define PDR0_PER_PODFr(x)               (((x) & PDR0_PER_PODF) >> 16)
+
+#define PDR0_HSP_PODF                   (0x7 << 11)
+#define PDR0_HSP_PODFw(x)               (((x) << 11) & PDR0_HSP_PODF)
+#define PDR0_HSP_PODFr(x)               (((x) & PDR0_HSP_PODF) >> 11)
+
+#define PDR0_NFC_PODF                   (0x7 << 8)
+#define PDR0_NFC_PODFw(x)               (((x) << 8) & PDR0_NFC_PODF)
+#define PDR0_NFC_PODFr(x)               (((x) & PDR0_NFC_PODF) >> 8)
+
+#define PDR0_IPG_PODF                   (0x3 << 6)
+#define PDR0_IPG_PODFw(x)               (((x) << 6) & PDR0_IPG_PODF)
+#define PDR0_IPG_PODFr(x)               (((x) & PDR0_IPG_PODF) >> 6)
+
+#define PDR0_MAX_PODF                   (0x7 << 3)
+#define PDR0_MAX_PODFw(x)               (((x) << 3) & PDR0_MAX_PODF)
+#define PDR0_MAX_PODFr(x)               (((x) & PDR0_MAX_PODF) >> 3)
+
+#define PDR0_MCU_PODF                   (0x7 << 0)
+#define PDR0_MCU_PODFw(x)               (((x) << 0) & PDR0_MCU_PODF)
+#define PDR0_MCU_PODFr(x)               (((x) & PDR0_MCU_PODF) >> 0)
+
+/* PDR1 */
+#define PDR1_USB_PRDF                   (0x3 << 30)
+#define PDR1_USB_PRDFw(x)               (((x) << 30) & PDR1_USB_PRDF)
+#define PDR1_USB_PRDFr(x)               (((x) & PDR1_USB_PRDF) >> 30)
+
+#define PDR1_USB_PODF                   (0x7 << 27)
+#define PDR1_USB_PODFw(x)               (((x) << 27) & PDR1_USB_PODF)
+#define PDR1_USB_PODFr(x)               (((x) & PDR1_USB_PODF) >> 27)
+
+#define PDR1_FIRI_PRE_PODF              (0x7 << 24)
+#define PDR1_FIRI_PRE_PODFw(x)          (((x) << 24) & PDR1_FIRI_PRE_PODF)
+#define PDR1_FIRI_PRE_PODFr(x)          (((x) & PDR1_FIRI_PRE_PODF) >> 24)
+
+#define PDR1_FIRI_PODF                  (0x3f << 18)
+#define PDR1_FIRI_PODFw(x)              (((x) << 18) & PDR1_FIRI_PODF)
+#define PDR1_FIRI_PODFr(x)              (((x) & PDR1_FIRI_PODF) >> 18)
+
+#define PDR1_SSI2_PRE_PODF              (0x7 << 15)
+#define PDR1_SSI2_PRE_PODFw(x)          (((x) << 15) & PDR1_SSI2_PRE_PODF)
+#define PDR1_SSI2_PRE_PODFr(x)          (((x) & PDR1_SSI2_PRE_PODF) >> 15)
+
+#define PDR1_SSI2_PODF                  (0x3f << 9)
+#define PDR1_SSI2_PODFw(x)              (((x) << 9) & PDR1_SSI2_PODF)
+#define PDR1_SSI2_PODFr(x)              (((x) & PDR1_SSI2_PODF) >> 9)
+
+#define PDR1_SSI1_PRE_PODF              (0x7 << 6)
+#define PDR1_SSI1_PRE_PODFw(x)          (((x) << 6) & PDR1_SSI1_PRE_PODF)
+#define PDR1_SSI1_PRE_PODFr(x)          (((x) & PDR1_SSI1_PRE_PODF) >> 6)
+
+#define PDR1_SSI1_PODF                  (0x3f << 0)
+#define PDR1_SSI1_PODFw(x)              (((x) << 0) & PDR1_SSI1_PODF)
+#define PDR1_SSI1_PODFr(x)              (((x) & PDR1_SSI1_PODF) >> 0)
 
 #define CGR0_SD_MMC1(cg)                ((cg) << 0*2)
 #define CGR0_SD_MMC2(cg)                ((cg) << 1*2)
