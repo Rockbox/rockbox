@@ -26,7 +26,7 @@
 #define I2C_SCS_COND_STOP   0x0002
 #define I2C_SCS_XMIT        0x0004
 
-#define I2C_TX_ACK          (1 << 20)
+#define I2C_TX_ACK          (1 << 8)
 
 static struct mutex i2c_mtx;
 
@@ -42,7 +42,12 @@ static inline void i2c_end(void)
 
 static inline bool i2c_getack(void)
 {
-    return (IO_I2C_RXDATA & 0x100)>>8;
+    return (IO_I2C_RXDATA >> 8) & 1;
+}
+
+static inline void i2c_ack(void)
+{
+    IO_I2C_TXDATA |= I2C_TX_ACK;
 }
 
 #define WAIT_FOR_I2C    if(IO_I2C_SCS & 0x4){ \

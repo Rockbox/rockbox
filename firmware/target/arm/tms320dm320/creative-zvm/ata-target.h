@@ -20,10 +20,13 @@
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
-/* Plain C read & write loops */
-#define PREFER_C_READING
-#define PREFER_C_WRITING
+/* ASM optimized reading and writing */
+#define ATA_OPTIMIZED_READING
+#define ATA_OPTIMIZED_WRITING
+void copy_read_sectors(unsigned char* buf, int wordcount);
+void copy_write_sectors(const unsigned char* buf, int wordcount);
 
+/* General purpose memory region #1 */
 #define ATA_IOBASE      0x50FEE000
 #define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE)))
 #define ATA_ERROR       (*((volatile unsigned char*)(ATA_IOBASE+0x2)))

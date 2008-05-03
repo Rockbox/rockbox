@@ -101,7 +101,9 @@ drivers/lcd-remote-2bit-vi.c
 drivers/led.c
 drivers/button.c
 #ifndef SIMULATOR
+#ifdef HAVE_DAC3550A
 drivers/dac.c
+#endif
 drivers/serial.c
 #endif /* SIMULATOR */
 
@@ -715,10 +717,10 @@ target/arm/tms320dm320/mrobe-500/usb-mr500.c
 
 #ifdef CREATIVE_ZVM
 #ifndef SIMULATOR
+target/arm/ata-as-arm.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.c
 target/arm/tms320dm320/creative-zvm/adc-creativezvm.c
-target/arm/tms320dm320/creative-zvm/audio-creativezvm.c
 target/arm/tms320dm320/creative-zvm/lcd-creativezvm.c
 target/arm/tms320dm320/creative-zvm/ata-creativezvm.c
 target/arm/tms320dm320/creative-zvm/pcm-creativezvm.c

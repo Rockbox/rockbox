@@ -33,6 +33,9 @@
     /* Untested */
     .text
     .equ    .ata_port, 0x18000000
+#elif defined(CREATIVE_ZVM)
+    .text
+    .equ    .ata_port, 0x50FEE000
 #endif
 
     .align  2
