@@ -27,48 +27,6 @@ bool option_screen(struct settings_list *setting,
                    struct viewport parent[NB_SCREENS],
                    bool use_temp_var, unsigned char* option_title);
 
-struct option_select
-{
-    const char * title;
-    int min_value;
-    int max_value;
-    int option;
-    const struct opt_items * items;
-};
-
-/*
- * Initializes an option containing a list of choices
- *  - title : the title of the option
- *  - selected : the initially selected item
- *  - items : the list of items, defined in settings.h
- *  - nb_items : the number of items in the 'items' list
- */
-extern void option_select_init_items(struct option_select * opt,
-                                     const char * title,
-                                     int selected,
-                                     const struct opt_items * items,
-                                     int nb_items);
-
-/*
- * Gets the selected option
- *  - opt : the option struct
- * Returns the selected option
- */
-extern const char * option_select_get_text(struct option_select * opt);
-
-/*
- * Selects the next value
- *  - opt : the option struct
- */
-extern void option_select_next(struct option_select * opt);
-
-/*
- * Selects the previous value
- *  - opt : the option struct
- */
-extern void option_select_prev(struct option_select * opt);
-
-
 
 void option_select_next_val(struct settings_list *setting,
                             bool previous, bool apply);
