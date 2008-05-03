@@ -22,6 +22,7 @@
 #include "button.h"
 #include "backlight.h"
 #include "adc.h"
+#include "lcd-remote-target.h"
 
 static bool hold_button        = false;
 static bool remote_hold_button = false;

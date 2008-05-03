@@ -22,6 +22,7 @@
 #if (CONFIG_TUNER & TEA5767)
 
 #include "i2c-coldfire.h"
+#include "fmradio_i2c.h"
 
 int fmradio_i2c_write(unsigned char address, const unsigned char* buf,
                       int count)

@@ -19,6 +19,7 @@
 
 /* "helper functions" common to all codecs  */
 
+#include <string.h>
 #include "codecs.h"
 #include "dsp.h"
 #include "codeclib.h"

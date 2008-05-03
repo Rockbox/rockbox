@@ -62,6 +62,7 @@
 #define SET_16BITREG(reg,val) reg = (val)
 
 void ata_reset(void);
+void ata_enable(bool on);
 void ata_device_init(void);
 bool ata_is_coldstart(void);
 

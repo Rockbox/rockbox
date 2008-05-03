@@ -22,6 +22,7 @@
 #include "file.h"
 #include "lcd.h"
 #include "scroll_engine.h"
+#include "lcd-remote-target.h"
 
 /* The LCD in the iAudio M3/M5/X5 remote control is a Tomato LSI 0350 */
 

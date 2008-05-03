@@ -119,7 +119,7 @@ void pcm_set_frequency(unsigned int frequency)
 } /* pcm_set_frequency */
 
 /* apply audio settings */
-bool _pcm_apply_settings(bool clear_reset)
+static bool _pcm_apply_settings(bool clear_reset)
 {
     bool did_reset = false;
     unsigned long iis_play_defparm = IIS_PLAY_DEFPARM;
@@ -154,7 +154,7 @@ bool _pcm_apply_settings(bool clear_reset)
 } /* _pcm_apply_settings */
 
 /* apply audio setting with all DMA interrupts disabled */
-void _pcm_apply_settings_irq_lock(bool clear_reset)
+static void _pcm_apply_settings_irq_lock(bool clear_reset)
 {
     int level = set_irq_level(DMA_IRQ_LEVEL);
     _pcm_apply_settings(clear_reset);

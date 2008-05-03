@@ -23,6 +23,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
+#include "ata-target.h"
 
 void ata_reset(void)
 {

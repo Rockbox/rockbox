@@ -1395,7 +1395,7 @@ MENUITEM_SETTING(set_region, &global_settings.fm_region, NULL);
 MENUITEM_SETTING(force_mono, &global_settings.fm_force_mono, NULL);
 
 #ifndef FM_MODE
-char* get_mode_text(int selected_item, void * data, char *buffer)
+static char* get_mode_text(int selected_item, void * data, char *buffer)
 {
     (void)selected_item;
     (void)data;
