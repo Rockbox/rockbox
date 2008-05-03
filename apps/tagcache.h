@@ -169,7 +169,7 @@ struct tagcache_search {
     int idx_id;
 };
 
-void build_tagcache(const char *path);
+void tagcache_build(const char *path);
 
 #ifdef __PCTOOL__
 void tagcache_reverse_scan(void);

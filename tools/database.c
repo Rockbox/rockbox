@@ -6,7 +6,7 @@
 int main(int argc, char **argv)
 {
     tagcache_init();
-    build_tagcache("/export/stuff/mp3");
+    tagcache_build("/export/stuff/mp3");
     tagcache_reverse_scan();
     
     return 0;

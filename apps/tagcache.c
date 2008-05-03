@@ -4154,7 +4154,7 @@ void tagcache_screensync_enable(bool state)
     tc_stat.syncscreen = state;
 }
 
-void build_tagcache(const char *path)
+void tagcache_build(const char *path)
 {
     struct tagcache_header header;
     bool ret;
@@ -4323,11 +4323,11 @@ static void tagcache_thread(void)
             
             case Q_REBUILD:
                 remove_files();
-                build_tagcache("/");
+                tagcache_build("/");
                 break;
             
             case Q_UPDATE:
-                build_tagcache("/");
+                tagcache_build("/");
 #ifdef HAVE_TC_RAMCACHE
                 load_ramcache();
 #endif
@@ -4345,13 +4345,13 @@ static void tagcache_thread(void)
                 {
                     load_ramcache();
                     if (tc_stat.ramcache && global_settings.tagcache_autoupdate)
-                        build_tagcache("/");
+                        tagcache_build("/");
                 }
                 else
 #endif
                 if (global_settings.tagcache_autoupdate)
                 {
-                    build_tagcache("/");
+                    tagcache_build("/");
                     
                     /* This will be very slow unless dircache is enabled
                        or target is flash based, but do it anyway for
