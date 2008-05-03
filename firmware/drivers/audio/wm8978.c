@@ -26,9 +26,15 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 
-#define HW_VOL_MIN  0
-#define HW_VOL_MUTE 0
-#define HW_VOL_MAX 96
+/* #define to help adjust lower volume limit */
+#define HW_VOL_MIN                0
+#define HW_VOL_MUTE               0
+#define HW_VOL_MAX               96
+#define HW_VOL_ANA_MIN            0
+#define HW_VOL_ANA_MAX           63
+#define HW_VOL_DIG_MAX          255
+#define HW_VOL_DIG_THRESHOLD    (HW_VOL_MAX - HW_VOL_ANA_MAX)
+#define HW_VOL_DIG_MIN          (HW_VOL_DIG_MAX - 2*HW_VOL_DIG_THRESHOLD)
 
 /* TODO: Define/refine an API for special hardware steps outside the
  * main codec driver such as special GPIO handling. */
@@ -119,7 +125,7 @@ struct
     bool ahw_mute;
 } wmc_vol =
 {
-    0, 0, false
+    HW_VOL_MUTE, HW_VOL_MUTE, false
 };
 
 static void wmc_write(unsigned int reg, unsigned int val)
@@ -222,10 +228,10 @@ void audiohw_postinit(void)
     wmc_write(WMC_ADDITIONAL_CTRL, WMC_SR_48KHZ); /* 44.1 */
 
     /* Initialize to minimum volume */
-    wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, 189, WMC_DVOL);
-    wmc_write_masked(WMC_LOUT1_HP_VOLUME_CTRL, 0, WMC_AVOL);
-    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, 189, WMC_DVOL);
-    wmc_write_masked(WMC_ROUT1_HP_VOLUME_CTRL, 0, WMC_AVOL);
+    wmc_write_masked(WMC_LEFT_DAC_DIGITAL_VOL, HW_VOL_DIG_MIN, WMC_DVOL);
+    wmc_write_masked(WMC_LOUT1_HP_VOLUME_CTRL, HW_VOL_ANA_MIN, WMC_AVOL);
+    wmc_write_masked(WMC_RIGHT_DAC_DIGITAL_VOL, HW_VOL_DIG_MIN, WMC_DVOL);
+    wmc_write_masked(WMC_ROUT1_HP_VOLUME_CTRL, HW_VOL_ANA_MIN, WMC_AVOL);
 
     /* ADC silenced */
     wmc_write_masked(WMC_LEFT_ADC_DIGITAL_VOL, 0x00, WMC_DVOL);
@@ -245,38 +251,38 @@ void audiohw_set_headphone_vol(int vol_l, int vol_r)
 
     /* When analogue volume falls below -57dB (0x00) start attenuating the
      * DAC volume */
-    if (vol_l >= 33)
+    if (vol_l >= HW_VOL_DIG_THRESHOLD)
     {
         if (vol_l > HW_VOL_MAX)
             vol_l = HW_VOL_MAX;
 
-        dac_l = 255;
-        vol_l -= 33;
+        dac_l = HW_VOL_DIG_MAX;
+        vol_l -= HW_VOL_DIG_THRESHOLD;
     }
     else
     {
         if (vol_l < HW_VOL_MIN)
             vol_l = HW_VOL_MIN;
 
-        dac_l = 2*vol_l + 189;
-        vol_l = 0;
+        dac_l = 2*vol_l + HW_VOL_DIG_MIN;
+        vol_l = HW_VOL_ANA_MIN;
     }
 
-    if (vol_r >= 33)
+    if (vol_r >= HW_VOL_DIG_THRESHOLD)
     {
         if (vol_r > HW_VOL_MAX)
             vol_r = HW_VOL_MAX;
 
-        dac_r = 255;
-        vol_r -= 33;
+        dac_r = HW_VOL_DIG_MAX;
+        vol_r -= HW_VOL_DIG_THRESHOLD;
     }
     else
     {
         if (vol_r < HW_VOL_MIN)
             vol_r = HW_VOL_MIN;
 
-        dac_r = 2*vol_r + 189;
-        vol_r = 0;
+        dac_r = 2*vol_r + HW_VOL_DIG_MIN;
+        vol_r = HW_VOL_ANA_MIN;
     }
 
     /* Have to write both channels always to have the latching work */
