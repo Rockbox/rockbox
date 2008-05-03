@@ -25,6 +25,7 @@
 #include "system.h"
 #include "id3.h"
 #include "metadata_common.h"
+#include "metadata_parsers.h"
 #include "debug.h"
 
 bool get_adx_metadata(int fd, struct mp3entry* id3)

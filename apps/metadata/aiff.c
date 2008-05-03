@@ -25,6 +25,7 @@
 #include "system.h"
 #include "id3.h"
 #include "metadata_common.h"
+#include "metadata_parsers.h"
 
 bool get_aiff_metadata(int fd, struct mp3entry* id3)
 {

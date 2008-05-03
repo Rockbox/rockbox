@@ -25,6 +25,7 @@
 #include "system.h"
 #include "id3.h"
 #include "metadata_common.h"
+#include "metadata_parsers.h"
 #include "logf.h"
 
 bool get_flac_metadata(int fd, struct mp3entry* id3)

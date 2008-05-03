@@ -22,6 +22,7 @@
 #include "system.h"
 #include "id3.h"
 #include "metadata_common.h"
+#include "metadata_parsers.h"
 #include "logf.h"
 #include "replaygain.h"
 

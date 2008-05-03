@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "rbunicode.h"
 #include "metadata_common.h"
+#include "metadata_parsers.h"
 #include "system.h"
 #include <codecs/libwma/asf.h>
 

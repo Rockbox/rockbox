@@ -25,6 +25,7 @@
 #include "system.h"
 #include "id3.h"
 #include "metadata_common.h"
+#include "metadata_parsers.h"
 #include "logf.h"
 
 #define ID_UNIQUE               0x3f

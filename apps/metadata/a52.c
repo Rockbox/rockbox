@@ -20,6 +20,8 @@
 #include "id3.h"
 #include "logf.h"
 
+#include "metadata_parsers.h"
+
 static const unsigned short a52_bitrates[] =
 {
      32,  40,  48,  56,  64,  80,  96, 112, 128, 160, 
