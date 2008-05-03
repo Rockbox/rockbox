@@ -22,11 +22,54 @@
 #include "audio.h"
 #include "sound.h"
 #include "file.h"
+#include "dm320.h"
+#include "audiohw.h"
+#include "dsp-target.h"
+
+void pcm_play_dma_init(void)
+{
+    IO_CLK_O1DIV = 3;
+    /* Set GIO25 to CLKOUT1A */
+    IO_GIO_FSEL2 |= 3;
+    sleep(5);
+
+    audiohw_init();
+
+    audiohw_set_frequency(1);
+    
+    /* init DSP */
+    dsp_init();
+}
 
 void pcm_postinit(void)
 {
-
+    audiohw_postinit();
+    /* wake DSP */
+    dsp_wake();
 }
+
+/* set frequency used by the audio hardware */
+void pcm_set_frequency(unsigned int frequency)
+{
+    int index;
+
+    switch(frequency)
+    {
+        case SAMPR_11:
+        case SAMPR_22:
+            index = 0;
+            break;
+        default:
+        case SAMPR_44:
+            index = 1;
+            break;
+        case SAMPR_88:
+            index = 2;
+            break;
+    }
+    
+    audiohw_set_frequency(index);
+} /* pcm_set_frequency */
 
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
@@ -34,25 +77,16 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
     return 0;
 }
 
-void pcm_play_dma_init(void)
-{
-
-}
-
 void pcm_apply_settings(void)
 {
 
 }
 
-void pcm_set_frequency(unsigned int frequency)
-{
-    (void) frequency;
-}
-
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    (void) addr;
-    (void) size;
+    (void)addr;
+    (void)size;
+    DEBUGF("pcm_play_dma_start(0x%x, %d)", addr, size);
 }
 
 void pcm_play_dma_stop(void)
