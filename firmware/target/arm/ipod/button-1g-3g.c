@@ -250,5 +250,21 @@ bool button_hold(void)
 
 bool headphones_inserted(void)
 {
+#ifdef IPOD_1G2G
+	if ((IPOD_HW_REVISION >> 16) == 2)
+    {
+		/* 2G uses GPIO B bit 0 */
+		return (GPIOB_INPUT_VAL & 0x1)?true:false;
+    }
+	else
+    {
+		/* 1G has no headphone detection, so fake insertion */
+		return (true);
+    }
+#else
+    /* 3G uses GPIO C bit 0 */
     return (GPIOC_INPUT_VAL & 0x1)?true:false;
+#endif
 }
+
+
