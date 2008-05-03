@@ -12,7 +12,7 @@
 %xl|D|shuffle-240x320x16.bmp|139|292|
 %xl|E|repeat-240x320x16.bmp|182|292|4|
 %xl|F|playmode-240x320x16.bmp|206|292|5|
-%Cl|55|30|sc130|sc130|
+%Cl|55|30|c130|c130|
 %pb|13|22|221|254|
 %?C<|>
 %?C<|%s%ac%?it<%it|%fn>>
@@ -25,9 +25,9 @@
 %?C<|>
 %?C<%s%ac%?it<%it|%fn>|>
 %?C<%s%ac%?ia<%ia|%?d2<%d2|(root)>>|%acNext Track:>
-%?C<%s%ac%?id<%id|%?d1<%d1|(root)>>|%ac%s%It>
-%?C<|%s%ac%?It<%Ia|%Fn>>
-%?C<%s%ac%?Ia<Next: %Ia - |%?Fn<Next: %Fn|>>%It|>
+%?C<%s%ac%?id<%id|%?d1<%d1|(root)>>|%ac%s%?It<%It|%Fn>>
+%?C<|%s%ac%?Ia<%Ia|%?D2<%D2|(root)>>>
+%?C<%s%acNext: %?Ia<%Ia|%?D2<%D2|(root)>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D1<%D1|(root)>>>
 
 
      %pc%ac%pp of %pe%ar%pr     
