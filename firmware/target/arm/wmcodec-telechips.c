@@ -27,6 +27,7 @@
 #include "system.h"
 #include "audiohw.h"
 #include "i2c.h"
+#include "wmcodec.h"
 
 #if defined(COWON_D2)
 /* The D2's audio codec uses an I2C address of 0x34 */

@@ -39,7 +39,7 @@ void sound_set_bass(int value);
 void sound_set_treble(int value);
 void sound_set_channels(int value);
 void sound_set_stereo_width(int value);
-#ifdef HAVE_WM8758
+#if defined(HAVE_WM8758) || defined(HAVE_WM8985)
 void sound_set_bass_cutoff(int value);
 void sound_set_treble_cutoff(int value);
 #endif

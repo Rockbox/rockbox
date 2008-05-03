@@ -329,7 +329,7 @@ static void draw_screen(struct screen *display, char *title,
 }
 
 #ifdef HAVE_TOUCHPAD
-int touchpad_slider(struct rgb_pick *rgb, int *selected_slider)
+static int touchpad_slider(struct rgb_pick *rgb, int *selected_slider)
 {
     short     x,y;
     int       text_top,i,x1;

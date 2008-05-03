@@ -276,6 +276,7 @@ void audiohw_set_sample_rate(int sampling_control)
     wmcodec_write(SRATECTRL, (0 << 1));
 }
 
+#ifdef HAVE_RECORDING
 void audiohw_enable_recording(bool source_mic)
 {
     (void)source_mic; /* We only have a line-in (I think) */
@@ -345,3 +346,4 @@ void audiohw_set_monitor(bool enable) {
 
     (void)enable;
 }
+#endif /* HAVE_RECORDING */

@@ -689,7 +689,7 @@ static void nand_test(void)
 
 /* API Functions */
 
-void ata_led(bool onoff)
+static void ata_led(bool onoff)
 {
     led(onoff);
 }

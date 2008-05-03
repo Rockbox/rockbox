@@ -18,10 +18,7 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "cpu.h"
-#include "system.h"
-#include "kernel.h"
-#include "ata.h"
+#include <stdbool.h>
 
 /* USB detect is currently unknown */
 inline bool usb_detect(void)
