@@ -19,7 +19,7 @@
 #ifndef __ROLO_H__
 #define __ROLO_H__
 
-void rolo_load(char* file);
+int rolo_load(const char* file);
 
 #ifdef CPU_PP
 void rolo_restart_cop(void);

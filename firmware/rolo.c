@@ -31,6 +31,7 @@
 #include "adc.h"
 #include "string.h"
 #include "buffer.h"
+#include "rolo.h"
 
 #ifdef MI4_FORMAT
 #include "crc32-mi4.h"
