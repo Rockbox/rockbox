@@ -263,7 +263,7 @@ void lcd_init_device(void)
     /* Set LCD values in Video Encoder */
     IO_VID_ENC_VMOD &= 0x8800; /* Clear all values */
     IO_VID_ENC_VMOD |= (VENC_VMOD_DACPD | VENC_VMOD_VMD | VENC_VMOD_ITLC | VENC_VMOD_VDMD(2)); /* set mode to RGB666 parallel 16 bit */
-    IO_VID_ENC_VDTL &= 8FE8; /* Clear all values */
+    IO_VID_ENC_VDTL &= 0x8FE8; /* Clear all values */
     IO_VID_ENC_VDCTL |= (VENC_VDCTL_VCLKP | VENC_VDCTL_DOMD(2)),
     IO_VID_ENC_VPRO = VENC_VDPRO_PFLTR;
     IO_VID_ENC_SYNCCTL &= 0xE000; /* Clear all values */
