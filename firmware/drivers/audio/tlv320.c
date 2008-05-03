@@ -17,7 +17,6 @@
  *
  ****************************************************************************/
 #include "config.h"
-#define LOGF_ENABLE
 #include "logf.h"
 #include "system.h"
 #include "string.h"
