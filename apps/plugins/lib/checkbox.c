@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "plugin.h"
+#include "checkbox.h"
 
 #ifdef HAVE_LCD_BITMAP
 

@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "plugin.h"
+#include "helper.h"
 
 /*  Force the backlight on */
 void backlight_force_on(struct plugin_api* rb)

@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include <inttypes.h>
+#include "fixedpoint.h"
 
 /* Inverse gain of circular cordic rotation in s0.31 format. */
 static const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */

@@ -21,6 +21,7 @@
 
 #ifndef SIMULATOR
 #include "plugin.h"
+#include "overlay.h"
 
 /* load and run a plugin linked as an overlay. 
 

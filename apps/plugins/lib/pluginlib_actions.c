@@ -456,7 +456,7 @@ static int plugin_context_count = 0;
 static int last_context = 0; /* index into plugin_context_order 
                                 of the last context returned */
 
-const struct button_mapping* get_context_map(int context)
+static const struct button_mapping* get_context_map(int context)
 {
     (void)context;
     if (last_context<plugin_context_count)

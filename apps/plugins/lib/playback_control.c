@@ -18,17 +18,18 @@
  ****************************************************************************/
 
 #include "plugin.h"
+#include "playback_control.h"
 
 struct plugin_api* api = 0;
 struct viewport *parentvp = NULL;
 
-bool prevtrack(void)
+static bool prevtrack(void)
 {
     api->audio_prev();
     return false;
 }
 
-bool play(void)
+static bool play(void)
 {
     int audio_status = api->audio_status();
     if (!audio_status && api->global_status->resume_index != -1)
@@ -46,13 +47,13 @@ bool play(void)
     return false;
 }
 
-bool stop(void)
+static bool stop(void)
 {
     api->audio_stop();
     return false;
 }
 
-bool nexttrack(void)
+static bool nexttrack(void)
 {
     api->audio_next();
     return false;

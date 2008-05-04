@@ -20,12 +20,11 @@
 #define __PLAYBACK_CONTROL_H__
 
 /* Use these if your menu uses the new menu api. 
-   REMEBER to call playback_control_init(rb) before rb->do_menu()... 
+   REMEMBER to call playback_control_init(rb) before rb->do_menu()... 
    The parent viewport here is needed by the internal functions,
    So, make sure you use the same viewport for the rb->do_menu() call
    that you use in the playback_control_init() call
 */
-extern const struct menu_item_ex playback_control_menu;
 void playback_control_init(struct plugin_api* newapi,
                            struct viewport parent[NB_SCREENS]);
 

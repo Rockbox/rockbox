@@ -26,9 +26,9 @@
 #include "xlcd.h"
 
 /* sort the given coordinates by increasing x value */
-void sort_points_by_increasing_x(int* x1, int* y1,
-                                 int* x2, int* y2,
-                                 int* x3, int* y3)
+static void sort_points_by_increasing_x(int* x1, int* y1,
+                                        int* x2, int* y2,
+                                        int* x3, int* y3)
 {
     int x, y;
     if (*x1 > *x3)
@@ -69,10 +69,10 @@ void sort_points_by_increasing_x(int* x1, int* y1,
     sort_points_by_increasing_x(y1, x1, y2, x2, y3, x3)
 
 /* draw a filled triangle, using horizontal lines for speed */
-void xlcd_filltriangle_horizontal(struct screen* display,
-                                  int x1, int y1,
-                                  int x2, int y2,
-                                  int x3, int y3)
+static void xlcd_filltriangle_horizontal(struct screen* display,
+                                         int x1, int y1,
+                                         int x2, int y2,
+                                         int x3, int y3)
 {
     long fp_x1, fp_x2, fp_dx1, fp_dx2;
     int y;
@@ -109,10 +109,10 @@ void xlcd_filltriangle_horizontal(struct screen* display,
 }
 
 /* draw a filled triangle, using vertical lines for speed */
-void xlcd_filltriangle_vertical(struct screen* display,
-                                int x1, int y1,
-                                int x2, int y2,
-                                int x3, int y3)
+static void xlcd_filltriangle_vertical(struct screen* display,
+                                       int x1, int y1,
+                                       int x2, int y2,
+                                       int x3, int y3)
 {
     long fp_y1, fp_y2, fp_dy1, fp_dy2;
     int x;

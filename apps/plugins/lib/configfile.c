@@ -26,7 +26,7 @@ void configfile_init(struct plugin_api* newrb)
     cfg_rb = newrb;
 }
 
-void get_cfg_filename(char* buf, int buf_len, const char* filename)
+static void get_cfg_filename(char* buf, int buf_len, const char* filename)
 {
     char *s;
     cfg_rb->strcpy(buf, cfg_rb->plugin_get_current_filename());
