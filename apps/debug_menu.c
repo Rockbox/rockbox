@@ -1899,7 +1899,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     }
     if (identify_info[88] & (1<<0)) {
         char udma0[2], udma1[2], udma2[2], udma3[2], udma4[2], udma5[2];
-        udma0[1] = udma1[1] = udma2[1] = udma3[1] = udma4[1] = 0;
+        udma0[1] = udma1[1] = udma2[1] = udma3[1] = udma4[1] = udma5[1] = 0;
         udma0[0] = (identify_info[88] & (1<<0)) ? '0' : 0;
         udma1[0] = (identify_info[88] & (1<<1)) ? '1' : 0;
         udma2[0] = (identify_info[88] & (1<<2)) ? '2' : 0;
