@@ -4477,11 +4477,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Sveglia disattivata"
+    alarm: "Sveglia disabilitata"
   </dest>
   <voice>
     *: none
-    alarm: "Sveglia disattivata"
+    alarm: "Sveglia disabilitata"
   </voice>
 </phrase>
 <phrase>
@@ -11555,5 +11555,89 @@
   </dest>
   <voice>
     *: "Sconosciuto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Study Mode"
+  </source>
+  <dest>
+    *: "Modo Studio"
+  </dest>
+  <voice>
+    *: "Modo Studio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Study Increment"
+  </source>
+  <dest>
+    *: "Incremento Studio"
+  </dest>
+  <voice>
+    *: "Passo Studio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_STUDY_MODE
+  desc: WPS context menu
+  user:
+  <source>
+    *: "Enable Study Mode"
+  </source>
+  <dest>
+    *: "Abilita Modo Studio"
+  </dest>
+  <voice>
+    *: "Abilita Modo Studio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: WPS context menu
+  user:
+  <source>
+    *: "Disable Study Mode"
+  </source>
+  <dest>
+    *: "Disabilita Modo Studio"
+  </dest>
+  <voice>
+    *: "Disabilita Modo Studio"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUICKSCREEN
+  desc: spoken only, Announces entering the "quick screen"
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Impostazioni Rapide"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OK
+  desc: spoken only, On exiting a context, specifically the quick screen
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "OK"
   </voice>
 </phrase>
