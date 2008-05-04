@@ -324,9 +324,7 @@ struct core_entry
 #if NUM_CORES > 1
     struct thread_blk_ops blk_ops; /* operations to perform when
                                       blocking a thread */
-#ifdef HAVE_PRIORITY_SCHEDULING
     struct corelock rtr_cl;        /* Lock for rtr list */
-#endif
 #endif /* NUM_CORES */
 };
 
