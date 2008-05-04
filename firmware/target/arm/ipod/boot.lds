@@ -68,8 +68,8 @@ SECTIONS
   /* The bss section is too large for IRAM - we just move it 16MB into the
      DRAM */
 
-  . = (DRAMORIG+16*1024*1024);
-  .bss : {
+  . = DRAMORIG;
+  .bss . + (16*1024*1024): {
      _edata = .;
      *(.bss*);
      *(.ibss);
