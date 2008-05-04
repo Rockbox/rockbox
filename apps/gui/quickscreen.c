@@ -35,6 +35,7 @@
 #include "viewport.h"
 #include "audio.h"
 #include "quickscreen.h"
+#include "talk.h"
 
 static struct viewport vps[NB_SCREENS][QUICKSCREEN_ITEM_COUNT];
 static struct viewport vp_icons[NB_SCREENS];
@@ -220,7 +221,15 @@ static void gui_quickscreen_draw(struct gui_quickscreen *qs,
     display->set_viewport(NULL);
 }
 
-
+static int option_value(const struct settings_list *setting)
+{
+    if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
+    {
+        return *(bool*)setting->setting==true?1:0;
+    }
+    else
+        return *(int*)setting->setting;
+}
 /*
  * Does the actions associated to the given button if any
  *  - qs : the quickscreen
@@ -249,6 +258,8 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
             return false;
     }
     option_select_next_val((struct settings_list *)qs->items[item], false, true);
+    option_talk_value((struct settings_list *)qs->items[item], 
+                       option_value((struct settings_list *)qs->items[item]), false);
     return true;
 }
 
@@ -271,6 +282,17 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
         quickscreen_fix_viewports(qs, &screens[i], &vp[i]);
         gui_quickscreen_draw(qs, &screens[i], &vp[i]);
     }
+    talk_id(qs->items[QUICKSCREEN_LEFT]->lang_id, false);
+    option_talk_value(qs->items[QUICKSCREEN_LEFT], 
+                      option_value(qs->items[QUICKSCREEN_LEFT]), true);
+    
+    talk_id(qs->items[QUICKSCREEN_RIGHT]->lang_id, true);
+    option_talk_value(qs->items[QUICKSCREEN_RIGHT], 
+                      option_value(qs->items[QUICKSCREEN_RIGHT]), true);
+    
+    talk_id(qs->items[QUICKSCREEN_BOTTOM]->lang_id, true);
+    option_talk_value(qs->items[QUICKSCREEN_BOTTOM], 
+                      option_value(qs->items[QUICKSCREEN_BOTTOM]), true);
     while (true) {
         button = get_action(CONTEXT_QUICKSCREEN,HZ/5);
         if(default_event_handler(button) == SYS_USB_CONNECTED)
