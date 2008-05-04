@@ -484,7 +484,11 @@ card_deck.195x80x2.bmp
 solitaire_suitsi.15x80x2.bmp
 #endif
 #else /* monochrome */
-#if LCD_WIDTH >= 112
+#if LCD_WIDTH >= 160
+card_back.18x23x1.bmp
+card_deck.234x92x1.bmp
+solitaire_suitsi.18x92x1.bmp
+#elif LCD_WIDTH >= 112
 card_back.13x13x1.bmp
 card_deck.169x52x1.bmp
 solitaire_suitsi.13x52x1.bmp
