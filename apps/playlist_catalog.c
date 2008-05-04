@@ -419,7 +419,8 @@ bool catalog_view_playlists(void)
     return true;
 }
 
-bool catalog_add_to_a_playlist(char* sel, int sel_attr, bool new_playlist)
+bool catalog_add_to_a_playlist(char* sel, int sel_attr,
+                               bool new_playlist, char *m3u8name)
 {
     char playlist[MAX_PATH];
     
@@ -429,9 +430,14 @@ bool catalog_add_to_a_playlist(char* sel, int sel_attr, bool new_playlist)
     if (new_playlist)
     {
         size_t len;
-        snprintf(playlist, MAX_PATH, "%s/", playlist_dir);
-        if (kbd_input(playlist, MAX_PATH))
-            return false;
+        if (m3u8name == NULL)
+        {
+            snprintf(playlist, MAX_PATH, "%s/", playlist_dir);
+            if (kbd_input(playlist, MAX_PATH))
+                return false;
+        }
+        else
+            strcpy(playlist, m3u8name);
         
         len = strlen(playlist);
 

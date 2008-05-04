@@ -69,6 +69,7 @@
 #include "gwps-common.h"
 #include "eeprom_settings.h"
 #include "scrobbler.h"
+#include "playlist_catalog.h"
 
 /* gui api */
 #include "list.h"
@@ -883,107 +884,17 @@ static int dirbrowse()
     return true;
 }
 
-static int plsize = 0;
-static long pltick;
-static bool add_dir(char* dirname, int len, int fd)
-{
-    bool abort = false;
-    DIR* dir;
-
-    /* check for user abort */
-    if (action_userabort(TIMEOUT_NOBLOCK))
-        return true;
-
-    dir = opendir(dirname);
-    if(!dir)
-        return true;
-
-    while (true) {
-        struct dirent *entry;
-
-        entry = readdir(dir);
-        if (!entry)
-            break;
-        if (entry->attribute & ATTR_DIRECTORY) {
-            int dirlen = strlen(dirname);
-            bool result;
-
-            if (!strcmp((char *)entry->d_name, ".") ||
-                !strcmp((char *)entry->d_name, ".."))
-                continue;
-
-            if (dirname[1])
-                snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
-            else
-                snprintf(dirname, len, "/%s", entry->d_name);
-
-            result = add_dir(dirname, len, fd);
-            dirname[dirlen] = '\0';
-            if (result) {
-                abort = true;
-                break;
-            }
-        }
-        else {
-            int x = strlen((char *)entry->d_name);
-            int i;
-            char *cp = strrchr((char *)entry->d_name,'.');
-
-            if (cp) {
-                cp++;
-
-                /* add all supported audio files to playlists */
-                for (i=0; i < filetypes_count; i++) {
-                    if (filetypes[i].tree_attr == FILE_ATTR_AUDIO) {
-                        if (!strcasecmp(cp, filetypes[i].extension)) {
-                            write(fd, dirname, strlen(dirname));
-                            write(fd, "/", 1);
-                            write(fd, entry->d_name, x);
-                            write(fd, "\n", 1);
-
-                            plsize++;
-                            if(TIME_AFTER(current_tick, pltick+HZ/4)) {
-                                pltick = current_tick;
-                                gui_syncsplash(0, "%d %s",
-                                               plsize, str(LANG_DIR_BROWSER));
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    closedir(dir);
-
-    return abort;
-}
-
 bool create_playlist(void)
 {
-    int fd;
     char filename[MAX_PATH];
-
-    pltick = current_tick;
 
     snprintf(filename, sizeof filename, "%s.m3u8",
              tc.currdir[1] ? tc.currdir : "/root");
     gui_syncsplash(0, "%s %s", str(LANG_CREATING), filename);
-    
-    fd = creat(filename);
-    if (fd < 0)
-        return false;
 
     trigger_cpu_boost();
-
-    snprintf(filename, sizeof(filename), "%s",
-             tc.currdir[1] ? tc.currdir : "/");
-    plsize = 0;
-    add_dir(filename, sizeof(filename), fd);
-    close(fd);
-
+    catalog_add_to_a_playlist(tc.currdir, ATTR_DIRECTORY, true, filename);
     cancel_cpu_boost();
-    sleep(HZ);
 
     return true;
 }

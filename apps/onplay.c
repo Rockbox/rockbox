@@ -236,12 +236,13 @@ static bool view_playlist(void)
 static bool cat_add_to_a_playlist(void)
 {
     return catalog_add_to_a_playlist(selected_file, selected_file_attr,
-        false);
+                                     false, NULL);
 }
 
 static bool cat_add_to_a_new_playlist(void)
 {
-    return catalog_add_to_a_playlist(selected_file, selected_file_attr, true);
+    return catalog_add_to_a_playlist(selected_file, selected_file_attr,
+                                     true, NULL);
 }
 
 

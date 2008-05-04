@@ -486,7 +486,7 @@ static int onplay_menu(int index)
             case 3: /* add to a new one */
                 catalog_add_to_a_playlist(current_track->name,
                                           FILE_ATTR_AUDIO,
-                                          result==3 );
+                                          result==3, NULL);
                 ret = 0;
                 break;
         }
