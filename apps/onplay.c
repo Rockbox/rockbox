@@ -1011,6 +1011,41 @@ MENUITEM_FUNCTION(eq_browse_presets_item, 0, ID2P(LANG_EQUALIZER_BROWSE),
                   eq_browse_presets, NULL, NULL, Icon_Audio);
 #endif
 
+/* study mode setting toggling */
+
+static char* study_mode_toggle_get_name(int selected_item, void * data,
+                                        char *buffer)
+{
+    (void)selected_item;
+    (void)data;
+    snprintf(buffer, MAX_PATH,
+             global_settings.study_mode ? str(LANG_DISABLE_STUDY_MODE)
+             : str(LANG_ENABLE_STUDY_MODE));
+    return buffer;
+}
+
+static int study_mode_toggle_speak_item(int selected_item, void * data)
+{
+    (void)selected_item;
+    (void)data;
+    talk_id(global_settings.study_mode ? LANG_DISABLE_STUDY_MODE
+         : LANG_ENABLE_STUDY_MODE, false);
+    return 0;
+}
+
+static int toggle_study_mode(void * param)
+{
+    (void)param;
+    global_settings.study_mode ^= 1;
+    return 0;
+}
+
+MENUITEM_FUNCTION_DYNTEXT(study_mode_toggle, 0,
+                          toggle_study_mode, NULL,
+                          study_mode_toggle_get_name,
+                          study_mode_toggle_speak_item,
+                          NULL, NULL, Icon_NOICON);
+
 /* CONTEXT_[TREE|ID3DB] items */
 static int clipboard_callback(int action,const struct menu_item_ex *this_item);
 MENUITEM_FUNCTION(rename_file_item, 0, ID2P(LANG_RENAME),
@@ -1152,6 +1187,7 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #if CONFIG_CODEC == SWCODEC
            &eq_menu_graphical_item, &eq_browse_presets_item,
 #endif
+           &study_mode_toggle,
          );
 /* used when onplay() is not called in the CONTEXT_WPS context */
 MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE), 

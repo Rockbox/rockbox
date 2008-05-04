@@ -437,6 +437,8 @@ struct user_settings
     bool play_selected; /* Plays selected file even in shuffle mode */
     int ff_rewind_min_step; /* FF/Rewind minimum step size */
     int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
+    bool study_mode; /* study mode enabled */
+    int study_hop_step; /* hop step in study mode, in seconds */
 
 #ifndef HAVE_FLASH_STORAGE
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */

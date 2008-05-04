@@ -90,6 +90,51 @@ static void gui_wps_set_margin(struct gui_wps *gwps)
 }
 #endif
 
+static void prev_track(unsigned skip_thresh)
+{
+    if (!wps_state.id3 || (wps_state.id3->elapsed < skip_thresh*1000)) {
+        audio_prev();
+    }
+    else {
+        if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
+        {
+            curr_cuesheet_skip(-1, wps_state.id3->elapsed);
+            return;
+        }
+
+        if (!wps_state.paused)
+#if (CONFIG_CODEC == SWCODEC)
+            audio_pre_ff_rewind();
+#else
+        audio_pause();
+#endif
+
+        audio_ff_rewind(0);
+
+#if (CONFIG_CODEC != SWCODEC)
+        if (!wps_state.paused)
+            audio_resume();
+#endif
+    }
+}
+
+void next_track(void)
+{
+    /* take care of if we're playing a cuesheet */
+    if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
+    {
+        if (curr_cuesheet_skip(1, wps_state.id3->elapsed))
+        {
+            /* if the result was false, then we really want
+               to skip to the next track */
+            return;
+        }
+    }
+
+    audio_next();
+}
+
+
 long gui_wps_show(void)
 {
     long button = 0;
@@ -335,11 +380,13 @@ long gui_wps_show(void)
             }
                 break;
             /* fast forward 
-                OR next dir if this is straight after ACTION_WPS_SKIPNEXT */
+                OR next dir if this is straight after ACTION_WPS_SKIPNEXT
+                OR in study mode, next track if straight after SKIPPREV. */
             case ACTION_WPS_SEEKFWD:
                 if (global_settings.party_mode)
                     break;
-                if (current_tick -last_right < HZ)
+                if (!global_settings.study_mode
+                    && current_tick -last_right < HZ)
                 {
                     if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
                     {
@@ -350,15 +397,23 @@ long gui_wps_show(void)
                         audio_next_dir();
                     }
                 }
+                else if(global_settings.study_mode
+                        && current_tick -last_left < HZ) {
+                    next_track();
+                    update_track = true;
+                }
                 else ffwd_rew(ACTION_WPS_SEEKFWD);
-                last_right = 0;
+                last_right = last_left = 0;
                 break;
             /* fast rewind 
-                OR prev dir if this is straight after ACTION_WPS_SKIPPREV */
+                OR prev dir if this is straight after ACTION_WPS_SKIPPREV,
+                OR in study mode, beg of track or prev track if this is
+                straight after SKIPPREV */
             case ACTION_WPS_SEEKBACK:
                 if (global_settings.party_mode)
                     break;
-                if (current_tick -last_left < HZ)
+                if (!global_settings.study_mode
+                    && current_tick -last_left < HZ)
                 {
                     if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
                     {
@@ -375,8 +430,14 @@ long gui_wps_show(void)
                         audio_prev_dir();
                     }
                 }
+                else if(global_settings.study_mode
+                        && current_tick -last_right < HZ)
+                {
+                    prev_track(3+global_settings.study_hop_step);
+                    update_track = true;
+                }
                 else ffwd_rew(ACTION_WPS_SEEKBACK);
-                last_left = 0;
+                last_left = last_right = 0;
                 break;
 
                 /* prev / restart */
@@ -404,34 +465,13 @@ long gui_wps_show(void)
                 /* ...otherwise, do it normally */
 #endif
 
-                if (!wps_state.id3 || (wps_state.id3->elapsed < 3*1000)) {
-                    audio_prev();
-                }
-                else {
-
-                    if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
-                    {
-                        curr_cuesheet_skip(-1, wps_state.id3->elapsed);
-                        break;
-                    }
-
-                    if (!wps_state.paused)
-#if (CONFIG_CODEC == SWCODEC)
-                        audio_pre_ff_rewind();
-#else
-                        audio_pause();
-#endif
-
-                    audio_ff_rewind(0);
-
-#if (CONFIG_CODEC != SWCODEC)
-                    if (!wps_state.paused)
-                        audio_resume();
-#endif
-                }
+                if(global_settings.study_mode)
+                    play_hop(-1);
+                else prev_track(3);
                 break;
 
-                /* next */
+                /* next
+                   OR in study mode, hop by predetermined amount. */
             case ACTION_WPS_SKIPNEXT:
                 if (global_settings.party_mode)
                     break;
@@ -456,18 +496,9 @@ long gui_wps_show(void)
                 /* ...otherwise, do it normally */
 #endif
 
-                /* take care of if we're playing a cuesheet */
-                if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
-                {
-                    if (curr_cuesheet_skip(1, wps_state.id3->elapsed))
-                    {
-                        /* if the result was false, then we really want
-                           to skip to the next track */
-                        break;
-                    }
-                }
-
-                audio_next();
+                if(global_settings.study_mode)
+                    play_hop(1);
+                else next_track();
                 break;
                 /* next / prev directories */
                 /* and set A-B markers if in a-b mode */
@@ -484,7 +515,9 @@ long gui_wps_show(void)
                 else
 #endif
                 {
-                    audio_next_dir();
+                    if(global_settings.study_mode)
+                        next_track();
+                    else audio_next_dir();
                 }
                 break;
             case ACTION_WPS_ABSETA_PREVDIR:
@@ -496,7 +529,9 @@ long gui_wps_show(void)
                 else
 #endif
                 {
-                    audio_prev_dir();
+                    if(global_settings.study_mode)
+                        prev_track(3);
+                    else audio_prev_dir();
                 }
                 break;
             /* menu key functions */

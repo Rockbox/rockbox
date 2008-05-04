@@ -1163,6 +1163,10 @@ const struct settings_list settings[] = {
 #endif
 #endif
     OFFON_SETTING(0,cuesheet,LANG_CUESHEET_ENABLE,false,"cuesheet support", NULL),
+    OFFON_SETTING(0,study_mode,LANG_ENABLE_STUDY_MODE,false,"Study mode",
+                  NULL),
+    INT_SETTING(0, study_hop_step, LANG_STUDY_HOP_STEP, 5, "Study hop step",
+                UNIT_SEC, 0, 250, 1, NULL, NULL, NULL),
     CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1, 
             "start in screen", "previous,root,files,db,wps,menu,"
 #ifdef HAVE_RECORDING

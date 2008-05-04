@@ -174,6 +174,11 @@ MAKE_MENU(unplug_menu, ID2P(LANG_HEADPHONE_UNPLUG), 0, Icon_NOICON,
           &unplug_mode, &unplug_rw, &unplug_autoresume);
 #endif
 
+MENUITEM_SETTING(study_mode, &global_settings.study_mode, NULL);
+MENUITEM_SETTING(study_hop_step, &global_settings.study_hop_step, NULL);
+MAKE_MENU(study_mode_menu, ID2P(LANG_STUDY_MODE), 0, Icon_NOICON,
+          &study_mode, &study_hop_step);
+
 MAKE_MENU(playback_menu_item,ID2P(LANG_PLAYBACK),0,
           Icon_Playback_menu,
           &shuffle_item, &repeat_mode, &play_selected,
@@ -194,6 +199,7 @@ MAKE_MENU(playback_menu_item,ID2P(LANG_PLAYBACK),0,
 #ifdef HAVE_HEADPHONE_DETECTION
          ,&unplug_menu
 #endif
+         ,&study_mode_menu
          );
          
 static int playback_callback(int action,const struct menu_item_ex *this_item)

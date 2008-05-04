@@ -11604,3 +11604,59 @@
     *: "Unknown"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Study Mode"
+  </source>
+  <dest>
+    *: "Study Mode"
+  </dest>
+  <voice>
+    *: "Study Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Study Increment"
+  </source>
+  <dest>
+    *: "Study Increment"
+  </dest>
+  <voice>
+    *: "Study Increment"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_STUDY_MODE
+  desc: WPS context menu
+  user:
+  <source>
+    *: "Enable Study Mode"
+  </source>
+  <dest>
+    *: "Enable Study Mode"
+  </dest>
+  <voice>
+    *: "Enable Study Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: WPS context menu
+  user:
+  <source>
+    *: "Disable Study Mode"
+  </source>
+  <dest>
+    *: "Disable Study Mode"
+  </dest>
+  <voice>
+    *: "Disable Study Mode"
+  </voice>
+</phrase>

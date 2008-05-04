@@ -78,6 +78,7 @@ static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 #define gui_wps_statusbar_draw(wps, force) \
     gui_statusbar_draw((wps)->statusbar, (force))
 #endif
+#include "pcmbuf.h"
 
 /* fades the volume */
 void fade(bool fade_in)
@@ -141,6 +142,39 @@ bool update_onvol_change(struct gui_wps * gwps)
     return true;
 #endif
     return false;
+}
+
+void play_hop(int direction)
+{
+    if(!wps_state.id3 || !wps_state.id3->length
+       || global_settings.study_hop_step == 0)
+        return;
+#define STEP ((unsigned)global_settings.study_hop_step *1000)
+    if(direction == 1
+       && wps_state.id3->length - wps_state.id3->elapsed < STEP+1000) {
+#if CONFIG_CODEC == SWCODEC
+        if(global_settings.beep)
+            pcmbuf_beep(1000, 150, 1500*global_settings.beep);
+#endif
+        return;
+    }
+    if((direction == -1 && wps_state.id3->elapsed < STEP))
+        wps_state.id3->elapsed = 0;
+    else
+        wps_state.id3->elapsed += STEP *direction;
+    if((audio_status() & AUDIO_STATUS_PLAY) && !wps_state.paused) {
+#if (CONFIG_CODEC == SWCODEC)
+        audio_pre_ff_rewind();
+#else
+        audio_pause();
+#endif
+    }
+    audio_ff_rewind(wps_state.id3->elapsed);
+#if (CONFIG_CODEC != SWCODEC)
+    if (!wps_state.paused)
+        audio_resume();
+#endif
+#undef STEP
 }
 
 bool ffwd_rew(int button)

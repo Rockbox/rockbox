@@ -49,8 +49,8 @@ int audio_current_aa_hid(void);
 extern void audio_next_dir(void);
 extern void audio_prev_dir(void);
 #else
-#define audio_next_dir() 
-#define audio_prev_dir()
+#define audio_next_dir() ({ })
+#define audio_prev_dir() ({ })
 #endif
 
 #endif
