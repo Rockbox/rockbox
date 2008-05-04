@@ -33,4 +33,5 @@ void option_select_next_val(struct settings_list *setting,
 char *option_get_valuestring(struct settings_list *setting, 
                              char *buffer, int buf_len,
                              intptr_t temp_var);
+void option_talk_value(const struct settings_list *setting, int value, bool enqueue);
 #endif /* _GUI_OPTION_SELECT_H_ */

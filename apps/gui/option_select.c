@@ -146,24 +146,21 @@ char *option_get_valuestring(struct settings_list *setting,
     }
     return buffer;
 }
-
-static int option_talk(int selected_item, void * data)
+void option_talk_value(const struct settings_list *setting, int value, bool enqueue)
 {
-    struct settings_list *setting = (struct settings_list *)data;
-    int temp_var = selection_to_val(setting, selected_item);
     if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
     {
-        bool val = temp_var==1?true:false;
+        bool val = value==1?true:false;
         talk_id(val? setting->bool_setting->lang_yes :
-                setting->bool_setting->lang_no, false);
+                setting->bool_setting->lang_no, enqueue);
     }
 #if 0 /* probably dont need this one */
     else if ((setting->flags & F_FILENAME) == F_FILENAME)
     {
-    }
+}
 #endif
     else if (((setting->flags & F_INT_SETTING) == F_INT_SETTING) ||
-             ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING))
+               ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING))
     {
         const struct int_setting *int_info = setting->int_setting;
         const struct table_setting *tbl_info = setting->table_setting;
@@ -180,9 +177,9 @@ static int option_talk(int selected_item, void * data)
             get_talk_id = tbl_info->get_talk_id;
         }
         if (get_talk_id)
-            talk_id(get_talk_id((int)temp_var, unit), false);
+            talk_id(get_talk_id(value, unit), enqueue);
         else
-            talk_value((int)temp_var, unit, false);
+            talk_value(value, unit, enqueue);
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
@@ -194,20 +191,26 @@ static int option_talk(int selected_item, void * data)
             talkunit = UNIT_PERCENT;
         else if (!strcmp(unit, "Hz"))
             talkunit = UNIT_HERTZ;
-        talk_value((int)temp_var, talkunit, false);
+        talk_value(value, talkunit, false);
     }
     else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
     {
-        int value = (int)temp_var;
         if (setting->flags & F_CHOICETALKS)
         {
-            talk_id(setting->choice_setting->talks[value], false);
+            talk_id(setting->choice_setting->talks[value], enqueue);
         }
         else
         {
-            talk_id(P2ID(setting->choice_setting->desc[value]), false);
+            talk_id(P2ID(setting->choice_setting->desc[value]), enqueue);
         }
     }
+}
+    
+static int option_talk(int selected_item, void * data)
+{
+    struct settings_list *setting = (struct settings_list *)data;
+    int temp_var = selection_to_val(setting, selected_item);
+    option_talk_value(setting, temp_var, false);
     return 0;
 }
 
