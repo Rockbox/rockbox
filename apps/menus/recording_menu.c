@@ -487,7 +487,7 @@ bool rectrigger(void)
     int offset[NB_SCREENS];
     int option_lines[NB_SCREENS];
     int w, h, i;
-    int stat_height = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
+    int stat_height = gui_statusbar_height();
     int pm_y[NB_SCREENS];
 
     int trig_xpos[NB_SCREENS];

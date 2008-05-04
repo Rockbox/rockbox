@@ -797,3 +797,9 @@ void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
         gui_statusbar_draw( &(bars->statusbars[i]), force_redraw );
     }
 }
+
+int gui_statusbar_height(void)
+{
+    return global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
+}
+

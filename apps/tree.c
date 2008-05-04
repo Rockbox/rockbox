@@ -936,8 +936,6 @@ static bool add_dir(char* dirname, int len, int fd)
                 for (i=0; i < filetypes_count; i++) {
                     if (filetypes[i].tree_attr == FILE_ATTR_AUDIO) {
                         if (!strcasecmp(cp, filetypes[i].extension)) {
-                            char buf[8];
-                            int i;
                             write(fd, dirname, strlen(dirname));
                             write(fd, "/", 1);
                             write(fd, entry->d_name, x);
@@ -946,28 +944,8 @@ static bool add_dir(char* dirname, int len, int fd)
                             plsize++;
                             if(TIME_AFTER(current_tick, pltick+HZ/4)) {
                                 pltick = current_tick;
-
-                                snprintf(buf, sizeof buf, "%d", plsize);
-#ifdef HAVE_LCD_BITMAP
-                                FOR_NB_SCREENS(i)
-                                {
-                                    screens[i].puts(0, 4, (unsigned char *)buf);
-                                    gui_textarea_update(&screens[i]);
-                                }
-#else
-                                if (plsize > 999)
-                                    x=7;
-                                else if (plsize > 99)
-                                    x=8;
-                                else if (plsize > 9)
-                                    x=9;
-                                else
-                                    x = 10;
-
-                                FOR_NB_SCREENS(i) {
-                                    screens[i].puts(x,0,buf);
-                                }
-#endif
+                                gui_syncsplash(0, "%d %s",
+                                               plsize, str(LANG_DIR_BROWSER));
                             }
                             break;
                         }
@@ -984,22 +962,14 @@ static bool add_dir(char* dirname, int len, int fd)
 bool create_playlist(void)
 {
     int fd;
-    int i;
     char filename[MAX_PATH];
 
     pltick = current_tick;
 
     snprintf(filename, sizeof filename, "%s.m3u8",
              tc.currdir[1] ? tc.currdir : "/root");
-    FOR_NB_SCREENS(i)
-    {
-        gui_textarea_clear(&screens[i]);
-        screens[i].puts(0, 0, str(LANG_CREATING));
-        screens[i].puts_scroll(0, 1, (unsigned char *)filename);
-#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
-        gui_textarea_update(&screens[i]);
-#endif
-    }
+    gui_syncsplash(0, "%s %s", str(LANG_CREATING), filename);
+    
     fd = creat(filename);
     if (fd < 0)
         return false;
@@ -1272,25 +1242,9 @@ void tree_restore(void)
     if (global_settings.dircache)
     {
         /* Print "Scanning disk..." to the display. */
-        int i;
-        FOR_NB_SCREENS(i)
-        {
-            screens[i].putsxy((LCD_WIDTH/2) -
-                              ((strlen(str(LANG_SCANNING_DISK)) *
-                                screens[i].char_width)/2),
-                              LCD_HEIGHT-screens[i].char_height*3,
-                              str(LANG_SCANNING_DISK));
-            gui_textarea_update(&screens[i]);
-        }
-        cond_talk_ids_fq(LANG_SCANNING_DISK);
+        gui_syncsplash(0, str(LANG_SCANNING_DISK));
 
         dircache_build(global_status.dircache_size);
-
-        /* Clean the text when we are done. */
-        FOR_NB_SCREENS(i)
-        {
-            gui_textarea_clear(&screens[i]);
-        }
     }
 #endif
 #ifdef HAVE_TAGCACHE

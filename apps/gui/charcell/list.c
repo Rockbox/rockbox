@@ -54,7 +54,7 @@ void list_draw(struct screen *display, struct viewport *parent,
     display->set_viewport(NULL);
     lines = display->nb_lines;
     
-    gui_textarea_clear(display);
+    display->clear_display();
     start = 0;
     end = display->nb_lines;
     gui_list->last_displayed_start_item[display->screen_type] = 
@@ -126,5 +126,5 @@ void list_draw(struct screen *display, struct viewport *parent,
     }
 
     display->update_viewport();
-    gui_textarea_update(display);
+    display->update();
 }
