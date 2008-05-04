@@ -1260,12 +1260,16 @@ int getmodel(struct ipod_t* ipod, int ipod_version)
     return 0;
 }
 
+/* returns number of found ipods or -1 if no ipods found and permission
+ * for raw disc access was denied. */
 int ipod_scan(struct ipod_t* ipod)
 {
     int i;
     int n = 0;
     int ipod_version;
     char last_ipod[4096];
+    int denied = 0;
+    int result;
 
     printf("[INFO] Scanning disk devices...\n");
 
@@ -1282,7 +1286,10 @@ int ipod_scan(struct ipod_t* ipod)
 #else
     #error No disk paths defined for this platform
 #endif
-         if (ipod_open(ipod, 1) < 0) {
+         if ((result = ipod_open(ipod, 1)) < 0) {
+             if(result == -2) {
+                 denied++;
+             }
              continue;
          }
 
@@ -1319,7 +1326,15 @@ int ipod_scan(struct ipod_t* ipod)
         /* Remember the disk name */
         strcpy(ipod->diskname,last_ipod);
     }
-    return n;
+    else if(n == 0 && denied) {
+        printf("[ERR]  FATAL: Permission denied on %d device(s) and no ipod detected.\n", denied);
+#ifdef __WIN32__
+        printf("[ERR]  You need to run this program with administrator priviledges!\n");
+#else
+        printf("[ERR]  You need permissions for raw disc access for this program to work!\n");
+#endif
+    }
+    return (n == 0 && denied) ? -1 : n;
 }
 
 static void put_int32le(uint32_t x, unsigned char* p)

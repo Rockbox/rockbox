@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <errno.h>
 
 #include "ipodio.h"
 
@@ -105,7 +106,8 @@ int ipod_open(struct ipod_t* ipod, int silent)
     ipod->dh=open(ipod->diskname,O_RDONLY);
     if (ipod->dh < 0) {
         if (!silent) perror(ipod->diskname);
-        return -1;
+        if(errno == EACCES) return -2;
+        else return -1;
     }
 
     /* Read information about the disk */
