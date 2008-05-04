@@ -272,7 +272,7 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
         gui_quickscreen_draw(qs, &screens[i], &vp[i]);
     }
     while (true) {
-        button = get_action(CONTEXT_QUICKSCREEN,TIMEOUT_BLOCK);
+        button = get_action(CONTEXT_QUICKSCREEN,HZ/5);
         if(default_event_handler(button) == SYS_USB_CONNECTED)
             return(true);
         if(gui_quickscreen_do_button(qs, button))
