@@ -148,8 +148,7 @@ void main(void)
     char model[5];
 
     lcd_clear_display();
-    printf("Hello world!");
-    printf("Gigabeat S Rockbox Bootloader v.00000010");
+    printf("Gigabeat S Rockbox Bootloader v.00000011");
     system_init();
     kernel_init();
     printf("kernel init done");
@@ -278,7 +277,7 @@ void main(void)
 
     rc = load_firmware(loadbuffer, "/.rockbox/rockbox.gigabeat", buffer_size);
     if(rc < 0)
-        error((int)buf, rc);
+        error(EBOOTFILE, rc);
 
     system_prepare_fw_start();
 
