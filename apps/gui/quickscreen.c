@@ -230,6 +230,17 @@ static int option_value(const struct settings_list *setting)
     else
         return *(int*)setting->setting;
 }
+
+void talk_qs_option(struct settings_list *opt, bool enqueue)
+{
+    if (global_settings.talk_menu) {
+        if(!enqueue)
+            talk_shutup();
+        talk_id(opt->lang_id, true);
+        option_talk_value(opt, option_value(opt), true);
+    }
+}
+
 /*
  * Does the actions associated to the given button if any
  *  - qs : the quickscreen
@@ -258,9 +269,7 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
             return false;
     }
     option_select_next_val((struct settings_list *)qs->items[item], false, true);
-    if (global_settings.talk_menu)
-        option_talk_value((struct settings_list *)qs->items[item], 
-                          option_value((struct settings_list *)qs->items[item]), false);
+    talk_qs_option((struct settings_list *)qs->items[item], false);
     return true;
 }
 
@@ -283,20 +292,13 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
         quickscreen_fix_viewports(qs, &screens[i], &vp[i]);
         gui_quickscreen_draw(qs, &screens[i], &vp[i]);
     }
-    if (global_settings.talk_menu)
-    {
-        talk_id(qs->items[QUICKSCREEN_LEFT]->lang_id, false);
-        option_talk_value(qs->items[QUICKSCREEN_LEFT], 
-                          option_value(qs->items[QUICKSCREEN_LEFT]), true);
-        
-        talk_id(qs->items[QUICKSCREEN_RIGHT]->lang_id, true);
-        option_talk_value(qs->items[QUICKSCREEN_RIGHT], 
-                          option_value(qs->items[QUICKSCREEN_RIGHT]), true);
-        
-        talk_id(qs->items[QUICKSCREEN_BOTTOM]->lang_id, true);
-        option_talk_value(qs->items[QUICKSCREEN_BOTTOM], 
-                          option_value(qs->items[QUICKSCREEN_BOTTOM]), true);
-    }
+    /* Announce current selection on entering this screen. This is all
+       queued up, but can be interrupted as soon as a setting is
+       changed. */
+    cond_talk_ids(VOICE_QUICKSCREEN);
+    talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_LEFT], true);
+    talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_BOTTOM], true);
+    talk_qs_option((struct settings_list *)qs->items[QUICKSCREEN_RIGHT], true);
     while (true) {
         button = get_action(CONTEXT_QUICKSCREEN,HZ/5);
         if(default_event_handler(button) == SYS_USB_CONNECTED)
@@ -321,6 +323,8 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
             
         gui_syncstatusbar_draw(&statusbars, false);
     }
+    /* Notify that we're exiting this screen */
+    cond_talk_ids_fq(VOICE_OK);
     return changed;
 }
 
