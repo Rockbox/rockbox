@@ -1907,8 +1907,8 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         udma4[0] = (identify_info[88] & (1<<4)) ? '4' : 0;
         udma5[0] = (identify_info[88] & (1<<5)) ? '5' : 0;
         simplelist_addline(SIMPLELIST_ADD_LINE,
-                 "UDMA modes: %s %s %s %s %s", udma0, udma1, udma2,
-                                               udma3, udma4, udma5);
+                 "UDMA modes: %s %s %s %s %s %s", udma0, udma1, udma2,
+                                                  udma3, udma4, udma5);
     }
     else {
         simplelist_addline(SIMPLELIST_ADD_LINE,
