@@ -37,13 +37,6 @@ static struct wakeup transfer_completion_signal;
 
 static bool dma_in_progress = false;
 
-static int debugi = 0;
-static void debugj(char* mes)
-{
-    lcd_puts(0,debugi++,mes);
-    lcd_update();
-}
-
 void MTC0(void)
 {
     IO_INTC_IRQ1 = INTR_IRQ1_MTC0;
@@ -60,16 +53,10 @@ void dma_start(const void* addr, size_t size)
 
 #define ATA_DEST        (ATA_IOBASE-CS1_START)
 void dma_ata_read(unsigned char* buf, int shortcount)
-{
-    char mes[30];
-    snprintf(mes, 30, "read(0x%x, %d)", buf, shortcount);
-    debugj(mes);
-    
+{   
     if(dma_in_progress)
         wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
     
-    if((unsigned long)buf & 0x1F)
-        debugj(" aligning");
     while((unsigned long)buf & 0x1F)
     {
         unsigned short tmp;
@@ -94,17 +81,8 @@ void dma_ata_read(unsigned char* buf, int shortcount)
     dma_in_progress = true;
     wakeup_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
     
-    int i;
-    for(i = 0; i < 30; i++)
-    {
-        if(*buf++ != 0)
-            mes[i] = *buf;
-    }
-    debugj(mes);
-    
     if(shortcount % 2)
     {
-        debugj(" aligning");
         unsigned short tmp;
         tmp = ATA_DATA;
         *buf++ = tmp & 0xFF;
