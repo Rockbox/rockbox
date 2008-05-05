@@ -26,32 +26,7 @@
 #include "debug-target.h"
 #include "mc13783.h"
 #include "adc.h"
-
-#define CONFIG_CLK32_FREQ   32768
-#define CONFIG_HCLK_FREQ    27000000
-
-/* Return PLL frequency in HZ */
-static unsigned int decode_pll(unsigned int reg,
-                               unsigned int infreq)
-{
-    uint64_t mfi = (reg >> 10) & 0xf;
-    uint64_t mfn =  reg & 0x3ff;
-    uint64_t mfd = ((reg >> 16) & 0x3ff) + 1;
-    uint64_t pd =  ((reg >> 26) & 0xf) + 1;
-
-    mfi = mfi <= 5 ? 5 : mfi;
-
-    return 2*infreq*(mfi * mfd + mfn) / (mfd * pd);
-}
-
-/* Get the PLL reference clock frequency */
-static unsigned int get_pll_ref_clk_freq(void)
-{
-    if ((CLKCTL_CCMR & (3 << 1)) == (1 << 1))
-        return CONFIG_CLK32_FREQ * 1024;
-    else
-        return CONFIG_HCLK_FREQ;
-}
+#include "clkctl-imx31.h"
 
 bool __dbg_hw_info(void)
 {
@@ -74,11 +49,11 @@ bool __dbg_hw_info(void)
         spctl = CLKCTL_SPCTL;
         upctl = CLKCTL_UPCTL;
 
-        pllref = get_pll_ref_clk_freq();
+        pllref = imx31_clkctl_get_pll_ref_clk();
 
-        mcu_pllfreq = decode_pll(mpctl, pllref);
-        ser_pllfreq = decode_pll(spctl, pllref);
-        usb_pllfreq = decode_pll(upctl, pllref);
+        mcu_pllfreq = imx31_clkctl_get_pll(PLL_MCU);
+        ser_pllfreq = imx31_clkctl_get_pll(PLL_SERIAL);
+        usb_pllfreq = imx31_clkctl_get_pll(PLL_USB);
 
         snprintf(buf, sizeof (buf), "pll_ref_clk: %u", pllref);
         lcd_puts(0, line++, buf); line++;

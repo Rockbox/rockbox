@@ -83,4 +83,27 @@ enum IMX31_CG_MODES
 void imx31_clkctl_module_clock_gating(enum IMX31_CG_LIST cg,
                                       enum IMX31_CG_MODES mode);
 
+enum IMX31_PLLS
+{
+    PLL_MCU = 0,
+    PLL_USB,
+    PLL_SERIAL,
+    NUM_PLLS,
+};
+
+#define CONFIG_CLK32_FREQ   32768
+#define CONFIG_HCLK_FREQ    27000000
+
+/* Get the PLL reference clock frequency in HZ */
+unsigned int imx31_clkctl_get_pll_ref_clk(void);
+
+/* Return PLL frequency in HZ */
+unsigned int imx31_clkctl_get_pll(enum IMX31_PLLS pll);
+
+/* Return ipg_clk in HZ */
+unsigned int imx31_clkctl_get_ipg_clk(void);
+
+/* Return the ATA frequency in HZ */
+unsigned int imx31_clkctl_get_ata_clk(void);
+
 #endif /* _CLKCTL_IMX31_H_ */

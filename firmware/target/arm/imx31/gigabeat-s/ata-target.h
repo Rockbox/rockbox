@@ -68,4 +68,7 @@ void ata_reset(void);
 void ata_device_init(void);
 bool ata_is_coldstart(void);
 
+#define ATA_NOTIFY_IDENTIFY_READY
+void ata_identify_ready(void);
+
 #endif

@@ -1089,6 +1089,10 @@ static int identify(void)
         identify_info[i] = ATA_DATA;
 #endif
     }
+
+#ifdef ATA_NOTIFY_IDENTIFY_READY
+    ata_identify_ready();
+#endif
     
     return 0;
 }
