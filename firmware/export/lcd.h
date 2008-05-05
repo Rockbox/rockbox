@@ -285,8 +285,8 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define LCD_DARKGRAY   LCD_RGBPACK(85, 85, 85)
 #define LCD_LIGHTGRAY  LCD_RGBPACK(170, 170, 170)
 #define LCD_WHITE      LCD_RGBPACK(255, 255, 255)
-#define LCD_DEFAULT_FG LCD_BLACK
-#define LCD_DEFAULT_BG LCD_RGBPACK(182, 198, 229) /* rockbox blue */
+#define LCD_DEFAULT_FG LCD_WHITE
+#define LCD_DEFAULT_BG LCD_BLACK
 #define LCD_DEFAULT_LS LCD_WHITE
 
 #elif LCD_DEPTH > 1 /* greyscale */
