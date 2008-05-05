@@ -48,6 +48,9 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_MC13783
 
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
+
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
