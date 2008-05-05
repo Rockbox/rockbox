@@ -210,6 +210,7 @@ static bool dbg_os(void)
                             NULL);
 #ifndef ROCKBOX_HAS_LOGF
     info.hide_selection = true;
+    info.scroll_all = true;
 #endif
     info.action_callback = dbg_threads_action_callback;
     info.get_name = threads_getname;
@@ -798,6 +799,7 @@ bool dbg_partitions(void)
     simplelist_info_init(&info, "Partition Info", 4, NULL);
     info.selection_size = 2;
     info.hide_selection = true;
+    info.scroll_all = true;
     info.get_name = dbg_partitions_getname;
     return simplelist_show_list(&info);
 }
@@ -1959,6 +1961,7 @@ static bool dbg_disk_info(void)
 #endif
     info.action_callback = disk_callback;
     info.hide_selection = true;
+    info.scroll_all = true;
     return simplelist_show_list(&info);
 }
 #endif /* !SIMULATOR */
@@ -1991,6 +1994,7 @@ static bool dbg_dircache_info(void)
     simplelist_info_init(&info, "Dircache Info", 7, NULL);
     info.action_callback = dircache_callback;
     info.hide_selection = true;
+    info.scroll_all = true;
     return simplelist_show_list(&info);
 }
 
@@ -2048,6 +2052,7 @@ static bool dbg_tagcache_info(void)
     simplelist_info_init(&info, "Database Info", 8, NULL);
     info.action_callback = database_callback;
     info.hide_selection = true;
+    info.scroll_all = true;
     
     /* Don't do nonblock here, must give enough processing time
        for tagcache thread. */
@@ -2194,6 +2199,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
 static bool dbg_fm_radio(void)
 {
     struct simplelist_info info;
+    info.scroll_all = true;
     simplelist_info_init(&info, "FM Radio", 1, NULL);
     simplelist_set_line_count(0);
     simplelist_addline(SIMPLELIST_ADD_LINE, "HW detected: %s",
@@ -2447,6 +2453,7 @@ static int isp1583_action_callback(int action, struct gui_synclist *lists)
 static bool dbg_isp1583(void)
 {
     struct simplelist_info isp1583;
+    info.scroll_all = true;
     simplelist_info_init(&isp1583, "ISP1583", dbg_usb_num_items(), NULL);
     isp1583.timeout = HZ/100; 
     isp1583.hide_selection = true;
@@ -2471,6 +2478,7 @@ static int pic_action_callback(int action, struct gui_synclist *lists)
 static bool dbg_pic(void)
 {
     struct simplelist_info pic;
+    info.scroll_all = true;
     simplelist_info_init(&pic, "PIC", pic_dbg_num_items(), NULL);
     pic.timeout = HZ/100; 
     pic.hide_selection = true;
