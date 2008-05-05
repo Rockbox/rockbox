@@ -271,7 +271,7 @@ void send_command_to_pic(unsigned char in, unsigned char* out,
     IO_INTC_EINT1 &= ~INTR_EINT1_EXT0;
     /* Clear EXT0 interrupt */
     IO_INTC_IRQ1 = INTR_IRQ1_EXT0;
-    /* Write command to I²C */
+    /* Write command to IÂ²C */
     restart:
     i2c_write(PIC_ADR, &in, 1);
     /* Wait for PIC */
@@ -283,7 +283,7 @@ void send_command_to_pic(unsigned char in, unsigned char* out,
         if(i > 50)
             goto restart;
     }
-    /* Read return from I²C */
+    /* Read return from IÂ²C */
     i2c_read(PIC_ADR, out, length);
     /* Re-enable GIO0 interrupt */
     IO_INTC_EINT1 |= INTR_EINT1_EXT0;

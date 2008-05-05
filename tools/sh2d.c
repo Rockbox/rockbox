@@ -3,7 +3,7 @@
  * Bart Trzynadlowski, July 24, 2000
  * Public domain
  *
- * Some changes by Björn Stenberg <bjorn@haxx.se>
+ * Some changes by BjÃ¶rn Stenberg <bjorn@haxx.se>
  * $Id$
  */
 

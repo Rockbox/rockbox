@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2008 by Maurus Cuelenaere
  *
- * DM320 I²C driver
+ * DM320 IÂ²C driver
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -145,12 +145,12 @@ int i2c_read(unsigned short address, unsigned char* buf, int count)
 void i2c_init(void)
 {
 #if 0 //TODO: mimic OF I2C clock settings; currently this is done by the bootloader
-    IO_CLK_MOD2 &= ~CLK_MOD2_I2C; // turn I²C clock off (just to be sure)
+    IO_CLK_MOD2 &= ~CLK_MOD2_I2C; // turn IÂ²C clock off (just to be sure)
     IO_CLK_LPCTL1 &= ~1; // set Powerdown mode to off
-    IO_CLK_SEL0 &= ~0x800; // set I²C clock to PLLA
-    IO_CLK_DIV4 &= ~0x1F; // I²C clock division = 1
-    IO_CLK_MOD2 |= CLK_MOD2_I2C; // enable I²C clock
+    IO_CLK_SEL0 &= ~0x800; // set IÂ²C clock to PLLA
+    IO_CLK_DIV4 &= ~0x1F; // IÂ²C clock division = 1
+    IO_CLK_MOD2 |= CLK_MOD2_I2C; // enable IÂ²C clock
 #endif
     IO_I2C_SCS &= ~0x8; //set clock to 100 kHz
-    IO_INTC_EINT2 &= ~INTR_EINT2_I2C; // disable I²C interrupt
+    IO_INTC_EINT2 &= ~INTR_EINT2_I2C; // disable IÂ²C interrupt
 }

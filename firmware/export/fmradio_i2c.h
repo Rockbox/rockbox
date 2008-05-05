@@ -8,7 +8,7 @@
  * $Id$
  * Physical interface of the Philips TEA5767 in Archos Ondio
  *
- * Copyright (C) 2004 by Jörg Hohensohn
+ * Copyright (C) 2004 by JÃ¶rg Hohensohn
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

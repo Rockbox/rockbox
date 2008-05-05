@@ -7,7 +7,7 @@
 *                     \/            \/     \/    \/            \/
 * $Id: timer.h 13806 2007-07-06 21:36:32Z jethead71 $
 *
-* Copyright (C) 2005 Kévin Ferrare
+* Copyright (C) 2005 KÃ©vin Ferrare
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.

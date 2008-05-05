@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id: jackpot.c 14034 2007-07-28 05:42:55Z kevin $
  *
- * Copyright (C) 2007 Copyright Kévin Ferrare
+ * Copyright (C) 2007 Copyright KÃ©vin Ferrare
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

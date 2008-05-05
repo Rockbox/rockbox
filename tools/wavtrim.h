@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id: wavtrim.h 14229 2007-08-07 10:21:03Z linus $
  *
- * Copyright (C) 2004 by Jörg Hohensohn
+ * Copyright (C) 2004 by JÃ¶rg Hohensohn
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

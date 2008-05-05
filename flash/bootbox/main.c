@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Jörg Hohensohn  aka [IDC]Dragon
+ * Copyright (C) 2005 by JÃ¶rg Hohensohn  aka [IDC]Dragon
  *
  * This is "Bootbox", a minimalistic loader, rescue firmware for just
  *   booting into a full features one. Aside from that it does charging

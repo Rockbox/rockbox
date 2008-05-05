@@ -7,7 +7,7 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* Copyright (C) 2006 Miguel A. Arévalo 
+* Copyright (C) 2006 Miguel A. ArÃ©valo 
 * Color graphics from eboard
 * GNUChess v2 chess engine Copyright (c) 1988  John Stanback
 *

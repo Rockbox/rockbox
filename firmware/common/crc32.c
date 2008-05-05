@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2003 Jörg Hohensohn [IDC]Dragon
+ * Copyright (C) 2003 JÃ¶rg Hohensohn [IDC]Dragon
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

@@ -19,7 +19,7 @@
 
 /*
  * Parts of this code has been stolen from the Ample project and was written
- * by David Härdeman. It has since been extended and enhanced pretty much by
+ * by David HÃ¤rdeman. It has since been extended and enhanced pretty much by
  * all sorts of friendly Rockbox people.
  *
  * A nice reference for MPEG header info:

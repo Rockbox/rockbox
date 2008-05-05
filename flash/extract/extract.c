@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2003 by Jörg Hohensohn 
+ * Copyright (C) 2003 by JÃ¶rg Hohensohn 
  * 
  * Tool to extract the scrambled image out of an Archos flash ROM dump
  *

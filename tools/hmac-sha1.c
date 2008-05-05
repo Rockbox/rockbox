@@ -428,7 +428,7 @@ sha1_process_block (const void *buffer, size_t len, struct sha1_ctx *ctx)
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Simon Josefsson.  The interface was inspired by memxor
-   in Niels Möller's Nettle. */
+   in Niels MÃ¶ller's Nettle. */
 
 void *
 memxor (void * dest, const void * src, size_t n)

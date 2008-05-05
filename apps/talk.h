@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 Jörg Hohensohn
+ * Copyright (C) 2004 JÃ¶rg Hohensohn
  *
  * This module collects the Talkbox and voice UI functions.
  * (Talkbox reads directory names from mp3 clips called thumbnails,

@@ -203,9 +203,9 @@ A12: In our testing we found the following results:
 
      So where is the break-even point?
 
-     Each second of pause will draw about 94 mAh / 3600 seconds = 26 µAh.
+     Each second of pause will draw about 94 mAh / 3600 seconds = 26 ÂµAh.
 
-     2.18 mAh / 26 µAh = 2180 µAh / 26 µAh = 83.5 seconds
+     2.18 mAh / 26 ÂµAh = 2180 ÂµAh / 26 ÂµAh = 83.5 seconds
 
      Thus a shutdown and restart uses as much power as 83.5 seconds of pause.
 

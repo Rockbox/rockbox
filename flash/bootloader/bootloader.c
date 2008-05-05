@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2003 by Jörg Hohensohn
+ * Copyright (C) 2003 by JÃ¶rg Hohensohn
  *
  * Second-level bootloader, with dual-boot feature by holding F1/Menu
  * This is the image being descrambled and executed by the boot ROM.

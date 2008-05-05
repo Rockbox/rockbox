@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id: clock.c 14095 2007-07-31 10:53:53Z nls $
  *
- * Copyright (C) 2007 Kévin Ferrare, graphic design 2003 Zakk Roberts
+ * Copyright (C) 2007 KÃ©vin Ferrare, graphic design 2003 Zakk Roberts
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

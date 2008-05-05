@@ -6,7 +6,7 @@ Background
   [Most, if not all, of this document is completely outdated. You should rather
   hunt down this info in the Rockbox wiki or source code!]
 
-  Björn Stenberg started this venture back in the late year 2001. The first
+  BjÃ¶rn Stenberg started this venture back in the late year 2001. The first
   Rockbox code was committed to CVS end of March 2002. Rockbox 1.0 was
   released in June.
 
@@ -54,7 +54,7 @@ Playing MPEG
 
   The DEMAND signal is connected to a port pin on the CPU which can generate
   an IRQ, but only on the falling edge. That means that the mpeg driver code
-  must poll the DEMAND signal every ms to keep the MAS happy. The mpeg code
+Â  must poll the DEMAND signal every ms to keep the MAS happy. The mpeg code
   does use the IRQ to detect the falling edge when the MAS is "full".
 
   Unfortunately, the serial port on the CPU sends the LSB first, and the MAS

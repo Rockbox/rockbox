@@ -9,7 +9,7 @@
  *
  * Copyright (C) 1999 Robert Hak (rhak@ramapo.edu)
  *
- * Heavily modified for embedded use by Björn Stenberg (bjorn@haxx.se)
+ * Heavily modified for embedded use by BjÃ¶rn Stenberg (bjorn@haxx.se)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

@@ -11,7 +11,7 @@
 * (This is a real mess if it has to be coded in one single C file)
 *
 * File scrolling addition (C) 2005 Alexander Spyridakis
-* Copyright (C) 2004 Jörg Hohensohn aka [IDC]Dragon
+* Copyright (C) 2004 JÃ¶rg Hohensohn aka [IDC]Dragon
 * Heavily borrowed from the IJG implementation (C) Thomas G. Lane
 * Small & fast downscaling IDCT (C) 2002 by Guido Vollbeding  JPEGclub.org
 *

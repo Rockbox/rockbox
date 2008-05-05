@@ -10,7 +10,7 @@
 * Plugin for reprogramming only the second image in Flash ROM.
 * !!! DON'T MESS WITH THIS CODE UNLESS YOU'RE ABSOLUTELY SURE WHAT YOU DO !!!
 *
-* Copyright (C) 2003 Jörg Hohensohn aka [IDC]Dragon
+* Copyright (C) 2003 JÃ¶rg Hohensohn aka [IDC]Dragon
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.

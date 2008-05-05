@@ -10,7 +10,7 @@
 * Plugin for reprogramming the whole Flash ROM chip with a new content.
 * !!! DON'T MESS WITH THIS CODE UNLESS YOU'RE ABSOLUTELY SURE WHAT YOU DO !!!
 *
-* Copyright (C) 2003 Jörg Hohensohn [IDC]Dragon
+* Copyright (C) 2003 JÃ¶rg Hohensohn [IDC]Dragon
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.

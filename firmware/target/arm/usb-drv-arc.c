@@ -9,7 +9,7 @@
  *
  * Driver for ARC USBOTG Device Controller
  *
- * Copyright (C) 2007 by Björn Stenberg
+ * Copyright (C) 2007 by BjÃ¶rn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2003 by Jörg Hohensohn 
+ * Copyright (C) 2003 by JÃ¶rg Hohensohn 
  * 
  * Autoring tool for the firmware image to be programmed into Flash ROM
  * It composes the flash content with header, bootloader and image(s)

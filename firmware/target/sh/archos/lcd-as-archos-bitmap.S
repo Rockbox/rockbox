@@ -8,7 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2004 by Jens Arnold
- * Based on the work of Alan Korr and Jörg Hohensohn
+ * Based on the work of Alan Korr and JÃ¶rg Hohensohn
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -121,7 +121,7 @@ _lcd_write_data:
 
     /* This code will fail if an interrupt changes the contents of PBDRL.
      * If so, we must disable the interrupt here. If disabling interrupts
-     * for a long time (~9200 clks = ~830 µs for transferring 112 bytes on
+     * for a long time (~9200 clks = ~830 Âµs for transferring 112 bytes on
      * recorders)is undesirable, the loop has to be rewritten to
      * disable/precalculate/transfer/enable for each iteration. However,
      * this would significantly decrease performance. */

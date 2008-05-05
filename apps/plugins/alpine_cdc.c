@@ -8,7 +8,7 @@
  * $Id$
  *
  *
- * Copyright (C) 2003-2005 Jörg Hohensohn
+ * Copyright (C) 2003-2005 JÃ¶rg Hohensohn
  *
  * Alpine CD changer Project
  * This is a feasibility study for Archos emulating an Alpine M-Bus CD changer.

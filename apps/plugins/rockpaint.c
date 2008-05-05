@@ -548,9 +548,9 @@ static struct menu_items select_menu[] =
       { SELECT_MENU_INVERT, "Invert" },
       { SELECT_MENU_HFLIP, "Horizontal flip" },
       { SELECT_MENU_VFLIP, "Vertical flip" },
-//      { SELECT_MENU_ROTATE90, "Rotate 90°" },
-      { SELECT_MENU_ROTATE180, "Rotate 180°" },
-//      { SELECT_MENU_ROTATE270, "Rotate 270°" },
+//      { SELECT_MENU_ROTATE90, "Rotate 90Â°" },
+      { SELECT_MENU_ROTATE180, "Rotate 180Â°" },
+//      { SELECT_MENU_ROTATE270, "Rotate 270Â°" },
       { SELECT_MENU_CANCEL, "Cancel" },
       { MENU_END, "" } };
 

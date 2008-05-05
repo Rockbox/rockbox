@@ -9,7 +9,7 @@
  *
  * Copyright (C) 1999 Chris Allegretta
  * Copyright (C) 2005 Alastair S - ported to podzilla
- * Copyright (C) 2005 Jonas Häggqvist - ported to rockbox
+ * Copyright (C) 2005 Jonas HÃ¤ggqvist - ported to rockbox
  *   
  *
  * All files in this archive are subject to the GNU General Public License.

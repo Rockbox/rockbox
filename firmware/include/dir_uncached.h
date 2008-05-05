@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id: dir.h 13741 2007-06-30 02:08:27Z jethead71 $
  *
- * Copyright (C) 2002 by Björn Stenberg
+ * Copyright (C) 2002 by BjÃ¶rn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

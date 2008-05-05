@@ -375,7 +375,7 @@ static bool dbg_buffering_thread(void)
 
         if (ticks > 0)
         {
-            int boostquota = boost_ticks * 1000 / ticks; /* in �/oo */
+            int boostquota = boost_ticks * 1000 / ticks; /* in °/oo */
             int avgclock   = freq_sum * 10 / ticks;      /* in 100 kHz */
             snprintf(buf, sizeof(buf), "boost ratio: %3d.%d%% (%2d.%dMHz)",
                      boostquota/10, boostquota%10, avgclock/10, avgclock%10);
@@ -1732,7 +1732,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     static const unsigned char i_vmin[] = { 0, 1, 5, 10, 25, 35, 60, 100 };
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
     static const unsigned char *kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };
-    static const unsigned char *nsec_units[] = { "ns", "�s", "ms" };
+    static const unsigned char *nsec_units[] = { "ns", "µs", "ms" };
     static const char *spec_vers[] = { "1.0-1.2", "1.4", "2.0-2.2",
         "3.1-3.31", "4.0" };
     if ((btn == ACTION_STD_OK) || (btn == SYS_FS_CHANGED) || (btn == ACTION_REDRAW))

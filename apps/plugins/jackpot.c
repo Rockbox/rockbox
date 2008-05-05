@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 Copyright Kévin Ferrare based on work by Pierre Delore
+ * Copyright (C) 2007 Copyright KÃ©vin Ferrare based on work by Pierre Delore
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

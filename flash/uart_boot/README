@@ -1,4 +1,4 @@
-(c) 2003 by Jörg Hohensohn
+(c) 2003 by JÃ¶rg Hohensohn
 
 This is the client side for MiniMon, a command line program that communicates with it.
 It can be used to reflash a box from ground up, load a program like gdb stub or Rockbox, 

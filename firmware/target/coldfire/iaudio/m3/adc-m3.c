@@ -25,8 +25,8 @@
 
 #define ADC_I2C_ADDR 0xa0
 
-/* The M3 ADC is hooked exclusively to the secondary I²C bus, and requires
- * very slow transfers (I²C clock <= 16kHz). So we start one 4-byte read
+/* The M3 ADC is hooked exclusively to the secondary IÂ²C bus, and requires
+ * very slow transfers (IÂ²C clock <= 16kHz). So we start one 4-byte read
  * transfer each tick, and handle it via an ISR. At 11MHz, one transfer
  * takes too long to be started every tick, but it seems we have to live 
  * with that. */
@@ -92,7 +92,7 @@ unsigned short adc_read(int channel)
 
 void adc_init(void)
 {
-    MFDR2 = 0x1f;             /* I²C clock = SYSCLK / 3840 */
+    MFDR2 = 0x1f;             /* IÂ²C clock = SYSCLK / 3840 */
     MBCR2 = IEN;              /* Enable interface */
     MBSR2 = 0;                /* Clear flags */
     MBCR2 = (IEN|IIEN);       /* Enable interrupts */
@@ -105,7 +105,7 @@ void adc_init(void)
         sleep(1);             /* Ensure valid readings when adc_init returns */
 }
 
-/* The ADC (most probably the PIC12F675) obviously has a slow and buggy I²C
+/* The ADC (most probably the PIC12F675) obviously has a slow and buggy IÂ²C
  * implementation. If a transfer is stopped prematurely, it often locks up
  * and doesn't react anymore until the unit is power cycled. */
 

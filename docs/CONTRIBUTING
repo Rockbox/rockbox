@@ -63,7 +63,7 @@ Text format
 -----------
 Use "unix style" line feeds: "LF" only. Do not use "CR+LF".
 
-Use ISO-8859-1 character set, but try to refrain from using any non-ascii
+Use UTF-8 character set, but try to refrain from using any non-ascii
 letters as they will only appear weird in some camps no matter what.
 
 Patches
