@@ -43,6 +43,8 @@
 #include "usb_drv.h"
 #endif
 
+/* Show the Rockbox logo - in show_logo.c */
+extern int show_logo(void);
 
 /* Button definitions */
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
@@ -442,23 +444,27 @@ void* main(void)
 
     system_init();
     kernel_init();
+
     lcd_init();
+#if LCD_DEPTH > 1
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+#endif
+
     font_init();
+    show_logo();
+
     button_init();
 #if defined(SANSA_E200)
     i2c_init();
     _backlight_on();
 #endif
 
-#if LCD_DEPTH > 1
-    lcd_set_foreground(LCD_WHITE);
-    lcd_set_background(LCD_BLACK);
-#endif
-    lcd_clear_display();
     
     if (button_hold())
     {
         verbose = true;
+        lcd_clear_display();
         printf("Hold switch on");
         printf("Shutting down...");
         sleep(HZ);
@@ -468,8 +474,10 @@ void* main(void)
     btn = button_read_device();
 
     /* Enable bootloader messages if any button is pressed */
-    if (btn)
+    if (btn) {
+        lcd_clear_display();
         verbose = true;
+    }
 
 #if defined(SANSA_E200) || defined(SANSA_C200)
 #if !defined(USE_ROCKBOX_USB)

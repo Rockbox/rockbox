@@ -8,10 +8,30 @@
 #
 
 INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)	\
- -I$(BUILDDIR)
+ -I$(BUILDDIR) -I$(BUILDDIR)/bitmaps
 
 DEPFILE = $(OBJDIR)/dep-bootloader
 LDS := $(FIRMDIR)/target/$(CPU)/$(MANUFACTURER)/boot.lds
+
+# Set up the bitmap libraries
+BITMAPLIBS =
+LINKBITMAPS =
+ifneq ($(strip $(BMP2RB_MONO)),)
+  BITMAPLIBS += $(BUILDDIR)/libbitmapsmono.a
+  LINKBITMAPS += -lbitmapsmono
+endif
+ifneq ($(strip $(BMP2RB_NATIVE)),)
+  BITMAPLIBS += $(BUILDDIR)/libbitmapsnative.a
+  LINKBITMAPS += -lbitmapsnative
+endif
+ifneq ($(strip $(BMP2RB_REMOTEMONO)),)
+  BITMAPLIBS += $(BUILDDIR)/libbitmapsremotemono.a
+  LINKBITMAPS += -lbitmapsremotemono
+endif
+ifneq ($(strip $(BMP2RB_REMOTENATIVE)),)
+  BITMAPLIBS += $(BUILDDIR)/libbitmapsremotenative.a
+  LINKBITMAPS += -lbitmapsremotenative
+endif
 
 ifdef DEBUG
     DEFINES := -DDEBUG
@@ -47,6 +67,8 @@ else
 all: $(BUILDDIR)/$(BINARY) $(FLASHFILE)
 endif
 
+$(DEPFILE): $(BITMAPLIBS)
+
 dep: $(DEPFILE)
 
 $(LINKFILE): $(LDS)
@@ -58,8 +80,22 @@ $(MAXOUTFILE):
 	$(SILENT)cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
 	$(SILENT)rm $(MAXINFILE)
 
-$(OBJDIR)/bootloader.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Wl,--gc-sections -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootloader.map
+build-bitmapsmono:
+	$(call PRINTS,MAKE in bitmaps/mono)$(MAKE) -C ../apps/bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
+ 
+build-bitmapsnative:
+	$(call PRINTS,MAKE in bitmaps/native)$(MAKE) -C ../apps/bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
+
+build-bitmapsremotemono:
+	$(call PRINTS,MAKE in bitmaps/remote_mono)$(MAKE) -C ../apps/bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+
+build-bitmapsremotenative:
+	$(call PRINTS,MAKE in bitmaps/remote_native)$(MAKE) -C ../apps/bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
+
+$(BITMAPLIBS): $(BUILDDIR)/lib%.a: build-%
+
+$(OBJDIR)/bootloader.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(BITMAPLIBS)
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Wl,--gc-sections -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootloader.map
 
 $(OBJDIR)/bootloader.bin : $(OBJDIR)/bootloader.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
@@ -76,5 +112,9 @@ clean:
 	$(call PRINTS,cleaning bootloader)-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/bootloader.asm \
 	$(OBJDIR)/bootloader.bin $(OBJDIR)/bootloader.elf $(OBJDIR)/*.map \
 	$(LINKFILE) $(MAXOUTFILE) $(DEPFILE)
+	$(SILENT)$(MAKE) -C bitmaps/mono clean OBJDIR=$(OBJDIR)/bitmaps/mono
+	$(SILENT)$(MAKE) -C bitmaps/native clean OBJDIR=$(OBJDIR)/bitmaps/native
+	$(SILENT)$(MAKE) -C bitmaps/remote_mono clean OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+	$(SILENT)$(MAKE) -C bitmaps/remote_native clean OBJDIR=$(OBJDIR)/bitmaps/remote_native
 
 -include $(DEPFILE)

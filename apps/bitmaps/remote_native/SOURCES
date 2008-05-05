@@ -1,5 +1,7 @@
 #ifdef HAVE_REMOTE_LCD
 
+#ifndef BOOTLOADER  /* We don't need these for the bootloader */
+
 #if (LCD_REMOTE_DEPTH == 1)
 remote_rockboxlogo.128x42x1.bmp
 remote_usblogo.104x27x1.bmp
@@ -9,5 +11,7 @@ remote_rockboxlogo.128x42x2.bmp
 remote_usblogo.104x27x2.bmp
 remote_default_icons.6x8x2.bmp
 #endif
+
+#endif /* BOOTLOADER */
 
 #endif /* HAVE_REMOTE_LCD */

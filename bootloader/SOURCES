@@ -13,6 +13,7 @@ gigabeat-s.c
 #ifdef E200R_INSTALLER
 main-e200r-installer.c
 #else
+show_logo.c
 main-pp.c
 #endif
 #elif defined(ELIO_TPJ1022)
