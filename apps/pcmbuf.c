@@ -39,7 +39,8 @@
 #include "thread.h"
 
 /* Define PCMBUF_MUTING if the codec requires muting to prevent pops */
-#if !defined(HAVE_UDA1380) && !defined(HAVE_TLV320) && !defined(HAVE_AS3514)
+#if !defined(HAVE_UDA1380) && !defined(HAVE_TLV320) && !defined(HAVE_AS3514) \
+    && !defined(HAVE_WM8978)
 #define PCMBUF_MUTING
 #endif
 
