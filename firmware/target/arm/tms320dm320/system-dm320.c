@@ -24,6 +24,9 @@
 #include "uart-target.h"
 #include "system-arm.h"
 #include "spi.h"
+#ifdef CREATIVE_ZVM
+#include "dma-target.h"
+#endif
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -77,6 +80,23 @@ default_interrupt(ICE);
 default_interrupt(ARMCOM_RX);
 default_interrupt(ARMCOM_TX);
 default_interrupt(RESERVED);
+
+/* The entry address is equal to base address plus an offset.
+ * The offset is based on the priority of the interrupt. So if
+ * the priority of an interrupt is changed, the user should also
+ * change the offset for the interrupt in the entry table.
+ */
+
+static const unsigned short const irqpriority[] = 
+{
+    IRQ_TIMER0,IRQ_TIMER1,IRQ_TIMER2,IRQ_TIMER3,IRQ_CCD_VD0,IRQ_CCD_VD1,
+    IRQ_CCD_WEN,IRQ_VENC,IRQ_SERIAL0,IRQ_SERIAL1,IRQ_EXT_HOST,IRQ_DSPHINT,
+    IRQ_UART0,IRQ_UART1,IRQ_USB_DMA,IRQ_USB_CORE,IRQ_VLYNQ,IRQ_MTC0,IRQ_MTC1,
+    IRQ_SD_MMC,IRQ_SDIO_MS,IRQ_GIO0,IRQ_GIO1,IRQ_GIO2,IRQ_GIO3,IRQ_GIO4,IRQ_GIO5,
+    IRQ_GIO6,IRQ_GIO7,IRQ_GIO8,IRQ_GIO9,IRQ_GIO10,IRQ_GIO11,IRQ_GIO12,IRQ_GIO13,
+    IRQ_GIO14,IRQ_GIO15,IRQ_PREVIEW0,IRQ_PREVIEW1,IRQ_WATCHDOG,IRQ_I2C,IRQ_CLKC,
+    IRQ_ICE,IRQ_ARMCOM_RX,IRQ_ARMCOM_TX,IRQ_RESERVED
+}; /* IRQ priorities, ranging from highest to lowest */
 
 static void (* const irqvector[])(void) =
 {
@@ -150,15 +170,14 @@ void system_reboot(void)
     __asm__ __volatile__(                    
         "mov     ip, #0                                             \n"
         "mcr     p15, 0, ip, c7, c7, 0           @ invalidate cache \n"
-        "mcr	 p15, 0, ip, c7, c10,4		     @ drain WB         \n"
+        "mcr     p15, 0, ip, c7, c10,4           @ drain WB         \n"
         "mcr     p15, 0, ip, c8, c7, 0           @ flush TLB (v4)   \n"
         "mrc     p15, 0, ip, c1, c0, 0           @ get ctrl register\n"
         "bic     ip, ip, #0x000f                 @ ............wcam \n"
         "bic     ip, ip, #0x2100                 @ ..v....s........ \n"
         "mcr     p15, 0, ip, c1, c0, 0           @ ctrl register    \n"
         "mov     ip, #0xFF000000                                    \n"
-        "orr     ip, ip, #0xFF0000               @ ip = 0xFFFF0000  \n"  
-        "mov     pc, ip                                             \n"
+        "orr     pc, ip, #0xFF0000               @ ip = 0xFFFF0000  \n"  
         :
         :
         : "cc"
@@ -194,10 +213,10 @@ void system_init(void)
     IO_INTC_ENTRY_TBA0 = 0;
     IO_INTC_ENTRY_TBA1 = 0;
     
-    unsigned short i;
-    /* Reset interrupt priorities to default values */
+    int i;
+    /* Set interrupt priorities to predefined values */
     for(i = 0; i < 23; i++)
-        DM320_REG(0x0540+i*2) = ( (i*2+1) << 8 ) | i*2 ;/* IO_INTC_PRIORITYx */
+        DM320_REG(0x0540+i*2) = ((irqpriority[i*2+1] & 0x3F) << 8) | (irqpriority[i*2] & 0x3F); /* IO_INTC_PRIORITYx */
     
     /* Turn off all timers */
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
@@ -213,6 +232,10 @@ void system_init(void)
 
     uart_init();
     spi_init();
+    
+#ifdef CREATIVE_ZVM
+    dma_init();
+#endif
  
     /* MMU initialization (Starts data and instruction cache) */
     ttb_init();
@@ -229,7 +252,7 @@ void system_init(void)
     map_section(0x40000000, 0x40000000, 16, CACHE_NONE);
     map_section(0x50000000, 0x50000000, 16, CACHE_NONE);
     map_section(0x60000000, 0x60000000, 16, CACHE_NONE);
-    map_section(0x80000000, 0x80000000,  1, CACHE_NONE); 
+    map_section(0x80000000, 0x80000000,  1, CACHE_NONE);
 #endif
     enable_mmu();
 }
