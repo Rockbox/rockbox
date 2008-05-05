@@ -392,7 +392,7 @@ int format_partition(struct ipod_t* ipod, int partition)
     if ( qTotalSectors >= 0xffffffff )
     {
         /* This is a more fundamental limitation on FAT32 - the total
-           sector count in the root dir ­s 32bit. With a bit of
+           sector count in the root dir is 32bit. With a bit of
            creativity, FAT32 could be extended to handle at least 2^28
            clusters There would need to be an extra field in the
            FSInfo sector, and the old sector count could be set to
