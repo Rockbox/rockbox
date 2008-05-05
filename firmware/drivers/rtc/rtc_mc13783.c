@@ -64,6 +64,14 @@ enum rtc_registers_indexes
     RTC_NUM_REGS,
 };
 
+/* was it an alarm that triggered power on ? */
+static bool alarm_start;
+
+void mc1378_alarm_start(void)
+{
+    alarm_start = true;
+}
+
 static const unsigned char rtc_registers[RTC_NUM_REGS] =
 {
     [RTC_REG_TIME]  = MC13783_RTC_TIME,
@@ -236,3 +244,47 @@ int rtc_write_datetime(unsigned char* buf)
 
     return 0;
 }
+
+bool rtc_check_alarm_flag(void)
+{
+    /* We don't need to do anything special if it has already fired */
+    return false;
+}
+
+bool rtc_enable_alarm(bool enable)
+{
+    if (enable)
+        mc13783_clear(MC13783_INTERRUPT_MASK1, MC13783_TODA);
+    else
+        mc13783_set(MC13783_INTERRUPT_MASK1, MC13783_TODA);
+
+    return false;
+}
+
+bool rtc_check_alarm_started(bool release_alarm)
+{
+    bool rc = alarm_start;
+    alarm_start &= ~release_alarm;
+
+    return rc;
+}
+
+void rtc_set_alarm(int h, int m)
+{
+    int day = mc13783_read(MC13783_RTC_DAY);
+    int tod = mc13783_read(MC13783_RTC_TIME);
+
+    if (h*3600 + m*60 < tod)
+        day++;
+
+    mc13783_write(MC13783_RTC_DAY_ALARM, day);
+    mc13783_write(MC13783_RTC_ALARM, h*3600 + m*60);
+}
+
+void rtc_get_alarm(int *h, int *m)
+{
+    int tod = mc13783_read(MC13783_RTC_ALARM);
+    *h = tod / 3600;
+    *m = tod % 3600 / 60;
+}
+
