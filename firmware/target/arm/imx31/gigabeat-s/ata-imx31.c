@@ -24,6 +24,7 @@
 #include "power.h"
 #include "panic.h"
 #include "ata.h"
+#include "ata-target.h"
 #include "clkctl-imx31.h"
 
 static const struct ata_pio_timings
@@ -78,6 +79,8 @@ static const struct ata_pio_timings
     },
 };
 
+static bool initialized = false;
+
 /* Setup the timing for PIO mode */
 static void ata_set_pio_mode(int mode)
 {
@@ -125,8 +128,19 @@ void ata_device_init(void)
 {
     ATA_INTF_CONTROL |= ATA_ATA_RST; /* Make sure we're not in reset mode */
 
-    /* Setup mode 0 by default */
-    ata_set_pio_mode(0);
+    if (!initialized)
+    {
+        initialized = true;
+        /* Setup mode 0 by default */
+        ata_set_pio_mode(0);
+        /* mode may be switched later once identify info is ready in which
+         * case the main driver calls back */
+    }
+    else
+    {
+        /* identify info will be ready */
+        ata_identify_ready();
+    }
 }
 
 void ata_identify_ready(void)
