@@ -60,6 +60,9 @@ gui/bitmap/list.c
 gui/charcell/list.c
 #endif
 gui/option_select.c
+#ifdef HAVE_PITCHSCREEN
+gui/pitchscreen.c
+#endif
 #ifdef HAVE_QUICKSCREEN
 gui/quickscreen.c
 #endif
