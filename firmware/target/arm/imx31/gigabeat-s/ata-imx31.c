@@ -79,17 +79,18 @@ static const struct ata_pio_timings
     },
 };
 
-static bool initialized = false;
+static int pio_mode = 0; /* Setup mode 0 by default */
 
 /* Setup the timing for PIO mode */
-static void ata_set_pio_mode(int mode)
+void ata_set_pio_timings(int mode)
 {
-    const struct ata_pio_timings * const timings = &pio_timings[mode];
+    while (!(ATA_INTERRUPT_PENDING & ATA_CONTROLLER_IDLE));
 
+    const struct ata_pio_timings * const timings = &pio_timings[mode];
     /* T = period in nanoseconds */
     int T = 1000 * 1000 * 1000 / imx31_clkctl_get_ata_clk();
 
-    while (!(ATA_INTERRUPT_PENDING & ATA_CONTROLLER_IDLE));
+    pio_mode = mode;
 
     ATA_TIME_OFF = 3;
     ATA_TIME_ON = 3;
@@ -128,40 +129,7 @@ void ata_device_init(void)
 {
     ATA_INTF_CONTROL |= ATA_ATA_RST; /* Make sure we're not in reset mode */
 
-    if (!initialized)
-    {
-        initialized = true;
-        /* Setup mode 0 by default */
-        ata_set_pio_mode(0);
-        /* mode may be switched later once identify info is ready in which
-         * case the main driver calls back */
-    }
-    else
-    {
-        /* identify info will be ready */
-        ata_identify_ready();
-    }
-}
-
-void ata_identify_ready(void)
-{
-    const unsigned short* identify_info = ata_get_identify();
-    int mode = 0;
-
-    if (identify_info[53] & (1 << 1))
-    {
-        /* Set up advanced timings */
-        if (identify_info[64] & (1 << 1))
-            mode = 4; /* Mode 0, 1, 2, 3, 4 */
-        else if (identify_info[64] & (1 << 0))
-            mode = 3; /* Mode 0, 1, 2, 3 */
-        else
-            mode = 2; /* Mode 0, 1, 2 */
-    }
-
-    /* If mode changed, actually set the timings */
-    if (mode != 0)
-    {
-        ata_set_pio_mode(mode);
-    }
+    /* mode may be switched later once identify info is ready in which
+     * case the main driver calls back */
+    ata_set_pio_timings(pio_mode);
 }

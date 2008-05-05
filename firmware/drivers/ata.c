@@ -1090,10 +1090,6 @@ static int identify(void)
 #endif
     }
 
-#ifdef ATA_NOTIFY_IDENTIFY_READY
-    ata_identify_ready();
-#endif
-    
     return 0;
 }
 
@@ -1171,6 +1167,10 @@ static int set_features(void)
             }
         }
     }
+
+#ifdef ATA_SET_DEVICE_FEATURES
+    ata_set_pio_timings(pio_mode);
+#endif
 
     return 0;
 }

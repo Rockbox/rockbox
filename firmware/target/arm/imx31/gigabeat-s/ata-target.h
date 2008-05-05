@@ -68,7 +68,7 @@ void ata_reset(void);
 void ata_device_init(void);
 bool ata_is_coldstart(void);
 
-#define ATA_NOTIFY_IDENTIFY_READY
-void ata_identify_ready(void);
+#define ATA_SET_DEVICE_FEATURES
+void ata_set_pio_timings(int mode);
 
-#endif
+#endif /* ATA_TARGET_H */
