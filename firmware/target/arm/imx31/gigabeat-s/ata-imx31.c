@@ -125,8 +125,6 @@ void ata_device_init(void)
 {
     ATA_INTF_CONTROL |= ATA_ATA_RST; /* Make sure we're not in reset mode */
 
-    while (!(ATA_INTERRUPT_PENDING & ATA_CONTROLLER_IDLE));
-
     /* Setup mode 0 by default */
     ata_set_pio_mode(0);
 }
