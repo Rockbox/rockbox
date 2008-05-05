@@ -20,10 +20,15 @@
 #ifndef ATA_TARGET_H
 #define ATA_TARGET_H
 
-/* ASM optimized reading and writing */
+/* DMA optimized reading and writing */
 #define ATA_OPTIMIZED_READING
 #define ATA_OPTIMIZED_WRITING
-void copy_read_sectors(unsigned char* buf, int wordcount);
+/*
+#include "dma-target.h"
+#define copy_read_sectors dma_ata_read
+#define copy_write_sectors dma_ata_write
+*/
+void copy_read_sectors(const unsigned char* buf, int wordcount);
 void copy_write_sectors(const unsigned char* buf, int wordcount);
 
 /* General purpose memory region #1 */

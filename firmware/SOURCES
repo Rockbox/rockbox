@@ -721,8 +721,9 @@ target/arm/ata-as-arm.S
 target/arm/lcd-as-memframe.S
 target/arm/mmu-arm.c
 target/arm/tms320dm320/creative-zvm/adc-creativezvm.c
-target/arm/tms320dm320/creative-zvm/lcd-creativezvm.c
 target/arm/tms320dm320/creative-zvm/ata-creativezvm.c
+target/arm/tms320dm320/creative-zvm/dma-creativezvm.c
+target/arm/tms320dm320/creative-zvm/lcd-creativezvm.c
 target/arm/tms320dm320/creative-zvm/pcm-creativezvm.c
 target/arm/tms320dm320/creative-zvm/pic-creativezvm.c
 target/arm/tms320dm320/creative-zvm/power-creativezvm.c
