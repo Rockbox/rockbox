@@ -28,8 +28,6 @@
 
 bool __timer_set(long cycles, bool start)
 {
-    #warning function not implemented
-    
     (void)cycles;
     (void)start;
     return false;
@@ -37,14 +35,11 @@ bool __timer_set(long cycles, bool start)
 
 bool __timer_register(void)
 {
-    #warning function not implemented
-    
     return false;
 }
 
 void __timer_unregister(void)
 {
-    #warning function not implemented
 }
 
 
