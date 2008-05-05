@@ -147,8 +147,11 @@ void main(void)
     char tarstring[6];
     char model[5];
 
+    /* Flush and invalidate all caches (because vectors were written) */
+    invalidate_icache();
+
     lcd_clear_display();
-    printf("Gigabeat S Rockbox Bootloader v.00000011");
+    printf("Gigabeat S Rockbox Bootloader v.00000012");
     system_init();
     kernel_init();
     printf("kernel init done");

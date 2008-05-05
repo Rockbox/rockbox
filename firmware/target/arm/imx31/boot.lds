@@ -56,8 +56,17 @@ SECTIONS
         . = ALIGN(0x4);
         _dataend = . ;
     } > DRAM
+    
+    .vectors 0x0 :
+    {
+        _vectorsstart = .;
+        *(.vectors);
+        KEEP(*(.vectors));
+        _vectorsend = .;
+    } AT > DRAM
+    _vectorscopy = LOADADDR(.vectors);
 
-    .stack :
+    .stack (NOLOAD) :
     {
         *(.stack)
         _stackbegin = .;
@@ -67,7 +76,7 @@ SECTIONS
         stackend = .;
     } > IRAM
 
-    .bss :
+    .bss (NOLOAD) :
     {
          _edata = .;
          *(.bss*);
@@ -75,16 +84,7 @@ SECTIONS
          *(COMMON)
          _end = .;
     } > DRAM
-
-    .vectors 0x0 :
-    {
-        _vectorsstart = .;
-        *(.vectors);
-        KEEP(*(.vectors));
-        _vectorsend = .;
-    } AT > DRAM
-    _vectorscopy = LOADADDR(.vectors);
-    
+   
     .devbss (NOLOAD) :
     {
         _devbssdata = .;
