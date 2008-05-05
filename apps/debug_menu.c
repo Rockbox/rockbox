@@ -2453,7 +2453,7 @@ static int isp1583_action_callback(int action, struct gui_synclist *lists)
 static bool dbg_isp1583(void)
 {
     struct simplelist_info isp1583;
-    info.scroll_all = true;
+    isp1583.scroll_all = true;
     simplelist_info_init(&isp1583, "ISP1583", dbg_usb_num_items(), NULL);
     isp1583.timeout = HZ/100; 
     isp1583.hide_selection = true;
@@ -2478,7 +2478,7 @@ static int pic_action_callback(int action, struct gui_synclist *lists)
 static bool dbg_pic(void)
 {
     struct simplelist_info pic;
-    info.scroll_all = true;
+    pic.scroll_all = true;
     simplelist_info_init(&pic, "PIC", pic_dbg_num_items(), NULL);
     pic.timeout = HZ/100; 
     pic.hide_selection = true;
