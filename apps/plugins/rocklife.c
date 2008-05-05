@@ -409,8 +409,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     backlight_force_on(rb); /* backlight control in lib/helper.c */
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_RGBPACK(182, 198, 229)); /* rockbox blue */
-#endif
+#else
+    rb->lcd_set_background(LCD_DEFAULT_BG);
+#endif /* HAVE_LCD_COLOR */
+#endif /* LCD_DEPTH > 1 */
 
     /* link pointers to grids */
     pgrid      = (char *)grid_a;

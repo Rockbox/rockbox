@@ -484,11 +484,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_background(LCD_RGBPACK(182, 198, 229)); /* rockbox blue */
 #if LCD_DEPTH >= 16
     rb->lcd_set_foreground( LCD_RGBPACK( 0, 0, 0));
+    rb->lcd_set_background(LCD_RGBPACK(182, 198, 229)); /* rockbox blue */
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(0);
+    rb->lcd_set_background(LCD_DEFAULT_BG);
 #endif
 #endif
     maze_init(&maze);
