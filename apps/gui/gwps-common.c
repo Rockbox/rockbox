@@ -7,7 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 Nicolas Pennequin
+ * Copyright (C) 2002-2007 Björn Stenberg
+ * Copyright (C) 2007-2008 Nicolas Pennequin
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
