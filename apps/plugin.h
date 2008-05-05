@@ -120,7 +120,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 109
+#define PLUGIN_API_VERSION 110
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -731,6 +731,12 @@ struct plugin_api {
 #ifdef HAVE_LCD_INVERT
     void (*lcd_set_invert_display)(bool yesno);
 #endif /* HAVE_LCD_INVERT */
+#ifdef HAVE_BUTTON_DATA
+    intptr_t (*button_get_data)(void);
+#endif /* HAVE_BUTTON_DATA */
+#ifdef HAVE_TOUCHPAD
+    void (*touchpad_set_mode)(enum touchpad_mode);
+#endif /* HAVE_TOUCHPAD */
 };
 
 /* plugin header */

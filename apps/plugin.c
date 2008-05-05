@@ -584,6 +584,12 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_INVERT
     lcd_set_invert_display,
 #endif /* HAVE_LCD_INVERT */
+#ifdef HAVE_BUTTON_DATA
+    button_get_data,
+#endif /* HAVE_BUTTON_DATA */
+#ifdef HAVE_TOUCHPAD
+    touchpad_set_mode,
+#endif /* HAVE_TOUCHPAD */
 };
 
 int plugin_load(const char* plugin, void* parameter)
