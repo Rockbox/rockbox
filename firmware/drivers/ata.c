@@ -956,6 +956,8 @@ int ata_hard_reset(void)
 {
     int ret;
 
+    mutex_lock(&ata_mtx);
+
     ata_reset();
 
     /* state HRR2 */
@@ -964,6 +966,8 @@ int ata_hard_reset(void)
 
     /* Massage the return code so it is 0 on success and -1 on failure */
     ret = ret?0:-1;
+
+    mutex_unlock(&ata_mtx);
 
     return ret;
 }
