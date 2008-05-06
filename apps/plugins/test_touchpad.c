@@ -17,8 +17,6 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "helper.h"
-#include "grey.h"
 
 PLUGIN_HEADER
 
