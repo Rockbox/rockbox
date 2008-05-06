@@ -115,11 +115,11 @@ int usb_serial_get_config_descriptor(unsigned char *dest,int max_packet_size)
     memcpy(dest,&interface_descriptor,sizeof(struct usb_interface_descriptor));
     dest+=sizeof(struct usb_interface_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_IN,
+    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_IN;
     memcpy(dest,&endpoint_descriptor,sizeof(struct usb_endpoint_descriptor));
     dest+=sizeof(struct usb_endpoint_descriptor);
 
-    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_OUT,
+    endpoint_descriptor.bEndpointAddress = usb_endpoint | USB_DIR_OUT;
     memcpy(dest,&endpoint_descriptor,sizeof(struct usb_endpoint_descriptor));
     dest+=sizeof(struct usb_endpoint_descriptor);
 
