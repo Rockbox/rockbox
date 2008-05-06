@@ -79,9 +79,16 @@ static struct colour_info
  */
 static int set_color_func(void* color)
 {
-    int res, c = (intptr_t)color;
+    int res, c = (intptr_t)color, banned_color=-1;
+    
+    /* Don't let foreground be set the same as background and vice-versa */
+    if (c == COLOR_BG)
+        banned_color = *colors[COLOR_FG].setting;
+    else if (c == COLOR_FG)
+        banned_color = *colors[COLOR_BG].setting;
+
     res = (int)set_color(&screens[SCREEN_MAIN],str(colors[c].lang_id),
-                         colors[c].setting,*colors[c].setting);
+                         colors[c].setting, banned_color);
     settings_save();
     settings_apply(false);
     return res;
