@@ -106,6 +106,9 @@ void ata_set_pio_timings(int mode)
 
 void ata_reset(void)
 {
+    /* Be sure we're not busy */
+    while (!(ATA_INTERRUPT_PENDING & ATA_CONTROLLER_IDLE));
+
     ATA_INTF_CONTROL &= ~ATA_ATA_RST;
     sleep(1);
     ATA_INTF_CONTROL |= ATA_ATA_RST;
