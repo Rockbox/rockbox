@@ -59,7 +59,9 @@ void ide_power_enable(bool on)
 {
     if(on){
         GPIO_CLEAR_BITWISE(GPIOF_OUTPUT_VAL, 0x01);
+        DEV_EN |= DEV_IDE0;
     } else {
+        DEV_EN &= ~DEV_IDE0;
         GPIO_SET_BITWISE(GPIOF_OUTPUT_VAL, 0x01);
     }
 }
