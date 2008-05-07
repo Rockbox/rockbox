@@ -10,6 +10,7 @@
  * Copyright (C) 2007 Vuong Minh Hiep (vmh)
  * Copyright (C) 2008 Thomas Martitz (kugel.)
  * Copyright (C) 2008 Alexander Papst
+ * Copyright (C) 2008 Peter D'Hoye
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -28,46 +29,46 @@ PLUGIN_HEADER
 /* variable button definitions - only targets with a colour display */
 #if defined(HAVE_LCD_COLOR)
 #if (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#   define FLASHLIGHT_LEFT       BUTTON_LEFT
-#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
-#   define FLASHLIGHT_LEFT       BUTTON_LEFT
-#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
-#   define FLASHLIGHT_NEXT       BUTTON_SCROLL_FWD
-#   define FLASHLIGHT_PREV       BUTTON_SCROLL_BACK
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_NEXT       BUTTON_SCROLL_FWD
+#   define LAMP_PREV       BUTTON_SCROLL_BACK
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#   define FLASHLIGHT_LEFT       BUTTON_LEFT
-#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#   define FLASHLIGHT_LEFT       BUTTON_LEFT
-#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
-#   define FLASHLIGHT_LEFT       BUTTON_LEFT
-#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#   define FLASHLIGHT_LEFT       BUTTON_LEFT
-#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
-#   define FLASHLIGHT_NEXT       BUTTON_SCROLL_FWD
-#   define FLASHLIGHT_PREV       BUTTON_SCROLL_BACK
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_NEXT       BUTTON_SCROLL_FWD
+#   define LAMP_PREV       BUTTON_SCROLL_BACK
 
 #elif (CONFIG_KEYPAD == SANSA_C200_PAD)
-#   define FLASHLIGHT_LEFT       BUTTON_LEFT
-#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#   define FLASHLIGHT_LEFT       BUTTON_LEFT
-#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
-#   define FLASHLIGHT_NEXT       BUTTON_SCROLL_UP
-#   define FLASHLIGHT_PREV       BUTTON_SCROLL_DOWN
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
+#   define LAMP_NEXT       BUTTON_SCROLL_UP
+#   define LAMP_PREV       BUTTON_SCROLL_DOWN
 
 #elif CONFIG_KEYPAD == MROBE500_PAD
-#   define FLASHLIGHT_LEFT       BUTTON_LEFT
-#   define FLASHLIGHT_RIGHT      BUTTON_RIGHT
+#   define LAMP_LEFT       BUTTON_LEFT
+#   define LAMP_RIGHT      BUTTON_RIGHT
 
 #elif CONFIG_KEYPAD == COWOND2_PAD
 
@@ -77,17 +78,17 @@ PLUGIN_HEADER
 #endif
 
 #ifdef HAVE_TOUCHPAD
-# ifndef FLASHLIGHT_LEFT
-#   define FLASHLIGHT_LEFT       BUTTON_MIDLEFT
+# ifndef LAMP_LEFT
+#   define LAMP_LEFT       BUTTON_MIDLEFT
 # endif
-# ifndef FLASHLIGHT_RIGHT
-#   define FLASHLIGHT_RIGHT      BUTTON_MIDRIGHT
+# ifndef LAMP_RIGHT
+#   define LAMP_RIGHT      BUTTON_MIDRIGHT
 # endif
-# ifndef FLASHLIGHT_NEXT
-#   define FLASHLIGHT_NEXT       BUTTON_TOPMIDDLE
+# ifndef LAMP_NEXT
+#   define LAMP_NEXT       BUTTON_TOPMIDDLE
 # endif
-# ifndef FLASHLIGHT_PREV
-#   define FLASHLIGHT_PREV       BUTTON_BOTTOMMIDDLE
+# ifndef LAMP_PREV
+#   define LAMP_PREV       BUTTON_BOTTOMMIDDLE
 # endif
 #endif
 
@@ -151,32 +152,32 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         switch(rb->button_get(true))
         {
-            case FLASHLIGHT_RIGHT:
-#ifdef FLASHLIGHT_NEXT
-            case FLASHLIGHT_NEXT:
-#endif /* FLASHLIGHT_NEXT */
+            case LAMP_RIGHT:
+#ifdef LAMP_NEXT
+            case LAMP_NEXT:
+#endif /* LAMP_NEXT */
                 cs++;
                 break;
 
-            case FLASHLIGHT_LEFT:
-#ifdef FLASHLIGHT_PREV
-            case FLASHLIGHT_PREV:
-#endif /* FLASHLIGHT_PREV */
+            case LAMP_LEFT:
+#ifdef LAMP_PREV
+            case LAMP_PREV:
+#endif /* LAMP_PREV */
                 cs--;
                 break;
 
-            case (FLASHLIGHT_RIGHT|BUTTON_REPEAT):
-            case (FLASHLIGHT_RIGHT|BUTTON_REL):
-            case (FLASHLIGHT_LEFT|BUTTON_REPEAT):
-            case (FLASHLIGHT_LEFT|BUTTON_REL):
-#ifdef FLASHLIGHT_NEXT
-            case (FLASHLIGHT_NEXT|BUTTON_REPEAT):
-            case (FLASHLIGHT_NEXT|BUTTON_REL):
-#endif /* FLASHLIGHT_NEXT */
-#ifdef FLASHLIGHT_PREV
-            case (FLASHLIGHT_PREV|BUTTON_REPEAT):
-            case (FLASHLIGHT_PREV|BUTTON_REL):
-#endif /* FLASHLIGHT_PREV */
+            case (LAMP_RIGHT|BUTTON_REPEAT):
+            case (LAMP_RIGHT|BUTTON_REL):
+            case (LAMP_LEFT|BUTTON_REPEAT):
+            case (LAMP_LEFT|BUTTON_REL):
+#ifdef LAMP_NEXT
+            case (LAMP_NEXT|BUTTON_REPEAT):
+            case (LAMP_NEXT|BUTTON_REL):
+#endif /* LAMP_NEXT */
+#ifdef LAMP_PREV
+            case (LAMP_PREV|BUTTON_REPEAT):
+            case (LAMP_PREV|BUTTON_REL):
+#endif /* LAMP_PREV */
                 /* eat these... */
                 break;
             default:

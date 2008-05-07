@@ -20,7 +20,7 @@ stopwatch.c
 vbrfix.c
 viewer.c
 #ifdef HAVE_BACKLIGHT
-flashlight.c
+lamp.c
 #endif /* HAVE_BACKLIGHT */
 
 #ifdef OLYMPUS_MROBE_500
