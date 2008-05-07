@@ -76,8 +76,8 @@ remap_start:
     mrc     p15, 0, r3, c1, c0, 0  /* perform writeback if D cache is enabled */
     tst     r3, #(1 <<  2)         /* dcache? */
     tsteq   r3, #(1 << 12)         /* or icache? */
-    mcrne   p15, 0, r0, c7, c10, 0 /* clean dcache */
     mov     r0, #0
+    mcrne   p15, 0, r0, c7, c10, 0 /* clean dcache */
     mcrne   p15, 0, r0, c7, c7, 0  /* invalidate I cache and D cache */
     mcr     p15, 0, r0, c8, c7, 0  /* invalidate TLBs */
     mcr     p15, 0, r0, c7, c10, 4 /* Drain the write buffer */
