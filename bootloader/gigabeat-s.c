@@ -17,48 +17,32 @@
  *
  ****************************************************************************/
 #include "config.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-#include "inttypes.h"
-#include "string.h"
-#include "cpu.h"
 #include "system.h"
-#include "lcd.h"
+#include <sprintf.h>
 #include "kernel.h"
-#include "thread.h"
+#include "string.h"
 #include "ata.h"
 #include "dir.h"
-#include "fat.h"
 #include "disk.h"
-#include "font.h"
-#include "adc.h"
-#include "backlight.h"
-#include "backlight-target.h"
-#include "button.h"
-#include "panic.h"
-#include "power.h"
-#include "file.h"
 #include "common.h"
-#include "rbunicode.h"
 #include "usb.h"
-#include "mmu-imx31.h"
-#include "lcd-target.h"
-#include "avic-imx31.h"
-#include <stdarg.h>
+#include "font.h"
+#include "lcd.h"
 #include "usb-target.h"
 
 #define TAR_CHUNK 512
 #define TAR_HEADER_SIZE 157
 
-char version[] = APPSVERSION;
-char basedir[] = "/Content/0b00/00/"; /* Where files sent via MTP are stored */
-int (*kernel_entry)(void);
-char *tarbuf = (char *)0x00000040;
-extern void reference_system_c(void);
+const char version[] = APPSVERSION;
+/* Where files sent via MTP are stored */
+static const char basedir[] = "/Content/0b00/00/";
+/* Can use memory after vector table up to 0x01f00000 */
+static char * const tarbuf = (char *)0x00000040;
+static const size_t tarbuf_size = 0x01f00000 - 0x00000040;
+/* Queue to get notifications when in USB mode */
 static struct event_queue usb_wait_queue;
 
-void show_splash(int timeout, const char *msg)
+static void show_splash(int timeout, const char *msg)
 {
     lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
                 (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
@@ -67,13 +51,19 @@ void show_splash(int timeout, const char *msg)
     sleep(timeout);
 }
 
-void untar(int tar_fd)
+static void untar(int tar_fd)
 {
     char header[TAR_HEADER_SIZE];
     char *ptr;
     char path[102];
-    int fd, i, size = 0;
+    int fd, i;
     int ret;
+    size_t size = filesize(tar_fd);
+
+    if (size > tarbuf_size) {
+        printf("tar file too large"); /* Paranoid but proper */
+        return;
+    }
 
     ret = read(tar_fd, tarbuf, filesize(tar_fd));
     if (ret < 0) {
@@ -151,7 +141,7 @@ void main(void)
     invalidate_icache();
 
     lcd_clear_display();
-    printf("Gigabeat S Rockbox Bootloader v.00000012");
+    printf("Gigabeat S Rockbox Bootloader v.00000013");
     system_init();
     kernel_init();
     printf("kernel init done");
@@ -286,9 +276,8 @@ void main(void)
 
     if (rc == EOK)
     {
-        kernel_entry = (void*) loadbuffer;
         invalidate_icache();
-        rc = kernel_entry();
+        asm volatile ("bx %0": : "r"(loadbuffer));
     }
 
     /* Halt */
