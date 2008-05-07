@@ -78,8 +78,11 @@ F3: equal to "="
 
 PLUGIN_HEADER
 
-#define REC_HEIGHT (int)(LCD_HEIGHT / 6)
-#define REC_WIDTH (int)(LCD_WIDTH / 5)
+#define BUTTON_ROWS 5
+#define BUTTON_COLS 5
+
+#define REC_HEIGHT (int)(LCD_HEIGHT / (BUTTON_ROWS + 1))
+#define REC_WIDTH (int)(LCD_WIDTH / BUTTON_COLS)
 
 #define Y_6_POS (LCD_HEIGHT)       /* Leave room for the border */
 #define Y_5_POS (Y_6_POS - REC_HEIGHT) /* y5 = 53 */
@@ -159,8 +162,8 @@ PLUGIN_HEADER
 
 #define CALCULATOR_LEFT BUTTON_LEFT
 #define CALCULATOR_RIGHT BUTTON_RIGHT
-#define CALCULATOR_UP   BUTTON_SCROLL_BACK
-#define CALCULATOR_DOWN BUTTON_SCROLL_FWD
+#define CALCULATOR_UP_W_SHIFT   BUTTON_SCROLL_BACK
+#define CALCULATOR_DOWN_W_SHIFT BUTTON_SCROLL_FWD
 #define CALCULATOR_QUIT BUTTON_MENU
 #define CALCULATOR_INPUT_CALC_PRE BUTTON_SELECT
 #define CALCULATOR_INPUT (BUTTON_SELECT | BUTTON_REL)
@@ -192,9 +195,14 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
 (CONFIG_KEYPAD == SANSA_C200_PAD)
 #define CALCULATOR_LEFT      BUTTON_LEFT
-#define CALCULATOR_RIGHT      BUTTON_RIGHT
+#define CALCULATOR_RIGHT     BUTTON_RIGHT
 #define CALCULATOR_UP        BUTTON_UP
 #define CALCULATOR_DOWN      BUTTON_DOWN
+#if CONFIG_KEYPAD == SANSA_E200_PAD
+/* c200 does not have a scroll wheel */
+#define CALCULATOR_UP_W_SHIFT   BUTTON_SCROLL_BACK
+#define CALCULATOR_DOWN_W_SHIFT BUTTON_SCROLL_FWD
+#endif
 #define CALCULATOR_QUIT      BUTTON_POWER
 #define CALCULATOR_INPUT_CALC_PRE BUTTON_SELECT
 #define CALCULATOR_INPUT     (BUTTON_SELECT|BUTTON_REL)
@@ -364,8 +372,9 @@ bool operInputted = false;  /*  false: do calculation first and
 double memTemp = 0;         /* temp memory                       */
 int memTempPower = 0;       /* 10^^power of memTemp              */
 
-int m, n, prev_m, prev_n;   /* position index for button         */
-#define CAL_BUTTON (m*5+n)
+int btn_row, btn_col;       /* current position index for button */
+int prev_btn_row, prev_btn_col; /* previous cursor position      */
+#define CAL_BUTTON (btn_row*5+btn_col)
 
 int btn = BUTTON_NONE;
 int lastbtn = BUTTON_NONE;
@@ -534,14 +543,14 @@ void drawButtons(int group)
     for (i = 0; i <= 4; i++){
         for (j = 0; j <= 4; j++){
             rb->lcd_getstringsize( buttonChar[group][i][j],&w,&h);
-            if (i == m && j == n) /* selected item */
+            if (i == btn_row && j == btn_col) /* selected item */
                 rb->lcd_set_drawmode(DRMODE_SOLID);
             else
                 rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             rb->lcd_fillrect( X_0_POS + j*REC_WIDTH,
                               Y_1_POS + i*REC_HEIGHT,
                               REC_WIDTH, REC_HEIGHT+1);
-            if (i == m && j == n) /* selected item */
+            if (i == btn_row && j == btn_col) /* selected item */
                 rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             else
                 rb->lcd_set_drawmode(DRMODE_SOLID);
@@ -574,10 +583,10 @@ void cal_initial (void)
 #endif
 
     /* initially, invert button "5" */
-    m = 2;
-    n = 1;
-    prev_m = m;
-    prev_n = n;
+    btn_row = 2;
+    btn_col = 1;
+    prev_btn_row = btn_row;
+    prev_btn_col = btn_col;
     drawButtons(buttonGroup);
     drawLines();
     rb->lcd_update();
@@ -848,43 +857,105 @@ void twoOperands(void)
     switchOperands();
     clearOper();
 }
+
+/* First, increases *dimen1 by dimen1_delta modulo dimen1_modulo.
+   If dimen1 wraps, increases *dimen2 by dimen2_delta modulo dimen2_modulo.
+*/
+static void move_with_wrap_and_shift(
+    int *dimen1, int dimen1_delta, int dimen1_modulo,
+    int *dimen2, int dimen2_delta, int dimen2_modulo)
+{
+    bool wrapped = false;
+    
+    *dimen1 += dimen1_delta;
+    if (*dimen1 < 0)
+    {
+        *dimen1 = dimen1_modulo - 1;
+        wrapped = true;
+    }
+    else if (*dimen1 >= dimen1_modulo)
+    {
+        *dimen1 = 0;
+        wrapped = true;
+    }
+    
+    if (wrapped)
+    {
+        /* Make the dividend always positive to be sure about the result.
+           Adding dimen2_modulo does not change it since we do it modulo. */
+        *dimen2 = (*dimen2 + dimen2_modulo + dimen2_delta) % dimen2_modulo;
+    }
+}
+
 /* -----------------------------------------------------------------------
 move button index
 Invert display new button, invert back previous button
 ----------------------------------------------------------------------- */
-void moveButton(void){
-    switch(btn){
+void moveButton(int button){
+    switch(button){
         case CALCULATOR_LEFT:
         case CALCULATOR_LEFT | BUTTON_REPEAT:
-            if (n == 0)
-                n = 4;
-            else
-                n--;
+            move_with_wrap_and_shift(
+                &btn_col, -1, BUTTON_COLS,
+                &btn_row,  0, BUTTON_ROWS);
             break;
 
         case CALCULATOR_RIGHT:
         case CALCULATOR_RIGHT | BUTTON_REPEAT:
-            if (n == 4)
-                n = 0;
-            else
-                n++;
+            move_with_wrap_and_shift(
+                &btn_col,  1, BUTTON_COLS,
+                &btn_row,  0, BUTTON_ROWS);
             break;
 
+#ifdef CALCULATOR_UP
         case CALCULATOR_UP:
         case CALCULATOR_UP | BUTTON_REPEAT:
-            if (m == 0)
-                m = 4;
-            else
-                m--;
+            move_with_wrap_and_shift(
+                &btn_row, -1, BUTTON_ROWS,
+                &btn_col,  0, BUTTON_COLS);
             break;
-
+#endif
+#ifdef CALCULATOR_DOWN
         case CALCULATOR_DOWN:
         case CALCULATOR_DOWN | BUTTON_REPEAT:
-            if (m == 4)
-                m = 0;
-            else
-                m++;
+            move_with_wrap_and_shift(
+                &btn_row,  1, BUTTON_ROWS,
+                &btn_col,  0, BUTTON_COLS);
             break;
+#endif
+
+#ifdef CALCULATOR_UP_W_SHIFT
+        case CALCULATOR_UP_W_SHIFT:
+        case CALCULATOR_UP_W_SHIFT | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_row, -1, BUTTON_ROWS,
+                &btn_col, -1, BUTTON_COLS);
+            break;
+#endif
+#ifdef CALCULATOR_DOWN_W_SHIFT
+        case CALCULATOR_DOWN_W_SHIFT:
+        case CALCULATOR_DOWN_W_SHIFT | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_row,  1, BUTTON_ROWS,
+                &btn_col,  1, BUTTON_COLS);
+            break;
+#endif
+#ifdef CALCULATOR_LEFT_W_SHIFT
+        case CALCULATOR_LEFT_W_SHIFT:
+        case CALCULATOR_LEFT_W_SHIFT | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_col, -1, BUTTON_COLS,
+                &btn_row, -1, BUTTON_ROWS);
+            break;
+#endif
+#ifdef CALCULATOR_RIGHT_W_SHIFT
+        case CALCULATOR_RIGHT_W_SHIFT:
+        case CALCULATOR_RIGHT_W_SHIFT | BUTTON_REPEAT:
+            move_with_wrap_and_shift(
+                &btn_col,  1, BUTTON_COLS,
+                &btn_row,  1, BUTTON_ROWS);
+            break;
+#endif
     }
 
     drawButtons(buttonGroup);
@@ -892,8 +963,8 @@ void moveButton(void){
 
     rb->lcd_update();
 
-    prev_m = m;
-    prev_n = n;
+    prev_btn_row = btn_row;
+    prev_btn_col = btn_col;
 }
 
 /* -----------------------------------------------------------------------
@@ -914,16 +985,16 @@ void flashButton(void)
     int k, w, h;
     for (k=2;k>0;k--)
     {
-        rb->lcd_getstringsize( buttonChar[buttonGroup][m][n],&w,&h);
+        rb->lcd_getstringsize( buttonChar[buttonGroup][btn_row][btn_col],&w,&h);
         rb->lcd_set_drawmode(DRMODE_SOLID|(k==1) ? 0 : DRMODE_INVERSEVID);
-        rb->lcd_fillrect( X_0_POS + n*REC_WIDTH + 1,
-                          Y_1_POS + m*REC_HEIGHT + 1,
+        rb->lcd_fillrect( X_0_POS + btn_col*REC_WIDTH + 1,
+                          Y_1_POS + btn_row*REC_HEIGHT + 1,
                           REC_WIDTH - 1, REC_HEIGHT - 1);
-        rb->lcd_putsxy( X_0_POS + n*REC_WIDTH + (REC_WIDTH - w)/2,
-                        Y_1_POS + m*REC_HEIGHT + (REC_HEIGHT - h)/2 +1,
-                        buttonChar[buttonGroup][m][n] );
-        rb->lcd_update_rect( X_0_POS + n*REC_WIDTH + 1,
-                            Y_1_POS + m*REC_HEIGHT + 1,
+        rb->lcd_putsxy( X_0_POS + btn_col*REC_WIDTH + (REC_WIDTH - w)/2,
+                        Y_1_POS + btn_row*REC_HEIGHT + (REC_HEIGHT - h)/2 +1,
+                        buttonChar[buttonGroup][btn_row][btn_col] );
+        rb->lcd_update_rect( X_0_POS + btn_col*REC_WIDTH + 1,
+                            Y_1_POS + btn_row*REC_HEIGHT + 1,
                             REC_WIDTH - 1, REC_HEIGHT - 1);
 
         if (k!= 1)
@@ -1219,7 +1290,7 @@ void typingProcess(void){
                             *typingbufPointer = '0';
                             break;
                         default:
-                            *typingbufPointer=(7+n-3*(m-1))+ '0';
+                            *typingbufPointer=(7+btn_col-3*(btn_row-1))+ '0';
                             break;
                     }
                     if (typingbufPointer!=typingbuf+DIGITLEN+1){
@@ -1230,7 +1301,7 @@ void typingProcess(void){
                          if (CAL_BUTTON != btn_0)
                              result= result +
                                      SIGN(result)*
-                                     (7+n-3*(m-1))*modifier;
+                                     (7+btn_col-3*(btn_row-1))*modifier;
                          modifier /= 10;
                         }
                     }
@@ -1344,7 +1415,7 @@ void basicButtonsProcess(void){
                 case btn_minus:
                 case btn_add:
                     if(!operInputted) {twoOperands(); operInputted = true;}
-                    oper = buttonChar[basicButtons][m][n][0];
+                    oper = buttonChar[basicButtons][btn_row][btn_col][0];
 #ifdef CALCULATOR_OPERATORS
                     case_cycle_operators:  /* F2 shortkey entrance */
 #endif
@@ -1516,11 +1587,27 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case CALCULATOR_LEFT | BUTTON_REPEAT:
             case CALCULATOR_RIGHT:
             case CALCULATOR_RIGHT | BUTTON_REPEAT:
+#ifdef CALCULATOR_UP
             case CALCULATOR_UP:
             case CALCULATOR_UP | BUTTON_REPEAT:
+#endif
+#ifdef CALCULATOR_DOWN
             case CALCULATOR_DOWN:
             case CALCULATOR_DOWN | BUTTON_REPEAT:
-                moveButton();
+#endif
+#ifdef CALCULATOR_UP_W_SHIFT
+            case CALCULATOR_UP_W_SHIFT:
+#endif
+#ifdef CALCULATOR_DOWN_W_SHIFT
+            case CALCULATOR_DOWN_W_SHIFT:
+#endif
+#ifdef CALCULATOR_LEFT_W_SHIFT
+            case CALCULATOR_LEFT_W_SHIFT:
+#endif
+#ifdef CALCULATOR_RIGHT_W_SHIFT
+            case CALCULATOR_RIGHT_W_SHIFT:
+#endif
+                moveButton(btn);
                 break;
 #ifdef CALCULATOR_RC_QUIT
             case CALCULATOR_RC_QUIT:
