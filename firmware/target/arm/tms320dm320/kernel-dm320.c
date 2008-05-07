@@ -50,6 +50,8 @@ void tick_start(unsigned int interval_in_ms)
 
 void TIMER1(void)
 {
+    IO_INTC_IRQ0 = INTR_IRQ0_TMR1;
+    
     int i;
 
     /* Run through the list of tick tasks */
@@ -61,6 +63,4 @@ void TIMER1(void)
         }
     }
     current_tick++;
-
-    IO_INTC_IRQ0 = INTR_IRQ0_TMR1;
 }

@@ -27,9 +27,9 @@
   should not be a functional pin and TIMER0 output unseen there */
 void TIMER0(void)
 {
+    IO_INTC_IRQ0 = INTR_IRQ0_TMR0; /* clear TIMER0 interrupt */
     if (pfn_timer != NULL)
         pfn_timer();
-    IO_INTC_IRQ0 = INTR_IRQ0_TMR0; //clear TIMER0 interrupt
 }
 
 bool __timer_set(long cycles, bool start)
