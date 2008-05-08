@@ -98,11 +98,11 @@
 #define TARGET_EXTRA_THREADS 1
 
 /* Type of mobile power - check this out */
-#define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 1500        /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 2500        /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 25         /* capacity increment */
-#define BATTERY_TYPES_COUNT  1          /* only one type */
+#define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN     700 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX    1200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC      25 /* capacity increment */
+#define BATTERY_TYPES_COUNT        1 /* only one type */
 
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR
