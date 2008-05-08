@@ -26,6 +26,7 @@
 #include "ata.h"
 #include "ata-target.h"
 #include "clkctl-imx31.h"
+#
 
 static const struct ata_pio_timings
 {
@@ -81,10 +82,15 @@ static const struct ata_pio_timings
 
 static int pio_mode = 0; /* Setup mode 0 by default */
 
+static void ata_wait_for_idle(void)
+{
+    while (!(ATA_INTERRUPT_PENDING & ATA_CONTROLLER_IDLE));
+}
+
 /* Setup the timing for PIO mode */
 void ata_set_pio_timings(int mode)
 {
-    while (!(ATA_INTERRUPT_PENDING & ATA_CONTROLLER_IDLE));
+    ata_wait_for_idle();
 
     const struct ata_pio_timings * const timings = &pio_timings[mode];
     /* T = period in nanoseconds */
@@ -107,20 +113,34 @@ void ata_set_pio_timings(int mode)
 void ata_reset(void)
 {
     /* Be sure we're not busy */
-    while (!(ATA_INTERRUPT_PENDING & ATA_CONTROLLER_IDLE));
+    ata_wait_for_idle();
 
     ATA_INTF_CONTROL &= ~ATA_ATA_RST;
     sleep(1);
     ATA_INTF_CONTROL |= ATA_ATA_RST;
     sleep(1);
 
-    while (!(ATA_INTERRUPT_PENDING & ATA_CONTROLLER_IDLE));
+    ata_wait_for_idle();
 }
 
-/* This function is called before enabling the USB bus */
 void ata_enable(bool on)
 {
-    (void)on;
+    /* Unconditionally clock module before writing regs */
+    imx31_clkctl_module_clock_gating(CG_ATA, CGM_ON_ALL);
+
+    if (on)
+    {
+        ATA_INTF_CONTROL |= ATA_ATA_RST;
+    }
+    else
+    {
+        ata_wait_for_idle();
+
+        ATA_INTF_CONTROL &= ~ATA_ATA_RST;
+
+        /* Disable off - unclock ATA module */
+        imx31_clkctl_module_clock_gating(CG_ATA, CGM_OFF);
+    }
 }
 
 bool ata_is_coldstart(void)
@@ -130,7 +150,8 @@ bool ata_is_coldstart(void)
 
 void ata_device_init(void)
 {
-    ATA_INTF_CONTROL |= ATA_ATA_RST; /* Make sure we're not in reset mode */
+    /* Make sure we're not in reset mode */
+    ata_enable(true);
 
     /* mode may be switched later once identify info is ready in which
      * case the main driver calls back */

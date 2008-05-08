@@ -39,10 +39,12 @@ static struct i2c_node wm8978_i2c_node =
 void audiohw_init(void)
 {
     /* USB PLL = 338.688MHz, /30 = 11.2896MHz = 256Fs */
-    imx31_regmod32(&CLKCTL_PDR1, PDR1_SSI1_PODF | PDR1_SSI2_PODF,
-                   PDR1_SSI1_PODFw(64-1) | PDR1_SSI2_PODFw(5-1));
-    imx31_regmod32(&CLKCTL_PDR1, PDR1_SSI1_PRE_PODF | PDR1_SSI2_PRE_PODF,
-                   PDR1_SSI1_PRE_PODFw(4-1) | PDR1_SSI2_PRE_PODFw(1-1));
+    imx31_regmod32(&CLKCTL_PDR1,
+                   PDR1_SSI1_PODFw(64-1) | PDR1_SSI2_PODFw(5-1),
+                   PDR1_SSI1_PODF | PDR1_SSI2_PODF);
+    imx31_regmod32(&CLKCTL_PDR1,
+                   PDR1_SSI1_PRE_PODFw(4-1) | PDR1_SSI2_PRE_PODFw(1-1),
+                   PDR1_SSI1_PRE_PODF | PDR1_SSI2_PRE_PODF);
     i2c_enable_node(&wm8978_i2c_node, true);
 
     audiohw_preinit();

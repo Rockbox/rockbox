@@ -27,7 +27,7 @@ void system_init(void)
     gpio_init();
 }
 
-void imx31_regmod32(volatile uint32_t *reg_p, uint32_t mask, uint32_t value)
+void imx31_regmod32(volatile uint32_t *reg_p, uint32_t value, uint32_t mask)
 {
     value &= mask;
     mask = ~mask;

@@ -19,6 +19,7 @@
 #include "config.h"
 #include "system.h"
 #include "power.h"
+#include "ata.h"
 #include "backlight.h"
 #include "backlight-target.h"
 #include "avic-imx31.h"
@@ -50,7 +51,21 @@ bool charging_state(void) {
 
 void ide_power_enable(bool on)
 {
-    (void)on;
+    if (!on)
+    {
+        /* Bus must be isolated before power off */
+        imx31_regmod32(&GPIO2_DR, (1 << 16), (1 << 16));
+    }
+
+    /* HD power switch */
+    imx31_regmod32(&GPIO3_DR, on ? (1 << 5) : 0, (1 << 5));
+
+    if (on)
+    {
+        /* Bus switch may be turned on after powerup */
+        sleep(HZ/10);
+        imx31_regmod32(&GPIO2_DR, 0, (1 << 16));
+    }
 }
 
 bool ide_powered(void)
