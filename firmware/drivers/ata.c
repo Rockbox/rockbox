@@ -1022,7 +1022,15 @@ static int ata_power_on(void)
     int rc;
     
     ide_power_enable(true);
-    sleep(HZ/50); /* allow voltage to build up */
+    sleep(HZ/4); /* allow voltage to build up */
+
+    /* Accessing the PP IDE controller too early after powering up the disk
+     * makes the core hang for a short time, causing an audio dropout. This
+     * also depends on the disk; iPod Mini G2 needs at least HZ/5 to get rid
+     * of the dropout. Since this time isn't additive (the wait_for_bsy() in
+     * ata_hard_reset() will shortened by the same amount), it's a good idea
+     * to do this on all HDD based targets. */
+
     if( ata_hard_reset() )
         return -1;
 
@@ -1235,7 +1243,7 @@ int ata_init(void)
         if (!ide_powered()) /* somebody has switched it off */
         {
             ide_power_enable(true);
-            sleep(HZ/50); /* allow voltage to build up */
+            sleep(HZ/4); /* allow voltage to build up */
         }
 
         /* first try, hard reset at cold start only */
