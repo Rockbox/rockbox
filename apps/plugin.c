@@ -590,6 +590,14 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_TOUCHPAD
     touchpad_set_mode,
 #endif /* HAVE_TOUCHPAD */
+#ifdef HAVE_BUTTON_LIGHT
+    buttonlight_set_timeout,
+    buttonlight_off,
+    buttonlight_on,
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    buttonlight_set_brightness,
+#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
+#endif /* HAVE_BUTTON_LIGHT */
 };
 
 int plugin_load(const char* plugin, void* parameter)

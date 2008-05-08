@@ -737,6 +737,14 @@ struct plugin_api {
 #ifdef HAVE_TOUCHPAD
     void (*touchpad_set_mode)(enum touchpad_mode);
 #endif /* HAVE_TOUCHPAD */
+#ifdef HAVE_BUTTON_LIGHT
+    void (*buttonlight_set_timeout)(int value);
+    void (*buttonlight_off)(void);
+    void (*buttonlight_on)(void);
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    void (*buttonlight_set_brightness)(int val);
+#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
+#endif /* HAVE_BUTTON_LIGHT */
 };
 
 /* plugin header */

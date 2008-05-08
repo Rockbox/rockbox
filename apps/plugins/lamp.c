@@ -115,6 +115,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     short old_brightness = rb->global_settings->brightness;
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    short old_buttonlight_brightness =
+            rb->global_settings->buttonlight_brightness;
+#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #if LCD_DEPTH > 1
     unsigned bg_color=rb->lcd_get_background();
@@ -125,6 +129,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     rb->backlight_set_brightness(MAX_BRIGHTNESS_SETTING);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    rb->buttonlight_set_brightness(MAX_BRIGHTNESS_SETTING);
+#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_LCD_INVERT
 #ifdef OLYMPUS_MROBE_100
@@ -136,9 +143,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif /* HAVE_LCD_INVERT */
 
     backlight_force_on(rb);
+#ifdef HAVE_BUTTON_LIGHT
+    buttonlight_force_on(rb);
+#endif /* HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_LCD_COLOR
-    do 
+    do
     {
         if(cs < 0)
             cs = NUM_COLORSETS-1;
@@ -198,6 +208,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* restore */
     backlight_use_settings(rb);
+#ifdef HAVE_BUTTON_LIGHT
+    buttonlight_use_settings(rb);
+#endif /* HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_LCD_INVERT
     rb->lcd_set_invert_display(rb->global_settings->invert);
@@ -206,6 +219,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     rb->backlight_set_brightness(old_brightness);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    rb->buttonlight_set_brightness(old_buttonlight_brightness);
+#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #if LCD_DEPTH > 1
     rb->lcd_set_background(bg_color);

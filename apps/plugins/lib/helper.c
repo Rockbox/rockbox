@@ -72,3 +72,22 @@ void remote_backlight_use_settings(struct plugin_api* rb)
 #endif /* CONFIG_CHARGING */
 }
 #endif /* HAVE_REMOTE_LCD */
+
+#ifdef HAVE_BUTTON_LIGHT
+/*  Force the buttonlight on */
+void buttonlight_force_on(struct plugin_api* rb)
+{
+    if (!rb)
+        return;
+    if (rb->global_settings->buttonlight_timeout > 0)
+        rb->buttonlight_set_timeout(0);
+}
+
+/*  Reset buttonlight operation to its settings */
+void buttonlight_use_settings(struct plugin_api* rb)
+{
+    if (!rb)
+        return;
+    rb->buttonlight_set_timeout(rb->global_settings->buttonlight_timeout);
+}
+#endif /* HAVE_BUTTON_LIGHT */
