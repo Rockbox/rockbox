@@ -44,7 +44,8 @@ bool charger_inserted(void)
 }
 
 /* Returns true if the unit is charging the batteries. */
-bool charging_state(void) {
+bool charging_state(void)
+{
     return false;
 }
 
@@ -69,7 +70,7 @@ void ide_power_enable(bool on)
 
 bool ide_powered(void)
 {
-    return true;
+    return (GPIO3_DR & (1 << 5)) != 0;
 }
 
 void power_off(void)
