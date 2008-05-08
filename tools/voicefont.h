@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: voicefont.h 15675 2007-11-18 22:01:31Z amiconn $
+ * $Id$
  *
  * Copyright (C) 2004 by Jörg Hohensohn
  *
