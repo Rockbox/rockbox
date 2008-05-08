@@ -277,6 +277,6 @@ int mc13783_write_regset(const unsigned char *regs, const uint32_t *data, int co
 uint32_t mc13783_read(unsigned address);
 int mc13783_read_multiple(unsigned start, uint32_t *buffer, int count);
 int mc13783_read_regset(const unsigned char *regs, uint32_t *buffer, int count);
-void mc1378_alarm_start(void);
+void mc13783_alarm_start(void);
 
 #endif /* _MC13783_H_ */

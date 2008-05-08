@@ -67,7 +67,7 @@ enum rtc_registers_indexes
 /* was it an alarm that triggered power on ? */
 static bool alarm_start = false;
 
-void mc1378_alarm_start(void)
+void mc13783_alarm_start(void)
 {
     alarm_start = true;
 }

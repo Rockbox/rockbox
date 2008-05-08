@@ -67,7 +67,7 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
     gpio_enable_event(MC13783_GPIO_NUM, MC13783_EVENT_ID);
 
     if (pending[1] & MC13783_TODA) /* only needs to be polled on startup */
-        mc1378_alarm_start();
+        mc13783_alarm_start();
 
     /* Check initial states for events with a sense bit */
     value = mc13783_read(MC13783_INTERRUPT_SENSE0);
