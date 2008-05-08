@@ -179,23 +179,22 @@ static int perform_soft_reset(void);
 static int set_multiple_mode(int sectors);
 static int set_features(void);
 
-STATICIRAM int wait_for_bsy(void) ICODE_ATTR;
-STATICIRAM int wait_for_bsy(void)
+STATICIRAM ICODE_ATTR int wait_for_bsy(void)
 {
     long timeout = current_tick + HZ*30;
-    while (TIME_BEFORE(current_tick, timeout) && (ATA_STATUS & STATUS_BSY)) {
+    
+    do 
+    {
+        if (!(ATA_STATUS & STATUS_BSY))
+            return 1;
         last_disk_activity = current_tick;
         yield();
-    }
+    } while (TIME_BEFORE(current_tick, timeout));
 
-    if (TIME_BEFORE(current_tick, timeout))
-        return 1;
-    else
-        return 0; /* timeout */
+    return 0; /* timeout */
 }
 
-STATICIRAM int wait_for_rdy(void) ICODE_ATTR;
-STATICIRAM int wait_for_rdy(void)
+STATICIRAM ICODE_ATTR int wait_for_rdy(void)
 {
     long timeout;
 
@@ -203,21 +202,19 @@ STATICIRAM int wait_for_rdy(void)
         return 0;
 
     timeout = current_tick + HZ*10;
-
-    while (TIME_BEFORE(current_tick, timeout) &&
-           !(ATA_ALT_STATUS & STATUS_RDY)) {
+    
+    do 
+    {
+        if (ATA_ALT_STATUS & STATUS_RDY)
+            return 1;
         last_disk_activity = current_tick;
         yield();
-    }
+    } while (TIME_BEFORE(current_tick, timeout));
 
-    if (TIME_BEFORE(current_tick, timeout))
-        return STATUS_RDY;
-    else
-        return 0; /* timeout */
+    return 0; /* timeout */
 }
 
-STATICIRAM int wait_for_start_of_transfer(void) ICODE_ATTR;
-STATICIRAM int wait_for_start_of_transfer(void)
+STATICIRAM ICODE_ATTR int wait_for_start_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
@@ -225,8 +222,7 @@ STATICIRAM int wait_for_start_of_transfer(void)
     return (ATA_ALT_STATUS & (STATUS_BSY|STATUS_DRQ)) == STATUS_DRQ;
 }
 
-STATICIRAM int wait_for_end_of_transfer(void) ICODE_ATTR;
-STATICIRAM int wait_for_end_of_transfer(void)
+STATICIRAM ICODE_ATTR int wait_for_end_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
@@ -247,8 +243,7 @@ static void ata_led(bool on)
 #endif
 
 #ifndef ATA_OPTIMIZED_READING
-STATICIRAM void copy_read_sectors(unsigned char* buf, int wordcount) ICODE_ATTR;
-STATICIRAM void copy_read_sectors(unsigned char* buf, int wordcount)
+STATICIRAM ICODE_ATTR void copy_read_sectors(unsigned char* buf, int wordcount)
 {
     unsigned short tmp = 0;
 
@@ -456,9 +451,8 @@ int ata_read_sectors(IF_MV2(int drive,)
 }
 
 #ifndef ATA_OPTIMIZED_WRITING
-STATICIRAM void copy_write_sectors(const unsigned char* buf, int wordcount)
-                                   ICODE_ATTR;
-STATICIRAM void copy_write_sectors(const unsigned char* buf, int wordcount)
+STATICIRAM ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
+                                              int wordcount)
 {
     if ( (unsigned long)buf & 1)
     {   /* not 16-bit aligned, copy byte by byte */
