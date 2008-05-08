@@ -231,7 +231,7 @@ static int option_value(const struct settings_list *setting)
         return *(int*)setting->setting;
 }
 
-void talk_qs_option(struct settings_list *opt, bool enqueue)
+static void talk_qs_option(struct settings_list *opt, bool enqueue)
 {
     if (global_settings.talk_menu) {
         if(!enqueue)

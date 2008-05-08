@@ -33,6 +33,7 @@
 #include "lang.h"
 #include "icons.h"
 #include "screen_access.h"
+#include "screens.h"
 
 #define PITCH_MAX         2000
 #define PITCH_MIN         500

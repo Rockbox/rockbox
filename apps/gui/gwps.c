@@ -118,7 +118,7 @@ static void prev_track(unsigned skip_thresh)
     }
 }
 
-void next_track(void)
+static void next_track(void)
 {
     /* take care of if we're playing a cuesheet */
     if (cuesheet_is_enabled() && wps_state.id3->cuesheet_type)
