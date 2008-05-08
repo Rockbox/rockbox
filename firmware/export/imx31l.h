@@ -365,6 +365,11 @@
 #define SW_PAD_CTL_FLD_1(x)                         ((x) << 10)
 #define SW_PAD_CTL_FLD_2(x)                         ((x) << 20)
 
+/* RNGA */
+#define RNGA_CONTROL            (*(REG32_PTR_T)(RNGA_BASE_ADDR+0x00))
+
+#define RNGA_CONTROL_SLEEP                          (1 << 4)
+
 /* IPU */
 #define IPU_CONF                (*(REG32_PTR_T)(IPU_CTRL_BASE_ADDR+0x00))
 #define IPU_CHA_BUF0_RDY        (*(REG32_PTR_T)(IPU_CTRL_BASE_ADDR+0x04))
@@ -1033,6 +1038,13 @@
 #define KPP_KPSR_KPKR           (1 << 1)
 #define KPP_KPSR_KPKD           (1 << 0)
 
+/* SDHC */
+#define SDHC1_CLOCK_CONTROL     (*(REG32_PTR_T)(MMC_SDHC1_BASE_ADDR+0x00))
+#define SDHC2_CLOCK_CONTROL     (*(REG32_PTR_T)(MMC_SDHC2_BASE_ADDR+0x00))
+
+/* SDHC bits */
+#define STOP_CLK                (1 << 0)
+
 /* ROMPATCH and AVIC */
 #define ROMPATCH_BASE_ADDR      0x60000000
 
@@ -1379,6 +1391,11 @@
 #define USR1_1                          (*(REG32_PTR_T)(UART1_BASE_ADDR+0x94))
 #define USR2_1                          (*(REG32_PTR_T)(UART1_BASE_ADDR+0x98))
 #define UTS1                            (*(REG32_PTR_T)(UART1_BASE_ADDR+0xB4))
+
+#define UCR1_2                          (*(REG32_PTR_T)(UART2_BASE_ADDR+0x80))
+#define UCR1_3                          (*(REG32_PTR_T)(UART3_BASE_ADDR+0x80))
+#define UCR1_4                          (*(REG32_PTR_T)(UART4_BASE_ADDR+0x80))
+#define UCR1_5                          (*(REG32_PTR_T)(UART5_BASE_ADDR+0x80))
 
 /*
  * UART Control Register 0 Bit Fields.

@@ -25,6 +25,7 @@
 #include "system.h"
 #include "backlight-target.h"
 #include "avic-imx31.h"
+#include "clkctl-imx31.h"
 
 /* Most code in here is taken from the Linux BSP provided by Freescale
  * Copyright 2004-2006 Freescale Semiconductor, Inc. All Rights Reserved. */
@@ -119,7 +120,7 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
 void button_init_device(void)
 {
     /* Enable keypad clock */
-    CLKCTL_CGR1 |= (3 << 2*10);
+    imx31_clkctl_module_clock_gating(CG_KPP, CGM_ON_ALL);
 
     /* 1. Enable number of rows in keypad (KPCR[4:0])
      *

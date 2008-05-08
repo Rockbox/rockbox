@@ -8,6 +8,7 @@
 #include "lcd.h"
 #include "serial-imx31.h"
 #include "debug.h"
+#include "clkctl-imx31.h"
 
 int system_memory_guard(int newmode)
 {
@@ -21,8 +22,63 @@ void system_reboot(void)
 
 void system_init(void)
 {
+    static const int disable_clocks[] =
+    {
+        /* CGR0 */
+        CG_SD_MMC1,
+        CG_SD_MMC2,
+        CG_IIM,
+        CG_CSPI3,
+        CG_RNG,
+        CG_UART1,
+        CG_UART2,
+        CG_SSI1,
+        CG_I2C1,
+        CG_I2C2,
+        CG_I2C3,
+
+        /* CGR1 */
+        CG_HANTRO,
+        CG_MEMSTICK1,
+        CG_MEMSTICK2,
+        CG_CSI,
+        CG_PWM,
+        CG_WDOG,
+        CG_SIM,
+        CG_ECT,
+        CG_USBOTG,
+        CG_KPP,
+        CG_UART3,
+        CG_UART4,
+        CG_UART5,
+        CG_1_WIRE,
+
+        /* CGR2 */
+        CG_SSI2,
+        CG_CSPI1,
+        CG_CSPI2,
+        CG_GACC,
+        CG_RTIC,
+        CG_FIR
+    };
+
+    unsigned int i;
+
     /* MCR WFI enables wait mode */
     CLKCTL_CCMR &= ~(3 << 14);
+
+    imx31_regmod32(&SDHC1_CLOCK_CONTROL, STOP_CLK, STOP_CLK);
+    imx31_regmod32(&SDHC2_CLOCK_CONTROL, STOP_CLK, STOP_CLK);
+    imx31_regmod32(&RNGA_CONTROL, RNGA_CONTROL_SLEEP, RNGA_CONTROL_SLEEP);
+    imx31_regmod32(&UCR1_1, 0, EUARTUCR1_UARTEN);
+    imx31_regmod32(&UCR1_2, 0, EUARTUCR1_UARTEN);
+    imx31_regmod32(&UCR1_3, 0, EUARTUCR1_UARTEN);
+    imx31_regmod32(&UCR1_4, 0, EUARTUCR1_UARTEN);
+    imx31_regmod32(&UCR1_5, 0, EUARTUCR1_UARTEN);
+
+    for (i = 0; i < ARRAYLEN(disable_clocks); i++)
+        imx31_clkctl_module_clock_gating(disable_clocks[i], CGM_OFF);
+
     avic_init();
     gpio_init();
 }
