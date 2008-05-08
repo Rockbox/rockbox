@@ -115,7 +115,7 @@
 
 /* Define this to the CPU frequency */
 /* TODO */
-#define CPU_FREQ 16934400
+#define CPU_FREQ 264000000 /* Set by retailOS loader */
 
 /* define this if the unit can be powered or charged via USB */
 //#define HAVE_USB_POWER /* Disable for now */
