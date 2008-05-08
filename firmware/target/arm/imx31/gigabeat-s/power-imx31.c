@@ -19,7 +19,6 @@
 #include "config.h"
 #include "system.h"
 #include "power.h"
-#include "ata.h"
 #include "backlight.h"
 #include "backlight-target.h"
 #include "avic-imx31.h"

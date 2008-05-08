@@ -26,7 +26,6 @@
 #include "ata.h"
 #include "ata-target.h"
 #include "clkctl-imx31.h"
-#
 
 static const struct ata_pio_timings
 {
