@@ -38,18 +38,18 @@ static bool hold_button_old = false;
 
 static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
 {
-    static const int key_mtx[5][3] =
+    static const struct key_mask_shift
     {
-        { BUTTON_LEFT,   BUTTON_BACK, BUTTON_VOL_UP   },
-        { BUTTON_UP,     BUTTON_MENU, BUTTON_VOL_DOWN },
-        { BUTTON_DOWN,   BUTTON_NONE, BUTTON_PREV     },
-        { BUTTON_RIGHT,  BUTTON_NONE, BUTTON_PLAY     },
-        { BUTTON_SELECT, BUTTON_NONE, BUTTON_NEXT     },
+        uint8_t mask;
+        uint8_t shift;
+    } kms[3] =
+    {
+        { 0x1f, 0 }, /* BUTTON_LEFT...BUTTON_SELECT */
+        { 0x03, 5 }, /* BUTTON_BACK...BUTTON_MENU   */
+        { 0x1f, 7 }, /* BUTTON_VOL_UP...BUTTON_NEXT */
     };
 
-    unsigned short reg_val;
-    int col, row;
-    int i;
+    int col;
     /* Power button is handled separately on PMIC */
     int button = int_btn & BUTTON_POWER;
 
@@ -60,6 +60,8 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
 
     for (col = 0; col < 3; col++) /* Col */
     {
+        int i;
+
         /* 2. Write 1s to KPDR[10:8] setting column data to 1s */
         KPP_KPDR |= (0x7 << 8);
 
@@ -80,7 +82,7 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
          * 7. Repeat steps 2 - 6 for remaining columns. */
 
         /* Col bit starts at 8th bit in KPDR */
-        KPP_KPDR &= ~(1 << (8 + col));
+        KPP_KPDR &= ~(0x100 << col);
 
         /* Delay added to avoid propagating the 0 from column to row
          * when scanning. */
@@ -88,12 +90,7 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
             asm volatile ("");
 
         /* Read row input */
-        reg_val = KPP_KPDR;
-        for (row = 0; row < 5; row++)   /* sample row */
-        {
-            if (!(reg_val & (1 << row)))
-                button |= key_mtx[row][col];
-        }
+        button |= (~KPP_KPDR & kms[col].mask) << kms[col].shift;
     }
 
     /* 8. Return all columns to 0 in preparation for standby mode. */

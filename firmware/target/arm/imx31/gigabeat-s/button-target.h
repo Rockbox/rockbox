@@ -31,32 +31,26 @@ void button_power_set_state(bool pressed);
 void set_headphones_inserted(bool inserted);
 bool headphones_inserted(void);
 
-/* Toshiba Gigabeat specific button codes */
+/* Toshiba Gigabeat S-specific button codes */
 
-#define BUTTON_BACK         (1 << 0)
-#define BUTTON_MENU         (1 << 1)
-
-#define BUTTON_LEFT         (1 << 2)
+/* These shifts are selected to optimize scanning of the keypad port */
+#define BUTTON_LEFT         (1 << 0)
+#define BUTTON_UP           (1 << 1)
+#define BUTTON_DOWN         (1 << 2)
 #define BUTTON_RIGHT        (1 << 3)
-#define BUTTON_UP           (1 << 4)
-#define BUTTON_DOWN         (1 << 5)
-#define BUTTON_SELECT       (1 << 6)
+#define BUTTON_SELECT       (1 << 4)
+#define BUTTON_BACK         (1 << 5)
+#define BUTTON_MENU         (1 << 6)
+#define BUTTON_VOL_UP       (1 << 7)
+#define BUTTON_VOL_DOWN     (1 << 8)
+#define BUTTON_PREV         (1 << 9)
+#define BUTTON_PLAY         (1 << 10)
+#define BUTTON_NEXT         (1 << 11)
+#define BUTTON_POWER        (1 << 12) /* Read from PMIC */
 
-#define BUTTON_POWER        (1 << 7)
-#define BUTTON_VOL_UP       (1 << 8)
-#define BUTTON_VOL_DOWN     (1 << 9)
-#define BUTTON_NEXT         (1 << 10)
-#define BUTTON_PREV         (1 << 11)
-#define BUTTON_PLAY         (1 << 12)
+#define BUTTON_REMOTE       0
 
-#define BUTTON_MAIN (BUTTON_BACK|BUTTON_MENU|BUTTON_LEFT|BUTTON_RIGHT \
-                |BUTTON_UP|BUTTON_DOWN|BUTTON_SELECT|BUTTON_POWER \
-                |BUTTON_VOL_UP|BUTTON_VOL_DOWN|BUTTON_NEXT|BUTTON_PREV \
-                |BUTTON_PLAY)
-
-#define BUTTON_REMOTE 0
-
-#define POWEROFF_BUTTON BUTTON_POWER
-#define POWEROFF_COUNT 10
+#define POWEROFF_BUTTON     BUTTON_POWER
+#define POWEROFF_COUNT      10
 
 #endif /* _BUTTON_TARGET_H_ */
