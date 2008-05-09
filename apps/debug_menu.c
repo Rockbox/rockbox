@@ -375,7 +375,7 @@ static bool dbg_buffering_thread(void)
 
         if (ticks > 0)
         {
-            int boostquota = boost_ticks * 1000 / ticks; /* in °/oo */
+            int boostquota = boost_ticks * 1000 / ticks; /* in 0.1 % */
             int avgclock   = freq_sum * 10 / ticks;      /* in 100 kHz */
             snprintf(buf, sizeof(buf), "boost ratio: %3d.%d%% (%2d.%dMHz)",
                      boostquota/10, boostquota%10, avgclock/10, avgclock%10);
