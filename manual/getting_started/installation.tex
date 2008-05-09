@@ -47,7 +47,7 @@ installation options.
   the \playerman{} bootloader. It is responsible for loading the Rockbox
   firmware and for providing the dual boot function. It directly replaces the
   \playerman{} firmware on the \daps{} disk.
-  \opt{gigabeat}{\note{Dual boot does not currently work on the gigabeat.}}}
+  \opt{gigabeatf}{\note{Dual boot does not currently work on the gigabeat.}}}
 
   \opt{HAVE_RB_BL_IN_FLASH}{
   The bootloader is the program that tells your
@@ -119,7 +119,7 @@ software.
   \opt{h10,h10_5gb}{\warn{The following steps require you to use UMS mode and so
     may require use of the UMS trick as described in the bootloader installation
     section.}}
-  \opt{gigabeat}{\warn{During installation, do not connect your \dap{}
+  \opt{gigabeatf}{\warn{During installation, do not connect your \dap{}
     using the cradle but plug the USB cable directly to the \dap{}.}}  
 \end{description}
 For manual installation and customization additional software is required.
@@ -320,9 +320,10 @@ structure that Rockbox needs.
   \opt{ipod}{\input{getting_started/ipod_install.tex}}
   \opt{m5,x5}{\input{getting_started/iaudio_install.tex}}
   \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
-  \opt{gigabeat}{\input{getting_started/gigabeat_install.tex}}
+  \opt{gigabeatf}{\input{getting_started/gigabeat_install.tex}}
   \opt{sansa}{\input{getting_started/sansa_install.tex}}
   \opt{mrobe100}{\input{getting_started/mrobe100_install.tex}}
+  \opt{gigabeats}{\input{getting_started/gigabeats_install.tex}}
 }
 
 \subsection{Enabling Speech Support (optional)}\label{sec:enabling_speech_support}
@@ -387,7 +388,7 @@ completely follow the manual uninstallation instructions below.}}
   connect the \dap{} to your computer, and delete the
   \fname{\firmwarefilename} file.
 }
-\nopt{gigabeat,m5,x5,archos,mrobe100}
+\nopt{gigabeatf,m5,x5,archos,mrobe100}
   {
   \note{The Rockbox bootloader can start the original firmware on your \dap.
   (See \reference{ref:Dualboot} for more information.)}}
