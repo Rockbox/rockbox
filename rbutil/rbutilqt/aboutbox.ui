@@ -145,7 +145,7 @@ Released under the GNU General Public License v2.</string>
      </property>
      <property name="sizeHint" >
       <size>
-       <width>191</width>
+       <width>40</width>
        <height>20</height>
       </size>
      </property>
