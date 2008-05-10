@@ -252,17 +252,20 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Да"
     h100,h120,h300: "NAVI = Да"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Да"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Да"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100: ""
+    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -829,6 +832,7 @@
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "Cross Gain"
@@ -845,6 +849,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_ATTENUATION
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Attenuation"
@@ -861,6 +866,7 @@
 <phrase>
   id: LANG_CROSSFEED_HF_CUTOFF
   desc: in crossfeed settings
+  user:
   <source>
     *: none
     swcodec: "High-Frequency Cutoff"
@@ -2029,6 +2035,7 @@
 <phrase>
   id: LANG_RANDOM
   desc: random folder
+  user:
   <source>
     *: "Random"
   </source>
@@ -2353,18 +2360,22 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
+    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Креирам базу података... %d пронађено (OFF за повратак)"
     h100,h120,h300: "Креирам базу података... %d пронађено (STOP за повратак)"
-    ipod*: "Креирам базу података... %d пронађено (PREV to return)"
-    x5,m5: "Креирам базу података... %d пронађено (LEFT за повратак)"
-    h10,h10_5gb,e200,c200: "Building database... %d пронађено (PREV за повратак)"
+    ipod*: "Креирам базу података... %d пронађено (PREV за повратак)"
+    x5,m5,gigabeatf,mrobe100: "Креирам базу података... %d пронађено (LEFT за повратак)"
+    h10,h10_5gb,e200,c200: "Креирам базу података... %d пронађено (PREV за повратак)"
   </dest>
   <voice>
     *: "улази за базу података"
+    h100,h120,h300: ""
+    ipod*: ""
+    x5,m5,gigabeatf,mrobe100: ""
+    h10,h10_5gb,e200,c200: ""
   </voice>
 </phrase>
 <phrase>
@@ -2499,6 +2510,7 @@
 <phrase>
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
+  user:
   <source>
     *: "Database is not ready"
   </source>
@@ -4112,17 +4124,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Постави"
     h100,h120,h300: "NAVI = Постави"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Постави"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Постави"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf: ""
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -4137,6 +4151,7 @@
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
   </source>
   <dest>
     *: none
@@ -4146,10 +4161,17 @@
     x5,m5: "RECORD = Врати на старо"
     h10,h10_5gb: "PREV = Врати на старо"
     gigabeatf: "A = Врати на старо"
+    mrobe100: "DISPLAY = Врати на старо"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf: ""
+    rtc: ""
+    h100,h120,h300: ""
+    ipod*,e200,c200: ""
+    x5,m5: ""
+    h10,h10_5gb: ""
+    gigabeatf: ""
+    mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -4525,10 +4547,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Макс датотека у претраживачу дир"
+    *: "Макс ставки у претраживачу фајлова"
   </dest>
   <voice>
-    *: "Максимално датотека у претраживачу директоријума"
+    *: "Максимално ставки у претраживачу фајлова"
   </voice>
 </phrase>
 <phrase>
@@ -5032,10 +5054,10 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "Запиши .cfg датотеку"
+    *: "Сними .cfg датотеку"
   </dest>
   <voice>
-    *: "Запиши configuration датотеку"
+    *: "Сними конфигурациону датотеку"
   </voice>
 </phrase>
 <phrase>
@@ -5559,6 +5581,7 @@
 <phrase>
   id: LANG_FM_REGION
   desc: fm tuner region setting
+  user:
   <source>
     *: none
     radio: "Region"
@@ -5575,6 +5598,7 @@
 <phrase>
   id: LANG_FM_EUROPE
   desc: fm tuner region europe
+  user:
   <source>
     *: none
     radio: "Europe"
@@ -5591,6 +5615,7 @@
 <phrase>
   id: LANG_FM_US
   desc: fm region us / canada
+  user:
   <source>
     *: none
     radio: "US / Canada"
@@ -5607,6 +5632,7 @@
 <phrase>
   id: LANG_FM_JAPAN
   desc: fm region japan
+  user:
   <source>
     *: none
     radio: "Japan"
@@ -5623,6 +5649,7 @@
 <phrase>
   id: LANG_FM_KOREA
   desc: fm region korea
+  user:
   <source>
     *: none
     radio: "Korea"
@@ -5931,6 +5958,7 @@
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Measure"
@@ -5947,6 +5975,7 @@
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "What to do when Splitting"
@@ -5997,6 +6026,7 @@
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Time"
@@ -6013,6 +6043,7 @@
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
@@ -6250,6 +6281,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_TYPE
   desc: in recording trigger menu
+  user:
   <source>
     *: none
     recording: "Trigtype"
@@ -6266,6 +6298,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_NEWFILESTP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "New file"
@@ -6282,6 +6315,7 @@
 <phrase>
   id: LANG_RECORD_TRIGGER_STOP
   desc: trigger types
+  user:
   <source>
     *: none
     recording: "Stop"
@@ -6417,6 +6451,7 @@
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: automatic gain control in record settings
+  user:
   <source>
     *: none
     agc: "Automatic Gain Control"
@@ -6433,6 +6468,7 @@
 <phrase>
   id: LANG_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
@@ -6449,6 +6485,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
@@ -6465,6 +6502,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
@@ -6481,6 +6519,7 @@
 <phrase>
   id: LANG_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
@@ -6497,6 +6536,7 @@
 <phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
@@ -6513,6 +6553,7 @@
 <phrase>
   id: LANG_RECORD_AGC_CLIPTIME
   desc: in record settings
+  user:
   <source>
     *: none
     agc: "AGC clip time"
@@ -8119,29 +8160,27 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Снимање није успело"
+    *: ""
   </dest>
   <voice>
-    *: "Снимање није успело"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user:
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Нема партиције?"
-    player: "Партиција?"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -10019,53 +10058,53 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "Yes"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Да"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Да"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Не"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Не"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "On"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Укључено"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Укључено"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10078,11 +10117,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Искључено"
+    lcd_bitmap: "Iskljuceno"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Искључено"
+    lcd_bitmap: "Iskljuceno"
   </voice>
 </phrase>
 <phrase>
@@ -10095,7 +10134,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "Мод измене: %s"
+    swcodec: "Mod izmene: %s"
   </dest>
   <voice>
     *: none
@@ -10112,11 +10151,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Гранична фреквенција"
+    swcodec: "Granicna frekvencija"
   </dest>
   <voice>
     *: none
-    swcodec: "Гранична фреквенција"
+    swcodec: "Granicna frekvencija"
   </voice>
 </phrase>
 <phrase>
@@ -10129,198 +10168,198 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Појачање"
+    lcd_bitmap: "Pojacanje"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Појачање"
+    lcd_bitmap: "Pojacanje"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "Shuffle"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Промешано"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Промешано"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "Repeat"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Понови"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Понови"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ALL
-  desc: repeat playlist once all songs have completed
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "All"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Све"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Све"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "One"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Једну"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Једну"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
-  desc: repeat range from point A to B
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "A-Б"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "A-Б"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "Show Files"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Прикажи датотеке"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Прикажи датотеке"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "Supported"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Подржане"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Подржане"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "Music"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Музичке"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Музичке"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "Playlists"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Плејлисте"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Плејлисте"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Изврнуто"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Изврнуто"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
+  desc: DEPRECATED
   user:
   <source>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Скрол линија"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Скрол линија"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10333,11 +10372,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Статусна линија"
+    lcd_bitmap: "Statusna linija"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Статусна линија"
+    lcd_bitmap: "Statusna linija"
   </voice>
 </phrase>
 <phrase>
@@ -10350,7 +10389,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Мод:"
+    lcd_bitmap: "Mod:"
   </dest>
   <voice>
     *: none
@@ -10367,7 +10406,7 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Мени"
+    recorder_pad: "Meni"
   </dest>
   <voice>
     *: none
@@ -10384,7 +10423,7 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Опција"
+    recorder_pad: "Opcija"
   </dest>
   <voice>
     *: none
@@ -10420,9 +10459,9 @@
   </source>
   <dest>
     *: none
-    recording: "Диска је пун. Притисните OFF за наставак."
-    h100,h120,h300: "Диска је пун. Притисните STOP за наставак."
-    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Диска је пун. Притисните LEFT за наставак."
+    recording: "Disk je pun. Pritisnite OFF za nastavak."
+    h100,h120,h300: "Disk je pun. Pritisnite STOP za nastavak."
+    m5,x5,ipod4g,ipodcolor,ipodnano,ipodvideo,e200,c200: "Disk je pun. Pritisnite LEFT za nastavak."
   </dest>
   <voice>
     *: none
@@ -10443,7 +10482,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Јачина"
+    recording: "Jacina"
   </voice>
 </phrase>
 <phrase>
@@ -10456,11 +10495,11 @@
   </source>
   <dest>
     *: none
-    recording: "Стерео"
+    recording: "Stereo"
   </dest>
   <voice>
     *: none
-    recording: "Стерео"
+    recording: "Stereo"
   </voice>
 </phrase>
 <phrase>
@@ -10473,11 +10512,11 @@
   </source>
   <dest>
     *: none
-    recording: "Моно"
+    recording: "Mono"
   </dest>
   <voice>
     *: none
-    recording: "Моно"
+    recording: "Mono"
   </voice>
 </phrase>
 <phrase>
@@ -10490,11 +10529,11 @@
   </source>
   <dest>
     *: none
-    recording_hwcodec: "Квалитет"
+    recording_hwcodec: "Kvalitet"
   </dest>
   <voice>
     *: none
-    recording_hwcodec: "Квалитет"
+    recording_hwcodec: "Kvalitet"
   </voice>
 </phrase>
 <phrase>
@@ -10507,11 +10546,11 @@
   </source>
   <dest>
     *: none
-    recording: "Фреквенција"
+    recording: "Frekvencija"
   </dest>
   <voice>
     *: none
-    recording: "Фреквенција"
+    recording: "Frekvencija"
   </voice>
 </phrase>
 <phrase>
@@ -10524,11 +10563,11 @@
   </source>
   <dest>
     *: none
-    recording: "Извор"
+    recording: "Izvor"
   </dest>
   <voice>
     *: none
-    recording: "Извор"
+    recording: "Izvor"
   </voice>
 </phrase>
 <phrase>
@@ -10541,11 +10580,11 @@
   </source>
   <dest>
     *: none
-    recording: "Инт. мик"
+    recording: "Int. mik"
   </dest>
   <voice>
     *: none
-    recording: "Интерни микрофон"
+    recording: "Interni mikrofon"
   </voice>
 </phrase>
 <phrase>
@@ -10558,11 +10597,11 @@
   </source>
   <dest>
     *: none
-    recording: "Линијски улаз"
+    recording: "Linijski ulaz"
   </dest>
   <voice>
     *: none
-    recording: "Линијски улаз"
+    recording: "Linijski ulaz"
   </voice>
 </phrase>
 <phrase>
@@ -10575,11 +10614,11 @@
   </source>
   <dest>
     *: none
-    recording: "Дигитални"
+    recording: "Digitalni"
   </dest>
   <voice>
     *: none
-    recording: "Дигитални"
+    recording: "Digitalni"
   </voice>
 </phrase>
 <phrase>
@@ -10592,11 +10631,11 @@
   </source>
   <dest>
     *: none
-    recording: "Канали"
+    recording: "Kanali"
   </dest>
   <voice>
     *: none
-    recording: "Канали"
+    recording: "Kanali"
   </voice>
 </phrase>
 <phrase>
@@ -10609,11 +10648,11 @@
   </source>
   <dest>
     *: none
-    recording: "Окидач"
+    recording: "Okidac"
   </dest>
   <voice>
     *: none
-    recording: "Окидач"
+    recording: "Okidac"
   </voice>
 </phrase>
 <phrase>
@@ -10721,17 +10760,18 @@
 <phrase>
   id: LANG_SYSFONT_SPLIT_SIZE
   desc: in record timesplit options
+  user:
   <source>
     *: none
     recording: "Split Filesize"
   </source>
   <dest>
     *: none
-    recording: "Величина једног дела"
+    recording: "Velicina jednog dela"
   </dest>
   <voice>
     *: none
-    recording: "Величина једног дела"
+    recording: "Velicina jednog dela"
   </voice>
 </phrase>
 <phrase>
@@ -10754,113 +10794,120 @@
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
+  user:
   <source>
     *: none
     agc: "AGC"
   </source>
   <dest>
     *: none
-    agc: "АРП"
+    agc: "ARP"
   </dest>
   <voice>
     *: none
-    agc: "АРП"
+    agc: "Automatska regulacija pojacanja"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Safety (clip)"
   </source>
   <dest>
     *: none
-    agc: "Сигурност (клип)"
+    agc: "Sigurnost (klip)"
   </dest>
   <voice>
     *: none
-    agc: "Сигурност (клип)"
+    agc: "Sigurnost (klip)"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Live (slow)"
   </source>
   <dest>
     *: none
-    agc: "Уживо (споро)"
+    agc: "Uzivo (sporo)"
   </dest>
   <voice>
     *: none
-    agc: "Уживо (споро)"
+    agc: "Uzivo (sporo)"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "DJ-Set (slow)"
   </source>
   <dest>
     *: none
-    agc: "DJ-сет (споро)"
+    agc: "DJ-set (sporo)"
   </dest>
   <voice>
     *: none
-    agc: "DJ сет (споро)"
+    agc: "DJ-set (sporo)"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Medium"
   </source>
   <dest>
     *: none
-    agc: "Средње"
+    agc: "Srednje"
   </dest>
   <voice>
     *: none
-    agc: "Средње"
+    agc: "Srednje"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: AGC preset
+  user:
   <source>
     *: none
     agc: "Voice (fast)"
   </source>
   <dest>
     *: none
-    agc: "Глас (брзо)"
+    agc: "Glas (brzo)"
   </dest>
   <voice>
     *: none
-    agc: "Глас (брзо)"
+    agc: "Glas (brzo)"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
+  user:
   <source>
     *: none
     agc: "AGC max. gain"
   </source>
   <dest>
     *: none
-    agc: "АРП макс. појачање"
+    agc: "ARP maks. pojacanje"
   </dest>
   <voice>
     *: none
-    agc: "АРП максимално појачање"
+    agc: "ARP maksimalno pojacanje"
   </voice>
 </phrase>
 <phrase>
@@ -11269,10 +11316,10 @@
     *: "Central European (CP1250)"
   </source>
   <dest>
-    *: "Централноевропска (CP1250)"
+    *: "централноевропска (CP1250)"
   </dest>
   <voice>
-    *: "Централноевропска"
+    *: "централноевропска"
   </voice>
 </phrase>
 <phrase>
