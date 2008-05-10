@@ -11551,13 +11551,16 @@
   desc: in system settings menu
   user: 
   <source>
-    *: "Accessory Power Supply"
+    *: none
+    accessory_supply: "Accessory Power Supply"
   </source>
   <dest>
-    *: "Захранване на аксесоарите"
+    *: none
+    accessory_supply: "Захранване на аксесоарите"
   </dest>
   <voice>
-    *: "Захранване на аксесоарите"
+    *: none
+    accessory_supply: "Захранване на аксесоарите"
   </voice>
 </phrase>
 <phrase>

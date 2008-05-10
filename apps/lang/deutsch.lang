@@ -11537,12 +11537,15 @@
   desc: in system settings menu
   user:
   <source>
-    *: "Accessory Power Supply"
+    *: none
+    accessory_supply: "Accessory Power Supply"
   </source>
   <dest>
-    *: "Zubehör Spannungsversorgung"
+    *: none
+    accessory_supply: "Zubehör Spannungsversorgung"
   </dest>
   <voice>
-    *: "Zubehör Spannungsversorgung"
+    *: none
+    accessory_supply: "Zubehör Spannungsversorgung"
   </voice>
 </phrase>

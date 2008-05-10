@@ -11538,13 +11538,16 @@
   desc: in system settings menu
   user:
   <source>
-    *: "Accessory Power Supply"
+    *: none
+    accessory_supply: "Accessory Power Supply"
   </source>
   <dest>
-    *: "Stroomvoorziening voor accessiores"
+    *: none
+    accessory_supply: "Stroomvoorziening voor accessiores"
   </dest>
   <voice>
-    *: "Stroomvoorziening voor accessiores"
+    *: none
+    accessory_supply: "Stroomvoorziening voor accessiores"
   </voice>
 </phrase>
 <phrase>

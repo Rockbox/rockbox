@@ -11563,13 +11563,16 @@
   desc: in system settings menu
   user: 
   <source>
-    *: "Accessory Power Supply"
+    *: none
+    accessory_supply: "Accessory Power Supply"
   </source>
   <dest>
-    *: "東西的電力"
+    *: none
+    accessory_supply: "東西的電力"
   </dest>
   <voice>
-    *: "東西的電力"
+    *: none
+    accessory_supply: "東西的電力"
   </voice>
 </phrase>
 <phrase>

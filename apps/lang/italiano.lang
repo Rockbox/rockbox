@@ -11534,13 +11534,16 @@
   desc: in system settings menu
   user:
   <source>
-    *: "Accessory Power Supply"
+    *: none
+    accessory_supply: "Accessory Power Supply"
   </source>
   <dest>
-    *: "Alimentazione Accessoria"
+    *: none
+    accessory_supply: "Alimentazione Accessoria"
   </dest>
   <voice>
-    *: "Alimentazione Accessoria"
+    *: none
+    accessory_supply: "Alimentazione Accessoria"
   </voice>
 </phrase>
 <phrase>

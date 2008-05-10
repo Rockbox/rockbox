@@ -11560,13 +11560,16 @@
   desc: in system settings menu
   user: 
   <source>
-    *: "Accessory Power Supply"
+    *: none
+    accessory_supply: "Accessory Power Supply"
   </source>
   <dest>
-    *: "东西的电"
+    *: none
+    accessory_supply: "东西的电"
   </dest>
   <voice>
-    *: "东西的电"
+    *: none
+    accessory_supply: "东西的电"
   </voice>
 </phrase>
 <phrase>
