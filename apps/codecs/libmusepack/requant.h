@@ -41,9 +41,15 @@
 #include "musepack.h"
 
 /* C O N S T A N T S */
-extern const mpc_uint32_t Res_bit [18];         // bits per sample for chosen quantizer
-extern const MPC_SAMPLE_FORMAT __Cc    [1 + 18];     // coefficients for requantization
-extern const mpc_int32_t          __Dc    [1 + 18];     // offset for requantization
+extern const mpc_uint32_t       Res_bit[18]; // bits per sample for chosen quantizer
+extern const MPC_SAMPLE_FORMAT __Cc[1 + 18]; // coefficients for requantization
+extern const mpc_int32_t       __Dc[1 + 18]; // offset for requantization
+extern const mpc_int32_t          idx30[27]; // 1st value of bundled 3-step quantizer
+extern const mpc_int32_t          idx31[27]; // 2nd value of bundled 3-step quantizer
+extern const mpc_int32_t          idx32[27]; // 3rd value of bundled 3-step quantizer
+extern const mpc_int32_t          idx50[25]; // 1st value of bundled 5-step quantizer
+extern const mpc_int32_t          idx51[25]; // 2nd value of bundled 5-step quantizer
+
 
 #define Cc      (__Cc + 1)
 #define Dc      (__Dc + 1)

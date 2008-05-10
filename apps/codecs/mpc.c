@@ -65,7 +65,6 @@ mpc_bool_t canseek_impl(void *data)
 
 MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH]
                   IBSS_ATTR_MPC_SAMPLE_BUF;
-mpc_uint32_t seek_table[10000];
 
 /* this is the codec entry point */
 enum codec_status codec_main(void)
@@ -86,11 +85,6 @@ enum codec_status codec_main(void)
     reader.get_size = get_size_impl;
     reader.canseek = canseek_impl;
     reader.data = ci;
-
-    /* Ensure that SeekTable is clear since decoder is reused */
-    decoder.SeekTable = NULL;
-    
-    mpc_decoder_set_seek_table(&decoder, seek_table, sizeof(seek_table));
 
 next_track:    
     if (codec_init()) {

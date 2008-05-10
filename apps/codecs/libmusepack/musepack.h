@@ -103,8 +103,6 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r);
 /// \return TRUE if decoder was initalized successfully, FALSE otherwise    
 mpc_bool_t mpc_decoder_initialize(mpc_decoder *d, mpc_streaminfo *si);
 
-void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si);
-
 /// Sets decoder sample scaling factor.  All decoded samples will be multiplied
 /// by this factor.
 /// \param scale_factor multiplicative scaling factor
@@ -136,10 +134,7 @@ mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample);
 /// Seeks to specified position in seconds in the source stream.
 mpc_bool_t mpc_decoder_seek_seconds(mpc_decoder *d, double seconds);
 
-/// Sets the static seek table pointer.
-void mpc_decoder_set_seek_table(mpc_decoder *d, mpc_uint32_t *seek_table, mpc_uint32_t max_table_size);
-
-/// Cleans up the decoder
+/// Cleans up the decoder (seektable)
 void mpc_decoder_destroy(mpc_decoder *d);
 
 #ifdef __cplusplus

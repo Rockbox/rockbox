@@ -468,7 +468,7 @@ mpc_decoder_decode_internal(mpc_decoder *d, MPC_SAMPLE_FORMAT *buffer)
         return (mpc_uint32_t)(-1);                           // end of file -> abort decoding
     }
 
-    if (d->DecodedFrames == 0 && d->Use_SeekTable)
+    if (d->DecodedFrames == 0)
         d->SeekTable[0] = mpc_decoder_bits_read(d);
 
     // read jump-info for validity check of frame
@@ -497,24 +497,20 @@ mpc_decoder_decode_internal(mpc_decoder *d, MPC_SAMPLE_FORMAT *buffer)
 
     d->DecodedFrames++;
 
-    if (d->Use_SeekTable) {
-        if (d->SeekTable_Step == 1) {
-            d->SeekTable [d->DecodedFrames] = d->FwdJumpInfo + 20;
-        } else {
-            if ((d->DecodedFrames-1) % d->SeekTable_Step == 0) {
-                d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
-                d->SeekTableIndex += 1;
-                d->SeekTableCounter = 0;
-            }
-            d->SeekTableCounter += d->FwdJumpInfo + 20;
+    /* update seek table */
+    if (d->SeekTable_Step == 1) {
+        d->SeekTable [d->DecodedFrames] = d->FwdJumpInfo + 20;
+    } else {
+        if ((d->DecodedFrames-1) % d->SeekTable_Step == 0) {
+            d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
+            d->SeekTableIndex += 1;
+            d->SeekTableCounter = 0;
         }
+        d->SeekTableCounter += d->FwdJumpInfo + 20;
     }
 
     // synthesize signal
     mpc_decoder_requantisierung(d, d->Max_Band);
-
-    //if ( d->EQ_activated && PluginSettings.EQbyMPC )
-    //    perform_EQ ();
 
     mpc_decoder_synthese_filter_float(d, buffer);
 
@@ -570,8 +566,6 @@ mpc_uint32_t mpc_decoder_decode(
 {
     for(;;)
     {
-        //const mpc_int32_t MaxBrokenFrames = 0; // PluginSettings.MaxBrokenFrames
-
         mpc_uint32_t RING = d->Zaehler;
         mpc_int32_t vbr_ring = (RING << 5) + d->pos;
 
@@ -764,7 +758,7 @@ mpc_decoder_requantisierung(mpc_decoder *d, const mpc_int32_t Last_Band)
 }
 
 #ifdef MPC_SUPPORT_SV456
-static const unsigned char Q_res[32][16] = {
+static const unsigned char Q_res[32][16] ICONST_ATTR = {
 {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17},
 {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17},
 {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17},
@@ -974,8 +968,6 @@ mpc_decoder_read_bitstream_sv6(mpc_decoder *d)
                     break;
                 }
             }
-            // update Reference for DSCF
-            //d->DSCF_Reference_R[n] = R[2];
         }
     }
 
@@ -1010,13 +1002,6 @@ mpc_decoder_read_bitstream_sv6(mpc_decoder *d)
 void
 mpc_decoder_read_bitstream_sv7(mpc_decoder *d, mpc_bool_t fastSeeking) 
 {
-    // these arrays hold decoding results for bundled quantizers (3- and 5-step)
-    /*static*/ mpc_int32_t idx30[] = { -1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1};
-    /*static*/ mpc_int32_t idx31[] = { -1,-1,-1, 0, 0, 0, 1, 1, 1,-1,-1,-1, 0, 0, 0, 1, 1, 1,-1,-1,-1, 0, 0, 0, 1, 1, 1};
-    /*static*/ mpc_int32_t idx32[] = { -1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    /*static*/ mpc_int32_t idx50[] = { -2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2};
-    /*static*/ mpc_int32_t idx51[] = { -2,-2,-2,-2,-2,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
-
     mpc_int32_t n,k;
     mpc_int32_t Max_used_Band=0;
     const HuffmanTyp *Table;
@@ -1340,7 +1325,7 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d, mpc_bool_t fastSeeking)
                 {
                     idx = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
                     *RQ++ = idx50[idx];
-                    *RQ++ = idx51[idx];
+                    *RQ++ = idx51[idx]; 
                 }
                 break;
             case 3:
@@ -1451,19 +1436,11 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   d->WordsRead = 0;
   d->Max_Band = 0;
   d->SeekTable = NULL;
-  d->Use_FastSeek = TRUE;
-  d->Use_SeekTable = TRUE;
-  d->Use_StaticSeekTable = FALSE;
   d->SeekTable_Step = 1;
   d->SeekTableIndex = 0;
   d->SeekTableCounter = 0;
-  d->Max_SeekTable_Size = 0;
 
   mpc_decoder_initialisiere_quantisierungstabellen(d, 1.0f);
-#if 0
-  mpc_decoder_init_huffman_sv6(d);
-  mpc_decoder_init_huffman_sv7(d);
-#endif
 
   LOOKUP ( mpc_table_HuffQ[0][1], 27, LUT1_0  );
   LOOKUP ( mpc_table_HuffQ[1][1], 27, LUT1_1  );
@@ -1490,16 +1467,15 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   #endif
 }
 
-void mpc_decoder_destroy(mpc_decoder *d) {
-
-    if (d->SeekTable != NULL && d->Use_StaticSeekTable == FALSE)
+void mpc_decoder_destroy(mpc_decoder *d) 
+{
+    if (d->SeekTable != NULL)
         free(d->SeekTable);
-
 }
 
-void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)
+static void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)
 {
-    mpc_uint16_t seekTableSize;
+    mpc_uint32_t seekTableSize;
 
     mpc_decoder_reset_synthesis(d);
     mpc_decoder_reset_globals(d);
@@ -1514,28 +1490,14 @@ void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)
 
     d->samples_to_skip = MPC_DECODER_SYNTH_DELAY;
 
-    if (d->SeekTable != NULL && d->Use_StaticSeekTable == FALSE) 
+    if (d->SeekTable != NULL)
         free(d->SeekTable);
 
-    if (d->Use_SeekTable) {
-        if (d->Use_StaticSeekTable == FALSE) {
-            if (d->Max_SeekTable_Size == 0) {
-                seekTableSize = si->frames;
-            } else {
-                seekTableSize = min(si->frames, d->Max_SeekTable_Size / sizeof(mpc_uint32_t));
-            }
-            d->SeekTable = (mpc_uint32_t*) calloc( sizeof(mpc_uint32_t), seekTableSize);
-            d->SeekTable_Step = si->frames / seekTableSize;
-            if (si->frames % seekTableSize)
-                d->SeekTable_Step+=1;
-        } else {
-            seekTableSize = d->Max_SeekTable_Size / sizeof(mpc_uint32_t);
-            d->SeekTable_Step = si->frames / seekTableSize;
-            if (si->frames % seekTableSize)
-                d->SeekTable_Step+=1;
-        }
-    }
-
+    seekTableSize = si->frames;
+    d->SeekTable = (mpc_uint32_t*) calloc( sizeof(mpc_uint32_t), seekTableSize);
+    d->SeekTable_Step = si->frames / seekTableSize;
+    if (si->frames % seekTableSize)
+        d->SeekTable_Step+=1;
 }
 
 mpc_bool_t mpc_decoder_initialize(mpc_decoder *d, mpc_streaminfo *si) 
@@ -1563,43 +1525,6 @@ mpc_bool_t mpc_decoder_initialize(mpc_decoder *d, mpc_streaminfo *si)
     return TRUE;
 }
 
-//---------------------------------------------------------------
-// will seek from the beginning of the file to the desired
-// position in ms (given by seek_needed)
-//---------------------------------------------------------------
-#if 0
-static void
-helper1(mpc_decoder *d, mpc_uint32_t bitpos) 
-{
-    f_seek(d, (bitpos >> 5) * 4 + d->MPCHeaderPos);
-    f_read_dword(d, d->Speicher, 2);
-    d->dword = SWAP(d->Speicher[d->Zaehler = 0]);
-    d->pos = bitpos & 31;
-}
-
-static void
-helper2(mpc_decoder *d, mpc_uint32_t bitpos) 
-{
-    f_seek(d, (bitpos>>5) * 4 + d->MPCHeaderPos);
-    f_read_dword(d, d->Speicher, MEMSIZE);
-    d->dword = SWAP(d->Speicher[d->Zaehler = 0]);
-    d->pos = bitpos & 31;
-}
-
-static void
-helper3(mpc_decoder *d, mpc_uint32_t bitpos, mpc_uint32_t* buffoffs) 
-{
-    d->pos = bitpos & 31;
-    bitpos >>= 5;
-    if ((mpc_uint32_t)(bitpos - *buffoffs) >= MEMSIZE - 2) {
-        *buffoffs = bitpos;
-        f_seek(d, bitpos * 4L + d->MPCHeaderPos);
-        f_read_dword(d, d->Speicher, MEMSIZE );
-    }
-    d->dword = SWAP(d->Speicher[d->Zaehler = bitpos - *buffoffs ]);
-}
-#endif
-
 // jumps over the current frame
 mpc_uint32_t mpc_decoder_jump_frame(mpc_decoder *d) {
 
@@ -1622,7 +1547,9 @@ static mpc_uint32_t get_initial_fpos(mpc_decoder *d, mpc_uint32_t StreamVersion)
 {
     mpc_uint32_t fpos = 0;
     (void) StreamVersion;
-    switch ( d->StreamVersion ) {                                                  // setting position to the beginning of the data-bitstream
+    
+    // setting position to the beginning of the data-bitstream
+    switch ( d->StreamVersion ) {
     case  0x04: fpos =  48; break;
     case  0x05:
     case  0x06: fpos =  64; break;
@@ -1685,7 +1612,7 @@ mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample)
     if (seekFrame > 33) 
         lastFrame = seekFrame - 33 + 1 - d->SeekTable_Step;
 
-    if ((!d->Use_SeekTable && delta < 0) || d->MaxDecodedFrames == 0) {
+    if (d->MaxDecodedFrames == 0) {
 
         mpc_decoder_reset_state(d);
 
@@ -1698,29 +1625,24 @@ mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample)
         // reset number of decoded frames
         d->DecodedFrames = 0;
 
-        if (d->Use_SeekTable) {
-            // jump to the last frame, updating seek table
-            if (d->SeekTable_Step == 1) {
-                d->SeekTable[0] = (mpc_uint32_t)fpos;
-                for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) 
-                    d->SeekTable[d->DecodedFrames+1] = mpc_decoder_jump_frame(d);
-            } else {
-                d->SeekTableIndex = 0;
-                d->SeekTableCounter = (mpc_uint32_t)fpos;
-                for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) {
-                    if (d->DecodedFrames % d->SeekTable_Step == 0) {
-                        d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
-                        d->SeekTableIndex += 1;
-                        d->SeekTableCounter = 0;
-                    }
-                    d->SeekTableCounter += mpc_decoder_jump_frame(d);
-                }
-            }
-        } else {
-            // just jump to the last frame
+        // jump to the last frame, updating seek table
+        if (d->SeekTable_Step == 1) {
+            d->SeekTable[0] = (mpc_uint32_t)fpos;
             for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) 
-                mpc_decoder_jump_frame(d);
-        } 
+                d->SeekTable[d->DecodedFrames+1] = mpc_decoder_jump_frame(d);
+        } else {
+            d->SeekTableIndex = 0;
+            d->SeekTableCounter = (mpc_uint32_t)fpos;
+            for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) {
+                if (d->DecodedFrames % d->SeekTable_Step == 0) {
+                    d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
+                    d->SeekTableIndex += 1;
+                    d->SeekTableCounter = 0;
+                }
+                d->SeekTableCounter += mpc_decoder_jump_frame(d);
+            }
+        }
+
         
     } else if (delta < 0) {
 
@@ -1745,45 +1667,38 @@ mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample)
         mpc_decoder_reset_state(d);
 
         // jumps forward from the current position
-        if (d->Use_SeekTable) {
-
-            if (d->MaxDecodedFrames > lastFrame) { // REVIEW: Correct?? or (d->MaxDecodedFrames > d->DecodedFrames)
-                // jump to the last usable position in the seek table
-                if (d->SeekTable_Step == 1) {
-                    fpos = mpc_decoder_bits_read(d);
-                    for (; d->DecodedFrames < d->MaxDecodedFrames && d->DecodedFrames < lastFrame; d->DecodedFrames++)
-                        fpos += d->SeekTable[d->DecodedFrames+1];
-                } else {
-                    // could test SeekTable offset and jump to next entry but this is easier for now...
-                    //d->SeekTableIndex = 0;
-                    //d->SeekTableCounter = 0;
-                    fpos = d->SeekTable[0];
-                    d->SeekTableIndex = 0;
-                    for (d->DecodedFrames = 0;d->DecodedFrames < d->MaxDecodedFrames && d->DecodedFrames < lastFrame; d->DecodedFrames+=d->SeekTable_Step, d->SeekTableIndex++)
-                        fpos += d->SeekTable[d->SeekTableIndex+1];
-                    d->SeekTableCounter = d->SeekTable[d->SeekTableIndex];
-                }
-
-                mpc_decoder_seek_to(d, fpos);
-            }
+        if (d->MaxDecodedFrames > lastFrame) { // REVIEW: Correct?? or (d->MaxDecodedFrames > d->DecodedFrames)
+            // jump to the last usable position in the seek table
             if (d->SeekTable_Step == 1) {
-                for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) 
-                    d->SeekTable[d->DecodedFrames+1] = mpc_decoder_jump_frame(d);
+                fpos = mpc_decoder_bits_read(d);
+                for (; d->DecodedFrames < d->MaxDecodedFrames && d->DecodedFrames < lastFrame; d->DecodedFrames++)
+                    fpos += d->SeekTable[d->DecodedFrames+1];
             } else {
-                for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) {
-                    if (d->DecodedFrames % d->SeekTable_Step == 0) {
-                        d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
-                        d->SeekTableIndex += 1;
-                        d->SeekTableCounter = 0;
-                    }
-                    d->SeekTableCounter += mpc_decoder_jump_frame(d);
-                }
-            } 
-        } else {
-            for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) 
-                mpc_decoder_jump_frame(d);
-        }
+                // could test SeekTable offset and jump to next entry but this is easier for now...
+                //d->SeekTableIndex = 0;
+                //d->SeekTableCounter = 0;
+                fpos = d->SeekTable[0];
+                d->SeekTableIndex = 0;
+                for (d->DecodedFrames = 0;d->DecodedFrames < d->MaxDecodedFrames && d->DecodedFrames < lastFrame; d->DecodedFrames+=d->SeekTable_Step, d->SeekTableIndex++)
+                    fpos += d->SeekTable[d->SeekTableIndex+1];
+                d->SeekTableCounter = d->SeekTable[d->SeekTableIndex];
+            }
 
+            mpc_decoder_seek_to(d, fpos);
+        }
+        if (d->SeekTable_Step == 1) {
+            for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) 
+                d->SeekTable[d->DecodedFrames+1] = mpc_decoder_jump_frame(d);
+        } else {
+            for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) {
+                if (d->DecodedFrames % d->SeekTable_Step == 0) {
+                    d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
+                    d->SeekTableIndex += 1;
+                    d->SeekTableCounter = 0;
+                }
+                d->SeekTableCounter += mpc_decoder_jump_frame(d);
+            }
+        }
     } 
 
     // REVIEW: Needed?
@@ -1798,7 +1713,7 @@ mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample)
         FrameBitCnt  = mpc_decoder_bits_read(d);  
         // scanning the scalefactors (and check for validity of frame)
         if (d->StreamVersion >= 7)  {
-            mpc_decoder_read_bitstream_sv7(d, d->Use_FastSeek && (d->DecodedFrames < seekFrame - 1));
+              mpc_decoder_read_bitstream_sv7(d, (d->DecodedFrames < seekFrame - 1));
         }
         else {
 #ifdef MPC_SUPPORT_SV456
@@ -1810,29 +1725,27 @@ mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample)
 
         FrameBitCnt = mpc_decoder_bits_read(d) - FrameBitCnt;
 
-        if (d->Use_FastSeek && d->FwdJumpInfo > FrameBitCnt) 
+        if (d->FwdJumpInfo > FrameBitCnt) 
             mpc_decoder_seek_forward(d, d->FwdJumpInfo - FrameBitCnt);
         else if (FrameBitCnt != d->FwdJumpInfo ) 
             // Bug in perform_jump;
             return FALSE;
 
         // REVIEW: Only if decodedFrames < maxDecodedFrames??
-        if (d->Use_SeekTable) {
-            if (d->SeekTable_Step == 1) {
-                // check that the frame length corresponds with any data already in the seek table
-                if (d->SeekTable[d->DecodedFrames+1] != 0 && d->SeekTable[d->DecodedFrames+1] != d->FwdJumpInfo + 20)
+        if (d->SeekTable_Step == 1) {
+            // check that the frame length corresponds with any data already in the seek table
+            if (d->SeekTable[d->DecodedFrames+1] != 0 && d->SeekTable[d->DecodedFrames+1] != d->FwdJumpInfo + 20)
+                return FALSE;
+            d->SeekTable [d->DecodedFrames+1] = d->FwdJumpInfo + 20;
+        } else {
+            if (d->DecodedFrames % d->SeekTable_Step == 0) {
+                if (d->SeekTable[d->SeekTableIndex] != 0 && d->SeekTable[d->SeekTableIndex] != d->SeekTableCounter)
                     return FALSE;
-                d->SeekTable [d->DecodedFrames+1] = d->FwdJumpInfo + 20;
-            } else {
-                if (d->DecodedFrames % d->SeekTable_Step == 0) {
-                    if (d->SeekTable[d->SeekTableIndex] != 0 && d->SeekTable[d->SeekTableIndex] != d->SeekTableCounter)
-                        return FALSE;
-                    d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
-                    d->SeekTableIndex += 1;
-                    d->SeekTableCounter = 0;
-                }
-                d->SeekTableCounter += d->FwdJumpInfo + 20;
-            } 
+                d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
+                d->SeekTableIndex += 1;
+                d->SeekTableCounter = 0;
+            }
+            d->SeekTableCounter += d->FwdJumpInfo + 20;
         }
 
         // update buffer
@@ -1906,7 +1819,6 @@ void mpc_decoder_seek_to(mpc_decoder *d, mpc_uint32_t bitPos) {
     
 }
 
-
 void mpc_decoder_seek_forward(mpc_decoder *d, mpc_uint32_t bits) {
 
     bits += d->pos;
@@ -1919,11 +1831,3 @@ void mpc_decoder_seek_forward(mpc_decoder *d, mpc_uint32_t bits) {
 
 }
 
-
-void mpc_decoder_set_seek_table(mpc_decoder *d, mpc_uint32_t *seek_table, mpc_uint32_t max_table_size) {
-
-    d->Use_StaticSeekTable = TRUE;
-    d->SeekTable = seek_table;
-    d->Max_SeekTable_Size = max_table_size;
-
-}

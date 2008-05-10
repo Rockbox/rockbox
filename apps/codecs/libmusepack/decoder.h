@@ -110,11 +110,7 @@ typedef struct mpc_decoder_t {
     mpc_bool_t    MS_Flag[32];                // MS used?
 
     mpc_uint32_t* SeekTable;
-    mpc_bool_t    Use_SeekTable;
-    mpc_bool_t    Use_FastSeek;
-    mpc_bool_t    Use_StaticSeekTable;
     mpc_uint8_t   SeekTable_Step;
-    mpc_uint32_t  Max_SeekTable_Size;
 
 #ifdef MPC_FIXED_POINT
     unsigned char SCF_shift[256];

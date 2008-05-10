@@ -69,6 +69,33 @@ const mpc_int32_t  __Dc [1 + 18] ICONST_ATTR = {
     127,   255,   511,  1023,  2047,  4095,  8191, 16383, 32767
 };
 
+// decoding results (requantized) for bundled quantizers (3- and 5-step)
+// 1st value of bundled 3-step quantizer
+const mpc_int32_t idx30[27] ICONST_ATTR = { -1, 0, 1,-1, 0, 1,-1, 0, 1,
+                                            -1, 0, 1,-1, 0, 1,-1, 0, 1,
+                                            -1, 0, 1,-1, 0, 1,-1, 0, 1};
+// 2nd value of bundled 3-step quantizer
+const mpc_int32_t idx31[27] ICONST_ATTR = { -1,-1,-1, 0, 0, 0, 1, 1, 1,
+                                            -1,-1,-1, 0, 0, 0, 1, 1, 1,
+                                            -1,-1,-1, 0, 0, 0, 1, 1, 1};
+// 3rd value of bundled 3-step quantizer                                            
+const mpc_int32_t idx32[27] ICONST_ATTR = { -1,-1,-1,-1,-1,-1,-1,-1,-1, 
+                                             0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                                             1, 1, 1, 1, 1, 1, 1, 1, 1};
+// 1st value of bundled 5-step quantizer                                             
+const mpc_int32_t idx50[25] ICONST_ATTR = { -2,-1, 0, 1, 2,
+                                            -2,-1, 0, 1, 2,
+                                            -2,-1, 0, 1, 2,
+                                            -2,-1, 0, 1, 2,
+                                            -2,-1, 0, 1, 2};
+// 2nd value of bundled 5-step quantizer                                            
+const mpc_int32_t idx51[25] ICONST_ATTR = { -2,-2,-2,-2,-2,
+                                            -1,-1,-1,-1,-1, 
+                                             0, 0, 0, 0, 0,
+                                             1, 1, 1, 1, 1,
+                                             2, 2, 2, 2, 2};
+     
+
 #ifdef MPC_FIXED_POINT
 static mpc_uint32_t find_shift(double fval)
 {
