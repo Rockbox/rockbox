@@ -89,11 +89,18 @@ void pcm_play_dma_init(void)
 {
     pcm_set_frequency(SAMPR_44);
 
-    /* slave */
-    IISMOD |= (1<<8);
+    /* There seem to be problems when changing the IIS interface configuration
+     * when a clock is not present.
+     */
+    s3c_regset(&CLKCON, 1<<17);
+    /* slave, transmit mode, 16 bit samples - MCLK 384fs - use 16.9344Mhz -
+       BCLK 32fs */
+    IISMOD = (1<<9) | (1<<8) | (2<<6) | (1<<3) | (1<<2) | (1<<0);
 
-    /* RX,TX off,idle */
+    /* RX,TX off,on */
     IISCON |= (1<<3) | (1<<2);
+
+    s3c_regclr(&CLKCON, 1<<17);
 
     audiohw_init();
 
@@ -182,10 +189,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     /* stop any DMA in progress - idle IIS */
     play_stop_pcm();
-
-    /* slave, transmit mode, 16 bit samples - MCLK 384fs - use 16.9344Mhz -
-       BCLK 32fs */
-    IISMOD = (1<<9) | (1<<8) | (2<<6) | (1<<3) | (1<<2) | (1<<0);
 
     /* connect DMA to the FIFO and enable the FIFO */
     IISFCON = (1<<15) | (1<<13);
