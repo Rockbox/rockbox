@@ -11543,11 +11543,11 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "Stroomvoorziening voor accessiores"
+    accessory_supply: "Stroomvoorziening voor accessoires"
   </dest>
   <voice>
     *: none
-    accessory_supply: "Stroomvoorziening voor accessiores"
+    accessory_supply: "Stroomvoorziening voor accessoires"
   </voice>
 </phrase>
 <phrase>
