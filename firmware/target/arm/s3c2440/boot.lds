@@ -63,6 +63,8 @@ SECTIONS
         *(.eh_frame)
     } 
 
+    _initdata_end =.;
+
     .stack :
     {
        *(.stack)
