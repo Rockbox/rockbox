@@ -116,7 +116,6 @@ class RbSettings : public QObject
         void setCacheDisable(bool on);
         void setCacheOffline(bool on);
         void setCurTTS(QString tts);
-        void setCurEncoder(QString enc);
         void setTTSPath(QString tts, QString path);
         void setTTSOptions(QString tts, QString options);
         void setTTSSpeed(QString tts, int speed);

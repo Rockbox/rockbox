@@ -253,7 +253,7 @@ QString RbSettings::curLang()
 
 QString RbSettings::curEncoder()
 {
-    return userSettings->value("encoder").toString();
+    return deviceSettingCurGet("encoder").toString();
 }
 
 QString RbSettings::curTTS()
@@ -527,11 +527,6 @@ void RbSettings::setCacheOffline(bool on)
 void RbSettings::setCurTTS(QString tts)
 {
     userSettings->setValue("tts",tts);
-}
-
-void RbSettings::setCurEncoder(QString enc)
-{
-    userSettings->setValue("encoder",enc);
 }
 
 void RbSettings::setTTSPath(QString tts, QString path)

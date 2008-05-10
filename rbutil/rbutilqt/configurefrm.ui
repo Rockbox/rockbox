@@ -26,11 +26,20 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="tabDevice" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>476</width>
+        <height>366</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>&amp;Device</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/rbutil.png</iconset>
+       <iconset resource="rbutilqt.qrc" >
+        <normaloff>:/icons/rbutil.png</normaloff>:/icons/rbutil.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
@@ -54,7 +63,8 @@
             <string>&amp;Browse</string>
            </property>
            <property name="icon" >
-            <iconset resource="rbutilqt.qrc" >:/icons/system-search.png</iconset>
+            <iconset resource="rbutilqt.qrc" >
+             <normaloff>:/icons/system-search.png</normaloff>:/icons/system-search.png</iconset>
            </property>
           </widget>
          </item>
@@ -84,7 +94,7 @@
          <property name="orientation" >
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>40</width>
            <height>20</height>
@@ -98,18 +108,28 @@
           <string>&amp;Autodetect</string>
          </property>
          <property name="icon" >
-          <iconset resource="rbutilqt.qrc" >:/icons/edit-find.png</iconset>
+          <iconset resource="rbutilqt.qrc" >
+           <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tabProxy" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>476</width>
+        <height>366</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>&amp;Proxy</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/network-idle.png</iconset>
+       <iconset resource="rbutilqt.qrc" >
+        <normaloff>:/icons/network-idle.png</normaloff>:/icons/network-idle.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
@@ -210,7 +230,7 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
            <height>40</height>
@@ -221,11 +241,20 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabLanguage" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>476</width>
+        <height>366</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>&amp;Language</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/preferences-desktop-locale.png</iconset>
+       <iconset resource="rbutilqt.qrc" >
+        <normaloff>:/icons/preferences-desktop-locale.png</normaloff>:/icons/preferences-desktop-locale.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
@@ -234,11 +263,20 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabCache" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>476</width>
+        <height>366</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Cac&amp;he</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/package-x-generic.png</iconset>
+       <iconset resource="rbutilqt.qrc" >
+        <normaloff>:/icons/package-x-generic.png</normaloff>:/icons/package-x-generic.png</iconset>
       </attribute>
       <attribute name="toolTip" >
        <string>Download cache settings</string>
@@ -286,7 +324,8 @@
             <string>&amp;Browse</string>
            </property>
            <property name="icon" >
-            <iconset resource="rbutilqt.qrc" >:/icons/edit-find.png</iconset>
+            <iconset resource="rbutilqt.qrc" >
+             <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
            </property>
           </widget>
          </item>
@@ -318,7 +357,7 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
            <height>61</height>
@@ -331,7 +370,7 @@
          <property name="orientation" >
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>40</width>
            <height>20</height>
@@ -345,18 +384,28 @@
           <string>Clean cache &amp;now</string>
          </property>
          <property name="icon" >
-          <iconset resource="rbutilqt.qrc" >:/icons/user-trash-full.png</iconset>
+          <iconset resource="rbutilqt.qrc" >
+           <normaloff>:/icons/user-trash-full.png</normaloff>:/icons/user-trash-full.png</iconset>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tabTts" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>476</width>
+        <height>366</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>&amp;TTS &amp;&amp; Encoder</string>
       </attribute>
       <attribute name="icon" >
-       <iconset resource="rbutilqt.qrc" >:/icons/audio-input-microphone.png</iconset>
+       <iconset resource="rbutilqt.qrc" >
+        <normaloff>:/icons/audio-input-microphone.png</normaloff>:/icons/audio-input-microphone.png</iconset>
       </attribute>
       <layout class="QVBoxLayout" >
        <item>
@@ -408,7 +457,8 @@
              <string>Configure &amp;TTS</string>
             </property>
             <property name="icon" >
-             <iconset resource="rbutilqt.qrc" >:/icons/edit-find.png</iconset>
+             <iconset resource="rbutilqt.qrc" >
+              <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
             </property>
            </widget>
           </item>
@@ -421,34 +471,14 @@
           <string>Encoder Engine</string>
          </property>
          <layout class="QGridLayout" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="labelEncoder" >
-            <property name="text" >
-             <string>Select &amp;encoder</string>
-            </property>
-            <property name="buddy" >
-             <cstring>comboEncoder</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" colspan="3" >
-           <widget class="QComboBox" name="comboEncoder" />
-          </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="labelEncoderExecutable" >
-            <property name="text" >
-             <string>Configure encoder</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" >
+          <item row="0" column="1" >
            <widget class="QLabel" name="configEncstatus" >
             <property name="text" >
              <string>Configuration invalid !</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="2" >
+          <item row="0" column="2" >
            <widget class="QLabel" name="configEncstatusimg" >
             <property name="text" >
              <string/>
@@ -458,13 +488,21 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="3" >
+          <item row="0" column="3" >
            <widget class="QPushButton" name="configEncoder" >
             <property name="text" >
              <string> Configure &amp;Enc</string>
             </property>
             <property name="icon" >
-             <iconset resource="rbutilqt.qrc" >:/icons/edit-find.png</iconset>
+             <iconset resource="rbutilqt.qrc" >
+              <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="encoderName" >
+            <property name="text" >
+             <string>encoder name</string>
             </property>
            </widget>
           </item>
@@ -476,7 +514,7 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>458</width>
            <height>131</height>
@@ -493,7 +531,7 @@
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>40</width>
        <height>20</height>
@@ -507,7 +545,8 @@
       <string>&amp;Ok</string>
      </property>
      <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>
+      <iconset resource="rbutilqt.qrc" >
+       <normaloff>:/icons/go-next.png</normaloff>:/icons/go-next.png</iconset>
      </property>
     </widget>
    </item>
@@ -517,7 +556,8 @@
       <string>&amp;Cancel</string>
      </property>
      <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >:/icons/process-stop.png</iconset>
+      <iconset resource="rbutilqt.qrc" >
+       <normaloff>:/icons/process-stop.png</normaloff>:/icons/process-stop.png</iconset>
      </property>
     </widget>
    </item>

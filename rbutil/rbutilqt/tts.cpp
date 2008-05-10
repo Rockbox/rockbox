@@ -203,7 +203,7 @@ bool TTSSapi::start(QString *errStr)
         return false;
     }
     
-    if(!voicescript->waitForReadyRead(100))  
+    if(!voicescript->waitForReadyRead(300))  
     {
         *errStr = voicescript->readAllStandardError();
         if(*errStr != "")

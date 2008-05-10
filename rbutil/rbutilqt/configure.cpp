@@ -80,8 +80,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     connect(ui.configTts, SIGNAL(clicked()), this, SLOT(configTts()));
     connect(ui.configEncoder, SIGNAL(clicked()), this, SLOT(configEnc()));
     connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsState(int)));
-    connect(ui.comboEncoder, SIGNAL(currentIndexChanged(int)), this, SLOT(updateEncState(int)));
-    
+     
 }
 
 
@@ -136,10 +135,7 @@ void Config::accept()
     // tts settings
     int i = ui.comboTts->currentIndex();
     settings->setCurTTS(ui.comboTts->itemData(i).toString());
-    //encoder settings
-    i = ui.comboEncoder->currentIndex();
-    settings->setCurEncoder(ui.comboEncoder->itemData(i).toString());
-
+   
     // sync settings
     settings->sync();
     this->close();
@@ -288,22 +284,14 @@ void Config::setDevices()
     // tts / encoder tab
     
     //encoders
-    int index;
-    QStringList encoders = EncBase::getEncoderList();
-    for(int a = 0; a < encoders.size(); a++)
-        ui.comboEncoder->addItem(EncBase::getEncoderName(encoders.at(a)), encoders.at(a));
-    //update index of combobox
-    index = ui.comboEncoder->findData(settings->curEncoder());
-    if(index < 0) index = 0;
-    ui.comboEncoder->setCurrentIndex(index);
-    updateEncState(index);
+    updateEncState();
 
     //tts
     QStringList ttslist = TTSBase::getTTSList();
     for(int a = 0; a < ttslist.size(); a++)
         ui.comboTts->addItem(TTSBase::getTTSName(ttslist.at(a)), ttslist.at(a));
     //update index of combobox
-    index = ui.comboTts->findData(settings->curTTS());
+    int index = ui.comboTts->findData(settings->curTTS());
     if(index < 0) index = 0;
     ui.comboTts->setCurrentIndex(index);
     updateTtsState(index);
@@ -329,9 +317,10 @@ void Config::updateTtsState(int index)
     }
 }
 
-void Config::updateEncState(int index)
+void Config::updateEncState()
 {
-    QString encoder = ui.comboEncoder->itemData(index).toString();
+    ui.encoderName->setText(EncBase::getEncoderName(settings->curEncoder()));
+    QString encoder = settings->curEncoder();
     EncBase* enc = EncBase::getEncoder(encoder);
     enc->setCfg(settings);
     
@@ -612,10 +601,9 @@ void Config::configTts()
 
 void Config::configEnc()
 {
-    int index = ui.comboEncoder->currentIndex();
-    EncBase* enc = EncBase::getEncoder(ui.comboEncoder->itemData(index).toString());
+    EncBase* enc = EncBase::getEncoder(settings->curEncoder());
     
     enc->setCfg(settings);
     enc->showCfg();
-    updateEncState(ui.comboEncoder->currentIndex());
+    updateEncState();
 }
