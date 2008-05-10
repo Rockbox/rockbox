@@ -412,6 +412,7 @@ enum mc13783_regs_enum
 /* TEST3 */
 
 void mc13783_init(void);
+void mc13783_close(void);
 uint32_t mc13783_set(unsigned address, uint32_t bits);
 uint32_t mc13783_clear(unsigned address, uint32_t bits);
 int mc13783_write(unsigned address, uint32_t data);

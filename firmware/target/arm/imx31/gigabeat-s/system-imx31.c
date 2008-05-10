@@ -28,6 +28,7 @@
 #include "serial-imx31.h"
 #include "debug.h"
 #include "clkctl-imx31.h"
+#include "mc13783.h"
 
 int system_memory_guard(int newmode)
 {
