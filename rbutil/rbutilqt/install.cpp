@@ -19,6 +19,7 @@
 
 #include "install.h"
 #include "ui_installfrm.h"
+#include "rbzip.h"
 
 Install::Install(QWidget *parent) : QDialog(parent)
 {
@@ -82,7 +83,22 @@ void Install::accept()
         return;
     }
     settings->sync();
-
+    
+    //! check if rockbox is already installed
+    if(QDir(settings->mountpoint() + "/.rockbox").exists())
+    {
+        if(QMessageBox::question(this, tr("Installed Rockbox detected"),
+           tr("Rockbox installation detected. Do you want to backup first?"),
+           QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
+            QString backupName = QFileDialog::getSaveFileName(this,"Select Backup Filename",settings->mountpoint());
+            logger->show();
+            RbZip backup;
+            backup.createZip(backupName,settings->mountpoint() + "/.rockbox",logger);          
+        }
+    }
+    
+    //! install build
     installer = new ZipInstaller(this);
     installer->setUrl(file);
     installer->setLogSection("Rockbox (Base)");

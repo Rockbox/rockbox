@@ -19,9 +19,9 @@
 
 #include "progressloggergui.h"
 
-ProgressLoggerGui::ProgressLoggerGui(QObject* parent): ProgressloggerInterface(parent)
+ProgressLoggerGui::ProgressLoggerGui(QWidget* parent): ProgressloggerInterface(parent)
 {
-    downloadProgress = new QDialog();
+    downloadProgress = new QDialog(parent);
     downloadProgress->setModal(true);
     dp.setupUi(downloadProgress);
     dp.listProgress->setAlternatingRowColors(true);

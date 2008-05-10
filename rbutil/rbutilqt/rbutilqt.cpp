@@ -33,6 +33,7 @@
 #include "uninstallwindow.h"
 #include "browseof.h"
 #include "utils.h"
+#include "rbzip.h"
 
 #if defined(Q_OS_LINUX)
 #include <stdio.h>
@@ -462,7 +463,22 @@ bool RbUtilQt::installAuto()
     }
 
     QString myversion = "r" + versmap.value("bleed_rev");
-
+    
+    //! check if rockbox is already installed
+    if(QDir(settings->mountpoint() + "/.rockbox").exists())
+    {
+        if(QMessageBox::question(this, tr("Installed Rockbox detected"),
+           tr("Rockbox installation detected. Do you want to backup first?"),
+           QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
+            QString backupName = QFileDialog::getSaveFileName(this,"Select Backup Filename",settings->mountpoint());
+            logger->show();
+            RbZip backup;
+            backup.createZip(backupName,settings->mountpoint() + "/.rockbox",logger);          
+        }
+    }
+    
+    //! install current build
     ZipInstaller* installer = new ZipInstaller(this);
     installer->setUrl(file);
     installer->setLogSection("Rockbox (Base)");

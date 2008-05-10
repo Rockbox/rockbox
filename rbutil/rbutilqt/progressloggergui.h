@@ -28,7 +28,7 @@ class ProgressLoggerGui :public ProgressloggerInterface
 {
     Q_OBJECT
 public:
-    ProgressLoggerGui(QObject * parent);
+    ProgressLoggerGui(QWidget * parent);
 
     virtual void addItem(const QString &text);  //adds a string to the list
 

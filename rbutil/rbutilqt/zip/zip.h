@@ -103,7 +103,9 @@ public:
 	ErrorCode closeArchive();
 
 	QString formatError(ErrorCode c) const;
-
+    
+    virtual void progress() {}
+    
 private:
 	ZipPrivate* d;
 };
