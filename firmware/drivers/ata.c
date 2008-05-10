@@ -59,11 +59,16 @@
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
 
 #define Q_SLEEP 0
+#define Q_CLOSE 1
 
 #define READ_TIMEOUT 5*HZ
 
 #ifdef HAVE_ATA_POWER_OFF
 #define ATA_POWER_OFF_TIMEOUT 2*HZ
+#endif
+
+#ifdef ATA_DRIVER_CLOSE
+static struct thread_entry *ata_thread_p = NULL;
 #endif
 
 #if defined(MAX_PHYS_SECTOR_SIZE) && MEM == 64
@@ -941,6 +946,11 @@ static void ata_thread(void)
                 call_ata_idle_notifys(false);
                 last_disk_activity = current_tick - sleep_timeout + (HZ/2);
                 break;
+
+#ifdef ATA_DRIVER_CLOSE
+            case Q_CLOSE:
+                return;
+#endif
         }
     }
 }
@@ -1307,6 +1317,9 @@ int ata_init(void)
         mutex_lock(&ata_mtx); /* Balance unlock below */
 
         last_disk_activity = current_tick;
+#ifdef ATA_DRIVER_CLOSE
+        ata_thread_p =
+#endif
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), 0, ata_thread_name
                       IF_PRIO(, PRIORITY_USER_INTERFACE)
@@ -1321,6 +1334,21 @@ int ata_init(void)
     mutex_unlock(&ata_mtx);
     return rc;
 }
+
+#ifdef ATA_DRIVER_CLOSE
+void ata_close(void)
+{
+    struct thread_entry *thread = ata_thread_p;
+    
+    if (thread == NULL)
+        return;
+
+    ata_thread_p = NULL;
+
+    queue_post(&ata_queue, Q_CLOSE, 0);
+    thread_wait(thread);
+}
+#endif /* ATA_DRIVER_CLOSE */
 
 #if (CONFIG_LED == LED_REAL)
 void ata_set_led_enabled(bool enabled) 

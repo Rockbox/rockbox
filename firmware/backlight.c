@@ -39,6 +39,11 @@
 #include "backlight-target.h"
 #endif
 
+#if !defined(BOOTLOADER)
+/* The whole driver should be built */
+#define BACKLIGHT_FULL_INIT
+#endif
+
 #ifdef SIMULATOR
 /* TODO: find a better way to do it but we need a kernel thread somewhere to
    handle this */
@@ -85,7 +90,7 @@ static inline void _remote_backlight_off(void)
 
 #endif /* SIMULATOR */
 
-#if defined(HAVE_BACKLIGHT) && !defined(BOOTLOADER)
+#if defined(HAVE_BACKLIGHT) && defined(BACKLIGHT_FULL_INIT)
 
 enum {
     BACKLIGHT_ON,
@@ -104,12 +109,18 @@ enum {
     BUTTON_LIGHT_ON,
     BUTTON_LIGHT_OFF,
 #endif
+#ifdef BACKLIGHT_DRIVER_CLOSE
+    BACKLIGHT_QUIT,
+#endif
 };
 
 static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
+#ifdef BACKLIGHT_DRIVER_CLOSE
+static struct thread_entry *backlight_thread_p = NULL;
+#endif
 
 static int backlight_timer SHAREDBSS_ATTR;
 static int backlight_timeout SHAREDBSS_ATTR;
@@ -158,7 +169,7 @@ void buttonlight_set_timeout(int value)
     buttonlight_update_state();
 }
 
-#endif
+#endif /* HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_REMOTE_LCD
 static int remote_backlight_timer;
@@ -170,7 +181,7 @@ static int remote_backlight_timeout_plugged = 5*HZ;
 #ifdef HAS_REMOTE_BUTTON_HOLD
 static int remote_backlight_on_button_hold = 0;
 #endif
-#endif
+#endif /* HAVE_REMOTE_LCD */
 
 #ifdef HAVE_LCD_SLEEP
 const signed char lcd_sleep_timeout_value[10] =
@@ -494,6 +505,12 @@ void backlight_thread(void)
             case SYS_USB_DISCONNECTED:
                 usb_acknowledge(SYS_USB_DISCONNECTED_ACK);
                 break;
+
+#ifdef BACKLIGHT_DRIVER_CLOSE
+            /* Get out of here */
+            case BACKLIGHT_QUIT:
+                return;
+#endif
         }
         if (locked)
             continue;
@@ -613,13 +630,31 @@ void backlight_init(void)
     /* Leave all lights as set by the bootloader here. The settings load will
      * call the appropriate backlight_set_*() functions, only changing light
      * status if necessary. */
-
+#ifdef BACKLIGHT_DRIVER_CLOSE
+    backlight_thread_p =
+#endif
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), 0, backlight_thread_name
                   IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
     tick_add_task(backlight_tick);
 }
+
+#ifdef BACKLIGHT_DRIVER_CLOSE
+void backlight_close(void)
+{
+    struct thread_entry *thread = backlight_thread_p;
+
+    /* Wait for thread to exit */
+    if (thread == NULL)
+        return;
+
+    backlight_thread_p = NULL;
+
+    queue_post(&backlight_queue, BACKLIGHT_QUIT, 0);
+    thread_wait(thread);
+}
+#endif /* BACKLIGHT_DRIVER_CLOSE */
 
 void backlight_on(void)
 {
@@ -788,10 +823,10 @@ void buttonlight_set_brightness(int val)
 }
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
-#else /* !defined(HAVE_BACKLIGHT) || defined(BOOTLOADER)
+#else /* !defined(HAVE_BACKLIGHT) || !defined(BACKLIGHT_FULL_INIT)
     -- no backlight, empty dummy functions */
 
-#if defined(BOOTLOADER) && defined(HAVE_BACKLIGHT)
+#if defined(HAVE_BACKLIGHT) && !defined(BACKLIGHT_FULL_INIT)
 void backlight_init(void)
 {
     (void)_backlight_init();
@@ -826,4 +861,4 @@ void backlight_set_brightness(int val) { (void)val; }
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
 void buttonlight_set_brightness(int val) { (void)val; }
 #endif
-#endif /* defined(HAVE_BACKLIGHT) && !defined(BOOTLOADER) */
+#endif /* defined(HAVE_BACKLIGHT) && defined(BACKLIGHT_FULL_INIT) */

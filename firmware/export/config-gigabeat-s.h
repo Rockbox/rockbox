@@ -54,15 +54,6 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 
-#define HAVE_LCD_ENABLE
-
-#define HAVE_BACKLIGHT_BRIGHTNESS
-
-/* Main LCD backlight brightness range and defaults */
-#define MIN_BRIGHTNESS_SETTING          0
-#define MAX_BRIGHTNESS_SETTING          24
-#define DEFAULT_BRIGHTNESS_SETTING      12
-
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
@@ -78,7 +69,20 @@
 #define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
                        SAMPR_CAP_11)
 
+#ifndef BOOTLOADER
+/* Not for bootloader */
+#define HAVE_LCD_ENABLE
+
+#define HAVE_BACKLIGHT_BRIGHTNESS
+
+/* Main LCD backlight brightness range and defaults */
+#define MIN_BRIGHTNESS_SETTING          0
+#define MAX_BRIGHTNESS_SETTING          24
+#define DEFAULT_BRIGHTNESS_SETTING      12
+
+
 #define HAVE_HEADPHONE_DETECTION
+#endif /* BOOTLOADER */
 
 #ifndef SIMULATOR
 

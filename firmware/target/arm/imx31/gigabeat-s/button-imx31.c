@@ -29,11 +29,16 @@
 
 /* Most code in here is taken from the Linux BSP provided by Freescale
  * Copyright 2004-2006 Freescale Semiconductor, Inc. All Rights Reserved. */
-
+#ifdef HAVE_HEADPHONE_DETECTION
 static bool headphones_detect = false;
+#endif
 static uint32_t int_btn     = BUTTON_NONE;
 static bool hold_button     = false;
+#ifdef BOOTLOADER
+static bool initialized     = false;
+#else
 static bool hold_button_old = false;
+#endif
 #define _button_hold() (GPIO3_DR & 0x10)
 
 static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
@@ -116,6 +121,14 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
 
 void button_init_device(void)
 {
+#ifdef BOOTLOADER
+    /* Can be called more than once in the bootloader */
+    if (initialized)
+        return;
+
+    initialized = true;
+#endif
+
     /* Enable keypad clock */
     imx31_clkctl_module_clock_gating(CG_KPP, CGM_ON_ALL);
 
@@ -136,14 +149,25 @@ void button_init_device(void)
     KPP_KDDR = (KPP_KDDR | (0x7 << 8)) & ~0x1f;
 
     /* 5. Clear the KPKD Status Flag and Synchronizer chain.
-     * 6. Set the KDIE control bit, and set the KRIE control
-     *    bit (to force immediate scan). */
-    KPP_KPSR = KPP_KPSR_KRIE | KPP_KPSR_KDIE | KPP_KPSR_KRSS |
-               KPP_KPSR_KDSC | KPP_KPSR_KPKR | KPP_KPSR_KPKD;
+     * 6. Set the KDIE control bit bit. */
+    KPP_KPSR = KPP_KPSR_KDIE | KPP_KPSR_KRSS | KPP_KPSR_KDSC | KPP_KPSR_KPKD;
 
     /* KPP IRQ at priority 3 */
     avic_enable_int(KPP, IRQ, 3, KPP_HANDLER);
 }
+
+#ifdef BUTTON_DRIVER_CLOSE
+void button_close_device(void)
+{
+    int oldlevel = disable_irq_save();
+
+    avic_disable_int(KPP);
+    KPP_KPSR &= ~(KPP_KPSR_KRIE | KPP_KPSR_KDIE);
+    int_btn = BUTTON_NONE;
+
+    restore_irq(oldlevel);
+}
+#endif /* BUTTON_DRIVER_CLOSE */
 
 bool button_hold(void)
 {
@@ -155,12 +179,14 @@ int button_read_device(void)
     /* Simple poll of GPIO status */
     hold_button = _button_hold();
 
+#ifndef BOOTLOADER
     /* Backlight hold handling */
     if (hold_button != hold_button_old)
     {
         hold_button_old = hold_button;
         backlight_hold_changed(hold_button);
     }
+#endif
 
     /* Enable the keypad interrupt to cause it to fire if a key is down.
      * KPP_HANDLER will clear and disable it after the scan. If no key
@@ -190,6 +216,7 @@ void button_power_set_state(bool pressed)
     restore_irq(oldlevel);
 }
 
+#ifdef HAVE_HEADPHONE_DETECTION
 /* This is called from the mc13783 interrupt thread */
 void set_headphones_inserted(bool inserted)
 {
@@ -203,3 +230,4 @@ bool headphones_inserted(void)
 {
     return headphones_detect;
 }
+#endif /* HAVE_HEADPHONE_DETECTION */

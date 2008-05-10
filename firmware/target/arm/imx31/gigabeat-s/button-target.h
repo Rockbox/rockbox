@@ -24,8 +24,13 @@
 
 #define HAS_BUTTON_HOLD
 
+#ifdef BOOTLOADER
+#define BUTTON_DRIVER_CLOSE
+#endif
+
 bool button_hold(void);
 void button_init_device(void);
+void button_close_device(void);
 int button_read_device(void);
 void button_power_set_state(bool pressed);
 void set_headphones_inserted(bool inserted);
@@ -47,6 +52,8 @@ bool headphones_inserted(void);
 #define BUTTON_PLAY         (1 << 10)
 #define BUTTON_NEXT         (1 << 11)
 #define BUTTON_POWER        (1 << 12) /* Read from PMIC */
+
+#define BUTTON_MAIN         (0x1fff)
 
 #define BUTTON_REMOTE       0
 

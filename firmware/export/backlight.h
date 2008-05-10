@@ -28,6 +28,7 @@ void backlight_set_timeout(int value);
 
 #ifdef HAVE_BACKLIGHT
 void backlight_init(void);
+void backlight_close(void);
 
 int  backlight_get_current_timeout(void);
 

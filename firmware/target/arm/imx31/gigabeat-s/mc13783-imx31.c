@@ -29,6 +29,10 @@
 #include "adc-target.h"
 #include "usb-target.h"
 
+#ifdef BOOTLOADER
+#define PMIC_DRIVER_CLOSE
+#endif
+
 /* This is all based on communicating with the MC13783 PMU which is on 
  * CSPI2 with the chip select at 0. The LCD controller resides on
  * CSPI3 cs1, but we have no idea how to communicate to it */
@@ -48,10 +52,14 @@ static struct spi_node mc13783_spi =
 static int mc13783_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)];
 static const char *mc13783_thread_name = "pmic";
 static struct wakeup mc13783_wake;
+#ifdef PMIC_DRIVER_CLOSE
+static bool pmic_close = false;
+static struct thread_entry *mc13783_thread_p = NULL;
+#endif
 
 /* The next two functions are rather target-specific but they'll just be left
  * here for the moment */
-static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
+static void mc13783_interrupt_thread(void)
 {
     const unsigned char status_regs[2] =
     {
@@ -76,7 +84,9 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
 
     value = mc13783_read(MC13783_INTERRUPT_SENSE1);
     button_power_set_state((value & MC13783_ONOFD1) == 0);
+#ifdef HAVE_HEADPHONE_DETECTION
     set_headphones_inserted((value & MC13783_ONOFD2) == 0);
+#endif
 
     pending[0] = pending[1] = 0xffffff;
     mc13783_write_regset(status_regs, pending, 2);
@@ -89,6 +99,14 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
     while (1)
     {
         wakeup_wait(&mc13783_wake, TIMEOUT_BLOCK);
+
+#ifdef PMIC_DRIVER_CLOSE
+        if (pmic_close)
+        {
+            gpio_disable_event(MC13783_GPIO_NUM, MC13783_EVENT_ID);
+            return;
+        }
+#endif
 
         mc13783_read_regset(status_regs, pending, 2);
         mc13783_write_regset(status_regs, pending, 2);
@@ -130,9 +148,10 @@ static __attribute__((noreturn)) void mc13783_interrupt_thread(void)
 
                 if (pending[1] & MC13783_ONOFD1)
                     button_power_set_state((value & MC13783_ONOFD1) == 0);
-
+#ifdef HAVE_HEADPHONE_DETECTION
                 if (pending[1] & MC13783_ONOFD2)
                     set_headphones_inserted((value & MC13783_ONOFD2) == 0);
+#endif
             }
         }
     }
@@ -161,10 +180,29 @@ void mc13783_init(void)
 
     MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
 
-    create_thread(mc13783_interrupt_thread, mc13783_thread_stack,
-                  sizeof(mc13783_thread_stack), 0, mc13783_thread_name
-                  IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
+#ifdef PMIC_DRIVER_CLOSE
+    mc13783_thread_p =
+#endif
+        create_thread(mc13783_interrupt_thread,
+            mc13783_thread_stack, sizeof(mc13783_thread_stack), 0,
+            mc13783_thread_name IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
 }
+
+#ifdef PMIC_DRIVER_CLOSE
+void mc13783_close(void)
+{
+    struct thread_entry *thread = mc13783_thread_p;
+
+    if (thread == NULL)
+        return;
+
+    mc13783_thread_p = NULL;
+
+    pmic_close = true;
+    wakeup_signal(&mc13783_wake);
+    thread_wait(thread);
+}
+#endif
 
 uint32_t mc13783_set(unsigned address, uint32_t bits)
 {

@@ -172,6 +172,10 @@ static void usb_thread(void)
         queue_wait(&usb_queue, &ev);
         switch(ev.id)
         {
+#ifdef USB_DRIVER_CLOSE
+            case USB_QUIT:
+                return;
+#endif
 #ifdef HAVE_USBSTACK
             case USB_TRANSFER_COMPLETION:
                 usb_core_handle_transfer_completion((struct usb_transfer_completion_event_data*)ev.data);
@@ -531,13 +535,22 @@ void usb_start_monitoring(void)
     usb_monitor_enabled = true;
 }
 
-#ifdef TOSHIBA_GIGABEAT_S
-void usb_stop_monitoring(void)
+#ifdef USB_DRIVER_CLOSE
+void usb_close(void)
 {
+    struct thread_entry *thread = usb_thread_entry;
+    usb_thread_entry = NULL;
+
+    if (thread == NULL)
+        return;
+
     tick_remove_task(usb_tick);
     usb_monitor_enabled = false;
+
+    queue_post(&usb_queue, USB_QUIT, 0);
+    thread_wait(thread);
 }
-#endif
+#endif /* USB_DRIVER_CLOSE */
 
 bool usb_inserted(void)
 {

@@ -48,6 +48,7 @@ extern bool ata_disk_is_active(void);
 extern int ata_hard_reset(void);
 extern int ata_soft_reset(void);
 extern int ata_init(void);
+extern void ata_close(void);
 extern int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf);
 extern int ata_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf);
 extern void ata_spin(void);

@@ -19,6 +19,10 @@
 #ifndef USB_TARGET_H
 #define USB_TARGET_H
 
+#ifdef BOOTLOADER
+#define USB_DRIVER_CLOSE
+#endif
+
 void usb_set_status(bool plugged);
 bool usb_init_device(void);
 int usb_detect(void);

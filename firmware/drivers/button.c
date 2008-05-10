@@ -410,6 +410,13 @@ void button_init(void)
     tick_add_task(button_tick);
 }
 
+#ifdef BUTTON_DRIVER_CLOSE
+void button_close(void)
+{
+    tick_remove_task(button_tick);
+}
+#endif /* BUTTON_DRIVER_CLOSE */
+
 #ifdef HAVE_LCD_BITMAP /* only bitmap displays can be flipped */
 /*
  * helper function to swap LEFT/RIGHT, UP/DOWN (if present), and F1/F3 (Recorder)

@@ -22,6 +22,7 @@
 #include "mc13783.h"
 #include "backlight-target.h"
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
 /* Table that uses combinations of current level and pwm fraction to get
  * as many uniquely-visible brightness levels as possible. The lowest current
  * level for any average current is used even though many combinations give
@@ -60,6 +61,7 @@ static const struct
     { 3, 12 }, /*    9       12      7.2  */ 
     /* Anything higher is just too much   */
 };
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
 bool _backlight_init(void)
 {
@@ -85,6 +87,7 @@ void _backlight_off(void)
     mc13783_clear(MC13783_LED_CONTROL0, MC13783_LEDEN);
 }
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
 /* Assumes that the backlight has been initialized */
 void _backlight_set_brightness(int brightness)
 {
@@ -106,3 +109,4 @@ void _backlight_set_brightness(int brightness)
 
     mc13783_write(MC13783_LED_CONTROL2, data);
 }
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
