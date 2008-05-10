@@ -87,7 +87,8 @@ mpc_uint8_t     LUT5_0  [1<< 6];
 mpc_uint8_t     LUT5_1  [1<< 8];            //  320 Bytes
 mpc_uint8_t     LUT6_0  [1<< 7];
 mpc_uint8_t     LUT6_1  [1<< 7];            //  256 Bytes
-mpc_uint8_t     LUT7_0  [1<< 8];mpc_uint8_t     LUT7_1  [1<< 8];            //  512 Bytes
+mpc_uint8_t     LUT7_0  [1<< 8];
+mpc_uint8_t     LUT7_1  [1<< 8];            //  512 Bytes
 mpc_uint8_t     LUTDSCF [1<< 6];            //   64 Bytes = 2976 Bytes
 
 //------------------------------------------------------------------------------
@@ -95,9 +96,6 @@ mpc_uint8_t     LUTDSCF [1<< 6];            //   64 Bytes = 2976 Bytes
 //------------------------------------------------------------------------------
 enum
     {
-        EQ_TAP = 13,                        // length of FIR filter for EQ
-        DELAY = ((EQ_TAP + 1) / 2),         // delay of FIR
-        FIR_BANDS = 4,                      // number of subbands to be FIR filtered
         MEMSIZE = MPC_DECODER_MEMSIZE,      // overall buffer size
         MEMSIZE2 = (MEMSIZE/2),             // size of one buffer
         MEMMASK = (MEMSIZE-1)
@@ -226,6 +224,7 @@ mpc_decoder_make_huffman_lookup(
     return;
 }
 
+#ifdef MPC_SUPPORT_SV456
 // decode SCFI-bundle (sv4,5,6)
 static void
 mpc_decoder_scfi_bundle_read(
@@ -273,6 +272,7 @@ mpc_decoder_huffman_decode(mpc_decoder *d, const HuffmanTyp *Table)
 
     return Table->Value;
 }
+#endif
 
 // faster huffman through previewing less bits
 // works with maximum lengths up to 10
@@ -391,28 +391,26 @@ mpc_decoder_reset_globals(mpc_decoder *d)
 {
     mpc_decoder_reset_bitstream_decode(d);
 
-    d->DecodedFrames  = 0;
-    d->SeekTableIndex = 0;
+    d->DecodedFrames    = 0;
+    d->SeekTableIndex   = 0;
     d->MaxDecodedFrames = 0;
-    d->StreamVersion  = 0;
-    d->MS_used        = 0;
+    d->StreamVersion    = 0;
+    d->MS_used          = 0;
 
     memset(d->Y_L          , 0, sizeof Y_L           );
     memset(d->Y_R          , 0, sizeof Y_R           );
-    memset(d->SCF_Index_L     , 0, sizeof d->SCF_Index_L      );
-    memset(d->SCF_Index_R     , 0, sizeof d->SCF_Index_R      );
-    memset(d->Res_L           , 0, sizeof d->Res_L            );
-    memset(d->Res_R           , 0, sizeof d->Res_R            );
-    memset(d->SCFI_L          , 0, sizeof d->SCFI_L           );
-    memset(d->SCFI_R          , 0, sizeof d->SCFI_R           );
+    memset(d->SCF_Index_L  , 0, sizeof d->SCF_Index_L);
+    memset(d->SCF_Index_R  , 0, sizeof d->SCF_Index_R);
+    memset(d->Res_L        , 0, sizeof d->Res_L      );
+    memset(d->Res_R        , 0, sizeof d->Res_R      );
+    memset(d->SCFI_L       , 0, sizeof d->SCFI_L     );
+    memset(d->SCFI_R       , 0, sizeof d->SCFI_R     );
 #ifdef MPC_SUPPORT_SV456
-    memset(d->DSCF_Flag_L     , 0, sizeof d->DSCF_Flag_L      );
-    memset(d->DSCF_Flag_R     , 0, sizeof d->DSCF_Flag_R      );
+    memset(d->DSCF_Flag_L  , 0, sizeof d->DSCF_Flag_L);
+    memset(d->DSCF_Flag_R  , 0, sizeof d->DSCF_Flag_R);
 #endif
-    //memset(d->DSCF_Reference_L, 0, sizeof d->DSCF_Reference_L );
-    //memset(d->DSCF_Reference_R, 0, sizeof d->DSCF_Reference_R );
-    memset(d->Q               , 0, sizeof d->Q                );
-    memset(d->MS_Flag         , 0, sizeof d->MS_Flag          );
+    memset(d->Q            , 0, sizeof d->Q          );
+    memset(d->MS_Flag      , 0, sizeof d->MS_Flag    );
 }
 
 mpc_uint32_t
@@ -856,7 +854,6 @@ mpc_decoder_read_bitstream_sv6(mpc_decoder *d)
             /*********** DSCF ************/
             if (d->DSCF_Flag_L[n]==1)
             {
-                //L[2] = d->DSCF_Reference_L[n];
                 switch (d->SCFI_L[n])
                 {
                 case 3:
@@ -914,12 +911,9 @@ mpc_decoder_read_bitstream_sv6(mpc_decoder *d)
                     break;
                 }
             }
-            // update Reference for DSCF
-            //d->DSCF_Reference_L[n] = L[2];
         }
         if (*ResR)
         {
-            //R[2] = d->DSCF_Reference_R[n];
             /*********** DSCF ************/
             if (d->DSCF_Flag_R[n]==1)
             {
@@ -1086,7 +1080,6 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d, mpc_bool_t fastSeeking)
     for (n=0; n<=Max_used_Band; ++n, ++ResL, ++ResR, L+=3, R+=3) {
         if (*ResL)
         {
-            //L[2] = d->DSCF_Reference_L[n];
             switch (d->SCFI_L[n])
             {
             case 1:
@@ -1663,8 +1656,6 @@ void mpc_decoder_reset_state(mpc_decoder *d) {
     memset(d->DSCF_Flag_L     , 0, sizeof d->DSCF_Flag_L      );
     memset(d->DSCF_Flag_R     , 0, sizeof d->DSCF_Flag_R      );
 #endif
-    //memset(d->DSCF_Reference_L, 0, sizeof d->DSCF_Reference_L );
-    //memset(d->DSCF_Reference_R, 0, sizeof d->DSCF_Reference_R );
     memset(d->Q               , 0, sizeof d->Q                );
     memset(d->MS_Flag         , 0, sizeof d->MS_Flag          );
 

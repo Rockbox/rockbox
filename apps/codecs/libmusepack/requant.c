@@ -41,7 +41,7 @@
 
 /* C O N S T A N T S */
 // bits per sample for chosen quantizer
-const mpc_uint32_t  Res_bit [18] = {
+const mpc_uint32_t  Res_bit [18] ICONST_ATTR = {
     0,  0,  0,  0,  0,  0,  0,  0,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16
 };
 
@@ -50,7 +50,7 @@ const mpc_uint32_t  Res_bit [18] = {
 
 #define _(X) MAKE_MPC_SAMPLE_EX(X,14)
 
-const MPC_SAMPLE_FORMAT  __Cc [1 + 18] = {
+const MPC_SAMPLE_FORMAT  __Cc [1 + 18] ICONST_ATTR = {
       _(111.285962475327f),                                        // 32768/2/255*sqrt(3)
     _(65536.000000000000f), _(21845.333333333332f), _(13107.200000000001f), _(9362.285714285713f),
      _(7281.777777777777f),  _(4369.066666666666f),  _(2114.064516129032f), _(1040.253968253968f),
@@ -63,7 +63,7 @@ const MPC_SAMPLE_FORMAT  __Cc [1 + 18] = {
 
 // offset for requantization
 // 2*D+1 = steps of quantizer
-const mpc_int32_t  __Dc [1 + 18] = {
+const mpc_int32_t  __Dc [1 + 18] ICONST_ATTR = {
       2,
       0,     1,     2,     3,     4,     7,    15,    31,    63,
     127,   255,   511,  1023,  2047,  4095,  8191, 16383, 32767
@@ -72,12 +72,12 @@ const mpc_int32_t  __Dc [1 + 18] = {
 #ifdef MPC_FIXED_POINT
 static mpc_uint32_t find_shift(double fval)
 {
-	mpc_int64_t  val = (mpc_int64_t)fval;
-	mpc_uint32_t ptr = 0;
-	if (val<0) val = -val;
-	while(val) {val>>=1;ptr++;}
+    mpc_int64_t  val = (mpc_int64_t)fval;
+    mpc_uint32_t ptr = 0;
+    if (val<0) val = -val;
+    while(val) {val>>=1;ptr++;}
 
-	return ptr > 31 ? 0 : 31 - ptr;
+    return ptr > 31 ? 0 : 31 - ptr;
 }
 #endif
 
@@ -92,22 +92,22 @@ mpc_decoder_scale_output(mpc_decoder *d, double factor)
     double  f1;
     double  f2;
 #ifndef MPC_FIXED_POINT
-	factor *= 1.0 / (double)(1<<(MPC_FIXED_POINT_SHIFT-1));
+    factor *= 1.0 / (double)(1<<(MPC_FIXED_POINT_SHIFT-1));
 #else
-	factor *= 1.0 / (double)(1<<(16 - MPC_FIXED_POINT_SHIFT));
+    factor *= 1.0 / (double)(1<<(16 - MPC_FIXED_POINT_SHIFT));
 #endif
     f1 = f2 = factor;
 
     // handles +1.58...-98.41 dB, where's scf[n] / scf[n-1] = 1.20050805774840750476
-	
-	SET_SCF(1,factor);
+    
+    SET_SCF(1,factor);
 
-	f1 *=   0.83298066476582673961;
-	f2 *= 1/0.83298066476582673961;
+    f1 *=   0.83298066476582673961;
+    f2 *= 1/0.83298066476582673961;
 
     for ( n = 1; n <= 128; n++ ) {
-		SET_SCF((unsigned char)(1+n),f1);
-		SET_SCF((unsigned char)(1-n),f2);
+        SET_SCF((unsigned char)(1+n),f1);
+        SET_SCF((unsigned char)(1-n),f2);
         f1 *=   0.83298066476582673961;
         f2 *= 1/0.83298066476582673961;
     }

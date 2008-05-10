@@ -43,7 +43,7 @@
 #include "reader.h"
 #include "streaminfo.h"
 
-#define MPC_SUPPORT_SV456
+//#define MPC_SUPPORT_SV456
 #define SCF_HACK
 
 enum {
@@ -107,8 +107,6 @@ typedef struct mpc_decoder_t {
 #endif
     mpc_int8_t    SCFI_L [32];
     mpc_int8_t    SCFI_R [32];                // describes order of transmitted SCF
-    //mpc_int32_t   DSCF_Reference_L [32];
-    //mpc_int32_t   DSCF_Reference_R [32];      // holds last frames SCF
     mpc_bool_t    MS_Flag[32];                // MS used?
 
     mpc_uint32_t* SeekTable;

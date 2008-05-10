@@ -44,19 +44,19 @@
 /// a functional reader.
 typedef struct mpc_reader_t {
     /// Reads size bytes of data into buffer at ptr.
-	mpc_int32_t (*read)(void *t, void *ptr, mpc_int32_t size);
+    mpc_int32_t (*read)(void *t, void *ptr, mpc_int32_t size);
 
     /// Seeks to byte position offset.
-	mpc_bool_t (*seek)(void *t, mpc_int32_t offset);
+    mpc_bool_t (*seek)(void *t, mpc_int32_t offset);
 
     /// Returns the current byte offset in the stream.
-	mpc_int32_t (*tell)(void *t);
+    mpc_int32_t (*tell)(void *t);
 
     /// Returns the total length of the source stream, in bytes.
-	mpc_int32_t (*get_size)(void *t);
+    mpc_int32_t (*get_size)(void *t);
 
     /// True if the stream is a seekable stream.
-	mpc_bool_t (*canseek)(void *t);
+    mpc_bool_t (*canseek)(void *t);
 
     /// Field that can be used to identify a particular instance of
     /// reader or carry along data associated with that reader.
@@ -65,7 +65,7 @@ typedef struct mpc_reader_t {
 } mpc_reader;
 /* No standard STDIO based reader in Rockbox
 typedef struct mpc_reader_file_t {
-	mpc_reader reader;
+    mpc_reader reader;
 
     FILE *file;
     long file_size;
