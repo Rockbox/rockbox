@@ -33,7 +33,6 @@ void __attribute__((naked)) ttb_init(void) {
 }
 
 void __attribute__((naked)) map_section(unsigned int pa, unsigned int va, int mb, int flags) {
-#if 0 /* This code needs to be fixed and the C needs to be replaced to ensure that stack is not used */
     asm volatile
     (
         /* pa &= (-1 << 20);   // align to 1MB */
@@ -78,11 +77,13 @@ void __attribute__((naked)) map_section(unsigned int pa, unsigned int va, int mb
          */
 
         "cmp  r2, #0                    \n"
-        "bxle lr                        \n"
+        "bxle lr                        \n"   
+        "mov  r3, #0x0                  \n"
         "loop:                          \n"
         "str  r0, [r1], #4              \n"
         "add  r0, r0, #0x100000         \n"
-        "sub  r2, r2, #0x01             \n"
+        "add  r3, r3, #0x1                 \n"
+        "cmp  r2, r3                    \n"
         "bne  loop                      \n"
         "bx   lr                        \n"
         : 
@@ -92,18 +93,6 @@ void __attribute__((naked)) map_section(unsigned int pa, unsigned int va, int mb
     (void) va;
     (void) mb;
     (void) flags;
-#else
-    pa &= (-1 << 20);
-    pa |= (flags | 0x412);
-    unsigned int* ttbPtr = TTB_BASE + (va >> 20);
-
-#define MB (1 << 20)
-    for( ; mb>0; mb--, pa += MB)
-    {
-        *(ttbPtr++) = pa;
-    }
-#undef MB
-#endif
 }
 
 void __attribute__((naked)) enable_mmu(void) {
