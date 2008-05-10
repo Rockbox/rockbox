@@ -2193,7 +2193,7 @@ manual-ztxt:
 manual-zip:
 	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-zip
 
-features:
+features: tools
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ features
 
 help:
