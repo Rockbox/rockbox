@@ -51,6 +51,7 @@ SECTIONS
         _textstart = .;
         *(.text)
         *(.text*)
+        *(.icode)
         *(.glue_7)
         *(.glue_7t)
         . = ALIGN(0x4);
@@ -64,12 +65,14 @@ SECTIONS
         *(.rodata*)
         *(.rodata.str1.1)
         *(.rodata.str1.4)
+        *(.irodata*)
         . = ALIGN(0x4);
     } > DRAM
 
     .data :
     {
         *(.data*)
+        *(.idata*)
         . = ALIGN(0x4);
     } > DRAM
 
@@ -78,27 +81,9 @@ SECTIONS
         *(.eh_frame)
     } 
 
-    .iram :
-    {
-        _iramstart = .;
-        *(.icode)
-        *(.irodata)
-        *(.idata)
-        . = ALIGN(0x4);
-        _iramend = .;
-    } > DRAM
+    _initdata_end =.;
 
-    _iramcopy = LOADADDR(.iram);
-
-    .ibss :
-    {
-        _iedata = .;
-        *(.ibss)
-        . = ALIGN(0x4);
-        _iend = .;
-    } > DRAM
-
-    .stack :
+    .stack (NOLOAD) : 
     {
        *(.stack)
        stackbegin = .;
@@ -106,34 +91,36 @@ SECTIONS
        stackend = .;
     } > DRAM
 
-    .bss :
+    .bss (NOLOAD) :
     {
        _edata = .;
         *(.bss*)
+        *(.ibss*)
         *(COMMON)
         . = ALIGN(0x4);
        _end = .;
     } > DRAM
 
-    .audiobuf ALIGN(4) :
+    .audiobuf (NOLOAD) :
     {
+    	. = ALIGN(4);
         _audiobuffer = .;
         audiobuffer = .;
     } > DRAM
 
-    .audiobufend ENDAUDIOADDR:
+    .audiobufend ENDAUDIOADDR (NOLOAD) :
     {
         audiobufend = .;
         _audiobufend = .;
     } > DRAM
 
-    .codec ENDAUDIOADDR:
+    .codec ENDAUDIOADDR  (NOLOAD) :
     {
         codecbuf = .;
         _codecbuf = .;
     }
 
-    .plugin ENDADDR:
+    .plugin ENDADDR (NOLOAD) :
     {
         _pluginbuf = .;
         pluginbuf = .;

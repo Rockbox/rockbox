@@ -97,7 +97,7 @@ start:
 
     /* Calculate the length of the code needed to run/copy */
     ldr     r1, = _vectorstart
-    ldr     r2, = _iramend
+    ldr     r2, = _initdata_end
     sub     r2, r2, r1
 
     add     r3, r2, #0x30000000
@@ -364,7 +364,7 @@ start:
 
     /* Copy code to 0x30000000 */
     ldr     r2, = _vectorstart
-    ldr     r3, = _iramend
+    ldr     r3, = _initdata_end
 
     sub     r2, r3, r2           /* length of loader */
     
@@ -407,22 +407,6 @@ donecopy:
     bl      map_section        
     
     bl      enable_mmu   
-
-    /* Zero out IBSS */
-    ldr     r2, =_iedata
-    ldr     r3, =_iend
-    mov     r4, #0
-ibsszero:
-    cmp     r3, r2
-    strhi   r4, [r2], #4
-    bhi     ibsszero
-
-    /* Copy the IRAM */
-    ldr     r0, =_iramcopy
-    ldr     r1, =_iramstart
-    ldr     r2, =_iramend
-    sub     r2, r2, r1
-    bl      word_copy
 
     /* Initialise bss section to zero */
     ldr     r2, =_edata

@@ -46,6 +46,7 @@ SECTIONS
         . = ALIGN(0x200);
         *(.init.text)
         *(.text*)
+        *(.icode)
         *(.glue_7)
         *(.glue_7t)
         . = ALIGN(0x4);
@@ -57,6 +58,7 @@ SECTIONS
         *(.rodata*)
         *(.rodata.str1.1)
         *(.rodata.str1.4)
+        *(.irodata)
         . = ALIGN(0x4);
 
         /* Pseudo-allocate the copies of the data sections */
@@ -70,6 +72,7 @@ SECTIONS
     {
         _datastart = .;
         *(.data*)
+        *(.idata)
         . = ALIGN(0x4);
         _dataend  = .;
     } > DRAM
@@ -88,26 +91,6 @@ SECTIONS
 
     _vectorscopy = LOADADDR(.vectors);
 
-    .iram :
-    {
-        _iramstart = .;
-        *(.icode)
-        *(.irodata)
-        *(.idata)
-        . = ALIGN(0x4);
-        _iramend = .;
-    } > DRAM
-
-    _iramcopy = LOADADDR(.iram);
-
-    .ibss (NOLOAD) :
-    {
-        _iedata = .;
-        *(.ibss)
-        . = ALIGN(0x4);
-        _iend = .;
-    } > DRAM
-
     .stack :
     {
        *(.stack)
@@ -120,6 +103,7 @@ SECTIONS
     {
        _edata = .;
         *(.bss*)
+        *(.ibss)
         *(COMMON)
         . = ALIGN(0x4);
        _end = .;

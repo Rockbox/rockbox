@@ -63,14 +63,12 @@ OUTPUT_FORMAT(elf32-sh)
 #define IRAMSIZE 0x9000
 #elif CONFIG_CPU == S3C2440
 #define DRAMORIG 0x0 + STUBOFFSET
-#define IRAMORIG DRAMORIG
-#define IRAMSIZE 4K
 #define IRAM DRAM
+#define IRAMSIZE 0
 #elif CONFIG_CPU == IMX31L
 #define DRAMORIG 0x0 + STUBOFFSET
-#define IRAMORIG DRAMORIG
-#define IRAMSIZE 0x4000
 #define IRAM DRAM
+#define IRAMSIZE 0
 #elif CONFIG_CPU==DM320
 #define DRAMORIG 0x00900000 + STUBOFFSET
 #define IRAMORIG DRAMORIG
@@ -100,7 +98,7 @@ OUTPUT_FORMAT(elf32-sh)
 MEMORY
 {
    PLUGIN_RAM : ORIGIN = THIS_ORIGIN, LENGTH = THIS_LENGTH
-#if defined(IRAMSIZE)
+#if defined(IRAMSIZE) && IRAMSIZE != 0
    PLUGIN_IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
 #endif
 }
@@ -116,6 +114,9 @@ SECTIONS
     .text :
     {
         *(.text*)
+#if defined(IRAMSIZE) && IRAMSIZE == 0
+	*(.icode)
+#endif
 #ifdef CPU_ARM
         *(.glue_7)
         *(.glue_7t)
@@ -125,12 +126,18 @@ SECTIONS
     .rodata :
     {
         *(.rodata*)
+#if defined(IRAMSIZE) && IRAMSIZE == 0
+	*(.irodata)
+#endif
         . = ALIGN(0x4);
     } > PLUGIN_RAM
 
     .data :
     {
         *(.data*)
+#if defined(IRAMSIZE) && IRAMSIZE == 0
+	*(.idata)
+#endif
     } > PLUGIN_RAM
 
 #if NOCACHE_BASE != 0
@@ -151,7 +158,7 @@ SECTIONS
         *(.eh_frame)
     }
 
-#if defined(IRAMSIZE)
+#if defined(IRAMSIZE) && IRAMSIZE != 0
     .iram IRAMORIG : AT ( iramcopy)
     {
         iramstart = .;
@@ -175,6 +182,9 @@ SECTIONS
     {
     	plugin_bss_start = .;
         *(.bss*)
+#if defined(IRAMSIZE) && IRAMSIZE == 0
+	*(.ibss)
+#endif
         *(COMMON)
         . = ALIGN(0x4);
     } > PLUGIN_RAM
