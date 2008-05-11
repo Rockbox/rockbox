@@ -71,7 +71,7 @@
 static struct thread_entry *ata_thread_p = NULL;
 #endif
 
-#if defined(MAX_PHYS_SECTOR_SIZE) && MEM == 64
+#if 0 /* defined(MAX_PHYS_SECTOR_SIZE) && MEM == 64 */
 /* Hack - what's the deal with 5g? */
 struct ata_lock
 {
