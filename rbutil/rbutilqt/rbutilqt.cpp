@@ -473,7 +473,7 @@ bool RbUtilQt::installAuto()
            QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
             logger->addItem(tr("Beginning Backup..."),LOGINFO);
-            QString backupName = settings->mountpoint() + ".backup/rockbox-backup-"+rbVersion+".zip";
+            QString backupName = settings->mountpoint() + "/.backup/rockbox-backup-"+rbVersion+".zip";
             
             //! create dir, if it doesnt exist
             QFileInfo backupFile(backupName);

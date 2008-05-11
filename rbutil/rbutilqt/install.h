@@ -36,8 +36,6 @@ class Install : public QDialog
 
     public slots:
         void accept(void);
-        void updateDataReadProgress(int read, int total);
-        void changeBackupPath();
         
     private:    
         Ui::InstallFrm ui;
@@ -56,6 +54,9 @@ class Install : public QDialog
         void setDetailsStable(bool);
         void setDetailsArchived(bool);
         void done(bool);
+        void updateDataReadProgress(int read, int total);
+        void changeBackupPath();
+        void backupCheckboxChanged(int state);
 
 };
 

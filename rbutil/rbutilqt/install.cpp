@@ -32,6 +32,7 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     connect(ui.radioCurrent, SIGNAL(toggled(bool)), this, SLOT(setDetailsCurrent(bool)));
     connect(ui.radioArchived, SIGNAL(toggled(bool)), this, SLOT(setDetailsArchived(bool)));
     connect(ui.changeBackup,SIGNAL(pressed()),this,SLOT(changeBackupPath()));
+    connect(ui.backup,SIGNAL(stateChanged(int)),this,SLOT(backupCheckboxChanged(int)));
     
     //! check if rockbox is already installed
     QString version = installedVersion(settings->mountpoint()); 
@@ -39,12 +40,29 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     if(version != "")
     {
         ui.Backupgroup->show();
-        ui.backupLocation->setText(settings->mountpoint() + ".backup/rockbox-backup-"+version+".zip");
+        ui.backupLocation->setText(settings->mountpoint() + "/.backup/rockbox-backup-"+version+".zip");
     }
     else
     {
         ui.Backupgroup->hide();
     }    
+    backupCheckboxChanged(Qt::Unchecked);
+}
+
+void Install::backupCheckboxChanged(int state)
+{
+    if(state == Qt::Checked)
+    {
+        ui.backupLabel->show();
+        ui.backupLocation->show();
+        ui.changeBackup->show();
+    }
+    else
+    {
+        ui.backupLabel->hide();
+        ui.backupLocation->hide();
+        ui.changeBackup->hide();
+    }
 }
 
 
