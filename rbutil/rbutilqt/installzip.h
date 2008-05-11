@@ -45,9 +45,9 @@ public:
     void setLogVersion(QStringList v) { m_verlist = v; qDebug() << m_verlist;}
     void setUnzip(bool i) { m_unzip = i; }
     void setTarget(QString t) { m_target = t; }
-    void setCache(QDir c) { m_cache = c; };
+    void setCache(QDir c) { m_cache = c; m_usecache = true; };
     void setCache(bool c) { m_usecache = c; };
-    void setCache(QString c) { m_cache = QDir(c);}
+    void setCache(QString c) { m_cache = QDir(c); m_usecache = true; }
 
 signals:
     void done(bool error);
