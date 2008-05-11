@@ -79,7 +79,10 @@ int sansa_open(struct sansa_t* sansa, int silent)
 
     if (sansa->dh == INVALID_HANDLE_VALUE) {
         if (!silent) print_error(" Error opening disk: ");
-        return -1;
+        if(GetLastError() == ERROR_ACCESS_DENIED)
+            return -2;
+        else
+            return -1;
     }
 
     if (!lock_volume(sansa->dh)) {

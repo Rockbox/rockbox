@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <errno.h>
 
 #if defined(linux) || defined (__linux)
 #include <sys/mount.h>
@@ -74,7 +75,8 @@ int sansa_open(struct sansa_t* sansa, int silent)
     sansa->dh=open(sansa->diskname,O_RDONLY);
     if (sansa->dh < 0) {
         if (!silent) perror(sansa->diskname);
-        return -1;
+        if(errno == EACCES) return -2;
+        else return -1;
     }
 
     if(ioctl(sansa->dh,SANSA_SECTORSIZE_IOCTL,&sansa->sector_size) < 0) {

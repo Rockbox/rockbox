@@ -490,49 +490,63 @@ int sansa_scan(struct sansa_t* sansa)
     int i;
     int n = 0;
     char last_disk[4096];
+    int denied = 0;
+    int result;
 
     printf("[INFO] Scanning disk devices...\n");
 
     for (i = 0; i <= 25 ; i++) {
 #ifdef __WIN32__
-         sprintf(sansa->diskname,"\\\\.\\PhysicalDrive%d",i);
+        sprintf(sansa->diskname,"\\\\.\\PhysicalDrive%d",i);
 #elif defined(linux) || defined (__linux)
-         sprintf(sansa->diskname,"/dev/sd%c",'a'+i);
+        sprintf(sansa->diskname,"/dev/sd%c",'a'+i);
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) \
-      || defined(__bsdi__) || defined(__DragonFly__)
-         sprintf(sansa->diskname,"/dev/da%d",i);
+        || defined(__bsdi__) || defined(__DragonFly__)
+        sprintf(sansa->diskname,"/dev/da%d",i);
 #elif defined(__APPLE__) && defined(__MACH__)
-         sprintf(sansa->diskname,"/dev/disk%d",i);
+        sprintf(sansa->diskname,"/dev/disk%d",i);
 #else
-    #error No disk paths defined for this platform
+#error No disk paths defined for this platform
 #endif
-         if (sansa_open(sansa, 1) < 0) {
-             continue;
-         }
+        if ((result = sansa_open(sansa, 1)) < 0) {
+            if(result == -2) {
+                denied++;
+            }
+            continue;
+        }
 
-         if (sansa_read_partinfo(sansa,1) < 0) {
-             continue;
-         }
+        if (sansa_read_partinfo(sansa,1) < 0) {
+            continue;
+        }
 
-         if (is_sansa(sansa) < 0) {
-             continue;
-         }
+        if (is_sansa(sansa) < 0) {
+            continue;
+        }
 
 #ifdef __WIN32__
-         printf("[INFO] %s found - disk device %d\n",sansa->targetname, i);
+        printf("[INFO] %s found - disk device %d\n",sansa->targetname, i);
 #else
-         printf("[INFO] %s found - %s\n",sansa->targetname, sansa->diskname);
+        printf("[INFO] %s found - %s\n",sansa->targetname, sansa->diskname);
 #endif
-         n++;
-         strcpy(last_disk,sansa->diskname);
-         sansa_close(sansa);
+        n++;
+        strcpy(last_disk,sansa->diskname);
+        sansa_close(sansa);
     }
 
     if (n==1) {
         /* Remember the disk name */
         strcpy(sansa->diskname,last_disk);
     }
-    return n;
+    else if (n == 0 && denied) {
+        printf("[ERR]  FATAL: Permission denied on %d device(s) and no sansa detected.\n", denied);
+#ifdef __WIN32__
+        printf("[ERR]  You need to run this program with administrator priviledges!\n");
+#else
+        printf("[ERR]  You need permissions for raw disc access for this program to work!\n");
+#endif
+    }
+
+    return (n == 0 && denied) ? -1 : n;
 }
 
 /* Prepare original firmware for writing to the firmware partition by decrypting
