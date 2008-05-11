@@ -60,8 +60,8 @@ static void gui_yesno_draw(struct gui_yesno * yn)
     int nb_lines, vp_lines, line_shift=0;
 
     display->set_viewport(vp);
-    display->clear_viewport();
     display->stop_scroll();
+    display->clear_viewport();
     nb_lines = yn->main_message->nb_lines;
     vp_lines = viewport_get_nb_lines(vp);
 
@@ -100,8 +100,8 @@ static bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
     if(message==NULL)
         return false;
     display->set_viewport(vp);
-    display->clear_viewport();
     display->stop_scroll();
+    display->clear_viewport();
     put_message(yn->display, message, 0, viewport_get_nb_lines(vp));
     display->update_viewport();
     display->set_viewport(NULL);

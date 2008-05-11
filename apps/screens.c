@@ -52,7 +52,6 @@
 #include "splash.h"
 #include "statusbar.h"
 #include "screen_access.h"
-#include "quickscreen.h"
 #include "pcmbuf.h"
 #include "list.h"
 #include "yesno.h"
@@ -449,6 +448,8 @@ bool set_time_screen(const char* title, struct tm *tm)
     unsigned int prev_line_height;
     int daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     unsigned char buffer[20];
+    struct viewport vp[NB_SCREENS];
+    int nb_lines;
 
     /* 6 possible cursor possitions, 2 values stored for each: x, y */
     unsigned int cursor[6][2];
@@ -508,16 +509,18 @@ bool set_time_screen(const char* title, struct tm *tm)
 
         FOR_NB_SCREENS(s)
         {
+            viewport_set_defaults(&vp[s], s);
+            nb_lines = viewport_get_nb_lines(&vp[s]);
+            
             /* minimum lines needed is 2 + title line */
-            gui_textarea_update_nblines(&screens[s]);
-            if (screens[s].nb_lines < 4)
+            if (nb_lines < 4)
             {
-                screens[s].setfont(FONT_SYSFIXED);
-                gui_textarea_update_nblines(&screens[s]);
+                vp[s].font = FONT_SYSFIXED;
+                nb_lines = viewport_get_nb_lines(&vp[s]);
             }
             
             /* recalculate the positions and offsets */
-            if (screens[s].nb_lines >= 3)
+            if (nb_lines >= 3)
                 screens[s].getstringsize(title, NULL, &prev_line_height);
             else
                 prev_line_height = 0;
@@ -542,13 +545,15 @@ bool set_time_screen(const char* title, struct tm *tm)
             }
 
             /* draw the screen */
-            screens[s].set_drawmode(DRMODE_SOLID);
-            gui_textarea_clear(&screens[s]);
+            screens[s].set_viewport(&vp[s]);
+            screens[s].stop_scroll();
+            screens[s].clear_viewport();
             /* display the screen title */
             screens[s].puts_scroll(0, 0, title);
 
             /* these are not selectable, so we draw them outside the loop */
-            screens[s].putsxy(0, cursor[3][INDEX_Y], str(LANG_WEEKDAY_SUNDAY + tm->tm_wday)); /* name of the week day */
+            screens[s].putsxy(0, cursor[3][INDEX_Y], 
+                              str(LANG_WEEKDAY_SUNDAY + tm->tm_wday)); /* name of the week day */
 
             /* draw the selected item with drawmode set to
                 DRMODE_SOLID|DRMODE_INVERSEVID, all other selectable
@@ -556,23 +561,24 @@ bool set_time_screen(const char* title, struct tm *tm)
             for(i=0; i<6; i++)
             {
                 if (cursorpos == (int)i)
-                    screens[s].set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                    vp[s].drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
     
                 screens[s].putsxy(cursor[i][INDEX_X], 
                                   cursor[i][INDEX_Y], ptr[i]);
 
-                screens[s].set_drawmode(DRMODE_SOLID);
+                vp[s].drawmode = DRMODE_SOLID;
 
                 screens[s].putsxy(cursor[i/4 +1][INDEX_X] - separator_width, 
                                   cursor[0][INDEX_Y], SEPARATOR);
             }
 
             /* print help text */
-            if (screens[s].nb_lines > 4)
+            if (nb_lines > 4)
                 screens[s].puts(0, 4, str(LANG_TIME_SET_BUTTON));
-            if (screens[s].nb_lines > 5)
+            if (nb_lines > 5)
                 screens[s].puts(0, 5, str(LANG_TIME_REVERT));
-            screens[s].update();
+            screens[s].update_viewport();
+            screens[s].set_viewport(NULL);
         }
         gui_syncstatusbar_draw(&statusbars, true);
 
@@ -642,11 +648,6 @@ bool set_time_screen(const char* title, struct tm *tm)
                     return true;
                 break;
         }
-    }
-    FOR_NB_SCREENS(i)
-    {
-        screens[i].setfont(FONT_UI);
-        gui_textarea_update_nblines(&screens[i]);
     }
     return false;
 }
