@@ -52,33 +52,40 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
                                       struct screen *display,
                                       struct viewport *parent)
 {
-    int char_height, i, screen = display->screen_type;
+#ifdef HAVE_REMOTE_LCD
+    int screen = display->screen_type;
+#else
+    const int screen = 0;
+#endif
+
+    int char_height, i;
     int left_width, right_width, bottom_lines = 3;
     unsigned char *s;
     int nb_lines = viewport_get_nb_lines(parent);
     char_height = parent->height/nb_lines;
-    
+
     vp_icons[screen] = *parent;
-    
+
     vps[screen][QUICKSCREEN_BOTTOM] = *parent;
     if (nb_lines <= MIN_LINES) /* make the bottom item use 1 line */
         bottom_lines = 1;
     else
         bottom_lines = 2;
     vps[screen][QUICKSCREEN_BOTTOM].height = bottom_lines*char_height;
-    vps[screen][QUICKSCREEN_BOTTOM].y = parent->y + parent->height - bottom_lines*char_height;
+    vps[screen][QUICKSCREEN_BOTTOM].y =
+                    parent->y + parent->height - bottom_lines*char_height;
     if (nb_lines >= MAX_NEEDED_LINES)
     {
         vps[screen][QUICKSCREEN_BOTTOM].y -= char_height;
     }
-    
+
     /* adjust the left/right items widths to fit the screen nicely */
     s = P2STR(ID2P(qs->items[QUICKSCREEN_LEFT]->lang_id));
     left_width = display->getstringsize(s, NULL, NULL);
     s = P2STR(ID2P(qs->items[QUICKSCREEN_RIGHT]->lang_id));
     right_width = display->getstringsize(s, NULL, NULL);
     nb_lines -= bottom_lines;
-    
+
     vps[screen][QUICKSCREEN_LEFT] = *parent;
     vps[screen][QUICKSCREEN_RIGHT] = *parent;
     vps[screen][QUICKSCREEN_LEFT].x = parent->x;
@@ -92,11 +99,12 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
         i = 3*char_height;
     else
         i = nb_lines*char_height;
-    
+
     vps[screen][QUICKSCREEN_LEFT].height = i;
     vps[screen][QUICKSCREEN_RIGHT].height = i;
     vp_icons[screen].y = vps[screen][QUICKSCREEN_LEFT].y + (char_height/2);
-    vp_icons[screen].height = vps[screen][QUICKSCREEN_BOTTOM].y - vp_icons[screen].y;
+    vp_icons[screen].height =
+                vps[screen][QUICKSCREEN_BOTTOM].y - vp_icons[screen].y;
     
     if (left_width + right_width > display->width - CENTER_MARGIN) /* scrolling needed */
     {
@@ -143,9 +151,9 @@ static void quickscreen_draw_text(char *s, int item, bool title,
                                   struct screen *display, struct viewport *vp)
 {
     int nb_lines = viewport_get_nb_lines(vp);
-    int w, h, line = 0, x=0;
+    int w, h, line = 0, x = 0;
     display->getstringsize(s, &w, &h);
-    
+
     if (nb_lines > 1 && !title)
         line = 1;
     switch (item)
@@ -161,7 +169,7 @@ static void quickscreen_draw_text(char *s, int item, bool title,
             break;
     }
     if (w>vp->width)
-        display->puts_scroll(0,line,s);
+        display->puts_scroll(0, line, s);
     else
         display->putsxy(x, line*h, s);
 }
@@ -170,6 +178,12 @@ static void gui_quickscreen_draw(struct gui_quickscreen *qs,
                                  struct screen *display,
                                  struct viewport *parent)
 {
+#ifdef HAVE_REMOTE_LCD
+    int screen = display->screen_type;
+#else
+    const int screen = 0;
+#endif
+
     int i;
     char buf[MAX_PATH];
     unsigned char *title, *value;
@@ -179,43 +193,43 @@ static void gui_quickscreen_draw(struct gui_quickscreen *qs,
     display->clear_viewport();
     for (i=0; i<QUICKSCREEN_ITEM_COUNT; i++)
     {
-        
         if (!qs->items[i])
             continue;
-        display->set_viewport(&vps[display->screen_type][i]);
-        display->scroll_stop(&vps[display->screen_type][i]);
-        
+        display->set_viewport(&vps[screen][i]);
+        display->scroll_stop(&vps[screen][i]);
+
         title = P2STR(ID2P(qs->items[i]->lang_id));
         setting = qs->items[i]->setting;
         if ((qs->items[i]->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
             temp = *(bool*)setting?1:0;
         else
             temp = *(int*)setting;
-        value = option_get_valuestring((struct settings_list*)qs->items[i], buf, MAX_PATH, temp);
-        
-        if (vps[display->screen_type][i].height < display->char_height*2)
+        value = option_get_valuestring((struct settings_list*)qs->items[i],
+                                       buf, MAX_PATH, temp);
+
+        if (vps[screen][i].height < display->char_height*2)
         {
             char text[MAX_PATH];
             snprintf(text, MAX_PATH, "%s: %s", title, value);
-            quickscreen_draw_text(text, i, true, display, &vps[display->screen_type][i]);
+            quickscreen_draw_text(text, i, true, display, &vps[screen][i]);
         }
         else
         {
-            quickscreen_draw_text(title, i, true, display, &vps[display->screen_type][i]);
-            quickscreen_draw_text(value, i, false, display, &vps[display->screen_type][i]);
+            quickscreen_draw_text(title, i, true, display, &vps[screen][i]);
+            quickscreen_draw_text(value, i, false, display, &vps[screen][i]);
         }
         display->update_viewport();
     }
     /* draw the icons */
-    display->set_viewport(&vp_icons[display->screen_type]);
+    display->set_viewport(&vp_icons[screen]);
     display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                         vp_icons[display->screen_type].width - 8, 0, 7, 8);
+                         vp_icons[screen].width - 8, 0, 7, 8);
     display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 0, 0, 7, 8);
     display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                         (vp_icons[display->screen_type].width/2) - 4, 
-                          vp_icons[display->screen_type].height - 7, 7, 8);
+                         (vp_icons[screen].width/2) - 4, 
+                          vp_icons[screen].height - 7, 7, 8);
     display->update_viewport();
-    
+
     display->set_viewport(parent);
     display->update_viewport();
     display->set_viewport(NULL);
@@ -282,7 +296,7 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
      *  - a second press on the button that made us enter
      *  - an action taken while pressing the enter button,
      *    then release the enter button*/
-    bool can_quit=false;
+    bool can_quit = false;
     gui_syncstatusbar_draw(&statusbars, true);
     FOR_NB_SCREENS(i)
     {
@@ -333,9 +347,12 @@ bool quick_screen_quick(int button_enter)
     struct gui_quickscreen qs;
     bool oldshuffle = global_settings.playlist_shuffle;
     int oldrepeat = global_settings.repeat_mode;
-    qs.items[QUICKSCREEN_LEFT] = find_setting(&global_settings.playlist_shuffle, NULL);
-    qs.items[QUICKSCREEN_RIGHT] = find_setting(&global_settings.repeat_mode, NULL);
-    qs.items[QUICKSCREEN_BOTTOM] = find_setting(&global_settings.dirfilter, NULL);
+    qs.items[QUICKSCREEN_LEFT] =
+                    find_setting(&global_settings.playlist_shuffle, NULL);
+    qs.items[QUICKSCREEN_RIGHT] =
+                    find_setting(&global_settings.repeat_mode, NULL);
+    qs.items[QUICKSCREEN_BOTTOM] =
+                    find_setting(&global_settings.dirfilter, NULL);
     qs.callback = NULL;
     if (gui_syncquickscreen_run(&qs, button_enter))
     {
@@ -366,9 +383,12 @@ bool quick_screen_quick(int button_enter)
 bool quick_screen_f3(int button_enter)
 {
     struct gui_quickscreen qs;
-    qs.items[QUICKSCREEN_LEFT] = find_setting(&global_settings.scrollbar, NULL);
-    qs.items[QUICKSCREEN_RIGHT] = find_setting(&global_settings.statusbar, NULL);
-    qs.items[QUICKSCREEN_BOTTOM] = find_setting(&global_settings.flip_display, NULL);
+    qs.items[QUICKSCREEN_LEFT] =
+                    find_setting(&global_settings.scrollbar, NULL);
+    qs.items[QUICKSCREEN_RIGHT] =
+                    find_setting(&global_settings.statusbar, NULL);
+    qs.items[QUICKSCREEN_BOTTOM] =
+                    find_setting(&global_settings.flip_display, NULL);
     qs.callback = NULL;
     if (gui_syncquickscreen_run(&qs, button_enter))
     {
