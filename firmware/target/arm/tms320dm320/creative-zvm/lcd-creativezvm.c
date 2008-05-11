@@ -27,6 +27,7 @@
 #include "spi.h"
 #include "spi-target.h"
 #include "lcd-target.h"
+#include "ltv350qv.h"
 
 /* Power and display status */
 static bool display_on = false; /* Is the display turned on? */
@@ -85,13 +86,10 @@ static void enable_venc(bool enable)
 /* LTV250QV panel functions */
 static void lcd_write_reg(unsigned char reg, unsigned short val)
 {
-    unsigned char block[3];
-    block[0] = 0x74;
-    block[1] = 0;
-    block[2] = reg | 0xFF;
+    unsigned char block[3] = {LTV_OPC_INDEX, 0, reg | 0xFF};
     spi_block_transfer(SPI_target_LTV250QV, block, sizeof(block), NULL, 0);
-    block[0] = 0x76;
-    block[1] = (val >> 8) & 0xFF;
+    block[0] = LTV_OPC_DATA;
+    block[1] = val >> 8;
     block[2] = val & 0xFF;
     spi_block_transfer(SPI_target_LTV250QV, block, sizeof(block), NULL, 0);
 }
@@ -128,57 +126,57 @@ static void lcd_display_on(bool reset)
     IO_GIO_BITSET2 = (1 << 8);
     sleep_ms(1);
     
-    lcd_write_reg(1,  0x1D);
-    lcd_write_reg(2,  0x0);
-    lcd_write_reg(3,  0x0);
-    lcd_write_reg(4,  0x0);
-    lcd_write_reg(5,  0x40A3);
-    lcd_write_reg(6,  0x0);
-    lcd_write_reg(7,  0x0);
-    lcd_write_reg(8,  0x0);
-    lcd_write_reg(9,  0x0);
-    lcd_write_reg(10, 0x0);
-    lcd_write_reg(16, 0x0);
-    lcd_write_reg(17, 0x0);
-    lcd_write_reg(18, 0x0);
-    lcd_write_reg(19, 0x0);
-    lcd_write_reg(20, 0x0);
-    lcd_write_reg(21, 0x0);
-    lcd_write_reg(22, 0x0);
-    lcd_write_reg(23, 0x0);
-    lcd_write_reg(24, 0x0);
-    lcd_write_reg(25, 0x0);
+    lcd_write_reg(LTV_IFCTL,     LTV_NL(29));
+    lcd_write_reg(LTV_DATACTL,   0);
+    lcd_write_reg(LTV_ENTRY_MODE,0);
+    lcd_write_reg(LTV_GATECTL1,  0);
+    lcd_write_reg(LTV_GATECTL2,  (LTV_NW_INV_1LINE | LTV_FHN | LTV_FTI(2) | LTV_FWI(3)));
+    lcd_write_reg(LTV_VBP,       0);
+    lcd_write_reg(LTV_HBP,       0);
+    lcd_write_reg(LTV_SOTCTL,    0);
+    lcd_write_reg(LTV_PWRCTL1,   0);
+    lcd_write_reg(LTV_PWRCTL2,   0);
+    lcd_write_reg(LTV_GAMMA(0),  0);
+    lcd_write_reg(LTV_GAMMA(1),  0);
+    lcd_write_reg(LTV_GAMMA(2),  0);
+    lcd_write_reg(LTV_GAMMA(3),  0);
+    lcd_write_reg(LTV_GAMMA(4),  0);
+    lcd_write_reg(LTV_GAMMA(5),  0);
+    lcd_write_reg(LTV_GAMMA(6),  0);
+    lcd_write_reg(LTV_GAMMA(7),  0);
+    lcd_write_reg(LTV_GAMMA(8),  0);
+    lcd_write_reg(LTV_GAMMA(9),  0);
     sleep_ms(10);
     
-    lcd_write_reg(9,  0x4055);
-    lcd_write_reg(10, 0x0);
+    lcd_write_reg(LTV_PWRCTL1,   (LTV_VCOM_DISABLE | LTV_DRIVE_CURRENT(5) | LTV_SUPPLY_CURRENT(5)));
+    lcd_write_reg(LTV_PWRCTL2,   0);
     sleep_ms(40);
     
-    lcd_write_reg(10, 0x2000);
+    lcd_write_reg(LTV_PWRCTL2,   LTV_VCOML_ENABLE);
     sleep_ms(40);
     
-    lcd_write_reg(1,  0x401D);
-    lcd_write_reg(2,  0x204);
-    lcd_write_reg(3,  0x100);
-    lcd_write_reg(4,  0x1000);
-    lcd_write_reg(5,  0x5033);
-    lcd_write_reg(6,  0x5);
-    lcd_write_reg(7,  0x1B);
-    lcd_write_reg(8,  0x800);
-    lcd_write_reg(16, 0x203);
-    lcd_write_reg(17, 0x302);
-    lcd_write_reg(18, 0xC08);
-    lcd_write_reg(19, 0xC08);
-    lcd_write_reg(20, 0x707);
-    lcd_write_reg(21, 0x707);
-    lcd_write_reg(22, 0x104);
-    lcd_write_reg(23, 0x306);
-    lcd_write_reg(24, 0x0);
-    lcd_write_reg(25, 0x0);
+    lcd_write_reg(LTV_IFCTL,     (LTV_NMD | LTV_NL(29)));
+    lcd_write_reg(LTV_DATACTL,   (LTV_DS_SAME | LTV_CHS_480 | LTV_DF_RGB | LTV_RGB_BGR));
+    lcd_write_reg(LTV_ENTRY_MODE,(LTV_VSPL_ACTIVE_LOW | LTV_HSPL_ACTIVE_LOW | LTV_DPL_SAMPLE_RISING | LTV_EPL_ACTIVE_LOW | LTV_SS_RIGHT_TO_LEFT));
+    lcd_write_reg(LTV_GATECTL1,  LTV_CLW(1));
+    lcd_write_reg(LTV_GATECTL2,  (LTV_NW_INV_1LINE | LTV_DSC | LTV_FTI(3) | LTV_FWI(3)));
+    lcd_write_reg(LTV_VBP,       0x5);
+    lcd_write_reg(LTV_HBP,       0x1B);
+    lcd_write_reg(LTV_SOTCTL,    LTV_SDT(2));
+    lcd_write_reg(LTV_GAMMA(0),  0x203);
+    lcd_write_reg(LTV_GAMMA(1),  0x302);
+    lcd_write_reg(LTV_GAMMA(2),  0xC08);
+    lcd_write_reg(LTV_GAMMA(3),  0xC08);
+    lcd_write_reg(LTV_GAMMA(4),  0x707);
+    lcd_write_reg(LTV_GAMMA(5),  0x707);
+    lcd_write_reg(LTV_GAMMA(6),  0x104);
+    lcd_write_reg(LTV_GAMMA(7),  0x306);
+    lcd_write_reg(LTV_GAMMA(8),  0);
+    lcd_write_reg(LTV_GAMMA(9),  0);
     sleep_ms(60);
     
-    lcd_write_reg(9,  0xA55);
-    lcd_write_reg(10, 0x111A);
+    lcd_write_reg(LTV_PWRCTL1,   (LTV_VCOMOUT_ENABLE | LTV_POWER_ON | LTV_DRIVE_CURRENT(5) | LTV_SUPPLY_CURRENT(5)));
+    lcd_write_reg(LTV_PWRCTL2,   (LTV_VCOML_VOLTAGE(17) | LTV_VCOMH_VOLTAGE(26))); /* VCOML=0,0625V VCOMH=1,21875V */
     sleep_ms(10);
 
     if(!reset)
@@ -194,15 +192,15 @@ static void lcd_display_on(bool reset)
 static void lcd_display_off(void)
 {
     /* LQV shutdown sequence */
-    lcd_write_reg(9,  0x855);
+    lcd_write_reg(LTV_PWRCTL1,  (LTV_VCOMOUT_ENABLE | LTV_DRIVE_CURRENT(5) | LTV_SUPPLY_CURRENT(5)));
     sleep_ms(20);
     
-    lcd_write_reg(9,  0x55);
-    lcd_write_reg(5,  0x4033);
-    lcd_write_reg(10, 0x0);
+    lcd_write_reg(LTV_PWRCTL1,  (LTV_DRIVE_CURRENT(5) | LTV_SUPPLY_CURRENT(5)));
+    lcd_write_reg(LTV_GATECTL2, (LTV_NW_INV_1LINE | LTV_FTI(3) | LTV_FWI(3)));
+    lcd_write_reg(LTV_PWRCTL2,  0);
     sleep_ms(20);
     
-    lcd_write_reg(9, 0x0);
+    lcd_write_reg(LTV_PWRCTL1,  0);
     sleep_ms(10);
     unsigned char temp[1];
     temp[0] = 0;
