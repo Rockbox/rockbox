@@ -43,16 +43,6 @@ extern void gui_textarea_clear(struct screen * display);
 extern void gui_textarea_update(struct screen * display);
 
 /*
- * Displays message lines on the given screen
- *  - display : the screen structure
- *  - message : the lines to display
- *  - ystart : the lineon which we start displaying
- * returns : the number of lines effectively displayed
- */
-extern int gui_textarea_put_message(struct screen * display,
-                                    const struct text_message * message,
-                                    int ystart);
-/*
  * Compute the number of text lines the display can draw with the current font
  * Also updates the char height and width
  * - display : the screen structure

@@ -24,36 +24,31 @@
 #include "lang.h"
 #include "action.h"
 #include "talk.h"
+#include "textarea.h"
+#include "viewport.h"
 
-/*
- * Initializes the yesno asker
- *  - yn : the yesno structure
- *  - main_message : the question the user has to answer
- *  - yes_message : message displayed if answer is 'yes'
- *  - no_message : message displayed if answer is 'no'
- */
-static void gui_yesno_init(struct gui_yesno * yn,
-                    const struct text_message * main_message,
-                    const struct text_message * yes_message,
-                    const struct text_message * no_message)
+
+struct gui_yesno
 {
-    yn->main_message=main_message;
-    yn->result_message[YESNO_YES]=yes_message;
-    yn->result_message[YESNO_NO]=no_message;
-    yn->display=0;
-}
-
-/*
- * Attach the yesno to a screen
- *  - yn : the yesno structure
- *  - display : the screen to attach
- */
-static void gui_yesno_set_display(struct gui_yesno * yn,
-                           struct screen * display)
+    const struct text_message * main_message;
+    const struct text_message * result_message[2];
+    
+    struct viewport *vp;
+    struct screen * display;
+};
+static int put_message(struct screen *display,
+                        const struct text_message * message,
+                        int start, int max_y)
 {
-    yn->display=display;
+    int i;
+    for(i=0; i<message->nb_lines && i+start<max_y; i++)
+    {
+        display->puts_scroll(0, i+start, 
+                             P2STR((unsigned char *)message->message_lines[i]));
+    }
+    return i;
 }
-
+    
 /*
  * Draws the yesno
  *  - yn : the yesno structure
@@ -61,26 +56,33 @@ static void gui_yesno_set_display(struct gui_yesno * yn,
 static void gui_yesno_draw(struct gui_yesno * yn)
 {
     struct screen * display=yn->display;
-    int nb_lines, line_shift=0;
+    struct viewport *vp = yn->vp;
+    int nb_lines, vp_lines, line_shift=0;
 
-    gui_textarea_clear(display);
-    nb_lines=yn->main_message->nb_lines;
+    display->set_viewport(vp);
+    display->clear_viewport();
+    display->stop_scroll();
+    nb_lines = yn->main_message->nb_lines;
+    vp_lines = viewport_get_nb_lines(vp);
 
-    if(nb_lines+3<display->nb_lines)
+    if(nb_lines+3< vp_lines)
         line_shift=1;
-    nb_lines=gui_textarea_put_message(display, yn->main_message, line_shift);
+    
+    line_shift += put_message(display, yn->main_message,
+                              line_shift, vp_lines);
 
     /* Space remaining for yes / no text ? */
-    if(nb_lines+line_shift+2<=display->nb_lines)
+    if(line_shift+2 <= vp_lines)
     {
-        if(nb_lines+line_shift+3<=display->nb_lines)
-            nb_lines++;
-        display->puts(0, nb_lines+line_shift, str(LANG_CONFIRM_WITH_BUTTON));
+        if(line_shift+3 <= vp_lines)
+            line_shift++;
+        display->puts(0, line_shift, str(LANG_CONFIRM_WITH_BUTTON));
 #ifdef HAVE_LCD_BITMAP
-        display->puts(0, nb_lines+line_shift+1, str(LANG_CANCEL_WITH_ANY));
+        display->puts(0, line_shift+1, str(LANG_CANCEL_WITH_ANY));
 #endif
     }
-    gui_textarea_update(display);
+    display->update_viewport();
+    display->set_viewport(NULL);
 }
 
 /*
@@ -93,13 +95,18 @@ static void gui_yesno_draw(struct gui_yesno * yn)
 static bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
 {
     const struct text_message * message=yn->result_message[result];
+    struct viewport *vp = yn->vp;
+    struct screen * display=yn->display;
     if(message==NULL)
         return false;
-    gui_textarea_put_message(yn->display, message, 0);
+    display->set_viewport(vp);
+    display->clear_viewport();
+    display->stop_scroll();
+    put_message(yn->display, message, 0, viewport_get_nb_lines(vp));
+    display->update_viewport();
+    display->set_viewport(NULL);
     return(true);
 }
-
-#include "debug.h"
 
 enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
                                  const struct text_message * yes_message,
@@ -110,11 +117,16 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
     int result=-1;
     bool result_displayed;
     struct gui_yesno yn[NB_SCREENS];
+    struct viewport vp[NB_SCREENS];
     long talked_tick = 0;
     FOR_NB_SCREENS(i)
     {
-        gui_yesno_init(&(yn[i]), main_message, yes_message, no_message);
-        gui_yesno_set_display(&(yn[i]), &(screens[i]));
+        yn[i].main_message=main_message;
+        yn[i].result_message[YESNO_YES]=yes_message;
+        yn[i].result_message[YESNO_NO]=no_message;
+        yn[i].display=&screens[i];
+        yn[i].vp = &vp[i];
+        viewport_set_defaults(yn[i].vp, i);
         gui_yesno_draw(&(yn[i]));
     }
     while (result==-1)

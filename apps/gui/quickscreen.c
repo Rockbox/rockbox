@@ -22,7 +22,6 @@
 #include "config.h"
 #include "system.h"
 #include "icons.h"
-#include "textarea.h"
 #include "font.h"
 #include "kernel.h"
 #include "misc.h"

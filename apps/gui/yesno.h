@@ -30,14 +30,6 @@ enum yesno_res
     YESNO_USB
 };
 
-struct gui_yesno
-{
-    const struct text_message * main_message;
-    const struct text_message * result_message[2];
-
-    struct screen * display;
-};
-
 /*
  * Runs the yesno asker :
  * it will display the 'main_message' question, and wait for user keypress

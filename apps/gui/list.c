@@ -32,7 +32,6 @@
 #include "list.h"
 #include "scrollbar.h"
 #include "statusbar.h"
-#include "textarea.h"
 #include "lang.h"
 #include "sound.h"
 #include "misc.h"

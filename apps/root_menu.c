@@ -42,7 +42,6 @@
 #include "statusbar.h"
 #include "splash.h"
 #include "buttonbar.h"
-#include "textarea.h"
 #include "action.h"
 #include "yesno.h"
 
