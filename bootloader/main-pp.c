@@ -446,10 +446,6 @@ void* main(void)
     kernel_init();
 
     lcd_init();
-#if LCD_DEPTH > 1
-    lcd_set_foreground(LCD_WHITE);
-    lcd_set_background(LCD_BLACK);
-#endif
 
     font_init();
     show_logo();
