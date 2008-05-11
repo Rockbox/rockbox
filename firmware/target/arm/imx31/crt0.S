@@ -172,6 +172,13 @@ remap_start:
     cmp     r2, r3
     blo     1b
 
+    /* Map device section 0x80100000 to 0x03f00000 - buffered, not cached */
+    bic     r1, r1, #0x0ff00000
+    orr     r1, r1, #0x00100000
+    bic     r1, r1, #(1 << 3)
+    add     r2, r5, #63*4
+    str     r1, [r2]
+
     /* Enable MMU */
 
     mov     r0, #0

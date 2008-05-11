@@ -30,7 +30,7 @@
 #define TTB_SIZE      (0x4000)
 #define IRAM_SIZE     (0x4000)
 #define TTB_BASE      ((unsigned int *)TTB_BASE_ADDR)
-#define FRAME         ((void*)0x80100000)
+#define FRAME         ((void*)0x03f00000)
 #define FRAME_SIZE    (240*320*2)
 
 #define DEVBSS_ATTR   __attribute__((section(".devbss"),nocommon))
