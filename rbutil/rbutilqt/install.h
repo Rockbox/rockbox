@@ -47,6 +47,7 @@ class Install : public QDialog
         QString fileName;
         ZipInstaller* installer;
         QMap<QString, QString> version;
+        QString m_backupName;
 
     private slots:
         void setCached(bool);

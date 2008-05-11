@@ -40,7 +40,8 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     if(version != "")
     {
         ui.Backupgroup->show();
-        ui.backupLocation->setText(settings->mountpoint() + "/.backup/rockbox-backup-"+version+".zip");
+        m_backupName = settings->mountpoint() + "/.backup/rockbox-backup-"+version+".zip";
+        ui.backupLocation->setText(fontMetrics().elidedText(m_backupName,Qt::ElideMiddle,200));
     }
     else
     {
@@ -154,8 +155,9 @@ void Install::accept()
     if(!settings->cacheDisabled()
         && !ui.radioCurrent->isChecked()
         && !ui.checkBoxCache->isChecked())
-        installer->setCache(settings->cachePath());
-
+    {
+        installer->setCache(true);
+    }
     installer->setLogVersion(myversion);
     installer->setMountPoint(mountPoint);
     
@@ -167,7 +169,8 @@ void Install::accept()
 
 void Install::changeBackupPath()
 {
-   ui.backupLocation->setText(QFileDialog::getSaveFileName(this,"Select Backup Filename",ui.backupLocation->text()));
+   m_backupName = QFileDialog::getSaveFileName(this,"Select Backup Filename",ui.backupLocation->text());
+   ui.backupLocation->setText(QWidget::fontMetrics().elidedText(m_backupName,Qt::ElideMiddle,200));
 }
 
 void Install::updateDataReadProgress(int read, int total)
