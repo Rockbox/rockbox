@@ -56,6 +56,7 @@
 #include "list.h"
 #include "yesno.h"
 #include "backdrop.h"
+#include "viewport.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include <bitmaps/usblogo.h>
@@ -546,7 +547,6 @@ bool set_time_screen(const char* title, struct tm *tm)
 
             /* draw the screen */
             screens[s].set_viewport(&vp[s]);
-            screens[s].stop_scroll();
             screens[s].clear_viewport();
             /* display the screen title */
             screens[s].puts_scroll(0, 0, title);

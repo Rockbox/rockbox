@@ -483,13 +483,15 @@ void gui_synclist_set_color_callback(struct gui_synclist * lists,
 static void gui_synclist_select_next_page(struct gui_synclist * lists,
                                    enum screen_type screen)
 {
-    gui_list_select_at_offset(lists, screens[screen].nb_lines);
+    int nb_lines = viewport_get_nb_lines(lists->parent[screen]);
+    gui_list_select_at_offset(lists, nb_lines);
 }
 
 static void gui_synclist_select_previous_page(struct gui_synclist * lists,
                                        enum screen_type screen)
 {
-    gui_list_select_at_offset(lists, -screens[screen].nb_lines);
+    int nb_lines = viewport_get_nb_lines(lists->parent[screen]);
+    gui_list_select_at_offset(lists, -nb_lines);
 }
 
 void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
