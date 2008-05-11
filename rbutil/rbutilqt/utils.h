@@ -28,6 +28,7 @@ bool recRmdir( const QString &dirName );
 QString resolvePathCase(QString path);
 
 QUrl systemProxy(void);
+QString installedVersion(QString mountpoint);
 
 #endif
 

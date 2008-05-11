@@ -20,15 +20,31 @@
 #include "install.h"
 #include "ui_installfrm.h"
 #include "rbzip.h"
+#include "utils.h"
 
-Install::Install(QWidget *parent) : QDialog(parent)
+Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
 {
+    settings = sett;
     ui.setupUi(this);
 
     connect(ui.radioCurrent, SIGNAL(toggled(bool)), this, SLOT(setCached(bool)));
     connect(ui.radioStable, SIGNAL(toggled(bool)), this, SLOT(setDetailsStable(bool)));
     connect(ui.radioCurrent, SIGNAL(toggled(bool)), this, SLOT(setDetailsCurrent(bool)));
     connect(ui.radioArchived, SIGNAL(toggled(bool)), this, SLOT(setDetailsArchived(bool)));
+    connect(ui.changeBackup,SIGNAL(pressed()),this,SLOT(changeBackupPath()));
+    
+    //! check if rockbox is already installed
+    QString version = installedVersion(settings->mountpoint()); 
+     
+    if(version != "")
+    {
+        ui.Backupgroup->show();
+        ui.backupLocation->setText(settings->mountpoint() + ".backup/rockbox-backup-"+version+".zip");
+    }
+    else
+    {
+        ui.Backupgroup->hide();
+    }    
 }
 
 
@@ -84,17 +100,32 @@ void Install::accept()
     }
     settings->sync();
     
-    //! check if rockbox is already installed
-    if(QDir(settings->mountpoint() + "/.rockbox").exists())
+    //! check if we should backup
+    if(ui.backup->isChecked())
     {
-        if(QMessageBox::question(this, tr("Installed Rockbox detected"),
-           tr("Rockbox installation detected. Do you want to backup first?"),
-           QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        logger->addItem(tr("Beginning Backup..."),LOGINFO);
+        QString backupName = ui.backupLocation->text();
+        
+        //! create dir, if it doesnt exist
+        QFileInfo backupFile(backupName);
+        if(!QDir(backupFile.path()).exists())
         {
-            QString backupName = QFileDialog::getSaveFileName(this,"Select Backup Filename",settings->mountpoint());
-            logger->show();
-            RbZip backup;
-            backup.createZip(backupName,settings->mountpoint() + "/.rockbox",logger);          
+            QDir a;
+            a.mkpath(backupFile.path());
+        }
+        
+        //! create backup
+        RbZip backup;
+        connect(&backup,SIGNAL(zipProgress(int,int)),this,SLOT(updateDataReadProgress(int,int)));
+        if(backup.createZip(backupName,settings->mountpoint() + "/.rockbox") == Zip::Ok)
+        {
+            logger->addItem(tr("Backup successfull"),LOGOK);
+        }
+        else
+        {
+            logger->addItem(tr("Backup failed!"),LOGERROR);
+            logger->abort();
+            return;
         }
     }
     
@@ -113,6 +144,19 @@ void Install::accept()
     connect(installer, SIGNAL(done(bool)), this, SLOT(done(bool)));
     
     installer->install(logger);
+
+}
+
+void Install::changeBackupPath()
+{
+   ui.backupLocation->setText(QFileDialog::getSaveFileName(this,"Select Backup Filename",ui.backupLocation->text()));
+}
+
+void Install::updateDataReadProgress(int read, int total)
+{
+    logger->setProgressMax(total);
+    logger->setProgressValue(read);
+    //qDebug() << "progress:" << read << "/" << total;
 
 }
 
@@ -216,7 +260,4 @@ void Install::setVersionStrings(QMap<QString, QString> ver)
     qDebug() << "Install::setVersionStrings" << version;
 }
 
-void Install::setSettings(RbSettings *sett)
-{
-    settings = sett;
-}
+

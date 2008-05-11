@@ -31,14 +31,15 @@ class Install : public QDialog
 {
     Q_OBJECT
     public:
-        Install(QWidget *parent = 0);
-        void setSettings(RbSettings* sett);
+        Install(RbSettings* sett,QWidget *parent = 0);
         void setVersionStrings(QMap<QString, QString>);
 
     public slots:
         void accept(void);
-
-    private:
+        void updateDataReadProgress(int read, int total);
+        void changeBackupPath();
+        
+    private:    
         Ui::InstallFrm ui;
         ProgressLoggerGui* logger;
         RbSettings* settings;

@@ -21,14 +21,12 @@
 #include <QtCore>
 
 
-Zip::ErrorCode RbZip::createZip(QString zip,QString dir,ProgressloggerInterface *dp)
+Zip::ErrorCode RbZip::createZip(QString zip,QString dir)
 {
-    m_logger = dp;
     Zip::ErrorCode error = Ok;
     m_curEntry = 1;
-    int numEntrys=0;
+    m_numEntrys=0;
     
-    m_logger->addItem(tr("Creating Backup: %1").arg(zip),LOGINFO);
     QCoreApplication::processEvents();
    
     // get number of entrys in dir
@@ -36,10 +34,10 @@ Zip::ErrorCode RbZip::createZip(QString zip,QString dir,ProgressloggerInterface 
     while (it.hasNext()) 
     {
         it.next();
-        numEntrys++;
+        m_numEntrys++;
         QCoreApplication::processEvents();
     }
-    m_logger->setProgressMax(numEntrys);
+
     
     //! create zip
     error = Zip::createArchive(zip);
@@ -54,13 +52,13 @@ Zip::ErrorCode RbZip::createZip(QString zip,QString dir,ProgressloggerInterface 
     //! close zip
     error = Zip::closeArchive();
    
-   return error;
+    return error;
 }
 
 void RbZip::progress()
 {
     m_curEntry++;
-    m_logger->setProgressValue(m_curEntry);
+    emit zipProgress(m_curEntry,m_numEntrys);
     QCoreApplication::processEvents(); // update UI
 }
 

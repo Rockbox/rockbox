@@ -465,16 +465,37 @@ bool RbUtilQt::installAuto()
     QString myversion = "r" + versmap.value("bleed_rev");
     
     //! check if rockbox is already installed
-    if(QDir(settings->mountpoint() + "/.rockbox").exists())
+    QString rbVersion = installedVersion(settings->mountpoint()); 
+    if(rbVersion != "")
     {
         if(QMessageBox::question(this, tr("Installed Rockbox detected"),
            tr("Rockbox installation detected. Do you want to backup first?"),
            QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
-            QString backupName = QFileDialog::getSaveFileName(this,"Select Backup Filename",settings->mountpoint());
-            logger->show();
+            logger->addItem(tr("Beginning Backup..."),LOGINFO);
+            QString backupName = settings->mountpoint() + ".backup/rockbox-backup-"+rbVersion+".zip";
+            
+            //! create dir, if it doesnt exist
+            QFileInfo backupFile(backupName);
+            if(!QDir(backupFile.path()).exists())
+            {
+                QDir a;
+                a.mkpath(backupFile.path());
+            }
+        
+            //! create backup
             RbZip backup;
-            backup.createZip(backupName,settings->mountpoint() + "/.rockbox",logger);          
+            connect(&backup,SIGNAL(zipProgress(int,int)),this,SLOT(updateDataReadProgress(int,int)));
+            if(backup.createZip(backupName,settings->mountpoint() + "/.rockbox") == Zip::Ok)
+            {
+                logger->addItem(tr("Backup successfull"),LOGOK);
+            }
+            else
+            {
+                logger->addItem(tr("Backup failed!"),LOGERROR);
+                logger->abort();
+                return false;
+            }      
         }
     }
     
@@ -493,10 +514,17 @@ bool RbUtilQt::installAuto()
     return true;
 }
 
+void RbUtilQt::updateDataReadProgress(int read, int total)
+{
+    logger->setProgressMax(total);
+    logger->setProgressValue(read);
+    //qDebug() << "progress:" << read << "/" << total;
+
+}
+
 void RbUtilQt::install()
 {
-    Install *installWindow = new Install(this);
-    installWindow->setSettings(settings);
+    Install *installWindow = new Install(settings,this);
 
     buildInfo.open();
     QSettings info(buildInfo.fileName(), QSettings::IniFormat, this);

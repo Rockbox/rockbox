@@ -134,3 +134,26 @@ QUrl systemProxy(void)
     return QUrl("");        
 #endif
 }
+
+QString installedVersion(QString mountpoint)
+{
+    // read rockbox-info.txt
+    QFile info(mountpoint +"/.rockbox/rockbox-info.txt");
+    if(!info.open(QIODevice::ReadOnly))
+    {
+        return "";
+    }
+    
+    QString target, features,version;
+    while (!info.atEnd()) {
+        QString line = info.readLine();
+        
+        if(line.contains("Version:"))
+        {
+            return line.remove("Version:").trimmed();
+        }        
+    }
+    info.close();
+    return "";
+}
+

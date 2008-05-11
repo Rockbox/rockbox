@@ -107,6 +107,7 @@ class RbUtilQt : public QMainWindow
         void updateInfo(void);
         void updateTabs(int);
 
+        void updateDataReadProgress(int read, int total);
 };
 
 #endif

@@ -23,19 +23,20 @@
 #include <QtCore>
 #include "zip/zip.h"
 
-#include "progressloggerinterface.h"
-
 class RbZip : public QObject, public Zip
 {
 	Q_OBJECT
 	public:
-        Zip::ErrorCode createZip(QString zip,QString dir,ProgressloggerInterface *dp);
+        Zip::ErrorCode createZip(QString zip,QString dir);
 
         virtual void progress();
-
+        
+        signals:
+		void zipProgress(int, int);
+    
     private:
         int m_curEntry;
-        ProgressloggerInterface *m_logger;
+        int m_numEntrys;
 };
 
 #endif
