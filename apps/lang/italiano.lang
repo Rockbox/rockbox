@@ -4186,6 +4186,7 @@
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
     mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: none
@@ -4196,10 +4197,11 @@
     h10,h10_5gb: "PREV = Annulla"
     gigabeatf: "A = Annulla"
     mrobe100: "DISPLAY = Annulla"
+    gigabeats: "Indietro = Annulla"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf,mrobe100: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeat*,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -4455,12 +4457,14 @@
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Imposta OFF=Annulla"
     ipod*: "SELECT=Imposta MENU=Annulla"
     h10,h10_5gb: "SELECT=Imposta PREV=Annulla"
+    gigabeats: "SELECT=Imposta POWER=Annulla"
   </dest>
   <voice>
     *: none
@@ -9931,14 +9935,14 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
+    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Costruzione database... %d trovato (OFF per uscire)"
     h100,h120,h300: "Costruzione database... %d trovato (STOP per uscire)"
     ipod*: "Costruzione database... %d trovato (PREV per uscire)"
-    x5,m5,gigabeatf,mrobe100: "Costruzione database... %d trovato (Sinistra per uscire)"
+    x5,m5,gigabeat*,mrobe100: "Costruzione database... %d trovato (Sinistra per uscire)"
     h10,h10_5gb,e200,c200: "Costruzione database... %d trovato (PREV per uscire)"
   </dest>
   <voice>
@@ -10511,13 +10515,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Sì"
     h100,h120,h300: "NAVI = Sì"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Sì"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Sì"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -10532,17 +10536,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Imposta"
     h100,h120,h300: "NAVI = Imposta"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Imposta"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: "SELECT = Imposta"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeatf,mrobe100: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeat*,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
