@@ -1477,7 +1477,7 @@ fi
     ;;
     
     91|creativezenvision)
-    target_id=35
+    target_id=39
     modelname="creativezm"
     target="-DCREATIVE_ZVM -DZEN_VISION"
     memory=64
