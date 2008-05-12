@@ -173,7 +173,7 @@ void Install::changeBackupPath()
     QString backupString = QFileDialog::getSaveFileName(this,"Select Backup Filename",m_backupName, "*.zip");
     // only update if a filename was entered, ignore if cancelled
     if(!backupString.isEmpty()) {
-        ui.backupLocation->setText(QDir::toNativeSeparators(backupString));
+        ui.backupLocation->setText(QDir::toNativeSeparators(fontMetrics().elidedText(backupString,Qt::ElideMiddle,200)));
         m_backupName = backupString;
     }
 }
