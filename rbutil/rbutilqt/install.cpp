@@ -40,8 +40,10 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     if(version != "")
     {
         ui.Backupgroup->show();
-        m_backupName = settings->mountpoint() + "/.backup/rockbox-backup-"+version+".zip";
-        ui.backupLocation->setText(fontMetrics().elidedText(m_backupName,Qt::ElideMiddle,200));
+        m_backupName = settings->mountpoint();
+        if(!m_backupName.endsWith("/")) m_backupName += "/";
+        m_backupName += ".backup/rockbox-backup-"+version+".zip";
+        ui.backupLocation->setText(QDir::toNativeSeparators(fontMetrics().elidedText(m_backupName,Qt::ElideMiddle,200)));
     }
     else
     {
@@ -123,10 +125,9 @@ void Install::accept()
     if(ui.backup->isChecked())
     {
         logger->addItem(tr("Beginning Backup..."),LOGINFO);
-        QString backupName = ui.backupLocation->text();
         
         //! create dir, if it doesnt exist
-        QFileInfo backupFile(backupName);
+        QFileInfo backupFile(m_backupName);
         if(!QDir(backupFile.path()).exists())
         {
             QDir a;
@@ -136,7 +137,7 @@ void Install::accept()
         //! create backup
         RbZip backup;
         connect(&backup,SIGNAL(zipProgress(int,int)),this,SLOT(updateDataReadProgress(int,int)));
-        if(backup.createZip(backupName,settings->mountpoint() + "/.rockbox") == Zip::Ok)
+        if(backup.createZip(m_backupName,settings->mountpoint() + "/.rockbox") == Zip::Ok)
         {
             logger->addItem(tr("Backup successfull"),LOGOK);
         }
@@ -169,8 +170,12 @@ void Install::accept()
 
 void Install::changeBackupPath()
 {
-   m_backupName = QFileDialog::getSaveFileName(this,"Select Backup Filename",ui.backupLocation->text());
-   ui.backupLocation->setText(QWidget::fontMetrics().elidedText(m_backupName,Qt::ElideMiddle,200));
+    QString backupString = QFileDialog::getSaveFileName(this,"Select Backup Filename",m_backupName, "*.zip");
+    // only update if a filename was entered, ignore if cancelled
+    if(!backupString.isEmpty()) {
+        ui.backupLocation->setText(QDir::toNativeSeparators(backupString));
+        m_backupName = backupString;
+    }
 }
 
 void Install::updateDataReadProgress(int read, int total)
