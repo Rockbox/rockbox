@@ -23,6 +23,8 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+
 extern int tenthdb2master(int db);
 
 extern void audiohw_preinit(void);
