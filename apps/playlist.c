@@ -179,7 +179,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion);
 static int get_previous_directory(char *dir);
 static int check_subdir_for_music(char *dir, char *subdir);
 static int format_track_path(char *dest, char *src, int buf_length, int max,
-                             char *dir);
+                             const char *dir);
 static void display_playlist_count(int count, const unsigned char *fmt,
                                    bool final);
 static void display_buffer_full(void);
@@ -317,24 +317,26 @@ static void empty_playlist(struct playlist_info* playlist, bool resume)
 static void new_playlist(struct playlist_info* playlist, const char *dir,
                          const char *file)
 {
+    const char *fileused = file;
+    const char *dirused = dir;
     empty_playlist(playlist, false);
 
-    if (!file)
+    if (!fileused)
     {
-        file = "";
+        fileused = "";
 
-        if (dir && playlist->current) /* !current cannot be in_ram */
+        if (dirused && playlist->current) /* !current cannot be in_ram */
             playlist->in_ram = true;
         else
-            dir = ""; /* empty playlist */
+            dirused = ""; /* empty playlist */
     }
     
-    update_playlist_filename(playlist, dir, file);
+    update_playlist_filename(playlist, dirused, fileused);
 
     if (playlist->control_fd >= 0)
     {
         update_control(playlist, PLAYLIST_COMMAND_PLAYLIST,
-            PLAYLIST_CONTROL_FILE_VERSION, -1, dir, file, NULL);
+            PLAYLIST_CONTROL_FILE_VERSION, -1, dirused, fileused, NULL);
         sync_control(playlist, false);
     }
 }
@@ -1676,7 +1678,7 @@ static int check_subdir_for_music(char *dir, char *subdir)
  * Returns absolute path of track
  */
 static int format_track_path(char *dest, char *src, int buf_length, int max,
-                             char *dir)
+                             const char *dir)
 {
     int i = 0;
     int j;
@@ -2953,13 +2955,13 @@ int playlist_insert_directory(struct playlist_info* playlist,
 /*
  * Insert all tracks from specified playlist into dynamic playlist.
  */
-int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
+int playlist_insert_playlist(struct playlist_info* playlist, const char *filename,
                              int position, bool queue)
 {
     int fd;
     int max;
     char *temp_ptr;
-    char *dir;
+    const char *dir;
     unsigned char *count_str;
     char temp_buf[MAX_PATH+1];
     char trackname[MAX_PATH+1];

@@ -42,7 +42,7 @@ static bool main_backdrop_valid = false;
 static bool wps_backdrop_valid = false;
 
 /* load a backdrop into a buffer */
-static bool load_backdrop(char* filename, fb_data* backdrop_buffer)
+static bool load_backdrop(const char* filename, fb_data* backdrop_buffer)
 {
     struct bitmap bm;
     int ret;
@@ -62,13 +62,13 @@ static bool load_backdrop(char* filename, fb_data* backdrop_buffer)
     }
 }
 
-bool load_main_backdrop(char* filename)
+bool load_main_backdrop(const char* filename)
 {
     main_backdrop_valid = load_backdrop(filename, &main_backdrop[0][0]);
     return main_backdrop_valid;
 }
 
-bool load_wps_backdrop(char* filename)
+bool load_wps_backdrop(const char* filename)
 {
     wps_backdrop_valid = load_backdrop(filename, &wps_backdrop[0][0]);
     return wps_backdrop_valid;
@@ -104,7 +104,7 @@ void show_wps_backdrop(void)
 
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
 
-static bool load_remote_backdrop(char* filename, fb_remote_data* backdrop_buffer)
+static bool load_remote_backdrop(const char* filename, fb_remote_data* backdrop_buffer)
 {
     struct bitmap bm;
     int ret;

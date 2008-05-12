@@ -60,7 +60,7 @@ void read_color_theme_file(void);
 /* Return the attribute (FILE_ATTR_*) of the file */
 int filetype_get_attr(const char* file);
 #ifdef HAVE_LCD_COLOR
-int filetype_get_color(const char * name, int attr);
+int filetype_get_color(const char* name, int attr);
 #endif
 int filetype_get_icon(int attr);
 /* return the plugin filename associated with the file */

@@ -22,7 +22,7 @@
 #define _PLAYLIST_VIEWER_H_
 
 bool playlist_viewer(void);
-bool playlist_viewer_ex(char* filename);
+bool playlist_viewer_ex(const char* filename);
 bool search_playlist(void);
 
 #endif

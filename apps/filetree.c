@@ -552,7 +552,7 @@ int ft_enter(struct tree_context* c)
 
             default:
             {
-                char* plugin;
+                const char* plugin;
 
                 if (global_settings.party_mode) {
                     gui_syncsplash(HZ, ID2P(LANG_PARTY_MODE));

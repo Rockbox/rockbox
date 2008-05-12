@@ -518,5 +518,5 @@ int filetype_load_plugin(const char* plugin, char* file)
         return PLUGIN_ERROR;
     snprintf(plugin_name, MAX_PATH, "%s/%s.%s",
              PLUGIN_DIR, filetypes[i].plugin, ROCK_EXTENSION);
-    return plugin_load(plugin_name,file);
+    return plugin_load(plugin_name, file);
 }

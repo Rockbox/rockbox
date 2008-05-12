@@ -142,7 +142,7 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
 int playlist_insert_directory(struct playlist_info* playlist,
                               const char *dirname, int position, bool queue,
                               bool recurse);
-int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
+int playlist_insert_playlist(struct playlist_info* playlist, const char *filename,
                              int position, bool queue);
 void playlist_skip_entry(struct playlist_info *playlist, int steps);
 int playlist_delete(struct playlist_info* playlist, int index);

@@ -35,7 +35,7 @@ bool catalog_view_playlists(void);
  *  m3u8name     : filename to save the playlist to, NULL to show the keyboard
  *  ret          : true if the file was successfully added
  */
-bool catalog_add_to_a_playlist(char* sel, int sel_attr,
+bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
                                bool new_playlist, char* m3u8name);
 
 #endif

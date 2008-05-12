@@ -323,7 +323,7 @@ static int add_track_to_playlist(char* filename, void* context)
 
 /* Add "sel" file into specified "playlist".  How to insert depends on type
    of file */
-static int add_to_playlist(const char* playlist, char* sel, int sel_attr)
+static int add_to_playlist(const char* playlist, const char* sel, int sel_attr)
 {
     int fd;
     int result = -1;
@@ -419,7 +419,7 @@ bool catalog_view_playlists(void)
     return true;
 }
 
-bool catalog_add_to_a_playlist(char* sel, int sel_attr,
+bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
                                bool new_playlist, char *m3u8name)
 {
     char playlist[MAX_PATH];

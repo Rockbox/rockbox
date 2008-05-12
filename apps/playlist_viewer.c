@@ -116,7 +116,7 @@ static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer 
                                                          int index);
 
 static bool playlist_viewer_init(struct playlist_viewer * viewer,
-                                 char* filename, bool reload);
+                                 const char* filename, bool reload);
 
 static void format_name(char* dest, const char* src);
 static void format_line(const struct playlist_entry* track, char* str,
@@ -271,7 +271,7 @@ static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer 
 
 /* Initialize the playlist viewer. */
 static bool playlist_viewer_init(struct playlist_viewer * viewer,
-                                 char* filename, bool reload)
+                                 const char* filename, bool reload)
 {
     char* buffer;
     size_t buffer_size;
@@ -304,7 +304,8 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     else
     {
         /* Viewing playlist on disk */
-        char *dir, *file, *temp_ptr;
+        const char *dir, *file;
+        char *temp_ptr;
         char *index_buffer = NULL;
         ssize_t index_buffer_size = 0;
 
@@ -591,7 +592,7 @@ static int playlist_callback_icons(int selected_item, void *data)
 
 /* Main viewer function.  Filename identifies playlist to be viewed.  If NULL,
    view current playlist. */
-bool playlist_viewer_ex(char* filename)
+bool playlist_viewer_ex(const char* filename)
 {
     bool ret = false;       /* return value */
     bool exit=false;        /* exit viewer */

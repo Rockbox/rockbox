@@ -25,8 +25,8 @@
 #include "lcd.h"
 #include "bmp.h"
 
-bool load_main_backdrop(char* filename);
-bool load_wps_backdrop(char* filename);
+bool load_main_backdrop(const char* filename);
+bool load_wps_backdrop(const char* filename);
 
 void unload_main_backdrop(void);
 void unload_wps_backdrop(void);
@@ -37,7 +37,7 @@ void show_wps_backdrop(void);
 #endif /* LCD_DEPTH > 1 */
 
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
-bool load_remote_wps_backdrop(char* filename);
+bool load_remote_wps_backdrop(const char* filename);
 void unload_remote_wps_backdrop(void);
 void show_remote_wps_backdrop(void);
 void show_remote_main_backdrop(void); /* only clears the wps backdrop */
