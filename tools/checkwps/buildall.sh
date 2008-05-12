@@ -3,6 +3,6 @@ cat targets.txt | (
     while read target model
     do
         rm -f checkwps.$model
-        make MODEL=$model TARGET=$target checkwps.$model
+        make MODEL=$model TARGET=$target checkwps
     done
 )

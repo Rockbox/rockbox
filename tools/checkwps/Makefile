@@ -9,6 +9,16 @@
 
 ROOT=../..
 
+ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
+CFLAGS+=-mno-cygwin
+ext = .exe
+else
+ifeq ($(findstring MINGW,$(shell uname)),MINGW)
+EXT = .exe
+CC = mingw32-gcc
+endif
+endif
+
 COMMON=$(ROOT)/apps/gui/wps_parser.c \
        $(ROOT)/apps/gui/wps_debug.c \
        $(ROOT)/apps/misc.c \
@@ -24,9 +34,9 @@ CFLAGS = -g -D__PCTOOL__ -DDEBUG -DROCKBOX_DIR_LEN=9 -DWPS_DIR=\".\"
 all:
 	@echo To build, run the buildall.sh script
 
-checkwps.$(MODEL): checkwps.c  $(COMMON)
+checkwps: checkwps.c  $(COMMON)
 	@echo CC [$(TARGET)]
-	@$(CC) $(INCLUDE) $(CFLAGS) $(COMMON) -D$(TARGET) checkwps.c -o $@
+	@$(CC) $(INCLUDE) $(CFLAGS) $(COMMON) -D$(TARGET) checkwps.c -o $@.$(MODEL)$(EXT)
 
 clean:
-	rm -f checkwps.$(MODEL)
+	rm -f checkwps.$(MODEL)$(EXT)
