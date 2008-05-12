@@ -77,12 +77,12 @@ int read_line(int fd, char* buffer, int buffer_size)
     return errno ? -1 : num_read;
 }
 
-bool load_wps_backdrop(char* filename)
+bool load_wps_backdrop(const char* filename)
 {
     return true;
 }
 
-bool load_remote_wps_backdrop(char* filename)
+bool load_remote_wps_backdrop(const char* filename)
 {
     return true;
 }
