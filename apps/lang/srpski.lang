@@ -11577,13 +11577,16 @@
   desc: in system settings menu
   user:
   <source>
-    *: "Accessory Power Supply"
+    *: none
+    accessory_supply: "Accessory Power Supply"
   </source>
   <dest>
-    *: "Напајање додатних уређаја"
+    *: none
+    accessory_supply: "Напајање додатних уређаја"
   </dest>
   <voice>
-    *: "Напајање додатних уређаја"
+    *: none
+    accessory_supply: "Напајање додатних уређаја"
   </voice>
 </phrase>
 <phrase>
