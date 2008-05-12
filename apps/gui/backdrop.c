@@ -124,7 +124,7 @@ static bool load_remote_backdrop(const char* filename, fb_remote_data* backdrop_
     }
 }
 
-bool load_remote_wps_backdrop(char* filename)
+bool load_remote_wps_backdrop(const char* filename)
 {
     remote_wps_backdrop_valid = load_remote_backdrop(filename, &remote_wps_backdrop[0][0]);
     return remote_wps_backdrop_valid;
