@@ -157,9 +157,6 @@ static inline int ipod_4g_button_read(void)
                         wheel_keycode = BUTTON_SCROLL_BACK;
                     else 
                         wheel_keycode = BUTTON_NONE;
-                      
-                    /* be able to read wheel action via button_read_device() */  
-                    btn |= wheel_keycode;
 
                     if (wheel_keycode != BUTTON_NONE)
                     {

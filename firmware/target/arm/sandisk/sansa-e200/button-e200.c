@@ -131,9 +131,6 @@ void clickwheel_int(void)
             btn = BUTTON_SCROLL_FWD;
         else if (old_wheel_value == wheel_tbl[1][wheel_value >> 6])
             btn = BUTTON_SCROLL_BACK;
-            
-        /* be able to read wheel action via button_read_device() */
-        int_btn |= btn;
 
         if (btn != BUTTON_NONE)
         {
