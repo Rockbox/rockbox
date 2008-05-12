@@ -11,7 +11,7 @@ ROOT=../..
 
 ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
 CFLAGS+=-mno-cygwin
-ext = .exe
+EXT = .exe
 else
 ifeq ($(findstring MINGW,$(shell uname)),MINGW)
 EXT = .exe
