@@ -678,6 +678,7 @@ cat <<EOF
                        71) M:Robe 100
  ==Creative==
  90) Zen Vision:M
+ 91) Zen Vision
 
 EOF
 
@@ -1469,6 +1470,30 @@ fi
     toolset=$ipodbitmaptools
     boottool="$rootdir/tools/scramble -creative=zvm"
     bootoutput="rockbox.zvmboot"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tms320dm320"
+    t_model="creative-zvm"
+    ;;
+    
+    91|creativezenvision)
+    target_id=35
+    modelname="creativezm"
+    target="-DCREATIVE_ZVM -DZEN_VISION"
+    memory=64
+    arm926ejscc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
+    tool="$rootdir/tools/scramble -creative=zenvision"
+    output="rockbox.zv"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    toolset=$ipodbitmaptools
+    boottool="$rootdir/tools/scramble -creative=zenvision"
+    bootoutput="rockbox.zv"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="tms320dm320"

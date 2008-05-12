@@ -151,7 +151,11 @@
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
+#ifndef ZEN_VISION
 #define BOOTFILE_EXT "zvm"
+#else
+#define BOOTFILE_EXT "zv"
+#endif
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
@@ -169,8 +173,4 @@
 
 #define DO_THREAD_TEST
 #endif
-
-
-//Uncomment next line to make this build Zen Vision compatible
-//#define ZEN_VISION
 #endif
