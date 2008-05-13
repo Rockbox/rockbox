@@ -501,7 +501,7 @@ static void codec_thread(void)
 static uintptr_t* codec_stack;
 static size_t codec_stack_size;
 
-static enum plugin_status test_track(char* filename)
+static enum plugin_status test_track(const char* filename)
 {
     size_t n;
     int fd;
@@ -511,7 +511,7 @@ static enum plugin_status test_track(char* filename)
     unsigned long speed;
     unsigned long duration;
     struct thread_entry* codecthread_id;
-    char* ch;
+    const char* ch;
 
     /* Display filename (excluding any path)*/
     ch = rb->strrchr(filename, '/');
