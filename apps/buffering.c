@@ -522,6 +522,8 @@ static void update_data_counters(void)
     size_t remaining = 0;
     size_t useful = 0;
 
+    mutex_lock(&llist_mutex);
+
     m = first_handle;
     while (m) {
         buffered += m->available;
@@ -536,6 +538,8 @@ static void update_data_counters(void)
 
         m = m->next;
     }
+
+    mutex_unlock(&llist_mutex);
 
     data_counters.buffered = buffered;
     data_counters.wasted = wasted;
