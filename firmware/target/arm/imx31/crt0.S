@@ -200,21 +200,25 @@ remap_start:
     mrc     p15, 0, r0, c1, c0, 0
     bic     r0, r0, #((1 << 29) | /* AF by AP disabled */ \
                       (1 << 28) | /* TEX remap disabled */ \
-                      (1 << 24) | /* Vectored interrupt OFF */ \
-                      (1 << 23) | /* Sub AP bits enabled (compatible) */ \
-                      (1 << 22))  /* Unaligned access support disabled */
+                      (1 << 23))  /* Sub AP bits enabled (compatible) */
     bic     r0, r0, #((1 << 21) | /* All performance features enabled */ \
                       (1 << 15))  /* Loads to PC set T bit */
     bic     r0, r0, #((1 << 13))  /* Low vectors */
+    bic     r0, r0, #((1 <<  1))  /* Strict alignment disabled */
+    orr     r0, r0, #((1 << 24) | /* Vectored interrupt ON */ \
+                      (1 << 22))  /* Unaligned access support enabled */
     orr     r0, r0, #((1 << 14) | /* Round-robin replacement for I/D caches */ \
                       (1 << 12) | /* L1 I-cache enabled */ \
                       (1 << 11) | /* Program flow prediction enabled */ \
                       (1 <<  9) | /* ROM protection enabled */ \
                       (1 <<  8))  /* MMU protection enabled */
     orr     r0, r0, #((1 <<  2) | /* L1 D-cache enabled */ \
-                      (1 <<  1) | /* Strict alignment enabled */ \
                       (1 <<  0))  /* MMU enabled */
     mcr     p15, 0, r0, c1, c0, 0
+    nop
+    nop
+    nop
+    nop
     nop
     nop
     nop
