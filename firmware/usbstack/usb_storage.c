@@ -605,7 +605,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     unsigned char lun = cbw->lun;
 #endif
     unsigned int block_size_mult = 1;
-#ifdef HAVE_HOTSWAP
+#if defined(HAVE_ATA_SD) || defined(HAVE_HOTSWAP)
     tCardInfo* cinfo = card_get_info(lun);
     if(cinfo->initialized==1 && cinfo->numblocks > 0) {
         block_size = cinfo->blocksize;

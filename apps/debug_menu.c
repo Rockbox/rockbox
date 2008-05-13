@@ -60,8 +60,8 @@
 #include "fat.h"
 #include "mas.h"
 #include "eeprom_24cxx.h"
-#if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
-#include "ata_mmc.h"
+#if defined(HAVE_MMC) || defined(HAVE_ATA_SD)
+#include "hotswap.h"
 #endif
 #if CONFIG_TUNER
 #include "tuner.h"
@@ -1716,7 +1716,7 @@ static bool view_battery(void)
 #endif
 
 #ifndef SIMULATOR
-#if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
+#if defined(HAVE_MMC) || defined(HAVE_ATA_SD)
 #if defined(HAVE_MMC)
 #define CARDTYPE "MMC"
 #else
@@ -1737,10 +1737,12 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         "3.1-3.31", "4.0" };
     if ((btn == ACTION_STD_OK) || (btn == SYS_FS_CHANGED) || (btn == ACTION_REDRAW))
     {
+#ifdef HAVE_HOTSWAP
         if (btn == ACTION_STD_OK)
         {
             *cardnum ^= 0x1; /* change cards */
         }
+#endif
 
         simplelist_set_line_count(0);
 
@@ -1814,7 +1816,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     }
     return btn;
 }
-#else /* !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP) */
+#else /* !defined(HAVE_MMC) && !defined(HAVE_ATA_SD) */
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
     (void)lists;
@@ -1948,12 +1950,13 @@ static bool dbg_identify_info(void)
     }
     return false;
 }
-#endif /* !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP) */
+#endif /* !defined(HAVE_MMC) && !defined(HAVE_ATA_SD) */
+
 static bool dbg_disk_info(void)
 {
     struct simplelist_info info;
     simplelist_info_init(&info, "Disk Info", 1, NULL);
-#if defined(HAVE_MMC) || defined(HAVE_HOTSWAP)
+#if defined(HAVE_MMC) || defined(HAVE_ATA_SD)
     char title[16];
     int card = 0;
     info.callback_data = (void*)&card;
@@ -2536,7 +2539,7 @@ static const struct the_menu_item menuitems[] = {
 #endif
 #ifndef SIMULATOR
         { "View disk info", dbg_disk_info },
-#if !defined(HAVE_MMC) && !defined(HAVE_HOTSWAP)
+#if !defined(HAVE_MMC) && !defined(HAVE_ATA_SD)
         { "Dump ATA identify info", dbg_identify_info},
 #endif
 #endif

@@ -113,6 +113,9 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
+/* define this if the flash memory uses the SecureDigital Memory Card protocol */
+#define HAVE_ATA_SD
+
 #define BATTERY_CAPACITY_DEFAULT 530    /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 530        /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 530        /* max. capacity selectable */

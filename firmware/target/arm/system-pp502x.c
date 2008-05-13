@@ -54,17 +54,19 @@ void irq(void)
         else if (CPU_HI_INT_STAT & I2C_MASK)
             ipod_4g_button_int();
 #elif defined(SANSA_E200)
+#ifdef HAVE_HOTSWAP
         else if (CPU_HI_INT_STAT & GPIO0_MASK) {
             if (GPIOA_INT_STAT & 0x80)
                 microsd_int();
         }
+#endif
         else if (CPU_HI_INT_STAT & GPIO1_MASK) {
             if (GPIOF_INT_STAT & 0xff)
                 button_int();
             if (GPIOH_INT_STAT & 0xc0)
                 clickwheel_int();
         }
-#elif defined(SANSA_C200)
+#elif defined(SANSA_C200) && defined(HAVE_HOTSWAP)
         else if (CPU_HI_INT_STAT & GPIO2_MASK) {
             if (GPIOL_INT_STAT & 0x08)
                 microsd_int();

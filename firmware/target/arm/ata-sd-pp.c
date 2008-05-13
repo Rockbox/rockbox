@@ -18,9 +18,7 @@
  ****************************************************************************/
 #include "fat.h"
 #include "hotswap.h"
-#ifdef BOOTLOADER
 #include "ata-sd-target.h"
-#endif
 #include "ata_idle_notify.h"
 #include "system.h"
 #include <string.h>
@@ -1278,16 +1276,20 @@ tCardInfo *card_get_info_target(int card_no)
     return &card;
 }
 
-#ifdef HAVE_HOTSWAP
 bool card_detect_target(void)
 {
+#ifdef HAVE_HOTSWAP
 #ifdef SANSA_E200
     return (GPIOA_INPUT_VAL & 0x80) == 0; /* low active */
 #elif defined SANSA_C200
     return (GPIOL_INPUT_VAL & 0x08) != 0; /* high active */
 #endif
+#else
+    return false;
+#endif
 }
 
+#ifdef HAVE_HOTSWAP
 static bool sd1_oneshot_callback(struct timeout *tmo)
 {
     (void)tmo;

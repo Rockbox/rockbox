@@ -40,6 +40,9 @@ typedef struct
 
 tCardInfo *card_get_info_target(int card_no);
 bool       card_detect_target(void);
+
+#ifdef HAVE_HOTSWAP
 void       card_enable_monitoring_target(bool on);
+#endif
 
 #endif
