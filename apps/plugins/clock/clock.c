@@ -54,7 +54,7 @@ const struct button_mapping* plugin_contexts[]={
 #define ACTION_SKIN_PREV PLA_DEC
 #define ACTION_SKIN_PREV_REPEAT PLA_DEC_REPEAT
 
-extern struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 /**************************
  * Cleanup on plugin return
@@ -109,7 +109,7 @@ void format_date(char* buffer, struct time* time, enum date_format format){
 /**********************************************************************
  * Plugin starts here
  **********************************************************************/
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter){
     int button;
     int last_second = -1;
     bool redraw=true;

@@ -92,7 +92,7 @@ PLUGIN_HEADER
 # endif
 #endif
 
-static struct plugin_api* rb; /* global api struct pointer */
+static const struct plugin_api* rb; /* global api struct pointer */
 
 #ifdef HAVE_LCD_COLOR
 /* RGB color sets */
@@ -102,7 +102,7 @@ static int colorset[NUM_COLORSETS][3] = { { 255, 255, 255 } ,    /* white */
 #endif /* HAVE_LCD_COLOR */
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     (void)parameter;
     rb = api;

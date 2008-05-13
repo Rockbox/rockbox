@@ -192,7 +192,7 @@ PLUGIN_HEADER
 #define MIN_DISTANCE ((BUBBLE_WIDTH*8)/10)*((BUBBLE_HEIGHT*8)/10)
 
 /* global rockbox api */
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* levels */
 char level[NUM_LEVELS][BB_LEVEL_HEIGHT][BB_WIDTH] = {
@@ -2585,7 +2585,7 @@ static int bubbles(struct game_context* bb) {
 /*****************************************************************************
 * plugin entry point.
 ******************************************************************************/
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
     struct game_context bb;
     bool exit = false;
     int position;

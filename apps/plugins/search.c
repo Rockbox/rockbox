@@ -22,7 +22,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 #define BUFFER_SIZE 16384
 
@@ -114,7 +114,7 @@ static void clear_display(void){
     }
 }
 
-static bool search_init(char* file){
+static bool search_init(const char* file){
     rb->memset(search_string, 0, sizeof(search_string));
 
     if (!rb->kbd_input(search_string,sizeof search_string)){
@@ -144,10 +144,10 @@ static bool search_init(char* file){
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int ok;
-    char *filename = parameter;
+    const char *filename = parameter;
     char *p;
 
     rb = api;

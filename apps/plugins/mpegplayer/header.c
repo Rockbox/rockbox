@@ -26,7 +26,7 @@
 
 #include "mpeg2dec_config.h"
 
-extern struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 #include "mpeg2.h"
 #include "attributes.h"

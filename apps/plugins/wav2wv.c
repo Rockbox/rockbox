@@ -27,7 +27,7 @@ PLUGIN_HEADER
 
 #define SAMPLES_PER_BLOCK 22050
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 void *memset(void *s, int c, size_t n) {
   return(rb->memset(s,c,n));
@@ -102,34 +102,35 @@ static void wvupdate (int32_t start_tick,
 
 static int32_t temp_buffer [TEMP_SAMPLES] IDATA_ATTR;
 
-static int wav2wv (char *filename)
+static int wav2wv(const char *infile)
 {
     int in_fd, out_fd, num_chans, error = false, last_buttons;
     unsigned int32_t total_bytes_read = 0, total_bytes_written = 0;
     unsigned int32_t total_samples, samples_remaining;
     int32_t *input_buffer = (int32_t *) audiobuf;
     unsigned char *output_buffer = (unsigned char *)(audiobuf + 0x100000);
-    char *extension, save_a;
+    char outfile[MAX_PATH];
+    const char *inextension;
+    char *outextension;
     WavpackConfig config;
     WavpackContext *wpc;
     int32_t start_tick;
 
     rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, (unsigned char *)filename);
+    rb->lcd_puts_scroll(0, 0, (unsigned char *)infile);
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
 #endif
 
     last_buttons = rb->button_status ();
     start_tick = *rb->current_tick;
-    extension = filename + rb->strlen (filename) - 3;
-
-    if (rb->strcasecmp (extension, "wav")) {
+    inextension = infile + rb->strlen(infile) - 3;
+    if (rb->strcasecmp (inextension, "wav")) {
         rb->splash(HZ*2, "only for wav files!");
         return 1;
     }
 
-    in_fd = rb->open(filename, O_RDONLY);
+    in_fd = rb->open(infile, O_RDONLY);
 
     if (in_fd < 0) {
         rb->splash(HZ*2, "could not open file!");
@@ -171,14 +172,12 @@ static int wav2wv (char *filename)
     }
 
     WavpackAddWrapper (wpc, &raw_header, sizeof (raw_header));
-    save_a = extension [1];
-    extension [1] = extension [2];
-    extension [2] = 0;
 
-    out_fd = rb->creat (filename);
-
-    extension [2] = extension [1];
-    extension [1] = save_a;
+    rb->strcpy(outfile, infile);
+    outextension = outfile + rb->strlen(outfile) - 3; 
+    outextension[1] = outextension[2];
+    outextension[2] = 0;
+    out_fd = rb->creat(outfile);
 
     if (out_fd < 0) {
         rb->splash(HZ*2, "could not create file!");
@@ -278,12 +277,7 @@ static int wav2wv (char *filename)
     rb->close (in_fd);
 
     if (error) {
-        save_a = extension [1];
-        extension [1] = extension [2];
-        extension [2] = 0;
-        rb->remove (filename);
-        extension [2] = extension [1];
-        extension [1] = save_a;
+        rb->remove (outfile);
     }
     else
         rb->splash(HZ*3, "operation successful");
@@ -291,7 +285,7 @@ static int wav2wv (char *filename)
     return error;
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void *parameter)
 {
 #ifdef RB_PROFILE
     /* This doesn't start profiling or anything, it just gives the

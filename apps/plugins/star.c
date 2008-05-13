@@ -310,7 +310,7 @@ static char board[STAR_HEIGHT][STAR_WIDTH];
 static int char_width = -1;
 static int char_height = -1;
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* this arrays contains a group of levels loaded into memory */
 static unsigned char* levels =
@@ -1101,7 +1101,7 @@ static int star_menu(void)
 /**
  * Main entry point
  */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     (void)parameter;
     rb = api;

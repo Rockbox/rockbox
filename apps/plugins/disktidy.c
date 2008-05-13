@@ -19,7 +19,7 @@
 #include "plugin.h"
 
 PLUGIN_HEADER
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* function return values */
 enum tidy_return
@@ -412,7 +412,7 @@ int tidy_lcd_menu(void)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     enum tidy_system system = TIDY_ALL;
     enum tidy_return status;

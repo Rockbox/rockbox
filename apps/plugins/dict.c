@@ -22,7 +22,7 @@
 PLUGIN_HEADER
 
 /* save the plugin api pointer. */
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 /* screen info */
 static int display_columns, display_lines;
 
@@ -138,7 +138,7 @@ long reverse (long N) {
 #define DICT_DESC ROCKBOX_DIR "/rocks/apps/dict.desc"
 
 /* the main plugin function */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     char searchword[WORDLEN]; /* word to search for */
     char *description; /* pointer to description buffer */

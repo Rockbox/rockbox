@@ -171,7 +171,7 @@ PLUGIN_HEADER
 #endif
 #endif
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 static int stopwatch = 0;
 static long start_at = 0;
@@ -228,7 +228,7 @@ static void ticks_to_string(int ticks,int lap,int buflen, char * buf)
     }
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     char buf[32];
     int button;

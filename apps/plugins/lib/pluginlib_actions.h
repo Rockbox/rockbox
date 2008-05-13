@@ -58,7 +58,7 @@ extern const struct button_mapping generic_left_right_fire[];
 extern const struct button_mapping generic_actions[];
 extern const struct button_mapping generic_increase_decrease[];
 
-int pluginlib_getaction(struct plugin_api *api,int timeout,
+int pluginlib_getaction(const struct plugin_api *api,int timeout,
                         const struct button_mapping *plugin_contexts[],
                         int count);
 

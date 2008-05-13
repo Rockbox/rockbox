@@ -273,7 +273,7 @@ PLUGIN_HEADER
 #define MYXLCD(fn) xlcd_ ## fn
 #endif
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* Fixed point format s5.26: sign, 5 bits integer part, 26 bits fractional part */
 static long x_min;
@@ -661,7 +661,7 @@ void cleanup(void *parameter)
 #define REDRAW_PARTIAL 1
 #define REDRAW_FULL    2
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int button;
     int lastbutton = BUTTON_NONE;

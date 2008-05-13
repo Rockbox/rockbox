@@ -191,11 +191,11 @@ int32_t gmbuf[BUF_SIZE*NBUF];
 static unsigned int samples_in_buf;
 
 int quit=0;
-struct plugin_api * rb;
+const struct plugin_api * rb;
 
-static int midimain(void * filename);
+static int midimain(const void * filename);
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int retval = 0;
 
@@ -292,7 +292,7 @@ void get_more(unsigned char** start, size_t* size)
 #endif
 }
 
-static int midimain(void * filename)
+static int midimain(const void * filename)
 {
     int notesUsed = 0;
     int a=0;

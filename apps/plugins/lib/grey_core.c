@@ -478,7 +478,7 @@ static void fill_gvalues(void)
 
    The function is authentic regarding memory usage on the simulator, even
    if it doesn't use all of the allocated memory. */
-bool grey_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
+bool grey_init(const struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
                unsigned features, int width, int height, long *buf_taken)
 {
     int bdim, i;

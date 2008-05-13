@@ -26,7 +26,7 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-void xlcd_init(struct plugin_api* newrb);
+void xlcd_init(const struct plugin_api* newrb);
 void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3);
 void xlcd_filltriangle_screen(struct screen* display,
                          int x1, int y1, int x2, int y2, int x3, int y3);
@@ -49,7 +49,7 @@ void xlcd_scroll_up(int count);
 void xlcd_scroll_down(int count);
 
 /* internal stuff */
-extern struct plugin_api *_xlcd_rb; /* global api struct pointer */
+extern const struct plugin_api *_xlcd_rb; /* global api struct pointer */
 
 #endif /* HAVE_LCD_BITMAP */
 #endif /* __XLCD_H__ */

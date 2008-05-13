@@ -119,7 +119,7 @@ extern const fb_data matrix_normal[];
 #define SLEEP HZ/50
 
 /* Codec api pointer */
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* Each position is of this type */
 typedef struct cmatrix {
@@ -284,7 +284,7 @@ static void matrix_loop(void)
     }
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
     int button;
     int sleep = SLEEP;
     bool frozen = false;

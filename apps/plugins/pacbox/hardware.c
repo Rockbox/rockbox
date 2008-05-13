@@ -25,7 +25,7 @@
 #include "plugin.h"
 #include "hardware.h"
 
-extern struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 /* The main data for Pacman  */
 

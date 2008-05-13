@@ -58,7 +58,7 @@ typedef struct _reversi_board_t {
      */
     move_t history[BOARD_SIZE*BOARD_SIZE - INIT_STONES];
 
-    struct plugin_api *rb;
+    const struct plugin_api *rb;
 } reversi_board_t;
 
 

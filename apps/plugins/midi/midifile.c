@@ -26,7 +26,7 @@ int readID(int file);
 
 struct MIDIfile midi_file IBSS_ATTR;
 
-struct MIDIfile * loadFile(char * filename)
+struct MIDIfile * loadFile(const char * filename)
 {
     struct MIDIfile * mfload;
     int file = rb->open (filename, O_RDONLY);

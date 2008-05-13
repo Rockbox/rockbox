@@ -3178,7 +3178,7 @@ void rec_tick(void) __attribute__((interrupt_handler));
 
 /* variables */
 
-static struct plugin_api *rb;
+static const struct plugin_api *rb;
 
 /* settings */
 struct rec_config {
@@ -3752,7 +3752,7 @@ static int recording_menu(void)
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
 	ssize_t buf_size;
 	int align;

@@ -25,7 +25,7 @@
 PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
-static struct plugin_api* rb; /* global api struct pointer */
+static const struct plugin_api* rb; /* global api struct pointer */
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define AST_PAUSE BUTTON_ON
@@ -2022,7 +2022,7 @@ enum plugin_status start_game(void)
     }
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     enum plugin_status retval;
     (void)(parameter);

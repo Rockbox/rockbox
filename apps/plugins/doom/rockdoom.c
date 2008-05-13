@@ -99,7 +99,7 @@ int my_close(int id)
    return 0;
 }
 #endif
-struct plugin_api* rb;
+const struct plugin_api* rb;
 #define MAXARGVS  100
 
 bool noprintf=0;  // Variable disables printf lcd updates to protect grayscale lib/direct lcd updates
@@ -675,7 +675,7 @@ int doom_menu()
 
 extern int systemvol;
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
    PLUGIN_IRAM_INIT(api)
 

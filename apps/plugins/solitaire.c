@@ -28,7 +28,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 #define min(a,b) (a<b?a:b)
 
 /**
@@ -1843,7 +1843,7 @@ int solitaire( int skipmenu )
  * Plugin entry point
  */
 
-enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
+enum plugin_status plugin_start( const struct plugin_api* api, const void* parameter )
 {
     int result;
 

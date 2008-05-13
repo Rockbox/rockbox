@@ -78,7 +78,7 @@ const struct button_mapping *plugin_contexts[]={
 };
 #define PLA_ARRAY_COUNT sizeof(plugin_contexts)/sizeof(plugin_contexts[0])
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 MEM_FUNCTION_WRAPPERS(rb);
 
@@ -299,7 +299,7 @@ void tap(void)
     reset_tap = false;
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter){
     int button;
     enum plugin_status status;
 

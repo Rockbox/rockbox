@@ -19,9 +19,9 @@
 #include "plugin.h"
 #include "highscore.h"
 
-static struct plugin_api *rb;
+static const struct plugin_api *rb;
 
-void highscore_init(struct plugin_api* newrb)
+void highscore_init(const struct plugin_api* newrb)
 {
     rb = newrb;
 }

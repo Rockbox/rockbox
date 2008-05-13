@@ -32,7 +32,7 @@
 
 #define SHORTCUTS_FILENAME "/shortcuts.link"
 
-extern struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 typedef struct sc_entry_s
 {

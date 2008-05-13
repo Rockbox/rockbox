@@ -99,7 +99,7 @@ static const unsigned char ramsize_table[5] =
     0, 1, 1, 4, 16
 };
 
-static char *romfile;
+static const char *romfile;
 static char sramfile[500];
 static char rtcfile[500];
 static char saveprefix[500];
@@ -284,7 +284,7 @@ void cleanup(void)
     /* IDEA - if error, write emergency savestate..? */
 }
 
-void loader_init(char *s)
+void loader_init(const char *s)
 {
     romfile = s;
     if(rom_load())

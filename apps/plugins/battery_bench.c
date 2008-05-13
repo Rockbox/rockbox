@@ -169,14 +169,14 @@ PLUGIN_HEADER
 #endif
 
 /****************************** Plugin Entry Point ****************************/
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 MEM_FUNCTION_WRAPPERS(rb);
 int main(void);
 bool exit_tsr(bool);
 void thread(void);
 
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     (void)parameter;
     rb = api;

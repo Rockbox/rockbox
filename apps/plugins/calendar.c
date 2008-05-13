@@ -25,7 +25,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 static bool leap_year;
 static int days_in_month[2][13] = {
@@ -659,7 +659,7 @@ static void prev_day(struct shown *shown, int step)
         draw_calendar(shown);
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     struct today today;
     struct shown shown;

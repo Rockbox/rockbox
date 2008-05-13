@@ -133,8 +133,8 @@ void sound_neutral(void); /* set to everything flat and 0 dB volume */
 void sound_normal(void); /* return to user settings */
 
 void thread(void); /* the thread running it all */
-int main(void* parameter); /* main loop */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter); /* entry */
+int main(const void* parameter); /* main loop */
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter); /* entry */
 
 
 /****************** data types ******************/
@@ -207,7 +207,7 @@ struct
     struct thread_entry *thread; /* worker thread id */
 } gTread;
 
-static struct plugin_api* rb; /* here is the global API struct pointer */
+static const struct plugin_api* rb; /* here is the global API struct pointer */
 
 
 /****************** implementation ******************/
@@ -1133,7 +1133,7 @@ bool exit_tsr(bool reenter)
 /****************** main ******************/
 
 
-int main(void* parameter)
+int main(const void* parameter)
 {
     (void)parameter;
 #ifdef DEBUG
@@ -1189,7 +1189,7 @@ int main(void* parameter)
 /***************** Plugin Entry Point *****************/
 
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     rb = api; /* copy to global api pointer */
 

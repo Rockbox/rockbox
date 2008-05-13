@@ -27,12 +27,12 @@
 
 /*** globals ***/
 
-struct plugin_api *_xlcd_rb = NULL; /* global api struct pointer */
+const struct plugin_api *_xlcd_rb = NULL; /* global api struct pointer */
 
 /*** functions ***/
 
 /* library init */
-void xlcd_init(struct plugin_api* newrb)
+void xlcd_init(const struct plugin_api* newrb)
 {
     _xlcd_rb = newrb;
 }

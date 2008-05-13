@@ -39,7 +39,7 @@ PLUGIN_IRAM_DECLARE
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* Screen logging */
 static int line;
@@ -334,7 +334,7 @@ static void time_greyscale(void)
 #endif
 
 /* plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
 #ifndef SIMULATOR
     char str[32];

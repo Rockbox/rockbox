@@ -120,12 +120,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 111
+#define PLUGIN_API_VERSION 112
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 108
+#define PLUGIN_MIN_API_VERSION 112
 
 /* plugin return codes */
 enum plugin_status {
@@ -291,7 +291,7 @@ struct plugin_api {
     void (*viewport_set_defaults)(struct viewport *vp, enum screen_type screen);
     /* list */
     void (*gui_synclist_init)(struct gui_synclist * lists,
-            list_get_name callback_get_item_name,void * data,
+            list_get_name callback_get_item_name, void * data,
             bool scroll_all,int selected_size,
             struct viewport parent[NB_SCREENS]);
     void (*gui_synclist_set_nb_items)(struct gui_synclist * lists, int nb_items);
@@ -754,7 +754,7 @@ struct plugin_header {
     unsigned short api_version;
     unsigned char *load_addr;
     unsigned char *end_addr;
-    enum plugin_status(*entry_point)(struct plugin_api*, void*);
+    enum plugin_status(*entry_point)(const struct plugin_api*, const void*);
 };
 
 #ifdef PLUGIN
@@ -792,7 +792,7 @@ extern unsigned char plugin_end_addr[];
 #endif /* PLUGIN_USE_IRAM */
 #endif /* PLUGIN */
 
-int plugin_load(const char* plugin, void* parameter);
+int plugin_load(const char* plugin, const void* parameter);
 void* plugin_get_buffer(size_t *buffer_size);
 void* plugin_get_audio_buffer(size_t *buffer_size);
 #ifdef PLUGIN_USE_IRAM
@@ -806,7 +806,7 @@ void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
 void plugin_tsr(bool (*exit_callback)(bool reenter));
 
 /* defined by the plugin */
-enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* rockbox, const void* parameter)
     NO_PROF_ATTR;
 
 /* Use this macro in plugins where gcc tries to optimize by calling

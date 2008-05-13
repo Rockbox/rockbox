@@ -22,7 +22,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /***
  * FIREWORKS.C by ZAKK ROBERTS
@@ -385,7 +385,7 @@ void fireworks_menu(void)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     (void)parameter;
 

@@ -425,7 +425,7 @@ static long matrice[3][3];
 static const int nb_points = 8;
 static long z_off = 600;
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 static void cube_rotate(int xa, int ya, int za)
 {
@@ -580,7 +580,7 @@ void cleanup(void *parameter)
 #endif
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     char buffer[30];
     int t_disp = 0;

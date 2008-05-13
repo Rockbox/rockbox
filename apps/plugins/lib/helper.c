@@ -21,7 +21,7 @@
 #include "helper.h"
 
 /*  Force the backlight on */
-void backlight_force_on(struct plugin_api* rb)
+void backlight_force_on(const struct plugin_api* rb)
 {
     if(!rb)
         return;
@@ -34,7 +34,7 @@ void backlight_force_on(struct plugin_api* rb)
 }
 
 /*  Reset backlight operation to its settings */
-void backlight_use_settings(struct plugin_api* rb)
+void backlight_use_settings(const struct plugin_api* rb)
 {
     if (!rb)
         return;
@@ -47,7 +47,7 @@ void backlight_use_settings(struct plugin_api* rb)
 
 #ifdef HAVE_REMOTE_LCD
 /*  Force the backlight on */
-void remote_backlight_force_on(struct plugin_api* rb)
+void remote_backlight_force_on(const struct plugin_api* rb)
 {
     if (!rb)
         return;
@@ -60,7 +60,7 @@ void remote_backlight_force_on(struct plugin_api* rb)
 }
 
 /*  Reset backlight operation to its settings */
-void remote_backlight_use_settings(struct plugin_api* rb)
+void remote_backlight_use_settings(const struct plugin_api* rb)
 {
     if (!rb)
         return;
@@ -75,7 +75,7 @@ void remote_backlight_use_settings(struct plugin_api* rb)
 
 #ifdef HAVE_BUTTON_LIGHT
 /*  Force the buttonlight on */
-void buttonlight_force_on(struct plugin_api* rb)
+void buttonlight_force_on(const struct plugin_api* rb)
 {
     if (!rb)
         return;
@@ -84,7 +84,7 @@ void buttonlight_force_on(struct plugin_api* rb)
 }
 
 /*  Reset buttonlight operation to its settings */
-void buttonlight_use_settings(struct plugin_api* rb)
+void buttonlight_use_settings(const struct plugin_api* rb)
 {
     if (!rb)
         return;

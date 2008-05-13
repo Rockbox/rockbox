@@ -417,7 +417,7 @@ static int player3_dir = EAST;
 static int players = 1;
 
 /* the rockbox plugin api */
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 #define SETTINGS_VERSION 1
 #define SETTINGS_MIN_VERSION 1
@@ -2444,7 +2444,7 @@ bool launch_wormlet(void)
 /**
  * Main entry point
  */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int result;
     int menu_quit = 0;

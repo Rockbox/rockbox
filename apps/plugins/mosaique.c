@@ -141,7 +141,7 @@ PLUGIN_HEADER
 #endif
 #endif
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int button;
     int timer = 10;
@@ -149,7 +149,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int y=0;
     int sx = 3;
     int sy = 3;
-    struct plugin_api* rb = api;
+    const struct plugin_api* rb = api;
     (void)parameter;
 
 #ifdef HAVE_LCD_CHARCELLS

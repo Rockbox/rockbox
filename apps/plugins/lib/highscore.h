@@ -26,7 +26,7 @@ struct highscore
     int level;
 };
 
-void highscore_init(struct plugin_api* newrb);
+void highscore_init(const struct plugin_api* newrb);
 int highscore_save(char *filename, struct highscore *scores, int num_scores);
 int highscore_load(char *filename, struct highscore *scores, int num_scores);
 int highscore_update(int score, int level, struct highscore *scores, int num_scores);

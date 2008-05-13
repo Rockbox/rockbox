@@ -176,12 +176,12 @@ const unsigned char rockbox16x7[] = {
 #endif
 #endif
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
     int button;
     int timer = 10;
     int x = (DISPLAY_WIDTH / 2) - (LOGO_WIDTH / 2);
     int y = (DISPLAY_HEIGHT / 2) - (LOGO_HEIGHT / 2);
-    struct plugin_api* rb = api;
+    const struct plugin_api* rb = api;
     int dx;
     int dy;
 #ifdef HAVE_LCD_CHARCELLS

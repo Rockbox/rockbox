@@ -70,7 +70,7 @@ PLUGIN_HEADER
 #endif
 
 static short particles[NUM_PARTICLES][2];
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 #ifdef HAVE_LCD_BITMAP
 #if LCD_WIDTH >= 160
@@ -185,7 +185,7 @@ static void snow_init(void)
 #endif
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int button;
     (void)(parameter);

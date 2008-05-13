@@ -21,8 +21,8 @@
 #ifndef SPMAIN_H
 #define SPMAIN_H
 
-extern void check_params(void* parameter);
-extern void start_spectemu(void* parameter);
+extern void check_params(const void* parameter);
+extern void start_spectemu(const void* parameter);
 extern struct zxbox_settings settings;
 struct zxbox_settings {
     int invert_colors;

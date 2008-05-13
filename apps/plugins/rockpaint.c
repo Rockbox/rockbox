@@ -256,7 +256,7 @@ static void inv_cursor(bool update);
 static void restore_screen(void);
 static void clear_drawing(void);
 static void goto_menu(void);
-static int load_bitmap( char *filename );
+static int load_bitmap( const char *filename );
 static int save_bitmap( char *filename );
 static void draw_rect_full( int x1, int y1, int x2, int y2 );
 extern int errno;
@@ -269,7 +269,7 @@ extern int errno;
 int errno;
 #endif
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 MEM_FUNCTION_WRAPPERS(rb);
 
@@ -2953,7 +2953,7 @@ static bool rockpaint_loop( void )
     return PLUGIN_OK;
 }
 
-static int load_bitmap( char *file )
+static int load_bitmap( const char *file )
 {
     struct bitmap bm;
     bool ret;
@@ -2992,7 +2992,7 @@ static int save_bitmap( char *file )
     return save_bmp_file( file, &bm, rb );
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     /** must have stuff **/
     rb = api;

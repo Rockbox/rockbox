@@ -77,7 +77,7 @@ PLUGIN_HEADER
 #define PATTERN_ACORN      3
 #define PATTERN_GLIDER_GUN 4 /* not yet implemented */
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 const struct button_mapping *plugin_contexts[]
 = {generic_directions, generic_actions};
 
@@ -393,7 +393,7 @@ static void next_generation(char *pgrid, char *pnext_grid){
 /**********************************/
 /* this is the plugin entry point */
 /**********************************/
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int button = 0;
     int quit = 0;

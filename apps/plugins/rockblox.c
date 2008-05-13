@@ -507,7 +507,7 @@ extern const fb_data rockblox_background[];
 
 
 /* must have variable */
-static struct plugin_api *rb;
+static const struct plugin_api *rb;
 
 static bool gameover = false;
 /* c=current f=figure o=orientation n=next */
@@ -1159,7 +1159,7 @@ static int rockblox_loop (void)
     return PLUGIN_OK;
 }
 
-enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
+enum plugin_status plugin_start (const struct plugin_api *api, const void *parameter)
 {
     int ret;
 

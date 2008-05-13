@@ -519,17 +519,17 @@ static void run_singlemode(void)
 }
 
 
-void check_params(void* parameter)
+void check_params(const void* parameter)
 {
   spcf_read_conf_file(GLOBALCFG);
   spcf_read_command_line(parameter);
 }
 
-static void init_load(void *parameter)
+static void init_load(const void *parameter)
 {
   if(load_immed) snsh_z80_load_intern(loadim, loadim_size);
 
-  check_params (parameter);
+  check_params(parameter);
   if(spcf_init_snapshot != NULL) {
 #ifndef USE_GREY
     rb->splash(HZ, "Loading snapshot '%s'", spcf_init_snapshot);
@@ -548,7 +548,7 @@ static void init_load(void *parameter)
   }
 }
 
-void start_spectemu(void *parameter)
+void start_spectemu(const void *parameter)
 {
   spti_init();
   init_load(parameter);

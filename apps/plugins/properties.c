@@ -20,7 +20,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 MEM_FUNCTION_WRAPPERS(rb);
 
@@ -252,21 +252,23 @@ char * get_props(int selected_item, void* data, char *buffer, size_t buffer_len)
     return buffer;
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* file)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     rb = api;
     struct gui_synclist properties_lists;
     int button;
     bool prev_show_statusbar;
     bool quit = false;
+    char file[MAX_PATH];
+    rb->strcpy(file, (const char *) parameter);
 
     /* determine if it's a file or a directory */
     bool found = false;
     DIR* dir;
     struct dirent* entry;
-    char* ptr = rb->strrchr((char*)file, '/') + 1;
-    int dirlen = (ptr - (char*)file);
-    rb->strncpy(str_dirname, (char*)file, dirlen);
+    char* ptr = rb->strrchr(file, '/') + 1;
+    int dirlen = (ptr - file);
+    rb->strncpy(str_dirname, file, dirlen);
     str_dirname[dirlen] = 0;
 
     dir = rb->opendir(str_dirname);
@@ -288,13 +290,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     if(!found)
     {
         /* weird: we couldn't find the entry. This Should Never Happen (TM) */
-        rb->splash(0, "File/Dir not found: %s", (char*)file);
+        rb->splash(0, "File/Dir not found: %s", file);
         rb->action_userabort(TIMEOUT_BLOCK);
         return PLUGIN_OK;
     }
 
     /* get the info depending on its_a_dir */
-    if(!(its_a_dir ? dir_properties((char*)file):file_properties((char*)file)))
+    if(!(its_a_dir ? dir_properties(file) : file_properties(file)))
     {
         /* something went wrong (to do: tell user what it was (nesting,...) */
         rb->splash(0, "Failed to gather information");

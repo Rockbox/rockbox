@@ -24,7 +24,7 @@
 #include "autoconf.h"
 #include "z_zone.h"
 
-extern struct plugin_api* rb;
+extern const struct plugin_api* rb;
 extern bool noprintf;
 extern bool doomexit;
 

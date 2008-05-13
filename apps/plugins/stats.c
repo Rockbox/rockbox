@@ -20,7 +20,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 static int files, dirs, musicfiles, largestdir;
 static int lasttick;
 static bool abort;
@@ -183,7 +183,7 @@ void traversedir(char* location, char* name)
         largestdir = files_in_dir;
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int button;
 

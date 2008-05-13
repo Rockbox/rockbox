@@ -184,7 +184,7 @@ PLUGIN_HEADER
 #define IMAGE_HEIGHT BMPHEIGHT_sliding_puzzle
 #define IMAGE_SIZE IMAGE_WIDTH
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* use a square image, (the default Archos bitmap looks square on its display)
    Puzzle image dimension is min(lcd_height,lcd_width)
@@ -603,7 +603,7 @@ static int puzzle_loop(void)
     }
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int i, w, h;
 

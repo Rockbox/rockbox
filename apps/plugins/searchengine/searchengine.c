@@ -26,7 +26,7 @@ PLUGIN_HEADER
 void *audio_bufferbase;
 void *audio_bufferpointer;
 size_t audio_buffer_free;
-struct plugin_api* rb;
+const struct plugin_api* rb;
 int w, h, y;
 
 void *my_malloc(size_t size)
@@ -56,7 +56,7 @@ void setmallocpos(void *pointer)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     unsigned char *result,buf[500];
     int parsefd,hits;

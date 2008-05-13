@@ -648,7 +648,7 @@ void digital_meter(void) {
     rb->lcd_hline(0,LCD_WIDTH-1,half_height+3);
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
     int button;
     int lastbutton = BUTTON_NONE;
 

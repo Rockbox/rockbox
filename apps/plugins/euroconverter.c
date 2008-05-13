@@ -140,7 +140,7 @@ static unsigned char *abbrev_str[12] = {
 
 static unsigned long heuro,hhome; /*Handles for the new patterns*/
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 static char *currency_str[12] = {
    "France",
@@ -402,7 +402,7 @@ static void euro_exit(void *parameter)
 
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     bool end, pos;
     longlong_t e,h,old_e,old_h;

@@ -20,7 +20,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* temp byte buffer */
 uint8_t samples[10 * 1024]; /* read 10KB at the time */
@@ -100,7 +100,7 @@ void little_endian_to_native (void *data, char *format)
 /*  read WAV file
     display some info about it
     store peak info in aufiobuf for display routine */
-static int readwavpeaks(char *filename)
+static int readwavpeaks(const char *filename)
 {
     register uint32_t bytes_read;
     register uint32_t fppmp_count;
@@ -352,7 +352,7 @@ void show_help(void)
     rb->lcd_update();
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void *parameter)
 {
     unsigned int quit = 0;
     unsigned int action = 0;

@@ -69,7 +69,7 @@ const struct picture jackpot_pictures[]={
 #define SLEEP_TIME (HZ/200)
 #endif /* HAVE_LCD_CHARCELLS */
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 struct jackpot
 {
@@ -290,7 +290,7 @@ void jackpot_play_turn(struct jackpot* game)
         jackpot_print_turn_result(game, gain, rb->screens[d]);
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     rb = api;
     int action, i;

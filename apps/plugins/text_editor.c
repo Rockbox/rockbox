@@ -26,7 +26,7 @@
 #endif
 #define MAX_LINE_LEN 2048
 PLUGIN_HEADER
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 static char buffer[MAX_CHARS];
 static char eol[3];
@@ -118,8 +118,8 @@ int _do_action(int action, char* str, int line)
 char *list_get_name_cb(int selected_item, void* data,
                        char* buf, size_t buf_len)
 {
-    char *b = &buffer[do_action(ACTION_GET,0,selected_item)];
     (void)data;
+    char *b = &buffer[do_action(ACTION_GET,0,selected_item)];
     if (rb->strlen(b) >= buf_len)
     {
         char t = b[buf_len-10];
@@ -306,7 +306,7 @@ int hex_to_rgb(const char* hex, int* color)
 #endif /* HAVE_LCD_COLOR */
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int fd;
     static char temp_line[MAX_LINE_LEN];

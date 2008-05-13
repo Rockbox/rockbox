@@ -34,7 +34,7 @@ PLUGIN_HEADER
 #endif
 #define TEST_TIME 10 /* in seconds */
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 static unsigned char* audiobuf;
 static ssize_t audiobuflen;
 
@@ -404,7 +404,7 @@ static bool test_speed(void)
 
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     static const struct menu_item items[] = {
         { "Disk speed",     test_speed  },

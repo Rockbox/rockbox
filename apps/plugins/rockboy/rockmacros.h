@@ -26,7 +26,7 @@
 #define malloc(a) my_malloc(a)
 void *my_malloc(size_t size);
 
-extern struct plugin_api* rb;
+extern const struct plugin_api* rb;
 extern int shut,cleanshut;
 void vid_init(void);
 inline void vid_begin(void);

@@ -16,7 +16,7 @@
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 MEM_FUNCTION_WRAPPERS(rb);
 
@@ -806,7 +806,7 @@ static const int win_const[18][4] = {
   {   134, -146,-3352,-3072 } };
 
 
-static char*       wav_filename;
+static const char* wav_filename;
 static int         mp3file, wavfile, wav_size, frames;
 static uint32      enc_buffer[16384]; /* storage for 65536 Bytes */
 static int         enc_chunk = 0;     /* encode chunk counter    */
@@ -2278,7 +2278,7 @@ void compress(void)
 int  num_file;
 char mp3_name[80];
 
-void get_mp3_filename(char *wav_name)
+void get_mp3_filename(const char *wav_name)
 {
     int slen = rb->strlen(wav_name);
     rb->strncpy(mp3_name, wav_name, 79);
@@ -2353,7 +2353,7 @@ void get_mp3_filename(char *wav_name)
 #endif
 #endif
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int   rat, srat, nrat; /* for rate selection */
     int   cont = 1, butt;

@@ -5,7 +5,7 @@
 extern int load_tap;
 extern bool clear_kbd;
 extern bool exit_requested;
-extern struct plugin_api* rb;
+extern const struct plugin_api* rb;
 extern void press_key(int c);
 extern long video_frames;
 extern long start_time;

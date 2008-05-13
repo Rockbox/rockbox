@@ -30,7 +30,7 @@ PLUGIN_IRAM_DECLARE
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
    in the plugin */
-struct plugin_api* rb;
+const struct plugin_api* rb;
 int shut,cleanshut;
 char *errormsg;
 
@@ -275,7 +275,7 @@ void doevents(void)
     }
 }
 
-static int gnuboy_main(char *rom)
+static int gnuboy_main(const char *rom)
 {
     rb->lcd_puts(0,0,"Init video");
     vid_init();
@@ -297,7 +297,7 @@ static int gnuboy_main(char *rom)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     PLUGIN_IRAM_INIT(api)
 

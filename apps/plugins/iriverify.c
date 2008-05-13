@@ -25,7 +25,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 ssize_t buf_size;
 static char *filename;
@@ -130,7 +130,7 @@ static int write_file(void)
     return 0;
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     char *buf;
     int rc;

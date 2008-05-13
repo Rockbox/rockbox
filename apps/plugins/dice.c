@@ -44,7 +44,7 @@ struct dices
 #define PRINT_BUFFER_LENGTH MAX_DICES*4
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 static struct dices dice;
 static int sides_index;
 
@@ -72,7 +72,7 @@ void dice_print(struct dices* dice, struct screen* display);
 bool dice_menu(struct dices* dice);
 
 /* plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
     (void)parameter;
     rb = api;
     int i, action;

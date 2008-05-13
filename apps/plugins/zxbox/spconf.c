@@ -103,7 +103,7 @@ static int find_extension(const char *ext)
 
 
 /* now actually a snapshot/tape loader*/
-void spcf_read_command_line(void* parameter)
+void spcf_read_command_line(const void* parameter)
 {
   int ix;
 

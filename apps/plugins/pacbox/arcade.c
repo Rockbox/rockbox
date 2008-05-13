@@ -27,7 +27,7 @@
 #include <string.h>
 #include "plugin.h"
 
-extern struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 #ifndef HAVE_LCD_COLOR
 /* Convert RGB888 to 2-bit greyscale - logic taken from bmp2rb.c */

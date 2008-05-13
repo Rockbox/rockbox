@@ -3135,7 +3135,7 @@ void dma_end_isr(void)      __attribute__((interrupt_handler));
 
 /* variables */
 
-static struct plugin_api *rb;
+static const struct plugin_api *rb;
 
 static unsigned char *aud_buf;
 static ssize_t aud_size;
@@ -3647,7 +3647,7 @@ int play_file(char* filename)
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
 	ssize_t buf_size;
 

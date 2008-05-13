@@ -20,7 +20,7 @@
 #include "plugin.h"
 #include "playback_control.h"
 
-struct plugin_api* api = 0;
+const struct plugin_api* api = 0;
 struct viewport *parentvp = NULL;
 
 static bool prevtrack(void)
@@ -105,14 +105,14 @@ MAKE_MENU(playback_control_menu, "Playback Control", NULL, Icon_NOICON,
             &prevtrack_item, &playpause_item, &stop_item, &nexttrack_item,
             &volume_item, &shuffle_item, &repeat_mode_item);
 
-void playback_control_init(struct plugin_api* newapi,
+void playback_control_init(const struct plugin_api* newapi,
                            struct viewport parent[NB_SCREENS])
 {
     api = newapi;
     parentvp = parent;
 }
 
-bool playback_control(struct plugin_api* newapi,
+bool playback_control(const struct plugin_api* newapi,
                       struct viewport parent[NB_SCREENS])
 {
     api = newapi;

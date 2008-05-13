@@ -36,7 +36,7 @@ PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
 
-static struct plugin_api* rb; /* global api struct pointer */
+static const struct plugin_api* rb; /* global api struct pointer */
 static unsigned char wave_array[256];  /* Pre calculated wave array */
 #ifdef HAVE_LCD_COLOR
 static fb_data colours[256]; /* Smooth transition of shades */
@@ -343,7 +343,7 @@ int main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int ret;
 

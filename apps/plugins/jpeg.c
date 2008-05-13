@@ -279,7 +279,7 @@ GREY_INFO_STRUCT
 
 /******************************* Globals ***********************************/
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 MEM_FUNCTION_WRAPPERS(rb);
 
 /* for portability of below JPEG code */
@@ -3318,7 +3318,7 @@ int load_and_show(char* filename)
 
 /******************** Plugin entry point *********************/
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     rb = api;
 

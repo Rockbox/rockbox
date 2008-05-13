@@ -372,7 +372,7 @@ static struct BufferedBoards {
 } buffered_boards;
 
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 MEM_FUNCTION_WRAPPERS(rb);
 
 static char buf[ROWS*(COLS + 1)]; /* Enough for a whole board or a filename */
@@ -1576,7 +1576,7 @@ static bool sokoban_loop(void)
 }
 
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int w, h;
 

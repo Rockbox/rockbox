@@ -79,7 +79,7 @@ PLUGIN_HEADER
 #define BORDER_W  0x00000080
 #define PATH      0x00000100
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 #ifdef __PLUGINLIB_ACTIONS_H__
 const struct button_mapping *plugin_contexts[]
@@ -470,7 +470,7 @@ void maze_move_player_right(struct maze* maze)
 /**********************************/
 /* this is the plugin entry point */
 /**********************************/
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int button, lastbutton = BUTTON_NONE;
     int quit = 0;

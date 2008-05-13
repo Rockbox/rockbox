@@ -17,5 +17,5 @@
  *
  ****************************************************************************/
 
-struct MIDIfile * loadFile(char * filename);
+struct MIDIfile * loadFile(const char * filename);
 

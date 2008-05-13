@@ -25,7 +25,7 @@
 /*
  * Print a checkbox
  */
-void checkbox(struct plugin_api *api, int x, int y, int width, int height, bool checked)
+void checkbox(const struct plugin_api *api, int x, int y, int width, int height, bool checked)
 {
     /* draw box */
     api->lcd_drawrect(x, y, width, height);

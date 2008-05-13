@@ -52,7 +52,7 @@ PLUGIN_HEADER
 /* The global api struct pointer. While not strictly necessary,
    it's nice not to have to pass the api pointer in all function
    calls in the plugin */
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* Thickness of the grid lines */
 #define LINE_THCK 1
@@ -543,7 +543,7 @@ static void reversi_gui_move_cursor(int new_row, int new_col) {
 
 
 /* plugin entry point */
-enum plugin_status plugin_start(struct plugin_api *api, void *parameter) {
+enum plugin_status plugin_start(const struct plugin_api *api, const void *parameter) {
     bool exit, draw_screen;
     int button;
     int lastbutton = BUTTON_NONE;

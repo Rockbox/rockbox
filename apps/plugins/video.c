@@ -141,7 +141,7 @@ typedef struct /* the little header for all audio blocks */
 
 /****************** globals ******************/
 
-static struct plugin_api* rb; /* here is a global api struct pointer */
+static const struct plugin_api* rb; /* here is a global api struct pointer */
 static char gPrint[32]; /* a global printf buffer, saves stack */
 
 
@@ -986,7 +986,7 @@ int main(char* filename)
 
 /***************** Plugin Entry Point *****************/
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     rb = api; /* copy to global api pointer */
     

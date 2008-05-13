@@ -26,7 +26,7 @@
 /* Include standard plugin macro */
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* The plugin actions of interest. */
 const struct button_mapping *plugin_contexts[]
@@ -916,7 +916,7 @@ static void main_menu(void)
 /*****************************************************************************
 * Plugin entry point 
 ******************************************************************************/
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     enum plugin_status plugin_state;
 

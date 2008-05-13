@@ -35,7 +35,7 @@
 #include "sudoku.h"
 #include "templates.h"
 
-extern struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 #define assert(x)
 

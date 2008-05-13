@@ -26,7 +26,7 @@
 /**
  * Save bitmap to file
  */
-int save_bmp_file( char* filename, struct bitmap *bm, struct plugin_api* rb  );
+int save_bmp_file( char* filename, struct bitmap *bm, const struct plugin_api* rb  );
 #endif
 
 /**

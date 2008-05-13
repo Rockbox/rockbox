@@ -198,7 +198,7 @@ bool ends_with(char *string, char *suffix)
 }
 
 
-enum plugin_status plugin_start(struct plugin_api* api, void* void_parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* void_parameter)
 {
     rb = api;
     bool leave_loop;

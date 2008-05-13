@@ -95,7 +95,7 @@ typedef struct
     char name[32];
 } tFlashInfo;
 
-static struct plugin_api* rb; /* here is a global api struct pointer */
+static const struct plugin_api* rb; /* here is a global api struct pointer */
 
 static UINT8* sector; /* better not place this on the stack... */
 
@@ -1017,7 +1017,7 @@ void DoUserDialog(char* filename)
 
 /***************** Plugin Entry Point *****************/
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int oldmode;
 

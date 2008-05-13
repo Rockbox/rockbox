@@ -30,7 +30,7 @@ PLUGIN_HEADER
 #define TESTCODEC_EXITBUTTON BUTTON_SELECT
 #endif
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 CACHE_FUNCTION_WRAPPERS(rb)
 
@@ -629,7 +629,7 @@ exit:
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     uintptr_t* codec_stack_copy;
     int result, selection = 0;

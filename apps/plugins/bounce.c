@@ -167,7 +167,7 @@ PLUGIN_HEADER
 #endif
 #endif
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 #define LETTER_WIDTH  11
 #define LETTER_HEIGHT 16
@@ -573,7 +573,7 @@ static int loopit(void)
 }
 
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int w, h;
     char *off = "[Off] to stop";

@@ -27,7 +27,7 @@
 PLUGIN_HEADER
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     return run_overlay(api, parameter, PLUGIN_GAMES_DIR "/rockboy.ovl", "RockBoy");
 }

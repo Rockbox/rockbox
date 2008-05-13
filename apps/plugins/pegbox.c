@@ -25,7 +25,7 @@
 #endif
 #include "pegbox_pieces.h"
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 PLUGIN_HEADER
 
@@ -1256,7 +1256,7 @@ static int pegbox(struct game_context* pb) {
 /*****************************************************************************
 * plugin entry point.
 ******************************************************************************/
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
     bool exit = false;
     struct game_context pb;
 

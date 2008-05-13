@@ -59,7 +59,7 @@ static unsigned char str[12];   /*String use to display the first line*/
 static unsigned long hsmile,hcry,h1,h2; /*Handle for the new pattern*/
 
 static bool end;    /*If true game is finished*/
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 
 /*Display that the action it's impossible*/
@@ -138,7 +138,7 @@ static void nim_exit(void *parameter)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int y,z,button;
     int x,v,min;

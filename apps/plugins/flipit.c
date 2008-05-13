@@ -244,7 +244,7 @@ PLUGIN_HEADER
 #endif
 #endif
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 static int spots[20];
 static int toggle[20];
 static int cursor_pos, moves;
@@ -591,7 +591,7 @@ static bool flipit_loop(void)
 }
 
 /* called function from outside */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int i, rc;
 

@@ -257,7 +257,7 @@ PLUGIN_IRAM_DECLARE
 #endif
 #endif
 
-struct plugin_api* rb;
+const struct plugin_api* rb;
 
 CACHE_FUNCTION_WRAPPERS(rb);
 ALIGN_BUFFER_WRAPPER(rb);
@@ -1544,7 +1544,7 @@ static void button_loop(void)
     backlight_use_settings(rb);
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int status = PLUGIN_ERROR; /* assume failure */
     int result;

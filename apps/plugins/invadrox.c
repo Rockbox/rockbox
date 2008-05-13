@@ -595,7 +595,7 @@ unsigned char fire_sprite[FIRE_HEIGHT] = {
 #define CYCLETIME 40
 
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* Physical x is at PLAYFIELD_X + LIVES_X + x * ALIEN_SPEED
  * Physical y is at y * ALIEN_HEIGHT
@@ -1785,7 +1785,7 @@ void game_loop(void)
 
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, UNUSED void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, UNUSED const void* parameter)
 {
     rb = api;
 

@@ -464,7 +464,7 @@ static const struct button_mapping* get_context_map(int context)
     else return NULL;
 }
 
-int pluginlib_getaction(struct plugin_api *api,int timeout,
+int pluginlib_getaction(const struct plugin_api *api,int timeout,
                         const struct button_mapping *plugin_contexts[],
                         int count)
 {

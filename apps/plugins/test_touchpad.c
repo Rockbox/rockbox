@@ -28,10 +28,10 @@ PLUGIN_HEADER
 #define TOUCHPAD_TOGGLE BUTTON_RC_MODE
 #endif
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int button = 0;
     enum touchpad_mode mode = TOUCHPAD_BUTTON;

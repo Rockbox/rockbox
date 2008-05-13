@@ -102,7 +102,7 @@ PLUGIN_HEADER
 /******************************* Globals ***********************************/
 
 GREY_INFO_STRUCT
-static struct plugin_api* rb; /* global api struct pointer */
+static const struct plugin_api* rb; /* global api struct pointer */
 static char pbuf[32];         /* global printf buffer */
 static unsigned char *gbuf;
 static size_t gbuf_size = 0;
@@ -361,7 +361,7 @@ int main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     rb = api; /* copy to global api pointer */
     (void)parameter;

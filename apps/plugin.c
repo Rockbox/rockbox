@@ -600,7 +600,7 @@ static const struct plugin_api rockbox_api = {
 #endif /* HAVE_BUTTON_LIGHT */
 };
 
-int plugin_load(const char* plugin, void* parameter)
+int plugin_load(const char* plugin, const void* parameter)
 {
     int rc;
     struct plugin_header *hdr;
@@ -719,8 +719,7 @@ int plugin_load(const char* plugin, void* parameter)
 
     invalidate_icache();
 
-    rc = hdr->entry_point((struct plugin_api*) &rockbox_api, parameter);
-    /* explicitly casting the pointer here to avoid touching every plugin. */
+    rc = hdr->entry_point(&rockbox_api, parameter);
 
     button_clear_queue();
 

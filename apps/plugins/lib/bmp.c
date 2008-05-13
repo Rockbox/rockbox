@@ -30,7 +30,7 @@
 /**
  * Save to 24 bit bitmap.
  */
-int save_bmp_file( char* filename, struct bitmap *bm, struct plugin_api* rb )
+int save_bmp_file( char* filename, struct bitmap *bm, const struct plugin_api* rb )
 {
     /* I'm not really sure about this one :) */
     int line_width = bm->width*3+((bm->width*3)%4?4-((bm->width*3)%4):0);

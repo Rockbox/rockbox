@@ -105,7 +105,7 @@ static const unsigned char dither_matrix[16][16] = {
 static unsigned char input_levels[STEPS+1];
 static unsigned char lcd_levels[STEPS+1];
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 static unsigned char *gbuf;
 static size_t gbuf_size = 0;
 
@@ -136,7 +136,7 @@ static void fill_rastered(int bx, int by, int bw, int bh, int step)
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     bool done = false;
     int cur_step = 1;

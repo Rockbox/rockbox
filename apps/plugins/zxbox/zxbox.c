@@ -22,7 +22,7 @@
 PLUGIN_HEADER
 PLUGIN_IRAM_DECLARE
 
-struct plugin_api* rb;
+const struct plugin_api* rb;
 
 #include "spkey_p.h"
 
@@ -59,7 +59,7 @@ static size_t         gbuf_size = 0;
 long video_frames IBSS_ATTR = 0 ;
 long start_time IBSS_ATTR = 0;
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     PLUGIN_IRAM_INIT(api)
 

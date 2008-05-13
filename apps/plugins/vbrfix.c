@@ -20,7 +20,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 static char   *audiobuf;
 static ssize_t audiobuflen;
@@ -36,7 +36,7 @@ static void xingupdate(int percent)
     rb->lcd_update();
 }
 
-static int insert_data_in_file(char *fname, int fpos, char *buf, int num_bytes)
+static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_bytes)
 {
     int readlen;
     int rc;
@@ -126,7 +126,7 @@ static const unsigned char empty_id3_header[] =
     0x00, 0x00, 0x1f, 0x76 /* Size is 4096 minus 10 bytes for the header */
 };
 
-static bool vbr_fix(char *selected_file)
+static bool vbr_fix(const char *selected_file)
 {
     struct mp3entry entry;
     int fd;
@@ -261,7 +261,7 @@ static bool vbr_fix(char *selected_file)
     return false;
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void *parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void *parameter)
 {
     rb = api;
 

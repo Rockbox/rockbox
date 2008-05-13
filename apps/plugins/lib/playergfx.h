@@ -26,7 +26,7 @@
 
 #ifdef HAVE_LCD_CHARCELLS /* Player only :) */
 
-bool pgfx_init(struct plugin_api* newrb, int cwidth, int cheight);
+bool pgfx_init(const struct plugin_api* newrb, int cwidth, int cheight);
 void pgfx_release(void);
 void pgfx_display(int cx, int cy);
 void pgfx_display_block(int cx, int cy, int x, int y);

@@ -21,7 +21,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 static bool abort;
 static int fd;
 static int dirs_count;
@@ -544,7 +544,7 @@ int main_menu(void)
     return 0;
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     (void)parameter;
 

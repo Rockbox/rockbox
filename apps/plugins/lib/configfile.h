@@ -37,7 +37,7 @@ struct configdata
                       NULL otherwise */
 };
 
-void configfile_init(struct plugin_api* newrb);
+void configfile_init(const struct plugin_api* newrb);
 
 /* configfile_save - Given configdata entries this function will
    create a config file with these entries, destroying any

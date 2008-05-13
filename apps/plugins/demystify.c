@@ -65,7 +65,7 @@ struct line_color
 
 /******************************* Globals ***********************************/
 
-static struct plugin_api* rb; /* global api struct pointer */
+static const struct plugin_api* rb; /* global api struct pointer */
 
 /*
  * Compute a new random step to make the point bounce the borders of the screen
@@ -424,7 +424,7 @@ int plugin_main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int ret;
 

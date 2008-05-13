@@ -41,7 +41,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb; /* global api struct pointer */
+static const struct plugin_api* rb; /* global api struct pointer */
 
 #ifndef HAVE_LCD_COLOR
 GREY_INFO_STRUCT
@@ -344,7 +344,7 @@ int main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int ret;
 

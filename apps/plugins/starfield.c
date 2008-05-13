@@ -24,7 +24,7 @@ PLUGIN_HEADER
 
 /******************************* Globals ***********************************/
 
-static struct plugin_api* rb; /* global api struct pointer */
+static const struct plugin_api* rb; /* global api struct pointer */
 
 /* Key assignement */
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
@@ -169,7 +169,7 @@ static struct plugin_api* rb; /* global api struct pointer */
 
 #define MSG_DISP_TIME 30
 
-static struct plugin_api* rb; /* global api struct pointer */
+static const struct plugin_api* rb; /* global api struct pointer */
 
 /*
  * Each star's stuffs
@@ -432,7 +432,7 @@ int plugin_main(void)
 
 /*************************** Plugin entry point ****************************/
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int ret;
 

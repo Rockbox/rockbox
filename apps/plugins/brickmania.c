@@ -195,7 +195,7 @@ PLUGIN_HEADER
 #endif
 
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 enum menu_items {
     BM_START,
@@ -2015,7 +2015,7 @@ int game_loop(void)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     (void)parameter;
     rb = api;

@@ -19,9 +19,9 @@
 #include "plugin.h"
 #include "configfile.h"
 
-static struct plugin_api *cfg_rb;
+static const struct plugin_api *cfg_rb;
 
-void configfile_init(struct plugin_api* newrb)
+void configfile_init(const struct plugin_api* newrb)
 {
     cfg_rb = newrb;
 }

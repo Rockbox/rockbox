@@ -339,7 +339,7 @@ struct jewels_menu {
 };
 
 /* global rockbox api */
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 /* external bitmaps */
 extern const fb_data jewels[];
@@ -1898,7 +1898,7 @@ static int jewels_main(struct game_context* bj) {
 /*****************************************************************************
 * plugin entry point.
 ******************************************************************************/
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter) {
     struct game_context bj;
     bool exit = false;
     int position;

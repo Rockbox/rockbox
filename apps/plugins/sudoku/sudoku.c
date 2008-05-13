@@ -80,7 +80,7 @@ PLUGIN_HEADER
    it's nice not to have to pass the api pointer in all function calls
    in the plugin */
 
-struct plugin_api* rb;
+const struct plugin_api* rb;
 
 /* Default game - used to initialise sudoku.ss if it doesn't exist. */
 static const char default_game[9][9] =
@@ -1188,7 +1188,7 @@ void move_cursor(struct sudoku_state_t* state, int newx, int newy)
 }
 
 /* plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     bool exit;
     int button;

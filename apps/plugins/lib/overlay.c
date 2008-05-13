@@ -44,7 +44,7 @@
    The linker script for the overlay should use a base address towards the
    end of the audiobuffer, just low enough to make the overlay fit. */
 
-enum plugin_status run_overlay(struct plugin_api* rb, void* parameter,
+enum plugin_status run_overlay(const struct plugin_api* rb, const void* parameter,
                                unsigned char *filename, unsigned char *name)
 {
     int fd, readsize;

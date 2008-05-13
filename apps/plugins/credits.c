@@ -21,7 +21,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
@@ -367,7 +367,7 @@ void roll_credits(void)
 
 #endif
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     (void)parameter;
     rb = api;

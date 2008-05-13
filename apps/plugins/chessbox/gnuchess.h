@@ -44,7 +44,7 @@ extern struct TimeControlRec TimeControl;
 extern struct GameRec GameList[240];
 
 /* ---- RockBox integration ---- */
-extern struct plugin_api* rb;
+extern const struct plugin_api* rb;
 
 /* ---- The beginning of a GNUChess v2 APIfication ---- */
 void SetTimeControl(void);

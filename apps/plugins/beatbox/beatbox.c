@@ -178,7 +178,7 @@ const unsigned char * drumNames[]={
 long gmbuf[BUF_SIZE*NBUF];
 
 int quit=0;
-struct plugin_api * rb;
+const struct plugin_api * rb;
 
 
 #define STATE_STOPPED 0
@@ -232,7 +232,7 @@ int editState=EDITSTATE_PATTERN;
 int playState=STATE_STOPPED, stepFlag=0;
 
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int retval = 0;
 

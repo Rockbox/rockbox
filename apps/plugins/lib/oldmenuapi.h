@@ -31,7 +31,7 @@ struct menu_item {
     bool (*function) (void); /* return true if USB was connected */
 };
 
-int menu_init(struct plugin_api *api, const struct menu_item* mitems, 
+int menu_init(const struct plugin_api *api, const struct menu_item* mitems, 
               int count, int (*callback)(int, int),
               const char *button1, const char *button2, const char *button3);
 void menu_exit(int menu);

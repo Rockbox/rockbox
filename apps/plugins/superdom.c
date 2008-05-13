@@ -18,7 +18,7 @@
  ****************************************************************************/
 #include "plugin.h"
 PLUGIN_HEADER
-static struct plugin_api* rb; 
+static const struct plugin_api* rb; 
 
 extern const fb_data superdom_boarditems[];
 char buf[255];
@@ -2153,7 +2153,7 @@ void computer_war(void) {
     }
 }
 
-int load_game(char* file) {
+static int load_game(const char* file) {
     int fd;
 
     fd = rb->open(file, O_RDONLY);
@@ -2222,7 +2222,7 @@ int average_strength(bool colour) {
     return totalpower/100;
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int tempmenu;
     bool statusbar_setting;

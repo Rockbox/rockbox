@@ -258,7 +258,7 @@ static int speed = 6; /* CYCLETIME = (11-speed)*10 ms */
 static int difficulty = 75; /* Percentage of screen that needs to be filled
                              * in order to win the game */
 
-static struct plugin_api *rb;
+static const struct plugin_api *rb;
 
 MEM_FUNCTION_WRAPPERS(rb);
 
@@ -974,7 +974,7 @@ static int xobox_loop (void)
 }
 
 /* plugin main procedure */
-enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
+enum plugin_status plugin_start (const struct plugin_api *api, const void *parameter)
 {
     int ret = PLUGIN_OK;
 

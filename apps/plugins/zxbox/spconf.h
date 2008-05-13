@@ -31,7 +31,7 @@ extern int   spcf_init_tapefile_type;
 
 
 /*extern int  spcf_read_conf_file(const char *filename);*/
-extern void spcf_read_command_line(void* parameter);
+extern void spcf_read_command_line(const void* parameter);
 extern void spcf_read_xresources(void);
 extern int  spcf_find_file_type(char *filename, int *ftp, int *ftsubp);
 

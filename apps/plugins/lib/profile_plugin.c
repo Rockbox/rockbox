@@ -21,9 +21,9 @@
 
 #include "plugin.h"
 
-static struct plugin_api *local_rb = NULL; /* global api struct pointer */
+static const struct plugin_api *local_rb = NULL; /* global api struct pointer */
 
-void profile_init(struct plugin_api* pa)
+void profile_init(const struct plugin_api* pa)
 {
     local_rb = pa;
 }

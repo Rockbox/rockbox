@@ -357,7 +357,7 @@ static int display_lines; /* number of lines on the display */
 static int draw_columns; /* number of (pixel) columns available for text */
 static int par_indent_spaces; /* number of spaces to indent first paragraph */
 static int fd;
-static char *file_name;
+static const char *file_name;
 static long file_size;
 static long start_position; /* position in the file after the viewer is started */
 static bool mac_text;
@@ -368,7 +368,7 @@ static unsigned char *screen_top_ptr;
 static unsigned char *next_screen_ptr;
 static unsigned char *next_screen_to_draw_ptr;
 static unsigned char *next_line_ptr;
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 #ifdef HAVE_LCD_BITMAP
 static struct font *pf;
 #endif
@@ -1457,7 +1457,7 @@ static void viewer_menu(void)
     viewer_draw(col);
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* file)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* file)
 {
     int button, i, ok;
     int lastbutton = BUTTON_NONE;

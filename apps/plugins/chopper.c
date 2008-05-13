@@ -125,7 +125,7 @@ Still To do:
 #endif
 #endif
 
-static struct plugin_api* rb;
+static const struct plugin_api* rb;
 
 #define NUMBER_OF_BLOCKS 8
 #define NUMBER_OF_PARTICLES 3
@@ -979,7 +979,7 @@ void chopper_load(bool newgame)
 }
 
 /* this is the plugin entry point */
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     (void)parameter;
     rb = api;

@@ -249,7 +249,7 @@ enum { OSC_HORIZ, OSC_VERT, MAX_OSC };
 
 /* global variables */
 
-struct plugin_api* rb;     /* global api struct pointer */
+const struct plugin_api* rb;     /* global api struct pointer */
 
 /* settings */
 struct osc_config {
@@ -650,7 +650,7 @@ void cleanup(void *parameter)
     backlight_use_settings(rb); /* backlight control in lib/helper.c */
 }
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     int button, vol;
     int lastbutton = BUTTON_NONE;

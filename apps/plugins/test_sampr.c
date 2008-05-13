@@ -21,7 +21,7 @@
 
 PLUGIN_HEADER
 
-struct plugin_api *rb;
+const struct plugin_api *rb;
 
 enum
 {
@@ -253,7 +253,7 @@ void set_waveform(void)
 
 /* Tests hardware sample rate switching */
 /* TODO: needs a volume control */
-enum plugin_status plugin_start(struct plugin_api *api, void *parameter)
+enum plugin_status plugin_start(const struct plugin_api *api, const void *parameter)
 {
     static const struct menu_item items[] =
     {

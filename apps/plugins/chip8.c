@@ -24,7 +24,7 @@
 
 PLUGIN_HEADER
 
-static struct plugin_api* rb; /* here is a global api struct pointer */
+static const struct plugin_api* rb; /* here is a global api struct pointer */
 
 #define EXTERN static
 #define STATIC static
@@ -1287,7 +1287,7 @@ static void chip8_interrupt (void)
     starttimer = newtimer - runtime;
 }
 
-static bool chip8_init(char* file)
+static bool chip8_init(const char* file)
 {
     int numread;
     int fd;
@@ -1307,14 +1307,16 @@ static bool chip8_init(char* file)
 
     rb->close(fd);
     /* is there a c8k file (chip8 keys) ? */
+    char c8kname[MAX_PATH];
+    rb->strcpy(c8kname, file);
     for(i=0; i<16; i++) {
 	chip8_virtual_keys[i] = 0;
 	chip8_keymap[i] = i;
     }
-    len = rb->strlen(file);
-    file[len-2] = '8';
-    file[len-1] = 'k';
-    fd = rb->open(file, O_RDONLY);
+    len = rb->strlen(c8kname);
+    c8kname[len-2] = '8';
+    c8kname[len-1] = 'k';
+    fd = rb->open(c8kname, O_RDONLY);
     if (fd!=-1) {
 	rb->lcd_puts(0, 6, "File&Keymap OK.");
 	numread = rb->read(fd, chip8_keymap, 16);
@@ -1340,7 +1342,7 @@ static bool chip8_init(char* file)
     return true;
 }
 
-bool chip8_run(char* file)
+bool chip8_run(const char* file)
 {
     int ok;
 
@@ -1406,9 +1408,9 @@ bool chip8_run(char* file)
 
 /***************** Plugin Entry Point *****************/
 
-enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
-    char* filename;
+    const char* filename;
 
     rb = api; /* copy to global api pointer */
 

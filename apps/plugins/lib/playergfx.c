@@ -26,7 +26,7 @@
 
 /*** globals ***/
 
-static struct plugin_api *pgfx_rb = NULL; /* global api struct pointer */
+static const struct plugin_api *pgfx_rb = NULL; /* global api struct pointer */
 static int char_width;
 static int char_height;
 static int pixel_height;
@@ -38,7 +38,7 @@ static int drawmode = DRMODE_SOLID;
 /*** Special functions ***/
 
 /* library init */
-bool pgfx_init(struct plugin_api* newrb, int cwidth, int cheight)
+bool pgfx_init(const struct plugin_api* newrb, int cwidth, int cheight)
 {
     int i;
 
