@@ -29,13 +29,13 @@ QUrl HttpGet::m_globalProxy; //< global proxy value for new objects
 HttpGet::HttpGet(QObject *parent)
     : QObject(parent)
 {
-    m_usecache = false;
     outputToBuffer = true;
-    cached = false;
+    m_cached = false;
+    m_noHeaderCheck = false;
     getRequest = -1;
     // if a request is cancelled before a reponse is available return some
     // hint about this in the http response instead of nonsense.
-    response = -1;
+    m_response = -1;
 
     // default to global proxy / cache if not empty.
     // proxy is automatically enabled, disable it by setting an empty proxy
@@ -63,7 +63,7 @@ void HttpGet::setCache(QDir d)
     m_cachedir = d;
     bool result;
     result = initializeCache(d);
-    qDebug() << "HttpGet::setCache(QDir)" << d.absolutePath() << result;
+    qDebug() << "[HTTP]"<< __func__ << "(QDir)" << d.absolutePath() << result;
     m_usecache = result;
 }
 
@@ -73,7 +73,7 @@ void HttpGet::setCache(QDir d)
  */
 void HttpGet::setCache(bool c)
 {
-    qDebug() << "setCache(bool)" << c;
+    qDebug() << "[HTTP]" << __func__ << "(bool) =" << c;
     m_usecache = c;
     // make sure cache is initialized
     if(c)
@@ -100,6 +100,9 @@ bool HttpGet::initializeCache(const QDir& d)
 }
 
 
+/** @brief read all downloaded data into a buffer
+ *  @return data
+ */
 QByteArray HttpGet::readAll()
 {
     return dataBuffer;
@@ -123,7 +126,7 @@ void HttpGet::httpProgress(int read, int total)
 
 void HttpGet::setProxy(const QUrl &proxy)
 {
-    qDebug() << "HttpGet::setProxy(QUrl)" << proxy.toString();
+    qDebug() << "[HTTP]" << __func__ << "(QUrl)" << proxy.toString();
     m_proxy = proxy;
     http.setProxy(m_proxy.host(), m_proxy.port(), m_proxy.userName(), m_proxy.password());
 }
@@ -131,7 +134,7 @@ void HttpGet::setProxy(const QUrl &proxy)
 
 void HttpGet::setProxy(bool enable)
 {
-    qDebug() << "HttpGet::setProxy(bool)" << enable;
+    qDebug() << "[HTTP]" << __func__ << "(bool)" << enable;
     if(enable)
         http.setProxy(m_proxy.host(), m_proxy.port(), m_proxy.userName(), m_proxy.password());
     else
@@ -143,7 +146,7 @@ void HttpGet::setFile(QFile *file)
 {
     outputFile = file;
     outputToBuffer = false;
-    qDebug() << "HttpGet::setFile" << outputFile->fileName();
+    qDebug() << "[HTTP]" << __func__ << "(QFile*)" << outputFile->fileName();
 }
 
 
@@ -158,40 +161,74 @@ void HttpGet::abort()
 bool HttpGet::getFile(const QUrl &url)
 {
     if (!url.isValid()) {
-        qDebug() << "Error: Invalid URL" << endl;
+        qDebug() << "[HTTP] Error: Invalid URL" << endl;
         return false;
     }
 
     if (url.scheme() != "http") {
-        qDebug() << "Error: URL must start with 'http:'" << endl;
+        qDebug() << "[HTTP] Error: URL must start with 'http:'" << endl;
         return false;
     }
 
     if (url.path().isEmpty()) {
-        qDebug() << "Error: URL has no path" << endl;
+        qDebug() << "[HTTP] Error: URL has no path" << endl;
         return false;
     }
     // if no output file was set write to buffer
     if(!outputToBuffer) {
         if (!outputFile->open(QIODevice::ReadWrite)) {
-            qDebug() << "Error: Cannot open " << qPrintable(outputFile->fileName())
+            qDebug() << "[HTTP] Error: Cannot open " << qPrintable(outputFile->fileName())
                 << " for writing: " << qPrintable(outputFile->errorString())
                 << endl;
             return false;
         }
     }
-    // put hash generation here so it can get reused later
-    QString hash = QCryptographicHash::hash(url.toEncoded(), QCryptographicHash::Md5).toHex();
-    cachefile = m_cachedir.absolutePath() + "/rbutil-cache/" + hash;
+    qDebug() << "[HTTP] downloading" << url.toEncoded();
+    // create request
+    http.setHost(url.host(), url.port(80));
+    // construct query (if any)
+    QList<QPair<QString, QString> > qitems = url.queryItems();
+    if(url.hasQuery()) {
+        m_query = "?";
+        for(int i = 0; i < qitems.size(); i++)
+            m_query += QUrl::toPercentEncoding(qitems.at(i).first, "/") + "="
+                  + QUrl::toPercentEncoding(qitems.at(i).second, "/") + "&";
+    }
+
+    // create hash used for caching
+    m_hash = QCryptographicHash::hash(url.toEncoded(), QCryptographicHash::Md5).toHex();
+    m_path = QString(QUrl::toPercentEncoding(url.path(), "/"));
+
+    if(m_noHeaderCheck || !m_usecache) {
+        getFileFinish();
+    }
+    else {
+        // request HTTP header
+        connect(this, SIGNAL(headerFinished()), this, SLOT(getFileFinish()));
+        headRequest = http.head(m_path + m_query);
+    }
+
+    return true;
+}
+
+
+void HttpGet::getFileFinish()
+{
+    m_cachefile = m_cachedir.absolutePath() + "/rbutil-cache/" + m_hash;
     if(m_usecache) {
         // check if the file is present in cache
-        qDebug() << "[HTTP] cache ENABLED for" << url.toEncoded();
-        if(QFileInfo(cachefile).isReadable() && QFileInfo(cachefile).size() > 0) {
-            qDebug() << "[HTTP] cached file found!" << cachefile;
+        qDebug() << "[HTTP] cache ENABLED";
+        QFileInfo cachefile = QFileInfo(m_cachefile);
+        if(cachefile.isReadable()
+            && cachefile.size() > 0
+            && cachefile.lastModified() > m_serverTimestamp) {
+
+            qDebug() << "[HTTP] cached file found:" << m_cachefile;
+
             getRequest = -1;
-            QFile c(cachefile);
+            QFile c(m_cachefile);
             if(!outputToBuffer) {
-                qDebug() << outputFile->fileName();
+                qDebug() << "[HTTP] copying cache file to output" << outputFile->fileName();
                 c.open(QIODevice::ReadOnly);
                 outputFile->open(QIODevice::ReadWrite);
                 outputFile->write(c.readAll());
@@ -199,46 +236,45 @@ bool HttpGet::getFile(const QUrl &url)
                 c.close();
             }
             else {
+                qDebug() << "[HTTP] reading cache file into buffer";
                 c.open(QIODevice::ReadOnly);
                 dataBuffer = c.readAll();
                 c.close();
             }
-            response = 200; // fake "200 OK" HTTP response
-            cached = true;
-            httpDone(false); // we're done now. This will emit the correct signal too.
-            return true;
+            m_response = 200; // fake "200 OK" HTTP response
+            m_cached = true;
+            httpDone(false); // we're done now. Fake http "done" signal.
+            return;
         }
-        else qDebug() << "[HTTP] file not cached, downloading to" << cachefile;
+        else {
+            if(cachefile.isReadable())
+                qDebug() << "[HTTP] file in cache timestamp:" << cachefile.lastModified();
+            else
+                qDebug() << "[HTTP] file not in cache.";
+            qDebug() << "[HTTP] server file timestamp:" << m_serverTimestamp;
+            qDebug() << "[HTTP] downloading file to" << m_cachefile;
+            // unlink old cache file
+            if(cachefile.isReadable())
+                QFile(m_cachefile).remove();
+        }
 
     }
     else {
         qDebug() << "[HTTP] cache DISABLED";
     }
 
-    http.setHost(url.host(), url.port(80));
-    // construct query (if any)
-    QList<QPair<QString, QString> > qitems = url.queryItems();
-    if(url.hasQuery()) {
-        query = "?";
-        for(int i = 0; i < qitems.size(); i++)
-            query += QUrl::toPercentEncoding(qitems.at(i).first, "/") + "=" 
-                  + QUrl::toPercentEncoding(qitems.at(i).second, "/") + "&";
-        qDebug() << query;
-    }
-
-    QString path;
-    path = QString(QUrl::toPercentEncoding(url.path(), "/"));
     if(outputToBuffer) {
-        qDebug() << "[HTTP] downloading to buffer:" << url.toString();
-        getRequest = http.get(path + query);
+        qDebug() << "[HTTP] downloading to buffer.";
+        getRequest = http.get(m_path + m_query);
     }
     else {
-        qDebug() << "[HTTP] downloading to file:" << url.toString() << qPrintable(outputFile->fileName());
-        getRequest = http.get(path + query, outputFile);
+        qDebug() << "[HTTP] downloading to file:"
+            << qPrintable(outputFile->fileName());
+        getRequest = http.get(m_path + m_query, outputFile);
     }
-    qDebug() << "[HTTP] request scheduled: GET" << getRequest;
+    qDebug() << "[HTTP] GET request scheduled, id:" << getRequest;
 
-    return true;
+    return;
 }
 
 
@@ -250,9 +286,9 @@ void HttpGet::httpDone(bool error)
     if(!outputToBuffer)
         outputFile->close();
 
-    if(m_usecache && !cached) {
-        qDebug() << "[HTTP] creating cache file" << cachefile;
-        QFile c(cachefile);
+    if(m_usecache && !m_cached) {
+        qDebug() << "[HTTP] creating cache file" << m_cachefile;
+        QFile c(m_cachefile);
         c.open(QIODevice::ReadWrite);
         if(!outputToBuffer) {
             outputFile->open(QIODevice::ReadOnly | QIODevice::Truncate);
@@ -264,23 +300,60 @@ void HttpGet::httpDone(bool error)
 
         c.close();
     }
-    emit done(error);
+    m_serverTimestamp = QDateTime();
+    // take care of concurring requests. If there is still one running,
+    // don't emit done(). That request will call this slot again.
+    if(http.currentId() == 0 && !http.hasPendingRequests())
+        emit done(error);
 }
 
 
 void HttpGet::httpFinished(int id, bool error)
 {
-    qDebug() << "HttpGet::httpFinished(int, bool) =" << id << error;
-    if(id == getRequest) dataBuffer = http.readAll();
-    qDebug() << "pending:" << http.hasPendingRequests();
-    //if(!http.hasPendingRequests()) httpDone(error);
-    emit requestFinished(id, error);
+    qDebug() << "[HTTP]" << __func__ << "(int, bool) =" << id << error;
+    if(id == getRequest) {
+        dataBuffer = http.readAll();
 
+        emit requestFinished(id, error);
+    }
+    qDebug() << "[HTTP] hasPendingRequests =" << http.hasPendingRequests();
+
+
+    if(id == headRequest) {
+        QHttpResponseHeader h = http.lastResponse();
+
+        QString date = h.value("Last-Modified").simplified();
+        if(date.isEmpty()) {
+            m_serverTimestamp = QDateTime(); // no value = invalid
+            emit headerFinished();
+            return;
+        }
+        // to successfully parse the date strip weekday and timezone
+        date.remove(0, date.indexOf(" ") + 1);
+        if(date.endsWith("GMT"))
+            date.truncate(date.indexOf(" GMT"));
+        // distinguish input formats (see RFC1945)
+        // RFC 850
+        if(date.contains("-"))
+            m_serverTimestamp = QDateTime::fromString(date, "dd-MMM-yy hh:mm:ss");
+        // asctime format
+        else if(date.at(0).isLetter())
+            m_serverTimestamp = QDateTime::fromString(date, "MMM d hh:mm:ss yyyy");
+        // RFC 822
+        else
+            m_serverTimestamp = QDateTime::fromString(date, "dd MMM yyyy hh:mm:ss");
+        qDebug() << "[HTTP] Header Request Date:" << date << ", parsed:" << m_serverTimestamp;
+        emit headerFinished();
+        return;
+    }
+    if(id == getRequest)
+        emit requestFinished(id, error);
 }
 
 void HttpGet::httpStarted(int id)
 {
-    qDebug() << "HttpGet::httpStarted(int) =" << id;
+    qDebug() << "[HTTP]" << __func__ << "(int) =" << id;
+    qDebug() << "headRequest" << headRequest << "getRequest" << getRequest;
 }
 
 
@@ -294,9 +367,9 @@ void HttpGet::httpResponseHeader(const QHttpResponseHeader &resp)
 {
     // if there is a network error abort all scheduled requests for
     // this download
-    response = resp.statusCode();
-    if(response != 200) {
-        qDebug() << "http response error:" << response << resp.reasonPhrase();
+    m_response = resp.statusCode();
+    if(m_response != 200) {
+        qDebug() << "[HTTP] response error =" << m_response << resp.reasonPhrase();
         http.abort();
     }
     // 301 -- moved permanently
@@ -304,17 +377,17 @@ void HttpGet::httpResponseHeader(const QHttpResponseHeader &resp)
     // 303 -- see other
     // 307 -- moved temporarily
     // in all cases, header: location has the correct address so we can follow.
-    if(response == 301 || response == 302 || response == 303 || response == 307) {
+    if(m_response == 301 || m_response == 302 || m_response == 303 || m_response == 307) {
         // start new request with new url
-        qDebug() << "http response" << response << "- following";
-        getFile(resp.value("location") + query);
+        qDebug() << "[HTTP] response =" << m_response << "- following";
+        getFile(resp.value("location") + m_query);
     }
 }
 
 
 int HttpGet::httpResponse()
 {
-    return response;
+    return m_response;
 }
 
 
@@ -323,7 +396,7 @@ void HttpGet::httpState(int state)
     QString s[] = {"Unconnected", "HostLookup", "Connecting", "Sending",
         "Reading", "Connected", "Closing"};
     if(state <= 6)
-        qDebug() << "HttpGet::httpState() = " << s[state];
-    else qDebug() << "HttpGet::httpState() = " << state;
+        qDebug() << "[HTTP]" << __func__ << "() = " << s[state];
+    else qDebug() << "[HTTP]" << __func__ << "() = " << state;
 }
 

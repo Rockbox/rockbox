@@ -43,7 +43,8 @@ class HttpGet : public QObject
         void setCache(bool);
         int httpResponse(void);
         QByteArray readAll(void);
-        bool isCached() { return cached; }
+        bool isCached() { return m_cached; }
+        void setNoHeaderCheck(bool b) { m_noHeaderCheck = b; } //< disable checking of http header timestamp for caching
         static void setGlobalCache(const QDir d) //< set global cache path
             { m_globalCache = d; }
         static void setGlobalProxy(const QUrl p) //< set global proxy value
@@ -56,6 +57,7 @@ class HttpGet : public QObject
         void done(bool);
         void dataReadProgress(int, int);
         void requestFinished(int, bool);
+        void headerFinished(void);
 
     private slots:
         void httpDone(bool error);
@@ -64,23 +66,29 @@ class HttpGet : public QObject
         void httpResponseHeader(const QHttpResponseHeader&);
         void httpState(int);
         void httpStarted(int);
+        void getFileFinish(void);
 
     private:
         bool initializeCache(const QDir&);
         QHttp http; //< download object
         QFile *outputFile;
-        int response; //< http response
-        int getRequest;
+        int m_response; //< http response
+        int getRequest;  //! get file http request id
+        int headRequest; //! get http header request id
         QByteArray dataBuffer;
         bool outputToBuffer;
-        QString query;
         bool m_usecache;
         QDir m_cachedir;
-        QString cachefile;
-        bool cached;
+        QString m_cachefile; // cached filename
+        bool m_cached;
         QUrl m_proxy;
         static QDir m_globalCache; //< global cache path value
         static QUrl m_globalProxy; //< global proxy value
+        QDateTime m_serverTimestamp; //< timestamp of file on server
+        QString m_query; //< constructed query to pass http getter
+        QString m_path; //< constructed path to pass http getter
+        QString m_hash; //< caching hash
+        bool m_noHeaderCheck; //< true if caching should ignore the server header
 };
 
 #endif
