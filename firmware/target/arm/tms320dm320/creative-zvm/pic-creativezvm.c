@@ -73,6 +73,8 @@
 #define BTN_MENU                        0x9F00
 #define BTN_HOLD                        0x9F06
 #define BTN_UNHOLD                      0xAF06
+
+
 /* TODO: other values
 
 First number is just pressing it, second is when you release it or keep it
@@ -104,23 +106,22 @@ AV out    = 9F06 */
 
 #define BTN_REL                         1
 
-#define BTN_TOUCHPAD_PRESS              0x8F00
-#define BTN_TOUCHPAD_LONG_PRESS         0x0F00
-#define BTN_TOUCHPAD_CORNER_DOWN        0xD700
-#define BTN_TOUCHPAD_CORNER_LONG_DOWN   0x5700
-#define BTN_TOUCHPAD_CORNER_UP          0x9F00
-#define BTN_TOUCHPAD_CORNER_LONG_UP     0x1F00
+#define BTN_TOUCHPAD_PRESS              0x1F00
+#define BTN_TOUCHPAD_LONG_PRESS         0x1F01
+#define BTN_TOUCHPAD_CORNER_DOWN        0xFF00
+#define BTN_TOUCHPAD_SCROLL_DOWN        0xFF01
+#define BTN_TOUCHPAD_CORNER_UP          0xDF00
+#define BTN_TOUCHPAD_SCROLL_UP          0xDF01
 
 #define HEADPHONE_PLUGIN_A              0xAF06
-#define HEADPHONE_PLUGIN_B              0xAF06
-#define HEADPHONE_UNPLUG_A              0xBF06
-#define HEADPHONE_UNPLUG_B              0xBF06
+#define HEADPHONE_PLUGIN_B              0x00AF06 //Dummy Value
+#define HEADPHONE_UNPLUG_A              0x00BF06 //Dummy Value 
+#define HEADPHONE_UNPLUG_B              0x00BF061 //Dummy Value 
 
-#define DOCK_INSERT                     0x0
-#define DOCK_UNPLUG                     0x0
+#define DOCK_INSERT                     0x00003 //Dummy Value
+#define DOCK_UNPLUG                     0x00002 //Dummy Value
 #define DOCK_USB_INSERT                 0x2F06
-#define DOCK_USB_UNPLUG_A               0x3F06
-#define DOCK_USB_UNPLUG_B               0x3F06
+#define DOCK_USB_UNPLUG                 0x3F06
 #define DOCK_POWER_INSERT               0x4F06
 #define DOCK_POWER_UNPLUG               0x5F06
 #define DOCK_AV_INSERT                  0x8F06
@@ -204,18 +205,23 @@ void GIO0(void)
         map_button(BTN_TOUCHPAD_PRESS,       BUTTON_SELECT);
         map_button(BTN_TOUCHPAD_CORNER_DOWN, BUTTON_DOWN);
         map_button(BTN_TOUCHPAD_CORNER_UP,   BUTTON_UP);
+    #ifndef ZEN_VISION
+    /* These don't seem to work for some reason on the Zen Vision.. */
     case BTN_TOUCHPAD_SCROLL_DOWN:
         btn = BUTTON_DOWN;
         break;
     case BTN_TOUCHPAD_SCROLL_UP:
         btn = BUTTON_UP;
         break;
+    #endif
     case BTN_HOLD:
         hold_switch = true;
         break;
     case BTN_UNHOLD:
         hold_switch = false;
         break;
+    #ifndef ZEN_VISION
+    /* These don't seem to work for some reason.. */
     case HEADPHONE_PLUGIN_A:
     case HEADPHONE_PLUGIN_B:
         nonbtn |= NONBUTTON_HEADPHONE;
@@ -224,6 +230,7 @@ void GIO0(void)
     case HEADPHONE_UNPLUG_B:
         nonbtn &= ~NONBUTTON_HEADPHONE;
         break;
+    #endif
     case DOCK_INSERT:
         nonbtn |= NONBUTTON_DOCK;
         break;
