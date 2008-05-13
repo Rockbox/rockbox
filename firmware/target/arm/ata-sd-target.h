@@ -16,8 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef HOTSWAP_TARGET_H
-#define HOTSWAP_TARGET_H
+#ifndef ATA_SD_TARGET_H
+#define ATA_SD_TARGET_H
 
 #include "inttypes.h"
 

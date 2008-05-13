@@ -19,9 +19,8 @@
 #include "fat.h"
 #include "hotswap.h"
 #ifdef BOOTLOADER
-#include "hotswap-target.h"
+#include "ata-sd-target.h"
 #endif
-#include "ata-target.h"
 #include "ata_idle_notify.h"
 #include "system.h"
 #include <string.h>
