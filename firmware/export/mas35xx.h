@@ -24,14 +24,22 @@
 
 #include "config.h"
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
-
 #if CONFIG_CODEC == MAS3507D
+
 #define VOLUME_MIN -780
 #define VOLUME_MAX  180
-#else
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+
+#else /* CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F */
+
+/* MAS3587F and MAS3539F handle clipping prevention internally so we do not need
+ * the prescaler -> CLIPPING_CAP
+ */
+
 #define VOLUME_MIN -400
 #define VOLUME_MAX  600
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BALANCE_CAP | CLIPPING_CAP)
+
 #endif
 
 

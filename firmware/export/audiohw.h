@@ -26,6 +26,8 @@
 /* define some audiohw caps */
 #define TREBLE_CAP      (1 << 0)
 #define BASS_CAP        (1 << 1)
+#define BALANCE_CAP     (1 << 2)
+#define CLIPPING_CAP    (1 << 3)
 
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
@@ -61,6 +63,14 @@
 
 #if (AUDIOHW_CAPS & BASS_CAP)
 #define AUDIOHW_HAVE_BASS
+#endif
+
+#if (AUDIOHW_CAPS & BALANCE_CAP)
+#define AUDIOHW_HAVE_BALANCE
+#endif
+
+#if (AUDIOHW_CAPS & CLIPPING_CAP)
+#define AUDIOHW_HAVE_CLIPPING
 #endif
 #endif /* AUDIOHW_CAPS */
 
@@ -143,6 +153,26 @@ void audiohw_postinit(void);
  * Close audio codec.
  */
 void audiohw_close(void);
+
+#ifdef AUDIOHW_HAVE_CLIPPING
+ /**
+ * Set new volume value
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          CLIPPING_CAP
+ */
+void audiohw_set_volume(int val);
+#endif
+
+#ifdef AUDIOHW_HAVE_BALANCE
+/**
+ * Set new balance value
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          BALANCE_CAP
+ */
+void audiohw_set_balance(int val);
+#endif
 
 /**
  * Mute or enable sound.

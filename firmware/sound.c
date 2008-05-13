@@ -227,11 +227,7 @@ static int tenthdb2reg(int db)
 #endif
 
 
-/* MAS3587F and MAS3539F handle clipping prevention internally so we do not need
- * the prescaler.
- */
-#if (CONFIG_CODEC != MAS3587F) && (CONFIG_CODEC != MAS3539F)
-
+#if !defined(AUDIOHW_HAVE_CLIPPING)
 /*
  * The prescaler compensates for any kind of boosts, to prevent clipping.
  *
@@ -327,41 +323,29 @@ void sound_set_volume(int value)
 {
     if(!audio_is_initialized)
         return;
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    unsigned tmp = ((unsigned)(value + 115) & 0xff) << 8;
-    mas_codec_writereg(0x10, tmp);
-#elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
-   || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
-   || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
-   || defined(HAVE_AS3514) || defined(HAVE_WM8985)  || defined(HAVE_TSC2100) \
-   || defined(HAVE_WM8978)
-    current_volume = value * 10;     /* tenth of dB */
-    set_prescaled_volume();
+
+#if defined(AUDIOHW_HAVE_CLIPPING)
+    audiohw_set_volume(value);
 #elif CONFIG_CPU == PNX0101
     int tmp = (60 - value * 4) & 0xff;
     CODECVOL = tmp | (tmp << 8);
+#else
+    current_volume = value * 10;     /* tenth of dB */
+    set_prescaled_volume();
 #endif
-    (void)value;
 }
 
 void sound_set_balance(int value)
 {
     if(!audio_is_initialized)
         return;
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    unsigned tmp = ((unsigned)(value * 127 / 100) & 0xff) << 8;
-    mas_codec_writereg(0x11, tmp);
-#elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380 \
-   || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
-   || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
-   || defined(HAVE_AS3514) || defined(HAVE_WM8985)  || defined(HAVE_TSC2100) \
-   || defined(HAVE_WM8978)
+
+#ifdef AUDIOHW_HAVE_BALANCE
+    audiohw_set_balance(value);
+#else
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
-#elif CONFIG_CPU == PNX0101
-    /* TODO: implement for iFP */
 #endif
-    (void)value;
 }
 
 void sound_set_bass(int value)
@@ -375,7 +359,7 @@ void sound_set_bass(int value)
     dsp_callback(DSP_CALLBACK_SET_BASS, current_bass);
 #endif
 
-#if (CONFIG_CODEC != MAS3587F) && (CONFIG_CODEC != MAS3539F)
+#if !defined(AUDIOHW_HAVE_CLIPPING)
 #if defined(HAVE_WM8751)
     current_bass = value;
 #else
@@ -396,7 +380,7 @@ void sound_set_treble(int value)
     dsp_callback(DSP_CALLBACK_SET_TREBLE, current_treble);
 #endif
 
-#if (CONFIG_CODEC != MAS3587F) && (CONFIG_CODEC != MAS3539F)
+#if !defined(AUDIOHW_HAVE_CLIPPING)
 #if defined(HAVE_WM8751)
     current_treble = value;
 #else

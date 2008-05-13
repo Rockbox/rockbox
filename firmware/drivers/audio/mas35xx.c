@@ -170,3 +170,15 @@ void audiohw_set_treble(int val)
     mas_writereg(MAS_REG_KTREBLE, treble_table[val+15]);
 #endif
 }
+
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+void audiohw_set_volume(int val) {
+    unsigned tmp = ((unsigned)(val + 115) & 0xff) << 8;
+    mas_codec_writereg(0x10, tmp);
+}
+
+void audiohw_set_balance(int val) {
+    unsigned tmp = ((unsigned)(val * 127 / 100) & 0xff) << 8;
+    mas_codec_writereg(0x11, tmp);
+}
+#endif
