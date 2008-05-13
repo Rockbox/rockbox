@@ -524,13 +524,16 @@ static int remove_dir(char* dirname, int len)
 /* share code for file and directory deletion, saves space */
 static bool delete_handler(bool is_dir)
 {
+    char file_to_delete[MAX_PATH];
+    strcpy(file_to_delete, selected_file);
+
     const char *lines[]={
         ID2P(LANG_REALLY_DELETE),
-        selected_file
+        file_to_delete
     };
     const char *yes_lines[]={
         ID2P(LANG_DELETED),
-        selected_file
+        file_to_delete
     };
 
     struct text_message message={lines, 2};
@@ -546,16 +549,16 @@ static bool delete_handler(bool is_dir)
     {
         char pathname[MAX_PATH]; /* space to go deep */
         cpu_boost(true);
-        strncpy(pathname, selected_file, sizeof pathname);
+        strncpy(pathname, file_to_delete, sizeof pathname);
         res = remove_dir(pathname, sizeof(pathname));
         cpu_boost(false);
     }
     else
-        res = remove(selected_file);
+        res = remove(file_to_delete);
 
-    if (!res) {
+    if (!res)
         onplay_result = ONPLAY_RELOAD_DIR;
-    }
+
     return false;
 }
 
