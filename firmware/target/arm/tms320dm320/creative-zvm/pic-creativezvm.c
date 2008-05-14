@@ -25,8 +25,6 @@
 #include "button-target.h"
 #include "i2c-dm320.h"
 
-#define BUTTON_DEBUG
-
 #ifdef BUTTON_DEBUG
 #include "lcd-target.h"
 #include "lcd.h"
