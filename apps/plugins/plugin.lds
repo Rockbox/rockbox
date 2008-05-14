@@ -53,10 +53,16 @@ OUTPUT_FORMAT(elf32-sh)
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x10010000
 #define IRAMSIZE 0x10000
-#elif defined(CPU_PP)
+#elif (defined(PP5022) || defined(PP5024))
+/* PP5022/24 have 128KB of IRAM */
 #define DRAMORIG 0x00000000
 #define IRAMORIG 0x4000c000
-#define IRAMSIZE 0xc000
+#define IRAMSIZE 0x14000
+#elif defined(CPU_PP)
+/* all other PP's have 96KB of IRAM */
+#define DRAMORIG 0x00000000
+#define IRAMORIG 0x4000c000
+#define IRAMSIZE 0x0c000
 #elif CONFIG_CPU == PNX0101
 #define DRAMORIG 0xc00000 + STUBOFFSET
 #define IRAMORIG 0x407000
