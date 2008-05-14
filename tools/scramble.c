@@ -104,7 +104,9 @@ void usage(void)
            "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
            "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
            "\t-creative=X Creative firmware structure format\n"
-           "\t-gigabeat Toshiba Gigabeat F/X format\n"
+           "\t            (X values: zvm, zvm60, zenvision\n"
+           "\t                       zenv, zen\n");
+    printf("\t-gigabeat Toshiba Gigabeat F/X format\n"
            "\t-gigabeats Toshiba Gigabeat S format\n"
            "\t-mi4v2  PortalPlayer .mi4 format (revision 010201)\n"
            "\t-mi4v3  PortalPlayer .mi4 format (revision 010301)\n"

@@ -56,8 +56,13 @@
 /* choose the lcd orientation. both work */
 #define CONFIG_ORIENTATION SCREEN_PORTRAIT
 
+#ifdef ZEN_VISION
+#define LCD_WIDTH  640
+#define LCD_HEIGHT 480
+#else
 #define LCD_WIDTH  320
 #define LCD_HEIGHT 240
+#endif
 
 #define LCD_DEPTH  16   /* 65k colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
@@ -105,7 +110,7 @@
 #define CONFIG_I2C I2C_DM320
 
 /* TLV320 has no tone controls, so we use the software ones */
-//#define HAVE_SW_TONE_CONTROLS
+#define HAVE_SW_TONE_CONTROLS
 
 /*#define HW_SAMPR_CAPS (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | \
     SAMPR_CAP_11)*/
@@ -134,7 +139,7 @@
 #define CPU_FREQ 16934400
 
 /* Define this if you have ATA power-off control */
-//#define HAVE_ATA_POWER_OFF
+#define HAVE_ATA_POWER_OFF
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
@@ -151,10 +156,12 @@
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
-#ifndef ZEN_VISION
-#define BOOTFILE_EXT "zvm"
+#ifdef ZEN_VISION
+ #define BOOTFILE_EXT "zv"
+#elseif defined(ZVM_60GB)
+ #define BOOTFILE_EXT "zvm60"
 #else
-#define BOOTFILE_EXT "zv"
+ #define BOOTFILE_EXT "zvm"
 #endif
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
@@ -164,13 +171,12 @@
 #define USB_VENDOR_ID 0x041e 
 #define USB_PRODUCT_ID 0x4133
 
-//DEBUGGING!
+/*DEBUGGING!*/
 #ifdef BOOTLOADER
 #define THREAD_EXTRA_CHECKS 1
 #define DEBUG 1
 #define debug(msg) printf(msg)
 #define BUTTON_DEBUG
-
-#define DO_THREAD_TEST
 #endif
+
 #endif

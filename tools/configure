@@ -677,8 +677,9 @@ cat <<EOF
  60) Elio TPJ-1022     70) M:Robe 500         80) DAX 1GB MP3/DAB
                        71) M:Robe 100
  ==Creative==
- 90) Zen Vision:M
- 91) Zen Vision
+ 90) Zen Vision:M 30GB
+ 91) Zen Vision:M 60GB
+ 92) Zen Vision
 
 EOF
 
@@ -1476,7 +1477,31 @@ fi
     t_model="creative-zvm"
     ;;
     
-    91|creativezenvision)
+    91|creativezvm60gb)
+    target_id=40
+    modelname="creativezvm"
+    target="-DCREATIVE_ZVM -DZVM_60GB"
+    memory=64
+    arm926ejscc
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
+    tool="$rootdir/tools/scramble -creative=zvm60"
+    output="rockbox.zvm60"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    toolset=$ipodbitmaptools
+    boottool="$rootdir/tools/scramble -creative=zvm60"
+    bootoutput="rockbox.zvm60boot"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tms320dm320"
+    t_model="creative-zvm"
+    ;;
+    
+    92|creativezenvision)
     target_id=39
     modelname="creativezm"
     target="-DCREATIVE_ZVM -DZEN_VISION"
