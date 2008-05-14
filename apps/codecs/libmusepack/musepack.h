@@ -56,6 +56,16 @@ extern "C" {
 #define IBSS_ATTR_MPC_SAMPLE_BUF IBSS_ATTR
 #endif
 
+#ifndef IBSS_ATTR_MPC_LARGE_IRAM
+#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250)
+/* PP5022/24 and MCF5250 have 128KB of IRAM */
+#define IBSS_ATTR_MPC_LARGE_IRAM IBSS_ATTR
+#else
+/* other PP's and MCF5249 have 96KB of IRAM */
+#define IBSS_ATTR_MPC_LARGE_IRAM
+#endif
+#endif
+
 #ifdef ROCKBOX_LITTLE_ENDIAN
 #define MPC_LITTLE_ENDIAN
 #endif

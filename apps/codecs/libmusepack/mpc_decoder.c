@@ -75,21 +75,21 @@ extern const HuffmanTyp    mpc_table_Region_C [ 4];
 #define HUFFMAN_DECODE_FASTEST(d,a,b,c)  mpc_decoder_huffman_decode_fastest ( (d), (a), (b), 32-(c) )
 #define HUFFMAN_DECODE_FASTERER(d,a,b,c)  mpc_decoder_huffman_decode_fasterer ( (d), (a), (b), 32-(c) )
 
-mpc_uint8_t     LUT1_0  [1<< 6];
-mpc_uint8_t     LUT1_1  [1<< 9];            //  576 Bytes
-mpc_uint8_t     LUT2_0  [1<< 7];
-mpc_uint8_t     LUT2_1  [1<<10];            // 1152 Bytes
-mpc_uint8_t     LUT3_0  [1<< 4];
-mpc_uint8_t     LUT3_1  [1<< 5];            //   48 Bytes
-mpc_uint8_t     LUT4_0  [1<< 4];
-mpc_uint8_t     LUT4_1  [1<< 5];            //   48 Bytes
-mpc_uint8_t     LUT5_0  [1<< 6];
-mpc_uint8_t     LUT5_1  [1<< 8];            //  320 Bytes
-mpc_uint8_t     LUT6_0  [1<< 7];
-mpc_uint8_t     LUT6_1  [1<< 7];            //  256 Bytes
-mpc_uint8_t     LUT7_0  [1<< 8];
-mpc_uint8_t     LUT7_1  [1<< 8];            //  512 Bytes
-mpc_uint8_t     LUTDSCF [1<< 6];            //   64 Bytes = 2976 Bytes
+mpc_uint8_t     LUT1_0  [1<< 6] IBSS_ATTR_MPC_LARGE_IRAM;
+mpc_uint8_t     LUT1_1  [1<< 9] IBSS_ATTR_MPC_LARGE_IRAM; //  576 Bytes
+mpc_uint8_t     LUT2_0  [1<< 7] IBSS_ATTR_MPC_LARGE_IRAM;
+mpc_uint8_t     LUT2_1  [1<<10] IBSS_ATTR_MPC_LARGE_IRAM; // 1152 Bytes
+mpc_uint8_t     LUT3_0  [1<< 4] IBSS_ATTR_MPC_LARGE_IRAM;
+mpc_uint8_t     LUT3_1  [1<< 5] IBSS_ATTR_MPC_LARGE_IRAM; //   48 Bytes
+mpc_uint8_t     LUT4_0  [1<< 4] IBSS_ATTR_MPC_LARGE_IRAM;
+mpc_uint8_t     LUT4_1  [1<< 5] IBSS_ATTR_MPC_LARGE_IRAM; //   48 Bytes
+mpc_uint8_t     LUT5_0  [1<< 6] IBSS_ATTR_MPC_LARGE_IRAM;
+mpc_uint8_t     LUT5_1  [1<< 8] IBSS_ATTR_MPC_LARGE_IRAM; //  320 Bytes
+mpc_uint8_t     LUT6_0  [1<< 7] IBSS_ATTR_MPC_LARGE_IRAM;
+mpc_uint8_t     LUT6_1  [1<< 7] IBSS_ATTR_MPC_LARGE_IRAM; //  256 Bytes
+mpc_uint8_t     LUT7_0  [1<< 8] IBSS_ATTR_MPC_LARGE_IRAM;
+mpc_uint8_t     LUT7_1  [1<< 8] IBSS_ATTR_MPC_LARGE_IRAM; //  512 Bytes
+mpc_uint8_t     LUTDSCF [1<< 6] IBSS_ATTR_MPC_LARGE_IRAM; //   64 Bytes = 2976 Bytes
 
 //------------------------------------------------------------------------------
 // types
@@ -119,8 +119,8 @@ static inline mpc_int32_t mpc_decoder_huffman_decode_fastest(mpc_decoder *d, con
 static void mpc_move_next(mpc_decoder *d);
 
 mpc_uint32_t  Speicher[MPC_DECODER_MEMSIZE];
-MPC_SAMPLE_FORMAT Y_L[36][32];
-MPC_SAMPLE_FORMAT Y_R[36][32];
+MPC_SAMPLE_FORMAT Y_L[36][32] IBSS_ATTR_MPC_LARGE_IRAM;
+MPC_SAMPLE_FORMAT Y_R[36][32] IBSS_ATTR_MPC_LARGE_IRAM;
 
 //------------------------------------------------------------------------------
 // utility functions
