@@ -40,7 +40,7 @@ extern struct viewport* current_vp;
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
 
-bool lcd_enabled()
+bool lcd_enabled(void)
 {
     return lcd_on;
 }

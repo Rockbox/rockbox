@@ -47,6 +47,7 @@
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 byte-swapped */
 
+#ifndef BOOTLOADER
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
 
@@ -55,6 +56,7 @@
  * We can currently put the lcd to sleep but it won't wake up properly */
 #define HAVE_LCD_SLEEP
 #define HAVE_LCD_SLEEP_SETTING
+#endif
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP

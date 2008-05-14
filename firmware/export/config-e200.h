@@ -47,6 +47,7 @@
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
+#ifndef BOOTLOADER
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE
 
@@ -54,6 +55,7 @@
    should be defined as well. */
 #define HAVE_LCD_SLEEP
 #define HAVE_LCD_SLEEP_SETTING
+#endif
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP

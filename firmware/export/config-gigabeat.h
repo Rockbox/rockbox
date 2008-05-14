@@ -38,6 +38,7 @@
 #define LCD_DEPTH  16   /* 65k colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
+#ifndef BOOTLOADER
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
 
@@ -47,6 +48,7 @@
 /* We don't use a setting but a fixed delay after the backlight has
  * turned off */
 #define LCD_SLEEP_TIMEOUT (5*HZ)
+#endif /* BOOTLOADER */
 
 #define CONFIG_KEYPAD GIGABEAT_PAD
 

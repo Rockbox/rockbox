@@ -35,9 +35,11 @@ bool _backlight_init(void)
 void _backlight_on(void)
 {
     int level;
-    lcd_enable(true);
-#ifndef BOOTLOADER
-    _lcd_sleep_timer = 0; /* LCD should be awake already */
+#ifdef HAVE_LCD_SLEEP
+    backlight_lcd_sleep_countdown(false); /* stop counter */
+#endif
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(true); /* power on lcd + visible display */
 #endif
     level = disable_irq_save();
     pcf50606_write(0x38, 0xb0); /* Backlight ON, GPO1INV=1, GPO1ACT=011 */
@@ -49,16 +51,11 @@ void _backlight_off(void)
     int level = disable_irq_save();
     pcf50606_write(0x38, 0x80); /* Backlight OFF, GPO1INV=1, GPO1ACT=000 */
     restore_irq(level);
-    lcd_enable(false);
-#ifndef BOOTLOADER
-    /* Start LCD sleep countdown */
-    if (_lcd_sleep_timeout < 0)
-    {
-        _lcd_sleep_timer = 0; /* Setting == Always */
-        lcd_sleep();
-    }
-    else
-        _lcd_sleep_timer = _lcd_sleep_timeout;
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(false); /* power off visible display */
+#endif
+#ifdef HAVE_LCD_SLEEP
+    backlight_lcd_sleep_countdown(true); /* start countdown */
 #endif
 }
 

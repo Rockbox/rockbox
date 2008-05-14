@@ -59,6 +59,7 @@
 
 #define LCD_REMOTE_PIXELFORMAT VERTICAL_INTERLEAVED
 
+#ifndef BOOTLOADER
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
 
@@ -66,6 +67,7 @@
    should be defined as well. */
 #define HAVE_LCD_SLEEP
 #define HAVE_LCD_SLEEP_SETTING
+#endif
 
 #define CONFIG_KEYPAD IAUDIO_X5M5_PAD
 
