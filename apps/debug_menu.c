@@ -2244,46 +2244,6 @@ static bool dbg_set_memory_guard(void)
 }
 #endif /* CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) */
 
-#if defined(TOSHIBA_GIGABEAT_F) && !defined(SIMULATOR)
-
-extern volatile bool lcd_poweroff;
-
-static bool dbg_lcd_power_off(void)
-{
-    lcd_setmargins(0, 0);
-
-    while(1)
-    {
-        int button;
-
-        lcd_clear_display();
-        lcd_puts(0, 0, "LCD Power Off");
-        if(lcd_poweroff)
-            lcd_puts(1, 1, "Yes");
-        else
-            lcd_puts(1, 1, "No");
-
-        lcd_update();
-
-        button = get_action(CONTEXT_STD,HZ/5);
-        switch(button)
-        {
-            case ACTION_STD_PREV:
-            case ACTION_STD_NEXT:
-                lcd_poweroff = !lcd_poweroff;
-                break;
-            case ACTION_STD_OK:
-            case ACTION_STD_CANCEL:
-                return false;
-            default:
-                sleep(HZ/10);
-                break;
-        }
-    }
-    return false;
-}
-#endif
-
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
 static bool dbg_write_eeprom(void)
 {
@@ -2498,9 +2458,6 @@ struct the_menu_item {
     bool (*function) (void); /* return true if USB was connected */
 };
 static const struct the_menu_item menuitems[] = {
-#if defined(TOSHIBA_GIGABEAT_F) && !defined(SIMULATOR)
-        { "LCD Power Off", dbg_lcd_power_off },
-#endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
     (defined(CPU_PP) && !(defined(SANSA_E200) || defined(SANSA_C200)))
         { "Dump ROM contents", dbg_save_roms },

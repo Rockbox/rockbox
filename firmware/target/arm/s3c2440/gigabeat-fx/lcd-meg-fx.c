@@ -27,7 +27,6 @@
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
 static volatile bool lcd_on = true;
-volatile bool lcd_poweroff = false;
 static unsigned lcd_yuv_options = 0;
 /*
 ** This is imported from lcd-16bit.c
