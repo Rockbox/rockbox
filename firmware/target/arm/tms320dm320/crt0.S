@@ -153,7 +153,7 @@ start:
     msr    cpsr_c, #0xd3
     ldr    sp, =stackend
     
-#if defined(BOOTLOADER) && !defined(CREATIVE_ZVM)
+#if defined(BOOTLOADER) && !defined(CREATIVE_ZVx)
     /* get the high part of our execute address */
     ldr    r2, =0xffffff00
     and    r4, pc, r2

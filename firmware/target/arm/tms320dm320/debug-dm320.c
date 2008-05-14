@@ -34,7 +34,7 @@ bool __dbg_ports(void)
     return false;
 }
 
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
 extern char r_buffer[5];
 extern int r_button;
 #endif
@@ -42,7 +42,7 @@ bool __dbg_hw_info(void)
 {
     int line = 0, oldline;
 	int button;
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
     int *address=0x0;
 #endif
     bool done=false;
@@ -103,14 +103,14 @@ bool __dbg_hw_info(void)
 					lcd_puts(0, line++, " Unknown DM320 Chip ID");
 	}
 
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
     line++;
 #endif
     oldline=line;
     while(!done)
     {
         line = oldline;
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
         button = button_get(false);
         button&=~BUTTON_REPEAT;
         if (button == BUTTON_POWER)
@@ -145,7 +145,7 @@ bool __dbg_hw_info(void)
         lcd_puts(0, line++, "[Rockbox info]");
         snprintf(buf, sizeof(buf), "current tick: %08x Seconds running: %08d",
             (unsigned int)current_tick, (unsigned int)current_tick/100);  lcd_puts(0, line++, buf);
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
         snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x", 
             (unsigned int)address, *address);           lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "Address: 0x%08x Data: 0x%08x",

@@ -25,10 +25,14 @@
 #include "button-target.h"
 #include "i2c-dm320.h"
 
+#define BUTTON_DEBUG
+
+#ifdef BUTTON_DEBUG
 #include "lcd-target.h"
 #include "lcd.h"
 #include "sprintf.h"
 #include "font.h"
+#endif
 
 #ifndef ZEN_VISION
 /* Creative Zen Vision:M */
@@ -189,7 +193,6 @@ void GIO0(void)
     if(tick_diff >= TICK_MIN && tick_diff <= TICK_MAX)
     {
         /* Ignore this, as it is a hold event */
-        IO_INTC_IRQ1 = INTR_IRQ1_EXT0;
         return;
     }
     last_btn = btn_press;
@@ -271,8 +274,8 @@ void GIO0(void)
 #endif
 }
 
-void send_command_to_pic(unsigned char in, unsigned char* out,
-                         unsigned int length)
+void send_command_to_pic(const unsigned char in, unsigned char* out,
+                         const unsigned int length)
 {
     /* Disable GIO0 interrupt */
     IO_INTC_EINT1 &= ~INTR_EINT1_EXT0;

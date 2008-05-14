@@ -48,7 +48,7 @@
 /* Conditions under which we want the entire driver */
 #if !defined(BOOTLOADER) || \
      (defined(TOSHIBA_GIGABEAT_S) && defined(USE_ROCKBOX_USB) && defined(USB_STORAGE)) || \
-     (defined(CREATIVE_ZVM) && defined(HAVE_USBSTACK))
+     (defined(CREATIVE_ZVx) && defined(HAVE_USBSTACK))
 #define USB_FULL_INIT
 #endif
 

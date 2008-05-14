@@ -1453,7 +1453,7 @@ fi
     t_model="logikdax"
     ;;
 	
-    90|creativezvm)
+    90|creativezvm30gb)
     target_id=35
     modelname="creativezvm"
     target="-DCREATIVE_ZVM"
@@ -1480,7 +1480,7 @@ fi
     91|creativezvm60gb)
     target_id=40
     modelname="creativezvm"
-    target="-DCREATIVE_ZVM -DZVM_60GB"
+    target="-DCREATIVE_ZVM60GB"
     memory=64
     arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -1504,7 +1504,7 @@ fi
     92|creativezenvision)
     target_id=39
     modelname="creativezm"
-    target="-DCREATIVE_ZVM -DZEN_VISION"
+    target="-DCREATIVE_ZV"
     memory=64
     arm926ejscc
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"

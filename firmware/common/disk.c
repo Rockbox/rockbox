@@ -68,7 +68,7 @@ struct partinfo* disk_init(IF_MV_NONVOID(int drive))
 #endif
 
     ata_read_sectors(IF_MV2(drive,) 0,1, &sector);
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
     /* check that the boot sector is initialized */
     if ( (sector[510] != 0x55) ||
          (sector[511] != 0xaa)) {
@@ -187,7 +187,7 @@ int disk_mount(int drive)
     {
         return 0;
     }
-#if defined(TOSHIBA_GIGABEAT_S) ||defined(CREATIVE_ZVM)
+#if defined(TOSHIBA_GIGABEAT_S) || defined(CREATIVE_ZVx)
     int i = 1;  /* For the Gigabeat S, we mount the second partition */
 #else
     int i = 0;

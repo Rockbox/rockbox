@@ -24,7 +24,7 @@
 #include <stdbool.h>
 
 enum SPI_target {
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
     SPI_target_TSC2100 = 0,
     SPI_target_RX5X348AB,
     SPI_target_BACKLIGHT,

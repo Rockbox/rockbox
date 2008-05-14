@@ -43,7 +43,7 @@ struct SPI_info {
 
 struct SPI_info spi_targets[] =
 {
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
     [SPI_target_TSC2100]   = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, GIO_TS_ENABLE },
     [SPI_target_RX5X348AB] = { &IO_GIO_BITSET0, &IO_GIO_BITCLR0, GIO_RTC_ENABLE},
     [SPI_target_BACKLIGHT] = { &IO_GIO_BITCLR1, &IO_GIO_BITSET1, GIO_BL_ENABLE },
@@ -106,7 +106,7 @@ void spi_init(void)
     IO_SERIAL0_MODE |= IO_SERIAL0_MODE_SCLK;
     /* Enable TX */
     IO_SERIAL0_TX_ENABLE = 0x0001;
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
     /* Set GIO 18 to output for touch screen slave enable */
     IO_GIO_DIR1 &= ~GIO_TS_ENABLE;
     /* Set GIO 12 to output for rtc slave enable */

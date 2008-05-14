@@ -24,7 +24,7 @@
 #include "uart-target.h"
 #include "system-arm.h"
 #include "spi.h"
-#ifdef CREATIVE_ZVM
+#ifdef CREATIVE_ZVx
 #include "dma-target.h"
 #endif
 
@@ -224,7 +224,7 @@ void system_init(void)
     IO_TIMER2_TMMD = CONFIG_TIMER2_TMMD_STOP;
     IO_TIMER3_TMMD = CONFIG_TIMER3_TMMD_STOP;
 
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
     /* set GIO26 (reset pin) to output and low */
     IO_GIO_BITCLR1=(1<<10);
     IO_GIO_DIR1&=~(1<<10);
@@ -233,7 +233,7 @@ void system_init(void)
     uart_init();
     spi_init();
     
-#ifdef CREATIVE_ZVM
+#ifdef CREATIVE_ZVx
     dma_init();
 #endif
  
@@ -245,8 +245,8 @@ void system_init(void)
     map_section(CONFIG_SDRAM_START, CONFIG_SDRAM_START, MEM, CACHE_ALL);
     /* enable buffered writing for the framebuffer */
     map_section((int)FRAME, (int)FRAME, 1, BUFFERED);
-#ifdef CREATIVE_ZVM
-    //mimic OF
+#ifdef CREATIVE_ZVx
+    /* mimic OF */
     map_section(0x00100000, 0x00100000,  4, CACHE_NONE);
     map_section(0x04700000, 0x04700000,  2,   BUFFERED);
     map_section(0x40000000, 0x40000000, 16, CACHE_NONE);

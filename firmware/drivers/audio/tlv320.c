@@ -59,7 +59,7 @@ int tenthdb2master(int db)
 }
 
 /* local functions and definations */
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
 #define TLV320_ADDR 0x34
 #else
 #define TLV320_ADDR 0x1A
@@ -118,10 +118,10 @@ void audiohw_init(void)
     audiohw_mute(true);
     tlv320_write_reg(REG_AAP, AAP_DAC | AAP_MICM);
     tlv320_write_reg(REG_DAP, 0x00);  /* No deemphasis */
-#ifndef CREATIVE_ZVM
+#ifndef CREATIVE_ZVx
     tlv320_write_reg(REG_DAIF, DAIF_IWL_16 | DAIF_FOR_I2S);
 #else
-    tlv320_write_reg(REG_DAIF, DAIF_IWL_16 | DAIF_FOR_DSP);
+    tlv320_write_reg(REG_DAIF, DAIF_IWL_32 | DAIF_FOR_DSP);
 #endif
     tlv320_write_reg(REG_DIA, DIA_ACT);
     audiohw_set_frequency(-1); /* default */

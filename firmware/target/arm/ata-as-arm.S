@@ -33,7 +33,7 @@
     /* Untested */
     .text
     .equ    .ata_port, 0x18000000
-#elif defined(CREATIVE_ZVM)
+#elif defined(CREATIVE_ZVx) /* Zen Vision could have an other address */
     .text
     .equ    .ata_port, 0x50FEE000
 #endif

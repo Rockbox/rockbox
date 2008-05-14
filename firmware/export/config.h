@@ -253,6 +253,10 @@
 #include "config-cowond2.h"
 #elif defined(CREATIVE_ZVM)
 #include "config-creativezvm.h"
+#elif defined(CREATIVE_ZVM60GB)
+#include "config-creativezvm60gb.h"
+#elif defined(CREATIVE_ZV)
+#include "config-creativezv.h"
 #else
 /* no known platform */
 #endif

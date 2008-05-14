@@ -716,7 +716,7 @@ target/arm/tms320dm320/mrobe-500/usb-mr500.c
 #endif /* SIMULATOR */
 #endif /* MROBE_500 */
 
-#ifdef CREATIVE_ZVM
+#ifdef CREATIVE_ZVx
 #ifndef SIMULATOR
 target/arm/ata-as-arm.S
 target/arm/lcd-as-memframe.S
@@ -731,7 +731,7 @@ target/arm/tms320dm320/creative-zvm/power-creativezvm.c
 target/arm/tms320dm320/creative-zvm/powermgmt-creativezvm.c
 target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 #endif /* SIMULATOR */
-#endif /* CREATIVE_ZVM */
+#endif /* CREATIVE_ZVx */
 
 #ifdef MROBE_100
 #ifndef SIMULATOR

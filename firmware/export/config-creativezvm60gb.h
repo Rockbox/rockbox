@@ -18,19 +18,19 @@
  ****************************************************************************/
 
 /*
- * This config file is for the Creative Zen Vision:M
+ * This config file is for the Creative Zen Vision:M 60GB
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
 #define CONFIG_SDRAM_START 0x00900000
 
-#define CREATIVE_ZVM 1
+#define CREATIVE_ZVM60GB 1
 
 /* This makes it part of the Creative Zen Vision family :) */
 #define CREATIVE_ZVx 1
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 26
+#define MODEL_NUMBER 27
 
 /* define this if you use an ATA controller */
 #define HAVE_ATA
@@ -154,21 +154,15 @@
 /* Define this if you have adjustable CPU frequency */
 /* #define HAVE_ADJUSTABLE_CPU_FREQ */
 
-#define BOOTFILE_EXT "zvm"
+#define BOOTFILE_EXT "zvm60"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-#define CONFIG_USBOTG	USBOTG_ISP1583
+#if 0
+#define CONFIG_USBOTG	USBOTG_ISP1761
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0x041e 
 #define USB_PRODUCT_ID 0x4133
-
-/*DEBUGGING!*/
-#ifdef BOOTLOADER
-#define THREAD_EXTRA_CHECKS 1
-#define DEBUG 1
-#define debug(msg) printf(msg)
-#define BUTTON_DEBUG
 #endif
 
-#endif
+#endif /* SIMULATOR */

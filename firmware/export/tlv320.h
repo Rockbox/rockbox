@@ -111,7 +111,7 @@ extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
 
 /* REG_SRC: Sample Rate Control */
 #define REG_SRC         0x8
-#define SRC_CLKIN       (1 << 6)    /* Clock input divider                          */ 
+#define SRC_CLKIN       (1 << 6)    /* Clock input divider                          */
 #define SRC_CLKOUT      (1 << 7)    /* Clock output divider                         */
 /*#define SRC_SR        ()*/
 #define SRC_BOSR        (1 << 1)    /* Base oversampling rate, depends on SRC_USB   */
