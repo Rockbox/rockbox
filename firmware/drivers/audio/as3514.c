@@ -277,7 +277,7 @@ void audiohw_mute(bool mute)
     }
 }
 
-/* Nice shutdown of WM8758 codec */
+/* Nice shutdown of AS3514 audio codec */
 void audiohw_close(void)
 {
     /* mute headphones */
