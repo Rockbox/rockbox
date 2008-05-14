@@ -264,12 +264,10 @@ static void set_prescaled_volume(void)
         prescale = VOLUME_MAX - current_volume;
 #endif
 
-#if defined(HAVE_SW_TONE_CONTROLS)
+#if defined(AUDIOHW_HAVE_PRESCALER)
+    audiohw_set_prescaler(prescale);
+#else
     dsp_callback(DSP_CALLBACK_SET_PRESCALE, prescale);
-#elif CONFIG_CODEC == MAS3507D
-    mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
-#elif defined(HAVE_UDA1380)
-    audiohw_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
 #endif
 
     if (current_volume == VOLUME_MIN)

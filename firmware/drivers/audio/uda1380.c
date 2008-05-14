@@ -282,6 +282,11 @@ void audiohw_postinit(void)
     audiohw_mute(false);
 }
 
+void audiohw_set_prescaler(int val)
+{
+    audiohw_set_mixer_vol(tenthdb2mixer(-val), tenthdb2mixer(-val));
+}
+
 /* Nice shutdown of UDA1380 codec */
 void audiohw_close(void)
 {

@@ -24,7 +24,7 @@
 #define VOLUME_MIN -840
 #define VOLUME_MAX  0
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP)
 
 extern int tenthdb2master(int db);
 extern int tenthdb2mixer(int db);

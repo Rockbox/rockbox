@@ -161,6 +161,13 @@ void audiohw_set_bass(int val)
 #endif
 }
 
+#if CONFIG_CODEC == MAS3507D
+void audiohw_set_prescaler(int val)
+{
+    mas_writereg(MAS_REG_KPRESCALE, prescale_table[val/10]);
+}
+#endif
+
 void audiohw_set_treble(int val)
 {
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)

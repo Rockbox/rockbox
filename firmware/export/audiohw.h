@@ -28,6 +28,7 @@
 #define BASS_CAP        (1 << 1)
 #define BALANCE_CAP     (1 << 2)
 #define CLIPPING_CAP    (1 << 3)
+#define PRESCALER_CAP   (1 << 4)
 
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
@@ -71,6 +72,10 @@
 
 #if (AUDIOHW_CAPS & CLIPPING_CAP)
 #define AUDIOHW_HAVE_CLIPPING
+#endif
+
+#if (AUDIOHW_CAPS & PRESCALER_CAP)
+#define AUDIOHW_HAVE_PRESCALER
 #endif
 #endif /* AUDIOHW_CAPS */
 
@@ -162,6 +167,16 @@ void audiohw_close(void);
  *          CLIPPING_CAP
  */
 void audiohw_set_volume(int val);
+#endif
+
+#ifdef AUDIOHW_HAVE_PRESCALER
+/**
+ * Set new prescaler value.
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          PRESCALER_CAP
+ */
+void audiohw_set_prescaler(int val);
 #endif
 
 #ifdef AUDIOHW_HAVE_BALANCE
