@@ -1518,7 +1518,7 @@ fi
     swcodec="yes"
     toolset=$ipodbitmaptools
     boottool="$rootdir/tools/scramble -creative=zenvision"
-    bootoutput="rockbox.zv"
+    bootoutput="rockbox.zvboot"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="tms320dm320"
