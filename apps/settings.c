@@ -924,7 +924,7 @@ void settings_apply(bool read_disk)
 #ifdef HAS_BUTTON_HOLD
     backlight_set_on_button_hold(global_settings.backlight_on_button_hold);
 #endif
-#ifdef HAVE_LCD_SLEEP
+#ifdef HAVE_LCD_SLEEP_SETTING
     lcd_set_sleep_after_backlight_off(global_settings.lcd_sleep_after_backlight_off);
 #endif
 #endif /* HAVE_BACKLIGHT */

@@ -54,6 +54,7 @@
  * should be defined as well.
  * We can currently put the lcd to sleep but it won't wake up properly */
 #define HAVE_LCD_SLEEP
+#define HAVE_LCD_SLEEP_SETTING
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP

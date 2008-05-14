@@ -1126,7 +1126,7 @@ const struct settings_list settings[] = {
                    ID2P(LANG_NORMAL), ID2P(LANG_OFF), ID2P(LANG_ON)),
 #endif
 
-#ifdef HAVE_LCD_SLEEP
+#ifdef HAVE_LCD_SLEEP_SETTING
     STRINGCHOICE_SETTING(0, lcd_sleep_after_backlight_off,
                          LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF, 3,
                          "lcd sleep after backlight off",
@@ -1137,7 +1137,7 @@ const struct settings_list settings[] = {
                          TALK_ID(20, UNIT_SEC), TALK_ID(30, UNIT_SEC),
                          TALK_ID(45, UNIT_SEC),TALK_ID(60, UNIT_SEC),
                          TALK_ID(90, UNIT_SEC)),
-#endif
+#endif /* HAVE_LCD_SLEEP_SETTING */
 #endif /* HAVE_BACKLIGHT */
 
     OFFON_SETTING(0, hold_lr_for_scroll_in_list, -1, true,

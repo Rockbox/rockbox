@@ -26,7 +26,8 @@
 
 #define LCDADDR(x, y) (&lcd_framebuffer[(y)][(x)])
 
-static volatile bool lcd_on = true;
+static bool lcd_on = true;
+static bool lcd_powered = true;
 static unsigned lcd_yuv_options = 0;
 /*
 ** This is imported from lcd-16bit.c
@@ -174,6 +175,8 @@ void LCD_SPI_powerdown(void)
         0,0x04,1,0x00
     };
 
+    lcd_powered = false;
+
     LCD_SPI_start();
 
     LCD_SPI_send(powerdncmd, sizeof(powerdncmd));
@@ -198,6 +201,8 @@ void LCD_SPI_powerup(void)
     LCD_SPI_send(powerupcmd, sizeof(powerupcmd));
 
     LCD_SPI_stop();
+
+    lcd_powered = true;
 }
 
 void LCD_SPI_init(void)
@@ -266,23 +271,40 @@ void lcd_init_device(void)
     LCD_SPI_init();
 }
 
+void lcd_sleep(void)
+{
+    if (lcd_powered)
+    {
+        /* "not powered" implies "disabled" */
+        if (lcd_on)
+            lcd_enable(false);
+
+        LCD_SPI_powerdown();
+    }
+}
+
 void lcd_enable(bool state)
 {
+    if (state == lcd_on)
+        return;
+
     if(state)
     {
-        if(!lcd_on)
+        /* "enabled" implies "powered" */
+        if (!lcd_powered)
         {
-            lcd_on = true;
-            lcd_update();
             LCD_SPI_powerup();
+            /* Wait long enough for a frame to be written - yes, it
+             * takes awhile. */
+            sleep(HZ/5);
         }
+
+        lcd_on = true;
+        lcd_update();
     }
     else 
     {
-        if(lcd_on) {
-            lcd_on = false;
-            LCD_SPI_powerdown();
-        }
+        lcd_on = false;
     }
 }
 

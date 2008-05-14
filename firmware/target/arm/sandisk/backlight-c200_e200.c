@@ -38,11 +38,11 @@ void _backlight_set_brightness(int brightness)
 
 void _backlight_on(void)
 {
-#ifdef HAVE_LCD_ENABLE
-    lcd_enable(true); /* power on lcd */
+#ifdef HAVE_LCD_SLEEP
+    backlight_lcd_sleep_countdown(false); /* stop counter */
 #endif
-#if defined(HAVE_LCD_SLEEP) && !defined(BOOTLOADER)
-    _lcd_sleep_timer = 0; /* LCD should be awake already */
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(true); /* power on lcd + visible display */
 #endif
     pp_i2c_send(AS3514_I2C_ADDR, AS3514_DCDC15, backlight_brightness);
 }
@@ -51,17 +51,10 @@ void _backlight_off(void)
 {
     pp_i2c_send(AS3514_I2C_ADDR, AS3514_DCDC15, 0x0);
 #ifdef HAVE_LCD_ENABLE
-    lcd_enable(false); /* power off lcd */
+    lcd_enable(false); /* power off visible display */
 #endif
-#if defined(HAVE_LCD_SLEEP) && !defined(BOOTLOADER)
-    /* Start LCD sleep countdown */
-    if (_lcd_sleep_timeout < 0)
-    {
-        _lcd_sleep_timer = 0; /* Setting == Always */
-        lcd_sleep();
-    }
-    else
-        _lcd_sleep_timer = _lcd_sleep_timeout;
+#ifdef HAVE_LCD_SLEEP
+    backlight_lcd_sleep_countdown(true); /* start countdown */
 #endif
 }
 

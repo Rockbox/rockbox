@@ -94,7 +94,7 @@ MENUITEM_SETTING(backlight_fade_out, &global_settings.backlight_fade_out, NULL);
 MENUITEM_SETTING(bl_filter_first_keypress, 
                     &global_settings.bl_filter_first_keypress, 
                     filterfirstkeypress_callback);
-#ifdef HAVE_LCD_SLEEP
+#ifdef HAVE_LCD_SLEEP_SETTING
 MENUITEM_SETTING(lcd_sleep_after_backlight_off,
                 &global_settings.lcd_sleep_after_backlight_off, NULL);
 #endif
@@ -130,7 +130,7 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
             ,&backlight_fade_in, &backlight_fade_out
 # endif
             ,&bl_filter_first_keypress
-# ifdef HAVE_LCD_SLEEP
+# ifdef HAVE_LCD_SLEEP_SETTING
             ,&lcd_sleep_after_backlight_off
 # endif
 # ifdef HAVE_BACKLIGHT_BRIGHTNESS

@@ -126,6 +126,7 @@
  * should be defined as well.
  * We can currently put the lcd to sleep but it won't wake up properly */
 /*TODO: #define HAVE_LCD_SLEEP*/
+/*TODO: #define HAVE_LCD_SLEEP_SETTING <= optional */
 
 /* We're able to shut off power to the HDD */
 #define HAVE_ATA_POWER_OFF

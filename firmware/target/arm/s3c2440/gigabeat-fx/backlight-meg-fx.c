@@ -314,11 +314,6 @@ static void led_control_service(void)
             sc606_control=SC606_CONTROL_IDLE;
             break;
     }
-
-    if(sc606regCONFval&0x03)
-        lcd_enable(true);
-    else
-        lcd_enable(false);
 }
 #endif /* BOOTLOADER */
 
@@ -340,13 +335,22 @@ static void __backlight_dim(bool dim_now)
 
 void _backlight_on(void)
 {
-    lcd_enable(true);
+#ifdef HAVE_LCD_SLEEP
+    backlight_lcd_sleep_countdown(false); /* stop counter */
+#endif
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(true); /* power on lcd + visible display */
+#endif
     __backlight_dim(false);
 }    
 
 void _backlight_off(void)
 {
     __backlight_dim(true);
+#ifdef HAVE_LCD_SLEEP
+    /* Disable lcd after fade completes (when lcd_sleep timeout expires) */
+    backlight_lcd_sleep_countdown(true); /* start countdown */
+#endif
 }
 
 static inline void __buttonlight_on(void)

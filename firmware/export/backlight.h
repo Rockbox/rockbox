@@ -45,8 +45,10 @@ void backlight_set_on_button_hold(int index);
 #endif
 
 #ifdef HAVE_LCD_SLEEP
+void backlight_lcd_sleep_countdown(bool start);
+#ifdef HAVE_LCD_SLEEP_SETTING
 void lcd_set_sleep_after_backlight_off(int index);
-extern const signed char lcd_sleep_timeout_value[];
+#endif
 #endif
 
 #else /* !HAVE_BACKLIGHT */
@@ -88,10 +90,6 @@ void buttonlight_set_timeout(int value);
 /* Private API for use in target tree backlight code only */
 #ifdef HAVE_BUTTON_LIGHT
 extern int _buttonlight_timeout;
-#endif
-#ifdef HAVE_LCD_SLEEP
-extern int _lcd_sleep_timer;
-extern int _lcd_sleep_timeout;
 #endif
 
 #endif /* BACKLIGHT_H */

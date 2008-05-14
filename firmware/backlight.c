@@ -184,13 +184,40 @@ static int remote_backlight_on_button_hold = 0;
 #endif /* HAVE_REMOTE_LCD */
 
 #ifdef HAVE_LCD_SLEEP
+#ifdef HAVE_LCD_SLEEP_SETTING
 const signed char lcd_sleep_timeout_value[10] =
 {
     -1, 0, 5, 10, 15, 20, 30, 45, 60, 90
 };
-int _lcd_sleep_timer;
-int _lcd_sleep_timeout = 10*HZ;
+static int lcd_sleep_timeout = 10*HZ;
+#else
+/* Target defines needed value */
+static const int lcd_sleep_timeout = LCD_SLEEP_TIMEOUT;
 #endif
+
+static int lcd_sleep_timer = 0;
+
+void backlight_lcd_sleep_countdown(bool start)
+{
+    if (!start)
+    {
+        /* Cancel the LCD sleep countdown */
+        lcd_sleep_timer = 0;
+        return;
+    }
+
+    /* Start LCD sleep countdown */
+    if (lcd_sleep_timeout < 0)
+    {
+        lcd_sleep_timer = 0; /* Setting == Always */
+        lcd_sleep();
+    }
+    else
+    {
+        lcd_sleep_timer = lcd_sleep_timeout;
+    }
+}
+#endif /* HAVE_LCD_SLEEP */
 
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
 /* backlight fading */
@@ -328,8 +355,9 @@ static void _backlight_on(void)
         bl_dim_fraction = (BL_PWM_COUNT<<16);
         _backlight_on_normal();
     }
+
 #ifdef HAVE_LCD_SLEEP
-    _lcd_sleep_timer = 0; /* LCD should be awake already */
+    backlight_lcd_sleep(false);
 #endif
 }
 
@@ -344,15 +372,9 @@ static void _backlight_off(void)
         bl_dim_target = bl_dim_fraction = 0;
         _backlight_off_normal();
     }
+
 #ifdef HAVE_LCD_SLEEP
-    /* Start LCD sleep countdown */
-    if (_lcd_sleep_timeout < 0)
-    {
-        _lcd_sleep_timer = 0; /* Setting == Always */
-        lcd_sleep();
-    }
-    else
-        _lcd_sleep_timer = _lcd_sleep_timeout;
+    backlight_start_lcd_sleep_counter(false);
 #endif
 }
 
@@ -580,10 +602,10 @@ static void backlight_tick(void)
         }
     }
 #ifdef HAVE_LCD_SLEEP
-    else if(_lcd_sleep_timer)
+    else if(lcd_sleep_timer)
     {
-        _lcd_sleep_timer--;
-        if(_lcd_sleep_timer == 0)
+        lcd_sleep_timer--;
+        if(lcd_sleep_timer == 0)
         {
             /* Queue on bl thread or freeze! */
             queue_post(&backlight_queue, LCD_SLEEP, 0);
@@ -716,26 +738,26 @@ void backlight_set_on_button_hold(int index)
 }
 #endif /* HAS_BUTTON_HOLD */
 
-#ifdef HAVE_LCD_SLEEP
+#ifdef HAVE_LCD_SLEEP_SETTING
 void lcd_set_sleep_after_backlight_off(int index)
 {
     if ((unsigned)index >= sizeof(lcd_sleep_timeout_value))
         /* if given a weird value, use default */
         index = 3;
 
-    _lcd_sleep_timeout = HZ * lcd_sleep_timeout_value[index];
+    lcd_sleep_timeout = HZ * lcd_sleep_timeout_value[index];
 
     if (backlight_timer > 0 || backlight_get_current_timeout() == 0)
         /* Timer will be set when bl turns off or bl set to on. */
         return;
 
     /* Backlight is Off */
-    if (_lcd_sleep_timeout < 0)
-        _lcd_sleep_timer = 1; /* Always - sleep next tick */
+    if (lcd_sleep_timeout < 0)
+        lcd_sleep_timer = 1; /* Always - sleep next tick */
     else
-        _lcd_sleep_timer = _lcd_sleep_timeout; /* Never, other */
+        lcd_sleep_timer = lcd_sleep_timeout; /* Never, other */
 }
-#endif /* HAVE_LCD_SLEEP */
+#endif /* HAVE_LCD_SLEEP_SETTING */
 
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_on(void)

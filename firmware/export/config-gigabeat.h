@@ -41,6 +41,13 @@
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
 
+/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
+   should be defined as well. */
+#define HAVE_LCD_SLEEP
+/* We don't use a setting but a fixed delay after the backlight has
+ * turned off */
+#define LCD_SLEEP_TIMEOUT (5*HZ)
+
 #define CONFIG_KEYPAD GIGABEAT_PAD
 
 /* Define this if you do software codec */

@@ -646,7 +646,7 @@ struct user_settings
     int backlight_on_button_hold; /* what to do with backlight when hold
                                      switch is on */
 #endif
-#ifdef HAVE_LCD_SLEEP
+#ifdef HAVE_LCD_SLEEP_SETTING
     int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
                                           has turned off */
 #endif
