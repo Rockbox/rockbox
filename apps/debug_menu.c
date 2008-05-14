@@ -2426,7 +2426,7 @@ static bool dbg_isp1583(void)
 }
 #endif
 
-#ifdef CREATIVE_ZVx
+#if defined(CREATIVE_ZVx) && !defined(SIMULATOR)
 extern int pic_dbg_num_items(void);
 extern char* pic_dbg_item(int selected_item, void *data, char *buffer, size_t buffer_len);
 
@@ -2527,7 +2527,7 @@ static const struct the_menu_item menuitems[] = {
 #if CONFIG_USBOTG == USBOTG_ISP1583
         { "View ISP1583 info", dbg_isp1583 },
 #endif
-#ifdef CREATIVE_ZVx
+#if defined(CREATIVE_ZVx) && !defined(SIMULATOR)
         { "View PIC info", dbg_pic },
 #endif
 #ifdef ROCKBOX_HAS_LOGF
