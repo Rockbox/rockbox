@@ -1455,7 +1455,7 @@ fi
 	
     90|creativezvm30gb)
     target_id=35
-    modelname="creativezvm"
+    modelname="creativezvm30"
     target="-DCREATIVE_ZVM"
     memory=64
     arm926ejscc
@@ -1479,7 +1479,7 @@ fi
     
     91|creativezvm60gb)
     target_id=40
-    modelname="creativezvm"
+    modelname="creativezvm60"
     target="-DCREATIVE_ZVM60GB"
     memory=64
     arm926ejscc
