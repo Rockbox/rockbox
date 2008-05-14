@@ -66,47 +66,7 @@ inline void delay_cycles(volatile int delay)
     while(delay>0) delay--;
 }
 
-void SPI_LCD_CS(bool select)
-{
-    delay_cycles(0x4FFF);
-
-    GPBCON&=~0x30000;
-    GPBCON|=0x10000;
-
-    if(select)
-        GPBDAT|=0x100;
-    else 
-        GPBDAT&=~0x100;
-}
-
-void reset_LCD(bool reset)
-{
-    GPBCON&=~0xC000;
-    GPBCON|=0x4000;
-    if(reset)
-        GPBDAT|=0x80;
-    else
-        GPBDAT&=~0x80;
-}
-
-void SPI_Send_Bytes(const unsigned char *array, int count)
-{
-    while (count--)       
-    {
-        while ((SPSTA0&0x01)==0){};
-        SPTDAT0=*array++;
-    }
-}
-
-void Setup_LCD_SPI(void)
-{
-    s3c_regset(&CLKCON, 0x40000);
-    SPI_LCD_CS(false);
-    SPCON0=0x3E;
-    SPPRE0=24;
-}
-
-void Setup_LCD_CTRL(void)
+void LCD_CTRL_setup(void)
 {
     /* ENVID = 0, BPPMODE = 16 bpp, PNRMODE = TFT, MMODE = Each Frame, CLKVAL = 8 */
     LCDCON1 = 0x878;
@@ -128,67 +88,128 @@ void Setup_LCD_CTRL(void)
     LCDSADDR3 = 0x000000F0;
 }
 
-/* LCD init */
-void lcd_init_device(void)
+void LCD_CTRL_clock(bool onoff)
 {
-#ifdef BOOTLOADER
-    int i;
-    /* When the Rockbox bootloader starts, we are changing framebuffer address,
-       but we don't want what's shown on the LCD to change until we do an
-       lcd_update(), so copy the data from the old framebuffer to the new one */
-    unsigned short *buf = (unsigned short*)FRAME;
+    if(onoff)
+    {
+        GPCCON  &= ~0xFFF000FC;
+        GPDCON  &= ~0xFFF0FFF0;
 
-    memcpy(FRAME, (short *)((LCDSADDR1)<<1), 320*240*2);
+        GPCCON  |= 0xAAA000A8;
+        GPCUP   |= 0xFC0E;
 
-    /* The Rockbox bootloader is transitioning from RGB555I to RGB565 mode
-       so convert the frambuffer data accordingly */
-    for(i=0; i< 320*240; i++){
-        *buf = ((*buf>>1) & 0x1F) | (*buf & 0xffc0);
-        buf++;
+        GPDCON  |= 0xAAA0AAA0;
+        GPDUP   |= 0xFCFC;
+
+        s3c_regset(&CLKCON, 0x20);  /* enable LCD clock */
+        LCDCON1 |=0x01;
     }
-#endif
+    else
+    {
+        GPCCON  &= ~0xFFF000FC;
+        GPCUP   &= ~0xFC0E;
 
-    /* Set pins up */
-    GPCCON  |= 0xAAA000A8;
-    GPCUP   |= 0xFC0E;
+        GPDCON  &= ~0xFFF0FFF0;
+        GPDUP   &= ~0xFCFC;
 
-    GPDCON  |= 0xAAA0AAA0;
-    GPDUP   |= 0xFCFC;
+        LCDCON1 &= ~1;              /* Must diable first or bus may freeze */
+        s3c_regclr(&CLKCON, 0x20);  /* disable LCD clock */
+    }
+}
 
-    GPHUP   &= 0x600;
+void reset_LCD(bool reset)
+{
+    GPBCON&=~0xC000;
+    GPBCON|=0x4000;
+    if(reset)
+        GPBDAT|=0x80;
+    else
+        GPBDAT&=~0x80;
+}
 
-    GPECON  |= 0x0A800000;
-    GPEUP   |= 0x3800;
+void LCD_SPI_send(const unsigned char *array, int count)
+{
+    while (count--)       
+    {
+        while ((SPSTA0&0x01)==0){};
+        SPTDAT0=*array++;
+    }
+}
 
-    GPBUP   |= 0x181;
+void LCD_SPI_SS(bool select)
+{
+    delay_cycles(0x4FFF);
 
-#if !defined(BOOTLOADER)
-    lcd_poweroff = false;
-#endif
+    GPBCON&=~0x30000;
+    GPBCON|=0x10000;
 
-    s3c_regset(&CLKCON, 0x20);       /* enable LCD clock */
+    if(select)
+        GPBDAT|=0x100;
+    else 
+        GPBDAT&=~0x100;
+}
 
-    Setup_LCD_SPI();
+void LCD_SPI_start(void)
+{
+    s3c_regset(&CLKCON, 0x40000);   /* enable SPI clock */
+    LCD_SPI_SS(false);
+    SPCON0=0x3E;
+    SPPRE0=24;
 
-    Setup_LCD_CTRL();
+    reset_LCD(true);
+    LCD_SPI_SS(true);
+}
 
-    delay_cycles(0xA000);
+void LCD_SPI_stop(void)
+{
+    LCD_SPI_SS(false);
 
-    reset_LCD(true);    
-    LCDCON1|=0x01;
+    SPCON0 &= ~0x10;
+    s3c_regclr(&CLKCON, 0x40000);    /* disable SPI clock */  
+}
 
-    delay_cycles(0x80000);
+void LCD_SPI_powerdown(void)
+{
+    const unsigned char powerdncmd[] = 
+    {
+        0,0x04,1,0x00
+    };
 
-#if 0
-    /* Setup the appropriate screen modes */
-    TCONSEL= 0xCE6;
-#endif
-    
-    /* SPI data - Right now we are not sure what each of these SPI writes is actually
-     *      telling the lcd.  Many thanks to Alex Gerchanovsky for discovering them.
+    LCD_SPI_start();
+
+    LCD_SPI_send(powerdncmd, sizeof(powerdncmd));
+
+    LCD_SPI_stop();
+
+    reset_LCD(false);   /* This makes a big difference on power */
+    LCD_CTRL_clock(false);
+} 
+
+void LCD_SPI_powerup(void)
+{
+    const unsigned char powerupcmd[] = 
+    {
+        0,0x04,1,0x01
+    };
+
+    LCD_CTRL_clock(true);
+
+    LCD_SPI_start();
+
+    LCD_SPI_send(powerupcmd, sizeof(powerupcmd));
+
+    LCD_SPI_stop();
+}
+
+void LCD_SPI_init(void)
+{
+    /* SPI data - Right now we are not sure what each of these SPI writes is 
+     *  actually telling the lcd.  Many thanks to Alex Gerchanovsky for 
+     *  discovering them.
      *
-     * This looks like a register, data combination, 0 denoting a register address,
-     *      1 denoting data.  Addr 0x04 is used more than once and may be an enable.
+     * This looks like a register, data combination, 0 denoting a register 
+     *  address, 1 denoting data.  Addr 0x04 is used more than once is
+     *  an enable.
      */
     const unsigned char initbuf[] = 
     {
@@ -219,11 +240,51 @@ void lcd_init_device(void)
         0,0x04,1,0x01,
     };
 
-    SPI_LCD_CS(true);
-    SPI_Send_Bytes(initbuf, sizeof(initbuf));
-    SPI_LCD_CS(false);
+    LCD_CTRL_clock(true);
 
-    s3c_regclr(&CLKCON, 0x40000);    /* disable SPI clock */  
+    LCD_SPI_start();
+
+    LCD_SPI_send(initbuf, sizeof(initbuf));
+
+    LCD_SPI_stop(); 
+}
+
+/* LCD init */
+void lcd_init_device(void)
+{
+    /* Set pins up */
+
+    GPHUP   &= 0x600;
+
+    GPECON  |= 0x0A800000;
+    GPEUP   |= 0x3800;
+
+    GPBUP   |= 0x181;
+
+    s3c_regset(&CLKCON, 0x20);       /* enable LCD clock */
+
+    LCD_CTRL_setup();
+    LCD_SPI_init();
+}
+
+void lcd_enable(bool state)
+{
+    if(state)
+    {
+        if(!lcd_on)
+        {
+            lcd_on = true;
+            lcd_update();
+            LCD_SPI_powerup();
+        }
+    }
+    else 
+    {
+        if(lcd_on) {
+            lcd_on = false;
+            LCD_SPI_powerdown();
+        }
+    }
 }
 
 /* Update a fraction of the display. */
@@ -263,28 +324,6 @@ void lcd_update_rect(int x, int y, int width, int height)
     {
         /* Full width - copy as one line */
         lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
-    }
-}
-
-void lcd_enable(bool state)
-{
-    if(!lcd_poweroff)
-        return;
-    if(state)
-    {
-        if(!lcd_on)
-        {
-            lcd_on = true;
-            lcd_update();
-            LCDCON1 |= 1;
-        }
-    }
-    else 
-    {
-        if(lcd_on) {
-            lcd_on = false;
-            LCDCON1 &= ~1;
-        }
     }
 }
 
