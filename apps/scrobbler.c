@@ -251,7 +251,10 @@ void scrobbler_shutdown(void)
 {
 #ifndef SIMULATOR
     if (scrobbler_ata_callback)
+    {
         unregister_ata_idle_func(scrobbler_flush_callback, false);
+        scrobbler_ata_callback = false;
+    }
 #endif
 
     scrobbler_flush_cache();
