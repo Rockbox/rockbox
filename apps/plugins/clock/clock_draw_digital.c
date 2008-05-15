@@ -55,7 +55,7 @@ void digital_clock_draw(struct screen* display,
     buffer_printf(buffer, buffer_pos, "%c", display_colon?':':' ');
     buffer_printf(buffer, buffer_pos, "%02d", time->minute);
     if(settings->general.hour_format==H12){
-        if(time->hour>12){
+        if(time->hour>=12){
             buffer_printf(buffer, buffer_pos, "P");/* PM */
         }else{
             buffer_printf(buffer, buffer_pos, "A");/* AM */
