@@ -120,12 +120,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 113
+#define PLUGIN_API_VERSION 114
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 113
+#define PLUGIN_MIN_API_VERSION 114
 
 /* plugin return codes */
 enum plugin_status {
@@ -317,17 +317,17 @@ struct plugin_api {
     /* button */
     long (*button_get)(bool block);
     long (*button_get_w_tmo)(int ticks);
+    int (*button_status)(void);
 #ifdef HAVE_BUTTON_DATA
     intptr_t (*button_get_data)(void);
 #endif
-#ifdef HAVE_TOUCHPAD
-    void (*touchpad_set_mode)(enum touchpad_mode);
-#endif
-    int (*button_status)(void);
     void (*button_clear_queue)(void);
     int (*button_queue_count)(void);   
 #ifdef HAS_BUTTON_HOLD
     bool (*button_hold)(void);
+#endif
+#ifdef HAVE_TOUCHPAD
+    void (*touchpad_set_mode)(enum touchpad_mode);
 #endif
 #ifdef HAVE_BUTTON_LIGHT
     void (*buttonlight_set_timeout)(int value);
