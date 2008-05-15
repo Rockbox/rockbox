@@ -280,6 +280,7 @@ void lcd_sleep(void)
             lcd_enable(false);
 
         LCD_SPI_powerdown();
+        GPBDAT &= ~(1 << 2);    /* Fully disable the backlight controller */
     }
 }
 
@@ -293,6 +294,7 @@ void lcd_enable(bool state)
         /* "enabled" implies "powered" */
         if (!lcd_powered)
         {
+            GPBDAT |= (1 << 2); /* Enable the backlight controller */
             LCD_SPI_powerup();
             /* Wait long enough for a frame to be written - yes, it
              * takes awhile. */
