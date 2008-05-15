@@ -46,12 +46,23 @@
     ((long)array[pos] | ((long)array[pos+1] << 8 ) |		\
      ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
 
+static const unsigned char fat_partition_types[] = {
+    0x0b, 0x1b, /* FAT32 + hidden variant */
+    0x0c, 0x1c, /* FAT32 (LBA) + hidden variant */
+#ifdef HAVE_FAT16SUPPORT
+    0x04, 0x14, /* FAT16 <= 32MB + hidden variant */
+    0x06, 0x16, /* FAT16  > 32MB + hidden variant */
+    0x0e, 0x1e, /* FAT16 (LBA) + hidden variant */
+#endif
+};
+
 static struct partinfo part[8]; /* space for 4 partitions on 2 drives */
 static int vol_drive[NUM_VOLUMES]; /* mounted to which drive (-1 if none) */
 
 #ifdef MAX_LOG_SECTOR_SIZE
 int disk_sector_multiplier = 1;
 #endif
+
 struct partinfo* disk_init(IF_MV_NONVOID(int drive))
 {
     int i;
@@ -194,9 +205,13 @@ int disk_mount(int drive)
 #endif
     for (; volume != -1 && i<4; i++)
     {
+        if (memchr(fat_partition_types, pinfo[i].type,
+                   sizeof(fat_partition_types)) == NULL)
+            continue;  /* not an accepted partition type */
+
 #ifdef MAX_LOG_SECTOR_SIZE
         int j;
-
+        
         for (j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
         {
             if (!fat_mount(IF_MV2(volume,) IF_MV2(drive,) pinfo[i].start * j))
