@@ -4575,6 +4575,7 @@
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
     mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: none
@@ -4585,6 +4586,7 @@
     h10,h10_5gb: "PREV = terugzetten"
     gigabeatf: "POWER = terugzetten"
     mrobe100: "DISPLAY = terugzetten"
+    gigabeats: "BACK = terugzetten"
   </dest>
   <voice>
     *: ""
@@ -4842,18 +4844,21 @@
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Instellen OFF=Afbreken"
     ipod*: "SELECT=Instellen MENU=Afbreken"
     h10,h10_5gb: "SELECT=Instellen PREV=Afbreken"
+    gigabeats: "SELECT=Instellen POWER=Afbreken"
   </dest>
   <voice>
     *: none
     alarm: "PLAY=Instellen OFF=Afbreken"
     ipod*: "SELECT=Instellen MENU=Afbreken"
     h10,h10_5gb: "SELECT=Instellen PREV=Afbreken"
+    gigabeats: "SELECT=Instellen POWER=Afbreken"
   </voice>
 </phrase>
 <phrase>
@@ -9936,14 +9941,14 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
+    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Aanmaken van database... %d gevonden (OFF = terug)"
     h100,h120,h300: "Aanmaken van database... %d gevonden (STOP = terug)"
     ipod*: "Aanmaken van database... %d gevonden (PREV = terug)"
-    x5,m5,gigabeatf,mrobe100: "Aanmaken van database... %d gevonden (LINKS = terug)"
+    x5,m5,gigabeat*,mrobe100: "Aanmaken van database... %d gevonden (LINKS = terug)"
     h10,h10_5gb,e200,c200: "Aanmaken van database... %d gevonden (PREV = terug)"
   </dest>
   <voice>
@@ -10502,13 +10507,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Ja"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Ja"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -10523,13 +10528,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Instellen"
     h100,h120,h300: "NAVI = Instellen"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Instellen"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: "SELECT = Instellen"
   </dest>
   <voice>
     *: none
@@ -11562,5 +11567,89 @@
   </dest>
   <voice>
     *: "Onbekend"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_STUDY_MODE
+  desc: WPS context menu
+  user:
+  <source>
+    *: "Enable Study Mode"
+  </source>
+  <dest>
+    *: "Activeer studeer mode"
+  </dest>
+  <voice>
+    *: "Activeer studeer mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Study Mode"
+  </source>
+  <dest>
+    *: "Studeer mode"
+  </dest>
+  <voice>
+    *: "Studeer mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: playback settings menu
+  user:
+  <source>
+    *: "Study Increment"
+  </source>
+  <dest>
+    *: "Studeertijd vergroten"
+  </dest>
+  <voice>
+    *: "Studeertijd vergroten"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUICKSCREEN
+  desc: spoken only, Announces entering the "quick screen"
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Snelscherm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: WPS context menu
+  user:
+  <source>
+    *: "Disable Study Mode"
+  </source>
+  <dest>
+    *: "Zet studeer mode af"
+  </dest>
+  <voice>
+    *: "Zet studeer mode af"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OK
+  desc: spoken only, On exiting a context, specifically the quick screen
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "OK"
   </voice>
 </phrase>
