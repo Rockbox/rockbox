@@ -721,9 +721,11 @@ void rec_command(enum recording_command cmd)
         case RECORDING_CMD_STOP_SHUTDOWN:
             pm_activate_clipcount(false);
             audio_stop_recording();
+#if CONFIG_CODEC == SWCODEC
             audio_close_recording();
+#endif
             sys_poweroff();
-            break;        
+            break;
         case RECORDING_CMD_STOP:
             pm_activate_clipcount(false);
             audio_stop_recording();
