@@ -81,6 +81,7 @@
 #define IAUDIO_M3_PAD      23
 #define CREATIVEZVM_PAD    24
 #define SANSA_M200_PAD     25
+#define CREATIVEZV_PAD     26
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1

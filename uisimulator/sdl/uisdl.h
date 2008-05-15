@@ -374,14 +374,31 @@
 #define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
 #define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
 
-#elif defined(CREATIVE_ZVM)
-#define UI_TITLE                    "Creative Zen Vision:M 30GB"
+#elif defined(CREATIVE_ZVM) || defined(CREATIVE_ZVM60GB)
+#ifdef CREATIVE_ZVM
+ #define UI_TITLE                    "Creative Zen Vision:M 30GB"
+#else
+ #define UI_TITLE                    "Creative Zen Vision:M 60GB"
+#endif
 #define UI_WIDTH                    383 /* width of GUI window */
 #define UI_HEIGHT                   643 /* height of GUI window */
 #define UI_LCD_POSX                 31 /* x position of lcd */
 #define UI_LCD_POSY                 62 /* y position of lcd */
 #define UI_LCD_WIDTH                320
 #define UI_LCD_HEIGHT               240
+#define UI_LCD_BGCOLOR              32, 32, 32 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         192, 192, 192 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */
+#define UI_LCD_FGCOLORLIGHT         0, 0, 0 /* foreground color of LCD (backlight) */
+
+#elif defined(CREATIVE_ZV)
+#define UI_TITLE                    "Creative Zen Vision"
+#define UI_WIDTH                    1054 /* width of GUI window */
+#define UI_HEIGHT                   643 /* height of GUI window */
+#define UI_LCD_POSX                 129 /* x position of lcd */
+#define UI_LCD_POSY                 85 /* y position of lcd */
+#define UI_LCD_WIDTH                640
+#define UI_LCD_HEIGHT               480
 #define UI_LCD_BGCOLOR              32, 32, 32 /* bkgnd color of LCD (no backlight) */
 #define UI_LCD_BGCOLORLIGHT         192, 192, 192 /* bkgnd color of LCD (backlight) */
 #define UI_LCD_FGCOLOR              0, 0, 0 /* foreground color of LCD (no backlight) */

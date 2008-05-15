@@ -1503,7 +1503,7 @@ fi
     
     92|creativezenvision)
     target_id=39
-    modelname="creativezm"
+    modelname="creativezv"
     target="-DCREATIVE_ZV"
     memory=64
     arm926ejscc

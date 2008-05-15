@@ -37,11 +37,26 @@
 
 #define BUTTON_HOLD         (1 << 10)
 
+#ifdef CREATIVE_ZV
+#define BUTTON_PREV         (1 << 11)
+#define BUTTON_NEXT         (1 << 12)
+
+#define BUTTON_VOL_UP       (1 << 13)
+#define BUTTON_VOL_DOWN     (1 << 14)
+#endif
+
 #define BUTTON_REMOTE       0
 
+#ifndef CREATIVE_ZV
 #define BUTTON_MAIN         ( BUTTON_BACK | BUTTON_MENU | BUTTON_LEFT   | BUTTON_RIGHT \
                             | BUTTON_UP   | BUTTON_DOWN | BUTTON_SELECT | BUTTON_POWER \
                             | BUTTON_PLAY | BUTTON_HOLD | BUTTON_CUSTOM                )
+#else
+#define BUTTON_MAIN         ( BUTTON_BACK   | BUTTON_MENU     | BUTTON_LEFT   | BUTTON_RIGHT \
+                            | BUTTON_UP     | BUTTON_DOWN     | BUTTON_SELECT | BUTTON_POWER \
+                            | BUTTON_PLAY   | BUTTON_HOLD     | BUTTON_NEXT   | BUTTON_PREV  \
+                            | BUTTON_VOL_UP | BUTTON_VOL_DOWN                                )
+#endif
 
 #define POWEROFF_BUTTON     BUTTON_POWER
 #define POWEROFF_COUNT      10

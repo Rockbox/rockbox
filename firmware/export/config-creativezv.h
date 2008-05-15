@@ -68,7 +68,7 @@
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
 
-#define CONFIG_KEYPAD CREATIVEZVM_PAD
+#define CONFIG_KEYPAD CREATIVEZV_PAD
 #define HAS_BUTTON_HOLD
 #define HAVE_HEADPHONE_DETECTION
 //#define HAVE_TOUCHPAD
