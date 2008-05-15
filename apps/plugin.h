@@ -212,7 +212,10 @@ struct plugin_api {
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
                                   int style);
-
+#ifdef HAVE_LCD_INVERT
+    void (*lcd_set_invert_display)(bool yesno);
+#endif /* HAVE_LCD_INVERT */
+    
     unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
     const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
     struct font* (*font_load)(const char *path);
@@ -232,6 +235,9 @@ struct plugin_api {
     void (*backlight_on)(void);
     void (*backlight_off)(void);
     void (*backlight_set_timeout)(int index);
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    void (*backlight_set_brightness)(int val);
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
 #if CONFIG_CHARGING
     void (*backlight_set_timeout_plugged)(int index);
@@ -311,12 +317,26 @@ struct plugin_api {
     /* button */
     long (*button_get)(bool block);
     long (*button_get_w_tmo)(int ticks);
+#ifdef HAVE_BUTTON_DATA
+    intptr_t (*button_get_data)(void);
+#endif
+#ifdef HAVE_TOUCHPAD
+    void (*touchpad_set_mode)(enum touchpad_mode);
+#endif
     int (*button_status)(void);
     void (*button_clear_queue)(void);
     int (*button_queue_count)(void);   
 #ifdef HAS_BUTTON_HOLD
     bool (*button_hold)(void);
 #endif
+#ifdef HAVE_BUTTON_LIGHT
+    void (*buttonlight_set_timeout)(int value);
+    void (*buttonlight_off)(void);
+    void (*buttonlight_on)(void);
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    void (*buttonlight_set_brightness)(int val);
+#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
+#endif /* HAVE_BUTTON_LIGHT */
 
     /* file */
     int (*PREFIX(open))(const char* pathname, int flags);
@@ -569,7 +589,7 @@ struct plugin_api {
     
     /* options */
     const struct settings_list* (*find_setting)(const void* variable, int *id);
-    bool (*option_screen)(struct settings_list *setting,
+    bool (*option_screen)(const struct settings_list *setting,
                           struct viewport parent[NB_SCREENS],
                           bool use_temp_var, unsigned char* option_title);
     bool (*set_option)(const char* string, const void* variable,
@@ -725,26 +745,6 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    void (*backlight_set_brightness)(int val);
-#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
-#ifdef HAVE_LCD_INVERT
-    void (*lcd_set_invert_display)(bool yesno);
-#endif /* HAVE_LCD_INVERT */
-#ifdef HAVE_BUTTON_DATA
-    intptr_t (*button_get_data)(void);
-#endif /* HAVE_BUTTON_DATA */
-#ifdef HAVE_TOUCHPAD
-    void (*touchpad_set_mode)(enum touchpad_mode);
-#endif /* HAVE_TOUCHPAD */
-#ifdef HAVE_BUTTON_LIGHT
-    void (*buttonlight_set_timeout)(int value);
-    void (*buttonlight_off)(void);
-    void (*buttonlight_on)(void);
-#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-    void (*buttonlight_set_brightness)(int val);
-#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
-#endif /* HAVE_BUTTON_LIGHT */
 };
 
 /* plugin header */

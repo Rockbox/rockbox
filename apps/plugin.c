@@ -128,6 +128,9 @@ static const struct plugin_api rockbox_api = {
 #endif /* LCD_DEPTH */
     lcd_puts_style,
     lcd_puts_scroll_style,
+#ifdef HAVE_LCD_INVERT
+    lcd_set_invert_display,
+#endif /* HAVE_LCD_INVERT */
     bidi_l2v,
     font_get_bits,
     font_load,
@@ -141,6 +144,9 @@ static const struct plugin_api rockbox_api = {
     backlight_on,
     backlight_off,
     backlight_set_timeout,
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    backlight_set_brightness,
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
 #if CONFIG_CHARGING
     backlight_set_timeout_plugged,
@@ -215,11 +221,26 @@ static const struct plugin_api rockbox_api = {
     button_get,
     button_get_w_tmo,
     button_status,
+#ifdef HAVE_BUTTON_DATA
+    button_get_data,
+#endif
     button_clear_queue,
     button_queue_count,
 #ifdef HAS_BUTTON_HOLD
     button_hold,
 #endif
+#ifdef HAVE_TOUCHPAD
+    touchpad_set_mode,
+#endif
+    
+#ifdef HAVE_BUTTON_LIGHT
+    buttonlight_set_timeout,
+    buttonlight_off,
+    buttonlight_on,
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    buttonlight_set_brightness,
+#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
+#endif /* HAVE_BUTTON_LIGHT */
 
     /* file */
     (open_func)PREFIX(open),
@@ -578,26 +599,6 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    backlight_set_brightness,
-#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
-#ifdef HAVE_LCD_INVERT
-    lcd_set_invert_display,
-#endif /* HAVE_LCD_INVERT */
-#ifdef HAVE_BUTTON_DATA
-    button_get_data,
-#endif /* HAVE_BUTTON_DATA */
-#ifdef HAVE_TOUCHPAD
-    touchpad_set_mode,
-#endif /* HAVE_TOUCHPAD */
-#ifdef HAVE_BUTTON_LIGHT
-    buttonlight_set_timeout,
-    buttonlight_off,
-    buttonlight_on,
-#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-    buttonlight_set_brightness,
-#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
-#endif /* HAVE_BUTTON_LIGHT */
 };
 
 int plugin_load(const char* plugin, const void* parameter)

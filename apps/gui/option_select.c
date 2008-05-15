@@ -43,7 +43,7 @@
 #define ASCENDING_INT_SETTINGS
 #endif
 
-static int selection_to_val(struct settings_list *setting, int selection);
+static int selection_to_val(const struct settings_list *setting, int selection);
 
 static const char *unit_strings[] = 
 {   
@@ -60,7 +60,7 @@ static const char *unit_strings[] =
 /* these two vars are needed so arbitrary values can be added to the
    TABLE_SETTING settings if the F_ALLOW_ARBITRARY_VALS flag is set */
 static int table_setting_oldval = 0, table_setting_array_position = 0;
-char *option_get_valuestring(struct settings_list *setting, 
+char *option_get_valuestring(const struct settings_list *setting, 
                              char *buffer, int buf_len,
                              intptr_t temp_var)
 {
@@ -215,7 +215,7 @@ static int option_talk(int selected_item, void * data)
 }
 
 #ifdef HAVE_QUICKSCREEN /* only the quickscreen uses this so far */
-void option_select_next_val(struct settings_list *setting,
+void option_select_next_val(const struct settings_list *setting,
                             bool previous, bool apply)
 {
     int val = 0;
@@ -230,15 +230,18 @@ void option_select_next_val(struct settings_list *setting,
     else if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
     {
         struct int_setting *info = (struct int_setting *)setting->int_setting;
+        int step = info->step;
+        if (step < 0)
+            step = -step;
         if (!previous)
         {
-            val = *value + info->step;
+            val = *value + step;
             if (val > info->max)
                 val = info->min;
         }
         else
         {
-            val = *value - info->step;
+            val = *value - step;
             if (val < info->min)
                 val = info->max;
         }
@@ -283,11 +286,27 @@ void option_select_next_val(struct settings_list *setting,
         if (apply && info->option_callback)
             info->option_callback(*(int*)value);
     }
+    else if ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING)
+    {
+        const struct table_setting *tbl_info = setting->table_setting;
+        int i, add;
+        add = previous?tbl_info->count-1:1;
+        for (i=0; i<tbl_info->count;i++)
+        {
+            if ((*value == tbl_info->values[i]) ||
+                  (settings->flags&F_ALLOW_ARBITRARY_VALS &&
+                    *value < tbl_info->values[i]))
+            {
+                val = tbl_info->values[(i+add)%tbl_info->count];
+                break;
+            }
+        }
+    }
     *value = val;
 }
 #endif
 
-static int selection_to_val(struct settings_list *setting, int selection)
+static int selection_to_val(const struct settings_list *setting, int selection)
 {
     int min = 0, max = 0, step = 1;
     if (((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING) ||
@@ -354,7 +373,7 @@ static void bool_funcwrapper(int value)
         boolfunction(false);
 }
 
-static void val_to_selection(struct settings_list *setting, int oldvalue,
+static void val_to_selection(const struct settings_list *setting, int oldvalue,
                              int *nb_items, int *selected,
                              void (**function)(int))
 {
@@ -430,7 +449,7 @@ static void val_to_selection(struct settings_list *setting, int oldvalue,
     }
 }
 
-bool option_screen(struct settings_list *setting,
+bool option_screen(const struct settings_list *setting,
                    struct viewport parent[NB_SCREENS],
                    bool use_temp_var, unsigned char* option_title)
 {

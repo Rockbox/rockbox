@@ -23,14 +23,14 @@
 #include "screen_access.h"
 #include "settings.h"
 
-bool option_screen(struct settings_list *setting,
+bool option_screen(const struct settings_list *setting,
                    struct viewport parent[NB_SCREENS],
                    bool use_temp_var, unsigned char* option_title);
 
 
-void option_select_next_val(struct settings_list *setting,
+void option_select_next_val(const struct settings_list *setting,
                             bool previous, bool apply);
-char *option_get_valuestring(struct settings_list *setting, 
+char *option_get_valuestring(const struct settings_list *setting, 
                              char *buffer, int buf_len,
                              intptr_t temp_var);
 void option_talk_value(const struct settings_list *setting, int value, bool enqueue);
