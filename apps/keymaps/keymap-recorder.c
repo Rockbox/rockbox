@@ -57,6 +57,7 @@ static const struct button_mapping button_context_standard[]  = {
 };
 
 static const struct button_mapping button_context_wps[]  = {
+    { ACTION_NONE,            BUTTON_ON,                  BUTTON_NONE },
     { ACTION_WPS_PLAY,        BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
     { ACTION_WPS_SKIPNEXT,    BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
     { ACTION_WPS_SKIPPREV,    BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
