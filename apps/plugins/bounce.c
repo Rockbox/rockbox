@@ -307,14 +307,14 @@ static void init_tables(void)
     int pfrac;
     unsigned long phase;
     long sin;
-    
+
     phase = pfrac = 0;
 
     for (i = 0; i < TABLE_SIZE; i++) {
          sin = fsincos(phase, NULL);
          xtable[i] = RADIUS_X + sin / DIV_X;
          ytable[i] = RADIUS_Y + sin / DIV_Y;
-         
+
          phase += PHASE_STEP;
          pfrac += PHASE_FRAC;
          if (pfrac >= TABLE_SIZE) {
@@ -374,9 +374,9 @@ static void init_clock(void)
     int pfrac;
     unsigned long phase;
     long sin, cos;
-    
+
     phase = pfrac = 0;
-    
+
     for (i = 0; i < 60; i++) {
          sin = fsincos(phase, &cos);
          xminute[i] = LCD_WIDTH/2 + sin / DIV_MX;
@@ -441,6 +441,9 @@ static int scrollit(void)
     char* rock="Rockbox! Pure pleasure. Pure fun. Oooh. What fun! ;-) ";
     unsigned int rocklen = rb->strlen(rock);
     int letter;
+#if LCD_DEPTH > 1
+    unsigned prev_color;
+#endif
 
     rb->lcd_clear_display();
     while(1)
@@ -453,7 +456,7 @@ static int scrollit(void)
 #endif
             case BOUNCE_QUIT :
                 return 0;
-            case BOUNCE_MODE : 
+            case BOUNCE_MODE :
                 return 1;
             default:
                 if ( rb->default_event_handler(b) == SYS_USB_CONNECTED )
@@ -462,6 +465,10 @@ static int scrollit(void)
         rb->lcd_clear_display();
 #if CONFIG_RTC
         addclock();
+#endif
+
+#if LCD_DEPTH > 1
+        prev_color = rb->lcd_get_foreground();
 #endif
 
         for(i=0, yy=y, xx=x; xx < LCD_WIDTH; i++) {
@@ -476,12 +483,12 @@ static int scrollit(void)
             xx += LETTER_WIDTH;
         }
 #if LCD_DEPTH > 1
-        rb->lcd_set_foreground(LCD_BLACK);
+        rb->lcd_set_foreground(prev_color);
 #endif
         rb->lcd_update();
 
         x-= XSPEED;
-        
+
         if(x < -LETTER_WIDTH) {
             x += LETTER_WIDTH;
             y += YADD;
@@ -517,7 +524,7 @@ static int loopit(void)
             return 0;
 
         if ( b == BOUNCE_MODE )
-            return 1;        
+            return 1;
 
         if ( rb->default_event_handler(b) == SYS_USB_CONNECTED )
             return -1;
@@ -573,7 +580,8 @@ static int loopit(void)
 }
 
 
-enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
+enum plugin_status plugin_start(const struct plugin_api* api,
+                                const void* parameter)
 {
     int w, h;
     char *off = "[Off] to stop";
@@ -607,7 +615,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         if (h > 0)
             h = scrollit();
     } while(h > 0);
-    
+
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_setfont(FONT_UI);
 
