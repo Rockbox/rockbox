@@ -25,6 +25,7 @@
 
 #include "system.h"
 #include "power.h"
+#include "powermgmt.h"
 #include "lcd.h"
 #include "led.h"
 #include "mpeg.h"
@@ -717,6 +718,12 @@ void rec_command(enum recording_command cmd)
 {
     switch(cmd)
     {
+        case RECORDING_CMD_STOP_SHUTDOWN:
+            pm_activate_clipcount(false);
+            audio_stop_recording();
+            audio_close_recording();
+            sys_poweroff();
+            break;        
         case RECORDING_CMD_STOP:
             pm_activate_clipcount(false);
             audio_stop_recording();
@@ -807,6 +814,10 @@ static void trigger_listener(int trigger_status)
                         rec_command(RECORDING_CMD_START_NEWFILE);
                         /* tell recording_screen to reset the time */
                         last_seconds = 0;
+                        break;
+                    
+                    case 3: /* Stop and shutdown */
+                        rec_command(RECORDING_CMD_STOP_SHUTDOWN);
                         break;
                  }
 
@@ -1571,7 +1582,10 @@ bool recording_screen(bool no_source)
                 {
                     peak_meter_trigger(false);
                     peak_meter_set_trigger_listener(NULL);
-                    rec_command(RECORDING_CMD_STOP);
+                    if( global_settings.rec_split_type == 1)
+                        rec_command(RECORDING_CMD_STOP);
+                    else
+                        rec_command(RECORDING_CMD_STOP_SHUTDOWN);
                 }
                 update_countdown = 1;
             }

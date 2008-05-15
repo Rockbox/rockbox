@@ -49,7 +49,8 @@ enum recording_command
                                                               start recording */
     RECORDING_CMD_START_NEWFILE, /* create unique filename and start recording*/
     RECORDING_CMD_PAUSE,
-    RECORDING_CMD_RESUME
+    RECORDING_CMD_RESUME,
+    RECORDING_CMD_STOP_SHUTDOWN /* stop recording and shutdown */
 };
 
 /* centralized way to start/stop/... recording */
