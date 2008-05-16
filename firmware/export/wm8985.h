@@ -24,7 +24,7 @@
 #define VOLUME_MIN -570
 #define VOLUME_MAX  60
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP)
 
 extern int tenthdb2master(int db);
 extern int tenthdb2mixer(int db);
@@ -32,8 +32,6 @@ extern int tenthdb2mixer(int db);
 extern void audiohw_set_master_vol(int vol_l, int vol_r);
 extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
 extern void audiohw_set_mixer_vol(int channel1, int channel2);
-extern void audiohw_set_bass_cutoff(int value);
-extern void audiohw_set_treble_cutoff(int value);
 extern void audiohw_set_nsorder(int order);
 extern void audiohw_set_sample_rate(int sampling_control);
 

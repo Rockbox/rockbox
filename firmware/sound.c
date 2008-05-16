@@ -70,8 +70,10 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
 #endif
-#if defined(HAVE_WM8758)
+#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
     [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
     [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
@@ -146,11 +148,13 @@ sound_set_type* sound_get_fn(int setting)
             result = sound_set_stereo_width;
             break;
 
-#ifdef HAVE_WM8758
+#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
         case SOUND_BASS_CUTOFF:
             result = sound_set_bass_cutoff;
             break;
+#endif
 
+#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
         case SOUND_TREBLE_CUTOFF:
             result = sound_set_treble_cutoff;
             break;
@@ -410,7 +414,7 @@ void sound_set_stereo_width(int value)
 #endif
 }
 
-#if defined(HAVE_WM8758) || defined(HAVE_WM8985)
+#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
 void sound_set_bass_cutoff(int value)
 {
     if(!audio_is_initialized)
@@ -418,7 +422,9 @@ void sound_set_bass_cutoff(int value)
 
     audiohw_set_bass_cutoff(value);
 }
+#endif
 
+#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
 void sound_set_treble_cutoff(int value)
 {
     if(!audio_is_initialized)

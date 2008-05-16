@@ -24,11 +24,13 @@
 #include <stdbool.h>
 
 /* define some audiohw caps */
-#define TREBLE_CAP      (1 << 0)
-#define BASS_CAP        (1 << 1)
-#define BALANCE_CAP     (1 << 2)
-#define CLIPPING_CAP    (1 << 3)
-#define PRESCALER_CAP   (1 << 4)
+#define TREBLE_CAP          (1 << 0)
+#define BASS_CAP            (1 << 1)
+#define BALANCE_CAP         (1 << 2)
+#define CLIPPING_CAP        (1 << 3)
+#define PRESCALER_CAP       (1 << 4)
+#define BASS_CUTOFF_CAP     (1 << 5)
+#define TREBLE_CUTOFF_CAP   (1 << 6)
 
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
@@ -77,6 +79,14 @@
 #if (AUDIOHW_CAPS & PRESCALER_CAP)
 #define AUDIOHW_HAVE_PRESCALER
 #endif
+
+#if (AUDIOHW_CAPS & BASS_CUTOFF_CAP)
+#define AUDIOHW_HAVE_BASS_CUTOFF
+#endif
+
+#if (AUDIOHW_CAPS & TREBLE_CUTOFF_CAP)
+#define AUDIOHW_HAVE_TREBLE_CUTOFF
+#endif
 #endif /* AUDIOHW_CAPS */
 
 enum {
@@ -103,8 +113,10 @@ enum {
     SOUND_RIGHT_GAIN,
     SOUND_MIC_GAIN,
 #endif
-#if defined(HAVE_WM8758) || defined(HAVE_WM8985)
+#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
     SOUND_BASS_CUTOFF,
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
     SOUND_TREBLE_CUTOFF,
 #endif
 };
@@ -219,6 +231,26 @@ void audiohw_set_treble(int val);
  *          BASS_CAP
  */
 void audiohw_set_bass(int val);
+#endif
+
+#ifdef AUDIOHW_HAVE_BASS_CUTOFF
+/**
+ * Set new bass cut off value.
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          BASS_CUTOFF_CAP
+ */
+void audiohw_set_bass_cutoff(int val);
+#endif
+
+#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
+/**
+ * Set new treble cut off value.
+ * @param val to set.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          TREBLE_CUTOFF_CAP
+ */
+void audiohw_set_treble_cutoff(int val);
 #endif
 
 #ifdef HAVE_RECORDING
