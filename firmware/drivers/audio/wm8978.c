@@ -48,10 +48,12 @@ const struct sound_settings_info audiohw_settings[] =
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
+#ifdef HAVE_RECORDING
     [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
 #if 0
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
+#endif
 #endif
 #if 0
     [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
