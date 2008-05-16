@@ -64,8 +64,7 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#if CONFIG_CODEC == MAS3587F || defined(HAVE_UDA1380) || defined(HAVE_TLV320)\
-    || defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#if defined(HAVE_RECORDING)
     [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
