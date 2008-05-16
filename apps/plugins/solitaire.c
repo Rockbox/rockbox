@@ -662,19 +662,16 @@ enum help solitaire_help( void )
 
 struct sol_config {
     int draw_type;
-    int auto_unhide;
 };
 
-struct sol_config sol_disk = {0, 0};
+struct sol_config sol_disk = {0};
 struct sol_config sol;
 
 static struct configdata config[] = {
    { TYPE_INT, 0, 1, &sol_disk.draw_type, "draw_type", NULL, NULL },
-   { TYPE_INT, 0, 1, &sol_disk.auto_unhide, "auto_unhide", NULL, NULL }
 };
 
 char draw_option_string[32];
-char unhide_option_string[32];
 
 static void create_draw_option_string(void)
 {
@@ -682,14 +679,6 @@ static void create_draw_option_string(void)
         rb->strcpy(draw_option_string, "Draw Three Cards");
     else
         rb->strcpy(draw_option_string, "Draw One Card");
-}
-
-static void create_unhide_option_string(void)
-{
-    if (sol.auto_unhide == 0)
-        rb->strcpy(unhide_option_string, "Unhide manually");
-    else
-        rb->strcpy(unhide_option_string, "Unhide automatically");
 }
 
 void solitaire_init(void);
@@ -703,7 +692,7 @@ int solitaire_menu(bool in_game)
     int result = -1;
     int i = 0;
 
-    struct menu_item items[7];
+    struct menu_item items[6];
 
     if( in_game )
     {
@@ -715,7 +704,6 @@ int solitaire_menu(bool in_game)
         items[i++].desc = "Start Game";
         items[i++].desc = draw_option_string;
     }
-    items[i++].desc = unhide_option_string;
     items[i++].desc = "Help";
     items[i++].desc = "Audio Playback";
     if( in_game )
@@ -725,7 +713,6 @@ int solitaire_menu(bool in_game)
     items[i++].desc = "Quit";
 
     create_draw_option_string();
-    create_unhide_option_string();
     m = menu_init(rb, items, i, NULL, NULL, NULL, NULL);
     while (result < 0)
     {
@@ -757,28 +744,23 @@ int solitaire_menu(bool in_game)
                 break;
 
             case 2:
-                sol.auto_unhide = (sol.auto_unhide + 1) % 2;
-                create_unhide_option_string();
-                break;
-
-            case 3:
                 rb->lcd_setmargins(0, 0);
                 if (solitaire_help() == HELP_USB)
                     result = MENU_USB;
                 break;
 
-            case 4:
+            case 3:
                  playback_control(rb, NULL);
                  break;
 
-            case 5:
+            case 4:
                 if( in_game )
                     result = MENU_SAVE_AND_QUIT;
                 else
                     result = MENU_QUIT;
                 break;
 
-            case 6:
+            case 5:
                 result = MENU_QUIT;
                 break;
         }
@@ -1135,10 +1117,7 @@ enum move move_card( int dest_col, int src_card )
         else
         {
             deck[src_card_prev].next = NOT_A_CARD;
-            if (sol.auto_unhide)
-            {
-                deck[src_card_prev].known = true;
-            }
+            deck[src_card_prev].known = true;
         }
     }
     sel_card = NOT_A_CARD;
