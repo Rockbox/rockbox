@@ -54,7 +54,7 @@ void usb_enable(bool on)
          usb_core_exit();
 }
 
-void GIO7(void)
+void IRAM_ATTR GIO7(void)
 {
 #ifdef DEBUG
     //printf("GIO7 interrupt... [%d]", current_tick);

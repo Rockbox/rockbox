@@ -19,6 +19,8 @@
 #ifndef ISP1583_H
 #define ISP1583_H
 
+#include "usb-target.h"
+
 #ifndef ISP1583_H_OVERRIDE
 /* Initialization registers */
 #define ISP1583_INIT_ADDRESS        (*((volatile unsigned char*)(ISP1583_IOBASE+0x0)))
@@ -166,20 +168,12 @@
 #define STANDARD_INTEN              ( INIT_INTEN_IEBRST | INIT_INTEN_IEHS_STA | INT_IESUSP | INT_IERESM | INIT_INTEN_IEVBUS | INIT_INTEN_IEP0SETUP | INIT_INTEN_IEP0RX | INIT_INTEN_IEP0TX )
 #define STANDARD_INIT_MODE          ( INIT_MODE_CLKAON | INIT_MODE_GLINTENA )
 
-bool usb_drv_powered(void);
-void usb_drv_init(void);
-int usb_drv_port_speed(void);
-void usb_drv_exit(void);
-void usb_drv_stall(int endpoint, bool stall, bool in);
-bool usb_drv_stalled(int endpoint, bool in);
-int usb_drv_recv(int ep, void* ptr, int length);
-int usb_drv_send_nonblocking(int ep, void* ptr, int length);
-int usb_drv_send(int endpoint, void* ptr, int length);
-void usb_drv_reset_endpoint(int ep, bool send);
-void usb_drv_wait(int ep, bool send);
-void usb_drv_cancel_all_transfers(void);
-void usb_drv_set_address(int address);
-void usb_drv_set_test_mode(int mode);
-void usb_drv_int(void); /* Method for handling interrupts, must be called from usb-<target>.c */
+#ifdef USE_IRAM
+ #define IRAM_ATTR __attribute__ ((section(".icode")))
+#else
+ #define IRAM_ATTR
+#endif
+
+#include "usb_drv.h"
 
 #endif

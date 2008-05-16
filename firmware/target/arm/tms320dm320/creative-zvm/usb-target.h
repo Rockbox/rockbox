@@ -69,7 +69,9 @@
                                                  : : : "r12")
 //#define ZVM_SPECIFIC
 
-#include "kernel.h"
+#define USE_IRAM
+
+#include <stdbool.h>
 int usb_detect(void);
 void usb_init_device(void);
 bool usb_drv_connected(void);

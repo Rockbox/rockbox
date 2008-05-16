@@ -19,7 +19,6 @@
  ****************************************************************************/
  
 #include "config.h"
-#include "usb-target.h"
 #include "usb_ch9.h"
 #include "usb_drv.h"
 #include "usb_core.h"
@@ -30,9 +29,6 @@
 
 #define DIR_RX                      0
 #define DIR_TX                      1
-
-#define DIR_OUT                     0
-#define DIR_IN                      1
  
 struct usb_endpoint
 {
@@ -626,7 +622,7 @@ static void bus_reset(void)
 }
 
 /* Method for handling interrupts, must be called from usb-<target>.c */
-void usb_drv_int(void)
+void IRAM_ATTR usb_drv_int(void)
 {
     unsigned long ints;
     ints = ISP1583_GEN_INT_READ & ISP1583_INIT_INTEN_READ;
