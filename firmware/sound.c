@@ -352,6 +352,14 @@ void sound_set_bass(int value)
     if(!audio_is_initialized)
         return;
 
+#if !defined(AUDIOHW_HAVE_CLIPPING)
+#if defined(HAVE_WM8751)
+    current_bass = value;
+#else
+    current_bass =  value * 10;
+#endif
+#endif
+
 #if defined(AUDIOHW_HAVE_BASS)
     audiohw_set_bass(value);
 #else
@@ -359,11 +367,6 @@ void sound_set_bass(int value)
 #endif
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
-#if defined(HAVE_WM8751)
-    current_bass = value;
-#else
-     current_bass =  value * 10;
-#endif
     set_prescaled_volume();
 #endif
 }
@@ -373,6 +376,14 @@ void sound_set_treble(int value)
     if(!audio_is_initialized)
         return;
 
+#if !defined(AUDIOHW_HAVE_CLIPPING)
+#if defined(HAVE_WM8751)
+    current_treble = value;
+#else
+    current_treble =  value * 10;
+#endif
+#endif
+
 #if defined(AUDIOHW_HAVE_TREBLE)
     audiohw_set_treble(value);
 #else
@@ -380,11 +391,6 @@ void sound_set_treble(int value)
 #endif
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
-#if defined(HAVE_WM8751)
-    current_treble = value;
-#else
-     current_treble =  value * 10;
-#endif
     set_prescaled_volume();
 #endif
 }
