@@ -106,9 +106,7 @@ enum {
     SOUND_MDB_ENABLE,
     SOUND_SUPERBASS,
 #endif
-#if CONFIG_CODEC == MAS3587F || defined(HAVE_UDA1380) || defined(HAVE_TLV320)\
-    || defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731) \
-    || defined(HAVE_AS3514) || defined(HAVE_WM8978) || defined(HAVE_WM8985)
+#if defined(HAVE_RECORDING)
     SOUND_LEFT_GAIN,
     SOUND_RIGHT_GAIN,
     SOUND_MIC_GAIN,
