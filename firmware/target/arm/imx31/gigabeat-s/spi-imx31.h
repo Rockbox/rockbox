@@ -16,8 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _SPI_IMX31_H_
-#define _SPI_IMX31_H_
+#ifndef SPI_IMX31_H
+#define SPI_IMX31_H
 
 #define USE_CSPI1_MODULE (1 << 0)
 #define USE_CSPI2_MODULE (1 << 1)
@@ -84,4 +84,4 @@ void spi_unlock(struct spi_node *node);
 /* Send and/or receive data on the specified node */
 int spi_transfer(struct spi_node *node, struct spi_transfer *trans);
 
-#endif /* _SPI_IMX31_H_ */
+#endif /* SPI_IMX31_H */

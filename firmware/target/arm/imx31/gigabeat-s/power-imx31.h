@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
+ * $Id$
  *
  * Copyright (C) 2008 by Nils Wallménius
  *
@@ -16,6 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef POWER_IMX31_H
+#define POWER_IMX31_H
 
 void set_charger_inserted(bool inserted);
 
+#endif /* POWER_IMX31_H */

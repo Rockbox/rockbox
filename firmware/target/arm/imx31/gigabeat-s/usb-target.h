@@ -30,4 +30,4 @@ int usb_detect(void);
 bool usb_plugged(void);
 void usb_enable(bool on);
 
-#endif
+#endif /* USB_TARGET */

@@ -16,8 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _I2C_IMX31_H_
-#define _I2C_IMX31_H_
+#ifndef I2C_IMX31_H
+#define I2C_IMX31_H
 
 #include <stdbool.h>
 
@@ -73,4 +73,4 @@ int i2c_write(struct i2c_node *node, const unsigned char *data, int count);
 void i2c_lock_node(struct i2c_node *node);
 void i2c_unlock_node(struct i2c_node *node);
 
-#endif /* _I2C_IMX31_H_ */
+#endif /* I2C_IMX31_H */

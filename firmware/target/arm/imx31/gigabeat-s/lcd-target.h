@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id $
+ * $Id$
  *
  * Copyright (C) 2007 by Greg White
  *
@@ -16,6 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef LCD_TARGET_H
+#define LCD_TARGET_H
 
-//extern void lcd_enable(bool state);
-void printscreen(unsigned int colour);
+#if 0
+void lcd_enable(bool state);
+#endif
+
+#endif /* LCD_TARGET_H */

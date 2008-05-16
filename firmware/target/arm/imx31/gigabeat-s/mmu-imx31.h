@@ -16,6 +16,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef MMU_IMX31_H
+#define MMU_IMX31_H
 
 void memory_init(void);
 void set_page_tables(void);
+
+#endif /* MMU_IMX31_H */

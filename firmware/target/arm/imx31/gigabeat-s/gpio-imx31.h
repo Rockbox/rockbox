@@ -16,8 +16,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _GPIO_IMX31_H_
-#define _GPIO_IMX31_H_
+#ifndef GPIO_IMX31_H
+#define GPIO_IMX31_H
 
 #include "gpio-target.h"
 
@@ -85,4 +85,4 @@ void gpio_init(void);
 bool gpio_enable_event(enum gpio_module_number gpio, unsigned id);
 void gpio_disable_event(enum gpio_module_number gpio, unsigned id);
 
-#endif /* _GPIO_IMX31_H_ */
+#endif /* GPIO_IMX31_H */

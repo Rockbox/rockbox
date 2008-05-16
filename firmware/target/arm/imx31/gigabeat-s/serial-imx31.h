@@ -16,7 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #ifndef SERIAL_IMX31_H
 #define SERIAL_IMX31_H
 
@@ -27,5 +26,4 @@ int tx_rdy(void);
 void tx_writec(const char c);
 void dprintf(const char * str, ... );
 
-#endif
-
+#endif /* SERIAL_IMX31_H */
