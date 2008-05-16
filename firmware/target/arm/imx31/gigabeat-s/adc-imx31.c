@@ -102,5 +102,5 @@ void adc_init(void)
     mc13783_write(MC13783_ADC1, MC13783_ADEN);
     /* Enable the ADCDONE interrupt - notifications are dispatched by
      * event handler. */
-    mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_ADCDONE);
+    mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_ADCDONEM);
 }

@@ -61,7 +61,7 @@ int usb_detect(void)
 /* Read the immediate state of the cable from the PMIC */
 bool usb_plugged(void)
 {
-    return mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_USB4V4;
+    return mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_USB4V4S;
 }
 
 void usb_init_device(void)
@@ -73,7 +73,7 @@ void usb_init_device(void)
     /* Module will be turned off later after firmware init */
     usb_drv_startup();
 
-    mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_USB4V4);
+    mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_USB4V4M);
 }
 
 void usb_enable(bool on)

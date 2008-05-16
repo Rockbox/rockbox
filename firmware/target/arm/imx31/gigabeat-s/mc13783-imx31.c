@@ -74,18 +74,18 @@ static void mc13783_interrupt_thread(void)
 
     gpio_enable_event(MC13783_GPIO_NUM, MC13783_EVENT_ID);
 
-    if (pending[1] & MC13783_TODA) /* only needs to be polled on startup */
+    if (pending[1] & MC13783_TODAI) /* only needs to be polled on startup */
         mc13783_alarm_start();
 
     /* Check initial states for events with a sense bit */
     value = mc13783_read(MC13783_INTERRUPT_SENSE0);
-    usb_set_status(value & MC13783_USB4V4);
-    set_charger_inserted(value & MC13783_CHGDET);
+    usb_set_status(value & MC13783_USB4V4S);
+    set_charger_inserted(value & MC13783_CHGDETS);
 
     value = mc13783_read(MC13783_INTERRUPT_SENSE1);
-    button_power_set_state((value & MC13783_ONOFD1) == 0);
+    button_power_set_state((value & MC13783_ONOFD1S) == 0);
 #ifdef HAVE_HEADPHONE_DETECTION
-    set_headphones_inserted((value & MC13783_ONOFD2) == 0);
+    set_headphones_inserted((value & MC13783_ONOFD2S) == 0);
 #endif
 
     pending[0] = pending[1] = 0xffffff;
@@ -93,8 +93,9 @@ static void mc13783_interrupt_thread(void)
 
     /* Enable desired PMIC interrupts - some are unmasked in the drivers that
      * handle a specific task */
-    mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_CHGDET);
-    mc13783_clear(MC13783_INTERRUPT_MASK1, MC13783_ONOFD1 | MC13783_ONOFD2);
+    mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_CHGDETM);
+    mc13783_clear(MC13783_INTERRUPT_MASK1, MC13783_ONOFD1M |
+                                           MC13783_ONOFD2M);
     
     while (1)
     {
@@ -116,20 +117,20 @@ static void mc13783_interrupt_thread(void)
             /* Handle ...PENDING0 */
 
             /* Handle interrupts without a sense bit */
-            if (pending[0] & MC13783_ADCDONE)
+            if (pending[0] & MC13783_ADCDONEI)
                 adc_done();
 
             /* Handle interrupts that have a sense bit that needs to
              * be checked */
-            if (pending[0] & (MC13783_CHGDET | MC13783_USB4V4))
+            if (pending[0] & (MC13783_CHGDETI | MC13783_USB4V4I))
             {
                 value = mc13783_read(MC13783_INTERRUPT_SENSE0);
 
-                if (pending[0] & MC13783_CHGDET)
-                    set_charger_inserted(value & MC13783_CHGDET);
+                if (pending[0] & MC13783_CHGDETI)
+                    set_charger_inserted(value & MC13783_CHGDETS);
 
-                if (pending[0] & MC13783_USB4V4)
-                    usb_set_status(value & MC13783_USB4V4);
+                if (pending[0] & MC13783_USB4V4I)
+                    usb_set_status(value & MC13783_USB4V4S);
             }
         }
 
@@ -142,15 +143,15 @@ static void mc13783_interrupt_thread(void)
 
             /* Handle interrupts that have a sense bit that needs to
              * be checked */
-            if (pending[1] & (MC13783_ONOFD1 | MC13783_ONOFD2))
+            if (pending[1] & (MC13783_ONOFD1I | MC13783_ONOFD2I))
             {
                 value = mc13783_read(MC13783_INTERRUPT_SENSE1);
 
-                if (pending[1] & MC13783_ONOFD1)
-                    button_power_set_state((value & MC13783_ONOFD1) == 0);
+                if (pending[1] & MC13783_ONOFD1I)
+                    button_power_set_state((value & MC13783_ONOFD1S) == 0);
 #ifdef HAVE_HEADPHONE_DETECTION
-                if (pending[1] & MC13783_ONOFD2)
-                    set_headphones_inserted((value & MC13783_ONOFD2) == 0);
+                if (pending[1] & MC13783_ONOFD2I)
+                    set_headphones_inserted((value & MC13783_ONOFD2S) == 0);
 #endif
             }
         }

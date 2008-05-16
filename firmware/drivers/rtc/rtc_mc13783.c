@@ -254,9 +254,9 @@ bool rtc_check_alarm_flag(void)
 bool rtc_enable_alarm(bool enable)
 {
     if (enable)
-        mc13783_clear(MC13783_INTERRUPT_MASK1, MC13783_TODA);
+        mc13783_clear(MC13783_INTERRUPT_MASK1, MC13783_TODAM);
     else
-        mc13783_set(MC13783_INTERRUPT_MASK1, MC13783_TODA);
+        mc13783_set(MC13783_INTERRUPT_MASK1, MC13783_TODAM);
 
     return false;
 }
