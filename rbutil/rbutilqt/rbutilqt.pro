@@ -170,10 +170,9 @@ unix:!static {
     LIBS += -lusb
 }
 unix:static {
-    # force statically linking of libusb. Use gcc to get its path.
-    # if you have libusb.a in a non-standard lib path add it to
-    # the INCLUDEPATH variable above.
-    LIBS += $$system($$QMAKE_CC $$INCLUDEPATH -print-file-name=libusb.a)
+    # force statically linking of libusb. Libraries that are appended
+    # later will get linked dynamically again.
+    LIBS += -Wl,-Bstatic -lusb -Wl,-Bdynamic
 }
 
 macx {
