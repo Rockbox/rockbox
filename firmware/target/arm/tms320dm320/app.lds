@@ -121,7 +121,11 @@ SECTIONS
        stackend = .;
     } > IRAM
 
+#ifndef CREATIVE_ZVx
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram) + SIZEOF(.vectors):
+#else
+    .bss ADDR(.data) + SIZEOF(.data):
+#endif
     {
        _edata = .;
         *(.bss*)
