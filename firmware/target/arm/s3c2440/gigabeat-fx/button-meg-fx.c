@@ -122,10 +122,21 @@ int button_read_device(void)
         buttonlight_on();
     }
     
-    /* the touchpad */
-    touchpad = GPJDAT & 0x10C9;
+    /* the touchpad - only watch the lines we actually read */
+    touchpad = GPJDAT & (((1 << 12) | (1 << 11)) | /* right++, right+ */
+                         ((1 <<  8) | (1 <<  7)) | /* left+, left++ */
+                         ((1 <<  6) | (1 <<  5)) | /* down++, down+ */
+                         ((1 <<  1) | (1 <<  0)) | /* up+, up++ */
+                          (1 <<  3));              /* center */
     if (touchpad)
     {
+        if (touchpad & (1 << 3))
+        {
+            btn |= BUTTON_SELECT;
+            /* Desensitize middle (+) detectors one level */
+            touchpad &= ~((1 << 11) | (1 << 8) | (1 << 5) | (1 << 1));
+        }
+
         if (touchpad & ((1 << 1) | (1 << 0)))
             btn |= BUTTON_UP;
 
@@ -138,8 +149,6 @@ int button_read_device(void)
         if (touchpad & ((1 << 8) | (1 << 7)))
             btn |= BUTTON_LEFT;
 
-        if (touchpad & (1 << 3))
-            btn |= BUTTON_SELECT;
         buttonlight_on();
     }
     
