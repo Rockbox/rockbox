@@ -83,7 +83,8 @@ static int elf_convert(const unsigned char *inbuf, unsigned char *outbuf)
 {
     Elf32_Ehdr *main_header;
     Elf32_Shdr *section_header;
-    unsigned int i, j, sum, startaddr;
+    unsigned int i, j, sum;
+    int startaddr;
     
     main_header = (Elf32_Ehdr*)inbuf;
     if( !( main_header->e_ident[0] == ELFMAG0 && main_header->e_ident[1] == ELFMAG1
@@ -93,7 +94,7 @@ static int elf_convert(const unsigned char *inbuf, unsigned char *outbuf)
         return -1;
     }
     
-    startaddr = (unsigned int)outbuf;
+    startaddr = (intptr_t)outbuf;
     
     for(i = 0; i < main_header->e_shnum; i++)
     {
@@ -102,7 +103,7 @@ static int elf_convert(const unsigned char *inbuf, unsigned char *outbuf)
         if( (section_header->sh_flags & SHF_WRITE || section_header->sh_flags & SHF_ALLOC
              || section_header->sh_flags & SHF_EXECINSTR) && section_header->sh_size > 0 
              && section_header->sh_type != SHT_NOBITS                                     )
-        {           
+        {
             /* Address */
             int2le(section_header->sh_addr, outbuf);
             outbuf += 4;
@@ -122,7 +123,7 @@ static int elf_convert(const unsigned char *inbuf, unsigned char *outbuf)
             outbuf += section_header->sh_size;
         }
     }
-    return (unsigned int)(outbuf - startaddr);
+    return (intptr_t)(outbuf - startaddr);
 }
 
 static int make_jrm_file(const unsigned char *inbuf, unsigned char *outbuf)
