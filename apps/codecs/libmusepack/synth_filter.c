@@ -198,7 +198,11 @@ static const MPC_SAMPLE_FORMAT  Di_opt [32] [16] ICONST_ATTR = {
 #define INVCOS30 MPC_MAKE_INVCOS( 684664578)
 #define INVCOS31 MPC_MAKE_INVCOS(1367679739)
 
-static inline void 
+void 
+mpc_calculate_new_V ( const MPC_SAMPLE_FORMAT * Sample, MPC_SAMPLE_FORMAT * V )
+ICODE_ATTR_MPC_LARGE_IRAM;
+
+void 
 mpc_calculate_new_V ( const MPC_SAMPLE_FORMAT * Sample, MPC_SAMPLE_FORMAT * V )
 {
     // Calculating new V-buffer values for left channel
@@ -453,7 +457,7 @@ mpc_calculate_new_V ( const MPC_SAMPLE_FORMAT * Sample, MPC_SAMPLE_FORMAT * V )
     //                    total: 111 adds, 107 subs, 80 muls,  80 shifts
 }
 
-static inline void 
+static void 
 mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data, const MPC_SAMPLE_FORMAT * V)
 {
    const MPC_SAMPLE_FORMAT *D = (const MPC_SAMPLE_FORMAT *) &Di_opt;

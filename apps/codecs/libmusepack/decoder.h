@@ -113,7 +113,7 @@ typedef struct mpc_decoder_t {
     mpc_uint8_t   SeekTable_Step;
 
 #ifdef MPC_FIXED_POINT
-    unsigned char SCF_shift[256];
+    mpc_uint8_t   SCF_shift[256];
 #endif
 
     MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960];

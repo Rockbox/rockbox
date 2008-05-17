@@ -66,6 +66,16 @@ extern "C" {
 #endif
 #endif
 
+#ifndef ICODE_ATTR_MPC_LARGE_IRAM
+#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+/* PP5022/24 have 128KB of IRAM and have better performance with ICODE_ATTR */
+#define ICODE_ATTR_MPC_LARGE_IRAM ICODE_ATTR
+#else
+/* all other targets either haven't enough IRAM or performance suffers */
+#define ICODE_ATTR_MPC_LARGE_IRAM
+#endif
+#endif
+
 #ifdef ROCKBOX_LITTLE_ENDIAN
 #define MPC_LITTLE_ENDIAN
 #endif
