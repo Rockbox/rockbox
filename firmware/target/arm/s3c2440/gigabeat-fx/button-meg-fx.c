@@ -126,16 +126,16 @@ int button_read_device(void)
     touchpad = GPJDAT & 0x10C9;
     if (touchpad)
     {
-        if (touchpad & (1 << 0))
+        if (touchpad & ((1 << 1) | (1 << 0)))
             btn |= BUTTON_UP;
 
-        if (touchpad & (1 << 12))
+        if (touchpad & ((1 << 12) | (1 << 11)))
             btn |= BUTTON_RIGHT;
 
-        if (touchpad & (1 << 6))
+        if (touchpad & ((1 << 6) | (1 << 5)))
             btn |= BUTTON_DOWN;
 
-        if (touchpad & (1 << 7))
+        if (touchpad & ((1 << 8) | (1 << 7)))
             btn |= BUTTON_LEFT;
 
         if (touchpad & (1 << 3))
