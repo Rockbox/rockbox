@@ -132,7 +132,7 @@ void lcd_init_device(void)
     lcd_cmd_and_data(R_DRV_WAVEFORM_CONTROL, 0x48);
                      /* C waveform, no EOR, 9 lines inversion */
     lcd_cmd_and_data(R_POWER_CONTROL, POWER_REG_H | 0xc);
-    lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
+    lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0019);
 #ifdef HAVE_BACKLIGHT_INVERSION
     invert_display();
 #endif
@@ -175,10 +175,10 @@ static void invert_display(void)
         int oldlevel = disable_irq_save();
 #if NUM_CORES > 1
         corelock_lock(&cl);
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, new_invert? 0x0017 : 0x0015);
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, new_invert? 0x0027 : 0x0019);
         corelock_unlock(&cl);
 #else
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, new_invert? 0x0017 : 0x0015);
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, new_invert? 0x0027 : 0x0019);
 #endif
         restore_irq(oldlevel);
         last_invert = new_invert;
@@ -199,7 +199,7 @@ void lcd_set_backlight_inversion(bool yesno)
 #else
 void lcd_set_invert_display(bool yesno)
 {
-    lcd_cmd_and_data(R_DISPLAY_CONTROL, yesno ? 0x0017 : 0x0015);
+    lcd_cmd_and_data(R_DISPLAY_CONTROL, yesno ? 0x0027 : 0x0019);
 }
 #endif
 
