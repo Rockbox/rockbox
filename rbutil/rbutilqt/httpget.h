@@ -44,11 +44,14 @@ class HttpGet : public QObject
         int httpResponse(void);
         QByteArray readAll(void);
         bool isCached() { return m_cached; }
-        void setNoHeaderCheck(bool b) { m_noHeaderCheck = b; } //< disable checking of http header timestamp for caching
+        void setDumbCache(bool b) //< disable checking of http header timestamp for caching
+            { m_dumbCache = b; }
         static void setGlobalCache(const QDir d) //< set global cache path
             { m_globalCache = d; }
         static void setGlobalProxy(const QUrl p) //< set global proxy value
             { m_globalProxy = p; }
+        static void setGlobalDumbCache(bool b) //< set "dumb" (ignore server status) caching mode
+            { m_globalDumbCache = b; }
 
     public slots:
         void abort(void);
@@ -84,11 +87,12 @@ class HttpGet : public QObject
         QUrl m_proxy;
         static QDir m_globalCache; //< global cache path value
         static QUrl m_globalProxy; //< global proxy value
+        static bool m_globalDumbCache; //< cache "dumb" mode global setting
         QDateTime m_serverTimestamp; //< timestamp of file on server
         QString m_query; //< constructed query to pass http getter
         QString m_path; //< constructed path to pass http getter
         QString m_hash; //< caching hash
-        bool m_noHeaderCheck; //< true if caching should ignore the server header
+        bool m_dumbCache; //< true if caching should ignore the server header
 };
 
 #endif

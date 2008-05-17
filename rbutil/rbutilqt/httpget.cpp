@@ -25,13 +25,14 @@
 
 QDir HttpGet::m_globalCache; //< global cach path value for new objects
 QUrl HttpGet::m_globalProxy; //< global proxy value for new objects
+bool HttpGet::m_globalDumbCache = false; //< globally set cache "dumb" mode
 
 HttpGet::HttpGet(QObject *parent)
     : QObject(parent)
 {
     outputToBuffer = true;
     m_cached = false;
-    m_noHeaderCheck = false;
+    m_dumbCache = m_globalDumbCache;
     getRequest = -1;
     // if a request is cancelled before a reponse is available return some
     // hint about this in the http response instead of nonsense.
@@ -199,7 +200,7 @@ bool HttpGet::getFile(const QUrl &url)
     m_hash = QCryptographicHash::hash(url.toEncoded(), QCryptographicHash::Md5).toHex();
     m_path = QString(QUrl::toPercentEncoding(url.path(), "/"));
 
-    if(m_noHeaderCheck || !m_usecache) {
+    if(m_dumbCache || !m_usecache) {
         getFileFinish();
     }
     else {
