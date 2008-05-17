@@ -266,6 +266,7 @@ void RbUtilQt::updateSettings()
         HttpGet::setGlobalProxy(QUrl(""));
     }
     HttpGet::setGlobalCache(settings->cachePath());
+    HttpGet::setGlobalDumbCache(settings->cacheOffline());
 }
 
 
