@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <elf.h>
 
 #include "creative.h"
 #include "hmac-sha1.h"
@@ -30,36 +31,19 @@ static const char null_key_v2[]  = "CTL:N0MAD|PDE0.DPMP.";
 static const char null_key_v3[]  = "CTL:Z3N07|PDE0.DPMP.";
 static const char null_key_v4[]  = "CTL:N0MAD|PDE0.DPFP.";
 
-static const unsigned char bootloader_v1[] =
-{
-    0xD3, 0xF0, 0x29, 0xE3, /* MSR     CPSR_cf, #0xD3     */
-    0x09, 0xF6, 0xA0, 0xE3  /* MOV     PC, #0x900000      */
-};
-
-static const unsigned char bootloader_v2[] =
-{
-    0xD3, 0xF0, 0x29, 0xE3, /* MSR     CPSR_cf, #0xD3     */
-    0x09, 0xF6, 0xA0, 0xE3  /* MOV     PC, #0x40000000      */
-};
-
-static const unsigned char bootloader_v3[] =
-{
-    0 /* Unknown */
-};
-
 static const struct device_info devices[] =
 {
     /* Creative Zen Vision:M */
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M",             42, null_key_v2, bootloader_v1, sizeof(bootloader_v1), 0x00900000},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M",             42, null_key_v2},
     /* Creative Zen Vision:M Go! */
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M\0 \0G\0o\0!", 50, null_key_v2, bootloader_v1, sizeof(bootloader_v1), 0x00900000},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0:\0M\0 \0G\0o\0!", 50, null_key_v2},
     /* Creative Zen Vision © TL */
     /* The "©" should be ANSI encoded or the device won't accept the firmware package. */
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0 \0©\0T\0L",       46, null_key_v2, bootloader_v1, sizeof(bootloader_v1), 0x00900000},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0e\0n\0 \0V\0i\0s\0i\0o\0n\0 \0©\0T\0L",       46, null_key_v2},
     /* Creative ZEN V */
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N\0 \0V",                                  42, null_key_v4, bootloader_v3, sizeof(bootloader_v3), 0x00000000},
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N\0 \0V",                                  42, null_key_v4},
     /* Creative ZEN */
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N",                                        48, null_key_v3, bootloader_v2, sizeof(bootloader_v2), 0x40000000}
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N",                                        48, null_key_v3}
 };
 
 /*
@@ -69,7 +53,7 @@ extern void int2le(unsigned int val, unsigned char* addr);
 extern unsigned int le2int(unsigned char* buf);
 
 
-static int make_ciff_file(unsigned char *inbuf, unsigned int length,
+static int make_ciff_file(const unsigned char *inbuf, unsigned int length,
                           unsigned char *outbuf, int device)
 {
     unsigned char key[20];
@@ -83,7 +67,8 @@ static int make_ciff_file(unsigned char *inbuf, unsigned int length,
     memcpy(&outbuf[0x70], "ATAD", 4);
     int2le(length+32, &outbuf[0x74]);
     memcpy(&outbuf[0x78], "H\0j\0u\0k\0e\0b\0o\0x\0\x32\0.\0j\0r\0m",
-           32); /*Unicode encoded*/
+           25); /*Unicode encoded*/
+    memset(&outbuf[0x78+25], 0, 32);
     memcpy(&outbuf[0x98], inbuf, length);
     memcpy(&outbuf[0x98+length], "LLUN", 4);
     int2le(20, &outbuf[0x98+length+4]);
@@ -94,57 +79,76 @@ static int make_ciff_file(unsigned char *inbuf, unsigned int length,
     return length+0x90+0x1C+8;
 }
 
-static int make_jrm_file(unsigned char *inbuf, unsigned int length,
-                         unsigned char *outbuf, int device)
+static int elf_convert(const unsigned char *inbuf, unsigned char *outbuf)
 {
-    unsigned int i;
-    unsigned int sum = 0;
+    Elf32_Ehdr *main_header;
+    Elf32_Shdr *section_header;
+    unsigned int i, j, sum, startaddr;
+    
+    main_header = (Elf32_Ehdr*)inbuf;
+    if( !( main_header->e_ident[0] == ELFMAG0 && main_header->e_ident[1] == ELFMAG1
+        && main_header->e_ident[2] == ELFMAG2 && main_header->e_ident[3] == ELFMAG3 ) )
+    {
+        printf("Invalid ELF header!\n");
+        return -1;
+    }
+    
+    startaddr = (unsigned int)outbuf;
+    
+    for(i = 0; i < main_header->e_shnum; i++)
+    {
+        section_header = (Elf32_Shdr*)(inbuf+main_header->e_shoff+i*sizeof(Elf32_Shdr));
+        
+        if( (section_header->sh_flags & SHF_WRITE || section_header->sh_flags & SHF_ALLOC
+             || section_header->sh_flags & SHF_EXECINSTR) && section_header->sh_size > 0 
+             && section_header->sh_type != SHT_NOBITS                                     )
+        {           
+            /* Address */
+            int2le(section_header->sh_addr, outbuf);
+            outbuf += 4;
+            /* Size */
+            int2le(section_header->sh_size, outbuf);
+            outbuf += 4;
+            /* Checksum */
+            sum = 0;
+            for(j=0; j<section_header->sh_size; j+= 4)
+                sum += le2int((unsigned char*)(inbuf+section_header->sh_offset+j)) + (le2int((unsigned char*)(inbuf+section_header->sh_offset+j))>>16);
+            int2le(sum, outbuf);
+            outbuf += 2;
+            memset(outbuf, 0, 2);
+            outbuf += 2;
+            /* Data */
+            memcpy(outbuf, inbuf+section_header->sh_offset, section_header->sh_size);
+            outbuf += section_header->sh_size;
+        }
+    }
+    return (unsigned int)(outbuf - startaddr);
+}
+
+static int make_jrm_file(const unsigned char *inbuf, unsigned char *outbuf)
+{
+    int length;
 
     /* Clear the header area to zero */
     memset(outbuf, 0, 0x18);
 
     /* Header (EDOC) */
     memcpy(outbuf, "EDOC", 4);
-    /* Total Size */
-    #define SIZEOF_BOOTLOADER_CODE  devices[device].bootloader_size
-    int2le(4+0xC+SIZEOF_BOOTLOADER_CODE+0xC+length, &outbuf[0x4]);
+    /* Total Size: temporarily set to 0 */
+    memset(&outbuf[0x4], 0, 4);
     /* 4 bytes of zero */
-    memset(&outbuf[0x8], 0, 0x4);
+    memset(&outbuf[0x8], 0, 4);
     
-    /* First block starts here ... */
-    /* Address = 0x0 */
-    memset(&outbuf[0xC], 0, 0x4);
-    /* Size */
-    int2le(SIZEOF_BOOTLOADER_CODE, &outbuf[0x10]);
-    /* Checksum */
-    for(i=0; i<SIZEOF_BOOTLOADER_CODE; i+= 4)
-        sum += le2int((unsigned char*)&devices[device].bootloader[i]) + (le2int((unsigned char*)&devices[device].bootloader[i])>>16);
-    int2le(sum, &outbuf[0x14]);
-    outbuf[0x16] = 0;
-    outbuf[0x17] = 0;
-    /*Data */
-    memcpy(&outbuf[0x18], devices[device].bootloader, SIZEOF_BOOTLOADER_CODE);
-    
-    /* Second block starts here ... */
-    /* Address = depends on target */
-    #define SB_START    (0x18+SIZEOF_BOOTLOADER_CODE)
-    int2le(devices[device].memory_address, &outbuf[SB_START]);
-    /* Size */
-    int2le(length, &outbuf[SB_START+0x4]);
-    /* Checksum */
-    sum = 0;
-    for(i=0; i<length; i+= 4)
-        sum += le2int(&inbuf[i]) + (le2int(&inbuf[i])>>16);
-    int2le(sum, &outbuf[SB_START+0x8]);
-    outbuf[SB_START+0xA] = 0;
-    outbuf[SB_START+0xB] = 0;
-    /* Data */
-    memcpy(&outbuf[SB_START+0xC], inbuf, length);
-    
-    return SB_START+0xC+length;
+    length = elf_convert(inbuf, &outbuf[0xC]);
+    if(length < 0)
+        return -1;
+    /* Now set the actual Total Size */
+    int2le(4+length, &outbuf[0x4]);
+
+    return 0xC+length;
 }
 
-int zvm_encode(char *iname, char *oname, int device)
+int zvm_encode(const char *iname, const char *oname, int device)
 {
     size_t len;
     int length;
@@ -164,7 +168,7 @@ int zvm_encode(char *iname, char *oname, int device)
 
     buf = (unsigned char*)malloc(length);
     if ( !buf ) {
-        printf("out of memory!\n");
+        printf("Out of memory!\n");
         return -1;
     }
 
@@ -178,11 +182,17 @@ int zvm_encode(char *iname, char *oname, int device)
     outbuf = (unsigned char*)malloc(length+0x300);
     if ( !outbuf ) {
         free(buf);
-        printf("out of memory!\n");
+        printf("Out of memory!\n");
         return -1;
     }
-    length = make_jrm_file(buf, len, outbuf, device);
+    length = make_jrm_file(buf, outbuf);
     free(buf);
+    if(length < 0)
+    {
+        free(outbuf);
+        printf("Error in making JRM file!\n");
+        return -1;
+    }
     buf = (unsigned char*)malloc(length+0x200);
     memset(buf, 0, length+0x200);
     length = make_ciff_file(outbuf, length, buf, device);

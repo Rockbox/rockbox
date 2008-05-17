@@ -81,9 +81,13 @@ SECTIONS
         _vectorsstart = .;
         *(.vectors);
         _vectorsend = .;
+#ifndef CREATIVE_ZVx
     } > IRAM AT> DRAM
 
     _vectorscopy = LOADADDR(.vectors);
+#else
+    } > IRAM
+#endif
 
     .iram :
     {
@@ -93,9 +97,13 @@ SECTIONS
         *(.idata)
         . = ALIGN(0x4);
         _iramend = .;
+#ifndef CREATIVE_ZVx
     } > IRAM AT> DRAM
 
     _iramcopy = LOADADDR(.iram);
+#else
+    } > IRAM
+#endif
 
     .ibss (NOLOAD) :
     {

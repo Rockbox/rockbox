@@ -34,11 +34,8 @@ struct device_info
     const char* cinf; /*Must be Unicode encoded*/
     const unsigned int cinf_size;
     const char* null;
-    const unsigned char* bootloader;
-    const unsigned int bootloader_size;
-    const unsigned int memory_address;
 };
 
-int zvm_encode(char *iname, char *oname, int device);
+int zvm_encode(const char *iname, const char *oname, int device);
 
 #endif /*CREATIVE_H_*/

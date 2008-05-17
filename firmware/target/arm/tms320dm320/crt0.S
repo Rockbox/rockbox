@@ -44,6 +44,7 @@ start:
 
     msr    cpsr, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
+#ifndef CREATIVE_ZVx
     /* Copy exception handler code to address 0 */
     ldr    r2, =_vectorsstart
     ldr    r3, =_vectorsend
@@ -53,6 +54,7 @@ start:
     ldrhi  r5, [r4], #4
     strhi  r5, [r2], #4
     bhi    1b
+#endif
 
     /* Disable data and instruction cache, high vectors (at 0xffff0000 instead of 0x00000000) */
     mrc    p15, 0, r0, c1, c0, 0
@@ -105,6 +107,7 @@ start:
     strhi  r4, [r2], #4
     bhi    1b
 
+#ifndef CREATIVE_ZVx
     /* Copy the IRAM */
     ldr    r2, =_iramcopy
     ldr    r3, =_iramstart
@@ -114,6 +117,7 @@ start:
     ldrhi  r5, [r2], #4
     strhi  r5, [r3], #4
     bhi    1b
+#endif
 #endif /* !BOOTLOADER,!STUB */
 
     /* Initialise bss section to zero */

@@ -147,7 +147,7 @@ $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(VOICE) $(
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKVOICE) $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
-	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(if $(filter yes, $(USE_ELF)), cp $< $@, $(OC) -O binary $< $@)
 
 $(OBJDIR)/rombox.bin : $(OBJDIR)/rombox.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
