@@ -5,4 +5,6 @@ mpc_decoder.c
 requant.c
 streaminfo.c
 synth_filter.c
-
+#if defined(CPU_ARM)
+synth_filter_arm.S
+#endif

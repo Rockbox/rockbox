@@ -38,7 +38,7 @@
 #ifndef _mpcdec_math_h_
 #define _mpcdec_math_h_
 
-#define MPC_FIXED_POINT
+#include "mpc_config.h"
 
 #define MPC_FIXED_POINT_SHIFT 16
 
