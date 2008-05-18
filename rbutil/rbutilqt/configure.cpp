@@ -115,7 +115,7 @@ void Config::accept()
     // mountpoint
     QString mp = ui.mountPoint->text();
     if(QFileInfo(mp).isDir())
-        settings->setMountpoint( mp);
+        settings->setMountpoint(QDir::fromNativeSeparators(mp));
 
     // platform
     QString nplat;
@@ -193,7 +193,7 @@ void Config::setUserSettings()
         ui.listLanguages->setCurrentItem(a.at(0));
 
     // devices tab
-    ui.mountPoint->setText(settings->mountpoint());
+    ui.mountPoint->setText(QDir::toNativeSeparators(settings->mountpoint()));
 
     // cache tab
     if(!QFileInfo(settings->cachePath()).isDir())
