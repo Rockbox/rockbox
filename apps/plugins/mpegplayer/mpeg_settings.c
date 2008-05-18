@@ -261,6 +261,7 @@ static bool mpeg_set_option(const char* string,
     return usb;
 }
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS /* Only used for this atm */
 static bool mpeg_set_int(const char *string, const char *unit,
                          int voice_unit, const int *variable,
                          void (*function)(int), int step,
@@ -278,6 +279,7 @@ static bool mpeg_set_int(const char *string, const char *unit,
 
     return usb;
 }
+#endif /* HAVE_BACKLIGHT_BRIGHNTESS */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void mpeg_backlight_update_brightness(int value)
