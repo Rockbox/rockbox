@@ -22,6 +22,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "ata.h"
+#include "usb.h"
 
 #define USB_RST_ASSERT
 #define USB_RST_DEASSERT
@@ -29,10 +30,10 @@
 #define USB_VPLUS_PWR_ASSERT
 #define USB_VPLUS_PWR_DEASSERT
 
-#define USB_UNIT_IS_PRESENT false
+#define USB_UNIT_IS_PRESENT USB_EXTRACTED
 
 /* The usb detect is one pin to the cpu active low */
-inline bool usb_detect(void)
+inline int usb_detect(void)
 {
     return USB_UNIT_IS_PRESENT;
 }
