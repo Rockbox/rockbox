@@ -34,4 +34,15 @@ void remote_backlight_use_settings(const struct plugin_api* rb);
 void buttonlight_force_on(const struct plugin_api* rb);
 void buttonlight_use_settings(const struct plugin_api* rb);
 #endif
+
+/**
+ * Backlight brightness adjustment settings
+ */
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+void backlight_brightness_set(const struct plugin_api *rb,
+                              int brightness);
+void backlight_brightness_use_setting(const struct plugin_api *rb);
 #endif
+
+
+#endif /* _LIB_HELPER_H_ */

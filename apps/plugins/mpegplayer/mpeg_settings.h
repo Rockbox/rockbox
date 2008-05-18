@@ -1,7 +1,7 @@
 
 #include "plugin.h"
 
-#define SETTINGS_VERSION 4
+#define SETTINGS_VERSION 5
 #define SETTINGS_MIN_VERSION 1
 #define SETTINGS_FILENAME "mpegplayer.cfg"
 
@@ -22,6 +22,9 @@ enum mpeg_option_id
     MPEG_OPTION_DISPLAY_FPS,
     MPEG_OPTION_LIMIT_FPS,
     MPEG_OPTION_SKIP_FRAMES,
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    MPEG_OPTION_BACKLIGHT_BRIGHTNESS,
+#endif
 };
 
 enum mpeg_audio_option_id
@@ -78,6 +81,10 @@ struct mpeg_settings {
     int crossfeed;
     int equalizer;
     int dithering;
+    /* Backlight options */
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    int backlight_brightness;
+#endif
 };
 
 extern struct mpeg_settings settings;
@@ -97,3 +104,7 @@ void mpeg_menu_sysevent_handle(void);
 
 void init_settings(const char* filename);
 void save_settings(void);
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+void mpeg_backlight_update_brightness(int value);
+#endif

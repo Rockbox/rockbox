@@ -91,3 +91,20 @@ void buttonlight_use_settings(const struct plugin_api* rb)
     rb->buttonlight_set_timeout(rb->global_settings->buttonlight_timeout);
 }
 #endif /* HAVE_BUTTON_LIGHT */
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+void backlight_brightness_set(const struct plugin_api *rb,
+                              int brightness)
+{
+    if (!rb)
+        return;
+    rb->backlight_set_brightness(brightness);
+}
+
+void backlight_brightness_use_setting(const struct plugin_api *rb)
+{
+    if (!rb)
+        return;
+    rb->backlight_set_brightness(rb->global_settings->brightness);
+}
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */

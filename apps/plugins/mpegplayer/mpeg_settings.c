@@ -1,4 +1,5 @@
 #include "plugin.h"
+#include "helper.h"
 #include "lib/configfile.h"
 #include "lib/oldmenuapi.h"
 
@@ -172,6 +173,10 @@ static struct configdata config[] =
     {TYPE_INT, 0, 2, &settings.crossfeed, "Crossfeed", NULL, NULL},
     {TYPE_INT, 0, 2, &settings.equalizer, "Equalizer", NULL, NULL},
     {TYPE_INT, 0, 2, &settings.dithering, "Dithering", NULL, NULL},
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    {TYPE_INT, -1, INT_MAX, &settings.backlight_brightness,
+     "Backlight brightness", NULL, NULL},
+#endif
 };
 
 static const struct opt_items noyes[2] = {
@@ -188,6 +193,10 @@ static const struct opt_items globaloff[2] = {
     { "Force off", -1 },
     { "Use sound setting", -1 },
 };
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+#define BACKLIGHT_OPTION_DEFAULT "Use setting"
+#endif
 
 static long mpeg_menu_sysevent_id;
 
@@ -251,6 +260,55 @@ static bool mpeg_set_option(const char* string,
 
     return usb;
 }
+
+static bool mpeg_set_int(const char *string, const char *unit,
+                         int voice_unit, const int *variable,
+                         void (*function)(int), int step,
+                         int min,
+                         int max,
+                         void (*formatter)(char*, size_t, int, const char*))
+{
+    mpeg_menu_sysevent_clear();
+
+    bool usb = rb->set_int(string, unit, voice_unit, variable, function,
+                           step, min, max, formatter);
+
+    if (usb)
+        mpeg_menu_sysevent_id = ACTION_STD_CANCEL;
+
+    return usb;
+}
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+void mpeg_backlight_update_brightness(int value)
+{
+    if (value >= 0)
+    {
+        value += MIN_BRIGHTNESS_SETTING;
+        backlight_brightness_set(rb, value);
+    }
+    else
+    {
+        backlight_brightness_use_setting(rb);
+    }
+}
+
+static void backlight_brightness_function(int value)
+{
+    mpeg_backlight_update_brightness(value);
+}
+
+static void backlight_brightness_formatter(char *buf, size_t length,
+                                           int value, const char *input)
+{
+    if (value < 0)
+        rb->strncpy(buf, BACKLIGHT_OPTION_DEFAULT, length);
+    else
+        rb->snprintf(buf, length, "%d", value + MIN_BRIGHTNESS_SETTING);
+
+    (void)input;
+}
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
 /* Sync a particular audio setting to global or mpegplayer forced off */
 static void sync_audio_setting(int setting, bool global)
@@ -816,6 +874,10 @@ static void display_options(void)
             { "Limit FPS", NULL },
         [MPEG_OPTION_SKIP_FRAMES] =
             { "Skip frames", NULL },
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+        [MPEG_OPTION_BACKLIGHT_BRIGHTNESS] =
+            { "Backlight brightness", NULL },
+#endif
     };
 
     menu_id = menu_init(rb, items, ARRAYLEN(items),
@@ -855,6 +917,19 @@ static void display_options(void)
             mpeg_set_option("Skip frames", &settings.skipframes, INT,
                             noyes, 2, NULL);
             break;
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+        case MPEG_OPTION_BACKLIGHT_BRIGHTNESS:
+            result = settings.backlight_brightness;
+            mpeg_backlight_update_brightness(result);
+            mpeg_set_int("Backlight brightness", NULL, -1, &result,
+                         backlight_brightness_function, 1, -1,
+                         MAX_BRIGHTNESS_SETTING - MIN_BRIGHTNESS_SETTING,
+                         backlight_brightness_formatter);
+            settings.backlight_brightness = result;
+            mpeg_backlight_update_brightness(-1);
+            break;
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
         default:
             menu_quit = true;
@@ -1057,6 +1132,9 @@ void init_settings(const char* filename)
     settings.skipframes = 1;  /* Skip frames */
     settings.resume_options = MPEG_RESUME_MENU_ALWAYS; /* Enable start menu */
     settings.resume_count = -1;
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    settings.backlight_brightness = -1; /* Use default setting */
+#endif
 #if MPEG_OPTION_DITHERING_ENABLED
     settings.displayoptions = 0; /* No visual effects */
 #endif
@@ -1125,6 +1203,11 @@ void save_settings(void)
         configfile_update_entry(SETTINGS_FILENAME, "Resume count",
                                 ++settings.resume_count);
     }
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    configfile_update_entry(SETTINGS_FILENAME, "Backlight brightness",
+                            settings.backlight_brightness);
+#endif
 
 #if MPEG_OPTION_DITHERING_ENABLED
     configfile_update_entry(SETTINGS_FILENAME, "Display options",

@@ -587,6 +587,30 @@ static void draw_putsxy_oriented(int x, int y, const char *str)
 }
 #endif /* LCD_PORTRAIT */
 
+static void wvs_backlight_on_video_mode(bool video_on)
+{
+    if (video_on) {
+        /* Turn off backlight timeout */
+        /* backlight control in lib/helper.c */
+        backlight_force_on(rb);
+    } else {
+        /* Revert to user's backlight settings */
+        backlight_use_settings(rb);
+    }
+}
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+static void wvs_backlight_brightness_video_mode(bool video_on)
+{
+    if (settings.backlight_brightness < 0)
+        return;
+
+    mpeg_backlight_update_brightness(
+        video_on ? settings.backlight_brightness : -1);
+}
+#else
+#define wvs_backlight_brightness_video_mode(video_on)
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
 static void wvs_text_init(void)
 {
@@ -1012,6 +1036,11 @@ static void wvs_show(unsigned show)
 
         wvs.flags |= WVS_SHOW;
 
+        if (wvs.status != WVS_STATUS_PLAYING) {
+            /* Not playing - set brightness to mpegplayer setting */
+            wvs_backlight_brightness_video_mode(true);
+        }
+
         stream_vo_set_clip(&rc);
 
         if (!(show & WVS_NODRAW))
@@ -1031,6 +1060,11 @@ static void wvs_show(unsigned show)
             stream_draw_frame(false);
         } else {
             stream_vo_set_clip(NULL);
+        }
+
+        if (wvs.status != WVS_STATUS_PLAYING) {
+            /* Not playing - restore backlight brightness */
+            wvs_backlight_brightness_video_mode(false);
         }
     }
 }
@@ -1227,6 +1261,8 @@ static int wvs_play(uint32_t time)
     retval = stream_seek(time, SEEK_SET);
 
     if (retval >= STREAM_OK) {
+        wvs_backlight_on_video_mode(true);
+        wvs_backlight_brightness_video_mode(true);
         stream_show_vo(true);
         retval = stream_play();
 
@@ -1251,6 +1287,8 @@ static int wvs_halt(void)
     /* Cancel some auto refreshes - caller will restart them if desired */
     wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
 
+    /* No backlight fiddling here - callers does the right thing */
+
     return status;
 }
 
@@ -1267,14 +1305,19 @@ static int wvs_pause(void)
 
     wvs_set_status(WVS_STATUS_PAUSED);
 
+    wvs_backlight_on_video_mode(false);
+    /* Leave brightness alone and restore it when WVS is hidden */
+
     return status;
 }
 
 /* Resume playback if halted or paused */
 static void wvs_resume(void)
 {
-    /* Cancel video and resume auto refresh - the resyc when starting playback
-     * will perform those tasks */
+    /* Cancel video and resume auto refresh - the resyc when starting
+     * playback will perform those tasks */
+    wvs_backlight_on_video_mode(true);
+    wvs_backlight_brightness_video_mode(true);
     wvs_cancel_refresh(WVS_REFRESH_VIDEO | WVS_REFRESH_RESUME);
     wvs_set_status(WVS_STATUS_PLAYING);
     stream_resume();
@@ -1295,6 +1338,9 @@ static void wvs_stop(void)
 
     if (resume_time != INVALID_TIMESTAMP)
         settings.resume_time = resume_time;
+
+    wvs_backlight_on_video_mode(false);
+    wvs_backlight_brightness_video_mode(false);
 }
 
 /* Perform a seek if seeking is possible for this stream - if playing, a delay
@@ -1343,14 +1389,12 @@ static void wvs_handle_phone_plug(bool inserted)
     if (inserted) {
         if (rb->global_settings->unplug_mode > 1) {
             if (status == STREAM_PAUSED) {
-                backlight_force_on(rb);
                 wvs_resume();
             }
         }
     } else {
         if (status == STREAM_PLAYING) {
             wvs_pause();
-            backlight_use_settings(rb);
 
             if (stream_can_seek() && rb->global_settings->unplug_rw) {
                 stream_seek(-rb->global_settings->unplug_rw*TS_SECOND,
@@ -1370,10 +1414,6 @@ static void button_loop(void)
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_clear_display();
     rb->lcd_update();
-
-    /* Turn off backlight timeout */
-    /* backlight control in lib/helper.c */
-    backlight_force_on(rb);
 
     wvs_init();
 
@@ -1442,7 +1482,7 @@ static void button_loop(void)
             /* Hide video output */
             wvs_show(WVS_HIDE | WVS_NODRAW);
             stream_show_vo(false);
-            backlight_use_settings(rb);
+            wvs_backlight_brightness_video_mode(false);
 
             result = mpeg_menu(0);
 
@@ -1464,7 +1504,6 @@ static void button_loop(void)
 
                 /* If stream was playing, restart it */
                 if (state == STREAM_PLAYING) {
-                    backlight_force_on(rb);
                     wvs_resume();
                 }
                 break;
@@ -1495,11 +1534,9 @@ static void button_loop(void)
             if (status == STREAM_PLAYING) {
                 /* Playing => Paused */
                 wvs_pause();
-                backlight_use_settings(rb);
             }
             else if (status == STREAM_PAUSED) {
                 /* Paused => Playing */
-                backlight_force_on(rb);
                 wvs_resume();
             }
 
@@ -1539,9 +1576,6 @@ static void button_loop(void)
     wvs_stop();
 
     rb->lcd_setfont(FONT_UI);
-
-    /* Turn on backlight timeout (revert to settings) */
-    backlight_use_settings(rb);
 }
 
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
