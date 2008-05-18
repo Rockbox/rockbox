@@ -20,6 +20,7 @@
 
 PLUGIN_HEADER
 static const struct plugin_api* rb;
+MEM_FUNCTION_WRAPPERS(rb)
 
 /* function return values */
 enum tidy_return
@@ -30,66 +31,131 @@ enum tidy_return
     TIDY_RETURN_ABORT = 3,
 };
 
-/* Which systems junk are we removing */
-enum tidy_system
+#define MAX_TYPES 64
+struct tidy_type {
+    char filestring[64];
+    bool directory;
+    bool remove;
+} tidy_types[MAX_TYPES];
+int tidy_type_count;
+bool tidy_loaded_and_changed = false;
+
+#define DEFAULT_FILES PLUGIN_APPS_DIR "/disktidy.config"
+#define CUSTOM_FILES  PLUGIN_APPS_DIR "/disktidy_custom.config"
+void add_item(const char* name, int index)
 {
-    TIDY_MAC = 0,
-    TIDY_WIN = 1,
-    TIDY_NIX = 2,
-    TIDY_ALL = 3,
-};
+    rb->strcpy(tidy_types[index].filestring, name);
+    if (name[rb->strlen(name)-1] == '/')
+    {
+        tidy_types[index].directory = true;
+        tidy_types[index].filestring[rb->strlen(name)-1] = '\0';
+    }
+    else
+        tidy_types[index].directory = false;
+}
+static int find_file_string(const char *file, char *last_group)
+{
+    char temp[MAX_PATH];
+    int i = 0, idx_last_group = -1;
+    bool folder = false;
+    rb->strcpy(temp, file);
+    if (temp[rb->strlen(temp)-1] == '/')
+    {
+        folder = true;
+        temp[rb->strlen(temp)-1] = '\0';
+    }
+    while (i<tidy_type_count)
+    {
+        if (!rb->strcmp(tidy_types[i].filestring, temp) &&
+            folder == tidy_types[i].directory)
+            return i;
+        else if (!rb->strcmp(tidy_types[i].filestring, last_group))
+            idx_last_group = i;
+        i++;
+    }
+    /* not found, so insert it into its group */
+    if (file[0] != '<' && idx_last_group != -1)
+    {
+        for (i=idx_last_group; i<tidy_type_count; i++)
+        {
+            if (tidy_types[i].filestring[0] == '<')
+            {
+                idx_last_group = i;
+                break;
+            }
+        }
+        /* shift items up one */
+        for (i=tidy_type_count;i>idx_last_group;i--)
+        {
+            rb->strcpy(tidy_types[i].filestring, tidy_types[i-1].filestring);
+            tidy_types[i].directory = tidy_types[i-1].directory;
+            tidy_types[i].remove = tidy_types[i-1].remove;
+        }
+        tidy_type_count++;
+        add_item(file, idx_last_group+1);
+        return idx_last_group+1;
+    }
+    return i;
+}
 
-/* variable button definitions */
-#if CONFIG_KEYPAD == PLAYER_PAD
-#define TIDY_STOP BUTTON_STOP
+bool tidy_load_file(const char* file)
+{
+    int fd = rb->open(file, O_RDONLY), i;
+    char buf[MAX_PATH], *str, *remove;
+    char last_group[MAX_PATH] = "";
+    bool new;
+    if (fd < 0)
+        return false;
+    while ((tidy_type_count < MAX_TYPES) && 
+            rb->read_line(fd, buf, MAX_PATH))
+    {
+        if (rb->settings_parseline(buf, &str, &remove))
+        {
+            i = find_file_string(str, last_group);
+            new = (i >= tidy_type_count);
+            if (!rb->strcmp(remove, "yes"))
+                tidy_types[i].remove = true;
+            else tidy_types[i].remove = false;
+            if (new)
+            {
+                i = tidy_type_count;
+                add_item(str, i);
+                tidy_type_count++;
+            }
+            if (str[0] == '<')
+                rb->strcpy(last_group, str);
+        }
+    }
+    rb->close(fd);
+    return true;
+}
 
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#define TIDY_STOP BUTTON_OFF
-
-#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
-#define TIDY_STOP BUTTON_OFF
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define TIDY_STOP BUTTON_OFF
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define TIDY_STOP BUTTON_OFF
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define TIDY_STOP BUTTON_MENU
-
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-#define TIDY_STOP BUTTON_POWER
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define TIDY_STOP BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-(CONFIG_KEYPAD == SANSA_C200_PAD)
-#define TIDY_STOP BUTTON_POWER
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define TIDY_STOP BUTTON_POWER
-
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD
-#define TIDY_STOP BUTTON_BACK
-
-#elif CONFIG_KEYPAD == MROBE100_PAD
-#define TIDY_STOP BUTTON_POWER
-
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define TIDY_STOP BUTTON_RC_REC
-
-#elif CONFIG_KEYPAD == COWOND2_PAD
-#define TIDY_STOP BUTTON_POWER
-
-#else
-#error No keymap defined!
-#endif
-
+bool tidy_remove_item(char *item, int attr)
+{
+    int i;
+    char *file;
+    bool ret = false, rem = false;
+    for (i=0; ret == false && i < tidy_type_count; i++)
+    {
+        file = tidy_types[i].filestring;
+        if (file[rb->strlen(file)-1] == '*')
+        {
+            if (!rb->strncmp(file, item, rb->strlen(file)-1))
+                 rem = true;
+        }
+        else if (!rb->strcmp(file, item))
+            rem = true;
+        if (rem)
+        {
+            if (!tidy_types[i].remove)
+                return false;
+            if (attr&ATTR_DIRECTORY)
+                ret = tidy_types[i].directory;
+            else ret = true;
+        }
+    }
+    return ret;
+}
 
 void tidy_lcd_status(const char *name, int *removed)
 {
@@ -139,8 +205,8 @@ enum tidy_return tidy_removedir(const char *name, int *removed)
         /* walk directory */
         {
             /* check for user input and usb connect */
-            button = rb->button_get(false);
-            if (button == TIDY_STOP)
+            button = rb->get_action(CONTEXT_STD, TIMEOUT_NOBLOCK);
+            if (button == ACTION_STD_CANCEL)
             {
                 rb->closedir(dir);
                 return TIDY_RETURN_ABORT;
@@ -184,8 +250,7 @@ enum tidy_return tidy_removedir(const char *name, int *removed)
     return status;
 }
 
-enum tidy_return tidy_clean(const char *name, int *removed, \
-                            enum tidy_system system)
+enum tidy_return tidy_clean(const char *name, int *removed)
 {
     /* deletes junk files and dirs left by system */
     struct dirent *entry;
@@ -207,8 +272,8 @@ enum tidy_return tidy_clean(const char *name, int *removed, \
         /* walk directory */
         {
             /* check for user input and usb connect */
-            button = rb->button_get(false);
-            if (button == TIDY_STOP)
+            button = rb->get_action(CONTEXT_STD, TIMEOUT_NOBLOCK);
+            if (button == ACTION_STD_CANCEL)
             {
                 rb->closedir(dir);
                 return TIDY_RETURN_ABORT;
@@ -232,40 +297,17 @@ enum tidy_return tidy_clean(const char *name, int *removed, \
                     /* get absolute path */
                     tidy_get_absolute_path(entry, fullname, name);
                     
-                    /* check if we are in root directory "/" */
-                    if (rb->strcmp(name, "/") == 0)
+                    if (tidy_remove_item(entry->d_name, entry->attribute))
                     {
-                        if ((system == TIDY_MAC) || (system == TIDY_ALL))
-                        {
-                            /* mac directories */
-                            if (rb->strcmp(entry->d_name, ".Trashes") == 0)
-                            {
-                                /* delete dir */
-                                tidy_removedir(fullname, removed);
-                                del = 1;
-                            }
-                        }
-                        
-                        if (del == 0)
-                        {
-                            if ((system == TIDY_WIN) || (system == TIDY_ALL))
-                            {
-                                /* windows directories */
-                                if (rb->strcmp(entry->d_name, "Recycled") == 0 \
-                || rb->strcmp(entry->d_name, "System Volume Information") == 0)
-                                {
-                                    /* delete dir */
-                                    tidy_removedir(fullname, removed);
-                                    del = 1;
-                                }
-                            }
-                        }
+                        /* delete dir */
+                        tidy_removedir(fullname, removed);
+                        del = 1;
                     }
                     
                     if (del == 0)
                     {
                         /* dir not deleted so clean it */
-                        status = tidy_clean(fullname, removed, system);
+                        status = tidy_clean(fullname, removed);
                     }
                 }
             }
@@ -273,63 +315,17 @@ enum tidy_return tidy_clean(const char *name, int *removed, \
             {
                 /* file */
                 del = 0;
-                
-                if ((system == TIDY_MAC) || (system == TIDY_ALL))
+                if (tidy_remove_item(entry->d_name, entry->attribute))
                 {
-                    /* remove mac files */
-                    if ((rb->strcmp(entry->d_name, ".DS_Store") == 0) || \
-                        (rb->strncmp(entry->d_name, "._", 2) == 0))
-                    {
-                        *removed += 1; /* increment removed files counter */
-                        
-                        /* get absolute path */
-                        char fullname[MAX_PATH];
-                        tidy_get_absolute_path(entry, fullname, name);
-                        
-                        /* delete file */
-                        rb->remove(fullname);
-                        del = 1;
-                    }
-                }
-                
-                if (del == 0)
-                {
-                    if ((system == TIDY_WIN) || (system == TIDY_ALL))
-                    {
-                        /* remove windows files*/
-                        if ((rb->strcmp(entry->d_name, "Thumbs.db") == 0))
-                        {
-                            *removed += 1; /* increment removed files counter */
-                            
-                            /* get absolute path */
-                            char fullname[MAX_PATH];
-                            tidy_get_absolute_path(entry, fullname, name);
-                            
-                            /* delete file */
-                            rb->remove(fullname);
-                            del = 1;
-                        }
-                    }
-                 }
-                 if (del == 0)
-                 {
-                    if ((system ==TIDY_NIX) || (system == TIDY_ALL))
-                    {
-                        /* remove linux files*/
-                        if ((rb->strcmp(entry->d_name, ".dolphinview") == 0) || \
-                            (rb->strncmp(entry->d_name, ".d3lphinview", 2) == 0))
-                        {
-                            *removed += 1; /* increment removed files counter */
-                            
-                            /* get absolute path */
-                            char fullname[MAX_PATH];
-                            tidy_get_absolute_path(entry, fullname, name);
-                            
-                            /* delete file */
-                            rb->remove(fullname);
-                            del = 1;
-                        }
-                   }
+                    *removed += 1; /* increment removed files counter */
+                    
+                    /* get absolute path */
+                    char fullname[MAX_PATH];
+                    tidy_get_absolute_path(entry, fullname, name);
+                    
+                    /* delete file */
+                    rb->remove(fullname);
+                    del = 1;
                 }
             }
         }
@@ -342,7 +338,7 @@ enum tidy_return tidy_clean(const char *name, int *removed, \
     }
 }
 
-enum plugin_status tidy_do(enum tidy_system system)
+enum plugin_status tidy_do(void)
 {
     /* clean disk and display num of items removed */
     int removed = 0;
@@ -353,7 +349,7 @@ enum plugin_status tidy_do(enum tidy_system system)
     rb->cpu_boost(true);
 #endif
     
-    status = tidy_clean("/", &removed, system);
+    status = tidy_clean("/", &removed);
     
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
@@ -373,6 +369,73 @@ enum plugin_status tidy_do(enum tidy_system system)
     return status;
 }
 
+enum themable_icons get_icon(int item, void * data)
+{
+    (void)data;
+    if (tidy_types[item].filestring[0] == '<') /* special type */
+        return Icon_Folder;
+    else if (tidy_types[item].remove)
+        return Icon_Cursor;
+    else
+        return Icon_NOICON;
+}
+
+char * get_name(int selected_item, void * data,
+                     char * buffer, size_t buffer_len)
+{
+    (void)data;
+    if (tidy_types[selected_item].directory)
+    {
+        rb->snprintf(buffer, buffer_len, "%s/",
+                     tidy_types[selected_item].filestring);
+        return buffer;
+    }
+    return tidy_types[selected_item].filestring;
+}
+
+int list_action_callback(int action, struct gui_synclist *lists)
+{
+    if (action == ACTION_STD_OK)
+    {
+        int selection = rb->gui_synclist_get_sel_pos(lists);
+        if (tidy_types[selection].filestring[0] == '<')
+        {
+            int i;
+            if (!rb->strcmp(tidy_types[selection].filestring, "< ALL >"))
+            {
+                for (i=0; i<tidy_type_count; i++)
+                {
+                    if (tidy_types[i].filestring[0] != '<')
+                        tidy_types[i].remove = true;
+                }
+            }
+            else if (!rb->strcmp(tidy_types[selection].filestring, "< NONE >"))
+            {
+                for (i=0; i<tidy_type_count; i++)
+                {
+                    if (tidy_types[i].filestring[0] != '<')
+                        tidy_types[i].remove = false;
+                }
+            }
+            else /* toggle all untill the next <> */
+            {
+                selection++;
+                while (selection < tidy_type_count &&
+                       tidy_types[selection].filestring[0] != '<')
+                {
+                    tidy_types[selection].remove = !tidy_types[selection].remove;
+                    selection++;
+                }
+            }
+        }
+        else
+            tidy_types[selection].remove = !tidy_types[selection].remove;
+        tidy_loaded_and_changed = true;
+        return ACTION_REDRAW;
+    }
+    return action;
+}
+
 int tidy_lcd_menu(void)
 {
     int selection, ret = 3;
@@ -381,14 +444,6 @@ int tidy_lcd_menu(void)
     MENUITEM_STRINGLIST(menu,"Disktidy Menu",NULL,"Start Cleaning",
                         "Files to Clean","Quit");
     
-    static const struct opt_items system_option[] = 
-    {
-        { "Mac", -1 },
-        { "Windows", -1 },
-        { "Linux", -1 },
-        { "All", -1 }
-    };
-                      
     while (!menu_quit)
     {    
         switch(rb->do_menu(&menu, &selection, NULL, false))
@@ -399,8 +454,15 @@ int tidy_lcd_menu(void)
                 break;
                 
             case 1:
-                rb->set_option("Files to Clean", &ret, INT, system_option, 4, NULL);
-                break;
+            {
+                struct simplelist_info list;
+                rb->simplelist_info_init(&list, "Files to Clean", tidy_type_count, NULL);
+                list.get_icon = get_icon;
+                list.get_name = get_name;
+                list.action_callback = list_action_callback;
+                rb->simplelist_show_list(&list);
+            }
+            break;
         
             default:
                 ret = 99;    /* exit plugin */
@@ -414,36 +476,40 @@ int tidy_lcd_menu(void)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
-    enum tidy_system system = TIDY_ALL;
     enum tidy_return status;
-
+    int ret;
     (void)parameter;
 
     rb = api;
-       
-    switch(tidy_lcd_menu())
+    tidy_type_count = 0;
+    tidy_load_file(DEFAULT_FILES);
+    tidy_load_file(CUSTOM_FILES);
+    if (tidy_type_count == 0)
     {
-        case 0:
-            system = TIDY_MAC;
-            break;
-        case 1:
-            system = TIDY_WIN;
-            break;
-        case 2:
-            system = TIDY_NIX;
-            break;
-        case 3:
-            system = TIDY_ALL;
-            break;
-        case 99:
-            return PLUGIN_OK;
-        default:
-            system = TIDY_ALL;
+        rb->splash(3*HZ, "Missing disktidy.config file");
+        return PLUGIN_ERROR;
     }
-
+    ret = tidy_lcd_menu();
+    if (tidy_loaded_and_changed)
+    {
+        int fd = rb->creat(CUSTOM_FILES);
+        int i;
+        if (fd >= 0)
+        {
+            for(i=0;i<tidy_type_count;i++)
+            {
+                rb->fdprintf(fd, "%s%c: %s\n", tidy_types[i].filestring,
+                             tidy_types[i].directory?'/':'\0',
+                             tidy_types[i].remove?"yes":"no");
+            }
+            rb->close(fd);
+        }
+    }
+    if (ret == 99)
+        return PLUGIN_OK;
     while (true)
     {
-            status = tidy_do(system);
+            status = tidy_do();
 
             switch (status)
             {

@@ -120,7 +120,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 114
+#define PLUGIN_API_VERSION 115
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -744,6 +744,9 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    void (*simplelist_info_init)(struct simplelist_info *info, char* title,
+                                 int count, void* data);
+    bool (*simplelist_show_list)(struct simplelist_info *info);
 
 };
 

@@ -336,6 +336,7 @@ STOP
     }
     
     `cp $ROOT/apps/tagnavi.config .rockbox/`;
+    `cp $ROOT/apps/plugins/disktidy.config .rockbox/rocks/apps/`;
       
     if($bitmap) {
         `cp $ROOT/apps/plugins/sokoban.levels .rockbox/rocks/games/`; # sokoban levels

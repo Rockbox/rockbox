@@ -597,7 +597,9 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     /* new stuff at the end, sort into place next time
-       the API gets incompatible */
+        the API gets incompatible */
+    simplelist_info_init,
+    simplelist_show_list,
 
 };
 
