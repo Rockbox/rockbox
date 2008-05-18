@@ -815,31 +815,27 @@ static void update_screen(void)
 #else
 #define STAT_X COLS*SOKOBAN_TILESIZE
 #endif
-#if LCD_HEIGHT >= 70
-#define STAT_Y (LCD_HEIGHT - 70)/2
-#else
-#define STAT_Y (LCD_HEIGHT - 47)/2
-#endif
+#define STAT_Y (LCD_HEIGHT - 64)/2
 #define STAT_WIDTH (LCD_WIDTH - STAT_X)
 #define BOARD_WIDTH (LCD_WIDTH - STAT_WIDTH)
 #define BOARD_HEIGHT LCD_HEIGHT
-    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 3, "Level");
+    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 2, "Level");
     rb->snprintf(buf, sizeof(buf), "%d", current_info.level.index + 1);
-    rb->lcd_putsxy(STAT_X + 4, STAT_Y + 13, buf);
-    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 26, "Moves");
+    rb->lcd_putsxy(STAT_X + 4, STAT_Y + 12, buf);
+    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 23, "Moves");
     rb->snprintf(buf, sizeof(buf), "%d", current_info.level.moves);
-    rb->lcd_putsxy(STAT_X + 4, STAT_Y + 36, buf);
-
-    rb->lcd_drawrect(STAT_X, STAT_Y + 0, STAT_WIDTH, 24);
-    rb->lcd_drawrect(STAT_X, STAT_Y + 23, STAT_WIDTH, 24);
-
-#if LCD_HEIGHT >= 70
-    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 49, "Pushes");
-    rb->snprintf(buf, sizeof(buf), "%d", current_info.level.pushes);
-    rb->lcd_putsxy(STAT_X + 4, STAT_Y + 59, buf);
-
-    rb->lcd_drawrect(STAT_X, STAT_Y + 46, STAT_WIDTH, 24);
+    rb->lcd_putsxy(STAT_X + 4, STAT_Y + 33, buf);
+#if STAT_WIDTH < 38
+    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 44, "Push");
+#else
+    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 44, "Pushes");
 #endif
+    rb->snprintf(buf, sizeof(buf), "%d", current_info.level.pushes);
+    rb->lcd_putsxy(STAT_X + 4, STAT_Y + 54, buf);
+
+    rb->lcd_drawrect(STAT_X, STAT_Y + 0, STAT_WIDTH, 64);
+    rb->lcd_hline(STAT_X, LCD_WIDTH - 1, STAT_Y + 21);
+    rb->lcd_hline(STAT_X, LCD_WIDTH - 1, STAT_Y + 42);
 
 #endif
 
