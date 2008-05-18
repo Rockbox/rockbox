@@ -108,7 +108,7 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 
 void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
-    audiohw_set_lineout_vol(vol_l, vol_r);
+    audiohw_set_master_vol(vol_l, vol_r);
 }
 
 void audiohw_mute(bool mute)
