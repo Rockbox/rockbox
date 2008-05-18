@@ -25,10 +25,10 @@
 #include <stdbool.h>
 
 /* Priority scheduling (when enabled with HAVE_PRIORITY_SCHEDULING) works
- * by giving high priority threads more CPU time than less priority threads
+ * by giving high priority threads more CPU time than lower priority threads
  * when they need it. Priority is differential such that the priority
  * difference between a lower priority runnable thread and the highest priority
- * runnable thread determines the amount of aging nescessary for the lower
+ * runnable thread determines the amount of aging necessary for the lower
  * priority thread to be scheduled in order to prevent starvation.
  *
  * If software playback codec pcm buffer is going down to critical, codec
@@ -118,8 +118,8 @@ struct regs
 #endif /* !SIMULATOR */
 
 /* NOTE: The use of the word "queue" may also refer to a linked list of
-   threads being maintainted that are normally dealt with in FIFO order
-   and not nescessarily kernel event_queue */
+   threads being maintained that are normally dealt with in FIFO order
+   and not necessarily kernel event_queue */
 enum
 {
     /* States without a timeout must be first */
@@ -306,7 +306,7 @@ struct thread_blk_ops
 #endif /* NUM_CORES > 1 */
 
 /* Information kept for each core
- * Member are arranged for the same reason as in thread_entry
+ * Members are arranged for the same reason as in thread_entry
  */
 struct core_entry
 {
