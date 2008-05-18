@@ -279,7 +279,7 @@ static bool mpeg_set_int(const char *string, const char *unit,
 
     return usb;
 }
-#endif /* HAVE_BACKLIGHT_BRIGHNTESS */
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void mpeg_backlight_update_brightness(int value)
