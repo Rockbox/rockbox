@@ -111,6 +111,8 @@
 /* The LCD on a Gigabeat is 240x320 - it is portrait */
 #define HAVE_PORTRAIT_LCD
 
+#define HAVE_LCD_FLIP
+
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU S3C2440
 

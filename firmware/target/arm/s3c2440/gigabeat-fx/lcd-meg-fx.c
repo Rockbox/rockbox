@@ -136,6 +136,15 @@ void LCD_SPI_send(const unsigned char *array, int count)
     }
 }
 
+void LCD_SPI_setreg(unsigned char reg, unsigned char value)
+{
+    unsigned char regval[] = 
+    {
+        0x00,reg,0x01,value
+    };
+    LCD_SPI_send(regval, sizeof(regval));
+}
+
 void LCD_SPI_SS(bool select)
 {
     delay_cycles(0x4FFF);
@@ -170,17 +179,10 @@ void LCD_SPI_stop(void)
 
 void LCD_SPI_powerdown(void)
 {
-    const unsigned char powerdncmd[] = 
-    {
-        0,0x04,1,0x00
-    };
-
     lcd_powered = false;
 
     LCD_SPI_start();
-
-    LCD_SPI_send(powerdncmd, sizeof(powerdncmd));
-
+    LCD_SPI_setreg(0x04, 0x00);
     LCD_SPI_stop();
 
     reset_LCD(false);   /* This makes a big difference on power */
@@ -189,17 +191,10 @@ void LCD_SPI_powerdown(void)
 
 void LCD_SPI_powerup(void)
 {
-    const unsigned char powerupcmd[] = 
-    {
-        0,0x04,1,0x01
-    };
-
     LCD_CTRL_clock(true);
 
     LCD_SPI_start();
-
-    LCD_SPI_send(powerupcmd, sizeof(powerupcmd));
-
+    LCD_SPI_setreg(0x04, 0x01);
     LCD_SPI_stop();
 
     lcd_powered = true;
@@ -211,45 +206,37 @@ void LCD_SPI_init(void)
      *  actually telling the lcd.  Many thanks to Alex Gerchanovsky for 
      *  discovering them.
      *
-     * This looks like a register, data combination, 0 denoting a register 
-     *  address, 1 denoting data.  Addr 0x04 is used more than once is
-     *  an enable.
+     * Addr 0x04 is used more than once is an enable.
      */
-    const unsigned char initbuf[] = 
-    {
-        0,0x0F,1,0x01, 
-        0,0x09,1,0x06, 
-        0,0x16,1,0xA6, 
-        0,0x1E,1,0x49, 
-        0,0x1F,1,0x26, 
-        0,0x0B,1,0x2F, 
-        0,0x0C,1,0x2B, 
-        0,0x19,1,0x5E, 
-        0,0x1A,1,0x15, 
-        0,0x1B,1,0x15, 
-        0,0x1D,1,0x01, 
-        0,0x00,1,0x03, 
-        0,0x01,1,0x10, 
-        0,0x02,1,0x0A, 
-        0,0x06,1,0x04, 
-        0,0x08,1,0x2E, 
-        0,0x24,1,0x12, 
-        0,0x25,1,0x3F,
-        0,0x26,1,0x0B, 
-        0,0x27,1,0x00,
-        0,0x28,1,0x00, 
-        0,0x29,1,0xF6, 
-        0,0x2A,1,0x03, 
-        0,0x2B,1,0x0A, 
-        0,0x04,1,0x01,
-    };
 
     LCD_CTRL_clock(true);
 
     LCD_SPI_start();
-
-    LCD_SPI_send(initbuf, sizeof(initbuf));
-
+    LCD_SPI_setreg(0x0F, 0x01);
+    LCD_SPI_setreg(0x09, 0x06);
+    LCD_SPI_setreg(0x16, 0xA6);
+    LCD_SPI_setreg(0x1E, 0x49);
+    LCD_SPI_setreg(0x1F, 0x26);
+    LCD_SPI_setreg(0x0B, 0x2F);
+    LCD_SPI_setreg(0x0C, 0x2B);
+    LCD_SPI_setreg(0x19, 0x5E);
+    LCD_SPI_setreg(0x1A, 0x15);
+    LCD_SPI_setreg(0x1B, 0x15);
+    LCD_SPI_setreg(0x1D, 0x01);
+    LCD_SPI_setreg(0x00, 0x03);
+    LCD_SPI_setreg(0x01, 0x10);
+    LCD_SPI_setreg(0x02, 0x0A);
+    LCD_SPI_setreg(0x06, 0x04); /* Set the orientation */
+    LCD_SPI_setreg(0x08, 0x2E);
+    LCD_SPI_setreg(0x24, 0x12);
+    LCD_SPI_setreg(0x25, 0x3F);
+    LCD_SPI_setreg(0x26, 0x0B);
+    LCD_SPI_setreg(0x27, 0x00);
+    LCD_SPI_setreg(0x28, 0x00);
+    LCD_SPI_setreg(0x29, 0xF6);
+    LCD_SPI_setreg(0x2A, 0x03);
+    LCD_SPI_setreg(0x2B, 0x0A);
+    LCD_SPI_setreg(0x04, 0x01); /* Turn the display on */
     LCD_SPI_stop(); 
 }
 
@@ -265,7 +252,7 @@ void lcd_init_device(void)
 
     GPBUP   |= 0x181;
 
-    s3c_regset(&CLKCON, 0x20);       /* enable LCD clock */
+    s3c_regset(&CLKCON, 0x20);  /* enable LCD clock */
 
     LCD_CTRL_setup();
     LCD_SPI_init();
@@ -306,6 +293,29 @@ void lcd_enable(bool state)
     {
         lcd_on = false;
     }
+}
+
+void lcd_set_flip(bool yesno) {
+    if (!lcd_on)
+        return;
+
+    /* Register 0x06 sets the screen orientation:
+     *
+     *  Known Values:
+     *      0x04: Right side up portrait
+     *      0x02: Upside down protrait
+     */
+
+    LCD_SPI_start();
+    if(yesno)
+    {
+        LCD_SPI_setreg(0x06, 0x02);
+    }
+    else 
+    {
+        LCD_SPI_setreg(0x06, 0x04);
+    }
+    LCD_SPI_stop();
 }
 
 /* Update a fraction of the display. */
@@ -486,11 +496,6 @@ void lcd_set_contrast(int val) {
 }
 
 void lcd_set_invert_display(bool yesno) {
-  (void) yesno;
-  // TODO:
-}
-
-void lcd_set_flip(bool yesno) {
   (void) yesno;
   // TODO:
 }
