@@ -76,9 +76,7 @@ sliding_puzzle.c
 snake.c
 snake2.c
 solitaire.c
-#ifndef SANSA_C200
 sokoban.c
-#endif
 star.c
 starfield.c
 #if CONFIG_LCD == LCD_SSD1815

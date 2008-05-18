@@ -22,14 +22,7 @@
 #include "plugin.h"
 #include "lib/playback_control.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 PLUGIN_HEADER
-
-#if LCD_DEPTH >= 2 && ((LCD_HEIGHT >= 96 && LCD_WIDTH >= 152) || \
-    (LCD_HEIGHT >= 121 && LCD_WIDTH >= 120))
-extern const fb_data sokoban_tiles[];
-#endif
 
 #define SOKOBAN_TITLE        "Sokoban"
 
@@ -37,38 +30,22 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_SAVE_FILE    PLUGIN_GAMES_DIR "/sokoban.save"
 #define SOKOBAN_SAVE_FOLDER  "/games"
 
-/* Magnify is the number of pixels for each block.
+#include "sokoban_tiles.h"
+#define SOKOBAN_TILESIZE BMPWIDTH_sokoban_tiles
+/* SOKOBAN_TILESIZE is the number of pixels for each block.
  * Set dynamically so all targets can support levels
  * that fill their entire screen, less the stat box.
  * 16 rows & 20 cols minimum */
-#if (LCD_HEIGHT >= 224) && (LCD_WIDTH >= 320)
-#define MAGNIFY 14
-#define ROWS (LCD_HEIGHT/MAGNIFY)
-#define COLS ((LCD_WIDTH-40)/MAGNIFY)
-#elif (LCD_HEIGHT >= 249) && (LCD_WIDTH >= 280)
-#define MAGNIFY 14
-#define ROWS ((LCD_HEIGHT-25)/MAGNIFY)
-#define COLS (LCD_WIDTH/MAGNIFY)
-#elif (LCD_HEIGHT >= 144) && (LCD_WIDTH >= 220)
-#define MAGNIFY 9
-#define ROWS (LCD_HEIGHT/MAGNIFY)
-#define COLS ((LCD_WIDTH-40)/MAGNIFY)
-#elif (LCD_HEIGHT >= 169) && (LCD_WIDTH+4 >= 180) /* plus 4 for sansa */
-#define MAGNIFY 9
-#define ROWS ((LCD_HEIGHT-25)/MAGNIFY)
-#define COLS ((LCD_WIDTH+4)/MAGNIFY)
-#elif (LCD_HEIGHT >= 96) && (LCD_WIDTH >= 160)
-#define MAGNIFY 6
-#define ROWS (LCD_HEIGHT/MAGNIFY)
-#define COLS ((LCD_WIDTH-40)/MAGNIFY)
-#elif (LCD_HEIGHT >= 121) && (LCD_WIDTH >= 120)
-#define MAGNIFY 6
-#define ROWS ((LCD_HEIGHT-25)/MAGNIFY)
-#define COLS (LCD_WIDTH/MAGNIFY)
+#if LCD_WIDTH > LCD_HEIGHT /* horizontal layout*/
+#define ROWS (LCD_HEIGHT/SOKOBAN_TILESIZE)
+#if (LCD_WIDTH+4) >= (20*SOKOBAN_TILESIZE+40) /* wide or narrow stats box */
+#define COLS ((LCD_WIDTH-40)/SOKOBAN_TILESIZE)
 #else
-#define MAGNIFY 4
-#define ROWS 16
-#define COLS 20
+#define COLS ((LCD_WIDTH-32)/SOKOBAN_TILESIZE)
+#endif
+#else /* vertical layout*/
+#define ROWS ((LCD_HEIGHT-25)/SOKOBAN_TILESIZE)
+#define COLS (LCD_WIDTH/SOKOBAN_TILESIZE)
 #endif
 
 /* Use either all but 16k of the plugin buffer for level data
@@ -229,6 +206,22 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_LEVEL_DOWN (BUTTON_SELECT | BUTTON_DOWN)
 #define SOKOBAN_LEVEL_REPEAT (BUTTON_SELECT | BUTTON_RIGHT)
 #define SOKOBAN_LEVEL_UP (BUTTON_SELECT | BUTTON_UP)
+#define SOKOBAN_PAUSE BUTTON_SELECT
+#define BUTTON_SAVE BUTTON_SELECT
+#define BUTTON_SAVE_NAME "SELECT"
+
+#elif CONFIG_KEYPAD == SANSA_C200_PAD
+#define SOKOBAN_LEFT BUTTON_LEFT
+#define SOKOBAN_RIGHT BUTTON_RIGHT
+#define SOKOBAN_UP BUTTON_UP
+#define SOKOBAN_DOWN BUTTON_DOWN
+#define SOKOBAN_MENU BUTTON_POWER
+#define SOKOBAN_UNDO_PRE BUTTON_SELECT
+#define SOKOBAN_UNDO (BUTTON_SELECT | BUTTON_REL)
+#define SOKOBAN_REDO BUTTON_REC
+#define SOKOBAN_LEVEL_DOWN BUTTON_VOL_DOWN
+#define SOKOBAN_LEVEL_REPEAT (BUTTON_SELECT | BUTTON_RIGHT)
+#define SOKOBAN_LEVEL_UP BUTTON_VOL_UP
 #define SOKOBAN_PAUSE BUTTON_SELECT
 #define BUTTON_SAVE BUTTON_SELECT
 #define BUTTON_SAVE_NAME "SELECT"
@@ -797,15 +790,7 @@ static void update_screen(void)
     int c, r;
     int rows, cols;
 
-#if LCD_DEPTH < 2 || ((LCD_HEIGHT < 96 || LCD_WIDTH < 152) && \
-    (LCD_HEIGHT < 121 || LCD_WIDTH < 120))
-    int i, j;
-    int max = MAGNIFY - 1;
-    int middle = max/2;
-    int ldelta = (middle + 1)/2;
-#endif
-
-#if LCD_WIDTH - (COLS*MAGNIFY) < 32
+#if LCD_WIDTH - (COLS*SOKOBAN_TILESIZE) < 32
 #define STAT_HEIGHT 25
 #define STAT_X (LCD_WIDTH - 120)/2
 #define STAT_Y (LCD_HEIGHT - STAT_HEIGHT)
@@ -825,10 +810,10 @@ static void update_screen(void)
     rb->lcd_drawrect(STAT_X + 37, STAT_Y, 39, STAT_HEIGHT);
     rb->lcd_drawrect(STAT_X + 75, STAT_Y, 45, STAT_HEIGHT);
 #else
-#if LCD_WIDTH - (COLS*MAGNIFY) > 40
+#if LCD_WIDTH - (COLS*SOKOBAN_TILESIZE) > 40
 #define STAT_X (LCD_WIDTH - 40)
 #else
-#define STAT_X COLS*MAGNIFY
+#define STAT_X COLS*SOKOBAN_TILESIZE
 #endif
 #if LCD_HEIGHT >= 70
 #define STAT_Y (LCD_HEIGHT - 70)/2
@@ -861,87 +846,56 @@ static void update_screen(void)
     /* load the board to the screen */
     for (rows = 0; rows < ROWS; rows++) {
         for (cols = 0; cols < COLS; cols++) {
-            c = cols*MAGNIFY +
-                (BOARD_WIDTH - current_info.level.width*MAGNIFY)/2;
-            r = rows*MAGNIFY +
-                (BOARD_HEIGHT - current_info.level.height*MAGNIFY)/2;
+            c = cols*SOKOBAN_TILESIZE +
+                (BOARD_WIDTH - current_info.level.width*SOKOBAN_TILESIZE)/2;
+            r = rows*SOKOBAN_TILESIZE +
+                (BOARD_HEIGHT - current_info.level.height*SOKOBAN_TILESIZE)/2;
 
             switch(current_info.board[rows][cols]) {
                 case 'X': /* blank space outside of level */
                     break;
 
-#if LCD_DEPTH >= 2 && ((LCD_HEIGHT >= 96 && LCD_WIDTH >= 152) || \
-    (LCD_HEIGHT >= 121 && LCD_WIDTH >= 120))
                 case ' ': /* floor */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 0*MAGNIFY, MAGNIFY,
-                                        c, r, MAGNIFY, MAGNIFY);
+                    rb->lcd_bitmap_part(sokoban_tiles, 0, 0*SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE, c, r, SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE);
                     break;
 
                 case '#': /* wall */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 1*MAGNIFY, MAGNIFY,
-                                        c, r, MAGNIFY, MAGNIFY);
+                    rb->lcd_bitmap_part(sokoban_tiles, 0, 1*SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE, c, r, SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE);
                     break;
 
                 case '$': /* box */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 2*MAGNIFY, MAGNIFY,
-                                        c, r, MAGNIFY, MAGNIFY);
+                    rb->lcd_bitmap_part(sokoban_tiles, 0, 2*SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE, c, r, SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE);
                     break;
 
                 case '*': /* box on goal */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 3*MAGNIFY, MAGNIFY,
-                                        c, r, MAGNIFY, MAGNIFY);
+                    rb->lcd_bitmap_part(sokoban_tiles, 0, 3*SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE, c, r, SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE);
                     break;
 
                 case '.': /* goal */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 4*MAGNIFY, MAGNIFY,
-                                        c, r, MAGNIFY, MAGNIFY);
+                    rb->lcd_bitmap_part(sokoban_tiles, 0, 4*SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE, c, r, SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE);
                     break;
 
                 case '@': /* player */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 5*MAGNIFY, MAGNIFY,
-                                        c, r, MAGNIFY, MAGNIFY);
+                    rb->lcd_bitmap_part(sokoban_tiles, 0, 5*SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE, c, r, SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE);
                     break;
 
                 case '+': /* player on goal */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 6*MAGNIFY, MAGNIFY,
-                                        c, r, MAGNIFY, MAGNIFY);
+                    rb->lcd_bitmap_part(sokoban_tiles, 0, 6*SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE, c, r, SOKOBAN_TILESIZE,
+                                        SOKOBAN_TILESIZE);
                     break;
-#else
-                case '#': /* wall */
-                    for (i = c; i < c + MAGNIFY; i++)
-                        for (j = r; j < r + MAGNIFY; j++)
-                            if ((i ^ j) & 1)
-                                rb->lcd_drawpixel(i, j);
-                    break;
-
-                case '$': /* box */
-                    rb->lcd_drawrect(c, r, MAGNIFY, MAGNIFY);
-                    break;
-
-                case '*': /* box on goal */
-                    rb->lcd_drawrect(c, r, MAGNIFY, MAGNIFY);
-                    rb->lcd_drawrect(c + MAGNIFY/2 - 1, r + MAGNIFY/2 - 1,
-                                     MAGNIFY/2, MAGNIFY/2);
-                    break;
-
-                case '.': /* goal */
-                    rb->lcd_drawrect(c + MAGNIFY/2 - 1, r + MAGNIFY/2 - 1,
-                                     MAGNIFY/2, MAGNIFY/2);
-                    break;
-
-                case '@': /* player */
-                case '+': /* player on goal */
-                    rb->lcd_drawline(c, r + middle, c + max, r + middle);
-                    rb->lcd_drawline(c + middle, r, c + middle,
-                                     r + max - ldelta);
-                    rb->lcd_drawline(c + max - middle, r, c + max - middle,
-                                     r + max - ldelta);
-                    rb->lcd_drawline(c + middle, r + max - ldelta,
-                                     c + middle - ldelta, r + max);
-                    rb->lcd_drawline(c + max - middle, r + max - ldelta,
-                                     c + max - middle + ldelta, r + max);
-                    break;
-#endif
             }
         }
     }
@@ -1617,5 +1571,3 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     return sokoban_loop();
 }
-
-#endif

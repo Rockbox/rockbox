@@ -437,22 +437,45 @@ snake2_bottom.160x128x2.bmp
 #endif
 
 /* Sokoban*/
+/* biggest tilesize: 20 columns x 16 rows + stat box need to fit (minimum)
+*  allow clipping of up to 4 pixels in favour of using a bigger tilesize
+*  stat box width of 32 in horizontal & height of 25 pixels in vertical layout
+*  currently the horizontal layout fits best on all wider than high displays
+ */
+
+#if LCD_WIDTH > LCD_HEIGHT
+#define SOKOBAN_TILESIZE ((LCD_WIDTH + 4 -32)/20)
+#else
+#define SOKOBAN_TILESIZE ((LCD_WIDTH + 4)/20)
+#endif
+
 #ifdef HAVE_LCD_COLOR
-#if (LCD_HEIGHT >= 224) && (LCD_WIDTH >= 312) || \
-    (LCD_HEIGHT >= 249) && (LCD_WIDTH >= 280)
-sokoban_tiles.14x14.bmp
-#elif (LCD_HEIGHT >= 144) && (LCD_WIDTH >= 212) || \
-      (LCD_HEIGHT >= 169) && (LCD_WIDTH >= 180-4)
-sokoban_tiles.9x9.bmp
-#elif (LCD_HEIGHT >= 96 && LCD_WIDTH >= 152) || \
-      (LCD_HEIGHT >= 121 && LCD_WIDTH >= 120)
-sokoban_tiles.6x6.bmp
-#endif
-#elif LCD_DEPTH >= 2 && \
-      ((LCD_HEIGHT >= 96 && LCD_WIDTH >= 152) || \
-      (LCD_HEIGHT >= 121 && LCD_WIDTH >= 120))
+#if SOKOBAN_TILESIZE >= 14
+sokoban_tiles.14x14x16.bmp
+#elif SOKOBAN_TILESIZE >= 12
+sokoban_tiles.12x12x16.bmp
+#elif SOKOBAN_TILESIZE >= 9
+sokoban_tiles.9x9x16.bmp
+#elif SOKOBAN_TILESIZE >= 7
+sokoban_tiles.7x7x16.bmp
+#elif SOKOBAN_TILESIZE >= 6
+sokoban_tiles.6x6x16.bmp
+#elif SOKOBAN_TILESIZE >= 5
+sokoban_tiles.5x5x16.bmp
+#endif /* tilesize */
+#elif LCD_DEPTH > 1 /*greyscale */
+#if SOKOBAN_TILESIZE >= 6
 sokoban_tiles.6x6x2.bmp
-#endif
+#elif SOKOBAN_TILESIZE >= 5
+sokoban_tiles.5x5x2.bmp
+#endif /* tilesize */
+#else /* mono */
+#if SOKOBAN_TILESIZE >= 6
+sokoban_tiles.6x6x1.bmp
+#elif SOKOBAN_TILESIZE >= 4
+sokoban_tiles.4x4x1.bmp
+#endif /* tilesize */
+#endif /* HAVE_COLOR */
 
 /* Solitaire and Blackjack */
 #ifdef HAVE_LCD_COLOR
