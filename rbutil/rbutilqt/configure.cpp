@@ -539,7 +539,7 @@ void Config::autodetect()
 
         if(detector.getMountPoint() != "" )
         {
-            ui.mountPoint->setText(detector.getMountPoint());
+            ui.mountPoint->setText(QDir::toNativeSeparators(detector.getMountPoint()));
         }
         else
         {
