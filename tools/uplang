@@ -1,7 +1,0 @@
-#!/usr/bin/perl
-
-print <<MOO
-The tool formerly known as 'uplang' is no longer used. We now use
-genlang2 with the -u option to get updated language files.
-MOO
-;
