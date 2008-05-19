@@ -644,6 +644,7 @@ static enum menu_result jewels_showmenu(struct jewels_menu* menu,
     int w, h;
     int firstline;
     int adj;
+    int extraline = LCD_HEIGHT <= ((menu->itemcnt+2)*FONT_HEIGHT) ? 0 : 1;
 
     /* handle menu command */
     switch(cmd) {
@@ -686,7 +687,8 @@ static enum menu_result jewels_showmenu(struct jewels_menu* menu,
         if(i == menu->selected) {
             rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         }
-        rb->lcd_putsxy((LCD_WIDTH-MENU_WIDTH)/2, (firstline+i+2)*FONT_HEIGHT,
+        rb->lcd_putsxy((LCD_WIDTH-MENU_WIDTH)/2,
+                       (firstline+i+1+extraline)*FONT_HEIGHT,
                        menu->items[i].text);
         if(i == menu->selected) {
             rb->lcd_set_drawmode(DRMODE_SOLID);
