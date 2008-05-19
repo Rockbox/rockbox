@@ -118,6 +118,7 @@ static mpc_uint32_t get_initial_fpos(mpc_decoder *d, mpc_uint32_t StreamVersion)
 static inline mpc_int32_t mpc_decoder_huffman_decode_fastest(mpc_decoder *d, const HuffmanTyp* Table, const mpc_uint8_t* tab, mpc_uint16_t unused_bits);
 static void mpc_move_next(mpc_decoder *d);
 
+mpc_uint32_t  Seekbuffer[MPC_SEEK_BUFFER_SIZE];
 mpc_uint32_t  Speicher[MPC_DECODER_MEMSIZE];
 MPC_SAMPLE_FORMAT Y_L[36][32] IBSS_ATTR_MPC_LARGE_IRAM;
 MPC_SAMPLE_FORMAT Y_R[36][32] IBSS_ATTR_MPC_LARGE_IRAM;
@@ -1458,6 +1459,7 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   LOOKUP ( mpc_table_HuffQ[1][7], 63, LUT7_1  );
   LOOKUP ( mpc_table_HuffDSCF,    16, LUTDSCF );
 
+  d->SeekTable = Seekbuffer;
   d->Speicher = Speicher;
   d->Y_L = Y_L;
   d->Y_R = Y_R;
@@ -1465,12 +1467,6 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   #if defined(CPU_COLDFIRE)
   coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
   #endif
-}
-
-void mpc_decoder_destroy(mpc_decoder *d) 
-{
-    if (d->SeekTable != NULL)
-        free(d->SeekTable);
 }
 
 static void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)
@@ -1490,11 +1486,9 @@ static void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)
 
     d->samples_to_skip = MPC_DECODER_SYNTH_DELAY;
 
-    if (d->SeekTable != NULL)
-        free(d->SeekTable);
+    memset(d->SeekTable, 0, sizeof(Seekbuffer));
 
-    seekTableSize = si->frames;
-    d->SeekTable = (mpc_uint32_t*) calloc( sizeof(mpc_uint32_t), seekTableSize);
+    seekTableSize = min(si->frames, MPC_SEEK_BUFFER_SIZE);
     d->SeekTable_Step = si->frames / seekTableSize;
     if (si->frames % seekTableSize)
         d->SeekTable_Step+=1;

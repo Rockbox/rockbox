@@ -48,7 +48,8 @@
 
 enum {
     MPC_V_MEM = 2304,
-    MPC_DECODER_MEMSIZE = 16384,  // overall buffer size
+    MPC_DECODER_MEMSIZE = 16384,  // overall buffer size (words)
+    MPC_SEEK_BUFFER_SIZE = 65536, // seek buffer size (words)
 };
 
 typedef struct {

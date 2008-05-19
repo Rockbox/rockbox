@@ -188,7 +188,6 @@ done:
         goto next_track;
 
 exit:
-    mpc_decoder_destroy(&decoder);
     return retval;
 }
 
