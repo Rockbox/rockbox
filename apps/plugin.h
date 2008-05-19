@@ -34,6 +34,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+void* plugin_get_buffer(size_t *buffer_size);
+
+#ifndef __PCTOOL__
 #include "config.h"
 #include "system.h"
 #include "dir.h"
@@ -796,7 +800,6 @@ extern unsigned char plugin_end_addr[];
 #endif /* PLUGIN */
 
 int plugin_load(const char* plugin, const void* parameter);
-void* plugin_get_buffer(size_t *buffer_size);
 void* plugin_get_audio_buffer(size_t *buffer_size);
 #ifdef PLUGIN_USE_IRAM
 void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
@@ -858,4 +861,5 @@ enum plugin_status plugin_start(const struct plugin_api* rockbox, const void* pa
         }
 #endif /* ALIGN_BUFFER_WRAPPER */
 
+#endif /* __PCTOOL__ */
 #endif

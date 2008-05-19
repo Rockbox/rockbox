@@ -23,6 +23,8 @@
 #include "gwps.h"
 #include "file.h"
 #include "misc.h"
+#include "plugin.h"
+
 #ifdef __PCTOOL__
 #define DEBUGF printf
 #define FONT_SYSFIXED 0
@@ -39,7 +41,6 @@
 
 #include "gwps.h"
 #include "settings.h"
-#include "plugin.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
