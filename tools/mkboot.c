@@ -33,9 +33,7 @@ int main(int argc, char *argv[])
 {
     char *infile, *bootfile, *outfile;
     FILE *f;
-    long pos;
     int i;
-    int file_length;
     int len;
     int actual_length, total_length, binary_length, num_chksums;
     int origin = 0x1f0000;   /* H1x0 bootloader address */
