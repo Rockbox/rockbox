@@ -69,8 +69,8 @@
 #define DEBUG_MESSAGE_LEN 133
 static char debug_message[DEBUG_MESSAGE_LEN];
 #define DEBUG_STACK ((0x1000)/sizeof(long))
-static int fd;          /* write debug information to this file */
-static int wrcount;
+static int fd = -1;          /* write debug information to this file */
+static int wrcount = 0;
 #else
 #define DEBUG_STACK 0
 #endif
@@ -134,7 +134,8 @@ static void battery_status_update(void)
         else
             battery_millivolts -= (BATT_MAXMVOLT - BATT_MINMVOLT) / 100;
 
-        battery_percent = 100 * (battery_millivolts - BATT_MINMVOLT) / (BATT_MAXMVOLT - BATT_MINMVOLT);
+        battery_percent = 100 * (battery_millivolts - BATT_MINMVOLT) /
+                            (BATT_MAXMVOLT - BATT_MINMVOLT);
         powermgmt_est_runningtime_min = battery_percent * BATT_MAXRUNTIME / 100;
     }
     send_battery_level_event();
@@ -204,40 +205,15 @@ void accessory_supply_set(bool enable)
 
 #else /* not SIMULATOR ******************************************************/
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-int long_delta;                     /* long term delta battery voltage */
-int short_delta;                    /* short term delta battery voltage */
-bool disk_activity_last_cycle = false;         /* flag set to aid charger time
-                                                * calculation */
-char power_message[POWER_MESSAGE_LEN] = "";    /* message that's shown in
-                                                  debug menu */
-                                               /* percentage at which charging
-                                                  starts */
-int powermgmt_last_cycle_startstop_min = 0;    /* how many minutes ago was the
-                                                  charging started or
-                                                  stopped? */
-int powermgmt_last_cycle_level = 0;            /* which level had the
-                                                  batteries at this time? */
-int trickle_sec = 0;                           /* how many seconds should the
-                                                  charger be enabled per
-                                                  minute for trickle
-                                                  charging? */
-int pid_p = 0;                      /* PID proportional term */
-int pid_i = 0;                      /* PID integral term */
-#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
+static void power_thread_sleep(int ticks);
 
 /*
  * Average battery voltage and charger voltage, filtered via a digital
- * exponential filter.
+ * exponential filter (aka. exponential moving average, scaled):
+ * avgbat = y[n] = (N-1)/N*y[n-1] + x[n]. battery_millivolts = y[n] / N.
  */
 static unsigned int avgbat;     /* average battery voltage (filtering) */
 static unsigned int battery_millivolts;/* filtered battery voltage, millivolts */
-
-#ifdef HAVE_CHARGE_CTRL
-#define BATT_AVE_SAMPLES    32  /* filter constant / @ 2Hz sample rate */
-#else
-#define BATT_AVE_SAMPLES   128  /* slw filter constant for all others */
-#endif
 
 /* battery level (0-100%) of this minute, updated once per minute */
 static int battery_percent  = -1;
@@ -376,36 +352,7 @@ static int voltage_to_battery_level(int battery_millivolts)
 {
     int level;
 
-#if defined(CONFIG_CHARGER) \
- && (defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES))
-    /* Checking for iriver is a temporary kludge.
-     * This code needs rework/unification */
-    if (charger_input_state == NO_CHARGER) {
-        /* discharging. calculate new battery level and average with last */
-        level = voltage_to_percent(battery_millivolts,
-                percent_to_volt_discharge[battery_type]);
-        if (level != (battery_percent - 1))
-            level = (level + battery_percent + 1) / 2;
-    }
-    else if (charger_input_state == CHARGER_UNPLUGGED) {
-        /* just unplugged. adjust filtered values */
-        battery_millivolts -= percent_to_volt_charge[battery_percent/10] -
-                              percent_to_volt_discharge[0][battery_percent/10];
-        avgbat = battery_millivolts * 1000 * BATT_AVE_SAMPLES;
-        level  = battery_percent;
-    }
-    else if (charger_input_state == CHARGER_PLUGGED) {
-        /* just plugged in. adjust battery values */
-        battery_millivolts += percent_to_volt_charge[battery_percent/10] -
-                              percent_to_volt_discharge[0][battery_percent/10];
-        avgbat = battery_millivolts * 1000 * BATT_AVE_SAMPLES;
-        level  = MIN(12 * battery_percent / 10, 99);
-    }
-    else { /* charging. calculate new battery level */
-        level = voltage_to_percent(battery_millivolts,
-                percent_to_volt_charge);
-    }
-#elif CONFIG_CHARGING >= CHARGING_MONITOR
+#if CONFIG_CHARGING >= CHARGING_MONITOR
     if (charge_state == DISCHARGING) {
         level = voltage_to_percent(battery_millivolts,
                     percent_to_volt_discharge[battery_type]);
@@ -422,7 +369,7 @@ static int voltage_to_battery_level(int battery_millivolts)
     /* always use the discharge table */
     level = voltage_to_percent(battery_millivolts,
                 percent_to_volt_discharge[battery_type]);
-#endif
+#endif /* CONFIG_CHARGING ... */
 
     return level;
 }
@@ -440,47 +387,7 @@ static void battery_status_update(void)
                                       / 100 / (CURRENT_MAX_CHG - runcurrent());
     }
     else
-#elif CONFIG_CHARGING \
-  && (defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES))
-    /* Checking for iriver is a temporary kludge.
-     * This code needs rework/unification */
-    if (charger_inserted()) {
-#ifdef IRIVER_H300_SERIES
-        /* H300_SERIES use CURRENT_MAX_CHG for basic charge time (80%)
-         * plus 110 min top off charge time */
-        powermgmt_est_runningtime_min = ((100-level) * battery_capacity * 80
-                                         /100 / CURRENT_MAX_CHG) + 110;
-#else
-        /* H100_SERIES scaled for 160 min basic charge time (80%) on
-         * 1600 mAh battery plus 110 min top off charge time */
-        powermgmt_est_runningtime_min = ((100 - level) * battery_capacity
-                                         / 993) + 110;
 #endif
-        level = (level * 80) / 100;
-        if (level > 72) { /* > 91% */
-            int i = POWER_HISTORY_LEN;
-            int d = 1;
-#ifdef HAVE_CHARGE_STATE
-            if (charge_state == DISCHARGING)
-                d = -2;
-#endif
-            while ((i > 2) && (d > 0)) /* search zero or neg. delta */
-                d = power_history[0] - power_history[--i];
-            if ((((d == 0) && (i > 6)) || (d == -1)) && (i < 118)) {
-                /* top off charging */
-                level = MIN(80 + (i*19 / 113), 99);  /* show 81% .. 99% */
-                powermgmt_est_runningtime_min = MAX(116 - i, 0);
-            }
-            else if ((d < 0) || (i > 117)) {
-                /* charging finished */
-                level = 100;
-                powermgmt_est_runningtime_min = battery_capacity * 60
-                                                / runcurrent();
-            }
-        }
-    }
-    else
-#endif /* BATT_LIPOL1300 */
     {
         if ((battery_millivolts + 20) > percent_to_volt_discharge[0][0])
             powermgmt_est_runningtime_min = (level + battery_percent) * 60 *
@@ -639,6 +546,395 @@ static void power_thread_rtc_process(void)
 #endif
 
 /*
+ * This power thread maintains a history of battery voltage
+ * and implements a charging algorithm.
+ */
+#if CONFIG_CHARGING == CHARGING_CONTROL
+#define BATT_AVE_SAMPLES    32  /* filter constant / @ 2Hz sample rate */
+
+/*
+ * For a complete description of the charging algorithm read
+ * docs/CHARGING_ALGORITHM.
+ */
+int long_delta;                     /* long term delta battery voltage */
+int short_delta;                    /* short term delta battery voltage */
+bool disk_activity_last_cycle = false;  /* flag set to aid charger time
+                                         * calculation */
+char power_message[POWER_MESSAGE_LEN] = ""; /* message that's shown in
+                                           debug menu */
+                                        /* percentage at which charging
+                                           starts */
+int powermgmt_last_cycle_startstop_min = 0; /* how many minutes ago was the
+                                           charging started or
+                                           stopped? */
+int powermgmt_last_cycle_level = 0;     /* which level had the
+                                           batteries at this time? */
+int trickle_sec = 0;                    /* how many seconds should the
+                                           charger be enabled per
+                                           minute for trickle
+                                           charging? */
+int pid_p = 0;                      /* PID proportional term */
+int pid_i = 0;                      /* PID integral term */
+
+static inline void charging_algorithm_small_step(void)
+{
+    if (ata_disk_is_active()) {
+        /* flag hdd use for charging calculation */
+        disk_activity_last_cycle = true;
+    }
+
+#if defined(DEBUG_FILE)
+    /*
+     * If we have a lot of pending writes or if the disk is spining,
+     * fsync the debug log file.
+     */
+    if((wrcount > 10) || ((wrcount > 0) && ata_disk_is_active())) {
+        fsync(fd);
+        wrcount = 0;
+    }
+#endif /* defined(DEBUG_FILE) */
+}
+
+static inline void charging_algorithm_big_step(void)
+{
+    static unsigned int target_voltage = TRICKLE_VOLTAGE; /* desired topoff/trickle
+                                                           * voltage level */
+    static int charge_max_time_idle = 0; /* max. charging duration, calculated at
+                                          * beginning of charging */
+    static int charge_max_time_now = 0; /* max. charging duration including
+                                         * hdd activity */
+    static int minutes_disk_activity = 0; /* count minutes of hdd use during
+                                           * charging */
+    static int last_disk_activity = CHARGE_END_LONGD + 1; /* last hdd use x mins ago */
+    int i;
+
+    if (charger_input_state == CHARGER_PLUGGED) {
+        pid_p = 0;
+        pid_i = 0;
+        snprintf(power_message, POWER_MESSAGE_LEN, "Charger plugged in");
+        /*
+         * The charger was just plugged in.  If the battery level is
+         * nearly charged, just trickle.  If the battery is low, start
+         * a full charge cycle.  If the battery level is in between,
+         * top-off and then trickle.
+         */
+        if(battery_percent > START_TOPOFF_CHG) {
+            powermgmt_last_cycle_level = battery_percent;
+            powermgmt_last_cycle_startstop_min = 0;
+            if(battery_percent >= START_TRICKLE_CHG) {
+                charge_state = TRICKLE;
+                target_voltage = TRICKLE_VOLTAGE;
+            } else {
+                charge_state = TOPOFF;
+                target_voltage = TOPOFF_VOLTAGE;
+            }
+        } else {
+            /*
+             * Start the charger full strength
+             */
+            i = CHARGE_MAX_TIME_1500 * battery_capacity / 1500;
+            charge_max_time_idle =
+                i * (100 + 35 - battery_percent) / 100;
+            if (charge_max_time_idle > i) {
+                charge_max_time_idle = i;
+            }
+            charge_max_time_now = charge_max_time_idle;
+
+            snprintf(power_message, POWER_MESSAGE_LEN,
+                     "ChgAt %d%% max %dm", battery_level(),
+                     charge_max_time_now);
+
+            /* enable the charger after the max time calc is done,
+               because battery_level depends on if the charger is
+               on */
+            DEBUGF("power: charger inserted and battery"
+                   " not full, charging\n");
+            powermgmt_last_cycle_level = battery_percent;
+            powermgmt_last_cycle_startstop_min = 0;
+            trickle_sec  = 60;
+            long_delta   = short_delta = 999999;
+            charge_state = CHARGING;
+        }
+    }
+
+    if (charge_state == CHARGING) {
+        /* alter charge time max length with extra disk use */
+        if (disk_activity_last_cycle) {
+            minutes_disk_activity++;
+            charge_max_time_now = charge_max_time_idle +
+                                 (minutes_disk_activity * 2 / 5);
+            disk_activity_last_cycle = false;
+            last_disk_activity = 0;
+        } else {
+            last_disk_activity++;
+        }
+        /*
+         * Check the delta voltage over the last X minutes so we can do
+         * our end-of-charge logic based on the battery level change.
+         *(no longer use minimum time as logic for charge end has 50
+         * minutes minimum charge built in)
+         */
+        if (powermgmt_last_cycle_startstop_min > CHARGE_END_SHORTD) {
+            short_delta = power_history[0] -
+                          power_history[CHARGE_END_SHORTD - 1];
+        }
+
+        if (powermgmt_last_cycle_startstop_min > CHARGE_END_LONGD) {
+        /*
+         * Scan the history: the points where measurement is taken need to
+         * be fairly static. (check prior to short delta 'area')
+         * (also only check first and last 10 cycles - delta in middle OK)
+         */
+            long_delta = power_history[0] -
+                         power_history[CHARGE_END_LONGD - 1];
+
+            for(i = CHARGE_END_SHORTD; i < CHARGE_END_SHORTD + 10; i++) {
+                if(((power_history[i] - power_history[i+1]) >  50) ||
+                   ((power_history[i] - power_history[i+1]) < -50)) {
+                    long_delta = 777777;
+                    break;
+                }
+            }
+             for(i = CHARGE_END_LONGD - 11; i < CHARGE_END_LONGD - 1 ; i++) {
+                if(((power_history[i] - power_history[i+1]) >  50) ||
+                   ((power_history[i] - power_history[i+1]) < -50)) {
+                    long_delta = 888888;
+                    break;
+                }
+            }
+        }
+
+        snprintf(power_message, POWER_MESSAGE_LEN,
+                 "Chg %dm, max %dm", powermgmt_last_cycle_startstop_min,
+                 charge_max_time_now);
+        /*
+         * End of charge criteria (any qualify):
+         * 1) Charged a long time
+         * 2) DeltaV went negative for a short time ( & long delta static)
+         * 3) DeltaV was negative over a longer period (no disk use only)
+         * Note: short_delta and long_delta are millivolts
+         */
+        if ((powermgmt_last_cycle_startstop_min >= charge_max_time_now) ||
+            (short_delta <= -50 && long_delta < 50 ) || (long_delta  < -20 &&
+            last_disk_activity > CHARGE_END_LONGD)) {
+            if (powermgmt_last_cycle_startstop_min > charge_max_time_now) {
+                DEBUGF("power: powermgmt_last_cycle_startstop_min > charge_max_time_now, "
+                       "enough!\n");
+                /*
+                 *have charged too long and deltaV detection did not
+                 *work!
+                 */
+                 snprintf(power_message, POWER_MESSAGE_LEN,
+                         "Chg tmout %d min", charge_max_time_now);
+                /*
+                 * Switch to trickle charging.  We skip the top-off
+                 * since we've effectively done the top-off operation
+                 * already since we charged for the maximum full
+                 * charge time.
+                 */
+                powermgmt_last_cycle_level = battery_percent;
+                powermgmt_last_cycle_startstop_min = 0;
+                charge_state = TRICKLE;
+
+                /*
+                 * set trickle charge target to a relative voltage instead
+                 * of an arbitrary value - the fully charged voltage may
+                 * vary according to ambient temp, battery condition etc
+                 * trickle target is -0.15v from full voltage acheived
+                 * topup target is -0.05v from full voltage
+                 */
+                target_voltage = power_history[0] - 150;
+
+            } else {
+                if(short_delta <= -5) {
+                    DEBUGF("power: short-term negative"
+                           " delta, enough!\n");
+                    snprintf(power_message, POWER_MESSAGE_LEN,
+                             "end negd %d %dmin", short_delta,
+                             powermgmt_last_cycle_startstop_min);
+                    target_voltage = power_history[CHARGE_END_SHORTD - 1]
+                                     - 50;
+                } else {
+                    DEBUGF("power: long-term small "
+                           "positive delta, enough!\n");
+                    snprintf(power_message, POWER_MESSAGE_LEN,
+                             "end lowd %d %dmin", long_delta,
+                             powermgmt_last_cycle_startstop_min);
+                    target_voltage = power_history[CHARGE_END_LONGD - 1]
+                                     - 50;
+                }
+                /*
+                 * Switch to top-off charging.
+                 */
+                powermgmt_last_cycle_level = battery_percent;
+                powermgmt_last_cycle_startstop_min = 0;
+                charge_state = TOPOFF;
+            }
+        }
+    }
+    else if (charge_state != DISCHARGING)  /* top off or trickle */
+    {
+        /*
+         *Time to switch from topoff to trickle?
+         */
+        if ((charge_state == TOPOFF) &&
+            (powermgmt_last_cycle_startstop_min > TOPOFF_MAX_TIME))
+        {
+            powermgmt_last_cycle_level = battery_percent;
+            powermgmt_last_cycle_startstop_min = 0;
+            charge_state = TRICKLE;
+            target_voltage = target_voltage - 100;
+        }
+        /*
+         * Adjust trickle charge time (proportional and integral terms).
+         * Note: I considered setting the level higher if the USB is
+         * plugged in, but it doesn't appear to be necessary and will
+         * generate more heat [gvb].
+         */
+
+        pid_p = ((signed)target_voltage - (signed)battery_millivolts) / 5;
+        if((pid_p <= PID_DEADZONE) && (pid_p >= -PID_DEADZONE))
+            pid_p = 0;
+
+        if((unsigned) battery_millivolts < target_voltage) {
+            if(pid_i < 60) {
+                pid_i++;        /* limit so it doesn't "wind up" */
+            }
+        } else {
+            if(pid_i > 0) {
+                pid_i--;        /* limit so it doesn't "wind up" */
+            }
+        }
+
+        trickle_sec = pid_p + pid_i;
+
+        if(trickle_sec > 60) {
+            trickle_sec = 60;
+        }
+        if(trickle_sec < 0) {
+            trickle_sec = 0;
+        }
+
+    } else if (charge_state == DISCHARGING) {
+        trickle_sec = 0;
+        /*
+         * The charger is enabled here only in one case: if it was
+         * turned on at boot time (power_init).  Turn it off now.
+         */
+        if (charger_enabled)
+            charger_enable(false);
+    }
+
+    if (charger_input_state == CHARGER_UNPLUGGED) {
+        /*
+         * The charger was just unplugged.
+         */
+        DEBUGF("power: charger disconnected, disabling\n");
+
+        charger_enable(false);
+        powermgmt_last_cycle_level = battery_percent;
+        powermgmt_last_cycle_startstop_min = 0;
+        trickle_sec  = 0;
+        pid_p        = 0;
+        pid_i        = 0;
+        charge_state = DISCHARGING;
+        snprintf(power_message, POWER_MESSAGE_LEN, "Charger: discharge");
+    }
+
+    /* sleep for a minute */
+    if(trickle_sec > 0) {
+        charger_enable(true);
+        power_thread_sleep(HZ * trickle_sec);
+    }
+    if(trickle_sec < 60)
+        charger_enable(false);
+    power_thread_sleep(HZ * (60 - trickle_sec));
+
+#if defined(DEBUG_FILE)
+    if(usb_inserted()) {
+        if(fd >= 0) {
+            /* It is probably too late to close the file but we can try...*/
+            close(fd);
+            fd = -1;
+        }
+    } else {
+        if(fd < 0) {
+            fd = open(DEBUG_FILE_NAME, O_WRONLY | O_APPEND | O_CREAT);
+            if(fd >= 0) {
+                snprintf(debug_message, DEBUG_MESSAGE_LEN,
+                "cycle_min, bat_millivolts, bat_percent, chgr_state"
+                " ,charge_state, pid_p, pid_i, trickle_sec\n");
+                write(fd, debug_message, strlen(debug_message));
+                wrcount = 99;   /* force a flush */
+            }
+        }
+        if(fd >= 0) {
+            snprintf(debug_message, DEBUG_MESSAGE_LEN,
+                    "%d, %d, %d, %d, %d, %d, %d, %d\n",
+                powermgmt_last_cycle_startstop_min, battery_millivolts,
+                battery_percent, charger_input_state, charge_state,
+                pid_p, pid_i, trickle_sec);
+            write(fd, debug_message, strlen(debug_message));
+            wrcount++;
+        }
+    }
+#endif /* defined(DEBUG_FILE) */
+
+    powermgmt_last_cycle_startstop_min++;
+}
+
+/*
+ * Prepare charging for poweroff
+ */
+static inline void charging_algorithm_close(void)
+{
+#if defined(DEBUG_FILE)
+    if(fd >= 0) {
+        close(fd);
+        fd = -1;
+    }
+#endif
+}
+#else
+#define BATT_AVE_SAMPLES   128  /* slw filter constant for all others */
+
+static inline void charging_algorithm_small_step(void)
+{
+#if CONFIG_CHARGING == CHARGING_MONITOR
+    switch (charger_input_state)
+    {
+        case CHARGER_UNPLUGGED:
+        case NO_CHARGER:
+            charge_state = DISCHARGING;
+            break;
+        case CHARGER_PLUGGED:
+        case CHARGER:
+            if (charging_state()) {
+                charge_state = CHARGING;
+            } else {
+                charge_state = DISCHARGING;
+            }
+            break;
+    }
+#endif /* CONFIG_CHARGING == CHARGING_MONITOR */
+}
+
+static inline void charging_algorithm_big_step(void)
+{
+    /* sleep for a minute */
+    power_thread_sleep(HZ * 60);
+}
+
+/*
+ * Prepare charging for poweroff
+ */
+static inline void charging_algorithm_close(void)
+{
+    /* Nothing to do */
+}
+#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
+
+/*
  * This function is called to do the relativly long sleep waits from within the
  * main power_thread loop while at the same time servicing any other periodic
  * functions in the power thread which need to be called at a faster periodic
@@ -663,9 +959,7 @@ static void power_thread_sleep(int ticks)
         if(charger_inserted()
 #ifdef HAVE_USB_POWER /* USB powered or USB inserted both provide power */
                 || usb_powered()
-#if CONFIG_CHARGING
                 || (usb_inserted() && usb_charging_enabled())
-#endif
 #endif
                 ) {
             switch(charger_input_state) {
@@ -696,24 +990,7 @@ static void power_thread_sleep(int ticks)
                     return;
             }
         }
-#endif
-#if CONFIG_CHARGING == CHARGING_MONITOR
-        switch (charger_input_state) {
-            case CHARGER_UNPLUGGED:
-            case NO_CHARGER:
-                charge_state = DISCHARGING;
-                break;
-            case CHARGER_PLUGGED:
-            case CHARGER:
-                if (charging_state()) {
-                    charge_state = CHARGING;
-                } else {
-                    charge_state = DISCHARGING;
-                }
-                break;
-        }
-
-#endif /* CONFIG_CHARGING == CHARGING_MONITOR */
+#endif /* CONFIG_CHARGING */
 
         small_ticks = MIN(HZ/2, ticks);
         sleep(small_ticks);
@@ -766,48 +1043,12 @@ static void power_thread_sleep(int ticks)
                 avgbat += battery_millivolts - (avgbat / BATT_AVE_SAMPLES);
         }
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-        if (ata_disk_is_active()) {
-            /* flag hdd use for charging calculation */
-            disk_activity_last_cycle = true;
-        }
-#endif
-#if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
-        /*
-         * If we have a lot of pending writes or if the disk is spining,
-         * fsync the debug log file.
-         */
-        if((wrcount > 10) || ((wrcount > 0) && ata_disk_is_active())) {
-            fsync(fd);
-            wrcount = 0;
-        }
-#endif
+        charging_algorithm_small_step();
     }
 }
 
-
-/*
- * This power thread maintains a history of battery voltage
- * and implements a charging algorithm.
- * For a complete description of the charging algorithm read
- * docs/CHARGING_ALGORITHM.
- */
-
 static void power_thread(void)
 {
-#if CONFIG_CHARGING == CHARGING_CONTROL
-    int i;
-    unsigned int target_voltage = TRICKLE_VOLTAGE;    /* desired topoff/trickle
-                                       * voltage level */
-    int charge_max_time_idle = 0;     /* max. charging duration, calculated at
-                                       * beginning of charging */
-    int charge_max_time_now = 0;      /* max. charging duration including
-                                       * hdd activity */
-    int minutes_disk_activity = 0;    /* count minutes of hdd use during
-                                       * charging */
-    int last_disk_activity = CHARGE_END_LONGD + 1; /* last hdd use x mins ago */
-#endif
-
     /* Delay reading the first battery level */
 #ifdef MROBE_100
     while(battery_adc_voltage()>4200)  /* gives false readings initially */
@@ -834,21 +1075,12 @@ static void power_thread(void)
     if(charger_inserted()) {
         battery_percent  = voltage_to_percent(battery_millivolts,
                            percent_to_volt_charge);
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-        /* Checking for iriver is a temporary kludge. */
-        charger_input_state = CHARGER;
-#endif
     } else
 #endif
     {   battery_percent  = voltage_to_percent(battery_millivolts,
                            percent_to_volt_discharge[battery_type]);
         battery_percent += (battery_percent < 100);
     }
-
-#if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
-    fd      = -1;
-    wrcount = 0;
-#endif
 
     while (1)
     {
@@ -859,288 +1091,9 @@ static void power_thread(void)
         /* insert new value at the start, in millivolts 8-) */
         power_history[0] = battery_millivolts;
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-        if (charger_input_state == CHARGER_PLUGGED) {
-            pid_p = 0;
-            pid_i = 0;
-            snprintf(power_message, POWER_MESSAGE_LEN, "Charger plugged in");
-            /*
-             * The charger was just plugged in.  If the battery level is
-             * nearly charged, just trickle.  If the battery is low, start
-             * a full charge cycle.  If the battery level is in between,
-             * top-off and then trickle.
-             */
-            if(battery_percent > START_TOPOFF_CHG) {
-                powermgmt_last_cycle_level = battery_percent;
-                powermgmt_last_cycle_startstop_min = 0;
-                if(battery_percent >= START_TRICKLE_CHG) {
-                    charge_state = TRICKLE;
-                    target_voltage = TRICKLE_VOLTAGE;
-                } else {
-                    charge_state = TOPOFF;
-                    target_voltage = TOPOFF_VOLTAGE;
-                }
-            } else {
-                /*
-                 * Start the charger full strength
-                 */
-                i = CHARGE_MAX_TIME_1500 * battery_capacity / 1500;
-                charge_max_time_idle =
-                    i * (100 + 35 - battery_percent) / 100;
-                if (charge_max_time_idle > i) {
-                    charge_max_time_idle = i;
-                }
-                charge_max_time_now = charge_max_time_idle;
+        charging_algorithm_big_step();
 
-                snprintf(power_message, POWER_MESSAGE_LEN,
-                         "ChgAt %d%% max %dm", battery_level(),
-                         charge_max_time_now);
-
-                /* enable the charger after the max time calc is done,
-                   because battery_level depends on if the charger is
-                   on */
-                DEBUGF("power: charger inserted and battery"
-                       " not full, charging\n");
-                powermgmt_last_cycle_level = battery_percent;
-                powermgmt_last_cycle_startstop_min = 0;
-                trickle_sec  = 60;
-                long_delta   = short_delta = 999999;
-                charge_state = CHARGING;
-            }
-        }
-        if (charge_state == CHARGING) {
-            /* alter charge time max length with extra disk use */
-            if (disk_activity_last_cycle) {
-                minutes_disk_activity++;
-                charge_max_time_now = charge_max_time_idle +
-                                     (minutes_disk_activity * 2 / 5);
-                disk_activity_last_cycle = false;
-                last_disk_activity = 0;
-            } else {
-                last_disk_activity++;
-            }
-            /*
-             * Check the delta voltage over the last X minutes so we can do
-             * our end-of-charge logic based on the battery level change.
-             *(no longer use minimum time as logic for charge end has 50
-             * minutes minimum charge built in)
-             */
-            if (powermgmt_last_cycle_startstop_min > CHARGE_END_SHORTD) {
-                short_delta = power_history[0] -
-                              power_history[CHARGE_END_SHORTD - 1];
-            }
-
-            if (powermgmt_last_cycle_startstop_min > CHARGE_END_LONGD) {
-            /*
-             * Scan the history: the points where measurement is taken need to
-             * be fairly static. (check prior to short delta 'area')
-             * (also only check first and last 10 cycles - delta in middle OK)
-             */
-                long_delta = power_history[0] -
-                             power_history[CHARGE_END_LONGD - 1];
-
-                for(i = CHARGE_END_SHORTD; i < CHARGE_END_SHORTD + 10; i++) {
-                    if(((power_history[i] - power_history[i+1]) >  50) ||
-                       ((power_history[i] - power_history[i+1]) < -50)) {
-                        long_delta = 777777;
-                        break;
-                    }
-                }
-                 for(i = CHARGE_END_LONGD - 11; i < CHARGE_END_LONGD - 1 ; i++) {
-                    if(((power_history[i] - power_history[i+1]) >  50) ||
-                       ((power_history[i] - power_history[i+1]) < -50)) {
-                        long_delta = 888888;
-                        break;
-                    }
-                }
-            }
-
-            snprintf(power_message, POWER_MESSAGE_LEN,
-                     "Chg %dm, max %dm", powermgmt_last_cycle_startstop_min,
-                     charge_max_time_now);
-            /*
-             * End of charge criteria (any qualify):
-             * 1) Charged a long time
-             * 2) DeltaV went negative for a short time ( & long delta static)
-             * 3) DeltaV was negative over a longer period (no disk use only)
-             * Note: short_delta and long_delta are millivolts
-             */
-            if ((powermgmt_last_cycle_startstop_min >= charge_max_time_now) ||
-                (short_delta <= -50 && long_delta < 50 ) || (long_delta  < -20 &&
-                last_disk_activity > CHARGE_END_LONGD)) {
-                if (powermgmt_last_cycle_startstop_min > charge_max_time_now) {
-                    DEBUGF("power: powermgmt_last_cycle_startstop_min > charge_max_time_now, "
-                           "enough!\n");
-                    /*
-                     *have charged too long and deltaV detection did not
-                     *work!
-                     */
-                     snprintf(power_message, POWER_MESSAGE_LEN,
-                             "Chg tmout %d min", charge_max_time_now);
-                    /*
-                     * Switch to trickle charging.  We skip the top-off
-                     * since we've effectively done the top-off operation
-                     * already since we charged for the maximum full
-                     * charge time.
-                     */
-                    powermgmt_last_cycle_level = battery_percent;
-                    powermgmt_last_cycle_startstop_min = 0;
-                    charge_state = TRICKLE;
-
-                    /*
-                     * set trickle charge target to a relative voltage instead
-                     * of an arbitrary value - the fully charged voltage may
-                     * vary according to ambient temp, battery condition etc
-                     * trickle target is -0.15v from full voltage acheived
-                     * topup target is -0.05v from full voltage
-                     */
-                    target_voltage = power_history[0] - 150;
-
-                } else {
-                    if(short_delta <= -5) {
-                        DEBUGF("power: short-term negative"
-                               " delta, enough!\n");
-                        snprintf(power_message, POWER_MESSAGE_LEN,
-                                 "end negd %d %dmin", short_delta,
-                                 powermgmt_last_cycle_startstop_min);
-                        target_voltage = power_history[CHARGE_END_SHORTD - 1]
-                                         - 50;
-                    } else {
-                        DEBUGF("power: long-term small "
-                               "positive delta, enough!\n");
-                        snprintf(power_message, POWER_MESSAGE_LEN,
-                                 "end lowd %d %dmin", long_delta,
-                                 powermgmt_last_cycle_startstop_min);
-                        target_voltage = power_history[CHARGE_END_LONGD - 1]
-                                         - 50;
-                    }
-                    /*
-                     * Switch to top-off charging.
-                     */
-                    powermgmt_last_cycle_level = battery_percent;
-                    powermgmt_last_cycle_startstop_min = 0;
-                    charge_state = TOPOFF;
-                }
-            }
-        }
-        else if (charge_state != DISCHARGING)  /* top off or trickle */
-        {
-            /*
-             *Time to switch from topoff to trickle?
-             */
-            if ((charge_state == TOPOFF) &&
-                (powermgmt_last_cycle_startstop_min > TOPOFF_MAX_TIME))
-            {
-                powermgmt_last_cycle_level = battery_percent;
-                powermgmt_last_cycle_startstop_min = 0;
-                charge_state = TRICKLE;
-                target_voltage = target_voltage - 100;
-            }
-            /*
-             * Adjust trickle charge time (proportional and integral terms).
-             * Note: I considered setting the level higher if the USB is
-             * plugged in, but it doesn't appear to be necessary and will
-             * generate more heat [gvb].
-             */
-
-            pid_p = ((signed)target_voltage - (signed)battery_millivolts) / 5;
-            if((pid_p <= PID_DEADZONE) && (pid_p >= -PID_DEADZONE))
-                pid_p = 0;
-
-            if((unsigned) battery_millivolts < target_voltage) {
-                if(pid_i < 60) {
-                    pid_i++;        /* limit so it doesn't "wind up" */
-                }
-            } else {
-                if(pid_i > 0) {
-                    pid_i--;        /* limit so it doesn't "wind up" */
-                }
-            }
-
-            trickle_sec = pid_p + pid_i;
-
-            if(trickle_sec > 60) {
-                trickle_sec = 60;
-            }
-            if(trickle_sec < 0) {
-                trickle_sec = 0;
-            }
-
-        } else if (charge_state == DISCHARGING) {
-            trickle_sec = 0;
-            /*
-             * The charger is enabled here only in one case: if it was
-             * turned on at boot time (power_init).  Turn it off now.
-             */
-            if (charger_enabled)
-                charger_enable(false);
-        }
-
-        if (charger_input_state == CHARGER_UNPLUGGED) {
-            /*
-             * The charger was just unplugged.
-             */
-            DEBUGF("power: charger disconnected, disabling\n");
-
-            charger_enable(false);
-            powermgmt_last_cycle_level = battery_percent;
-            powermgmt_last_cycle_startstop_min = 0;
-            trickle_sec  = 0;
-            pid_p        = 0;
-            pid_i        = 0;
-            charge_state = DISCHARGING;
-            snprintf(power_message, POWER_MESSAGE_LEN, "Charger: discharge");
-        }
-
-#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
-
-        /* sleep for a minute */
-
-#if CONFIG_CHARGING == CHARGING_CONTROL
-        if(trickle_sec > 0) {
-            charger_enable(true);
-            power_thread_sleep(HZ * trickle_sec);
-        }
-        if(trickle_sec < 60)
-            charger_enable(false);
-        power_thread_sleep(HZ * (60 - trickle_sec));
-#else
-        power_thread_sleep(HZ * 60);
-#endif
-
-#if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
-        if(usb_inserted()) {
-            if(fd >= 0) {
-                /* It is probably too late to close the file but we can try...*/
-                close(fd);
-                fd = -1;
-            }
-        } else {
-            if(fd < 0) {
-                fd = open(DEBUG_FILE_NAME, O_WRONLY | O_APPEND | O_CREAT);
-                if(fd >= 0) {
-                    snprintf(debug_message, DEBUG_MESSAGE_LEN,
-                    "cycle_min, bat_millivolts, bat_percent, chgr_state, charge_state, pid_p, pid_i, trickle_sec\n");
-                    write(fd, debug_message, strlen(debug_message));
-                    wrcount = 99;   /* force a flush */
-                }
-            }
-            if(fd >= 0) {
-                snprintf(debug_message, DEBUG_MESSAGE_LEN,
-                        "%d, %d, %d, %d, %d, %d, %d, %d\n",
-                    powermgmt_last_cycle_startstop_min, battery_millivolts,
-                    battery_percent, charger_input_state, charge_state,
-                    pid_p, pid_i, trickle_sec);
-                write(fd, debug_message, strlen(debug_message));
-                wrcount++;
-            }
-        }
-#endif
         handle_auto_poweroff();
-
-#if CONFIG_CHARGING == CHARGING_CONTROL
-        powermgmt_last_cycle_startstop_min++;
-#endif
     }
 }
 
@@ -1192,12 +1145,7 @@ void cancel_shutdown(void)
 void shutdown_hw(void)
 {
 #ifndef SIMULATOR
-#if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
-    if(fd >= 0) {
-        close(fd);
-        fd = -1;
-    }
-#endif
+    charging_algorithm_close();
     audio_stop();
     if (battery_level_safe()) { /* do not save on critical battery */
 #ifdef HAVE_LCD_BITMAP
