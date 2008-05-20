@@ -657,7 +657,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_STD_PREVREPEAT:
                 gui_list_select_at_offset(lists, -next_item_modifier);
 #ifndef HAVE_SCROLLWHEEL
-            if (queue_count(&button_queue) < FRAMEDROP_TRIGGER)
+            if (button_queue_count() < FRAMEDROP_TRIGGER)
 #endif
                 gui_synclist_draw(lists);
             _gui_synclist_speak_item(lists,
@@ -671,7 +671,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
         case ACTION_STD_NEXTREPEAT:
                 gui_list_select_at_offset(lists, next_item_modifier);
 #ifndef HAVE_SCROLLWHEEL
-            if (queue_count(&button_queue) < FRAMEDROP_TRIGGER)
+            if (button_queue_count() < FRAMEDROP_TRIGGER)
 #endif
                 gui_synclist_draw(lists);
             _gui_synclist_speak_item(lists,
