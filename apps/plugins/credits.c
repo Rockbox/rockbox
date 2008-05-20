@@ -23,11 +23,11 @@ PLUGIN_HEADER
 
 static const struct plugin_api* rb;
 
-const char* const credits[] = {
+static const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
 };
 
-bool STOP_AUTOSCROLL(int action)
+static bool stop_autoscroll(int action)
 {
     switch (action)
     {
@@ -46,7 +46,7 @@ bool STOP_AUTOSCROLL(int action)
     
 #ifdef HAVE_LCD_CHARCELLS
 
-void roll_credits(void)
+static void roll_credits(void)
 {
     int numnames = sizeof(credits)/sizeof(char*);
     int curr_name = 0;
@@ -107,7 +107,7 @@ void roll_credits(void)
 
 #else
 
-int update_rowpos(int action, int cur_pos, int rows_per_screen, int tot_rows)
+static int update_rowpos(int action, int cur_pos, int rows_per_screen, int tot_rows)
 {
     switch(action)
     {
@@ -129,7 +129,7 @@ int update_rowpos(int action, int cur_pos, int rows_per_screen, int tot_rows)
     return cur_pos;
 }
 
-void roll_credits(void)
+static void roll_credits(void)
 {
     /* to do: use target defines iso keypads to set animation timings */
 #if (CONFIG_KEYPAD == RECORDER_PAD)
@@ -210,17 +210,17 @@ void roll_credits(void)
 
             /* exit on abort, switch to manual on up/down */
             action = rb->get_action(CONTEXT_LIST, HZ/ANIM_SPEED);
-            if(STOP_AUTOSCROLL(action))
+            if(stop_autoscroll(action))
                 break;
         }
-        if(STOP_AUTOSCROLL(action))
+        if(stop_autoscroll(action))
             break;
     }
     
     /* process user actions (if any) */
     if(ACTION_STD_CANCEL == action)
         return;
-    if(STOP_AUTOSCROLL(action))
+    if(stop_autoscroll(action))
         manual_scroll = true; /* up/down - abort was catched above */
 
     if(!manual_scroll)
@@ -231,7 +231,7 @@ void roll_credits(void)
         action = rb->get_action(CONTEXT_LIST, HZ*PAUSE_TIME);
         if(ACTION_STD_CANCEL == action)
             return;
-        if(STOP_AUTOSCROLL(action))
+        if(stop_autoscroll(action))
             manual_scroll = true;
     }
 
@@ -262,13 +262,13 @@ void roll_credits(void)
     
                     /* exit on keypress, react to scrolling */
                     action = rb->get_action(CONTEXT_LIST, HZ/ANIM_SPEED);
-                    if(STOP_AUTOSCROLL(action))
+                    if(stop_autoscroll(action))
                         break;
 
                     namepos += offset_dummy;
                     offset_dummy++;
                 } /* while(namepos<LCD_WIDTH+offset_dummy) */
-                if(STOP_AUTOSCROLL(action))
+                if(stop_autoscroll(action))
                     break;
 
                 rb->snprintf(name, sizeof(name), "%s", credits[j+i]);
@@ -293,18 +293,18 @@ void roll_credits(void)
     
                     /* stop on keypress */
                     action = rb->get_action(CONTEXT_LIST, HZ/ANIM_SPEED);
-                    if(STOP_AUTOSCROLL(action))
+                    if(stop_autoscroll(action))
                         break;
                 }
-                if(STOP_AUTOSCROLL(action))
+                if(stop_autoscroll(action))
                     break;
                 namepos = name_targetpos;
             } /* for(i=0; i<NUM_VISIBLE_LINES; i++) */
-            if(STOP_AUTOSCROLL(action))
+            if(stop_autoscroll(action))
                 break;
             
             action = rb->get_action(CONTEXT_LIST, HZ*PAUSE_TIME);
-            if(STOP_AUTOSCROLL(action))
+            if(stop_autoscroll(action))
                 break;
 
             j+=i; /* no user intervention, draw the next screen-full */
@@ -313,7 +313,7 @@ void roll_credits(void)
         /* handle the keypress that we intercepted during autoscroll */
         if(ACTION_STD_CANCEL == action)
             return;
-        if(STOP_AUTOSCROLL(action))
+        if(stop_autoscroll(action))
             manual_scroll = true;
     } /* if(!manual_scroll) */
 
