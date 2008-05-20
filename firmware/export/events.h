@@ -22,8 +22,6 @@
 
 #include <stdbool.h>
 
-#define MAX_SYS_EVENTS 10
-
 /**
  * High byte = Event class definition
  * Low byte  = Event ID

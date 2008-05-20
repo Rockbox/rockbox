@@ -21,13 +21,15 @@
 #include "events.h"
 #include "panic.h"
 
+#define MAX_SYS_EVENTS 10
+
 struct sysevent {
     unsigned short id;
     bool oneshot;
     void (*callback)(void *data);
 };
 
-struct sysevent events[MAX_SYS_EVENTS];
+static struct sysevent events[MAX_SYS_EVENTS];
 
 bool add_event(unsigned short id, bool oneshot, void (*handler))
 {
