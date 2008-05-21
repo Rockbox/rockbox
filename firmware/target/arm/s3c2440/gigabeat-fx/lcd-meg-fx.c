@@ -310,6 +310,20 @@ void lcd_set_flip(bool yesno) {
     LCD_SPI_stop();
 }
 
+int lcd_default_contrast(void)
+{
+    return DEFAULT_CONTRAST_SETTING;
+}
+
+void lcd_set_contrast(int val) {
+    if (!lcd_on)
+        return;
+
+    LCD_SPI_start();
+    LCD_SPI_setreg(0x0B, (unsigned char) val);
+    LCD_SPI_stop();
+}
+
 void lcd_set_invert_display(bool yesno) {
     if (!lcd_on)
         return;
@@ -496,10 +510,5 @@ void lcd_blit_yuv(unsigned char * const src[3],
         }
         while (--height > 0);
     }
-}
-
-void lcd_set_contrast(int val) {
-  (void) val;
-  // TODO:
 }
 

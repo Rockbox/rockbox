@@ -113,6 +113,13 @@
 
 #define HAVE_LCD_FLIP
 
+/* Define this if your LCD can set contrast */
+#define HAVE_LCD_CONTRAST
+
+#define MIN_CONTRAST_SETTING        0
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    47 /* Match boot contrast */
+
 /* LCD invert - does not currently work */
 /* #define HAVE_LCD_INVERT */
 
