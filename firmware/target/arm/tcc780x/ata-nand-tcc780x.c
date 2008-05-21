@@ -25,11 +25,13 @@
 
 /* The NAND driver is currently work-in-progress and as such contains
    some dead code and debug stuff, such as the next few lines. */
+#include "lcd.h"
+#include "font.h"
+#include "button.h"
+#include <sprintf.h>
 
-#if defined(BOOTLOADER)
-#include "../../../../bootloader/common.h"  /* for printf */
-extern int line;
-#endif
+/* #define USE_TCC_LPT */
+/* #define USE_ECC_CORRECTION */
 
 /* for compatibility */
 int ata_spinup_time = 0;
@@ -50,29 +52,27 @@ static struct mutex ata_mtx SHAREDBSS_ATTR;
 #define NFC_SDATA  (*(volatile unsigned long *)0xF0053040)
 #define NFC_WDATA  (*(volatile unsigned long *)0xF0053010)
 #define NFC_CTRL   (*(volatile unsigned long *)0xF0053050)
+    #define NFC_16BIT (1<<26)
+    #define NFC_CS0   (1<<23)
+    #define NFC_CS1   (1<<22)
+    #define NFC_READY (1<<20)
 #define NFC_IREQ   (*(volatile unsigned long *)0xF0053060)
 #define NFC_RST    (*(volatile unsigned long *)0xF0053064)
 
-/* NFC_CTRL flags */
-#define NFC_16BIT (1<<26)
-#define NFC_CS0   (1<<23)
-#define NFC_CS1   (1<<22)
-#define NFC_READY (1<<20)
+/* TCC780x ECC Controller */
 
 #define ECC_CTRL    (*(volatile unsigned long *)0xF005B000)
+    #define ECC_M4EN  (1<<6)
+    #define ECC_ENC   (1<<27)
+    #define ECC_READY (1<<26)
 #define ECC_BASE    (*(volatile unsigned long *)0xF005B004)
 #define ECC_CLR     (*(volatile unsigned long *)0xF005B00C)
 #define ECC_MLC0W   (*(volatile unsigned long *)0xF005B030)
 #define ECC_MLC1W   (*(volatile unsigned long *)0xF005B034)
 #define ECC_MLC2W   (*(volatile unsigned long *)0xF005B038)
-#define ECC_ERR     (*(volatile unsigned long *)0xF005B070)
 #define ECC_ERRADDR (*(volatile unsigned long *)0xF005B050)
 #define ECC_ERRDATA (*(volatile unsigned long *)0xF005B060)
-
-/* ECC_CTRL flags */
-#define ECC_M4EN  (1<<6)
-#define ECC_ENC   (1<<27)
-#define ECC_READY (1<<26)
+#define ECC_ERR     (*(volatile unsigned long *)0xF005B070)
 
 /* Chip characteristics, initialised by nand_get_chip_info() */
 
@@ -95,23 +95,23 @@ static int segments_per_bank   = 0;
 #define MAX_SPARE_SIZE      128
 #define MAX_BLOCKS_PER_BANK 8192
 #define MAX_PAGES_PER_BLOCK 128
+#define BLOCKS_PER_SEGMENT  4
 
-/* In theory we can support 4 banks, but only 2 have been seen on 2/4/8Gb D2s. */
+/* In theory we can support 4 banks, but only 2 have been seen on 2/4/8Gb D2s */
 #ifdef COWON_D2
 #define MAX_BANKS 2
 #else
 #define MAX_BANKS 4
 #endif
 
-#define MAX_SEGMENTS (MAX_BLOCKS_PER_BANK * MAX_BANKS / 4)
+#define MAX_SEGMENTS (MAX_BLOCKS_PER_BANK * MAX_BANKS / BLOCKS_PER_SEGMENT)
 
 /* Logical/Physical translation table */
 
 struct lpt_entry
 {
-    short chip;
+    short bank;
     short phys_segment;
-    //short segment_flag;
 };
 static struct lpt_entry lpt_lookup[MAX_SEGMENTS];
 
@@ -121,18 +121,26 @@ static struct lpt_entry lpt_lookup[MAX_SEGMENTS];
 
 struct write_cache
 {
-    short chip;
+    short bank;
     short phys_segment;
     short log_segment;
-    short page_map[MAX_PAGES_PER_BLOCK * 4];
+    short page_map[MAX_PAGES_PER_BLOCK * BLOCKS_PER_SEGMENT];
 };
 static struct write_cache write_caches[MAX_WRITE_CACHES];
 
 static int write_caches_in_use = 0;
 
-/* Read buffer */
+#ifdef USE_TCC_LPT
+/* Read buffer (used for reading LPT blocks only) */
+static unsigned char page_buf[MAX_PAGE_SIZE + MAX_SPARE_SIZE]
+       __attribute__ ((aligned (4)));
+#endif
 
-unsigned int page_buf[(MAX_PAGE_SIZE + MAX_SPARE_SIZE) / 4];
+#ifdef USE_ECC_CORRECTION
+static unsigned int ecc_sectors_corrected = 0;
+static unsigned int ecc_bits_corrected = 0;
+static unsigned int ecc_fail_count = 0;
+#endif
 
 
 /* Conversion functions */
@@ -161,9 +169,9 @@ static inline int phys_segment_to_page_addr(int phys_segment, int page_in_seg)
 
 /* NAND physical access functions */
 
-static void nand_chip_select(int chip)
+static void nand_chip_select(int bank)
 {
-    if (chip == -1)
+    if (bank == -1)
     {
         /* Disable both chip selects */
         GPIOB_CLEAR = (1<<21);
@@ -172,7 +180,11 @@ static void nand_chip_select(int chip)
     else
     {
         /* NFC chip select */
-        if (chip & 1)
+#ifdef USE_TCC_LPT
+        if (!(bank & 1))
+#else
+        if (bank & 1)
+#endif
         {
             NFC_CTRL &= ~NFC_CS0;
             NFC_CTRL |= NFC_CS1;
@@ -184,7 +196,7 @@ static void nand_chip_select(int chip)
         }
 
         /* Secondary chip select */
-        if (chip & 2)
+        if (bank & 2)
         {
             GPIOB_SET = (1<<21);
         }
@@ -196,7 +208,7 @@ static void nand_chip_select(int chip)
 }
 
 
-static void nand_read_id(int chip, unsigned char* id_buf)
+static void nand_read_id(int bank, unsigned char* id_buf)
 {
     int i;
     
@@ -209,7 +221,7 @@ static void nand_read_id(int chip, unsigned char* id_buf)
     /* Set slow cycle timings since the chip is as yet unidentified */
     NFC_CTRL = (NFC_CTRL &~0xFFF) | 0x353;
 
-    nand_chip_select(chip);
+    nand_chip_select(bank);
 
     /* Set write protect */
     GPIOB_CLEAR = (1<<19);
@@ -237,7 +249,7 @@ static void nand_read_id(int chip, unsigned char* id_buf)
 }
 
 
-static void nand_read_uid(int chip, unsigned int* uid_buf)
+static void nand_read_uid(int bank, unsigned int* uid_buf)
 {
     int i;
 
@@ -247,7 +259,7 @@ static void nand_read_uid(int chip, unsigned int* uid_buf)
     /* Set cycle timing (stp = 1, pw = 3, hold = 1) */
     NFC_CTRL = (NFC_CTRL &~0xFFF) | 0x131;
 
-    nand_chip_select(chip);
+    nand_chip_select(bank);
 
     /* Set write protect */
     GPIOB_CLEAR = 1<<19;
@@ -289,7 +301,7 @@ static void nand_read_uid(int chip, unsigned int* uid_buf)
 }
 
 
-static void nand_read_raw(int chip, int row, int column, int size, void* buf)
+static void nand_read_raw(int bank, int row, int column, int size, void* buf)
 {
     int i;
 
@@ -299,7 +311,7 @@ static void nand_read_raw(int chip, int row, int column, int size, void* buf)
     /* Set cycle timing (stp = 1, pw = 3, hold = 1) */
     NFC_CTRL = (NFC_CTRL &~0xFFF) | 0x131;
 
-    nand_chip_select(chip);
+    nand_chip_select(bank);
 
     /* Set write protect */
     GPIOB_CLEAR = (1<<19);
@@ -407,8 +419,8 @@ static void nand_get_chip_info(void)
     }
 
     pages_per_bank      = blocks_per_bank * pages_per_block;
-    segments_per_bank   = blocks_per_bank / 4;
-    bytes_per_segment   = page_size * pages_per_block * 4;
+    segments_per_bank   = blocks_per_bank / BLOCKS_PER_SEGMENT;
+    bytes_per_segment   = page_size * pages_per_block * BLOCKS_PER_SEGMENT;
     sectors_per_page    = page_size / SECTOR_SIZE;
     sectors_per_segment = bytes_per_segment / SECTOR_SIZE;
 
@@ -476,27 +488,29 @@ static void nand_get_chip_info(void)
 }
 
 
-static bool nand_read_sector_of_phys_page(int chip, int page,
+static bool nand_read_sector_of_phys_page(int bank, int page,
                                           int sector, void* buf)
 {
-    nand_read_raw(chip, page,
+#ifndef USE_ECC_CORRECTION
+    nand_read_raw(bank, page,
                   sector * (SECTOR_SIZE+16),
                   SECTOR_SIZE, buf);
-
-    /* TODO: Read the 16 spare bytes, perform ECC correction */
-
     return true;
+#else
+    /* Not yet implemented */
+    return false;
+#endif
 }
 
 
-static bool nand_read_sector_of_phys_segment(int chip, int phys_segment,
+static bool nand_read_sector_of_phys_segment(int bank, int phys_segment,
                                              int page_in_seg, int sector,
                                              void* buf)
 {
     int page_addr = phys_segment_to_page_addr(phys_segment,
                                               page_in_seg);
 
-    return nand_read_sector_of_phys_page(chip, page_addr, sector, buf);
+    return nand_read_sector_of_phys_page(bank, page_addr, sector, buf);
 }
 
 
@@ -506,7 +520,7 @@ static bool nand_read_sector_of_logical_segment(int log_segment, int sector,
     int page_in_segment = sector / sectors_per_page;
     int sector_in_page  = sector % sectors_per_page;
 
-    int chip = lpt_lookup[log_segment].chip;
+    int bank = lpt_lookup[log_segment].bank;
     int phys_segment = lpt_lookup[log_segment].phys_segment;
 
     /* Check if any of the write caches refer to this segment/page.
@@ -521,7 +535,7 @@ static bool nand_read_sector_of_logical_segment(int log_segment, int sector,
             && write_caches[cache_num].page_map[page_in_segment] != -1)
         {
             found = true;
-            chip = write_caches[cache_num].chip;
+            bank = write_caches[cache_num].bank;
             phys_segment = write_caches[cache_num].phys_segment;
             page_in_segment = write_caches[cache_num].page_map[page_in_segment];
         }
@@ -531,14 +545,19 @@ static bool nand_read_sector_of_logical_segment(int log_segment, int sector,
         }
     }
 
-    return nand_read_sector_of_phys_segment(chip, phys_segment,
+    return nand_read_sector_of_phys_segment(bank, phys_segment,
                                             page_in_segment,
                                             sector_in_page, buf);
 }
 
-#if 0   // LPT table is work-in-progress
 
-static void read_lpt_block(int chip, int phys_segment)
+#ifdef USE_TCC_LPT
+
+/* Reading the LPT from NAND is not yet fully understood. This code is therefore
+   not enabled by default, as it gives much worse results than the bank-scanning
+   approach currently used. */
+
+static void read_lpt_block(int bank, int phys_segment)
 {
     int page = 1;   /* table starts at page 1 of segment */
     bool cont = true;
@@ -548,8 +567,9 @@ static void read_lpt_block(int chip, int phys_segment)
     while (cont && page < pages_per_block)
     {
         int i = 0;
+        unsigned int* int_buf = (int*)page_buf;
         
-        nand_read_sector_of_phys_segment(chip, phys_segment,
+        nand_read_sector_of_phys_segment(bank, phys_segment,
                                          page, 0, /* only sector 0 is used */
                                          page_buf);
 
@@ -557,12 +577,12 @@ static void read_lpt_block(int chip, int phys_segment)
            Do this by reading the logical segment number of entry 0 */
         if (lpt_ptr == NULL)
         {
-            int first_chip = page_buf[0] / segments_per_bank;
-            int first_phys_segment = page_buf[0] % segments_per_bank;
+            int first_bank = int_buf[0] / segments_per_bank;
+            int first_phys_segment = int_buf[0] % segments_per_bank;
 
             unsigned char spare_buf[16];
 
-            nand_read_raw(first_chip,
+            nand_read_raw(first_bank,
                           phys_segment_to_page_addr(first_phys_segment, 0),
                           SECTOR_SIZE, /* offset */
                           16, spare_buf);
@@ -573,16 +593,16 @@ static void read_lpt_block(int chip, int phys_segment)
 
 #if defined(BOOTLOADER) && 1
             printf("lpt @ %lx:%lx (ls:%lx)",
-                   first_chip, first_phys_segment, first_log_segment);
+                   first_bank, first_phys_segment, first_log_segment);
 #endif
         }
 
         while (cont && (i < SECTOR_SIZE/4))
         {
-            if (page_buf[i] != 0xFFFFFFFF)
+            if (int_buf[i] != 0xFFFFFFFF)
             {
-                lpt_ptr->chip = page_buf[i] / segments_per_bank;
-                lpt_ptr->phys_segment = page_buf[i] % segments_per_bank;
+                lpt_ptr->bank = int_buf[i] / segments_per_bank;
+                lpt_ptr->phys_segment = int_buf[i] % segments_per_bank;
 
                 lpt_ptr++;
                 i++;
@@ -593,10 +613,10 @@ static void read_lpt_block(int chip, int phys_segment)
     }
 }
 
-#endif
+#endif /* USE_TCC_LPT */
 
 
-static void read_write_cache_segment(int chip, int phys_segment)
+static void read_write_cache_segment(int bank, int phys_segment)
 {
     int page;
     unsigned char spare_buf[16];
@@ -604,17 +624,17 @@ static void read_write_cache_segment(int chip, int phys_segment)
     if (write_caches_in_use == MAX_WRITE_CACHES)
         panicf("Max NAND write caches reached");
 
-    write_caches[write_caches_in_use].chip = chip;
+    write_caches[write_caches_in_use].bank = bank;
     write_caches[write_caches_in_use].phys_segment = phys_segment;
     
     /* Loop over each page in the phys segment (from page 1 onwards).
        Read spare for 1st sector, store location of page in array. */
-    for (page = 1; page < pages_per_block * 4; page++)
+    for (page = 1; page < pages_per_block * BLOCKS_PER_SEGMENT; page++)
     {
         unsigned short cached_page;
         unsigned short log_segment;
         
-        nand_read_raw(chip, phys_segment_to_page_addr(phys_segment, page),
+        nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, page),
                       SECTOR_SIZE, /* offset to first sector's spare */
                       16, spare_buf);
 
@@ -630,70 +650,6 @@ static void read_write_cache_segment(int chip, int phys_segment)
     write_caches_in_use++;
 }
 
-
-/* TEMP testing functions */
-
-#ifdef BOOTLOADER
-
-#if 0
-static void display_page(int chip, int page)
-{
-    int i;
-    nand_read_raw(chip, page, 0, page_size+spare_size, page_buf);
-
-    for (i = 0; i < (page_size+spare_size)/4; i += 132)
-    {
-        int j,interesting = 0;
-        line = 1;
-        printf("c:%d p:%lx s:%d", chip, page, i/128);
-
-        for (j=i; j<(i+131); j++)
-        {
-            if (page_buf[j] != 0xffffffff) interesting = 1;
-        }
-
-        if (interesting)
-        {
-            for (j=i; j<(i+131); j+=8)
-            {
-                printf("%lx %lx %lx %lx %lx %lx %lx %lx",
-                       page_buf[j],page_buf[j+1],page_buf[j+2],page_buf[j+3],
-                       page_buf[j+4],page_buf[j+5],page_buf[j+6],page_buf[j+7]);
-            }
-            while (!button_read_device()) {};
-            while (button_read_device()) {};
-            reset_screen();
-        }
-    }
-}
-#endif
-
-static void nand_test(void)
-{
-    int segment = 0;
-
-    printf("%d banks", total_banks);
-    printf("* %d pages", pages_per_bank);
-    printf("* %d bytes per page", page_size);
-
-    while (lpt_lookup[segment].chip != -1
-           && segment < segments_per_bank * total_banks)
-    {
-        segment++;
-    }
-    printf("%d sequential segments found (%dMb)",
-           segment, (unsigned)(segment*bytes_per_segment)>>20);
-}
-#endif
-
-
-/* API Functions */
-#if 0 /* currently unused */
-static void ata_led(bool onoff)
-{
-    led(onoff);
-}
-#endif
 
 int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
                      void* inbuf)
@@ -730,7 +686,7 @@ int ata_read_sectors(IF_MV2(int drive,) unsigned long start, int incount,
         }
         start += done;
     }
-    
+
     mutex_unlock(&ata_mtx);
     return 0;
 }
@@ -796,15 +752,14 @@ int ata_init(void)
     unsigned char spare_buf[16];
 
     if (initialized) return 0;
-    
+
     /* Get chip characteristics and number of banks */
     nand_get_chip_info();
     
     for (i = 0; i < MAX_SEGMENTS; i++)
     {
-        lpt_lookup[i].chip = -1;
+        lpt_lookup[i].bank = -1;
         lpt_lookup[i].phys_segment = -1;
-        //lpt_lookup[i].segment_flag = -1;
     }
     
     write_caches_in_use = 0;
@@ -814,7 +769,7 @@ int ata_init(void)
         int page;
         
         write_caches[i].log_segment = -1;
-        write_caches[i].chip = -1;
+        write_caches[i].bank = -1;
         write_caches[i].phys_segment = -1;
         
         for (page = 0; page < MAX_PAGES_PER_BLOCK * 4; page++)
@@ -835,32 +790,27 @@ int ata_init(void)
 
             switch (spare_buf[4]) /* block type */
             {
+#ifdef USE_TCC_LPT
                 case 0x12:
                 {
                     /* Log->Phys Translation table (for Main data area) */
-                    //read_lpt_block(bank, phys_segment);
+                    read_lpt_block(bank, phys_segment);
                     break;
                 }
-                
-                case 0x13:
+#else
                 case 0x17:
                 {
                     /* Main data area segment */
-                    int segment = (spare_buf[6] << 8) | spare_buf[7];
-                    
+                    unsigned short segment = (spare_buf[6] << 8) | spare_buf[7];
+
                     if (segment < MAX_SEGMENTS)
                     {
-                        /* Store in LPT if not present or 0x17 overrides 0x13 */
-                        //if (lpt_lookup[segment].segment_flag == -1 ||
-                        //    lpt_lookup[segment].segment_flag == 0x13)
-                        {
-                            lpt_lookup[segment].chip = bank;
-                            lpt_lookup[segment].phys_segment = phys_segment;
-                            //lpt_lookup[segment].segment_flag = spare_buf[4];
-                        }
+                        lpt_lookup[segment].bank = bank;
+                        lpt_lookup[segment].phys_segment = phys_segment;
                     }
                     break;
                 }
+#endif
 
                 case 0x15:
                 {
@@ -872,12 +822,38 @@ int ata_init(void)
         }
     }
 
-    initialized = true;
-    
-#ifdef BOOTLOADER
-    /* TEMP - print out some diagnostics */
-    nand_test();
+#ifndef USE_TCC_LPT
+    /* Scan banks a second time as 0x13 segments appear to override 0x17 */
+    for (bank = 0; bank < total_banks; bank++)
+    {
+        for (phys_segment = 0; phys_segment < segments_per_bank; phys_segment++)
+        {
+            /* Read spare bytes from first sector of each segment */
+            nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, 0),
+                          SECTOR_SIZE, /* offset */
+                          16, spare_buf);
+
+            switch (spare_buf[4]) /* block type */
+            {
+                case 0x13:
+                {
+                    /* Main data area segment */
+                    unsigned short segment = (spare_buf[6] << 8) | spare_buf[7];
+
+                    if (segment < MAX_SEGMENTS)
+                    {
+                        /* 0x17 seems to override 0x13, so store in our LPT */
+                        lpt_lookup[segment].bank = bank;
+                        lpt_lookup[segment].phys_segment = phys_segment;
+                    }
+                    break;
+                }
+            }
+        }
+    }
 #endif
+    
+    initialized = true;
 
     return 0;
 }
