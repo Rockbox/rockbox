@@ -113,6 +113,9 @@
 
 #define HAVE_LCD_FLIP
 
+/* LCD invert - does not currently work */
+/* #define HAVE_LCD_INVERT */
+
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU S3C2440
 

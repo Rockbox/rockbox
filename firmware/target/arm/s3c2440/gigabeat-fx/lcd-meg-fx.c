@@ -66,7 +66,7 @@ inline void delay_cycles(volatile int delay)
     while(delay>0) delay--;
 }
 
-void LCD_CTRL_setup(void)
+static void LCD_CTRL_setup(void)
 {
     /* ENVID = 0, BPPMODE = 16 bpp, PNRMODE = TFT, MMODE = Each Frame, CLKVAL = 8 */
     LCDCON1 = 0x878;
@@ -88,7 +88,7 @@ void LCD_CTRL_setup(void)
     LCDSADDR3 = 0x000000F0;
 }
 
-void LCD_CTRL_clock(bool onoff)
+static void LCD_CTRL_clock(bool onoff)
 {
     if(onoff)
     {
@@ -117,7 +117,7 @@ void LCD_CTRL_clock(bool onoff)
     }
 }
 
-void reset_LCD(bool reset)
+static void reset_LCD(bool reset)
 {
     GPBCON&=~0xC000;
     GPBCON|=0x4000;
@@ -127,7 +127,7 @@ void reset_LCD(bool reset)
         GPBDAT&=~0x80;
 }
 
-void LCD_SPI_send(const unsigned char *array, int count)
+static void LCD_SPI_send(const unsigned char *array, int count)
 {
     while (count--)       
     {
@@ -145,7 +145,7 @@ void LCD_SPI_setreg(unsigned char reg, unsigned char value)
     LCD_SPI_send(regval, sizeof(regval));
 }
 
-void LCD_SPI_SS(bool select)
+static void LCD_SPI_SS(bool select)
 {
     delay_cycles(0x4FFF);
 
@@ -177,7 +177,7 @@ void LCD_SPI_stop(void)
     s3c_regclr(&CLKCON, 0x40000);    /* disable SPI clock */  
 }
 
-void LCD_SPI_powerdown(void)
+static void LCD_SPI_powerdown(void)
 {
     lcd_powered = false;
 
@@ -189,7 +189,7 @@ void LCD_SPI_powerdown(void)
     LCD_CTRL_clock(false);
 } 
 
-void LCD_SPI_powerup(void)
+static void LCD_SPI_powerup(void)
 {
     LCD_CTRL_clock(true);
 
@@ -200,13 +200,12 @@ void LCD_SPI_powerup(void)
     lcd_powered = true;
 }
 
-void LCD_SPI_init(void)
+static void LCD_SPI_init(void)
 {
-    /* SPI data - Right now we are not sure what each of these SPI writes is 
-     *  actually telling the lcd.  Many thanks to Alex Gerchanovsky for 
-     *  discovering them.
-     *
-     * Addr 0x04 is used more than once is an enable.
+    /*
+     * SPI setup - Some of these registers are known; they are documented in
+     *  the wiki.  Many thanks to Alex Gerchanovsky for discovering this
+     *  sequence.
      */
 
     LCD_CTRL_clock(true);
@@ -299,13 +298,6 @@ void lcd_set_flip(bool yesno) {
     if (!lcd_on)
         return;
 
-    /* Register 0x06 sets the screen orientation:
-     *
-     *  Known Values:
-     *      0x04: Right side up portrait
-     *      0x02: Upside down protrait
-     */
-
     LCD_SPI_start();
     if(yesno)
     {
@@ -314,6 +306,22 @@ void lcd_set_flip(bool yesno) {
     else 
     {
         LCD_SPI_setreg(0x06, 0x04);
+    }
+    LCD_SPI_stop();
+}
+
+void lcd_set_invert_display(bool yesno) {
+    if (!lcd_on)
+        return;
+
+    LCD_SPI_start();
+    if(yesno)
+    {
+        LCD_SPI_setreg(0x27, 0x10);
+    }
+    else 
+    {
+        LCD_SPI_setreg(0x27, 0x00);
     }
     LCD_SPI_stop();
 }
@@ -492,11 +500,6 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
 void lcd_set_contrast(int val) {
   (void) val;
-  // TODO:
-}
-
-void lcd_set_invert_display(bool yesno) {
-  (void) yesno;
   // TODO:
 }
 
