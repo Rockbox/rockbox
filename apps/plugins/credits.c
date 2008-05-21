@@ -27,23 +27,6 @@ static const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
 };
 
-static bool stop_autoscroll(int action)
-{
-    switch (action)
-    {
-        case ACTION_STD_CANCEL:
-        case ACTION_STD_OK:
-        case ACTION_STD_NEXT:
-        case ACTION_STD_NEXTREPEAT:
-        case ACTION_STD_PREV:
-        case ACTION_STD_PREVREPEAT:
-            return true;
-        default:
-            return false;
-    }
-    return false;
-}
-    
 #ifdef HAVE_LCD_CHARCELLS
 
 static void roll_credits(void)
@@ -106,6 +89,23 @@ static void roll_credits(void)
 }
 
 #else
+
+static bool stop_autoscroll(int action)
+{
+    switch (action)
+    {
+        case ACTION_STD_CANCEL:
+        case ACTION_STD_OK:
+        case ACTION_STD_NEXT:
+        case ACTION_STD_NEXTREPEAT:
+        case ACTION_STD_PREV:
+        case ACTION_STD_PREVREPEAT:
+            return true;
+        default:
+            return false;
+    }
+    return false;
+}
 
 static int update_rowpos(int action, int cur_pos, int rows_per_screen, int tot_rows)
 {
