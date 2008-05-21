@@ -68,6 +68,7 @@ const struct filetype inbuilt_filetypes[] = {
     { "m4a", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "m4b", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mp4", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "mod", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "shn", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "aif", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "aiff",FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },

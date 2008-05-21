@@ -134,6 +134,7 @@ metadata/mp4.c
 metadata/mpc.c
 metadata/ogg.c
 metadata/sid.c
+metadata/mod.c
 metadata/spc.c
 metadata/vorbis.c
 metadata/wave.c

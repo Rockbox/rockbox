@@ -57,6 +57,7 @@ enum
     AFMT_SPC,          /* SPC700 save state */
     AFMT_APE,          /* Monkey's Audio (APE) */
     AFMT_WMA,          /* WMAV1/V2 in ASF */
+    AFMT_MOD,          /* Amiga MOD File Format */
 #endif
 
     /* add new formats at any index above this line to have a sensible order -
