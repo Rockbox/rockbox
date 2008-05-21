@@ -483,6 +483,7 @@ void Config::autodetect()
     // disable tree during detection as "working" feedback.
     // TODO: replace the tree view with a splash screen during this time.
     ui.treeDevices->setEnabled(false);
+    QCoreApplication::processEvents();
 
     if(detector.detect())  //let it detect
     {
