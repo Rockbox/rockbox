@@ -19,6 +19,6 @@
 #ifndef POWER_IMX31_H
 #define POWER_IMX31_H
 
-void set_charger_inserted(bool inserted);
+void charger_detect_event(void);
 
 #endif /* POWER_IMX31_H */

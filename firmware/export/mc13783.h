@@ -1270,6 +1270,9 @@ enum mc13783_regs_enum
     #define MC13783_TC3PERIODr(x)       (((x) & MC13783_TC3PERIOD) >> 21)
 #define MC13783_TC3TRIODE               (0x1 << 23)
 
+/* For event enum values which are target-defined */
+#include "mc13783-target.h"
+
 void mc13783_init(void);
 void mc13783_close(void);
 uint32_t mc13783_set(unsigned address, uint32_t bits);
@@ -1281,6 +1284,28 @@ int mc13783_write_regset(const unsigned char *regs, const uint32_t *data, int co
 uint32_t mc13783_read(unsigned address);
 int mc13783_read_multiple(unsigned start, uint32_t *buffer, int count);
 int mc13783_read_regset(const unsigned char *regs, uint32_t *buffer, int count);
-void mc13783_alarm_start(void);
+
+/* Statically-registered event enable/disable */
+enum mc13783_event_sets
+{
+    MC13783_EVENT_SET0 = 0,
+    MC13783_EVENT_SET1 = 1,
+};
+
+struct mc13783_event
+{
+    enum mc13783_event_sets set : 8;
+    uint32_t mask               : 24;
+    void (*callback)(void);
+};
+
+struct mc13783_event_list
+{
+    unsigned count;
+    const struct mc13783_event *events;
+};
+
+bool mc13783_enable_event(enum mc13783_event_ids event);
+void mc13783_disable_event(enum mc13783_event_ids event);
 
 #endif /* _MC13783_H_ */

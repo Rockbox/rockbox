@@ -7,7 +7,9 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Linus Nielsen Feltzing
+ * Copyright (c) 2008 by Michael Sevakis
+ *
+ * Gigabeat S mc13783 event descriptions
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,18 +18,19 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef USB_TARGET_H
-#define USB_TARGET_H
+#ifndef MC13783_TARGET_H
+#define MC13783_TARGET_H
 
-#ifdef BOOTLOADER
-#define USB_DRIVER_CLOSE
+/* Declare event indexes in priority order in a packed array */
+enum mc13783_event_ids
+{
+    MC13783_ADCDONE_EVENT = 0, /* ADC conversion complete */
+    MC13783_ONOFD1_EVENT,      /* Power button */
+#ifdef HAVE_HEADPHONE_DETECTION
+    MC13783_ONOFD2_EVENT,      /* Headphone jack */
 #endif
+    MC13783_CHGDET_EVENT,      /* Charger detection */
+    MC13783_USB4V4_EVENT,      /* USB insertion */
+};
 
-void usb_connect_event(void);
-bool usb_init_device(void);
-int usb_detect(void);
-/* Read the immediate state of the cable from the PMIC */
-bool usb_plugged(void);
-void usb_enable(bool on);
-
-#endif /* USB_TARGET */
+#endif /* MC13783_TARGET_H */

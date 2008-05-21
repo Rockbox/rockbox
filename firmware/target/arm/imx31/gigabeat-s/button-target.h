@@ -32,8 +32,8 @@ bool button_hold(void);
 void button_init_device(void);
 void button_close_device(void);
 int button_read_device(void);
-void button_power_set_state(bool pressed);
-void set_headphones_inserted(bool inserted);
+void button_power_event(void);
+void headphone_detect_event(void);
 bool headphones_inserted(void);
 
 /* Toshiba Gigabeat S-specific button codes */

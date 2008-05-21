@@ -73,29 +73,38 @@ static struct gpio_module_descriptor
 #endif
 };
 
-static void gpio_call_events(enum gpio_module_number gpio)
+static void gpio_call_events(const struct gpio_module_descriptor * const desc)
 {
-    const struct gpio_module_descriptor * const desc = &gpio_descs[gpio];
     const struct gpio_event_list * const list = desc->list;
     struct gpio_map * const base = desc->base;
-    unsigned i;
+    const struct gpio_event * event, *event_last;
 
     /* Intersect pending and unmasked bits */
-    uint32_t pending = base->isr & base->imr;
+    uint32_t pnd = base->isr & base->imr;
+
+    event = list->events;
+    event_last = event + list->count;
 
     /* Call each event handler in order */
-    for (i = 0; i < list->count; i++)
+    /* .count is surely expected to be > 0 */
+    do
     {
-        const struct gpio_event * const event = &list->events[i];
-        uint32_t bit = 1ul << event->line;
+        uint32_t mask = event->mask;
 
-        if ((pending & bit) && event->callback())
-            pending &= ~bit;
+        if (pnd & mask)
+        {
+            event->callback();
+            pnd &= ~mask;
+        }
+
+        if (pnd == 0)
+            break; /* Teminate early if nothing more to service */
     }
+    while (++event < event_last);
 
-    if (pending != 0)
+    if (pnd != 0)
     {
-        /* Wasn't handled */
+        /* One or more weren't handled */
         UIE_VECTOR();
     }
 }
@@ -103,21 +112,21 @@ static void gpio_call_events(enum gpio_module_number gpio)
 #if (GPIO_EVENT_MASK & USE_GPIO1_EVENTS)
 static __attribute__((interrupt("IRQ"))) void GPIO1_HANDLER(void)
 {
-    gpio_call_events(GPIO1_NUM);
+    gpio_call_events(&gpio_descs[GPIO1_NUM]);
 }
 #endif
 
 #if (GPIO_EVENT_MASK & USE_GPIO2_EVENTS)
 static __attribute__((interrupt("IRQ"))) void GPIO2_HANDLER(void)
 {
-    gpio_call_events(GPIO2_NUM);
+    gpio_call_events(&gpio_descs[GPIO2_NUM]);
 }
 #endif
 
 #if (GPIO_EVENT_MASK & USE_GPIO3_EVENTS)
 static __attribute__((interrupt("IRQ"))) void GPIO3_HANDLER(void)
 {
-    gpio_call_events(GPIO3_NUM);
+    gpio_call_events(&gpio_descs[GPIO3_NUM]);
 }
 #endif
 
@@ -140,18 +149,15 @@ void gpio_init(void)
 #endif
 }
 
-bool gpio_enable_event(enum gpio_module_number gpio, unsigned id)
+bool gpio_enable_event(enum gpio_event_ids id)
 {
-    const struct gpio_module_descriptor * const desc = &gpio_descs[gpio];
-    const struct gpio_event * const event = &desc->list->events[id];
+    const struct gpio_module_descriptor * const desc = &gpio_descs[id >> 5];
+    const struct gpio_event * const event = &desc->list->events[id & 31];
     struct gpio_map * const base = desc->base;
     volatile uint32_t *icr;
-    uint32_t mask;
+    uint32_t mask, line;
     uint32_t imr;
     int shift;
-
-    if (id >= desc->list->count)
-        return false;
 
     int oldlevel = disable_irq_save();
 
@@ -160,39 +166,37 @@ bool gpio_enable_event(enum gpio_module_number gpio, unsigned id)
     if (imr == 0)
     {
         /* First enabled interrupt for this GPIO */
-        avic_enable_int(desc->ints, IRQ, desc->list->priority,
+        avic_enable_int(desc->ints, IRQ, desc->list->ints_priority,
                         desc->handler);
     }
 
     /* Set the line sense */
-    icr = &base->icr[event->line >> 4];
-    shift = (event->line & 15) << 1;
+    line = find_first_set_bit(event->mask);
+    icr = &base->icr[line >> 4];
+    shift = (line & 15) << 1;
     mask = GPIO_SENSE_CONFIG_MASK << shift;
 
     *icr = (*icr & ~mask) | ((event->sense << shift) & mask);
 
     /* Unmask the line */
-    base->imr = imr | (1ul << event->line);
+    base->imr = imr | event->mask;
 
     restore_irq(oldlevel);
 
     return true;
 }
 
-void gpio_disable_event(enum gpio_module_number gpio, unsigned id)
+void gpio_disable_event(enum gpio_event_ids id)
 {
-    const struct gpio_module_descriptor * const desc = &gpio_descs[gpio];
-    const struct gpio_event * const event = &desc->list->events[id];
+    const struct gpio_module_descriptor * const desc = &gpio_descs[id >> 5];
+    const struct gpio_event * const event = &desc->list->events[id & 31];
     struct gpio_map * const base = desc->base;
     uint32_t imr;
-
-    if (id >= desc->list->count)
-        return;
 
     int oldlevel = disable_irq_save();
 
     /* Remove bit from mask */
-    imr = base->imr & ~(1ul << event->line);
+    imr = base->imr & ~event->mask;
 
     /* Mask the line */
     base->imr = imr;

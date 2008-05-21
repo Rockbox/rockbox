@@ -26,6 +26,7 @@
 #include "backlight-target.h"
 #include "avic-imx31.h"
 #include "clkctl-imx31.h"
+#include "mc13783.h"
 
 /* Most code in here is taken from the Linux BSP provided by Freescale
  * Copyright 2004-2006 Freescale Semiconductor, Inc. All Rights Reserved. */
@@ -119,6 +120,71 @@ static __attribute__((interrupt("IRQ"))) void KPP_HANDLER(void)
     int_btn = button;
 }
 
+bool button_hold(void)
+{
+    return _button_hold();
+}
+
+int button_read_device(void)
+{
+    /* Simple poll of GPIO status */
+    hold_button = _button_hold();
+
+#ifndef BOOTLOADER
+    /* Backlight hold handling */
+    if (hold_button != hold_button_old)
+    {
+        hold_button_old = hold_button;
+        backlight_hold_changed(hold_button);
+    }
+#endif
+
+    /* Enable the keypad interrupt to cause it to fire if a key is down.
+     * KPP_HANDLER will clear and disable it after the scan. If no key
+     * is depressed then this bit will already be set in waiting for the
+     * first key down event. */
+    KPP_KPSR |= KPP_KPSR_KDIE;
+
+    /* If hold, ignore any pressed button */
+    return hold_button ? BUTTON_NONE : int_btn;
+}
+
+/* This is called from the mc13783 interrupt thread */
+void button_power_event(void)
+{
+    bool pressed =
+        (mc13783_read(MC13783_INTERRUPT_SENSE1) & MC13783_ONOFD1S) == 0;
+
+    /* Prevent KPP_HANDLER from changing things */
+    int oldlevel = disable_irq_save();
+
+    if (pressed)
+    {
+        int_btn |= BUTTON_POWER;
+    }
+    else
+    {
+        int_btn &= ~BUTTON_POWER;
+    }
+
+    restore_irq(oldlevel);
+}
+
+#ifdef HAVE_HEADPHONE_DETECTION
+/* This is called from the mc13783 interrupt thread */
+void headphone_detect_event(void)
+{
+    /* FIXME: Not really the correct method */
+    headphones_detect =
+        (mc13783_read(MC13783_INTERRUPT_SENSE1) & MC13783_ONOFD2S) == 0;
+}
+
+bool headphones_inserted(void)
+{
+    return headphones_detect;
+}
+#endif /* HAVE_HEADPHONE_DETECTION */
+
 void button_init_device(void)
 {
 #ifdef BOOTLOADER
@@ -154,6 +220,14 @@ void button_init_device(void)
 
     /* KPP IRQ at priority 3 */
     avic_enable_int(KPP, IRQ, 3, KPP_HANDLER);
+
+    button_power_event();
+    mc13783_enable_event(MC13783_ONOFD1_EVENT);
+
+#ifdef HAVE_HEADPHONE_DETECTION
+    headphone_detect_event();
+    mc13783_enable_event(MC13783_ONOFD2_EVENT);
+#endif
 }
 
 #ifdef BUTTON_DRIVER_CLOSE
@@ -168,66 +242,3 @@ void button_close_device(void)
     restore_irq(oldlevel);
 }
 #endif /* BUTTON_DRIVER_CLOSE */
-
-bool button_hold(void)
-{
-    return _button_hold();
-}
-
-int button_read_device(void)
-{
-    /* Simple poll of GPIO status */
-    hold_button = _button_hold();
-
-#ifndef BOOTLOADER
-    /* Backlight hold handling */
-    if (hold_button != hold_button_old)
-    {
-        hold_button_old = hold_button;
-        backlight_hold_changed(hold_button);
-    }
-#endif
-
-    /* Enable the keypad interrupt to cause it to fire if a key is down.
-     * KPP_HANDLER will clear and disable it after the scan. If no key
-     * is depressed then this bit will already be set in waiting for the
-     * first key down event. */
-    KPP_KPSR |= KPP_KPSR_KDIE;
-
-    /* If hold, ignore any pressed button */
-    return hold_button ? BUTTON_NONE : int_btn;
-}
-
-/* This is called from the mc13783 interrupt thread */
-void button_power_set_state(bool pressed)
-{
-    /* Prevent KPP_HANDLER from changing things */
-    int oldlevel = disable_irq_save();
-
-    if (pressed)
-    {
-        int_btn |= BUTTON_POWER;
-    }
-    else
-    {
-        int_btn &= ~BUTTON_POWER;
-    }
-
-    restore_irq(oldlevel);
-}
-
-#ifdef HAVE_HEADPHONE_DETECTION
-/* This is called from the mc13783 interrupt thread */
-void set_headphones_inserted(bool inserted)
-{
-    headphones_detect = inserted;
-}
-
-/* This is called from the mc13783 interrupt thread */
-/* TODO: Just do a post to the button queue directly - implement the
- * appropriate variant in the driver. */
-bool headphones_inserted(void)
-{
-    return headphones_detect;
-}
-#endif /* HAVE_HEADPHONE_DETECTION */

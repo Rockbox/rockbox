@@ -21,11 +21,22 @@
 #ifndef GPIO_TARGET_H
 #define GPIO_TARGET_H
 
-#define GPIO_EVENT_MASK (USE_GPIO1_EVENTS)
-
+/* MC13783 GPIO pin info for this target */
 #define MC13783_GPIO_NUM    GPIO1_NUM   
 #define MC13783_GPIO_ISR    GPIO1_ISR
 #define MC13783_GPIO_LINE   31
-#define MC13783_EVENT_ID    0
+
+/* Declare event indexes in priority order in a packed array */
+enum gpio_event_ids
+{
+    /* GPIO1 event IDs */
+    MC13783_EVENT_ID = GPIO1_EVENT_FIRST,
+    /* GPIO2 event IDs */
+    /* none defined */
+    /* GPIO3 event IDs */
+    /* none defined */
+};
+
+void mc13783_event(void);
 
 #endif /* GPIO_TARGET_H */

@@ -97,6 +97,7 @@
 /* Define the bitmask of modules used */
 #define SPI_MODULE_MASK (USE_CSPI2_MODULE)
 #define I2C_MODULE_MASK (USE_I2C1_MODULE)
+#define GPIO_EVENT_MASK (USE_GPIO1_EVENTS)
 
 /* Define this if target has an additional number of threads specific to it */
 #define TARGET_EXTRA_THREADS 1

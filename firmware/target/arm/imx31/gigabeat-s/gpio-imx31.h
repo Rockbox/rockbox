@@ -19,12 +19,12 @@
 #ifndef GPIO_IMX31_H
 #define GPIO_IMX31_H
 
-#include "gpio-target.h"
-
+/* Static registration mechanism for imx31 GPIO interrupts */
 #define USE_GPIO1_EVENTS (1 << 0)
 #define USE_GPIO2_EVENTS (1 << 1)
 #define USE_GPIO3_EVENTS (1 << 2)
 
+/* Module indexes defined by which GPIO modules are used */
 enum gpio_module_number
 {
     __GPIO_NUM_START = -1,
@@ -40,6 +40,22 @@ enum gpio_module_number
     GPIO_NUM_GPIO,
 };
 
+/* Module corresponding to the event ID is identified by range */
+enum gpio_event_bases
+{
+#if (GPIO_EVENT_MASK & USE_GPIO1_EVENTS)
+    GPIO1_EVENT_FIRST = 32*GPIO1_NUM,
+#endif
+#if (GPIO_EVENT_MASK & USE_GPIO2_EVENTS)
+    GPIO2_EVENT_FIRST = 32*GPIO2_NUM,
+#endif
+#if (GPIO_EVENT_MASK & USE_GPIO3_EVENTS)
+    GPIO3_EVENT_FIRST = 32*GPIO3_NUM,
+#endif
+};
+
+#include "gpio-target.h"
+
 /* Possible values for gpio interrupt line config */
 enum gpio_int_sense_enum
 {
@@ -54,35 +70,43 @@ enum gpio_int_sense_enum
 /* Register map for each module */
 struct gpio_map
 {
-    volatile uint32_t dr;        /* 00h */
-    volatile uint32_t gdir;      /* 04h */
-    volatile uint32_t psr;       /* 08h */
-    volatile uint32_t icr[2];    /* 0Ch */
-    volatile uint32_t imr;       /* 14h */
-    volatile uint32_t isr;       /* 18h */
+    volatile uint32_t dr;           /* 00h */
+    volatile uint32_t gdir;         /* 04h */
+    volatile uint32_t psr;          /* 08h */
+    union
+    {
+        struct
+        {
+            volatile uint32_t icr1; /* 0Ch */
+            volatile uint32_t icr2; /* 10h */
+        };
+        volatile uint32_t icr[2];   /* 0Ch */
+    };
+    volatile uint32_t imr;          /* 14h */
+    volatile uint32_t isr;          /* 18h */
 };
 
-/* Pending events will be called in array order */
+/* Pending events will be called in array order which allows easy
+ * pioritization */
 
 /* Describes a single event for a pin */
 struct gpio_event
 {
-    int line;                       /* Line number (0-31) */
+    uint32_t mask;                  /* mask: 1 << (0...31) */
     enum gpio_int_sense_enum sense; /* Type of sense */
-    int (*callback)(void);          /* Callback function (return nonzero
-                                     * to indicate this event was handled) */
+    void (*callback)(void);         /* Callback function */
 };
 
 /* Describes the events attached to a port */
 struct gpio_event_list
 {
-    int priority;                    /* Interrupt priority for this GPIO */
-    unsigned count;                  /* Count of events */
+    int ints_priority;               /* Interrupt priority for this GPIO */
+    unsigned count;                  /* Count of events for the module */
     const struct gpio_event *events; /* List of events */
 };
 
 void gpio_init(void);
-bool gpio_enable_event(enum gpio_module_number gpio, unsigned id);
-void gpio_disable_event(enum gpio_module_number gpio, unsigned id);
+bool gpio_enable_event(enum gpio_event_ids id);
+void gpio_disable_event(enum gpio_event_ids id);
 
 #endif /* GPIO_IMX31_H */

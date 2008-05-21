@@ -77,11 +77,11 @@ unsigned short adc_read(int channel)
 
     mutex_unlock(&adc_mtx);
 
-    /* Channels 0-3/8-11 in ADD1, 0-4/12-15 in ADD2 */
+    /* Channels 0-3/8-11 in ADD1, 4-7/12-15 in ADD2 */
     return (channel & 4) ? MC13783_ADD2r(data) : MC13783_ADD1r(data);
 }
 
-/* Called when conversion is complete */
+/* Called by mc13783 interrupt thread when conversion is complete */
 void adc_done(void)
 {
     wakeup_signal(&adc_wake);
@@ -100,7 +100,8 @@ void adc_init(void)
                   MC13783_RTHEN | MC13783_CHRGICON);
     /* Enable ADC, set multi-channel mode */
     mc13783_write(MC13783_ADC1, MC13783_ADEN);
-    /* Enable the ADCDONE interrupt - notifications are dispatched by
-     * event handler. */
-    mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_ADCDONEM);
+
+    /* Enable ADCDONE event */
+    mc13783_write(MC13783_INTERRUPT_STATUS0, MC13783_ADCDONEI);
+    mc13783_enable_event(MC13783_ADCDONE_EVENT);
 }

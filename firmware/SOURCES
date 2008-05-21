@@ -679,12 +679,13 @@ target/arm/imx31/gigabeat-s/backlight-imx31.c
 target/arm/imx31/gigabeat-s/button-imx31.c
 target/arm/imx31/gigabeat-s/clkctl-imx31.c
 target/arm/imx31/gigabeat-s/dma_start.c
-target/arm/imx31/gigabeat-s/gpio-imx31.c
 target/arm/imx31/gigabeat-s/gpio-gigabeat-s.c
+target/arm/imx31/gigabeat-s/gpio-imx31.c
 target/arm/imx31/gigabeat-s/kernel-imx31.c
 target/arm/imx31/gigabeat-s/i2c-imx31.c
 target/arm/imx31/gigabeat-s/i2s-imx31.c
 target/arm/imx31/gigabeat-s/lcd-imx31.c
+target/arm/imx31/gigabeat-s/mc13783-gigabeat-s.c
 target/arm/imx31/gigabeat-s/mc13783-imx31.c
 target/arm/imx31/gigabeat-s/mmu-imx31.c
 target/arm/imx31/gigabeat-s/power-imx31.c

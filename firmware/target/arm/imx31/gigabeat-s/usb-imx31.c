@@ -48,9 +48,10 @@ static void enable_transceiver(bool enable)
     }
 }
 
-void usb_set_status(bool plugged)
+void usb_connect_event(void)
 {
-    usb_status = plugged ? USB_INSERTED : USB_EXTRACTED;
+    uint32_t status = mc13783_read(MC13783_INTERRUPT_SENSE0);    
+    usb_status = (status & MC13783_USB4V4S) ? USB_INSERTED : USB_EXTRACTED;
 }
 
 int usb_detect(void)
@@ -73,7 +74,11 @@ void usb_init_device(void)
     /* Module will be turned off later after firmware init */
     usb_drv_startup();
 
-    mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_USB4V4M);
+    /* Initially poll */
+    usb_connect_event();
+
+    /* Enable PMIC event */
+    mc13783_enable_event(MC13783_USB4V4_EVENT);
 }
 
 void usb_enable(bool on)

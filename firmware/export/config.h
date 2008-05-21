@@ -341,7 +341,14 @@
 #endif
 
 #if (CONFIG_CODEC == SWCODEC)
-#ifndef BOOTLOADER
+#ifdef BOOTLOADER
+
+#if CONFIG_CPU == IMX31L
+/* Priority in bootloader is wanted */
+#define HAVE_PRIORITY_SCHEDULING
+#endif
+
+#else /* !BOOTLOADER */
 
 #define HAVE_EXTENDED_MESSAGING_AND_NAME
 

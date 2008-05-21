@@ -22,18 +22,23 @@
 #include "system.h"
 #include "gpio-imx31.h"
 
-extern int mc13783_event(void);
+/* Gigabeat S definitions for static GPIO event registration */
 
-static const struct gpio_event gpio1_events =
+/* Describes single events for each GPIO1 pin */
+static const struct gpio_event gpio1_events[] =
 {
-    .line     = MC13783_GPIO_LINE,
-    .sense    = GPIO_SENSE_RISING,
-    .callback = mc13783_event,
+    [MC13783_EVENT_ID-GPIO1_EVENT_FIRST] =
+    {
+        .mask     = 1 << MC13783_GPIO_LINE,
+        .sense    = GPIO_SENSE_RISING,
+        .callback = mc13783_event,
+    }
 };
 
+/* Describes the events attached to GPIO1 port */
 const struct gpio_event_list gpio1_event_list =
 {
-    .priority = 7,
-    .count    = 1,
-    .events   = &gpio1_events,
+    .ints_priority = 7,
+    .count         = ARRAYLEN(gpio1_events),
+    .events        = gpio1_events,
 };

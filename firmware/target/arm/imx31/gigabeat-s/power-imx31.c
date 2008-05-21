@@ -28,14 +28,11 @@
 
 static bool charger_detect = false;
 
-void power_init(void)
-{
-}
-
 /* This is called from the mc13783 interrupt thread */
-void set_charger_inserted(bool inserted)
+void charger_detect_event(void)
 {
-    charger_detect = inserted;
+    charger_detect =
+        mc13783_read(MC13783_INTERRUPT_SENSE0) & MC13783_CHGDETS;
 }
 
 bool charger_inserted(void)
@@ -79,6 +76,15 @@ void power_off(void)
 
     disable_interrupt(IRQ_FIQ_STATUS);
     while (1);
+}
+
+void power_init(void)
+{
+    /* Poll initial state */
+    charger_detect_event();
+
+    /* Enable detect event */
+    mc13783_enable_event(MC13783_CHGDET_EVENT);
 }
 
 #else /* SIMULATOR */

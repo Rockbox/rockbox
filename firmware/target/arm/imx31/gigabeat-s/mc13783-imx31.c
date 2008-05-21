@@ -49,121 +49,86 @@ static struct spi_node mc13783_spi =
     0,                             /* SPI clock - no wait states */
 };
 
-static int mc13783_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)];
+extern const struct mc13783_event_list mc13783_event_list;
+
+static int mc13783_thread_stack[3*DEFAULT_STACK_SIZE/sizeof(int)];
 static const char *mc13783_thread_name = "pmic";
 static struct wakeup mc13783_wake;
+
+/* Tracking for which interrupts are enabled */
+static uint32_t pmic_int_enabled[2] =
+    { 0x00000000, 0x00000000 };
+
+static const unsigned char pmic_intm_regs[2] =
+    { MC13783_INTERRUPT_MASK0, MC13783_INTERRUPT_MASK1 };
+
+static const unsigned char pmic_ints_regs[2] =
+    { MC13783_INTERRUPT_STATUS0, MC13783_INTERRUPT_STATUS1 };
+
 #ifdef PMIC_DRIVER_CLOSE
 static bool pmic_close = false;
 static struct thread_entry *mc13783_thread_p = NULL;
 #endif
 
-/* The next two functions are rather target-specific but they'll just be left
- * here for the moment */
 static void mc13783_interrupt_thread(void)
 {
-    const unsigned char status_regs[2] =
-    {
-        MC13783_INTERRUPT_STATUS0,
-        MC13783_INTERRUPT_STATUS1,
-    };
     uint32_t pending[2];
-    uint32_t value;
 
-    mc13783_read_regset(status_regs, pending, 2);
-    mc13783_write_regset(status_regs, pending, 2);
+    /* Enable mc13783 GPIO event */
+    gpio_enable_event(MC13783_EVENT_ID);
 
-    gpio_enable_event(MC13783_GPIO_NUM, MC13783_EVENT_ID);
-
-    if (pending[1] & MC13783_TODAI) /* only needs to be polled on startup */
-        mc13783_alarm_start();
-
-    /* Check initial states for events with a sense bit */
-    value = mc13783_read(MC13783_INTERRUPT_SENSE0);
-    usb_set_status(value & MC13783_USB4V4S);
-    set_charger_inserted(value & MC13783_CHGDETS);
-
-    value = mc13783_read(MC13783_INTERRUPT_SENSE1);
-    button_power_set_state((value & MC13783_ONOFD1S) == 0);
-#ifdef HAVE_HEADPHONE_DETECTION
-    set_headphones_inserted((value & MC13783_ONOFD2S) == 0);
-#endif
-
-    pending[0] = pending[1] = 0xffffff;
-    mc13783_write_regset(status_regs, pending, 2);
-
-    /* Enable desired PMIC interrupts - some are unmasked in the drivers that
-     * handle a specific task */
-    mc13783_clear(MC13783_INTERRUPT_MASK0, MC13783_CHGDETM);
-    mc13783_clear(MC13783_INTERRUPT_MASK1, MC13783_ONOFD1M |
-                                           MC13783_ONOFD2M);
-    
     while (1)
     {
+        const struct mc13783_event *event, *event_last;
+
         wakeup_wait(&mc13783_wake, TIMEOUT_BLOCK);
 
 #ifdef PMIC_DRIVER_CLOSE
         if (pmic_close)
-        {
-            gpio_disable_event(MC13783_GPIO_NUM, MC13783_EVENT_ID);
-            return;
-        }
+            break;
 #endif
 
-        mc13783_read_regset(status_regs, pending, 2);
-        mc13783_write_regset(status_regs, pending, 2);
+        mc13783_read_regset(pmic_ints_regs, pending, 2);
 
-        if (pending[0])
+        /* Only clear interrupts being dispatched */
+        pending[0] &= pmic_int_enabled[0];
+        pending[1] &= pmic_int_enabled[1];
+
+        mc13783_write_regset(pmic_ints_regs, pending, 2);
+
+        event = mc13783_event_list.events;
+        event_last = event + mc13783_event_list.count;
+
+        /* .count is surely expected to be > 0 */
+        do
         {
-            /* Handle ...PENDING0 */
+            enum mc13783_event_sets set = event->set;
+            uint32_t pnd = pending[set];
+            uint32_t mask = event->mask;
 
-            /* Handle interrupts without a sense bit */
-            if (pending[0] & MC13783_ADCDONEI)
-                adc_done();
-
-            /* Handle interrupts that have a sense bit that needs to
-             * be checked */
-            if (pending[0] & (MC13783_CHGDETI | MC13783_USB4V4I))
+            if (pnd & mask)
             {
-                value = mc13783_read(MC13783_INTERRUPT_SENSE0);
-
-                if (pending[0] & MC13783_CHGDETI)
-                    set_charger_inserted(value & MC13783_CHGDETS);
-
-                if (pending[0] & MC13783_USB4V4I)
-                    usb_set_status(value & MC13783_USB4V4S);
+                event->callback();
+                pnd &= ~mask;
+                pending[set] = pnd;
             }
+
+            if ((pending[0] | pending[1]) == 0)
+                break; /* Teminate early if nothing more to service */
         }
-
-        if (pending[1])
-        {
-            /* Handle ...PENDING1 */
-
-            /* Handle interrupts without a sense bit */
-            /* ... */
-
-            /* Handle interrupts that have a sense bit that needs to
-             * be checked */
-            if (pending[1] & (MC13783_ONOFD1I | MC13783_ONOFD2I))
-            {
-                value = mc13783_read(MC13783_INTERRUPT_SENSE1);
-
-                if (pending[1] & MC13783_ONOFD1I)
-                    button_power_set_state((value & MC13783_ONOFD1S) == 0);
-#ifdef HAVE_HEADPHONE_DETECTION
-                if (pending[1] & MC13783_ONOFD2I)
-                    set_headphones_inserted((value & MC13783_ONOFD2S) == 0);
-#endif
-            }
-        }
+        while (++event < event_last);
     }
+
+#ifdef PMIC_DRIVER_CLOSE
+    gpio_disable_event(MC13783_EVENT_ID);
+#endif
 }
 
 /* GPIO interrupt handler for mc13783 */
-int mc13783_event(void)
+void mc13783_event(void)
 {
     MC13783_GPIO_ISR = (1ul << MC13783_GPIO_LINE);
     wakeup_signal(&mc13783_wake);
-    return 1; /* Yes, it's handled */
 }
 
 void mc13783_init(void)
@@ -174,8 +139,8 @@ void mc13783_init(void)
     /* Enable the PMIC SPI module */
     spi_enable_module(&mc13783_spi);
 
-    /* Mask any PMIC interrupts for now - poll initial status in thread
-     * and enable them there */
+    /* Mask any PMIC interrupts for now - modules will enable them as
+     * required */
     mc13783_write(MC13783_INTERRUPT_MASK0, 0xffffff);
     mc13783_write(MC13783_INTERRUPT_MASK1, 0xffffff);
 
@@ -203,7 +168,39 @@ void mc13783_close(void)
     wakeup_signal(&mc13783_wake);
     thread_wait(thread);
 }
-#endif
+#endif /* PMIC_DRIVER_CLOSE */
+
+bool mc13783_enable_event(enum mc13783_event_ids id)
+{
+    const struct mc13783_event * const event =
+        &mc13783_event_list.events[id];
+    int set = event->set;
+    uint32_t mask = event->mask;
+
+    spi_lock(&mc13783_spi);
+
+    pmic_int_enabled[set] |= mask;
+    mc13783_clear(pmic_intm_regs[set], mask);
+
+    spi_unlock(&mc13783_spi);
+
+    return true;
+}
+
+void mc13783_disable_event(enum mc13783_event_ids id)
+{
+    const struct mc13783_event * const event =
+        &mc13783_event_list.events[id];
+    int set = event->set;
+    uint32_t mask = event->mask;
+
+    spi_lock(&mc13783_spi);
+
+    pmic_int_enabled[set] &= ~mask;
+    mc13783_set(pmic_intm_regs[set], mask);
+
+    spi_unlock(&mc13783_spi);
+}
 
 uint32_t mc13783_set(unsigned address, uint32_t bits)
 {

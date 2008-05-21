@@ -67,11 +67,6 @@ enum rtc_registers_indexes
 /* was it an alarm that triggered power on ? */
 static bool alarm_start = false;
 
-void mc13783_alarm_start(void)
-{
-    alarm_start = true;
-}
-
 static const unsigned char rtc_registers[RTC_NUM_REGS] =
 {
     [RTC_REG_TIME]  = MC13783_RTC_TIME,
@@ -122,7 +117,12 @@ static int is_leap_year(int y)
 /** Public APIs **/
 void rtc_init(void)
 {
-    /* Nothing to do */
+    /* only needs to be polled on startup */
+    if (mc13783_read(MC13783_INTERRUPT_STATUS1) & MC13783_TODAI)
+    {
+        alarm_start = true;
+        mc13783_write(MC13783_INTERRUPT_STATUS1, MC13783_TODAI);
+    }
 }
 
 int rtc_read_datetime(unsigned char* buf)
@@ -264,7 +264,9 @@ bool rtc_enable_alarm(bool enable)
 bool rtc_check_alarm_started(bool release_alarm)
 {
     bool rc = alarm_start;
-    alarm_start &= ~release_alarm;
+
+    if (release_alarm)
+        alarm_start = false;
 
     return rc;
 }
