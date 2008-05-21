@@ -480,6 +480,9 @@ void Config::autodetect()
 {
     Autodetection detector(this);
     detector.setSettings(settings);
+    // disable tree during detection as "working" feedback.
+    // TODO: replace the tree view with a splash screen during this time.
+    ui.treeDevices->setEnabled(false);
 
     if(detector.detect())  //let it detect
     {
@@ -557,6 +560,7 @@ void Config::autodetect()
                    QMessageBox::Ok ,QMessageBox::Ok);
 
     }
+    ui.treeDevices->setEnabled(true);
 }
 
 void Config::cacheClear()
