@@ -34,8 +34,6 @@ class ProgressloggerInterface : public QObject
 
 public:
     ProgressloggerInterface(QObject* parent) : QObject(parent) {}
-    virtual void addItem(const QString &text)=0;  //adds a string to the list
-    virtual void addItem(const QString &text, int flag)=0;  //adds a string to the list, with icon
 
     virtual void setProgressValue(int value)=0;
     virtual void setProgressMax(int max)=0;
@@ -46,6 +44,9 @@ signals:
 
 
 public slots:
+    virtual void addItem(const QString &text)=0; //! add a string to the progress
+    virtual void addItem(const QString &text, int flag)=0; //! add a string to the list, with icon
+
     virtual void abort()=0;
     virtual void undoAbort()=0;
     virtual void close()=0;

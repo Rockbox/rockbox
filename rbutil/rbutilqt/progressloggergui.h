@@ -30,10 +30,6 @@ class ProgressLoggerGui :public ProgressloggerInterface
 public:
     ProgressLoggerGui(QWidget * parent);
 
-    virtual void addItem(const QString &text);  //adds a string to the list
-
-    virtual void addItem(const QString &text, int flag);  //adds a string to the list
-
     virtual void setProgressValue(int value);
     virtual void setProgressMax(int max);
     virtual int getProgressMax();
@@ -43,6 +39,9 @@ signals:
     virtual void closed();
 
 public slots:
+    virtual void addItem(const QString &text);  //! add a string to the progress list
+    virtual void addItem(const QString &text, int flag);  //! add a string to the list
+
     virtual void abort();
     virtual void undoAbort();
     virtual void close();
