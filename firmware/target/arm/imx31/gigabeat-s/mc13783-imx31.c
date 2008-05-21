@@ -51,7 +51,7 @@ static struct spi_node mc13783_spi =
 
 extern const struct mc13783_event_list mc13783_event_list;
 
-static int mc13783_thread_stack[3*DEFAULT_STACK_SIZE/sizeof(int)];
+static int mc13783_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)];
 static const char *mc13783_thread_name = "pmic";
 static struct wakeup mc13783_wake;
 
