@@ -1006,9 +1006,9 @@ enum mc13783_regs_enum
 
 /* ADC2 (45) */
 #define MC13783_ADD1                    (0x3ff << 2)
-    #define MC13783_ADD1r(x)            (((x) >> 2) & MC13783_ADD1)
+    #define MC13783_ADD1r(x)            (((x) & MC13783_ADD1) >> 2)
 #define MC13783_ADD2                    (0x3ff << 14)
-    #define MC13783_ADD2r(x)            (((x) >> 14) & MC13783_ADD2)
+    #define MC13783_ADD2r(x)            (((x) & MC13783_ADD2) >> 14)
 
 /* ADC3 (46) */
 #define MC13783_WHIGH                   (0x3f << 0)
