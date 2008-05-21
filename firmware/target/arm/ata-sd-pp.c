@@ -526,7 +526,7 @@ static int sd_select_bank(unsigned char bank)
 static void sd_card_mux(int card_no)
 {
 /* Set the current card mux */
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(PHILIPS_SA9200)
     if (card_no == 0)
     {
         GPO32_VAL |= 0x4;

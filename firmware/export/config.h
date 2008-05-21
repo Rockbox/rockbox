@@ -82,6 +82,7 @@
 #define CREATIVEZVM_PAD    24
 #define SANSA_M200_PAD     25
 #define CREATIVEZV_PAD     26
+#define PHILIPS_SA9200_PAD 27
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -120,6 +121,7 @@
 #define LCD_CREATIVEZVM 22 /* as used by Creative Zen Vision:M */
 #define LCD_TL0350A  23 /* as used by the iAudio M3 remote, treated as main LCD */
 #define LCD_COWOND2  24 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
+#define LCD_SA9200   25 /* as used by the Philips SA9200 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -258,6 +260,8 @@
 #include "config-creativezvm60gb.h"
 #elif defined(CREATIVE_ZV)
 #include "config-creativezv.h"
+#elif defined(PHILIPS_SA9200)
+#include "config-sa9200.h"
 #else
 /* no known platform */
 #endif

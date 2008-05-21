@@ -118,7 +118,7 @@ drivers/ata_flash.c
 drivers/ata.c
 #endif /* HAVE_MMC */
 drivers/fat.c
-#ifdef HAVE_HOTSWAP
+#if defined(HAVE_HOTSWAP) || defined(HAVE_ATA_SD)
 hotswap.c
 #endif
 #endif /* SIMULATOR */
@@ -466,6 +466,20 @@ target/arm/sandisk/audio-c200_e200.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
 #endif /* SANSA_C200 */
+
+#ifdef PHILIPS_SA9200
+#ifndef SIMULATOR
+target/arm/ata-sd-pp.c
+target/arm/philips/sa9200/lcd-sa9200.c
+target/arm/adc-as3514.c
+target/arm/philips/sa9200/backlight-sa9200.c
+target/arm/usb-fw-pp502x.c
+target/arm/philips/sa9200/button-sa9200.c
+target/arm/philips/sa9200/power-sa9200.c
+target/arm/philips/sa9200/powermgmt-sa9200.c
+target/arm/i2s-pp.c
+#endif /* SIMULATOR */
+#endif /* PHILIPS_SA9200 */
 
 #ifdef IAUDIO_X5
 #ifndef SIMULATOR

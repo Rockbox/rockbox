@@ -99,7 +99,7 @@
 #include "debug-target.h"
 #endif
 
-#if defined(SANSA_E200)
+#if defined(SANSA_E200) || defined(PHILIPS_SA9200)
 #include "i2c-pp.h"
 #include "as3514.h"
 #endif
@@ -1017,6 +1017,11 @@ static bool dbg_spdif(void)
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
       (CONFIG_KEYPAD == SANSA_C200_PAD)
 #   define DEBUG_CANCEL  BUTTON_LEFT
+
+/* This is temporary until the SA9200 touchpad works */
+#elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+#   define DEBUG_CANCEL  BUTTON_POWER
+
 #endif /* key definitions */
 
 /* Test code!!! */
@@ -1197,7 +1202,7 @@ bool dbg_ports(void)
         snprintf(buf, sizeof(buf), "REM:  %03x PAD: %03x",
                                  adc_read(ADC_REMOTE), adc_read(ADC_SCROLLPAD));
         lcd_puts(0, line++, buf);
-#elif defined(SANSA_E200)       
+#elif defined(SANSA_E200) || defined(PHILIPS_SA9200)
         snprintf(buf, sizeof(buf), "ADC_BVDD:     %4d", adc_read(ADC_BVDD));
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_RTCSUP:   %4d", adc_read(ADC_RTCSUP));
@@ -1220,12 +1225,14 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_I_MICSUP1:%4d", adc_read(ADC_I_MICSUP1));
         lcd_puts(0, line++, buf);
+#if !defined(PHILIPS_SA9200)
         snprintf(buf, sizeof(buf), "ADC_I_MICSUP2:%4d", adc_read(ADC_I_MICSUP2));
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_VBAT:     %4d", adc_read(ADC_VBAT));
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "CHARGER: %02X/%02X", i2c_readbyte(AS3514_I2C_ADDR, AS3514_CHARGER), i2c_readbyte(AS3514_I2C_ADDR, AS3514_IRQ_ENRD0));
         lcd_puts(0, line++, buf);
+#endif
 #endif
         lcd_update();
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
@@ -2136,7 +2143,7 @@ static bool dbg_save_roms(void)
 
     return false;
 }
-#elif defined(CPU_PP) && !(defined(SANSA_E200) || defined(SANSA_C200))
+#elif defined(CPU_PP) && !defined(HAVE_ATA_SD)
 static bool dbg_save_roms(void)
 {
     int fd;
@@ -2459,7 +2466,7 @@ struct the_menu_item {
 };
 static const struct the_menu_item menuitems[] = {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
-    (defined(CPU_PP) && !(defined(SANSA_E200) || defined(SANSA_C200)))
+    (defined(CPU_PP) && !defined(HAVE_ATA_SD))
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) \

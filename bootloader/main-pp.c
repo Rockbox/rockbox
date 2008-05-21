@@ -34,11 +34,11 @@
 #include "crc32-mi4.h"
 #include <string.h>
 #include "power.h"
-#if defined(SANSA_E200)
+#if defined(SANSA_E200) || defined(PHILIPS_SA9200)
 #include "i2c.h"
 #include "backlight-target.h"
 #endif
-#if defined(SANSA_E200) || defined(SANSA_C200)
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
 #include "usb.h"
 #include "usb_drv.h"
 #endif
@@ -59,6 +59,8 @@ extern int show_logo(void);
 #elif CONFIG_KEYPAD == MROBE100_PAD
 #define BOOTLOADER_BOOT_OF      BUTTON_POWER
 
+#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
+#define BOOTLOADER_BOOT_OF      BUTTON_VOL_UP
 #endif
 
 /* Maximum allowed firmware image size. 10MB is more than enough */
@@ -71,7 +73,7 @@ unsigned char *loadbuffer = (unsigned char *)DRAM_START;
 char version[] = APPSVERSION;
         
 /* Locations and sizes in hidden partition on Sansa */
-#if defined(SANSA_E200) || defined(SANSA_C200)
+#if defined(HAVE_ATA_SD)
 #define PPMI_SECTOR_OFFSET  1024
 #define PPMI_SECTORS        1
 #define MI4_HEADER_SECTORS  1
@@ -351,7 +353,7 @@ int load_mi4(unsigned char* buf, char* firmware, unsigned int buffer_size)
     return EOK;
 }
 
-#if defined(SANSA_E200) || defined(SANSA_C200)
+#if defined(HAVE_ATA_SD)
 /* Load mi4 firmware from a hidden disk partition */
 int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
                   unsigned int buffer_size, bool disable_rebuild)
@@ -432,7 +434,7 @@ void* main(void)
     int rc;
     int num_partitions;
     struct partinfo* pinfo;
-#if defined(SANSA_E200) || defined(SANSA_C200)
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
     int usb_retry = 0;
     bool usb = false;
 #else
@@ -451,12 +453,11 @@ void* main(void)
     show_logo();
 
     button_init();
-#if defined(SANSA_E200)
+#if defined(SANSA_E200) || defined(PHILIPS_SA9200)
     i2c_init();
     _backlight_on();
 #endif
 
-    
     if (button_hold())
     {
         verbose = true;
@@ -466,7 +467,7 @@ void* main(void)
         sleep(HZ);
         power_off();
     }
-        
+
     btn = button_read_device();
 
     /* Enable bootloader messages if any button is pressed */
@@ -475,7 +476,7 @@ void* main(void)
         verbose = true;
     }
 
-#if defined(SANSA_E200) || defined(SANSA_C200)
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
 #if !defined(USE_ROCKBOX_USB)
     usb_init();
     while (usb_drv_powered() && usb_retry < 5 && !usb)
@@ -496,7 +497,7 @@ void* main(void)
     printf(MODEL_NAME);
 
     i=ata_init();
-#if !defined(SANSA_E200) && !defined(SANSA_C200)
+#if !defined(HAVE_ATA_SD)
     if (i==0) {
         identify_info=ata_get_identify();
         /* Show model */
@@ -540,7 +541,7 @@ void* main(void)
         */
         printf("Loading original firmware...");
 
-#if defined(SANSA_E200) || defined(SANSA_C200)
+#if defined(HAVE_ATA_SD)
         /* First try a (hidden) firmware partition */
         printf("Trying firmware partition");
         pinfo = disk_partinfo(1);
@@ -617,7 +618,7 @@ void* main(void)
     return (void*)loadbuffer;
 }
 
-#if !defined(SANSA_E200) && !defined(SANSA_C200)
+#if !defined(SANSA_E200) && !defined(SANSA_C200) && !defined(PHILIPS_SA9200)
 /* These functions are present in the firmware library, but we reimplement
    them here because the originals do a lot more than we want */
 void usb_acknowledge(void)

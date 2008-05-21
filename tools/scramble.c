@@ -119,7 +119,8 @@ void usage(void)
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd, mn2g\n"
            "\t                   ip3g, ip4g, mini, iax5, iam5, iam3, h10, h10_5gb,\n"
-           "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2)\n");
+           "\t                   tpj2, c200, e200, giga, gigs, m100, m500, d2,\n");
+    printf("\t                   9200)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -271,6 +272,8 @@ int main (int argc, char** argv)
             modelnum = 24;
         else if(!strcmp(&argv[1][5], "iam3"))
             modelnum = 25;
+        else if(!strcmp(&argv[1][5], "9200")) /* Philips SA9200 */
+            modelnum = 26;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

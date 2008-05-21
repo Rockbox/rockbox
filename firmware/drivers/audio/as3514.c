@@ -37,9 +37,11 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_BALANCE]       = {"%",    0,   1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",     0,   1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",    0,   5,   0, 250, 100},
+#if defined(HAVE_RECORDING)
     [SOUND_MIC_GAIN]      = {"dB",   1,   1,   0,  39,  23},
     [SOUND_LEFT_GAIN]     = {"dB",   1,   1,   0,  31,  23},
     [SOUND_RIGHT_GAIN]    = {"dB",   1,   1,   0,  31,  23},
+#endif
 };
 
 /* Shadow registers */
@@ -112,11 +114,13 @@ int sound_val2phys(int setting, int value)
 
     switch(setting)
     {
+#if defined(HAVE_RECORDING)
     case SOUND_LEFT_GAIN:
     case SOUND_RIGHT_GAIN:
     case SOUND_MIC_GAIN:
         result = (value - 23) * 15;
         break;
+#endif
 
     default:
         result = value;
@@ -292,6 +296,7 @@ void audiohw_set_sample_rate(int sampling_control)
     (void)sampling_control;
 }
 
+#if defined(HAVE_RECORDING)
 void audiohw_enable_recording(bool source_mic)
 {
     if (source_mic) {
@@ -417,3 +422,4 @@ void audiohw_set_monitor(bool enable)
     /* Sync mixer volume */
     audiohw_set_master_vol(as3514.vol_l, as3514.vol_r);
 }
+#endif /* HAVE_RECORDING */

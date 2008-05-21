@@ -121,6 +121,11 @@ static bool usb_pin_detect(void)
     /* GPIO L bit 2 is usb detect */
     if (GPIOL_INPUT_VAL & 0x4)
         retval = true;
+
+#elif defined(PHILIPS_SA9200)
+    /* GPIO F bit 7 is usb detect */
+    if (!(GPIOF_INPUT_VAL & 0x80))
+        retval = true;
 #endif
 
     return retval;

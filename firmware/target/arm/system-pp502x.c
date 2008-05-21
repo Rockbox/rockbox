@@ -374,7 +374,7 @@ void system_init(void)
         /* to be done */
 #endif
 
-#if !defined(SANSA_E200) && !defined(SANSA_C200)
+#if !defined(SANSA_E200) && !defined(SANSA_C200) && !defined(PHILIPS_SA9200)
         /* Remap the flash ROM on CPU, keep hidden from COP:
          * 0x00000000-0x3fffffff = 0x20000000-0x23ffffff */
         MMAP1_LOGICAL  = 0x20003c00;
@@ -405,7 +405,7 @@ void system_init(void)
         GPIOK_INT_EN        = 0;
         GPIOL_INT_EN        = 0;
 
-#if defined(SANSA_E200) || defined(SANSA_C200)
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
         /* outl(0x00000000, 0x6000b000); */
         outl(inl(0x6000a000) | 0x80000000, 0x6000a000); /* Init DMA controller? */
 #endif 
@@ -433,7 +433,7 @@ void system_init(void)
 void system_reboot(void)
 {
     /* Reboot */
-#if defined(SANSA_E200) || defined(SANSA_C200)
+#if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
     CACHE_CTL &= ~CACHE_CTL_VECT_REMAP;
 
     /* Magic used by the c200 OF: 0x23066000

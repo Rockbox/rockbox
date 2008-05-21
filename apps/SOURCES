@@ -189,4 +189,6 @@ keymaps/keymap-cowond2.c
 keymaps/keymap-creativezvm.c
 #elif CONFIG_KEYPAD == CREATIVEZV_PAD
 keymaps/keymap-creativezv.c
+#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
+keymaps/keymap-sa9200.c
 #endif

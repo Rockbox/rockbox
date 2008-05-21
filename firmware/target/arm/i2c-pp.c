@@ -209,7 +209,7 @@ void i2c_init(void)
     outl(0x0, 0x600060a4);
     outl(0x80 | (0 << 8), 0x600060a4);
 #elif CONFIG_I2C == I2C_PP5024
-#ifdef SANSA_E200
+#if defined(SANSA_E200) || defined(PHILIPS_SA9200)
     /* Sansa OF sets this to 0x20 first, communicates with the AS3514
        then sets it to 0x23 - this still works fine though */
     outl(0x0, 0x600060a4);
