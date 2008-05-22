@@ -49,7 +49,7 @@
 enum {
     MPC_V_MEM = 2304,
     MPC_DECODER_MEMSIZE = 16384,  // overall buffer size (words)
-    MPC_SEEK_BUFFER_SIZE = 65536, // seek buffer size (words)
+    MPC_SEEK_BUFFER_SIZE = 8192, // seek buffer size (words)
 };
 
 typedef struct {
@@ -78,9 +78,6 @@ typedef struct mpc_decoder_t {
 
     mpc_uint32_t  DecodedFrames;
     mpc_uint32_t  OverallFrames;
-    mpc_uint32_t  MaxDecodedFrames;           // Maximum frames decoded (indicates usable seek table entries)
-    mpc_uint16_t  SeekTableIndex;
-    mpc_uint32_t  SeekTableCounter;
     mpc_int32_t   SampleRate;                 // Sample frequency
 
     mpc_uint32_t  StreamVersion;              // version of bitstream
@@ -110,8 +107,10 @@ typedef struct mpc_decoder_t {
     mpc_int8_t    SCFI_R [32];                // describes order of transmitted SCF
     mpc_bool_t    MS_Flag[32];                // MS used?
 
-    mpc_uint32_t* SeekTable;
-    mpc_uint8_t   SeekTable_Step;
+    mpc_uint32_t  SeekTableCounter;           // used to sum up skip info, if SeekTable_Step != 1
+    mpc_uint32_t  MaxDecodedFrames;           // Maximum frames decoded (indicates usable seek table entries)
+    mpc_uint32_t* SeekTable;                  // seek table itself
+    mpc_uint8_t   SeekTable_Step;             // frames per seek table index
 
 #ifdef MPC_FIXED_POINT
     mpc_uint8_t   SCF_shift[256];
