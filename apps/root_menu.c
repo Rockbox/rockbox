@@ -326,7 +326,7 @@ static const struct root_items items[] = {
 #ifdef HAVE_TAGCACHE
     [GO_TO_DBBROWSER] =     { browser, (void*)GO_TO_DBBROWSER, &tagcache_menu },
 #endif
-    [GO_TO_WPS] =           { wpsscrn, NULL, &playback_menu_item },
+    [GO_TO_WPS] =           { wpsscrn, NULL, &playback_settings },
     [GO_TO_MAINMENU] =      { menu, NULL, &manage_settings },
     
 #ifdef HAVE_RECORDING

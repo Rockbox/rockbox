@@ -490,7 +490,7 @@ MENUITEM_FUNCTION(browse_langs, 0, ID2P(LANG_LANGUAGE), language_browse,
 
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           Icon_General_settings_menu,
-          &playback_menu_item, &playlist_settings, &file_menu,
+          &playback_settings, &playlist_settings, &file_menu,
 #ifdef HAVE_TAGCACHE
           &tagcache_menu,
 #endif

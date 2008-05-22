@@ -1494,13 +1494,13 @@
   desc: in settings_menu()
   user:
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
-    *: "Playback"
+    *: "Playback Settings"
   </dest>
   <voice>
-    *: "Playback"
+    *: "Playback Settings"
   </voice>
 </phrase>
 <phrase>
@@ -11645,7 +11645,7 @@
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: WPS context menu
+  desc: playback settings menu
   user:
   <source>
     *: "Enable Study Mode"
@@ -11659,16 +11659,16 @@
 </phrase>
 <phrase>
   id: LANG_DISABLE_STUDY_MODE
-  desc: WPS context menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Disable Study Mode"
+    *: ""
   </dest>
   <voice>
-    *: "Disable Study Mode"
+    *: ""
   </voice>
 </phrase>
 <phrase>

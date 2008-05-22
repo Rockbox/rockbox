@@ -26,7 +26,7 @@
 extern const struct menu_item_ex 
         main_menu_,                 /* main_menu.c      */
         display_menu,               /* display_menu.c   */
-        playback_menu_item,         /* playback_menu.c  */
+        playback_settings,          /* playback_menu.c  */
 #ifdef HAVE_RECORDING
         recording_settings,         /* recording_menu.c */
 #endif

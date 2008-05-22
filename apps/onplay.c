@@ -55,9 +55,6 @@
 #include "icons.h"
 #endif
 #include "sound_menu.h"
-#if CONFIG_CODEC == SWCODEC
-#include "menus/eq_menu.h"
-#endif
 #include "playlist_menu.h"
 #include "playlist_catalog.h"
 #ifdef HAVE_TAGCACHE
@@ -1007,47 +1004,6 @@ MENUITEM_FUNCTION(browse_id3_item, 0, ID2P(LANG_MENU_SHOW_ID3_INFO),
 MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
                   pitch_screen, NULL, NULL, Icon_Audio);
 #endif
-#if CONFIG_CODEC == SWCODEC
-MENUITEM_FUNCTION(eq_menu_graphical_item, 0, ID2P(LANG_EQUALIZER_GRAPHICAL),
-                  eq_menu_graphical, NULL, NULL, Icon_Audio);
-MENUITEM_FUNCTION(eq_browse_presets_item, 0, ID2P(LANG_EQUALIZER_BROWSE),
-                  eq_browse_presets, NULL, NULL, Icon_Audio);
-#endif
-
-/* study mode setting toggling */
-
-static char* study_mode_toggle_get_name(int selected_item, void * data,
-                                        char *buffer)
-{
-    (void)selected_item;
-    (void)data;
-    snprintf(buffer, MAX_PATH,
-             global_settings.study_mode ? str(LANG_DISABLE_STUDY_MODE)
-             : str(LANG_ENABLE_STUDY_MODE));
-    return buffer;
-}
-
-static int study_mode_toggle_speak_item(int selected_item, void * data)
-{
-    (void)selected_item;
-    (void)data;
-    talk_id(global_settings.study_mode ? LANG_DISABLE_STUDY_MODE
-         : LANG_ENABLE_STUDY_MODE, false);
-    return 0;
-}
-
-static int toggle_study_mode(void * param)
-{
-    (void)param;
-    global_settings.study_mode ^= 1;
-    return 0;
-}
-
-MENUITEM_FUNCTION_DYNTEXT(study_mode_toggle, 0,
-                          toggle_study_mode, NULL,
-                          study_mode_toggle_get_name,
-                          study_mode_toggle_speak_item,
-                          NULL, NULL, Icon_NOICON);
 
 /* CONTEXT_[TREE|ID3DB] items */
 static int clipboard_callback(int action,const struct menu_item_ex *this_item);
@@ -1179,7 +1135,7 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
             
 MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE), 
            onplaymenu_callback, Icon_Audio,
-           &sound_settings, &wps_playlist_menu, &cat_playlist_menu,
+           &wps_playlist_menu, &cat_playlist_menu, &sound_settings, &playback_settings,
 #ifdef HAVE_TAGCACHE
            &rating_item, 
 #endif
@@ -1187,10 +1143,6 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #ifdef HAVE_PITCHSCREEN
            &pitch_screen_item,
 #endif
-#if CONFIG_CODEC == SWCODEC
-           &eq_menu_graphical_item, &eq_browse_presets_item,
-#endif
-           &study_mode_toggle,
          );
 /* used when onplay() is not called in the CONTEXT_WPS context */
 MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE), 
