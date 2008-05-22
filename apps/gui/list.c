@@ -274,7 +274,7 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
         }
         else
         {
-            int top_of_screen = gui_list->selected_item - SCROLL_LIMIT;
+            int top_of_screen = gui_list->selected_item - SCROLL_LIMIT + 1;
             int temp = MIN(top_of_screen, gui_list->nb_items - nb_lines);
             gui_list->start_item[screen] = MAX(0, temp);
         }
