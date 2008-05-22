@@ -1609,18 +1609,15 @@ mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample)
         // seek to the first frame
         mpc_decoder_seek_to(d, fpos);
 
-        // reset number of decoded frames
-        d->DecodedFrames = 0;
-
         // jump to the last frame via parsing, updating seek table
         d->SeekTable[0] = (mpc_uint32_t)fpos;
-        d->SeekTableCounter = d->SeekTable[0];
-        for (d->DecodedFrames = 1; d->DecodedFrames < lastFrame; d->DecodedFrames++)
+        d->SeekTableCounter = 0;
+        for (d->DecodedFrames = 0; d->DecodedFrames < lastFrame; d->DecodedFrames++)
         {
             d->SeekTableCounter += mpc_decoder_jump_frame(d);
-            if (0 == (d->DecodedFrames % d->SeekTable_Step)) 
+            if (0 == ((d->DecodedFrames+1) % d->SeekTable_Step)) 
             {
-                d->SeekTable[d->DecodedFrames/d->SeekTable_Step] = d->SeekTableCounter;
+                d->SeekTable[(d->DecodedFrames+1)/d->SeekTable_Step] = d->SeekTableCounter;
                 d->MaxDecodedFrames = d->DecodedFrames;
                 d->SeekTableCounter = 0;
             }
@@ -1702,6 +1699,15 @@ mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample)
         else if (FrameBitCnt != d->FwdJumpInfo ) 
             // Bug in perform_jump;
             return FALSE;
+            
+        // update seek table, if there new entries to fill
+        d->SeekTableCounter += d->FwdJumpInfo + 20;
+        if (0 == (d->DecodedFrames+1) % d->SeekTable_Step)
+        {
+            d->SeekTable[(d->DecodedFrames+1)/d->SeekTable_Step] = d->SeekTableCounter;
+            d->MaxDecodedFrames = d->DecodedFrames;
+            d->SeekTableCounter = 0;
+        }
 
         // update buffer
         mpc_decoder_update_buffer(d);
