@@ -1135,11 +1135,13 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
             
 MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE), 
            onplaymenu_callback, Icon_Audio,
-           &wps_playlist_menu, &cat_playlist_menu, &sound_settings, &playback_settings,
+           &wps_playlist_menu, &cat_playlist_menu,
+           &sound_settings, &playback_settings,
 #ifdef HAVE_TAGCACHE
            &rating_item, 
 #endif
-           &bookmark_menu, &browse_id3_item, &delete_file_item, &view_cue_item,
+           &bookmark_menu, &browse_id3_item, &list_viewers_item,
+           &delete_file_item, &view_cue_item,
 #ifdef HAVE_PITCHSCREEN
            &pitch_screen_item,
 #endif
