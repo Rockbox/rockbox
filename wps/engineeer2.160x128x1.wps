@@ -1,5 +1,5 @@
 %x|a|background.bmp|0|0|
-%xl|A|codec.bmp|9|70|21|
+%xl|A|codec.bmp|9|70|22|
 %xl|B|encoding.bmp|9|76|2|
 %xl|C|repeat.bmp|60|1|4|
 %xl|D|playmode.bmp|6|17|5|
@@ -26,7 +26,7 @@
 %ac%t3%?It<%It|%Fn>;%ac%t3%?Ia<%Ia|%D2>
 %?pv<%xdHa|%xdHb|%xdHc|%xdHd|%xdHe|%xdHf|%xdHg|%xdHh|%xdHi|%xdHj>
 %t0.2%?bp<%xdIa|%?bl<%xdIb|%xdIc|%xdId|%xdIe|%xdIf>>;%t0.2%?bp<%xdIa|%?bl<|%xdIc|%xdId|%xdIe|%xdIf>>;%t0.2%?bp<%xdIa|%?bl<%xdIb||%xdId|%xdIe|%xdIf>>;%t0.2%?bp<%xdIa|%?bl<||%xdId|%xdIe|%xdIf>>
-%?fc<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAf|%xdAg|%xdAh|%xdAi|%xdAj|%xdAk|%xdAl|%xdAm|%xdAn|%xdAo|%xdAp|%xdAq|%xdAr|%xdAs|%xdAt|%xdAu>
+%?fc<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAf|%xdAg|%xdAh|%xdAi|%xdAj|%xdAk|%xdAl|%xdAm|%xdAn|%xdAo|%xdAp|%xdAq|%xdAr|%xdAs|%xdAt|%xdAu|%xdAv>
 %?fv<%xdBa|%xdBb>
 %?mm<|%xdCa|%xdCb|%xdCc|%xdCd>
 %?mp<%xdDa|%xdDb|%xdDc|%xdDd|%xdDe>

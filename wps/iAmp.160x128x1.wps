@@ -13,8 +13,8 @@
 
 %pb
 %pc/%pt %ar%pp of %pe
-%xl|A|codec.bmp|68|87|21|
-%?fc<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAf|%xdAg|%xdAh|%xdAi|%xdAj|%xdAk|%xdAl|%xdAm|%xdAn|%xdAo|%xdAp|%xdAq|%xdAr|%xdAs|%xdAt|%xdAu>
+%xl|A|codec.bmp|68|87|22|
+%?fc<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAf|%xdAg|%xdAh|%xdAi|%xdAj|%xdAk|%xdAl|%xdAm|%xdAn|%xdAo|%xdAp|%xdAq|%xdAr|%xdAs|%xdAt|%xdAu|%xdAv>
 %xl|B|battery.bmp|1|1|6|
 %?bp<%xdBa|%?bl<%xdBb|%xdBc|%xdBd|%xdBe|%xdBf>>
 %xl|C|lock.bmp|114|1|3|

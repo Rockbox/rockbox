@@ -1,5 +1,5 @@
 %x|a|background_r.bmp|0|0|
-%xl|A|codec.bmp|8|46|21|
+%xl|A|codec.bmp|8|46|22|
 %xl|B|encoding.bmp|9|52|2|
 %xl|C|repeat.bmp|41|1|4|
 %xl|D|playmode_r.bmp|6|12|5|
@@ -14,7 +14,7 @@
 
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%d2>
-%ar%pc/%pt %?fc<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAf|%xdAg|%xdAh|%xdAi|%xdAj|%xdAk|%xdAl|%xdAm|%xdAn|%xdAo|%xdAp|%xdAq|%xdAr|%xdAs|%xdAt|%xdAu>
+%ar%pc/%pt %?fc<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAf|%xdAg|%xdAh|%xdAi|%xdAj|%xdAk|%xdAl|%xdAm|%xdAn|%xdAo|%xdAp|%xdAq|%xdAr|%xdAs|%xdAt|%xdAu|%xdAv>
         %fbk
 %?fv<%xdBa|%xdBb>
 %?pv<%xdHa|%xdHb|%xdHc|%xdHd|%xdHe|%xdHf|%xdHg|%xdHh|%xdHi|%xdHj>

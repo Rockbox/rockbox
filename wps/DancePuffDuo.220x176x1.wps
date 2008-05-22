@@ -9,7 +9,7 @@
 %xl|H|HoldM.bmp|45|0|
 %xl|I|HoldR.bmp|56|0|
 %xl|J|rating.bmp|64|90|11|
-%xl|K|codec.bmp|100|90|21|
+%xl|K|codec.bmp|100|90|22|
 %wd
 %al   %pv
 
@@ -27,4 +27,4 @@
 %?mh<%xdH|>%?mr<%xdI|>%?mp<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe>%?mm<|%xdBa|%xdBb|%xdBc|%xdBd>%?ps<%xdC|>
 %?bp<%xdD|%?bl<%xdEa|%xdEb|%xdEc|%xdEd|%xdEe>>
 %?rr<%xdJa|%xdJb|%xdJc|%xdJd|%xdJe|%xdJf|%xdJg|%xdJh|%xdJi|%xdJj|%xdJk>#escape line ending to not break drawing but break long line
-%?fc<%xdKa|%xdKb|%xdKc|%xdKd|%xdKe|%xdKf|%xdKg|%xdKh|%xdKi|%xdKj|%xdKk|%xdKl|%xdKm|%xdKn|%xdKo|%xdKp|%xdKq|%xdKr|%xdKs|%xdKt|%xdKu>
+%?fc<%xdKa|%xdKb|%xdKc|%xdKd|%xdKe|%xdKf|%xdKg|%xdKh|%xdKi|%xdKj|%xdKk|%xdKl|%xdKm|%xdKn|%xdKo|%xdKp|%xdKq|%xdKr|%xdKs|%xdKt|%xdKu|%xdKv>
