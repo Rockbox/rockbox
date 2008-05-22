@@ -21,7 +21,14 @@
 
 #ifndef WAVTRIM_H
 #define WAVTRIM_H
- 
-int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize);
- 
+
+#ifdef __cplusplus
+extern "C" {
 #endif
+int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+

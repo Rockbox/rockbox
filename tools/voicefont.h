@@ -27,7 +27,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
- 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output);
 
+#ifdef __cplusplus
+}
 #endif
+#endif
+

@@ -21,6 +21,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 unsigned int get_long_le(unsigned char *p);
 bool get_wave_metadata(FILE *fd, int *numchan, int *bps, int *sr, int *numsamples);
 bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
@@ -29,6 +33,8 @@ bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
 void put_ushort_le(unsigned short x, unsigned char *out);
 void put_uint_le(unsigned int x, unsigned char *out);
 
-
+#ifdef __cplusplus
+}
+#endif
 #endif
 

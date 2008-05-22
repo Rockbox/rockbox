@@ -24,11 +24,8 @@
 #include <QtCore>
 #include "rbsettings.h"
 
-extern "C" {
-    // Ipodpatcher
 #include "../ipodpatcher/ipodpatcher.h"
 #include "../sansapatcher/sansapatcher.h"
-};
 
 class Autodetection :public QObject
 {
@@ -36,9 +33,9 @@ class Autodetection :public QObject
 
 public:
     Autodetection(QObject* parent=0);
-    
+
     void setSettings(RbSettings* sett) {settings = sett;}
-        
+
     bool detect();
 
     QString getDevice() {return m_device;}

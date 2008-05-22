@@ -24,10 +24,7 @@
  
 #include "rbsettings.h"
 
-extern "C"
-{
-    #include "rbspeex.h"
-}
+#include "rbspeex.h"
 
 
 class EncBase : public QObject

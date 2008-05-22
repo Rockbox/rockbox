@@ -29,18 +29,15 @@
 #include "httpget.h"
 #include "rbsettings.h"
 
-extern "C"
-{
-    #include "wavtrim.h"
-    #include "voicefont.h"
-}
-    
+#include "wavtrim.h"
+#include "voicefont.h"
+
 class VoiceFileCreator :public QObject
 {
     Q_OBJECT
 public:
     VoiceFileCreator(QObject* parent=0);
-    
+
     //start creation
     bool createVoiceFile(ProgressloggerInterface* logger);
 

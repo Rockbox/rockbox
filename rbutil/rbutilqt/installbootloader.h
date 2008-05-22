@@ -30,11 +30,8 @@
 #include "httpget.h"
 #include "irivertools/irivertools.h"
 
-extern "C" {
-    // Ipodpatcher
-    #include "../ipodpatcher/ipodpatcher.h"
-    #include "../sansapatcher/sansapatcher.h"
-};
+#include "../ipodpatcher/ipodpatcher.h"
+#include "../sansapatcher/sansapatcher.h"
 
 bool initIpodpatcher();
 bool initSansapatcher();

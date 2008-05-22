@@ -20,6 +20,10 @@
 #ifndef _IPODPATCHER_H
 #define _IPODPATCHER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "ipodio.h"
 
 /* Size of buffer for disk I/O - 8MB is large enough for any version
@@ -51,4 +55,8 @@ int read_aupd(struct ipod_t* ipod, char* filename);
 int write_aupd(struct ipod_t* ipod, char* filename);
 off_t filesize(int fd);
 
+#ifdef __cplusplus
+}
 #endif
+#endif
+

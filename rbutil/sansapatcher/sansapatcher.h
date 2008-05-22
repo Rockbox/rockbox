@@ -20,6 +20,10 @@
 #ifndef _SANSAPATCHER_H
 #define _SANSAPATCHER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "sansaio.h"
 
 /* Size of buffer for disk I/O - 8MB is large enough for any version
@@ -40,4 +44,8 @@ int sansa_update_of(struct sansa_t* sansa,char* filename);
 int sansa_update_ppbl(struct sansa_t* sansa,char* filename);
 void sansa_list_images(struct sansa_t* sansa);
 
+#ifdef __cplusplus
+}
 #endif
+#endif
+
