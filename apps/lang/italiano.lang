@@ -642,13 +642,13 @@
   desc: in settings_menu()
   user:
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
-    *: "Riproduzione"
+    *: "Impostazioni Riproduzione"
   </dest>
   <voice>
-    *: "Riproduzione"
+    *: "Impostazioni Riproduzione"
   </voice>
 </phrase>
 <phrase>
@@ -4181,7 +4181,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200: "MENU = Revert"
+    ipod*,e200,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4192,7 +4192,7 @@
     *: none
     rtc: "OFF = Annulla"
     h100,h120,h300: "STOP = Annulla"
-    ipod*,e200,c200: "MENU = Annulla"
+    ipod*,e200,c200,sa9200: "MENU = Annulla"
     x5,m5: "RECORD = Annulla"
     h10,h10_5gb: "PREV = Annulla"
     gigabeatf: "A = Annulla"
@@ -4201,7 +4201,7 @@
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeat*,mrobe100: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9936,14 +9936,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Costruzione database... %d trovato (OFF per uscire)"
     h100,h120,h300: "Costruzione database... %d trovato (STOP per uscire)"
     ipod*: "Costruzione database... %d trovato (PREV per uscire)"
     x5,m5,gigabeat*,mrobe100: "Costruzione database... %d trovato (Sinistra per uscire)"
-    h10,h10_5gb,e200,c200: "Costruzione database... %d trovato (PREV per uscire)"
+    h10,h10_5gb,e200,c200,sa9200: "Costruzione database... %d trovato (PREV per uscire)"
   </dest>
   <voice>
     *: "Elementi trovati per il database"
@@ -9970,17 +9970,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Button Light Timeout"
+    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Tempo di spegnimento illuminazione rotella"
-    c200,gigabeatf,mrobe100: "Tempo di spegnimento illuminazione tasti"
+    c200,gigabeatf,mrobe100,sa9200: "Tempo di spegnimento illuminazione tasti"
   </dest>
   <voice>
     *: none
     e200: "Tempo di spegnimento illuminazione rotella"
-    c200,gigabeatf,mrobe100: "Tempo di spegnimento illuminazione tasti"
+    c200,gigabeatf,mrobe100,sa9200: "Tempo di spegnimento illuminazione tasti"
   </voice>
 </phrase>
 <phrase>
@@ -10515,13 +10515,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Sì"
     h100,h120,h300: "NAVI = Sì"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Sì"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Sì"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -10536,17 +10536,17 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Imposta"
     h100,h120,h300: "NAVI = Imposta"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: "SELECT = Imposta"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Imposta"
   </dest>
   <voice>
     *: none
-    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeat*,mrobe100: ""
+    rtc,h100,h120,h300,h10,h10_5gb,x5,m5,ipod*,e200,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -11594,7 +11594,7 @@
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: WPS context menu
+  desc: playback settings menu
   user:
   <source>
     *: "Enable Study Mode"
@@ -11608,16 +11608,16 @@
 </phrase>
 <phrase>
   id: LANG_DISABLE_STUDY_MODE
-  desc: WPS context menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Disabilita Modo Studio"
+    *: ""
   </dest>
   <voice>
-    *: "Disabilita Modo Studio"
+    *: ""
   </voice>
 </phrase>
 <phrase>
