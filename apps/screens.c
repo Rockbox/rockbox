@@ -238,7 +238,8 @@ static void charging_display_info(bool animate)
     if (!animate)
     {   /* draw the outline */
         /* middle part */
-        lcd_mono_bitmap(charging_logo, pox_x, pox_y + 8, sizeof(charging_logo), 8);
+        lcd_mono_bitmap(charging_logo, pox_x, pox_y + 8,
+                        sizeof(charging_logo), 8);
         lcd_set_drawmode(DRMODE_FG);
         /* upper line */
         charging_logo[0] = charging_logo[1] = 0x00;
@@ -246,7 +247,8 @@ static void charging_display_info(bool animate)
         lcd_mono_bitmap(charging_logo, pox_x, pox_y, sizeof(charging_logo), 8);
         /* lower line */
         memset(charging_logo+2, 0x01, 34);
-        lcd_mono_bitmap(charging_logo, pox_x, pox_y + 16, sizeof(charging_logo), 8);
+        lcd_mono_bitmap(charging_logo, pox_x, pox_y + 16,
+                        sizeof(charging_logo), 8);
         lcd_set_drawmode(DRMODE_SOLID);
     }
     else
@@ -262,7 +264,8 @@ static void charging_display_info(bool animate)
                 charging_logo[i] = 0x01 << bitpos;
             }
         }
-        lcd_mono_bitmap(charging_logo, pox_x, pox_y + 8, sizeof(charging_logo), 8);
+        lcd_mono_bitmap(charging_logo, pox_x, pox_y + 8,
+                        sizeof(charging_logo), 8);
         phase++;
     }
     lcd_update();
@@ -529,7 +532,8 @@ bool set_time_screen(const char* title, struct tm *tm)
             screens[s].getstringsize(SEPARATOR, &separator_width, NULL);
 
             /* weekday */
-            screens[s].getstringsize(str(LANG_WEEKDAY_SUNDAY + tm->tm_wday), &weekday_width, NULL);
+            screens[s].getstringsize(str(LANG_WEEKDAY_SUNDAY + tm->tm_wday),
+                                     &weekday_width, NULL);
             screens[s].getstringsize(" ", &separator_width, NULL);
 
             for(i=0, j=0; i < 6; i++)
@@ -552,8 +556,9 @@ bool set_time_screen(const char* title, struct tm *tm)
             screens[s].puts_scroll(0, 0, title);
 
             /* these are not selectable, so we draw them outside the loop */
-            screens[s].putsxy(0, cursor[3][INDEX_Y], 
-                              str(LANG_WEEKDAY_SUNDAY + tm->tm_wday)); /* name of the week day */
+            /* name of the week day */
+            screens[s].putsxy(0, cursor[3][INDEX_Y],
+                              str(LANG_WEEKDAY_SUNDAY + tm->tm_wday));
 
             /* draw the selected item with drawmode set to
                 DRMODE_SOLID|DRMODE_INVERSEVID, all other selectable
@@ -562,13 +567,13 @@ bool set_time_screen(const char* title, struct tm *tm)
             {
                 if (cursorpos == (int)i)
                     vp[s].drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
-    
+
                 screens[s].putsxy(cursor[i][INDEX_X], 
                                   cursor[i][INDEX_Y], ptr[i]);
 
                 vp[s].drawmode = DRMODE_SOLID;
 
-                screens[s].putsxy(cursor[i/4 +1][INDEX_X] - separator_width, 
+                screens[s].putsxy(cursor[i/4 +1][INDEX_X] - separator_width,
                                   cursor[0][INDEX_Y], SEPARATOR);
             }
 
@@ -781,8 +786,8 @@ static char * id3_get_info(int selected_item, void* data,
                 info=buffer;
                 break;
             case 11:/*LANG_ID3_PLAYLIST*/
-                snprintf(buffer, buffer_len, "%d/%d", playlist_get_display_index(),
-            playlist_amount());
+                snprintf(buffer, buffer_len, "%d/%d",
+                         playlist_get_display_index(), playlist_amount());
                 info=buffer;
                 break;
             case 12:/*LANG_ID3_BITRATE*/
@@ -921,4 +926,3 @@ bool view_runtime(void)
     }
     return false;
 }
-
