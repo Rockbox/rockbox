@@ -312,7 +312,7 @@ void BootloaderInstaller::gigabeatPrepare()
         QString url = m_bootloaderUrlBase + "/gigabeat/" + m_bootloadername;
 
         m_dp->addItem(tr("Downloading file %1.%2")
-            .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()),LOGINFO);
+                .arg(QFileInfo(url).baseName(), QFileInfo(url).completeSuffix()),LOGINFO);
 
         // temporary file needs to be opened to get the filename
         downloadFile.open();
@@ -325,11 +325,11 @@ void BootloaderInstaller::gigabeatPrepare()
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
         connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
-        
+
         getter->getFile(QUrl(url));
-   }
-   else                 //UnInstallation
-   {
+    }
+    else                 //UnInstallation
+    {
         QString firmware;
         firmware = resolvePathCase(m_mountpoint + "/GBSYSTEM/FWIMG/FWIMG01.DAT");
         QString firmwareOrig = resolvePathCase(firmware.append(".ORIG"));
@@ -339,7 +339,7 @@ void BootloaderInstaller::gigabeatPrepare()
         // check if original firmware exists
         if(!firmwareOrigFI.exists())
         {
-             m_dp->addItem(tr("Could not find the Original Firmware at: %1")
+            m_dp->addItem(tr("Could not find the Original Firmware at: %1")
                     .arg(firmwareOrig),LOGERROR);
             emit done(true);
             return;
@@ -351,7 +351,7 @@ void BootloaderInstaller::gigabeatPrepare()
         //remove modified firmware
         if(!firmwareFile.remove())
         {
-             m_dp->addItem(tr("Could not remove the Firmware at: %1")
+            m_dp->addItem(tr("Could not remove the Firmware at: %1")
                     .arg(firmware),LOGERROR);
             emit done(true);
             return;
@@ -360,7 +360,7 @@ void BootloaderInstaller::gigabeatPrepare()
         // rename original firmware back
         if(!firmwareOrigFile.rename(firmware))
         {
-             m_dp->addItem(tr("Could not copy the Firmware from: %1 to %2")
+            m_dp->addItem(tr("Could not copy the Firmware from: %1 to %2")
                     .arg(firmwareOrig,firmware),LOGERROR);
             emit done(true);
             return;
@@ -369,7 +369,7 @@ void BootloaderInstaller::gigabeatPrepare()
         removeInstallLog();
 
         emit done(false);  //success
-   }
+    }
 
 }
 
@@ -1330,9 +1330,22 @@ void BootloaderInstaller::iriverFinish()
     newHex.close();
 
     // iriver decode
-    if (iriver_decode(m_origfirmware, firmwareBinName, FALSE, STRIP_NONE,m_dp) == -1)
+    int result;
+    if ((result = iriver_decode(m_origfirmware, firmwareBinName, FALSE, STRIP_NONE)) < 0)
     {
-        m_dp->addItem(tr("Error in descramble"),LOGERROR);
+        QString error;
+        switch(result) {
+            case -1: error = tr("Can't open input file"); break;
+            case -2: error = tr("Can't open output file"); break;
+            case -3: error = tr("invalid file: header length wrong"); break;
+            case -4: error = tr("invalid file: unrecognized header"); break;
+            case -5: error = tr("invalid file: \"length\" field wrong"); break;
+            case -6: error = tr("invalid file: \"length2\" field wrong"); break;
+            case -7: error = tr("invalid file: internal checksum error"); break;
+            case -8: error = tr("invalid file: \"length3\" field wrong"); break;
+            default: error = tr("unknown"); break;
+        }
+        m_dp->addItem(tr("Error in descramble: %1").arg(error), LOGERROR);
         firmwareBin.remove();
         newBin.remove();
         newHex.remove();
@@ -1340,9 +1353,20 @@ void BootloaderInstaller::iriverFinish()
         return;
     }
     //  mkboot
-    if (!mkboot(firmwareBinName, newBinName, m_tempfilename, origin,m_dp))
+    if((result = mkboot(firmwareBinName, newBinName, m_tempfilename, origin)) < 0)
     {
-        m_dp->addItem(tr("Error in patching"),LOGERROR);
+        QString error;
+        switch(result) {
+            case -1: error = tr("could not open input file"); break;
+            case -2: error = tr("reading header failed"); break;
+            case -3: error = tr("reading firmware failed"); break;
+            case -4: error = tr("can't open bootloader file"); break;
+            case -5: error = tr("reading bootloader file failed"); break;
+            case -6: error = tr("can't open output file"); break;
+            case -7: error = tr("writing output file failed"); break;
+        }
+        m_dp->addItem(tr("Error in patching: %1").arg(error), LOGERROR);
+
         firmwareBin.remove();
         newBin.remove();
         newHex.remove();
@@ -1350,9 +1374,22 @@ void BootloaderInstaller::iriverFinish()
         return;
     }
     // iriver_encode
-    if (iriver_encode(newBinName, newHexName, FALSE,m_dp) == -1)
+    if((result = iriver_encode(newBinName, newHexName, FALSE)) < 0)
     {
-        m_dp->addItem(tr("Error in scramble"),LOGERROR);
+        QString error;
+        switch(result) {
+            case -1: error = tr("Can't open input file"); break;
+            case -2: error = tr("Can't open output file"); break;
+            case -3: error = tr("invalid file: header length wrong"); break;
+            case -4: error = tr("invalid file: unrecognized header"); break;
+            case -5: error = tr("invalid file: \"length\" field wrong"); break;
+            case -6: error = tr("invalid file: \"length2\" field wrong"); break;
+            case -7: error = tr("invalid file: internal checksum error"); break;
+            case -8: error = tr("invalid file: \"length3\" field wrong"); break;
+            default: error = tr("unknown"); break;
+        }
+        m_dp->addItem(tr("Error in scramble: %1").arg(error), LOGERROR);
+
         firmwareBin.remove();
         newBin.remove();
         newHex.remove();

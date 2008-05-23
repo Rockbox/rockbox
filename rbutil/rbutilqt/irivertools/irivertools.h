@@ -25,7 +25,6 @@
 #include <QtCore>
 
 #include "md5sum.h"
-#include "progressloggerinterface.h"
 
 #define ESTF_SIZE 32
 
@@ -37,18 +36,18 @@ struct sumpairs {
 
 enum striptype
 {
-  STRIP_NONE,
-  STRIP_HEADER_CHECKSUM,
-  STRIP_HEADER_CHECKSUM_ESTF
+    STRIP_NONE,
+    STRIP_HEADER_CHECKSUM,
+    STRIP_HEADER_CHECKSUM_ESTF
 };
 
 /* protos for iriver.c */
 
 int intable(char *md5, struct sumpairs *table, int len);
 
-bool mkboot(QString infile, QString outfile,QString bootloader,int origin,ProgressloggerInterface* dp);
+int mkboot(QString infile, QString outfile,QString bootloader,int origin);
 int iriver_decode(QString infile_name, QString outfile_name, unsigned int modify,
-                  enum striptype stripmode,ProgressloggerInterface* dp );
-int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify,ProgressloggerInterface* dp);
+                  enum striptype stripmode);
+int iriver_encode(QString infile_name, QString outfile_name, unsigned int modify);
 
 #endif // IRIVERTOOLS_H_INCLUDED
