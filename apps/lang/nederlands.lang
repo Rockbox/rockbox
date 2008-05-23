@@ -653,13 +653,13 @@
   desc: in settings_menu()
   user:
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
-    *: "Afspelen"
+    *: "Weergave instellingen"
   </dest>
   <voice>
-    *: "Afspelen"
+    *: "Weergave instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -4570,7 +4570,7 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200: "MENU = Revert"
+    ipod*,e200,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
@@ -4581,7 +4581,7 @@
     *: none
     rtc: "OFF = terugzetten"
     h100,h120,h300: "STOP = terugzetten"
-    ipod*,e200,c200: "MENU = terugzetten"
+    ipod*,e200,c200,sa9200: "MENU = terugzetten"
     x5,m5: "RECORD = terugzetten"
     h10,h10_5gb: "PREV = terugzetten"
     gigabeatf: "POWER = terugzetten"
@@ -9942,14 +9942,14 @@
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
+    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Aanmaken van database... %d gevonden (OFF = terug)"
     h100,h120,h300: "Aanmaken van database... %d gevonden (STOP = terug)"
     ipod*: "Aanmaken van database... %d gevonden (PREV = terug)"
     x5,m5,gigabeat*,mrobe100: "Aanmaken van database... %d gevonden (LINKS = terug)"
-    h10,h10_5gb,e200,c200: "Aanmaken van database... %d gevonden (PREV = terug)"
+    h10,h10_5gb,e200,c200,sa9200: "Aanmaken van database... %d gevonden (PREV = terug)"
   </dest>
   <voice>
     *: ""
@@ -10257,17 +10257,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Button Light Timeout"
+    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Wiel Licht Vertraging"
-    c200,gigabeatf,mrobe100: "Knoppen Licht Vertraging"
+    c200,gigabeatf,mrobe100,sa9200: "Knoppen Licht Vertraging"
   </dest>
   <voice>
     *: none
     e200: "Wiel Licht Vertraging"
-    c200,gigabeatf,mrobe100: "Knoppen Licht Vertraging"
+    c200,gigabeatf,mrobe100,sa9200: "Knoppen Licht Vertraging"
   </voice>
 </phrase>
 <phrase>
@@ -10507,13 +10507,13 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100: "SELECT = Ja"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Ja"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
@@ -10528,13 +10528,13 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Instellen"
     h100,h120,h300: "NAVI = Instellen"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100: "SELECT = Instellen"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Instellen"
   </dest>
   <voice>
     *: none
@@ -11571,7 +11571,7 @@
 </phrase>
 <phrase>
   id: LANG_ENABLE_STUDY_MODE
-  desc: WPS context menu
+  desc: playback settings menu
   user:
   <source>
     *: "Enable Study Mode"
@@ -11627,16 +11627,16 @@
 </phrase>
 <phrase>
   id: LANG_DISABLE_STUDY_MODE
-  desc: WPS context menu
+  desc: DEPRECATED
   user:
   <source>
-    *: "Disable Study Mode"
+    *: ""
   </source>
   <dest>
-    *: "Zet studeer mode af"
+    *: ""
   </dest>
   <voice>
-    *: "Zet studeer mode af"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11670,4 +11670,3 @@
     recording: "Stop opname en zet uit"
   </voice>
 </phrase>
-<phrase>
