@@ -33,6 +33,7 @@ public:
     virtual void setProgressValue(int value);
     virtual void setProgressMax(int max);
     virtual int getProgressMax();
+    virtual void setProgressVisible(bool);
 
 signals:
     virtual void aborted();
@@ -41,6 +42,7 @@ signals:
 public slots:
     virtual void addItem(const QString &text);  //! add a string to the progress list
     virtual void addItem(const QString &text, int flag);  //! add a string to the list
+    virtual void setProgress(int, int); //! set progress bar
 
     virtual void abort();
     virtual void undoAbort();

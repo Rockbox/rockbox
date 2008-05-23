@@ -59,6 +59,13 @@ void ProgressLoggerGui::addItem(const QString &text, int flag)
     dp.listProgress->scrollToItem(item);
 }
 
+void ProgressLoggerGui::setProgress(int value, int max)
+{
+    setProgressValue(value);
+    setProgressMax(max);
+}
+
+
 void ProgressLoggerGui::setProgressValue(int  value)
 {
     dp.progressBar->setValue(value);
@@ -73,6 +80,12 @@ int ProgressLoggerGui::getProgressMax()
 {
     return dp.progressBar->maximum();
 }
+
+void ProgressLoggerGui::setProgressVisible(bool b)
+{
+    dp.progressBar->setVisible(b);
+}
+
 
 void ProgressLoggerGui::abort()
 {
