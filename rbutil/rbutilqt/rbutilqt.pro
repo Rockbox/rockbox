@@ -193,4 +193,8 @@ static {
     message("using static plugin")
 }
 
+unix {
+    target.path = /usr/local/bin
+    INSTALLS += target
+}
 
