@@ -81,10 +81,10 @@ static const unsigned char lcdlinear[256] = {
 220, 221, 222, 223, 225, 226, 227, 228, 229, 230, 231, 232, 234, 235, 236, 237,
 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 249, 250, 251, 252
 };
-/* The actual LCD scanrate is twice as high, but we cannot transfer fast enough
- * for 150Hz. Even at 75Hz, greyscale display is very smooth. Average from
- * 2 iAudio remotes. */
-#define LCD_SCANRATE 75 /* Hz */
+/* The actual LCD scanrate is 3x as high, but 150 Hz or 75 Hz cause a too high
+ * CPU load (> 50 %). Even at 50Hz, greyscale display is rather smooth. Average
+ * from 2 iAudio remotes. */
+#define LCD_SCANRATE 50 /* Hz */
 
 #elif defined IAUDIO_M5         /* verified */
 /* Measurement of one iAudio M5L */

@@ -58,15 +58,15 @@
     swap    %d3                 /* Shift data to upper byte */
     lsl.l   #8, %d3
 
-    eor.l   %d7, %d0            /* precalculate opposite state of clock line */
+    move.l  %d0, %d1            /* precalculate opposite state of clock line */
+    eor.l   %d7, %d1
 
-    lsl.l   #1,%d3              /* Shift out MSB */
+    lsl.l   #1, %d3             /* Shift out MSB */
     bcc.s   1f
     eor.l   %d6, %d0            /* 1: Flip data bit */
+    eor.l   %d6, %d1
 1:
-    move.l  %d0, (%a0)          /* Output new state and set CLK = 0*/
-    move.l  %d0, %d1
-    eor.l   %d7, %d1
+    move.l  %d1, (%a0)          /* Output new state and set CLK = 0*/
     bra.w   .wr_bit7
 
 
@@ -98,62 +98,77 @@
     eor.l   %d1, %d3            /*   previous state, and 0's where it doesn't */
     swap    %d3                 /* Shift data to upper word */
 
-    eor.l   %d7, %d0            /* precalculate opposite state of clock line */
+    move.l  %d0, %d1            /* precalculate opposite state of clock line */
+    eor.l   %d7, %d1
 
-    lsl.l   #1,%d3              /* Shift out MSB */
+    lsl.l   #1, %d3             /* Shift out MSB */
     bcc.s   1f
     eor.l   %d6, %d0            /* 1: Flip data bit */
+    eor.l   %d6, %d1
 1:
-    move.l  %d0, (%a0)          /* Output new state and set CLK = 0*/
-    move.l  %d0, %d1
-    eor.l   %d7, %d1
-    nop
+    move.l  %d1, (%a0)          /* Output new state and set CLK = 0*/
 
 .macro bit_out
-    lsl.l   #1,%d3
+    move.l  %d0, (%a0)          /* Set CLK = 1 */
+    lsl.l   #1, %d3
     bcc.s   1f
     eor.l   %d6, %d0
+    eor.l   %d6, %d1
 1:
-    move.l  %d1, (%a0)          /* Set CLK = 1 (delayed) */
-    move.l  %d0, (%a0)
-    move.l  %d0, %d1
-    eor.l   %d7, %d1
+    move.l  %d1, (%a0)
 .endm
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
 
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+
+    nop
 .wr_bit7:
-    bit_out
     nop
     bit_out
     nop
-    bit_out
     nop
     bit_out
     nop
-    bit_out
     nop
     bit_out
     nop
+    nop
     bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
     nop
 
-    nop
-    move.l  %d1, (%a0)          /* Set CLK = 1 (delayed) */
+    move.l  %d0, (%a0)          /* Set CLK = 1 */
     move.w  %d2, %sr
     rts
 
@@ -195,6 +210,7 @@
     move.l  %d1, (%a0)          /* Output new state and set CLK = 0*/
     move.l  %d0, (%a0)          /* set CLK = 1 */
 .endm
+
     bit_out_fast
     bit_out_fast
     bit_out_fast

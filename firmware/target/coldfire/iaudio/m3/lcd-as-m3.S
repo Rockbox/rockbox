@@ -58,15 +58,15 @@
     swap    %d3                 /* Shift data to upper byte */
     lsl.l   #8, %d3
 
-    eor.l   %d7, %d0            /* precalculate opposite state of clock line */
+    move.l  %d0, %d1            /* precalculate opposite state of clock line */
+    eor.l   %d7, %d1
 
-    lsl.l   #1,%d3              /* Shift out MSB */
+    lsl.l   #1, %d3             /* Shift out MSB */
     bcc.s   1f
     eor.l   %d6, %d0            /* 1: Flip data bit */
+    eor.l   %d6, %d1
 1:
-    move.l  %d0, (%a0)          /* Output new state and set CLK = 0*/
-    move.l  %d0, %d1
-    eor.l   %d7, %d1
+    move.l  %d1, (%a0)          /* Output new state and set CLK = 0*/
     bra.w   .wr_bit7
 
 
@@ -98,62 +98,77 @@
     eor.l   %d1, %d3            /*   previous state, and 0's where it doesn't */
     swap    %d3                 /* Shift data to upper word */
 
-    eor.l   %d7, %d0            /* precalculate opposite state of clock line */
+    move.l  %d0, %d1            /* precalculate opposite state of clock line */
+    eor.l   %d7, %d1
 
-    lsl.l   #1,%d3              /* Shift out MSB */
+    lsl.l   #1, %d3             /* Shift out MSB */
     bcc.s   1f
     eor.l   %d6, %d0            /* 1: Flip data bit */
+    eor.l   %d6, %d1
 1:
-    move.l  %d0, (%a0)          /* Output new state and set CLK = 0*/
-    move.l  %d0, %d1
-    eor.l   %d7, %d1
-    nop
+    move.l  %d1, (%a0)          /* Output new state and set CLK = 0*/
 
 .macro bit_out
-    lsl.l   #1,%d3
+    move.l  %d0, (%a0)          /* Set CLK = 1 */
+    lsl.l   #1, %d3
     bcc.s   1f
     eor.l   %d6, %d0
+    eor.l   %d6, %d1
 1:
-    move.l  %d1, (%a0)          /* Set CLK = 1 (delayed) */
-    move.l  %d0, (%a0)
-    move.l  %d0, %d1
-    eor.l   %d7, %d1
+    move.l  %d1, (%a0)
 .endm
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
-    bit_out
-    nop
 
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+
+    nop
 .wr_bit7:
-    bit_out
     nop
     bit_out
     nop
-    bit_out
     nop
     bit_out
     nop
-    bit_out
     nop
     bit_out
     nop
+    nop
     bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
     nop
 
-    nop
-    move.l  %d1, (%a0)          /* Set CLK = 1 (delayed) */
+    move.l  %d0, (%a0)          /* Set CLK = 1 */
     move.w  %d2, %sr
     rts
 
@@ -195,6 +210,7 @@
     move.l  %d1, (%a0)          /* Output new state and set CLK = 0*/
     move.l  %d0, (%a0)          /* set CLK = 1 */
 .endm
+
     bit_out_fast
     bit_out_fast
     bit_out_fast
@@ -438,33 +454,41 @@ lcd_grey_data:
     eor.l   %d1, %d3            /*   previous state, and 0's where it doesn't */
     swap    %d3                 /* Shift data to upper word */
 
-    eor.l   %d7, %d0            /* precalculate opposite state of clock line */
+    move.l  %d0, %d1            /* precalculate opposite state of clock line */
+    eor.l   %d7, %d1
 
-    lsl.l   #1,%d3              /* Shift out MSB */
+    lsl.l   #1, %d3             /* Shift out MSB */
     bcc.s   1f
     eor.l   %d6, %d0            /* 1: Flip data bit */
+    eor.l   %d6, %d1
 1:
-    move.l  %d0, %d1
-    move.l  %d0, (%a0)          /* Output new state and set CLK = 0*/
-    eor.l   %d7, %d1
+    move.l  %d1, (%a0)          /* Output new state and set CLK = 0*/
 
     move.l  (%a3), %d4          /* fetch 4 pixel phases */
     bit_out
     bclr.l  #31, %d4            /* Z = !(p0 & 0x80); p0 &= ~0x80; */
     seq.b   %d5                 /* %d5 = ........................00000000 */
     lsl.l   #1, %d5             /* %d5 = .......................00000000. */
+    trapf
+    trapf
     bit_out
     bclr.l  #23, %d4            /* Z = !(p1 & 0x80); p1 &= ~0x80; */
     seq.b   %d5                 /* %d5 = .......................011111111 */
     lsl.l   #1, %d5             /* %d5 = ......................011111111. */
+    trapf
+    trapf
     bit_out
     bclr.l  #15, %d4            /* Z = !(p2 & 0x80); p2 &= ~0x80; */
     seq.b   %d5                 /* %d5 = ......................0122222222 */
     lsl.l   #1, %d5             /* %d5 = .....................0122222222. */
+    trapf
+    trapf
     bit_out
     bclr.l  #7, %d4             /* Z = !(p3 & 0x80); p3 &= ~0x80; */
     seq.b   %d5                 /* %d5 = .....................01233333333 */
     lsl.l   #1, %d5             /* %d5 = ....................01233333333. */
+    trapf
+    trapf
     bit_out
     add.l   (%a2)+, %d4         /* add 4 pixel values to the phases */
     bit_out
@@ -476,18 +500,26 @@ lcd_grey_data:
     bclr.l  #31, %d4            /* Z = !(p0 & 0x80); p0 &= ~0x80; */
     seq.b   %d5                 /* %d5 = ....................012344444444 */
     lsl.l   #1, %d5             /* %d5 = ...................012344444444. */
+    trapf
+    trapf
     bit_out
     bclr.l  #23, %d4            /* Z = !(p1 & 0x80); p1 &= ~0x80; */
     seq.b   %d5                 /* %d5 = ...................0123455555555 */
     lsl.l   #1, %d5             /* %d5 = ..................0123455555555. */
+    trapf
+    trapf
     bit_out
     bclr.l  #15, %d4            /* Z = !(p2 & 0x80); p2 &= ~0x80; */
     seq.b   %d5                 /* %d5 = ..................01234566666666 */
     lsl.l   #1, %d5             /* %d5 = .................01234566666666. */
+    trapf
+    trapf
     bit_out
     bclr.l  #7, %d4             /* Z = !(p3 & 0x80); p3 &= ~0x80; */
     seq.b   %d5                 /* %d5 = .................012345677777777 */
     lsr.l   #7, %d5             /* %d5 = ........................01234567 */
+    trapf
+    trapf
     bit_out
     add.l   (%a2)+, %d4         /* add 4 pixel values to the phases */
     bit_out
@@ -495,13 +527,14 @@ lcd_grey_data:
 
     bit_out
     nop
+    nop
     bit_out
     move.l  %d5, %d3
     lsl.l   #8, %d3
     or.l    %d5, %d3
-    
     nop
-    move.l  %d1, (%a0)          /* Set CLK = 1 (delayed) */
+
+    move.l  %d0, (%a0)          /* Set CLK = 1 */
     move.w  %d2, %sr
 
     cmp.l   %a3, %a4
