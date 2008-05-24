@@ -48,7 +48,7 @@
 #endif
 
 /* a table for the know file types */
-const struct filetype inbuilt_filetypes[] = {
+static const struct filetype inbuilt_filetypes[] = {
     { "mp3", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mp2", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mpa", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
@@ -130,7 +130,7 @@ static bool custom_icons_loaded = false;
 static int custom_colors[MAX_FILETYPES+1];
 #endif
 static int filetype_count = 0;
-static unsigned char heighest_attr = 0;
+static unsigned char highest_attr = 0;
 
 static char *filetypes_strdup(char* string)
 {
@@ -277,8 +277,8 @@ static void read_builtin_types(void)
         filetypes[filetype_count].extension = inbuilt_filetypes[i].extension;
         filetypes[filetype_count].plugin = NULL;
         filetypes[filetype_count].attr   = inbuilt_filetypes[i].tree_attr>>8;
-        if (filetypes[filetype_count].attr > heighest_attr)
-            heighest_attr = filetypes[filetype_count].attr;
+        if (filetypes[filetype_count].attr > highest_attr)
+            highest_attr = filetypes[filetype_count].attr;
         filetypes[filetype_count].icon   = inbuilt_filetypes[i].icon;
         filetype_count++;
     }
@@ -321,9 +321,9 @@ static void read_config(char* config_file)
         /* ok, store this plugin/extension, check icon after */
         filetypes[filetype_count].extension = filetypes_strdup(extension);
         filetypes[filetype_count].plugin = filetypes_strdup(plugin);
-        filetypes[filetype_count].attr = heighest_attr +1;
+        filetypes[filetype_count].attr = highest_attr +1;
         filetypes[filetype_count].icon = Icon_Questionmark;
-        heighest_attr++;
+        highest_attr++;
         /* get the icon */
         s = e+1;
         if (*s == '*')
@@ -419,7 +419,7 @@ bool  filetype_supported(int attr)
 /**** Open With Screen ****/
 struct cb_data {
     int *items;
-    char *current_file;
+    const char *current_file;
 };
 
 static enum themable_icons openwith_get_icon(int selected_item, void * data)
@@ -463,7 +463,7 @@ int filetype_list_viewers(const char* current_file)
     int i, count = 0;
     int items[MAX_FILETYPES];
     struct simplelist_info info;
-    struct cb_data data = { items, (char*)current_file };
+    struct cb_data data = { items, current_file };
     for (i=0; i<filetype_count && count < MAX_FILETYPES; i++)
     {
         if (filetypes[i].plugin)
