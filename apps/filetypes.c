@@ -471,8 +471,7 @@ int filetype_list_viewers(const char* current_file)
             int j;
             for (j=0;j<count;j++) /* check if the plugin is in the list yet */
             {
-                if (filetypes[i].plugin && 
-                    !strcmp(filetypes[i].plugin,filetypes[items[j]].plugin))
+                if (!strcmp(filetypes[i].plugin,filetypes[items[j]].plugin))
                     break;
             }
             if (j<count) 
