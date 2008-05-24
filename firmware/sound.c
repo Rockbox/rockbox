@@ -40,7 +40,9 @@
 */
 
 #if !defined(VOLUME_MIN) && !defined(VOLUME_MAX)
-#error define for VOLUME_MIN and VOLUME_MAX is missing!
+#warning define for VOLUME_MIN and VOLUME_MAX is missing
+#define VOLUME_MIN -700
+#define VOLUME_MAX  0
 #endif
 
 /* volume/balance/treble/bass interdependency main part */
