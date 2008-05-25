@@ -323,12 +323,19 @@ static int add_track_to_playlist(char* filename, void* context)
 
 /* Add "sel" file into specified "playlist".  How to insert depends on type
    of file */
-static int add_to_playlist(const char* playlist, const char* sel, int sel_attr)
+static int add_to_playlist(const char* playlist, bool new_playlist,
+                           const char* sel, int sel_attr)
 {
     int fd;
     int result = -1;
+    int flags = O_CREAT|O_WRONLY;
     
-    fd = open(playlist, O_CREAT|O_WRONLY|O_APPEND);
+    if (new_playlist)
+        flags |= O_TRUNC;
+    else
+        flags |= O_APPEND;
+    
+    fd = open(playlist, flags);
     if(fd < 0)
         return result;
 
@@ -452,7 +459,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
             return false;
     }
 
-    if (add_to_playlist(playlist, sel, sel_attr) == 0)
+    if (add_to_playlist(playlist, new_playlist, sel, sel_attr) == 0)
     {
         strncpy(most_recent_playlist, playlist+playlist_dir_length+1,
             sizeof(most_recent_playlist));
