@@ -37,7 +37,7 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_BALANCE]       = {"%",    0,   1,-100, 100,   0},
     [SOUND_CHANNELS]      = {"",     0,   1,   0,   5,   0},
     [SOUND_STEREO_WIDTH]  = {"%",    0,   5,   0, 250, 100},
-#if defined(HAVE_RECORDING)
+#ifdef HAVE_RECORDING
     [SOUND_MIC_GAIN]      = {"dB",   1,   1,   0,  39,  23},
     [SOUND_LEFT_GAIN]     = {"dB",   1,   1,   0,  31,  23},
     [SOUND_RIGHT_GAIN]    = {"dB",   1,   1,   0,  31,  23},

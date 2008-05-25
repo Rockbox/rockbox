@@ -47,7 +47,7 @@ const struct sound_settings_info audiohw_settings[] = {
     [SOUND_MDB_ENABLE]    = {"",   0,  1,   0,   1,   0},
     [SOUND_SUPERBASS]     = {"",   0,  1,   0,   1,   0},
 #endif
-#if CONFIG_CODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F && defined(HAVE_RECORDING)
     [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  15,   8},
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  15,   8},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,  15,   2},
