@@ -370,7 +370,7 @@ pegbox_pieces.8x8x1.bmp
 
 /* Rockblox */
 #if LCD_DEPTH == 16 /* colour versions*/
-#if   (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+#if   (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
 rockblox_background.320x240x16.bmp
 #elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
 rockblox_background.240x320x16.bmp
