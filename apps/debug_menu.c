@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "config.h"
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -1649,7 +1650,18 @@ static bool view_battery(void)
                 snprintf(buf, 30, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
                 lcd_puts(0, 3, buf);
-#endif
+#if defined TOSHIBA_GIGABEAT_S
+                y = battery_adc_charge_current();
+                x = y < 0 ? '-' : ' ';
+                y = abs(y);
+                snprintf(buf, 30, "I Charge:%c%d.%03d A", (char)x, y / 1000, y % 1000);
+                lcd_puts(0, 4, buf);
+
+                y = battery_adc_temp();
+                snprintf(buf, 30, "T Battery: %dC (%dF)", y, (9*y + 160) / 5);
+                lcd_puts(0, 5, buf);
+#endif /* defined TOSHIBA_GIGABEAT_S */
+#endif /* defined IPOD_NANO || defined IPOD_VIDEO */
 #endif /* CONFIG_CHARGING != CHARGING_CONTROL */
 #endif /* CONFIG_CHARGING */
                 break;

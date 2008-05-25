@@ -45,5 +45,7 @@
 #define ADC_READ_ERROR 0xFFFF
 
 void adc_done(void);
+int battery_adc_charge_current(void);
+unsigned int battery_adc_temp(void);
 
 #endif
