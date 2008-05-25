@@ -105,7 +105,7 @@ unsigned int battery_adc_temp(void)
      *
      * Steinhart-Hart thermistor equation (sans "C*ln^2(R)" term because it
      * has negligible effect):
-     * [A + B*ln(R) + D*ln^3(R)] - 273.15 = 1 / T[°K]
+     * [A + B*ln(R) + D*ln^3(R)] = 1 / T[°K]
      *
      * Coeffients that fit experimental data (one thermistor so far, one run):
      * A = 0.0013002631685462800
