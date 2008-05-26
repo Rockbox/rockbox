@@ -374,7 +374,7 @@ STATICIRAM bool loadmod(void *modfile) ICODE_ATTR;
 bool loadmod(void *modfile)
 {
     int i;
-    bool periodsconverted = false;
+    unsigned char *periodsconverted;
 
     /* We don't support PowerPacker 2.0 Files */
     if (memcmp((char*) modfile, "PP20", 4) == 0) return false;
@@ -401,26 +401,10 @@ bool loadmod(void *modfile)
         {modsong.noofchannels = 8; modsong.noofinstruments = 31;}
     else if (memcmp(fileformattag, "CD81", 4) == 0)
         {modsong.noofchannels = 8; modsong.noofinstruments = 31;}
-    else if (memcmp(fileformattag, "RS", 2) == 0)
-    {
-        /* This is a special internal in-memory fileformat
-         * where the periods have been already converted to offsets
-         * in our periodtable.
-         * It comes to use when rockbox reloads an already played
-         * module (e.g. on rewinding) */
-        modsong.noofchannels = fileformattag[2];
-        modsong.noofinstruments = fileformattag[3];
-        periodsconverted = true;
-    }
     else {
-        /* The file has no format tag, so we take a guess */
+        /* The file has no format tag, so most likely soundtracker */
         modsong.noofchannels = 4;
-
-        /* For the no of instruments we check if there is a sample #16 and
-         * if it has a (ascii) name */
-        char *p = (char *)modfile + 470;
-        if ((*p >= 32) && (*p <= 126)) modsong.noofinstruments = 31;
-        else modsong.noofinstruments = 15;
+        modsong.noofinstruments = 15;
     }
 
     /* Get the Song title
@@ -458,14 +442,19 @@ bool loadmod(void *modfile)
             maxpatterns = modsong.patternordertable[i];
     maxpatterns++;
 
-    /* Get the pattern data */
-    modsong.patterndata = (char*)modfile + 20 +
-        modsong.noofinstruments*30 + 134;
+    /* use 'restartposition' (historically set to 127) which is not used here
+       as a marker that periods have already been converted */
+       
+    periodsconverted = (char*)modfile + 20 + modsong.noofinstruments*30 + 1; 
 
+    /* Get the pattern data; ST doesn't have fileformattag, so 4 bytes less */
+    modsong.patterndata = periodsconverted + 
+                          (modsong.noofinstruments==15 ? 129 : 133); 
+ 
     /* Convert the period values in the mod file to offsets
      * in our periodtable (but only, if we haven't done this yet) */
     p = (unsigned char *) modsong.patterndata;
-    if (!periodsconverted)
+    if (*periodsconverted != 0xfe)
     {
         int note, note2, channel;
         for (note=0;note<maxpatterns*64;note++)
@@ -487,10 +476,9 @@ bool loadmod(void *modfile)
                 p += 4;
             }
         /* Remember that we already converted the periods,
-         * in case the file gets reloaded by rewinding */
-        fileformattag[0] = 'R'; fileformattag[1] = 'S';
-        fileformattag[2] = modsong.noofchannels;
-        fileformattag[3] = modsong.noofinstruments;
+         * in case the file gets reloaded by rewinding 
+         * with 0xfe (arbitary magic value > 127) */
+        *periodsconverted = 0xfe;  
     }
 
     /* Get the samples
