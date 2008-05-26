@@ -913,7 +913,7 @@ static int xobox_loop (void)
         }
 #endif
 
-        button = rb->button_get_w_tmo (true);
+        button = rb->button_get_w_tmo (1);
         switch (button) {
             case UP:
             case UP|BUTTON_REPEAT:
