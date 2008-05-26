@@ -21,7 +21,7 @@
 #include "events.h"
 #include "panic.h"
 
-#define MAX_SYS_EVENTS 10
+#define MAX_SYS_EVENTS 16
 
 struct sysevent {
     unsigned short id;
