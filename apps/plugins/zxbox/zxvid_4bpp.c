@@ -33,7 +33,7 @@ void init_spect_scr(void)
     sp_colors[7] = 3;/* WHITE ? */
 
     /* same but 'light/bright' colors */
-    sp_colors[8] = 1;
+    sp_colors[8] = 0;
     sp_colors[9] = 1;
     sp_colors[10] = 1;
     sp_colors[11] = 1;
@@ -79,13 +79,13 @@ void update_screen(void)
         srcy &= 0xffff;     /* set up the y-coordinate between 0 and 1 */
     }
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
-	int shift;
+    int shift;
     for(y = 0; y < LCD_HEIGHT; y++)
     {
         frameb = rb->lcd_framebuffer + (y/4) * LCD_WIDTH;
         srcx = 0;           /* reset our x counter before each row... */
-		shift = ((y & 3 ) * 2 );
-		mask = ~pixmask[y & 3];
+        shift = ((y & 3 ) * 2 );
+        mask = ~pixmask[y & 3];
         for(x = 0; x < LCD_WIDTH; x++)
         {
             frameb[x] = (frameb[x] & mask) |  ((image[(srcx>>16)]&0x3) << shift );
@@ -96,13 +96,13 @@ void update_screen(void)
         srcy &= 0xffff;     /* set up the y-coordinate between 0 and 1 */
     }
 #elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
-	int shift;
+    int shift;
     for(y = 0; y < LCD_HEIGHT; y++)
     {
         frameb = rb->lcd_framebuffer + (y/8) * LCD_WIDTH;
         srcx = 0;           /* reset our x counter before each row... */
-		shift = (y & 7);
-		mask = ~pixmask[y & 7];
+        shift = (y & 7);
+        mask = ~pixmask[y & 7];
         for(x = 0; x < LCD_WIDTH; x++)
         {
             frameb[x] = (frameb[x] & mask) |  (pixval[image[(srcx>>16)]&0x3] << shift );

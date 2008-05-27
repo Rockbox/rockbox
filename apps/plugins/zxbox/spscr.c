@@ -28,42 +28,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int color_type = 0;
-
-#define N0 0x04
-#define N1 0x34
-
-#define B0 0x08
-#define B1 0x3F
-
-
-struct rgb *spscr_crgb;
-
-static struct rgb norm_colors[COLORNUM]={
-  {0,0,0},{N0,N0,N1},{N1,N0,N0},{N1,N0,N1},
-  {N0,N1,N0},{N0,N1,N1},{N1,N1,N0},{N1,N1,N1},
-
-  {0x15,0x15,0x15},{B0,B0,B1},{B1,B0,B0},{B1,B0,B1},
-  {B0,B1,B0},{B0,B1,B1},{B1,B1,B0},{B1,B1,B1}
-};
-
-static struct rgb gray_colors[COLORNUM]={
-  {0,0,0},{20,20,20},{26,26,26},{32,32,32},
-  {38,38,38},{44,44,44},{50,50,50},{56,56,56},
-
-  {16,16,16},{23,23,23},{30,30,30},{36,36,36},
-  {43,43,43},{50,50,50},{56,56,56},{63,63,63}
-};
-
-struct rgb custom_colors[COLORNUM]={
-  {0,0,0},{N0,N0,N1},{N1,N0,N0},{N1,N0,N1},
-  {N0,N1,N0},{N0,N1,N1},{N1,N1,N0},{N1,N1,N1},
-
-  {0x15,0x15,0x15},{B0,B0,B1},{B1,B0,B0},{B1,B0,B1},
-  {B0,B1,B0},{B0,B1,B1},{B1,B1,B0},{B1,B1,B1}
-};
-
-
 #define TABOFFS 2
 
 volatile int screen_visible = 1;
@@ -238,24 +202,5 @@ void spscr_init_line_pointers(int lines)
       }
       else sp_scri[i] = -1;
     }
-  }
-}
-
-void spscr_init_colors(void)
-{
-  spscr_crgb = norm_colors;
-  
-  switch(color_type) {
-  case 0:
-    spscr_crgb = norm_colors;
-    break;
-    
-  case 1:
-    spscr_crgb = gray_colors;
-    break;
-    
-  case 2:
-    spscr_crgb = custom_colors;
-    break;
   }
 }

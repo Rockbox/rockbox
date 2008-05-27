@@ -13,15 +13,16 @@ use for slightly different colors
 */
 
 #define N0 0x00
-#define N1 0xAA
+#define N1 0xC0
 
-#define B0 0x55
+#define B0 0x00
 #define B1 0xFF
+
 struct rgb norm_colors[COLORNUM]={
   {0,0,0},{N0,N0,N1},{N1,N0,N0},{N1,N0,N1},
   {N0,N1,N0},{N0,N1,N1},{N1,N1,N0},{N1,N1,N1},
 
-  {0x15,0x15,0x15},{B0,B0,B1},{B1,B0,B0},{B1,B0,B1},
+  {0,0,0},{B0,B0,B1},{B1,B0,B0},{B1,B0,B1},
   {B0,B1,B0},{B0,B1,B1},{B1,B1,B0},{B1,B1,B1}
 };
 

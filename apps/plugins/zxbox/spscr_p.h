@@ -30,11 +30,7 @@ struct rgb {
 #define SCRSIZE 6912
 #define COLORBEG 6144
 
-extern struct rgb *spscr_crgb;
-extern struct rgb custom_colors[];
-
 extern void spscr_init_mask_color(void);
 extern void spscr_init_line_pointers(int lines);
-extern void spscr_init_colors(void);
 
 #endif /* SPSCR_P_H */
