@@ -182,7 +182,7 @@ bool EncRbSpeex::start()
 
 bool EncRbSpeex::encode(QString input,QString output)
 {
-    //qDebug() << "encoding
+    qDebug() << "encoding " << input << " to "<< output;  
     char errstr[512];
     
     FILE *fin,*fout;

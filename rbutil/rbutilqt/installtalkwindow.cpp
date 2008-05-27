@@ -31,8 +31,6 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
     connect(ui.buttonBrowse, SIGNAL(clicked()), this, SLOT(browseFolder()));
     connect(ui.change,SIGNAL(clicked()),this,SLOT(change()));
 
-    ui.OverwriteWav->setChecked(true);
-    ui.RemoveWav->setChecked(true);
     ui.recursive->setChecked(true);
     ui.OverwriteTalk->setChecked(true);
     ui.StripExtensions->setChecked(true);
@@ -99,13 +97,13 @@ void InstallTalkWindow::accept()
     talkcreator->setMountPoint(settings->mountpoint());
     
     talkcreator->setOverwriteTalk(ui.OverwriteTalk->isChecked());
-    talkcreator->setOverwriteWav(ui.OverwriteWav->isChecked());
-    talkcreator->setRemoveWav(ui.RemoveWav->isChecked());
+    talkcreator->setOverwriteWav(true);
+    talkcreator->setRemoveWav(true);
     talkcreator->setRecursive(ui.recursive->isChecked());
     talkcreator->setStripExtensions(ui.StripExtensions->isChecked());
     talkcreator->setTalkFolders(ui.talkFolders->isChecked());
     talkcreator->setTalkFiles(ui.talkFiles->isChecked());
-
+    
     talkcreator->createTalkFiles(logger);
 }
 

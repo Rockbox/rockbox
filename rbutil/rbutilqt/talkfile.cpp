@@ -83,11 +83,12 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
         QString toSpeak;
         QString filename;
         QString wavfilename;
+        QString filepath;
 
         QString path = fileInf.filePath(); 
         qDebug() << path;
 
-        if( path.endsWith("..") || path.endsWith(".talk") )
+        if( path.endsWith("..") || path.endsWith(".") || path.endsWith(".talk") )
         {
             it.next();
             continue;
@@ -102,13 +103,12 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
               it.next();
               continue;
             }
-            int index1 = path.lastIndexOf("/");
-            int index2 = path.lastIndexOf("/",index1-1);
-
-            toSpeak = path.mid(index2+1,(index1-index2)-1);
-
-            filename = path.left(index1) + "/_dirname.talk";
-            qDebug() << "toSpeak: " << toSpeak << "filename: " << filename; 
+            
+            toSpeak = fileInf.fileName();
+            
+            filepath = fileInf.filePath() + "/";
+            filename = "_dirname.talk";
+            qDebug() << "toSpeak: " << toSpeak << "filename: " << filename << " path: " <<filepath; 
         }
         else   // if it is a file
         {
@@ -118,15 +118,21 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
                it.next();
                continue;
             }
+                   
+            // create toSpeak string
             if(m_stripExtensions)
                 toSpeak = fileInf.baseName();
             else
                 toSpeak = fileInf.fileName();
-            filename = fileInf.absoluteFilePath() + ".talk";
+            // create filename and path
+            filepath = fileInf.absolutePath();
+            filename = fileInf.fileName() + ".talk";
+            
         }
-        wavfilename = filename + ".wav";
+        
+        wavfilename = QDir::tempPath()+ "/"+ filename + ".wav";
 
-        QFileInfo filenameInf(filename);
+        QFileInfo filenameInf(filepath+filename);
         QFileInfo wavfilenameInf(wavfilename);
 
         //! the actual generation of the .talk files
@@ -147,7 +153,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
                 QCoreApplication::processEvents();
             }
             m_logger->addItem(tr("Encoding of %1").arg(toSpeak),LOGINFO);
-            if(!m_enc->encode(wavfilename,filename))
+            if(!m_enc->encode(wavfilename,filepath+filename))
             {
                 m_logger->addItem(tr("Encoding of %1 failed").arg(wavfilename),LOGERROR);
                 m_logger->abort();
@@ -171,7 +177,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             installlog.setValue(wavfilename.remove(0,m_mountpoint.length()),now);
         
         //! add the .talk file to the install log
-        installlog.setValue(filename.remove(0,m_mountpoint.length()),now);
+        installlog.setValue(QString(filepath+filename).remove(0,m_mountpoint.length()),now);
         it.next();
     }
 
