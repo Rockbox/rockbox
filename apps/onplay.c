@@ -99,8 +99,9 @@ MENUITEM_FUNCTION(bookmark_load_menu_item, 0,
                   ID2P(LANG_BOOKMARK_MENU_LIST), 
                   bookmark_load_menu, NULL, 
                   bookmark_menu_callback, Icon_Bookmark);
-MAKE_MENU(bookmark_menu, ID2P(LANG_BOOKMARK_MENU), bookmark_menu_callback,
-          Icon_Bookmark, &bookmark_create_menu_item, &bookmark_load_menu_item);
+MAKE_ONPLAYMENU(bookmark_menu, ID2P(LANG_BOOKMARK_MENU), bookmark_menu_callback,
+                Icon_Bookmark, &bookmark_create_menu_item,
+                &bookmark_load_menu_item);
 static int bookmark_menu_callback(int action,
                                   const struct menu_item_ex *this_item)
 {
@@ -252,9 +253,9 @@ MENUITEM_FUNCTION(cat_add_to_list, 0, ID2P(LANG_CATALOG_ADD_TO),
                   cat_add_to_a_playlist, 0, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(cat_add_to_new, 0, ID2P(LANG_CATALOG_ADD_TO_NEW), 
                   cat_add_to_a_new_playlist, 0, NULL, Icon_Playlist);
-MAKE_MENU( cat_playlist_menu, ID2P(LANG_CATALOG), cat_playlist_callback,
-           Icon_Playlist, &cat_view_lists, 
-           &cat_add_to_list, &cat_add_to_new );
+MAKE_ONPLAYMENU(cat_playlist_menu, ID2P(LANG_CATALOG), cat_playlist_callback,
+                Icon_Playlist, &cat_view_lists, &cat_add_to_list,
+                &cat_add_to_new);
         
 static int cat_playlist_callback(int action,
                                  const struct menu_item_ex *this_item)
