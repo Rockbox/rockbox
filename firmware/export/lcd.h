@@ -344,8 +344,8 @@ extern bool lcd_enabled(void);
 /* Register a hook that is called when the lcd is powered and after the
  * framebuffer data is synchronized */
 void lcd_set_enable_hook(void (*enable_hook)(void));
-void lcd_call_enable_hook(void);
 #endif /* HAVE_LCD_ENABLE */
+void lcd_call_enable_hook(void);
 
 #ifdef HAVE_LCD_SLEEP
 /* Put the LCD into a power saving state deeper than lcd_enable(false). */
