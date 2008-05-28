@@ -1598,6 +1598,12 @@ static void button_loop(void)
 
     wvs_stop();
 
+#ifdef HAVE_LCD_ENABLE
+    /* Be sure hook is removed before exiting since the stop will put it
+     * back because of the backlight restore. */
+    rb->lcd_set_enable_hook(NULL);
+#endif
+
     rb->lcd_setfont(FONT_UI);
 }
 
