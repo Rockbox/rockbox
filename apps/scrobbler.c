@@ -61,7 +61,6 @@ static int cache_pos;
 static struct mp3entry scrobbler_entry;
 static bool pending = false;
 static bool scrobbler_initialised = false;
-static bool scrobbler_ata_callback = false;
 #if CONFIG_RTC
 static time_t timestamp;
 #else
@@ -80,8 +79,6 @@ static void write_cache(void)
 {
     int i;
     int fd;
-
-    scrobbler_ata_callback = false;
 
     /* If the file doesn't exist, create it.
     Check at each write since file may be deleted at any time */
@@ -178,11 +175,7 @@ static void add_to_cache(unsigned long play_length)
         logf("SCROBBLER: %s", scrobbler_entry.path);
     } else {
         cache_pos++;
-        if (!scrobbler_ata_callback)
-        {
-            register_ata_idle_func(scrobbler_flush_callback);
-            scrobbler_ata_callback = true;
-        }
+        register_ata_idle_func(scrobbler_flush_callback);
     }
 
 }
@@ -249,14 +242,6 @@ void scrobbler_flush_cache(void)
 
 void scrobbler_shutdown(void)
 {
-#ifndef SIMULATOR
-    if (scrobbler_ata_callback)
-    {
-        unregister_ata_idle_func(scrobbler_flush_callback, false);
-        scrobbler_ata_callback = false;
-    }
-#endif
-
     scrobbler_flush_cache();
 
     if (scrobbler_initialised)
