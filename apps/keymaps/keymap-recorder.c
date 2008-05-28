@@ -294,6 +294,7 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_quickscreen;
 
         case CONTEXT_RECSCREEN:
+        case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_recscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;

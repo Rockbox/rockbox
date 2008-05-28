@@ -33,7 +33,8 @@ extern void pm_activate_clipcount(bool active);
 extern bool peak_meter_enabled;
 
 extern void peak_meter_playback(bool playback);
-extern int  peak_meter_draw_get_btn(int x, int y[], int height, int nb_screens);
+extern int  peak_meter_draw_get_btn(int action_context, int x, int y[],
+                                    int height, int nb_screens);
 extern void peak_meter_set_clip_hold(int time);
 extern void peak_meter_peek(void);
 extern void peak_meter_init_range( bool dbfs, int range_min, int range_max);

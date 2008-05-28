@@ -90,12 +90,19 @@ struct opt_items {
 #define BOOKMARK_RECENT_ONLY_YES 3
 #define BOOKMARK_RECENT_ONLY_ASK 4
 
-#define TRIG_MODE_OFF 0
-#define TRIG_MODE_NOREARM 1
-#define TRIG_MODE_REARM 2
+enum
+{
+    TRIG_MODE_OFF = 0,
+    TRIG_MODE_NOREARM,
+    TRIG_MODE_REARM
+};
 
-#define TRIG_DURATION_COUNT 13
-extern const struct opt_items trig_durations[TRIG_DURATION_COUNT];
+enum
+{
+    TRIG_TYPE_STOP = 0,
+    TRIG_TYPE_PAUSE,
+    TRIG_TYPE_NEW_FILE
+};
 
 #define CROSSFADE_ENABLE_SHUFFLE                1
 #define CROSSFADE_ENABLE_TRACKSKIP              2
@@ -354,10 +361,12 @@ struct user_settings
                       2 = main and remote lcd
                       3 = remote lcd */
 
-    int rec_start_thres;    /* negative: db, positive: % range -87 .. 100 */
+    int rec_start_thres_db;
+    int rec_start_thres_linear;
     int rec_start_duration; /* index of trig_durations */
-    int rec_stop_thres;     /* negative: db, positive: % */
-    int rec_stop_postrec;   /* negative: db, positive: % range -87 .. 100 */
+    int rec_stop_thres_db;
+    int rec_stop_thres_linear;
+    int rec_stop_postrec;
     int rec_stop_gap;       /* index of trig_durations */
     int rec_trigger_mode;   /* see TRIG_MODE_XXX constants */
     int rec_trigger_type;   /* what to do when trigger released */

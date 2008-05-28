@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id:$
+ * $Id$
  *
  * Copyright (C) 2007 Mark Arigo
  *
@@ -307,6 +307,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS_COLOURCHOOSER:
         case CONTEXT_SETTINGS_EQ:
+        case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_right_is_inc;
 
         case CONTEXT_YESNOSCREEN:

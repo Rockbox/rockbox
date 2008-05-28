@@ -207,10 +207,6 @@ static const char graphic_numeric[] = "graphic,numeric";
 #define DEFAULT_BACKDROP    "cabbiev2"
 
 #ifdef HAVE_RECORDING
-/* keep synchronous to trig_durations and
-   trigger_times in settings_apply_trigger */
-static const char trig_durations_conf [] =
-                  "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min";
 /* these should be in the config.h files */
 #if CONFIG_CODEC == MAS3587F
 # define DEFAULT_REC_MIC_GAIN 8
@@ -918,24 +914,35 @@ const struct settings_list settings[] = {
     /** Encoder settings end **/
 #endif /* CONFIG_CODEC == SWCODEC */
     /* values for the trigger */
-    {F_T_INT|F_RECSETTING,&global_settings.rec_start_thres,
-        LANG_RECORD_START_THRESHOLD, INT(-35),
-        "trigger start threshold",NULL,UNUSED},
-    {F_T_INT|F_RECSETTING,&global_settings.rec_stop_thres,
-        LANG_RECORD_STOP_THRESHOLD,INT(-45),
-        "trigger stop threshold",NULL,UNUSED},
-    {F_T_INT|F_RECSETTING,&global_settings.rec_start_duration,
-        LANG_MIN_DURATION,INT(0),
-        "trigger start duration",trig_durations_conf,UNUSED},
-    {F_T_INT|F_RECSETTING,&global_settings.rec_stop_postrec,
-        LANG_MIN_DURATION,INT(2),
-        "trigger stop postrec",trig_durations_conf,UNUSED},
-    {F_T_INT|F_RECSETTING,&global_settings.rec_stop_gap,
-        LANG_RECORD_STOP_GAP,INT(1),
-        "trigger min gap",trig_durations_conf,UNUSED},
-    {F_T_INT|F_RECSETTING,&global_settings.rec_trigger_mode,
-        LANG_RECORD_TRIGGER,INT(0),
-        "trigger mode","off,once,repeat",UNUSED},
+    INT_SETTING(F_RECSETTING, rec_start_thres_db, LANG_RECORD_START_THRESHOLD, -35,
+        "trigger start threshold dB", UNIT_DB, VOLUME_MIN/10, 0, -1, NULL, NULL, NULL),
+    INT_SETTING(F_RECSETTING, rec_start_thres_linear, LANG_RECORD_START_THRESHOLD, 5,
+        "trigger start threshold linear", UNIT_PERCENT, 0, 100, 1, NULL, NULL, NULL),
+    INT_SETTING(F_RECSETTING, rec_stop_thres_db, LANG_RECORD_STOP_THRESHOLD, -45,
+        "trigger stop threshold dB", UNIT_DB, VOLUME_MIN/10, 0, -1, NULL, NULL, NULL),
+    INT_SETTING(F_RECSETTING, rec_stop_thres_linear, LANG_RECORD_STOP_THRESHOLD, 10,
+        "trigger stop threshold linear", UNIT_PERCENT, 0, 100, 1, NULL, NULL, NULL),
+    TABLE_SETTING(F_RECSETTING, rec_start_duration, LANG_MIN_DURATION, 0,
+        "trigger start duration", 
+        "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min",
+        UNIT_SEC, NULL, NULL, NULL, 13,
+        0,1,2,5,10,15,20,25,30,60,120,300,600),
+    TABLE_SETTING(F_RECSETTING, rec_stop_postrec, LANG_MIN_DURATION, 0,
+        "trigger stop duration", 
+        "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min",
+        UNIT_SEC, NULL, NULL, NULL, 13,
+        0,1,2,5,10,15,20,25,30,60,120,300,600),
+    TABLE_SETTING(F_RECSETTING, rec_stop_gap, LANG_RECORD_STOP_GAP, 1,
+        "trigger min gap", 
+        "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min",
+        UNIT_SEC, NULL, NULL, NULL, 13,
+        0,1,2,5,10,15,20,25,30,60,120,300,600),
+    CHOICE_SETTING(F_RECSETTING, rec_trigger_mode, LANG_RECORD_TRIGGER, TRIG_MODE_OFF,
+       "trigger mode","off,once,repeat", NULL ,3,
+       ID2P(LANG_OFF), ID2P(LANG_RECORD_TRIG_NOREARM), ID2P(LANG_REPEAT)),
+    CHOICE_SETTING(F_RECSETTING, rec_trigger_type, LANG_RECORD_TRIGGER_TYPE, TRIG_TYPE_STOP,
+       "trigger mode","off,once,repeat", NULL ,3,
+       ID2P(LANG_RECORD_TRIGGER_STOP), ID2P(LANG_PAUSE), ID2P(LANG_RECORD_TRIGGER_NEWFILESTP)),
 #endif /* HAVE_RECORDING */
 
 #ifdef HAVE_SPDIF_POWER
@@ -1192,14 +1199,6 @@ const struct settings_list settings[] = {
 
     OFFON_SETTING(0, audioscrobbler, LANG_AUDIOSCROBBLER, false,
                   "Last.fm Logging", NULL),
-
-#ifdef HAVE_RECORDING
-    {F_T_INT|F_RECSETTING,&global_settings.rec_trigger_type,
-        LANG_RECORD_TRIGGER_TYPE, INT(0),
-        "trigger type","stop,pause,nf stp",UNUSED},
-#endif
-
-    /** settings not in the old config blocks **/ 
 #if CONFIG_TUNER
     FILENAME_SETTING(0, fmr_file, "fmr", "",
                      FMPRESET_PATH "/", ".fmr", MAX_FILENAME+1),

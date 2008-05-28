@@ -121,37 +121,28 @@ static unsigned long rec_sizesplit_bytes(void)
 {
     return rec_size_bytes[global_settings.rec_sizesplit];
 }
-/*
- * Time strings used for the trigger durations.
- * Keep synchronous to trigger_times in settings_apply_trigger
- */
-const struct opt_items trig_durations[TRIG_DURATION_COUNT] =
-{
-#define TS(x) { (unsigned char *)(#x "s"), TALK_ID(x, UNIT_SEC) }
-#define TM(x) { (unsigned char *)(#x "min"), TALK_ID(x, UNIT_MIN) }
-    TS(0), TS(1), TS(2), TS(5),
-    TS(10), TS(15), TS(20), TS(25), TS(30),
-    TM(1), TM(2), TM(5), TM(10)
-#undef TS
-#undef TM
-};
 
 void settings_apply_trigger(void)
 {
-    /* Keep synchronous to trig_durations and trig_durations_conf*/
-    static const long trigger_times[TRIG_DURATION_COUNT] = {
-        0, HZ, 2*HZ, 5*HZ,
-        10*HZ, 15*HZ, 20*HZ, 25*HZ, 30*HZ,
-        60*HZ, 2*60*HZ, 5*60*HZ, 10*60*HZ
-    };
+    int start_thres, stop_thres;
+    if (global_settings.peak_meter_dbfs)
+    {
+        start_thres = global_settings.rec_start_thres_db - 1;
+        stop_thres = global_settings.rec_stop_thres_db - 1;
+    }
+    else
+    {
+        start_thres = global_settings.rec_start_thres_linear;
+        stop_thres = global_settings.rec_stop_thres_linear;
+    }
 
     peak_meter_define_trigger(
-        global_settings.rec_start_thres,
-        trigger_times[global_settings.rec_start_duration],
-        MIN(trigger_times[global_settings.rec_start_duration] / 2, 2*HZ),
-        global_settings.rec_stop_thres,
-        trigger_times[global_settings.rec_stop_postrec],
-        trigger_times[global_settings.rec_stop_gap]
+        start_thres,
+        global_settings.rec_start_duration*HZ,
+        MIN(global_settings.rec_start_duration*HZ / 2, 2*HZ),
+        stop_thres,
+        global_settings.rec_stop_postrec*HZ,
+        global_settings.rec_stop_gap*HZ
     );
 }
 /* recording screen status flags */
@@ -784,12 +775,12 @@ static void trigger_listener(int trigger_status)
             else
             {
                 if((audio_status() & AUDIO_STATUS_PAUSE) &&
-                       (global_settings.rec_trigger_type == 1))
+                    (global_settings.rec_trigger_type == TRIG_TYPE_PAUSE))
                 {
                     rec_command(RECORDING_CMD_RESUME);
                 }
                 /* New file on trig start*/
-                else if (global_settings.rec_trigger_type != 2)
+                else if (global_settings.rec_trigger_type != TRIG_TYPE_NEW_FILE)
                 {
                     rec_command(RECORDING_CMD_START_NEWFILE);
                     /* tell recording_screen to reset the time */
@@ -804,15 +795,15 @@ static void trigger_listener(int trigger_status)
             {
                 switch(global_settings.rec_trigger_type)
                 {
-                    case 0: /* Stop */
+                    case TRIG_TYPE_STOP: /* Stop */
                         rec_command(RECORDING_CMD_STOP);
                         break;
 
-                    case 1: /* Pause */
+                    case TRIG_TYPE_PAUSE: /* Pause */
                         rec_command(RECORDING_CMD_PAUSE);
                         break;
 
-                    case 2: /* New file on trig stop*/
+                    case TRIG_TYPE_NEW_FILE: /* New file on trig stop*/
                         rec_command(RECORDING_CMD_START_NEWFILE);
                         /* tell recording_screen to reset the time */
                         last_seconds = 0;
@@ -1036,7 +1027,8 @@ bool recording_screen(bool no_source)
 #endif /* CONFIG_LED */
 
         /* Wait for a button a while (HZ/10) drawing the peak meter */
-        button = peak_meter_draw_get_btn(pm_x, pm_y, h * PM_HEIGHT,
+        button = peak_meter_draw_get_btn(CONTEXT_RECSCREEN,
+                                         pm_x, pm_y, h * PM_HEIGHT,
                                          screen_update);
 
         if (last_audio_stat != audio_stat)

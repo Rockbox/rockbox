@@ -200,10 +200,7 @@ static void gui_quickscreen_draw(struct gui_quickscreen *qs,
 
         title = P2STR(ID2P(qs->items[i]->lang_id));
         setting = qs->items[i]->setting;
-        if ((qs->items[i]->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
-            temp = *(bool*)setting?1:0;
-        else
-            temp = *(int*)setting;
+        temp = option_value_as_int(qs->items[i]);
         value = option_get_valuestring((struct settings_list*)qs->items[i],
                                        buf, MAX_PATH, temp);
 
@@ -235,23 +232,13 @@ static void gui_quickscreen_draw(struct gui_quickscreen *qs,
     display->set_viewport(NULL);
 }
 
-static int option_value(const struct settings_list *setting)
-{
-    if ((setting->flags & F_BOOL_SETTING) == F_BOOL_SETTING)
-    {
-        return *(bool*)setting->setting==true?1:0;
-    }
-    else
-        return *(int*)setting->setting;
-}
-
 static void talk_qs_option(struct settings_list *opt, bool enqueue)
 {
     if (global_settings.talk_menu) {
         if(!enqueue)
             talk_shutup();
         talk_id(opt->lang_id, true);
-        option_talk_value(opt, option_value(opt), true);
+        option_talk_value(opt, option_value_as_int(opt), true);
     }
 }
 

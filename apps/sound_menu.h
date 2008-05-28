@@ -22,6 +22,6 @@
 #include "menu.h"
 
 bool recording_menu(bool no_source);
-bool rectrigger(void);
+int rectrigger(void);
 
 #endif

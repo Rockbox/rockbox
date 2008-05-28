@@ -889,6 +889,7 @@ static const struct button_mapping* get_context_mapping_remote(int context)
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return remote_btn_ctxt_tree;
         case CONTEXT_SETTINGS_TIME:
+        case CONTEXT_SETTINGS_RECTRIGGER:
             return remote_btn_ctxt_settingsgrph;
             
         case CONTEXT_SETTINGS:
@@ -939,6 +940,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_SETTINGS:
             return button_context_settings;
         case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
+        case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_right_is_inc;
         
         case CONTEXT_SETTINGS_COLOURCHOOSER:

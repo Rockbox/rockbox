@@ -1318,7 +1318,8 @@ void peak_meter_draw_trig(int xpos[], int ypos[], int trig_width[], int nb_scree
 }
 #endif
 
-int peak_meter_draw_get_btn(int x, int y[], int height, int nb_screens)
+int peak_meter_draw_get_btn(int action_context, int x, int y[],
+                            int height, int nb_screens)
 {
     int button = BUTTON_NONE;
     long next_refresh = current_tick;
@@ -1337,7 +1338,7 @@ int peak_meter_draw_get_btn(int x, int y[], int height, int nb_screens)
     bool dopeek = true;
 
     while (TIME_BEFORE(current_tick, next_big_refresh)) {
-        button = get_action(CONTEXT_RECSCREEN, TIMEOUT_NOBLOCK);
+        button = get_action(action_context, TIMEOUT_NOBLOCK);
         if (button != BUTTON_NONE) {
             break;
         }

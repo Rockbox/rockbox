@@ -44,7 +44,16 @@
 #endif
 
 static int selection_to_val(const struct settings_list *setting, int selection);
-
+int option_value_as_int(const struct settings_list *setting)
+{
+    int type = (setting->flags & F_T_MASK);
+    int temp = 0;
+    if (type == F_T_BOOL)
+        temp = *(bool*)setting->setting?1:0;
+    else if (type == F_T_UINT || type == F_T_INT)
+        temp = *(int*)setting->setting;
+    return temp;
+}
 static const char *unit_strings[] = 
 {   
     [UNIT_INT] = "",    [UNIT_MS]  = "ms",
@@ -214,7 +223,8 @@ static int option_talk(int selected_item, void * data)
     return 0;
 }
 
-#ifdef HAVE_QUICKSCREEN /* only the quickscreen uses this so far */
+#if defined(HAVE_QUICKSCREEN) || defined(HAVE_RECORDING)
+   /* only the quickscreen and recording trigger needs this */
 void option_select_next_val(const struct settings_list *setting,
                             bool previous, bool apply)
 {

@@ -58,6 +58,7 @@ enum {
     CONTEXT_SETTINGS_EQ,            
     CONTEXT_SETTINGS_COLOURCHOOSER, 
     CONTEXT_SETTINGS_TIME,          
+    CONTEXT_SETTINGS_RECTRIGGER,
     
     /* The following contexts should use ACTION_STD_[NEXT|PREV]
         and (possibly) ACTION_SETTINGS_[INC|DEC] 

@@ -391,6 +391,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_SETTINGS_COLOURCHOOSER:
         case CONTEXT_SETTINGS_EQ:
         case CONTEXT_SETTINGS_TIME:
+        case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_right_is_inc;
             
         case CONTEXT_YESNOSCREEN:

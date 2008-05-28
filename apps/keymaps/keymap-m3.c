@@ -469,6 +469,7 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_settings;
 
         case CONTEXT_SETTINGS_EQ:
+        case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_r_is_inc;
 
         case CONTEXT_TREE:
