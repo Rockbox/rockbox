@@ -246,7 +246,7 @@ void option_select_next_val(const struct settings_list *setting,
                 val = info->max;
         }
         if (apply && info->option_callback)
-            info->option_callback(*(int*)value);
+            info->option_callback(val);
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
@@ -284,7 +284,7 @@ void option_select_next_val(const struct settings_list *setting,
                 val = info->count-1;
         }
         if (apply && info->option_callback)
-            info->option_callback(*(int*)value);
+            info->option_callback(val);
     }
     else if ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING)
     {
