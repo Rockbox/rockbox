@@ -49,6 +49,10 @@ fb_data lcd_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
 
+#ifdef HAVE_LCD_ENABLE
+static void (*lcd_enable_hook)(void) = NULL;
+#endif
+
 static struct viewport default_vp =
 {
     .x        = 0,
@@ -83,6 +87,23 @@ void lcd_init(void)
     lcd_init_device();
     scroll_init();
 }
+
+/*** Helpers - consolidate optional code ***/
+#ifdef HAVE_LCD_ENABLE
+void lcd_set_enable_hook(void (*enable_hook)(void))
+{
+    lcd_enable_hook = enable_hook;
+}
+
+/* To be called by target driver after enabling display and refreshing it */
+void lcd_call_enable_hook(void)
+{
+   void (*enable_hook)(void) = lcd_enable_hook;
+
+    if (enable_hook != NULL)
+        enable_hook();
+}
+#endif
 
 /*** Viewports ***/
 

@@ -287,6 +287,7 @@ void lcd_enable(bool state)
 
         lcd_on = true;
         lcd_update();
+        lcd_call_enable_hook();
     }
     else 
     {

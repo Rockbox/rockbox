@@ -104,4 +104,7 @@ enum mpeg_malloc_reason_t
 #include "disk_buf.h"
 #include "stream_mgr.h"
 
+#define LCD_ENABLE_EVENT_0 MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0)
+#define LCD_ENABLE_EVENT_1 MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 1)
+
 #endif /* MPEGPLAYER_H */

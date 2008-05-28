@@ -261,6 +261,7 @@ void lcd_enable(bool on)
         if(on)
         {
             _display_on();
+            lcd_call_enable_hook();
         }
         else
         {

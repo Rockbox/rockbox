@@ -587,13 +587,27 @@ static void draw_putsxy_oriented(int x, int y, const char *str)
 }
 #endif /* LCD_PORTRAIT */
 
+#ifdef HAVE_LCD_ENABLE
+/* So we can refresh the overlay */
+static void wvs_lcd_enable_hook(void)
+{
+    rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_1, 0);
+}
+#endif
+
 static void wvs_backlight_on_video_mode(bool video_on)
 {
     if (video_on) {
         /* Turn off backlight timeout */
         /* backlight control in lib/helper.c */
         backlight_force_on(rb);
+#ifdef HAVE_LCD_ENABLE
+        rb->lcd_set_enable_hook(NULL);
+#endif
     } else {
+#ifdef HAVE_LCD_ENABLE
+        rb->lcd_set_enable_hook(wvs_lcd_enable_hook);
+#endif
         /* Revert to user's backlight settings */
         backlight_use_settings(rb);
     }
@@ -1440,6 +1454,15 @@ static void button_loop(void)
             wvs_refresh(WVS_REFRESH_DEFAULT);
             continue;
             } /* BUTTON_NONE: */
+
+#ifdef HAVE_LCD_ENABLE
+        case LCD_ENABLE_EVENT_1:
+        {
+            /* Draw the current frame if prepared already */
+            stream_draw_frame(true);
+            break;
+            } /* LCD_ENABLE_EVENT_1: */
+#endif
 
         case MPEG_VOLUP:
         case MPEG_VOLUP|BUTTON_REPEAT:

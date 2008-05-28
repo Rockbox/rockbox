@@ -361,6 +361,7 @@ void lcd_enable(bool on)
         /* Probably out of sync and we don't wanna pepper the code with
            lcd_update() calls for this. */
         lcd_update();
+        lcd_call_enable_hook();
     }
     else
     {

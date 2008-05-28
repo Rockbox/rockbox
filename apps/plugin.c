@@ -601,6 +601,10 @@ static const struct plugin_api rockbox_api = {
     simplelist_info_init,
     simplelist_show_list,
 
+#ifdef HAVE_LCD_ENABLE
+    lcd_set_enable_hook,
+    &button_queue,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

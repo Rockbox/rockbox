@@ -543,6 +543,13 @@ static uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
     return val;
 }
 
+#ifdef HAVE_LCD_ENABLE
+static void get_start_time_lcd_enable_hook(void)
+{
+    rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_0, 0);
+}
+#endif /* HAVE_LCD_ENABLE */
+
 static int get_start_time(uint32_t duration)
 {
     int button = 0;
@@ -555,6 +562,10 @@ static int get_start_time(uint32_t duration)
 
     lcd_(clear_display)();
     lcd_(update)();
+
+#ifdef HAVE_LCD_ENABLE
+    rb->lcd_set_enable_hook(get_start_time_lcd_enable_hook);
+#endif
 
     draw_slider(0, 100, &rc_bound);
     rc_bound.b = rc_bound.t - SLIDER_TMARGIN;
@@ -707,6 +718,13 @@ static int get_start_time(uint32_t duration)
             slider_state = state9;
             break;
 
+#ifdef HAVE_LCD_ENABLE
+        case LCD_ENABLE_EVENT_0:
+            if (slider_state == state2)
+                display_thumb_image(&rc_vid);
+            continue;
+#endif
+
         default:
             rb->default_event_handler(button);
             rb->yield();
@@ -735,6 +753,10 @@ static int get_start_time(uint32_t duration)
 
         rb->yield();
     }
+
+#ifdef HAVE_LCD_ENABLE
+    rb->lcd_set_enable_hook(NULL);
+#endif
 
 #ifndef HAVE_LCD_COLOR
     stream_gray_show(false);

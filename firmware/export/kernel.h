@@ -45,6 +45,7 @@
 #define SYS_EVENT_CLS_FILESYS 3
 #define SYS_EVENT_CLS_PLUG    4
 #define SYS_EVENT_CLS_MISC    5
+#define SYS_EVENT_CLS_PRIVATE 7 /* For use inside plugins */
 /* make sure SYS_EVENT_CLS_BITS has enough range */
 
 /* Bit 31->|S|c...c|i...i| */

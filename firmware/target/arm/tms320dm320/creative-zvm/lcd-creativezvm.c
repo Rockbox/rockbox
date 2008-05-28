@@ -235,6 +235,7 @@ return;
     {
         lcd_display_on(false);  /* Turn on display */
         lcd_update();      /* Resync display */
+        lcd_call_enable_hook();
     }
     else
     {
