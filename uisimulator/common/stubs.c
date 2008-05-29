@@ -306,6 +306,13 @@ void button_set_flip(bool yesno)
     (void)yesno;
 }
 
+#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+void touchpad_set_sensitivity(int level)
+{
+    (void)level;
+}
+#endif
+
 /* assure an unused place to direct virtual pointers to */
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
 unsigned char vp_dummy[VIRT_SIZE];
