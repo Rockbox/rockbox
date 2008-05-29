@@ -19,9 +19,10 @@
 #ifndef _ADC_TARGET_H_
 #define _ADC_TARGET_H_
 
-#define NUM_ADC_CHANNELS 1
+#define NUM_ADC_CHANNELS 2
 
 #define ADC_BATTERY 0
+#define ADC_ACCESSORY 1
 #define ADC_UNREG_POWER ADC_BATTERY
 
 /* Force a scan now */

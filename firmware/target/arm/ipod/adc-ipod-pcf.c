@@ -83,5 +83,7 @@ void adc_init(void)
     struct adc_struct *adc_battery = &adcdata[ADC_BATTERY];
     adc_battery->channelnum = 0x2; /* ADCVIN1, resistive divider */
     adc_battery->timeout = 0;
+    adcdata[ADC_ACCESSORY].channelnum = 4;
+    adcdata[ADC_ACCESSORY].timeout = 0;
     _adc_read(adc_battery);
 }
