@@ -460,7 +460,6 @@ static int remove_dir(char* dirname, int len)
     int result = 0;
     DIR* dir;
     int dirlen = strlen(dirname);
-    int i;
 
     dir = opendir(dirname);
     if (!dir)
@@ -475,10 +474,7 @@ static int remove_dir(char* dirname, int len)
             break;
 
         dirname[dirlen] ='\0';
-        FOR_NB_SCREENS(i){
-            screens[i].puts(0,1,dirname);
-            screens[i].update();        
-        }
+        gui_syncsplash(0, dirname);
         
         /* append name to current directory */
         snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
@@ -539,7 +535,7 @@ static bool delete_handler(bool is_dir)
 
     if(gui_syncyesno_run(&message, &yes_message, NULL)!=YESNO_YES)
         return false;
-
+    
     gui_syncsplash(0, str(LANG_DELETING));
 
     int res;

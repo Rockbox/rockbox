@@ -214,7 +214,10 @@ void gui_syncsplash(int ticks, const char *fmt, ...)
     fmt = P2STR((unsigned char *)fmt);
     va_start( ap, fmt );
     FOR_NB_SCREENS(i)
+    {
+        screens[i].set_viewport(NULL);
         splash(&(screens[i]), fmt, ap);
+    }
     va_end( ap );
 
     if(ticks)
