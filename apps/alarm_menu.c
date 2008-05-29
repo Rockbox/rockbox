@@ -33,14 +33,14 @@
 #include "rtc.h"
 #include "misc.h"
 #include "screens.h"
-#include"talk.h"
+#include "talk.h"
 #include "lang.h"
 #include "power.h"
 #include "alarm_menu.h"
 #include "backlight.h"
 #include "splash.h"
 #include "statusbar.h"
-#include "textarea.h"
+#include "viewport.h"
 
 static void speak_time(int hours, int minutes, bool speak_hours)
 {
@@ -65,6 +65,7 @@ bool alarm_screen(void)
     int i;
     bool update = true;
     bool hour_wrapped = false;
+    struct viewport vp[NB_SCREENS];
 
     rtc_get_alarm(&h, &m);
 
@@ -75,14 +76,18 @@ bool alarm_screen(void)
     } else {
         m = m / 5 * 5; /* 5 min accuracy should be enough */
     }
+    FOR_NB_SCREENS(i)
+    {
+        viewport_set_defaults(&vp[i], i);
+    }
 
     while(!done) {
         if(update)
         {
             FOR_NB_SCREENS(i)
             {
-                screens[i].setmargins(0, 0);
-                gui_textarea_clear(&screens[i]);
+                screens[i].set_viewport(&vp[i]);
+                screens[i].clear_viewport();
                 screens[i].puts(0, 3, str(LANG_ALARM_MOD_KEYS));
             }
             /* Talk when entering the wakeup screen */
@@ -97,8 +102,10 @@ bool alarm_screen(void)
         snprintf(buf, 32, str(LANG_ALARM_MOD_TIME), h, m);
         FOR_NB_SCREENS(i)
         {
+            screens[i].set_viewport(&vp[i]);
             screens[i].puts(0, 1, buf);
-            gui_textarea_update(&screens[i]);
+            screens[i].update_viewport();
+            screens[i].set_viewport(NULL);
         }
         button = get_action(CONTEXT_SETTINGS,HZ);
 
