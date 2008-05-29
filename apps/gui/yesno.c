@@ -16,7 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#include "config.h"
 #include "yesno.h"
 #include "system.h"
 #include "kernel.h"
@@ -24,7 +24,7 @@
 #include "lang.h"
 #include "action.h"
 #include "talk.h"
-#include "textarea.h"
+#include "settings.h"
 #include "viewport.h"
 
 
@@ -36,6 +36,24 @@ struct gui_yesno
     struct viewport *vp;
     struct screen * display;
 };
+
+static void talk_text_message(const struct text_message * message, bool enqueue)
+{
+    int line;
+    if(message)
+    {
+        for(line=0; line<message->nb_lines; line++)
+        {
+            long id = P2ID((unsigned char *)message->message_lines[line]);
+            if(id>=0)
+            {
+                talk_id(id, enqueue);
+                enqueue = true;
+            }
+        }
+    }
+}
+
 static int put_message(struct screen *display,
                         const struct text_message * message,
                         int start, int max_y)

@@ -40,6 +40,7 @@
 #include "filetypes.h"
 #include "debug.h"
 #include "playlist_catalog.h"
+#include "statusbar.h"
 
 #define MAX_PLAYLISTS 400
 #define PLAYLIST_DISPLAY_COUNT 10

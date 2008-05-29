@@ -71,7 +71,6 @@ gui/quickscreen.c
 gui/scrollbar.c
 gui/splash.c
 gui/statusbar.c
-gui/textarea.c
 gui/yesno.c
 gui/wps_debug.c
 gui/wps_parser.c

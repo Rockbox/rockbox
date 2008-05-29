@@ -73,7 +73,6 @@
 
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_IPODSTYLE)
-#include "textarea.h"
 #include "rolo.h"
 #include "yesno.h"
 #endif

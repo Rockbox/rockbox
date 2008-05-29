@@ -21,13 +21,18 @@
 #define _GUI_YESNO_H_
 
 #include "screen_access.h"
-#include "textarea.h"
 
 enum yesno_res
 {
     YESNO_YES,
     YESNO_NO,
     YESNO_USB
+};
+
+struct text_message
+{
+    const char **message_lines;
+    int nb_lines;
 };
 
 /*

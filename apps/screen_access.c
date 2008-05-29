@@ -29,7 +29,6 @@
 #include <icons.h>
 
 #include "screen_access.h"
-#include "textarea.h"
 
 struct screen screens[NB_SCREENS] =
 {
@@ -228,11 +227,28 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
 void screen_access_init(void)
 {
     int i;
+    struct screen *display;
     FOR_NB_SCREENS(i)
     {
+        display = &screens[i];
 #ifdef HAVE_LCD_BITMAP
         ((struct screen*)&screens[i])->setfont(FONT_UI);
 #endif
-        gui_textarea_update_nblines(&screens[i]);
+        
+        int height=display->height;
+#ifdef HAVE_LCD_BITMAP
+        if(global_settings.statusbar)
+            height -= STATUSBAR_HEIGHT;
+#ifdef HAS_BUTTONBAR
+        if(global_settings.buttonbar && display->has_buttonbar)
+            height -= BUTTONBAR_HEIGHT;
+#endif
+        display->getstringsize((unsigned char *)"A", &display->char_width,
+                                &display->char_height);
+#else
+        display->char_width  = 1;
+        display->char_height = 1;
+#endif
+        display->nb_lines = height / display->char_height;
     }
 }

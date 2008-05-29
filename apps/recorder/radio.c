@@ -53,7 +53,6 @@
 #include "sound.h"
 #include "screen_access.h"
 #include "statusbar.h"
-#include "textarea.h"
 #include "splash.h"
 #include "yesno.h"
 #include "buttonbar.h"
@@ -64,6 +63,7 @@
 #include "list.h"
 #include "menus/exported_menus.h"
 #include "root_menu.h"
+#include "viewport.h"
 
 #if CONFIG_TUNER
 
@@ -131,7 +131,7 @@ static int save_preset_list(void);
 static int load_preset_list(void);
 static int clear_preset_list(void);
 
-static int scan_presets(void);
+static int scan_presets(void *viewports);
 
 /* Function to manipulate all yesno dialogues.
    This function needs the output text as an argument. */
@@ -142,7 +142,7 @@ static bool yesno_pop(const char* text)
     const struct text_message message={lines, 1};
     bool ret = (gui_syncyesno_run(&message,NULL,NULL)== YESNO_YES);
     FOR_NB_SCREENS(i)
-        gui_textarea_clear(&screens[i]);
+        screens[i].clear_viewport();
     return ret;
 }
 
@@ -451,6 +451,7 @@ int radio_screen(void)
 #ifndef HAVE_NOISY_IDLE_MODE
     int button_timeout = current_tick + (2*HZ);
 #endif
+    struct viewport vp[NB_SCREENS];
 #ifdef HAS_BUTTONBAR
     struct gui_buttonbar buttonbar;
     gui_buttonbar_init(&buttonbar);
@@ -463,14 +464,19 @@ int radio_screen(void)
     /* always display status bar in radio screen for now */
     global_status.statusbar_forced = statusbar?0:1;
     global_settings.statusbar = true;
+    gui_syncstatusbar_draw(&statusbars,true);
     FOR_NB_SCREENS(i)
     {
-        gui_textarea_clear(&screens[i]);
-        screen_set_xmargin(&screens[i],0);
+        viewport_set_defaults(&vp[i], i);
+#ifdef HAS_BUTTONBAR
+        if (global_settings.buttonbar)
+            vp[i].height -= BUTTONBAR_HEIGHT;
+#endif
+        screens[i].set_viewport(&vp[i]);
+        screens[i].clear_viewport();
+        screens[i].update_viewport();
     }
     
-    gui_syncstatusbar_draw(&statusbars,true);
-
     fh = font_get(FONT_UI)->height;
     
     /* Adjust for font size, trying to center the information vertically */
@@ -520,7 +526,7 @@ int radio_screen(void)
 #endif
 
    if(num_presets < 1 && yesno_pop(ID2P(LANG_FM_FIRST_AUTOSCAN)))
-        scan_presets();
+        scan_presets(vp);
     
     curr_preset = find_preset(curr_freq);
     if(curr_preset != -1)
@@ -715,10 +721,12 @@ int radio_screen(void)
             case ACTION_FM_MENU:
                 radio_menu();
                 curr_preset = find_preset(curr_freq);
-                FOR_NB_SCREENS(i){
-                    struct screen *sc = &screens[i];
-                    gui_textarea_clear(sc);
-                    screen_set_xmargin(sc, 0);
+                FOR_NB_SCREENS(i)
+                {
+                    screens[i].set_viewport(&vp[i]);
+                    screens[i].clear_viewport();
+                    screens[i].update_viewport();
+                    screens[i].set_viewport(NULL);
                 }
 #ifdef HAS_BUTTONBAR
                 gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
@@ -736,10 +744,10 @@ int radio_screen(void)
                     update_screen = true;
                     FOR_NB_SCREENS(i)
                     {
-                        struct screen *sc = &screens[i];
-                        gui_textarea_clear(sc);
-                        screen_set_xmargin(sc, 0);
-                        gui_textarea_update(sc);
+                        screens[i].set_viewport(&vp[i]);
+                        screens[i].clear_viewport();
+                        screens[i].update_viewport();
+                        screens[i].set_viewport(NULL);
                     }
 
                     break;
@@ -747,10 +755,10 @@ int radio_screen(void)
                 handle_radio_presets();
                 FOR_NB_SCREENS(i)
                 {
-                    struct screen *sc = &screens[i];
-                    gui_textarea_clear(sc);
-                    screen_set_xmargin(sc, 0);
-                    gui_textarea_update(sc);
+                    screens[i].set_viewport(&vp[i]);
+                    screens[i].clear_viewport();
+                    screens[i].update_viewport();
+                    screens[i].set_viewport(NULL);
                 }
 #ifdef HAS_BUTTONBAR
                 gui_buttonbar_set(&buttonbar,
@@ -847,10 +855,12 @@ int radio_screen(void)
             {
                 FOR_NB_SCREENS(i)
                 {
+                    screens[i].set_viewport(&vp[i]);
                     peak_meter_screen(&screens[i],0,
                                           STATUSBAR_HEIGHT + fh*(top_of_screen + 4), fh);
                     screens[i].update_rect(0, STATUSBAR_HEIGHT + fh*(top_of_screen + 4),
-                                               screens[i].width, fh);
+                                           screens[i].width, fh);
+                    screens[i].set_viewport(NULL);
                 }
             }
 
@@ -887,7 +897,9 @@ int radio_screen(void)
                 int freq;
 
                 FOR_NB_SCREENS(i)
-                    screens[i].setfont(FONT_UI);
+                {
+                    screens[i].set_viewport(&vp[i]);
+                }
                 
                 snprintf(buf, 128, curr_preset >= 0 ? "%d. %s" : " ",
                          curr_preset + 1, presets[curr_preset].name);
@@ -934,11 +946,15 @@ int radio_screen(void)
                 }
 #endif /* CONFIG_CODEC != SWCODEC */
 
+                FOR_NB_SCREENS(i)
+                {
+                    screens[i].update_viewport();
+                    screens[i].set_viewport(NULL);
+                }
+                    
 #ifdef HAS_BUTTONBAR
                 gui_buttonbar_draw(&buttonbar);
 #endif
-                FOR_NB_SCREENS(i)
-                    gui_textarea_update(&screens[i]);
             }
             /* Only force the redraw if update_screen is true */
             gui_syncstatusbar_draw(&statusbars,true);
@@ -983,7 +999,11 @@ int radio_screen(void)
         gui_syncsplash(0, str(LANG_DISK_FULL));
         gui_syncstatusbar_draw(&statusbars,true);
         FOR_NB_SCREENS(i)
-            gui_textarea_update(&screens[i]);
+        {
+            screens[i].set_viewport(&vp[i]);
+            screens[i].update_viewport();
+            screens[i].set_viewport(NULL);
+        }
         audio_error_clear();
 
         while(1)
@@ -1415,10 +1435,14 @@ MENUITEM_FUNCTION_DYNTEXT(radio_mode_item, 0,
                                  get_mode_text, NULL, NULL, NULL, Icon_NOICON);
 #endif
 
-static int scan_presets(void)
+static int scan_presets(void *viewports)
 {
     bool do_scan = true;
+    int i;
+    struct viewport *vp = (struct viewport *)viewports;
     
+    FOR_NB_SCREENS(i)
+        screens[i].set_viewport(vp?&vp[i]:NULL);
     if(num_presets > 0) /* Do that to avoid 2 questions. */
         do_scan = yesno_pop(ID2P(LANG_FM_CLEAR_PRESETS));
         
@@ -1428,7 +1452,6 @@ static int scan_presets(void)
             &fm_region_data[global_settings.fm_region];
 
         char buf[MAX_FMPRESET_LEN + 1];
-        int i;
 
         curr_freq = fmr->freq_min;
         num_presets = 0;
@@ -1466,9 +1489,8 @@ static int scan_presets(void)
         
         FOR_NB_SCREENS(i)
         {
-            gui_textarea_clear(&screens[i]);
-            screen_set_xmargin(&screens[i],0);
-            gui_textarea_update(&screens[i]);
+            screens[i].clear_viewport();
+            screens[i].update_viewport();
         }
 
         if(num_presets > 0)
@@ -1557,7 +1579,8 @@ MENUITEM_FUNCTION(presetsave_item, 0, ID2P(LANG_FM_PRESET_SAVE),
                     save_preset_list, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(presetclear_item, 0, ID2P(LANG_FM_PRESET_CLEAR), 
                     clear_preset_list, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(scan_presets_item, 0, ID2P(LANG_FM_SCAN_PRESETS), 
+MENUITEM_FUNCTION(scan_presets_item, MENU_FUNC_USEPARAM,
+                    ID2P(LANG_FM_SCAN_PRESETS),
                     scan_presets, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL, 
