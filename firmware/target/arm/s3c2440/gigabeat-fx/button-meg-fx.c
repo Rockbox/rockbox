@@ -119,20 +119,7 @@ int button_read_device(void)
     buttons = GPGDAT & 0x1F;
     if (buttons)
     {
-        if (buttons & (1 << 0))
-            btn |= BUTTON_POWER;
-
-        if (buttons & (1 << 1))
-            btn |= BUTTON_MENU;
-
-        if (buttons & (1 << 2))
-            btn |= BUTTON_VOL_UP;
-
-        if (buttons & (1 << 3))
-            btn |= BUTTON_VOL_DOWN;
-
-        if (buttons & (1 << 4))
-            btn |= BUTTON_A;
+        btn |= buttons;
         buttonlight_on();
     }
     
