@@ -40,11 +40,6 @@
 #define O_BINARY 0
 #endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define BUTTONBAR_HEIGHT 8
-#else
-#define BUTTONBAR_HEIGHT 0
-#endif
 
 #define DEFAULT_MARGIN 6
 #define KBD_BUF_SIZE 500

@@ -21,13 +21,14 @@
 #define _GUI_BUTTONBAR_H_
 #include "config.h"
 #include "button.h"
-#if CONFIG_KEYPAD == RECORDER_PAD
+#include "screen_access.h"
 
-#define HAS_BUTTONBAR
+
+#ifdef HAS_BUTTONBAR
 #define BUTTONBAR_HEIGHT 8
 #define BUTTONBAR_MAX_BUTTONS 3
 #define BUTTONBAR_CAPTION_LENGTH 8
-#include "screen_access.h"
+
 
 struct gui_buttonbar
 {
@@ -76,6 +77,7 @@ extern void gui_buttonbar_draw(struct gui_buttonbar * buttonbar);
  *  - buttonbar : the buttonbar
  */
 extern bool gui_buttonbar_isset(struct gui_buttonbar * buttonbar);
-
-#endif  /* CONFIG_KEYPAD == RECORDER_PAD */
+#else
+#define BUTTONBAR_HEIGHT 0
+#endif
 #endif /* _GUI_BUTTONBAR_H_ */
