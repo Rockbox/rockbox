@@ -1194,8 +1194,10 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "DEV_INIT2: %08lx", DEV_INIT2);
         lcd_puts(0, line++, buf);
+#ifdef ADC_ACCESSORY
         snprintf(buf, sizeof(buf), "ACCESSORY: %d", adc_read(ADC_ACCESSORY));
         lcd_puts(0, line++, buf);
+#endif
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         line++;
