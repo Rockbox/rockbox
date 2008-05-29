@@ -81,31 +81,47 @@
     eor.l   %d6, %d0            /* invert data bit */
     move.l  %d0, (%a1)          /*   output data bit7 */
     nop
+    nop
 1:
 
 .macro bit_out
+    move.l  %d2, (%a0)          /* Bit7: set CLK = 1 */
+    nop
     lsl.l   #1, %d4             /* Invert data line for bit6 ? */
     bcc.s   1f                  /*   no: skip */
     eor.l   %d6, %d0            /* Invert data bit */
-    move.l  %d2, (%a0)          /* Bit7: set CLK = 1 */
     move.l  %d1, (%a0)          /*       set CLK = 0 */
     move.l  %d0, (%a1)          /* Output data bit6 */
-    bra.s   2f                  /* slower than trapf.l - required here */
-1:                              /*   else */
-    move.l  %d2, (%a0)          /* Bit7: set CLK = 1 */
+    .word   0x51fa              /* trapf.w - shadow next insn */
+1:
     move.l  %d1, (%a0)          /*       set CLK = 0 */
-2:
 .endm
-    bit_out
-    bit_out
-    bit_out
-    bit_out
-    bit_out
-    bit_out
-    bit_out
 
-    nop                         /* Let data line settle */
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+    bit_out
+    nop
+    nop
+
     move.l  %d2, (%a0)          /* Bit0: Set CLK = 1 */
+    nop
+    nop
     move.l  %d1, (%a0)          /*       Set CLK = 0 */
 
     move.w  %d3, %sr            /* Restore interrupt level */

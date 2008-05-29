@@ -299,7 +299,7 @@ void lcd_remote_update(void)
 
 #ifdef HAVE_REMOTE_LCD_TICKING
     /* Adjust byte delay for emi reduction. */
-    remote_byte_delay = emireduce ? cpu_frequency / 192800 - 100: 0;
+    remote_byte_delay = emireduce ? cpu_frequency / 206200 - 85: 0;
 #endif
 
     /* Copy display bitmap to hardware */
@@ -333,7 +333,7 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
 
 #ifdef HAVE_REMOTE_LCD_TICKING
     /* Adjust byte delay for emi reduction */
-    remote_byte_delay = emireduce ? cpu_frequency / 192800 - 100: 0;
+    remote_byte_delay = emireduce ? cpu_frequency / 206200 - 85: 0;
 #endif
 
     /* Copy specified rectange bitmap to hardware */
