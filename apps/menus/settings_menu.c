@@ -361,6 +361,10 @@ MENUITEM_SETTING(buttonlight_timeout, &global_settings.buttonlight_timeout, NULL
 MENUITEM_SETTING(buttonlight_brightness, &global_settings.buttonlight_brightness, NULL);
 #endif
 
+#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
+#endif
+
 
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM), 
           0, Icon_System_menu,
@@ -399,6 +403,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #if CONFIG_CODEC == SWCODEC
             &keyclick_menu,
+#endif
+#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+            &touchpad_sensitivity,
 #endif
          );
 

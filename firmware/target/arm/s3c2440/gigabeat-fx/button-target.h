@@ -27,6 +27,7 @@
 bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
+void touchpad_set_sensitivity(int level);
 
 /* Toshiba Gigabeat specific button codes */
 

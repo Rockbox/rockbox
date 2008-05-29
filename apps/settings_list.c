@@ -1321,6 +1321,11 @@ const struct settings_list settings[] = {
 #endif /* CONFIG_CODEC == SWCODEC */
     FILENAME_SETTING(0, playlist_catalog_dir, "playlist catalog directory",
                      PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL, MAX_FILENAME+1),
+#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+    CHOICE_SETTING(0, touchpad_sensitivity, LANG_TOUCHPAD_SENSITIVITY, 0,
+                   "touchpad sensitivity", "normal,high", touchpad_set_sensitivity, 2,
+                   ID2P(LANG_NORMAL), ID2P(LANG_HIGH)),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

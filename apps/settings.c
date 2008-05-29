@@ -929,6 +929,10 @@ void settings_apply(bool read_disk)
 #endif
 #endif /* HAVE_BACKLIGHT */
 
+#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+    touchpad_set_sensitivity(global_settings.touchpad_sensitivity);
+#endif
+
     /* This should stay last */
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
     enc_global_settings_apply();

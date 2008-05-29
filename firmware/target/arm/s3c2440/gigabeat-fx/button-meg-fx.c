@@ -30,6 +30,20 @@
 static bool headphones_detect;
 static bool hold_button        = false;
 
+#define TOUCHPAD_SENS_NORMAL ((1 << 12) | /* right++ */ \
+                              (1 <<  7) | /* left++ */ \
+                              (1 <<  6) | /* down++*/ \
+                              (1 <<  0) | /* up++ */ \
+                              (1 <<  3))  /* center */
+
+#define TOUCHPAD_SENS_HIGH   (((1 << 12) | (1 << 11)) | /* right++, right+ */ \
+                              ((1 <<  8) | (1 <<  7)) | /* left+, left++ */ \
+                              ((1 <<  6) | (1 <<  5)) | /* down++, down+ */ \
+                              ((1 <<  1) | (1 <<  0)) | /* up+, up++ */ \
+                                           (1 <<  3))   /* Center */
+
+static int touchpad_mask = TOUCHPAD_SENS_NORMAL;
+
 static int const remote_buttons[] =
 {
     BUTTON_NONE,        /* Headphones connected - remote disconnected */
@@ -123,36 +137,51 @@ int button_read_device(void)
     }
     
     /* the touchpad - only watch the lines we actually read */
-    touchpad = GPJDAT & (((1 << 12) | (1 << 11)) | /* right++, right+ */
-                         ((1 <<  8) | (1 <<  7)) | /* left+, left++ */
-                         ((1 <<  6) | (1 <<  5)) | /* down++, down+ */
-                         ((1 <<  1) | (1 <<  0)) | /* up+, up++ */
-                          (1 <<  3));              /* center */
+    touchpad = GPJDAT & touchpad_mask;
+
     if (touchpad)
     {
         if (touchpad & (1 << 3))
         {
             btn |= BUTTON_SELECT;
-            /* Desensitize middle (+) detectors one level */
-            touchpad &= ~((1 << 11) | (1 << 8) | (1 << 5) | (1 << 1));
+            /* Desensitize all but outer detectors and still allow a combo if
+             * that's really intended. */
+            touchpad &= TOUCHPAD_SENS_NORMAL;
         }
 
-        if (touchpad & ((1 << 1) | (1 << 0)))
+        /* Simply include all lines in checks since "touchpad" has been
+         * masked to desired sensitivity already - allows any mask to be
+         * used without changing this code. */
+        if (touchpad & ((1 << 2) | (1 << 1) | (1 << 0)))
             btn |= BUTTON_UP;
 
-        if (touchpad & ((1 << 12) | (1 << 11)))
+        if (touchpad & ((1 << 12) | (1 << 11) | (1 << 10)))
             btn |= BUTTON_RIGHT;
 
-        if (touchpad & ((1 << 6) | (1 << 5)))
+        if (touchpad & ((1 << 6) | (1 << 5) | (1 << 4)))
             btn |= BUTTON_DOWN;
 
-        if (touchpad & ((1 << 8) | (1 << 7)))
+        if (touchpad & ((1 << 9) | (1 << 8) | (1 << 7)))
             btn |= BUTTON_LEFT;
 
         buttonlight_on();
     }
     
     return btn;
+}
+
+void touchpad_set_sensitivity(int level)
+{
+    static const int masks[] =
+    {
+        TOUCHPAD_SENS_NORMAL,
+        TOUCHPAD_SENS_HIGH
+    };
+
+    if ((unsigned)level >= ARRAYLEN(masks))
+        level = 0;
+
+    touchpad_mask = masks[level];
 }
 
 bool headphones_inserted(void)

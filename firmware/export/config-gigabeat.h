@@ -48,6 +48,8 @@
 /* We don't use a setting but a fixed delay after the backlight has
  * turned off */
 #define LCD_SLEEP_TIMEOUT (5*HZ)
+
+#define HAVE_TOUCHPAD_SENSITIVITY_SETTING
 #endif /* BOOTLOADER */
 
 #define CONFIG_KEYPAD GIGABEAT_PAD

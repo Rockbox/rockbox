@@ -740,6 +740,9 @@ struct user_settings
     unsigned char playlist_catalog_dir[MAX_FILENAME+1];
     bool study_mode; /* study mode enabled */
     int study_hop_step; /* hop step in study mode, in seconds */
+#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+    int touchpad_sensitivity;
+#endif
 };
 
 /** global variables **/

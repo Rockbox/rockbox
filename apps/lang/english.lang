@@ -11716,3 +11716,37 @@
     recording: "Stop Recording And Shutdown"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "High"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "High"
+  </voice>
+</phrase>
