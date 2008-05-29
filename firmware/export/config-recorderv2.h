@@ -22,7 +22,7 @@
 /* define this if you have access to the pitchscreen */
 #define HAVE_PITCHSCREEN
 /* define this if you have the button bar */
-#define HAS_BUTTONBAR
+#define HAVE_BUTTONBAR
 
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE

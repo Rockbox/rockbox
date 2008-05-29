@@ -128,7 +128,7 @@ struct screen screens[NB_SCREENS] =
         .backlight_off=&backlight_off,
         .is_backlight_on=&is_backlight_on,
         .backlight_set_timeout=&backlight_set_timeout,
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
         .has_buttonbar=false
 #endif
     },
@@ -239,7 +239,7 @@ void screen_access_init(void)
 #ifdef HAVE_LCD_BITMAP
         if(global_settings.statusbar)
             height -= STATUSBAR_HEIGHT;
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
         if(global_settings.buttonbar && display->has_buttonbar)
             height -= BUTTONBAR_HEIGHT;
 #endif

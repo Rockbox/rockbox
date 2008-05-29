@@ -89,7 +89,7 @@ struct gui_synclist tree_lists;
 
 /* I put it here because other files doesn't use it yet,
  * but should be elsewhere since it will be used mostly everywhere */
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
 struct gui_buttonbar tree_buttonbar;
 #endif
 static struct tree_context tc;
@@ -299,7 +299,7 @@ void tree_gui_init(void)
     FOR_NB_SCREENS(i)
         screens[i].double_height(false);
 #endif
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     gui_buttonbar_init(&tree_buttonbar);
     /* since archos only have one screen, no need to create more than that */
     gui_buttonbar_set_display(&tree_buttonbar, &(screens[SCREEN_MAIN]) );
@@ -463,7 +463,7 @@ static int update_dir(void)
         tc.selected_item=tc.filesindir-1;
 
     gui_synclist_select_item(&tree_lists, tc.selected_item);
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     if (global_settings.buttonbar) {
         if (*tc.dirfilter < NUM_FILTER_MODES)
             gui_buttonbar_set(&tree_buttonbar, str(LANG_SYSFONT_DIRBROWSE_F1),

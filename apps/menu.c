@@ -299,7 +299,7 @@ static void init_default_menu_viewports(struct viewport parent[NB_SCREENS], bool
             }
         }
     }
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     if (!hide_bars && global_settings.buttonbar)
         parent[0].height -= BUTTONBAR_HEIGHT;
 #endif
@@ -383,7 +383,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     bool in_stringlist, done = false;
     
     struct viewport *vps, menu_vp[NB_SCREENS]; /* menu_vp will hopefully be phased out */
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     struct gui_buttonbar buttonbar;
     gui_buttonbar_init(&buttonbar);
     gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
@@ -418,7 +418,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     get_menu_callback(menu, &menu_callback);
     
 
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     if (!hide_bars)
     {
         gui_buttonbar_set(&buttonbar, "<<<", "", "");
@@ -526,7 +526,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         else if (action == ACTION_STD_OK)
         {
             int type;
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
             if (!hide_bars)
             {
                 gui_buttonbar_unset(&buttonbar);
@@ -633,7 +633,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 done = true;
                 break;
             }
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
             if (!hide_bars)
             {
                 gui_buttonbar_set(&buttonbar, "<<<", "", "");

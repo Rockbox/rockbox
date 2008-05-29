@@ -24,7 +24,7 @@
 #include "screen_access.h"
 
 
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
 #define BUTTONBAR_HEIGHT 8
 #define BUTTONBAR_MAX_BUTTONS 3
 #define BUTTONBAR_CAPTION_LENGTH 8

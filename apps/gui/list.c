@@ -79,7 +79,7 @@ void list_init_viewports(struct gui_synclist *list)
             list->parent[i]->height = screens[i].height - list->parent[i]->y;
         }
     }
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     if (list && (list->parent[0] == &parent[0]) && global_settings.buttonbar)
         list->parent[0]->height -= BUTTONBAR_HEIGHT;
 #endif
@@ -218,11 +218,11 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
     int i;
     static struct gui_synclist *last_list = NULL;
     static int last_count = -1;
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     static bool last_buttonbar = false;
 #endif
     if (force_list_reinit ||
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
         last_buttonbar != screens[SCREEN_MAIN].has_buttonbar ||
 #endif
         last_list != gui_list ||
@@ -231,7 +231,7 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
         list_init_viewports(gui_list);
         force_list_reinit = false;
     }
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     last_buttonbar = screens[SCREEN_MAIN].has_buttonbar;
 #endif
     last_count = gui_list->nb_items;

@@ -452,7 +452,7 @@ int radio_screen(void)
     int button_timeout = current_tick + (2*HZ);
 #endif
     struct viewport vp[NB_SCREENS];
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     struct gui_buttonbar buttonbar;
     gui_buttonbar_init(&buttonbar);
     gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
@@ -468,7 +468,7 @@ int radio_screen(void)
     FOR_NB_SCREENS(i)
     {
         viewport_set_defaults(&vp[i], i);
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
         if (global_settings.buttonbar)
             vp[i].height -= BUTTONBAR_HEIGHT;
 #endif
@@ -532,7 +532,7 @@ int radio_screen(void)
     if(curr_preset != -1)
          radio_mode = RADIO_PRESET_MODE;
 
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
         str(LANG_PRESET), str(LANG_FM_BUTTONBAR_RECORD));
 #endif
@@ -728,7 +728,7 @@ int radio_screen(void)
                     screens[i].update_viewport();
                     screens[i].set_viewport(NULL);
                 }
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
                 gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
                                   str(LANG_PRESET),
                                   str(LANG_FM_BUTTONBAR_RECORD));
@@ -760,7 +760,7 @@ int radio_screen(void)
                     screens[i].update_viewport();
                     screens[i].set_viewport(NULL);
                 }
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
                 gui_buttonbar_set(&buttonbar,
                                   str(LANG_BUTTONBAR_MENU),
                                   str(LANG_PRESET),
@@ -952,7 +952,7 @@ int radio_screen(void)
                     screens[i].set_viewport(NULL);
                 }
                     
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
                 gui_buttonbar_draw(&buttonbar);
 #endif
             }
@@ -1337,14 +1337,14 @@ static int handle_radio_presets(void)
     struct gui_synclist lists;
     int result = 0;
     int action = ACTION_NONE;
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     struct gui_buttonbar buttonbar;
 #endif
 
     if(presets_loaded == false)
         return result;
 
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     gui_buttonbar_init(&buttonbar);
     gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
     gui_buttonbar_set(&buttonbar, str(LANG_FM_BUTTONBAR_ADD),

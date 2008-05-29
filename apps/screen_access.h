@@ -68,7 +68,7 @@ struct screen
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     bool has_disk_led;
 #endif
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     bool has_buttonbar;
 #endif
     void (*set_viewport)(struct viewport* vp);
@@ -155,7 +155,7 @@ struct screen
     void (*backlight_set_timeout)(int index);
 };
 
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
 /*
  * Sets if the given screen has a buttonbar or not
  * - screen : the screen structure

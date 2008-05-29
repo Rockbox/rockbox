@@ -338,7 +338,7 @@ int kbd_input(char* text, int buflen)
     }
 
     char outline[256];
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     struct gui_buttonbar buttonbar;
     bool buttonbar_config = global_settings.buttonbar;
 
@@ -712,7 +712,7 @@ int kbd_input(char* text, int buflen)
 
         cur_blink = !cur_blink;
 
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
         /* draw the button bar */
         gui_buttonbar_set(&buttonbar, "Shift", "OK", "Del");
         gui_buttonbar_draw(&buttonbar);
@@ -764,7 +764,7 @@ int kbd_input(char* text, int buflen)
                 FOR_NB_SCREENS(l)
                     screens[l].setfont(FONT_UI);
 
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
                 global_settings.buttonbar=buttonbar_config;
 #endif
                 return -1;
@@ -1230,7 +1230,7 @@ int kbd_input(char* text, int buflen)
         }
     }
 
-#ifdef HAS_BUTTONBAR
+#ifdef HAVE_BUTTONBAR
     global_settings.buttonbar = buttonbar_config;
 #endif
 
