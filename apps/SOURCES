@@ -47,7 +47,9 @@ filetree.c
 scrobbler.c
 
 screen_access.c
+#ifdef HAS_BUTTONBAR
 gui/buttonbar.c
+#endif
 gui/gwps.c
 gui/gwps-common.c
 #ifdef HAVE_LCD_BITMAP

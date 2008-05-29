@@ -22,20 +22,32 @@
  - Rewrote a lot of code to avoid global vars and make it accept eventually
    more that 3 buttons on the bar (just the prototype of gui_buttonbar_set
    and the constant BUTTONBAR_MAX_BUTTONS to modify)
+2008 Jonathan Gordon
+ - redone to use viewports, items will NOT scroll in their vp.
+   Bar is always drawn at the bottom of the screen. This may be changed later.
+   Callers need to remember to adjust their viewports to not be overwitten
 */
 #include "config.h"
 #include "buttonbar.h"
-
-#ifdef HAS_BUTTONBAR
-
+#include "viewport.h"
 #include "lcd.h"
 #include "font.h"
 #include "string.h"
 #include "settings.h"
 
+static struct viewport bb_vp[NB_SCREENS];
 void gui_buttonbar_init(struct gui_buttonbar * buttonbar)
 {
+    int i;
     gui_buttonbar_unset(buttonbar);
+    FOR_NB_SCREENS(i)
+    {
+        viewport_set_defaults(&bb_vp[i], i);
+        bb_vp[i].font = FONT_SYSFIXED;
+        bb_vp[i].y = screens[i].height - BUTTONBAR_HEIGHT;
+        bb_vp[i].height = BUTTONBAR_HEIGHT;
+        bb_vp[i].drawmode = DRMODE_COMPLEMENT;
+    }
 }
 
 void gui_buttonbar_set_display(struct gui_buttonbar * buttonbar,
@@ -46,26 +58,22 @@ void gui_buttonbar_set_display(struct gui_buttonbar * buttonbar,
 
 static void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
 {
-    int xpos, ypos, button_width, text_width;
-    int fh;
+    int button_width;
+    int fh, fw;
     struct screen * display = buttonbar->display;
-    display->getstringsize("M", NULL, &fh);
+    struct viewport vp = bb_vp[display->screen_type];
 
     button_width = display->width/BUTTONBAR_MAX_BUTTONS;
-    xpos = num * button_width;
-    ypos = display->height - fh;
-
+    vp.width = button_width;
+    vp.x = button_width * num;
+    display->set_viewport(&vp);
+    display->fillrect(0, 0, button_width - 1, vp.height);
     if(buttonbar->caption[num][0] != 0)
     {
-        /* center the text */
-        text_width = display->getstringsize(buttonbar->caption[num], NULL, NULL);
-        display->putsxy(xpos + (button_width - text_width)/2,
-                        ypos, buttonbar->caption[num]);
+        display->getstringsize(buttonbar->caption[num], &fw, &fh);
+        display->putsxy((button_width - fw)/2,
+                        (vp.height-fh)/2, buttonbar->caption[num]);
     }
-
-    display->set_drawmode(DRMODE_COMPLEMENT);
-    display->fillrect(xpos, ypos, button_width - 1, fh);
-    display->set_drawmode(DRMODE_SOLID);
 }
 
 void gui_buttonbar_set(struct gui_buttonbar * buttonbar,
@@ -101,22 +109,16 @@ void gui_buttonbar_unset(struct gui_buttonbar * buttonbar)
 void gui_buttonbar_draw(struct gui_buttonbar * buttonbar)
 {
     struct screen * display = buttonbar->display;
-    screen_has_buttonbar(display, gui_buttonbar_isset(buttonbar));
-    if(!global_settings.buttonbar || !display->has_buttonbar)
+    if(!global_settings.buttonbar || !gui_buttonbar_isset(buttonbar))
         return;
     int i;
-    display->setfont(FONT_SYSFIXED);
-
-    display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    display->fillrect(0, display->height - BUTTONBAR_HEIGHT,
-                      display->width, BUTTONBAR_HEIGHT);
-    display->set_drawmode(DRMODE_SOLID);
-
+    display->set_viewport(&bb_vp[display->screen_type]);
+    display->clear_viewport();
     for(i = 0;i < BUTTONBAR_MAX_BUTTONS;i++)
         gui_buttonbar_draw_button(buttonbar, i);
-    display->update_rect(0, display->height - BUTTONBAR_HEIGHT,
-                         display->width, BUTTONBAR_HEIGHT);
-    display->setfont(FONT_UI);
+    display->set_viewport(&bb_vp[display->screen_type]);
+    display->update_viewport();
+    display->set_viewport(NULL);
 }
 
 bool gui_buttonbar_isset(struct gui_buttonbar * buttonbar)
@@ -128,5 +130,3 @@ bool gui_buttonbar_isset(struct gui_buttonbar * buttonbar)
             return true;
     return false;
 }
-
-#endif /* HAS_BUTTONBAR */
