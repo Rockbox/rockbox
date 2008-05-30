@@ -278,6 +278,7 @@ void list_draw(struct screen *display, struct viewport *parent,
 
 
 #if defined(HAVE_TOUCHPAD)
+static int prev_line=0;
 /* this needs to be fixed if we ever get more than 1 touchscreen on a target */
 /* this also assumes the whole screen is used, which is a bad asusmption but
    fine untill customizable lists comes in... */
@@ -309,15 +310,15 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
             nb_lines = viewport_get_nb_lines(&list_text[SCREEN_MAIN]);
             if (nb_lines <  gui_list->nb_items)
             {
-                height = nb_lines * display->char_height;
+                height = nb_lines * font_get(parent->font)->height;
                 size = height*nb_lines / gui_list->nb_items;
                 new_selection = ((y-list_text[SCREEN_MAIN].y)*(gui_list->nb_items-nb_lines))/(height-size);
-                gui_synclist_select_item(gui_list, new_selection);
                 nb_lines /= 2;
+                
                 if (new_selection - gui_list->start_item[SCREEN_MAIN] > nb_lines)
-                {
                     new_selection = gui_list->start_item[SCREEN_MAIN]+nb_lines;
-                }
+                    
+                gui_synclist_select_item(gui_list, new_selection);
                 gui_list->start_item[SCREEN_MAIN] = new_selection;
                 return ACTION_REDRAW;
             }
@@ -329,32 +330,52 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
             pressing the selected item will "enter" it */
         if (y > list_text[SCREEN_MAIN].y)
         {
-            line = (y-list_text[SCREEN_MAIN].y) / display->char_height;
-            if (button != BUTTON_REL && button != BUTTON_REPEAT)
+            int i, line_height, actual_y;
+            actual_y =  y - list_text[SCREEN_MAIN].y;
+            line_height = font_get(parent->font)->height;
+            line = -1;
+            for(i=0; i<gui_list->nb_items; i++)
             {
-                if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN])
-                    gui_synclist_select_item(gui_list, gui_list->start_item[SCREEN_MAIN]+line);
-                return ACTION_REDRAW;
+                if(actual_y > line_height*i && actual_y < line_height*(i+1))
+                    line = i;
             }
-            if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN])
+            if(line == -1)
+                return ACTION_NONE;
+            
+            /* BUTTON_TOUCHPAD represents a button press*/
+            if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN] && button == BUTTON_TOUCHPAD)
             {
                 if (gui_list->start_item[SCREEN_MAIN]+line > gui_list->nb_items)
                     return ACTION_NONE;
                 gui_synclist_select_item(gui_list, gui_list->start_item[SCREEN_MAIN]+line);
+                return ACTION_REDRAW;
             }
-        
+            
             if (button == BUTTON_REPEAT)
                 return ACTION_STD_CONTEXT;
+            else if(button == BUTTON_REL)
+            {
+                if(prev_line == line)
+                {
+                    prev_line = 0;
+                    return ACTION_STD_OK;
+                }
+                else
+                {
+                    prev_line = line;
+                    return ACTION_NONE;
+                }
+            }
             else
-                return ACTION_STD_OK;
+                return ACTION_NONE;
         }
         /* title goes up one level */
-        else if (y > title_text[SCREEN_MAIN].y && draw_title(display, parent, gui_list))
+        else if (y > title_text[SCREEN_MAIN].y && draw_title(display, parent, gui_list) && button == BUTTON_REL)
         {
             return ACTION_STD_CANCEL;
         }
         /* title or statusbar is cancel */
-        else if (global_settings.statusbar)
+        else if (global_settings.statusbar && button == BUTTON_REL)
         {
             return ACTION_STD_CANCEL;
         }

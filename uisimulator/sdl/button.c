@@ -166,6 +166,13 @@ void button_event(int key, bool pressed)
     case SDLK_KP3:
         new_btn = BUTTON_BOTTOMRIGHT;
         break;
+    case SDLK_F10:
+        if(pressed)
+        {
+            touchpad_mode = (touchpad_mode == TOUCHPAD_POINT ? TOUCHPAD_BUTTON : TOUCHPAD_POINT);
+            printf("Touchpad mode: %s\n", touchpad_mode == TOUCHPAD_POINT ? "TOUCHPAD_POINT" : "TOUCHPAD_BUTTON");
+        }
+        break;
             
 #endif
     case SDLK_u:
@@ -1080,6 +1087,15 @@ void mouse_tick_task(void)
     last_check = current_tick;
     if (SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT))
     {
+        if(background)
+        {
+            x -= UI_LCD_POSX;
+            y -= UI_LCD_POSY;
+            
+            if(x<0 || y<0 || x>UI_LCD_WIDTH || y>UI_LCD_HEIGHT)
+                return;
+        }
+        
         mouse_coords = (x<<16)|y;
         button_event(BUTTON_TOUCHPAD, true);
         if (debug_wps)
