@@ -11665,3 +11665,37 @@
     recording: "Ferma Registrazione e Spegni"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Sensibilità Touchpad"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Sensibilità Touchpad"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Alta"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Alta"
+  </voice>
+</phrase>
