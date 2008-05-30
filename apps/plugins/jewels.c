@@ -1249,7 +1249,7 @@ static unsigned int jewels_initlevel(struct game_context* bj) {
 * jewels_nextlevel() advances the game to the next level and returns
 *     points earned.
 ******************************************************************************/
-static unsigned int jewels_nextlevel(struct game_context* bj) {
+static void jewels_nextlevel(struct game_context* bj) {
     int i, x, y;
     unsigned int points = 0;
 
@@ -1286,7 +1286,8 @@ static unsigned int jewels_nextlevel(struct game_context* bj) {
             break;
     }
 
-    return jewels_initlevel(bj);
+    points += jewels_initlevel(bj);
+    bj->score += points;
 }
 
 /*****************************************************************************
@@ -1886,12 +1887,13 @@ static int jewels_main(struct game_context* bj) {
 
         switch(bj->type) {
             case GAME_TYPE_NORMAL:
-                if(bj->score >= LEVEL_PTS) bj->score = jewels_nextlevel(bj);
+                if(bj->score >= LEVEL_PTS)
+                    jewels_nextlevel(bj);
                 break;
 
             case GAME_TYPE_PUZZLE:
                 if(jewels_puzzle_is_finished(bj))
-                    bj->score += jewels_nextlevel(bj);
+                    jewels_nextlevel(bj);
                 break;
         }
     }
