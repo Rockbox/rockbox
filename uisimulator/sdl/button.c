@@ -166,7 +166,7 @@ void button_event(int key, bool pressed)
     case SDLK_KP3:
         new_btn = BUTTON_BOTTOMRIGHT;
         break;
-    case SDLK_F10:
+    case SDLK_F4:
         if(pressed)
         {
             touchpad_mode = (touchpad_mode == TOUCHPAD_POINT ? TOUCHPAD_BUTTON : TOUCHPAD_POINT);
