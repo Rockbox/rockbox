@@ -79,10 +79,13 @@ void audio_input_mux(int source, unsigned flags)
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
             /* Switch line in source to tuner */
             GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x04);
-#endif            /* Set line-in vol to 0dB*/
+            /* Set line-in vol to +12dB, which is proper for H10's */
+            if (!recording)
+                audiohw_set_recvol(0x1f, 0x1f, AUDIO_GAIN_LINEIN);
+#else            /* Set line-in vol to 0dB*/
             if (!recording)
                 audiohw_set_recvol(0x17, 0x17, AUDIO_GAIN_LINEIN);
-
+#endif
             if (source == last_source && recording == last_recording)
                 break;
 
