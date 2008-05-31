@@ -1511,7 +1511,6 @@ mpc_bool_t mpc_decoder_initialize(mpc_decoder *d, mpc_streaminfo *si)
     d->WordsRead = fpos;
     d->dword = SWAP(d->Speicher[0]);
     d->next = SWAP(d->Speicher[1]);
-    d->SeekTable_Step = 1;
     
     return TRUE;
 }
