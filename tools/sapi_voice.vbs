@@ -321,7 +321,7 @@ Function LangIDs(ByRef sLanguage)
             LangIDs = Array( &h809,  &h409,  &hc09, &h1009, &h1409, &h1809, _
                             &h1c09, &h2009, &h2409, &h2809, &h2c09, &h3009, _
                             &h3409)
-            ' Britsh, American, Australian, Canadian, New Zealand, Ireland,
+            ' British, American, Australian, Canadian, New Zealand, Ireland,
             ' South Africa, Jamaika, Caribbean, Belize, Trinidad, Zimbabwe,
             ' Philippines
         Case "espanol"
