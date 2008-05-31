@@ -96,6 +96,7 @@ chessbox.c
 #if CONFIG_KEYPAD == RECORDER_PAD
 rockboy.c
 #endif
+zxbox.c
 #endif
 
 /* not support recorder models for now */

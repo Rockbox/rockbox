@@ -64,7 +64,9 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     PLUGIN_IRAM_INIT(api)
 
     rb = api;
+#if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#endif
     rb->splash(HZ, "Welcome to ZXBox");
 
 

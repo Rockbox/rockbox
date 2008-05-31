@@ -19,11 +19,9 @@ rockboy
 chessbox
 sudoku
 reversi
-#endif
-
-/* For all 2bpp and colour targets */
-#if (LCD_DEPTH >= 2) && !defined(OLYMPUS_MROBE_500)
+#ifndef OLYMPUS_MROBE_500
 zxbox
+#endif
 #endif
 
 /* For all the colour targets, iriver H1x0 and iAudio M5 */
