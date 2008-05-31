@@ -275,7 +275,14 @@ void system_init(void)
 
 void system_reboot(void)
 {
-    SWRESET = -1;
+    disable_interrupt(IRQ_FIQ_DISABLED);
+    
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    set_cpu_frequency(CPUFREQ_DEFAULT);
+#endif
+
+    /* TODO: implement reboot (eg. jump to boot ROM?) */
+    while (1);
 }
 
 int system_memory_guard(int newmode)

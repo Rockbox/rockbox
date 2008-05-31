@@ -111,6 +111,8 @@ void panicf( const char *fmt, ...)
         if ((GPIO_READ & 0x0c000000) == 0x08000000) /* check for ON button and !hold */
 #elif defined(IAUDIO_M3)
         if ((GPIO1_READ & 0x202) == 0x200) /* check for ON button and !hold */
+#elif defined(COWON_D2)
+        if (GPIOA & 0x10) /* check for power button */
 #elif CONFIG_CPU == SH7034
 #if CONFIG_KEYPAD == PLAYER_PAD
         if (!(PADRL & 0x20))
