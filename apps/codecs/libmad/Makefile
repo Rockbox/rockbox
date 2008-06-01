@@ -15,14 +15,7 @@ ifdef APPEXTRA
 endif
 
 # NOTE: FPM_ define has been moved to global.h
-MADOPTS = -UDEBUG -DNDEBUG
-
-# libmad may be faster on ipod3g with -O instead of -O2
-ifeq ($(findstring IPOD_3G,$(TARGET)),IPOD_3G)
-   MADOPTS += -O
-else
-   MADOPTS += -O2
-endif
+MADOPTS = -UDEBUG -DNDEBUG -O2
 
 # We build libmad separately for mpegplayer
 ifdef MPEGPLAYER
