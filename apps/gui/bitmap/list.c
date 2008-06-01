@@ -311,12 +311,13 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
             if (nb_lines <  gui_list->nb_items)
             {
                 height = nb_lines * font_get(parent->font)->height;
-                size = height*nb_lines / gui_list->nb_items;
+                size = height / gui_list->nb_items;
                 new_selection = ((y-list_text[SCREEN_MAIN].y)*(gui_list->nb_items-nb_lines))/(height-size);
-                nb_lines /= 2;
                 
-                if (new_selection - gui_list->start_item[SCREEN_MAIN] > nb_lines)
-                    new_selection = gui_list->start_item[SCREEN_MAIN]+nb_lines;
+                if (new_selection - gui_list->start_item[SCREEN_MAIN] > (nb_lines/2))
+                    new_selection = gui_list->start_item[SCREEN_MAIN]+(nb_lines/2);
+                else if (new_selection > gui_list->nb_items-nb_lines)
+                    new_selection = gui_list->nb_items-nb_lines;
                     
                 gui_synclist_select_item(gui_list, new_selection);
                 gui_list->start_item[SCREEN_MAIN] = new_selection;
@@ -337,7 +338,10 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
             for(i=0; i<gui_list->nb_items; i++)
             {
                 if(actual_y > line_height*i && actual_y < line_height*(i+1))
+                {
                     line = i;
+                    break;
+                }
             }
             if(line == -1)
                 return ACTION_NONE;
