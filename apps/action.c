@@ -310,7 +310,7 @@ int action_get_touchpad_press(short *x, short *y)
         return BUTTON_REL;
     /* this is to give a BUTTON_REL after a BUTTON_REPEAT */
     if (last_button & BUTTON_REL)
-        return BUTTON_REL;
+        return BUTTON_REPEAT|BUTTON_REL;
     return BUTTON_TOUCHPAD;
 }
 #endif

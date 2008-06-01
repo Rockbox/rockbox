@@ -278,7 +278,7 @@ void list_draw(struct screen *display, struct viewport *parent,
 
 
 #if defined(HAVE_TOUCHPAD)
-static int prev_line=0;
+static unsigned int prev_line=0;
 /* this needs to be fixed if we ever get more than 1 touchscreen on a target */
 /* this also assumes the whole screen is used, which is a bad asusmption but
    fine untill customizable lists comes in... */
@@ -297,7 +297,7 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
         {
             if (button == BUTTON_REL)
                 return ACTION_STD_MENU;
-            else if (button == BUTTON_REPEAT)
+            else if (button == (BUTTON_REPEAT|BUTTON_REL))
                 return ACTION_STD_CONTEXT;
             else
                 return ACTION_NONE;
@@ -355,13 +355,13 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
                 return ACTION_REDRAW;
             }
             
-            if (button == BUTTON_REPEAT)
+            if (button == (BUTTON_REPEAT|BUTTON_REL))
                 return ACTION_STD_CONTEXT;
             else if(button == BUTTON_REL)
             {
-                if(prev_line == line)
+                if((signed)prev_line == line)
                 {
-                    prev_line = 0;
+                    prev_line = -1;
                     return ACTION_STD_OK;
                 }
                 else
@@ -375,14 +375,10 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
         }
         /* title goes up one level */
         else if (y > title_text[SCREEN_MAIN].y && draw_title(display, parent, gui_list) && button == BUTTON_REL)
-        {
             return ACTION_STD_CANCEL;
-        }
         /* title or statusbar is cancel */
         else if (global_settings.statusbar && button == BUTTON_REL)
-        {
             return ACTION_STD_CANCEL;
-        }
     }
     return ACTION_NONE;
 }
