@@ -17,8 +17,8 @@ endif
 # NOTE: FPM_ define has been moved to global.h
 MADOPTS = -UDEBUG -DNDEBUG
 
-# libmad is faster on ipods with -O instead of -O2
-ifeq ($(findstring IPOD,$(TARGET)),IPOD)
+# libmad may be faster on ipod3g with -O instead of -O2
+ifeq ($(findstring IPOD_3G,$(TARGET)),IPOD_3G)
    MADOPTS += -O
 else
    MADOPTS += -O2
