@@ -178,6 +178,7 @@ bool HttpGet::getFile(const QUrl &url)
         qDebug() << "[HTTP] Error: URL has no path" << endl;
         return false;
     }
+    m_serverTimestamp = QDateTime();
     // if no output file was set write to buffer
     if(!outputToBuffer) {
         if (!outputFile->open(QIODevice::ReadWrite)) {
@@ -304,7 +305,6 @@ void HttpGet::httpDone(bool error)
 
         c.close();
     }
-    m_serverTimestamp = QDateTime();
     // take care of concurring requests. If there is still one running,
     // don't emit done(). That request will call this slot again.
     if(http.currentId() == 0 && !http.hasPendingRequests())
