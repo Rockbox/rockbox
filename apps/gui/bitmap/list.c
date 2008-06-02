@@ -282,7 +282,7 @@ void list_draw(struct screen *display, struct viewport *parent,
  * This also assumes the whole screen is used, which is a bad assumption but
  * fine until customizable lists comes in...
  */
-static unsigned int prev_line=0;
+static bool scrolling=false;
 
 unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewport *parent)
 {
@@ -335,7 +335,7 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
          * | Pressing an item will select it and "enter" it.        |
          * |                                                        |
          * | Pressing and holding your pen down will scroll through |
-         * | the list of items, releasing your pen will "enter" it. |
+         * | the list of items.                                     |
          * |                                                        |
          * | Pressing and holding your pen down on a single item    |
          * | will bring up the context menu of it.                  |
@@ -360,32 +360,32 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
             if(line == -1)
                 return ACTION_NONE;
             
-            /* BUTTON_TOUCHPAD represents a button press*/
             if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN] && button ^ BUTTON_REL)
             {
                 if (gui_list->start_item[SCREEN_MAIN]+line > gui_list->nb_items)
                     return ACTION_NONE;
+                if(button & BUTTON_REPEAT)
+                    scrolling = true;
                 gui_synclist_select_item(gui_list, gui_list->start_item[SCREEN_MAIN]+line);
                 return ACTION_REDRAW;
             }
             
             if (button == (BUTTON_REPEAT|BUTTON_REL))
             {
-                if(prev_line == (unsigned)line)
+                if(!scrolling)
                 {
                     /* Pen was hold on the same line as the previously selected one
                      *  => simulate long button press
                      */
-                    prev_line = -1;
                     return ACTION_STD_CONTEXT;
                 }
                 else
                 {
                     /* Pen was moved across several lines and then released on this one
-                     *  => simulate short button press
+                     *  => do nothing
                      */
-                    prev_line = line;
-                    return ACTION_STD_OK;
+                    scrolling = false;
+                    return ACTION_NONE;
                 }
             }
             else if(button == BUTTON_REL)
