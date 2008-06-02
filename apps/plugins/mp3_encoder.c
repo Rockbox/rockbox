@@ -11,6 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Library General Public License for more details. */
 
+#include <inttypes.h>
 #include "plugin.h"
 
 PLUGIN_HEADER
@@ -29,13 +30,8 @@ MEM_FUNCTION_WRAPPERS(rb);
 
 enum e_byte_order { order_unknown, order_bigEndian, order_littleEndian };
 
-typedef unsigned  long uint32;
-typedef unsigned short uint16;
-typedef unsigned  char  uint8;
-
-
 typedef struct {
-    int   type; /* 0=(22.05,24,16kHz) 1=(44.1,48,32kHz) */
+    int   type; /* 0=(MPEG2 - 22.05,24,16kHz) 1=(MPEG1 - 44.1,48,32kHz) */
     int   mode; /* 0=stereo, 1=jstereo, 2=dual, 3=mono  */
     int   bitrate;
     int   padding;
@@ -46,17 +42,17 @@ typedef struct {
 
 /* Side information */
 typedef struct {
-    uint32 part2_3_length;
+    uint32_t part2_3_length;
     int    count1;          /* number of 0-1-quadruples  */
-    uint32 global_gain;
-    uint32 table_select[4];
-    uint32 region_0_1;
-    uint32 address1;
-    uint32 address2;
-    uint32 address3;
-    long   quantStep;
-    long   additStep;
-    long   max_val;
+    uint32_t global_gain;
+    uint32_t table_select[4];
+    uint32_t region_0_1;
+    uint32_t address1;
+    uint32_t address2;
+    uint32_t address3;
+    long     quantStep;
+    long     additStep;
+    uint32_t max_val;
 } side_info_t;
 
 typedef struct {
@@ -76,14 +72,14 @@ typedef struct {
 } config_t;
 
 typedef struct {
-    int     bitpos;     /* current bitpos for writing   */
-    uint32  bbuf[263];
+    int       bitpos;   /* current bitpos for writing */
+    uint32_t  bbuf[263];
 } BF_Data;
 
 struct huffcodetab {
-  int          len;     /* max. index                   */
-  const uint8  *table;  /* pointer to array[len][len]   */
-  const uint8  *hlen;   /* pointer to array[len][len]   */
+  int            len;    /* max. index                  */
+  const uint8_t  *table; /* pointer to array[len][len]  */
+  const uint8_t  *hlen;  /* pointer to array[len][len]  */
 };
 
 struct huffcodebig {
@@ -100,98 +96,99 @@ struct huffcodebig {
 #define shft_n(x,n) ((x) >> n)
 #define SQRT        724 /* sqrt(2) * 512 */
 
-short     mfbuf       [2*(1152+512)]          IBSS_ATTR; /*  3328 Bytes */
-int       sb_data     [2][2][18][SBLIMIT]     IBSS_ATTR; /* 13824 Bytes */
-int       mdct_freq   [SAMPL2]                IBSS_ATTR; /*  9216 Bytes */
-short     enc_data    [SAMPL2]                IBSS_ATTR; /*  4608 Bytes */
-uint32    scalefac    [23]                    IBSS_ATTR; /*    92 Bytes */
-BF_Data   CodedData                           IBSS_ATTR; /*  1056 Bytes */
-int       ca          [8]                     IBSS_ATTR; /*    32 Bytes */
-int       cs          [8]                     IBSS_ATTR; /*    32 Bytes */
-int       cx          [9]                     IBSS_ATTR; /*    36 Bytes */
-int       win         [18][4]                 IBSS_ATTR; /*   288 Bytes */
-short     enwindow    [15*27+24]              IBSS_ATTR; /*   862 Bytes */
-short     int2idx     [4096]                  IBSS_ATTR; /*  8192 Bytes */
-uint8     ht_count    [2][2][16]              IBSS_ATTR; /*    64 Bytes */
-uint32    tab01       [ 16]                   IBSS_ATTR; /*    64 Bytes */
-uint32    tab23       [  9]                   IBSS_ATTR; /*    36 Bytes */
-uint32    tab56       [ 16]                   IBSS_ATTR; /*    64 Bytes */
-uint32    tab1315     [256]                   IBSS_ATTR; /*  1024 Bytes */
-uint32    tab1624     [256]                   IBSS_ATTR; /*  1024 Bytes */
-uint32    tab789      [ 36]                   IBSS_ATTR; /*   144 Bytes */
-uint32    tabABC      [ 64]                   IBSS_ATTR; /*   256 Bytes */
-uint8     t1HB        [  4]                   IBSS_ATTR;
-uint8     t2HB        [  9]                   IBSS_ATTR;
-uint8     t3HB        [  9]                   IBSS_ATTR;
-uint8     t5HB        [ 16]                   IBSS_ATTR;
-uint8     t6HB        [ 16]                   IBSS_ATTR;
-uint8     t7HB        [ 36]                   IBSS_ATTR;
-uint8     t8HB        [ 36]                   IBSS_ATTR;
-uint8     t9HB        [ 36]                   IBSS_ATTR;
-uint8     t10HB       [ 64]                   IBSS_ATTR;
-uint8     t11HB       [ 64]                   IBSS_ATTR;
-uint8     t12HB       [ 64]                   IBSS_ATTR;
-uint8     t13HB       [256]                   IBSS_ATTR;
-uint8     t15HB       [256]                   IBSS_ATTR;
-uint16    t16HB       [256]                   IBSS_ATTR;
-uint16    t24HB       [256]                   IBSS_ATTR;
-uint8     t1l         [  8]                   IBSS_ATTR;
-uint8     t2l         [  9]                   IBSS_ATTR;
-uint8     t3l         [  9]                   IBSS_ATTR;
-uint8     t5l         [ 16]                   IBSS_ATTR;
-uint8     t6l         [ 16]                   IBSS_ATTR;
-uint8     t7l         [ 36]                   IBSS_ATTR;
-uint8     t8l         [ 36]                   IBSS_ATTR;
-uint8     t9l         [ 36]                   IBSS_ATTR;
-uint8     t10l        [ 64]                   IBSS_ATTR;
-uint8     t11l        [ 64]                   IBSS_ATTR;
-uint8     t12l        [ 64]                   IBSS_ATTR;
-uint8     t13l        [256]                   IBSS_ATTR;
-uint8     t15l        [256]                   IBSS_ATTR;
-uint8     t16l        [256]                   IBSS_ATTR;
-uint8     t24l        [256]                   IBSS_ATTR;
-struct huffcodetab ht [HTN]                   IBSS_ATTR;
+static short     mfbuf       [2*(1152+512)]      IBSS_ATTR; /*  3328 Bytes */
+static int       sb_data     [2][2][18][SBLIMIT] IBSS_ATTR; /* 13824 Bytes */
+static int       mdct_freq   [SAMPL2]            IBSS_ATTR; /*  2304 Bytes */
+static char      mdct_sign   [SAMPL2]            IBSS_ATTR; /*   576 Bytes */
+static short     enc_data    [SAMPL2]            IBSS_ATTR; /*  1152 Bytes */
+static uint32_t  scalefac    [23]                IBSS_ATTR; /*    92 Bytes */
+static BF_Data   CodedData                       IBSS_ATTR; /*  1056 Bytes */
+static int       ca          [8]                 IBSS_ATTR; /*    32 Bytes */
+static int       cs          [8]                 IBSS_ATTR; /*    32 Bytes */
+static int       cx          [9]                 IBSS_ATTR; /*    36 Bytes */
+static int       win         [18][4]             IBSS_ATTR; /*   288 Bytes */
+static short     enwindow    [15*27+24]          IBSS_ATTR; /*   862 Bytes */
+static short     int2idx     [4096]              IBSS_ATTR; /*  8192 Bytes */
+static uint8_t   ht_count    [2][2][16]          IBSS_ATTR; /*    64 Bytes */
+static uint32_t  tab01       [ 16]               IBSS_ATTR; /*    64 Bytes */
+static uint32_t  tab23       [  9]               IBSS_ATTR; /*    36 Bytes */
+static uint32_t  tab56       [ 16]               IBSS_ATTR; /*    64 Bytes */
+static uint32_t  tab1315     [256]               IBSS_ATTR; /*  1024 Bytes */
+static uint32_t  tab1624     [256]               IBSS_ATTR; /*  1024 Bytes */
+static uint32_t  tab789      [ 36]               IBSS_ATTR; /*   144 Bytes */
+static uint32_t  tabABC      [ 64]               IBSS_ATTR; /*   256 Bytes */
+static uint8_t   t1HB        [  4]               IBSS_ATTR;
+static uint8_t   t2HB        [  9]               IBSS_ATTR;
+static uint8_t   t3HB        [  9]               IBSS_ATTR;
+static uint8_t   t5HB        [ 16]               IBSS_ATTR;
+static uint8_t   t6HB        [ 16]               IBSS_ATTR;
+static uint8_t   t7HB        [ 36]               IBSS_ATTR;
+static uint8_t   t8HB        [ 36]               IBSS_ATTR;
+static uint8_t   t9HB        [ 36]               IBSS_ATTR;
+static uint8_t   t10HB       [ 64]               IBSS_ATTR;
+static uint8_t   t11HB       [ 64]               IBSS_ATTR;
+static uint8_t   t12HB       [ 64]               IBSS_ATTR;
+static uint8_t   t13HB       [256]               IBSS_ATTR;
+static uint8_t   t15HB       [256]               IBSS_ATTR;
+static uint16_t  t16HB       [256]               IBSS_ATTR;
+static uint16_t  t24HB       [256]               IBSS_ATTR;
+static uint8_t   t1l         [  8]               IBSS_ATTR;
+static uint8_t   t2l         [  9]               IBSS_ATTR;
+static uint8_t   t3l         [  9]               IBSS_ATTR;
+static uint8_t   t5l         [ 16]               IBSS_ATTR;
+static uint8_t   t6l         [ 16]               IBSS_ATTR;
+static uint8_t   t7l         [ 36]               IBSS_ATTR;
+static uint8_t   t8l         [ 36]               IBSS_ATTR;
+static uint8_t   t9l         [ 36]               IBSS_ATTR;
+static uint8_t   t10l        [ 64]               IBSS_ATTR;
+static uint8_t   t11l        [ 64]               IBSS_ATTR;
+static uint8_t   t12l        [ 64]               IBSS_ATTR;
+static uint8_t   t13l        [256]               IBSS_ATTR;
+static uint8_t   t15l        [256]               IBSS_ATTR;
+static uint8_t   t16l        [256]               IBSS_ATTR;
+static uint8_t   t24l        [256]               IBSS_ATTR;
+static struct huffcodetab ht [HTN]               IBSS_ATTR;
 
-static const uint8 ht_count_const[2][2][16] =
+static const uint8_t ht_count_const[2][2][16] =
 { { { 1,  5,  4,  5,  6,  5, 4, 4, 7, 3, 6, 0, 7, 2, 3, 1 },     /* table0 */
     { 1,  5,  5,  7,  5,  8, 7, 9, 5, 7, 7, 9, 7, 9, 9,10 } },   /* hleng0 */
   { {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },     /* table1 */
     { 4,  5,  5,  6,  5,  6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8 } } }; /* hleng1 */
 
-static const uint8  t1HB_const[4]  = {1,1,1,0}; 
-static const uint8  t2HB_const[9]  = {1,2,1,3,1,1,3,2,0};
-static const uint8  t3HB_const[9]  = {3,2,1,1,1,1,3,2,0};
-static const uint8  t5HB_const[16] = {1,2,6,5,3,1,4,4,7,5,7,1,6,1,1,0};
-static const uint8  t6HB_const[16] = {7,3,5,1,6,2,3,2,5,4,4,1,3,3,2,0};
+static const uint8_t  t1HB_const[4]  = {1,1,1,0}; 
+static const uint8_t  t2HB_const[9]  = {1,2,1,3,1,1,3,2,0};
+static const uint8_t  t3HB_const[9]  = {3,2,1,1,1,1,3,2,0};
+static const uint8_t  t5HB_const[16] = {1,2,6,5,3,1,4,4,7,5,7,1,6,1,1,0};
+static const uint8_t  t6HB_const[16] = {7,3,5,1,6,2,3,2,5,4,4,1,3,3,2,0};
 
-static const uint8  t7HB_const[36] =
+static const uint8_t  t7HB_const[36] =
 {  1, 2,10,19,16,10, 3, 3, 7,10, 5, 3,11, 4,13,17, 8, 4,
   12,11,18,15,11, 2, 7, 6, 9,14, 3, 1, 6, 4, 5, 3, 2, 0 };
 
-static const uint8  t8HB_const[36] =
+static const uint8_t  t8HB_const[36] =
 {  3, 4, 6,18,12, 5, 5, 1, 2,16, 9, 3, 7, 3, 5,14, 7, 3,
   19,17,15,13,10, 4,13, 5, 8,11, 5, 1,12, 4, 4, 1, 1, 0 };
 
-static const uint8  t9HB_const[36] =
+static const uint8_t  t9HB_const[36] =
 {  7, 5, 9,14,15, 7, 6, 4, 5, 5, 6, 7, 7, 6, 8, 8, 8, 5,
   15, 6, 9,10, 5, 1,11, 7, 9, 6, 4, 1,14, 4, 6, 2, 6, 0 };
 
-static const uint8 t10HB_const[64] =
+static const uint8_t t10HB_const[64] =
 {1,2,10,23,35,30,12,17,3,3,8,12,18,21,12,7,11,9,15,21,32,
  40,19,6,14,13,22,34,46,23,18,7,20,19,33,47,27,22,9,3,31,22,
  41,26,21,20,5,3,14,13,10,11,16,6,5,1,9,8,7,8,4,4,2,0 };
 
-static const uint8 t11HB_const[64] =
+static const uint8_t t11HB_const[64] =
 {3,4,10,24,34,33,21,15,5,3,4,10,32,17,11,10,11,7,13,18,30,
  31,20,5,25,11,19,59,27,18,12,5,35,33,31,58,30,16,7,5,28,26,
  32,19,17,15,8,14,14,12,9,13,14,9,4,1,11,4,6,6,6,3,2,0 };
 
-static const uint8 t12HB_const[64] =
+static const uint8_t t12HB_const[64] =
 {9,6,16,33,41,39,38,26,7,5,6,9,23,16,26,11,17,7,11,14,21,
 30,10,7,17,10,15,12,18,28,14,5,32,13,22,19,18,16,9,5,40,17,
 31,29,17,13,4,2,27,12,11,15,10,7,4,1,27,12,8,12,6,3,1,0 };
 
-static const uint8 t13HB_const[256] =
+static const uint8_t t13HB_const[256] =
 {1,5,14,21,34,51,46,71,42,52,68,52,67,44,43,19,3,4,12,19,31,26,44,33,31,24,32,
  24,31,35,22,14,15,13,23,36,59,49,77,65,29,40,30,40,27,33,42,16,22,20,37,61,56,
  79,73,64,43,76,56,37,26,31,25,14,35,16,60,57,97,75,114,91,54,73,55,41,48,53,
@@ -203,7 +200,7 @@ static const uint8 t13HB_const[256] =
  45,21,34,64,56,50,49,45,31,19,12,15,10,7,6,3,48,23,20,39,36,35,53,21,16,23,13,
  10,6,1,4,2,16,15,17,27,25,20,29,11,17,12,16,8,1,1,0,1 };
 
-static const uint8 t15HB_const[256] =
+static const uint8_t t15HB_const[256] =
 {7,12,18,53,47,76,124,108,89,123,108,119,107,81,122,63,13,5,16,27,46,36,61,51,
  42,70,52,83,65,41,59,36,19,17,15,24,41,34,59,48,40,64,50,78,62,80,56,33,29,28,
  25,43,39,63,55,93,76,59,93,72,54,75,50,29,52,22,42,40,67,57,95,79,72,57,89,69,
@@ -215,7 +212,7 @@ static const uint8 t15HB_const[256] =
  24,16,22,13,14,7,91,44,39,38,34,63,52,45,31,52,28,19,14,8,9,3,123,60,58,53,47,
  43,32,22,37,24,17,12,15,10,2,1,71,37,34,30,28,20,17,26,21,16,10,6,8,6,2,0};
 
-static const uint16 t16HB_const[256] =
+static const uint16_t t16HB_const[256] =
 {1,5,14,44,74,63,110,93,172,149,138,242,225,195,376,17,3,4,12,20,35,62,53,47,
  83,75,68,119,201,107,207,9,15,13,23,38,67,58,103,90,161,72,127,117,110,209,
  206,16,45,21,39,69,64,114,99,87,158,140,252,212,199,387,365,26,75,36,68,65,
@@ -230,7 +227,7 @@ static const uint16 t16HB_const[256] =
  358,711,709,866,1734,871,3458,870,434,0,12,10,7,11,10,17,11,9,13,12,10,7,5,3,
  1,3};
 
-static const uint16 t24HB_const[256] =
+static const uint16_t t24HB_const[256] =
 {15,13,46,80,146,262,248,434,426,669,653,649,621,517,1032,88,14,12,21,38,71,
  130,122,216,209,198,327,345,319,297,279,42,47,22,41,74,68,128,120,221,207,194,
  182,340,315,295,541,18,81,39,75,70,134,125,116,220,204,190,178,325,311,293,
@@ -245,7 +242,7 @@ static const uint16 t24HB_const[256] =
  374,369,365,361,357,2,1033,280,278,274,267,264,259,382,378,372,367,363,360,
  358,356,0,43,20,19,17,15,13,11,9,7,6,4,7,5,3,1,3};
 
-static const uint32 tab1315_const[256] =
+static const uint32_t tab1315_const[256] =
 { 0x010003,0x050005,0x070006,0x080008,0x090008,0x0a0009,0x0a000a,0x0b000a,
   0x0a000a,0x0b000b,0x0c000b,0x0c000c,0x0d000c,0x0d000c,0x0e000d,0x0e000e,
   0x040005,0x060005,0x080007,0x090008,0x0a0009,0x0a0009,0x0b000a,0x0b000a,
@@ -279,18 +276,18 @@ static const uint32 tab1315_const[256] =
   0x0d000d,0x0e000d,0x0f000d,0x10000d,0x10000d,0x10000d,0x11000d,0x10000e,
   0x11000e,0x11000e,0x12000e,0x12000e,0x15000f,0x14000f,0x15000f,0x12000f };
 
-static const uint32 tab01_const[16] =
+static const uint32_t tab01_const[16] =
 { 0x10004,0x50005,0x50005,0x70006,0x50005,0x80006,0x70006,0x90007,
   0x50005,0x70006,0x70006,0x90007,0x70006,0x90007,0x90007,0xa0008 };
 
-static const uint32 tab23_const[ 9] =
+static const uint32_t tab23_const[ 9] =
 { 0x10002,0x40003,0x70007,0x40004,0x50004,0x70007,0x60006,0x70007,0x80008 };
 
-static const uint32 tab56_const[16] =
+static const uint32_t tab56_const[16] =
 { 0x10003,0x40004,0x70006,0x80008,0x40004,0x50004,0x80006,0x90007,
   0x70005,0x80006,0x90007,0xa0008,0x80007,0x80007,0x90008,0xa0009 };
 
-static const uint32 tab789_const[36] =
+static const uint32_t tab789_const[36] =
 {0x00100803,0x00401004,0x00701c06,0x00902407,0x00902409,0x00a0280a,0x00401004,
  0x00601005,0x00801806,0x00902807,0x00902808,0x00a0280a,0x00701c05,0x00701806,
  0x00902007,0x00a02808,0x00a02809,0x00b02c0a,0x00802407,0x00902807,0x00a02808,
@@ -298,7 +295,7 @@ static const uint32 tab789_const[36] =
  0x00b0300a,0x00c0300b,0x00902809,0x00a02809,0x00b02c0a,0x00c02c0a,0x00c0340b,
  0x00c0340b};
 
-static const uint32 tabABC_const[64] =
+static const uint32_t tabABC_const[64] =
 {0x00100804,0x00401004,0x00701806,0x00902008,0x00a02409,0x00a0280a,0x00a0240a,
  0x00b0280a,0x00401004,0x00601405,0x00801806,0x00902007,0x00a02809,0x00b02809,
  0x00a0240a,0x00a0280a,0x00701806,0x00801c06,0x00902007,0x00a02408,0x00b02809,
@@ -310,7 +307,7 @@ static const uint32 tabABC_const[64] =
  0x00a0240a,0x00a0240a,0x00b0280a,0x00c02c0b,0x00c0300b,0x00d0300b,0x00d0300b,
  0x00d0300c};
 
-static const uint32 tab1624_const[256] =
+static const uint32_t tab1624_const[256] =
 {0x00010004,0x00050005,0x00070007,0x00090008,0x000a0009,0x000a000a,0x000b000a,
  0x000b000b,0x000c000b,0x000c000c,0x000c000c,0x000d000c,0x000d000c,0x000d000c,
  0x000e000d,0x000a000a,0x00040005,0x00060006,0x00080007,0x00090008,0x000a0009,
@@ -349,34 +346,34 @@ static const uint32 tab1624_const[256] =
  0x000c0009,0x000c0009,0x000c0009,0x000d0009,0x000d0009,0x000d0009,0x000d000a,
  0x000d000a,0x000d000a,0x000d000a,0x000a0006};
 
-static const uint8 t1l_const[8]  = {1,3,2,3,1,4,3,5};
-static const uint8 t2l_const[9]  = {1,3,6,3,3,5,5,5,6};
-static const uint8 t3l_const[9]  = {2,2,6,3,2,5,5,5,6};
-static const uint8 t5l_const[16] = {1,3,6,7,3,3,6,7,6,6,7,8,7,6,7,8};
-static const uint8 t6l_const[16] = {3,3,5,7,3,2,4,5,4,4,5,6,6,5,6,7};
+static const uint8_t t1l_const[8]  = {1,3,2,3,1,4,3,5};
+static const uint8_t t2l_const[9]  = {1,3,6,3,3,5,5,5,6};
+static const uint8_t t3l_const[9]  = {2,2,6,3,2,5,5,5,6};
+static const uint8_t t5l_const[16] = {1,3,6,7,3,3,6,7,6,6,7,8,7,6,7,8};
+static const uint8_t t6l_const[16] = {3,3,5,7,3,2,4,5,4,4,5,6,6,5,6,7};
 
-static const uint8 t7l_const[36] =
+static const uint8_t t7l_const[36] =
 {1,3,6,8,8,9,3,4,6,7,7,8,6,5,7,8,8,9,7,7,8,9,9,9,7,7,8,9,9,10,8,8,9,10,10,10};
 
-static const uint8 t8l_const[36] =
+static const uint8_t t8l_const[36] =
 {2,3,6,8,8,9,3,2,4,8,8,8,6,4,6,8,8,9,8,8,8,9,9,10,8,7,8,9,10,10,9,8,9,9,11,11};
 
-static const uint8 t9l_const[36] =
+static const uint8_t t9l_const[36] =
 {3,3,5,6,8,9,3,3,4,5,6,8,4,4,5,6,7,8,6,5,6,7,7,8,7,6,7,7,8,9,8,7,8,8,9,9};
 
-static const uint8 t10l_const[64] =
+static const uint8_t t10l_const[64] =
 {1,3,6,8,9,9,9,10,3,4,6,7,8,9,8,8,6,6,7,8,9,10,9,9,7,7,8,9,10,10,9,10,8,8,9,10,
  10,10,10,10,9,9,10,10,11,11,10,11,8,8,9,10,10,10,11,11,9,8,9,10,10,11,11,11};
 
-static const uint8 t11l_const[64] =
+static const uint8_t t11l_const[64] =
 {2,3,5,7,8,9,8,9,3,3,4,6,8,8,7,8,5,5,6,7,8,9,8,8,7,6,7,9,8,10,8,9,8,8,8,9,9,10,
  9,10,8,8,9,10,10,11,10,11,8,7,7,8,9,10,10,10,8,7,8,9,10,10,10,10};
 
-static const uint8 t12l_const[64] =
+static const uint8_t t12l_const[64] =
 {4,3,5,7,8,9,9,9,3,3,4,5,7,7,8,8,5,4,5,6,7,8,7,8,6,5,6,6,7,8,8,8,7,6,7,7,8,
  8,8,9,8,7,8,8,8,9,8,9,8,7,7,8,8,9,9,10,9,8,8,9,9,9,9,10};
 
-static const uint8 t13l_const[256] =
+static const uint8_t t13l_const[256] =
 {1,4,6,7,8,9,9,10,9,10,11,11,12,12,13,13,3,4,6,7,8,8,9,9,9,9,10,10,11,12,12,12,
  6,6,7,8,9,9,10,10,9,10,10,11,11,12,13,13,7,7,8,9,9,10,10,10,10,11,11,11,11,12,
  13,13,8,7,9,9,10,10,11,11,10,11,11,12,12,13,13,14,9,8,9,10,10,10,11,11,11,11,
@@ -388,7 +385,7 @@ static const uint8 t13l_const[256] =
  16,16,13,12,12,13,13,13,15,14,14,17,15,15,15,17,16,16,12,12,13,14,14,14,15,14,
  15,15,16,16,19,18,19,16};
 
-static const uint8 t15l_const[256] =
+static const uint8_t t15l_const[256] =
 {3,4,5,7,7,8,9,9,9,10,10,11,11,11,12,13,4,3,5,6,7,7,8,8,8,9,9,10,10,10,11,11,5,
  5,5,6,7,7,8,8,8,9,9,10,10,11,11,11,6,6,6,7,7,8,8,9,9,9,10,10,10,11,11,11,7,6,
  7,7,8,8,9,9,9,9,10,10,10,11,11,11,8,7,7,8,8,8,9,9,9,9,10,10,11,11,11,12,9,7,8,
@@ -399,7 +396,7 @@ static const uint8 t15l_const[256] =
  11,11,11,11,12,12,12,12,12,13,13,12,11,11,11,11,11,11,11,12,12,12,12,13,13,12,
  13,12,11,11,11,11,11,11,12,12,12,12,12,13,13,13,13};
 
-static const uint8 t16l_const[256] =
+static const uint8_t t16l_const[256] =
 {1,4,6,8,9,9,10,10,11,11,11,12,12,12,13,9,3,4,6,7,8,9,9,9,10,10,10,11,12,11,12,
  8,6,6,7,8,9,9,10,10,11,10,11,11,11,12,12,9,8,7,8,9,9,10,10,10,11,11,12,12,12,
  13,13,10,9,8,9,9,10,10,11,11,11,12,12,12,13,13,13,9,9,8,9,9,10,11,11,12,11,12,
@@ -411,7 +408,7 @@ static const uint8 t16l_const[256] =
  17,15,11,13,13,11,12,14,14,13,14,14,15,16,15,17,15,14,11,9,8,8,9,9,10,10,10,
  11,11,11,11,11,11,11,8};
 
-static const uint8 t24l_const[256] =
+static const uint8_t t24l_const[256] =
 {4,4,6,7,8,9,9,10,10,11,11,11,11,11,12,9,4,4,5,6,7,8,8,9,9,9,10,10,10,10,10,8,
  6,5,6,7,7,8,8,9,9,9,9,10,10,10,11,7,7,6,7,7,8,8,8,9,9,9,9,10,10,10,10,7,8,7,7,
  8,8,8,8,9,9,9,10,10,10,10,11,7,9,7,8,8,8,8,9,9,9,9,10,10,10,10,10,7,9,8,8,8,8,
@@ -460,8 +457,8 @@ static const struct huffcodebig ht_big[HTN] =
 
 static const struct
 {
-  uint32 region0_cnt;
-  uint32 region1_cnt;
+  uint32_t region0_cnt;
+  uint32_t region1_cnt;
 } subdv_table[23] =
 { {0, 0}, /*  0 bands */
   {0, 0}, /*  1 bands */
@@ -488,7 +485,7 @@ static const struct
   {6, 7}, /* 22 bands */
 };
 
-static const uint32 sfBand[6][23] =
+static const uint32_t sfBand[6][23] =
 {
 /* Table B.2.b: 22.05 kHz */
 {0,6,12,18,24,30,36,44,54,66,80,96,116,140,168,200,238,284,336,396,464,522,576},
@@ -716,9 +713,13 @@ static const int order[32] =
 { 0, 1, 16, 17, 8, 9, 24, 25, 4, 5, 20, 21, 12, 13, 28, 29,
   2, 3, 18, 19,10,11, 26, 27, 6, 7, 22, 23, 14, 15, 30, 31 };
 
-static const int bitr_index[2][15] =
-{ {0, 8,16,24,32,40,48,56, 64, 80, 96,112,128,144,160},
-  {0,32,40,48,56,64,80,96,112,128,160,192,224,256,320} };
+static const long sampr_index[2][3] = 
+{ { 22050, 24000, 16000 },      /* MPEG 2 */
+  { 44100, 48000, 32000 } };    /* MPEG 1 */
+
+static const long bitr_index[2][15] =
+{ {0, 8,16,24,32,40,48,56, 64, 80, 96,112,128,144,160},    /* MPEG 2 */
+  {0,32,40,48,56,64,80,96,112,128,160,192,224,256,320} };  /* MPEG 1 */
 
 static const int num_bands[3][15]  =
 { {0,10,10,10,10,12,14,16, 20, 22, 24, 26, 28, 30, 32},
@@ -808,21 +809,23 @@ static const int win_const[18][4] = {
 
 static const char* wav_filename;
 static int         mp3file, wavfile, wav_size, frames;
-static uint32      enc_buffer[16384]; /* storage for 65536 Bytes */
+static uint32_t    enc_buffer[16384]; /* storage for 65536 Bytes */
 static int         enc_chunk = 0;     /* encode chunk counter    */
 static int         enc_size;
 static config_t    cfg;
+static uint8_t     band_scale_f[22];
+
 
 /* forward declarations */
-int  HuffmanCode( short *ix, int *xr, uint32 begin, uint32 end, int table);
-int  HuffmanCod1( short *ix, int *xr, uint32 begin, uint32 end, int table);
-void putbits(uint32 val, uint32 nbit);
-int  find_best_2( short *ix, uint32 start, uint32 end, const uint32 *table,
-                  uint32 len, int *bits);
-int  find_best_3( short *ix, uint32 start, uint32 end, const uint32 *table,
-                  uint32 len, int *bits);
-int  count_bit1 ( short *ix, uint32 start, uint32 end, int *bits );
-int  count_bigv ( short *ix, uint32 start, uint32 end, int table0, int table1,
+static int  HuffmanCode( short *ix, char *xr_sign, uint32_t begin, uint32_t end, int table);
+static int  HuffmanCod1( short *ix, char *xr_sign, uint32_t begin, uint32_t end, int table);
+static void putbits(uint32_t val, uint32_t nbit);
+static int  find_best_2( short *ix, uint32_t start, uint32_t end, const uint32_t *table,
+                          uint32_t len, int *bits);
+static int  find_best_3( short *ix, uint32_t start, uint32_t end, const uint32_t *table,
+                         uint32_t len, int *bits);
+static int  count_bit1 ( short *ix, uint32_t start, uint32_t end, int *bits );
+static int  count_bigv ( short *ix, uint32_t start, uint32_t end, int table0, int table1,
                   int *bits);
 
 
@@ -891,7 +894,7 @@ int wave_open(void)
   return 0;
 }
 
-int read_samples(uint32 *buffer, int num_samples)
+int read_samples(uint32_t *buffer, int num_samples)
 {
   int s, samples = rb->read(wavfile, buffer, 4 * num_samples) / 4;
   /* Pad last sample with zeros */
@@ -901,30 +904,50 @@ int read_samples(uint32 *buffer, int num_samples)
   return samples;
 }
 
-inline uint32 myswap32(uint32 val)
+inline uint32_t myswap32(uint32_t val)
 {
-  const uint8* v = (const uint8*)&val;
+  const uint8_t* v = (const uint8_t*)&val;
 
-  return ((uint32)v[0]<<24) | ((uint32)v[1]<<16) | ((uint32)v[2]<<8) | v[3];
+  return ((uint32_t)v[0]<<24) | ((uint32_t)v[1]<<16) | ((uint32_t)v[2]<<8) | v[3];
 }
 
-void encodeSideInfo( side_info_t si[2][2] )
+static void encodeSideInfo( side_info_t si[2][2] )
 {
   int gr, ch, header;
-  uint32  cc=0, sz=0;
+  uint32_t  cc=0, sz=0;
   
-  header  = 0xfff00000;
-  header |= cfg.mpg.type    << 19; /* mp3 type: 1  */
-  header |= 1               << 17; /* mp3 layer: 1 */
-  header |= 1               << 16; /* mp3 crc: 0   */
+  /*
+   * MPEG header layout:
+   * AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM
+   * A (31-21) = frame sync
+   * B (20-19) = MPEG type
+   * C (18-17) = MPEG layer
+   * D (16)    = protection bit
+   * E (15-12) = bitrate index
+   * F (11-10) = samplerate index
+   * G (9)     = padding bit
+   * H (8)     = private bit
+   * I (7-6)   = channel mode
+   * J (5-4)   = mode extension (jstereo only)
+   * K (3)     = copyright bit
+   * L (2)     = original
+   * M (1-0)   = emphasis
+   */
+
+  header  = (0xfff00000) | /* frame sync (AAAAAAAAA AAA)
+                              mp3 type (upper):  1 (B)  */
+            (0x01 << 17) | /* mp3 layer:        01 (CC) */
+            ( 0x1 << 16) | /* mp3 crc:           1 (D)  */
+            ( 0x1 <<  2);  /* mp3 org:           1 (L)  */
+  header |= cfg.mpg.type    << 19;
   header |= cfg.mpg.bitr_id << 12;
   header |= cfg.mpg.smpl_id << 10;
   header |= cfg.mpg.padding <<  9;
   header |= cfg.mpg.mode    <<  6;
-  header |= 1               <<  2; /* mp3 original: 1 */
+  /* no emphasis (bits 0-1) */
   putbits( header, 32 );
 
-  if(cfg.mpg.type)
+  if(cfg.mpg.type == 1)
   { /* MPEG1 */
     if(cfg.channels == 2)  { putlong( 0, 20); }
     else                   { putlong( 0, 18); }
@@ -934,14 +957,16 @@ void encodeSideInfo( side_info_t si[2][2] )
       {
         side_info_t *gi = &si[gr][ch];
 
-        putlong( gi->part2_3_length,  12 );
-        putlong( gi->address3>>1,      9 );
-        putlong( gi->global_gain,      8 );
-        putlong( gi->table_select[0], 10 );
-        putlong( gi->table_select[1],  5 );
-        putlong( gi->table_select[2],  5 );
-        putlong( gi->region_0_1,       7 );
-        putlong( gi->table_select[3],  3 );
+        putlong((gi->part2_3_length+42),12 ); /* add scale_facs array size */
+        putlong( gi->address3>>1,        9 );
+        putlong( gi->global_gain,        8 );
+        putlong( 9,                      4 ); /* set scale_facs compr type */
+        putlong( gi->table_select[0],    6 );
+        putlong( gi->table_select[1],    5 );
+        putlong( gi->table_select[2],    5 );
+        putlong( gi->region_0_1,         7 );
+        putlong( 1                  ,    2 ); /* set scale_facs to 1bit */
+        putlong( gi->table_select[3],    1 );
       }
   }
   else
@@ -953,14 +978,16 @@ void encodeSideInfo( side_info_t si[2][2] )
     {
       side_info_t *gi = &si[0][ch];
 
-      putlong( gi->part2_3_length,    12);
-      putlong( gi->address3>>1,        9);
-      putlong( gi->global_gain,        8);
-      putlong( gi->table_select[0],   15);
-      putlong( gi->table_select[1],    5);
-      putlong( gi->table_select[2],    5);
-      putlong( gi->region_0_1,         7);
-      putlong( gi->table_select[3],    2);
+      putlong((gi->part2_3_length+42),12 ); /* add scale_facs array size */
+      putlong( gi->address3>>1,        9 );
+      putlong( gi->global_gain,        8 );
+      putlong( 0xCA,                   9 ); /* set scale_facs compr type */
+      putlong( gi->table_select[0],    6 );
+      putlong( gi->table_select[1],    5 );
+      putlong( gi->table_select[2],    5 );
+      putlong( gi->region_0_1     ,    7 );
+      putlong( 1                  ,    1 ); /* set scale_facs to 1bit */
+      putlong( gi->table_select[3],    1 );
     }
   }
   /* flush remaining bits */
@@ -969,7 +996,7 @@ void encodeSideInfo( side_info_t si[2][2] )
 
 /* Note the discussion of huffmancodebits() on pages 28 and 29 of the IS,
    as well as the definitions of the side information on pages 26 and 27. */
-void Huffmancodebits( short *ix, int *xr, side_info_t *gi )
+static void Huffmancodebits( short *ix, char *xr_sign, side_info_t *gi )
 {
   int    region1   = gi->address1;
   int    region2   = gi->address2;
@@ -977,18 +1004,27 @@ void Huffmancodebits( short *ix, int *xr, side_info_t *gi )
   int    count1    = bigvals + (gi->count1 << 2);
   int    stuffBits = 0;
   int    bits      = 0;
+  int    i, v;
+
+  for(i=v=0; i<32; i+=2)
+    v |= band_scale_f[i>>1] << (30-i);
+  putbits(v, 32); // store scale_facs (part1)
+
+  for(v=0; i<42; i+=2)
+    v |= band_scale_f[i>>1] << (40-i);
+  putbits(v, 10); // store scale_facs (part2)
 
   if(region1 > 0)
-    bits += HuffmanCode(ix, xr,   0    , region1, gi->table_select[0]);
+    bits += HuffmanCode(ix, xr_sign,   0    , region1, gi->table_select[0]);
 
   if(region2 > region1)
-    bits += HuffmanCode(ix, xr, region1, region2, gi->table_select[1]);
+    bits += HuffmanCode(ix, xr_sign, region1, region2, gi->table_select[1]);
 
   if(bigvals > region2)
-    bits += HuffmanCode(ix, xr, region2, bigvals, gi->table_select[2]);
+    bits += HuffmanCode(ix, xr_sign, region2, bigvals, gi->table_select[2]);
  
   if(count1 > bigvals)
-    bits += HuffmanCod1(ix, xr, bigvals,  count1, gi->table_select[3]);
+    bits += HuffmanCod1(ix, xr_sign, bigvals,  count1, gi->table_select[3]);
 
   if((stuffBits = gi->part2_3_length - bits) > 0)
   {
@@ -1003,15 +1039,15 @@ void Huffmancodebits( short *ix, int *xr, side_info_t *gi )
   }
 }
 
-int HuffmanCod1( short *ix, int *xr, uint32 begin, uint32 end, int tbl)
+int HuffmanCod1( short *ix, char *xr_sign, uint32_t begin, uint32_t end, int tbl)
 {
-  uint32  cc=0, sz=0;
-  uint32  i, d, p;
+  uint32_t  cc=0, sz=0;
+  uint32_t  i, d, p;
   int     sumbit=0, s=0, l=0, v, w, x, y;
-  #define sgnv (xr[i+0] < 0 ? 1 : 0)
-  #define sgnw (xr[i+1] < 0 ? 1 : 0)
-  #define sgnx (xr[i+2] < 0 ? 1 : 0)
-  #define sgny (xr[i+3] < 0 ? 1 : 0)
+  #define sgnv xr_sign[i+0]
+  #define sgnw xr_sign[i+1]
+  #define sgnx xr_sign[i+2]
+  #define sgny xr_sign[i+3]
 
   for(i=begin; i<end; i+=4)
   {
@@ -1024,20 +1060,20 @@ int HuffmanCod1( short *ix, int *xr, uint32 begin, uint32 end, int tbl)
     switch(p)
     {
       case  0: l=0; s = 0; break;
-      case  1: l=1; s = sgnv; break;
-      case  2: l=1; s =               sgnw; break;
-      case  3: l=2; s = (sgnv << 1) + sgnw; break;
-      case  4: l=1; s =                             sgnx; break;
-      case  5: l=2; s = (sgnv << 1)               + sgnx; break;
-      case  6: l=2; s =               (sgnw << 1) + sgnx; break;
-      case  7: l=3; s = (sgnv << 2) + (sgnw << 1) + sgnx; break;
-      case  8: l=1; s =                                           sgny; break;
+      case  1: l=1; s =                                           sgny; break;
+      case  2: l=1; s =                              sgnx;              break;
+      case  3: l=2; s =                             (sgnx << 1) + sgny; break;
+      case  4: l=1; s =                sgnw;                            break;
+      case  5: l=2; s =               (sgnw << 1)               + sgny; break;
+      case  6: l=2; s =               (sgnw << 1) +  sgnx;              break;
+      case  7: l=3; s =               (sgnw << 2) + (sgnx << 1) + sgny; break;
+      case  8: l=1; s =  sgnv;                                          break;
       case  9: l=2; s = (sgnv << 1)                             + sgny; break;
-      case 10: l=2; s =               (sgnw << 1)               + sgny; break;
-      case 11: l=3; s = (sgnv << 2) + (sgnw << 1)               + sgny; break;
-      case 12: l=2; s =                             (sgnx << 1) + sgny; break;
-      case 13: l=3; s = (sgnv << 2)               + (sgnx << 1) + sgny; break;
-      case 14: l=3; s =               (sgnw << 2) + (sgnx << 1) + sgny; break;
+      case 10: l=2; s = (sgnv << 1)               +  sgnx;              break;
+      case 11: l=3; s = (sgnv << 2)               + (sgnx << 1) + sgny; break;
+      case 12: l=2; s = (sgnv << 1) +  sgnw;                            break;
+      case 13: l=3; s = (sgnv << 2) + (sgnw << 1)               + sgny; break;
+      case 14: l=3; s = (sgnv << 2) + (sgnw << 1) +  sgnx;              break;
       case 15: l=4; s = (sgnv << 3) + (sgnw << 2) + (sgnx << 1) + sgny; break;
     }
 
@@ -1054,22 +1090,22 @@ int HuffmanCod1( short *ix, int *xr, uint32 begin, uint32 end, int tbl)
 }
 
 /* Implements the pseudocode of page 98 of the IS */
-int HuffmanCode( short *ix, int *xr, uint32 begin, uint32 end, int table)
+int HuffmanCode(short *ix, char *xr_sign, uint32_t begin, uint32_t end, int table)
 {
-  uint32       cc=0, sz=0, code;
-  uint32       i, xl=0, yl=0, idx;
-  int          x, y, bit, sumbit=0;
-  #define sign_x (xr[i+0] < 0 ? 1 : 0)
-  #define sign_y (xr[i+1] < 0 ? 1 : 0)
+  uint32_t       cc=0, sz=0, code;
+  uint32_t       i, xl=0, yl=0, idx;
+  int            x, y, bit, sumbit=0;
+  #define sign_x xr_sign[i+0]
+  #define sign_y xr_sign[i+1]
 
   if(table == 0)
     return 0;
 
   if( table > 15 )
   { /* ESC-table is used */
-    uint32 linbits  = ht_big[table-16].linbits;
-    uint16 *hffcode = table < 24 ? t16HB : t24HB;
-    uint8  *hlen    = table < 24 ? t16l  : t24l;
+    uint32_t linbits  = ht_big[table-16].linbits;
+    uint16_t *hffcode = table < 24 ? t16HB : t24HB;
+    uint8_t  *hlen    = table < 24 ? t16l  : t24l;
 
     for(i=begin; i<end; i+=2)
     {
@@ -1099,6 +1135,13 @@ int HuffmanCode( short *ix, int *xr, uint32 begin, uint32 end, int table)
       {
         if(y > 14)
         {
+          if(bit + linbits + 1 > 32)
+          {
+            putlong( code, bit );
+            sumbit += bit;
+            code = bit = 0;
+          }
+
           code = (code << linbits) | yl;
           bit += linbits;
         }
@@ -1147,14 +1190,14 @@ int HuffmanCode( short *ix, int *xr, uint32 begin, uint32 end, int table)
   return sumbit;
 }
 
-void putbits(uint32 val, uint32 nbit)
+void putbits(uint32_t val, uint32_t nbit)
 {
   int new_bitpos = CodedData.bitpos + nbit;
   int ptrpos     = CodedData.bitpos >> 5;
 
   val = val & (0xffffffff >> (32 - nbit));
 
-  /* data fit in one uint32 */
+  /* data fit in one uint32_t */
   if(((new_bitpos - 1) >> 5) == ptrpos)
     CodedData.bbuf[ptrpos] |= val << ((32 - new_bitpos) & 31);
   else
@@ -1173,9 +1216,9 @@ void putbits(uint32 val, uint32 nbit)
 /*  of the Huffman tables as defined in the IS (Table B.7), and will not   */
 /*  work with any arbitrary tables.                                        */
 /***************************************************************************/
-int choose_table( short *ix, uint32 begin, uint32 end, int *bits )
+int choose_table( short *ix, uint32_t begin, uint32_t end, int *bits )
 {
-  uint32 i;
+  uint32_t i;
   int    max, table0, table1;
   
   for(i=begin,max=0; i<end; i++)
@@ -1217,10 +1260,10 @@ int choose_table( short *ix, uint32 begin, uint32 end, int *bits )
   }
 }
 
-int find_best_2(short *ix, uint32 start, uint32 end, const uint32 *table,
-                uint32 len, int *bits)
+int find_best_2(short *ix, uint32_t start, uint32_t end, const uint32_t *table,
+                uint32_t len, int *bits)
 {
-  uint32 i, sum = 0;
+  uint32_t i, sum = 0;
 
   for(i=start; i<end; i+=2)
     sum += table[ix[i] * len + ix[i+1]];
@@ -1237,10 +1280,10 @@ int find_best_2(short *ix, uint32 start, uint32 end, const uint32 *table,
   }
 }
 
-int find_best_3(short *ix, uint32 start, uint32 end, const uint32 *table,
-                uint32 len, int *bits)
+int find_best_3(short *ix, uint32_t start, uint32_t end, const uint32_t *table,
+                uint32_t len, int *bits)
 {
-  uint32 i, j, sum  = 0;
+  uint32_t i, j, sum  = 0;
   int          sum1 = 0;
   int          sum2 = 0;
   int          sum3 = 0;
@@ -1270,9 +1313,9 @@ int find_best_3(short *ix, uint32 start, uint32 end, const uint32 *table,
 /*************************************************************************/
 /* Function: Count the number of bits necessary to code the subregion.   */
 /*************************************************************************/
-int count_bit1(short *ix, uint32 start, uint32 end, int *bits )
+int count_bit1(short *ix, uint32_t start, uint32_t end, int *bits )
 {
-  uint32 i, sum = 0;
+  uint32_t i, sum = 0;
 
   for(i=start; i<end; i+=2)
     sum += t1l[4 + ix[i] * 2 + ix[i+1]];
@@ -1282,10 +1325,10 @@ int count_bit1(short *ix, uint32 start, uint32 end, int *bits )
   return 1; /* this is table1 */
 }
 
-int count_bigv(short *ix, uint32 start, uint32 end, int table0,
+int count_bigv(short *ix, uint32_t start, uint32_t end, int table0,
                int table1, int *bits )
 {
-  uint32  i, sum0, sum1, sum=0, bigv=0, x, y;
+  uint32_t  i, sum0, sum1, sum=0, bigv=0, x, y;
 
   /* ESC-table is used */
   for(i=start; i<end; i+=2)
@@ -1323,7 +1366,7 @@ int calc_runlen( short *ix, side_info_t *si )
   int  p, i, sum = 0;
 
   for(i=SAMPL2; i-=2; )
-    if(*(uint32*)&ix[i-2]) /* !!!! short *ix; !!!!! */
+    if(*(uint32_t*)&ix[i-2]) /* !!!! short *ix; !!!!! */
       break;
 
   si->count1 = 0;
@@ -1366,16 +1409,29 @@ int calc_runlen( short *ix, side_info_t *si )
 /*************************************************************************/
 int quantize_int(int *xr, short *ix, side_info_t *si)
 {
-  int   i, s, frac_pow[] = { 0x10000, 0xd745, 0xb505, 0x9838 };
+  unsigned int i, idx, s, frac_pow[] = { 0x10000, 0xd745, 0xb505, 0x9838 };
 
   s = frac_pow[si->quantStep & 3] >> si->quantStep / 4;
 
-  /* check for integer overflow */
-  if(((si->max_val + 256) >> 8) * s >= (1622 << 8))
+  /* check for possible 'out of range' values */
+  if(((si->max_val + 256) >> 8) * s >= (65536 << 8))
     return 0;
 
-  for(i=SAMPL2; i--; )
-    ix[i] = int2idx[(abs(xr[i]) * s + 0x8000) >> 16];
+  if(((si->max_val + 256) >> 8) * s < (4096 << 8))
+  { /* all values fit the table size */
+    for(i=SAMPL2; i--; )
+      ix[i] = int2idx[(xr[i] * s + 0x8000) >> 16];
+  }
+  else
+  { /* check each index wether it fits the table */
+    for(i=SAMPL2; i--; )
+    {
+      idx = (xr[i] * s + 0x08000) >> 16;
+
+      if(idx > 4095)  ix[i] = int2idx[(idx + 8) >> 4] << 3;
+      else            ix[i] = int2idx[idx];
+    }
+  }
 
   return 1;
 }
@@ -1446,9 +1502,9 @@ int quantize_and_count_bits(int *xr, short *ix, side_info_t *si)
   return bits;
 }
 
-/***********************************************************************/
-/* The code selects the best quantStep for a particular set of scalefacs                                                            */
-/***********************************************************************/ 
+/************************************************************************/
+/* The code selects the best quantStep for a particular set of scalefacs*/
+/************************************************************************/ 
 int inner_loop(int *xr, int max_bits, side_info_t *si)
 {
   int bits;
@@ -1970,8 +2026,7 @@ static int find_bitrate_index(int type, int bitrate)
 }
 
 static int find_samplerate_index(long freq, int *mp3_type)
-{                                /* MPEG 2 */           /* MPEG 1 */
-  static long mpeg[2][3] = { {22050, 24000, 16000}, {44100, 48000, 32000} };
+{
   int    mpg, rate;
 
   /* set default values: MPEG1 at 44100/s */
@@ -1979,7 +2034,7 @@ static int find_samplerate_index(long freq, int *mp3_type)
 
   for(mpg=0; mpg<2; mpg++)
     for(rate=0; rate<3; rate++)
-      if(freq == mpeg[mpg][rate])
+      if(freq == sampr_index[mpg][rate])
       { *mp3_type = mpg; return rate; }
 
   return 0;
@@ -1987,7 +2042,7 @@ static int find_samplerate_index(long freq, int *mp3_type)
 
 void init_mp3_encoder_engine(bool stereo, int bitrate, int sample_rate)
 {
-  uint32  avg_byte_per_frame;
+  uint32_t  avg_byte_per_frame;
 
 #ifdef ROCKBOX_LITTLE_ENDIAN
   cfg.byte_order = order_littleEndian;
@@ -2094,11 +2149,44 @@ void init_mp3_encoder_engine(bool stereo, int bitrate, int sample_rate)
                                           : (cfg.channels == 1 ?  72 : 136));
 }
 
+void set_scale_facs(int *mdct_freq)
+{
+  unsigned int i, is, ie, k, s;
+  int max_freq_val, avrg_freq_val;
+
+  /* calc average of first 256 frequency values */
+  for(avrg_freq_val=i=0; i<256; i++)
+    avrg_freq_val += mdct_freq[i];
+  avrg_freq_val >>= 8;
+
+  /* if max of current band is smaller than average, increase precision */
+  /* last band keeps untouched (not scaled) */
+  for(is=k=0; is<scalefac[21]; k++)
+  {
+    max_freq_val = 0;
+
+    for(i=is, ie=scalefac[k+1]; i<ie; i++)
+      if(max_freq_val < mdct_freq[i])
+        max_freq_val = mdct_freq[i];
+
+    for(s=0; s<3; s++)
+      if((max_freq_val<<s) > avrg_freq_val)
+        break;
+
+    band_scale_f[k] = (unsigned char)s;
+
+    for(i=is; s && i<ie; i++)
+      mdct_freq[i] <<= s;
+
+    is = ie;
+  }
+}
+
 void compress(void)
 {
-  int      i, ii, gr, k, ch, shift, gr_cnt;
-  int      max, min;
+  int      i, gr, gr_cnt;
   char     stg[20];
+  uint32_t max;
 
   while(1)
   {
@@ -2120,22 +2208,23 @@ void compress(void)
       cfg.mpg.padding = 0;
 
     cfg.mean_bits = (8 * cfg.byte_per_frame + 8 * cfg.mpg.padding
-                       - cfg.sideinfo_len) / cfg.granules / cfg.channels;
+                       - cfg.sideinfo_len) / cfg.granules / cfg.channels
+                       - 42; // reserved for scale_facs
 
     /* shift out old samples */
     memcpy(mfbuf, mfbuf + 2*cfg.granules*576, 4*512);
 
     /* read new samples to iram for further processing */
-    if(read_samples((uint32*)(mfbuf + 2*512), SAMP_PER_FRAME) == 0)
+    if(read_samples((uint32_t*)(mfbuf + 2*512), SAMP_PER_FRAME) == 0)
       break;
 
     /* swap bytes if neccessary */
     if(cfg.byte_order == order_bigEndian)
       for(i=0; i<SAMP_PER_FRAME; i++)
       {
-        uint32 t = ((uint32*)mfbuf)[512 + i];
+        uint32_t t = ((uint32_t*)mfbuf)[512 + i];
         t = ((t >> 8) & 0xff00ff) | ((t << 8) & 0xff00ff00);
-        ((uint32*)mfbuf)[512 + i] = t;
+        ((uint32_t*)mfbuf)[512 + i] = t;
       }
 
     if(cfg.resample) /* downsample to half of original */
@@ -2152,17 +2241,18 @@ void compress(void)
     cfg.ResvSize = 0;
     gr_cnt = cfg.granules * cfg.channels;
     CodedData.bitpos = cfg.sideinfo_len; /* leave space for mp3 header */
+
     for(gr=0; gr<cfg.granules; gr++)
     {
       short *wk = mfbuf + 2*286 + gr*1152;
+      int ch;
 
       /* 16bit packed wav data can be windowed efficiently on coldfire */
       window_subband1(wk, sb_data[0][1-gr][0], sb_data[1][1-gr][0]);
 
       for(ch=0; ch<cfg.channels; ch++)
       {
-        int   band;
-        int   *mdct;
+        int   ii, k, shift;
 
         wk = mfbuf + 2*286 + gr*1152 + ch;
 
@@ -2172,16 +2262,21 @@ void compress(void)
           window_subband2(wk, sb_data[ch][1-gr][k]);
           /* Compensate for inversion in the analysis filter */
           if(k & 1)
+          {
+            int band;
             for(band=1; band<32; band+=2)
-              sb_data[ch][1-gr][k][band] *= -1;
+            sb_data[ch][1-gr][k][band] *= -1;
+          }
         }
 
         /* Perform imdct of 18 previous + 18 current subband samples */
-        /* for integer precision do this loop twice (if neccessary) */
-        shift = k = 14;
-        for(ii=0; ii<2 && k; ii++)
+        /* for integer precision do this loop again (if neccessary)  */
+        shift = 14 - (cfg.cod_info[gr][ch].additStep >> 2);
+        for(k=1,ii=0; ii<3 && k; ii++)
         {
-          mdct = mdct_freq;
+          int *mdct = mdct_freq;
+          int band;
+
           cfg.cod_info[gr][ch].additStep = 4 * (14 - shift);
           for(band=0; band<cfg.mpg.num_bands; band++, mdct+=18)
           {
@@ -2197,11 +2292,15 @@ void compress(void)
               int c = shft_n(band0[(k+9)*32], shift);
               int d = shft_n(band0[(8-k)*32], shift);
 
-              work[k+ 9] = shft16(a * win[k+ 9][0] + b * win[k+ 9][1]
-                                + c * win[k+ 9][2] + d * win[k+ 9][3]);
+              work[k+ 9] = shft16(a * win[k+ 9][0] +
+                                  b * win[k+ 9][1] +
+                                  c * win[k+ 9][2] +
+                                  d * win[k+ 9][3]);
 
-              work[k+18] = shft16(c * win[k+18][0] + d * win[k+18][1]
-                                + a * win[k+18][2] + b * win[k+18][3]);
+              work[k+18] = shft16(c * win[k+18][0] +
+                                  d * win[k+18][1] +
+                                  a * win[k+18][2] +
+                                  b * win[k+18][3]);
             }
 
             /* 7200=4*18*100 */
@@ -2209,43 +2308,66 @@ void compress(void)
 
             /* Perform aliasing reduction butterfly */
             if(band != 0)
+            {
               for(k=7; k>=0; --k)
               {
                 int bu, bd;
-                bu = shft15(mdct[k]) * ca[k] + shft15(mdct[-1-k]) * cs[k];
-                bd = shft15(mdct[k]) * cs[k] - shft15(mdct[-1-k]) * ca[k];
+                bu = shft15(mdct[k]) * ca[k] +
+                     shft15(mdct[-1-k]) * cs[k];
+                bd = shft15(mdct[k]) * cs[k] -
+                     shft15(mdct[-1-k]) * ca[k];
                 mdct[-1-k] = bu;
                 mdct[ k  ] = bd;
               }
+            }
           }
 
-          max = min = 0;
+          max = 0;
           for(k=0; k<576; k++)
           {
-            mdct_freq[k] = shft13(mdct_freq[k]);
-            if(max < mdct_freq[k])  max = mdct_freq[k];
-            if(min > mdct_freq[k])  min = mdct_freq[k];
+            if(mdct_freq[k] < 0)
+            {
+              mdct_sign[k] = 1; /* negative */
+              mdct_freq[k] = shft13(-mdct_freq[k]);
+            }
+            else
+            {
+              mdct_sign[k] = 0; /* positive */
+              mdct_freq[k] = shft13(mdct_freq[k]);
+            }
+
+            if(max < (uint32_t)mdct_freq[k])
+              max = (uint32_t)mdct_freq[k];
           }
 
-          max = (max > -min) ? max : -min;
-          cfg.cod_info[gr][ch].max_val = (long)max;
+          cfg.cod_info[gr][ch].max_val = max;
 
           /* calc new shift for higher integer precision */
-          for(k=0; max<(0x3c00>>k); k++);
-          shift = 12 - k;
+          for(k=0; max<(uint32_t)(0x7800>>k); k++) shift--;
+          for( ; (max>>k)>=(uint32_t)0x10000; k++) shift++;
+          if(shift < 0)  shift = 0;
         }
 
-        cfg.cod_info[gr][ch].quantStep += cfg.cod_info[gr][ch].additStep;
+        cfg.cod_info[gr][ch].quantStep +=
+                            cfg.cod_info[gr][ch].additStep;
+
+        set_scale_facs(mdct_freq);
 
         /* bit and noise allocation */
-        iteration_loop(mdct_freq, &cfg.cod_info[gr][ch], gr_cnt--);
+        iteration_loop(mdct_freq, &cfg.cod_info[gr][ch],
+                       gr_cnt--);
         /* write the frame to the bitstream */
-        Huffmancodebits(enc_data, mdct_freq, &cfg.cod_info[gr][ch]);
+        Huffmancodebits(enc_data, mdct_sign,
+                        &cfg.cod_info[gr][ch]);
 
-        cfg.cod_info[gr][ch].quantStep -= cfg.cod_info[gr][ch].additStep;
+        cfg.cod_info[gr][ch].quantStep -=
+                            cfg.cod_info[gr][ch].additStep;
 
         if(cfg.granules == 1)
-          memcpy(sb_data[ch][0], sb_data[ch][1], sizeof(sb_data[ch][0]));
+        {
+          memcpy(sb_data[ch][0], sb_data[ch][1],
+                 sizeof(sb_data[ch][0]));
+        }
       }
     }
 

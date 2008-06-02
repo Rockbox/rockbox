@@ -73,9 +73,9 @@ typedef struct {
     uint32_t address1;
     uint32_t address2;
     uint32_t address3;
-    long   quantStep;
-    long   additStep;
-    long   max_val;
+    long     quantStep;
+    long     additStep;
+    uint32_t max_val;
 } side_info_t;
 
 typedef struct {
@@ -93,14 +93,14 @@ typedef struct {
 } config_t;
 
 typedef struct {
-    int     bitpos;     /* current bitpos for writing   */
+    int       bitpos;   /* current bitpos for writing */
     uint32_t  bbuf[263];
 } BF_Data;
 
 struct huffcodetab {
-  int          len;     /* max. index                   */
-  const uint8_t  *table;  /* pointer to array[len][len]   */
-  const uint8_t  *hlen;   /* pointer to array[len][len]   */
+  int            len;    /* max. index                  */
+  const uint8_t  *table; /* pointer to array[len][len]  */
+  const uint8_t  *hlen;  /* pointer to array[len][len]  */
 };
 
 struct huffcodebig {
@@ -119,8 +119,9 @@ struct huffcodebig {
 
 static short     mfbuf       [2*(1152+512)]      IBSS_ATTR; /*  3328 Bytes */
 static int       sb_data     [2][2][18][SBLIMIT] IBSS_ATTR; /* 13824 Bytes */
-static int       mdct_freq   [SAMPL2]            IBSS_ATTR; /*  9216 Bytes */
-static short     enc_data    [SAMPL2]            IBSS_ATTR; /*  4608 Bytes */
+static int       mdct_freq   [SAMPL2]            IBSS_ATTR; /*  2304 Bytes */
+static char      mdct_sign   [SAMPL2]            IBSS_ATTR; /*   576 Bytes */
+static short     enc_data    [SAMPL2]            IBSS_ATTR; /*  1152 Bytes */
 static uint32_t  scalefac    [23]                IBSS_ATTR; /*    92 Bytes */
 static BF_Data   CodedData                       IBSS_ATTR; /*  1056 Bytes */
 static int       ca          [8]                 IBSS_ATTR; /*    32 Bytes */
@@ -175,6 +176,7 @@ static unsigned samp_per_frame                   IBSS_ATTR;
 static config_t          cfg                     IBSS_ATTR;
 static char             *res_buffer;
 static int32_t           err                     IBSS_ATTR;
+static uint8_t           band_scale_f[22];
 
 static const uint8_t ht_count_const[2][2][16] =
 { { { 1,  5,  4,  5,  6,  5, 4, 4, 7, 3, 6, 0, 7, 2, 3, 1 },     /* table0 */
@@ -834,8 +836,8 @@ static const int win_const[18][4] = {
   {   134, -146,-3352,-3072 } };
 
 /* forward declarations */
-static int  HuffmanCode( short *ix, int *xr, uint32_t begin, uint32_t end, int table);
-static int  HuffmanCod1( short *ix, int *xr, uint32_t begin, uint32_t end, int table);
+static int  HuffmanCode( short *ix, char *xr_sign, uint32_t begin, uint32_t end, int table);
+static int  HuffmanCod1( short *ix, char *xr_sign, uint32_t begin, uint32_t end, int table);
 static void putbits(uint32_t val, uint32_t nbit);
 static int  find_best_2( short *ix, uint32_t start, uint32_t end, const uint32_t *table,
                           uint32_t len, int *bits);
@@ -892,14 +894,16 @@ static void encodeSideInfo( side_info_t si[2][2] )
       {
         side_info_t *gi = &si[gr][ch];
 
-        putlong( gi->part2_3_length,  12 );
-        putlong( gi->address3>>1,      9 );
-        putlong( gi->global_gain,      8 );
-        putlong( gi->table_select[0], 10 );
-        putlong( gi->table_select[1],  5 );
-        putlong( gi->table_select[2],  5 );
-        putlong( gi->region_0_1,       7 );
-        putlong( gi->table_select[3],  3 );
+        putlong((gi->part2_3_length+42),12 ); /* add scale_facs array size */
+        putlong( gi->address3>>1,        9 );
+        putlong( gi->global_gain,        8 );
+        putlong( 9,                      4 ); /* set scale_facs compr type */
+        putlong( gi->table_select[0],    6 );
+        putlong( gi->table_select[1],    5 );
+        putlong( gi->table_select[2],    5 );
+        putlong( gi->region_0_1,         7 );
+        putlong( 1                  ,    2 ); /* set scale_facs to 1bit */
+        putlong( gi->table_select[3],    1 );
       }
   }
   else
@@ -911,14 +915,16 @@ static void encodeSideInfo( side_info_t si[2][2] )
     {
       side_info_t *gi = &si[0][ch];
 
-      putlong( gi->part2_3_length,    12);
-      putlong( gi->address3>>1,        9);
-      putlong( gi->global_gain,        8);
-      putlong( gi->table_select[0],   15);
-      putlong( gi->table_select[1],    5);
-      putlong( gi->table_select[2],    5);
-      putlong( gi->region_0_1,         7);
-      putlong( gi->table_select[3],    2);
+      putlong((gi->part2_3_length+42),12 ); /* add scale_facs array size */
+      putlong( gi->address3>>1,        9 );
+      putlong( gi->global_gain,        8 );
+      putlong( 0xCA,                   9 ); /* set scale_facs compr type */
+      putlong( gi->table_select[0],    6 );
+      putlong( gi->table_select[1],    5 );
+      putlong( gi->table_select[2],    5 );
+      putlong( gi->region_0_1     ,    7 );
+      putlong( 1                  ,    1 ); /* set scale_facs to 1bit */
+      putlong( gi->table_select[3],    1 );
     }
   }
   /* flush remaining bits */
@@ -927,7 +933,7 @@ static void encodeSideInfo( side_info_t si[2][2] )
 
 /* Note the discussion of huffmancodebits() on pages 28 and 29 of the IS,
    as well as the definitions of the side information on pages 26 and 27. */
-static void Huffmancodebits( short *ix, int *xr, side_info_t *gi )
+static void Huffmancodebits( short *ix, char *xr_sign, side_info_t *gi )
 {
   int    region1   = gi->address1;
   int    region2   = gi->address2;
@@ -935,18 +941,27 @@ static void Huffmancodebits( short *ix, int *xr, side_info_t *gi )
   int    count1    = bigvals + (gi->count1 << 2);
   int    stuffBits = 0;
   int    bits      = 0;
+  int    i, v;
+
+  for(i=v=0; i<32; i+=2)
+    v |= band_scale_f[i>>1] << (30-i);
+  putbits(v, 32); // store scale_facs (part1)
+
+  for(v=0; i<42; i+=2)
+    v |= band_scale_f[i>>1] << (40-i);
+  putbits(v, 10); // store scale_facs (part2)
 
   if(region1 > 0)
-    bits += HuffmanCode(ix, xr,   0    , region1, gi->table_select[0]);
+    bits += HuffmanCode(ix, xr_sign,   0    , region1, gi->table_select[0]);
 
   if(region2 > region1)
-    bits += HuffmanCode(ix, xr, region1, region2, gi->table_select[1]);
+    bits += HuffmanCode(ix, xr_sign, region1, region2, gi->table_select[1]);
 
   if(bigvals > region2)
-    bits += HuffmanCode(ix, xr, region2, bigvals, gi->table_select[2]);
+    bits += HuffmanCode(ix, xr_sign, region2, bigvals, gi->table_select[2]);
  
   if(count1 > bigvals)
-    bits += HuffmanCod1(ix, xr, bigvals,  count1, gi->table_select[3]);
+    bits += HuffmanCod1(ix, xr_sign, bigvals,  count1, gi->table_select[3]);
 
   if((stuffBits = gi->part2_3_length - bits) > 0)
   {
@@ -961,15 +976,15 @@ static void Huffmancodebits( short *ix, int *xr, side_info_t *gi )
   }
 }
 
-int HuffmanCod1( short *ix, int *xr, uint32_t begin, uint32_t end, int tbl)
+int HuffmanCod1( short *ix, char *xr_sign, uint32_t begin, uint32_t end, int tbl)
 {
   uint32_t  cc=0, sz=0;
   uint32_t  i, d, p;
   int     sumbit=0, s=0, l=0, v, w, x, y;
-  #define sgnv (xr[i+0] < 0 ? 1 : 0)
-  #define sgnw (xr[i+1] < 0 ? 1 : 0)
-  #define sgnx (xr[i+2] < 0 ? 1 : 0)
-  #define sgny (xr[i+3] < 0 ? 1 : 0)
+  #define sgnv xr_sign[i+0]
+  #define sgnw xr_sign[i+1]
+  #define sgnx xr_sign[i+2]
+  #define sgny xr_sign[i+3]
 
   for(i=begin; i<end; i+=4)
   {
@@ -982,20 +997,20 @@ int HuffmanCod1( short *ix, int *xr, uint32_t begin, uint32_t end, int tbl)
     switch(p)
     {
       case  0: l=0; s = 0; break;
-      case  1: l=1; s = sgnv; break;
-      case  2: l=1; s =               sgnw; break;
-      case  3: l=2; s = (sgnv << 1) + sgnw; break;
-      case  4: l=1; s =                             sgnx; break;
-      case  5: l=2; s = (sgnv << 1)               + sgnx; break;
-      case  6: l=2; s =               (sgnw << 1) + sgnx; break;
-      case  7: l=3; s = (sgnv << 2) + (sgnw << 1) + sgnx; break;
-      case  8: l=1; s =                                           sgny; break;
+      case  1: l=1; s =                                           sgny; break;
+      case  2: l=1; s =                              sgnx;              break;
+      case  3: l=2; s =                             (sgnx << 1) + sgny; break;
+      case  4: l=1; s =                sgnw;                            break;
+      case  5: l=2; s =               (sgnw << 1)               + sgny; break;
+      case  6: l=2; s =               (sgnw << 1) +  sgnx;              break;
+      case  7: l=3; s =               (sgnw << 2) + (sgnx << 1) + sgny; break;
+      case  8: l=1; s =  sgnv;                                          break;
       case  9: l=2; s = (sgnv << 1)                             + sgny; break;
-      case 10: l=2; s =               (sgnw << 1)               + sgny; break;
-      case 11: l=3; s = (sgnv << 2) + (sgnw << 1)               + sgny; break;
-      case 12: l=2; s =                             (sgnx << 1) + sgny; break;
-      case 13: l=3; s = (sgnv << 2)               + (sgnx << 1) + sgny; break;
-      case 14: l=3; s =               (sgnw << 2) + (sgnx << 1) + sgny; break;
+      case 10: l=2; s = (sgnv << 1)               +  sgnx;              break;
+      case 11: l=3; s = (sgnv << 2)               + (sgnx << 1) + sgny; break;
+      case 12: l=2; s = (sgnv << 1) +  sgnw;                            break;
+      case 13: l=3; s = (sgnv << 2) + (sgnw << 1)               + sgny; break;
+      case 14: l=3; s = (sgnv << 2) + (sgnw << 1) +  sgnx;              break;
       case 15: l=4; s = (sgnv << 3) + (sgnw << 2) + (sgnx << 1) + sgny; break;
     }
 
@@ -1012,13 +1027,13 @@ int HuffmanCod1( short *ix, int *xr, uint32_t begin, uint32_t end, int tbl)
 }
 
 /* Implements the pseudocode of page 98 of the IS */
-int HuffmanCode( short *ix, int *xr, uint32_t begin, uint32_t end, int table)
+int HuffmanCode(short *ix, char *xr_sign, uint32_t begin, uint32_t end, int table)
 {
   uint32_t       cc=0, sz=0, code;
   uint32_t       i, xl=0, yl=0, idx;
-  int          x, y, bit, sumbit=0;
-  #define sign_x (xr[i+0] < 0 ? 1 : 0)
-  #define sign_y (xr[i+1] < 0 ? 1 : 0)
+  int            x, y, bit, sumbit=0;
+  #define sign_x xr_sign[i+0]
+  #define sign_y xr_sign[i+1]
 
   if(table == 0)
     return 0;
@@ -1057,6 +1072,13 @@ int HuffmanCode( short *ix, int *xr, uint32_t begin, uint32_t end, int table)
       {
         if(y > 14)
         {
+          if(bit + linbits + 1 > 32)
+          {
+            putlong( code, bit );
+            sumbit += bit;
+            code = bit = 0;
+          }
+
           code = (code << linbits) | yl;
           bit += linbits;
         }
@@ -1324,16 +1346,29 @@ int calc_runlen( short *ix, side_info_t *si )
 /*************************************************************************/
 int quantize_int(int *xr, short *ix, side_info_t *si)
 {
-  int   i, s, frac_pow[] = { 0x10000, 0xd745, 0xb505, 0x9838 };
+  unsigned int i, idx, s, frac_pow[] = { 0x10000, 0xd745, 0xb505, 0x9838 };
 
   s = frac_pow[si->quantStep & 3] >> si->quantStep / 4;
 
-  /* check for integer overflow */
-  if(((si->max_val + 256) >> 8) * s >= (1622 << 8))
+  /* check for possible 'out of range' values */
+  if(((si->max_val + 256) >> 8) * s >= (65536 << 8))
     return 0;
 
-  for(i=SAMPL2; i--; )
-    ix[i] = int2idx[(abs(xr[i]) * s + 0x8000) >> 16];
+  if(((si->max_val + 256) >> 8) * s < (4096 << 8))
+  { /* all values fit the table size */
+    for(i=SAMPL2; i--; )
+      ix[i] = int2idx[(xr[i] * s + 0x8000) >> 16];
+  }
+  else
+  { /* check each index wether it fits the table */
+    for(i=SAMPL2; i--; )
+    {
+      idx = (xr[i] * s + 0x08000) >> 16;
+
+      if(idx > 4095)  ix[i] = int2idx[(idx + 8) >> 4] << 3;
+      else            ix[i] = int2idx[idx];
+    }
+  }
 
   return 1;
 }
@@ -1404,9 +1439,9 @@ int quantize_and_count_bits(int *xr, short *ix, side_info_t *si)
   return bits;
 }
 
-/***********************************************************************/
-/* The code selects the best quantStep for a particular set of scalefacs                                                            */
-/***********************************************************************/ 
+/************************************************************************/
+/* The code selects the best quantStep for a particular set of scalefacs*/
+/************************************************************************/ 
 int inner_loop(int *xr, int max_bits, side_info_t *si)
 {
   int bits;
@@ -2100,12 +2135,45 @@ static inline void byte_swap_frame32(uint32_t *dst, uint32_t *src,
 } /* byte_swap_frame32 */
 #endif /* ROCKBOX_LITTLE_ENDIAN */
 
+void set_scale_facs(int *mdct_freq)
+{
+  unsigned int i, is, ie, k, s;
+  int max_freq_val, avrg_freq_val;
+
+  /* calc average of first 256 frequency values */
+  for(avrg_freq_val=i=0; i<256; i++)
+    avrg_freq_val += mdct_freq[i];
+  avrg_freq_val >>= 8;
+
+  /* if max of current band is smaller than average, increase precision */
+  /* last band keeps untouched (not scaled) */
+  for(is=k=0; is<scalefac[21]; k++)
+  {
+    max_freq_val = 0;
+
+    for(i=is, ie=scalefac[k+1]; i<ie; i++)
+      if(max_freq_val < mdct_freq[i])
+        max_freq_val = mdct_freq[i];
+
+    for(s=0; s<3; s++)
+      if((max_freq_val<<s) > avrg_freq_val)
+        break;
+
+    band_scale_f[k] = (unsigned char)s;
+
+    for(i=is; s && i<ie; i++)
+      mdct_freq[i] <<= s;
+
+    is = ie;
+  }
+}
+
 STATICIRAM void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
                              ICODE_ATTR;
 STATICIRAM void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
 {
-   int gr, gr_cnt;
-   int max, min;
+   int      gr, gr_cnt;
+   uint32_t max;
 
     /* encode one mp3 frame in this loop */
     CodedData.bitpos = 0;
@@ -2120,7 +2188,8 @@ STATICIRAM void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
         cfg.mpg.padding = 0;
 
     cfg.mean_bits = (8 * cfg.byte_per_frame + 8 * cfg.mpg.padding
-                  - cfg.sideinfo_len) / cfg.granules / cfg.channels;
+                       - cfg.sideinfo_len) / cfg.granules / cfg.channels
+                       - 42; // reserved for scale_facs
 
     /* shift out old samples */
     memcpy(mfbuf, mfbuf + 2*cfg.granules*576, 4*512);
@@ -2175,11 +2244,10 @@ STATICIRAM void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
                 }
             }
 
-            /* Perform imdct of 18 previous + 18 current subband samples
-               for integer precision do this loop twice (if neccessary)
-            */
-            shift = k = 14;
-            for(ii=0; ii<2 && k; ii++)
+            /* Perform imdct of 18 previous + 18 current subband samples */
+            /* for integer precision do this loop again (if neccessary)  */
+            shift = 14 - (cfg.cod_info[gr][ch].additStep >> 2);
+            for(k=1,ii=0; ii<3 && k; ii++)
             {
                 int *mdct = mdct_freq;
                 int band;
@@ -2230,30 +2298,41 @@ STATICIRAM void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
                     }
                 }
 
-                max = min = 0;
+                max = 0;
                 for(k=0; k<576; k++)
                 {
-                    mdct_freq[k] = shft13(mdct_freq[k]);
-                    if(max < mdct_freq[k])  max = mdct_freq[k];
-                    if(min > mdct_freq[k])  min = mdct_freq[k];
-                }
+                    if(mdct_freq[k] < 0)
+                    {
+                        mdct_sign[k] = 1; /* negative */
+                        mdct_freq[k] = shft13(-mdct_freq[k]);
+                    }
+                    else
+                    {
+                        mdct_sign[k] = 0; /* positive */
+                        mdct_freq[k] = shft13(mdct_freq[k]);
+                    }
 
-                max = (max > -min) ? max : -min;
-                cfg.cod_info[gr][ch].max_val = (long)max;
+                    if(max < (uint32_t)mdct_freq[k])
+                        max = (uint32_t)mdct_freq[k];
+                }
+                cfg.cod_info[gr][ch].max_val = max;
 
                 /* calc new shift for higher integer precision */
-                for(k=0; max<(0x3c00>>k); k++);
-                    shift = 12 - k;
+                for(k=0; max<(uint32_t)(0x7800>>k); k++) shift--;
+                for( ; (max>>k)>=(uint32_t)0x10000; k++) shift++;
+                if(shift < 0)  shift = 0;
             }
 
             cfg.cod_info[gr][ch].quantStep +=
                                 cfg.cod_info[gr][ch].additStep;
 
+            set_scale_facs(mdct_freq);
+
             /* bit and noise allocation */
             iteration_loop(mdct_freq, &cfg.cod_info[gr][ch],
                            gr_cnt--);
             /* write the frame to the bitstream */
-            Huffmancodebits(enc_data, mdct_freq,
+            Huffmancodebits(enc_data, mdct_sign,
                             &cfg.cod_info[gr][ch]);
 
             cfg.cod_info[gr][ch].quantStep -=
