@@ -45,6 +45,9 @@ HttpGet::HttpGet(QObject *parent)
         setProxy(m_globalProxy);
     m_usecache = false;
     m_cachedir = m_globalCache;
+
+    m_serverTimestamp = QDateTime();
+
     connect(&http, SIGNAL(done(bool)), this, SLOT(httpDone(bool)));
     connect(&http, SIGNAL(dataReadProgress(int, int)), this, SLOT(httpProgress(int, int)));
     connect(&http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpFinished(int, bool)));

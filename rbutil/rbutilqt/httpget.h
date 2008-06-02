@@ -43,7 +43,10 @@ class HttpGet : public QObject
         void setCache(bool);
         int httpResponse(void);
         QByteArray readAll(void);
-        bool isCached() { return m_cached; }
+        bool isCached()
+            { return m_cached; }
+        QDateTime timestamp(void)
+            { return m_serverTimestamp; }
         void setDumbCache(bool b) //< disable checking of http header timestamp for caching
             { m_dumbCache = b; }
         static void setGlobalCache(const QDir d) //< set global cache path
