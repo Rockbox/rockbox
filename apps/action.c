@@ -281,11 +281,12 @@ int get_action_statuscode(int *button)
 }
 
 #ifdef HAVE_TOUCHPAD
-/* return BUTTON_NONE on error
-          BUTTON_REPEAT if repeated press
-          BUTTON_REL    if its a short press
-          BUTTON_TOUCHPAD   otherwise
-*/
+/* return BUTTON_NONE               on error
+ *        BUTTON_REPEAT             if repeated press
+ *        BUTTON_REPEAT|BUTTON_REL  if release after repeated press
+ *        BUTTON_REL                if its a short press = release after press
+ *        BUTTON_TOUCHPAD           if press
+ */
 int action_get_touchpad_press(short *x, short *y)
 {
     static int last_data = 0;
@@ -308,7 +309,7 @@ int action_get_touchpad_press(short *x, short *y)
         return BUTTON_REPEAT;
     if (short_press)
         return BUTTON_REL;
-    /* this is to give a BUTTON_REL after a BUTTON_REPEAT */
+    /* This is to return a BUTTON_REL after a BUTTON_REPEAT. */
     if (last_button & BUTTON_REL)
         return BUTTON_REPEAT|BUTTON_REL;
     return BUTTON_TOUCHPAD;

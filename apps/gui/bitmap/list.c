@@ -278,13 +278,15 @@ void list_draw(struct screen *display, struct viewport *parent,
 
 
 #if defined(HAVE_TOUCHPAD)
+/* This needs to be fixed if we ever get more than 1 touchscreen on a target.
+ * This also assumes the whole screen is used, which is a bad assumption but
+ * fine until customizable lists comes in...
+ */
 static unsigned int prev_line=0;
-/* this needs to be fixed if we ever get more than 1 touchscreen on a target */
-/* this also assumes the whole screen is used, which is a bad asusmption but
-   fine untill customizable lists comes in... */
+
 unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewport *parent)
 {
-    short x,y;
+    short x, y;
     unsigned button = action_get_touchpad_press(&x, &y);
     int line;
     struct screen *display = &screens[SCREEN_MAIN];
@@ -292,7 +294,7 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
         return ACTION_NONE;
     if (x<list_text[SCREEN_MAIN].x)
     {
-        /* top left corner is hopefully GO_TO_ROOT */
+        /* Top left corner is hopefully GO_TO_ROOT */
         if (y<list_text[SCREEN_MAIN].y)
         {
             if (button == BUTTON_REL)
@@ -302,7 +304,7 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
             else
                 return ACTION_NONE;
         }
-        /* scroll bar */
+        /* Scroll bar */
         else
         {
             int new_selection, nb_lines;
@@ -327,8 +329,18 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
     }
     else
     {
-        /*  pressing an item will select it.
-            pressing the selected item will "enter" it */
+        /* |--------------------------------------------------------|
+         * | Description of the touchscreen list interface:         |
+         * |--------------------------------------------------------|
+         * | Pressing an item will select it and "enter" it.        |
+         * |                                                        |
+         * | Pressing and holding your pen down will scroll through |
+         * | the list of items, releasing your pen will "enter" it. |
+         * |                                                        |
+         * | Pressing and holding your pen down on a single item    |
+         * | will bring up the context menu of it.                  |
+         * |--------------------------------------------------------|
+         */
         if (y > list_text[SCREEN_MAIN].y)
         {
             int i, line_height, actual_y;
@@ -343,11 +355,13 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
                     break;
                 }
             }
+            
+            /* Something went wrong during line detection... */
             if(line == -1)
                 return ACTION_NONE;
             
             /* BUTTON_TOUCHPAD represents a button press*/
-            if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN] && button == BUTTON_TOUCHPAD)
+            if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN] && button ^ BUTTON_REL)
             {
                 if (gui_list->start_item[SCREEN_MAIN]+line > gui_list->nb_items)
                     return ACTION_NONE;
@@ -356,27 +370,39 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
             }
             
             if (button == (BUTTON_REPEAT|BUTTON_REL))
-                return ACTION_STD_CONTEXT;
-            else if(button == BUTTON_REL)
             {
-                if((signed)prev_line == line)
+                if(prev_line == (unsigned)line)
                 {
+                    /* Pen was hold on the same line as the previously selected one
+                     *  => simulate long button press
+                     */
                     prev_line = -1;
-                    return ACTION_STD_OK;
+                    return ACTION_STD_CONTEXT;
                 }
                 else
                 {
+                    /* Pen was moved across several lines and then released on this one
+                     *  => simulate short button press
+                     */
                     prev_line = line;
-                    return ACTION_NONE;
+                    return ACTION_STD_OK;
                 }
+            }
+            else if(button == BUTTON_REL)
+            {
+                /* Pen was released on either the same line as the previously selected one
+                 * or an other one
+                 *  => simulate short press
+                 */
+                return ACTION_STD_OK;
             }
             else
                 return ACTION_NONE;
         }
-        /* title goes up one level */
+        /* Title goes up one level (only on BUTTON_REL&~BUTTON_REPEAT) */
         else if (y > title_text[SCREEN_MAIN].y && draw_title(display, parent, gui_list) && button == BUTTON_REL)
             return ACTION_STD_CANCEL;
-        /* title or statusbar is cancel */
+        /* Title or statusbar is cancel (only on BUTTON_REL&~BUTTON_REPEAT) */
         else if (global_settings.statusbar && button == BUTTON_REL)
             return ACTION_STD_CANCEL;
     }
