@@ -216,7 +216,7 @@ ALIGN static const uint16_t swb_offset_128_8[] ICONST_ATTR =
     0, 4, 8, 12, 16, 20, 24, 28, 36, 44, 52, 60, 72, 88, 108, 128
 };
 
-ALIGN static const uint16_t *swb_offset_1024_window[] ICODE_ATTR =
+ALIGN static const uint16_t *const swb_offset_1024_window[] ICONST_ATTR =
 {
     swb_offset_1024_96,      /* 96000 */
     swb_offset_1024_96,      /* 88200 */
@@ -266,7 +266,7 @@ ALIGN static const uint16_t *swb_offset_480_window[] =
 };
 #endif
 
-ALIGN static const  uint16_t *swb_offset_128_window[] ICODE_ATTR =
+ALIGN static const uint16_t *const swb_offset_128_window[] ICONST_ATTR =
 {
     swb_offset_128_96,       /* 96000 */
     swb_offset_128_96,       /* 88200 */
