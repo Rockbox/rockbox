@@ -475,7 +475,7 @@ void usb_drv_exit(void)
 #if CONFIG_CPU == IMX31L
     avic_disable_int(USB_OTG);
 #else
-    CPU_INT_CLR = USB_MASK;
+    CPU_INT_DIS = USB_MASK;
 #endif
 
     cancel_cpu_boost();

@@ -142,7 +142,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         : : "a"(dest)
     );
 #elif defined(CPU_PP502x)
-    CPU_INT_CLR = -1;
+    CPU_INT_DIS = -1;
 
     /* Flush cache */
     flush_icache();

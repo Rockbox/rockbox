@@ -63,8 +63,8 @@ void power_off(void)
     disable_interrupt(IRQ_FIQ_STATUS);
 
     /* Mask them on both cores */
-    CPU_INT_CLR = -1;
-    COP_INT_CLR = -1;
+    CPU_INT_DIS = -1;
+    COP_INT_DIS = -1;
 
     while (1)
         GPIOB_OUTPUT_VAL |= 0x80;

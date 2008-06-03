@@ -177,8 +177,8 @@ void system_init(void)
 #endif
 
         INT_FORCED_CLR = -1;
-        CPU_INT_CLR    = -1;
-        COP_INT_CLR    = -1;
+        CPU_INT_DIS    = -1;
+        COP_INT_DIS    = -1;
 
         GPIOA_INT_EN   = 0;
         GPIOB_INT_EN   = 0;

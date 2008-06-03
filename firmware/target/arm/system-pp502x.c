@@ -384,12 +384,12 @@ void system_init(void)
 #endif
 
         /* disable all irqs */
-        COP_HI_INT_CLR      = -1;
-        CPU_HI_INT_CLR      = -1;
+        COP_HI_INT_DIS      = -1;
+        CPU_HI_INT_DIS      = -1;
         HI_INT_FORCED_CLR   = -1;
         
-        COP_INT_CLR         = -1;
-        CPU_INT_CLR         = -1;
+        COP_INT_DIS         = -1;
+        CPU_INT_DIS         = -1;
         INT_FORCED_CLR      = -1;
 
         GPIOA_INT_EN        = 0;

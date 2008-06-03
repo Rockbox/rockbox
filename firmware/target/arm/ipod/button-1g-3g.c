@@ -167,7 +167,7 @@ static int ipod_3g_button_read(void)
 
 void ipod_3g_button_int(void)
 {
-    CPU_INT_CLR = GPIO_MASK;
+    CPU_INT_DIS = GPIO_MASK;
     int_btn = ipod_3g_button_read();
     CPU_INT_EN = GPIO_MASK;
 }

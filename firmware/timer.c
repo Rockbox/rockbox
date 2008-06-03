@@ -201,8 +201,8 @@ static bool timer_set(long cycles, bool start)
             pfn_unregister();
             pfn_unregister = NULL;
         }
-        CPU_INT_CLR = TIMER2_MASK;
-        COP_INT_CLR = TIMER2_MASK;
+        CPU_INT_DIS = TIMER2_MASK;
+        COP_INT_DIS = TIMER2_MASK;
     }
     if (start || (cycles_new == -1))  /* within isr, cycles_new is "locked" */
         TIMER2_CFG = 0xc0000000 | (cycles - 1);    /* enable timer */
@@ -311,8 +311,8 @@ void timer_unregister(void)
     or_l((1<<10), &IMR);    /* disable interrupt */
 #elif defined(CPU_PP)
     TIMER2_CFG = 0;         /* stop timer 2 */
-    CPU_INT_CLR = TIMER2_MASK;
-    COP_INT_CLR = TIMER2_MASK;
+    CPU_INT_DIS = TIMER2_MASK;
+    COP_INT_DIS = TIMER2_MASK;
 #elif CONFIG_CPU == PNX0101
     TIMER1.ctrl &= ~0x80;  /* disable timer 1 */
     irq_disable_int(IRQ_TIMER1);

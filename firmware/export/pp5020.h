@@ -62,12 +62,12 @@
 
 #define CPU_INT_EN_STAT     (*(volatile unsigned long*)(0x60004020))
 #define CPU_INT_EN          (*(volatile unsigned long*)(0x60004024))
-#define CPU_INT_CLR         (*(volatile unsigned long*)(0x60004028))
+#define CPU_INT_DIS         (*(volatile unsigned long*)(0x60004028))
 #define CPU_INT_PRIORITY    (*(volatile unsigned long*)(0x6000402c))
 
 #define COP_INT_EN_STAT     (*(volatile unsigned long*)(0x60004030))
 #define COP_INT_EN          (*(volatile unsigned long*)(0x60004034))
-#define COP_INT_CLR         (*(volatile unsigned long*)(0x60004038))
+#define COP_INT_DIS         (*(volatile unsigned long*)(0x60004038))
 #define COP_INT_PRIORITY    (*(volatile unsigned long*)(0x6000403c))
 
 #define CPU_HI_INT_STAT     (*(volatile unsigned long*)(0x60004100))

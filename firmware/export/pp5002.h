@@ -105,12 +105,12 @@
 
 #define CPU_INT_EN_STAT  (*(volatile unsigned long *)(0xcf001020))
 #define CPU_INT_EN       (*(volatile unsigned long *)(0xcf001024))
-#define CPU_INT_CLR      (*(volatile unsigned long *)(0xcf001028))
+#define CPU_INT_DIS      (*(volatile unsigned long *)(0xcf001028))
 #define CPU_INT_PRIORITY (*(volatile unsigned long *)(0xcf00102c))
 
 #define COP_INT_EN_STAT  (*(volatile unsigned long *)(0xcf001030))
 #define COP_INT_EN       (*(volatile unsigned long *)(0xcf001034))
-#define COP_INT_CLR      (*(volatile unsigned long *)(0xcf001038))
+#define COP_INT_DIS      (*(volatile unsigned long *)(0xcf001038))
 #define COP_INT_PRIORITY (*(volatile unsigned long *)(0xcf00103c))
 
 #define IDE_IRQ          1

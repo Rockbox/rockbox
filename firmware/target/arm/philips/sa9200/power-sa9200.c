@@ -40,8 +40,8 @@ void power_off(void)
 
     /* Stop interrupts on both cores */
     disable_interrupt(IRQ_FIQ_STATUS);
-    COP_INT_CLR = -1;
-    CPU_INT_CLR = -1;
+    COP_INT_DIS = -1;
+    CPU_INT_DIS = -1;
 
     /* Halt everything and wait for device to power off */
     while (1)
