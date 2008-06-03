@@ -71,6 +71,74 @@
 static struct thread_entry *ata_thread_p = NULL;
 #endif
 
+#if defined(MAX_PHYS_SECTOR_SIZE) && MEM == 64
+/* Hack - what's the deal with 5g? */
+struct ata_lock
+{
+    struct thread_entry *thread;
+    int count;
+    volatile unsigned char locked;
+    IF_COP( struct corelock cl; )
+};
+
+static void ata_lock_init(struct ata_lock *l)
+{
+    corelock_init(&l->cl);
+    l->locked = 0;
+    l->count = 0;
+    l->thread = NULL;
+}
+
+static void ata_lock_lock(struct ata_lock *l)
+{
+    struct thread_entry * const current = thread_get_current();
+
+    if (current == l->thread)
+    {
+        l->count++;
+        return;
+    }
+
+    corelock_lock(&l->cl);
+
+    IF_PRIO( current->skip_count = -1; )
+
+    while (l->locked != 0)
+    {
+        corelock_unlock(&l->cl);
+        switch_thread();
+        corelock_lock(&l->cl);
+    }
+
+    l->locked = 1;
+    l->thread = current;
+    corelock_unlock(&l->cl);
+}
+
+static void ata_lock_unlock(struct ata_lock *l)
+{
+    if (l->count > 0)
+    {
+        l->count--;
+        return;
+    }
+
+    corelock_lock(&l->cl);
+
+    IF_PRIO( l->thread->skip_count = 0; )
+
+    l->thread = NULL;
+    l->locked = 0;
+
+    corelock_unlock(&l->cl);
+}
+
+#define mutex           ata_lock
+#define mutex_init      ata_lock_init
+#define mutex_lock      ata_lock_lock
+#define mutex_unlock    ata_lock_unlock
+#endif /* MAX_PHYS_SECTOR_SIZE */
+
 static struct mutex ata_mtx SHAREDBSS_ATTR;
 int ata_device; /* device 0 (master) or 1 (slave) */
 
