@@ -91,7 +91,7 @@ void ZipInstaller::installStart()
     getter->setFile(downloadFile);
     
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+    connect(getter, SIGNAL(dataReadProgress(int, int)), m_dp, SLOT(setProgress(int, int)));
     connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
     
     getter->getFile(QUrl(m_url));
@@ -135,7 +135,7 @@ void ZipInstaller::downloadDone(bool error)
         qDebug() << "file to unzip: " << m_file;
         UnZip::ErrorCode ec;
         RbUnZip uz;
-        connect(&uz, SIGNAL(unzipProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+        connect(&uz, SIGNAL(unzipProgress(int, int)), m_dp, SLOT(setProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), &uz, SLOT(abortUnzip()));
         ec = uz.openArchive(m_file);
         if(ec != UnZip::Ok) {
@@ -198,14 +198,6 @@ void ZipInstaller::downloadDone(bool error)
     installlog.sync();
 
     emit cont();
-}
-
-void ZipInstaller::updateDataReadProgress(int read, int total)
-{
-    m_dp->setProgressMax(total);
-    m_dp->setProgressValue(read);
-    //qDebug() << "progress:" << read << "/" << total;
-
 }
 
 

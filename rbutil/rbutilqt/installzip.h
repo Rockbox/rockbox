@@ -54,7 +54,6 @@ signals:
     void cont();
 
 private slots:
-    void updateDataReadProgress(int, int);
     void downloadDone(bool);
     void installStart(void);
     void installContinue(void);

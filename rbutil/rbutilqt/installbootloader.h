@@ -68,7 +68,6 @@ private slots:
     void createInstallLog();  // adds the bootloader entry to the log
     void removeInstallLog(); // removes the bootloader entry from the log
 
-    void updateDataReadProgress(int, int);
     void downloadDone(bool);
     void downloadRequestFinished(int, bool);
     void infoDownloadDone(bool);

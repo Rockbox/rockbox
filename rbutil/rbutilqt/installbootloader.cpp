@@ -182,13 +182,6 @@ void BootloaderInstaller::downloadDone(bool error)
 
 }
 
-void BootloaderInstaller::updateDataReadProgress(int read, int total)
-{
-    m_dp->setProgressMax(total);
-    m_dp->setProgressValue(read);
-    qDebug() << "progress:" << read << "/" << total;
-}
-
 
 void BootloaderInstaller::installEnded(bool error)
 {
@@ -323,7 +316,7 @@ void BootloaderInstaller::gigabeatPrepare()
         getter->setFile(&downloadFile);
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-        connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+        connect(getter, SIGNAL(dataReadProgress(int, int)), m_dp, SLOT(setProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
 
         getter->getFile(QUrl(url));
@@ -469,7 +462,7 @@ void BootloaderInstaller::iaudioPrepare()
     getter->getFile(QUrl(url));
     // connect signals from HttpGet
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+    connect(getter, SIGNAL(dataReadProgress(int, int)), m_dp, SLOT(setProgress(int, int)));
     connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
 }
 
@@ -525,7 +518,7 @@ void BootloaderInstaller::h10Prepare()
         getter->setFile(&downloadFile);
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-        connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+        connect(getter, SIGNAL(dataReadProgress(int, int)), m_dp, SLOT(setProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
         
         getter->getFile(QUrl(url));
@@ -684,7 +677,7 @@ void BootloaderInstaller::mrobe100Prepare()
         
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-        connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+        connect(getter, SIGNAL(dataReadProgress(int, int)), m_dp, SLOT(setProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
         
         getter->getFile(QUrl(url));
@@ -854,7 +847,7 @@ void BootloaderInstaller::ipodPrepare()
         
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-        connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+        connect(getter, SIGNAL(dataReadProgress(int, int)), m_dp, SLOT(setProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
         
         getter->getFile(QUrl(url));
@@ -1098,7 +1091,7 @@ void BootloaderInstaller::sansaPrepare()
         
         // connect signals from HttpGet
         connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-        connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+        connect(getter, SIGNAL(dataReadProgress(int, int)), m_dp, SLOT(setProgress(int, int)));
         connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
         
         getter->getFile(QUrl(url));
@@ -1288,7 +1281,7 @@ void BootloaderInstaller::iriverPrepare()
     
     // connect signals from HttpGet
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    connect(getter, SIGNAL(dataReadProgress(int, int)), this, SLOT(updateDataReadProgress(int, int)));
+    connect(getter, SIGNAL(dataReadProgress(int, int)), m_dp, SLOT(setProgress(int, int)));
     connect(m_dp, SIGNAL(aborted()), getter, SLOT(abort()));
     
     getter->getFile(QUrl(url));

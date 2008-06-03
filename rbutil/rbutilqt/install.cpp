@@ -136,7 +136,7 @@ void Install::accept()
         
         //! create backup
         RbZip backup;
-        connect(&backup,SIGNAL(zipProgress(int,int)),this,SLOT(updateDataReadProgress(int,int)));
+        connect(&backup,SIGNAL(zipProgress(int,int)),logger,SLOT(setProgress(int,int)));
         if(backup.createZip(m_backupName,settings->mountpoint() + "/.rockbox") == Zip::Ok)
         {
             logger->addItem(tr("Backup successfull"),LOGOK);
@@ -178,13 +178,6 @@ void Install::changeBackupPath()
     }
 }
 
-void Install::updateDataReadProgress(int read, int total)
-{
-    logger->setProgressMax(total);
-    logger->setProgressValue(read);
-    //qDebug() << "progress:" << read << "/" << total;
-
-}
 
 // Zip installer has finished
 void Install::done(bool error)
