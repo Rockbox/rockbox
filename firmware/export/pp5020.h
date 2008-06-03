@@ -82,12 +82,12 @@
 
 #define CPU_HI_INT_EN_STAT  (*(volatile unsigned long*)(0x60004120))
 #define CPU_HI_INT_EN       (*(volatile unsigned long*)(0x60004124))
-#define CPU_HI_INT_CLR      (*(volatile unsigned long*)(0x60004128))
+#define CPU_HI_INT_DIS      (*(volatile unsigned long*)(0x60004128))
 #define CPU_HI_INT_PRIORITY (*(volatile unsigned long*)(0x6000412c))
  
 #define COP_HI_INT_EN_STAT  (*(volatile unsigned long*)(0x60004130))
 #define COP_HI_INT_EN       (*(volatile unsigned long*)(0x60004134))
-#define COP_HI_INT_CLR      (*(volatile unsigned long*)(0x60004138))
+#define COP_HI_INT_DIS      (*(volatile unsigned long*)(0x60004138))
 #define COP_HI_INT_PRIORITY (*(volatile unsigned long*)(0x6000413c))
 
 #define TIMER1_IRQ   0

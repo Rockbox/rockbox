@@ -70,7 +70,7 @@ void rolo_restart_cop(void)
         return;
     }
 
-    COP_INT_CLR = -1;
+    COP_INT_DIS = -1;
 
     /* Invalidate cache */
     invalidate_icache();

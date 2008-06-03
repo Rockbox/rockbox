@@ -262,7 +262,7 @@ void wheel_send_events(bool send)
 
 void ipod_4g_button_int(void)
 {
-    CPU_HI_INT_CLR = I2C_MASK;
+    CPU_HI_INT_DIS = I2C_MASK;
 
     int_btn = ipod_4g_button_read();
     
