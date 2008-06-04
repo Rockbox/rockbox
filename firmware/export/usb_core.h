@@ -57,5 +57,10 @@ int usb_core_ack_control(struct usb_ctrlrequest* req);
 #ifdef HAVE_HOTSWAP
 void usb_core_hotswap_event(int volume,bool inserted);
 #endif
+
+#ifdef HAVE_USB_POWER
+unsigned short usb_allowed_current(void);
+#endif
+
 #endif
 

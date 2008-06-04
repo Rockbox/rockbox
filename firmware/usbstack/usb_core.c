@@ -726,3 +726,16 @@ int usb_core_ack_control(struct usb_ctrlrequest* req)
         return usb_drv_send(EP_CONTROL, NULL, 0);
 }
 
+#ifdef HAVE_USB_POWER
+unsigned short usb_allowed_current()
+{
+    if (usb_state == CONFIGURED)
+    {
+        return 500;
+    }
+    else
+    {
+        return 100;
+    }
+}
+#endif
