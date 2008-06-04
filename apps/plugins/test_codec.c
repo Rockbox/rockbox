@@ -613,6 +613,17 @@ static enum plugin_status test_track(const char* filename)
 
         rb->snprintf(str,sizeof(str),"%d.%02d%% realtime",(int)speed/100,(int)speed%100);
         log_text(str,true);
+        
+#ifndef SIMULATOR
+        /* show effective clockrate in MHz needed for realtime decoding */
+        if (speed > 0)
+        {
+            speed = CPUFREQ_MAX / speed;
+            rb->snprintf(str,sizeof(str),"%d.%02dMHz needed for realtime",
+            (int)speed/100,(int)speed%100);
+            log_text(str,true);
+        }   
+#endif
     }
 
     res = PLUGIN_OK;
