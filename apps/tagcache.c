@@ -4323,6 +4323,7 @@ static void tagcache_thread(void)
             
             case Q_REBUILD:
                 remove_files();
+                remove(TAGCACHE_FILE_TEMP);
                 tagcache_build("/");
                 break;
             
