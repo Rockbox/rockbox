@@ -110,7 +110,8 @@ typedef struct mpc_decoder_t {
     mpc_uint32_t  SeekTableCounter;           // used to sum up skip info, if SeekTable_Step != 1
     mpc_uint32_t  MaxDecodedFrames;           // Maximum frames decoded (indicates usable seek table entries)
     mpc_uint32_t* SeekTable;                  // seek table itself
-    mpc_uint8_t   SeekTable_Step;             // frames per seek table index
+    mpc_uint8_t   SeekTable_Step;             // 1<<SeekTable_Step = frames per table index
+    mpc_uint32_t  SeekTable_Mask;             // used to avoid modulo-operation in seek
 
 #ifdef MPC_FIXED_POINT
     mpc_uint8_t   SCF_shift[256];
