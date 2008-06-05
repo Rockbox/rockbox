@@ -489,7 +489,7 @@ static int parse_image_load(const char *wps_bufptr,
 
     ptr++;
 
-    if (!(ptr = parse_list("ssdd", '|', ptr, &id, &filename, &x, &y)))
+    if (!(ptr = parse_list("ssdd", NULL, '|', ptr, &id, &filename, &x, &y)))
         return WPS_ERROR_INVALID_PARAM;
 
     /* Check there is a terminating | */
@@ -540,17 +540,34 @@ static int parse_viewport(const char *wps_bufptr,
                           struct wps_token *token,
                           struct wps_data *wps_data)
 {
+    (void)token; /* Kill warnings */
     const char *ptr = wps_bufptr;
     struct viewport* vp;
     int depth;
-
-    (void)token; /* Kill warnings */
+    int valid = 0;
+    enum {
+        PL_X = 0,
+        PL_Y,
+        PL_WIDTH,
+        PL_HEIGHT,
+        PL_FONT,
+        PL_FG,
+        PL_BG,
+    };
+    int lcd_width = LCD_WIDTH, lcd_height = LCD_HEIGHT;
+#ifdef HAVE_REMOTE_LCD
+    if (wps_data->remote_wps)
+    {
+        lcd_width = LCD_REMOTE_WIDTH;
+        lcd_height = LCD_REMOTE_HEIGHT;
+    }
+#endif
 
     if (*wps_bufptr != '|')
         return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
 
     ptr = wps_bufptr + 1;
-    /* format: %V|x|y|width|height|fg_pattern|bg_pattern| */
+    /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
 
     if (wps_data->num_viewports >= WPS_MAX_VIEWPORTS)
         return WPS_ERROR_INVALID_PARAM;
@@ -573,7 +590,7 @@ static int parse_viewport(const char *wps_bufptr,
 #ifdef HAVE_LCD_COLOR
     if (depth == 16)
     {
-        if (!(ptr = parse_list("dddddcc", '|', ptr, &vp->x, &vp->y, &vp->width,
+        if (!(ptr = parse_list("dddddcc", &valid, '|', ptr, &vp->x, &vp->y, &vp->width,
                     &vp->height, &vp->font, &vp->fg_pattern,&vp->bg_pattern)))
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -581,7 +598,10 @@ static int parse_viewport(const char *wps_bufptr,
 #endif
 #if (LCD_DEPTH == 2) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 2)
     if (depth == 2) {
-        if (!(ptr = parse_list("dddddgg", '|', ptr, &vp->x, &vp->y, &vp->width,
+        /* Default to black on white */
+        vp->fg_pattern = 0;
+        vp->bg_pattern = 3;
+        if (!(ptr = parse_list("dddddgg", &valid, '|', ptr, &vp->x, &vp->y, &vp->width,
                     &vp->height, &vp->font, &vp->fg_pattern, &vp->bg_pattern)))
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -590,8 +610,8 @@ static int parse_viewport(const char *wps_bufptr,
 #if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
     if (depth == 1)
     {
-        if (!(ptr = parse_list("ddddd", '|', ptr, &vp->x, &vp->y, &vp->width,
-                                                  &vp->height, &vp->font)))
+        if (!(ptr = parse_list("ddddd", &valid, '|', ptr, &vp->x, &vp->y, 
+                                    &vp->width, &vp->height, &vp->font)))
             return WPS_ERROR_INVALID_PARAM;
     }
       else
@@ -602,34 +622,39 @@ static int parse_viewport(const char *wps_bufptr,
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
 
+    if ((valid&(1<<PL_X)) == 0 || (valid&(1<<PL_Y)) == 0)
+        return WPS_ERROR_INVALID_PARAM;
+    
+    /* fix defaults */
+    if ((valid&(1<<PL_WIDTH)) == 0)
+        vp->width = lcd_width - vp->x;
+    if ((valid&(1<<PL_HEIGHT)) == 0)
+        vp->height = lcd_height - vp->y;
+    
     /* Default to using the user font if the font was an invalid number */
-    if ((vp->font != FONT_SYSFIXED) && (vp->font != FONT_UI))
+    if (((valid&(1<<PL_FONT)) == 0) ||
+         ((vp->font != FONT_SYSFIXED) && (vp->font != FONT_UI)))
         vp->font = FONT_UI;
 
     /* Validate the viewport dimensions - we know that the numbers are
        non-negative integers */
-#ifdef HAVE_REMOTE_LCD
-    if (wps_data->remote_wps)
+    if ((vp->x >= lcd_width) ||
+        ((vp->x + vp->width) > lcd_width) ||
+        (vp->y >= lcd_height) ||
+        ((vp->y + vp->height) > lcd_height))
     {
-        if ((vp->x >= LCD_REMOTE_WIDTH) ||
-            ((vp->x + vp->width) > LCD_REMOTE_WIDTH) ||
-            (vp->y >= LCD_REMOTE_HEIGHT) ||
-            ((vp->y + vp->height) > LCD_REMOTE_HEIGHT))
-        {
-            return WPS_ERROR_INVALID_PARAM;
-        }
+        return WPS_ERROR_INVALID_PARAM;
     }
-    else
+    
+#ifdef HAVE_LCD_COLOR
+    if (depth == 16)
+    {
+        if ((valid&(1<<PL_FG)) == 0)
+            vp->fg_pattern = global_settings.fg_color;
+        if ((valid&(1<<PL_BG)) == 0)
+            vp->fg_pattern = global_settings.bg_color;
+    }
 #endif
-    {
-        if ((vp->x >= LCD_WIDTH) ||
-            ((vp->x + vp->width) > LCD_WIDTH) ||
-            (vp->y >= LCD_HEIGHT) ||
-            ((vp->y + vp->height) > LCD_HEIGHT))
-        {
-            return WPS_ERROR_INVALID_PARAM;
-        }
-    }
 
     wps_data->viewports[wps_data->num_viewports-1].last_line = wps_data->num_lines - 1;
 

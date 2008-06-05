@@ -129,6 +129,7 @@ bool dir_exists(const char *path);
 char *strip_extension(char* buffer, int buffer_size, const char *filename);
 
 /* A simplified scanf */
-const char* parse_list(const char *fmt, const char sep, const char* str, ...);
+const char* parse_list(const char *fmt, unsigned int *valid_vals,
+                       const char sep, const char* str, ...);
 
 #endif /* MISC_H */
