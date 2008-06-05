@@ -714,7 +714,7 @@ static int prime_transfer(int endpoint, void* ptr, int len, bool send, bool wait
         if(qh->status!=0) {
             /* No need to cancel wait here since it was done and the signal
              * came. */
-            return 5;
+            return -5;
         }
         //logf("all tds done");
     }
