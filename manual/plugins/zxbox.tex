@@ -1,0 +1,95 @@
+\subsection{\label{ref:ZXBox}ZXBox}
+\screenshot{plugins/images/ss-zxbox}{ZXBox}{img:zxbox}
+ZXBox is a port of the ``Spectemu'' ZX Spectrum 48k emulator for Rockbox
+(\Pointinghand\href{http://kempelen.iit.bme.hu/~mszeredi/spectemu/spectemu.html}
+{project's homepage}). To start a game open a tape file or snapshot saved as
+\fname{.tap}, \fname{.tzx}, \fname{.z80} or \fname{.sna} in the file browser.\\
+\note{As ZXBox is a 48k emulator only loading of 48k z80 snapshots is possible.}
+
+\subsubsection{Default keys}
+The emulator is set up for 5 different buttons: Up, Down, Left, Right and
+Jump/Fire. Each one of these can be mapped to one key of the Spectrum Keyboard
+or they can be used like a ``Kempston'' joystick. Per default the buttons,
+including an additional but fixed menu button, are assigned as follows:
+
+\begin{table}
+    \begin{btnmap}{}{}
+    \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu/\ButtonPlay/}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
+        ,IAUDIO_X5_PAD,SANSA_C200_PAD,SANSA_E200_PAD,MROBE100_PAD}{\ButtonUp/\ButtonDown/}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown/}
+    \ButtonLeft/\ButtonRight
+    & Directional movement\\
+    %
+    \opt{IPOD_3G_PAD,IPOD_4G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IAUDIO_X5_PAD%
+        ,SANSA_C200_PAD,SANSA_E200_PAD,MROBE100_PAD}{\ButtonSelect}
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    & Jump/Fire\\
+    %
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{ONDIO_PAD}{\ButtonOff}
+    \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonHold{} switch}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonMenu}
+    \opt{SANSA_C200_PAD,SANSA_E200_PAD,MROBE100_PAD}{\ButtonPower}
+    \opt{IAUDIO_X5_PAD}{\ButtonPlay}
+    \opt{IRIVER_H10_PAD}{\ButtonFF}
+    & Open ZXBox menu\\
+    \end{btnmap}
+\end{table}
+
+\subsubsection{ZXBox menu}
+\begin{description}
+\item[ Vkeyboard.]
+    This is a virtual keyboard representing the Spectrum keyboard. Controls are
+    the same as in standard Rockbox, but you just press one key instead of
+    entering a phrase.
+\item[Play/Pause Tape.] Toggles playing of the tape (if it is loaded).
+\item[Save Quick Snapshot.] Saves snapshot into \fname{/.rockbox/zxboxq.z80}.
+\item[Load Quick Snapshot.] Loads snapshot from \fname{/.rockbox/zxboxq.z80}.
+\item[Save Snapshot.]
+    Saves a snapshot of the current state. You would enter the full path and
+    desired name - for example \fname{/games/zx/snapshots/chuckie.sna}. The
+    snapshot format will be chosen after the extension you specified, per
+    default \fname{.z80} will be taken in case you leave it open.
+\item[Toggle Fast Mode.]
+    Toggles fastest possible emulation speed (no sound, maximum frameskip etc.).
+    This is Useful when loading tapes with some specific loaders.
+\item[Options.]
+    \begin{description}
+    \item[Map Keys To Kempston.]
+        Controls whether the \daps{} buttons should simulate a ``Kempston''
+        joystick or some assigned keys of the Spectrum keyboard.
+    \item[Display Speed.]Toggle displaying the emulation speed (in percent).
+    \item[Invert Colors.]
+        Inverts the Spectum colour palette, sometimes helps visibility.
+    \item[Frameskip]
+        Sets the number of frames to skip before displaying one. With zero
+        frameskip ZXBox tries to display 50 frames per second.
+    \item[Sound.]Turns sound on or off.
+    \item[Volume.]Controls volume of sound output.
+    \item[Predefined Keymap]
+        Select one of the predefined keymaps. For example \setting{2w90z} means:
+       map ZXBox's \btnfnt{Up} to \setting{2}, \btnfnt{Down} to \setting{w},
+       \btnfnt{Left} to \setting{9}, \btnfnt{Right} to \setting{0} and
+       \btnfnt{Jump/Fire} to \setting{z}. This example keymap is used in the
+       ``Chuckie Egg'' game.
+    \item[Custom Keymap]
+        This menu allows you to map one of the Spectrum keys accessible through the 
+        plugin's virtual keyboard to each one of the buttons.
+    \end{description}
+\item[Quit.] Quits the emulator..
+\end{description}
+
+\nopt{ipodvideo}{% no scaling for here, still include it?
+\subsubsection{Hacking graphics}
+Due to ZXBox's simple (but fast) scaling to the screen by dropping lines and
+columns some games can become unplayable. It is possible to hack graphics to
+make them better visible with the help of an utility such as the ``Spectrum
+Graphics Editor''. Useful tools can be found at the ``World of Spectrum'' site
+(\url{http://www.worldofspectrum.org/utilities.html}).}
+
+See also the plugin's wiki page \wikilink{PluginZXBox}.
