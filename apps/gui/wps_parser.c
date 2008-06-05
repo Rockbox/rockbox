@@ -652,7 +652,7 @@ static int parse_viewport(const char *wps_bufptr,
         if ((valid&(1<<PL_FG)) == 0)
             vp->fg_pattern = global_settings.fg_color;
         if ((valid&(1<<PL_BG)) == 0)
-            vp->fg_pattern = global_settings.bg_color;
+            vp->bg_pattern = global_settings.bg_color;
     }
 #endif
 
