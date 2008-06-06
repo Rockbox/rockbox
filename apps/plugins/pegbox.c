@@ -368,6 +368,32 @@ PLUGIN_HEADER
 #define BOARD_Y   0
 #endif
 
+#ifdef HAVE_TOUCHPAD
+#include "lib/touchscreen.h"
+
+static struct ts_mapping main_menu_items[5] =
+{
+{(LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, BMPHEIGHT_pegbox_menu_top, BMPWIDTH_pegbox_menu_items,       (BMPHEIGHT_pegbox_menu_items/9)},
+{(LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, BMPHEIGHT_pegbox_menu_top+(BMPHEIGHT_pegbox_menu_items/9),   BMPWIDTH_pegbox_menu_items, (BMPHEIGHT_pegbox_menu_items/9)},
+{(LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, BMPHEIGHT_pegbox_menu_top+(BMPHEIGHT_pegbox_menu_items/9)*2, BMPWIDTH_pegbox_menu_items, (BMPHEIGHT_pegbox_menu_items/9)},
+{(LCD_WIDTH-BMPWIDTH_pegbox_menu_items)/2, BMPHEIGHT_pegbox_menu_top+(BMPHEIGHT_pegbox_menu_items/9)*3, BMPWIDTH_pegbox_menu_items, (BMPHEIGHT_pegbox_menu_items/9)},
+{
+#if (LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110)
+0, BMPHEIGHT_pegbox_menu_top+4*(BMPHEIGHT_pegbox_menu_items/9)+8, SYSFONT_WIDTH*28, SYSFONT_HEIGHT
+#elif LCD_WIDTH > 112
+0, LCD_HEIGHT - 8, SYSFONT_WIDTH*28, SYSFONT_HEIGHT
+#else
+#error "Touchpad isn't supported on non-bitmap screens!"
+#endif
+}
+
+};
+static struct ts_mappings main_menu = {main_menu_items, 5};
+
+static struct ts_raster pegbox_raster = { BOARD_X, BOARD_Y, COLS*BMPWIDTH_pegbox_pieces, ROWS*BMPWIDTH_pegbox_pieces, BMPWIDTH_pegbox_pieces, BMPWIDTH_pegbox_pieces };
+static struct ts_raster_button_mapping pegbox_raster_btn = { &pegbox_raster, false, false, true, false, true, {0, 0}, 0, 0, 0 };
+#endif
+
 struct game_context {
     unsigned int level;
     unsigned int highlevel;
@@ -612,6 +638,9 @@ static void display_text(char *str, bool waitkey)
                 key = rb->button_get(true);
                 switch (key)
                 {
+#ifdef HAVE_TOUCHPAD
+                    case BUTTON_TOUCHPAD:
+#endif
                     case PEGBOX_QUIT:
                     case PEGBOX_LEFT:
                     case PEGBOX_DOWN:
@@ -738,6 +767,28 @@ static void new_piece(struct game_context* pb, unsigned int x_loc,
     while (!exit) {
         draw_board(pb);
         button = rb->button_get(true);
+#ifdef HAVE_TOUCHPAD
+        if(button & BUTTON_TOUCHPAD)
+        {
+            pegbox_raster_btn.two_d_from.y = x_loc;
+            pegbox_raster_btn.two_d_from.x = y_loc;
+            
+            struct ts_raster_button_result ret = touchscreen_raster_map_button(&pegbox_raster_btn, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff, button);
+            if(ret.action == TS_ACTION_TWO_D_MOVEMENT)
+            {
+                if(ret.to.x > ret.from.x)
+                    button = PEGBOX_UP;
+                else if(ret.to.x < ret.from.x)
+                    button = PEGBOX_DOWN;
+                else if(ret.to.y > ret.from.y)
+                    button = PEGBOX_LEFT;
+                else if(ret.to.y < ret.from.y)
+                    button = PEGBOX_RIGHT;
+            }
+            else if(ret.action == TS_ACTION_CLICK && (unsigned)ret.to.x == y_loc && (unsigned)ret.to.y == x_loc)
+                button = PEGBOX_SAVE;
+        }
+#endif
         switch(button){
             case PEGBOX_LEFT:
             case (PEGBOX_LEFT|BUTTON_REPEAT):
@@ -1053,6 +1104,24 @@ static unsigned int pegbox_menu(struct game_context* pb) {
         
         /* handle menu button presses */
         button = rb->button_get(true);
+        
+#ifdef HAVE_TOUCHPAD
+        if(button & BUTTON_TOUCHPAD)
+        {
+            unsigned int result = touchscreen_map(&main_menu, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff);
+            if(result != (unsigned)-1 && button & BUTTON_REL)
+            {
+                if(result == 4)
+                    button = PEGBOX_LVL_UP;
+                else
+                {
+                    if(loc == result)
+                        button = PEGBOX_RIGHT;
+                    loc = result;
+                }
+            }
+        }
+#endif
 
         switch(button) {
             case PEGBOX_SAVE: /* start playing */
@@ -1169,6 +1238,17 @@ static int pegbox(struct game_context* pb) {
 
     while (true) {
         temp_var = rb->button_get(true);
+#ifdef HAVE_TOUCHPAD
+        if(temp_var & BUTTON_TOUCHPAD)
+        {
+            pegbox_raster_btn.two_d_from.y = pb->player_row;
+            pegbox_raster_btn.two_d_from.x = pb->player_col;
+            
+            struct ts_raster_button_result ret = touchscreen_raster_map_button(&pegbox_raster_btn, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff, temp_var);
+            if(ret.action == TS_ACTION_TWO_D_MOVEMENT)
+                move_player(pb, ret.to.x - ret.from.x, ret.to.y - ret.from.y);
+        }
+#endif
         switch(temp_var){
             case PEGBOX_LEFT:             /* move cursor left */
             case (PEGBOX_LEFT|BUTTON_REPEAT):

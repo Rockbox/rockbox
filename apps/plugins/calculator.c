@@ -288,6 +288,9 @@ PLUGIN_HEADER
 #ifndef CALCULATOR_CLEAR
 #define CALCULATOR_CLEAR          BUTTON_TOPRIGHT
 #endif
+
+#include "lib/touchscreen.h"
+static struct ts_raster calc_raster = { X_0_POS, Y_1_POS, BUTTON_COLS*REC_WIDTH, BUTTON_ROWS*REC_HEIGHT, REC_WIDTH, REC_HEIGHT };
 #endif
 
 static const struct plugin_api* rb;
@@ -1547,6 +1550,37 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     while (calStatus != cal_exit ) {
         btn = rb->button_get_w_tmo(HZ/2);
+#ifdef HAVE_TOUCHPAD
+        if(btn & BUTTON_TOUCHPAD)
+        {
+            struct ts_raster_result res;
+            if(touchscreen_map_raster(&calc_raster, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff, &res) == 1)
+            {
+                btn_row = res.y;
+                btn_col = res.x;
+                drawButtons(buttonGroup);
+                drawLines();
+
+                rb->lcd_update();
+
+                prev_btn_row = btn_row;
+                prev_btn_col = btn_col;
+                if(btn & BUTTON_REL)
+                {
+                    btn = CALCULATOR_INPUT;
+                    switch(buttonGroup){
+                        case basicButtons:
+                            basicButtonsProcess();
+                            break;
+                        case sciButtons:
+                            sciButtonsProcess();
+                            break;
+                    }
+                    btn = BUTTON_TOUCHPAD;
+                }
+            }
+        }
+#endif
         switch (btn) {
             case CALCULATOR_INPUT:
             case CALCULATOR_CALC:

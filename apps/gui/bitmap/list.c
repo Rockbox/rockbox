@@ -344,20 +344,12 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
         if (y > list_text[SCREEN_MAIN].y)
         {
             int i, line_height, actual_y;
+            
             actual_y =  y - list_text[SCREEN_MAIN].y;
             line_height = font_get(parent->font)->height;
-            line = -1;
-            for(i=0; i<gui_list->nb_items; i++)
-            {
-                if(actual_y > line_height*i && actual_y < line_height*(i+1))
-                {
-                    line = i;
-                    break;
-                }
-            }
+            line = actual_y / line_height;
             
-            /* Something went wrong during line detection... */
-            if(line == -1)
+            if(actual_y%line_height == 0) /* Pressed a border */
                 return ACTION_NONE;
             
             if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN] && button ^ BUTTON_REL)

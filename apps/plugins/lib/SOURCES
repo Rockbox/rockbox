@@ -39,3 +39,6 @@ bmp_smooth_scale.c
 #endif
 pluginlib_actions.c
 helper.c
+#ifdef HAVE_TOUCHPAD
+touchscreen.c
+#endif
