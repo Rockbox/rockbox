@@ -343,7 +343,7 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
          */
         if (y > list_text[SCREEN_MAIN].y)
         {
-            int i, line_height, actual_y;
+            int line_height, actual_y;
             
             actual_y =  y - list_text[SCREEN_MAIN].y;
             line_height = font_get(parent->font)->height;
