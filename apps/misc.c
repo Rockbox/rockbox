@@ -1263,7 +1263,7 @@ const char* parse_list(const char *fmt, uint32_t *set_vals,
                 *s = p;
                 while (*p && *p != sep)
                    p++;
-                set = (*s[0]!='-') && (*s[1]!=sep) ;
+                set = (s[0][0]!='-') && (s[0][1]!=sep) ;
                 break;
 
             case 'd': /* int */

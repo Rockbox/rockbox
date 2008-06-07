@@ -20,7 +20,7 @@
 #define MISC_H
 
 #include <stdbool.h>
-
+#include <inttypes.h>
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
