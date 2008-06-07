@@ -489,10 +489,10 @@ const struct settings_list settings[] = {
                   "idle poweroff", "off", UNIT_MIN, formatter_unit_0_is_off,
                   getlang_unit_0_is_off, set_poweroff_timeout, 15,
                   0,1,2,3,4,5,6,7,8,9,10,15,30,45,60),
-                  SYSTEM_SETTING(NVRAM(4), runtime, 0),
-                  SYSTEM_SETTING(NVRAM(4), topruntime, 0),
-                  INT_SETTING(0, max_files_in_playlist, 
-                              LANG_MAX_FILES_IN_PLAYLIST,
+    SYSTEM_SETTING(NVRAM(4), runtime, 0),
+    SYSTEM_SETTING(NVRAM(4), topruntime, 0),
+    INT_SETTING(0, max_files_in_playlist, 
+                LANG_MAX_FILES_IN_PLAYLIST,
 #if MEM > 1
                   10000,
 #else
