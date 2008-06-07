@@ -58,10 +58,25 @@ static int fd_log = -1;
 
 /** tuner register defines **/
 
-/* pins on GPIOH port */
+#if defined(SANSA_E200) || defined(SANSA_C200)
+#define GPIO_OUTPUT_EN  GPIOH_OUTPUT_EN
+#define GPIO_OUTPUT_VAL GPIOH_OUTPUT_VAL
+#define GPIO_INPUT_VAL  GPIOH_INPUT_VAL
 #define FM_NRW_PIN      3
 #define FM_CLOCK_PIN    4
 #define FM_DATA_PIN     5
+#elif defined(COWON_D2)
+#define GPIO_OUTPUT_EN  GPIOC_DIR
+#define GPIO_OUTPUT_VAL GPIOC
+#define GPIO_INPUT_VAL  GPIOC
+#define FM_NRW_PIN      31
+#define FM_CLOCK_PIN    29
+#define FM_DATA_PIN     30
+#define udelay(x)       /* Remove hack when D2 has udelay */
+#else
+#error GPIOs undefined for this target
+#endif
+
 #define FM_CLK_DELAY    1
 
 /* block 1 registers */
@@ -258,17 +273,18 @@ static void lv24020lp_send_byte(unsigned int byte)
 {
     int i;
 
-    byte <<= FM_DATA_PIN;
-
     for (i = 0; i < 8; i++)
     {
-        GPIOH_OUTPUT_VAL &= ~(1 << FM_CLOCK_PIN);
+        GPIO_OUTPUT_VAL &= ~(1 << FM_CLOCK_PIN);
 
-        GPIOH_OUTPUT_VAL = (GPIOH_OUTPUT_VAL & ~(1 << FM_DATA_PIN)) |
-                            (byte & (1 << FM_DATA_PIN));
+        if (byte & 1)
+            GPIO_OUTPUT_VAL |= (1 << FM_DATA_PIN);
+        else
+            GPIO_OUTPUT_VAL &=  ~(1 << FM_DATA_PIN);
+
         udelay(FM_CLK_DELAY);
 
-        GPIOH_OUTPUT_VAL |= (1 << FM_CLOCK_PIN);
+        GPIO_OUTPUT_VAL |= (1 << FM_CLOCK_PIN);
         udelay(FM_CLK_DELAY);
 
         byte >>= 1;
@@ -279,8 +295,8 @@ static void lv24020lp_send_byte(unsigned int byte)
 static void lv24020lp_end_write(void)
 {
     /* switch back to read mode */
-    GPIOH_OUTPUT_EN &= ~(1 << FM_DATA_PIN);
-    GPIOH_OUTPUT_VAL &= ~(1 << FM_NRW_PIN);
+    GPIO_OUTPUT_EN &= ~(1 << FM_DATA_PIN);
+    GPIO_OUTPUT_VAL &= ~(1 << FM_NRW_PIN);
     udelay(FM_CLK_DELAY);
 }
 
@@ -294,8 +310,8 @@ static unsigned int lv24020lp_begin_write(unsigned int address)
     for (;;)
     {
         /* Prepare 3-wire bus pins for write cycle */
-        GPIOH_OUTPUT_VAL |= (1 << FM_NRW_PIN);
-        GPIOH_OUTPUT_EN |= (1 << FM_DATA_PIN);
+        GPIO_OUTPUT_VAL |= (1 << FM_NRW_PIN);
+        GPIO_OUTPUT_EN |= (1 << FM_DATA_PIN);
         udelay(FM_CLK_DELAY);
 
         /* current block == register block? */
@@ -386,16 +402,17 @@ static unsigned int lv24020lp_read(unsigned int address)
     toread = 0;
     for (i = 0; i < 8; i++)
     {
-        GPIOH_OUTPUT_VAL &= ~(1 << FM_CLOCK_PIN);
+        GPIO_OUTPUT_VAL &= ~(1 << FM_CLOCK_PIN);
         udelay(FM_CLK_DELAY);
 
-        toread |= (GPIOH_INPUT_VAL & (1 << FM_DATA_PIN)) << i;
+        if (GPIO_INPUT_VAL & (1 << FM_DATA_PIN))
+            toread |= (1 << i);
 
-        GPIOH_OUTPUT_VAL |= (1 << FM_CLOCK_PIN);
+        GPIO_OUTPUT_VAL |= (1 << FM_CLOCK_PIN);
         udelay(FM_CLK_DELAY);
     }
 
-    return toread >> FM_DATA_PIN;
+    return toread;
 }
 
 /* enables auto frequency centering */
