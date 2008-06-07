@@ -136,7 +136,7 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename);
  *   - valid_vals: value after the call to 'parse_list'
  */
 #define LIST_VALUE_PARSED(setvals, position) ((setvals)&(1<<(position)))
-const char* parse_list(const char *fmt, unsigned int *set_vals,
+const char* parse_list(const char *fmt, uint32_t *set_vals,
                        const char sep, const char* str, ...);
 
 #endif /* MISC_H */
