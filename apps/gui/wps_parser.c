@@ -544,7 +544,7 @@ static int parse_viewport(const char *wps_bufptr,
     const char *ptr = wps_bufptr;
     struct viewport* vp;
     int depth;
-    int valid = 0;
+    uint32_t set = 0;
     enum {
         PL_X = 0,
         PL_Y,
@@ -590,7 +590,7 @@ static int parse_viewport(const char *wps_bufptr,
 #ifdef HAVE_LCD_COLOR
     if (depth == 16)
     {
-        if (!(ptr = parse_list("dddddcc", &valid, '|', ptr, &vp->x, &vp->y, &vp->width,
+        if (!(ptr = parse_list("dddddcc", &set, '|', ptr, &vp->x, &vp->y, &vp->width,
                     &vp->height, &vp->font, &vp->fg_pattern,&vp->bg_pattern)))
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -601,7 +601,7 @@ static int parse_viewport(const char *wps_bufptr,
         /* Default to black on white */
         vp->fg_pattern = 0;
         vp->bg_pattern = 3;
-        if (!(ptr = parse_list("dddddgg", &valid, '|', ptr, &vp->x, &vp->y, &vp->width,
+        if (!(ptr = parse_list("dddddgg", &set, '|', ptr, &vp->x, &vp->y, &vp->width,
                     &vp->height, &vp->font, &vp->fg_pattern, &vp->bg_pattern)))
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -610,7 +610,7 @@ static int parse_viewport(const char *wps_bufptr,
 #if (LCD_DEPTH == 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH == 1)
     if (depth == 1)
     {
-        if (!(ptr = parse_list("ddddd", &valid, '|', ptr, &vp->x, &vp->y, 
+        if (!(ptr = parse_list("ddddd", &set, '|', ptr, &vp->x, &vp->y, 
                                     &vp->width, &vp->height, &vp->font)))
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -622,17 +622,17 @@ static int parse_viewport(const char *wps_bufptr,
     if (*ptr != '|')
         return WPS_ERROR_INVALID_PARAM;
 
-    if ((valid&(1<<PL_X)) == 0 || (valid&(1<<PL_Y)) == 0)
+    if (!LIST_VALUE_PARSED(set, PL_X) || !LIST_VALUE_PARSED(set, PL_Y))
         return WPS_ERROR_INVALID_PARAM;
     
     /* fix defaults */
-    if ((valid&(1<<PL_WIDTH)) == 0)
+    if (!LIST_VALUE_PARSED(set, PL_WIDTH))
         vp->width = lcd_width - vp->x;
-    if ((valid&(1<<PL_HEIGHT)) == 0)
+    if (!LIST_VALUE_PARSED(set, PL_HEIGHT))
         vp->height = lcd_height - vp->y;
     
     /* Default to using the user font if the font was an invalid number */
-    if (((valid&(1<<PL_FONT)) == 0) ||
+    if (!LIST_VALUE_PARSED(set, PL_FONT) ||
          ((vp->font != FONT_SYSFIXED) && (vp->font != FONT_UI)))
         vp->font = FONT_UI;
 
@@ -649,9 +649,9 @@ static int parse_viewport(const char *wps_bufptr,
 #ifdef HAVE_LCD_COLOR
     if (depth == 16)
     {
-        if ((valid&(1<<PL_FG)) == 0)
+        if (!LIST_VALUE_PARSED(set, PL_FG))
             vp->fg_pattern = global_settings.fg_color;
-        if ((valid&(1<<PL_BG)) == 0)
+        if (!LIST_VALUE_PARSED(set, PL_BG))
             vp->bg_pattern = global_settings.bg_color;
     }
 #endif

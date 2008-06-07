@@ -129,7 +129,14 @@ bool dir_exists(const char *path);
 char *strip_extension(char* buffer, int buffer_size, const char *filename);
 
 /* A simplified scanf */
-const char* parse_list(const char *fmt, unsigned int *valid_vals,
+/*
+ * Checks whether the value at position 'position' was really read
+ * during a call to 'parse_list'
+ *   - position: 0-based number of the value
+ *   - valid_vals: value after the call to 'parse_list'
+ */
+#define LIST_VALUE_PARSED(setvals, position) ((setvals)&(1<<(position)))
+const char* parse_list(const char *fmt, unsigned int *set_vals,
                        const char sep, const char* str, ...);
 
 #endif /* MISC_H */

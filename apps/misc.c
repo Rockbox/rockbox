@@ -1217,7 +1217,7 @@ int hex_to_rgb(const char* hex, int* color)
                s - string (sets pointer to string, without copying)
                c - hex colour (RGB888 - e.g. ff00ff)
                g - greyscale "colour" (0-3)
-   valid_vals - if not NULL 1 is set in the bitplace if the item was read OK
+   set_vals - if not NULL 1 is set in the bitplace if the item was read OK
                 0 if not read.
                 first item is LSB, (max 32 items! )
                 Stops parseing if an item is invalid unless the item == '-'
@@ -1232,19 +1232,19 @@ int hex_to_rgb(const char* hex, int* color)
 /* '0'-'3' are ASCII 0x30 to 0x33 */
 #define is0123(x) (((x) & 0xfc) == 0x30)
 
-const char* parse_list(const char *fmt, unsigned int *valid_vals,
+const char* parse_list(const char *fmt, unsigned int *set_vals,
                        const char sep, const char* str, ...)
 {
     va_list ap;
     const char* p = str, *f = fmt;
     const char** s;
     int* d;
-    bool valid;
+    bool set;
     int i=0;
 
     va_start(ap, str);
-    if (valid_vals)
-        *valid_vals = 0;
+    if (set_vals)
+        *set_vals = 0;
     while (*fmt)
     {
         /* Check for separator, if we're not at the start */
@@ -1254,7 +1254,7 @@ const char* parse_list(const char *fmt, unsigned int *valid_vals,
                 goto err;
             p++;
         }
-        valid = false;
+        set = false;
         switch (*fmt++) 
         {
             case 's': /* string - return a pointer to it (not a copy) */
@@ -1263,14 +1263,14 @@ const char* parse_list(const char *fmt, unsigned int *valid_vals,
                 *s = p;
                 while (*p && *p != sep)
                    p++;
-                valid = (*s[0]!='-') && (*s[1]!=sep) ;
+                set = (*s[0]!='-') && (*s[1]!=sep) ;
                 break;
 
             case 'd': /* int */
                 d = va_arg(ap, int*);
                 if (!isdigit(*p))
                 {
-                    if (!valid_vals || *p != '-')
+                    if (!set_vals || *p != '-')
                         goto err;
                     while (*p && *p != sep)
                         p++;
@@ -1280,7 +1280,7 @@ const char* parse_list(const char *fmt, unsigned int *valid_vals,
                    *d = *p++ - '0';
                     while (isdigit(*p))
                        *d = (*d * 10) + (*p++ - '0');
-                    valid = true;
+                    set = true;
                 }
 
                 break;
@@ -1291,7 +1291,7 @@ const char* parse_list(const char *fmt, unsigned int *valid_vals,
 
                 if (hex_to_rgb(p, d) < 0)
                 {
-                    if (!valid_vals || *p != '-')
+                    if (!set_vals || *p != '-')
                         goto err;
                     while (*p && *p != sep)
                         p++;
@@ -1299,7 +1299,7 @@ const char* parse_list(const char *fmt, unsigned int *valid_vals,
                 else
                 {
                     p += 6;
-                    valid = true;
+                    set = true;
                 }
 
                 break;
@@ -1312,9 +1312,9 @@ const char* parse_list(const char *fmt, unsigned int *valid_vals,
                 if (is0123(*p))
                 {
                     *d = *p++ - '0';
-                    valid = true;
+                    set = true;
                 }
-                else if (!valid_vals || *p != '-')
+                else if (!set_vals || *p != '-')
                     goto err;
                 else
                 {
@@ -1329,8 +1329,8 @@ const char* parse_list(const char *fmt, unsigned int *valid_vals,
                 goto err;
                 break;
         }
-        if (valid_vals && valid)
-            *valid_vals |= (1<<i);
+        if (set_vals && set)
+            *set_vals |= (1<<i);
         i++;
     }
 
