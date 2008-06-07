@@ -1220,6 +1220,7 @@ int hex_to_rgb(const char* hex, int* color)
    valid_vals - if not NULL 1 is set in the bitplace if the item was read OK
                 0 if not read.
                 first item is LSB, (max 32 items! )
+                Stops parseing if an item is invalid unless the item == '-'
    sep - list separator (e.g. ',' or '|')
    str  - string to parse, must be terminated by 0 or sep
    ... - pointers to store the parsed values
@@ -1262,14 +1263,14 @@ const char* parse_list(const char *fmt, unsigned int *valid_vals,
                 *s = p;
                 while (*p && *p != sep)
                    p++;
-                valid = (*s[0]!=sep);
+                valid = (*s[0]!='-') && (*s[1]!=sep) ;
                 break;
 
             case 'd': /* int */
                 d = va_arg(ap, int*);
                 if (!isdigit(*p))
                 {
-                    if (!valid_vals)
+                    if (!valid_vals || *p != '-')
                         goto err;
                     while (*p && *p != sep)
                         p++;
@@ -1290,7 +1291,7 @@ const char* parse_list(const char *fmt, unsigned int *valid_vals,
 
                 if (hex_to_rgb(p, d) < 0)
                 {
-                    if (!valid_vals)
+                    if (!valid_vals || *p != '-')
                         goto err;
                     while (*p && *p != sep)
                         p++;
@@ -1313,7 +1314,7 @@ const char* parse_list(const char *fmt, unsigned int *valid_vals,
                     *d = *p++ - '0';
                     valid = true;
                 }
-                else if (!valid_vals)
+                else if (!valid_vals || *p != '-')
                     goto err;
                 else
                 {
