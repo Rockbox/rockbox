@@ -291,7 +291,7 @@ void HttpGet::httpDone(bool error)
     if(!outputToBuffer)
         outputFile->close();
 
-    if(m_usecache && !m_cached) {
+    if(m_usecache && !m_cached && !error) {
         qDebug() << "[HTTP] creating cache file" << m_cachefile;
         QFile c(m_cachefile);
         c.open(QIODevice::ReadWrite);
@@ -304,6 +304,10 @@ void HttpGet::httpDone(bool error)
             c.write(dataBuffer);
 
         c.close();
+    }
+    // if cached file found and cache enabled ignore http errors
+    if(m_usecache && m_cached && !http.hasPendingRequests()) {
+        error = false;
     }
     // take care of concurring requests. If there is still one running,
     // don't emit done(). That request will call this slot again.
