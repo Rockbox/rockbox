@@ -74,6 +74,15 @@ static struct mutex ata_mtx SHAREDBSS_ATTR;
 #define ECC_ERRDATA (*(volatile unsigned long *)0xF005B060)
 #define ECC_ERR     (*(volatile unsigned long *)0xF005B070)
 
+/* GPIOs */
+
+#define NAND_GPIO_SET(n)    GPIOB_SET = n
+#define NAND_GPIO_CLEAR(n)  GPIOB_CLEAR = n
+#define NAND_GPIO_OUT_EN(n) GPIOB_DIR |= n
+
+#define WE_GPIO_BIT (1<<19) /* Write Enable */
+#define CS_GPIO_BIT (1<<21) /* Chip Select (4 banks when used with NFC_CSx) */
+
 /* Chip characteristics, initialised by nand_get_chip_info() */
 
 static int page_size       = 0;
@@ -96,13 +105,7 @@ static int segments_per_bank   = 0;
 #define MAX_BLOCKS_PER_BANK 8192
 #define MAX_PAGES_PER_BLOCK 128
 #define BLOCKS_PER_SEGMENT  4
-
-/* In theory we can support 4 banks, but only 2 have been seen on 2/4/8Gb D2s */
-#ifdef COWON_D2
-#define MAX_BANKS 2
-#else
-#define MAX_BANKS 4
-#endif
+#define MAX_BANKS           4
 
 #define MAX_SEGMENTS (MAX_BLOCKS_PER_BANK * MAX_BANKS / BLOCKS_PER_SEGMENT)
 
@@ -174,7 +177,7 @@ static void nand_chip_select(int bank)
     if (bank == -1)
     {
         /* Disable both chip selects */
-        GPIOB_CLEAR = (1<<21);
+        NAND_GPIO_CLEAR(CS_GPIO_BIT);
         NFC_CTRL |= NFC_CS0 | NFC_CS1;
     }
     else
@@ -197,13 +200,9 @@ static void nand_chip_select(int bank)
 
         /* Secondary chip select */
         if (bank & 2)
-        {
-            GPIOB_SET = (1<<21);
-        }
+            NAND_GPIO_SET(CS_GPIO_BIT);
         else
-        {
-            GPIOB_CLEAR = (1<<21);
-        }
+            NAND_GPIO_CLEAR(CS_GPIO_BIT);
     }
 }
 
@@ -224,7 +223,7 @@ static void nand_read_id(int bank, unsigned char* id_buf)
     nand_chip_select(bank);
 
     /* Set write protect */
-    GPIOB_CLEAR = (1<<19);
+    NAND_GPIO_CLEAR(WE_GPIO_BIT);
 
     /* Reset command */
     NFC_CMD = 0xFF;
@@ -262,7 +261,7 @@ static void nand_read_uid(int bank, unsigned int* uid_buf)
     nand_chip_select(bank);
 
     /* Set write protect */
-    GPIOB_CLEAR = 1<<19;
+    NAND_GPIO_CLEAR(WE_GPIO_BIT);
 
     /* Set 8-bit data width */
     NFC_CTRL &= ~NFC_16BIT;
@@ -314,7 +313,7 @@ static void nand_read_raw(int bank, int row, int column, int size, void* buf)
     nand_chip_select(bank);
 
     /* Set write protect */
-    GPIOB_CLEAR = (1<<19);
+    NAND_GPIO_CLEAR(WE_GPIO_BIT);
 
     /* Set 8-bit data width */
     NFC_CTRL &= ~NFC_16BIT;
@@ -777,6 +776,9 @@ int ata_init(void)
             write_caches[i].page_map[page] = -1;
         }
     }
+
+    /* Set GPIO direction for chip select & write protect */
+    NAND_GPIO_OUT_EN(CS_GPIO_BIT | WE_GPIO_BIT);
 
     /* Scan banks to build up block translation table */
     for (bank = 0; bank < total_banks; bank++)
