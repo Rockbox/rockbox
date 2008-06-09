@@ -199,10 +199,9 @@ void singlepad(int x, int y, int set)
     }
 }
 
+static int xpos[2]={0, LCD_WIDTH-PAD_WIDTH};
 void pad(struct pong *p, int pad)
 {
-    static int xpos[2]={0, LCD_WIDTH-PAD_WIDTH};
-
     /* clear existing pad */
     singlepad(xpos[pad], p->e_pad[pad], 0);
 
@@ -396,12 +395,31 @@ int keys(struct pong *p)
     static bool pause = false;
 #endif
 
-    int time = 4; /* number of ticks this function will loop reading keys */
+    /* number of ticks this function will loop reading keys */
+#ifndef HAVE_TOUCHPAD
+    int time = 4;
+#else
+    int time = 1;
+#endif
     int start = *rb->current_tick;
     int end = start + time;
 
     while(end > *rb->current_tick) {
         key = rb->button_get_w_tmo(end - *rb->current_tick);
+        
+#ifdef HAVE_TOUCHPAD
+    short touch_x, touch_y;
+    if(key & BUTTON_TOUCHPAD)
+    {
+        touch_x = rb->button_get_data() >> 16;
+        touch_y = rb->button_get_data() & 0xFFFF;
+        if(touch_x >= xpos[0] && touch_x <= xpos[0]+(PAD_WIDTH*4))
+            padmove(&p->w_pad[0], touch_y-(p->e_pad[0]*2+PAD_HEIGHT)/2);
+        
+        if(touch_x >= xpos[1]-(PAD_WIDTH*4) && touch_x <= xpos[1])
+            padmove(&p->w_pad[1], touch_y-(p->e_pad[1]*2+PAD_HEIGHT)/2);
+    }
+#endif
 
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold())

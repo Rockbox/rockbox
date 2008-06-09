@@ -446,6 +446,20 @@ enum menu_items {
 #endif
 
 
+#ifdef HAVE_TOUCHPAD
+#include "lib/touchscreen.h"
+
+static struct ts_mapping main_menu_items[4] =
+{
+    {MENU_ITEMXOFS, BMPYOFS_start,  MENU_ITEMWIDTH, MENU_ITEMHEIGHT},
+    {MENU_ITEMXOFS, BMPYOFS_resume, MENU_ITEMWIDTH, MENU_ITEMHEIGHT},
+    {MENU_ITEMXOFS, BMPYOFS_help,   MENU_ITEMWIDTH, MENU_ITEMHEIGHT},
+    {MENU_ITEMXOFS, BMPYOFS_quit,   MENU_ITEMWIDTH, MENU_ITEMHEIGHT}
+};
+static struct ts_mappings main_menu = {main_menu_items, 4};
+#endif
+
+
 int levels_num = 29;
 
 static unsigned char levels[29][8][10] = {
@@ -1008,6 +1022,18 @@ int game_menu(int when)
         rb->lcd_update();
 
         button = rb->button_get(true);
+#ifdef HAVE_TOUCHPAD
+        if(button & BUTTON_TOUCHPAD)
+        {
+            unsigned int result = touchscreen_map(&main_menu, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff);
+            if(result != (unsigned)-1 && button & BUTTON_REL)
+            {
+                if(cur == (signed)result)
+                    button = SELECT;
+                cur = result;
+            }
+        }
+#endif
         switch(button) {
             case UP:
             case UP | BUTTON_REPEAT:
@@ -1147,6 +1173,9 @@ int help(int when)
         switch (button) {
 #ifdef RC_QUIT
             case RC_QUIT:
+#endif
+#ifdef HAVE_TOUCHPAD
+            case BUTTON_TOUCHPAD:
 #endif
             case QUIT:
                 switch (game_menu(when)) {
@@ -1840,46 +1869,74 @@ int game_loop(void)
             button = QUIT;
 #endif
 
-            move_button=rb->button_status();
-#ifdef ALTRIGHT
-            button_right=((move_button & RIGHT) || (move_button & ALTRIGHT));
-            button_left=((move_button & LEFT) || (move_button & ALTLEFT));
-#else
-            button_right=((move_button & RIGHT) || (SCROLL_FWD(button)));
-            button_left=((move_button & LEFT) || (SCROLL_BACK(button)));
-#endif
-            if ((con_game== 1 && start_game!=1) && (button_right || button_left))
-                continue;
-            if ((button_right && flip_sides==false) ||
-                (button_left && flip_sides==true)) {
-                if (pad_pos_x+8+PAD_WIDTH > LCD_WIDTH) {
-                    for(k=0;k<used_balls;k++)
-                        if (start_game==1 || ball[k].glue)
-                            ball[k].pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
-                    pad_pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
-                }
-                else {
+#ifdef HAVE_TOUCHPAD
+            if(button & BUTTON_TOUCHPAD)
+            {
+                short touch_x, touch_y;
+                touch_x = rb->button_get_data() >> 16;
+                touch_y = rb->button_get_data() & 0xffff;
+                if(touch_y >= PAD_POS_Y && touch_y <= PAD_POS_Y+PAD_HEIGHT)
+                {
+                    pad_pos_x += (flip_sides ? -1 : 1) * ( (touch_x-pad_pos_x-PAD_WIDTH/2) / 4 );
+                    
+                    if(pad_pos_x < 0)
+                        pad_pos_x = 0;
+                    else if(pad_pos_x+PAD_WIDTH > LCD_WIDTH)
+                        pad_pos_x = LCD_WIDTH-PAD_WIDTH;
                     for(k=0;k<used_balls;k++)
                         if ((start_game==1 || ball[k].glue))
-                            ball[k].pos_x+=8;
-                    pad_pos_x+=8;
+                            ball[k].pos_x = pad_pos_x+PAD_WIDTH/2;
                 }
+                
+                if(button & BUTTON_REL)
+                    button = SELECT;
             }
-            else if ((button_left && flip_sides==false) ||
-                     (button_right && flip_sides==true)) {
-                if (pad_pos_x-8 < 0) {
-                    for(k=0;k<used_balls;k++)
-                        if (start_game==1 || ball[k].glue)
-                            ball[k].pos_x-=pad_pos_x;
-                    pad_pos_x-=pad_pos_x;
+            else
+            {
+#endif
+                move_button=rb->button_status();
+                #ifdef ALTRIGHT
+                button_right=((move_button & RIGHT) || (move_button & ALTRIGHT));
+                button_left=((move_button & LEFT) || (move_button & ALTLEFT));
+                #else
+                button_right=((move_button & RIGHT) || (SCROLL_FWD(button)));
+                button_left=((move_button & LEFT) || (SCROLL_BACK(button)));
+                #endif
+                if ((con_game== 1 && start_game!=1) && (button_right || button_left))
+                    continue;
+                if ((button_right && flip_sides==false) ||
+                    (button_left && flip_sides==true)) {
+                    if (pad_pos_x+8+PAD_WIDTH > LCD_WIDTH) {
+                        for(k=0;k<used_balls;k++)
+                            if (start_game==1 || ball[k].glue)
+                                ball[k].pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
+                        pad_pos_x+=LCD_WIDTH-pad_pos_x-PAD_WIDTH;
+                    }
+                    else {
+                        for(k=0;k<used_balls;k++)
+                            if ((start_game==1 || ball[k].glue))
+                                ball[k].pos_x+=8;
+                        pad_pos_x+=8;
+                    }
                 }
-                else {
-                    for(k=0;k<used_balls;k++)
-                        if (start_game==1 || ball[k].glue)
-                            ball[k].pos_x-=8;
-                    pad_pos_x-=8;
+                else if ((button_left && flip_sides==false) ||
+                         (button_right && flip_sides==true)) {
+                    if (pad_pos_x-8 < 0) {
+                        for(k=0;k<used_balls;k++)
+                            if (start_game==1 || ball[k].glue)
+                                ball[k].pos_x-=pad_pos_x;
+                        pad_pos_x-=pad_pos_x;
+                    }
+                    else {
+                        for(k=0;k<used_balls;k++)
+                            if (start_game==1 || ball[k].glue)
+                                ball[k].pos_x-=8;
+                        pad_pos_x-=8;
+                    }
                 }
+#ifdef HAVE_TOUCHPAD
             }
+#endif
 
 
             switch(button) {
