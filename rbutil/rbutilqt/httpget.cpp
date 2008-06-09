@@ -34,6 +34,7 @@ HttpGet::HttpGet(QObject *parent)
     m_cached = false;
     m_dumbCache = m_globalDumbCache;
     getRequest = -1;
+    headRequest = -1;
     // if a request is cancelled before a reponse is available return some
     // hint about this in the http response instead of nonsense.
     m_response = -1;
@@ -49,7 +50,7 @@ HttpGet::HttpGet(QObject *parent)
     m_serverTimestamp = QDateTime();
 
     connect(&http, SIGNAL(done(bool)), this, SLOT(httpDone(bool)));
-    connect(&http, SIGNAL(dataReadProgress(int, int)), this, SLOT(httpProgress(int, int)));
+    connect(&http, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(dataReadProgress(int, int)));
     connect(&http, SIGNAL(requestFinished(int, bool)), this, SLOT(httpFinished(int, bool)));
     connect(&http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader&)), this, SLOT(httpResponseHeader(const QHttpResponseHeader&)));
     connect(&http, SIGNAL(stateChanged(int)), this, SLOT(httpState(int)));
@@ -119,12 +120,6 @@ QByteArray HttpGet::readAll()
 QHttp::Error HttpGet::error()
 {
     return http.error();
-}
-
-
-void HttpGet::httpProgress(int read, int total)
-{
-    emit dataReadProgress(read, total);
 }
 
 

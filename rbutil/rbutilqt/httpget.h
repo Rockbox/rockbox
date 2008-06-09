@@ -67,7 +67,6 @@ class HttpGet : public QObject
 
     private slots:
         void httpDone(bool error);
-        void httpProgress(int, int);
         void httpFinished(int, bool);
         void httpResponseHeader(const QHttpResponseHeader&);
         void httpState(int);
