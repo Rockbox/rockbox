@@ -26,13 +26,15 @@ static const struct plugin_api *rb;
 
 MEM_FUNCTION_WRAPPERS(rb);
 
-int hash( char *string, const char *path )
+static int count = 0;
+static int done = 0;
+
+static int hash( char *string, const char *path )
 {
     char *buffer[512];
     ssize_t len;
     struct md5_s md5;
     int in = rb->open( path, O_RDONLY );
-    rb->splash( 0, path );
     if( in < 0 ) return -1;
 
     InitMD5( &md5 );
@@ -46,20 +48,27 @@ int hash( char *string, const char *path )
     return 0;
 }
 
-void hash_file( int out, const char *path )
+static void hash_file( int out, const char *path )
 {
-    char string[MD5_STRING_LENGTH+1];
-    if( hash( string, path ) )
-        rb->write( out, "error", 5 );
+    if( out < 0 )
+        count++;
     else
-        rb->write( out, string, MD5_STRING_LENGTH );
-    rb->write( out, "  ", 2 );
-    rb->write( out, path, rb->strlen( path ) );
-    rb->write( out, "\n", 1 );
+    {
+        char string[MD5_STRING_LENGTH+1];
+        done++;
+        rb->splash( 0, "%d / %d : %s", done, count, path );
+        if( hash( string, path ) )
+            rb->write( out, "error", 5 );
+        else
+            rb->write( out, string, MD5_STRING_LENGTH );
+        rb->write( out, "  ", 2 );
+        rb->write( out, path, rb->strlen( path ) );
+        rb->write( out, "\n", 1 );
+    }
 }
 
-void hash_dir( int out, const char *path );
-void hash_dir( int out, const char *path )
+static void hash_dir( int out, const char *path );
+static void hash_dir( int out, const char *path )
 {
     DIR *dir;
     struct dirent *entry;
@@ -91,7 +100,7 @@ void hash_dir( int out, const char *path )
     }
 }
 
-void hash_list( int out, const char *path )
+static void hash_list( int out, const char *path )
 {
     int list = rb->open( path, O_RDONLY );
     char newpath[MAX_PATH];
@@ -114,7 +123,7 @@ void hash_list( int out, const char *path )
     rb->close( list );
 }
 
-void hash_check( int out, const char *path )
+static void hash_check( int out, const char *path )
 {
     int list = rb->open( path, O_RDONLY );
     char line[MD5_STRING_LENGTH+1+MAX_PATH+1];
@@ -123,28 +132,37 @@ void hash_check( int out, const char *path )
 
     while( ( len = rb->read_line( list, line, MD5_STRING_LENGTH+1+MAX_PATH+1 ) ) > 0 )
     {
-        const char *filename = rb->strchr( line, ' ' );
-        if( !filename || len < MD5_STRING_LENGTH + 2 )
-        {
-            const char error[] = "Malformed input line ... skipping";
-            rb->write( out, error, rb->strlen( error ) );
-        }
+        if( out < 0 )
+            count++;
         else
         {
-            char string[MD5_STRING_LENGTH+1];
-            while( *filename == ' ' )
-                filename++;
-            rb->write( out, filename, rb->strlen( filename ) );
-            rb->write( out, ": ", 2 );
-            if( hash( string, filename ) )
-                rb->write( out, "FAILED open or read", 19 );
-            else if( rb->strncasecmp( line, string, MD5_STRING_LENGTH ) )
-                rb->write( out, "FAILED", 6 );
+            const char *filename = rb->strchr( line, ' ' );
+            done++;
+            rb->splash( 0, "%d / %d : %s", done, count, filename );
+            if( !filename || len < MD5_STRING_LENGTH + 2 )
+            {
+                const char error[] = "Malformed input line ... skipping";
+                rb->write( out, error, rb->strlen( error ) );
+            }
             else
-                rb->write( out, "OK", 2 );
+            {
+                char string[MD5_STRING_LENGTH+1];
+                while( *filename == ' ' )
+                    filename++;
+                rb->write( out, filename, rb->strlen( filename ) );
+                rb->write( out, ": ", 2 );
+                if( hash( string, filename ) )
+                    rb->write( out, "FAILED open or read", 19 );
+                else if( rb->strncasecmp( line, string, MD5_STRING_LENGTH ) )
+                    rb->write( out, "FAILED", 6 );
+                else
+                    rb->write( out, "OK", 2 );
+            }
+            rb->write( out, "\n", 1 );
         }
-        rb->write( out, "\n", 1 );
     }
+
+    rb->close( list );
 }
 
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
@@ -152,6 +170,8 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     const char *arg = (const char *)parameter; /* input file name, if any */
     int out = -1; /* output file descriptor */
     char filename[MAX_PATH]; /* output file name */
+
+    void (*action)( int, const char * ) = NULL;
 
     md5_init( api );
     rb = api;
@@ -164,59 +184,62 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         const char *ext = rb->strrchr( arg, '.' );
         DIR *dir;
         rb->snprintf( filename, MAX_PATH, "%s.md5sum", arg );
-        out = rb->open( filename, O_WRONLY|O_CREAT );
-        if( out < 0 )
-        {
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost( false );
-#endif
-            return PLUGIN_ERROR;
-        }
 
         if( ext )
         {
             if( !rb->strcmp( ext, ".md5" ) || !rb->strcmp( ext, ".md5sum" ) )
             {
+                rb->snprintf( filename + ( ext - arg ),
+                              MAX_PATH + rb->strlen( ext ) - rb->strlen( arg ),
+                              ".md5check" );
                 /* Lets check the sums */
-                hash_check( out, arg );
-                goto exit;
+                action = hash_check;
             }
             else if( !rb->strcmp( ext, ".md5list" ) ) /* ugly */
             {
                 /* Hash listed files */
-                hash_list( out, arg );
-                goto exit;
+                action = hash_list;
             }
         }
 
-        dir = rb->opendir( arg );
-        if( dir )
+        if( !action )
         {
-            api->closedir( dir );
+            dir = rb->opendir( arg );
+            if( dir )
+            {
+                api->closedir( dir );
 
-            /* Hash the directory's content recursively */
-            hash_dir( out, arg );
-        }
-        else
-        {
-            /* Hash the file */
-            hash_file( out, arg );
+                /* Hash the directory's content recursively */
+                action = hash_dir;
+            }
+            else
+            {
+                /* Hash the file */
+                action = hash_file;
+            }
         }
     }
     else
     {
         rb->snprintf( filename, MAX_PATH, "/everything.md5sum" );
-        out = rb->open( filename, O_WRONLY|O_CREAT );
-        if( out < 0 ) return PLUGIN_ERROR;
-
         /* Hash the whole filesystem */
-        hash_dir( out, "/" );
+        action = hash_dir;
+        arg = "/";
     }
 
-    exit:
-        rb->close( out );
+    rb->lcd_puts( 0, 1, "Output file:" );
+    rb->lcd_puts( 0, 2, filename );
+
+    count = 0;
+    done = 0;
+    action( out, arg );
+
+    out = rb->open( filename, O_WRONLY|O_CREAT );
+    if( out < 0 ) return PLUGIN_ERROR;
+    action( out, arg );
+    rb->close( out );
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        rb->cpu_boost( false );
+    rb->cpu_boost( false );
 #endif
-        return PLUGIN_OK;
+    return PLUGIN_OK;
 }
