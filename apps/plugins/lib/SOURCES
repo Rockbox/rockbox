@@ -42,3 +42,4 @@ helper.c
 #ifdef HAVE_TOUCHPAD
 touchscreen.c
 #endif
+md5.c
