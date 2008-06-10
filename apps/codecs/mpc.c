@@ -76,7 +76,9 @@ enum codec_status codec_main(void)
     mpc_streaminfo info;
     int retval = CODEC_OK;
     
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+    /* musepack's sample representation is 18.14
+     * DSP_SET_SAMPLE_DEPTH = 14 (FRACT) + 16 (NATIVE) - 1 (SIGN) = 29 */
+    ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
     
     /* Create a decoder instance */
     reader.read = read_impl;

@@ -75,7 +75,8 @@ mpc_decoder_windowing_D:
     ldr r11, [r1, #896*4]   /* 14 */
     mla r12, r9, r11, r12     
     ldr r11, [r1, #992*4]   /* 15 */
-    mla r12, r10, r11, r12     
+    mla r12, r10, r11, r12
+    mov r12, r12, asr #1    /* post shift to compensate for pre-shifting */
     str r12, [r0], #4       /* store Data */
     add r1, r1, #4          /* V++ */
     
@@ -142,7 +143,7 @@ mpc_decoder_windowing_D:
     smlal r11, r12, r9, r11  
     ldr r11, [r1, #992*4]   /* 15 */
     smlal r11, r12, r10, r11
-    mov r4, r12, lsl #1     /* get result from hi-part */
+    mov r4, r12, lsl #2     /* get result from hi-part, loose 2 bits */
     str r4, [r0], #4        /* store Data */
     add r1, r1, #4          /* V++ */
     

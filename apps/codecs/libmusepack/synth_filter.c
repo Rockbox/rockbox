@@ -44,11 +44,15 @@
 
 #if defined(MPC_FIXED_POINT)
    #if defined(OPTIMIZE_FOR_SPEED)
-      // round to +/- 2^14 as pre-shift before 32=32x32-multiply
+      // round at compile time to +/- 2^14 as a pre-shift before 32=32x32-multiply
       #define D(value)  (MPC_SHR_RND(value, 3))
       
-      // round to +/- 2^17 as pre-shift before 32=32x32-multiply
-      #define MPC_V_PRESHIFT(X) MPC_SHR_RND(X, 14)
+      // round at runtime to +/- 2^17 as a pre-shift before 32=32x32-multiply
+      // samples are 18.14 fixed point. 30.2 after this shift, whereas the
+      // 15.2 bits are significant (not including sign)
+      #define MPC_V_PRESHIFT(X) MPC_SHR_RND(X, 12)
+      
+      // in this configuration a post-shift by >>1 is needed after synthesis
    #else
       // saturate to +/- 2^31 (= value << (31-17)), D-values are +/- 2^17
       #define D(value)  (value << (14))
@@ -65,7 +69,7 @@
    #define MPC_V_PRESHIFT(X) (X)
 #endif
     
-// Di_opt coefficients are +/- 2^17
+// Di_opt coefficients are +/- 2^17 (pre-shifted by <<16)
 static const MPC_SAMPLE_FORMAT  Di_opt [512] ICONST_ATTR = {
 /*           0        1        2         3         4         5          6          7         8         9       10        11       12       13      14     15  */
 /*  0 */  D( 0), -D( 29), D( 213), -D( 459),  D(2037), -D(5153),  D( 6574), -D(37489), D(75038),  D(37489), D(6574),  D(5153), D(2037),  D(459), D(213), D(29),
@@ -462,6 +466,7 @@ mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data,
                + V[256]*D[ 4] + V[352]*D[ 5] + V[384]*D[ 6] + V[480]*D[ 7]
                + V[512]*D[ 8] + V[608]*D[ 9] + V[640]*D[10] + V[736]*D[11]
                + V[768]*D[12] + V[864]*D[13] + V[896]*D[14] + V[992]*D[15];
+         *Data >>= 1; // post shift to compensate for pre-shifting
          Data += 1;
          // total: 32 * (16 muls, 15 adds)
       }
@@ -493,6 +498,7 @@ mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data,
                "mac.l %%d2, %%a5, (992*4, %[V]), %%a5, %%acc0\n\t"
                "mac.l %%d3, %%a5, %%acc0                     \n\t"
                "movclr.l %%acc0, %%d0                        \n\t"
+               "lsl.l #1, %%d0                               \n\t"
                "move.l %%d0, (%[Data])+                      \n"
                : [Data] "+a" (Data)
                : [V] "a" (V), [D] "a" (D)
@@ -500,16 +506,16 @@ mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data,
          }
       #else
          // 64=64x64-multiply (FIXED_POINT) or float=float*float (!FIXED_POINT) in C
-         for ( k = 0; k < 32; k++, D += 16, V++ ) 
+         for ( k = 0; k < 32; k++, D += 16, V++ )
          {
-            *Data = MPC_MULTIPLY_EX(V[  0],D[ 0],31) + MPC_MULTIPLY_EX(V[ 96],D[ 1],31)
-                  + MPC_MULTIPLY_EX(V[128],D[ 2],31) + MPC_MULTIPLY_EX(V[224],D[ 3],31)
-                  + MPC_MULTIPLY_EX(V[256],D[ 4],31) + MPC_MULTIPLY_EX(V[352],D[ 5],31)
-                  + MPC_MULTIPLY_EX(V[384],D[ 6],31) + MPC_MULTIPLY_EX(V[480],D[ 7],31)
-                  + MPC_MULTIPLY_EX(V[512],D[ 8],31) + MPC_MULTIPLY_EX(V[608],D[ 9],31)
-                  + MPC_MULTIPLY_EX(V[640],D[10],31) + MPC_MULTIPLY_EX(V[736],D[11],31)
-                  + MPC_MULTIPLY_EX(V[768],D[12],31) + MPC_MULTIPLY_EX(V[864],D[13],31)
-                  + MPC_MULTIPLY_EX(V[896],D[14],31) + MPC_MULTIPLY_EX(V[992],D[15],31);
+            *Data = MPC_MULTIPLY_EX(V[  0],D[ 0],30) + MPC_MULTIPLY_EX(V[ 96],D[ 1],30)
+                  + MPC_MULTIPLY_EX(V[128],D[ 2],30) + MPC_MULTIPLY_EX(V[224],D[ 3],30)
+                  + MPC_MULTIPLY_EX(V[256],D[ 4],30) + MPC_MULTIPLY_EX(V[352],D[ 5],30)
+                  + MPC_MULTIPLY_EX(V[384],D[ 6],30) + MPC_MULTIPLY_EX(V[480],D[ 7],30)
+                  + MPC_MULTIPLY_EX(V[512],D[ 8],30) + MPC_MULTIPLY_EX(V[608],D[ 9],30)
+                  + MPC_MULTIPLY_EX(V[640],D[10],30) + MPC_MULTIPLY_EX(V[736],D[11],30)
+                  + MPC_MULTIPLY_EX(V[768],D[12],30) + MPC_MULTIPLY_EX(V[864],D[13],30)
+                  + MPC_MULTIPLY_EX(V[896],D[14],30) + MPC_MULTIPLY_EX(V[992],D[15],30);
             Data += 1;
             // total: 16 muls, 15 adds, 16 shifts
          }
