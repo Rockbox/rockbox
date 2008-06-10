@@ -24,12 +24,15 @@ PLUGIN_HEADER
 
 static const struct plugin_api *rb;
 
+MEM_FUNCTION_WRAPPERS(rb);
+
 int hash( char *string, const char *path )
 {
     char *buffer[512];
     ssize_t len;
     struct md5_s md5;
     int in = rb->open( path, O_RDONLY );
+    rb->splash( 0, path );
     if( in < 0 ) return -1;
 
     InitMD5( &md5 );
@@ -50,7 +53,7 @@ void hash_file( int out, const char *path )
         rb->write( out, "error", 5 );
     else
         rb->write( out, string, MD5_STRING_LENGTH );
-    rb->write( out, " ", 1 );
+    rb->write( out, "  ", 2 );
     rb->write( out, path, rb->strlen( path ) );
     rb->write( out, "\n", 1 );
 }
@@ -129,7 +132,8 @@ void hash_check( int out, const char *path )
         else
         {
             char string[MD5_STRING_LENGTH+1];
-            filename++;
+            while( *filename == ' ' )
+                filename++;
             rb->write( out, filename, rb->strlen( filename ) );
             rb->write( out, ": ", 2 );
             if( hash( string, filename ) )
@@ -151,6 +155,9 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     md5_init( api );
     rb = api;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost( true );
+#endif
 
     if( arg && *arg )
     {
@@ -158,7 +165,13 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
         DIR *dir;
         rb->snprintf( filename, MAX_PATH, "%s.md5sum", arg );
         out = rb->open( filename, O_WRONLY|O_CREAT );
-        if( out < 0 ) return PLUGIN_ERROR;
+        if( out < 0 )
+        {
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost( false );
+#endif
+            return PLUGIN_ERROR;
+        }
 
         if( ext )
         {
@@ -202,5 +215,8 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 
     exit:
         rb->close( out );
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        rb->cpu_boost( false );
+#endif
         return PLUGIN_OK;
 }

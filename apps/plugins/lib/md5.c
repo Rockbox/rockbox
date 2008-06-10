@@ -34,7 +34,14 @@ void md5_init( const struct plugin_api *api )
     rb = api;
 }
 
-#ifdef WORDS_BIGENDIAN
+#ifdef ROCKBOX_BIG_ENDIAN
+static inline uint32_t GetDWLE( const void * _p )
+{
+    const uint8_t * p = (const uint8_t *)_p;
+    return ( ((uint32_t)p[3] << 24) | ((uint32_t)p[2] << 16)
+              | ((uint32_t)p[1] << 8) | p[0] );
+}
+
 /*****************************************************************************
  * Reverse: reverse byte order
  *****************************************************************************/
@@ -246,10 +253,10 @@ void psz_md5_hash( char *psz, struct md5_s *md5_s )
     for ( i = 0; i < 4; i++ )
     {
         rb->snprintf( &psz[8*i], 9, "%02x%02x%02x%02x",
-            md5_s->p_digest[i] & 0xff,
-            ( md5_s->p_digest[i] >> 8 ) & 0xff,
-            ( md5_s->p_digest[i] >> 16 ) & 0xff,
-            md5_s->p_digest[i] >> 24
+            (unsigned int)(md5_s->p_digest[i] & 0xff),
+            (unsigned int)(( md5_s->p_digest[i] >> 8 ) & 0xff),
+            (unsigned int)(( md5_s->p_digest[i] >> 16 ) & 0xff),
+            (unsigned int)(md5_s->p_digest[i] >> 24)
         );
     }
 }
