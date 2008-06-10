@@ -138,7 +138,7 @@ void hash_check( int out, const char *path )
             rb->write( out, ": ", 2 );
             if( hash( string, filename ) )
                 rb->write( out, "FAILED open or read", 19 );
-            else if( rb->memcmp( line, string, MD5_STRING_LENGTH ) )
+            else if( rb->strncasecmp( line, string, MD5_STRING_LENGTH ) )
                 rb->write( out, "FAILED", 6 );
             else
                 rb->write( out, "OK", 2 );
