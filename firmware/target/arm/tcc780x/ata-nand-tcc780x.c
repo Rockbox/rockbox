@@ -752,6 +752,9 @@ int ata_init(void)
 
     if (initialized) return 0;
 
+    /* Set GPIO direction for chip select & write protect */
+    NAND_GPIO_OUT_EN(CS_GPIO_BIT | WE_GPIO_BIT);
+
     /* Get chip characteristics and number of banks */
     nand_get_chip_info();
     
@@ -776,9 +779,6 @@ int ata_init(void)
             write_caches[i].page_map[page] = -1;
         }
     }
-
-    /* Set GPIO direction for chip select & write protect */
-    NAND_GPIO_OUT_EN(CS_GPIO_BIT | WE_GPIO_BIT);
 
     /* Scan banks to build up block translation table */
     for (bank = 0; bank < total_banks; bank++)
