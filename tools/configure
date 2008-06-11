@@ -42,9 +42,9 @@ crosswincc () {
 
  prefixtools i586-mingw32msvc-
 
- LDOPTS="-lgdi32 -luser32 -mwindows"
  # add cross-compiler option(s)
- GCCOPTS="$GCCOPTS -mno-cygwin"
+ GCCOPTS="$GCCOPTS `sdl-config --cflags`"
+ LDOPTS="`sdl-config --libs` -mconsole"
 
  output="rockboxui.exe" # use this as output binary name
  crosscompile="yes"
@@ -129,13 +129,13 @@ simcc () {
 
    Linux)
    echo "Linux host detected"
-   GCCOPTS="$GCCOPTS"
    if [ "0" != `sdl-config --libs |grep -c mwindows` ]; then
        # Enable crosscompiling if sdl-config is from Windows SDL
        crosswincc
+   else
+       GCCOPTS="$GCCOPTS `sdl-config --cflags`"
+       LDOPTS="`sdl-config --libs`"
    fi
-   GCCOPTS="$GCCOPTS `sdl-config --cflags`"
-   LDOPTS="`sdl-config --libs`"
    ;;
 
    FreeBSD)
@@ -159,16 +159,16 @@ simcc () {
    ;;
  esac
 
- if [ "`uname -m`" = "x86_64" ] || [ "`uname -m`" = "amd64" ]; then
-   # fPIC is needed to make shared objects link
-   # setting visibility to hidden is necessary to avoid strange crashes
-   # due to symbol clashing
-   GCCOPTS="$GCCOPTS -fPIC -fvisibility=hidden"
- fi
-
  GCCOPTS="$GCCOPTS -I\$(SIMDIR)"
 
  if test "X$crosscompile" != "Xyes"; then
+   if [ "`uname -m`" = "x86_64" ] || [ "`uname -m`" = "amd64" ]; then
+     # fPIC is needed to make shared objects link
+     # setting visibility to hidden is necessary to avoid strange crashes
+     # due to symbol clashing
+     GCCOPTS="$GCCOPTS -fPIC -fvisibility=hidden"
+   fi
+
    id=$$
    cat >/tmp/conftest-$id.c <<EOF
 #include <stdio.h>
