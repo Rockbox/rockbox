@@ -102,6 +102,17 @@ void lcd_init_device(void)
             lcd_type = 1;
         }
     }
+	if (lcd_type == 0) {
+		lcd_cmd_data(0xef, 0x0);
+		lcd_cmd_data(0x1, 0x0);
+		lcd_cmd_data(0x80, 0x1);
+		lcd_cmd_data(0x10, 0x8);
+		lcd_cmd_data(0x18, 0x6);
+		lcd_cmd_data(0x7e, 0x4);
+		lcd_cmd_data(0x7e, 0x5);
+		lcd_cmd_data(0x7f, 0x1);
+	}
+
 #elif CONFIG_LCD == LCD_IPODNANO
     /* iPodLinux doesn't appear have any LCD init code for the Nano */
 #endif
