@@ -1,0 +1,42 @@
+\subsection{Midiplay}
+
+To get MIDI file playback a patchset is required. This file contains the
+instruments required to synthesize the music. A sample patchset is available
+through the wiki (\wikilink{PluginMidiPlay}), and needs to be extracted
+to the \fname{.rockbox} directory in the root of your player. There should
+now be a \fname{/.rockbox/patchset/} directory, with the patchset directory
+containing several \fname{.pat} files and two \fname {.cfg} files. Just
+select a MIDI file saved as \fname{.mid} or \fname{.midi} in the file
+browser to start playback.
+% portalplayer targets
+\opt{ipod,sansa,h10,h10_5gb,mrobe100}{
+\note{Currently playing MIDI files is still in its early stages and you
+might experience ``Buffer miss'' with many files, exept simple ones.}
+}
+
+\begin{table}
+    \begin{btnmap}{}{}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
+        ,IAUDIO_X5_PAD,MROBE100_PAD}{\ButtonUp/ \ButtonDown}
+    \opt{IPOD_3G_PAD,IPOD_4G_PAD,SANSA_E200_PAD}{\ButtonScrollFwd/ \ButtonScrollBack}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp/ \ButtonScrollDown}
+    \opt{SANSA_C200_PAD}{\ButtonVolUp/ \ButtonVolDown}
+    & Volume up/ Volume down\\
+    %
+    \ButtonRight/ \ButtonLeft
+    & Skip 3 seconds forward/ backward\\
+    %
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{IPOD_3G_PAD,IPOD_4G_PAD,GIGABEAT_S_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+    \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonUp}
+    \opt{GIGABEAT_PAD}{\ButtonA}
+    \opt{MROBE100_PAD}{\ButtonDisplay}
+    & Pause/Resume playback\\
+    %
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}
+    \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD,IAUDIO_X5_PAD%
+        ,IRIVER_H10_PAD,MROBE100_PAD}{\ButtonPower}
+    & Stop playback and quit\\
+    \end{btnmap}
+\end{table}
