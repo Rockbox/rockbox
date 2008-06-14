@@ -54,9 +54,16 @@
       
       // in this configuration a post-shift by >>1 is needed after synthesis
    #else
-      // saturate to +/- 2^31 (= value << (31-17)), D-values are +/- 2^17
-      #define D(value)  (value << (14))
-      
+      #if defined(CPU_ARM)
+          // do not up-scale D-values to achieve higher speed in smull/mlal
+          // operations. saves ~14/8 = 1.75 cycles per multiplication
+          #define D(value)  (value)
+          
+          // in this configuration a post-shift by >>16 is needed after synthesis
+      #else
+          // saturate to +/- 2^31 (= value << (31-17)), D-values are +/- 2^17
+          #define D(value)  (value << (14))
+      #endif
       // do not perform pre-shift
       #define MPC_V_PRESHIFT(X) (X)
    #endif
