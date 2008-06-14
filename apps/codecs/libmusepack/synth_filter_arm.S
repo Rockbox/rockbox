@@ -21,6 +21,7 @@
 
     .section .text, "ax", %progbits
     
+#if defined(OPTIMIZE_FOR_SPEED)
 /****************************************************************************
  * void mpc_decoder_windowing_D(...)
  * 
@@ -29,7 +30,6 @@
  * Uses pre-shifted V[] and D[] values. D[] will always be the second operand
  * of mul/mla to achieve higher speed as D[] has lower amplitude than V[].
  ****************************************************************************/
-#if defined(OPTIMIZE_FOR_SPEED)
     .align  2
     .global mpc_decoder_windowing_D
     .type   mpc_decoder_windowing_D, %function
