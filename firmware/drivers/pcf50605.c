@@ -76,25 +76,40 @@ void pcf50605_standby_mode(void)
 
 void pcf50605_init(void)
 {
-#if defined (IPOD_VIDEO)    
-    /* I/O and GPO voltage supply (default: 0xf8 = 3.3V ON) */
-    /* ECO not allowed regarding data sheet */
-    pcf50605_write(PCF5060X_IOREGC,  0xf8); /* 3.3V ON */
+#if (defined (IPOD_VIDEO) || defined (IPOD_NANO))
+    /* I/O and GPO voltage supply. ECO not allowed regarding data sheet. Defaults:
+     * iPod Video = 0xf8 = 3.3V ON
+     * iPod nano  = 0xf5 = 3.0V ON */
+    pcf50605_write(PCF5060X_IOREGC,  0xf5); /* 3.0V ON */
     
-    /* core voltage supply (default DCDC1/DCDC2: 0xec = 1.2V ON) */
-    /* ECO not stable, assumed due to less precision of voltage in ECO mode */
+    /* Core voltage supply. ECO not stable, assumed due to less precision of 
+     * voltage in ECO mode. DCDC2 is not relevant as this may be used for 
+     * voltage scaling. Default is 1.2V ON for PP5022/PP5024 */
     pcf50605_write(PCF5060X_DCDC1,   0xec); /* 1.2V ON */
     pcf50605_write(PCF5060X_DCDC2,   0x0c); /* OFF */
     
-    /* unknown (default: 0xe3 = 1.8V ON) */
+    /* Unknown. Defaults:
+     * iPod Video = 0xe3 = 1.8V ON
+     * iPod nano  = 0xe3 = 1.8V ON */
     pcf50605_write(PCF5060X_DCUDC1,  0xe3); /* 1.8V ON */
     
-    /* WM8758 voltage supply (default: 0xf5 = 3.0V ON) */
-    /* ECO not allowed as max. current of 5mA is not sufficient */
+    /* Codec voltage supply. ECO not allowed as max. current of 5mA is not
+     * sufficient. Defaults:
+     * iPod Video = 0xf5 = 3.0V ON
+     * iPod nano  = 0xef = 2.4V ON */
     pcf50605_write(PCF5060X_D1REGC1, 0xf0); /* 2.5V ON */
     
-    /* LCD voltage supply (default: 0xf5 = 3.0V ON) */
+    /* PCF5060X_D2REGC1 is set in accordance to the accessory power setting */
+    
+    /* LCD voltage supply. Defaults:
+     * iPod Video = 0xf5 = 3.0V ON
+     * iPod nano  = 0xf5 = 3.0V ON */
     pcf50605_write(PCF5060X_D3REGC1, 0xf1); /* 2.6V ON */
+    
+    /* PCF5060X_LPREGC1 is leaved untouched as the setting varies over the 
+     * different iPod platforms. Defaults:
+     * iPod Video = 0x1f = 0ff
+     * iPod nano  = 0xf6 = 3.1V ON */
 #else
     /* keep initialization from svn for other iPods */
     pcf50605_write(PCF5060X_D1REGC1, 0xf5); /* 3.0V ON */
