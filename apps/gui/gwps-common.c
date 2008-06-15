@@ -82,12 +82,14 @@ static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 #include "pcmbuf.h"
 
 /* fades the volume */
+bool wps_fading_out = false;
 void fade(bool fade_in)
 {
     int fp_global_vol = global_settings.volume << 8;
     int fp_min_vol = sound_min(SOUND_VOLUME) << 8;
     int fp_step = (fp_global_vol - fp_min_vol) / 30;
-
+    int i;
+    wps_fading_out = !fade_in;
     if (fade_in) {
         /* fade in */
         int fp_volume = fp_min_vol;
@@ -101,6 +103,8 @@ void fade(bool fade_in)
         while (fp_volume < fp_global_vol - fp_step) {
             fp_volume += fp_step;
             sound_set_volume(fp_volume >> 8);
+            FOR_NB_SCREENS(i)
+                gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
             sleep(1);
         }
         sound_set_volume(global_settings.volume);
@@ -112,10 +116,12 @@ void fade(bool fade_in)
         while (fp_volume > fp_min_vol + fp_step) {
             fp_volume -= fp_step;
             sound_set_volume(fp_volume >> 8);
+            FOR_NB_SCREENS(i)
+                gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
             sleep(1);
         }
         audio_pause();
-
+        wps_fading_out = false;
 #if CONFIG_CODEC != SWCODEC
 #ifndef SIMULATOR
         /* let audio thread run and wait for the mas to run out of data */
@@ -1139,7 +1145,8 @@ static char *get_token_value(struct gui_wps *gwps,
             int mode = 1;
             if (status == AUDIO_STATUS_PLAY)
                 mode = 2;
-            if (status & AUDIO_STATUS_PAUSE && !status_get_ffmode())
+            if (wps_fading_out || 
+               (status & AUDIO_STATUS_PAUSE && !status_get_ffmode()))
                 mode = 3;
             if (status_get_ffmode() == STATUS_FASTFORWARD)
                 mode = 4;
