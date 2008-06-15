@@ -212,13 +212,13 @@ void list_draw(struct screen *display, struct viewport *parent,
             )
             {
                 /* Display inverted-line-style */
-                list_text[display->screen_type].drawmode |= STYLE_INVERT;
+                list_text[display->screen_type].drawmode = STYLE_INVERT;
             }
 #ifdef HAVE_LCD_COLOR
             else if (global_settings.cursor_style == 2)
             {
                 /* Display colour line selector */
-                list_text[display->screen_type].drawmode |= STYLE_COLORBAR;
+                list_text[display->screen_type].drawmode = STYLE_COLORBAR;
             }
             else if (global_settings.cursor_style == 3)
             {
