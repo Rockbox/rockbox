@@ -17,6 +17,11 @@ rbspeex.commands = @$(MAKE) -C ../../tools/rbspeex librbspeex.a
 QMAKE_EXTRA_TARGETS += rbspeex
 PRE_TARGETDEPS += rbspeex
 
+# rule for creating ctags file
+tags.commands = ctags -R --c++-kinds=+p --fields=+iaS --extra=+q $(SOURCES) 
+tags.depends = $(SOURCES)
+QMAKE_EXTRA_TARGETS += tags
+
 # add a custom rule for making the translations
 lrelease.commands = $$[QT_INSTALL_BINS]/lrelease -silent rbutilqt.pro
 QMAKE_EXTRA_TARGETS += lrelease
