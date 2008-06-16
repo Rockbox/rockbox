@@ -2601,7 +2601,14 @@ int show_menu(void) /* return 1 to quit */
 
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
         case MIID_SHOW_PLAYBACK_MENU:
-            playback_control(rb, NULL);
+            if (plug_buf)
+            {
+                playback_control(rb, NULL);
+            }
+            else
+            {
+                rb->splash(HZ, "Cannot restart playback");
+            }
             break;
 #endif
 #ifdef HAVE_LCD_COLOR
