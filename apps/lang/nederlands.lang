@@ -11670,3 +11670,37 @@
     recording: "Stop opname en zet uit"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Touchpad gevoeligheid"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Touchpad gevoeligheid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Hoog"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Hoog"
+  </voice>
+</phrase>
