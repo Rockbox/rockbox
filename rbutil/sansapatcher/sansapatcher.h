@@ -26,10 +26,11 @@ extern "C" {
 
 #include "sansaio.h"
 
+extern int sansa_verbose;
 /* Size of buffer for disk I/O - 8MB is large enough for any version
    of the Apple firmware, but not the Nano's RSRC image. */
 #define BUFFER_SIZE 8*1024*1024
-extern unsigned char* sectorbuf;
+extern unsigned char* sansa_sectorbuf;
 
 #define FILETYPE_MI4 0
 #define FILETYPE_INTERNAL 1

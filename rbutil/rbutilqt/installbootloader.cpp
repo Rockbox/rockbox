@@ -807,7 +807,7 @@ int verbose =0;
 // reserves memory for ipodpatcher
 bool initIpodpatcher()
 {
-    if (ipod_alloc_buffer(&sectorbuf,BUFFER_SIZE) < 0) return true;
+    if (ipod_alloc_buffer(&ipod_sectorbuf,BUFFER_SIZE) < 0) return true;
       else return false;
 }
 
@@ -1050,7 +1050,7 @@ void BootloaderInstaller::ipodFinish()
 // reserves memory for sansapatcher
 bool initSansapatcher()
 {
-      if (sansa_alloc_buffer(&sectorbuf,BUFFER_SIZE) < 0) return true;
+      if (sansa_alloc_buffer(&sansa_sectorbuf,BUFFER_SIZE) < 0) return true;
       else return false;
 }
 

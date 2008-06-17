@@ -29,7 +29,8 @@ extern "C" {
 /* Size of buffer for disk I/O - 8MB is large enough for any version
    of the Apple firmware, but not the Nano's RSRC image. */
 #define BUFFER_SIZE 8*1024*1024
-extern unsigned char* sectorbuf;
+extern unsigned char* ipod_sectorbuf;
+extern int ipod_verbose;
 
 #define FILETYPE_DOT_IPOD 0
 #define FILETYPE_DOT_BIN  1

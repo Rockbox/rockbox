@@ -31,8 +31,6 @@
 
 #define VERSION "2.0 with v2.0 bootloaders"
 
-int verbose = 0;
-
 enum {
    NONE,
 #ifdef WITH_BOOTOBJS
@@ -155,7 +153,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if (ipod_alloc_buffer(&sectorbuf,BUFFER_SIZE) < 0) {
+    if (ipod_alloc_buffer(&ipod_sectorbuf,BUFFER_SIZE) < 0) {
         fprintf(stderr,"Failed to allocate memory buffer\n");
     }
 
@@ -297,7 +295,7 @@ int main(int argc, char* argv[])
             i++;
         } else if ((strcmp(argv[i],"-v")==0) || 
                    (strcmp(argv[i],"--verbose")==0)) {
-            verbose++;
+            ipod_verbose++;
             i++;
         } else if ((strcmp(argv[i],"-f")==0) || 
                    (strcmp(argv[i],"--format")==0)) {

@@ -32,10 +32,6 @@
 
 #define VERSION "0.6 with v4.0 bootloaders"
 
-unsigned char* sectorbuf;
-
-int verbose = 0;
-
 enum {
    NONE,
    INSTALL,
@@ -150,7 +146,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if (sansa_alloc_buffer(&sectorbuf,BUFFER_SIZE) < 0) {
+    if (sansa_alloc_buffer(&sansa_sectorbuf,BUFFER_SIZE) < 0) {
         fprintf(stderr,"Failed to allocate memory buffer\n");
     }
 

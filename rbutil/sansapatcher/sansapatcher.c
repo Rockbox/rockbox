@@ -38,14 +38,14 @@
 #define NVPARAMS_OFFSET 0x780000
 #define NVPARAMS_SIZE   (0x80000-0x200)
 
-extern int verbose;
+int sansa_verbose = 0;
 
 /* Windows requires the buffer for disk I/O to be aligned in memory on a
    multiple of the disk volume size - so we use a single global variable
    and initialise it with sansa_alloc_buf() in main().
 */
 
-extern unsigned char* sectorbuf;
+unsigned char* sansa_sectorbuf;
 
 static off_t filesize(int fd) {
     struct stat buf;
@@ -94,17 +94,17 @@ int sansa_read_partinfo(struct sansa_t* sansa, int silent)
     int i;
     unsigned long count;
 
-    count = sansa_read(sansa,sectorbuf, sansa->sector_size);
+    count = sansa_read(sansa,sansa_sectorbuf, sansa->sector_size);
 
     if (count <= 0) {
         print_error(" Error reading from disk: ");
         return -1;
     }
 
-    if ((sectorbuf[510] == 0x55) && (sectorbuf[511] == 0xaa)) {
+    if ((sansa_sectorbuf[510] == 0x55) && (sansa_sectorbuf[511] == 0xaa)) {
         /* parse partitions */
         for ( i = 0; i < 4; i++ ) {
-            unsigned char* ptr = sectorbuf + 0x1be + 16*i;
+            unsigned char* ptr = sansa_sectorbuf + 0x1be + 16*i;
             sansa->pinfo[i].type  = ptr[4];
             sansa->pinfo[i].start = BYTES2INT32(ptr, 8);
             sansa->pinfo[i].size  = BYTES2INT32(ptr, 12);
@@ -114,7 +114,7 @@ int sansa_read_partinfo(struct sansa_t* sansa, int silent)
                 /* not handled yet */
             }
         }
-    } else if ((sectorbuf[0] == 'E') && (sectorbuf[1] == 'R')) {
+    } else if ((sansa_sectorbuf[0] == 'E') && (sansa_sectorbuf[1] == 'R')) {
         if (!silent) fprintf(stderr,"[ERR]  Bad boot sector signature\n");
         return -1;
     }
@@ -405,14 +405,14 @@ int is_sansa(struct sansa_t* sansa)
     }
 
     /* Check Bootloader header */
-    if (sansa_seek_and_read(sansa, sansa->start, sectorbuf, 0x200) < 0) {
+    if (sansa_seek_and_read(sansa, sansa->start, sansa_sectorbuf, 0x200) < 0) {
         return -2;
     }
-    if (memcmp(sectorbuf,"PPBL",4)!=0) {
+    if (memcmp(sansa_sectorbuf,"PPBL",4)!=0) {
         /* No bootloader header, abort */
         return -4;
     }
-    ppbl_length = (le2int(sectorbuf+4) + 0x1ff) & ~0x1ff;
+    ppbl_length = (le2int(sansa_sectorbuf+4) + 0x1ff) & ~0x1ff;
 
     /* Sanity/safety check - the bootloader can't be larger than PPMI_OFFSET */
     if (ppbl_length > PPMI_OFFSET)
@@ -421,12 +421,12 @@ int is_sansa(struct sansa_t* sansa)
     }
 
     /* Load Sansa bootloader and check for "Sansa C200" magic string */
-    if (sansa_seek_and_read(sansa, sansa->start + 0x200, sectorbuf, ppbl_length) < 0) {
+    if (sansa_seek_and_read(sansa, sansa->start + 0x200, sansa_sectorbuf, ppbl_length) < 0) {
         fprintf(stderr,"[ERR]  Seek and read to 0x%08llx in is_sansa failed.\n",
                        sansa->start+0x200);
         return -6;
     }
-    if (sansa_memmem(sectorbuf, ppbl_length, "Sansa C200", 10) != NULL) {
+    if (sansa_memmem(sansa_sectorbuf, ppbl_length, "Sansa C200", 10) != NULL) {
         /* C200 */
         sansa->targetname="c200";
     } else {
@@ -435,25 +435,25 @@ int is_sansa(struct sansa_t* sansa)
     }
     
     /* Check Main firmware header */
-    if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET, sectorbuf, 0x200) < 0) {
+    if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET, sansa_sectorbuf, 0x200) < 0) {
         fprintf(stderr,"[ERR]  Seek to 0x%08llx in is_sansa failed.\n",
                        sansa->start+PPMI_OFFSET);
         return -5;
     }
-    if (memcmp(sectorbuf,"PPMI",4)!=0) {
+    if (memcmp(sansa_sectorbuf,"PPMI",4)!=0) {
         /* No bootloader header, abort */
         return -7;
     }
-    ppmi_length = le2int(sectorbuf+4);
+    ppmi_length = le2int(sansa_sectorbuf+4);
 
     /* Check main mi4 file header */
-    if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET+0x200, sectorbuf, 0x200) < 0) {
+    if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET+0x200, sansa_sectorbuf, 0x200) < 0) {
         fprintf(stderr,"[ERR]  Seek to 0x%08llx in is_sansa failed.\n",
                        sansa->start+PPMI_OFFSET+0x200);
         return -5;
     }
 
-    if (get_mi4header(sectorbuf,&mi4header) < 0) {
+    if (get_mi4header(sansa_sectorbuf,&mi4header) < 0) {
         fprintf(stderr,"[ERR]  Invalid mi4header\n");
         return -6;
     }
@@ -465,15 +465,15 @@ int is_sansa(struct sansa_t* sansa)
      */
 
     sansa->hasoldbootloader = 0;
-    if (memcmp(sectorbuf+0x1f8,"RBBL",4)==0) {
+    if (memcmp(sansa_sectorbuf+0x1f8,"RBBL",4)==0) {
         /* Look for an original firmware after the first image */
         if (sansa_seek_and_read(sansa,
                                 sansa->start + PPMI_OFFSET + 0x200 + ppmi_length,
-                                sectorbuf, 512) < 0) {
+                                sansa_sectorbuf, 512) < 0) {
             return -7;
         }
 
-        if (get_mi4header(sectorbuf,&mi4header)!=0) {
+        if (get_mi4header(sansa_sectorbuf,&mi4header)!=0) {
             fprintf(stderr,"[ERR]  No original firmware found\n");
             sansa->hasoldbootloader = 1;
         }
@@ -654,7 +654,7 @@ int sansa_read_firmware(struct sansa_t* sansa, char* filename)
     int outfile;
     struct mi4header_t mi4header;
 
-    res = load_original_firmware(sansa,sectorbuf,&mi4header);
+    res = load_original_firmware(sansa,sansa_sectorbuf,&mi4header);
     if (res < 0)
         return res;
 
@@ -664,7 +664,7 @@ int sansa_read_firmware(struct sansa_t* sansa, char* filename)
         return -1;
     }
 
-    res = write(outfile,sectorbuf,mi4header.mi4size);
+    res = write(outfile,sansa_sectorbuf,mi4header.mi4size);
     if (res != (int)mi4header.mi4size) {
         fprintf(stderr,"[ERR]  Write error - %d\n", res);
         return -1;
@@ -704,14 +704,14 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
     }
 
     /* Create PPMI header */
-    memset(sectorbuf,0,0x200);
-    memcpy(sectorbuf,"PPMI",4);
-    int2le(bl_length,   sectorbuf+4);
-    int2le(0x00020000,  sectorbuf+8);
+    memset(sansa_sectorbuf,0,0x200);
+    memcpy(sansa_sectorbuf,"PPMI",4);
+    int2le(bl_length,   sansa_sectorbuf+4);
+    int2le(0x00020000,  sansa_sectorbuf+8);
 
     if (type==FILETYPE_MI4) {
-        /* Read bootloader into sectorbuf+0x200 */
-        n = read(infile,sectorbuf+0x200,bl_length);
+        /* Read bootloader into sansa_sectorbuf+0x200 */
+        n = read(infile,sansa_sectorbuf+0x200,bl_length);
         close(infile);
         if (n < bl_length) {
             fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
@@ -719,7 +719,7 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
             return -1;
         }
 
-        if (memcmp(sectorbuf+0x200+0x1f8,"RBBL",4)!=0) {
+        if (memcmp(sansa_sectorbuf+0x200+0x1f8,"RBBL",4)!=0) {
             fprintf(stderr,"[ERR]  %s is not a Rockbox bootloader, aborting.\n",
                            filename);
             return -1;
@@ -727,15 +727,15 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
     } else {
         #ifndef RBUTIL
         if (strcmp(sansa->targetname,"c200") == 0) {
-            memcpy(sectorbuf+0x200,bootimg_c200,LEN_bootimg_c200);
+            memcpy(sansa_sectorbuf+0x200,bootimg_c200,LEN_bootimg_c200);
         } else {
-            memcpy(sectorbuf+0x200,bootimg_e200,LEN_bootimg_e200);
+            memcpy(sansa_sectorbuf+0x200,bootimg_e200,LEN_bootimg_e200);
         }
         #endif
     }
 
     /* Load original firmware from Sansa to the space after the bootloader */
-    res = load_original_firmware(sansa,sectorbuf+0x200+bl_length,&mi4header);
+    res = load_original_firmware(sansa,sansa_sectorbuf+0x200+bl_length,&mi4header);
     if (res < 0)
         return res;
 
@@ -749,7 +749,7 @@ int sansa_add_bootloader(struct sansa_t* sansa, char* filename, int type)
 
     length = 0x200 + bl_length + mi4header.mi4size;
 
-    n=sansa_write(sansa, sectorbuf, length);
+    n=sansa_write(sansa, sansa_sectorbuf, length);
     if (n < length) {
         fprintf(stderr,"[ERR]  Short write in add_bootloader\n");
         return -6;
@@ -765,16 +765,16 @@ int sansa_delete_bootloader(struct sansa_t* sansa)
     int n;
     int length;
 
-    /* Load original firmware from Sansa to sectorbuf+0x200 */
-    res = load_original_firmware(sansa,sectorbuf+0x200,&mi4header);
+    /* Load original firmware from Sansa to sansa_sectorbuf+0x200 */
+    res = load_original_firmware(sansa,sansa_sectorbuf+0x200,&mi4header);
     if (res < 0)
         return res;
 
     /* Create PPMI header */
-    memset(sectorbuf,0,0x200);
-    memcpy(sectorbuf,"PPMI",4);
-    int2le(mi4header.mi4size, sectorbuf+4);
-    int2le(0x00020000,        sectorbuf+8);
+    memset(sansa_sectorbuf,0,0x200);
+    memcpy(sansa_sectorbuf,"PPMI",4);
+    int2le(mi4header.mi4size, sansa_sectorbuf+4);
+    int2le(0x00020000,        sansa_sectorbuf+8);
 
     /* Now write the whole thing back to the Sansa */
 
@@ -786,7 +786,7 @@ int sansa_delete_bootloader(struct sansa_t* sansa)
 
     length = 0x200 + mi4header.mi4size;
 
-    n=sansa_write(sansa, sectorbuf, length);
+    n=sansa_write(sansa, sansa_sectorbuf, length);
     if (n < length) {
         fprintf(stderr,"[ERR]  Short write in delete_bootloader\n");
         return -6;
@@ -801,20 +801,20 @@ void sansa_list_images(struct sansa_t* sansa)
     loff_t ppmi_length;
 
     /* Check Main firmware header */
-    if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET, sectorbuf, 0x200) < 0) {
+    if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET, sansa_sectorbuf, 0x200) < 0) {
         return;
     }
 
-    ppmi_length = le2int(sectorbuf+4);
+    ppmi_length = le2int(sansa_sectorbuf+4);
 
     printf("[INFO] Image 1 - %llu bytes\n",ppmi_length);
 
     /* Look for an original firmware after the first image */
-    if (sansa_seek_and_read(sansa, sansa->start + PPMI_OFFSET + 0x200 + ppmi_length, sectorbuf, 512) < 0) {
+    if (sansa_seek_and_read(sansa, sansa->start + PPMI_OFFSET + 0x200 + ppmi_length, sansa_sectorbuf, 512) < 0) {
         return;
     }
 
-    if (get_mi4header(sectorbuf,&mi4header)==0) {
+    if (get_mi4header(sansa_sectorbuf,&mi4header)==0) {
         printf("[INFO] Image 2 - %d bytes\n",mi4header.mi4size);
     }
 }
@@ -864,8 +864,8 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
     of_length = filesize(infile);
 
     /* Load original firmware from file */
-    memset(sectorbuf,0,0x200);
-    n = read(infile,sectorbuf,of_length);
+    memset(sansa_sectorbuf,0,0x200);
+    n = read(infile,sansa_sectorbuf,of_length);
     close(infile);
     if (n < of_length) {
            fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n"
@@ -874,13 +874,13 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
     }
 
     /* Check we have a valid MI4 file. */
-    if (get_mi4header(sectorbuf,&mi4header)!=0) {
+    if (get_mi4header(sansa_sectorbuf,&mi4header)!=0) {
         fprintf(stderr,"[ERR]  %s is not a valid mi4 file\n",filename);
         return -1;
     }
 
     /* Decrypt and build the header */
-    if(prepare_original_firmware(sectorbuf, &mi4header)!=0){
+    if(prepare_original_firmware(sansa_sectorbuf, &mi4header)!=0){
         fprintf(stderr,"[ERR]  Unable to build decrypted mi4 from %s\n"
                       ,filename);
         return -1;
@@ -893,7 +893,7 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
         return -1;
     }
 
-    n=sansa_write(sansa, sectorbuf, of_length);
+    n=sansa_write(sansa, sansa_sectorbuf, of_length);
     if (n < of_length) {
         fprintf(stderr,"[ERR]  Short write in sansa_update_of\n");
         return -1;
@@ -910,8 +910,8 @@ int sansa_update_of(struct sansa_t* sansa, char* filename)
             return -1;
         }
         
-        memset(sectorbuf,0,NVPARAMS_SIZE);
-        n=sansa_write(sansa, sectorbuf, NVPARAMS_SIZE);
+        memset(sansa_sectorbuf,0,NVPARAMS_SIZE);
+        n=sansa_write(sansa, sansa_sectorbuf, NVPARAMS_SIZE);
         if (n < NVPARAMS_SIZE) {
             fprintf(stderr,"[ERR]  Short write in sansa_update_of\n");
             return -1;
@@ -937,7 +937,7 @@ int sansa_update_ppbl(struct sansa_t* sansa, char* filename)
 
     ppbl_length = filesize(infile);
 
-    n = read(infile,sectorbuf+0x200,ppbl_length);
+    n = read(infile,sansa_sectorbuf+0x200,ppbl_length);
     close(infile);
     if (n < ppbl_length) {
            fprintf(stderr,"[ERR]  Short read - requested %d bytes, received %d\n", ppbl_length, n);
@@ -945,10 +945,10 @@ int sansa_update_ppbl(struct sansa_t* sansa, char* filename)
     }
 
     /* Step 2 - Build the header */
-    memset(sectorbuf,0,0x200);
-    memcpy(sectorbuf,"PPBL",4);
-    int2le(ppbl_length, sectorbuf+4);
-    int2le(0x00010000,  sectorbuf+8);
+    memset(sansa_sectorbuf,0,0x200);
+    memcpy(sansa_sectorbuf,"PPBL",4);
+    int2le(ppbl_length, sansa_sectorbuf+4);
+    int2le(0x00010000,  sansa_sectorbuf+8);
 
     /* Step 3 - write the bootloader to the Sansa */
     if (sansa_seek(sansa, sansa->start) < 0) {
@@ -956,7 +956,7 @@ int sansa_update_ppbl(struct sansa_t* sansa, char* filename)
         return -1;
     }
 
-    n=sansa_write(sansa, sectorbuf, ppbl_length + 0x200);
+    n=sansa_write(sansa, sansa_sectorbuf, ppbl_length + 0x200);
     if (n < (ppbl_length+0x200)) {
         fprintf(stderr,"[ERR]  Short write in sansa_update_ppbl\n");
         return -1;
