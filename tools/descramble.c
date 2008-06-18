@@ -87,8 +87,7 @@ int main (int argc, char** argv)
         /* iRiver code dealt with in the iriver.c code */
         iname = argv[2];
         oname = argv[3];
-        iriver_decode(iname, oname, FALSE, STRIP_NONE);
-        return 0;
+        return iriver_decode(iname, oname, FALSE, STRIP_NONE) ? -1 : 0;
     }
     if(!strcmp(argv[1], "-gigabeat")) {
         iname = argv[2];

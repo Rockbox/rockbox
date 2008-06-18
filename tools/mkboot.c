@@ -19,25 +19,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "mkboot.h"
 
-void usage(void)
+#ifndef RBUTIL
+static void usage(void)
 {
     printf("usage: mkboot [-h300] <firmware file> <boot file> <output file>\n");
 
     exit(1);
 }
+#endif
 
-unsigned char image[0x400000 + 0x220 + 0x400000/0x200];
+static unsigned char image[0x400000 + 0x220 + 0x400000/0x200];
 
+#ifndef RBUTIL
 int main(int argc, char *argv[])
 {
     char *infile, *bootfile, *outfile;
-    FILE *f;
-    int i;
-    int len;
-    int actual_length, total_length, binary_length, num_chksums;
     int origin = 0x1f0000;   /* H1x0 bootloader address */
-    
+
     if(argc < 3) {
         usage();
     }
@@ -55,6 +55,16 @@ int main(int argc, char *argv[])
         bootfile = argv[2];
         outfile = argv[3];
     }
+    return mkboot(infile, bootfile, outfile, origin);
+}
+#endif
+
+int mkboot(const char* infile, const char* bootfile, const char* outfile, int origin)
+{
+    FILE *f;
+    int i;
+    int len;
+    int actual_length, total_length, binary_length, num_chksums;
 
     memset(image, 0xff, sizeof(image));
 
@@ -62,13 +72,14 @@ int main(int argc, char *argv[])
     f = fopen(infile, "rb");
     if(!f) {
         perror(infile);
-        exit(1);
+        return -1;
     }
 
     i = fread(image, 1, 16, f);
     if(i < 16) {
         perror(infile);
-        exit(1);
+        fclose(f);
+        return -2;
     }
 
     /* This is the length of the binary image without the scrambling
@@ -81,7 +92,8 @@ int main(int argc, char *argv[])
     i = fread(image+16, 1, len, f);
     if(i < len) {
         perror(infile);
-        exit(1);
+        fclose(f);
+        return -3;
     }
     
     fclose(f);
@@ -90,7 +102,8 @@ int main(int argc, char *argv[])
     f = fopen(bootfile, "rb");
     if(!f) {
         perror(bootfile);
-        exit(1);
+        fclose(f);
+        return -4;
     }
 
     fseek(f, 0, SEEK_END);
@@ -101,7 +114,8 @@ int main(int argc, char *argv[])
     i = fread(image+0x220 + origin, 1, len, f);
     if(i < len) {
         perror(bootfile);
-        exit(1);
+        fclose(f);
+        return -5;
     }
 
     fclose(f);
@@ -109,7 +123,7 @@ int main(int argc, char *argv[])
     f = fopen(outfile, "wb");
     if(!f) {
         perror(outfile);
-        exit(1);
+        return -6;
     }
 
     /* Patch the reset vector to start the boot loader */
@@ -161,7 +175,8 @@ int main(int argc, char *argv[])
     i = fwrite(image, 1, total_length, f);
     if(i < total_length) {
         perror(outfile);
-        exit(1);
+        fclose(f);
+        return -7;
     }
 
     printf("Wrote 0x%x bytes in %s\n", total_length, outfile);

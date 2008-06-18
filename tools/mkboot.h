@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Daniel Stenberg
+ * Copyright (C) 2008 by Dominik Riebeling
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,34 +16,18 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef TRUE
-#define TRUE 1
-#endif
-#ifndef FALSE
-#define FALSE 0
-#endif
 
-#define BOOL unsigned int
-
-#define ESTF_SIZE 32
+#ifndef MKBOOT_H
+#define MKBOOT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-enum striptype
-{
-  STRIP_NONE,
-  STRIP_HEADER_CHECKSUM,
-  STRIP_HEADER_CHECKSUM_ESTF
-};
-
-/* protos for iriver.c */
-int iriver_decode(const char *infile, const char *outfile, BOOL modify,
-                  enum striptype stripmode );
-int iriver_encode(const char *infile_name, const char *outfile_name, BOOL modify);
+int mkboot(const char* infile, const char* bootfile, const char* outfile, int origin);
 
 #ifdef __cplusplus
 }
+#endif
 #endif
 
