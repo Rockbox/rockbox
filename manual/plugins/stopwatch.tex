@@ -4,33 +4,42 @@
 A simple stopwatch program with support for saving times.
 
 \begin{table}
-\begin{btnmap}{}{}
-\opt{PLAYER_PAD}{\ButtonMenu}
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
-\opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
-& Quit Plugin \\
-\opt{PLAYER_PAD,RECORDER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
-\opt{ONDIO_PAD}{\ButtonRight}
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonSelect}
-\opt{SANSA_E200_PAD}{\ButtonLeft}
-& Start / stop \\
-\opt{PLAYER_PAD}{\ButtonStop}
-\opt{RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonLeft}
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonDown}
-\opt{IRIVER_H10_PAD}{\ButtonRew}
-\opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}
-& Reset timer (only when timer is stopped)\\
-\opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-\opt{ONDIO_PAD}{\ButtonMenu}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonRight} 
-\opt{IRIVER_H10_PAD}{\ButtonFF}
-\opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonSelect}
-& Take lap time \\
-\opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonLeft/\ButtonRight}
-\opt{RECORDER_PAD,ONDIO_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonUp/\ButtonDown}
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
-\opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown}
-& Scroll through lap times \\
-\end{btnmap}
+    \begin{btnmap}{}{}
+    \opt{PLAYER_PAD}{\ButtonMenu}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
+        ,MROBE100_PAD}{\ButtonPower}
+    & Quit Plugin \\
+    %
+    \opt{PLAYER_PAD,RECORDER_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRight}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,MROBE100_PAD,IPOD_4G_PAD%
+        ,IPOD_3G_PAD}{\ButtonSelect}
+    & Start / stop \\
+    %
+    \opt{PLAYER_PAD}{\ButtonStop}
+    \opt{RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD%
+        ,SANSA_C200_PAD}{\ButtonLeft}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonDown}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{IAUDIO_X5_PAD}{\ButtonRec}
+    \opt{GIGABEAT_PAD}{\ButtonA}
+    \opt{MROBE100_PAD}{\ButtonDisplay}
+    & Reset timer (only when timer is stopped)\\
+    %
+    \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonMenu}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonRight}
+    \opt{IRIVER_H10_PAD}{\ButtonFF}
+    \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonSelect}
+    & Take lap time \\
+    %
+    \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonLeft{} / \ButtonRight}
+    \opt{RECORDER_PAD,ONDIO_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
+        ,GIGABEAT_PAD,MROBE100_PAD}{\ButtonUp{} / \ButtonDown}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd{} / \ButtonScrollBack}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
+    & Scroll through lap times \\
+    \end{btnmap}
 \end{table}
