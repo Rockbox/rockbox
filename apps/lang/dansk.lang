@@ -1,3 +1,22 @@
+# Rockbox danish language file
+# Translated by:
+# - Rune Wiinberg
+# - Jakob Givoni
+# - Jonas Häggqvist
+#
+# Try to follow the guidelines from http://www.sslug.dk/locale/ Specifically
+# try to avoid english words at (almost) all costs.
+#
+# Local conventions:
+# "Settings" is removed from translations used in the menu since it's all
+# settings there ("Sound Settings > Lyd"). "Recording Settings" is an exception
+# since it's used alongside "Recording" in some menus.
+# No excessive capitals ("Håndter opsætning" - not "Håndter Opsætning")
+#
+# Strings that need attention:
+# - LANG_EQUALIZER_BAND_LOW_SHELF
+# - LANG_EQUALIZER_BAND_HIGH_SHELF
+# - All strings with "Equalizer" in them.
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -625,13 +644,13 @@
   desc: in settings_menu()
   user:
   <source>
-    *: "Playback"
+    *: "Playback Settings"
   </source>
   <dest>
-    *: "Afspilning"
+    *: "Afspilningsindstillinger"
   </dest>
   <voice>
-    *: "Afspilning"
+    *: "Afspilningsindstillinger"
   </voice>
 </phrase>
 <phrase>
@@ -2159,10 +2178,12 @@
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    recording: "deprecated"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -3850,30 +3871,34 @@
     *: none
     rtc: "OFF = Revert"
     h100,h120,h300: "STOP = Revert"
-    ipod*,e200,c200: "MENU = Revert"
+    ipod*,e200,c200,sa9200: "MENU = Revert"
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
     mrobe100: "DISPLAY = Revert"
+    gigabeats: "BACK = Revert"
   </source>
   <dest>
     *: "SLUK: Fortryd"
     rtc: "SLUK = Fortryd"
     h100,h120,h300: "STOP = Fortryd"
-    ipod*,e200,c200: "MENU = Fortryd"
+    ipod*,e200,c200,sa9200: "MENU = Fortryd"
     x5,m5: "OPTAG = Fortryd"
     h10,h10_5gb: "FORRIGE = Fortryd"
     gigabeatf: "TÆND/SLUK = Fortryd"
     mrobe100: "VIS = Fortryd"
+    gigabeats: "TILBAGE = Fortryd"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,e200,c200: ""
+    ipod*,e200,c200,sa9200: ""
     x5,m5: ""
     h10,h10_5gb: ""
     gigabeatf: ""
+    mrobe100: ""
+    gigabeats: ""
   </voice>
 </phrase>
 <phrase>
@@ -4132,17 +4157,21 @@
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     h10,h10_5gb: "SELECT=Set PREV=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
   </source>
   <dest>
     *: none
     alarm: "SPIL=Sæt SLUK=Annuller"
     ipod*: "VÆLG=Sæt MENU=Annuller"
     h10,h10_5gb: "VÆLG=Sæt FORRIGE=Annuller"
+    gigabeats: "VÆLG=Sæt TÆND/SLUK=Annuller"
   </dest>
   <voice>
     *: none
     alarm: ""
     ipod*: ""
+    h10,h10_5gb: ""
+    gigabeats: ""
   </voice>
 </phrase>
 <phrase>
@@ -5893,7 +5922,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: "deprecated"
   </dest>
   <voice>
     *: ""
@@ -8176,53 +8205,53 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Yes"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Ja"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Ja"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "No"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Nej"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Nej"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "On"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Til"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Til"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8295,138 +8324,138 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Shuffle"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Bland"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Bland"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Repeat"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Gentag"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Gentag"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "One"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "En"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "En"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
-  desc: repeat range from point A to B
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "A-B"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Show Files"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Vis filtyper"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Vis filtyper"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Supported"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Understøttede"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Understøttede"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Music"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Musik"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Musik"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Playlists"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Sætlister"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Sætlister"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8533,53 +8562,53 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Upside Down"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "På hovedet"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "På hovedet"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Scroll Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Rullebjælke"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Rullebjælke"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "Status Bar"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Status bjælke"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status bjælke"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -8802,11 +8831,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Smal"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Smal"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -8887,11 +8916,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Aktiver hardware equalizer"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Aktiver hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -9003,11 +9032,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Hardware equalizer"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Hardware equalizer"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -9034,11 +9063,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Båndbredde"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Båndbredde"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -9099,11 +9128,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Bred"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Bred"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -9281,22 +9310,22 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
-    h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
+    x5,m5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    h10,h10_5gb,e200,c200,sa9200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Bygger database... %d fundet (SLUK for at stoppe)"
     h100,h120,h300: "Bygger database... %d fundet (STOP for at stoppe)"
-    ipod*: "Bygger database... %d fundet (SPIL/PAUSE for at stoppe)"
-    x5,m5,gigabeatf,mrobe100: "Bygger database... %d fundet (VENSTRE for at stoppe)"
-    h10,h10_5gb,e200,c200: "Bygger database... %d fundet (FORRIGE for at stoppe)"
+    ipod*: "Bygger database... %d fundet (FORRIGE for at stoppe)"
+    x5,m5,gigabeat*,mrobe100: "Bygger database... %d fundet (VENSTRE for at stoppe)"
+    h10,h10_5gb,e200,c200,sa9200: "Bygger database... %d fundet (FORRIGE for at stoppe)"
   </dest>
   <voice>
     *: "filer fundet til databasen"
     h100,h120,h300: ""
     ipod*: ""
-    x5,m5: ""
-    h10,h10_5gb,e200,c200: ""
+    x5,m5,gigabeat*,mrobe100: ""
+    h10,h10_5gb,e200,c200,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -9892,17 +9921,17 @@
   <source>
     *: none
     e200: "Wheel Light Timeout"
-    c200,gigabeatf,mrobe100: "Button Light Timeout"
+    c200,gigabeatf,mrobe100,sa9200: "Button Light Timeout"
   </source>
   <dest>
     *: none
     e200: "Hjul-lys sluk"
-    c200,gigabeatf,mrobe100: "Knap-lys sluk"
+    c200,gigabeatf,mrobe100,sa9200: "Knap-lys sluk"
   </dest>
   <voice>
     *: none
     e200: "Hjul-lys sluk"
-    c200,gigabeatf,mrobe100: "Knap-lys sluk"
+    c200,gigabeatf,mrobe100,sa9200: "Knap-lys sluk"
   </voice>
 </phrase>
 <phrase>
@@ -10357,19 +10386,19 @@
 </phrase>
 <phrase>
   id: LANG_SYSFONT_ALL
-  desc: repeat playlist once all songs have completed
+  desc: deprecated
   user:
   <source>
     *: none
-    lcd_bitmap: "All"
+    lcd_bitmap: ""
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Alle"
+    lcd_bitmap: ""
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Alle"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10415,7 +10444,6 @@
   </dest>
   <voice>
     *: ""
-    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -10517,19 +10545,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "SPIL = Ja"
     h100,h120,h300: "NAVI = Ja"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "VÆLG = Ja"
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: "VÆLG = Ja"
     player: "(SPIL/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: ""
+    ipod*,x5,m5,gigabeat*,e200,c200,h10,h10_5gb,mrobe100,sa9200: ""
     player: ""
   </voice>
 </phrase>
@@ -10541,19 +10569,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "Tænd = Indstil"
     h100,h120,h300: "NAVI = Indstil"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "VÆLG = Indstil"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: "VÆLG = Indstil"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeat*,mrobe100,sa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -11552,5 +11580,171 @@
   <voice>
     *: none
     swcodec: "Tastaturtonegentagelser"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENABLE_STUDY_MODE
+  desc: playback settings menu
+  user: 
+  <source>
+    *: "Enable Study Mode"
+  </source>
+  <dest>
+    *: "Aktiver studietilstand"
+  </dest>
+  <voice>
+    *: "Aktiver studietilstand"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Touchpad følsomhed"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Touchpad følsomhed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACCESSORY_SUPPLY
+  desc: in system settings menu
+  user: 
+  <source>
+    *: none
+    accessory_supply: "Accessory Power Supply"
+  </source>
+  <dest>
+    *: none
+    accessory_supply: "Tilbehørsstrømforsyning"
+  </dest>
+  <voice>
+    *: none
+    accessory_supply: "Tilbehørsstrømforsyning"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING_AND_SHUTDOWN
+  desc: in record timesplit options
+  user: 
+  <source>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </source>
+  <dest>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </dest>
+  <voice>
+    *: none
+    recording: "Stop Recording And Shutdown"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_MODE
+  desc: playback settings menu
+  user: 
+  <source>
+    *: "Study Mode"
+  </source>
+  <dest>
+    *: "Studietilstand"
+  </dest>
+  <voice>
+    *: "Studietilstand"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STUDY_HOP_STEP
+  desc: playback settings menu
+  user: 
+  <source>
+    *: "Study Increment"
+  </source>
+  <dest>
+    *: "Studie trin"
+  </dest>
+  <voice>
+    *: "Studie trin"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUICKSCREEN
+  desc: spoken only, Announces entering the "quick screen"
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Kvikskærm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISABLE_STUDY_MODE
+  desc: DEPRECATED
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNKNOWN
+  desc: generic string for unknown states, such as an unset clock
+  user: 
+  <source>
+    *: "Unknown"
+  </source>
+  <dest>
+    *: "Ukendt"
+  </dest>
+  <voice>
+    *: "Ukendt"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_OK
+  desc: spoken only, On exiting a context, specifically the quick screen
+  user: 
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user: 
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Høj"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Høj"
   </voice>
 </phrase>
