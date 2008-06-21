@@ -238,16 +238,16 @@ QString getUserPermissionsString(void)
     int perm = getUserPermissions();
     switch(perm) {
         case GUEST:
-            result = tr("Guest");
+            result = QObject::tr("Guest");
             break;
         case ADMIN:
-            result = tr("Admin");
+            result = QObject::tr("Admin");
             break;
         case USER:
-            result = tr("User");
+            result = QObject::tr("User");
             break;
         default:
-            result = tr("Error");
+            result = QObject::tr("Error");
             break;
     }
     return result;
