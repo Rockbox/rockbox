@@ -36,6 +36,7 @@
 #include <usb.h>
 #include <sys/utsname.h>
 #include <unistd.h>
+#include <pwd.h>
 #endif
 #if defined(Q_OS_LINUX)
 #include <mntent.h>
@@ -192,7 +193,9 @@ QString getUserName(void)
     return QString::fromWCharArray(userbuf);
 #endif
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
-    return QString(getlogin());
+    struct passwd *user;
+    user = getpwuid(geteuid());
+    return QString(user->pw_name);
 #endif
 }
 
