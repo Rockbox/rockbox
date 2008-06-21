@@ -4,56 +4,102 @@ Rockboy is a Nintendo Game Boy and Game Boy Color emulator for Rockbox based on
 the gnuboy emulator. To start a game open a ROM file saved as \fname{.gb} or
 \fname{.gbc} in the file browser.\\
 
-\textbf{Default keys}
+\opt{ipod}{
+    Within Rockboy the wheel is used as a touchpad. It is split into 8 sections
+     that when tapped correspond to 8 buttons as detailed in the table below.
+}
+
+\subsubsection{Default keys}
 \begin{table}
     \begin{btnmap}{}{}
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD}{
-        \opt{RECORDER_PAD}{\ButtonFOne}
-        \opt{IRIVER_H100_PAD}{\ButtonOn}
-        \opt{IRIVER_H300_PAD}{\ButtonRec}
-        \opt{SANSA_E200_PAD}{\ButtonSelect}
-    & A button\\}
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD}{
-        \opt{RECORDER_PAD}{\ButtonFTwo}
-        \opt{IRIVER_H100_PAD}{\ButtonOff}
-        \opt{IRIVER_H300_PAD}{\ButtonMode}
-        \opt{SANSA_E200_PAD}{\ButtonRec}
-    & B button\\}
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
+        ,SANSA_C200_PAD,GIGABEAT_PAD}{\ButtonUp{} / \ButtonDown{} /}
+    \opt{IPOD_4G_PAD}{Tap \ButtonPlay{} / \ButtonMenu{} /}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp{}/ \ButtonScrollDown{} /}
+    \ButtonLeft{} / \ButtonRight{} /
+    & Direction keys\\
+    %
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{IRIVER_H100_PAD}{\ButtonOn}
+    \opt{IRIVER_H300_PAD}{\ButtonRec}
+    \opt{IPOD_4G_PAD}{Tap \btnfnt{Top-Right}}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+    \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonSelect}
+    \opt{GIGABEAT_PAD}{\ButtonVolUp}
+    & A button\\
+    %
+    \opt{RECORDER_PAD}{\ButtonFTwo}
+    \opt{IRIVER_H100_PAD}{\ButtonOff}
+    \opt{IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IPOD_4G_PAD}{Tap \btnfnt{Top-Left}}
+    \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
+    \opt{IRIVER_H10_PAD}{\ButtonFF}
+    \opt{GIGABEAT_PAD}{\ButtonVolDown}
+    & B button\\
+    %
     \opt{RECORDER_PAD}{\ButtonFThree}
     \opt{IRIVER_H100_PAD}{\ButtonRec}
     \opt{IRIVER_H300_PAD}{\ButtonOn}
-    \opt{IPOD_4G_PAD}{\ButtonSelect}
+    \opt{IPOD_4G_PAD}{Tap \btnfnt{Bottom-Right} /~Press \ButtonSelect}
+    \opt{IAUDIO_X5_PAD}{\ButtonSelect}
     \opt{SANSA_E200_PAD}{\ButtonScrollBack}
+    \opt{SANSA_C200_PAD}{\ButtonVolDown}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{GIGABEAT_PAD}{\ButtonA}
     & Start\\
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD}{
+    %
+    \nopt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{
         \opt{RECORDER_PAD}{\ButtonPlay}
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+        \opt{IPOD_4G_PAD}{Tap \btnfnt{Bottom-Left}}
         \opt{SANSA_E200_PAD}{\ButtonScrollFwd}
-    & Select\\}
-    \opt{RECORDER_PAD}{\ButtonOn & Cycle display scaling modes\\}
+        \opt{SANSA_C200_PAD}{\ButtonVolUp}
+        \opt{GIGABEAT_PAD}{\ButtonSelect}
+        & Select\\
+        %
+    }
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,m5}{
+        \opt{RECORDER_PAD}{\ButtonOn}
+        \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD}{\ButtonHold{} switch}
+        & Cycle display scaling modes\\
+    %
+    }
     \opt{RECORDER_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IRIVER_H100_PAD}{\ButtonMode}
-    \opt{IPOD_4G_PAD}{Long \ButtonSelect}
-    \opt{SANSA_E200_PAD}{\ButtonPower}
+    \opt{IPOD_4G_PAD}{\ButtonHold{} switch}
+    \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,IRIVER_H10_PAD}{\ButtonPower}
+    \opt{GIGABEAT_PAD}{\ButtonMenu}
     & Open Rockboy menu\\
     \end{btnmap}
 \end{table}
 
-\textbf{Rockboy menu}
+\subsubsection{Rockboy menu}
 \begin{description}
-\item[Back to Game.] Takes you back to the game.
-\item[Load State\ldots] Loads a previously saved state.
-\item[Save State\ldots] Saves your current state.
+\item[Load Game\ldots] Loads a previously saved game.
+\item[Save Game\ldots] Saves your current state.
 \item[Options\ldots]
     \begin{description}
-    \item[Frameskip.]
+    \item[Max Frameskip.]
     Change frameskip setting to improve speed.
-    \item[Sound ON/OFF.]
-    Toggle sound.
-    \item[Stats ON/OFF.]
+    \item[Sound.]
+    Toggle sound on or off.
+    \item[Stats.]
     Toggle showing fps and current frameskip.
     \item[Set Keys (BUGGY)]
     Select this option to set a new keymapping.
+    \opt{lcd_color}{
+        \item[Screen Size.]
+        Chose whether the original aspect ratio should be kept when scaling
+        the picture to the screen%
+        % targets with bigger displays than the original gameboy
+        \opt{gigabeat,h300,ipodcolor,ipodvideo,e200}{
+            or whether it should be displayed unscaled%
+        }.
+        \item[Screen Rotate.]
+        Rotate the displayed picture by 90 percent.
+        \item[Set Palette.]
+        Pick one of a few predefined colour palettes.
+    }
     \end{description}
 \item[Quit RockBoy.] Quits the Rockboy plugin.
 \end{description}
