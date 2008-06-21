@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: backlight-target.h 15599 2007-11-12 18:49:53Z amiconn $
+ * $Id$
  *
  * Copyright (C) 2007 by Dave Chapman
  *

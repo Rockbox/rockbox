@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: button-logikdax.c 15396 2007-11-01 23:38:57Z dave $
+ * $Id$
  *
  * Copyright (C) 2007 by Dave Chapman
  *

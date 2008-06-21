@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: power-logikdax.c 15339 2007-10-28 11:08:10Z dave $
+ * $Id$
  *
  * Copyright (C) 2007 Dave Chapman
  *
