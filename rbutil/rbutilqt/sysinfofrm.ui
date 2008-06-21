@@ -1,0 +1,66 @@
+<ui version="4.0" >
+ <class>SysinfoFrm</class>
+ <widget class="QWidget" name="SysinfoFrm" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>System Info</string>
+  </property>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" colspan="3" >
+    <widget class="QTextBrowser" name="textBrowser" />
+   </item>
+   <item row="1" column="0" >
+    <widget class="QPushButton" name="buttonRefresh" >
+     <property name="text" >
+      <string>&amp;Refresh</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="rbutilqt.qrc" >:/icons/view-refresh.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="2" >
+    <widget class="QPushButton" name="buttonOk" >
+     <property name="text" >
+      <string>&amp;OK</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>
+     </property>
+     <property name="default" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>buttonOk</tabstop>
+  <tabstop>buttonRefresh</tabstop>
+  <tabstop>textBrowser</tabstop>
+ </tabstops>
+ <resources>
+  <include location="rbutilqt.qrc" />
+ </resources>
+ <connections/>
+</ui>

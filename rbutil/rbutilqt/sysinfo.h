@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- *   Copyright (C) 2007 by Dominik Wenger
+ *   Copyright (C) 2007 by Dominik Riebeling
  *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
@@ -17,27 +17,26 @@
  *
  ****************************************************************************/
 
+#ifndef SYSINFO_H
+#define SYSINFO_H
 
-#ifndef UTILS_H
-#define UTILS_H
+#include <QtGui>
+#include "ui_sysinfofrm.h"
 
-#include <QString>
-#include <QUrl>
+class Sysinfo : public QDialog
+{
+    Q_OBJECT
 
-#if defined(Q_OS_WIN32)
-enum userlevel { ERR, GUEST, USER, ADMIN };
-enum userlevel getUserPermissions(void);
-QString getUserPermissionsString(void);
-#endif
-QString getUserName(void);
-QString getOsVersionString(void);
-QList<uint32_t> listUsbIds(void);
+    public:
+        Sysinfo(QWidget *parent = 0);
 
-bool recRmdir( const QString &dirName );
-QString resolvePathCase(QString path);
+    private:
+        Ui::SysinfoFrm ui;
 
-QUrl systemProxy(void);
-QString installedVersion(QString mountpoint);
+    private slots:
+        void updateSysinfo(void);
+
+};
 
 #endif
 

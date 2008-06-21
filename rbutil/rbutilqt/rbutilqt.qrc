@@ -31,6 +31,7 @@
         <file>icons/talkfile_btn.png</file>
         <file>icons/themes_btn.png</file>
         <file>icons/user-trash-full.png</file>
+        <file>icons/view-refresh.png</file>
         <file>icons/wizard.xpm</file>
     </qresource>
     <qresource prefix="/ini" >

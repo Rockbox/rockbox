@@ -34,6 +34,8 @@
 #include "browseof.h"
 #include "utils.h"
 #include "rbzip.h"
+#include "sysinfo.h"
+
 
 #if defined(Q_OS_LINUX)
 #include <stdio.h>
@@ -101,6 +103,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.actionCreate_Talk_Files, SIGNAL(triggered()), this, SLOT(createTalkFiles()));
     connect(ui.actionRemove_bootloader, SIGNAL(triggered()), this, SLOT(uninstallBootloader()));
     connect(ui.actionUninstall_Rockbox, SIGNAL(triggered()), this, SLOT(uninstall()));
+    connect(ui.action_System_Info, SIGNAL(triggered()), this, SLOT(sysinfo()));
 
 #if !defined(STATIC)
     ui.actionInstall_Rockbox_Utility_on_player->setEnabled(false);
@@ -114,6 +117,12 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 
 }
 
+
+void RbUtilQt::sysinfo(void)
+{
+    Sysinfo *info = new Sysinfo(this);
+    info->show();
+}
 
 void RbUtilQt::updateTabs(int count)
 {

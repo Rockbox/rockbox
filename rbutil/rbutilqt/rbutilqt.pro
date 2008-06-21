@@ -62,7 +62,8 @@ SOURCES += rbutilqt.cpp \
  createvoicewindow.cpp \
  rbsettings.cpp \
  rbunzip.cpp \
- rbzip.cpp
+ rbzip.cpp \
+ sysinfo.cpp
  
 HEADERS += rbutilqt.h \
  install.h \
@@ -109,7 +110,8 @@ HEADERS += rbutilqt.h \
  createvoicewindow.h \
  rbsettings.h \
  rbunzip.h \
- rbzip.h
+ rbzip.h \
+ sysinfo.h
  
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex ../../tools
@@ -145,7 +147,8 @@ FORMS += rbutilqtfrm.ui \
  encexescfgfrm.ui \
  ttsexescfgfrm.ui \
  sapicfgfrm.ui \
- createvoicefrm.ui
+ createvoicefrm.ui \
+ sysinfofrm.ui
 
 RESOURCES += rbutilqt.qrc
 win32 {
@@ -164,7 +167,7 @@ win32 {
     SOURCES +=  ../ipodpatcher/ipodio-win32.c
     SOURCES +=  ../sansapatcher/sansaio-win32.c
     RC_FILE = rbutilqt.rc
-    LIBS += -lsetupapi
+    LIBS += -lsetupapi -lnetapi32
 }
 
 unix {

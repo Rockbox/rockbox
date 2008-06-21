@@ -19,9 +19,10 @@
 
 #include "utils.h"
 
+#include <QtCore>
+#include <QDebug>
 #include <cstdlib>
-
-#include <QDir>
+#include <stdio.h>
 
 #if defined(Q_OS_WIN32)
 #if defined(UNICODE)
@@ -29,8 +30,29 @@
 #endif
 #include <windows.h>
 #include <tchar.h>
+#include <lm.h>
 #endif
-#include <QDebug>
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+#include <usb.h>
+#include <sys/utsname.h>
+#include <unistd.h>
+#endif
+#if defined(Q_OS_LINUX)
+#include <mntent.h>
+#endif
+#if defined(Q_OS_MACX)
+#include <sys/param.h>
+#include <sys/ucred.h>
+#include <sys/mount.h>
+#endif
+#if defined(Q_OS_WIN32)
+#if defined(UNICODE)
+#define _UNICODE
+#endif
+#include <tchar.h>
+#include <windows.h>
+#include <setupapi.h>
+#endif
 
 // recursive function to delete a dir with files
 bool recRmdir( const QString &dirName )
@@ -157,3 +179,196 @@ QString installedVersion(QString mountpoint)
     return "";
 }
 
+
+QString getUserName(void)
+{
+#if defined(Q_OS_WIN32)
+    wchar_t userbuf[UNLEN];
+    DWORD usersize = UNLEN;
+    BOOL status;
+ 
+    status = GetUserNameW(userbuf, &usersize);
+
+    return QString::fromWCharArray(userbuf);
+#endif
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+    return QString(getlogin());
+#endif
+}
+
+
+#if defined(Q_OS_WIN32)
+enum userlevel getUserPermissions(void)
+{
+    LPUSER_INFO_1 buf;
+    NET_API_STATUS napistatus;
+    wchar_t userbuf[UNLEN];
+    DWORD usersize = UNLEN;
+    BOOL status;
+    enum userlevel result;
+
+    status = GetUserNameW(userbuf, &usersize);
+    if(!status)
+        return ERR;
+ 
+    napistatus = NetUserGetInfo(NULL, userbuf, (DWORD)1, (LPBYTE*)&buf);
+
+    switch(buf->usri1_priv) {
+        case USER_PRIV_GUEST:
+            result = GUEST;
+            break;
+        case USER_PRIV_USER:
+            result = USER;
+            break;
+        case USER_PRIV_ADMIN:
+            result = ADMIN;
+            break;
+        default:
+            result = ERR;
+            break;
+    }
+    NetApiBufferFree(buf);
+
+    return result;
+}
+
+QString getUserPermissionsString(void)
+{
+    QString result;
+    int perm = getUserPermissions();
+    switch(perm) {
+        case GUEST:
+            result = tr("Guest");
+            break;
+        case ADMIN:
+            result = tr("Admin");
+            break;
+        case USER:
+            result = tr("User");
+            break;
+        default:
+            result = tr("Error");
+            break;
+    }
+    return result;
+}
+#endif
+
+QString getOsVersionString(void)
+{
+    QString result;
+#if defined(Q_OS_WIN32)
+    OSVERSIONINFO osvi;
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&osvi);
+
+    result = QString("Windows version %1.%2, ").arg(osvi.dwMajorVersion).arg(osvi.dwMinorVersion);
+    result += QString("build %1 (%2)").arg(osvi.dwBuildNumber).arg(QString::fromWCharArray(osvi.szCSDVersion));
+#endif
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
+    struct utsname u;
+    int ret;
+    ret = uname(&u);
+
+    result = QString("CPU: %1<br/>System: %2<br/>Release: %3<br/>Version: %4")
+        .arg(u.machine).arg(u.sysname).arg(u.release).arg(u.version);
+#endif
+    return result;
+
+}
+
+/** @brief detect devices based on usb pid / vid.
+ *  @return list with usb VID / PID values.
+ */
+QList<uint32_t> listUsbIds(void)
+{
+    QList<uint32_t> usbids;
+    // usb pid detection
+#if defined(Q_OS_LINUX) | defined(Q_OS_MACX)
+    usb_init();
+    usb_find_busses();
+    usb_find_devices();
+    struct usb_bus *b;
+    b = usb_busses;
+
+    while(b) {
+        qDebug() << "bus:" << b->dirname << b->devices;
+        if(b->devices) {
+            qDebug() << "devices present.";
+            struct usb_device *u;
+            u = b->devices;
+            while(u) {
+                uint32_t id;
+                id = u->descriptor.idVendor << 16 | u->descriptor.idProduct;
+                if(id) usbids.append(id);
+                u = u->next;
+            }
+        }
+        b = b->next;
+    }
+#endif
+
+#if defined(Q_OS_WIN32)
+    HDEVINFO deviceInfo;
+    SP_DEVINFO_DATA infoData;
+    DWORD i;
+
+    // Iterate over all devices
+    // by doing it this way it's unneccessary to use GUIDs which might be not
+    // present in current MinGW. It also seemed to be more reliably than using
+    // a GUID.
+    // See KB259695 for an example.
+    deviceInfo = SetupDiGetClassDevs(NULL, NULL, NULL, DIGCF_ALLCLASSES | DIGCF_PRESENT);
+
+    infoData.cbSize = sizeof(SP_DEVINFO_DATA);
+
+    for(i = 0; SetupDiEnumDeviceInfo(deviceInfo, i, &infoData); i++) {
+        DWORD data;
+        LPTSTR buffer = NULL;
+        DWORD buffersize = 0;
+
+        // get device desriptor first
+        // for some reason not doing so results in bad things (tm)
+        while(!SetupDiGetDeviceRegistryProperty(deviceInfo, &infoData,
+            SPDRP_DEVICEDESC,&data, (PBYTE)buffer, buffersize, &buffersize)) {
+            if(GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+                if(buffer) free(buffer);
+                // double buffer size to avoid problems as per KB888609
+                buffer = (LPTSTR)malloc(buffersize * 2);
+            }
+            else {
+                break;
+            }
+        }
+
+        // now get the hardware id, which contains PID and VID.
+        while(!SetupDiGetDeviceRegistryProperty(deviceInfo, &infoData,
+            SPDRP_HARDWAREID,&data, (PBYTE)buffer, buffersize, &buffersize)) {
+            if(GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+                if(buffer) free(buffer);
+                // double buffer size to avoid problems as per KB888609
+                buffer = (LPTSTR)malloc(buffersize * 2);
+            }
+            else {
+                break;
+            }
+        }
+
+        unsigned int vid, pid, rev;
+        if(_stscanf(buffer, _TEXT("USB\\Vid_%x&Pid_%x&Rev_%x"), &vid, &pid, &rev) != 3) {
+            qDebug() << "Error getting USB ID -- possibly no USB device";
+        }
+        else {
+            uint32_t id;
+            id = vid << 16 | pid;
+            usbids.append(id);
+            qDebug("VID: %04x PID: %04x", vid, pid);
+        }
+        if(buffer) free(buffer);
+    }
+    SetupDiDestroyDeviceInfoList(deviceInfo);
+
+#endif
+    return usbids;
+}
