@@ -972,7 +972,26 @@ target/arm/tcc77x/debug-tcc77x.c
 target/arm/tcc77x/pcm-tcc77x.c
 #endif /* BOOTLOADER */
 #endif /* SIMULATOR */
-#endif /* LOGIK_DAX */
+#endif /* SANSA_M200 */
+
+#ifdef SANSA_C100
+#ifndef SIMULATOR
+target/arm/tcc77x/adc-tcc77x.c
+target/arm/tcc77x/ata-nand-tcc77x.c
+target/arm/tcc77x/kernel-tcc77x.c
+target/arm/tcc77x/c100/lcd-S6B33B2.c
+target/arm/tcc77x/powermgmt-tcc77x.c
+target/arm/tcc77x/system-tcc77x.c
+target/arm/tcc77x/timer-tcc77x.c
+target/arm/tcc77x/usb-tcc77x.c
+target/arm/tcc77x/c100/button-c100.c
+target/arm/tcc77x/c100/power-c100.c
+#ifndef BOOTLOADER
+target/arm/tcc77x/debug-tcc77x.c
+target/arm/tcc77x/pcm-tcc77x.c
+#endif /* BOOTLOADER */
+#endif /* SIMULATOR */
+#endif /* SANSA_C100 */
 
 #ifdef IAUDIO_7
 #ifndef SIMULATOR

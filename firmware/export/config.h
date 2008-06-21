@@ -51,6 +51,7 @@
 #define DSC25          25
 #define DM320         320
 #define IMX31L         31
+#define TCC770        770
 #define TCC771L       771
 #define TCC773L       773
 #define TCC7801      7801
@@ -83,6 +84,7 @@
 #define SANSA_M200_PAD     25
 #define CREATIVEZV_PAD     26
 #define PHILIPS_SA9200_PAD 27
+#define SANSA_C100_PAD     28
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -122,6 +124,7 @@
 #define LCD_TL0350A  23 /* as used by the iAudio M3 remote, treated as main LCD */
 #define LCD_COWOND2  24 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
 #define LCD_SA9200   25 /* as used by the Philips SA9200 */
+#define LCD_S6B33B2  26 /* as used by the Sansa c100 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -262,6 +265,8 @@
 #include "config-creativezv.h"
 #elif defined(PHILIPS_SA9200)
 #include "config-sa9200.h"
+#elif defined(SANSA_C100)
+#include "config-c100.h"
 #else
 /* no known platform */
 #endif
@@ -391,7 +396,7 @@
 #endif
 
 /* define for all cpus from TCC77X family */
-#if (CONFIG_CPU == TCC771L) || (CONFIG_CPU == TCC773L)
+#if (CONFIG_CPU == TCC771L) || (CONFIG_CPU == TCC773L) || (CONFIG_CPU == TCC770)
 #define CPU_TCC77X
 #endif
 

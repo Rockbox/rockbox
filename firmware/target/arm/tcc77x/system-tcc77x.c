@@ -61,15 +61,19 @@ static void gpio_init(void)
     GPIOD_FUNC = 0;
     GPIOD_DIR = 0x3f0;
     GPIOD = 0xe0;
+	
     GPIOE_FUNC = 0;
     GPIOE_DIR = 0xe0;
     GPIOE = 0;
+	
     GPIOA_FUNC = 0;
     GPIOA_DIR = 0xffff1000;   /* 0 - 0xf000 */
     GPIOA = 0x1080;
+	
     GPIOB_FUNC = 0x16a3;
     GPIOB_DIR = 0x6ffff;
     GPIOB = 0;
+	
     GPIOC_FUNC = 1;
     GPIOC_DIR = 0x03ffffff;  /* mvn r2, 0xfc000000 */
     GPIOC = 0;
@@ -98,6 +102,28 @@ static void gpio_init(void)
 static void gpio_init(void)
 {
     /* TODO - Implement for M200 */
+}
+#elif defined(SANSA_C100)
+static void gpio_init(void)
+{
+    /* Do what the original firmware does */
+    GPIOA_FUNC = 0;
+    GPIOB_FUNC = 0x16A3;
+    GPIOC_FUNC = 1;
+    GPIOD_FUNC |= 2; 
+    GPIOE_FUNC = 0;
+	
+    GPIOA_DIR = 0xFFFF0E00;  
+    GPIOB_DIR = 0x6FFFF; 
+    GPIOC_DIR = 0x03FFFFFF; 
+    GPIOD_DIR = 0x3F7; 
+    GPIOE_DIR = 0x9B; 
+    
+    GPIOA = 0x80; 
+    GPIOB = 0;
+    GPIOC = 0;
+    GPIOD |= 0xC0; 
+    GPIOE = 0x9B; 
 }
 #endif
 
@@ -158,7 +184,7 @@ http://infocenter.arm.com/help/topic/com.arm.doc.ddi0201d/DDI0201D_arm946es_r1p1
         "mcr     p15, 0, r0, c6, c0, 0  \n\t"
         "mcr     p15, 0, r0, c6, c0, 1  \n\t"
 
-#ifdef LOGIK_DAX
+#if defined(LOGIK_DAX) || defined(SANSA_C100)
         /* Address region 1 - addr 0x2fff0000, size=64KB, enabled*/
         "ldr     r0, =0x2fff001f        \n\t"
 #elif defined(IAUDIO_7)
@@ -208,7 +234,7 @@ http://infocenter.arm.com/help/topic/com.arm.doc.ddi0201d/DDI0201D_arm946es_r1p1
         "mcr     p15, 0, r0, c6, c7, 0  \n\t"
         "mcr     p15, 0, r0, c6, c7, 1  \n\t"
 
-
+		
         /* Register 5 - Access Permission Registers */
 
         "ldr     r0, =0xffff            \n\t"
@@ -218,9 +244,9 @@ http://infocenter.arm.com/help/topic/com.arm.doc.ddi0201d/DDI0201D_arm946es_r1p1
         "mov     r0, #0xa7              \n\t"
         "mcr     p15, 0, r0, c3, c0, 0  \n\t"  /* set write buffer control register */
 
-#ifdef LOGIK_DAX
+#if defined(LOGIK_DAX) || defined(SANSA_C100)
         "mov     r0, #0xa5              \n\t"
-#elif defined(IAUDIO_7) || defined(SANSA_M200)
+#elif defined(IAUDIO_7) || defined(SANSA_M200) 
         "mov     r0, #0xa7              \n\t"
 #elif
     #error NOT DEFINED FOR THIS TARGET!

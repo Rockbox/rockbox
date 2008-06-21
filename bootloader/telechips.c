@@ -61,13 +61,14 @@ void show_debug_screen(void)
     int power_count = 0;
     int count = 0;
     bool do_power_off = false;
-
-    lcd_puts_scroll(0,0,"this is a very long line to test scrolling");
+	
+    /*lcd_puts_scroll(0,0,"this is a very long line to test scrolling");*/
     while(!do_power_off) {
+	
         line = 1;
         button = button_get(false);
-
-        /* Power-off if POWER button has been held for a long time
+		
+       /* Power-off if POWER button has been held for a long time
            This loop is currently running at about 100 iterations/second
          */
         if (button & POWEROFF_BUTTON) {
@@ -77,19 +78,25 @@ void show_debug_screen(void)
         } else {
             power_count = 0;
         }
-
-        printf("Btn: 0x%08x",button);
+		    
+        if (button & BUTTON_SELECT){
+		    _backlight_off();
+        }
+        else{
+            _backlight_on();
+        }
+		
+        /*printf("Btn: 0x%08x",button);
         printf("Tick: %d",current_tick);
-
         printf("GPIOA: 0x%08x",GPIOA);
         printf("GPIOB: 0x%08x",GPIOB);
         printf("GPIOC: 0x%08x",GPIOC);
         printf("GPIOD: 0x%08x",GPIOD);
-//        printf("GPIOE: 0x%08x",GPIOE);
+        printf("GPIOE: 0x%08x",GPIOE);*/
 
 #if 0
         int i;
-        for (i = 0; i<4; i++)
+        for (i = 1; i<4; i++)
         {
             printf("ADC%d: 0x%04x",i,adc_read(i));
         }
@@ -109,6 +116,7 @@ void show_debug_screen(void)
 
     printf("(NOT) POWERED OFF");
     while (true);
+	
 }
 #else /* !CPU_TCC77X */
 void show_debug_screen(void)

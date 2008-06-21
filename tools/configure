@@ -671,7 +671,7 @@ cat <<EOF
  31) M5/M5L            41) Gigabeat S         51) Sansa e200R
  32) 7                                        52) Sansa c200
  33) Cowon D2                                 53) Sansa m200
- 34) M3/M3L
+ 34) M3/M3L                                   54) Sansa c100
 
  ==Tatung==            ==Olympus==            ==Logik==
  60) Elio TPJ-1022     70) M:Robe 500         80) DAX 1GB MP3/DAB
@@ -1627,7 +1627,27 @@ fi
     t_manufacturer="tcc77x"
     t_model="m200"
     ;;
-	
+
+   54|c100)
+    target_id=42 
+    modelname="c100" 
+    target="-DSANSA_C100" # The #define used in firmware/export/config.h for conditional compilation     
+    memory=32  # how many megabytes of RAM
+    arm946cc # Which compiler to use, see the beginning of the file
+    tool="$rootdir/tools/scramble -add=c100" # Which command to use for creating a rockbox binary to be loaded by the bootloader
+	boottool="$rootdir/tools/scramble -tcc=crc"
+    bootoutput="player.rom"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0" # How to create a monochrome bitmap
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4" # How to create a native bitmap
+    output="rockbox.c100" # The name of the Rockbox binary file
+    appextra="recorder:gui" # What directories in the apps/ tree to include in compilation
+    plugins="" # Does it support plugins?
+    toolset=$tccbitmaptools
+    t_cpu="arm"
+    t_manufacturer="tcc77x"
+    t_model="c100"
+    ;;
+
    60|tpj1022)
     target_id=25
     modelname="tpj1022"
