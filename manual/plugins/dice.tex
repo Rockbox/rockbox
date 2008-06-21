@@ -1,28 +1,21 @@
 \subsection{Dice}
-Dice is a simple dice rolling simulator. You can select number and type of dice
-to roll, it shows individual numbers as well as the total of the rolled
-dice.
+Dice is a simple dice rolling simulator. Select number and type of dice to roll
+in a menu and start by choosing ``Roll Dice''. The result is shown as individual
+numbers as well as the total of the rolled dice.
 
 \begin{table}
     \begin{btnmap}{}{}
-    \ButtonLeft/\ButtonRight 
-        & Pick between type and number of dice\\
-    \opt{PLAYER_PAD}{\ButtonPlay/\ButtonStop}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,MROBE100_PAD}
-        {\ButtonUp/\ButtonDown}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
-        & Select number of sides or number of dice\\
-    \opt{PLAYER_PAD}{\ButtonOn}
-    \opt{RECORDER_PAD}{\ButtonOn/\ButtonPlay}
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn/\ButtonSelect}
-    \opt{IPOD_4G_PAD,IPOD_4G_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonSelect}
-    \opt{IAUDIO_X5_PAD}{\ButtonSelect/\ButtonPlay}
-        & Roll dice\\
-    \opt{PLAYER_PAD}{\ButtonMenu}
+    \opt{GIGABEAT_PAD}{\ButtonA}
+    \opt{PLAYER_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,MROBE100_PAD}{\ButtonPlay}
+    \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonUp}
+        & Roll dice again\\
+    \opt{PLAYER_PAD}{\ButtonStop}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long press on \ButtonPlay}
-    \opt{IAUDIO_x5_PAD,SANSA_E200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu+\ButtonSelect}
+    \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD%
+        ,IRIVER_H10_PAD}{\ButtonPower}
         & Quit\\
     \end{btnmap}
 \end{table}
