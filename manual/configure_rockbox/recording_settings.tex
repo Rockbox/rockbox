@@ -36,7 +36,7 @@
     Choose which format to save your recording in. The available choices are
     the two uncompressed formats \setting{PCM Wave} and \setting{AIFF}, the
     losslessly compressed \setting{WavPack} and the lossy
-    \setting{MPEG Layer 3}.
+	\setting{MPEG Layer 3}.
 
   \section{Encoder Settings}
     This sets the bitrate when using the \setting{MPEG Layer 3} format. And has
@@ -133,9 +133,96 @@
     Options: \setting{Off}, \setting{Main unit only},
     \setting{Main and remote unit}, \setting{Remote unit only}.
 }
-  \section{Trigger}
-    \fixme{Add description of triggered recording.}
-
+\section{Trigger}
+  When you record a source you often are only interested in the sound and not
+  the silence in between. The recording trigger provides you with a
+  tool to automatically distinguish between sound and silence and record the
+  sound only.  Unfortunately it is not very easy to make this distinction between
+  silence and sound because you hardly ever encounter real silence. There always
+  are background noises. What is considered as background noise depends on the
+  situation. For example during a lecture the very low noise of rustling paper
+  might be considered as background noise. During a rock concert the murmur of
+  the audience might be concidered background noise which is much louder compared
+  to rustling paper. Also the duration of the signal matters. When you record
+  speech you want to record every syllable. When you record live music you may
+  not be interested in that chord the guitarist strokes for two minutes before
+  the show to verify his amp is turned on. The trigger features numerous
+  parameters to adapt its behaviour to the desired situation.
+  \begin{description}
+  \item[Trigger]
+	This parameter specifies the trigger mode.  When set to \setting{Off}
+	the recording must be started manually and apart from the Prerecord time no
+	other parameter has any effect.  \setting{Once} will have the trigger start
+	one recording only; after the recording has finished the input signal will
+	not start another recording. \setting{Repeat} will have the trigger start 
+	multiple recordings.
+	
+  \item[Trigtype]
+    \fixme{Add description of Trigtype}
+	Options: \setting{Stop}, \setting{Pause}, \setting{New File}.
+	
+  \item[Prerecord Time]
+    This specifies the time that is included into the recording before the
+	trigger event occurs. This is very useful if you record a signal that fades
+	in. Usually you want to set the prerecord time >= start duration. That
+	ensures that you record the entire sound. Strictly speaking the prerecord
+	time is not a special parameter of the trigger. It is available during normal
+	recordings too.  
+	
+  \item[Start Above]
+	The start threshold defines the minimal volume a sound must have to start the
+	recording. It is displayed numerically in the line "Start Above". Note that
+	the unit of the threshold depends on the settings of the peakmeter. (i.e.
+	When the peakmeter displays db you can adjust the level in db and when the
+	peakmeter is set to linear the threshold is displayed as percentage.) In the
+	peakmeter at the bottom of the screen the start threshold is displayed
+	graphically by a little triangle pointing to the right. There are two special
+	values. The value \setting{Off} turns the start condition off.  With this
+	setting you have to start the recording manually and the trigger only stops
+	the recording according to the stop condition. The setting \setting{-inf}
+	sets the trigger to the absolute minimum. This setting only makes sense when
+	you record via a digital input as even the noise of the device itself would
+	exceed this threshold immediately.
+	
+  \item[for at least]
+	The start duration defines the minimal duration that a signal must exceed the
+	start threshold to start the recording. Depending on your situation you may
+	want to set this setting to 0 (e.g. when copying a song from a commercial
+	medium) or to quite big values. Because sound is not continuous by nature
+	(think of percussion) neglectable dropouts are tolerated during this start
+	duration.
+	
+  \item[Stop Below]
+	When the sound level drops below the stop threshold the recording is stopped.
+	It is displayed numerically in the line "Stop Below". Just like the start
+	threshold the unit of the stop threshold depends on the settings of the peak
+	meter. There's also a small triangular marker in the peak meter at the bottom
+	of the screen. In contrast to the start threshold marker it points to the
+	left. The value \setting{Off} turns the stop condition off. With this setting you
+	have to stop the recording manually.
+	
+  \item[for at least]
+    This time specifies the duration the signal must drop below the stop
+	threshold to stop the recording. By selecting high values you can ensure
+	that, for example, trailing fade-outs are recorded entirely.
+	
+  \item[Presplit Gap]
+    When the signal drops below the stop threshold for the time specified by the
+	presplit gap a new recording may be started when the signal raises above the
+	start threshold. Thus the value of the presplit gap should be smaller than
+	the stop hold time. Otherwise the recording would stop anyway and the
+	presplit gap has no effect. For most uses I recommend to set this parameter
+	equal to the stop hold time. Sometimes you may encounter a sound source (e.g.
+	a CD) where the songs have fade outs and hardly any gaps between the tracks.
+	Here you can set the stop hold time to long values to ensure that all fade
+	outs are recorded completely. By specifying a short presplit gap you still
+	can split the recording into seperate tracks whenever the trigger start
+	condition is met.
+	
+  \end{description}
+  
+More information can be found at \wikilink{VolumeTriggeredRecording}.
+  
 \opt{h1xx,h300}{%
   \section{Automatic Gain Control}
     The \setting{Automatic Gain Control} has five different presets for
@@ -168,3 +255,5 @@
     This setting controls how long the level is too loud or soft before the
     \setting{Automatic Gain Control} kicks in.
 }%
+
+
