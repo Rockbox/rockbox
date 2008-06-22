@@ -11645,3 +11645,37 @@
     recording: "Pysäytä nauhoitus ja sammuta"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCHPAD_SENSITIVITY
+  desc: touchpad sensitivity setting
+  user: 
+  <source>
+    *: none
+    gigabeatf: "Touchpad Sensitivity"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Kosketuslevyn herkkyys"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Kosketuslevyn herkkyys"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIGH
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "High"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Suuri"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Suuri"
+  </voice>
+</phrase>
