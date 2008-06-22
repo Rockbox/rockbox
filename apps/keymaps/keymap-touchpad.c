@@ -67,6 +67,15 @@ static const struct button_mapping button_context_standard[]  = {
 }; /* button_context_standard */
 
 static const struct button_mapping button_context_wps[]  = {
+    
+    { ACTION_WPS_SKIPNEXT,    BUTTON_MIDRIGHT|BUTTON_REL,        BUTTON_MIDRIGHT },
+    { ACTION_WPS_SKIPPREV,    BUTTON_MIDLEFT|BUTTON_REL,         BUTTON_MIDLEFT },
+
+    { ACTION_WPS_SEEKBACK,    BUTTON_MIDLEFT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_WPS_SEEKFWD,     BUTTON_MIDRIGHT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_WPS_STOPSEEK,    BUTTON_MIDLEFT|BUTTON_REL,         BUTTON_MIDLEFT|BUTTON_REPEAT },
+    { ACTION_WPS_STOPSEEK,    BUTTON_MIDRIGHT|BUTTON_REL,        BUTTON_MIDRIGHT|BUTTON_REPEAT },
+    
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_WPS)
 }; /* button_context_wps */
 

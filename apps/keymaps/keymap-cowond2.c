@@ -42,11 +42,14 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_NEXT,        BUTTON_PLUS,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,  BUTTON_PLUS|BUTTON_REPEAT,  BUTTON_NONE },
 
-    { ACTION_STD_OK,          BUTTON_MENU|BUTTON_REL,     BUTTON_NONE },
-    { ACTION_STD_MENU,        BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_OK,          BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },
+    { ACTION_STD_CANCEL,      BUTTON_POWER,               BUTTON_NONE },    
+    { ACTION_STD_MENU,        BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU },
+    
    // { ACTION_STD_QUICKSCREEN, BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_STD_CONTEXT,     BUTTON_PLUS|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_STD_CANCEL,      BUTTON_POWER,               BUTTON_NONE },
+    
+    
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
@@ -55,9 +58,13 @@ static const struct button_mapping button_context_wps[]  = {
 
     { ACTION_WPS_VOLDOWN,       BUTTON_MINUS,                    BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,       BUTTON_MINUS|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_WPS_VOLUP,         BUTTON_PLUS,                      BUTTON_NONE },
-    { ACTION_WPS_VOLUP,         BUTTON_PLUS|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_WPS_VOLUP,         BUTTON_PLUS,                     BUTTON_NONE },
+    { ACTION_WPS_VOLUP,         BUTTON_PLUS|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,          BUTTON_MENU },
+    { ACTION_WPS_CONTEXT,       BUTTON_MENU|BUTTON_REPEAT,       BUTTON_MENU },
+    
+    { ACTION_WPS_STOP,          BUTTON_POWER|BUTTON_REL,         BUTTON_POWER },
+    
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
