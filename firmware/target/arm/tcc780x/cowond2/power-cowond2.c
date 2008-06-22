@@ -22,6 +22,7 @@
 #include "power.h"
 #include "pcf50606.h"
 #include "button-target.h"
+#include "tuner.h"
 
 #ifndef SIMULATOR
 
@@ -69,7 +70,6 @@ void EXT3(void)
     unsigned char data[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
 
     /* Clear pending interrupts from pcf50606 */
-    int fiq_status = disable_fiq_save();
     pcf50606_read_multiple(0x02, data, 3);
 
     if (data[0] & 0x04)
@@ -87,7 +87,6 @@ void EXT3(void)
         /* Touchscreen event, do something about it */
         button_set_touch_available();
     }
-    restore_fiq(fiq_status);
 }
 #endif
 

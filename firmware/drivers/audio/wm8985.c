@@ -86,18 +86,6 @@
 #define OUT4MIX     0x39
 #define BIASCTL     0x3d
 
-/* Register settings for the supported samplerates: */
-#define WM8985_8000HZ      0x4d
-#define WM8985_12000HZ     0x61
-#define WM8985_16000HZ     0x55
-#define WM8985_22050HZ     0x77
-#define WM8985_24000HZ     0x79
-#define WM8985_32000HZ     0x59
-#define WM8985_44100HZ     0x63
-#define WM8985_48000HZ     0x41
-#define WM8985_88200HZ     0x7f
-#define WM8985_96000HZ     0x5d
-
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -58,   6, -25},
     [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   0},
@@ -136,19 +124,6 @@ int tenthdb2master(int db)
     }
 }
 
-/* convert tenth of dB volume (-780..0) to mixer volume register value */
-int tenthdb2mixer(int db)
-{
-    if (db < -660)                 /* 1.5 dB steps */
-        return (2640 - db) / 15;
-    else if (db < -600)            /* 0.75 dB steps */
-        return (990 - db) * 2 / 15;
-    else if (db < -460)            /* 0.5 dB steps */
-        return (460 - db) / 5;
-    else                           /* 0.25 dB steps */
-        return -db * 2 / 5;
-}
-
 /* Silently enable / disable audio output */
 void audiohw_enable_output(bool enable)
 {
@@ -157,32 +132,53 @@ void audiohw_enable_output(bool enable)
         /* TODO: reset the I2S controller into known state */
         //i2s_reset();
 
-        /* TODO: Review the power-up sequence to prevent pops (see datasheet) */
+        wmcodec_write(RESET,    0x1ff);    /* Reset */
 
-        wmcodec_write(RESET, 0x1ff);    /*Reset*/
+        wmcodec_write(BIASCTL,  0x100); /* BIASCUT = 1 */
+        wmcodec_write(OUTCTRL,  0x6);   /* Thermal shutdown */
 
-        wmcodec_write(PWRMGMT1, 0x2b);
-        wmcodec_write(PWRMGMT2, 0x180);
+        wmcodec_write(PWRMGMT1, 0x8);   /* BIASEN = 1 */
+
+        /* Volume zero, mute all outputs */
+        wmcodec_write(LOUT1VOL, 0x140);
+        wmcodec_write(ROUT1VOL, 0x140);
+        wmcodec_write(LOUT2VOL, 0x140);
+        wmcodec_write(ROUT2VOL, 0x140);
+        wmcodec_write(OUT3MIX,  0x40);
+        wmcodec_write(OUT4MIX,  0x40);
+        
+        /* DAC softmute, automute, 128OSR */
+        wmcodec_write(DACCTRL,  0x4c);
+
+        wmcodec_write(OUT4ADC,  0x2);   /* POBCTRL = 1 */
+
+        /* Enable output, DAC and mixer */
         wmcodec_write(PWRMGMT3, 0x6f);
+        wmcodec_write(PWRMGMT2, 0x180);
+        wmcodec_write(PWRMGMT1, 0xd);
+        wmcodec_write(LOUTMIX,  0x1);
+        wmcodec_write(ROUTMIX,  0x1);
 
-        wmcodec_write(AINTFCE, 0x10);
-        wmcodec_write(CLKCTRL, 0x49);
+        /* Disable clock since we're acting as slave to the SoC */
+        wmcodec_write(CLKGEN,  0x0);
+        wmcodec_write(AINTFCE, 0x10);   /* 16-bit, I2S format */
 
-        wmcodec_write(OUTCTRL, 1);
+        wmcodec_write(LDACVOL, 0x1ff);  /* Full DAC digital vol */
+        wmcodec_write(RDACVOL, 0x1ff);
 
-        /* The iPod can handle multiple frequencies, but fix at 44.1KHz
-           for now */
-        audiohw_set_sample_rate(WM8985_44100HZ);
+        wmcodec_write(OUT4ADC, 0x0);    /* POBCTRL = 0 */
 
-        wmcodec_write(LOUTMIX,0x1); /* Enable mixer */
-        wmcodec_write(ROUTMIX,0x1); /* Enable mixer */
+        sleep(HZ/2);
+
         audiohw_mute(0);
-    } else {
+    }
+    else
+    {
         audiohw_mute(1);
     }
 }
 
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_headphone_vol(int vol_l, int vol_r)
 {
     /* OUT1 */
     wmcodec_write(LOUT1VOL, 0x080 | vol_l);
@@ -194,12 +190,6 @@ void audiohw_set_lineout_vol(int vol_l, int vol_r)
     /* OUT2 */
     wmcodec_write(LOUT2VOL, vol_l);
     wmcodec_write(ROUT2VOL, 0x100 | vol_r);
-}
-
-void audiohw_set_mixer_vol(int channel1, int channel2)
-{
-    (void)channel1;
-    (void)channel2;
 }
 
 void audiohw_set_bass(int value)
@@ -231,14 +221,14 @@ void audiohw_mute(bool mute)
     if (mute)
     {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
-        wmcodec_write(DACCTRL, 0x40);
+        wmcodec_write(DACCTRL, 0x4c);
     } else {
         /* Set DACMU = 0 to soft-un-mute the audio DACs. */
-        wmcodec_write(DACCTRL, 0x0);
+        wmcodec_write(DACCTRL, 0xc);
     }
 }
 
-/* Nice shutdown of WM8758 codec */
+/* Nice shutdown of WM8985 codec */
 void audiohw_close(void)
 {
     audiohw_mute(1);
@@ -250,32 +240,13 @@ void audiohw_close(void)
     wmcodec_write(PWRMGMT2, 0x40);
 }
 
-/* Change the order of the noise shaper, 5th order is recommended above 32kHz */
-void audiohw_set_nsorder(int order)
-{
-    (void)order;
-}
-
 /* Note: Disable output before calling this function */
 void audiohw_set_sample_rate(int sampling_control)
 {
-    /**** We force 44.1KHz for now. ****/
+    /* Currently the WM8985 acts as slave to the SoC I2S controller, so no
+       setup is needed here. This seems to be in contrast to every other WM
+       driver in Rockbox, so this may need to change in the future. */
     (void)sampling_control;
-
-    /* set clock div */
-    wmcodec_write(CLKCTRL, 1 | (0 << 2) | (2 << 5));
-
-    /* setup PLL for MHZ=11.2896 */
-    wmcodec_write(PLLN, (1 << 4) | 0x7);
-    wmcodec_write(PLLK1, 0x21);
-    wmcodec_write(PLLK2, 0x161);
-    wmcodec_write(PLLK3, 0x26);
-
-    /* set clock div */
-    wmcodec_write(CLKCTRL, 1 | (1 << 2) | (2 << 5) | (1 << 8));
-
-    /* set srate */
-    wmcodec_write(SRATECTRL, (0 << 1));
 }
 
 #ifdef HAVE_RECORDING

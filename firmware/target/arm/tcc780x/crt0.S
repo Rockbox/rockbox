@@ -100,10 +100,18 @@ copied_start:
     mov    r0,#0xd2
     msr    cpsr, r0
     ldr    sp, =irq_stack
+    
     /* Set up stack for FIQ mode */ 
     mov    r0,#0xd1
     msr    cpsr, r0
     ldr    sp, =fiq_stack
+    
+    /* Load the banked FIQ mode registers with useful values here.
+       These values will be used in the FIQ handler in pcm-tcc780x.c */
+    .equ   DADO_BASE,  0xF0059020
+    
+    ldr    r10, =DADO_BASE
+    ldr    r11, =dma_play_data
 
     /* Let abort and undefined modes use IRQ stack */
     mov    r0,#0xd7
