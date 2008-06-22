@@ -37,7 +37,7 @@
    #if defined(CPU_COLDFIRE)
       // do nothing
    #elif defined(CPU_ARM)
-      #define OPTIMIZE_FOR_SPEED
+      //#define OPTIMIZE_FOR_SPEED
    #else
       #define OPTIMIZE_FOR_SPEED
    #endif

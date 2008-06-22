@@ -115,8 +115,8 @@ static const MPC_SAMPLE_FORMAT  Di_opt [512] ICONST_ATTR = {
 
 #undef  D
 
-// needed to prevent from internal overflow in calculate_V
-#define OVERFLOW_FIX 1
+// needed to prevent from internal overflow in calculate_V (see below)
+#define OVERFLOW_FIX 2
 
 // V-coefficients were expanded (<<) by V_COEFFICIENT_EXPAND
 #define V_COEFFICIENT_EXPAND 27
@@ -128,6 +128,7 @@ static const MPC_SAMPLE_FORMAT  Di_opt [512] ICONST_ATTR = {
       #define MPC_MULTIPLY_V(sample, vcoef) ( MPC_SHR_RND(sample, 12) * vcoef )
       
       // pre- and postscale are used to avoid internal overflow in synthesis calculation
+      // samples are s15.0, v-coefs are 4.12 -> internal format is s19.12
       #define MPC_MULTIPLY_V_PRESCALE(sample, vcoef)  ( MPC_SHR_RND(sample, (12+OVERFLOW_FIX)) * vcoef )
       #define MPC_MULTIPLY_V_POSTSCALE(sample, vcoef) ( MPC_SHR_RND(sample, (12-OVERFLOW_FIX)) * vcoef )
       #define MPC_V_POSTSCALE(sample) (sample<<OVERFLOW_FIX)
@@ -141,6 +142,7 @@ static const MPC_SAMPLE_FORMAT  Di_opt [512] ICONST_ATTR = {
       #define MPC_MULTIPLY_V(sample, vcoef) ( (MPC_MULTIPLY_FRACT(sample, vcoef)) << (32-V_COEFFICIENT_EXPAND) )
       
       // pre- and postscale are used to avoid internal overflow in synthesis calculation
+      // samples are s15.14, v-coefs are 4.27 -> internal format is s19.12
       #define MPC_MULTIPLY_V_PRESCALE(sample, vcoef)  ( (MPC_MULTIPLY_FRACT(sample, vcoef)) << (32-V_COEFFICIENT_EXPAND-OVERFLOW_FIX) )
       #define MPC_MULTIPLY_V_POSTSCALE(sample, vcoef) ( (MPC_MULTIPLY_FRACT(sample, vcoef)) << (32-V_COEFFICIENT_EXPAND+OVERFLOW_FIX) )
       #define MPC_V_POSTSCALE(sample) (sample<<OVERFLOW_FIX)
