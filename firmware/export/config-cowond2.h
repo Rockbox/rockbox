@@ -14,7 +14,7 @@
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
-//#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_SPDIF)
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_FMRADIO)
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -38,6 +38,10 @@
 
 /* define this if you would like tagcache to build on this target */
 //#define HAVE_TAGCACHE
+
+/* FM Tuner 
+#define CONFIG_TUNER LV24020LP
+#define HAVE_TUNER_PWR_CTRL*/
 
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
