@@ -5404,10 +5404,10 @@
     *: "KB"
   </source>
   <dest>
-    *: "KB"
+    *: "KiB"
   </dest>
   <voice>
-    *: "kilobyte"
+    *: "kibibyte"
   </voice>
 </phrase>
 <phrase>
@@ -5418,10 +5418,10 @@
     *: "MB"
   </source>
   <dest>
-    *: "MB"
+    *: "MiB"
   </dest>
   <voice>
-    *: "megabyte"
+    *: "mebibyte"
   </voice>
 </phrase>
 <phrase>
@@ -5432,10 +5432,10 @@
     *: "GB"
   </source>
   <dest>
-    *: "GB"
+    *: "GiB"
   </dest>
   <voice>
-    *: "gigabyte"
+    *: "gibibyte"
   </voice>
 </phrase>
 <phrase>
@@ -10500,8 +10500,8 @@
     player: "Buf: %d.%03dMB"
   </source>
   <dest>
-    *: "Buffer: %d.%03dMB"
-    player: "Buf: %d.%03dMB"
+    *: "Buffer: %d.%03dMiB"
+    player: "Buf: %d.%03dMiB"
   </dest>
   <voice>
     *: "Buffer størrelse"
@@ -11640,11 +11640,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Stop optagelse og sluk"
   </dest>
   <voice>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Stop optagelse og sluk"
   </voice>
 </phrase>
 <phrase>
