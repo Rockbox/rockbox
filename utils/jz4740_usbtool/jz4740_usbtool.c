@@ -349,7 +349,8 @@ found:
 int filesize(FILE* fd)
 {
     int tmp;
-    tmp = fseek(fd, 0, SEEK_END);
+    fseek(fd, 0, SEEK_END);
+    tmp = ftell(fd);
     fseek(fd, 0, SEEK_SET);
     return tmp;
 }
@@ -426,6 +427,8 @@ int main(int argc, char* argv[])
                 return 7;
             }
             fclose(fd);
+            
+            fprintf(stderr, "[INFO] File size: %d bytes\n", n);
             
             jzconnect(address, buf, len, 1);
         break;
