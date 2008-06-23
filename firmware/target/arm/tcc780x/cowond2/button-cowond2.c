@@ -119,6 +119,8 @@ int button_read_device(int *data)
     int btn = BUTTON_NONE;
     int adc;
     *data = 0;
+    
+    if (button_hold()) return BUTTON_NONE;
 
     if (GPIOB & 0x4)
     {
