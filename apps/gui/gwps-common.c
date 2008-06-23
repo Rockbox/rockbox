@@ -83,7 +83,7 @@ static void gui_wps_statusbar_draw(struct gui_wps *wps, bool force)
 
 /* fades the volume */
 bool wps_fading_out = false;
-void fade(bool fade_in)
+void fade(bool fade_in, bool updatewps)
 {
     int fp_global_vol = global_settings.volume << 8;
     int fp_min_vol = sound_min(SOUND_VOLUME) << 8;
@@ -103,8 +103,9 @@ void fade(bool fade_in)
         while (fp_volume < fp_global_vol - fp_step) {
             fp_volume += fp_step;
             sound_set_volume(fp_volume >> 8);
-            FOR_NB_SCREENS(i)
-                gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+            if (updatewps)
+                FOR_NB_SCREENS(i)
+                    gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
             sleep(1);
         }
         sound_set_volume(global_settings.volume);
@@ -116,8 +117,9 @@ void fade(bool fade_in)
         while (fp_volume > fp_min_vol + fp_step) {
             fp_volume -= fp_step;
             sound_set_volume(fp_volume >> 8);
-            FOR_NB_SCREENS(i)
-                gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+            if (updatewps)
+                FOR_NB_SCREENS(i)
+                    gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
             sleep(1);
         }
         audio_pause();

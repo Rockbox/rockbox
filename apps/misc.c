@@ -697,7 +697,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         if (global_settings.fade_on_stop
             && (audio_stat & AUDIO_STATUS_PLAY))
         {
-            fade(0);
+            fade(false, false);
         }
 
         if (batt_safe) /* do not save on critical battery */
@@ -774,7 +774,7 @@ bool list_stop_handler(void)
         if (!global_settings.party_mode) 
         {
             if (global_settings.fade_on_stop)
-                fade(0);
+                fade(false, false);
             bookmark_autobookmark();
             audio_stop();
             ret = true;  /* bookmarking can make a refresh necessary */
@@ -840,7 +840,7 @@ static void car_adapter_mode_processing(bool inserted)
                 !(audio_status() & AUDIO_STATUS_PAUSE))
             {
                 if (global_settings.fade_on_stop)
-                    fade(0);
+                    fade(false, false);
                 else
                     audio_pause();
             }

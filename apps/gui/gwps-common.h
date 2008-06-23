@@ -23,7 +23,7 @@
 
 #include "gwps.h"
 
-void fade(bool fade_in);
+void fade(bool fade_in, bool updatewps);
 bool gui_wps_display(void);
 bool update_onvol_change(struct gui_wps * gwps);
 bool update(struct gui_wps *gwps);

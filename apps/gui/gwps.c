@@ -326,7 +326,7 @@ long gui_wps_show(void)
                 {
                     wps_state.paused = false;
                     if ( global_settings.fade_on_stop )
-                        fade(1);
+                        fade(true, true);
                     else
                         audio_resume();
                 }
@@ -334,7 +334,7 @@ long gui_wps_show(void)
                 {
                     wps_state.paused = true;
                     if ( global_settings.fade_on_stop )
-                        fade(0);
+                        fade(false, true);
                     else
                         audio_pause();
                     settings_save();
@@ -712,7 +712,7 @@ long gui_wps_show(void)
             status_set_audio(false);
 #endif
             if (global_settings.fade_on_stop)
-                fade(0);
+                fade(false, true);
 
             FOR_NB_SCREENS(i)
                 gui_wps[i].display->stop_scroll();
