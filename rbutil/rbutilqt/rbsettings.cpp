@@ -370,6 +370,30 @@ QString RbSettings::brand(QString plattform)
     return brand;
 }
 
+QString RbSettings::nameOfTargetId(int id)
+{
+    QString result ="";
+     // get a list of ID -> target name
+    QStringList platforms;
+    devices->beginGroup("platforms");
+    platforms = devices->childKeys();
+    devices->endGroup();
+    for(int i = 0; i < platforms.size(); i++)
+    {
+        devices->beginGroup("platforms");
+        QString target = devices->value(platforms.at(i)).toString();
+        devices->endGroup();
+        devices->beginGroup(target);
+        if(devices->value("targetid").toInt() == id)
+        {
+            result = devices->value("name").toString();
+        }
+        devices->endGroup();
+    }
+    
+    return result;
+}
+
 QMap<int, QString> RbSettings::usbIdMap()
 {
     QMap<int, QString> map;

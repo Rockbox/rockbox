@@ -180,6 +180,28 @@ QString installedVersion(QString mountpoint)
     return "";
 }
 
+int installedTargetId(QString mountpoint)
+{
+   // read rockbox-info.txt
+    QFile info(mountpoint +"/.rockbox/rockbox-info.txt");
+    if(!info.open(QIODevice::ReadOnly))
+    {
+        return -1;
+    }
+    
+    QString target, features,version;
+    while (!info.atEnd()) {
+        QString line = info.readLine();
+        
+        if(line.contains("Target id:"))
+        {
+            return line.remove("Target id:").trimmed().toInt();
+        }        
+    }
+    info.close();
+    return -1;
+
+}
 
 QString getUserName(void)
 {

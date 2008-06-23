@@ -121,6 +121,23 @@ void Install::accept()
     }
     settings->sync();
     
+    int rbTarget = installedTargetId(settings->mountpoint());
+    if(rbTarget != -1 && rbTarget != settings->curTargetId())
+    {
+        if(QMessageBox::question(this, tr("Device mismatch detected"),
+           tr("Device mismatch detected.\n\n" 
+              "Installed Rockbox is for Device: %1.\n"
+              "New Rockbox is for Device: %2.\n\n" 
+              "Do you want to continue?").arg(settings->nameOfTargetId(rbTarget),settings->curName()),
+           QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
+        {
+            logger->addItem(tr("Aborted!"),LOGERROR);
+            logger->abort();
+            return;
+        }
+    }
+    
+    
     //! check if we should backup
     if(ui.backup->isChecked())
     {

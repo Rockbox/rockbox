@@ -81,6 +81,7 @@ class RbSettings : public QObject
         QString name(QString plattform);
         QString brand(QString plattform);
         QStringList allLanguages();
+        QString nameOfTargetId(int id);
         QMap<int, QString> usbIdMap();
         QMap<int, QString> usbIdErrorMap();
         QMap<int, QString> usbIdIncompatMap();

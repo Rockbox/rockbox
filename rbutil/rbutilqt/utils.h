@@ -38,6 +38,7 @@ QString resolvePathCase(QString path);
 
 QUrl systemProxy(void);
 QString installedVersion(QString mountpoint);
+int installedTargetId(QString mountpoint);
 
 #endif
 

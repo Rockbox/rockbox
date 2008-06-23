@@ -474,8 +474,25 @@ bool RbUtilQt::installAuto()
 
     QString myversion = "r" + versmap.value("bleed_rev");
     
-    //! check if rockbox is already installed
+    // check installed Version and Target
     QString rbVersion = installedVersion(settings->mountpoint()); 
+    int rbTarget = installedTargetId(settings->mountpoint());
+    if(rbTarget != -1 && rbTarget != settings->curTargetId())
+    {
+        if(QMessageBox::question(this, tr("Target mismatch detected"),
+           tr("Target mismatch detected. \n\n"
+              "Installed target: %1.\n"
+              "New Target: %2.\n\n"
+              "Do you want to continue?").arg(settings->nameOfTargetId(rbTarget),settings->curName()),
+           QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
+        {
+            logger->addItem(tr("Aborted!"),LOGERROR);
+            logger->abort();
+            return false;
+        }
+    }
+    
+    // check version
     if(rbVersion != "")
     {
         if(QMessageBox::question(this, tr("Installed Rockbox detected"),
