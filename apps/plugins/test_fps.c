@@ -57,14 +57,12 @@ static void log_init(void)
 {
     int h;
 
-    rb->lcd_setmargins(0, 0);
     rb->lcd_getstringsize("A", NULL, &h);
     max_line = LCD_HEIGHT / h;
     line = 0;
     rb->lcd_clear_display();
     rb->lcd_update();
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_setmargins(0, 0);
     rb->lcd_remote_getstringsize("A", NULL, &h);
     remote_max_line = LCD_REMOTE_HEIGHT / h;
     remote_line = 0;

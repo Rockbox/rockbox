@@ -54,8 +54,6 @@ static struct viewport default_vp =
     .height   = LCD_HEIGHT,
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .xmargin  = 0,
-    .ymargin  = 0,
     .fg_pattern = LCD_DEFAULT_FG,
     .bg_pattern = LCD_DEFAULT_BG
 };
@@ -139,22 +137,6 @@ void lcd_set_drawinfo(int mode, unsigned fg_brightness, unsigned bg_brightness)
     lcd_set_drawmode(mode);
     lcd_set_foreground(fg_brightness);
     lcd_set_background(bg_brightness);
-}
-
-void lcd_setmargins(int x, int y)
-{
-    current_vp->xmargin = x;
-    current_vp->ymargin = y;
-}
-
-int lcd_getxmargin(void)
-{
-    return current_vp->xmargin;
-}
-
-int lcd_getymargin(void)
-{
-    return current_vp->ymargin;
 }
 
 int lcd_getwidth(void)
@@ -950,8 +932,8 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str,
         return;
 
     lcd_getstringsize(str, &w, &h);
-    xpos = current_vp->xmargin + x*w / utf8length((char *)str);
-    ypos = current_vp->ymargin + y*h;
+    xpos = x*w / utf8length((char *)str);
+    ypos = y*h;
     current_vp->drawmode = (style & STYLE_INVERT) ?
                            (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     lcd_putsxyofs(xpos, ypos, offset, str);
@@ -1003,7 +985,7 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
 
     lcd_getstringsize(string, &w, &h);
 
-    if (current_vp->width - x * 8 - current_vp->xmargin < w) {
+    if (current_vp->width - x * 8 < w) {
         /* prepare scroll line */
         char *end;
 
@@ -1016,7 +998,7 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         /* scroll bidirectional or forward only depending on the string
            width */
         if ( lcd_scroll_info.bidir_limit ) {
-            s->bidir = s->width < (current_vp->width - current_vp->xmargin) *
+            s->bidir = s->width < (current_vp->width) *
                 (100 + lcd_scroll_info.bidir_limit) / 100;
         }
         else
@@ -1035,7 +1017,7 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
         s->y = y;
         s->len = utf8length((char *)string);
         s->offset = offset;
-        s->startx = current_vp->xmargin + x * s->width / s->len;;
+        s->startx = x * s->width / s->len;;
         s->backward = false;
         lcd_scroll_info.lines++;
     }
@@ -1066,7 +1048,7 @@ void lcd_scroll_fn(void)
 
         pf = font_get(current_vp->font);
         xpos = s->startx;
-        ypos = current_vp->ymargin + s->y * pf->height;
+        ypos = s->y * pf->height;
 
         if (s->bidir) { /* scroll bidirectional */
             if (s->offset <= 0) {

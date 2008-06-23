@@ -1758,15 +1758,6 @@ static void display_playlist_count(int count, const unsigned char *fmt,
     }
     fmt = P2STR(fmt);
 
-    lcd_clear_display();
-
-#ifdef HAVE_LCD_BITMAP
-    if(global_settings.statusbar)
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
-    else
-        lcd_setmargins(0, 0);
-#endif
-
     gui_syncsplash(0, fmt, count, str(LANG_OFF_ABORT));
 }
 

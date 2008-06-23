@@ -22,10 +22,15 @@
 
 #include "status.h"
 #include "screen_access.h"
+#include "events.h"
 
 #define STATUSBAR_X_POS                         0
 #define STATUSBAR_Y_POS                         0 /* MUST be a multiple of 8 */
 #define STATUSBAR_HEIGHT                        8
+
+/* possibly a horrible misuse of the event system.
+   This is triggered when the statusbar setting changes */
+#define STATUSBAR_TOGGLE_EVENT  (EVENT_CLASS_GUI|1)
 
 struct status_info {
     int battlevel;

@@ -38,7 +38,6 @@ bool __dbg_ports(void)
     char buf[50];
     int line;
 
-    lcd_setmargins(0, 0);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 

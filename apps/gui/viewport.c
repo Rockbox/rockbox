@@ -45,8 +45,6 @@ int viewport_get_nb_lines(struct viewport *vp)
 
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 {
-    vp->xmargin = 0;
-    vp->ymargin = 0;
     vp->x = 0;
     vp->width = screens[screen].width;
     

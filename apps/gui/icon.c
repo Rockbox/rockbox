@@ -103,7 +103,7 @@ void screen_put_icon_with_offset(struct screen * display,
     int screen = display->screen_type;
     display->getstringsize((unsigned char *)"M", &width, &height);
     xpos = x*ICON_WIDTH(screen) + off_x;
-    ypos = y*height + display->getymargin() + off_y;
+    ypos = y*height + off_y;
 
     if ( height > ICON_HEIGHT(screen) )/* center the cursor */
         ypos += (height - ICON_HEIGHT(screen)) / 2;

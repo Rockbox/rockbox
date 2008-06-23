@@ -38,7 +38,6 @@ bool __dbg_hw_info(void)
     unsigned int freq;
     uint32_t regval;
 
-    lcd_setmargins(0, 0);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
@@ -158,7 +157,6 @@ bool __dbg_ports(void)
 
     uint32_t pmic_regs[ARRAYLEN(pmic_regset)];
 
-    lcd_setmargins(0, 0);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 

@@ -72,11 +72,8 @@ struct screen
     bool has_buttonbar;
 #endif
     void (*set_viewport)(struct viewport* vp);
-    void (*setmargins)(int x, int y);
     int (*getwidth)(void);
     int (*getheight)(void);
-    int (*getxmargin)(void);
-    int (*getymargin)(void);
     int (*getstringsize)(const unsigned char *str, int *w, int *h);
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
     void (*setfont)(int newfont);
@@ -154,32 +151,6 @@ struct screen
     bool (*is_backlight_on)(bool ignore_always_off);
     void (*backlight_set_timeout)(int index);
 };
-
-#ifdef HAVE_BUTTONBAR
-/*
- * Sets if the given screen has a buttonbar or not
- * - screen : the screen structure
- * - has : a boolean telling wether the current screen will have a buttonbar or not
- */
-#define screen_has_buttonbar(screen, has_btnb) \
-    (screen)->has_buttonbar=has_btnb;
-#endif
-
-/*
- * Sets the x margin in pixels for the given screen
- * - screen : the screen structure
- * - xmargin : the number of pixels to the left of the screen
- */
-#define screen_set_xmargin(screen, xmargin) \
-    (screen)->setmargins(xmargin, (screen)->getymargin());
-
-/*
- * Sets the y margin in pixels for the given screen
- * - screen : the screen structure
- * - xmargin : the number of pixels to the top of the screen
- */
-#define screen_set_ymargin(screen, ymargin) \
-    (screen)->setmargins((screen)->getxmargin(), ymargin);
 
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD)
 /*

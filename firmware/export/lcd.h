@@ -33,8 +33,6 @@ struct viewport {
     int font;
     int drawmode;
 #endif
-    int xmargin;  /* During the transition only - to be removed */
-    int ymargin;  /* During the transition only - to be removed */
 #if LCD_DEPTH > 1
     unsigned fg_pattern;
     unsigned bg_pattern;
@@ -105,9 +103,6 @@ extern void lcd_init_device(void);
 extern void lcd_backlight(bool on);
 extern int  lcd_default_contrast(void);
 extern void lcd_set_contrast(int val);
-extern void lcd_setmargins(int xmargin, int ymargin);
-extern int  lcd_getxmargin(void);
-extern int  lcd_getymargin(void);
 extern int  lcd_getwidth(void);
 extern int  lcd_getheight(void);
 extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);

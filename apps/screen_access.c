@@ -51,11 +51,8 @@ struct screen screens[NB_SCREENS] =
         .has_disk_led=true,
 #endif
         .set_viewport=&lcd_set_viewport,
-        .setmargins=&lcd_setmargins,
         .getwidth=&lcd_getwidth,
         .getheight=&lcd_getheight,
-        .getymargin=&lcd_getymargin,
-        .getxmargin=&lcd_getxmargin,
         .getstringsize=&lcd_getstringsize,
 #ifdef HAVE_LCD_BITMAP
         .setfont=&lcd_setfont,
@@ -142,11 +139,8 @@ struct screen screens[NB_SCREENS] =
         .pixel_format=LCD_REMOTE_PIXELFORMAT,
         .has_disk_led=false,
         .set_viewport=&lcd_remote_set_viewport,
-        .setmargins=&lcd_remote_setmargins,
         .getwidth=&lcd_remote_getwidth,
         .getheight=&lcd_remote_getheight,
-        .getymargin=&lcd_remote_getymargin,
-        .getxmargin=&lcd_remote_getxmargin,
         .getstringsize=&lcd_remote_getstringsize,
 #if 1 /* all remote LCDs are bitmapped so far */
         .setfont=&lcd_remote_setfont,

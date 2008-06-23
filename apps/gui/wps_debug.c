@@ -79,11 +79,6 @@ static char *get_token_desc(struct wps_token *token, struct wps_data *data,
         case WPS_TOKEN_ALIGN_RIGHT:
             snprintf(buf, bufsize, "align right");
             break;
-
-        case WPS_TOKEN_LEFTMARGIN:
-            snprintf(buf, bufsize, "left margin, value: %d",
-                    token->value.i);
-            break;
 #endif
 
         case WPS_TOKEN_SUBLINE_TIMEOUT:

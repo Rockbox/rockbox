@@ -75,7 +75,6 @@ static const struct plugin_api rockbox_api = {
     lcd_set_contrast,
     lcd_update,
     lcd_clear_display,
-    lcd_setmargins,
     lcd_getstringsize,
     lcd_putsxy,
     lcd_puts,
@@ -131,6 +130,10 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_INVERT
     lcd_set_invert_display,
 #endif /* HAVE_LCD_INVERT */
+#ifdef HAVE_LCD_ENABLE
+    lcd_set_enable_hook,
+    &button_queue,
+#endif
     bidi_l2v,
     font_get_bits,
     font_load,
@@ -158,7 +161,6 @@ static const struct plugin_api rockbox_api = {
     /* remote lcd */
     lcd_remote_set_contrast,
     lcd_remote_clear_display,
-    lcd_remote_setmargins,
     lcd_remote_puts,
     lcd_remote_puts_scroll,
     lcd_remote_stop_scroll,
@@ -216,6 +218,8 @@ static const struct plugin_api rockbox_api = {
     gui_synclist_limit_scroll,
     gui_synclist_do_button,
     gui_synclist_set_title,
+    simplelist_info_init,
+    simplelist_show_list,
 
     /* button */
     button_get,
@@ -598,13 +602,7 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
         the API gets incompatible */
-    simplelist_info_init,
-    simplelist_show_list,
 
-#ifdef HAVE_LCD_ENABLE
-    lcd_set_enable_hook,
-    &button_queue,
-#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)
@@ -620,10 +618,6 @@ int plugin_load(const char* plugin, const void* parameter)
     unsigned my_core;
 #endif
 #endif /* !SIMULATOR */
-    int xm, ym;
-#ifdef HAVE_REMOTE_LCD
-    int rxm, rym;
-#endif
 
 #if LCD_DEPTH > 1
     fb_data* old_backdrop;
@@ -705,10 +699,7 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     plugin_loaded = true;
-
-    xm = lcd_getxmargin();
-    ym = lcd_getymargin();
-    lcd_setmargins(0,0);
+    
 
 #if defined HAVE_LCD_BITMAP && LCD_DEPTH > 1
     old_backdrop = lcd_get_backdrop();
@@ -717,9 +708,6 @@ int plugin_load(const char* plugin, const void* parameter)
     lcd_update();
 
 #ifdef HAVE_REMOTE_LCD
-    rxm = lcd_remote_getxmargin();
-    rym = lcd_remote_getymargin();
-    lcd_remote_setmargins(0, 0);
     lcd_remote_clear_display();
     lcd_remote_update();
 #endif
@@ -744,8 +732,6 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif /* LCD_DEPTH */
 #endif /* HAVE_LCD_BITMAP */
 
-    /* restore margins */
-    lcd_setmargins(xm,ym);
     lcd_clear_display();
     lcd_update();
 
@@ -756,7 +742,6 @@ int plugin_load(const char* plugin, const void* parameter)
 #else
     lcd_remote_set_drawmode(DRMODE_SOLID);
 #endif
-    lcd_remote_setmargins(rxm, rym);
     lcd_remote_clear_display();
 
 

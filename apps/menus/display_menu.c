@@ -21,6 +21,7 @@
 #include <stddef.h>
 #include <limits.h>
 #include "config.h"
+#include "events.h"
 #include "lang.h"
 #include "action.h"
 #include "settings.h"
@@ -35,6 +36,7 @@
 #include "lcd.h"
 #include "lcd-remote.h"
 #include "backdrop.h"
+#include "statusbar.h"
 
 #ifdef HAVE_BACKLIGHT
 static int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
@@ -300,6 +302,7 @@ static int statusbar_callback(int action,const struct menu_item_ex *this_item)
     switch (action)
     {
         case ACTION_EXIT_MENUITEM:
+            send_event(STATUSBAR_TOGGLE_EVENT, NULL);
             /* this should be changed so only the viewports are reloaded */
             settings_apply(false);
             break;

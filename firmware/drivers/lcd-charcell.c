@@ -58,8 +58,6 @@ static struct viewport default_vp =
     .y        = 0,
     .width    = LCD_WIDTH,
     .height   = LCD_HEIGHT,
-    .xmargin  = 0,
-    .ymargin  = 0,
   };
 
 static struct viewport* current_vp = &default_vp;
@@ -91,22 +89,6 @@ void lcd_update_viewport(void)
 }
 
 /** parameter handling **/
-
-void lcd_setmargins(int x, int y)
-{
-    current_vp->xmargin = x;
-    current_vp->ymargin = y;
-}
-
-int lcd_getxmargin(void)
-{
-    return current_vp->xmargin;
-}
-
-int lcd_getymargin(void)
-{
-    return current_vp->ymargin;
-}
 
 int lcd_getwidth(void)
 {
@@ -484,7 +466,7 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
     lcd_puts_offset(x, y, string, offset);
     len = utf8length(string);
 
-    if (current_vp->width - x - current_vp->xmargin < len) 
+    if (current_vp->width - x < len) 
     {
         /* prepare scroll line */
         char *end;
@@ -498,7 +480,7 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
         /* scroll bidirectional or forward only depending on the string width */
         if (lcd_scroll_info.bidir_limit)
         {
-            s->bidir = s->len < (current_vp->width - current_vp->xmargin) *
+            s->bidir = s->len < (current_vp->width) *
                 (100 + lcd_scroll_info.bidir_limit) / 100;
         }
         else
@@ -517,7 +499,7 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
         s->vp = current_vp;
         s->y = y;
         s->offset = offset;
-        s->startx = current_vp->xmargin + x;
+        s->startx = x;
         s->backward = false;
         lcd_scroll_info.lines++;
     }
@@ -547,7 +529,7 @@ void lcd_scroll_fn(void)
             s->offset++;
 
         xpos = s->startx;
-        ypos = current_vp->ymargin + s->y;
+        ypos = s->y;
 
         if (s->bidir)  /* scroll bidirectional */
         {

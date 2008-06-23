@@ -60,8 +60,6 @@ static struct viewport default_vp =
     .height   = LCDM(HEIGHT),
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .xmargin  = 0,
-    .ymargin  = 0,
     .fg_pattern = LCDM(DEFAULT_FG),
     .bg_pattern = LCDM(DEFAULT_BG)
 };
@@ -175,23 +173,6 @@ int LCDFN(getheight)(void)
 {
     return current_vp->height;
 }
-
-void LCDFN(setmargins)(int x, int y)
-{
-    current_vp->xmargin = x;
-    current_vp->ymargin = y;
-}
-
-int LCDFN(getxmargin)(void)
-{
-    return current_vp->xmargin;
-}
-
-int LCDFN(getymargin)(void)
-{
-    return current_vp->ymargin;
-}
-
 void LCDFN(setfont)(int newfont)
 {
     current_vp->font = newfont;
@@ -1105,8 +1086,8 @@ void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
         return;
 
     LCDFN(getstringsize)(str, &w, &h);
-    xpos = current_vp->xmargin + x*w / utf8length((char *)str);
-    ypos = current_vp->ymargin + y*h;
+    xpos = x*w / utf8length((char *)str);
+    ypos = y*h;
     current_vp->drawmode = (style & STYLE_INVERT) ?
                            (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     LCDFN(putsxyofs)(xpos, ypos, offset, str);
@@ -1158,7 +1139,7 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
 
     LCDFN(getstringsize)(string, &w, &h);
 
-    if (current_vp->width - x * 8 - current_vp->xmargin < w) {
+    if (current_vp->width - x * 8 < w) {
         /* prepare scroll line */
         char *end;
 
@@ -1171,7 +1152,7 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
         /* scroll bidirectional or forward only depending on the string
            width */
         if ( LCDFN(scroll_info).bidir_limit ) {
-            s->bidir = s->width < (current_vp->width - current_vp->xmargin) *
+            s->bidir = s->width < (current_vp->width) *
                 (100 + LCDFN(scroll_info).bidir_limit) / 100;
         }
         else
@@ -1190,7 +1171,7 @@ void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
         s->y = y;
         s->len = utf8length((char *)string);
         s->offset = offset;
-        s->startx = current_vp->xmargin + x * s->width / s->len;
+        s->startx = x * s->width / s->len;
         s->backward = false;
 
         LCDFN(scroll_info).lines++;
@@ -1222,7 +1203,7 @@ void LCDFN(scroll_fn)(void)
 
         pf = font_get(current_vp->font);
         xpos = s->startx;
-        ypos = current_vp->ymargin + s->y * pf->height;
+        ypos = s->y * pf->height;
 
         if (s->bidir) { /* scroll bidirectional */
             if (s->offset <= 0) {

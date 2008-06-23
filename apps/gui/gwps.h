@@ -136,7 +136,6 @@ enum wps_token_type {
     WPS_TOKEN_ALIGN_LEFT,
     WPS_TOKEN_ALIGN_CENTER,
     WPS_TOKEN_ALIGN_RIGHT,
-    WPS_TOKEN_LEFTMARGIN,
 
     /* Sublines */
     WPS_TOKEN_SUBLINE_TIMEOUT,

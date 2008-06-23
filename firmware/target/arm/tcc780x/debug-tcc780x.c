@@ -44,7 +44,6 @@ bool __dbg_hw_info(void)
     bool done=false;
     char buf[100];
 
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
 

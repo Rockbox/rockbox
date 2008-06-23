@@ -43,8 +43,6 @@ static struct viewport vp0 =
     .height   = 20,
     .font     = FONT_UI,
     .drawmode = DRMODE_SOLID,
-    .xmargin  = 0,
-    .ymargin  = 0,
 #if LCD_DEPTH > 1
     .fg_pattern = LCD_DEFAULT_FG,
     .bg_pattern = BGCOLOR_1,
@@ -64,8 +62,6 @@ static struct viewport vp1 =
     .height   = LCD_HEIGHT / 2,
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .xmargin  = 0,
-    .ymargin  = 0,
 #if LCD_DEPTH > 1
     .fg_pattern = LCD_DEFAULT_FG,
     .bg_pattern = LCD_DEFAULT_BG,
@@ -85,8 +81,6 @@ static struct viewport vp2 =
     .height   = (LCD_HEIGHT / 2),
     .font     = FONT_UI,
     .drawmode = DRMODE_SOLID,
-    .xmargin  = 0,
-    .ymargin  = 0,
 #if LCD_DEPTH > 1
     .fg_pattern = FGCOLOR_1,
     .bg_pattern = BGCOLOR_2,
@@ -107,8 +101,6 @@ static struct viewport vp3 =
     .height   = (LCD_HEIGHT / 4),
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .xmargin  = 0,
-    .ymargin  = 0,
 #if LCD_DEPTH > 1
     .fg_pattern = LCD_BLACK,
     .bg_pattern = LCD_WHITE,
@@ -130,8 +122,6 @@ static struct viewport rvp0 =
     .height   = LCD_REMOTE_HEIGHT - 10,
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .xmargin  = 0,
-    .ymargin  = 0,
 #if LCD_REMOTE_DEPTH > 1
     .fg_pattern = LCD_REMOTE_BLACK,
     .bg_pattern = LCD_REMOTE_LIGHTGRAY,
@@ -146,8 +136,6 @@ static struct viewport rvp1 =
     .height   = LCD_REMOTE_HEIGHT - 10,
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .xmargin  = 0,
-    .ymargin  = 0,
 #if LCD_REMOTE_DEPTH > 1
     .fg_pattern = LCD_REMOTE_DEFAULT_FG,
     .bg_pattern = LCD_REMOTE_DEFAULT_BG
@@ -253,8 +241,6 @@ static struct viewport vp0 =
     .y        = 0,
     .width    = 5,
     .height   = 1,
-    .xmargin  = 0,
-    .ymargin  = 0,
 };
 
 static struct viewport vp1 =
@@ -263,8 +249,6 @@ static struct viewport vp1 =
     .y        = 0,
     .width    = 5,
     .height   = 1,
-    .xmargin  = 0,
-    .ymargin  = 0,
 };
 
 static struct viewport vp2 =
@@ -273,8 +257,6 @@ static struct viewport vp2 =
     .y        = 1,
     .width    = LCD_WIDTH,
     .height   = 1,
-    .xmargin  = 0,
-    .ymargin  = 0,
 };
 
 

@@ -345,7 +345,6 @@ bool gui_wps_display(void)
             /* Update the values in the first (default) viewport - in case the user
                has modified the statusbar or colour settings */
 #ifdef HAVE_LCD_BITMAP
-            gui_wps[i].data->viewports[0].vp.ymargin = gui_wps[i].display->getymargin();
 #if LCD_DEPTH > 1
             if (gui_wps[i].display->depth > 1)
             {
@@ -1408,14 +1407,6 @@ static char *get_token_value(struct gui_wps *gwps,
             else
                 return NULL;
 #endif
-
-#ifdef HAVE_LCD_BITMAP
-        case WPS_TOKEN_LEFTMARGIN:
-            gwps->display->setmargins(token->value.i,
-                                      gwps->display->getymargin());
-            return NULL;
-#endif
-
         default:
             return NULL;
     }
@@ -1528,11 +1519,6 @@ static bool get_line(struct gui_wps *gwps,
     align->left = NULL;
     align->center = NULL;
     align->right = NULL;
-
-#ifdef HAVE_LCD_BITMAP
-    /* Reset margins - only bitmap targets modify them */
-    gwps->display->setmargins(0, gwps->display->getymargin());
-#endif
 
     /* Process all tokens of the desired subline */
     last_token_idx = wps_last_token_index(data, line, subline);
@@ -1800,7 +1786,7 @@ static void write_line(struct screen *display,
                                 &center_width, &string_height);
     }
 
-    left_xpos = display->getxmargin();
+    left_xpos = 0;
     right_xpos = (display->getwidth() - right_width);
     center_xpos = (display->getwidth() + left_xpos - center_width) / 2;
 
@@ -1885,7 +1871,7 @@ static void write_line(struct screen *display,
         right_width = 0;
     }
 
-    ypos = (line * string_height) + display->getymargin();
+    ypos = (line * string_height);
 
 
     if (scroll && ((left_width > scroll_width) || 
@@ -1968,7 +1954,8 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     /* reset to first subline if refresh all flag is set */
     if (refresh_mode == WPS_REFRESH_ALL)
     {
-        display->clear_display();
+        display->set_viewport(&data->viewports[0].vp);
+        display->clear_viewport();
 
         for (i = 0; i <= data->num_lines; i++)
         {
@@ -2063,7 +2050,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
                 update_line = false;
 
                 int h = font_get(data->viewports[v].vp.font)->height;
-                int peak_meter_y = display->getymargin() + (line - data->viewports[v].first_line)* h;
+                int peak_meter_y = (line - data->viewports[v].first_line)* h;
 
                 /* The user might decide to have the peak meter in the last
                     line so that it is only displayed if no status bar is

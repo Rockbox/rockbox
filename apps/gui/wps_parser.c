@@ -133,8 +133,6 @@ static int parse_viewport_display(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_viewport(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
-static int parse_leftmargin(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
 static int parse_statusbar_enable(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_statusbar_disable(const char *wps_bufptr,
@@ -273,10 +271,6 @@ static const struct wps_tag all_tags[] = {
     { WPS_TOKEN_PLAYBACK_STATUS,          "mp",  WPS_REFRESH_DYNAMIC, NULL },
 
 #ifdef HAVE_LCD_BITMAP
-    { WPS_TOKEN_LEFTMARGIN,               "m",   0, parse_leftmargin       },
-#endif
-
-#ifdef HAVE_LCD_BITMAP
     { WPS_TOKEN_PEAKMETER,                "pm", WPS_REFRESH_PEAK_METER, NULL },
 #else
     { WPS_TOKEN_PLAYER_PROGRESSBAR,       "pf",
@@ -368,6 +362,11 @@ static int parse_statusbar_enable(const char *wps_bufptr,
     (void)token; /* Kill warnings */
     wps_data->wps_sb_tag = true;
     wps_data->show_sb_on_wps = true;
+    if (wps_data->viewports[0].vp.y == 0)
+    {
+        wps_data->viewports[0].vp.y = STATUSBAR_HEIGHT;
+        wps_data->viewports[0].vp.height -= STATUSBAR_HEIGHT;
+    }
     return skip_end_of_line(wps_bufptr);
 }
 
@@ -378,6 +377,11 @@ static int parse_statusbar_disable(const char *wps_bufptr,
     (void)token; /* Kill warnings */
     wps_data->wps_sb_tag = true;
     wps_data->show_sb_on_wps = false;
+    if (wps_data->viewports[0].vp.y == STATUSBAR_HEIGHT)
+    {
+        wps_data->viewports[0].vp.y = 0;
+        wps_data->viewports[0].vp.height += STATUSBAR_HEIGHT;
+    }
     return skip_end_of_line(wps_bufptr);
 }
 
@@ -616,8 +620,6 @@ static int parse_viewport(const char *wps_bufptr,
 
     /* Set the defaults for fields not user-specified */
     vp->drawmode = DRMODE_SOLID;
-    vp->xmargin  = 0;
-    vp->ymargin  = 0;
 
     /* Work out the depth of this display */
 #ifdef HAVE_REMOTE_LCD
@@ -817,16 +819,6 @@ static int parse_progressbar(const char *wps_bufptr,
     int font_height = font_get(vp->font)->height;
     int line_y_pos = font_height*(wps_data->num_lines - 
             wps_data->viewports[wps_data->num_viewports].first_line);
-    
-    /** Remove this bit when the remove lcd margins patch goes in **/
-    bool draw_sb = global_settings.statusbar;
-
-    if (wps_data->wps_sb_tag)
-        draw_sb = wps_data->show_sb_on_wps;
-
-    if (wps_data->num_viewports == 0 && draw_sb)
-        line_y_pos += STATUSBAR_HEIGHT;
-    /** Remove the above bit when the remove lcd margins patch goes in **/
     
     if (wps_data->progressbar_count +1 >= MAX_PROGRESSBARS)
         return WPS_ERROR_INVALID_PARAM;
@@ -1105,33 +1097,6 @@ static int parse_albumart_conditional(const char *wps_bufptr,
     }
 };
 #endif /* HAVE_ALBUMART */
-
-#ifdef HAVE_LCD_BITMAP
-static int parse_leftmargin(const char *wps_bufptr, struct wps_token *token,
-                            struct wps_data *wps_data)
-{
-    const char* p;
-    const char* pend;
-    const char *newline;
-
-    (void)wps_data; /* Kill the warning */
-
-    /* valid tag looks like %m|12| */
-    if(*wps_bufptr == '|')
-    {
-        p = wps_bufptr + 1;
-        newline = strchr(wps_bufptr, '\n');
-        if(isdigit(*p) && (pend = strchr(p, '|')) && pend < newline)
-        {
-            token->value.i = atoi(p);
-            return pend - wps_bufptr + 1;
-        }
-    }
-
-    /* invalid tag syntax */
-    return WPS_ERROR_INVALID_PARAM;
-}
-#endif
 
 
 /* Parse a generic token from the given string. Return the length read */
@@ -1583,15 +1548,21 @@ bool wps_data_load(struct wps_data *wps_data,
 
     /* Initialise the first (default) viewport */
     wps_data->viewports[0].vp.x          = 0;
-    wps_data->viewports[0].vp.y          = 0;
     wps_data->viewports[0].vp.width      = display->width;
-    wps_data->viewports[0].vp.height     = display->height;
+    if (!global_settings.statusbar)
+    {
+        wps_data->viewports[0].vp.y      = 0;
+        wps_data->viewports[0].vp.height = display->height;
+    }
+    else
+    {
+        wps_data->viewports[0].vp.y      = STATUSBAR_HEIGHT;
+        wps_data->viewports[0].vp.height = display->height - STATUSBAR_HEIGHT;
+    }
 #ifdef HAVE_LCD_BITMAP
     wps_data->viewports[0].vp.font       = FONT_UI;
     wps_data->viewports[0].vp.drawmode   = DRMODE_SOLID;
 #endif
-    wps_data->viewports[0].vp.xmargin    = display->getxmargin();
-    wps_data->viewports[0].vp.ymargin    = display->getymargin();
 #if LCD_DEPTH > 1
     if (display->depth > 1)
     {

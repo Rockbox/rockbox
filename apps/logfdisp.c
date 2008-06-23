@@ -66,7 +66,6 @@ bool logfdisplay(void)
     if(!lines)
         return false;
 
-    lcd_setmargins(0, 0);
     lcd_clear_display();
     
     do {

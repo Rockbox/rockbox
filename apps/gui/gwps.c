@@ -77,19 +77,6 @@ static void gui_wps_set_disp(struct gui_wps *gui_wps, struct screen *display);
 /* connects a wps with a statusbar*/
 static void gui_wps_set_statusbar(struct gui_wps *gui_wps, struct gui_statusbar *statusbar);
 
-#ifdef HAVE_LCD_BITMAP
-static void gui_wps_set_margin(struct gui_wps *gwps)
-{
-    int offset = 0;
-    struct wps_data *data = gwps->data;
-    if(data->wps_sb_tag && data->show_sb_on_wps)
-        offset = STATUSBAR_HEIGHT;
-    else if ( global_settings.statusbar && !data->wps_sb_tag)
-        offset = STATUSBAR_HEIGHT;
-    gwps->display->setmargins(0, offset);
-}
-#endif
-
 static void prev_track(unsigned skip_thresh)
 {
     if (!wps_state.id3 || (wps_state.id3->elapsed < skip_thresh*1000)) {
@@ -152,10 +139,6 @@ long gui_wps_show(void)
     status_set_audio(true);
     status_set_param(false);
 #else
-    FOR_NB_SCREENS(i)
-    {
-        gui_wps_set_margin(&gui_wps[i]);
-    }
 #if LCD_DEPTH > 1
     show_wps_backdrop();
 #endif /* LCD_DEPTH > 1 */
@@ -298,12 +281,6 @@ long gui_wps_show(void)
 #endif
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 show_remote_wps_backdrop();
-#endif
-#ifdef HAVE_LCD_BITMAP
-                FOR_NB_SCREENS(i)
-                {
-                    gui_wps_set_margin(&gui_wps[i]);
-                }
 #endif
                 restore = true;
                 break;
@@ -558,12 +535,6 @@ long gui_wps_show(void)
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 show_remote_wps_backdrop();
 #endif
-#ifdef HAVE_LCD_BITMAP
-                FOR_NB_SCREENS(i)
-                {
-                    gui_wps_set_margin(&gui_wps[i]);
-                }
-#endif
                 restore = true;
                 break;
 #endif /* HAVE_QUICKSCREEN */
@@ -579,12 +550,6 @@ long gui_wps_show(void)
 #endif
                 if (quick_screen_f3(BUTTON_F3))
                     return SYS_USB_CONNECTED;
-#ifdef HAVE_LCD_BITMAP
-                FOR_NB_SCREENS(i)
-                {
-                    gui_wps_set_margin(&gui_wps[i]);
-                }
-#endif 
                 restore = true;
                 break;
 #endif /* BUTTON_F3 */
@@ -642,12 +607,6 @@ long gui_wps_show(void)
 #endif
 #if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
                 show_remote_wps_backdrop();
-#endif
-#ifdef HAVE_LCD_BITMAP
-                FOR_NB_SCREENS(i)
-                {
-                    gui_wps_set_margin(&gui_wps[i]);
-                }
 #endif
                 restore = true;
                 break;
@@ -812,7 +771,32 @@ void gui_sync_wps_screen_init(void)
     FOR_NB_SCREENS(i)
         gui_wps_set_disp(&gui_wps[i], &screens[i]);
 }
+#ifdef HAVE_LCD_BITMAP
+static void statusbar_toggle_handler(void *data)
+{
+    (void)data;
+    int i;
+    bool draw = global_settings.statusbar;
 
+    FOR_NB_SCREENS(i)
+    {
+        struct wps_viewport *vp = &gui_wps[i].data->viewports[0];
+        if (gui_wps[i].data->wps_sb_tag)
+            draw = gui_wps[i].data->show_sb_on_wps;
+        if (!global_settings.statusbar && !draw)
+        {
+            vp->vp.y = 0;
+            vp->vp.height = screens[i].height;
+        }
+        else
+        {
+            vp->vp.y      = STATUSBAR_HEIGHT;
+            vp->vp.height = screens[i].height - STATUSBAR_HEIGHT;
+        }
+    }
+}
+#endif
+    
 void gui_sync_wps_init(void)
 {
     int i;
@@ -826,6 +810,9 @@ void gui_sync_wps_init(void)
         gui_wps_set_data(&gui_wps[i], &wps_datas[i]);
         gui_wps_set_statusbar(&gui_wps[i], &statusbars.statusbars[i]);
     }
+#ifdef HAVE_LCD_BITMAP
+    add_event(STATUSBAR_TOGGLE_EVENT, false, statusbar_toggle_handler);
+#endif
 #if LCD_DEPTH > 1
     unload_wps_backdrop();
 #endif

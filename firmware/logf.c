@@ -59,7 +59,6 @@ static void displayremote(void)
     lcd_remote_getstringsize("A", &w, &h);
     lines = LCD_REMOTE_HEIGHT/h;
     columns = LCD_REMOTE_WIDTH/w;
-    lcd_remote_setmargins(0, 0);
     lcd_remote_clear_display();
     
     index = logfindex;

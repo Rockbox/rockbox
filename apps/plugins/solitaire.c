@@ -744,7 +744,6 @@ int solitaire_menu(bool in_game)
                 break;
 
             case 2:
-                rb->lcd_setmargins(0, 0);
                 if (solitaire_help() == HELP_USB)
                     result = MENU_USB;
                 break;
@@ -766,7 +765,6 @@ int solitaire_menu(bool in_game)
         }
     }
     menu_exit(m);
-    rb->lcd_setmargins(0, 0);
     return result;
 }
 

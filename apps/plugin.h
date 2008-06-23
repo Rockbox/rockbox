@@ -124,12 +124,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 116
+#define PLUGIN_API_VERSION 117
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 114
+#define PLUGIN_MIN_API_VERSION 117
 
 /* plugin return codes */
 enum plugin_status {
@@ -150,7 +150,6 @@ struct plugin_api {
     void (*lcd_set_contrast)(int x);
     void (*lcd_update)(void);
     void (*lcd_clear_display)(void);
-    void (*lcd_setmargins)(int x, int y);
     int  (*lcd_getstringsize)(const unsigned char *str, int *w, int *h);
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts)(int x, int y, const unsigned char *string);
@@ -220,6 +219,10 @@ struct plugin_api {
     void (*lcd_set_invert_display)(bool yesno);
 #endif /* HAVE_LCD_INVERT */
     
+#ifdef HAVE_LCD_ENABLE
+    void (*lcd_set_enable_hook)(void (*enable_hook)(void));
+    struct event_queue *button_queue;
+#endif
     unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
     const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
     struct font* (*font_load)(const char *path);
@@ -253,7 +256,6 @@ struct plugin_api {
     /* remote lcd */
     void (*lcd_remote_set_contrast)(int x);
     void (*lcd_remote_clear_display)(void);
-    void (*lcd_remote_setmargins)(int x, int y);
     void (*lcd_remote_puts)(int x, int y, const unsigned char *string);
     void (*lcd_remote_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_remote_stop_scroll)(void);
@@ -317,6 +319,9 @@ struct plugin_api {
     bool (*gui_synclist_do_button)(struct gui_synclist * lists,
                                          unsigned *action, enum list_wrap wrap);
     void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title, int icon);
+    void (*simplelist_info_init)(struct simplelist_info *info, char* title,
+           int count, void* data);
+    bool (*simplelist_show_list)(struct simplelist_info *info);
 
     /* button */
     long (*button_get)(bool block);
@@ -748,14 +753,7 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    void (*simplelist_info_init)(struct simplelist_info *info, char* title,
-                                 int count, void* data);
-    bool (*simplelist_show_list)(struct simplelist_info *info);
 
-#ifdef HAVE_LCD_ENABLE
-    void (*lcd_set_enable_hook)(void (*enable_hook)(void));
-    struct event_queue *button_queue;
-#endif
 };
 
 /* plugin header */

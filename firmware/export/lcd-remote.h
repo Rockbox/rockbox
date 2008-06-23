@@ -144,9 +144,6 @@ extern void lcd_remote_set_flip(bool yesno);
 
 extern void lcd_remote_set_drawmode(int mode);
 extern int  lcd_remote_get_drawmode(void);
-extern void lcd_remote_setmargins(int xmargin, int ymargin);
-extern int  lcd_remote_getxmargin(void);
-extern int  lcd_remote_getymargin(void);
 extern int  lcd_remote_getwidth(void);
 extern int  lcd_remote_getheight(void);
 extern void lcd_remote_setfont(int font);

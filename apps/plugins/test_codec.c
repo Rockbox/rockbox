@@ -44,7 +44,6 @@ static bool log_init(bool use_logfile)
 {
     int h;
 
-    rb->lcd_setmargins(0, 0);
     rb->lcd_getstringsize("A", NULL, &h);
     max_line = LCD_HEIGHT / h;
     line = 0;

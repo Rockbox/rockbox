@@ -68,6 +68,7 @@
 #include "action.h"
 #include "radio.h"
 #include "sound_menu.h"
+#include "viewport.h"
 
 #ifdef HAVE_RECORDING
 /* This array holds the record timer interval lengths, in seconds */
@@ -882,6 +883,8 @@ bool recording_screen(bool no_source)
 
     int base_style = STYLE_INVERT;
     int style;
+    struct viewport vp[NB_SCREENS];
+    int ymargin = global_settings.cursor_style?0:10;
 #ifdef HAVE_LCD_COLOR
     if (global_settings.cursor_style == 2) {
         base_style |= STYLE_COLORBAR;
@@ -956,11 +959,12 @@ bool recording_screen(bool no_source)
 
     FOR_NB_SCREENS(i)
     {
-        screens[i].setfont(FONT_SYSFIXED);
+        viewport_set_defaults(&vp[i], i);
+        vp[i].font = FONT_SYSFIXED;
+        screens[i].set_viewport(&vp[i]);
         screens[i].getstringsize("M", &w, &h);
-        screens[i].setmargins(global_settings.cursor_style ? 0 : w, 8);
-        filename_offset[i] = ((screens[i].height >= 80) ? 1 : 0);
-        pm_y[i] = 8 + h * (2 + filename_offset[i]);
+        filename_offset[i] = ((vp[i].height >= 80) ? 1 : 0);
+        pm_y[i] = h * (2 + filename_offset[i]);
     }
 
 #ifdef HAVE_REMOTE_LCD
@@ -968,8 +972,8 @@ bool recording_screen(bool no_source)
     {
         screens[1].clear_display();
         snprintf(buf, sizeof(buf), str(LANG_REMOTE_LCD_ON));
-        screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1,
-                            screens[1].height/(h*2) + 1, buf);
+        screens[1].puts((vp[1].width/w - strlen(buf))/2 + 1,
+                            vp[1].height/(h*2) + 1, buf);
         screens[1].update();
         gui_syncsplash(0, str(LANG_REMOTE_LCD_OFF));
     }
@@ -1363,9 +1367,8 @@ bool recording_screen(bool no_source)
 
                         FOR_NB_SCREENS(i)
                         {
+                            screens[i].set_viewport(&vp[i]);
                             screens[i].setfont(FONT_SYSFIXED);
-                            screens[i].setmargins(
-                                global_settings.cursor_style ? 0 : w, 8);
                         }
                     }
                 }
@@ -1613,7 +1616,9 @@ bool recording_screen(bool no_source)
             else
             {
                 for(i = 0; i < screen_update; i++)
-                    screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 2, buf);
+                    screens[i].putsxy(ymargin,
+                                      SYSFONT_HEIGHT*(filename_offset[i]+
+                                      PM_HEIGHT + 2), buf);
             }
 
             if(global_settings.rec_source == AUDIO_SRC_MIC)
@@ -1632,8 +1637,9 @@ bool recording_screen(bool no_source)
                 else
                 {
                     for(i = 0; i < screen_update; i++)
-                        screens[i].puts(0, filename_offset[i] +
-                                            PM_HEIGHT + 3, buf);
+                        screens[i].putsxy(ymargin,
+                                          SYSFONT_HEIGHT*(filename_offset[i] +
+                                          PM_HEIGHT + 3), buf);
                 }
             }
             else if(0
@@ -1664,8 +1670,9 @@ bool recording_screen(bool no_source)
                 else
                 {
                      for(i = 0; i < screen_update; i++)
-                         screens[i].puts(0, filename_offset[i] +
-                                             PM_HEIGHT + 3, buf);
+                         screens[i].putsxy(ymargin,
+                                           SYSFONT_HEIGHT*(filename_offset[i] +
+                                           PM_HEIGHT + 3), buf);
                 }
 
                 snprintf(buf, sizeof(buf), "%s:%s",
@@ -1688,8 +1695,9 @@ bool recording_screen(bool no_source)
                 else
                 {
                     for(i = 0; i < screen_update; i++)
-                        screens[i].puts(0, filename_offset[i] +
-                                            PM_HEIGHT + 4, buf);
+                        screens[i].putsxy(ymargin, 
+                                          SYSFONT_HEIGHT*(filename_offset[i] +
+                                          PM_HEIGHT + 4), buf);
                 }
             }
 #ifdef HAVE_LCD_COLOR
@@ -1721,7 +1729,7 @@ bool recording_screen(bool no_source)
                     break;
                 } /* end switch */
 #ifdef HAVE_AGC
-                if (screens[i].height < h * (2 + filename_offset[i] +
+                if (vp[i].height < h * (2 + filename_offset[i] +
                                              PM_HEIGHT + line[i]))
                 {
                     line[i] -= 1;
@@ -1785,8 +1793,9 @@ bool recording_screen(bool no_source)
             {
                 for(i = 0; i < screen_update; i++) {
                     if (display_agc[i]) {
-                        screens[i].puts(0, filename_offset[i] +
-                                        PM_HEIGHT + line[i], buf);
+                        screens[i].putsxy(ymargin, 
+                                          SYSFONT_HEIGHT*(filename_offset[i] +
+                                          PM_HEIGHT + line[i]), buf);
                     }
                 }
             }
@@ -1859,7 +1868,9 @@ bool recording_screen(bool no_source)
 
             for(i = 0; i < screen_update; i++)
             {
+                screens[i].set_viewport(NULL);
                 gui_statusbar_draw(&(statusbars.statusbars[i]), true);
+                screens[i].set_viewport(&vp[i]);
                 peak_meter_screen(&screens[i], pm_x, pm_y[i], h*PM_HEIGHT);
                 screens[i].update();
             }
@@ -1867,11 +1878,11 @@ bool recording_screen(bool no_source)
             /* draw the trigger status */
             FOR_NB_SCREENS(i)
             {
-                trig_width[i] = ((screens[i].height < 64) ||
-                                ((screens[i].height < 72) && (PM_HEIGHT > 1))) ?
+                trig_width[i] = ((vp[i].height < 64) ||
+                                ((vp[i].height < 72) && (PM_HEIGHT > 1))) ?
                                   screens[i].width - 14 * w : screens[i].width;
                 trig_xpos[i] = screens[i].width - trig_width[i];
-                trig_ypos[i] =  ((screens[i].height < 72) && (PM_HEIGHT > 1)) ?
+                trig_ypos[i] =  ((vp[i].height < 72) && (PM_HEIGHT > 1)) ?
                                   h*2 :
                                   h*(1 + filename_offset[i] + PM_HEIGHT +
                                      line[i]

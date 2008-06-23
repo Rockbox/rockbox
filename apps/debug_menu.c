@@ -226,7 +226,6 @@ static bool dbg_audio_thread(void)
     char buf[32];
     struct audio_debug d;
 
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
 
     while(1)
@@ -299,7 +298,6 @@ static bool dbg_buffering_thread(void)
 
     tick_add_task(dbg_audio_task);
 
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     while(!done)
     {
@@ -521,7 +519,6 @@ static bool dbg_hw_info(void)
 
     system_memory_guard(oldmode);  /* re-enable memory guard */
 
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
 
@@ -572,7 +569,6 @@ static bool dbg_hw_info(void)
 
     system_memory_guard(oldmode);  /* re-enable memory guard */
 
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
 
@@ -623,7 +619,6 @@ static bool dbg_hw_info(void)
                           (PP_VER1 >> 24) & 0xff, (PP_VER1 >> 16) & 0xff,
                           (PP_VER1 >> 8) & 0xff, (PP_VER1) & 0xff, '\0' };
 
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
 
@@ -660,7 +655,6 @@ static bool dbg_hw_info(void)
                           (PP_VER1 >> 8) & 0xff, PP_VER1 & 0xff, '\0' };
 
 
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
 
@@ -823,7 +817,6 @@ static bool dbg_spdif(void)
     int spdif_source = spdif_get_output_source(&spdif_src_on);
     spdif_set_output_source(AUDIO_SRC_SPDIF IF_SPDIF_POWER_(, true));
 
-    lcd_setmargins(0, 0);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
@@ -1033,7 +1026,6 @@ bool dbg_ports(void)
     int adc_battery_voltage, adc_battery_level;
 
     lcd_setfont(FONT_SYSFIXED);
-    lcd_setmargins(0, 0);
     lcd_clear_display();
 
     while(1)
@@ -1075,7 +1067,6 @@ bool dbg_ports(void)
     char buf[128];
     int line;
 
-    lcd_setmargins(0, 0);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
@@ -1151,7 +1142,6 @@ bool dbg_ports(void)
     char buf[128];
     int line;
 
-    lcd_setmargins(0, 0);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
@@ -1248,7 +1238,6 @@ bool dbg_ports(void)
     char buf[128];
     int line;
 
-    lcd_setmargins(0, 0);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
@@ -1374,7 +1363,6 @@ static bool dbg_pcf(void)
     int line;
 
 #ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
 #endif
     lcd_clear_display();
@@ -1429,7 +1417,6 @@ static bool dbg_cpufreq(void)
     int button;
 
 #ifdef HAVE_LCD_BITMAP
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
 #endif
     lcd_clear_display();
@@ -1559,7 +1546,6 @@ static bool view_battery(void)
     unsigned short maxv, minv;
     char buf[32];
 
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
 
     while(1)
@@ -2316,7 +2302,6 @@ static bool cpu_boost_log(void)
     int lines = LCD_HEIGHT/SYSFONT_HEIGHT;
     char *str;
     bool done;
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     str = cpu_boost_log_getlog_first();
     while (i < count)
@@ -2369,7 +2354,6 @@ static bool dbg_scrollwheel(void)
     char buf[64];
     unsigned int speed;
 
-    lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
 
     while (1)
