@@ -80,12 +80,12 @@ void EncExesGui::accept(void)
     
     // sync settings
     settings->sync();
-    this->close();
+    this->done(0);
 }
 
 void EncExesGui::reject(void)
 {
-    this->close();
+    this->done(0);
 }
 
 void EncExesGui::reset()
@@ -153,12 +153,12 @@ void EncRbSpeexGui::accept(void)
 
     // sync settings
     settings->sync();
-    this->close();
+    this->done(0);
 }
 
 void EncRbSpeexGui::reject(void)
 {
-    this->close();
+    this->done(0);
 }
 
 void EncRbSpeexGui::reset()
@@ -168,3 +168,4 @@ void EncRbSpeexGui::reset()
     ui.complexity->setValue(defaultComplexity);
     ui.narrowband->setChecked(Qt::Unchecked); 
 }
+

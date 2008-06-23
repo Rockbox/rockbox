@@ -88,18 +88,18 @@ void TTSSapiGui::accept(void)
         settings->setTTSUseSapi4(false);
     // sync settings
     settings->sync();
-    
-    this->close();
+
+    this->done(0);
 }
 
 void TTSSapiGui::reject(void)
 {
-    this->close();
+    this->done(0);
 }
 
 void TTSSapiGui::updateVoices(QString language)
 {
-    QStringList Voices = m_sapi->getVoiceList(language);  
+    QStringList Voices = m_sapi->getVoiceList(language);
     ui.voicecombo->clear();
     ui.voicecombo->addItems(Voices);    
 
@@ -182,12 +182,12 @@ void TTSExesGui::accept(void)
     // sync settings
     settings->sync();
     
-    this->close();
+    this->done(0);
 }
 
 void TTSExesGui::reject(void)
 {
-    this->close();
+    this->done(0);
 }
 
 
