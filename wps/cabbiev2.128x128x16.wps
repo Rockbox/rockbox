@@ -11,20 +11,34 @@
 %xl|F|playmode-128x128x16.bmp|111|110|5|
 %Cl|4|12|s60|s60|
 %pb|pb-128x128x16.bmp|3|87|122|6|
-#NowPlaying
-%?C<%s%m|70|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
-%?C<%s%m|70|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
-%?C<%s%m|70|%al%?id<%id|%?d1<%d1|(root)>>|%s%ac%?id<%id|%?d1<%d1|(root)>>>
-%?C<%s%m|70|%al%iy|%s%ac%iy>
-
-%s%acNext:%?It<%It|%Fn>
-
-%al %pc%ac%pp of %pe%ar%pr 
-
+# images all in the default viewport
 %?mh<%xdAa|%xdAb>
 %?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
 %?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
 %?ps<%xdD>
 %?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
 %?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
-%?C<%C>
+
+%?C<%C%Vda|%Vdb>
+
+
+#NowPlaying - with AA
+%Vl|a|70|12|-|50|1|-|-|
+%s%al%?it<%it|%fn>
+%s%al%?ia<%ia|%?d2<%d2|(root)>>
+%s%al%?id<%id|%?d1<%d1|(root)>>
+%s%al%iy
+
+#NowPlaying - without AA
+%Vl|b|0|12|-|50|1|-|-|
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d2<%d2|(root)>>
+%s%ac%?id<%id|%?d1<%d1|(root)>>
+%s%ac%iy
+
+#next and playlist
+%V|0|70|-|-|1|-|-|
+%s%acNext:%?It<%It|%Fn>
+
+%al %pc%ac%pp of %pe%ar%pr 
+

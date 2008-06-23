@@ -1,37 +1,42 @@
-%X|backdrop-176x132.bmp|
-%xl|A|codec.bmp|40|70|22|
-%xl|B|encoding.bmp|40|76|2|
-%xl|C|repeat.bmp|99|0|4|
-%xl|D|navi-colour.bmp|68|3|5|
-%xl|E|shf.bmp|99|17|
-%xl|F|lock-m.bmp|87|0|
-%xl|G|lock-r.bmp|87|12|
-%xl|H|volume-colour.bmp|12|1|11|
-%xl|I|battery-colour.bmp|149|1|6|
-%xl|J|rating-colour.bmp|91|68|11|
+# cabbie 2.0 default
+# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+#derived from "cabbie" (C) Yohann Misquitta
+#Ported to nano by crzyboyster
 %wd
+%X|wpsbackdrop-176x132x16.bmp|
+%xl|A|lock-176x132x16.bmp|65|116|2|
+%xl|B|battery-176x132x16.bmp|83|117|10|
+%xl|C|volume-176x132x16.bmp|102|117|10|
+%xl|D|shuffle-176x132x16.bmp|120|117|
+%xl|E|repeat-176x132x16.bmp|139|113|4|
+%xl|F|playmode-176x132x16.bmp|156|115|5|
+%Cl|9|16|s65|s65|
+%pb|pb-176x132x16.bmp|8|86|160|8|
+%?mh<%xdAa|%xdAb>
+%?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
+%?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
+%?ps<%xdD>
+%?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
+%?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
 
+%?C<%Vda%C|%Vdb>
 
+#NowPlaying
+%Vl|a|81|12|-|-|1|-|-|
+%s%al%?it<%it|%fn>
+%s%al%?ia<%ia|%?d2<%d2|(root)>>
+%s%al%?id<%id|%?d1<%d1|(root)>>
 
+%s%alNext Track:
+%s%al%?It<%It|%Fn>
 
-%ac%s%?it<%it|%fn>
-%ac%t5%s%?ia<%ia|%?d2<%d2|(Unknown Artist)>>;%ac%t5%s%?id<%id|%?d1<%d1|(Unknown Album)>>
+%Vl|b|0|12|-|-|1|-|-|
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d2<%d2|(root)>>
+%s%ac%?id<%id|%?d1<%d1|(root)>>
 
-%ac%t5%pc / %pt;%ac%t5Track %pp of %pe
+%acNext Track:
+%s%ac%?It<%It|%Fn>
 
- %fbk
-
-%pb
-
-
-%ac%t5%s%?It<%It|%Fn>;%ac%t5%s%?Ia<%Ia|%D2>
-%?pv<%xdHa|%xdHb|%xdHc|%xdHd|%xdHe|%xdHf|%xdHg|%xdHh|%xdHi|%xdHj|%xdHk>
-%?bp<%xdIa|%?bl<%xdIb|%xdIc|%xdId|%xdIe|%xdIf>>
-%?fc<%xdAa|%xdAb|%xdAc|%xdAd|%xdAe|%xdAf|%xdAg|%xdAh|%xdAi|%xdAj|%xdAk|%xdAl|%xdAm|%xdAn|%xdAo|%xdAp|%xdAq|%xdAr|%xdAs|%xdAt|%xdAu|%xdAv>
-%?fv<%xdBa|%xdBb>
-%?mm<|%xdCa|%xdCb|%xdCc|%xdCd>
-%?mp<%xdDa|%xdDb|%xdDc|%xdDd|%xdDe>
-%?ps<%xdE|>
-%?mh<%xdF|>
-%?mr<%xdG|>
-%?rr<%xdJa|%xdJb|%xdJc|%xdJd|%xdJe|%xdJf|%xdJg|%xdJh|%xdJi|%xdJj|%xdJk>
+%V|0|96|-|-|1|-|-|
+%al   %pc%ac%pc%ac%pp of %pe%ar%pr%ar%pr   

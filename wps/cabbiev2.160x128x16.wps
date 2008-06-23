@@ -11,19 +11,32 @@
 %xl|F|playmode-160x128x16.bmp|142|114|5|
 %Cl|7|16|c65|c65|
 %pb|pb-160x128x16.bmp|6|86|149|8|
-#NowPlaying
-%?C<%s%m|77|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
-%?C<%s%m|77|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
-%?C<%s%m|77|%al%?id<%id|%?d1<%d1|(root)>>|%s%ac%?id<%id|%?d1<%d1|(root)>>>
-
-%?C<%m|77||%ac>%t4Next Track:
-%?C<%m|77||%ac>%s%t4%It
-
-%al  %pc%ac%pc%ac%pp of %pe%ar%pr%ar%pr  
 %?mh<%xdAa|%xdAb>
 %?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
 %?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
 %?ps<%xdD>
 %?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
 %?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
-%?C<%C>
+%?C<%C%Vda|%Vdb>
+
+# NowPlaying - AA
+%Vl|a|77|10|-|-|1|-|-|
+%s%al%?it<%it|%fn>
+%s%al%?ia<%ia|%?d2<%d2|(root)>>
+%s%al%?id<%id|%?d1<%d1|(root)>>
+
+Next Track:
+%s%?It<%It|%Fn>
+
+# NowPlaying - no AA
+%Vl|b|0|10|-|-|1|-|-|
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d2<%d2|(root)>>
+%s%ac%?id<%id|%?d1<%d1|(root)>>
+
+Next Track:
+%s%?It<%It|%Fn>
+
+%V|0|66|-|-|1|-|-|
+%al  %pc%ac%pc%ac%pp of %pe%ar%pr%ar%pr  
+

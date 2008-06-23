@@ -10,15 +10,26 @@
 %xl|F|playmode-132x80x16.bmp|118|67|5|
 %Cl|3|14|c40|c40|
 %pb|pb-132x80x16.bmp|2|58|127|6|
-#NowPlaying
-%?C<%s%m|48|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
-%?C<%s%m|48|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
-%?C<%s%m|48|%al%?id<%id|%?d1<%d1|(root)>>|%s%ac%?id<%id|%?d1<%d1|(root)>>>
-%?C<%s%m|48|%alNext: %?It<%It|%Fn>|%s%acNext: %?It<%It|%Fn>>
+%?C<%C%Vda|%Vdb>
+
+#Images
 %?mh<%xdAa|%xdAb>
 %?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
 %?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
 %?ps<%xdD>
 %?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
 %?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
-%?C<%C>
+
+#NowPlaying - aa
+%Vl|a|48|10|-|48|1|-|-|
+%s%al%?it<%it|%fn>
+%s%al%?ia<%ia|%?d2<%d2|(root)>>
+%s%al%?id<%id|%?d1<%d1|(root)>>
+%s%alNext: %?It<%It|%Fn>
+
+#NowPlaying - no aa
+%Vl|b|0|10|-|48|1|-|-|
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d2<%d2|(root)>>
+%s%ac%?id<%id|%?d1<%d1|(root)>>
+%s%acNext: %?It<%It|%Fn>

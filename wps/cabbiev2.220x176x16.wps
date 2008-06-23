@@ -11,23 +11,32 @@
 %xl|F|playmode-220x176x16.bmp|200|152|5|
 %Cl|15|32|s75|s75|
 %pb|pb-220x176x16.bmp|11|121|199|8|
-#NowPlaying
-
-
-%?C<%s%m|105|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
-%?C<%s%m|105|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
-%?C<%s%m|105|%al%?id<%id|%?d1<%d1|(root)>>|%s%ac%?id<%id|%?d1<%d1|(root)>>>
-
-%?C<%s%m|105|%alNext Track:|%acNext Track:>
-%?C<%s%m|105|%al%?It<%It|%Fn>|%s%ac%?It<%It|%Fn>>
-
-
-%al   %pc%ac%pp of %pe%ar%pr   
-
 %?mh<%xdAa|%xdAb>
 %?bp<%?bc<%xdBa|%xdBb>|%?bl<|%xdBc|%xdBd|%xdBe|%xdBf|%xdBg|%xdBh|%xdBi|%xdBj>>
 %?pv<%xdCa|%xdCb|%xdCc|%xdCd|%xdCe|%xdCf|%xdCg|%xdCh|%xdCi|%xdCj>
 %?ps<%xdD>
 %?mm<|%xdEa|%xdEb|%xdEc|%xdEd>
 %?mp<%xdFa|%xdFb|%xdFc|%xdFd|%xdFe>
-%?C<%C>
+
+#NowPlaying
+%?C<%Vda%C|%Vdb>
+
+%Vl|a|105|30|-|-|1|-|-|
+%s%al%?it<%it|%fn>
+%s%al%?ia<%ia|%?d2<%d2|(root)>>
+%s%al%?id<%id|%?d1<%d1|(root)>>
+
+%s%alNext Track:
+%s%al%?It<%It|%Fn>
+
+%Vl|b|0|30|-|-|1|-|-|
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?d2<%d2|(root)>>
+%s%ac%?id<%id|%?d1<%d1|(root)>>
+
+%acNext Track:
+%s%ac%?It<%It|%Fn>
+
+
+%V|0|130|-|-|1|-|-|
+%al   %pc%ac%pp of %pe%ar%pr   
