@@ -3,7 +3,6 @@
 #derived from "cabbie" (C) Yohann Misquitta
 #Ported to nano by crzyboyster
 %wd
-%P|pb-176x132x16.bmp|
 %X|wpsbackdrop-176x132x16.bmp|
 %xl|A|lock-176x132x16.bmp|65|116|2|
 %xl|B|battery-176x132x16.bmp|83|117|10|
@@ -12,7 +11,7 @@
 %xl|E|repeat-176x132x16.bmp|139|113|4|
 %xl|F|playmode-176x132x16.bmp|156|115|5|
 %Cl|9|16|s65|s65|
-%pb|8|8|168|86|
+%pb|pb-176x132x16.bmp|8|86|160|8|
 #NowPlaying
 %?C<%s%m|81|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
 %?C<%s%m|81|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>

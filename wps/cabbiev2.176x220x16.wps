@@ -2,7 +2,6 @@
 # derived from cabbie 2.0 default (C) 2007, Johannes Voggenthaler (Zinc Alloy)
 %wd
 %X|wpsbackdrop-176x220x16.bmp|
-%P|pb-176x220x16.bmp|
 %xl|A|lock-176x220x16.bmp|51|204|2|
 %xl|B|battery-176x220x16.bmp|73|206|10|
 %xl|C|volume-176x220x16.bmp|97|206|10|
@@ -10,7 +9,7 @@
 %xl|E|repeat-176x220x16.bmp|144|204|4|
 %xl|F|playmode-176x220x16.bmp|159|204|5|
 %Cl|29|20|c120|c120|
-%pb|8|5|171|182|
+%pb|pb-176x220x16.bmp|5|182|166|8|
 #NowPlaying
 
 

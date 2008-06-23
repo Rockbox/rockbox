@@ -6,7 +6,7 @@
 %s%ac%?ia<%ia|%?d2<%d2|Unknown Artist>>
 %s%ac%?id<%id|%?d1<%d1|Unknown Album>>
 %al %fbKbps
-%pb|4|10|150|
+%pb|-|10|-|140|4|
 %s%ac%?in<%in|%pp> - %?it<%it|%fn>
 
 %xl|A|battery-g.bmp|135|8|5|

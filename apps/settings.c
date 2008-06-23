@@ -791,6 +791,25 @@ void settings_apply(bool read_disk)
 
     if (read_disk)
     {
+        
+#ifdef HAVE_LCD_BITMAP
+        /* fonts need to be loaded before the WPS */
+        if ( global_settings.font_file[0]) {
+            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
+                     global_settings.font_file);
+            font_load(buf);
+        }
+        else
+            font_reset();
+    
+        if ( global_settings.kbd_file[0]) {
+            snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
+                     global_settings.kbd_file);
+            load_kbd(buf);
+        }
+        else
+            load_kbd(NULL);
+#endif
 #if LCD_DEPTH > 1
         unload_wps_backdrop();
 #endif
@@ -837,24 +856,6 @@ void settings_apply(bool read_disk)
             wps_data_init(gui_wps[1].data);
             gui_wps[1].data->remote_wps = true;
         }
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-        if ( global_settings.font_file[0]) {
-            snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
-                    global_settings.font_file);
-            font_load(buf);
-        }
-        else
-            font_reset();
-    
-        if ( global_settings.kbd_file[0]) {
-            snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
-                    global_settings.kbd_file);
-            load_kbd(buf);
-        }
-        else
-            load_kbd(NULL);
 #endif
         if ( global_settings.lang_file[0]) {
             snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",

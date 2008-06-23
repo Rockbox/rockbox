@@ -431,6 +431,10 @@ static char *get_token_desc(struct wps_token *token, struct wps_data *data,
             snprintf(buf, bufsize, "pitch value");
             break;
 #endif
+        case WPS_VIEWPORT_ENABLE:
+            snprintf(buf, bufsize, "enable VP:%d",
+                     token->value.i);
+            break;
 
         default:
             snprintf(buf, bufsize, "FIXME (code: %d)",

@@ -5,14 +5,13 @@
 # derived from "cabbie" (C) Yohann Misquitta
 %wd
 %x|z|wpsbackdrop-160x128x1.bmp|0|0|
-%P|pb-160x128x1.bmp|
 %xl|A|lock-160x128x1.bmp|48|114|2|
 %xl|B|battery-160x128x1.bmp|66|115|10|
 %xl|C|volume-160x128x1.bmp|87|114|10|
 %xl|D|shuffle-160x128x1.bmp|107|115|
 %xl|E|repeat-160x128x1.bmp|127|113|4|
 %xl|F|playmode-160x128x1.bmp|145|114|5|
-%pb|8|1|159|86|
+%pb|pb-160x128x1.bmp|1|86|158|8|
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>

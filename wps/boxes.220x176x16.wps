@@ -1,5 +1,4 @@
 %X|backdrop-220x176.bmp|
-%P|pb-220.bmp|
 %xl|A|codec.bmp|40|102|22|
 %xl|B|encoding.bmp|40|108|2|
 %xl|C|repeat.bmp|124|10|4|
@@ -27,7 +26,7 @@
 
   %fbk
 
-%pb|8|0|208|
+%pb|pb-220.bmp|0|-|208|8|
 
 
 %ac%t5%s%?It<%It|%Fn>;%ac%t5%s%?Ia<%Ia|%D2>

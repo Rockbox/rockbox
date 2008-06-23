@@ -5,7 +5,6 @@
 # derived from "cabbie" (C) Yohann Misquitta
 %wd
 %X|wpsbackdrop-160x128x2.bmp|
-%P|pb-160x128x2.bmp|
 %xl|A|lock-160x128x2.bmp|48|114|2|
 %xl|B|battery-160x128x2.bmp|66|115|10|
 %xl|C|volume-160x128x2.bmp|87|114|10|
@@ -13,7 +12,7 @@
 %xl|E|repeat-160x128x2.bmp|127|113|4|
 %xl|F|playmode-160x128x2.bmp|145|114|5|
 %Cl|2|16|s64|s64|
-%pb|8|1|159|86|
+%pb|pb-160x128x2.bmp|1|86|158|8|
 %?C<%s%m|70|%al%?it<%it|%fn>|%s%ac%?it<%it|%fn>>
 %?C<%s%m|70|%al%?ia<%ia|%?d2<%d2|(root)>>|%s%ac%?ia<%ia|%?d2<%d2|(root)>>>
 %?C<%s%m|70|%al%?id<%id|%?d1<%d1|(root)>>|%s%ac%?id<%id|%?d1<%d1|(root)>>>

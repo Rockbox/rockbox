@@ -80,13 +80,13 @@ static int line;
 #ifdef HAVE_LCD_BITMAP
 
 #if LCD_DEPTH > 1
-#define MAX_BITMAPS (MAX_IMAGES+2) /* WPS images + pbar bitmap + backdrop */
+#define MAX_BITMAPS (MAX_IMAGES+MAX_PROGRESSBARS+1) /* WPS images + pbar bitmap + backdrop */
 #else
-#define MAX_BITMAPS (MAX_IMAGES+1) /* WPS images + pbar bitmap */
+#define MAX_BITMAPS (MAX_IMAGES+MAX_PROGRESSBARS) /* WPS images + pbar bitmap */
 #endif
 
 #define PROGRESSBAR_BMP MAX_IMAGES
-#define BACKDROP_BMP    (MAX_IMAGES+1)
+#define BACKDROP_BMP    (MAX_BITMAPS-1)
 
 /* pointers to the bitmap filenames in the WPS source */
 static const char *bmp_names[MAX_BITMAPS];
@@ -129,6 +129,8 @@ static int parse_dir_level(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 
 #ifdef HAVE_LCD_BITMAP
+static int parse_viewport_display(const char *wps_bufptr,
+        struct wps_token *token, struct wps_data *wps_data);
 static int parse_viewport(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_leftmargin(const char *wps_bufptr,
@@ -317,13 +319,14 @@ static const struct wps_tag all_tags[] = {
                                                        parse_image_display },
 
     { WPS_TOKEN_IMAGE_DISPLAY,            "x",   0,       parse_image_load },
-    { WPS_TOKEN_IMAGE_PROGRESS_BAR,       "P",   0,    parse_image_special },
 #ifdef HAVE_ALBUMART
     { WPS_NO_TOKEN,                       "Cl",  0,    parse_albumart_load },
     { WPS_TOKEN_ALBUMART_DISPLAY,         "C",   WPS_REFRESH_STATIC,
                                                 parse_albumart_conditional },
 #endif
 
+    { WPS_VIEWPORT_ENABLE,                "Vd",  WPS_REFRESH_DYNAMIC, 
+                                                    parse_viewport_display },
     { WPS_NO_TOKEN,                       "V",   0,    parse_viewport      },
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
@@ -536,6 +539,22 @@ static int parse_image_load(const char *wps_bufptr,
     return skip_end_of_line(wps_bufptr);
 }
 
+static int parse_viewport_display(const char *wps_bufptr,
+                                  struct wps_token *token,
+                                  struct wps_data *wps_data)
+{
+    (void)wps_data;
+    char letter = wps_bufptr[0];
+
+    if (letter < 'a' || letter > 'z')
+    {
+        /* invalid viewport tag */
+        return WPS_ERROR_INVALID_PARAM;
+    }
+    token->value.i = letter;
+    return 1;
+}
+
 static int parse_viewport(const char *wps_bufptr,
                           struct wps_token *token,
                           struct wps_data *wps_data)
@@ -563,17 +582,35 @@ static int parse_viewport(const char *wps_bufptr,
     }
 #endif
 
-    if (*wps_bufptr != '|')
-        return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
-
-    ptr = wps_bufptr + 1;
-    /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
-
     if (wps_data->num_viewports >= WPS_MAX_VIEWPORTS)
         return WPS_ERROR_INVALID_PARAM;
-
+    
     wps_data->num_viewports++;
+    /* check for the optional letter to signify its a hideable viewport */
+    /* %Vl|<label>|<rest of tags>| */
+    wps_data->viewports[wps_data->num_viewports].hidden_flags = 0;
+    
+    if (*ptr == 'l')
+    {
+        if (*(ptr+1) == '|')
+        {
+            char label = *(ptr+2);
+            if (label >= 'a' && label < 'a' + WPS_MAX_VIEWPORTS)
+            {
+                wps_data->viewports[wps_data->num_viewports].hidden_flags = VP_DRAW_HIDEABLE;
+                wps_data->viewports[wps_data->num_viewports].label = label;
+            }
+            else
+                return WPS_ERROR_INVALID_PARAM; /* malformed token: e.g. %Cl7  */
+            ptr += 3;
+        }
+    }
+    if (*ptr != '|')
+        return WPS_ERROR_INVALID_PARAM;
+    
+    ptr++;
     vp = &wps_data->viewports[wps_data->num_viewports].vp;
+    /* format: %V|x|y|width|height|font|fg_pattern|bg_pattern| */
 
     /* Set the defaults for fields not user-specified */
     vp->drawmode = DRMODE_SOLID;
@@ -687,14 +724,8 @@ static int parse_image_special(const char *wps_bufptr,
 
     if (pos > newline)
         return WPS_ERROR_INVALID_PARAM;
-
-    if (token->type == WPS_TOKEN_IMAGE_PROGRESS_BAR)
-    {
-        /* format: %P|filename.bmp| */
-        bmp_names[PROGRESSBAR_BMP] = wps_bufptr + 1;
-    }
 #if LCD_DEPTH > 1
-    else if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
+    if (token->type == WPS_TOKEN_IMAGE_BACKDROP)
     {
         /* format: %X|filename.bmp| */
         bmp_names[BACKDROP_BMP] = wps_bufptr + 1;
@@ -762,40 +793,82 @@ static int parse_progressbar(const char *wps_bufptr,
                              struct wps_data *wps_data)
 {
     (void)token; /* Kill warnings */
+    /* %pb or %pb|filename|x|y|width|height|
+    using - for any of the params uses "sane" values */
 #ifdef HAVE_LCD_BITMAP
+    enum {
+        PB_FILENAME = 0,
+        PB_X,
+        PB_Y,
+        PB_WIDTH,
+        PB_HEIGHT
+    };
+    const char *filename;
+    int x, y, height, width, set = 0;
+    const char *ptr = wps_bufptr;
+    struct progressbar *pb;
+    struct viewport *vp = &wps_data->viewports[wps_data->num_viewports].vp;
+    int font_height = font_get(vp->font)->height;
+    int line_y_pos = font_height*(wps_data->num_lines - 
+            wps_data->viewports[wps_data->num_viewports].first_line);
+    
+    /** Remove this bit when the remove lcd margins patch goes in **/
+    bool draw_sb = global_settings.statusbar;
 
-    short *vals[] = {
-        &wps_data->progress_height,
-        &wps_data->progress_start,
-        &wps_data->progress_end,
-        &wps_data->progress_top };
+    if (wps_data->wps_sb_tag)
+        draw_sb = wps_data->show_sb_on_wps;
 
-    /* default values : */
-    wps_data->progress_height = 6;
-    wps_data->progress_start = 0;
-    wps_data->progress_end = 0;
-    wps_data->progress_top = -1;
+    if (wps_data->num_viewports == 0 && draw_sb)
+        line_y_pos += STATUSBAR_HEIGHT;
+    /** Remove the above bit when the remove lcd margins patch goes in **/
+    
+    if (wps_data->progressbar_count +1 >= MAX_PROGRESSBARS)
+        return WPS_ERROR_INVALID_PARAM;
+    
+    pb = &wps_data->progressbar[wps_data->progressbar_count];
+    pb->have_bitmap_pb = false;
+    
+    if (*wps_bufptr != '|') /* regular old style */
+    {
+        pb->x = 0;
+        pb->width = vp->width;
+        pb->height = SYSFONT_HEIGHT-2;
+        pb->y = line_y_pos + (font_height-pb->height)/2;
 
-    int i = 0;
-    char *newline = strchr(wps_bufptr, '\n');
-    char *prev = strchr(wps_bufptr, '|');
-    if (prev && prev < newline) {
-        char *next = strchr(prev+1, '|');
-        while (i < 4 && next && next < newline)
-        {
-            *(vals[i++]) = atoi(++prev);
-            prev = strchr(prev, '|');
-            next = strchr(++next, '|');
-        }
-
-        if (wps_data->progress_height < 3)
-            wps_data->progress_height = 3;
-        if (wps_data->progress_end < wps_data->progress_start + 3)
-            wps_data->progress_end = 0;
+        wps_data->viewports[wps_data->num_viewports].pb =
+                &wps_data->progressbar[wps_data->progressbar_count];
+        wps_data->progressbar_count++;
+        return 0;
     }
-
-    return newline - wps_bufptr;
-
+    ptr = wps_bufptr + 1;
+    
+    if (!(ptr = parse_list("sdddd", &set, '|', ptr, &filename,
+                                                 &x, &y, &width, &height)))
+        return WPS_ERROR_INVALID_PARAM;
+    if (LIST_VALUE_PARSED(set, PB_FILENAME)) /* filename */
+        bmp_names[PROGRESSBAR_BMP+wps_data->progressbar_count] = filename;
+    if (LIST_VALUE_PARSED(set, PB_X)) /* x */
+        pb->x = x;
+    else
+        pb->x = vp->x;
+    if (LIST_VALUE_PARSED(set, PB_WIDTH)) /* width */
+        pb->width = width;
+    else
+        pb->width = vp->width - pb->x;
+    if (LIST_VALUE_PARSED(set, PB_HEIGHT)) /* height, default to font height */
+        pb->height = height;
+    else
+        pb->height = font_height;
+    if (LIST_VALUE_PARSED(set, PB_Y)) /* y */
+        pb->y = y;
+    else
+        pb->y = line_y_pos + (font_height-pb->height)/2;
+    wps_data->progressbar[wps_data->progressbar_count].have_bitmap_pb = false;
+    wps_data->viewports[wps_data->num_viewports].pb =
+            &wps_data->progressbar[wps_data->progressbar_count];
+    wps_data->progressbar_count++;
+    /* Skip the rest of the line */
+    return skip_end_of_line(wps_bufptr)-1;
 #else
 
     if (*(wps_bufptr-1) == 'f')
@@ -1359,7 +1432,6 @@ static void wps_images_clear(struct wps_data *data)
        data->img[i].always_display = false;
        data->img[i].num_subimages = 1;
     }
-    data->progressbar.have_bitmap_pb = false;
 }
 #endif
 
@@ -1373,6 +1445,8 @@ void wps_data_init(struct wps_data *wps_data)
     wps_data->img_buf_ptr = wps_data->img_buf; /* where in image buffer */
     wps_data->img_buf_free = IMG_BUFSIZE; /* free space in image buffer */
     wps_data->peak_meter_enabled = false;
+    /* progress bars */
+    wps_data->progressbar_count = 0;
 #else /* HAVE_LCD_CHARCELLS */
     int i;
     for (i = 0; i < 8; i++)
@@ -1414,10 +1488,10 @@ static bool load_wps_bitmaps(struct wps_data *wps_data, char *bmpdir)
             get_image_filename(bmp_names[n], bmpdir,
                                img_path, sizeof(img_path));
 
-            if (n == PROGRESSBAR_BMP) {
+            if (n >= PROGRESSBAR_BMP ) {
                 /* progressbar bitmap */
-                bitmap = &wps_data->progressbar.bm;
-                loaded = &wps_data->progressbar.have_bitmap_pb;
+                bitmap = &wps_data->progressbar[n-PROGRESSBAR_BMP].bm;
+                loaded = &wps_data->progressbar[n-PROGRESSBAR_BMP].have_bitmap_pb;
             } else {
                 /* regular bitmap */
                 bitmap = &wps_data->img[n].bm;

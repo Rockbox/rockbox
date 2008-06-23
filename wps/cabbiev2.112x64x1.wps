@@ -2,7 +2,6 @@
 # derived from cabbie 2.0 default (C) 2007, Johannes Voggenthaler (Zinc Alloy)
 %wd
 %x|z|wpsbackdrop-112x64x1.bmp|0|0|
-%P|pb-112x64x1.bmp|
 %xl|A|lock-112x64x1.bmp|4|56|2|
 %xl|B|battery-112x64x1.bmp|22|56|9|
 %xl|C|volume-112x64x1.bmp|41|56|9|
@@ -15,7 +14,7 @@
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>
 %t5%ac%s%?Fn<Next: %?It<%It|%Fn>|%ac%pp of %pe>;%t5%ac%s%?Fn<Next: %?Ia<%Ia|%Fn>|%ac%pp of %pe>
-%pb|4|1|111|42|
+%pb|pb-112x64x1.bmp|1|42|110|4|
 %pc%ar%pr
 #Bottom status bar
 %?mh<%xdAa|%xdAb>

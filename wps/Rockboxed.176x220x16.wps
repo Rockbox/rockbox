@@ -2,7 +2,6 @@
 # License: GNU GPL v2 or later.
 %wd
 %X|bg-176x220x16.bmp|
-%P|pg-156.bmp|
 %xl|A|mode-color-big.bmp|81|201|4|
 %xl|B|shuffle-color-big.bmp|40|201|
 %xl|C|volume-color-big.bmp|15|203|11|
@@ -23,7 +22,7 @@
 
 
 
-%pb|5|10|166|171|
+%pb|pg-156.bmp|10|171|156|5|
 %al %pc%ac%?fc<mp1|mp2|mp3|aiff|wav|vorbis|flac|mpc|a52|wavpack|alac|aac|shn|sid|adx|nsf|speex|spc|ape|wma|unknown>%ar%pt 
 %?ps<%xdB>
 %?mp<%xdAb|%xdAa|%xdAb|%xdAc|%xdAd>

@@ -506,53 +506,33 @@ void display_keylock_text(bool locked)
 
 #ifdef HAVE_LCD_BITMAP
 
-static void draw_progressbar(struct gui_wps *gwps, int line)
+static void draw_progressbar(struct gui_wps *gwps,
+                             struct progressbar *pb)
 {
-    struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
     struct wps_state *state = gwps->state;
-    int h = font_get(display->getfont())->height;
-
-    int sb_y;
-    if (data->progress_top < 0)
-        sb_y = line*h + display->getymargin() +
-               ((h > data->progress_height + 1)
-                ? (h - data->progress_height) / 2 : 1);
-    else
-        sb_y = data->progress_top;
-
-    if (!data->progress_end)
-        data->progress_end=display->getwidth();
-
-    if (gwps->data->progressbar.have_bitmap_pb)
-        gui_bitmap_scrollbar_draw(display, data->progressbar.bm,
-                                  data->progress_start, sb_y,
-                                  data->progress_end-data->progress_start,
-                                  data->progressbar.bm.height,
+    if (pb->have_bitmap_pb)
+        gui_bitmap_scrollbar_draw(display, pb->bm,
+                                  pb->x, pb->y, pb->width, pb->bm.height,
                                   state->id3->length ? state->id3->length : 1, 0,
                                   state->id3->length ? state->id3->elapsed
-                                                       + state->ff_rewind_count : 0,
-                                  HORIZONTAL);
+                                          + state->ff_rewind_count : 0,
+                                          HORIZONTAL);
     else
-        gui_scrollbar_draw(display, data->progress_start, sb_y,
-                           data->progress_end-data->progress_start,
-                           data->progress_height,
+        gui_scrollbar_draw(display, pb->x, pb->y, pb->width, pb->height,
                            state->id3->length ? state->id3->length : 1, 0,
                            state->id3->length ? state->id3->elapsed
-                                                + state->ff_rewind_count : 0,
-                           HORIZONTAL);
-
+                                   + state->ff_rewind_count : 0,
+                                   HORIZONTAL);
 #ifdef AB_REPEAT_ENABLE
     if ( ab_repeat_mode_enabled() && state->id3->length != 0 )
         ab_draw_markers(display, state->id3->length,
-                        data->progress_start, data->progress_end, sb_y,
-                        data->progress_height);
+                        pb->x, pb->x + pb->width, pb->y, pb->height);
 #endif
 
     if ( cuesheet_is_enabled() && state->id3->cuesheet_type )
         cue_draw_markers(display, state->id3->length,
-                         data->progress_start, data->progress_end,
-                         sb_y+1, data->progress_height-2);
+                         pb->x, pb->x + pb->width, pb->y+1, pb->height-2);
 }
 
 /* clears the area where the image was shown */
@@ -1621,7 +1601,24 @@ static bool get_line(struct gui_wps *gwps,
                 *buf++ = 0;
                 cur_align_start = buf;
                 break;
-
+            case WPS_VIEWPORT_ENABLE:
+            {
+                char label = data->tokens[i].value.i;
+                int j;
+                char temp = VP_DRAW_HIDEABLE;
+                for(j=0;j<data->num_viewports;j++)
+                {
+                    temp = VP_DRAW_HIDEABLE;
+                    if ((data->viewports[j].hidden_flags&VP_DRAW_HIDEABLE) &&
+                        (data->viewports[j].label == label))
+                    {
+                        if (data->viewports[j].hidden_flags&VP_DRAW_WASHIDDEN)
+                            temp |= VP_DRAW_WASHIDDEN;
+                        data->viewports[j].hidden_flags = temp;
+                    }
+                }
+            }
+                break;
             default:
             {
                 /* get the value of the tag and copy it to the buffer */
@@ -1945,6 +1942,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
     int v, line, i, subline_idx;
     unsigned char flags;
     char linebuf[MAX_PATH];
+    unsigned char vp_refresh_mode;
 
     struct align_pos align;
     align.left = NULL;
@@ -1994,14 +1992,21 @@ bool gui_wps_refresh(struct gui_wps *gwps,
 
     state->ff_rewind_count = ffwd_offset;
 
+    /* disable any viewports which are conditionally displayed */
+    for (v = 0; v < data->num_viewports; v++)
+    {
+        if (data->viewports[v].hidden_flags&VP_DRAW_HIDEABLE)
+        {
+            if (data->viewports[v].hidden_flags&VP_DRAW_HIDDEN)
+                data->viewports[v].hidden_flags |= VP_DRAW_WASHIDDEN;
+            else
+                data->viewports[v].hidden_flags |= VP_DRAW_HIDDEN;
+        }
+    }
     for (v = 0; v < data->num_viewports; v++)
     {
         display->set_viewport(&data->viewports[v].vp);
-
-        if (refresh_mode == WPS_REFRESH_ALL)
-        {
-            display->clear_viewport();
-        }
+        vp_refresh_mode = refresh_mode;
 
 #ifdef HAVE_LCD_BITMAP
         /* Set images to not to be displayed */
@@ -2010,7 +2015,26 @@ bool gui_wps_refresh(struct gui_wps *gwps,
             data->img[i].display = -1;
         }
 #endif
-
+        /* dont redraw the viewport if its disabled */
+        if ((data->viewports[v].hidden_flags&VP_DRAW_HIDDEN))
+        {
+            if (!(data->viewports[v].hidden_flags&VP_DRAW_WASHIDDEN))
+                display->scroll_stop(&data->viewports[v].vp);
+            data->viewports[v].hidden_flags |= VP_DRAW_WASHIDDEN;
+            continue;
+        }
+        else if (((data->viewports[v].hidden_flags&
+                   (VP_DRAW_WASHIDDEN|VP_DRAW_HIDEABLE))
+                    == (VP_DRAW_WASHIDDEN|VP_DRAW_HIDEABLE)))
+        {
+            vp_refresh_mode = WPS_REFRESH_ALL;
+            data->viewports[v].hidden_flags = VP_DRAW_HIDEABLE;
+        }
+        if (vp_refresh_mode == WPS_REFRESH_ALL)
+        {
+            display->clear_viewport();
+        }
+            
         for (line = data->viewports[v].first_line; 
              line <= data->viewports[v].last_line; line++)
         {
@@ -2024,30 +2048,21 @@ bool gui_wps_refresh(struct gui_wps *gwps,
                                             data->lines[line].curr_subline);
             flags = data->sublines[subline_idx].line_type;
 
-            if (refresh_mode == WPS_REFRESH_ALL || (flags & refresh_mode)
+            if (vp_refresh_mode == WPS_REFRESH_ALL || (flags & vp_refresh_mode)
                 || new_subline_refresh)
             {
                 /* get_line tells us if we need to update the line */
                 update_line = get_line(gwps, line, data->lines[line].curr_subline,
                                        &align, linebuf, sizeof(linebuf));
             }
-
 #ifdef HAVE_LCD_BITMAP
-            /* progressbar */
-            if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
-            {
-                /* the progressbar should be alone on its line */
-                update_line = false;
-                draw_progressbar(gwps, line - data->viewports[v].first_line);
-            }
-
             /* peakmeter */
-            if (flags & refresh_mode & WPS_REFRESH_PEAK_METER)
+            if (flags & vp_refresh_mode & WPS_REFRESH_PEAK_METER)
             {
                 /* the peakmeter should be alone on its line */
                 update_line = false;
 
-                int h = font_get(display->getfont())->height;
+                int h = font_get(data->viewports[v].vp.font)->height;
                 int peak_meter_y = display->getymargin() + (line - data->viewports[v].first_line)* h;
 
                 /* The user might decide to have the peak meter in the last
@@ -2066,7 +2081,7 @@ bool gui_wps_refresh(struct gui_wps *gwps,
 #else /* HAVE_LCD_CHARCELL */
 
             /* progressbar */
-            if (flags & refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
+            if (flags & vp_refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
             {
                 if (data->full_line_progressbar)
                     draw_player_fullbar(gwps, linebuf, sizeof(linebuf));
@@ -2075,22 +2090,32 @@ bool gui_wps_refresh(struct gui_wps *gwps,
             }
 #endif
 
-            if (update_line)
+            if (update_line && 
+                /* conditionals clear the line which means if the %Vd is put into the default
+                   viewport there will be a blank line.
+                   To get around this we dont allow any actual drawing to happen in the
+                   deault vp if other vp's are defined */
+                ((data->num_viewports>1 && v!=0) || data->num_viewports == 1))
             {
                 if (flags & WPS_REFRESH_SCROLL)
                 {
                     /* if the line is a scrolling one we don't want to update
                        too often, so that it has the time to scroll */
-                    if ((refresh_mode & WPS_REFRESH_SCROLL) || new_subline_refresh)
+                    if ((vp_refresh_mode & WPS_REFRESH_SCROLL) || new_subline_refresh)
                         write_line(display, &align, line - data->viewports[v].first_line, true);
                 }
                 else
                     write_line(display, &align, line - data->viewports[v].first_line, false);
             }
-
         }
 
 #ifdef HAVE_LCD_BITMAP
+        /* progressbar */
+        if (vp_refresh_mode & WPS_REFRESH_PLAYER_PROGRESS)
+        {
+            if (data->viewports[v].pb)
+                draw_progressbar(gwps, data->viewports[v].pb);
+        }
         /* Now display any images in this viewport */
         wps_display_images(gwps, &data->viewports[v].vp);
 #endif

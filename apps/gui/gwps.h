@@ -70,7 +70,13 @@ struct gui_img{
     bool always_display;    /* not using the preload/display mechanism */
 };
 
-struct prog_img{ /*progressbar image*/
+struct progressbar {
+    /* regular pb */
+    short x;
+    short y;
+    short width;
+    short height;
+    /*progressbar image*/
     struct bitmap bm;
     bool have_bitmap_pb;
 };
@@ -85,6 +91,7 @@ struct align_pos {
 #ifdef HAVE_LCD_BITMAP
 
 #define MAX_IMAGES (26*2) /* a-z and A-Z */
+#define MAX_PROGRESSBARS 3
 
 /* The image buffer is big enough to store one full-screen native bitmap,
    plus two full-screen mono bitmaps. */
@@ -92,7 +99,7 @@ struct align_pos {
 #define IMG_BUFSIZE ((LCD_HEIGHT*LCD_WIDTH*LCD_DEPTH/8) \
                    + (2*LCD_HEIGHT*LCD_WIDTH/8))
 
-#define WPS_MAX_VIEWPORTS   16
+#define WPS_MAX_VIEWPORTS   24
 #define WPS_MAX_LINES       ((LCD_HEIGHT/5+1) * 2)
 #define WPS_MAX_SUBLINES    (WPS_MAX_LINES*3)
 #define WPS_MAX_TOKENS      1024
@@ -271,8 +278,11 @@ enum wps_token_type {
 
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     /* Virtual LED */
-    WPS_TOKEN_VLED_HDD
+    WPS_TOKEN_VLED_HDD,
 #endif
+
+    /* Viewport display */
+    WPS_VIEWPORT_ENABLE
 };
 
 struct wps_token {
@@ -323,12 +333,17 @@ struct wps_line {
     long subline_expire_time;
 };
 
+#define VP_DRAW_HIDEABLE 0x1
+#define VP_DRAW_HIDDEN   0x2
+#define VP_DRAW_WASHIDDEN  0x4
 struct wps_viewport {
     struct viewport vp;   /* The LCD viewport struct */
-
+    struct progressbar *pb;
     /* Indexes of the first and last lines belonging to this viewport in the 
        lines[] array */
     int first_line, last_line;
+    char hidden_flags;
+    char label;
 };
 
 /* wps_data
@@ -338,17 +353,15 @@ struct wps_data
 {
 #ifdef HAVE_LCD_BITMAP
     struct gui_img img[MAX_IMAGES];
-    struct prog_img progressbar;
     unsigned char img_buf[IMG_BUFSIZE];
     unsigned char* img_buf_ptr;
     int img_buf_free;
     bool wps_sb_tag;
     bool show_sb_on_wps;
 
-    short progress_top;
-    short progress_height;
-    short progress_start;
-    short progress_end;
+    struct progressbar progressbar[MAX_PROGRESSBARS];
+    short progressbar_count;
+    
     bool peak_meter_enabled;
 
 #ifdef HAVE_ALBUMART
