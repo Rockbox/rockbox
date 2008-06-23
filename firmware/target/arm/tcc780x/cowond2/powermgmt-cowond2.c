@@ -66,7 +66,7 @@ unsigned int battery_adc_voltage(void)
         int adc_val, irq_status;
         unsigned char buf[2];
 
-        irq_status = disable_interrupt_save(IRQ_FIQ_DISABLED);
+        irq_status = disable_irq_save();
         pcf50606_write(PCF5060X_ADCC2, 0x1);
         pcf50606_read_multiple(PCF5060X_ADCS1, buf, 2);
         restore_interrupt(irq_status);
