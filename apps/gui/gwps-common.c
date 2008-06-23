@@ -104,8 +104,10 @@ void fade(bool fade_in, bool updatewps)
             fp_volume += fp_step;
             sound_set_volume(fp_volume >> 8);
             if (updatewps)
+            {
                 FOR_NB_SCREENS(i)
                     gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+            }
             sleep(1);
         }
         sound_set_volume(global_settings.volume);
@@ -118,8 +120,10 @@ void fade(bool fade_in, bool updatewps)
             fp_volume -= fp_step;
             sound_set_volume(fp_volume >> 8);
             if (updatewps)
+            {
                 FOR_NB_SCREENS(i)
                     gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
+            }
             sleep(1);
         }
         audio_pause();
