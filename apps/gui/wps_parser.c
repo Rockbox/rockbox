@@ -135,8 +135,6 @@ static int parse_viewport(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_leftmargin(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
-static int parse_image_special(const char *wps_bufptr,
-        struct wps_token *token, struct wps_data *wps_data);
 static int parse_statusbar_enable(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 static int parse_statusbar_disable(const char *wps_bufptr,
@@ -146,6 +144,10 @@ static int parse_image_display(const char *wps_bufptr,
 static int parse_image_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
 #endif /*HAVE_LCD_BITMAP */
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
+static int parse_image_special(const char *wps_bufptr,
+       struct wps_token *token, struct wps_data *wps_data);
+#endif
 #ifdef HAVE_ALBUMART
 static int parse_albumart_load(const char *wps_bufptr,
         struct wps_token *token, struct wps_data *wps_data);
@@ -711,11 +713,13 @@ static int parse_viewport(const char *wps_bufptr,
 }
 
 
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 static int parse_image_special(const char *wps_bufptr,
                                struct wps_token *token,
                                struct wps_data *wps_data)
 {
     (void)wps_data; /* kill warning */
+    (void)token;
     const char *pos = NULL;
     const char *newline;
 
@@ -735,6 +739,7 @@ static int parse_image_special(const char *wps_bufptr,
     /* Skip the rest of the line */
     return skip_end_of_line(wps_bufptr);
 }
+#endif
 
 #endif /* HAVE_LCD_BITMAP */
 
@@ -804,7 +809,8 @@ static int parse_progressbar(const char *wps_bufptr,
         PB_HEIGHT
     };
     const char *filename;
-    int x, y, height, width, set = 0;
+    int x, y, height, width;
+    uint32_t set = 0;
     const char *ptr = wps_bufptr;
     struct progressbar *pb;
     struct viewport *vp = &wps_data->viewports[wps_data->num_viewports].vp;
