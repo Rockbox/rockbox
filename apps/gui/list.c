@@ -271,6 +271,8 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
         {
             if (gui_list->start_item[screen] > gui_list->selected_item)
                 gui_list->start_item[screen] = (gui_list->selected_item/nb_lines)*nb_lines;
+            if (gui_list->nb_items <= nb_lines)
+                gui_list->start_item[screen] = 0;
         }
         else
         {
