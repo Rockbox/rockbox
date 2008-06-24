@@ -601,8 +601,10 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     /* new stuff at the end, sort into place next time
-        the API gets incompatible */
-
+       the API gets incompatible */
+#ifdef HAVE_TAGCACHE
+    tagcache_get_numeric,
+#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

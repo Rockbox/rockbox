@@ -419,33 +419,57 @@ int create_track_index(const int slide_index)
         return -1;
 
     int ret = 0;
+    char temp_titles[MAX_TRACKS][AVG_TRACK_NAME_LENGTH*4];
+    int temp_seeks[MAX_TRACKS];
 
     rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
     track_count=0;
-    int l, old_l = 0;
-    tracks[0].name_idx = 0;
+    int string_index = 0;
+    int l, track_num, heighest_index = 0;
 
+    for(l=0;l<MAX_TRACKS;l++)
+        temp_titles[l][0] = '\0';
     while (rb->tagcache_get_next(&tcs) && track_count  < MAX_TRACKS)
     {
-        l = rb->strlen(tcs.result) + 1;
-        if ( track_count > 0 )
-            tracks[track_count].name_idx = tracks[track_count-1].name_idx + old_l;
-
-        if ( (tracks[track_count].name_idx + l) > MAX_TRACKS * AVG_TRACK_NAME_LENGTH )
+        track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber) - 1;
+        if (track_num >= 0)
         {
-            /* not enough memory */
-            ret = ERROR_BUFFER_FULL;
-            break;
+            rb->snprintf(temp_titles[track_num],sizeof(temp_titles[track_num]), "%d:  %s",
+                         track_num+1, tcs.result);
+            temp_seeks[track_num] = tcs.result_seek;
         }
-        rb->strcpy(track_names + tracks[track_count].name_idx, tcs.result);
-        tracks[track_count].seek = tcs.result_seek;
-        old_l = l;
+        else
+        {
+            track_num = 0;
+            while (temp_titles[track_num][0] != '\0')
+                track_num++;
+            rb->strcpy(temp_titles[track_num], tcs.result);
+            temp_seeks[track_num] = tcs.result_seek;
+        }
+        if (track_num > heighest_index)
+            heighest_index = track_num;
         track_count++;
     }
 
     rb->tagcache_search_finish(&tcs);
     track_index = slide_index;
 
+    /* now fix the track list order */
+    l = 0;
+    track_count = 0;
+    while (l < heighest_index && 
+           string_index <  MAX_TRACKS*AVG_TRACK_NAME_LENGTH)
+    {
+        if (temp_titles[l][0] != '\0')
+        {
+            rb->strcpy(track_names + string_index, temp_titles[l]);
+            tracks[track_count].name_idx = string_index;
+            tracks[track_count].seek = temp_seeks[l];
+            string_index += rb->strlen(temp_titles[l]) + 1;
+            track_count++;
+        }
+        l++;
+    }
     if (ret != 0)
         return ret;
     else
@@ -1759,6 +1783,14 @@ void show_track_list(void)
     }
     static int titletxt_w, titletxt_h, titletxt_y, titletxt_x, i, color;
     titletxt_y = 0;
+    if (track_list_visible_entries >= track_count)
+    {
+        int albumtxt_h;
+        const char* albumtxt = get_album_name(center_index);
+        rb->lcd_getstringsize(albumtxt, NULL, &albumtxt_h);
+        titletxt_y = ((LCD_HEIGHT-albumtxt_h-10)-(track_count*albumtxt_h))/2;
+    }
+        
     int track_i;
     for (i=0; i < track_list_visible_entries; i++) {
         track_i = i+start_index_track_list;
