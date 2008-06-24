@@ -25,6 +25,8 @@ typedef struct MDCTContext
     int n;  /* size of MDCT (i.e. number of input data * 2) */
     int nbits; /* n = 2^nbits */
     /* pre/post rotation tables */
+    fixed32 *tcos;
+    fixed32 *tsin;
     FFTContext fft;
 }
 MDCTContext;
