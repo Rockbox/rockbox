@@ -1,7 +1,7 @@
 % $Id$ %
 \chapter{Advanced Topics}
 
-\section{\label{ref:CustomisingUI}Customising the userinterface}
+\section{\label{ref:CustomisingUI}Customising the User Interface}
 \subsection{\label{ref:GettingExtras}Getting Extras}
 \opt{lcd_bitmap}{
 Rockbox supports custom fonts. A collection of fonts is available for download
@@ -45,6 +45,10 @@ file find the instructions on the Rockbox website:
   and select \setting{Background Colour} or \setting{Foreground Colour}.
   The colours set here are used in all menus, browsers and in the
   \setting{While Playing Screen}.
+      \subsection{Changing Filetype Colours}
+	  Rockbox has the capability to modify the File Browser to show different 
+	  filetypes in different colours depending upon the file extension.
+	  See the \wikilink{CustomFiletypeColours} Wiki page for details.
 }
 
 \nopt{archos,mrobe100}{%
@@ -142,7 +146,7 @@ The WPS parser will always display the last part if the tag has no value, or if
 the list of alternatives is too short.
 \end{description}
 
-\subsubsection{Next Song info}
+\subsubsection{Next Song Info}
 You can display information about the next song -- the song that is
 about to play after the one currently playing (unless you change the
 plan).
@@ -157,7 +161,7 @@ name used in the next song and \config{\%Ff} is the mp3 frequency.
   suggest you use the conditional display tag a lot when displaying
   information about the next song!}
 
-\subsubsection{Alternating sublines}
+\subsubsection{Alternating Sublines}
 
 It is possible to group items on each line into 2 or more groups or 
 ``sublines''. Each subline will be displayed in succession on the line for a 
@@ -268,9 +272,9 @@ title [artist]''.
 % % \end{verbatim}
 %}
 
-\section{\label{ref:manage_settings}Managing Rockbox settings}
+\section{\label{ref:manage_settings}Managing Rockbox Settings}
 
-\subsection{Introduction to \fname{.cfg} files.}
+\subsection{Introduction to \fname{.cfg} Files.}
 Rockbox allows users to store and load multiple settings through the use of
 configuration files. A configuration file is simply a text file with the
 extension \fname{.cfg}.
@@ -286,7 +290,7 @@ for configuration files. See \reference{ref:manage_settings_menu} for an
 explanation of how to create, edit and load configuration files.
 
 \subsection{\label{ref:cfg_specs}Specifications for \fname{.cfg}
-  files.}
+  Files.}
 
 The Rockbox configuration file is a plain text file, so once you use the 
 \setting{Save .cfg file} option to create the file, you can edit the file on 
@@ -328,6 +332,9 @@ Example of a configuration file:
   each file a different name (such as \fname{car.cfg}, 
   \fname{headphones.cfg}, etc.), and you can then use the \setting{Browse .cfg 
     files} option to quickly change settings.} 
+	
+	A special case configuration file can be used to force a particular setting or settings every time Rockbox starts up (e.g. to set the volume to a safe level).
+Format a new configuration file as above with the required setting(s) and save it into the \fname{/.rockbox} directory with the filename \fname{fixed.cfg}.
 
 \subsection{\label{ref:manage_settings_menu}The \setting{Manage Settings} 
   menu} The \setting{Manage Settings} menu can be found in the \setting{Main 
@@ -337,7 +344,7 @@ Example of a configuration file:
 
 \begin{description}
   
-\item [Browse .cfg Files.]Opens the file browser in the \fname{/.rockbox} 
+\item [Browse .cfg Files]Opens the file browser in the \fname{/.rockbox} 
   directory and displays all \fname{.cfg} (configuration) files. Selecting a 
   \fname{.cfg} file will cause Rockbox to load the settings contained in that 
   file. Pressing \ButtonLeft\ will exit back to the \setting{Manage Settings}
@@ -345,7 +352,7 @@ Example of a configuration file:
   \setting{Manage Settings} menu for details of how to save and edit a 
   configuration file.
   
-\item [Reset Settings.]This wipes the saved settings in the \dap\ and 
+\item [Reset Settings]This wipes the saved settings in the \dap\ and 
   resets all settings to their default values. 
   
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{
@@ -362,22 +369,22 @@ Example of a configuration file:
       \ButtonA\ button immediately after the \dap\ turns on.}
   }
 
-\item [Save .cfg file.]This option writes a \fname{.cfg} file to 
+\item [Save .cfg File]This option writes a \fname{.cfg} file to 
   your \daps{} disk.  The configuration file has the \fname{.cfg} 
   extension and is used to store all of the user settings that are described 
   throughout this manual.
     
-  Hint: Use the \setting{Save .cfg file} feature (\setting{Main Menu 
+  Hint: Use the \setting{Save .cfg File} feature (\setting{Main Menu 
     $\rightarrow$ General Settings}) to save the current settings, then 
   use a text editor to customize the settings file. See Appendix 
   \reference{ref:config_file_options} for the full reference of available 
   options.
   
-\item [Save Sound Settings.]This option writes a \fname{.cfg} file to 
+\item [Save Sound Settings]This option writes a \fname{.cfg} file to 
   your \daps\ disk.  The configuration file has the \fname{.cfg} 
   extension and is used to store all of the sound related settings.
     
-\item [Save Theme Settings.]This option writes a \fname{.cfg} file to 
+\item [Save Theme Settings]This option writes a \fname{.cfg} file to 
   your \daps\ disk.  The configuration file has the \fname{.cfg} 
   extension and is used to store all of the theme related settings.
 
@@ -394,7 +401,7 @@ Example of a configuration file:
   you intended.
 }
 
-\subsection{\label{ref:using_rolo}Using ROLO (Rockbox loader)}
+\subsection{\label{ref:using_rolo}Using ROLO (Rockbox Loader)}
 Rockbox is able to load and start another firmware file without rebooting. 
 You just ``play'' a file with the extension %
 \opt{recorder,recorderv2fm,ondio}{\fname{.ajz}.} %
