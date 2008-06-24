@@ -25,7 +25,9 @@ QMAKE_EXTRA_TARGETS += tags
 # add a custom rule for making the translations
 lrelease.commands = $$[QT_INSTALL_BINS]/lrelease -silent rbutilqt.pro
 QMAKE_EXTRA_TARGETS += lrelease
-PRE_TARGETDEPS += lrelease
+!dbg {
+    PRE_TARGETDEPS += lrelease
+}
 
 
 SOURCES += rbutilqt.cpp \
@@ -153,6 +155,9 @@ FORMS += rbutilqtfrm.ui \
 RESOURCES += rbutilqt.qrc
 win32 {
     RESOURCES += rbutilqt-win.qrc
+}
+!dbg {
+    RESOURCES += rbutilqt-lang.qrc
 }
 
 TRANSLATIONS += rbutil_de.ts \

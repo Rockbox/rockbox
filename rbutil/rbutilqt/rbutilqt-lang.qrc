@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/lang" >
+        <file>rbutil_de.qm</file>
+        <file>rbutil_tr.qm</file>
+        <file>rbutil_fr.qm</file>
+        <file>rbutil_zh_CN.qm</file>
+        <file>rbutil_zh_TW.qm</file>
+    </qresource>
+</RCC>
