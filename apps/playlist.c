@@ -3420,6 +3420,12 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), false);
 
     cpu_boost(true);
+    
+    if (is_m3u8(path))
+    {
+        /* some applications require a BOM to read the file properly */
+        write(fd, BOM, BOM_SIZE);
+    }
 
     index = playlist->first_index;
     for (i=0; i<playlist->amount; i++)
