@@ -6,9 +6,12 @@ This chapter describes the Rockbox music database system. Using the information
 contained in the tags (ID3v1, ID3v2%
   \opt{swcodec}{, Vorbis Comments, Apev2, etc.}%
 ) in your audio files, Rockbox builds and maintains a database of the music
-files on your player and allows you to browse them by Artist, Album and Genre.
+files on your player and allows you to browse them by Artist, Album, Genre, 
+Song Name, etc.  The criteria the database uses to sort the songs can be completely
+ customised. More information on how to achieve this can be found on the Rockbox
+ website at \wikilink{DataBase}. 
 
-\subsection{Initializing the database}
+\subsection{Initializing the Database}
 The first time you use the database, Rockbox will scan your disk for audio files.
 This can take quite a while depending on the number of files on your \dap{}.
 This scan happens in the background, so you can choose to return to the
@@ -17,7 +20,7 @@ If you shut down your player, the scan will continue next time you turn it on.
 After the scan is finished you may be prompted to restart your \dap{} before
 you can use the database.
 
-\subsubsection{Ignoring directories during database initialization}
+\subsubsection{Ignoring Directories During Database Initialization}
 
 You may have directories on your \dap{} whose contents should not be added
 to the database. Placing a file named \fname{database.ignore} in a directory
@@ -33,7 +36,7 @@ its subdirectories will be scanned and added to the database.
 
 \begin{description}
   \opt{swcodec}{
-  \item[Load To Ram.]
+  \item[Load To RAM]
     The database can either be kept on disk (to save memory), or
     loaded into RAM (for fast browsing). Setting this to \setting{Yes} loads
     the database to RAM, allowing faster browsing and searching. Setting this
@@ -45,7 +48,7 @@ its subdirectories will be scanned and added to the database.
       the disk will not need to spin on each search.}
   }
   
-\item[Auto Update.]
+\item[Auto Update]
   If \setting{Auto update} is set to \setting{on}, each time the \dap{}
   boots, the database will automatically be updated.
   \opt{swcodec}{
@@ -58,14 +61,14 @@ its subdirectories will be scanned and added to the database.
   \opt{MASCODEC}{\setting{Auto Update} does not detect deleted files. To remove
     deleted files from the database you need to run \setting{Update Now}.}%
 
-\item[Initialize Now.]
+\item[Initialize Now]
   You can force Rockbox to rescan your disk for tagged files by
   using the \setting{Initialize Now} function in the \setting{Database
     Menu}.
   \warn{\setting{Initialize Now} removes all database files (removing
     runtimedb data also) and rebuilds the database from scratch.}
 
-\item[Update Now.]
+\item[Update Now]
   \setting{Update now} causes the database to detect new and deleted files
   \opt{swcodec}{
     \note{Unlike the \setting{Auto Update} function, \setting{Update Now}
@@ -77,13 +80,13 @@ its subdirectories will be scanned and added to the database.
   Unlike \setting{Initialize Now}, the \setting{Update Now} function
   does not remove runtime database information.
   
-\item[Gather Runtime Data.]
+\item[Gather Runtime Data]
   When enabled, rockbox will record how often and how long a track is being played, 
   when it was last played and its rating. This information can be displayed in
   the WPS and is used in the database browser to, for example, show the most played, 
   unplayed and most recently played tracks.
   
-\item[Export Modifications.]
+\item[Export Modifications]
   This allows for the runtime data to be exported to the file \\
   \fname{/.rockbox/database\_changelog.txt}, which backs up the runtime data in
   ASCII format. This is needed when database structures change, because new
@@ -97,10 +100,10 @@ its subdirectories will be scanned and added to the database.
   
 \end{description}
 
-\subsection{Using the database}
-Once the database has been initialized, you can browse your music by Artist, 
-Album, Genre and Song Name. To use the database, go to the \setting{Main Menu}
-and select \setting{Database}.\\
+\subsection{Using the Database}
+Once the database has been initialized, you can browse your music 
+by Artist, Album, Genre, Song Name, etc.  To use the database, go to the
+ \setting{Main Menu} and select \setting{Database}.\\
 
 \note{You may need to increase the value of the \setting{Max files in dir 
 browser} setting (\setting{Settings $\rightarrow$ General Settings
@@ -109,8 +112,8 @@ tracks in the ID3 database browser.\\
 
 There is no option to turn off database completely. If you do not want
 to use it just do not do the initial build of the database and do not load it
-to RAM.}
-%
+to RAM.}%
+
 \begin{table}
 \begin{center}
   \begin{tabularx}{.75\textwidth}{XXX}%
