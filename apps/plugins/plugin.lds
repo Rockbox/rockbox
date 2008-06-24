@@ -82,8 +82,10 @@ OUTPUT_FORMAT(elf32-sh)
 #define IRAM DRAM
 #elif defined(CPU_TCC780X)
 #define DRAMORIG 0x20000000
-#define IRAMORIG 0x1000c000
-#define IRAMSIZE 0xc000
+/*#define IRAMORIG 0x1000c000
+#define IRAMSIZE 0xc000*/
+#define IRAM DRAM
+#define IRAMSIZE 0
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #endif

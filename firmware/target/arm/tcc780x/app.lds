@@ -115,7 +115,8 @@ SECTIONS
         *(.icode)
         . = ALIGN(0x4);
         _iramend = .;
-    } > SRAM AT> DRAM
+    /* } > SRAM AT> DRAM */
+    } > DRAM
 
     _iramcopy = LOADADDR(.iram);
     
@@ -125,7 +126,8 @@ SECTIONS
         *(.ibss)
         . = ALIGN(0x4);
         _iend = .;
-    } > SRAM
+    /* } > SRAM */
+    } > DRAM
 
     .stack :
     {
@@ -133,7 +135,8 @@ SECTIONS
        stackbegin = .;
        . += 0x2000;
        stackend = .;
-    } > SRAM
+    /* } > SRAM */
+    } > DRAM
 
     .bss :
     {
