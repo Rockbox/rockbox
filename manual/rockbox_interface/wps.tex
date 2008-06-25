@@ -76,8 +76,8 @@ your WPS (While Playing Screen).
       %
       \ActionWpsContext & Enter \setting{WPS Context Menu}.\\
       %
-      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,
-      MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
+          ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
         \ActionWpsPitchScreen & Show \setting{Pitch Screen}
         (see \reference{sec:pitchscreen}).\\}%
       %
@@ -102,24 +102,23 @@ your WPS (While Playing Screen).
       \opt{ONDIO_PAD}{%
         Long \ButtonMenu+\ButtonDown & Key lock on/off.\\%
       }%
-      \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,
-      MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+      \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD%
+          ,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
         \ActionWpsIdThreeScreen & Enter \setting{ID3 Viewer}.\\%
       }%
-      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,
-      MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
-         \ActionWpsAbSetBNextDir{} or Short \ActionWpsSkipNext + 
-         Long \ActionWpsSkipNext & Skip to the next directory.\\%
-         \ActionWpsAbSetAPrevDir{} or Short \ActionWpsSkipPrev +
-         Long \ActionWpsSkipPrev & Skip to the previous directory.\\%
-      }%
-      \nopt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,
-      MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
-          Short \ActionWpsSkipNext + Long \ActionWpsSkipNext & 
-          Skip to the next directory.\\%
-          Short \ActionWpsSkipPrev + Long \ActionWpsSkipPrev & 
-          Skip to the previous directory.\\%	       
-	  }%
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD,MROBE100_PAD%
+          ,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+         \ActionWpsAbSetBNextDir{} or }%
+         % not all targets have the above action defined but the one below works on all
+      Short \ActionWpsSkipNext{} + Long \ActionWpsSkipNext
+      & Skip to the next directory.\\
+      %
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD%
+         ,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_C200_PAD}{%
+         \ActionWpsAbSetAPrevDir{} or }%
+      Short \ActionWpsSkipPrev{} + Long \ActionWpsSkipPrev
+      & Skip to the previous directory.\\
+      %
       \opt{SANSA_E200_PAD,SANSA_C200_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
         \ActionStdRec & Switches to the Recording screen \\
       }%
