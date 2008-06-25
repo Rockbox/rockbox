@@ -415,7 +415,7 @@ static int info_action_callback(int action, struct gui_synclist *lists)
 #endif
         return ACTION_REDRAW;
     }
-    else if (action == ACTION_NONE)
+    else if (action == ACTION_NONE && lists->selected_item == INFO_TIME)
     {
         if (TIME_AFTER(current_tick, last_redraw + HZ/2))
         {
