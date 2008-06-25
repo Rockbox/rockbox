@@ -399,24 +399,29 @@ unsigned int read_file(const char *name, unsigned char **buffer)
                       SEND_DATA(buffer, fsize); \
                       free(buffer); \
                       fprintf(stderr, " Done!\n");
-#define _VERIFY_DATA(a,b,c) fprintf(stderr, "[INFO] Verifying data (%s)...", a); \
-                            fsize = read_file(a, &buffer); \
-                            buffer2 = (unsigned char*)malloc(fsize); \
-                            SEND_COMMAND(VR_SET_DATA_ADDRESS, c); \
-                            SEND_COMMAND(VR_SET_DATA_LENGTH, fsize); \
-                            GET_DATA(buffer2, fsize); \
-                            if(memcmp(buffer, buffer2, fsize) != 0) \
-                                fprintf(stderr, "\n[WARN] Sent data isn't the same as received data...\n"); \
-                            else \
-                                fprintf(stderr, " Done!\n"); \
-                            free(buffer); \
-                            free(buffer2);
+#define _VERIFY_DATA(a,c) fprintf(stderr, "[INFO] Verifying data (%s)...", a); \
+                          fsize = read_file(a, &buffer); \
+                          buffer2 = (unsigned char*)malloc(fsize); \
+                          SEND_COMMAND(VR_SET_DATA_ADDRESS, c); \
+                          SEND_COMMAND(VR_SET_DATA_LENGTH,  fsize); \
+                          GET_DATA(buffer2, fsize); \
+                          if(memcmp(buffer, buffer2, fsize) != 0) \
+                              fprintf(stderr, "\n[WARN] Sent data isn't the same as received data...\n"); \
+                          else \
+                              fprintf(stderr, " Done!\n"); \
+                          free(buffer); \
+                          free(buffer2);
 #define _STAGE1(a)     fprintf(stderr, "[INFO] Stage 1 at 0x%x\n", a); \
                        SEND_COMMAND(VR_PROGRAM_START1, a);
 #define _STAGE2(a)     fprintf(stderr, "[INFO] Stage 2 at 0x%x\n", a); \
                        SEND_COMMAND(VR_PROGRAM_START2, a);
 #define _FLUSH         fprintf(stderr, "[INFO] Flushing caches...\n"); \
                        SEND_COMMAND(VR_FLUSH_CACHES, 0);
+#ifdef _WIN32
+ #define _SLEEP(x) Sleep(x*1000);
+#else
+ #define _SLEEP(x) sleep(x);
+#endif
 int mimic_of(usb_dev_handle *dh)
 {
     int err, fsize;
@@ -428,10 +433,10 @@ int mimic_of(usb_dev_handle *dh)
     _SET_ADDR(0x8000 << 16);
     _SEND_FILE("1.bin");
     _GET_CPU;
-    _VERIFY_DATA("1.bin", 0, 0x8000 << 16);
+    _VERIFY_DATA("1.bin", 0x8000 << 16);
     _STAGE1(0x8000 << 16);
-    Sleep(3000);
-    _VERIFY_DATA("2.bin", 0, 0xB3020060);
+    _SLEEP(3);
+    _VERIFY_DATA("2.bin", 0xB3020060);
     _GET_CPU;
     _GET_CPU;
     _FLUSH;
@@ -440,7 +445,7 @@ int mimic_of(usb_dev_handle *dh)
     _SET_ADDR(0x8000 << 16);
     _SEND_FILE("3.bin");
     _GET_CPU;
-    _VERIFY_DATA("3.bin", 0, 0x8000 << 16);
+    _VERIFY_DATA("3.bin", 0x8000 << 16);
     _GET_CPU;
     _FLUSH;
     _GET_CPU;
@@ -448,7 +453,7 @@ int mimic_of(usb_dev_handle *dh)
     _SET_ADDR(0x80D0 << 16);
     _SEND_FILE("4.bin");
     _GET_CPU;
-    _VERIFY_DATA("4.bin", 0, 0x80D0 << 16);
+    _VERIFY_DATA("4.bin", 0x80D0 << 16);
     _GET_CPU;
     _FLUSH;
     _GET_CPU;
@@ -456,7 +461,7 @@ int mimic_of(usb_dev_handle *dh)
     _SET_ADDR(0x80E0 << 16);
     _SEND_FILE("5.bin");
     _GET_CPU;
-    _VERIFY_DATA("5.bin", 3 << 16, 0x80E0 << 16);
+    _VERIFY_DATA("5.bin", 0x80E0 << 16);
     _GET_CPU;
     _FLUSH;
     _GET_CPU;
@@ -464,7 +469,7 @@ int mimic_of(usb_dev_handle *dh)
     _SET_ADDR(0x80004000);
     _SEND_FILE("6.bin");
     _GET_CPU;
-    _VERIFY_DATA("6.bin", 0, 0x80004000);
+    _VERIFY_DATA("6.bin", 0x80004000);
     _GET_CPU;
     _FLUSH;
     _GET_CPU;
@@ -472,23 +477,23 @@ int mimic_of(usb_dev_handle *dh)
     _SET_ADDR(0x80FD << 16);
     _SEND_FILE("7.bin");
     _GET_CPU;
-    _VERIFY_DATA("7.bin", 0, 0x80FD << 16);
+    _VERIFY_DATA("7.bin", 0x80FD << 16);
     _GET_CPU;
     _FLUSH;
     _GET_CPU;
     _STAGE2(0x80FD0004);
-    _VERIFY_DATA("8.bin", 0, 0x80004004);
-    _VERIFY_DATA("9.bin", 0, 0x80004008);
-    Sleep(2000);
+    _VERIFY_DATA("8.bin", 0x80004004);
+    _VERIFY_DATA("9.bin", 0x80004008);
+    _SLEEP(2);
     _GET_CPU;
     _SET_ADDR(0x80E0 << 16);
-    _SEND_FILE("verminkt.bin");
+    _SEND_FILE("10.bin");
     _GET_CPU;
-    _VERIFY_DATA("verminkt.bin", 3 << 16, 0x80E0 << 16);
+    _VERIFY_DATA("10.bin", 0x80E0 << 16);
     _GET_CPU;
     _FLUSH;
     _GET_CPU;
-    _STAGE2(0x80E0 << 16);
+    _STAGE2(0x80e00008);
     fprintf(stderr, "[INFO] Done!\n");
     return 0;
 }
