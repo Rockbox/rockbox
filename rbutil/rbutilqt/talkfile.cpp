@@ -37,7 +37,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
     QString errStr;
     if(!m_tts->start(&errStr))
     {
-        m_logger->addItem(errStr,LOGERROR);
+        m_logger->addItem(errStr.trimmed(),LOGERROR);
         m_logger->addItem(tr("Init of TTS engine failed"),LOGERROR);
         m_logger->abort();
         return false;
