@@ -601,7 +601,7 @@ static int parse_viewport(const char *wps_bufptr,
         if (*(ptr+1) == '|')
         {
             char label = *(ptr+2);
-            if (label >= 'a' && label < 'a' + WPS_MAX_VIEWPORTS)
+            if (label >= 'a' && label <= 'z')
             {
                 wps_data->viewports[wps_data->num_viewports].hidden_flags = VP_DRAW_HIDEABLE;
                 wps_data->viewports[wps_data->num_viewports].label = label;
