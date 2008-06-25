@@ -162,6 +162,7 @@ win32 {
 
 TRANSLATIONS += rbutil_de.ts \
  rbutil_fr.ts \
+ rbutil_nl.ts \
  rbutil_tr.ts \
  rbutil_zh_CN.ts \
  rbutil_zh_TW.ts
