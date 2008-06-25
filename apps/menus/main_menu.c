@@ -389,7 +389,6 @@ static int info_speak_item(int selected_item, void * data)
 
 static int info_action_callback(int action, struct gui_synclist *lists)
 {
-    static int last_redraw = 0;
     if (action == ACTION_STD_CANCEL)
         return action;
     else if ((action == ACTION_STD_OK)
@@ -415,14 +414,17 @@ static int info_action_callback(int action, struct gui_synclist *lists)
 #endif
         return ACTION_REDRAW;
     }
+#if CONFIG_RTC
     else if (action == ACTION_NONE && lists->selected_item == INFO_TIME)
     {
+        static int last_redraw = 0;
         if (TIME_AFTER(current_tick, last_redraw + HZ/2))
         {
             last_redraw = current_tick;
             return ACTION_REDRAW;
         }
     }
+#endif
     return action;
 }
 static bool show_info(void)
