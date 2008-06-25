@@ -389,9 +389,10 @@ static int info_speak_item(int selected_item, void * data)
 
 static int info_action_callback(int action, struct gui_synclist *lists)
 {
+    static int last_redraw = 0;
     if (action == ACTION_STD_CANCEL)
         return action;
-    if ((action == ACTION_STD_OK)
+    else if ((action == ACTION_STD_OK)
 #ifdef HAVE_MULTIVOLUME
         || action == SYS_HOTSWAP_INSERTED
         || action == SYS_HOTSWAP_EXTRACTED
@@ -413,6 +414,14 @@ static int info_action_callback(int action, struct gui_synclist *lists)
         (void) lists;
 #endif
         return ACTION_REDRAW;
+    }
+    else if (action == ACTION_NONE)
+    {
+        if (TIME_AFTER(current_tick, last_redraw + HZ/2))
+        {
+            last_redraw = current_tick;
+            return ACTION_REDRAW;
+        }
     }
     return action;
 }
