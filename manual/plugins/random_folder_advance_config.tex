@@ -1,0 +1,26 @@
+\subsection{Random Folder Advance Configuration}
+{\label{ref:random_folder_advance_config}}
+This plugin is used to configure the folders which will be considered
+when the Auto-Change Directory feature is set to \setting{Random}.
+
+\subsubsection{Menu}
+\begin{description}
+\item[Generate Folder List] Generates a list of all folders found 
+on the player
+\item[Edit Folder List] Enter the folder list editor
+\item[Export List To Textfile] Exports the list to 
+  \fname{/.rockbox/folder\_advance\_list.txt}
+\item[Import List From Textfile] Imports the list from
+  \fname{/.rockbox/folder\_advance\_list.txt}
+\item[Quit]
+\end{description}
+
+\subsubsection{Folder List Editor Keys}
+\begin{table}
+\begin{btnmap}{}{}
+	\ActionStdOk{} & Delete selected folder\\
+	\ActionStdContext{} & Bring up the context menu which allows you to
+	remove the selected folder or it's entire folder tree\\
+	\ActionStdCancel{} & Exit\\
+\end{btnmap}
+\end{table}

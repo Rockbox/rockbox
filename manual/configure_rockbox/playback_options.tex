@@ -3,35 +3,35 @@
 The \setting{Playback} sub menu allows you to configure settings
 related to audio playback.
 \begin{description}
-\item[Shuffle. ]Turning shuffle on will cause Rockbox to randomly re-order the
+\item[Shuffle]Turning shuffle on will cause Rockbox to randomly re-order the
   playlist. Thus, to shuffle all of the audio files on the player, you first
   need to create a playlist containing all of them. For more information on
   creating playlists refer to \reference{ref:working_with_playlists}.\\
   Options: \setting{Yes}/\setting{No}.
   %
-\item[Repeat. ]Configures settings related to repeating of directories or
+\item[Repeat]Configures settings related to repeating of directories or
   playlists.\\
   Options: \setting{Off} / \setting{All} / \setting{One} / \setting{Shuffle}
   \nopt{ondiosp,ondiofm}{\setting{/A-B}}:
   \begin{description}
     %
-  \item[Off. ]The current playlist will not repeat when it is finished.
-    \note{If you have the \setting{Auto change directory} option set to
+  \item[Off]The current playlist will not repeat when it is finished.
+    \note{If you have the \setting{Auto-Change Directory} option set to
       \setting{Yes}, Rockbox will move on to the next directory on your
-      hard drive. If the \setting{Auto Change Directory} option is set to
+      hard drive. If the \setting{Auto-Change Directory} option is set to
       \setting{No}, playback will stop when the current directory or
       playlist is finished.}
     %
-  \item[All. ]The current playlist will repeat when it is finished.
+  \item[All]The current playlist will repeat when it is finished.
 
     %
-  \item[One. ]Repeat one track over and over.
+  \item[One]Repeat one track over and over.
     %
-  \item[Shuffle. ]When the current playlist has finished playing, it will
+  \item[Shuffle]When the current playlist has finished playing, it will
     be shuffled and then repeated.
     %
     \nopt{ondiosp,ondiofm}{
-    \item[A-B. ]Repeats between two user defined points within a track,
+    \item[A-B]Repeats between two user defined points within a track,
       typically used by musicians when attempting to learn a piece of music.
       This option is more complicated to use than the others as the \dap\
       must first be placed into A-B repeat mode and then the start and end
@@ -91,19 +91,19 @@ related to audio playback.
     }
   \end{description}
 
-\item[Play Selected First. ]This setting controls what happens when you
+\item[Play Selected First]This setting controls what happens when you
   select a file for playback while shuffle mode is on. If the
   \setting{Play Selected First} setting is \setting{Yes}, the file you
   selected will be played first. If this setting is \setting{No}, a random
   file in the directory will be played first.
 
-  \item[Fast-Forward/Rewind. ]How fast you want search (fast forward or rewind)
+  \item[Fast-Forward/Rewind]How fast you want search (fast forward or rewind)
     to accelerate when you hold down the button. \setting{Off} means no 
     acceleration. \setting{2x/1s} means double the search speed once every 
     second the button is held. \setting{2x/5s} means double the search speed 
     once every 5 seconds the button is held.
 
-  \item[Anti-Skip Buffer. ]This setting allows you to control how much music is
+  \item[Anti-Skip Buffer]This setting allows you to control how much music is
     stored in the \daps{} memory whilst playing a song, acting as a buffer
     against shock or playback problems. The \dap{} transfers the selected
     amount of the forthcoming song into its memory at high speed whilst you are
@@ -134,45 +134,45 @@ related to audio playback.
       reduce your battery life. It is recommended to always use the lowest
       possible setting that allows correct and continuous playback.}
     
-  \item[Fade on Stop/Pause. ]Enables and disables a fade effect when you
+  \item[Fade on Stop/Pause]Enables and disables a fade effect when you
     pause or stop playing a song. If the Fade on Stop/Pause option is
     set to \setting{Yes}, your music will fade out when you stop or pause 
     playback, and fade in when you resume playback.
     
-  \item[Party Mode. ]Enables unstoppable music playback. When new songs are
+  \item[Party Mode]Enables unstoppable music playback. When new songs are
     selected, they are queued at the end of the current dynamic playlist
     instead of being played immediately. Pausing and stopping playback is
     disabled as well as skipping songs and launching plugins.
 
     \opt{swcodec}{
-    \item[Crossfade. ]
+    \item[Crossfade]
       This setting enables a cross-fader. At the end of a song, the song will 
       fade out as the next song fades in, creating a smooth transition between 
       songs.\\
       Options:
       \begin{description}
-      \item[Enable Crossfade. ]If set to \setting{Off}, crossfade is disabled.
+      \item[Enable Crossfade]If set to \setting{Off}, crossfade is disabled.
         If set to \setting{Always}, songs will always crossfade into one
         another. If set to \setting{Shuffle}, crossfade is enabled when the
         shuffle feature is set to \setting{Yes}, but disabled otherwise. If set
         to track skip only, tracks will only crossfade when you manually change
         tracks.
         %
-      \item[Fade In Delay. ]The ``fade in delay'' is the length of time between
+      \item[Fade In Delay]The ``fade in delay'' is the length of time between
         when the crossfade process begins and when the new track begins to fade
         in.
         %
-      \item[Fade In Duration. ]The length of time, in seconds, that it takes
+      \item[Fade In Duration]The length of time, in seconds, that it takes
         your music to fade in.
         %
-      \item[Fade Out Delay. ]The ``fade out delay'' is the length of time
+      \item[Fade Out Delay]The ``fade out delay'' is the length of time
         between when the crossfade process begins and when the old track begins
         to fade out.
         %
-      \item[Fade Out Duration. ]The length of time, in seconds, that it takes
+      \item[Fade Out Duration]The length of time, in seconds, that it takes
         your music to fade out.
         %
-      \item[Fade Out Mode. ]If set to \setting{Crossfade}, one song will fade
+      \item[Fade Out Mode]If set to \setting{Crossfade}, one song will fade
         out and the next song will simultaneously fade in. If set to 
         \setting{Mix}, the ending song will continue to play as normal until 
         its end, while the starting song will fade in from under it. 
@@ -185,7 +185,7 @@ related to audio playback.
     }%
     
     \opt{swcodec}{
-    \item[Replaygain. ]This allows you to control the replaygain function.
+    \item[Replaygain]This allows you to control the replaygain function.
       The purpose of replaygain is to adjust the volume of the music played
       so that all songs (or albums, depending on your settings) have the
       same apparent volume. This prevents sudden changes in volume when
@@ -196,29 +196,29 @@ related to audio playback.
       
       Options for replaygain are:
       \begin{description}
-      \item[Enable Replaygain. ]This turns on/off the replaygain function.
+      \item[Enable Replaygain]This turns on/off the replaygain function.
         %
-      \item[Prevent Clipping. ]Avoid clipping of a song's waveform.
+      \item[Prevent Clipping]Avoid clipping of a song's waveform.
         If a song would clip during playback, the volume is lowered for 
         that song. Replaygain information is needed for this to work.
         %
-      \item[Replaygain type. ]Choose the type of replaygain to apply:
+      \item[Replaygain Type]Choose the type of replaygain to apply:
         \begin{description}
-        \item[Album Gain. ]Maintain a constant volume level between
+        \item[Album Gain]Maintain a constant volume level between
           albums, but keep any intentional volume variations between 
           songs in an album. (If album gain value is not available,
           uses track gain information).
           %
-        \item[Track Gain. ]Maintain a constant volume level between
+        \item[Track Gain]Maintain a constant volume level between
           tracks. If track gain value is not available, no replaygain 
           is applied.
           %
-        \item[Track Gain if Shuffling. ]Maintains a constant volume
+        \item[Track Gain If Shuffling]Maintains a constant volume
           between tracks if \setting{Shuffle} is set to \setting{Yes}.
           Reverts to album mode if \setting{Shuffle} is set to \setting{No}.
         \end{description}
         %
-      \item[Pre-amp. ]This allows you to adjust the volume when replaygain
+      \item[Pre-amp]This allows you to adjust the volume when replaygain
         is applied. Replaygain often lowers the volume, sometimes quite
         much, so here you can compensate for that. Please note that a
         (large) positive pre-amp setting can cause clipping, unless
@@ -227,7 +227,7 @@ related to audio playback.
       \end{description}
     }
     \opt{swcodec}{
-      \item[Beep Volume. ]Controls the volume of the beep that is heard when
+      \item[Beep Volume]Controls the volume of the beep that is heard when
         skipping forward or backward between tracks. The beep is disabled when
         set to \setting{Off}.
     }
@@ -238,22 +238,26 @@ related to audio playback.
          optical output, set to \setting{Yes}
     }
 
-\item[Auto-Change Directory. ]Control what Rockbox does when it reaches the end
+\item[Auto-Change Directory]Control what Rockbox does when it reaches the end
   of a directory. If \setting{Auto-Change Directory} is set to \setting{Yes},
   Rockbox will continue to the next directory. If
   \setting{Auto-Change Directory} is set to \setting{No}, playback will stop at
-  the end of the current playlist.
+  the end of the current playlist.  Using the \setting{Random} feature requires
+  you to first generate a folder list via the Random Folder Advance Configuration
+  plugin (see \reference{ref:random_folder_advance_config}).
   \note{You must have the \setting{Repeat} option set to \setting{No} for
     \setting{Auto-Change Directory} to function properly.}
+  \note{This feature only works when songs have been played from the file
+    browser.  Using it with the database may cause unexpected behavior.}
 
   %
 \opt{headphone_detection}{
-\item[Pause on headphone unplug.] Enables and disables automatic pausing of 
+\item[Pause on Headphone Unplug] Enables and disables automatic pausing of 
   playback when the headphones are disconnected from the \daps{} headphone 
   socket.
   %
   \begin{description}
-  \item[Pause on headphone unplug. ]Options for automatic pause:
+  \item[Pause on Headphone Unplug]Options for automatic pause:
     \begin{description}
     \item[Off.] Disables automatic pause.
       %
@@ -262,10 +266,10 @@ related to audio playback.
     \item[Pause and Resume.] Pauses when the headphones are removed, and 
       resumes playback when they are reconnected.
   \end{description}
-  \item[Duration to rewind.] Number of seconds (between 0 and 15) to rewind 
+  \item[Duration to Rewind] Number of seconds (between 0 and 15) to rewind 
     playback when the headphones are removed.
     %
-  \item[Disable auto-resume if phones not present.] This option will disable 
+  \item[Disable Auto-Resume If Phones Not Present] This option will disable 
     the automatic resumption of playback at startup if the headphones are not 
     connected to the \dap{}.
     \note{This requires \setting{Resume on Startup} to be enabled.}
@@ -273,7 +277,7 @@ related to audio playback.
 
 }%
 
-\item[Last.fm Log.]\index{Last.fm Log}\index{Audioscrobbler|see{Last.fm Log}}
+\item[Last.fm Log]\index{Last.fm Log}\index{Audioscrobbler|see{Last.fm Log}}
   Enables logging of your played tracks for submittal to 
   \url{http://www.last.fm}. This service was formely known as 
   \emph{Audioscrobbler}. When you enable this option, you'll have to reboot to
@@ -284,7 +288,7 @@ related to audio playback.
   \note{See \wikilink{LastFMLog} for a further description, and for tools you 
     can use to submit your Last.fm log.}
 
-\item[Cuesheet Support.]\index{Cuesheet Support}
+\item[Cuesheet Support]\index{Cuesheet Support}
   Enables reading of cuesheet files for played tracks. If a cuesheet is found
   for a track, track markers are displayed on the progressbar and it is
   possible to skip between the tracks within the cuesheet. Also the information

@@ -315,9 +315,11 @@ void edit_list(void)
         switch (button)
         {
             case ACTION_STD_OK:
+            {
                 list->folder[selection][0] = ' ';
                 list->folder[selection][1] = '\0';
                 break;
+            }
             case ACTION_STD_CONTEXT:
             {
                 int m, len;
@@ -348,7 +350,7 @@ void edit_list(void)
                             }
                         }
                     }
-                        break;
+                    break;
                 }
                 menu_exit(m);
             }
@@ -372,7 +374,7 @@ void edit_list(void)
                 }
                 menu_exit(m);
             }
-                break;
+            break;
         }
     }
 }
