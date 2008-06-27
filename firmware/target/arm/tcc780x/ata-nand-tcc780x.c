@@ -465,12 +465,9 @@ static void nand_get_chip_info(void)
 
     /*
        Sanity checks:
-    
        1. "BMP" tag at block 0, page 0, offset <page_size> [always present]
-       2. Byte at <page_size>+4 contains number of banks [or 0xff if 1 bank]
-        
-       If this is confirmed for all D2s we can simplify the above code and
-       also remove the icky nand_read_uid() function.
+       2. On most D2s, <page_size>+3 is 'M' and <page_size>+4 is no. of banks.
+          This is not present on some older players (formatted with early FW?)
      */
 
     nand_read_raw(0,          /* bank */
@@ -479,8 +476,8 @@ static void nand_get_chip_info(void)
                   8, id_buf);
 
     if (strncmp(id_buf, "BMP", 3)) panicf("BMP tag not present");
-    
-    if (total_banks > 1)
+
+    if (id_buf[3] == 'M')
     {
         if (id_buf[4] != total_banks) panicf("BMPM total_banks mismatch");
     }
