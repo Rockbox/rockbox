@@ -802,6 +802,7 @@ void button_event(int key, bool pressed)
     case SDLK_KP_ENTER:
         new_btn = BUTTON_MENU;
         break;
+
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
     case SDLK_KP1:
         new_btn = BUTTON_BACK;
@@ -886,6 +887,34 @@ void button_event(int key, bool pressed)
         break;
     case SDLK_s:
         new_btn = BUTTON_VOL_UP;
+
+#elif CONFIG_KEYPAD == MEIZU_M6SL_PAD
+    case SDLK_KP1:
+        new_btn = BUTTON_PREV;
+        break;
+    case SDLK_KP3:
+        new_btn = BUTTON_NEXT;
+        break;
+    case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+    case SDLK_a:
+        new_btn = BUTTON_PLAY;
+        break;
+    case SDLK_KP_PERIOD:
+    case SDLK_INSERT:
+        new_btn = BUTTON_MENU;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+        new_btn = BUTTON_SELECT;
         break;
 #else
 #error No keymap defined!

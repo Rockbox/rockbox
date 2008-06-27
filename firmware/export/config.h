@@ -31,6 +31,8 @@
 #define TEA5767    0x02 /* Philips */
 #define LV24020LP  0x04 /* Sanyo */
 #define SI4700     0x08 /* Silicon Labs */
+#define TEA5760    0x10 /* Philips */
+#define LV240000   0x20 /* Sanyo */
 
 /* CONFIG_CODEC */
 #define MAS3587F 3587
@@ -55,6 +57,7 @@
 #define TCC771L       771
 #define TCC773L       773
 #define TCC7801      7801
+#define S5L8700      8700
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1
@@ -86,6 +89,7 @@
 #define PHILIPS_SA9200_PAD 27
 #define SANSA_C100_PAD     28
 #define PHILIPS_HDD1630_PAD 29
+#define MEIZU_M6SL_PAD     30
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -127,6 +131,7 @@
 #define LCD_SA9200   25 /* as used by the Philips SA9200 */
 #define LCD_S6B33B2  26 /* as used by the Sansa c100 */
 #define LCD_HDD1630  27 /* as used by the Philips HDD1630 */
+#define LCD_MEIZUM6  28 /* as used by the Meizu M6SP and M6SL (various models) */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -154,6 +159,7 @@
 #define I2C_TCC77X  10
 #define I2C_TCC780X 11
 #define I2C_DM320   12 /* DM320 style */
+#define I2C_S5L8700 12
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -177,6 +183,8 @@
 #define RTC_TCC780X  11
 #define RTC_MR100  12
 #define RTC_MC13783  13 /* Freescale MC13783 PMIC */
+#define RTC_S5L8700  14
+#define RTC_S35390A  15
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362 /* iriver H300 */
@@ -271,6 +279,8 @@
 #include "config-hdd1630.h"
 #elif defined(SANSA_C100)
 #include "config-c100.h"
+#elif defined(MEIZU_M6SL)
+#include "config-meizu-m6sl.h"
 #else
 /* no known platform */
 #endif
@@ -426,7 +436,7 @@
 #endif
 
 #if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) \
-  || (CONFIG_CPU == DSC25)
+  || (CONFIG_CPU == DSC25) || (CONFIG_CPU == S5L8700)
 #define CPU_ARM
 #define ARM_ARCH 4 /* ARMv4 */
 #endif
@@ -454,7 +464,8 @@
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
     defined(CPU_TCC77X) ||  /* Telechips: core, plugins, codecs */ \
-    (CONFIG_CPU == PNX0101))
+    (CONFIG_CPU == PNX0101) || \
+    (CONFIG_CPU == S5L8700)) /* Samsing S5L8700: core, plugins, codecs */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))
 #define IDATA_ATTR      __attribute__ ((section(".idata")))

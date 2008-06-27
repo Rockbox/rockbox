@@ -233,12 +233,18 @@ static const char* const uiename[] = {
     "Divide by zero"
 };
 
+int bla(int arg)
+{
+    return arg+1;
+}
+
 /* Unexpected Interrupt or Exception handler. Currently only deals with
    exceptions, but will deal with interrupts later.
  */
 void UIE(unsigned int pc, unsigned int num) __attribute__((noreturn));
 void UIE(unsigned int pc, unsigned int num)
 {
+#warning got here
     char str[32];
 
     lcd_clear_display();

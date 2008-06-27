@@ -248,6 +248,14 @@ arm9tdmicc () {
  gccchoice="4.0.3"
 }
 
+arm940tbecc () {
+ prefixtools arm-elf-
+ GCCOPTS="$CCOPTS -mbig-endian -mcpu=arm940t -mlong-calls"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="big"
+ gccchoice="4.0.3"
+}
+
 arm946cc () {
  prefixtools arm-elf-
  GCCOPTS="$CCOPTS -mcpu=arm9e -mlong-calls"
@@ -676,12 +684,10 @@ cat <<EOF
  ==Tatung==            ==Olympus==            ==Logik==
  60) Elio TPJ-1022     70) M:Robe 500         80) DAX 1GB MP3/DAB
                        71) M:Robe 100
-
- ==Creative==          ==Philips==
- 90) Zen Vision:M 30GB 100) GoGear SA9200
+ ==Creative==          ==Philips==            ==Meizu==
+ 90) Zen Vision:M 30GB 100) GoGear SA9200     110) M6SL
  91) Zen Vision:M 60GB 101) GoGear HDD1630
  92) Zen Vision
-
 EOF
 
   buildfor=`input`;
@@ -1720,6 +1726,27 @@ fi
     t_model="hdd1630"
     ;;
 
+   110|meizum6sl)
+    target_id=20
+    modelname="meizum6sl"
+    target="-DMEIZU_M6SL"
+    memory=16 # always
+    arm940tbecc
+    tool="cp"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.meizu"
+    appextra="recorder:gui"
+    plugins="no" #FIXME
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    boottool="cp"
+    bootoutput="rockboot.ebn"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="s5l8700"
+    t_model="meizu-m6sl"
+    ;;
    *)
     echo "Please select a supported target platform!"
     exit

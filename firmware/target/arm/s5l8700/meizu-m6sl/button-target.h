@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 by Linus Nielsen Feltzing
+ * Copyright (C) 2006 by Linus Nielsen Feltzing
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,44 +16,37 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _BUTTON_TARGET_H_
+#define _BUTTON_TARGET_H_
+
+#include <stdbool.h>
 #include "config.h"
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
-#endif
-#if CONFIG_CPU == MCF5249
-#include "mcf5249.h"
-#endif
-#if CONFIG_CPU == MCF5250
-#include "mcf5250.h"
-#endif
-#if (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5022)
-#include "pp5020.h"
-#endif
-#if CONFIG_CPU == PP5002
-#include "pp5002.h"
-#endif
-#if CONFIG_CPU == PP5024
-#include "pp5024.h"
-#endif
-#if CONFIG_CPU == PNX0101
-#include "pnx0101.h"
-#endif
-#if CONFIG_CPU == S3C2440
-#include "s3c2440.h"
-#endif
-#if CONFIG_CPU == DM320
-#include "dm320.h"
-#endif
-#if CONFIG_CPU == IMX31L
-#include "imx31l.h"
-#endif
-#ifdef CPU_TCC77X
-#include "tcc77x.h"
-#endif
-#ifdef CPU_TCC780X
-#include "tcc780x.h"
-#endif
-#if CONFIG_CPU == S5L8700
-#include "s5l8700.h"
-#endif
+#define HAS_BUTTON_HOLD
+
+bool button_hold(void);
+void button_init_device(void);
+int button_read_device(void);
+
+/* Toshiba Gigabeat specific button codes */
+
+#define BUTTON_LEFT         0x00000001
+#define BUTTON_RIGHT        0x00000002
+#define BUTTON_UP           0x00000004
+#define BUTTON_DOWN         0x00000008
+
+#define BUTTON_SELECT       0x00000010
+
+#define BUTTON_MENU         0x00000020
+#define BUTTON_PLAY         0x00000040
+
+
+#define BUTTON_MAIN (BUTTON_MENU|BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_UP|BUTTON_DOWN|BUTTON_SELECT|BUTTON_PLAY)
+
+#define BUTTON_REMOTE 0
+
+#define POWEROFF_BUTTON BUTTON_PLAY
+#define POWEROFF_COUNT 10
+
+#endif /* _BUTTON_TARGET_H_ */

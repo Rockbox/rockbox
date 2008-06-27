@@ -29,4 +29,6 @@ iriver_h300.c
 mrobe500.c
 #elif defined(CPU_TCC77X) || defined(CPU_TCC780X)
 telechips.c
+#elif defined(MEIZU_M6SL)
+meizu_m6sl.c
 #endif
