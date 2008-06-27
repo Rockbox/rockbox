@@ -499,7 +499,7 @@ bool RbUtilQt::installAuto()
            tr("Rockbox installation detected. Do you want to backup first?"),
            QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
-            logger->addItem(tr("Beginning Backup..."),LOGINFO);
+            logger->addItem(tr("Starting backup..."),LOGINFO);
             QString backupName = settings->mountpoint() + "/.backup/rockbox-backup-"+rbVersion+".zip";
             
             //! create dir, if it doesnt exist
@@ -512,7 +512,7 @@ bool RbUtilQt::installAuto()
         
             //! create backup
             RbZip backup;
-            connect(&backup,SIGNAL(zipProgress(int,int)),this,SLOT(updateDataReadProgress(int,int)));
+            connect(&backup,SIGNAL(zipProgress(int,int)),logger, SLOT(setProgress(int,int)));
             if(backup.createZip(backupName,settings->mountpoint() + "/.rockbox") == Zip::Ok)
             {
                 logger->addItem(tr("Backup successfull"),LOGOK);
@@ -541,13 +541,6 @@ bool RbUtilQt::installAuto()
     return true;
 }
 
-void RbUtilQt::updateDataReadProgress(int read, int total)
-{
-    logger->setProgressMax(total);
-    logger->setProgressValue(read);
-    //qDebug() << "progress:" << read << "/" << total;
-
-}
 
 void RbUtilQt::install()
 {

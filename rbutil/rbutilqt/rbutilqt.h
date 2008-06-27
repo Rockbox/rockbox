@@ -107,8 +107,7 @@ class RbUtilQt : public QMainWindow
         void installPortable(void);
         void updateInfo(void);
         void updateTabs(int);
-
-        void updateDataReadProgress(int read, int total);
 };
 
 #endif
+
