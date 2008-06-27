@@ -209,8 +209,10 @@ void fiq_handler(void)
      * r8 and r9 contains local copies of p and size respectively.
      * r0-r3 and r12 is a working register.
      */
-    asm volatile (
-        "stmfd   sp!, { r0-r3, lr }  \n" /* stack scratch regs and lr */
+    asm volatile (        
+        "mov     r8, #0xc000         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
+        "ldr     r9, =0xf3001004     \n" /* CREQ */
+        "str     r8, [r9]            \n" /* clear DAI IRQs */
         
         "ldmia   r11, { r8-r9 }      \n" /* r8 = p, r9 = size */
         "cmp     r9, #0x10           \n" /* is size <16? */
@@ -237,13 +239,10 @@ void fiq_handler(void)
         "stmia   r11, { r8-r9 }      \n" /* save p and size */
 
     ".exit:                          \n"
-        "mov     r8, #0xc000         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
-        "ldr     r9, =0xf3001004     \n" /* CREQ */
-        "str     r8, [r9]            \n" /* clear DAI IRQs */
-        "ldmfd   sp!, { r0-r3, lr }  \n"
         "subs    pc, lr, #4          \n" /* FIQ specific return sequence */
 
     ".more_data:                     \n"
+        "stmfd   sp!, { r0-r3, lr }  \n" /* stack scratch regs and lr */
         "ldr     r2, =pcm_callback_for_more \n"
         "ldr     r2, [r2]            \n" /* get callback address */
         "cmp     r2, #0              \n" /* check for null pointer */
@@ -252,11 +251,13 @@ void fiq_handler(void)
         "blxne   r2                  \n" /* call pcm_callback_for_more */
         "ldmia   r11, { r8-r9 }      \n" /* reload p and size */
         "cmp     r9, #0x10           \n" /* did we actually get more data? */
+        "ldmgefd sp!, { r0-r3, lr }  \n"
         "bge     .fill_fifo          \n" /* yes: fill the fifo */
         "ldr     r12, =pcm_play_dma_stop \n"
         "blx     r12                 \n" /* no: stop playback */
         "ldr     r12, =pcm_play_dma_stopped_callback \n"
         "blx     r12                 \n"
+        "ldmfd   sp!, { r0-r3, lr }  \n"
         "b       .exit               \n"
         ".ltorg                      \n"
     );
