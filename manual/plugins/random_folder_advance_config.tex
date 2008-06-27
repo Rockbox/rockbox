@@ -6,7 +6,16 @@ when the Auto-Change Directory feature is set to \setting{Random}.
 \subsubsection{Menu}
 \begin{description}
 \item[Generate Folder List] Generates a list of all folders found 
-on the player
+on the player.  You can filter the directories which are scanned by
+creating a file called \\* 
+\fname{/.rockbox/folder\_advance\_dir.txt}.  
+Only the directories in this file and any contained directories
+ will be scanned.  You can have up to 10 directories ignored by the 
+ scan by placing a minus sign before them in the list 
+ (i.e. \fname{-/CDs} will cause everything in the \fname{/CDs} 
+ directory to be ignored.).  If you just want \fname{/CDs}
+ to be ignored but want to include the folders within 
+it you need to have both \fname{-/CDs} and \fname{CDs} as entries.
 \item[Edit Folder List] Enter the folder list editor
 \item[Export List To Textfile] Exports the list to 
   \fname{/.rockbox/folder\_advance\_list.txt}
