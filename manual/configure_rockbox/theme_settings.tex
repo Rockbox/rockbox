@@ -30,8 +30,8 @@ customize the visual apperance of Rockbox.
     headphones and when connected to an external amplifier. See
     \reference{ref:CreateYourOwnWPS} for more details.}
 
-\nopt{player}{
-  \item[Browse fonts.]
+\opt{lcd_bitmap}{
+  \item[Browse Fonts.]
     Browse the installed fonts on your \dap{}. Selecting one will activate it.
     See \reference{ref:Loadingfonts} for further details about fonts.
 } % \nopt{player}
@@ -58,8 +58,12 @@ customize the visual apperance of Rockbox.
   Rockbox has the ability to display an icon to the left of the file
   in the \setting{File Browser}. For details of these icons, see
   \reference{ref:Supportedfileformats}.
+  \opt{lcd_bitmap}{
+    These icons can also be customised. See the \wikilink{IconSets}
+    and \wikilink{CustomIcons} Wiki pages for details.
+  }
 
-\nopt{archos}{%
+\opt{lcd_non-mono}{%
   \item[Clear Backdrop:]
     Rockbox allows you to select bitmap pictures to use as backdrops,
     see \reference{ref:LoadingBackdrops} for further information.
