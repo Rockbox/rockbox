@@ -443,11 +443,11 @@ static inline long muls32_asr26(long a, long b)
         "mov     %[r], %[r], lsr #26         \n"
         "orr     %[r], %[r], %[t1], lsl #6   \n"
         : /* outputs */
-        [r] "=&r"(r),
-        [t1]"=&r"(t1)
+        [r] "=&r,&r,&r"(r),
+        [t1]"=&r,&r,&r"(t1)
         : /* inputs */
-        [a] "r" (a),
-        [b] "r" (b)
+        [a] "%r,%r,%r" (a),
+        [b] "r,0,1" (b)
     );
     return r;
 }
@@ -615,7 +615,7 @@ void calc_mandelbrot_high_prec(void)
                 y2 = MULS32_ASR26(y, y);
 
                 if (x2 + y2 > (4L<<26)) break;
-                
+
                 y = 2 * MULS32_ASR26(x, y) + b;
                 x = x2 - y2 + a;
             }
