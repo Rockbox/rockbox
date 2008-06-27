@@ -64,7 +64,7 @@
  *  @return enum userlevel.
  */
 #if defined(Q_OS_WIN32)
-enum userlevel Detect::userPermissions(void)
+enum Detect::userlevel Detect::userPermissions(void)
 {
     LPUSER_INFO_1 buf;
     NET_API_STATUS napistatus;
@@ -104,7 +104,7 @@ enum userlevel Detect::userPermissions(void)
 QString Detect::userPermissionsString(void)
 {
     QString result;
-    int perm = getUserPermissions();
+    int perm = userPermissions();
     switch(perm) {
         case GUEST:
             result = QObject::tr("Guest");
