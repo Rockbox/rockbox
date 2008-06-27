@@ -126,6 +126,11 @@ static bool usb_pin_detect(void)
     /* GPIO F bit 7 is usb detect */
     if (!(GPIOF_INPUT_VAL & 0x80))
         retval = true;
+
+#elif defined(PHILIPS_HDD1630)
+    /* GPIO E bit 2 is usb detect */
+    if (GPIOE_INPUT_VAL & 0x4)
+        retval = true;
 #endif
 
     return retval;

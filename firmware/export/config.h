@@ -85,6 +85,7 @@
 #define CREATIVEZV_PAD     26
 #define PHILIPS_SA9200_PAD 27
 #define SANSA_C100_PAD     28
+#define PHILIPS_HDD1630_PAD 29
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -125,6 +126,7 @@
 #define LCD_COWOND2  24 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
 #define LCD_SA9200   25 /* as used by the Philips SA9200 */
 #define LCD_S6B33B2  26 /* as used by the Sansa c100 */
+#define LCD_HDD1630  27 /* as used by the Philips HDD1630 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -265,6 +267,8 @@
 #include "config-creativezv.h"
 #elif defined(PHILIPS_SA9200)
 #include "config-sa9200.h"
+#elif defined(PHILIPS_HDD1630)
+#include "config-hdd1630.h"
 #elif defined(SANSA_C100)
 #include "config-c100.h"
 #else

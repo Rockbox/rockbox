@@ -679,7 +679,7 @@ cat <<EOF
 
  ==Creative==          ==Philips==
  90) Zen Vision:M 30GB 100) GoGear SA9200
- 91) Zen Vision:M 60GB
+ 91) Zen Vision:M 60GB 101) GoGear HDD1630
  92) Zen Vision
 
 EOF
@@ -1694,6 +1694,30 @@ fi
     t_cpu="arm"
     t_manufacturer="philips"
     t_model="sa9200"
+    ;;
+
+   101|hdd1630)
+    target_id=43
+    modelname="hdd1630"
+    target="-DPHILIPS_HDD1630"
+    memory=32 # supposedly
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -mi4v3 -model=1630 -type=RBOS"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.mi4"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    boottool="$rootdir/tools/scramble -mi4v3 -model=1630 -type=RBBL"
+    bootoutput="FWImage.ebn"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools scramble"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="philips"
+    t_model="hdd1630"
     ;;
 
    *)

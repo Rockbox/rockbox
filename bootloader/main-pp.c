@@ -61,6 +61,10 @@ extern int show_logo(void);
 
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
 #define BOOTLOADER_BOOT_OF      BUTTON_VOL_UP
+
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+#define BOOTLOADER_BOOT_OF      BUTTON_MENU
+
 #endif
 
 /* Maximum allowed firmware image size. 10MB is more than enough */

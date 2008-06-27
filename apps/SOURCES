@@ -193,4 +193,6 @@ keymaps/keymap-creativezvm.c
 keymaps/keymap-creativezv.c
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
 keymaps/keymap-sa9200.c
+#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
+keymaps/keymap-hdd1630.c
 #endif

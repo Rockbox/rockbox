@@ -1013,7 +1013,8 @@ static bool dbg_spdif(void)
 #   define DEBUG_CANCEL  BUTTON_LEFT
 
 /* This is temporary until the SA9200 touchpad works */
-#elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)
+#elif (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) || \
+      (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)
 #   define DEBUG_CANCEL  BUTTON_POWER
 
 #endif /* key definitions */
