@@ -58,7 +58,7 @@ related to audio playback.
           \ButtonOn{} and \ButtonRight{}.
           To reset the markers hold \ButtonOn{} and press \ButtonSelect{}.
       }
-      \opt{e200}{
+      \opt{sansa}{
           To set the Start Point (A) hold \ButtonPower{} and press \ButtonLeft{}.
           Setting the End Point (B) is done accordingly using
           \ButtonPower{} and \ButtonRight{}.
@@ -148,8 +148,10 @@ related to audio playback.
     \item[Crossfade]
       This setting enables a cross-fader. At the end of a song, the song will 
       fade out as the next song fades in, creating a smooth transition between 
-      songs.\\
-      Options:
+      songs. The crossfade setting is particularly effective when the player is 
+        set on shuffle.\\
+
+      Options for crossfade settings are:
       \begin{description}
       \item[Enable Crossfade]If set to \setting{Off}, crossfade is disabled.
         If set to \setting{Always}, songs will always crossfade into one
@@ -163,14 +165,14 @@ related to audio playback.
         in.
         %
       \item[Fade In Duration]The length of time, in seconds, that it takes
-        your music to fade in.
+        your music to fade in once the \setting{Fade In Delay} has ended.
         %
       \item[Fade Out Delay]The ``fade out delay'' is the length of time
         between when the crossfade process begins and when the old track begins
         to fade out.
         %
       \item[Fade Out Duration]The length of time, in seconds, that it takes
-        your music to fade out.
+        your music to fade out once the \setting{Fade Out Delay} has ended.
         %
       \item[Fade Out Mode]If set to \setting{Crossfade}, one song will fade
         out and the next song will simultaneously fade in. If set to 
@@ -180,8 +182,14 @@ related to audio playback.
         used for manual track skips, even if it is selected here.
       \end{description}
       
-      \note{The crossfade setting is particularly effective when the player is 
-        set on shuffle.}
+      \note{The rules above apply except in the instance where
+          \setting{Fade Out Delay} plus \setting{Fade Out Duration} is less then
+          \setting{Fade In Delay} (which would create a gap in the audio). In this case,
+          the \setting{Fade In Delay} is reduced to eliminate the gap.}
+
+          The graphic below illustrates how the different settings work in practice.
+
+         \includegraphics[width=14cm]{configure_rockbox/images/crossfade_graphic.png}
     }%
     
     \opt{swcodec}{
