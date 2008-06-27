@@ -43,12 +43,10 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_NEXTREPEAT,  BUTTON_PLUS|BUTTON_REPEAT,  BUTTON_NONE },
 
     { ACTION_STD_OK,          BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },
-    { ACTION_STD_CANCEL,      BUTTON_POWER,               BUTTON_NONE },    
-    { ACTION_STD_MENU,        BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU },
+    { ACTION_STD_CANCEL,      BUTTON_POWER,               BUTTON_NONE },
     
-   // { ACTION_STD_QUICKSCREEN, BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_STD_CONTEXT,     BUTTON_PLUS|BUTTON_REPEAT,  BUTTON_NONE },
-    
+    { ACTION_STD_QUICKSCREEN, BUTTON_PLUS|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_CONTEXT,     BUTTON_MENU|BUTTON_REPEAT,  BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -128,6 +126,11 @@ static const struct button_mapping button_context_quickscreen[]  = {
 
 static const struct button_mapping button_context_pitchscreen[]  = {
 
+    { ACTION_PS_INC_SMALL, BUTTON_PLUS,                BUTTON_NONE },
+    { ACTION_PS_INC_SMALL, BUTTON_PLUS|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_PS_DEC_SMALL, BUTTON_MINUS,               BUTTON_NONE },
+    { ACTION_PS_DEC_SMALL, BUTTON_MINUS|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_PS_EXIT,      BUTTON_POWER,               BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
