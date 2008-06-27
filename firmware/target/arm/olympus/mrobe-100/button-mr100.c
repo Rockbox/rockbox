@@ -61,6 +61,9 @@ static int int_btn = BUTTON_NONE;
 #define BUTTONS_ID      0x9
 #define ABSOLUTE_HEADER 0x0b
 
+#define MEP_READ 0x1
+#define MEP_WRITE 0x3
+
 static int syn_status = 0;
 
 static int syn_wait_clk_change(unsigned int val)
@@ -107,9 +110,9 @@ static void syn_wait_guest_flush(void)
 static void syn_flush(void)
 {
     int i;
-
+#if defined(LOGF_ENABLE)
     logf("syn_flush...");
-
+#endif
     /* Flusher holds DATA low for at least 36 handshake cycles */
     DATA_LO;
 
@@ -134,9 +137,9 @@ static int syn_send_data(int *data, int len)
 {
     int i, bit;
     int parity = 0;
-
+#if defined(LOGF_ENABLE)
     logf("syn_send_data...");
-
+#endif
     /* 1. Lower DATA line to issue a request-to-send to guest */
     DATA_LO;
 
@@ -152,8 +155,9 @@ static int syn_send_data(int *data, int len)
     /* 5. Send data */
     for (i = 0; i < len; i++)
     {
-        logf("  sending byte: %d", data[i]);
-
+#if defined(LOGF_ENABLE)
+       logf("  sending byte: %d", data[i]);
+#endif
         bit = 0;
         while (bit < 8)
         {
@@ -198,7 +202,9 @@ static int syn_send_data(int *data, int len)
            parity should set DATA high. Parity is 1 if there's an odd
            number of '1' bits, or 0 if there's an even number of '1' bits. */
     parity = parity % 2;
+#if defined(LOGF_ENABLE)    
     logf("  send parity = %d", parity);
+#endif   
     if (parity)
     {
         DATA_HI;
@@ -227,7 +233,9 @@ static int syn_send_data(int *data, int len)
            enter the flushee state. */
     if (syn_get_data() == LO)
     {
+#if defined(LOGF_ENABLE)
         logf("  module flushing");
+#endif     
         syn_wait_guest_flush();
         return -1;
     }
@@ -242,9 +250,9 @@ static int syn_read_data(int *data, int data_len)
 {
     int i, len, bit, parity, tmp;
     int *data_ptr;
-
+#if defined(LOGF_ENABLE)
     logf("syn_read_data...");
-
+#endif
     /* 1. Guest drives CLK low */
     if (CLK != LO)
         return 0;
@@ -325,7 +333,9 @@ static int syn_read_data(int *data, int data_len)
             {
                 /* Packet length is bits 0:2 */
                 len = *data_ptr & 0x7;
+#if defined(LOGF_ENABLE)
                 logf("  packet length = %d", len);
+#endif
             }
             else
             {
@@ -344,7 +354,9 @@ static int syn_read_data(int *data, int data_len)
 
     /* 7c. The host verifies the parity bit is correct */
     parity = parity % 2;
+#if defined(LOGF_ENABLE)
     logf("  parity check: %d / %d", syn_get_data(), parity);
+#endif
     /* TODO: parity error handling */
 
     /* 7d. The host lowers ACK */
@@ -398,9 +410,9 @@ static int syn_reset(void)
 {
     int val, id;
     int data[2];
-
+#if defined(LOGF_ENABLE)
     logf("syn_reset...");
-
+#endif
     /* reset module 0 */
     val = (0 << 4) | (1 << 3) | 0;
     syn_send_data(&val, 1);
@@ -431,7 +443,7 @@ static void syn_info(void)
 
     /* module base info */
     logf("module base info:");
-    data[0] = (0 << 4) | (0 << 3) | 1;
+    data[0] = MEP_READ;
     data[1] = 0x80;
     syn_send_data(data, 2);
     val = syn_read_device(data, 8);
@@ -443,7 +455,7 @@ static void syn_info(void)
     
     /* module product info */
     logf("module product info:");
-    data[0] = (0 << 4) | (0 << 3) | 1;
+    data[0] = MEP_READ;
     data[1] = 0x81;
     syn_send_data(data, 2);
     val = syn_read_device(data, 8);
@@ -455,7 +467,7 @@ static void syn_info(void)
 
     /* module serialization */
     logf("module serialization:");
-    data[0] = (0 << 4) | (0 << 3) | 1;
+    data[0] = MEP_READ;
     data[1] = 0x82;
     syn_send_data(data, 2);
     val = syn_read_device(data, 8);
@@ -467,7 +479,7 @@ static void syn_info(void)
 
     /* 1-D sensor info */
     logf("1-d sensor info:");
-    data[0] = (0 << 4) | (0 << 3) | 1;
+    data[0] = MEP_READ;
     data[1] = 0x80 + 0x20;
     syn_send_data(data, 2);
     val = syn_read_device(data, 8);
@@ -540,13 +552,13 @@ void button_int(void)
         {
             val = data[0] & 0xff;      /* packet header */
             id = (data[1] >> 4) & 0xf; /* packet id */
-
+#if defined(LOGF_ENABLE)
             logf("button_read_device...");
             logf("  data[0] = 0x%08x", data[0]);
             logf("  data[1] = 0x%08x", data[1]);
             logf("  data[2] = 0x%08x", data[2]);
             logf("  data[3] = 0x%08x", data[3]);
-
+#endif
             if ((val == BUTTONS_HEADER) && (id == BUTTONS_ID))
             {
                 /* Buttons packet - touched one of the 5 "buttons" */
@@ -563,20 +575,31 @@ void button_int(void)
 
                 /* An Absolute packet should follow which we ignore */
                 val = syn_read_device(data, 4);
-
+#if defined(LOGF_ENABLE)
                 logf("  int_btn = 0x%04x", int_btn);
+#endif            
             }
             else if (val == ABSOLUTE_HEADER)
             {
                 /* Absolute packet - the finger is on the vertical strip.
                    Position ranges from 1-4095, with 1 at the bottom. */
                 val = ((data[1] >> 4) << 8) | data[2]; /* position */
-                if ((val > 0) && (val <= 1365))
-                    int_btn |= BUTTON_DOWN;
-                else if ((val > 1365) && (val <= 2730))
-                    int_btn |= BUTTON_SELECT;
-                else if ((val > 2730) && (val <= 4095))
-                    int_btn |= BUTTON_UP;
+#if defined(LOGF_ENABLE)                
+                logf(" pos %d", val);
+                logf(" z %d", data[3]);
+                logf(" finger %d", data[1] & 0x1);
+                logf(" gesture %d", data[1] & 0x2);
+                logf(" RelPosVld %d", data[1] & 0x4);
+#endif                
+                if(data[1] & 0x1)  /* if finger on touch strip */
+                {
+                    if ((val > 0) && (val <= 1365))
+                        int_btn |= BUTTON_DOWN;
+                    else if ((val > 1365) && (val <= 2730))
+                        int_btn |= BUTTON_SELECT;
+                    else if ((val > 2730) && (val <= 4095))
+                        int_btn |= BUTTON_UP;
+                }
             }
         }
 
