@@ -35,8 +35,6 @@ struct flash_header {
     char version[32];
 };
 
-void UIE(unsigned int pc, unsigned int num);
-
 bool detect_flashed_romimage(void);
 bool detect_flashed_ramimage(void);
 bool detect_original_firmware(void);
