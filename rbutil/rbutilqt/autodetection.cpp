@@ -40,7 +40,7 @@
 #include <windows.h>
 #include <setupapi.h>
 #endif
-#include "utils.h"
+#include "detect.h"
 
 Autodetection::Autodetection(QObject* parent): QObject(parent)
 {
@@ -267,7 +267,7 @@ bool Autodetection::detectUsb()
 
     // usb pid detection
     QList<uint32_t> attached;
-    attached = listUsbIds();
+    attached = Detect::listUsbIds();
 
     int i = attached.size();
     while(i--) {

@@ -20,7 +20,7 @@
 #include "install.h"
 #include "ui_installfrm.h"
 #include "rbzip.h"
-#include "utils.h"
+#include "detect.h"
 
 Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
 {
@@ -35,7 +35,7 @@ Install::Install(RbSettings *sett,QWidget *parent) : QDialog(parent)
     connect(ui.backup,SIGNAL(stateChanged(int)),this,SLOT(backupCheckboxChanged(int)));
     
     //! check if rockbox is already installed
-    QString version = installedVersion(settings->mountpoint()); 
+    QString version = Detect::installedVersion(settings->mountpoint()); 
      
     if(version != "")
     {
@@ -120,23 +120,13 @@ void Install::accept()
         return;
     }
     settings->sync();
-    
-    int rbTarget = installedTargetId(settings->mountpoint());
-    if(rbTarget != -1 && rbTarget != settings->curTargetId())
+  
+    if(Detect::check(settings,false,settings->curTargetId()) == false)
     {
-        if(QMessageBox::question(this, tr("Device mismatch detected"),
-           tr("Device mismatch detected.\n\n" 
-              "Installed Rockbox is for Device: %1.\n"
-              "New Rockbox is for Device: %2.\n\n" 
-              "Do you want to continue?").arg(settings->nameOfTargetId(rbTarget),settings->curName()),
-           QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
-        {
-            logger->addItem(tr("Aborted!"),LOGERROR);
-            logger->abort();
-            return;
-        }
-    }
-    
+        logger->addItem(tr("Aborted!"),LOGERROR);
+        logger->abort();
+        return;
+    }    
     
     //! check if we should backup
     if(ui.backup->isChecked())

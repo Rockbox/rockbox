@@ -20,7 +20,7 @@
 #include <QtGui>
 #include "sysinfo.h"
 #include "ui_sysinfofrm.h"
-#include "utils.h"
+#include "detect.h"
 
 
 Sysinfo::Sysinfo(QWidget *parent) : QDialog(parent)
@@ -33,17 +33,16 @@ Sysinfo::Sysinfo(QWidget *parent) : QDialog(parent)
     connect(ui.buttonRefresh, SIGNAL(clicked()), this, SLOT(updateSysinfo()));
 }
 
-
 void Sysinfo::updateSysinfo(void)
 {
     QString info;
-    info += tr("<b>OS</b><br/>") + getOsVersionString() + "<hr/>";
-    info += tr("<b>Username:</b><br/>%1<hr/>").arg(getUserName());
+    info += tr("<b>OS</b><br/>") + Detect::osVersionString() + "<hr/>";
+    info += tr("<b>Username:</b><br/>%1<hr/>").arg(Detect::userName());
 #if defined(Q_OS_WIN32)
-    info += tr("<b>Permissions:</b><br/>%1<hr/>").arg(getUserPermissionsString());
+    info += tr("<b>Permissions:</b><br/>%1<hr/>").arg(Detect::userPermissionsString());
 #endif
     info += tr("<b>Attached USB devices:</b><br/>");
-    QList<uint32_t> usbids = listUsbIds();
+    QList<uint32_t> usbids = Detect::listUsbIds();
     for(int i = 0; i < usbids.size(); i++)
         info += tr("VID: %1 PID: %2<br/>")
             .arg((usbids.at(i)&0xffff0000)>>16, 4, 16, QChar('0'))

@@ -25,7 +25,7 @@
 #include "browsedirtree.h"
 #include "encoders.h"
 #include "tts.h"
-#include "utils.h"
+#include "detect.h"
 
 #include <stdio.h>
 #if defined(Q_OS_WIN32)
@@ -361,7 +361,7 @@ void Config::setSystemProxy(bool checked)
         proxy.setHost(ui.proxyHost->text());
         proxy.setPort(ui.proxyPort->text().toInt());
         // show system values in input box
-        QUrl envproxy = systemProxy();
+        QUrl envproxy = Detect::systemProxy();
 
         ui.proxyHost->setText(envproxy.host());
 

@@ -35,7 +35,7 @@
 #include "utils.h"
 #include "rbzip.h"
 #include "sysinfo.h"
-
+#include "detect.h"
 
 #if defined(Q_OS_LINUX)
 #include <stdio.h>
@@ -266,7 +266,7 @@ void RbUtilQt::updateSettings()
     updateDevice();
     updateManual();
     if(settings->proxyType() == "system") {
-        HttpGet::setGlobalProxy(systemProxy());
+        HttpGet::setGlobalProxy(Detect::systemProxy());
     }
     else if(settings->proxyType() == "manual") {
         HttpGet::setGlobalProxy(settings->proxy());
@@ -475,23 +475,15 @@ bool RbUtilQt::installAuto()
     QString myversion = "r" + versmap.value("bleed_rev");
     
     // check installed Version and Target
-    QString rbVersion = installedVersion(settings->mountpoint()); 
-    int rbTarget = installedTargetId(settings->mountpoint());
-    if(rbTarget != -1 && rbTarget != settings->curTargetId())
+    QString rbVersion = Detect::installedVersion(settings->mountpoint()); 
+
+    if(Detect::check(settings,false,settings->curTargetId()) == false)
     {
-        if(QMessageBox::question(this, tr("Target mismatch detected"),
-           tr("Target mismatch detected. \n\n"
-              "Installed target: %1.\n"
-              "New Target: %2.\n\n"
-              "Do you want to continue?").arg(settings->nameOfTargetId(rbTarget),settings->curName()),
-           QMessageBox::Yes | QMessageBox::No) == QMessageBox::No)
-        {
-            logger->addItem(tr("Aborted!"),LOGERROR);
-            logger->abort();
-            return false;
-        }
+       logger->addItem(tr("Aborted!"),LOGERROR);
+       logger->abort();
+       return false;
     }
-    
+  
     // check version
     if(rbVersion != "")
     {
@@ -1001,7 +993,7 @@ QUrl RbUtilQt::proxy()
         return QUrl(settings->proxy());
     else if(settings->proxy() == "system")
     {    
-        return systemProxy();
+        return Detect::systemProxy();
     }
     return QUrl("");
 }

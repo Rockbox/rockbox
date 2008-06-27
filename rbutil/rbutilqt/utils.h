@@ -24,21 +24,8 @@
 #include <QString>
 #include <QUrl>
 
-#if defined(Q_OS_WIN32)
-enum userlevel { ERR, GUEST, USER, ADMIN };
-enum userlevel getUserPermissions(void);
-QString getUserPermissionsString(void);
-#endif
-QString getUserName(void);
-QString getOsVersionString(void);
-QList<uint32_t> listUsbIds(void);
-
 bool recRmdir( const QString &dirName );
 QString resolvePathCase(QString path);
-
-QUrl systemProxy(void);
-QString installedVersion(QString mountpoint);
-int installedTargetId(QString mountpoint);
 
 #endif
 

@@ -65,7 +65,8 @@ SOURCES += rbutilqt.cpp \
  rbsettings.cpp \
  rbunzip.cpp \
  rbzip.cpp \
- sysinfo.cpp
+ sysinfo.cpp \
+ detect.cpp
  
 HEADERS += rbutilqt.h \
  install.h \
@@ -113,7 +114,8 @@ HEADERS += rbutilqt.h \
  rbsettings.h \
  rbunzip.h \
  rbzip.h \
- sysinfo.h
+ sysinfo.h \
+ detect.h
  
 # Needed by QT on Win
 INCLUDEPATH = . irivertools zip zlib ../ipodpatcher ../sansapatcher ../../tools/rbspeex ../../tools
