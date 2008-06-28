@@ -47,6 +47,7 @@ disktidy.c
 flipit.c
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
+rockblox1d.c
 brickmania.c
 maze.c
 mazezam.c      
