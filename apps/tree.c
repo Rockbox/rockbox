@@ -51,7 +51,6 @@
 #include "bookmark.h"
 #include "onplay.h"
 #include "buffer.h"
-#include "plugin.h"
 #include "power.h"
 #include "action.h"
 #include "talk.h"
