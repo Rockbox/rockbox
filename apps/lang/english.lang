@@ -11755,16 +11755,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: none
-    gigabeatf: "Very slow"
+    *: "Very slow"
   </source>
   <dest>
-    *: none
-    gigabeatf: "Very slow"
+    *: "Very slow"
   </dest>
   <voice>
-    *: none
-    gigabeatf: "Very slow"
+    *: "Very slow"
   </voice>
 </phrase>
 <phrase>
@@ -11772,16 +11769,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: none
-    gigabeatf: "Slow"
+    *: "Slow"
   </source>
   <dest>
-    *: none
-    gigabeatf: "Slow"
+    *: "Slow"
   </dest>
   <voice>
-    *: none
-    gigabeatf: "Slow"
+    *: "Slow"
   </voice>
 </phrase>
 <phrase>
@@ -11789,16 +11783,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: none
-    gigabeatf: "Very fast"
+    *: "Very fast"
   </source>
   <dest>
-    *: none
-    gigabeatf: "Very fast"
+    *: "Very fast"
   </dest>
   <voice>
-    *: none
-    gigabeatf: "Very fast"
+    *: "Very fast"
   </voice>
 </phrase>
 <phrase>
@@ -11806,15 +11797,12 @@
   desc: in settings_menu
   user:
   <source>
-    *: none
-    gigabeatf: "Fast"
+    *: "Fast"
   </source>
   <dest>
-    *: none
-    gigabeatf: "Fast"
+    *: "Fast"
   </dest>
   <voice>
-    *: none
-    gigabeatf: "Fast"
+    *: "Fast"
   </voice>
 </phrase>
