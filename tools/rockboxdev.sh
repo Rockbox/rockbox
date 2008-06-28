@@ -2,7 +2,7 @@
 
 # this is where this script will store downloaded files and check for already
 # downloaded files
-dlwhere="/usr/tmp/rbdev-dl"
+dlwhere="/tmp/rbdev-dl"
 
 # will append the target string to the prefix dir mentioned here
 # Note that the user running this script must be able to do make install in
@@ -12,7 +12,7 @@ prefix="/usr/local"
 
 # This directory is used to extract all files and to build everything in. It
 # must not exist before this script is invoked (as a security measure).
-builddir="/usr/tmp/rbdev-build"
+builddir="/tmp/rbdev-build"
 
 # This script needs to use GNU Make. On Linux systems, GNU Make is invoked
 # by running the "make" command, on most BSD systems, GNU Make is invoked
