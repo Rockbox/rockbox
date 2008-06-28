@@ -45,7 +45,7 @@
     <message>
         <location filename="installbootloader.cpp" line="247"/>
         <source>Creating installation log</source>
-        <translation>Bezig met creëeren van installatie log</translation>
+        <translation>Bezig met creëren van installatie log</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="263"/>
@@ -222,7 +222,7 @@
     <message>
         <location filename="installbootloader.cpp" line="1210"/>
         <source>Successfully added Bootloader</source>
-        <translation>De Bootloader is sucessvol toegevoegd</translation>
+        <translation>De Bootloader is succesvol toegevoegd</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1218"/>
@@ -594,7 +594,7 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="configure.cpp" line="537"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
-        <translation>Er is een niet ondersteunde speler %1 herkent. Sorry, Rockbox werkt niet op deze speler.</translation>
+        <translation>Er is een niet ondersteunde speler %1 herkend. Sorry, Rockbox werkt niet op deze speler.</translation>
     </message>
     <message>
         <location filename="configure.cpp" line="539"/>
@@ -707,7 +707,7 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
     <message>
         <location filename="configurefrm.ui" line="288"/>
         <source>Rockbox Utility uses a local download cache to save network traffic. You can change the path to the cache and use it as local repository by enabling Offline mode.</source>
-        <translation>Rockbox Utility gebruikt een lokale download cache om netwerk traffiek te besparen. U kan het pad naar deze cache veranderen en het gebruiken als een lokale opslagplaats door Offline modus in te schakelen.</translation>
+        <translation>Rockbox Utility gebruikt een lokale download cache om netwerkverkeer te besparen. U kan het pad naar deze cache veranderen en het gebruiken als een lokale opslagplaats door Offline modus in te schakelen.</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="298"/>
@@ -1037,7 +1037,7 @@ Wilt u verdergaan?</translation>
     <message>
         <location filename="install.cpp" line="159"/>
         <source>Backup successfull</source>
-        <translation>Backup is sucessvol beëindigd!</translation>
+        <translation>Backup is succesvol beëindigd</translation>
     </message>
     <message>
         <location filename="install.cpp" line="163"/>
@@ -1130,7 +1130,7 @@ Wilt u verdergaan?</translation>
     <message>
         <location filename="installfrm.ui" line="188"/>
         <source>Change</source>
-        <translation>Veranderen</translation>
+        <translation>Verander</translation>
     </message>
     <message>
         <location filename="installfrm.ui" line="207"/>
@@ -1563,7 +1563,7 @@ Voulez-vous vraiment l&apos;installer ?</translation>
     <message>
         <location filename="rbutilqt.cpp" line="934"/>
         <source>Successfully installed Rockbox Utility.</source>
-        <translation>Rockbox Utility is sucessvol geïnstalleerd.</translation>
+        <translation>Rockbox Utility is succesvol geïnstalleerd.</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="573"/>
@@ -1655,7 +1655,7 @@ Wilt u verdergaan?</translation>
     <message>
         <location filename="rbutilqt.cpp" line="518"/>
         <source>Backup successfull</source>
-        <translation>Backup is sucessvol beëindigd!</translation>
+        <translation>Backup is succesvol beëindigd!</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="522"/>
@@ -1975,7 +1975,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="rbutilqtfrm.ui" line="700"/>
         <source>&amp;PDF version</source>
-        <translation>Version &amp;PDF</translation>
+        <translation>&amp;PDF versie</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="707"/>
@@ -2386,7 +2386,7 @@ e File</source>
     <message>
         <location filename="sysinfo.cpp" line="45"/>
         <source>&lt;b&gt;Attached USB devices:&lt;/b&gt;&lt;br/&gt;</source>
-        <translation>&lt;b&gt;Aangeslote USB apparaten:&lt;/b&gt;&lt;br/&gt;</translation>
+        <translation>&lt;b&gt;Aangesloten USB apparaten:&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="49"/>
@@ -2649,7 +2649,7 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
     <message>
         <location filename="zip/unzip.cpp" line="245"/>
         <source>ZIP operation completed successfully.</source>
-        <translation>ZIP operatie sucessvol voltooid.</translation>
+        <translation>ZIP operatie succesvol voltooid.</translation>
     </message>
     <message>
         <location filename="zip/unzip.cpp" line="246"/>
@@ -2863,7 +2863,7 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
     <message>
         <location filename="voicefile.cpp" line="245"/>
         <source>creating </source>
-        <translation>bezig met creëeren</translation>
+        <translation>bezig met creëren</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="268"/>
@@ -2878,7 +2878,7 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
     <message>
         <location filename="voicefile.cpp" line="292"/>
         <source>successfully created.</source>
-        <translation>sucessvol gecreëerd.</translation>
+        <translation>succesvol gecreëerd.</translation>
     </message>
 </context>
 <context>
@@ -2886,7 +2886,7 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
     <message>
         <location filename="zip/zip.cpp" line="481"/>
         <source>ZIP operation completed successfully.</source>
-        <translation>ZIP operatie sucessvol voltooid.</translation>
+        <translation>ZIP operatie succesvol voltooid.</translation>
     </message>
     <message>
         <location filename="zip/zip.cpp" line="482"/>
@@ -2999,7 +2999,7 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
     <message>
         <location filename="installzip.cpp" line="189"/>
         <source>Creating installation log</source>
-        <translation>Bezig met creëeren van installatie log</translation>
+        <translation>Bezig met creëren van installatie log</translation>
     </message>
 </context>
 <context>
@@ -3020,7 +3020,7 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
 
 © 2005 - 2008 The Rockbox Team.
 Released under the GNU General Public License v2.</source>
-        <translation>Installateur en schoonmaak hulpmiddel voor de Rockbox open source digitale audio player firmware.
+        <translation>Installatie en schoonmaak hulpmiddel voor de Rockbox open source digitale audio player firmware.
 
 © 2005 - 2008 Het Rockbox Team.
 Vrijgegeven onder GNU General Public Licensie v2.</translation>
