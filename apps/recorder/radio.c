@@ -861,7 +861,7 @@ int radio_screen(void)
                     peak_meter_screen(&screens[i],0,
                                           STATUSBAR_HEIGHT + fh*(top_of_screen + 4), fh);
                     screens[i].update_rect(0, STATUSBAR_HEIGHT + fh*(top_of_screen + 4),
-                                           screens[i].width, fh);
+                                           screens[i].getwidth(), fh);
                     screens[i].set_viewport(NULL);
                 }
             }

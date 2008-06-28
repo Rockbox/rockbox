@@ -360,11 +360,11 @@ static int touchpad_slider(struct rgb_pick *rgb, int *selected_slider)
     text_top     = MARGIN_TOP + display->char_height + TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
     slider_left  = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN +
                    max_label_width + SLIDER_MARGIN_LEFT;
-    slider_width = display->width - slider_left - SLIDER_MARGIN_RIGHT -
+    slider_width = display->getwidth() - slider_left - SLIDER_MARGIN_RIGHT -
                    display->char_width*2 - SELECTOR_LR_MARGIN - SELECTOR_WIDTH -
                    MARGIN_RIGHT;
     display_three_rows =
-        display->height >= MARGIN_TOP             +
+        display->getheight() >= MARGIN_TOP        +
                            display->char_height*4 + /* Title + 3 sliders */
                            TITLE_MARGIN_BOTTOM    +
                            SELECTOR_TB_MARGIN*6   + /* 2 margins/slider  */

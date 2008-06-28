@@ -46,7 +46,7 @@ void gui_buttonbar_init(struct gui_buttonbar * buttonbar)
     {
         viewport_set_defaults(&bb_vp[i], i);
         bb_vp[i].font = FONT_SYSFIXED;
-        bb_vp[i].y = screens[i].height - BUTTONBAR_HEIGHT;
+        bb_vp[i].y = screens[i].lcdheight - BUTTONBAR_HEIGHT;
         bb_vp[i].height = BUTTONBAR_HEIGHT;
         bb_vp[i].drawmode = DRMODE_COMPLEMENT;
     }
@@ -65,7 +65,7 @@ static void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
     struct screen * display = buttonbar->display;
     struct viewport vp = bb_vp[display->screen_type];
 
-    button_width = display->width/BUTTONBAR_MAX_BUTTONS;
+    button_width = display->lcdwidth/BUTTONBAR_MAX_BUTTONS;
     vp.width = button_width;
     vp.x = button_width * num;
     display->set_viewport(&vp);
