@@ -279,6 +279,7 @@ static int32_t backlight_getlang(int value, int unit)
 }
 #endif
 
+#ifndef HAVE_SCROLLWHEEL
 static void scanaccel_formatter(char *buffer, size_t buffer_size,
         int val, const char *unit)
 {
@@ -288,6 +289,7 @@ static void scanaccel_formatter(char *buffer, size_t buffer_size,
     else
         snprintf(buffer, buffer_size, "2x/%ds", val);
 }
+#endif
 
 #if CONFIG_CODEC == SWCODEC
 static void crossfeed_cross_set(int val)
