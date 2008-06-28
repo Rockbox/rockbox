@@ -32,6 +32,8 @@ PLUGIN_HEADER
 #define LAP_Y TIMER_Y+1
 #define MAX_LAPS 64
 
+#define STOPWATCH_FILE ROCKBOX_DIR "/apps/stopwatch.dat"
+
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define STOPWATCH_QUIT BUTTON_OFF
@@ -230,6 +232,75 @@ static void ticks_to_string(int ticks,int lap,int buflen, char * buf)
     }
 }
 
+/* 
+ * Load saved stopwatch state, if exists.
+ */
+void load_stopwatch(void)
+{
+    int fd;
+    
+    fd = rb->open(STOPWATCH_FILE, O_RDONLY);
+    
+    if (fd < 0)
+    {
+        return;
+    }
+    
+    /* variable stopwatch isn't saved/loaded, because it is only used
+     * temporarily in main loop
+     */
+    
+    rb->read(fd, &start_at, sizeof(start_at));
+    rb->read(fd, &prev_total, sizeof(prev_total));
+    rb->read(fd, &counting, sizeof(counting));
+    rb->read(fd, &curr_lap, sizeof(curr_lap));
+    rb->read(fd, &lap_scroll, sizeof(lap_scroll));
+    rb->read(fd, &lap_start, sizeof(lap_start));
+    rb->read(fd, lap_times, sizeof(lap_times));
+    
+    if (counting && start_at > *rb->current_tick)
+    {
+        /* Stopwatch started in the future? Unlikely; probably started on a
+         * previous session and powered off in-between.  We'll keep
+         * everything intact (user can clear manually) but stop the
+         * stopwatch to avoid negative timing.
+         */
+        start_at = 0;
+        counting = false;
+    }
+    
+    rb->close(fd);
+}
+
+/* 
+ * Save stopwatch state.
+ */
+void save_stopwatch(void)
+{
+    int fd;
+    
+    fd = rb->open(STOPWATCH_FILE, O_CREAT|O_WRONLY|O_TRUNC);
+    
+    if (fd < 0)
+    {
+        return;
+    }
+    
+    /* variable stopwatch isn't saved/loaded, because it is only used
+     * temporarily in main loop
+     */
+    
+    rb->write(fd, &start_at, sizeof(start_at));
+    rb->write(fd, &prev_total, sizeof(prev_total));
+    rb->write(fd, &counting, sizeof(counting));
+    rb->write(fd, &curr_lap, sizeof(curr_lap));
+    rb->write(fd, &lap_scroll, sizeof(lap_scroll));
+    rb->write(fd, &lap_start, sizeof(lap_start));
+    rb->write(fd, lap_times, sizeof(lap_times));
+    
+    rb->close(fd);
+}
+
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
 {
     char buf[32];
@@ -251,6 +322,8 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     lines = 1;
 #endif
 
+    load_stopwatch();
+    
     rb->lcd_clear_display();
     
     while (!done)
@@ -308,6 +381,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
             case STOPWATCH_RC_QUIT:
 #endif
             case STOPWATCH_QUIT:
+                  save_stopwatch();
                   done = true;
                   break;
 
