@@ -303,5 +303,21 @@ related to audio playback.
   found in the cuesheet file will replace the information from the ID3 tags.
   When you enable this option, you'll have to reboot for it to come into
   effect.
+  
+\item[Study Mode]\index{Study Mode}
+  Designed to prevent the unintentional skipping of tracks while listening to 
+  audio books, Study Mode changes the behavior of the \ActionWpsSkipPrev{} and
+  \ActionWpsSkipNext{} buttons so that they skip by a user-defined number of 
+  seconds instead of the entire track, thus preventing you from losing your place
+  entirely.
 
+  \begin{description}
+    \item[Enable Study Mode] \setting{On}/\setting{Off}.
+    \item[Study Increment] The number of seconds to skip forward and backward.
+  \end{description}
+    
+  \note{To skip tracks with this setting on, press Short 
+    \ActionWpsSkipPrev{} + Long \ActionWpsSkipNext{} to go forward and Short 
+    \ActionWpsSkipNext{} + Long \ActionWpsSkipPrev{} to go back.}  
+	
 \end{description}
