@@ -42,11 +42,13 @@ void Sysinfo::updateSysinfo(void)
     info += tr("<b>Permissions:</b><br/>%1<hr/>").arg(Detect::userPermissionsString());
 #endif
     info += tr("<b>Attached USB devices:</b><br/>");
-    QList<uint32_t> usbids = Detect::listUsbIds();
-    for(int i = 0; i < usbids.size(); i++)
-        info += tr("VID: %1 PID: %2<br/>")
-            .arg((usbids.at(i)&0xffff0000)>>16, 4, 16, QChar('0'))
-            .arg(usbids.at(i)&0xffff, 4, 16, QChar('0'));
+    QMap<uint32_t, QString> usbids = Detect::listUsbDevices();
+    QList<uint32_t> usbkeys = usbids.keys();
+    for(int i = 0; i < usbkeys.size(); i++)
+        info += tr("VID: %1 PID: %2, %3<br/>")
+            .arg((usbkeys.at(i)&0xffff0000)>>16, 4, 16, QChar('0'))
+            .arg(usbkeys.at(i)&0xffff, 4, 16, QChar('0'))
+	    .arg(usbids.value(usbkeys.at(i)));
 
     ui.textBrowser->setHtml(info);
 }

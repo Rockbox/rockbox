@@ -172,12 +172,17 @@ QString Detect::osVersionString(void)
     return result;
 }
 
+QList<uint32_t> Detect::listUsbIds(void)
+{
+    return listUsbDevices().keys();
+}
+
 /** @brief detect devices based on usb pid / vid.
  *  @return list with usb VID / PID values.
  */
-QList<uint32_t> Detect::listUsbIds(void)
+QMap<uint32_t, QString> Detect::listUsbDevices(void)
 {
-    QList<uint32_t> usbids;
+    QMap<uint32_t, QString> usbids;
     // usb pid detection
 #if defined(Q_OS_LINUX) | defined(Q_OS_MACX)
     usb_init();
@@ -195,7 +200,8 @@ QList<uint32_t> Detect::listUsbIds(void)
             while(u) {
                 uint32_t id;
                 id = u->descriptor.idVendor << 16 | u->descriptor.idProduct;
-                if(id) usbids.append(id);
+                // FIXME: until description is empty for now.
+                if(id) usbids.insert(id, QString(""));
                 u = u->next;
             }
         }
@@ -221,6 +227,7 @@ QList<uint32_t> Detect::listUsbIds(void)
         DWORD data;
         LPTSTR buffer = NULL;
         DWORD buffersize = 0;
+        QString description;
 
         // get device desriptor first
         // for some reason not doing so results in bad things (tm)
@@ -238,6 +245,19 @@ QList<uint32_t> Detect::listUsbIds(void)
 
         // now get the hardware id, which contains PID and VID.
         while(!SetupDiGetDeviceRegistryProperty(deviceInfo, &infoData,
+            SPDRP_LOCATION_INFORMATION,&data, (PBYTE)buffer, buffersize, &buffersize)) {
+            if(GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+                if(buffer) free(buffer);
+                // double buffer size to avoid problems as per KB888609
+                buffer = (LPTSTR)malloc(buffersize * 2);
+            }
+            else {
+                break;
+            }
+        }
+        description = QString::fromWCharArray(buffer);
+
+        while(!SetupDiGetDeviceRegistryProperty(deviceInfo, &infoData,
             SPDRP_HARDWAREID,&data, (PBYTE)buffer, buffersize, &buffersize)) {
             if(GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
                 if(buffer) free(buffer);
@@ -248,6 +268,7 @@ QList<uint32_t> Detect::listUsbIds(void)
                 break;
             }
         }
+	qDebug() << "SetupDiGetDeviceRegistryProperty" << description << QString::fromWCharArray(buffer);
 
         unsigned int vid, pid, rev;
         if(_stscanf(buffer, _TEXT("USB\\Vid_%x&Pid_%x&Rev_%x"), &vid, &pid, &rev) != 3) {
@@ -256,7 +277,7 @@ QList<uint32_t> Detect::listUsbIds(void)
         else {
             uint32_t id;
             id = vid << 16 | pid;
-            usbids.append(id);
+            usbids.insert(id, description);
             qDebug("VID: %04x PID: %04x", vid, pid);
         }
         if(buffer) free(buffer);
