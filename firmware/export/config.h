@@ -159,7 +159,7 @@
 #define I2C_TCC77X  10
 #define I2C_TCC780X 11
 #define I2C_DM320   12 /* DM320 style */
-#define I2C_S5L8700 12
+#define I2C_S5L8700 13
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
