@@ -134,12 +134,12 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_LCD_INVERT
-#ifdef OLYMPUS_MROBE_100
+#ifdef MROBE_100
     /* mrobe-100 has inverted display so invert it for max brightness */
     rb->lcd_set_invert_display(true);
 #else
     rb->lcd_set_invert_display(false);
-#endif /* OLYMPUS_MROBE_100 */
+#endif /* MROBE_100 */
 #endif /* HAVE_LCD_INVERT */
 
     backlight_force_on(rb);
