@@ -52,10 +52,10 @@ static void print_usage(void)
 #endif
 }
 
-static unsigned int checksum(FILE *file)
+static int checksum(FILE *file)
 {
     int oldpos = ftell(file);
-    unsigned int ret, i, filesize = _filesize(file)-0x40;
+    int ret=0, i, filesize = _filesize(file)-0x40;
     unsigned char *buf;
     
     buf = (unsigned char*)malloc(filesize);
