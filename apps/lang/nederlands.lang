@@ -11704,3 +11704,59 @@
     gigabeatf: "Hoog"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "Zeer traag"
+  </dest>
+  <voice>
+    *: "Zeer traag"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Traag"
+  </dest>
+  <voice>
+    *: "Traag"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "Zeer snel"
+  </dest>
+  <voice>
+    *: "Zeer snel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Fast"
+  </source>
+  <dest>
+    *: "Snel"
+  </dest>
+  <voice>
+    *: "Snel"
+  </voice>
+</phrase>
