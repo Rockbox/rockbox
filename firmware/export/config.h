@@ -465,7 +465,7 @@
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
     defined(CPU_TCC77X) ||  /* Telechips: core, plugins, codecs */ \
     (CONFIG_CPU == PNX0101) || \
-    (CONFIG_CPU == S5L8700)) /* Samsing S5L8700: core, plugins, codecs */
+    (CONFIG_CPU == S5L8700)) /* Samsung S5L8700: core, plugins, codecs */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
