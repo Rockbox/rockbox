@@ -343,7 +343,14 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
     \end{btnmap}
   \end{table}
 
-\label{ref:Safeshutdown}On shutdown, Rockbox automatically saves its settings.
+\label{ref:Safeshutdown}On shutdown, Rockbox automatically saves its settings. 
+ 
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
+  ,SANSA_C200_PAD,IRIVER_H10_PAD,IPOD_4G_PAD,GIGABEAT_PAD}{%
+  If you have problems with your settings, such as accidentally having
+  set the colours to black on black, they can be reset at boot time.  See 
+  the Reset Settings in \reference{ref:manage_settings_menu} for details.
+}%
 
 \opt{PLAYER_PAD,RECORDER_PAD,ONDIO_PAD}{%
   In the unlikely event of a software failure, a hardware power off can be
@@ -352,7 +359,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
   until the \nopt{ondiosp,ondiofm}{\dap{} power light}%
   \opt{ondiosp,ondiofm}{\daps{} display} goes off.%
-}
+}%
 
 \nopt{gigabeatf,m5,x5,archos}
   {
