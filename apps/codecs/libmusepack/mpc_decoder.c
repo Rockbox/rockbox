@@ -65,7 +65,7 @@ extern const HuffmanTyp    mpc_table_Region_C [ 4];
 #endif
 
 #ifdef SCF_HACK
-#define SCF_DIFF(SCF, D) (SCF == -128 ? -128 : SCF + D)
+#define SCF_DIFF(SCF, D) (SCF == 127 ? 127 : SCF + D)
 #else 
 #define SCF_DIFF(SCF, D) SCF + D
 #endif
@@ -1565,8 +1565,8 @@ void mpc_decoder_reset_state(mpc_decoder *d) {
     memset(d->Y_L             , 0, sizeof Y_L              );
     memset(d->Y_R             , 0, sizeof Y_R              );
 #ifdef SCF_HACK
-    memset(d->SCF_Index_L     , -128, sizeof d->SCF_Index_L   );
-    memset(d->SCF_Index_R     , -128, sizeof d->SCF_Index_R   );
+    memset(d->SCF_Index_L     , 127, sizeof d->SCF_Index_L   );
+    memset(d->SCF_Index_R     , 127, sizeof d->SCF_Index_R   );
 #else
     memset(d->SCF_Index_L     , 0, sizeof d->SCF_Index_L      );
     memset(d->SCF_Index_R     , 0, sizeof d->SCF_Index_R      );

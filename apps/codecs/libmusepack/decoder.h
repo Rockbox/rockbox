@@ -43,7 +43,15 @@
 #include "reader.h"
 #include "streaminfo.h"
 
+// define this to enable/disable support for streamversion SV4-6
 //#define MPC_SUPPORT_SV456
+
+// SCF_HACK is used to avoid possible distortion after seeking with mpc files
+// background: scf's are coded differential in time domain. if you seek to the
+// desired postion it might happen that the baseline is missed and the resulting
+// scf is much too high (hissing noise). this hack uses the lowest scaling until
+// a non-differential scf could be decoded after seek. through this hack subbands
+// are faded out until there was at least a single non-differential scf found.
 #define SCF_HACK
 
 enum {
