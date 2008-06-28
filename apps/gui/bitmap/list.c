@@ -309,22 +309,23 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
         /* Scroll bar */
         else
         {
-            int new_selection, nb_lines;
-            int height, size;
-            nb_lines = viewport_get_nb_lines(&list_text[SCREEN_MAIN]);
+            int nb_lines = viewport_get_nb_lines(&list_text[SCREEN_MAIN]);
             if (nb_lines <  gui_list->nb_items)
             {
-                height = nb_lines * font_get(parent->font)->height;
-                size = height / gui_list->nb_items;
-                new_selection = ((y-list_text[SCREEN_MAIN].y)*(gui_list->nb_items-nb_lines))/(height-size);
+                int scrollbar_size = nb_lines * font_get(parent->font)->height;
+                int actual_y = y - list_text[SCREEN_MAIN].y;
                 
-                if (new_selection - gui_list->start_item[SCREEN_MAIN] > (nb_lines/2))
-                    new_selection = gui_list->start_item[SCREEN_MAIN]+(nb_lines/2);
-                else if (new_selection > gui_list->nb_items-nb_lines)
-                    new_selection = gui_list->nb_items-nb_lines;
+                int new_selection = (actual_y * gui_list->nb_items) / scrollbar_size;
+                
+                int start_item = new_selection - nb_lines/2;
+                if(start_item < 0)
+                    start_item = 0;
+                else if(start_item > gui_list->nb_items - nb_lines)
+                    start_item = gui_list->nb_items - nb_lines;
                     
+                gui_list->start_item[SCREEN_MAIN] = start_item;
                 gui_synclist_select_item(gui_list, new_selection);
-                gui_list->start_item[SCREEN_MAIN] = new_selection;
+                
                 return ACTION_REDRAW;
             }
         }
@@ -346,6 +347,7 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
         if (y > list_text[SCREEN_MAIN].y)
         {
             int line_height, actual_y;
+            static int last_y = 0;
             
             actual_y =  y - list_text[SCREEN_MAIN].y;
             line_height = font_get(parent->font)->height;
@@ -354,13 +356,12 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
             if(actual_y%line_height == 0) /* Pressed a border */
                 return ACTION_NONE;
 
-            if(actual_y >= line_height*gui_list->nb_items) /* Pressed below the list */
+            if (gui_list->start_item[SCREEN_MAIN]+line > gui_list->nb_items) /* Pressed below the list*/
                 return ACTION_NONE;
-            
+
+            last_y = actual_y;
             if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN] && button ^ BUTTON_REL)
             {
-                if (gui_list->start_item[SCREEN_MAIN]+line > gui_list->nb_items)
-                    return ACTION_NONE;
                 if(button & BUTTON_REPEAT)
                     scrolling = true;
                 gui_synclist_select_item(gui_list, gui_list->start_item[SCREEN_MAIN]+line);
