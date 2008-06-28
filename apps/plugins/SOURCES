@@ -60,6 +60,7 @@ fire.c
 jpeg.c
 mandelbrot.c
 plasma.c
+ppmviewer.c
 
 blackjack.c
 bounce.c
