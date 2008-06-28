@@ -1353,7 +1353,8 @@ int peak_meter_draw_get_btn(int action_context, int x, int y[],
             for(i = 0; i < nb_screens; i++)
             {
                 peak_meter_screen(&screens[i], x, y[i], height);
-                screens[i].update_rect(x, y[i], screens[i].width - x, height);
+                screens[i].update_viewport_rect(x, y[i],
+                                                screens[i].width - x, height);
             }
             next_refresh += HZ / PEAK_METER_FPS;
             dopeek = true;
