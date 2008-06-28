@@ -54,6 +54,17 @@
 
 #define LSP_POW_BITS 7
 
+/*define IRAM for targets with 48k/80k IRAM split*/
+#ifndef IBSS_ATTR_WMA_LARGE_IRAM
+#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250)
+/* PP5022/24 and MCF5250 have 128KB of IRAM, with 80KB allocated for codecs */
+#define IBSS_ATTR_WMA_LARGE_IRAM IBSS_ATTR
+#else
+/* other PP's and MCF5249 have 96KB of IRAM */
+#define IBSS_ATTR_WMA_LARGE_IRAM
+#endif
+#endif
+
 typedef struct WMADecodeContext
 {
     GetBitContext gb;
@@ -110,7 +121,8 @@ typedef struct WMADecodeContext
     MDCTContext mdct_ctx[BLOCK_NB_SIZES];
     fixed32 *windows[BLOCK_NB_SIZES];
     /* output buffer for one frame and the last for IMDCT windowing */
-    fixed32 frame_out[MAX_CHANNELS][BLOCK_MAX_SIZE * 2];
+    fixed32 (*frame_out)[MAX_CHANNELS][BLOCK_MAX_SIZE*2];
+
     /* last frame info */
     uint8_t last_superframe[MAX_CODED_SUPERFRAME_SIZE + 4]; /* padding added */
     int last_bitoffset;

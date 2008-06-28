@@ -52,6 +52,8 @@ CoefVLCTable;
 static void wma_lsp_to_curve_init(WMADecodeContext *s, int frame_len);
 
 fixed32 coefsarray[MAX_CHANNELS][BLOCK_MAX_SIZE] IBSS_ATTR;
+/*decode and window into IRAM on targets with at least 80KB of codec IRAM*/
+fixed32 frame_out_buf[MAX_CHANNELS][BLOCK_MAX_SIZE * 2] IBSS_ATTR_WMA_LARGE_IRAM;
 
 //static variables that replace malloced stuff
 fixed32 stat0[2048], stat1[1024], stat2[512], stat3[256], stat4[128];    //these are the MDCT reconstruction windows
@@ -329,6 +331,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
     s->block_align = wfx->blockalign;
 
     s->coefs = &coefsarray;
+    s->frame_out = &frame_out_buf;
 
     if (wfx->codec_id == ASF_CODEC_ID_WMAV1) {
         s->version = 1;
@@ -1369,7 +1372,6 @@ static int wma_decode_block(WMADecodeContext *s)
         if (s->channel_coded[ch])
         {
             static fixed32  output[BLOCK_MAX_SIZE * 2] IBSS_ATTR;
-
             int n4, index, n;
 
             n = s->block_len;
@@ -1382,8 +1384,7 @@ static int wma_decode_block(WMADecodeContext *s)
 
             /* add in the frame */
             index = (s->frame_len / 2) + s->block_pos - n4;
-
-            wma_window(s, output, &s->frame_out[ch][index]);
+            wma_window(s, output, &((*s->frame_out)[ch][index]));
 
 
 
@@ -1391,7 +1392,7 @@ static int wma_decode_block(WMADecodeContext *s)
                channel if it is not coded */
             if (s->ms_stereo && !s->channel_coded[1])
             {
-                wma_window(s, output, &s->frame_out[1][index]);
+                wma_window(s, output, &((*s->frame_out)[1][index]));
             }
         }
     }
@@ -1415,7 +1416,6 @@ static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
     int ret, i, n, ch, incr;
     int32_t *ptr;
     fixed32 *iptr;
-   // rb->splash(HZ, "in wma_decode_frame");
 
     /* read each block */
     s->block_num = 0;
@@ -1443,17 +1443,16 @@ static int wma_decode_frame(WMADecodeContext *s, int32_t *samples)
     for(ch = 0; ch < s->nb_channels; ++ch)
     {
         ptr = samples + ch;
-        iptr = s->frame_out[ch];
+        iptr = &((*s->frame_out)[ch][0]);
 
         for (i=0;i<n;++i)
         {
             *ptr = (*iptr++);
             ptr += incr;
         }
-        /* prepare for next block */
-        memmove(&s->frame_out[ch][0], &s->frame_out[ch][s->frame_len],
-                s->frame_len * sizeof(fixed32));
 
+        memmove(&((*s->frame_out)[ch][0]), &((*s->frame_out)[ch][s->frame_len]),
+            s->frame_len * sizeof(fixed32));
     }
 
     return 0;
