@@ -916,7 +916,7 @@ void peak_meter_screen(struct screen *display, int x, int y, int height)
 {
     peak_meter_draw(display, &scales[display->screen_type], x, y,
                         display->getwidth() - x, height);
-}           
+}
 /**
  * Draws a peak meter in the specified size at the specified position.
  * @param int x - The x coordinate. 
@@ -952,7 +952,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
 
 
         if (level_check){
-            /* only read the volume info from MAS if peek since last read*/      
+            /* only read the volume info from MAS if peek since last read*/
             left_level  = peak_meter_read_l(); 
             right_level = peak_meter_read_r();
             level_check = false;
@@ -960,7 +960,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
 
         /* scale the samples dBfs */    
         left  = peak_meter_scale_value(left_level, meterwidth);
-        right = peak_meter_scale_value(right_level, meterwidth);        
+        right = peak_meter_scale_value(right_level, meterwidth);
 
          /*if the scale has changed -> recalculate the scale 
            (The scale becomes invalid when the range changed.) */
@@ -972,9 +972,9 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
                     /* find the real x-coords for predefined interesting
                        dBfs values. These only are recalculated when the
                        scaling of the meter changed. */
-                        scales->db_scale_lcd_coord[i] = 
+                        scales->db_scale_lcd_coord[i] =
                             peak_meter_scale_value(
-                                db_scale_src_values[i], 
+                                db_scale_src_values[i],
                                 meterwidth - 1);
                 } 
             }
@@ -983,7 +983,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
             else {
                 db_scale_count = 10;
                 for (i = 0; i < db_scale_count; i++) {
-                    scales->db_scale_lcd_coord[i] = 
+                    scales->db_scale_lcd_coord[i] =
                         (i * (MAX_PEAK / 10) - peak_meter_range_min) *
                         meterwidth / pm_range;
                 }
@@ -1111,7 +1111,8 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         start_trigx = x+peak_meter_scale_value(trig_strt_threshold,meterwidth);
         display->vline(start_trigx, ycenter - 2, ycenter);
         start_trigx ++;
-        if (start_trigx < display->getwidth() ) display->drawpixel(start_trigx, ycenter - 1);
+        if (start_trigx < display->getwidth() ) display->drawpixel(start_trigx,
+                                                                   ycenter - 1);
 
         stop_trigx = x + peak_meter_scale_value(trig_stp_threshold,meterwidth);
         display->vline(stop_trigx, ycenter - 2, ycenter);
@@ -1238,7 +1239,8 @@ int peak_meter_trigger_status(void)
    return trig_status; /* & TRIG_PIT_MASK;*/
 }
 
-void peak_meter_draw_trig(int xpos[], int ypos[], int trig_width[], int nb_screens) 
+void peak_meter_draw_trig(int xpos[], int ypos[],
+                          int trig_width[], int nb_screens)
 {
     int barstart[NB_SCREENS];
     int barend[NB_SCREENS];
@@ -1354,7 +1356,8 @@ int peak_meter_draw_get_btn(int action_context, int x, int y[],
             {
                 peak_meter_screen(&screens[i], x, y[i], height);
                 screens[i].update_viewport_rect(x, y[i],
-                                                screens[i].width - x, height);
+                                                screens[i].getwidth() - x,
+                                                height);
             }
             next_refresh += HZ / PEAK_METER_FPS;
             dopeek = true;
