@@ -74,7 +74,7 @@ bool VoiceFileCreator::createVoiceFile(ProgressloggerInterface* logger)
         {
             version = line.remove("Version:").trimmed();
             version = version.left(version.indexOf("-")).remove(0,1);
-        }        
+        }
     }
     info.close();
         
@@ -286,7 +286,14 @@ void VoiceFileCreator::downloadDone(bool error)
     {
         QFile::remove(mp3files.at(i));
     }        
-    
+
+    // Add Voice file to the install log
+    QSettings installlog(m_mountpoint + "/.rockbox/rbutil.log", QSettings::IniFormat, 0);
+    installlog.beginGroup("selfcreated Voice");        
+    installlog.setValue("/.rockbox/langs/" + m_lang + ".voice",QDate::currentDate().toString("yyyyMMdd"));
+    installlog.endGroup();
+    installlog.sync();
+
     m_logger->setProgressMax(100);
     m_logger->setProgressValue(100);
     m_logger->addItem(tr("successfully created."),LOGOK);    
