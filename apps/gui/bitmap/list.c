@@ -353,6 +353,9 @@ unsigned gui_synclist_do_touchpad(struct gui_synclist * gui_list, struct viewpor
             
             if(actual_y%line_height == 0) /* Pressed a border */
                 return ACTION_NONE;
+
+            if(actual_y >= line_height*gui_list->nb_items) /* Pressed below the list */
+                return ACTION_NONE;
             
             if (line != gui_list->selected_item - gui_list->start_item[SCREEN_MAIN] && button ^ BUTTON_REL)
             {
