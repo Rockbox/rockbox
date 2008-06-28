@@ -23,6 +23,7 @@
 #include "i2s.h"
 #include "i2c-pp.h"
 #include "as3514.h"
+#include "ata-sd-target.h"
 #ifdef HAVE_USBSTACK
 #include "usb_drv.h"
 #endif
@@ -32,7 +33,6 @@ extern void TIMER1(void);
 extern void TIMER2(void);
 extern void ipod_mini_button_int(void); /* iPod Mini 1st gen only */
 extern void ipod_4g_button_int(void);   /* iPod 4th gen and higher only */
-extern void microsd_int(void);          /* Sansa E200 and C200 */
 #ifdef SANSA_E200
 extern void button_int(void);
 extern void clickwheel_int(void);

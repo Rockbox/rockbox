@@ -22,6 +22,7 @@
 #define ATA_SD_TARGET_H
 
 #include "inttypes.h"
+#include "hotswap.h"
 
 typedef struct
 {
@@ -45,6 +46,7 @@ bool       card_detect_target(void);
 
 #ifdef HAVE_HOTSWAP
 void       card_enable_monitoring_target(bool on);
+void       microsd_int(void);
 #endif
 
 #endif
