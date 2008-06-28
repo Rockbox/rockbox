@@ -11750,3 +11750,71 @@
     gigabeatf: "High"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "Very slow"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Very slow"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Very slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "Slow"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Slow"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "Very fast"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Very fast"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Very fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: none
+    gigabeatf: "Fast"
+  </source>
+  <dest>
+    *: none
+    gigabeatf: "Fast"
+  </dest>
+  <voice>
+    *: none
+    gigabeatf: "Fast"
+  </voice>
+</phrase>

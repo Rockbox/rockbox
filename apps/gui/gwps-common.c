@@ -196,10 +196,10 @@ bool ffwd_rew(int button)
     unsigned int max_step = 0; /* maximum ff/rewind step */ 
     int ff_rewind_count = 0;   /* current ff/rewind count (in ticks) */
     int direction = -1;         /* forward=1 or backward=-1 */
-    long accel_tick = 0;       /* next time at which to bump the step size */
     bool exit = false;
     bool usb = false;
     int i = 0;
+    const long ff_rw_accel = (global_settings.ff_rewind_accel + 3);
 
     if (button == ACTION_NONE)
     {
@@ -237,13 +237,8 @@ bool ffwd_rew(int button)
 
                     ff_rewind_count += step * direction;
 
-                    if (global_settings.ff_rewind_accel != 0 && 
-                        current_tick >= accel_tick)
-                    { 
-                        step *= 2;
-                        accel_tick = current_tick +
-                            global_settings.ff_rewind_accel*HZ; 
-                    } 
+                    /* smooth seeking by multiplying step by: 1 + (2 ^ -accel) */
+                    step += step >> ff_rw_accel;
                 }
                 else
                 {
@@ -268,9 +263,6 @@ bool ffwd_rew(int button)
                         wps_state.ff_rewind = true;
 
                         step = 1000 * global_settings.ff_rewind_min_step;
-
-                        accel_tick = current_tick +
-                            global_settings.ff_rewind_accel*HZ; 
                     }
                     else
                         break;

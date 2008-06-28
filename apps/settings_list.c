@@ -666,8 +666,10 @@ const struct settings_list settings[] = {
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, ff_rewind_min_step,
                   LANG_FFRW_STEP, 1, "scan min step", NULL, UNIT_SEC,
                   NULL, NULL, NULL, 14,  1,2,3,4,5,6,8,10,15,20,25,30,45,60),
-    INT_SETTING(0, ff_rewind_accel, LANG_FFRW_ACCEL, 3, "scan accel", UNIT_SEC,
-                16, 0, -1, scanaccel_formatter, getlang_unit_0_is_off, NULL),
+    CHOICE_SETTING(0, ff_rewind_accel, LANG_FFRW_ACCEL, 2,
+                   "seek accel", "very fast,fast,normal,slow,very slow", NULL, 5,
+                   ID2P(LANG_VERY_FAST), ID2P(LANG_FAST), ID2P(LANG_NORMAL),
+                   ID2P(LANG_SLOW) , ID2P(LANG_VERY_SLOW)),
 #if (CONFIG_CODEC == SWCODEC) && !defined(HAVE_FLASH_STORAGE)
     STRINGCHOICE_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0,"antiskip",
                          "5s,15s,30s,1min,2min,3min,5min,10min", NULL, 8,

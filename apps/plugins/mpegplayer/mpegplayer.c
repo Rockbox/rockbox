@@ -1109,8 +1109,7 @@ static int wvs_get_status(void)
 static uint32_t wvs_ff_rw(int btn, unsigned refresh)
 {
     unsigned int step = TS_SECOND*rb->global_settings->ff_rewind_min_step;
-    const long ff_rw_accel = rb->global_settings->ff_rewind_accel;
-    long accel_tick = *rb->current_tick + ff_rw_accel*HZ;
+    const long ff_rw_accel = (rb->global_settings->ff_rewind_accel + 3);
     uint32_t start;
     uint32_t time = stream_get_seek_time(&start);
     const uint32_t duration = stream_get_duration();
@@ -1145,7 +1144,6 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
 
     while (1)
     {
-        long tick = *rb->current_tick;
         stream_keep_disk_active();
 
         switch (btn)
@@ -1199,10 +1197,8 @@ static uint32_t wvs_ff_rw(int btn, unsigned refresh)
 
         ff_rw_count += step;
 
-        if (ff_rw_accel != 0 && TIME_AFTER(tick, accel_tick)) { 
-            step *= 2;
-            accel_tick = tick + ff_rw_accel*HZ; 
-        }
+        /* smooth seeking by multiplying step by: 1 + (2 ^ -accel) */
+        step += step >> ff_rw_accel;
 
         if (wvs.status == WVS_STATUS_FF) {
             if (duration - time <= ff_rw_count)
