@@ -256,7 +256,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         memcmp(&(bar->info), &(bar->lastinfo), sizeof(struct status_info)))
     {
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        display->fillrect(0, 0, display->width, STATUSBAR_HEIGHT);
+        display->fillrect(0, 0, display->getwidth(), STATUSBAR_HEIGHT);
         display->set_drawmode(DRMODE_SOLID);
 
         if (bar->info.battery_state)
@@ -329,7 +329,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         if(!display->has_disk_led && bar->info.led)
             gui_statusbar_led(display);
 #endif
-        display->update_rect(0, 0, display->width, STATUSBAR_HEIGHT);
+        display->update_rect(0, 0, display->getwidth(), STATUSBAR_HEIGHT);
         bar->lastinfo = bar->info;
     }
 #endif /* HAVE_LCD_BITMAP */
@@ -573,7 +573,7 @@ static void gui_statusbar_icon_lock_remote(struct screen * display)
 static void gui_statusbar_led(struct screen * display)
 {
     display->mono_bitmap(bitmap_icon_disk,
-                         STATUSBAR_DISK_X_POS(display->width),
+                         STATUSBAR_DISK_X_POS(display->getwidth()),
                          STATUSBAR_Y_POS, STATUSBAR_DISK_WIDTH,
                          STATUSBAR_HEIGHT);
 }
@@ -605,7 +605,7 @@ static void gui_statusbar_time(struct screen * display, struct tm *time)
     display->setfont(FONT_SYSFIXED);
     display->getstringsize(buffer, &width, &height);
     if (height <= STATUSBAR_HEIGHT) {
-        display->putsxy(STATUSBAR_TIME_X_END(display->width) - width,
+        display->putsxy(STATUSBAR_TIME_X_END(display->getwidth()) - width,
                         STATUSBAR_Y_POS, buffer);
     }
     display->setfont(FONT_UI);

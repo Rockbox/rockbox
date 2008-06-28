@@ -48,10 +48,10 @@ int viewport_get_nb_lines(struct viewport *vp)
 void viewport_set_defaults(struct viewport *vp, enum screen_type screen)
 {
     vp->x = 0;
-    vp->width = screens[screen].width;
-    
+    vp->width = screens[screen].lcdwidth;
+
     vp->y = gui_statusbar_height();
-    vp->height = screens[screen].height - vp->y;
+    vp->height = screens[screen].lcdheight - vp->y;
 #ifdef HAVE_LCD_BITMAP
     vp->drawmode = DRMODE_SOLID;
     vp->font = FONT_UI; /* default to UI to discourage SYSFONT use */

@@ -1064,8 +1064,9 @@ bool recording_screen(bool no_source)
                     screen_update = 1;
                     screens[1].clear_display();
                     snprintf(buf, sizeof(buf), str(LANG_REMOTE_LCD_ON));
-                    screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1,
-                                    screens[1].height/(h*2) + 1, buf);
+                    screens[1].puts((screens[1].getwidth()/w - strlen(buf))/2 +
+                                    1,
+                                    screens[1].getheight()/(h*2) + 1, buf);
                     screens[1].update();
                     gui_syncsplash(0, str(LANG_REMOTE_LCD_OFF));
                 }
@@ -1880,10 +1881,12 @@ bool recording_screen(bool no_source)
             /* draw the trigger status */
             FOR_NB_SCREENS(i)
             {
+                /* NOTE: UGLY width setting based on height! To be fixed! */
                 trig_width[i] = ((vp[i].height < 64) ||
                                 ((vp[i].height < 72) && (PM_HEIGHT > 1))) ?
-                                  screens[i].width - 14 * w : screens[i].width;
-                trig_xpos[i] = screens[i].width - trig_width[i];
+                                  screens[i].getwidth() - 14 * w :
+                                  screens[i].getwidth();
+                trig_xpos[i] = screens[i].getwidth() - trig_width[i];
                 trig_ypos[i] =  ((vp[i].height < 72) && (PM_HEIGHT > 1)) ?
                                   h*2 :
                                   h*(1 + filename_offset[i] + PM_HEIGHT +

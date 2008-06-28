@@ -173,8 +173,8 @@ void jackpot_display_slot_machine(struct jackpot* game, struct screen* display)
     display->putc(0, 0, '[');
 #else
     const struct picture* picture= &(jackpot_pictures[display->screen_type]);
-    int pos_x=(display->width-NB_SLOTS*(picture->width+1))/2;
-    int pos_y=(display->height-(picture->height))/2;
+    int pos_x=(display->getwidth()-NB_SLOTS*(picture->width+1))/2;
+    int pos_y=(display->getheight()-(picture->height))/2;
 #endif /* HAVE_LCD_CHARCELLS */
     for(i=0;i<NB_SLOTS;i++)
     {
@@ -223,9 +223,10 @@ void jackpot_info_message(struct screen* display, char* message)
     int xpos, ypos;
     int message_height, message_width;
     display->getstringsize(message, &message_width, &message_height);
-    xpos=(display->width-message_width)/2;
-    ypos=display->height-message_height;
-    rb->screen_clear_area(display, 0, ypos, display->width, message_height);
+    xpos=(display->getwidth()-message_width)/2;
+    ypos=display->getheight()-message_height;
+    rb->screen_clear_area(display, 0, ypos, display->getwidth(),
+                          message_height);
     display->putsxy(xpos,ypos,message);
     display->update();
 #endif /* HAVE_LCD_CHARCELLS */

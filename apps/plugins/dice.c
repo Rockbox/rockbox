@@ -112,7 +112,7 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
 void dice_init(struct dices* dice){
     dice->nb_dices=INITIAL_NB_DICES;
     sides_index=INITIAL_NB_SIDES;
-    
+
 }
 
 void dice_roll(struct dices* dice) {
@@ -139,8 +139,8 @@ void dice_print(struct dices* dice, struct screen* display){
     /* display characteristics */
     int char_height, char_width;
     display->getstringsize("M", &char_width, &char_height);
-    int display_nb_row=display->height/char_height;
-    int display_nb_col=display->width/char_width;
+    int display_nb_row=display->getheight()/char_height;
+    int display_nb_col=display->getwidth()/char_width;
 
     int nb_dices_per_line=display_nb_col/4;/* 4 char per dice displayed*/
     int nb_lines_required=dice->nb_dices/nb_dices_per_line;

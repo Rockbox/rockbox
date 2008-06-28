@@ -91,14 +91,14 @@ static void splash(struct screen * screen, const char *fmt, va_list ap)
 #endif
         if (lastbreak)
         {
-            if (x + (next - lastbreak) * space_w + w > screen->width)
+            if (x + (next - lastbreak) * space_w + w > screen->lcdwidth)
             {   /* too wide, wrap */
                 widths[line] = x;
 #ifdef HAVE_LCD_BITMAP
                 if (x > maxw)
                     maxw = x;
 #endif
-                if ((y + h > screen->height) || (line >= (MAXLINES-1)))
+                if ((y + h > screen->lcdheight) || (line >= (MAXLINES-1)))
                     break;  /* screen full or out of lines */
                 x = 0;
                 y += h;
@@ -132,8 +132,8 @@ static void splash(struct screen * screen, const char *fmt, va_list ap)
 #ifdef HAVE_LCD_BITMAP
     /* If we center the display, then just clear the box we need and put
        a nice little frame and put the text in there! */
-    y = (screen->height - y) / 2;  /* height => y start position */
-    x = (screen->width - maxw) / 2 - 2;
+    y = (screen->lcdheight - y) / 2;  /* height => y start position */
+    x = (screen->lcdwidth - maxw) / 2 - 2;
 
 #if LCD_DEPTH > 1
     if (screen->depth > 1)
@@ -147,7 +147,7 @@ static void splash(struct screen * screen, const char *fmt, va_list ap)
 #endif
         screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
 
-    screen->fillrect(x, y-2, maxw+4, screen->height-y*2+4);
+    screen->fillrect(x, y-2, maxw+4, screen->lcdheight-y*2+4);
 
 #if LCD_DEPTH > 1
     if (screen->depth > 1)
@@ -156,7 +156,7 @@ static void splash(struct screen * screen, const char *fmt, va_list ap)
 #endif
         screen->set_drawmode(DRMODE_SOLID);
 
-    screen->drawrect(x, y-2, maxw+4, screen->height-y*2+4);
+    screen->drawrect(x, y-2, maxw+4, screen->lcdheight-y*2+4);
 #else /* HAVE_LCD_CHARCELLS */
     y = 0;    /* vertical centering on 2 lines would be silly */
     x = 0;
@@ -167,7 +167,7 @@ static void splash(struct screen * screen, const char *fmt, va_list ap)
 
     for (i = 0; i <= line; i++)
     {
-        x = MAX((screen->width - widths[i]) / 2, 0);
+        x = MAX((screen->lcdwidth - widths[i]) / 2, 0);
 
 #ifdef HAVE_LCD_BITMAP
         screen->putsxy(x, y, lines[i]);

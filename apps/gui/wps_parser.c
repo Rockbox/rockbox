@@ -1550,16 +1550,17 @@ bool wps_data_load(struct wps_data *wps_data,
 
     /* Initialise the first (default) viewport */
     wps_data->viewports[0].vp.x          = 0;
-    wps_data->viewports[0].vp.width      = display->width;
+    wps_data->viewports[0].vp.width      = display->getwidth();
     if (!global_settings.statusbar)
     {
         wps_data->viewports[0].vp.y      = 0;
-        wps_data->viewports[0].vp.height = display->height;
+        wps_data->viewports[0].vp.height = display->getheight();
     }
     else
     {
         wps_data->viewports[0].vp.y      = STATUSBAR_HEIGHT;
-        wps_data->viewports[0].vp.height = display->height - STATUSBAR_HEIGHT;
+        wps_data->viewports[0].vp.height = display->getheight() -
+                                            STATUSBAR_HEIGHT;
     }
 #ifdef HAVE_LCD_BITMAP
     wps_data->viewports[0].vp.font       = FONT_UI;

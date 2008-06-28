@@ -995,7 +995,7 @@ static int star_menu(void)
         rb->viewport_set_defaults(&vp[selection], selection);
         /* we are hiding the statusbar so fix the height also */
         vp[selection].y = 0; 
-        vp[selection].height = rb->screens[selection]->height;
+        vp[selection].height = rb->screens[selection]->lcdheight;
 #if LCD_DEPTH > 1
         if (rb->screens[selection]->depth > 1)
         {

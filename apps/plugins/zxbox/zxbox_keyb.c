@@ -232,7 +232,8 @@ int zx_kbd_input(char* text/*, int buflen*/)
         param[l].font_h = param[l].font->height;
 
             /* check if FONT_UI fits the screen */
-        if (2*param[l].font_h+3 + BUTTONBAR_HEIGHT > rb->screens[l]->height) {
+        if (2*param[l].font_h+3 + BUTTONBAR_HEIGHT >
+            rb->screens[l]->getheight()) {
             param[l].font = rb->font_get(FONT_SYSFIXED);
             param[l].font_h = param[l].font->height;
             param[l].curfont = FONT_SYSFIXED;
@@ -259,9 +260,9 @@ int zx_kbd_input(char* text/*, int buflen*/)
         {
             if( param[l].kbd_buf[i] == '\n' )
             {
-                k = ( rb->screens[l]->width / param[l].font_w )
-                        - i % ( rb->screens[l]->width / param[l].font_w ) - 1;
-                if( k == ( rb->screens[l]->width / param[l].font_w ) - 1 )
+                k = ( rb->screens[l]->getwidth() / param[l].font_w ) -
+                    i % ( rb->screens[l]->getwidth() / param[l].font_w ) - 1;
+                if( k == ( rb->screens[l]->getwidth() / param[l].font_w ) - 1 )
                 {
                     param[l].nchars--;
                     for( j = i; j < param[l].nchars; j++ )
@@ -303,17 +304,19 @@ int zx_kbd_input(char* text/*, int buflen*/)
             if (w > text_w)
                 text_w = w;
         }
-        param[l].max_chars_text = rb->screens[l]->width / text_w - 2;
+        param[l].max_chars_text = rb->screens[l]->getwidth() / text_w - 2;
 
     /* calculate keyboard grid size */
-        param[l].max_chars = rb->screens[l]->width / param[l].font_w;
+        param[l].max_chars = rb->screens[l]->getwidth() / param[l].font_w;
         if (!kbd_loaded) {
             param[l].lines = param[l].DEFAULT_LINES;
             param[l].keyboard_margin = DEFAULT_MARGIN;
         } else {
-            param[l].lines = (rb->screens[l]->height - BUTTONBAR_HEIGHT - statusbar_size) / param[l].font_h - 1;
-            param[l].keyboard_margin = rb->screens[l]->height - BUTTONBAR_HEIGHT -
-                statusbar_size - (param[l].lines+1)*param[l].font_h;
+            param[l].lines = (rb->screens[l]->lcdheight - BUTTONBAR_HEIGHT -
+                             statusbar_size) / param[l].font_h - 1;
+            param[l].keyboard_margin = rb->screens[l]->lcdheight -
+                                       BUTTONBAR_HEIGHT - statusbar_size -
+                                       (param[l].lines+1)*param[l].font_h;
             if (param[l].keyboard_margin < 3) {
                 param[l].lines--;
                 param[l].keyboard_margin += param[l].font_h;
@@ -342,7 +345,7 @@ int zx_kbd_input(char* text/*, int buflen*/)
         FOR_NB_SCREENS(l)
             rb->screens[l]->clear_display();
 
-        
+
             /* draw page */
             FOR_NB_SCREENS(l)
             {
@@ -360,12 +363,13 @@ int zx_kbd_input(char* text/*, int buflen*/)
                     }
                 }
             }
-        
+
 
         /* separator */
         FOR_NB_SCREENS(l)
         {
-            rb->screens[l]->hline(0, rb->screens[l]->width - 1, param[l].main_y - param[l].keyboard_margin);
+            rb->screens[l]->hline(0, rb->screens[l]->getwidth() - 1,
+                                  param[l].main_y - param[l].keyboard_margin);
 
         /* write out the text */
 #if 0

@@ -788,17 +788,17 @@ static void statusbar_toggle_handler(void *data)
         if (!global_settings.statusbar && !draw)
         {
             vp->vp.y = 0;
-            vp->vp.height = screens[i].height;
+            vp->vp.height = screens[i].lcdheight;
         }
         else
         {
             vp->vp.y      = STATUSBAR_HEIGHT;
-            vp->vp.height = screens[i].height - STATUSBAR_HEIGHT;
+            vp->vp.height = screens[i].lcdheight - STATUSBAR_HEIGHT;
         }
     }
 }
 #endif
-    
+
 void gui_sync_wps_init(void)
 {
     int i;

@@ -35,7 +35,7 @@ void black_background(struct screen* display){
 #endif
     {
         display->clear_display();
-        display->fillrect(0,0,display->width,display->height);
+        display->fillrect(0,0,display->getwidth(),display->getheight());
     }
 }
 

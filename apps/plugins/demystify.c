@@ -108,8 +108,8 @@ void polygon_init(struct polygon * polygon, struct screen * display)
     int i;
     for(i=0;i<NB_POINTS;++i)
     {
-        polygon->points[i].x=(rb->rand() % (display->width));
-        polygon->points[i].y=(rb->rand() % (display->height));
+        polygon->points[i].x=(rb->rand() % (display->getwidth()));
+        polygon->points[i].y=(rb->rand() % (display->getheight()));
     }
 }
 
@@ -167,9 +167,9 @@ void polygon_update(struct polygon *polygon, struct screen * display, struct pol
             x=1;
             polygon_move->move_steps[i].x=get_new_step(step);
         }
-        else if(x>=display->width)
+        else if(x>=display->getwidth())
         {
-            x=display->width-1;
+            x=display->getwidth()-1;
             polygon_move->move_steps[i].x=get_new_step(step);
         }
         polygon->points[i].x=x;
@@ -182,9 +182,9 @@ void polygon_update(struct polygon *polygon, struct screen * display, struct pol
             y=1;
             polygon_move->move_steps[i].y=get_new_step(step);
         }
-        else if(y>=display->height)
+        else if(y>=display->getheight())
         {
-            y=display->height-1;
+            y=display->getheight()-1;
             polygon_move->move_steps[i].y=get_new_step(step);
         }
         polygon->points[i].y=y;

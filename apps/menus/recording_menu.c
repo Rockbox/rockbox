@@ -448,7 +448,7 @@ int rectrigger(void)
     int old_stop_gap = global_settings.rec_stop_gap;
     int old_trigger_mode = global_settings.rec_trigger_mode;
     int old_trigger_type = global_settings.rec_trigger_type;
-    
+
     FOR_NB_SCREENS(i)
     {
         screens[i].clear_display();
@@ -457,11 +457,11 @@ int rectrigger(void)
         vp[i].height -= SYSFONT_HEIGHT*2;
         trig_xpos[i] = 0;
         trig_ypos[i] =  vp[i].y + vp[i].height;
-        pm_y[i] = screens[i].height - SYSFONT_HEIGHT;
-        trig_width[i] = screens[i].width;
+        pm_y[i] = screens[i].getheight() - SYSFONT_HEIGHT;
+        trig_width[i] = screens[i].getwidth();
     }
     /* TODO: what to do if there is < 4 lines on the screen? */
-    
+
     settings[TRIGGER_MODE] =
             find_setting(&global_settings.rec_trigger_mode, NULL);
     settings[TRIGGER_TYPE] =

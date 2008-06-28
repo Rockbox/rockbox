@@ -176,8 +176,8 @@ void maze_draw(struct maze* maze, struct screen* display)
     int point_width, point_height, point_offset_x, point_offset_y;
     unsigned short cell;
 
-    wx = (int) display->width / MAZE_WIDTH;
-    wy = (int) display->height / MAZE_HEIGHT;
+    wx = (int) display->getwidth() / MAZE_WIDTH;
+    wy = (int) display->getheight() / MAZE_HEIGHT;
 
     if(wx>3){
         point_width=wx-3;

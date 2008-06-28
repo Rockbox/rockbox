@@ -28,7 +28,7 @@
 #define ANALOG_SECOND_RADIUS(screen, round) \
     ANALOG_MINUTE_RADIUS(screen, round)
 #define ANALOG_MINUTE_RADIUS(screen, round) \
-    (round?MIN(screen->height/2 -10, screen->width/2 -10):screen->height/2)
+    (round?MIN(screen->getheight()/2 -10, screen->getwidth()/2 -10):screen->getheight()/2)
 #define ANALOG_HOUR_RADIUS(screen, round) \
     (2*ANALOG_MINUTE_RADIUS(screen, round)/3)
 
@@ -52,8 +52,8 @@ void polar_to_cartesian_screen_centered(struct screen * display,
                                         int a, int r, int* x, int* y)
 {
     polar_to_cartesian(a, r, x, y);
-    *x+=display->width/2;
-    *y+=display->height/2;
+    *x+=display->getwidth()/2;
+    *y+=display->getheight()/2;
 }
 
 void angle_to_square(int square_width, int square_height,
@@ -87,8 +87,8 @@ void angle_to_square_screen_centered(struct screen * display,
                      int a, int* x, int* y)
 {
     angle_to_square(square_width, square_height, a, x, y);
-    *x+=display->width/2;
-    *y+=display->height/2;
+    *x+=display->getwidth()/2;
+    *y+=display->getheight()/2;
 }
 
 void draw_hand(struct screen* display, int angle,
@@ -100,9 +100,9 @@ void draw_hand(struct screen* display, int angle,
         polar_to_cartesian_screen_centered(display, angle, radius, &x1, &y1);
     }else{/* fullscreen clock, hands describes square motions */
         int square_width, square_height;
-        /* radius is defined smallest between width and height */
+        /* radius is defined smallest between getwidth() and getheight() */
         square_height=radius;
-        square_width=(radius*display->width)/display->height;
+        square_width=(radius*display->getwidth())/display->getheight();
         angle_to_square_screen_centered(
             display, square_width, square_height, angle, &x1, &y1);
     }
@@ -140,14 +140,14 @@ void draw_counter(struct screen* display, struct counter* counter)
                     counter_time.hour, counter_time.minute);
     getstringsize(smalldigits_bitmaps, buffer, &hour_str_w, &str_h);
     draw_string(display, smalldigits_bitmaps, buffer,
-                display->width-hour_str_w,
-                display->height-2*str_h);
+                display->getwidth()-hour_str_w,
+                display->getheight()-2*str_h);
 
     rb->snprintf(buffer, 10, "%02d", counter_time.second);
     getstringsize(smalldigits_bitmaps, buffer, &second_str_w, &str_h);
     draw_string(display, smalldigits_bitmaps, buffer,
-                display->width-(hour_str_w+second_str_w)/2,
-                display->height-str_h);
+                display->getwidth()-(hour_str_w+second_str_w)/2,
+                display->getheight()-str_h);
 }
 
 void draw_date(struct screen* display, struct time* time, int date_format)
@@ -166,14 +166,14 @@ void draw_date(struct screen* display, struct time* time, int date_format)
     /* draws month and day */
     getstringsize(smalldigits_bitmaps, buffer, &monthday_str_w, &str_h);
     draw_string(display, smalldigits_bitmaps, buffer,
-                0, display->height-year_line*str_h);
+                0, display->getheight()-year_line*str_h);
     rb->snprintf(buffer, 10, "%04d", time->year);
 
     /* draws year */
     getstringsize(smalldigits_bitmaps, buffer, &year_str_w, &str_h);
     draw_string(display, smalldigits_bitmaps, buffer,
                 (monthday_str_w-year_str_w)/2,
-                display->height-monthday_line*str_h);
+                display->getheight()-monthday_line*str_h);
 }
 
 void draw_border(struct screen* display, int skin)
@@ -181,7 +181,7 @@ void draw_border(struct screen* display, int skin)
     /* Draws square dots every 5 minutes */
     int i;
     int x, y;
-    int size=display->height/50;/* size of the square dots */
+    int size=display->getheight()/50;/* size of the square dots */
     if(size%2)/* a pair number */
         size++;
     for(i=0; i < 60; i+=5){
@@ -190,7 +190,7 @@ void draw_border(struct screen* display, int skin)
                 ANALOG_MINUTE_RADIUS(display, skin), &x, &y);
         }else{
             angle_to_square_screen_centered(
-                display, display->width/2-size/2, display->height/2-size/2,
+                display, display->getwidth()/2-size/2, display->getheight()/2-size/2,
                 MINUTE_ANGLE(i, 0), &x, &y);
         }
         display->fillrect(x-size/2, y-size/2, size, size);
@@ -222,15 +222,15 @@ void draw_hour(struct screen* display, struct time* time,
 
 void draw_center_cover(struct screen* display)
 {
-    display->hline((display->width/2)-1,
-                   (display->width/2)+1, (display->height/2)+3);
-    display->hline((display->width/2)-3,
-                   (display->width/2)+3, (display->height/2)+2);
-    display->fillrect((display->width/2)-4, (display->height/2)-1, 9, 3);
-    display->hline((display->width/2)-3,
-                   (display->width/2)+3, (display->height/2)-2);
-    display->hline((display->width/2)-1,
-                   (display->width/2)+1, (display->height/2)-3);
+    display->hline((display->getwidth()/2)-1,
+                   (display->getwidth()/2)+1, (display->getheight()/2)+3);
+    display->hline((display->getwidth()/2)-3,
+                   (display->getwidth()/2)+3, (display->getheight()/2)+2);
+    display->fillrect((display->getwidth()/2)-4, (display->getheight()/2)-1, 9, 3);
+    display->hline((display->getwidth()/2)-3,
+                   (display->getwidth()/2)+3, (display->getheight()/2)-2);
+    display->hline((display->getwidth()/2)-1,
+                   (display->getwidth()/2)+1, (display->getheight()/2)-3);
 }
 
 void analog_clock_draw(struct screen* display, struct time* time,

@@ -64,19 +64,22 @@ void digital_clock_draw(struct screen* display,
         }
     }
     getstringsize(digits_bitmaps, buffer, &str_w, &str_h);
-    draw_string(display, digits_bitmaps, buffer, (display->width-str_w)/2, 0);
+    draw_string(display, digits_bitmaps, buffer,
+                (display->getwidth()-str_w)/2, 0);
     if(settings->digital.show_seconds){
         buffer_pos=0;
         buffer_printf(buffer, buffer_pos, "%02d", time->second);
         getstringsize(digits_bitmaps, buffer, &str_w, &str_h);
-        draw_string(display, digits_bitmaps, buffer, (display->width-str_w)/2,
+        draw_string(display, digits_bitmaps, buffer,
+                    (display->getwidth()-str_w)/2,
                     digits_bitmaps->height);
     }
     if(settings->general.date_format!=NONE){
         format_date(buffer, time, settings->general.date_format);
         getstringsize(smalldigits_bitmaps, buffer, &str_w, &str_h);
-        draw_string(display, smalldigits_bitmaps, buffer, (display->width-str_w)/2,
-                    display->height-smalldigits_bitmaps->height*2);
+        draw_string(display, smalldigits_bitmaps, buffer,
+                    (display->getwidth()-str_w)/2,
+                    display->getheight()-smalldigits_bitmaps->height*2);
     }
     if(counter){
         struct time counter_time;
@@ -84,7 +87,7 @@ void digital_clock_draw(struct screen* display,
         rb->snprintf(buffer, 20, "%02d:%02d:%02d",
                      counter_time.hour, counter_time.minute, counter_time.second);
         getstringsize(smalldigits_bitmaps, buffer, &str_w, &str_h);
-        draw_string(display, smalldigits_bitmaps, buffer, (display->width-str_w)/2,
-                    display->height-str_h);
+        draw_string(display, smalldigits_bitmaps, buffer,
+                    (display->getwidth()-str_w)/2, display->getheight()-str_h);
     }
 }

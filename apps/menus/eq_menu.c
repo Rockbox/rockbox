@@ -399,8 +399,8 @@ static int draw_eq_sliders(int current_band, enum eq_slider_mode mode)
     enum eq_type type;
 
     FOR_NB_SCREENS(i)
-        slider_width[i] = screens[i].width - 4; /* two pixel margin on each side */  
-    
+        slider_width[i] = screens[i].getwidth() - 4; /* 2 pixel margin
+                                                                    each side */
     for (i=0; i<5; i++) {
         cutoff = *setting++;
         q = *setting++;

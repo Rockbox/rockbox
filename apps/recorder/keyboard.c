@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Björn Stenberg
+ * Copyright (C) 2002 by Bjï¿½rn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -302,7 +302,7 @@ int kbd_input(char* text, int buflen)
 #if LCD_WIDTH >= 160 && LCD_HEIGHT >= 96
         struct screen *sc = &screens[l];
 
-        if (sc->width >= 160 && sc->height >= 96)
+        if (sc->getwidth() >= 160 && sc->getheight() >= 96)
         {
             pm->default_kbd =
                 "ABCDEFG abcdefg !?\" @#$%+'\n"
@@ -384,7 +384,8 @@ int kbd_input(char* text, int buflen)
         pm->font_h = pm->font->height;
 
         /* check if FONT_UI fits the screen */
-        if (2*pm->font_h + 3 + statusbar_size + BUTTONBAR_HEIGHT > sc->height)
+        if (2*pm->font_h + 3 + statusbar_size + 
+            BUTTONBAR_HEIGHT > sc->getheight())
         {
             pm->font = font_get(FONT_SYSFIXED);
             pm->font_h = pm->font->height;
@@ -419,11 +420,11 @@ int kbd_input(char* text, int buflen)
         {
             if (pm->kbd_buf[i] == '\n')
             {
-                int k = sc->width / pm->font_w
-                        - i % ( sc->width / pm->font_w ) - 1;
+                int k = sc->getwidth() / pm->font_w
+                        - i % ( sc->getwidth() / pm->font_w ) - 1;
                 int j;
 
-                if (k == sc->width / pm->font_w - 1)
+                if (k == sc->getwidth() / pm->font_w - 1)
                 {
                     pm->nchars--;
 
@@ -478,10 +479,10 @@ int kbd_input(char* text, int buflen)
                 text_w = w;
         }
 
-        pm->max_chars_text = sc->width / text_w - 2;
+        pm->max_chars_text = sc->getwidth() / text_w - 2;
 
         /* Calculate keyboard grid size */
-        pm->max_chars = sc->width / pm->font_w;
+        pm->max_chars = sc->getwidth() / pm->font_w;
 
         if (!kbd_loaded)
         {
@@ -490,9 +491,9 @@ int kbd_input(char* text, int buflen)
         }
         else
         {
-            pm->lines = (sc->height - BUTTONBAR_HEIGHT - statusbar_size)
+            pm->lines = (sc->getheight() - BUTTONBAR_HEIGHT - statusbar_size)
                             / pm->font_h - 1;
-            pm->keyboard_margin = sc->height - BUTTONBAR_HEIGHT -
+            pm->keyboard_margin = sc->getheight() - BUTTONBAR_HEIGHT -
                 statusbar_size - (pm->lines+1)*pm->font_h;
 
             if (pm->keyboard_margin < 3)
@@ -518,7 +519,7 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MORSE_INPUT
         pm->old_main_y = pm->main_y;
         if (morse_mode)
-            pm->main_y = sc->height - pm->font_h;
+            pm->main_y = sc->getheight() - pm->font_h;
 #endif
     }
 
@@ -587,7 +588,7 @@ int kbd_input(char* text, int buflen)
                     }
 
                     pm->x += w*5 - 3;
-                    if (pm->x >= sc->width - w*6)
+                    if (pm->x >= sc->getwidth() - w*6)
                     {
                         pm->x = 0;
                         pm->y += 8; /* sysfixed font height */
@@ -639,10 +640,10 @@ int kbd_input(char* text, int buflen)
                doesn't collide */
             sc->set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
             sc->fillrect(0, pm->main_y - pm->keyboard_margin - 1,
-                         sc->width, pm->font_h + 4);
+                         sc->getwidth(), pm->font_h + 4);
             sc->set_drawmode(DRMODE_SOLID);
 
-            sc->hline(0, sc->width - 1, pm->main_y - pm->keyboard_margin);
+            sc->hline(0, sc->getwidth() - 1, pm->main_y - pm->keyboard_margin);
 
             /* write out the text */
             sc->setfont(pm->curfont);
@@ -691,13 +692,14 @@ int kbd_input(char* text, int buflen)
                 /* Draw nicer bitmap arrow if room, else settle for ">". */
                 if (text_w >= 6 && pm->font_h >= 8)
                 {
-                    screen_put_iconxy(sc, sc->width - text_w + (text_w - 6) / 2,
+                    screen_put_iconxy(sc, sc->getwidth() - text_w +
+                                      (text_w - 6) / 2,
                                       pm->main_y + (pm->font_h - 8) / 2,
                                       Icon_Cursor);
                 }
                 else
                 {
-                    sc->putsxy(sc->width - text_w, pm->main_y, ">");
+                    sc->putsxy(sc->getwidth() - text_w, pm->main_y, ">");
                 }
             }
 
@@ -729,7 +731,7 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MODES
             if (pm->line_edit)
                 sc->fillrect(0, pm->main_y - pm->keyboard_margin + 2,
-                             sc->width, pm->font_h + 2);
+                             sc->getwidth(), pm->font_h + 2);
             else /* highlight the key that has focus */
 #endif
                 sc->fillrect(pm->font_w*pm->x,
@@ -801,7 +803,7 @@ int kbd_input(char* text, int buflen)
                     if (morse_mode)
                     {
                         pm->old_main_y = pm->main_y;
-                        pm->main_y = sc->height - pm->font_h;
+                        pm->main_y = sc->getheight() - pm->font_h;
                     }
                     else
                     {

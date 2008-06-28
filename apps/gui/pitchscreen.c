@@ -64,7 +64,7 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
     {
         w = snprintf((char *)buf, sizeof(buf), "%s: %d.%d%%",str(LANG_PITCH),
                   pitch / 10, pitch % 10 );
-        display->putsxy((display->width-(w*display->char_width))/2,
+        display->putsxy((display->lcdwidth-(w*display->char_width))/2,
                          display->nb_lines/2,buf);
     }
     else /* bigger screen, show everything... */
@@ -77,9 +77,9 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
             ptr = str(LANG_PITCH_UP_SEMITONE);
         }
         display->getstringsize(ptr,&w,&h);
-        display->putsxy((display->width-w)/2, 0, ptr);
+        display->putsxy((display->lcdwidth-w)/2, 0, ptr);
         display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
-                        display->width/2 - 3, h, 7, 8);
+                        display->lcdwidth/2 - 3, h, 7, 8);
 
         /* DOWN: Pitch Down */
         if (pitch_mode == PITCH_MODE_ABSOLUTE) {
@@ -88,33 +88,35 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
             ptr = str(LANG_PITCH_DOWN_SEMITONE);
         }
         display->getstringsize(ptr,&w,&h);
-        display->putsxy((display->width-w)/2, display->height - h, ptr);
+        display->putsxy((display->lcdwidth-w)/2, display->lcdheight - h, ptr);
         display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                             display->width/2 - 3, display->height - h*2, 7, 8);
+                             display->lcdwidth/2 - 3,
+                             display->lcdheight - h*2, 7, 8);
 
         /* RIGHT: +2% */
         ptr = "+2%";
         display->getstringsize(ptr,&w,&h);
-        display->putsxy(display->width-w, (display->height-h)/2, ptr);
+        display->putsxy(display->lcdwidth-w, (display->lcdheight-h)/2, ptr);
         display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                             display->width-w-8, (display->height-h)/2, 7, 8);
+                             display->lcdwidth-w-8,
+                             (display->lcdheight-h)/2, 7, 8);
 
         /* LEFT: -2% */
         ptr = "-2%";
         display->getstringsize(ptr,&w,&h);
-        display->putsxy(0, (display->height-h)/2, ptr);
+        display->putsxy(0, (display->lcdheight-h)/2, ptr);
         display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
-                             w+1, (display->height-h)/2, 7, 8);
+                             w+1, (display->lcdheight-h)/2, 7, 8);
 
         /* "Pitch" */
         snprintf((char *)buf, sizeof(buf), str(LANG_PITCH));
         display->getstringsize(buf,&w,&h);
-        display->putsxy((display->width-w)/2, (display->height/2)-h, buf);
+        display->putsxy((display->lcdwidth-w)/2, (display->lcdheight/2)-h, buf);
         /* "XX.X%" */
         snprintf((char *)buf, sizeof(buf), "%d.%d%%",
                 pitch / 10, pitch % 10 );
         display->getstringsize(buf,&w,&h);
-        display->putsxy((display->width-w)/2, display->height/2, buf);
+        display->putsxy((display->lcdwidth-w)/2, display->lcdheight/2, buf);
     }
 
     display->update();
@@ -123,7 +125,7 @@ static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
 static int pitch_increase(int pitch, int delta, bool allow_cutoff)
 {
     int new_pitch;
-    
+
     if (delta < 0) {
         if (pitch + delta >= PITCH_MIN) {
             new_pitch = pitch + delta;

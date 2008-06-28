@@ -45,8 +45,8 @@ void binary_clock_draw(struct screen* display, struct time* time, int skin){
     char buffer[9];
     int i;
     const struct picture* binary_bitmaps = &(binary_skin[skin][display->screen_type]);
-    int y_offset=(display->height-(binary_bitmaps->height*3))/2;
-    int x_offset=(display->width-(binary_bitmaps->width*6))/2;
+    int y_offset=(display->getheight()-(binary_bitmaps->height*3))/2;
+    int x_offset=(display->getwidth()-(binary_bitmaps->width*6))/2;
     for(i=0;i<3;i++){
         print_binary(buffer, lines_values[i], 6);
         draw_string(display, binary_bitmaps, buffer, x_offset,

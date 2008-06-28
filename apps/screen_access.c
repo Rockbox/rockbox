@@ -36,8 +36,8 @@ struct screen screens[NB_SCREENS] =
 {
     {
         .screen_type=SCREEN_MAIN,
-        .width=LCD_WIDTH,
-        .height=LCD_HEIGHT,
+        .lcdwidth=LCD_WIDTH,
+        .lcdheight=LCD_HEIGHT,
         .depth=LCD_DEPTH,
 #if defined(HAVE_LCD_COLOR)
         .is_color=true,
@@ -134,8 +134,8 @@ struct screen screens[NB_SCREENS] =
 #if NB_SCREENS == 2
     {
         .screen_type=SCREEN_REMOTE,
-        .width=LCD_REMOTE_WIDTH,
-        .height=LCD_REMOTE_HEIGHT,
+        .lcdwidth=LCD_REMOTE_WIDTH,
+        .lcdheight=LCD_REMOTE_HEIGHT,
         .depth=LCD_REMOTE_DEPTH,
         .is_color=false,/* No color remotes yet */
         .pixel_format=LCD_REMOTE_PIXELFORMAT,
@@ -230,8 +230,8 @@ void screen_access_init(void)
 #ifdef HAVE_LCD_BITMAP
         ((struct screen*)&screens[i])->setfont(FONT_UI);
 #endif
-        
-        int height=display->height;
+
+        int height=display->lcdheight;
 #ifdef HAVE_LCD_BITMAP
         if(global_settings.statusbar)
             height -= STATUSBAR_HEIGHT;

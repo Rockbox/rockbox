@@ -58,7 +58,7 @@ typedef void screen_bitmap_func(const void *src, int x, int y, int width,
 struct screen
 {
     enum screen_type screen_type;
-    int width, height;
+    int lcdwidth, lcdheight;
     int depth;
     int nb_lines;
 #ifdef HAVE_LCD_BITMAP
