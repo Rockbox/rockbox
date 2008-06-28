@@ -1,6 +1,5 @@
-autostart,apps
-matrix,demos
 alpine_cdc,apps
+autostart,apps
 battery_bench,apps
 blackjack,games
 bounce,demos
@@ -18,8 +17,8 @@ cube,demos
 demystify,demos
 dice,games
 dict,apps
-doom,games
 disktidy,apps
+doom,games
 euroconverter,apps
 fire,demos
 fireworks,demos
@@ -33,10 +32,13 @@ iriverify,viewers
 jackpot,games
 jewels,games
 jpeg,viewers
+lamp,apps
 logo,demos
 mandelbrot,demos
+matrix,demos
 maze,games
 mazezam,games
+md5sum,apps
 mem_mon,apps
 metronome,apps
 midi2wav,viewers
@@ -64,11 +66,11 @@ rocklife,games
 rockpaint,apps
 search,viewers
 searchengine,viewers
-shortcuts_view,viewers
 shortcuts_append,viewers
+shortcuts_view,viewers
 sliding_puzzle,games
-snake2,games
 snake,games
+snake2,games
 snow,demos
 sokoban,games
 solitaire,games
@@ -99,5 +101,3 @@ wavview,viewers
 wormlet,games
 xobox,games
 zxbox,viewers
-lamp,apps
-md5sum,apps
