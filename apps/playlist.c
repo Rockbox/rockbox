@@ -1486,6 +1486,8 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
         if (fd >= 0)
         {
             read(fd,&folder_count,sizeof(int));
+            if (!folder_count)
+                exit = true;
             while (!exit)
             {
                 i = rand()%folder_count;
@@ -1494,7 +1496,8 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
                 if (check_subdir_for_music(buffer,"") ==0)
                     exit = true;
             }
-            strcpy(dir,buffer);
+            if (folder_count)
+                strcpy(dir,buffer);
             close(fd);
             *(tc->dirfilter) = dirfilter;
             reload_directory();
