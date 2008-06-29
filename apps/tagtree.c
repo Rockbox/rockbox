@@ -1581,7 +1581,12 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     {
         if (playlist_remove_all_tracks(NULL) == 0)
             position = PLAYLIST_INSERT_LAST;
-        else return -1;    }
+        else
+        {
+            cpu_boost(false);
+            return false;
+        }
+    }
 
     if (position == PLAYLIST_INSERT_FIRST)
     {
