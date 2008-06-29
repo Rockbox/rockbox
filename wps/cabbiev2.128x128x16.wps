@@ -37,7 +37,7 @@
 %s%ac%iy
 
 #next and playlist
-%V|0|70|-|-|1|-|-|
+%V|0|70|-|18|1|-|-|
 %s%acNext:%?It<%It|%Fn>
 
 %al %pc%ac%pp of %pe%ar%pr 

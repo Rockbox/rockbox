@@ -20,7 +20,7 @@
 %?C<%C%Vda|%Vdb>
 
 # NowPlaying - AA
-%Vl|a|77|10|-|-|1|-|-|
+%Vl|a|77|10|-|75|1|-|-|
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d2<%d2|(root)>>
 %s%al%?id<%id|%?d1<%d1|(root)>>
@@ -29,7 +29,7 @@ Next Track:
 %s%?It<%It|%Fn>
 
 # NowPlaying - no AA
-%Vl|b|0|10|-|-|1|-|-|
+%Vl|b|0|10|-|75|1|-|-|
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>
@@ -37,6 +37,6 @@ Next Track:
 Next Track:
 %s%?It<%It|%Fn>
 
-%V|0|96|-|-|1|-|-|
+%V|0|96|-|10|1|-|-|
 %al  %pc%ac%pc%ac%pp of %pe%ar%pr%ar%pr  
 

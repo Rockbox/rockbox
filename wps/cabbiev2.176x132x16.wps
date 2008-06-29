@@ -21,7 +21,7 @@
 %?C<%C%Vda|%Vdb>
 
 #NowPlaying
-%Vl|a|81|12|-|-|1|-|-|
+%Vl|a|81|12|-|74|1|-|-|
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d2<%d2|(root)>>
 %s%al%?id<%id|%?d1<%d1|(root)>>
@@ -29,7 +29,7 @@
 %s%alNext Track:
 %s%al%?It<%It|%Fn>
 
-%Vl|b|0|12|-|-|1|-|-|
+%Vl|b|0|12|-|74|1|-|-|
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>
@@ -37,5 +37,5 @@
 %acNext Track:
 %s%ac%?It<%It|%Fn>
 
-%V|0|96|-|-|1|-|-|
+%V|0|96|-|12|1|-|-|
 %al   %pc%ac%pc%ac%pp of %pe%ar%pr%ar%pr   

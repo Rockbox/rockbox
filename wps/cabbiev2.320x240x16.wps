@@ -21,7 +21,7 @@
 %?C<%Vda%C|%Vdb>
 #NowPlaying
 
-%Vl|a|153|30|-|-|1|-|-|
+%Vl|a|153|30|-|130|1|-|-|
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?d2<%d2|(root)>>
 %s%al%?id<%id|%?d1<%d1|(root)>>
@@ -31,7 +31,7 @@
 %s%al%?It<%It|%Fn>
 %s%al%Ia
 
-%Vl|b|0|30|-|-|1|-|-|
+%Vl|b|0|30|-|130|1|-|-|
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?d2<%d2|(root)>>
 %s%ac%?id<%id|%?d1<%d1|(root)>>
@@ -41,6 +41,6 @@
 %s%ac%?It<%It|%Fn>
 %s%ac%Ia
 
-%V|0|180|-|-|1|-|-|
+%V|0|180|-|20|1|-|-|
 %al   %pc%ac%pp of %pe%ar%pr   
 
