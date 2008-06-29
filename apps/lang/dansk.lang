@@ -11748,3 +11748,59 @@
     gigabeatf: "Høj"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FAST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Fast"
+  </source>
+  <dest>
+    *: "Hurtig"
+  </dest>
+  <voice>
+    *: "Hurtig"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "Meget langsom"
+  </dest>
+  <voice>
+    *: "Meget langsom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Langsom"
+  </dest>
+  <voice>
+    *: "Langsom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user: 
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "Meget hurtig"
+  </dest>
+  <voice>
+    *: "Meget hurtig"
+  </voice>
+</phrase>
