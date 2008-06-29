@@ -285,18 +285,18 @@ int save_list(void)
     return 1;
 }
 
-void edit_list(void)
+int edit_list(void)
 {
     struct gui_synclist lists;
     bool exit = false;
     int button,i;
-    int selection;
+    int selection, ret = 0;
     
     /* load the dat file if not already done */
     if ((list == NULL || list->count == 0) && (i = load_list()) != 0)
     {
         rb->splash(HZ*2, "Could not load %s, rv = %d", RFA_FILE, i);
-        return;
+        return -1;
     }
     
     dirs_count = list->count;
@@ -371,12 +371,14 @@ void edit_list(void)
                         save_list();
                     case 1:
                         exit = true;
+                        ret = -2;
                 }
                 menu_exit(m);
             }
             break;
         }
     }
+    return ret;
 }
 
 int export_list_to_file_text(void)
@@ -474,6 +476,7 @@ int import_list_from_file_text(void)
 int main_menu(void)
 {
     int m;
+    bool exit = false;
     static const struct menu_item items[] = {
         { "Generate Folder List", NULL },
         { "Edit Folder List", NULL },
@@ -503,7 +506,8 @@ int main_menu(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(true);
 #endif
-            edit_list();
+            if (edit_list() < 0)
+                exit = true;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(false);
 #endif
@@ -543,7 +547,7 @@ int main_menu(void)
             return 1;
     }
     menu_exit(m);
-    return 0;
+    return exit?1:0;
 }
 
 enum plugin_status plugin_start(const struct plugin_api* api, const void* parameter)
