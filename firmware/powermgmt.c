@@ -462,21 +462,23 @@ static void handle_auto_poweroff(void)
     else
     {
         /* Handle sleeptimer */
-        if(sleeptimer_active && !usb_inserted())
+        if(sleeptimer_active)
         {
             if(TIME_AFTER(current_tick, sleeptimer_endtick))
             {
                 audio_stop();
+                if (!usb_inserted()
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
-                if((charger_input_state == CHARGER) ||
-                   (charger_input_state == CHARGER_PLUGGED))
+                    || ((charger_input_state == CHARGER) ||
+                    (charger_input_state == CHARGER_PLUGGED))
+#endif
+                   )
                 {
                     DEBUGF("Sleep timer timeout. Stopping...\n");
                     set_sleep_timer(0);
                     backlight_off(); /* Nighty, nighty... */
                 }
                 else
-#endif
                 {
                     DEBUGF("Sleep timer timeout. Shutting off...\n");
                     sys_poweroff();
