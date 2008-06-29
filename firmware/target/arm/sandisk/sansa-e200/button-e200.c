@@ -51,8 +51,6 @@ static bool hold_button_old = false;
 #endif /* BOOTLOADER */
 static int  int_btn         = BUTTON_NONE;
 
-void button_int(void);
-
 void button_init_device(void)
 {
     /* Enable all buttons */

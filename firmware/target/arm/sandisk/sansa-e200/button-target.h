@@ -30,6 +30,10 @@
 bool button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
+#ifndef BOOTLOADER
+void clickwheel_int(void);
+#endif
+void button_int(void);
 
 /* Sandisk Sansa E200 button codes */
 
