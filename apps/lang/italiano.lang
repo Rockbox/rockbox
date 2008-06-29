@@ -11699,3 +11699,59 @@
     gigabeatf: "Alta"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_VERY_SLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Very slow"
+  </source>
+  <dest>
+    *: "Molto lento"
+  </dest>
+  <voice>
+    *: "Molto lento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Lento"
+  </dest>
+  <voice>
+    *: "Lento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERY_FAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Very fast"
+  </source>
+  <dest>
+    *: "Molto veloce"
+  </dest>
+  <voice>
+    *: "Molto veloce"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Fast"
+  </source>
+  <dest>
+    *: "Veloce"
+  </dest>
+  <voice>
+    *: "Veloce"
+  </voice>
+</phrase>
