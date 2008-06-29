@@ -18,11 +18,20 @@
  ****************************************************************************/
 
 #include "utils.h"
+#ifdef UNICODE
+#define _UNICODE
+#endif
 
 #include <QtCore>
 #include <QDebug>
 #include <cstdlib>
 #include <stdio.h>
+
+#if defined(Q_OS_WIN32)
+#include <windows.h>
+#include <tchar.h>
+#include <winioctl.h>
+#endif
 
 // recursive function to delete a dir with files
 bool recRmdir( const QString &dirName )
@@ -90,4 +99,41 @@ QString resolvePathCase(QString path)
     return realpath;
 }
 
+#if defined(Q_OS_WIN32)
+QString getMountpointByDevice(int drive)
+{
+    QString result;
+    for(int letter = 'A'; letter <= 'Z'; letter++) {
+        DWORD written;
+        HANDLE h;
+        TCHAR uncpath[MAX_PATH];
+        UCHAR buffer[0x400];
+        PVOLUME_DISK_EXTENTS extents = (PVOLUME_DISK_EXTENTS)buffer;
+
+        _stprintf(uncpath, _TEXT("\\\\.\\%c:"), letter);
+        h = CreateFile(uncpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                NULL, OPEN_EXISTING, 0, NULL);
+        if(h == INVALID_HANDLE_VALUE) {
+            qDebug() << "error getting extents for" << uncpath;
+            continue;
+        }
+        // get the extents
+        if(DeviceIoControl(h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
+                    NULL, 0, extents, sizeof(buffer), &written, NULL)) {
+            for(int a = 0; a < extents->NumberOfDiskExtents; a++) {
+                qDebug() << "Disk:" << extents->Extents[a].DiskNumber;
+                if(extents->Extents[a].DiskNumber == drive) {
+                    result = letter;
+                    qDebug("found: %c", letter);
+                    break;
+                }
+            }
+
+        }
+
+    }
+    return result;
+
+}
+#endif
 

@@ -160,6 +160,9 @@ bool Autodetection::detect()
 #if !defined(Q_OS_WIN32)
         m_mountpoint = resolveMountPoint(ipod.diskname);
 #endif
+#if defined(Q_OS_WIN32)
+        m_mountpoint = getMountpointByDevice(ipod.diskname);
+#endif
         return true;
     }
 
@@ -169,7 +172,12 @@ bool Autodetection::detect()
     if(n == 1) {
         qDebug() << "Sansa found:" << sansa.targetname << "at" << sansa.diskname;
         m_device = QString("sansa%1").arg(sansa.targetname);
+#if !defined(Q_OS_WIN32)
         m_mountpoint = resolveMountPoint(sansa.diskname);
+#endif
+#if defined(Q_OS_WIN32)
+        m_mountpoint = getMountpointByDevice(sansa.diskname);
+#endif
         return true;
     }
 
