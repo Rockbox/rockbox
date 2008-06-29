@@ -206,6 +206,9 @@ int button_read_device(int *data)
 
     if (!(GPIOA & 0x4))
         btn |= BUTTON_POWER;
-
+        
+    if(btn & BUTTON_TOUCHPAD && !is_backlight_on(true))
+        *data = 0;
+    
     return btn;
 }
