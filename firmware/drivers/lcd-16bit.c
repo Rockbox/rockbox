@@ -716,8 +716,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
                                      int width, int height)
 {
     const unsigned char *src_end;
-    bool has_backdrop;
-    fb_data *dst, *dst_end, *backdrop;
+    fb_data *dst, *dst_end;
     lcd_fastpixelfunc_type *fgfunc, *bgfunc;
 
     /* nothing to draw? */
@@ -748,47 +747,24 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     src_end = src + width;
 
     dst = LCDADDR(current_vp->x + x, current_vp->y + y);
-    has_backdrop = (lcd_backdrop != NULL);
-    backdrop = lcd_backdrop + (current_vp->y + y) * LCD_WIDTH + current_vp->x + x;
     fgfunc = lcd_fastpixelfuncs[current_vp->drawmode];
     bgfunc = lcd_fastpixelfuncs[current_vp->drawmode ^ DRMODE_INVERSEVID];
-    do 
+    do
     {
         const unsigned char *src_col = src++;
         unsigned data = *src_col >> src_y;
         fb_data *dst_col = dst++;
         int numbits = 8 - src_y;
-        fb_data *backdrop_col = backdrop++;
         dst_end = dst_col + height * LCD_WIDTH;
-        do 
+        do
         {
-            switch (current_vp->drawmode)
-            {
-                case DRMODE_SOLID:
-                    if (data & 0x01)
-                        *dst_col = current_vp->fg_pattern;
-                    else
-                        *dst_col = has_backdrop ? *backdrop_col : current_vp->bg_pattern;
-                    break;
-                case DRMODE_FG:
-                    if (data & 0x01)
-                        *dst_col = current_vp->fg_pattern;
-                    break;
-                case (DRMODE_SOLID|DRMODE_INVERSEVID):
-                    if (data & 0x01)
-                        *dst_col = has_backdrop ? *backdrop_col : current_vp->bg_pattern;
-                    else
-                        *dst_col = current_vp->fg_pattern;
-                    break;
-                default:
-                    if (data & 0x01)
-                        fgfunc(dst_col);
-                    else
-                        bgfunc(dst_col);
-                    break;
-            }
+            if (data & 0x01)
+                fgfunc(dst_col);
+            else
+                bgfunc(dst_col);
+
             dst_col += LCD_WIDTH;
-            backdrop_col += LCD_WIDTH;
+
             data >>= 1;
             if (--numbits == 0) 
             {
