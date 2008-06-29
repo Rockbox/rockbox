@@ -39,8 +39,10 @@
 #include <tchar.h>
 #include <windows.h>
 #include <setupapi.h>
+#include <winioctl.h>
 #endif
 #include "detect.h"
+#include "utils.h"
 
 Autodetection::Autodetection(QObject* parent): QObject(parent)
 {
@@ -157,13 +159,11 @@ bool Autodetection::detect()
     if(n == 1) {
         qDebug() << "Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
         m_device = ipod.targetname;
-#if !defined(Q_OS_WIN32)
         m_mountpoint = resolveMountPoint(ipod.diskname);
-#endif
-#if defined(Q_OS_WIN32)
-        m_mountpoint = getMountpointByDevice(ipod.diskname);
-#endif
         return true;
+    }
+    else {
+        qDebug() << "ipodpatcher: no Ipod found." << n;
     }
 
     //try sansapatcher
@@ -172,13 +172,11 @@ bool Autodetection::detect()
     if(n == 1) {
         qDebug() << "Sansa found:" << sansa.targetname << "at" << sansa.diskname;
         m_device = QString("sansa%1").arg(sansa.targetname);
-#if !defined(Q_OS_WIN32)
         m_mountpoint = resolveMountPoint(sansa.diskname);
-#endif
-#if defined(Q_OS_WIN32)
-        m_mountpoint = getMountpointByDevice(sansa.diskname);
-#endif
         return true;
+    }
+    else {
+        qDebug() << "sansapatcher: no Sansa found." << n;
     }
 
     if(m_mountpoint.isEmpty() && m_device.isEmpty() && m_errdev.isEmpty() && m_incompat.isEmpty())
@@ -256,8 +254,43 @@ QString Autodetection::resolveMountPoint(QString device)
         mntinf++;
     }
 #endif
-    return QString("");
 
+#if defined(Q_OS_WIN32)
+    QString result;
+    unsigned int driveno = device.replace(QRegExp("^.*([0-9]+)"), "\\1").toInt();
+
+    for(int letter = 'A'; letter <= 'Z'; letter++) {
+        DWORD written;
+        HANDLE h;
+        TCHAR uncpath[MAX_PATH];
+        UCHAR buffer[0x400];
+        PVOLUME_DISK_EXTENTS extents = (PVOLUME_DISK_EXTENTS)buffer;
+
+        _stprintf(uncpath, _TEXT("\\\\.\\%c:"), letter);
+        h = CreateFile(uncpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                NULL, OPEN_EXISTING, 0, NULL);
+        if(h == INVALID_HANDLE_VALUE) {
+            //qDebug() << "error getting extents for" << uncpath;
+            continue;
+        }
+        // get the extents
+        if(DeviceIoControl(h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
+                    NULL, 0, extents, sizeof(buffer), &written, NULL)) {
+            for(unsigned int a = 0; a < extents->NumberOfDiskExtents; a++) {
+                qDebug() << "Disk:" << extents->Extents[a].DiskNumber;
+                if(extents->Extents[a].DiskNumber == driveno) {
+                    result = letter;
+                    qDebug("drive found for volume %i: %c", driveno, letter);
+                    break;
+                }
+            }
+
+        }
+
+    }
+    return result + ":/";
+#endif
+    return QString("");
 }
 
 

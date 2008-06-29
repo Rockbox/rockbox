@@ -29,9 +29,5 @@
 bool recRmdir( const QString &dirName );
 QString resolvePathCase(QString path);
 
-#if defined(Q_OS_WIN32)
-QString getMountpointByDevice(int drive);
-#endif
-
 #endif
 
