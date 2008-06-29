@@ -151,7 +151,8 @@ enum filling_state {
     STATE_IDLE,     /* audio is stopped: nothing to do */
     STATE_FILLING,  /* adding tracks to the buffer */
     STATE_FULL,     /* can't add any more tracks */
-    STATE_FINISHED, /* all remaining tracks have been added */
+    STATE_END_OF_PLAYLIST, /* all remaining tracks have been added */
+    STATE_FINISHED, /* all remaining tracks are fully buffered */
 };
 
 #if MEM > 1
@@ -1413,7 +1414,7 @@ static void buffering_low_buffer_callback(void *data)
     (void)data;
     logf("low buffer callback");
 
-    if (filling == STATE_FULL) {
+    if (filling == STATE_FULL || filling == STATE_END_OF_PLAYLIST) {
         /* force a refill */
         LOGFQUEUE("buffering > audio Q_AUDIO_FILL_BUFFER");
         queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
@@ -1443,6 +1444,15 @@ static void buffering_handle_finished_callback(int *data)
         /* This is most likely an audio handle, so we strip the useless
            trailing tags that are left. */
         strip_tags(*data);
+
+        if (*data == tracks[track_widx-1].audio_hid
+            && filling == STATE_END_OF_PLAYLIST)
+        {
+            /* This was the last track in the playlist.
+               We now have all the data we need. */
+            logf("last track finished buffering");
+            filling = STATE_FINISHED;
+        }
     }
 }
 
@@ -1634,7 +1644,7 @@ static bool audio_load_track(size_t offset, bool start_play)
     {
         logf("End-of-playlist");
         memset(&lasttrack_id3, 0, sizeof(struct mp3entry));
-        filling = STATE_FINISHED;
+        filling = STATE_END_OF_PLAYLIST;
         return false;
     }
 
