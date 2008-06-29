@@ -535,6 +535,7 @@ void pm_reset_clipcount(void)
  */
 void peak_meter_playback(bool playback)
 {
+    int i;
 #ifdef SIMULATOR
     (void)playback;
 #elif CONFIG_CODEC == SWCODEC
@@ -548,6 +549,11 @@ void peak_meter_playback(bool playback)
         pm_src_right = MAS_REG_QPEAK_R;
     }
 #endif
+    /* reset the scales just in case recording and playback
+       use different viewport sizes. Normally we should be checking viewport
+       sizes every time but this will do for now */
+    FOR_NB_SCREENS(i)
+            scales[i].db_scale_valid = false;
 }
 
 #ifdef HAVE_RECORDING
@@ -1075,7 +1081,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         display->drawpixel(x + scales->db_scale_lcd_coord[i],
                            y + height / 2 - 1);
     }
-    
+
 #ifdef HAVE_RECORDING
 
 #ifdef HAVE_BACKLIGHT
