@@ -671,7 +671,7 @@ const struct settings_list settings[] = {
                   LANG_FFRW_STEP, 1, "scan min step", NULL, UNIT_SEC,
                   NULL, NULL, NULL, 14,  1,2,3,4,5,6,8,10,15,20,25,30,45,60),
     CHOICE_SETTING(0, ff_rewind_accel, LANG_FFRW_ACCEL, 2,
-                   "seek accel", "very fast,fast,normal,slow,very slow", NULL, 5,
+                   "seek acceleration", "very fast,fast,normal,slow,very slow", NULL, 5,
                    ID2P(LANG_VERY_FAST), ID2P(LANG_FAST), ID2P(LANG_NORMAL),
                    ID2P(LANG_SLOW) , ID2P(LANG_VERY_SLOW)),
 #if (CONFIG_CODEC == SWCODEC) && !defined(HAVE_FLASH_STORAGE)
