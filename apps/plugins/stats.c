@@ -215,8 +215,8 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
     rb->backlight_on();
     rb->splash(HZ, "Done");
     update_screen();
-    button = rb->button_get(true);
     while (1) {
+        button = rb->button_get(true);
         switch (button) {
 #ifdef HAVE_REMOTE_LCD
             case STATS_STOP_REMOTE:
@@ -230,6 +230,6 @@ enum plugin_status plugin_start(const struct plugin_api* api, const void* parame
                 }
                 break;
         }
-        return PLUGIN_OK;
     }
+    return PLUGIN_OK;
 }
