@@ -268,17 +268,13 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
                 break;
             }
         }
-	qDebug() << "SetupDiGetDeviceRegistryProperty" << description << QString::fromWCharArray(buffer);
 
         unsigned int vid, pid, rev;
-        if(_stscanf(buffer, _TEXT("USB\\Vid_%x&Pid_%x&Rev_%x"), &vid, &pid, &rev) != 3) {
-            qDebug() << "Error getting USB ID -- possibly no USB device";
-        }
-        else {
+        if(_stscanf(buffer, _TEXT("USB\\Vid_%x&Pid_%x&Rev_%x"), &vid, &pid, &rev) == 3) {
             uint32_t id;
             id = vid << 16 | pid;
             usbids.insert(id, description);
-            qDebug("VID: %04x PID: %04x", vid, pid);
+            qDebug("VID: %04x, PID: %04x", vid, pid);
         }
         if(buffer) free(buffer);
     }
