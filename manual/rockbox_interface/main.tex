@@ -352,13 +352,17 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   the Reset Settings in \reference{ref:manage_settings_menu} for details.
 }%
 
-\opt{PLAYER_PAD,RECORDER_PAD,ONDIO_PAD}{%
-  In the unlikely event of a software failure, a hardware power off can be
-  performed by holding down
-  \opt{PLAYER_PAD}{\ButtonStop}%
-  \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
-  until the \nopt{ondiosp,ondiofm}{\dap{} power light}%
-  \opt{ondiosp,ondiofm}{\daps{} display} goes off.%
+In the unlikely event of a software failure, a hardware power off can be
+performed by
+\opt{PLAYER_PAD,RECORDER_PAD,ONDIO_PAD,GIGABEAT_PAD,IPOD_4G_PAD,SANSA_E200_PAD%
+,SANSA_C200_PAD,IAUDIO_X5_PAD,IAUDIO_M5_PAD}{%
+  holding down \opt{PLAYER_PAD}{\ButtonStop}\opt{RECORDER_PAD,ONDIO_PAD}
+  {\ButtonOff}\opt{GIGABEAT_PAD}{the battery switch}\opt{IPOD_4G_PAD}
+  {\ButtonMenu + \ButtonSelect}\opt{SANSA_E200_PAD,SANSA_C200_PAD,IAUDIO_X5_PAD%
+  ,IAUDIO_M5_PAD}{\ButtonPower} until the \dap{} shuts off.
+}%
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_M3_PAD}{%
+  inserting a paperclip gently into the Reset hole.
 }%
 
 \nopt{gigabeatf,m5,x5,archos}
