@@ -1292,23 +1292,28 @@ int ipod_scan(struct ipod_t* ipod)
              if(result == -2) {
                  denied++;
              }
+             ipod_close(ipod);
              continue;
          }
 
          if (read_partinfo(ipod,1) < 0) {
+             ipod_close(ipod);
              continue;
          }
 
          if ((ipod->pinfo[0].start==0) || (ipod->pinfo[0].type != 0)) {
+             ipod_close(ipod);
              continue;
          }
 
          if (read_directory(ipod) < 0) {
+             ipod_close(ipod);
              continue;
          }
 
          ipod_version=(ipod->ipod_directory[0].vers>>8);
          if (getmodel(ipod,ipod_version) < 0) {
+             ipod_close(ipod);
              continue;
          }
 

@@ -514,15 +514,18 @@ int sansa_scan(struct sansa_t* sansa)
             if(result == -2) {
                 denied++;
             }
+            sansa_close(sansa);
             continue;
         }
 
         if (sansa_read_partinfo(sansa,1) < 0) {
+            sansa_close(sansa);
             continue;
         }
 
         if (is_sansa(sansa) < 0) {
             continue;
+            sansa_close(sansa);
         }
 
 #ifdef __WIN32__
