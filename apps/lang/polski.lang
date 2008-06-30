@@ -2532,10 +2532,12 @@
     recording: ""
   </source>
   <dest>
-    *: ""
+    *: none
+    recording: "deprecated"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -4568,24 +4570,21 @@
     x5,m5: "RECORD = Revert"
     h10,h10_5gb: "PREV = Revert"
     gigabeatf: "A = Revert"
+    mrobe100: "DISPLAY = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Przywróć"
     h100,h120,h300: "STOP = Przywróć"
     ipod*,e200,c200: "MENU = Przywróć"
-    x5,m5: "REC = Przywróć"
+    x5,m5: "RECORD = Przywróć"
     h10,h10_5gb: "COFNIJ = Przywróć"
     gigabeatf: "A = Przywróć"
+    mrobe100: "DISPLAY = Przywróć"
   </dest>
   <voice>
     *: none
-    rtc: ""
-    h100,h120,h300: ""
-    ipod*,e200,c200: ""
-    x5,m5: ""
-    h10,h10_5gb: ""
-    gigabeatf: ""
+    rtc,h100,h120,h300,ipod*,e200,c200,x5,m5,h10,h10_gb,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -6671,7 +6670,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+    *: "deprecated"
   </dest>
   <voice>
     *: ""
@@ -8883,11 +8882,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Korektor sprzętowy"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Korektor sprzętowy"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -8900,11 +8899,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Włącz korektor sprzętowy"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Włącz korektor sprzętowy"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -8917,11 +8916,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Szerokość pasma"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Szerokość pasma"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -8934,11 +8933,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Wąskie"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Wąskie"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -8951,11 +8950,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo: "Szerokie"
+    ipodvideo: ""
   </dest>
   <voice>
     *: none
-    ipodvideo: "Szerokie"
+    ipodvideo: ""
   </voice>
 </phrase>
 <phrase>
@@ -9684,10 +9683,10 @@
     *: ""
   </source>
   <dest>
-    *: "Aktualny czas"
+    *: ""
   </dest>
   <voice>
-    *: "Aktualny czas"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9771,21 +9770,21 @@
     *: "Building database... %d found (OFF to return)"
     h100,h120,h300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    x5,m5: "Building database... %d found (LEFT to return)"
+    x5,m5,gigabeatf,mrobe100: "Building database... %d found (LEFT to return)"
     h10,h10_5gb,e200,c200: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Budowanie bazy danych... %d znalezionych (OFF żeby wrócić)"
     h100,h120,h300: "Budowanie bazy danych... %d znalezionych (STOP żeby wrócić)"
     ipod*: "Budowanie bazy danych... %d znalezionych (PLAY/PAUSE żeby wrócić)"
-    x5,m5: "Budowanie bazy danych... %d znalezionych (LEWO żeby wrócić)"
+    x5,m5,gigabeatf,mrobe100: "Budowanie bazy danych... %d znalezionych (LEWO żeby wrócić)"
     h10,h10_5gb,e200,c200: "Budowanie bazy danych... %d znalezionych (COFNIJ żeby wrócić)"
   </dest>
   <voice>
     *: "Znaleziono wpisy do bazy danych"
     h100,h120,h300: ""
     ipod*: ""
-    x5,m5: ""
+    x5,m5,gigabeatf,mrobe100: ""
     h10,h10_5gb,e200,c200: ""
   </voice>
 </phrase>
@@ -9926,19 +9925,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_PARTITION
-  desc: if save settings has failed
+  desc: DEPRECATED
   user: 
   <source>
-    *: "No partition?"
-    player: "Partition?"
+    *: ""
   </source>
   <dest>
-    *: "Brak partycji?"
-    player: "Partycja?"
+    *: ""
   </dest>
   <voice>
     *: ""
-    player: ""
   </voice>
 </phrase>
 <phrase>
@@ -9988,16 +9984,16 @@
 </phrase>
 <phrase>
   id: LANG_SETTINGS_SAVE_FAILED
-  desc: displayed if save settings has failed
+  desc: DEPRECATED
   user: 
   <source>
-    *: "Save Failed"
+    *: ""
   </source>
   <dest>
-    *: "Błąd zapisu"
+    *: ""
   </dest>
   <voice>
-    *: "Błąd zapisu"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10117,19 +10113,19 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "SELECT = Yes"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "SELECT = Yes"
     player: "(PLAY/STOP)"
   </source>
   <dest>
     *: "PLAY = Tak"
     h100,h120,h300: "NAVI = Tak"
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: "WYBIERZ = Tak"
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: "WYBIERZ = TAK"
     player: "(PLAY/STOP)"
   </dest>
   <voice>
     *: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb: ""
+    ipod*,x5,m5,gigabeatf,e200,c200,h10,h10_5gb,mrobe100,gigabeats: ""
     player: ""
   </voice>
 </phrase>
@@ -10141,19 +10137,19 @@
     *: none
     rtc: "ON = Set"
     h100,h120,h300: "NAVI = Set"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "SELECT = Set"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "SELECT = Set"
   </source>
   <dest>
     *: none
     rtc: "ON = Ustaw"
     h100,h120,h300: "NAVI = Ustaw"
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: "WYBIERZ = Ustaw"
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: "WYBIERZ = Ustaw"
   </dest>
   <voice>
     *: none
     rtc: ""
     h100,h120,h300: ""
-    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf: ""
+    ipod*,x5,m5,h10,h10_5gb,e200,c200,gigabeatf,mrobe100: ""
   </voice>
 </phrase>
 <phrase>
@@ -10618,15 +10614,15 @@
   user: 
   <source>
     *: none
-    gigabeatf: "Button Light Brightness"
+    gigabeatf,mrobe100: "Button Light Brightness"
   </source>
   <dest>
     *: none
-    gigabeatf: "Jasność podświetlenia klawiszy"
+    gigabeatf,mrobe100: "Jasność podświetlania przycisków"
   </dest>
   <voice>
     *: none
-    gigabeatf: "Jasność podświetlenia klawiszy"
+    gigabeatf,mrobe100: "Jasność podświetlania przycisków"
   </voice>
 </phrase>
 <phrase>
