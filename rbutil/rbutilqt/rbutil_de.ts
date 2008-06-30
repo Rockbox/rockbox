@@ -346,42 +346,42 @@ ALTE ROCKBOX-INSTALLATION GEFUNDEN, BEENDE.Du musst die Original-Firmware neu in
     <message>
         <location filename="installbootloader.cpp" line="1374"/>
         <source>Can&apos;t open input file</source>
-        <translation>Konnte das input File nicht öffnen</translation>
+        <translation>Konnte die Eingabedatei nicht öffnen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1375"/>
         <source>Can&apos;t open output file</source>
-        <translation>Konnte das output File nicht öffnen</translation>
+        <translation>Konnte die Ausgabedatei nicht öffnen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1376"/>
         <source>invalid file: header length wrong</source>
-        <translation>ungültiges File: Länge des Headers ist falsch</translation>
+        <translation>ungültige Datei: Länge des Headers ist falsch</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1377"/>
         <source>invalid file: unrecognized header</source>
-        <translation>ungültiges File: unbekannter Header</translation>
+        <translation>ungültige Datei: unbekannter Header</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1378"/>
         <source>invalid file: &quot;length&quot; field wrong</source>
-        <translation>ungültiges File: &quot;length&quot; Eintrag ist falsch</translation>
+        <translation>ungültige Datei: &quot;length&quot; Eintrag ist falsch</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1379"/>
         <source>invalid file: &quot;length2&quot; field wrong</source>
-        <translation>ungültiges File: &quot;length2&quot; Eintrag ist falsch</translation>
+        <translation>ungültige Datei: &quot;length2&quot; Eintrag ist falsch</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1380"/>
         <source>invalid file: internal checksum error</source>
-        <translation>ungültiges File: interne Checksumme ist falsch</translation>
+        <translation>ungültige Datei: interne Checksumme ist falsch</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1381"/>
         <source>invalid file: &quot;length3&quot; field wrong</source>
-        <translation>ungültiges File: &quot;length3&quot; Eintrag ist falsch</translation>
+        <translation>ungültige Datei: &quot;length3&quot; Eintrag ist falsch</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1382"/>
@@ -396,7 +396,7 @@ ALTE ROCKBOX-INSTALLATION GEFUNDEN, BEENDE.Du musst die Original-Firmware neu in
     <message>
         <location filename="installbootloader.cpp" line="1353"/>
         <source>could not open input file</source>
-        <translation>Konnte das input File nicht öffnen</translation>
+        <translation>Konnte die Eingabedatei nicht öffnen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1354"/>
@@ -421,12 +421,12 @@ ALTE ROCKBOX-INSTALLATION GEFUNDEN, BEENDE.Du musst die Original-Firmware neu in
     <message>
         <location filename="installbootloader.cpp" line="1358"/>
         <source>can&apos;t open output file</source>
-        <translation>Konnte das input File nicht öffnen</translation>
+        <translation>Konnte die Ausgabedatei nicht öffnen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1359"/>
         <source>writing output file failed</source>
-        <translation>Konnte output File nicht Schreiben</translation>
+        <translation>Konnte Ausgabedatei nicht Schreiben</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1361"/>
@@ -837,12 +837,12 @@ You need to change your player to UMS mode for installation. </source>
     <message>
         <location filename="createvoicefrm.ui" line="16"/>
         <source>Create Voice File</source>
-        <translation>Erstelle Voicefile</translation>
+        <translation>Erstelle Sprachdatei</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="41"/>
         <source>Select the Language you want to generate a voicefile for:</source>
-        <translation>Wähle die Sprache für die das Voicefile generiert werden soll:</translation>
+        <translation>Wähle die Sprache für die die Sprachdatei generiert werden soll:</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="51"/>
@@ -2010,12 +2010,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="rbutilqtfrm.ui" line="526"/>
         <source>Create Voice files</source>
-        <translation>Erstelle Voicefile</translation>
+        <translation>Erstelle Sprachdatei</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="1023"/>
         <source>Create Voice File</source>
-        <translation>Erstelle Voicefile</translation>
+        <translation>Erstelle Sprachdatei</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="162"/>
@@ -2040,7 +2040,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="rbutilqtfrm.ui" line="353"/>
         <source>&lt;b&gt;Fonts Package&lt;/b&gt;&lt;br/&gt;The Fonts Package contains a couple of commonly used fonts. Installation is highly recommended.</source>
-        <translation>&lt;b&gt;Schrift Pakete&lt;/b&gt;&lt;br/&gt;Das Schriftpaket enthält eine Reihe von häufig benutzen Schriften. Die Installation wird empfohlen.</translation>
+        <translation>&lt;b&gt;Installiere Schrift Paket&lt;/b&gt;&lt;br/&gt;Das Schriftpaket enthält eine Reihe von häufig benutzen Schriften. Die Installation wird empfohlen.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="379"/>
@@ -2050,23 +2050,23 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="rbutilqtfrm.ui" line="405"/>
         <source>&lt;b&gt;Install Game Files&lt;/b&gt;&lt;br/&gt;Doom needs a base wad file to run.</source>
-        <translation>&lt;b&gt;Installiere Spiele Dateien &lt;/b&gt;&lt;br/&gt; Doom benötigt ein Basis wad file um zu funktionieren.</translation>
+        <translation>&lt;b&gt;Installiere Spiele Dateien &lt;/b&gt;&lt;br/&gt; Doom benötigt eine Basis wad Datei um zu funktionieren.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="467"/>
         <source>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</source>
-        <translation>&lt;b&gt;Installiere Sprachfile&lt;/b&gt;&lt;br&gt; Sprachfiles werden benötigt damit Rockbox seine Benutzeroberfläche vorlesen kann. Sprachausgabe ist standardmäßig angeschaltet, sobald sie ein sprachfile installieren wird Rockbox sprechen.</translation>
+        <translation>&lt;b&gt;Installiere Sprachdatei&lt;/b&gt;&lt;br&gt; Sprachdateien werden benötigt damit Rockbox seine Benutzeroberfläche vorlesen kann. Sprachausgabe ist Standardmäßig angeschaltet, sobald sie eine Sprachdatei installieren wird Rockbox sprechen.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="493"/>
         <source>&lt;b&gt;Create Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles are needed to let Rockbox speak File and Foldernames</source>
-        <translation>&lt;b&gt;Erstelle Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles werden benötigt damit Rockbox Dateien und Ordner vorlesen kann</translation>
+        <translation>&lt;b&gt;Erstelle Talk Dateien&lt;/b&gt;&lt;br/&gt;Talkdateien werden benötigt damit Rockbox Dateien und Ordner vorlesen kann</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="542"/>
         <source>&lt;b&gt;Create Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so
  if you installed the voice file Rockbox will speak.</source>
-        <translation>&lt;b&gt;Erstelle Sprachfile&lt;/b&gt;&lt;br&gt; Sprachfiles werden benötigt damit Rockbox seine Benutzeroberfläche vorlesen kann. Sprachausgabe ist standardmäßig angeschaltet, sobald sie ein Sprachfile installieren wird Rockbox sprechen.</translation>
+        <translation>&lt;b&gt;Installiere Sprachdatei&lt;/b&gt;&lt;br&gt; Sprachdateien werden benötigt damit Rockbox seine Benutzeroberfläche vorlesen kann. Sprachausgabe ist Standardmäßig angeschaltet, sobald sie eine Sprachdatei installieren wird Rockbox sprechen.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="579"/>
@@ -2116,17 +2116,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="rbutilqtfrm.ui" line="960"/>
         <source>Install &amp;Game Files</source>
-        <translation>Installiere &amp;Game Files</translation>
+        <translation>Installiere &amp;Spiele Dateien</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="968"/>
         <source>&amp;Install Voice File</source>
-        <translation>&amp;Installiere Sprach File</translation>
+        <translation>&amp;Installiere Sprachdateien</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="976"/>
         <source>Create &amp;Talk Files</source>
-        <translation>Erstelle &amp;Talk Files</translation>
+        <translation>Erstelle &amp;Talkdateien</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="984"/>
@@ -2141,7 +2141,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="rbutilqtfrm.ui" line="1020"/>
         <source>Create &amp;Voice File</source>
-        <translation>Erstelle &amp;Voice File</translation>
+        <translation>Erstelle &amp;Sprachdateien</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="1028"/>
@@ -2322,7 +2322,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="talkfile.cpp" line="31"/>
         <source>Starting Talk file generation</source>
-        <translation>Beginne Talkfile generation</translation>
+        <translation>Beginne Talkdatei generierung</translation>
     </message>
     <message>
         <location filename="talkfile.cpp" line="41"/>
@@ -2337,7 +2337,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="talkfile.cpp" line="75"/>
         <source>Talk file creation aborted</source>
-        <translation>Talkfile generation abgebrochen</translation>
+        <translation>Sprachdatei generierung abgebrochen</translation>
     </message>
     <message>
         <location filename="talkfile.cpp" line="143"/>
@@ -2362,7 +2362,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="talkfile.cpp" line="186"/>
         <source>Finished creating Talk files</source>
-        <translation>Erstellen der Talkfiles beendet</translation>
+        <translation>Erstellen der Sprachdateien beendet</translation>
     </message>
 </context>
 <context>
@@ -2666,7 +2666,7 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
     <message>
         <location filename="voicefile.cpp" line="41"/>
         <source>Starting Voicefile generation</source>
-        <translation>Beginne Voicefile generation</translation>
+        <translation>Beginne Sprachdatei generation</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="55"/>
@@ -2696,7 +2696,7 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
     <message>
         <location filename="voicefile.cpp" line="137"/>
         <source>failed to open downloaded file</source>
-        <translation>Konnte das heruntergladene File nicht öffnen</translation>
+        <translation>Konnte die heruntergeladene Datei nicht öffnen</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="151"/>
@@ -2711,7 +2711,7 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
     <message>
         <location filename="voicefile.cpp" line="206"/>
         <source>The downloaded file was empty!</source>
-        <translation>Das heruntergeladene File was leer!</translation>
+        <translation>Die heruntergeladene Datei war leer!</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="245"/>
@@ -2721,12 +2721,12 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
     <message>
         <location filename="voicefile.cpp" line="268"/>
         <source>Error opening downloaded file</source>
-        <translation>Konnte das heruntergladene File nicht öffnen</translation>
+        <translation>Konnte die heruntergeladene Datei nicht öffnen</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="277"/>
         <source>Error opening output file</source>
-        <translation>Konnte das output File nicht öffnen</translation>
+        <translation>Konnte die Ausgabedatei nicht öffnen</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="292"/>
