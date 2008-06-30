@@ -24,6 +24,7 @@
 #include "button.h"
 #include "adc.h"
 #include "pcf50606.h"
+#include "backlight.h"
 
 #define TOUCH_MARGIN 8
 
