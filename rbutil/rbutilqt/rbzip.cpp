@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2008 by Dominik Wenger
- *   $Id: rbzip.cpp 17129 2008-04-15 21:25:57Z bluebrother $
+ *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.

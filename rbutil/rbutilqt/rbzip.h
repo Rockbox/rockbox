@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  *   Copyright (C) 2008 by Dominik Wenger
- *   $Id: rbzip.h 16993 2008-04-06 18:12:56Z bluebrother $
+ *   $Id$
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
