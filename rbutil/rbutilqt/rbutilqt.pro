@@ -200,6 +200,10 @@ macx {
     INCLUDEPATH += /usr/local/include
     QMAKE_INFO_PLIST = Info.plist
     RC_FILE = icons/rbutilqt.icns
+    
+    # rule for creating a dmg file
+    dmg.commands = hdiutil create -ov -srcfolder rbutilqt.app/ rbutil.dmg
+    QMAKE_EXTRA_TARGETS += dmg
 }
 
 static {
