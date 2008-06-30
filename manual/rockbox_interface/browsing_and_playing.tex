@@ -80,9 +80,12 @@ the \setting{Show Files} setting to all.
       \ActionStdMenu{}
       & Enter the \setting{Main Menu}\\
       %
-      \opt{RECORDER_PAD}{
-        \ButtonFTwo & Switches to the Browse/Play Quick Screen \\
+      \nopt{PLAYER_PAD,ONDIO_PAD} {
+        \ActionStdQuickScreen & Switches to the \setting{Quick Screen}
+        (see \reference{ref:QuickScreen}) \\
         %
+      }	  
+      \opt{RECORDER_PAD}{
         \ButtonFThree & Switches to the Display Quick Screen \\ 
         %
       }
