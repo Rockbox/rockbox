@@ -107,14 +107,16 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     vp_icons[screen].height =
                 vps[screen][QUICKSCREEN_BOTTOM].y - vp_icons[screen].y;
 
-    if (left_width + right_width > display->lcdwidth - CENTER_ICONAREA_WIDTH)
+    if ((left_width + right_width > parent->width - CENTER_ICONAREA_WIDTH) ||
+        (MAX(left_width, right_width)*2 > parent->width - CENTER_ICONAREA_WIDTH))
     {
         /* scrolling needed */
-        int width = (parent->width - CENTER_ICONAREA_WIDTH)/2;
+        int center = (parent->width - CENTER_ICONAREA_WIDTH)/2;
+        int width = MIN(center, MIN(left_width, right_width));
         vps[screen][QUICKSCREEN_LEFT].width = width;
         vps[screen][QUICKSCREEN_RIGHT].width = width;
         vps[screen][QUICKSCREEN_RIGHT].x = parent->x+parent->width - width;
-        vp_icons[screen].x = parent->x + width;
+        vp_icons[screen].x = parent->x + center;
         vp_icons[screen].width = CENTER_ICONAREA_WIDTH;
     }
     else
@@ -144,7 +146,7 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
             vps[screen][QUICKSCREEN_BOTTOM].x += pad;
             vps[screen][QUICKSCREEN_BOTTOM].width -= pad;
         }
-        vp_icons[screen].width = vps[screen][QUICKSCREEN_RIGHT].x - width;
+        vp_icons[screen].width = vps[screen][QUICKSCREEN_RIGHT].x - (vps[screen][QUICKSCREEN_LEFT].x+width);
         
     }
 }
