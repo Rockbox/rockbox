@@ -264,6 +264,12 @@ static bool skipped_during_pause = false; /* Do we need to clear the PCM buffer 
 static bool start_play_g = false; /* Used by audio_load_track to notify
                                      audio_finish_load_track about start_play */
 
+/* True when a track load is in progress, i.e. audio_load_track() has returned
+ * but audio_finish_load_track() hasn't been called yet. Used to avoid allowing
+ * audio_load_track() to get called twice in a row, which would cause problems.
+ */
+static bool track_load_started = false;
+
 /* Set to true if the codec thread should send an audio stop request
  * (typically because the end of the playlist has been reached).
  */
@@ -1610,6 +1616,14 @@ static bool audio_load_track(size_t offset, bool start_play)
     const char *trackname;
     int fd = -1;
 
+    if (track_load_started) {
+        /* There is already a track load in progress, so track_widx hasn't been
+           incremented yet. Loading another track would overwrite the one that
+           hasn't finished loading. */
+        logf("audio_load_track(): a track load is already in progress");
+        return false;
+    }
+
     start_play_g = start_play;  /* will be read by audio_finish_load_track */
 
     /* Stop buffer filling if there is no free track entries.
@@ -1693,6 +1707,7 @@ static bool audio_load_track(size_t offset, bool start_play)
     }
 
     close(fd);
+    track_load_started = true; /* Remember that we've started loading a track */
     return true;
 }
 
@@ -1723,6 +1738,8 @@ static void audio_finish_load_track(void)
         }
     }
 #endif
+
+    track_load_started = false;
 
     if (tracks[track_widx].id3_hid < 0) {
         logf("no metatdata");
@@ -1900,6 +1917,9 @@ static void audio_rebuffer(void)
     /* Reset track pointers */
     track_widx = track_ridx;
     audio_clear_track_entries();
+
+    /* Reset a possibly interrupted track load */
+    track_load_started = false;
 
     /* Fill the buffer */
     last_peek_offset = -1;
@@ -2121,6 +2141,7 @@ static void audio_stop_playback(void)
     paused = false;
     audio_stop_codec_flush();
     playing = false;
+    track_load_started = false;
 
     filling = STATE_IDLE;
 
@@ -2149,6 +2170,7 @@ static void audio_play_start(size_t offset)
     track_changed = true;
 
     playing = true;
+    track_load_started = false;
 
     ci.new_track = 0;
     ci.seek_time = 0;
