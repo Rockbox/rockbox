@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="de">
+<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -30,7 +31,7 @@
     <message>
         <location filename="installbootloader.cpp" line="174"/>
         <source>Download error: %1</source>
-        <translation>Downloadfehler: %1</translation>
+        <translation>Download fehler: %1</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="179"/>
@@ -179,7 +180,6 @@
         <translation>Unbekannte Versionsnummer in Firmware (%1)</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod</source>
         <translation type="obsolete">Warnung, dies ist ein MacPod, Rockbox funktioniert damit nicht. Konvertiere das Gerät zu einem WinPod</translation>
     </message>
@@ -234,7 +234,6 @@
         <translation>Konnte Sansa nicht öffnen </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Disk is not an E200 (%1), aborting.</source>
         <translation type="obsolete">Dies ist kein E200 (%1), Fehler.</translation>
     </message>
@@ -341,102 +340,103 @@ sansapatcher for the first time.
 See http://www.rockbox.org/wiki/SansaE200Install
 *********************************************
 </source>
-        <translation type="unfinished"></translation>
+        <translation>********************************************
+ALTE ROCKBOX-INSTALLATION GEFUNDEN, BEENDE.Du musst die Original-Firmware neu installieren bevor sansapatcher ausgeführt werden kann.Siehe http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install*********************************************</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1374"/>
         <source>Can&apos;t open input file</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte das input File nicht öffnen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1375"/>
         <source>Can&apos;t open output file</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte das output File nicht öffnen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1376"/>
         <source>invalid file: header length wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>ungültiges File: Länge des Headers ist falsch</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1377"/>
         <source>invalid file: unrecognized header</source>
-        <translation type="unfinished"></translation>
+        <translation>ungültiges File: unbekannter Header</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1378"/>
         <source>invalid file: &quot;length&quot; field wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>ungültiges File: &quot;length&quot; Eintrag ist falsch</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1379"/>
         <source>invalid file: &quot;length2&quot; field wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>ungültiges File: &quot;length2&quot; Eintrag ist falsch</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1380"/>
         <source>invalid file: internal checksum error</source>
-        <translation type="unfinished"></translation>
+        <translation>ungültiges File: interne Checksumme ist falsch</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1381"/>
         <source>invalid file: &quot;length3&quot; field wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>ungültiges File: &quot;length3&quot; Eintrag ist falsch</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1382"/>
         <source>unknown</source>
-        <translation type="unfinished">unbekannt</translation>
+        <translation>unbekannt</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1341"/>
         <source>Error in descramble: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler in descramble: %1</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1353"/>
         <source>could not open input file</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte das input File nicht öffnen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1354"/>
         <source>reading header failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte Headers nicht lesen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1355"/>
         <source>reading firmware failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte Firmware nicht lesen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1356"/>
         <source>can&apos;t open bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte Bootloader nicht öffnen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1357"/>
         <source>reading bootloader file failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte Bootloader nicht lesen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1358"/>
         <source>can&apos;t open output file</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte das input File nicht öffnen</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1359"/>
         <source>writing output file failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte output File nicht Schreiben</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1361"/>
         <source>Error in patching: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Patchen %1</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1384"/>
         <source>Error in scramble: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler in scramble: %1</translation>
     </message>
 </context>
 <context>
@@ -522,7 +522,6 @@ Select your device and Mountpoint manually.</source>
 Bitte Gerät und den Einhängepunt manuell auswählen.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Current cache size is %1 kiB.</source>
         <translation type="obsolete">Aktuelle Cachegröße ist %1 kiB.</translation>
     </message>
@@ -593,12 +592,12 @@ You need to change your player to UMS mode for installation. </source>
     <message>
         <location filename="configure.cpp" line="537"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht unterstützter Player %1 erkannt. Rockbox funktioniert leider nicht auf diesem Gerät.</translation>
     </message>
     <message>
         <location filename="configure.cpp" line="539"/>
         <source>Fatal error: incompatible player found</source>
-        <translation type="unfinished"></translation>
+        <translation>Fataler Fehler: inkompatibles Gerät gefunden </translation>
     </message>
 </context>
 <context>
@@ -764,12 +763,10 @@ You need to change your player to UMS mode for installation. </source>
         <translation>TTS Engine</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>&amp;Select TTS profile</source>
         <translation type="obsolete">TTS-Profil au&amp;swählen</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>TTS Options</source>
         <translation type="obsolete">TTS-Optionen</translation>
     </message>
@@ -779,12 +776,10 @@ You need to change your player to UMS mode for installation. </source>
         <translation>Encoder</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Select &amp;encoder profile</source>
         <translation type="obsolete">&amp;Encoder-Profil auswählen</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>B&amp;rowse</source>
         <translation type="obsolete">&amp;Durchsuchen</translation>
     </message>
@@ -826,7 +821,7 @@ You need to change your player to UMS mode for installation. </source>
     <message>
         <location filename="configurefrm.ui" line="505"/>
         <source>encoder name</source>
-        <translation type="unfinished"></translation>
+        <translation>Name des Encoders</translation>
     </message>
 </context>
 <context>
@@ -986,12 +981,12 @@ You need to change your player to UMS mode for installation. </source>
     <message>
         <location filename="install.cpp" line="260"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Builds werden jeden Tag automatisch aus dem aktuellen Source Code gebaut. Sie haben meist mehr Features als das letzte stabile Release können aber weniger Stabil sein. Features können sich häufig verändern.</translation>
     </message>
     <message>
         <location filename="install.cpp" line="127"/>
         <source>Device mismatch detected</source>
-        <translation type="unfinished"></translation>
+        <translation>Geräte Inkompatiblität erkannt</translation>
     </message>
     <message>
         <location filename="install.cpp" line="131"/>
@@ -1001,27 +996,27 @@ Installed Rockbox is for Device: %1.
 New Rockbox is for Device: %2.
 
 Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Geräte inkompatibilität erkannt.Installiertes Rockbox ist für Gerät: %1.Neues Rockbox its für Gerät: %2.Wollen sie fortfahren ?</translation>
     </message>
     <message>
         <location filename="install.cpp" line="134"/>
         <source>Aborted!</source>
-        <translation type="unfinished"></translation>
+        <translation>Abgebrochen!</translation>
     </message>
     <message>
         <location filename="install.cpp" line="144"/>
         <source>Beginning Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstelle Backup...</translation>
     </message>
     <message>
         <location filename="install.cpp" line="159"/>
         <source>Backup successfull</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup erfolgreich</translation>
     </message>
     <message>
         <location filename="install.cpp" line="163"/>
         <source>Backup failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup fehlgeschlagen!</translation>
     </message>
 </context>
 <context>
@@ -1082,7 +1077,6 @@ Do you want to continue?</source>
         <translation>&amp;keine lokale Zwischenkopie verwenden</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>&amp;Ok</source>
         <translation type="obsolete">&amp;Ok</translation>
     </message>
@@ -1099,22 +1093,22 @@ Do you want to continue?</source>
     <message>
         <location filename="installfrm.ui" line="156"/>
         <source>Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup</translation>
     </message>
     <message>
         <location filename="installfrm.ui" line="162"/>
         <source>Backup before installing</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstelle Backup vor der Installation</translation>
     </message>
     <message>
         <location filename="installfrm.ui" line="169"/>
         <source>Backup location</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup ort</translation>
     </message>
     <message>
         <location filename="installfrm.ui" line="188"/>
         <source>Change</source>
-        <translation type="unfinished">Ändere</translation>
+        <translation>Ändere</translation>
     </message>
     <message>
         <location filename="installfrm.ui" line="207"/>
@@ -1123,7 +1117,7 @@ Do you want to continue?</source>
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Backup Location:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;p, li { white-space: pre-wrap; }&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Backup Ort:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -1182,7 +1176,6 @@ p, li { white-space: pre-wrap; }
         <translation>Dateiendungen entfernen</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>&amp;Ok</source>
         <translation type="obsolete">&amp;Ok</translation>
     </message>
@@ -1240,22 +1233,18 @@ p, li { white-space: pre-wrap; }
         <translation>Der Ordner für den Talk Dateien erzeugt werden sollen ist falsch!</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>TTS Profile: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="obsolete">TTS-Profil: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Invalid TTS profile!</source>
         <translation type="obsolete">Ungültiges TTS-Profil!</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Encoder Profile: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="obsolete">Encoder-Profil: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Invalid encoder profile!</source>
         <translation type="obsolete">Ungültiges Encoder-Profil!</translation>
     </message>
@@ -1288,12 +1277,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="progressloggerfrm.ui" line="19"/>
         <source>Progress</source>
-        <translation type="unfinished">Fortschritt</translation>
+        <translation>Fortschritt</translation>
     </message>
     <message>
         <location filename="progressloggerfrm.ui" line="56"/>
         <source>&amp;Abort</source>
-        <translation type="unfinished">&amp;Abbrechen</translation>
+        <translation>&amp;Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -1314,22 +1303,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="utils.cpp" line="266"/>
         <source>Guest</source>
-        <translation type="unfinished"></translation>
+        <translation>Gast</translation>
     </message>
     <message>
         <location filename="utils.cpp" line="269"/>
         <source>Admin</source>
-        <translation type="unfinished"></translation>
+        <translation>Admin</translation>
     </message>
     <message>
         <location filename="utils.cpp" line="272"/>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzer</translation>
     </message>
     <message>
         <location filename="utils.cpp" line="275"/>
         <source>Error</source>
-        <translation type="unfinished">Fehler</translation>
+        <translation>Fehler</translation>
     </message>
 </context>
 <context>
@@ -1538,19 +1527,16 @@ p, li { white-space: pre-wrap; }
         <translation>Bootloader-Installation</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>It seem your Bootloader is already uptodate.
 Do really want to install it?</source>
         <translation type="obsolete">Der Bootloader scheint aktuell zu sein
 Trotzdem installieren?</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Bootloader installation Canceled!</source>
         <translation type="obsolete">Bootloader-Installation abgebrochen!</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Bootloader installation Skipped!</source>
         <translation type="obsolete">Bootloader-Installation übersprungen!</translation>
     </message>
@@ -1594,12 +1580,12 @@ Wollen sie wircklich den Bootloader ersetzen ?</translation>
     <message>
         <location filename="rbutilqt.cpp" line="185"/>
         <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuration dialog will now open to allow you correcting the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deine Konfiguration ist ungültig. Dies liegt wahrscheinlich daran das Rockbox Utillity das erste mal gestartet wird, oder an geänderten Pfaden. Der Konfigurationsdialog wird sich nun öffnen damit sie das Problem korrigieren können. </translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="482"/>
         <source>Target mismatch detected</source>
-        <translation type="unfinished"></translation>
+        <translation>Geräte Inkompatiblität erkannt</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="486"/>
@@ -1609,47 +1595,47 @@ Installed target: %1.
 New Target: %2.
 
 Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Geräte inkompatibilität erkannt.Installiertes Rockbox ist für Gerät: %1.Neues Rockbox its für Gerät: %2.Wollen sie fortfahren ?</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="489"/>
         <source>Aborted!</source>
-        <translation type="unfinished"></translation>
+        <translation>Abgebrochen!</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="498"/>
         <source>Installed Rockbox detected</source>
-        <translation type="unfinished"></translation>
+        <translation>Installiertes Rockbox erkannt</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="499"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
-        <translation type="unfinished"></translation>
+        <translation>Installiertes Rockbox erkannt. Wollen sie ein Backup durchführen ?</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="502"/>
         <source>Beginning Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstelle Backup...</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="518"/>
         <source>Backup successfull</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup erfolgreich</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="522"/>
         <source>Backup failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup fehlgeschlagen!</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="706"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Warnung</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="707"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Progamm läd noch Informationen über neue Builds. Bitte versuchen nach einer kurzen Zeit nochmal.</translation>
     </message>
 </context>
 <context>
@@ -1665,7 +1651,6 @@ Do you want to continue?</source>
         <translation>&amp;Schnellstart</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>...</source>
         <translation type="obsolete">...</translation>
     </message>
@@ -2035,138 +2020,138 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="rbutilqtfrm.ui" line="162"/>
         <source>&lt;b&gt;Complete Installation&lt;/b&gt;&lt;br/&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Komplette Installation&lt;/b&gt;&lt;br/&gt;Dies installiert den Bootloader, ein aktuellen Build und die Extra Pakete. Dies ist die empfohlene Methode für eine neue Installation.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="191"/>
         <source>&lt;b&gt;Small installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Kleine Installationn&lt;/b&gt;&lt;br/&gt; Dies installiert den Bootloader und ein aktuellen Build von Rockbox. Wenn sie die extra pakte nicht brauchen, wählen sie diese Option.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="256"/>
         <source>&lt;b&gt;Install the bootloader&lt;/b&gt;&lt;br/&gt;Before Rockbox can be run on your audio player, you may have to install a bootloader. This is only necessary the first time Rockbox is installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installiere Bootloader&lt;/b&gt;&lt;br/&gt; Bevor Rockbox auf ihrem Audioplayer laufen kann, müssen sie einen Bootloader installieren. Dies ist nur nötig wenn sie Rockbox zum erstenmal installieren.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="285"/>
         <source>&lt;b&gt;Install Rockbox&lt;/b&gt; on your audio player</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installiere Rockbox&lt;/b&gt; auf deinem Audioplayer</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="353"/>
         <source>&lt;b&gt;Fonts Package&lt;/b&gt;&lt;br/&gt;The Fonts Package contains a couple of commonly used fonts. Installation is highly recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Schrift Pakete&lt;/b&gt;&lt;br/&gt;Das Schriftpaket enthält eine Reihe von häufig benutzen Schriften. Die Installation wird empfohlen.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="379"/>
         <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installiere Themes &lt;/b&gt;&lt;br/&gt; Das Aussehen von Rockbox kann mit Themes verändert werden. Sie können zwischen mehrern offiziell vertriebenen Themen auswählen.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="405"/>
         <source>&lt;b&gt;Install Game Files&lt;/b&gt;&lt;br/&gt;Doom needs a base wad file to run.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installiere Spiele Dateien &lt;/b&gt;&lt;br/&gt; Doom benötigt ein Basis wad file um zu funktionieren.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="467"/>
         <source>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installiere Sprachfile&lt;/b&gt;&lt;br&gt; Sprachfiles werden benötigt damit Rockbox seine Benutzeroberfläche vorlesen kann. Sprachausgabe ist standardmäßig angeschaltet, sobald sie ein sprachfile installieren wird Rockbox sprechen.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="493"/>
         <source>&lt;b&gt;Create Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles are needed to let Rockbox speak File and Foldernames</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Erstelle Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles werden benötigt damit Rockbox Dateien und Ordner vorlesen kann</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="542"/>
         <source>&lt;b&gt;Create Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so
  if you installed the voice file Rockbox will speak.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Erstelle Sprachfile&lt;/b&gt;&lt;br&gt; Sprachfiles werden benötigt damit Rockbox seine Benutzeroberfläche vorlesen kann. Sprachausgabe ist standardmäßig angeschaltet, sobald sie ein Sprachfile installieren wird Rockbox sprechen.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="579"/>
         <source>&lt;b&gt;Remove the bootloader&lt;/b&gt;&lt;br/&gt;After removing the bootloader you won&apos;t be able to start Rockbox.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Entferne Bootloaderr&lt;/b&gt;&lt;br/&gt;Nach dem entfernen des Bootloader werden sie Rockbox nicht mehr starten können.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="605"/>
         <source>&lt;b&gt;Uninstall Rockbox from your audio player.&lt;/b&gt;&lt;br/&gt;This will leave the bootloader in place (you need to remove it manually).</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Entferne Rockbox von ihrem Audio Player&lt;/b&gt;&lt;br/&gt;Dies wird den Bootloader intakt lassen (sie müssen ihn manuell entfernen).</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="759"/>
         <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuell installierte Pakete.&lt;br/&lt;b&gt;Note:&lt;/b&gt; wenn sie Pakete manuell installiert haben, wird dies nicht korrekt sein!</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="804"/>
         <source>Abou&amp;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Ü&amp;ber</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="920"/>
         <source>&amp;Small Installation</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Kleine Installation</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="928"/>
         <source>Install &amp;Bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Installiere &amp;Bootloader</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="936"/>
         <source>Install &amp;Rockbox</source>
-        <translation type="unfinished"></translation>
+        <translation>Installiere &amp;Rockbox</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="944"/>
         <source>Install &amp;Fonts Package</source>
-        <translation type="unfinished"></translation>
+        <translation>Installiere &amp;Fonts Paket</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="952"/>
         <source>Install &amp;Themes</source>
-        <translation type="unfinished"></translation>
+        <translation>Installiere &amp;Themes</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="960"/>
         <source>Install &amp;Game Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Installiere &amp;Game Files</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="968"/>
         <source>&amp;Install Voice File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Installiere Sprach File</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="976"/>
         <source>Create &amp;Talk Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstelle &amp;Talk Files</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="984"/>
         <source>Remove &amp;bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Entferne &amp;bootloader</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="992"/>
         <source>Uninstall &amp;Rockbox</source>
-        <translation type="unfinished"></translation>
+        <translation>Entferne &amp;Rockbox</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="1020"/>
         <source>Create &amp;Voice File</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstelle &amp;Voice File</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="1028"/>
         <source>&amp;System Info</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;System Info</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="912"/>
         <source>&amp;Complete Installation</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Komplette Installation</translation>
     </message>
 </context>
 <context>
@@ -2219,7 +2204,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="sapicfgfrm.ui" line="129"/>
         <source>Use Sapi 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutze Sapi 4</translation>
     </message>
 </context>
 <context>
@@ -2227,27 +2212,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="sysinfo.cpp" line="40"/>
         <source>&lt;b&gt;OS&lt;/b&gt;&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Betriebssystem&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="41"/>
         <source>&lt;b&gt;Username:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Benutzername:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="43"/>
         <source>&lt;b&gt;Permissions:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Rechte:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="45"/>
         <source>&lt;b&gt;Attached USB devices:&lt;/b&gt;&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Angeschlossene USB Geräte:&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="49"/>
         <source>VID: %1 PID: %2&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>VID: %1 PID: %2&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -2255,17 +2240,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="sysinfofrm.ui" line="13"/>
         <source>System Info</source>
-        <translation type="unfinished"></translation>
+        <translation>System Info</translation>
     </message>
     <message>
         <location filename="sysinfofrm.ui" line="22"/>
         <source>&amp;Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Aktualisieren</translation>
     </message>
     <message>
         <location filename="sysinfofrm.ui" line="45"/>
         <source>&amp;OK</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ok</translation>
     </message>
 </context>
 <context>
@@ -2403,7 +2388,6 @@ p, li { white-space: pre-wrap; }
         <translation>Downloadgröße:</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>&amp;Ok</source>
         <translation type="obsolete">&amp;Ok</translation>
     </message>
@@ -2460,7 +2444,6 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
         <translation>hole Vorschau ...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Download size %1 kiB</source>
         <translation type="obsolete">Downloadgröße: %1 kiB</translation>
     </message>
@@ -2636,7 +2619,6 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
         <translation>Installierte Teile</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>&amp;Ok</source>
         <translation type="obsolete">&amp;Ok</translation>
     </message>
@@ -2906,7 +2888,7 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
 
 © 2005 - 2008 The Rockbox Team.
 Released under the GNU General Public License v2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.© 2005 - 2008 The Rockbox Team.Released under the GNU General Public License v2.</translation>
     </message>
     <message>
         <location filename="aboutbox.ui" line="72"/>
