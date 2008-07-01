@@ -19,6 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * $Id$
+ * libmpeg2 sync history:
+ * 2008-07-01 - CVS revision 1.114
  */
 
 #include "plugin.h"
@@ -155,16 +159,14 @@ static inline mpeg2_state_t seek_chunk (mpeg2dec_t * mpeg2dec)
     mpeg2dec->bytes_since_tag += skipped;
     mpeg2dec->code = mpeg2dec->buf_start[-1];
 
-    return (mpeg2_state_t)-1;
+    return STATE_INTERNAL_NORETURN;
 }
 
 mpeg2_state_t mpeg2_seek_header (mpeg2dec_t * mpeg2dec)
 {
-    while (mpeg2dec->code != 0xb3 &&
-	       ((mpeg2dec->code != 0xb7 &&
-             mpeg2dec->code != 0xb8 &&
-             mpeg2dec->code) ||
-             mpeg2dec->sequence.width == (unsigned)-1))
+    while (!(mpeg2dec->code == 0xb3 ||
+	       ((mpeg2dec->code == 0xb7 || mpeg2dec->code == 0xb8 ||
+             !mpeg2dec->code) && mpeg2dec->sequence.width != (unsigned)-1)))
     {
     	if (seek_chunk (mpeg2dec) == STATE_BUFFER)
     	    return STATE_BUFFER;
@@ -175,9 +177,8 @@ mpeg2_state_t mpeg2_seek_header (mpeg2dec_t * mpeg2dec)
 
     mpeg2dec->user_data_len = 0;
 
-    return mpeg2dec->code ?
-                mpeg2_parse_header(mpeg2dec) :
- 	            mpeg2_header_picture_start(mpeg2dec);
+    return ((mpeg2dec->code == 0xb7) ?
+            mpeg2_header_end(mpeg2dec) : mpeg2_parse_header(mpeg2dec));
 }
 
 #define RECEIVED(code,state) (((state) << 8) + (code))
@@ -192,7 +193,7 @@ mpeg2_state_t mpeg2_parse (mpeg2dec_t * mpeg2dec)
 
     	state = mpeg2dec->action (mpeg2dec);
 
-	    if ((int)state >= 0)
+	    if ((int)state > (int)STATE_INTERNAL_NORETURN)
 	        return state;
     }
 
@@ -244,24 +245,20 @@ mpeg2_state_t mpeg2_parse (mpeg2dec_t * mpeg2dec)
     	    return STATE_BUFFER;
     }
 
+    mpeg2dec->action = mpeg2_seek_header;
+
     switch (mpeg2dec->code)
     {
     case 0x00:
-    	mpeg2dec->action = mpeg2_header_picture_start;
     	return mpeg2dec->state;
-    case 0xb7:
-    	mpeg2dec->action = mpeg2_header_end;
-    	break;
     case 0xb3:
+    case 0xb7:
     case 0xb8:
-    	mpeg2dec->action = mpeg2_parse_header;
-    	break;
+        return (mpeg2dec->state == STATE_SLICE) ? STATE_SLICE : STATE_INVALID;
     default:
     	mpeg2dec->action = seek_chunk;
     	return STATE_INVALID;
     }
-
-    return (mpeg2dec->state == STATE_SLICE) ? STATE_SLICE : STATE_INVALID;
 }
 
 mpeg2_state_t mpeg2_parse_header (mpeg2dec_t * mpeg2dec)
@@ -331,7 +328,6 @@ mpeg2_state_t mpeg2_parse_header (mpeg2dec_t * mpeg2dec)
         {
     	/* state transition after a sequence header */
     	case RECEIVED (0x00, STATE_SEQUENCE):
-    	    mpeg2dec->action = mpeg2_header_picture_start;
     	case RECEIVED (0xb8, STATE_SEQUENCE):
     	    mpeg2_header_sequence_finalize (mpeg2dec);
     	    break;
@@ -339,7 +335,6 @@ mpeg2_state_t mpeg2_parse_header (mpeg2dec_t * mpeg2dec)
     	/* other legal state transitions */
     	case RECEIVED (0x00, STATE_GOP):
     	    mpeg2_header_gop_finalize (mpeg2dec);
-    	    mpeg2dec->action = mpeg2_header_picture_start;
     	    break;
     	case RECEIVED (0x01, STATE_PICTURE):
     	case RECEIVED (0x01, STATE_PICTURE_2ND):

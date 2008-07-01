@@ -20,6 +20,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * $Id$
+ * libmpeg2 sync history:
+ * 2008-07-01 - CVS revision 1.55
  */
 
 #include "plugin.h"
@@ -488,7 +492,7 @@ static void get_intra_block_B14 (mpeg2_decoder_t * const decoder,
     }
 
     dest[63] ^= mismatch & 16;
-    DUMPBITS (bit_buf, bits, 2);        /* dump end of block code */
+    DUMPBITS (bit_buf, bits, tab->len); /* dump end of block code */
     decoder->bitstream_buf = bit_buf;
     decoder->bitstream_bits = bits;
     decoder->bitstream_ptr = bit_ptr;
@@ -601,7 +605,7 @@ static void get_intra_block_B15 (mpeg2_decoder_t * const decoder,
     }
 
     dest[63] ^= mismatch & 16;
-    DUMPBITS (bit_buf, bits, 4);        /* dump end of block code */
+    DUMPBITS (bit_buf, bits, tab->len); /* dump end of block code */
     decoder->bitstream_buf = bit_buf;
     decoder->bitstream_bits = bits;
     decoder->bitstream_ptr = bit_ptr;
@@ -728,7 +732,7 @@ static int get_non_intra_block (mpeg2_decoder_t * const decoder,
     }
 
     dest[63] ^= mismatch & 16;
-    DUMPBITS (bit_buf, bits, 2);        /* dump end of block code */
+    DUMPBITS (bit_buf, bits, tab->len); /* dump end of block code */
     decoder->bitstream_buf = bit_buf;
     decoder->bitstream_bits = bits;
     decoder->bitstream_ptr = bit_ptr;
@@ -852,7 +856,7 @@ static void get_mpeg1_intra_block (mpeg2_decoder_t * const decoder)
         break;        /* illegal, check needed to avoid buffer overflow */
     }
 
-    DUMPBITS (bit_buf, bits, 2);        /* dump end of block code */
+    DUMPBITS (bit_buf, bits, tab->len); /* dump end of block code */
     decoder->bitstream_buf = bit_buf;
     decoder->bitstream_bits = bits;
     decoder->bitstream_ptr = bit_ptr;
@@ -989,7 +993,7 @@ static int get_mpeg1_non_intra_block (mpeg2_decoder_t * const decoder)
         break;        /* illegal, check needed to avoid buffer overflow */
     }
 
-    DUMPBITS (bit_buf, bits, 2);        /* dump end of block code */
+    DUMPBITS (bit_buf, bits, tab->len); /* dump end of block code */
     decoder->bitstream_buf = bit_buf;
     decoder->bitstream_bits = bits;
     decoder->bitstream_ptr = bit_ptr;
@@ -1924,7 +1928,7 @@ static void skip_chroma_intra (mpeg2_decoder_t * const decoder)
     {                                                                         \
     table[4] (decoder->dest[1] + decoder->offset,                             \
               ref[1] + offset, decoder->stride, 16);                          \
-    table[4] (decoder->dest[2] + (decoder->offset >> 1),                      \
+    table[4] (decoder->dest[2] + decoder->offset,                             \
               ref[2] + offset, decoder->stride, 16);                          \
     }
 

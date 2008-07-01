@@ -19,11 +19,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * $Id$
+ * libmpeg2 sync history:
+ * 2008-07-01 - CVS revision 1.89
  */
 #ifndef MPEG2_INTERNAL_H
 #define MPEG2_INTERNAL_H
 
 #include "config.h" /* for Rockbox CPU_ #defines */
+
+#define STATE_INTERNAL_NORETURN ((mpeg2_state_t)-1)
 
 /* macroblock modes */
 #define MACROBLOCK_INTRA            1
@@ -233,7 +239,6 @@ void mpeg2_header_state_init (mpeg2dec_t * mpeg2dec);
 void mpeg2_reset_info (mpeg2_info_t * info);
 int mpeg2_header_sequence (mpeg2dec_t * mpeg2dec);
 int mpeg2_header_gop (mpeg2dec_t * mpeg2dec);
-mpeg2_state_t mpeg2_header_picture_start (mpeg2dec_t * mpeg2dec);
 int mpeg2_header_picture (mpeg2dec_t * mpeg2dec);
 int mpeg2_header_extension (mpeg2dec_t * mpeg2dec);
 int mpeg2_header_user_data (mpeg2dec_t * mpeg2dec);

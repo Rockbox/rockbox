@@ -1,6 +1,6 @@
 /*
  * mpeg2.h
- * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
+ * Copyright (C) 2000-2004 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *
  * This file is part of mpeg2dec, a free MPEG-2 video stream decoder.
@@ -19,6 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * $Id$
+ * libmpeg2 sync history:
+ * 2008-07-01 - CVS revision 1.67
  */
 
 #ifndef MPEG2_H
@@ -27,7 +31,7 @@
 #include "mpeg2dec_config.h"
 
 #define MPEG2_VERSION(a,b,c) (((a)<<16)|((b)<<8)|(c))
-#define MPEG2_RELEASE MPEG2_VERSION (0, 4, 0)	/* 0.4.0 */
+#define MPEG2_RELEASE MPEG2_VERSION (0, 5, 0)	/* 0.5.0 */
 
 #define SEQ_FLAG_MPEG2                  1
 #define SEQ_FLAG_CONSTRAINED_PARAMETERS 2
@@ -129,14 +133,15 @@ typedef enum
     STATE_BUFFER            = 0,
     STATE_SEQUENCE          = 1,
     STATE_SEQUENCE_REPEATED = 2,
-    STATE_GOP               = 3,
-    STATE_PICTURE           = 4,
-    STATE_SLICE_1ST         = 5,
-    STATE_PICTURE_2ND       = 6,
-    STATE_SLICE             = 7,
-    STATE_END               = 8,
-    STATE_INVALID           = 9,
-    STATE_INVALID_END       = 10
+    STATE_SEQUENCE_MODIFIED = 3,
+    STATE_GOP               = 4,
+    STATE_PICTURE           = 5,
+    STATE_SLICE_1ST         = 6,
+    STATE_PICTURE_2ND       = 7,
+    STATE_SLICE             = 8,
+    STATE_END               = 9,
+    STATE_INVALID           = 10,
+    STATE_INVALID_END       = 11,
 } mpeg2_state_t;
 
 typedef struct mpeg2_convert_init_s
@@ -183,6 +188,10 @@ void mpeg2_init_fbuf (mpeg2_decoder_t * decoder,
                       uint8_t * forward_fbuf[MPEG2_COMPONENTS],
                       uint8_t * backward_fbuf[MPEG2_COMPONENTS]);
 void mpeg2_slice (mpeg2_decoder_t * decoder, int code, const uint8_t * buffer);
+
+int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
+                        unsigned int * pixel_width,
+                        unsigned int * pixel_height);
 
 typedef enum
 {

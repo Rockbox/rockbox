@@ -21,6 +21,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * $Id$
+ * libmpeg2 sync history:
+ * 2008-07-01 - CVS revision 1.17 - lost compatibility previously to
+ *              provide simplified and CPU-optimized motion compensation.
  */
 
 #include "plugin.h"
