@@ -107,8 +107,7 @@ static void quickscreen_fix_viewports(struct gui_quickscreen *qs,
     vp_icons[screen].height =
                 vps[screen][QUICKSCREEN_BOTTOM].y - vp_icons[screen].y;
 
-    if ((left_width + right_width > parent->width - CENTER_ICONAREA_WIDTH) ||
-        (MAX(left_width, right_width)*2 > parent->width - CENTER_ICONAREA_WIDTH))
+    if (MAX(left_width, right_width)*2 > parent->width - CENTER_ICONAREA_WIDTH)
     {
         /* scrolling needed */
         int center = (parent->width - CENTER_ICONAREA_WIDTH)/2;
