@@ -103,10 +103,16 @@ void pcf50605_init(void)
     
     /* PCF5060X_D2REGC1 is set in accordance to the accessory power setting */
     
+#if  defined (IPOD_VIDEO)
     /* LCD voltage supply. Defaults:
-     * iPod Video = 0xf5 = 3.0V ON
-     * iPod nano  = 0xf5 = 3.0V ON */
+     * iPod Video = 0xf5 = 3.0V ON */
     pcf50605_write(PCF5060X_D3REGC1, 0xf1); /* 2.6V ON */
+#elif defined (IPOD_NANO)
+    /* D3REGC has effect on LCD and ATA, leave it unchanged due to possible ATA
+     * failures. Defaults:
+     * iPod nano  = 0xf5 = 3.0V ON */
+    pcf50605_write(PCF5060X_D3REGC1, 0xf5); /* 3.0V ON */
+#endif
     
     /* PCF5060X_LPREGC1 is leaved untouched as the setting varies over the 
      * different iPod platforms. Defaults:
