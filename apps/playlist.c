@@ -179,7 +179,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
 static int get_next_directory(char *dir);
 static int get_next_dir(char *dir, bool is_forward, bool recursion);
 static int get_previous_directory(char *dir);
-static int check_subdir_for_music(char *dir, char *subdir);
+static int check_subdir_for_music(char *dir, char *subdir, bool recurse);
 static int format_track_path(char *dest, char *src, int buf_length, int max,
                              const char *dir);
 static void display_playlist_count(int count, const unsigned char *fmt,
@@ -1475,7 +1475,6 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
     bool exit = false;
     struct tree_context* tc = tree_get_context();
     int dirfilter = *(tc->dirfilter);
-
     if (global_settings.next_folder == FOLDER_ADVANCE_RANDOM)
     {
         int fd = open(ROCKBOX_DIR "/folder_advance_list.dat",O_RDONLY);
@@ -1493,7 +1492,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
                 i = rand()%folder_count;
                 lseek(fd,sizeof(int) + (MAX_PATH*i),SEEK_SET);
                 read(fd,buffer,MAX_PATH);
-                if (check_subdir_for_music(buffer,"") ==0)
+                if (check_subdir_for_music(buffer, "", false) ==0)
                     exit = true;
             }
             if (folder_count)
@@ -1561,7 +1560,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
             {
                 if (!start_dir)
                 {
-                    result = check_subdir_for_music(dir, files[i].name);
+                    result = check_subdir_for_music(dir, files[i].name, true);
                     if (result != -1)
                     {
                         exit = true;
@@ -1604,7 +1603,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
  * Checks if there are any music files in the dir or any of its
  * subdirectories.  May be called recursively.
  */
-static int check_subdir_for_music(char *dir, char *subdir)
+static int check_subdir_for_music(char *dir, char *subdir, bool recurse)
 {
     int result = -1;
     int dirlen = strlen(dir);
@@ -1639,8 +1638,8 @@ static int check_subdir_for_music(char *dir, char *subdir)
 
     if (has_music)
         return 0;
-
-    if (has_subdir)
+        
+    if (has_subdir && recurse)
     {
         for (i=0; i<num_files; i++)
         {
@@ -1652,7 +1651,7 @@ static int check_subdir_for_music(char *dir, char *subdir)
 
             if (files[i].attr & ATTR_DIRECTORY)
             {
-                result = check_subdir_for_music(dir, files[i].name);
+                result = check_subdir_for_music(dir, files[i].name, true);
                 if (!result)
                     break;
             }
@@ -1675,7 +1674,6 @@ static int check_subdir_for_music(char *dir, char *subdir)
             gui_syncsplash(HZ*2,
                 ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));        
     }
-
     return result;
 }
 
