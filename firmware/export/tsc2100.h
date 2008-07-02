@@ -131,9 +131,7 @@ void tsc2100_writereg(int page, int address, short value);
 #define TSAC5_ADDRESS       0x1e
 
 extern int tenthdb2master(int db);
-extern void audiohw_init(void);
 extern void audiohw_set_master_vol(int vol_l, int vol_r);
 extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
-extern void audiohw_mute(bool mute);
 
 #endif
