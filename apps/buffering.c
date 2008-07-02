@@ -1431,6 +1431,8 @@ void buffering_thread(void)
             if (filling) {
                 if (data_counters.remaining > 0 && BUF_USED < buffer_len)
                     filling = fill_buffer();
+                else if (data_counters.remaining == 0)
+                    filling = false;
             }
             else if (ev.id == SYS_TIMEOUT)
             {
