@@ -72,7 +72,7 @@ enum Detect::userlevel Detect::userPermissions(void)
     DWORD usersize = UNLEN;
     BOOL status;
     enum userlevel result;
-
+   
     status = GetUserNameW(userbuf, &usersize);
     if(!status)
         return ERR;
@@ -184,7 +184,7 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
 {
     QMap<uint32_t, QString> usbids;
     // usb pid detection
-#if defined(Q_OS_LINUX) | defined(Q_OS_MACX)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     usb_init();
     usb_find_busses();
     usb_find_devices();
@@ -200,8 +200,28 @@ QMap<uint32_t, QString> Detect::listUsbDevices(void)
             while(u) {
                 uint32_t id;
                 id = u->descriptor.idVendor << 16 | u->descriptor.idProduct;
-                // FIXME: until description is empty for now.
-                if(id) usbids.insert(id, QString(""));
+                // get identification strings
+                usb_dev_handle *dev;
+                QString name;
+                char string[256];
+                int res;
+                dev = usb_open(u);
+                if(dev) {
+                    if(u->descriptor.iManufacturer) {
+                        res = usb_get_string_simple(dev, u->descriptor.iManufacturer, string, sizeof(string));
+                        if(res > 0)
+                            name += QString::fromAscii(string) + " ";
+                    }
+                    if(u->descriptor.iProduct) {
+                        res = usb_get_string_simple(dev, u->descriptor.iProduct, string, sizeof(string));
+                        if(res > 0)
+                            name += QString::fromAscii(string);
+                    }
+                }
+                usb_close(dev);
+                if(name.isEmpty()) name = QObject::tr("(no description available)");
+
+                if(id) usbids.insert(id, name);
                 u = u->next;
             }
         }
