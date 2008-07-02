@@ -88,7 +88,11 @@ void lcd_stop_scroll(void)
 static bool line_overlaps_viewport(struct viewport *lines_vp, int line,
                                    struct viewport *othervp)
 {
+#ifdef HAVE_LCD_BITMAP
     int y = (font_get(lines_vp->font)->height*line) + lines_vp->y;
+#else
+    int y = lines_vp->y+line;
+#endif
     if (y < othervp->y || y > othervp->y + othervp->height)
         return false;
     else if ((lines_vp->x + lines_vp->width < othervp->x) ||
