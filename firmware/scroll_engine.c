@@ -84,25 +84,6 @@ void lcd_stop_scroll(void)
     lcd_scroll_info.lines = 0;
 }
 
-/* returns true if the 'line' in 'lines_vp' would scroll into 'othervp' */
-static bool line_overlaps_viewport(struct viewport *lines_vp, int line,
-                                   struct viewport *othervp)
-{
-#if 0
-#ifdef HAVE_LCD_BITMAP
-    int y = (font_get(lines_vp->font)->height*line) + lines_vp->y;
-#else
-    int y = lines_vp->y+line;
-#endif
-    if (y < othervp->y || y > othervp->y + othervp->height)
-        return false;
-    else if ((lines_vp->x + lines_vp->width < othervp->x) ||
-             (othervp->x + othervp->width < lines_vp->x))
-        return false;
-    return true;
-#endif
-    return false;
-}
 /* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
 void lcd_scroll_stop_line(struct viewport* current_vp, int y)
 {
@@ -110,11 +91,8 @@ void lcd_scroll_stop_line(struct viewport* current_vp, int y)
 
     while (i < lcd_scroll_info.lines)
     {
-        if (((lcd_scroll_info.scroll[i].vp == current_vp) && 
-                ((y < 0) || (lcd_scroll_info.scroll[i].y == y))) ||
-            ((lcd_scroll_info.scroll[i].vp != current_vp) &&
-                line_overlaps_viewport(lcd_scroll_info.scroll[i].vp, 
-                                   lcd_scroll_info.scroll[i].y, current_vp)))
+        if ((lcd_scroll_info.scroll[i].vp == current_vp) && 
+            ((y < 0) || (lcd_scroll_info.scroll[i].y == y)))
         {
             /* If i is not the last active line in the array, then move
                the last item to position i */
@@ -189,11 +167,8 @@ void lcd_remote_scroll_stop_line(struct viewport* current_vp, int y)
 
     while (i < lcd_remote_scroll_info.lines)
     {
-        if (((lcd_remote_scroll_info.scroll[i].vp == current_vp) && 
-                ((y < 0) || (lcd_remote_scroll_info.scroll[i].y == y))) ||
-            (((lcd_remote_scroll_info.scroll[i].vp != current_vp) &&
-                line_overlaps_viewport(lcd_scroll_info.scroll[i].vp, 
-                                   lcd_scroll_info.scroll[i].y, current_vp))))
+        if ((lcd_remote_scroll_info.scroll[i].vp == current_vp) && 
+            ((y < 0) || (lcd_remote_scroll_info.scroll[i].y == y)))
         {
             /* If i is not the last active line in the array, then move
                the last item to position i */

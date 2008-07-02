@@ -145,6 +145,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
         yn[i].display=&screens[i];
         yn[i].vp = &vp[i];
         viewport_set_defaults(yn[i].vp, i);
+        screens[i].stop_scroll();
         gui_yesno_draw(&(yn[i]));
     }
     while (result==-1)
