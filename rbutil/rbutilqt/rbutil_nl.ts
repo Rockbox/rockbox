@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="nl">
+<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -970,44 +971,44 @@ U moet uw speler in UMS modus plaatsen voor installatie.</translation>
         <translation>Mount punt is verkeerd!</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="226"/>
+        <location filename="install.cpp" line="216"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
         <translation>Dit is de meest recente Rockbox build. Een huidige build zal upgedatete worden elke keer een verandering is gemaakt. Laatste versie is  r%1 (%2).</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="230"/>
+        <location filename="install.cpp" line="220"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Pas op:&lt;/b&gt; Deze optie zal altijd een versie kopie downloaden. &lt;b&gt;Dt is de aanbevolen versie.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="233"/>
+        <location filename="install.cpp" line="223"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy.</source>
         <translation>&lt;b&gt;Pas op:&lt;/b&gt; Deze optie zal altijd een verse kopie downloaden.</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="242"/>
+        <location filename="install.cpp" line="232"/>
         <source>This is the last released version of Rockbox.</source>
         <translation>Dit is de laatst gereleasede versie van Rockbox.</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="248"/>
+        <location filename="install.cpp" line="238"/>
         <source>&lt;b&gt;Note:&lt;/b&gt;The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Pas op:&lt;/b&gt; De laatste gereleasede versie is %1. &lt;b&gt;Dit is de aanbevolen versie.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="260"/>
+        <location filename="install.cpp" line="250"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
         <translation>Deze worden elke dag automatisch gebouwd van de huidige ontwikkelings broncode. Deze heeft algemeen gezien meer features dan de laatst stabiele release maar kan minder stabiel zijn. Featuren kunnen regelmatig veranderen.</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="262"/>
+        <location filename="install.cpp" line="252"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;Pas op:&lt;/b&gt; gearchiveerde versie is r%1(%2).</translation>
     </message>
     <message>
         <location filename="install.cpp" line="127"/>
         <source>Device mismatch detected</source>
-        <translation>Verkeerd apparaat herkend</translation>
+        <translation type="obsolete">Verkeerd apparaat herkend</translation>
     </message>
     <message>
         <location filename="install.cpp" line="131"/>
@@ -1017,7 +1018,7 @@ Installed Rockbox is for Device: %1.
 New Rockbox is for Device: %2.
 
 Do you want to continue?</source>
-        <translation>Verkeerd apparaat herkend.
+        <translation type="obsolete">Verkeerd apparaat herkend.
 
 Geïnstalleerde Rockbox voor dit apparaat is: %1.
 Nieuwe Rockbox voor dit apparaat is: %2.
@@ -1025,22 +1026,22 @@ Nieuwe Rockbox voor dit apparaat is: %2.
 Wilt u verdergaan?</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="134"/>
+        <location filename="install.cpp" line="126"/>
         <source>Aborted!</source>
         <translation>Afgebroken!</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="144"/>
+        <location filename="install.cpp" line="134"/>
         <source>Beginning Backup...</source>
         <translation>Backup wordt gestart...</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="159"/>
+        <location filename="install.cpp" line="149"/>
         <source>Backup successfull</source>
         <translation>Backup is succesvol beëindigd</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="163"/>
+        <location filename="install.cpp" line="153"/>
         <source>Backup failed!</source>
         <translation>Backup mislukt!</translation>
     </message>
@@ -1333,24 +1334,66 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>QObject</name>
     <message>
-        <location filename="utils.cpp" line="266"/>
+        <location filename="detect.cpp" line="110"/>
         <source>Guest</source>
         <translation>Gast</translation>
     </message>
     <message>
-        <location filename="utils.cpp" line="269"/>
+        <location filename="detect.cpp" line="113"/>
         <source>Admin</source>
         <translation>Hoofdgebruiker</translation>
     </message>
     <message>
-        <location filename="utils.cpp" line="272"/>
+        <location filename="detect.cpp" line="116"/>
         <source>User</source>
         <translation>Gebruiker</translation>
     </message>
     <message>
-        <location filename="utils.cpp" line="275"/>
+        <location filename="detect.cpp" line="119"/>
         <source>Error</source>
         <translation>Fout</translation>
+    </message>
+    <message>
+        <location filename="detect.cpp" line="222"/>
+        <source>(no description available)</source>
+        <translation>(geen beschrijving beschikbaar)</translation>
+    </message>
+    <message>
+        <location filename="detect.cpp" line="414"/>
+        <source>Permissions are not sufficient! 
+ Run with admin rights. 
+
+</source>
+        <translation>U hebt niet voldoende machtigingen!
+Start met hoofdgebruiker rechten.
+</translation>
+    </message>
+    <message>
+        <location filename="detect.cpp" line="427"/>
+        <source>Target mismatch detected. 
+
+Installed target: %1.
+New Target: %2.
+
+</source>
+        <translation>Verkeerd apparaat herkend.
+
+Geïnstalleerde apparaat is: %1.
+Nieuw apparaat is: %2.
+
+</translation>
+    </message>
+    <message>
+        <location filename="detect.cpp" line="435"/>
+        <source>
+ Do you want to continue ?</source>
+        <translation>
+Wilt u verdergaan ?</translation>
+    </message>
+    <message>
+        <location filename="detect.cpp" line="436"/>
+        <source>Problems detected</source>
+        <translation>Problemen gevonden</translation>
     </message>
 </context>
 <context>
@@ -1444,7 +1487,7 @@ p, li { white-space: pre-wrap; }
         <translation>&lt;a href=&apos;%1&apos;&gt;Handboek overzicht&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="745"/>
+        <location filename="rbutilqt.cpp" line="730"/>
         <source>Confirm Installation</source>
         <translation>Bevestig Installatie</translation>
     </message>
@@ -1454,7 +1497,7 @@ p, li { white-space: pre-wrap; }
         <translation>Wilt u zeker een complete installatie doen?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="914"/>
+        <location filename="rbutilqt.cpp" line="899"/>
         <source>Mount point is wrong!</source>
         <translation>Mount punt is verkeerd!</translation>
     </message>
@@ -1464,17 +1507,17 @@ p, li { white-space: pre-wrap; }
         <translation>Wilt u zeker een kleine installatie doen?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="581"/>
+        <location filename="rbutilqt.cpp" line="566"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>Wilt u zeker de Bootloader installeren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="842"/>
+        <location filename="rbutilqt.cpp" line="827"/>
         <source>Could not get the bootloader info file!</source>
         <translation>Kon het bootloader- info bestand niet vinden!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="615"/>
+        <location filename="rbutilqt.cpp" line="600"/>
         <source>Bootloader Installation</source>
         <translation>Bootloader installatie</translation>
     </message>
@@ -1486,82 +1529,82 @@ Do really want to install it?</source>
 Voulez-vous vraiment l&apos;installer ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="640"/>
+        <location filename="rbutilqt.cpp" line="625"/>
         <source>Original Firmware Path is wrong!</source>
         <translation>Oorspronkelijk Firmware pad is verkeerd!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="653"/>
+        <location filename="rbutilqt.cpp" line="638"/>
         <source>Original Firmware selection Canceled!</source>
         <translation>Oorspronkelijke Firmware selectie afgebroken!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="668"/>
+        <location filename="rbutilqt.cpp" line="653"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Wilt u zeker het lettertypen pakket installeren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="712"/>
+        <location filename="rbutilqt.cpp" line="697"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Wilt u zeker de spraakbestanden?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="746"/>
+        <location filename="rbutilqt.cpp" line="731"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Wilt u zeker de spelletjes addon bestanden installeren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="826"/>
+        <location filename="rbutilqt.cpp" line="811"/>
         <source>Confirm Uninstallation</source>
         <translation>Bevestig Deïnstallatie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="827"/>
+        <location filename="rbutilqt.cpp" line="812"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Wilt u zeker de Bootloader deïnstalleren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="855"/>
+        <location filename="rbutilqt.cpp" line="840"/>
         <source>Confirm download</source>
         <translation>Bevestig download</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="857"/>
+        <location filename="rbutilqt.cpp" line="842"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Wilt u zeker het handboek downloaden? Dit handboek zal opgeslagen worden in de hoofdmap van uw speler.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="900"/>
+        <location filename="rbutilqt.cpp" line="885"/>
         <source>Confirm installation</source>
         <translation>Bevestig installatie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="902"/>
+        <location filename="rbutilqt.cpp" line="887"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Wilt u zeker Rockbox Utility installeren op uw speler? Na installatie kan u het opstarten van uw speler zijn harde schijf.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="910"/>
+        <location filename="rbutilqt.cpp" line="895"/>
         <source>Installing Rockbox Utility</source>
         <translation>Bezig met installeren van Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="924"/>
+        <location filename="rbutilqt.cpp" line="909"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Fout tijdens installeren van Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="928"/>
+        <location filename="rbutilqt.cpp" line="913"/>
         <source>Installing user configuration</source>
         <translation>Bezig met installeren van gebruikerconfiguratie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="930"/>
+        <location filename="rbutilqt.cpp" line="915"/>
         <source>Error installing user configuration</source>
         <translation>Fout tijdens installeren van gebruikersconfiguratie</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="934"/>
+        <location filename="rbutilqt.cpp" line="919"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox Utility is succesvol geïnstalleerd.</translation>
     </message>
@@ -1571,7 +1614,7 @@ Voulez-vous vraiment l&apos;installer ?</translation>
         <translation type="obsolete">Etape d&apos;instllation du bootloader sautée !</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1025"/>
+        <location filename="rbutilqt.cpp" line="1010"/>
         <source>Configuration error</source>
         <translation>Configuratie fout</translation>
     </message>
@@ -1581,29 +1624,29 @@ Voulez-vous vraiment l&apos;installer ?</translation>
         <translation type="obsolete">Uw configuratie is ongeldig. Dit is waarschijnlijk door een nieuwe installatie van Rockbox Utility of een veranderd apparaats pad. Het configuratie scherm zal nu openen zodat u de fout kan herstellen.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="741"/>
+        <location filename="rbutilqt.cpp" line="726"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="741"/>
+        <location filename="rbutilqt.cpp" line="726"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Uw apparaat heeft de Doom plugin niet. Installatie wordt afgebroken.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1027"/>
+        <location filename="rbutilqt.cpp" line="1012"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Uw configuratie is ongeldig. Gelieve naar het configuratie scherm te gaan en de juiste instellingen te gebruiken.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="617"/>
+        <location filename="rbutilqt.cpp" line="602"/>
         <source>The bootloader is already installed and up to date.
 Do want to replace the current bootloader?</source>
         <translation>De bootloader is alreeds geïnstalleerd en up to date.
 Wilt u de huidige bootloader vervangen?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="621"/>
+        <location filename="rbutilqt.cpp" line="606"/>
         <source>Bootloader installation skipped!</source>
         <translation>Bootloader installatie overgeslagen!</translation>
     </message>
@@ -1615,7 +1658,7 @@ Wilt u de huidige bootloader vervangen?</translation>
     <message>
         <location filename="rbutilqt.cpp" line="482"/>
         <source>Target mismatch detected</source>
-        <translation>Verkeerd apparaat herkend</translation>
+        <translation type="obsolete">Verkeerd apparaat herkend</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="486"/>
@@ -1625,52 +1668,57 @@ Installed target: %1.
 New Target: %2.
 
 Do you want to continue?</source>
-        <translation>Verkeerd apparaat herkend.
+        <translation type="obsolete">Verkeerd apparaat herkend.
 
 Geïnstalleerde apparaat is: %1.
-Nieuwe apparaat is: %2.
+Nieuw apparaat is: %2.
 
 Wilt u verdergaan?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="489"/>
+        <location filename="rbutilqt.cpp" line="482"/>
         <source>Aborted!</source>
         <translation>Afgebroken!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="498"/>
+        <location filename="rbutilqt.cpp" line="490"/>
         <source>Installed Rockbox detected</source>
         <translation>Geïnstalleerde Rockbox herkend</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="499"/>
+        <location filename="rbutilqt.cpp" line="491"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Rockbox installatie herkend. Wilt u eerst een backup maken?</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="502"/>
         <source>Beginning Backup...</source>
-        <translation>Backup wordt gestart...</translation>
+        <translation type="obsolete">Backup wordt gestart...</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="518"/>
+        <location filename="rbutilqt.cpp" line="510"/>
         <source>Backup successfull</source>
         <translation>Backup is succesvol beëindigd!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="522"/>
+        <location filename="rbutilqt.cpp" line="514"/>
         <source>Backup failed!</source>
         <translation>Backup mislukt!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="706"/>
+        <location filename="rbutilqt.cpp" line="691"/>
         <source>Warning</source>
         <translation>Waarschuwing</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="707"/>
+        <location filename="rbutilqt.cpp" line="692"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>Deze applicatie is nog steeds bezig met informatie te downloaden over nieuwe Builds. Gelieve binnen een korte periode opnieuw te proberen.</translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="494"/>
+        <source>Starting backup...</source>
+        <translation>Backup wordt gestart...</translation>
     </message>
 </context>
 <context>
@@ -2369,29 +2417,29 @@ e File</source>
 <context>
     <name>Sysinfo</name>
     <message>
-        <location filename="sysinfo.cpp" line="40"/>
+        <location filename="sysinfo.cpp" line="39"/>
         <source>&lt;b&gt;OS&lt;/b&gt;&lt;br/&gt;</source>
         <translation>&lt;b&gt;OS&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="sysinfo.cpp" line="41"/>
+        <location filename="sysinfo.cpp" line="40"/>
         <source>&lt;b&gt;Username:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Gebruikersnaam:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="sysinfo.cpp" line="43"/>
+        <location filename="sysinfo.cpp" line="42"/>
         <source>&lt;b&gt;Permissions:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Toelatingen:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="sysinfo.cpp" line="45"/>
+        <location filename="sysinfo.cpp" line="44"/>
         <source>&lt;b&gt;Attached USB devices:&lt;/b&gt;&lt;br/&gt;</source>
         <translation>&lt;b&gt;Aangesloten USB apparaten:&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="49"/>
-        <source>VID: %1 PID: %2&lt;br/&gt;</source>
-        <translation>VID: %1 PID: %2&lt;br/&gt;</translation>
+        <source>VID: %1 PID: %2, %3&lt;br/&gt;</source>
+        <translation>VID: %1 PID: %2, %3&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -2876,7 +2924,7 @@ Gelieve uw netwerk en proxy instellingen te bekijken.</translation>
         <translation>Fout bij openen van output bestand</translation>
     </message>
     <message>
-        <location filename="voicefile.cpp" line="292"/>
+        <location filename="voicefile.cpp" line="299"/>
         <source>successfully created.</source>
         <translation>succesvol gecreëerd.</translation>
     </message>

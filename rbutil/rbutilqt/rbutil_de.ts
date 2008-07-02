@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="de">
-<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -180,6 +179,7 @@
         <translation>Unbekannte Versionsnummer in Firmware (%1)</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod</source>
         <translation type="obsolete">Warnung, dies ist ein MacPod, Rockbox funktioniert damit nicht. Konvertiere das Gerät zu einem WinPod</translation>
     </message>
@@ -234,6 +234,7 @@
         <translation>Konnte Sansa nicht öffnen </translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Disk is not an E200 (%1), aborting.</source>
         <translation type="obsolete">Dies ist kein E200 (%1), Fehler.</translation>
     </message>
@@ -522,6 +523,7 @@ Select your device and Mountpoint manually.</source>
 Bitte Gerät und den Einhängepunt manuell auswählen.</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Current cache size is %1 kiB.</source>
         <translation type="obsolete">Aktuelle Cachegröße ist %1 kiB.</translation>
     </message>
@@ -763,10 +765,12 @@ You need to change your player to UMS mode for installation. </source>
         <translation>TTS Engine</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Select TTS profile</source>
         <translation type="obsolete">TTS-Profil au&amp;swählen</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>TTS Options</source>
         <translation type="obsolete">TTS-Optionen</translation>
     </message>
@@ -776,10 +780,12 @@ You need to change your player to UMS mode for installation. </source>
         <translation>Encoder</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Select &amp;encoder profile</source>
         <translation type="obsolete">&amp;Encoder-Profil auswählen</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>B&amp;rowse</source>
         <translation type="obsolete">&amp;Durchsuchen</translation>
     </message>
@@ -949,44 +955,44 @@ You need to change your player to UMS mode for installation. </source>
         <translation>Falscher Einhängepunkt!</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="230"/>
+        <location filename="install.cpp" line="220"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Hinweis:&lt;/b&gt; Dies lädt immer eine aktuelle Kopie herunter. &lt;b&gt;Dies ist die empfohlene Version.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="233"/>
+        <location filename="install.cpp" line="223"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; This option will always download a fresh copy.</source>
         <translation>&lt;b&gt;Hinweis:&lt;/b&gt; Dies lädt immer eine aktuelle Kopie herunter. </translation>
     </message>
     <message>
-        <location filename="install.cpp" line="242"/>
+        <location filename="install.cpp" line="232"/>
         <source>This is the last released version of Rockbox.</source>
         <translation>Dies ist die letzte veröffentlichte Version von Rockbox.</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="248"/>
+        <location filename="install.cpp" line="238"/>
         <source>&lt;b&gt;Note:&lt;/b&gt;The lastest released version is %1. &lt;b&gt;This is the recommended version.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Hinweis:&lt;/b&gt; Die letzte veröffentlichte Version ist %1. &lt;b&gt;Dies ist die empfohlene Version.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="226"/>
+        <location filename="install.cpp" line="216"/>
         <source>This is the absolute up to the minute Rockbox built. A current build will get updated every time a change is made. Latest version is r%1 (%2).</source>
         <translation>Dies ist das aktuellste Rockbox build. Es wird bei jeder Änderung upgedated. Letzte Version ist r%1 (%2).</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="262"/>
+        <location filename="install.cpp" line="252"/>
         <source>&lt;b&gt;Note:&lt;/b&gt; archived version is r%1 (%2).</source>
         <translation>&lt;b&gt;Hinweis:&lt;/b&gt; Archivierte Version ist r%1 (%2).</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="260"/>
+        <location filename="install.cpp" line="250"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
         <translation>Diese Builds werden jeden Tag automatisch aus dem aktuellen Source Code gebaut. Sie haben meist mehr Features als das letzte stabile Release können aber weniger Stabil sein. Features können sich häufig verändern.</translation>
     </message>
     <message>
         <location filename="install.cpp" line="127"/>
         <source>Device mismatch detected</source>
-        <translation>Geräte Inkompatiblität erkannt</translation>
+        <translation type="obsolete">Geräte Inkompatiblität erkannt</translation>
     </message>
     <message>
         <location filename="install.cpp" line="131"/>
@@ -996,25 +1002,25 @@ Installed Rockbox is for Device: %1.
 New Rockbox is for Device: %2.
 
 Do you want to continue?</source>
-        <translation>Geräte inkompatibilität erkannt.Installiertes Rockbox ist für Gerät: %1.Neues Rockbox its für Gerät: %2.Wollen sie fortfahren ?</translation>
+        <translation type="obsolete">Geräte inkompatibilität erkannt.Installiertes Rockbox ist für Gerät: %1.Neues Rockbox its für Gerät: %2.Wollen sie fortfahren ?</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="134"/>
+        <location filename="install.cpp" line="126"/>
         <source>Aborted!</source>
         <translation>Abgebrochen!</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="144"/>
+        <location filename="install.cpp" line="134"/>
         <source>Beginning Backup...</source>
         <translation>Erstelle Backup...</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="159"/>
+        <location filename="install.cpp" line="149"/>
         <source>Backup successfull</source>
         <translation>Backup erfolgreich</translation>
     </message>
     <message>
-        <location filename="install.cpp" line="163"/>
+        <location filename="install.cpp" line="153"/>
         <source>Backup failed!</source>
         <translation>Backup fehlgeschlagen!</translation>
     </message>
@@ -1077,6 +1083,7 @@ Do you want to continue?</source>
         <translation>&amp;keine lokale Zwischenkopie verwenden</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Ok</source>
         <translation type="obsolete">&amp;Ok</translation>
     </message>
@@ -1176,6 +1183,7 @@ p, li { white-space: pre-wrap; }
         <translation>Dateiendungen entfernen</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Ok</source>
         <translation type="obsolete">&amp;Ok</translation>
     </message>
@@ -1233,18 +1241,22 @@ p, li { white-space: pre-wrap; }
         <translation>Der Ordner für den Talk Dateien erzeugt werden sollen ist falsch!</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>TTS Profile: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="obsolete">TTS-Profil: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Invalid TTS profile!</source>
         <translation type="obsolete">Ungültiges TTS-Profil!</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Encoder Profile: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="obsolete">Encoder-Profil: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Invalid encoder profile!</source>
         <translation type="obsolete">Ungültiges Encoder-Profil!</translation>
     </message>
@@ -1301,24 +1313,58 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>QObject</name>
     <message>
-        <location filename="utils.cpp" line="266"/>
+        <location filename="detect.cpp" line="110"/>
         <source>Guest</source>
         <translation>Gast</translation>
     </message>
     <message>
-        <location filename="utils.cpp" line="269"/>
+        <location filename="detect.cpp" line="113"/>
         <source>Admin</source>
         <translation>Admin</translation>
     </message>
     <message>
-        <location filename="utils.cpp" line="272"/>
+        <location filename="detect.cpp" line="116"/>
         <source>User</source>
         <translation>Benutzer</translation>
     </message>
     <message>
-        <location filename="utils.cpp" line="275"/>
+        <location filename="detect.cpp" line="119"/>
         <source>Error</source>
         <translation>Fehler</translation>
+    </message>
+    <message>
+        <location filename="detect.cpp" line="222"/>
+        <source>(no description available)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="detect.cpp" line="414"/>
+        <source>Permissions are not sufficient! 
+ Run with admin rights. 
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="detect.cpp" line="427"/>
+        <source>Target mismatch detected. 
+
+Installed target: %1.
+New Target: %2.
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="detect.cpp" line="435"/>
+        <source>
+ Do you want to continue ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="detect.cpp" line="436"/>
+        <source>Problems detected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1402,97 +1448,97 @@ p, li { white-space: pre-wrap; }
         <translation>&lt;a href=&apos;%1&apos;&gt;Anleitungen-Übersicht&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="745"/>
+        <location filename="rbutilqt.cpp" line="730"/>
         <source>Confirm Installation</source>
         <translation>Installation bestätigen</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="581"/>
+        <location filename="rbutilqt.cpp" line="566"/>
         <source>Do you really want to install the Bootloader?</source>
         <translation>Bootloader wirklich installieren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="640"/>
+        <location filename="rbutilqt.cpp" line="625"/>
         <source>Original Firmware Path is wrong!</source>
         <translation>Pfad zur Original-Firmware ist falsch!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="653"/>
+        <location filename="rbutilqt.cpp" line="638"/>
         <source>Original Firmware selection Canceled!</source>
         <translation>Auswahl der Original-Firmware abgebrochen!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="668"/>
+        <location filename="rbutilqt.cpp" line="653"/>
         <source>Do you really want to install the fonts package?</source>
         <translation>Schriftarten-Paket wirklich installieren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="712"/>
+        <location filename="rbutilqt.cpp" line="697"/>
         <source>Do you really want to install the voice file?</source>
         <translation>Sprachdateien wirklich installieren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="746"/>
+        <location filename="rbutilqt.cpp" line="731"/>
         <source>Do you really want to install the game addon files?</source>
         <translation>Zusatzdateien für Spiele wirklich installieren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="826"/>
+        <location filename="rbutilqt.cpp" line="811"/>
         <source>Confirm Uninstallation</source>
         <translation>Deinstallation bestätigen</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="827"/>
+        <location filename="rbutilqt.cpp" line="812"/>
         <source>Do you really want to uninstall the Bootloader?</source>
         <translation>Bootloader wirklich deinstallieren?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="855"/>
+        <location filename="rbutilqt.cpp" line="840"/>
         <source>Confirm download</source>
         <translation>Download bestätigen</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="857"/>
+        <location filename="rbutilqt.cpp" line="842"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
         <translation>Handbuch wirklich herunterladen? Das Handbuch wird im Wurzelordner des Geräts gespeichert.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="900"/>
+        <location filename="rbutilqt.cpp" line="885"/>
         <source>Confirm installation</source>
         <translation>Installation bestätigen</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="902"/>
+        <location filename="rbutilqt.cpp" line="887"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Rockbox Utility wirklich auf dem Gerät installieren? Nach der Installation kann es von dem Laufwerk des Geräts ausgeführt werden.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="910"/>
+        <location filename="rbutilqt.cpp" line="895"/>
         <source>Installing Rockbox Utility</source>
         <translation>Installiere Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="914"/>
+        <location filename="rbutilqt.cpp" line="899"/>
         <source>Mount point is wrong!</source>
         <translation>Falscher Einhängepunkt!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="924"/>
+        <location filename="rbutilqt.cpp" line="909"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Fehler beim installieren von Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="928"/>
+        <location filename="rbutilqt.cpp" line="913"/>
         <source>Installing user configuration</source>
         <translation>Installiere Benutzerkonfiguration</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="930"/>
+        <location filename="rbutilqt.cpp" line="915"/>
         <source>Error installing user configuration</source>
         <translation>Fehler beim installieren der Benutzerkonfiguration</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="934"/>
+        <location filename="rbutilqt.cpp" line="919"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox Utility erfolgreich installiert.</translation>
     </message>
@@ -1517,31 +1563,34 @@ p, li { white-space: pre-wrap; }
         <translation>Wirklich eine kleine Installation durchführen?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="842"/>
+        <location filename="rbutilqt.cpp" line="827"/>
         <source>Could not get the bootloader info file!</source>
         <translation>Konnte Bootloader-Informationsdatei nicht herunterladen!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="615"/>
+        <location filename="rbutilqt.cpp" line="600"/>
         <source>Bootloader Installation</source>
         <translation>Bootloader-Installation</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>It seem your Bootloader is already uptodate.
 Do really want to install it?</source>
         <translation type="obsolete">Der Bootloader scheint aktuell zu sein
 Trotzdem installieren?</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Bootloader installation Canceled!</source>
         <translation type="obsolete">Bootloader-Installation abgebrochen!</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Bootloader installation Skipped!</source>
         <translation type="obsolete">Bootloader-Installation übersprungen!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1025"/>
+        <location filename="rbutilqt.cpp" line="1010"/>
         <source>Configuration error</source>
         <translation>Konfigurationsfehler</translation>
     </message>
@@ -1551,29 +1600,29 @@ Trotzdem installieren?</translation>
         <translation type="obsolete">Deine Konfiguration ist ungültig. Dies liegt wahrscheinlich daran das Rockbox Utillity das erste mal gestartet wird, oder an geänderten Pfaden. Der Konfigurationsdialog wird sich nun öffnen damit sie das Problem korrigieren können. </translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="617"/>
+        <location filename="rbutilqt.cpp" line="602"/>
         <source>The bootloader is already installed and up to date.
 Do want to replace the current bootloader?</source>
         <translation>Der Bootloader ist schon installiert und aktuell.
 Wollen sie wircklich den Bootloader ersetzen ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="621"/>
+        <location filename="rbutilqt.cpp" line="606"/>
         <source>Bootloader installation skipped!</source>
         <translation>Bootloader installation übersprungen!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="741"/>
+        <location filename="rbutilqt.cpp" line="726"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="741"/>
+        <location filename="rbutilqt.cpp" line="726"/>
         <source>Your device doesn&apos;t have a doom plugin. Aborting.</source>
         <translation>Für dein Gerät existiert kein Doom plugin. Breche Installation ab.</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="1027"/>
+        <location filename="rbutilqt.cpp" line="1012"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Deine Konfiguration ist ungültig. Bitte gehe in den Konfigurationsdialog und stelle sicher das die Einstellungen korrekt sind.</translation>
     </message>
@@ -1585,7 +1634,7 @@ Wollen sie wircklich den Bootloader ersetzen ?</translation>
     <message>
         <location filename="rbutilqt.cpp" line="482"/>
         <source>Target mismatch detected</source>
-        <translation>Geräte Inkompatiblität erkannt</translation>
+        <translation type="obsolete">Geräte Inkompatiblität erkannt</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="486"/>
@@ -1595,47 +1644,52 @@ Installed target: %1.
 New Target: %2.
 
 Do you want to continue?</source>
-        <translation>Geräte inkompatibilität erkannt.Installiertes Rockbox ist für Gerät: %1.Neues Rockbox its für Gerät: %2.Wollen sie fortfahren ?</translation>
+        <translation type="obsolete">Geräte inkompatibilität erkannt.Installiertes Rockbox ist für Gerät: %1.Neues Rockbox its für Gerät: %2.Wollen sie fortfahren ?</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="489"/>
+        <location filename="rbutilqt.cpp" line="482"/>
         <source>Aborted!</source>
         <translation>Abgebrochen!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="498"/>
+        <location filename="rbutilqt.cpp" line="490"/>
         <source>Installed Rockbox detected</source>
         <translation>Installiertes Rockbox erkannt</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="499"/>
+        <location filename="rbutilqt.cpp" line="491"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
         <translation>Installiertes Rockbox erkannt. Wollen sie ein Backup durchführen ?</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="502"/>
         <source>Beginning Backup...</source>
-        <translation>Erstelle Backup...</translation>
+        <translation type="obsolete">Erstelle Backup...</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="518"/>
+        <location filename="rbutilqt.cpp" line="510"/>
         <source>Backup successfull</source>
         <translation>Backup erfolgreich</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="522"/>
+        <location filename="rbutilqt.cpp" line="514"/>
         <source>Backup failed!</source>
         <translation>Backup fehlgeschlagen!</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="706"/>
+        <location filename="rbutilqt.cpp" line="691"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="rbutilqt.cpp" line="707"/>
+        <location filename="rbutilqt.cpp" line="692"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
         <translation>Das Progamm läd noch Informationen über neue Builds. Bitte versuchen nach einer kurzen Zeit nochmal.</translation>
+    </message>
+    <message>
+        <location filename="rbutilqt.cpp" line="494"/>
+        <source>Starting backup...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1651,6 +1705,7 @@ Do you want to continue?</source>
         <translation>&amp;Schnellstart</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>...</source>
         <translation type="obsolete">...</translation>
     </message>
@@ -2210,29 +2265,29 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>Sysinfo</name>
     <message>
-        <location filename="sysinfo.cpp" line="40"/>
+        <location filename="sysinfo.cpp" line="39"/>
         <source>&lt;b&gt;OS&lt;/b&gt;&lt;br/&gt;</source>
         <translation>&lt;b&gt;Betriebssystem&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="sysinfo.cpp" line="41"/>
+        <location filename="sysinfo.cpp" line="40"/>
         <source>&lt;b&gt;Username:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Benutzername:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="sysinfo.cpp" line="43"/>
+        <location filename="sysinfo.cpp" line="42"/>
         <source>&lt;b&gt;Permissions:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Rechte:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="sysinfo.cpp" line="45"/>
+        <location filename="sysinfo.cpp" line="44"/>
         <source>&lt;b&gt;Attached USB devices:&lt;/b&gt;&lt;br/&gt;</source>
         <translation>&lt;b&gt;Angeschlossene USB Geräte:&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="49"/>
-        <source>VID: %1 PID: %2&lt;br/&gt;</source>
-        <translation>VID: %1 PID: %2&lt;br/&gt;</translation>
+        <source>VID: %1 PID: %2, %3&lt;br/&gt;</source>
+        <translation type="unfinished">VID: %1 PID: %2&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -2388,6 +2443,7 @@ p, li { white-space: pre-wrap; }
         <translation>Downloadgröße:</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Ok</source>
         <translation type="obsolete">&amp;Ok</translation>
     </message>
@@ -2444,6 +2500,7 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
         <translation>hole Vorschau ...</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>Download size %1 kiB</source>
         <translation type="obsolete">Downloadgröße: %1 kiB</translation>
     </message>
@@ -2619,6 +2676,7 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
         <translation>Installierte Teile</translation>
     </message>
     <message>
+        <location filename="" line="0"/>
         <source>&amp;Ok</source>
         <translation type="obsolete">&amp;Ok</translation>
     </message>
@@ -2729,7 +2787,7 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
         <translation>Konnte die Ausgabedatei nicht öffnen</translation>
     </message>
     <message>
-        <location filename="voicefile.cpp" line="292"/>
+        <location filename="voicefile.cpp" line="299"/>
         <source>successfully created.</source>
         <translation>erfolgreich erstellt.</translation>
     </message>
