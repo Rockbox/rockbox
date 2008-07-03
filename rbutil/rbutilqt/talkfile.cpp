@@ -75,6 +75,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
             m_logger->addItem(tr("Talk file creation aborted"),LOGERROR);
             m_logger->abort();
             m_tts->stop();
+            m_enc->stop();
             return false;
         }
 
@@ -183,6 +184,7 @@ bool TalkFileCreator::createTalkFiles(ProgressloggerInterface* logger)
 
     installlog.endGroup();
     m_tts->stop();
+    m_enc->stop();
     m_logger->addItem(tr("Finished creating Talk files"),LOGOK);
     m_logger->setProgressMax(1);
     m_logger->setProgressValue(1);
