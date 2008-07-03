@@ -199,7 +199,7 @@ int upload_app(usb_dev_handle* dh, int address, unsigned char* p, int len, bool 
     free(tmp_buf);
 
     fprintf(stderr, "[INFO] Booting device [STAGE%d]...", (stage2 ? 2 : 1));
-    SEND_COMMAND((stage2 ? VR_PROGRAM_START2 : VR_PROGRAM_START1), (address+(stage2 ? 8 : 0)) );
+    SEND_COMMAND((stage2 ? VR_PROGRAM_START2 : VR_PROGRAM_START1), address );
     fprintf(stderr, " Done!\n");
     
     return 0;

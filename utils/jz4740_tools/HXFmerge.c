@@ -1,6 +1,23 @@
-/*
-Made by Maurus Cuelenaere
-*/
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2008 by Maurus Cuelenaere
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,8 +59,8 @@ static unsigned int le2int(unsigned char* buf)
 #define MIN(a, b) (a > b ? b : a)
 static char* replace(char* str)
 {
-    char tmp[255];
-    memcpy(tmp, str, MIN(strlen(str), 255);
+    static char tmp[255];
+    memcpy(tmp, str, MIN(strlen(str), 255));
     char *ptr = tmp;
     while(*ptr != 0)
     {
@@ -156,19 +173,32 @@ static void merge_hxf(const char* indir, FILE* outfile, const char* add)
                 
                 if(strlen(add)>0)
                 {
+#ifdef _DIRENT_HAVE_D_NAMLEN
                     WRITE(int2le(dirs->d_namlen+strlen(add)), 4);
+#else
+                    WRITE(int2le(strlen(dirs->d_name)+strlen(add)), 4);
+#endif
 #ifndef _WIN32
-                    WRITE(replace(add), strlen(add)-1);
+                    WRITE(replace(&add), strlen(add)-1);
 #else
                     WRITE(add, strlen(add)-1);
 #endif
                     WRITE(PATH_SEPARATOR, 1);
+#ifdef _DIRENT_HAVE_D_NAMLEN
                     WRITE(dirs->d_name, dirs->d_namlen);
+#else
+                    WRITE(dirs->d_name, strlen(dirs->d_name));
+#endif
                 }
                 else
                 {
+#ifdef _DIRENT_HAVE_D_NAMLEN
                     WRITE(int2le(dirs->d_namlen), 4);
                     WRITE(dirs->d_name, dirs->d_namlen);
+#else
+                    WRITE(int2le(strlen(dirs->d_name)), 4);
+                    WRITE(dirs->d_name, strlen(dirs->d_name));
+#endif
                 }
                 WRITE(int2le(filesize), 4);
                 if(filesize>0)
