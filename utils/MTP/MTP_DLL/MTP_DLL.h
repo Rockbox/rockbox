@@ -9,3 +9,7 @@
 #else
 #define MTP_DLL_API __declspec(dllimport)
 #endif
+
+extern "C" {
+__declspec(dllexport) bool send_fw(LPWSTR file, int filesize);
+}

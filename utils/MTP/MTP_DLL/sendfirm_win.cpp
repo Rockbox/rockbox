@@ -20,7 +20,7 @@
  * Link to "mssachlp.lib"
  *
  */
-
+extern "C" {
 __declspec(dllexport) bool send_fw(LPWSTR file, int filesize)
 {
     bool return_value = false;
@@ -157,6 +157,7 @@ __declspec(dllexport) bool send_fw(LPWSTR file, int filesize)
 	CoUninitialize();
 
 	return return_value;
+}
 }
 
 /*

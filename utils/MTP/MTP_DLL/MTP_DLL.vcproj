@@ -140,7 +140,7 @@
 				AdditionalDependencies="mssachlp.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="d:\wmsdk\wmfsdk95\lib,d:\wmsdk\wmfsdk95\wmdm\lib"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
