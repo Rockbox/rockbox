@@ -1335,7 +1335,7 @@ int peak_meter_draw_get_btn(int action_context, int x, int y[],
     long next_refresh = current_tick;
     long next_big_refresh = current_tick + HZ / 10;
     int i;
-#if (CONFIG_CODEC == SWCODEC) || defined(SIMULATOR)
+#if (CONFIG_CODEC == SWCODEC)
     bool highperf = false;
 #else
     /* On MAS targets, we need to poll as often as possible in order to not

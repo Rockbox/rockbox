@@ -364,9 +364,7 @@ struct plugin_api {
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
     void (*ata_sleep)(void);
-#ifndef SIMULATOR
     bool (*ata_disk_is_active)(void);
-#endif
     void (*ata_spin)(void);
     void (*ata_spindown)(int seconds);
     void (*reload_directory)(void);

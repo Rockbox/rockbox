@@ -292,11 +292,7 @@ static bool read_peak_levels(int *peak_l, int *peak_r, int *balance)
     peak_valid_mem[peak_time % 3] = *peak_l;
     if (((peak_valid_mem[0] == peak_valid_mem[1]) &&
          (peak_valid_mem[1] == peak_valid_mem[2])) &&
-        ((*peak_l < 32767)
-#ifndef SIMULATOR
-         || ata_disk_is_active()
-#endif
-         ))
+        ((*peak_l < 32767) || ata_disk_is_active()))
             return false;
 
     if (*peak_r > *peak_l)

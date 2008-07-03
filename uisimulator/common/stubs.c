@@ -33,6 +33,7 @@
 #include "ata.h" /* for volume definitions */
 
 extern char having_new_lcd;
+static bool ata_spinning = false;
 
 #if CONFIG_CODEC != SWCODEC
 void audio_set_buffer_margin(int seconds)
@@ -108,6 +109,7 @@ void ata_flush(void)
 
 void ata_spin(void)
 {
+    ata_spinning = true;
 }
 
 void ata_sleep(void)
@@ -115,9 +117,15 @@ void ata_sleep(void)
     DEBUGF("ata_sleep()\n");
 }
 
+bool ata_disk_is_active(void)
+{
+    return ata_spinning;
+}
+
 void ata_spindown(int s)
 {
     (void)s;
+    ata_spinning = false;
 }
 
 void rtc_init(void)
