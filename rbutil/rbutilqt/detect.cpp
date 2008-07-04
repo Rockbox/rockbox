@@ -159,7 +159,11 @@ QString Detect::osVersionString(void)
     GetVersionEx(&osvi);
 
     result = QString("Windows version %1.%2, ").arg(osvi.dwMajorVersion).arg(osvi.dwMinorVersion);
-    result += QString("build %1 (%2)").arg(osvi.dwBuildNumber).arg(QString::fromWCharArray(osvi.szCSDVersion));
+    if(osvi.szCSDVersion)
+        result += QString("build %1 (%2)").arg(osvi.dwBuildNumber)
+            .arg(QString::fromWCharArray(osvi.szCSDVersion));
+    else
+        result += QString("build %1").arg(osvi.dwBuildNumber);
 #endif
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     struct utsname u;
