@@ -127,15 +127,15 @@ __declspec(dllexport) bool send_fw(LPWSTR file, int filesize)
 
                                                             if(SUCCEEDED(hr) || hr == WMDM_S_NOT_ALL_PROPERTIES_APPLIED
                                                                 || hr == WMDM_S_NOT_ALL_PROPERTIES_RETRIEVED)
+                                                            {
                                                                 return_value = true;
+                                                                hr = S_FALSE;
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
 										}
-										/* move to next Storage */
-										if(!return_value)
-											hr = pIEnumStorage->Next(1, (IWMDMStorage **)&pIStorage, &ulNumFetched);
 									}
 									pIEnumStorage->Release();
 								}
@@ -159,32 +159,3 @@ __declspec(dllexport) bool send_fw(LPWSTR file, int filesize)
 	return return_value;
 }
 }
-
-/*
- * Example code:
-
-#include <windows.h>
-int filesize(char* filename)
-{
-	FILE* fd;
-    int tmp;
-	fopen_s(&fd, filename, "r");
-    fseek(fd, 0, SEEK_END);
-    tmp = ftell(fd);
-	fclose(fd);
-    return tmp;
-}
-
-__declspec(dllimport) bool send_fw(LPWSTR file, int filesize);
-
-int _tmain(int argc, char* argv[])
-{
-	printf("Sending %s [%d]...\n", "Zlant.bin", filesize("Zlant.bin"));
-	if(send_fw(L"Zlant.bin", filesize("Zlant.bin")))
-		printf("Transmitting succesfull!\n");
-	else
-		printf("Transmitting failed!\n");
-	return 0;
-}
-
- */
