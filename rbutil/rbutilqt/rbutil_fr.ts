@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="fr">
+<defaultcodec></defaultcodec>
 <context>
     <name>BootloaderInstaller</name>
     <message>
@@ -330,7 +331,7 @@ Voir http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install (en anglais)
         <location filename="installbootloader.cpp" line="1017"/>
         <source>Warning this is a MacPod, Rockbox doesnt work on this. Convert it to WinPod
 See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
-        <translation type="unfinished"></translation>
+        <translation>Avertissement : Ceci est un MacPod, Rockbox ne fonctionnera pas dessus. Veuillez le convertir en WinPodVoir http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1196"/>
@@ -341,102 +342,102 @@ sansapatcher for the first time.
 See http://www.rockbox.org/wiki/SansaE200Install
 *********************************************
 </source>
-        <translation type="unfinished"></translation>
+        <translation>********************************************ANCIENNE INSTALLATION DE ROCKBOX DETECTEE, ANNULATION.Vous devez réinstaller le firmware original Sansa avant d&apos;exécutersansapatcher pour la première fois.Voir http://www.rockbox.org/wiki/SansaE200Install*********************************************</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1374"/>
         <source>Can&apos;t open input file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier d&apos;entrée</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1375"/>
         <source>Can&apos;t open output file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier de sortie</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1376"/>
         <source>invalid file: header length wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier invalide : longueur de l&apos;en-tête incorrecte</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1377"/>
         <source>invalid file: unrecognized header</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier invalide : en-tête non reconnu</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1378"/>
         <source>invalid file: &quot;length&quot; field wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier invalide : champ &quot;longueur&quot; erroné</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1379"/>
         <source>invalid file: &quot;length2&quot; field wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier invalide : champ &quot;longueur2&quot; erroné</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1380"/>
         <source>invalid file: internal checksum error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier invalide : erreur interne de somme de contrôle</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1381"/>
         <source>invalid file: &quot;length3&quot; field wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier invalide : champ &quot;longueur3&quot; erroné</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1382"/>
         <source>unknown</source>
-        <translation type="unfinished">inconnu</translation>
+        <translation>inconnu</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1341"/>
         <source>Error in descramble: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Error dans descramble : %1</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1353"/>
         <source>could not open input file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier d&apos;entrée</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1354"/>
         <source>reading header failed</source>
-        <translation type="unfinished"></translation>
+        <translation>La lecture de l&apos;en-tête a échoué</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1355"/>
         <source>reading firmware failed</source>
-        <translation type="unfinished"></translation>
+        <translation>La lecture du firmware a échoué</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1356"/>
         <source>can&apos;t open bootloader file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier de bootloader</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1357"/>
         <source>reading bootloader file failed</source>
-        <translation type="unfinished"></translation>
+        <translation>La lecture du fichier du bootloader a échoué</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1358"/>
         <source>can&apos;t open output file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier de sortie</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1359"/>
         <source>writing output file failed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;écriture du fichier de sortie a échoué</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1361"/>
         <source>Error in patching: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur dans la modification : %1</translation>
     </message>
     <message>
         <location filename="installbootloader.cpp" line="1384"/>
         <source>Error in scramble: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur dans scramble : %1</translation>
     </message>
 </context>
 <context>
@@ -583,17 +584,17 @@ Vous devez mettre votre lecteur en mode UMS pour l&apos;installation. </translat
     <message>
         <location filename="configure.cpp" line="218"/>
         <source>Current cache size is %L1 kiB.</source>
-        <translation type="unfinished"></translation>
+        <translation>La taille actuelle du cache est %L1 ko.</translation>
     </message>
     <message>
         <location filename="configure.cpp" line="537"/>
         <source>Detected an unsupported %1 player variant. Sorry, Rockbox doesn&apos;t run on your player.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une variante non supportée %1 de lecteur a été détectée. Malheuresement Rockbox ne supporte pas ce modèle.</translation>
     </message>
     <message>
         <location filename="configure.cpp" line="539"/>
         <source>Fatal error: incompatible player found</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur fatale : lecteur audio incompatible détecté</translation>
     </message>
 </context>
 <context>
@@ -754,7 +755,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="configurefrm.ui" line="420"/>
         <source>&amp;Select TTS Engine</source>
-        <translation type="unfinished">Profil &amp;TTS</translation>
+        <translation>&amp;Choisir un moteur TTS</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="384"/>
@@ -809,27 +810,27 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="configurefrm.ui" line="433"/>
         <source>Configure TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurer le moteur TTS</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="477"/>
         <source>Configuration invalid !</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration invalide !</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="457"/>
         <source>Configure &amp;TTS</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurer le moteur &amp;TTS</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="494"/>
         <source> Configure &amp;Enc</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurer l&apos;&amp;encodage</translation>
     </message>
     <message>
         <location filename="configurefrm.ui" line="505"/>
         <source>encoder name</source>
-        <translation type="unfinished"></translation>
+        <translation>nom de l&apos;encodeur</translation>
     </message>
 </context>
 <context>
@@ -845,47 +846,47 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="createvoicefrm.ui" line="16"/>
         <source>Create Voice File</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer un fichier de voix</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="41"/>
         <source>Select the Language you want to generate a voicefile for:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner la langue pour laquelle vous souhaitez générer un fichier de voix :</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="51"/>
         <source>Generation settings</source>
-        <translation type="unfinished">Paramètres de génération</translation>
+        <translation>Paramètres de génération</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="57"/>
         <source>Encoder profile:</source>
-        <translation type="unfinished">Profil d&apos;encodage :</translation>
+        <translation>Profil d&apos;encodage :</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="64"/>
         <source>TTS profile:</source>
-        <translation type="unfinished">Profil TTS :</translation>
+        <translation>Profil TTS :</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="77"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="128"/>
         <source>&amp;Install</source>
-        <translation type="unfinished">&amp;Installer</translation>
+        <translation>&amp;Installer</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="138"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Annuler</translation>
+        <translation>&amp;Annuler</translation>
     </message>
     <message>
         <location filename="createvoicefrm.ui" line="152"/>
         <source>Wavtrim Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>Seuil pour Wavtrim</translation>
     </message>
 </context>
 <context>
@@ -893,17 +894,17 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="createvoicewindow.cpp" line="104"/>
         <source>Selected TTS engine : &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Moteur TTS sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="createvoicewindow.cpp" line="106"/>
         <source>Selected TTS Engine: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Moteur TTS sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="createvoicewindow.cpp" line="119"/>
         <source>Selected Encoder: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Encodeur sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -911,42 +912,42 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="encexescfgfrm.ui" line="13"/>
         <source>Configuration</source>
-        <translation type="unfinished">Configuration</translation>
+        <translation>Configuration</translation>
     </message>
     <message>
         <location filename="encexescfgfrm.ui" line="19"/>
         <source>Configure Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurer l&apos;encodeur</translation>
     </message>
     <message>
         <location filename="encexescfgfrm.ui" line="31"/>
         <source>Path to Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Chemin vers l&apos;encodeur</translation>
     </message>
     <message>
         <location filename="encexescfgfrm.ui" line="43"/>
         <source>&amp;Browse</source>
-        <translation type="unfinished">&amp;Parcourir</translation>
+        <translation>&amp;Parcourir</translation>
     </message>
     <message>
         <location filename="encexescfgfrm.ui" line="52"/>
         <source>Encoder options</source>
-        <translation type="unfinished">Options de l&apos;encodeur</translation>
+        <translation>Options de l&apos;encodeur</translation>
     </message>
     <message>
         <location filename="encexescfgfrm.ui" line="77"/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Remettre à zéro</translation>
     </message>
     <message>
         <location filename="encexescfgfrm.ui" line="97"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="encexescfgfrm.ui" line="107"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Annuler</translation>
+        <translation>&amp;Annuler</translation>
     </message>
 </context>
 <context>
@@ -984,7 +985,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="install.cpp" line="250"/>
         <source>These are automatically built each day from the current development source code. This generally has more features than the last stable release but may be much less stable. Features may change regularly.</source>
-        <translation type="unfinished">Elles sont mises à jour chaque jour à partir du code source courant. Il y a généralement plus de fonctionnalités que dans la dernière version publique officielle mais le stabilité n&apos;est pas garantie. les fonctionnalités peuvent changer.</translation>
+        <translation>Celles-ci sont compilées chaque jour à partir du code source courant. Il y a généralement plus de fonctionnalités que dans la dernière version publique officielle mais le stabilité n&apos;est pas garantie. les fonctionnalités peuvent changer.</translation>
     </message>
     <message>
         <location filename="install.cpp" line="252"/>
@@ -994,22 +995,22 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="install.cpp" line="126"/>
         <source>Aborted!</source>
-        <translation type="unfinished"></translation>
+        <translation>Abandonné !</translation>
     </message>
     <message>
         <location filename="install.cpp" line="134"/>
         <source>Beginning Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Début de la sauvegarde...</translation>
     </message>
     <message>
         <location filename="install.cpp" line="149"/>
         <source>Backup successfull</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde effectuée avec succès</translation>
     </message>
     <message>
         <location filename="install.cpp" line="153"/>
         <source>Backup failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde échouée !</translation>
     </message>
 </context>
 <context>
@@ -1082,22 +1083,22 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
     <message>
         <location filename="installfrm.ui" line="156"/>
         <source>Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde</translation>
     </message>
     <message>
         <location filename="installfrm.ui" line="162"/>
         <source>Backup before installing</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarder avant d&apos;installer</translation>
     </message>
     <message>
         <location filename="installfrm.ui" line="169"/>
         <source>Backup location</source>
-        <translation type="unfinished"></translation>
+        <translation>Lieu de la sauvegarde</translation>
     </message>
     <message>
         <location filename="installfrm.ui" line="188"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier</translation>
     </message>
     <message>
         <location filename="installfrm.ui" line="207"/>
@@ -1106,7 +1107,7 @@ pour télécharger tous les fichiers néecessaires dans le cache.</translation>
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Backup Location:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;p, li { white-space: pre-wrap; }&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Lieu de la sauvegarde :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -1197,17 +1198,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="installtalkfrm.ui" line="82"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier</translation>
     </message>
     <message>
         <location filename="installtalkfrm.ui" line="141"/>
         <source>Generate .talk files for Folders</source>
-        <translation type="unfinished"></translation>
+        <translation>Générer des fichiers .talk pour les dossiers</translation>
     </message>
     <message>
         <location filename="installtalkfrm.ui" line="151"/>
         <source>Generate .talk files for Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Générer des fichiers .talk pour les fichiers</translation>
     </message>
 </context>
 <context>
@@ -1250,17 +1251,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="installtalkwindow.cpp" line="124"/>
         <source>Selected TTS engine : &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Moteur TTS sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="126"/>
         <source>Selected TTS Engine: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Moteur TTS sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="installtalkwindow.cpp" line="138"/>
         <source>Selected Encoder: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Encodeur sélectionné : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -1276,12 +1277,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="progressloggerfrm.ui" line="19"/>
         <source>Progress</source>
-        <translation type="unfinished">Avancement</translation>
+        <translation>Avancement</translation>
     </message>
     <message>
         <location filename="progressloggerfrm.ui" line="56"/>
         <source>&amp;Abort</source>
-        <translation type="unfinished">&amp;Annuler</translation>
+        <translation>&amp;Annuler</translation>
     </message>
 </context>
 <context>
@@ -1302,56 +1303,56 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="detect.cpp" line="110"/>
         <source>Guest</source>
-        <translation type="unfinished"></translation>
+        <translation>Invité</translation>
     </message>
     <message>
         <location filename="detect.cpp" line="113"/>
         <source>Admin</source>
-        <translation type="unfinished"></translation>
+        <translation>Administrateur</translation>
     </message>
     <message>
         <location filename="detect.cpp" line="116"/>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilisateur</translation>
     </message>
     <message>
         <location filename="detect.cpp" line="119"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="detect.cpp" line="222"/>
+        <location filename="detect.cpp" line="226"/>
         <source>(no description available)</source>
-        <translation type="unfinished"></translation>
+        <translation>(aucune description disponible)</translation>
     </message>
     <message>
-        <location filename="detect.cpp" line="414"/>
+        <location filename="detect.cpp" line="418"/>
         <source>Permissions are not sufficient! 
  Run with admin rights. 
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Les permissions sont insuffisantes !Veuillez lancer le programme avec les droits d&apos;administrateur.</translation>
     </message>
     <message>
-        <location filename="detect.cpp" line="427"/>
+        <location filename="detect.cpp" line="431"/>
         <source>Target mismatch detected. 
 
 Installed target: %1.
 New Target: %2.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Cibles incohérentes détectées.Cible installée : %1.Nouvelle cible : %2.</translation>
     </message>
     <message>
-        <location filename="detect.cpp" line="435"/>
+        <location filename="detect.cpp" line="439"/>
         <source>
  Do you want to continue ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Souhaitez-vous continuer ?</translation>
     </message>
     <message>
-        <location filename="detect.cpp" line="436"/>
+        <location filename="detect.cpp" line="440"/>
         <source>Problems detected</source>
-        <translation type="unfinished"></translation>
+        <translation>Des problèmes ont été détectés</translation>
     </message>
 </context>
 <context>
@@ -1359,17 +1360,17 @@ New Target: %2.
     <message>
         <location filename="rbspeexcfgfrm.ui" line="13"/>
         <source>Configuration</source>
-        <translation type="unfinished">Configuration</translation>
+        <translation>Configuration</translation>
     </message>
     <message>
         <location filename="rbspeexcfgfrm.ui" line="19"/>
         <source>Configure RbSpeex Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurer l&apos;encodeur RbSpeex</translation>
     </message>
     <message>
         <location filename="rbspeexcfgfrm.ui" line="38"/>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Volume</translation>
     </message>
     <message>
         <location filename="rbspeexcfgfrm.ui" line="45"/>
@@ -1379,27 +1380,27 @@ New Target: %2.
     <message>
         <location filename="rbspeexcfgfrm.ui" line="68"/>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Qualité</translation>
     </message>
     <message>
         <location filename="rbspeexcfgfrm.ui" line="85"/>
         <source>Complexity</source>
-        <translation type="unfinished"></translation>
+        <translation>Complexité</translation>
     </message>
     <message>
         <location filename="rbspeexcfgfrm.ui" line="115"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="rbspeexcfgfrm.ui" line="125"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Annuler</translation>
+        <translation>&amp;Annuler</translation>
     </message>
     <message>
         <location filename="rbspeexcfgfrm.ui" line="95"/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Remettre à zéro</translation>
     </message>
 </context>
 <context>
@@ -1477,7 +1478,7 @@ New Target: %2.
     <message>
         <location filename="rbutilqt.cpp" line="600"/>
         <source>Bootloader Installation</source>
-        <translation type="unfinished">Installation du bootloader annulée !</translation>
+        <translation>Installation du bootloader</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="561"/>
@@ -1600,57 +1601,57 @@ Voulez-vous vraiment l&apos;installer ?</translation>
         <location filename="rbutilqt.cpp" line="602"/>
         <source>The bootloader is already installed and up to date.
 Do want to replace the current bootloader?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bootloader est déjà installé et à jour.Souhaitez vous remplacer le bootloader actuel ?</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="606"/>
         <source>Bootloader installation skipped!</source>
-        <translation type="unfinished"></translation>
+        <translation>Etape d&apos;instllation du bootloader sautée !</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="185"/>
         <source>Your configuration is invalid. This is most likely due to a new installation of Rockbox Utility or a changed device path. The configuration dialog will now open to allow you correcting the problem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Votre configuration est invalide. Ceci est probablement dû à une nouvelle installation de l&apos;utilitaire Rockbox ou à un changement du chemin du périphérique. La fenêtre de configuration va s&apos;ouvrir pour vous permettre de corriger le problème.</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="482"/>
         <source>Aborted!</source>
-        <translation type="unfinished"></translation>
+        <translation>Abandonné !</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="490"/>
         <source>Installed Rockbox detected</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation de Rockbox détectée</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="491"/>
         <source>Rockbox installation detected. Do you want to backup first?</source>
-        <translation type="unfinished"></translation>
+        <translation>Une installation de Rockox a été détectée. Souhaitez-vous la sauvegarder avant de continuer ?</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="510"/>
         <source>Backup successfull</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde effectuée avec succès</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="514"/>
         <source>Backup failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde échouée !</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="691"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Avertissement</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="692"/>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;application est encore en train de télécharger les informations sur les dernières versions. Veuillez réessayer dans un instant.</translation>
     </message>
     <message>
         <location filename="rbutilqt.cpp" line="494"/>
         <source>Starting backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Début de la sauvegarde...</translation>
     </message>
 </context>
 <context>
@@ -2038,188 +2039,188 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="rbutilqtfrm.ui" line="146"/>
         <source>Complete Installation</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation complète</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="175"/>
         <source>Small Installation</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation minimale</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="814"/>
         <source>Action&amp;s</source>
-        <translation type="unfinished"></translation>
+        <translation>Action&amp;s</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="904"/>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Information</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="997"/>
         <source>Read PDF manual</source>
-        <translation type="unfinished"></translation>
+        <translation>Lire le manuel PDF</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="1002"/>
         <source>Read HTML manual</source>
-        <translation type="unfinished"></translation>
+        <translation>Lire le manuel HTML</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="1007"/>
         <source>Download PDF manual</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécharger le manuel PDF</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="1012"/>
         <source>Download HTML manual (zip)</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécharger le manuel HTML (zip)</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="526"/>
         <source>Create Voice files</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer des fichiers de voix</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="1023"/>
         <source>Create Voice File</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer un fichier de voix</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="162"/>
         <source>&lt;b&gt;Complete Installation&lt;/b&gt;&lt;br/&gt;This installs the bootloader, a current build and the extras package. This is the recommended method for new installations.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installation complète&lt;/b&gt;&lt;br/&gt;Ceci installe le bootloader, une version actuelle et le paquet des extras. C&apos;est la méthode recommandée pour les nouvelles installations.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="191"/>
         <source>&lt;b&gt;Small installation&lt;/b&gt;&lt;br/&gt;This installs bootloader and the current build of Rockbox. If you don&apos;t want the extras package, choose this option.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installation minimale&lt;/b&gt;&lt;br/&gt;Ceci installe le bootloader et la version actuelle de Rockbox. Si vous ne voulez pas le paquet des extras, choisissez cette option.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="256"/>
         <source>&lt;b&gt;Install the bootloader&lt;/b&gt;&lt;br/&gt;Before Rockbox can be run on your audio player, you may have to install a bootloader. This is only necessary the first time Rockbox is installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installer le bootloader&lt;/b&gt;&lt;br/&gt;Avant de pouvoir utiliser Rockbox sur votre lecteur audio, vous devez installer un bootloader. Ceci n&apos;est nécessaire que la première fois que vous installez Rockbox.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="285"/>
         <source>&lt;b&gt;Install Rockbox&lt;/b&gt; on your audio player</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installer Rockbox&lt;/b&gt; sur votre lecteur audio</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="353"/>
         <source>&lt;b&gt;Fonts Package&lt;/b&gt;&lt;br/&gt;The Fonts Package contains a couple of commonly used fonts. Installation is highly recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Paquet des polices de caractères&lt;/b&gt;&lt;br/&gt;Il contient des polices communément utilisées. Son installation est fortement recommandée.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="379"/>
         <source>&lt;b&gt;Install Themes&lt;/b&gt;&lt;br/&gt;Rockbox&apos; look can be customized by themes. You can choose and install several officially distributed themes.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installer des thèmes&lt;/b&gt;&lt;br/&gt;L&apos;apparence de Rockbox peut être personnalisée avec des thèmes. Vous pouvez choisir et installer plusieurs thèmes officiellement distribués.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="405"/>
         <source>&lt;b&gt;Install Game Files&lt;/b&gt;&lt;br/&gt;Doom needs a base wad file to run.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installer les fichiers de jeu&lt;/b&gt;&lt;br/&gt;Doom nécessite un fichier wad pour pouvoir être utilisé.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="467"/>
         <source>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Installer le fichier de voix&lt;/b&gt;&lt;br/&gt;Celui-ci est requis pour que Rockbox parle. La synthèse vocale est activée par défaut, donc si vous installez le fichier de voix, Rockbox parlera.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="493"/>
         <source>&lt;b&gt;Create Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles are needed to let Rockbox speak File and Foldernames</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Créer des fichiers d&apos;annonce&lt;/b&gt;&lt;br/&gt;Ceux-ci sont nécessaires pour que Rockbox énonce les noms des fichiers et des dossiers</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="542"/>
         <source>&lt;b&gt;Create Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so
  if you installed the voice file Rockbox will speak.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Créer le fichier de voix&lt;/b&gt;&lt;br/&gt;celui-ci est requis pour que Rockbox parle. La synthèse vocale est activée par défaut, doncsi vous installez le fichier de voix, Rockbox parlera.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="579"/>
         <source>&lt;b&gt;Remove the bootloader&lt;/b&gt;&lt;br/&gt;After removing the bootloader you won&apos;t be able to start Rockbox.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Désinstaller le bootloader&lt;/b&gt;&lt;br/&gt;Après avoir supprimé le bootloader, vous ne pourrez plus démarrer Rockbox.</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="605"/>
         <source>&lt;b&gt;Uninstall Rockbox from your audio player.&lt;/b&gt;&lt;br/&gt;This will leave the bootloader in place (you need to remove it manually).</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Désinstaller Rockbox de votre lecteur audio&lt;/b&gt;&lt;br/&gt;Ceci laissera le bootloader (vous devrez le supprimer manuellement).</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="759"/>
         <source>Currently installed packages.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; if you manually installed packages this might not be correct!</source>
-        <translation type="unfinished"></translation>
+        <translation>Paquets actuellement installés.&lt;br/&gt;&lt;b&gt;Note :&lt;/b&gt;Si vous avez installé manuellement des paquets, ceci ne sera peut-être pas correct !</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="804"/>
         <source>Abou&amp;t</source>
-        <translation type="unfinished"></translation>
+        <translation>A &amp;propos</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="920"/>
         <source>&amp;Small Installation</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation &amp;minimale</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="928"/>
         <source>Install &amp;Bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Installer le &amp;bootloader</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="936"/>
         <source>Install &amp;Rockbox</source>
-        <translation type="unfinished"></translation>
+        <translation>Installer &amp;Rockbox</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="944"/>
         <source>Install &amp;Fonts Package</source>
-        <translation type="unfinished"></translation>
+        <translation>Installer le pack des &amp;polices de caractères</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="952"/>
         <source>Install &amp;Themes</source>
-        <translation type="unfinished"></translation>
+        <translation>Installer des &amp;thèmes</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="960"/>
         <source>Install &amp;Game Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Installer les fichiers de &amp;jeu</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="968"/>
         <source>&amp;Install Voice File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Installer le fichier de voix</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="976"/>
         <source>Create &amp;Talk Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Installer les fichiers d&apos;&amp;annonce</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="984"/>
         <source>Remove &amp;bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Désinstaller le &amp;bootloader</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="992"/>
         <source>Uninstall &amp;Rockbox</source>
-        <translation type="unfinished"></translation>
+        <translation>Désinstaller &amp;Rockbox</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="1020"/>
         <source>Create &amp;Voice File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Créer le fichier de voix</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="1028"/>
         <source>&amp;System Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Informations &amp;système</translation>
     </message>
     <message>
         <location filename="rbutilqtfrm.ui" line="912"/>
         <source>&amp;Complete Installation</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation &amp;complète</translation>
     </message>
 </context>
 <context>
@@ -2227,52 +2228,52 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="sapicfgfrm.ui" line="13"/>
         <source>Configuration</source>
-        <translation type="unfinished">Configuration</translation>
+        <translation>Configuration</translation>
     </message>
     <message>
         <location filename="sapicfgfrm.ui" line="19"/>
         <source>Configure TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurer le moteur TTS</translation>
     </message>
     <message>
         <location filename="sapicfgfrm.ui" line="62"/>
         <source>TTS options</source>
-        <translation type="unfinished"></translation>
+        <translation>Options TTS</translation>
     </message>
     <message>
         <location filename="sapicfgfrm.ui" line="25"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Langue</translation>
     </message>
     <message>
         <location filename="sapicfgfrm.ui" line="87"/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Remettre à zéro</translation>
     </message>
     <message>
         <location filename="sapicfgfrm.ui" line="107"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="sapicfgfrm.ui" line="117"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Annuler</translation>
+        <translation>&amp;Annuler</translation>
     </message>
     <message>
         <location filename="sapicfgfrm.ui" line="35"/>
         <source>Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>Voix</translation>
     </message>
     <message>
         <location filename="sapicfgfrm.ui" line="45"/>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse</translation>
     </message>
     <message>
         <location filename="sapicfgfrm.ui" line="129"/>
         <source>Use Sapi 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser Sapi 4</translation>
     </message>
 </context>
 <context>
@@ -2280,27 +2281,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="sysinfo.cpp" line="39"/>
         <source>&lt;b&gt;OS&lt;/b&gt;&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Système d&apos;exploitation&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="40"/>
         <source>&lt;b&gt;Username:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Nom d&apos;utilisateur :&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="42"/>
         <source>&lt;b&gt;Permissions:&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Permissions :&lt;/b&gt;&lt;br/&gt;%1&lt;hr/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="44"/>
         <source>&lt;b&gt;Attached USB devices:&lt;/b&gt;&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Périphériques USB raccordés :&lt;/b&gt;&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="sysinfo.cpp" line="49"/>
         <source>VID: %1 PID: %2, %3&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>VID: %1 PID: %2, %3&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -2308,17 +2309,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="sysinfofrm.ui" line="13"/>
         <source>System Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Informations système</translation>
     </message>
     <message>
         <location filename="sysinfofrm.ui" line="22"/>
         <source>&amp;Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Rafraîchir</translation>
     </message>
     <message>
         <location filename="sysinfofrm.ui" line="45"/>
         <source>&amp;OK</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;OK</translation>
     </message>
 </context>
 <context>
@@ -2326,7 +2327,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="tts.cpp" line="114"/>
         <source>TTS executable not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Exécutable TTS non trouvé</translation>
     </message>
 </context>
 <context>
@@ -2334,42 +2335,42 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="ttsexescfgfrm.ui" line="13"/>
         <source>Configuration</source>
-        <translation type="unfinished">Configuration</translation>
+        <translation>Configuration</translation>
     </message>
     <message>
         <location filename="ttsexescfgfrm.ui" line="19"/>
         <source>Configure TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurer le moteur TTS</translation>
     </message>
     <message>
         <location filename="ttsexescfgfrm.ui" line="31"/>
         <source>Path to TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Chemin vers le moteur TTS</translation>
     </message>
     <message>
         <location filename="ttsexescfgfrm.ui" line="43"/>
         <source>&amp;Browse</source>
-        <translation type="unfinished">&amp;Parcourir</translation>
+        <translation>&amp;Parcourir</translation>
     </message>
     <message>
         <location filename="ttsexescfgfrm.ui" line="52"/>
         <source>TTS options</source>
-        <translation type="unfinished"></translation>
+        <translation>Options TTS</translation>
     </message>
     <message>
         <location filename="ttsexescfgfrm.ui" line="77"/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Remettre à zéro</translation>
     </message>
     <message>
         <location filename="ttsexescfgfrm.ui" line="97"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="ttsexescfgfrm.ui" line="107"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Annuler</translation>
+        <translation>&amp;Annuler</translation>
     </message>
 </context>
 <context>
@@ -2377,12 +2378,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="tts.cpp" line="181"/>
         <source>Could not copy the Sapi-script</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de copier le script Sapi</translation>
     </message>
     <message>
         <location filename="tts.cpp" line="202"/>
         <source>Could not start the Sapi-script</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de démarrer le script Sapi</translation>
     </message>
 </context>
 <context>
@@ -2390,47 +2391,47 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="talkfile.cpp" line="31"/>
         <source>Starting Talk file generation</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrage de la génération des fichiers d&apos;annonce</translation>
     </message>
     <message>
         <location filename="talkfile.cpp" line="41"/>
         <source>Init of TTS engine failed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;initialisation du moteur TTS a échoué</translation>
     </message>
     <message>
         <location filename="talkfile.cpp" line="52"/>
         <source>Init of Encoder engine failed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;initialisation de l&quot;encodeur a échoué</translation>
     </message>
     <message>
         <location filename="talkfile.cpp" line="75"/>
         <source>Talk file creation aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>Création des fichiers d&apos;annonce abandonnée</translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="143"/>
+        <location filename="talkfile.cpp" line="144"/>
         <source>Voicing of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Synthèse vocale de %1</translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="146"/>
+        <location filename="talkfile.cpp" line="147"/>
         <source>Voicing of %s failed</source>
-        <translation type="unfinished"></translation>
+        <translation>La synthèse vocale de %s a échoué</translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="155"/>
+        <location filename="talkfile.cpp" line="156"/>
         <source>Encoding of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Encodage de %1</translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="158"/>
+        <location filename="talkfile.cpp" line="159"/>
         <source>Encoding of %1 failed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;encodage de %1 a échoué</translation>
     </message>
     <message>
-        <location filename="talkfile.cpp" line="186"/>
+        <location filename="talkfile.cpp" line="188"/>
         <source>Finished creating Talk files</source>
-        <translation type="unfinished"></translation>
+        <translation>Création des fichiers d&apos;annonce terminée</translation>
     </message>
 </context>
 <context>
@@ -2510,7 +2511,7 @@ Veuillez vérifier vos paramètres réseau et proxy.</translation>
     <message>
         <location filename="installthemes.cpp" line="155"/>
         <source>Download size %L1 kiB</source>
-        <translation type="unfinished">Taille du téléchargement %1 ko</translation>
+        <translation>Taille du téléchargement %L1 ko</translation>
     </message>
     <message>
         <location filename="installthemes.cpp" line="168"/>
@@ -2722,72 +2723,72 @@ Veuillez vérifier vos paramètres réseau et proxy.</translation>
     <message>
         <location filename="voicefile.cpp" line="41"/>
         <source>Starting Voicefile generation</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrage de la génération du fichier de voix</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="55"/>
         <source>failed to open rockbox-info.txt</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir rockbox-info.txt</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="116"/>
         <source>Download error: received HTTP error %1.</source>
-        <translation type="unfinished">Erreur de téléchargement. Erreur HTTP %1.</translation>
+        <translation>Erreur de téléchargement : Erreur HTTP %1.</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="121"/>
         <source>Cached file used.</source>
-        <translation type="unfinished">Fichier en cache utilisé.</translation>
+        <translation>Fichier en cache utilisé.</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="123"/>
         <source>Download error: %1</source>
-        <translation type="unfinished">Erreur de téléchargement : %1</translation>
+        <translation>Erreur de téléchargement : %1</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="128"/>
         <source>Download finished.</source>
-        <translation type="unfinished">Téléchargement terminé.</translation>
+        <translation>Téléchargement terminé.</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="137"/>
         <source>failed to open downloaded file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier téléchargé</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="151"/>
         <source>Init of TTS engine failed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;initialisation du moteur TTS a échoué</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="163"/>
         <source>Init of Encoder engine failed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;initialisation de l&quot;encodeur a échoué</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="206"/>
         <source>The downloaded file was empty!</source>
-        <translation type="unfinished"></translation>
+        <translation>Le fichier téléchargé est vide !</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="245"/>
         <source>creating </source>
-        <translation type="unfinished"></translation>
+        <translation>création</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="268"/>
         <source>Error opening downloaded file</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de l&apos;ouverture du fichier téléchargé</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="277"/>
         <source>Error opening output file</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de l&apos;ouverture du fichier de sortie</translation>
     </message>
     <message>
         <location filename="voicefile.cpp" line="299"/>
         <source>successfully created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Créé avec succes.</translation>
     </message>
 </context>
 <context>
@@ -2929,9 +2930,9 @@ Veuillez vérifier vos paramètres réseau et proxy.</translation>
 
 © 2005 - 2008 The Rockbox Team.
 Released under the GNU General Public License v2.</source>
-        <translation type="unfinished">Installateur et utilitaire de gestion pour roxkbox, le firmware open source pour lecteurs audio numériques.
+        <translation>Installateur et utilitaire de gestion pour Rockbox, le firmware open source pour lecteurs audio numériques.
 
-© 2005 - 2007 L&apos;équipe Rockbox.
+© 2005 - 2008 L&apos;équipe Rockbox.
 Redistribué sous la GNU General Public License v2.</translation>
     </message>
     <message>
