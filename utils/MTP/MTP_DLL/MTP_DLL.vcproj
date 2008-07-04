@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="d:\wmsdk\wmfsdk95\include;d:\wmsdk\wmfsdk95\wmdm\inc"
+				AdditionalIncludeDirectories="c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;MTP_DLL_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="mssachlp.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="d:\wmsdk\wmfsdk95\lib,d:\wmsdk\wmfsdk95\wmdm\lib"
+				AdditionalLibraryDirectories="c:\wmsdk\wmfsdk95\lib,c:\wmsdk\wmfsdk95\wmdm\lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -118,7 +118,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="d:\wmsdk\wmfsdk95\include;d:\wmsdk\wmfsdk95\wmdm\inc"
+				AdditionalIncludeDirectories="c:\wmsdk\wmfsdk95\include;c:\wmsdk\wmfsdk95\wmdm\inc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;MTP_DLL_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -139,7 +139,8 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="mssachlp.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="d:\wmsdk\wmfsdk95\lib,d:\wmsdk\wmfsdk95\wmdm\lib"
+				AdditionalLibraryDirectories="c:\wmsdk\wmfsdk95\lib,c:\wmsdk\wmfsdk95\wmdm\lib"
+				GenerateManifest="true"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"

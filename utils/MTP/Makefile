@@ -8,7 +8,7 @@ $(OUTPUT): sendfirm.c
 	gcc $(CFLAGS) $(LIBS) -o $(OUTPUT) sendfirm.c
 
 $(OUTPUT).exe: sendfirm_win.c
-	gcc $(CFLAGS) -o $(OUTPUT).exe sendfirm_win.c MTP_DLL.dll
+	mingw32-gcc $(CFLAGS) -o $(OUTPUT).exe sendfirm_win.c MTP_DLL.dll
 
 clean:
 	rm -f $(OUTPUT)
