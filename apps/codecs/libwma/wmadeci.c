@@ -1178,7 +1178,6 @@ static int wma_decode_block(WMADecodeContext *s)
 
         if (s->version == 1)
         {
-            fixed32 tmp =  fixtoi32(fixsqrt32(itofix32(n4)));
              mdct_norm *= fixtoi32(fixsqrt32(itofix32(n4)));
         }
     }
