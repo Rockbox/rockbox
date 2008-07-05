@@ -876,8 +876,9 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
             *q++ = v;
         }
         while (--n);
+    } else {
+       last_exp = 36;
     }
-    last_exp = 36;
 
     while (q < q_end)
     {
@@ -1171,15 +1172,14 @@ static int wma_decode_block(WMADecodeContext *s)
 
     {
         int n4 = s->block_len >> 1;
-        //mdct_norm = 0x10000;
-        //mdct_norm = fixdiv32(mdct_norm,itofix32(n4));
 
-        mdct_norm = 0x10000>>(s->block_len_bits-1);        //theres no reason to do a divide by two in fixed precision ...
+
+        mdct_norm = 0x10000>>(s->block_len_bits-1);
 
         if (s->version == 1)
         {
             fixed32 tmp =  fixtoi32(fixsqrt32(itofix32(n4)));
-            mdct_norm *= tmp; // PJJ : exercise this path
+             mdct_norm *= fixtoi32(fixsqrt32(itofix32(n4)));
         }
     }
 
@@ -1322,9 +1322,12 @@ static int wma_decode_block(WMADecodeContext *s)
             {
                 /*Noise coding not used, simply convert from exp to fixed representation*/
 
-
                 fixed32 mult3 = (fixed32)(fixdiv64(pow_table[total_gain+20],Fixed32To64(s->max_exponent[ch])));
                 mult3 = fixmul32(mult3, mdct_norm);
+
+                /*zero the first 3 coefficients for WMA V1, does nothing otherwise*/
+                for(i=0; i<s->coefs_start; i++)
+                    *coefs++=0;
 
                 n = nb_coefs[ch];
 
