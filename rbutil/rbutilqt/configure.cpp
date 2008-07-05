@@ -413,7 +413,8 @@ QString Config::languageName(const QString &qmFile)
     if(!translator.load(file, programPath))
         translator.load(file, ":/lang");
 
-    return translator.translate("Configure", "English");
+    return translator.translate("Configure", "English",
+        "This is the localized language name, i.e. your language.");
 }
 
 
