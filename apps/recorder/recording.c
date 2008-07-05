@@ -961,7 +961,7 @@ bool recording_screen(bool no_source)
         vp[i].font = FONT_SYSFIXED;
         screens[i].set_viewport(&vp[i]);
         screens[i].getstringsize("M", &w, &h);
-        filename_offset[i] = ((vp[i].height >= 80) ? 1 : 0);
+        filename_offset[i] = ((vp[i].height >= 7*h) ? 1 : 0);
         pm_y[i] = h * (2 + filename_offset[i]);
     }
 
